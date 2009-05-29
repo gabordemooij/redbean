@@ -47,7 +47,7 @@
 
 	All advertising materials mentioning features or use of this software
     are encouraged to display the following acknowledgement:
-    This product is powered by RedBean written by Gabor de Mooij (Buurtnerd.nl/#redbean)
+    This product is powered by RedBean written by Gabor de Mooij (www.buurtnerd.nl/redbean.htm)
     
 
 									----
