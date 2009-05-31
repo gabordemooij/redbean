@@ -1963,7 +1963,56 @@ class RedBean_OODB {
 				$db->exec($unassocSQL);
 			}
 		}
-
+		
+		/**
+		 * Counts the associations between a type and a bean
+		 * @param $type
+		 * @param $bean
+		 * @return integer $numberOfRelations
+		 */
+		public static function numofRelated( $type, OODBBean $bean ) {
+			
+			//get a database
+			$db = self::$db;
+			
+			$t2 = strtolower( $db->escape( $type ) );
+						
+			//is this bean valid?
+			self::checkBean( $bean );
+			$t1 = strtolower( $bean->type  );
+			$tref = strtolower( $db->escape( $bean->type ) );
+			$id = intval( $bean->id );
+						
+			//infer the association table
+			$tables = array();
+			array_push( $tables, $t1 );
+			array_push( $tables, $t2 );
+			
+			//sort the table names to make sure we only get one assoc table
+			sort($tables);
+			$assoctable = $db->escape( implode("_",$tables) );
+			
+			//get all tables
+			$tables = self::showTables();
+			
+			if ($tables && is_array($tables) && count($tables) > 0) {
+				if (in_array( $t1, $tables ) && in_array($t2, $tables)){
+					$sqlCountRelations = "
+						SELECT COUNT(1) 
+						FROM `$assoctable` WHERE 
+						".$t1."_id = $id
+					";
+					
+					return (int) $db->getCell( $sqlCountRelations );
+				}
+			}
+			else {
+				return 0;
+			}
+			
+			
+		}
+		
 		/**
 		 * Performs database garbage collection,
 		 * keeps database in shape
@@ -2427,6 +2476,11 @@ class RedBean_Decorator {
 			$type = strtolower( substr( $method, 12 ) );
 			RedBean_OODB::deleteAllAssocType($type, $this->data);
 			return $this;
+		}
+		else if (strpos($method,"numof")===0) {
+			$type = strtolower( substr( $method, 5 ) );
+			return RedBean_OODB::numOfRelated($type, $this->data);
+			
 		}
 	}
 
