@@ -1221,6 +1221,26 @@ function testsperengine() {
 	if ($kwak->getName() != $kwak2->getName()) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); ;
 	
 	
+	SmartTest::instance()->canwe="countRelated";
+	R::gen("Blog,Comment");
+	$blog = new Blog;
+	$blog2 = new Blog;
+	$blog->setTitle("blog1");
+	$blog2->setTitle("blog2");
+	for($i=0; $i<5; $i++){
+		$comment = new Comment;
+		$comment->setText( "comment no.  $i " );
+		$blog->add( $comment );	
+	}
+	for($i=0; $i<3; $i++){
+		$comment = new Comment;
+		$comment->setText( "comment no.  $i " );
+		$blog2->add( $comment );	
+	}
+	
+	if ($blog->numofComment()!==5) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); ;
+	if ($blog2->numofComment()!==3) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); ;
+	
 	
 	Redbean_OODB::clean();
 }
