@@ -2339,11 +2339,11 @@ class RedBean_Decorator {
 	}
 
 	/**
-	 * Imports an array
+	 * Imports an array or object
 	 * If this function returns boolean true, no problems
 	 * have occurred during the import and all values have been copies
 	 * succesfully. 
-	 * @param $arr
+	 * @param $arr or $obj
 	 * @return boolean $anyproblems
 	 */
 	public function import( $arr ) {
@@ -2776,6 +2776,8 @@ class RedBean_Decorator {
 				$bean[$prop] = $value;
 			}
 		}
+		
+		return $bean;
 	}
 
 
