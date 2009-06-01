@@ -482,7 +482,7 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getInsertID() {
-		self::$log[] = $sql;
+		// self::$log[] = $sql;
 		return $this->db->getInsertID();
 	}
 
@@ -491,7 +491,7 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getAffectedRows() {
-		self::$log[] = $sql;
+		// self::$log[] = $sql;
 		return $this->db->Affected_Rows();
 	}
 
