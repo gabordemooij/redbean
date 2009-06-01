@@ -16,6 +16,12 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
 |RedBean Database Objects -
 |Written by Gabor de Mooij (c) copyright 2009
+
+
+|List of Contributors:
+|Sean Hess 
+|
+
 ======================================================
 |						       RedBean is Licensed BSD
 ------------------------------------------------------
