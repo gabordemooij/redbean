@@ -1672,6 +1672,9 @@ class RedBean_OODB {
 				return array(); //nope, so no associations...!
 			}
 			else {
+				if ($t1==$t2) {
+					$t2.="2";
+				}
 				$getassocSQL = "SELECT `".$t2."_id` FROM `$assoctable` WHERE `".$t1."_id` = $id ";
 				$rows = $db->getCol( $getassocSQL );
 				$beans = array();
