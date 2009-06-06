@@ -1242,6 +1242,18 @@ function testsperengine() {
 	if ($blog2->numofComment()!==3) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); ;
 	
 	
+	SmartTest::instance()->canwe="associate tables of the same name";
+	$blog = new Blog;
+	$blogb = new Blog;
+	$blog->title='blog a';
+	$blogb->title='blog b';
+	$blog->add( $blogb );
+	$b = $blog->getRelatedBlog();
+	if (count($b)!==1) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); ;
+	$b=	array_pop($b);
+	if ($b->title!='blog b') {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	
+	
 	Redbean_OODB::clean();
 }
 
