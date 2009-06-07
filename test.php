@@ -1254,6 +1254,16 @@ function testsperengine() {
 	if ($b->title!='blog b') {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
 	
 	
+	SmartTest::instance()->canwe="inferTypeII patch";
+	$blog->rating = 4294967295;
+	$blog->save();
+	$id = $blog->getID();
+	$blog2->rating = -1;
+	$blog2->save();
+	$blog = new Blog( $id );
+	if ($blog->getRating()!=4294967295) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+
+	
 	Redbean_OODB::clean();
 }
 

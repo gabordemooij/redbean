@@ -575,7 +575,7 @@ class RedBean_OODB {
 	public static $typeno_sqltype = array(
 		" TINYINT(3) UNSIGNED ",
 		" INT(11) UNSIGNED ",
-		" INT(11) SIGNED ",
+		" BIGINT(20) SIGNED ",
 		" VARCHAR(255) ",
 		" TEXT "
 		);
@@ -587,7 +587,7 @@ class RedBean_OODB {
 		public static $sqltype_typeno = array(
 		"tinyint(3) unsigned"=>0,
 		"int(11) unsigned"=>1,
-		"int(11) signed"=>2,
+		"bigint(20) signed"=>2,
 		"varchar(255)"=>3,
 		"text"=>4
 		);
@@ -970,13 +970,15 @@ class RedBean_OODB {
 			//generate the basic redbean tables
 			//Create the RedBean tables we need -- this should only happen once..
 			if (!self::$frozen) {
+				
+				self::$db->exec("drop tables dtyp");
 					
 				self::$db->exec("
 			CREATE TABLE IF NOT EXISTS `dtyp` (
 			  `id` int(11) unsigned NOT NULL auto_increment,
 			  `tinyintus` tinyint(3) unsigned NOT NULL,
 			  `intus` int(11) unsigned NOT NULL,
-			  `ints` int(11) NOT NULL,
+			  `ints` bigint(20) NOT NULL,
 			  
 			  `varchar255` varchar(255) NOT NULL,
 			  PRIMARY KEY  (`id`)
