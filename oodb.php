@@ -2133,7 +2133,7 @@ class RedBean_OODB {
 		public static function gen( $classes ) {
 			$classes = explode(",",$classes);
 			foreach($classes as $c) {
-				if ($c!=="" && $c!=="null" && !is_numeric($c) && !class_exists($c) && preg_match("/^[A-Za-z0-9_]+$/",$c)){
+				if ($c!=="" && $c!=="null" && !class_exists($c) && preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$c)){
 					try{
 						eval("class ".$c." extends RedBean_Decorator {
 							public function __construct(\$id=0, \$lock=false) {
