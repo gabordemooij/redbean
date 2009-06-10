@@ -2126,7 +2126,9 @@ class RedBean_OODB {
 		/**
 		 * Accepts a comma separated list of class names and
 		 * creates a default model for each classname mentioned in
-		 * this list
+		 * this list. Note that you should not gen() classes
+		 * for which you already created a model (by inheriting
+		 * from ReadBean_Decorator).
 		 * @param string $classes
 		 * @return unknown_type
 		 */
