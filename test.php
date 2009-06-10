@@ -1262,8 +1262,20 @@ function testsperengine() {
 	$blog2->save();
 	$blog = new Blog( $id );
 	if ($blog->getRating()!=4294967295) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
-
 	
+	SmartTest::instance()->canwe="Longtext column type";
+	$blog->message = str_repeat("x",65535);
+	$blog->save();
+	$blog = new Blog( $id );
+	if (strlen($blog->message)!=65535) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress();
+	$rows = RedBean_OODB::$db->get("describe blog");
+	if($rows[3]["Type"]!="text")  {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	$blog->message = str_repeat("x",65536);
+	$blog->save();
+	$blog = new Blog( $id );
+	if (strlen($blog->message)!=65536) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress();
+	$rows = RedBean_OODB::$db->get("describe blog");
+	if($rows[3]["Type"]!="longtext")  {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
 	Redbean_OODB::clean();
 }
 

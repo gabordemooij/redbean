@@ -577,7 +577,8 @@ class RedBean_OODB {
 		" INT(11) UNSIGNED ",
 		" BIGINT(20) SIGNED ",
 		" VARCHAR(255) ",
-		" TEXT "
+		" TEXT ",
+		" LONGTEXT "
 		);
 
 		/**
@@ -589,14 +590,15 @@ class RedBean_OODB {
 		"int(11) unsigned"=>1,
 		"bigint(20) signed"=>2,
 		"varchar(255)"=>3,
-		"text"=>4
+		"text"=>4,
+		"longtext"=>5
 		);
 
 		/**
 		 * @var array all dtype types
 		 */
 		public static $dtypes = array(
-		"tintyintus","intus","ints","varchar255","text"
+		"tintyintus","intus","ints","varchar255","text","ltext"
 		);
 
 		/**
@@ -915,10 +917,10 @@ class RedBean_OODB {
 			$db = self::$db;
 			$rawv = $v;
 			$v = "'".$db->escape(strval($v))."'";
-			$checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v )";
+			$checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v )";
 			$db->exec( $checktypeSQL );
 			$id = $db->getInsertID();
-			$readtypeSQL = "select tinyintus,intus,ints,varchar255 from dtyp where id=$id";
+			$readtypeSQL = "select tinyintus,intus,ints,varchar255,`text` from dtyp where id=$id";
 			$row=$db->getRow($readtypeSQL);
 			$db->exec("truncate table dtyp");
 			$tp = 0;
@@ -981,6 +983,7 @@ class RedBean_OODB {
 			  `ints` bigint(20) NOT NULL,
 			  
 			  `varchar255` varchar(255) NOT NULL,
+			  `text` text NOT NULL,
 			  PRIMARY KEY  (`id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 			");
