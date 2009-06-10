@@ -20,7 +20,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
 |List of Contributors:
 |Sean Hess 
-|
+|Alan Hogan
 
 ======================================================
 |						       RedBean is Licensed BSD
