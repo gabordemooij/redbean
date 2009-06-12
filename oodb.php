@@ -1264,6 +1264,39 @@ class RedBean_OODB {
 				return $no;
 			}
 		}
+		
+		/**
+		 * Gets
+		 *
+		 * @param String Object type e.g. "user" (lowercase!)
+		 * @param String Field/parameter e.g. "zip"
+		 * @return Array list of beans with distinct values of $field. Uses GROUP BY
+		 * @author Alan J. Hogan
+		 **/
+		function distinct($type, $field)
+		{
+			//TODO: Consider if GROUP BY (equivalent meaning) is more portable 
+			//across DB types?
+			$db = self::$db;
+			$type = $db->escape( $type );
+			$field = $db->escape( $field );
+		
+			$alltables = self::showTables();
+
+			if (!in_array($type, $alltables)) {
+				return array();
+			}
+			else {
+				$ids = $db->getCol("SELECT id FROM `$type` GROUP BY $field");
+				$beans = array();
+				if (is_array($ids) && count($ids)>0) {
+					foreach( $ids as $id ) {
+						$beans[ $id ] = self::getById( $type, $id , false);
+					}
+				}
+				return $beans;
+			}
+		}
 
 		/**
 		 * Simple statistic
