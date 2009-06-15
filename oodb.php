@@ -1266,14 +1266,14 @@ class RedBean_OODB {
 		}
 		
 		/**
-		 * Gets
+		 * Gets all beans of $type, grouped by $field.
 		 *
 		 * @param String Object type e.g. "user" (lowercase!)
 		 * @param String Field/parameter e.g. "zip"
 		 * @return Array list of beans with distinct values of $field. Uses GROUP BY
 		 * @author Alan J. Hogan
 		 **/
-		function distinct($type, $field)
+		static function distinct($type, $field)
 		{
 			//TODO: Consider if GROUP BY (equivalent meaning) is more portable 
 			//across DB types?
