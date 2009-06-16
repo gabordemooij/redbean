@@ -596,6 +596,7 @@ function testsperengine() {
 	if (RedBean_OODB::minof("stattest","amount")!=1) die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); else SmartTest::instance()->progress(); 
 	if (RedBean_OODB::avgof("stattest","amount")!=2) die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); else SmartTest::instance()->progress(); 
 	if (RedBean_OODB::sumof("stattest","amount")!=6) die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); else SmartTest::instance()->progress(); 
+	if (count(RedBean_OODB::distinct("stattest","amount"))!=3) die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); else SmartTest::instance()->progress(); 
 	
 	//test list function
 	SmartTest::instance()->canwe = "can we use list functions using Redbean?";
