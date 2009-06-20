@@ -1288,9 +1288,43 @@ try{RedBean_OODB::setEngine(""); die("<b style='color:red'>Error CANNOT:".SmartT
 
 
 RedBean_OODB::setEngine("myisam");
+
+SmartTest::instance()->canwe="performance monitor";
+R::gen("Patient");
+$patient = new Patient;
+$patient->surname="Van Dalen";
+$patient->address="Street 1";
+$patient->save();
+for( $i=0; $i<100; $i++ ){ 
+$patient = new Patient;
+$patient->surname="Waals $i ";
+$patient->address="Street 2$i ";
+$patient->save();
+}
+$dummy = new Patient;
+$dummy->address = "lane";
+$db->exec("update searchindex set cnt=100 where ind='patient.address' ");
+$db->exec("update searchindex set cnt=0 where ind!='patient.address' ");
+if (count($db->get("SHOW INDEX FROM patient"))!==1){ die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress();
+Patient::find( $dummy, array("address"=>"="));
+if ($db->getCell("select cnt from searchindex where ind='patient.address'")!=101){ die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress();
+R::optimizeIndexes( true );
+if (count($db->get("SHOW INDEX FROM patient"))!==2){ die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress();
+$db->exec(" update patient set address='street same' ");
+R::optimizeIndexes( true );
+if (count($db->get("SHOW INDEX FROM patient"))!==1){ die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress();
+$db->exec(" update patient set address=rand() ");
+R::optimizeIndexes( true );
+if (count($db->get("SHOW INDEX FROM patient"))!==2){ die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress();
+$db->exec("update searchindex set cnt=0 where ind='patient.address' ");
+$db->exec("update searchindex set cnt=100 where ind!='patient.address' ");
+R::optimizeIndexes( true );
+if (count($db->get("SHOW INDEX FROM patient"))!==1){ die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress();
+
 testsperengine();
 RedBean_OODB::setEngine("innodb");
 testsperengine();
+
 
 
 SmartTest::instance()->progress(); ; SmartTest::instance()->canwe = "clean up the database?";

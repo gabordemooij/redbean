@@ -2214,49 +2214,75 @@ class RedBean_OODB {
 		 * Checks the database whether extra indexes need to be created
 		 * @return unknown_type
 		 */
-		public static function optimizeIndexes() {
+		public static function optimizeIndexes( $takefirst=false ) {
 
 			if (self::$frozen) {
 				return false;
 			}
 
 			$db = self::$db;
-
+			
+			$num = (int) $db->getCell("select count(*) from searchindex");
+			$limit = floor($num/2);			
+			if ($limit < 2) return true;
+			
 			//what is a high number in our searchindex table?
-			$cnts = $db->get("select ind, cnt from searchindex order by cnt desc limit 50");
-
+			$cnts = $db->get("select ind, cnt from searchindex order by cnt desc limit $limit ");
+			
 			if ($cnts && is_array($cnts) && count($cnts)>0) {
 					
 				//take a random column-table combination
-				$info = $cnts[ array_rand( $cnts, 1 ) ];
+				if (!$takefirst) {
+					$info = $cnts[ array_rand( $cnts, 1 ) ];	
+				}
+				else {
+					$info = $cnts[ 0 ];
+				}
 					
 				$parts = explode(".",$info["ind"]);
 				$table = $parts[0];
 				$column = $parts[1];
-					
+				
 				//Is this column worth the trouble?
-				$variance = $db->getCell("select count(*) from $table group by $column ");
+				$variance = $db->getCell("select count( distinct $column ) from $table");
 				$records = $db->getCell("select count(*) from $table");
 					
-				if (!$records) {
-					return true;
+				if ($records) {
+					$relvar = intval($variance) / intval($records); //how useful would this index be?
+					//if this column describes the table well enough it might be used to
+					//improve overall performance.
+					$indexname = "reddex_".$column;
+					if ($records > 1 && $relvar > 0.85) {
+						$sqladdindex="ALTER IGNORE TABLE `$table` ADD INDEX $indexname (`$column`)";
+						$db->exec( $sqladdindex );
+					}
+					else {
+						$sqldropindex = "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
+						$db->exec( $sqldropindex );
+					}
 				}
-					
-				$relvar = intval($variance) / intval($records); //how useful would this index be?
-					
-				//if this column describes the table well enough it might be used to
-				//improve overall performance.
-				$indexname = "reddex_".$column;
-				if ($records > 1 && $relvar > 0.85) {
-					$sqladdindex="ALTER IGNORE TABLE `$table` ADD INDEX $indexname (`$column`)";
-					$db->exec( $sqladdindex );
+			}
+			
+			//Now, remove redundant indexes.
+			//what is a low number in our searchindex table?
+			$cnts = $db->get("select ind, cnt from searchindex order by cnt asc limit $limit");
+			if ($cnts && is_array($cnts) && count($cnts)>0) {
+				
+				//take a random column-table combination
+				if (!$takefirst) {
+					$info = $cnts[ array_rand( $cnts, 1 ) ];	
 				}
 				else {
-					$sqldropindex = "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
-					$db->exec( $sqldropindex );
+					$info = $cnts[ 0 ];
 				}
-
+				$parts = explode(".",$info["ind"]);
+				$table = $parts[0];
+				$column = $parts[1];
+				$indexname = "reddex_".$column;
+				$sqldropindex = "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
+				$db->exec( $sqldropindex );
 			}
+			
 			return true;
 		}
 
