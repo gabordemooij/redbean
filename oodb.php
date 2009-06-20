@@ -2462,7 +2462,7 @@ class RedBean_Decorator {
 	 */
 	public function __get( $name ) {
 		$name = strtolower( $name );
-		return $this->data->$name;
+		return isset($this->data->$name) ? $this->data->$name : null;
 	}
 	
 	/**
