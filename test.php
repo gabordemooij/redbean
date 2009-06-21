@@ -965,7 +965,7 @@ function testsperengine() {
 	
 	
 	SmartTest::instance()->progress(); ; SmartTest::instance()->canwe = "avoid race-conditions by locking?";
-	RedBean_OODB::gen("Cheese","Wine");
+	RedBean_OODB::gen("Cheese,Wine");
 	$cheese = new Cheese;
 	$cheese->setName('Brie');
 	$cheese->save();
@@ -984,7 +984,36 @@ function testsperengine() {
 	}
 	if (!$ok) die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); 
 	
+	SmartTest::instance()->progress();
+	$bordeaux = new Wine;
+	$bordeaux->setRegion("Bordeaux");
 	
+	try{
+	$bordeaux->add( $cheese );
+	}
+	catch(ExceptionFailedAccessBean $e) {
+		$ok=1;
+	}
+	if (!$ok) die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); 
+	SmartTest::instance()->progress();
+	
+	try{
+	$bordeaux->attach( $cheese );
+	}
+	catch(ExceptionFailedAccessBean $e) {
+		$ok=1;
+	}
+	if (!$ok) die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); 
+	SmartTest::instance()->progress();
+	
+	try{
+	$bordeaux->add( new Wine() );
+	$ok=1;
+	}
+	catch(ExceptionFailedAccessBean $e) {
+		$ok=0;
+	}
+	if (!$ok) die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); 
 	
 	SmartTest::instance()->progress(); ;
 	RedBean_OODB::$pkey = $oldkey;
@@ -1001,7 +1030,7 @@ function testsperengine() {
 	if (!$ok) die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); 
 	
 	
-	
+	SmartTest::instance()->progress();
 	try{
 	RedBean_OODB::$pkey = 999;
 	RedBean_OODB::setLockingTime(0);
