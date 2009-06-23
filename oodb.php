@@ -1146,11 +1146,11 @@ class RedBean_OODB {
 			$openSQL = "INSERT INTO locking VALUES(\"$tbl\",$id,\"".self::$pkey."\",\"".time()."\") ";
 			$trials = 0;
 			$aff = 0;
-			while( $aff < 1 && $trials < 3 ) {
+			while( $aff < 1 && $trials < 5 ) {
 				$db->exec($openSQL);
 				$aff = $db->getAffectedRows();
 				$trials++;
-				if ($aff < 1) sleep(1); //half a sec
+				if ($aff < 1) usleep(500000); //half a sec
 			}
 
 			if ($trials > 4) {
