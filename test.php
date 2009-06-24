@@ -1332,6 +1332,12 @@ $patient->save();
 }
 $dummy = new Patient;
 $dummy->address = "lane";
+$db->exec("insert into searchindex VALUES(null,'filler1',0) ");
+$db->exec("insert into searchindex VALUES(null,'filler2',0) ");
+$db->exec("insert into searchindex VALUES(null,'filler3',0) ");
+$db->exec("insert into searchindex VALUES(null,'filler4',0) ");
+$db->exec("insert into searchindex VALUES(null,'filler5',0) ");
+$db->exec("insert into searchindex VALUES(null,'patient.address',0) ");
 $db->exec("update searchindex set cnt=100 where ind='patient.address' ");
 $db->exec("update searchindex set cnt=0 where ind!='patient.address' ");
 if (count($db->get("SHOW INDEX FROM patient"))!==1){ die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress();

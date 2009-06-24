@@ -21,6 +21,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 |List of Contributors:
 |Sean Hess 
 |Alan Hogan
+|Desfrenes
 
 ======================================================
 |						       RedBean is Licensed BSD
@@ -96,8 +97,13 @@ Put your database configuration here
 //Standard configurations, you may override them in your own code before inclusion if
 //you don't want to alter these values here.
 
+
 if (!isset($hostname))
 $hostname = "localhost"; //the host where we should connect to...
+
+//Uncomment these 2 lines if you prefer PDO
+//if (!isset($dsn))
+//$dsn = "mysql:host=$hostname;dbname=oodb";
 
 if (!isset($databasename))
 $databasename = "oodb"; //the name of the database we should select
@@ -122,6 +128,11 @@ $debugmode = false; //do you want to see the queries RedBean performs?
 //Uncomment to activate - Database ENGINE : MySQL - InnoDB
 $engine = "innodb";
 
+//--------------------------------- 
+//Use this setting if you want RedBean to reset all its tables: dont touch this if you are not
+//a redbean developer:
+//$for_testing_reset_redbean = true;
+//----------------------------------
 
 //Advanced configurations -- use with care
 $freeze = false; //freeze the database, RedBean wont change your tables anymore if TRUE !
@@ -394,6 +405,161 @@ class MySQLDatabase implements IGenericDatabaseDriver {
 
 }
 
+/**
+ * PDO support driver
+ * the PDO driver has been written by Desfrenes.
+ */
+class PDODriver implements IGenericDatabaseDriver {
+    private static $instance;
+    
+    private $debug = false;
+    private $pdo;
+    private $affected_rows;
+    private $rs;
+    
+    public static function getInstance($dsn, $user, $pass, $dbname)
+    {
+        if(is_null(self::$instance))
+        {
+            self::$instance = new PDODriver($dsn, $user, $pass);
+        }
+        return self::$instance;
+    }
+    
+    public function __construct($dsn, $user, $pass)
+    {
+        $this->pdo = new PDO(
+                $dsn,
+                $user,
+                $pass,
+                array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+                      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC)
+            );
+    }
+    
+    public function GetAll( $sql )
+    {
+    	try{ 
+	        if ($this->debug)
+	        {
+	            echo "<HR>" . $sql;
+	        }
+	        $rs = $this->pdo->query($sql);
+	        $this->rs = $rs;
+	        $rows = $rs->fetchAll();
+	        if(!$rows)
+	        {
+	            $rows = array();
+	        }
+	        
+	        if ($this->debug)
+	        {
+	            if (count($rows) > 0)
+	            {
+	                echo "<br><b style='color:green'>resultset: " . count($rows) . " rows</b>";
+	            }
+	            
+	            $str = $this->Errormsg();
+	            if ($str != "")
+	            {
+	                echo "<br><b style='color:red'>" . $str . "</b>";
+	            }
+	        }
+    	}
+    	catch(Exception $e){}
+        return $rows;
+    }
+    
+    public function GetCol($sql)
+    {
+    	try{
+	        $rows = $this->GetAll($sql);
+	        $cols = array();
+	 
+	        if ($rows && is_array($rows) && count($rows)>0){
+		        foreach ($rows as $row)
+		        {
+		            $cols[] = array_shift($row);
+		        }
+	        }
+	    	
+    	}
+    	catch(Exception $e){}
+        return $cols;
+    }
+ 
+    public function GetCell($sql)
+    {
+    	try{
+	        $arr = $this->GetAll($sql);
+	        $row1 = array_shift($arr);
+	        $col1 = array_shift($row1);
+    	}
+    	catch(Exception $e){}
+        return $col1;
+    }
+    
+    public function GetRow($sql)
+    {
+    	try{
+        	$arr = $this->GetAll($sql);
+    	}
+       	catch(Exception $e){}
+        return array_shift($arr);
+    }
+    
+    public function ErrorNo()
+    {
+    	$infos = $this->pdo->errorInfo();
+        return $infos[1];
+    }
+    public function Errormsg()
+    {
+        $infos = $this->pdo->errorInfo();
+        return $infos[2];
+    }
+    public function Execute( $sql )
+    {
+    	try{
+	        if ($this->debug)
+	        {
+	            echo "<HR>" . $sql;
+	        }
+	        $this->affected_rows = $this->pdo->exec($sql);
+	        if ($this->debug)
+	        {
+	            $str = $this->Errormsg();
+	            if ($str != "")
+	            {
+	                echo "<br><b style='color:red'>" . $str . "</b>";
+	            }
+	        }
+    	}
+    	catch(Exception $e){}
+        return $this->affected_rows;
+    }
+    public function Escape( $str )
+    {
+        return substr(substr($this->pdo->quote($str), 1), 0, -1);
+    }
+    public function GetInsertID()
+    {
+        return (int) $this->pdo->lastInsertId();
+    }
+    public function Affected_Rows()
+    {
+        return (int) $this->affected_rows;
+    }
+    public function setDebugMode( $tf )
+    {
+        $this->debug = (bool)$tf;
+    }
+    public function GetRaw()
+    {
+        return $this->rs;
+    }
+}
 
 
 //Exception for Database problems -- not in use yet...
@@ -2732,7 +2898,6 @@ class RedBean_Decorator {
 	 * @return unknown_type
 	 */
 	public function save() {
-		//print_r( $this->data );
 		return RedBean_OODB::set( $this->data );
 	}
 
@@ -2906,11 +3071,20 @@ if ($shortnotation_for_redbeandecorator) {
  */
 
 //get an instance of the MySQL database
-$db = MySQLDatabase::getInstance(
-$hostname,
-$username,
-$password,
-$databasename);
+if (isset($dsn)) {
+	$db = PDODriver::getInstance( $dsn, $username, $password, null ); 
+} 
+else {
+	$db = MySQLDatabase::getInstance(
+	$hostname,
+	$username,
+	$password,
+	$databasename);
+}
+
+if (isset($for_testing_reset_redbean)){
+	$db->Execute("drop tables dtyp,locking,patient,redbeantables,searchindex"); 
+}
 	
 //$db->SetFetchMode(2);//RedBean uses ADO-fetch-mode 2 -- USE IF YOU REQUIRE ADO!
 
