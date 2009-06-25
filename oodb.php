@@ -467,7 +467,7 @@ class PDODriver implements IGenericDatabaseDriver {
 	            }
 	        }
     	}
-    	catch(Exception $e){}
+    	catch(Exception $e){ return array(); }
         return $rows;
     }
     
@@ -485,7 +485,7 @@ class PDODriver implements IGenericDatabaseDriver {
 	        }
 	    	
     	}
-    	catch(Exception $e){}
+    	catch(Exception $e){ return array(); }
         return $cols;
     }
  
@@ -505,7 +505,7 @@ class PDODriver implements IGenericDatabaseDriver {
     	try{
         	$arr = $this->GetAll($sql);
     	}
-       	catch(Exception $e){}
+       	catch(Exception $e){ return array(); }
         return array_shift($arr);
     }
     
@@ -536,7 +536,7 @@ class PDODriver implements IGenericDatabaseDriver {
 	            }
 	        }
     	}
-    	catch(Exception $e){}
+    	catch(Exception $e){ return 0; }
         return $this->affected_rows;
     }
     public function Escape( $str )
