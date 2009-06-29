@@ -182,6 +182,28 @@ interface IGenericDatabaseDriver {
 }
 
 /**
+ * RedBean_Querylogger
+ * @desc A very basic logger
+ * @author gabordemooij
+ *
+ */
+class RedBean_Querylogger {
+	
+	/**
+	 * Logs a piece of SQL code
+	 * @param $sql
+	 * @return void
+	 */
+	public static function logSCQuery( $sql ) {
+		$sql = addslashes($sql);
+		$db = RedBean_OODB::$db;
+		$db->exec("INSERT INTO querylogs (id,`sql`) VALUES(null,\"$sql\")");
+		return null;
+	}
+	
+}
+
+/**
  * MySQL Database object driver
  * @desc performs all redbean actions for MySQL
  *
@@ -981,6 +1003,9 @@ class RedBean_OODB {
 					}
 					//get a table for our friend!
 					$db->exec( $createtableSQL );
+					
+					RedBean_Querylogger::logSCQuery($createtableSQL);
+					
 					//jupz, now he has its own table!
 					self::addTable( $table );
 				}
@@ -1012,12 +1037,14 @@ class RedBean_OODB {
 								//no, we have to widen the database column type
 								$changecolumnSQL="ALTER TABLE `$table` CHANGE `$p` `$p` ".self::$typeno_sqltype[$typeno];
 								$db->exec( $changecolumnSQL );
+								RedBean_Querylogger::logSCQuery($changecolumnSQL);
 							}
 						}
 						else {
 							//no it is not
 							$addcolumnSQL = "ALTER TABLE `$table` ADD `$p` ".self::$typeno_sqltype[$typeno];
 							$db->exec( $addcolumnSQL );
+							RedBean_Querylogger::logSCQuery($addcolumnSQL);
 						}
 						//Okay, now we are sure that the property value will fit
 						$insertvalues[] = "\"".$v."\"";
@@ -1142,48 +1169,58 @@ class RedBean_OODB {
 				self::$db->exec("drop tables dtyp");
 					
 				self::$db->exec("
-			CREATE TABLE IF NOT EXISTS `dtyp` (
-			  `id` int(11) unsigned NOT NULL auto_increment,
-			  `tinyintus` tinyint(3) unsigned NOT NULL,
-			  `intus` int(11) unsigned NOT NULL,
-			  `ints` bigint(20) NOT NULL,
-			  
-			  `varchar255` varchar(255) NOT NULL,
-			  `text` text NOT NULL,
-			  PRIMARY KEY  (`id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-			");
-					
+				CREATE TABLE IF NOT EXISTS `dtyp` (
+				  `id` int(11) unsigned NOT NULL auto_increment,
+				  `tinyintus` tinyint(3) unsigned NOT NULL,
+				  `intus` int(11) unsigned NOT NULL,
+				  `ints` bigint(20) NOT NULL,
+				  
+				  `varchar255` varchar(255) NOT NULL,
+				  `text` text NOT NULL,
+				  PRIMARY KEY  (`id`)
+				) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+				");
+						
+					self::$db->exec("
+				CREATE TABLE IF NOT EXISTS `locking` (
+				  `tbl` varchar(255) NOT NULL,
+				  `id` bigint(20) NOT NULL,
+				  `fingerprint` varchar(255) NOT NULL,
+				  `expire` int(11) NOT NULL,
+				  UNIQUE KEY `tbl` (`tbl`,`id`)
+				) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+				");
+						
+					//rbt
+					self::$db->exec("
+				 CREATE TABLE IF NOT EXISTS `redbeantables` (
+				 `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+				 `tablename` VARCHAR( 255 ) NOT NULL ,
+				 PRIMARY KEY ( `id` ),
+				 UNIQUE KEY `tablename` (`tablename`)
+				 ) ENGINE = MYISAM 
+				");
+						
+					self::$db->exec("
+				 CREATE TABLE IF NOT EXISTS `searchindex` (
+				`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+				`ind` VARCHAR( 255 ) NOT NULL ,
+				`cnt` INT( 11 ) NOT NULL ,
+				PRIMARY KEY ( `id` ),
+				UNIQUE KEY `ind` (`ind`)
+				) ENGINE = MYISAM ");
+				
+	
 				self::$db->exec("
-			CREATE TABLE IF NOT EXISTS `locking` (
-			  `tbl` varchar(255) NOT NULL,
-			  `id` bigint(20) NOT NULL,
-			  `fingerprint` varchar(255) NOT NULL,
-			  `expire` int(11) NOT NULL,
-			  UNIQUE KEY `tbl` (`tbl`,`id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-			");
-					
-				//rbt
-				self::$db->exec("
-			 CREATE TABLE IF NOT EXISTS `redbeantables` (
-			 `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-			 `tablename` VARCHAR( 255 ) NOT NULL ,
-			 PRIMARY KEY ( `id` ),
-			 UNIQUE KEY `tablename` (`tablename`)
-			 ) ENGINE = MYISAM 
-			");
-					
-				self::$db->exec("
-			 CREATE TABLE IF NOT EXISTS `searchindex` (
-			`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-			`ind` VARCHAR( 255 ) NOT NULL ,
-			`cnt` INT( 11 ) NOT NULL ,
-			PRIMARY KEY ( `id` ),
-			UNIQUE KEY `ind` (`ind`)
-			) ENGINE = MYISAM ");
+				 CREATE TABLE IF NOT EXISTS `querylogs` (
+				`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+				`sql` VARCHAR( 255 ) NOT NULL ,
+				PRIMARY KEY ( `id` ),
+				UNIQUE KEY `sqlcode` (`sql`)
+				) ENGINE = MYISAM ");
+			
 			}
-
+			
 			//generate a key
 			if (!self::$pkey) {
 				self::$pkey = str_replace(".","",microtime(true)."".mt_rand());
@@ -2258,7 +2295,9 @@ class RedBean_OODB {
 			$rows = $db->getCell("SELECT count(*) FROM `$table`");
 			if ($rows < 1) {
 				//no rows in table, guess it can be dropped then..
-				$db->exec("drop table `$table`");
+				$droptableSQL = "drop table `$table`";
+				$db->exec( $droptableSQL );
+				RedBean_Querylogger::logSCQuery($droptableSQL);
 				self::dropTable( $table );
 			}
 			else {
@@ -2288,7 +2327,9 @@ class RedBean_OODB {
 				//any rows?
 				if ($rows < 1) {
 					//no rows, clean up table by removing this column
-					$db->exec("alter table `$table` drop `$col` ");
+					$sql = "alter table `$table` drop `$col` ";
+					$db->exec( $sql );
+					RedBean_Querylogger::logSCQuery($sql);
 				}
 				else {
 					//okay so this column is still in use, but maybe its to wide
@@ -2307,7 +2348,9 @@ class RedBean_OODB {
 						//echo "<br><br>DELTA = $delta;"; --for debugging only
 						if (intval($delta)===0) {
 							//no difference? then change the column to save some space
-							$db->exec("alter table `$table` change `$col` `$col` ".self::$typeno_sqltype[$trytype]);
+							$sql = "alter table `$table` change `$col` `$col` ".self::$typeno_sqltype[$trytype];
+							$db->exec($sql);
+							RedBean_Querylogger::logSCQuery($sql);
 						}
 						//get rid of the test column..
 						$db->exec("alter table `$table` drop __test");
@@ -2421,10 +2464,12 @@ class RedBean_OODB {
 					if ($records > 1 && $relvar > 0.85) {
 						$sqladdindex="ALTER IGNORE TABLE `$table` ADD INDEX $indexname (`$column`)";
 						$db->exec( $sqladdindex );
+						RedBean_Querylogger::logSCQuery($sqladdindex);
 					}
 					else {
 						$sqldropindex = "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
 						$db->exec( $sqldropindex );
+						RedBean_Querylogger::logSCQuery($sqldropindex);
 					}
 				}
 			}
@@ -2447,6 +2492,7 @@ class RedBean_OODB {
 				$indexname = "reddex_".$column;
 				$sqldropindex = "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
 				$db->exec( $sqldropindex );
+				RedBean_Querylogger::logSCQuery($sqldropindex);
 			}
 			
 			return true;
