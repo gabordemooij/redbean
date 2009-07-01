@@ -117,6 +117,12 @@ $password = ""; //the password, if any, to sign in
 if (!isset($debugmode))
 $debugmode = false; //do you want to see the queries RedBean performs?
 
+if (!isset($redbean_garbagecollector)) 
+$redbean_garbagecollector = true; //toggle garbage collector
+
+if (!isset($redbean_optimizer))
+$redbean_optimizer = true; //toggle optimizer
+
 //Select a database driver
 //Choose between MySQL-MyISAM and MySQL-InnoDB. In later versions we will try to support: 
 //Postgres, DB2 and Oracle. Feel free to provide feedback or write your own drivers. :)
@@ -814,6 +820,16 @@ class RedBean_OODB {
 		private static $frozen = false;
 
 		/**
+		 * @var boolean $garbagecollector - indicates whether the gc should be invoked
+		 */
+		private static $garbagecollector = true;
+		
+		/**
+		 * @var $optimizer - indicates whether the optimizer should be invoked
+		 */
+		private static $optimizer = true;
+		
+		/**
 		 * Closes and unlocks the bean
 		 * @return unknown_type
 		 */
@@ -828,7 +844,8 @@ class RedBean_OODB {
 				//nope
 			}
 
-			RedBean_OODB::gc();
+			RedBean_OODB::gc(); 
+			
 			RedBean_OODB::releaseAllLocks();
 			//echo "destructor has been invoked";
 		}
@@ -866,7 +883,42 @@ class RedBean_OODB {
 		public static function getLocking() {
 			return self::$locking;
 		}
-
+		
+		/**
+		 * Turns garbage collector on/off
+		 * @param $bool
+		 * @return unknown_type
+		 */
+		public static function setGarbageCollectorActive( $bool ) {
+			self::$garbagecollector = (boolean) $bool;
+		} 
+		
+		/**
+		 * Returns the state of the garbagecollector
+		 * @return unknown_type
+		 */
+		public static function getGarbageCollectorActive() {
+			return self::$garbagecollector;
+		} 
+		
+		/**
+		 * Toggles optimizer
+		 * @param $bool
+		 * @return unknown_type
+		 */
+		public static function setOptimizerActive( $bool ) {
+			self::$optimizer = (boolean) $bool;
+		}
+		
+		/**
+		 * Returns state of the optimizer
+		 * @param $bool
+		 * @return unknown_type
+		 */
+		public static function getOptimizerActive() {
+			return self::$optimizer;
+		}
+		
 		/**
 		 * Checks whether a bean is valid
 		 * @param $bean
@@ -2270,6 +2322,11 @@ class RedBean_OODB {
 		 */
 		public static function gc() {
 
+			//Is gc disabled?
+			if (!self::$garbagecollector) {
+				return false;
+			} 
+			
 			//oops, we are frozen, so no change..
 			if (self::$frozen) {
 				return false;
@@ -2363,6 +2420,7 @@ class RedBean_OODB {
 
 			//after cleaning, try to improve performance by adding indexes
 			self::optimizeIndexes();
+			
 			return true;
 		}
 
@@ -2425,6 +2483,12 @@ class RedBean_OODB {
 		 */
 		public static function optimizeIndexes( $takefirst=false ) {
 
+			//Optimizer has been disabled
+			if (!self::$optimizer) {
+				return false;
+			} 
+			
+			//Oops... db has been frozen..
 			if (self::$frozen) {
 				return false;
 			}
@@ -3162,7 +3226,14 @@ if ($freeze) {
 	
 }
 
+if (isset($redbean_garbagecollector)) {
+	RedBean_OODB::setGarbageCollectorActive( $redbean_garbagecollector );
+}
 
+
+if (isset($redbean_optimizer)) {
+	RedBean_OODB::setOptimizerActive( $redbean_optimizer );
+}
 
 
 //Define some handy exceptions

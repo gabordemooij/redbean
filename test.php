@@ -42,6 +42,15 @@ class SmartTest {
 	
 }
 
+//Use this database for tests
+$databasename = "oodb";
+$freeze = false;
+$host = "localhost";
+$username = "root";
+$password = "";
+$redbean_garbagecollector = true;
+$redbean_optimizer = true;
+
 require("oodb.php");
 
 SmartTest::instance()->canwe = "Basic test suite";
@@ -113,6 +122,57 @@ catch(Exception $e) {
 	die("<b style='color:red'>Exception during init... "); 
 }
 
+SmartTest::instance()->canwe = "Configuration tester";
+
+R::setGarbageCollectorActive( false );
+
+if (R::getGarbageCollectorActive()===false) {
+	SmartTest::instance()->progress(); 
+}
+else {
+	die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe);
+}
+
+if (RedBean_OODB::gc()===false) {
+	SmartTest::instance()->progress(); 
+}
+else {
+	die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe);
+}
+
+
+R::setOptimizerActive( false );
+
+if (R::getOptimizerActive()===false) {
+	SmartTest::instance()->progress(); 
+}
+else {
+	die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe);
+}
+
+if (RedBean_OODB::optimizeIndexes()===false) {
+	SmartTest::instance()->progress(); 
+}
+else {
+	die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe);
+}
+
+R::setGarbageCollectorActive( 1 );
+R::setOptimizerActive( "on" );
+
+if (R::getOptimizerActive()===true) {
+	SmartTest::instance()->progress(); 
+}
+else {
+	die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe);
+}
+
+if (R::getGarbageCollectorActive()===true) {
+	SmartTest::instance()->progress(); 
+}
+else {
+	die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe);
+}
 //drop the note table
 
 
