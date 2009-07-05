@@ -1507,7 +1507,7 @@ class RedBean_OODB {
 		public static function numberof($type) {
 
 			$db = self::$db;
-			$type = $db->escape( $type );
+			$type = strtolower( $db->escape( $type ) );
 
 			$alltables = self::showTables();
 
@@ -1533,7 +1533,7 @@ class RedBean_OODB {
 			//TODO: Consider if GROUP BY (equivalent meaning) is more portable 
 			//across DB types?
 			$db = self::$db;
-			$type = $db->escape( $type );
+			$type = strtolower( $db->escape( $type ) );
 			$field = $db->escape( $field );
 		
 			$alltables = self::showTables();
@@ -1562,8 +1562,8 @@ class RedBean_OODB {
 		private static function stat($type,$field,$stat="sum") {
 
 			$db = self::$db;
-			$type = $db->escape( $type );
-			$field = $db->escape( $field );
+			$type = strtolower( $db->escape( $type ) );
+			$field = strtolower( $db->escape( $field ) );
 			$stat = $db->escape( $stat );
 
 			$alltables = self::showTables();
