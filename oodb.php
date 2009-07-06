@@ -711,6 +711,10 @@ class RedBean_DBAdapter {
 		self::$log = array();
 		return null;
 	}
+	
+	public function getDatabase() {
+		return $this->db;
+	}
 
 }
 
@@ -926,6 +930,17 @@ class RedBean_OODB {
 		 */
 		public static function checkBean(OODBBean $bean) {
 
+			foreach($bean as $prop=>$value) {
+				$prop = preg_replace('/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/',"",$prop);
+				if (strlen(trim($prop))===0) {
+					throw new ExceptionRedBeanSecurity("Invalid Characters in property");
+				}
+				else {
+					
+					$bean->$prop = $value;
+				}
+			}			
+			
 			//has redBean already been initialized?
 			if (!self::$pkey) self::init();
 
@@ -1637,13 +1652,18 @@ class RedBean_OODB {
 		 * @param $orderby
 		 * @return unknown_type
 		 */
-		public static function find(OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
+		public static function find(OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false, $justcount = false) {
 
 			self::checkBean( $bean );
 			$db = self::$db;
 			$tbl = $db->escape( $bean->type );
 
 			$findSQL = "SELECT id FROM `$tbl` WHERE ";
+			
+			if ($justcount) {
+				$findSQL = "SELECT count(*) FROM `$tbl` WHERE ";
+			}  
+			
 			foreach($bean as $p=>$v) {
 				if ($p === "type" || $p === "id") continue;
 				$p = $db->escape($p);
@@ -1673,17 +1693,38 @@ class RedBean_OODB {
 				$findSQL .= @implode(" AND ",$part) . " ORDER BY $orderby LIMIT $start, $end ";
 			}
 
+			if ($justcount) {
+				return $db->getCell( $findSQL );
+			}
 			
 			$ids = $db->getCol( $findSQL );
 			$beans = array();
+
 			if (is_array($ids) && count($ids)>0) {
-				foreach( $ids as $id ) {
-					$beans[ $id ] = self::getById( $bean->type, $id , false);
+					foreach( $ids as $id ) {
+						$beans[ $id ] = self::getById( $bean->type, $id , false);
 				}
 			}
+			
 			return $beans;
+			
 		}
-
+		
+		/**
+		 * Simplified version of find, also more lightweight, returns a Can filled with beans,
+		 * this can implements Iterator and offers a count() method for easy paging
+		 * @param $bean
+		 * @param $searchoperators
+		 * @param $orderby
+		 * @return Can $can
+		 */
+		public static function getCan(OODBBean $bean, $searchoperators = array(), $orderby="id ASC") {
+			$can = self::find($bean, $searchoperators, 0, 0, $orderby, " ORDER BY ".$orderby, true);
+			return $can;	
+		}
+		
+		
+		
 		/**
 		 * Returns a plain and simple array filled with record data
 		 * @param $type
@@ -3044,7 +3085,7 @@ class RedBean_Decorator {
 	 * @param $filter
 	 * @return array $decorators
 	 */
-	public static function find( $deco, $filter, $start=0, $end=100, $orderby=" id ASC ", $extraSQL=false ) {
+	public static function find( $deco, $filter, $start=0, $end=100, $orderby=" id ASC ", $extraSQL=false, $justcount=false ) {
 
 		if (!is_array($filter)) {
 			return array();
@@ -3065,7 +3106,10 @@ class RedBean_Decorator {
 				
 		}
 
-		$beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
+		$beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL, $justcount );
+		
+		if ($justcount) return $beans;
+		
 		$decos = array();
 		$dclass = PRFX.$deco->type.SFFX;
 		foreach( $beans as $bean ) {
@@ -3136,18 +3180,21 @@ class RedBean_Decorator {
 	 * @param $bean
 	 * @return array $arr
 	 */
-	public function exportAsArr( $bean ) {
+	public function exportAsArr() {
 		$arr = array();
 		foreach($this->data as $prop=>$value) {
-			if (is_object($value)){
+			if ($value instanceof RedBean_Decorator){
 				$value = $value->getID();
 			}
 			$arr[ $prop ] = $value;
+		
 		}
+		return  $arr;
 	}
 
 
 }
+
 
 
 //The bean class we use..
@@ -3249,3 +3296,6 @@ class ExceptionInvalidFindOperator extends Exception{}
 
 //Exception for invalid argument
 class ExceptionInvalidArgument extends Exception {}
+
+//Exception for security issues 
+class ExceptionRedBeanSecurity extends Exception {}

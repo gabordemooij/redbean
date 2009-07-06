@@ -20,11 +20,9 @@ class SmartTest {
 	public function __set( $canwe, $v ) {
 		if ($canwe=="canwe") {
 			$this->canwe = $v;
-			
 			echo "<br>processing testpack: ".RedBean_OODB::getEngine()."-".$v." ...now testing: ";
 		    ob_flush();
 		    flush(); 
-			
 		}
 	}
 	
@@ -356,6 +354,10 @@ function testsperengine() {
 	if (count($persons)!=2) {
 		die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe);
 	}
+	//print_r( $persons );
+	//now with iterator
+	
+	if (RedBean_OODB::find( $searchBean, array("gender"=>"="),0,100,'id asc',false,true )!=2) die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe);
 	
 	//RedBean_OODB::closeAllBeansOfType("person");
 	
@@ -1367,7 +1369,78 @@ function testsperengine() {
 	$rows = RedBean_OODB::$db->get("describe blog");
 	if($rows[3]["Type"]!="longtext")  {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
 	Redbean_OODB::clean();
+	
+	SmartTest::instance()->canwe="Export";
+	RedBean_OODB::gen("justabean");
+	$oBean = new JustABean();
+	$oBean->setA("a");
+	$oOtherBean = new OODBBean();
+	$oOtherBean->a = "b";
+	$oBean2 = new OODBBean();
+	$oBean->exportTo( $oBean2);
+	if ($oBean2->a!=="a") {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	$oBean2 = $oBean->exportTo($oBean2);
+	if ($oBean2->a!=="a") {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	$oBean->exportTo($oBean2, $oOtherBean);
+	if ($oBean2->a!=="b") {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	$arr = array();
+	$oBean->exportTo($arr);
+	if ($arr["a"]!=="a") {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	$arr = array();
+	$arr = $oBean->exportTo($arr);
+	if ($arr["a"]!=="a") {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	$arr = $oBean->exportTo($arr, $oOtherBean);
+	if ($arr["a"]!=="b") {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	
+	SmartTest::instance()->canwe="Export Array";
+	$oBean->a = "a";
+	$oInnerBean = new JustABean;
+	$oInnerBean->setID(123);
+	$oBean->innerbean = $oInnerBean;
+	$arr = $oBean->exportAsArr();
+	if (!is_array($arr)) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	if ($arr["innerbean"]!==123) {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	if ($arr["a"]!=="a") {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+	
+	
+	
+	
 }
+
+
+RedBean_OODB::gen("justabean");
+SmartTest::instance()->canwe="Security";
+$maliciousproperty = "\"";
+$oBean = new JustABean;
+$oBean->$maliciousproperty = "a";
+try {
+	$oBean->save();
+	die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); 
+}
+catch(ExceptionRedBeanSecurity $e){
+	SmartTest::instance()->progress();	
+}
+$maliciousproperty = "\"test";
+$oBean = new JustABean;
+$oBean->$maliciousproperty = "a";
+try {
+	$oBean->save();
+	SmartTest::instance()->progress();
+	 
+}
+catch(ExceptionRedBeanSecurity $e){
+	die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe);	
+}
+$converted = "test";
+if ($oBean->$converted!=="a") {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+$maliciousvalue = "\"abc";
+$oBean->another = $maliciousvalue;
+$oBean->save();
+$oBean->another;
+if ($oBean->another!=="\"abc") {die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }else SmartTest::instance()->progress(); 
+
+	
+
 
 SmartTest::instance()->canwe="select only valid engines?";
 try{RedBean_OODB::setEngine("nonsensebase"); die("<b style='color:red'>Error CANNOT:".SmartTest::instance()->canwe); }catch(Exception $e){ SmartTest::instance()->progress(); ; }
@@ -1419,6 +1492,7 @@ if (count($db->get("SHOW INDEX FROM patient"))!==1){ die("<b style='color:red'>E
 testsperengine();
 RedBean_OODB::setEngine("innodb");
 testsperengine();
+
 
 
 
