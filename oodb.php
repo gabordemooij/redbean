@@ -715,6 +715,10 @@ class RedBean_DBAdapter {
 	public function getDatabase() {
 		return $this->db;
 	}
+	
+	public function getErrorMsg() {
+		return $this->db->Errormsg();
+	}
 
 }
 
@@ -1457,7 +1461,7 @@ class RedBean_OODB {
 		 * @param $id
 		 * @return OODBBean $bean
 		 */
-		public static function getById($type, $id) {
+		public static function getById($type, $id, $data=false) {
 
 			$bean = self::dispense( $type );
 			$db = self::$db;
@@ -1469,8 +1473,14 @@ class RedBean_OODB {
 			self::openBean($bean);
 
 			//load the bean using sql
-			$getSQL = "SELECT * FROM `$type` WHERE id = $id ";
-			$row = $db->getRow( $getSQL );
+			if (!$data) {
+				$getSQL = "SELECT * FROM `$type` WHERE id = $id ";
+				$row = $db->getRow( $getSQL );
+			}
+			else {
+				$row = $data;
+			}
+			
 			if ($row && is_array($row) && count($row)>0) {
 				foreach($row as $p=>$v) {
 					//populate the bean with the database row
@@ -1709,6 +1719,69 @@ class RedBean_OODB {
 			return $beans;
 			
 		}
+		
+	
+		
+		public static function processQuerySlots($sql, $slots) {
+			
+			$db = self::$db;
+			
+			//Just a funny code to identify slots based on randomness
+			$code = sha1(rand(1,1000)*time());
+			
+			//This ensures no one can hack our queries via SQL template injection
+			foreach( $slots as $key=>$value ) {
+				$sql = str_replace( "{".$key."}", "{".$code.$key."}" ,$sql ); 
+			}
+			
+			//replace the slots inside the SQL template
+			foreach( $slots as $key=>$value ) {
+				$sql = str_replace( "{".$code.$key."}", "\"".$db->escape( $value )."\"",$sql ); 
+			}
+			
+			return $sql;
+		}
+		
+		public static function getBySQL( $rawsql, $slots, $table, $trials=0 ) {
+		
+			$db = self::$db;
+			$sql = $rawsql;
+			
+			if (is_array($slots)) {
+				$sql = self::processQuerySlots( $sql, $slots );
+			}
+			
+			
+			$rs = $db->get( "select * from $table where " . $sql );
+			
+			$beans = array();
+			
+			//fetch the beans
+			if (is_array($rs) && count($rs)>0) {
+				foreach( $rs as $row ) {
+					//Use the fastloader for optimal performance (takes row as data)
+					$beans[ $row["id"] ] = self::getById( $table, $row["id"] , $row);
+				}
+			}
+			
+			$rs = $beans; 
+			
+			if ($err = $db->getErrorMsg()) {
+				//If the query fails, try to replace the missing columns with NULL
+				if (preg_match("/Unknown\scolumn\s'(.*?)'\sin/",$err, $aMatches) && !self::$frozen) {
+					$column = $aMatches[1];
+					$pattern = "/([^\{])`?".$column."`?([^\}])/i";
+					$rawsql = preg_replace($pattern, "\$1NULL\$2 ", $rawsql);
+					//10 trials at max to prevent out of memory error
+					if ($trials < 10) {
+						$rs = self::getBySQL( $rawsql, $slots, $table, ++$trials );
+					}
+				}
+			}
+			
+			return $rs;
+		}
+		
 		
 		/**
 		 * Simplified version of find, also more lightweight, returns a Can filled with beans,
@@ -3078,6 +3151,8 @@ class RedBean_Decorator {
 		RedBean_OODB::closeBean( $this->getData());
 	}
 
+	
+	
 
 	/**
 	 * Finds another decorator
@@ -3193,8 +3268,22 @@ class RedBean_Decorator {
 	}
 
 
+	public function where( $sql, $slots=array() ) {
+		$rs = RedBean_OODB::getBySQL( $sql, $slots, $this->type );
+		$beans = $rs;
+		$decos = array();
+		$type = $this->type;
+		$dclass = PRFX.$type.SFFX;
+		foreach( $beans as $bean ) {
+			$decos[ $bean->id ] = new $dclass( floatval( $bean->id ) );
+			$decos[ $bean->id ]->setData( $bean );
+		}
+		return $decos;
+		
+	}
+	
+	
 }
-
 
 
 //The bean class we use..
