@@ -2745,8 +2745,8 @@ class RedBean_Setup {
 	 * @param $dsn
 	 * @param $username
 	 * @param $password
-	 * @param $engine
 	 * @param $freeze
+	 * @param $engine
 	 * @param $debugmode
 	 * @param $unlockall
 	 * @return unknown_type
@@ -2754,8 +2754,8 @@ class RedBean_Setup {
 	public static function kickstart( $dsn="mysql:host=localhost;dbname=oodb", 
 									  $username='root', 
 									  $password='', 
-									  $engine="innodb", 
 									  $freeze=false, 
+  									  $engine="innodb", 
 									  $debugmode=false, 
 									  $unlockall=false ) {
 	
