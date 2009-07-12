@@ -31,7 +31,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 ------------------------------------------------------
 |Loosely based on an idea by Erik Roelofs - thanks man
 
-VERSION 0.4
+VERSION 0.5
 
 ======================================================
 Official GIT HUB:
@@ -98,58 +98,6 @@ Put your database configuration here
 //you don't want to alter these values here.
 
 
-if (!isset($hostname))
-$hostname = "localhost"; //the host where we should connect to...
-
-//Uncomment these 2 lines if you prefer PDO
-//if (!isset($dsn))
-//$dsn = "mysql:host=$hostname;dbname=oodb";
-
-if (!isset($databasename))
-$databasename = "oodb"; //the name of the database we should select
-
-if (!isset($username))
-$username = "root"; //the user for the selected database
-
-if (!isset($password))
-$password = ""; //the password, if any, to sign in
-
-if (!isset($debugmode))
-$debugmode = false; //do you want to see the queries RedBean performs?
-
-if (!isset($redbean_garbagecollector)) 
-$redbean_garbagecollector = true; //toggle garbage collector
-
-if (!isset($redbean_optimizer))
-$redbean_optimizer = true; //toggle optimizer
-
-//Select a database driver
-//Choose between MySQL-MyISAM and MySQL-InnoDB. In later versions we will try to support: 
-//Postgres, DB2 and Oracle. Feel free to provide feedback or write your own drivers. :)
-
-//CHOOSE YOUR DATABASE/ENGINE
-//Uncomment to activate - Database ENGINE : MySQL - MyISAM
-//$engine = "myisam";
-
-//Uncomment to activate - Database ENGINE : MySQL - InnoDB
-$engine = "innodb";
-
-//--------------------------------- 
-//Use this setting if you want RedBean to reset all its tables: dont touch this if you are not
-//a redbean developer:
-//$for_testing_reset_redbean = true;
-//----------------------------------
-
-//Advanced configurations -- use with care
-$freeze = false; //freeze the database, RedBean wont change your tables anymore if TRUE !
-$unlockall = false; //Easy for newbies; unlocks all beans in the RedBean datastore
-
-//Short notations for use in your own code
-$shortnotation_for_redbean = "R"; //use R instead of RedBean_OODB
-
-$shortnotation_for_redbeandecorator = "RD"; //use RD instead of RedBean_Decorator
-
-
 //For framework intergration if you define $db you can specify a class prefix for models
 if (!isset($db)) define("PRFX","");
 if (!isset($db)) define("SFFX","");
@@ -184,252 +132,6 @@ interface IGenericDatabaseDriver {
 	public function setDebugMode( $tf );
 
 	public function GetRaw();
-
-}
-
-/**
- * RedBean_Querylogger
- * @desc A very basic logger
- * @author gabordemooij
- *
- */
-class RedBean_Querylogger {
-	
-	/**
-	 * Logs a piece of SQL code
-	 * @param $sql
-	 * @return void
-	 */
-	public static function logSCQuery( $sql ) {
-		$sql = addslashes($sql);
-		$db = RedBean_OODB::$db;
-		$db->exec("INSERT INTO querylogs (id,`sql`) VALUES(null,\"$sql\")");
-		return null;
-	}
-	
-}
-
-/**
- * MySQL Database object driver
- * @desc performs all redbean actions for MySQL
- *
- */
-class MySQLDatabase implements IGenericDatabaseDriver {
-
-	/**
-	 *
-	 * @var MySQLDatabase instance
-	 */
-	private static $me = null;
-
-	/**
-	 *
-	 * @var int
-	 */
-	public $Insert_ID;
-
-	/**
-	 * 
-	 * @var boolean
-	 */
-	private $debug = false;
-
-	/**
-	 * 
-	 * @var unknown_type
-	 */
-	private $rs = null;
-
-	/**
-	 * Singleton Design Pattern
-	 * @return DB $DB
-	 */
-	private function __construct(){}
-	
-	/**
-	 * Gets an instance of the database object (singleton) and connects to the database
-	 * @return MySQLDatabase $databasewrapper
-	 */
-	public static function getInstance( $host, $user, $pass, $dbname ) {
-
-		if (!self::$me) {
-			mysql_connect(
-				
-			$host,
-			$user,
-			$pass
-
-			);
-				
-			mysql_selectdb( $dbname );
-				
-			self::$me = new MySQLDatabase();
-		}
-		return self::$me;
-	}
-
-	/**
-	 * Retrieves a record or more using an SQL statement
-	 * @return array $rows
-	 */
-	public function GetAll( $sql ) {
-
-		if ($this->debug) {
-			echo "<HR>".$sql;
-		}
-
-		$rs = mysql_query( $sql );
-		$this->rs=$rs;
-		$arr = array();
-		while( $r = @mysql_fetch_assoc($rs) ) {
-			$arr[] = $r;
-		}
-
-		if ($this->debug) {
-				
-			if (count($arr) > 0) {
-				echo "<br><b style='color:green'>resultset: ".count($arr)." rows</b>";
-			}
-				
-			$str = mysql_error();
-			if ($str!="") {
-				echo "<br><b style='color:red'>".$str."</b>";
-			}
-		}
-
-		return $arr;
-
-	}
-
-
-	/**
-	 * Retrieves a column
-	 * @param $sql
-	 * @return unknown_type
-	 */
-	public function GetCol( $sql ) {
-
-		$rows = $this->GetAll($sql);
-		$cols = array();
-
-		foreach( $rows as $row ) {
-			$cols[] = array_shift( $row );
-		}
-
-		return $cols;
-
-	}
-
-	/**
-	 * Retrieves a single cell
-	 * @param $sql
-	 * @return unknown_type
-	 */
-	public function GetCell( $sql ) {
-
-		$arr = $this->GetAll( $sql );
-
-		$row1 = array_shift( $arr );
-
-		$col1 = array_shift( $row1 );
-
-		return $col1;
-
-	}
-
-
-	/**
-	 * Retrieves a single row
-	 * @param $sql
-	 * @return unknown_type
-	 */
-	public function GetRow( $sql ) {
-
-		$arr = $this->GetAll( $sql );
-
-		return array_shift( $arr );
-
-	}
-
-	/**
-	 * Returns latest error number
-	 * @return unknown_type
-	 */
-	public function ErrorNo() {
-		return mysql_errno();
-	}
-
-	/**
-	 * Returns latest error message
-	 * @return unknown_type
-	 */
-	public function Errormsg() {
-		return mysql_error();
-	}
-
-
-
-	/**
-	 * Executes an SQL statement and returns the number of
-	 * affected rows.
-	 * @return int $affected
-	 */
-	public function Execute( $sql ) {
-
-
-		if ($this->debug) {
-			echo "<HR>".$sql;
-		}
-
-		$rs = mysql_query( $sql );
-		$this->rs=$rs;
-
-		if ($this->debug) {
-			$str = mysql_error();
-			if ($str!="") {
-				echo "<br><b style='color:red'>".$str."</b>";
-			}
-		}
-
-		$this->Insert_ID = $this->GetInsertID();
-
-		return intval( mysql_affected_rows());
-
-	}
-
-	/**
-	 * Prepares a string for usage in SQL code
-	 * @see IDB#esc()
-	 */
-	public function Escape( $str ) {
-		return mysql_real_escape_string( $str );
-	}
-
-
-	/**
-	 * Returns the insert id of an insert query
-	 * @see IDB#getInsertID()
-	 */
-	public function GetInsertID() {
-		return intval( mysql_insert_id());
-	}
-
-
-	/**
-	 * Return the number of rows affected by the latest query
-	 * @return unknown_type
-	 */
-	public function Affected_Rows() {
-		return mysql_affected_rows();
-	}
-
-	public function setDebugMode($tf) {
-		$this->debug = $tf;
-	}
-
-	public function getRaw() {
-		return $this->rs;
-	}
 
 }
 
@@ -694,28 +396,19 @@ class RedBean_DBAdapter {
 		// self::$log[] = $sql;
 		return $this->db->Affected_Rows();
 	}
-
-	/**
-	 * Returns the SQL log
-	 * @return array $sqllog
-	 */
-	public static function getLogs() {
-		return self::$log;
-	}
-
-	/**
-	 * Resets the logs
-	 * @return void
-	 */
-	public static function resetLogs() {
-		self::$log = array();
-		return null;
-	}
 	
+	/**
+	 * Unwrap the original database object
+	 * @return $database
+	 */
 	public function getDatabase() {
 		return $this->db;
 	}
 	
+	/**
+	 * Return latest error message
+	 * @return string $message
+	 */
 	public function getErrorMsg() {
 		return $this->db->Errormsg();
 	}
@@ -733,7 +426,7 @@ class RedBean_OODB {
 	 *
 	 * @var float
 	 */
-	private static $version = 0.4;
+	private static $version = 0.5;
 
 	/**
 	 *
@@ -741,7 +434,7 @@ class RedBean_OODB {
 	 */
 	private static $versioninf = "
 		RedBean Object Database layer 
-		VERSION 0.4
+		VERSION 0.5
 		BY G.J.G.T DE MOOIJ
 		LICENSE BSD
 		COPYRIGHT 2009
@@ -827,15 +520,6 @@ class RedBean_OODB {
 		 */
 		private static $frozen = false;
 
-		/**
-		 * @var boolean $garbagecollector - indicates whether the gc should be invoked
-		 */
-		private static $garbagecollector = true;
-		
-		/**
-		 * @var $optimizer - indicates whether the optimizer should be invoked
-		 */
-		private static $optimizer = true;
 		
 		/**
 		 * Closes and unlocks the bean
@@ -851,11 +535,8 @@ class RedBean_OODB {
 			else if (self::$engine === "myisam"){
 				//nope
 			}
-
-			RedBean_OODB::gc(); 
-			
 			RedBean_OODB::releaseAllLocks();
-			//echo "destructor has been invoked";
+			
 		}
 
 		/**
@@ -891,23 +572,7 @@ class RedBean_OODB {
 		public static function getLocking() {
 			return self::$locking;
 		}
-		
-		/**
-		 * Turns garbage collector on/off
-		 * @param $bool
-		 * @return unknown_type
-		 */
-		public static function setGarbageCollectorActive( $bool ) {
-			self::$garbagecollector = (boolean) $bool;
-		} 
-		
-		/**
-		 * Returns the state of the garbagecollector
-		 * @return unknown_type
-		 */
-		public static function getGarbageCollectorActive() {
-			return self::$garbagecollector;
-		} 
+	
 		
 		/**
 		 * Toggles optimizer
@@ -1039,12 +704,7 @@ class RedBean_OODB {
 
 			$db = self::$db; //I am lazy, I dont want to waste characters...
 
-			if (!self::$frozen) {
-				self::registerUpdate( $bean->type );
-			}
-
-
-
+		
 			$table = $db->escape($bean->type); //what table does it want
 
 			//may we adjust the database?
@@ -1075,7 +735,6 @@ class RedBean_OODB {
 					//get a table for our friend!
 					$db->exec( $createtableSQL );
 					
-					RedBean_Querylogger::logSCQuery($createtableSQL);
 					
 					//jupz, now he has its own table!
 					self::addTable( $table );
@@ -1108,14 +767,12 @@ class RedBean_OODB {
 								//no, we have to widen the database column type
 								$changecolumnSQL="ALTER TABLE `$table` CHANGE `$p` `$p` ".self::$typeno_sqltype[$typeno];
 								$db->exec( $changecolumnSQL );
-								RedBean_Querylogger::logSCQuery($changecolumnSQL);
 							}
 						}
 						else {
 							//no it is not
 							$addcolumnSQL = "ALTER TABLE `$table` ADD `$p` ".self::$typeno_sqltype[$typeno];
 							$db->exec( $addcolumnSQL );
-							RedBean_Querylogger::logSCQuery($addcolumnSQL);
 						}
 						//Okay, now we are sure that the property value will fit
 						$insertvalues[] = "\"".$v."\"";
@@ -1282,13 +939,7 @@ class RedBean_OODB {
 				) ENGINE = MYISAM ");
 				
 	
-				self::$db->exec("
-				 CREATE TABLE IF NOT EXISTS `querylogs` (
-				`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-				`sql` VARCHAR( 255 ) NOT NULL ,
-				PRIMARY KEY ( `id` ),
-				UNIQUE KEY `sqlcode` (`sql`)
-				) ENGINE = MYISAM ");
+			
 			
 			}
 			
@@ -1416,7 +1067,6 @@ class RedBean_OODB {
 			}
 
 			//try to get acquire lock on the bean
-			//$db->exec("DELETE FROM locking WHERE expire > ".time());
 			$openSQL = "INSERT INTO locking VALUES(\"$tbl\",$id,\"".self::$pkey."\",\"".time()."\") ";
 			$trials = 0;
 			$aff = 0;
@@ -1451,8 +1101,6 @@ class RedBean_OODB {
 			else {
 				self::closeBean( $bean );
 			}
-
-
 		}
 
 		/**
@@ -1653,75 +1301,7 @@ class RedBean_OODB {
 			return true;
 		}
 
-		/**
-		 * Finds a bean using search parameters
-		 * @param $bean
-		 * @param $searchoperators
-		 * @param $start
-		 * @param $end
-		 * @param $orderby
-		 * @return unknown_type
-		 */
-		public static function find(OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false, $justcount = false) {
-
-			self::checkBean( $bean );
-			$db = self::$db;
-			$tbl = $db->escape( $bean->type );
-
-			$findSQL = "SELECT id FROM `$tbl` WHERE ";
-			
-			if ($justcount) {
-				$findSQL = "SELECT count(*) FROM `$tbl` WHERE ";
-			}  
-			
-			foreach($bean as $p=>$v) {
-				if ($p === "type" || $p === "id") continue;
-				$p = $db->escape($p);
-				$v = $db->escape($v);
-				if (isset($searchoperators[$p])) {
-
-					if (!self::$frozen) {
-						self::registerSearch( $bean->type.".".$p );
-					}
-
-					if ($searchoperators[$p]==="LIKE") {
-						$part[] = " `$p`LIKE \"%$v%\" ";
-					}
-					else {
-						$part[] = " `$p` ".$searchoperators[$p]." \"$v\" ";
-					}
-				}
-				else {
-
-				}
-			}
-
-			if ($extraSQL) {
-				$findSQL .= @implode(" AND ",$part) . $extraSQL;
-			}
-			else {
-				$findSQL .= @implode(" AND ",$part) . " ORDER BY $orderby LIMIT $start, $end ";
-			}
-
-			if ($justcount) {
-				return $db->getCell( $findSQL );
-			}
-			
-			$ids = $db->getCol( $findSQL );
-			$beans = array();
-
-			if (is_array($ids) && count($ids)>0) {
-					foreach( $ids as $id ) {
-						$beans[ $id ] = self::getById( $bean->type, $id , false);
-				}
-			}
-			
-			return $beans;
-			
-		}
-		
 	
-		
 		public static function processQuerySlots($sql, $slots) {
 			
 			$db = self::$db;
@@ -1751,7 +1331,7 @@ class RedBean_OODB {
 			
 		}
 		
-		public static function getBySQL( $rawsql, $slots, $table, $trials=0 ) {
+		public static function getBySQL( $rawsql, $slots, $table ) {
 		
 			$db = self::$db;
 			$sql = $rawsql;
@@ -1760,33 +1340,7 @@ class RedBean_OODB {
 				$sql = self::processQuerySlots( $sql, $slots );
 			}
 			
-			
 			$rs = $db->getCol( "select id from $table where " . $sql );
-			
-			//$beans = array();
-			
-			//fetch the beans
-			/*if (is_array($rs) && count($rs)>0) {
-				foreach( $rs as $row ) {
-					//Use the fastloader for optimal performance (takes row as data)
-					//$beans[ $row["id"] ] = self::getById( $table, $row["id"] , $row);
-				}
-			}*/
-			
-			//$rs = $beans; 
-			
-			if ($err = $db->getErrorMsg()) {
-				//If the query fails, try to replace the missing columns with NULL
-				if (preg_match("/Unknown\scolumn\s'(.*?)'\sin/",$err, $aMatches) && !self::$frozen) {
-					$column = $aMatches[1];
-					$pattern = "/([^\{])`?".$column."`?([^\}])/i";
-					$rawsql = preg_replace($pattern, "\$1NULL\$2 ", $rawsql);
-					//10 trials at max to prevent out of memory error
-					if ($trials < 10) {
-						$rs = self::getBySQL( $rawsql, $slots, $table, ++$trials );
-					}
-				}
-			}
 			
 			if (is_array($rs)) {
 				return $rs;
@@ -1797,107 +1351,9 @@ class RedBean_OODB {
 		}
 		
 		
-		/**
-		 * Simplified version of find, also more lightweight, returns a Can filled with beans,
-		 * this can implements Iterator and offers a count() method for easy paging
-		 * @param $bean
-		 * @param $searchoperators
-		 * @param $orderby
-		 * @return Can $can
-		 */
-		public static function getCan(OODBBean $bean, $searchoperators = array(), $orderby="id ASC") {
-			$can = self::find($bean, $searchoperators, 0, 0, $orderby, " ORDER BY ".$orderby, true);
-			return $can;	
-		}
+	
 		
 		
-		
-		/**
-		 * Returns a plain and simple array filled with record data
-		 * @param $type
-		 * @param $start
-		 * @param $end
-		 * @param $orderby
-		 * @return unknown_type
-		 */
-		public static function listAll($type, $start=false, $end=false, $orderby="id ASC", $extraSQL = false) {
-
-			$db = self::$db;
-
-			if ($extraSQL) {
-
-				$listSQL = "SELECT * FROM ".$db->escape($type)." ".$extraSQL;
-
-			}
-			else {
-
-				$listSQL = "SELECT * FROM ".$db->escape($type)."
-					ORDER BY ".$orderby;
-					
-					if ($end !== false && $start===false) {
-						$listSQL .= " LIMIT ".intval($end);
-					}
-					
-					if ($start !== false && $end !== false) {
-						$listSQL .= " LIMIT ".intval($start).", ".intval($end);
-					}
-					
-					if ($start !== false && $end===false) {
-						$listSQL .= " LIMIT ".intval($start).", 18446744073709551615 ";
-					}
-					
-					
-
-			}
-
-			return $db->get( $listSQL );
-
-		}
-
-
-		/**
-		 * Registers a search action for optimization purposes
-		 * @param $p
-		 * @return unknown_type
-		 */
-		public static function registerSearch( $p ) {
-
-			if (self::$frozen) {
-				return false;
-			}
-
-			$db = self::$db;
-			$p = $db->escape( $p );
-
-			if (!$db->getCell("select cnt from searchindex where ind='$p'")) {
-				$db->exec("replace into searchindex values(null,'$p',1)");
-			}
-			else {
-				$db->exec("update searchindex set cnt=cnt+1 where ind='$p'");
-			}
-
-			return true;
-
-		}
-
-		/**
-		 * Registers an update action for optimization purposes
-		 * @param $p
-		 * @return unknown_type
-		 */
-		public static function registerUpdate( $p ) {
-
-			if (self::$frozen) {
-				return false;
-			}
-
-			$db = self::$db;
-			$p = $db->escape( $p );
-			$db->exec("update searchindex set cnt=cnt-1 where ind LIKE '$p.%' and cnt > 0");
-
-			return true;
-
-		}
 
 		/**
 		 * Associates two beans
@@ -2439,121 +1895,8 @@ class RedBean_OODB {
 			else {
 				return 0;
 			}
-			
-			
 		}
 		
-		/**
-		 * Performs database garbage collection,
-		 * keeps database in shape
-		 * @return unknown_type
-		 */
-		public static function gc() {
-
-			//Is gc disabled?
-			if (!self::$garbagecollector) {
-				return false;
-			} 
-			
-			//oops, we are frozen, so no change..
-			if (self::$frozen) {
-				return false;
-			}
-
-			//get a database
-			$db = self::$db;
-
-			//get all tables
-			$tables = self::showTables();
-
-			//pick a random table
-			if ($tables && is_array($tables) && count($tables) > 0) {
-				$table = $tables[array_rand( $tables, 1 )];
-			}
-			else {
-				return; //or return if there are no tables (yet)
-			}
-
-			$table = $db->escape( $table );
-
-			//is this table empty
-			$rows = $db->getCell("SELECT count(*) FROM `$table`");
-			if ($rows < 1) {
-				//no rows in table, guess it can be dropped then..
-				$droptableSQL = "drop table `$table`";
-				$db->exec( $droptableSQL );
-				RedBean_Querylogger::logSCQuery($droptableSQL);
-				self::dropTable( $table );
-			}
-			else {
-					
-				//do not remove columns from association tables
-				if (strpos($table,'_')!==false) return;
-					
-				//table is still in use? But are all columns in use as well?
-				$cols = $db->get("describe `$table`");
-					
-				//pick a random column
-				$colr = $cols[array_rand( $cols )];
-				$col = $db->escape( $colr["Field"] ); //fetch the name and escape
-					
-				if ($col=="id" || strpos($col,"_id")!==false) {
-					return; //special column, cant slim it down
-				}
-					
-				//prevent others from using this table while doing maintenance
-				//$db->exec("lock tables `$table` write ");
-				//self::openBean( $table );
-					
-				//is this column unused?
-				$rows = $db->getCell("select count(*) from `$table` where `$col` IS NOT NULL
-			and `$col` != '' ");
-					
-				//any rows?
-				if ($rows < 1) {
-					//no rows, clean up table by removing this column
-					$sql = "alter table `$table` drop `$col` ";
-					$db->exec( $sql );
-					RedBean_Querylogger::logSCQuery($sql);
-				}
-				else {
-					//okay so this column is still in use, but maybe its to wide
-					//get the field type
-					$currenttype =  self::$sqltype_typeno[$colr["Type"]];
-					if ($currenttype > 0) {
-						//echo "adjusting $table - $col "; --for debugging only
-						$trytype = rand(0,$currenttype - 1); //try a little smaller
-						//add a test column
-						$db->exec("alter table `$table` add __test  ".self::$typeno_sqltype[$trytype]);
-						//fill the tinier column with the same values of the original column
-						$db->exec("update `$table` set __test=`$col`");
-						//measure the difference
-						$delta = $db->getCell("select count(*) as df from `$table` where
-					strcmp(`$col`,__test) != 0 AND `$col` IS NOT NULL");
-						//echo "<br><br>DELTA = $delta;"; --for debugging only
-						if (intval($delta)===0) {
-							//no difference? then change the column to save some space
-							$sql = "alter table `$table` change `$col` `$col` ".self::$typeno_sqltype[$trytype];
-							$db->exec($sql);
-							RedBean_Querylogger::logSCQuery($sql);
-						}
-						//get rid of the test column..
-						$db->exec("alter table `$table` drop __test");
-					}
-				}
-			}
-
-			//unlock tables again...
-			//$db->exec("unlock tables ");
-
-			//after cleaning, try to improve performance by adding indexes
-			self::optimizeIndexes();
-			
-			return true;
-		}
-
-
-
 		/**
 		 * Accepts a comma separated list of class names and
 		 * creates a default model for each classname mentioned in
@@ -2605,91 +1948,7 @@ class RedBean_OODB {
 		}
 
 
-		/**
-		 * Checks the database whether extra indexes need to be created
-		 * @return unknown_type
-		 */
-		public static function optimizeIndexes( $takefirst=false ) {
-
-			//Optimizer has been disabled
-			if (!self::$optimizer) {
-				return false;
-			} 
-			
-			//Oops... db has been frozen..
-			if (self::$frozen) {
-				return false;
-			}
-
-			$db = self::$db;
-			
-			$num = (int) $db->getCell("select count(*) from searchindex");
-			$limit = floor($num/2);			
-			if ($limit < 2) return true;
-			
-			//what is a high number in our searchindex table?
-			$cnts = $db->get("select ind, cnt from searchindex order by cnt desc limit $limit ");
-			
-			if ($cnts && is_array($cnts) && count($cnts)>0) {
-					
-				//take a random column-table combination
-				if (!$takefirst) {
-					$info = $cnts[ array_rand( $cnts, 1 ) ];	
-				}
-				else {
-					$info = $cnts[ 0 ];
-				}
-					
-				$parts = explode(".",$info["ind"]);
-				$table = $parts[0];
-				$column = $parts[1];
-				
-				//Is this column worth the trouble?
-				$variance = $db->getCell("select count( distinct $column ) from $table");
-				$records = $db->getCell("select count(*) from $table");
-					
-				if ($records) {
-					$relvar = intval($variance) / intval($records); //how useful would this index be?
-					//if this column describes the table well enough it might be used to
-					//improve overall performance.
-					$indexname = "reddex_".$column;
-					if ($records > 1 && $relvar > 0.85) {
-						$sqladdindex="ALTER IGNORE TABLE `$table` ADD INDEX $indexname (`$column`)";
-						$db->exec( $sqladdindex );
-						RedBean_Querylogger::logSCQuery($sqladdindex);
-					}
-					else {
-						$sqldropindex = "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
-						$db->exec( $sqldropindex );
-						RedBean_Querylogger::logSCQuery($sqldropindex);
-					}
-				}
-			}
-			
-			//Now, remove redundant indexes.
-			//what is a low number in our searchindex table?
-			$cnts = $db->get("select ind, cnt from searchindex order by cnt asc limit $limit");
-			if ($cnts && is_array($cnts) && count($cnts)>0) {
-				
-				//take a random column-table combination
-				if (!$takefirst) {
-					$info = $cnts[ array_rand( $cnts, 1 ) ];	
-				}
-				else {
-					$info = $cnts[ 0 ];
-				}
-				$parts = explode(".",$info["ind"]);
-				$table = $parts[0];
-				$column = $parts[1];
-				$indexname = "reddex_".$column;
-				$sqldropindex = "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
-				$db->exec( $sqldropindex );
-				RedBean_Querylogger::logSCQuery($sqldropindex);
-			}
-			
-			return true;
-		}
-
+		
 		/**
 		 * Cleans the entire redbean database, this will not affect
 		 * tables that are not managed by redbean.
@@ -2892,33 +2151,6 @@ class RedBean_Decorator {
 			return false;
 				
 		}
-		elseif (strpos( $method,"oset" ) === 0) {
-				
-				
-			$prop = strtolower( substr( $method, 4 ) );
-			$obj = $arguments[0];
-				
-			if (!is_null($obj)) {
-
-				$id = intval( $obj->getID() );
-					
-				//id must not be 0!
-				if (!$id) {
-						
-					$obj->save();
-					$id = intval( $obj->getID() );
-						
-					if (!$id) return false;
-				}
-					
-			}
-			else {
-				$id = 0;
-			}
-				
-			$this->data->$prop = $id;
-			return false;
-		}
 		elseif (strpos($method,"getRelated")===0)	{
 			$prop = strtolower( substr( $method, 10 ) );
 			$beans = RedBean_OODB::getAssoc( $this->data, $prop );
@@ -2937,13 +2169,6 @@ class RedBean_Decorator {
 		elseif (strpos( $method, "get" ) === 0) {
 			$prop = substr( $method, 3 );
 			return $this->$prop;
-		}
-		elseif (strpos( $method, "oget" ) === 0) {
-			$prop = strtolower( substr( $method, 4 ) );
-			$id = intval( $this->data->$prop );
-			$classname = PRFX.$prop.SFFX;
-			$obj = new $classname( $id );
-			return $obj;
 		}
 		elseif (strpos( $method, "is" ) === 0) {
 			$prop = strtolower( substr( $method, 2 ) );
@@ -2978,7 +2203,27 @@ class RedBean_Decorator {
 			
 		}
 	}
-
+	
+	/**
+	 * Enforces an n-to-1 relationship
+	 * @param $deco
+	 * @return unknown_type
+	 */
+	public function belongsTo( $deco ) {
+		RedBean_OODB::deleteAllAssocType($deco->getType(), $this->data);
+		RedBean_OODB::associate($this->data, $deco->getData());
+	}
+	
+	/**
+	 * Enforces an 1-to-n relationship
+	 * @param $deco
+	 * @return unknown_type
+	 */
+	public function exclusiveAdd( $deco ) {
+		RedBean_OODB::deleteAllAssocType($this->type,$deco->getData());
+		RedBean_OODB::associate($deco->getData(), $this->data);
+	}
+	
 	/**
 	 * Returns the parent object of the current object if any
 	 * @return RedBean_Decorator $oBean
@@ -3169,48 +2414,6 @@ class RedBean_Decorator {
 	
 
 	/**
-	 * Finds another decorator
-	 * @param $deco
-	 * @param $filter
-	 * @return array $decorators
-	 */
-	public static function find( $deco, $filter, $start=0, $end=100, $orderby=" id ASC ", $extraSQL=false, $justcount=false ) {
-
-		if (!is_array($filter)) {
-			return array();
-		}
-
-		if (count($filter)<1) {
-			return array();
-		}
-
-		//make all keys of the filter lowercase
-		$filters = array();
-		foreach($filter as $key=>$f) {
-			$filters[strtolower($key)] =$f;
-				
-			if (!in_array($f,array("=","!=","<",">","<=",">=","like","LIKE"))) {
-				throw new ExceptionInvalidFindOperator();
-			}
-				
-		}
-
-		$beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL, $justcount );
-		
-		if ($justcount) return $beans;
-		
-		$decos = array();
-		$dclass = PRFX.$deco->type.SFFX;
-		foreach( $beans as $bean ) {
-			$decos[ $bean->id ] = new $dclass( floatval( $bean->id ) );
-			$decos[ $bean->id ]->setData( $bean );
-		}
-		return $decos;
-	}
-
-
-
-	/**
 	 * Closes and unlocks the bean
 	 * @param $deco
 	 * @return unknown_type
@@ -3384,6 +2587,11 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 		return $beans;
 	}
 	
+	public function slice( $begin=0, $end=0 ) {
+		$this->collectionIDs = array_slice( $this->collectionIDs, $begin, $end);
+		$this->num = count( $this->collectionIDs );
+	} 
+	
 	/**
 	 * Returns the current bean
 	 * @return RedBean_Decorator $bean
@@ -3409,10 +2617,22 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	
 	/**
 	 * Advances the internal pointer to the next bean in the can
-	 * @return void
+	 * @return int $pointer
 	 */
 	public function next() {
 		return ++$this->pointer;	
+	}
+	
+	/**
+	 * Sets the internal pointer to the previous bean in the can
+	 * @return int $pointer
+	 */
+	public function prev() {
+		if ($this->pointer > 0) {
+			return ++$this->pointer;
+		}else {
+			return 0;
+		}
 	}
 	
 	/**
@@ -3438,7 +2658,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 * @return boolean $morebeans
 	 */
 	public function valid() {
-		return ($this->num > $this->pointer);
+		return ($this->num > ($this->pointer+1));
 	}
 	
 	/**
@@ -3503,91 +2723,74 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 }
 
 
-//The bean class we use..
+/**
+ * Object Oriented Database Bean class
+ * Empty Type definition for bean processing
+ *
+ */
 class OODBBean {
 }
 
 
-//For short notations
-if ($shortnotation_for_redbean) {
-	
-	eval("
-	
-		class $shortnotation_for_redbean extends RedBean_OODB { }
-	
-	");
-}
-
-if ($shortnotation_for_redbeandecorator) {
-
-	eval("
-	
-		class $shortnotation_for_redbeandecorator extends RedBean_Decorator { }
-
-	");
-
-}
-
 /**
- * Initialize the ADODB wrapper for MYSQL and
- * prepare RedBean OODB
+ * RedBean Setup
+ * Helper class to quickly setup RedBean for you
+ * @author gabordemooij
+ *
  */
-
-//get an instance of the MySQL database
-if (isset($dsn)) {
-	$db = PDODriver::getInstance( $dsn, $username, $password, null ); 
-} 
-else {
-	$db = MySQLDatabase::getInstance(
-	$hostname,
-	$username,
-	$password,
-	$databasename);
-}
-
-if (isset($for_testing_reset_redbean)){
-	$db->Execute("drop tables dtyp,locking,patient,redbeantables,searchindex"); 
-}
+class RedBean_Setup { 
 	
-//$db->SetFetchMode(2);//RedBean uses ADO-fetch-mode 2 -- USE IF YOU REQUIRE ADO!
-
-if ($debugmode) {
+	/**
+	 * Kickstarts RedBean :)
+	 * @param $dsn
+	 * @param $username
+	 * @param $password
+	 * @param $engine
+	 * @param $freeze
+	 * @param $debugmode
+	 * @param $unlockall
+	 * @return unknown_type
+	 */
+	public static function kickstart( $dsn="mysql:host=localhost;dbname=oodb", 
+									  $username='root', 
+									  $password='', 
+									  $engine="innodb", 
+									  $freeze=false, 
+									  $debugmode=false, 
+									  $unlockall=false ) {
 	
-	$db->setDebugMode(1);
+		//This is no longer configurable							  		
+		eval("
+			class R extends RedBean_OODB { }
+		");
+		
+		eval("
+			class RD extends RedBean_Decorator { }
+		");
+		
+
+		//get an instance of the MySQL database
+		$db = PDODriver::getInstance( $dsn, $username, $password, null ); 
+		
+			
 	
-}
-
-RedBean_OODB::$db = new RedBean_DBAdapter($db); //Wrap ADO in RedBean's adapter
-
-if ($engine) {
-
-	RedBean_OODB::setEngine($engine); //select a database driver
+		if ($debugmode) {
+			$db->setDebugMode(1);
+		}
 	
-}
-
-RedBean_OODB::init(); //Init RedBean
-
-if ($unlockall) {
-
-	RedBean_OODB::resetAll();//Release all locks
+		RedBean_OODB::$db = new RedBean_DBAdapter($db); //Wrap ADO in RedBean's adapter
+		RedBean_OODB::setEngine($engine); //select a database driver
+		RedBean_OODB::init(); //Init RedBean
 	
-}
-
-if ($freeze) {
-
-	RedBean_OODB::freeze(); //Decide whether to freeze the database
+		if ($unlockall) {
+			RedBean_OODB::resetAll(); //Release all locks
+		}
 	
+		if ($freeze) {
+			RedBean_OODB::freeze(); //Decide whether to freeze the database
+		}
+	}
 }
-
-if (isset($redbean_garbagecollector)) {
-	RedBean_OODB::setGarbageCollectorActive( $redbean_garbagecollector );
-}
-
-
-if (isset($redbean_optimizer)) {
-	RedBean_OODB::setOptimizerActive( $redbean_optimizer );
-}
-
 
 //Define some handy exceptions
 
@@ -3596,9 +2799,6 @@ class ExceptionFailedAccessBean extends Exception{}
 
 //Exception for invalid parent-child associations (type mismatch)
 class ExceptionInvalidParentChildCombination extends Exception{}
-
-//Exception for invalid search operators
-class ExceptionInvalidFindOperator extends Exception{}
 
 //Exception for invalid argument
 class ExceptionInvalidArgument extends Exception {}
