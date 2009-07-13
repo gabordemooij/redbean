@@ -1340,7 +1340,7 @@ class RedBean_OODB {
 				$sql = self::processQuerySlots( $sql, $slots );
 			}
 			
-			$rs = $db->getCol( "select id from $table where " . $sql );
+			$rs = $db->getCol( "select `$table`.id from $table where " . $sql );
 			
 			if (is_array($rs)) {
 				return $rs;
