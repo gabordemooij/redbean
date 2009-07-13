@@ -1977,8 +1977,65 @@ class RedBean_OODB {
 			return true;
 
 		}
+		
+		/**
+		 * Narrows columns to appropriate size if needed
+		 * @return unknown_type
+		 */
+		public static function keepInShape() {
+			
+			//oops, we are frozen, so no change..
+			if (self::$frozen) {
+				return false;
+			}
 
+			//get a database
+			$db = self::$db;
 
+			//get all tables
+			$tables = self::showTables();
+
+			//pick a random table
+			if ($tables && is_array($tables) && count($tables) > 0) {
+				$table = $tables[array_rand( $tables, 1 )];
+			}
+			else {
+				return; //or return if there are no tables (yet)
+			}
+
+			$table = $db->escape( $table );
+			//do not remove columns from association tables
+			if (strpos($table,'_')!==false) return;
+			//table is still in use? But are all columns in use as well?
+			$cols = $db->get("describe `$table`");
+			//pick a random column
+			$colr = $cols[array_rand( $cols )];
+			$col = $db->escape( $colr["Field"] ); //fetch the name and escape
+			if ($col=="id" || strpos($col,"_id")!==false) {
+				return; //special column, cant slim it down
+			}
+			//okay so this column is still in use, but maybe its to wide
+			//get the field type
+			$currenttype =  self::$sqltype_typeno[$colr["Type"]];
+			if ($currenttype > 0) {
+				$trytype = rand(0,$currenttype - 1); //try a little smaller
+				//add a test column
+				$db->exec("alter table `$table` add __test  ".self::$typeno_sqltype[$trytype]);
+				//fill the tinier column with the same values of the original column
+				$db->exec("update `$table` set __test=`$col`");
+				//measure the difference
+				$delta = $db->getCell("select count(*) as df from `$table` where
+				strcmp(`$col`,__test) != 0 AND `$col` IS NOT NULL");
+				if (intval($delta)===0) {
+					//no difference? then change the column to save some space
+					$sql = "alter table `$table` change `$col` `$col` ".self::$typeno_sqltype[$trytype];
+					$db->exec($sql);
+				}
+				//get rid of the test column..
+				$db->exec("alter table `$table` drop __test");
+			}
+		}
+	
 }
 
 
@@ -2758,7 +2815,7 @@ class RedBean_Setup {
   									  $engine="innodb", 
 									  $debugmode=false, 
 									  $unlockall=false ) {
-	
+		
 		//This is no longer configurable							  		
 		eval("
 			class R extends RedBean_OODB { }

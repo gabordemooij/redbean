@@ -58,14 +58,6 @@ class SmartTest {
 
 
 //Use this database for tests
-$databasename = "oodb";
-$freeze = false;
-$host = "localhost";
-$username = "root";
-$password = "";
-$redbean_garbagecollector = true;
-$redbean_optimizer = true;
-
 require("oodb.php");
 RedBean_Setup::kickstart();
 
@@ -167,8 +159,6 @@ if (!in_array("redbeantables",$alltables)) SmartTest::failedTest();
 SmartTest::instance()->progress(); ;
 if (!in_array("locking",$alltables)) SmartTest::failedTest();
 SmartTest::instance()->progress(); ;
-if (!in_array("searchindex",$alltables)) SmartTest::failedTest();
-SmartTest::instance()->progress(); ;
 if (!in_array("nonsense",$alltables)) SmartTest::failedTest();
 SmartTest::instance()->progress(); ;
 if (in_array("trash",$alltables)) SmartTest::failedTest();
@@ -176,6 +166,43 @@ if (in_array("trash",$alltables)) SmartTest::failedTest();
 
 $db->exec("drop table `nonsense`");
 
+$db->exec("
+CREATE TABLE  `oodb`.`slimtable` (
+`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
+`col1` VARCHAR( 255 ) NOT NULL ,
+`col2` TEXT NOT NULL ,
+`col3` INT( 11 ) NOT NULL ,
+PRIMARY KEY (  `id` )
+) ENGINE = MYISAM");
+
+$db->exec("INSERT INTO  `oodb`.`redbeantables` (
+`id` ,
+`tablename`
+)
+VALUES (
+NULL ,  'slimtable'
+);
+");
+
+$db->exec("INSERT INTO  `oodb`.`slimtable` (
+`id` ,
+`col1` ,
+`col2` ,
+`col3`
+)
+VALUES (
+NULL ,  '1',  'mustbevarchar',  '1000'
+);
+");
+
+for($i=0; $i<1000; $i++) {
+	RedBean_OODB::keepInShape();
+}
+
+$row = $db->getRow("select * from slimtable limit 1");
+SmartTest::test($row["col1"],1);
+SmartTest::test($row["col2"],"mustbevarchar");
+SmartTest::test($row["col3"],1000);
 
 function testsperengine() {
 
