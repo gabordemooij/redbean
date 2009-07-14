@@ -166,8 +166,10 @@ if (in_array("trash",$alltables)) SmartTest::failedTest();
 
 $db->exec("drop table `nonsense`");
 
+SmartTest::instance()->testPack = "Optimizer and Garbage collector";
+
 $db->exec("
-CREATE TABLE  `oodb`.`slimtable` (
+CREATE TABLE  `slimtable` (
 `id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
 `col1` VARCHAR( 255 ) NOT NULL ,
 `col2` TEXT NOT NULL ,
@@ -175,7 +177,7 @@ CREATE TABLE  `oodb`.`slimtable` (
 PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM");
 
-$db->exec("INSERT INTO  `oodb`.`redbeantables` (
+$db->exec("INSERT INTO  `redbeantables` (
 `id` ,
 `tablename`
 )
@@ -184,7 +186,7 @@ NULL ,  'slimtable'
 );
 ");
 
-$db->exec("INSERT INTO  `oodb`.`slimtable` (
+$db->exec("INSERT INTO  `slimtable` (
 `id` ,
 `col1` ,
 `col2` ,
@@ -203,6 +205,15 @@ $row = $db->getRow("select * from slimtable limit 1");
 SmartTest::test($row["col1"],1);
 SmartTest::test($row["col2"],"mustbevarchar");
 SmartTest::test($row["col3"],1000);
+
+SmartTest::test(count($db->get("describe slimtable")),4); 
+RedBean_OODB::dropColumn("slimtable","col3");
+SmartTest::test(count($db->get("describe slimtable")),3); 
+
+RedBean_OODB::KeepInShape( true );
+$tables = RedBean_OODB::showTables(); 
+SmartTest::test(in_array("slimtable",$tables),false);
+
 
 function testsperengine() {
 

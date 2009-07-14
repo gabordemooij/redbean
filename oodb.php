@@ -1978,11 +1978,64 @@ class RedBean_OODB {
 
 		}
 		
+	
+		/**
+		 * Removes all tables from redbean that have
+		 * no classes
+		 * @return unknown_type
+		 */
+		public static function removeUnused( ) {
+
+			//oops, we are frozen, so no change..
+			if (self::$frozen) {
+				return false;
+			}
+
+			//get a database
+			$db = self::$db;
+
+			//get all tables
+			$tables = self::showTables();
+			
+			foreach($tables as $table) {
+				
+				//does the class exist?
+				$classname = PRFX . $table . SFFX;
+				if(!class_exists( $classname , true)) {
+					$db->exec("DROP TABLE `$table`;");
+					$db->exec("DELETE FROM redbeantables WHERE tablename=\"$table\"");
+				} 
+				
+			}
+			
+		}
+		/**
+		 * Drops a specific column
+		 * @param $table
+		 * @param $property
+		 * @return unknown_type
+		 */
+		public static function dropColumn( $table, $property ) {
+			
+			//oops, we are frozen, so no change..
+			if (self::$frozen) {
+				return false;
+			}
+
+			//get a database
+			$db = self::$db;
+			
+			$db->exec("ALTER TABLE `$table` DROP `$property`");
+			
+		}
+		
+		
+		
 		/**
 		 * Narrows columns to appropriate size if needed
 		 * @return unknown_type
 		 */
-		public static function keepInShape() {
+		public static function keepInShape( $gc = false) {
 			
 			//oops, we are frozen, so no change..
 			if (self::$frozen) {
@@ -1997,6 +2050,7 @@ class RedBean_OODB {
 
 			//pick a random table
 			if ($tables && is_array($tables) && count($tables) > 0) {
+				if ($gc) self::removeUnused( $tables );
 				$table = $tables[array_rand( $tables, 1 )];
 			}
 			else {
@@ -2094,6 +2148,10 @@ class RedBean_Decorator {
 		}
 	}
 
+	public function free( $property ) {
+		RedBean_OODB::dropColumn( $this->type, $property );
+	}
+	
 	/**
 
 	* Quick service to copy post values to properties
