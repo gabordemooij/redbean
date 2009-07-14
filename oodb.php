@@ -2029,7 +2029,7 @@ class RedBean_OODB {
 			
 		}
 		
-		
+	
 		
 		/**
 		 * Narrows columns to appropriate size if needed
@@ -2068,6 +2068,9 @@ class RedBean_OODB {
 			if ($col=="id" || strpos($col,"_id")!==false) {
 				return; //special column, cant slim it down
 			}
+			
+			//now we have a table and a column $table and $col
+			
 			//okay so this column is still in use, but maybe its to wide
 			//get the field type
 			$currenttype =  self::$sqltype_typeno[$colr["Type"]];
@@ -2088,6 +2091,35 @@ class RedBean_OODB {
 				//get rid of the test column..
 				$db->exec("alter table `$table` drop __test");
 			}
+		
+			//Can we put an index on this column?
+			//Is this column worth the trouble?
+			if (
+				strpos($colr["Type"],"TEXT")!==false ||
+				strpos($colr["Type"],"LONGTEXT")!==false
+			) {
+				return;
+			}
+			
+		
+			$variance = $db->getCell("select count( distinct $col ) from $table");
+			$records = $db->getCell("select count(*) from $table");
+			if ($records) {
+				$relvar = intval($variance) / intval($records); //how useful would this index be?
+				//if this column describes the table well enough it might be used to
+				//improve overall performance.
+				$indexname = "reddex_".$col;
+				if ($records > 1 && $relvar > 0.85) {
+					$sqladdindex="ALTER IGNORE TABLE `$table` ADD INDEX $indexname (`$col`)";
+					$db->exec( $sqladdindex );
+				}
+				else {
+					$sqldropindex = "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
+					$db->exec( $sqldropindex );
+				}
+			}
+			
+			return true;
 		}
 	
 }
@@ -2148,6 +2180,11 @@ class RedBean_Decorator {
 		}
 	}
 
+	/**
+	 * Free memory of a class, drop column in db
+	 * @param $property
+	 * @return unknown_type
+	 */
 	public function free( $property ) {
 		RedBean_OODB::dropColumn( $this->type, $property );
 	}

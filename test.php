@@ -59,7 +59,7 @@ class SmartTest {
 
 //Use this database for tests
 require("oodb.php");
-RedBean_Setup::kickstart();
+RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
 
 
 SmartTest::instance()->testPack = "Basic test suite";
@@ -197,7 +197,43 @@ NULL ,  '1',  'mustbevarchar',  '1000'
 );
 ");
 
-for($i=0; $i<1000; $i++) {
+
+$db->exec("
+CREATE TABLE  `indexer` (
+`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
+`highcard` VARCHAR( 255 ) NOT NULL ,
+`lowcard` TEXT NOT NULL ,
+`lowcard2` INT( 11 ) NOT NULL ,
+`highcard2` LONGTEXT NOT NULL ,
+PRIMARY KEY (  `id` )
+) ENGINE = MYISAM");
+
+$db->exec("INSERT INTO  `redbeantables` (
+`id` ,
+`tablename`
+)
+VALUES (
+NULL ,  'indexer'
+);
+");
+
+
+for($i=0; $i<20; $i++){
+$db->exec("INSERT INTO  `indexer` (
+`id` ,
+`highcard` ,
+`lowcard` ,
+`lowcard2`,
+`highcard2`
+)
+VALUES (
+NULL ,  rand(),  'a',  rand(), CONCAT( rand()*100, '".str_repeat('x',1000)."' )
+);
+");
+}
+
+
+for($i=0; $i<500; $i++) {
 	RedBean_OODB::keepInShape();
 }
 
