@@ -1351,7 +1351,62 @@ class RedBean_OODB {
 		}
 		
 		
-	
+     /** DEPRECATED
+     * Finds a bean using search parameters
+     * @param $bean
+     * @param $searchoperators
+     * @param $start
+     * @param $end
+     * @param $orderby
+     * @return unknown_type
+     */
+    public static function find(OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
+ 
+      self::checkBean( $bean );
+      $db = self::$db;
+      $tbl = $db->escape( $bean->type );
+ 
+      $findSQL = "SELECT id FROM `$tbl` WHERE ";
+      
+      
+      foreach($bean as $p=>$v) {
+        if ($p === "type" || $p === "id") continue;
+        $p = $db->escape($p);
+        $v = $db->escape($v);
+        if (isset($searchoperators[$p])) {
+ 
+          if ($searchoperators[$p]==="LIKE") {
+            $part[] = " `$p`LIKE \"%$v%\" ";
+          }
+          else {
+            $part[] = " `$p` ".$searchoperators[$p]." \"$v\" ";
+          }
+        }
+        else {
+ 
+        }
+      }
+ 
+      if ($extraSQL) {
+        $findSQL .= @implode(" AND ",$part) . $extraSQL;
+      }
+      else {
+        $findSQL .= @implode(" AND ",$part) . " ORDER BY $orderby LIMIT $start, $end ";
+      }
+ 
+      
+      $ids = $db->getCol( $findSQL );
+      $beans = array();
+ 
+      if (is_array($ids) && count($ids)>0) {
+          foreach( $ids as $id ) {
+            $beans[ $id ] = self::getById( $bean->type, $id , false);
+        }
+      }
+      
+      return $beans;
+      
+    }
 		
 		
 
@@ -2645,6 +2700,47 @@ class RedBean_Decorator {
 	public function where( $sql, $slots=array() ) {
 		return new RedBean_Can( $this->type, RedBean_OODB::getBySQL( $sql, $slots, $this->type ) );
 	}
+	
+
+  /** DEPRECATED
+   * Finds another decorator
+   * @param $deco
+   * @param $filter
+   * @return array $decorators
+   */
+  public static function find( $deco, $filter, $start=0, $end=100, $orderby=" id ASC ", $extraSQL=false ) {
+ 
+    if (!is_array($filter)) {
+      return array();
+    }
+ 
+    if (count($filter)<1) {
+      return array();
+    }
+ 
+    //make all keys of the filter lowercase
+    $filters = array();
+    foreach($filter as $key=>$f) {
+      $filters[strtolower($key)] =$f;
+        
+      if (!in_array($f,array("=","!=","<",">","<=",">=","like","LIKE"))) {
+        throw new ExceptionInvalidFindOperator();
+      }
+        
+    }
+ 
+    $beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
+    
+    
+    
+    $decos = array();
+    $dclass = PRFX.$deco->type.SFFX;
+    foreach( $beans as $bean ) {
+      $decos[ $bean->id ] = new $dclass( floatval( $bean->id ) );
+      $decos[ $bean->id ]->setData( $bean );
+    }
+    return $decos;
+  }
 	
 	
 }
