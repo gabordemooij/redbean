@@ -106,30 +106,28 @@ else {
 }
 
 
-
+//Test description: Check other basic functions
 try{
 	$db = RedBean_OODB::$db;
 	if ($db instanceof RedBean_DBAdapter) SmartTest::instance()->progress(); else SmartTest::failedTest();
-
 	if ((RedBean_OODB::getVersionInfo())) {
 		SmartTest::instance()->progress(); ;
 	}
 	else {
 		SmartTest::failedTest(); 
 	}
-	
 	if ((RedBean_OODB::getVersionNumber())) {
 		SmartTest::instance()->progress(); ;
 	}else {
 		SmartTest::failedTest(); 
 	}
-	
 	SmartTest::instance()->progress(); ;
 }
 catch(Exception $e) {
 	SmartTest::failedTest();
 }
 
+//Test description: Test redbean table-space
 SmartTest::instance()->testPack = "Configuration tester";
 
 //insert garbage tables
@@ -140,17 +138,11 @@ $db->exec(" CREATE TABLE `nonsense` (
 			) ENGINE = MYISAM ");
 
 Redbean_OODB::clean();
-
-
 Redbean_OODB::gen("trash");
 $trash = new Trash();
 $trash->save();
-
 Redbean_OODB::clean();
-
-
 Redbean_OODB::setLocking( false ); //turn locking off
-
 $alltables = $db->getCol("show tables");
 SmartTest::instance()->progress(); ;
 if (!in_array("dtyp",$alltables)) SmartTest::failedTest();
@@ -162,10 +154,9 @@ SmartTest::instance()->progress(); ;
 if (!in_array("nonsense",$alltables)) SmartTest::failedTest();
 SmartTest::instance()->progress(); ;
 if (in_array("trash",$alltables)) SmartTest::failedTest();
-
-
 $db->exec("drop table `nonsense`");
 
+//Test description: KeepInShape() tester
 SmartTest::instance()->testPack = "Optimizer and Garbage collector";
 
 $db->exec("
@@ -250,7 +241,7 @@ RedBean_OODB::KeepInShape( true );
 $tables = RedBean_OODB::showTables(); 
 SmartTest::test(in_array("slimtable",$tables),false);
 
-
+//Tests for each individual engine
 function testsperengine() {
 
 	global $tests;
