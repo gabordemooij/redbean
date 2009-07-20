@@ -1351,7 +1351,7 @@ class RedBean_OODB {
 		}
 		
 		
-     /** DEPRECATED
+     /** 
      * Finds a bean using search parameters
      * @param $bean
      * @param $searchoperators
@@ -1408,6 +1408,48 @@ class RedBean_OODB {
       
     }
 		
+    
+		/**
+		 * Returns a plain and simple array filled with record data
+		 * @param $type
+		 * @param $start
+		 * @param $end
+		 * @param $orderby
+		 * @return unknown_type
+		 */
+		public static function listAll($type, $start=false, $end=false, $orderby="id ASC", $extraSQL = false) {
+ 
+			$db = self::$db;
+ 
+			if ($extraSQL) {
+ 
+				$listSQL = "SELECT * FROM ".$db->escape($type)." ".$extraSQL;
+ 
+			}
+			else {
+ 
+				$listSQL = "SELECT * FROM ".$db->escape($type)."
+					ORDER BY ".$orderby;
+ 
+					if ($end !== false && $start===false) {
+						$listSQL .= " LIMIT ".intval($end);
+					}
+ 
+					if ($start !== false && $end !== false) {
+						$listSQL .= " LIMIT ".intval($start).", ".intval($end);
+					}
+ 
+					if ($start !== false && $end===false) {
+						$listSQL .= " LIMIT ".intval($start).", 18446744073709551615 ";
+					}
+ 
+ 
+ 
+			}
+ 
+			return $db->get( $listSQL );
+ 
+		}
 		
 
 		/**
@@ -1967,9 +2009,21 @@ class RedBean_OODB {
 				if ($c!=="" && $c!=="null" && !class_exists($c) && preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$c)){
 					try{
 						eval("class ".$c." extends RedBean_Decorator {
+							private static \$__static_property_type = \"".$c."\";
+							
 							public function __construct(\$id=0, \$lock=false) {
-							parent::__construct('".strtolower($c)."',\$id,\$lock);
-						}
+								parent::__construct('".strtolower($c)."',\$id,\$lock);
+							}
+							
+							//no late static binding... great..
+							public static function where( \$sql, \$slots=array() ) {
+								return new RedBean_Can( self::\$__static_property_type, RedBean_OODB::getBySQL( \$sql, \$slots, self::\$__static_property_type) );
+							}
+	
+							public static function listAll(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
+								return RedBean_OODB::listAll(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
+							}
+							
 					}");
 							
 						if (!class_exists($c)) return false;
@@ -2690,19 +2744,8 @@ class RedBean_Decorator {
 		}
 		return  $arr;
 	}
-
-	/**
-	 * Returns a can of beans given an SQL string
-	 * @param $sql
-	 * @param $slots
-	 * @return RedBean_Can $can
-	 */
-	public function where( $sql, $slots=array() ) {
-		return new RedBean_Can( $this->type, RedBean_OODB::getBySQL( $sql, $slots, $this->type ) );
-	}
 	
-
-  /** DEPRECATED
+  /** 
    * Finds another decorator
    * @param $deco
    * @param $filter

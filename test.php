@@ -332,6 +332,8 @@ function testsperengine() {
 	
 	SmartTest::instance()->testPack = "find records on basis of similarity";
 	
+	
+	
 	$ids = RedBean_OODB::getBySQL("`gender`={gender} order by `name` asc",array("gender"=>"m"),"person");
 	if (count($ids)!=2) {
 		SmartTest::failedTest();
@@ -350,13 +352,30 @@ function testsperengine() {
 		SmartTest::failedTest();
 	} 
 	SmartTest::instance()->progress();
-
+	
 	R::gen("Person");
+	$dummy = new Person;
+	$dummy->age = 40;
+	SmartTest::instance()->test(count(Person::find( $dummy, array("age"=>">"))),1);
+	$dummy->age = 20;
+	SmartTest::instance()->test(count(Person::find( $dummy, array("age"=>">"))),2);
+	$dummy->age = 100;
+	SmartTest::instance()->test(count(Person::find( $dummy, array("age"=>">"))),0);
+	$dummy->age = 100;
+	SmartTest::instance()->test(count(Person::find( $dummy, array("age"=>"<="))),2);
+	$dummy->name="ob";
+	SmartTest::instance()->test(count(Person::find( $dummy, array("name"=>"LIKE"))),1);
+	$dummy->name="o";
+	SmartTest::instance()->test(count(Person::find( $dummy, array("name"=>"LIKE"))),2);
+	$dummy->gender="m";
+	SmartTest::instance()->test(count(Person::find( $dummy, array("gender"=>"="))),2);
+	$dummy->gender="f";
+	SmartTest::instance()->test(count(Person::find( $dummy, array("gender"=>"="))),0);
+	SmartTest::instance()->test(count(Person::listAll()),2);
+	SmartTest::instance()->test(count(Person::listAll(0,1)),1);
+	SmartTest::instance()->test(count(Person::listAll(1)),1);
 	
-	
-	$person = new Person;
-	
-	$can = $person->where("`gender`={gender} order by `name`  asc",array("gender"=>"m"),"person");
+	$can = Person::where("`gender`={gender} order by `name`  asc",array("gender"=>"m"),"person");
 	
 	//test array access
 	foreach($can as $item) {
@@ -418,7 +437,7 @@ function testsperengine() {
 	SmartTest::instance()->progress();
 	
 	//basic functionality where()
-	$beans = $person->where("`gender`={gender} order by `name` asc",array("gender"=>"m"),"person")->getBeans();
+	$beans = Person::where("`gender`={gender} order by `name` asc",array("gender"=>"m"),"person")->getBeans();
 	
 	if (count($beans)!=2) {
 		SmartTest::failedTest();
@@ -426,7 +445,7 @@ function testsperengine() {
 	SmartTest::instance()->progress();
 	
 	//without backticks should still work
-	$beans = $person->where("gender={person} order by `name` asc",array("person"=>"m"),"person")->getBeans();
+	$beans = Person::where("gender={person} order by `name` asc",array("person"=>"m"),"person")->getBeans();
 	
 	if (count($beans)!=2) {
 		SmartTest::failedTest();
@@ -434,7 +453,7 @@ function testsperengine() {
 	SmartTest::instance()->progress(); 
 	
 	//like comparing should still work
-	$beans = $person->where("gender={gender} and `name` LIKE {name} order by `name` asc",array(
+	$beans = Person::where("gender={gender} and `name` LIKE {name} order by `name` asc",array(
 				"gender"=>"m",
 				"name" => "B%"
 	),"person")->getBeans();
