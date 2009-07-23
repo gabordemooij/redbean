@@ -58,7 +58,7 @@ class SmartTest {
 
 
 //Use this database for tests
-require("oodb.php");
+require("allinone.php");
 RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
 
 
@@ -126,6 +126,20 @@ try{
 catch(Exception $e) {
 	SmartTest::failedTest();
 }
+
+
+SmartTest::instance()->testPack = "Sieves";
+R::gen("Employee");
+$e = new Employee;
+$e->setName("Max");
+SmartTest::instance()->test(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric"))->valid($e),true);
+$e->setName("Ma.x");
+SmartTest::instance()->test(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric"))->valid($e),false);
+$e->setName("Max")->setFunct("sales");
+SmartTest::instance()->test(count(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric","funct"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
+$e->setName("x")->setFunct("");
+SmartTest::instance()->test(count(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric","funct"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
+SmartTest::instance()->test(count(RedBean_Sieve::make(array("a"=>"RedBean_Validator_AlphaNumeric","b"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
 
 //Test description: Test redbean table-space
 SmartTest::instance()->testPack = "Configuration tester";
