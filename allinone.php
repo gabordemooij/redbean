@@ -464,7 +464,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
  * @desc   this class provides additional ORM functionality and defauly accessors
  * @author gabordemooij
  */
-class RedBean_Decorator {
+class RedBean_Decorator extends RedBean_Observable {
 
 	/**
 	 *
@@ -516,6 +516,7 @@ class RedBean_Decorator {
 	 * @return unknown_type
 	 */
 	public function free( $property ) {
+		$this->signal("deco_free", $this);
 		RedBean_OODB::dropColumn( $this->type, $property );
 	}
 	
@@ -526,7 +527,7 @@ class RedBean_Decorator {
 	* @return unknown_type
 	*/
 	public function importFromPost( $selection=null ) {
-		
+		$this->signal("deco_importpost", $this);
 		if (!$selection) {
 			$selection = array_keys($_POST);
 		}
@@ -556,7 +557,7 @@ class RedBean_Decorator {
 	 * @return boolean $anyproblems
 	 */
 	public function import( $arr ) {
-		
+		$this->signal("deco_import", $this);
 		foreach( $arr as $key=>$val ) {
 			$setter = "set".ucfirst( $key );
 			$resp = $this->$setter( $val );
@@ -566,14 +567,6 @@ class RedBean_Decorator {
 
 	}
 
-	/**
-	 * Returns a list filled with possible problems
-	 * that occurred while populating the model
-	 * @return unknown_type
-	 */
-	public function problems() {
-		return $this->problems;
-	}
 
 	/**
 	 * Magic method call, this provides basic accessor functionalities
@@ -586,6 +579,7 @@ class RedBean_Decorator {
 	 * Magic getter. Another way to handle accessors
 	 */
 	public function __get( $name ) {
+		$this->signal("deco_get", $this);
 		$name = strtolower( $name );
 		return isset($this->data->$name) ? $this->data->$name : null;
 	}
@@ -594,6 +588,7 @@ class RedBean_Decorator {
 	 * Magic setter. Another way to handle accessors
 	 */
 	public function __set( $name, $value ) {
+		$this->signal("deco_set", $this);
 		$name = strtolower( $name );
 		$this->data->$name = $value;
 	}
@@ -607,6 +602,7 @@ class RedBean_Decorator {
 	 * @return unknown_type
 	 */
 	public function command( $method, $arguments ) {
+		
 		if (strpos( $method,"set" ) === 0) {
 			$prop = substr( $method, 3 );
 			$this->$prop = $arguments[0];
@@ -614,6 +610,7 @@ class RedBean_Decorator {
 				
 		}
 		elseif (strpos($method,"getRelated")===0)	{
+			$this->signal("deco_get", $this);
 			$prop = strtolower( substr( $method, 10 ) );
 			$beans = RedBean_OODB::getAssoc( $this->data, $prop );
 			$decos = array();
@@ -634,32 +631,41 @@ class RedBean_Decorator {
 		}
 		elseif (strpos( $method, "is" ) === 0) {
 			$prop = strtolower( substr( $method, 2 ) );
+			if (!isset($this->data->$prop)) {
+				$this->signal("deco_get",$this);
+				return false;	
+			}
 			return ($this->data->$prop ? TRUE : FALSE);
 		}
 		else if (strpos($method,"add") === 0) { //@add
+			$this->signal("deco_add",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
 			RedBean_OODB::associate($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"remove")===0) {
+			$this->signal("deco_remove",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
 			RedBean_OODB::unassociate($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"attach")===0) {
+			$this->signal("deco_attach",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
 			RedBean_OODB::addChild($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"clearRelated")===0) {
+			$this->signal("deco_clearrelated",$this);
 			$type = strtolower( substr( $method, 12 ) );
 			RedBean_OODB::deleteAllAssocType($type, $this->data);
 			return $this;
 		}
 		else if (strpos($method,"numof")===0) {
+			$this->signal("deco_numof",$this);
 			$type = strtolower( substr( $method, 5 ) );
 			return RedBean_OODB::numOfRelated($type, $this->data);
 			
@@ -672,6 +678,7 @@ class RedBean_Decorator {
 	 * @return unknown_type
 	 */
 	public function belongsTo( $deco ) {
+		$this->signal("deco_belongsto", $this);
 		RedBean_OODB::deleteAllAssocType($deco->getType(), $this->data);
 		RedBean_OODB::associate($this->data, $deco->getData());
 	}
@@ -682,6 +689,7 @@ class RedBean_Decorator {
 	 * @return unknown_type
 	 */
 	public function exclusiveAdd( $deco ) {
+		$this->signal("deco_exclusiveadd", $this);
 		RedBean_OODB::deleteAllAssocType($this->type,$deco->getData());
 		RedBean_OODB::associate($deco->getData(), $this->data);
 	}
@@ -691,6 +699,7 @@ class RedBean_Decorator {
 	 * @return RedBean_Decorator $oBean
 	 */
 	public function parent() {
+		$this->signal("deco_parent", $this);
 		$beans = RedBean_OODB::getParent( $this->data );
 		if (count($beans) > 0 ) $bean = array_pop($beans); else return null;
 		$dclass = PRFX.$this->type.SFFX;
@@ -704,6 +713,7 @@ class RedBean_Decorator {
 	 * @return array $aObjects
 	 */
 	public function siblings() { 
+		$this->signal("deco_siblings", $this);
 		$beans = RedBean_OODB::getParent( $this->data );
 		if (count($beans) > 0 ) {
 			$bean = array_pop($beans);	
@@ -731,6 +741,7 @@ class RedBean_Decorator {
 	 * @return array $aObjects
 	 */
 	public function children() {
+		$this->signal("deco_children", $this);
 		$beans = RedBean_OODB::getChildren( $this->data );
 		$decos = array();
 		$dclass = PRFX.$this->type.SFFX;
@@ -771,16 +782,12 @@ class RedBean_Decorator {
 		
 		$nodes = array($this);
 		while($node = array_shift($nodes)) {
-			//echo "<br>checking ".$node->getID();
-			//echo "<br>equals?... ".$deco->getID();
 			if ($node->getID() == $deco->getID() && 
 				($node->getID() != $this->getID())) {
 					return true;	
 				}
-			//echo "<br> no.. get children.. ";
 			if ($children = $node->children()) {
 				$nodes = array_merge($nodes, $children);
-				//echo "<br>new array: ".count($nodes);
 			}
 		}
 		return false;
@@ -807,6 +814,7 @@ class RedBean_Decorator {
 	 * @return RedBean_Decorator $oRD
 	 */
 	public function copy() {
+		$this->signal("deco_copy", $this);
 		$clone = new self( $this->type, 0 );
 		$clone->setData( $this->getData() );
 		return $clone;
@@ -817,6 +825,7 @@ class RedBean_Decorator {
 	 * @return unknown_type
 	 */
 	public function clearAllRelations() {
+		$this->signal("deco_clearrelations", $this);
 		RedBean_OODB::deleteAllAssoc( $this->getData() );
 	}
 
@@ -843,6 +852,7 @@ class RedBean_Decorator {
 	 * @return unknown_type
 	 */
 	public function save() {
+		$this->signal("deco_save", $this);
 		return RedBean_OODB::set( $this->data );
 	}
 
@@ -872,8 +882,6 @@ class RedBean_Decorator {
 		RedBean_OODB::closeBean( $this->getData());
 	}
 
-	
-	
 
 	/**
 	 * Closes and unlocks the bean
@@ -974,8 +982,6 @@ class RedBean_Decorator {
     }
  
     $beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
-    
-    
     
     $decos = array();
     $dclass = PRFX.$deco->type.SFFX;
@@ -3059,6 +3065,11 @@ class RedBean_OODB {
 		}
 	
 }
+/**
+ * 
+ * @author gabordemooij
+ *
+ */
 class Redbean_Querylogger implements RedBean_Observer
 {
  
@@ -3276,7 +3287,12 @@ class RedBean_Sieve {
 	
 	
 }
-class Redbean_Tools
+/**
+ * 
+ * @author Desfrenes
+ *
+ */
+class RedBean_Tools
 {
     private static $class_definitions;
     private static $remove_whitespaces;
@@ -3315,7 +3331,7 @@ class Redbean_Tools
         {
             file_put_contents($file, $content);
         }
-        return $compiled;
+        return $content;
     }
  
     private static function stripClassDefinition($file)
@@ -3338,11 +3354,6 @@ class RedBean_Validator_AlphaNumeric implements RedBean_Validator {
 		return (bool) preg_match('/^[A-Za-z0-9]+$/', $v);
 	}
 }
-/**
- * 
- * @author gabordemooij
- *
- */
 interface RedBean_Validator {
 	/**
 	 * 

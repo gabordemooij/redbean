@@ -61,8 +61,6 @@ class SmartTest {
 require("allinone.php");
 RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
 
-Redbean_Querylogger::init( "/Applications/xampp/xamppfiles/htdocs/tmp/", "9" );
-
 SmartTest::instance()->testPack = "Basic test suite";
 $tests = 0; SmartTest::instance()->progress(); ;
 
@@ -138,6 +136,83 @@ SmartTest::instance()->test($thing->importFromPost("nonexistant")->getFirst(),"a
 SmartTest::instance()->test($thing->importFromPost(array("first"))->getFirst(),"abc");
 SmartTest::instance()->test($thing->importFromPost(array("first"))->getSecond(),2);
 SmartTest::instance()->test($thing->importFromPost()->getSecond(),"xyz");
+
+
+SmartTest::instance()->testPack = "Observers";
+R::gen("Employee");
+$employee = new Employee;
+
+class TestObserver implements RedBean_Observer {
+	public $signal = "";
+	public function onEvent( $event, RedBean_Observable $observer ) {
+		$this->signal=$event;
+	}
+}
+$observer = new TestObserver;
+$employee->addEventListener( "deco_set",$observer );
+$employee->addEventListener( "deco_get",$observer );
+$employee->addEventListener( "deco_clearrelated",$observer );
+$employee->addEventListener( "deco_add",$observer );
+$employee->addEventListener( "deco_remove",$observer );
+$employee->addEventListener( "deco_attach",$observer );
+$employee->addEventListener( "deco_numof",$observer );
+$employee->addEventListener( "deco_belongsto",$observer );
+$employee->addEventListener( "deco_exclusiveadd",$observer );
+$employee->addEventListener( "deco_children",$observer );
+$employee->addEventListener( "deco_parent",$observer );
+$employee->addEventListener( "deco_siblings",$observer );
+$employee->addEventListener( "deco_importpost",$observer );
+$employee->addEventListener( "deco_import",$observer );
+$employee->addEventListener( "deco_copy",$observer );
+$employee->addEventListener( "deco_free",$observer );
+$observer->signal="";
+$employee->setName("test");
+SmartTest::instance()->test($observer->signal,"deco_set");
+$observer->signal="";
+$employee->getName();
+SmartTest::instance()->test($observer->signal,"deco_get");
+$observer->signal="";
+$employee->getRelatedCustomer();
+SmartTest::instance()->test($observer->signal,"deco_get");
+$observer->signal="";
+$employee->is("nerd");
+SmartTest::instance()->test($observer->signal,"deco_get");
+$observer->signal="";
+$employee->clearRelated("nerd");
+SmartTest::instance()->test($observer->signal,"deco_clearrelated");
+$observer->signal="";
+$employee2 = new Employee;
+$employee2->setName("Minni");
+$employee->add($employee2);
+SmartTest::instance()->test($observer->signal,"deco_add");
+$observer->signal="";
+$employee->remove($employee2);
+SmartTest::instance()->test($observer->signal,"deco_remove");
+$observer->signal="";
+$employee->attach($employee2);
+SmartTest::instance()->test($observer->signal,"deco_attach");
+$observer->signal="";
+$employee->numofEmployee();
+SmartTest::instance()->test($observer->signal,"deco_numof");
+$observer->signal="";
+$employee->belongsTo($employee2);
+SmartTest::instance()->test($observer->signal,"deco_belongsto");
+$observer->signal="";
+$employee->exclusiveAdd($employee2);
+SmartTest::instance()->test($observer->signal,"deco_exclusiveadd");
+$observer->signal="";
+$employee->parent();
+SmartTest::instance()->test($observer->signal,"deco_parent");
+$observer->signal="";
+$employee->children($employee2);
+SmartTest::instance()->test($observer->signal,"deco_children");
+$observer->signal="";
+$employee->siblings($employee2);
+SmartTest::instance()->test($observer->signal,"deco_siblings");
+$observer->signal="";
+$employee->copy();
+SmartTest::instance()->test($observer->signal,"deco_copy");
+
 
 SmartTest::instance()->testPack = "Sieves";
 R::gen("Employee");

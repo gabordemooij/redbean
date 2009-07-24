@@ -1,4 +1,9 @@
 <?php
+/**
+ * 
+ * @author gabordemooij
+ *
+ */
 class Redbean_Querylogger implements RedBean_Observer
 {
  

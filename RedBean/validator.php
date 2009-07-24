@@ -1,9 +1,5 @@
 <?php
-/**
- * 
- * @author gabordemooij
- *
- */
+
 interface RedBean_Validator {
 	/**
 	 * 

@@ -1,6 +1,10 @@
 <?php
-
-class Redbean_Tools
+/**
+ * 
+ * @author Desfrenes
+ *
+ */
+class RedBean_Tools
 {
     private static $class_definitions;
     private static $remove_whitespaces;
@@ -39,7 +43,7 @@ class Redbean_Tools
         {
             file_put_contents($file, $content);
         }
-        return $compiled;
+        return $content;
     }
  
     private static function stripClassDefinition($file)
