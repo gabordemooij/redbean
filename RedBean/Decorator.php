@@ -82,22 +82,11 @@ class RedBean_Decorator {
 				$setter = "set".ucfirst( $field );  
 				if (isset( $_POST[$field] )) {
 					$resp = $this->$setter( $_POST[ $field ]  );
-					if ($resp !== true) {
-						$this->problems[$field] = $resp;
-					}
 				}
-	
-			}
-	
-			if (count($this->problems)===0) {
-				return true;
-			}
-			else {
-				return false;
 			}
 		}
 		
-
+		return $this;
 	}
 
 	/**
@@ -113,18 +102,9 @@ class RedBean_Decorator {
 		foreach( $arr as $key=>$val ) {
 			$setter = "set".ucfirst( $key );
 			$resp = $this->$setter( $val );
-			if ($resp !== true) {
-				$this->problems[$key] = $resp;
-			}
+			
 		}
-
-
-		if (count($this->problems)===0) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return $this;
 
 	}
 

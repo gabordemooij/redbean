@@ -128,6 +128,16 @@ catch(Exception $e) {
 	SmartTest::failedTest();
 }
 
+SmartTest::instance()->testPack = "Import";
+R::gen("Thing");
+$_POST["first"]="abc";
+$_POST["second"]="xyz";
+$thing = new Thing;
+SmartTest::instance()->test($thing->import(array("first"=>"a","second"=>2))->getFirst(),"a");
+SmartTest::instance()->test($thing->importFromPost("nonexistant")->getFirst(),"a");
+SmartTest::instance()->test($thing->importFromPost(array("first"))->getFirst(),"abc");
+SmartTest::instance()->test($thing->importFromPost(array("first"))->getSecond(),2);
+SmartTest::instance()->test($thing->importFromPost()->getSecond(),"xyz");
 
 SmartTest::instance()->testPack = "Sieves";
 R::gen("Employee");
