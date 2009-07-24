@@ -322,16 +322,17 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
  * @author gabordemooij
  *
  */
-class RedBean_DBAdapter {
+class RedBean_DBAdapter extends RedBean_Observable {
 
 	/**
 	 *
 	 * @var ADODB
 	 */
 	private $db = null;
+	
+	private $sql = "";
 
-	public static $log = array();
-
+	
 	/**
 	 *
 	 * @param $database
@@ -339,6 +340,10 @@ class RedBean_DBAdapter {
 	 */
 	public function __construct($database) {
 		$this->db = $database;
+	}
+	
+	public function getSQL() {
+		return $this->sql;
 	}
 
 	/**
@@ -355,8 +360,12 @@ class RedBean_DBAdapter {
 	 * @param $sql
 	 * @return unknown_type
 	 */
-	public function exec( $sql ) {
-		self::$log[] = $sql;
+	public function exec( $sql , $noevent=false) {
+		
+		if (!$noevent){
+			$this->sql = $sql;
+			$this->signal("sql_exec", $this);
+		}
 		return $this->db->Execute( $sql );
 	}
 
@@ -366,7 +375,11 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function get( $sql ) {
-		self::$log[] = $sql;
+		
+		$this->sql = $sql;
+		$this->signal("sql_exec", $this);
+		
+		
 		return $this->db->GetAll( $sql );
 	}
 
@@ -376,7 +389,11 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getRow( $sql ) {
-		self::$log[] = $sql;
+		
+		$this->sql = $sql;
+		$this->signal("sql_exec", $this);
+		
+		
 		return $this->db->GetRow( $sql );
 	}
 
@@ -386,7 +403,11 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getCol( $sql ) {
-		self::$log[] = $sql;
+		
+		$this->sql = $sql;
+		$this->signal("sql_exec", $this);
+		
+		
 		return $this->db->GetCol( $sql );
 	}
 
@@ -396,7 +417,11 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getCell( $sql ) {
-		self::$log[] = $sql;
+		
+		$this->sql = $sql;
+		$this->signal("sql_exec", $this);
+		
+		
 		$arr = $this->db->GetCol( $sql );
 		if ($arr && is_array($arr))	return ($arr[0]); else return false;
 	}
@@ -406,7 +431,6 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getInsertID() {
-		// self::$log[] = $sql;
 		return $this->db->getInsertID();
 	}
 
@@ -415,7 +439,6 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getAffectedRows() {
-		// self::$log[] = $sql;
 		return $this->db->Affected_Rows();
 	}
 	
@@ -1172,12 +1195,73 @@ interface RedBean_Driver {
 	public function GetRaw();
 
 }
-class ExceptionFailedAccessBean extends Exception{}
-class ExceptionInvalidArgument extends RedBean_Exception {}
-class ExceptionRedBeanSecurity extends RedBean_Exception {}
-class ExceptionInvalidParentChildCombination extends RedBean_Exception{}
-class ExceptionSQL extends RedBean_Exception {};
+class RedBean_Exception_FailedAccessBean extends Exception{}
+class RedBean_Exception_InvalidArgument extends RedBean_Exception {}
+class RedBean_Exception_Security extends RedBean_Exception {}
+class RedBean_Exception_InvalidParentChildCombination extends RedBean_Exception{}
+class RedBean_Exception_SQL extends RedBean_Exception {};
 class Redbean_Exception extends Exception{}
+/**
+ * 
+ * @author gabordemooij
+ *
+ */
+class RedBean_Observable {
+	/**
+	 * 
+	 * @var array
+	 */
+	private $observers = array();
+	
+	/**
+	 * 
+	 * @param $eventname
+	 * @param $observer
+	 * @return unknown_type
+	 */
+	public function addEventListener( $eventname, RedBean_Observer $observer ) {
+		
+		if (!is_array($this->observers[ $eventname ])) {
+			$this->observers[ $eventname ] = array();
+		}
+		
+		$this->observers[ $eventname ][] = $observer;
+	}
+	
+	/**
+	 * 
+	 * @param $eventname
+	 * @return unknown_type
+	 */
+	public function signal( $eventname ) {
+		
+		if (!is_array($this->observers[ $eventname ])) {
+			$this->observers[ $eventname ] = array();
+		}
+		
+		foreach($this->observers[$eventname] as $observer) {
+			$observer->onEvent( $eventname, $this );	
+		}
+		
+	}
+	
+	
+}
+/**
+ * 
+ * @author gabordemooij
+ *
+ */
+interface RedBean_Observer {
+	
+	/**
+	 * 
+	 * @param $eventname
+	 * @param $o
+	 * @return unknown_type
+	 */
+	public function onEvent( $eventname, RedBean_Observable $o );
+}
 /**
  * RedBean OODB (object oriented database) Core class for the RedBean ORM pack
  * @author gabordemooij
@@ -1365,7 +1449,7 @@ class RedBean_OODB {
 			foreach($bean as $prop=>$value) {
 				$prop = preg_replace('/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/',"",$prop);
 				if (strlen(trim($prop))===0) {
-					throw new ExceptionRedBeanSecurity("Invalid Characters in property");
+					throw new RedBean_Exception_Security("Invalid Characters in property");
 				}
 				else {
 					
@@ -1825,7 +1909,7 @@ class RedBean_OODB {
 
 			//If you must lock a bean then the bean must have been locked by a previous call.
 			if ($mustlock) {
-				throw new ExceptionFailedAccessBean("Could not acquire a lock for bean $tbl . $id ");
+				throw new RedBean_Exception_FailedAccessBean("Could not acquire a lock for bean $tbl . $id ");
 				return false;
 			}
 
@@ -1899,7 +1983,7 @@ class RedBean_OODB {
 				}
 			}
 			else {
-				throw new ExceptionFailedAccessBean("bean not found");
+				throw new RedBean_Exception_FailedAccessBean("bean not found");
 			}
 
 			return $bean;
@@ -2556,7 +2640,7 @@ class RedBean_OODB {
 
 			//are parent and child of the same type?
 			if ($parent->type !== $child->type) {
-				throw new ExceptionInvalidParentChildCombination();
+				throw new RedBean_Exception_InvalidParentChildCombination();
 			}
 
 			$pid = intval($parent->id);
@@ -2690,7 +2774,7 @@ class RedBean_OODB {
 
 			//are parent and child of the same type?
 			if ($parent->type !== $child->type) {
-				throw new ExceptionInvalidParentChildCombination();
+				throw new RedBean_Exception_InvalidParentChildCombination();
 			}
 
 			//infer the association table
@@ -2815,7 +2899,7 @@ class RedBean_OODB {
 				self::$locktime = $timeInSecs;
 			}
 			else {
-				throw new ExceptionInvalidArgument( "time must be integer >= 0" );
+				throw new RedBean_Exception_InvalidArgument( "time must be integer >= 0" );
 			}
 		}
 
@@ -2995,21 +3079,66 @@ class RedBean_OODB {
 		}
 	
 }
-class Redbean_Querylogger
+class Redbean_Querylogger implements RedBean_Observer
 {
  
+	/**
+	 * 
+	 * @var string
+	 */
+	private $path = "";
+	
+	/**
+	 * 
+	 * @var integer
+	 */
+	private $userid = 0;
+	
+	private function getFilename() {
+		return $this->path . "audit_".date("m_d_y").".log";
+	}
+	
 	/**
 	 * Logs a piece of SQL code
 	 * @param $sql
 	 * @return void
 	 */
-	public static function logSCQuery( $sql )
+	public function logSCQuery( $sql, $db )
     {
 		$sql = addslashes($sql);
-		$db = Redbean_OODB::$db;
-		$db->exec("INSERT INTO auditsql (id,`sql`) VALUES(null,\"$sql\")");
+		$line = "\n".date("H:i:s")."|".$_SERVER["REMOTE_ADDR"]."|UID=".$this->userid."|".$sql;  
+		file_put_contents( $this->getFilename(), $line, FILE_APPEND );
 		return null;
 	}
+	
+	/**
+	 * Inits the logger
+	 * @param $path
+	 * @param $userid
+	 * @return unknown_type
+	 */
+	public static function init($path="",$userid=0) {
+		
+		$logger = new self;
+		$logger->userid = $userid;
+		$logger->path = $path;
+		if (!file_exists($logger->getFilename())) {
+			file_put_contents($logger->getFilename(),"begin logging");	
+		}
+		
+		RedBean_OODB::$db->addEventListener( "sql_exec", $logger );
+	
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Observer#onEvent()
+	 */
+	public function onEvent( $event, RedBean_Observable $db ) {
+		
+		$this->logSCQuery( $db->getSQL(), $db );
+	}
+	
  
 }
 //For framework intergration if you define $db you can specify a class prefix for models
@@ -3075,14 +3204,38 @@ class RedBean_Setup {
 			RedBean_OODB::freeze(); //Decide whether to freeze the database
 		}
 	}
+	
 }
+/**
+ * 
+ * @author gabordemooij
+ *
+ */
 class RedBean_Sieve {
 	
+	/**
+	 * 
+	 * @var array
+	 */
 	private $vals;
+	
+	/**
+	 * 
+	 * @var array
+	 */
 	private $report = array();
+	
+	/**
+	 * 
+	 * @var boolean
+	 */
 	private $succes = true;
 	
-	
+	/**
+	 * 
+	 * @param $validations
+	 * @return unknown_type
+	 */
 	public static function make( $validations ) {
 		
 		$sieve = new self;
@@ -3091,6 +3244,11 @@ class RedBean_Sieve {
 			
 	}
 	
+	/**
+	 * 
+	 * @param $deco
+	 * @return unknown_type
+	 */
 	public function valid( RedBean_Decorator $deco ) {
 	
 		foreach($this->vals as $p => $v) {
@@ -3112,6 +3270,12 @@ class RedBean_Sieve {
 		return $this->succes;	
 	}
 	
+	/**
+	 * 
+	 * @param $deco
+	 * @param $key
+	 * @return unknown_type
+	 */
 	public function validAndReport( RedBean_Decorator $deco, $key=false ) {
 		$this->valid( $deco );
 		if ($key) {
@@ -3122,11 +3286,13 @@ class RedBean_Sieve {
 		return $this->report;
 	}
 	
+	/**
+	 * 
+	 * @return unknown_type
+	 */
 	public function getReport() {
 		return $this->report;
 	}
-	
-	
 	
 	
 }
@@ -3192,6 +3358,16 @@ class RedBean_Validator_AlphaNumeric implements RedBean_Validator {
 		return (bool) preg_match('/^[A-Za-z0-9]+$/', $v);
 	}
 }
+/**
+ * 
+ * @author gabordemooij
+ *
+ */
 interface RedBean_Validator {
+	/**
+	 * 
+	 * @param $property
+	 * @return unknown_type
+	 */
 	public function check( $property );
 }

@@ -61,6 +61,7 @@ class SmartTest {
 require("allinone.php");
 RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
 
+Redbean_Querylogger::init( "/Applications/xampp/xamppfiles/htdocs/tmp/", "9" );
 
 SmartTest::instance()->testPack = "Basic test suite";
 $tests = 0; SmartTest::instance()->progress(); ;
@@ -500,7 +501,7 @@ function testsperengine() {
 	RedBean_OODB::trash( $person );
 	try{
 	$person = RedBean_OODB::getById( "person", $bobid);$ok=0;
-	}catch(ExceptionFailedAccessBean $e){
+	}catch(RedBean_Exception_FailedAccessBean $e){
 		$ok=true;
 	}
 	
@@ -698,7 +699,7 @@ function testsperengine() {
 	try{
 	$cheese->save();
 	}
-	catch(ExceptionFailedAccessBean $e) {
+	catch(RedBean_Exception_FailedAccessBean $e) {
 		$ok=1;
 	}
 	if (!$ok) SmartTest::failedTest(); 
@@ -710,7 +711,7 @@ function testsperengine() {
 	try{
 	$bordeaux->add( $cheese );
 	}
-	catch(ExceptionFailedAccessBean $e) {
+	catch(RedBean_Exception_FailedAccessBean $e) {
 		$ok=1;
 	}
 	if (!$ok) SmartTest::failedTest(); 
@@ -719,7 +720,7 @@ function testsperengine() {
 	try{
 	$bordeaux->attach( $cheese );
 	}
-	catch(ExceptionFailedAccessBean $e) {
+	catch(RedBean_Exception_FailedAccessBean $e) {
 		$ok=1;
 	}
 	if (!$ok) SmartTest::failedTest(); 
@@ -729,12 +730,13 @@ function testsperengine() {
 	$bordeaux->add( new Wine() );
 	$ok=1;
 	}
-	catch(ExceptionFailedAccessBean $e) {
+	catch(RedBean_Exception_FailedAccessBean $e) {
 		$ok=0;
 	}
 	if (!$ok) SmartTest::failedTest(); 
 	
 	SmartTest::instance()->progress(); ;
+	
 	RedBean_OODB::$pkey = $oldkey;
 	$cheese = new Cheese(1);
 	$cheese->setName("Camembert");
@@ -743,7 +745,7 @@ function testsperengine() {
 	$cheese->save();
 	$ok=1;
 	}
-	catch(ExceptionFailedAccessBean $e) {
+	catch(RedBean_Exception_FailedAccessBean $e) {
 		$ok=0;
 	}
 	if (!$ok) SmartTest::failedTest(); 
@@ -793,28 +795,28 @@ function testsperengine() {
 	try{
 	RedBean_OODB::setLockingTime( -1 );
 	SmartTest::failedTest();
-	}catch(ExceptionInvalidArgument $e){  }
+	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
 	SmartTest::instance()->testPack = "protect inner state of RedBean";
 	try{
 	RedBean_OODB::setLockingTime( 1.5 );
 	SmartTest::failedTest();
-	}catch(ExceptionInvalidArgument $e){  }
+	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
 	SmartTest::instance()->testPack = "protect inner state of RedBean";
 	try{
 	RedBean_OODB::setLockingTime( "aaa" );
 	SmartTest::failedTest();
-	}catch(ExceptionInvalidArgument $e){  }
+	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
 	SmartTest::instance()->testPack = "protect inner state of RedBean";
 	try{
 	RedBean_OODB::setLockingTime( null );
 	SmartTest::failedTest();
-	}catch(ExceptionInvalidArgument $e){  }
+	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
 	
@@ -985,7 +987,7 @@ try {
 	$oBean->save();
 	SmartTest::failedTest(); 
 }
-catch(ExceptionRedBeanSecurity $e){
+catch(RedBean_Exception_Security $e){
 	SmartTest::instance()->progress();	
 }
 $maliciousproperty = "\"test";
@@ -996,7 +998,7 @@ try {
 	SmartTest::instance()->progress();
 	 
 }
-catch(ExceptionRedBeanSecurity $e){
+catch(RedBean_Exception_Security $e){
 	SmartTest::failedTest();	
 }
 $converted = "test";

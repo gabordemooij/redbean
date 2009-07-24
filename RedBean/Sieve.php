@@ -1,12 +1,34 @@
 <?php
-
+/**
+ * 
+ * @author gabordemooij
+ *
+ */
 class RedBean_Sieve {
 	
+	/**
+	 * 
+	 * @var array
+	 */
 	private $vals;
+	
+	/**
+	 * 
+	 * @var array
+	 */
 	private $report = array();
+	
+	/**
+	 * 
+	 * @var boolean
+	 */
 	private $succes = true;
 	
-	
+	/**
+	 * 
+	 * @param $validations
+	 * @return unknown_type
+	 */
 	public static function make( $validations ) {
 		
 		$sieve = new self;
@@ -15,6 +37,11 @@ class RedBean_Sieve {
 			
 	}
 	
+	/**
+	 * 
+	 * @param $deco
+	 * @return unknown_type
+	 */
 	public function valid( RedBean_Decorator $deco ) {
 	
 		foreach($this->vals as $p => $v) {
@@ -36,6 +63,12 @@ class RedBean_Sieve {
 		return $this->succes;	
 	}
 	
+	/**
+	 * 
+	 * @param $deco
+	 * @param $key
+	 * @return unknown_type
+	 */
 	public function validAndReport( RedBean_Decorator $deco, $key=false ) {
 		$this->valid( $deco );
 		if ($key) {
@@ -46,11 +79,13 @@ class RedBean_Sieve {
 		return $this->report;
 	}
 	
+	/**
+	 * 
+	 * @return unknown_type
+	 */
 	public function getReport() {
 		return $this->report;
 	}
-	
-	
 	
 	
 }

@@ -1,2 +1,2 @@
 <?php 
-class ExceptionInvalidParentChildCombination extends RedBean_Exception{}
+class RedBean_Exception_InvalidParentChildCombination extends RedBean_Exception{}

@@ -4,16 +4,17 @@
  * @author gabordemooij
  *
  */
-class RedBean_DBAdapter {
+class RedBean_DBAdapter extends RedBean_Observable {
 
 	/**
 	 *
 	 * @var ADODB
 	 */
 	private $db = null;
+	
+	private $sql = "";
 
-	public static $log = array();
-
+	
 	/**
 	 *
 	 * @param $database
@@ -21,6 +22,10 @@ class RedBean_DBAdapter {
 	 */
 	public function __construct($database) {
 		$this->db = $database;
+	}
+	
+	public function getSQL() {
+		return $this->sql;
 	}
 
 	/**
@@ -37,8 +42,12 @@ class RedBean_DBAdapter {
 	 * @param $sql
 	 * @return unknown_type
 	 */
-	public function exec( $sql ) {
-		self::$log[] = $sql;
+	public function exec( $sql , $noevent=false) {
+		
+		if (!$noevent){
+			$this->sql = $sql;
+			$this->signal("sql_exec", $this);
+		}
 		return $this->db->Execute( $sql );
 	}
 
@@ -48,7 +57,11 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function get( $sql ) {
-		self::$log[] = $sql;
+		
+		$this->sql = $sql;
+		$this->signal("sql_exec", $this);
+		
+		
 		return $this->db->GetAll( $sql );
 	}
 
@@ -58,7 +71,11 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getRow( $sql ) {
-		self::$log[] = $sql;
+		
+		$this->sql = $sql;
+		$this->signal("sql_exec", $this);
+		
+		
 		return $this->db->GetRow( $sql );
 	}
 
@@ -68,7 +85,11 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getCol( $sql ) {
-		self::$log[] = $sql;
+		
+		$this->sql = $sql;
+		$this->signal("sql_exec", $this);
+		
+		
 		return $this->db->GetCol( $sql );
 	}
 
@@ -78,7 +99,11 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getCell( $sql ) {
-		self::$log[] = $sql;
+		
+		$this->sql = $sql;
+		$this->signal("sql_exec", $this);
+		
+		
 		$arr = $this->db->GetCol( $sql );
 		if ($arr && is_array($arr))	return ($arr[0]); else return false;
 	}
@@ -88,7 +113,6 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getInsertID() {
-		// self::$log[] = $sql;
 		return $this->db->getInsertID();
 	}
 
@@ -97,7 +121,6 @@ class RedBean_DBAdapter {
 	 * @return unknown_type
 	 */
 	public function getAffectedRows() {
-		// self::$log[] = $sql;
 		return $this->db->Affected_Rows();
 	}
 	

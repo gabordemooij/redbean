@@ -1,2 +1,2 @@
 <?php 
-class ExceptionFailedAccessBean extends Exception{}
+class RedBean_Exception_FailedAccessBean extends Exception{}

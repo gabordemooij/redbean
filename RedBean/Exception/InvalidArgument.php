@@ -1,2 +1,2 @@
 <?php 
-class ExceptionInvalidArgument extends RedBean_Exception {}
+class RedBean_Exception_InvalidArgument extends RedBean_Exception {}

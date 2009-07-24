@@ -63,4 +63,5 @@ class RedBean_Setup {
 			RedBean_OODB::freeze(); //Decide whether to freeze the database
 		}
 	}
+	
 }

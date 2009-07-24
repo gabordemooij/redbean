@@ -1,2 +1,2 @@
 <?php 
-class ExceptionSQL extends RedBean_Exception {};
+class RedBean_Exception_SQL extends RedBean_Exception {};

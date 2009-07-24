@@ -188,7 +188,7 @@ class RedBean_OODB {
 			foreach($bean as $prop=>$value) {
 				$prop = preg_replace('/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/',"",$prop);
 				if (strlen(trim($prop))===0) {
-					throw new ExceptionRedBeanSecurity("Invalid Characters in property");
+					throw new RedBean_Exception_Security("Invalid Characters in property");
 				}
 				else {
 					
@@ -648,7 +648,7 @@ class RedBean_OODB {
 
 			//If you must lock a bean then the bean must have been locked by a previous call.
 			if ($mustlock) {
-				throw new ExceptionFailedAccessBean("Could not acquire a lock for bean $tbl . $id ");
+				throw new RedBean_Exception_FailedAccessBean("Could not acquire a lock for bean $tbl . $id ");
 				return false;
 			}
 
@@ -722,7 +722,7 @@ class RedBean_OODB {
 				}
 			}
 			else {
-				throw new ExceptionFailedAccessBean("bean not found");
+				throw new RedBean_Exception_FailedAccessBean("bean not found");
 			}
 
 			return $bean;
@@ -1379,7 +1379,7 @@ class RedBean_OODB {
 
 			//are parent and child of the same type?
 			if ($parent->type !== $child->type) {
-				throw new ExceptionInvalidParentChildCombination();
+				throw new RedBean_Exception_InvalidParentChildCombination();
 			}
 
 			$pid = intval($parent->id);
@@ -1513,7 +1513,7 @@ class RedBean_OODB {
 
 			//are parent and child of the same type?
 			if ($parent->type !== $child->type) {
-				throw new ExceptionInvalidParentChildCombination();
+				throw new RedBean_Exception_InvalidParentChildCombination();
 			}
 
 			//infer the association table
@@ -1638,7 +1638,7 @@ class RedBean_OODB {
 				self::$locktime = $timeInSecs;
 			}
 			else {
-				throw new ExceptionInvalidArgument( "time must be integer >= 0" );
+				throw new RedBean_Exception_InvalidArgument( "time must be integer >= 0" );
 			}
 		}
 
