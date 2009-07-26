@@ -917,7 +917,7 @@ class RedBean_OODB {
 			
 		}
 		
-		public static function getBySQL( $rawsql, $slots, $table ) {
+		public static function getBySQL( $rawsql, $slots, $table, $max=0 ) {
 		
 			$db = self::$db;
 			$sql = $rawsql;
@@ -926,13 +926,28 @@ class RedBean_OODB {
 				$sql = self::processQuerySlots( $sql, $slots );
 			}
 			
+			$sql = str_replace('@ifexists:','', $sql);
 			$rs = $db->getCol( "select `$table`.id from $table where " . $sql );
 			
-			if (is_array($rs)) {
-				return $rs;
+			$err = $db->getErrorMsg();
+			if (!self::$frozen && strpos($err,"Unknown column")!==false && $max<10) {
+				$matches = array();
+				if (preg_match("/Unknown\scolumn\s'(.*?)'/",$err,$matches)) {
+					if (count($matches)==2 && strpos($rawsql,'@ifexists')!==false){
+						$rawsql = str_replace('@ifexists:`'.$matches[1].'`','NULL', $rawsql);
+						$rawsql = str_replace('@ifexists:'.$matches[1].'','NULL', $rawsql);
+						return self::getBySQL( $rawsql, $slots, $table, ++$max);
+					}
+				}
+				return array();
 			}
 			else {
-				return array();
+				if (is_array($rs)) {
+					return $rs;
+				}
+				else {
+					return array();
+				}
 			}
 		}
 		
@@ -1764,7 +1779,12 @@ class RedBean_OODB {
 				return; //special column, cant slim it down
 			}
 			
+			
 			//now we have a table and a column $table and $col
+			if ($gc && !intval($db->getCell("SELECT count(*) FROM `$table` WHERE `$col` IS NOT NULL "))) {
+				$db->exec("ALTER TABLE `$table` DROP `$col`");
+				return;	
+			}
 			
 			//okay so this column is still in use, but maybe its to wide
 			//get the field type

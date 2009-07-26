@@ -1005,6 +1005,7 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     private $pdo;
     private $affected_rows;
     private $rs;
+    private $exc =0;
     
     public static function getInstance($dsn, $user, $pass, $dbname)
     {
@@ -1029,6 +1030,7 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     
     public function GetAll( $sql )
     {
+    	$this->exc = 0;
     	try{ 
 	        if ($this->debug)
 	        {
@@ -1049,19 +1051,24 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 	                echo "<br><b style='color:green'>resultset: " . count($rows) . " rows</b>";
 	            }
 	            
-	            $str = $this->Errormsg();
-	            if ($str != "")
-	            {
-	                echo "<br><b style='color:red'>" . $str . "</b>";
-	            }
 	        }
     	}
-    	catch(Exception $e){ return array(); }
+    	catch(Exception $e){ $this->exc = 1; 
+    	
+    			if ($this->debug){
+	           	 $str = $this->Errormsg();
+	           	 if ($str != "")
+	           	 {
+	           	     echo "<br><b style='color:red'>" . $str . "</b>";
+	           	 }
+    			}
+    	return array(); }
         return $rows;
     }
     
     public function GetCol($sql)
     {
+    	$this->exc = 0;
     	try{
 	        $rows = $this->GetAll($sql);
 	        $cols = array();
@@ -1074,49 +1081,60 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 	        }
 	    	
     	}
-    	catch(Exception $e){ return array(); }
+    	catch(Exception $e){ 
+    		$this->exc = 1;
+    		return array(); }
         return $cols;
     }
  
     public function GetCell($sql)
     {
+    	$this->exc = 0;
     	try{
 	        $arr = $this->GetAll($sql);
 	        $row1 = array_shift($arr);
 	        $col1 = array_shift($row1);
     	}
-    	catch(Exception $e){}
+    	catch(Exception $e){ $this->exc = 1; }
         return $col1;
     }
     
     public function GetRow($sql)
     {
+    	$this->exc = 0;
     	try{
         	$arr = $this->GetAll($sql);
     	}
-       	catch(Exception $e){ return array(); }
+       	catch(Exception $e){ $this->exc = 1; return array(); }
         return array_shift($arr);
     }
     
     public function ErrorNo()
     {
+    	if (!$this->exc) return 0;
     	$infos = $this->pdo->errorInfo();
         return $infos[1];
     }
     public function Errormsg()
     {
+    	if (!$this->exc) return "";
         $infos = $this->pdo->errorInfo();
         return $infos[2];
     }
     public function Execute( $sql )
     {
+    	$this->exc = 0;
     	try{
 	        if ($this->debug)
 	        {
 	            echo "<HR>" . $sql;
 	        }
 	        $this->affected_rows = $this->pdo->exec($sql);
-	        if ($this->debug)
+	       
+    	}
+    	catch(Exception $e){ $this->exc = 1; 
+    	
+    	 if ($this->debug)
 	        {
 	            $str = $this->Errormsg();
 	            if ($str != "")
@@ -1124,8 +1142,7 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 	                echo "<br><b style='color:red'>" . $str . "</b>";
 	            }
 	        }
-    	}
-    	catch(Exception $e){ return 0; }
+    	return 0; }
         return $this->affected_rows;
     }
     public function Escape( $str )
@@ -2164,7 +2181,7 @@ class RedBean_OODB {
 			
 		}
 		
-		public static function getBySQL( $rawsql, $slots, $table ) {
+		public static function getBySQL( $rawsql, $slots, $table, $max=0 ) {
 		
 			$db = self::$db;
 			$sql = $rawsql;
@@ -2173,13 +2190,28 @@ class RedBean_OODB {
 				$sql = self::processQuerySlots( $sql, $slots );
 			}
 			
+			$sql = str_replace('@ifexists:','', $sql);
 			$rs = $db->getCol( "select `$table`.id from $table where " . $sql );
 			
-			if (is_array($rs)) {
-				return $rs;
+			$err = $db->getErrorMsg();
+			if (!self::$frozen && strpos($err,"Unknown column")!==false && $max<10) {
+				$matches = array();
+				if (preg_match("/Unknown\scolumn\s'(.*?)'/",$err,$matches)) {
+					if (count($matches)==2 && strpos($rawsql,'@ifexists')!==false){
+						$rawsql = str_replace('@ifexists:`'.$matches[1].'`','NULL', $rawsql);
+						$rawsql = str_replace('@ifexists:'.$matches[1].'','NULL', $rawsql);
+						return self::getBySQL( $rawsql, $slots, $table, ++$max);
+					}
+				}
+				return array();
 			}
 			else {
-				return array();
+				if (is_array($rs)) {
+					return $rs;
+				}
+				else {
+					return array();
+				}
 			}
 		}
 		
@@ -3011,7 +3043,12 @@ class RedBean_OODB {
 				return; //special column, cant slim it down
 			}
 			
+			
 			//now we have a table and a column $table and $col
+			if ($gc && !intval($db->getCell("SELECT count(*) FROM `$table` WHERE `$col` IS NOT NULL "))) {
+				$db->exec("ALTER TABLE `$table` DROP `$col`");
+				return;	
+			}
 			
 			//okay so this column is still in use, but maybe its to wide
 			//get the field type

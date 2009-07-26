@@ -126,6 +126,8 @@ catch(Exception $e) {
 	SmartTest::failedTest();
 }
 
+
+
 SmartTest::instance()->testPack = "Import";
 R::gen("Thing");
 $_POST["first"]="abc";
@@ -309,6 +311,29 @@ NULL ,  'indexer'
 ");
 
 
+
+$db->exec("INSERT INTO  `redbeantables` (
+`id` ,
+`tablename`
+)
+VALUES (
+NULL ,  'empcol'
+);
+");
+
+
+$db->exec("
+CREATE TABLE  `empcol` (
+`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
+`aaa` INT( 11),
+`bbb` INT(11),
+`ccc` INT( 11 ),
+PRIMARY KEY (  `id` )
+) ENGINE = MYISAM");
+
+$db->exec("INSERT INTO  `empcol` (`id` ,`aaa` )VALUES (NULL ,  1 )");
+
+
 for($i=0; $i<20; $i++){
 $db->exec("INSERT INTO  `indexer` (
 `id` ,
@@ -324,9 +349,14 @@ NULL ,  rand(),  'a',  rand(), CONCAT( rand()*100, '".str_repeat('x',1000)."' )
 }
 
 
+R::gen('empcol,slimtable,indexer');
+
 for($i=0; $i<500; $i++) {
-	RedBean_OODB::keepInShape();
+	RedBean_OODB::keepInShape( true );
 }
+
+$empcol = new empcol;
+SmartTest::test(empcol::where(' @ifexists:aaa=1 or @ifexists:bbb=1')->count(),1);
 
 $row = $db->getRow("select * from slimtable limit 1");
 SmartTest::test($row["col1"],1);
@@ -337,9 +367,27 @@ SmartTest::test(count($db->get("describe slimtable")),4);
 RedBean_OODB::dropColumn("slimtable","col3");
 SmartTest::test(count($db->get("describe slimtable")),3); 
 
+
+$db->exec("
+CREATE TABLE  `garbagetable` (
+`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
+`highcard` VARCHAR( 255 ) NOT NULL ,
+PRIMARY KEY (  `id` )
+) ENGINE = MYISAM");
+
+$db->exec("INSERT INTO  `redbeantables` (
+`id` ,
+`tablename`
+)
+VALUES (
+NULL ,  'garbagetable'
+);
+");
+
+
 RedBean_OODB::KeepInShape( true );
 $tables = RedBean_OODB::showTables(); 
-SmartTest::test(in_array("slimtable",$tables),false);
+SmartTest::test(in_array("garbagetable",$tables),false);
 
 //Tests for each individual engine
 function testsperengine() {
