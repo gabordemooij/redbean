@@ -1196,7 +1196,7 @@ interface RedBean_Driver {
 	public function setDebugMode( $tf );
 
 	public function GetRaw();
-
+	
 }
 class RedBean_Exception_FailedAccessBean extends Exception{}
 class RedBean_Exception_InvalidArgument extends RedBean_Exception {}
@@ -1370,6 +1370,10 @@ class RedBean_OODB {
 		 */
 		private static $frozen = false;
 
+		/**
+		 * @var QueryWriter
+		 */
+		private static $writer;
 		
 		/**
 		 * Closes and unlocks the bean
@@ -1460,9 +1464,6 @@ class RedBean_OODB {
 				}
 			}			
 			
-			//has redBean already been initialized?
-			if (!self::$pkey) self::init();
-
 			//Is the bean valid? does the bean have an id?
 			if (!isset($bean->id)) {
 				throw new Exception("Invalid bean, no id");
@@ -1565,27 +1566,13 @@ class RedBean_OODB {
 					
 				if (!in_array($table, $tables)) {
 
-					if (self::$engine=="myisam") {
-						//this fellow has no table yet to put his beer on!
-						$createtableSQL = "
-					 CREATE TABLE `$table` (
-					`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-					 PRIMARY KEY ( `id` )
-					 ) ENGINE = MYISAM 
-					";
-					}
-					else {
-						$createtableSQL = "
-					 CREATE TABLE `$table` (
-					`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-					 PRIMARY KEY ( `id` )
-					 ) ENGINE = InnoDB 
-					";
-					}
+					$createtableSQL = self::$writer->getQuery("create_table", array(
+						"engine"=>$engine,
+						"table"=>$table
+					));
+				
 					//get a table for our friend!
 					$db->exec( $createtableSQL );
-					
-					
 					//jupz, now he has its own table!
 					self::addTable( $table );
 				}
@@ -1615,19 +1602,29 @@ class RedBean_OODB {
 							//echo "TYPE = $sqlt .... $typeno ";
 							if ($typeno > $sqlt) {
 								//no, we have to widen the database column type
-								$changecolumnSQL="ALTER TABLE `$table` CHANGE `$p` `$p` ".self::$typeno_sqltype[$typeno];
+								$changecolumnSQL = self::$writer->getQuery( "widen_column", array(
+									"table" => $table,
+									"column" => $p,
+									"newtype" => self::$typeno_sqltype[$typeno]
+								) ); 
+								
 								$db->exec( $changecolumnSQL );
 							}
 						}
 						else {
 							//no it is not
-							$addcolumnSQL = "ALTER TABLE `$table` ADD `$p` ".self::$typeno_sqltype[$typeno];
+							$addcolumnSQL = self::$writer->getQuery("add_column",array(
+								"table"=>$table,
+								"column"=>$p,
+								"type"=> self::$typeno_sqltype[$typeno]
+							));
+							
 							$db->exec( $addcolumnSQL );
 						}
 						//Okay, now we are sure that the property value will fit
-						$insertvalues[] = "\"".$v."\"";
-						$insertcolumns[] = "`".$p."`";
-						$updatevalues[] = " `$p`=\"$v\" ";
+						$insertvalues[] = $v;
+						$insertcolumns[] = $p;
+						$updatevalues[] = array( "property"=>$p, "value"=>$v );
 					}
 				}
 
@@ -1638,10 +1635,9 @@ class RedBean_OODB {
 					if ($p!="type" && $p!="id") {
 						$p = $db->escape($p);
 						$v = $db->escape($v);
-							
-						$insertvalues[] = "\"".$v."\"";
-						$insertcolumns[] = "`".$p."`";
-						$updatevalues[] = " `$p`=\"$v\" ";
+						$insertvalues[] = $v;
+						$insertcolumns[] = $p;
+						$updatevalues[] = array( "property"=>$p, "value"=>$v );
 					}
 				}
 					
@@ -1653,7 +1649,12 @@ class RedBean_OODB {
 				self::openBean($bean, true);
 				//yes it exists, update it
 				if (count($updatevalues)>0) {
-					$updateSQL = "UPDATE `$table` SET ".implode(",",$updatevalues)."WHERE id = ".$bean->id;
+					$updateSQL = self::$writer->getQuery("update", array(
+						"table"=>$table,
+						"updatevalues"=>$updatevalues,
+						"id"=>$bean->id
+					)); 
+					
 					//execute the previously build query
 					$db->exec( $updateSQL );
 				}
@@ -1661,12 +1662,16 @@ class RedBean_OODB {
 			else {
 				//no it does not exist, create it
 				if (count($insertvalues)>0) {
-					$insertSQL = "INSERT INTO `$table` ";
-					$insertSQL .= " ( id, ".implode(",",$insertcolumns)." ) ";
-					$insertSQL .= " VALUES( null, ".implode(",",$insertvalues)." ) ";
+					
+					$insertSQL = self::$writer->getQuery("insert",array(
+						"table"=>$table,
+						"insertcolumns"=>$insertcolumns,
+						"insertvalues"=>$insertvalues
+					));
+				
 				}
 				else {
-					$insertSQL = "INSERT INTO `$table` VALUES(null) ";
+					$insertSQL = self::$writer->getQuery("create", array("table"=>$table)); 
 				}
 				//execute the previously build query
 				$db->exec( $insertSQL );
@@ -1685,15 +1690,27 @@ class RedBean_OODB {
 		 * @return $type the SQL type number constant
 		 */
 		public static function inferType( $v ) {
+			
 			$db = self::$db;
 			$rawv = $v;
-			$v = "'".$db->escape(strval($v))."'";
-			$checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v )";
+			
+			$checktypeSQL = self::$writer->getQuery("infertype", array(
+				"value"=> self::$db->escape(strval($v))
+			));
+			
+			
 			$db->exec( $checktypeSQL );
 			$id = $db->getInsertID();
-			$readtypeSQL = "select tinyintus,intus,ints,varchar255,`text` from dtyp where id=$id";
+			
+			$readtypeSQL = self::$writer->getQuery("readtype",array(
+				"id"=>$id
+			));
+			
 			$row=$db->getRow($readtypeSQL);
-			$db->exec("truncate table dtyp");
+			
+			
+			$db->exec( self::$writer->getQuery("reset_dtyp") );
+			
 			$tp = 0;
 			foreach($row as $t=>$tv) {
 				if (strval($tv) === strval($rawv)) {
@@ -1725,18 +1742,19 @@ class RedBean_OODB {
 		 * Initializes RedBean
 		 * @return bool $true
 		 */
-		public static function init( $dontclose = false) {
+		public static function init( $querywriter, $dontclose = false ) {
 
 			self::$me = new RedBean_OODB();
-
+			self::$writer = $querywriter;
+		
 
 			//prepare database
 			if (self::$engine === "innodb") {
-				self::$db->exec("SET autocommit=0");
-				self::$db->exec("START TRANSACTION");
+				self::$db->exec(self::$writer->getQuery("prepare_innodb"));
+				self::$db->exec(self::$writer->getQuery("starttransaction"));
 			}
 			else if (self::$engine === "myisam"){
-				self::$db->exec("SET autocommit=1");
+				self::$db->exec(self::$writer->getQuery("prepare_myisam"));
 			}
 
 
@@ -1744,53 +1762,13 @@ class RedBean_OODB {
 			//Create the RedBean tables we need -- this should only happen once..
 			if (!self::$frozen) {
 				
-				self::$db->exec("drop tables dtyp");
+				self::$db->exec(self::$writer->getQuery("clear_dtyp"));
 					
-				self::$db->exec("
-				CREATE TABLE IF NOT EXISTS `dtyp` (
-				  `id` int(11) unsigned NOT NULL auto_increment,
-				  `tinyintus` tinyint(3) unsigned NOT NULL,
-				  `intus` int(11) unsigned NOT NULL,
-				  `ints` bigint(20) NOT NULL,
-				  
-				  `varchar255` varchar(255) NOT NULL,
-				  `text` text NOT NULL,
-				  PRIMARY KEY  (`id`)
-				) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-				");
+				self::$db->exec(self::$writer->getQuery("setup_dtyp"));
 						
-					self::$db->exec("
-				CREATE TABLE IF NOT EXISTS `locking` (
-				  `tbl` varchar(255) NOT NULL,
-				  `id` bigint(20) NOT NULL,
-				  `fingerprint` varchar(255) NOT NULL,
-				  `expire` int(11) NOT NULL,
-				  UNIQUE KEY `tbl` (`tbl`,`id`)
-				) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-				");
+				self::$db->exec(self::$writer->getQuery("setup_locking"));
 						
-					//rbt
-					self::$db->exec("
-				 CREATE TABLE IF NOT EXISTS `redbeantables` (
-				 `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-				 `tablename` VARCHAR( 255 ) NOT NULL ,
-				 PRIMARY KEY ( `id` ),
-				 UNIQUE KEY `tablename` (`tablename`)
-				 ) ENGINE = MYISAM 
-				");
-						
-					self::$db->exec("
-				 CREATE TABLE IF NOT EXISTS `searchindex` (
-				`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-				`ind` VARCHAR( 255 ) NOT NULL ,
-				`cnt` INT( 11 ) NOT NULL ,
-				PRIMARY KEY ( `id` ),
-				UNIQUE KEY `ind` (`ind`)
-				) ENGINE = MYISAM ");
-				
-	
-			
-			
+				self::$db->exec(self::$writer->getQuery("setup_tables"));
 			}
 			
 			//generate a key
@@ -1827,11 +1805,11 @@ class RedBean_OODB {
 			$db = self::$db;
 
 			if ($all && self::$frozen) {
-				$alltables = $db->getCol("show tables");
+				$alltables = $db->getCol(self::$writer->getQuery("show_tables"));
 				return $alltables;
 			}
 			else {
-				$alltables = $db->getCol("select tablename from redbeantables");
+				$alltables = $db->getCol(self::$writer->getQuery("show_rtables"));
 				return $alltables;
 			}
 
@@ -1848,7 +1826,7 @@ class RedBean_OODB {
 
 			$tablename = $db->escape( $tablename );
 
-			$db->exec("replace into redbeantables values (null, \"$tablename\") ");
+			$db->exec(self::$writer->getQuery("register_table",array("table"=>$tablename)));
 
 		}
 
@@ -1863,7 +1841,7 @@ class RedBean_OODB {
 
 			$tablename = $db->escape( $tablename );
 
-			$db->exec("delete from redbeantables where tablename = \"$tablename\" ");
+			$db->exec(self::$writer->getQuery("unregister_table",array("table"=>$tablename)));
 
 
 		}
@@ -1874,7 +1852,7 @@ class RedBean_OODB {
 		 */
 		public function releaseAllLocks() {
 
-			self::$db->exec("DELETE FROM locking WHERE fingerprint=\"".self::$pkey."\" ");
+			self::$db->exec(self::$writer->getQuery("release",array("key"=>self::$pkey)));
 
 		}
 
@@ -1887,26 +1865,36 @@ class RedBean_OODB {
 		public static function openBean( $bean, $mustlock=false) {
 
 			self::checkBean( $bean );
-
-			//echo "trying to open bean... ".print_r($bean,1);
-
+			
 			//If locking is turned off, or the bean has no persistance yet (not shared) life is always a success!
 			if (!self::$locking || $bean->id === 0) return true;
 
 			$db = self::$db;
 
 			//remove locks that have been expired...
-			$removeExpiredSQL = "DELETE FROM locking WHERE expire < ".(time()-self::$locktime);
+			$removeExpiredSQL = self::$writer->getQuery("remove_expir_lock", array(
+				"locktime"=>self::$locktime
+			));
+			
 			$db->exec($removeExpiredSQL);
 
 			$tbl = $db->escape( $bean->type );
 			$id = intval( $bean->id );
 
 			//Is the bean already opened for us?
-			$checkopenSQL = "SELECT id FROM locking WHERE id=$id AND  tbl=\"$tbl\" AND fingerprint=\"".self::$pkey."\" ";
+			$checkopenSQL = self::$writer->getQuery("get_lock",array(
+				"id"=>$id,
+				"table"=>$tbl,
+				"key"=>self::$pkey
+			));
+			
 			$row = $db->getRow($checkopenSQL);
 			if ($row && is_array($row) && count($row)>0) {
-				$updateexpstamp = "UPDATE locking SET expire=".time()." WHERE id =".$row["id"];
+				$updateexpstamp = self::$writer->getQuery("update_expir_lock",array(
+					"time"=>time(),
+					"id"=>$row["id"]
+				));
+				$db->exec($updateexpstamp);
 				return true; //bean is locked for us!
 			}
 
@@ -1917,7 +1905,13 @@ class RedBean_OODB {
 			}
 
 			//try to get acquire lock on the bean
-			$openSQL = "INSERT INTO locking VALUES(\"$tbl\",$id,\"".self::$pkey."\",\"".time()."\") ";
+			$openSQL = self::$writer->getQuery("aq_lock", array(
+				"table"=>$tbl,
+				"id"=>$id,
+				"key"=>self::$pkey,
+				"time"=>time()
+			));
+			
 			$trials = 0;
 			$aff = 0;
 			while( $aff < 1 && $trials < 5 ) {
@@ -1972,7 +1966,11 @@ class RedBean_OODB {
 
 			//load the bean using sql
 			if (!$data) {
-				$getSQL = "SELECT * FROM `$type` WHERE id = $id ";
+				
+				$getSQL = self::$writer->getQuery("get_bean",array(
+					"type"=>$type,
+					"id"=>$id
+				)); 
 				$row = $db->getRow( $getSQL );
 			}
 			else {
@@ -2012,7 +2010,10 @@ class RedBean_OODB {
 				return false;
 			}
 			else {
-				$no = $db->getCell("select count(*) from `$type` where id=$id");
+				$no = $db->getCell( self::$writer->getQuery("bean_exists",array(
+					"type"=>$type,
+					"id"=>$id
+				)) );
 				if (intval($no)) {
 					return true;
 				}
@@ -2038,7 +2039,9 @@ class RedBean_OODB {
 				return 0;
 			}
 			else {
-				$no = $db->getCell("select count(*) from `$type`");
+				$no = $db->getCell( self::$writer->getQuery("count",array(
+					"type"=>$type
+				)));
 				return $no;
 			}
 		}
@@ -2065,7 +2068,10 @@ class RedBean_OODB {
 				return array();
 			}
 			else {
-				$ids = $db->getCol("SELECT id FROM `$type` GROUP BY $field");
+				$ids = $db->getCol( self::$writer->getQuery("distinct",array(
+					"type"=>$type,
+					"field"=>$field
+				)));
 				$beans = array();
 				if (is_array($ids) && count($ids)>0) {
 					foreach( $ids as $id ) {
@@ -2095,7 +2101,11 @@ class RedBean_OODB {
 				return 0;
 			}
 			else {
-				$no = $db->getCell("select $stat(`$field`) from `$type`");
+				$no = $db->getCell(self::$writer->getQuery("stat",array(
+					"stat"=>$stat,
+					"field"=>$field,
+					"type"=>$type
+				)));
 				return $no;
 			}
 		}
@@ -2146,7 +2156,7 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public static function resetAll() {
-			$sql = "TRUNCATE locking";
+			$sql = self::$writer->getQuery("releaseall");
 			self::$db->exec( $sql );
 			return true;
 		}
@@ -2166,7 +2176,7 @@ class RedBean_OODB {
 			
 			//replace the slots inside the SQL template
 			foreach( $slots as $key=>$value ) {
-				$sql = str_replace( "{".$code.$key."}", "\"".$db->escape( $value )."\"",$sql ); 
+				$sql = str_replace( "{".$code.$key."}", self::$writer->getQuote().$db->escape( $value ).self::$writer->getQuote(),$sql ); 
 			}
 			
 			return $sql;
@@ -2175,8 +2185,13 @@ class RedBean_OODB {
 		public static function fastLoader( $type, $ids ) {
 			
 			$db = self::$db;
-			$sql = "SELECT * FROM `$type` WHERE id IN ( ".implode(",", $ids)." ) ORDER BY FIELD(id,".implode(",", $ids).") ASC
-			";
+			
+			
+			$sql = self::$writer->getQuery("fastload", array(
+				"type"=>$type,
+				"ids"=>$ids
+			)); 
+			
 			return $db->get( $sql );
 			
 		}
@@ -2191,7 +2206,9 @@ class RedBean_OODB {
 			}
 			
 			$sql = str_replace('@ifexists:','', $sql);
-			$rs = $db->getCol( "select `$table`.id from $table where " . $sql );
+			$rs = $db->getCol( self::$writer->getQuery("where",array(
+				"table"=>$table
+			)) . $sql );
 			
 			$err = $db->getErrorMsg();
 			if (!self::$frozen && strpos($err,"Unknown column")!==false && $max<10) {
@@ -2231,34 +2248,15 @@ class RedBean_OODB {
       $db = self::$db;
       $tbl = $db->escape( $bean->type );
  
-      $findSQL = "SELECT id FROM `$tbl` WHERE ";
-      
-      
-      foreach($bean as $p=>$v) {
-        if ($p === "type" || $p === "id") continue;
-        $p = $db->escape($p);
-        $v = $db->escape($v);
-        if (isset($searchoperators[$p])) {
- 
-          if ($searchoperators[$p]==="LIKE") {
-            $part[] = " `$p`LIKE \"%$v%\" ";
-          }
-          else {
-            $part[] = " `$p` ".$searchoperators[$p]." \"$v\" ";
-          }
-        }
-        else {
- 
-        }
-      }
- 
-      if ($extraSQL) {
-        $findSQL .= @implode(" AND ",$part) . $extraSQL;
-      }
-      else {
-        $findSQL .= @implode(" AND ",$part) . " ORDER BY $orderby LIMIT $start, $end ";
-      }
- 
+      $findSQL = self::$writer->getQuery("find",array(
+      	"searchoperators"=>$searchoperators,
+      	"bean"=>$bean,
+      	"start"=>$start,
+      	"end"=>$end,
+      	"orderby"=>$orderby,
+      	"extraSQL"=>$extraSQL,
+      	"tbl"=>$tbl
+      ));
       
       $ids = $db->getCol( $findSQL );
       $beans = array();
@@ -2286,32 +2284,15 @@ class RedBean_OODB {
  
 			$db = self::$db;
  
-			if ($extraSQL) {
- 
-				$listSQL = "SELECT * FROM ".$db->escape($type)." ".$extraSQL;
- 
-			}
-			else {
- 
-				$listSQL = "SELECT * FROM ".$db->escape($type)."
-					ORDER BY ".$orderby;
- 
-					if ($end !== false && $start===false) {
-						$listSQL .= " LIMIT ".intval($end);
-					}
- 
-					if ($start !== false && $end !== false) {
-						$listSQL .= " LIMIT ".intval($start).", ".intval($end);
-					}
- 
-					if ($start !== false && $end===false) {
-						$listSQL .= " LIMIT ".intval($start).", 18446744073709551615 ";
-					}
- 
- 
- 
-			}
- 
+			$listSQL = self::$writer->getQuery("list",array(
+				"type"=>$type,
+				"start"=>$start,
+				"end"=>$end,
+				"orderby"=>$orderby,
+				"extraSQL"=>$extraSQL
+			));
+			
+			
 			return $db->get( $listSQL );
  
 		}
@@ -2371,23 +2352,33 @@ class RedBean_OODB {
 						$t2.="2";
 					}
 
-					$assoccreateSQL = "
-				 CREATE TABLE `$assoctable` (
-				`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-				`".$t1."_id` INT( 11 ) UNSIGNED NOT NULL,
-				`".$t2."_id` INT( 11 ) UNSIGNED NOT NULL,
-				 PRIMARY KEY ( `id` )
-				 ) ENGINE = ".self::$engine."; 
-				";
+					$assoccreateSQL = self::$writer->getQuery("create_assoc",array(
+						"assoctable"=> $assoctable,
+						"t1" =>$t1,
+						"t2" =>$t2,
+						"engine"=>self::$engine
+					));
+					
 					$db->exec( $assoccreateSQL );
+					
 					//add a unique constraint
-					$db->exec( "ALTER TABLE `$assoctable` ADD UNIQUE INDEX `u_$assoctable` (`".$t1."_id`, `".$t2."_id` ) " );
+					$db->exec( self::$writer->getQuery("add_assoc",array(
+						"assoctable"=> $assoctable,
+						"t1" =>$t1,
+						"t2" =>$t2
+					)) );
+					
 					self::addTable( $assoctable );
 				}
 			}
 				
 			//now insert the association record
-			$assocSQL = "REPLACE INTO `$assoctable` VALUES(null,$id1,$id2) ";
+			$assocSQL = self::$writer->getQuery("add_assoc_now", array(
+				"id1"=>$id1,
+				"id2"=>$id2,
+				"assoctable"=>$assoctable
+			));
+			
 			$db->exec( $assocSQL );
 				
 
@@ -2452,12 +2443,27 @@ class RedBean_OODB {
 				$t2 = $tables[1];
 				if ($t1==$t2) {
 					$t2.="2";
-					$unassocSQL = "DELETE FROM `$assoctable` WHERE ".$t2."_id = $id1 AND ".$t1."_id = $id2 ";
+					$unassocSQL = self::$writer->getQuery("unassoc",array(
+					"assoctable"=>$assoctable,
+					"t1"=>$t2,
+					"t2"=>$t1,
+					"id1"=>$id1,
+					"id2"=>$id2
+					));
+					//$unassocSQL = "DELETE FROM `$assoctable` WHERE ".$t2."_id = $id1 AND ".$t1."_id = $id2 ";
 					$db->exec($unassocSQL);
 				}
 
-				$unassocSQL = "DELETE FROM `$assoctable` WHERE ".$t1."_id = $id1 AND ".$t2."_id = $id2 ";
+				//$unassocSQL = "DELETE FROM `$assoctable` WHERE ".$t1."_id = $id1 AND ".$t2."_id = $id2 ";
 
+				$unassocSQL = self::$writer->getQuery("unassoc",array(
+					"assoctable"=>$assoctable,
+					"t1"=>$t1,
+					"t2"=>$t2,
+					"id1"=>$id1,
+					"id2"=>$id2
+				));
+				
 				$db->exec($unassocSQL);
 			}
 			if ($tp1==$tp2) {
@@ -2469,9 +2475,12 @@ class RedBean_OODB {
 
 					//$id1 = intval($bean1->id);
 					//$id2 = intval($bean2->id);
-					$unassocSQL = "DELETE FROM `$assoctable2` WHERE
-				(parent_id = $idx1 AND child_id = $idx2) OR
-				(parent_id = $idx2 AND child_id = $idx1) ";
+					$unassocSQL = self::$writer->getQuery("untree", array(
+						"assoctable2"=>$assoctable2,
+						"idx1"=>$idx1,
+						"idx2"=>$idx2
+					));
+					
 					$db->exec($unassocSQL);
 				}
 			}
@@ -2514,7 +2523,15 @@ class RedBean_OODB {
 				if ($t1==$t2) {
 					$t2.="2";
 				}
-				$getassocSQL = "SELECT `".$t2."_id` FROM `$assoctable` WHERE `".$t1."_id` = $id ";
+				
+				$getassocSQL = self::$writer->getQuery("get_assoc",array(
+					"t1"=>$t1,
+					"t2"=>$t2,
+					"assoctable"=>$assoctable,
+					"id"=>$id
+				));
+				
+				
 				$rows = $db->getCol( $getassocSQL );
 				$beans = array();
 				if ($rows && is_array($rows) && count($rows)>0) {
@@ -2540,7 +2557,12 @@ class RedBean_OODB {
 			if (intval($bean->id)===0) return;
 			self::deleteAllAssoc( $bean );
 			self::openBean($bean);
-			self::$db->exec( "DELETE FROM ".self::$db->escape($bean->type)." WHERE id = ".intval($bean->id) );
+			$table = self::$db->escape($bean->type);
+			$id = intval($bean->id);
+			self::$db->exec( self::$writer->getQuery("trash",array(
+				"table"=>$table,
+				"id"=>$id
+			)) );
 
 		}
 			
@@ -2574,11 +2596,16 @@ class RedBean_OODB {
 			//remove every possible association
 			foreach($checktables as $table) {
 				if (strpos($table,"pc_")===0){
-					$db->exec("DELETE FROM $table WHERE parent_id = $id OR child_id = $id ");
+				
+					$db->exec( self::$writer->getQuery("deltree",array(
+						"id"=>$id,
+						"table"=>$table
+					)) );
 				}
 				else {
-					$db->exec("DELETE FROM $table WHERE ".$t."_id = $id ");
-					$db->exec("DELETE FROM $table WHERE ".$t."2_id = $id ");
+					
+					$db->exec( self::$writer->getQuery("unassoc_all_t1",array("table"=>$table,"t"=>$t,"id"=>$id)) );
+					$db->exec( self::$writer->getQuery("unassoc_all_t2",array("table"=>$table,"t"=>$t,"id"=>$id)) );
 				}
 					
 					
@@ -2612,10 +2639,21 @@ class RedBean_OODB {
 			$assoctable = $db->escape( implode("_",$tables) );
 
 			if (strpos($assoctable,"pc_")===0){
-				$db->exec("DELETE FROM $assoctable WHERE parent_id = $id  OR child_id = $id ");
+				$db->exec( self::$writer->getQuery("deltreetype",array(
+					"assoctable"=>$assoctable,
+					"id"=>$id
+				)) );
 			}else{
-				$db->exec("DELETE FROM $assoctable WHERE ".$t1."_id = $id ");
-				$db->exec("DELETE FROM $assoctable WHERE ".$t1."2_id = $id ");
+				$db->exec( self::$writer->getQuery("unassoctype1",array(
+					"assoctable"=>$assoctable,
+					"t1"=>$t1,
+					"id"=>$id
+				)) );
+				$db->exec( self::$writer->getQuery("unassoctype2",array(
+					"assoctable"=>$assoctable,
+					"t1"=>$t1,
+					"id"=>$id
+				)) );
 
 			}
 
@@ -2672,23 +2710,25 @@ class RedBean_OODB {
 				$alltables = self::showTables();
 				if (!in_array($assoctable, $alltables)) {
 					//no assoc table does not exist, create it..
-					$assoccreateSQL = "
-				 CREATE TABLE `$assoctable` (
-				`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-				`parent_id` INT( 11 ) UNSIGNED NOT NULL,
-				`child_id` INT( 11 ) UNSIGNED NOT NULL,
-				 PRIMARY KEY ( `id` )
-				 ) ENGINE = ".self::$engine."; 
-				";
+					$assoccreateSQL = self::$writer->getQuery("create_tree",array(
+						"engine"=>self::$engine,
+						"assoctable"=>$assoctable
+					));
 					$db->exec( $assoccreateSQL );
 					//add a unique constraint
-					$db->exec( "ALTER TABLE `$assoctable` ADD UNIQUE INDEX `u_$assoctable` (`parent_id`, `child_id` ) " );
+					$db->exec( self::$writer->getQuery("unique", array(
+						"assoctable"=>$assoctable
+					)) );
 					self::addTable( $assoctable );
 				}
 			}
 
 			//now insert the association record
-			$assocSQL = "REPLACE INTO `$assoctable` VALUES(null,$pid,$cid) ";
+			$assocSQL = self::$writer->getQuery("add_child",array(
+				"assoctable"=>$assoctable,
+				"pid"=>$pid,
+				"cid"=>$cid
+			));
 			$db->exec( $assocSQL );
 
 		}
@@ -2718,7 +2758,10 @@ class RedBean_OODB {
 			}
 			else {
 				$targettype = $parent->type;
-				$getassocSQL = "SELECT `child_id` FROM `$assoctable` WHERE `parent_id` = $pid ";
+				$getassocSQL = self::$writer->getQuery("get_children", array(
+					"assoctable"=>$assoctable,
+					"pid"=>$pid
+				));
 				$rows = $db->getCol( $getassocSQL );
 				$beans = array();
 				if ($rows && is_array($rows) && count($rows)>0) {
@@ -2756,7 +2799,11 @@ class RedBean_OODB {
 			}
 			else {
 				$targettype = $child->type;
-				$getassocSQL = "SELECT `parent_id` FROM `$assoctable` WHERE `child_id` = $cid ";
+				
+				$getassocSQL = self::$writer->getQuery("get_parent", array(
+					"assoctable"=>$assoctable,
+					"cid"=>$cid
+				));
 					
 				$rows = $db->getCol( $getassocSQL );
 				$beans = array();
@@ -2806,8 +2853,11 @@ class RedBean_OODB {
 			else {
 				$pid = intval($parent->id);
 				$cid = intval($child->id);
-				$unassocSQL = "DELETE FROM `$assoctable` WHERE
-				( parent_id = $pid AND child_id = $cid ) ";
+				$unassocSQL = self::$writer->getQuery("remove_child", array(
+					"assoctable"=>$assoctable,
+					"pid"=>$pid,
+					"cid"=>$cid
+				));
 				$db->exec($unassocSQL);
 			}
 		}
@@ -2845,11 +2895,13 @@ class RedBean_OODB {
 			
 			if ($tables && is_array($tables) && count($tables) > 0) {
 				if (in_array( $t1, $tables ) && in_array($t2, $tables)){
-					$sqlCountRelations = "
-						SELECT COUNT(1) 
-						FROM `$assoctable` WHERE 
-						".$t1."_id = $id
-					";
+					$sqlCountRelations = self::$writer->getQuery(
+						"num_related", array(
+							"assoctable"=>$assoctable,
+							"t1"=>$t1,
+							"id"=>$id
+						)
+					);
 					
 					return (int) $db->getCell( $sqlCountRelations );
 				}
@@ -2936,17 +2988,19 @@ class RedBean_OODB {
 
 			$db = self::$db;
 
-			$tables = $db->getCol("select tablename from redbeantables");
+			$tables = $db->getCol( self::$writer->getQuery("show_rtables") );
 
 			foreach($tables as $key=>$table) {
-				$tables[$key] = "`".$table."`";
+				$tables[$key] = self::$writer->getEscape().$table.self::$writer->getEscape();
 			}
 
-			$sqlcleandatabase = "drop tables ".implode(",",$tables);
+			$sqlcleandatabase = self::$writer->getQuery("drop_tables",array(
+				"tables"=>$tables
+			));
 
 			$db->exec( $sqlcleandatabase );
 
-			$db->exec( "truncate redbeantables" );
+			$db->exec( self::$writer->getQuery("truncate_rtables") );
 			self::resetAll();
 			return true;
 
@@ -2976,8 +3030,8 @@ class RedBean_OODB {
 				//does the class exist?
 				$classname = PRFX . $table . SFFX;
 				if(!class_exists( $classname , true)) {
-					$db->exec("DROP TABLE `$table`;");
-					$db->exec("DELETE FROM redbeantables WHERE tablename=\"$table\"");
+					$db->exec( self::$writer->getQuery("drop_tables",array("tables"=>array($table))) );
+					$db->exec(self::$writer->getQuery("unregister_table",array("table"=>$table)));
 				} 
 				
 			}
@@ -2999,7 +3053,10 @@ class RedBean_OODB {
 			//get a database
 			$db = self::$db;
 			
-			$db->exec("ALTER TABLE `$table` DROP `$property`");
+			$db->exec( self::$writer->getQuery("drop_column", array(
+				"table"=>$table,
+				"property"=>$property
+			)) );
 			
 		}
 		
@@ -3035,7 +3092,9 @@ class RedBean_OODB {
 			//do not remove columns from association tables
 			if (strpos($table,'_')!==false) return;
 			//table is still in use? But are all columns in use as well?
-			$cols = $db->get("describe `$table`");
+			$cols = $db->get( self::$writer->getQuery("describe",array(
+				"table"=>$table
+			)) );
 			//pick a random column
 			$colr = $cols[array_rand( $cols )];
 			$col = $db->escape( $colr["Field"] ); //fetch the name and escape
@@ -3045,8 +3104,12 @@ class RedBean_OODB {
 			
 			
 			//now we have a table and a column $table and $col
-			if ($gc && !intval($db->getCell("SELECT count(*) FROM `$table` WHERE `$col` IS NOT NULL "))) {
-				$db->exec("ALTER TABLE `$table` DROP `$col`");
+			if ($gc && !intval($db->getCell( self::$writer->getQuery("get_null",array(
+				"table"=>$table,
+				"col"=>$col
+			)
+			)))) {
+				$db->exec( self::$writer->getQuery("drop_column",array("table"=>$table,"property"=>$col)));
 				return;	
 			}
 			
@@ -3056,19 +3119,34 @@ class RedBean_OODB {
 			if ($currenttype > 0) {
 				$trytype = rand(0,$currenttype - 1); //try a little smaller
 				//add a test column
-				$db->exec("alter table `$table` add __test  ".self::$typeno_sqltype[$trytype]);
+				$db->exec(self::$writer->getQuery("test_column",array(
+					"type"=>self::$typeno_sqltype[$trytype],
+					"table"=>$table
+				)
+				));
 				//fill the tinier column with the same values of the original column
-				$db->exec("update `$table` set __test=`$col`");
+				$db->exec(self::$writer->getQuery("update_test",array(
+					"table"=>$table,
+					"col"=>$col
+				)));
 				//measure the difference
-				$delta = $db->getCell("select count(*) as df from `$table` where
-				strcmp(`$col`,__test) != 0 AND `$col` IS NOT NULL");
+				$delta = $db->getCell(self::$writer->getQuery("measure",array(
+					"table"=>$table,
+					"col"=>$col
+				)));
 				if (intval($delta)===0) {
 					//no difference? then change the column to save some space
-					$sql = "alter table `$table` change `$col` `$col` ".self::$typeno_sqltype[$trytype];
+					$sql = self::$writer->getQuery("remove_test",array(
+						"table"=>$table,
+						"col"=>$col,
+						"type"=>self::$typeno_sqltype[$trytype]
+					));
 					$db->exec($sql);
 				}
 				//get rid of the test column..
-				$db->exec("alter table `$table` drop __test");
+				$db->exec( self::$writer->getQuery("drop_test",array(
+					"table"=>$table
+				)) );
 			}
 		
 			//Can we put an index on this column?
@@ -3081,19 +3159,26 @@ class RedBean_OODB {
 			}
 			
 		
-			$variance = $db->getCell("select count( distinct $col ) from $table");
-			$records = $db->getCell("select count(*) from $table");
+			$variance = $db->getCell(self::$writer->getQuery("variance",array(
+				"col"=>$col,
+				"table"=>$table
+			)));
+			$records = $db->getCell(self::$writer->getQuery("count",array("table"=>$table)));
 			if ($records) {
 				$relvar = intval($variance) / intval($records); //how useful would this index be?
 				//if this column describes the table well enough it might be used to
 				//improve overall performance.
 				$indexname = "reddex_".$col;
 				if ($records > 1 && $relvar > 0.85) {
-					$sqladdindex="ALTER IGNORE TABLE `$table` ADD INDEX $indexname (`$col`)";
+					$sqladdindex=self::$writer->getQuery("index1",array(
+						"table"=>$table,
+						"indexname"=>$indexname,
+						"col"=>$col
+					));
 					$db->exec( $sqladdindex );
 				}
 				else {
-					$sqldropindex = "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
+					$sqldropindex = self::$writer->getQuery("index2",array("table"=>$table,"indexname"=>$indexname));
 					$db->exec( $sqldropindex );
 				}
 			}
@@ -3169,6 +3254,674 @@ class Redbean_Querylogger implements RedBean_Observer
 	
  
 }
+class QueryWriter_MySQL implements QueryWriter {
+	
+	
+	private function getQueryCreateTable( $options=array() ) {
+		
+		$engine = $options["engine"];
+		$table = $options["table"];
+		
+		if ($engine=="myisam") {
+						
+			//this fellow has no table yet to put his beer on!
+			$createtableSQL = "
+			 CREATE TABLE `$table` (
+			`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+			 PRIMARY KEY ( `id` )
+			 ) ENGINE = MYISAM 
+			";
+		}
+		else {
+			$createtableSQL = "
+			 CREATE TABLE `$table` (
+			`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+			 PRIMARY KEY ( `id` )
+			 ) ENGINE = InnoDB 
+			";
+			
+		}
+		return $createtableSQL;
+	}
+	
+	private function getQueryWiden( $options ) {
+		extract($options);
+		return "ALTER TABLE `$table` CHANGE `$column` `$column` $newtype ";
+	}
+	
+	private function getQueryAddColumn( $options ) {
+		extract($options);
+		return "ALTER TABLE `$table` ADD `$column` $type ";
+	}
+	
+	private function getQueryUpdate( $options ) {
+		extract($options);
+		$update = array();
+		foreach($updatevalues as $u) {
+			$update[] = " `".$u["property"]."` = \"".$u["value"]."\" ";
+		}
+		return "UPDATE `$table` SET ".implode(",",$update)." WHERE id = ".$id;
+	}
+	
+	private function getQueryInsert( $options ) {
+		
+		extract($options);
+		
+		foreach($insertcolumns as $k=>$v) {
+			$insertcolumns[$k] = "`".$v."`";
+		}
+		
+		foreach($insertvalues as $k=>$v) {
+			$insertvalues[$k] = "\"".$v."\"";
+		}
+		
+		$insertSQL = "INSERT INTO `$table` 
+					  ( id, ".implode(",",$insertcolumns)." ) 
+					  VALUES( null, ".implode(",",$insertvalues)." ) ";
+		return $insertSQL;
+	}
+	
+	private function getQueryCreate( $options ) {
+		extract($options);
+		return "INSERT INTO `$table` VALUES(null) ";
+	}
+	
+	private function getQueryInferType( $options ) {
+		extract($options);
+		$v = "\"".$value."\"";
+		$checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v )";
+		return $checktypeSQL;
+	}
+	
+	private function getQueryReadType( $options ) {
+		extract($options);
+		return "select tinyintus,intus,ints,varchar255,`text` from dtyp where id=$id";
+	}
+	
+	private function getQueryResetDTYP() {
+		return "truncate table dtyp";	
+	}
+	
+	private function getQueryRegisterTable( $options ) {
+		extract( $options );
+		return "replace into redbeantables values (null, \"$table\") ";
+	}
+	
+	private function getQueryUnregisterTable( $options ) {
+		extract( $options );
+		return "delete from redbeantables where tablename = \"$table\" ";
+	}
+	
+	private function getQueryRelease( $options ) {
+		extract( $options );
+		return "DELETE FROM locking WHERE fingerprint=\"".$key."\" ";
+	}
+	
+	private function getQueryRemoveExpirLock( $options ) {
+		extract( $options );
+		return "DELETE FROM locking WHERE expire < ".(time()-$locktime);
+	}
+	
+	private function getQuerySelectLock( $options ) {
+		extract( $options );
+		return	"SELECT id FROM locking WHERE id=$id AND  tbl=\"$table\" AND fingerprint=\"".$key."\" ";
+	}
+	
+	private function getQueryUpdateExpirLock( $options ) {
+		extract( $options );
+		return "UPDATE locking SET expire=".$time." WHERE id =".$id;
+	}
+	
+	private function getQueryAQLock( $options ) {
+		extract($options);
+		return "INSERT INTO locking VALUES(\"$table\",$id,\"".$key."\",\"".$time."\") ";	
+	}
+	
+	private function getQueryGetBean($options) {
+		extract($options);
+		return "SELECT * FROM `$type` WHERE id = $id ";
+	}
+	
+	private function getQueryBeanExists( $options ) {
+		extract($options);
+		return "select count(*) from `$type` where id=$id";
+	}
+	
+	private function getQueryCount($options) {
+		extract($options);
+		return "select count(*) from `$type`";
+	}
+	
+	private function getQueryDistinct($options) {
+		extract($options);
+		return "SELECT id FROM `$type` GROUP BY $field";
+	}
+	
+	private function getQueryStat( $options ) {
+		extract($options);
+		return "select $stat(`$field`) from `$type`";
+	}
+	
+	private function getQueryFastLoad( $options ) {
+		extract( $options );
+		return "SELECT * FROM `$type` WHERE id IN ( ".implode(",", $ids)." ) ORDER BY FIELD(id,".implode(",", $ids).") ASC		";
+	}
+	
+	private function getQueryWhere($options) {
+		extract($options);
+		return "select `$table`.id from $table where ";
+	}
+	
+	private function getQueryFind($options) {
+
+			extract($options);
+			$db = RedBean_OODB::$db;
+ 			$findSQL = "SELECT id FROM `$tbl` WHERE ";
+      
+	      
+	      foreach($bean as $p=>$v) {
+	        if ($p === "type" || $p === "id") continue;
+	        $p = $db->escape($p);
+	        $v = $db->escape($v);
+	        if (isset($searchoperators[$p])) {
+	 
+	          if ($searchoperators[$p]==="LIKE") {
+	            $part[] = " `$p`LIKE \"%$v%\" ";
+	          }
+	          else {
+	            $part[] = " `$p` ".$searchoperators[$p]." \"$v\" ";
+	          }
+	        }
+	        else {
+	 
+	        }
+	      }
+	 
+	      if ($extraSQL) {
+	        $findSQL .= @implode(" AND ",$part) . $extraSQL;
+	      }
+	      else {
+	        $findSQL .= @implode(" AND ",$part) . " ORDER BY $orderby LIMIT $start, $end ";
+	      }
+	 
+	      return $findSQL;
+      
+	}
+	
+	
+	private function getQueryList($options) {
+		
+		extract($options);
+		$db = RedBean_OODB::$db;
+		if ($extraSQL) {
+ 
+			$listSQL = "SELECT * FROM ".$db->escape($type)." ".$extraSQL;
+ 
+		}
+		else {
+ 
+			$listSQL = "SELECT * FROM ".$db->escape($type)."
+			ORDER BY ".$orderby;
+ 
+			if ($end !== false && $start===false) {
+				$listSQL .= " LIMIT ".intval($end);
+			}
+ 
+			if ($start !== false && $end !== false) {
+				$listSQL .= " LIMIT ".intval($start).", ".intval($end);
+			}
+ 
+			if ($start !== false && $end===false) {
+				$listSQL .= " LIMIT ".intval($start).", 18446744073709551615 ";
+			}
+ 		}
+ 		
+ 		return $listSQL;
+	}
+	
+	
+	private function getQueryAddAssocNow( $options ) {
+		extract($options);
+		return "REPLACE INTO `$assoctable` VALUES(null,$id1,$id2) ";
+	}
+	
+	private function getQueryUnassoc( $options ) {
+		extract($options);
+		return "DELETE FROM `$assoctable` WHERE ".$t1."_id = $id1 AND ".$t2."_id = $id2 ";
+	}
+	
+	private function getQueryCreateAssoc($options) {
+		
+		extract($options);
+		
+		return "
+		 CREATE TABLE `$assoctable` (
+		`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+		`".$t1."_id` INT( 11 ) UNSIGNED NOT NULL,
+		`".$t2."_id` INT( 11 ) UNSIGNED NOT NULL,
+		 PRIMARY KEY ( `id` )
+		 ) ENGINE = ".$engine."; 
+		";
+	}
+	
+	private function getQueryUntree( $options ) {
+		extract($options);
+		return "DELETE FROM `$assoctable2` WHERE
+				(parent_id = $idx1 AND child_id = $idx2) OR
+				(parent_id = $idx2 AND child_id = $idx1) ";
+	}
+	
+	
+	private function getQueryAddAssoc($options) {
+		extract( $options );
+		return "ALTER TABLE `$assoctable` ADD UNIQUE INDEX `u_$assoctable` (`".$t1."_id`, `".$t2."_id` ) ";
+	}
+	
+	private function getQueryGetAssoc($options) {
+		extract( $options );
+		return "SELECT `".$t2."_id` FROM `$assoctable` WHERE `".$t1."_id` = $id ";
+	}
+	
+	
+	private function getQueryTrash( $options ) {
+		extract( $options );
+		return "DELETE FROM ".$table." WHERE id = $id ";
+	}
+	
+	private function getQueryDeltree( $options ) {
+		extract( $options );
+		return "DELETE FROM $table WHERE parent_id = $id OR child_id = $id ";
+	}
+	
+	private function getQueryUnassocAllT1( $options ) {
+		extract( $options );
+		return "DELETE FROM $table WHERE ".$t."_id = $id ";
+	}
+
+	private function getQueryUnassocAllT2( $options ) {
+		extract( $options );
+		return "DELETE FROM $table WHERE ".$t."2_id = $id ";
+	}
+	
+	private function getQueryDeltreeType($options) {
+		extract( $options );
+		return "DELETE FROM $assoctable WHERE parent_id = $id  OR child_id = $id ";
+	}
+	
+	
+	private function getQueryUnassocType1($options) {
+		extract( $options );
+		return "DELETE FROM $assoctable WHERE ".$t1."_id = $id ";	
+	}
+	
+	private function getQueryUnassocType2($options) {
+		extract( $options );
+		return "DELETE FROM $assoctable WHERE ".$t1."2_id = $id ";	
+	}
+	
+	private function getQueryCreateTree( $options ) {
+		extract( $options );		
+		return "
+				 CREATE TABLE `$assoctable` (
+				`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+				`parent_id` INT( 11 ) UNSIGNED NOT NULL,
+				`child_id` INT( 11 ) UNSIGNED NOT NULL,
+				 PRIMARY KEY ( `id` )
+				 ) ENGINE = ".$engine."; 
+				";
+	}
+	
+	private function getQueryUnique( $options ) {
+		extract( $options );		
+		return "ALTER TABLE `$assoctable` ADD UNIQUE INDEX `u_$assoctable` (`parent_id`, `child_id` ) ";
+	} 
+	
+	private function getQueryAddChild( $options ) {
+		extract( $options );	
+		return "REPLACE INTO `$assoctable` VALUES(null,$pid,$cid) ";
+	}
+	
+	private function getQueryGetChildren( $options ) {
+		extract( $options );
+		return "SELECT `child_id` FROM `$assoctable` WHERE `parent_id` = $pid ";
+	}
+	
+	private function getQueryGetParent( $options ) {
+		extract( $options );
+		return "SELECT `parent_id` FROM `$assoctable` WHERE `child_id` = $cid ";
+	}
+	
+	private function getQueryRemoveChild( $options ) {
+		extract( $options );
+		return "DELETE FROM `$assoctable` WHERE
+				( parent_id = $pid AND child_id = $cid ) ";
+	}
+	
+	private function getQueryNumRelated( $options ) {
+		extract( $options );
+		return "
+						SELECT COUNT(1) 
+						FROM `$assoctable` WHERE 
+						".$t1."_id = $id
+					";
+	}
+	
+	private function getQueryDescribe( $options ) {
+		extract( $options );
+		return "describe `$table`";
+	}
+	
+	private function getQueryDropTables( $options ) {
+		extract($options);
+		return "drop tables ".implode(",",$tables);
+	}
+	
+	private function getQueryDropColumn( $options ) {
+		extract($options);
+		return "ALTER TABLE `$table` DROP `$property`";	
+	}
+	
+	private function getQueryGetNull( $options ) {
+		extract($options);
+		return "SELECT count(*) FROM `$table` WHERE `$col` IS NOT NULL ";
+	}
+	
+	private function getQueryTestColumn( $options ) {
+		extract($options);
+		return "alter table `$table` add __test  ".$type;
+	}
+	
+	private function getQueryUpdateTest( $options ) {
+		extract($options);
+		return "update `$table` set __test=`$col`";
+	}
+
+	private function getQueryMeasure( $options ) {
+		extract($options);
+		return "select count(*) as df from `$table` where
+				strcmp(`$col`,__test) != 0 AND `$col` IS NOT NULL";
+	}
+	
+	private function getQueryRemoveTest($options) {
+		extract($options);
+		return "alter table `$table` change `$col` `$col` ".$type;
+	}
+	
+	private function getQueryDropTest($options) {
+		extract($options);
+		return "alter table `$table` drop __test";
+	}
+	
+	private function getQueryVariance($options) {
+		extract($options);
+		return "select count( distinct $col ) from $table";
+	}
+	
+	private function getIndex1($options) {
+		extract($options);
+		return "ALTER IGNORE TABLE `$table` ADD INDEX $indexname (`$col`)";
+	}
+	
+	private function getIndex2($options) {
+		extract($options);
+		return "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
+	}
+	
+	public function getQuery( $queryname, $params=array() ) {
+		//echo "<b style='color:yellow'>$queryname</b>";
+		switch($queryname) {
+			case "create_table":
+				return $this->getQueryCreateTable($params);
+			break;
+			case "widen_column":
+				return $this->getQueryWiden($params);
+			break;
+			case "add_column":
+				return $this->getQueryAddColumn($params);
+			break;
+			case "update":
+				return $this->getQueryUpdate($params);
+			break;
+			case "insert":
+				return $this->getQueryInsert($params);
+			break;
+			case "create":	
+				return $this->getQueryCreate($params);
+			break;
+			case "infertype":
+				return $this->getQueryInferType($params);
+			break;
+			case "readtype":
+				return $this->getQueryReadType($params);
+			break;
+			case "reset_dtyp":
+				return $this->getQueryResetDTYP();
+			break;
+			case "prepare_innodb":
+				return "SET autocommit=0";
+			break;
+			case "prepare_myisam":
+				return "SET autocommit=1";
+			break;
+			case "starttransaction":
+				return "START TRANSACTION";
+			break;
+			case "setup_dtyp":
+				return "
+				CREATE TABLE IF NOT EXISTS `dtyp` (
+				  `id` int(11) unsigned NOT NULL auto_increment,
+				  `tinyintus` tinyint(3) unsigned NOT NULL,
+				  `intus` int(11) unsigned NOT NULL,
+				  `ints` bigint(20) NOT NULL,
+				  
+				  `varchar255` varchar(255) NOT NULL,
+				  `text` text NOT NULL,
+				  PRIMARY KEY  (`id`)
+				) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+				";
+			break;
+			case "clear_dtyp":
+				return "drop tables dtyp";
+			break;
+			case "setup_locking":
+				return "
+				CREATE TABLE IF NOT EXISTS `locking` (
+				  `tbl` varchar(255) NOT NULL,
+				  `id` bigint(20) NOT NULL,
+				  `fingerprint` varchar(255) NOT NULL,
+				  `expire` int(11) NOT NULL,
+				  UNIQUE KEY `tbl` (`tbl`,`id`)
+				) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+				";
+			break;
+			case "setup_tables":
+				return "
+				 CREATE TABLE IF NOT EXISTS `redbeantables` (
+				 `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+				 `tablename` VARCHAR( 255 ) NOT NULL ,
+				 PRIMARY KEY ( `id` ),
+				 UNIQUE KEY `tablename` (`tablename`)
+				 ) ENGINE = MYISAM 
+				";
+			break;
+			case "show_tables":
+				return "show tables";
+			break;
+			case "show_rtables":
+				return "select tablename from redbeantables";
+			break;
+			case "register_table":
+				return $this->getQueryRegisterTable( $params );
+			break;
+			case "unregister_table":
+				return $this->getQueryUnregisterTable( $params );
+			break;
+			case "release":
+				return $this->getQueryRelease( $params );
+			break;
+			case "remove_expir_lock":
+				return $this->getQueryRemoveExpirLock( $params );
+			break;
+			case "update_expir_lock":
+				//return $this->getQueryUpdateExpirLock( $params );
+			break;
+			case "aq_lock":
+				return $this->getQueryAQLock( $params );
+			break;
+			case "get_lock":
+				return $this->getQuerySelectLock( $params);
+			break;
+			case "get_bean":
+				return $this->getQueryGetBean( $params );
+			break;
+			case "bean_exists":
+				return $this->getQueryBeanExists($params);
+			break;
+			case "count":
+				return $this->getQueryCount($params);
+			break;
+			case "distinct":
+				return $this->getQueryDistinct($params);
+			break;
+			case "stat":
+				return $this->getQueryStat($params);
+			break;
+			case "releaseall":
+				return "TRUNCATE locking";
+			break;
+			case "fastload":
+				return $this->getQueryFastLoad($params);
+			break;
+			case "where":
+				return $this->getQueryWhere($params);
+			break;
+			case "find":
+				return $this->getQueryFind( $params);
+			break;
+			case "list":
+				return $this->getQueryList( $params);
+			break;
+			case "create_assoc":
+				return $this->getQueryCreateAssoc( $params );
+			break;
+			case "add_assoc":
+				return $this->getQueryAddAssoc( $params );
+			break;
+			case "add_assoc_now":
+				return $this->getQueryAddAssocNow( $params );
+			break;
+			case "unassoc":
+				return $this->getQueryUnassoc( $params );
+			break;
+			case "untree":
+				return $this->getQueryUntree( $params );
+			break;
+			case "get_assoc":
+				return $this->getQueryGetAssoc( $params );
+			break;
+			case "trash":
+				return $this->getQueryTrash( $params );
+			break;
+			case "deltree":
+				return $this->getQueryDeltree( $params );
+			break;
+			case "unassoc_all_t1":
+				return $this->getQueryUnassocAllT1( $params );
+			break;
+			case "unassoc_all_t2":
+				return $this->getQueryUnassocAllT2( $params );
+			break;
+			case "deltreetype":
+				return $this->getQueryDeltreeType( $params );
+			break;
+			case "unassoctype1":
+				return $this->getQueryUnassocType1( $params );
+			break;
+			case "unassoctype2":
+				return $this->getQueryUnassocType2( $params );
+			break;
+			case "create_tree":
+				return $this->getQueryCreateTree( $params );
+			break;
+			case "unique":
+				return $this->getQueryUnique( $params );
+			break;
+			case "add_child":
+				return $this->getQueryAddChild( $params );
+			break;
+			case "get_children":
+				return $this->getQueryGetChildren( $params );
+			break;
+			case "get_parent":
+				return $this->getQueryGetParent( $params );
+			break;
+			case "remove_child":
+				return $this->getQueryRemoveChild( $params );
+			break;
+			case "num_related":
+				return $this->getQueryNumRelated( $params );
+			break;
+			case "drop_tables":
+				return $this->getQueryDropTables( $params );
+			break;
+			case "truncate_rtables":
+				return "truncate redbeantables";
+			break;
+			case "drop_column":
+				return $this->getQueryDropColumn( $params );
+			break;
+			case "describe":
+				return $this->getQueryDescribe( $params );
+			break;
+			case "get_null":
+				return $this->getQueryGetNull( $params );
+			break;
+			case "test_column":
+				return $this->getQueryTestColumn( $params );
+			break;
+			case "update_test":
+				return $this->getQueryUpdateTest( $params );
+			break;
+			case "measure":
+				return $this->getQueryMeasure( $params );
+			break;
+			case "remove_test":
+				return $this->getQueryRemoveTest($params);
+			break;
+			case "drop_test":
+				return $this->getQueryDropTest($params);
+			break;
+			case "variance":
+				return $this->getQueryVariance($params);
+			break;
+			case "index1":
+				return $this->getIndex1($params);
+			break;
+			case "index2":
+				return $this->getIndex2($params);
+			break;
+			default:
+			throw new Exception("QueryWriter has no support for Query:".$queryname);
+		}
+		
+		
+	}
+	
+	
+	public function getQuote() {
+		return "\"";	
+	}
+	
+	public function getEscape() {
+		return "`";	
+	}
+	
+}
+interface QueryWriter {
+	
+	public function getQuery( $queryname, $params=array() );
+	
+}
 //For framework intergration if you define $db you can specify a class prefix for models
 if (!isset($db)) define("PRFX","");
 if (!isset($db)) define("SFFX","");
@@ -3222,7 +3975,7 @@ class RedBean_Setup {
 	
 		RedBean_OODB::$db = new RedBean_DBAdapter($db); //Wrap ADO in RedBean's adapter
 		RedBean_OODB::setEngine($engine); //select a database driver
-		RedBean_OODB::init(); //Init RedBean
+		RedBean_OODB::init( new QueryWriter_MySQL() ); //Init RedBean
 	
 		if ($unlockall) {
 			RedBean_OODB::resetAll(); //Release all locks

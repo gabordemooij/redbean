@@ -53,7 +53,7 @@ class RedBean_Setup {
 	
 		RedBean_OODB::$db = new RedBean_DBAdapter($db); //Wrap ADO in RedBean's adapter
 		RedBean_OODB::setEngine($engine); //select a database driver
-		RedBean_OODB::init(); //Init RedBean
+		RedBean_OODB::init( new QueryWriter_MySQL() ); //Init RedBean
 	
 		if ($unlockall) {
 			RedBean_OODB::resetAll(); //Release all locks

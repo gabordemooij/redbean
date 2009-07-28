@@ -29,5 +29,5 @@ interface RedBean_Driver {
 	public function setDebugMode( $tf );
 
 	public function GetRaw();
-
+	
 }
