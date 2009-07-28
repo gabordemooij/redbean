@@ -2243,7 +2243,7 @@ class RedBean_OODB {
  * @desc   this class provides additional ORM functionality and defauly accessors
  * @author gabordemooij
  */
-class RedBean_Decorator {
+class RedBean_Decorator implements IteratorAggregate {
 
 	/**
 	 *
@@ -2287,6 +2287,12 @@ class RedBean_Decorator {
 				$this->data = RedBean_OODB::dispense( $this->type );
 			}
 		}
+	}
+	
+	public function getIterator()
+	{
+		$o = new ArrayObject($this->data);
+		return $o->getIterator();
 	}
 
 	/**
