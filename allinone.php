@@ -464,7 +464,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
  * @desc   this class provides additional ORM functionality and defauly accessors
  * @author gabordemooij
  */
-class RedBean_Decorator extends RedBean_Observable {
+class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate {
 
 	/**
 	 *
@@ -519,7 +519,7 @@ class RedBean_Decorator extends RedBean_Observable {
 		$this->signal("deco_free", $this);
 		RedBean_OODB::dropColumn( $this->type, $property );
 	}
-	
+
 	/**
 
 	* Quick service to copy post values to properties
@@ -531,20 +531,20 @@ class RedBean_Decorator extends RedBean_Observable {
 		if (!$selection) {
 			$selection = array_keys($_POST);
 		}
-		
+
 		if (is_string($selection)) {
 			$selection = explode(",",$selection);
 		}
-		
+
 		if ($selection && is_array($selection) && count($selection) > 0) {
-			foreach( $selection as $field ) { 
-				$setter = "set".ucfirst( $field );  
+			foreach( $selection as $field ) {
+				$setter = "set".ucfirst( $field );
 				if (isset( $_POST[$field] )) {
 					$resp = $this->$setter( $_POST[ $field ]  );
 				}
 			}
 		}
-		
+
 		return $this;
 	}
 
@@ -552,7 +552,7 @@ class RedBean_Decorator extends RedBean_Observable {
 	 * Imports an array or object
 	 * If this function returns boolean true, no problems
 	 * have occurred during the import and all values have been copies
-	 * succesfully. 
+	 * succesfully.
 	 * @param $arr or $obj
 	 * @return boolean $anyproblems
 	 */
@@ -561,7 +561,7 @@ class RedBean_Decorator extends RedBean_Observable {
 		foreach( $arr as $key=>$val ) {
 			$setter = "set".ucfirst( $key );
 			$resp = $this->$setter( $val );
-			
+				
 		}
 		return $this;
 
@@ -574,7 +574,7 @@ class RedBean_Decorator extends RedBean_Observable {
 	public function __call( $method, $arguments ) {
 		return $this->command( $method, $arguments );
 	}
-	
+
 	/**
 	 * Magic getter. Another way to handle accessors
 	 */
@@ -583,7 +583,7 @@ class RedBean_Decorator extends RedBean_Observable {
 		$name = strtolower( $name );
 		return isset($this->data->$name) ? $this->data->$name : null;
 	}
-	
+
 	/**
 	 * Magic setter. Another way to handle accessors
 	 */
@@ -602,12 +602,12 @@ class RedBean_Decorator extends RedBean_Observable {
 	 * @return unknown_type
 	 */
 	public function command( $method, $arguments ) {
-		
+
 		if (strpos( $method,"set" ) === 0) {
 			$prop = substr( $method, 3 );
 			$this->$prop = $arguments[0];
 			return $this;
-				
+
 		}
 		elseif (strpos($method,"getRelated")===0)	{
 			$this->signal("deco_get", $this);
@@ -615,7 +615,7 @@ class RedBean_Decorator extends RedBean_Observable {
 			$beans = RedBean_OODB::getAssoc( $this->data, $prop );
 			$decos = array();
 			$dclass = PRFX.$prop.SFFX;
-				
+
 			if ($beans && is_array($beans)) {
 				foreach($beans as $b) {
 					$d = new $dclass();
@@ -633,7 +633,7 @@ class RedBean_Decorator extends RedBean_Observable {
 			$prop = strtolower( substr( $method, 2 ) );
 			if (!isset($this->data->$prop)) {
 				$this->signal("deco_get",$this);
-				return false;	
+				return false;
 			}
 			return ($this->data->$prop ? TRUE : FALSE);
 		}
@@ -668,10 +668,10 @@ class RedBean_Decorator extends RedBean_Observable {
 			$this->signal("deco_numof",$this);
 			$type = strtolower( substr( $method, 5 ) );
 			return RedBean_OODB::numOfRelated($type, $this->data);
-			
+				
 		}
 	}
-	
+
 	/**
 	 * Enforces an n-to-1 relationship
 	 * @param $deco
@@ -682,7 +682,7 @@ class RedBean_Decorator extends RedBean_Observable {
 		RedBean_OODB::deleteAllAssocType($deco->getType(), $this->data);
 		RedBean_OODB::associate($this->data, $deco->getData());
 	}
-	
+
 	/**
 	 * Enforces an 1-to-n relationship
 	 * @param $deco
@@ -693,7 +693,7 @@ class RedBean_Decorator extends RedBean_Observable {
 		RedBean_OODB::deleteAllAssocType($this->type,$deco->getData());
 		RedBean_OODB::associate($deco->getData(), $this->data);
 	}
-	
+
 	/**
 	 * Returns the parent object of the current object if any
 	 * @return RedBean_Decorator $oBean
@@ -707,19 +707,19 @@ class RedBean_Decorator extends RedBean_Observable {
 		$deco->setData( $bean );
 		return $deco;
 	}
-	
+
 	/**
 	 * Returns array of siblings (objects with the same parent except the object itself)
 	 * @return array $aObjects
 	 */
-	public function siblings() { 
+	public function siblings() {
 		$this->signal("deco_siblings", $this);
 		$beans = RedBean_OODB::getParent( $this->data );
 		if (count($beans) > 0 ) {
-			$bean = array_pop($beans);	
-		} 
-		else { 
-			return null;	
+			$bean = array_pop($beans);
+		}
+		else {
+			return null;
 		}
 		$beans = RedBean_OODB::getChildren( $bean );
 		$decos = array();
@@ -735,9 +735,9 @@ class RedBean_Decorator extends RedBean_Observable {
 		}
 		return $decos;
 	}
-	
+
 	/**
-	 * Returns array of child objects 
+	 * Returns array of child objects
 	 * @return array $aObjects
 	 */
 	public function children() {
@@ -754,7 +754,7 @@ class RedBean_Decorator extends RedBean_Observable {
 		}
 		return $decos;
 	}
-	
+
 	/**
 	 * Returns whether a node has a certain parent in its ancestry
 	 * @param $deco
@@ -772,28 +772,28 @@ class RedBean_Decorator extends RedBean_Observable {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Searches children of a specific tree node for the target child
 	 * @param $deco
 	 * @return boolean $found
 	 */
 	public function hasChild( $deco ) {
-		
+
 		$nodes = array($this);
 		while($node = array_shift($nodes)) {
-			if ($node->getID() == $deco->getID() && 
-				($node->getID() != $this->getID())) {
-					return true;	
-				}
+			if ($node->getID() == $deco->getID() &&
+			($node->getID() != $this->getID())) {
+				return true;
+			}
 			if ($children = $node->children()) {
 				$nodes = array_merge($nodes, $children);
 			}
 		}
 		return false;
-		
+
 	}
-	
+
 	/**
 	 * Searches if a node has the specified sibling
 	 * @param $deco
@@ -802,13 +802,13 @@ class RedBean_Decorator extends RedBean_Observable {
 	public function hasSibling( $deco ) {
 		$siblings = $this->siblings();
 		foreach( $siblings as $sibling ) {
-			if ($sibling->getID() == $deco->getID()) { 
-				return true;	
+			if ($sibling->getID() == $deco->getID()) {
+				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * This function simply copies the model and returns it
 	 * @return RedBean_Decorator $oRD
@@ -819,7 +819,7 @@ class RedBean_Decorator extends RedBean_Observable {
 		$clone->setData( $this->getData() );
 		return $clone;
 	}
-	
+
 	/**
 	 * Clears all associations
 	 * @return unknown_type
@@ -912,7 +912,7 @@ class RedBean_Decorator extends RedBean_Observable {
 
 
 		foreach($this->data as $prop=>$value) {
-				
+
 			//what value should we use?
 			if (is_object($overridebean) && isset($overridebean->$prop)) {
 				$value = $overridebean->$prop;
@@ -920,11 +920,11 @@ class RedBean_Decorator extends RedBean_Observable {
 			elseif (is_array($overridebean) && isset($overridebean[$prop])) {
 				$value = $overridebean[$prop];
 			}
-				
+
 			if (is_object($value)){
 				$value = $value->getID();
 			}
-				
+
 			if (is_object($bean)) {
 				$bean->$prop = $value;
 			}
@@ -932,7 +932,7 @@ class RedBean_Decorator extends RedBean_Observable {
 				$bean[$prop] = $value;
 			}
 		}
-		
+
 		return $bean;
 	}
 
@@ -949,50 +949,55 @@ class RedBean_Decorator extends RedBean_Observable {
 				$value = $value->getID();
 			}
 			$arr[ $prop ] = $value;
-		
+
 		}
 		return  $arr;
 	}
-	
-  /** 
-   * Finds another decorator
-   * @param $deco
-   * @param $filter
-   * @return array $decorators
-   */
-  public static function find( $deco, $filter, $start=0, $end=100, $orderby=" id ASC ", $extraSQL=false ) {
- 
-    if (!is_array($filter)) {
-      return array();
-    }
- 
-    if (count($filter)<1) {
-      return array();
-    }
- 
-    //make all keys of the filter lowercase
-    $filters = array();
-    foreach($filter as $key=>$f) {
-      $filters[strtolower($key)] =$f;
-        
-      if (!in_array($f,array("=","!=","<",">","<=",">=","like","LIKE"))) {
-        throw new ExceptionInvalidFindOperator();
-      }
-        
-    }
- 
-    $beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
-    
-    $decos = array();
-    $dclass = PRFX.$deco->type.SFFX;
-    foreach( $beans as $bean ) {
-      $decos[ $bean->id ] = new $dclass( floatval( $bean->id ) );
-      $decos[ $bean->id ]->setData( $bean );
-    }
-    return $decos;
-  }
-	
-	
+
+	/**
+	 * Finds another decorator
+	 * @param $deco
+	 * @param $filter
+	 * @return array $decorators
+	 */
+	public static function find( $deco, $filter, $start=0, $end=100, $orderby=" id ASC ", $extraSQL=false ) {
+
+		if (!is_array($filter)) {
+			return array();
+		}
+
+		if (count($filter)<1) {
+			return array();
+		}
+
+		//make all keys of the filter lowercase
+		$filters = array();
+		foreach($filter as $key=>$f) {
+			$filters[strtolower($key)] =$f;
+
+			if (!in_array($f,array("=","!=","<",">","<=",">=","like","LIKE"))) {
+				throw new ExceptionInvalidFindOperator();
+			}
+
+		}
+
+		$beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
+
+		$decos = array();
+		$dclass = PRFX.$deco->type.SFFX;
+		foreach( $beans as $bean ) {
+			$decos[ $bean->id ] = new $dclass( floatval( $bean->id ) );
+			$decos[ $bean->id ]->setData( $bean );
+		}
+		return $decos;
+	}
+
+
+	public function getIterator() {
+		$o = new ArrayObject($this->data);
+		return $o->getIterator();
+	}
+
 }
 /**
  * PDO support driver
