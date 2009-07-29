@@ -3763,7 +3763,7 @@ class QueryWriter_MySQL implements QueryWriter {
 				return $this->getQueryRemoveExpirLock( $params );
 			break;
 			case "update_expir_lock":
-				//return $this->getQueryUpdateExpirLock( $params );
+				return $this->getQueryUpdateExpirLock( $params );
 			break;
 			case "aq_lock":
 				return $this->getQueryAQLock( $params );

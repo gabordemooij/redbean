@@ -888,10 +888,14 @@ function testsperengine() {
 	try{
 	RedBean_OODB::$pkey = 999;
 	RedBean_OODB::setLockingTime(0);
+	sleep(1);
 	$cheese = new Cheese(1);
 	$cheese->setName("Cheddar");
+	
+	echo '---';
 	$cheese->save();
-	RedBean_OODB::setLockingTime(10);
+	RedBean_OODB::setLockingTime(10); //*
+	
 	SmartTest::instance()->progress(); ;
 	}catch(Exception $e) {
 		SmartTest::failedTest();
