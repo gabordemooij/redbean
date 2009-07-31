@@ -176,7 +176,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 		if (is_array($rows)) {
 			foreach( $rows as $row ) {
 				//Use the fastloader for optimal performance (takes row as data)
-				$beans[] = $this->wrap( RedBean_OODB::getById( $this->type, $id , $row) );
+				$beans[] = $this->wrap( RedBean_OODB::getById( $this->type, $row["id"] , $row) );
 			}
 		}
 
@@ -313,6 +313,19 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 			return null;
 		}
       
+    }
+    
+    /**
+     * Returns the can as a list (array)
+     * @return array
+     */
+    public function getList() {
+    	$list = array();
+    	$beans = $this->getBeans();
+    	foreach($beans as $bean) {
+    		$list[] = $bean->exportAsArr();
+    	}
+    	return $list;
     }
 	
 	
