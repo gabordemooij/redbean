@@ -233,6 +233,15 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
     	}
     	return $list;
     }
+    
+    /**
+     * Reverses the order of IDs
+     * @return unknown_type
+     */
+    public function reverse() {
+    	$this->collectionIDs = array_reverse($this->collectionIDs, true);
+    	return $this;
+    }
 	
 	
 }

@@ -327,6 +327,15 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
     	}
     	return $list;
     }
+    
+    /**
+     * Reverses the order of IDs
+     * @return unknown_type
+     */
+    public function reverse() {
+    	$this->collectionIDs = array_reverse($this->collectionIDs, true);
+    	return $this;
+    }
 	
 	
 }
@@ -1242,7 +1251,7 @@ class RedBean_Observable {
 	 */
 	public function addEventListener( $eventname, RedBean_Observer $observer ) {
 		
-		if (!is_array($this->observers[ $eventname ])) {
+		if (!isset($this->observers[ $eventname ])) {
 			$this->observers[ $eventname ] = array();
 		}
 		
@@ -1256,7 +1265,7 @@ class RedBean_Observable {
 	 */
 	public function signal( $eventname ) {
 		
-		if (!is_array($this->observers[ $eventname ])) {
+		if (!isset($this->observers[ $eventname ])) {
 			$this->observers[ $eventname ] = array();
 		}
 		
@@ -1585,7 +1594,7 @@ class RedBean_OODB {
 				if (!in_array($table, $tables)) {
 
 					$createtableSQL = self::$writer->getQuery("create_table", array(
-						"engine"=>$engine,
+						"engine"=>self::$engine,
 						"table"=>$table
 					));
 				

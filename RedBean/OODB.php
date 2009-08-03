@@ -303,7 +303,7 @@ class RedBean_OODB {
 				if (!in_array($table, $tables)) {
 
 					$createtableSQL = self::$writer->getQuery("create_table", array(
-						"engine"=>$engine,
+						"engine"=>self::$engine,
 						"table"=>$table
 					));
 				

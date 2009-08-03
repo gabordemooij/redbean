@@ -19,7 +19,7 @@ class RedBean_Observable {
 	 */
 	public function addEventListener( $eventname, RedBean_Observer $observer ) {
 		
-		if (!is_array($this->observers[ $eventname ])) {
+		if (!isset($this->observers[ $eventname ])) {
 			$this->observers[ $eventname ] = array();
 		}
 		
@@ -33,7 +33,7 @@ class RedBean_Observable {
 	 */
 	public function signal( $eventname ) {
 		
-		if (!is_array($this->observers[ $eventname ])) {
+		if (!isset($this->observers[ $eventname ])) {
 			$this->observers[ $eventname ] = array();
 		}
 		
