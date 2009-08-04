@@ -537,6 +537,16 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		$o = new ArrayObject($this->data);
 		return $o->getIterator();
 	}
+	
+	public function isReadOnly() {
+		try{
+			RedBean_OODB::openBean($this->data, true);
+		}
+		catch(RedBean_Exception_FailedAccessBean $e){
+			return false;	
+		}
+		return true;
+	}
 
 }
 
