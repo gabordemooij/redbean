@@ -1815,10 +1815,17 @@ class RedBean_OODB {
 			)) );
 			
 		}
-		
-	
-		
+
 		/**
+	     * Removes all beans of a particular type
+	     * @param $type
+	     * @return nothing
+	     */
+	    public static function trashAll($type) {
+	        self::$db->exec( self::$writer->getQuery("drop_type",array("type"=>strtolower($type))));
+	    }
+
+	    /**
 		 * Narrows columns to appropriate size if needed
 		 * @return unknown_type
 		 */

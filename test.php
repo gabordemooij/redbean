@@ -1111,6 +1111,17 @@ function testsperengine() {
 	SmartTest::instance()->test(count($track->getRelatedDisc()),1);
 	$cd2->exclusiveAdd( $track2 );
 	SmartTest::instance()->test(count($track->getRelatedDisc()),1);
+
+	RedBean_OODB::gen('SomeBean');
+	$b = new SomeBean;
+	$b->aproperty = 1;
+	$b->save();
+	$b = new SomeBean;
+	$b->anotherprop = 1;
+	$b->save();
+	SmartTest::test(RedBean_OODB::numberof("SomeBean"),2);
+	RedBean_OODB::trashAll("SomeBean");
+	SmartTest::test(RedBean_OODB::numberof("SomeBean"),0);
 	
 }
 

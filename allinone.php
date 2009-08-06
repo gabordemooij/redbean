@@ -3360,10 +3360,17 @@ class RedBean_OODB {
 			)) );
 			
 		}
-		
-	
-		
+
 		/**
+	     * Removes all beans of a particular type
+	     * @param $type
+	     * @return nothing
+	     */
+	    public static function trashAll($type) {
+	        self::$db->exec( self::$writer->getQuery("drop_type",array("type"=>strtolower($type))));
+	    }
+
+	    /**
 		 * Narrows columns to appropriate size if needed
 		 * @return unknown_type
 		 */
@@ -4264,6 +4271,17 @@ class QueryWriter_MySQL implements QueryWriter {
 		return "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
 	}
 	
+	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
+	private function getDropType($options) {
+		extract($options);
+		return "DELETE FROM ".$type." WHERE 1=1";
+	}
+	
 	/**
 	 * (non-PHPdoc)
 	 * @see RedBean/QueryWriter#getQuery()
@@ -4500,6 +4518,9 @@ class QueryWriter_MySQL implements QueryWriter {
 			break;
 			case "index2":
 				return $this->getIndex2($params);
+			break;
+			case "drop_type":
+				return $this->getDropType($params);
 			break;
 			default:
 			throw new Exception("QueryWriter has no support for Query:".$queryname);
