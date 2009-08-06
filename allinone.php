@@ -88,17 +88,11 @@ THIS IS AN PRE-BETA VERSION, DONT USE THIS CODE ON PRODUCTION SERVERS
 */
 
 /**
- * Object Oriented Database Bean class
- * Empty Type definition for bean processing
- *
- */
-class OODBBean {
-}
-/**
- * RedBean Can
- * @desc   a Can contains beans and acts as n iterator, it also enables you to work with
- * 		   large collections while remaining light-weight
- * @author gabordemooij
+ * Can (Can of Beans)
+ * @package 		RedBean/Can.php
+ * @description		A lightweight collection for beans
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Countable {
 	
@@ -340,9 +334,11 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	
 }
 /**
- * Adapter for ADODB database layer AND RedBean
- * @author gabordemooij
- *
+ * DBAdapter (Database Adapter)
+ * @package 		RedBean/DBAdapter.php
+ * @description		An adapter class to connect various database systems to RedBean
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_DBAdapter extends RedBean_Observable {
 
@@ -352,6 +348,10 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 */
 	private $db = null;
 	
+	/**
+	 * 
+	 * @var string
+	 */
 	private $sql = "";
 
 	
@@ -364,6 +364,10 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		$this->db = $database;
 	}
 	
+	/**
+	 * 
+	 * @return unknown_type
+	 */
 	public function getSQL() {
 		return $this->sql;
 	}
@@ -482,9 +486,11 @@ class RedBean_DBAdapter extends RedBean_Observable {
 
 }
 /**
- * RedBean decorator class
- * @desc   this class provides additional ORM functionality and defauly accessors
- * @author gabordemooij
+ * Decorator
+ * @package 		RedBean/Decorator.php
+ * @description		Adds additional so-called 'porcelain' functions to the bean objects
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate {
 
@@ -1014,12 +1020,19 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		return $decos;
 	}
 
-
+	/**
+	 * Returns an iterator
+	 * @return Iterator $i
+	 */
 	public function getIterator() {
 		$o = new ArrayObject($this->data);
 		return $o->getIterator();
 	}
 	
+	/**
+	 * Whether you can write to this bean or not
+	 * @return boolean $locked
+	 */
 	public function isReadOnly() {
 		try{
 			RedBean_OODB::openBean($this->data, true);
@@ -1032,18 +1045,58 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 }
 /**
- * PDO support driver
- * the PDO driver has been written by Desfrenes.
+ * PDO Driver
+ * @package 		RedBean/PDO.php
+ * @description		PDO Driver
+ * @author			Desfrenes
+ * @license			BSD
  */
 class Redbean_Driver_PDO implements RedBean_Driver {
-    private static $instance;
+
+	/**
+	 * 
+	 * @var unknown_type
+	 */
+	private static $instance;
     
+	/**
+	 * 
+	 * @var boolean
+	 */
     private $debug = false;
+    
+    /**
+     * 
+     * @var unknown_type
+     */
     private $pdo;
+    
+    /**
+     * 
+     * @var unknown_type
+     */
     private $affected_rows;
+    
+    /**
+     * 
+     * @var unknown_type
+     */
     private $rs;
+    
+    /**
+     * 
+     * @var unknown_type
+     */
     private $exc =0;
     
+    /**
+     * 
+     * @param $dsn
+     * @param $user
+     * @param $pass
+     * @param $dbname
+     * @return unknown_type
+     */
     public static function getInstance($dsn, $user, $pass, $dbname)
     {
         if(is_null(self::$instance))
@@ -1053,6 +1106,13 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return self::$instance;
     }
     
+    /**
+     * 
+     * @param $dsn
+     * @param $user
+     * @param $pass
+     * @return unknown_type
+     */
     public function __construct($dsn, $user, $pass)
     {
         $this->pdo = new PDO(
@@ -1065,6 +1125,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
             );
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetAll()
+     */
     public function GetAll( $sql )
     {
     	$this->exc = 0;
@@ -1103,6 +1167,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return $rows;
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetCol()
+     */
     public function GetCol($sql)
     {
     	$this->exc = 0;
@@ -1124,6 +1192,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return $cols;
     }
  
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetCell()
+     */
     public function GetCell($sql)
     {
     	$this->exc = 0;
@@ -1136,6 +1208,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return $col1;
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetRow()
+     */
     public function GetRow($sql)
     {
     	$this->exc = 0;
@@ -1146,18 +1222,32 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return array_shift($arr);
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#ErrorNo()
+     */
     public function ErrorNo()
     {
     	if (!$this->exc) return 0;
     	$infos = $this->pdo->errorInfo();
         return $infos[1];
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#Errormsg()
+     */
     public function Errormsg()
     {
     	if (!$this->exc) return "";
         $infos = $this->pdo->errorInfo();
         return $infos[2];
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#Execute()
+     */
     public function Execute( $sql )
     {
     	$this->exc = 0;
@@ -1182,69 +1272,219 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     	return 0; }
         return $this->affected_rows;
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#Escape()
+     */
     public function Escape( $str )
     {
         return substr(substr($this->pdo->quote($str), 1), 0, -1);
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetInsertID()
+     */
     public function GetInsertID()
     {
         return (int) $this->pdo->lastInsertId();
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#Affected_Rows()
+     */
     public function Affected_Rows()
     {
         return (int) $this->affected_rows;
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#setDebugMode()
+     */
     public function setDebugMode( $tf )
     {
         $this->debug = (bool)$tf;
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetRaw()
+     */
     public function GetRaw()
     {
         return $this->rs;
     }
 }
 /**
- * Generic interface for Databases
+ * Interface for database drivers
+ * @package 		RedBean/Driver.php
+ * @description		Describes the API for database classes
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 interface RedBean_Driver {
 
+	/**
+	 * Implements Singleton
+	 * Requests an instance of the database 
+	 * @param $host
+	 * @param $user
+	 * @param $pass
+	 * @param $dbname
+	 * @return RedBean_Driver $driver
+	 */
 	public static function getInstance( $host, $user, $pass, $dbname );
 
+	/**
+	 * Runs a query and fetches results as a multi dimensional array
+	 * @param $sql
+	 * @return array $results
+	 */
 	public function GetAll( $sql );
 
+	/**
+	 * Runs a query and fetches results as a column
+	 * @param $sql
+	 * @return array $results
+	 */
 	public function GetCol( $sql );
 
+	/**
+	 * Runs a query an returns results as a single cell
+	 * @param $sql
+	 * @return mixed $cellvalue
+	 */
 	public function GetCell( $sql );
 
+	/**
+	 * Runs a query and returns a flat array containing the values of
+	 * one row
+	 * @param $sql
+	 * @return array $row
+	 */
 	public function GetRow( $sql );
 
+	/**
+	 * Returns the error constant of the most
+	 * recent error
+	 * @return mixed $error
+	 */
 	public function ErrorNo();
 
+	/**
+	 * Returns the error message of the most recent
+	 * error
+	 * @return string $message
+	 */
 	public function Errormsg();
 
+	/**
+	 * Runs an SQL query
+	 * @param $sql
+	 * @return void
+	 */
 	public function Execute( $sql );
 
+	/**
+	 * Escapes a value according to the
+	 * escape policies of the current database instance
+	 * @param $str
+	 * @return string $escaped_str
+	 */
 	public function Escape( $str );
 
+	/**
+	 * Returns the latest insert_id value
+	 * @return integer $id
+	 */
 	public function GetInsertID();
 
+	/**
+	 * Returns the number of rows affected
+	 * by the latest query
+	 * @return integer $id
+	 */
 	public function Affected_Rows();
 
+	/**
+	 * Toggles debug mode (printing queries on screen)
+	 * @param $tf
+	 * @return void
+	 */
 	public function setDebugMode( $tf );
 
+	/**
+	 * Returns the unwrapped version of the database object;
+	 * the raw database driver.
+	 * @return mixed $database
+	 */
 	public function GetRaw();
 	
 }
+/**
+ * Exception Failed Access
+ * Part of the RedBean Exceptions Mechanism
+ * @package 		RedBean/Exception
+ * @description		Represents a subtype in the RedBean Exception System
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */ 
 class RedBean_Exception_FailedAccessBean extends Exception{}
+/**
+ * Exception Invalid Argument
+ * Part of the RedBean Exceptions Mechanism
+ * @package 		RedBean/Exception
+ * @description		Represents a subtype in the RedBean Exception System
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */ 
 class RedBean_Exception_InvalidArgument extends RedBean_Exception {}
-class RedBean_Exception_Security extends RedBean_Exception {}
+/**
+ * Exception Invalid Parent Child combination in TREE
+ * Part of the RedBean Exceptions Mechanism
+ * @package 		RedBean/Exception
+ * @description		Represents a subtype in the RedBean Exception System
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */  
 class RedBean_Exception_InvalidParentChildCombination extends RedBean_Exception{}
+/**
+ * Exception Security
+ * Part of the RedBean Exceptions Mechanism
+ * @package 		RedBean/Exception
+ * @description		Represents a subtype in the RedBean Exception System
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */ 
+class RedBean_Exception_Security extends RedBean_Exception {}
+/**
+ * Exception SQL
+ * Part of the RedBean Exceptions Mechanism
+ * @package 		RedBean/Exception
+ * @description		Represents a subtype in the RedBean Exception System
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */ 
 class RedBean_Exception_SQL extends RedBean_Exception {};
+/**
+ * RedBean Exception Base
+ * @package 		RedBean/Exception.php
+ * @description		Represents the base class
+ * 					for RedBean Exceptions
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
 class Redbean_Exception extends Exception{}
 /**
- * 
- * @author gabordemooij
- *
+ * Observable
+ * Base class for Observables
+ * @package 		RedBean/Observable.php
+ * @description		Part of the observer pattern in RedBean
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_Observable {
 	/**
@@ -1254,7 +1494,7 @@ class RedBean_Observable {
 	private $observers = array();
 	
 	/**
-	 * 
+	 * Adds a listener to this instance
 	 * @param $eventname
 	 * @param $observer
 	 * @return unknown_type
@@ -1269,7 +1509,7 @@ class RedBean_Observable {
 	}
 	
 	/**
-	 * 
+	 * Sends an event (signal) to the registered listeners
 	 * @param $eventname
 	 * @return unknown_type
 	 */
@@ -1288,24 +1528,28 @@ class RedBean_Observable {
 	
 }
 /**
- * 
- * @author gabordemooij
- *
+ * Observer
+ * @package 		RedBean/Observer.php
+ * @description		Part of the observer pattern in RedBean
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 interface RedBean_Observer {
 	
 	/**
-	 * 
-	 * @param $eventname
-	 * @param $o
+	 * Handles the event send by a RedBean Observable
+	 * @param string $eventname
+	 * @param RedBean_Observable $observable
 	 * @return unknown_type
 	 */
 	public function onEvent( $eventname, RedBean_Observable $o );
 }
 /**
- * RedBean OODB (object oriented database) Core class for the RedBean ORM pack
- * @author gabordemooij
- *
+ * RedBean OODB (object oriented database)
+ * @package 		RedBean/OODB.php
+ * @description		Core class for the RedBean ORM pack
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_OODB {
 
@@ -2198,7 +2442,12 @@ class RedBean_OODB {
 			return true;
 		}
 
-	
+		/**
+		 * Fills slots in SQL query
+		 * @param $sql
+		 * @param $slots
+		 * @return unknown_type
+		 */
 		public static function processQuerySlots($sql, $slots) {
 			
 			$db = self::$db;
@@ -2219,6 +2468,12 @@ class RedBean_OODB {
 			return $sql;
 		}
 		
+		/**
+		 * Loads a collection of beans -fast-
+		 * @param $type
+		 * @param $ids
+		 * @return unknown_type
+		 */
 		public static function fastLoader( $type, $ids ) {
 			
 			$db = self::$db;
@@ -2233,6 +2488,15 @@ class RedBean_OODB {
 			
 		}
 		
+		/**
+		 * Allows you to fetch an array of beans using plain
+		 * old SQL.
+		 * @param $rawsql
+		 * @param $slots
+		 * @param $table
+		 * @param $max
+		 * @return array $beans
+		 */
 		public static function getBySQL( $rawsql, $slots, $table, $max=0 ) {
 		
 			$db = self::$db;
@@ -3225,15 +3489,25 @@ class RedBean_OODB {
 	
 }
 /**
- * 
- * @author gabordemooij
- *
+ * OODBBean (Object Oriented DataBase Bean)
+ * @package 		RedBean/OODBBean.php
+ * @description		The Bean class used for passing information
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
+class OODBBean {
+}
+/**
+ * Querylogger 
+ * @package 		RedBean/QueryLogger.php
+ * @description		Simple Audit Logger
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class Redbean_Querylogger implements RedBean_Observer
 {
  
 	/**
-	 * 
 	 * @var string
 	 */
 	private $path = "";
@@ -3291,9 +3565,20 @@ class Redbean_Querylogger implements RedBean_Observer
 	
  
 }
+/**
+ * RedBean MySQLWriter
+ * @package 		RedBean/QueryWriter/MySQL.php
+ * @description		Writes Queries for MySQL Databases
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
 class QueryWriter_MySQL implements QueryWriter {
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryCreateTable( $options=array() ) {
 		
 		$engine = $options["engine"];
@@ -3321,16 +3606,31 @@ class QueryWriter_MySQL implements QueryWriter {
 		return $createtableSQL;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryWiden( $options ) {
 		extract($options);
 		return "ALTER TABLE `$table` CHANGE `$column` `$column` $newtype ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryAddColumn( $options ) {
 		extract($options);
 		return "ALTER TABLE `$table` ADD `$column` $type ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUpdate( $options ) {
 		extract($options);
 		$update = array();
@@ -3340,6 +3640,11 @@ class QueryWriter_MySQL implements QueryWriter {
 		return "UPDATE `$table` SET ".implode(",",$update)." WHERE id = ".$id;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryInsert( $options ) {
 		
 		extract($options);
@@ -3358,11 +3663,21 @@ class QueryWriter_MySQL implements QueryWriter {
 		return $insertSQL;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryCreate( $options ) {
 		extract($options);
 		return "INSERT INTO `$table` VALUES(null) ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryInferType( $options ) {
 		extract($options);
 		$v = "\"".$value."\"";
@@ -3370,85 +3685,170 @@ class QueryWriter_MySQL implements QueryWriter {
 		return $checktypeSQL;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryReadType( $options ) {
 		extract($options);
 		return "select tinyintus,intus,ints,varchar255,`text` from dtyp where id=$id";
 	}
 	
+	/**
+	 * 
+	 * @return unknown_type
+	 */
 	private function getQueryResetDTYP() {
 		return "truncate table dtyp";	
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryRegisterTable( $options ) {
 		extract( $options );
 		return "replace into redbeantables values (null, \"$table\") ";
 	}
 	
+	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnregisterTable( $options ) {
 		extract( $options );
 		return "delete from redbeantables where tablename = \"$table\" ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryRelease( $options ) {
 		extract( $options );
 		return "DELETE FROM locking WHERE fingerprint=\"".$key."\" ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryRemoveExpirLock( $options ) {
 		extract( $options );
 		return "DELETE FROM locking WHERE expire < ".(time()-$locktime);
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQuerySelectLock( $options ) {
 		extract( $options );
 		return	"SELECT id FROM locking WHERE id=$id AND  tbl=\"$table\" AND fingerprint=\"".$key."\" ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUpdateExpirLock( $options ) {
 		extract( $options );
 		return "UPDATE locking SET expire=".$time." WHERE id =".$id;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryAQLock( $options ) {
 		extract($options);
 		return "INSERT INTO locking VALUES(\"$table\",$id,\"".$key."\",\"".$time."\") ";	
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryGetBean($options) {
 		extract($options);
 		return "SELECT * FROM `$type` WHERE id = $id ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryBeanExists( $options ) {
 		extract($options);
 		return "select count(*) from `$type` where id=$id";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryCount($options) {
 		extract($options);
 		return "select count(*) from `$type`";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDistinct($options) {
 		extract($options);
 		return "SELECT id FROM `$type` GROUP BY $field";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryStat( $options ) {
 		extract($options);
 		return "select $stat(`$field`) from `$type`";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryFastLoad( $options ) {
 		extract( $options );
 		return "SELECT * FROM `$type` WHERE id IN ( ".implode(",", $ids)." ) ORDER BY FIELD(id,".implode(",", $ids).") ASC		";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryWhere($options) {
 		extract($options);
 		return "select `$table`.id from $table where ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryFind($options) {
 
 			extract($options);
@@ -3485,7 +3885,11 @@ class QueryWriter_MySQL implements QueryWriter {
       
 	}
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryList($options) {
 		
 		extract($options);
@@ -3516,17 +3920,31 @@ class QueryWriter_MySQL implements QueryWriter {
  		return $listSQL;
 	}
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryAddAssocNow( $options ) {
 		extract($options);
 		return "REPLACE INTO `$assoctable` VALUES(null,$id1,$id2) ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnassoc( $options ) {
 		extract($options);
 		return "DELETE FROM `$assoctable` WHERE ".$t1."_id = $id1 AND ".$t2."_id = $id2 ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryCreateAssoc($options) {
 		
 		extract($options);
@@ -3541,6 +3959,11 @@ class QueryWriter_MySQL implements QueryWriter {
 		";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUntree( $options ) {
 		extract($options);
 		return "DELETE FROM `$assoctable2` WHERE
@@ -3548,54 +3971,101 @@ class QueryWriter_MySQL implements QueryWriter {
 				(parent_id = $idx2 AND child_id = $idx1) ";
 	}
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryAddAssoc($options) {
 		extract( $options );
 		return "ALTER TABLE `$assoctable` ADD UNIQUE INDEX `u_$assoctable` (`".$t1."_id`, `".$t2."_id` ) ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryGetAssoc($options) {
 		extract( $options );
 		return "SELECT `".$t2."_id` FROM `$assoctable` WHERE `".$t1."_id` = $id ";
 	}
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryTrash( $options ) {
 		extract( $options );
 		return "DELETE FROM ".$table." WHERE id = $id ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDeltree( $options ) {
 		extract( $options );
 		return "DELETE FROM $table WHERE parent_id = $id OR child_id = $id ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnassocAllT1( $options ) {
 		extract( $options );
 		return "DELETE FROM $table WHERE ".$t."_id = $id ";
 	}
 
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnassocAllT2( $options ) {
 		extract( $options );
 		return "DELETE FROM $table WHERE ".$t."2_id = $id ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDeltreeType($options) {
 		extract( $options );
 		return "DELETE FROM $assoctable WHERE parent_id = $id  OR child_id = $id ";
 	}
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnassocType1($options) {
 		extract( $options );
 		return "DELETE FROM $assoctable WHERE ".$t1."_id = $id ";	
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnassocType2($options) {
 		extract( $options );
 		return "DELETE FROM $assoctable WHERE ".$t1."2_id = $id ";	
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryCreateTree( $options ) {
 		extract( $options );		
 		return "
@@ -3608,32 +4078,62 @@ class QueryWriter_MySQL implements QueryWriter {
 				";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnique( $options ) {
 		extract( $options );		
 		return "ALTER TABLE `$assoctable` ADD UNIQUE INDEX `u_$assoctable` (`parent_id`, `child_id` ) ";
 	} 
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryAddChild( $options ) {
 		extract( $options );	
 		return "REPLACE INTO `$assoctable` VALUES(null,$pid,$cid) ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryGetChildren( $options ) {
 		extract( $options );
 		return "SELECT `child_id` FROM `$assoctable` WHERE `parent_id` = $pid ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryGetParent( $options ) {
 		extract( $options );
 		return "SELECT `parent_id` FROM `$assoctable` WHERE `child_id` = $cid ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryRemoveChild( $options ) {
 		extract( $options );
 		return "DELETE FROM `$assoctable` WHERE
 				( parent_id = $pid AND child_id = $cid ) ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryNumRelated( $options ) {
 		extract( $options );
 		return "
@@ -3643,67 +4143,131 @@ class QueryWriter_MySQL implements QueryWriter {
 					";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDescribe( $options ) {
 		extract( $options );
 		return "describe `$table`";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDropTables( $options ) {
 		extract($options);
 		return "drop tables ".implode(",",$tables);
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDropColumn( $options ) {
 		extract($options);
 		return "ALTER TABLE `$table` DROP `$property`";	
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryGetNull( $options ) {
 		extract($options);
 		return "SELECT count(*) FROM `$table` WHERE `$col` IS NOT NULL ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryTestColumn( $options ) {
 		extract($options);
 		return "alter table `$table` add __test  ".$type;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUpdateTest( $options ) {
 		extract($options);
 		return "update `$table` set __test=`$col`";
 	}
 
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryMeasure( $options ) {
 		extract($options);
 		return "select count(*) as df from `$table` where
 				strcmp(`$col`,__test) != 0 AND `$col` IS NOT NULL";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryRemoveTest($options) {
 		extract($options);
 		return "alter table `$table` change `$col` `$col` ".$type;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDropTest($options) {
 		extract($options);
 		return "alter table `$table` drop __test";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryVariance($options) {
 		extract($options);
 		return "select count( distinct $col ) from $table";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getIndex1($options) {
 		extract($options);
 		return "ALTER IGNORE TABLE `$table` ADD INDEX $indexname (`$col`)";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getIndex2($options) {
 		extract($options);
 		return "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/QueryWriter#getQuery()
+	 */
 	public function getQuery( $queryname, $params=array() ) {
 		//echo "<b style='color:yellow'>$queryname</b>";
 		switch($queryname) {
@@ -3944,31 +4508,65 @@ class QueryWriter_MySQL implements QueryWriter {
 		
 	}
 	
-	
+	/**
+	 * 
+	 * @return unknown_type
+	 */
 	public function getQuote() {
 		return "\"";	
 	}
 	
+	/**
+	 * 
+	 * @return unknown_type
+	 */
 	public function getEscape() {
 		return "`";	
 	}
 	
 }
+/**
+ * QueryWriter
+ * Interface for QueryWriters
+ * @package 		RedBean/QueryWriter.php
+ * @description		Describes the API for a QueryWriter
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
 interface QueryWriter {
 	
+	/**
+	 * Returns the requested query if the writer has any
+	 * @param $queryname
+	 * @param $params
+	 * @return mixed $sql_query
+	 */
 	public function getQuery( $queryname, $params=array() );
 	
+	/**
+	 * Gets the quote-escape symbol of this writer
+	 * @return unknown_type
+	 */
+	public function getQuote();
+
+	/**
+	 * Gets the backtick for this writer
+	 * @return unknown_type
+	 */
+	public function getEscape();
+
 }
 //For framework intergration if you define $db you can specify a class prefix for models
 if (!isset($db)) define("PRFX","");
 if (!isset($db)) define("SFFX","");
 
-
 /**
  * RedBean Setup
  * Helper class to quickly setup RedBean for you
- * @author gabordemooij
- *
+ * @package 		RedBean/Setup.php
+ * @description		Helper class to quickly setup RedBean for you
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_Setup { 
 	
@@ -4025,9 +4623,11 @@ class RedBean_Setup {
 	
 }
 /**
- * 
- * @author gabordemooij
- *
+ * Sieve
+ * @package 		RedBean/Sieve.php
+ * @description		Filters a bean
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_Sieve {
 	
@@ -4115,14 +4715,34 @@ class RedBean_Sieve {
 	
 }
 /**
- * 
- * @author Desfrenes
- *
+ * RedBean Tools
+ * Tool Collection for RedBean
+ * @package 		RedBean/Tools.php
+ * @description		A series of Tools of RedBean
+ * @author			Desfrenes
+ * @license			BSD
  */
 class RedBean_Tools
 {
+	/**
+	 * 
+	 * @var unknown_type
+	 */
     private static $class_definitions;
+    
+    /**
+     * 
+     * @var unknown_type
+     */
     private static $remove_whitespaces;
+    
+    /**
+     * 
+     * @param $root
+     * @param $callback
+     * @param $recursive
+     * @return unknown_type
+     */
     public static function walk_dir( $root, $callback, $recursive = true )
     {
         $root = realpath($root);
@@ -4147,6 +4767,12 @@ class RedBean_Tools
         return true;
     }
  
+    /**
+     * 
+     * @param $file
+     * @param $removeWhiteSpaces
+     * @return unknown_type
+     */
     public static function compile($file = '', $removeWhiteSpaces = true)
     {
         self::$remove_whitespaces = $removeWhiteSpaces;
@@ -4161,6 +4787,11 @@ class RedBean_Tools
         return $content;
     }
  
+    /**
+     * 
+     * @param $file
+     * @return unknown_type
+     */
     private static function stripClassDefinition($file)
     {
         if(is_file($file) && substr($file, -4) == '.php')
@@ -4176,11 +4807,29 @@ class RedBean_Tools
         }
     }
 }
+/**
+ * RedBean Validator Alphanumeric
+ * @package 		RedBean/Validator/AlphaNumeric.php
+ * @description		Checks whether a value is alpha numeric
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
 class RedBean_Validator_AlphaNumeric implements RedBean_Validator {
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Validator#check()
+	 */
 	public function check( $v ) {
 		return (bool) preg_match('/^[A-Za-z0-9]+$/', $v);
 	}
 }
+/**
+ * RedBean Validator
+ * @package 		RedBean/Validator.php
+ * @description		API for Validators
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
 interface RedBean_Validator {
 	/**
 	 * 

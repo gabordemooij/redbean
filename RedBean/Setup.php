@@ -4,12 +4,13 @@
 if (!isset($db)) define("PRFX","");
 if (!isset($db)) define("SFFX","");
 
-
 /**
  * RedBean Setup
  * Helper class to quickly setup RedBean for you
- * @author gabordemooij
- *
+ * @package 		RedBean/Setup.php
+ * @description		Helper class to quickly setup RedBean for you
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_Setup { 
 	

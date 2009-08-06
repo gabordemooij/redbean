@@ -1,8 +1,10 @@
 <?php 
 /**
- * Adapter for ADODB database layer AND RedBean
- * @author gabordemooij
- *
+ * DBAdapter (Database Adapter)
+ * @package 		RedBean/DBAdapter.php
+ * @description		An adapter class to connect various database systems to RedBean
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_DBAdapter extends RedBean_Observable {
 
@@ -12,6 +14,10 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 */
 	private $db = null;
 	
+	/**
+	 * 
+	 * @var string
+	 */
 	private $sql = "";
 
 	
@@ -24,6 +30,10 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		$this->db = $database;
 	}
 	
+	/**
+	 * 
+	 * @return unknown_type
+	 */
 	public function getSQL() {
 		return $this->sql;
 	}

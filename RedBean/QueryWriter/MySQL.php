@@ -1,8 +1,18 @@
 <?php 
-
+/**
+ * RedBean MySQLWriter
+ * @package 		RedBean/QueryWriter/MySQL.php
+ * @description		Writes Queries for MySQL Databases
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
 class QueryWriter_MySQL implements QueryWriter {
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryCreateTable( $options=array() ) {
 		
 		$engine = $options["engine"];
@@ -30,16 +40,31 @@ class QueryWriter_MySQL implements QueryWriter {
 		return $createtableSQL;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryWiden( $options ) {
 		extract($options);
 		return "ALTER TABLE `$table` CHANGE `$column` `$column` $newtype ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryAddColumn( $options ) {
 		extract($options);
 		return "ALTER TABLE `$table` ADD `$column` $type ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUpdate( $options ) {
 		extract($options);
 		$update = array();
@@ -49,6 +74,11 @@ class QueryWriter_MySQL implements QueryWriter {
 		return "UPDATE `$table` SET ".implode(",",$update)." WHERE id = ".$id;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryInsert( $options ) {
 		
 		extract($options);
@@ -67,11 +97,21 @@ class QueryWriter_MySQL implements QueryWriter {
 		return $insertSQL;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryCreate( $options ) {
 		extract($options);
 		return "INSERT INTO `$table` VALUES(null) ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryInferType( $options ) {
 		extract($options);
 		$v = "\"".$value."\"";
@@ -79,85 +119,170 @@ class QueryWriter_MySQL implements QueryWriter {
 		return $checktypeSQL;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryReadType( $options ) {
 		extract($options);
 		return "select tinyintus,intus,ints,varchar255,`text` from dtyp where id=$id";
 	}
 	
+	/**
+	 * 
+	 * @return unknown_type
+	 */
 	private function getQueryResetDTYP() {
 		return "truncate table dtyp";	
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryRegisterTable( $options ) {
 		extract( $options );
 		return "replace into redbeantables values (null, \"$table\") ";
 	}
 	
+	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnregisterTable( $options ) {
 		extract( $options );
 		return "delete from redbeantables where tablename = \"$table\" ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryRelease( $options ) {
 		extract( $options );
 		return "DELETE FROM locking WHERE fingerprint=\"".$key."\" ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryRemoveExpirLock( $options ) {
 		extract( $options );
 		return "DELETE FROM locking WHERE expire < ".(time()-$locktime);
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQuerySelectLock( $options ) {
 		extract( $options );
 		return	"SELECT id FROM locking WHERE id=$id AND  tbl=\"$table\" AND fingerprint=\"".$key."\" ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUpdateExpirLock( $options ) {
 		extract( $options );
 		return "UPDATE locking SET expire=".$time." WHERE id =".$id;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryAQLock( $options ) {
 		extract($options);
 		return "INSERT INTO locking VALUES(\"$table\",$id,\"".$key."\",\"".$time."\") ";	
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryGetBean($options) {
 		extract($options);
 		return "SELECT * FROM `$type` WHERE id = $id ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryBeanExists( $options ) {
 		extract($options);
 		return "select count(*) from `$type` where id=$id";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryCount($options) {
 		extract($options);
 		return "select count(*) from `$type`";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDistinct($options) {
 		extract($options);
 		return "SELECT id FROM `$type` GROUP BY $field";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryStat( $options ) {
 		extract($options);
 		return "select $stat(`$field`) from `$type`";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryFastLoad( $options ) {
 		extract( $options );
 		return "SELECT * FROM `$type` WHERE id IN ( ".implode(",", $ids)." ) ORDER BY FIELD(id,".implode(",", $ids).") ASC		";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryWhere($options) {
 		extract($options);
 		return "select `$table`.id from $table where ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryFind($options) {
 
 			extract($options);
@@ -194,7 +319,11 @@ class QueryWriter_MySQL implements QueryWriter {
       
 	}
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryList($options) {
 		
 		extract($options);
@@ -225,17 +354,31 @@ class QueryWriter_MySQL implements QueryWriter {
  		return $listSQL;
 	}
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryAddAssocNow( $options ) {
 		extract($options);
 		return "REPLACE INTO `$assoctable` VALUES(null,$id1,$id2) ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnassoc( $options ) {
 		extract($options);
 		return "DELETE FROM `$assoctable` WHERE ".$t1."_id = $id1 AND ".$t2."_id = $id2 ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryCreateAssoc($options) {
 		
 		extract($options);
@@ -250,6 +393,11 @@ class QueryWriter_MySQL implements QueryWriter {
 		";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUntree( $options ) {
 		extract($options);
 		return "DELETE FROM `$assoctable2` WHERE
@@ -257,54 +405,101 @@ class QueryWriter_MySQL implements QueryWriter {
 				(parent_id = $idx2 AND child_id = $idx1) ";
 	}
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryAddAssoc($options) {
 		extract( $options );
 		return "ALTER TABLE `$assoctable` ADD UNIQUE INDEX `u_$assoctable` (`".$t1."_id`, `".$t2."_id` ) ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryGetAssoc($options) {
 		extract( $options );
 		return "SELECT `".$t2."_id` FROM `$assoctable` WHERE `".$t1."_id` = $id ";
 	}
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryTrash( $options ) {
 		extract( $options );
 		return "DELETE FROM ".$table." WHERE id = $id ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDeltree( $options ) {
 		extract( $options );
 		return "DELETE FROM $table WHERE parent_id = $id OR child_id = $id ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnassocAllT1( $options ) {
 		extract( $options );
 		return "DELETE FROM $table WHERE ".$t."_id = $id ";
 	}
 
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnassocAllT2( $options ) {
 		extract( $options );
 		return "DELETE FROM $table WHERE ".$t."2_id = $id ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDeltreeType($options) {
 		extract( $options );
 		return "DELETE FROM $assoctable WHERE parent_id = $id  OR child_id = $id ";
 	}
 	
-	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnassocType1($options) {
 		extract( $options );
 		return "DELETE FROM $assoctable WHERE ".$t1."_id = $id ";	
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnassocType2($options) {
 		extract( $options );
 		return "DELETE FROM $assoctable WHERE ".$t1."2_id = $id ";	
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryCreateTree( $options ) {
 		extract( $options );		
 		return "
@@ -317,32 +512,62 @@ class QueryWriter_MySQL implements QueryWriter {
 				";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUnique( $options ) {
 		extract( $options );		
 		return "ALTER TABLE `$assoctable` ADD UNIQUE INDEX `u_$assoctable` (`parent_id`, `child_id` ) ";
 	} 
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryAddChild( $options ) {
 		extract( $options );	
 		return "REPLACE INTO `$assoctable` VALUES(null,$pid,$cid) ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryGetChildren( $options ) {
 		extract( $options );
 		return "SELECT `child_id` FROM `$assoctable` WHERE `parent_id` = $pid ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryGetParent( $options ) {
 		extract( $options );
 		return "SELECT `parent_id` FROM `$assoctable` WHERE `child_id` = $cid ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryRemoveChild( $options ) {
 		extract( $options );
 		return "DELETE FROM `$assoctable` WHERE
 				( parent_id = $pid AND child_id = $cid ) ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryNumRelated( $options ) {
 		extract( $options );
 		return "
@@ -352,67 +577,131 @@ class QueryWriter_MySQL implements QueryWriter {
 					";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDescribe( $options ) {
 		extract( $options );
 		return "describe `$table`";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDropTables( $options ) {
 		extract($options);
 		return "drop tables ".implode(",",$tables);
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDropColumn( $options ) {
 		extract($options);
 		return "ALTER TABLE `$table` DROP `$property`";	
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryGetNull( $options ) {
 		extract($options);
 		return "SELECT count(*) FROM `$table` WHERE `$col` IS NOT NULL ";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryTestColumn( $options ) {
 		extract($options);
 		return "alter table `$table` add __test  ".$type;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryUpdateTest( $options ) {
 		extract($options);
 		return "update `$table` set __test=`$col`";
 	}
 
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryMeasure( $options ) {
 		extract($options);
 		return "select count(*) as df from `$table` where
 				strcmp(`$col`,__test) != 0 AND `$col` IS NOT NULL";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryRemoveTest($options) {
 		extract($options);
 		return "alter table `$table` change `$col` `$col` ".$type;
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryDropTest($options) {
 		extract($options);
 		return "alter table `$table` drop __test";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getQueryVariance($options) {
 		extract($options);
 		return "select count( distinct $col ) from $table";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getIndex1($options) {
 		extract($options);
 		return "ALTER IGNORE TABLE `$table` ADD INDEX $indexname (`$col`)";
 	}
 	
+	/**
+	 * 
+	 * @param $options
+	 * @return unknown_type
+	 */
 	private function getIndex2($options) {
 		extract($options);
 		return "ALTER IGNORE TABLE `$table` DROP INDEX $indexname";
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/QueryWriter#getQuery()
+	 */
 	public function getQuery( $queryname, $params=array() ) {
 		//echo "<b style='color:yellow'>$queryname</b>";
 		switch($queryname) {
@@ -653,11 +942,18 @@ class QueryWriter_MySQL implements QueryWriter {
 		
 	}
 	
-	
+	/**
+	 * 
+	 * @return unknown_type
+	 */
 	public function getQuote() {
 		return "\"";	
 	}
 	
+	/**
+	 * 
+	 * @return unknown_type
+	 */
 	public function getEscape() {
 		return "`";	
 	}

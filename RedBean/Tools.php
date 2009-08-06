@@ -1,13 +1,33 @@
 <?php
 /**
- * 
- * @author Desfrenes
- *
+ * RedBean Tools
+ * Tool Collection for RedBean
+ * @package 		RedBean/Tools.php
+ * @description		A series of Tools of RedBean
+ * @author			Desfrenes
+ * @license			BSD
  */
 class RedBean_Tools
 {
+	/**
+	 * 
+	 * @var unknown_type
+	 */
     private static $class_definitions;
+    
+    /**
+     * 
+     * @var unknown_type
+     */
     private static $remove_whitespaces;
+    
+    /**
+     * 
+     * @param $root
+     * @param $callback
+     * @param $recursive
+     * @return unknown_type
+     */
     public static function walk_dir( $root, $callback, $recursive = true )
     {
         $root = realpath($root);
@@ -32,6 +52,12 @@ class RedBean_Tools
         return true;
     }
  
+    /**
+     * 
+     * @param $file
+     * @param $removeWhiteSpaces
+     * @return unknown_type
+     */
     public static function compile($file = '', $removeWhiteSpaces = true)
     {
         self::$remove_whitespaces = $removeWhiteSpaces;
@@ -46,6 +72,11 @@ class RedBean_Tools
         return $content;
     }
  
+    /**
+     * 
+     * @param $file
+     * @return unknown_type
+     */
     private static function stripClassDefinition($file)
     {
         if(is_file($file) && substr($file, -4) == '.php')

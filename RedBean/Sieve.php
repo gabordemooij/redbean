@@ -1,8 +1,10 @@
 <?php
 /**
- * 
- * @author gabordemooij
- *
+ * Sieve
+ * @package 		RedBean/Sieve.php
+ * @description		Filters a bean
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_Sieve {
 	

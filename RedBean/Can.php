@@ -1,10 +1,10 @@
 <?php
-
 /**
- * RedBean Can
- * @desc   a Can contains beans and acts as n iterator, it also enables you to work with
- * 		   large collections while remaining light-weight
- * @author gabordemooij
+ * Can (Can of Beans)
+ * @package 		RedBean/Can.php
+ * @description		A lightweight collection for beans
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Countable {
 	

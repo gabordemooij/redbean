@@ -1,14 +1,15 @@
 <?php
 /**
- * 
- * @author gabordemooij
- *
+ * Querylogger 
+ * @package 		RedBean/QueryLogger.php
+ * @description		Simple Audit Logger
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class Redbean_Querylogger implements RedBean_Observer
 {
  
 	/**
-	 * 
 	 * @var string
 	 */
 	private $path = "";

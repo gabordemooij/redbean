@@ -1,8 +1,10 @@
 <?php
 /**
- * RedBean decorator class
- * @desc   this class provides additional ORM functionality and defauly accessors
- * @author gabordemooij
+ * Decorator
+ * @package 		RedBean/Decorator.php
+ * @description		Adds additional so-called 'porcelain' functions to the bean objects
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate {
 
@@ -532,12 +534,19 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		return $decos;
 	}
 
-
+	/**
+	 * Returns an iterator
+	 * @return Iterator $i
+	 */
 	public function getIterator() {
 		$o = new ArrayObject($this->data);
 		return $o->getIterator();
 	}
 	
+	/**
+	 * Whether you can write to this bean or not
+	 * @return boolean $locked
+	 */
 	public function isReadOnly() {
 		try{
 			RedBean_OODB::openBean($this->data, true);

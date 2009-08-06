@@ -1,8 +1,11 @@
 <?php
 /**
- * 
- * @author gabordemooij
- *
+ * Observable
+ * Base class for Observables
+ * @package 		RedBean/Observable.php
+ * @description		Part of the observer pattern in RedBean
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_Observable {
 	/**
@@ -12,7 +15,7 @@ class RedBean_Observable {
 	private $observers = array();
 	
 	/**
-	 * 
+	 * Adds a listener to this instance
 	 * @param $eventname
 	 * @param $observer
 	 * @return unknown_type
@@ -27,7 +30,7 @@ class RedBean_Observable {
 	}
 	
 	/**
-	 * 
+	 * Sends an event (signal) to the registered listeners
 	 * @param $eventname
 	 * @return unknown_type
 	 */

@@ -1,18 +1,57 @@
 <?php 
-
 /**
- * PDO support driver
- * the PDO driver has been written by Desfrenes.
+ * PDO Driver
+ * @package 		RedBean/PDO.php
+ * @description		PDO Driver
+ * @author			Desfrenes
+ * @license			BSD
  */
 class Redbean_Driver_PDO implements RedBean_Driver {
-    private static $instance;
+
+	/**
+	 * 
+	 * @var unknown_type
+	 */
+	private static $instance;
     
+	/**
+	 * 
+	 * @var boolean
+	 */
     private $debug = false;
+    
+    /**
+     * 
+     * @var unknown_type
+     */
     private $pdo;
+    
+    /**
+     * 
+     * @var unknown_type
+     */
     private $affected_rows;
+    
+    /**
+     * 
+     * @var unknown_type
+     */
     private $rs;
+    
+    /**
+     * 
+     * @var unknown_type
+     */
     private $exc =0;
     
+    /**
+     * 
+     * @param $dsn
+     * @param $user
+     * @param $pass
+     * @param $dbname
+     * @return unknown_type
+     */
     public static function getInstance($dsn, $user, $pass, $dbname)
     {
         if(is_null(self::$instance))
@@ -22,6 +61,13 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return self::$instance;
     }
     
+    /**
+     * 
+     * @param $dsn
+     * @param $user
+     * @param $pass
+     * @return unknown_type
+     */
     public function __construct($dsn, $user, $pass)
     {
         $this->pdo = new PDO(
@@ -34,6 +80,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
             );
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetAll()
+     */
     public function GetAll( $sql )
     {
     	$this->exc = 0;
@@ -72,6 +122,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return $rows;
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetCol()
+     */
     public function GetCol($sql)
     {
     	$this->exc = 0;
@@ -93,6 +147,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return $cols;
     }
  
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetCell()
+     */
     public function GetCell($sql)
     {
     	$this->exc = 0;
@@ -105,6 +163,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return $col1;
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetRow()
+     */
     public function GetRow($sql)
     {
     	$this->exc = 0;
@@ -115,18 +177,32 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return array_shift($arr);
     }
     
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#ErrorNo()
+     */
     public function ErrorNo()
     {
     	if (!$this->exc) return 0;
     	$infos = $this->pdo->errorInfo();
         return $infos[1];
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#Errormsg()
+     */
     public function Errormsg()
     {
     	if (!$this->exc) return "";
         $infos = $this->pdo->errorInfo();
         return $infos[2];
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#Execute()
+     */
     public function Execute( $sql )
     {
     	$this->exc = 0;
@@ -151,22 +227,47 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     	return 0; }
         return $this->affected_rows;
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#Escape()
+     */
     public function Escape( $str )
     {
         return substr(substr($this->pdo->quote($str), 1), 0, -1);
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetInsertID()
+     */
     public function GetInsertID()
     {
         return (int) $this->pdo->lastInsertId();
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#Affected_Rows()
+     */
     public function Affected_Rows()
     {
         return (int) $this->affected_rows;
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#setDebugMode()
+     */
     public function setDebugMode( $tf )
     {
         $this->debug = (bool)$tf;
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see RedBean/RedBean_Driver#GetRaw()
+     */
     public function GetRaw()
     {
         return $this->rs;

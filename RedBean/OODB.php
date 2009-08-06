@@ -1,10 +1,10 @@
 <?php 
-
-
 /**
- * RedBean OODB (object oriented database) Core class for the RedBean ORM pack
- * @author gabordemooij
- *
+ * RedBean OODB (object oriented database)
+ * @package 		RedBean/OODB.php
+ * @description		Core class for the RedBean ORM pack
+ * @author			Gabor de Mooij
+ * @license			BSD
  */
 class RedBean_OODB {
 
@@ -897,7 +897,12 @@ class RedBean_OODB {
 			return true;
 		}
 
-	
+		/**
+		 * Fills slots in SQL query
+		 * @param $sql
+		 * @param $slots
+		 * @return unknown_type
+		 */
 		public static function processQuerySlots($sql, $slots) {
 			
 			$db = self::$db;
@@ -918,6 +923,12 @@ class RedBean_OODB {
 			return $sql;
 		}
 		
+		/**
+		 * Loads a collection of beans -fast-
+		 * @param $type
+		 * @param $ids
+		 * @return unknown_type
+		 */
 		public static function fastLoader( $type, $ids ) {
 			
 			$db = self::$db;
@@ -932,6 +943,15 @@ class RedBean_OODB {
 			
 		}
 		
+		/**
+		 * Allows you to fetch an array of beans using plain
+		 * old SQL.
+		 * @param $rawsql
+		 * @param $slots
+		 * @param $table
+		 * @param $max
+		 * @return array $beans
+		 */
 		public static function getBySQL( $rawsql, $slots, $table, $max=0 ) {
 		
 			$db = self::$db;
