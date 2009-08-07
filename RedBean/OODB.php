@@ -49,38 +49,7 @@ class RedBean_OODB {
 	 */
 	private static $locking = true;
 
-	/**
-	 *
-	 * @var array all allowed sql types
-	 */
-	public static $typeno_sqltype = array(
-		" TINYINT(3) UNSIGNED ",
-		" INT(11) UNSIGNED ",
-		" BIGINT(20) SIGNED ",
-		" VARCHAR(255) ",
-		" TEXT ",
-		" LONGTEXT "
-		);
 
-		/**
-		 *
-		 * @var array all allowed sql types
-		 */
-		public static $sqltype_typeno = array(
-		"tinyint(3) unsigned"=>0,
-		"int(11) unsigned"=>1,
-		"bigint(20) signed"=>2,
-		"varchar(255)"=>3,
-		"text"=>4,
-		"longtext"=>5
-		);
-
-		/**
-		 * @var array all dtype types
-		 */
-		public static $dtypes = array(
-		"tintyintus","intus","ints","varchar255","text","ltext"
-		);
 
 		/**
 		 *
@@ -117,14 +86,11 @@ class RedBean_OODB {
 		 */
 		public function __destruct() {
 
-
-			//prepare database
-			if (self::$engine === "innodb") {
-				self::$db->exec("COMMIT");
-			}
-			else if (self::$engine === "myisam"){
-				//nope
-			}
+			self::$db->exec( 
+				self::$writer->getQuery("destruct", array("engine"=>self::$engine))
+			);
+			
+			
 			RedBean_OODB::releaseAllLocks();
 			
 		}
@@ -341,7 +307,7 @@ class RedBean_OODB {
 								$changecolumnSQL = self::$writer->getQuery( "widen_column", array(
 									"table" => $table,
 									"column" => $p,
-									"newtype" => self::$typeno_sqltype[$typeno]
+									"newtype" => self::$writer->typeno_sqltype[$typeno]
 								) ); 
 								
 								$db->exec( $changecolumnSQL );
@@ -352,7 +318,7 @@ class RedBean_OODB {
 							$addcolumnSQL = self::$writer->getQuery("add_column",array(
 								"table"=>$table,
 								"column"=>$p,
-								"type"=> self::$typeno_sqltype[$typeno]
+								"type"=> self::$writer->typeno_sqltype[$typeno]
 							));
 							
 							$db->exec( $addcolumnSQL );
@@ -464,8 +430,8 @@ class RedBean_OODB {
 		 */
 		public static function getType( $sqlType ) {
 
-			if (in_array($sqlType,self::$sqltype_typeno)) {
-				$typeno = self::$sqltype_typeno[$sqlType];
+			if (in_array($sqlType,self::$writer->sqltype_typeno)) {
+				$typeno = self::$writer->sqltype_typeno[$sqlType];
 			}
 			else {
 				$typeno = -1;
@@ -1878,12 +1844,12 @@ class RedBean_OODB {
 			
 			//okay so this column is still in use, but maybe its to wide
 			//get the field type
-			$currenttype =  self::$sqltype_typeno[$colr["Type"]];
+			$currenttype =  self::$writer->sqltype_typeno[$colr["Type"]];
 			if ($currenttype > 0) {
 				$trytype = rand(0,$currenttype - 1); //try a little smaller
 				//add a test column
 				$db->exec(self::$writer->getQuery("test_column",array(
-					"type"=>self::$typeno_sqltype[$trytype],
+					"type"=>self::$writer->typeno_sqltype[$trytype],
 					"table"=>$table
 				)
 				));
@@ -1902,7 +1868,7 @@ class RedBean_OODB {
 					$sql = self::$writer->getQuery("remove_test",array(
 						"table"=>$table,
 						"col"=>$col,
-						"type"=>self::$typeno_sqltype[$trytype]
+						"type"=>self::$writer->typeno_sqltype[$trytype]
 					));
 					$db->exec($sql);
 				}

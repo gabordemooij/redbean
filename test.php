@@ -61,6 +61,8 @@ class SmartTest {
 require("allinone.php");
 RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
 
+
+
 SmartTest::instance()->testPack = "Basic test suite";
 $tests = 0; SmartTest::instance()->progress(); ;
 
@@ -728,6 +730,9 @@ function testsperengine() {
 	$petesfood = RedBean_OODB::getAssoc( $pete, "food" );
 	if (is_array($petesfood) && count($petesfood)===1) $ok=1;
 	if (!$ok) SmartTest::failedTest();
+	RedBean_OODB::unassociate( $food, $pete );
+	if (is_array($petesfood) && count($petesfood)===0) $ok=1;
+	if (!$ok) SmartTest::failedTest();
 	
 	
 	//some extra tests... quick without further notice.	
@@ -935,21 +940,19 @@ function testsperengine() {
 	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
-	SmartTest::instance()->testPack = "protect inner state of RedBean";
+	
 	try{
 	RedBean_OODB::setLockingTime( 1.5 );
 	SmartTest::failedTest();
 	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
-	SmartTest::instance()->testPack = "protect inner state of RedBean";
 	try{
 	RedBean_OODB::setLockingTime( "aaa" );
 	SmartTest::failedTest();
 	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
-	SmartTest::instance()->testPack = "protect inner state of RedBean";
 	try{
 	RedBean_OODB::setLockingTime( null );
 	SmartTest::failedTest();
@@ -991,6 +994,7 @@ function testsperengine() {
 	if ($kwak->hasSibling($kwak)!=false) {SmartTest::failedTest(); }else SmartTest::instance()->progress(); ;
 	if ($kwak->hasSibling($donald)!=false) {SmartTest::failedTest(); }else SmartTest::instance()->progress(); ;
 	
+	
 	//copy
 	SmartTest::instance()->testPack="copy functions";
 	$kwak2 = $kwak->copy();
@@ -998,6 +1002,13 @@ function testsperengine() {
 	$kwak2 = new Person( $id );
 	if ($kwak->getName() != $kwak2->getName()) {SmartTest::failedTest(); }else SmartTest::instance()->progress(); ;
 	
+	SmartTest::test(count($donald->children()),3);
+	Person::delete($kwek);
+	SmartTest::test(count($donald->children()),2);
+	Person::delete($kwik);
+	SmartTest::test(count($donald->children()),1);
+	Person::delete($kwak);
+	SmartTest::test(count($donald->children()),0);
 	
 	SmartTest::instance()->testPack="countRelated";
 	R::gen("Blog,Comment");
@@ -1123,6 +1134,21 @@ function testsperengine() {
 	RedBean_OODB::trashAll("SomeBean");
 	SmartTest::test(RedBean_OODB::numberof("SomeBean"),0);
 	
+	RedBean_OODB::gen("Book");
+	$book = new Book;
+	$book->setTitle('about a red bean');
+	RedBean_OODB::gen("Page");
+	$page1 = new Page;
+	$page2 = new Page;
+	SmartTest::test(count($book->getRelatedPage()),0);
+	$book->add($page1);
+	SmartTest::test(count($book->getRelatedPage()),1);
+	$book->add($page2);
+	SmartTest::test(count($book->getRelatedPage()),2);
+	$book->remove($page1);
+	SmartTest::test(count($book->getRelatedPage()),1);
+	$book->remove($page2);
+	SmartTest::test(count($book->getRelatedPage()),0);
 }
 
 
