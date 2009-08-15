@@ -1603,6 +1603,12 @@ class RedBean_OODB {
 		public static $pkey = false;
 
 		/**
+		 * Indicates that a rollback is required
+		 * @var unknown_type
+		 */
+		private static $rollback = false;
+		
+		/**
 		 * 
 		 * @var RedBean_OODB
 		 */
@@ -1632,7 +1638,7 @@ class RedBean_OODB {
 		public function __destruct() {
 
 			self::$db->exec( 
-				self::$writer->getQuery("destruct", array("engine"=>self::$engine))
+				self::$writer->getQuery("destruct", array("engine"=>self::$engine,"rollback"=>self::$rollback))
 			);
 			
 			
@@ -1790,6 +1796,14 @@ class RedBean_OODB {
 
 		}
 
+		/**
+		 * Will perform a rollback at the end of the script
+		 * @return unknown_type
+		 */
+		public static function rollback() {
+			self::$rollback = true;
+		}
+		
 		/**
 		 * Inserts a bean into the database
 		 * @param $bean
@@ -4077,6 +4091,7 @@ class QueryWriter_MySQL implements QueryWriter {
 		 */
 		private function getDestruct($options) {
 			extract($options);
+			if ($rollback) return;
 			if ($engine=="innodb") return "COMMIT"; else return "";
 		}
 

@@ -538,6 +538,7 @@ class QueryWriter_MySQL implements QueryWriter {
 		 */
 		private function getDestruct($options) {
 			extract($options);
+			if ($rollback) return;
 			if ($engine=="innodb") return "COMMIT"; else return "";
 		}
 
