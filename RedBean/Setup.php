@@ -65,4 +65,39 @@ class RedBean_Setup {
 		}
 	}
 	
+	/**
+	 * Kickstarter for development phase
+	 * @param $dsn
+	 * @param $username
+	 * @param $password
+	 * @param $gen
+	 * @return unknown_type
+	 */
+	public static function kickstartDev( $gen, $dsn, $username="root", $password="" ) {
+		
+		//kickstart for development
+		self::kickstart( $dsn, $username, $password, false, "innodb", false, false);
+		
+		//generate classes
+		R::gen( $gen );
+	}
+	
+	/**
+	 * Kickstarter for deployment phase and testing
+	 * @param $dsn
+	 * @param $username
+	 * @param $password
+	 * @param $gen
+	 * @return unknown_type
+	 */
+	public static function kickstartFrozen( $gen, $dsn, $username="root", $password="" ) {
+		
+		//kickstart for development
+		self::kickstart( $dsn, $username, $password, true, "innodb", false, false);
+		
+		//generate classes
+		R::gen( $gen );
+	}
+		
+	
 }

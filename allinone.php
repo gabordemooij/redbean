@@ -3879,13 +3879,13 @@ class QueryWriter_MySQL implements QueryWriter {
 			extract($options);
 
 			return "
-		 CREATE TABLE `$assoctable` (
-		`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-		`".$t1."_id` INT( 11 ) UNSIGNED NOT NULL,
-		`".$t2."_id` INT( 11 ) UNSIGNED NOT NULL,
-		 PRIMARY KEY ( `id` )
-		 ) ENGINE = ".$engine."; 
-		";
+			 CREATE TABLE `$assoctable` (
+			`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+			`".$t1."_id` INT( 11 ) UNSIGNED NOT NULL,
+			`".$t2."_id` INT( 11 ) UNSIGNED NOT NULL,
+			 PRIMARY KEY ( `id` )
+			 ) ENGINE = ".$engine."; 
+			";
 		}
 
 		/**
@@ -4489,6 +4489,41 @@ class RedBean_Setup {
 			RedBean_OODB::freeze(); //Decide whether to freeze the database
 		}
 	}
+	
+	/**
+	 * Kickstarter for development phase
+	 * @param $dsn
+	 * @param $username
+	 * @param $password
+	 * @param $gen
+	 * @return unknown_type
+	 */
+	public static function kickstartDev( $gen, $dsn, $username="root", $password="" ) {
+		
+		//kickstart for development
+		self::kickstart( $dsn, $username, $password, false, "innodb", false, false);
+		
+		//generate classes
+		R::gen( $gen );
+	}
+	
+	/**
+	 * Kickstarter for deployment phase and testing
+	 * @param $dsn
+	 * @param $username
+	 * @param $password
+	 * @param $gen
+	 * @return unknown_type
+	 */
+	public static function kickstartFrozen( $gen, $dsn, $username="root", $password="" ) {
+		
+		//kickstart for development
+		self::kickstart( $dsn, $username, $password, true, "innodb", false, false);
+		
+		//generate classes
+		R::gen( $gen );
+	}
+		
 	
 }
 /**

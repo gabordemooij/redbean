@@ -340,13 +340,13 @@ class QueryWriter_MySQL implements QueryWriter {
 			extract($options);
 
 			return "
-		 CREATE TABLE `$assoctable` (
-		`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-		`".$t1."_id` INT( 11 ) UNSIGNED NOT NULL,
-		`".$t2."_id` INT( 11 ) UNSIGNED NOT NULL,
-		 PRIMARY KEY ( `id` )
-		 ) ENGINE = ".$engine."; 
-		";
+			 CREATE TABLE `$assoctable` (
+			`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+			`".$t1."_id` INT( 11 ) UNSIGNED NOT NULL,
+			`".$t2."_id` INT( 11 ) UNSIGNED NOT NULL,
+			 PRIMARY KEY ( `id` )
+			 ) ENGINE = ".$engine."; 
+			";
 		}
 
 		/**
