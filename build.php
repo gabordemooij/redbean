@@ -12,5 +12,5 @@ function __autoload($class)
 {
     include_once(str_replace('_', '/', $class) . '.php');
 }
-Redbean_Tools::compile(BASE_DIR . 'allinone.php', false);
-Redbean_Tools::compile(BASE_DIR . 'allinone-compressed.php', true);
+RedBean_Tools::compile(BASE_DIR . 'allinone.php', false);
+RedBean_Tools::compile(BASE_DIR . 'allinone-compressed.php', true);
