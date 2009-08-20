@@ -25,8 +25,6 @@ class SmartTest {
 		if ($canwe=="testPack") {
 			$this->testPack = $v;
 			echo "<br>processing testpack: ".RedBean_OODB::getEngine()."-".$v." ...now testing: ";
-		    ob_flush();
-		    flush(); 
 		}
 	}
 	public function __get( $canwe ) {
@@ -36,8 +34,6 @@ class SmartTest {
 		 global $tests;
 		 $tests++;
 		 echo "[".$tests."]";
-		 ob_flush();
-		 flush();
 	}
 	
 	public static function failedTest() {
@@ -58,8 +54,9 @@ class SmartTest {
 
 
 //Use this database for tests
-require("oodb.php");
+require("allinone.php");
 RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
+
 
 
 SmartTest::instance()->testPack = "Basic test suite";
@@ -89,21 +86,7 @@ else {
 	SmartTest::failedTest();	
 }
 
-//Test description: Can we use short notations?
-if (!$shortnotation_for_redbean || class_exists($shortnotation_for_redbean)) {
-	SmartTest::instance()->progress(); ;
-}
-else {
-	SmartTest::failedTest(); 	
-}
 
-//Test description: Can we use short notations?
-if (!$shortnotation_for_redbeandecorator || class_exists($shortnotation_for_redbeandecorator)) {
-	SmartTest::instance()->progress(); ;
-}
-else {
-	SmartTest::failedTest();	
-}
 
 
 //Test description: Check other basic functions
@@ -126,6 +109,109 @@ try{
 catch(Exception $e) {
 	SmartTest::failedTest();
 }
+
+
+
+SmartTest::instance()->testPack = "Import";
+R::gen("Thing");
+$_POST["first"]="abc";
+$_POST["second"]="xyz";
+$thing = new Thing;
+SmartTest::instance()->test($thing->import(array("first"=>"a","second"=>2))->getFirst(),"a");
+SmartTest::instance()->test($thing->importFromPost("nonexistant")->getFirst(),"a");
+SmartTest::instance()->test($thing->importFromPost(array("first"))->getFirst(),"abc");
+SmartTest::instance()->test($thing->importFromPost(array("first"))->getSecond(),2);
+SmartTest::instance()->test($thing->importFromPost()->getSecond(),"xyz");
+
+
+SmartTest::instance()->testPack = "Observers";
+R::gen("Employee");
+$employee = new Employee;
+
+class TestObserver implements RedBean_Observer {
+	public $signal = "";
+	public function onEvent( $event, RedBean_Observable $observer ) {
+		$this->signal=$event;
+	}
+}
+$observer = new TestObserver;
+$employee->addEventListener( "deco_set",$observer );
+$employee->addEventListener( "deco_get",$observer );
+$employee->addEventListener( "deco_clearrelated",$observer );
+$employee->addEventListener( "deco_add",$observer );
+$employee->addEventListener( "deco_remove",$observer );
+$employee->addEventListener( "deco_attach",$observer );
+$employee->addEventListener( "deco_numof",$observer );
+$employee->addEventListener( "deco_belongsto",$observer );
+$employee->addEventListener( "deco_exclusiveadd",$observer );
+$employee->addEventListener( "deco_children",$observer );
+$employee->addEventListener( "deco_parent",$observer );
+$employee->addEventListener( "deco_siblings",$observer );
+$employee->addEventListener( "deco_importpost",$observer );
+$employee->addEventListener( "deco_import",$observer );
+$employee->addEventListener( "deco_copy",$observer );
+$employee->addEventListener( "deco_free",$observer );
+$observer->signal="";
+$employee->setName("test");
+SmartTest::instance()->test($observer->signal,"deco_set");
+$observer->signal="";
+$employee->getName();
+SmartTest::instance()->test($observer->signal,"deco_get");
+$observer->signal="";
+$employee->getRelatedCustomer();
+SmartTest::instance()->test($observer->signal,"deco_get");
+$observer->signal="";
+$employee->is("nerd");
+SmartTest::instance()->test($observer->signal,"deco_get");
+$observer->signal="";
+$employee->clearRelated("nerd");
+SmartTest::instance()->test($observer->signal,"deco_clearrelated");
+$observer->signal="";
+$employee2 = new Employee;
+$employee2->setName("Minni");
+$employee->add($employee2);
+SmartTest::instance()->test($observer->signal,"deco_add");
+$observer->signal="";
+$employee->remove($employee2);
+SmartTest::instance()->test($observer->signal,"deco_remove");
+$observer->signal="";
+$employee->attach($employee2);
+SmartTest::instance()->test($observer->signal,"deco_attach");
+$observer->signal="";
+$employee->numofEmployee();
+SmartTest::instance()->test($observer->signal,"deco_numof");
+$observer->signal="";
+$employee->belongsTo($employee2);
+SmartTest::instance()->test($observer->signal,"deco_belongsto");
+$observer->signal="";
+$employee->exclusiveAdd($employee2);
+SmartTest::instance()->test($observer->signal,"deco_exclusiveadd");
+$observer->signal="";
+$employee->parent();
+SmartTest::instance()->test($observer->signal,"deco_parent");
+$observer->signal="";
+$employee->children($employee2);
+SmartTest::instance()->test($observer->signal,"deco_children");
+$observer->signal="";
+$employee->siblings($employee2);
+SmartTest::instance()->test($observer->signal,"deco_siblings");
+$observer->signal="";
+$employee->copy();
+SmartTest::instance()->test($observer->signal,"deco_copy");
+
+
+SmartTest::instance()->testPack = "Sieves";
+R::gen("Employee");
+$e = new Employee;
+$e->setName("Max");
+SmartTest::instance()->test(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric"))->valid($e),true);
+$e->setName("Ma.x");
+SmartTest::instance()->test(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric"))->valid($e),false);
+$e->setName("Max")->setFunct("sales");
+SmartTest::instance()->test(count(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric","funct"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
+$e->setName("x")->setFunct("");
+SmartTest::instance()->test(count(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric","funct"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
+SmartTest::instance()->test(count(RedBean_Sieve::make(array("a"=>"RedBean_Validator_AlphaNumeric","b"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
 
 //Test description: Test redbean table-space
 SmartTest::instance()->testPack = "Configuration tester";
@@ -161,10 +247,10 @@ SmartTest::instance()->testPack = "Optimizer and Garbage collector";
 
 $db->exec("
 CREATE TABLE  `slimtable` (
-`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
+`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
 `col1` VARCHAR( 255 ) NOT NULL ,
 `col2` TEXT NOT NULL ,
-`col3` INT( 11 ) NOT NULL ,
+`col3` INT( 11 ) UNSIGNED NOT NULL ,
 PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM");
 
@@ -191,10 +277,10 @@ NULL ,  '1',  'mustbevarchar',  '1000'
 
 $db->exec("
 CREATE TABLE  `indexer` (
-`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
+`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
 `highcard` VARCHAR( 255 ) NOT NULL ,
 `lowcard` TEXT NOT NULL ,
-`lowcard2` INT( 11 ) NOT NULL ,
+`lowcard2` INT( 11 ) UNSIGNED NOT NULL ,
 `highcard2` LONGTEXT NOT NULL ,
 PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM");
@@ -207,6 +293,29 @@ VALUES (
 NULL ,  'indexer'
 );
 ");
+
+
+
+$db->exec("INSERT INTO  `redbeantables` (
+`id` ,
+`tablename`
+)
+VALUES (
+NULL ,  'empcol'
+);
+");
+
+
+$db->exec("
+CREATE TABLE  `empcol` (
+`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+`aaa` INT( 11) UNSIGNED,
+`bbb` INT(11) UNSIGNED,
+`ccc` INT( 11 ) UNSIGNED,
+PRIMARY KEY (  `id` )
+) ENGINE = MYISAM");
+
+$db->exec("INSERT INTO  `empcol` (`id` ,`aaa` )VALUES (NULL ,  1 )");
 
 
 for($i=0; $i<20; $i++){
@@ -224,9 +333,14 @@ NULL ,  rand(),  'a',  rand(), CONCAT( rand()*100, '".str_repeat('x',1000)."' )
 }
 
 
+R::gen('empcol,slimtable,indexer');
+
 for($i=0; $i<500; $i++) {
-	RedBean_OODB::keepInShape();
+	RedBean_OODB::keepInShape( true );
 }
+
+$empcol = new empcol;
+SmartTest::test(empcol::where(' @ifexists:aaa=1 or @ifexists:bbb=1')->count(),1);
 
 $row = $db->getRow("select * from slimtable limit 1");
 SmartTest::test($row["col1"],1);
@@ -237,9 +351,27 @@ SmartTest::test(count($db->get("describe slimtable")),4);
 RedBean_OODB::dropColumn("slimtable","col3");
 SmartTest::test(count($db->get("describe slimtable")),3); 
 
+
+$db->exec("
+CREATE TABLE  `garbagetable` (
+`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
+`highcard` VARCHAR( 255 ) NOT NULL ,
+PRIMARY KEY (  `id` )
+) ENGINE = MYISAM");
+
+$db->exec("INSERT INTO  `redbeantables` (
+`id` ,
+`tablename`
+)
+VALUES (
+NULL ,  'garbagetable'
+);
+");
+
+
 RedBean_OODB::KeepInShape( true );
 $tables = RedBean_OODB::showTables(); 
-SmartTest::test(in_array("slimtable",$tables),false);
+SmartTest::test(in_array("garbagetable",$tables),false);
 
 //Tests for each individual engine
 function testsperengine() {
@@ -473,7 +605,8 @@ function testsperengine() {
 	$app->kind = "dentist";
 	RedBean_OODB::set($app);
 	RedBean_OODB::associate( $person2, $app );
-	$appforbob = array_shift(RedBean_OODB::getAssoc( $person2, "appointment" ));
+	$arr = RedBean_OODB::getAssoc( $person2, "appointment" );
+	$appforbob = array_shift($arr);
 	
 	if (!$appforbob || $appforbob->kind!="dentist") {
 		SmartTest::failedTest();
@@ -486,7 +619,7 @@ function testsperengine() {
 	RedBean_OODB::trash( $person );
 	try{
 	$person = RedBean_OODB::getById( "person", $bobid);$ok=0;
-	}catch(ExceptionFailedAccessBean $e){
+	}catch(RedBean_Exception_FailedAccessBean $e){
 		$ok=true;
 	}
 	
@@ -579,6 +712,9 @@ function testsperengine() {
 	
 	$petesfood = RedBean_OODB::getAssoc( $pete, "food" );
 	if (is_array($petesfood) && count($petesfood)===1) $ok=1;
+	if (!$ok) SmartTest::failedTest();
+	RedBean_OODB::unassociate( $food, $pete );
+	if (is_array($petesfood) && count($petesfood)===0) $ok=1;
 	if (!$ok) SmartTest::failedTest();
 	
 	
@@ -684,7 +820,7 @@ function testsperengine() {
 	try{
 	$cheese->save();
 	}
-	catch(ExceptionFailedAccessBean $e) {
+	catch(RedBean_Exception_FailedAccessBean $e) {
 		$ok=1;
 	}
 	if (!$ok) SmartTest::failedTest(); 
@@ -696,7 +832,7 @@ function testsperengine() {
 	try{
 	$bordeaux->add( $cheese );
 	}
-	catch(ExceptionFailedAccessBean $e) {
+	catch(RedBean_Exception_FailedAccessBean $e) {
 		$ok=1;
 	}
 	if (!$ok) SmartTest::failedTest(); 
@@ -705,7 +841,7 @@ function testsperengine() {
 	try{
 	$bordeaux->attach( $cheese );
 	}
-	catch(ExceptionFailedAccessBean $e) {
+	catch(RedBean_Exception_FailedAccessBean $e) {
 		$ok=1;
 	}
 	if (!$ok) SmartTest::failedTest(); 
@@ -715,12 +851,13 @@ function testsperengine() {
 	$bordeaux->add( new Wine() );
 	$ok=1;
 	}
-	catch(ExceptionFailedAccessBean $e) {
+	catch(RedBean_Exception_FailedAccessBean $e) {
 		$ok=0;
 	}
 	if (!$ok) SmartTest::failedTest(); 
 	
 	SmartTest::instance()->progress(); ;
+	
 	RedBean_OODB::$pkey = $oldkey;
 	$cheese = new Cheese(1);
 	$cheese->setName("Camembert");
@@ -729,7 +866,7 @@ function testsperengine() {
 	$cheese->save();
 	$ok=1;
 	}
-	catch(ExceptionFailedAccessBean $e) {
+	catch(RedBean_Exception_FailedAccessBean $e) {
 		$ok=0;
 	}
 	if (!$ok) SmartTest::failedTest(); 
@@ -739,10 +876,14 @@ function testsperengine() {
 	try{
 	RedBean_OODB::$pkey = 999;
 	RedBean_OODB::setLockingTime(0);
+	sleep(1);
 	$cheese = new Cheese(1);
 	$cheese->setName("Cheddar");
+	
+	echo '---';
 	$cheese->save();
-	RedBean_OODB::setLockingTime(10);
+	RedBean_OODB::setLockingTime(10); //*
+	
 	SmartTest::instance()->progress(); ;
 	}catch(Exception $e) {
 		SmartTest::failedTest();
@@ -779,28 +920,26 @@ function testsperengine() {
 	try{
 	RedBean_OODB::setLockingTime( -1 );
 	SmartTest::failedTest();
-	}catch(ExceptionInvalidArgument $e){  }
+	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
-	SmartTest::instance()->testPack = "protect inner state of RedBean";
+	
 	try{
 	RedBean_OODB::setLockingTime( 1.5 );
 	SmartTest::failedTest();
-	}catch(ExceptionInvalidArgument $e){  }
+	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
-	SmartTest::instance()->testPack = "protect inner state of RedBean";
 	try{
 	RedBean_OODB::setLockingTime( "aaa" );
 	SmartTest::failedTest();
-	}catch(ExceptionInvalidArgument $e){  }
+	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
-	SmartTest::instance()->testPack = "protect inner state of RedBean";
 	try{
 	RedBean_OODB::setLockingTime( null );
 	SmartTest::failedTest();
-	}catch(ExceptionInvalidArgument $e){  }
+	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
 	
@@ -838,6 +977,7 @@ function testsperengine() {
 	if ($kwak->hasSibling($kwak)!=false) {SmartTest::failedTest(); }else SmartTest::instance()->progress(); ;
 	if ($kwak->hasSibling($donald)!=false) {SmartTest::failedTest(); }else SmartTest::instance()->progress(); ;
 	
+	
 	//copy
 	SmartTest::instance()->testPack="copy functions";
 	$kwak2 = $kwak->copy();
@@ -845,6 +985,13 @@ function testsperengine() {
 	$kwak2 = new Person( $id );
 	if ($kwak->getName() != $kwak2->getName()) {SmartTest::failedTest(); }else SmartTest::instance()->progress(); ;
 	
+	SmartTest::test(count($donald->children()),3);
+	Person::delete($kwek);
+	SmartTest::test(count($donald->children()),2);
+	Person::delete($kwik);
+	SmartTest::test(count($donald->children()),1);
+	Person::delete($kwak);
+	SmartTest::test(count($donald->children()),0);
 	
 	SmartTest::instance()->testPack="countRelated";
 	R::gen("Blog,Comment");
@@ -892,6 +1039,7 @@ function testsperengine() {
 	$blog->message = str_repeat("x",65535);
 	$blog->save();
 	$blog = new Blog( $id );
+	
 	if (strlen($blog->message)!=65535) {SmartTest::failedTest(); }else SmartTest::instance()->progress();
 	$rows = RedBean_OODB::$db->get("describe blog");
 	if($rows[3]["Type"]!="text")  {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
@@ -958,7 +1106,33 @@ function testsperengine() {
 	SmartTest::instance()->test(count($track->getRelatedDisc()),1);
 	$cd2->exclusiveAdd( $track2 );
 	SmartTest::instance()->test(count($track->getRelatedDisc()),1);
+
+	RedBean_OODB::gen('SomeBean');
+	$b = new SomeBean;
+	$b->aproperty = 1;
+	$b->save();
+	$b = new SomeBean;
+	$b->anotherprop = 1;
+	$b->save();
+	SmartTest::test(RedBean_OODB::numberof("SomeBean"),2);
+	RedBean_OODB::trashAll("SomeBean");
+	SmartTest::test(RedBean_OODB::numberof("SomeBean"),0);
 	
+	RedBean_OODB::gen("Book");
+	$book = new Book;
+	$book->setTitle('about a red bean');
+	RedBean_OODB::gen("Page");
+	$page1 = new Page;
+	$page2 = new Page;
+	SmartTest::test(count($book->getRelatedPage()),0);
+	$book->add($page1);
+	SmartTest::test(count($book->getRelatedPage()),1);
+	$book->add($page2);
+	SmartTest::test(count($book->getRelatedPage()),2);
+	$book->remove($page1);
+	SmartTest::test(count($book->getRelatedPage()),1);
+	$book->remove($page2);
+	SmartTest::test(count($book->getRelatedPage()),0);
 }
 
 
@@ -971,7 +1145,7 @@ try {
 	$oBean->save();
 	SmartTest::failedTest(); 
 }
-catch(ExceptionRedBeanSecurity $e){
+catch(RedBean_Exception_Security $e){
 	SmartTest::instance()->progress();	
 }
 $maliciousproperty = "\"test";
@@ -982,7 +1156,7 @@ try {
 	SmartTest::instance()->progress();
 	 
 }
-catch(ExceptionRedBeanSecurity $e){
+catch(RedBean_Exception_Security $e){
 	SmartTest::failedTest();	
 }
 $converted = "test";
