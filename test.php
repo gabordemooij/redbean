@@ -25,8 +25,6 @@ class SmartTest {
 		if ($canwe=="testPack") {
 			$this->testPack = $v;
 			echo "<br>processing testpack: ".RedBean_OODB::getEngine()."-".$v." ...now testing: ";
-		    ob_flush();
-		    flush(); 
 		}
 	}
 	public function __get( $canwe ) {
@@ -36,8 +34,6 @@ class SmartTest {
 		 global $tests;
 		 $tests++;
 		 echo "[".$tests."]";
-		 ob_flush();
-		 flush();
 	}
 	
 	public static function failedTest() {
@@ -90,21 +86,7 @@ else {
 	SmartTest::failedTest();	
 }
 
-//Test description: Can we use short notations?
-if (!$shortnotation_for_redbean || class_exists($shortnotation_for_redbean)) {
-	SmartTest::instance()->progress(); ;
-}
-else {
-	SmartTest::failedTest(); 	
-}
 
-//Test description: Can we use short notations?
-if (!$shortnotation_for_redbeandecorator || class_exists($shortnotation_for_redbeandecorator)) {
-	SmartTest::instance()->progress(); ;
-}
-else {
-	SmartTest::failedTest();	
-}
 
 
 //Test description: Check other basic functions
@@ -265,10 +247,10 @@ SmartTest::instance()->testPack = "Optimizer and Garbage collector";
 
 $db->exec("
 CREATE TABLE  `slimtable` (
-`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
+`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
 `col1` VARCHAR( 255 ) NOT NULL ,
 `col2` TEXT NOT NULL ,
-`col3` INT( 11 ) NOT NULL ,
+`col3` INT( 11 ) UNSIGNED NOT NULL ,
 PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM");
 
@@ -295,10 +277,10 @@ NULL ,  '1',  'mustbevarchar',  '1000'
 
 $db->exec("
 CREATE TABLE  `indexer` (
-`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
+`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
 `highcard` VARCHAR( 255 ) NOT NULL ,
 `lowcard` TEXT NOT NULL ,
-`lowcard2` INT( 11 ) NOT NULL ,
+`lowcard2` INT( 11 ) UNSIGNED NOT NULL ,
 `highcard2` LONGTEXT NOT NULL ,
 PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM");
@@ -326,10 +308,10 @@ NULL ,  'empcol'
 
 $db->exec("
 CREATE TABLE  `empcol` (
-`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
-`aaa` INT( 11),
-`bbb` INT(11),
-`ccc` INT( 11 ),
+`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+`aaa` INT( 11) UNSIGNED,
+`bbb` INT(11) UNSIGNED,
+`ccc` INT( 11 ) UNSIGNED,
 PRIMARY KEY (  `id` )
 ) ENGINE = MYISAM");
 
@@ -623,7 +605,8 @@ function testsperengine() {
 	$app->kind = "dentist";
 	RedBean_OODB::set($app);
 	RedBean_OODB::associate( $person2, $app );
-	$appforbob = array_shift(RedBean_OODB::getAssoc( $person2, "appointment" ));
+	$arr = RedBean_OODB::getAssoc( $person2, "appointment" );
+	$appforbob = array_shift($arr);
 	
 	if (!$appforbob || $appforbob->kind!="dentist") {
 		SmartTest::failedTest();
@@ -1056,6 +1039,7 @@ function testsperengine() {
 	$blog->message = str_repeat("x",65535);
 	$blog->save();
 	$blog = new Blog( $id );
+	
 	if (strlen($blog->message)!=65535) {SmartTest::failedTest(); }else SmartTest::instance()->progress();
 	$rows = RedBean_OODB::$db->get("describe blog");
 	if($rows[3]["Type"]!="text")  {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 

@@ -13,7 +13,7 @@ class QueryWriter_MySQL implements QueryWriter {
 	public $typeno_sqltype = array(
 		" TINYINT(3) UNSIGNED ",
 		" INT(11) UNSIGNED ",
-		" BIGINT(20) SIGNED ",
+		" BIGINT(20) ",
 		" VARCHAR(255) ",
 		" TEXT ",
 		" LONGTEXT "
@@ -26,7 +26,7 @@ class QueryWriter_MySQL implements QueryWriter {
 		public $sqltype_typeno = array(
 		"tinyint(3) unsigned"=>0,
 		"int(11) unsigned"=>1,
-		"bigint(20) signed"=>2,
+		"bigint(20)"=>2,
 		"varchar(255)"=>3,
 		"text"=>4,
 		"longtext"=>5
@@ -628,7 +628,6 @@ class QueryWriter_MySQL implements QueryWriter {
 				  `tinyintus` tinyint(3) unsigned NOT NULL,
 				  `intus` int(11) unsigned NOT NULL,
 				  `ints` bigint(20) NOT NULL,
-				  
 				  `varchar255` varchar(255) NOT NULL,
 				  `text` text NOT NULL,
 				  PRIMARY KEY  (`id`)

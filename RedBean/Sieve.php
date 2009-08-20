@@ -54,7 +54,7 @@ class RedBean_Sieve {
 					if ($message !== true) {
 						$this->succes = false;
 					}
-					if (!is_array($this->report[$v])) {
+					if (!isset($this->report[$v])) {
 						$this->report[$v]=array();
 					}
 					$this->report[ $v ][ $p ] = $message;

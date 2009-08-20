@@ -1858,6 +1858,7 @@ class RedBean_OODB {
 			
 			//okay so this column is still in use, but maybe its to wide
 			//get the field type
+			//print_r($colr);
 			$currenttype =  self::$writer->sqltype_typeno[$colr["Type"]];
 			if ($currenttype > 0) {
 				$trytype = rand(0,$currenttype - 1); //try a little smaller
@@ -1906,7 +1907,7 @@ class RedBean_OODB {
 				"col"=>$col,
 				"table"=>$table
 			)));
-			$records = $db->getCell(self::$writer->getQuery("count",array("table"=>$table)));
+			$records = $db->getCell(self::$writer->getQuery("count",array("type"=>$table)));
 			if ($records) {
 				$relvar = intval($variance) / intval($records); //how useful would this index be?
 				//if this column describes the table well enough it might be used to

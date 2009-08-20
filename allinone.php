@@ -3403,6 +3403,7 @@ class RedBean_OODB {
 			
 			//okay so this column is still in use, but maybe its to wide
 			//get the field type
+			//print_r($colr);
 			$currenttype =  self::$writer->sqltype_typeno[$colr["Type"]];
 			if ($currenttype > 0) {
 				$trytype = rand(0,$currenttype - 1); //try a little smaller
@@ -3451,7 +3452,7 @@ class RedBean_OODB {
 				"col"=>$col,
 				"table"=>$table
 			)));
-			$records = $db->getCell(self::$writer->getQuery("count",array("table"=>$table)));
+			$records = $db->getCell(self::$writer->getQuery("count",array("type"=>$table)));
 			if ($records) {
 				$relvar = intval($variance) / intval($records); //how useful would this index be?
 				//if this column describes the table well enough it might be used to
@@ -3566,7 +3567,7 @@ class QueryWriter_MySQL implements QueryWriter {
 	public $typeno_sqltype = array(
 		" TINYINT(3) UNSIGNED ",
 		" INT(11) UNSIGNED ",
-		" BIGINT(20) SIGNED ",
+		" BIGINT(20) ",
 		" VARCHAR(255) ",
 		" TEXT ",
 		" LONGTEXT "
@@ -3579,7 +3580,7 @@ class QueryWriter_MySQL implements QueryWriter {
 		public $sqltype_typeno = array(
 		"tinyint(3) unsigned"=>0,
 		"int(11) unsigned"=>1,
-		"bigint(20) signed"=>2,
+		"bigint(20)"=>2,
 		"varchar(255)"=>3,
 		"text"=>4,
 		"longtext"=>5
@@ -4181,7 +4182,6 @@ class QueryWriter_MySQL implements QueryWriter {
 				  `tinyintus` tinyint(3) unsigned NOT NULL,
 				  `intus` int(11) unsigned NOT NULL,
 				  `ints` bigint(20) NOT NULL,
-				  
 				  `varchar255` varchar(255) NOT NULL,
 				  `text` text NOT NULL,
 				  PRIMARY KEY  (`id`)
@@ -4596,7 +4596,7 @@ class RedBean_Sieve {
 					if ($message !== true) {
 						$this->succes = false;
 					}
-					if (!is_array($this->report[$v])) {
+					if (!isset($this->report[$v])) {
 						$this->report[$v]=array();
 					}
 					$this->report[ $v ][ $p ] = $message;
