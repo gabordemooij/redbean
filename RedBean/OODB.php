@@ -1809,7 +1809,7 @@ class RedBean_OODB {
 		 * Narrows columns to appropriate size if needed
 		 * @return unknown_type
 		 */
-		public static function keepInShape( $gc = false) {
+		public static function keepInShape( $gc = false ,$stdTable=false, $stdCol=false) {
 			
 			//oops, we are frozen, so no change..
 			if (self::$frozen) {
@@ -1821,26 +1821,44 @@ class RedBean_OODB {
 
 			//get all tables
 			$tables = self::showTables();
-
-			//pick a random table
-			if ($tables && is_array($tables) && count($tables) > 0) {
-				if ($gc) self::removeUnused( $tables );
-				$table = $tables[array_rand( $tables, 1 )];
-			}
-			else {
-				return; //or return if there are no tables (yet)
-			}
+			
+				//pick a random table
+				if ($tables && is_array($tables) && count($tables) > 0) {
+					if ($gc) self::removeUnused( $tables );
+					$table = $tables[array_rand( $tables, 1 )];
+				}
+				else {
+					return; //or return if there are no tables (yet)
+				}
+			if ($stdTable) $table = $stdTable;
 
 			$table = $db->escape( $table );
 			//do not remove columns from association tables
 			if (strpos($table,'_')!==false) return;
 			//table is still in use? But are all columns in use as well?
+			
 			$cols = $db->get( self::$writer->getQuery("describe",array(
 				"table"=>$table
 			)) );
 			//pick a random column
-			$colr = $cols[array_rand( $cols )];
-			$col = $db->escape( $colr["Field"] ); //fetch the name and escape
+			if (count($cols)<1) return;
+				$colr = $cols[array_rand( $cols )];
+				$col = $db->escape( $colr["Field"] ); //fetch the name and escape
+		        if ($stdCol){
+				$exists = false;	
+				$col = $stdCol; 
+				foreach($cols as $cl){
+					if ($cl["Field"]==$col) {
+						$exists = $cl;
+					}
+				}
+				if (!$exists) {
+					return; 
+				}
+				else {
+					$colr = $exists;
+				}
+			}
 			if ($col=="id" || strpos($col,"_id")!==false) {
 				return; //special column, cant slim it down
 			}

@@ -1,6 +1,3 @@
-<html>
-<body style="background-color:black;font-family:courier;font-size:9px;color:white;">
-<br>Welcome to RedBean UNIT TESTS, this unit test suite is ONLY SUCCESFUL IF ALL UNIT TESTS pass. If you see a message like 'all X tests passed, redbean should work fine' AND THERE ARE NO-WARINGS OR ERRORS... THEN ALL TESTS HAVE BEEN PASSED SUCCESSFULLY.
 <?php 
 
 //Some unittests for RedBean
@@ -13,6 +10,16 @@
 //I often need to adjust and change this file, however I am now trying to tidy up this file so 
 //you can use it as well. Also, test descriptions will be added over time.
 
+function printtext( $text ) {
+	if ($_SERVER["DOCUMENT_ROOT"]) {
+		echo "<BR>".$text;
+	}
+	else {
+		echo "\n".$text;
+	}
+}
+
+
 //Simple class for testing
 class SmartTest {
 	private static $me = false;
@@ -24,7 +31,7 @@ class SmartTest {
 	public function __set( $canwe, $v ) {
 		if ($canwe=="testPack") {
 			$this->testPack = $v;
-			echo "<br>processing testpack: ".RedBean_OODB::getEngine()."-".$v." ...now testing: ";
+			printtext("processing testpack: ".RedBean_OODB::getEngine()."-".$v." ...now testing: ");
 		}
 	}
 	public function __get( $canwe ) {
@@ -33,16 +40,16 @@ class SmartTest {
 	public function progress() {
 		 global $tests;
 		 $tests++;
-		 echo "[".$tests."]";
+		 print( "[".$tests."]" );
 	}
 	
 	public static function failedTest() {
-		die("<b style='color:red'>FAIL</b>");
+		printtext("FAILED TEST");
 	}
 	
 	public static function test( $value, $expected ) {
 		if ($value != $expected) {
-			die("<b style='color:red'>FAIL</b>");
+			printtext("FAILED TEST");
 		}
 		else {
 			self::instance()->progress();
@@ -335,9 +342,16 @@ NULL ,  rand(),  'a',  rand(), CONCAT( rand()*100, '".str_repeat('x',1000)."' )
 
 R::gen('empcol,slimtable,indexer');
 
-for($i=0; $i<500; $i++) {
-	RedBean_OODB::keepInShape( true );
-}
+
+RedBean_OODB::keepInShape( true, "empcol", "aaa" );
+RedBean_OODB::keepInShape( true, "empcol", "bbb" );
+RedBean_OODB::keepInShape( true, "slimtable", "col1" );
+RedBean_OODB::keepInShape( true, "slimtable", "col2" );
+RedBean_OODB::keepInShape( true, "slimtable", "col3" );
+RedBean_OODB::keepInShape( true, "indexer", "highcard" );
+RedBean_OODB::keepInShape( true, "indexer", "highcard2" );
+RedBean_OODB::keepInShape( true, "indexer", "lowcard" );
+RedBean_OODB::keepInShape( true, "indexer", "lowcard2" );
 
 $empcol = new empcol;
 SmartTest::test(empcol::where(' @ifexists:aaa=1 or @ifexists:bbb=1')->count(),1);
@@ -1185,8 +1199,5 @@ testsperengine();
 
 
 
-echo "<br><br><b style='color:green'>All $tests tests passed, redbean should work fine.</b>";
-
+printtext("ALL TESTS PASSED. REDBEAN SHOULD WORK FINE.");
 ?>
-</body>
-</html>	
