@@ -45,11 +45,13 @@ class SmartTest {
 	
 	public static function failedTest() {
 		printtext("FAILED TEST");
+		exit;
 	}
 	
 	public static function test( $value, $expected ) {
 		if ($value != $expected) {
 			printtext("FAILED TEST");
+			exit;
 		}
 		else {
 			self::instance()->progress();
@@ -58,7 +60,22 @@ class SmartTest {
 	
 }
 
+//New test functions, no objects required here
+function asrt( $a, $b ) {
+	if ($a === $b) {
+		global $tests;
+		$tests++;
+		print( "[".$tests."]" );
+	}
+	else {
+		printtext("FAILED TEST");
+		exit;
+	}
+}
 
+function testpack($name) {
+	printtext("testing: ".$name);
+}
 
 //Use this database for tests
 require("allinone.php");
@@ -219,6 +236,34 @@ SmartTest::instance()->test(count(RedBean_Sieve::make(array("name"=>"RedBean_Val
 $e->setName("x")->setFunct("");
 SmartTest::instance()->test(count(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric","funct"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
 SmartTest::instance()->test(count(RedBean_Sieve::make(array("a"=>"RedBean_Validator_AlphaNumeric","b"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
+
+SmartTest::instance()->testPack = "Validators";
+
+//Test alphanumeric validation
+$validator = new RedBean_Validator_AlphaNumeric();
+asrt($validator->check("Max"), true);
+asrt($validator->check("M...a x"), false);
+
+//Test numeric validation
+$validator = new RedBean_Validator_Numeric();
+asrt($validator->check("12"), true);
+asrt($validator->check("+12"), true);
+asrt($validator->check("-12"), true);
+asrt($validator->check("-3.92"), true);
+asrt($validator->check("twelve"), false);
+
+//Test email validation
+$validator = new RedBean_Validator_Email();
+asrt($validator->check("joe@work.com"), true);
+asrt($validator->check("joe.work@com"), false);
+
+//Test URI validation
+$validator = new RedBean_Validator_URI();
+asrt($validator->check("www.adomain.com"), true);
+asrt($validator->check(".invaliddomain.com"), false);
+
+
+
 
 //Test description: Test redbean table-space
 SmartTest::instance()->testPack = "Configuration tester";
