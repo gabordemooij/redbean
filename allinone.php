@@ -1045,112 +1045,6 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 }
 /**
- * Interface for database drivers
- * @package 		RedBean/Driver.php
- * @description		Describes the API for database classes
- * @author			Gabor de Mooij
- * @license			BSD
- */
-interface RedBean_Driver {
-
-	/**
-	 * Implements Singleton
-	 * Requests an instance of the database 
-	 * @param $host
-	 * @param $user
-	 * @param $pass
-	 * @param $dbname
-	 * @return RedBean_Driver $driver
-	 */
-	public static function getInstance( $host, $user, $pass, $dbname );
-
-	/**
-	 * Runs a query and fetches results as a multi dimensional array
-	 * @param $sql
-	 * @return array $results
-	 */
-	public function GetAll( $sql );
-
-	/**
-	 * Runs a query and fetches results as a column
-	 * @param $sql
-	 * @return array $results
-	 */
-	public function GetCol( $sql );
-
-	/**
-	 * Runs a query an returns results as a single cell
-	 * @param $sql
-	 * @return mixed $cellvalue
-	 */
-	public function GetCell( $sql );
-
-	/**
-	 * Runs a query and returns a flat array containing the values of
-	 * one row
-	 * @param $sql
-	 * @return array $row
-	 */
-	public function GetRow( $sql );
-
-	/**
-	 * Returns the error constant of the most
-	 * recent error
-	 * @return mixed $error
-	 */
-	public function ErrorNo();
-
-	/**
-	 * Returns the error message of the most recent
-	 * error
-	 * @return string $message
-	 */
-	public function Errormsg();
-
-	/**
-	 * Runs an SQL query
-	 * @param $sql
-	 * @return void
-	 */
-	public function Execute( $sql );
-
-	/**
-	 * Escapes a value according to the
-	 * escape policies of the current database instance
-	 * @param $str
-	 * @return string $escaped_str
-	 */
-	public function Escape( $str );
-
-	/**
-	 * Returns the latest insert_id value
-	 * @return integer $id
-	 */
-	public function GetInsertID();
-
-	/**
-	 * Returns the number of rows affected
-	 * by the latest query
-	 * @return integer $id
-	 */
-	public function Affected_Rows();
-
-	/**
-	 * Toggles debug mode (printing queries on screen)
-	 * @param $tf
-	 * @return void
-	 */
-	public function setDebugMode( $tf );
-
-	/**
-	 * Returns the unwrapped version of the database object;
-	 * the raw database driver.
-	 * @return mixed $database
-	 */
-	public function GetRaw();
-	
-}
-/**
  * PDO Driver
  * @package 		RedBean/PDO.php
  * @description		PDO Driver
@@ -1425,14 +1319,111 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     }
 }
 /**
- * RedBean Exception Base
- * @package 		RedBean/Exception.php
- * @description		Represents the base class
- * 					for RedBean Exceptions
+ * Interface for database drivers
+ * @package 		RedBean/Driver.php
+ * @description		Describes the API for database classes
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class Redbean_Exception extends Exception{}
+interface RedBean_Driver {
+
+	/**
+	 * Implements Singleton
+	 * Requests an instance of the database 
+	 * @param $host
+	 * @param $user
+	 * @param $pass
+	 * @param $dbname
+	 * @return RedBean_Driver $driver
+	 */
+	public static function getInstance( $host, $user, $pass, $dbname );
+
+	/**
+	 * Runs a query and fetches results as a multi dimensional array
+	 * @param $sql
+	 * @return array $results
+	 */
+	public function GetAll( $sql );
+
+	/**
+	 * Runs a query and fetches results as a column
+	 * @param $sql
+	 * @return array $results
+	 */
+	public function GetCol( $sql );
+
+	/**
+	 * Runs a query an returns results as a single cell
+	 * @param $sql
+	 * @return mixed $cellvalue
+	 */
+	public function GetCell( $sql );
+
+	/**
+	 * Runs a query and returns a flat array containing the values of
+	 * one row
+	 * @param $sql
+	 * @return array $row
+	 */
+	public function GetRow( $sql );
+
+	/**
+	 * Returns the error constant of the most
+	 * recent error
+	 * @return mixed $error
+	 */
+	public function ErrorNo();
+
+	/**
+	 * Returns the error message of the most recent
+	 * error
+	 * @return string $message
+	 */
+	public function Errormsg();
+
+	/**
+	 * Runs an SQL query
+	 * @param $sql
+	 * @return void
+	 */
+	public function Execute( $sql );
+
+	/**
+	 * Escapes a value according to the
+	 * escape policies of the current database instance
+	 * @param $str
+	 * @return string $escaped_str
+	 */
+	public function Escape( $str );
+
+	/**
+	 * Returns the latest insert_id value
+	 * @return integer $id
+	 */
+	public function GetInsertID();
+
+	/**
+	 * Returns the number of rows affected
+	 * by the latest query
+	 * @return integer $id
+	 */
+	public function Affected_Rows();
+
+	/**
+	 * Toggles debug mode (printing queries on screen)
+	 * @param $tf
+	 * @return void
+	 */
+	public function setDebugMode( $tf );
+
+	/**
+	 * Returns the unwrapped version of the database object;
+	 * the raw database driver.
+	 * @return mixed $database
+	 */
+	public function GetRaw();
+	
+}
 /**
  * Exception Failed Access
  * Part of the RedBean Exceptions Mechanism
@@ -1461,6 +1452,15 @@ class RedBean_Exception_InvalidArgument extends RedBean_Exception {}
  */  
 class RedBean_Exception_InvalidParentChildCombination extends RedBean_Exception{}
 /**
+ * Exception Security
+ * Part of the RedBean Exceptions Mechanism
+ * @package 		RedBean/Exception
+ * @description		Represents a subtype in the RedBean Exception System
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */ 
+class RedBean_Exception_Security extends RedBean_Exception {}
+/**
  * Exception SQL
  * Part of the RedBean Exceptions Mechanism
  * @package 		RedBean/Exception
@@ -1470,14 +1470,80 @@ class RedBean_Exception_InvalidParentChildCombination extends RedBean_Exception{
  */ 
 class RedBean_Exception_SQL extends RedBean_Exception {};
 /**
- * Exception Security
- * Part of the RedBean Exceptions Mechanism
- * @package 		RedBean/Exception
- * @description		Represents a subtype in the RedBean Exception System
+ * RedBean Exception Base
+ * @package 		RedBean/Exception.php
+ * @description		Represents the base class
+ * 					for RedBean Exceptions
  * @author			Gabor de Mooij
  * @license			BSD
- */ 
-class RedBean_Exception_Security extends RedBean_Exception {}
+ */
+class Redbean_Exception extends Exception{}
+/**
+ * Observable
+ * Base class for Observables
+ * @package 		RedBean/Observable.php
+ * @description		Part of the observer pattern in RedBean
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
+class RedBean_Observable {
+	/**
+	 * 
+	 * @var array
+	 */
+	private $observers = array();
+	
+	/**
+	 * Adds a listener to this instance
+	 * @param $eventname
+	 * @param $observer
+	 * @return unknown_type
+	 */
+	public function addEventListener( $eventname, RedBean_Observer $observer ) {
+		
+		if (!isset($this->observers[ $eventname ])) {
+			$this->observers[ $eventname ] = array();
+		}
+		
+		$this->observers[ $eventname ][] = $observer;
+	}
+	
+	/**
+	 * Sends an event (signal) to the registered listeners
+	 * @param $eventname
+	 * @return unknown_type
+	 */
+	public function signal( $eventname ) {
+		
+		if (!isset($this->observers[ $eventname ])) {
+			$this->observers[ $eventname ] = array();
+		}
+		
+		foreach($this->observers[$eventname] as $observer) {
+			$observer->onEvent( $eventname, $this );	
+		}
+		
+	}
+	
+	
+}
+/**
+ * Observer
+ * @package 		RedBean/Observer.php
+ * @description		Part of the observer pattern in RedBean
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
+interface RedBean_Observer {
+	
+	/**
+	 * Handles the event send by a RedBean Observable
+	 * @param string $eventname
+	 * @param RedBean_Observable $observable
+	 * @return unknown_type
+	 */
+	public function onEvent( $eventname, RedBean_Observable $o );
+}
 /**
  * RedBean OODB (object oriented database)
  * @package 		RedBean/OODB.php
@@ -3140,7 +3206,7 @@ class RedBean_OODB {
 			foreach($classes as $c) {
 				if ($c!=="" && $c!=="null" && !class_exists($c) && preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$c)){
 					try{
-						eval("final class ".$c." extends RedBean_Decorator {
+						eval("class ".$c." extends RedBean_Decorator {
 							private static \$__static_property_type = \"".strtolower($c)."\";
 							
 							public function __construct(\$id=0, \$lock=false) {
@@ -3438,101 +3504,72 @@ class RedBean_OODB {
 class OODBBean {
 }
 /**
- * Observable
- * Base class for Observables
- * @package 		RedBean/Observable.php
- * @description		Part of the observer pattern in RedBean
+ * Querylogger 
+ * @package 		RedBean/QueryLogger.php
+ * @description		Simple Audit Logger
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_Observable {
+class Redbean_Querylogger implements RedBean_Observer
+{
+ 
+	/**
+	 * @var string
+	 */
+	private $path = "";
+	
 	/**
 	 * 
-	 * @var array
+	 * @var integer
 	 */
-	private $observers = array();
+	private $userid = 0;
 	
-	/**
-	 * Adds a listener to this instance
-	 * @param $eventname
-	 * @param $observer
-	 * @return unknown_type
-	 */
-	public function addEventListener( $eventname, RedBean_Observer $observer ) {
-		
-		if (!isset($this->observers[ $eventname ])) {
-			$this->observers[ $eventname ] = array();
-		}
-		
-		$this->observers[ $eventname ][] = $observer;
+	private function getFilename() {
+		return $this->path . "audit_".date("m_d_y").".log";
 	}
 	
 	/**
-	 * Sends an event (signal) to the registered listeners
-	 * @param $eventname
-	 * @return unknown_type
+	 * Logs a piece of SQL code
+	 * @param $sql
+	 * @return void
 	 */
-	public function signal( $eventname ) {
-		
-		if (!isset($this->observers[ $eventname ])) {
-			$this->observers[ $eventname ] = array();
-		}
-		
-		foreach($this->observers[$eventname] as $observer) {
-			$observer->onEvent( $eventname, $this );	
-		}
-		
+	public function logSCQuery( $sql, $db )
+    {
+		$sql = addslashes($sql);
+		$line = "\n".date("H:i:s")."|".$_SERVER["REMOTE_ADDR"]."|UID=".$this->userid."|".$sql;  
+		file_put_contents( $this->getFilename(), $line, FILE_APPEND );
+		return null;
 	}
 	
-	
-}
-/**
- * Observer
- * @package 		RedBean/Observer.php
- * @description		Part of the observer pattern in RedBean
- * @author			Gabor de Mooij
- * @license			BSD
- */
-interface RedBean_Observer {
-	
 	/**
-	 * Handles the event send by a RedBean Observable
-	 * @param string $eventname
-	 * @param RedBean_Observable $observable
+	 * Inits the logger
+	 * @param $path
+	 * @param $userid
 	 * @return unknown_type
 	 */
-	public function onEvent( $eventname, RedBean_Observable $o );
-}
-/**
- * QueryWriter
- * Interface for QueryWriters
- * @package 		RedBean/QueryWriter.php
- * @description		Describes the API for a QueryWriter
- * @author			Gabor de Mooij
- * @license			BSD
- */
-interface QueryWriter {
+	public static function init($path="",$userid=0) {
+		
+		$logger = new self;
+		$logger->userid = $userid;
+		$logger->path = $path;
+		if (!file_exists($logger->getFilename())) {
+			file_put_contents($logger->getFilename(),"begin logging");	
+		}
+		
+		RedBean_OODB::$db->addEventListener( "sql_exec", $logger );
+	
+	}
 	
 	/**
-	 * Returns the requested query if the writer has any
-	 * @param $queryname
-	 * @param $params
-	 * @return mixed $sql_query
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Observer#onEvent()
 	 */
-	public function getQuery( $queryname, $params=array() );
+	public function onEvent( $event, RedBean_Observable $db ) {
+		
+		$this->logSCQuery( $db->getSQL(), $db );
+	}
 	
-	/**
-	 * Gets the quote-escape symbol of this writer
-	 * @return unknown_type
-	 */
-	public function getQuote();
-
-	/**
-	 * Gets the backtick for this writer
-	 * @return unknown_type
-	 */
-	public function getEscape();
-
+ 
 }
 /**
  * RedBean MySQLWriter
@@ -4391,72 +4428,35 @@ class QueryWriter_MySQL implements QueryWriter {
 		}
 }
 /**
- * Querylogger 
- * @package 		RedBean/QueryLogger.php
- * @description		Simple Audit Logger
+ * QueryWriter
+ * Interface for QueryWriters
+ * @package 		RedBean/QueryWriter.php
+ * @description		Describes the API for a QueryWriter
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class Redbean_Querylogger implements RedBean_Observer
-{
- 
+interface QueryWriter {
+	
 	/**
-	 * @var string
+	 * Returns the requested query if the writer has any
+	 * @param $queryname
+	 * @param $params
+	 * @return mixed $sql_query
 	 */
-	private $path = "";
+	public function getQuery( $queryname, $params=array() );
 	
 	/**
-	 * 
-	 * @var integer
-	 */
-	private $userid = 0;
-	
-	private function getFilename() {
-		return $this->path . "audit_".date("m_d_y").".log";
-	}
-	
-	/**
-	 * Logs a piece of SQL code
-	 * @param $sql
-	 * @return void
-	 */
-	public function logSCQuery( $sql, $db )
-    {
-		$sql = addslashes($sql);
-		$line = "\n".date("H:i:s")."|".$_SERVER["REMOTE_ADDR"]."|UID=".$this->userid."|".$sql;  
-		file_put_contents( $this->getFilename(), $line, FILE_APPEND );
-		return null;
-	}
-	
-	/**
-	 * Inits the logger
-	 * @param $path
-	 * @param $userid
+	 * Gets the quote-escape symbol of this writer
 	 * @return unknown_type
 	 */
-	public static function init($path="",$userid=0) {
-		
-		$logger = new self;
-		$logger->userid = $userid;
-		$logger->path = $path;
-		if (!file_exists($logger->getFilename())) {
-			file_put_contents($logger->getFilename(),"begin logging");	
-		}
-		
-		RedBean_OODB::$db->addEventListener( "sql_exec", $logger );
-	
-	}
-	
+	public function getQuote();
+
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Observer#onEvent()
+	 * Gets the backtick for this writer
+	 * @return unknown_type
 	 */
-	public function onEvent( $event, RedBean_Observable $db ) {
-		
-		$this->logSCQuery( $db->getSQL(), $db );
-	}
-	
- 
+	public function getEscape();
+
 }
 //For framework intergration if you define $db you can specify a class prefix for models
 if (!isset($db)) define("PRFX","");

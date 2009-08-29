@@ -1661,7 +1661,7 @@ class RedBean_OODB {
 			foreach($classes as $c) {
 				if ($c!=="" && $c!=="null" && !class_exists($c) && preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$c)){
 					try{
-						eval("final class ".$c." extends RedBean_Decorator {
+						eval("class ".$c." extends RedBean_Decorator {
 							private static \$__static_property_type = \"".strtolower($c)."\";
 							
 							public function __construct(\$id=0, \$lock=false) {
