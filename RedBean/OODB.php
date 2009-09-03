@@ -12,7 +12,7 @@ class RedBean_OODB {
 	 *
 	 * @var float
 	 */
-	private static $version = 0.5;
+	private static $version = 0.6;
 
 	/**
 	 *
@@ -20,7 +20,7 @@ class RedBean_OODB {
 	 */
 	private static $versioninf = "
 		RedBean Object Database layer 
-		VERSION 0.5
+		VERSION 0.6
 		BY G.J.G.T DE MOOIJ
 		LICENSE BSD
 		COPYRIGHT 2009

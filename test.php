@@ -81,6 +81,10 @@ function testpack($name) {
 require("allinone.php");
 RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
 
+$tables = R::$db->getCol("show tables");
+foreach($tables as $t){
+	R::$db->exec("TRUNACTE `$t`");
+};
 
 
 SmartTest::instance()->testPack = "Basic test suite";
@@ -939,7 +943,6 @@ function testsperengine() {
 	$cheese = new Cheese(1);
 	$cheese->setName("Cheddar");
 	
-	echo '---';
 	$cheese->save();
 	RedBean_OODB::setLockingTime(10); //*
 	
@@ -1244,5 +1247,5 @@ testsperengine();
 
 
 
-printtext("ALL TESTS PASSED. REDBEAN SHOULD WORK FINE.");
+printtext("\n<BR>ALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 ?>
