@@ -247,7 +247,7 @@ SmartTest::instance()->testPack = "Validators";
 $validator = new RedBean_Validator_AlphaNumeric();
 asrt($validator->check("Max"), true);
 asrt($validator->check("M...a x"), false);
-
+/*
 //Test numeric validation
 $validator = new RedBean_Validator_Numeric();
 asrt($validator->check("12"), true);
@@ -267,7 +267,7 @@ asrt($validator->check("www.adomain.com"), true);
 asrt($validator->check(".invaliddomain.com"), false);
 
 
-
+*/
 
 //Test description: Test redbean table-space
 SmartTest::instance()->testPack = "Configuration tester";
@@ -548,7 +548,7 @@ function testsperengine() {
 	} 
 	SmartTest::instance()->progress();
 	
-	R::gen("Person");
+	R::gen("PERSON");
 	$dummy = new Person;
 	$dummy->age = 40;
 	SmartTest::instance()->test(count(Person::find( $dummy, array("age"=>">"))),1);
@@ -1246,6 +1246,4 @@ RedBean_OODB::setEngine("innodb");
 testsperengine();
 
 
-
 printtext("\n<BR>ALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
-?>

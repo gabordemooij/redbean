@@ -1557,7 +1557,7 @@ class RedBean_OODB {
 	 *
 	 * @var float
 	 */
-	private static $version = 0.5;
+	private static $version = 0.6;
 
 	/**
 	 *
@@ -1565,7 +1565,7 @@ class RedBean_OODB {
 	 */
 	private static $versioninf = "
 		RedBean Object Database layer 
-		VERSION 0.5
+		VERSION 0.6
 		BY G.J.G.T DE MOOIJ
 		LICENSE BSD
 		COPYRIGHT 2009
@@ -3201,19 +3201,35 @@ class RedBean_OODB {
 		 * @param string $classes
 		 * @return unknown_type
 		 */
-		public static function gen( $classes ) {
+		/**
+		 * Accepts a comma separated list of class names and
+		 * creates a default model for each classname mentioned in
+		 * this list. Note that you should not gen() classes
+		 * for which you already created a model (by inheriting
+		 * from ReadBean_Decorator).
+		 * @param string $classes
+		 * @return unknown_type
+		 */
+		public static function gen( $classes ) { 
 			$classes = explode(",",$classes);
 			foreach($classes as $c) {
-				if ($c!=="" && $c!=="null" && !class_exists($c) && preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$c)){
+				$ns = '';
+				$names = explode('\\', $c);
+				$className = trim(end($names));
+				if(count($names) > 1)
+				{
+					$ns = 'namespace ' . implode('\\', array_slice($names, 0, -1)) . ";\n";
+				}
+				if ($c!=="" && $c!=="null" && !class_exists($c) && 
+								preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){ 
 					try{
-						eval("class ".$c." extends RedBean_Decorator {
-							private static \$__static_property_type = \"".strtolower($c)."\";
+							$toeval = $ns . " class ".$className." extends RedBean_Decorator {
+							private static \$__static_property_type = \"".strtolower($className)."\";
 							
 							public function __construct(\$id=0, \$lock=false) {
-								parent::__construct('".strtolower($c)."',\$id,\$lock);
+								parent::__construct('".strtolower($className)."',\$id,\$lock);
 							}
 							
-							//no late static binding... great..
 							public static function where( \$sql, \$slots=array() ) {
 								return new RedBean_Can( self::\$__static_property_type, RedBean_OODB::getBySQL( \$sql, \$slots, self::\$__static_property_type) );
 							}
@@ -3222,8 +3238,8 @@ class RedBean_OODB {
 								return RedBean_OODB::listAll(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
 							}
 							
-					}");
-							
+						}";
+						eval($toeval);	
 						if (!class_exists($c)) return false;
 					}
 					catch(Exception $e){
@@ -3236,6 +3252,7 @@ class RedBean_OODB {
 			}
 			return true;
 		}
+		
 
 
 		/**
@@ -4758,54 +4775,6 @@ class RedBean_Validator_AlphaNumeric implements RedBean_Validator {
 	 */
 	public function check( $v ) {
 		return (bool) preg_match('/^[A-Za-z0-9]+$/', $v);
-	}
-}
-/**
- * RedBean Validator Email
- * @package 		RedBean/Validator/Email.php
- * @description		Checks whether a value is a valid email address
- * @author			Gabor de Mooij
- * @license			BSD
- */
-class RedBean_Validator_Email implements RedBean_Validator {
-	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Validator#check()
-	 */
-	public function check( $v ) {
-		return (bool) preg_match( "/^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/", $v );
-	}
-}
-/**
- * RedBean Validator Numeric
- * @package 		RedBean/Validator/Numeric.php
- * @description		Checks whether a value is numeric
- * @author			Gabor de Mooij
- * @license			BSD
- */
-class RedBean_Validator_Numeric implements RedBean_Validator {
-	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Validator#check()
-	 */
-	public function check( $v ) {
-		return (bool) is_numeric( $v );
-	}
-}
-/**
- * RedBean Validator URI
- * @package 		RedBean/Validator/URI.php
- * @description		Checks whether a value is a valid URI address
- * @author			Gabor de Mooij
- * @license			BSD
- */
-class RedBean_Validator_URI implements RedBean_Validator {
-	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Validator#check()
-	 */
-	public function check( $v ) {
-		return (bool) preg_match( "/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}$/", $v );
 	}
 }
 /**
