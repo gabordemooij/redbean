@@ -31,7 +31,7 @@ class RedBean_Setup {
 									  $freeze=false, 
   									  $engine="innodb", 
 									  $debugmode=false, 
-									  $unlockall=false ) {
+									  $unlockall=false) {
 		
 		//This is no longer configurable							  		
 		eval("
@@ -44,10 +44,26 @@ class RedBean_Setup {
 		
 
 		//get an instance of the MySQL database
-		$db = Redbean_Driver_PDO::getInstance( $dsn, $username, $password, null ); 
 		
-			
-	
+		if (strpos($dsn,"embmysql")===0) {
+
+			//try to parse emb string
+			$dsn .= ';';
+			$matches = array();
+			preg_match('/host=(.+?);/',$dsn,$matches);
+			$matches2 = array();
+			preg_match('/dbname=(.+?);/',$dsn,$matches2);
+			if (count($matches)==2 && count($matches2)==2) {
+				$db = RedBean_Driver_MySQL::getInstance( $matches[1], $username, $password, $matches2[1] );
+			}
+			else {
+				throw new Exception("Could not parse MySQL DSN");
+			}
+		}
+		else{
+			$db = Redbean_Driver_PDO::getInstance( $dsn, $username, $password, null );
+		}
+		
 		if ($debugmode) {
 			$db->setDebugMode(1);
 		}

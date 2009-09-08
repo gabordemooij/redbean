@@ -79,7 +79,22 @@ function testpack($name) {
 
 //Use this database for tests
 require("allinone.php");
-RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
+
+if (!isset($_SERVER['argv'][1])) {
+	RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
+	echo "\n<BR>USING: PDO";
+}
+else {
+	if ($_SERVER['argv'][1]=='embmysql') {
+		RedBean_Setup::kickstart("embmysql:host=localhost;dbname=oodb","root","",false,"innodb",false);		
+		echo "\n<BR>USING: EMBEDDED MYSQL";
+	}
+	else {
+		echo "\n<BR>Invalid arg\n";
+		exit;
+	}
+}
+
 
 $tables = R::$db->getCol("show tables");
 foreach($tables as $t){
@@ -435,6 +450,20 @@ NULL ,  'garbagetable'
 RedBean_OODB::KeepInShape( true );
 $tables = RedBean_OODB::showTables(); 
 SmartTest::test(in_array("garbagetable",$tables),false);
+
+//Test: can we extend from a bean and still use magic setters / getters?
+R::gen("ACat");
+class Cat extends ACat {
+	public function mew(){
+		return 123;
+	}	
+}
+$cat = new Cat;
+$cat->name = 'pinky';
+$id = $cat->save();
+$cat = new Cat($id);
+asrt( $cat->name, "pinky" );
+asrt( $cat->mew(), 123 );
 
 //Tests for each individual engine
 function testsperengine() {
