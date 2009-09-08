@@ -1859,7 +1859,7 @@ class RedBean_OODB {
 			if (strpos($table,'_')!==false) return;
 			//table is still in use? But are all columns in use as well?
 			
-			$cold = self::$writer->getTableColumns( $table, $db );
+			$cols = self::$writer->getTableColumns( $table, $db );
 			
 			//$cols = $db->get( self::$writer->getQuery("describe",array(
 			//	"table"=>$table
