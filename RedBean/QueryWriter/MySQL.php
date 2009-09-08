@@ -438,6 +438,20 @@ class QueryWriter_MySQL implements QueryWriter {
 			extract( $options );
 			return "describe `$table`";
 		}
+		
+		
+		/**
+	     * Returns an array of table Columns
+	     * @return array
+	     */
+	    public function getTableColumns($tbl, RedBean_DBAdapter $db) {
+	        $rs = $db->get($this->getQuery("describe",array(
+	            "table"=>$tbl
+	        )));
+	    
+	        return $rs;
+	    } 
+		
 
 		/**
 		 *

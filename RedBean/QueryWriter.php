@@ -28,5 +28,7 @@ interface QueryWriter {
 	 * @return unknown_type
 	 */
 	public function getEscape();
+	
+	public function getTableColumns( $tbl, RedBean_DBAdapter $db );
 
 }

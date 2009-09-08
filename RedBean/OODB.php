@@ -294,7 +294,12 @@ class RedBean_OODB {
 				}
 
 				//does the table fit?
-				$columnsRaw = $db->get("describe `$table` ");
+			/*	$columnsRaw = $db->get( self::$writer->getQuery("describe",array(
+            	    "table"=>$table
+       			 )) ); 
+       			 
+       			 */
+       			 $columnsRaw = self::$writer->getTableColumns($table, $db) ;
 					
 				$columns = array();
 				foreach($columnsRaw as $r) {
@@ -1854,9 +1859,11 @@ class RedBean_OODB {
 			if (strpos($table,'_')!==false) return;
 			//table is still in use? But are all columns in use as well?
 			
-			$cols = $db->get( self::$writer->getQuery("describe",array(
-				"table"=>$table
-			)) );
+			$cold = self::$writer->getTableColumns( $table, $db );
+			
+			//$cols = $db->get( self::$writer->getQuery("describe",array(
+			//	"table"=>$table
+			//)) );
 			//pick a random column
 			if (count($cols)<1) return;
 				$colr = $cols[array_rand( $cols )];

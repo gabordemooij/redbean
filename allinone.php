@@ -2062,7 +2062,12 @@ class RedBean_OODB {
 				}
 
 				//does the table fit?
-				$columnsRaw = $db->get("describe `$table` ");
+			/*	$columnsRaw = $db->get( self::$writer->getQuery("describe",array(
+            	    "table"=>$table
+       			 )) ); 
+       			 
+       			 */
+       			 $columnsRaw = self::$writer->getTableColumns($table, $db) ;
 					
 				$columns = array();
 				foreach($columnsRaw as $r) {
@@ -3622,9 +3627,11 @@ class RedBean_OODB {
 			if (strpos($table,'_')!==false) return;
 			//table is still in use? But are all columns in use as well?
 			
-			$cols = $db->get( self::$writer->getQuery("describe",array(
-				"table"=>$table
-			)) );
+			$cold = self::$writer->getTableColumns( $table, $db );
+			
+			//$cols = $db->get( self::$writer->getQuery("describe",array(
+			//	"table"=>$table
+			//)) );
 			//pick a random column
 			if (count($cols)<1) return;
 				$colr = $cols[array_rand( $cols )];
@@ -4250,6 +4257,20 @@ class QueryWriter_MySQL implements QueryWriter {
 			extract( $options );
 			return "describe `$table`";
 		}
+		
+		
+		/**
+	     * Returns an array of table Columns
+	     * @return array
+	     */
+	    public function getTableColumns($tbl, RedBean_DBAdapter $db) {
+	        $rs = $db->get($this->getQuery("describe",array(
+	            "table"=>$tbl
+	        )));
+	    
+	        return $rs;
+	    } 
+		
 
 		/**
 		 *
@@ -4696,6 +4717,8 @@ interface QueryWriter {
 	 * @return unknown_type
 	 */
 	public function getEscape();
+	
+	public function getTableColumns( $tbl, RedBean_DBAdapter $db );
 
 }
 //For framework intergration if you define $db you can specify a class prefix for models
