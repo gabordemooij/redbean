@@ -56,7 +56,7 @@ class QueryWriter_MySQL implements QueryWriter {
 			 CREATE TABLE `$table` (
 			`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
 			 PRIMARY KEY ( `id` )
-			 ) ENGINE = MYISAM 
+			 ) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 			";
 			}
 			else {
@@ -64,7 +64,7 @@ class QueryWriter_MySQL implements QueryWriter {
 			 CREATE TABLE `$table` (
 			`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
 			 PRIMARY KEY ( `id` )
-			 ) ENGINE = InnoDB 
+			 ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 			";
 					
 			}

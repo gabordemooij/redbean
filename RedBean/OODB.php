@@ -294,12 +294,7 @@ class RedBean_OODB {
 				}
 
 				//does the table fit?
-			/*	$columnsRaw = $db->get( self::$writer->getQuery("describe",array(
-            	    "table"=>$table
-       			 )) ); 
-       			 
-       			 */
-       			 $columnsRaw = self::$writer->getTableColumns($table, $db) ;
+				 $columnsRaw = self::$writer->getTableColumns($table, $db) ;
 					
 				$columns = array();
 				foreach($columnsRaw as $r) {
@@ -679,7 +674,7 @@ class RedBean_OODB {
 			$bean = self::dispense( $type );
 			$db = self::$db;
 			$table = $db->escape( $type );
-			$id = intval( $id );
+			$id = abs( intval( $id ) );
 			$bean->id = $id;
 
 			//try to open the bean

@@ -29,6 +29,13 @@ interface QueryWriter {
 	 */
 	public function getEscape();
 	
+	
+	/**
+	 * 
+	 * @param string $tbl
+	 * @param RedBean_DBAdapter $db
+	 * @return array $arr( array('Field'=>$string, 'Type'=>$string) )
+	 */
 	public function getTableColumns( $tbl, RedBean_DBAdapter $db );
 
 }

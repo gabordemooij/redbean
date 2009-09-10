@@ -73,6 +73,18 @@ function asrt( $a, $b ) {
 	}
 }
 
+function pass() {
+	global $tests;
+	$tests++;
+	print( "[".$tests."]" );
+}
+
+function fail() {
+	printtext("FAILED TEST");
+	exit;
+}
+
+
 function testpack($name) {
 	printtext("testing: ".$name);
 }
@@ -80,6 +92,10 @@ function testpack($name) {
 //Use this database for tests
 require("allinone.php");
 
+//====== DRIVER SELECTION ======
+/**
+ * Select the driver we use and show it
+ */
 if (!isset($_SERVER['argv'][1])) {
 	RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
 	echo "\n<BR>USING: PDO";
@@ -95,6 +111,7 @@ else {
 	}
 }
 
+//====== CLEAN UP ======
 
 $tables = R::$db->getCol("show tables");
 foreach($tables as $t){
@@ -102,69 +119,37 @@ foreach($tables as $t){
 };
 
 
-SmartTest::instance()->testPack = "Basic test suite";
+/**
+ * Test the very basics 
+ */
+testpack("Basic test suite");
 $tests = 0; SmartTest::instance()->progress(); ;
 
 //Test description: Does the redbean core class exist?
-if (class_exists("RedBean_OODB")) {
-	SmartTest::instance()->progress(); ;
-}
-else {
-	SmartTest::failedTest(); 	
-}
-
+asrt( class_exists("RedBean_OODB") , true);
 //Test description: Does the redbean decorator class exist?
-if (class_exists("RedBean_Decorator")) {
-	SmartTest::instance()->progress(); ;
-}
-else {
-	SmartTest::failedTest();	
-}
-
+asrt(class_exists("RedBean_Decorator"), true);
 //Test description: Does the redbean database adapter class exist?
-if (class_exists("RedBean_DBAdapter")) {
-	SmartTest::instance()->progress(); ;
-}
-else {
-	SmartTest::failedTest();	
-}
+asrt(class_exists("RedBean_DBAdapter"),true);
+
+//Test description: Is the database a DBAdapter?
+$db = RedBean_OODB::$db;
+asrt(($db instanceof RedBean_DBAdapter),true);
+//Test decription: Can we retrieve the version no. ?
+asrt(is_string(RedBean_OODB::getVersionInfo()),true);
 
 
-
-
-//Test description: Check other basic functions
-try{
-	$db = RedBean_OODB::$db;
-	if ($db instanceof RedBean_DBAdapter) SmartTest::instance()->progress(); else SmartTest::failedTest();
-	if ((RedBean_OODB::getVersionInfo())) {
-		SmartTest::instance()->progress(); ;
-	}
-	else {
-		SmartTest::failedTest(); 
-	}
-	if ((RedBean_OODB::getVersionNumber())) {
-		SmartTest::instance()->progress(); ;
-	}else {
-		SmartTest::failedTest(); 
-	}
-	SmartTest::instance()->progress(); ;
-}
-catch(Exception $e) {
-	SmartTest::failedTest();
-}
-
-
-
-SmartTest::instance()->testPack = "Import";
+//Test description: Test importing of data from post array or custom array
+testpack("Import");
 R::gen("Thing");
 $_POST["first"]="abc";
 $_POST["second"]="xyz";
 $thing = new Thing;
-SmartTest::instance()->test($thing->import(array("first"=>"a","second"=>2))->getFirst(),"a");
-SmartTest::instance()->test($thing->importFromPost("nonexistant")->getFirst(),"a");
-SmartTest::instance()->test($thing->importFromPost(array("first"))->getFirst(),"abc");
-SmartTest::instance()->test($thing->importFromPost(array("first"))->getSecond(),2);
-SmartTest::instance()->test($thing->importFromPost()->getSecond(),"xyz");
+asrt($thing->import(array("first"=>"a","second"=>2))->getFirst(),"a");
+asrt($thing->importFromPost("nonexistant")->getFirst(),"a");
+asrt($thing->importFromPost(array("first"))->getFirst(),"abc");
+asrt($thing->importFromPost(array("first"))->getSecond(),2);
+asrt($thing->importFromPost()->getSecond(),"xyz");
 
 
 SmartTest::instance()->testPack = "Observers";
@@ -262,27 +247,7 @@ SmartTest::instance()->testPack = "Validators";
 $validator = new RedBean_Validator_AlphaNumeric();
 asrt($validator->check("Max"), true);
 asrt($validator->check("M...a x"), false);
-/*
-//Test numeric validation
-$validator = new RedBean_Validator_Numeric();
-asrt($validator->check("12"), true);
-asrt($validator->check("+12"), true);
-asrt($validator->check("-12"), true);
-asrt($validator->check("-3.92"), true);
-asrt($validator->check("twelve"), false);
 
-//Test email validation
-$validator = new RedBean_Validator_Email();
-asrt($validator->check("joe@work.com"), true);
-asrt($validator->check("joe.work@com"), false);
-
-//Test URI validation
-$validator = new RedBean_Validator_URI();
-asrt($validator->check("www.adomain.com"), true);
-asrt($validator->check(".invaliddomain.com"), false);
-
-
-*/
 
 //Test description: Test redbean table-space
 SmartTest::instance()->testPack = "Configuration tester";
@@ -452,57 +417,116 @@ $tables = RedBean_OODB::showTables();
 SmartTest::test(in_array("garbagetable",$tables),false);
 
 //Test: can we extend from a bean and still use magic setters / getters?
-R::gen("ACat");
+R::gen("ACat,Dog");
 class Cat extends ACat {
 	public function mew(){
 		return 123;
 	}	
 }
 $cat = new Cat;
-$cat->name = 'pinky';
+$cat->name = 'Garfield';
 $id = $cat->save();
 $cat = new Cat($id);
-asrt( $cat->name, "pinky" );
+asrt( $cat->name, "Garfield" );
 asrt( $cat->mew(), 123 );
 
-//Tests for each individual engine
-function testsperengine() {
+//Test if we remove an associated item, dont remove the item itself
+$dog = new Dog;
+$dog->name="Ody";
+$cat->add( $dog );
 
-	global $tests;
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack ="perform generic bean manipulation";
-	$ok=1;
+$dog = $cat->getRelatedDog();
+asrt( count($dog) , 1 );
+
+
+Dog::delete( $dog[0] ); //Ody goes on holiday
+asrt( count($cat->getRelatedDog()), 0 );
+//Cat should still exist!
+$cat = new Cat($id);
+asrt( $cat->name, "Garfield" );
+
+//Tests for each individual engine
+function testsperengine( $engine ) {
+
+	testpack("Anemic Model on ".$engine);
+	//Test basic, fundamental OODBBean functions with Anemic Model
+	asrt(is_numeric(RedBean_OODB::getVersionNumber()),true);
+	$file = RedBean_OODB::dispense("file");
+	asrt((RedBean_OODB::dispense("file") instanceof OODBBean),true);
+	//Test description: has the type property been set?
+	asrt($file->type,"file");
+	//Test description: Is the ID set and 0?
+	asrt((isset($file->id) && $file->id===0),true);
+	//Test description: can we set and get a bean?
+	$file->name="document";
+	$id = RedBean_OODB::set( $file );
+	asrt(is_numeric($id),true);
+	//Test description: can we load it again using an ID?
+	$file = RedBean_OODB::getById("file",$id);
+	asrt($file->name,"document");
+	//Test description: If a bean does not exist RedBean OODB must throw an exception
+	try{RedBean_OODB::getById("file",999); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); };
+	//Test description: Only certain IDs are valid: >0 and only integers! using intval!
+	//becomes 1
+	try{RedBean_OODB::getById("file",1.1); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); };
+	//becomes 0
+	try{RedBean_OODB::getById("file",0.9); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); };
+	//becomes 1 (due to abs())
+	try{RedBean_OODB::getById("file",-1); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); };
+	//Test description: can we fastload a bean?
+	try{$file2 = RedBean_OODB::getById("file",2,array("name"=>"picture")); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+	asrt($file2->name,"picture");
 	
+	
+	//Test description: can add a property dynamically?
+	$file->content=42;
+	$id = RedBean_OODB::set( $file );
+	$file = RedBean_OODB::getById( "file", $id );
+	asrt($file->content,"42");
+	//Test description: Can we store a value of a different type in the same property?
+	$file->content="Lorem Ipsum";
+	$id = RedBean_OODB::set( $file );
+	$file = RedBean_OODB::getById( "file", $id );
+	asrt($file->content,"Lorem Ipsum");
+
+	testpack("Anemic Model Bean Manipulation on ".$engine);
+	//Test description: save and load a complete bean with several properties
 	$bean = RedBean_OODB::dispense("note");
-	$bean->message = "hai";
+	$bean->message = "hello";
 	$bean->color=3;
 	$bean->date = time();
 	$bean->special='n';
 	$bean->state = 90;
-	RedBean_OODB::set($bean); 
-				
-	$bean2 = RedBean_OODB::getById("note",1);
-	if ($bean2->state != 90 || $bean2->special !='n' || $bean2->message !='hai') {
-		$ok=0;
-		SmartTest::failedTest();
-	}
-	SmartTest::instance()->progress(); ;
-	
-	$bean->message = "lorem ipsum";
+	$id = RedBean_OODB::set($bean); 
+	$bean2 = RedBean_OODB::getById("note", $id);
+	asrt(($bean2->state == 90 && $bean2->special =='n' && $bean2->message =='hello'),true);	
+	//Test description: change the message property, can we modify it?
+	$bean->message = "What is life but a dream?";
 	RedBean_OODB::set($bean);
-	
-	
+	$bean2 = RedBean_OODB::getById("note", $id); //Using same ID!
+	asrt($bean2->message,"What is life but a dream?");
+	//Test description can we choose other values, smaller... bigger?
 	$bean->message = 1;
 	$bean->color = "green";
 	$bean->date = str_repeat("BLABLA", 100);
 	RedBean_OODB::set($bean);
-	$note =$bean;
-	
-	
-	SmartTest::instance()->progress(); ;
+	$bean2 = RedBean_OODB::getById("note", $id); //Using same ID!
+	asrt($bean2->message,"1");
+	asrt($bean2->date,$bean->date);
+	asrt($bean2->green,$bean->green);
+	//Test description: test whether we can save/load UTF8 values
+	$txt = file_get_contents("utf8.txt");
+	$bean->message=$txt;
+	RedBean_OODB::set($bean);
+	$bean2 = RedBean_OODB::getById("note", $id); //Using same ID!
+	asrt($bean2->message,file_get_contents("utf8.txt"));
+	global $tests;
+	$note = $bean;
 	$person = RedBean_OODB::dispense("person");
 	$person->age = 50;
 	$person->name = "Bob";
 	$person->gender = "m";
+	
 	RedBean_OODB::set( $person );
 	RedBean_OODB::associate( $person, $note );
 	
@@ -513,12 +537,8 @@ function testsperengine() {
 	RedBean_OODB::trash( $authors[1] );
 	
 	$authors = RedBean_OODB::getAssoc( $memo, "person" );
-	if (count($authors)>0) $ok=0;
+	asrt(count($authors),0);
 
-	
-	if (!$ok) {
-		SmartTest::failedTest();
-	}
 	
 	//unit tests
 	//drop the note table
@@ -1267,12 +1287,11 @@ try{RedBean_OODB::setEngine("INNODB"); SmartTest::failedTest(); }catch(Exception
 try{RedBean_OODB::setEngine("MYISaM"); SmartTest::failedTest(); }catch(Exception $e){ SmartTest::instance()->progress(); ; }
 try{RedBean_OODB::setEngine(""); SmartTest::failedTest(); }catch(Exception $e){ SmartTest::instance()->progress(); ; }
 
-
 RedBean_OODB::setEngine("myisam");
-
-testsperengine();
+testsperengine("MYSQL-MYISAM");
 RedBean_OODB::setEngine("innodb");
-testsperengine();
+testsperengine("MYSQL-INNODB");
+
 
 
 printtext("\n<BR>ALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
