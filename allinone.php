@@ -3449,11 +3449,12 @@ class RedBean_OODB {
 				if ($c!=="" && $c!=="null" && !class_exists($c) && 
 								preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){ 
 					try{
+							$tablename = preg_replace("/_/","",$className);
 							$toeval = $ns . " class ".$className." extends RedBean_Decorator {
-							private static \$__static_property_type = \"".strtolower($className)."\";
+							private static \$__static_property_type = \"".strtolower($tablename)."\";
 							
 							public function __construct(\$id=0, \$lock=false) {
-								parent::__construct('".strtolower($className)."',\$id,\$lock);
+								parent::__construct('".strtolower($tablename)."',\$id,\$lock);
 							}
 							
 							public static function where( \$sql, \$slots=array() ) {
