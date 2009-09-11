@@ -166,7 +166,7 @@ class QueryWriter_MySQL implements QueryWriter { public $typeno_sqltype = array(
 				  `varchar255` varchar(255) NOT NULL,
 				  `text` text NOT NULL,
 				  PRIMARY KEY  (`id`)
-				) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 				"; break; case "clear_dtyp": return "drop tables dtyp"; break; case "setup_locking": return "
 				CREATE TABLE IF NOT EXISTS `locking` (
 				  `tbl` varchar(255) NOT NULL,
