@@ -34,19 +34,19 @@ class RedBean_Setup {
 									  $unlockall=false) {
 		
 		//This is no longer configurable							  		
-		eval("
-			class R extends RedBean_OODB { }
-		");
+		if (!class_exists("R")) {
+			eval("
+				class R extends RedBean_OODB { }
+			");
+			
+			eval("
+				class RD extends RedBean_Decorator { }
+			");
+		}
 		
-		eval("
-			class RD extends RedBean_Decorator { }
-		");
 		
-
 		//get an instance of the MySQL database
-		
 		if (strpos($dsn,"embmysql")===0) {
-
 			//try to parse emb string
 			$dsn .= ';';
 			$matches = array();
@@ -61,14 +61,17 @@ class RedBean_Setup {
 			}
 		}
 		else{
-			$db = Redbean_Driver_PDO::getInstance( $dsn, $username, $password, null );
+			$db = new Redbean_Driver_PDO( $dsn, $username, $password, null );
 		}
 		
 		if ($debugmode) {
 			$db->setDebugMode(1);
 		}
 	
-		RedBean_OODB::$db = new RedBean_DBAdapter($db); //Wrap ADO in RedBean's adapter
+		$oldconn = RedBean_OODB::$db;
+		$conn = new RedBean_DBAdapter($db);//Wrap ADO in RedBean's adapter
+		RedBean_OODB::$db = $conn; 
+		
 		RedBean_OODB::setEngine($engine); //select a database driver
 		RedBean_OODB::init( new QueryWriter_MySQL() ); //Init RedBean
 	
@@ -79,6 +82,8 @@ class RedBean_Setup {
 		if ($freeze) {
 			RedBean_OODB::freeze(); //Decide whether to freeze the database
 		}
+	
+		return $oldconn;
 	}
 	
 	/**
@@ -114,6 +119,12 @@ class RedBean_Setup {
 		//generate classes
 		R::gen( $gen );
 	}
-		
+	
+	
+	public static function reconnect( RedBean_DBAdapter $new ) {
+		$old = RedBean_OODB::$db;
+		RedBean_OODB::$db = $new;
+		return $old;
+	}
 	
 }

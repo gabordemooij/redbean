@@ -68,7 +68,7 @@ function asrt( $a, $b ) {
 		print( "[".$tests."]" );
 	}
 	else {
-		printtext("FAILED TEST");
+		printtext("FAILED TEST: EXPECTED $b BUT GOT: $a ");
 		exit;
 	}
 }
@@ -121,6 +121,7 @@ foreach($tables as $t){
 };
 
 
+
 //====== TEST TRANSACTIONS =====
 
 /*
@@ -154,6 +155,15 @@ $db = RedBean_OODB::$db;
 asrt(($db instanceof RedBean_DBAdapter),true);
 //Test decription: Can we retrieve the version no. ?
 asrt(is_string(RedBean_OODB::getVersionInfo()),true);
+
+//Test description: test multiple database support
+testpack("multi database");
+$old = RedBean_Setup::kickstart("mysql:host=localhost;dbname=test","root","",false,"innodb",false);
+asrt(R::$db->getCell("select database()"),"test");
+RedBean_Setup::kickstart("mysql:host=localhost;dbname=tutorial","root","",false,"innodb",false);
+asrt(R::$db->getCell("select database()"),"tutorial");
+RedBean_Setup::reconnect( $old );
+asrt(R::$db->getCell("select database()"),"oodb");
 
 
 //Test description: Test importing of data from post array or custom array
