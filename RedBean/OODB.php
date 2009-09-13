@@ -161,6 +161,10 @@ class RedBean_OODB {
 		 */
 		public static function checkBean(OODBBean $bean) {
 
+			if (!self::$db) {
+				throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
+			}
+			
 			foreach($bean as $prop=>$value) {
 				$prop = preg_replace('/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/',"",$prop);
 				if (strlen(trim($prop))===0) {
