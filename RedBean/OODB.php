@@ -1679,7 +1679,7 @@ class RedBean_OODB {
 								preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){ 
 					try{
 							$tablename = preg_replace("/_/","",$className);
-							$toeval = $ns . " class ".$className." extends RedBean_Decorator {
+							$toeval = $ns . " class ".RedBean_Setup_Namespace_PRFX.$className.RedBean_Setup_Namespace_SFFX." extends RedBean_Decorator {
 							private static \$__static_property_type = \"".strtolower($tablename)."\";
 							
 							public function __construct(\$id=0, \$lock=false) {
@@ -1782,7 +1782,7 @@ class RedBean_OODB {
 			foreach($tables as $table) {
 				
 				//does the class exist?
-				$classname = PRFX . $table . SFFX;
+				$classname = RedBean_Setup_Namespace_PRFX . $table . RedBean_Setup_Namespace_SFFX;
 				if(!class_exists( $classname , true)) {
 					$db->exec( self::$writer->getQuery("drop_tables",array("tables"=>array($table))) );
 					$db->exec(self::$writer->getQuery("unregister_table",array("table"=>$table)));

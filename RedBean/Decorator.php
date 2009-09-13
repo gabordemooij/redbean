@@ -156,7 +156,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$prop = strtolower( substr( $method, 10 ) );
 			$beans = RedBean_OODB::getAssoc( $this->data, $prop );
 			$decos = array();
-			$dclass = PRFX.$prop.SFFX;
+			$dclass = RedBean_Setup_Namespace_PRFX.$prop.RedBean_Setup_Namespace_SFFX;
 
 			if ($beans && is_array($beans)) {
 				foreach($beans as $b) {
@@ -244,7 +244,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		$this->signal("deco_parent", $this);
 		$beans = RedBean_OODB::getParent( $this->data );
 		if (count($beans) > 0 ) $bean = array_pop($beans); else return null;
-		$dclass = PRFX.$this->type.SFFX;
+		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		$deco = new $dclass();
 		$deco->setData( $bean );
 		return $deco;
@@ -265,7 +265,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		}
 		$beans = RedBean_OODB::getChildren( $bean );
 		$decos = array();
-		$dclass = PRFX.$this->type.SFFX;
+		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
 			foreach($beans as $b) {
 				if ($b->id != $this->data->id) {
@@ -286,7 +286,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		$this->signal("deco_children", $this);
 		$beans = RedBean_OODB::getChildren( $this->data );
 		$decos = array();
-		$dclass = PRFX.$this->type.SFFX;
+		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
 			foreach($beans as $b) {
 				$d = new $dclass();
@@ -526,7 +526,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		$beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
 
 		$decos = array();
-		$dclass = PRFX.$deco->type.SFFX;
+		$dclass = RedBean_Setup_Namespace_PRFX.$deco->type.RedBean_Setup_Namespace_SFFX;
 		foreach( $beans as $bean ) {
 			$decos[ $bean->id ] = new $dclass( floatval( $bean->id ) );
 			$decos[ $bean->id ]->setData( $bean );

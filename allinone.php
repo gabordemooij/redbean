@@ -33,7 +33,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 ------------------------------------------------------
 |Loosely based on an idea by Erik Roelofs - thanks man
 
-VERSION 0.5
+VERSION 0.6
 
 ======================================================
 Official GIT HUB:
@@ -141,7 +141,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 */
 	public function wrap( $bean ) {
 
-		$dclass = PRFX.$this->type.SFFX;
+		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		$deco = new $dclass( floatval( $bean->id ) );
 		$deco->setData( $bean );
 		return $deco;
@@ -643,7 +643,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$prop = strtolower( substr( $method, 10 ) );
 			$beans = RedBean_OODB::getAssoc( $this->data, $prop );
 			$decos = array();
-			$dclass = PRFX.$prop.SFFX;
+			$dclass = RedBean_Setup_Namespace_PRFX.$prop.RedBean_Setup_Namespace_SFFX;
 
 			if ($beans && is_array($beans)) {
 				foreach($beans as $b) {
@@ -731,7 +731,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		$this->signal("deco_parent", $this);
 		$beans = RedBean_OODB::getParent( $this->data );
 		if (count($beans) > 0 ) $bean = array_pop($beans); else return null;
-		$dclass = PRFX.$this->type.SFFX;
+		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		$deco = new $dclass();
 		$deco->setData( $bean );
 		return $deco;
@@ -752,7 +752,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		}
 		$beans = RedBean_OODB::getChildren( $bean );
 		$decos = array();
-		$dclass = PRFX.$this->type.SFFX;
+		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
 			foreach($beans as $b) {
 				if ($b->id != $this->data->id) {
@@ -773,7 +773,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		$this->signal("deco_children", $this);
 		$beans = RedBean_OODB::getChildren( $this->data );
 		$decos = array();
-		$dclass = PRFX.$this->type.SFFX;
+		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
 			foreach($beans as $b) {
 				$d = new $dclass();
@@ -1013,7 +1013,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		$beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
 
 		$decos = array();
-		$dclass = PRFX.$deco->type.SFFX;
+		$dclass = RedBean_Setup_Namespace_PRFX.$deco->type.RedBean_Setup_Namespace_SFFX;
 		foreach( $beans as $bean ) {
 			$decos[ $bean->id ] = new $dclass( floatval( $bean->id ) );
 			$decos[ $bean->id ]->setData( $bean );
@@ -3450,7 +3450,7 @@ class RedBean_OODB {
 								preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){ 
 					try{
 							$tablename = preg_replace("/_/","",$className);
-							$toeval = $ns . " class ".$className." extends RedBean_Decorator {
+							$toeval = $ns . " class ".RedBean_Setup_Namespace_PRFX.$className.RedBean_Setup_Namespace_SFFX." extends RedBean_Decorator {
 							private static \$__static_property_type = \"".strtolower($tablename)."\";
 							
 							public function __construct(\$id=0, \$lock=false) {
@@ -3553,7 +3553,7 @@ class RedBean_OODB {
 			foreach($tables as $table) {
 				
 				//does the class exist?
-				$classname = PRFX . $table . SFFX;
+				$classname = RedBean_Setup_Namespace_PRFX . $table . RedBean_Setup_Namespace_SFFX;
 				if(!class_exists( $classname , true)) {
 					$db->exec( self::$writer->getQuery("drop_tables",array("tables"=>array($table))) );
 					$db->exec(self::$writer->getQuery("unregister_table",array("table"=>$table)));
@@ -4727,9 +4727,9 @@ interface QueryWriter {
 	public function getTableColumns( $tbl, RedBean_DBAdapter $db );
 
 }
-//For framework intergration if you define $db you can specify a class prefix for models
-if (!isset($db)) define("PRFX","");
-if (!isset($db)) define("SFFX","");
+//For framework intergration if you can specify a class prefix for models
+if (!defined("RedBean_Setup_Namespace_PRFX")) define("RedBean_Setup_Namespace_PRFX","");
+if (!defined("RedBean_Setup_Namespace_SFFX")) define("RedBean_Setup_Namespace_SFFX","");
 
 /**
  * RedBean Setup

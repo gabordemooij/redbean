@@ -52,7 +52,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 */
 	public function wrap( $bean ) {
 
-		$dclass = PRFX.$this->type.SFFX;
+		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		$deco = new $dclass( floatval( $bean->id ) );
 		$deco->setData( $bean );
 		return $deco;

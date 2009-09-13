@@ -1,8 +1,8 @@
 <?php 
 
-//For framework intergration if you define $db you can specify a class prefix for models
-if (!isset($db)) define("PRFX","");
-if (!isset($db)) define("SFFX","");
+//For framework intergration if you can specify a class prefix for models
+if (!defined("RedBean_Setup_Namespace_PRFX")) define("RedBean_Setup_Namespace_PRFX","");
+if (!defined("RedBean_Setup_Namespace_SFFX")) define("RedBean_Setup_Namespace_SFFX","");
 
 /**
  * RedBean Setup
