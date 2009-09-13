@@ -111,13 +111,30 @@ else {
 	}
 }
 
+
 //====== CLEAN UP ======
 
 $tables = R::$db->getCol("show tables");
 foreach($tables as $t){
-	R::$db->exec("TRUNACTE `$t`");
+	R::$db->exec("TRUNCATE `$t`");
+	
 };
 
+
+//====== TEST TRANSACTIONS =====
+
+/*
+//Mind though that table will continue to exits, this test is only about the record in Trans
+//Unfortunately you have to run this test apart to see the effect. Check manually.
+R::gen("Trans");
+$t = new Trans;
+$t->name = "part of trans";
+$t->save();
+//throw new Exception("aa"); //trans should not be in database
+//R::rollback();
+//R::$db->exec("ROLLBACK");
+exit; 
+*/
 
 /**
  * Test the very basics 
@@ -515,40 +532,31 @@ function testsperengine( $engine ) {
 	asrt($bean2->date,$bean->date);
 	asrt($bean2->green,$bean->green);
 	//Test description: test whether we can save/load UTF8 values
+	testpack("UTF8 ".$engine);
 	$txt = file_get_contents("utf8.txt");
 	$bean->message=$txt;
 	RedBean_OODB::set($bean);
 	$bean2 = RedBean_OODB::getById("note", $id); //Using same ID!
 	asrt($bean2->message,file_get_contents("utf8.txt"));
 	global $tests;
+	
+	//Test description: test whether we can associate anemic beans
+	testpack("Associations $engine ");
 	$note = $bean;
 	$person = RedBean_OODB::dispense("person");
 	$person->age = 50;
 	$person->name = "Bob";
 	$person->gender = "m";
-	
 	RedBean_OODB::set( $person );
 	RedBean_OODB::associate( $person, $note );
-	
 	$memo = RedBean_OODB::getById( "note", 1 );
 	$authors = RedBean_OODB::getAssoc( $memo, "person" );
-	if (count($authors)!==1) SmartTest::failedTest(); 
-	
+	asrt(count($authors),1); 
 	RedBean_OODB::trash( $authors[1] );
-	
 	$authors = RedBean_OODB::getAssoc( $memo, "person" );
 	asrt(count($authors),0);
 
-	
-	//unit tests
-	//drop the note table
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "dispense an RedBean_OODB Bean";
-	$oBean = RedBean_OODB::dispense();
-	if (!($oBean instanceof OODBBean)){
-		SmartTest::failedTest();
-	}
-	
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "put a bean in the database";
+	testpack("Put a Bean in the Database - various types $engine ");
 	$person = RedBean_OODB::dispense("person");
 	$person->name = "John";
 	$person->age= 35;
@@ -557,14 +565,9 @@ function testsperengine( $engine ) {
 	$id = RedBean_OODB::set( $person ); $johnid=$id;
 	$person2 = RedBean_OODB::getById( "person", $id );
 	
-	if (($person2->age) != ($person->age)) {
-		SmartTest::failedTest();
-	}
-	
+	asrt(intval($person2->age),intval($person->age)); 
 	$person2->anotherprop = 2;
 	RedBean_OODB::set( $person2 );
-	
-	
 	$person = RedBean_OODB::dispense("person");
 	$person->name = "Bob";
 	$person->age= 50;
@@ -572,55 +575,52 @@ function testsperengine( $engine ) {
 	$person->hasJob = false;
 	$bobid = RedBean_OODB::set( $person );
 	
-	SmartTest::instance()->progress();
-	
-	SmartTest::instance()->testPack = "find records on basis of similarity";
-	
-	
-	
+	testpack("getBySQL $engine ");
 	$ids = RedBean_OODB::getBySQL("`gender`={gender} order by `name` asc",array("gender"=>"m"),"person");
-	if (count($ids)!=2) {
-		SmartTest::failedTest();
-	}
-	SmartTest::instance()->progress(); 
-
-
+	asrt(count($ids),2);
 	$ids = RedBean_OODB::getBySQL("`gender`={gender} OR `color`={clr} ",array("gender"=>"m","clr"=>"red"),"person");
-	if (count($ids)!=0) {
-		SmartTest::failedTest();
-	}
-	SmartTest::instance()->progress(); 
-	
+	asrt(count($ids),0);
 	$ids = RedBean_OODB::getBySQL("`gender`={gender} AND `color`={clr} ",array("gender"=>"m","clr"=>"red"),"person");
-	if (count($ids)!=0) {
-		SmartTest::failedTest();
-	} 
-	SmartTest::instance()->progress();
+	asrt(count($ids),0);
 	
+	//Test description: table names should always be case insensitive, no matter the table name
+	testpack("case insens. $engine ");
 	R::gen("PERSON");
 	$dummy = new Person;
+	asrt($dummy->getData()->type,"person");
+	
+	//Test description: table names should contain no underscores
+	testpack("tablenames. $engine ");
+	R::gen("under_score_s");
+	asrt(class_exists("under_score_s"),true);
+	$a = new under_score_s;
+	asrt($a->getData()->type,"underscores");
+	
+	//Test description: can we find beans on the basis of similarity?
+	testpack("finder and listAll $engine ");
 	$dummy->age = 40;
-	SmartTest::instance()->test(count(Person::find( $dummy, array("age"=>">"))),1);
+	asrt(count(Person::find( $dummy, array("age"=>">"))),1);
 	$dummy->age = 20;
-	SmartTest::instance()->test(count(Person::find( $dummy, array("age"=>">"))),2);
+	asrt(count(Person::find( $dummy, array("age"=>">"))),2);
 	$dummy->age = 100;
-	SmartTest::instance()->test(count(Person::find( $dummy, array("age"=>">"))),0);
+	asrt(count(Person::find( $dummy, array("age"=>">"))),0);
 	$dummy->age = 100;
-	SmartTest::instance()->test(count(Person::find( $dummy, array("age"=>"<="))),2);
+	asrt(count(Person::find( $dummy, array("age"=>"<="))),2);
 	$dummy->name="ob";
-	SmartTest::instance()->test(count(Person::find( $dummy, array("name"=>"LIKE"))),1);
+	asrt(count(Person::find( $dummy, array("name"=>"LIKE"))),1);
 	$dummy->name="o";
-	SmartTest::instance()->test(count(Person::find( $dummy, array("name"=>"LIKE"))),2);
+	asrt(count(Person::find( $dummy, array("name"=>"LIKE"))),2);
 	$dummy->gender="m";
-	SmartTest::instance()->test(count(Person::find( $dummy, array("gender"=>"="))),2);
+	asrt(count(Person::find( $dummy, array("gender"=>"="))),2);
 	$dummy->gender="f";
-	SmartTest::instance()->test(count(Person::find( $dummy, array("gender"=>"="))),0);
-	SmartTest::instance()->test(count(Person::listAll()),2);
-	SmartTest::instance()->test(count(Person::listAll(0,1)),1);
-	SmartTest::instance()->test(count(Person::listAll(1)),1);
+	asrt(count(Person::find( $dummy, array("gender"=>"="))),0);
+	asrt(count(Person::listAll()),2);
+	asrt(count(Person::listAll(0,1)),1);
+	asrt(count(Person::listAll(1)),1);
 	
+	//Test description Cans
+	testpack("Cans of Beans $engine ");
 	$can = Person::where("`gender`={gender} order by `name`  asc",array("gender"=>"m"),"person");
-	
 	//test array access
 	foreach($can as $item) {
 		if ($item->getName() == "Bob" || $item->getName() == "John" ) {
@@ -630,57 +630,31 @@ function testsperengine( $engine ) {
 			SmartTest::failedTest();
 		}
 	}
-	
-	//test array access
+	testpack("Cans 2");
 	$bean = $can[0];
-	if ($bean->name=="Bob") {
-		SmartTest::instance()->progress();
-	} 
-	else {
-		SmartTest::failedTest();
-	}
-	
-	if ($can->count()!=2) {
-		SmartTest::failedTest();
-	}
-	
-	SmartTest::instance()->progress();
-	
+	asrt($bean->name,"Bob");
+	asrt($can->count(),2);
 	$can->rewind();
-	SmartTest::instance()->test($can->key(), 0);
-	SmartTest::instance()->test($can->valid(), true);
-	SmartTest::instance()->test($can->current()->getName(), "Bob");
+	asrt($can->key(), 0);
+	asrt($can->valid(), true);
+	asrt($can->current()->getName(), "Bob");
 	$can->next();
-	SmartTest::instance()->test($can->key(), 1);
-	SmartTest::instance()->test($can->valid(), false);
-	SmartTest::instance()->test($can->current()->getName(), "John");
+	asrt($can->key(), 1);
+	asrt($can->valid(), false);
+	asrt($can->current()->getName(), "John");
 	$can->seek(0);
-	SmartTest::instance()->test($can->key(), 0);
-	
+	asrt($can->key(), 0);
 	$beans = $can->getBeans();
-	
-	if (count($beans)!=2) {
-		SmartTest::failedTest();
-	} 
-	
-	SmartTest::instance()->progress();
-	
-	//test slicing
+	asrt(count($beans),2);
 	$can->slice( 0, 1 );
 	$can->rewind();
-	SmartTest::instance()->test($can->current()->getName(), "Bob");
-	SmartTest::instance()->test($can->count(), 1);
+	asrt($can->current()->getName(), "Bob");
+	asrt($can->count(), 1);
+	$b1 = array_shift($beans); 
+	asrt($b1->name,"Bob");
 	
-	
-	
-	$b1 = array_shift($beans);
-	
-	if ($b1->name!="Bob") {
-		SmartTest::failedTest();
-	}
-	SmartTest::instance()->progress();
-	
-	//basic functionality where()
+	//Test description: basic functionality where()
+	testpack("where() $engine");
 	$beans = Person::where("`gender`={gender} order by `name` asc",array("gender"=>"m"),"person")->getBeans();
 	
 	if (count($beans)!=2) {
