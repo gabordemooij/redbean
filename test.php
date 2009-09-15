@@ -268,24 +268,17 @@ $e->setName("x")->setFunct("");
 SmartTest::instance()->test(count(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric","funct"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
 SmartTest::instance()->test(count(RedBean_Sieve::make(array("a"=>"RedBean_Validator_AlphaNumeric","b"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
 
-SmartTest::instance()->testPack = "Validators";
 
 //Test alphanumeric validation
+testpack("Validators");
 $validator = new RedBean_Validator_AlphaNumeric();
 asrt($validator->check("Max"), true);
 asrt($validator->check("M...a x"), false);
 
-
 //Test description: Test redbean table-space
-SmartTest::instance()->testPack = "Configuration tester";
-
+testpack("Configuration tester");
 //insert garbage tables
-$db->exec(" CREATE TABLE `nonsense` (
-			`a` VARCHAR( 11 ) NOT NULL ,
-			`b` VARCHAR( 11 ) NOT NULL ,
-			`j` VARCHAR( 11 ) NOT NULL
-			) ENGINE = MYISAM ");
-
+$db->exec(" CREATE TABLE `nonsense` (`a` VARCHAR( 11 ) NOT NULL ,`b` VARCHAR( 11 ) NOT NULL ,`j` VARCHAR( 11 ) NOT NULL	) ENGINE = MYISAM ");
 Redbean_OODB::clean();
 Redbean_OODB::gen("trash");
 $trash = new Trash();
@@ -306,93 +299,17 @@ if (in_array("trash",$alltables)) SmartTest::failedTest();
 $db->exec("drop table `nonsense`");
 
 //Test description: KeepInShape() tester
-SmartTest::instance()->testPack = "Optimizer and Garbage collector";
-
-$db->exec("
-CREATE TABLE  `slimtable` (
-`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-`col1` VARCHAR( 255 ) NOT NULL ,
-`col2` TEXT NOT NULL ,
-`col3` INT( 11 ) UNSIGNED NOT NULL ,
-PRIMARY KEY (  `id` )
-) ENGINE = MYISAM");
-
-$db->exec("INSERT INTO  `redbeantables` (
-`id` ,
-`tablename`
-)
-VALUES (
-NULL ,  'slimtable'
-);
-");
-
-$db->exec("INSERT INTO  `slimtable` (
-`id` ,
-`col1` ,
-`col2` ,
-`col3`
-)
-VALUES (
-NULL ,  '1',  'mustbevarchar',  '1000'
-);
-");
-
-
-$db->exec("
-CREATE TABLE  `indexer` (
-`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-`highcard` VARCHAR( 255 ) NOT NULL ,
-`lowcard` TEXT NOT NULL ,
-`lowcard2` INT( 11 ) UNSIGNED NOT NULL ,
-`highcard2` LONGTEXT NOT NULL ,
-PRIMARY KEY (  `id` )
-) ENGINE = MYISAM");
-
-$db->exec("INSERT INTO  `redbeantables` (
-`id` ,
-`tablename`
-)
-VALUES (
-NULL ,  'indexer'
-);
-");
-
-
-
-$db->exec("INSERT INTO  `redbeantables` (
-`id` ,
-`tablename`
-)
-VALUES (
-NULL ,  'empcol'
-);
-");
-
-
-$db->exec("
-CREATE TABLE  `empcol` (
-`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-`aaa` INT( 11) UNSIGNED,
-`bbb` INT(11) UNSIGNED,
-`ccc` INT( 11 ) UNSIGNED,
-PRIMARY KEY (  `id` )
-) ENGINE = MYISAM");
-
+testpack("Optimizer and Garbage collector");
+$db->exec("CREATE TABLE  `slimtable` (`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,`col1` VARCHAR( 255 ) NOT NULL ,`col2` TEXT NOT NULL ,`col3` INT( 11 ) UNSIGNED NOT NULL ,PRIMARY KEY (  `id` ) ) ENGINE = MYISAM");
+$db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`) VALUES (NULL ,  'slimtable');");
+$db->exec("INSERT INTO  `slimtable` (`id` ,`col1` ,`col2` ,`col3`) VALUES (NULL ,  '1',  'mustbevarchar',  '1000');");
+$db->exec("CREATE TABLE  `indexer` (`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,`highcard` VARCHAR( 255 ) NOT NULL ,`lowcard` TEXT NOT NULL ,`lowcard2` INT( 11 ) UNSIGNED NOT NULL ,`highcard2` LONGTEXT NOT NULL ,PRIMARY KEY (  `id` )) ENGINE = MYISAM");
+$db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`) VALUES (NULL ,  'indexer');");
+$db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`) VALUES (NULL ,  'empcol');");
+$db->exec("CREATE TABLE  `empcol` (`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,`aaa` INT( 11) UNSIGNED,`bbb` INT(11) UNSIGNED,`ccc` INT( 11 ) UNSIGNED,PRIMARY KEY (  `id` )) ENGINE = MYISAM");
 $db->exec("INSERT INTO  `empcol` (`id` ,`aaa` )VALUES (NULL ,  1 )");
-
-
 for($i=0; $i<20; $i++){
-$db->exec("INSERT INTO  `indexer` (
-`id` ,
-`highcard` ,
-`lowcard` ,
-`lowcard2`,
-`highcard2`
-)
-VALUES (
-NULL ,  rand(),  'a',  rand(), CONCAT( rand()*100, '".str_repeat('x',1000)."' )
-);
-");
+$db->exec("INSERT INTO  `indexer` (`id` ,`highcard` ,`lowcard` ,`lowcard2`,`highcard2`) VALUES ( NULL ,  rand(),  'a',  rand(), CONCAT( rand()*100, '".str_repeat('x',1000)."' ) );");
 }
 
 
@@ -408,41 +325,20 @@ RedBean_OODB::keepInShape( true, "indexer", "highcard" );
 RedBean_OODB::keepInShape( true, "indexer", "highcard2" );
 RedBean_OODB::keepInShape( true, "indexer", "lowcard" );
 RedBean_OODB::keepInShape( true, "indexer", "lowcard2" );
-
 $empcol = new empcol;
 SmartTest::test(empcol::where(' @ifexists:aaa=1 or @ifexists:bbb=1')->count(),1);
-
 $row = $db->getRow("select * from slimtable limit 1");
 SmartTest::test($row["col1"],1);
 SmartTest::test($row["col2"],"mustbevarchar");
 SmartTest::test($row["col3"],1000);
-
 SmartTest::test(count($db->get("describe slimtable")),4); 
 RedBean_OODB::dropColumn("slimtable","col3");
 SmartTest::test(count($db->get("describe slimtable")),3); 
-
-
-$db->exec("
-CREATE TABLE  `garbagetable` (
-`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,
-`highcard` VARCHAR( 255 ) NOT NULL ,
-PRIMARY KEY (  `id` )
-) ENGINE = MYISAM");
-
-$db->exec("INSERT INTO  `redbeantables` (
-`id` ,
-`tablename`
-)
-VALUES (
-NULL ,  'garbagetable'
-);
-");
-
-
+$db->exec("CREATE TABLE  `garbagetable` (`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,`highcard` VARCHAR( 255 ) NOT NULL ,PRIMARY KEY (  `id` )) ENGINE = MYISAM");
+$db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`)VALUES (NULL ,  'garbagetable');");
 RedBean_OODB::KeepInShape( true );
 $tables = RedBean_OODB::showTables(); 
 SmartTest::test(in_array("garbagetable",$tables),false);
-
 //Test: can we extend from a bean and still use magic setters / getters?
 R::gen("ACat,Dog");
 class Cat extends ACat {
@@ -606,8 +502,157 @@ function testsperengine( $engine ) {
 	$a = new under_score_s;
 	asrt($a->getData()->type,"underscores");
 	
+	//Test description: find()
+	
+	testpack("anemic find");
+	$dummy->age = 40;
+	$rawdummy = $dummy->getData();
+	asrt(count(RedBean_OODB::find( $rawdummy, array("age"=>">"))),1);
+	$rawdummy->age = 20;
+	asrt(count(RedBean_OODB::find( $rawdummy, array("age"=>">"))),2);
+	$rawdummy->age = 100;
+	asrt(count(RedBean_OODB::find( $rawdummy, array("age"=>">"))),0);
+	$rawdummy->age = 100;
+	asrt(count(RedBean_OODB::find( $rawdummy, array("age"=>"<="))),2);
+	$rawdummy->name="ob";
+	asrt(count(RedBean_OODB::find( $rawdummy, array("name"=>"LIKE"))),1);
+	$rawdummy->name="o";
+	asrt(count(RedBean_OODB::find( $rawdummy, array("name"=>"LIKE"))),2);
+	$rawdummy->gender="m";
+	asrt(count(RedBean_OODB::find( $rawdummy, array("gender"=>"="))),2);
+	$rawdummy->gender="f";
+	asrt(count(RedBean_OODB::find( $rawdummy, array("gender"=>"="))),0);
+	asrt(count(RedBean_OODB::listAll("person")),2);
+	asrt(count(RedBean_OODB::listAll("person",0,1)),1);
+	asrt(count(RedBean_OODB::listAll("person",1)),1);
+	
+	
+	//Test description: associate
+	testpack("anemic association");
+	$searchBean = RedBean_OODB::dispense("person");
+	$searchBean->gender = "m";
+	SmartTest::instance()->progress(); ; 
+	$app = RedBean_OODB::dispense("appointment");
+	$app->kind = "dentist";
+	RedBean_OODB::set($app);
+	RedBean_OODB::associate( $person2, $app );
+	$arr = RedBean_OODB::getAssoc( $person2, "appointment" );
+	$appforbob = array_shift($arr);
+	if (!$appforbob || $appforbob->kind!="dentist") {
+		SmartTest::failedTest();
+	} 
+	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "delete a bean?";
+	$person = RedBean_OODB::getById( "person", $bobid );
+	RedBean_OODB::trash( $person );
+	try{
+	$person = RedBean_OODB::getById( "person", $bobid);$ok=0;
+	}catch(RedBean_Exception_FailedAccessBean $e){
+		$ok=true;
+	}
+	if (!$ok) {
+		SmartTest::failedTest();
+	}
+	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "unassociate two beans?";
+	$john = RedBean_OODB::getById( "person", $johnid); //hmmmmmm gaat mis bij innodb
+	$app = RedBean_OODB::getById( "appointment", 1);
+	RedBean_OODB::unassociate($john, $app);
+	$john2 = RedBean_OODB::getById( "person", $johnid);
+	$appsforjohn = RedBean_OODB::getAssoc($john2,"appointment");
+	if (count($appsforjohn)>0) SmartTest::failedTest();
+	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "unassociate by deleting a bean?";
+	$anotherdrink = RedBean_OODB::dispense("whisky");
+	$anotherdrink->name = "bowmore";
+	$anotherdrink->age = 18;
+	$anotherdrink->singlemalt = 'y';
+	RedBean_OODB::set( $anotherdrink );
+	RedBean_OODB::associate( $anotherdrink, $john );
+	$hisdrinks = RedBean_OODB::getAssoc( $john, "whisky" );
+	if (count($hisdrinks)!==1) SmartTest::failedTest();
+	RedBean_OODB::trash( $anotherdrink );
+	$hisdrinks = RedBean_OODB::getAssoc( $john, "whisky" );
+	if (count($hisdrinks)!==0) SmartTest::failedTest();
+	SmartTest::instance()->progress(); ; 
+	
+	//Test description: trees
+	testpack("anemic trees");
+	$pete = RedBean_OODB::dispense("person");
+	$pete->age=48;
+	$pete->gender="m";
+	$pete->name="Pete";
+	$peteid = RedBean_OODB::set( $pete );
+	$rob = RedBean_OODB::dispense("person");
+	$rob->age=19;
+	$rob->name="Rob";
+	$rob->gender="m";
+	$saskia = RedBean_OODB::dispense("person");
+	$saskia->age=20;
+	$saskia->name="Saskia";
+	$saskia->gender="f";
+	$idsaskia = RedBean_OODB::set( $saskia );
+	$idrob = RedBean_OODB::set( $rob );
+	RedBean_OODB::addChild( $pete, $rob );
+	RedBean_OODB::addChild( $pete, $saskia );
+	$children = RedBean_OODB::getChildren( $pete );
+	$names=0;
+	if (is_array($children) && count($children)===2) {
+		foreach($children as $child){
+			if ($child->name==="Rob") $names++;
+			if ($child->name==="Saskia") $names++;
+		}
+	}
+	
+	if (!$names) SmartTest::failedTest();
+	$daddies = RedBean_OODB::getParent( $saskia );
+	$daddy = array_pop( $daddies );
+	if ($daddy->name === "Pete") $ok = 1; else $ok = 0;
+	if (!$ok) SmartTest::failedTest();
+	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "remove a child from a parent-child tree?";
+	RedBean_OODB::removeChild( $daddy, $saskia );
+	$children = RedBean_OODB::getChildren( $pete );
+	$ok=0;
+	if (count($children)===1) {
+		$only = array_pop($children);
+		if ($only->name==="Rob") $ok=1;
+	}
+	
+	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "save on the fly while associating?";
+	
+	$food = RedBean_OODB::dispense("dish");
+	$food->name="pizza";
+	RedBean_OODB::associate( $food, $pete );
+	$petesfood = RedBean_OODB::getAssoc( $pete, "food" );
+	if (is_array($petesfood) && count($petesfood)===1) $ok=1;
+	if (!$ok) SmartTest::failedTest();
+	RedBean_OODB::unassociate( $food, $pete );
+	if (is_array($petesfood) && count($petesfood)===0) $ok=1;
+	if (!$ok) SmartTest::failedTest();
+	//some extra tests... quick without further notice.	
+	$food = RedBean_OODB::dispense("dish");
+	$food->name="spaghetti";
+	RedBean_OODB::trash( $food );
+	
+	//Test description: test whether we can trash beans
+	testpack("trash on $engine ");
+	asrt(count(RedBean_OODB::find($pete,array("name"=>"="))),1);
+	asrt(count(RedBean_OODB::find($saskia,array("name"=>"="))),1);
+	RedBean_OODB::trash( $pete );
+	RedBean_OODB::trash( $saskia );
+	asrt(count(RedBean_OODB::find($pete,array("name"=>"="))),0);
+	asrt(count(RedBean_OODB::find($saskia,array("name"=>"="))),0);
+	
+	
+	
+	
+	//Test decorator
 	//Test description: can we find beans on the basis of similarity?
-	testpack("finder and listAll $engine ");
+	testpack("finder on decorator and listAll on decorator $engine ");
+	$person = RedBean_OODB::dispense("person");
+	$person = RedBean_OODB::dispense("person");
+	$person->age = 50;
+	$person->name = "Bob";
+	$person->gender = "m";
+	RedBean_OODB::set( $person );
+	$dummy = new Person;
 	$dummy->age = 40;
 	asrt(count(Person::find( $dummy, array("age"=>">"))),1);
 	$dummy->age = 20;
@@ -615,20 +660,23 @@ function testsperengine( $engine ) {
 	$dummy->age = 100;
 	asrt(count(Person::find( $dummy, array("age"=>">"))),0);
 	$dummy->age = 100;
-	asrt(count(Person::find( $dummy, array("age"=>"<="))),2);
+	asrt(count(Person::find( $dummy, array("age"=>"<="))),3);
 	$dummy->name="ob";
-	asrt(count(Person::find( $dummy, array("name"=>"LIKE"))),1);
-	$dummy->name="o";
 	asrt(count(Person::find( $dummy, array("name"=>"LIKE"))),2);
+	$dummy->name="o";
+	asrt(count(Person::find( $dummy, array("name"=>"LIKE"))),3);
 	$dummy->gender="m";
-	asrt(count(Person::find( $dummy, array("gender"=>"="))),2);
+	asrt(count(Person::find( $dummy, array("gender"=>"="))),3);
 	$dummy->gender="f";
 	asrt(count(Person::find( $dummy, array("gender"=>"="))),0);
-	asrt(count(Person::listAll()),2);
+	asrt(count(Person::listAll()),3);
 	asrt(count(Person::listAll(0,1)),1);
-	asrt(count(Person::listAll(1)),1);
+	asrt(count(Person::listAll(1)),2);
+	
+	
 	
 	//Test description Cans
+	RedBean_OODB::trash( $rob );
 	testpack("Cans of Beans $engine ");
 	$can = Person::where("`gender`={gender} order by `name`  asc",array("gender"=>"m"),"person");
 	//test array access
@@ -692,132 +740,7 @@ function testsperengine( $engine ) {
 	SmartTest::instance()->progress();
 	
 	
-	$searchBean = RedBean_OODB::dispense("person");
-	$searchBean->gender = "m";
 	
-	
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "associate beans with eachother?";
-	$app = RedBean_OODB::dispense("appointment");
-	$app->kind = "dentist";
-	RedBean_OODB::set($app);
-	RedBean_OODB::associate( $person2, $app );
-	$arr = RedBean_OODB::getAssoc( $person2, "appointment" );
-	$appforbob = array_shift($arr);
-	
-	if (!$appforbob || $appforbob->kind!="dentist") {
-		SmartTest::failedTest();
-	} 
-	
-	
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "delete a bean?";
-	$person = RedBean_OODB::getById( "person", $bobid );
-	
-	RedBean_OODB::trash( $person );
-	try{
-	$person = RedBean_OODB::getById( "person", $bobid);$ok=0;
-	}catch(RedBean_Exception_FailedAccessBean $e){
-		$ok=true;
-	}
-	
-	if (!$ok) {
-		SmartTest::failedTest();
-	}
-	
-	
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "unassociate two beans?";
-	$john = RedBean_OODB::getById( "person", $johnid); //hmmmmmm gaat mis bij innodb
-	
-	$app = RedBean_OODB::getById( "appointment", 1);
-	RedBean_OODB::unassociate($john, $app);
-	
-	$john2 = RedBean_OODB::getById( "person", $johnid);
-	$appsforjohn = RedBean_OODB::getAssoc($john2,"appointment");
-	if (count($appsforjohn)>0) SmartTest::failedTest();
-	
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "unassociate by deleting a bean?";
-	
-	$anotherdrink = RedBean_OODB::dispense("whisky");
-	$anotherdrink->name = "bowmore";
-	$anotherdrink->age = 18;
-	$anotherdrink->singlemalt = 'y';
-	RedBean_OODB::set( $anotherdrink );
-	RedBean_OODB::associate( $anotherdrink, $john );
-	
-	$hisdrinks = RedBean_OODB::getAssoc( $john, "whisky" );
-	if (count($hisdrinks)!==1) SmartTest::failedTest();
-	
-	RedBean_OODB::trash( $anotherdrink );
-	$hisdrinks = RedBean_OODB::getAssoc( $john, "whisky" );
-	if (count($hisdrinks)!==0) SmartTest::failedTest();
-	
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "create parent child relationships?";
-	$pete = RedBean_OODB::dispense("person");
-	$pete->age=48;
-	$pete->gender="m";
-	$pete->name="Pete";
-	$peteid = RedBean_OODB::set( $pete );
-	$rob = RedBean_OODB::dispense("person");
-	$rob->age=19;
-	$rob->name="Rob";
-	$rob->gender="m";
-	$saskia = RedBean_OODB::dispense("person");
-	$saskia->age=20;
-	$saskia->name="Saskia";
-	$saskia->gender="f";
-	RedBean_OODB::set( $saskia );
-	RedBean_OODB::set( $rob );
-	RedBean_OODB::addChild( $pete, $rob );
-	RedBean_OODB::addChild( $pete, $saskia );
-	
-	$children = RedBean_OODB::getChildren( $pete );
-	$names=0;
-	if (is_array($children) && count($children)===2) {
-		foreach($children as $child){
-			if ($child->name==="Rob") $names++;
-			if ($child->name==="Saskia") $names++;
-		}
-	}
-	
-	if (!$names) SmartTest::failedTest();
-	
-	$daddies = RedBean_OODB::getParent( $saskia );
-	$daddy = array_pop( $daddies );
-	if ($daddy->name === "Pete") $ok = 1; else $ok = 0;
-	if (!$ok) SmartTest::failedTest();
-	
-		
-	
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "remove a child from a parent-child tree?";
-	
-	RedBean_OODB::removeChild( $daddy, $saskia );
-	$children = RedBean_OODB::getChildren( $pete );
-	
-	
-	$ok=0;
-	if (count($children)===1) {
-		$only = array_pop($children);
-		if ($only->name==="Rob") $ok=1;
-	}
-	
-	
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "save on the fly while associating?";
-	
-	$food = RedBean_OODB::dispense("dish");
-	$food->name="pizza";
-	RedBean_OODB::associate( $food, $pete );
-	
-	$petesfood = RedBean_OODB::getAssoc( $pete, "food" );
-	if (is_array($petesfood) && count($petesfood)===1) $ok=1;
-	if (!$ok) SmartTest::failedTest();
-	RedBean_OODB::unassociate( $food, $pete );
-	if (is_array($petesfood) && count($petesfood)===0) $ok=1;
-	if (!$ok) SmartTest::failedTest();
-	
-	
-	//some extra tests... quick without further notice.	
-	$food = RedBean_OODB::dispense("dish");
-	$food->name="spaghetti";
-	RedBean_OODB::trash( $food );
 	
 	
 	//test aggregation functions
