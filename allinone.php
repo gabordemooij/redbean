@@ -3431,32 +3431,36 @@ class RedBean_OODB {
 		 * for which you already created a model (by inheriting
 		 * from ReadBean_Decorator).
 		 * @param string $classes
+		 * @param string $prefix prefix for framework integration (optional, constant is used otherwise)
+		 * @param string $suffix suffix for framework integration (optional, constant is used otherwise)
 		 * @return unknown_type
 		 */
-		/**
-		 * Accepts a comma separated list of class names and
-		 * creates a default model for each classname mentioned in
-		 * this list. Note that you should not gen() classes
-		 * for which you already created a model (by inheriting
-		 * from ReadBean_Decorator).
-		 * @param string $classes
-		 * @return unknown_type
-		 */
-		public static function gen( $classes ) { 
+		
+		public static function gen( $classes, $prefix = false, $suffix = false ) {
+			
+			if (!$prefix) {
+				$prefix = RedBean_Setup_Namespace_PRFX;
+			}
+			
+			if (!$suffix) {
+				$suffix = RedBean_Setup_Namespace_SFFX; 
+			}
+			
 			$classes = explode(",",$classes);
-			foreach($classes as $c) {
+			foreach($classes as $c) { // echo $c;
 				$ns = '';
 				$names = explode('\\', $c);
 				$className = trim(end($names));
 				if(count($names) > 1)
 				{
-					$ns = 'namespace ' . implode('\\', array_slice($names, 0, -1)) . ";\n";
+					$namespacestring = implode('\\', array_slice($names, 0, -1));
+					$ns = 'namespace ' . $namespacestring . " { ";
 				}
 				if ($c!=="" && $c!=="null" && !class_exists($c) && 
 								preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){ 
-					try{
 							$tablename = preg_replace("/_/","",$className);
-							$toeval = $ns . " class ".RedBean_Setup_Namespace_PRFX.$className.RedBean_Setup_Namespace_SFFX." extends RedBean_Decorator {
+							$fullname = $prefix.$className.$suffix;
+							$toeval = $ns . " class ".$fullname." extends ". (($ns=='') ? '' : '\\' ) . "RedBean_Decorator {
 							private static \$__static_property_type = \"".strtolower($tablename)."\";
 							
 							public function __construct(\$id=0, \$lock=false) {
@@ -3472,12 +3476,18 @@ class RedBean_OODB {
 							}
 							
 						}";
+
+						if(count($names) > 1) {
+							$toeval .= "}";	
+						}	
+						
+						$teststring = (($ns!="") ? '\\'.$namespacestring.'\\'.$fullname : $fullname);
+
 						eval($toeval);	
-						if (!class_exists($c)) return false;
-					}
-					catch(Exception $e){
-						return false;
-					}
+						if (!class_exists( $teststring )) {
+							throw new Exception("Failed to generate class");
+						}
+					
 				}
 				else {
 					return false;

@@ -178,6 +178,19 @@ asrt($thing->importFromPost(array("first"))->getFirst(),"abc");
 asrt($thing->importFromPost(array("first"))->getSecond(),2);
 asrt($thing->importFromPost()->getSecond(),"xyz");
 
+//Test description: Tests whether gen() can produce classes with framework compliant names or using proper namespacing.
+//always test in pairs because something might go wrong after first class (during class_exist check for instance!)
+testpack("Framework Integration Tools");
+asrt(RedBean_OODB::gen("Entity1,Entity2"),true);
+asrt(class_exists("Entity1"),true);
+asrt(class_exists("Entity2"),true);
+asrt(RedBean_OODB::gen("Entity3,Entity4","prefix_","_suffix"),true);
+asrt(class_exists("prefix_Entity3_suffix"),true);
+asrt(class_exists("prefix_Entity4_suffix"),true);
+asrt(RedBean_OODB::gen("a\b\Entity5,c\d\Entity6"),true);
+asrt(class_exists("\a\b\Entity5"),true);
+asrt(class_exists("\c\d\Entity6"),true);
+asrt(RedBean_OODB::gen(".,--"),false);
 
 SmartTest::instance()->testPack = "Observers";
 R::gen("Employee");
