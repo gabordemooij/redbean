@@ -116,8 +116,9 @@ else {
 
 $tables = R::$db->getCol("show tables");
 foreach($tables as $t){
-	R::$db->exec("TRUNCATE `$t`");
-	
+	if ($t!="dtyp" && $t!="redbeantables" && $t!="locking") {
+		R::$db->exec("DROP TABLE `$t`");
+	}
 };
 
 
@@ -393,6 +394,11 @@ function testsperengine( $engine ) {
 	asrt($file->type,"file");
 	//Test description: Is the ID set and 0?
 	asrt((isset($file->id) && $file->id===0),true);
+	//Test don't accept arrays or objects
+	try{ $file->anArray = array(1,2,3); $id = RedBean_OODB::set( $file ); fail(); }catch(Exception $e){ pass(); }
+	try{ $file->anObject = $file;  $id = RedBean_OODB::set( $file ); fail(); }catch(Exception $e){ pass(); }
+	unset($file->anArray);
+	unset($file->anObject); 
 	//Test description: can we set and get a bean?
 	$file->name="document";
 	$id = RedBean_OODB::set( $file );

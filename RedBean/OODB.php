@@ -171,7 +171,12 @@ class RedBean_OODB {
 					throw new RedBean_Exception_Security("Invalid Characters in property");
 				}
 				else {
-					
+					if (is_array($value)) {
+						throw new RedBean_Exception_Security("Cannot store an array, use composition instead or serialize first.");
+					}
+					if (is_object($value)) {
+						throw new RedBean_Exception_Security("Cannot store an object, use composition instead or serialize first.");
+					}
 					$bean->$prop = $value;
 				}
 			}			
