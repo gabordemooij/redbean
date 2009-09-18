@@ -1956,32 +1956,32 @@ class RedBean_OODB {
 			
 			//Is the bean valid? does the bean have an id?
 			if (!isset($bean->id)) {
-				throw new Exception("Invalid bean, no id");
+				throw new RedBean_Exception_Security("Invalid bean, no id");
 			}
 
 			//is the id numeric?
-			if (!is_numeric($bean->id)) {
-				throw new Exception("Invalid bean, id not numeric");
+			if (!is_numeric($bean->id) || $bean->id < 0 || (round($bean->id)!=$bean->id)) {
+				throw new RedBean_Exception_Security("Invalid bean, id not numeric");
 			}
 
 			//does the bean have a type?
 			if (!isset($bean->type)) {
-				throw new Exception("Invalid bean, no type");
+				throw new RedBean_Exception_Security("Invalid bean, no type");
 			}
 
 			//is the beantype correct and valid?
 			if (!is_string($bean->type) || is_numeric($bean->type) || strlen($bean->type)<3) {
-				throw new Exception("Invalid bean, wrong type");
+				throw new RedBean_Exception_Security("Invalid bean, wrong type");
 			}
 
 			//is the beantype legal?
-			if ($bean->type==="locking" || $bean->type==="dtyp") {
-				throw new Exception("Beantype is reserved table");
+			if ($bean->type==="locking" || $bean->type==="dtyp" || $bean->type==="redbeantables") {
+				throw new RedBean_Exception_Security("Beantype is reserved table");
 			}
 
 			//is the beantype allowed?
 			if (strpos($bean->type,"_")!==false && ctype_alnum($bean->type)) {
-				throw new Exception("Beantype contains illegal characters");
+				throw new RedBean_Exception_Security("Beantype contains illegal characters");
 			}
 
 
@@ -3155,13 +3155,17 @@ class RedBean_OODB {
 			//sort the table names to make sure we only get one assoc table
 			sort($tables);
 			$assoctable = $db->escape( implode("_",$tables) );
-
-			if (strpos($assoctable,"pc_")===0){
+			
+			$availabletables = self::showTables();
+			
+			
+			if (in_array('pc_'.$assoctable,$availabletables)){
 				$db->exec( self::$writer->getQuery("deltreetype",array(
-					"assoctable"=>$assoctable,
+					"assoctable"=>'pc_'.$assoctable,
 					"id"=>$id
 				)) );
-			}else{
+			}
+			if (in_array($assoctable,$availabletables)) {
 				$db->exec( self::$writer->getQuery("unassoctype1",array(
 					"assoctable"=>$assoctable,
 					"t1"=>$t1,

@@ -382,9 +382,88 @@ asrt( count($cat->getRelatedDog()), 0 );
 $cat = new Cat($id);
 asrt( $cat->name, "Garfield" );
 
+
+//Test description; Query writer should support following query requests
+testpack("Query Writer");
+$writer = new QueryWriter_MySQL;
+$queries=array("prepare_innodb","starttransaction","clear_dtyp","setup_dtyp","setup_locking",
+"setup_tables","destruct","release","show_rtables","create_table","register_table","describe",
+"infertype","readtype","reset_dtyp","add_column","insert","remove_expir_lock","get_lock","aq_lock",
+"update_expir_lock","create_assoc","add_assoc","add_assoc_now","unassoc","create_tree",
+"unique","add_child","num_related","deltreetype","unassoctype1","unassoctype2","get_parent",
+"get_children","drop_tables","truncate_rtables","releaseall","create","get_null","test_column",
+"update_test","measure","remove_test","drop_test","variance","count","index2","drop_column","index1","where",
+"unregister_table","get_bean","get_assoc","unassoc_all_t1","unassoc_all_t2","trash","update","widen_column","find"
+,"list","remove_child","deltree","fastload","bean_exists","stat","distinct","drop_type");
+foreach($queries as $query){
+	try{ $writer->getQuery( $query, array("updatevalues"=>array(),"fields"=>array(),"insertcolumns"=>array(), "insertvalues"=>array(),
+	"searchoperators"=>array(), "ids"=>array(), "bean"=>RedBean_OODB::dispense("x"), "tables"=>array()) ); pass(); }catch(Exception $e){ fail(); }
+}
+try{ $writer->getQuery("unsupported"); fail(); }catch(Exception $e){ pass(); }
+$cols = $writer->getTableColumns("redbeantables",RedBean_OODB::$db);
+asrt(count($cols),2);
+$col = array_shift($cols);
+asrt($col["Field"],"id");
+asrt($col["Type"],"int(11) unsigned");
+asrt($col["Null"],"NO");
+asrt($col["Default"],null);
+asrt($col["Extra"],"auto_increment");
+
+//Test description: is the bean properly checked?
+testpack("Bean Checking");
+$bean = RedBean_OODB::dispense("bean");
+try{RedBean_OODB::checkBean($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
+$bean->type = null;
+try{RedBean_OODB::checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean = RedBean_OODB::dispense("bean");
+$bean->id = null;
+try{RedBean_OODB::checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->id = -1;
+try{RedBean_OODB::checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->id = 0.5;
+try{RedBean_OODB::checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->id = "5";
+try{RedBean_OODB::checkBean($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
+$bean->id = "a";
+try{RedBean_OODB::checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->id = array();
+try{RedBean_OODB::checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->id = $bean;
+try{RedBean_OODB::checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->id = 0;
+try{RedBean_OODB::checkBean($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
+$bean->type = "redbeantables";
+try{RedBean_OODB::checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->type = "dtyp";
+try{RedBean_OODB::checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->type = "locking";
+try{RedBean_OODB::checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+//Some tests for checkAssoc
+testpack("checkAssoc");
+$bean->type = "justabean";
+$bean->id = "a";
+try{RedBean_OODB::checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->id = array();
+try{RedBean_OODB::checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->id = $bean;
+try{RedBean_OODB::checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->id = 0;
+try{RedBean_OODB::checkBeanForAssoc($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
+$bean->type = "redbeantables";
+try{RedBean_OODB::checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->type = "dtyp";
+try{RedBean_OODB::checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+$bean->type = "locking";
+try{RedBean_OODB::checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+
+
+
+
+
 //Tests for each individual engine
 function testsperengine( $engine ) {
 
+	
 	testpack("Anemic Model on ".$engine);
 	//Test basic, fundamental OODBBean functions with Anemic Model
 	asrt(is_numeric(RedBean_OODB::getVersionNumber()),true);
@@ -399,6 +478,18 @@ function testsperengine( $engine ) {
 	try{ $file->anObject = $file;  $id = RedBean_OODB::set( $file ); fail(); }catch(Exception $e){ pass(); }
 	unset($file->anArray);
 	unset($file->anObject); 
+	
+	
+	//Test description: test table management features
+	testpack("Table Management on ".$engine);
+	$cnt = count(RedBean_OODB::showTables());
+	RedBean_OODB::addTable("newtable");
+	asrt(count(RedBean_OODB::showTables()), (++$cnt));
+	RedBean_OODB::dropTable("newtable");
+	asrt(count(RedBean_OODB::showTables()), (--$cnt));
+	
+	
+	
 	//Test description: can we set and get a bean?
 	$file->name="document";
 	$id = RedBean_OODB::set( $file );
@@ -418,6 +509,17 @@ function testsperengine( $engine ) {
 	//Test description: can we fastload a bean?
 	try{$file2 = RedBean_OODB::getById("file",2,array("name"=>"picture")); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
 	asrt($file2->name,"picture");
+	
+	
+	//Test description: test whether we can infer data types
+	testpack("Data Type Detection");
+	asrt(RedBean_OODB::inferType(1),0);
+	asrt(RedBean_OODB::inferType(255),0);
+	asrt(RedBean_OODB::inferType(256),1);
+	asrt(RedBean_OODB::inferType(-1),2);
+	asrt(RedBean_OODB::inferType("12345.9"),3);
+	asrt(RedBean_OODB::inferType(str_repeat('a',40000)),4);
+	
 	
 	
 	//Test description: can add a property dynamically?
@@ -522,7 +624,6 @@ function testsperengine( $engine ) {
 	asrt($a->getData()->type,"underscores");
 	
 	//Test description: find()
-	
 	testpack("anemic find");
 	$dummy->age = 40;
 	$rawdummy = $dummy->getData();
@@ -550,7 +651,7 @@ function testsperengine( $engine ) {
 	testpack("anemic association");
 	$searchBean = RedBean_OODB::dispense("person");
 	$searchBean->gender = "m";
-	SmartTest::instance()->progress(); ; 
+	SmartTest::instance()->progress();
 	$app = RedBean_OODB::dispense("appointment");
 	$app->kind = "dentist";
 	RedBean_OODB::set($app);
@@ -620,38 +721,86 @@ function testsperengine( $engine ) {
 		}
 	}
 	
-	if (!$names) SmartTest::failedTest();
+	if (!$names) fail();
 	$daddies = RedBean_OODB::getParent( $saskia );
 	$daddy = array_pop( $daddies );
 	if ($daddy->name === "Pete") $ok = 1; else $ok = 0;
-	if (!$ok) SmartTest::failedTest();
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "remove a child from a parent-child tree?";
+	if (!$ok) fail();
+	pass();
+	testpack("remove a child from a parent-child tree?");
 	RedBean_OODB::removeChild( $daddy, $saskia );
 	$children = RedBean_OODB::getChildren( $pete );
-	$ok=0;
-	if (count($children)===1) {
-		$only = array_pop($children);
-		if ($only->name==="Rob") $ok=1;
-	}
+	asrt(count($children),1);
+	$only = array_pop($children);
+	asrt($only->name,"Rob");
 	
-	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "save on the fly while associating?";
+	//test can we move a node in the tree?
+	testpack("change parent");
+	$node1 = RedBean_OODB::dispense("node");
+	$node1->name = "node1";
+	$node2 = RedBean_OODB::dispense("node");
+	$node2->name = "node2";
+	$node3 = RedBean_OODB::dispense("node");
+	$node3->name = "node3";
+	RedBean_OODB::set($node1);
+	RedBean_OODB::set($node2);
+	RedBean_OODB::set($node3);
+	RedBean_OODB::addChild($node1,$node2);
+	asrt(count(RedBean_OODB::getChildren($node1)),1);
+	asrt(count(RedBean_OODB::getChildren($node3)),0);
+	RedBean_OODB::addChild($node1,$node2);
+	//nothing changes due to unique constraint 
+	asrt(count(RedBean_OODB::getChildren($node1)),1);
+	asrt(count(RedBean_OODB::getChildren($node3)),0);
+	RedBean_OODB::addChild($node3,$node2);
+	asrt(count(RedBean_OODB::getChildren($node1)),1);
+	asrt(count(RedBean_OODB::getChildren($node3)),1);
+	//now swap! 
+	RedBean_OODB::removeChild($node1,$node2);
+	asrt(count(RedBean_OODB::getChildren($node1)),0);
+	asrt(count(RedBean_OODB::getChildren($node3)),1);
+	//swap back again
+	RedBean_OODB::removeChild($node3,$node2);
+	RedBean_OODB::addChild($node1,$node2);
+	asrt(count(RedBean_OODB::getChildren($node1)),1);
+	asrt(count(RedBean_OODB::getChildren($node3)),0);
+	$node = array_shift(RedBean_OODB::getParent($node2));
+	asrt($node->name,"node1");
+	RedBean_OODB::associate($node2, $node3); //normal assoc
+	RedBean_OODB::associate($node2, RedBean_OODB::dispense("nodeb"));
+	asrt(count(RedBean_OODB::getParent($node2)),1);
+	asrt(count(RedBean_OODB::getAssoc($node2, "node")),1);
+	asrt(count(RedBean_OODB::getAssoc($node2, "nodeb")),1);
+	RedBean_OODB::deleteAllAssocType("node",$node2);
+	asrt(count(RedBean_OODB::getParent($node2)),0);
+	asrt(count(RedBean_OODB::getAssoc($node2, "node")),0);
+	asrt(count(RedBean_OODB::getAssoc($node2, "nodeb")),1);
+	RedBean_OODB::deleteAllAssoc($node2);
+	asrt(count(RedBean_OODB::getParent($node2)),0);
+	asrt(count(RedBean_OODB::getAssoc($node2, "node")),0);
+	asrt(count(RedBean_OODB::getAssoc($node2, "nodeb")),0);
 	
+	
+	//exit;
+	
+	//Test description: on the fly saving while associating beans
+	testpack("save on the fly while associating?");
 	$food = RedBean_OODB::dispense("dish");
 	$food->name="pizza";
 	RedBean_OODB::associate( $food, $pete );
-	$petesfood = RedBean_OODB::getAssoc( $pete, "food" );
-	if (is_array($petesfood) && count($petesfood)===1) $ok=1;
-	if (!$ok) SmartTest::failedTest();
+	$petesfood = RedBean_OODB::getAssoc( $pete, "dish" );
+	asrt((is_array($petesfood) && count($petesfood)===1),true);
 	RedBean_OODB::unassociate( $food, $pete );
-	if (is_array($petesfood) && count($petesfood)===0) $ok=1;
-	if (!$ok) SmartTest::failedTest();
-	//some extra tests... quick without further notice.	
-	$food = RedBean_OODB::dispense("dish");
-	$food->name="spaghetti";
-	RedBean_OODB::trash( $food );
+	$petesfood = RedBean_OODB::getAssoc( $pete, "dish" );
+	asrt((is_array($petesfood) && count($petesfood)===0),true);
+	
 	
 	//Test description: test whether we can trash beans
 	testpack("trash on $engine ");
+	$food = RedBean_OODB::dispense("dish");
+	$food->name="spaghetti";
+	//no exception or error... must be able to trash unsaved beans
+	try{ RedBean_OODB::trash( $food ); pass(); }catch(Exception $e){ fail();}
 	asrt(count(RedBean_OODB::find($pete,array("name"=>"="))),1);
 	asrt(count(RedBean_OODB::find($saskia,array("name"=>"="))),1);
 	RedBean_OODB::trash( $pete );
@@ -773,15 +922,18 @@ function testsperengine( $engine ) {
 	RedBean_OODB::set( $s );
 	$s = RedBean_OODB::dispense("stattest");
 	$s->amount = 3;
-	RedBean_OODB::set( $s );
+	$id = RedBean_OODB::set( $s );
 	
-	SmartTest::instance()->testPack = "can we use aggr functions using Redbean?";
-	if (RedBean_OODB::numberof("stattest")!=3) SmartTest::failedTest(); else SmartTest::instance()->progress(); 
-	if (RedBean_OODB::maxof("stattest","amount")!=3) SmartTest::failedTest(); else SmartTest::instance()->progress(); 
-	if (RedBean_OODB::minof("stattest","amount")!=1) SmartTest::failedTest(); else SmartTest::instance()->progress(); 
-	if (RedBean_OODB::avgof("stattest","amount")!=2) SmartTest::failedTest(); else SmartTest::instance()->progress(); 
-	if (RedBean_OODB::sumof("stattest","amount")!=6) SmartTest::failedTest(); else SmartTest::instance()->progress(); 
-	if (count(RedBean_OODB::distinct("stattest","amount"))!=3) SmartTest::failedTest(); else SmartTest::instance()->progress(); 
+	//Test description: quick aggregation functions
+	testpack("can we use aggr functions using Redbean?");
+	asrt(RedBean_OODB::exists("stattest",$id),true);
+	asrt(RedBean_OODB::exists("stattest",99),false);
+	asrt(intval(RedBean_OODB::numberof("stattest")),3); 
+	asrt(intval(RedBean_OODB::maxof("stattest","amount")),3); 
+	asrt(intval(RedBean_OODB::minof("stattest","amount")),1); 
+	asrt(intval(RedBean_OODB::avgof("stattest","amount")),2); 
+	asrt(intval(RedBean_OODB::sumof("stattest","amount")),6); 
+	asrt(count(RedBean_OODB::distinct("stattest","amount")),3); 
 	
 		
 	RedBean_OODB::setLocking( true );
@@ -1217,7 +1369,6 @@ RedBean_OODB::setEngine("myisam");
 testsperengine("MYSQL-MYISAM");
 RedBean_OODB::setEngine("innodb");
 testsperengine("MYSQL-INNODB");
-
 
 
 printtext("\n<BR>ALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
