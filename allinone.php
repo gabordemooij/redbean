@@ -139,9 +139,16 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 * @param OODBBean $bean
 	 * @return RedBean_Decorator $deco
 	 */
-	public function wrap( $bean ) {
+	public function wrap( $bean, $prefix=false, $suffix=false ) {
 
-		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
+		if (!$prefix) {
+			$prefix = RedBean_Setup_Namespace_PRFX;
+		}  
+		
+		if (!$suffix) {
+			$suffix = RedBean_Setup_Namespace_SFFX;
+		}
+		$dclass = $prefix.$this->type.$suffix;
 		$deco = new $dclass( floatval( $bean->id ) );
 		$deco->setData( $bean );
 		return $deco;
@@ -242,6 +249,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 */
 	public function seek( $seek ) {
 		$this->pointer = (int) $seek;
+		return $this;
 	}
 	
 	/**
@@ -299,7 +307,6 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 * @return RedBean_Decorator $bean
 	 */
 	public function offsetGet($offset) {
-    	
     	if (isset($this->collectionIDs[$offset])) {
 			$id = $this->collectionIDs[$offset];
 			return $this->wrap( RedBean_OODB::getById( $this->type, $id ) );
@@ -328,7 +335,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
      * @return unknown_type
      */
     public function reverse() {
-    	$this->collectionIDs = array_reverse($this->collectionIDs, true);
+    	$this->collectionIDs = array_reverse($this->collectionIDs, false);
     	return $this;
     }
 	
@@ -2540,7 +2547,7 @@ class RedBean_OODB {
 				$no = $db->getCell( self::$writer->getQuery("count",array(
 					"type"=>$type
 				)));
-				return $no;
+				return intval( $no );
 			}
 		}
 		
@@ -2604,7 +2611,7 @@ class RedBean_OODB {
 					"field"=>$field,
 					"type"=>$type
 				)));
-				return $no;
+				return floatval( $no );
 			}
 		}
 

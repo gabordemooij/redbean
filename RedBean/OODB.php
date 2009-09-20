@@ -767,7 +767,7 @@ class RedBean_OODB {
 				$no = $db->getCell( self::$writer->getQuery("count",array(
 					"type"=>$type
 				)));
-				return $no;
+				return intval( $no );
 			}
 		}
 		
@@ -831,7 +831,7 @@ class RedBean_OODB {
 					"field"=>$field,
 					"type"=>$type
 				)));
-				return $no;
+				return floatval( $no );
 			}
 		}
 

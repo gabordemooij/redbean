@@ -142,21 +142,23 @@ exit;
  * Test the very basics 
  */
 testpack("Basic test suite");
-$tests = 0; SmartTest::instance()->progress(); ;
-
+$tests = 0; 
 //Test description: Does the redbean core class exist?
 asrt( class_exists("RedBean_OODB") , true);
 //Test description: Does the redbean decorator class exist?
 asrt(class_exists("RedBean_Decorator"), true);
 //Test description: Does the redbean database adapter class exist?
 asrt(class_exists("RedBean_DBAdapter"),true);
-
+//Test description are the other core classes available?
+asrt(class_exists("RedBean_Can"),true);
+asrt(class_exists("RedBean_Sieve"),true);
+asrt(interface_exists("RedBean_Validator"),true);
+asrt(class_exists("RedBean_Setup"),true);
 //Test description: Is the database a DBAdapter?
 $db = RedBean_OODB::$db;
 asrt(($db instanceof RedBean_DBAdapter),true);
 //Test decription: Can we retrieve the version no. ?
 asrt(is_string(RedBean_OODB::getVersionInfo()),true);
-
 //Test description: test multiple database support
 testpack("multi database");
 $old = RedBean_Setup::kickstart("mysql:host=localhost;dbname=test","root","",false,"innodb",false);
@@ -222,65 +224,65 @@ $employee->addEventListener( "deco_copy",$observer );
 $employee->addEventListener( "deco_free",$observer );
 $observer->signal="";
 $employee->setName("test");
-SmartTest::instance()->test($observer->signal,"deco_set");
+asrt($observer->signal,"deco_set");
 $observer->signal="";
 $employee->getName();
-SmartTest::instance()->test($observer->signal,"deco_get");
+asrt($observer->signal,"deco_get");
 $observer->signal="";
 $employee->getRelatedCustomer();
-SmartTest::instance()->test($observer->signal,"deco_get");
+asrt($observer->signal,"deco_get");
 $observer->signal="";
 $employee->is("nerd");
-SmartTest::instance()->test($observer->signal,"deco_get");
+asrt($observer->signal,"deco_get");
 $observer->signal="";
 $employee->clearRelated("nerd");
-SmartTest::instance()->test($observer->signal,"deco_clearrelated");
+asrt($observer->signal,"deco_clearrelated");
 $observer->signal="";
 $employee2 = new Employee;
 $employee2->setName("Minni");
 $employee->add($employee2);
-SmartTest::instance()->test($observer->signal,"deco_add");
+asrt($observer->signal,"deco_add");
 $observer->signal="";
 $employee->remove($employee2);
-SmartTest::instance()->test($observer->signal,"deco_remove");
+asrt($observer->signal,"deco_remove");
 $observer->signal="";
 $employee->attach($employee2);
-SmartTest::instance()->test($observer->signal,"deco_attach");
+asrt($observer->signal,"deco_attach");
 $observer->signal="";
 $employee->numofEmployee();
-SmartTest::instance()->test($observer->signal,"deco_numof");
+asrt($observer->signal,"deco_numof");
 $observer->signal="";
 $employee->belongsTo($employee2);
-SmartTest::instance()->test($observer->signal,"deco_belongsto");
+asrt($observer->signal,"deco_belongsto");
 $observer->signal="";
 $employee->exclusiveAdd($employee2);
-SmartTest::instance()->test($observer->signal,"deco_exclusiveadd");
+asrt($observer->signal,"deco_exclusiveadd");
 $observer->signal="";
 $employee->parent();
-SmartTest::instance()->test($observer->signal,"deco_parent");
+asrt($observer->signal,"deco_parent");
 $observer->signal="";
 $employee->children($employee2);
-SmartTest::instance()->test($observer->signal,"deco_children");
+asrt($observer->signal,"deco_children");
 $observer->signal="";
 $employee->siblings($employee2);
-SmartTest::instance()->test($observer->signal,"deco_siblings");
+asrt($observer->signal,"deco_siblings");
 $observer->signal="";
 $employee->copy();
-SmartTest::instance()->test($observer->signal,"deco_copy");
+asrt($observer->signal,"deco_copy");
 
 
 SmartTest::instance()->testPack = "Sieves";
 R::gen("Employee");
 $e = new Employee;
 $e->setName("Max");
-SmartTest::instance()->test(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric"))->valid($e),true);
+asrt(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric"))->valid($e),true);
 $e->setName("Ma.x");
-SmartTest::instance()->test(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric"))->valid($e),false);
+asrt(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric"))->valid($e),false);
 $e->setName("Max")->setFunct("sales");
-SmartTest::instance()->test(count(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric","funct"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
+asrt(count(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric","funct"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
 $e->setName("x")->setFunct("");
-SmartTest::instance()->test(count(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric","funct"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
-SmartTest::instance()->test(count(RedBean_Sieve::make(array("a"=>"RedBean_Validator_AlphaNumeric","b"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
+asrt(count(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric","funct"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
+asrt(count(RedBean_Sieve::make(array("a"=>"RedBean_Validator_AlphaNumeric","b"=>"RedBean_Validator_AlphaNumeric"))->validAndReport($e,"RedBean_Validator_AlphaNumeric")),2);
 
 
 //Test alphanumeric validation
@@ -340,19 +342,19 @@ RedBean_OODB::keepInShape( true, "indexer", "highcard2" );
 RedBean_OODB::keepInShape( true, "indexer", "lowcard" );
 RedBean_OODB::keepInShape( true, "indexer", "lowcard2" );
 $empcol = new empcol;
-SmartTest::test(empcol::where(' @ifexists:aaa=1 or @ifexists:bbb=1')->count(),1);
+asrt(empcol::where(' @ifexists:aaa=1 or @ifexists:bbb=1')->count(),1);
 $row = $db->getRow("select * from slimtable limit 1");
-SmartTest::test($row["col1"],1);
-SmartTest::test($row["col2"],"mustbevarchar");
-SmartTest::test($row["col3"],1000);
-SmartTest::test(count($db->get("describe slimtable")),4); 
+asrt($row["col1"],'1');
+asrt($row["col2"],"mustbevarchar");
+asrt($row["col3"],'1000');
+asrt(count($db->get("describe slimtable")),4); 
 RedBean_OODB::dropColumn("slimtable","col3");
-SmartTest::test(count($db->get("describe slimtable")),3); 
+asrt(count($db->get("describe slimtable")),3); 
 $db->exec("CREATE TABLE  `garbagetable` (`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,`highcard` VARCHAR( 255 ) NOT NULL ,PRIMARY KEY (  `id` )) ENGINE = MYISAM");
 $db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`)VALUES (NULL ,  'garbagetable');");
 RedBean_OODB::KeepInShape( true );
 $tables = RedBean_OODB::showTables(); 
-SmartTest::test(in_array("garbagetable",$tables),false);
+asrt(in_array("garbagetable",$tables),false);
 //Test: can we extend from a bean and still use magic setters / getters?
 R::gen("ACat,Dog");
 class Cat extends ACat {
@@ -856,7 +858,7 @@ function testsperengine( $engine ) {
 			SmartTest::failedTest();
 		}
 	}
-	testpack("Cans 2");
+	testpack("Can-methods for $engine ");
 	$bean = $can[0];
 	asrt($bean->name,"Bob");
 	asrt($can->count(),2);
@@ -872,12 +874,25 @@ function testsperengine( $engine ) {
 	asrt($can->key(), 0);
 	$beans = $can->getBeans();
 	asrt(count($beans),2);
+	$can->reverse();
+	$bean = $can[0];
+	asrt($bean->name,"John");
+	$can->reverse();
+	$bean = $can[0];
+	asrt($bean->name,"Bob");
 	$can->slice( 0, 1 );
 	$can->rewind();
 	asrt($can->current()->getName(), "Bob");
 	asrt($can->count(), 1);
 	$b1 = array_shift($beans); 
 	asrt($b1->name,"Bob");
+	asrt($can->wrap($b1->getData())->getName(),$b1->getName());
+	$lst = $can->getList();
+	asrt(count($lst),1);
+	asrt($lst[0]["type"],"person");
+	asrt($lst[0]["id"],"7");
+	asrt($lst[0]["name"],"Bob");
+	asrt(count($lst[0]),7);
 	
 	//Test description: basic functionality where()
 	testpack("where() $engine");
@@ -1174,13 +1189,13 @@ function testsperengine( $engine ) {
 	$kwak2 = new Person( $id );
 	if ($kwak->getName() != $kwak2->getName()) {SmartTest::failedTest(); }else SmartTest::instance()->progress(); ;
 	
-	SmartTest::test(count($donald->children()),3);
+	asrt(count($donald->children()),3);
 	Person::delete($kwek);
-	SmartTest::test(count($donald->children()),2);
+	asrt(count($donald->children()),2);
 	Person::delete($kwik);
-	SmartTest::test(count($donald->children()),1);
+	asrt(count($donald->children()),1);
 	Person::delete($kwak);
-	SmartTest::test(count($donald->children()),0);
+	asrt(count($donald->children()),0);
 	
 	SmartTest::instance()->testPack="countRelated";
 	R::gen("Blog,Comment");
@@ -1285,16 +1300,16 @@ function testsperengine( $engine ) {
 	$track->title = "song 1";
 	$track->belongsTo( $cd1 );
 	$discs = $track->getRelatedDisc();
-	SmartTest::instance()->test(count($discs),1);
+	asrt(count($discs),1);
 	$track->belongsTo( $cd2 );
 	$discs = $track->getRelatedDisc();
-	SmartTest::instance()->test(count($discs),1);
+	asrt(count($discs),1);
 	$track2 = new Track;
 	$track2->title = "song 2";
 	$cd1->exclusiveAdd( $track2 );
-	SmartTest::instance()->test(count($track->getRelatedDisc()),1);
+	asrt(count($track->getRelatedDisc()),1);
 	$cd2->exclusiveAdd( $track2 );
-	SmartTest::instance()->test(count($track->getRelatedDisc()),1);
+	asrt(count($track->getRelatedDisc()),1);
 
 	RedBean_OODB::gen('SomeBean');
 	$b = new SomeBean;
@@ -1303,9 +1318,9 @@ function testsperengine( $engine ) {
 	$b = new SomeBean;
 	$b->anotherprop = 1;
 	$b->save();
-	SmartTest::test(RedBean_OODB::numberof("SomeBean"),2);
+	asrt(RedBean_OODB::numberof("SomeBean"),2);
 	RedBean_OODB::trashAll("SomeBean");
-	SmartTest::test(RedBean_OODB::numberof("SomeBean"),0);
+	asrt(RedBean_OODB::numberof("SomeBean"),0);
 	
 	RedBean_OODB::gen("Book");
 	$book = new Book;
@@ -1313,15 +1328,15 @@ function testsperengine( $engine ) {
 	RedBean_OODB::gen("Page");
 	$page1 = new Page;
 	$page2 = new Page;
-	SmartTest::test(count($book->getRelatedPage()),0);
+	asrt(count($book->getRelatedPage()),0);
 	$book->add($page1);
-	SmartTest::test(count($book->getRelatedPage()),1);
+	asrt(count($book->getRelatedPage()),1);
 	$book->add($page2);
-	SmartTest::test(count($book->getRelatedPage()),2);
+	asrt(count($book->getRelatedPage()),2);
 	$book->remove($page1);
-	SmartTest::test(count($book->getRelatedPage()),1);
+	asrt(count($book->getRelatedPage()),1);
 	$book->remove($page2);
-	SmartTest::test(count($book->getRelatedPage()),0);
+	asrt(count($book->getRelatedPage()),0);
 }
 
 
