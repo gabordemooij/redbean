@@ -316,6 +316,38 @@ $db->exec("drop table `nonsense`");
 
 //Test description: KeepInShape() tester
 testpack("Optimizer and Garbage collector");
+//Test description: test whether relation tables are spared during keepinshape (github issue #3)
+$db->exec("CREATE TABLE  `deletethis` (`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,`col1` VARCHAR( 255 ) NOT NULL ,`col2` TEXT NOT NULL ,`col3` INT( 11 ) UNSIGNED NOT NULL ,PRIMARY KEY (  `id` ) ) ENGINE = MYISAM");
+$db->exec("CREATE TABLE  `deletethis2` (`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,`col1` VARCHAR( 255 ) NOT NULL ,`col2` TEXT NOT NULL ,`col3` INT( 11 ) UNSIGNED NOT NULL ,PRIMARY KEY (  `id` ) ) ENGINE = MYISAM");
+$db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`) VALUES (NULL ,  'deletethis');");
+$db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`) VALUES (NULL ,  'deletethis2');");
+$db->exec("CREATE TABLE  `deletethis_deletethis2` (`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,`col1` VARCHAR( 255 ) NOT NULL ,`col2` TEXT NOT NULL ,`col3` INT( 11 ) UNSIGNED NOT NULL ,PRIMARY KEY (  `id` ) ) ENGINE = MYISAM");
+$db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`) VALUES (NULL ,  'deletethis_deletethis2');");
+$db->exec("CREATE TABLE  `deletethis_dontdeletethis` (`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,`col1` VARCHAR( 255 ) NOT NULL ,`col2` TEXT NOT NULL ,`col3` INT( 11 ) UNSIGNED NOT NULL ,PRIMARY KEY (  `id` ) ) ENGINE = MYISAM");
+$db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`) VALUES (NULL ,  'deletethis_dontdeletethis');");
+R::gen('dontdelete,dontdelete2');
+$dontdelete = new dontdelete;
+$dontdelete->save();
+asrt(intval($db->getCell("SELECT COUNT(*) FROM redbeantables WHERE tablename='dontdelete'")),1);
+asrt(intval($db->getCell("SELECT COUNT(*) FROM redbeantables WHERE tablename='deletethis'")),1);
+$dontdelete->add( new dontdelete2 );
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'deletethis'")),1);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'dontdelete'")),1);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'dontdelete2'")),1);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'dontdelete_dontdelete2'")),1);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'deletethis_dontdeletethis'")),1);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'deletethis_deletethis2'")),1);
+R::keepInShape( true );
+asrt(intval($db->getCell("SELECT COUNT(*) FROM redbeantables WHERE tablename='dontdelete'")),1);
+asrt(intval($db->getCell("SELECT COUNT(*) FROM redbeantables WHERE tablename='deletethis'")),0);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'deletethis'")),0);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'dontdelete'")),1);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'dontdelete2'")),1);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'dontdelete_dontdelete2'")),1);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'deletethis_dontdeletethis'")),0);
+asrt(intval($db->getCell("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'oodb' AND table_name = 'deletethis_deletethis2'")),0);
+
+
 $db->exec("CREATE TABLE  `slimtable` (`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,`col1` VARCHAR( 255 ) NOT NULL ,`col2` TEXT NOT NULL ,`col3` INT( 11 ) UNSIGNED NOT NULL ,PRIMARY KEY (  `id` ) ) ENGINE = MYISAM");
 $db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`) VALUES (NULL ,  'slimtable');");
 $db->exec("INSERT INTO  `slimtable` (`id` ,`col1` ,`col2` ,`col3`) VALUES (NULL ,  '1',  'mustbevarchar',  '1000');");
