@@ -661,7 +661,7 @@ class QueryWriter_MySQL implements QueryWriter {
 				  `fingerprint` varchar(255) NOT NULL,
 				  `expire` int(11) NOT NULL,
 				  UNIQUE KEY `tbl` (`tbl`,`id`)
-				) ENGINE=$engine DEFAULT CHARSET=latin1;
+				) ENGINE=$engine DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 				";
 					break;
 				case "setup_tables":
@@ -672,7 +672,7 @@ class QueryWriter_MySQL implements QueryWriter {
 				 `tablename` VARCHAR( 255 ) NOT NULL ,
 				 PRIMARY KEY ( `id` ),
 				 UNIQUE KEY `tablename` (`tablename`)
-				 ) ENGINE = $engine 
+				 ) ENGINE = $engine DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 				";
 					break;
 				case "show_tables":
