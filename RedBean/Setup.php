@@ -88,16 +88,17 @@ class RedBean_Setup {
 	
 	/**
 	 * Kickstarter for development phase
+	 * @param $gen
 	 * @param $dsn
 	 * @param $username
 	 * @param $password
-	 * @param $gen
+	 * @param $debug
 	 * @return unknown_type
 	 */
-	public static function kickstartDev( $gen, $dsn, $username="root", $password="" ) {
+	public static function kickstartDev( $gen, $dsn, $username="root", $password="", $debug=false ) {
 		
 		//kickstart for development
-		self::kickstart( $dsn, $username, $password, false, "innodb", false, false);
+		self::kickstart( $dsn, $username, $password, false, "innodb", $debug, false);
 		
 		//generate classes
 		R::gen( $gen );

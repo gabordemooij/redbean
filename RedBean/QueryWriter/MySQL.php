@@ -636,6 +636,7 @@ class QueryWriter_MySQL implements QueryWriter {
 					return "START TRANSACTION";
 					break;
 				case "setup_dtyp":
+					$engine = RedBean_OODB::getEngine();
 					return "
 				CREATE TABLE IF NOT EXISTS `dtyp` (
 				  `id` int(11) unsigned NOT NULL auto_increment,
@@ -645,13 +646,14 @@ class QueryWriter_MySQL implements QueryWriter {
 				  `varchar255` varchar(255) NOT NULL,
 				  `text` text NOT NULL,
 				  PRIMARY KEY  (`id`)
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
+				) ENGINE=$engine DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 				";
 					break;
 				case "clear_dtyp":
 					return "drop tables dtyp";
 					break;
 				case "setup_locking":
+					$engine = RedBean_OODB::getEngine();
 					return "
 				CREATE TABLE IF NOT EXISTS `locking` (
 				  `tbl` varchar(255) NOT NULL,
@@ -659,17 +661,18 @@ class QueryWriter_MySQL implements QueryWriter {
 				  `fingerprint` varchar(255) NOT NULL,
 				  `expire` int(11) NOT NULL,
 				  UNIQUE KEY `tbl` (`tbl`,`id`)
-				) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+				) ENGINE=$engine DEFAULT CHARSET=latin1;
 				";
 					break;
 				case "setup_tables":
+					$engine = RedBean_OODB::getEngine();
 					return "
 				 CREATE TABLE IF NOT EXISTS `redbeantables` (
 				 `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
 				 `tablename` VARCHAR( 255 ) NOT NULL ,
 				 PRIMARY KEY ( `id` ),
 				 UNIQUE KEY `tablename` (`tablename`)
-				 ) ENGINE = MYISAM 
+				 ) ENGINE = $engine 
 				";
 					break;
 				case "show_tables":

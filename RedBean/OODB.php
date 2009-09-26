@@ -92,12 +92,11 @@ class RedBean_OODB {
 		 */
 		public function __destruct() {
 
+			RedBean_OODB::releaseAllLocks();
+			
 			self::$db->exec( 
 				self::$writer->getQuery("destruct", array("engine"=>self::$engine,"rollback"=>self::$rollback))
 			);
-			
-			
-			RedBean_OODB::releaseAllLocks();
 			
 		}
 
