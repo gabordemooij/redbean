@@ -52,7 +52,7 @@ class Redbean_Querylogger implements RedBean_Observer
 			file_put_contents($logger->getFilename(),"begin logging");	
 		}
 		
-		RedBean_OODB::$db->addEventListener( "sql_exec", $logger );
+		RedBean_OODB::getInstance()->getDatabase()->addEventListener( "sql_exec", $logger );
 	
 	}
 	

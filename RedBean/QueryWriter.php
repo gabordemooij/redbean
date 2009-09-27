@@ -7,7 +7,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-interface QueryWriter {
+interface RedBean_QueryWriter {
 	
 	/**
 	 * Returns the requested query if the writer has any

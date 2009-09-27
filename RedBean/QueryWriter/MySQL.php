@@ -6,7 +6,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class QueryWriter_MySQL implements QueryWriter {
+class QueryWriter_MySQL implements RedBean_QueryWriter {
 	/**
 	 * @var array all allowed sql types
 	 */
@@ -194,7 +194,7 @@ class QueryWriter_MySQL implements QueryWriter {
 		 */
 		private function getQueryRemoveExpirLock( $options ) {
 			extract( $options );
-			return "DELETE FROM locking WHERE expire < ".(time()-$locktime);
+			return "DELETE FROM locking WHERE expire <= ".(time()-$locktime);
 		}
 
 		/**
@@ -255,7 +255,7 @@ class QueryWriter_MySQL implements QueryWriter {
 		private function getQueryFind($options) {
 
 			extract($options);
-			$db = RedBean_OODB::$db;
+			$db = RedBean_OODB::getInstance()->getDatabase();
 			$findSQL = "SELECT id FROM `$tbl` WHERE ";
 
 	   
@@ -290,7 +290,7 @@ class QueryWriter_MySQL implements QueryWriter {
 		 */
 		private function getQueryList($options) {
 			extract($options);
-			$db = RedBean_OODB::$db;
+			$db = RedBean_OODB::getInstance()->getDatabase();
 			if ($extraSQL) {
 				$listSQL = "SELECT * FROM ".$db->escape($type)." ".$extraSQL;
 			}
@@ -636,7 +636,7 @@ class QueryWriter_MySQL implements QueryWriter {
 					return "START TRANSACTION";
 					break;
 				case "setup_dtyp":
-					$engine = RedBean_OODB::getEngine();
+					$engine = RedBean_OODB::getInstance()->getEngine();
 					return "
 				CREATE TABLE IF NOT EXISTS `dtyp` (
 				  `id` int(11) unsigned NOT NULL auto_increment,
@@ -653,7 +653,7 @@ class QueryWriter_MySQL implements QueryWriter {
 					return "drop tables dtyp";
 					break;
 				case "setup_locking":
-					$engine = RedBean_OODB::getEngine();
+					$engine = RedBean_OODB::getInstance()->getEngine();
 					return "
 				CREATE TABLE IF NOT EXISTS `locking` (
 				  `tbl` varchar(255) NOT NULL,
@@ -665,7 +665,7 @@ class QueryWriter_MySQL implements QueryWriter {
 				";
 					break;
 				case "setup_tables":
-					$engine = RedBean_OODB::getEngine();
+					$engine = RedBean_OODB::getInstance()->getEngine();
 					return "
 				 CREATE TABLE IF NOT EXISTS `redbeantables` (
 				 `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,

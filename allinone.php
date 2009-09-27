@@ -122,13 +122,20 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	private $num = 0;
 	
 	/**
+	 * 
+	 * @var RedBean_OODB
+	 */
+	private $provider = null;
+	
+	/**
 	 * Constructor
 	 * @param $type
 	 * @param $collection
 	 * @return RedBean_Can $instance
 	 */
-	public function __construct( $type="", $collection = array() ) {
+	public function __construct( RedBean_OODB $provider, $type="", $collection = array() ) {
 		
+		$this->provider=$provider;
 		$this->collectionIDs = $collection;
 		$this->type = $type;
 		$this->num = count( $this->collectionIDs );
@@ -171,14 +178,14 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 */
 	public function getBeans() {
 
-		$rows = RedBean_OODB::fastloader( $this->type, $this->collectionIDs );
+		$rows = $this->provider->fastloader( $this->type, $this->collectionIDs );
 		
 		$beans = array();
 		
 		if (is_array($rows)) {
 			foreach( $rows as $row ) {
 				//Use the fastloader for optimal performance (takes row as data)
-				$beans[] = $this->wrap( RedBean_OODB::getById( $this->type, $row["id"] , $row) );
+				$beans[] = $this->wrap( $this->provider->getById( $this->type, $row["id"] , $row) );
 			}
 		}
 
@@ -197,7 +204,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	public function current() {
 		if (isset($this->collectionIDs[$this->pointer])) {
 			$id = $this->collectionIDs[$this->pointer];
-			return $this->wrap( RedBean_OODB::getById( $this->type, $id ) );
+			return $this->wrap( $this->provider->getById( $this->type, $id ) );
 		}
 		else {
 			return null;
@@ -309,7 +316,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	public function offsetGet($offset) {
     	if (isset($this->collectionIDs[$offset])) {
 			$id = $this->collectionIDs[$offset];
-			return $this->wrap( RedBean_OODB::getById( $this->type, $id ) );
+			return $this->wrap( $this->provider->getById( $this->type, $id ) );
 		}
 		else {
 			return null;
@@ -521,6 +528,10 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	protected $problems = array();
 
 
+	/**
+	 * @var RedBean_OODB
+	 */
+	protected $provider = null;
 
 	/**
 	 * Constructor, loads directly from main table
@@ -528,8 +539,9 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @param $id
 	 * @return unknown_type
 	 */
-	public function __construct( $type=false, $id=0, $lock=false ) {
+	public function __construct( RedBean_OODB $provider, $type=false, $id=0, $lock=false ) {
 
+		$this->provider = $provider;
 		$id = floatval( $id );
 		if (!$type) {
 			throw new Exception("Undefined bean type");
@@ -538,12 +550,21 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$this->type = preg_replace( "[\W_]","", strtolower($type));
 			//echo $this->type;
 			if ($id > 0) { //if the id is higher than 0 load data
-				$this->data = RedBean_OODB::getById( $this->type, $id, $lock );
+				$this->data = $this->provider->getById( $this->type, $id, $lock );
 			}
 			else { //otherwise, dispense a regular empty OODBBean
-				$this->data = RedBean_OODB::dispense( $this->type );
+				$this->data = $this->provider->dispense( $this->type );
 			}
 		}
+	}
+	
+	/**
+	 * This is a service for static convenience methods that
+	 * have no object context but still need a provider.
+	 * @return unknown_type
+	 */
+	private static function getStaticProvider() {
+		return RedBean_OODB::getInstance();
 	}
 
 	/**
@@ -553,7 +574,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function free( $property ) {
 		$this->signal("deco_free", $this);
-		RedBean_OODB::dropColumn( $this->type, $property );
+		$this->provider->dropColumn( $this->type, $property );
 	}
 
 	/**
@@ -648,7 +669,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		elseif (strpos($method,"getRelated")===0)	{
 			$this->signal("deco_get", $this);
 			$prop = strtolower( substr( $method, 10 ) );
-			$beans = RedBean_OODB::getAssoc( $this->data, $prop );
+			$beans = $this->provider->getAssoc( $this->data, $prop );
 			$decos = array();
 			$dclass = RedBean_Setup_Namespace_PRFX.$prop.RedBean_Setup_Namespace_SFFX;
 
@@ -677,33 +698,33 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$this->signal("deco_add",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			RedBean_OODB::associate($this->data, $bean);
+			$this->provider->associate($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"remove")===0) {
 			$this->signal("deco_remove",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			RedBean_OODB::unassociate($this->data, $bean);
+			$this->provider->unassociate($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"attach")===0) {
 			$this->signal("deco_attach",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			RedBean_OODB::addChild($this->data, $bean);
+			$this->provider->addChild($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"clearRelated")===0) {
 			$this->signal("deco_clearrelated",$this);
 			$type = strtolower( substr( $method, 12 ) );
-			RedBean_OODB::deleteAllAssocType($type, $this->data);
+			$this->provider->deleteAllAssocType($type, $this->data);
 			return $this;
 		}
 		else if (strpos($method,"numof")===0) {
 			$this->signal("deco_numof",$this);
 			$type = strtolower( substr( $method, 5 ) );
-			return RedBean_OODB::numOfRelated($type, $this->data);
+			return $this->provider->numOfRelated($type, $this->data);
 				
 		}
 	}
@@ -715,8 +736,8 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function belongsTo( $deco ) {
 		$this->signal("deco_belongsto", $this);
-		RedBean_OODB::deleteAllAssocType($deco->getType(), $this->data);
-		RedBean_OODB::associate($this->data, $deco->getData());
+		$this->provider->deleteAllAssocType($deco->getType(), $this->data);
+		$this->provider->associate($this->data, $deco->getData());
 	}
 
 	/**
@@ -726,8 +747,8 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function exclusiveAdd( $deco ) {
 		$this->signal("deco_exclusiveadd", $this);
-		RedBean_OODB::deleteAllAssocType($this->type,$deco->getData());
-		RedBean_OODB::associate($deco->getData(), $this->data);
+		$this->provider->deleteAllAssocType($this->type,$deco->getData());
+		$this->provider->associate($deco->getData(), $this->data);
 	}
 
 	/**
@@ -736,7 +757,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function parent() {
 		$this->signal("deco_parent", $this);
-		$beans = RedBean_OODB::getParent( $this->data );
+		$beans = $this->provider->getParent( $this->data );
 		if (count($beans) > 0 ) $bean = array_pop($beans); else return null;
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		$deco = new $dclass();
@@ -750,14 +771,14 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function siblings() {
 		$this->signal("deco_siblings", $this);
-		$beans = RedBean_OODB::getParent( $this->data );
+		$beans = $this->provider->getParent( $this->data );
 		if (count($beans) > 0 ) {
 			$bean = array_pop($beans);
 		}
 		else {
 			return null;
 		}
-		$beans = RedBean_OODB::getChildren( $bean );
+		$beans = $this->provider->getChildren( $bean );
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
@@ -778,7 +799,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function children() {
 		$this->signal("deco_children", $this);
-		$beans = RedBean_OODB::getChildren( $this->data );
+		$beans = $this->provider->getChildren( $this->data );
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
@@ -851,7 +872,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function copy() {
 		$this->signal("deco_copy", $this);
-		$clone = new self( $this->type, 0 );
+		$clone = new self( $this->provider, $this->type, 0 );
 		$clone->setData( $this->getData() );
 		return $clone;
 	}
@@ -862,7 +883,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function clearAllRelations() {
 		$this->signal("deco_clearrelations", $this);
-		RedBean_OODB::deleteAllAssoc( $this->getData() );
+		$this->provider->deleteAllAssoc( $this->getData() );
 	}
 
 	/**
@@ -889,7 +910,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function save() {
 		$this->signal("deco_save", $this);
-		return RedBean_OODB::set( $this->data );
+		return $this->provider->set( $this->data );
 	}
 
 	/**
@@ -898,7 +919,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public static function delete( $deco ) {
-		RedBean_OODB::trash( $deco->getData() );
+		self::getStaticProvider()->trash( $deco->getData() );
 	}
 
 
@@ -907,7 +928,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public function lock() {
-		RedBean_OODB::openBean($this->getData());
+		$this->provider->openBean($this->getData());
 	}
 
 	/**
@@ -915,7 +936,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public function unlock() {
-		RedBean_OODB::closeBean( $this->getData());
+		$this->provider->closeBean( $this->getData());
 	}
 
 
@@ -925,7 +946,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public static function close( $deco ) {
-		RedBean_OODB::closeBean( $deco->getData() );
+		self::getStaticProvider()->closeBean( $deco->getData() );
 	}
 
 	/**
@@ -935,7 +956,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public static function make( $type="", $id ){
-		return new RedBean_Decorator( $type, $id );
+		return new RedBean_Decorator( self::getStaticProvider(), $type, $id );
 	}
 
 
@@ -1017,7 +1038,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		}
 
-		$beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
+		$beans = self::getStaticProvider()->find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
 
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$deco->type.RedBean_Setup_Namespace_SFFX;
@@ -1043,7 +1064,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function isReadOnly() {
 		try{
-			RedBean_OODB::openBean($this->data, true);
+			$this->provider->openBean($this->data, true);
 		}
 		catch(RedBean_Exception_FailedAccessBean $e){
 			return false;	
@@ -1792,13 +1813,13 @@ class RedBean_OODB {
 	 *
 	 * @var float
 	 */
-	private static $version = 0.6;
+	private $version = 0.6;
 
 	/**
 	 *
 	 * @var string
 	 */
-	private static $versioninf = "
+	private $versioninf = "
 		RedBean Object Database layer 
 		VERSION 0.6
 		BY G.J.G.T DE MOOIJ
@@ -1814,20 +1835,20 @@ class RedBean_OODB {
 	 * bean during this time interval.
 	 * @var unknown_type
 	 */
-	private static $locktime = 10;
+	private $locktime = 10;
 
 	/**
 	 * a standard adapter for use with RedBean's MYSQL Database wrapper or
 	 * ADO library
 	 * @var RedBean_DBAdapter
 	 */
-	public static $db;
+	private $db;
 
 	/**
 	 * 
 	 * @var boolean
 	 */
-	private static $locking = true;
+	private $locking = true;
 
 
 
@@ -1835,36 +1856,36 @@ class RedBean_OODB {
 		 *
 		 * @var string $pkey - a fingerprint for locking
 		 */
-		public static $pkey = false;
+		public $pkey = false;
 
 		/**
 		 * Indicates that a rollback is required
 		 * @var unknown_type
 		 */
-		private static $rollback = false;
+		private $rollback = false;
 		
 		/**
 		 * 
-		 * @var RedBean_OODB
+		 * @var $this
 		 */
-		private static $me = null;
+		private $me = null;
 
 		/**
 		 * 
 		 * Indicates the current engine
 		 * @var string
 		 */
-		private static $engine = "myisam";
+		private $engine = "myisam";
 
 		/**
 		 * @var boolean $frozen - indicates whether the db may be adjusted or not
 		 */
-		private static $frozen = false;
+		private $frozen = false;
 
 		/**
 		 * @var QueryWriter
 		 */
-		private static $writer;
+		private $writer;
 		
 		/**
 		 * Closes and unlocks the bean
@@ -1872,10 +1893,10 @@ class RedBean_OODB {
 		 */
 		public function __destruct() {
 
-			RedBean_OODB::releaseAllLocks();
+			$this->releaseAllLocks();
 			
-			self::$db->exec( 
-				self::$writer->getQuery("destruct", array("engine"=>self::$engine,"rollback"=>self::$rollback))
+			$this->db->exec( 
+				$this->writer->getQuery("destruct", array("engine"=>$this->engine,"rollback"=>$this->rollback))
 			);
 			
 		}
@@ -1884,16 +1905,16 @@ class RedBean_OODB {
 		 * Returns the version information of this RedBean instance
 		 * @return float
 		 */
-		public static function getVersionInfo() {
-			return self::$versioninf;
+		public function getVersionInfo() {
+			return $this->versioninf;
 		}
 
 		/**
 		 * Returns the version number of this RedBean instance
 		 * @return unknown_type
 		 */
-		public static function getVersionNumber() {
-			return self::$version;
+		public function getVersionNumber() {
+			return $this->version;
 		}
 
 		/**
@@ -1901,17 +1922,24 @@ class RedBean_OODB {
 		 * @param $tf
 		 * @return unknown_type
 		 */
-		public static function setLocking( $tf ) {
-			self::$locking = $tf;
+		public function setLocking( $tf ) {
+			$this->locking = $tf;
 		}
 
-
+		public function getDatabase() {
+			return $this->db;
+		}
+		
+		public function setDatabase( RedBean_DBAdapter $db ) {
+			$this->db = $db;
+		} 
+		
 		/**
 		 * Gets the current locking mode (on or off)
 		 * @return unknown_type
 		 */
-		public static function getLocking() {
-			return self::$locking;
+		public function getLocking() {
+			return $this->locking;
 		}
 	
 		
@@ -1920,8 +1948,8 @@ class RedBean_OODB {
 		 * @param $bool
 		 * @return unknown_type
 		 */
-		public static function setOptimizerActive( $bool ) {
-			self::$optimizer = (boolean) $bool;
+		public function setOptimizerActive( $bool ) {
+			$this->optimizer = (boolean) $bool;
 		}
 		
 		/**
@@ -1929,8 +1957,25 @@ class RedBean_OODB {
 		 * @param $bool
 		 * @return unknown_type
 		 */
-		public static function getOptimizerActive() {
-			return self::$optimizer;
+		public function getOptimizerActive() {
+			return $this->optimizer;
+		}
+		
+		/**
+		 * keeps the current instance
+		 * @var RedBean_OODB
+		 */
+		private static $instance = null;
+		
+		/**
+		 * Singleton
+		 * @return unknown_type
+		 */
+		public function getInstance() {
+			if (self::$instance === null) {
+				self::$instance = new RedBean_OODB;
+			}
+			return self::$instance;
 		}
 		
 		/**
@@ -1938,9 +1983,9 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return unknown_type
 		 */
-		public static function checkBean(OODBBean $bean) {
+		public function checkBean(OODBBean $bean) {
 
-			if (!self::$db) {
+			if (!$this->db) {
 				throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
 			}
 			
@@ -1998,15 +2043,15 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return unknown_type
 		 */
-		public static function checkBeanForAssoc( $bean ) {
+		public function checkBeanForAssoc( $bean ) {
 
 			//check the bean
-			self::checkBean($bean);
+			$this->checkBean($bean);
 
 			//make sure it has already been saved to the database, else we have no id.
 			if (intval($bean->id) < 1) {
 				//if it's not saved, save it
-				$bean->id = self::set( $bean );
+				$bean->id = $this->set( $bean );
 			}
 
 			return $bean;
@@ -2017,8 +2062,8 @@ class RedBean_OODB {
 		 * Returns the current engine
 		 * @return unknown_type
 		 */
-		public static function getEngine() {
-			return self::$engine;
+		public function getEngine() {
+			return $this->engine;
 		}
 
 		/**
@@ -2026,16 +2071,16 @@ class RedBean_OODB {
 		 * @param $engine
 		 * @return unknown_type
 		 */
-		public static function setEngine( $engine ) {
+		public function setEngine( $engine ) {
 
 			if ($engine=="myisam" || $engine=="innodb") {
-				self::$engine = $engine;
+				$this->engine = $engine;
 			}
 			else {
 				throw new Exception("Unsupported database engine");
 			}
 
-			return self::$engine;
+			return $this->engine;
 
 		}
 
@@ -2043,8 +2088,8 @@ class RedBean_OODB {
 		 * Will perform a rollback at the end of the script
 		 * @return unknown_type
 		 */
-		public static function rollback() {
-			self::$rollback = true;
+		public function rollback() {
+			$this->rollback = true;
 		}
 		
 		/**
@@ -2052,37 +2097,37 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return $id
 		 */
-		public static function set( OODBBean $bean ) {
+		public function set( OODBBean $bean ) {
 
-			self::checkBean($bean);
+			$this->checkBean($bean);
 
 
-			$db = self::$db; //I am lazy, I dont want to waste characters...
+			$db = $this->db; //I am lazy, I dont want to waste characters...
 
 		
 			$table = $db->escape($bean->type); //what table does it want
 
 			//may we adjust the database?
-			if (!self::$frozen) {
+			if (!$this->frozen) {
 
 				//does this table exist?
-				$tables = self::showTables();
+				$tables = $this->showTables();
 					
 				if (!in_array($table, $tables)) {
 
-					$createtableSQL = self::$writer->getQuery("create_table", array(
-						"engine"=>self::$engine,
+					$createtableSQL = $this->writer->getQuery("create_table", array(
+						"engine"=>$this->engine,
 						"table"=>$table
 					));
 				
 					//get a table for our friend!
 					$db->exec( $createtableSQL );
 					//jupz, now he has its own table!
-					self::addTable( $table );
+					$this->addTable( $table );
 				}
 
 				//does the table fit?
-				 $columnsRaw = self::$writer->getTableColumns($table, $db) ;
+				 $columnsRaw = $this->writer->getTableColumns($table, $db) ;
 					
 				$columns = array();
 				foreach($columnsRaw as $r) {
@@ -2098,18 +2143,18 @@ class RedBean_OODB {
 						$p = $db->escape($p);
 						$v = $db->escape($v);
 						//What kind of property are we dealing with?
-						$typeno = self::inferType($v);
+						$typeno = $this->inferType($v);
 						//Is this property represented in the table?
 						if (isset($columns[$p])) {
 							//yes it is, does it still fit?
-							$sqlt = self::getType($columns[$p]);
+							$sqlt = $this->getType($columns[$p]);
 							//echo "TYPE = $sqlt .... $typeno ";
 							if ($typeno > $sqlt) {
 								//no, we have to widen the database column type
-								$changecolumnSQL = self::$writer->getQuery( "widen_column", array(
+								$changecolumnSQL = $this->writer->getQuery( "widen_column", array(
 									"table" => $table,
 									"column" => $p,
-									"newtype" => self::$writer->typeno_sqltype[$typeno]
+									"newtype" => $this->writer->typeno_sqltype[$typeno]
 								) ); 
 								
 								$db->exec( $changecolumnSQL );
@@ -2117,10 +2162,10 @@ class RedBean_OODB {
 						}
 						else {
 							//no it is not
-							$addcolumnSQL = self::$writer->getQuery("add_column",array(
+							$addcolumnSQL = $this->writer->getQuery("add_column",array(
 								"table"=>$table,
 								"column"=>$p,
-								"type"=> self::$writer->typeno_sqltype[$typeno]
+								"type"=> $this->writer->typeno_sqltype[$typeno]
 							));
 							
 							$db->exec( $addcolumnSQL );
@@ -2150,10 +2195,10 @@ class RedBean_OODB {
 			//Does the record exist already?
 			if ($bean->id) {
 				//echo "<hr>Now trying to open bean....";
-				self::openBean($bean, true);
+				$this->openBean($bean, true);
 				//yes it exists, update it
 				if (count($updatevalues)>0) {
-					$updateSQL = self::$writer->getQuery("update", array(
+					$updateSQL = $this->writer->getQuery("update", array(
 						"table"=>$table,
 						"updatevalues"=>$updatevalues,
 						"id"=>$bean->id
@@ -2167,7 +2212,7 @@ class RedBean_OODB {
 				//no it does not exist, create it
 				if (count($insertvalues)>0) {
 					
-					$insertSQL = self::$writer->getQuery("insert",array(
+					$insertSQL = $this->writer->getQuery("insert",array(
 						"table"=>$table,
 						"insertcolumns"=>$insertcolumns,
 						"insertvalues"=>$insertvalues
@@ -2175,12 +2220,12 @@ class RedBean_OODB {
 				
 				}
 				else {
-					$insertSQL = self::$writer->getQuery("create", array("table"=>$table)); 
+					$insertSQL = $this->writer->getQuery("create", array("table"=>$table)); 
 				}
 				//execute the previously build query
 				$db->exec( $insertSQL );
 				$bean->id = $db->getInsertID();
-				self::openBean($bean);
+				$this->openBean($bean);
 			}
 
 			return $bean->id;
@@ -2193,27 +2238,27 @@ class RedBean_OODB {
 		 * @param $v
 		 * @return $type the SQL type number constant
 		 */
-		public static function inferType( $v ) {
+		public function inferType( $v ) {
 			
-			$db = self::$db;
+			$db = $this->db;
 			$rawv = $v;
 			
-			$checktypeSQL = self::$writer->getQuery("infertype", array(
-				"value"=> self::$db->escape(strval($v))
+			$checktypeSQL = $this->writer->getQuery("infertype", array(
+				"value"=> $this->db->escape(strval($v))
 			));
 			
 			
 			$db->exec( $checktypeSQL );
 			$id = $db->getInsertID();
 			
-			$readtypeSQL = self::$writer->getQuery("readtype",array(
+			$readtypeSQL = $this->writer->getQuery("readtype",array(
 				"id"=>$id
 			));
 			
 			$row=$db->getRow($readtypeSQL);
 			
 			
-			$db->exec( self::$writer->getQuery("reset_dtyp") );
+			$db->exec( $this->writer->getQuery("reset_dtyp") );
 			
 			$tp = 0;
 			foreach($row as $t=>$tv) {
@@ -2230,10 +2275,10 @@ class RedBean_OODB {
 		 * @param $sqlType
 		 * @return $typeno
 		 */
-		public static function getType( $sqlType ) {
+		public function getType( $sqlType ) {
 
-			if (in_array($sqlType,self::$writer->sqltype_typeno)) {
-				$typeno = self::$writer->sqltype_typeno[$sqlType];
+			if (in_array($sqlType,$this->writer->sqltype_typeno)) {
+				$typeno = $this->writer->sqltype_typeno[$sqlType];
 			}
 			else {
 				$typeno = -1;
@@ -2246,38 +2291,37 @@ class RedBean_OODB {
 		 * Initializes RedBean
 		 * @return bool $true
 		 */
-		public static function init( $querywriter, $dontclose = false ) {
+		public function init( RedBean_QueryWriter $querywriter, $dontclose = false ) {
 
-			self::$me = new RedBean_OODB();
-			self::$writer = $querywriter;
+			$this->writer = $querywriter;
 		
 
 			//prepare database
-			if (self::$engine === "innodb") {
-				self::$db->exec(self::$writer->getQuery("prepare_innodb"));
-				self::$db->exec(self::$writer->getQuery("starttransaction"));
+			if ($this->engine === "innodb") {
+				$this->db->exec($this->writer->getQuery("prepare_innodb"));
+				$this->db->exec($this->writer->getQuery("starttransaction"));
 			}
-			else if (self::$engine === "myisam"){
-				self::$db->exec(self::$writer->getQuery("prepare_myisam"));
+			else if ($this->engine === "myisam"){
+				$this->db->exec($this->writer->getQuery("prepare_myisam"));
 			}
 
 
 			//generate the basic redbean tables
 			//Create the RedBean tables we need -- this should only happen once..
-			if (!self::$frozen) {
+			if (!$this->frozen) {
 				
-				self::$db->exec(self::$writer->getQuery("clear_dtyp"));
+				$this->db->exec($this->writer->getQuery("clear_dtyp"));
 					
-				self::$db->exec(self::$writer->getQuery("setup_dtyp"));
+				$this->db->exec($this->writer->getQuery("setup_dtyp"));
 						
-				self::$db->exec(self::$writer->getQuery("setup_locking"));
+				$this->db->exec($this->writer->getQuery("setup_locking"));
 						
-				self::$db->exec(self::$writer->getQuery("setup_tables"));
+				$this->db->exec($this->writer->getQuery("setup_tables"));
 			}
 			
 			//generate a key
-			if (!self::$pkey) {
-				self::$pkey = str_replace(".","",microtime(true)."".mt_rand());
+			if (!$this->pkey) {
+				$this->pkey = str_replace(".","",microtime(true)."".mt_rand());
 			}
 
 			return true;
@@ -2287,16 +2331,16 @@ class RedBean_OODB {
 		 * Freezes the database so it won't be changed anymore
 		 * @return unknown_type
 		 */
-		public static function freeze() {
-			self::$frozen = true;
+		public function freeze() {
+			$this->frozen = true;
 		}
 
 		/**
 		 * UNFreezes the database so it won't be changed anymore
 		 * @return unknown_type
 		 */
-		public static function unfreeze() {
-			self::$frozen = false;
+		public function unfreeze() {
+			$this->frozen = false;
 		}
 
 		/**
@@ -2304,16 +2348,16 @@ class RedBean_OODB {
 		 * @param $all if set to true this function returns all tables instead of just all rb tables
 		 * @return array $listoftables
 		 */
-		public static function showTables( $all=false ) {
+		public function showTables( $all=false ) {
 
-			$db = self::$db;
+			$db = $this->db;
 
-			if ($all && self::$frozen) {
-				$alltables = $db->getCol(self::$writer->getQuery("show_tables"));
+			if ($all && $this->frozen) {
+				$alltables = $db->getCol($this->writer->getQuery("show_tables"));
 				return $alltables;
 			}
 			else {
-				$alltables = $db->getCol(self::$writer->getQuery("show_rtables"));
+				$alltables = $db->getCol($this->writer->getQuery("show_rtables"));
 				return $alltables;
 			}
 
@@ -2324,13 +2368,13 @@ class RedBean_OODB {
 		 * @param $tablename
 		 * @return void
 		 */
-		public static function addTable( $tablename ) {
+		public function addTable( $tablename ) {
 
-			$db = self::$db;
+			$db = $this->db;
 
 			$tablename = $db->escape( $tablename );
 
-			$db->exec(self::$writer->getQuery("register_table",array("table"=>$tablename)));
+			$db->exec($this->writer->getQuery("register_table",array("table"=>$tablename)));
 
 		}
 
@@ -2339,13 +2383,13 @@ class RedBean_OODB {
 		 * @param $tablename
 		 * @return void
 		 */
-		public static function dropTable( $tablename ) {
+		public function dropTable( $tablename ) {
 
-			$db = self::$db;
+			$db = $this->db;
 
 			$tablename = $db->escape( $tablename );
 
-			$db->exec(self::$writer->getQuery("unregister_table",array("table"=>$tablename)));
+			$db->exec($this->writer->getQuery("unregister_table",array("table"=>$tablename)));
 
 
 		}
@@ -2355,8 +2399,8 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public function releaseAllLocks() {
-
-			self::$db->exec(self::$writer->getQuery("release",array("key"=>self::$pkey)));
+			
+			$this->db->exec($this->writer->getQuery("release",array("key"=>$this->pkey)));
 
 		}
 
@@ -2366,18 +2410,18 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return unknown_type
 		 */
-		public static function openBean( $bean, $mustlock=false) {
+		public function openBean( $bean, $mustlock=false) {
 
-			self::checkBean( $bean );
+			$this->checkBean( $bean );
 			
 			//If locking is turned off, or the bean has no persistance yet (not shared) life is always a success!
-			if (!self::$locking || $bean->id === 0) return true;
+			if (!$this->locking || $bean->id === 0) return true;
 
-			$db = self::$db;
+			$db = $this->db;
 
 			//remove locks that have been expired...
-			$removeExpiredSQL = self::$writer->getQuery("remove_expir_lock", array(
-				"locktime"=>self::$locktime
+			$removeExpiredSQL = $this->writer->getQuery("remove_expir_lock", array(
+				"locktime"=>$this->locktime
 			));
 			
 			$db->exec($removeExpiredSQL);
@@ -2386,15 +2430,15 @@ class RedBean_OODB {
 			$id = intval( $bean->id );
 
 			//Is the bean already opened for us?
-			$checkopenSQL = self::$writer->getQuery("get_lock",array(
+			$checkopenSQL = $this->writer->getQuery("get_lock",array(
 				"id"=>$id,
 				"table"=>$tbl,
-				"key"=>self::$pkey
+				"key"=>$this->pkey
 			));
 			
 			$row = $db->getRow($checkopenSQL);
 			if ($row && is_array($row) && count($row)>0) {
-				$updateexpstamp = self::$writer->getQuery("update_expir_lock",array(
+				$updateexpstamp = $this->writer->getQuery("update_expir_lock",array(
 					"time"=>time(),
 					"id"=>$row["id"]
 				));
@@ -2409,10 +2453,10 @@ class RedBean_OODB {
 			}
 
 			//try to get acquire lock on the bean
-			$openSQL = self::$writer->getQuery("aq_lock", array(
+			$openSQL = $this->writer->getQuery("aq_lock", array(
 				"table"=>$tbl,
 				"id"=>$id,
-				"key"=>self::$pkey,
+				"key"=>$this->pkey,
 				"time"=>time()
 			));
 			
@@ -2438,16 +2482,16 @@ class RedBean_OODB {
 		 * @param $toggle
 		 * @return unknown_type
 		 */
-		private static function sync( $toggle ) {
+		private function sync( $toggle ) {
 
-			$bean = RedBean_OODB::dispense("_syncmethod");
+			$bean = $this->dispense("_syncmethod");
 			$bean->id = 0;
 
 			if ($toggle) {
-				self::openBean( $bean );
+				$this->openBean( $bean );
 			}
 			else {
-				self::closeBean( $bean );
+				$this->closeBean( $bean );
 			}
 		}
 
@@ -2457,21 +2501,21 @@ class RedBean_OODB {
 		 * @param $id
 		 * @return OODBBean $bean
 		 */
-		public static function getById($type, $id, $data=false) {
+		public function getById($type, $id, $data=false) {
 
-			$bean = self::dispense( $type );
-			$db = self::$db;
+			$bean = $this->dispense( $type );
+			$db = $this->db;
 			$table = $db->escape( $type );
 			$id = abs( intval( $id ) );
 			$bean->id = $id;
 
 			//try to open the bean
-			self::openBean($bean);
+			$this->openBean($bean);
 
 			//load the bean using sql
 			if (!$data) {
 				
-				$getSQL = self::$writer->getQuery("get_bean",array(
+				$getSQL = $this->writer->getQuery("get_bean",array(
 					"type"=>$type,
 					"id"=>$id
 				)); 
@@ -2501,20 +2545,20 @@ class RedBean_OODB {
 		 * @param $id
 		 * @return unknown_type
 		 */
-		public static function exists($type,$id) {
+		public function exists($type,$id) {
 
-			$db = self::$db;
+			$db = $this->db;
 			$id = intval( $id );
 			$type = $db->escape( $type );
 
 			//$alltables = $db->getCol("show tables");
-			$alltables = self::showTables();
+			$alltables = $this->showTables();
 
 			if (!in_array($type, $alltables)) {
 				return false;
 			}
 			else {
-				$no = $db->getCell( self::$writer->getQuery("bean_exists",array(
+				$no = $db->getCell( $this->writer->getQuery("bean_exists",array(
 					"type"=>$type,
 					"id"=>$id
 				)) );
@@ -2532,18 +2576,18 @@ class RedBean_OODB {
 		 * @param $type
 		 * @return integer $i
 		 */
-		public static function numberof($type) {
+		public function numberof($type) {
 
-			$db = self::$db;
+			$db = $this->db;
 			$type = strtolower( $db->escape( $type ) );
 
-			$alltables = self::showTables();
+			$alltables = $this->showTables();
 
 			if (!in_array($type, $alltables)) {
 				return 0;
 			}
 			else {
-				$no = $db->getCell( self::$writer->getQuery("count",array(
+				$no = $db->getCell( $this->writer->getQuery("count",array(
 					"type"=>$type
 				)));
 				return intval( $no );
@@ -2558,28 +2602,28 @@ class RedBean_OODB {
 		 * @return Array list of beans with distinct values of $field. Uses GROUP BY
 		 * @author Alan J. Hogan
 		 **/
-		static function distinct($type, $field)
+		function distinct($type, $field)
 		{
 			//TODO: Consider if GROUP BY (equivalent meaning) is more portable 
 			//across DB types?
-			$db = self::$db;
+			$db = $this->db;
 			$type = strtolower( $db->escape( $type ) );
 			$field = $db->escape( $field );
 		
-			$alltables = self::showTables();
+			$alltables = $this->showTables();
 
 			if (!in_array($type, $alltables)) {
 				return array();
 			}
 			else {
-				$ids = $db->getCol( self::$writer->getQuery("distinct",array(
+				$ids = $db->getCol( $this->writer->getQuery("distinct",array(
 					"type"=>$type,
 					"field"=>$field
 				)));
 				$beans = array();
 				if (is_array($ids) && count($ids)>0) {
 					foreach( $ids as $id ) {
-						$beans[ $id ] = self::getById( $type, $id , false);
+						$beans[ $id ] = $this->getById( $type, $id , false);
 					}
 				}
 				return $beans;
@@ -2592,20 +2636,20 @@ class RedBean_OODB {
 		 * @param $field
 		 * @return integer $i
 		 */
-		private static function stat($type,$field,$stat="sum") {
+		private function stat($type,$field,$stat="sum") {
 
-			$db = self::$db;
+			$db = $this->db;
 			$type = strtolower( $db->escape( $type ) );
 			$field = strtolower( $db->escape( $field ) );
 			$stat = $db->escape( $stat );
 
-			$alltables = self::showTables();
+			$alltables = $this->showTables();
 
 			if (!in_array($type, $alltables)) {
 				return 0;
 			}
 			else {
-				$no = $db->getCell(self::$writer->getQuery("stat",array(
+				$no = $db->getCell($this->writer->getQuery("stat",array(
 					"stat"=>$stat,
 					"field"=>$field,
 					"type"=>$type
@@ -2620,8 +2664,8 @@ class RedBean_OODB {
 		 * @param $field
 		 * @return float $i
 		 */
-		public static function sumof($type,$field) {
-			return self::stat( $type, $field, "sum");
+		public function sumof($type,$field) {
+			return $this->stat( $type, $field, "sum");
 		}
 
 		/**
@@ -2630,8 +2674,8 @@ class RedBean_OODB {
 		 * @param $field
 		 * @return float $i
 		 */
-		public static function avgof($type,$field) {
-			return self::stat( $type, $field, "avg");
+		public function avgof($type,$field) {
+			return $this->stat( $type, $field, "avg");
 		}
 
 		/**
@@ -2640,8 +2684,8 @@ class RedBean_OODB {
 		 * @param $field
 		 * @return float $i
 		 */
-		public static function minof($type,$field) {
-			return self::stat( $type, $field, "min");
+		public function minof($type,$field) {
+			return $this->stat( $type, $field, "min");
 		}
 
 		/**
@@ -2650,8 +2694,8 @@ class RedBean_OODB {
 		 * @param $field
 		 * @return float $i
 		 */
-		public static function maxof($type,$field) {
-			return self::stat( $type, $field, "max");
+		public function maxof($type,$field) {
+			return $this->stat( $type, $field, "max");
 		}
 
 
@@ -2659,9 +2703,9 @@ class RedBean_OODB {
 		 * Unlocks everything
 		 * @return unknown_type
 		 */
-		public static function resetAll() {
-			$sql = self::$writer->getQuery("releaseall");
-			self::$db->exec( $sql );
+		public function resetAll() {
+			$sql = $this->writer->getQuery("releaseall");
+			$this->db->exec( $sql );
 			return true;
 		}
 
@@ -2671,9 +2715,9 @@ class RedBean_OODB {
 		 * @param $slots
 		 * @return unknown_type
 		 */
-		public static function processQuerySlots($sql, $slots) {
+		public function processQuerySlots($sql, $slots) {
 			
-			$db = self::$db;
+			$db = $this->db;
 			
 			//Just a funny code to identify slots based on randomness
 			$code = sha1(rand(1,1000)*time());
@@ -2685,7 +2729,7 @@ class RedBean_OODB {
 			
 			//replace the slots inside the SQL template
 			foreach( $slots as $key=>$value ) {
-				$sql = str_replace( "{".$code.$key."}", self::$writer->getQuote().$db->escape( $value ).self::$writer->getQuote(),$sql ); 
+				$sql = str_replace( "{".$code.$key."}", $this->writer->getQuote().$db->escape( $value ).$this->writer->getQuote(),$sql ); 
 			}
 			
 			return $sql;
@@ -2697,12 +2741,12 @@ class RedBean_OODB {
 		 * @param $ids
 		 * @return unknown_type
 		 */
-		public static function fastLoader( $type, $ids ) {
+		public function fastLoader( $type, $ids ) {
 			
-			$db = self::$db;
+			$db = $this->db;
 			
 			
-			$sql = self::$writer->getQuery("fastload", array(
+			$sql = $this->writer->getQuery("fastload", array(
 				"type"=>$type,
 				"ids"=>$ids
 			)); 
@@ -2720,28 +2764,28 @@ class RedBean_OODB {
 		 * @param $max
 		 * @return array $beans
 		 */
-		public static function getBySQL( $rawsql, $slots, $table, $max=0 ) {
+		public function getBySQL( $rawsql, $slots, $table, $max=0 ) {
 		
-			$db = self::$db;
+			$db = $this->db;
 			$sql = $rawsql;
 			
 			if (is_array($slots)) {
-				$sql = self::processQuerySlots( $sql, $slots );
+				$sql = $this->processQuerySlots( $sql, $slots );
 			}
 			
 			$sql = str_replace('@ifexists:','', $sql);
-			$rs = $db->getCol( self::$writer->getQuery("where",array(
+			$rs = $db->getCol( $this->writer->getQuery("where",array(
 				"table"=>$table
 			)) . $sql );
 			
 			$err = $db->getErrorMsg();
-			if (!self::$frozen && strpos($err,"Unknown column")!==false && $max<10) {
+			if (!$this->frozen && strpos($err,"Unknown column")!==false && $max<10) {
 				$matches = array();
 				if (preg_match("/Unknown\scolumn\s'(.*?)'/",$err,$matches)) {
 					if (count($matches)==2 && strpos($rawsql,'@ifexists')!==false){
 						$rawsql = str_replace('@ifexists:`'.$matches[1].'`','NULL', $rawsql);
 						$rawsql = str_replace('@ifexists:'.$matches[1].'','NULL', $rawsql);
-						return self::getBySQL( $rawsql, $slots, $table, ++$max);
+						return $this->getBySQL( $rawsql, $slots, $table, ++$max);
 					}
 				}
 				return array();
@@ -2766,13 +2810,13 @@ class RedBean_OODB {
      * @param $orderby
      * @return unknown_type
      */
-    public static function find(OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
+    public function find(OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
  
-      self::checkBean( $bean );
-      $db = self::$db;
+      $this->checkBean( $bean );
+      $db = $this->db;
       $tbl = $db->escape( $bean->type );
  
-      $findSQL = self::$writer->getQuery("find",array(
+      $findSQL = $this->writer->getQuery("find",array(
       	"searchoperators"=>$searchoperators,
       	"bean"=>$bean,
       	"start"=>$start,
@@ -2787,7 +2831,7 @@ class RedBean_OODB {
  
       if (is_array($ids) && count($ids)>0) {
           foreach( $ids as $id ) {
-            $beans[ $id ] = self::getById( $bean->type, $id , false);
+            $beans[ $id ] = $this->getById( $bean->type, $id , false);
         }
       }
       
@@ -2804,11 +2848,11 @@ class RedBean_OODB {
 		 * @param $orderby
 		 * @return unknown_type
 		 */
-		public static function listAll($type, $start=false, $end=false, $orderby="id ASC", $extraSQL = false) {
+		public function listAll($type, $start=false, $end=false, $orderby="id ASC", $extraSQL = false) {
  
-			$db = self::$db;
+			$db = $this->db;
  
-			$listSQL = self::$writer->getQuery("list",array(
+			$listSQL = $this->writer->getQuery("list",array(
 				"type"=>$type,
 				"start"=>$start,
 				"end"=>$end,
@@ -2828,17 +2872,17 @@ class RedBean_OODB {
 		 * @param $bean2
 		 * @return unknown_type
 		 */
-		public static function associate( OODBBean $bean1, OODBBean $bean2 ) { //@associate
+		public function associate( OODBBean $bean1, OODBBean $bean2 ) { //@associate
 
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 
 			//first we check the beans whether they are valid
-			$bean1 = self::checkBeanForAssoc($bean1);
-			$bean2 = self::checkBeanForAssoc($bean2);
+			$bean1 = $this->checkBeanForAssoc($bean1);
+			$bean2 = $this->checkBeanForAssoc($bean2);
 
-			self::openBean( $bean1, true );
-			self::openBean( $bean2, true );
+			$this->openBean( $bean1, true );
+			$this->openBean( $bean2, true );
 
 			//sort the beans
 			$tp1 = $bean1->type;
@@ -2865,8 +2909,8 @@ class RedBean_OODB {
 			$assoctable = $db->escape( implode("_",$tables) );
 
 			//check whether this assoctable already exists
-			if (!self::$frozen) {
-				$alltables = self::showTables();
+			if (!$this->frozen) {
+				$alltables = $this->showTables();
 				if (!in_array($assoctable, $alltables)) {
 					//no assoc table does not exist, create it..
 					$t1 = $tables[0];
@@ -2876,28 +2920,28 @@ class RedBean_OODB {
 						$t2.="2";
 					}
 
-					$assoccreateSQL = self::$writer->getQuery("create_assoc",array(
+					$assoccreateSQL = $this->writer->getQuery("create_assoc",array(
 						"assoctable"=> $assoctable,
 						"t1" =>$t1,
 						"t2" =>$t2,
-						"engine"=>self::$engine
+						"engine"=>$this->engine
 					));
 					
 					$db->exec( $assoccreateSQL );
 					
 					//add a unique constraint
-					$db->exec( self::$writer->getQuery("add_assoc",array(
+					$db->exec( $this->writer->getQuery("add_assoc",array(
 						"assoctable"=> $assoctable,
 						"t1" =>$t1,
 						"t2" =>$t2
 					)) );
 					
-					self::addTable( $assoctable );
+					$this->addTable( $assoctable );
 				}
 			}
 				
 			//now insert the association record
-			$assocSQL = self::$writer->getQuery("add_assoc_now", array(
+			$assocSQL = $this->writer->getQuery("add_assoc_now", array(
 				"id1"=>$id1,
 				"id2"=>$id2,
 				"assoctable"=>$assoctable
@@ -2914,18 +2958,18 @@ class RedBean_OODB {
 		 * @param $bean2
 		 * @return unknown_type
 		 */
-		public static function unassociate(OODBBean $bean1, OODBBean $bean2) {
+		public function unassociate(OODBBean $bean1, OODBBean $bean2) {
 
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 
 			//first we check the beans whether they are valid
-			$bean1 = self::checkBeanForAssoc($bean1);
-			$bean2 = self::checkBeanForAssoc($bean2);
+			$bean1 = $this->checkBeanForAssoc($bean1);
+			$bean2 = $this->checkBeanForAssoc($bean2);
 
 
-			self::openBean( $bean1, true );
-			self::openBean( $bean2, true );
+			$this->openBean( $bean1, true );
+			$this->openBean( $bean2, true );
 
 
 			$idx1 = intval($bean1->id);
@@ -2960,14 +3004,14 @@ class RedBean_OODB {
 			$assoctable = $db->escape( implode("_",$tables) );
 				
 			//check whether this assoctable already exists
-			$alltables = self::showTables();
+			$alltables = $this->showTables();
 				
 			if (in_array($assoctable, $alltables)) {
 				$t1 = $tables[0];
 				$t2 = $tables[1];
 				if ($t1==$t2) {
 					$t2.="2";
-					$unassocSQL = self::$writer->getQuery("unassoc",array(
+					$unassocSQL = $this->writer->getQuery("unassoc",array(
 					"assoctable"=>$assoctable,
 					"t1"=>$t2,
 					"t2"=>$t1,
@@ -2980,7 +3024,7 @@ class RedBean_OODB {
 
 				//$unassocSQL = "DELETE FROM `$assoctable` WHERE ".$t1."_id = $id1 AND ".$t2."_id = $id2 ";
 
-				$unassocSQL = self::$writer->getQuery("unassoc",array(
+				$unassocSQL = $this->writer->getQuery("unassoc",array(
 					"assoctable"=>$assoctable,
 					"t1"=>$t1,
 					"t2"=>$t2,
@@ -2994,12 +3038,12 @@ class RedBean_OODB {
 				$assoctable2 = "pc_".$db->escape( $bean1->type )."_".$db->escape( $bean1->type );
 				//echo $assoctable2;
 				//check whether this assoctable already exists
-				$alltables = self::showTables();
+				$alltables = $this->showTables();
 				if (in_array($assoctable2, $alltables)) {
 
 					//$id1 = intval($bean1->id);
 					//$id2 = intval($bean2->id);
-					$unassocSQL = self::$writer->getQuery("untree", array(
+					$unassocSQL = $this->writer->getQuery("untree", array(
 						"assoctable2"=>$assoctable2,
 						"idx1"=>$idx1,
 						"idx2"=>$idx2
@@ -3016,11 +3060,11 @@ class RedBean_OODB {
 		 * @param $targettype
 		 * @return array $beans
 		 */
-		public static function getAssoc(OODBBean $bean, $targettype) {
+		public function getAssoc(OODBBean $bean, $targettype) {
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 			//first we check the beans whether they are valid
-			$bean = self::checkBeanForAssoc($bean);
+			$bean = $this->checkBeanForAssoc($bean);
 
 			$id = intval($bean->id);
 
@@ -3038,7 +3082,7 @@ class RedBean_OODB {
 			$assoctable = $db->escape( implode("_",$tables) );
 
 			//check whether this assoctable exists
-			$alltables = self::showTables();
+			$alltables = $this->showTables();
 				
 			if (!in_array($assoctable, $alltables)) {
 				return array(); //nope, so no associations...!
@@ -3048,7 +3092,7 @@ class RedBean_OODB {
 					$t2.="2";
 				}
 				
-				$getassocSQL = self::$writer->getQuery("get_assoc",array(
+				$getassocSQL = $this->writer->getQuery("get_assoc",array(
 					"t1"=>$t1,
 					"t2"=>$t2,
 					"assoctable"=>$assoctable,
@@ -3060,7 +3104,7 @@ class RedBean_OODB {
 				$beans = array();
 				if ($rows && is_array($rows) && count($rows)>0) {
 					foreach($rows as $i) {
-						$beans[$i] = self::getById( $targettype, $i, false);
+						$beans[$i] = $this->getById( $targettype, $i, false);
 					}
 				}
 				return $beans;
@@ -3075,15 +3119,15 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return unknown_type
 		 */
-		public static function trash( OODBBean $bean ) {
+		public function trash( OODBBean $bean ) {
 
-			self::checkBean( $bean );
+			$this->checkBean( $bean );
 			if (intval($bean->id)===0) return;
-			self::deleteAllAssoc( $bean );
-			self::openBean($bean);
-			$table = self::$db->escape($bean->type);
+			$this->deleteAllAssoc( $bean );
+			$this->openBean($bean);
+			$table = $this->db->escape($bean->type);
 			$id = intval($bean->id);
-			self::$db->exec( self::$writer->getQuery("trash",array(
+			$this->db->exec( $this->writer->getQuery("trash",array(
 				"table"=>$table,
 				"id"=>$id
 			)) );
@@ -3095,18 +3139,18 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return unknown_type
 		 */
-		public static function deleteAllAssoc( $bean ) {
+		public function deleteAllAssoc( $bean ) {
 
-			$db = self::$db;
-			$bean = self::checkBeanForAssoc($bean);
+			$db = $this->db;
+			$bean = $this->checkBeanForAssoc($bean);
 
-			self::openBean( $bean, true );
+			$this->openBean( $bean, true );
 
 
 			$id = intval( $bean->id );
 
 			//get all tables
-			$alltables = self::showTables();
+			$alltables = $this->showTables();
 
 			//are there any possible associations?
 			$t = $db->escape($bean->type);
@@ -3121,15 +3165,15 @@ class RedBean_OODB {
 			foreach($checktables as $table) {
 				if (strpos($table,"pc_")===0){
 				
-					$db->exec( self::$writer->getQuery("deltree",array(
+					$db->exec( $this->writer->getQuery("deltree",array(
 						"id"=>$id,
 						"table"=>$table
 					)) );
 				}
 				else {
 					
-					$db->exec( self::$writer->getQuery("unassoc_all_t1",array("table"=>$table,"t"=>$t,"id"=>$id)) );
-					$db->exec( self::$writer->getQuery("unassoc_all_t2",array("table"=>$table,"t"=>$t,"id"=>$id)) );
+					$db->exec( $this->writer->getQuery("unassoc_all_t1",array("table"=>$table,"t"=>$t,"id"=>$id)) );
+					$db->exec( $this->writer->getQuery("unassoc_all_t2",array("table"=>$table,"t"=>$t,"id"=>$id)) );
 				}
 					
 					
@@ -3142,11 +3186,11 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return unknown_type
 		 */
-		public static function deleteAllAssocType( $targettype, $bean ) {
+		public function deleteAllAssocType( $targettype, $bean ) {
 
-			$db = self::$db;
-			$bean = self::checkBeanForAssoc($bean);
-			self::openBean( $bean, true );
+			$db = $this->db;
+			$bean = $this->checkBeanForAssoc($bean);
+			$this->openBean( $bean, true );
 
 			$id = intval( $bean->id );
 
@@ -3162,22 +3206,22 @@ class RedBean_OODB {
 			sort($tables);
 			$assoctable = $db->escape( implode("_",$tables) );
 			
-			$availabletables = self::showTables();
+			$availabletables = $this->showTables();
 			
 			
 			if (in_array('pc_'.$assoctable,$availabletables)){
-				$db->exec( self::$writer->getQuery("deltreetype",array(
+				$db->exec( $this->writer->getQuery("deltreetype",array(
 					"assoctable"=>'pc_'.$assoctable,
 					"id"=>$id
 				)) );
 			}
 			if (in_array($assoctable,$availabletables)) {
-				$db->exec( self::$writer->getQuery("unassoctype1",array(
+				$db->exec( $this->writer->getQuery("unassoctype1",array(
 					"assoctable"=>$assoctable,
 					"t1"=>$t1,
 					"id"=>$id
 				)) );
-				$db->exec( self::$writer->getQuery("unassoctype2",array(
+				$db->exec( $this->writer->getQuery("unassoctype2",array(
 					"assoctable"=>$assoctable,
 					"t1"=>$t1,
 					"id"=>$id
@@ -3194,7 +3238,7 @@ class RedBean_OODB {
 		 * @param $type
 		 * @return OODBBean $bean
 		 */
-		public static function dispense( $type="StandardBean" ) {
+		public function dispense( $type="StandardBean" ) {
 
 			$oBean = new OODBBean();
 			$oBean->type = $type;
@@ -3209,17 +3253,17 @@ class RedBean_OODB {
 		 * @param $child
 		 * @return unknown_type
 		 */
-		public static function addChild( OODBBean $parent, OODBBean $child ) {
+		public function addChild( OODBBean $parent, OODBBean $child ) {
 
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 
 			//first we check the beans whether they are valid
-			$parent = self::checkBeanForAssoc($parent);
-			$child = self::checkBeanForAssoc($child);
+			$parent = $this->checkBeanForAssoc($parent);
+			$child = $this->checkBeanForAssoc($child);
 
-			self::openBean( $parent, true );
-			self::openBean( $child, true );
+			$this->openBean( $parent, true );
+			$this->openBean( $child, true );
 
 
 			//are parent and child of the same type?
@@ -3234,25 +3278,25 @@ class RedBean_OODB {
 			$assoctable = "pc_".$db->escape($parent->type."_".$parent->type);
 
 			//check whether this assoctable already exists
-			if (!self::$frozen) {
-				$alltables = self::showTables();
+			if (!$this->frozen) {
+				$alltables = $this->showTables();
 				if (!in_array($assoctable, $alltables)) {
 					//no assoc table does not exist, create it..
-					$assoccreateSQL = self::$writer->getQuery("create_tree",array(
-						"engine"=>self::$engine,
+					$assoccreateSQL = $this->writer->getQuery("create_tree",array(
+						"engine"=>$this->engine,
 						"assoctable"=>$assoctable
 					));
 					$db->exec( $assoccreateSQL );
 					//add a unique constraint
-					$db->exec( self::$writer->getQuery("unique", array(
+					$db->exec( $this->writer->getQuery("unique", array(
 						"assoctable"=>$assoctable
 					)) );
-					self::addTable( $assoctable );
+					$this->addTable( $assoctable );
 				}
 			}
 
 			//now insert the association record
-			$assocSQL = self::$writer->getQuery("add_child",array(
+			$assocSQL = $this->writer->getQuery("add_child",array(
 				"assoctable"=>$assoctable,
 				"pid"=>$pid,
 				"cid"=>$cid
@@ -3266,13 +3310,13 @@ class RedBean_OODB {
 		 * @param $parent
 		 * @return array $beans
 		 */
-		public static function getChildren( OODBBean $parent ) {
+		public function getChildren( OODBBean $parent ) {
 
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 
 			//first we check the beans whether they are valid
-			$parent = self::checkBeanForAssoc($parent);
+			$parent = $this->checkBeanForAssoc($parent);
 
 			$pid = intval($parent->id);
 
@@ -3280,13 +3324,13 @@ class RedBean_OODB {
 			$assoctable = "pc_".$db->escape( $parent->type . "_" . $parent->type );
 
 			//check whether this assoctable exists
-			$alltables = self::showTables();
+			$alltables = $this->showTables();
 			if (!in_array($assoctable, $alltables)) {
 				return array(); //nope, so no children...!
 			}
 			else {
 				$targettype = $parent->type;
-				$getassocSQL = self::$writer->getQuery("get_children", array(
+				$getassocSQL = $this->writer->getQuery("get_children", array(
 					"assoctable"=>$assoctable,
 					"pid"=>$pid
 				));
@@ -3294,7 +3338,7 @@ class RedBean_OODB {
 				$beans = array();
 				if ($rows && is_array($rows) && count($rows)>0) {
 					foreach($rows as $i) {
-						$beans[$i] = self::getById( $targettype, $i, false);
+						$beans[$i] = $this->getById( $targettype, $i, false);
 					}
 				}
 				return $beans;
@@ -3307,28 +3351,28 @@ class RedBean_OODB {
 		 * @param $child
 		 * @return OODBBean $parent
 		 */
-		public static function getParent( OODBBean $child ) {
+		public function getParent( OODBBean $child ) {
 
 				
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 
 			//first we check the beans whether they are valid
-			$child = self::checkBeanForAssoc($child);
+			$child = $this->checkBeanForAssoc($child);
 
 			$cid = intval($child->id);
 
 			//infer the association table
 			$assoctable = "pc_".$db->escape( $child->type . "_" . $child->type );
 			//check whether this assoctable exists
-			$alltables = self::showTables();
+			$alltables = $this->showTables();
 			if (!in_array($assoctable, $alltables)) {
 				return array(); //nope, so no children...!
 			}
 			else {
 				$targettype = $child->type;
 				
-				$getassocSQL = self::$writer->getQuery("get_parent", array(
+				$getassocSQL = $this->writer->getQuery("get_parent", array(
 					"assoctable"=>$assoctable,
 					"cid"=>$cid
 				));
@@ -3337,7 +3381,7 @@ class RedBean_OODB {
 				$beans = array();
 				if ($rows && is_array($rows) && count($rows)>0) {
 					foreach($rows as $i) {
-						$beans[$i] = self::getById( $targettype, $i, false);
+						$beans[$i] = $this->getById( $targettype, $i, false);
 					}
 				}
 					
@@ -3352,17 +3396,17 @@ class RedBean_OODB {
 		 * @param $child
 		 * @return unknown_type
 		 */
-		public static function removeChild(OODBBean $parent, OODBBean $child) {
+		public function removeChild(OODBBean $parent, OODBBean $child) {
 
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 
 			//first we check the beans whether they are valid
-			$parent = self::checkBeanForAssoc($parent);
-			$child = self::checkBeanForAssoc($child);
+			$parent = $this->checkBeanForAssoc($parent);
+			$child = $this->checkBeanForAssoc($child);
 
-			self::openBean( $parent, true );
-			self::openBean( $child, true );
+			$this->openBean( $parent, true );
+			$this->openBean( $child, true );
 
 
 			//are parent and child of the same type?
@@ -3374,14 +3418,14 @@ class RedBean_OODB {
 			$assoctable = "pc_".$db->escape( $parent->type . "_" . $parent->type );
 
 			//check whether this assoctable already exists
-			$alltables = self::showTables();
+			$alltables = $this->showTables();
 			if (!in_array($assoctable, $alltables)) {
 				return true; //no association? then nothing to do!
 			}
 			else {
 				$pid = intval($parent->id);
 				$cid = intval($child->id);
-				$unassocSQL = self::$writer->getQuery("remove_child", array(
+				$unassocSQL = $this->writer->getQuery("remove_child", array(
 					"assoctable"=>$assoctable,
 					"pid"=>$pid,
 					"cid"=>$cid
@@ -3396,15 +3440,15 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return integer $numberOfRelations
 		 */
-		public static function numofRelated( $type, OODBBean $bean ) {
+		public function numofRelated( $type, OODBBean $bean ) {
 			
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 			
 			$t2 = strtolower( $db->escape( $type ) );
 						
 			//is this bean valid?
-			self::checkBean( $bean );
+			$this->checkBean( $bean );
 			$t1 = strtolower( $bean->type  );
 			$tref = strtolower( $db->escape( $bean->type ) );
 			$id = intval( $bean->id );
@@ -3419,11 +3463,11 @@ class RedBean_OODB {
 			$assoctable = $db->escape( implode("_",$tables) );
 			
 			//get all tables
-			$tables = self::showTables();
+			$tables = $this->showTables();
 			
 			if ($tables && is_array($tables) && count($tables) > 0) {
 				if (in_array( $t1, $tables ) && in_array($t2, $tables)){
-					$sqlCountRelations = self::$writer->getQuery(
+					$sqlCountRelations = $this->writer->getQuery(
 						"num_related", array(
 							"assoctable"=>$assoctable,
 							"t1"=>$t1,
@@ -3451,7 +3495,7 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		
-		public static function gen( $classes, $prefix = false, $suffix = false ) {
+		public function gen( $classes, $prefix = false, $suffix = false ) {
 			
 			if (!$prefix) {
 				$prefix = RedBean_Setup_Namespace_PRFX;
@@ -3479,15 +3523,16 @@ class RedBean_OODB {
 							private static \$__static_property_type = \"".strtolower($tablename)."\";
 							
 							public function __construct(\$id=0, \$lock=false) {
-								parent::__construct('".strtolower($tablename)."',\$id,\$lock);
+								
+								parent::__construct( RedBean_OODB::getInstance(), '".strtolower($tablename)."',\$id,\$lock);
 							}
 							
 							public static function where( \$sql, \$slots=array() ) {
-								return new RedBean_Can( self::\$__static_property_type, RedBean_OODB::getBySQL( \$sql, \$slots, self::\$__static_property_type) );
+								return new RedBean_Can( RedBean_OODB::getInstance(), self::\$__static_property_type, RedBean_OODB::getInstance()->getBySQL( \$sql, \$slots, self::\$__static_property_type) );
 							}
 	
 							public static function listAll(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
-								return RedBean_OODB::listAll(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
+								return RedBean_OODB::getInstance()->listAll(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
 							}
 							
 						}";
@@ -3519,10 +3564,10 @@ class RedBean_OODB {
 		 * @param $timeInSecs
 		 * @return unknown_type
 		 */
-		public static function setLockingTime( $timeInSecs ) {
+		public function setLockingTime( $timeInSecs ) {
 
 			if (is_int($timeInSecs) && $timeInSecs >= 0) {
-				self::$locktime = $timeInSecs;
+				$this->locktime = $timeInSecs;
 			}
 			else {
 				throw new RedBean_Exception_InvalidArgument( "time must be integer >= 0" );
@@ -3536,28 +3581,28 @@ class RedBean_OODB {
 		 * tables that are not managed by redbean.
 		 * @return unknown_type
 		 */
-		public static function clean() {
+		public function clean() {
 
-			if (self::$frozen) {
+			if ($this->frozen) {
 				return false;
 			}
 
-			$db = self::$db;
+			$db = $this->db;
 
-			$tables = $db->getCol( self::$writer->getQuery("show_rtables") );
+			$tables = $db->getCol( $this->writer->getQuery("show_rtables") );
 
 			foreach($tables as $key=>$table) {
-				$tables[$key] = self::$writer->getEscape().$table.self::$writer->getEscape();
+				$tables[$key] = $this->writer->getEscape().$table.$this->writer->getEscape();
 			}
 
-			$sqlcleandatabase = self::$writer->getQuery("drop_tables",array(
+			$sqlcleandatabase = $this->writer->getQuery("drop_tables",array(
 				"tables"=>$tables
 			));
 
 			$db->exec( $sqlcleandatabase );
 
-			$db->exec( self::$writer->getQuery("truncate_rtables") );
-			self::resetAll();
+			$db->exec( $this->writer->getQuery("truncate_rtables") );
+			$this->resetAll();
 			return true;
 
 		}
@@ -3568,18 +3613,18 @@ class RedBean_OODB {
 		 * no classes
 		 * @return unknown_type
 		 */
-		public static function removeUnused( ) {
+		public function removeUnused( ) {
 
 			//oops, we are frozen, so no change..
-			if (self::$frozen) {
+			if ($this->frozen) {
 				return false;
 			}
 
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 
 			//get all tables
-			$tables = self::showTables();
+			$tables = $this->showTables();
 			foreach($tables as $table) {
 				if (strpos($table,"_")!==false) {
 					//associative table
@@ -3588,16 +3633,16 @@ class RedBean_OODB {
 					$classname1 = RedBean_Setup_Namespace_PRFX . $tables[0] . RedBean_Setup_Namespace_SFFX;
 					$classname2 = RedBean_Setup_Namespace_PRFX . $tables[1] . RedBean_Setup_Namespace_SFFX;
 					if(!class_exists( $classname1 , true) || !class_exists( $classname2 , true)) {
-						$db->exec( self::$writer->getQuery("drop_tables",array("tables"=>array($table))) );
-						$db->exec(self::$writer->getQuery("unregister_table",array("table"=>$table)));
+						$db->exec( $this->writer->getQuery("drop_tables",array("tables"=>array($table))) );
+						$db->exec($this->writer->getQuery("unregister_table",array("table"=>$table)));
 					}
 				}
 				else {
 					//does the class exist?
 					$classname = RedBean_Setup_Namespace_PRFX . $table . RedBean_Setup_Namespace_SFFX;
 					if(!class_exists( $classname , true)) {
-						$db->exec( self::$writer->getQuery("drop_tables",array("tables"=>array($table))) );
-						$db->exec(self::$writer->getQuery("unregister_table",array("table"=>$table)));
+						$db->exec( $this->writer->getQuery("drop_tables",array("tables"=>array($table))) );
+						$db->exec($this->writer->getQuery("unregister_table",array("table"=>$table)));
 					}
 				} 
 				
@@ -3610,17 +3655,17 @@ class RedBean_OODB {
 		 * @param $property
 		 * @return unknown_type
 		 */
-		public static function dropColumn( $table, $property ) {
+		public function dropColumn( $table, $property ) {
 			
 			//oops, we are frozen, so no change..
-			if (self::$frozen) {
+			if ($this->frozen) {
 				return false;
 			}
 
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 			
-			$db->exec( self::$writer->getQuery("drop_column", array(
+			$db->exec( $this->writer->getQuery("drop_column", array(
 				"table"=>$table,
 				"property"=>$property
 			)) );
@@ -3632,30 +3677,30 @@ class RedBean_OODB {
 	     * @param $type
 	     * @return nothing
 	     */
-	    public static function trashAll($type) {
-	        self::$db->exec( self::$writer->getQuery("drop_type",array("type"=>strtolower($type))));
+	    public function trashAll($type) {
+	        $this->db->exec( $this->writer->getQuery("drop_type",array("type"=>strtolower($type))));
 	    }
 
 	    /**
 		 * Narrows columns to appropriate size if needed
 		 * @return unknown_type
 		 */
-		public static function keepInShape( $gc = false ,$stdTable=false, $stdCol=false) {
+		public function keepInShape( $gc = false ,$stdTable=false, $stdCol=false) {
 			
 			//oops, we are frozen, so no change..
-			if (self::$frozen) {
+			if ($this->frozen) {
 				return false;
 			}
 
 			//get a database
-			$db = self::$db;
+			$db = $this->db;
 
 			//get all tables
-			$tables = self::showTables();
+			$tables = $this->showTables();
 			
 				//pick a random table
 				if ($tables && is_array($tables) && count($tables) > 0) {
-					if ($gc) self::removeUnused( $tables );
+					if ($gc) $this->removeUnused( $tables );
 					$table = $tables[array_rand( $tables, 1 )];
 				}
 				else {
@@ -3668,9 +3713,9 @@ class RedBean_OODB {
 			if (strpos($table,'_')!==false) return;
 			//table is still in use? But are all columns in use as well?
 			
-			$cols = self::$writer->getTableColumns( $table, $db );
+			$cols = $this->writer->getTableColumns( $table, $db );
 			
-			//$cols = $db->get( self::$writer->getQuery("describe",array(
+			//$cols = $db->get( $this->writer->getQuery("describe",array(
 			//	"table"=>$table
 			//)) );
 			//pick a random column
@@ -3698,52 +3743,53 @@ class RedBean_OODB {
 			
 			
 			//now we have a table and a column $table and $col
-			if ($gc && !intval($db->getCell( self::$writer->getQuery("get_null",array(
+			if ($gc && !intval($db->getCell( $this->writer->getQuery("get_null",array(
 				"table"=>$table,
 				"col"=>$col
 			)
 			)))) {
-				$db->exec( self::$writer->getQuery("drop_column",array("table"=>$table,"property"=>$col)));
+				$db->exec( $this->writer->getQuery("drop_column",array("table"=>$table,"property"=>$col)));
 				return;	
 			}
 			
 			//okay so this column is still in use, but maybe its to wide
 			//get the field type
 			//print_r($colr);
-			$currenttype =  self::$writer->sqltype_typeno[$colr["Type"]];
+			$currenttype =  $this->writer->sqltype_typeno[$colr["Type"]];
 			if ($currenttype > 0) {
 				$trytype = rand(0,$currenttype - 1); //try a little smaller
 				//add a test column
-				$db->exec(self::$writer->getQuery("test_column",array(
-					"type"=>self::$writer->typeno_sqltype[$trytype],
+				$db->exec($this->writer->getQuery("test_column",array(
+					"type"=>$this->writer->typeno_sqltype[$trytype],
 					"table"=>$table
 				)
 				));
 				//fill the tinier column with the same values of the original column
-				$db->exec(self::$writer->getQuery("update_test",array(
+				$db->exec($this->writer->getQuery("update_test",array(
 					"table"=>$table,
 					"col"=>$col
 				)));
 				//measure the difference
-				$delta = $db->getCell(self::$writer->getQuery("measure",array(
+				$delta = $db->getCell($this->writer->getQuery("measure",array(
 					"table"=>$table,
 					"col"=>$col
 				)));
 				if (intval($delta)===0) {
 					//no difference? then change the column to save some space
-					$sql = self::$writer->getQuery("remove_test",array(
+					$sql = $this->writer->getQuery("remove_test",array(
 						"table"=>$table,
 						"col"=>$col,
-						"type"=>self::$writer->typeno_sqltype[$trytype]
+						"type"=>$this->writer->typeno_sqltype[$trytype]
 					));
 					$db->exec($sql);
 				}
 				//get rid of the test column..
-				$db->exec( self::$writer->getQuery("drop_test",array(
+				$db->exec( $this->writer->getQuery("drop_test",array(
 					"table"=>$table
 				)) );
 			}
 		
+			//@todo -> querywriter!
 			//Can we put an index on this column?
 			//Is this column worth the trouble?
 			if (
@@ -3754,18 +3800,18 @@ class RedBean_OODB {
 			}
 			
 		
-			$variance = $db->getCell(self::$writer->getQuery("variance",array(
+			$variance = $db->getCell($this->writer->getQuery("variance",array(
 				"col"=>$col,
 				"table"=>$table
 			)));
-			$records = $db->getCell(self::$writer->getQuery("count",array("type"=>$table)));
+			$records = $db->getCell($this->writer->getQuery("count",array("type"=>$table)));
 			if ($records) {
 				$relvar = intval($variance) / intval($records); //how useful would this index be?
 				//if this column describes the table well enough it might be used to
 				//improve overall performance.
 				$indexname = "reddex_".$col;
 				if ($records > 1 && $relvar > 0.85) {
-					$sqladdindex=self::$writer->getQuery("index1",array(
+					$sqladdindex=$this->writer->getQuery("index1",array(
 						"table"=>$table,
 						"indexname"=>$indexname,
 						"col"=>$col
@@ -3773,7 +3819,7 @@ class RedBean_OODB {
 					$db->exec( $sqladdindex );
 				}
 				else {
-					$sqldropindex = self::$writer->getQuery("index2",array("table"=>$table,"indexname"=>$indexname));
+					$sqldropindex = $this->writer->getQuery("index2",array("table"=>$table,"indexname"=>$indexname));
 					$db->exec( $sqldropindex );
 				}
 			}
@@ -3844,7 +3890,7 @@ class Redbean_Querylogger implements RedBean_Observer
 			file_put_contents($logger->getFilename(),"begin logging");	
 		}
 		
-		RedBean_OODB::$db->addEventListener( "sql_exec", $logger );
+		RedBean_OODB::getInstance()->getDatabase()->addEventListener( "sql_exec", $logger );
 	
 	}
 	
@@ -3866,7 +3912,7 @@ class Redbean_Querylogger implements RedBean_Observer
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class QueryWriter_MySQL implements QueryWriter {
+class QueryWriter_MySQL implements RedBean_QueryWriter {
 	/**
 	 * @var array all allowed sql types
 	 */
@@ -4054,7 +4100,7 @@ class QueryWriter_MySQL implements QueryWriter {
 		 */
 		private function getQueryRemoveExpirLock( $options ) {
 			extract( $options );
-			return "DELETE FROM locking WHERE expire < ".(time()-$locktime);
+			return "DELETE FROM locking WHERE expire <= ".(time()-$locktime);
 		}
 
 		/**
@@ -4115,7 +4161,7 @@ class QueryWriter_MySQL implements QueryWriter {
 		private function getQueryFind($options) {
 
 			extract($options);
-			$db = RedBean_OODB::$db;
+			$db = RedBean_OODB::getInstance()->getDatabase();
 			$findSQL = "SELECT id FROM `$tbl` WHERE ";
 
 	   
@@ -4150,7 +4196,7 @@ class QueryWriter_MySQL implements QueryWriter {
 		 */
 		private function getQueryList($options) {
 			extract($options);
-			$db = RedBean_OODB::$db;
+			$db = RedBean_OODB::getInstance()->getDatabase();
 			if ($extraSQL) {
 				$listSQL = "SELECT * FROM ".$db->escape($type)." ".$extraSQL;
 			}
@@ -4496,7 +4542,7 @@ class QueryWriter_MySQL implements QueryWriter {
 					return "START TRANSACTION";
 					break;
 				case "setup_dtyp":
-					$engine = RedBean_OODB::getEngine();
+					$engine = RedBean_OODB::getInstance()->getEngine();
 					return "
 				CREATE TABLE IF NOT EXISTS `dtyp` (
 				  `id` int(11) unsigned NOT NULL auto_increment,
@@ -4513,7 +4559,7 @@ class QueryWriter_MySQL implements QueryWriter {
 					return "drop tables dtyp";
 					break;
 				case "setup_locking":
-					$engine = RedBean_OODB::getEngine();
+					$engine = RedBean_OODB::getInstance()->getEngine();
 					return "
 				CREATE TABLE IF NOT EXISTS `locking` (
 				  `tbl` varchar(255) NOT NULL,
@@ -4525,7 +4571,7 @@ class QueryWriter_MySQL implements QueryWriter {
 				";
 					break;
 				case "setup_tables":
-					$engine = RedBean_OODB::getEngine();
+					$engine = RedBean_OODB::getInstance()->getEngine();
 					return "
 				 CREATE TABLE IF NOT EXISTS `redbeantables` (
 				 `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -4740,7 +4786,7 @@ class QueryWriter_MySQL implements QueryWriter {
  * @author			Gabor de Mooij
  * @license			BSD
  */
-interface QueryWriter {
+interface RedBean_QueryWriter {
 	
 	/**
 	 * Returns the requested query if the writer has any
@@ -4840,19 +4886,22 @@ class RedBean_Setup {
 			$db->setDebugMode(1);
 		}
 	
-		$oldconn = RedBean_OODB::$db;
+		$oldconn = RedBean_OODB::getInstance()->getInstance()->getDatabase();
 		$conn = new RedBean_DBAdapter($db);//Wrap ADO in RedBean's adapter
-		RedBean_OODB::$db = $conn; 
+		RedBean_OODB::getInstance()->setDatabase( $conn ); 
 		
-		RedBean_OODB::setEngine($engine); //select a database driver
-		RedBean_OODB::init( new QueryWriter_MySQL() ); //Init RedBean
+		
+		RedBean_OODB::getInstance()->setEngine($engine); //select a database driver
+		RedBean_OODB::getInstance()->init( new QueryWriter_MySQL() ); //Init RedBean
 	
 		if ($unlockall) {
-			RedBean_OODB::resetAll(); //Release all locks
+			
+	 
+			RedBean_OODB::getInstance()->resetAll(); //Release all locks
 		}
 	
 		if ($freeze) {
-			RedBean_OODB::freeze(); //Decide whether to freeze the database
+			RedBean_OODB::getInstance()->freeze(); //Decide whether to freeze the database
 		}
 	
 		return $oldconn;
@@ -4873,7 +4922,7 @@ class RedBean_Setup {
 		self::kickstart( $dsn, $username, $password, false, "innodb", $debug, false);
 		
 		//generate classes
-		R::gen( $gen );
+		RedBean_OODB::getInstance()->gen( $gen );
 	}
 	
 	/**
@@ -4890,13 +4939,13 @@ class RedBean_Setup {
 		self::kickstart( $dsn, $username, $password, true, "innodb", false, false);
 		
 		//generate classes
-		R::gen( $gen );
+		RedBean_OODB::getInstance()->gen( $gen );
 	}
 	
 	
 	public static function reconnect( RedBean_DBAdapter $new ) {
-		$old = RedBean_OODB::$db;
-		RedBean_OODB::$db = $new;
+		$old = RedBean_OODB::getInstance()->getInstance()->getDatabase();
+		RedBean_OODB::getInstance()->getInstance()->setDatabase( $new );
 		return $old;
 	}
 	

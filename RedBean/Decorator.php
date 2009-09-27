@@ -27,6 +27,10 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	protected $problems = array();
 
 
+	/**
+	 * @var RedBean_OODB
+	 */
+	protected $provider = null;
 
 	/**
 	 * Constructor, loads directly from main table
@@ -34,8 +38,9 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @param $id
 	 * @return unknown_type
 	 */
-	public function __construct( $type=false, $id=0, $lock=false ) {
+	public function __construct( RedBean_OODB $provider, $type=false, $id=0, $lock=false ) {
 
+		$this->provider = $provider;
 		$id = floatval( $id );
 		if (!$type) {
 			throw new Exception("Undefined bean type");
@@ -44,12 +49,21 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$this->type = preg_replace( "[\W_]","", strtolower($type));
 			//echo $this->type;
 			if ($id > 0) { //if the id is higher than 0 load data
-				$this->data = RedBean_OODB::getById( $this->type, $id, $lock );
+				$this->data = $this->provider->getById( $this->type, $id, $lock );
 			}
 			else { //otherwise, dispense a regular empty OODBBean
-				$this->data = RedBean_OODB::dispense( $this->type );
+				$this->data = $this->provider->dispense( $this->type );
 			}
 		}
+	}
+	
+	/**
+	 * This is a service for static convenience methods that
+	 * have no object context but still need a provider.
+	 * @return unknown_type
+	 */
+	private static function getStaticProvider() {
+		return RedBean_OODB::getInstance();
 	}
 
 	/**
@@ -59,7 +73,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function free( $property ) {
 		$this->signal("deco_free", $this);
-		RedBean_OODB::dropColumn( $this->type, $property );
+		$this->provider->dropColumn( $this->type, $property );
 	}
 
 	/**
@@ -154,7 +168,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		elseif (strpos($method,"getRelated")===0)	{
 			$this->signal("deco_get", $this);
 			$prop = strtolower( substr( $method, 10 ) );
-			$beans = RedBean_OODB::getAssoc( $this->data, $prop );
+			$beans = $this->provider->getAssoc( $this->data, $prop );
 			$decos = array();
 			$dclass = RedBean_Setup_Namespace_PRFX.$prop.RedBean_Setup_Namespace_SFFX;
 
@@ -183,33 +197,33 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$this->signal("deco_add",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			RedBean_OODB::associate($this->data, $bean);
+			$this->provider->associate($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"remove")===0) {
 			$this->signal("deco_remove",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			RedBean_OODB::unassociate($this->data, $bean);
+			$this->provider->unassociate($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"attach")===0) {
 			$this->signal("deco_attach",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			RedBean_OODB::addChild($this->data, $bean);
+			$this->provider->addChild($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"clearRelated")===0) {
 			$this->signal("deco_clearrelated",$this);
 			$type = strtolower( substr( $method, 12 ) );
-			RedBean_OODB::deleteAllAssocType($type, $this->data);
+			$this->provider->deleteAllAssocType($type, $this->data);
 			return $this;
 		}
 		else if (strpos($method,"numof")===0) {
 			$this->signal("deco_numof",$this);
 			$type = strtolower( substr( $method, 5 ) );
-			return RedBean_OODB::numOfRelated($type, $this->data);
+			return $this->provider->numOfRelated($type, $this->data);
 				
 		}
 	}
@@ -221,8 +235,8 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function belongsTo( $deco ) {
 		$this->signal("deco_belongsto", $this);
-		RedBean_OODB::deleteAllAssocType($deco->getType(), $this->data);
-		RedBean_OODB::associate($this->data, $deco->getData());
+		$this->provider->deleteAllAssocType($deco->getType(), $this->data);
+		$this->provider->associate($this->data, $deco->getData());
 	}
 
 	/**
@@ -232,8 +246,8 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function exclusiveAdd( $deco ) {
 		$this->signal("deco_exclusiveadd", $this);
-		RedBean_OODB::deleteAllAssocType($this->type,$deco->getData());
-		RedBean_OODB::associate($deco->getData(), $this->data);
+		$this->provider->deleteAllAssocType($this->type,$deco->getData());
+		$this->provider->associate($deco->getData(), $this->data);
 	}
 
 	/**
@@ -242,7 +256,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function parent() {
 		$this->signal("deco_parent", $this);
-		$beans = RedBean_OODB::getParent( $this->data );
+		$beans = $this->provider->getParent( $this->data );
 		if (count($beans) > 0 ) $bean = array_pop($beans); else return null;
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		$deco = new $dclass();
@@ -256,14 +270,14 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function siblings() {
 		$this->signal("deco_siblings", $this);
-		$beans = RedBean_OODB::getParent( $this->data );
+		$beans = $this->provider->getParent( $this->data );
 		if (count($beans) > 0 ) {
 			$bean = array_pop($beans);
 		}
 		else {
 			return null;
 		}
-		$beans = RedBean_OODB::getChildren( $bean );
+		$beans = $this->provider->getChildren( $bean );
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
@@ -284,7 +298,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function children() {
 		$this->signal("deco_children", $this);
-		$beans = RedBean_OODB::getChildren( $this->data );
+		$beans = $this->provider->getChildren( $this->data );
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
@@ -357,7 +371,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function copy() {
 		$this->signal("deco_copy", $this);
-		$clone = new self( $this->type, 0 );
+		$clone = new self( $this->provider, $this->type, 0 );
 		$clone->setData( $this->getData() );
 		return $clone;
 	}
@@ -368,7 +382,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function clearAllRelations() {
 		$this->signal("deco_clearrelations", $this);
-		RedBean_OODB::deleteAllAssoc( $this->getData() );
+		$this->provider->deleteAllAssoc( $this->getData() );
 	}
 
 	/**
@@ -395,7 +409,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function save() {
 		$this->signal("deco_save", $this);
-		return RedBean_OODB::set( $this->data );
+		return $this->provider->set( $this->data );
 	}
 
 	/**
@@ -404,7 +418,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public static function delete( $deco ) {
-		RedBean_OODB::trash( $deco->getData() );
+		self::getStaticProvider()->trash( $deco->getData() );
 	}
 
 
@@ -413,7 +427,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public function lock() {
-		RedBean_OODB::openBean($this->getData());
+		$this->provider->openBean($this->getData());
 	}
 
 	/**
@@ -421,7 +435,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public function unlock() {
-		RedBean_OODB::closeBean( $this->getData());
+		$this->provider->closeBean( $this->getData());
 	}
 
 
@@ -431,7 +445,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public static function close( $deco ) {
-		RedBean_OODB::closeBean( $deco->getData() );
+		self::getStaticProvider()->closeBean( $deco->getData() );
 	}
 
 	/**
@@ -441,7 +455,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public static function make( $type="", $id ){
-		return new RedBean_Decorator( $type, $id );
+		return new RedBean_Decorator( self::getStaticProvider(), $type, $id );
 	}
 
 
@@ -523,7 +537,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		}
 
-		$beans = RedBean_OODB::find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
+		$beans = self::getStaticProvider()->find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
 
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$deco->type.RedBean_Setup_Namespace_SFFX;
@@ -549,7 +563,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function isReadOnly() {
 		try{
-			RedBean_OODB::openBean($this->data, true);
+			$this->provider->openBean($this->data, true);
 		}
 		catch(RedBean_Exception_FailedAccessBean $e){
 			return false;	

@@ -68,19 +68,22 @@ class RedBean_Setup {
 			$db->setDebugMode(1);
 		}
 	
-		$oldconn = RedBean_OODB::$db;
+		$oldconn = RedBean_OODB::getInstance()->getInstance()->getDatabase();
 		$conn = new RedBean_DBAdapter($db);//Wrap ADO in RedBean's adapter
-		RedBean_OODB::$db = $conn; 
+		RedBean_OODB::getInstance()->setDatabase( $conn ); 
 		
-		RedBean_OODB::setEngine($engine); //select a database driver
-		RedBean_OODB::init( new QueryWriter_MySQL() ); //Init RedBean
+		
+		RedBean_OODB::getInstance()->setEngine($engine); //select a database driver
+		RedBean_OODB::getInstance()->init( new QueryWriter_MySQL() ); //Init RedBean
 	
 		if ($unlockall) {
-			RedBean_OODB::resetAll(); //Release all locks
+			
+	 
+			RedBean_OODB::getInstance()->resetAll(); //Release all locks
 		}
 	
 		if ($freeze) {
-			RedBean_OODB::freeze(); //Decide whether to freeze the database
+			RedBean_OODB::getInstance()->freeze(); //Decide whether to freeze the database
 		}
 	
 		return $oldconn;
@@ -101,7 +104,7 @@ class RedBean_Setup {
 		self::kickstart( $dsn, $username, $password, false, "innodb", $debug, false);
 		
 		//generate classes
-		R::gen( $gen );
+		RedBean_OODB::getInstance()->gen( $gen );
 	}
 	
 	/**
@@ -118,13 +121,13 @@ class RedBean_Setup {
 		self::kickstart( $dsn, $username, $password, true, "innodb", false, false);
 		
 		//generate classes
-		R::gen( $gen );
+		RedBean_OODB::getInstance()->gen( $gen );
 	}
 	
 	
 	public static function reconnect( RedBean_DBAdapter $new ) {
-		$old = RedBean_OODB::$db;
-		RedBean_OODB::$db = $new;
+		$old = RedBean_OODB::getInstance()->getInstance()->getDatabase();
+		RedBean_OODB::getInstance()->getInstance()->setDatabase( $new );
 		return $old;
 	}
 	
