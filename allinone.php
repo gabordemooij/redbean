@@ -647,6 +647,15 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	public function __set( $name, $value ) {
 		$this->signal("deco_set", $this);
 		$name = strtolower( $name );
+		
+		
+		if ($name=="type") {
+			throw new RedBean_Exception_Security("type is a reserved property to identify the table, pleae use another name for this property.");	
+		}
+		if ($name=="id") {
+			throw new RedBean_Exception_Security("id is a reserved property to identify the record, pleae use another name for this property.");	
+		}
+	
 		$this->data->$name = $value;
 	}
 
@@ -662,6 +671,12 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		if (strpos( $method,"set" ) === 0) {
 			$prop = substr( $method, 3 );
+			if ($prop=="type") {
+				throw new RedBean_Exception_Security("type is a reserved property to identify the table, pleae use another name for this property.");	
+			}
+			if ($prop=="id") {
+				throw new RedBean_Exception_Security("id is a reserved property to identify the record, pleae use another name for this property.");	
+			}
 			$this->$prop = $arguments[0];
 			return $this;
 
@@ -3495,7 +3510,7 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		
-		public function gen( $classes, $prefix = false, $suffix = false ) {
+		public function generate( $classes, $prefix = false, $suffix = false ) {
 			
 			if (!$prefix) {
 				$prefix = RedBean_Setup_Namespace_PRFX;
@@ -3685,7 +3700,7 @@ class RedBean_OODB {
 		 * Narrows columns to appropriate size if needed
 		 * @return unknown_type
 		 */
-		public function keepInShape( $gc = false ,$stdTable=false, $stdCol=false) {
+		public function keepInShapeNS( $gc = false ,$stdTable=false, $stdCol=false) {
 			
 			//oops, we are frozen, so no change..
 			if ($this->frozen) {
@@ -3826,7 +3841,14 @@ class RedBean_OODB {
 			
 			return true;
 		}
+		
+		public static function gen($arg, $prefix = false, $suffix = false) {
+			return self::getInstance()->generate($arg, $prefix, $suffix);
+		}
 	
+		public static function keepInShape($gc = false ,$stdTable=false, $stdCol=false) {
+			return self::getInstance()->keepInShapeNS($gc, $stdTable, $stdCol);
+		}
 }
 /**
  * OODBBean (Object Oriented DataBase Bean)

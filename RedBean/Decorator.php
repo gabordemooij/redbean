@@ -146,6 +146,15 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	public function __set( $name, $value ) {
 		$this->signal("deco_set", $this);
 		$name = strtolower( $name );
+		
+		
+		if ($name=="type") {
+			throw new RedBean_Exception_Security("type is a reserved property to identify the table, pleae use another name for this property.");	
+		}
+		if ($name=="id") {
+			throw new RedBean_Exception_Security("id is a reserved property to identify the record, pleae use another name for this property.");	
+		}
+	
 		$this->data->$name = $value;
 	}
 
@@ -161,6 +170,12 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		if (strpos( $method,"set" ) === 0) {
 			$prop = substr( $method, 3 );
+			if ($prop=="type") {
+				throw new RedBean_Exception_Security("type is a reserved property to identify the table, pleae use another name for this property.");	
+			}
+			if ($prop=="id") {
+				throw new RedBean_Exception_Security("id is a reserved property to identify the record, pleae use another name for this property.");	
+			}
 			$this->$prop = $arguments[0];
 			return $this;
 

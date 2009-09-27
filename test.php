@@ -169,6 +169,12 @@ RedBean_Setup::reconnect( $old );
 asrt(R::getInstance()->getInstance()->getDatabase()->getCell("select database()"),"oodb");
 
 
+testpack("legacy");
+R::gen("myclass");
+asrt(class_exists("myclass"), true);
+R::keepInShape();
+pass();
+
 //Test description: Test importing of data from post array or custom array
 testpack("Import");
 R::getInstance()->gen("Thing");
@@ -848,7 +854,14 @@ function testsperengine( $engine ) {
 	//Test decorator
 	//Test description: can we find beans on the basis of similarity?
 	testpack("finder on decorator and listAll on decorator $engine ");
-	$person = RedBean_OODB::getInstance()->dispense("person");
+	
+	//Test description: we should not be able to modify type and id
+	$person = new Person;
+	try{ $person->id = 9; fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+	try{ $person->type = 'alien'; fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+	try{ $person->setID(9); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+	try{ $person->setType('alien'); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+	
 	$person = RedBean_OODB::getInstance()->dispense("person");
 	$person->age = 50;
 	$person->name = "Bob";
@@ -1273,12 +1286,12 @@ function testsperengine( $engine ) {
 	
 	SmartTest::instance()->testPack="Export Array";
 	$oBean->a = "a";
-	$oInnerBean = new JustABean;
-	$oInnerBean->setID(123);
-	$oBean->innerbean = $oInnerBean;
+	$inner= new JustABean();
+	$id = $inner->save();
+	$oBean->innerbean = $inner;
 	$arr = $oBean->exportAsArr();
 	if (!is_array($arr)) {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
-	if ($arr["innerbean"]!==123) {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
+	if ($arr["innerbean"]!==$id) {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
 	if ($arr["a"]!=="a") {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
 	
 	//test 1-to-n 
