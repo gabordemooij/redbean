@@ -97,7 +97,7 @@ require("allinone.php");
  * Select the driver we use and show it
  */
 if (!isset($_SERVER['argv'][1])) {
-	RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",0);
+	RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
 	echo "\n<BR>USING: PDO";
 }
 else {

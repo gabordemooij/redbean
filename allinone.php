@@ -4063,7 +4063,7 @@ class QueryWriter_MySQL implements RedBean_QueryWriter {
 		 */
 		private function getQueryCreate( $options ) {
 			extract($options);
-			return "INSERT INTO `$table` VALUES(null) ";
+			return "INSERT INTO `$table` (id) VALUES(null) ";
 		}
 
 		/**
