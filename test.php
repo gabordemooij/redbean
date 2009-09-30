@@ -422,6 +422,22 @@ asrt( count($cat->getRelatedDog()), 0 );
 $cat = new Cat($id);
 asrt( $cat->name, "Garfield" );
 
+//Test Description: if we associate two empty beans we ids must be set
+$r = RedBean_OODB::getInstance();
+
+$emptybean1 = $r->dispense("emptybean1");
+$emptybean2 = $r->dispense("emptybean2");
+$emptybean2->test = 1;
+$r->set( $emptybean2 );
+$r->trash( $emptybean2 );
+$emptybean2 = $r->dispense("emptybean2");
+$r->associate($emptybean1,$emptybean2);
+try{$res =  $r->getAssoc($emptybean1,"emptybean2"); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+asrt(is_array($res),true);
+asrt(count($res),1);
+$emptybean2 = array_shift($res);
+asrt(($emptybean2->id!=0),true);
+
 
 //Test description; Query writer should support following query requests
 testpack("Query Writer");
