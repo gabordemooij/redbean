@@ -20,7 +20,7 @@ class RedBean_OODB {
 	 */
 	private $versioninf = "
 		RedBean Object Database layer 
-		VERSION 0.6
+		VERSION 0.7
 		BY G.J.G.T DE MOOIJ
 		LICENSE BSD
 		COPYRIGHT 2009
@@ -85,7 +85,14 @@ class RedBean_OODB {
 		 * @var QueryWriter
 		 */
 		private $writer;
-		
+
+
+                private $beanchecker;
+
+                public function __construct() {
+                    $this->beanchecker = new RedBean_Mod_BeanChecker();
+                }
+
 		/**
 		 * Closes and unlocks the bean
 		 * @return unknown_type
@@ -182,59 +189,11 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return unknown_type
 		 */
-		public function checkBean(OODBBean $bean) {
-
-			if (!$this->db) {
-				throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
-			}
-			
-			foreach($bean as $prop=>$value) {
-				$prop = preg_replace('/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/',"",$prop);
-				if (strlen(trim($prop))===0) {
-					throw new RedBean_Exception_Security("Invalid Characters in property");
-				}
-				else {
-					if (is_array($value)) {
-						throw new RedBean_Exception_Security("Cannot store an array, use composition instead or serialize first.");
-					}
-					if (is_object($value)) {
-						throw new RedBean_Exception_Security("Cannot store an object, use composition instead or serialize first.");
-					}
-					$bean->$prop = $value;
-				}
-			}			
-			
-			//Is the bean valid? does the bean have an id?
-			if (!isset($bean->id)) {
-				throw new RedBean_Exception_Security("Invalid bean, no id");
-			}
-
-			//is the id numeric?
-			if (!is_numeric($bean->id) || $bean->id < 0 || (round($bean->id)!=$bean->id)) {
-				throw new RedBean_Exception_Security("Invalid bean, id not numeric");
-			}
-
-			//does the bean have a type?
-			if (!isset($bean->type)) {
-				throw new RedBean_Exception_Security("Invalid bean, no type");
-			}
-
-			//is the beantype correct and valid?
-			if (!is_string($bean->type) || is_numeric($bean->type) || strlen($bean->type)<3) {
-				throw new RedBean_Exception_Security("Invalid bean, wrong type");
-			}
-
-			//is the beantype legal?
-			if ($bean->type==="locking" || $bean->type==="dtyp" || $bean->type==="redbeantables") {
-				throw new RedBean_Exception_Security("Beantype is reserved table");
-			}
-
-			//is the beantype allowed?
-			if (strpos($bean->type,"_")!==false && ctype_alnum($bean->type)) {
-				throw new RedBean_Exception_Security("Beantype contains illegal characters");
-			}
-
-
+		public function checkBean(RedBean_OODBBean $bean) {
+                    if (!$this->db) {
+                        throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
+                    }
+                    return $this->beanchecker->check( $bean );
 		}
 
 		/**
@@ -296,7 +255,7 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return $id
 		 */
-		public function set( OODBBean $bean ) {
+		public function set( RedBean_OODBBean $bean ) {
 
 			$this->checkBean($bean);
 
@@ -698,7 +657,7 @@ class RedBean_OODB {
 		 * Gets a bean by its primary ID
 		 * @param $type
 		 * @param $id
-		 * @return OODBBean $bean
+		 * @return RedBean_OODBBean $bean
 		 */
 		public function getById($type, $id, $data=false) {
 
@@ -1009,7 +968,7 @@ class RedBean_OODB {
      * @param $orderby
      * @return unknown_type
      */
-    public function find(OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
+    public function find(RedBean_OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
  
       $this->checkBean( $bean );
       $db = $this->db;
@@ -1071,7 +1030,7 @@ class RedBean_OODB {
 		 * @param $bean2
 		 * @return unknown_type
 		 */
-		public function associate( OODBBean $bean1, OODBBean $bean2 ) { //@associate
+		public function associate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) { //@associate
 
 			//get a database
 			$db = $this->db;
@@ -1157,7 +1116,7 @@ class RedBean_OODB {
 		 * @param $bean2
 		 * @return unknown_type
 		 */
-		public function unassociate(OODBBean $bean1, OODBBean $bean2) {
+		public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 
 			//get a database
 			$db = $this->db;
@@ -1259,7 +1218,7 @@ class RedBean_OODB {
 		 * @param $targettype
 		 * @return array $beans
 		 */
-		public function getAssoc(OODBBean $bean, $targettype) {
+		public function getAssoc(RedBean_OODBBean $bean, $targettype) {
 			//get a database
 			$db = $this->db;
 			//first we check the beans whether they are valid
@@ -1318,7 +1277,7 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return unknown_type
 		 */
-		public function trash( OODBBean $bean ) {
+		public function trash( RedBean_OODBBean $bean ) {
 
 			$this->checkBean( $bean );
 			if (intval($bean->id)===0) return;
@@ -1435,11 +1394,11 @@ class RedBean_OODB {
 		/**
 		 * Dispenses; creates a new OODB bean of type $type
 		 * @param $type
-		 * @return OODBBean $bean
+		 * @return RedBean_OODBBean $bean
 		 */
 		public function dispense( $type="StandardBean" ) {
 
-			$oBean = new OODBBean();
+			$oBean = new RedBean_OODBBean();
 			$oBean->type = $type;
 			$oBean->id = 0;
 			return $oBean;
@@ -1452,7 +1411,7 @@ class RedBean_OODB {
 		 * @param $child
 		 * @return unknown_type
 		 */
-		public function addChild( OODBBean $parent, OODBBean $child ) {
+		public function addChild( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
 
 			//get a database
 			$db = $this->db;
@@ -1509,7 +1468,7 @@ class RedBean_OODB {
 		 * @param $parent
 		 * @return array $beans
 		 */
-		public function getChildren( OODBBean $parent ) {
+		public function getChildren( RedBean_OODBBean $parent ) {
 
 			//get a database
 			$db = $this->db;
@@ -1548,9 +1507,9 @@ class RedBean_OODB {
 		/**
 		 * Fetches the parent bean of child bean $child
 		 * @param $child
-		 * @return OODBBean $parent
+		 * @return RedBean_OODBBean $parent
 		 */
-		public function getParent( OODBBean $child ) {
+		public function getParent( RedBean_OODBBean $child ) {
 
 				
 			//get a database
@@ -1595,7 +1554,7 @@ class RedBean_OODB {
 		 * @param $child
 		 * @return unknown_type
 		 */
-		public function removeChild(OODBBean $parent, OODBBean $child) {
+		public function removeChild(RedBean_OODBBean $parent, RedBean_OODBBean $child) {
 
 			//get a database
 			$db = $this->db;
@@ -1639,7 +1598,7 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return integer $numberOfRelations
 		 */
-		public function numofRelated( $type, OODBBean $bean ) {
+		public function numofRelated( $type, RedBean_OODBBean $bean ) {
 			
 			//get a database
 			$db = $this->db;

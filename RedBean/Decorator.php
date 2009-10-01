@@ -10,7 +10,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 	/**
 	 *
-	 * @var OODBBean
+	 * @var RedBean_OODBBean
 	 */
 	protected $data = null;
 
@@ -51,7 +51,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			if ($id > 0) { //if the id is higher than 0 load data
 				$this->data = $this->provider->getById( $this->type, $id, $lock );
 			}
-			else { //otherwise, dispense a regular empty OODBBean
+			else { //otherwise, dispense a regular empty RedBean_OODBBean
 				$this->data = $this->provider->dispense( $this->type );
 			}
 		}
@@ -131,12 +131,38 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		return $this->command( $method, $arguments );
 	}
 
+        /**
+         * @param string $name
+         * @return string $filteredName
+         */
+        private function filterProperty( $name, $forReading = false ) {
+
+            $name = strtolower($name);
+
+            if (!$forReading) {
+                if ($name=="type") {
+                	throw new RedBean_Exception_Security("type is a reserved property to identify the table, pleae use another name for this property.");
+                }
+                if ($name=="id") {
+                	throw new RedBean_Exception_Security("id is a reserved property to identify the record, pleae use another name for this property.");
+                }
+            }
+
+            $name =  trim(preg_replace("/[^abcdefghijklmnopqrstuvwxyz0123456789]/","",$name));
+
+            if (strlen($name)===0) {
+                throw new RedBean_Exception_Security("Empty property is not allowed");
+            }
+
+            return $name;
+        }
+
 	/**
 	 * Magic getter. Another way to handle accessors
 	 */
 	public function __get( $name ) {
 		$this->signal("deco_get", $this);
-		$name = strtolower( $name );
+		$name = $this->filterProperty($name, true);
 		return isset($this->data->$name) ? $this->data->$name : null;
 	}
 
@@ -145,16 +171,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function __set( $name, $value ) {
 		$this->signal("deco_set", $this);
-		$name = strtolower( $name );
-		
-		
-		if ($name=="type") {
-			throw new RedBean_Exception_Security("type is a reserved property to identify the table, pleae use another name for this property.");	
-		}
-		if ($name=="id") {
-			throw new RedBean_Exception_Security("id is a reserved property to identify the record, pleae use another name for this property.");	
-		}
-	
+		$name = $this->filterProperty($name);
 		$this->data->$name = $value;
 	}
 
@@ -170,12 +187,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		if (strpos( $method,"set" ) === 0) {
 			$prop = substr( $method, 3 );
-			if ($prop=="type") {
-				throw new RedBean_Exception_Security("type is a reserved property to identify the table, pleae use another name for this property.");	
-			}
-			if ($prop=="id") {
-				throw new RedBean_Exception_Security("id is a reserved property to identify the record, pleae use another name for this property.");	
-			}
+			$prop = $this->filterProperty($prop);
 			$this->$prop = $arguments[0];
 			return $this;
 
@@ -198,6 +210,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		}
 		elseif (strpos( $method, "get" ) === 0) {
 			$prop = substr( $method, 3 );
+                        $prop = $this->filterProperty($prop, true);
 			return $this->$prop;
 		}
 		elseif (strpos( $method, "is" ) === 0) {
@@ -402,7 +415,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 	/**
 	 * Gets data directly
-	 * @return OODBBean
+	 * @return RedBean_OODBBean
 	 */
 	public function getData() {
 		return $this->data;

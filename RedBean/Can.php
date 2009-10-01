@@ -53,8 +53,8 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	}
 	
 	/**
-	 * Wraps an OODBBean in a RedBean_Decorator
-	 * @param OODBBean $bean
+	 * Wraps an RedBean_OODBBean in a RedBean_Decorator
+	 * @param RedBean_OODBBean $bean
 	 * @return RedBean_Decorator $deco
 	 */
 	public function wrap( $bean, $prefix=false, $suffix=false ) {

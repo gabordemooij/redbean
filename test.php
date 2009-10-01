@@ -521,10 +521,10 @@ function testsperengine( $engine ) {
 
 	
 	testpack("Anemic Model on ".$engine);
-	//Test basic, fundamental OODBBean functions with Anemic Model
+	//Test basic, fundamental RedBean_OODBBean functions with Anemic Model
 	asrt(is_numeric(RedBean_OODB::getInstance()->getVersionNumber()),true);
 	$file = RedBean_OODB::getInstance()->dispense("file");
-	asrt((RedBean_OODB::getInstance()->dispense("file") instanceof OODBBean),true);
+	asrt((RedBean_OODB::getInstance()->dispense("file") instanceof RedBean_OODBBean),true);
 	//Test description: has the type property been set?
 	asrt($file->type,"file");
 	//Test description: Is the ID set and 0?
@@ -876,6 +876,8 @@ function testsperengine( $engine ) {
 	try{ $person->id = 9; fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 	try{ $person->type = 'alien'; fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 	try{ $person->setID(9); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+
+        
 	try{ $person->setType('alien'); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 	
 	$person = RedBean_OODB::getInstance()->dispense("person");
@@ -1282,9 +1284,9 @@ function testsperengine( $engine ) {
 	RedBean_OODB::getInstance()->gen("justabean");
 	$oBean = new JustABean();
 	$oBean->setA("a");
-	$oOtherBean = new OODBBean();
+	$oOtherBean = new RedBean_OODBBean();
 	$oOtherBean->a = "b";
-	$oBean2 = new OODBBean();
+	$oBean2 = new RedBean_OODBBean();
 	$oBean->exportTo( $oBean2);
 	if ($oBean2->a!=="a") {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
 	$oBean2 = $oBean->exportTo($oBean2);
@@ -1366,35 +1368,42 @@ function testsperengine( $engine ) {
 RedBean_OODB::getInstance()->gen("justabean");
 SmartTest::instance()->testPack="Security";
 $maliciousproperty = "\"";
-$oBean = new JustABean;
+$oBean = R::getInstance()->dispense("justabean");
 $oBean->$maliciousproperty = "a";
 try {
-	$oBean->save();
+	R::getInstance()->set($oBean);
 	SmartTest::failedTest(); 
 }
 catch(RedBean_Exception_Security $e){
 	SmartTest::instance()->progress();	
 }
 $maliciousproperty = "\"test";
-$oBean = new JustABean;
+$oBean = R::getInstance()->dispense("justabean");
 $oBean->$maliciousproperty = "a";
 try {
-	$oBean->save();
-	SmartTest::instance()->progress();
-	 
+	R::getInstance()->set($oBean);
+	fail();
 }
 catch(RedBean_Exception_Security $e){
-	SmartTest::failedTest();	
+	pass();
 }
-$converted = "test";
-if ($oBean->$converted!=="a") {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
+
 $maliciousvalue = "\"abc";
+$oBean = R::getInstance()->dispense("justabean");
 $oBean->another = $maliciousvalue;
-$oBean->save();
+R::getInstance()->set($oBean);
 $oBean->another;
 if ($oBean->another!=="\"abc") {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
 
-	
+//test decorator as well
+$malicious = array( "a"=>"\"a", "b"=>"\'b", "x"=>" x  " );
+$bean = new JustABean;
+foreach($malicious as $k=>$m) {
+    $bean->$m = sha1($m);
+    asrt(($bean->$m === $bean->$k),true);
+}
+$m = "";
+try{ $bean->$m = 1; fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 
 
 SmartTest::instance()->testPack="select only valid engines?";

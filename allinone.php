@@ -142,8 +142,8 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	}
 	
 	/**
-	 * Wraps an OODBBean in a RedBean_Decorator
-	 * @param OODBBean $bean
+	 * Wraps an RedBean_OODBBean in a RedBean_Decorator
+	 * @param RedBean_OODBBean $bean
 	 * @return RedBean_Decorator $deco
 	 */
 	public function wrap( $bean, $prefix=false, $suffix=false ) {
@@ -511,7 +511,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 	/**
 	 *
-	 * @var OODBBean
+	 * @var RedBean_OODBBean
 	 */
 	protected $data = null;
 
@@ -552,7 +552,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			if ($id > 0) { //if the id is higher than 0 load data
 				$this->data = $this->provider->getById( $this->type, $id, $lock );
 			}
-			else { //otherwise, dispense a regular empty OODBBean
+			else { //otherwise, dispense a regular empty RedBean_OODBBean
 				$this->data = $this->provider->dispense( $this->type );
 			}
 		}
@@ -632,12 +632,38 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		return $this->command( $method, $arguments );
 	}
 
+        /**
+         * @param string $name
+         * @return string $filteredName
+         */
+        private function filterProperty( $name, $forReading = false ) {
+
+            $name = strtolower($name);
+
+            if (!$forReading) {
+                if ($name=="type") {
+                	throw new RedBean_Exception_Security("type is a reserved property to identify the table, pleae use another name for this property.");
+                }
+                if ($name=="id") {
+                	throw new RedBean_Exception_Security("id is a reserved property to identify the record, pleae use another name for this property.");
+                }
+            }
+
+            $name =  trim(preg_replace("/[^abcdefghijklmnopqrstuvwxyz0123456789]/","",$name));
+
+            if (strlen($name)===0) {
+                throw new RedBean_Exception_Security("Empty property is not allowed");
+            }
+
+            return $name;
+        }
+
 	/**
 	 * Magic getter. Another way to handle accessors
 	 */
 	public function __get( $name ) {
 		$this->signal("deco_get", $this);
-		$name = strtolower( $name );
+		$name = $this->filterProperty($name, true);
 		return isset($this->data->$name) ? $this->data->$name : null;
 	}
 
@@ -646,16 +672,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function __set( $name, $value ) {
 		$this->signal("deco_set", $this);
-		$name = strtolower( $name );
-		
-		
-		if ($name=="type") {
-			throw new RedBean_Exception_Security("type is a reserved property to identify the table, pleae use another name for this property.");	
-		}
-		if ($name=="id") {
-			throw new RedBean_Exception_Security("id is a reserved property to identify the record, pleae use another name for this property.");	
-		}
-	
+		$name = $this->filterProperty($name);
 		$this->data->$name = $value;
 	}
 
@@ -671,12 +688,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		if (strpos( $method,"set" ) === 0) {
 			$prop = substr( $method, 3 );
-			if ($prop=="type") {
-				throw new RedBean_Exception_Security("type is a reserved property to identify the table, pleae use another name for this property.");	
-			}
-			if ($prop=="id") {
-				throw new RedBean_Exception_Security("id is a reserved property to identify the record, pleae use another name for this property.");	
-			}
+			$prop = $this->filterProperty($prop);
 			$this->$prop = $arguments[0];
 			return $this;
 
@@ -699,6 +711,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		}
 		elseif (strpos( $method, "get" ) === 0) {
 			$prop = substr( $method, 3 );
+                        $prop = $this->filterProperty($prop, true);
 			return $this->$prop;
 		}
 		elseif (strpos( $method, "is" ) === 0) {
@@ -903,7 +916,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 	/**
 	 * Gets data directly
-	 * @return OODBBean
+	 * @return RedBean_OODBBean
 	 */
 	public function getData() {
 		return $this->data;
@@ -1749,6 +1762,64 @@ class RedBean_Exception_SQL extends RedBean_Exception {};
  * @license			BSD
  */
 class Redbean_Exception extends Exception{}
+class RedBean_Mod_BeanChecker {
+
+    public function check( RedBean_OODBBean $bean ) {
+        foreach($bean as $prop=>$value) {
+            
+            if (preg_match('/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/',$prop)) {
+                throw new RedBean_Exception_Security("Invalid Characters in property $prop ");
+            }
+
+            $prop = preg_replace('/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/',"",$prop);
+            if (strlen(trim($prop))===0) {
+                throw new RedBean_Exception_Security("Invalid Characters in property");
+            }
+            else {
+                if (is_array($value)) {
+                    throw new RedBean_Exception_Security("Cannot store an array, use composition instead or serialize first.");
+                }
+                if (is_object($value)) {
+                    throw new RedBean_Exception_Security("Cannot store an object, use composition instead or serialize first.");
+                }
+                $bean->$prop = $value;
+            }
+        }
+
+        //Is the bean valid? does the bean have an id?
+        if (!isset($bean->id)) {
+            throw new RedBean_Exception_Security("Invalid bean, no id");
+        }
+
+        //is the id numeric?
+        if (!is_numeric($bean->id) || $bean->id < 0 || (round($bean->id)!=$bean->id)) {
+            throw new RedBean_Exception_Security("Invalid bean, id not numeric");
+        }
+
+        //does the bean have a type?
+        if (!isset($bean->type)) {
+            throw new RedBean_Exception_Security("Invalid bean, no type");
+        }
+
+        //is the beantype correct and valid?
+        if (!is_string($bean->type) || is_numeric($bean->type) || strlen($bean->type)<3) {
+            throw new RedBean_Exception_Security("Invalid bean, wrong type");
+        }
+
+        //is the beantype legal?
+        if ($bean->type==="locking" || $bean->type==="dtyp" || $bean->type==="redbeantables") {
+            throw new RedBean_Exception_Security("Beantype is reserved table");
+        }
+
+        //is the beantype allowed?
+        if (strpos($bean->type,"_")!==false && ctype_alnum($bean->type)) {
+            throw new RedBean_Exception_Security("Beantype contains illegal characters");
+        }
+
+    }
+
+
+}
 /**
  * Observable
  * Base class for Observables
@@ -1901,7 +1972,14 @@ class RedBean_OODB {
 		 * @var QueryWriter
 		 */
 		private $writer;
-		
+
+
+                private $beanchecker;
+
+                public function __construct() {
+                    $this->beanchecker = new RedBean_Mod_BeanChecker();
+                }
+
 		/**
 		 * Closes and unlocks the bean
 		 * @return unknown_type
@@ -1998,59 +2076,11 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return unknown_type
 		 */
-		public function checkBean(OODBBean $bean) {
-
-			if (!$this->db) {
-				throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
-			}
-			
-			foreach($bean as $prop=>$value) {
-				$prop = preg_replace('/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/',"",$prop);
-				if (strlen(trim($prop))===0) {
-					throw new RedBean_Exception_Security("Invalid Characters in property");
-				}
-				else {
-					if (is_array($value)) {
-						throw new RedBean_Exception_Security("Cannot store an array, use composition instead or serialize first.");
-					}
-					if (is_object($value)) {
-						throw new RedBean_Exception_Security("Cannot store an object, use composition instead or serialize first.");
-					}
-					$bean->$prop = $value;
-				}
-			}			
-			
-			//Is the bean valid? does the bean have an id?
-			if (!isset($bean->id)) {
-				throw new RedBean_Exception_Security("Invalid bean, no id");
-			}
-
-			//is the id numeric?
-			if (!is_numeric($bean->id) || $bean->id < 0 || (round($bean->id)!=$bean->id)) {
-				throw new RedBean_Exception_Security("Invalid bean, id not numeric");
-			}
-
-			//does the bean have a type?
-			if (!isset($bean->type)) {
-				throw new RedBean_Exception_Security("Invalid bean, no type");
-			}
-
-			//is the beantype correct and valid?
-			if (!is_string($bean->type) || is_numeric($bean->type) || strlen($bean->type)<3) {
-				throw new RedBean_Exception_Security("Invalid bean, wrong type");
-			}
-
-			//is the beantype legal?
-			if ($bean->type==="locking" || $bean->type==="dtyp" || $bean->type==="redbeantables") {
-				throw new RedBean_Exception_Security("Beantype is reserved table");
-			}
-
-			//is the beantype allowed?
-			if (strpos($bean->type,"_")!==false && ctype_alnum($bean->type)) {
-				throw new RedBean_Exception_Security("Beantype contains illegal characters");
-			}
-
-
+		public function checkBean(RedBean_OODBBean $bean) {
+                    if (!$this->db) {
+                        throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
+                    }
+                    return $this->beanchecker->check( $bean );
 		}
 
 		/**
@@ -2112,7 +2142,7 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return $id
 		 */
-		public function set( OODBBean $bean ) {
+		public function set( RedBean_OODBBean $bean ) {
 
 			$this->checkBean($bean);
 
@@ -2514,7 +2544,7 @@ class RedBean_OODB {
 		 * Gets a bean by its primary ID
 		 * @param $type
 		 * @param $id
-		 * @return OODBBean $bean
+		 * @return RedBean_OODBBean $bean
 		 */
 		public function getById($type, $id, $data=false) {
 
@@ -2825,7 +2855,7 @@ class RedBean_OODB {
      * @param $orderby
      * @return unknown_type
      */
-    public function find(OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
+    public function find(RedBean_OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
  
       $this->checkBean( $bean );
       $db = $this->db;
@@ -2887,7 +2917,7 @@ class RedBean_OODB {
 		 * @param $bean2
 		 * @return unknown_type
 		 */
-		public function associate( OODBBean $bean1, OODBBean $bean2 ) { //@associate
+		public function associate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) { //@associate
 
 			//get a database
 			$db = $this->db;
@@ -2973,7 +3003,7 @@ class RedBean_OODB {
 		 * @param $bean2
 		 * @return unknown_type
 		 */
-		public function unassociate(OODBBean $bean1, OODBBean $bean2) {
+		public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 
 			//get a database
 			$db = $this->db;
@@ -3075,7 +3105,7 @@ class RedBean_OODB {
 		 * @param $targettype
 		 * @return array $beans
 		 */
-		public function getAssoc(OODBBean $bean, $targettype) {
+		public function getAssoc(RedBean_OODBBean $bean, $targettype) {
 			//get a database
 			$db = $this->db;
 			//first we check the beans whether they are valid
@@ -3134,7 +3164,7 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return unknown_type
 		 */
-		public function trash( OODBBean $bean ) {
+		public function trash( RedBean_OODBBean $bean ) {
 
 			$this->checkBean( $bean );
 			if (intval($bean->id)===0) return;
@@ -3251,11 +3281,11 @@ class RedBean_OODB {
 		/**
 		 * Dispenses; creates a new OODB bean of type $type
 		 * @param $type
-		 * @return OODBBean $bean
+		 * @return RedBean_OODBBean $bean
 		 */
 		public function dispense( $type="StandardBean" ) {
 
-			$oBean = new OODBBean();
+			$oBean = new RedBean_OODBBean();
 			$oBean->type = $type;
 			$oBean->id = 0;
 			return $oBean;
@@ -3268,7 +3298,7 @@ class RedBean_OODB {
 		 * @param $child
 		 * @return unknown_type
 		 */
-		public function addChild( OODBBean $parent, OODBBean $child ) {
+		public function addChild( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
 
 			//get a database
 			$db = $this->db;
@@ -3325,7 +3355,7 @@ class RedBean_OODB {
 		 * @param $parent
 		 * @return array $beans
 		 */
-		public function getChildren( OODBBean $parent ) {
+		public function getChildren( RedBean_OODBBean $parent ) {
 
 			//get a database
 			$db = $this->db;
@@ -3364,9 +3394,9 @@ class RedBean_OODB {
 		/**
 		 * Fetches the parent bean of child bean $child
 		 * @param $child
-		 * @return OODBBean $parent
+		 * @return RedBean_OODBBean $parent
 		 */
-		public function getParent( OODBBean $child ) {
+		public function getParent( RedBean_OODBBean $child ) {
 
 				
 			//get a database
@@ -3411,7 +3441,7 @@ class RedBean_OODB {
 		 * @param $child
 		 * @return unknown_type
 		 */
-		public function removeChild(OODBBean $parent, OODBBean $child) {
+		public function removeChild(RedBean_OODBBean $parent, RedBean_OODBBean $child) {
 
 			//get a database
 			$db = $this->db;
@@ -3455,7 +3485,7 @@ class RedBean_OODB {
 		 * @param $bean
 		 * @return integer $numberOfRelations
 		 */
-		public function numofRelated( $type, OODBBean $bean ) {
+		public function numofRelated( $type, RedBean_OODBBean $bean ) {
 			
 			//get a database
 			$db = $this->db;
@@ -3851,13 +3881,13 @@ class RedBean_OODB {
 		}
 }
 /**
- * OODBBean (Object Oriented DataBase Bean)
- * @package 		RedBean/OODBBean.php
+ * RedBean_OODBBean (Object Oriented DataBase Bean)
+ * @package 		RedBean/RedBean_OODBBean.php
  * @description		The Bean class used for passing information
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class OODBBean {
+class RedBean_OODBBean {
 }
 /**
  * Querylogger 
