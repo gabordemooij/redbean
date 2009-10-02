@@ -449,6 +449,13 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		self::getStaticProvider()->trash( $deco->getData() );
 	}
 
+        /**
+         * Same as delete() but not static
+         */
+        public function destroy() {
+                $this->provider->trash( $this->getData() );
+        }
+
 
 	/**
 	 * Explicitly forward-locks a decorated bean

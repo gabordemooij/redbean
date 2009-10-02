@@ -950,6 +950,10 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		self::getStaticProvider()->trash( $deco->getData() );
 	}
 
+        public function deleteNS() {
+                $this->provider->trash( $this->getData() );
+        }
+
 
 	/**
 	 * Explicitly forward-locks a decorated bean
@@ -3586,6 +3590,17 @@ class RedBean_OODB {
                                                                 RedBean_OODB::getInstance()->setLocking( true );
                                                                 return \$me;
                                                         }
+
+                                                        public function whereNS( \$sql, \$slots=array() ) {
+								return self::where( \$sql, \$slots );
+							}
+
+                                                        public function listAllNS(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
+								self::listAll(\$start,\$end,\$orderby,\$sql);
+							}
+                                                        public function getReadOnlyNS(\$id) {
+                                                                return self::getReadOnly(\$id);
+                                                        }
 							
 						}";
 
@@ -3886,6 +3901,12 @@ class RedBean_OODB {
 		public static function keepInShape($gc = false ,$stdTable=false, $stdCol=false) {
 			return self::getInstance()->keepInShapeNS($gc, $stdTable, $stdCol);
 		}
+
+                public function getInstOf( $className, $id=0 ) {
+                    if (!class_exists($className)) throw new Exception("Class does not Exist");
+                    $object = new $className($id);
+                    return $object;
+                }
 }
 /**
  * RedBean_OODBBean (Object Oriented DataBase Bean)
