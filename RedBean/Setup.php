@@ -105,6 +105,7 @@ class RedBean_Setup {
 		
 		//generate classes
 		RedBean_OODB::getInstance()->gen( $gen );
+                return RedBean_OODB::getInstance();
 	}
 	
 	/**
@@ -122,6 +123,7 @@ class RedBean_Setup {
 		
 		//generate classes
 		RedBean_OODB::getInstance()->gen( $gen );
+                return RedBean_OODB::getInstance();
 	}
 	
 	

@@ -38,7 +38,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @param $id
 	 * @return unknown_type
 	 */
-	public function __construct( RedBean_OODB $provider, $type=false, $id=0, $lock=false ) {
+	public function __construct( RedBean_OODB $provider, $type=false, $id=0) {
 
 		$this->provider = $provider;
 		$id = floatval( $id );
@@ -49,7 +49,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$this->type = preg_replace( "[\W_]","", strtolower($type));
 			//echo $this->type;
 			if ($id > 0) { //if the id is higher than 0 load data
-				$this->data = $this->provider->getById( $this->type, $id, $lock );
+				$this->data = $this->provider->getById( $this->type, $id);
 			}
 			else { //otherwise, dispense a regular empty RedBean_OODBBean
 				$this->data = $this->provider->dispense( $this->type );
@@ -594,10 +594,11 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$this->provider->openBean($this->data, true);
 		}
 		catch(RedBean_Exception_FailedAccessBean $e){
-			return false;	
+			return true;
 		}
-		return true;
+		return false;
 	}
+
 
 }
 

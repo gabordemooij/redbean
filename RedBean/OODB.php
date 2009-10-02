@@ -383,7 +383,7 @@ class RedBean_OODB {
 				//execute the previously build query
 				$db->exec( $insertSQL );
 				$bean->id = $db->getInsertID();
-				$this->openBean($bean);
+                    		$this->openBean($bean);
 			}
 
 			return $bean->id;
@@ -574,8 +574,7 @@ class RedBean_OODB {
 			
 			//If locking is turned off, or the bean has no persistance yet (not shared) life is always a success!
 			if (!$this->locking || $bean->id === 0) return true;
-
-			$db = $this->db;
+                        $db = $this->db;
 
 			//remove locks that have been expired...
 			$removeExpiredSQL = $this->writer->getQuery("remove_expir_lock", array(
@@ -1674,7 +1673,7 @@ class RedBean_OODB {
 					$ns = 'namespace ' . $namespacestring . " { ";
 				}
 				if ($c!=="" && $c!=="null" && !class_exists($c) && 
-								preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){ 
+							preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){ 
 							$tablename = preg_replace("/_/","",$className);
 							$fullname = $prefix.$className.$suffix;
 							$toeval = $ns . " class ".$fullname." extends ". (($ns=='') ? '' : '\\' ) . "RedBean_Decorator {
@@ -1692,6 +1691,13 @@ class RedBean_OODB {
 							public static function listAll(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
 								return RedBean_OODB::getInstance()->listAll(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
 							}
+
+                                                        public static function getReadOnly(\$id) {
+                                                                RedBean_OODB::getInstance()->setLocking( false );
+                                                                \$me = new self( \$id );
+                                                                RedBean_OODB::getInstance()->setLocking( true );
+                                                                return \$me;
+                                                        }
 							
 						}";
 

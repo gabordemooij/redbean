@@ -306,7 +306,7 @@ RedBean_OODB::getInstance()->gen("trash");
 $trash = new Trash();
 $trash->save();
 RedBean_OODB::getInstance()->clean();
-RedBean_OODB::getInstance()->setLocking( false ); //turn locking off
+//RedBean_OODB::getInstance()->setLocking( false ); //turn locking off
 $alltables = $db->getCol("show tables");
 SmartTest::instance()->progress(); ;
 if (!in_array("dtyp",$alltables)) SmartTest::failedTest();
@@ -751,12 +751,13 @@ function testsperengine( $engine ) {
 	
 	//Test description: trees
 	testpack("anemic trees");
+
 	$pete = RedBean_OODB::getInstance()->dispense("person");
 	$pete->age=48;
 	$pete->gender="m";
 	$pete->name="Pete";
 	$peteid = RedBean_OODB::getInstance()->set( $pete );
-	$rob = RedBean_OODB::getInstance()->dispense("person");
+        $rob = RedBean_OODB::getInstance()->dispense("person");
 	$rob->age=19;
 	$rob->name="Rob";
 	$rob->gender="m";
@@ -906,11 +907,22 @@ function testsperengine( $engine ) {
 	asrt(count(Person::listAll(0,1)),1);
 	asrt(count(Person::listAll(1)),2);
 	
-	
-	
+	//Test description Can we create read only instances?
+        testpack("Read Only Beans");
+        RedBean_OODB::getInstance()->generate("Story");
+        $story = new Story;
+        $story->name = "Never Ending";
+        asrt($story->isReadOnly(), false);
+        RedBean_OODB::getInstance()->setLocking( false );
+        $id = $story->save();
+        RedBean_OODB::getInstance()->setLocking( true );
+        $story2 = Story::getReadOnly( $id );
+        asrt($story2->isReadOnly(), true);
+       
+
 	//Test description Cans
 	RedBean_OODB::getInstance()->trash( $rob );
-	testpack("Cans of Beans $engine ");
+        testpack("Cans of Beans $engine ");
 	$can = Person::where("`gender`={gender} order by `name`  asc",array("gender"=>"m"),"person");
 	//test array access
 	foreach($can as $item) {

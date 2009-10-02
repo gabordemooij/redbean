@@ -539,7 +539,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @param $id
 	 * @return unknown_type
 	 */
-	public function __construct( RedBean_OODB $provider, $type=false, $id=0, $lock=false ) {
+	public function __construct( RedBean_OODB $provider, $type=false, $id=0) {
 
 		$this->provider = $provider;
 		$id = floatval( $id );
@@ -550,7 +550,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$this->type = preg_replace( "[\W_]","", strtolower($type));
 			//echo $this->type;
 			if ($id > 0) { //if the id is higher than 0 load data
-				$this->data = $this->provider->getById( $this->type, $id, $lock );
+				$this->data = $this->provider->getById( $this->type, $id);
 			}
 			else { //otherwise, dispense a regular empty RedBean_OODBBean
 				$this->data = $this->provider->dispense( $this->type );
@@ -1095,10 +1095,11 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$this->provider->openBean($this->data, true);
 		}
 		catch(RedBean_Exception_FailedAccessBean $e){
-			return false;	
+			return true;
 		}
-		return true;
+		return false;
 	}
+
 
 }
 /**
@@ -1907,7 +1908,7 @@ class RedBean_OODB {
 	 */
 	private $versioninf = "
 		RedBean Object Database layer 
-		VERSION 0.6
+		VERSION 0.7
 		BY G.J.G.T DE MOOIJ
 		LICENSE BSD
 		COPYRIGHT 2009
@@ -2270,7 +2271,7 @@ class RedBean_OODB {
 				//execute the previously build query
 				$db->exec( $insertSQL );
 				$bean->id = $db->getInsertID();
-				$this->openBean($bean);
+                    		$this->openBean($bean);
 			}
 
 			return $bean->id;
@@ -2461,8 +2462,7 @@ class RedBean_OODB {
 			
 			//If locking is turned off, or the bean has no persistance yet (not shared) life is always a success!
 			if (!$this->locking || $bean->id === 0) return true;
-
-			$db = $this->db;
+                        $db = $this->db;
 
 			//remove locks that have been expired...
 			$removeExpiredSQL = $this->writer->getQuery("remove_expir_lock", array(
@@ -3561,7 +3561,7 @@ class RedBean_OODB {
 					$ns = 'namespace ' . $namespacestring . " { ";
 				}
 				if ($c!=="" && $c!=="null" && !class_exists($c) && 
-								preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){ 
+							preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){ 
 							$tablename = preg_replace("/_/","",$className);
 							$fullname = $prefix.$className.$suffix;
 							$toeval = $ns . " class ".$fullname." extends ". (($ns=='') ? '' : '\\' ) . "RedBean_Decorator {
@@ -3579,6 +3579,13 @@ class RedBean_OODB {
 							public static function listAll(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
 								return RedBean_OODB::getInstance()->listAll(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
 							}
+
+                                                        public static function getReadOnly(\$id) {
+                                                                RedBean_OODB::getInstance()->setLocking( false );
+                                                                \$me = new self( \$id );
+                                                                RedBean_OODB::getInstance()->setLocking( true );
+                                                                return \$me;
+                                                        }
 							
 						}";
 
@@ -4975,6 +4982,7 @@ class RedBean_Setup {
 		
 		//generate classes
 		RedBean_OODB::getInstance()->gen( $gen );
+                return RedBean_OODB::getInstance();
 	}
 	
 	/**
@@ -4992,6 +5000,7 @@ class RedBean_Setup {
 		
 		//generate classes
 		RedBean_OODB::getInstance()->gen( $gen );
+                return RedBean_OODB::getInstance();
 	}
 	
 	
