@@ -157,8 +157,6 @@ asrt(class_exists("RedBean_Setup"),true);
 //Test description: Is the database a DBAdapter?
 $db = RedBean_OODB::getInstance()->getDatabase();
 asrt(($db instanceof RedBean_DBAdapter),true);
-//Test decription: Can we retrieve the version no. ?
-asrt(is_string(RedBean_OODB::getInstance()->getVersionInfo()),true);
 //Test description: test multiple database support
 testpack("multi database");
 $old = RedBean_Setup::kickstart("mysql:host=localhost;dbname=test","root","",false,"innodb",false);
@@ -522,7 +520,6 @@ function testsperengine( $engine ) {
 	
 	testpack("Anemic Model on ".$engine);
 	//Test basic, fundamental RedBean_OODBBean functions with Anemic Model
-	asrt(is_numeric(RedBean_OODB::getInstance()->getVersionNumber()),true);
 	$file = RedBean_OODB::getInstance()->dispense("file");
 	asrt((RedBean_OODB::getInstance()->dispense("file") instanceof RedBean_OODBBean),true);
 	//Test description: has the type property been set?

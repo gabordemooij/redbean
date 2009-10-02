@@ -8,23 +8,6 @@
  */
 class RedBean_OODB {
 
-	/**
-	 *
-	 * @var float
-	 */
-	private $version = 0.6;
-
-	/**
-	 *
-	 * @var string
-	 */
-	private $versioninf = "
-		RedBean Object Database layer 
-		VERSION 0.7
-		BY G.J.G.T DE MOOIJ
-		LICENSE BSD
-		COPYRIGHT 2009
-	";
 
 	/**
 	 * Indicates how long one can lock an item,
@@ -88,9 +71,13 @@ class RedBean_OODB {
 
 
                 private $beanchecker;
+                private $gc;
+                private $classGenerator;
 
                 public function __construct() {
                     $this->beanchecker = new RedBean_Mod_BeanChecker();
+                    $this->gc = new RedBean_Mod_GarbageCollector();
+                    $this->classGenerator = new RedBean_Mod_ClassGenerator();
                 }
 
 		/**
@@ -107,22 +94,7 @@ class RedBean_OODB {
 			
 		}
 
-		/**
-		 * Returns the version information of this RedBean instance
-		 * @return float
-		 */
-		public function getVersionInfo() {
-			return $this->versioninf;
-		}
-
-		/**
-		 * Returns the version number of this RedBean instance
-		 * @return unknown_type
-		 */
-		public function getVersionNumber() {
-			return $this->version;
-		}
-
+		
 		/**
 		 * Toggles Forward Locking
 		 * @param $tf
@@ -1653,83 +1625,9 @@ class RedBean_OODB {
 		 */
 		
 		public function generate( $classes, $prefix = false, $suffix = false ) {
+			return $this->classGenerator->generate($classes,$prefix,$suffix);
+                }
 			
-			if (!$prefix) {
-				$prefix = RedBean_Setup_Namespace_PRFX;
-			}
-			
-			if (!$suffix) {
-				$suffix = RedBean_Setup_Namespace_SFFX; 
-			}
-			
-			$classes = explode(",",$classes);
-			foreach($classes as $c) { // echo $c;
-				$ns = '';
-				$names = explode('\\', $c);
-				$className = trim(end($names));
-				if(count($names) > 1)
-				{
-					$namespacestring = implode('\\', array_slice($names, 0, -1));
-					$ns = 'namespace ' . $namespacestring . " { ";
-				}
-				if ($c!=="" && $c!=="null" && !class_exists($c) && 
-							preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){ 
-							$tablename = preg_replace("/_/","",$className);
-							$fullname = $prefix.$className.$suffix;
-							$toeval = $ns . " class ".$fullname." extends ". (($ns=='') ? '' : '\\' ) . "RedBean_Decorator {
-							private static \$__static_property_type = \"".strtolower($tablename)."\";
-							
-							public function __construct(\$id=0, \$lock=false) {
-								
-								parent::__construct( RedBean_OODB::getInstance(), '".strtolower($tablename)."',\$id,\$lock);
-							}
-							
-							public static function where( \$sql, \$slots=array() ) {
-								return new RedBean_Can( RedBean_OODB::getInstance(), self::\$__static_property_type, RedBean_OODB::getInstance()->getBySQL( \$sql, \$slots, self::\$__static_property_type) );
-							}
-	
-							public static function listAll(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
-								return RedBean_OODB::getInstance()->listAll(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
-							}
-
-                                                        public static function getReadOnly(\$id) {
-                                                                RedBean_OODB::getInstance()->setLocking( false );
-                                                                \$me = new self( \$id );
-                                                                RedBean_OODB::getInstance()->setLocking( true );
-                                                                return \$me;
-                                                        }
-
-                                                        public function whereNS( \$sql, \$slots=array() ) {
-								return self::where( \$sql, \$slots );
-							}
-
-                                                        public function listAllNS(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
-								self::listAll(\$start,\$end,\$orderby,\$sql);
-							}
-                                                        public function getReadOnlyNS(\$id) {
-                                                                return self::getReadOnly(\$id);
-                                                        }
-							
-						}";
-
-						if(count($names) > 1) {
-							$toeval .= "}";	
-						}	
-						
-						$teststring = (($ns!="") ? '\\'.$namespacestring.'\\'.$fullname : $fullname);
-
-						eval($toeval);	
-						if (!class_exists( $teststring )) {
-							throw new Exception("Failed to generate class");
-						}
-					
-				}
-				else {
-					return false;
-				}
-			}
-			return true;
-		}
 		
 
 
@@ -1795,33 +1693,8 @@ class RedBean_OODB {
 				return false;
 			}
 
-			//get a database
-			$db = $this->db;
+                        return $this->gc->removeUnused( $this, $this->db, $this->writer );
 
-			//get all tables
-			$tables = $this->showTables();
-			foreach($tables as $table) {
-				if (strpos($table,"_")!==false) {
-					//associative table
-					$tables = explode("_", $table); 
-					//both classes need to exist in order to keep this table
-					$classname1 = RedBean_Setup_Namespace_PRFX . $tables[0] . RedBean_Setup_Namespace_SFFX;
-					$classname2 = RedBean_Setup_Namespace_PRFX . $tables[1] . RedBean_Setup_Namespace_SFFX;
-					if(!class_exists( $classname1 , true) || !class_exists( $classname2 , true)) {
-						$db->exec( $this->writer->getQuery("drop_tables",array("tables"=>array($table))) );
-						$db->exec($this->writer->getQuery("unregister_table",array("table"=>$table)));
-					}
-				}
-				else {
-					//does the class exist?
-					$classname = RedBean_Setup_Namespace_PRFX . $table . RedBean_Setup_Namespace_SFFX;
-					if(!class_exists( $classname , true)) {
-						$db->exec( $this->writer->getQuery("drop_tables",array("tables"=>array($table))) );
-						$db->exec($this->writer->getQuery("unregister_table",array("table"=>$table)));
-					}
-				} 
-				
-			}
 			
 		}
 		/**
