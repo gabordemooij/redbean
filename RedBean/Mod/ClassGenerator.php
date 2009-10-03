@@ -2,15 +2,11 @@
 
 class RedBean_Mod_ClassGenerator {
 
-    private $filter;
     private $provider;
 
     public function __construct( RedBean_OODB $provider ) {
-        $this->filter = $provider->getFilter();
         $this->provider = $provider;
     }
-
-    
 
     public function generate( $classes, $prefix = false, $suffix = false ) {
 
@@ -37,11 +33,11 @@ class RedBean_Mod_ClassGenerator {
                                         $tablename = $className;
                                         $fullname = $prefix.$className.$suffix;
                                         $toeval = $ns . " class ".$fullname." extends ". (($ns=='') ? '' : '\\' ) . "RedBean_Decorator {
-                                        private static \$__static_property_type = \"".$this->filter->table($tablename)."\";
+                                        private static \$__static_property_type = \"".$this->provider->getFilter()->table($tablename)."\";
 
                                         public function __construct(\$id=0, \$lock=false) {
 
-                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->filter->table($tablename)."',\$id,\$lock);
+                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->provider->getFilter()->table($tablename)."',\$id,\$lock);
                                         }
 
                                         public static function where( \$sql, \$slots=array() ) {
@@ -59,16 +55,7 @@ class RedBean_Mod_ClassGenerator {
                                                 return \$me;
                                         }
 
-                                        public function whereNS( \$sql, \$slots=array() ) {
-                                                return self::where( \$sql, \$slots );
-                                        }
-
-                                        public function listAllNS(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
-                                                self::listAll(\$start,\$end,\$orderby,\$sql);
-                                        }
-                                        public function getReadOnlyNS(\$id) {
-                                                return self::getReadOnly(\$id);
-                                        }
+                                       
 
                                 }";
 

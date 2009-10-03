@@ -75,15 +75,19 @@ class RedBean_OODB {
                 private $classGenerator;
                 private $filter;
 
-                public function __construct( $filter = false ) {
-                    if ($filter) $this->filter=$filter; else  $this->filter = new RedBean_Mod_Filter_Strict();
+                private function __construct( $filter = false ) {
+                    $this->filter = new RedBean_Mod_Filter_Strict();
                     $this->beanchecker = new RedBean_Mod_BeanChecker();
                     $this->gc = new RedBean_Mod_GarbageCollector();
-                    $this->classGenerator = new RedBean_Mod_ClassGenerator( $this->filter );
+                    $this->classGenerator = new RedBean_Mod_ClassGenerator( $this );
                 }
 
                 public function getFilter() {
                     return $this->filter;
+                }
+
+                public function setFilter( RedBean_Mod_Filter $filter ) {
+                    $this->filter = $filter;
                 }
                
 

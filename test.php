@@ -518,15 +518,19 @@ $r = RedBean_OODB::getInstance();
 $r->generate("StrA_NGER");
 $o = new StrA_NGER;
 asrt($o->getData()->type,"stranger");
-$r = new RedBean_OODB( new RedBean_Mod_Filter_NullFilter );
+$r->setFilter( new RedBean_Mod_Filter_NullFilter );
 asrt(($r->getFilter() instanceof RedBean_Mod_Filter_NullFilter),true);
 $r->generate("StrA_NGER2");
 $o = new StrA_NGER2;
 asrt($o->getData()->type,"StrA_NGER2");
+$p = "Wr0_NGProp";
+$o->$p = 42;
+asrt($o->$p,42);
+$o->save();
+$r->setFilter( new RedBean_Mod_Filter_Strict );
+pass();
 
 
-
-exit;
 
 //Tests for each individual engine
 function testsperengine( $engine ) {

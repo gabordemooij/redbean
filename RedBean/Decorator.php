@@ -32,7 +32,6 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	protected $provider = null;
 
-        protected $filter = null;
 
 	/**
 	 * Constructor, loads directly from main table
@@ -43,15 +42,14 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	public function __construct( RedBean_OODB $provider, $type=false, $id=0) {
 
 		$this->provider = $provider;
-                $this->filter = $provider->getFilter();
-
+                
                
 		$id = floatval( $id );
 		if (!$type) {
 			throw new Exception("Undefined bean type");
 		}
 		else {
-			$this->type = $this->filter->table($type);
+                	$this->type = $this->provider->getFilter()->table($type);
                         //echo $this->type;
 			if ($id > 0) { //if the id is higher than 0 load data
 				$this->data = $this->provider->getById( $this->type, $id);
@@ -143,7 +141,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function __get( $name ) {
 		$this->signal("deco_get", $this);
-		$name = $this->filter->property($name, true);
+		$name = $this->provider->getFilter()->property($name, true);
 		return isset($this->data->$name) ? $this->data->$name : null;
 	}
 
@@ -152,7 +150,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function __set( $name, $value ) {
 		$this->signal("deco_set", $this);
-		$name = $this->filter->property($name);
+		$name = $this->provider->getFilter()->property($name);
 		$this->data->$name = $value;
 	}
 
@@ -168,14 +166,14 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		if (strpos( $method,"set" ) === 0) {
 			$prop = substr( $method, 3 );
-			$prop = $this->filter->property($prop);
+			$prop = $this->provider->getFilter()->property($prop);
 			$this->$prop = $arguments[0];
 			return $this;
 
 		}
 		elseif (strpos($method,"getRelated")===0)	{
 			$this->signal("deco_get", $this);
-			$prop = $this->filter->table( substr( $method, 10 ) );
+			$prop = $this->provider->getFilter()->table( substr( $method, 10 ) );
 			$beans = $this->provider->getAssoc( $this->data, $prop );
 			$decos = array();
 			$dclass = RedBean_Setup_Namespace_PRFX.$prop.RedBean_Setup_Namespace_SFFX;
@@ -191,11 +189,11 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		}
 		elseif (strpos( $method, "get" ) === 0) {
 			$prop = substr( $method, 3 );
-                        $prop = $this->filter->property($prop, true);
+                        $prop = $this->provider->getFilter()->property($prop, true);
 			return $this->$prop;
 		}
 		elseif (strpos( $method, "is" ) === 0) {
-			$prop = $this->filter->property( substr( $method, 2 ) );
+			$prop = $this->provider->getFilter()->property( substr( $method, 2 ) );
 			if (!isset($this->data->$prop)) {
 				$this->signal("deco_get",$this);
 				return false;
@@ -225,13 +223,13 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		}
 		else if (strpos($method,"clearRelated")===0) {
 			$this->signal("deco_clearrelated",$this);
-			$type = $this->filter->table( substr( $method, 12 ) );
+			$type = $this->provider->getFilter()->table( substr( $method, 12 ) );
 			$this->provider->deleteAllAssocType($type, $this->data);
 			return $this;
 		}
 		else if (strpos($method,"numof")===0) {
 			$this->signal("deco_numof",$this);
-			$type = $this->filter->table( substr( $method, 5 ) );
+			$type = $this->provider->getFilter()->table( substr( $method, 5 ) );
 			return $this->provider->numOfRelated($type, $this->data);
 				
 		}

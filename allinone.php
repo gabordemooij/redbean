@@ -533,7 +533,6 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	protected $provider = null;
 
-        protected $filter = null;
 
 	/**
 	 * Constructor, loads directly from main table
@@ -544,17 +543,15 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	public function __construct( RedBean_OODB $provider, $type=false, $id=0) {
 
 		$this->provider = $provider;
-                $this->filter = $provider->getFilter();
-
+                
                
 		$id = floatval( $id );
 		if (!$type) {
 			throw new Exception("Undefined bean type");
 		}
 		else {
-			$this->type = $this->filter->table($type);
-                        echo '\n type = '.$this->type;
-			//echo $this->type;
+                	$this->type = $this->provider->getFilter()->table($type);
+                        //echo $this->type;
 			if ($id > 0) { //if the id is higher than 0 load data
 				$this->data = $this->provider->getById( $this->type, $id);
 			}
@@ -645,7 +642,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function __get( $name ) {
 		$this->signal("deco_get", $this);
-		$name = $this->filter->property($name, true);
+		$name = $this->provider->getFilter()->property($name, true);
 		return isset($this->data->$name) ? $this->data->$name : null;
 	}
 
@@ -654,7 +651,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function __set( $name, $value ) {
 		$this->signal("deco_set", $this);
-		$name = $this->filter->property($name);
+		$name = $this->provider->getFilter()->property($name);
 		$this->data->$name = $value;
 	}
 
@@ -670,14 +667,14 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		if (strpos( $method,"set" ) === 0) {
 			$prop = substr( $method, 3 );
-			$prop = $this->filter->property($prop);
+			$prop = $this->provider->getFilter()->property($prop);
 			$this->$prop = $arguments[0];
 			return $this;
 
 		}
 		elseif (strpos($method,"getRelated")===0)	{
 			$this->signal("deco_get", $this);
-			$prop = $this->filter->table( substr( $method, 10 ) );
+			$prop = $this->provider->getFilter()->table( substr( $method, 10 ) );
 			$beans = $this->provider->getAssoc( $this->data, $prop );
 			$decos = array();
 			$dclass = RedBean_Setup_Namespace_PRFX.$prop.RedBean_Setup_Namespace_SFFX;
@@ -693,11 +690,11 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		}
 		elseif (strpos( $method, "get" ) === 0) {
 			$prop = substr( $method, 3 );
-                        $prop = $this->filter->property($prop, true);
+                        $prop = $this->provider->getFilter()->property($prop, true);
 			return $this->$prop;
 		}
 		elseif (strpos( $method, "is" ) === 0) {
-			$prop = $this->filter->property( substr( $method, 2 ) );
+			$prop = $this->provider->getFilter()->property( substr( $method, 2 ) );
 			if (!isset($this->data->$prop)) {
 				$this->signal("deco_get",$this);
 				return false;
@@ -727,13 +724,13 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		}
 		else if (strpos($method,"clearRelated")===0) {
 			$this->signal("deco_clearrelated",$this);
-			$type = $this->filter->table( substr( $method, 12 ) );
+			$type = $this->provider->getFilter()->table( substr( $method, 12 ) );
 			$this->provider->deleteAllAssocType($type, $this->data);
 			return $this;
 		}
 		else if (strpos($method,"numof")===0) {
 			$this->signal("deco_numof",$this);
-			$type = $this->filter->table( substr( $method, 5 ) );
+			$type = $this->provider->getFilter()->table( substr( $method, 5 ) );
 			return $this->provider->numOfRelated($type, $this->data);
 				
 		}
@@ -1815,13 +1812,11 @@ class RedBean_Mod_BeanChecker {
 }
 class RedBean_Mod_ClassGenerator {
 
-    private $filter;
+    private $provider;
 
-    public function __construct( RedBean_Mod_Filter $filter ) {
-        $this->filter = $filter;
+    public function __construct( RedBean_OODB $provider ) {
+        $this->provider = $provider;
     }
-
-    
 
     public function generate( $classes, $prefix = false, $suffix = false ) {
 
@@ -1848,11 +1843,11 @@ class RedBean_Mod_ClassGenerator {
                                         $tablename = $className;
                                         $fullname = $prefix.$className.$suffix;
                                         $toeval = $ns . " class ".$fullname." extends ". (($ns=='') ? '' : '\\' ) . "RedBean_Decorator {
-                                        private static \$__static_property_type = \"".$this->filter->table($tablename)."\";
+                                        private static \$__static_property_type = \"".$this->provider->getFilter()->table($tablename)."\";
 
                                         public function __construct(\$id=0, \$lock=false) {
 
-                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->filter->table($tablename)."',\$id,\$lock);
+                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->provider->getFilter()->table($tablename)."',\$id,\$lock);
                                         }
 
                                         public static function where( \$sql, \$slots=array() ) {
@@ -1870,16 +1865,7 @@ class RedBean_Mod_ClassGenerator {
                                                 return \$me;
                                         }
 
-                                        public function whereNS( \$sql, \$slots=array() ) {
-                                                return self::where( \$sql, \$slots );
-                                        }
-
-                                        public function listAllNS(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
-                                                self::listAll(\$start,\$end,\$orderby,\$sql);
-                                        }
-                                        public function getReadOnlyNS(\$id) {
-                                                return self::getReadOnly(\$id);
-                                        }
+                                       
 
                                 }";
 
@@ -1888,7 +1874,6 @@ class RedBean_Mod_ClassGenerator {
                                 }
 
                                 $teststring = (($ns!="") ? '\\'.$namespacestring.'\\'.$fullname : $fullname);
-                                echo $toeval; 
                                 eval($toeval);
                                 if (!class_exists( $teststring )) {
                                         throw new Exception("Failed to generate class");
@@ -2120,15 +2105,19 @@ class RedBean_OODB {
                 private $classGenerator;
                 private $filter;
 
-                public function __construct( $filter = false ) {
-                    if ($filter) $this->filter=$filter; else  $this->filter = new RedBean_Mod_Filter_Strict();
+                private function __construct( $filter = false ) {
+                    $this->filter = new RedBean_Mod_Filter_Strict();
                     $this->beanchecker = new RedBean_Mod_BeanChecker();
                     $this->gc = new RedBean_Mod_GarbageCollector();
-                    $this->classGenerator = new RedBean_Mod_ClassGenerator( $this->filter );
+                    $this->classGenerator = new RedBean_Mod_ClassGenerator( $this );
                 }
 
                 public function getFilter() {
                     return $this->filter;
+                }
+
+                public function setFilter( RedBean_Mod_Filter $filter ) {
+                    $this->filter = $filter;
                 }
                
 
