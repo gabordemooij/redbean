@@ -6,6 +6,9 @@
  * @author			Desfrenes
  * @license			BSD
  */
+echo "\n RedBean Builder v1.0 ";
+echo "\n Written by Desfrenes ";
+echo "\n Building..... ";
 define('BASE_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 set_include_path('.' . PATH_SEPARATOR . BASE_DIR);
 function __autoload($class)
@@ -14,3 +17,4 @@ function __autoload($class)
 }
 RedBean_Tools::compile(BASE_DIR . 'allinone.php', false);
 RedBean_Tools::compile(BASE_DIR . 'allinone-compressed.php', true);
+echo "\n done.. \n\n";

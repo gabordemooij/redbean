@@ -1752,8 +1752,10 @@ class RedBean_Exception_SQL extends RedBean_Exception {};
  * @license			BSD
  */
 class Redbean_Exception extends Exception{}
-class RedBean_Mod_BeanChecker {
+class RedBean_Mod_BeanChecker extends RedBean_Mod {
 
+    public function __construct(){}
+    
     public function check( RedBean_OODBBean $bean ) {
         foreach($bean as $prop=>$value) {
             
@@ -1810,14 +1812,154 @@ class RedBean_Mod_BeanChecker {
 
 
 }
-class RedBean_Mod_ClassGenerator {
+class RedBean_Mod_BeanStore extends RedBean_Mod {
 
-    private $provider;
+    /**
+     * Inserts a bean into the database
+     * @param $bean
+     * @return $id
+     */
+    public function set( RedBean_OODBBean $bean ) {
 
-    public function __construct( RedBean_OODB $provider ) {
-        $this->provider = $provider;
+        $this->provider->checkBean($bean);
+
+
+        $db = $this->provider->getDatabase(); //I am lazy, I dont want to waste characters...
+
+
+        $table = $db->escape($bean->type); //what table does it want
+
+        //may we adjust the database?
+        if (!$this->provider->isFrozen()) {
+
+        //does this table exist?
+            $tables = $this->provider->showTables();
+
+            if (!in_array($table, $tables)) {
+
+                $createtableSQL = $this->provider->getWriter()->getQuery("create_table", array(
+                    "engine"=>$this->provider->getEngine(),
+                    "table"=>$table
+                ));
+
+                //get a table for our friend!
+                $db->exec( $createtableSQL );
+                //jupz, now he has its own table!...
+                $this->provider->addTable( $table );
+            }
+
+            //does the table fit?
+            $columnsRaw = $this->provider->getWriter()->getTableColumns($table, $db) ;
+
+            $columns = array();
+            foreach($columnsRaw as $r) {
+                $columns[$r["Field"]]=$r["Type"];
+            }
+
+            $insertvalues = array();
+            $insertcolumns = array();
+            $updatevalues = array();
+
+            foreach( $bean as $p=>$v) {
+                if ($p!="type" && $p!="id") {
+                    $p = $db->escape($p);
+                    $v = $db->escape($v);
+                    //What kind of property are we dealing with?
+                    $typeno = $this->provider->inferType($v);
+                    //Is this property represented in the table?
+                    if (isset($columns[$p])) {
+                    //yes it is, does it still fit?
+                        $sqlt = $this->provider->getType($columns[$p]);
+                        //echo "TYPE = $sqlt .... $typeno ";
+                        if ($typeno > $sqlt) {
+                        //no, we have to widen the database column type
+                            $changecolumnSQL = $this->provider->getWriter()->getQuery( "widen_column", array(
+                                "table" => $table,
+                                "column" => $p,
+                                "newtype" => $this->provider->getWriter()->typeno_sqltype[$typeno]
+                                ) );
+
+                            $db->exec( $changecolumnSQL );
+                        }
+                    }
+                    else {
+                    //no it is not
+                        $addcolumnSQL = $this->provider->getWriter()->getQuery("add_column",array(
+                            "table"=>$table,
+                            "column"=>$p,
+                            "type"=> $this->provider->getWriter()->typeno_sqltype[$typeno]
+                        ));
+
+                        $db->exec( $addcolumnSQL );
+                    }
+                    //Okay, now we are sure that the property value will fit
+                    $insertvalues[] = $v;
+                    $insertcolumns[] = $p;
+                    $updatevalues[] = array( "property"=>$p, "value"=>$v );
+                }
+            }
+
+        }
+        else {
+
+            foreach( $bean as $p=>$v) {
+                if ($p!="type" && $p!="id") {
+                    $p = $db->escape($p);
+                    $v = $db->escape($v);
+                    $insertvalues[] = $v;
+                    $insertcolumns[] = $p;
+                    $updatevalues[] = array( "property"=>$p, "value"=>$v );
+                }
+            }
+
+        }
+
+        //Does the record exist already?
+        if ($bean->id) {
+        //echo "<hr>Now trying to open bean....";
+            $this->provider->openBean($bean, true);
+            //yes it exists, update it
+            if (count($updatevalues)>0) {
+                $updateSQL = $this->provider->getWriter()->getQuery("update", array(
+                    "table"=>$table,
+                    "updatevalues"=>$updatevalues,
+                    "id"=>$bean->id
+                ));
+
+                //execute the previously build query
+                $db->exec( $updateSQL );
+            }
+        }
+        else {
+        //no it does not exist, create it
+            if (count($insertvalues)>0) {
+
+                $insertSQL = $this->provider->getWriter()->getQuery("insert",array(
+                    "table"=>$table,
+                    "insertcolumns"=>$insertcolumns,
+                    "insertvalues"=>$insertvalues
+                ));
+
+            }
+            else {
+                $insertSQL = $this->provider->getWriter()->getQuery("create", array("table"=>$table));
+            }
+            //execute the previously build query
+            $db->exec( $insertSQL );
+            $bean->id = $db->getInsertID();
+            $this->provider->openBean($bean);
+        }
+
+        return $bean->id;
+
     }
+    
 
+
+}
+class RedBean_Mod_ClassGenerator extends RedBean_Mod {
+
+    
     public function generate( $classes, $prefix = false, $suffix = false ) {
 
         if (!$prefix) {
@@ -1890,7 +2032,9 @@ class RedBean_Mod_ClassGenerator {
 
 
 }
-class RedBean_Mod_Filter_NullFilter implements RedBean_Mod_Filter {
+class RedBean_Mod_Filter_NullFilter extends RedBean_Mod implements RedBean_Mod_Filter {
+
+    public function __construct(){}
 
     public function property( $name, $forReading = false ) {
         return $name;
@@ -1901,8 +2045,10 @@ class RedBean_Mod_Filter_NullFilter implements RedBean_Mod_Filter {
     }
 
 }
-class RedBean_Mod_Filter_Strict implements RedBean_Mod_Filter {
+class RedBean_Mod_Filter_Strict extends RedBean_Mod implements RedBean_Mod_Filter {
 
+    public function __construct(){}
+    
     public function property( $name, $forReading = false ) {
         $name = strtolower($name);
           if (!$forReading) {
@@ -1932,9 +2078,12 @@ interface RedBean_Mod_Filter {
     public function property( $name, $forReading = false );
     public function table( $name );
 }
-class RedBean_Mod_GarbageCollector {
+class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 
+    public function __construct() {
 
+    }
+    
     public function removeUnused( RedBean_OODB $oodb, RedBean_DBAdapter $db, RedBean_QueryWriter $writer ) {
 
             //get all tables
@@ -1962,6 +2111,234 @@ class RedBean_Mod_GarbageCollector {
 
             }
     }
+}
+class RedBean_Mod_Optimizer extends RedBean_Mod {
+
+    /**
+     * Narrows columns to appropriate size if needed
+     * @return unknown_type
+     */
+    public function run( $gc = false ,$stdTable=false, $stdCol=false) {
+
+    //oops, we are frozen, so no change..
+        if ($this->provider->isFrozen()) {
+            return false;
+        }
+
+        //get a database
+        $db = $this->provider->getDatabase();
+
+        //get all tables
+        $tables = $this->provider->showTables();
+
+        //pick a random table
+        if ($tables && is_array($tables) && count($tables) > 0) {
+            if ($gc) $this->provider->removeUnused( $tables );
+            $table = $tables[array_rand( $tables, 1 )];
+        }
+        else {
+            return; //or return if there are no tables (yet)
+        }
+        if ($stdTable) $table = $stdTable;
+
+        $table = $db->escape( $table );
+        //do not remove columns from association tables
+        if (strpos($table,'_')!==false) return;
+        //table is still in use? But are all columns in use as well?
+
+        $cols = $this->provider->getWriter()->getTableColumns( $table, $db );
+
+        //$cols = $db->get( $this->provider->getWriter()->getQuery("describe",array(
+        //	"table"=>$table
+        //)) );
+        //pick a random column
+        if (count($cols)<1) return;
+        $colr = $cols[array_rand( $cols )];
+        $col = $db->escape( $colr["Field"] ); //fetch the name and escape
+        if ($stdCol) {
+            $exists = false;
+            $col = $stdCol;
+            foreach($cols as $cl) {
+                if ($cl["Field"]==$col) {
+                    $exists = $cl;
+                }
+            }
+            if (!$exists) {
+                return;
+            }
+            else {
+                $colr = $exists;
+            }
+        }
+        if ($col=="id" || strpos($col,"_id")!==false) {
+            return; //special column, cant slim it down
+        }
+
+
+        //now we have a table and a column $table and $col
+        if ($gc && !intval($db->getCell( $this->provider->getWriter()->getQuery("get_null",array(
+            "table"=>$table,
+            "col"=>$col
+            )
+        )))) {
+            $db->exec( $this->provider->getWriter()->getQuery("drop_column",array("table"=>$table,"property"=>$col)));
+            return;
+        }
+
+        //okay so this column is still in use, but maybe its to wide
+        //get the field type
+        //print_r($colr);
+        $currenttype =  $this->writer->sqltype_typeno[$colr["Type"]];
+        if ($currenttype > 0) {
+            $trytype = rand(0,$currenttype - 1); //try a little smaller
+            //add a test column
+            $db->exec($this->provider->getWriter()->getQuery("test_column",array(
+                "type"=>$this->writer->typeno_sqltype[$trytype],
+                "table"=>$table
+                )
+            ));
+            //fill the tinier column with the same values of the original column
+            $db->exec($this->provider->getWriter()->getQuery("update_test",array(
+                "table"=>$table,
+                "col"=>$col
+            )));
+            //measure the difference
+            $delta = $db->getCell($this->provider->getWriter()->getQuery("measure",array(
+                "table"=>$table,
+                "col"=>$col
+            )));
+            if (intval($delta)===0) {
+            //no difference? then change the column to save some space
+                $sql = $this->provider->getWriter()->getQuery("remove_test",array(
+                    "table"=>$table,
+                    "col"=>$col,
+                    "type"=>$this->writer->typeno_sqltype[$trytype]
+                ));
+                $db->exec($sql);
+            }
+            //get rid of the test column..
+            $db->exec( $this->provider->getWriter()->getQuery("drop_test",array(
+                "table"=>$table
+                )) );
+        }
+
+        //@todo -> querywriter!
+        //Can we put an index on this column?
+        //Is this column worth the trouble?
+        if (
+        strpos($colr["Type"],"TEXT")!==false ||
+            strpos($colr["Type"],"LONGTEXT")!==false
+        ) {
+            return;
+        }
+
+
+        $variance = $db->getCell($this->provider->getWriter()->getQuery("variance",array(
+            "col"=>$col,
+            "table"=>$table
+        )));
+        $records = $db->getCell($this->provider->getWriter()->getQuery("count",array("type"=>$table)));
+        if ($records) {
+            $relvar = intval($variance) / intval($records); //how useful would this index be?
+            //if this column describes the table well enough it might be used to
+            //improve overall performance.
+            $indexname = "reddex_".$col;
+            if ($records > 1 && $relvar > 0.85) {
+                $sqladdindex=$this->provider->getWriter()->getQuery("index1",array(
+                    "table"=>$table,
+                    "indexname"=>$indexname,
+                    "col"=>$col
+                ));
+                $db->exec( $sqladdindex );
+            }
+            else {
+                $sqldropindex = $this->provider->getWriter()->getQuery("index2",array("table"=>$table,"indexname"=>$indexname));
+                $db->exec( $sqldropindex );
+            }
+        }
+
+        return true;
+    }
+
+
+}
+class RedBean_Mod_Search extends RedBean_Mod {
+
+    /**
+     * Fills slots in SQL query
+     * @param $sql
+     * @param $slots
+     * @return unknown_type
+     */
+    public function processQuerySlots($sql, $slots) {
+
+        $db = $this->provider->getDatabase();
+
+        //Just a funny code to identify slots based on randomness
+        $code = sha1(rand(1,1000)*time());
+
+        //This ensures no one can hack our queries via SQL template injection
+        foreach( $slots as $key=>$value ) {
+            $sql = str_replace( "{".$key."}", "{".$code.$key."}" ,$sql );
+        }
+
+        //replace the slots inside the SQL template
+        foreach( $slots as $key=>$value ) {
+            $sql = str_replace( "{".$code.$key."}", $this->provider->getWriter()->getQuote().$db->escape( $value ).$this->provider->getWriter()->getQuote(),$sql );
+        }
+
+        return $sql;
+    }
+
+
+
+    public function sql($rawsql, $slots, $table, $max=0) {
+
+        $db = $this->provider->getDatabase();
+        
+        $sql = $rawsql;
+
+        if (is_array($slots)) {
+            $sql = $this->processQuerySlots( $sql, $slots );
+        }
+
+        $sql = str_replace('@ifexists:','', $sql);
+        $rs = $db->getCol( $this->provider->getWriter()->getQuery("where",array(
+            "table"=>$table
+            )) . $sql );
+
+        $err = $db->getErrorMsg();
+        if (!$this->frozen && strpos($err,"Unknown column")!==false && $max<10) {
+            $matches = array();
+            if (preg_match("/Unknown\scolumn\s'(.*?)'/",$err,$matches)) {
+                if (count($matches)==2 && strpos($rawsql,'@ifexists')!==false) {
+                    $rawsql = str_replace('@ifexists:`'.$matches[1].'`','NULL', $rawsql);
+                    $rawsql = str_replace('@ifexists:'.$matches[1].'','NULL', $rawsql);
+                    return $this->sql( $rawsql, $slots, $table, ++$max);
+                }
+            }
+            return array();
+        }
+        else {
+            if (is_array($rs)) {
+                return $rs;
+            }
+            else {
+                return array();
+            }
+        }
+
+
+    }
+}
+abstract class RedBean_Mod {
+
+    protected $provider;
+
+    public function __construct(RedBean_OODB $provider) {
+        $this->provider = $provider;
+    }
+
 }
 /**
  * Observable
@@ -2104,12 +2481,18 @@ class RedBean_OODB {
                 private $gc;
                 private $classGenerator;
                 private $filter;
+                private $search;
+                private $optimizer;
+                private $beanstore;
 
                 private function __construct( $filter = false ) {
                     $this->filter = new RedBean_Mod_Filter_Strict();
                     $this->beanchecker = new RedBean_Mod_BeanChecker();
                     $this->gc = new RedBean_Mod_GarbageCollector();
                     $this->classGenerator = new RedBean_Mod_ClassGenerator( $this );
+                    $this->search = new RedBean_Mod_Search( $this );
+                    $this->optimizer = new RedBean_Mod_Optimizer( $this );
+                    $this->beanstore = new RedBean_Mod_BeanStore( $this );
                 }
 
                 public function getFilter() {
@@ -2120,6 +2503,13 @@ class RedBean_OODB {
                     $this->filter = $filter;
                 }
                
+                public function getWriter() {
+                    return $this->writer;
+                }
+
+                public function isFrozen() {
+                    return (boolean) $this->freeze;
+                }
 
 		/**
 		 * Closes and unlocks the bean
@@ -2265,145 +2655,9 @@ class RedBean_OODB {
 			$this->rollback = true;
 		}
 		
-		/**
-		 * Inserts a bean into the database
-		 * @param $bean
-		 * @return $id
-		 */
 		public function set( RedBean_OODBBean $bean ) {
-
-			$this->checkBean($bean);
-
-
-			$db = $this->db; //I am lazy, I dont want to waste characters...
-
-		
-			$table = $db->escape($bean->type); //what table does it want
-
-			//may we adjust the database?
-			if (!$this->frozen) {
-
-				//does this table exist?
-				$tables = $this->showTables();
-					
-				if (!in_array($table, $tables)) {
-
-					$createtableSQL = $this->writer->getQuery("create_table", array(
-						"engine"=>$this->engine,
-						"table"=>$table
-					));
-				
-					//get a table for our friend!
-					$db->exec( $createtableSQL );
-					//jupz, now he has its own table!
-					$this->addTable( $table );
-				}
-
-				//does the table fit?
-				 $columnsRaw = $this->writer->getTableColumns($table, $db) ;
-					
-				$columns = array();
-				foreach($columnsRaw as $r) {
-					$columns[$r["Field"]]=$r["Type"];
-				}
-					
-				$insertvalues = array();
-				$insertcolumns = array();
-				$updatevalues = array();
-					
-				foreach( $bean as $p=>$v) {
-					if ($p!="type" && $p!="id") {
-						$p = $db->escape($p);
-						$v = $db->escape($v);
-						//What kind of property are we dealing with?
-						$typeno = $this->inferType($v);
-						//Is this property represented in the table?
-						if (isset($columns[$p])) {
-							//yes it is, does it still fit?
-							$sqlt = $this->getType($columns[$p]);
-							//echo "TYPE = $sqlt .... $typeno ";
-							if ($typeno > $sqlt) {
-								//no, we have to widen the database column type
-								$changecolumnSQL = $this->writer->getQuery( "widen_column", array(
-									"table" => $table,
-									"column" => $p,
-									"newtype" => $this->writer->typeno_sqltype[$typeno]
-								) ); 
-								
-								$db->exec( $changecolumnSQL );
-							}
-						}
-						else {
-							//no it is not
-							$addcolumnSQL = $this->writer->getQuery("add_column",array(
-								"table"=>$table,
-								"column"=>$p,
-								"type"=> $this->writer->typeno_sqltype[$typeno]
-							));
-							
-							$db->exec( $addcolumnSQL );
-						}
-						//Okay, now we are sure that the property value will fit
-						$insertvalues[] = $v;
-						$insertcolumns[] = $p;
-						$updatevalues[] = array( "property"=>$p, "value"=>$v );
-					}
-				}
-
-			}
-			else {
-					
-				foreach( $bean as $p=>$v) {
-					if ($p!="type" && $p!="id") {
-						$p = $db->escape($p);
-						$v = $db->escape($v);
-						$insertvalues[] = $v;
-						$insertcolumns[] = $p;
-						$updatevalues[] = array( "property"=>$p, "value"=>$v );
-					}
-				}
-					
-			}
-
-			//Does the record exist already?
-			if ($bean->id) {
-				//echo "<hr>Now trying to open bean....";
-				$this->openBean($bean, true);
-				//yes it exists, update it
-				if (count($updatevalues)>0) {
-					$updateSQL = $this->writer->getQuery("update", array(
-						"table"=>$table,
-						"updatevalues"=>$updatevalues,
-						"id"=>$bean->id
-					)); 
-					
-					//execute the previously build query
-					$db->exec( $updateSQL );
-				}
-			}
-			else {
-				//no it does not exist, create it
-				if (count($insertvalues)>0) {
-					
-					$insertSQL = $this->writer->getQuery("insert",array(
-						"table"=>$table,
-						"insertcolumns"=>$insertcolumns,
-						"insertvalues"=>$insertvalues
-					));
-				
-				}
-				else {
-					$insertSQL = $this->writer->getQuery("create", array("table"=>$table)); 
-				}
-				//execute the previously build query
-				$db->exec( $insertSQL );
-				$bean->id = $db->getInsertID();
-                    		$this->openBean($bean);
-			}
-
-			return $bean->id;
-				
-		}
+                    return $this->beanstore->set($bean);
+                }
 
 
 		/**
@@ -2882,32 +3136,6 @@ class RedBean_OODB {
 		}
 
 		/**
-		 * Fills slots in SQL query
-		 * @param $sql
-		 * @param $slots
-		 * @return unknown_type
-		 */
-		public function processQuerySlots($sql, $slots) {
-			
-			$db = $this->db;
-			
-			//Just a funny code to identify slots based on randomness
-			$code = sha1(rand(1,1000)*time());
-			
-			//This ensures no one can hack our queries via SQL template injection
-			foreach( $slots as $key=>$value ) {
-				$sql = str_replace( "{".$key."}", "{".$code.$key."}" ,$sql ); 
-			}
-			
-			//replace the slots inside the SQL template
-			foreach( $slots as $key=>$value ) {
-				$sql = str_replace( "{".$code.$key."}", $this->writer->getQuote().$db->escape( $value ).$this->writer->getQuote(),$sql ); 
-			}
-			
-			return $sql;
-		}
-		
-		/**
 		 * Loads a collection of beans -fast-
 		 * @param $type
 		 * @param $ids
@@ -2937,39 +3165,9 @@ class RedBean_OODB {
 		 * @return array $beans
 		 */
 		public function getBySQL( $rawsql, $slots, $table, $max=0 ) {
-		
-			$db = $this->db;
-			$sql = $rawsql;
-			
-			if (is_array($slots)) {
-				$sql = $this->processQuerySlots( $sql, $slots );
-			}
-			
-			$sql = str_replace('@ifexists:','', $sql);
-			$rs = $db->getCol( $this->writer->getQuery("where",array(
-				"table"=>$table
-			)) . $sql );
-			
-			$err = $db->getErrorMsg();
-			if (!$this->frozen && strpos($err,"Unknown column")!==false && $max<10) {
-				$matches = array();
-				if (preg_match("/Unknown\scolumn\s'(.*?)'/",$err,$matches)) {
-					if (count($matches)==2 && strpos($rawsql,'@ifexists')!==false){
-						$rawsql = str_replace('@ifexists:`'.$matches[1].'`','NULL', $rawsql);
-						$rawsql = str_replace('@ifexists:'.$matches[1].'','NULL', $rawsql);
-						return $this->getBySQL( $rawsql, $slots, $table, ++$max);
-					}
-				}
-				return array();
-			}
-			else {
-				if (is_array($rs)) {
-					return $rs;
-				}
-				else {
-					return array();
-				}
-			}
+
+                        return $this->search->sql( $rawsql, $slots, $table, $max );
+                       
 		}
 		
 		
@@ -3772,158 +3970,14 @@ class RedBean_OODB {
 	        $this->db->exec( $this->writer->getQuery("drop_type",array("type"=>$this->filter->table($type))));
 	    }
 
-	    /**
-		 * Narrows columns to appropriate size if needed
-		 * @return unknown_type
-		 */
-		public function keepInShapeNS( $gc = false ,$stdTable=false, $stdCol=false) {
-			
-			//oops, we are frozen, so no change..
-			if ($this->frozen) {
-				return false;
-			}
-
-			//get a database
-			$db = $this->db;
-
-			//get all tables
-			$tables = $this->showTables();
-			
-				//pick a random table
-				if ($tables && is_array($tables) && count($tables) > 0) {
-					if ($gc) $this->removeUnused( $tables );
-					$table = $tables[array_rand( $tables, 1 )];
-				}
-				else {
-					return; //or return if there are no tables (yet)
-				}
-			if ($stdTable) $table = $stdTable;
-
-			$table = $db->escape( $table );
-			//do not remove columns from association tables
-			if (strpos($table,'_')!==false) return;
-			//table is still in use? But are all columns in use as well?
-			
-			$cols = $this->writer->getTableColumns( $table, $db );
-			
-			//$cols = $db->get( $this->writer->getQuery("describe",array(
-			//	"table"=>$table
-			//)) );
-			//pick a random column
-			if (count($cols)<1) return;
-				$colr = $cols[array_rand( $cols )];
-				$col = $db->escape( $colr["Field"] ); //fetch the name and escape
-		        if ($stdCol){
-				$exists = false;	
-				$col = $stdCol; 
-				foreach($cols as $cl){
-					if ($cl["Field"]==$col) {
-						$exists = $cl;
-					}
-				}
-				if (!$exists) {
-					return; 
-				}
-				else {
-					$colr = $exists;
-				}
-			}
-			if ($col=="id" || strpos($col,"_id")!==false) {
-				return; //special column, cant slim it down
-			}
-			
-			
-			//now we have a table and a column $table and $col
-			if ($gc && !intval($db->getCell( $this->writer->getQuery("get_null",array(
-				"table"=>$table,
-				"col"=>$col
-			)
-			)))) {
-				$db->exec( $this->writer->getQuery("drop_column",array("table"=>$table,"property"=>$col)));
-				return;	
-			}
-			
-			//okay so this column is still in use, but maybe its to wide
-			//get the field type
-			//print_r($colr);
-			$currenttype =  $this->writer->sqltype_typeno[$colr["Type"]];
-			if ($currenttype > 0) {
-				$trytype = rand(0,$currenttype - 1); //try a little smaller
-				//add a test column
-				$db->exec($this->writer->getQuery("test_column",array(
-					"type"=>$this->writer->typeno_sqltype[$trytype],
-					"table"=>$table
-				)
-				));
-				//fill the tinier column with the same values of the original column
-				$db->exec($this->writer->getQuery("update_test",array(
-					"table"=>$table,
-					"col"=>$col
-				)));
-				//measure the difference
-				$delta = $db->getCell($this->writer->getQuery("measure",array(
-					"table"=>$table,
-					"col"=>$col
-				)));
-				if (intval($delta)===0) {
-					//no difference? then change the column to save some space
-					$sql = $this->writer->getQuery("remove_test",array(
-						"table"=>$table,
-						"col"=>$col,
-						"type"=>$this->writer->typeno_sqltype[$trytype]
-					));
-					$db->exec($sql);
-				}
-				//get rid of the test column..
-				$db->exec( $this->writer->getQuery("drop_test",array(
-					"table"=>$table
-				)) );
-			}
-		
-			//@todo -> querywriter!
-			//Can we put an index on this column?
-			//Is this column worth the trouble?
-			if (
-				strpos($colr["Type"],"TEXT")!==false ||
-				strpos($colr["Type"],"LONGTEXT")!==false
-			) {
-				return;
-			}
-			
-		
-			$variance = $db->getCell($this->writer->getQuery("variance",array(
-				"col"=>$col,
-				"table"=>$table
-			)));
-			$records = $db->getCell($this->writer->getQuery("count",array("type"=>$table)));
-			if ($records) {
-				$relvar = intval($variance) / intval($records); //how useful would this index be?
-				//if this column describes the table well enough it might be used to
-				//improve overall performance.
-				$indexname = "reddex_".$col;
-				if ($records > 1 && $relvar > 0.85) {
-					$sqladdindex=$this->writer->getQuery("index1",array(
-						"table"=>$table,
-						"indexname"=>$indexname,
-						"col"=>$col
-					));
-					$db->exec( $sqladdindex );
-				}
-				else {
-					$sqldropindex = $this->writer->getQuery("index2",array("table"=>$table,"indexname"=>$indexname));
-					$db->exec( $sqldropindex );
-				}
-			}
-			
-			return true;
-		}
+	  
 		
 		public static function gen($arg, $prefix = false, $suffix = false) {
 			return self::getInstance()->generate($arg, $prefix, $suffix);
 		}
 	
 		public static function keepInShape($gc = false ,$stdTable=false, $stdCol=false) {
-			return self::getInstance()->keepInShapeNS($gc, $stdTable, $stdCol);
+			return self::getInstance()->optimizer->run($gc, $stdTable, $stdCol);
 		}
 
                 public function getInstOf( $className, $id=0 ) {
@@ -5230,6 +5284,8 @@ class RedBean_Tools
     {
         if(is_file($file) && substr($file, -4) == '.php')
         {
+            echo "\n including.. $file ";
+
             if(self::$remove_whitespaces)
             {
                 self::$class_definitions .= "\n" . trim(str_replace('', '', php_strip_whitespace($file)));

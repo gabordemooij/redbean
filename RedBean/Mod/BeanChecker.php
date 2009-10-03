@@ -1,7 +1,9 @@
 <?php
 
-class RedBean_Mod_BeanChecker {
+class RedBean_Mod_BeanChecker extends RedBean_Mod {
 
+    public function __construct(){}
+    
     public function check( RedBean_OODBBean $bean ) {
         foreach($bean as $prop=>$value) {
             

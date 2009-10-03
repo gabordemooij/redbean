@@ -1,8 +1,11 @@
 <?php
 
-class RedBean_Mod_GarbageCollector {
+class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 
+    public function __construct() {
 
+    }
+    
     public function removeUnused( RedBean_OODB $oodb, RedBean_DBAdapter $db, RedBean_QueryWriter $writer ) {
 
             //get all tables

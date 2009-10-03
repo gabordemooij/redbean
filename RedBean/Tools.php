@@ -81,6 +81,8 @@ class RedBean_Tools
     {
         if(is_file($file) && substr($file, -4) == '.php')
         {
+            echo "\n including.. $file ";
+
             if(self::$remove_whitespaces)
             {
                 self::$class_definitions .= "\n" . trim(str_replace('<?php', '', php_strip_whitespace($file)));

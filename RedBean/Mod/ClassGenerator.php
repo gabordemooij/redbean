@@ -1,13 +1,8 @@
 <?php
 
-class RedBean_Mod_ClassGenerator {
+class RedBean_Mod_ClassGenerator extends RedBean_Mod {
 
-    private $provider;
-
-    public function __construct( RedBean_OODB $provider ) {
-        $this->provider = $provider;
-    }
-
+    
     public function generate( $classes, $prefix = false, $suffix = false ) {
 
         if (!$prefix) {
