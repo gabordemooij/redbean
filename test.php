@@ -50,7 +50,7 @@ class SmartTest {
 	
 	public static function test( $value, $expected ) {
 		if ($value != $expected) {
-			printtext("FAILED TEST");
+			fail();
 			exit;
 		}
 		else {
@@ -81,6 +81,7 @@ function pass() {
 
 function fail() {
 	printtext("FAILED TEST");
+        
 	exit;
 }
 
@@ -236,7 +237,7 @@ $observer->signal="";
 $employee->getRelatedCustomer();
 asrt($observer->signal,"deco_get");
 $observer->signal="";
-$employee->is("nerd");
+$employee->isNerd();
 asrt($observer->signal,"deco_get");
 $observer->signal="";
 $employee->clearRelated("nerd");
@@ -511,8 +512,21 @@ $bean->type = "locking";
 try{RedBean_OODB::getInstance()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 
 
+//Test filtering
+testpack("Filter classes");
+$r = RedBean_OODB::getInstance();
+$r->generate("StrA_NGER");
+$o = new StrA_NGER;
+asrt($o->getData()->type,"stranger");
+$r = new RedBean_OODB( new RedBean_Mod_Filter_NullFilter );
+asrt(($r->getFilter() instanceof RedBean_Mod_Filter_NullFilter),true);
+$r->generate("StrA_NGER2");
+$o = new StrA_NGER2;
+asrt($o->getData()->type,"StrA_NGER2");
 
 
+
+exit;
 
 //Tests for each individual engine
 function testsperengine( $engine ) {

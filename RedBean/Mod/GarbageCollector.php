@@ -31,3 +31,4 @@ class RedBean_Mod_GarbageCollector {
             }
     }
 }
+

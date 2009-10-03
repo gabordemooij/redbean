@@ -73,12 +73,19 @@ class RedBean_OODB {
                 private $beanchecker;
                 private $gc;
                 private $classGenerator;
+                private $filter;
 
-                public function __construct() {
+                public function __construct( $filter = false ) {
+                    if ($filter) $this->filter=$filter; else  $this->filter = new RedBean_Mod_Filter_Strict();
                     $this->beanchecker = new RedBean_Mod_BeanChecker();
                     $this->gc = new RedBean_Mod_GarbageCollector();
-                    $this->classGenerator = new RedBean_Mod_ClassGenerator();
+                    $this->classGenerator = new RedBean_Mod_ClassGenerator( $this->filter );
                 }
+
+                public function getFilter() {
+                    return $this->filter;
+                }
+               
 
 		/**
 		 * Closes and unlocks the bean
@@ -93,6 +100,8 @@ class RedBean_OODB {
 			);
 			
 		}
+
+
 
 		
 		/**
@@ -708,7 +717,7 @@ class RedBean_OODB {
 		public function numberof($type) {
 
 			$db = $this->db;
-			$type = strtolower( $db->escape( $type ) );
+			$type = $this->filter->table( $db->escape( $type ) );
 
 			$alltables = $this->showTables();
 
@@ -736,7 +745,7 @@ class RedBean_OODB {
 			//TODO: Consider if GROUP BY (equivalent meaning) is more portable 
 			//across DB types?
 			$db = $this->db;
-			$type = strtolower( $db->escape( $type ) );
+			$type = $this->filter->table( $db->escape( $type ) );
 			$field = $db->escape( $field );
 		
 			$alltables = $this->showTables();
@@ -768,8 +777,8 @@ class RedBean_OODB {
 		private function stat($type,$field,$stat="sum") {
 
 			$db = $this->db;
-			$type = strtolower( $db->escape( $type ) );
-			$field = strtolower( $db->escape( $field ) );
+			$type = $this->filter->table( $db->escape( $type ) );
+			$field = $this->filter->property( $db->escape( $field ) );
 			$stat = $db->escape( $stat );
 
 			$alltables = $this->showTables();
@@ -1199,7 +1208,7 @@ class RedBean_OODB {
 
 
 			//obtain the table names
-			$t1 = $db->escape( strtolower($bean->type) );
+			$t1 = $db->escape( $this->filter->table($bean->type) );
 			$t2 = $db->escape( $targettype );
 
 			//infer the association table
@@ -1324,7 +1333,7 @@ class RedBean_OODB {
 			$id = intval( $bean->id );
 
 			//obtain the table names
-			$t1 = $db->escape( strtolower($bean->type) );
+			$t1 = $db->escape( $this->filter->table($bean->type) );
 			$t2 = $db->escape( $targettype );
 
 			//infer the association table
@@ -1574,12 +1583,12 @@ class RedBean_OODB {
 			//get a database
 			$db = $this->db;
 			
-			$t2 = strtolower( $db->escape( $type ) );
+			$t2 = $this->filter->table( $db->escape( $type ) );
 						
 			//is this bean valid?
 			$this->checkBean( $bean );
-			$t1 = strtolower( $bean->type  );
-			$tref = strtolower( $db->escape( $bean->type ) );
+			$t1 = $this->filter->table( $bean->type  );
+			$tref = $this->filter->table( $db->escape( $bean->type ) );
 			$id = intval( $bean->id );
 						
 			//infer the association table
@@ -1726,7 +1735,7 @@ class RedBean_OODB {
 	     * @return nothing
 	     */
 	    public function trashAll($type) {
-	        $this->db->exec( $this->writer->getQuery("drop_type",array("type"=>strtolower($type))));
+	        $this->db->exec( $this->writer->getQuery("drop_type",array("type"=>$this->filter->table($type))));
 	    }
 
 	    /**

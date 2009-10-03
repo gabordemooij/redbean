@@ -2,7 +2,18 @@
 
 class RedBean_Mod_ClassGenerator {
 
+    private $filter;
+    private $provider;
+
+    public function __construct( RedBean_OODB $provider ) {
+        $this->filter = $provider->getFilter();
+        $this->provider = $provider;
+    }
+
+    
+
     public function generate( $classes, $prefix = false, $suffix = false ) {
+
         if (!$prefix) {
                 $prefix = RedBean_Setup_Namespace_PRFX;
         }
@@ -23,14 +34,14 @@ class RedBean_Mod_ClassGenerator {
                 }
                 if ($c!=="" && $c!=="null" && !class_exists($c) &&
                                         preg_match("/^\s*[A-Za-z_][A-Za-z0-9_]*\s*$/",$className)){
-                                        $tablename = preg_replace("/_/","",$className);
+                                        $tablename = $className;
                                         $fullname = $prefix.$className.$suffix;
                                         $toeval = $ns . " class ".$fullname." extends ". (($ns=='') ? '' : '\\' ) . "RedBean_Decorator {
-                                        private static \$__static_property_type = \"".strtolower($tablename)."\";
+                                        private static \$__static_property_type = \"".$this->filter->table($tablename)."\";
 
                                         public function __construct(\$id=0, \$lock=false) {
 
-                                                parent::__construct( RedBean_OODB::getInstance(), '".strtolower($tablename)."',\$id,\$lock);
+                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->filter->table($tablename)."',\$id,\$lock);
                                         }
 
                                         public static function where( \$sql, \$slots=array() ) {
@@ -66,7 +77,6 @@ class RedBean_Mod_ClassGenerator {
                                 }
 
                                 $teststring = (($ns!="") ? '\\'.$namespacestring.'\\'.$fullname : $fullname);
-
                                 eval($toeval);
                                 if (!class_exists( $teststring )) {
                                         throw new Exception("Failed to generate class");
@@ -83,3 +93,4 @@ class RedBean_Mod_ClassGenerator {
 
 
 }
+
