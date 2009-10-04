@@ -723,7 +723,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			return $this;
 		}
 		else if (strpos($method,"clearRelated")===0) {
-			$this->signal("deco_clearrelated",$this);
+			$this->signal("deco_clearrelated",$this); 
 			$type = $this->provider->getFilter()->table( substr( $method, 12 ) );
 			$this->provider->deleteAllAssocType($type, $this->data);
 			return $this;
@@ -1752,6 +1752,190 @@ class RedBean_Exception_SQL extends RedBean_Exception {};
  * @license			BSD
  */
 class Redbean_Exception extends Exception{}
+class RedBean_Mod_Association extends RedBean_Mod {
+
+    public function link( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
+        //get a database
+        $db = $this->provider->getDatabase();
+
+        //first we check the beans whether they are valid
+        $bean1 = $this->provider->checkBeanForAssoc($bean1);
+        $bean2 = $this->provider->checkBeanForAssoc($bean2);
+
+        $this->provider->openBean( $bean1, true );
+        $this->provider->openBean( $bean2, true );
+
+        //sort the beans
+        $tp1 = $bean1->type;
+        $tp2 = $bean2->type;
+        if ($tp1==$tp2) {
+            $arr = array( 0=>$bean1, 1 =>$bean2 );
+        }
+        else {
+            $arr = array( $tp1=>$bean1, $tp2 =>$bean2 );
+        }
+        ksort($arr);
+        $bean1 = array_shift( $arr );
+        $bean2 = array_shift( $arr );
+
+        $id1 = intval($bean1->id);
+        $id2 = intval($bean2->id);
+
+        //infer the association table
+        $tables = array();
+        array_push( $tables, $db->escape( $bean1->type ) );
+        array_push( $tables, $db->escape( $bean2->type ) );
+        //sort the table names to make sure we only get one assoc table
+        sort($tables);
+        $assoctable = $db->escape( implode("_",$tables) );
+
+        //check whether this assoctable already exists
+        if (!$this->provider->isFrozen()) {
+            $alltables = $this->provider->showTables();
+            if (!in_array($assoctable, $alltables)) {
+            //no assoc table does not exist, create it..
+                $t1 = $tables[0];
+                $t2 = $tables[1];
+
+                if ($t1==$t2) {
+                    $t2.="2";
+                }
+
+                $assoccreateSQL = $this->provider->getWriter()->getQuery("create_assoc",array(
+                    "assoctable"=> $assoctable,
+                    "t1" =>$t1,
+                    "t2" =>$t2,
+                    "engine"=>$this->provider->getEngine()
+                ));
+
+                $db->exec( $assoccreateSQL );
+
+                //add a unique constraint
+                $db->exec( $this->provider->getWriter()->getQuery("add_assoc",array(
+                    "assoctable"=> $assoctable,
+                    "t1" =>$t1,
+                    "t2" =>$t2
+                    )) );
+
+                $this->provider->addTable( $assoctable );
+            }
+        }
+
+        //now insert the association record
+        $assocSQL = $this->provider->getWriter()->getQuery("add_assoc_now", array(
+            "id1"=>$id1,
+            "id2"=>$id2,
+            "assoctable"=>$assoctable
+        ));
+
+        $db->exec( $assocSQL );
+
+    }
+
+
+    /**
+     * Breaks the association between a pair of beans
+     * @param $bean1
+     * @param $bean2
+     * @return unknown_type
+     */
+    public function breakLink(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+    //get a database
+        $db = $this->provider->getDatabase();
+
+        //first we check the beans whether they are valid
+        $bean1 = $this->provider->checkBeanForAssoc($bean1);
+        $bean2 = $this->provider->checkBeanForAssoc($bean2);
+
+
+        $this->provider->openBean( $bean1, true );
+        $this->provider->openBean( $bean2, true );
+
+
+        $idx1 = intval($bean1->id);
+        $idx2 = intval($bean2->id);
+
+        //sort the beans
+        $tp1 = $bean1->type;
+        $tp2 = $bean2->type;
+
+        if ($tp1==$tp2) {
+            $arr = array( 0=>$bean1, 1 =>$bean2 );
+        }
+        else {
+            $arr = array( $tp1=>$bean1, $tp2 =>$bean2 );
+        }
+
+        ksort($arr);
+        $bean1 = array_shift( $arr );
+        $bean2 = array_shift( $arr );
+
+        $id1 = intval($bean1->id);
+        $id2 = intval($bean2->id);
+
+        //infer the association table
+        $tables = array();
+        array_push( $tables, $db->escape( $bean1->type ) );
+        array_push( $tables, $db->escape( $bean2->type ) );
+        //sort the table names to make sure we only get one assoc table
+        sort($tables);
+
+
+        $assoctable = $db->escape( implode("_",$tables) );
+
+        //check whether this assoctable already exists
+        $alltables = $this->provider->showTables();
+
+        if (in_array($assoctable, $alltables)) {
+            $t1 = $tables[0];
+            $t2 = $tables[1];
+            if ($t1==$t2) {
+                $t2.="2";
+                $unassocSQL = $this->provider->getWriter()->getQuery("unassoc",array(
+                    "assoctable"=>$assoctable,
+                    "t1"=>$t2,
+                    "t2"=>$t1,
+                    "id1"=>$id1,
+                    "id2"=>$id2
+                ));
+                //$unassocSQL = "DELETE FROM `$assoctable` WHERE ".$t2."_id = $id1 AND ".$t1."_id = $id2 ";
+                $db->exec($unassocSQL);
+            }
+
+            //$unassocSQL = "DELETE FROM `$assoctable` WHERE ".$t1."_id = $id1 AND ".$t2."_id = $id2 ";
+
+            $unassocSQL = $this->provider->getWriter()->getQuery("unassoc",array(
+                "assoctable"=>$assoctable,
+                "t1"=>$t1,
+                "t2"=>$t2,
+                "id1"=>$id1,
+                "id2"=>$id2
+            ));
+
+            $db->exec($unassocSQL);
+        }
+        if ($tp1==$tp2) {
+            $assoctable2 = "pc_".$db->escape( $bean1->type )."_".$db->escape( $bean1->type );
+            //echo $assoctable2;
+            //check whether this assoctable already exists
+            $alltables = $this->provider->showTables();
+            if (in_array($assoctable2, $alltables)) {
+
+            //$id1 = intval($bean1->id);
+            //$id2 = intval($bean2->id);
+                $unassocSQL = $this->provider->getWriter()->getQuery("untree", array(
+                    "assoctable2"=>$assoctable2,
+                    "idx1"=>$idx1,
+                    "idx2"=>$idx2
+                ));
+
+                $db->exec($unassocSQL);
+            }
+        }
+    }
+
+
+}
 class RedBean_Mod_BeanChecker extends RedBean_Mod {
 
     public function __construct(){}
@@ -1812,6 +1996,12 @@ class RedBean_Mod_BeanChecker extends RedBean_Mod {
 
 
 }
+/**
+ * @class BeanStore
+ * @desc The BeanStore is responsible for storing, retrieving, updating and deleting beans.
+ * It performs the BASIC CRUD operations on bean objects.
+ * 
+ */
 class RedBean_Mod_BeanStore extends RedBean_Mod {
 
     /**
@@ -1860,6 +2050,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
             $insertcolumns = array();
             $updatevalues = array();
 
+            //@todo: move this logic to a table manager
             foreach( $bean as $p=>$v) {
                 if ($p!="type" && $p!="id") {
                     $p = $db->escape($p);
@@ -1953,8 +2144,42 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
         return $bean->id;
 
     }
-    
 
+   
+    public function get($type, $id, $data=false) {
+        $bean = $this->provider->dispense( $type );
+        $db = $this->provider->getDatabase();
+        $table = $db->escape( $type );
+        $id = abs( intval( $id ) );
+        $bean->id = $id;
+
+        //try to open the bean
+        $this->provider->openBean($bean);
+
+        //load the bean using sql
+        if (!$data) {
+                $getSQL = $this->provider->getWriter()->getQuery("get_bean",array(
+                        "type"=>$type,
+                        "id"=>$id
+                ));
+                $row = $db->getRow( $getSQL );
+        }
+        else {
+                $row = $data;
+        }
+
+        if ($row && is_array($row) && count($row)>0) {
+                foreach($row as $p=>$v) {
+                        //populate the bean with the database row
+                        $bean->$p = $v;
+                }
+        }
+        else {
+                throw new RedBean_Exception_FailedAccessBean("bean not found");
+        }
+
+        return $bean;
+    }
 
 }
 class RedBean_Mod_ClassGenerator extends RedBean_Mod {
@@ -2068,6 +2293,9 @@ class RedBean_Mod_Filter_Strict extends RedBean_Mod implements RedBean_Mod_Filte
 
     public function table( $name ) {
           $name =  strtolower(trim(preg_replace("/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]/","",$name)));
+          if (strlen($name)===0) {
+            throw new RedBean_Exception_Security("Empty property is not allowed");
+          }
           return $name;
 
     }
@@ -2188,12 +2416,12 @@ class RedBean_Mod_Optimizer extends RedBean_Mod {
         //okay so this column is still in use, but maybe its to wide
         //get the field type
         //print_r($colr);
-        $currenttype =  $this->writer->sqltype_typeno[$colr["Type"]];
+        $currenttype =  $this->provider->getWriter()->sqltype_typeno[$colr["Type"]];
         if ($currenttype > 0) {
             $trytype = rand(0,$currenttype - 1); //try a little smaller
             //add a test column
             $db->exec($this->provider->getWriter()->getQuery("test_column",array(
-                "type"=>$this->writer->typeno_sqltype[$trytype],
+                "type"=>$this->provider->getWriter()->typeno_sqltype[$trytype],
                 "table"=>$table
                 )
             ));
@@ -2212,7 +2440,7 @@ class RedBean_Mod_Optimizer extends RedBean_Mod {
                 $sql = $this->provider->getWriter()->getQuery("remove_test",array(
                     "table"=>$table,
                     "col"=>$col,
-                    "type"=>$this->writer->typeno_sqltype[$trytype]
+                    "type"=>$this->provider->getWriter()->typeno_sqltype[$trytype]
                 ));
                 $db->exec($sql);
             }
@@ -2308,7 +2536,7 @@ class RedBean_Mod_Search extends RedBean_Mod {
             )) . $sql );
 
         $err = $db->getErrorMsg();
-        if (!$this->frozen && strpos($err,"Unknown column")!==false && $max<10) {
+        if (!$this->provider->isFrozen() && strpos($err,"Unknown column")!==false && $max<10) {
             $matches = array();
             if (preg_match("/Unknown\scolumn\s'(.*?)'/",$err,$matches)) {
                 if (count($matches)==2 && strpos($rawsql,'@ifexists')!==false) {
@@ -2484,6 +2712,7 @@ class RedBean_OODB {
                 private $search;
                 private $optimizer;
                 private $beanstore;
+                private $association;
 
                 private function __construct( $filter = false ) {
                     $this->filter = new RedBean_Mod_Filter_Strict();
@@ -2493,6 +2722,7 @@ class RedBean_OODB {
                     $this->search = new RedBean_Mod_Search( $this );
                     $this->optimizer = new RedBean_Mod_Optimizer( $this );
                     $this->beanstore = new RedBean_Mod_BeanStore( $this );
+                    $this->association = new RedBean_Mod_Association( $this );
                 }
 
                 public function getFilter() {
@@ -2508,7 +2738,7 @@ class RedBean_OODB {
                 }
 
                 public function isFrozen() {
-                    return (boolean) $this->freeze;
+                    return (boolean) $this->frozen;
                 }
 
 		/**
@@ -2928,43 +3158,9 @@ class RedBean_OODB {
 		 * @return RedBean_OODBBean $bean
 		 */
 		public function getById($type, $id, $data=false) {
-
-			$bean = $this->dispense( $type );
-			$db = $this->db;
-			$table = $db->escape( $type );
-			$id = abs( intval( $id ) );
-			$bean->id = $id;
-
-			//try to open the bean
-			$this->openBean($bean);
-
-			//load the bean using sql
-			if (!$data) {
-				
-				$getSQL = $this->writer->getQuery("get_bean",array(
-					"type"=>$type,
-					"id"=>$id
-				)); 
-				$row = $db->getRow( $getSQL );
-			}
-			else {
-				$row = $data;
-			}
-			
-			if ($row && is_array($row) && count($row)>0) {
-				foreach($row as $p=>$v) {
-					//populate the bean with the database row
-					$bean->$p = $v;
-				}
-			}
-			else {
-				throw new RedBean_Exception_FailedAccessBean("bean not found");
-			}
-
-			return $bean;
-
-		}
-
+                        return $this->beanstore->get($type,$id,$data);
+                }
+                
 		/**
 		 * Checks whether a type-id combination exists
 		 * @param $type
@@ -3243,83 +3439,7 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public function associate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) { //@associate
-
-			//get a database
-			$db = $this->db;
-
-			//first we check the beans whether they are valid
-			$bean1 = $this->checkBeanForAssoc($bean1);
-			$bean2 = $this->checkBeanForAssoc($bean2);
-
-			$this->openBean( $bean1, true );
-			$this->openBean( $bean2, true );
-
-			//sort the beans
-			$tp1 = $bean1->type;
-			$tp2 = $bean2->type;
-			if ($tp1==$tp2){
-				$arr = array( 0=>$bean1, 1 =>$bean2 );
-			}
-			else {
-				$arr = array( $tp1=>$bean1, $tp2 =>$bean2 );
-			}
-			ksort($arr);
-			$bean1 = array_shift( $arr );
-			$bean2 = array_shift( $arr );
-
-			$id1 = intval($bean1->id);
-			$id2 = intval($bean2->id);
-
-			//infer the association table
-			$tables = array();
-			array_push( $tables, $db->escape( $bean1->type ) );
-			array_push( $tables, $db->escape( $bean2->type ) );
-			//sort the table names to make sure we only get one assoc table
-			sort($tables);
-			$assoctable = $db->escape( implode("_",$tables) );
-
-			//check whether this assoctable already exists
-			if (!$this->frozen) {
-				$alltables = $this->showTables();
-				if (!in_array($assoctable, $alltables)) {
-					//no assoc table does not exist, create it..
-					$t1 = $tables[0];
-					$t2 = $tables[1];
-
-					if ($t1==$t2) {
-						$t2.="2";
-					}
-
-					$assoccreateSQL = $this->writer->getQuery("create_assoc",array(
-						"assoctable"=> $assoctable,
-						"t1" =>$t1,
-						"t2" =>$t2,
-						"engine"=>$this->engine
-					));
-					
-					$db->exec( $assoccreateSQL );
-					
-					//add a unique constraint
-					$db->exec( $this->writer->getQuery("add_assoc",array(
-						"assoctable"=> $assoctable,
-						"t1" =>$t1,
-						"t2" =>$t2
-					)) );
-					
-					$this->addTable( $assoctable );
-				}
-			}
-				
-			//now insert the association record
-			$assocSQL = $this->writer->getQuery("add_assoc_now", array(
-				"id1"=>$id1,
-				"id2"=>$id2,
-				"assoctable"=>$assoctable
-			));
-			
-			$db->exec( $assocSQL );
-				
-
+                        return $this->association->link( $bean1, $bean2 );
 		}
 
 		/**
@@ -3329,99 +3449,7 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-
-			//get a database
-			$db = $this->db;
-
-			//first we check the beans whether they are valid
-			$bean1 = $this->checkBeanForAssoc($bean1);
-			$bean2 = $this->checkBeanForAssoc($bean2);
-
-
-			$this->openBean( $bean1, true );
-			$this->openBean( $bean2, true );
-
-
-			$idx1 = intval($bean1->id);
-			$idx2 = intval($bean2->id);
-
-			//sort the beans
-			$tp1 = $bean1->type;
-			$tp2 = $bean2->type;
-
-			if ($tp1==$tp2){
-				$arr = array( 0=>$bean1, 1 =>$bean2 );
-			}
-			else {
-				$arr = array( $tp1=>$bean1, $tp2 =>$bean2 );
-			}
-				
-			ksort($arr);
-			$bean1 = array_shift( $arr );
-			$bean2 = array_shift( $arr );
-				
-			$id1 = intval($bean1->id);
-			$id2 = intval($bean2->id);
-				
-			//infer the association table
-			$tables = array();
-			array_push( $tables, $db->escape( $bean1->type ) );
-			array_push( $tables, $db->escape( $bean2->type ) );
-			//sort the table names to make sure we only get one assoc table
-			sort($tables);
-				
-				
-			$assoctable = $db->escape( implode("_",$tables) );
-				
-			//check whether this assoctable already exists
-			$alltables = $this->showTables();
-				
-			if (in_array($assoctable, $alltables)) {
-				$t1 = $tables[0];
-				$t2 = $tables[1];
-				if ($t1==$t2) {
-					$t2.="2";
-					$unassocSQL = $this->writer->getQuery("unassoc",array(
-					"assoctable"=>$assoctable,
-					"t1"=>$t2,
-					"t2"=>$t1,
-					"id1"=>$id1,
-					"id2"=>$id2
-					));
-					//$unassocSQL = "DELETE FROM `$assoctable` WHERE ".$t2."_id = $id1 AND ".$t1."_id = $id2 ";
-					$db->exec($unassocSQL);
-				}
-
-				//$unassocSQL = "DELETE FROM `$assoctable` WHERE ".$t1."_id = $id1 AND ".$t2."_id = $id2 ";
-
-				$unassocSQL = $this->writer->getQuery("unassoc",array(
-					"assoctable"=>$assoctable,
-					"t1"=>$t1,
-					"t2"=>$t2,
-					"id1"=>$id1,
-					"id2"=>$id2
-				));
-				
-				$db->exec($unassocSQL);
-			}
-			if ($tp1==$tp2) {
-				$assoctable2 = "pc_".$db->escape( $bean1->type )."_".$db->escape( $bean1->type );
-				//echo $assoctable2;
-				//check whether this assoctable already exists
-				$alltables = $this->showTables();
-				if (in_array($assoctable2, $alltables)) {
-
-					//$id1 = intval($bean1->id);
-					//$id2 = intval($bean2->id);
-					$unassocSQL = $this->writer->getQuery("untree", array(
-						"assoctable2"=>$assoctable2,
-						"idx1"=>$idx1,
-						"idx2"=>$idx2
-					));
-					
-					$db->exec($unassocSQL);
-				}
-			}
+                    return $this->association->breakLink( $bean1, $bean2 );
 		}
 
 		/**

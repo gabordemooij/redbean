@@ -76,12 +76,12 @@ class RedBean_Mod_Optimizer extends RedBean_Mod {
         //okay so this column is still in use, but maybe its to wide
         //get the field type
         //print_r($colr);
-        $currenttype =  $this->writer->sqltype_typeno[$colr["Type"]];
+        $currenttype =  $this->provider->getWriter()->sqltype_typeno[$colr["Type"]];
         if ($currenttype > 0) {
             $trytype = rand(0,$currenttype - 1); //try a little smaller
             //add a test column
             $db->exec($this->provider->getWriter()->getQuery("test_column",array(
-                "type"=>$this->writer->typeno_sqltype[$trytype],
+                "type"=>$this->provider->getWriter()->typeno_sqltype[$trytype],
                 "table"=>$table
                 )
             ));
@@ -100,7 +100,7 @@ class RedBean_Mod_Optimizer extends RedBean_Mod {
                 $sql = $this->provider->getWriter()->getQuery("remove_test",array(
                     "table"=>$table,
                     "col"=>$col,
-                    "type"=>$this->writer->typeno_sqltype[$trytype]
+                    "type"=>$this->provider->getWriter()->typeno_sqltype[$trytype]
                 ));
                 $db->exec($sql);
             }

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @class BeanStore
+ * @desc The BeanStore is responsible for storing, retrieving, updating and deleting beans.
+ * It performs the BASIC CRUD operations on bean objects.
+ * 
+ */
 class RedBean_Mod_BeanStore extends RedBean_Mod {
 
     /**
@@ -48,6 +54,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
             $insertcolumns = array();
             $updatevalues = array();
 
+            //@todo: move this logic to a table manager
             foreach( $bean as $p=>$v) {
                 if ($p!="type" && $p!="id") {
                     $p = $db->escape($p);
@@ -141,7 +148,41 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
         return $bean->id;
 
     }
-    
 
+   
+    public function get($type, $id, $data=false) {
+        $bean = $this->provider->dispense( $type );
+        $db = $this->provider->getDatabase();
+        $table = $db->escape( $type );
+        $id = abs( intval( $id ) );
+        $bean->id = $id;
+
+        //try to open the bean
+        $this->provider->openBean($bean);
+
+        //load the bean using sql
+        if (!$data) {
+                $getSQL = $this->provider->getWriter()->getQuery("get_bean",array(
+                        "type"=>$type,
+                        "id"=>$id
+                ));
+                $row = $db->getRow( $getSQL );
+        }
+        else {
+                $row = $data;
+        }
+
+        if ($row && is_array($row) && count($row)>0) {
+                foreach($row as $p=>$v) {
+                        //populate the bean with the database row
+                        $bean->$p = $v;
+                }
+        }
+        else {
+                throw new RedBean_Exception_FailedAccessBean("bean not found");
+        }
+
+        return $bean;
+    }
 
 }

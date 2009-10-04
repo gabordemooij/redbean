@@ -240,7 +240,7 @@ $observer->signal="";
 $employee->isNerd();
 asrt($observer->signal,"deco_get");
 $observer->signal="";
-$employee->clearRelated("nerd");
+$employee->clearRelatedNerd();
 asrt($observer->signal,"deco_clearrelated");
 $observer->signal="";
 $employee2 = new Employee;
@@ -451,8 +451,14 @@ $queries=array("prepare_innodb","starttransaction","clear_dtyp","setup_dtyp","se
 "unregister_table","get_bean","get_assoc","unassoc_all_t1","unassoc_all_t2","trash","update","widen_column","find"
 ,"list","remove_child","deltree","fastload","bean_exists","stat","distinct","drop_type");
 foreach($queries as $query){
-	try{ $writer->getQuery( $query, array("updatevalues"=>array(),"fields"=>array(),"insertcolumns"=>array(), "insertvalues"=>array(),
-	"searchoperators"=>array(), "ids"=>array(), "bean"=>RedBean_OODB::getInstance()->dispense("x"), "tables"=>array()) ); pass(); }catch(Exception $e){ fail(); }
+	try{ $writer->getQuery( $query, array("time"=>"","col"=>"","engine"=>"","id1"=>"","id2"=>"",
+                    "rollback"=>"","key"=>"","value"=>"","locktime"=>"",
+                    "indexname"=>"","property"=>"","t1"=>"","t2"=>"",
+                    "t"=>"","tbl"=>"","column"=>"","newtype"=>"","start"=>"","end"=>"","extraSQL"=>"","orderby"=>"",
+                    "table"=>"","assoctable"=>"","id"=>"","pid"=>"","cid"=>"",
+                    "updatevalues"=>array(),"fields"=>array(),"insertcolumns"=>array(),
+                    "insertvalues"=>array(),
+	"searchoperators"=>array(), "ids"=>array(), "bean"=>RedBean_OODB::getInstance()->dispense("x"), "tables"=>array(), "type"=>"","stat"=>"","field"=>"" ) ); pass(); }catch(Exception $e){ fail(); }
 }
 try{ $writer->getQuery("unsupported"); fail(); }catch(Exception $e){ pass(); }
 $cols = $writer->getTableColumns("redbeantables",RedBean_OODB::getInstance()->getDatabase());
@@ -529,8 +535,23 @@ asrt($o->$p,42);
 $o->save();
 $r->setFilter( new RedBean_Mod_Filter_Strict );
 pass();
-
-
+$filter = new RedBean_Mod_Filter_Strict;
+try{ $filter->property("_"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->property(""); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->property(" "); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->property("-"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->property("...."); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->table("_"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->table(""); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->table(" "); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->table("-"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->table("...."); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->table("type"); pass(); }catch(RedBean_Exception_Security $e){ fail(); }
+try{ $filter->table("id"); pass(); }catch(RedBean_Exception_Security $e){ fail(); }
+try{ $filter->property("type"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $filter->property("id"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+asrt($filter->property("F Ilter TH-_iS!"),"filterthis");
+asrt($filter->table("F Ilter TH-_iS!"),"filterthis");
 
 //Tests for each individual engine
 function testsperengine( $engine ) {
@@ -628,7 +649,7 @@ function testsperengine( $engine ) {
 	$bean2 = RedBean_OODB::getInstance()->getById("note", $id); //Using same ID!
 	asrt($bean2->message,"1");
 	asrt($bean2->date,$bean->date);
-	asrt($bean2->green,$bean->green);
+	@asrt($bean2->green,$bean->green);
 	//Test description: test whether we can save/load UTF8 values
 	testpack("UTF8 ".$engine);
 	$txt = file_get_contents("utf8.txt");

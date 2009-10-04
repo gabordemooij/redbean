@@ -46,7 +46,7 @@ class RedBean_Mod_Search extends RedBean_Mod {
             )) . $sql );
 
         $err = $db->getErrorMsg();
-        if (!$this->frozen && strpos($err,"Unknown column")!==false && $max<10) {
+        if (!$this->provider->isFrozen() && strpos($err,"Unknown column")!==false && $max<10) {
             $matches = array();
             if (preg_match("/Unknown\scolumn\s'(.*?)'/",$err,$matches)) {
                 if (count($matches)==2 && strpos($rawsql,'@ifexists')!==false) {

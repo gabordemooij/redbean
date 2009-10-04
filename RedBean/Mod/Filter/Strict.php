@@ -23,6 +23,9 @@ class RedBean_Mod_Filter_Strict extends RedBean_Mod implements RedBean_Mod_Filte
 
     public function table( $name ) {
           $name =  strtolower(trim(preg_replace("/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]/","",$name)));
+          if (strlen($name)===0) {
+            throw new RedBean_Exception_Security("Empty property is not allowed");
+          }
           return $name;
 
     }

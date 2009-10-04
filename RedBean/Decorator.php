@@ -222,7 +222,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			return $this;
 		}
 		else if (strpos($method,"clearRelated")===0) {
-			$this->signal("deco_clearrelated",$this);
+			$this->signal("deco_clearrelated",$this); 
 			$type = $this->provider->getFilter()->table( substr( $method, 12 ) );
 			$this->provider->deleteAllAssocType($type, $this->data);
 			return $this;
