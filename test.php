@@ -44,8 +44,8 @@ class SmartTest {
 	}
 	
 	public static function failedTest() {
-		printtext("FAILED TEST");
-		exit;
+		
+		fail();
 	}
 	
 	public static function test( $value, $expected ) {
@@ -69,7 +69,7 @@ function asrt( $a, $b ) {
 	}
 	else {
 		printtext("FAILED TEST: EXPECTED $b BUT GOT: $a ");
-		exit;
+		fail();
 	}
 }
 
@@ -81,7 +81,7 @@ function pass() {
 
 function fail() {
 	printtext("FAILED TEST");
-        
+        debug_print_backtrace();
 	exit;
 }
 
@@ -857,7 +857,8 @@ function testsperengine( $engine ) {
 	RedBean_OODB::getInstance()->addChild($node1,$node2);
 	asrt(count(RedBean_OODB::getInstance()->getChildren($node1)),1);
 	asrt(count(RedBean_OODB::getInstance()->getChildren($node3)),0);
-	$node = array_shift(RedBean_OODB::getInstance()->getParent($node2));
+        $nodes = RedBean_OODB::getInstance()->getParent($node2);
+	$node = array_shift($nodes);
 	asrt($node->name,"node1");
 	RedBean_OODB::getInstance()->associate($node2, $node3); //normal assoc
 	RedBean_OODB::getInstance()->associate($node2, RedBean_OODB::getInstance()->dispense("nodeb"));

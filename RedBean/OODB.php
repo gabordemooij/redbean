@@ -31,14 +31,11 @@ class RedBean_OODB {
 	 * @var boolean
 	 */
 	private $locking = true;
-
-
-
-		/**
-		 *
-		 * @var string $pkey - a fingerprint for locking
-		 */
-		public $pkey = false;
+        /**
+         *
+         * @var string $pkey - a fingerprint for locking
+         */
+        public $pkey = false;
 
 		/**
 		 * Indicates that a rollback is required
@@ -78,6 +75,13 @@ class RedBean_OODB {
                 private $optimizer;
                 private $beanstore;
                 private $association;
+                private $lockmanager;
+                private $tree;
+                private $tableregister;
+                private $finder;
+                private $lister;
+                private $dispenser;
+
 
                 private function __construct( $filter = false ) {
                     $this->filter = new RedBean_Mod_Filter_Strict();
@@ -88,6 +92,10 @@ class RedBean_OODB {
                     $this->optimizer = new RedBean_Mod_Optimizer( $this );
                     $this->beanstore = new RedBean_Mod_BeanStore( $this );
                     $this->association = new RedBean_Mod_Association( $this );
+                    $this->lockmanager = new RedBean_Mod_LockManager( $this );
+                    $this->tree = new RedBean_Mod_Tree( $this );
+                    $this->tableregister = new RedBean_Mod_TableRegister( $this );
+                    $this->finder = new RedBean_Mod_Finder( $this );
                 }
 
                 public function getFilter() {
@@ -177,7 +185,7 @@ class RedBean_OODB {
 		 * Singleton
 		 * @return unknown_type
 		 */
-		public function getInstance() {
+		public static function getInstance() {
 			if (self::$instance === null) {
 				self::$instance = new RedBean_OODB;
 			}
@@ -371,19 +379,8 @@ class RedBean_OODB {
 		 * @return array $listoftables
 		 */
 		public function showTables( $all=false ) {
-
-			$db = $this->db;
-
-			if ($all && $this->frozen) {
-				$alltables = $db->getCol($this->writer->getQuery("show_tables"));
-				return $alltables;
-			}
-			else {
-				$alltables = $db->getCol($this->writer->getQuery("show_rtables"));
-				return $alltables;
-			}
-
-		}
+                        return $this->tableregister->getTables($all);
+                }
 
 		/**
 		 * Registers a table with RedBean
@@ -391,13 +388,7 @@ class RedBean_OODB {
 		 * @return void
 		 */
 		public function addTable( $tablename ) {
-
-			$db = $this->db;
-
-			$tablename = $db->escape( $tablename );
-
-			$db->exec($this->writer->getQuery("register_table",array("table"=>$tablename)));
-
+                        return $this->tableregister->register( $tablename);
 		}
 
 		/**
@@ -406,14 +397,7 @@ class RedBean_OODB {
 		 * @return void
 		 */
 		public function dropTable( $tablename ) {
-
-			$db = $this->db;
-
-			$tablename = $db->escape( $tablename );
-
-			$db->exec($this->writer->getQuery("unregister_table",array("table"=>$tablename)));
-
-
+                        return $this->tableregister->unregister( $tablename );
 		}
 
 		/**
@@ -421,11 +405,8 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public function releaseAllLocks() {
-			
 			$this->db->exec($this->writer->getQuery("release",array("key"=>$this->pkey)));
-
-		}
-
+        	}
 
 		/**
 		 * Opens and locks a bean
@@ -433,89 +414,11 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public function openBean( $bean, $mustlock=false) {
+                        $this->checkBean( $bean );
+                        $this->lockmanager->openBean( $bean, $mustlock );
+            	}
 
-			$this->checkBean( $bean );
-			
-			//If locking is turned off, or the bean has no persistance yet (not shared) life is always a success!
-			if (!$this->locking || $bean->id === 0) return true;
-                        $db = $this->db;
-
-			//remove locks that have been expired...
-			$removeExpiredSQL = $this->writer->getQuery("remove_expir_lock", array(
-				"locktime"=>$this->locktime
-			));
-			
-			$db->exec($removeExpiredSQL);
-
-			$tbl = $db->escape( $bean->type );
-			$id = intval( $bean->id );
-
-			//Is the bean already opened for us?
-			$checkopenSQL = $this->writer->getQuery("get_lock",array(
-				"id"=>$id,
-				"table"=>$tbl,
-				"key"=>$this->pkey
-			));
-			
-			$row = $db->getRow($checkopenSQL);
-			if ($row && is_array($row) && count($row)>0) {
-				$updateexpstamp = $this->writer->getQuery("update_expir_lock",array(
-					"time"=>time(),
-					"id"=>$row["id"]
-				));
-				$db->exec($updateexpstamp);
-				return true; //bean is locked for us!
-			}
-
-			//If you must lock a bean then the bean must have been locked by a previous call.
-			if ($mustlock) {
-				throw new RedBean_Exception_FailedAccessBean("Could not acquire a lock for bean $tbl . $id ");
-				return false;
-			}
-
-			//try to get acquire lock on the bean
-			$openSQL = $this->writer->getQuery("aq_lock", array(
-				"table"=>$tbl,
-				"id"=>$id,
-				"key"=>$this->pkey,
-				"time"=>time()
-			));
-			
-			$trials = 0;
-			$aff = 0;
-			while( $aff < 1 && $trials < 5 ) {
-				$db->exec($openSQL);
-				$aff = $db->getAffectedRows();
-				$trials++;
-				if ($aff < 1) usleep(500000); //half a sec
-			}
-
-			if ($trials > 4) {
-				return false;
-			}
-			else {
-				return true;
-			}
-		}
-
-		/**
-		 * For internal use, synchronizes a block of code
-		 * @param $toggle
-		 * @return unknown_type
-		 */
-		private function sync( $toggle ) {
-
-			$bean = $this->dispense("_syncmethod");
-			$bean->id = 0;
-
-			if ($toggle) {
-				$this->openBean( $bean );
-			}
-			else {
-				$this->closeBean( $bean );
-			}
-		}
-
+		
 		/**
 		 * Gets a bean by its primary ID
 		 * @param $type
@@ -742,32 +645,8 @@ class RedBean_OODB {
      * @return unknown_type
      */
     public function find(RedBean_OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
- 
-      $this->checkBean( $bean );
-      $db = $this->db;
-      $tbl = $db->escape( $bean->type );
- 
-      $findSQL = $this->writer->getQuery("find",array(
-      	"searchoperators"=>$searchoperators,
-      	"bean"=>$bean,
-      	"start"=>$start,
-      	"end"=>$end,
-      	"orderby"=>$orderby,
-      	"extraSQL"=>$extraSQL,
-      	"tbl"=>$tbl
-      ));
-      
-      $ids = $db->getCol( $findSQL );
-      $beans = array();
- 
-      if (is_array($ids) && count($ids)>0) {
-          foreach( $ids as $id ) {
-            $beans[ $id ] = $this->getById( $bean->type, $id , false);
-        }
-      }
-      
-      return $beans;
-      
+        return $this->finder->find($bean, $searchoperators, $start, $end, $orderby, $extraSQL);
+     
     }
 		
     
@@ -824,56 +703,7 @@ class RedBean_OODB {
 		 * @return array $beans
 		 */
 		public function getAssoc(RedBean_OODBBean $bean, $targettype) {
-			//get a database
-			$db = $this->db;
-			//first we check the beans whether they are valid
-			$bean = $this->checkBeanForAssoc($bean);
-
-			$id = intval($bean->id);
-
-
-			//obtain the table names
-			$t1 = $db->escape( $this->filter->table($bean->type) );
-			$t2 = $db->escape( $targettype );
-
-			//infer the association table
-			$tables = array();
-			array_push( $tables, $t1 );
-			array_push( $tables, $t2 );
-			//sort the table names to make sure we only get one assoc table
-			sort($tables);
-			$assoctable = $db->escape( implode("_",$tables) );
-
-			//check whether this assoctable exists
-			$alltables = $this->showTables();
-				
-			if (!in_array($assoctable, $alltables)) {
-				return array(); //nope, so no associations...!
-			}
-			else {
-				if ($t1==$t2) {
-					$t2.="2";
-				}
-				
-				$getassocSQL = $this->writer->getQuery("get_assoc",array(
-					"t1"=>$t1,
-					"t2"=>$t2,
-					"assoctable"=>$assoctable,
-					"id"=>$id
-				));
-				
-				
-				$rows = $db->getCol( $getassocSQL );
-				$beans = array();
-				if ($rows && is_array($rows) && count($rows)>0) {
-					foreach($rows as $i) {
-						$beans[$i] = $this->getById( $targettype, $i, false);
-					}
-				}
-				return $beans;
-			}
-
-
+                        return $this->association->get( $bean, $targettype );
 		}
 
 
@@ -883,19 +713,9 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public function trash( RedBean_OODBBean $bean ) {
-
-			$this->checkBean( $bean );
-			if (intval($bean->id)===0) return;
-			$this->deleteAllAssoc( $bean );
-			$this->openBean($bean);
-			$table = $this->db->escape($bean->type);
-			$id = intval($bean->id);
-			$this->db->exec( $this->writer->getQuery("trash",array(
-				"table"=>$table,
-				"id"=>$id
-			)) );
-
-		}
+                        return $this->beanstore->trash( $bean );
+                }
+                
 			
 		/**
 		 * Breaks all associations of a perticular bean $bean
@@ -903,45 +723,7 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public function deleteAllAssoc( $bean ) {
-
-			$db = $this->db;
-			$bean = $this->checkBeanForAssoc($bean);
-
-			$this->openBean( $bean, true );
-
-
-			$id = intval( $bean->id );
-
-			//get all tables
-			$alltables = $this->showTables();
-
-			//are there any possible associations?
-			$t = $db->escape($bean->type);
-			$checktables = array();
-			foreach( $alltables as $table ) {
-				if (strpos($table,$t."_")!==false || strpos($table,"_".$t)!==false){
-					$checktables[] = $table;
-				}
-			}
-
-			//remove every possible association
-			foreach($checktables as $table) {
-				if (strpos($table,"pc_")===0){
-				
-					$db->exec( $this->writer->getQuery("deltree",array(
-						"id"=>$id,
-						"table"=>$table
-					)) );
-				}
-				else {
-					
-					$db->exec( $this->writer->getQuery("unassoc_all_t1",array("table"=>$table,"t"=>$t,"id"=>$id)) );
-					$db->exec( $this->writer->getQuery("unassoc_all_t2",array("table"=>$table,"t"=>$t,"id"=>$id)) );
-				}
-					
-					
-			}
-			return true;
+                        return $this->association->deleteAllAssoc( $bean );
 		}
 
 		/**
@@ -950,51 +732,9 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public function deleteAllAssocType( $targettype, $bean ) {
-
-			$db = $this->db;
-			$bean = $this->checkBeanForAssoc($bean);
-			$this->openBean( $bean, true );
-
-			$id = intval( $bean->id );
-
-			//obtain the table names
-			$t1 = $db->escape( $this->filter->table($bean->type) );
-			$t2 = $db->escape( $targettype );
-
-			//infer the association table
-			$tables = array();
-			array_push( $tables, $t1 );
-			array_push( $tables, $t2 );
-			//sort the table names to make sure we only get one assoc table
-			sort($tables);
-			$assoctable = $db->escape( implode("_",$tables) );
-			
-			$availabletables = $this->showTables();
-			
-			
-			if (in_array('pc_'.$assoctable,$availabletables)){
-				$db->exec( $this->writer->getQuery("deltreetype",array(
-					"assoctable"=>'pc_'.$assoctable,
-					"id"=>$id
-				)) );
-			}
-			if (in_array($assoctable,$availabletables)) {
-				$db->exec( $this->writer->getQuery("unassoctype1",array(
-					"assoctable"=>$assoctable,
-					"t1"=>$t1,
-					"id"=>$id
-				)) );
-				$db->exec( $this->writer->getQuery("unassoctype2",array(
-					"assoctable"=>$assoctable,
-					"t1"=>$t1,
-					"id"=>$id
-				)) );
-
-			}
-
-			return true;
-		}
-
+                        return $this->association->deleteAllAssocType( $targettype, $bean );
+                }
+              
 
 		/**
 		 * Dispenses; creates a new OODB bean of type $type
@@ -1017,56 +757,8 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public function addChild( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
-
-			//get a database
-			$db = $this->db;
-
-			//first we check the beans whether they are valid
-			$parent = $this->checkBeanForAssoc($parent);
-			$child = $this->checkBeanForAssoc($child);
-
-			$this->openBean( $parent, true );
-			$this->openBean( $child, true );
-
-
-			//are parent and child of the same type?
-			if ($parent->type !== $child->type) {
-				throw new RedBean_Exception_InvalidParentChildCombination();
-			}
-
-			$pid = intval($parent->id);
-			$cid = intval($child->id);
-
-			//infer the association table
-			$assoctable = "pc_".$db->escape($parent->type."_".$parent->type);
-
-			//check whether this assoctable already exists
-			if (!$this->frozen) {
-				$alltables = $this->showTables();
-				if (!in_array($assoctable, $alltables)) {
-					//no assoc table does not exist, create it..
-					$assoccreateSQL = $this->writer->getQuery("create_tree",array(
-						"engine"=>$this->engine,
-						"assoctable"=>$assoctable
-					));
-					$db->exec( $assoccreateSQL );
-					//add a unique constraint
-					$db->exec( $this->writer->getQuery("unique", array(
-						"assoctable"=>$assoctable
-					)) );
-					$this->addTable( $assoctable );
-				}
-			}
-
-			//now insert the association record
-			$assocSQL = $this->writer->getQuery("add_child",array(
-				"assoctable"=>$assoctable,
-				"pid"=>$pid,
-				"cid"=>$cid
-			));
-			$db->exec( $assocSQL );
-
-		}
+                        return $this->tree->add( $parent, $child );
+                }
 
 		/**
 		 * Returns all child beans of parent bean $parent
@@ -1074,84 +766,17 @@ class RedBean_OODB {
 		 * @return array $beans
 		 */
 		public function getChildren( RedBean_OODBBean $parent ) {
-
-			//get a database
-			$db = $this->db;
-
-			//first we check the beans whether they are valid
-			$parent = $this->checkBeanForAssoc($parent);
-
-			$pid = intval($parent->id);
-
-			//infer the association table
-			$assoctable = "pc_".$db->escape( $parent->type . "_" . $parent->type );
-
-			//check whether this assoctable exists
-			$alltables = $this->showTables();
-			if (!in_array($assoctable, $alltables)) {
-				return array(); //nope, so no children...!
-			}
-			else {
-				$targettype = $parent->type;
-				$getassocSQL = $this->writer->getQuery("get_children", array(
-					"assoctable"=>$assoctable,
-					"pid"=>$pid
-				));
-				$rows = $db->getCol( $getassocSQL );
-				$beans = array();
-				if ($rows && is_array($rows) && count($rows)>0) {
-					foreach($rows as $i) {
-						$beans[$i] = $this->getById( $targettype, $i, false);
-					}
-				}
-				return $beans;
-			}
-
-		}
-
+                        return $this->tree->getChildren($parent);
+                }
+		
 		/**
 		 * Fetches the parent bean of child bean $child
 		 * @param $child
 		 * @return RedBean_OODBBean $parent
 		 */
 		public function getParent( RedBean_OODBBean $child ) {
-
-				
-			//get a database
-			$db = $this->db;
-
-			//first we check the beans whether they are valid
-			$child = $this->checkBeanForAssoc($child);
-
-			$cid = intval($child->id);
-
-			//infer the association table
-			$assoctable = "pc_".$db->escape( $child->type . "_" . $child->type );
-			//check whether this assoctable exists
-			$alltables = $this->showTables();
-			if (!in_array($assoctable, $alltables)) {
-				return array(); //nope, so no children...!
-			}
-			else {
-				$targettype = $child->type;
-				
-				$getassocSQL = $this->writer->getQuery("get_parent", array(
-					"assoctable"=>$assoctable,
-					"cid"=>$cid
-				));
-					
-				$rows = $db->getCol( $getassocSQL );
-				$beans = array();
-				if ($rows && is_array($rows) && count($rows)>0) {
-					foreach($rows as $i) {
-						$beans[$i] = $this->getById( $targettype, $i, false);
-					}
-				}
-					
-				return $beans;
-			}
-
-		}
+                        return $this->tree->getParent($child);
+                }
 
 		/**
 		 * Removes a child bean from a parent-child association
@@ -1160,41 +785,7 @@ class RedBean_OODB {
 		 * @return unknown_type
 		 */
 		public function removeChild(RedBean_OODBBean $parent, RedBean_OODBBean $child) {
-
-			//get a database
-			$db = $this->db;
-
-			//first we check the beans whether they are valid
-			$parent = $this->checkBeanForAssoc($parent);
-			$child = $this->checkBeanForAssoc($child);
-
-			$this->openBean( $parent, true );
-			$this->openBean( $child, true );
-
-
-			//are parent and child of the same type?
-			if ($parent->type !== $child->type) {
-				throw new RedBean_Exception_InvalidParentChildCombination();
-			}
-
-			//infer the association table
-			$assoctable = "pc_".$db->escape( $parent->type . "_" . $parent->type );
-
-			//check whether this assoctable already exists
-			$alltables = $this->showTables();
-			if (!in_array($assoctable, $alltables)) {
-				return true; //no association? then nothing to do!
-			}
-			else {
-				$pid = intval($parent->id);
-				$cid = intval($child->id);
-				$unassocSQL = $this->writer->getQuery("remove_child", array(
-					"assoctable"=>$assoctable,
-					"pid"=>$pid,
-					"cid"=>$cid
-				));
-				$db->exec($unassocSQL);
-			}
+                        return $this->tree->removeChild( $parent, $child );
 		}
 		
 		/**
@@ -1280,6 +871,8 @@ class RedBean_OODB {
 				throw new RedBean_Exception_InvalidArgument( "time must be integer >= 0" );
 			}
 		}
+
+                public function getLockingTime() { return $this->locktime; }
 
 
 		

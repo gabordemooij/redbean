@@ -185,4 +185,18 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
         return $bean;
     }
 
+    //@todo tested?
+    public function trash( RedBean_OODBBean $bean ) {
+        $this->provider->checkBean( $bean );
+	if (intval($bean->id)===0) return;
+	$this->provider->deleteAllAssoc( $bean );
+	$this->provider->openBean($bean);
+	$table = $this->provider->getDatabase()->escape($bean->type);
+	$id = intval($bean->id);
+	$this->provider->getDatabase()->exec( $this->provider->getWriter()->getQuery("trash",array(
+		"table"=>$table,
+		"id"=>$id
+	)) );
+    }
+
 }

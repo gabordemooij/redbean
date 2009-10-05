@@ -3,7 +3,7 @@
 class RedBean_Mod_Association extends RedBean_Mod {
 
     public function link( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
-        //get a database
+    //get a database
         $db = $this->provider->getDatabase();
 
         //first we check the beans whether they are valid
@@ -182,5 +182,148 @@ class RedBean_Mod_Association extends RedBean_Mod {
         }
     }
 
+
+
+
+    public function get( RedBean_OODBBean $bean, $targettype ) {
+    //get a database
+        $db = $this->provider->getDatabase();
+        //first we check the beans whether they are valid
+        $bean = $this->provider->checkBeanForAssoc($bean);
+
+        $id = intval($bean->id);
+
+
+        //obtain the table names
+        $t1 = $db->escape( $this->provider->getFilter()->table($bean->type) );
+        $t2 = $db->escape( $targettype );
+
+        //infer the association table
+        $tables = array();
+        array_push( $tables, $t1 );
+        array_push( $tables, $t2 );
+        //sort the table names to make sure we only get one assoc table
+        sort($tables);
+        $assoctable = $db->escape( implode("_",$tables) );
+
+        //check whether this assoctable exists
+        $alltables = $this->provider->showTables();
+
+        if (!in_array($assoctable, $alltables)) {
+            return array(); //nope, so no associations...!
+        }
+        else {
+            if ($t1==$t2) {
+                $t2.="2";
+            }
+
+            $getassocSQL = $this->provider->getWriter()->getQuery("get_assoc",array(
+                "t1"=>$t1,
+                "t2"=>$t2,
+                "assoctable"=>$assoctable,
+                "id"=>$id
+            ));
+
+
+            $rows = $db->getCol( $getassocSQL );
+            $beans = array();
+            if ($rows && is_array($rows) && count($rows)>0) {
+                foreach($rows as $i) {
+                    $beans[$i] = $this->provider->getById( $targettype, $i, false);
+                }
+            }
+            return $beans;
+        }
+
+
+    }
+
+    public function deleteAllAssoc( $bean ) {
+
+        $db = $this->provider->getDatabase();
+        $bean = $this->provider->checkBeanForAssoc($bean);
+
+        $this->provider->openBean( $bean, true );
+
+
+        $id = intval( $bean->id );
+
+        //get all tables
+        $alltables = $this->provider->showTables();
+
+        //are there any possible associations?
+        $t = $db->escape($bean->type);
+        $checktables = array();
+        foreach( $alltables as $table ) {
+            if (strpos($table,$t."_")!==false || strpos($table,"_".$t)!==false) {
+                $checktables[] = $table;
+            }
+        }
+
+        //remove every possible association
+        foreach($checktables as $table) {
+            if (strpos($table,"pc_")===0) {
+
+                $db->exec( $this->provider->getWriter()->getQuery("deltree",array(
+                    "id"=>$id,
+                    "table"=>$table
+                    )) );
+            }
+            else {
+
+                $db->exec( $this->provider->getWriter()->getQuery("unassoc_all_t1",array("table"=>$table,"t"=>$t,"id"=>$id)) );
+                $db->exec( $this->provider->getWriter()->getQuery("unassoc_all_t2",array("table"=>$table,"t"=>$t,"id"=>$id)) );
+            }
+
+
+        }
+        return true;
+    }
+
+
+    public function deleteAllAssocType( $targettype, $bean ) {
+        $db = $this->provider->getDatabase();
+        $bean = $this->provider->checkBeanForAssoc($bean);
+        $this->provider->openBean( $bean, true );
+
+        $id = intval( $bean->id );
+
+        //obtain the table names
+        $t1 = $db->escape( $this->provider->getFilter()->table($bean->type) );
+        $t2 = $db->escape( $targettype );
+
+        //infer the association table
+        $tables = array();
+        array_push( $tables, $t1 );
+        array_push( $tables, $t2 );
+        //sort the table names to make sure we only get one assoc table
+        sort($tables);
+        $assoctable = $db->escape( implode("_",$tables) );
+
+        $availabletables = $this->provider->showTables();
+
+
+        if (in_array('pc_'.$assoctable,$availabletables)) {
+            $db->exec( $this->provider->getWriter()->getQuery("deltreetype",array(
+                "assoctable"=>'pc_'.$assoctable,
+                "id"=>$id
+                )) );
+        }
+        if (in_array($assoctable,$availabletables)) {
+            $db->exec( $this->provider->getWriter()->getQuery("unassoctype1",array(
+                "assoctable"=>$assoctable,
+                "t1"=>$t1,
+                "id"=>$id
+                )) );
+            $db->exec( $this->provider->getWriter()->getQuery("unassoctype2",array(
+                "assoctable"=>$assoctable,
+                "t1"=>$t1,
+                "id"=>$id
+                )) );
+
+        }
+
+        return true;
+    }
 
 }
