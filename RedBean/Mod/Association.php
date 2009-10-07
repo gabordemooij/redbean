@@ -326,4 +326,46 @@ class RedBean_Mod_Association extends RedBean_Mod {
         return true;
     }
 
+    public function numOfRelated( $type, RedBean_OODBBean $bean ) {
+
+    			$db = $this->provider->getDatabase();
+
+			$t2 = $this->provider->getFilter()->table( $db->escape( $type ) );
+
+			//is this bean valid?
+			$this->provider->checkBean( $bean );
+			$t1 = $this->provider->getFilter()->table( $bean->type  );
+			$tref = $this->provider->getFilter()->table( $db->escape( $bean->type ) );
+			$id = intval( $bean->id );
+
+			//infer the association table
+			$tables = array();
+			array_push( $tables, $t1 );
+			array_push( $tables, $t2 );
+
+			//sort the table names to make sure we only get one assoc table
+			sort($tables);
+			$assoctable = $db->escape( implode("_",$tables) );
+
+			//get all tables
+			$tables = $this->provider->showTables();
+
+			if ($tables && is_array($tables) && count($tables) > 0) {
+				if (in_array( $t1, $tables ) && in_array($t2, $tables)){
+					$sqlCountRelations = $this->provider->getWriter()->getQuery(
+						"num_related", array(
+							"assoctable"=>$assoctable,
+							"t1"=>$t1,
+							"id"=>$id
+						)
+					);
+
+					return (int) $db->getCell( $sqlCountRelations );
+				}
+			}
+			else {
+				return 0;
+			}
+		}
+
 }

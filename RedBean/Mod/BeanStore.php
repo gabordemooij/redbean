@@ -199,4 +199,48 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 	)) );
     }
 
+    public function exists($type,$id) {
+
+    	$db = $this->provider->getDatabase();
+			$id = intval( $id );
+			$type = $db->escape( $type );
+
+			//$alltables = $db->getCol("show tables");
+			$alltables = $this->provider->showTables();
+
+			if (!in_array($type, $alltables)) {
+				return false;
+			}
+			else {
+				$no = $db->getCell( $this->provider->getWriter()->getQuery("bean_exists",array(
+					"type"=>$type,
+					"id"=>$id
+				)) );
+				if (intval($no)) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+		}
+
+           public function numberof($type) {
+                	$db = $this->provider->getDatabase();
+			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
+
+			$alltables = $this->provider->showTables();
+
+			if (!in_array($type, $alltables)) {
+				return 0;
+			}
+			else {
+				$no = $db->getCell( $this->provider->getWriter()->getQuery("count",array(
+					"type"=>$type
+				)));
+				return intval( $no );
+			}
+           }
+
+
 }

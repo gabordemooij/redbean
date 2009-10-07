@@ -129,7 +129,7 @@ foreach($tables as $t){
 /*
 //Mind though that table will continue to exits, this test is only about the record in Trans
 //Unfortunately you have to run this test apart to see the effect. Check manually.
-R::getInstance()->gen("Trans");
+R::getInstance()->generate("Trans");
 $t = new Trans;
 $t->name = "part of trans";
 $t->save();
@@ -160,13 +160,13 @@ $db = RedBean_OODB::getInstance()->getDatabase();
 asrt(($db instanceof RedBean_DBAdapter),true);
 //Test description: test multiple database support
 testpack("multi database");
-$old = RedBean_Setup::kickstart("mysql:host=localhost;dbname=test","root","",false,"innodb",false);
-asrt(R::getInstance()->getInstance()->getDatabase()->getCell("select database()"),"test");
+$redbean = RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
+$old = $redbean->getToolBox()->getDatabase();
 RedBean_Setup::kickstart("mysql:host=localhost;dbname=tutorial","root","",false,"innodb",false);
 asrt(R::getInstance()->getInstance()->getDatabase()->getCell("select database()"),"tutorial");
 RedBean_Setup::reconnect( $old );
 asrt(R::getInstance()->getInstance()->getDatabase()->getCell("select database()"),"oodb");
-
+$db = R::getInstance()->getToolBox()->getDatabase();
 
 testpack("legacy");
 R::gen("myclass");
@@ -176,7 +176,7 @@ pass();
 
 //Test description: Test importing of data from post array or custom array
 testpack("Import");
-R::getInstance()->gen("Thing");
+R::getInstance()->generate("Thing");
 $_POST["first"]="abc";
 $_POST["second"]="xyz";
 $thing = new Thing;
@@ -189,19 +189,19 @@ asrt($thing->importFromPost()->getSecond(),"xyz");
 //Test description: Tests whether gen() can produce classes with framework compliant names or using proper namespacing.
 //always test in pairs because something might go wrong after first class (during class_exist check for instance!)
 testpack("Framework Integration Tools");
-asrt(RedBean_OODB::getInstance()->gen("Entity1,Entity2"),true);
+asrt(RedBean_OODB::getInstance()->generate("Entity1,Entity2"),true);
 asrt(class_exists("Entity1"),true);
 asrt(class_exists("Entity2"),true);
-asrt(RedBean_OODB::getInstance()->gen("Entity3,Entity4","prefix_","_suffix"),true);
+asrt(RedBean_OODB::getInstance()->generate("Entity3,Entity4","prefix_","_suffix"),true);
 asrt(class_exists("prefix_Entity3_suffix"),true);
 asrt(class_exists("prefix_Entity4_suffix"),true);
-asrt(RedBean_OODB::getInstance()->gen("a\b\Entity5,c\d\Entity6"),true);
+asrt(RedBean_OODB::getInstance()->generate("a\b\Entity5,c\d\Entity6"),true);
 asrt(class_exists("\a\b\Entity5"),true);
 asrt(class_exists("\c\d\Entity6"),true);
-asrt(RedBean_OODB::getInstance()->gen(".,--"),false);
+asrt(RedBean_OODB::getInstance()->generate(".,--"),false);
 
 SmartTest::instance()->testPack = "Observers";
-R::getInstance()->gen("Employee");
+R::getInstance()->generate("Employee");
 $employee = new Employee;
 
 class TestObserver implements RedBean_Observer {
@@ -277,7 +277,7 @@ asrt($observer->signal,"deco_copy");
 
 
 SmartTest::instance()->testPack = "Sieves";
-R::getInstance()->gen("Employee");
+R::getInstance()->generate("Employee");
 $e = new Employee;
 $e->setName("Max");
 asrt(RedBean_Sieve::make(array("name"=>"RedBean_Validator_AlphaNumeric"))->valid($e),true);
@@ -301,7 +301,7 @@ testpack("Configuration tester");
 //insert garbage tables
 $db->exec(" CREATE TABLE `nonsense` (`a` VARCHAR( 11 ) NOT NULL ,`b` VARCHAR( 11 ) NOT NULL ,`j` VARCHAR( 11 ) NOT NULL	) ENGINE = MYISAM ");
 RedBean_OODB::getInstance()->clean();
-RedBean_OODB::getInstance()->gen("trash");
+RedBean_OODB::getInstance()->generate("trash");
 $trash = new Trash();
 $trash->save();
 RedBean_OODB::getInstance()->clean();
@@ -330,7 +330,9 @@ $db->exec("CREATE TABLE  `deletethis_deletethis2` (`id` INT( 11 ) UNSIGNED NOT N
 $db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`) VALUES (NULL ,  'deletethis_deletethis2');");
 $db->exec("CREATE TABLE  `deletethis_dontdeletethis` (`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,`col1` VARCHAR( 255 ) NOT NULL ,`col2` TEXT NOT NULL ,`col3` INT( 11 ) UNSIGNED NOT NULL ,PRIMARY KEY (  `id` ) ) ENGINE = MYISAM");
 $db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`) VALUES (NULL ,  'deletethis_dontdeletethis');");
-R::getInstance()->gen('dontdelete,dontdelete2');
+
+
+R::getInstance()->generate('dontdelete,dontdelete2');
 $dontdelete = new dontdelete;
 $dontdelete->save();
 asrt(intval($db->getCell("SELECT COUNT(*) FROM redbeantables WHERE tablename='dontdelete'")),1);
@@ -366,7 +368,7 @@ $db->exec("INSERT INTO  `indexer` (`id` ,`highcard` ,`lowcard` ,`lowcard2`,`high
 }
 
 
-R::getInstance()->gen('empcol,slimtable,indexer');
+R::getInstance()->generate('empcol,slimtable,indexer');
 
 
 RedBean_OODB::getInstance()->keepInShape( true, "empcol", "aaa" );
@@ -393,7 +395,7 @@ RedBean_OODB::getInstance()->KeepInShape( true );
 $tables = RedBean_OODB::getInstance()->showTables(); 
 asrt(in_array("garbagetable",$tables),false);
 //Test: can we extend from a bean and still use magic setters / getters?
-R::getInstance()->gen("ACat,Dog");
+R::getInstance()->generate("ACat,Dog");
 class Cat extends ACat {
 	public function mew(){
 		return 123;
@@ -704,13 +706,13 @@ function testsperengine( $engine ) {
 	
 	//Test description: table names should always be case insensitive, no matter the table name
 	testpack("case insens. $engine ");
-	R::getInstance()->gen("PERSON");
+	R::getInstance()->generate("PERSON");
 	$dummy = new Person;
 	asrt($dummy->getData()->type,"person");
 	
 	//Test description: table names should contain no underscores
 	testpack("tablenames. $engine ");
-	R::getInstance()->gen("under_score_s");
+	R::getInstance()->generate("under_score_s");
 	asrt(class_exists("under_score_s"),true);
 	$a = new under_score_s;
 	asrt($a->getData()->type,"underscores");
@@ -1066,17 +1068,17 @@ function testsperengine( $engine ) {
 	RedBean_OODB::getInstance()->setLocking( true );
 	$i=3;
 	SmartTest::instance()->testPack="generate only valid classes?";
-	try{ $i += RedBean_OODB::getInstance()->gen(""); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //nothing
-	try{ $i += RedBean_OODB::getInstance()->gen("."); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //illegal chars
-	try{ $i += RedBean_OODB::getInstance()->gen(","); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //illegal chars
-	try{ $i += RedBean_OODB::getInstance()->gen("null"); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //keywords
-	try{ $i += RedBean_OODB::getInstance()->gen("Exception"); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //reserved
+	try{ $i += RedBean_OODB::getInstance()->generate(""); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //nothing
+	try{ $i += RedBean_OODB::getInstance()->generate("."); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //illegal chars
+	try{ $i += RedBean_OODB::getInstance()->generate(","); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //illegal chars
+	try{ $i += RedBean_OODB::getInstance()->generate("null"); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //keywords
+	try{ $i += RedBean_OODB::getInstance()->generate("Exception"); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //reserved
 	
 	
 	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "generate classes using Redbean?";
 	
 	if (!class_exists("Bug")) {
-		$i += RedBean_OODB::getInstance()->gen("Bug");
+		$i += RedBean_OODB::getInstance()->generate("Bug");
 		if ($i!==4) SmartTest::failedTest();
 	}
 	else {
@@ -1125,7 +1127,7 @@ function testsperengine( $engine ) {
 	pass();
 	
 	testpack("avoid race-conditions by locking?");
-	RedBean_OODB::getInstance()->gen("Cheese,Wine");
+	RedBean_OODB::getInstance()->generate("Cheese,Wine");
 	$cheese = new Cheese;
 	$cheese->setName('Brie');
 	$cheese->save();
@@ -1224,7 +1226,7 @@ function testsperengine( $engine ) {
 	
 	//test convenient tree functions
 	 SmartTest::instance()->testPack="convient tree functions";
-	if (!class_exists("Person")) RedBean_OODB::getInstance()->gen("person");
+	if (!class_exists("Person")) RedBean_OODB::getInstance()->generate("person");
 	$donald = new Person();
 	$donald->setName("Donald");
 	$donald->save();
@@ -1272,7 +1274,7 @@ function testsperengine( $engine ) {
 	asrt(count($donald->children()),0);
 	
 	SmartTest::instance()->testPack="countRelated";
-	R::getInstance()->gen("Blog,Comment");
+	R::getInstance()->generate("Blog,Comment");
 	$blog = new Blog;
 	$blog2 = new Blog;
 	$blog->setTitle("blog1");
@@ -1330,7 +1332,7 @@ function testsperengine( $engine ) {
 	RedBean_OODB::getInstance()->clean();
 	
 	SmartTest::instance()->testPack="Export";
-	RedBean_OODB::getInstance()->gen("justabean");
+	RedBean_OODB::getInstance()->generate("justabean");
 	$oBean = new JustABean();
 	$oBean->setA("a");
 	$oOtherBean = new RedBean_OODBBean();
@@ -1363,7 +1365,7 @@ function testsperengine( $engine ) {
 	
 	//test 1-to-n 
 	SmartTest::instance()->testPack="1-to-n relations";
-	R::getInstance()->gen("Track,Disc");
+	R::getInstance()->generate("Track,Disc");
 	$cd1 = new Disc;
 	$cd1->name='first';
 	$cd1->save();
@@ -1385,7 +1387,7 @@ function testsperengine( $engine ) {
 	$cd2->exclusiveAdd( $track2 );
 	asrt(count($track->getRelatedDisc()),1);
 
-	RedBean_OODB::getInstance()->gen('SomeBean');
+	RedBean_OODB::getInstance()->generate('SomeBean');
 	$b = new SomeBean;
 	$b->aproperty = 1;
 	$b->save();
@@ -1396,10 +1398,10 @@ function testsperengine( $engine ) {
 	RedBean_OODB::getInstance()->trashAll("SomeBean");
 	asrt(RedBean_OODB::getInstance()->numberof("SomeBean"),0);
 	
-	RedBean_OODB::getInstance()->gen("Book");
+	RedBean_OODB::getInstance()->generate("Book");
 	$book = new Book;
 	$book->setTitle('about a red bean');
-	RedBean_OODB::getInstance()->gen("Page");
+	RedBean_OODB::getInstance()->generate("Page");
 	$page1 = new Page;
 	$page2 = new Page;
 	asrt(count($book->getRelatedPage()),0);
@@ -1414,7 +1416,7 @@ function testsperengine( $engine ) {
 }
 
 
-RedBean_OODB::getInstance()->gen("justabean");
+RedBean_OODB::getInstance()->generate("justabean");
 SmartTest::instance()->testPack="Security";
 $maliciousproperty = "\"";
 $oBean = R::getInstance()->dispense("justabean");

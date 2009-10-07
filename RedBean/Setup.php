@@ -67,26 +67,61 @@ class RedBean_Setup {
 		if ($debugmode) {
 			$db->setDebugMode(1);
 		}
-	
-		$oldconn = RedBean_OODB::getInstance()->getInstance()->getDatabase();
-		$conn = new RedBean_DBAdapter($db);//Wrap ADO in RedBean's adapter
-		RedBean_OODB::getInstance()->setDatabase( $conn ); 
+
+                $conn = new RedBean_DBAdapter($db);//Wrap ADO in RedBean's adapter
+		$writer = new QueryWriter_MySQL();
+                //assemble a toolbox
+                $toolbox = new RedBean_ToolBox_ModHub();
+                $toolbox->add("database", $conn);
+                $toolbox->add("writer", $writer);
+                $toolbox->add("filter",new RedBean_Mod_Filter_Strict($toolbox));
+                $toolbox->add("beanchecker",new RedBean_Mod_BeanChecker($toolbox));
+                $toolbox->add("gc",new RedBean_Mod_GarbageCollector($toolbox));
+                $toolbox->add("classgenerator",new RedBean_Mod_ClassGenerator($toolbox));
+                $toolbox->add("search",new RedBean_Mod_Search($toolbox));
+                $toolbox->add("optimizer",new RedBean_Mod_Optimizer($toolbox));
+                $toolbox->add("beanstore",new RedBean_Mod_BeanStore($toolbox));
+                $toolbox->add("association",new RedBean_Mod_Association($toolbox));
+                $toolbox->add("lockmanager",new RedBean_Mod_LockManager($toolbox));
+                $toolbox->add("tree",new RedBean_Mod_Tree($toolbox));
+                $toolbox->add("tableregister",new RedBean_Mod_TableRegister($toolbox));
+                $toolbox->add("finder",new RedBean_Mod_Finder($toolbox));
+                $toolbox->add("dispenser",new RedBean_Mod_Dispenser($toolbox));
+                $toolbox->add("scanner",new RedBean_Mod_Scanner($toolbox));
+                $toolbox->add("lister",new RedBean_Mod_Lister($toolbox));
+               
+                
+                $redbean = RedBean_OODB::getInstance( $toolbox );
+                $toolbox->setFacade( $redbean );
+                //$oldconn = RedBean_OODB::getInstance()->getInstance()->getDatabase();
+                $redbean->setEngine($engine);
+
+
+                  
+
+
+
+                
+
+                //RedBean_OODB::getInstance()->setDatabase( $conn );
 		
 		
-		RedBean_OODB::getInstance()->setEngine($engine); //select a database driver
-		RedBean_OODB::getInstance()->init( new QueryWriter_MySQL() ); //Init RedBean
+		//RedBean_OODB::getInstance()->setEngine($engine); //select a database driver
+		//RedBean_OODB::getInstance()->init(  ); //Init RedBean
 	
 		if ($unlockall) {
 			
 	 
-			RedBean_OODB::getInstance()->resetAll(); //Release all locks
+			//RedBean_OODB::getInstance()->resetAll(); //Release all locks
+                        $redbean->resetAll();
 		}
 	
 		if ($freeze) {
-			RedBean_OODB::getInstance()->freeze(); //Decide whether to freeze the database
+			//RedBean_OODB::getInstance()->freeze(); //Decide whether to freeze the database
+                        $redbean->freeze();
 		}
 	
-		return $oldconn;
+		return $redbean;
 	}
 	
 	/**
@@ -101,11 +136,11 @@ class RedBean_Setup {
 	public static function kickstartDev( $gen, $dsn, $username="root", $password="", $debug=false ) {
 		
 		//kickstart for development
-		self::kickstart( $dsn, $username, $password, false, "innodb", $debug, false);
+		return self::kickstart( $dsn, $username, $password, false, "innodb", $debug, false);
 		
 		//generate classes
-		RedBean_OODB::getInstance()->gen( $gen );
-                return RedBean_OODB::getInstance();
+		//RedBean_OODB::getInstance()->gen( $gen );
+                //return RedBean_OODB::getInstance();
 	}
 	
 	/**
@@ -119,18 +154,26 @@ class RedBean_Setup {
 	public static function kickstartFrozen( $gen, $dsn, $username="root", $password="" ) {
 		
 		//kickstart for development
-		self::kickstart( $dsn, $username, $password, true, "innodb", false, false);
+		return self::kickstart( $dsn, $username, $password, true, "innodb", false, false);
 		
 		//generate classes
-		RedBean_OODB::getInstance()->gen( $gen );
-                return RedBean_OODB::getInstance();
+		//RedBean_OODB::getInstance()->gen( $gen );
+                //return RedBean_OODB::getInstance();
 	}
 	
 	
-	public static function reconnect( RedBean_DBAdapter $new ) {
-		$old = RedBean_OODB::getInstance()->getInstance()->getDatabase();
-		RedBean_OODB::getInstance()->getInstance()->setDatabase( $new );
-		return $old;
+	public static function reconnect( RedBean_DBAdapter $newDatabase ) {
+		
+                $oldToolBox = RedBean_OODB::getInstance()->getToolBox();
+                $oldDatabase = $oldToolBox->getDatabase();
+                $oldToolBox->add("database", $newDatabase);
+                return $oldDatabase;
+
+
+
+                //$old = RedBean_OODB::getInstance()->getInstance()->getDatabase();
+		//RedBean_OODB::getInstance()->getInstance()->setDatabase( $new );
+		//return $old;
 	}
 	
 }

@@ -2,9 +2,7 @@
 
 class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 
-    public function __construct() {
-
-    }
+ 
     
     public function removeUnused( RedBean_OODB $oodb, RedBean_DBAdapter $db, RedBean_QueryWriter $writer ) {
 
@@ -33,5 +31,50 @@ class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 
             }
     }
+
+
+    public function dropColumn($table,$property) {
+        	//oops, we are frozen, so no change..
+			if ($this->provider->isFrozen()) {
+				return false;
+			}
+
+			//get a database
+			$db = $this->provider->getDatabase();
+
+			$db->exec( $this->provider->getWriter()->getQuery("drop_column", array(
+				"table"=>$table,
+				"property"=>$property
+			)) );
+
+		}
+
+    public function clean() {
+
+			if ($this->provider->isFrozen()) {
+				return false;
+			}
+
+			$db = $this->provider->getDatabase();
+
+			$tables = $db->getCol( $this->provider->getWriter()->getQuery("show_rtables") );
+
+			foreach($tables as $key=>$table) {
+				$tables[$key] = $this->provider->getWriter()->getEscape().$table.$this->provider->getWriter()->getEscape();
+			}
+
+			$sqlcleandatabase = $this->provider->getWriter()->getQuery("drop_tables",array(
+				"tables"=>$tables
+			));
+
+			$db->exec( $sqlcleandatabase );
+
+			$db->exec( $this->provider->getWriter()->getQuery("truncate_rtables") );
+			$this->provider->resetAll();
+			return true;
+
+		
+    }
+    
 }
 

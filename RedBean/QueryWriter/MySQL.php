@@ -6,7 +6,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class QueryWriter_MySQL implements RedBean_QueryWriter {
+class QueryWriter_MySQL implements RedBean_QueryWriter, RedBean_Tool {
 	/**
 	 * @var array all allowed sql types
 	 */
