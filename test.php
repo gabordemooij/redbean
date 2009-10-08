@@ -475,49 +475,49 @@ asrt($col["Extra"],"auto_increment");
 //Test description: is the bean properly checked?
 testpack("Bean Checking");
 $bean = RedBean_OODB::getInstance()->dispense("bean");
-try{RedBean_OODB::getInstance()->checkBean($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
 $bean->type = null;
-try{RedBean_OODB::getInstance()->checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean = RedBean_OODB::getInstance()->dispense("bean");
 $bean->id = null;
-try{RedBean_OODB::getInstance()->checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->id = -1;
-try{RedBean_OODB::getInstance()->checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->id = 0.5;
-try{RedBean_OODB::getInstance()->checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->id = "5";
-try{RedBean_OODB::getInstance()->checkBean($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
 $bean->id = "a";
-try{RedBean_OODB::getInstance()->checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->id = array();
-try{RedBean_OODB::getInstance()->checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->id = $bean;
-try{RedBean_OODB::getInstance()->checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->id = 0;
-try{RedBean_OODB::getInstance()->checkBean($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
 $bean->type = "redbeantables";
-try{RedBean_OODB::getInstance()->checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->type = "dtyp";
-try{RedBean_OODB::getInstance()->checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->type = "locking";
-try{RedBean_OODB::getInstance()->checkBean($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 //Some tests for checkAssoc
 testpack("checkAssoc");
 $bean->type = "justabean";
 $bean->id = "a";
-try{RedBean_OODB::getInstance()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->id = array();
-try{RedBean_OODB::getInstance()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->id = $bean;
-try{RedBean_OODB::getInstance()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->id = 0;
-try{RedBean_OODB::getInstance()->checkBeanForAssoc($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->checkBeanForAssoc($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
 $bean->type = "redbeantables";
-try{RedBean_OODB::getInstance()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->type = "dtyp";
-try{RedBean_OODB::getInstance()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->type = "locking";
-try{RedBean_OODB::getInstance()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
+try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->checkBeanForAssoc($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 
 
 //Test filtering

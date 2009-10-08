@@ -73,27 +73,9 @@ class RedBean_OODB {
         return $this->toolbox;
     }
 
-    public function checkBean(RedBean_OODBBean $bean) {
-        if (!$this->toolbox->getDatabase()) {
-            throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
-        }
-        return $this->toolbox->getBeanChecker()->check( $bean );
-    }
+   
 
-    public function checkBeanForAssoc( $bean ) {
-
-    //check the bean
-        $this->checkBean($bean);
-
-        //make sure it has already been saved to the database, else we have no id.
-        if (intval($bean->id) < 1) {
-        //if it's not saved, save it
-            $bean->id = $this->set( $bean );
-        }
-
-        return $bean;
-
-    }
+    
 
     public function getEngine() {
         return $this->engine;
@@ -153,7 +135,7 @@ class RedBean_OODB {
     }
 
     public function openBean( $bean, $mustlock=false) {
-        $this->checkBean( $bean );
+        $this->toolbox->getBeanChecker()->check( $bean );
         $this->toolbox->getLockManager()->openBean( $bean, $mustlock );
     }
 

@@ -1351,27 +1351,9 @@ class RedBean_OODB {
         return $this->toolbox;
     }
 
-    public function checkBean(RedBean_OODBBean $bean) {
-        if (!$this->toolbox->getDatabase()) {
-            throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
-        }
-        return $this->toolbox->getBeanChecker()->check( $bean );
-    }
+   
 
-    public function checkBeanForAssoc( $bean ) {
-
-    //check the bean
-        $this->checkBean($bean);
-
-        //make sure it has already been saved to the database, else we have no id.
-        if (intval($bean->id) < 1) {
-        //if it's not saved, save it
-            $bean->id = $this->set( $bean );
-        }
-
-        return $bean;
-
-    }
+    
 
     public function getEngine() {
         return $this->engine;
@@ -1431,7 +1413,7 @@ class RedBean_OODB {
     }
 
     public function openBean( $bean, $mustlock=false) {
-        $this->checkBean( $bean );
+        $this->toolbox->getBeanChecker()->check( $bean );
         $this->toolbox->getLockManager()->openBean( $bean, $mustlock );
     }
 
@@ -2666,8 +2648,8 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $db = $this->provider->getDatabase();
 
         //first we check the beans whether they are valid
-        $bean1 = $this->provider->checkBeanForAssoc($bean1);
-        $bean2 = $this->provider->checkBeanForAssoc($bean2);
+        $bean1 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean1);
+        $bean2 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean2);
 
         $this->provider->openBean( $bean1, true );
         $this->provider->openBean( $bean2, true );
@@ -2751,8 +2733,8 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $db = $this->provider->getDatabase();
 
         //first we check the beans whether they are valid
-        $bean1 = $this->provider->checkBeanForAssoc($bean1);
-        $bean2 = $this->provider->checkBeanForAssoc($bean2);
+        $bean1 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean1);
+        $bean2 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean2);
 
 
         $this->provider->openBean( $bean1, true );
@@ -2848,7 +2830,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
     //get a database
         $db = $this->provider->getDatabase();
         //first we check the beans whether they are valid
-        $bean = $this->provider->checkBeanForAssoc($bean);
+        $bean = $this->provider->getBeanChecker()->checkBeanForAssoc($bean);
 
         $id = intval($bean->id);
 
@@ -2900,7 +2882,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
     public function deleteAllAssoc( $bean ) {
 
         $db = $this->provider->getDatabase();
-        $bean = $this->provider->checkBeanForAssoc($bean);
+        $bean = $this->provider->getBeanChecker()->checkBeanForAssoc($bean);
 
         $this->provider->openBean( $bean, true );
 
@@ -2942,7 +2924,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
 
     public function deleteAllAssocType( $targettype, $bean ) {
         $db = $this->provider->getDatabase();
-        $bean = $this->provider->checkBeanForAssoc($bean);
+        $bean = $this->provider->getBeanChecker()->checkBeanForAssoc($bean);
         $this->provider->openBean( $bean, true );
 
         $id = intval( $bean->id );
@@ -2992,7 +2974,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
 			$t2 = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
 
 			//is this bean valid?
-			$this->provider->checkBean( $bean );
+			$this->provider->getBeanChecker()->check( $bean );
 			$t1 = $this->provider->getToolBox()->getFilter()->table( $bean->type  );
 			$tref = $this->provider->getToolBox()->getFilter()->table( $db->escape( $bean->type ) );
 			$id = intval( $bean->id );
@@ -3030,9 +3012,11 @@ class RedBean_Mod_Association extends RedBean_Mod {
 }
 class RedBean_Mod_BeanChecker extends RedBean_Mod {
 
-    public function __construct(){}
     
     public function check( RedBean_OODBBean $bean ) {
+        if (!$this->provider->getDatabase()) {
+            throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
+        }
         foreach($bean as $prop=>$value) {
             
             if (preg_match('/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/',$prop)) {
@@ -3086,6 +3070,21 @@ class RedBean_Mod_BeanChecker extends RedBean_Mod {
 
     }
 
+    public function checkBeanForAssoc( $bean ) {
+
+    //check the bean
+        $this->check($bean);
+
+        //make sure it has already been saved to the database, else we have no id.
+        if (intval($bean->id) < 1) {
+        //if it's not saved, save it
+            $bean->id = $this->provider->getBeanStore()->set( $bean );
+        }
+
+        return $bean;
+
+    }
+
 
 }
 /**
@@ -3103,7 +3102,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
      */
     public function set( RedBean_OODBBean $bean ) {
 
-        $this->provider->checkBean($bean);
+        $this->provider->getBeanChecker()->check($bean);
 
 
         $db = $this->provider->getDatabase(); //I am lazy, I dont want to waste characters...
@@ -3275,7 +3274,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 
     //@todo tested?
     public function trash( RedBean_OODBBean $bean ) {
-        $this->provider->checkBean( $bean );
+        $this->provider->getBeanChecker()->check( $bean );
 	if (intval($bean->id)===0) return;
 	$this->provider->deleteAllAssoc( $bean );
 	$this->provider->openBean($bean);
@@ -3452,7 +3451,7 @@ class RedBean_Mod_Finder extends RedBean_Mod {
      * @return unknown_type
      */
     public function find(RedBean_OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
-      $this->provider->checkBean( $bean );
+      $this->provider->getBeanChecker()->check( $bean );
       $db = $this->provider->getDatabase();
       $tbl = $db->escape( $bean->type );
 
@@ -4040,8 +4039,8 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$db = $this->provider->getDatabase();
 
 			//first we check the beans whether they are valid
-			$parent = $this->provider->checkBeanForAssoc($parent);
-			$child = $this->provider->checkBeanForAssoc($child);
+			$parent = $this->provider->getBeanChecker()->checkBeanForAssoc($parent);
+			$child = $this->provider->getBeanChecker()->checkBeanForAssoc($child);
 
 			$this->provider->openBean( $parent, true );
 			$this->provider->openBean( $child, true );
@@ -4092,7 +4091,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$db = $this->provider->getDatabase();
 
 			//first we check the beans whether they are valid
-			$parent = $this->provider->checkBeanForAssoc($parent);
+			$parent = $this->provider->getBeanChecker()->checkBeanForAssoc($parent);
 
 			$pid = intval($parent->id);
 
@@ -4129,7 +4128,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$db = $this->provider->getDatabase();
 
 			//first we check the beans whether they are valid
-			$child = $this->provider->checkBeanForAssoc($child);
+			$child = $this->provider->getBeanChecker()->checkBeanForAssoc($child);
 
 			$cid = intval($child->id);
 
@@ -4166,8 +4165,8 @@ class RedBean_Mod_Tree extends RedBean_Mod {
                     	$db = $this->provider->getDatabase();
 
 			//first we check the beans whether they are valid
-			$parent = $this->provider->checkBeanForAssoc($parent);
-			$child = $this->provider->checkBeanForAssoc($child);
+			$parent = $this->provider->getBeanChecker()->checkBeanForAssoc($parent);
+			$child = $this->provider->getBeanChecker()->checkBeanForAssoc($child);
 
 			$this->provider->openBean( $parent, true );
 			$this->provider->openBean( $child, true );

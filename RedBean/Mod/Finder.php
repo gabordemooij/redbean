@@ -12,7 +12,7 @@ class RedBean_Mod_Finder extends RedBean_Mod {
      * @return unknown_type
      */
     public function find(RedBean_OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
-      $this->provider->checkBean( $bean );
+      $this->provider->getBeanChecker()->check( $bean );
       $db = $this->provider->getDatabase();
       $tbl = $db->escape( $bean->type );
 

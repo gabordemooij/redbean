@@ -2,9 +2,11 @@
 
 class RedBean_Mod_BeanChecker extends RedBean_Mod {
 
-    public function __construct(){}
     
     public function check( RedBean_OODBBean $bean ) {
+        if (!$this->provider->getDatabase()) {
+            throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
+        }
         foreach($bean as $prop=>$value) {
             
             if (preg_match('/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/',$prop)) {
@@ -55,6 +57,21 @@ class RedBean_Mod_BeanChecker extends RedBean_Mod {
         if (strpos($bean->type,"_")!==false && ctype_alnum($bean->type)) {
             throw new RedBean_Exception_Security("Beantype contains illegal characters");
         }
+
+    }
+
+    public function checkBeanForAssoc( $bean ) {
+
+    //check the bean
+        $this->check($bean);
+
+        //make sure it has already been saved to the database, else we have no id.
+        if (intval($bean->id) < 1) {
+        //if it's not saved, save it
+            $bean->id = $this->provider->getBeanStore()->set( $bean );
+        }
+
+        return $bean;
 
     }
 

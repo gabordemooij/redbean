@@ -7,8 +7,8 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $db = $this->provider->getDatabase();
 
         //first we check the beans whether they are valid
-        $bean1 = $this->provider->checkBeanForAssoc($bean1);
-        $bean2 = $this->provider->checkBeanForAssoc($bean2);
+        $bean1 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean1);
+        $bean2 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean2);
 
         $this->provider->openBean( $bean1, true );
         $this->provider->openBean( $bean2, true );
@@ -92,8 +92,8 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $db = $this->provider->getDatabase();
 
         //first we check the beans whether they are valid
-        $bean1 = $this->provider->checkBeanForAssoc($bean1);
-        $bean2 = $this->provider->checkBeanForAssoc($bean2);
+        $bean1 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean1);
+        $bean2 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean2);
 
 
         $this->provider->openBean( $bean1, true );
@@ -189,7 +189,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
     //get a database
         $db = $this->provider->getDatabase();
         //first we check the beans whether they are valid
-        $bean = $this->provider->checkBeanForAssoc($bean);
+        $bean = $this->provider->getBeanChecker()->checkBeanForAssoc($bean);
 
         $id = intval($bean->id);
 
@@ -241,7 +241,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
     public function deleteAllAssoc( $bean ) {
 
         $db = $this->provider->getDatabase();
-        $bean = $this->provider->checkBeanForAssoc($bean);
+        $bean = $this->provider->getBeanChecker()->checkBeanForAssoc($bean);
 
         $this->provider->openBean( $bean, true );
 
@@ -283,7 +283,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
 
     public function deleteAllAssocType( $targettype, $bean ) {
         $db = $this->provider->getDatabase();
-        $bean = $this->provider->checkBeanForAssoc($bean);
+        $bean = $this->provider->getBeanChecker()->checkBeanForAssoc($bean);
         $this->provider->openBean( $bean, true );
 
         $id = intval( $bean->id );
@@ -333,7 +333,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
 			$t2 = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
 
 			//is this bean valid?
-			$this->provider->checkBean( $bean );
+			$this->provider->getBeanChecker()->check( $bean );
 			$t1 = $this->provider->getToolBox()->getFilter()->table( $bean->type  );
 			$tref = $this->provider->getToolBox()->getFilter()->table( $db->escape( $bean->type ) );
 			$id = intval( $bean->id );

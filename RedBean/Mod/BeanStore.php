@@ -15,7 +15,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
      */
     public function set( RedBean_OODBBean $bean ) {
 
-        $this->provider->checkBean($bean);
+        $this->provider->getBeanChecker()->check($bean);
 
 
         $db = $this->provider->getDatabase(); //I am lazy, I dont want to waste characters...
@@ -187,7 +187,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 
     //@todo tested?
     public function trash( RedBean_OODBBean $bean ) {
-        $this->provider->checkBean( $bean );
+        $this->provider->getBeanChecker()->check( $bean );
 	if (intval($bean->id)===0) return;
 	$this->provider->deleteAllAssoc( $bean );
 	$this->provider->openBean($bean);

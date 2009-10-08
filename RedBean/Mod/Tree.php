@@ -8,8 +8,8 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$db = $this->provider->getDatabase();
 
 			//first we check the beans whether they are valid
-			$parent = $this->provider->checkBeanForAssoc($parent);
-			$child = $this->provider->checkBeanForAssoc($child);
+			$parent = $this->provider->getBeanChecker()->checkBeanForAssoc($parent);
+			$child = $this->provider->getBeanChecker()->checkBeanForAssoc($child);
 
 			$this->provider->openBean( $parent, true );
 			$this->provider->openBean( $child, true );
@@ -60,7 +60,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$db = $this->provider->getDatabase();
 
 			//first we check the beans whether they are valid
-			$parent = $this->provider->checkBeanForAssoc($parent);
+			$parent = $this->provider->getBeanChecker()->checkBeanForAssoc($parent);
 
 			$pid = intval($parent->id);
 
@@ -97,7 +97,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$db = $this->provider->getDatabase();
 
 			//first we check the beans whether they are valid
-			$child = $this->provider->checkBeanForAssoc($child);
+			$child = $this->provider->getBeanChecker()->checkBeanForAssoc($child);
 
 			$cid = intval($child->id);
 
@@ -134,8 +134,8 @@ class RedBean_Mod_Tree extends RedBean_Mod {
                     	$db = $this->provider->getDatabase();
 
 			//first we check the beans whether they are valid
-			$parent = $this->provider->checkBeanForAssoc($parent);
-			$child = $this->provider->checkBeanForAssoc($child);
+			$parent = $this->provider->getBeanChecker()->checkBeanForAssoc($parent);
+			$child = $this->provider->getBeanChecker()->checkBeanForAssoc($child);
 
 			$this->provider->openBean( $parent, true );
 			$this->provider->openBean( $child, true );
