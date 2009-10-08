@@ -255,7 +255,7 @@ class QueryWriter_MySQL implements RedBean_QueryWriter, RedBean_Tool {
 		private function getQueryFind($options) {
 
 			extract($options);
-			$db = RedBean_OODB::getInstance()->getDatabase();
+			$db = RedBean_OODB::getInstance()->getToolBox()->getDatabase();
 			$findSQL = "SELECT id FROM `$tbl` WHERE ";
 
 	   
@@ -290,7 +290,7 @@ class QueryWriter_MySQL implements RedBean_QueryWriter, RedBean_Tool {
 		 */
 		private function getQueryList($options) {
 			extract($options);
-			$db = RedBean_OODB::getInstance()->getDatabase();
+			$db = RedBean_OODB::getInstance()->getToolBox()->getDatabase();
 			if ($extraSQL) {
 				$listSQL = "SELECT * FROM ".$db->escape($type)." ".$extraSQL;
 			}

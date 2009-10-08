@@ -133,7 +133,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 * @param $collection
 	 * @return RedBean_Can $instance
 	 */
-	public function __construct( RedBean_OODB $provider, $type="", $collection = array() ) {
+	public function __construct( RedBean_ToolBox_ModHub $provider, $type="", $collection = array() ) {
 		
 		$this->provider=$provider;
 		$this->collectionIDs = $collection;
@@ -178,17 +178,14 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 */
 	public function getBeans() {
 
-		$rows = $this->provider->fastloader( $this->type, $this->collectionIDs );
-		
+                $rows = $this->provider->getBeanStore()->fastloader( $this->type, $this->collectionIDs );
 		$beans = array();
-		
 		if (is_array($rows)) {
 			foreach( $rows as $row ) {
 				//Use the fastloader for optimal performance (takes row as data)
 				$beans[] = $this->wrap( $this->provider->getById( $this->type, $row["id"] , $row) );
 			}
 		}
-
 		return $beans;
 	}
 	
@@ -550,7 +547,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			throw new Exception("Undefined bean type");
 		}
 		else {
-                	$this->type = $this->provider->getFilter()->table($type);
+                	$this->type = $this->provider->getToolBox()->getFilter()->table($type);
                         //echo $this->type;
 			if ($id > 0) { //if the id is higher than 0 load data
 				$this->data = $this->provider->getById( $this->type, $id);
@@ -642,7 +639,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function __get( $name ) {
 		$this->signal("deco_get", $this);
-		$name = $this->provider->getFilter()->property($name, true);
+		$name = $this->provider->getToolBox()->getFilter()->property($name, true);
 		return isset($this->data->$name) ? $this->data->$name : null;
 	}
 
@@ -651,7 +648,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function __set( $name, $value ) {
 		$this->signal("deco_set", $this);
-		$name = $this->provider->getFilter()->property($name);
+		$name = $this->provider->getToolBox()->getFilter()->property($name);
 		$this->data->$name = $value;
 	}
 
@@ -667,14 +664,14 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		if (strpos( $method,"set" ) === 0) {
 			$prop = substr( $method, 3 );
-			$prop = $this->provider->getFilter()->property($prop);
+			$prop = $this->provider->getToolBox()->getFilter()->property($prop);
 			$this->$prop = $arguments[0];
 			return $this;
 
 		}
 		elseif (strpos($method,"getRelated")===0)	{
 			$this->signal("deco_get", $this);
-			$prop = $this->provider->getFilter()->table( substr( $method, 10 ) );
+			$prop = $this->provider->getToolBox()->getFilter()->table( substr( $method, 10 ) );
 			$beans = $this->provider->getAssoc( $this->data, $prop );
 			$decos = array();
 			$dclass = RedBean_Setup_Namespace_PRFX.$prop.RedBean_Setup_Namespace_SFFX;
@@ -690,11 +687,11 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		}
 		elseif (strpos( $method, "get" ) === 0) {
 			$prop = substr( $method, 3 );
-                        $prop = $this->provider->getFilter()->property($prop, true);
+                        $prop = $this->provider->getToolBox()->getFilter()->property($prop, true);
 			return $this->$prop;
 		}
 		elseif (strpos( $method, "is" ) === 0) {
-			$prop = $this->provider->getFilter()->property( substr( $method, 2 ) );
+			$prop = $this->provider->getToolBox()->getFilter()->property( substr( $method, 2 ) );
 			if (!isset($this->data->$prop)) {
 				$this->signal("deco_get",$this);
 				return false;
@@ -724,13 +721,13 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		}
 		else if (strpos($method,"clearRelated")===0) {
 			$this->signal("deco_clearrelated",$this); 
-			$type = $this->provider->getFilter()->table( substr( $method, 12 ) );
+			$type = $this->provider->getToolBox()->getFilter()->table( substr( $method, 12 ) );
 			$this->provider->deleteAllAssocType($type, $this->data);
 			return $this;
 		}
 		else if (strpos($method,"numof")===0) {
 			$this->signal("deco_numof",$this);
-			$type = $this->provider->getFilter()->table( substr( $method, 5 ) );
+			$type = $this->provider->getToolBox()->getFilter()->table( substr( $method, 5 ) );
 			return $this->provider->numOfRelated($type, $this->data);
 				
 		}
@@ -1281,63 +1278,19 @@ interface RedBean_Observer {
 	 */
 	public function onEvent( $eventname, RedBean_Observable $o );
 }
-/**
- * RedBean OODB (object oriented database)
- * @package 		RedBean/OODB.php
- * @description		Core class for the RedBean ORM pack
- * @author			Gabor de Mooij
- * @license			BSD
- */
 class RedBean_OODB {
 
-
-    /**
-     * Indicates how long one can lock an item,
-     * defaults to ten minutes
-     * If a user opens a bean and he or she does not
-     * perform any actions on it others cannot modify the
-     * bean during this time interval.
-     * @var unknown_type
-     */
-    private $locktime = 10;
-
-    /**
-     *
-     * @var boolean
-     */
-    private $locking = true;
-    /**
-     *
-     * @var string $pkey - a fingerprint for locking
-     */
     public $pkey = false;
 
-    /**
-     * Indicates that a rollback is required
-     * @var unknown_type
-     */
     private $rollback = false;
 
-    /**
-     *
-     * @var $this
-     */
     private static $me = null;
 
-    /**
-     *
-     * Indicates the current engine
-     * @var string
-     */
     private $engine = "myisam";
 
-    /**
-     * @var boolean $frozen - indicates whether the db may be adjusted or not
-     */
     private $frozen = false;
 
     private $toolbox = null;
-    
 
     public function initWithToolBox( RedBean_ToolBox_ModHub $toolbox ) {
         $this->toolbox = $toolbox;
@@ -1366,28 +1319,7 @@ class RedBean_OODB {
         return true;
     }
 
-
-
-    public function getFilter() {
-        return $this->toolbox->getFilter();
-    }
-
-    public function setFilter( RedBean_Mod_Filter $filter ) {
-        $this->toolbox->add("filter",$filter);
-    }
-
-    public function getWriter() {
-        return $this->toolbox->getWriter();
-    }
-
-    public function isFrozen() {
-        return (boolean) $this->frozen;
-    }
-
-    /**
-     * Closes and unlocks the bean
-     * @return unknown_type
-     */
+   
     public function __destruct() {
 
         $this->releaseAllLocks();
@@ -1395,61 +1327,18 @@ class RedBean_OODB {
         $this->toolbox->getDatabase()->exec(
             $this->toolbox->getWriter()->getQuery("destruct", array("engine"=>$this->engine,"rollback"=>$this->rollback))
         );
+    }
+    
 
+    public function isFrozen() {
+        return (boolean) $this->frozen;
     }
 
 
-
-
-    /**
-     * Toggles Forward Locking
-     * @param $tf
-     * @return unknown_type
-     */
-    public function setLocking( $tf ) {
-        $this->locking = $tf;
-    }
-
-    public function getDatabase() {
-        return $this->toolbox->getDatabase();
-    }
-
-    public function setDatabase( RedBean_DBAdapter $db ) {
-        $this->toolbox->add("database",$db);
-    }
-
-    /**
-     * Gets the current locking mode (on or off)
-     * @return unknown_type
-     */
-    public function getLocking() {
-        return $this->locking;
-    }
-
-
-    /**
-     * Toggles optimizer
-     * @param $bool
-     * @return unknown_type
-     */
-    public function setOptimizerActive( $bool ) {
-        $this->optimizer = (boolean) $bool;
-    }
-
-    /**
-     * Returns state of the optimizer
-     * @param $bool
-     * @return unknown_type
-     */
-    public function getOptimizerActive() {
-        return $this->optimizer;
-    }
+    
 
    
-    /**
-     * Singleton
-     * @return unknown_type
-     */
+
     public static function getInstance( RedBean_ToolBox_ModHub $toolbox = NULL ) {
         if (self::$me === null) {
             self::$me = new RedBean_OODB;
@@ -1458,16 +1347,10 @@ class RedBean_OODB {
         return self::$me;
     }
 
-
     public function getToolBox() {
         return $this->toolbox;
     }
 
-    /**
-     * Checks whether a bean is valid
-     * @param $bean
-     * @return unknown_type
-     */
     public function checkBean(RedBean_OODBBean $bean) {
         if (!$this->toolbox->getDatabase()) {
             throw new RedBean_Exception_Security("No database object. Have you used kickstart to initialize RedBean?");
@@ -1475,11 +1358,6 @@ class RedBean_OODB {
         return $this->toolbox->getBeanChecker()->check( $bean );
     }
 
-    /**
-     * same as check bean, but does additional checks for associations
-     * @param $bean
-     * @return unknown_type
-     */
     public function checkBeanForAssoc( $bean ) {
 
     //check the bean
@@ -1495,19 +1373,10 @@ class RedBean_OODB {
 
     }
 
-    /**
-     * Returns the current engine
-     * @return unknown_type
-     */
     public function getEngine() {
         return $this->engine;
     }
 
-    /**
-     * Sets the current engine
-     * @param $engine
-     * @return unknown_type
-     */
     public function setEngine( $engine ) {
 
         if ($engine=="myisam" || $engine=="innodb") {
@@ -1521,11 +1390,7 @@ class RedBean_OODB {
 
     }
 
-    /**
-     * Will perform a rollback at the end of the script
-     * @return unknown_type
-     */
-    public function rollback() {
+    public static function rollback() {
         $this->rollback = true;
     }
 
@@ -1533,433 +1398,149 @@ class RedBean_OODB {
         return $this->toolbox->getBeanStore()->set($bean);
     }
 
-
-    /**
-     * Infers the SQL type of a bean
-     * @param $v
-     * @return $type the SQL type number constant
-     */
     public function inferType( $v ) {
         return $this->toolbox->getScanner()->type( $v );
     }
 
-
-    /**
-     * Returns the RedBean type const for an SQL type
-     * @param $sqlType
-     * @return $typeno
-     */
     public function getType( $sqlType ) {
         return $this->toolbox->getScanner()->code( $sqlType );
     }
 
-    
-    /**
-     * Freezes the database so it won't be changed anymore
-     * @return unknown_type
-     */
     public function freeze() {
         $this->frozen = true;
     }
 
-    /**
-     * UNFreezes the database so it won't be changed anymore
-     * @return unknown_type
-     */
     public function unfreeze() {
         $this->frozen = false;
     }
 
-    /**
-     * Returns all redbean tables or all tables in the database
-     * @param $all if set to true this function returns all tables instead of just all rb tables
-     * @return array $listoftables
-     */
     public function showTables( $all=false ) {
         return $this->toolbox->getTableRegister()->getTables($all);
     }
 
-    /**
-     * Registers a table with RedBean
-     * @param $tablename
-     * @return void
-     */
     public function addTable( $tablename ) {
         return $this->toolbox->getTableRegister()->register( $tablename);
     }
 
-    /**
-     * UNRegisters a table with RedBean
-     * @param $tablename
-     * @return void
-     */
     public function dropTable( $tablename ) {
         return $this->toolbox->getTableRegister()->unregister( $tablename );
     }
 
-    /**
-     * Quick and dirty way to release all locks
-     * @return unknown_type
-     */
     public function releaseAllLocks() {
         $this->toolbox->getDatabase()->exec($this->toolbox->getWriter()->getQuery("release",array("key"=>$this->pkey)));
     }
 
-    /**
-     * Opens and locks a bean
-     * @param $bean
-     * @return unknown_type
-     */
     public function openBean( $bean, $mustlock=false) {
         $this->checkBean( $bean );
         $this->toolbox->getLockManager()->openBean( $bean, $mustlock );
     }
 
-
-    /**
-     * Gets a bean by its primary ID
-     * @param $type
-     * @param $id
-     * @return RedBean_OODBBean $bean
-     */
     public function getById($type, $id, $data=false) {
         return $this->toolbox->getBeanStore()->get($type,$id,$data);
     }
 
-    /**
-     * Checks whether a type-id combination exists
-     * @param $type
-     * @param $id
-     * @return unknown_type
-     */
     public function exists($type,$id) {
         return $this->toolbox->getBeanStore()->exists($type, $id);
     }
 
-
-
-    /**
-     * Counts occurences of  a bean
-     * @param $type
-     * @return integer $i
-     */
     public function numberof($type) {
         return $this->toolbox->getBeanStore()->numberof( $type );
     }
 
-    /**
-     * Gets all beans of $type, grouped by $field.
-     *
-     * @param String Object type e.g. "user" (lowercase!)
-     * @param String Field/parameter e.g. "zip"
-     * @return Array list of beans with distinct values of $field. Uses GROUP BY
-     * @author Alan J. Hogan
-     **/
-    function distinct($type, $field) {
+    public function distinct($type, $field) {
         return $this->toolbox->getLister()->distinct( $type, $field );
     }
 
-
-    /**
-     * Simple statistic
-     * @param $type
-     * @param $field
-     * @return integer $i
-     */
     private function stat($type,$field,$stat="sum") {
         return $this->toolbox->getLister()->stat( $type, $field, $stat);
     }
 
-
-
-    /**
-     * Sum
-     * @param $type
-     * @param $field
-     * @return float $i
-     */
     public function sumof($type,$field) {
         return $this->stat( $type, $field, "sum");
     }
 
-    /**
-     * AVG
-     * @param $type
-     * @param $field
-     * @return float $i
-     */
     public function avgof($type,$field) {
         return $this->stat( $type, $field, "avg");
     }
 
-    /**
-     * minimum
-     * @param $type
-     * @param $field
-     * @return float $i
-     */
     public function minof($type,$field) {
         return $this->stat( $type, $field, "min");
     }
 
-    /**
-     * maximum
-     * @param $type
-     * @param $field
-     * @return float $i
-     */
     public function maxof($type,$field) {
         return $this->stat( $type, $field, "max");
     }
 
-
-    /**
-     * Unlocks everything
-     * @return unknown_type
-     */
     public function resetAll() {
         $sql = $this->toolbox->getWriter()->getQuery("releaseall");
         $this->toolbox->getDatabase()->exec( $sql );
         return true;
     }
 
-    /**
-     * Loads a collection of beans -fast-
-     * @param $type
-     * @param $ids
-     * @return unknown_type
-     */
-    public function fastLoader( $type, $ids ) {
-
-        $db = $this->toolbox->getDatabase();
-
-
-        $sql = $this->toolbox->getWriter()->getQuery("fastload", array(
-            "type"=>$type,
-            "ids"=>$ids
-        ));
-
-        return $db->get( $sql );
-
-    }
-
-    /**
-     * Allows you to fetch an array of beans using plain
-     * old SQL.
-     * @param $rawsql
-     * @param $slots
-     * @param $table
-     * @param $max
-     * @return array $beans
-     */
     public function getBySQL( $rawsql, $slots, $table, $max=0 ) {
-
         return $this->toolbox->getSearch()->sql( $rawsql, $slots, $table, $max );
-
     }
 
-
-    /**
-     * Finds a bean using search parameters
-     * @param $bean
-     * @param $searchoperators
-     * @param $start
-     * @param $end
-     * @param $orderby
-     * @return unknown_type
-     */
     public function find(RedBean_OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
         return $this->toolbox->getFinder()->find($bean, $searchoperators, $start, $end, $orderby, $extraSQL);
 
     }
-
-
-    /**
-     * Returns a plain and simple array filled with record data
-     * @param $type
-     * @param $start
-     * @param $end
-     * @param $orderby
-     * @return unknown_type
-     */
     public function listAll($type, $start=false, $end=false, $orderby="id ASC", $extraSQL = false) {
         return $this->toolbox->getLister()->get($type, $start, $end, $orderby,$extraSQL);
     }
-
-
-    /**
-     * Associates two beans
-     * @param $bean1
-     * @param $bean2
-     * @return unknown_type
-     */
     public function associate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) { //@associate
         return $this->toolbox->getAssociation()->link( $bean1, $bean2 );
     }
-
-    /**
-     * Breaks the association between a pair of beans
-     * @param $bean1
-     * @param $bean2
-     * @return unknown_type
-     */
     public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
         return $this->toolbox->getAssociation()->breakLink( $bean1, $bean2 );
     }
-
-    /**
-     * Fetches all beans of type $targettype assoiciated with $bean
-     * @param $bean
-     * @param $targettype
-     * @return array $beans
-     */
     public function getAssoc(RedBean_OODBBean $bean, $targettype) {
         return $this->toolbox->getAssociation()->get( $bean, $targettype );
     }
-
-
-    /**
-     * Removes a bean from the database and breaks associations if required
-     * @param $bean
-     * @return unknown_type
-     */
     public function trash( RedBean_OODBBean $bean ) {
         return $this->toolbox->getBeanStore()->trash( $bean );
     }
-
-
-    /**
-     * Breaks all associations of a perticular bean $bean
-     * @param $bean
-     * @return unknown_type
-     */
     public function deleteAllAssoc( $bean ) {
         return $this->toolbox->getAssociation()->deleteAllAssoc( $bean );
     }
-
-    /**
-     * Breaks all associations of a perticular bean $bean
-     * @param $bean
-     * @return unknown_type
-     */
     public function deleteAllAssocType( $targettype, $bean ) {
         return $this->toolbox->getAssociation()->deleteAllAssocType( $targettype, $bean );
     }
-
-
-    /**
-     * Dispenses; creates a new OODB bean of type $type
-     * @param $type
-     * @return RedBean_OODBBean $bean
-     */
     public function dispense( $type="StandardBean" ) {
         return $this->toolbox->getDispenser()->dispense( $type );
     }
-
-
-    /**
-     * Adds a child bean to a parent bean
-     * @param $parent
-     * @param $child
-     * @return unknown_type
-     */
     public function addChild( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
         return $this->toolbox->getTree()->add( $parent, $child );
     }
 
-    /**
-     * Returns all child beans of parent bean $parent
-     * @param $parent
-     * @return array $beans
-     */
     public function getChildren( RedBean_OODBBean $parent ) {
         return $this->toolbox->getTree()->getChildren($parent);
     }
 
-    /**
-     * Fetches the parent bean of child bean $child
-     * @param $child
-     * @return RedBean_OODBBean $parent
-     */
     public function getParent( RedBean_OODBBean $child ) {
         return $this->toolbox->getTree()->getParent($child);
     }
 
-    /**
-     * Removes a child bean from a parent-child association
-     * @param $parent
-     * @param $child
-     * @return unknown_type
-     */
     public function removeChild(RedBean_OODBBean $parent, RedBean_OODBBean $child) {
         return $this->toolbox->getTree()->removeChild( $parent, $child );
     }
 
-    /**
-     * Counts the associations between a type and a bean
-     * @param $type
-     * @param $bean
-     * @return integer $numberOfRelations
-     */
     public function numofRelated( $type, RedBean_OODBBean $bean ) {
         return $this->toolbox->getAssociation()->numOfRelated( $type, $bean );
 
     }
-
-    /**
-     * Accepts a comma separated list of class names and
-     * creates a default model for each classname mentioned in
-     * this list. Note that you should not gen() classes
-     * for which you already created a model (by inheriting
-     * from ReadBean_Decorator).
-     * @param string $classes
-     * @param string $prefix prefix for framework integration (optional, constant is used otherwise)
-     * @param string $suffix suffix for framework integration (optional, constant is used otherwise)
-     * @return unknown_type
-     */
-
     public function generate( $classes, $prefix = false, $suffix = false ) {
         return $this->toolbox->getClassGenerator()->generate($classes,$prefix,$suffix);
     }
 
+   
 
     
 
-    /**
-     * Changes the locktime, this time indicated how long
-     * a user can lock a bean in the database.
-     * @param $timeInSecs
-     * @return unknown_type
-     */
-    public function setLockingTime( $timeInSecs ) {
-
-        if (is_int($timeInSecs) && $timeInSecs >= 0) {
-            $this->locktime = $timeInSecs;
-        }
-        else {
-            throw new RedBean_Exception_InvalidArgument( "time must be integer >= 0" );
-        }
-    }
-
-    public function getLockingTime() { return $this->locktime; }
-
-
-
-    /**
-     * Cleans the entire redbean database, this will not affect
-     * tables that are not managed by redbean.
-     * @return unknown_type
-     */
     public function clean() {
         return $this->toolbox->getGC()->clean();
     }
 
-
-    /**
-     * Removes all tables from redbean that have
-     * no classes
-     * @return unknown_type
-     */
     public function removeUnused( ) {
     //oops, we are frozen, so no change..
         if ($this->frozen) {
@@ -1969,21 +1550,10 @@ class RedBean_OODB {
 
 
     }
-    /**
-     * Drops a specific column
-     * @param $table
-     * @param $property
-     * @return unknown_type
-     */
     public function dropColumn( $table, $property ) {
         return $this->toolbox->getGC()->dropColumn($table,$property);
     }
 
-    /**
-     * Removes all beans of a particular type
-     * @param $type
-     * @return nothing
-     */
     public function trashAll($type) {
         $this->toolbox->getDatabase()->exec( $this->toolbox->getWriter()->getQuery("drop_type",array("type"=>$this->toolbox->getFilter()->table($type))));
     }
@@ -1996,10 +1566,12 @@ class RedBean_OODB {
         return self::getInstance()->getToolBox()->getOptimizer()->run($gc, $stdTable, $stdCol);
     }
 
-    public function getInstOf( $className, $id=0 ) {
-        if (!class_exists($className)) throw new Exception("Class does not Exist");
-        $object = new $className($id);
-        return $object;
+    public static function kickstartDev( $gen, $dsn, $username="root", $password="", $debug=false ) {
+        return RedBean_Setup::kickstartDev( $gen, $dsn, $username, $password, $debug ); 
+    }
+
+    public static function kickstartFrozen( $gen, $dsn, $username="root", $password="" ) {
+        return RedBean_Setip::kickstartFrozen( $gen, $dsn, $username, $password);
     }
 }
 /**
@@ -2064,7 +1636,7 @@ class Redbean_Querylogger implements RedBean_Observer
 			file_put_contents($logger->getFilename(),"begin logging");	
 		}
 		
-		RedBean_OODB::getInstance()->getDatabase()->addEventListener( "sql_exec", $logger );
+		RedBean_OODB::getInstance()->getToolBox()->getDatabase()->addEventListener( "sql_exec", $logger );
 	
 	}
 	
@@ -3282,7 +2854,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
 
 
         //obtain the table names
-        $t1 = $db->escape( $this->provider->getFilter()->table($bean->type) );
+        $t1 = $db->escape( $this->provider->getToolBox()->getFilter()->table($bean->type) );
         $t2 = $db->escape( $targettype );
 
         //infer the association table
@@ -3376,7 +2948,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $id = intval( $bean->id );
 
         //obtain the table names
-        $t1 = $db->escape( $this->provider->getFilter()->table($bean->type) );
+        $t1 = $db->escape( $this->provider->getToolBox()->getFilter()->table($bean->type) );
         $t2 = $db->escape( $targettype );
 
         //infer the association table
@@ -3417,12 +2989,12 @@ class RedBean_Mod_Association extends RedBean_Mod {
 
     			$db = $this->provider->getDatabase();
 
-			$t2 = $this->provider->getFilter()->table( $db->escape( $type ) );
+			$t2 = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
 
 			//is this bean valid?
 			$this->provider->checkBean( $bean );
-			$t1 = $this->provider->getFilter()->table( $bean->type  );
-			$tref = $this->provider->getFilter()->table( $db->escape( $bean->type ) );
+			$t1 = $this->provider->getToolBox()->getFilter()->table( $bean->type  );
+			$tref = $this->provider->getToolBox()->getFilter()->table( $db->escape( $bean->type ) );
 			$id = intval( $bean->id );
 
 			//infer the association table
@@ -3743,7 +3315,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 
            public function numberof($type) {
                 	$db = $this->provider->getDatabase();
-			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
+			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
 
 			$alltables = $this->provider->showTables();
 
@@ -3758,11 +3330,28 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 			}
            }
 
+           public function fastloader($type, $ids) {
+
+                $db = $this->provider->getDatabase();
+                $sql = $this->provider->getWriter()->getQuery("fastload", array(
+                    "type"=>$type,
+                    "ids"=>$ids
+                ));
+                return $db->get( $sql );
+
+           }
+
 
 }
 class RedBean_Mod_ClassGenerator extends RedBean_Mod {
 
-    
+   /**
+    *
+    * @param <type> $classes
+    * @param <type> $prefix
+    * @param <type> $suffix
+    * @return <type>
+    */
     public function generate( $classes, $prefix = false, $suffix = false ) {
 
         if (!$prefix) {
@@ -3788,15 +3377,15 @@ class RedBean_Mod_ClassGenerator extends RedBean_Mod {
                                         $tablename = $className;
                                         $fullname = $prefix.$className.$suffix;
                                         $toeval = $ns . " class ".$fullname." extends ". (($ns=='') ? '' : '\\' ) . "RedBean_Decorator {
-                                        private static \$__static_property_type = \"".$this->provider->getFilter()->table($tablename)."\";
+                                        private static \$__static_property_type = \"".$this->provider->getToolBox()->getFilter()->table($tablename)."\";
 
                                         public function __construct(\$id=0, \$lock=false) {
 
-                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->provider->getFilter()->table($tablename)."',\$id,\$lock);
+                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->provider->getToolBox()->getFilter()->table($tablename)."',\$id,\$lock);
                                         }
 
                                         public static function where( \$sql, \$slots=array() ) {
-                                                return new RedBean_Can( RedBean_OODB::getInstance(), self::\$__static_property_type, RedBean_OODB::getInstance()->getBySQL( \$sql, \$slots, self::\$__static_property_type) );
+                                                return new RedBean_Can( RedBean_OODB::getInstance()->getToolBox(), self::\$__static_property_type, RedBean_OODB::getInstance()->getBySQL( \$sql, \$slots, self::\$__static_property_type) );
                                         }
 
                                         public static function listAll(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
@@ -3804,9 +3393,9 @@ class RedBean_Mod_ClassGenerator extends RedBean_Mod {
                                         }
 
                                         public static function getReadOnly(\$id) {
-                                                RedBean_OODB::getInstance()->setLocking( false );
+                                                RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( false );
                                                 \$me = new self( \$id );
-                                                RedBean_OODB::getInstance()->setLocking( true );
+                                                RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( true );
                                                 return \$me;
                                         }
 
@@ -3998,7 +3587,7 @@ class RedBean_Mod_Lister extends RedBean_Mod {
         //TODO: Consider if GROUP BY (equivalent meaning) is more portable
 			//across DB types?
 			$db = $this->provider->getDatabase();
-			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
+			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
 			$field = $db->escape( $field );
 
 			$alltables = $this->provider->showTables();
@@ -4025,8 +3614,8 @@ class RedBean_Mod_Lister extends RedBean_Mod {
 
     public function stat( $type, $field, $stat) {
         $db = $this->provider->getDatabase();
-			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
-			$field = $this->provider->getFilter()->property( $db->escape( $field ) );
+			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
+			$field = $this->provider->getToolBox()->getFilter()->property( $db->escape( $field ) );
 			$stat = $db->escape( $stat );
 
 			$alltables = $this->provider->showTables();
@@ -4047,16 +3636,27 @@ class RedBean_Mod_Lister extends RedBean_Mod {
 }
 class RedBean_Mod_LockManager extends RedBean_Mod {
 
+    private $locking = true;
+    private $locktime = 10;
+    public function getLockingTime() { return $this->locktime; }
+     public function setLockingTime( $timeInSecs ) {
 
+        if (is_int($timeInSecs) && $timeInSecs >= 0) {
+            $this->locktime = $timeInSecs;
+        }
+        else {
+            throw new RedBean_Exception_InvalidArgument( "time must be integer >= 0" );
+        }
+    }
     public function openBean($bean, $mustlock = false) {
 
 			//If locking is turned off, or the bean has no persistance yet (not shared) life is always a success!
-			if (!$this->provider->getLocking() || $bean->id === 0) return true;
+			if (!$this->provider->getToolBox()->getLockManager()->getLocking() || $bean->id === 0) return true;
                         $db = $this->provider->getDatabase();
 
 			//remove locks that have been expired...
 			$removeExpiredSQL = $this->provider->getWriter()->getQuery("remove_expir_lock", array(
-				"locktime"=>$this->provider->getLockingTime()
+				"locktime"=>$this->provider->getToolBox()->getLockManager()->getLockingTime()
 			));
 
 			$db->exec($removeExpiredSQL);
@@ -4110,6 +3710,17 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 			else {
 				return true;
 			}
+    }
+
+
+    public function setLocking( $tf ) {
+        $this->locking = $tf;
+    }
+
+
+
+    public function getLocking() {
+        return $this->locking;
     }
 
 }
@@ -4846,7 +4457,7 @@ class QueryWriter_MySQL implements RedBean_QueryWriter, RedBean_Tool {
 		private function getQueryFind($options) {
 
 			extract($options);
-			$db = RedBean_OODB::getInstance()->getDatabase();
+			$db = RedBean_OODB::getInstance()->getToolBox()->getDatabase();
 			$findSQL = "SELECT id FROM `$tbl` WHERE ";
 
 	   
@@ -4881,7 +4492,7 @@ class QueryWriter_MySQL implements RedBean_QueryWriter, RedBean_Tool {
 		 */
 		private function getQueryList($options) {
 			extract($options);
-			$db = RedBean_OODB::getInstance()->getDatabase();
+			$db = RedBean_OODB::getInstance()->getToolBox()->getDatabase();
 			if ($extraSQL) {
 				$listSQL = "SELECT * FROM ".$db->escape($type)." ".$extraSQL;
 			}

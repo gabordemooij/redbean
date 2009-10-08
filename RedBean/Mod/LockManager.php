@@ -2,16 +2,27 @@
 
 class RedBean_Mod_LockManager extends RedBean_Mod {
 
+    private $locking = true;
+    private $locktime = 10;
+    public function getLockingTime() { return $this->locktime; }
+     public function setLockingTime( $timeInSecs ) {
 
+        if (is_int($timeInSecs) && $timeInSecs >= 0) {
+            $this->locktime = $timeInSecs;
+        }
+        else {
+            throw new RedBean_Exception_InvalidArgument( "time must be integer >= 0" );
+        }
+    }
     public function openBean($bean, $mustlock = false) {
 
 			//If locking is turned off, or the bean has no persistance yet (not shared) life is always a success!
-			if (!$this->provider->getLocking() || $bean->id === 0) return true;
+			if (!$this->provider->getToolBox()->getLockManager()->getLocking() || $bean->id === 0) return true;
                         $db = $this->provider->getDatabase();
 
 			//remove locks that have been expired...
 			$removeExpiredSQL = $this->provider->getWriter()->getQuery("remove_expir_lock", array(
-				"locktime"=>$this->provider->getLockingTime()
+				"locktime"=>$this->provider->getToolBox()->getLockManager()->getLockingTime()
 			));
 
 			$db->exec($removeExpiredSQL);
@@ -65,6 +76,17 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 			else {
 				return true;
 			}
+    }
+
+
+    public function setLocking( $tf ) {
+        $this->locking = $tf;
+    }
+
+
+
+    public function getLocking() {
+        return $this->locking;
     }
 
 }

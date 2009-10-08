@@ -44,7 +44,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 * @param $collection
 	 * @return RedBean_Can $instance
 	 */
-	public function __construct( RedBean_OODB $provider, $type="", $collection = array() ) {
+	public function __construct( RedBean_ToolBox_ModHub $provider, $type="", $collection = array() ) {
 		
 		$this->provider=$provider;
 		$this->collectionIDs = $collection;
@@ -89,17 +89,14 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	 */
 	public function getBeans() {
 
-		$rows = $this->provider->fastloader( $this->type, $this->collectionIDs );
-		
+                $rows = $this->provider->getBeanStore()->fastloader( $this->type, $this->collectionIDs );
 		$beans = array();
-		
 		if (is_array($rows)) {
 			foreach( $rows as $row ) {
 				//Use the fastloader for optimal performance (takes row as data)
 				$beans[] = $this->wrap( $this->provider->getById( $this->type, $row["id"] , $row) );
 			}
 		}
-
 		return $beans;
 	}
 	

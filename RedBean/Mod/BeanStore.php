@@ -227,7 +227,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 
            public function numberof($type) {
                 	$db = $this->provider->getDatabase();
-			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
+			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
 
 			$alltables = $this->provider->showTables();
 
@@ -240,6 +240,17 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 				)));
 				return intval( $no );
 			}
+           }
+
+           public function fastloader($type, $ids) {
+
+                $db = $this->provider->getDatabase();
+                $sql = $this->provider->getWriter()->getQuery("fastload", array(
+                    "type"=>$type,
+                    "ids"=>$ids
+                ));
+                return $db->get( $sql );
+
            }
 
 

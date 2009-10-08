@@ -195,7 +195,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
 
 
         //obtain the table names
-        $t1 = $db->escape( $this->provider->getFilter()->table($bean->type) );
+        $t1 = $db->escape( $this->provider->getToolBox()->getFilter()->table($bean->type) );
         $t2 = $db->escape( $targettype );
 
         //infer the association table
@@ -289,7 +289,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $id = intval( $bean->id );
 
         //obtain the table names
-        $t1 = $db->escape( $this->provider->getFilter()->table($bean->type) );
+        $t1 = $db->escape( $this->provider->getToolBox()->getFilter()->table($bean->type) );
         $t2 = $db->escape( $targettype );
 
         //infer the association table
@@ -330,12 +330,12 @@ class RedBean_Mod_Association extends RedBean_Mod {
 
     			$db = $this->provider->getDatabase();
 
-			$t2 = $this->provider->getFilter()->table( $db->escape( $type ) );
+			$t2 = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
 
 			//is this bean valid?
 			$this->provider->checkBean( $bean );
-			$t1 = $this->provider->getFilter()->table( $bean->type  );
-			$tref = $this->provider->getFilter()->table( $db->escape( $bean->type ) );
+			$t1 = $this->provider->getToolBox()->getFilter()->table( $bean->type  );
+			$tref = $this->provider->getToolBox()->getFilter()->table( $db->escape( $bean->type ) );
 			$id = intval( $bean->id );
 
 			//infer the association table

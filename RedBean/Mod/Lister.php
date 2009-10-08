@@ -26,7 +26,7 @@ class RedBean_Mod_Lister extends RedBean_Mod {
         //TODO: Consider if GROUP BY (equivalent meaning) is more portable
 			//across DB types?
 			$db = $this->provider->getDatabase();
-			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
+			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
 			$field = $db->escape( $field );
 
 			$alltables = $this->provider->showTables();
@@ -53,8 +53,8 @@ class RedBean_Mod_Lister extends RedBean_Mod {
 
     public function stat( $type, $field, $stat) {
         $db = $this->provider->getDatabase();
-			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
-			$field = $this->provider->getFilter()->property( $db->escape( $field ) );
+			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
+			$field = $this->provider->getToolBox()->getFilter()->property( $db->escape( $field ) );
 			$stat = $db->escape( $stat );
 
 			$alltables = $this->provider->showTables();

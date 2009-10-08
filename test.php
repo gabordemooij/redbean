@@ -115,10 +115,10 @@ else {
 
 //====== CLEAN UP ======
 
-$tables = R::getInstance()->getInstance()->getDatabase()->getCol("show tables");
+$tables = R::getInstance()->getToolBox()->getDatabase()->getCol("show tables");
 foreach($tables as $t){
 	if ($t!="dtyp" && $t!="redbeantables" && $t!="locking") {
-		R::getInstance()->getInstance()->getDatabase()->exec("DROP TABLE `$t`");
+		R::getInstance()->getToolBox()->getDatabase()->exec("DROP TABLE `$t`");
 	}
 };
 
@@ -135,7 +135,7 @@ $t->name = "part of trans";
 $t->save();
 //throw new Exception("aa"); //trans should not be in database
 //R::getInstance()->rollback();
-//R::getInstance()->getInstance()->getDatabase()->exec("ROLLBACK");
+//R::getInstance()->getToolBox()->getDatabase()->exec("ROLLBACK");
 exit; 
 */
 
@@ -156,16 +156,16 @@ asrt(class_exists("RedBean_Sieve"),true);
 asrt(interface_exists("RedBean_Validator"),true);
 asrt(class_exists("RedBean_Setup"),true);
 //Test description: Is the database a DBAdapter?
-$db = RedBean_OODB::getInstance()->getDatabase();
+$db = RedBean_OODB::getInstance()->getToolBox()->getDatabase();
 asrt(($db instanceof RedBean_DBAdapter),true);
 //Test description: test multiple database support
 testpack("multi database");
 $redbean = RedBean_Setup::kickstart("mysql:host=localhost;dbname=oodb","root","",false,"innodb",false);
 $old = $redbean->getToolBox()->getDatabase();
 RedBean_Setup::kickstart("mysql:host=localhost;dbname=tutorial","root","",false,"innodb",false);
-asrt(R::getInstance()->getInstance()->getDatabase()->getCell("select database()"),"tutorial");
+asrt(R::getInstance()->getToolBox()->getDatabase()->getCell("select database()"),"tutorial");
 RedBean_Setup::reconnect( $old );
-asrt(R::getInstance()->getInstance()->getDatabase()->getCell("select database()"),"oodb");
+asrt(R::getInstance()->getToolBox()->getDatabase()->getCell("select database()"),"oodb");
 $db = R::getInstance()->getToolBox()->getDatabase();
 
 testpack("legacy");
@@ -305,7 +305,7 @@ RedBean_OODB::getInstance()->generate("trash");
 $trash = new Trash();
 $trash->save();
 RedBean_OODB::getInstance()->clean();
-//RedBean_OODB::getInstance()->setLocking( false ); //turn locking off
+//RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( false ); //turn locking off
 $alltables = $db->getCol("show tables");
 SmartTest::instance()->progress(); ;
 if (!in_array("dtyp",$alltables)) SmartTest::failedTest();
@@ -463,7 +463,7 @@ foreach($queries as $query){
 	"searchoperators"=>array(), "ids"=>array(), "bean"=>RedBean_OODB::getInstance()->dispense("x"), "tables"=>array(), "type"=>"","stat"=>"","field"=>"" ) ); pass(); }catch(Exception $e){ fail(); }
 }
 try{ $writer->getQuery("unsupported"); fail(); }catch(Exception $e){ pass(); }
-$cols = $writer->getTableColumns("redbeantables",RedBean_OODB::getInstance()->getDatabase());
+$cols = $writer->getTableColumns("redbeantables",RedBean_OODB::getInstance()->getToolBox()->getDatabase());
 asrt(count($cols),2);
 $col = array_shift($cols);
 asrt($col["Field"],"id");
@@ -526,8 +526,8 @@ $r = RedBean_OODB::getInstance();
 $r->generate("StrA_NGER");
 $o = new StrA_NGER;
 asrt($o->getData()->type,"stranger");
-$r->setFilter( new RedBean_Mod_Filter_NullFilter );
-asrt(($r->getFilter() instanceof RedBean_Mod_Filter_NullFilter),true);
+$r->getToolBox()->add( "filter", new RedBean_Mod_Filter_NullFilter );
+asrt(($r->getToolBox()->getFilter() instanceof RedBean_Mod_Filter_NullFilter),true);
 $r->generate("StrA_NGER2");
 $o = new StrA_NGER2;
 asrt($o->getData()->type,"StrA_NGER2");
@@ -535,7 +535,7 @@ $p = "Wr0_NGProp";
 $o->$p = 42;
 asrt($o->$p,42);
 $o->save();
-$r->setFilter( new RedBean_Mod_Filter_Strict );
+$r->getToolBox()->add( "filter", new RedBean_Mod_Filter_Strict );
 pass();
 $filter = new RedBean_Mod_Filter_Strict;
 try{ $filter->property("_"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
@@ -952,9 +952,9 @@ function testsperengine( $engine ) {
         $story = new Story;
         $story->name = "Never Ending";
         asrt($story->isReadOnly(), false);
-        RedBean_OODB::getInstance()->setLocking( false );
+        RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( false );
         $id = $story->save();
-        RedBean_OODB::getInstance()->setLocking( true );
+        RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( true );
         $story2 = Story::getReadOnly( $id );
         asrt($story2->isReadOnly(), true);
        
@@ -1065,7 +1065,7 @@ function testsperengine( $engine ) {
 	asrt(count(RedBean_OODB::getInstance()->distinct("stattest","amount")),3); 
 	
 		
-	RedBean_OODB::getInstance()->setLocking( true );
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( true );
 	$i=3;
 	SmartTest::instance()->testPack="generate only valid classes?";
 	try{ $i += RedBean_OODB::getInstance()->generate(""); SmartTest::instance()->progress(); ; }catch(Exception $e){ SmartTest::failedTest(); } //nothing
@@ -1155,16 +1155,16 @@ function testsperengine( $engine ) {
 	//now pretend to be a third session
 	RedBean_OODB::getInstance()->pkey = 999;
 	//however locking is turned off now
-	RedBean_OODB::getInstance()->setLocking( false );
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( false );
 	//and we modify the previously crafted record
 	$cheese = new Cheese(1);
 	$cheese->setName("Cheddar");
 	try{ $cheese->save(); pass(); }catch(Exception $e){ fail(); }
 	//restore locking
-	RedBean_OODB::getInstance()->setLocking( true );
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( true );
 	//verify that locking with time 0 and locking turned on is simply a no-go, because no object
 	//will have enough time to aqcuire a lock
-	RedBean_OODB::getInstance()->setLockingTime(0); 
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLockingTime(0); 
 	$merlot = new Wine;
 	$merlot->setGrape("Merlot");
 	$id = $merlot->save();
@@ -1173,7 +1173,7 @@ function testsperengine( $engine ) {
 	try{ $merlot->save(); fail(); }catch(Exception $e){ pass(); }
 	
 	//Test description: same kind of test; different key and time, should not be able to write to cheese 1
-	RedBean_OODB::getInstance()->setLockingTime(100);
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLockingTime(100);
 	RedBean_OODB::getInstance()->pkey = $oldkey;
 	$cheese = new Cheese(1);
 	RedBean_OODB::getInstance()->pkey = 123;
@@ -1186,38 +1186,38 @@ function testsperengine( $engine ) {
 	//Once again a different session
 	RedBean_OODB::getInstance()->pkey = 42;
 	//We will have to wait 2 seconds before it expires
-	RedBean_OODB::getInstance()->setLockingTime(2);
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLockingTime(2);
 	//Open the bean
 	sleep(2); 
 	$cheese = new Cheese(1);
 	$cheese->setName("Cheddar3");
 	try{  $cheese->save(); pass(); }catch(Exception $e) { fail();	}
 	//reset
-	RedBean_OODB::getInstance()->setLockingTime(10);
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLockingTime(10);
 	
 	
 	testpack("protect inner state of RedBean");
 	try{
-	RedBean_OODB::getInstance()->setLockingTime( -1 );
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLockingTime( -1 );
 	SmartTest::failedTest();
 	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
 	
 	try{
-	RedBean_OODB::getInstance()->setLockingTime( 1.5 );
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLockingTime( 1.5 );
 	SmartTest::failedTest();
 	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
 	try{
-	RedBean_OODB::getInstance()->setLockingTime( "aaa" );
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLockingTime( "aaa" );
 	SmartTest::failedTest();
 	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
 	SmartTest::instance()->progress(); ;
 	try{
-	RedBean_OODB::getInstance()->setLockingTime( null );
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLockingTime( null );
 	SmartTest::failedTest();
 	}catch(RedBean_Exception_InvalidArgument $e){  }
 	
@@ -1321,13 +1321,13 @@ function testsperengine( $engine ) {
 	$blog = new Blog( $id );
 	
 	if (strlen($blog->message)!=65535) {SmartTest::failedTest(); }else SmartTest::instance()->progress();
-	$rows = RedBean_OODB::getInstance()->getDatabase()->get("describe blog");
+	$rows = RedBean_OODB::getInstance()->getToolBox()->getDatabase()->get("describe blog");
 	if($rows[3]["Type"]!="text")  {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
 	$blog->message = str_repeat("x",65536);
 	$blog->save();
 	$blog = new Blog( $id );
 	if (strlen($blog->message)!=65536) {SmartTest::failedTest(); }else SmartTest::instance()->progress();
-	$rows = RedBean_OODB::getInstance()->getDatabase()->get("describe blog");
+	$rows = RedBean_OODB::getInstance()->getToolBox()->getDatabase()->get("describe blog");
 	if($rows[3]["Type"]!="longtext")  {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
 	RedBean_OODB::getInstance()->clean();
 	
