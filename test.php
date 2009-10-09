@@ -607,12 +607,12 @@ function testsperengine( $engine ) {
 	
 	//Test description: test whether we can infer data types
 	testpack("Data Type Detection");
-	asrt(RedBean_OODB::getInstance()->inferType(1),0);
-	asrt(RedBean_OODB::getInstance()->inferType(255),0);
-	asrt(RedBean_OODB::getInstance()->inferType(256),1);
-	asrt(RedBean_OODB::getInstance()->inferType(-1),2);
-	asrt(RedBean_OODB::getInstance()->inferType("12345.9"),3);
-	asrt(RedBean_OODB::getInstance()->inferType(str_repeat('a',40000)),4);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type(1),0);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type(255),0);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type(256),1);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type(-1),2);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type("12345.9"),3);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type(str_repeat('a',40000)),4);
 	
 	
 	

@@ -60,7 +60,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
                     $p = $db->escape($p);
                     $v = $db->escape($v);
                     //What kind of property are we dealing with?
-                    $typeno = $this->provider->inferType($v);
+                    $typeno = $this->provider->getScanner()->type($v);
                     //Is this property represented in the table?
                     if (isset($columns[$p])) {
                     //yes it is, does it still fit?

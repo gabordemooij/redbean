@@ -102,9 +102,9 @@ class RedBean_OODB {
         return $this->toolbox->getBeanStore()->set($bean);
     }
 
-    public function inferType( $v ) {
+   /* public function inferType( $v ) {
         return $this->toolbox->getScanner()->type( $v );
-    }
+    }*/
 
     public function getType( $sqlType ) {
         return $this->toolbox->getScanner()->code( $sqlType );
