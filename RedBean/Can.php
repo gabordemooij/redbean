@@ -94,7 +94,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 		if (is_array($rows)) {
 			foreach( $rows as $row ) {
 				//Use the fastloader for optimal performance (takes row as data)
-				$beans[] = $this->wrap( $this->provider->getById( $this->type, $row["id"] , $row) );
+				$beans[] = $this->wrap( $this->provider->getBeanStore()->get( $this->type, $row["id"] , $row) );
 			}
 		}
 		return $beans;
@@ -112,7 +112,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	public function current() {
 		if (isset($this->collectionIDs[$this->pointer])) {
 			$id = $this->collectionIDs[$this->pointer];
-			return $this->wrap( $this->provider->getById( $this->type, $id ) );
+			return $this->wrap( $this->provider->getBeanStore()->get( $this->type, $id ) );
 		}
 		else {
 			return null;
@@ -224,7 +224,7 @@ class RedBean_Can implements Iterator ,  ArrayAccess , SeekableIterator , Counta
 	public function offsetGet($offset) {
     	if (isset($this->collectionIDs[$offset])) {
 			$id = $this->collectionIDs[$offset];
-			return $this->wrap( $this->provider->getById( $this->type, $id ) );
+			return $this->wrap( $this->provider->getBeanStore()->get( $this->type, $id ) );
 		}
 		else {
 			return null;

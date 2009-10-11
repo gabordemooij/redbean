@@ -56,6 +56,10 @@ class RedBean_Mod_ClassGenerator extends RedBean_Mod {
                                                 return \$me;
                                         }
 
+                                        public static function exists( \$id ) {
+                                            return  RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->exists(self::\$__static_property_type, \$id);
+                                        }
+
                                        
 
                                 }";

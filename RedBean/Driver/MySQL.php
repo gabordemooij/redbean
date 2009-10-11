@@ -217,7 +217,7 @@ class RedBean_Driver_MySQL implements RedBean_Driver {
 		$this->debug = $tf;
 	}
 
-	public function getRaw() {
+	public function GetRaw() {
 		return $this->rs;
 	}
 

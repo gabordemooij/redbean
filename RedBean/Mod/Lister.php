@@ -29,7 +29,7 @@ class RedBean_Mod_Lister extends RedBean_Mod {
 			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
 			$field = $db->escape( $field );
 
-			$alltables = $this->provider->showTables();
+			$alltables = $this->provider->getTableRegister()->getTables();
 
 			if (!in_array($type, $alltables)) {
 				return array();
@@ -42,7 +42,7 @@ class RedBean_Mod_Lister extends RedBean_Mod {
 				$beans = array();
 				if (is_array($ids) && count($ids)>0) {
 					foreach( $ids as $id ) {
-						$beans[ $id ] = $this->provider->getById( $type, $id , false);
+						$beans[ $id ] = $this->provider->getBeanStore()->get( $type, $id , false);
 					}
 				}
 				return $beans;
@@ -57,7 +57,7 @@ class RedBean_Mod_Lister extends RedBean_Mod {
 			$field = $this->provider->getToolBox()->getFilter()->property( $db->escape( $field ) );
 			$stat = $db->escape( $stat );
 
-			$alltables = $this->provider->showTables();
+			$alltables = $this->provider->getTableRegister()->getTables();
 
 			if (!in_array($type, $alltables)) {
 				return 0;

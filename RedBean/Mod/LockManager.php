@@ -4,6 +4,8 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 
     private $locking = true;
     private $locktime = 10;
+
+
     public function getLockingTime() { return $this->locktime; }
      public function setLockingTime( $timeInSecs ) {
 
@@ -16,6 +18,7 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
     }
     public function openBean($bean, $mustlock = false) {
 
+                        $this->provider->getBeanChecker()->check( $bean);
 			//If locking is turned off, or the bean has no persistance yet (not shared) life is always a success!
 			if (!$this->provider->getToolBox()->getLockManager()->getLocking() || $bean->id === 0) return true;
                         $db = $this->provider->getDatabase();
@@ -87,6 +90,10 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 
     public function getLocking() {
         return $this->locking;
+    }
+
+    public function unlockAll() {
+          $this->provider->getDatabase()->exec($this->provider->getWriter()->getQuery("release",array("key"=>$this->provider->pkey)));
     }
 
 }

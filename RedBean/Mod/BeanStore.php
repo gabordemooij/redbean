@@ -27,7 +27,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
         if (!$this->provider->isFrozen()) {
 
         //does this table exist?
-            $tables = $this->provider->showTables();
+            $tables = $this->provider->getTableRegister()->getTables();
 
             if (!in_array($table, $tables)) {
 
@@ -39,7 +39,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
                 //get a table for our friend!
                 $db->exec( $createtableSQL );
                 //jupz, now he has its own table!...
-                $this->provider->addTable( $table );
+                $this->provider->getTableRegister()->register( $table );
             }
 
             //does the table fit?
@@ -64,7 +64,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
                     //Is this property represented in the table?
                     if (isset($columns[$p])) {
                     //yes it is, does it still fit?
-                        $sqlt = $this->provider->getType($columns[$p]);
+                        $sqlt = $this->provider->getScanner()->code($columns[$p]);
                         //echo "TYPE = $sqlt .... $typeno ";
                         if ($typeno > $sqlt) {
                         //no, we have to widen the database column type
@@ -112,7 +112,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
         //Does the record exist already?
         if ($bean->id) {
         //echo "<hr>Now trying to open bean....";
-            $this->provider->openBean($bean, true);
+            $this->provider->getLockManager()->openBean($bean, true);
             //yes it exists, update it
             if (count($updatevalues)>0) {
                 $updateSQL = $this->provider->getWriter()->getQuery("update", array(
@@ -142,7 +142,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
             //execute the previously build query
             $db->exec( $insertSQL );
             $bean->id = $db->getInsertID();
-            $this->provider->openBean($bean);
+            $this->provider->getLockManager()->openBean($bean);
         }
 
         return $bean->id;
@@ -158,7 +158,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
         $bean->id = $id;
 
         //try to open the bean
-        $this->provider->openBean($bean);
+        $this->provider->getLockManager()->openBean($bean);
 
         //load the bean using sql
         if (!$data) {
@@ -190,7 +190,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
         $this->provider->getBeanChecker()->check( $bean );
 	if (intval($bean->id)===0) return;
 	$this->provider->deleteAllAssoc( $bean );
-	$this->provider->openBean($bean);
+	$this->provider->getLockManager()->openBean($bean);
 	$table = $this->provider->getDatabase()->escape($bean->type);
 	$id = intval($bean->id);
 	$this->provider->getDatabase()->exec( $this->provider->getWriter()->getQuery("trash",array(
@@ -206,7 +206,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 			$type = $db->escape( $type );
 
 			//$alltables = $db->getCol("show tables");
-			$alltables = $this->provider->showTables();
+			$alltables = $this->provider->getTableRegister()->getTables();
 
 			if (!in_array($type, $alltables)) {
 				return false;
@@ -229,7 +229,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
                 	$db = $this->provider->getDatabase();
 			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
 
-			$alltables = $this->provider->showTables();
+			$alltables = $this->provider->getTableRegister()->getTables();
 
 			if (!in_array($type, $alltables)) {
 				return 0;

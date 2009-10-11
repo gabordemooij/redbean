@@ -52,7 +52,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
                 	$this->type = $this->provider->getToolBox()->getFilter()->table($type);
                         //echo $this->type;
 			if ($id > 0) { //if the id is higher than 0 load data
-				$this->data = $this->provider->getById( $this->type, $id);
+				$this->data = $this->provider->getToolBox()->getBeanStore()->get( $this->type, $id);
 			}
 			else { //otherwise, dispense a regular empty RedBean_OODBBean
 				$this->data = $this->provider->dispense( $this->type );
@@ -416,7 +416,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function save() {
 		$this->signal("deco_save", $this);
-		return $this->provider->set( $this->data );
+		return $this->provider->getToolBox()->getBeanStore()->set( $this->data );
 	}
 
 	/**
@@ -441,7 +441,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public function lock() {
-		$this->provider->openBean($this->getData());
+		$this->provider->getLockManager()->openBean($this->getData());
 	}
 
 	/**
@@ -580,7 +580,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function isReadOnly() {
 		try{
-			$this->provider->openBean($this->data, true);
+			$this->provider->getToolBox()->getLockManager()->openBean($this->data, true);
 		}
 		catch(RedBean_Exception_FailedAccessBean $e){
 			return true;

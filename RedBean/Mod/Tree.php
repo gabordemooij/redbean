@@ -11,8 +11,8 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$parent = $this->provider->getBeanChecker()->checkBeanForAssoc($parent);
 			$child = $this->provider->getBeanChecker()->checkBeanForAssoc($child);
 
-			$this->provider->openBean( $parent, true );
-			$this->provider->openBean( $child, true );
+			$this->provider->getLockManager()->openBean( $parent, true );
+			$this->provider->getLockManager()->openBean( $child, true );
 
 
 			//are parent and child of the same type?
@@ -28,7 +28,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 
 			//check whether this assoctable already exists
 			if (!$this->provider->isFrozen()) {
-				$alltables = $this->provider->showTables();
+				$alltables = $this->provider->getTableRegister()->getTables();
 				if (!in_array($assoctable, $alltables)) {
 					//no assoc table does not exist, create it..
 					$assoccreateSQL = $this->provider->getWriter()->getQuery("create_tree",array(
@@ -40,7 +40,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 					$db->exec( $this->provider->getWriter()->getQuery("unique", array(
 						"assoctable"=>$assoctable
 					)) );
-					$this->provider->addTable( $assoctable );
+					$this->provider->getTableRegister()->register( $assoctable );
 				}
 			}
 
@@ -68,7 +68,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$assoctable = "pc_".$db->escape( $parent->type . "_" . $parent->type );
 
 			//check whether this assoctable exists
-			$alltables = $this->provider->showTables();
+			$alltables = $this->provider->getTableRegister()->getTables();
 			if (!in_array($assoctable, $alltables)) {
 				return array(); //nope, so no children...!
 			}
@@ -82,7 +82,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 				$beans = array();
 				if ($rows && is_array($rows) && count($rows)>0) {
 					foreach($rows as $i) {
-						$beans[$i] = $this->provider->getById( $targettype, $i, false);
+						$beans[$i] = $this->provider->getBeanStore()->get( $targettype, $i, false);
 					}
 				}
 				return $beans;
@@ -104,7 +104,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			//infer the association table
 			$assoctable = "pc_".$db->escape( $child->type . "_" . $child->type );
 			//check whether this assoctable exists
-			$alltables = $this->provider->showTables();
+			$alltables = $this->provider->getTableRegister()->getTables();
 			if (!in_array($assoctable, $alltables)) {
 				return array(); //nope, so no children...!
 			}
@@ -120,7 +120,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 				$beans = array();
 				if ($rows && is_array($rows) && count($rows)>0) {
 					foreach($rows as $i) {
-						$beans[$i] = $this->provider->getById( $targettype, $i, false);
+						$beans[$i] = $this->provider->getBeanStore()->get( $targettype, $i, false);
 					}
 				}
 
@@ -137,8 +137,8 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$parent = $this->provider->getBeanChecker()->checkBeanForAssoc($parent);
 			$child = $this->provider->getBeanChecker()->checkBeanForAssoc($child);
 
-			$this->provider->openBean( $parent, true );
-			$this->provider->openBean( $child, true );
+			$this->provider->getLockManager()->openBean( $parent, true );
+			$this->provider->getLockManager()->openBean( $child, true );
 
 
 			//are parent and child of the same type?
@@ -150,7 +150,7 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$assoctable = "pc_".$db->escape( $parent->type . "_" . $parent->type );
 
 			//check whether this assoctable already exists
-			$alltables = $this->provider->showTables();
+			$alltables = $this->provider->getTableRegister()->getTables();
 			if (!in_array($assoctable, $alltables)) {
 				return true; //no association? then nothing to do!
 			}

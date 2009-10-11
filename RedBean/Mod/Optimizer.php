@@ -17,7 +17,7 @@ class RedBean_Mod_Optimizer extends RedBean_Mod {
         $db = $this->provider->getDatabase();
 
         //get all tables
-        $tables = $this->provider->showTables();
+        $tables = $this->provider->getTableRegister()->getTables();
 
         //pick a random table
         if ($tables && is_array($tables) && count($tables) > 0) {

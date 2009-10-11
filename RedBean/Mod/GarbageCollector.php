@@ -5,9 +5,9 @@ class RedBean_Mod_GarbageCollector extends RedBean_Mod {
  
     
     public function removeUnused( RedBean_OODB $oodb, RedBean_DBAdapter $db, RedBean_QueryWriter $writer ) {
-
+            if ($this->provider->isFrozen()) return;
             //get all tables
-            $tables = $oodb->showTables();
+            $tables = $this->provider->getTableRegister()->getTables();
             foreach($tables as $table) {
                     if (strpos($table,"_")!==false) {
                             //associative table

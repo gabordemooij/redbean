@@ -31,7 +31,7 @@ class RedBean_Mod_Finder extends RedBean_Mod {
 
       if (is_array($ids) && count($ids)>0) {
           foreach( $ids as $id ) {
-            $beans[ $id ] = $this->provider->getById( $bean->type, $id , false);
+            $beans[ $id ] = $this->provider->getBeanStore()->get( $bean->type, $id , false);
         }
       }
 

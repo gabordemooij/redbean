@@ -10,8 +10,8 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $bean1 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean1);
         $bean2 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean2);
 
-        $this->provider->openBean( $bean1, true );
-        $this->provider->openBean( $bean2, true );
+        $this->provider->getLockManager()->openBean( $bean1, true );
+        $this->provider->getLockManager()->openBean( $bean2, true );
 
         //sort the beans
         $tp1 = $bean1->type;
@@ -39,7 +39,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
 
         //check whether this assoctable already exists
         if (!$this->provider->isFrozen()) {
-            $alltables = $this->provider->showTables();
+            $alltables = $this->provider->getTableRegister()->getTables();
             if (!in_array($assoctable, $alltables)) {
             //no assoc table does not exist, create it..
                 $t1 = $tables[0];
@@ -65,7 +65,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
                     "t2" =>$t2
                     )) );
 
-                $this->provider->addTable( $assoctable );
+                $this->provider->getTableRegister()->register( $assoctable );
             }
         }
 
@@ -96,8 +96,8 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $bean2 = $this->provider->getBeanChecker()->checkBeanForAssoc($bean2);
 
 
-        $this->provider->openBean( $bean1, true );
-        $this->provider->openBean( $bean2, true );
+        $this->provider->getLockManager()->openBean( $bean1, true );
+        $this->provider->getLockManager()->openBean( $bean2, true );
 
 
         $idx1 = intval($bean1->id);
@@ -132,7 +132,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $assoctable = $db->escape( implode("_",$tables) );
 
         //check whether this assoctable already exists
-        $alltables = $this->provider->showTables();
+        $alltables = $this->provider->getTableRegister()->getTables();
 
         if (in_array($assoctable, $alltables)) {
             $t1 = $tables[0];
@@ -166,7 +166,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
             $assoctable2 = "pc_".$db->escape( $bean1->type )."_".$db->escape( $bean1->type );
             //echo $assoctable2;
             //check whether this assoctable already exists
-            $alltables = $this->provider->showTables();
+            $alltables = $this->provider->getTableRegister()->getTables();
             if (in_array($assoctable2, $alltables)) {
 
             //$id1 = intval($bean1->id);
@@ -207,7 +207,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $assoctable = $db->escape( implode("_",$tables) );
 
         //check whether this assoctable exists
-        $alltables = $this->provider->showTables();
+        $alltables = $this->provider->getTableRegister()->getTables();
 
         if (!in_array($assoctable, $alltables)) {
             return array(); //nope, so no associations...!
@@ -229,7 +229,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
             $beans = array();
             if ($rows && is_array($rows) && count($rows)>0) {
                 foreach($rows as $i) {
-                    $beans[$i] = $this->provider->getById( $targettype, $i, false);
+                    $beans[$i] = $this->provider->getBeanStore()->get( $targettype, $i, false);
                 }
             }
             return $beans;
@@ -243,13 +243,13 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $db = $this->provider->getDatabase();
         $bean = $this->provider->getBeanChecker()->checkBeanForAssoc($bean);
 
-        $this->provider->openBean( $bean, true );
+        $this->provider->getLockManager()->openBean( $bean, true );
 
 
         $id = intval( $bean->id );
 
         //get all tables
-        $alltables = $this->provider->showTables();
+        $alltables = $this->provider->getTableRegister()->getTables();
 
         //are there any possible associations?
         $t = $db->escape($bean->type);
@@ -284,7 +284,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
     public function deleteAllAssocType( $targettype, $bean ) {
         $db = $this->provider->getDatabase();
         $bean = $this->provider->getBeanChecker()->checkBeanForAssoc($bean);
-        $this->provider->openBean( $bean, true );
+        $this->provider->getLockManager()->openBean( $bean, true );
 
         $id = intval( $bean->id );
 
@@ -300,7 +300,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
         sort($tables);
         $assoctable = $db->escape( implode("_",$tables) );
 
-        $availabletables = $this->provider->showTables();
+        $availabletables = $this->provider->getTableRegister()->getTables();
 
 
         if (in_array('pc_'.$assoctable,$availabletables)) {
@@ -348,7 +348,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
 			$assoctable = $db->escape( implode("_",$tables) );
 
 			//get all tables
-			$tables = $this->provider->showTables();
+			$tables = $this->provider->getTableRegister()->getTables();
 
 			if ($tables && is_array($tables) && count($tables) > 0) {
 				if (in_array( $t1, $tables ) && in_array($t2, $tables)){

@@ -1,9 +1,27 @@
 <?php 
-
+/**
+ * @name RedBean OODB
+ * @package RedBean
+ * @author Gabor de Mooij and the RedBean Team
+ * @copyright Gabor de Mooij (c) 
+ * @license BSD
+ * 
+ * The RedBean OODB Class acts as a facade; it connects the
+ * user models to internal modules and hides the various modules
+ * behind a coherent group of methods. 
+ */
 class RedBean_OODB {
 
+    /**
+     *
+     * @var string
+     */
     public $pkey = false;
 
+    /**
+     *
+     * @var boolean
+     */
     private $rollback = false;
 
     private static $me = null;
@@ -44,22 +62,16 @@ class RedBean_OODB {
    
     public function __destruct() {
 
-        $this->releaseAllLocks();
+        $this->getToolBox()->getLockManager()->unlockAll();
 
         $this->toolbox->getDatabase()->exec(
             $this->toolbox->getWriter()->getQuery("destruct", array("engine"=>$this->engine,"rollback"=>$this->rollback))
         );
     }
     
-
     public function isFrozen() {
         return (boolean) $this->frozen;
     }
-
-
-    
-
-   
 
     public static function getInstance( RedBean_ToolBox_ModHub $toolbox = NULL ) {
         if (self::$me === null) {
@@ -72,10 +84,6 @@ class RedBean_OODB {
     public function getToolBox() {
         return $this->toolbox;
     }
-
-   
-
-    
 
     public function getEngine() {
         return $this->engine;
@@ -98,17 +106,6 @@ class RedBean_OODB {
         $this->rollback = true;
     }
 
-    public function set( RedBean_OODBBean $bean ) {
-        return $this->toolbox->getBeanStore()->set($bean);
-    }
-
-   /* public function inferType( $v ) {
-        return $this->toolbox->getScanner()->type( $v );
-    }*/
-
-    public function getType( $sqlType ) {
-        return $this->toolbox->getScanner()->code( $sqlType );
-    }
 
     public function freeze() {
         $this->frozen = true;
@@ -118,34 +115,9 @@ class RedBean_OODB {
         $this->frozen = false;
     }
 
-    public function showTables( $all=false ) {
-        return $this->toolbox->getTableRegister()->getTables($all);
-    }
-
-    public function addTable( $tablename ) {
-        return $this->toolbox->getTableRegister()->register( $tablename);
-    }
-
-    public function dropTable( $tablename ) {
-        return $this->toolbox->getTableRegister()->unregister( $tablename );
-    }
-
-    public function releaseAllLocks() {
-        $this->toolbox->getDatabase()->exec($this->toolbox->getWriter()->getQuery("release",array("key"=>$this->pkey)));
-    }
-
-    public function openBean( $bean, $mustlock=false) {
-        $this->toolbox->getBeanChecker()->check( $bean );
-        $this->toolbox->getLockManager()->openBean( $bean, $mustlock );
-    }
-
-    public function getById($type, $id, $data=false) {
-        return $this->toolbox->getBeanStore()->get($type,$id,$data);
-    }
-
-    public function exists($type,$id) {
-        return $this->toolbox->getBeanStore()->exists($type, $id);
-    }
+   // public function exists($type,$id) {
+   //     return $this->toolbox->getBeanStore()->exists($type, $id);
+   // }
 
     public function numberof($type) {
         return $this->toolbox->getBeanStore()->numberof( $type );
@@ -237,23 +209,14 @@ class RedBean_OODB {
         return $this->toolbox->getClassGenerator()->generate($classes,$prefix,$suffix);
     }
 
-   
-
-    
-
     public function clean() {
         return $this->toolbox->getGC()->clean();
     }
 
     public function removeUnused( ) {
-    //oops, we are frozen, so no change..
-        if ($this->frozen) {
-            return false;
-        }
         return $this->toolbox->getGC()->removeUnused( $this, $this->toolbox->getDatabase(), $this->toolbox->getWriter() );
-
-
     }
+    
     public function dropColumn( $table, $property ) {
         return $this->toolbox->getGC()->dropColumn($table,$property);
     }
