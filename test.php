@@ -300,11 +300,11 @@ asrt($validator->check("M...a x"), false);
 testpack("Configuration tester");
 //insert garbage tables
 $db->exec(" CREATE TABLE `nonsense` (`a` VARCHAR( 11 ) NOT NULL ,`b` VARCHAR( 11 ) NOT NULL ,`j` VARCHAR( 11 ) NOT NULL	) ENGINE = MYISAM ");
-RedBean_OODB::getInstance()->clean();
+RedBean_OODB::getInstance()->getToolBox()->getGC()->clean();
 RedBean_OODB::getInstance()->generate("trash");
 $trash = new Trash();
 $trash->save();
-RedBean_OODB::getInstance()->clean();
+RedBean_OODB::getInstance()->getToolBox()->getGC()->clean();
 //RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( false ); //turn locking off
 $alltables = $db->getCol("show tables");
 SmartTest::instance()->progress(); ;
@@ -387,7 +387,7 @@ asrt($row["col1"],'1');
 asrt($row["col2"],"mustbevarchar");
 asrt($row["col3"],'1000');
 asrt(count($db->get("describe slimtable")),4); 
-RedBean_OODB::getInstance()->dropColumn("slimtable","col3");
+RedBean_OODB::getInstance()->getToolBox()->getGC()->dropColumn("slimtable","col3");
 asrt(count($db->get("describe slimtable")),3); 
 $db->exec("CREATE TABLE  `garbagetable` (`id` INT( 11 ) NOT NULL AUTO_INCREMENT ,`highcard` VARCHAR( 255 ) NOT NULL ,PRIMARY KEY (  `id` )) ENGINE = MYISAM");
 $db->exec("INSERT INTO  `redbeantables` (`id` ,`tablename`)VALUES (NULL ,  'garbagetable');");
@@ -426,14 +426,14 @@ asrt( $cat->name, "Garfield" );
 //Test Description: if we associate two empty beans we ids must be set
 $r = RedBean_OODB::getInstance();
 
-$emptybean1 = $r->dispense("emptybean1");
-$emptybean2 = $r->dispense("emptybean2");
+$emptybean1 = $r->getToolBox()->getDispenser()->dispense("emptybean1");
+$emptybean2 = $r->getToolBox()->getDispenser()->dispense("emptybean2");
 $emptybean2->test = 1;
 $r->getToolBox()->getBeanStore()->set( $emptybean2 );
-$r->trash( $emptybean2 );
-$emptybean2 = $r->dispense("emptybean2");
-$r->associate($emptybean1,$emptybean2);
-try{$res =  $r->getAssoc($emptybean1,"emptybean2"); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+$r->getToolBox()->getBeanStore()->trash( $emptybean2 );
+$emptybean2 = $r->getToolBox()->getDispenser()->dispense("emptybean2");
+$r->getToolBox()->getAssociation()->link($emptybean1,$emptybean2);
+try{$res =  $r->getToolBox()->getAssociation()->get($emptybean1,"emptybean2"); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
 asrt(is_array($res),true);
 asrt(count($res),1);
 $emptybean2 = array_shift($res);
@@ -460,7 +460,7 @@ foreach($queries as $query){
                     "table"=>"","assoctable"=>"","id"=>"","pid"=>"","cid"=>"",
                     "updatevalues"=>array(),"fields"=>array(),"insertcolumns"=>array(),
                     "insertvalues"=>array(),
-	"searchoperators"=>array(), "ids"=>array(), "bean"=>RedBean_OODB::getInstance()->dispense("x"), "tables"=>array(), "type"=>"","stat"=>"","field"=>"" ) ); pass(); }catch(Exception $e){ fail(); }
+	"searchoperators"=>array(), "ids"=>array(), "bean"=>RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("x"), "tables"=>array(), "type"=>"","stat"=>"","field"=>"" ) ); pass(); }catch(Exception $e){ fail(); }
 }
 try{ $writer->getQuery("unsupported"); fail(); }catch(Exception $e){ pass(); }
 $cols = $writer->getTableColumns("redbeantables",RedBean_OODB::getInstance()->getToolBox()->getDatabase());
@@ -474,11 +474,11 @@ asrt($col["Extra"],"auto_increment");
 
 //Test description: is the bean properly checked?
 testpack("Bean Checking");
-$bean = RedBean_OODB::getInstance()->dispense("bean");
+$bean = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("bean");
 try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);pass();}catch(RedBean_Exception_Security $oE){ fail(); }
 $bean->type = null;
 try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
-$bean = RedBean_OODB::getInstance()->dispense("bean");
+$bean = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("bean");
 $bean->id = null;
 try{RedBean_OODB::getInstance()->getToolBox()->getBeanChecker()->check($bean);fail();}catch(RedBean_Exception_Security $oE){ pass(); }
 $bean->id = -1;
@@ -561,8 +561,8 @@ function testsperengine( $engine ) {
 	
 	testpack("Anemic Model on ".$engine);
 	//Test basic, fundamental RedBean_OODBBean functions with Anemic Model
-	$file = RedBean_OODB::getInstance()->dispense("file");
-	asrt((RedBean_OODB::getInstance()->dispense("file") instanceof RedBean_OODBBean),true);
+	$file = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("file");
+	asrt((RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("file") instanceof RedBean_OODBBean),true);
 	//Test description: has the type property been set?
 	asrt($file->type,"file");
 	//Test description: Is the ID set and 0?
@@ -629,7 +629,7 @@ function testsperengine( $engine ) {
 
 	testpack("Anemic Model Bean Manipulation on ".$engine);
 	//Test description: save and load a complete bean with several properties
-	$bean = RedBean_OODB::getInstance()->dispense("note");
+	$bean = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("note");
 	$bean->message = "hello";
 	$bean->color=3;
 	$bean->date = time();
@@ -664,21 +664,21 @@ function testsperengine( $engine ) {
 	//Test description: test whether we can associate anemic beans
 	testpack("Associations $engine ");
 	$note = $bean;
-	$person = RedBean_OODB::getInstance()->dispense("person");
+	$person = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
 	$person->age = 50;
 	$person->name = "Bob";
 	$person->gender = "m";
 	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $person );
-	RedBean_OODB::getInstance()->associate( $person, $note );
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->link( $person, $note );
 	$memo = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "note", 1 );
-	$authors = RedBean_OODB::getInstance()->getAssoc( $memo, "person" );
+	$authors = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get( $memo, "person" );
 	asrt(count($authors),1); 
-	RedBean_OODB::getInstance()->trash( $authors[1] );
-	$authors = RedBean_OODB::getInstance()->getAssoc( $memo, "person" );
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->trash( $authors[1] );
+	$authors = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get( $memo, "person" );
 	asrt(count($authors),0);
 
 	testpack("Put a Bean in the Database - various types $engine ");
-	$person = RedBean_OODB::getInstance()->dispense("person");
+	$person = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
 	$person->name = "John";
 	$person->age= 35;
 	$person->gender = "m";
@@ -689,7 +689,7 @@ function testsperengine( $engine ) {
 	asrt(intval($person2->age),intval($person->age)); 
 	$person2->anotherprop = 2;
 	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $person2 );
-	$person = RedBean_OODB::getInstance()->dispense("person");
+	$person = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
 	$person->name = "Bob";
 	$person->age= 50;
 	$person->gender = "m";
@@ -697,11 +697,11 @@ function testsperengine( $engine ) {
 	$bobid = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $person );
 	
 	testpack("getBySQL $engine ");
-	$ids = RedBean_OODB::getInstance()->getBySQL("`gender`={gender} order by `name` asc",array("gender"=>"m"),"person");
+	$ids = RedBean_OODB::getInstance()->getToolBox()->getSearch()->sql("`gender`={gender} order by `name` asc",array("gender"=>"m"),"person");
 	asrt(count($ids),2);
-	$ids = RedBean_OODB::getInstance()->getBySQL("`gender`={gender} OR `color`={clr} ",array("gender"=>"m","clr"=>"red"),"person");
+	$ids = RedBean_OODB::getInstance()->getToolBox()->getSearch()->sql("`gender`={gender} OR `color`={clr} ",array("gender"=>"m","clr"=>"red"),"person");
 	asrt(count($ids),0);
-	$ids = RedBean_OODB::getInstance()->getBySQL("`gender`={gender} AND `color`={clr} ",array("gender"=>"m","clr"=>"red"),"person");
+	$ids = RedBean_OODB::getInstance()->getToolBox()->getSearch()->sql("`gender`={gender} AND `color`={clr} ",array("gender"=>"m","clr"=>"red"),"person");
 	asrt(count($ids),0);
 	
 	//Test description: table names should always be case insensitive, no matter the table name
@@ -721,43 +721,43 @@ function testsperengine( $engine ) {
 	testpack("anemic find");
 	$dummy->age = 40;
 	$rawdummy = $dummy->getData();
-	asrt(count(RedBean_OODB::getInstance()->find( $rawdummy, array("age"=>">"))),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("age"=>">"))),1);
 	$rawdummy->age = 20;
-	asrt(count(RedBean_OODB::getInstance()->find( $rawdummy, array("age"=>">"))),2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("age"=>">"))),2);
 	$rawdummy->age = 100;
-	asrt(count(RedBean_OODB::getInstance()->find( $rawdummy, array("age"=>">"))),0);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("age"=>">"))),0);
 	$rawdummy->age = 100;
-	asrt(count(RedBean_OODB::getInstance()->find( $rawdummy, array("age"=>"<="))),2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("age"=>"<="))),2);
 	$rawdummy->name="ob";
-	asrt(count(RedBean_OODB::getInstance()->find( $rawdummy, array("name"=>"LIKE"))),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("name"=>"LIKE"))),1);
 	$rawdummy->name="o";
-	asrt(count(RedBean_OODB::getInstance()->find( $rawdummy, array("name"=>"LIKE"))),2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("name"=>"LIKE"))),2);
 	$rawdummy->gender="m";
-	asrt(count(RedBean_OODB::getInstance()->find( $rawdummy, array("gender"=>"="))),2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("gender"=>"="))),2);
 	$rawdummy->gender="f";
-	asrt(count(RedBean_OODB::getInstance()->find( $rawdummy, array("gender"=>"="))),0);
-	asrt(count(RedBean_OODB::getInstance()->listAll("person")),2);
-	asrt(count(RedBean_OODB::getInstance()->listAll("person",0,1)),1);
-	asrt(count(RedBean_OODB::getInstance()->listAll("person",1)),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("gender"=>"="))),0);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getLister()->get("person")),2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getLister()->get("person",0,1)),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getLister()->get("person",1)),1);
 	
 	
 	//Test description: associate
 	testpack("anemic association");
-	$searchBean = RedBean_OODB::getInstance()->dispense("person");
+	$searchBean = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
 	$searchBean->gender = "m";
 	SmartTest::instance()->progress();
-	$app = RedBean_OODB::getInstance()->dispense("appointment");
+	$app = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("appointment");
 	$app->kind = "dentist";
 	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set($app);
-	RedBean_OODB::getInstance()->associate( $person2, $app );
-	$arr = RedBean_OODB::getInstance()->getAssoc( $person2, "appointment" );
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->link( $person2, $app );
+	$arr = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get( $person2, "appointment" );
 	$appforbob = array_shift($arr);
 	if (!$appforbob || $appforbob->kind!="dentist") {
 		SmartTest::failedTest();
 	} 
 	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "delete a bean?";
 	$person = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "person", $bobid );
-	RedBean_OODB::getInstance()->trash( $person );
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->trash( $person );
 	try{
 	$person = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "person", $bobid);$ok=0;
 	}catch(RedBean_Exception_FailedAccessBean $e){
@@ -769,45 +769,45 @@ function testsperengine( $engine ) {
 	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "unassociate two beans?";
 	$john = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "person", $johnid); //hmmmmmm gaat mis bij innodb
 	$app = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "appointment", 1);
-	RedBean_OODB::getInstance()->unassociate($john, $app);
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->breakLink($john, $app);
 	$john2 = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "person", $johnid);
-	$appsforjohn = RedBean_OODB::getInstance()->getAssoc($john2,"appointment");
+	$appsforjohn = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get($john2,"appointment");
 	if (count($appsforjohn)>0) SmartTest::failedTest();
 	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "unassociate by deleting a bean?";
-	$anotherdrink = RedBean_OODB::getInstance()->dispense("whisky");
+	$anotherdrink = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("whisky");
 	$anotherdrink->name = "bowmore";
 	$anotherdrink->age = 18;
 	$anotherdrink->singlemalt = 'y';
 	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $anotherdrink );
-	RedBean_OODB::getInstance()->associate( $anotherdrink, $john );
-	$hisdrinks = RedBean_OODB::getInstance()->getAssoc( $john, "whisky" );
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->link( $anotherdrink, $john );
+	$hisdrinks = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get( $john, "whisky" );
 	if (count($hisdrinks)!==1) SmartTest::failedTest();
-	RedBean_OODB::getInstance()->trash( $anotherdrink );
-	$hisdrinks = RedBean_OODB::getInstance()->getAssoc( $john, "whisky" );
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->trash( $anotherdrink );
+	$hisdrinks = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get( $john, "whisky" );
 	if (count($hisdrinks)!==0) SmartTest::failedTest();
 	SmartTest::instance()->progress(); ; 
 	
 	//Test description: trees
 	testpack("anemic trees");
 
-	$pete = RedBean_OODB::getInstance()->dispense("person");
+	$pete = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
 	$pete->age=48;
 	$pete->gender="m";
 	$pete->name="Pete";
 	$peteid = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $pete );
-        $rob = RedBean_OODB::getInstance()->dispense("person");
+        $rob = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
 	$rob->age=19;
 	$rob->name="Rob";
 	$rob->gender="m";
-	$saskia = RedBean_OODB::getInstance()->dispense("person");
+	$saskia = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
 	$saskia->age=20;
 	$saskia->name="Saskia";
 	$saskia->gender="f";
 	$idsaskia = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $saskia );
 	$idrob = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $rob );
-	RedBean_OODB::getInstance()->addChild( $pete, $rob );
-	RedBean_OODB::getInstance()->addChild( $pete, $saskia );
-	$children = RedBean_OODB::getInstance()->getChildren( $pete );
+	RedBean_OODB::getInstance()->getToolBox()->getTree()->add( $pete, $rob );
+	RedBean_OODB::getInstance()->getToolBox()->getTree()->add( $pete, $saskia );
+	$children = RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren( $pete );
 	$names=0;
 	if (is_array($children) && count($children)===2) {
 		foreach($children as $child){
@@ -817,92 +817,92 @@ function testsperengine( $engine ) {
 	}
 	
 	if (!$names) fail();
-	$daddies = RedBean_OODB::getInstance()->getParent( $saskia );
+	$daddies = RedBean_OODB::getInstance()->getToolBox()->getTree()->getParent( $saskia );
 	$daddy = array_pop( $daddies );
 	if ($daddy->name === "Pete") $ok = 1; else $ok = 0;
 	if (!$ok) fail();
 	pass();
 	testpack("remove a child from a parent-child tree?");
-	RedBean_OODB::getInstance()->removeChild( $daddy, $saskia );
-	$children = RedBean_OODB::getInstance()->getChildren( $pete );
+	RedBean_OODB::getInstance()->getToolBox()->getTree()->removeChild( $daddy, $saskia );
+	$children = RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren( $pete );
 	asrt(count($children),1);
 	$only = array_pop($children);
 	asrt($only->name,"Rob");
 	
 	//test can we move a node in the tree?
 	testpack("change parent");
-	$node1 = RedBean_OODB::getInstance()->dispense("node");
+	$node1 = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("node");
 	$node1->name = "node1";
-	$node2 = RedBean_OODB::getInstance()->dispense("node");
+	$node2 = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("node");
 	$node2->name = "node2";
-	$node3 = RedBean_OODB::getInstance()->dispense("node");
+	$node3 = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("node");
 	$node3->name = "node3";
 	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set($node1);
 	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set($node2);
 	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set($node3);
-	RedBean_OODB::getInstance()->addChild($node1,$node2);
-	asrt(count(RedBean_OODB::getInstance()->getChildren($node1)),1);
-	asrt(count(RedBean_OODB::getInstance()->getChildren($node3)),0);
-	RedBean_OODB::getInstance()->addChild($node1,$node2);
+	RedBean_OODB::getInstance()->getToolBox()->getTree()->add($node1,$node2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren($node1)),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren($node3)),0);
+	RedBean_OODB::getInstance()->getToolBox()->getTree()->add($node1,$node2);
 	//nothing changes due to unique constraint 
-	asrt(count(RedBean_OODB::getInstance()->getChildren($node1)),1);
-	asrt(count(RedBean_OODB::getInstance()->getChildren($node3)),0);
-	RedBean_OODB::getInstance()->addChild($node3,$node2);
-	asrt(count(RedBean_OODB::getInstance()->getChildren($node1)),1);
-	asrt(count(RedBean_OODB::getInstance()->getChildren($node3)),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren($node1)),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren($node3)),0);
+	RedBean_OODB::getInstance()->getToolBox()->getTree()->add($node3,$node2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren($node1)),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren($node3)),1);
 	//now swap! 
-	RedBean_OODB::getInstance()->removeChild($node1,$node2);
-	asrt(count(RedBean_OODB::getInstance()->getChildren($node1)),0);
-	asrt(count(RedBean_OODB::getInstance()->getChildren($node3)),1);
+	RedBean_OODB::getInstance()->getToolBox()->getTree()->removeChild($node1,$node2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren($node1)),0);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren($node3)),1);
 	//swap back again
-	RedBean_OODB::getInstance()->removeChild($node3,$node2);
-	RedBean_OODB::getInstance()->addChild($node1,$node2);
-	asrt(count(RedBean_OODB::getInstance()->getChildren($node1)),1);
-	asrt(count(RedBean_OODB::getInstance()->getChildren($node3)),0);
-        $nodes = RedBean_OODB::getInstance()->getParent($node2);
+	RedBean_OODB::getInstance()->getToolBox()->getTree()->removeChild($node3,$node2);
+	RedBean_OODB::getInstance()->getToolBox()->getTree()->add($node1,$node2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren($node1)),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getChildren($node3)),0);
+        $nodes = RedBean_OODB::getInstance()->getToolBox()->getTree()->getParent($node2);
 	$node = array_shift($nodes);
 	asrt($node->name,"node1");
-	RedBean_OODB::getInstance()->associate($node2, $node3); //normal assoc
-	RedBean_OODB::getInstance()->associate($node2, RedBean_OODB::getInstance()->dispense("nodeb"));
-	asrt(count(RedBean_OODB::getInstance()->getParent($node2)),1);
-	asrt(count(RedBean_OODB::getInstance()->getAssoc($node2, "node")),1);
-	asrt(count(RedBean_OODB::getInstance()->getAssoc($node2, "nodeb")),1);
-	RedBean_OODB::getInstance()->deleteAllAssocType("node",$node2);
-	asrt(count(RedBean_OODB::getInstance()->getParent($node2)),0);
-	asrt(count(RedBean_OODB::getInstance()->getAssoc($node2, "node")),0);
-	asrt(count(RedBean_OODB::getInstance()->getAssoc($node2, "nodeb")),1);
-	RedBean_OODB::getInstance()->deleteAllAssoc($node2);
-	asrt(count(RedBean_OODB::getInstance()->getParent($node2)),0);
-	asrt(count(RedBean_OODB::getInstance()->getAssoc($node2, "node")),0);
-	asrt(count(RedBean_OODB::getInstance()->getAssoc($node2, "nodeb")),0);
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->link($node2, $node3); //normal assoc
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->link($node2, RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("nodeb"));
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getParent($node2)),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get($node2, "node")),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get($node2, "nodeb")),1);
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->deleteAllAssocType("node",$node2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getParent($node2)),0);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get($node2, "node")),0);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get($node2, "nodeb")),1);
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->deleteAllAssoc($node2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTree()->getParent($node2)),0);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get($node2, "node")),0);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get($node2, "nodeb")),0);
 	
 	
 	//exit;
 	
 	//Test description: on the fly saving while associating beans
 	testpack("save on the fly while associating?");
-	$food = RedBean_OODB::getInstance()->dispense("dish");
+	$food = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("dish");
 	$food->name="pizza";
-	RedBean_OODB::getInstance()->associate( $food, $pete );
-	$petesfood = RedBean_OODB::getInstance()->getAssoc( $pete, "dish" );
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->link( $food, $pete );
+	$petesfood = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get( $pete, "dish" );
 	asrt((is_array($petesfood) && count($petesfood)===1),true);
-	RedBean_OODB::getInstance()->unassociate( $food, $pete );
-	$petesfood = RedBean_OODB::getInstance()->getAssoc( $pete, "dish" );
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->breakLink( $food, $pete );
+	$petesfood = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get( $pete, "dish" );
 	asrt((is_array($petesfood) && count($petesfood)===0),true);
 	
 	
 	//Test description: test whether we can trash beans
 	testpack("trash on $engine ");
-	$food = RedBean_OODB::getInstance()->dispense("dish");
+	$food = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("dish");
 	$food->name="spaghetti";
 	//no exception or error... must be able to trash unsaved beans
-	try{ RedBean_OODB::getInstance()->trash( $food ); pass(); }catch(Exception $e){ fail();}
-	asrt(count(RedBean_OODB::getInstance()->find($pete,array("name"=>"="))),1);
-	asrt(count(RedBean_OODB::getInstance()->find($saskia,array("name"=>"="))),1);
-	RedBean_OODB::getInstance()->trash( $pete );
-	RedBean_OODB::getInstance()->trash( $saskia );
-	asrt(count(RedBean_OODB::getInstance()->find($pete,array("name"=>"="))),0);
-	asrt(count(RedBean_OODB::getInstance()->find($saskia,array("name"=>"="))),0);
+	try{ RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->trash( $food ); pass(); }catch(Exception $e){ fail();}
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find($pete,array("name"=>"="))),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find($saskia,array("name"=>"="))),1);
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->trash( $pete );
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->trash( $saskia );
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find($pete,array("name"=>"="))),0);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find($saskia,array("name"=>"="))),0);
 	
 	
 	
@@ -920,7 +920,7 @@ function testsperengine( $engine ) {
         
 	try{ $person->setType('alien'); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 	
-	$person = RedBean_OODB::getInstance()->dispense("person");
+	$person = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
 	$person->age = 50;
 	$person->name = "Bob";
 	$person->gender = "m";
@@ -960,7 +960,7 @@ function testsperengine( $engine ) {
        
 
 	//Test description Cans
-	RedBean_OODB::getInstance()->trash( $rob );
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->trash( $rob );
         testpack("Cans of Beans $engine ");
 	$can = Person::where("`gender`={gender} order by `name`  asc",array("gender"=>"m"),"person");
 	//test array access
@@ -1043,13 +1043,13 @@ function testsperengine( $engine ) {
 	//test aggregation functions
 		
 	//insert stat table
-	$s = RedBean_OODB::getInstance()->dispense("stattest");
+	$s = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("stattest");
 	$s->amount = 1;
 	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $s );
-	$s = RedBean_OODB::getInstance()->dispense("stattest");
+	$s = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("stattest");
 	$s->amount = 2;
 	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $s );
-	$s = RedBean_OODB::getInstance()->dispense("stattest");
+	$s = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("stattest");
 	$s->amount = 3;
 	$id = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $s );
 	
@@ -1058,12 +1058,12 @@ function testsperengine( $engine ) {
 	asrt(RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->exists("stattest",$id),true);
 	asrt(RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->exists("stattest",99),false);
        
-	asrt(intval(RedBean_OODB::getInstance()->numberof("stattest")),3); 
-	asrt(intval(RedBean_OODB::getInstance()->maxof("stattest","amount")),3); 
-	asrt(intval(RedBean_OODB::getInstance()->minof("stattest","amount")),1); 
-	asrt(intval(RedBean_OODB::getInstance()->avgof("stattest","amount")),2); 
-	asrt(intval(RedBean_OODB::getInstance()->sumof("stattest","amount")),6); 
-	asrt(count(RedBean_OODB::getInstance()->distinct("stattest","amount")),3); 
+	asrt(intval(RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->numberof("stattest")),3);
+	asrt(intval(RedBean_OODB::getInstance()->getToolBox()->getLister()->stat("max","stattest","amount")),3);
+	asrt(intval(RedBean_OODB::getInstance()->getToolBox()->getLister()->stat("min","stattest","amount")),1);
+	asrt(intval(RedBean_OODB::getInstance()->getToolBox()->getLister()->stat("avg","stattest","amount")),2);
+	asrt(intval(RedBean_OODB::getInstance()->getToolBox()->getLister()->stat("sum","stattest","amount")),6);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getLister()->distinct("stattest","amount")),3);
 	
 		
 	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( true );
@@ -1134,8 +1134,8 @@ function testsperengine( $engine ) {
 	$cheese->save();
 	$cheese = new Cheese(1);
 	//try to mess with the locking system... simulate another proces by providing another key
-	$oldkey = RedBean_OODB::getInstance()->pkey;
-	RedBean_OODB::getInstance()->pkey = 1234;
+	$oldkey = RedBean_OODB::getInstance()->getToolBox()->getLockManager()->getKey();
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setKey(1234);
 	$cheese = new Cheese(1);
 	$cheese->setName("Camembert");
 	//Test description: you should not be able to save a read-lock bean (modifying assoc table)
@@ -1149,12 +1149,12 @@ function testsperengine( $engine ) {
 	//but your own object is unaffected
 	try{ $bordeaux->add( new Wine() ); pass(); }catch(RedBean_Exception_FailedAccessBean $e) { fail(); }
 	//switch back to the original session
-	RedBean_OODB::getInstance()->pkey = $oldkey;
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setKey($oldkey);
 	$cheese = new Cheese(1);
 	$cheese->setName("Camembert");
 	try{ $cheese->save(); pass(); }catch(RedBean_Exception_FailedAccessBean $e) { fail();}
 	//now pretend to be a third session
-	RedBean_OODB::getInstance()->pkey = 999;
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setKey(999);
 	//however locking is turned off now
 	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLocking( false );
 	//and we modify the previously crafted record
@@ -1175,9 +1175,9 @@ function testsperengine( $engine ) {
 	
 	//Test description: same kind of test; different key and time, should not be able to write to cheese 1
 	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLockingTime(100);
-	RedBean_OODB::getInstance()->pkey = $oldkey;
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setKey($oldkey);
 	$cheese = new Cheese(1);
-	RedBean_OODB::getInstance()->pkey = 123;
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setKey(123);
 	$cheese = new Cheese(1);
 	$cheese->setName("Cheddar2");
 	try{ $cheese->save(); fail();}catch(Exception $e) { pass();	}
@@ -1185,7 +1185,7 @@ function testsperengine( $engine ) {
 	//Test description: now test whether a lock expires
 	echo '---'; //test marker
 	//Once again a different session
-	RedBean_OODB::getInstance()->pkey = 42;
+	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setKey(42);
 	//We will have to wait 2 seconds before it expires
 	RedBean_OODB::getInstance()->getToolBox()->getLockManager()->setLockingTime(2);
 	//Open the bean
@@ -1334,7 +1334,7 @@ function testsperengine( $engine ) {
 	if (strlen($blog->message)!=65536) {SmartTest::failedTest(); }else SmartTest::instance()->progress();
 	$rows = RedBean_OODB::getInstance()->getToolBox()->getDatabase()->get("describe blog");
 	if($rows[3]["Type"]!="longtext")  {SmartTest::failedTest(); }else SmartTest::instance()->progress(); 
-	RedBean_OODB::getInstance()->clean();
+	RedBean_OODB::getInstance()->getToolBox()->getGC()->clean();
 	
 	SmartTest::instance()->testPack="Export";
 	RedBean_OODB::getInstance()->generate("justabean");
@@ -1399,9 +1399,9 @@ function testsperengine( $engine ) {
 	$b = new SomeBean;
 	$b->anotherprop = 1;
 	$b->save();
-	asrt(RedBean_OODB::getInstance()->numberof("SomeBean"),2);
-	RedBean_OODB::getInstance()->trashAll("SomeBean");
-	asrt(RedBean_OODB::getInstance()->numberof("SomeBean"),0);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->numberof("SomeBean"),2);
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->trashAll("SomeBean");
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->numberof("SomeBean"),0);
 	
 	RedBean_OODB::getInstance()->generate("Book");
 	$book = new Book;
@@ -1424,7 +1424,7 @@ function testsperengine( $engine ) {
 RedBean_OODB::getInstance()->generate("justabean");
 SmartTest::instance()->testPack="Security";
 $maliciousproperty = "\"";
-$oBean = R::getInstance()->dispense("justabean");
+$oBean = R::getInstance()->getToolBox()->getDispenser()->dispense("justabean");
 $oBean->$maliciousproperty = "a";
 try {
 	R::getInstance()->getToolBox()->getBeanStore()->set($oBean);
@@ -1434,7 +1434,7 @@ catch(RedBean_Exception_Security $e){
 	SmartTest::instance()->progress();	
 }
 $maliciousproperty = "\"test";
-$oBean = R::getInstance()->dispense("justabean");
+$oBean = R::getInstance()->getToolBox()->getDispenser()->dispense("justabean");
 $oBean->$maliciousproperty = "a";
 try {
 	R::getInstance()->getToolBox()->getBeanStore()->set($oBean);
@@ -1445,7 +1445,7 @@ catch(RedBean_Exception_Security $e){
 }
 
 $maliciousvalue = "\"abc";
-$oBean = R::getInstance()->dispense("justabean");
+$oBean = R::getInstance()->getToolBox()->getDispenser()->dispense("justabean");
 $oBean->another = $maliciousvalue;
 R::getInstance()->getToolBox()->getBeanStore()->set($oBean);
 $oBean->another;

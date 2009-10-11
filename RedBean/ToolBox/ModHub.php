@@ -21,6 +21,10 @@ class RedBean_ToolBox_ModHub extends RedBean_ToolBox {
     public function setFacade( $facade ) {
         $this->facade = $facade;
     }
+
+    public function getFacade() {
+        return $this->facade;
+    }
     
     public function __call( $who, $args=array() ) {
 
@@ -29,17 +33,17 @@ class RedBean_ToolBox_ModHub extends RedBean_ToolBox {
             return $this->give( $tool );
         }
         else {
-            return call_user_func_array( array($this->facade,$who), $args );
+           throw new Exception(" $tool not available ");
         }
         
     }
 
     public function __get($v) {
-       return $this->facade->$v;
+      throw new Exception("getter not allowed"); // return $this->facade->$v;
     }
 
     public function __set($v,$i) {
-        $this->facade->$v = $i;
+      throw new Exception("setter not allowed");
     }
 
 

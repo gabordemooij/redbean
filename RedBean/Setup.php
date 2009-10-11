@@ -112,8 +112,8 @@ class RedBean_Setup {
 		if ($unlockall) {
 			
 	 
-			//RedBean_OODB::getInstance()->resetAll(); //Release all locks
-                        $redbean->resetAll();
+			//RedBean_OODB::getInstance()->getLockManager()->reset(); //Release all locks
+                        $redbean->getLockManager()->reset();
 		}
 	
 		if ($freeze) {

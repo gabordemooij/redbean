@@ -27,12 +27,12 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$assoctable = "pc_".$db->escape($parent->type."_".$parent->type);
 
 			//check whether this assoctable already exists
-			if (!$this->provider->isFrozen()) {
+			if (!$this->provider->getFacade()->isFrozen()) {
 				$alltables = $this->provider->getTableRegister()->getTables();
 				if (!in_array($assoctable, $alltables)) {
 					//no assoc table does not exist, create it..
 					$assoccreateSQL = $this->provider->getWriter()->getQuery("create_tree",array(
-						"engine"=>$this->provider->getEngine(),
+						"engine"=>$this->provider->getFacade()->getEngine(),
 						"assoctable"=>$assoctable
 					));
 					$db->exec( $assoccreateSQL );

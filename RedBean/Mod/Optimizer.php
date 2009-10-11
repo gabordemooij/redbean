@@ -9,7 +9,7 @@ class RedBean_Mod_Optimizer extends RedBean_Mod {
     public function run( $gc = false ,$stdTable=false, $stdCol=false) {
 
     //oops, we are frozen, so no change..
-        if ($this->provider->isFrozen()) {
+        if ($this->provider->getFacade()->isFrozen()) {
             return false;
         }
 
@@ -21,7 +21,7 @@ class RedBean_Mod_Optimizer extends RedBean_Mod {
 
         //pick a random table
         if ($tables && is_array($tables) && count($tables) > 0) {
-            if ($gc) $this->provider->removeUnused( $tables );
+            if ($gc) $this->provider->getGC()->removeUnused( $tables );
             $table = $tables[array_rand( $tables, 1 )];
         }
         else {

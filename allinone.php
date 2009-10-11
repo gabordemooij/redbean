@@ -553,7 +553,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 				$this->data = $this->provider->getToolBox()->getBeanStore()->get( $this->type, $id);
 			}
 			else { //otherwise, dispense a regular empty RedBean_OODBBean
-				$this->data = $this->provider->dispense( $this->type );
+				$this->data = $this->provider->getToolBox()->getDispenser()->dispense( $this->type );
 			}
 		}
 	}
@@ -672,7 +672,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		elseif (strpos($method,"getRelated")===0)	{
 			$this->signal("deco_get", $this);
 			$prop = $this->provider->getToolBox()->getFilter()->table( substr( $method, 10 ) );
-			$beans = $this->provider->getAssoc( $this->data, $prop );
+			$beans = $this->provider->getToolBox()->getAssociation()->get( $this->data, $prop );
 			$decos = array();
 			$dclass = RedBean_Setup_Namespace_PRFX.$prop.RedBean_Setup_Namespace_SFFX;
 
@@ -702,33 +702,33 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$this->signal("deco_add",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			$this->provider->associate($this->data, $bean);
+			$this->provider->getToolBox()->getAssociation()->link($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"remove")===0) {
 			$this->signal("deco_remove",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			$this->provider->unassociate($this->data, $bean);
+			$this->provider->getToolBox()->getAssociation()->breakLink($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"attach")===0) {
 			$this->signal("deco_attach",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			$this->provider->addChild($this->data, $bean);
+			$this->provider->getToolBox()->getTree()->add($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"clearRelated")===0) {
 			$this->signal("deco_clearrelated",$this); 
 			$type = $this->provider->getToolBox()->getFilter()->table( substr( $method, 12 ) );
-			$this->provider->deleteAllAssocType($type, $this->data);
+			$this->provider->getToolBox()->getAssociation()->deleteAllAssocType($type, $this->data);
 			return $this;
 		}
 		else if (strpos($method,"numof")===0) {
 			$this->signal("deco_numof",$this);
 			$type = $this->provider->getToolBox()->getFilter()->table( substr( $method, 5 ) );
-			return $this->provider->numOfRelated($type, $this->data);
+			return $this->provider->getToolBox()->getAssociation()->numOfRelated($type, $this->data);
 				
 		}
 	}
@@ -740,8 +740,8 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function belongsTo( $deco ) {
 		$this->signal("deco_belongsto", $this);
-		$this->provider->deleteAllAssocType($deco->getType(), $this->data);
-		$this->provider->associate($this->data, $deco->getData());
+		$this->provider->getToolBox()->getAssociation()->deleteAllAssocType($deco->getType(), $this->data);
+		$this->provider->getToolBox()->getAssociation()->link($this->data, $deco->getData());
 	}
 
 	/**
@@ -751,8 +751,8 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function exclusiveAdd( $deco ) {
 		$this->signal("deco_exclusiveadd", $this);
-		$this->provider->deleteAllAssocType($this->type,$deco->getData());
-		$this->provider->associate($deco->getData(), $this->data);
+		$this->provider->getToolBox()->getAssociation()->deleteAllAssocType($this->type,$deco->getData());
+		$this->provider->getToolBox()->getAssociation()->link($deco->getData(), $this->data);
 	}
 
 	/**
@@ -761,7 +761,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function parent() {
 		$this->signal("deco_parent", $this);
-		$beans = $this->provider->getParent( $this->data );
+		$beans = $this->provider->getToolBox()->getTree()->getParent( $this->data );
 		if (count($beans) > 0 ) $bean = array_pop($beans); else return null;
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		$deco = new $dclass();
@@ -775,14 +775,14 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function siblings() {
 		$this->signal("deco_siblings", $this);
-		$beans = $this->provider->getParent( $this->data );
+		$beans = $this->provider->getToolBox()->getTree()->getParent( $this->data );
 		if (count($beans) > 0 ) {
 			$bean = array_pop($beans);
 		}
 		else {
 			return null;
 		}
-		$beans = $this->provider->getChildren( $bean );
+		$beans = $this->provider->getToolBox()->getTree()->getChildren( $bean );
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
@@ -803,7 +803,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function children() {
 		$this->signal("deco_children", $this);
-		$beans = $this->provider->getChildren( $this->data );
+		$beans = $this->provider->getToolBox()->getTree()->getChildren( $this->data );
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
@@ -887,7 +887,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function clearAllRelations() {
 		$this->signal("deco_clearrelations", $this);
-		$this->provider->deleteAllAssoc( $this->getData() );
+		$this->provider->getToolBox()->deleteAllAssoc( $this->getData() );
 	}
 
 	/**
@@ -923,7 +923,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public static function delete( $deco ) {
-		self::getStaticProvider()->trash( $deco->getData() );
+		self::getStaticProvider()->getToolBox()->getBeanStore()->trash( $deco->getData() );
 	}
 
         /**
@@ -1052,7 +1052,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		}
 
-		$beans = self::getStaticProvider()->find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
+		$beans = self::getStaticProvider()->getToolBox()->getFinder()->find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
 
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$deco->type.RedBean_Setup_Namespace_SFFX;
@@ -1331,10 +1331,7 @@ class RedBean_OODB {
             $db->exec($writer->getQuery("setup_locking"));
             $db->exec($writer->getQuery("setup_tables"));
         }
-        //generate a key
-        if (!$this->pkey) {
-            $this->pkey = str_replace(".","",microtime(true)."".mt_rand());
-        }
+     
         return true;
     }
 
@@ -1394,65 +1391,8 @@ class RedBean_OODB {
         $this->frozen = false;
     }
 
-   // public function exists($type,$id) {
-   //     return $this->toolbox->getBeanStore()->exists($type, $id);
-   // }
-
-    public function numberof($type) {
-        return $this->toolbox->getBeanStore()->numberof( $type );
-    }
-
-    public function distinct($type, $field) {
-        return $this->toolbox->getLister()->distinct( $type, $field );
-    }
-
-    private function stat($type,$field,$stat="sum") {
-        return $this->toolbox->getLister()->stat( $type, $field, $stat);
-    }
-
-    public function sumof($type,$field) {
-        return $this->stat( $type, $field, "sum");
-    }
-
-    public function avgof($type,$field) {
-        return $this->stat( $type, $field, "avg");
-    }
-
-    public function minof($type,$field) {
-        return $this->stat( $type, $field, "min");
-    }
-
-    public function maxof($type,$field) {
-        return $this->stat( $type, $field, "max");
-    }
-
-    public function resetAll() {
-        $sql = $this->toolbox->getWriter()->getQuery("releaseall");
-        $this->toolbox->getDatabase()->exec( $sql );
-        return true;
-    }
-
-    public function getBySQL( $rawsql, $slots, $table, $max=0 ) {
-        return $this->toolbox->getSearch()->sql( $rawsql, $slots, $table, $max );
-    }
-
-    public function find(RedBean_OODBBean $bean, $searchoperators = array(), $start=0, $end=100, $orderby="id ASC", $extraSQL=false) {
-        return $this->toolbox->getFinder()->find($bean, $searchoperators, $start, $end, $orderby, $extraSQL);
-
-    }
-    public function listAll($type, $start=false, $end=false, $orderby="id ASC", $extraSQL = false) {
-        return $this->toolbox->getLister()->get($type, $start, $end, $orderby,$extraSQL);
-    }
-    public function associate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) { //@associate
-        return $this->toolbox->getAssociation()->link( $bean1, $bean2 );
-    }
-    public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-        return $this->toolbox->getAssociation()->breakLink( $bean1, $bean2 );
-    }
-    public function getAssoc(RedBean_OODBBean $bean, $targettype) {
-        return $this->toolbox->getAssociation()->get( $bean, $targettype );
-    }
-    public function trash( RedBean_OODBBean $bean ) {
+    
+    /*public function trash( RedBean_OODBBean $bean ) {
         return $this->toolbox->getBeanStore()->trash( $bean );
     }
     public function deleteAllAssoc( $bean ) {
@@ -1484,10 +1424,15 @@ class RedBean_OODB {
         return $this->toolbox->getAssociation()->numOfRelated( $type, $bean );
 
     }
+
+    */
+
     public function generate( $classes, $prefix = false, $suffix = false ) {
         return $this->toolbox->getClassGenerator()->generate($classes,$prefix,$suffix);
     }
 
+
+/*
     public function clean() {
         return $this->toolbox->getGC()->clean();
     }
@@ -1503,8 +1448,10 @@ class RedBean_OODB {
     public function trashAll($type) {
         $this->toolbox->getDatabase()->exec( $this->toolbox->getWriter()->getQuery("drop_type",array("type"=>$this->toolbox->getFilter()->table($type))));
     }
+*/
 
-    public static function gen($arg, $prefix = false, $suffix = false) {
+
+   public static function gen($arg, $prefix = false, $suffix = false) {
         return self::getInstance()->generate($arg, $prefix, $suffix);
     }
 
@@ -1749,8 +1696,8 @@ class RedBean_Setup {
 		if ($unlockall) {
 			
 	 
-			//RedBean_OODB::getInstance()->resetAll(); //Release all locks
-                        $redbean->resetAll();
+			//RedBean_OODB::getInstance()->getLockManager()->reset(); //Release all locks
+                        $redbean->getLockManager()->reset();
 		}
 	
 		if ($freeze) {
@@ -2643,7 +2590,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $assoctable = $db->escape( implode("_",$tables) );
 
         //check whether this assoctable already exists
-        if (!$this->provider->isFrozen()) {
+        if (!$this->provider->getFacade()->isFrozen()) {
             $alltables = $this->provider->getTableRegister()->getTables();
             if (!in_array($assoctable, $alltables)) {
             //no assoc table does not exist, create it..
@@ -2658,7 +2605,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
                     "assoctable"=> $assoctable,
                     "t1" =>$t1,
                     "t2" =>$t2,
-                    "engine"=>$this->provider->getEngine()
+                    "engine"=>$this->provider->getFacade()->getEngine()
                 ));
 
                 $db->exec( $assoccreateSQL );
@@ -2800,7 +2747,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
 
 
         //obtain the table names
-        $t1 = $db->escape( $this->provider->getToolBox()->getFilter()->table($bean->type) );
+        $t1 = $db->escape( $this->provider->getFilter()->table($bean->type) );
         $t2 = $db->escape( $targettype );
 
         //infer the association table
@@ -2894,7 +2841,7 @@ class RedBean_Mod_Association extends RedBean_Mod {
         $id = intval( $bean->id );
 
         //obtain the table names
-        $t1 = $db->escape( $this->provider->getToolBox()->getFilter()->table($bean->type) );
+        $t1 = $db->escape( $this->provider->getFilter()->table($bean->type) );
         $t2 = $db->escape( $targettype );
 
         //infer the association table
@@ -2935,12 +2882,12 @@ class RedBean_Mod_Association extends RedBean_Mod {
 
     			$db = $this->provider->getDatabase();
 
-			$t2 = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
+			$t2 = $this->provider->getFilter()->table( $db->escape( $type ) );
 
 			//is this bean valid?
 			$this->provider->getBeanChecker()->check( $bean );
-			$t1 = $this->provider->getToolBox()->getFilter()->table( $bean->type  );
-			$tref = $this->provider->getToolBox()->getFilter()->table( $db->escape( $bean->type ) );
+			$t1 = $this->provider->getFilter()->table( $bean->type  );
+			$tref = $this->provider->getFilter()->table( $db->escape( $bean->type ) );
 			$id = intval( $bean->id );
 
 			//infer the association table
@@ -3075,7 +3022,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
         $table = $db->escape($bean->type); //what table does it want
 
         //may we adjust the database?
-        if (!$this->provider->isFrozen()) {
+        if (!$this->provider->getFacade()->isFrozen()) {
 
         //does this table exist?
             $tables = $this->provider->getTableRegister()->getTables();
@@ -3083,7 +3030,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
             if (!in_array($table, $tables)) {
 
                 $createtableSQL = $this->provider->getWriter()->getQuery("create_table", array(
-                    "engine"=>$this->provider->getEngine(),
+                    "engine"=>$this->provider->getFacade()->getEngine(),
                     "table"=>$table
                 ));
 
@@ -3202,7 +3149,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 
    
     public function get($type, $id, $data=false) {
-        $bean = $this->provider->dispense( $type );
+        $bean = $this->provider->getDispenser()->dispense( $type );
         $db = $this->provider->getDatabase();
         $table = $db->escape( $type );
         $id = abs( intval( $id ) );
@@ -3240,7 +3187,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
     public function trash( RedBean_OODBBean $bean ) {
         $this->provider->getBeanChecker()->check( $bean );
 	if (intval($bean->id)===0) return;
-	$this->provider->deleteAllAssoc( $bean );
+	$this->provider->getAssociation()->deleteAllAssoc( $bean );
 	$this->provider->getLockManager()->openBean($bean);
 	$table = $this->provider->getDatabase()->escape($bean->type);
 	$id = intval($bean->id);
@@ -3278,7 +3225,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 
            public function numberof($type) {
                 	$db = $this->provider->getDatabase();
-			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
+			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
 
 			$alltables = $this->provider->getTableRegister()->getTables();
 
@@ -3303,6 +3250,10 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
                 return $db->get( $sql );
 
            }
+
+        public function trashAll($type) {
+            $this->provider->getDatabase()->exec( $this->provider->getWriter()->getQuery("drop_type",array("type"=>$this->provider->getFilter()->table($type))));
+        }
 
 
 }
@@ -3340,19 +3291,20 @@ class RedBean_Mod_ClassGenerator extends RedBean_Mod {
                                         $tablename = $className;
                                         $fullname = $prefix.$className.$suffix;
                                         $toeval = $ns . " class ".$fullname." extends ". (($ns=='') ? '' : '\\' ) . "RedBean_Decorator {
-                                        private static \$__static_property_type = \"".$this->provider->getToolBox()->getFilter()->table($tablename)."\";
+                                        private static \$__static_property_type = \"".$this->provider->getFilter()->table($tablename)."\";
 
                                         public function __construct(\$id=0, \$lock=false) {
 
-                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->provider->getToolBox()->getFilter()->table($tablename)."',\$id,\$lock);
+                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->provider->getFilter()->table($tablename)."',\$id,\$lock);
                                         }
 
                                         public static function where( \$sql, \$slots=array() ) {
-                                                return new RedBean_Can( RedBean_OODB::getInstance()->getToolBox(), self::\$__static_property_type, RedBean_OODB::getInstance()->getBySQL( \$sql, \$slots, self::\$__static_property_type) );
+                                                return new RedBean_Can( RedBean_OODB::getInstance()->getToolBox(), self::\$__static_property_type,
+                                                RedBean_OODB::getInstance()->getToolBox()->getSearch()->sql( \$sql, \$slots, self::\$__static_property_type ));
                                         }
 
                                         public static function listAll(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
-                                                return RedBean_OODB::getInstance()->listAll(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
+                                                return RedBean_OODB::getInstance()->getToolBox()->getLister()->get(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
                                         }
 
                                         public static function getReadOnly(\$id) {
@@ -3455,8 +3407,15 @@ class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 
  
     
-    public function removeUnused( RedBean_OODB $oodb, RedBean_DBAdapter $db, RedBean_QueryWriter $writer ) {
-            if ($this->provider->isFrozen()) return;
+    public function removeUnused() {
+
+            if ($this->provider->getFacade()->isFrozen()) return;
+
+            $toolbox = $this->provider;
+
+            $db = $toolbox->getDatabase();
+            $writer = $toolbox->getWriter();
+
             //get all tables
             $tables = $this->provider->getTableRegister()->getTables();
             foreach($tables as $table) {
@@ -3486,7 +3445,7 @@ class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 
     public function dropColumn($table,$property) {
         	//oops, we are frozen, so no change..
-			if ($this->provider->isFrozen()) {
+			if ($this->provider->getFacade()->isFrozen()) {
 				return false;
 			}
 
@@ -3502,7 +3461,7 @@ class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 
     public function clean() {
 
-			if ($this->provider->isFrozen()) {
+			if ($this->provider->getFacade()->isFrozen()) {
 				return false;
 			}
 
@@ -3521,7 +3480,7 @@ class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 			$db->exec( $sqlcleandatabase );
 
 			$db->exec( $this->provider->getWriter()->getQuery("truncate_rtables") );
-			$this->provider->resetAll();
+			$this->provider->getLockManager()->reset();
 			return true;
 
 		
@@ -3554,7 +3513,7 @@ class RedBean_Mod_Lister extends RedBean_Mod {
         //TODO: Consider if GROUP BY (equivalent meaning) is more portable
 			//across DB types?
 			$db = $this->provider->getDatabase();
-			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
+			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
 			$field = $db->escape( $field );
 
 			$alltables = $this->provider->getTableRegister()->getTables();
@@ -3579,10 +3538,10 @@ class RedBean_Mod_Lister extends RedBean_Mod {
     }
 
 
-    public function stat( $type, $field, $stat) {
-        $db = $this->provider->getDatabase();
-			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
-			$field = $this->provider->getToolBox()->getFilter()->property( $db->escape( $field ) );
+    public function stat( $stat, $type, $field ) {
+                         $db = $this->provider->getDatabase();
+			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
+			$field = $this->provider->getFilter()->property( $db->escape( $field ) );
 			$stat = $db->escape( $stat );
 
 			$alltables = $this->provider->getTableRegister()->getTables();
@@ -3605,7 +3564,12 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 
     private $locking = true;
     private $locktime = 10;
+    private $pkey = null;
 
+    public function __construct(RedBean_ToolBox_ModHub $provider) {
+        $this->pkey = str_replace(".","",microtime(true)."".mt_rand());
+        parent::__construct($provider);
+    }
 
     public function getLockingTime() { return $this->locktime; }
      public function setLockingTime( $timeInSecs ) {
@@ -3621,12 +3585,12 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 
                         $this->provider->getBeanChecker()->check( $bean);
 			//If locking is turned off, or the bean has no persistance yet (not shared) life is always a success!
-			if (!$this->provider->getToolBox()->getLockManager()->getLocking() || $bean->id === 0) return true;
+			if (!$this->getLocking() || $bean->id === 0) return true;
                         $db = $this->provider->getDatabase();
 
 			//remove locks that have been expired...
 			$removeExpiredSQL = $this->provider->getWriter()->getQuery("remove_expir_lock", array(
-				"locktime"=>$this->provider->getToolBox()->getLockManager()->getLockingTime()
+				"locktime"=>$this->getLockingTime()
 			));
 
 			$db->exec($removeExpiredSQL);
@@ -3638,7 +3602,7 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 			$checkopenSQL = $this->provider->getWriter()->getQuery("get_lock",array(
 				"id"=>$id,
 				"table"=>$tbl,
-				"key"=>$this->provider->pkey
+				"key"=>$this->pkey
 			));
 
 			$row = $db->getRow($checkopenSQL);
@@ -3661,7 +3625,7 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 			$openSQL = $this->provider->getWriter()->getQuery("aq_lock", array(
 				"table"=>$tbl,
 				"id"=>$id,
-				"key"=>$this->provider->pkey,
+				"key"=>$this->pkey,
 				"time"=>time()
 			));
 
@@ -3694,7 +3658,21 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
     }
 
     public function unlockAll() {
-          $this->provider->getDatabase()->exec($this->provider->getWriter()->getQuery("release",array("key"=>$this->provider->pkey)));
+          $this->provider->getDatabase()->exec($this->provider->getWriter()->getQuery("release",array("key"=>$this->pkey)));
+    }
+
+    public function reset() {
+        $sql = $this->provider->getWriter()->getQuery("releaseall");
+        $this->provider->getDatabase()->exec( $sql );
+        return true;
+    }
+
+    public function getKey() {
+        return $this->pkey;
+    }
+
+    public function setKey($key) {
+        $this->pkey = $key;
     }
 
 }
@@ -3707,7 +3685,7 @@ class RedBean_Mod_Optimizer extends RedBean_Mod {
     public function run( $gc = false ,$stdTable=false, $stdCol=false) {
 
     //oops, we are frozen, so no change..
-        if ($this->provider->isFrozen()) {
+        if ($this->provider->getFacade()->isFrozen()) {
             return false;
         }
 
@@ -3719,7 +3697,7 @@ class RedBean_Mod_Optimizer extends RedBean_Mod {
 
         //pick a random table
         if ($tables && is_array($tables) && count($tables) > 0) {
-            if ($gc) $this->provider->removeUnused( $tables );
+            if ($gc) $this->provider->getGC()->removeUnused( $tables );
             $table = $tables[array_rand( $tables, 1 )];
         }
         else {
@@ -3943,7 +3921,7 @@ class RedBean_Mod_Search extends RedBean_Mod {
             )) . $sql );
 
         $err = $db->getErrorMsg();
-        if (!$this->provider->isFrozen() && strpos($err,"Unknown column")!==false && $max<10) {
+        if (!$this->provider->getFacade()->isFrozen() && strpos($err,"Unknown column")!==false && $max<10) {
             $matches = array();
             if (preg_match("/Unknown\scolumn\s'(.*?)'/",$err,$matches)) {
                 if (count($matches)==2 && strpos($rawsql,'@ifexists')!==false) {
@@ -3971,7 +3949,7 @@ class RedBean_Mod_TableRegister extends RedBean_Mod {
     public function getTables( $all=false ) {
         $db = $this->provider->getDatabase();
 
-        if ($all && $this->provider->isFrozen()) {
+        if ($all && $this->provider->getFacade()->isFrozen()) {
             $alltables = $db->getCol($this->provider->getWriter()->getQuery("show_tables"));
             return $alltables;
         }
@@ -4033,12 +4011,12 @@ class RedBean_Mod_Tree extends RedBean_Mod {
 			$assoctable = "pc_".$db->escape($parent->type."_".$parent->type);
 
 			//check whether this assoctable already exists
-			if (!$this->provider->isFrozen()) {
+			if (!$this->provider->getFacade()->isFrozen()) {
 				$alltables = $this->provider->getTableRegister()->getTables();
 				if (!in_array($assoctable, $alltables)) {
 					//no assoc table does not exist, create it..
 					$assoccreateSQL = $this->provider->getWriter()->getQuery("create_tree",array(
-						"engine"=>$this->provider->getEngine(),
+						"engine"=>$this->provider->getFacade()->getEngine(),
 						"assoctable"=>$assoctable
 					));
 					$db->exec( $assoccreateSQL );
@@ -5069,6 +5047,10 @@ class RedBean_ToolBox_ModHub extends RedBean_ToolBox {
     public function setFacade( $facade ) {
         $this->facade = $facade;
     }
+
+    public function getFacade() {
+        return $this->facade;
+    }
     
     public function __call( $who, $args=array() ) {
 
@@ -5077,17 +5059,17 @@ class RedBean_ToolBox_ModHub extends RedBean_ToolBox {
             return $this->give( $tool );
         }
         else {
-            return call_user_func_array( array($this->facade,$who), $args );
+           throw new Exception(" $tool not available ");
         }
         
     }
 
     public function __get($v) {
-       return $this->facade->$v;
+      throw new Exception("getter not allowed"); // return $this->facade->$v;
     }
 
     public function __set($v,$i) {
-        $this->facade->$v = $i;
+      throw new Exception("setter not allowed");
     }
 
 

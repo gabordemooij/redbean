@@ -24,7 +24,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
         $table = $db->escape($bean->type); //what table does it want
 
         //may we adjust the database?
-        if (!$this->provider->isFrozen()) {
+        if (!$this->provider->getFacade()->isFrozen()) {
 
         //does this table exist?
             $tables = $this->provider->getTableRegister()->getTables();
@@ -32,7 +32,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
             if (!in_array($table, $tables)) {
 
                 $createtableSQL = $this->provider->getWriter()->getQuery("create_table", array(
-                    "engine"=>$this->provider->getEngine(),
+                    "engine"=>$this->provider->getFacade()->getEngine(),
                     "table"=>$table
                 ));
 
@@ -151,7 +151,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 
    
     public function get($type, $id, $data=false) {
-        $bean = $this->provider->dispense( $type );
+        $bean = $this->provider->getDispenser()->dispense( $type );
         $db = $this->provider->getDatabase();
         $table = $db->escape( $type );
         $id = abs( intval( $id ) );
@@ -189,7 +189,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
     public function trash( RedBean_OODBBean $bean ) {
         $this->provider->getBeanChecker()->check( $bean );
 	if (intval($bean->id)===0) return;
-	$this->provider->deleteAllAssoc( $bean );
+	$this->provider->getAssociation()->deleteAllAssoc( $bean );
 	$this->provider->getLockManager()->openBean($bean);
 	$table = $this->provider->getDatabase()->escape($bean->type);
 	$id = intval($bean->id);
@@ -227,7 +227,7 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
 
            public function numberof($type) {
                 	$db = $this->provider->getDatabase();
-			$type = $this->provider->getToolBox()->getFilter()->table( $db->escape( $type ) );
+			$type = $this->provider->getFilter()->table( $db->escape( $type ) );
 
 			$alltables = $this->provider->getTableRegister()->getTables();
 
@@ -252,6 +252,10 @@ class RedBean_Mod_BeanStore extends RedBean_Mod {
                 return $db->get( $sql );
 
            }
+
+        public function trashAll($type) {
+            $this->provider->getDatabase()->exec( $this->provider->getWriter()->getQuery("drop_type",array("type"=>$this->provider->getFilter()->table($type))));
+        }
 
 
 }

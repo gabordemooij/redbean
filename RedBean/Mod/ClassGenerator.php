@@ -34,19 +34,20 @@ class RedBean_Mod_ClassGenerator extends RedBean_Mod {
                                         $tablename = $className;
                                         $fullname = $prefix.$className.$suffix;
                                         $toeval = $ns . " class ".$fullname." extends ". (($ns=='') ? '' : '\\' ) . "RedBean_Decorator {
-                                        private static \$__static_property_type = \"".$this->provider->getToolBox()->getFilter()->table($tablename)."\";
+                                        private static \$__static_property_type = \"".$this->provider->getFilter()->table($tablename)."\";
 
                                         public function __construct(\$id=0, \$lock=false) {
 
-                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->provider->getToolBox()->getFilter()->table($tablename)."',\$id,\$lock);
+                                                parent::__construct( RedBean_OODB::getInstance(), '".$this->provider->getFilter()->table($tablename)."',\$id,\$lock);
                                         }
 
                                         public static function where( \$sql, \$slots=array() ) {
-                                                return new RedBean_Can( RedBean_OODB::getInstance()->getToolBox(), self::\$__static_property_type, RedBean_OODB::getInstance()->getBySQL( \$sql, \$slots, self::\$__static_property_type) );
+                                                return new RedBean_Can( RedBean_OODB::getInstance()->getToolBox(), self::\$__static_property_type,
+                                                RedBean_OODB::getInstance()->getToolBox()->getSearch()->sql( \$sql, \$slots, self::\$__static_property_type ));
                                         }
 
                                         public static function listAll(\$start=false,\$end=false,\$orderby=' id ASC ',\$sql=false) {
-                                                return RedBean_OODB::getInstance()->listAll(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
+                                                return RedBean_OODB::getInstance()->getToolBox()->getLister()->get(self::\$__static_property_type,\$start,\$end,\$orderby,\$sql);
                                         }
 
                                         public static function getReadOnly(\$id) {

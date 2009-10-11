@@ -55,7 +55,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 				$this->data = $this->provider->getToolBox()->getBeanStore()->get( $this->type, $id);
 			}
 			else { //otherwise, dispense a regular empty RedBean_OODBBean
-				$this->data = $this->provider->dispense( $this->type );
+				$this->data = $this->provider->getToolBox()->getDispenser()->dispense( $this->type );
 			}
 		}
 	}
@@ -174,7 +174,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 		elseif (strpos($method,"getRelated")===0)	{
 			$this->signal("deco_get", $this);
 			$prop = $this->provider->getToolBox()->getFilter()->table( substr( $method, 10 ) );
-			$beans = $this->provider->getAssoc( $this->data, $prop );
+			$beans = $this->provider->getToolBox()->getAssociation()->get( $this->data, $prop );
 			$decos = array();
 			$dclass = RedBean_Setup_Namespace_PRFX.$prop.RedBean_Setup_Namespace_SFFX;
 
@@ -204,33 +204,33 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 			$this->signal("deco_add",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			$this->provider->associate($this->data, $bean);
+			$this->provider->getToolBox()->getAssociation()->link($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"remove")===0) {
 			$this->signal("deco_remove",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			$this->provider->unassociate($this->data, $bean);
+			$this->provider->getToolBox()->getAssociation()->breakLink($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"attach")===0) {
 			$this->signal("deco_attach",$this);
 			$deco = $arguments[0];
 			$bean = $deco->getData();
-			$this->provider->addChild($this->data, $bean);
+			$this->provider->getToolBox()->getTree()->add($this->data, $bean);
 			return $this;
 		}
 		else if (strpos($method,"clearRelated")===0) {
 			$this->signal("deco_clearrelated",$this); 
 			$type = $this->provider->getToolBox()->getFilter()->table( substr( $method, 12 ) );
-			$this->provider->deleteAllAssocType($type, $this->data);
+			$this->provider->getToolBox()->getAssociation()->deleteAllAssocType($type, $this->data);
 			return $this;
 		}
 		else if (strpos($method,"numof")===0) {
 			$this->signal("deco_numof",$this);
 			$type = $this->provider->getToolBox()->getFilter()->table( substr( $method, 5 ) );
-			return $this->provider->numOfRelated($type, $this->data);
+			return $this->provider->getToolBox()->getAssociation()->numOfRelated($type, $this->data);
 				
 		}
 	}
@@ -242,8 +242,8 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function belongsTo( $deco ) {
 		$this->signal("deco_belongsto", $this);
-		$this->provider->deleteAllAssocType($deco->getType(), $this->data);
-		$this->provider->associate($this->data, $deco->getData());
+		$this->provider->getToolBox()->getAssociation()->deleteAllAssocType($deco->getType(), $this->data);
+		$this->provider->getToolBox()->getAssociation()->link($this->data, $deco->getData());
 	}
 
 	/**
@@ -253,8 +253,8 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function exclusiveAdd( $deco ) {
 		$this->signal("deco_exclusiveadd", $this);
-		$this->provider->deleteAllAssocType($this->type,$deco->getData());
-		$this->provider->associate($deco->getData(), $this->data);
+		$this->provider->getToolBox()->getAssociation()->deleteAllAssocType($this->type,$deco->getData());
+		$this->provider->getToolBox()->getAssociation()->link($deco->getData(), $this->data);
 	}
 
 	/**
@@ -263,7 +263,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function parent() {
 		$this->signal("deco_parent", $this);
-		$beans = $this->provider->getParent( $this->data );
+		$beans = $this->provider->getToolBox()->getTree()->getParent( $this->data );
 		if (count($beans) > 0 ) $bean = array_pop($beans); else return null;
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		$deco = new $dclass();
@@ -277,14 +277,14 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function siblings() {
 		$this->signal("deco_siblings", $this);
-		$beans = $this->provider->getParent( $this->data );
+		$beans = $this->provider->getToolBox()->getTree()->getParent( $this->data );
 		if (count($beans) > 0 ) {
 			$bean = array_pop($beans);
 		}
 		else {
 			return null;
 		}
-		$beans = $this->provider->getChildren( $bean );
+		$beans = $this->provider->getToolBox()->getTree()->getChildren( $bean );
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
@@ -305,7 +305,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function children() {
 		$this->signal("deco_children", $this);
-		$beans = $this->provider->getChildren( $this->data );
+		$beans = $this->provider->getToolBox()->getTree()->getChildren( $this->data );
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$this->type.RedBean_Setup_Namespace_SFFX;
 		if ($beans && is_array($beans)) {
@@ -389,7 +389,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 */
 	public function clearAllRelations() {
 		$this->signal("deco_clearrelations", $this);
-		$this->provider->deleteAllAssoc( $this->getData() );
+		$this->provider->getToolBox()->deleteAllAssoc( $this->getData() );
 	}
 
 	/**
@@ -425,7 +425,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 	 * @return unknown_type
 	 */
 	public static function delete( $deco ) {
-		self::getStaticProvider()->trash( $deco->getData() );
+		self::getStaticProvider()->getToolBox()->getBeanStore()->trash( $deco->getData() );
 	}
 
         /**
@@ -554,7 +554,7 @@ class RedBean_Decorator extends RedBean_Observable implements IteratorAggregate 
 
 		}
 
-		$beans = self::getStaticProvider()->find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
+		$beans = self::getStaticProvider()->getToolBox()->getFinder()->find( $deco->getData(), $filters, $start, $end, $orderby, $extraSQL );
 
 		$decos = array();
 		$dclass = RedBean_Setup_Namespace_PRFX.$deco->type.RedBean_Setup_Namespace_SFFX;

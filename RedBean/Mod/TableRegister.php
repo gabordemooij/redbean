@@ -5,7 +5,7 @@ class RedBean_Mod_TableRegister extends RedBean_Mod {
     public function getTables( $all=false ) {
         $db = $this->provider->getDatabase();
 
-        if ($all && $this->provider->isFrozen()) {
+        if ($all && $this->provider->getFacade()->isFrozen()) {
             $alltables = $db->getCol($this->provider->getWriter()->getQuery("show_tables"));
             return $alltables;
         }

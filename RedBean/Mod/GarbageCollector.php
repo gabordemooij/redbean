@@ -4,8 +4,15 @@ class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 
  
     
-    public function removeUnused( RedBean_OODB $oodb, RedBean_DBAdapter $db, RedBean_QueryWriter $writer ) {
-            if ($this->provider->isFrozen()) return;
+    public function removeUnused() {
+
+            if ($this->provider->getFacade()->isFrozen()) return;
+
+            $toolbox = $this->provider;
+
+            $db = $toolbox->getDatabase();
+            $writer = $toolbox->getWriter();
+
             //get all tables
             $tables = $this->provider->getTableRegister()->getTables();
             foreach($tables as $table) {
@@ -35,7 +42,7 @@ class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 
     public function dropColumn($table,$property) {
         	//oops, we are frozen, so no change..
-			if ($this->provider->isFrozen()) {
+			if ($this->provider->getFacade()->isFrozen()) {
 				return false;
 			}
 
@@ -51,7 +58,7 @@ class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 
     public function clean() {
 
-			if ($this->provider->isFrozen()) {
+			if ($this->provider->getFacade()->isFrozen()) {
 				return false;
 			}
 
@@ -70,7 +77,7 @@ class RedBean_Mod_GarbageCollector extends RedBean_Mod {
 			$db->exec( $sqlcleandatabase );
 
 			$db->exec( $this->provider->getWriter()->getQuery("truncate_rtables") );
-			$this->provider->resetAll();
+			$this->provider->getLockManager()->reset();
 			return true;
 
 		

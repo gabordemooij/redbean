@@ -4,7 +4,12 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 
     private $locking = true;
     private $locktime = 10;
+    private $pkey = null;
 
+    public function __construct(RedBean_ToolBox_ModHub $provider) {
+        $this->pkey = str_replace(".","",microtime(true)."".mt_rand());
+        parent::__construct($provider);
+    }
 
     public function getLockingTime() { return $this->locktime; }
      public function setLockingTime( $timeInSecs ) {
@@ -20,12 +25,12 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 
                         $this->provider->getBeanChecker()->check( $bean);
 			//If locking is turned off, or the bean has no persistance yet (not shared) life is always a success!
-			if (!$this->provider->getToolBox()->getLockManager()->getLocking() || $bean->id === 0) return true;
+			if (!$this->getLocking() || $bean->id === 0) return true;
                         $db = $this->provider->getDatabase();
 
 			//remove locks that have been expired...
 			$removeExpiredSQL = $this->provider->getWriter()->getQuery("remove_expir_lock", array(
-				"locktime"=>$this->provider->getToolBox()->getLockManager()->getLockingTime()
+				"locktime"=>$this->getLockingTime()
 			));
 
 			$db->exec($removeExpiredSQL);
@@ -37,7 +42,7 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 			$checkopenSQL = $this->provider->getWriter()->getQuery("get_lock",array(
 				"id"=>$id,
 				"table"=>$tbl,
-				"key"=>$this->provider->pkey
+				"key"=>$this->pkey
 			));
 
 			$row = $db->getRow($checkopenSQL);
@@ -60,7 +65,7 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
 			$openSQL = $this->provider->getWriter()->getQuery("aq_lock", array(
 				"table"=>$tbl,
 				"id"=>$id,
-				"key"=>$this->provider->pkey,
+				"key"=>$this->pkey,
 				"time"=>time()
 			));
 
@@ -93,7 +98,21 @@ class RedBean_Mod_LockManager extends RedBean_Mod {
     }
 
     public function unlockAll() {
-          $this->provider->getDatabase()->exec($this->provider->getWriter()->getQuery("release",array("key"=>$this->provider->pkey)));
+          $this->provider->getDatabase()->exec($this->provider->getWriter()->getQuery("release",array("key"=>$this->pkey)));
+    }
+
+    public function reset() {
+        $sql = $this->provider->getWriter()->getQuery("releaseall");
+        $this->provider->getDatabase()->exec( $sql );
+        return true;
+    }
+
+    public function getKey() {
+        return $this->pkey;
+    }
+
+    public function setKey($key) {
+        $this->pkey = $key;
     }
 
 }
