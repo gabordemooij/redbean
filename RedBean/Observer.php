@@ -14,5 +14,5 @@ interface RedBean_Observer {
 	 * @param RedBean_Observable $observable
 	 * @return unknown_type
 	 */
-	public function onEvent( $eventname, RedBean_Observable $o );
+	public function onEvent( $eventname, $info );
 }

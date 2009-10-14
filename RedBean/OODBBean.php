@@ -8,3 +8,4 @@
  */
 class RedBean_OODBBean {
 }
+

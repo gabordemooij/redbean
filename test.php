@@ -10,6 +10,9 @@
 //I often need to adjust and change this file, however I am now trying to tidy up this file so 
 //you can use it as well. Also, test descriptions will be added over time.
 
+
+
+
 function printtext( $text ) {
 	if ($_SERVER["DOCUMENT_ROOT"]) {
 		echo "<BR>".$text;
@@ -91,7 +94,325 @@ function testpack($name) {
 }
 
 //Use this database for tests
-require("allinone.php");
+require("RedBean/Driver.php");
+require("RedBean/Driver/PDO.php");
+
+require("RedBean/OODBBean.php");
+require("RedBean/Observable.php");
+require("RedBean/Observer.php");
+require("RedBean/DBAdapter.php");
+require("RedBean/QueryWriter.php");
+require("RedBean/QueryWriter/MySQL.php");
+require("RedBean/ChangeLogger.php");
+require("RedBean/Exception.php");
+require("RedBean/Exception/Security.php");
+require("RedBean/Exception/FailedAccessBean.php");
+require("RedBean/OODB.php");
+
+
+$pdo = new Redbean_Driver_PDO( "mysql:host=localhost;dbname=oodb","root","" );
+$pdo->setDebugMode(0);
+$pdo->Execute("DROP TABLE IF EXISTS page");
+$pdo->Execute("DROP TABLE IF EXISTS association");
+$adapter = new RedBean_DBAdapter( $pdo );
+
+$redbean = new RedBean_OODB( new RedBean_QueryWriter_MySQL( $adapter ) );
+
+//add concurrency shield
+$redbean->addEventListener( "open", new RedBean_ChangeLogger( $adapter ));
+$redbean->addEventListener( "update", new RedBean_ChangeLogger( $adapter ));
+
+$page = $redbean->dispense("page");
+
+
+testpack("Test RedBean OODB: Dispense");
+asrt(isset($page->__info),true);
+asrt(isset($page->__info["type"]),true);
+asrt(isset($page->id),true);
+asrt(($page->__info["type"]),"page");
+asrt(($page->id),0);
+try{ $redbean->dispense("."); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->dispense("-"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+
+testpack("Test RedBean_OODB: Insert Record");
+$page->name = "my page";
+$id = (int) $redbean->store($page);
+asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 1 );
+asrt( $pdo->GetCell("SELECT `name` FROM page LIMIT 1"), "my page" );
+asrt( $id, 1 );
+testpack("Test RedBean OODB: Can we Retrieve a Record? ");
+$page = $redbean->load( "page", 1 );
+asrt($page->name, "my page");
+asrt(isset($page->__info),true);
+asrt(isset($page->__info["type"]),true);
+asrt(isset($page->id),true);
+asrt(($page->__info["type"]),"page");
+asrt((int)$page->id,$id);
+
+
+testpack("Test RedBean OODB: Can we Update a Record? ");
+$page->name = "new name";
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+$page->rating = 5;
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( $page->rating, "5" );
+
+$page->rating = 300;
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( $page->rating, "300" );
+
+$page->rating = -2;
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( $page->rating, "-2" );
+
+$page->rating = "good";
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( $page->rating, "good" );
+
+$longtext = str_repeat('great! because..',100);
+$page->rating = $longtext;
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( $page->rating, $longtext );
+
+$redbean->trash( $page );
+asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 0 );
+
+//test locking
+testpack("Test Locking");
+$page = $redbean->dispense("page");
+$page->name = "a page";
+$id = $redbean->store( $page );
+$page = $redbean->load("page", $id);
+$otherpage = $redbean->load("page", $id);
+asrt(isset($page->__info["opened"]),true);
+asrt(isset($otherpage->__info["opened"]),true);
+try{ $redbean->store( $page ); pass(); }catch(Exception $e){ fail(); }
+try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
+
+
+
+exit;
+
+/*
+
+	//Test description: test table management features
+	testpack("Table Management on ".$engine);
+	$cnt = count(RedBean_OODB::getInstance()->getToolBox()->getTableRegister()->getTables());
+	RedBean_OODB::getInstance()->getToolBox()->getTableRegister()->register("newtable");
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTableRegister()->getTables()), (++$cnt));
+	RedBean_OODB::getInstance()->getToolBox()->getTableRegister()->unregister("newtable");
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getTableRegister()->getTables()), (--$cnt));
+
+
+
+	//Test description: can we set and get a bean?
+	$file->name="document";
+	$id = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $file );
+	asrt(is_numeric($id),true);
+	//Test description: can we load it again using an ID?
+	$file = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get("file",$id);
+	asrt($file->name,"document");
+	//Test description: If a bean does not exist RedBean OODB must throw an exception
+	try{RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get("file",999); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); };
+	//Test description: Only certain IDs are valid: >0 and only integers! using intval!
+	//becomes 1
+	try{RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get("file",1.1); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); };
+	//becomes 0
+	try{RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get("file",0.9); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); };
+	//becomes 1 (due to abs())
+	try{RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get("file",-1); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); };
+	//Test description: can we fastload a bean?
+	try{$file2 = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get("file",2,array("name"=>"picture")); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+	asrt($file2->name,"picture");
+
+
+	//Test description: test whether we can infer data types
+	testpack("Data Type Detection");
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type(1),0);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type(255),0);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type(256),1);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type(-1),2);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type("12345.9"),3);
+	asrt(RedBean_OODB::getInstance()->getToolBox()->getScanner()->type(str_repeat('a',40000)),4);
+
+
+
+	//Test description: can add a property dynamically?
+	$file->content=42;
+	$id = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $file );
+	$file = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "file", $id );
+	asrt($file->content,"42");
+	//Test description: Can we store a value of a different type in the same property?
+	$file->content="Lorem Ipsum";
+	$id = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $file );
+	$file = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "file", $id );
+	asrt($file->content,"Lorem Ipsum");
+
+	testpack("Anemic Model Bean Manipulation on ".$engine);
+	//Test description: save and load a complete bean with several properties
+	$bean = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("note");
+	$bean->message = "hello";
+	$bean->color=3;
+	$bean->date = time();
+	$bean->special='n';
+	$bean->state = 90;
+	$id = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set($bean);
+	$bean2 = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get("note", $id);
+	asrt(($bean2->state == 90 && $bean2->special =='n' && $bean2->message =='hello'),true);
+	//Test description: change the message property, can we modify it?
+	$bean->message = "What is life but a dream?";
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set($bean);
+	$bean2 = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get("note", $id); //Using same ID!
+	asrt($bean2->message,"What is life but a dream?");
+	//Test description can we choose other values, smaller... bigger?
+	$bean->message = 1;
+	$bean->color = "green";
+	$bean->date = str_repeat("BLABLA", 100);
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set($bean);
+	$bean2 = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get("note", $id); //Using same ID!
+	asrt($bean2->message,"1");
+	asrt($bean2->date,$bean->date);
+	@asrt($bean2->green,$bean->green);
+	//Test description: test whether we can save/load UTF8 values
+	testpack("UTF8 ".$engine);
+	$txt = file_get_contents("utf8.txt");
+	$bean->message=$txt;
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set($bean);
+	$bean2 = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get("note", $id); //Using same ID!
+	asrt($bean2->message,file_get_contents("utf8.txt"));
+	global $tests;
+
+	//Test description: test whether we can associate anemic beans
+	testpack("Associations $engine ");
+	$note = $bean;
+	$person = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
+	$person->age = 50;
+	$person->name = "Bob";
+	$person->gender = "m";
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $person );
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->link( $person, $note );
+	$memo = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "note", 1 );
+	$authors = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get( $memo, "person" );
+	asrt(count($authors),1);
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->trash( $authors[1] );
+	$authors = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get( $memo, "person" );
+	asrt(count($authors),0);
+
+	testpack("Put a Bean in the Database - various types $engine ");
+	$person = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
+	$person->name = "John";
+	$person->age= 35;
+	$person->gender = "m";
+	$person->hasJob = true;
+	$id = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $person ); $johnid=$id;
+	$person2 = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "person", $id );
+
+	asrt(intval($person2->age),intval($person->age));
+	$person2->anotherprop = 2;
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $person2 );
+	$person = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
+	$person->name = "Bob";
+	$person->age= 50;
+	$person->gender = "m";
+	$person->hasJob = false;
+	$bobid = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set( $person );
+
+	testpack("getBySQL $engine ");
+	$ids = RedBean_OODB::getInstance()->getToolBox()->getSearch()->sql("`gender`={gender} order by `name` asc",array("gender"=>"m"),"person");
+	asrt(count($ids),2);
+	$ids = RedBean_OODB::getInstance()->getToolBox()->getSearch()->sql("`gender`={gender} OR `color`={clr} ",array("gender"=>"m","clr"=>"red"),"person");
+	asrt(count($ids),0);
+	$ids = RedBean_OODB::getInstance()->getToolBox()->getSearch()->sql("`gender`={gender} AND `color`={clr} ",array("gender"=>"m","clr"=>"red"),"person");
+	asrt(count($ids),0);
+
+	//Test description: table names should always be case insensitive, no matter the table name
+	testpack("case insens. $engine ");
+	R::getInstance()->generate("PERSON");
+	$dummy = new Person;
+	asrt($dummy->getData()->type,"person");
+
+	//Test description: table names should contain no underscores
+	testpack("tablenames. $engine ");
+	R::getInstance()->generate("under_score_s");
+	asrt(class_exists("under_score_s"),true);
+	$a = new under_score_s;
+	asrt($a->getData()->type,"underscores");
+
+	//Test description: find()
+	testpack("anemic find");
+	$dummy->age = 40;
+	$rawdummy = $dummy->getData();
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("age"=>">"))),1);
+	$rawdummy->age = 20;
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("age"=>">"))),2);
+	$rawdummy->age = 100;
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("age"=>">"))),0);
+	$rawdummy->age = 100;
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("age"=>"<="))),2);
+	$rawdummy->name="ob";
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("name"=>"LIKE"))),1);
+	$rawdummy->name="o";
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("name"=>"LIKE"))),2);
+	$rawdummy->gender="m";
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("gender"=>"="))),2);
+	$rawdummy->gender="f";
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getFinder()->find( $rawdummy, array("gender"=>"="))),0);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getLister()->get("person")),2);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getLister()->get("person",0,1)),1);
+	asrt(count(RedBean_OODB::getInstance()->getToolBox()->getLister()->get("person",1)),1);
+
+
+	//Test description: associate
+	testpack("anemic association");
+	$searchBean = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("person");
+	$searchBean->gender = "m";
+	SmartTest::instance()->progress();
+	$app = RedBean_OODB::getInstance()->getToolBox()->getDispenser()->dispense("appointment");
+	$app->kind = "dentist";
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->set($app);
+	RedBean_OODB::getInstance()->getToolBox()->getAssociation()->link( $person2, $app );
+	$arr = RedBean_OODB::getInstance()->getToolBox()->getAssociation()->get( $person2, "appointment" );
+	$appforbob = array_shift($arr);
+	if (!$appforbob || $appforbob->kind!="dentist") {
+		SmartTest::failedTest();
+	}
+	SmartTest::instance()->progress(); ; SmartTest::instance()->testPack = "delete a bean?";
+	$person = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "person", $bobid );
+	RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->trash( $person );
+	try{
+	$person = RedBean_OODB::getInstance()->getToolBox()->getBeanStore()->get( "person", $bobid);$ok=0;
+	}catch(RedBean_Exception_FailedAccessBean $e){
+		$ok=true;
+	}
+	if (!$ok) {
+		SmartTest::failedTest();
+	}
+
+
+
+
+
+echo "\n\nDone.";
+
+exit;
 
 //====== DRIVER SELECTION ======
 /**

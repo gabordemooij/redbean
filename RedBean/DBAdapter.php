@@ -6,7 +6,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Tool {
+class RedBean_DBAdapter extends RedBean_Observable {
 
 	/**
 	 *

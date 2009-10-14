@@ -6,10 +6,15 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class QueryWriter_MySQL implements RedBean_QueryWriter, RedBean_Tool {
+class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	/**
+         *
 	 * @var array all allowed sql types
 	 */
+
+
+
+
 	public $typeno_sqltype = array(
 		" TINYINT(3) UNSIGNED ",
 		" INT(11) UNSIGNED ",
@@ -39,37 +44,32 @@ class QueryWriter_MySQL implements RedBean_QueryWriter, RedBean_Tool {
 		"tintyintus","intus","ints","varchar255","text","ltext"
 		);
 
-		/**
-		 *
-		 * @param $options
-		 * @return string $query
-		 */
-		private function getQueryCreateTable( $options=array() ) {
 
-			$engine = $options["engine"];
-			$table = $options["table"];
+                private $adapter;
 
-			if ($engine=="myisam") {
+                public function __construct( RedBean_DBAdapter $adapter ) {
+                    $this->adapter = $adapter;
 
-				//this fellow has no table yet to put his beer on!
-				$createtableSQL = "
-			 CREATE TABLE `$table` (
-			`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-			 PRIMARY KEY ( `id` )
-			 ) ENGINE = MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-			";
-			}
-			else {
-				$createtableSQL = "
-			 CREATE TABLE `$table` (
-			`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-			 PRIMARY KEY ( `id` )
-			 ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-			";
-					
-			}
-			return $createtableSQL;
-		}
+
+                    $this->adapter->exec("
+				CREATE TABLE IF NOT EXISTS `dtyp` (
+				  `id` int(11) unsigned NOT NULL auto_increment,
+				  `tinyintus` tinyint(3) unsigned NOT NULL,
+				  `intus` int(11) unsigned NOT NULL,
+				  `ints` bigint(20) NOT NULL,
+				  `varchar255` varchar(255) NOT NULL,
+				  `text` text NOT NULL,
+				  PRIMARY KEY  (`id`)
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
+				");
+
+
+                    
+
+                }
+
+
+		
 
 		/**
 		 *
@@ -589,11 +589,13 @@ class QueryWriter_MySQL implements RedBean_QueryWriter, RedBean_Tool {
 		}
 
 
+
+
 		/**
 		 * (non-PHPdoc)
 		 * @see RedBean/QueryWriter#getQuery()
 		 */
-		public function getQuery( $queryname, $params=array() ) {
+		private function getQuery( $queryname, $params=array() ) {
 			//echo "<br><b style='color:yellow'>$queryname</b>";
 			switch($queryname) {
 				case "create_table":
@@ -871,4 +873,144 @@ class QueryWriter_MySQL implements RedBean_QueryWriter, RedBean_Tool {
 		public function getEscape() {
 			return "`";
 		}
+
+                public function escape( $value ) {
+                    return $this->adapter->escape( $value );
+                }
+
+                public function getTables() {
+                    return $this->adapter->getCol( "show tables" );
+                }
+
+
+                public function createTable( $table ) {
+
+                    $sql = "
+                     CREATE TABLE `$table` (
+                    `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+                     PRIMARY KEY ( `id` )
+                     ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
+                    ";
+                    $this->adapter->exec( $sql );
+
+		}
+
+                public function getColumns( $table ) {
+
+                    $columnsRaw = $this->adapter->get("DESCRIBE `$table`");
+
+                    foreach($columnsRaw as $r) {
+                       $columns[$r["Field"]]=$r["Type"];
+                    }
+
+                    return $columns;
+
+                }
+
+                public function scanType( $value ) {
+
+                        $this->adapter->exec( $this->getQuery("reset_dtyp") );
+
+			$checktypeSQL = $this->getQuery("infertype", array(
+				"value"=> $this->escape(strval($value))
+			));
+
+			$this->adapter->exec( $checktypeSQL );
+                        $id = $this->adapter->getInsertID();
+
+			$readtypeSQL = $this->getQuery("readtype",array(
+				"id"=>$id
+			));
+
+                        $row = $this->adapter->getRow($readtypeSQL);;
+
+                        $tp = 0;
+			foreach($row as $t=>$tv) {
+				if (strval($tv) === strval($value)) {
+					return $tp;
+				}
+				$tp++;
+			}
+			return $tp;
+                }
+
+                public function addColumn( $table, $column, $type ) {
+                    
+                    $sql = $this->getQuery("add_column",array(
+                              "table"=>$table,
+                              "column"=>$column,
+                              "type"=> $this->typeno_sqltype[$type]
+                    ));
+
+                    $this->adapter->exec( $sql );
+
+                }
+
+                public function code( $typedescription ) {
+                    return $this->sqltype_typeno[$typedescription];
+                }
+
+
+                public function widenColumn( $table, $column, $type ) {
+
+                       $changecolumnSQL = $this->getQuery( "widen_column", array(
+                                "table" => $table,
+                                "column" => $column,
+                                "newtype" => $this->typeno_sqltype[$type]
+                       ) );
+                       $this->adapter->exec( $changecolumnSQL );
+
+                }
+
+                public function updateRecord( $table, $updatevalues, $id) {
+
+                    $updateSQL = $this->getQuery("update", array(
+                    "table"=>$table,
+                    "updatevalues"=>$updatevalues,
+                    "id"=>$id
+                    ));
+
+                    $this->adapter->exec( $updateSQL );
+                }
+
+                public function insertRecord( $table, $insertcolumns, $insertvalues ) {
+
+                    if (count($insertvalues)>0){
+
+                        $insertSQL = $this->getQuery("insert",array(
+                          "table"=>$table,
+                         "insertcolumns"=>$insertcolumns,
+                         "insertvalues"=>$insertvalues
+                        ));
+                        $this->adapter->exec( $insertSQL );
+                        return $this->adapter->getInsertID();
+                    }
+                    else {
+                        $this->adapter->exec( $this->getQuery("create", array("table"=>$table)));
+                        return $this->adapter->getInsertID();
+                    }
+                }
+
+
+            public function selectRecord($type, $id) {
+                $getSQL = $this->getQuery("get_bean",array(
+                        "type"=>$type,
+                        "id"=>$id
+                ));
+                $row = $this->adapter->getRow( $getSQL );
+
+                if ($row && is_array($row) && count($row)>0) {
+                    return $row;
+                }
+                else {
+                    throw RedBean_Exception_Security("Could not find bean");
+                }
+           }
+
+           public function deleteRecord( $table, $id ) {
+               $this->adapter->exec("DELETE FROM `$table` WHERE id = $id ");
+           }
+
+      
+
 }
