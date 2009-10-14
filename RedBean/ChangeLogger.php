@@ -21,6 +21,8 @@ class RedBean_ChangeLogger implements RedBean_Observer {
                         ) ENGINE = MYISAM ;
 
                     ");
+
+        $this->db->exec("DELETE FROM __log WHERE logstamp < ".((microtime(1)*100)-1000) );
     }
 
 
@@ -44,7 +46,7 @@ class RedBean_ChangeLogger implements RedBean_Observer {
             $sql = "SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND logstamp >= $oldstamp ";
             //echo "\n".$sql;
             $r = $db->getCell($sql);
-            if ($r) throw new Exception("Locked, failed to access");
+            if ($r) throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)");
             $sql = "INSERT INTO __log (id,action,tbl,itemid,logstamp) VALUES (NULL, 2, \"$type\", $id, $time ) ";
             //echo "\n".$sql;
             $db->exec( $sql );

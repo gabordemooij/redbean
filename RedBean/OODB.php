@@ -194,6 +194,13 @@ class RedBean_OODB extends RedBean_Observable {
     }
 
   
+    public function batch( $type, $ids ) {
+        $collection = array();
+        foreach($ids as $id) {
+            $collection[ $id ] = $this->load( $type, $id );
+        }
+        return $collection;
+    }
 
 }
 
