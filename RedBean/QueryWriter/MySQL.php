@@ -48,6 +48,17 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 				  PRIMARY KEY  (`id`)
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 				");
+
+          $this->adapter->exec("
+                          CREATE TABLE IF NOT EXISTS `__log` (
+                        `id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+                        `tbl` VARCHAR( 255 ) NOT NULL ,
+                        `action` TINYINT( 2 ) NOT NULL ,
+                        `itemid` INT( 11 ) NOT NULL ,
+                        `logstamp` BIGINT( 20 ) unsigned NOT NULL
+                        ) ENGINE = MYISAM ;
+
+                    ");
     }
 
 
@@ -120,17 +131,6 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
         return "INSERT INTO `$table` (id) VALUES(null) ";
     }
 
-    /**
-     *
-     * @param $options
-     * @return string $query
-     */
-    private function getQueryInferType( $options ) {
-        extract($options);
-        $v = "\"".$value."\"";
-        $checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v )";
-        return $checktypeSQL;
-    }
 
     /**
      *
@@ -204,9 +204,6 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
             case "create":
                 return $this->getQueryCreate($params);
                 break;
-            case "infertype":
-                return $this->getQueryInferType($params);
-                break;
             case "readtype":
                 return $this->getBasicQuery(
                 array("fields"=>array("tinyintus","intus","ints","varchar255","text"),
@@ -270,9 +267,11 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 
         $this->adapter->exec( $this->getQuery("reset_dtyp") );
 
-        $checktypeSQL = $this->getQuery("infertype", array(
-            "value"=> $this->escape(strval($value))
-        ));
+      
+
+        $v = "\"".$value."\"";
+        $checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v )";
+
 
         $this->adapter->exec( $checktypeSQL );
         $id = $this->adapter->getInsertID();
@@ -366,10 +365,33 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
         }
     }
 
-    public function deleteRecord( $table, $id ) {
-        $this->adapter->exec("DELETE FROM `$table` WHERE id = $id ");
+    public function deleteRecord( $table, $column, $value, $oper="=" ) {
+        $this->adapter->exec("DELETE FROM `$table` WHERE `$column` $oper \"$value\" ");
     }
 
+
+    public function getLoggedChanges($type, $id, $oldstamp) {
+        return $this->adapter->getCell("
+        SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND logstamp >= $oldstamp");
+    }
+
+    public function addUniqueIndex( $table,$col1,$col2 ) {
+
+        $r = $this->adapter->get("SHOW INDEX FROM $table");
+        $name = "UQ_".$col1."_".$col2;
+
+        if ($r) {
+            foreach($r as $i) {
+                if ($i["Key_name"]==$name){
+                    return;
+                }
+            }
+        }
+
+        $sql = "ALTER IGNORE TABLE `$table`
+                ADD UNIQUE INDEX `$name` (`$col1`, `$col2`)";
+        $this->adapter->exec($sql);
+    }
 
 
 }

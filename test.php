@@ -94,9 +94,10 @@ $pdo->Execute("DROP TABLE IF EXISTS association");
 $adapter = new RedBean_DBAdapter( $pdo );
 $redbean = new RedBean_OODB( new RedBean_QueryWriter_MySQL( $adapter ) );
 //add concurrency shield
-$redbean->addEventListener( "open", new RedBean_ChangeLogger( $adapter ));
-$redbean->addEventListener( "update", new RedBean_ChangeLogger( $adapter ));
+$redbean->addEventListener( "open", new RedBean_ChangeLogger( new RedBean_QueryWriter_MySQL( $adapter ) ));
+$redbean->addEventListener( "update", new RedBean_ChangeLogger( new RedBean_QueryWriter_MySQL( $adapter ) ));
 $page = $redbean->dispense("page");
+
 
 
 testpack("Test RedBean OODB: Dispense");
@@ -131,6 +132,7 @@ asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 $page->rating = 5;
+//$page->__info["unique"] = array("name","rating");
 $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
@@ -172,6 +174,7 @@ asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 0 );
 testpack("Test RedBean OODB: Batch Loader ");
 $page = $redbean->dispense("page");
 $page->name = "page no. 1";
+$page->rating = 1;
 $id1 = $redbean->store($page);
 $page = $redbean->dispense("page");
 $page->name = "page no. 2";

@@ -151,6 +151,10 @@ class RedBean_OODB extends RedBean_Observable {
                 }
             }
 
+             if (isset($bean->__info["unique"])) {
+                    $this->writer->addUniqueIndex( $table, $bean->__info["unique"][0],$bean->__info["unique"][1] );
+             }
+
             if ($bean->id) {
                 if (count($updatevalues)>0) {
                     $this->writer->updateRecord( $table, $updatevalues, $bean->id );
@@ -190,7 +194,7 @@ class RedBean_OODB extends RedBean_Observable {
 
     public function trash( $bean ) {
         $this->check( $bean );
-        $this->writer->deleteRecord( $bean->__info["type"], $bean->id );
+        $this->writer->deleteRecord( $bean->__info["type"], "id",$bean->id );
     }
 
   
