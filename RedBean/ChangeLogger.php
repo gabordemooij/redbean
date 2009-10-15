@@ -1,48 +1,50 @@
 <?php
-
+/**
+ * RedBean ChangeLogger
+ * Shields you from race conditions automatically.
+ * @package 		RedBean/ChangeLogger.php
+ * @description		Shields you from race conditions automatically.
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
 class RedBean_ChangeLogger implements RedBean_Observer {
 
     /**
-     *
      * @var RedBean_DBAdapter
      */
     private $writer;
 
+	/**
+	 * Constructor, requires a writer
+	 * @param RedBean_QueryWriter $writer
+	 */
     public function __construct(RedBean_QueryWriter $writer) {
         $this->writer = $writer;
-        $this->writer->deleteRecord("__log", "logstamp", ((microtime(1)*100)-1000), "<" );
+        $this->writer->cleanUpLog();
     }
 
-
+	/**
+	 * Throws an exception if information in the bean has been changed
+	 * by another process or bean.
+	 * @param string $event
+	 * @param RedBean_OODBBean $item
+	 */
     public function onEvent( $event, $item ) {
-
         $id = $item->id;
         if (! ((int) $id)) return;
         $type = $item->__info["type"];
-        $time =  microtime(1)*100;
         if ($event=="open") {
-            $this->writer->insertRecord("__log",array("action","tbl","itemid","logstamp"),
-            array(1,  $type, $id, $time));
-            $item->__info["opened"] = $time;
-            //echo "\n opening item on: $time ";
+            $insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
+            array(1,  $type, $id));
+            $item->__info["opened"] = $insertid;
         }
         if ($event=="update") {
-            $oldstamp = $item->__info["opened"];
-            //echo "\n this item was opened on: $oldstamp ";
-            $sql = "SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND logstamp >= $oldstamp ";
-
-            //echo "\n".$sql;
-            $r = $this->writer->getLoggedChanges($type,$id,$oldstamp);
-            if ($r) throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)");
-            //$sql = "INSERT INTO __log (id,action,tbl,itemid,logstamp) VALUES (NULL, 2, \"$type\", $id, $time ) ";
-            $this->writer->insertRecord("__log",array("action","tbl","itemid","logstamp"),
-            array(2,  $type, $id, $time));
-            //echo "\n".$sql;
-            //$db->exec( $sql );
-            $item->__info["opened"] = $time;
-            //echo "\n updating opened time item to: $time ";
-
-            
+            $oldid = $item->__info["opened"];
+            $r = $this->writer->getLoggedChanges($type,$id, $oldid);
+            if ($r) { throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)"); }
+            $newid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
+            array(2,  $type, $id));
+            $item->__info["opened"] = $newid;
         }
     }
 }

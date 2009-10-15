@@ -9,10 +9,9 @@
 interface RedBean_Observer {
 	
 	/**
-	 * Handles the event send by a RedBean Observable
-	 * @param string $eventname
-	 * @param RedBean_Observable $observable
-	 * @return unknown_type
+	 *
+	 * @param <type> $eventname
+	 * @param RedBean_OODBBean $bean
 	 */
-	public function onEvent( $eventname, $info );
+	public function onEvent( $eventname, $bean );
 }

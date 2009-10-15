@@ -62,6 +62,7 @@ require("RedBean/OODBBean.php");
 require("RedBean/Observable.php");
 require("RedBean/Observer.php");
 require("RedBean/DBAdapter.php");
+
 require("RedBean/QueryWriter.php");
 require("RedBean/QueryWriter/MySQL.php");
 require("RedBean/ChangeLogger.php");
@@ -69,6 +70,8 @@ require("RedBean/Exception.php");
 require("RedBean/Exception/Security.php");
 require("RedBean/Exception/FailedAccessBean.php");
 require("RedBean/OODB.php");
+require("RedBean/ToolBox.php");
+require("RedBean/Association.php");
 
 //Observable Mock Object
 class ObservableMock extends RedBean_Observable {
@@ -80,7 +83,7 @@ class ObservableMock extends RedBean_Observable {
 class ObserverMock implements RedBean_Observer {
     public $event = false;
     public $info = false;
-    public function onEvent($event,$info) {
+    public function onEvent($event, $info) {
         $this->event = $event;
         $this->info = $info;
     }
@@ -90,9 +93,12 @@ class ObserverMock implements RedBean_Observer {
 $pdo = new Redbean_Driver_PDO( "mysql:host=localhost;dbname=oodb","root","" );
 $pdo->setDebugMode(0);
 $pdo->Execute("DROP TABLE IF EXISTS page");
+$pdo->Execute("DROP TABLE IF EXISTS user");
+$pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS association");
 $adapter = new RedBean_DBAdapter( $pdo );
-$redbean = new RedBean_OODB( new RedBean_QueryWriter_MySQL( $adapter ) );
+$writer = new RedBean_QueryWriter_MySQL( $adapter );
+$redbean = new RedBean_OODB( $writer );
 //add concurrency shield
 $redbean->addEventListener( "open", new RedBean_ChangeLogger( new RedBean_QueryWriter_MySQL( $adapter ) ));
 $redbean->addEventListener( "update", new RedBean_ChangeLogger( new RedBean_QueryWriter_MySQL( $adapter ) ));
@@ -214,6 +220,25 @@ asrt($observer->info,"testsignal1");
 $observable->test("event3", "testsignal3");
 asrt($observer->event,"event3");
 asrt($observer->info,"testsignal3");
+
+
+testpack("Test Association");
+$user = $redbean->dispense("user");
+$user->name = "John";
+$redbean->store( $user );
+$page = $redbean->dispense("page");
+$page->name = "John's page";
+$redbean->store($page);
+$page2 = $redbean->dispense("page");
+$page2->name = "John's second page";
+$redbean->store($page2);
+$a = new RedBean_Association( new RedBean_ToolBox( $redbean, $adapter, $writer ) );
+$a->associate($page, $user);
+asrt(count($a->related($user, "page" )),1);
+$a->associate($user,$page2);
+asrt(count($a->related($user, "page" )),2);
+$a->unassociate($page, $user);
+asrt(count($a->related($user, "page" )),1);
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

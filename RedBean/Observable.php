@@ -7,7 +7,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_Observable {
+abstract class RedBean_Observable {
 	/**
 	 * 
 	 * @var array
@@ -34,7 +34,7 @@ class RedBean_Observable {
 	 * @param $eventname
 	 * @return unknown_type
 	 */
-	public function signal( $eventname, $info ) {
+		public function signal( $eventname, $info ) {
 		
 		if (!isset($this->observers[ $eventname ])) {
 			$this->observers[ $eventname ] = array();

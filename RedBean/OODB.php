@@ -104,8 +104,6 @@ class RedBean_OODB extends RedBean_Observable {
         $this->signal( "update", $bean );
         $this->check($bean);
 
-       
-
         //what table does it want
         $table = $this->writer->escape($bean->__info["type"]);
 
@@ -191,6 +189,9 @@ class RedBean_OODB extends RedBean_Observable {
 
 
     }
+
+    
+
 
     public function trash( $bean ) {
         $this->check( $bean );

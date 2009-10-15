@@ -2,12 +2,18 @@
 /**
  * RedBean MySQLWriter
  * @package 		RedBean/QueryWriter/MySQL.php
- * @description		Writes Queries for MySQL Databases
+ * @description		Represents a MySQL Database to RedBean
+ *					To write a driver for a different database for RedBean
+ *					you should only have to change this file.
  * @author			Gabor de Mooij
  * @license			BSD
  */
 class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 
+	/**
+	 * @var array
+	 * Supported Column Types
+	 */
     public $typeno_sqltype = array(
     " TINYINT(3) UNSIGNED ",
     " INT(11) UNSIGNED ",
@@ -16,6 +22,13 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
     " TEXT ",
     " LONGTEXT "
     );
+
+	/**
+	 *
+	 * @var array
+	 * Supported Column Types and their
+	 * constants (magic numbers)
+	 */
     public $sqltype_typeno = array(
     "tinyint(3) unsigned"=>0,
     "int(11) unsigned"=>1,
@@ -26,15 +39,25 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
     );
 
     /**
-     * @var array all dtype types
+     * @var array
+	 * DTYPES code names of the supported types,
+	 * these are used for the column names
      */
     public $dtypes = array(
     "tintyintus","intus","ints","varchar255","text","ltext"
     );
 
-
+    /**
+     *
+     * @var RedBean_DBAdapter
+     */
     private $adapter;
 
+    /**
+     * Constructor
+     * The Query Writer Constructor also sets up the database
+     * @param RedBean_DBAdapter $adapter
+     */
     public function __construct( RedBean_DBAdapter $adapter ) {
         $this->adapter = $adapter;
         $this->adapter->exec("
@@ -47,101 +70,16 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 				  `text` text NOT NULL,
 				  PRIMARY KEY  (`id`)
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-				");
-
-          $this->adapter->exec("
-                          CREATE TABLE IF NOT EXISTS `__log` (
+		");
+		$this->adapter->exec("
+                        CREATE TABLE IF NOT EXISTS `__log` (
                         `id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
                         `tbl` VARCHAR( 255 ) NOT NULL ,
                         `action` TINYINT( 2 ) NOT NULL ,
-                        `itemid` INT( 11 ) NOT NULL ,
-                        `logstamp` BIGINT( 20 ) unsigned NOT NULL
+                        `itemid` INT( 11 ) NOT NULL 
                         ) ENGINE = MYISAM ;
-
-                    ");
+        ");
     }
-
-
-
-
-    /**
-     *
-     * @param $options
-     * @return string $query
-     */
-    private function getQueryWiden( $options ) {
-        extract($options);
-        return "ALTER TABLE `$table` CHANGE `$column` `$column` $newtype ";
-    }
-
-    /**
-     *
-     * @param $options
-     * @return string $query
-     */
-    private function getQueryAddColumn( $options ) {
-        extract($options);
-        return "ALTER TABLE `$table` ADD `$column` $type ";
-    }
-
-    /**
-     *
-     * @param $options
-     * @return string $query
-     */
-    private function getQueryUpdate( $options ) {
-        extract($options);
-        $update = array();
-        foreach($updatevalues as $u) {
-            $update[] = " `".$u["property"]."` = \"".$u["value"]."\" ";
-        }
-        return "UPDATE `$table` SET ".implode(",",$update)." WHERE id = ".$id;
-    }
-
-    /**
-     *
-     * @param $options
-     * @return string $query
-     */
-    private function getQueryInsert( $options ) {
-
-        extract($options);
-
-        foreach($insertcolumns as $k=>$v) {
-            $insertcolumns[$k] = "`".$v."`";
-        }
-
-        foreach($insertvalues as $k=>$v) {
-            $insertvalues[$k] = "\"".$v."\"";
-        }
-
-        $insertSQL = "INSERT INTO `$table`
-					  ( id, ".implode(",",$insertcolumns)." ) 
-					  VALUES( null, ".implode(",",$insertvalues)." ) ";
-        return $insertSQL;
-    }
-
-    /**
-     *
-     * @param $options
-     * @return string $query
-     */
-    private function getQueryCreate( $options ) {
-        extract($options);
-        return "INSERT INTO `$table` (id) VALUES(null) ";
-    }
-
-
-    /**
-     *
-     * @return string $query
-     */
-    private function getQueryResetDTYP() {
-        return "truncate table dtyp";
-    }
-
-
-
 
 
     /**
@@ -149,6 +87,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      * @param array $options
      * @param string $sql_type
      * @return string $sql
+	 * @todo: way to complex, eliminate!
      */
     private function getBasicQuery( $options, $sql_type="SELECT" ) {
         extract($options);
@@ -178,51 +117,13 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 
 
 
-
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/QueryWriter#getQuery()
-     */
-    private function getQuery( $queryname, $params=array() ) {
-    //echo "<br><b style='color:yellow'>$queryname</b>";
-        switch($queryname) {
-            case "create_table":
-                return $this->getQueryCreateTable($params);
-                break;
-            case "widen_column":
-                return $this->getQueryWiden($params);
-                break;
-            case "add_column":
-                return $this->getQueryAddColumn($params);
-                break;
-            case "update":
-                return $this->getQueryUpdate($params);
-                break;
-            case "insert":
-                return $this->getQueryInsert($params);
-                break;
-            case "create":
-                return $this->getQueryCreate($params);
-                break;
-            case "readtype":
-                return $this->getBasicQuery(
-                array("fields"=>array("tinyintus","intus","ints","varchar255","text"),
-                "table" =>"dtyp",
-                "where"=>array("id"=>$params["id"])));
-                break;
-            case "reset_dtyp":
-                return $this->getQueryResetDTYP();
-                break;
-            case "get_bean":
-                return $this->getBasicQuery(array("field"=>"*","table"=>$params["type"],"where"=>array("id"=>$params["id"])));
-                break;
-            default:
-                throw new Exception("QueryWriter has no support for Query:".$queryname);
-        }
-    }
-
     /**
      * Escapes a value using database specific escaping rules
+	 * This is actually a pretty dumb function, it just plumbs the
+	 * request to the driver. However there can be a difference between
+	 * what the driver thinks is a useful escape and what the MySQL query writer
+	 * thinks is the best way to escape. In our case, we simply agree with the
+	 * driver.
      * @param string $value
      * @return string $escapedValue
      */
@@ -238,7 +139,10 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
         return $this->adapter->getCol( "show tables" );
     }
 
-
+	/**
+	 * Creates an empty, column-less table for a bean.
+	 * @param <string> $table
+	 */
     public function createTable( $table ) {
 
         $sql = "
@@ -251,37 +155,36 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 
     }
 
+	/**
+	 * Returns an array containing the column names of the specified table.
+	 * @param string $table
+	 * @return array $columns
+	 */
     public function getColumns( $table ) {
-
         $columnsRaw = $this->adapter->get("DESCRIBE `$table`");
-
         foreach($columnsRaw as $r) {
             $columns[$r["Field"]]=$r["Type"];
         }
-
         return $columns;
-
     }
 
-    public function scanType( $value ) {
-
-        $this->adapter->exec( $this->getQuery("reset_dtyp") );
-
-      
-
+	/**
+	 * Returns the MySQL Column Type Code (integer) that corresponds
+	 * to the given value type.
+	 * @param string $value
+	 * @return integer $type 
+	 */
+	public function scanType( $value ) {
+        $this->adapter->exec( "truncate table dtyp" );
         $v = "\"".$value."\"";
         $checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v )";
-
-
         $this->adapter->exec( $checktypeSQL );
         $id = $this->adapter->getInsertID();
-
-        $readtypeSQL = $this->getQuery("readtype",array(
-            "id"=>$id
-        ));
-
+        $readtypeSQL = $this->getBasicQuery(
+            array("fields"=>array("tinyintus","intus","ints","varchar255","text"),
+            "table" =>"dtyp",
+            "where"=>array("id"=>$id)));
         $row = $this->adapter->getRow($readtypeSQL);;
-
         $tp = 0;
         foreach($row as $t=>$tv) {
             if (strval($tv) === strval($value)) {
@@ -292,54 +195,74 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
         return $tp;
     }
 
+	/**
+	 * Adds a column of a given type to a table
+	 * @param string $table
+	 * @param string $column
+	 * @param integer $type
+	 */
     public function addColumn( $table, $column, $type ) {
-
-        $sql = $this->getQuery("add_column",array(
-            "table"=>$table,
-            "column"=>$column,
-            "type"=> $this->typeno_sqltype[$type]
-        ));
-
+        $type=$this->typeno_sqltype[$type];
+        $sql = "ALTER TABLE `$table` ADD `$column` $type ";
         $this->adapter->exec( $sql );
-
     }
 
+	/**
+	 * Returns the Type Code for a Column Description
+	 * @param string $typedescription
+	 * @return integer $typecode
+	 */
     public function code( $typedescription ) {
-        return $this->sqltype_typeno[$typedescription];
+        return ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : -1);
     }
 
-
+	/**
+	 * Change (Widen) the column to the give type.
+	 * @param string $table
+	 * @param string $column
+	 * @param integer $type
+	 */
     public function widenColumn( $table, $column, $type ) {
-
-        $changecolumnSQL = $this->getQuery( "widen_column", array(
-            "table" => $table,
-            "column" => $column,
-            "newtype" => $this->typeno_sqltype[$type]
-            ) );
+        $newtype = $this->typeno_sqltype[$type];
+        $changecolumnSQL = "ALTER TABLE `$table` CHANGE `$column` `$column` $newtype ";
         $this->adapter->exec( $changecolumnSQL );
-
     }
 
+	/**
+	 * Update a record using a series of update values.
+	 * @param string $table
+	 * @param array $updatevalues
+	 * @param integer $id
+	 */
     public function updateRecord( $table, $updatevalues, $id) {
-
-        $updateSQL = $this->getQuery("update", array(
-            "table"=>$table,
-            "updatevalues"=>$updatevalues,
-            "id"=>$id
-        ));
-
+        $update = array();
+        foreach($updatevalues as $u) {
+            $update[] = " `".$u["property"]."` = \"".$u["value"]."\" ";
+        }
+        $updateSQL = "UPDATE `$table` SET ".implode(",",$update)." WHERE id = ".$id;
         $this->adapter->exec( $updateSQL );
     }
 
+	/**
+	 * Inserts a record into the database using a series of insert columns
+	 * and corresponding insertvalues. Returns the insert id.
+	 * @param string $table
+	 * @param array $insertcolumns
+	 * @param array $insertvalues
+	 * @return integer $insertid
+	 */
     public function insertRecord( $table, $insertcolumns, $insertvalues ) {
-
         if (count($insertvalues)>0) {
+            foreach($insertcolumns as $k=>$v) {
+                $insertcolumns[$k] = "`".$v."`";
+            }
+            foreach($insertvalues as $k=>$v) {
+                $insertvalues[$k] = "\"".$v."\"";
+            }
+            $insertSQL = "INSERT INTO `$table`
+					  ( id, ".implode(",",$insertcolumns)." )
+					  VALUES( null, ".implode(",",$insertvalues)." ) ";
 
-            $insertSQL = $this->getQuery("insert",array(
-                "table"=>$table,
-                "insertcolumns"=>$insertcolumns,
-                "insertvalues"=>$insertvalues
-            ));
             $this->adapter->exec( $insertSQL );
             return $this->adapter->getInsertID();
         }
@@ -349,14 +272,14 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
         }
     }
 
-
+	/**
+	 * Selects a record based on type and id.
+	 * @param string $type
+	 * @param integer $id
+	 * @return array $row
+	 */
     public function selectRecord($type, $id) {
-        $getSQL = $this->getQuery("get_bean",array(
-            "type"=>$type,
-            "id"=>$id
-        ));
-        $row = $this->adapter->getRow( $getSQL );
-
+        $row = $this->adapter->getRow( "SELECT * FROM `$type` WHERE id = ".intval($id) );
         if ($row && is_array($row) && count($row)>0) {
             return $row;
         }
@@ -365,33 +288,65 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
         }
     }
 
+	/**
+	 * Deletes a record based on a table, column, value and operator
+	 * @param string $table
+	 * @param string $column
+	 * @param mixed $value
+	 * @param string $oper
+	 * @todo validate arguments for security
+	 */
     public function deleteRecord( $table, $column, $value, $oper="=" ) {
         $this->adapter->exec("DELETE FROM `$table` WHERE `$column` $oper \"$value\" ");
     }
 
 
-    public function getLoggedChanges($type, $id, $oldstamp) {
+	/**
+	 * Gets information about changed records using a type and id and a logid.
+	 * RedBean Locking shields you from race conditions by comparing the latest
+	 * cached insert id with a the highest insert id associated with a write action
+	 * on the same table. If there is any id between these two the record has
+	 * been changed and RedBean will throw an exception.
+	 * @param  string $type
+	 * @param  integer $id
+	 * @param  integer $logid
+	 * @return integer $numberOfIntermediateChanges
+	 */
+    public function getLoggedChanges($type, $id, $logid) {
         return $this->adapter->getCell("
-        SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND logstamp >= $oldstamp");
+        SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id >= $logid");
+
     }
 
+	/**
+	 * Adds a Unique index constrain to the table.
+	 * @param string $table
+	 * @param string $col1
+	 * @param string $col2
+	 * @return void
+	 */
     public function addUniqueIndex( $table,$col1,$col2 ) {
-
         $r = $this->adapter->get("SHOW INDEX FROM $table");
         $name = "UQ_".$col1."_".$col2;
-
         if ($r) {
             foreach($r as $i) {
-                if ($i["Key_name"]==$name){
+                if ($i["Key_name"]==$name) {
                     return;
                 }
             }
         }
-
         $sql = "ALTER IGNORE TABLE `$table`
                 ADD UNIQUE INDEX `$name` (`$col1`, `$col2`)";
         $this->adapter->exec($sql);
     }
 
+	/**
+	 * Just Cleans up the log to prevent it from
+	 * getting really big.
+	 */
+    public function cleanUpLog() {
+        $maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
+        $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
+    }
 
 }
