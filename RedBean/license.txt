@@ -1,9 +1,4 @@
 
-//BRNRDPROJECT-REDBEAN - SOURCE CODE
-
-/**
-
---- welcome to
 
                    .______.                         
 _______   ____   __| _/\_ |__   ____ _____    ____  
@@ -14,39 +9,10 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
 
 
-|RedBean Database Objects -
-|Written by Gabor de Mooij (c) copyright 2009
+RedBean Database Objects -
+Written by Gabor de Mooij (c) copyright 2009
 
-
-|List of Contributors:
-|Sean Hess 
-|Alan Hogan
-|Desfrenes
-|Xwisdom
-
-======================================================
-|						       RedBean is Licensed BSD
-------------------------------------------------------
-|RedBean is a OOP Database Simulation Middleware layer
-|for php.
-------------------------------------------------------
-|Loosely based on an idea by Erik Roelofs - thanks man
-
-VERSION 0.6
-
-======================================================
-Official GIT HUB:
-git://github.com/buurtnerd/redbean.git
-http://github.com/buurtnerd/redbean/tree/master
-======================================================
-
-
-
-Copyright (c) 2009, G.J.G.T (Gabor) de Mooij
-All rights reserved.
-
-a Buurtnerd project
-
+RedBean is Licensed BSD
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -63,12 +29,6 @@ All advertising materials mentioning features or use of this software
 are encouraged to display the following acknowledgement:
 This product is powered by RedBean written by Gabor de Mooij (http://www.redbeanphp.com)
 
-
-----
-
-
-
-
 THIS SOFTWARE IS PROVIDED BY GABOR DE MOOIJ ''AS IS'' AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -80,9 +40,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-
 WARNING
 THIS IS AN PRE-BETA VERSION, DONT USE THIS CODE ON PRODUCTION SERVERS
 
-*/

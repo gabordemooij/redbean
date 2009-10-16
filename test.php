@@ -54,24 +54,10 @@ function testpack($name) {
 	printtext("testing: ".$name);
 }
 
-//Use this database for tests
-require("RedBean/Driver.php");
-require("RedBean/Driver/PDO.php");
 
-require("RedBean/OODBBean.php");
-require("RedBean/Observable.php");
-require("RedBean/Observer.php");
-require("RedBean/DBAdapter.php");
+require("RedBean/redbean.inc.php");
+$toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
 
-require("RedBean/QueryWriter.php");
-require("RedBean/QueryWriter/MySQL.php");
-require("RedBean/ChangeLogger.php");
-require("RedBean/Exception.php");
-require("RedBean/Exception/Security.php");
-require("RedBean/Exception/FailedAccessBean.php");
-require("RedBean/OODB.php");
-require("RedBean/ToolBox.php");
-require("RedBean/Association.php");
 
 //Observable Mock Object
 class ObservableMock extends RedBean_Observable {
@@ -89,19 +75,15 @@ class ObserverMock implements RedBean_Observer {
     }
 }
 
-
-$pdo = new Redbean_Driver_PDO( "mysql:host=localhost;dbname=oodb","root","" );
+$adapter = $toolbox->getDatabaseAdapter();
+$writer  = $toolbox->getWriter();
+$redbean = $toolbox->getRedBean();
+$pdo = $adapter->getDatabase();
 $pdo->setDebugMode(0);
 $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS association");
-$adapter = new RedBean_DBAdapter( $pdo );
-$writer = new RedBean_QueryWriter_MySQL( $adapter );
-$redbean = new RedBean_OODB( $writer );
-//add concurrency shield
-$redbean->addEventListener( "open", new RedBean_ChangeLogger( new RedBean_QueryWriter_MySQL( $adapter ) ));
-$redbean->addEventListener( "update", new RedBean_ChangeLogger( new RedBean_QueryWriter_MySQL( $adapter ) ));
 $page = $redbean->dispense("page");
 
 
@@ -194,7 +176,7 @@ asrt((int)$batch[$id2]->id,$id2);
 
 
 //test locking
-testpack("Test Locking");
+testpack("Test RedBean Locking: Change Logger method ");
 $page = $redbean->dispense("page");
 $page->name = "a page";
 $id = $redbean->store( $page );
@@ -206,7 +188,7 @@ try{ $redbean->store( $page ); pass(); }catch(Exception $e){ fail(); }
 try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
 
 //Test observer
-testpack("Test Observers");
+testpack("Test Observer Mechanism ");
 $observable = new ObservableMock();
 $observer = new ObserverMock();
 $observable->addEventListener("event1",$observer);
@@ -222,7 +204,7 @@ asrt($observer->event,"event3");
 asrt($observer->info,"testsignal3");
 
 
-testpack("Test Association");
+testpack("Test Association ");
 $user = $redbean->dispense("user");
 $user->name = "John";
 $redbean->store( $user );
@@ -232,16 +214,32 @@ $redbean->store($page);
 $page2 = $redbean->dispense("page");
 $page2->name = "John's second page";
 $redbean->store($page2);
-$a = new RedBean_Association( new RedBean_ToolBox( $redbean, $adapter, $writer ) );
+$a = new RedBean_AssociationManager( $toolbox );
 $a->associate($page, $user);
 asrt(count($a->related($user, "page" )),1);
 $a->associate($user,$page2);
 asrt(count($a->related($user, "page" )),2);
 $a->unassociate($page, $user);
 asrt(count($a->related($user, "page" )),1);
+$a->clearRelations($user, "page");
+asrt(count($a->related($user, "page" )),0);
+$user2 = $redbean->dispense("user");
+$user2->name = "Second User";
+$a->set1toNAssoc($user2, $page);
+$a->set1toNAssoc($user, $page);
+asrt(count($a->related($user2, "page" )),0);
+asrt(count($a->related($user, "page" )),1);
+$a->set1toNAssoc($user, $page2);
+asrt(count($a->related($user, "page" )),2);
+$pages = ($redbean->batch("page", $a->related($user, "page" )));
+asrt(count($pages),2);
+$apage = array_shift($pages);
+asrt(($apage->name=="John's page" || $apage->name=="John's second page"),true);
+$apage = array_shift($pages);
+asrt(($apage->name=="John's page" || $apage->name=="John's second page"),true);
 
 
-testpack("Test Frozen");
+testpack("Test Frozen ");
 $redbean->freeze( true );
 $page = $redbean->dispense("page");
 $page->sections = 10;
@@ -249,19 +247,22 @@ $page->name = "half a page";
 $id = $redbean->store($page);
 asrt($id,0);
 $page = $redbean->load("page", $id);
+$redbean->freeze( false );
 asrt($page,NULL);
 
-testpack("Test Tree");
-$redbean->freeze( false );
-$page = $redbean->dispense("page");
-$page->name="nested pages";
-$page->user = $redbean->dispense("user");
-$page->user->name = "Mark";
-$page->page = $redbean->dispense("page");
-$page->page->name = "another page";
-$id = $redbean->store($page);
-$page = $redbean->load("page", $id);
-asrt( $page->name, "nested pages" );
-asrt( $redbean->bean($page,"user")->name, "Mark" );
+testpack("Test Developer Interface API");
+$post = $redbean->dispense("post");
+$post->title = "My First Post";
+$post->created = time();
+$id = $redbean->store( $post );
+$post = $redbean->load("post",$id);
+$redbean->trash( $post );
+
+
+testpack("Test Finding");
+$keys = $adapter->getCol("SELECT id FROM page WHERE `name` LIKE '%John%'");
+asrt(count($keys),2);
+$pages = $redbean->batch("page", $keys);
+asrt(count($pages),2);
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

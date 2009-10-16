@@ -31,20 +31,18 @@ class RedBean_ToolBox {
 	 */
     private $adapter;
 
-
 	/**
 	 * Constructor
 	 * @param RedBean_OODB $oodb
 	 * @param RedBean_DBAdapter $adapter
 	 * @param RedBean_QueryWriter $writer
+	 * return RedBean_ToolBox $toolbox
 	 */
     public function __construct( RedBean_OODB $oodb, RedBean_DBAdapter $adapter, RedBean_QueryWriter $writer ) {
-
         $this->oodb = $oodb;
         $this->adapter = $adapter;
         $this->writer = $writer;
-
-
+		return $this;
     }
 
 	/**

@@ -85,20 +85,7 @@ class RedBean_OODB extends RedBean_Observable {
             }
         }
     }
-	/**
-	 * Stores nested beans
-	 * @param RedBean_OODBBean $bean
-	 */
-	private function storeNested(RedBean_OODBBean $bean) {
-		foreach($bean as $property=>$value) {
-			if ($property!="__info") {
-				if ($value instanceOf RedBean_OODBBean) {
-					$bean->$property = $this->store($value);
-				}
-				if (is_array($value)) throw new RedBean_Exception_Security("Arrays not allowed: $property ");
-			}
-		}
-	}
+	
 	/**
 	 * Stores a Bean in the database. If the bean contains other beans,
 	 * these will get stored as well.
@@ -106,15 +93,14 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return integer $newid
 	 */
     public function store( RedBean_OODBBean $bean ) {
-		$this->storeNested( $bean );
-        $this->signal( "update", $bean );
+		$this->signal( "update", $bean );
         $this->check($bean);
         //what table does it want
         $table = $this->writer->escape($bean->__info["type"]);
 	        //does this table exist?
             $tables = $this->writer->getTables();
             //If not, create
-            if (!in_array($table, $tables)) {
+            if (!$this->isFrozen && !in_array($table, $tables)) {
                 $this->writer->createTable( $table );
             }
             $columns = $this->writer->getColumns($table) ;
@@ -147,7 +133,7 @@ class RedBean_OODB extends RedBean_Observable {
                     $updatevalues[] = array( "property"=>$p, "value"=>$v );
                 }
             }
-            if (isset($bean->__info["unique"])) {
+            if (!$this->isFrozen && isset($bean->__info["unique"])) {
                     $this->writer->addUniqueIndex( $table, $bean->__info["unique"][0],$bean->__info["unique"][1] );
              }
             if ($bean->id) {
@@ -184,6 +170,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean
 	 */
     public function trash( $bean ) {
+		$this->signal( "delete", $bean );
         $this->check( $bean );
         $this->writer->deleteRecord( $bean->__info["type"], "id",$bean->id );
     }
@@ -200,22 +187,7 @@ class RedBean_OODB extends RedBean_Observable {
         }
         return $collection;
     }
-	/**
-	 * Extracts a nested bean
-	 * @param RedBean_OODBBean $bean
-	 * @param string $property
-	 * @param string $type (optional)
-	 * @return RedBean_OODBBean $bean
-	 */
-	public function bean( RedBean_OODBBean $bean, $property, $type=false ) {
-		if (!$type) $type=$property;
-		if (isset($bean->$property)) {
-			return $this->load( $type, (int) $bean->$property );
-		}
-		else {
-			return null;
-		}
-	}
+	
 }
 
 

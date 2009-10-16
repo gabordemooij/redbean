@@ -264,11 +264,11 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 					  VALUES( null, ".implode(",",$insertvalues)." ) ";
 
             $this->adapter->exec( $insertSQL );
-            return $this->adapter->getInsertID();
+		    return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
         else {
             $this->adapter->exec( $this->getQuery("create", array("table"=>$table)));
-            return $this->adapter->getInsertID();
+              return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
     }
 
