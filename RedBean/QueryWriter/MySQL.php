@@ -284,7 +284,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
             return $row;
         }
         else {
-            throw RedBean_Exception_Security("Could not find bean");
+            return null;
         }
     }
 
@@ -306,17 +306,33 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * RedBean Locking shields you from race conditions by comparing the latest
 	 * cached insert id with a the highest insert id associated with a write action
 	 * on the same table. If there is any id between these two the record has
-	 * been changed and RedBean will throw an exception.
+	 * been changed and RedBean will throw an exception. This function checks for changes.
+	 * If changes have occurred it will throw an exception. If no changes have occurred
+	 * it will insert a new change record and return the new change id.
+	 * This method locks the log table exclusively.
 	 * @param  string $type
 	 * @param  integer $id
 	 * @param  integer $logid
-	 * @return integer $numberOfIntermediateChanges
+	 * @return integer $newchangeid
 	 */
-    public function getLoggedChanges($type, $id, $logid) {
-        return $this->adapter->getCell("
+    public function checkChanges($type, $id, $logid) {
+
+		$this->adapter->exec("LOCK TABLES __log WRITE");
+		$num = $this->adapter->getCell("
         SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id >= $logid");
 
-    }
+        if ($num) {
+			$this->adapter->exec("UNLOCK TABLES");
+			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)"); 
+		}
+        
+		$newid = $this->insertRecord("__log",array("action","tbl","itemid"),
+            array(2,  $type, $id));
+
+		$this->adapter->exec("UNLOCK TABLES");
+		return $newid;
+	
+	}
 
 	/**
 	 * Adds a Unique index constrain to the table.

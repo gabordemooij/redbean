@@ -241,4 +241,27 @@ $a->unassociate($page, $user);
 asrt(count($a->related($user, "page" )),1);
 
 
+testpack("Test Frozen");
+$redbean->freeze( true );
+$page = $redbean->dispense("page");
+$page->sections = 10;
+$page->name = "half a page";
+$id = $redbean->store($page);
+asrt($id,0);
+$page = $redbean->load("page", $id);
+asrt($page,NULL);
+
+testpack("Test Tree");
+$redbean->freeze( false );
+$page = $redbean->dispense("page");
+$page->name="nested pages";
+$page->user = $redbean->dispense("user");
+$page->user->name = "Mark";
+$page->page = $redbean->dispense("page");
+$page->page->name = "another page";
+$id = $redbean->store($page);
+$page = $redbean->load("page", $id);
+asrt( $page->name, "nested pages" );
+asrt( $redbean->bean($page,"user")->name, "Mark" );
+
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

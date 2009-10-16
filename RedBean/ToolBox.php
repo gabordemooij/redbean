@@ -13,11 +13,31 @@
  */
 class RedBean_ToolBox {
 
+	/**
+	 *
+	 * @var RedBean_OODB
+	 */
     private $oodb;
+
+	/**
+	 *
+	 * @var RedBean_QueryWriter
+	 */
     private $writer;
+
+	/**
+	 *
+	 * @var RedBean_DBAdapter
+	 */
     private $adapter;
 
 
+	/**
+	 * Constructor
+	 * @param RedBean_OODB $oodb
+	 * @param RedBean_DBAdapter $adapter
+	 * @param RedBean_QueryWriter $writer
+	 */
     public function __construct( RedBean_OODB $oodb, RedBean_DBAdapter $adapter, RedBean_QueryWriter $writer ) {
 
         $this->oodb = $oodb;
@@ -27,14 +47,26 @@ class RedBean_ToolBox {
 
     }
 
+	/**
+	 * Returns the QueryWriter
+	 * @return RedBean_QueryWriter $writer
+	 */
     public function getWriter() {
         return $this->writer;
     }
 
+	/**
+	 * Retruns the RedBean OODB Core object
+	 * @return RedBean_OODB $oodb
+	 */
     public function getRedBean() {
         return $this->oodb;
     }
 
+	/**
+	 * Returns the adapter
+	 * @return RedBean_DBAdapter $adapter
+	 */
     public function getDatabaseAdapter() {
         return $this->adapter;
     }

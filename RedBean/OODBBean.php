@@ -7,5 +7,6 @@
  * @license			BSD
  */
 class RedBean_OODBBean {
+	
 }
 
