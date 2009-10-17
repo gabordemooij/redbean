@@ -45,9 +45,11 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
      * @return RedBean_OODBBean $bean
      */
     public function dispense($type ) {
+		
         $bean = new RedBean_OODBBean();
         $bean->__info = array( "type"=>$type );
         $bean->id = 0;
+		$this->signal( "dispense", $bean );
         $this->check( $bean );
         return $bean;
     }
