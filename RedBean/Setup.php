@@ -19,7 +19,7 @@ class RedBean_Setup {
 		 */
         public static function kickstart( $dsn, $username, $password ) {
 
-            $pdo = new Redbean_Driver_PDO( "mysql:host=localhost;dbname=oodb","root","" );
+            $pdo = new Redbean_Driver_PDO( $dsn,$username,$password );
             $adapter = new RedBean_DBAdapter( $pdo );
             $writer = new RedBean_QueryWriter_MySQL( $adapter );
             $redbean = new RedBean_OODB( $writer );
@@ -41,7 +41,7 @@ class RedBean_Setup {
 		 * @param  string $password
 		 * @return RedBean_ToolBox $toolbox
 		 */
-		public static function kickstartDev( $dsn, $username, $password ) {
+		public static function kickstartDev( $dsn, $username="root", $password="" ) {
 			$toolbox = self::kickstart($dsn, $username, $password);
 			return $toolbox;
 		}
@@ -64,9 +64,9 @@ class RedBean_Setup {
 		 * @param  string $password
 		 * @return RedBean_ToolBox $toolbox
 		 */
-		public static function kickstartDebug( $dsn, $username, $password ) {
+		public static function kickstartDebug( $dsn, $username="root", $password="" ) {
 			$toolbox = self::kickstart($dsn, $username, $password);
-			$toolbox->getDatabaseAdapter()->getDatabase()->setDebug( true );
+			$toolbox->getDatabaseAdapter()->getDatabase()->setDebugMode( true );
 			return $toolbox;
 		}
 

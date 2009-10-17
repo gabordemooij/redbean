@@ -12,7 +12,7 @@
  * object database.
  * 
  */
-class RedBean_OODB extends RedBean_Observable {
+class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
     /**
      *
      * @var RedBean_DBAdapter
@@ -157,19 +157,20 @@ class RedBean_OODB extends RedBean_Observable {
     public function load($type, $id) {
 		$bean = $this->dispense( $type );
         $row =  $this->writer->selectRecord($type,$id);
-		if (!$row) return null;
+		if (!$row) return $this->dispense($type);
         foreach($row as $p=>$v) {
             //populate the bean with the database row
                 $bean->$p = $v;
         }
         $this->signal( "open", $bean );
-        return $bean;
+
+		return $bean;
     }
 	/**
 	 * Deletes a bean from the database
 	 * @param RedBean_OODBBean $bean
 	 */
-    public function trash( $bean ) {
+    public function trash( RedBean_OODBBean $bean ) {
 		$this->signal( "delete", $bean );
         $this->check( $bean );
         $this->writer->deleteRecord( $bean->__info["type"], "id",$bean->id );

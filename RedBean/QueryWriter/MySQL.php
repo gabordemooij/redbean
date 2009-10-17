@@ -267,7 +267,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		    return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
         else {
-            $this->adapter->exec( $this->getQuery("create", array("table"=>$table)));
+            $this->adapter->exec( "INSERT INTO `$table` (id) VALUES(NULL) " );
               return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
     }
@@ -319,7 +319,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 
 		$this->adapter->exec("LOCK TABLES __log WRITE");
 		$num = $this->adapter->getCell("
-        SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id >= $logid");
+        SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id > $logid");
 
         if ($num) {
 			$this->adapter->exec("UNLOCK TABLES");

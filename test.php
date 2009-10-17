@@ -87,6 +87,20 @@ $pdo->Execute("DROP TABLE IF EXISTS association");
 $page = $redbean->dispense("page");
 
 
+testpack("Test RedBean OODBBean: import");
+$bean = new RedBean_OODBBean;
+$bean->import(array("a"=>1,"b"=>2));
+asrt($bean->a, 1);
+asrt($bean->b, 2);
+
+testpack("Test RedBean OODBBean: export");
+$arr = $bean->export();
+asrt(is_array($arr),true);
+asrt(isset($arr["a"]),true);
+asrt(isset($arr["b"]),true);
+asrt($arr["a"],1);
+asrt($arr["b"],2);
+
 
 testpack("Test RedBean OODB: Dispense");
 asrt(isset($page->__info),true);
@@ -100,6 +114,7 @@ try{ $redbean->dispense("-"); fail(); }catch(RedBean_Exception_Security $e){ pas
 testpack("Test RedBean OODB: Insert Record");
 $page->name = "my page";
 $id = (int) $redbean->store($page);
+asrt( $page->id, 1 );
 asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 1 );
 asrt( $pdo->GetCell("SELECT `name` FROM page LIMIT 1"), "my page" );
 asrt( $id, 1 );
@@ -248,7 +263,7 @@ $id = $redbean->store($page);
 asrt($id,0);
 $page = $redbean->load("page", $id);
 $redbean->freeze( false );
-asrt($page,NULL);
+asrt($page->id,0);
 
 testpack("Test Developer Interface API");
 $post = $redbean->dispense("post");
@@ -257,6 +272,7 @@ $post->created = time();
 $id = $redbean->store( $post );
 $post = $redbean->load("post",$id);
 $redbean->trash( $post );
+pass();
 
 
 testpack("Test Finding");

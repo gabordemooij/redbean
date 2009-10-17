@@ -37,13 +37,11 @@ class RedBean_ChangeLogger implements RedBean_Observer {
             $insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
             array(1,  $type, $id));
             $item->__info["opened"] = $insertid;
+			//echo "<br>opened: ".print_r($item, 1);
         }
         if ($event=="update") {
-            $oldid = $item->__info["opened"];
+            if (isset($item->__info["opened"])) $oldid = $item->__info["opened"]; else $oldid=0;
             $newid = $this->writer->checkChanges($type,$id, $oldid);
-            //if ($r) { throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)"); }
-            //$newid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
-            //array(2,  $type, $id));
             $item->__info["opened"] = $newid;
         }
     }

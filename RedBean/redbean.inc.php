@@ -13,6 +13,8 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
  */
 
+require("ObjectDatabase.php");
+
 require("Driver.php");
 require("Driver/PDO.php");
 
@@ -30,4 +32,5 @@ require("Exception/FailedAccessBean.php");
 require("OODB.php");
 require("ToolBox.php");
 require("Association.php");
+require("TreeManager.php");
 require("Setup.php");
