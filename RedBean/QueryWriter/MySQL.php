@@ -44,7 +44,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * these are used for the column names
      */
     public $dtypes = array(
-    "tintyintus","intus","ints","varchar255","text","ltext"
+    "tinyintus","intus","ints","varchar255","text","ltext"
     );
 
     /**
@@ -72,64 +72,17 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 		");
 		$this->adapter->exec("
-                        CREATE TABLE IF NOT EXISTS `__log` (
-                        `id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-                        `tbl` VARCHAR( 255 ) NOT NULL ,
-                        `action` TINYINT( 2 ) NOT NULL ,
-                        `itemid` INT( 11 ) NOT NULL 
-                        ) ENGINE = MYISAM ;
-        ");
+				CREATE TABLE IF NOT EXISTS `__log` (
+				`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`tbl` VARCHAR( 255 ) NOT NULL ,
+				`action` TINYINT( 2 ) NOT NULL ,
+				`itemid` INT( 11 ) NOT NULL
+				) ENGINE = MYISAM ;
+        "); //Must be MyISAM! else you run in trouble if you use transactions!
+		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
+        $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
     }
-
-
-    /**
-     * Gets a basic SQL query
-     * @param array $options
-     * @param string $sql_type
-     * @return string $sql
-	 * @todo: way to complex, eliminate!
-     */
-    private function getBasicQuery( $options, $sql_type="SELECT" ) {
-        extract($options);
-        if (isset($fields)) {
-            $sqlfields = array();
-            foreach($fields as $field) {
-                $sqlfields[] = " `$field` ";
-            }
-            $field = implode(",", $fields);
-        }
-        if (!isset($field)) $field="";
-        $sql = "$sql_type ".$field." FROM `$table` ";
-        if (isset($where)) {
-            if (is_array($where)) {
-                $crit = array();
-                foreach($where as $w=>$v) {
-                    $crit[] = " `$w` = \"".$v."\"";
-                }
-                $sql .= " WHERE ".implode(" AND ",$crit);
-            }
-            else {
-                $sql .= " WHERE ".$where;
-            }
-        }
-        return $sql;
-    }
-
-
-
-    /**
-     * Escapes a value using database specific escaping rules
-	 * This is actually a pretty dumb function, it just plumbs the
-	 * request to the driver. However there can be a difference between
-	 * what the driver thinks is a useful escape and what the MySQL query writer
-	 * thinks is the best way to escape. In our case, we simply agree with the
-	 * driver.
-     * @param string $value
-     * @return string $escapedValue
-     */
-    public function escape( $value ) {
-        return $this->adapter->escape( $value );
-    }
+    
 
     /**
      * Returns all tables in the database
@@ -141,10 +94,9 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 
 	/**
 	 * Creates an empty, column-less table for a bean.
-	 * @param <string> $table
+	 * @param string $table
 	 */
     public function createTable( $table ) {
-
         $sql = "
                      CREATE TABLE `$table` (
                     `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -152,7 +104,6 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
                      ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
             ";
         $this->adapter->exec( $sql );
-
     }
 
 	/**
@@ -161,7 +112,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return array $columns
 	 */
     public function getColumns( $table ) {
-		$table = $this->escape($table);
+		$table = $this->adapter->escape($table);
         $columnsRaw = $this->adapter->get("DESCRIBE `$table`");
         foreach($columnsRaw as $r) {
             $columns[$r["Field"]]=$r["Type"];
@@ -181,11 +132,10 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
         $checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v )";
         $this->adapter->exec( $checktypeSQL );
         $id = $this->adapter->getInsertID();
-        $readtypeSQL = $this->getBasicQuery(
-            array("fields"=>array("tinyintus","intus","ints","varchar255","text"),
-            "table" =>"dtyp",
-            "where"=>array("id"=>$id)));
-        $row = $this->adapter->getRow($readtypeSQL);;
+		$types = $this->dtypes;
+		array_pop($types);
+        $readtypeSQL = "SELECT ".implode(",",$types)." FROM dtyp WHERE id = $id ";
+		$row = $this->adapter->getRow($readtypeSQL);;
         $tp = 0;
         foreach($row as $t=>$tv) {
             if (strval($tv) === strval($value)) {
@@ -203,8 +153,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $type
 	 */
     public function addColumn( $table, $column, $type ) {
-		$column = $this->escape($column);
-		$table = $this->escape($table);
+		$column = $this->adapter->escape($column);
+		$table = $this->adapter->escape($table);
         $type=$this->typeno_sqltype[$type];
         $sql = "ALTER TABLE `$table` ADD `$column` $type ";
         $this->adapter->exec( $sql );
@@ -226,8 +176,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $type
 	 */
     public function widenColumn( $table, $column, $type ) {
-        $column = $this->escape($column);
-		$table = $this->escape($table);
+        $column = $this->adapter->escape($column);
+		$table = $this->adapter->escape($table);
 		$newtype = $this->typeno_sqltype[$type];
         $changecolumnSQL = "ALTER TABLE `$table` CHANGE `$column` `$column` $newtype ";
         $this->adapter->exec( $changecolumnSQL );
@@ -242,7 +192,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
     public function updateRecord( $table, $updatevalues, $id) {
         $update = array();
         foreach($updatevalues as $u) {
-            $update[] = " `".$this->escape($u["property"])."` = \"".$this->escape($u["value"])."\" ";
+            $update[] = " `".$this->adapter->escape($u["property"])."` = \"".$this->adapter->escape($u["value"])."\" ";
         }
         $updateSQL = "UPDATE `$table` SET ".implode(",",$update)." WHERE id = ".$id;
         $this->adapter->exec( $updateSQL );
@@ -257,13 +207,13 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return integer $insertid
 	 */
     public function insertRecord( $table, $insertcolumns, $insertvalues ) {
-		$table = $this->escape($table);
+		$table = $this->adapter->escape($table);
         if (count($insertvalues)>0) {
             foreach($insertcolumns as $k=>$v) {
-                $insertcolumns[$k] = "`".$this->escape($v)."`";
+                $insertcolumns[$k] = "`".$this->adapter->escape($v)."`";
             }
             foreach($insertvalues as $k=>$v) {
-                $insertvalues[$k] = "\"".$this->escape($v)."\"";
+                $insertvalues[$k] = "\"".$this->adapter->escape($v)."\"";
             }
             $insertSQL = "INSERT INTO `$table`
 					  ( id, ".implode(",",$insertcolumns)." )
@@ -285,7 +235,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return array $row
 	 */
     public function selectRecord($type, $id) {
-		$type=$this->escape($type);
+		$type=$this->adapter->escape($type);
         $row = $this->adapter->getRow( "SELECT * FROM `$type` WHERE id = ".intval($id) );
         if ($row && is_array($row) && count($row)>0) {
             return $row;
@@ -304,13 +254,11 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @todo validate arguments for security
 	 */
     public function deleteRecord( $table, $column, $value, $oper="=" ) {
-		$table = $this->escape($table);
-		$column = $this->escape($column);
-		$value = $this->escape($value);
+		$table = $this->adapter->escape($table);
+		$column = $this->adapter->escape($column);
+		$value = $this->adapter->escape($value);
         $this->adapter->exec("DELETE FROM `$table` WHERE `$column` $oper \"$value\" ");
     }
-
-
 	/**
 	 * Gets information about changed records using a type and id and a logid.
 	 * RedBean Locking shields you from race conditions by comparing the latest
@@ -326,27 +274,21 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return integer $newchangeid
 	 */
     public function checkChanges($type, $id, $logid) {
-
-		$type = $this->escape($type);
+		$type = $this->adapter->escape($type);
 		$id = (int) $id;
 		$logid = (int) $logid;
 		$this->adapter->exec("LOCK TABLES __log WRITE");
 		$num = $this->adapter->getCell("
         SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id > $logid");
-
         if ($num) {
 			$this->adapter->exec("UNLOCK TABLES");
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)"); 
 		}
-        
 		$newid = $this->insertRecord("__log",array("action","tbl","itemid"),
             array(2,  $type, $id));
-
 		$this->adapter->exec("UNLOCK TABLES");
 		return $newid;
-	
 	}
-
 	/**
 	 * Adds a Unique index constrain to the table.
 	 * @param string $table
@@ -355,9 +297,9 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return void
 	 */
     public function addUniqueIndex( $table,$col1,$col2 ) {
-		$col1 = $this->escape($col1);
-		$col2 = $this->escape($col2);
-		$table = $this->escape($table);
+		$col1 = $this->adapter->escape($col1);
+		$col2 = $this->adapter->escape($col2);
+		$table = $this->adapter->escape($table);
         $r = $this->adapter->get("SHOW INDEX FROM $table");
         $name = "UQ_".$col1."_".$col2;
         if ($r) {
@@ -371,14 +313,4 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
                 ADD UNIQUE INDEX `$name` (`$col1`, `$col2`)";
         $this->adapter->exec($sql);
     }
-
-	/**
-	 * Just Cleans up the log to prevent it from
-	 * getting really big.
-	 */
-    public function cleanUpLog() {
-        $maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
-        $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
-    }
-
 }

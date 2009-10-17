@@ -98,7 +98,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 		$this->signal( "update", $bean );
         $this->check($bean);
         //what table does it want
-        $table = $this->writer->escape($bean->__info["type"]);
+        $table = $bean->__info["type"];
 	        //does this table exist?
             $tables = $this->writer->getTables();
             //If not, create

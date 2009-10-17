@@ -20,7 +20,6 @@ class RedBean_ChangeLogger implements RedBean_Observer {
 	 */
     public function __construct(RedBean_QueryWriter $writer) {
         $this->writer = $writer;
-        $this->writer->cleanUpLog();
     }
 
 	/**
