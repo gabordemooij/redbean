@@ -161,6 +161,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return array $columns
 	 */
     public function getColumns( $table ) {
+		$table = $this->escape($table);
         $columnsRaw = $this->adapter->get("DESCRIBE `$table`");
         foreach($columnsRaw as $r) {
             $columns[$r["Field"]]=$r["Type"];
@@ -202,6 +203,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $type
 	 */
     public function addColumn( $table, $column, $type ) {
+		$column = $this->escape($column);
+		$table = $this->escape($table);
         $type=$this->typeno_sqltype[$type];
         $sql = "ALTER TABLE `$table` ADD `$column` $type ";
         $this->adapter->exec( $sql );
@@ -223,7 +226,9 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $type
 	 */
     public function widenColumn( $table, $column, $type ) {
-        $newtype = $this->typeno_sqltype[$type];
+        $column = $this->escape($column);
+		$table = $this->escape($table);
+		$newtype = $this->typeno_sqltype[$type];
         $changecolumnSQL = "ALTER TABLE `$table` CHANGE `$column` `$column` $newtype ";
         $this->adapter->exec( $changecolumnSQL );
     }
@@ -237,7 +242,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
     public function updateRecord( $table, $updatevalues, $id) {
         $update = array();
         foreach($updatevalues as $u) {
-            $update[] = " `".$u["property"]."` = \"".$u["value"]."\" ";
+            $update[] = " `".$this->escape($u["property"])."` = \"".$this->escape($u["value"])."\" ";
         }
         $updateSQL = "UPDATE `$table` SET ".implode(",",$update)." WHERE id = ".$id;
         $this->adapter->exec( $updateSQL );
@@ -252,12 +257,13 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return integer $insertid
 	 */
     public function insertRecord( $table, $insertcolumns, $insertvalues ) {
+		$table = $this->escape($table);
         if (count($insertvalues)>0) {
             foreach($insertcolumns as $k=>$v) {
-                $insertcolumns[$k] = "`".$v."`";
+                $insertcolumns[$k] = "`".$this->escape($v)."`";
             }
             foreach($insertvalues as $k=>$v) {
-                $insertvalues[$k] = "\"".$v."\"";
+                $insertvalues[$k] = "\"".$this->escape($v)."\"";
             }
             $insertSQL = "INSERT INTO `$table`
 					  ( id, ".implode(",",$insertcolumns)." )
@@ -279,6 +285,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return array $row
 	 */
     public function selectRecord($type, $id) {
+		$type=$this->escape($type);
         $row = $this->adapter->getRow( "SELECT * FROM `$type` WHERE id = ".intval($id) );
         if ($row && is_array($row) && count($row)>0) {
             return $row;
@@ -297,6 +304,9 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @todo validate arguments for security
 	 */
     public function deleteRecord( $table, $column, $value, $oper="=" ) {
+		$table = $this->escape($table);
+		$column = $this->escape($column);
+		$value = $this->escape($value);
         $this->adapter->exec("DELETE FROM `$table` WHERE `$column` $oper \"$value\" ");
     }
 
@@ -317,6 +327,9 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 */
     public function checkChanges($type, $id, $logid) {
 
+		$type = $this->escape($type);
+		$id = (int) $id;
+		$logid = (int) $logid;
 		$this->adapter->exec("LOCK TABLES __log WRITE");
 		$num = $this->adapter->getCell("
         SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id > $logid");
@@ -342,6 +355,9 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return void
 	 */
     public function addUniqueIndex( $table,$col1,$col2 ) {
+		$col1 = $this->escape($col1);
+		$col2 = $this->escape($col2);
+		$table = $this->escape($table);
         $r = $this->adapter->get("SHOW INDEX FROM $table");
         $name = "UQ_".$col1."_".$col2;
         if ($r) {
