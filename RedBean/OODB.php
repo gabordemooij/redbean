@@ -13,6 +13,9 @@
  * 
  */
 class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
+
+	private $stash = NULL;
+
     /**
      *
      * @var RedBean_DBAdapter
@@ -158,14 +161,19 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 	 */
     public function load($type, $id) {
 		$bean = $this->dispense( $type );
-        $row =  $this->writer->selectRecord($type,$id);
-		if (!$row) return $this->dispense($type);
-        foreach($row as $p=>$v) {
-            //populate the bean with the database row
+		if ($this->stash && $this->stash[$id]) {
+			$row = $this->stash[$id];
+		}
+		else {
+			$rows = $this->writer->selectRecord($type,array($id));
+			if (!$rows) return $this->dispense($type);
+			$row = array_pop($rows);
+		}
+		foreach($row as $p=>$v) {
+				 //populate the bean with the database row
                 $bean->$p = $v;
         }
         $this->signal( "open", $bean );
-
 		return $bean;
     }
 	/**
@@ -185,9 +193,15 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 	 */
     public function batch( $type, $ids ) {
         $collection = array();
+		$rows = $this->writer->selectRecord($type,$ids);
+		$this->stash = array();
+		foreach($rows as $row) {
+			$this->stash[$row["id"]] = $row;
+		}
         foreach($ids as $id) {
             $collection[ $id ] = $this->load( $type, $id );
         }
+		$this->stash = NULL;
         return $collection;
     }
 	

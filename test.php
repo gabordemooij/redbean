@@ -82,6 +82,7 @@ $pdo = $adapter->getDatabase();
 $pdo->setDebugMode(0);
 $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
+$pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS association");
 $page = $redbean->dispense("page");
@@ -188,6 +189,17 @@ asrt($batch[$id1]->__info["type"],"page");
 asrt($batch[$id2]->__info["type"],"page");
 asrt((int)$batch[$id1]->id,$id1);
 asrt((int)$batch[$id2]->id,$id2);
+$book = $redbean->dispense("book");
+$book->name="book 1";
+$redbean->store($book);
+$book = $redbean->dispense("book");
+$book->name="book 2";
+$redbean->store($book);
+$book = $redbean->dispense("book");
+$book->name="book 3";
+$redbean->store($book);
+$books = $redbean->batch("book", $adapter->getCol("SELECT id FROM book"));
+asrt(count($books),3);
 
 
 //test locking

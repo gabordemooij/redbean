@@ -234,11 +234,11 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $id
 	 * @return array $row
 	 */
-    public function selectRecord($type, $id) {
+    public function selectRecord($type, $ids) {
 		$type=$this->adapter->escape($type);
-        $row = $this->adapter->getRow( "SELECT * FROM `$type` WHERE id = ".intval($id) );
-        if ($row && is_array($row) && count($row)>0) {
-            return $row;
+        $rows = $this->adapter->get( "SELECT * FROM `$type` WHERE id IN ( ".implode(",",$ids)." )");
+        if ($rows && is_array($rows) && count($rows)>0) {
+            return $rows;
         }
         else {
             return null;
