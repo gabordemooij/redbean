@@ -277,7 +277,6 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		$type = $this->adapter->escape($type);
 		$id = (int) $id;
 		$logid = (int) $logid;
-		$this->adapter->exec("LOCK TABLES __log WRITE");
 		$num = $this->adapter->getCell("
         SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id > $logid");
         if ($num) {
@@ -286,7 +285,9 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		}
 		$newid = $this->insertRecord("__log",array("action","tbl","itemid"),
             array(2,  $type, $id));
-		$this->adapter->exec("UNLOCK TABLES");
+		if ($this->adapter->getCell("select id from __log where id < $newid and id > $logid and action=2 and itemid=$id ")){
+			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access II (type:$type, id:$id)");
+		}
 		return $newid;
 	}
 	/**
