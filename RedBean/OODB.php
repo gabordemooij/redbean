@@ -195,6 +195,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
         $collection = array();
 		$rows = $this->writer->selectRecord($type,$ids);
 		$this->stash = array();
+		if (!$rows) return array();
 		foreach($rows as $row) {
 			$this->stash[$row["id"]] = $row;
 		}
