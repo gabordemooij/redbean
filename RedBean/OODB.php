@@ -50,7 +50,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
     public function dispense($type ) {
 		
         $bean = new RedBean_OODBBean();
-        $bean->__info = array( "type"=>$type );
+        $bean->setMeta("type", $type );
         $bean->id = 0;
 		$this->signal( "dispense", $bean );
         $this->check( $bean );
@@ -61,30 +61,23 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
      * @param RedBean_OODBBean $bean
      */
     public function check( RedBean_OODBBean $bean ) {
-	   //Bean should contain a hidden information section
-        if (!isset($bean->__info)) {
-            throw new RedBean_Exception_Security("Bean has no Meta Information");
-        }
-        //Is all meta information present?
-        if (!isset($bean->id) || !isset($bean->__info["type"])) {
+	    //Is all meta information present?
+        if (!isset($bean->id) || !($bean->getMeta("type"))) {
             throw new RedBean_Exception_Security("Bean has incomplete Meta Information");
         }
         //Pattern of allowed characters
         $pattern = '/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/';
         //Does the type contain invalid characters?
-        if (preg_match($pattern,$bean->__info["type"])) {
+        if (preg_match($pattern,$bean->getMeta("type"))) {
             throw new RedBean_Exception_Security("Bean Type is invalid");
         }
         //Are the properties and values valid?
         foreach($bean as $prop=>$value) {
             if (
-            ($prop != "__info") &&
-                (
                 is_array($value) ||
                 is_object($value) ||
                 strlen($prop)<1 ||
                 preg_match($pattern,$prop)
-            )
             ) {
                 throw new RedBean_Exception_Security("Invalid Bean: property $prop OR value $value ");
             }
@@ -101,7 +94,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 		$this->signal( "update", $bean );
         $this->check($bean);
         //what table does it want
-        $table = $bean->__info["type"];
+        $table = $bean->getMeta("type");
 	        //does this table exist?
             $tables = $this->writer->getTables();
             //If not, create
@@ -114,7 +107,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
             $insertcolumns = array();
             $updatevalues = array();
             foreach( $bean as $p=>$v) {
-                if ($p!="__info" && $p!="id") {
+                if ($p!="id") {
 					 if (!$this->isFrozen) {
 						//What kind of property are we dealing with?
 						$typeno = $this->writer->scanType($v);
@@ -138,8 +131,10 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
                     $updatevalues[] = array( "property"=>$p, "value"=>$v );
                 }
             }
-            if (!$this->isFrozen && isset($bean->__info["unique"])) {
-                    $this->writer->addUniqueIndex( $table, $bean->__info["unique"][0],$bean->__info["unique"][1] );
+            if (!$this->isFrozen && ($uniques = $bean->getMeta("buildcommand.unique"))) {
+					foreach($uniques as $unique){
+						$this->writer->addUniqueIndex( $table, $unique );
+					}
              }
             if ($bean->id) {
                 if (count($updatevalues)>0) {
@@ -183,7 +178,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
     public function trash( RedBean_OODBBean $bean ) {
 		$this->signal( "delete", $bean );
         $this->check( $bean );
-        $this->writer->deleteRecord( $bean->__info["type"], "id",$bean->id );
+        $this->writer->deleteRecord( $bean->getMeta("type"), "id",$bean->id );
     }
 	/**
 	 * Loads a Batch of Beans at once

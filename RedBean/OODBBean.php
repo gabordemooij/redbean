@@ -8,6 +8,8 @@
  */
 class RedBean_OODBBean {
 
+	private $__info = NULL;
+
 	/**
 	 * Imports data into bean
 	 * @param array $arr
@@ -42,6 +44,34 @@ class RedBean_OODBBean {
 		if (!isset($this->$property)) return NULL;
 	}
 
+
+
+	public function getMeta( $path, $default = NULL) {
+		$ref = $this->__info;
+		$parts = explode(".", $path);
+		foreach($parts as $part) { 
+			if (isset($ref[$part])) {
+				$ref = $ref[$part];
+			}
+			else {
+				return $default;
+			}
+		}
+		return $ref;
+	}
+
+	public function setMeta( $path, $value ) {
+		$ref = &$this->__info;
+		$parts = explode(".", $path);
+		$lastpart = array_pop( $parts );
+		foreach($parts as $part) { 
+			if (!isset($ref[$part])) {
+				$ref[$part] = array();
+			}
+			$ref = &$ref[$part];
+		}
+		$ref[$lastpart] = $value;
+	}
 
 
 }

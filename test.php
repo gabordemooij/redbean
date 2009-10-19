@@ -87,6 +87,22 @@ $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS association");
 $page = $redbean->dispense("page");
 
+testpack("Test RedBean OODBBean: Meta Information");
+$bean = new RedBean_OODBBean;
+$bean->setMeta( "test", array( "one" => 123 ));
+asrt($bean->getMeta("test.one"),123);
+$bean->setMeta( "arr", array(1,2) );
+asrt(is_array($bean->getMeta("arr")),true);
+asrt($bean->getMeta("nonexistant"),NULL);
+asrt($bean->getMeta("nonexistant","abc"),"abc");
+asrt($bean->getMeta("nonexistant.nested"),NULL);
+asrt($bean->getMeta("nonexistant,nested","abc"),"abc");
+$bean->setMeta("test.two","second");
+asrt($bean->getMeta("test.two"),"second");
+$bean->setMeta("another.little.property","yes");
+asrt($bean->getMeta("another.little.property"),"yes");
+asrt($bean->getMeta("test.two"),"second");
+
 
 testpack("Test RedBean OODBBean: import");
 $bean = new RedBean_OODBBean;
@@ -104,10 +120,10 @@ asrt($arr["b"],2);
 
 
 testpack("Test RedBean OODB: Dispense");
-asrt(isset($page->__info),true);
-asrt(isset($page->__info["type"]),true);
+
+asrt(((bool)$page->getMeta("type")),true);
 asrt(isset($page->id),true);
-asrt(($page->__info["type"]),"page");
+asrt(($page->getMeta("type")),"page");
 asrt(($page->id),0);
 try{ $redbean->dispense("."); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->dispense("-"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
@@ -122,10 +138,9 @@ asrt( $id, 1 );
 testpack("Test RedBean OODB: Can we Retrieve a Record? ");
 $page = $redbean->load( "page", 1 );
 asrt($page->name, "my page");
-asrt(isset($page->__info),true);
-asrt(isset($page->__info["type"]),true);
+asrt(( (bool) $page->getMeta("type")),true);
 asrt(isset($page->id),true);
-asrt(($page->__info["type"]),"page");
+asrt(($page->getMeta("type")),"page");
 asrt((int)$page->id,$id);
 
 
@@ -135,6 +150,17 @@ $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
+
+
+$page->rating = "1";
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( $page->rating, "1" );
+
+
+
 $page->rating = 5;
 //$page->__info["unique"] = array("name","rating");
 $newid = $redbean->store( $page );
@@ -157,6 +183,20 @@ $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 asrt( $page->rating, "-2" );
 
+$page->rating = 2.5;
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( $page->rating, "2.5" );
+
+$page->rating = -3.3;
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( $page->rating, "-3.3" );
+
 $page->rating = "good";
 $newid = $redbean->store( $page );
 asrt( $newid, $id );
@@ -173,6 +213,9 @@ asrt( $page->name, "new name" );
 asrt( $page->rating, $longtext );
 
 $redbean->trash( $page );
+
+
+
 asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 0 );
 
 testpack("Test RedBean OODB: Batch Loader ");
@@ -185,8 +228,8 @@ $page->name = "page no. 2";
 $id2 = $redbean->store($page);
 $batch = $redbean->batch( "page", array($id1, $id2) );
 asrt(count($batch),2);
-asrt($batch[$id1]->__info["type"],"page");
-asrt($batch[$id2]->__info["type"],"page");
+asrt($batch[$id1]->getMeta("type"),"page");
+asrt($batch[$id2]->getMeta("type"),"page");
 asrt((int)$batch[$id1]->id,$id1);
 asrt((int)$batch[$id2]->id,$id2);
 $book = $redbean->dispense("book");
@@ -209,8 +252,8 @@ $page->name = "a page";
 $id = $redbean->store( $page );
 $page = $redbean->load("page", $id);
 $otherpage = $redbean->load("page", $id);
-asrt(isset($page->__info["opened"]),true);
-asrt(isset($otherpage->__info["opened"]),true);
+asrt(((bool)$page->getMeta("opened")),true);
+asrt(((bool)$otherpage->getMeta("opened")),true);
 try{ $redbean->store( $page ); pass(); }catch(Exception $e){ fail(); }
 try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
 

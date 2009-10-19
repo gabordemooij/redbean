@@ -31,17 +31,17 @@ class RedBean_ChangeLogger implements RedBean_Observer {
     public function onEvent( $event, $item ) {
         $id = $item->id;
         if (! ((int) $id)) return;
-        $type = $item->__info["type"];
+        $type = $item->getMeta("type");
         if ($event=="open") {
             $insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
             array(1,  $type, $id));
-            $item->__info["opened"] = $insertid;
+            $item->setMeta("opened",$insertid);
 			//echo "<br>opened: ".print_r($item, 1);
         }
         if ($event=="update") {
-            if (isset($item->__info["opened"])) $oldid = $item->__info["opened"]; else $oldid=0;
+            if (($item->getMeta("opened"))) $oldid = $item->getMeta("opened"); else $oldid=0;
             $newid = $this->writer->checkChanges($type,$id, $oldid);
-            $item->__info["opened"] = $newid;
+            $item->getMeta("opened",$newid);
         }
     }
 }

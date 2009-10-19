@@ -51,9 +51,9 @@ class RedBean_TreeManager {
 	 * @return array $childObjects
 	 */
 	public function children( RedBean_OODBBean $parent ) {
-		return $this->oodb->batch($parent->__info["type"],
+		return $this->oodb->batch($parent->getMeta("type"),
 			$this->adapter->getCol("SELECT id FROM
-			`".$parent->__info["type"]."`
+			`".$parent->getMeta("type")."`
 			WHERE `".$this->property."` = ".intval( $parent->id )."
 		"));
 	}

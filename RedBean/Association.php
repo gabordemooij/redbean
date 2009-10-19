@@ -44,11 +44,11 @@ class RedBean_AssociationManager {
 	 * @param RedBean_OODBBean $bean2
 	 */
 	public function associate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-		$table = $this->getTable( array($bean1->__info["type"] , $bean2->__info["type"]) );
+		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
 		$bean = $this->oodb->dispense($table);
-		$property1 = $bean1->__info["type"] . "_id";
-		$property2 = $bean2->__info["type"] . "_id";
-		$bean->__info[ "unique" ] = array( $property1, $property2 );
+		$property1 = $bean1->getMeta("type") . "_id";
+		$property2 = $bean2->getMeta("type") . "_id";
+		$bean->setMeta( "buildcommand.unique" , array( array( $property1, $property2 )));
 		$bean->$property1 = $bean1->id;
 		$bean->$property2 = $bean2->id;
 		$this->oodb->store( $bean );
@@ -61,9 +61,9 @@ class RedBean_AssociationManager {
 	 * @return array $ids
 	 */
 	public function related( RedBean_OODBBean $bean, $type ) {
-		$table = $this->getTable( array($bean->__info["type"] , $type) );
+		$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$targetproperty = $type."_id";
-		$property = $bean->__info["type"]."_id";
+		$property = $bean->getMeta("type")."_id";
 		$sqlFetchKeys = " SELECT ".$this->adapter->escape($targetproperty)." FROM `$table` WHERE ".$this->adapter->escape($property)."
 			= ".$this->adapter->escape($bean->id);
 		return $this->adapter->getCol( $sqlFetchKeys );
@@ -75,9 +75,9 @@ class RedBean_AssociationManager {
 	 * @param RedBean_OODBBean $bean2
 	 */
 	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-		$table = $this->getTable( array($bean1->__info["type"] , $bean2->__info["type"]) );
-		$property1 = $bean1->__info["type"]."_id";
-		$property2 = $bean2->__info["type"]."_id";
+		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
+		$property1 = $bean1->getMeta("type")."_id";
+		$property2 = $bean2->getMeta("type")."_id";
 		$value1 = (int) $bean1->id;
 		$value2 = (int) $bean2->id;
 		$sqlDeleteAssoc = "DELETE FROM `$table`
@@ -91,9 +91,9 @@ class RedBean_AssociationManager {
 	 * @param <type> $type
 	 */
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
-		$table = $this->getTable( array($bean->__info["type"] , $type) );
+		$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$targetproperty = $type."_id";
-		$property = $bean->__info["type"]."_id";
+		$property = $bean->getMeta("type")."_id";
 		$this->adapter->exec("DELETE FROM `$table` WHERE ".$this->adapter->escape($property)." = ".$this->adapter->escape($bean->id));
 	}
 	/**
@@ -102,7 +102,7 @@ class RedBean_AssociationManager {
 	 * @param RedBean_OODBBean $bean2
 	 */
 	public function set1toNAssoc(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-		$this->clearRelations($bean2, $bean1->__info["type"]);
+		$this->clearRelations($bean2, $bean1->getMeta("type"));
 		$this->associate($bean1, $bean2);
 	}
 

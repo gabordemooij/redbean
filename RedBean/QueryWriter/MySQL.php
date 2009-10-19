@@ -15,9 +15,11 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * Supported Column Types
 	 */
     public $typeno_sqltype = array(
-    " TINYINT(3) UNSIGNED ",
+    " SET('1') ",
+	" TINYINT(3) UNSIGNED ",
     " INT(11) UNSIGNED ",
-    " BIGINT(20) ",
+   // " BIGINT(20) ",
+	" DOUBLE ",
     " VARCHAR(255) ",
     " TEXT ",
     " LONGTEXT "
@@ -30,12 +32,14 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * constants (magic numbers)
 	 */
     public $sqltype_typeno = array(
-    "tinyint(3) unsigned"=>0,
-    "int(11) unsigned"=>1,
-    "bigint(20)"=>2,
-    "varchar(255)"=>3,
-    "text"=>4,
-    "longtext"=>5
+	"set('1')"=>0,
+    "tinyint(3) unsigned"=>1,
+    "int(11) unsigned"=>2,
+    //"bigint(20)"=>3,
+	"double" => 3,
+    "varchar(255)"=>4,
+    "text"=>5,
+    "longtext"=>6
     );
 
     /**
@@ -44,7 +48,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * these are used for the column names
      */
     public $dtypes = array(
-    "tinyintus","intus","ints","varchar255","text","ltext"
+    "booleanset","tinyintus","intus","doubles","varchar255","text","ltext"
     );
 
     /**
@@ -60,12 +64,14 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      */
     public function __construct( RedBean_DBAdapter $adapter ) {
         $this->adapter = $adapter;
-        $this->adapter->exec("
+        $this->adapter->exec("DROP TABLE IF EXISTS `dtyp`");
+		$this->adapter->exec("
 				CREATE TABLE IF NOT EXISTS `dtyp` (
 				  `id` int(11) unsigned NOT NULL auto_increment,
+				  `booleanset` set('1'),
 				  `tinyintus` tinyint(3) unsigned NOT NULL,
 				  `intus` int(11) unsigned NOT NULL,
-				  `ints` bigint(20) NOT NULL,
+				  `doubles` double NOT NULL,
 				  `varchar255` varchar(255) NOT NULL,
 				  `text` text NOT NULL,
 				  PRIMARY KEY  (`id`)
@@ -129,7 +135,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	public function scanType( $value ) {
         $this->adapter->exec( "truncate table dtyp" );
         $v = "\"".$value."\"";
-        $checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v )";
+        $checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v,$v )";
         $this->adapter->exec( $checktypeSQL );
         $id = $this->adapter->getInsertID();
 		$types = $this->dtypes;
@@ -280,7 +286,6 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		$num = $this->adapter->getCell("
         SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id > $logid");
         if ($num) {
-			$this->adapter->exec("UNLOCK TABLES");
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)"); 
 		}
 		$newid = $this->insertRecord("__log",array("action","tbl","itemid"),
@@ -297,12 +302,14 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param string $col2
 	 * @return void
 	 */
-    public function addUniqueIndex( $table,$col1,$col2 ) {
-		$col1 = $this->adapter->escape($col1);
-		$col2 = $this->adapter->escape($col2);
+    public function addUniqueIndex( $table,$columns ) {
+		sort($columns); //else we get multiple indexes due to order-effects
+		foreach($columns as $k=>$v){
+			$columns[$k]="`".$this->adapter->escape($v)."`";
+		}
 		$table = $this->adapter->escape($table);
         $r = $this->adapter->get("SHOW INDEX FROM $table");
-        $name = "UQ_".$col1."_".$col2;
+        $name = "UQ_".sha1(implode(',',$columns));
         if ($r) {
             foreach($r as $i) {
                 if ($i["Key_name"]==$name) {
@@ -311,7 +318,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
             }
         }
         $sql = "ALTER IGNORE TABLE `$table`
-                ADD UNIQUE INDEX `$name` (`$col1`, `$col2`)";
+                ADD UNIQUE INDEX `$name` (".implode(",",$columns).")";
         $this->adapter->exec($sql);
     }
 }
