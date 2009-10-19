@@ -50,6 +50,8 @@ class RedBean_AssociationManager {
 		$property2 = $bean2->getMeta("type") . "_id";
 		$bean->setMeta( "buildcommand.unique" , array( array( $property1, $property2 )));
 		$bean->$property1 = $bean1->id;
+		if ($bean1->id == 0) $this->oodb->store($bean1);
+		if ($bean2->id == 0) $this->oodb->store($bean2);
 		$bean->$property2 = $bean2->id;
 		$this->oodb->store( $bean );
 	}

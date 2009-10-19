@@ -307,7 +307,14 @@ $apage = array_shift($pages);
 asrt(($apage->name=="John's page" || $apage->name=="John's second page"),true);
 $apage = array_shift($pages);
 asrt(($apage->name=="John's page" || $apage->name=="John's second page"),true);
-
+//test save on the fly
+$page = $redbean->dispense("page");
+$page2 = $redbean->dispense("page");
+$page->name="idless page 1";
+$page2->name="idless page 1";
+$a->associate($page, $page2);
+asrt(($page->id>0),true);
+asrt(($page2->id>0),true);
 
 testpack("Test Frozen ");
 $redbean->freeze( true );
