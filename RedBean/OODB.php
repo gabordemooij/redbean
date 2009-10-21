@@ -187,6 +187,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 	 * @return array $beans
 	 */
     public function batch( $type, $ids ) {
+		if (!$ids) return array();
         $collection = array();
 		$rows = $this->writer->selectRecord($type,$ids);
 		$this->stash = array();
