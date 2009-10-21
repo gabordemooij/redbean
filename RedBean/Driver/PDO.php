@@ -90,7 +90,7 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     public function GetAll( $sql )
     {
     	$this->exc = 0;
-    	try{ 
+    	//try{
 	        if ($this->debug)
 	        {
 	            echo "<HR>" . $sql;
@@ -111,8 +111,8 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 	            }
 	            
 	        }
-    	}
-    	catch(Exception $e){ $this->exc = 1; 
+    	//}
+    	/*catch(Exception $e){ $this->exc = 1;
     	
     			if ($this->debug){
 	           	 $str = $this->Errormsg();
@@ -121,7 +121,7 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 	           	     echo "<br><b style='color:red'>" . $str . "</b>";
 	           	 }
     			}
-    	return array(); }
+    	return array(); }*/
         return $rows;
     }
     
@@ -132,7 +132,7 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     public function GetCol($sql)
     {
     	$this->exc = 0;
-    	try{
+    	//try{
 	        $rows = $this->GetAll($sql);
 	        $cols = array();
 	 
@@ -143,10 +143,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 		        }
 	        }
 	    	
-    	}
-    	catch(Exception $e){ 
-    		$this->exc = 1;
-    		return array(); }
+    	//}
+    	//catch(Exception $e){
+    //		$this->exc = 1;
+    //		return array(); }
         return $cols;
     }
  
@@ -157,12 +157,12 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     public function GetCell($sql)
     {
     	$this->exc = 0;
-    	try{
+    	//try{
 	        $arr = $this->GetAll($sql);
 	        $row1 = array_shift($arr);
 	        $col1 = array_shift($row1);
-    	}
-    	catch(Exception $e){ $this->exc = 1; }
+    	//}
+    	//catch(Exception $e){ $this->exc = 1; }
         return $col1;
     }
     
@@ -173,10 +173,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     public function GetRow($sql)
     {
     	$this->exc = 0;
-    	try{
+    	//try{
         	$arr = $this->GetAll($sql);
-    	}
-       	catch(Exception $e){ $this->exc = 1; return array(); }
+    	//}
+       	//catch(Exception $e){ $this->exc = 1; return array(); }
         return array_shift($arr);
     }
     
@@ -209,25 +209,25 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     public function Execute( $sql )
     {
     	$this->exc = 0;
-    	try{
+    	//try{
 	        if ($this->debug)
 	        {
 	            echo "<HR>" . $sql;
 	        }
 	        $this->affected_rows = $this->pdo->exec($sql);
 	       
-    	}
-    	catch(Exception $e){ $this->exc = 1; 
+    	//}
+    	//catch(Exception $e){ $this->exc = 1;
     	
-    	 if ($this->debug)
-	        {
-	            $str = $this->Errormsg();
-	            if ($str != "")
-	            {
-	                echo "<br><b style='color:red'>" . $str . "</b>";
-	            }
-	        }
-    	return 0; }
+    	 //if ($this->debug)
+	     //   {
+	     //       $str = $this->Errormsg();
+	     //       if ($str != "")
+	     //       {
+	     //           echo "<br><b style='color:red'>" . $str . "</b>";
+	      //      }
+	    //    }
+    	//return 0; }
         return $this->affected_rows;
     }
     
@@ -275,5 +275,17 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     {
         return $this->rs;
     }
-    
+
+	public function StartTrans() {
+		$this->pdo->beginTransaction();
+	}
+
+	public function CommitTrans() {
+		$this->pdo->commit();
+	}
+
+
+	public function FailTrans() {
+		$this->pdo->rollback();
+	}
 }

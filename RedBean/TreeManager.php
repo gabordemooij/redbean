@@ -40,7 +40,8 @@ class RedBean_TreeManager {
 	 * @param RedBean_OODBBean $child
 	 */
 	public function attach( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
-		if (!$parent->id) $this->oodb->store($parent);
+
+		if (!intval($parent->id)) $this->oodb->store($parent);
 		$child->{$this->property} = $parent->id;
 		$this->oodb->store($child);
 	}

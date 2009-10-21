@@ -84,6 +84,7 @@ $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
+$pdo->Execute("DROP TABLE IF EXISTS page_page");
 $pdo->Execute("DROP TABLE IF EXISTS association");
 $page = $redbean->dispense("page");
 
@@ -315,17 +316,52 @@ $page2->name="idless page 1";
 $a->associate($page, $page2);
 asrt(($page->id>0),true);
 asrt(($page2->id>0),true);
+$idpage = $page->id;
+$idpage2 = $page2->id;
+
+testpack("Cross References");
+$ids = $a->related($page, "page");
+asrt(count($ids),1);
+asrt(intval(array_pop($ids)),intval($idpage2));
+$ids = $a->related($page2, "page");
+asrt(count($ids),1);
+asrt(intval(array_pop($ids)),intval($idpage));
+$page3 = $redbean->dispense("page");
+$page3->name="third";
+$page4 = $redbean->dispense("page");
+$page4->name="fourth";
+$a->associate($page3,$page2);
+$a->associate($page2,$page4);
+$a->unassociate($page,$page2);
+asrt(count($a->related($page, "page")),0);
+$ids = $a->related($page2, "page");
+asrt(count($ids),2);
+asrt(in_array($page3->id,$ids),true);
+asrt(in_array($page4->id,$ids),true);
+asrt(in_array($page->id,$ids),false);
+asrt(count($a->related($page3, "page")),1);
+asrt(count($a->related($page4, "page")),1);
+$a->clearRelations($page2, "page");
+asrt(count($a->related($page2, "page")),0);
+asrt(count($a->related($page3, "page")),0);
+asrt(count($a->related($page4, "page")),0);
+try{ $a->associate($page2,$page2); pass(); }catch(PDOException $e){ fail(); }
+try{ $a->associate($page2,$page2); fail(); }catch(PDOException $e){ pass(); }
+
+testpack("Transactions");
+$adapter->startTransaction(); pass();
+$adapter->rollback(); pass();
+$adapter->startTransaction(); pass();
+$adapter->commit(); pass();
 
 testpack("Test Frozen ");
 $redbean->freeze( true );
 $page = $redbean->dispense("page");
 $page->sections = 10;
 $page->name = "half a page";
-$id = $redbean->store($page);
-asrt($id,0);
-$page = $redbean->load("page", $id);
+try{$id = $redbean->store($page); fail();}catch(PDOException $e){ pass(); }
 $redbean->freeze( false );
-asrt($page->id,0);
+
 
 testpack("Test Developer Interface API");
 $post = $redbean->dispense("post");

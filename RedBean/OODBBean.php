@@ -8,6 +8,10 @@
  */
 class RedBean_OODBBean {
 
+	/**
+	 * Meta Data storage
+	 * @var array
+	 */
 	private $__info = NULL;
 
 	/**
@@ -40,12 +44,22 @@ class RedBean_OODBBean {
 	}
 
 
+	/**
+	 * Returns NULL instead of throwing errors
+	 * @param string $property
+	 * @return mixed $value
+	 */
 	public function __get( $property ) {
 		if (!isset($this->$property)) return NULL;
 	}
 
 
-
+	/**
+	 * Fetches a meta data item
+	 * @param string $path
+	 * @param mixed $default
+	 * @return mixed $value
+	 */
 	public function getMeta( $path, $default = NULL) {
 		$ref = $this->__info;
 		$parts = explode(".", $path);
@@ -60,6 +74,11 @@ class RedBean_OODBBean {
 		return $ref;
 	}
 
+	/**
+	 * Sets a meta data item
+	 * @param string $path
+	 * @param mixed $value
+	 */
 	public function setMeta( $path, $value ) {
 		$ref = &$this->__info;
 		$parts = explode(".", $path);

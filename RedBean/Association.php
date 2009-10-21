@@ -48,10 +48,11 @@ class RedBean_AssociationManager {
 		$bean = $this->oodb->dispense($table);
 		$property1 = $bean1->getMeta("type") . "_id";
 		$property2 = $bean2->getMeta("type") . "_id";
+		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
 		$bean->setMeta( "buildcommand.unique" , array( array( $property1, $property2 )));
-		$bean->$property1 = $bean1->id;
 		if ($bean1->id == 0) $this->oodb->store($bean1);
 		if ($bean2->id == 0) $this->oodb->store($bean2);
+		$bean->$property1 = $bean1->id;
 		$bean->$property2 = $bean2->id;
 		$this->oodb->store( $bean );
 	}
@@ -64,10 +65,18 @@ class RedBean_AssociationManager {
 	 */
 	public function related( RedBean_OODBBean $bean, $type ) {
 		$table = $this->getTable( array($bean->getMeta("type") , $type) );
+		if ($type==$bean->getMeta("type")) {// echo "<b>CROSS</b>";
+			$type .= "2";
+			$cross = 1;
+		}
+		else $cross=0;
 		$targetproperty = $type."_id";
 		$property = $bean->getMeta("type")."_id";
 		$sqlFetchKeys = " SELECT ".$this->adapter->escape($targetproperty)." FROM `$table` WHERE ".$this->adapter->escape($property)."
 			= ".$this->adapter->escape($bean->id);
+		if ($cross) {
+			$sqlFetchKeys .= " UNION SELECT ".$this->adapter->escape($property)." FROM `$table` WHERE ".$this->adapter->escape($targetproperty)." = ".$this->adapter->escape($bean->id);;
+		}
 		return $this->adapter->getCol( $sqlFetchKeys );
 	}
 
@@ -78,13 +87,22 @@ class RedBean_AssociationManager {
 	 */
 	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
-		$property1 = $bean1->getMeta("type")."_id";
+		$type = $bean1->getMeta("type");
+		if ($type==$bean2->getMeta("type")) { //echo "<b>CROSS</b>";
+			$type .= "2";
+			$cross = 1;
+		}
+		else $cross = 0;
+		$property1 = $type."_id";
 		$property2 = $bean2->getMeta("type")."_id";
 		$value1 = (int) $bean1->id;
 		$value2 = (int) $bean2->id;
 		$sqlDeleteAssoc = "DELETE FROM `$table`
-		WHERE $property1 = $value1
-		AND $property2 = $value2	";
+		WHERE 
+		( $property1 = $value1 AND $property2 = $value2 )	";
+		if ($cross) {
+			$sqlDeleteAssoc .= " OR ( $property2 = $value1 AND $property1 = $value2 ) ";
+		}
 		$this->adapter->exec( $sqlDeleteAssoc );
 	}
 	/**
@@ -94,9 +112,18 @@ class RedBean_AssociationManager {
 	 */
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
 		$table = $this->getTable( array($bean->getMeta("type") , $type) );
-		$targetproperty = $type."_id";
+		if ($type==$bean->getMeta("type")) { //echo "<b>CROSS</b>";
+			$property2 = $type."2_id";
+			$cross = 1;
+		}
+		else $cross = 0;
 		$property = $bean->getMeta("type")."_id";
-		$this->adapter->exec("DELETE FROM `$table` WHERE ".$this->adapter->escape($property)." = ".$this->adapter->escape($bean->id));
+		$sql = "DELETE FROM `$table`
+		WHERE ".$this->adapter->escape($property)." = ".$this->adapter->escape($bean->id);
+		if ($cross){
+			$sql .= " OR  ".$this->adapter->escape($property2)." = ".$this->adapter->escape($bean->id);;
+		}
+		$this->adapter->exec($sql);
 	}
 	/**
 	 * Creates a 1 to Many Association

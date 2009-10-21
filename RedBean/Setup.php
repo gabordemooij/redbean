@@ -10,6 +10,13 @@
  */
 class RedBean_Setup {
 
+		/**
+		 *
+		 * @var array
+		 * Keeps track of the observers
+		 */
+		private static $observers = array();
+
 
 		/**
 		 * @param  string $dsn
@@ -26,6 +33,7 @@ class RedBean_Setup {
 
             //add concurrency shield
 			$logger = new RedBean_ChangeLogger( $writer );
+			self::$observers["logger"] = $logger;
             $redbean->addEventListener( "open", $logger );
             $redbean->addEventListener( "update", $logger);
 			$redbean->addEventListener( "delete", $logger);
@@ -68,6 +76,15 @@ class RedBean_Setup {
 			$toolbox = self::kickstart($dsn, $username, $password);
 			$toolbox->getDatabaseAdapter()->getDatabase()->setDebugMode( true );
 			return $toolbox;
+		}
+
+
+		/**
+		 * Returns the observers that have been attached by Setup
+		 * @return array $observers
+		 */
+		public static function getAttachedObservers() {
+			return self::$observers;
 		}
 
 }

@@ -41,7 +41,7 @@ class RedBean_ChangeLogger implements RedBean_Observer {
         if ($event=="update") {
             if (($item->getMeta("opened"))) $oldid = $item->getMeta("opened"); else $oldid=0;
             $newid = $this->writer->checkChanges($type,$id, $oldid);
-            $item->getMeta("opened",$newid);
+	        $item->setMeta("opened",$newid);
         }
     }
 }
