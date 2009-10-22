@@ -75,7 +75,9 @@ class RedBean_AssociationManager {
 		$sqlFetchKeys = " SELECT ".$this->adapter->escape($targetproperty)." FROM `$table` WHERE ".$this->adapter->escape($property)."
 			= ".$this->adapter->escape($bean->id);
 		if ($cross) {
-			$sqlFetchKeys .= " UNION SELECT ".$this->adapter->escape($property)." FROM `$table` WHERE ".$this->adapter->escape($targetproperty)." = ".$this->adapter->escape($bean->id);;
+			$sqlFetchKeys .= " UNION SELECT ".$this->adapter->escape($property)." 
+			FROM `$table`
+			WHERE ".$this->adapter->escape($targetproperty)." = ".$this->adapter->escape($bean->id);;
 		}
 		return $this->adapter->getCol( $sqlFetchKeys );
 	}

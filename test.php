@@ -78,6 +78,11 @@ class ObserverMock implements RedBean_Observer {
 $adapter = $toolbox->getDatabaseAdapter();
 $writer  = $toolbox->getWriter();
 $redbean = $toolbox->getRedBean();
+testpack("Test Kickstart and Toolbox: Init");
+asrt(($adapter instanceof RedBean_DBAdapter),true);
+asrt(($writer instanceof RedBean_QueryWriter),true);
+asrt(($redbean instanceof RedBean_OODB),true);
+
 $pdo = $adapter->getDatabase();
 $pdo->setDebugMode(0);
 $pdo->Execute("DROP TABLE IF EXISTS page");
@@ -90,6 +95,8 @@ $page = $redbean->dispense("page");
 
 testpack("Test RedBean OODBBean: Meta Information");
 $bean = new RedBean_OODBBean;
+$bean->setMeta( "this.is.a.custom.metaproperty" , "yes" );
+asrt($bean->getMeta("this.is.a.custom.metaproperty"),"yes");
 $bean->setMeta( "test", array( "one" => 123 ));
 asrt($bean->getMeta("test.one"),123);
 $bean->setMeta( "arr", array(1,2) );
@@ -121,11 +128,11 @@ asrt($arr["b"],2);
 
 
 testpack("Test RedBean OODB: Dispense");
-
 asrt(((bool)$page->getMeta("type")),true);
 asrt(isset($page->id),true);
 asrt(($page->getMeta("type")),"page");
 asrt(($page->id),0);
+try{ $redbean->dispense(""); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->dispense("."); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->dispense("-"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 
@@ -347,6 +354,23 @@ asrt(count($a->related($page3, "page")),0);
 asrt(count($a->related($page4, "page")),0);
 try{ $a->associate($page2,$page2); pass(); }catch(PDOException $e){ fail(); }
 try{ $a->associate($page2,$page2); fail(); }catch(PDOException $e){ pass(); }
+$pageOne = $redbean->dispense("page");
+$pageOne->name = "one";
+$pageMore = $redbean->dispense("page");
+$pageMore->name = "more";
+$pageEvenMore = $redbean->dispense("page");
+$pageEvenMore->name = "evenmore";
+$pageOther = $redbean->dispense("page");
+$pageOther->name = "othermore";
+$a->set1toNAssoc($pageOther, $pageMore);
+$a->set1toNAssoc($pageOne, $pageMore);
+$a->set1toNAssoc($pageOne, $pageEvenMore);
+asrt(count($a->related($pageOne, "page")),2);
+asrt(count($a->related($pageMore, "page")),1);
+asrt(count($a->related($pageEvenMore, "page")),1);
+asrt(count($a->related($pageOther, "page")),0);
+
+
 
 testpack("Transactions");
 $adapter->startTransaction(); pass();
