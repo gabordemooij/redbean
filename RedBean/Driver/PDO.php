@@ -87,17 +87,18 @@ class Redbean_Driver_PDO implements RedBean_Driver {
      * (non-PHPdoc)
      * @see RedBean/RedBean_Driver#GetAll()
      */
-    public function GetAll( $sql )
+    public function GetAll( $sql, $aValues=array() )
     {
+		
     	$this->exc = 0;
-    	//try{
-	        if ($this->debug)
+    	    if ($this->debug)
 	        {
 	            echo "<HR>" . $sql;
 	        }
-	        $rs = $this->pdo->query($sql);
-	        $this->rs = $rs;
-	        $rows = $rs->fetchAll();
+			$s = $this->pdo->prepare($sql);
+	        $s->execute($aValues);
+		    $this->rs = $s->fetchAll();
+	        $rows = $this->rs;
 	        if(!$rows)
 	        {
 	            $rows = array();
@@ -111,17 +112,7 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 	            }
 	            
 	        }
-    	//}
-    	/*catch(Exception $e){ $this->exc = 1;
     	
-    			if ($this->debug){
-	           	 $str = $this->Errormsg();
-	           	 if ($str != "")
-	           	 {
-	           	     echo "<br><b style='color:red'>" . $str . "</b>";
-	           	 }
-    			}
-    	return array(); }*/
         return $rows;
     }
     
@@ -129,11 +120,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
      * (non-PHPdoc)
      * @see RedBean/RedBean_Driver#GetCol()
      */
-    public function GetCol($sql)
+    public function GetCol($sql, $aValues=array())
     {
     	$this->exc = 0;
-    	//try{
-	        $rows = $this->GetAll($sql);
+    	    $rows = $this->GetAll($sql,$aValues);
 	        $cols = array();
 	 
 	        if ($rows && is_array($rows) && count($rows)>0){
@@ -143,10 +133,6 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 		        }
 	        }
 	    	
-    	//}
-    	//catch(Exception $e){
-    //		$this->exc = 1;
-    //		return array(); }
         return $cols;
     }
  
@@ -154,15 +140,12 @@ class Redbean_Driver_PDO implements RedBean_Driver {
      * (non-PHPdoc)
      * @see RedBean/RedBean_Driver#GetCell()
      */
-    public function GetCell($sql)
+    public function GetCell($sql, $aValues=array())
     {
     	$this->exc = 0;
-    	//try{
-	        $arr = $this->GetAll($sql);
-	        $row1 = array_shift($arr);
-	        $col1 = array_shift($row1);
-    	//}
-    	//catch(Exception $e){ $this->exc = 1; }
+        $arr = $this->GetAll($sql,$aValues);
+	    $row1 = array_shift($arr);
+	    $col1 = array_shift($row1);
         return $col1;
     }
     
@@ -170,13 +153,10 @@ class Redbean_Driver_PDO implements RedBean_Driver {
      * (non-PHPdoc)
      * @see RedBean/RedBean_Driver#GetRow()
      */
-    public function GetRow($sql)
+    public function GetRow($sql, $aValues=array())
     {
     	$this->exc = 0;
-    	//try{
-        	$arr = $this->GetAll($sql);
-    	//}
-       	//catch(Exception $e){ $this->exc = 1; return array(); }
+       	$arr = $this->GetAll($sql, $aValues);
         return array_shift($arr);
     }
     
@@ -206,29 +186,16 @@ class Redbean_Driver_PDO implements RedBean_Driver {
      * (non-PHPdoc)
      * @see RedBean/RedBean_Driver#Execute()
      */
-    public function Execute( $sql )
+    public function Execute( $sql, $aValues=array() )
     {
     	$this->exc = 0;
-    	//try{
-	        if ($this->debug)
+    	    if ($this->debug)
 	        {
 	            echo "<HR>" . $sql;
 	        }
-	        $this->affected_rows = $this->pdo->exec($sql);
-	       
-    	//}
-    	//catch(Exception $e){ $this->exc = 1;
-    	
-    	 //if ($this->debug)
-	     //   {
-	     //       $str = $this->Errormsg();
-	     //       if ($str != "")
-	     //       {
-	     //           echo "<br><b style='color:red'>" . $str . "</b>";
-	      //      }
-	    //    }
-    	//return 0; }
-        return $this->affected_rows;
+			$s = $this->pdo->prepare($sql);
+			$s->execute($aValues);
+		//	return $this->affected_rows;
     }
     
     /**

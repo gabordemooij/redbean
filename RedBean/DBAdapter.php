@@ -52,13 +52,13 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 * @param $sql
 	 * @return unknown_type
 	 */
-	public function exec( $sql , $noevent=false) {
+	public function exec( $sql , $aValues=array(), $noevent=false) {
 		
 		if (!$noevent){
 			$this->sql = $sql;
 			$this->signal("sql_exec", $this);
 		}
-		return $this->db->Execute( $sql );
+		return $this->db->Execute( $sql, $aValues );
 	}
 
 	/**
@@ -66,13 +66,13 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 * @param $sql
 	 * @return unknown_type
 	 */
-	public function get( $sql ) {
+	public function get( $sql, $aValues = array() ) {
 		
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
 		
 		
-		return $this->db->GetAll( $sql );
+		return $this->db->GetAll( $sql,$aValues );
 	}
 
 	/**
@@ -80,13 +80,13 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 * @param $sql
 	 * @return unknown_type
 	 */
-	public function getRow( $sql ) {
+	public function getRow( $sql, $aValues = array() ) {
 		
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
 		
 		
-		return $this->db->GetRow( $sql );
+		return $this->db->GetRow( $sql, $aValues );
 	}
 
 	/**
@@ -94,13 +94,13 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 * @param $sql
 	 * @return unknown_type
 	 */
-	public function getCol( $sql ) {
+	public function getCol( $sql, $aValues = array() ) {
 		
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
 		
 		
-		return $this->db->GetCol( $sql );
+		return $this->db->GetCol( $sql, $aValues );
 	}
 
 	/**
@@ -108,13 +108,13 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 * @param $sql
 	 * @return unknown_type
 	 */
-	public function getCell( $sql ) {
+	public function getCell( $sql, $aValues = array() ) {
 		
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
 		
 		
-		$arr = $this->db->GetCol( $sql );
+		$arr = $this->db->GetCol( $sql, $aValues );
 		if ($arr && is_array($arr))	return ($arr[0]); else return false;
 	}
 

@@ -93,6 +93,13 @@ $pdo->Execute("DROP TABLE IF EXISTS page_page");
 $pdo->Execute("DROP TABLE IF EXISTS association");
 $page = $redbean->dispense("page");
 
+testpack("Test Database");
+asrt( (int) $adapter->getCell("SELECT 123") ,123);
+asrt( (int) $adapter->getCell("SELECT ?",array("987")) ,987);
+asrt( (int) $adapter->getCell("SELECT ?+?",array("987","2")) ,989);
+asrt( (int) $adapter->getCell("SELECT :numberOne+:numberTwo",array(
+			":numberOne"=>42,":numberTwo"=>50)) ,92);
+
 testpack("Test RedBean OODBBean: Meta Information");
 $bean = new RedBean_OODBBean;
 $bean->setMeta( "this.is.a.custom.metaproperty" , "yes" );
@@ -370,6 +377,7 @@ asrt(count($a->related($pageMore, "page")),1);
 asrt(count($a->related($pageEvenMore, "page")),1);
 asrt(count($a->related($pageOther, "page")),0);
 
+//test preloading --no official tests yet
 $observers = RedBean_Setup::getAttachedObservers();
 $logger = array_pop($observers);
 $pagea = $redbean->dispense("page");
