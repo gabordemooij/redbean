@@ -14,6 +14,8 @@ class RedBean_ChangeLogger implements RedBean_Observer {
      */
     private $writer;
 
+	private $ids = array();
+
 	/**
 	 * Constructor, requires a writer
 	 * @param RedBean_QueryWriter $writer
@@ -33,15 +35,34 @@ class RedBean_ChangeLogger implements RedBean_Observer {
         if (! ((int) $id)) return;
         $type = $item->getMeta("type");
         if ($event=="open") {
+			if (isset($this->stash[$id])) {
+				$insertid = $this->stash[$id];
+				unset($this->stash[$id]);
+				return $insertid;
+			}
             $insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
-            array(1,  $type, $id));
+            array(array(1,  $type, $id)));
             $item->setMeta("opened",$insertid);
 			//echo "<br>opened: ".print_r($item, 1);
         }
-        if ($event=="update") {
+        if ($event=="update" || $event=="delete") {
             if (($item->getMeta("opened"))) $oldid = $item->getMeta("opened"); else $oldid=0;
             $newid = $this->writer->checkChanges($type,$id, $oldid);
 	        $item->setMeta("opened",$newid);
         }
     }
+
+
+
+	public function preLoad( $type, $ids ) {
+		$insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
+           array(array(1,  '__no_type__', 0)));
+		$values = array();
+		foreach($ids as $id) {
+			$this->stash[$id]=$insertid;
+			$values[] = array(1, $type, $id);
+
+		}
+		$this->writer->insertRecord("__log",array("action","tbl","itemid"), $values);
+	}
 }

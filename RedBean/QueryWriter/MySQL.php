@@ -214,18 +214,28 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 */
     public function insertRecord( $table, $insertcolumns, $insertvalues ) {
 		$table = $this->adapter->escape($table);
-        if (count($insertvalues)>0) {
-            foreach($insertcolumns as $k=>$v) {
+        if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
+			foreach($insertcolumns as $k=>$v) {
                 $insertcolumns[$k] = "`".$this->adapter->escape($v)."`";
             }
-            foreach($insertvalues as $k=>$v) {
-                $insertvalues[$k] = "\"".$this->adapter->escape($v)."\"";
-            }
-            $insertSQL = "INSERT INTO `$table`
-					  ( id, ".implode(",",$insertcolumns)." )
-					  VALUES( null, ".implode(",",$insertvalues)." ) ";
 
-            $this->adapter->exec( $insertSQL );
+            
+            $insertSQL = "INSERT INTO `$table`
+					  ( id, ".implode(",",$insertcolumns)." ) ";
+
+			$insertSQL .= " VALUES ";
+			$first = true;
+			foreach($insertvalues as $insertvalue) {
+				if (!$first) $insertSQL .= ",";
+				$insertSQL .= "( null, ";
+				$vs = array();
+				foreach($insertvalue as $v) {
+					$vs[] = "\"".$this->adapter->escape($v)."\"";
+				}
+				$insertSQL .= implode(",",$vs).")";
+				$first=false;
+			}
+			$this->adapter->exec( $insertSQL );
 		    return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
         else {
@@ -233,6 +243,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
               return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
     }
+
+
 
 	/**
 	 * Selects a record based on type and id.
@@ -289,7 +301,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)"); 
 		}
 		$newid = $this->insertRecord("__log",array("action","tbl","itemid"),
-            array(2,  $type, $id));
+           array(array(2,  $type, $id)));
 		if ($this->adapter->getCell("select id from __log where id < $newid and id > $logid and action=2 and itemid=$id ")){
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access II (type:$type, id:$id)");
 		}

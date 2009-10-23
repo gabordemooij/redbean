@@ -370,6 +370,22 @@ asrt(count($a->related($pageMore, "page")),1);
 asrt(count($a->related($pageEvenMore, "page")),1);
 asrt(count($a->related($pageOther, "page")),0);
 
+$observers = RedBean_Setup::getAttachedObservers();
+$logger = array_pop($observers);
+$pagea = $redbean->dispense("page");
+$pageb = $redbean->dispense("page");
+$pagec = $redbean->dispense("page");
+$redbean->store($pagea);
+$redbean->store($pageb);
+$redbean->store($pagec);
+$a->associate($pagea, $pageb);
+$a->associate($pagea, $pagec);
+$ids = $a->related($pagea,"page");
+$logger->preLoad("page",$ids);
+$pages = $redbean->batch("page",$ids);
+
+
+
 
 
 testpack("Transactions");

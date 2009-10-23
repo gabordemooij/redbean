@@ -143,7 +143,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
                 return (int) $bean->id;
             }
             else {
-                $id = $this->writer->insertRecord( $table, $insertcolumns, $insertvalues );
+                $id = $this->writer->insertRecord( $table, $insertcolumns, array($insertvalues) );
                 $bean->id = $id;
                 return (int) $id;
             }
@@ -188,7 +188,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 	 */
     public function batch( $type, $ids ) {
 		if (!$ids) return array();
-        $collection = array();
+		$collection = array();
 		$rows = $this->writer->selectRecord($type,$ids);
 		$this->stash = array();
 		if (!$rows) return array();
