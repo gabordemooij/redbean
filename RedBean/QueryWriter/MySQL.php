@@ -271,11 +271,11 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param string $oper
 	 * @todo validate arguments for security
 	 */
-    public function deleteRecord( $table, $column, $value, $oper="=" ) {
+    public function deleteRecord( $table, $column, $value) {
 		$table = $this->adapter->escape($table);
 		$column = $this->adapter->escape($column);
 		$value = $this->adapter->escape($value);
-        $this->adapter->exec("DELETE FROM `$table` WHERE `$column` $oper \"$value\" ");
+        $this->adapter->exec("DELETE FROM `$table` WHERE `$column` = \"$value\" ");
     }
 	/**
 	 * Gets information about changed records using a type and id and a logid.

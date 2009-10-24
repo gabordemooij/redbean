@@ -88,6 +88,8 @@ $pdo->setDebugMode(0);
 $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
 $pdo->Execute("DROP TABLE IF EXISTS book");
+$pdo->Execute("DROP TABLE IF EXISTS one");
+$pdo->Execute("DROP TABLE IF EXISTS post");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS page_page");
 $pdo->Execute("DROP TABLE IF EXISTS association");
@@ -387,10 +389,21 @@ try{ $redbean->store($pageII); fail(); }catch(RedBean_Exception_FailedAccessBean
 try{ $a->associate($pageII,$user); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); }
 try{ $a->unassociate($pageII,$user); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); }
 try{ $a->clearRelations($pageII, "user"); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); }
+try{ $redbean->store($page); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+try{ $a->associate($page,$user); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+try{ $a->unassociate($page,$user); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+try{ $a->clearRelations($page, "user"); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+$pageII = $redbean->load("page",$pageII->id); //reload will help
+try{ $redbean->store($pageII); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+try{ $a->associate($pageII,$user); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+try{ $a->unassociate($pageII,$user); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+try{ $a->clearRelations($pageII, "user"); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
+
 
 testpack("Test Preloader");
 $observers = RedBean_Setup::getAttachedObservers();
 $logger = array_pop($observers);
+asrt(($logger instanceof RedBean_Observer),true);
 $pagea = $redbean->dispense("page");
 $pageb = $redbean->dispense("page");
 $pagec = $redbean->dispense("page");
@@ -441,5 +454,94 @@ $keys = $adapter->getCol("SELECT id FROM page WHERE `name` LIKE '%John%'");
 asrt(count($keys),2);
 $pages = $redbean->batch("page", $keys);
 asrt(count($pages),2);
+
+
+testpack("Test (UN)Common Scenarios");
+$page = $redbean->dispense("page");
+$page->name = "test page";
+$id = $redbean->store($page);
+$user = $redbean->dispense("user");
+$a->unassociate($user,$page); pass(); //no error
+$a->unassociate($page,$user); pass(); //no error
+$a->clearRelations($page, "user"); pass(); //no error
+$a->clearRelations($user, "page"); pass(); //no error
+$a->associate($user,$page); pass();
+asrt(count($a->related( $user, "page")),1);
+asrt(count($a->related( $page, "user")),1);
+$a->clearRelations($user, "page"); pass(); //no error
+asrt(count($a->related( $user, "page")),0);
+asrt(count($a->related( $page, "user")),0);
+$page = $redbean->load("page",$id); pass();
+asrt($page->name,"test page");
+
+testpack("Test Plugins: Trees ");
+$tm = new RedBean_TreeManager($toolbox);
+$subpage1 = $redbean->dispense("page");
+$subpage2 = $redbean->dispense("page");
+$subpage3 = $redbean->dispense("page");
+$tm->attach( $page, $subpage1 );
+asrt(count($tm->children($page)),1);
+$tm->attach( $page, $subpage2 );
+asrt(count($tm->children($page)),2);
+$tm->attach( $subpage2, $subpage3 );
+asrt(count($tm->children($page)),2);
+asrt(count($tm->children($subpage2)),1);
+asrt(intval($subpage1->parent_id),intval($id));
+
+testpack("Test Plugins: Optimizer");
+
+$one = $redbean->dispense("one");
+$one->col = str_repeat('a long text',100);
+$redbean->store($one);
+require("Optimizer.php");
+$optimizer = new Optimizer( $toolbox );
+$redbean->addEventListener("update", $optimizer);
+$writer  = $toolbox->getWriter();
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"text");
+$one->col = NULL;
+$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"text");
+$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"set('1')");
+
+$one->col = str_repeat('a long text',100);
+$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"text");
+$one->col = 12;
+$redbean->store($one);$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"tinyint(3) unsigned");
+
+$one->col = str_repeat('a long text',100);
+$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"text");
+$one->col = 9000;
+$redbean->store($one);$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"int(11) unsigned");
+
+$one->col = str_repeat('a long text',100);
+$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"text");
+$one->col = 1.23;
+$redbean->store($one);$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"double");
+
+$one->col = str_repeat('a long text',100);
+$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"text");
+$one->col = "short text";
+$redbean->store($one);$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"varchar(255)");
+
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

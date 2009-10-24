@@ -19,7 +19,7 @@ class Optimizer implements RedBean_Observer {
 	}
 
 
-	public function onEvent( $event , $bean ) { return;
+	public function onEvent( $event , $bean ) {  
 		if ($event=="update") {
 			$arr = $bean->export();
 			unset($arr["id"]);
@@ -27,12 +27,12 @@ class Optimizer implements RedBean_Observer {
 			$table = $this->adapter->escape($bean->getMeta("type"));
 			$columns = array_keys($arr);
 			$column = $this->adapter->escape($columns[ array_rand($columns) ]);
-			$column = "body";
 			$value = $arr[$column];
 			$type = $this->writer->scanType($value);
 			$fields = $this->writer->getColumns($table);
+			if (!in_array($column,array_keys($fields))) return;
 			$typeInField = $this->writer->code($fields[$column]);
-			if ($type < $typeInField) {
+			if ($type < $typeInField) { 
 				$type = $this->writer->typeno_sqltype[$type];
 				$this->adapter->exec("alter table `$table` add __test ".$type);
 				$this->adapter->exec("update `$table` set __test=`$column`");
