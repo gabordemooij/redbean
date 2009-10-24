@@ -33,10 +33,10 @@ class RedBean_OODBBean {
 	 * Exports the bean as an array
 	 * @return array $arr
 	 */
-	public function export() {
+	public function export($meta = false) {
 		$arr = array();
 		foreach($this as $p=>$v) {
-			if ($p != "__info") {
+			if ($p != "__info" || $meta) {
 				$arr[ $p ] = $v;
 			}
 		}

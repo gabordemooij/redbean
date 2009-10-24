@@ -128,12 +128,19 @@ asrt($bean->a, 1);
 asrt($bean->b, 2);
 
 testpack("Test RedBean OODBBean: export");
+$bean->setMeta("justametaproperty","hellothere");
 $arr = $bean->export();
 asrt(is_array($arr),true);
 asrt(isset($arr["a"]),true);
 asrt(isset($arr["b"]),true);
 asrt($arr["a"],1);
 asrt($arr["b"],2);
+asrt(isset($arr["__info"]),false);
+$arr = $bean->export( true );
+asrt(isset($arr["__info"]),true);
+asrt($arr["a"],1);
+asrt($arr["b"],2);
+
 
 
 testpack("Test RedBean OODB: Dispense");
@@ -542,6 +549,24 @@ $one->col = "short text";
 $redbean->store($one);$redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"varchar(255)");
+
+$pdo->setDebugMode(0);
+testpack("Test RedBean Extended Journaling with manual Opened modification");
+$page = $redbean->dispense("page");
+$id = $redbean->store($page);
+$page = $redbean->load("page",$id);
+$page->name = "antique one";
+$redbean->store($page);
+$newpage = $redbean->dispense("page");
+$newpage->id  = $id;
+$newpage->name = "new one";
+try{ $redbean->store($newpage); fail(); }catch(Exception $e){ pass(); }
+$newpage = $redbean->dispense("page");
+$newpage->id  = $id;
+$newpage->name = "new one";
+$newpage->setMeta("opened",$page->getMeta("opened"));
+try{ $redbean->store($newpage); pass(); }catch(Exception $e){ fail(); }
+
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
