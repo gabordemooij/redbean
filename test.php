@@ -377,7 +377,18 @@ asrt(count($a->related($pageMore, "page")),1);
 asrt(count($a->related($pageEvenMore, "page")),1);
 asrt(count($a->related($pageOther, "page")),0);
 
-//test preloading --no official tests yet
+testpack("Test Locking with Assoc");
+$page = $redbean->dispense("page");
+$user = $redbean->dispense("page");
+$id = $redbean->store($page);
+$pageII = $redbean->load("page", $id);
+$redbean->store($page);
+try{ $redbean->store($pageII); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); }
+try{ $a->associate($pageII,$user); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); }
+try{ $a->unassociate($pageII,$user); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); }
+try{ $a->clearRelations($pageII, "user"); fail(); }catch(RedBean_Exception_FailedAccessBean $e){ pass(); }
+
+testpack("Test Preloader");
 $observers = RedBean_Setup::getAttachedObservers();
 $logger = array_pop($observers);
 $pagea = $redbean->dispense("page");
@@ -389,9 +400,13 @@ $redbean->store($pagec);
 $a->associate($pagea, $pageb);
 $a->associate($pagea, $pagec);
 $ids = $a->related($pagea,"page");
+$adapter->exec("TRUNCATE __log");
+asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),0);
 $logger->preLoad("page",$ids);
+asrt(count($ids),2);
+asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),3);
 $pages = $redbean->batch("page",$ids);
-
+asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),3);
 
 
 

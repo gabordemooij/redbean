@@ -32,7 +32,9 @@ class RedBean_ChangeLogger implements RedBean_Observer {
 	 */
     public function onEvent( $event, $item ) {
         $id = $item->id;
-        if (! ((int) $id)) return;
+        if (! ((int) $id)) $event="open";
+
+
         $type = $item->getMeta("type");
         if ($event=="open") {
 			if (isset($this->stash[$id])) {

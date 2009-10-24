@@ -50,8 +50,8 @@ class RedBean_AssociationManager {
 		$property2 = $bean2->getMeta("type") . "_id";
 		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
 		$bean->setMeta( "buildcommand.unique" , array( array( $property1, $property2 )));
-		if ($bean1->id == 0) $this->oodb->store($bean1);
-		if ($bean2->id == 0) $this->oodb->store($bean2);
+		$this->oodb->store($bean1);
+		$this->oodb->store($bean2);
 		$bean->$property1 = $bean1->id;
 		$bean->$property2 = $bean2->id;
 		$this->oodb->store( $bean );
@@ -88,6 +88,8 @@ class RedBean_AssociationManager {
 	 * @param RedBean_OODBBean $bean2
 	 */
 	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+		$this->oodb->store($bean1);
+		$this->oodb->store($bean2);
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
 		$type = $bean1->getMeta("type");
 		if ($type==$bean2->getMeta("type")) { //echo "<b>CROSS</b>";
@@ -113,6 +115,7 @@ class RedBean_AssociationManager {
 	 * @param <type> $type
 	 */
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
+		$this->oodb->store($bean);
 		$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		if ($type==$bean->getMeta("type")) { //echo "<b>CROSS</b>";
 			$property2 = $type."2_id";
