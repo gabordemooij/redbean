@@ -493,7 +493,7 @@ testpack("Test Plugins: Optimizer");
 $one = $redbean->dispense("one");
 $one->col = str_repeat('a long text',100);
 $redbean->store($one);
-require("Optimizer.php");
+require("RedBean/Optimizer.php");
 $optimizer = new Optimizer( $toolbox );
 $redbean->addEventListener("update", $optimizer);
 $writer  = $toolbox->getWriter();
