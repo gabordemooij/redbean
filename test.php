@@ -540,7 +540,6 @@ $one->col = 1.23;
 $redbean->store($one);$redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"double");
-
 $one->col = str_repeat('a long text',100);
 $redbean->store($one);
 $cols = $writer->getColumns("one");
@@ -550,7 +549,7 @@ $redbean->store($one);$redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"varchar(255)");
 
-$pdo->setDebugMode(0);
+
 testpack("Test RedBean Extended Journaling with manual Opened modification");
 $page = $redbean->dispense("page");
 $id = $redbean->store($page);

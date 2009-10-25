@@ -196,12 +196,14 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $id
 	 */
     public function updateRecord( $table, $updatevalues, $id) {
-        $update = array();
-        foreach($updatevalues as $u) {
-            $update[] = " `".$this->adapter->escape($u["property"])."` = \"".$this->adapter->escape($u["value"])."\" ";
-        }
-        $updateSQL = "UPDATE `$table` SET ".implode(",",$update)." WHERE id = ".$id;
-        $this->adapter->exec( $updateSQL );
+		$sql = "UPDATE ".$this->adapter->escape($table)." SET ";
+		$p = $v = array();
+		foreach($updatevalues as $uv) {
+			$p[] = " `".$uv["property"]."` = ? ";
+			$v[]=strval( $uv["value"] );
+		}
+		$sql .= implode(",", $p ) ." WHERE id = ".intval($id);
+		$this->adapter->exec( $sql, $v );
     }
 
 	/**
