@@ -43,7 +43,8 @@ class Redbean_Driver_PDO implements RedBean_Driver {
      * @var unknown_type
      */
     private $exc =0;
-    
+
+
     /**
      * 
      * @param $dsn
@@ -82,7 +83,9 @@ class Redbean_Driver_PDO implements RedBean_Driver {
                       PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC)
             );
     }
-    
+
+
+
     /**
      * (non-PHPdoc)
      * @see RedBean/RedBean_Driver#GetAll()

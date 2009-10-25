@@ -442,7 +442,9 @@ $redbean->freeze( true );
 $page = $redbean->dispense("page");
 $page->sections = 10;
 $page->name = "half a page";
-//try{$id = $redbean->store($page); fail();}catch(PDOException $e){ pass(); }
+try{$id = $redbean->store($page); pass();}catch(PDOException $e){ fail(); }
+$page =$redbean->load("page",$id);
+asrt(($page->sections!=10),true);
 $redbean->freeze( false );
 
 

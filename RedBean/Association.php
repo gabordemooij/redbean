@@ -79,7 +79,7 @@ class RedBean_AssociationManager {
 			FROM `$table`
 			WHERE ".$this->adapter->escape($targetproperty)." = ".$this->adapter->escape($bean->id);;
 		}
-		return $this->adapter->getCol( $sqlFetchKeys );
+		return $this->adapter->probe(1)->getCol( $sqlFetchKeys );
 	}
 
 	/**
@@ -107,7 +107,7 @@ class RedBean_AssociationManager {
 		if ($cross) {
 			$sqlDeleteAssoc .= " OR ( $property2 = $value1 AND $property1 = $value2 ) ";
 		}
-		$this->adapter->exec( $sqlDeleteAssoc );
+		$this->adapter->probe(1)->exec( $sqlDeleteAssoc );
 	}
 	/**
 	 * Removes all relations for a bean
@@ -128,7 +128,7 @@ class RedBean_AssociationManager {
 		if ($cross){
 			$sql .= " OR  ".$this->adapter->escape($property2)." = ".$this->adapter->escape($bean->id);;
 		}
-		$this->adapter->exec($sql);
+		$this->adapter->probe(1)->exec($sql);
 	}
 	/**
 	 * Creates a 1 to Many Association

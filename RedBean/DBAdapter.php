@@ -20,6 +20,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 */
 	private $sql = "";
 
+	private $prb = false;
 
 
 	/**
@@ -31,6 +32,12 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		$this->db = $database;
 	}
 
+
+
+	public function probe( $i ) {
+		$this->prb = $i;
+		return $this;
+	}
 
 
 	/**
@@ -54,15 +61,20 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		try {
 			return $this->db->$type($sql,$arg);
 		}catch(PDOException $e){
+			if ($this->prb) {
+				$this->prb--;
+				if ($e->getCode()=="42S02") {
+					//table not found, no problem for redbean
+					return array();
+				}
 
-			if ($e->getCode()=="42S02") {
-				//table not found, no problem for redbean
-				return array();
+				if ($e->getCode()=="42S22") {
+					//column not found, no problem for redbean
+					return array();
+				}
 			}
-
-			if ($e->getCode()=="42S22") {
-				//column not found, no problem for redbean
-				return array();
+			else {
+				throw $e;
 			}
 			
 		}

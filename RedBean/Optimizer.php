@@ -34,15 +34,15 @@ class Optimizer implements RedBean_Observer {
 			$typeInField = $this->writer->code($fields[$column]);
 			if ($type < $typeInField) { 
 				$type = $this->writer->typeno_sqltype[$type];
-				$this->adapter->exec("alter table `$table` add __test ".$type);
-				$this->adapter->exec("update `$table` set __test=`$column`");
+				$this->adapter->probe(1)->exec("alter table `$table` add __test ".$type);
+				$this->adapter->probe(1)->exec("update `$table` set __test=`$column`");
 				$diff = $this->adapter->getCell("select
 							count(*) as df from `$table` where
 							strcmp(`$column`,__test) != 0");
 				if (!$diff) {
-					$this->adapter->exec("alter table `$table` change `$column` `$column` ".$type);
+					$this->adapter->probe(1)->exec("alter table `$table` change `$column` `$column` ".$type);
 				}
-				$this->adapter->exec("alter table `$table` drop __test");
+				$this->adapter->probe(1)->exec("alter table `$table` drop __test");
 			}
 
 		}
