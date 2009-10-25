@@ -144,14 +144,26 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		return $this->db->Errormsg();
 	}
 
+	/**
+	 *
+	 * Starts a transaction
+	 */
 	public function startTransaction() {
 		return $this->db->StartTrans();
 	}
 
+	/**
+	 *
+	 * Commits a transaction
+	 */
 	public function commit() {
 		return $this->db->CommitTrans();
 	}
 
+	/**
+	 *
+	 * Rolls back transaction
+	 */
 	public function rollback() {
 		return $this->db->FailTrans();
 	}

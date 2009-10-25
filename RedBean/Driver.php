@@ -24,21 +24,21 @@ interface RedBean_Driver {
 	 * @param $sql
 	 * @return array $results
 	 */
-	public function GetAll( $sql );
+	public function GetAll( $sql, $aValues=array() );
 
 	/**
 	 * Runs a query and fetches results as a column
 	 * @param $sql
 	 * @return array $results
 	 */
-	public function GetCol( $sql );
+	public function GetCol( $sql, $aValues=array() );
 
 	/**
 	 * Runs a query an returns results as a single cell
 	 * @param $sql
 	 * @return mixed $cellvalue
 	 */
-	public function GetCell( $sql );
+	public function GetCell( $sql, $aValues=array() );
 
 	/**
 	 * Runs a query and returns a flat array containing the values of
@@ -46,7 +46,7 @@ interface RedBean_Driver {
 	 * @param $sql
 	 * @return array $row
 	 */
-	public function GetRow( $sql );
+	public function GetRow( $sql, $aValues=array() );
 
 	/**
 	 * Returns the error constant of the most
@@ -67,7 +67,7 @@ interface RedBean_Driver {
 	 * @param $sql
 	 * @return void
 	 */
-	public function Execute( $sql );
+	public function Execute( $sql, $aValues=array() );
 
 	/**
 	 * Escapes a value according to the
@@ -103,5 +103,21 @@ interface RedBean_Driver {
 	 * @return mixed $database
 	 */
 	public function GetRaw();
+
+	/**
+	 * Commits a transaction
+	 */
+	public function CommitTrans();
+
+	/**
+	 * Starts a transaction
+	 */
+	public function StartTrans();
+
+	/**
+	 * Rolls back a transaction
+	 */
+	public function FailTrans();
+
 	
 }

@@ -257,15 +257,25 @@ class Redbean_Driver_PDO implements RedBean_Driver {
         return $this->rs;
     }
 
+
+	/**
+	 * Starts a transaction
+	 */
 	public function StartTrans() {
 		$this->pdo->beginTransaction();
 	}
 
+	/**
+	 * Commits a transaction
+	 */
 	public function CommitTrans() {
 		$this->pdo->commit();
 	}
 
 
+	/**
+	 * Rolls back a transaction
+	 */
 	public function FailTrans() {
 		$this->pdo->rollback();
 	}

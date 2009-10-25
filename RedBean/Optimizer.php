@@ -1,9 +1,22 @@
 <?php
-
+/**
+ * Optimizer
+ * @package 		RedBean/Optimizer.php
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
 class Optimizer implements RedBean_Observer {
 
-
+	/**
+	 *
+	 * @var RedBean_DBAdapter
+	 */
 	private $adapter;
+
+	/**
+	 *
+	 * @var RedBean_OODB
+	 */
 	private $oodb;
 
 	/**
@@ -12,13 +25,22 @@ class Optimizer implements RedBean_Observer {
 	 */
 	private $writer;
 
+	/**
+	 * Constructor
+	 * Handles the toolbox
+	 * @param RedBean_ToolBox $toolbox
+	 */
 	public function __construct( RedBean_ToolBox $toolbox ) {
 		$this->oodb = $toolbox->getRedBean();
 		$this->adapter = $toolbox->getDatabaseAdapter();
 		$this->writer = $toolbox->getWriter(); 
 	}
 
-
+	/**
+	 * Does an optimization cycle for each UPDATE event
+	 * @param string $event
+	 * @param RedBean_OODBBean $bean
+	 */
 	public function onEvent( $event , $bean ) {  
 		if ($event=="update") {
 			$arr = $bean->export();

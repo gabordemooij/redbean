@@ -96,6 +96,7 @@ $pdo->Execute("DROP TABLE IF EXISTS association");
 $page = $redbean->dispense("page");
 
 testpack("Test Database");
+try{ $adapter->exec("an invalid query"); fail(); }catch(RedBean_Exception_SQL $e ){ pass(); }
 asrt( (int) $adapter->getCell("SELECT 123") ,123);
 asrt( (int) $adapter->getCell("SELECT ?",array("987")) ,987);
 asrt( (int) $adapter->getCell("SELECT ?+?",array("987","2")) ,989);
@@ -151,6 +152,25 @@ asrt(($page->id),0);
 try{ $redbean->dispense(""); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->dispense("."); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->dispense("-"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+
+
+testpack("Test RedBean OODB: Check");
+$bean = $redbean->dispense("page");
+$bean->name = array("1");
+try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+$bean->name = new RedBean_OODBBean;
+try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+$prop = ".";
+$bean->$prop = 1;
+try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+$prop = "-";
+$bean->$prop = 1;
+try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+
 
 testpack("Test RedBean OODB: Insert Record");
 $page->name = "my page";
