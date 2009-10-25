@@ -220,28 +220,19 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 			foreach($insertcolumns as $k=>$v) {
                 $insertcolumns[$k] = "`".$this->adapter->escape($v)."`";
             }
-
-            
-            $insertSQL = "INSERT INTO `$table`
-					  ( id, ".implode(",",$insertcolumns)." ) ";
-
-			$insertSQL .= " VALUES ";
-			$first = true;
+			$insertSQL = "INSERT INTO `$table` ( id, ".implode(",",$insertcolumns)." ) VALUES ";
+			$pat = "( NULL, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." )";
+			$insertSQL .= implode(",",array_fill(0,count($insertvalues),$pat));
 			foreach($insertvalues as $insertvalue) {
-				if (!$first) $insertSQL .= ",";
-				$insertSQL .= "( null, ";
-				$vs = array();
 				foreach($insertvalue as $v) {
-					$vs[] = "\"".$this->adapter->escape($v)."\"";
+					$vs[] = strval( $v );
 				}
-				$insertSQL .= implode(",",$vs).")";
-				$first=false;
 			}
-			$this->adapter->exec( $insertSQL );
+			$this->adapter->exec( $insertSQL, $vs );
 		    return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
         else {
-            $this->adapter->exec( "INSERT INTO `$table` (id) VALUES(NULL) " );
+		      $this->adapter->exec( "INSERT INTO `$table` (id) VALUES(NULL) " );
               return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
     }
@@ -256,13 +247,9 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 */
     public function selectRecord($type, $ids) {
 		$type=$this->adapter->escape($type);
-        $rows = $this->adapter->get( "SELECT * FROM `$type` WHERE id IN ( ".implode(",",$ids)." )");
-        if ($rows && is_array($rows) && count($rows)>0) {
-            return $rows;
-        }
-        else {
-            return null;
-        }
+		$sql = "SELECT * FROM `$type` WHERE id IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
+		$rows = $this->adapter->get($sql,$ids);
+		return ($rows && is_array($rows) && count($rows)>0) ? $rows : NULL;
     }
 
 	/**
@@ -276,8 +263,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
     public function deleteRecord( $table, $column, $value) {
 		$table = $this->adapter->escape($table);
 		$column = $this->adapter->escape($column);
-		$value = $this->adapter->escape($value);
-        $this->adapter->exec("DELETE FROM `$table` WHERE `$column` = \"$value\" ");
+	    $this->adapter->exec("DELETE FROM `$table` WHERE `$column` = ? ",array(strval($value)));
     }
 	/**
 	 * Gets information about changed records using a type and id and a logid.

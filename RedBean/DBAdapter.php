@@ -20,7 +20,8 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 */
 	private $sql = "";
 
-	
+
+
 	/**
 	 *
 	 * @param $database
@@ -29,7 +30,9 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	public function __construct($database) {
 		$this->db = $database;
 	}
-	
+
+
+
 	/**
 	 * 
 	 * @return unknown_type
@@ -47,6 +50,24 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		return $this->db->Escape($sqlvalue);
 	}
 
+	private function doQuery( $type, $sql, $arg=array() ) {
+		try {
+			return $this->db->$type($sql,$arg);
+		}catch(PDOException $e){
+
+			if ($e->getCode()=="42S02") {
+				//table not found, no problem for redbean
+				return array();
+			}
+
+			if ($e->getCode()=="42S22") {
+				//column not found, no problem for redbean
+				return array();
+			}
+			
+		}
+	}
+
 	/**
 	 * Executes SQL code
 	 * @param $sql
@@ -58,7 +79,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 			$this->sql = $sql;
 			$this->signal("sql_exec", $this);
 		}
-		return $this->db->Execute( $sql, $aValues );
+		return $this->doQuery( "Execute", $sql, $aValues );
 	}
 
 	/**
@@ -71,8 +92,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
 		
-		
-		return $this->db->GetAll( $sql,$aValues );
+		return $this->doQuery( "GetAll",$sql,$aValues );
 	}
 
 	/**
@@ -84,9 +104,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
-		
-		
-		return $this->db->GetRow( $sql, $aValues );
+		return $this->doQuery( "GetRow",$sql,$aValues );
 	}
 
 	/**
@@ -95,12 +113,9 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 * @return unknown_type
 	 */
 	public function getCol( $sql, $aValues = array() ) {
-		
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
-		
-		
-		return $this->db->GetCol( $sql, $aValues );
+		return $this->doQuery( "GetCol",$sql,$aValues );
 	}
 
 	/**
@@ -112,9 +127,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
-		
-		
-		$arr = $this->db->GetCol( $sql, $aValues );
+		$arr = $this->getCol( $sql, $aValues );
 		if ($arr && is_array($arr))	return ($arr[0]); else return false;
 	}
 
