@@ -160,7 +160,13 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 			$row = $this->stash[$id];
 		}
 		else {
-			$rows = $this->writer->selectRecord($type,array($id));
+			try{ $rows = $this->writer->selectRecord($type,array($id));	}catch(RedBean_Exception_SQL $e){
+				if ($e->getSQLState()=="42S02" || $e->getSQLState()=="42S22") {
+					$rows = 0;
+					if ($this->isFrozen) throw $e; //only throw if frozen;
+				}
+				else throw $e;
+			}
 			if (!$rows) return $this->dispense($type);
 			$row = array_pop($rows);
 		}

@@ -52,11 +52,15 @@ class RedBean_TreeManager {
 	 * @return array $childObjects
 	 */
 	public function children( RedBean_OODBBean $parent ) {
-		return $this->oodb->batch($parent->getMeta("type"),
-			$this->adapter->probe(1)->getCol("SELECT id FROM
+		try {$ids = $this->adapter->getCol("SELECT id FROM
 			`".$parent->getMeta("type")."`
 			WHERE `".$this->property."` = ".intval( $parent->id )."
-		"));
+		");
+		}
+		catch(RedBean_Exception_SQL $e) {
+			return array();
+		}
+		return $this->oodb->batch($parent->getMeta("type"),$ids	);
 	}
 	
 }

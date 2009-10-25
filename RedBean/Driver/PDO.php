@@ -99,10 +99,16 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 	            echo "<HR>" . $sql;
 	        }
 			$s = $this->pdo->prepare($sql);
-	        $s->execute($aValues);
+
+			try {
+			$s->execute($aValues);
 		    $this->rs = $s->fetchAll();
 	        $rows = $this->rs;
-	        if(!$rows)
+			}catch(PDOException $e) {
+				throw new RedBean_Exception_SQL( $e->getCode() );
+			}
+
+			if(!$rows)
 	        {
 	            $rows = array();
 	        }
@@ -196,8 +202,13 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 	        {
 	            echo "<HR>" . $sql;
 	        }
+			try {
 			$s = $this->pdo->prepare($sql);
 			$s->execute($aValues);
+			}
+			catch(PDOException $e) {
+				throw new RedBean_Exception_SQL( $e->getCode() );
+			}
 		//	return $this->affected_rows;
     }
     

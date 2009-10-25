@@ -20,8 +20,6 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	 */
 	private $sql = "";
 
-	private $prb = false;
-
 
 	/**
 	 *
@@ -31,14 +29,6 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	public function __construct($database) {
 		$this->db = $database;
 	}
-
-
-
-	public function probe( $i ) {
-		$this->prb = $i;
-		return $this;
-	}
-
 
 	/**
 	 * 
@@ -57,28 +47,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		return $this->db->Escape($sqlvalue);
 	}
 
-	private function doQuery( $type, $sql, $arg=array() ) {
-		try {
-			return $this->db->$type($sql,$arg);
-		}catch(PDOException $e){
-			if ($this->prb) {
-				$this->prb--;
-				if ($e->getCode()=="42S02") {
-					//table not found, no problem for redbean
-					return array();
-				}
-
-				if ($e->getCode()=="42S22") {
-					//column not found, no problem for redbean
-					return array();
-				}
-			}
-			else {
-				throw $e;
-			}
-			
-		}
-	}
+	
 
 	/**
 	 * Executes SQL code
@@ -91,7 +60,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 			$this->sql = $sql;
 			$this->signal("sql_exec", $this);
 		}
-		return $this->doQuery( "Execute", $sql, $aValues );
+		return $this->db->Execute( $sql, $aValues );
 	}
 
 	/**
@@ -104,7 +73,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
 		
-		return $this->doQuery( "GetAll",$sql,$aValues );
+		return $this->db->GetAll( $sql,$aValues );
 	}
 
 	/**
@@ -116,7 +85,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
-		return $this->doQuery( "GetRow",$sql,$aValues );
+		return $this->db->GetRow( $sql,$aValues );
 	}
 
 	/**
@@ -127,7 +96,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 	public function getCol( $sql, $aValues = array() ) {
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
-		return $this->doQuery( "GetCol",$sql,$aValues );
+		return $this->db->GetCol( $sql,$aValues );
 	}
 
 	/**
@@ -139,7 +108,7 @@ class RedBean_DBAdapter extends RedBean_Observable {
 		
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
-		$arr = $this->getCol( $sql, $aValues );
+		$arr = $this->db->getCol( $sql, $aValues );
 		if ($arr && is_array($arr))	return ($arr[0]); else return false;
 	}
 

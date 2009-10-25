@@ -368,8 +368,8 @@ $a->clearRelations($page2, "page");
 asrt(count($a->related($page2, "page")),0);
 asrt(count($a->related($page3, "page")),0);
 asrt(count($a->related($page4, "page")),0);
-try{ $a->associate($page2,$page2); pass(); }catch(PDOException $e){ fail(); }
-//try{ $a->associate($page2,$page2); fail(); }catch(PDOException $e){ pass(); }
+try{ $a->associate($page2,$page2); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
+try{ $a->associate($page2,$page2); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
 $pageOne = $redbean->dispense("page");
 $pageOne->name = "one";
 $pageMore = $redbean->dispense("page");
@@ -442,9 +442,7 @@ $redbean->freeze( true );
 $page = $redbean->dispense("page");
 $page->sections = 10;
 $page->name = "half a page";
-try{$id = $redbean->store($page); pass();}catch(PDOException $e){ fail(); }
-$page =$redbean->load("page",$id);
-asrt(($page->sections!=10),true);
+try{$id = $redbean->store($page); fail();}catch(RedBean_Exception_SQL $e){ pass(); }
 $redbean->freeze( false );
 
 

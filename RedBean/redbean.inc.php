@@ -13,6 +13,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
  */
 
+require("Exception/SQL.php");
 require("ObjectDatabase.php");
 
 require("Driver.php");
