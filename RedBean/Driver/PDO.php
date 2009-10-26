@@ -105,7 +105,11 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 		    $this->rs = $s->fetchAll();
 	        $rows = $this->rs;
 			}catch(PDOException $e) {
-				throw new RedBean_Exception_SQL( $e->getCode() );
+				//Unfortunately the code field is supposed to be int by default (php)
+				//So we need a property to convey the SQL State code
+				$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
+				$x->setSQLState( $e->getCode() );
+				throw $x;
 			}
 
 			if(!$rows)
@@ -205,11 +209,18 @@ class Redbean_Driver_PDO implements RedBean_Driver {
 			try {
 			$s = $this->pdo->prepare($sql);
 			$s->execute($aValues);
+			$this->affected_rows=$s->rowCount();
+			return $this->affected_rows;
 			}
 			catch(PDOException $e) {
-				throw new RedBean_Exception_SQL( $e->getCode() );
+				//Unfortunately the code field is supposed to be int by default (php)
+				//So we need a property to convey the SQL State code
+				$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
+				$x->setSQLState( $e->getCode() );
+				throw $x;
+				
 			}
-		//	return $this->affected_rows;
+		//	
     }
     
     /**

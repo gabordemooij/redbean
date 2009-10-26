@@ -155,6 +155,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 	 * @return RedBean_OODBBean $bean
 	 */
     public function load($type, $id) {
+		$id = intval( $id );
 		$bean = $this->dispense( $type );
 		if ($this->stash && $this->stash[$id]) {
 			$row = $this->stash[$id];

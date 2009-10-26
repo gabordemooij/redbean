@@ -57,6 +57,17 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      */
     private $adapter;
 
+
+	/**
+	 * Checks table name or column name
+	 * @param string $table
+	 * @return string $table
+	 */
+	private function check($table) {
+		if (strpos($table,"`")!==false) throw new Redbean_Exception_Security("Illegal chars in table name");
+		return $this->adapter->escape($table);
+	}
+
     /**
      * Constructor
      * The Query Writer Constructor also sets up the database
@@ -103,7 +114,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param string $table
 	 */
     public function createTable( $table ) {
-        $sql = "
+		$table = $this->check($table);
+		$sql = "
                      CREATE TABLE `$table` (
                     `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
                      PRIMARY KEY ( `id` )
@@ -118,7 +130,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return array $columns
 	 */
     public function getColumns( $table ) {
-		$table = $this->adapter->escape($table);
+		$table = $this->check($table);
         $columnsRaw = $this->adapter->get("DESCRIBE `$table`");
         foreach($columnsRaw as $r) {
             $columns[$r["Field"]]=$r["Type"];
@@ -159,8 +171,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $type
 	 */
     public function addColumn( $table, $column, $type ) {
-		$column = $this->adapter->escape($column);
-		$table = $this->adapter->escape($table);
+		$column = $this->check($column);
+		$table = $this->check($table);
         $type=$this->typeno_sqltype[$type];
         $sql = "ALTER TABLE `$table` ADD `$column` $type ";
         $this->adapter->exec( $sql );
@@ -182,8 +194,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $type
 	 */
     public function widenColumn( $table, $column, $type ) {
-        $column = $this->adapter->escape($column);
-		$table = $this->adapter->escape($table);
+        $column = $this->check($column);
+		$table = $this->check($table);
 		$newtype = $this->typeno_sqltype[$type];
         $changecolumnSQL = "ALTER TABLE `$table` CHANGE `$column` `$column` $newtype ";
         $this->adapter->exec( $changecolumnSQL );
@@ -196,7 +208,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $id
 	 */
     public function updateRecord( $table, $updatevalues, $id) {
-		$sql = "UPDATE ".$this->adapter->escape($table)." SET ";
+		$sql = "UPDATE ".$this->check($table)." SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
 			$p[] = " `".$uv["property"]."` = ? ";
@@ -215,10 +227,10 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return integer $insertid
 	 */
     public function insertRecord( $table, $insertcolumns, $insertvalues ) {
-		$table = $this->adapter->escape($table);
+		$table = $this->check($table);
         if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k=>$v) {
-                $insertcolumns[$k] = "`".$this->adapter->escape($v)."`";
+                $insertcolumns[$k] = "`".$this->check($v)."`";
             }
 			$insertSQL = "INSERT INTO `$table` ( id, ".implode(",",$insertcolumns)." ) VALUES ";
 			$pat = "( NULL, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." )";
@@ -246,7 +258,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return array $row
 	 */
     public function selectRecord($type, $ids) {
-		$type=$this->adapter->escape($type);
+		$type=$this->check($type);
 		$sql = "SELECT * FROM `$type` WHERE id IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);
 		return ($rows && is_array($rows) && count($rows)>0) ? $rows : NULL;
@@ -261,8 +273,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @todo validate arguments for security
 	 */
     public function deleteRecord( $table, $column, $value) {
-		$table = $this->adapter->escape($table);
-		$column = $this->adapter->escape($column);
+		$table = $this->check($table);
+		$column = $this->check($column);
 	    $this->adapter->exec("DELETE FROM `$table` WHERE `$column` = ? ",array(strval($value)));
     }
 	/**
@@ -280,7 +292,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return integer $newchangeid
 	 */
     public function checkChanges($type, $id, $logid) {
-		$type = $this->adapter->escape($type);
+		$type = $this->check($type);
 		$id = (int) $id;
 		$logid = (int) $logid;
 		$num = $this->adapter->getCell("
@@ -307,7 +319,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		foreach($columns as $k=>$v){
 			$columns[$k]="`".$this->adapter->escape($v)."`";
 		}
-		$table = $this->adapter->escape($table);
+		$table = $this->check($table);
         $r = $this->adapter->get("SHOW INDEX FROM $table");
         $name = "UQ_".sha1(implode(',',$columns));
         if ($r) {

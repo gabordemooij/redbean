@@ -85,6 +85,10 @@ asrt(($redbean instanceof RedBean_OODB),true);
 
 $pdo = $adapter->getDatabase();
 $pdo->setDebugMode(0);
+$pdo->Execute("CREATE TABLE IF NOT EXISTS`hack` (
+`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY
+) ENGINE = MYISAM ;
+");
 $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
 $pdo->Execute("DROP TABLE IF EXISTS book");
@@ -144,6 +148,7 @@ asrt($arr["b"],2);
 
 
 
+
 testpack("Test RedBean OODB: Dispense");
 asrt(((bool)$page->getMeta("type")),true);
 asrt(isset($page->id),true);
@@ -186,6 +191,7 @@ asrt(( (bool) $page->getMeta("type")),true);
 asrt(isset($page->id),true);
 asrt(($page->getMeta("type")),"page");
 asrt((int)$page->id,$id);
+
 
 
 testpack("Test RedBean OODB: Can we Update a Record? ");
@@ -586,6 +592,95 @@ $newpage->name = "new one";
 $newpage->setMeta("opened",$page->getMeta("opened"));
 try{ $redbean->store($newpage); pass(); }catch(Exception $e){ fail(); }
 
+
+testpack("Test Query Writer MySQL");
+$adapter->exec("DROP TABLE IF EXISTS testtable");
+asrt(in_array("testtable",$adapter->getCol("show tables")),false);
+$writer->createTable("testtable");
+asrt(in_array("testtable",$adapter->getCol("show tables")),true);
+asrt(count(array_diff($writer->getTables(),$adapter->getCol("show tables"))),0);
+asrt(count(array_keys($writer->getColumns("testtable"))),1);
+asrt(in_array("id",array_keys($writer->getColumns("testtable"))),true);
+asrt(in_array("c1",array_keys($writer->getColumns("testtable"))),false);
+$writer->addColumn("testtable", "c1", 1);
+asrt(count(array_keys($writer->getColumns("testtable"))),2);
+asrt(in_array("c1",array_keys($writer->getColumns("testtable"))),true);
+foreach($writer->sqltype_typeno as $key=>$type){asrt($writer->code($key),$type);}
+asrt($writer->code("unknown"),99);
+asrt($writer->scanType(false),0);
+asrt($writer->scanType(NULL),0);
+asrt($writer->scanType(2),1);
+asrt($writer->scanType(255),1);
+asrt($writer->scanType(256),2);
+asrt($writer->scanType(-1),3);
+asrt($writer->scanType(1.5),3);
+asrt($writer->scanType("abc"),4);
+asrt($writer->scanType(str_repeat("lorem ipsum",100)),5);
+$writer->widenColumn("testtable", "c1", 2);
+$cols=$writer->getColumns("testtable");asrt($writer->code($cols["c1"]),2);
+$writer->widenColumn("testtable", "c1", 3);
+$cols=$writer->getColumns("testtable");asrt($writer->code($cols["c1"]),3);
+$writer->widenColumn("testtable", "c1", 4);
+$cols=$writer->getColumns("testtable");asrt($writer->code($cols["c1"]),4);
+$writer->widenColumn("testtable", "c1", 5);
+$cols=$writer->getColumns("testtable");asrt($writer->code($cols["c1"]),5);
+$id = $writer->insertRecord("testtable", array("c1"), array(array("lorem ipsum")));
+$row = $writer->selectRecord("testtable", array($id));
+asrt($row[0]["c1"],"lorem ipsum");
+$writer->updateRecord("testtable", array(array("property"=>"c1","value"=>"ipsum lorem")), $id);
+$row = $writer->selectRecord("testtable", array($id));
+asrt($row[0]["c1"],"ipsum lorem");
+$writer->deleteRecord("testtable", "id", $id);
+$row = $writer->selectRecord("testtable", array($id));
+asrt($row,NULL);
+
+
+testpack("Test RedBean Security - bean interface ");
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+$bean = $redbean->load("page","13; drop table hack");
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+try{ $bean = $redbean->load("page where 1; drop table hack",1); }catch(Exception $e){}
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+$bean = $redbean->dispense("page");
+$evil = "; drop table hack";
+$bean->id = $evil;
+try{$redbean->store($bean);}catch(Exception $e){}
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+unset($bean->id);
+$bean->name = "\"".$evil;
+try{$redbean->store($bean);}catch(Exception $e){}
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+$bean->name = "'".$evil;
+try{$redbean->store($bean);}catch(Exception $e){}
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+$bean->$evil = 1;
+try{$redbean->store($bean);}catch(Exception $e){}
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+unset($bean->$evil);
+$bean->id = 1;
+$bean->name = "\"".$evil;
+try{$redbean->store($bean);}catch(Exception $e){}
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+$bean->name = "'".$evil;
+try{$redbean->store($bean);}catch(Exception $e){}
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+$bean->$evil = 1;
+try{$redbean->store($bean);}catch(Exception $e){}
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+try{$redbean->trash($bean);}catch(Exception $e){}
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+
+
+
+$adapter->exec("drop table if exists sometable");
+testpack("Test RedBean Security - query writer");
+try{$writer->createTable("sometable` ( `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT , PRIMARY KEY ( `id` ) ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ; drop table hack; --");}catch(Exception $e){}
+asrt(in_array("hack",$adapter->getCol("show tables")),true);
+
+//print_r( $adapter->get("select id from page where id = 1; drop table hack") );
+//asrt(in_array("hack",$adapter->getCol("show tables")),true);
+//$bean = $redbean->load("page","13);show tables; ");
+//exit;
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
