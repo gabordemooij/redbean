@@ -32,4 +32,9 @@ class RedBean_Exception_SQL extends Exception {
 	public function setSQLState( $sqlState ) {
 		$this->sqlState = $sqlState;
 	}
+
+	
+	public function __toString() {
+		echo "[".$this->getSQLState()."] - ".$this->getMessage();
+	}
 }

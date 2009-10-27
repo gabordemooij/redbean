@@ -74,6 +74,8 @@ class ObserverMock implements RedBean_Observer {
     }
 }
 
+
+
 $adapter = $toolbox->getDatabaseAdapter();
 $writer  = $toolbox->getWriter();
 $redbean = $toolbox->getRedBean();
@@ -659,6 +661,18 @@ asrt($row[0]["c1"],"ipsum lorem");
 $writer->deleteRecord("testtable", "id", $id);
 $row = $writer->selectRecord("testtable", array($id));
 asrt($row,NULL);
+//$pdo->setDebugMode(1);
+
+$writer->addColumn("testtable", "c2", 2);
+try{ $writer->addUniqueIndex("testtable", array("c1","c2")); fail(); //should fail, no content length blob
+}catch(RedBean_Exception_SQL $e){ pass(); }
+$writer->addColumn("testtable", "c3", 2);
+try{ $writer->addUniqueIndex("testtable", array("c2","c3")); pass(); //should fail, no content length blob
+}catch(RedBean_Exception_SQL $e){ fail(); }
+$a = $adapter->get("show index from testtable");
+asrt(count($a),3);
+asrt($a[1]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
+asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 
 
 testpack("Test RedBean Security - bean interface ");
@@ -707,6 +721,7 @@ asrt(in_array("hack",$adapter->getCol("show tables")),true);
 //asrt(in_array("hack",$adapter->getCol("show tables")),true);
 //$bean = $redbean->load("page","13);show tables; ");
 //exit;
+
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
