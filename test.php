@@ -58,7 +58,6 @@ function testpack($name) {
 require("RedBean/redbean.inc.php");
 $toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
 
-
 //Observable Mock Object
 class ObservableMock extends RedBean_Observable {
     public function test( $eventname, $info ) {
@@ -97,6 +96,9 @@ $pdo->Execute("DROP TABLE IF EXISTS post");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS page_page");
 $pdo->Execute("DROP TABLE IF EXISTS association");
+$pdo->Execute("DROP TABLE IF EXISTS logentry");
+$pdo->Execute("DROP TABLE IF EXISTS admin");
+$pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
 $page = $redbean->dispense("page");
 
 testpack("Test Database");
@@ -591,6 +593,30 @@ $newpage->id  = $id;
 $newpage->name = "new one";
 $newpage->setMeta("opened",$page->getMeta("opened"));
 try{ $redbean->store($newpage); pass(); }catch(Exception $e){ fail(); }
+
+
+
+testpack("Test Logger issue");
+//issue#Michiel
+$rb=$redbean;
+$pdo = $adapter->getDatabase();
+//$pdo->setDebugMode(1);
+$l = $rb->dispense("logentry");
+$rb->store($l);
+$l = $rb->dispense("admin");
+$rb->store($l);
+$l = $rb->dispense("logentry");
+$rb->store($l);
+$l = $rb->dispense("admin");
+$rb->store($l);
+$admin = $rb->load('admin' , 1);
+$a = new RedBean_AssociationManager($toolbox);
+$log = $rb->load('logentry' , 1);
+$a->associate($log, $admin); //throws exception
+$log2 = $rb->load('logentry' , 2);
+$a->associate($log2, $admin);
+pass();//no exception? still alive? proficiat.. pass!
+
 
 
 testpack("Test Query Writer MySQL");

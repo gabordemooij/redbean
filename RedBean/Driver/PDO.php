@@ -96,7 +96,7 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     	$this->exc = 0;
     	    if ($this->debug)
 	        {
-	            echo "<HR>" . $sql;
+	            echo "<HR>" . $sql.print_r($aValues,1);
 	        }
 			$s = $this->pdo->prepare($sql);
 
@@ -204,7 +204,7 @@ class Redbean_Driver_PDO implements RedBean_Driver {
     	$this->exc = 0;
     	    if ($this->debug)
 	        {
-	            echo "<HR>" . $sql;
+	            echo "<HR>" . $sql.print_r($aValues,1);
 	        }
 			try {
 			$s = $this->pdo->prepare($sql);

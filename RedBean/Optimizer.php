@@ -41,7 +41,8 @@ class Optimizer implements RedBean_Observer {
 	 * @param string $event
 	 * @param RedBean_OODBBean $bean
 	 */
-	public function onEvent( $event , $bean ) {  
+	public function onEvent( $event , $bean ) {
+		try{
 		if ($event=="update") {
 			$arr = $bean->export();
 			unset($arr["id"]);
@@ -67,6 +68,9 @@ class Optimizer implements RedBean_Observer {
 				$this->adapter->exec("alter table `$table` drop __test");
 			}
 
+		}
+		}catch(RedBean_Exception_SQL $e){ //optimizer might make mistakes, dont care..
+		
 		}
 	}
 

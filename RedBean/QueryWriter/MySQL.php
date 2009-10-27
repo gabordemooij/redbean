@@ -301,8 +301,9 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)"); 
 		}
 		$newid = $this->insertRecord("__log",array("action","tbl","itemid"),
-           array(array(2,  $type, $id)));
-		if ($this->adapter->getCell("select id from __log where id < $newid and id > $logid and action=2 and itemid=$id ")){
+		   array(array(2,  $type, $id)));
+	    if ($this->adapter->getCell("select id from __log where tbl=:tbl AND id < $newid and id > $logid and action=2 and itemid=$id ",
+			array(":tbl"=>$type))){
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access II (type:$type, id:$id)");
 		}
 		return $newid;
