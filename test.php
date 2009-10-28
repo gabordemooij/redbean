@@ -1,17 +1,21 @@
 <?php 
 
-//Some unittests for RedBean
-//Written by G.J.G.T. de Mooij
+//
+//                   ._______ __________  .______________
+//_______   ____   __| _/    |   \      \ |   \__    ___/
+//\_  __ \_/ __ \ / __ ||    |   /   |   \|   | |    |
+// |  | \/\  ___// /_/ ||    |  /    |    \   | |    |
+// |__|    \___  >____ ||______/\____|__  /___| |____|
+//            \/     \/                \/
 
-//I used this file to develop and tweak Redbean
-//Redbean has been developed TEST DRIVEN (TDD)
-
-//This file is mostly for me to test RedBean so it might be a bit chaotic because
-//I often need to adjust and change this file, however I am now trying to tidy up this file so 
-//you can use it as well. Also, test descriptions will be added over time.
-
-
-
+ // Written by Gabor de Mooij Copyright (c) 2009
+/**
+ * RedUNIT (Test Suite)
+ * @package 		test.php
+ * @description		Series of Unit Tests for RedBean
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
 
 function printtext( $text ) {
 	if ($_SERVER["DOCUMENT_ROOT"]) {
@@ -144,21 +148,207 @@ class NullWriter implements RedBean_QueryWriter {
 		$this->addUniqueIndexArguments=array($table,$columns);
 		return $this->returnAddUniqueIndex;
 	}
+	public function reset() {
+		$this->createTableArgument = NULL;
+		$this->getColumnsArgument = NULL;
+		$this->scanTypeArgument = NULL;
+		$this->addColumnArguments = array();
+		$this->codeArgument = NULL;
+		$this->widenColumnArguments = array();
+		$this->updateRecordArguments = array();
+		$this->insertRecordArguments = array();
+		$this->selectRecordArguments = array();
+		$this->deleteRecordArguments = array();
+		$this->checkChangesArguments = array();
+		$this->addUniqueIndexArguments = array();
+
+		$this->returnTables = array();
+		$this->returnGetColumns = array();
+		$this->returnScanType = 1;
+		$this->returnAddColumn = NULL;
+		$this->returnCode = NULL;
+		$this->returnWidenColumn = NULL;
+		$this->returnUpdateRecord = NULL;
+		$this->returnInsertRecord = NULL;
+		$this->returnSelectRecord = NULL;
+		$this->returnDeleteRecord = NULL;
+		$this->returnCheckChanges = NULL;
+		$this->returnAddUniqueIndex = NULL;
+	}
 }
-/*
+
 $nullWriter = new NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
 
+//Section A: UNIT TESTING
 
-exit;*/
+testpack("UNIT TEST RedBean OODB: Dispense");
+$page = $redbean->dispense("page");
+asrt(((bool)$page->getMeta("type")),true);
+asrt(isset($page->id),true);
+asrt(($page->getMeta("type")),"page");
+asrt(($page->id),0);
+try{ $redbean->dispense(""); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->dispense("."); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->dispense("-"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+
+
+testpack("UNIT TEST RedBean OODB: Check");
+$bean = $redbean->dispense("page");
+$bean->name = array("1");
+try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+$bean->name = new RedBean_OODBBean;
+try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+$prop = ".";
+$bean->$prop = 1;
+try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+$prop = "-";
+$bean->$prop = 1;
+try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+
+
+testpack("UNIT TEST RedBean OODB: Load");
+$bean = $redbean->load("typetest",2); 
+$nullWriter->returnSelectRecord = array();
+asrt($nullWriter->selectRecordArguments[0],"typetest");
+asrt($nullWriter->selectRecordArguments[1],array(2));
+asrt($bean->id,0);
+$nullWriter->returnSelectRecord = array(array("name"=>"abc","id"=>3));
+$bean = $redbean->load("typetest",3);
+asrt($nullWriter->selectRecordArguments[0],"typetest");
+asrt($nullWriter->selectRecordArguments[1],array(3));
+asrt($bean->id,3);
+try { $bean = $redbean->load("typetest",-2); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try { $bean = $redbean->load("typetest",0); pass(); }catch(RedBean_Exception_Security $e){ fail(); }
+try { $bean = $redbean->load("typetest",2.1); pass(); }catch(RedBean_Exception_Security $e){ fail(); }
+try { $bean = $redbean->load(" ",3); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try { $bean = $redbean->load(".",3); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try { $bean = $redbean->load("type.test",3); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+
+testpack("UNIT TEST RedBean OODB: Batch");
+$nullWriter->reset();
+$beans = $redbean->batch("typetest",array(2));
+$nullWriter->returnSelectRecord = array();
+asrt($nullWriter->selectRecordArguments[0],"typetest");
+asrt($nullWriter->selectRecordArguments[1],array(2));
+asrt(count($beans),0);
+$nullWriter->reset();
+$nullWriter->returnSelectRecord = array(array("name"=>"abc","id"=>3));
+$beans = $redbean->batch("typetest",array(3));
+asrt($nullWriter->selectRecordArguments[0],"typetest");
+asrt($nullWriter->selectRecordArguments[1],array(3));
+asrt(count($beans),1);
+
+
+testpack("UNIT TEST RedBean OODB: Store");
+$nullWriter->reset();
+$bean = $redbean->dispense("bean");
+$bean->name = "coffee";
+$nullWriter->returnScanType = 91239;
+$nullWriter->returnInsertRecord = 1234;
+asrt($redbean->store($bean),1234);
+asrt($nullWriter->getColumnsArgument,"bean");
+asrt($nullWriter->createTableArgument,"bean");
+asrt($nullWriter->scanTypeArgument,"coffee");
+asrt($nullWriter->codeArgument,NULL);
+//print_r($nullWriter);
+asrt($nullWriter->addColumnArguments,array("bean","name",91239));
+asrt($nullWriter->insertRecordArguments,array("bean",array("name"),array(array("coffee"))));
+asrt($nullWriter->addUniqueIndexArguments,array());
+asrt($nullWriter->updateRecordArguments,array());
+asrt($nullWriter->widenColumnArguments,array());
+$nullWriter->reset();
+$bean = $redbean->dispense("bean");
+$bean->name = "chili";
+$bean->id=9876;
+$nullWriter->returnCode = 0;
+$nullWriter->returnScanType = 777;
+$nullWriter->returnTables=array("bean");
+$nullWriter->returnGetColumns=array("name"=>13);
+asrt($redbean->store($bean),9876);
+asrt($nullWriter->getColumnsArgument,"bean");
+asrt($nullWriter->createTableArgument,NULL);
+asrt($nullWriter->scanTypeArgument,"chili");
+asrt($nullWriter->codeArgument,13);
+asrt($nullWriter->addColumnArguments,array());
+asrt($nullWriter->insertRecordArguments,array());
+asrt($nullWriter->addUniqueIndexArguments,array());
+asrt($nullWriter->updateRecordArguments,array("bean",array(array("property"=>"name","value"=>"chili")),9876 ));
+asrt($nullWriter->widenColumnArguments,array("bean","name", 777));
+
+testpack("UNIT TEST RedBean OODB: Freeze");
+$nullWriter->reset();
+$redbean->freeze(true);
+$bean = $redbean->dispense("bean");
+$bean->name = "coffee";
+$nullWriter->returnScanType = 91239;
+$nullWriter->returnInsertRecord = 1234;
+asrt($redbean->store($bean),1234);
+asrt($nullWriter->getColumnsArgument,"bean");
+asrt($nullWriter->createTableArgument,NULL);
+asrt($nullWriter->scanTypeArgument,NULL);
+asrt($nullWriter->codeArgument,NULL);
+asrt($nullWriter->addColumnArguments,array());
+asrt($nullWriter->insertRecordArguments,array("bean",array("name"),array(array("coffee"))));
+asrt($nullWriter->addUniqueIndexArguments,array());
+asrt($nullWriter->updateRecordArguments,array());
+asrt($nullWriter->widenColumnArguments,array());
+$redbean->freeze(false);
+
+
+testpack("UNIT TEST RedBean OODBBean: Meta Information");
+$bean = new RedBean_OODBBean;
+$bean->setMeta( "this.is.a.custom.metaproperty" , "yes" );
+asrt($bean->getMeta("this.is.a.custom.metaproperty"),"yes");
+$bean->setMeta( "test", array( "one" => 123 ));
+asrt($bean->getMeta("test.one"),123);
+$bean->setMeta( "arr", array(1,2) );
+asrt(is_array($bean->getMeta("arr")),true);
+asrt($bean->getMeta("nonexistant"),NULL);
+asrt($bean->getMeta("nonexistant","abc"),"abc");
+asrt($bean->getMeta("nonexistant.nested"),NULL);
+asrt($bean->getMeta("nonexistant,nested","abc"),"abc");
+$bean->setMeta("test.two","second");
+asrt($bean->getMeta("test.two"),"second");
+$bean->setMeta("another.little.property","yes");
+asrt($bean->getMeta("another.little.property"),"yes");
+asrt($bean->getMeta("test.two"),"second");
+
+
+testpack("UNIT TEST RedBean OODBBean: import");
+$bean = new RedBean_OODBBean;
+$bean->import(array("a"=>1,"b"=>2));
+asrt($bean->a, 1);
+asrt($bean->b, 2);
+
+testpack("UNIT TEST RedBean OODBBean: export");
+$bean->setMeta("justametaproperty","hellothere");
+$arr = $bean->export();
+asrt(is_array($arr),true);
+asrt(isset($arr["a"]),true);
+asrt(isset($arr["b"]),true);
+asrt($arr["a"],1);
+asrt($arr["b"],2);
+asrt(isset($arr["__info"]),false);
+$arr = $bean->export( true );
+asrt(isset($arr["__info"]),true);
+asrt($arr["a"],1);
+asrt($arr["b"],2);
+
+
 
 $adapter = $toolbox->getDatabaseAdapter();
 $writer  = $toolbox->getWriter();
 $redbean = $toolbox->getRedBean();
-testpack("Test Kickstart and Toolbox: Init");
+testpack("UNIT TEST Toolbox");
 asrt(($adapter instanceof RedBean_DBAdapter),true);
 asrt(($writer instanceof RedBean_QueryWriter),true);
 asrt(($redbean instanceof RedBean_OODB),true);
+
 
 $pdo = $adapter->getDatabase();
 $pdo->setDebugMode(0);
@@ -187,74 +377,7 @@ asrt( (int) $adapter->getCell("SELECT ?+?",array("987","2")) ,989);
 asrt( (int) $adapter->getCell("SELECT :numberOne+:numberTwo",array(
 			":numberOne"=>42,":numberTwo"=>50)) ,92);
 
-testpack("Test RedBean OODBBean: Meta Information");
-$bean = new RedBean_OODBBean;
-$bean->setMeta( "this.is.a.custom.metaproperty" , "yes" );
-asrt($bean->getMeta("this.is.a.custom.metaproperty"),"yes");
-$bean->setMeta( "test", array( "one" => 123 ));
-asrt($bean->getMeta("test.one"),123);
-$bean->setMeta( "arr", array(1,2) );
-asrt(is_array($bean->getMeta("arr")),true);
-asrt($bean->getMeta("nonexistant"),NULL);
-asrt($bean->getMeta("nonexistant","abc"),"abc");
-asrt($bean->getMeta("nonexistant.nested"),NULL);
-asrt($bean->getMeta("nonexistant,nested","abc"),"abc");
-$bean->setMeta("test.two","second");
-asrt($bean->getMeta("test.two"),"second");
-$bean->setMeta("another.little.property","yes");
-asrt($bean->getMeta("another.little.property"),"yes");
-asrt($bean->getMeta("test.two"),"second");
 
-
-testpack("Test RedBean OODBBean: import");
-$bean = new RedBean_OODBBean;
-$bean->import(array("a"=>1,"b"=>2));
-asrt($bean->a, 1);
-asrt($bean->b, 2);
-
-testpack("Test RedBean OODBBean: export");
-$bean->setMeta("justametaproperty","hellothere");
-$arr = $bean->export();
-asrt(is_array($arr),true);
-asrt(isset($arr["a"]),true);
-asrt(isset($arr["b"]),true);
-asrt($arr["a"],1);
-asrt($arr["b"],2);
-asrt(isset($arr["__info"]),false);
-$arr = $bean->export( true );
-asrt(isset($arr["__info"]),true);
-asrt($arr["a"],1);
-asrt($arr["b"],2);
-
-
-
-
-testpack("Test RedBean OODB: Dispense");
-asrt(((bool)$page->getMeta("type")),true);
-asrt(isset($page->id),true);
-asrt(($page->getMeta("type")),"page");
-asrt(($page->id),0);
-try{ $redbean->dispense(""); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->dispense("."); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->dispense("-"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-
-
-testpack("Test RedBean OODB: Check");
-$bean = $redbean->dispense("page");
-$bean->name = array("1");
-try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-$bean->name = new RedBean_OODBBean;
-try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-$prop = ".";
-$bean->$prop = 1;
-try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-$prop = "-";
-$bean->$prop = 1;
-try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 
 
 testpack("Test RedBean OODB: Insert Record");

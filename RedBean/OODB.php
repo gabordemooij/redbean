@@ -156,6 +156,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 	 */
     public function load($type, $id) {
 		$id = intval( $id );
+		if ($id < 0) throw new RedBean_Exception_Security("Id less than zero not allowed");
 		$bean = $this->dispense( $type );
 		if ($this->stash && $this->stash[$id]) {
 			$row = $this->stash[$id];
