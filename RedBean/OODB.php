@@ -186,7 +186,11 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
     public function trash( RedBean_OODBBean $bean ) {
 		$this->signal( "delete", $bean );
         $this->check( $bean );
+		try{
         $this->writer->deleteRecord( $bean->getMeta("type"), "id",$bean->id );
+		}catch(RedBean_Exception_SQL $e){
+			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+		}
     }
 	/**
 	 * Loads a Batch of Beans at once
@@ -197,7 +201,13 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
     public function batch( $type, $ids ) {
 		if (!$ids) return array();
 		$collection = array();
+
+		try{
 		$rows = $this->writer->selectRecord($type,$ids);
+		}catch(RedBean_Exception_SQL $e){
+			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+			$rows = false;
+		}
 		$this->stash = array();
 		if (!$rows) return array();
 		foreach($rows as $row) {

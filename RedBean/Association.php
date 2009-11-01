@@ -79,7 +79,12 @@ class RedBean_AssociationManager {
 			FROM `$table`
 			WHERE ".$this->adapter->escape($targetproperty)." = ".$this->adapter->escape($bean->id);;
 		}
-		return $this->adapter->getCol( $sqlFetchKeys );
+		try{
+			return $this->adapter->getCol( $sqlFetchKeys );
+		}catch(RedBean_Exception_SQL $e){
+			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+			return array();
+		}
 	}
 
 	/**
@@ -107,7 +112,11 @@ class RedBean_AssociationManager {
 		if ($cross) {
 			$sqlDeleteAssoc .= " OR ( $property2 = $value1 AND $property1 = $value2 ) ";
 		}
+		try{
 		$this->adapter->exec( $sqlDeleteAssoc );
+		}catch(RedBean_Exception_SQL $e){
+			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+		}
 	}
 	/**
 	 * Removes all relations for a bean
