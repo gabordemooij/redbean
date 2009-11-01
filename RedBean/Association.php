@@ -128,7 +128,11 @@ class RedBean_AssociationManager {
 		if ($cross){
 			$sql .= " OR  ".$this->adapter->escape($property2)." = ".$this->adapter->escape($bean->id);;
 		}
+		try{
 		$this->adapter->exec($sql);
+		}catch(RedBean_Exception_SQL $e){
+			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+		}
 	}
 	/**
 	 * Creates a 1 to Many Association
