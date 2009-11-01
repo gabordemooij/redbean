@@ -724,8 +724,20 @@ asrt(count($tm->children($page)),2);
 asrt(count($tm->children($subpage2)),1);
 asrt(intval($subpage1->parent_id),intval($id));
 
-testpack("Test Plugins: Optimizer");
+testpack("Test Integration Pre-existing Schema");
+$adapter->exec("ALTER TABLE `page` CHANGE `name` `name` VARCHAR( 254 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL ");
+$page = $redbean->dispense("page");
+$page->name = "Just Another Page In a Table";
+$cols = $writer->getColumns("page");
+asrt($cols["name"],"varchar(254)");
+//$pdo->setDebugMode(1);
+$redbean->store( $page );
+pass(); //no crash?
+$cols = $writer->getColumns("page");
+asrt($cols["name"],"varchar(254)"); //must still be same
 
+
+testpack("Test Plugins: Optimizer");
 $one = $redbean->dispense("one");
 $one->col = str_repeat('a long text',100);
 $redbean->store($one);
