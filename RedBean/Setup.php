@@ -19,6 +19,12 @@ class RedBean_Setup {
 
 
 		/**
+		 * 
+		 * @var RedBean_ToolBox $toolbox
+		 */
+		private static $toolbox = NULL;
+
+		/**
 		 * @param  string $dsn
 		 * @param  string $username
 		 * @param  string $password
@@ -39,7 +45,8 @@ class RedBean_Setup {
 			$redbean->addEventListener( "delete", $logger);
 
             //deliver everything back in a neat toolbox
-            return new RedBean_ToolBox( $redbean, $adapter, $writer );
+			self::$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
+            return self::$toolbox;
 
         }
 
@@ -85,6 +92,14 @@ class RedBean_Setup {
 		 */
 		public static function getAttachedObservers() {
 			return self::$observers;
+		}
+
+		/**
+		 * Returns the most recently assembled toolbox
+		 * @return RedBean_ToolBox $toolbox
+		 */
+		public static function getToolBox() {
+			return self::$toolbox;
 		}
 
 }

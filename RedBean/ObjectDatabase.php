@@ -6,5 +6,6 @@ interface ObjectDatabase {
 	public function store( RedBean_OODBBean $bean );
 	public function trash( RedBean_OODBBean $bean );
 	public function batch( $type, $ids );
+	public function dispense( $type );
 
 }
