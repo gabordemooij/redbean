@@ -421,35 +421,35 @@ $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-asrt( $page->rating, "5" );
+asrt( strval( $page->rating ), "5" );
 
 $page->rating = 300;
 $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-asrt( $page->rating, "300" );
+asrt( strval( $page->rating ), "300" );
 
 $page->rating = -2;
 $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-asrt( $page->rating, "-2" );
+asrt( strval( $page->rating ), "-2" );
 
 $page->rating = 2.5;
 $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-asrt( $page->rating, "2.5" );
+asrt( strval( $page->rating ), "2.5" );
 
 $page->rating = -3.3;
 $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-asrt( $page->rating, "-3.3" );
+asrt( strval( $page->rating ), "-3.3" );
 
 $page->rating = "good";
 $newid = $redbean->store( $page );
