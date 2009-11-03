@@ -180,8 +180,15 @@ class NullWriter implements RedBean_QueryWriter {
 $nullWriter = new NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
 
-//Section A: UNIT TESTING
+//Section A: Config Testing
+testpack("CONFIG TEST");
+//Can we access the required exceptions?
+asrt(class_exists("RedBean_Exception_FailedAccessBean"),true);
+asrt(class_exists("RedBean_Exception_Security"),true);
+asrt(class_exists("RedBean_Exception_SQL"),true);
 
+
+//Section B: UNIT TESTING
 testpack("UNIT TEST RedBean OODB: Dispense");
 $page = $redbean->dispense("page");
 asrt(((bool)$page->getMeta("type")),true);
@@ -339,11 +346,26 @@ asrt(isset($arr["__info"]),true);
 asrt($arr["a"],1);
 asrt($arr["b"],2);
 
-
+//Test observer
+testpack("UNIT TEST Observer Mechanism ");
+$observable = new ObservableMock();
+$observer = new ObserverMock();
+$observable->addEventListener("event1",$observer);
+$observable->addEventListener("event3",$observer);
+$observable->test("event1", "testsignal1");
+asrt($observer->event,"event1");
+asrt($observer->info,"testsignal1");
+$observable->test("event2", "testsignal2");
+asrt($observer->event,"event1");
+asrt($observer->info,"testsignal1");
+$observable->test("event3", "testsignal3");
+asrt($observer->event,"event3");
+asrt($observer->info,"testsignal3");
 
 $adapter = $toolbox->getDatabaseAdapter();
 $writer  = $toolbox->getWriter();
 $redbean = $toolbox->getRedBean();
+
 testpack("UNIT TEST Toolbox");
 asrt(($adapter instanceof RedBean_DBAdapter),true);
 asrt(($writer instanceof RedBean_QueryWriter),true);
@@ -370,7 +392,7 @@ $pdo->Execute("DROP TABLE IF EXISTS admin");
 $pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
 $page = $redbean->dispense("page");
 
-testpack("Test Database");
+testpack("UNIT TEST Database");
 try{ $adapter->exec("an invalid query"); fail(); }catch(RedBean_Exception_SQL $e ){ pass(); }
 asrt( (int) $adapter->getCell("SELECT 123") ,123);
 asrt( (int) $adapter->getCell("SELECT ?",array("987")) ,987);
@@ -379,7 +401,7 @@ asrt( (int) $adapter->getCell("SELECT :numberOne+:numberTwo",array(
 			":numberOne"=>42,":numberTwo"=>50)) ,92);
 
 
-
+//Section C: Integration Tests / Regression Tests
 
 testpack("Test RedBean OODB: Insert Record");
 $page->name = "my page";
@@ -501,6 +523,8 @@ asrt(count($books),3);
 
 //test locking
 testpack("Test RedBean Locking: Change Logger method ");
+$observers = RedBean_Setup::getAttachedObservers();
+$logger = array_pop($observers);
 $page = $redbean->dispense("page");
 $page->name = "a page";
 $id = $redbean->store( $page );
@@ -510,22 +534,7 @@ asrt(((bool)$page->getMeta("opened")),true);
 asrt(((bool)$otherpage->getMeta("opened")),true);
 try{ $redbean->store( $page ); pass(); }catch(Exception $e){ fail(); }
 try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
-
-//Test observer
-testpack("Test Observer Mechanism ");
-$observable = new ObservableMock();
-$observer = new ObserverMock();
-$observable->addEventListener("event1",$observer);
-$observable->addEventListener("event3",$observer);
-$observable->test("event1", "testsignal1");
-asrt($observer->event,"event1");
-asrt($observer->info,"testsignal1");
-$observable->test("event2", "testsignal2");
-asrt($observer->event,"event1");
-asrt($observer->info,"testsignal1");
-$observable->test("event3", "testsignal3");
-asrt($observer->event,"event3");
-asrt($observer->info,"testsignal3");
+asrt(count($logger->testingOnly_getStash()),0); // Stash empty?
 
 
 testpack("Test Association ");
@@ -636,27 +645,51 @@ try{ $a->associate($pageII,$user); pass(); }catch(RedBean_Exception_FailedAccess
 try{ $a->unassociate($pageII,$user); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
 try{ $a->clearRelations($pageII, "user"); pass(); }catch(RedBean_Exception_FailedAccessBean $e){ fail(); }
 
-
+//Test whether we can pre-open, or prelock multiple beans at once and
+//if the logger fires less queries
 testpack("Test Preloader");
+class QueryCounter implements RedBean_Observer {
+	public $counter = 0;
+	public function onEvent($event, $info) {
+		$this->counter++;
+	}
+}
+$querycounter = new QueryCounter;
 $observers = RedBean_Setup::getAttachedObservers();
 $logger = array_pop($observers);
 asrt(($logger instanceof RedBean_Observer),true);
 $pagea = $redbean->dispense("page");
 $pageb = $redbean->dispense("page");
 $pagec = $redbean->dispense("page");
+$paged = $redbean->dispense("page");
 $redbean->store($pagea);
 $redbean->store($pageb);
 $redbean->store($pagec);
+$redbean->store($paged);
 $a->associate($pagea, $pageb);
 $a->associate($pagea, $pagec);
+$a->associate($pagea, $paged);
 $ids = $a->related($pagea,"page");
 $adapter->exec("TRUNCATE __log");
+$adapter->addEventListener("sql_exec", $querycounter);
+asrt($querycounter->counter,0); //confirm counter works
 asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),0);
+asrt($querycounter->counter,1); //confirm counter works
+$querycounter->counter=0;
 $logger->preLoad("page",$ids);
-asrt(count($ids),2);
-asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),3);
+asrt($querycounter->counter,2); //confirm counter works
+asrt(count($ids),3);
+asrt(count($logger->testingOnly_getStash()),3); //stash filled with ids
+asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),4);
+$querycounter->counter=0;
 $pages = $redbean->batch("page",$ids);
-asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),3);
+asrt($querycounter->counter,1);
+$querycounter->counter=0;
+$pages = $redbean->batch("page",$ids);
+asrt($querycounter->counter,4); //compare with normal batch without preloading
+//did we save queries (3 is normal, 1 is with preloading)
+asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),7);
+asrt(count($logger->testingOnly_getStash()),0); //should be used up
 
 
 
@@ -886,7 +919,7 @@ asrt(count($a),3);
 asrt($a[1]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 
-
+//Section D Security Tests
 testpack("Test RedBean Security - bean interface ");
 asrt(in_array("hack",$adapter->getCol("show tables")),true);
 $bean = $redbean->load("page","13; drop table hack");

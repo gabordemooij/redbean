@@ -14,7 +14,11 @@ class RedBean_ChangeLogger implements RedBean_Observer {
      */
     private $writer;
 
-	private $ids = array();
+	/**
+	 *
+	 * @var array
+	 */
+	private $stash = array();
 
 	/**
 	 * Constructor, requires a writer
@@ -26,7 +30,10 @@ class RedBean_ChangeLogger implements RedBean_Observer {
 
 	/**
 	 * Throws an exception if information in the bean has been changed
-	 * by another process or bean.
+	 * by another process or bean. This is actually the same as journaling
+	 * using timestamps however with timestamps you risk race conditions
+	 * when the measurements are not fine-grained enough; with
+	 * auto-incremented primary key ids we dont have this risk.
 	 * @param string $event
 	 * @param RedBean_OODBBean $item
 	 */
@@ -55,16 +62,34 @@ class RedBean_ChangeLogger implements RedBean_Observer {
     }
 
 
-
+	/**
+	 * Facilitates preloading. If you want to load multiple beans at once
+	 * these beans can be locked individually; given N beans this means approx.
+	 * N*3 queries which is quite a lot. This method allows you to pre-lock or pre-open
+	 * multiple entries at once. All beans will get an opened stamp that correspond to
+	 * the first bean opened. This means this approach is conservative; it might
+	 * produce a higher rate of false alarms but it does not compromise
+	 * concurrency security.
+	 * @param string $type
+	 * @param array $ids
+	 */
 	public function preLoad( $type, $ids ) {
 		$insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
-           array(array(1,  '__no_type__', 0)));
+           array(array(1,  '__no_type__', 0))); //Write a multi opened record
 		$values = array();
-		foreach($ids as $id) {
-			$this->stash[$id]=$insertid;
-			$values[] = array(1, $type, $id);
+		foreach($ids as $id) { //The returned Ids will be stored in a stash buffer
+			$this->stash[$id]=$insertid; //the onEvent OPEN will empty this stash
+			$values[] = array(1, $type, $id); //by using up the ids in it.
 
 		}
 		$this->writer->insertRecord("__log",array("action","tbl","itemid"), $values);
+	}
+
+	/**
+	 * For testing only, dont use.
+	 * @return array $stash
+	 */
+	public function testingOnly_getStash() {
+		return $this->stash;
 	}
 }
