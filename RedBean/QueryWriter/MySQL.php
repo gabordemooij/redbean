@@ -15,14 +15,13 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * Supported Column Types
 	 */
     public $typeno_sqltype = array(
-    " SET('1') ",
-	" TINYINT(3) UNSIGNED ",
-    " INT(11) UNSIGNED ",
-   // " BIGINT(20) ",
-	" DOUBLE ",
-    " VARCHAR(255) ",
-    " TEXT ",
-    " LONGTEXT "
+    RedBean_QueryWriter::C_DATATYPE_BOOL=>" SET('1') ",
+	RedBean_QueryWriter::C_DATATYPE_UINT8=>" TINYINT(3) UNSIGNED ",
+    RedBean_QueryWriter::C_DATATYPE_UINT32=>" INT(11) UNSIGNED ",
+  	RedBean_QueryWriter::C_DATATYPE_DOUBLE=>" DOUBLE ",
+    RedBean_QueryWriter::C_DATATYPE_TEXT8=>" VARCHAR(255) ",
+    RedBean_QueryWriter::C_DATATYPE_TEXT16=>" TEXT ",
+    RedBean_QueryWriter::C_DATATYPE_TEXT32=>" LONGTEXT "
     );
 
 	/**
@@ -32,14 +31,13 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * constants (magic numbers)
 	 */
     public $sqltype_typeno = array(
-	"set('1')"=>0,
-    "tinyint(3) unsigned"=>1,
-    "int(11) unsigned"=>2,
-    //"bigint(20)"=>3,
-	"double" => 3,
-    "varchar(255)"=>4,
-    "text"=>5,
-    "longtext"=>6
+	"set('1')"=>RedBean_QueryWriter::C_DATATYPE_BOOL,
+    "tinyint(3) unsigned"=>RedBean_QueryWriter::C_DATATYPE_UINT8,
+    "int(11) unsigned"=>RedBean_QueryWriter::C_DATATYPE_UINT32,
+    "double" => RedBean_QueryWriter::C_DATATYPE_DOUBLE,
+    "varchar(255)"=>RedBean_QueryWriter::C_DATATYPE_TEXT8,
+    "text"=>RedBean_QueryWriter::C_DATATYPE_TEXT16,
+    "longtext"=>RedBean_QueryWriter::C_DATATYPE_TEXT32
     );
 
     /**
