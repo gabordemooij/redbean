@@ -55,13 +55,21 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      */
     private $adapter;
 
+	/**
+	 * Indicates the field name to be used for primary keys;
+	 * default is 'id'
+	 * @var string
+	 */
+	private $idfield = "id";
+
+
 
 	/**
 	 * Checks table name or column name
 	 * @param string $table
 	 * @return string $table
 	 */
-	private function check($table) {
+	public function check($table) {
 		if (strpos($table,"`")!==false) throw new Redbean_Exception_Security("Illegal chars in table name");
 		return $this->adapter->escape($table);
 	}
@@ -71,29 +79,31 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      * The Query Writer Constructor also sets up the database
      * @param RedBean_DBAdapter $adapter
      */
-    public function __construct( RedBean_DBAdapter $adapter ) {
+    public function __construct( RedBean_DBAdapter $adapter, $frozen = false ) {
         $this->adapter = $adapter;
-        $this->adapter->exec("DROP TABLE IF EXISTS `dtyp`");
-		$this->adapter->exec("
-				CREATE TABLE IF NOT EXISTS `dtyp` (
-				  `id` int(11) unsigned NOT NULL auto_increment,
-				  `booleanset` set('1'),
-				  `tinyintus` tinyint(3) unsigned NOT NULL,
-				  `intus` int(11) unsigned NOT NULL,
-				  `doubles` double NOT NULL,
-				  `varchar255` varchar(255) NOT NULL,
-				  `text` text NOT NULL,
-				  PRIMARY KEY  (`id`)
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-		");
-		$this->adapter->exec("
-				CREATE TABLE IF NOT EXISTS `__log` (
-				`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-				`tbl` VARCHAR( 255 ) NOT NULL ,
-				`action` TINYINT( 2 ) NOT NULL ,
-				`itemid` INT( 11 ) NOT NULL
-				) ENGINE = MYISAM ;
-        "); //Must be MyISAM! else you run in trouble if you use transactions!
+		if (!$frozen) {
+			$this->adapter->exec("DROP TABLE IF EXISTS `dtyp`");
+			$this->adapter->exec("
+					CREATE TABLE IF NOT EXISTS `dtyp` (
+					  `id` int(11) unsigned NOT NULL auto_increment,
+					  `booleanset` set('1'),
+					  `tinyintus` tinyint(3) unsigned NOT NULL,
+					  `intus` int(11) unsigned NOT NULL,
+					  `doubles` double NOT NULL,
+					  `varchar255` varchar(255) NOT NULL,
+					  `text` text NOT NULL,
+					  PRIMARY KEY  (`id`)
+					) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
+			");
+			$this->adapter->exec("
+					CREATE TABLE IF NOT EXISTS `__log` (
+					`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+					`tbl` VARCHAR( 255 ) NOT NULL ,
+					`action` TINYINT( 2 ) NOT NULL ,
+					`itemid` INT( 11 ) NOT NULL
+					) ENGINE = MYISAM ;
+			"); //Must be MyISAM! else you run in trouble if you use transactions!
+		}
 		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
         $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
     }
@@ -112,11 +122,12 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param string $table
 	 */
     public function createTable( $table ) {
+		$idfield = $this->idfield;
 		$table = $this->check($table);
 		$sql = "
                      CREATE TABLE `$table` (
-                    `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-                     PRIMARY KEY ( `id` )
+                    `$idfield` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+                     PRIMARY KEY ( `$idfield` )
                      ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
             ";
         $this->adapter->exec( $sql );
@@ -206,13 +217,14 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $id
 	 */
     public function updateRecord( $table, $updatevalues, $id) {
+		$idfield = $this->idfield;
 		$sql = "UPDATE ".$this->check($table)." SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
 			$p[] = " `".$uv["property"]."` = ? ";
 			$v[]=strval( $uv["value"] );
 		}
-		$sql .= implode(",", $p ) ." WHERE id = ".intval($id);
+		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
 		$this->adapter->exec( $sql, $v );
     }
 
@@ -225,12 +237,14 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return integer $insertid
 	 */
     public function insertRecord( $table, $insertcolumns, $insertvalues ) {
+		//if ($table == "__log") $idfield="id"; else
+		$idfield = $this->idfield;
 		$table = $this->check($table);
         if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k=>$v) {
                 $insertcolumns[$k] = "`".$this->check($v)."`";
             }
-			$insertSQL = "INSERT INTO `$table` ( id, ".implode(",",$insertcolumns)." ) VALUES ";
+			$insertSQL = "INSERT INTO `$table` ( $idfield, ".implode(",",$insertcolumns)." ) VALUES ";
 			$pat = "( NULL, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." )";
 			$insertSQL .= implode(",",array_fill(0,count($insertvalues),$pat));
 			foreach($insertvalues as $insertvalue) {
@@ -242,7 +256,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		    return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
         else {
-		      $this->adapter->exec( "INSERT INTO `$table` (id) VALUES(NULL) " );
+		      $this->adapter->exec( "INSERT INTO `$table` ($idfield) VALUES(NULL) " );
               return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
     }
@@ -256,8 +270,9 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return array $row
 	 */
     public function selectRecord($type, $ids) {
+		$idfield = $this->idfield;
 		$type=$this->check($type);
-		$sql = "SELECT * FROM `$type` WHERE id IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
+		$sql = "SELECT * FROM `$type` WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);
 		return ($rows && is_array($rows) && count($rows)>0) ? $rows : NULL;
     }
@@ -270,42 +285,11 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param string $oper
 	 * @todo validate arguments for security
 	 */
-    public function deleteRecord( $table, $column, $value) {
+    public function deleteRecord( $table, $id) {
 		$table = $this->check($table);
-		$column = $this->check($column);
-	    $this->adapter->exec("DELETE FROM `$table` WHERE `$column` = ? ",array(strval($value)));
+		$this->adapter->exec("DELETE FROM `$table` WHERE `".$this->idfield."` = ? ",array(strval($id)));
     }
-	/**
-	 * Gets information about changed records using a type and id and a logid.
-	 * RedBean Locking shields you from race conditions by comparing the latest
-	 * cached insert id with a the highest insert id associated with a write action
-	 * on the same table. If there is any id between these two the record has
-	 * been changed and RedBean will throw an exception. This function checks for changes.
-	 * If changes have occurred it will throw an exception. If no changes have occurred
-	 * it will insert a new change record and return the new change id.
-	 * This method locks the log table exclusively.
-	 * @param  string $type
-	 * @param  integer $id
-	 * @param  integer $logid
-	 * @return integer $newchangeid
-	 */
-    public function checkChanges($type, $id, $logid) {
-		$type = $this->check($type);
-		$id = (int) $id;
-		$logid = (int) $logid;
-		$num = $this->adapter->getCell("
-        SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id > $logid");
-        if ($num) {
-			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)"); 
-		}
-		$newid = $this->insertRecord("__log",array("action","tbl","itemid"),
-		   array(array(2,  $type, $id)));
-	    if ($this->adapter->getCell("select id from __log where tbl=:tbl AND id < $newid and id > $logid and action=2 and itemid=$id ",
-			array(":tbl"=>$type))){
-			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access II (type:$type, id:$id)");
-		}
-		return $newid;
-	}
+	
 	/**
 	 * Adds a Unique index constrain to the table.
 	 * @param string $table

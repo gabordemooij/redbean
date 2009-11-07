@@ -26,8 +26,10 @@ require("DBAdapter.php");
 
 require("QueryWriter.php");
 require("QueryWriter/MySQL.php");
+
 require("QueryWriter/PostgreSQL.php");
-require("ChangeLogger.php");
+
+require("Plugins/ChangeLogger.php");
 require("Exception.php");
 require("Exception/Security.php");
 require("Exception/FailedAccessBean.php");

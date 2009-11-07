@@ -14,6 +14,10 @@
  */
 class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 
+	/**
+	 *
+	 * @var array
+	 */
 	private $stash = NULL;
 
     /**
@@ -187,7 +191,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 		$this->signal( "delete", $bean );
         $this->check( $bean );
 		try{
-        $this->writer->deleteRecord( $bean->getMeta("type"), "id",$bean->id );
+        $this->writer->deleteRecord( $bean->getMeta("type"), $bean->id );
 		}catch(RedBean_Exception_SQL $e){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 		}

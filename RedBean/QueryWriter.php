@@ -29,8 +29,8 @@ interface RedBean_QueryWriter {
     public function updateRecord( $table, $updatevalues, $id);
     public function insertRecord( $table, $insertcolumns, $insertvalues );
     public function selectRecord($type, $ids);
-    public function deleteRecord( $table, $column, $value);
-    public function checkChanges($type, $id, $logid);
+    public function deleteRecord( $table, $id );
+    
 	public function addUniqueIndex( $table,$columns );
 	
 }

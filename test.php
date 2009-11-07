@@ -136,8 +136,8 @@ class NullWriter implements RedBean_QueryWriter {
 		$this->selectRecordArguments = array($type, $ids);
 		return $this->returnSelectRecord;
 	}
-	public function deleteRecord( $table, $column, $value){
-		$this->deleteRecordArguments = array($table, $column, $value);
+	public function deleteRecord( $table, $id){
+		$this->deleteRecordArguments = array($table, "id", $id);
 		return $this->returnDeleteRecord;
 	}
     public function checkChanges($type, $id, $logid){
@@ -380,6 +380,7 @@ $pdo->Execute("CREATE TABLE IF NOT EXISTS`hack` (
 ");
 $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
+$pdo->Execute("DROP TABLE IF EXISTS movie");
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");
 $pdo->Execute("DROP TABLE IF EXISTS one");
@@ -522,6 +523,7 @@ asrt(count($books),3);
 
 
 //test locking
+
 testpack("Test RedBean Locking: Change Logger method ");
 $observers = RedBean_Setup::getAttachedObservers();
 $logger = array_pop($observers);
@@ -531,11 +533,11 @@ $id = $redbean->store( $page );
 $page = $redbean->load("page", $id);
 $otherpage = $redbean->load("page", $id);
 asrt(((bool)$page->getMeta("opened")),true);
-asrt(((bool)$otherpage->getMeta("opened")),true);
+asrt(((bool)$otherpage->getMeta("opened")),true); 
 try{ $redbean->store( $page ); pass(); }catch(Exception $e){ fail(); }
+echo '---';
 try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
 asrt(count($logger->testingOnly_getStash()),0); // Stash empty?
-
 
 testpack("Test Association ");
 $user = $redbean->dispense("user");
@@ -775,7 +777,7 @@ testpack("Test Plugins: Optimizer");
 $one = $redbean->dispense("one");
 $one->col = str_repeat('a long text',100);
 $redbean->store($one);
-require("RedBean/Optimizer.php");
+require("RedBean/Plugins/Optimizer.php");
 $optimizer = new Optimizer( $toolbox );
 $redbean->addEventListener("update", $optimizer);
 $writer  = $toolbox->getWriter();
@@ -903,7 +905,7 @@ asrt($row[0]["c1"],"lorem ipsum");
 $writer->updateRecord("testtable", array(array("property"=>"c1","value"=>"ipsum lorem")), $id);
 $row = $writer->selectRecord("testtable", array($id));
 asrt($row[0]["c1"],"ipsum lorem");
-$writer->deleteRecord("testtable", "id", $id);
+$writer->deleteRecord("testtable", $id);
 $row = $writer->selectRecord("testtable", array($id));
 asrt($row,NULL);
 //$pdo->setDebugMode(1);

@@ -30,27 +30,30 @@ class RedBean_Setup {
 		 * @param  string $password
 		 * @return RedBean_ToolBox $toolbox
 		 */
-        public static function kickstart( $dsn, $username, $password ) {
+        public static function kickstart( $dsn, $username, $password, $frozen=false ) {
 
             $pdo = new Redbean_Driver_PDO( $dsn,$username,$password );
             $adapter = new RedBean_DBAdapter( $pdo );
 
             if (strpos($dsn,"pgsql")===0) {
-                $writer = new RedBean_QueryWriter_PostgreSQL( $adapter );
+                $writer = new RedBean_QueryWriter_PostgreSQL( $adapter, $frozen );
             }
 
-            $writer = new RedBean_QueryWriter_MySQL( $adapter );
+            
+            $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+
             $redbean = new RedBean_OODB( $writer );
 
+			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
             //add concurrency shield
-			$logger = new RedBean_ChangeLogger( $writer );
+			$logger = new RedBean_ChangeLogger( $toolbox );
 			self::$observers["logger"] = $logger;
             $redbean->addEventListener( "open", $logger );
             $redbean->addEventListener( "update", $logger);
 			$redbean->addEventListener( "delete", $logger);
 
             //deliver everything back in a neat toolbox
-			self::$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
+			self::$toolbox = $toolbox;
             return self::$toolbox;
 
         }
@@ -73,7 +76,7 @@ class RedBean_Setup {
 		 * @return RedBean_ToolBox $toolbox
 		 */
 		public static function kickstartFrozen( $dsn, $username, $password ) {
-			$toolbox = self::kickstart($dsn, $username, $password);
+			$toolbox = self::kickstart($dsn, $username, $password, true);
 			$toolbox->getRedBean()->freeze(true);
 			return $toolbox;
 		}
