@@ -34,6 +34,11 @@ class RedBean_Setup {
 
             $pdo = new Redbean_Driver_PDO( $dsn,$username,$password );
             $adapter = new RedBean_DBAdapter( $pdo );
+
+            if (strpos($dsn,"pgsql")===0) {
+                $writer = new RedBean_QueryWriter_PostgreSQL( $adapter );
+            }
+
             $writer = new RedBean_QueryWriter_MySQL( $adapter );
             $redbean = new RedBean_OODB( $writer );
 
