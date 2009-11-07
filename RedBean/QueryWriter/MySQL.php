@@ -63,24 +63,6 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	private $idfield = "id";
 
 
-	/**
-	 * Sets the name of the column to be used for primary keys.
-	 * Default value is 'id'.
-	 * @param string $idfield
-	 */
-	public function setCustomIDField( $idfield ) {
-		if (preg_match("/\W/",$idfield)) throw new RedBean_Exception_Security("Invalid ID Field");
-		$this->idfield = $idfield;
-	}
-
-
-	/**
-	 * @return string $idfield
-	 */
-	public function getCustomIDField() {
-		return $this->idfield;
-	}
-
 
 	/**
 	 * Checks table name or column name

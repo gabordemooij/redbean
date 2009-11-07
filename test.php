@@ -539,30 +539,6 @@ echo '---';
 try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
 asrt(count($logger->testingOnly_getStash()),0); // Stash empty?
 
-
-testpack("Test Custom ID Field");
-$writer->setCustomIDField("movie_id");
-pass();
-$movie = $redbean->dispense("movie");
-pass();
-$movie->name = "thriller";
-$redbean->store($movie);
-pass();
-$cols = array_keys($writer->getColumns("movie"));
-asrt(in_array("movie_id",$cols),true);
-$movie->rating = 3;
-$redbean->store($movie);
-pass();
-$redbean->trash($movie);
-pass();
-$writer->setCustomIDField("id");
-
-
-
-
-
-
-
 testpack("Test Association ");
 $user = $redbean->dispense("user");
 $user->name = "John";
