@@ -57,13 +57,10 @@ class RedBean_ChangeLogger implements RedBean_Observer {
 				unset($this->stash[$id]);
 				return $insertid;
 			}
-			$cid = $this->writer->getCustomIDField();
-			$this->writer->setCustomIDField("id");
-            $insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
+			$insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
             array(array(1,  $type, $id)));
-			$this->writer->setCustomIDField($cid);
-            $item->setMeta("opened",$insertid);
-			//echo "<br>opened: ".print_r($item, 1);
+			$item->setMeta("opened",$insertid);
+			
         }
         if ($event=="update" || $event=="delete") {
             if (($item->getMeta("opened"))) $oldid = $item->getMeta("opened"); else $oldid=0;
@@ -94,10 +91,7 @@ class RedBean_ChangeLogger implements RedBean_Observer {
 			$values[] = array(1, $type, $id); //by using up the ids in it.
 
 		}
-		$cid = $this->writer->getCustomIDField();
-		$this->writer->setCustomIDField("id");
 		$this->writer->insertRecord("__log",array("action","tbl","itemid"), $values); //use extend. insert if possible
-		$this->writer->setCustomIDField($cid);
 	}
 
 	/**
