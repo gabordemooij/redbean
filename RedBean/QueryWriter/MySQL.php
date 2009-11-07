@@ -73,6 +73,15 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		$this->idfield = $idfield;
 	}
 
+
+	/**
+	 * @return string $idfield
+	 */
+	public function getCustomIDField() {
+		return $this->idfield;
+	}
+
+
 	/**
 	 * Checks table name or column name
 	 * @param string $table
@@ -246,7 +255,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return integer $insertid
 	 */
     public function insertRecord( $table, $insertcolumns, $insertvalues ) {
-		if ($table == "__log") $idfield="id"; else 	$idfield = $this->idfield;
+		//if ($table == "__log") $idfield="id"; else
+		$idfield = $this->idfield;
 		$table = $this->check($table);
         if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k=>$v) {

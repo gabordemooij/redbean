@@ -57,8 +57,11 @@ class RedBean_ChangeLogger implements RedBean_Observer {
 				unset($this->stash[$id]);
 				return $insertid;
 			}
+			$cid = $this->writer->getCustomIDField();
+			$this->writer->setCustomIDField("id");
             $insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
             array(array(1,  $type, $id)));
+			$this->writer->setCustomIDField($cid);
             $item->setMeta("opened",$insertid);
 			//echo "<br>opened: ".print_r($item, 1);
         }
@@ -82,15 +85,19 @@ class RedBean_ChangeLogger implements RedBean_Observer {
 	 * @param array $ids
 	 */
 	public function preLoad( $type, $ids ) {
-		$insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
-           array(array(1,  '__no_type__', 0))); //Write a multi opened record
+		$this->adapter->exec("INSERT INTO __log (id,action,tbl,itemid)
+		VALUES(NULL, :action,:tbl,:id)",array(":action"=>1,":tbl"=>"__no_type__",":id"=>0)); //Write a multi opened record
+		$insertid = $this->adapter->getInsertID();
 		$values = array();
 		foreach($ids as $id) { //The returned Ids will be stored in a stash buffer
 			$this->stash[$id]=$insertid; //the onEvent OPEN will empty this stash
 			$values[] = array(1, $type, $id); //by using up the ids in it.
 
 		}
-		$this->writer->insertRecord("__log",array("action","tbl","itemid"), $values);
+		$cid = $this->writer->getCustomIDField();
+		$this->writer->setCustomIDField("id");
+		$this->writer->insertRecord("__log",array("action","tbl","itemid"), $values); //use extend. insert if possible
+		$this->writer->setCustomIDField($cid);
 	}
 
 	/**
