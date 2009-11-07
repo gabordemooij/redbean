@@ -16,6 +16,13 @@ class RedBean_ChangeLogger implements RedBean_Observer {
 
 	/**
 	 *
+	 * @var RedBean_Adapter
+	 */
+	private $adapter;
+
+
+	/**
+	 *
 	 * @var array
 	 */
 	private $stash = array();
@@ -24,8 +31,9 @@ class RedBean_ChangeLogger implements RedBean_Observer {
 	 * Constructor, requires a writer
 	 * @param RedBean_QueryWriter $writer
 	 */
-    public function __construct(RedBean_QueryWriter $writer) {
-        $this->writer = $writer;
+    public function __construct(RedBean_ToolBox $toolbox) {
+        $this->writer = $toolbox->getWriter();
+		$this->adapter = $toolbox->getDatabaseAdapter();
     }
 
 	/**
@@ -56,7 +64,7 @@ class RedBean_ChangeLogger implements RedBean_Observer {
         }
         if ($event=="update" || $event=="delete") {
             if (($item->getMeta("opened"))) $oldid = $item->getMeta("opened"); else $oldid=0;
-            $newid = $this->writer->checkChanges($type,$id, $oldid);
+            $newid = $this->checkChanges($type,$id, $oldid);
 	        $item->setMeta("opened",$newid);
         }
     }
@@ -91,5 +99,37 @@ class RedBean_ChangeLogger implements RedBean_Observer {
 	 */
 	public function testingOnly_getStash() {
 		return $this->stash;
+	}
+
+	/**
+	 * Gets information about changed records using a type and id and a logid.
+	 * RedBean Locking shields you from race conditions by comparing the latest
+	 * cached insert id with a the highest insert id associated with a write action
+	 * on the same table. If there is any id between these two the record has
+	 * been changed and RedBean will throw an exception. This function checks for changes.
+	 * If changes have occurred it will throw an exception. If no changes have occurred
+	 * it will insert a new change record and return the new change id.
+	 * This method locks the log table exclusively.
+	 * @param  string $type
+	 * @param  integer $id
+	 * @param  integer $logid
+	 * @return integer $newchangeid
+	 */
+    public function checkChanges($type, $id, $logid) {
+		$type = $this->writer->check($type);
+		$id = (int) $id;
+		$logid = (int) $logid;
+		$num = $this->adapter->getCell("
+        SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id > $logid");
+        if ($num) {
+			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)");
+		}
+		$this->adapter->exec("INSERT INTO __log (id,action,tbl,itemid) VALUES(NULL, 2,:tbl,:id)",array(":tbl"=>$type, ":id"=>$id));
+		$newid = $this->adapter->getInsertID();
+	    if ($this->adapter->getCell("select id from __log where tbl=:tbl AND id < $newid and id > $logid and action=2 and itemid=$id ",
+			array(":tbl"=>$type))){
+			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access II (type:$type, id:$id)");
+		}
+		return $newid;
 	}
 }
