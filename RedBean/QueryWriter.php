@@ -30,7 +30,6 @@ interface RedBean_QueryWriter {
     public function insertRecord( $table, $insertcolumns, $insertvalues );
     public function selectRecord($type, $ids);
     public function deleteRecord( $table, $id );
-    
-	public function addUniqueIndex( $table,$columns );
-	
+    public function addUniqueIndex( $table,$columns );
+	public function getIDField( $table );
 }

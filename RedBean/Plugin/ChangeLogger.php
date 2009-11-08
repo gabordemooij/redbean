@@ -45,7 +45,7 @@ class RedBean_Plugin_ChangeLogger implements RedBean_Observer {
 	 * @param string $event
 	 * @param RedBean_OODBBean $item
 	 */
-    public function onEvent( $event, $item ) {
+    public function onEvent( $event, $item ) { 
         $id = $item->id;
         if (! ((int) $id)) $event="open";
 

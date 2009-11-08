@@ -26,12 +26,13 @@ require("DBAdapter.php");
 
 require("QueryWriter.php");
 require("QueryWriter/MySQL.php");
-require("Plugins/ChangeLogger.php");
+require("Plugin/ChangeLogger.php");
 require("Exception.php");
 require("Exception/Security.php");
 require("Exception/FailedAccessBean.php");
 require("OODB.php");
 require("ToolBox.php");
-require("Association.php");
+require("AssociationManager.php");
 require("TreeManager.php");
 require("Setup.php");
+require("RedBean/Plugin/Cache.php");

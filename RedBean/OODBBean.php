@@ -50,7 +50,9 @@ class RedBean_OODBBean {
 	 * @return mixed $value
 	 */
 	public function __get( $property ) {
-		if (!isset($this->$property)) return NULL;
+		if (!isset($this->$property)) {
+			return NULL;
+		}
 	}
 
 
