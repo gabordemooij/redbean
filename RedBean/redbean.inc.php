@@ -35,4 +35,4 @@ require("ToolBox.php");
 require("AssociationManager.php");
 require("TreeManager.php");
 require("Setup.php");
-require("RedBean/Plugin/Cache.php");
+require("Plugin/Cache.php");
