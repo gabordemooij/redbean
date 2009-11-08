@@ -38,9 +38,9 @@ class RedBean_Setup {
             if (strpos($dsn,"pgsql")===0) {
                 $writer = new RedBean_QueryWriter_PostgreSQL( $adapter, $frozen );
             }
-
-            
-            $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+			else {
+                $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+			}
 
             $redbean = new RedBean_OODB( $writer );
 

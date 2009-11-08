@@ -62,7 +62,7 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * @return string $table
 	 */
 	private function check($table) {
-		if (strpos($table,"")!==false) throw new Redbean_Exception_Security("Illegal chars in table name");
+		if (strpos($table,"`")!==false) throw new Redbean_Exception_Security("Illegal chars in table name");
 		return $this->adapter->escape($table);
 	}
 
@@ -75,7 +75,7 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
         $this->adapter = $adapter;
         $this->adapter->exec("DROP TABLE IF EXISTS dtyp");
 		$this->adapter->exec("
-                            CREATE TABLE dtyp (
+               CREATE TABLE dtyp (
 				  id serial,
 				  booleanset boolean,
 				  tinyintus smallint,
@@ -86,14 +86,20 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 				  PRIMARY KEY  (id)
 				) 
 		");
-		$this->adapter->exec("
-				CREATE TABLE IF NOT EXISTS __log (
-				id INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-				tbl VARCHAR( 255 ) NOT NULL ,
-				action TINYINT( 2 ) NOT NULL ,
-				itemid INT( 11 ) NOT NULL
-				) ENGINE = MYISAM ;
-        "); //Must be MyISAM! else you run in trouble if you use transactions!
+
+
+		$tables = $this->getTables();
+		if (!in_array("__log", $tables)) {
+			$this->adapter->exec("
+					CREATE TABLE __log (
+					id serial,
+					tbl text,
+					action smallint,
+					itemid integer,
+					PRIMARY KEY (id)
+					)
+			");
+		}
 		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
         $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
     }
@@ -104,7 +110,8 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
      * @return array $tables
      */
     public function getTables() {
-        return $this->adapter->getCol( "show tables" );
+        return $this->adapter->getCol( "select table_name from information_schema.tables
+where table_schema = 'public'" );
     }
 
 	/**
@@ -270,9 +277,9 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * @param string $oper
 	 * @todo validate arguments for security
 	 */
-    public function deleteRecord( $table, $column, $value) {
+    public function deleteRecord( $table, $value) {
 		$table = $this->check($table);
-		$column = $this->check($column);
+		$column = "id";
 	    $this->adapter->exec("DELETE FROM $table WHERE $column = ? ",array(strval($value)));
     }
 	/**

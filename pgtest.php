@@ -135,7 +135,8 @@ class NullWriter implements RedBean_QueryWriter {
 		$this->selectRecordArguments = array($type, $ids);
 		return $this->returnSelectRecord;
 	}
-	public function deleteRecord( $table, $column, $value){
+	public function deleteRecord( $table, $value){
+		$column="id";
 		$this->deleteRecordArguments = array($table, $column, $value);
 		return $this->returnDeleteRecord;
 	}
@@ -373,31 +374,25 @@ asrt(($redbean instanceof RedBean_OODB),true);
 
 $pdo = $adapter->getDatabase();
 $pdo->setDebugMode(0);
-$pdo->Execute("CREATE TABLE IF NOT EXISTS`hack` (
-`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY
-) ENGINE = MYISAM ;
-");
-$pdo->Execute("DROP TABLE IF EXISTS page");
-$pdo->Execute("DROP TABLE IF EXISTS user");
-$pdo->Execute("DROP TABLE IF EXISTS book");
-$pdo->Execute("DROP TABLE IF EXISTS author");
-$pdo->Execute("DROP TABLE IF EXISTS one");
-$pdo->Execute("DROP TABLE IF EXISTS post");
-$pdo->Execute("DROP TABLE IF EXISTS page_user");
-$pdo->Execute("DROP TABLE IF EXISTS page_page");
-$pdo->Execute("DROP TABLE IF EXISTS association");
-$pdo->Execute("DROP TABLE IF EXISTS logentry");
-$pdo->Execute("DROP TABLE IF EXISTS admin");
-$pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
+$_tables = $writer->getTables();
+if (!in_array("hack",$_tables)) $pdo->Execute("CREATE TABLE hack (id serial, PRIMARY KEY (id) ); ");
+if (in_array("page",$_tables)) $pdo->Execute("DROP TABLE page");
+if (in_array("user",$_tables)) $pdo->Execute("DROP TABLE user");
+if (in_array("book",$_tables)) $pdo->Execute("DROP TABLE book");
+if (in_array("author",$_tables)) $pdo->Execute("DROP TABLE author");
+if (in_array("one",$_tables)) $pdo->Execute("DROP TABLE one");
+if (in_array("post",$_tables)) $pdo->Execute("DROP TABLE post");
+if (in_array("page_user",$_tables)) $pdo->Execute("DROP TABLE page_user");
+if (in_array("page_page",$_tables)) $pdo->Execute("DROP TABLE page_page");
+if (in_array("association",$_tables)) $pdo->Execute("DROP TABLE association");
+if (in_array("logentry",$_tables)) $pdo->Execute("DROP TABLE logentry");
+if (in_array("admin",$_tables)) $pdo->Execute("DROP TABLE admin");
+if (in_array("admin_logentry",$_tables)) $pdo->Execute("DROP TABLE admin_logentry");
 $page = $redbean->dispense("page");
 
 testpack("UNIT TEST Database");
 try{ $adapter->exec("an invalid query"); fail(); }catch(RedBean_Exception_SQL $e ){ pass(); }
 asrt( (int) $adapter->getCell("SELECT 123") ,123);
-asrt( (int) $adapter->getCell("SELECT ?",array("987")) ,987);
-asrt( (int) $adapter->getCell("SELECT ?+?",array("987","2")) ,989);
-asrt( (int) $adapter->getCell("SELECT :numberOne+:numberTwo",array(
-			":numberOne"=>42,":numberTwo"=>50)) ,92);
 
 
 //Section C: Integration Tests / Regression Tests
