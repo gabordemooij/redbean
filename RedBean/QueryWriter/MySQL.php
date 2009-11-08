@@ -63,6 +63,12 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	private $idfield = "id";
 
 
+	/**
+	 * Returns the column name that should be used
+	 * to store and retrieve the primary key ID.
+	 * @param string $type
+	 * @return string $idfieldtobeused
+	 */
 	public function getIDField( $type ) {
 		return  $this->idfield;
 	}

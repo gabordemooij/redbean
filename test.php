@@ -374,7 +374,6 @@ asrt(($adapter instanceof RedBean_DBAdapter),true);
 asrt(($writer instanceof RedBean_QueryWriter),true);
 asrt(($redbean instanceof RedBean_OODB),true);
 
-//$redbean = new RedBean_Plugin_Cache( $redbean, $toolbox );
 
 $pdo = $adapter->getDatabase();
 $pdo->setDebugMode(0);
@@ -766,7 +765,37 @@ asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),7);
 asrt(count($logger->testingOnly_getStash()),0); //should be used up
 
 
-
+testpack("Test RedBean Cache plugin");
+$adapter->exec("drop table movie");
+$querycounter->counter = 0;
+$redbean3 = new RedBean_Plugin_Cache( $redbean, $toolbox );
+$movie = $redbean3->dispense("movie");
+$movie->name = "cached movie 1";
+$movieid = $redbean3->store($movie);
+asrt(($querycounter->counter>0),true);
+$querycounter->counter=0;
+$movie = $redbean3->load("movie",$movieid);
+asrt($movie->name,"cached movie 1");
+asrt(($querycounter->counter>0),false);
+$movie->name = "cached movie 2";
+$movieid = $redbean3->store($movie);
+asrt(($querycounter->counter>0),true);
+$querycounter->counter=0;
+$movie = $redbean3->load("movie",$movieid);
+asrt($movie->name,"cached movie 2");
+asrt(($querycounter->counter>0),false);
+$movie2 = $redbean3->dispense("movie");
+$movie2->name="another movie";
+$movie2id = $redbean3->store($movie2);
+$querycounter->counter=0;
+$movies = $redbean3->batch("movie",array($movie2id, $movieid));
+asrt(count($movies),2);
+asrt(($querycounter->counter>0),false);
+$redbean3->trash($movie2);
+asrt(($querycounter->counter>0),true);
+$querycounter->counter=0;
+$movies = $redbean3->batch("page",$adapter->getCol("SELECT id FROM page"));
+asrt(($querycounter->counter>0),true);
 
 testpack("Transactions");
 $adapter->startTransaction(); pass();
