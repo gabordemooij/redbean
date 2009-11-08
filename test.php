@@ -523,10 +523,13 @@ asrt(count($books),3);
 
 
 //test locking
+$logger = new RedBean_Plugin_ChangeLogger( $toolbox );
+$redbean->addEventListener( "open", $logger );
+$redbean->addEventListener( "update", $logger);
+$redbean->addEventListener( "delete", $logger);
 
 testpack("Test RedBean Locking: Change Logger method ");
 $observers = RedBean_Setup::getAttachedObservers();
-$logger = array_pop($observers);
 $page = $redbean->dispense("page");
 $page->name = "a page";
 $id = $redbean->store( $page );
@@ -535,7 +538,6 @@ $otherpage = $redbean->load("page", $id);
 asrt(((bool)$page->getMeta("opened")),true);
 asrt(((bool)$otherpage->getMeta("opened")),true); 
 try{ $redbean->store( $page ); pass(); }catch(Exception $e){ fail(); }
-echo '---';
 try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
 asrt(count($logger->testingOnly_getStash()),0); // Stash empty?
 
@@ -658,7 +660,6 @@ class QueryCounter implements RedBean_Observer {
 }
 $querycounter = new QueryCounter;
 $observers = RedBean_Setup::getAttachedObservers();
-$logger = array_pop($observers);
 asrt(($logger instanceof RedBean_Observer),true);
 $pagea = $redbean->dispense("page");
 $pageb = $redbean->dispense("page");
@@ -778,7 +779,7 @@ $one = $redbean->dispense("one");
 $one->col = str_repeat('a long text',100);
 $redbean->store($one);
 require("RedBean/Plugins/Optimizer.php");
-$optimizer = new Optimizer( $toolbox );
+$optimizer = new RedBean_Plugin_Optimizer( $toolbox );
 $redbean->addEventListener("update", $optimizer);
 $writer  = $toolbox->getWriter();
 $cols = $writer->getColumns("one");

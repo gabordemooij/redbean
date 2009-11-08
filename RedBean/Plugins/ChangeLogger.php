@@ -7,7 +7,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_ChangeLogger implements RedBean_Observer {
+class RedBean_Plugin_ChangeLogger implements RedBean_Observer {
 
     /**
      * @var RedBean_DBAdapter

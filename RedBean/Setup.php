@@ -38,13 +38,7 @@ class RedBean_Setup {
             $redbean = new RedBean_OODB( $writer );
 
 			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
-            //add concurrency shield
-			$logger = new RedBean_ChangeLogger( $toolbox );
-			self::$observers["logger"] = $logger;
-            $redbean->addEventListener( "open", $logger );
-            $redbean->addEventListener( "update", $logger);
-			$redbean->addEventListener( "delete", $logger);
-
+            
             //deliver everything back in a neat toolbox
 			self::$toolbox = $toolbox;
             return self::$toolbox;
