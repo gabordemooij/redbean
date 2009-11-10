@@ -28,6 +28,18 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements ObjectDatabase 
 	 */
 	private $cache = array();
 
+	/**
+	 *
+	 * @var array
+	 */
+	private $originals = array();
+
+	/**
+	 *
+	 * @var integer
+	 */
+	private $columnCounter = 0;
+
 
 	/**
 	 * Constructor
@@ -48,6 +60,94 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements ObjectDatabase 
 		$this->oodb->addEventListener($event, $o);
 	}
 
+
+	/**
+	 * Generates a key based on the ID and TYPE of a bean to
+	 * identify the bean in the cache.
+	 * @param RedBean_OODBBean $bean
+	 * @return string $key
+	 */
+	private function generateKey( RedBean_OODBBean $bean ) {
+		$type=$bean->getMeta("type");
+		$idfield = $this->writer->getIDField($type);
+		$id = $bean->$idfield;
+		return sha1($type."-".$id);
+	}
+
+
+	/**
+	 * Puts a bean in the cache and stores a copy of the bean in the
+	 * cache archive.
+	 * @param RedBean_OODBBean $bean
+	 */
+	private function putInCache( RedBean_OODBBean $bean ) {
+		$key = $this->generateKey($bean);
+		$this->cache[$key]=$bean;
+		$copy = clone $bean;
+		$copy->copyMetaFrom($bean);
+		$this->originals[ $key ] = $copy;
+		return $this;
+	}
+
+
+	/**
+	 * Fetches a bean from the cache or returns NULL.
+	 * @param RedBean_OODBBean $bean
+	 * @return RedBean_OODBBean $bean
+	 */
+	private function fetchFromCache( RedBean_OODBBean $bean ) {
+		$key = $this->generateKey($bean);
+		if (isset($this->cache[$key])) {
+			return $this->cache[$key];
+		}
+		else {
+			return NULL;
+		}
+	}
+
+
+	/**
+	 * Fetches a bean from the cache or returns NULL.
+	 * This function takes a TYPE and ID.
+	 * @param string $type
+	 * @param integer $id
+	 * @return  RedBean_OODBBean $bean
+	 */
+	private function fetchFromCacheByTypeID( $type, $id ) {
+		$bean = $this->oodb->dispense($type);
+		$idfield = $this->writer->getIDField($type);
+		$bean->$idfield = $id;
+		return $this->fetchFromCache($bean);
+	}
+
+
+	/**
+	 * Fetches the original bean as it was stored in the cache
+	 * archive or NULL.
+	 * @param RedBean_OODBBean $bean
+	 * @return RedBean_OODBBean $bean
+	 */
+	private function fetchOriginal(RedBean_OODBBean $bean) {
+		$key = $this->generateKey($bean);
+		if (isset($this->originals[$key])) {
+			return $this->originals[$key];
+		}
+		else {
+			return NULL;
+		}
+	}
+
+	/**
+	 * Removes a bean from the cache and the archive.
+	 * @param RedBean_OODBBean $bean
+	 */
+	private function removeFromCache( RedBean_OODBBean $bean ) {
+		$key = $this->generateKey($bean);
+		unset($this->cache[$key]);
+		unset($this->originals[$key]);
+		return $this;
+	}
+
 	/**
 	 * Tries to load a bean from cache, if this fails, it asks
 	 * the oodb object to load the bean from the database.
@@ -57,13 +157,19 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements ObjectDatabase 
 	 */
 	public function load( $type, $id ) {
 
-		if (!isset($this->cache[sha1($type."-".$id)])) {
-			$this->cache[sha1($type."-".$id)] = $this->oodb->load($type,$id);
+		$bean = $this->fetchFromCacheByTypeID($type, $id);
+		if ($bean) {
+			return $bean;
 		}
-		return $this->cache[sha1($type."-".$id)];
+		else {
+			$bean = $this->oodb->load($type, $id);
+			$this->putInCache($bean);
+			return $bean;
+		}
 
 	}
 
+	
 	/**
 	 * Stores a bean and updates cache
 	 * @param RedBean_OODBBean $bean
@@ -71,11 +177,38 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements ObjectDatabase 
 	 */
 	public function store( RedBean_OODBBean $bean ) {
 
+		$this->columnCounter = 0;
 		$type=$bean->getMeta("type");
-		$id = $this->oodb->store($bean);
-		$this->cache[sha1($type."-".$id)] = $bean;
-		return $id;
-
+		$idfield = $this->writer->getIDField($type);
+		$newbean = $this->oodb->dispense($type);
+		$newbean->$idfield = $bean->$idfield;
+		$oldBean = $this->fetchOriginal($bean);
+		if ($oldBean) {
+			$dirty = false;
+			foreach($oldBean as $p=>$v) {
+				if ($v !== $bean->$p && $p!=$idfield) {
+					$newbean->$p = $bean->$p;
+					//echo "ADDING CHANGED PROP: $p $v ->  ".$bean->$p;
+					$this->columnCounter++;
+					$dirty=true;
+				}
+			}
+			if ($dirty) {
+				$newbean->copyMetaFrom($bean);
+				$id = $this->oodb->store($newbean);
+				$bean->copyMetaFrom($newbean);
+				$this->putInCache($bean);
+				return $id;
+			}
+			else {
+				return $bean->$idfield;
+			}
+		}
+		else {
+			$id = $this->oodb->store($bean);
+			$this->putInCache($bean);
+			return $id;
+		}
 	}
 
 	/**
@@ -83,9 +216,7 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements ObjectDatabase 
 	 * @param RedBean_OODBBean $bean
 	 */
 	public function trash( RedBean_OODBBean $bean ) {
-		$type = $bean->getMeta("type");
-		$id = $this->writer->getIDField($type);
-		unset( $this->cache[sha1($type."-".$id)] );
+		$this->removeFromCache($bean);
 		return $this->oodb->trash($bean);
 	}
 
@@ -103,9 +234,8 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements ObjectDatabase 
 		$idfield = $this->writer->getIDField($type);
 		$collect = array();
 		foreach($ids as $id) {
-			if (isset($this->cache[sha1($type."-".$id)])) {
-				$collect[$id] = $this->cache[sha1($type."-".$id)];
-			}
+			$bean = $this->fetchFromCacheByTypeID($type, $id);
+			if ($bean) $collect[$id] = $bean;
 		}
 		if (count($collect) == count($ids)) { 
 			return $collect;
@@ -113,7 +243,7 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements ObjectDatabase 
 		else {
 			$beans = $this->oodb->batch($type, $ids);
 			foreach($beans as $bean) {
-				$this->cache[sha1($type."-".$bean->$idfield)] = $bean;
+				$this->putInCache( $bean );
 			}
 			return $beans;
 		}
@@ -126,6 +256,15 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements ObjectDatabase 
 	 */
 	public function dispense( $type ){
 		return $this->oodb->dispense($type);
+	}
+
+	/**
+	 * For testing only; returns the number of properties that has
+	 * been updated in the latest store action.
+	 * @return integer $count
+	 */
+	public function test_getColCount() {
+		return $this->columnCounter;
 	}
 
 }

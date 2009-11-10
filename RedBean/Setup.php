@@ -56,6 +56,26 @@ class RedBean_Setup {
 			return $toolbox;
 		}
 
+
+		/**
+		 * Almost the same as Dev, but adds the journaling plugin by default for you.
+		 * @param  string $dsn
+		 * @param  string $username
+		 * @param  string $password
+		 * @return RedBean_ToolBox $toolbox
+		 */
+		public static function KickStartDevWithJournal($dsn, $username="root", $password="") {
+			$toolbox = self::kickstart($dsn, $username, $password);
+			$redbean = $toolbox->getRedBean();
+			$logger = new RedBean_Plugin_ChangeLogger( $toolbox );
+			self::$observers["logger"] = $logger;
+			$redbean->addEventListener( "open", $logger );
+			$redbean->addEventListener( "update", $logger);
+			$redbean->addEventListener( "delete", $logger);
+			return $toolbox;
+		}
+
+
 		/**
 		 * @param  string $dsn
 		 * @param  string $username

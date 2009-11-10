@@ -94,6 +94,11 @@ class RedBean_OODBBean {
 		$ref[$lastpart] = $value;
 	}
 
+	public function copyMetaFrom( RedBean_OODBBean $bean ) {
+		$this->__info = $bean->__info;
+		return $this;
+	}
+
 
 }
 
