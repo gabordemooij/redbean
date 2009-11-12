@@ -328,6 +328,14 @@ asrt($bean->getMeta("another.little.property"),"yes");
 asrt($bean->getMeta("test.two"),"second");
 
 
+testpack("UNIT TEST RedBean OODBBean: copyMeta");
+$bean = new RedBean_OODBBean;
+$bean->setMeta("meta.meta","123");
+$bean2 = new RedBean_OODBBean;
+asrt($bean2->getMeta("meta.meta"),NULL);
+$bean2->copyMetaFrom($bean);
+asrt($bean2->getMeta("meta.meta"),"123");
+
 testpack("UNIT TEST RedBean OODBBean: import");
 $bean = new RedBean_OODBBean;
 $bean->import(array("a"=>1,"b"=>2));
@@ -1036,7 +1044,6 @@ $writer->deleteRecord("testtable", $id);
 $row = $writer->selectRecord("testtable", array($id));
 asrt($row,NULL);
 //$pdo->setDebugMode(1);
-
 $writer->addColumn("testtable", "c2", 2);
 try{ $writer->addUniqueIndex("testtable", array("c1","c2")); fail(); //should fail, no content length blob
 }catch(RedBean_Exception_SQL $e){ pass(); }
@@ -1047,6 +1054,11 @@ $a = $adapter->get("show index from testtable");
 asrt(count($a),3);
 asrt($a[1]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
+
+testpack("TEST SimpleStat ");
+require("RedBean/SimpleStat.php");
+$stat = new RedBean_SimpleStat( $toolbox );
+asrt( $stat->numberOf($page), 25);
 
 //Section D Security Tests
 testpack("Test RedBean Security - bean interface ");

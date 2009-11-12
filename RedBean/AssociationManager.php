@@ -139,7 +139,7 @@ class RedBean_AssociationManager {
 		$this->oodb->store($bean);
 		$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
-		if ($type==$bean->getMeta("type")) { //echo "<b>CROSS</b>";
+		if ($type==$bean->getMeta("type")) { 
 			$property2 = $type."2_id";
 			$cross = 1;
 		}

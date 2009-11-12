@@ -1,12 +1,12 @@
 <?php 
 /**
- * DBAdapter (Database Adapter)
- * @package 		RedBean/DBAdapter.php
+ * DBAdapter	    (Database Adapter)
+ * @package 		RedBean/Adapter/DBAdapter.php
  * @description		An adapter class to connect various database systems to RedBean
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_DBAdapter extends RedBean_Observable {
+class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 
 	/**
 	 *

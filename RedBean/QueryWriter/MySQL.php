@@ -89,7 +89,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      * The Query Writer Constructor also sets up the database
      * @param RedBean_DBAdapter $adapter
      */
-    public function __construct( RedBean_DBAdapter $adapter, $frozen = false ) {
+    public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
         $this->adapter = $adapter;
 		if (!$frozen) {
 			$this->adapter->exec("DROP TABLE IF EXISTS `dtyp`");

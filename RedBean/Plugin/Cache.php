@@ -8,7 +8,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_Plugin_Cache extends RedBean_Observable implements ObjectDatabase {
+class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_ObjectDatabase {
 
 	/**
 	 *

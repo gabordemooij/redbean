@@ -77,6 +77,7 @@ class RedBean_Setup {
 
 
 		/**
+		 * Kickstart method for production environment.
 		 * @param  string $dsn
 		 * @param  string $username
 		 * @param  string $password
@@ -89,6 +90,7 @@ class RedBean_Setup {
 		}
 
 		/**
+		 * Kickstart Method for debugging.
 		 * @param  string $dsn
 		 * @param  string $username
 		 * @param  string $password
@@ -99,6 +101,26 @@ class RedBean_Setup {
 			$toolbox->getDatabaseAdapter()->getDatabase()->setDebugMode( true );
 			return $toolbox;
 		}
+
+
+		/**
+		 * Kickstart Method
+		 * Sets up RedBean for Zend Framework.
+		 * @param Zend_Db_Adapter_Abstract $adapter
+		 * @param boolean $frozen
+		 * @return RedBean_ToolBox $toolbox
+		 */
+		public static function kickstartZendDev( Zend_Db_Adapter_Abstract $adapter, $frozen = false ) {
+			$adapter = new RedBean_Adapter_Zend( $adapter );
+            $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+            $redbean = new RedBean_OODB( $writer );
+			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
+            //deliver everything back in a neat toolbox
+			self::$toolbox = $toolbox;
+			Zend_Registry::set("redbean_toolbox", self::$toolbox);
+			return self::$toolbox;
+		}
+
 
 
 		/**

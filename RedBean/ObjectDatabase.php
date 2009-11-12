@@ -1,6 +1,6 @@
 <?php
 
-interface ObjectDatabase {
+interface RedBean_ObjectDatabase {
 
 	public function load( $type, $id );
 	public function store( RedBean_OODBBean $bean );

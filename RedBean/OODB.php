@@ -12,7 +12,7 @@
  * object database.
  * 
  */
-class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
+class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase {
 
 	/**
 	 *

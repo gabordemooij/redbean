@@ -13,26 +13,52 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
  */
 
-require("Exception/SQL.php");
+/**
+ * RedBean Loader
+ * @package 		RedBean/redbean.inc.php
+ * @description		If you do not use a pre-packaged version of RedBean
+ *					you can use this RedBean loader to include all RedBean
+ *					files for you.
+ * @author			Gabor de Mooij
+ * @license			BSD
+ */
+
+
+//Load Core Inteface
 require("ObjectDatabase.php");
 
+//Load Database drivers
 require("Driver.php");
 require("Driver/PDO.php");
 
+//Load Infrastructure
 require("OODBBean.php");
 require("Observable.php");
 require("Observer.php");
-require("DBAdapter.php");
 
+//Load Database Adapters
+require("Adapter.php");
+require("Adapter/DBAdapter.php");
+
+//Load SQL drivers
 require("QueryWriter.php");
 require("QueryWriter/MySQL.php");
-require("Plugin/ChangeLogger.php");
+
+//Load required Exceptions
 require("Exception.php");
+require("Exception/SQL.php");
 require("Exception/Security.php");
 require("Exception/FailedAccessBean.php");
+
+//Load Core functionality
 require("OODB.php");
 require("ToolBox.php");
+
+//Load extended functionality
 require("AssociationManager.php");
 require("TreeManager.php");
 require("Setup.php");
+
+//Load the default plugins
+require("Plugin/ChangeLogger.php");
 require("Plugin/Cache.php");
