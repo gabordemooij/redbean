@@ -10,7 +10,7 @@ interface RedBean_Observer {
 	
 	/**
 	 *
-	 * @param <type> $eventname
+	 * @param string $eventname
 	 * @param RedBean_OODBBean $bean
 	 */
 	public function onEvent( $eventname, $bean );

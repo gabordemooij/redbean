@@ -3,10 +3,13 @@
  * PDO Driver
  * @package 		RedBean/PDO.php
  * @description		PDO Driver
+ *					This Driver implements the RedBean Driver API
+ *					
+ *
  * @author			Desfrenes
  * @license			BSD
  */
-class Redbean_Driver_PDO implements RedBean_Driver {
+class RedBean_Driver_PDO implements RedBean_Driver {
 
 	/**
 	 * 

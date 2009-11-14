@@ -10,7 +10,7 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 
 	/**
 	 *
-	 * @var ADODB
+	 * @var ADODB compatible class
 	 */
 	private $db = null;
 	

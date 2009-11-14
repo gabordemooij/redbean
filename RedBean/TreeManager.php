@@ -30,8 +30,6 @@ class RedBean_TreeManager {
 	 */
 	private $writer;
 
-
-
 	/**
 	 * Constructor
 	 * @param RedBean_ToolBox $tools
