@@ -5,7 +5,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class Optimizer implements RedBean_Observer {
+class RedBean_Plugin_Optimizer implements RedBean_Observer {
 
 	/**
 	 *

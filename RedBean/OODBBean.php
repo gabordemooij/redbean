@@ -50,7 +50,9 @@ class RedBean_OODBBean {
 	 * @return mixed $value
 	 */
 	public function __get( $property ) {
-		if (!isset($this->$property)) return NULL;
+		if (!isset($this->$property)) {
+			return NULL;
+		}
 	}
 
 
@@ -90,6 +92,18 @@ class RedBean_OODBBean {
 			$ref = &$ref[$part];
 		}
 		$ref[$lastpart] = $value;
+	}
+
+	/**
+	 * Copies the meta information of the specified bean
+	 * This is a convenience method to enable you to
+	 * exchange meta information easily.
+	 * @param RedBean_OODBBean $bean
+	 * @return RedBean_OODBBean
+	 */
+	public function copyMetaFrom( RedBean_OODBBean $bean ) {
+		$this->__info = $bean->__info;
+		return $this;
 	}
 
 

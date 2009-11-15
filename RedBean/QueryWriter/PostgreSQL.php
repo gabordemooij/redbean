@@ -16,9 +16,9 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 */
     public $typeno_sqltype = array(
         RedBean_QueryWriter::C_DATATYPE_BOOL=>" SET('1') ",
-	RedBean_QueryWriter::C_DATATYPE_UINT8=>" TINYINT(3) UNSIGNED ",
+		RedBean_QueryWriter::C_DATATYPE_UINT8=>" TINYINT(3) UNSIGNED ",
         RedBean_QueryWriter::C_DATATYPE_UINT32=>" INT(11) UNSIGNED ",
-  	RedBean_QueryWriter::C_DATATYPE_DOUBLE=>" DOUBLE ",
+		RedBean_QueryWriter::C_DATATYPE_DOUBLE=>" DOUBLE ",
         RedBean_QueryWriter::C_DATATYPE_TEXT8=>" VARCHAR(255) ",
         RedBean_QueryWriter::C_DATATYPE_TEXT16=>" TEXT ",
         RedBean_QueryWriter::C_DATATYPE_TEXT32=>" LONGTEXT "
@@ -122,9 +122,8 @@ where table_schema = 'public'" );
 		$table = $this->check($table);
 		$sql = "
                      CREATE TABLE $table (
-                    id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-                     PRIMARY KEY ( id )
-                     ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
+						id SERIAL PRIMARY KEY
+                     );
             ";
         $this->adapter->exec( $sql );
     }
@@ -339,4 +338,16 @@ where table_schema = 'public'" );
                 ADD UNIQUE INDEX $name (".implode(",",$columns).")";
         $this->adapter->exec($sql);
     }
+
+
+	/**
+	 * Returns the column name that should be used
+	 * to store and retrieve the primary key ID.
+	 * @param string $type
+	 * @return string $idfieldtobeused
+	 */
+	public function getIDField( $type ) {
+		return  "id";
+	}
+
 }

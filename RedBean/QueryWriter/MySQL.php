@@ -63,6 +63,16 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	private $idfield = "id";
 
 
+	/**
+	 * Returns the column name that should be used
+	 * to store and retrieve the primary key ID.
+	 * @param string $type
+	 * @return string $idfieldtobeused
+	 */
+	public function getIDField( $type ) {
+		return  $this->idfield;
+	}
+
 
 	/**
 	 * Checks table name or column name
@@ -79,7 +89,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      * The Query Writer Constructor also sets up the database
      * @param RedBean_DBAdapter $adapter
      */
-    public function __construct( RedBean_DBAdapter $adapter, $frozen = false ) {
+    public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
         $this->adapter = $adapter;
 		if (!$frozen) {
 			$this->adapter->exec("DROP TABLE IF EXISTS `dtyp`");
@@ -122,7 +132,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param string $table
 	 */
     public function createTable( $table ) {
-		$idfield = $this->idfield;
+		$idfield = $this->getIDfield($table);
 		$table = $this->check($table);
 		$sql = "
                      CREATE TABLE `$table` (
@@ -217,7 +227,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @param integer $id
 	 */
     public function updateRecord( $table, $updatevalues, $id) {
-		$idfield = $this->idfield;
+		$idfield = $this->getIDField($table);
 		$sql = "UPDATE ".$this->check($table)." SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
@@ -238,7 +248,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 */
     public function insertRecord( $table, $insertcolumns, $insertvalues ) {
 		//if ($table == "__log") $idfield="id"; else
-		$idfield = $this->idfield;
+		$idfield = $this->getIDField($table);
 		$table = $this->check($table);
         if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k=>$v) {
@@ -270,7 +280,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return array $row
 	 */
     public function selectRecord($type, $ids) {
-		$idfield = $this->idfield;
+		$idfield = $this->getIDField($type);
 		$type=$this->check($type);
 		$sql = "SELECT * FROM `$type` WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);
@@ -287,7 +297,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 */
     public function deleteRecord( $table, $id) {
 		$table = $this->check($table);
-		$this->adapter->exec("DELETE FROM `$table` WHERE `".$this->idfield."` = ? ",array(strval($id)));
+		$this->adapter->exec("DELETE FROM `$table` WHERE `".$this->getIDField($table)."` = ? ",array(strval($id)));
     }
 	
 	/**

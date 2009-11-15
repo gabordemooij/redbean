@@ -148,6 +148,8 @@ class NullWriter implements RedBean_QueryWriter {
 		$this->addUniqueIndexArguments=array($table,$columns);
 		return $this->returnAddUniqueIndex;
 	}
+	public function getIDField( $type ) { return "id"; }
+
 	public function reset() {
 		$this->createTableArgument = NULL;
 		$this->getColumnsArgument = NULL;
@@ -326,6 +328,14 @@ asrt($bean->getMeta("another.little.property"),"yes");
 asrt($bean->getMeta("test.two"),"second");
 
 
+testpack("UNIT TEST RedBean OODBBean: copyMeta");
+$bean = new RedBean_OODBBean;
+$bean->setMeta("meta.meta","123");
+$bean2 = new RedBean_OODBBean;
+asrt($bean2->getMeta("meta.meta"),NULL);
+$bean2->copyMetaFrom($bean);
+asrt($bean2->getMeta("meta.meta"),"123");
+
 testpack("UNIT TEST RedBean OODBBean: import");
 $bean = new RedBean_OODBBean;
 $bean->import(array("a"=>1,"b"=>2));
@@ -366,6 +376,7 @@ $adapter = $toolbox->getDatabaseAdapter();
 $writer  = $toolbox->getWriter();
 $redbean = $toolbox->getRedBean();
 
+
 testpack("UNIT TEST Toolbox");
 asrt(($adapter instanceof RedBean_DBAdapter),true);
 asrt(($writer instanceof RedBean_QueryWriter),true);
@@ -381,6 +392,7 @@ $pdo->Execute("CREATE TABLE IF NOT EXISTS`hack` (
 $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
 $pdo->Execute("DROP TABLE IF EXISTS movie");
+$pdo->Execute("DROP TABLE IF EXISTS movie_movie");
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");
 $pdo->Execute("DROP TABLE IF EXISTS one");
@@ -391,6 +403,9 @@ $pdo->Execute("DROP TABLE IF EXISTS association");
 $pdo->Execute("DROP TABLE IF EXISTS logentry");
 $pdo->Execute("DROP TABLE IF EXISTS admin");
 $pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
+$pdo->Execute("DROP TABLE IF EXISTS genre");
+$pdo->Execute("DROP TABLE IF EXISTS genre_movie");
+
 $page = $redbean->dispense("page");
 
 testpack("UNIT TEST Database");
@@ -522,11 +537,77 @@ $books = $redbean->batch("book", $adapter->getCol("SELECT id FROM book"));
 asrt(count($books),3);
 
 
+testpack("Test Custom ID Field");
+class MyWriter extends RedBean_QueryWriter_MySQL {
+	public function getIDField( $type ) {
+		return $type . "_id";
+	}
+}
+$writer2 = new MyWriter($adapter);
+$redbean2 = new RedBean_OODB($writer2);
+$movie = $redbean2->dispense("movie");
+asrt(isset($movie->movie_id),true);
+$movie->name="movie 1";
+$movieid = $redbean2->store($movie);
+asrt(($movieid>0),true);
+$columns = array_keys( $writer->getColumns("movie") );
+asrt(in_array("movie_id",$columns),true);
+asrt(in_array("id",$columns),false);
+$movie2 = $redbean2->dispense("movie");
+asrt(isset($movie2->movie_id),true);
+$movie2->name="movie 2";
+$movieid2 = $redbean2->store($movie2);
+$movie1 = $redbean2->load("movie",$movieid);
+asrt($movie->name,"movie 1");
+$movie2 = $redbean2->load("movie",$movieid2);
+asrt($movie2->name,"movie 2");
+$movies = $redbean2->batch("movie", array($movieid,$movieid2));
+asrt(count($movies),2);
+asrt($movies[$movieid]->name,"movie 1");
+asrt($movies[$movieid2]->name,"movie 2");
+$toolbox2 = new RedBean_ToolBox($redbean2, $adapter, $writer2);
+
+$a2 = new RedBean_AssociationManager($toolbox2);
+$a2->associate($movie1,$movie2);
+$movies = $a2->related($movie1, "movie");
+asrt(count($movies),1);
+asrt((int) $movies[0],(int) $movieid2);
+$movies = $a2->related($movie2, "movie");
+asrt(count($movies),1);
+asrt((int) $movies[0],(int) $movieid);
+$genre = $redbean2->dispense("genre");
+$genre->name="western";
+$a2->associate($movie,$genre);
+$movies = $a2->related($genre, "movie");
+asrt(count($movies),1);
+asrt((int)$movies[0],(int)$movieid);
+$a2->unassociate($movie,$genre);
+$movies = $a2->related($genre, "movie");
+asrt(count($movies),0);
+$a2->clearRelations($movie, "movie");
+$movies = $a2->related($movie1, "movie");
+asrt(count($movies),0);
+$pdo->setDebugMode(0);
+$t2 = new RedBean_TreeManager($toolbox2);
+$t2->attach($movie1, $movie2);
+$movies = $t2->children($movie1);
+asrt(count($movies),1);
+asrt($movies[$movieid2]->name,"movie 2");
+$redbean2->trash($movie1);
+asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),1);
+$redbean2->trash($movie2);
+asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),0);
+$columns = array_keys($writer->getColumns("movie_movie"));
+asrt(in_array("movie_movie_id",$columns),true);
+
 //test locking
+$logger = new RedBean_Plugin_ChangeLogger( $toolbox );
+$redbean->addEventListener( "open", $logger );
+$redbean->addEventListener( "update", $logger);
+$redbean->addEventListener( "delete", $logger);
 
 testpack("Test RedBean Locking: Change Logger method ");
 $observers = RedBean_Setup::getAttachedObservers();
-$logger = array_pop($observers);
 $page = $redbean->dispense("page");
 $page->name = "a page";
 $id = $redbean->store( $page );
@@ -535,7 +616,6 @@ $otherpage = $redbean->load("page", $id);
 asrt(((bool)$page->getMeta("opened")),true);
 asrt(((bool)$otherpage->getMeta("opened")),true); 
 try{ $redbean->store( $page ); pass(); }catch(Exception $e){ fail(); }
-echo '---';
 try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
 asrt(count($logger->testingOnly_getStash()),0); // Stash empty?
 
@@ -658,7 +738,6 @@ class QueryCounter implements RedBean_Observer {
 }
 $querycounter = new QueryCounter;
 $observers = RedBean_Setup::getAttachedObservers();
-$logger = array_pop($observers);
 asrt(($logger instanceof RedBean_Observer),true);
 $pagea = $redbean->dispense("page");
 $pageb = $redbean->dispense("page");
@@ -694,6 +773,62 @@ asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),7);
 asrt(count($logger->testingOnly_getStash()),0); //should be used up
 
 
+testpack("Test RedBean Cache plugin");
+$adapter->exec("drop table movie");
+$querycounter->counter = 0;
+$redbean3 = new RedBean_Plugin_Cache( $redbean, $toolbox );
+$movie = $redbean3->dispense("movie");
+$movie->name = "cached movie 1";
+//$pdo->setDebugMode(1);
+$movieid = $redbean3->store($movie);
+asrt(($querycounter->counter>0),true);
+$querycounter->counter=0;
+$movie = $redbean3->load("movie",$movieid);
+asrt($movie->name,"cached movie 1");
+asrt(($querycounter->counter>0),false);
+$movie->name = "cached movie 2";
+$movieid = $redbean3->store($movie);
+asrt(($querycounter->counter>0),true);
+$querycounter->counter=0;
+$movie = $redbean3->load("movie",$movieid);
+asrt($movie->name,"cached movie 2");
+asrt(($querycounter->counter>0),false);
+$movie2 = $redbean3->dispense("movie");
+$movie2->name="another movie";
+$movie2id = $redbean3->store($movie2);
+$querycounter->counter=0;
+$movies = $redbean3->batch("movie",array($movie2id, $movieid));
+asrt(count($movies),2);
+asrt(($querycounter->counter>0),false);
+$redbean3->trash($movie2);
+asrt(($querycounter->counter>0),true);
+$querycounter->counter=0;
+$pages = $redbean3->batch("page",$adapter->getCol("SELECT id FROM page"));
+asrt(($querycounter->counter>0),true);
+$apage = array_pop($pages);
+$querycounter->counter=0;
+$samepage = $redbean3->load("page",$apage->id);
+asrt(($querycounter->counter>0),false);
+asrt($samepage->name,$apage->name);
+asrt($samepage->id,$apage->id);
+$movie = $redbean3->dispense("movie");
+$movie->rating = 5;
+$movie->name="scary movie";
+$redbean3->store($movie);
+asrt($redbean3->test_getColCount(),0);
+$movie->rating = 4;
+$movie->name="scary movie 2";
+$redbean3->store($movie);
+asrt($redbean3->test_getColCount(),2);
+$movie->rating = 3;
+$redbean3->store($movie);
+asrt($redbean3->test_getColCount(),1);
+$movie->name="scary movie 3";
+$redbean3->store($movie);
+asrt($redbean3->test_getColCount(),1);
+$redbean3->store($movie);
+asrt($redbean3->test_getColCount(),0);
+
 
 
 testpack("Transactions");
@@ -702,13 +837,7 @@ $adapter->rollback(); pass();
 $adapter->startTransaction(); pass();
 $adapter->commit(); pass();
 
-testpack("Test Frozen ");
-$redbean->freeze( true );
-$page = $redbean->dispense("page");
-$page->sections = 10;
-$page->name = "half a page";
-try{$id = $redbean->store($page); fail();}catch(RedBean_Exception_SQL $e){ pass(); }
-$redbean->freeze( false );
+
 
 
 testpack("Test Developer Interface API");
@@ -719,6 +848,24 @@ $id = $redbean->store( $post );
 $post = $redbean->load("post",$id);
 $redbean->trash( $post );
 pass();
+
+
+testpack("Test Frozen ");
+$redbean->freeze( true );
+$page = $redbean->dispense("page");
+$page->sections = 10;
+$page->name = "half a page";
+try{$id = $redbean->store($page); fail();}catch(RedBean_Exception_SQL $e){ pass(); }
+$post = $redbean->dispense("post");
+$post->title = "existing table";
+try{$id = $redbean->store($post); pass();}catch(RedBean_Exception_SQL $e){ fail(); }
+asrt(in_array("name",array_keys($writer->getColumns("page"))),true);
+asrt(in_array("sections",array_keys($writer->getColumns("page"))),false);
+$newtype = $redbean->dispense("newtype");
+$newtype->property=1;
+try{$id = $redbean->store($newtype); fail();}catch(RedBean_Exception_SQL $e){ pass(); }
+$redbean->freeze( false );
+
 
 
 testpack("Test Finding");
@@ -746,7 +893,7 @@ asrt(count($a->related( $page, "user")),0);
 $page = $redbean->load("page",$id); pass();
 asrt($page->name,"test page");
 
-testpack("Test Plugins: Trees ");
+testpack("Test: Trees ");
 $tm = new RedBean_TreeManager($toolbox);
 $subpage1 = $redbean->dispense("page");
 $subpage2 = $redbean->dispense("page");
@@ -777,8 +924,8 @@ testpack("Test Plugins: Optimizer");
 $one = $redbean->dispense("one");
 $one->col = str_repeat('a long text',100);
 $redbean->store($one);
-require("RedBean/Plugins/Optimizer.php");
-$optimizer = new Optimizer( $toolbox );
+require("RedBean/Plugin/Optimizer.php");
+$optimizer = new RedBean_Plugin_Optimizer( $toolbox );
 $redbean->addEventListener("update", $optimizer);
 $writer  = $toolbox->getWriter();
 $cols = $writer->getColumns("one");
@@ -909,7 +1056,6 @@ $writer->deleteRecord("testtable", $id);
 $row = $writer->selectRecord("testtable", array($id));
 asrt($row,NULL);
 //$pdo->setDebugMode(1);
-
 $writer->addColumn("testtable", "c2", 2);
 try{ $writer->addUniqueIndex("testtable", array("c1","c2")); fail(); //should fail, no content length blob
 }catch(RedBean_Exception_SQL $e){ pass(); }
@@ -920,6 +1066,11 @@ $a = $adapter->get("show index from testtable");
 asrt(count($a),3);
 asrt($a[1]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
+
+testpack("TEST SimpleStat ");
+require("RedBean/SimpleStat.php");
+$stat = new RedBean_SimpleStat( $toolbox );
+asrt( $stat->numberOf($page), 25);
 
 //Section D Security Tests
 testpack("Test RedBean Security - bean interface ");

@@ -12,7 +12,7 @@
  * object database.
  * 
  */
-class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
+class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase {
 
 	/**
 	 *
@@ -55,7 +55,8 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 		
         $bean = new RedBean_OODBBean();
         $bean->setMeta("type", $type );
-        $bean->id = 0;
+		$idfield = $this->writer->getIDField($bean->getMeta("type"));
+        $bean->$idfield = 0;
 		$this->signal( "dispense", $bean );
         $this->check( $bean );
         return $bean;
@@ -65,8 +66,9 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
      * @param RedBean_OODBBean $bean
      */
     public function check( RedBean_OODBBean $bean ) {
+		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 	    //Is all meta information present?
-        if (!isset($bean->id) || !($bean->getMeta("type"))) {
+        if (!isset($bean->$idfield) || !($bean->getMeta("type"))) {
             throw new RedBean_Exception_Security("Bean has incomplete Meta Information");
         }
         //Pattern of allowed characters
@@ -99,6 +101,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
         $this->check($bean);
         //what table does it want
         $table = $bean->getMeta("type");
+		$idfield = $this->writer->getIDField($table);
 	        //does this table exist?
             $tables = $this->writer->getTables();
             //If not, create
@@ -111,7 +114,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
             $insertcolumns = array();
             $updatevalues = array();
             foreach( $bean as $p=>$v) {
-                if ($p!="id") {
+                if ($p!=$idfield) {
 					 if (!$this->isFrozen) {
 						//What kind of property are we dealing with?
 						$typeno = $this->writer->scanType($v);
@@ -140,15 +143,16 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 						$this->writer->addUniqueIndex( $table, $unique );
 					}
              }
-            if ($bean->id) {
+            if ($bean->$idfield) {
                 if (count($updatevalues)>0) {
-                    $this->writer->updateRecord( $table, $updatevalues, $bean->id );
+                    $this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
                 }
-                return (int) $bean->id;
+				
+                return (int) $bean->$idfield;
             }
             else {
                 $id = $this->writer->insertRecord( $table, $insertcolumns, array($insertvalues) );
-                $bean->id = $id;
+                $bean->$idfield = $id;
                 return (int) $id;
             }
     }
@@ -188,10 +192,11 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 	 * @param RedBean_OODBBean $bean
 	 */
     public function trash( RedBean_OODBBean $bean ) {
+		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		$this->signal( "delete", $bean );
         $this->check( $bean );
 		try{
-        $this->writer->deleteRecord( $bean->getMeta("type"), $bean->id );
+        $this->writer->deleteRecord( $bean->getMeta("type"), $bean->$idfield );
 		}catch(RedBean_Exception_SQL $e){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 		}
@@ -215,7 +220,7 @@ class RedBean_OODB extends RedBean_Observable implements ObjectDatabase {
 		$this->stash = array();
 		if (!$rows) return array();
 		foreach($rows as $row) {
-			$this->stash[$row["id"]] = $row;
+			$this->stash[$row[$this->writer->getIDField($type)]] = $row;
 		}
         foreach($ids as $id) {
             $collection[ $id ] = $this->load( $type, $id );

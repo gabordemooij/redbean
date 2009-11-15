@@ -175,7 +175,11 @@ class NullWriter implements RedBean_QueryWriter {
 		$this->returnCheckChanges = NULL;
 		$this->returnAddUniqueIndex = NULL;
 	}
+
+	public function getIDField($t) { return "id"; }
 }
+
+try{
 
 $nullWriter = new NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
@@ -1017,3 +1021,8 @@ $bean->id = 2;
 $redbean->trash($bean);
 pass();
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
+
+
+}catch(Exception $e) {
+  echo "<pre>".$e->getTraceAsString();
+}

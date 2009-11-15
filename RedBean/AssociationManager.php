@@ -22,12 +22,19 @@ class RedBean_AssociationManager {
 	private $adapter;
 
 	/**
+	 * @var RedBean_QueryWriter
+	 */
+	private $writer;
+
+
+	/**
 	 * Constructor
 	 * @param RedBean_ToolBox $tools
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
+		$this->writer = $tools->getWriter();
 	}
 	/**
 	 * Creates a table name based on a types array.
@@ -45,6 +52,8 @@ class RedBean_AssociationManager {
 	 */
 	public function associate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
+		$idfield1 = $this->writer->getIDField($bean1->getMeta("type"));
+		$idfield2 = $this->writer->getIDField($bean2->getMeta("type"));
 		$bean = $this->oodb->dispense($table);
 		$property1 = $bean1->getMeta("type") . "_id";
 		$property2 = $bean2->getMeta("type") . "_id";
@@ -52,8 +61,8 @@ class RedBean_AssociationManager {
 		$bean->setMeta( "buildcommand.unique" , array( array( $property1, $property2 )));
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
-		$bean->$property1 = $bean1->id;
-		$bean->$property2 = $bean2->id;
+		$bean->$property1 = $bean1->$idfield1;
+		$bean->$property2 = $bean2->$idfield2;
 		$this->oodb->store( $bean );
 	}
 
@@ -65,6 +74,7 @@ class RedBean_AssociationManager {
 	 */
 	public function related( RedBean_OODBBean $bean, $type ) {
 		$table = $this->getTable( array($bean->getMeta("type") , $type) );
+		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		if ($type==$bean->getMeta("type")) {// echo "<b>CROSS</b>";
 			$type .= "2";
 			$cross = 1;
@@ -73,11 +83,11 @@ class RedBean_AssociationManager {
 		$targetproperty = $type."_id";
 		$property = $bean->getMeta("type")."_id";
 		$sqlFetchKeys = " SELECT ".$this->adapter->escape($targetproperty)." FROM `$table` WHERE ".$this->adapter->escape($property)."
-			= ".$this->adapter->escape($bean->id);
+			= ".$this->adapter->escape($bean->$idfield);
 		if ($cross) {
 			$sqlFetchKeys .= " UNION SELECT ".$this->adapter->escape($property)." 
 			FROM `$table`
-			WHERE ".$this->adapter->escape($targetproperty)." = ".$this->adapter->escape($bean->id);;
+			WHERE ".$this->adapter->escape($targetproperty)." = ".$this->adapter->escape($bean->$idfield);;
 		}
 		try{
 			return $this->adapter->getCol( $sqlFetchKeys );
@@ -96,6 +106,8 @@ class RedBean_AssociationManager {
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
+		$idfield1 = $this->writer->getIDField($bean1->getMeta("type"));
+		$idfield2 = $this->writer->getIDField($bean2->getMeta("type"));
 		$type = $bean1->getMeta("type");
 		if ($type==$bean2->getMeta("type")) { //echo "<b>CROSS</b>";
 			$type .= "2";
@@ -104,8 +116,8 @@ class RedBean_AssociationManager {
 		else $cross = 0;
 		$property1 = $type."_id";
 		$property2 = $bean2->getMeta("type")."_id";
-		$value1 = (int) $bean1->id;
-		$value2 = (int) $bean2->id;
+		$value1 = (int) $bean1->$idfield1;
+		$value2 = (int) $bean2->$idfield2;
 		$sqlDeleteAssoc = "DELETE FROM `$table`
 		WHERE 
 		( $property1 = $value1 AND $property2 = $value2 )	";
@@ -126,16 +138,17 @@ class RedBean_AssociationManager {
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
 		$this->oodb->store($bean);
 		$table = $this->getTable( array($bean->getMeta("type") , $type) );
-		if ($type==$bean->getMeta("type")) { //echo "<b>CROSS</b>";
+		$idfield = $this->writer->getIDField($bean->getMeta("type"));
+		if ($type==$bean->getMeta("type")) { 
 			$property2 = $type."2_id";
 			$cross = 1;
 		}
 		else $cross = 0;
 		$property = $bean->getMeta("type")."_id";
 		$sql = "DELETE FROM `$table`
-		WHERE ".$this->adapter->escape($property)." = ".$this->adapter->escape($bean->id);
+		WHERE ".$this->adapter->escape($property)." = ".$this->adapter->escape($bean->$idfield);
 		if ($cross){
-			$sql .= " OR  ".$this->adapter->escape($property2)." = ".$this->adapter->escape($bean->id);;
+			$sql .= " OR  ".$this->adapter->escape($property2)." = ".$this->adapter->escape($bean->$idfield);;
 		}
 		try{
 		$this->adapter->exec($sql);

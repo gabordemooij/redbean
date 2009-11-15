@@ -45,13 +45,7 @@ class RedBean_Setup {
             $redbean = new RedBean_OODB( $writer );
 
 			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
-            //add concurrency shield
-			$logger = new RedBean_ChangeLogger( $toolbox );
-			self::$observers["logger"] = $logger;
-            $redbean->addEventListener( "open", $logger );
-            $redbean->addEventListener( "update", $logger);
-			$redbean->addEventListener( "delete", $logger);
-
+            
             //deliver everything back in a neat toolbox
 			self::$toolbox = $toolbox;
             return self::$toolbox;
@@ -69,7 +63,28 @@ class RedBean_Setup {
 			return $toolbox;
 		}
 
+
 		/**
+		 * Almost the same as Dev, but adds the journaling plugin by default for you.
+		 * @param  string $dsn
+		 * @param  string $username
+		 * @param  string $password
+		 * @return RedBean_ToolBox $toolbox
+		 */
+		public static function KickStartDevWithJournal($dsn, $username="root", $password="") {
+			$toolbox = self::kickstart($dsn, $username, $password);
+			$redbean = $toolbox->getRedBean();
+			$logger = new RedBean_Plugin_ChangeLogger( $toolbox );
+			self::$observers["logger"] = $logger;
+			$redbean->addEventListener( "open", $logger );
+			$redbean->addEventListener( "update", $logger);
+			$redbean->addEventListener( "delete", $logger);
+			return $toolbox;
+		}
+
+
+		/**
+		 * Kickstart method for production environment.
 		 * @param  string $dsn
 		 * @param  string $username
 		 * @param  string $password
@@ -82,6 +97,7 @@ class RedBean_Setup {
 		}
 
 		/**
+		 * Kickstart Method for debugging.
 		 * @param  string $dsn
 		 * @param  string $username
 		 * @param  string $password

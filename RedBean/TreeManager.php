@@ -26,12 +26,18 @@ class RedBean_TreeManager {
 	private $adapter;
 
 	/**
+	 * @var RedBean_QueryWriter
+	 */
+	private $writer;
+
+	/**
 	 * Constructor
 	 * @param RedBean_ToolBox $tools
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
+		$this->writer = $tools->getWriter();
 	}
 
 	/**
@@ -40,9 +46,9 @@ class RedBean_TreeManager {
 	 * @param RedBean_OODBBean $child
 	 */
 	public function attach( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
-
-		if (!intval($parent->id)) $this->oodb->store($parent);
-		$child->{$this->property} = $parent->id;
+		$idfield = $this->writer->getIDField($parent->getMeta("type"));
+		if (!intval($parent->$idfield)) $this->oodb->store($parent);
+		$child->{$this->property} = $parent->$idfield;
 		$this->oodb->store($child);
 	}
 
@@ -52,9 +58,10 @@ class RedBean_TreeManager {
 	 * @return array $childObjects
 	 */
 	public function children( RedBean_OODBBean $parent ) {
-		try {$ids = $this->adapter->getCol("SELECT id FROM
+		$idfield = $this->writer->getIDField($parent->getMeta("type"));
+		try {$ids = $this->adapter->getCol("SELECT ".$idfield." FROM
 			`".$parent->getMeta("type")."`
-			WHERE `".$this->property."` = ".intval( $parent->id )."
+			WHERE `".$this->property."` = ".intval( $parent->$idfield )."
 		");
 		}
 		catch(RedBean_Exception_SQL $e) {
