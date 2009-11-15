@@ -837,13 +837,7 @@ $adapter->rollback(); pass();
 $adapter->startTransaction(); pass();
 $adapter->commit(); pass();
 
-testpack("Test Frozen ");
-$redbean->freeze( true );
-$page = $redbean->dispense("page");
-$page->sections = 10;
-$page->name = "half a page";
-try{$id = $redbean->store($page); fail();}catch(RedBean_Exception_SQL $e){ pass(); }
-$redbean->freeze( false );
+
 
 
 testpack("Test Developer Interface API");
@@ -854,6 +848,24 @@ $id = $redbean->store( $post );
 $post = $redbean->load("post",$id);
 $redbean->trash( $post );
 pass();
+
+
+testpack("Test Frozen ");
+$redbean->freeze( true );
+$page = $redbean->dispense("page");
+$page->sections = 10;
+$page->name = "half a page";
+try{$id = $redbean->store($page); fail();}catch(RedBean_Exception_SQL $e){ pass(); }
+$post = $redbean->dispense("post");
+$post->title = "existing table";
+try{$id = $redbean->store($post); pass();}catch(RedBean_Exception_SQL $e){ fail(); }
+asrt(in_array("name",array_keys($writer->getColumns("page"))),true);
+asrt(in_array("sections",array_keys($writer->getColumns("page"))),false);
+$newtype = $redbean->dispense("newtype");
+$newtype->property=1;
+try{$id = $redbean->store($newtype); fail();}catch(RedBean_Exception_SQL $e){ pass(); }
+$redbean->freeze( false );
+
 
 
 testpack("Test Finding");
