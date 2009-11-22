@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean Association
- * @package 		RedBean/Association.php
+ * @file 		RedBean/Association.php
  * @description		This is actually more like an example than
  *					a real part of RedBean. Since version 0.7 you can create
  *					your own ORM structures with RedBean. Association is a

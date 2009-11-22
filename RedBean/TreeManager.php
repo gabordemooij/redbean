@@ -2,7 +2,7 @@
 /**
  * RedBean Tree
  *
- * @package 		RedBean/TreeManager.php
+ * @file 		RedBean/TreeManager.php
  * @description		Shields you from race conditions automatically.
  * @author			Gabor de Mooij
  * @license			BSD

@@ -2,12 +2,12 @@
 /**
  * RedBean ChangeLogger
  * Shields you from race conditions automatically.
- * @package 		RedBean/ChangeLogger.php
+ * @file 		RedBean/ChangeLogger.php
  * @description		Shields you from race conditions automatically.
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_Plugin_ChangeLogger implements RedBean_Observer {
+class RedBean_Plugin_ChangeLogger implements RedBean_Plugin,RedBean_Observer {
 
     /**
      * @var RedBean_DBAdapter

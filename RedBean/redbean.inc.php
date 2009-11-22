@@ -15,7 +15,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
 /**
  * RedBean Loader
- * @package 		RedBean/redbean.inc.php
+ * @file 		RedBean/redbean.inc.php
  * @description		If you do not use a pre-packaged version of RedBean
  *					you can use this RedBean loader to include all RedBean
  *					files for you.
@@ -24,8 +24,9 @@ _______   ____   __| _/\_ |__   ____ _____    ____
  */
 
 
-//Load Core Inteface
+//Load Core Intefaces
 require("ObjectDatabase.php");
+require("Plugin.php");
 
 //Load Database drivers
 require("Driver.php");
@@ -49,6 +50,7 @@ require("Exception.php");
 require("Exception/SQL.php");
 require("Exception/Security.php");
 require("Exception/FailedAccessBean.php");
+require("Exception/NotImplemented.php");
 
 //Load Core functionality
 require("OODB.php");

@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean MySQLWriter
- * @package 		RedBean/QueryWriter/MySQL.php
+ * @file 		RedBean/QueryWriter/MySQL.php
  * @description		Represents a MySQL Database to RedBean
  *					To write a driver for a different database for RedBean
  *					you should only have to change this file.

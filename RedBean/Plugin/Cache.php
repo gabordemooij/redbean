@@ -1,48 +1,43 @@
 <?php
 /**
  * RedBean Bean Cache
- * @package 		RedBean/Plugin/Cache.php
+ * @file 		RedBean/Plugin/Cache.php
  * @description		Decorator for RedBean core class RedBean_OODB
- *					Adds caching to RedBean
+ *					Adds primitive caching to RedBean.
  *					
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_ObjectDatabase {
+class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin, RedBean_ObjectDatabase {
 
 	/**
-	 *
 	 * @var RedBean_OODB
 	 */
 	private $oodb;
 
 	/**
-	 *
 	 * @var RedBean_QueryWriter
 	 */
 	private $writer;
 
 	/**
-	 *
 	 * @var array
 	 */
 	private $cache = array();
 
 	/**
-	 *
 	 * @var array
 	 */
 	private $originals = array();
 
 	/**
-	 *
 	 * @var integer
 	 */
 	private $columnCounter = 0;
 
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 * @param RedBean_OODB $oodb
 	 * @param RedBean_ToolBox $toolBox
 	 */
@@ -52,7 +47,7 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_ObjectD
 	}
 
 	/**
-	 * Adds event listener
+	 * Adds event listener.
 	 * @param <type> $event
 	 * @param RedBean_Observer $o
 	 */
@@ -171,7 +166,7 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_ObjectD
 
 	
 	/**
-	 * Stores a bean and updates cache
+	 * Stores a bean and updates cache.
 	 * @param RedBean_OODBBean $bean
 	 * @return integer $id
 	 */
@@ -183,16 +178,21 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_ObjectD
 		$newbean = $this->oodb->dispense($type);
 		$newbean->$idfield = $bean->$idfield;
 		$oldBean = $this->fetchOriginal($bean);
+		//Is there a cached version?
 		if ($oldBean) {
+			//Assume no differences.
 			$dirty = false;
+			//Check for differences.
 			foreach($oldBean as $p=>$v) {
 				if ($v !== $bean->$p && $p!=$idfield) {
 					$newbean->$p = $bean->$p;
 					//echo "ADDING CHANGED PROP: $p $v ->  ".$bean->$p;
-					$this->columnCounter++;
+					$this->columnCounter++; //for tests.
+					//found a difference; mark as tainted.
 					$dirty=true;
 				}
 			}
+			//If the bean is dirty; send only differences for update.
 			if ($dirty) {
 				$newbean->copyMetaFrom($bean);
 				$id = $this->oodb->store($newbean);

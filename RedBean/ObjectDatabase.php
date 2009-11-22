@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean_ObjectDatabase
- * @package 		RedBean/RedBean_ObjectDatabase.php
+ * @file 		RedBean/RedBean_ObjectDatabase.php
  * @description		RedBean simulates an object oriented database. This interface
  *					describes the API for the object database. It is the
  *					abstract core of RedBean describing its main functionality.
@@ -11,9 +11,13 @@
 interface RedBean_ObjectDatabase {
 
 	/**
-	 * Loads a bean from the object database.
-	 * If the bean cannot be found in the database a new bean of
-	 * the specified type will be generated and returned.
+	 * This interface describes how ANY Object Database should
+	 * behave.For detailed descriptions of RedBean specific implementation 
+	 * see: RedBean_OODB.
+	 * An Object Database should be able to load a bean using a $type and $id.
+	 * The $type argument indicated what kind of bean you are looking for.
+	 * The $id argument specifies the primary key ID; which links the bean to
+	 * a (series) of record(s) in the database.
 	 * @param string $type
 	 * @param integer $id
 	 * @return RedBean_OODBBean $bean
@@ -21,34 +25,39 @@ interface RedBean_ObjectDatabase {
 	public function load( $type, $id );
 
 	/**
-	 * Stores a bean in the database.
+	 * This interface describes how ANY Object Database should
+	 * behave.For detailed descriptions of RedBean specific implementation
+	 * see: RedBean_OODB.
+	 * An Object Database should be able to store a RedBean_OODBBean $bean.
 	 * @param RedBean_OODBBean $bean
+	 * @return integer $newid
 	 */
 	public function store( RedBean_OODBBean $bean );
 
 	/**
-	 * Removes a bean from the database.
+	 * This interface describes how ANY Object Database should
+	 * behave.For detailed descriptions of RedBean specific implementation
+	 * see: RedBean_OODB.
 	 * @param RedBean_OODBBean $bean
 	 */
 	public function trash( RedBean_OODBBean $bean );
 
 	/**
-	 * Loads a series of beans all at once.
-	 * The beans are retrieved using their primary key IDs
-	 * specified in the second argument.
+	 * This interface describes how ANY Object Database should
+	 * behave.For detailed descriptions of RedBean specific implementation
+	 * see: RedBean_OODB.
 	 * @param string $type
 	 * @param array $ids
+	 * @return array $beans
 	 */
 	public function batch( $type, $ids );
 
 	/**
-	 * Dispenses a new bean of the specified type. Always
-	 * use this function to get an empty bean object. Never
-	 * instantiate a RedBean_OODBBean yourself because it needs
-	 * to be configured before you can use it with RedBean. This
-	 * function applies the appropriate initialization /
-	 * configuration for you.
-	 * @param string $type
+	 * This interface describes how ANY Object Database should
+	 * behave.For detailed descriptions of RedBean specific implementation
+	 * see: RedBean_OODB.
+	*  @param string $type
+	 * @return RedBean_OODBBean $bean
 	 */
 	public function dispense( $type );
 

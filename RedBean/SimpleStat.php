@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean SimpleStat
- * @package 		RedBean/SimpleStat.php
+ * @file 		RedBean/SimpleStat.php
  * @description		Provides simple statistics for MySQL Databases
  * @author			Gabor de Mooij
  * @license			BSD

@@ -1,7 +1,7 @@
 <?php
 /**
  * Adapter Interface
- * @package 		RedBean/Adapter.php
+ * @file 		RedBean/Adapter.php
  * @description		Describes the API for a RedBean Database Adapter.
  * @author			Gabor de Mooij
  * @license			BSD
