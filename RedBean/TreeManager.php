@@ -21,7 +21,7 @@ class RedBean_TreeManager {
 	private $oodb;
 
 	/**
-	 * @var RedBean_DBAdapter
+	 * @var RedBean_Adapter_DBAdapter
 	 */
 	private $adapter;
 

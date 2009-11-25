@@ -71,7 +71,7 @@ class RedBean_Setup {
 
 			self::checkDSN($dsn);
             $pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
-            $adapter = new RedBean_DBAdapter( $pdo );
+            $adapter = new RedBean_Adapter_DBAdapter( $pdo );
             $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
             $redbean = new RedBean_OODB( $writer );
 

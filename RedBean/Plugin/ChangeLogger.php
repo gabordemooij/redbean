@@ -10,7 +10,7 @@
 class RedBean_Plugin_ChangeLogger implements RedBean_Plugin,RedBean_Observer {
 
     /**
-     * @var RedBean_DBAdapter
+     * @var RedBean_Adapter_DBAdapter
      */
     private $writer;
 

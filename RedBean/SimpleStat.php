@@ -15,7 +15,7 @@ class RedBean_SimpleStat {
 	private $oodb;
 
 	/**
-	 * @var RedBean_DBAdapter
+	 * @var RedBean_Adapter_DBAdapter
 	 */
 	private $adapter;
 

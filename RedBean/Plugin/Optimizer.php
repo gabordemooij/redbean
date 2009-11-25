@@ -8,7 +8,7 @@
 class RedBean_Plugin_Optimizer implements RedBean_Plugin,RedBean_Observer {
 
 	/**
-	 * @var RedBean_DBAdapter
+	 * @var RedBean_Adapter_DBAdapter
 	 */
 	private $adapter;
 

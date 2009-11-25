@@ -27,7 +27,7 @@ class RedBean_ToolBox {
 
 	/**
 	 *
-	 * @var RedBean_DBAdapter
+	 * @var RedBean_Adapter_DBAdapter
 	 */
     private $adapter;
 
@@ -39,7 +39,7 @@ class RedBean_ToolBox {
 	 * a micro service locator. You can pass the toolbox to any object that needs
 	 * one of the RedBean core objects to interact with.
 	 * @param RedBean_OODB $oodb
-	 * @param RedBean_DBAdapter $adapter
+	 * @param RedBean_Adapter_DBAdapter $adapter
 	 * @param RedBean_QueryWriter $writer
 	 * return RedBean_ToolBox $toolbox
 	 */
@@ -82,7 +82,7 @@ class RedBean_ToolBox {
 	 * any object that needs one of these objects to function properly.
 	 * Returns the adapter. The Adapter can be used to perform queries
 	 * on the database directly.
-	 * @return RedBean_DBAdapter $adapter
+	 * @return RedBean_Adapter_DBAdapter $adapter
 	 */
     public function getDatabaseAdapter() {
         return $this->adapter;

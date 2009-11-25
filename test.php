@@ -313,7 +313,7 @@ $redbean = $toolbox->getRedBean();
 
 
 testpack("UNIT TEST Toolbox");
-asrt(($adapter instanceof RedBean_DBAdapter),true);
+asrt(($adapter instanceof RedBean_Adapter_DBAdapter),true);
 asrt(($writer instanceof RedBean_QueryWriter),true);
 asrt(($redbean instanceof RedBean_OODB),true);
 

@@ -22,7 +22,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 
     /**
      *
-     * @var RedBean_DBAdapter
+     * @var RedBean_Adapter_DBAdapter
      */
     private $writer;
     /**
@@ -37,7 +37,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * database as well as providing other CRUD functions. This class acts as a
 	 * object database.
      * Constructor, requires a DBAadapter (dependency inversion)
-     * @param RedBean_DBAdapter $adapter
+     * @param RedBean_Adapter_DBAdapter $adapter
      */
     public function __construct( RedBean_QueryWriter $writer ) {
         $this->writer = $writer;

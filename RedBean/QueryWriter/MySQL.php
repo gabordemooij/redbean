@@ -51,7 +51,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 
     /**
      *
-     * @var RedBean_DBAdapter
+     * @var RedBean_Adapter_DBAdapter
      */
     private $adapter;
 
@@ -87,7 +87,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
     /**
      * Constructor
      * The Query Writer Constructor also sets up the database
-     * @param RedBean_DBAdapter $adapter
+     * @param RedBean_Adapter_DBAdapter $adapter
      */
     public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
         $this->adapter = $adapter;
