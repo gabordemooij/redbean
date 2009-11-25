@@ -58,7 +58,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
     {
         if(is_null(self::$instance))
         {
-            self::$instance = new Redbean_Driver_PDO($dsn, $user, $pass);
+            self::$instance = new RedBean_Driver_PDO($dsn, $user, $pass);
             
         }
         return self::$instance;

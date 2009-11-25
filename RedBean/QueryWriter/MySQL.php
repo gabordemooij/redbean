@@ -80,7 +80,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return string $table
 	 */
 	public function check($table) {
-		if (strpos($table,"`")!==false) throw new Redbean_Exception_Security("Illegal chars in table name");
+		if (strpos($table,"`")!==false) throw new RedBean_Exception_Security("Illegal chars in table name");
 		return $this->adapter->escape($table);
 	}
 

@@ -7,4 +7,4 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class Redbean_Exception extends Exception{}
+class RedBean_Exception extends Exception{}
