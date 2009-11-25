@@ -70,7 +70,7 @@ class RedBean_Setup {
         public static function kickstart( $dsn, $username, $password, $frozen=false ) {
 
 			self::checkDSN($dsn);
-            $pdo = new Redbean_Driver_PDO( $dsn,$username,$password );
+            $pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
             $adapter = new RedBean_DBAdapter( $pdo );
             $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
             $redbean = new RedBean_OODB( $writer );
