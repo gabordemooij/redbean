@@ -15,13 +15,13 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * Supported Column Types
 	 */
     public $typeno_sqltype = array(
-        RedBean_QueryWriter::C_DATATYPE_BOOL=>" SET('1') ",
-		RedBean_QueryWriter::C_DATATYPE_UINT8=>" TINYINT(3) UNSIGNED ",
-        RedBean_QueryWriter::C_DATATYPE_UINT32=>" INT(11) UNSIGNED ",
-		RedBean_QueryWriter::C_DATATYPE_DOUBLE=>" DOUBLE ",
-        RedBean_QueryWriter::C_DATATYPE_TEXT8=>" VARCHAR(255) ",
-        RedBean_QueryWriter::C_DATATYPE_TEXT16=>" TEXT ",
-        RedBean_QueryWriter::C_DATATYPE_TEXT32=>" LONGTEXT "
+        RedBean_QueryWriter::C_DATATYPE_BOOL=>" smallint ",
+		RedBean_QueryWriter::C_DATATYPE_UINT8=>" smallint ",
+        RedBean_QueryWriter::C_DATATYPE_UINT32=>" integer ",
+		RedBean_QueryWriter::C_DATATYPE_DOUBLE=>" double precision ",
+        RedBean_QueryWriter::C_DATATYPE_TEXT8=>" text ",
+        RedBean_QueryWriter::C_DATATYPE_TEXT16=>" text ",
+        RedBean_QueryWriter::C_DATATYPE_TEXT32=>" text "
     );
 
 	/**
@@ -31,13 +31,13 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * constants (magic numbers)
 	 */
     public $sqltype_typeno = array(
-	"set('1')"=>RedBean_QueryWriter::C_DATATYPE_BOOL,
-    "tinyint(3) unsigned"=>RedBean_QueryWriter::C_DATATYPE_UINT8,
-    "int(11) unsigned"=>RedBean_QueryWriter::C_DATATYPE_UINT32,
-    "double" => RedBean_QueryWriter::C_DATATYPE_DOUBLE,
-    "varchar(255)"=>RedBean_QueryWriter::C_DATATYPE_TEXT8,
+	"smallint"=>RedBean_QueryWriter::C_DATATYPE_BOOL,
+    "smallint"=>RedBean_QueryWriter::C_DATATYPE_UINT8,
+    "integer"=>RedBean_QueryWriter::C_DATATYPE_UINT32,
+    "double precision" => RedBean_QueryWriter::C_DATATYPE_DOUBLE,
+    "text"=>RedBean_QueryWriter::C_DATATYPE_TEXT8,
     "text"=>RedBean_QueryWriter::C_DATATYPE_TEXT16,
-    "longtext"=>RedBean_QueryWriter::C_DATATYPE_TEXT32
+    "text"=>RedBean_QueryWriter::C_DATATYPE_TEXT32
     );
 
     /**
@@ -77,7 +77,7 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 		$this->adapter->exec("
                CREATE TABLE dtyp (
 				  id serial,
-				  booleanset boolean,
+				  booleanset smallint,
 				  tinyintus smallint,
 				  intus integer,
 				  doubles double precision,
@@ -135,9 +135,11 @@ where table_schema = 'public'" );
 	 */
     public function getColumns( $table ) {
 		$table = $this->check($table);
-        $columnsRaw = $this->adapter->get("DESCRIBE $table");
-        foreach($columnsRaw as $r) {
-            $columns[$r["Field"]]=$r["Type"];
+        $columnsRaw = $this->adapter->get("select column_name, data_type from information_schema.columns where table_name='$table'");
+        
+
+		foreach($columnsRaw as $r) {
+            $columns[$r["column_name"]]=$r["data_type"];
         }
         return $columns;
     }
@@ -148,17 +150,33 @@ where table_schema = 'public'" );
 	 * @param string $value
 	 * @return integer $type
 	 */
-	public function scanType( $value ) {
+	public function scanType( $value ) { $this->adapter->getDatabase()->setDebugMode(1);
         $this->adapter->exec( "truncate table dtyp" );
-        $v = "\"".$value."\"";
-        $checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v,$v )";
-        $this->adapter->exec( $checktypeSQL );
-        $id = $this->adapter->getInsertID();
+        $v = "'".$value."'";
+
+		$nulls = array();
+		for($j=0; $j<6; $j++) {
+			if ($j) $nulls = array_fill(0,$j,"NULL");
+			$values = array_fill(0,6-$j,$v);
+			$valueString = implode(",",array_merge($nulls,$values));
+			$checktypeSQL = "insert into dtyp VALUES(DEFAULT,$valueString) RETURNING id";
+			try{
+				$id = $this->adapter->getCell( $checktypeSQL );
+				break;
+			}catch(RedBean_Exception_SQL $e){
+				if (!$e->getSQLState()=="22P02") {
+					throw $e;
+				}
+			}
+		}
 		$types = $this->dtypes;
 		array_pop($types);
         $readtypeSQL = "SELECT ".implode(",",$types)." FROM dtyp WHERE id = $id ";
-		$row = $this->adapter->getRow($readtypeSQL);;
-        $tp = 0;
+
+		$row = $this->adapter->getRow($readtypeSQL);
+        if (!$row) exit;
+
+		$tp = 0;
         foreach($row as $t=>$tv) {
             if (strval($tv) === strval($value)) {
                 return $tp;
@@ -201,8 +219,8 @@ where table_schema = 'public'" );
         $column = $this->check($column);
 		$table = $this->check($table);
 		$newtype = $this->typeno_sqltype[$type];
-        $changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
-        $this->adapter->exec( $changecolumnSQL );
+        $changecolumnSQL = "ALTER TABLE $table \n\t ALTER COLUMN $column TYPE $newtype ";
+        try { $this->adapter->exec( $changecolumnSQL ); }catch(Exception $e){ die($e->getMessage()); }
     }
 
 	/**
@@ -237,19 +255,18 @@ where table_schema = 'public'" );
                 $insertcolumns[$k] = "".$this->check($v)."";
             }
 			$insertSQL = "INSERT INTO $table ( id, ".implode(",",$insertcolumns)." ) VALUES ";
-			$pat = "( NULL, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." )";
-			$insertSQL .= implode(",",array_fill(0,count($insertvalues),$pat));
+			$insertSQL .= "( DEFAULT, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) RETURNING id";
+			
+			$ids = array();
 			foreach($insertvalues as $insertvalue) {
-				foreach($insertvalue as $v) {
-					$vs[] = strval( $v );
-				}
+				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue );
 			}
-			$this->adapter->exec( $insertSQL, $vs );
-		    return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
+			print_r($ids);
+			if (count($ids)===1) return array_pop($ids); else	return $ids;
+			
         }
         else {
-		      $this->adapter->exec( "INSERT INTO $table (id) VALUES(NULL) " );
-              return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
+			return $this->adapter->getCell( "INSERT INTO $table (id) VALUES(DEFAULT) RETURNING id " );
         }
     }
 

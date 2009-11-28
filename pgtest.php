@@ -406,7 +406,7 @@ $page->name = "my page";
 $id = (int) $redbean->store($page);
 asrt( $page->id, 1 );
 asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 1 );
-asrt( $pdo->GetCell("SELECT `name` FROM page LIMIT 1"), "my page" );
+asrt( $pdo->GetCell("SELECT \"name\" FROM page LIMIT 1"), "my page" );
 asrt( $id, 1 );
 testpack("Test RedBean OODB: Can we Retrieve a Record? ");
 $page = $redbean->load( "page", 1 );
@@ -428,17 +428,17 @@ asrt( $page->name, "new name" );
 
 $page->rating = "1";
 $newid = $redbean->store( $page );
-asrt( $newid, $id );
+asrt( (int) $newid, (int) $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-asrt( $page->rating, "1" );
+asrt( (int) $page->rating, 1 );
 
 
 
 $page->rating = 5;
 //$page->__info["unique"] = array("name","rating");
 $newid = $redbean->store( $page );
-asrt( $newid, $id );
+asrt( (int) $newid, (int) $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 asrt( strval( $page->rating ), "5" );
