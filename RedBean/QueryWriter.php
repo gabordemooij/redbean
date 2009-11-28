@@ -8,77 +8,7 @@
  * @license			BSD
  */
 interface RedBean_QueryWriter {
-
-	/**
-	 * Here we describe the datatypes that RedBean
-	 * Uses internally. If you write a QueryWriter for
-	 * RedBean you should provide support for these types
-	 * by mapping them on database specific column types.
-	 */
-
-	/**
-	 * DATA TYPE
-	 * Boolean Data type
-	 * @var integer
-	 */
-	const C_DATATYPE_BOOL = 0;
-
-	/**
-	 * DATA TYPE
-	 * Unsigned 8BIT Integer 
-	 * @var integer
-	 */
-	const C_DATATYPE_UINT8 = 1;
-
-	/**
-	 * DATA TYPE
-	 * Unsigned 32BIT Integer
-	 * @var integer
-	 */
-	const C_DATATYPE_UINT32 = 2;
-
-	/**
-	 * DATA TYPE
-	 * Double precision floating point number and
-	 * negative numbers.
-	 * @var integer
-	 */
-	const C_DATATYPE_DOUBLE = 3;
-
-	/**
-	 * DATA TYPE
-	 * Standard Text column (like varchar255)
-	 * At least 8BIT character support.
-	 * @var integer
-	 */
-	const C_DATATYPE_TEXT8 = 4;
-
-	/**
-	 * DATA TYPE
-	 * Long text column (16BIT)
-	 * @var integer
-	 */
-	const C_DATATYPE_TEXT16 = 5;
-
-	/**
-	 * DATA TYPE
-	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
-	 * This is the biggest column that RedBean supports. If possible you may write
-	 * an implementation that stores even bigger values.
-	 * @var integer
-	 */
-	const C_DATATYPE_TEXT32 = 6;
-
-	/**
-	 * DATA TYPE
-	 * Specified. This means the developer or DBA
-	 * has altered the column to a different type not
-	 * recognized by RedBean. This high number makes sure
-	 * it will not be converted back to another type by accident.
-	 * @var integer
-	 */
-	const C_DATATYPE_SPECIFIED = 99;
-
+	
 	/**
 	 * Returns the tables that are in the database.
 	 * @return array $arrayOfTables
