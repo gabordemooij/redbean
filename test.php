@@ -707,6 +707,12 @@ asrt($querycounter->counter,4); //compare with normal batch without preloading
 asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),7);
 asrt(count($logger->testingOnly_getStash()),0); //should be used up
 
+$stat = new RedBean_SimpleStat($toolbox);
+testpack("Test RedBean Finder Plugin");
+asrt(count(Finder::where("page", " name LIKE '%more%' ")),3);
+asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'))),3);
+asrt(count(Finder::where("page")),$stat->numberOf($redbean->dispense("page")));
+
 
 testpack("Test RedBean Cache plugin");
 $adapter->exec("drop table movie");
@@ -1003,7 +1009,6 @@ asrt($a[1]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 
 testpack("TEST SimpleStat ");
-require("RedBean/SimpleStat.php");
 $stat = new RedBean_SimpleStat( $toolbox );
 asrt( $stat->numberOf($page), 25);
 
@@ -1042,6 +1047,7 @@ try{$redbean->store($bean);}catch(Exception $e){}
 asrt(in_array("hack",$adapter->getCol("show tables")),true);
 try{$redbean->trash($bean);}catch(Exception $e){}
 asrt(in_array("hack",$adapter->getCol("show tables")),true);
+try{Finder::where("::");}catch(Exception $e){pass();}
 
 
 

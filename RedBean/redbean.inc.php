@@ -60,7 +60,9 @@ require("ToolBox.php");
 require("AssociationManager.php");
 require("TreeManager.php");
 require("Setup.php");
+require("SimpleStat.php");
 
 //Load the default plugins
 require("Plugin/ChangeLogger.php");
 require("Plugin/Cache.php");
+require("Plugin/Finder.php");

@@ -275,6 +275,27 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$this->stash = NULL;
         return $collection;
     }
+
+	/**
+	 * This is a convenience method; it converts database rows
+	 * (arrays) into beans.
+	 * @param string $type
+	 * @param array $rows
+	 * @return array $collectionOfBeans
+	 */
+	public function convertToBeans($type, $rows) {
+
+		$collection = array();
+		$this->stash = array();
+		foreach($rows as $row) {
+			$id = $row[$this->writer->getIDField($type)];
+			$this->stash[$id] = $row;
+			$collection[ $id ] = $this->load( $type, $id );
+
+		}
+		return $collection;
+
+	}
 	
 }
 
