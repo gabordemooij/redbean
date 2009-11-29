@@ -15,7 +15,7 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * Supported Column Types
 	 */
     public $typeno_sqltype = array(
-        RedBean_QueryWriter::C_DATATYPE_BOOL=>" smallint ",
+        RedBean_QueryWriter::C_DATATYPE_BOOL=>" boolean ",
 		RedBean_QueryWriter::C_DATATYPE_UINT8=>" smallint ",
         RedBean_QueryWriter::C_DATATYPE_UINT32=>" integer ",
 		RedBean_QueryWriter::C_DATATYPE_DOUBLE=>" double precision ",
@@ -31,7 +31,7 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * constants (magic numbers)
 	 */
     public $sqltype_typeno = array(
-	"smallint"=>RedBean_QueryWriter::C_DATATYPE_BOOL,
+	"boolean"=>RedBean_QueryWriter::C_DATATYPE_BOOL,
     "smallint"=>RedBean_QueryWriter::C_DATATYPE_UINT8,
     "integer"=>RedBean_QueryWriter::C_DATATYPE_UINT32,
     "double precision" => RedBean_QueryWriter::C_DATATYPE_DOUBLE,
@@ -77,7 +77,7 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 		$this->adapter->exec("
                CREATE TABLE dtyp (
 				  id serial,
-				  booleanset smallint,
+				  booleanset boolean,
 				  tinyintus smallint,
 				  intus integer,
 				  doubles double precision,
@@ -102,7 +102,33 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 		}
 		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
         $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
-    }
+    
+	
+		$addCastFunction = "
+			create or replace function b2s( boolean ) 
+			returns smallint as $$
+			begin
+				if $1=true then return 1;
+				end if;
+				return 0;
+			end;
+			$$ 
+			language plpgsql
+			immutable;";
+
+		$addCastDefinition = "
+			create cast ( boolean as smallint) with function b2s(boolean) AS IMPLICIT;
+		";
+		try {
+			$this->adapter->exec($addCastFunction);
+			$this->adapter->exec($addCastDefinition);
+
+		}
+		catch(Exception $e){}
+
+
+	}
+
 
 
     /**
@@ -153,7 +179,6 @@ where table_schema = 'public'" );
 	public function scanType( $value ) { $this->adapter->getDatabase()->setDebugMode(1);
         $this->adapter->exec( "truncate table dtyp" );
         $v = "'".$value."'";
-
 		$nulls = array();
 		for($j=0; $j<6; $j++) {
 			if ($j) $nulls = array_fill(0,$j,"NULL");
