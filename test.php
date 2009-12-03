@@ -331,6 +331,7 @@ $pdo->Execute("DROP TABLE IF EXISTS movie_movie");
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");
 $pdo->Execute("DROP TABLE IF EXISTS one");
+$pdo->Execute("DROP TABLE IF EXISTS special");
 $pdo->Execute("DROP TABLE IF EXISTS post");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS page_page");
@@ -914,6 +915,21 @@ $one->col = "short text";
 $redbean->store($one);$redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"varchar(255)");
+
+testpack("Test Plugins: MySQL Spec. Column");
+$special = $redbean->dispense("special");
+$v = "2009-01-01 10:00:00";
+$special->datetime = $v;
+$redbean->store($special);
+$redbean->store($special);
+//$optimizer->MySQLSpecificColumns("special", "datetime", "varchar", $v);
+$cols = $writer->getColumns("special");
+asrt($cols["datetime"],"datetime");
+$special->datetime = "convertmeback";
+$redbean->store($special);
+$redbean->store($special);
+$cols = $writer->getColumns("special");
+asrt(($cols["datetime"]!="datetime"),true);
 
 
 testpack("Test RedBean Extended Journaling with manual Opened modification");

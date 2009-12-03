@@ -71,11 +71,47 @@ class RedBean_Plugin_Optimizer implements RedBean_Plugin,RedBean_Observer {
 				//Throw away test column; we don't need it anymore!
 				$this->adapter->exec("alter table `$table` drop __test");
 			}
+			else {
+				$this->MySQLSpecificColumns($table, $column, $fields[$column], $value);
+			}
 
 		}
 		}catch(RedBean_Exception_SQL $e){
 			//optimizer might make mistakes, don't care.
 		}
+	}
+
+
+	/**
+	 * Tries to convert columns to MySQL specific types like:
+	 * datetime, ENUM etc. This method is called automatically for you and
+	 * works completely in the background. You can however if you like trigger
+	 * this method by invoking it directly.
+	 * @param string $table
+	 * @param string $column
+	 * @param string $columnType
+	 * @param string $value
+	 */
+	public function MySQLSpecificColumns( $table, $column, $columnType, $value ) {
+		//$this->adapter->getDatabase()->setDebugMode(1);
+		$table = $this->adapter->escape($table);
+		$column = $this->adapter->escape($column);
+		//Is column already datetime?
+		if ($columnType!="datetime") {
+			$pattern = "/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9]) (?:([0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/";
+			if (preg_match($pattern, $value)){
+				//Ok, value is datetime, can we convert the column to support this?
+				$cnt = (int) $this->adapter->getCell("select count(*) as n from $table where
+					$column regexp '[0-9]{4}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]'
+				");
+				$total = (int) $this->adapter->getCell("SELECT count(*) FROM $table");
+				//Is it safe to convert: ie are all values compatible?
+				if ($total===$cnt) { //yes
+					$this->adapter->exec("ALTER TABLE `$table` change `$column` `$column` datetime ");
+				}
+			}
+		}
+
 	}
 
 }
