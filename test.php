@@ -930,6 +930,17 @@ $redbean->store($special);
 $redbean->store($special);
 $cols = $writer->getColumns("special");
 asrt(($cols["datetime"]!="datetime"),true);
+$special2 = $redbean->dispense("special");
+$special2->datetime = "1990-10-10 12:00:00";
+$redbean->store($special2);
+$redbean->store($special2);
+$cols = $writer->getColumns("special");
+asrt(($cols["datetime"]!="datetime"),true);
+$special->datetime = "1990-10-10 12:00:00";
+$redbean->store($special);
+$redbean->store($special);
+$cols = $writer->getColumns("special");
+asrt(($cols["datetime"]!="datetime"),false);
 
 
 testpack("Test RedBean Extended Journaling with manual Opened modification");
