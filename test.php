@@ -708,9 +708,10 @@ asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),7);
 asrt(count($logger->testingOnly_getStash()),0); //should be used up
 
 $stat = new RedBean_SimpleStat($toolbox);
-testpack("Test RedBean Finder Plugin");
+testpack("Test RedBean Finder Plugin*");
 asrt(count(Finder::where("page", " name LIKE '%more%' ")),3);
 asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'))),3);
+asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%mxore%'))),0);
 asrt(count(Finder::where("page")),$stat->numberOf($redbean->dispense("page")));
 
 
