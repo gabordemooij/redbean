@@ -300,7 +300,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 */
     public function updateRecord( $table, $updatevalues, $id) {
 		$idfield = $this->getIDField($table);
-		$sql = "UPDATE ".$this->check($table)." SET ";
+		$sql = "UPDATE `".$this->check($table)."` SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
 			$p[] = " `".$uv["property"]."` = ? ";
@@ -385,7 +385,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 			$columns[$k]="`".$this->adapter->escape($v)."`";
 		}
 		$table = $this->check($table);
-        $r = $this->adapter->get("SHOW INDEX FROM $table");
+        $r = $this->adapter->get("SHOW INDEX FROM `$table`");
         $name = "UQ_".sha1(implode(',',$columns));
         if ($r) {
             foreach($r as $i) {

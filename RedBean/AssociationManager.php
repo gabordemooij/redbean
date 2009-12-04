@@ -63,7 +63,16 @@ class RedBean_AssociationManager {
 		$this->oodb->store($bean2);
 		$bean->$property1 = $bean1->$idfield1;
 		$bean->$property2 = $bean2->$idfield2;
-		$this->oodb->store( $bean );
+		try{
+			$this->oodb->store( $bean );
+		}
+		catch(RedBean_Exception_SQL $e) {
+			//If this is a SQLSTATE[23000]: Integrity constraint violation
+			//Then just ignore the insert
+			if ((int)$e->getSQLState()!==23000) {
+				throw $e;
+			}
+		}
 	}
 
 	/**

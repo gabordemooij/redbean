@@ -59,7 +59,7 @@ class RedBean_TreeManager {
 	 */
 	public function children( RedBean_OODBBean $parent ) {
 		$idfield = $this->writer->getIDField($parent->getMeta("type"));
-		try {$ids = $this->adapter->getCol("SELECT ".$idfield." FROM
+		try {$ids = $this->adapter->getCol("SELECT `".$idfield."` FROM
 			`".$parent->getMeta("type")."`
 			WHERE `".$this->property."` = ".intval( $parent->$idfield )."
 		");

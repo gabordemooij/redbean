@@ -626,7 +626,7 @@ asrt(count($a->related($page2, "page")),0);
 asrt(count($a->related($page3, "page")),0);
 asrt(count($a->related($page4, "page")),0);
 try{ $a->associate($page2,$page2); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
-try{ $a->associate($page2,$page2); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
+//try{ $a->associate($page2,$page2); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
 $pageOne = $redbean->dispense("page");
 $pageOne->name = "one";
 $pageMore = $redbean->dispense("page");
@@ -1121,6 +1121,16 @@ $a->associate($book,$author1);
 $a->associate($book, $author2);
 pass();
 
+testpack("Test Association Issue Group keyword (Issues 9 and 10)");
+$pdo->Execute("DROP TABLE IF EXISTS `group`");
+$pdo->Execute("DROP TABLE IF EXISTS `book_group`");
+$group = $redbean->dispense("group");
+$group->name ="mygroup";
+$redbean->store( $group );
+try{ $a->associate($group,$book); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
+//test issue SQL error 23000
+try { $a->associate($group,$book); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
+asrt((int)$adapter->getCell("select count(*) from book_group"),1); //just 1 rec!
 
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");
