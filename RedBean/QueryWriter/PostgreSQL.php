@@ -61,7 +61,7 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * @param string $table
 	 * @return string $table
 	 */
-	private function check($table) {
+	public function check($table) {
 		if (strpos($table,"`")!==false) throw new Redbean_Exception_Security("Illegal chars in table name");
 		return $this->adapter->escape($table);
 	}
@@ -147,7 +147,7 @@ where table_schema = 'public'" );
     public function createTable( $table ) {
 		$table = $this->check($table);
 		$sql = "
-                     CREATE TABLE $table (
+                     CREATE TABLE \"$table\" (
 						id SERIAL PRIMARY KEY
                      );
             ";
@@ -176,10 +176,10 @@ where table_schema = 'public'" );
 	 * @param string $value
 	 * @return integer $type
 	 */
-	public function scanType( $value ) { $this->adapter->getDatabase()->setDebugMode(1);
+	public function scanType( $value ) { 
         $this->adapter->exec( "truncate table dtyp" );
-        $v = "'".$value."'";
-		$nulls = array();
+        $v = "'".$this->adapter->escape($value)."'";
+		$nulls = array();// $this->adapter->getDatabase()->setDebugMode(1);
 		for($j=0; $j<6; $j++) {
 			if ($j) $nulls = array_fill(0,$j,"NULL");
 			$values = array_fill(0,6-$j,$v);
@@ -188,10 +188,11 @@ where table_schema = 'public'" );
 			try{
 				$id = $this->adapter->getCell( $checktypeSQL );
 				break;
-			}catch(RedBean_Exception_SQL $e){
+			}catch(RedBean_Exception_SQL $e){ //echo "<br>". $e->getMessage();
 				if (!$e->getSQLState()=="22P02") {
 					throw $e;
 				}
+				
 			}
 		}
 		$types = $this->dtypes;
@@ -221,7 +222,7 @@ where table_schema = 'public'" );
 		$column = $this->check($column);
 		$table = $this->check($table);
         $type=$this->typeno_sqltype[$type];
-        $sql = "ALTER TABLE $table ADD $column $type ";
+        $sql = "ALTER TABLE \"$table\" ADD $column $type ";
         $this->adapter->exec( $sql );
     }
 
@@ -244,7 +245,7 @@ where table_schema = 'public'" );
         $column = $this->check($column);
 		$table = $this->check($table);
 		$newtype = $this->typeno_sqltype[$type];
-        $changecolumnSQL = "ALTER TABLE $table \n\t ALTER COLUMN $column TYPE $newtype ";
+        $changecolumnSQL = "ALTER TABLE \"$table\" \n\t ALTER COLUMN $column TYPE $newtype ";
         try { $this->adapter->exec( $changecolumnSQL ); }catch(Exception $e){ die($e->getMessage()); }
     }
 
@@ -255,13 +256,14 @@ where table_schema = 'public'" );
 	 * @param integer $id
 	 */
     public function updateRecord( $table, $updatevalues, $id) {
-		$sql = "UPDATE ".$this->check($table)." SET ";
+		$sql = "UPDATE \"".$this->adapter->escape($this->check($table))."\" SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
-			$p[] = " ".$uv["property"]." = ? ";
-			$v[]=strval( $uv["value"] );
+			$p[] = " \"".$uv["property"]."\" = ? ";
+			$v[]=strval( $this->adapter->escape( $uv["value"] ) );
 		}
 		$sql .= implode(",", $p ) ." WHERE id = ".intval($id);
+		
 		$this->adapter->exec( $sql, $v );
     }
 
@@ -279,19 +281,18 @@ where table_schema = 'public'" );
 			foreach($insertcolumns as $k=>$v) {
                 $insertcolumns[$k] = "".$this->check($v)."";
             }
-			$insertSQL = "INSERT INTO $table ( id, ".implode(",",$insertcolumns)." ) VALUES ";
+			$insertSQL = "INSERT INTO \"$table\" ( id, ".implode(",",$insertcolumns)." ) VALUES ";
 			$insertSQL .= "( DEFAULT, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) RETURNING id";
 			
 			$ids = array();
 			foreach($insertvalues as $insertvalue) {
 				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue );
 			}
-			print_r($ids);
 			if (count($ids)===1) return array_pop($ids); else	return $ids;
 			
         }
         else {
-			return $this->adapter->getCell( "INSERT INTO $table (id) VALUES(DEFAULT) RETURNING id " );
+			return $this->adapter->getCell( "INSERT INTO \"$table\" (id) VALUES(DEFAULT) RETURNING id " );
         }
     }
 
@@ -366,8 +367,8 @@ where table_schema = 'public'" );
 		foreach($columns as $k=>$v){
 			$columns[$k]="".$this->adapter->escape($v)."";
 		}
-		$table = $this->check($table);
-        $r = $this->adapter->get("SHOW INDEX FROM $table");
+		$table = $this->adapter->escape( $this->check($table) );
+        $r = $this->adapter->get("SHOW INDEX FROM \"$table\"");
         $name = "UQ_".sha1(implode(',',$columns));
         if ($r) {
             foreach($r as $i) {
@@ -376,7 +377,8 @@ where table_schema = 'public'" );
                 }
             }
         }
-        $sql = "ALTER IGNORE TABLE $table
+		
+        $sql = "ALTER IGNORE TABLE \"$table\"
                 ADD UNIQUE INDEX $name (".implode(",",$columns).")";
         $this->adapter->exec($sql);
     }

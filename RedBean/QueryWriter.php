@@ -172,4 +172,10 @@ interface RedBean_QueryWriter {
 	 * @param string $tableOfTheBean
 	 */
 	public function getIDField( $table );
+
+	/**
+	 * Checks a table.
+	 * @param string $table
+	 */
+	public function check( $table );
 }

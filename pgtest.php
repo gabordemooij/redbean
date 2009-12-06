@@ -177,6 +177,7 @@ class NullWriter implements RedBean_QueryWriter {
 	}
 
 	public function getIDField($t) { return "id"; }
+	public function check($t){}
 }
 
 try{
@@ -381,7 +382,7 @@ $pdo->setDebugMode(0);
 $_tables = $writer->getTables();
 if (!in_array("hack",$_tables)) $pdo->Execute("CREATE TABLE hack (id serial, PRIMARY KEY (id) ); ");
 if (in_array("page",$_tables)) $pdo->Execute("DROP TABLE page");
-if (in_array("user",$_tables)) $pdo->Execute("DROP TABLE user");
+if (in_array("user",$_tables)) $pdo->Execute("DROP TABLE \"user\"");
 if (in_array("book",$_tables)) $pdo->Execute("DROP TABLE book");
 if (in_array("author",$_tables)) $pdo->Execute("DROP TABLE author");
 if (in_array("one",$_tables)) $pdo->Execute("DROP TABLE one");
@@ -517,22 +518,6 @@ $book->name="book 3";
 $redbean->store($book);
 $books = $redbean->batch("book", $adapter->getCol("SELECT id FROM book"));
 asrt(count($books),3);
-
-
-//test locking
-testpack("Test RedBean Locking: Change Logger method ");
-$observers = RedBean_Setup::getAttachedObservers();
-$logger = array_pop($observers);
-$page = $redbean->dispense("page");
-$page->name = "a page";
-$id = $redbean->store( $page );
-$page = $redbean->load("page", $id);
-$otherpage = $redbean->load("page", $id);
-asrt(((bool)$page->getMeta("opened")),true);
-asrt(((bool)$otherpage->getMeta("opened")),true);
-try{ $redbean->store( $page ); pass(); }catch(Exception $e){ fail(); }
-try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
-asrt(count($logger->testingOnly_getStash()),0); // Stash empty?
 
 
 testpack("Test Association ");
