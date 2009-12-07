@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean Exception SQL
- * @package 		RedBean/Exception/SQL.php
+ * @file 		RedBean/Exception/SQL.php
  * @description		Represents a generic database exception independent of the
  *					underlying driver.
  * @author			Gabor de Mooij
@@ -9,15 +9,13 @@
  */
 class RedBean_Exception_SQL extends Exception {
 
-
 	/**
-	 *
 	 * @var string
 	 */
 	private $sqlState;
 
 	/**
-	 * Returns an ANSI-92 compliant SQL state
+	 * Returns an ANSI-92 compliant SQL state.
 	 * @return string $state
 	 */
 	public function getSQLState() {
@@ -26,7 +24,7 @@ class RedBean_Exception_SQL extends Exception {
 
 	/**
 	 * @todo parse state to verify valid ANSI92!
-	 * Stores ANSI-92 compliant SQL state
+	 * Stores ANSI-92 compliant SQL state.
 	 * @param string $sqlState
 	 */
 	public function setSQLState( $sqlState ) {
@@ -35,7 +33,7 @@ class RedBean_Exception_SQL extends Exception {
 
 
 	/**
-	 * To String prints both code and SQL state
+	 * To String prints both code and SQL state.
 	 * @return string
 	 */
 	public function __toString() {

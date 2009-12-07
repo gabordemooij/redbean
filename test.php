@@ -11,12 +11,17 @@
  // Written by Gabor de Mooij Copyright (c) 2009
 /**
  * RedUNIT (Test Suite)
- * @package 		test.php
+ * @file 		test.php
  * @description		Series of Unit Tests for RedBean
  * @author			Gabor de Mooij
  * @license			BSD
  */
 
+/**
+ * A simple print function that works
+ * both for CLI and HTML.
+ * @param string $text
+ */
 function printtext( $text ) {
 	if ($_SERVER["DOCUMENT_ROOT"]) {
 		echo "<BR>".$text;
@@ -26,9 +31,12 @@ function printtext( $text ) {
 	}
 }
 
-
-
-//New test functions, no objects required here
+/**
+ * Tests whether a === b.
+ * @global integer $tests
+ * @param mixed $a
+ * @param mixed $b
+ */
 function asrt( $a, $b ) {
 	if ($a === $b) {
 		global $tests;
@@ -59,127 +67,44 @@ function testpack($name) {
 }
 
 
+//Test the Setup Class
+testpack("Test Setup");
+
+//Can we load all modules properly?
 require("RedBean/redbean.inc.php");
+if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
+
+//Test whether a non mysql DSN throws an exception
+try{RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root",""); fail();}catch(RedBean_Exception_NotImplemented $e){ pass(); }
+
+//Test whether we can setup a connection
 $toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
 
-//Observable Mock Object
+/**
+ * Observable Mock
+ * This is just for testing
+ */
 class ObservableMock extends RedBean_Observable {
     public function test( $eventname, $info ) {
         $this->signal($eventname, $info);
     }
 }
-
+/**
+ * Observer Mock
+ * This is just for testing
+ */
 class ObserverMock implements RedBean_Observer {
     public $event = false;
     public $info = false;
-    public function onEvent($event, $info) {
+	public function onEvent($event, $info) {
         $this->event = $event;
         $this->info = $info;
     }
 }
 
-class NullWriter implements RedBean_QueryWriter {
 
-	//Arguments
-	public $createTableArgument = NULL;
-	public $getColumnsArgument = NULL;
-	public $scanTypeArgument = NULL;
-	public $addColumnArguments = array();
-	public $codeArgument = NULL;
-	public $widenColumnArguments = array();
-	public $updateRecordArguments = array();
-	public $insertRecordArguments = array();
-	public $selectRecordArguments = array();
-	public $deleteRecordArguments = array();
-	public $checkChangesArguments = array();
-	public $addUniqueIndexArguments = array();
-
-	//Return values
-	public $returnTables = array();
-	public $returnGetColumns = array();
-	public $returnScanType = 1;
-	public $returnAddColumn = NULL;
-	public $returnCode = NULL;
-	public $returnWidenColumn = NULL;
-	public $returnUpdateRecord = NULL;
-	public $returnInsertRecord = NULL;
-	public $returnSelectRecord = NULL;
-	public $returnDeleteRecord = NULL;
-	public $returnCheckChanges = NULL;
-	public $returnAddUniqueIndex = NULL;
-
-	//Dummy implementations
-	public function getTables(){ return $this->returnTables; }
-	public function createTable( $table ){ $this->createTableArgument = $table; }
-    public function getColumns( $table ){ $this->getColumnsArgument = $table; return $this->returnGetColumns; }
-	public function scanType( $value ){ $this->scanTypeArgument = $value; return $this->returnScanType; }
-    public function addColumn( $table, $column, $type ){
-		$this->addColumnArguments = array( $table, $column, $type );
-		return $this->returnAddColumn;
-	}
-    public function code( $typedescription ){ $this->codeArgument = $typedescription;
-		return $this->returnCode;
-	}
-    public function widenColumn( $table, $column, $type ){
-		$this->widenColumnArguments = array($table, $column, $type);
-		return $this->returnWidenColumn;
-	}
-    public function updateRecord( $table, $updatevalues, $id){
-		$this->updateRecordArguments = array($table, $updatevalues, $id);
-		return $this->returnUpdateRecord;
-	}
-    public function insertRecord( $table, $insertcolumns, $insertvalues ){
-		$this->insertRecordArguments = array( $table, $insertcolumns, $insertvalues );
-		return $this->returnInsertRecord;
-	}
-    public function selectRecord($type, $ids){
-		$this->selectRecordArguments = array($type, $ids);
-		return $this->returnSelectRecord;
-	}
-	public function deleteRecord( $table, $id){
-		$this->deleteRecordArguments = array($table, "id", $id);
-		return $this->returnDeleteRecord;
-	}
-    public function checkChanges($type, $id, $logid){
-		$this->checkChangesArguments = array($type, $id, $logid);
-		return $this->returnCheckChanges;
-	}
-	public function addUniqueIndex( $table,$columns ){
-		$this->addUniqueIndexArguments=array($table,$columns);
-		return $this->returnAddUniqueIndex;
-	}
-	public function getIDField( $type ) { return "id"; }
-
-	public function reset() {
-		$this->createTableArgument = NULL;
-		$this->getColumnsArgument = NULL;
-		$this->scanTypeArgument = NULL;
-		$this->addColumnArguments = array();
-		$this->codeArgument = NULL;
-		$this->widenColumnArguments = array();
-		$this->updateRecordArguments = array();
-		$this->insertRecordArguments = array();
-		$this->selectRecordArguments = array();
-		$this->deleteRecordArguments = array();
-		$this->checkChangesArguments = array();
-		$this->addUniqueIndexArguments = array();
-
-		$this->returnTables = array();
-		$this->returnGetColumns = array();
-		$this->returnScanType = 1;
-		$this->returnAddColumn = NULL;
-		$this->returnCode = NULL;
-		$this->returnWidenColumn = NULL;
-		$this->returnUpdateRecord = NULL;
-		$this->returnInsertRecord = NULL;
-		$this->returnSelectRecord = NULL;
-		$this->returnDeleteRecord = NULL;
-		$this->returnCheckChanges = NULL;
-		$this->returnAddUniqueIndex = NULL;
-	}
-}
-
-$nullWriter = new NullWriter();
+require("redbean/QueryWriter/NullWriter.php");
+$nullWriter = new RedBean_QueryWriter_NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
 
 //Section A: Config Testing
@@ -189,31 +114,41 @@ asrt(class_exists("RedBean_Exception_FailedAccessBean"),true);
 asrt(class_exists("RedBean_Exception_Security"),true);
 asrt(class_exists("RedBean_Exception_SQL"),true);
 
-
 //Section B: UNIT TESTING
 testpack("UNIT TEST RedBean OODB: Dispense");
+//Can we dispense a bean?
 $page = $redbean->dispense("page");
+//Does it have a meta type?
 asrt(((bool)$page->getMeta("type")),true);
+//Does it have an ID?
 asrt(isset($page->id),true);
+//Type should be 'page'
 asrt(($page->getMeta("type")),"page");
+//ID should be 0 because bean does not exist in database yet.
 asrt(($page->id),0);
+//Try some faulty dispense actions.
 try{ $redbean->dispense(""); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->dispense("."); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->dispense("-"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 
-
+//Test the Check() function (also indirectly using store())
 testpack("UNIT TEST RedBean OODB: Check");
 $bean = $redbean->dispense("page");
+//Set some illegal values in the bean; this should trugger Security exceptions.
+//Arrays are not allowed.
 $bean->name = array("1");
 try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+//Objects should not be allowed.
 $bean->name = new RedBean_OODBBean;
 try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+//Property names should be alphanumeric
 $prop = ".";
 $bean->$prop = 1;
 try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+//Really...
 $prop = "-";
 $bean->$prop = 1;
 try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
@@ -378,7 +313,7 @@ $redbean = $toolbox->getRedBean();
 
 
 testpack("UNIT TEST Toolbox");
-asrt(($adapter instanceof RedBean_DBAdapter),true);
+asrt(($adapter instanceof RedBean_Adapter_DBAdapter),true);
 asrt(($writer instanceof RedBean_QueryWriter),true);
 asrt(($redbean instanceof RedBean_OODB),true);
 
@@ -396,6 +331,7 @@ $pdo->Execute("DROP TABLE IF EXISTS movie_movie");
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");
 $pdo->Execute("DROP TABLE IF EXISTS one");
+$pdo->Execute("DROP TABLE IF EXISTS special");
 $pdo->Execute("DROP TABLE IF EXISTS post");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS page_page");
@@ -690,7 +626,7 @@ asrt(count($a->related($page2, "page")),0);
 asrt(count($a->related($page3, "page")),0);
 asrt(count($a->related($page4, "page")),0);
 try{ $a->associate($page2,$page2); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
-try{ $a->associate($page2,$page2); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
+//try{ $a->associate($page2,$page2); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
 $pageOne = $redbean->dispense("page");
 $pageOne->name = "one";
 $pageMore = $redbean->dispense("page");
@@ -771,6 +707,13 @@ asrt($querycounter->counter,4); //compare with normal batch without preloading
 //did we save queries (3 is normal, 1 is with preloading)
 asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),7);
 asrt(count($logger->testingOnly_getStash()),0); //should be used up
+
+$stat = new RedBean_SimpleStat($toolbox);
+testpack("Test RedBean Finder Plugin*");
+asrt(count(Finder::where("page", " name LIKE '%more%' ")),3);
+asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'))),3);
+asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%mxore%'))),0);
+asrt(count(Finder::where("page")),$stat->numberOf($redbean->dispense("page")));
 
 
 testpack("Test RedBean Cache plugin");
@@ -973,6 +916,32 @@ $redbean->store($one);$redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"varchar(255)");
 
+testpack("Test Plugins: MySQL Spec. Column");
+$special = $redbean->dispense("special");
+$v = "2009-01-01 10:00:00";
+$special->datetime = $v;
+$redbean->store($special);
+$redbean->store($special);
+//$optimizer->MySQLSpecificColumns("special", "datetime", "varchar", $v);
+$cols = $writer->getColumns("special");
+asrt($cols["datetime"],"datetime");
+$special->datetime = "convertmeback";
+$redbean->store($special);
+$redbean->store($special);
+$cols = $writer->getColumns("special");
+asrt(($cols["datetime"]!="datetime"),true);
+$special2 = $redbean->dispense("special");
+$special2->datetime = "1990-10-10 12:00:00";
+$redbean->store($special2);
+$redbean->store($special2);
+$cols = $writer->getColumns("special");
+asrt(($cols["datetime"]!="datetime"),true);
+$special->datetime = "1990-10-10 12:00:00";
+$redbean->store($special);
+$redbean->store($special);
+$cols = $writer->getColumns("special");
+asrt(($cols["datetime"]!="datetime"),false);
+
 
 testpack("Test RedBean Extended Journaling with manual Opened modification");
 $page = $redbean->dispense("page");
@@ -1068,7 +1037,6 @@ asrt($a[1]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 
 testpack("TEST SimpleStat ");
-require("RedBean/SimpleStat.php");
 $stat = new RedBean_SimpleStat( $toolbox );
 asrt( $stat->numberOf($page), 25);
 
@@ -1107,6 +1075,7 @@ try{$redbean->store($bean);}catch(Exception $e){}
 asrt(in_array("hack",$adapter->getCol("show tables")),true);
 try{$redbean->trash($bean);}catch(Exception $e){}
 asrt(in_array("hack",$adapter->getCol("show tables")),true);
+try{Finder::where("::");}catch(Exception $e){pass();}
 
 
 
@@ -1152,6 +1121,16 @@ $a->associate($book,$author1);
 $a->associate($book, $author2);
 pass();
 
+testpack("Test Association Issue Group keyword (Issues 9 and 10)");
+$pdo->Execute("DROP TABLE IF EXISTS `group`");
+$pdo->Execute("DROP TABLE IF EXISTS `book_group`");
+$group = $redbean->dispense("group");
+$group->name ="mygroup";
+$redbean->store( $group );
+try{ $a->associate($group,$book); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
+//test issue SQL error 23000
+try { $a->associate($group,$book); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
+asrt((int)$adapter->getCell("select count(*) from book_group"),1); //just 1 rec!
 
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");

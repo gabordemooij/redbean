@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean Association
- * @package 		RedBean/Association.php
+ * @file 		RedBean/AssociationManager.php
  * @description		This is actually more like an example than
  *					a real part of RedBean. Since version 0.7 you can create
  *					your own ORM structures with RedBean. Association is a
@@ -17,7 +17,7 @@ class RedBean_AssociationManager {
 	private $oodb;
 
 	/**
-	 * @var RedBean_DBAdapter
+	 * @var RedBean_Adapter_DBAdapter
 	 */
 	private $adapter;
 
@@ -63,7 +63,16 @@ class RedBean_AssociationManager {
 		$this->oodb->store($bean2);
 		$bean->$property1 = $bean1->$idfield1;
 		$bean->$property2 = $bean2->$idfield2;
-		$this->oodb->store( $bean );
+		try{
+			$this->oodb->store( $bean );
+		}
+		catch(RedBean_Exception_SQL $e) {
+			//If this is a SQLSTATE[23000]: Integrity constraint violation
+			//Then just ignore the insert
+			if ((int)$e->getSQLState()!==23000) {
+				throw $e;
+			}
+		}
 	}
 
 	/**

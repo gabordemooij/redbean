@@ -2,7 +2,7 @@
 /**
  * RedBean Tree
  *
- * @package 		RedBean/TreeManager.php
+ * @file 		RedBean/TreeManager.php
  * @description		Shields you from race conditions automatically.
  * @author			Gabor de Mooij
  * @license			BSD
@@ -21,7 +21,7 @@ class RedBean_TreeManager {
 	private $oodb;
 
 	/**
-	 * @var RedBean_DBAdapter
+	 * @var RedBean_Adapter_DBAdapter
 	 */
 	private $adapter;
 
@@ -59,7 +59,7 @@ class RedBean_TreeManager {
 	 */
 	public function children( RedBean_OODBBean $parent ) {
 		$idfield = $this->writer->getIDField($parent->getMeta("type"));
-		try {$ids = $this->adapter->getCol("SELECT ".$idfield." FROM
+		try {$ids = $this->adapter->getCol("SELECT `".$idfield."` FROM
 			`".$parent->getMeta("type")."`
 			WHERE `".$this->property."` = ".intval( $parent->$idfield )."
 		");

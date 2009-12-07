@@ -1,28 +1,26 @@
 <?php 
 /**
  * DBAdapter	    (Database Adapter)
- * @package 		RedBean/Adapter/DBAdapter.php
+ * @file 		RedBean/Adapter/DBAdapter.php
  * @description		An adapter class to connect various database systems to RedBean
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
+class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 
 	/**
-	 *
 	 * @var ADODB compatible class
 	 */
 	private $db = null;
 	
 	/**
-	 * 
 	 * @var string
 	 */
 	private $sql = "";
 
 
 	/**
-	 *
+	 * Constructor.
 	 * @param $database
 	 * @return unknown_type
 	 */
@@ -31,7 +29,7 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 	}
 
 	/**
-	 * 
+	 * Returns the latest SQL Statement.
 	 * @return unknown_type
 	 */
 	public function getSQL() {
@@ -39,7 +37,7 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 	}
 
 	/**
-	 * Escapes a string for use in a Query
+	 * Escapes a string for use in a Query.
 	 * @param $sqlvalue
 	 * @return unknown_type
 	 */
@@ -47,15 +45,13 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 		return $this->db->Escape($sqlvalue);
 	}
 
-	
-
 	/**
-	 * Executes SQL code
+	 * Executes SQL code; any query without
+	 * returning a resultset.
 	 * @param $sql
 	 * @return unknown_type
 	 */
 	public function exec( $sql , $aValues=array(), $noevent=false) {
-		
 		if (!$noevent){
 			$this->sql = $sql;
 			$this->signal("sql_exec", $this);
@@ -64,20 +60,18 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 	}
 
 	/**
-	 * Multi array SQL fetch
+	 * Multi array SQL fetch. Fetches a multi dimensional array.
 	 * @param $sql
 	 * @return unknown_type
 	 */
 	public function get( $sql, $aValues = array() ) {
-		
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
-		
 		return $this->db->GetAll( $sql,$aValues );
 	}
 
 	/**
-	 * SQL row fetch
+	 * SQL row fetch. Fetches a single row.
 	 * @param $sql
 	 * @return unknown_type
 	 */
@@ -89,7 +83,7 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 	}
 
 	/**
-	 * SQL column fetch
+	 * SQL column fetch. Fetches one column of a table.
 	 * @param $sql
 	 * @return unknown_type
 	 */
@@ -113,7 +107,7 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 	}
 
 	/**
-	 * Returns last inserted id
+	 * Returns last inserted id.
 	 * @return unknown_type
 	 */
 	public function getInsertID() {
@@ -121,7 +115,7 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 	}
 
 	/**
-	 * Returns number of affected rows
+	 * Returns number of affected rows.
 	 * @return unknown_type
 	 */
 	public function getAffectedRows() {
@@ -129,7 +123,7 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 	}
 	
 	/**
-	 * Unwrap the original database object
+	 * Unwrap the original database object.
 	 * @return $database
 	 */
 	public function getDatabase() {
@@ -137,7 +131,7 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 	}
 	
 	/**
-	 * Return latest error message
+	 * Return latest error message.
 	 * @return string $message
 	 */
 	public function getErrorMsg() {
@@ -145,28 +139,24 @@ class RedBean_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 	}
 
 	/**
-	 *
-	 * Starts a transaction
+	 * Starts a transaction.
 	 */
 	public function startTransaction() {
 		return $this->db->StartTrans();
 	}
 
 	/**
-	 *
-	 * Commits a transaction
+	 * Commits a transaction.
 	 */
 	public function commit() {
 		return $this->db->CommitTrans();
 	}
 
 	/**
-	 *
-	 * Rolls back transaction
+	 * Rolls back transaction.
 	 */
 	public function rollback() {
 		return $this->db->FailTrans();
 	}
-
 
 }

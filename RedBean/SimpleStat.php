@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean SimpleStat
- * @package 		RedBean/SimpleStat.php
+ * @file 		RedBean/SimpleStat.php
  * @description		Provides simple statistics for MySQL Databases
  * @author			Gabor de Mooij
  * @license			BSD
@@ -15,7 +15,7 @@ class RedBean_SimpleStat {
 	private $oodb;
 
 	/**
-	 * @var RedBean_DBAdapter
+	 * @var RedBean_Adapter_DBAdapter
 	 */
 	private $adapter;
 

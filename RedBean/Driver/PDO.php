@@ -1,11 +1,9 @@
 <?php 
 /**
  * PDO Driver
- * @package 		RedBean/PDO.php
+ * @file 		RedBean/PDO.php
  * @description		PDO Driver
  *					This Driver implements the RedBean Driver API
- *					
- *
  * @author			Desfrenes
  * @license			BSD
  */
@@ -52,7 +50,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 
     /**
-     * 
+     * Returns an instance of the PDO Driver.
      * @param $dsn
      * @param $user
      * @param $pass
@@ -63,14 +61,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
     {
         if(is_null(self::$instance))
         {
-            self::$instance = new Redbean_Driver_PDO($dsn, $user, $pass);
+            self::$instance = new RedBean_Driver_PDO($dsn, $user, $pass);
             
         }
         return self::$instance;
     }
     
     /**
-     * 
+     * Constructor.
      * @param $dsn
      * @param $user
      * @param $pass
@@ -93,8 +91,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
             );
     }
 
-
-
     /**
      * (non-PHPdoc)
      * @see RedBean/RedBean_Driver#GetAll()
@@ -102,7 +98,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
     public function GetAll( $sql, $aValues=array() )
     {
 		
-    	$this->exc = 0;
+	    	$this->exc = 0;
     	    if ($this->debug)
 	        {
 	            echo "<HR>" . $sql.print_r($aValues,1);
@@ -116,32 +112,28 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				$s = $this->pdo->prepare($sql);
 			}
 
-			try {
-			$s->execute($aValues);
-		    $this->rs = $s->fetchAll();
-	        $rows = $this->rs;
-			}catch(PDOException $e) {
-				//Unfortunately the code field is supposed to be int by default (php)
-				//So we need a property to convey the SQL State code
-				$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
-				$x->setSQLState( $e->getCode() );
-				throw $x;
-			}
 
-			if(!$rows)
-	        {
-	            $rows = array();
-	        }
-	        
-	        if ($this->debug)
-	        {
-	            if (count($rows) > 0)
-	            {
-	                echo "<br><b style='color:green'>resultset: " . count($rows) . " rows</b>";
-	            }
-	            
-	        }
-    	
+		try {
+		$s->execute($aValues);
+		$this->rs = $s->fetchAll();
+		$rows = $this->rs;
+		}catch(PDOException $e) {
+			//Unfortunately the code field is supposed to be int by default (php)
+			//So we need a property to convey the SQL State code.
+			$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
+			$x->setSQLState( $e->getCode() );
+			throw $x;
+		}
+
+		if(!$rows) {
+			$rows = array();
+		}
+
+		if ($this->debug) {
+			if (count($rows) > 0) {
+				echo "<br><b style='color:green'>resultset: " . count($rows) . " rows</b>";
+			}
+		}
         return $rows;
     }
     
@@ -152,16 +144,16 @@ class RedBean_Driver_PDO implements RedBean_Driver {
     public function GetCol($sql, $aValues=array())
     {
     	$this->exc = 0;
-    	    $rows = $this->GetAll($sql,$aValues);
-	        $cols = array();
-	 
-	        if ($rows && is_array($rows) && count($rows)>0){
-		        foreach ($rows as $row)
-		        {
-		            $cols[] = array_shift($row);
-		        }
-	        }
-	    	
+		$rows = $this->GetAll($sql,$aValues);
+		$cols = array();
+
+		if ($rows && is_array($rows) && count($rows)>0){
+			foreach ($rows as $row)
+			{
+				$cols[] = array_shift($row);
+			}
+		}
+
         return $cols;
     }
  
@@ -237,7 +229,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			}
 			catch(PDOException $e) {
 				//Unfortunately the code field is supposed to be int by default (php)
-				//So we need a property to convey the SQL State code
+				//So we need a property to convey the SQL State code.
 				$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
 				$x->setSQLState( $e->getCode() );
 				throw $x;
@@ -293,14 +285,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 
 	/**
-	 * Starts a transaction
+	 * Starts a transaction.
 	 */
 	public function StartTrans() {
 		$this->pdo->beginTransaction();
 	}
 
 	/**
-	 * Commits a transaction
+	 * Commits a transaction.
 	 */
 	public function CommitTrans() {
 		$this->pdo->commit();
@@ -308,7 +300,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 
 	/**
-	 * Rolls back a transaction
+	 * Rolls back a transaction.
 	 */
 	public function FailTrans() {
 		$this->pdo->rollback();

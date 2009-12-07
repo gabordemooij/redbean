@@ -2,7 +2,7 @@
 /**
  * Observable
  * Base class for Observables
- * @package 		RedBean/Observable.php
+ * @file 		RedBean/Observable.php
  * @description		Part of the observer pattern in RedBean
  * @author			Gabor de Mooij
  * @license			BSD

@@ -1,7 +1,7 @@
 <?php
 /**
  * Observer
- * @package 		RedBean/Observer.php
+ * @file 		RedBean/Observer.php
  * @description		Part of the observer pattern in RedBean
  * @author			Gabor de Mooij
  * @license			BSD

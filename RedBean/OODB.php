@@ -1,7 +1,7 @@
 <?php 
 /**
  * @name RedBean OODB
- * @package RedBean
+ * @file RedBean
  * @author Gabor de Mooij and the RedBean Team
  * @copyright Gabor de Mooij (c)
  * @license BSD
@@ -22,7 +22,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 
     /**
      *
-     * @var RedBean_DBAdapter
+     * @var RedBean_Adapter_DBAdapter
      */
     private $writer;
     /**
@@ -30,27 +30,40 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
      * @var boolean
      */
     private $isFrozen = false;
+
     /**
+	 * The RedBean OODB Class is the main class of RedBean.
+	 * It takes RedBean_OODBBean objects and stores them to and loads them from the
+	 * database as well as providing other CRUD functions. This class acts as a
+	 * object database.
      * Constructor, requires a DBAadapter (dependency inversion)
-     * @param RedBean_DBAdapter $adapter
+     * @param RedBean_Adapter_DBAdapter $adapter
      */
     public function __construct( RedBean_QueryWriter $writer ) {
         $this->writer = $writer;
     }
+	
 	/**
 	 * Toggles fluid or frozen mode. In fluid mode the database
 	 * structure is adjusted to accomodate your objects. In frozen mode
 	 * this is not the case.
-	 * @param boolean $tf
+	 * @param boolean $trueFalse
 	 */
     public function freeze( $tf ) {
         $this->isFrozen = (bool) $tf;
     }
+	
     /**
-     * Dispenses a OODBBean
-     * @param string $type
-     * @return RedBean_OODBBean $bean
-     */
+	 * Dispenses a new bean (a RedBean_OODBBean Bean Object)
+	 * of the specified type. Always
+	 * use this function to get an empty bean object. Never
+	 * instantiate a RedBean_OODBBean yourself because it needs
+	 * to be configured before you can use it with RedBean. This
+	 * function applies the appropriate initialization /
+	 * configuration for you.
+	 * @param string $type
+	 * @return RedBean_OODBBean $bean
+	 */
     public function dispense($type ) {
 		
         $bean = new RedBean_OODBBean();
@@ -61,8 +74,12 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
         $this->check( $bean );
         return $bean;
     }
+
     /**
-     * Checks whether a bean is valid
+	 * Checks whether a RedBean_OODBBean bean is valid.
+	 * If the type is not valid or the ID is not valid it will
+	 * throw an exception: RedBean_Exception_Security.
+	 * @throws RedBean_Exception_Security $exception
      * @param RedBean_OODBBean $bean
      */
     public function check( RedBean_OODBBean $bean ) {
@@ -91,8 +108,16 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
     }
 	
 	/**
-	 * Stores a Bean in the database. If the bean contains other beans,
-	 * these will get stored as well.
+	 * Stores a bean in the database. This function takes a
+	 * RedBean_OODBBean Bean Object $bean and stores it
+	 * in the database. If the database schema is not compatible
+	 * with this bean and RedBean runs in fluid mode the schema
+	 * will be altered to store the bean correctly.
+	 * If the database schema is not compatible with this bean and
+	 * RedBean runs in frozen mode it will throw an exception.
+	 * This function returns the primary key ID of the inserted
+	 * bean.
+	 * @throws RedBean_Exception_Security $exception
 	 * @param RedBean_OODBBean $bean
 	 * @return integer $newid
 	 */
@@ -156,8 +181,21 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
                 return (int) $id;
             }
     }
+
 	/**
-	 * Loads a bean using its primary Key and its Type
+	 * Loads a bean from the object database.
+	 * It searches for a RedBean_OODBBean Bean Object in the
+	 * database. It does not matter how this bean has been stored.
+	 * RedBean uses the primary key ID $id and the string $type
+	 * to find the bean. The $type specifies what kind of bean your
+	 * are looking for; this is the same type as used with the
+	 * dispense() function. If RedBean finds the bean it will return
+	 * the RedBean_OODB Bean object; if it cannot find the bean
+	 * RedBean will return a new bean of type $type and with
+	 * primary key ID 0. In the latter case it acts basically the
+	 * same as dispense().
+	 * If the bean cannot be found in the database a new bean of
+	 * the specified type will be generated and returned.
 	 * @param string $type
 	 * @param integer $id
 	 * @return RedBean_OODBBean $bean
@@ -187,8 +225,12 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
         $this->signal( "open", $bean );
 		return $bean;
     }
+	
 	/**
-	 * Deletes a bean from the database
+	 * Removes a bean from the database.
+	 * This function will remove the specified RedBean_OODBBean
+	 * Bean Object from the database.
+	 * @throws RedBean_Exception_Security $exception
 	 * @param RedBean_OODBBean $bean
 	 */
     public function trash( RedBean_OODBBean $bean ) {
@@ -201,8 +243,13 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 		}
     }
+	
 	/**
-	 * Loads a Batch of Beans at once
+	 * Loads and returns a series of beans of type $type.
+	 * The beans are loaded all at once.
+	 * The beans are retrieved using their primary key IDs
+	 * specified in the second argument.
+	 * @throws RedBean_Exception_Security $exception
 	 * @param string $type
 	 * @param array $ids
 	 * @return array $beans
@@ -228,6 +275,27 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$this->stash = NULL;
         return $collection;
     }
+
+	/**
+	 * This is a convenience method; it converts database rows
+	 * (arrays) into beans.
+	 * @param string $type
+	 * @param array $rows
+	 * @return array $collectionOfBeans
+	 */
+	public function convertToBeans($type, $rows) {
+
+		$collection = array();
+		$this->stash = array();
+		foreach($rows as $row) {
+			$id = $row[$this->writer->getIDField($type)];
+			$this->stash[$id] = $row;
+			$collection[ $id ] = $this->load( $type, $id );
+
+		}
+		return $collection;
+
+	}
 	
 }
 
