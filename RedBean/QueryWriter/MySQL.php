@@ -178,17 +178,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 					  PRIMARY KEY  (`id`)
 					) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 			");
-			$this->adapter->exec("
-					CREATE TABLE IF NOT EXISTS `__log` (
-					`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-					`tbl` VARCHAR( 255 ) NOT NULL ,
-					`action` TINYINT( 2 ) NOT NULL ,
-					`itemid` INT( 11 ) NOT NULL
-					) ENGINE = MYISAM ;
-			"); //Must be MyISAM! else you run in trouble if you use transactions!
 		}
-		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
-        $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
     }
     
 
