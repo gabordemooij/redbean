@@ -105,6 +105,36 @@ class RedBean_Setup {
 			return $toolbox;
 		}
 
+		/**
+		 * Kickstart for development phase (strict mode).
+		 * Use this method to quickly setup RedBean for use during development phase.
+		 * This Kickstart establishes a database connection
+		 * using the $dsn, the $username and the $password you provide.
+		 * It will start RedBean in fluid mode; meaning the database will
+		 * be altered if required to store your beans.
+		 * This method returns a RedBean_Toolbox $toolbox filled with a
+		 * RedBean_Adapter, a RedBean_QueryWriter and most importantly a
+		 * RedBean_OODB; the object database. To start storing beans in the database
+		 * simply say: $redbean = $toolbox->getRedBean(); Now you have a reference
+		 * to the RedBean object.
+		 * @param  string $dsn
+		 * @param  string $username
+		 * @param  string $password
+		 * @return RedBean_ToolBox $toolbox
+		 */
+		public static function kickstartDevS( $dsn, $username="root", $password="" ) {
+			$frozen = false;
+			self::checkDSN($dsn);
+            $pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
+            $adapter = new RedBean_Adapter_DBAdapter( $pdo );
+            $writer = new RedBean_QueryWriter_MySQLS( $adapter, $frozen );
+            $redbean = new RedBean_OODB( $writer );
+			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
+            //deliver everything back in a neat toolbox
+			self::$toolbox = $toolbox;
+            return self::$toolbox;
+		}
+
 
 		/**
 		 * Almost the same as Dev, but adds the journaling plugin by default for you.

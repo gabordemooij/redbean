@@ -125,14 +125,14 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      *
      * @var RedBean_Adapter_DBAdapter
      */
-    private $adapter;
+    protected $adapter;
 
 	/**
 	 * Indicates the field name to be used for primary keys;
 	 * default is 'id'
 	 * @var string
 	 */
-	private $idfield = "id";
+	protected $idfield = "id";
 
 
 	/**
@@ -165,7 +165,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
         $this->adapter = $adapter;
 		if (!$frozen) {
 			$this->adapter->exec("DROP TABLE IF EXISTS `dtyp`");
-			try{$this->adapter->exec("SET SESSION SQL_MODE=''");}catch(Exception $e){}
+			//try{$this->adapter->exec("SET SESSION SQL_MODE=''");}catch(Exception $e){}
 			$this->adapter->exec("
 					CREATE TABLE IF NOT EXISTS `dtyp` (
 					  `id` int(11) unsigned NOT NULL auto_increment,

@@ -77,8 +77,17 @@ if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 //Test whether a non mysql DSN throws an exception
 try{RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root",""); fail();}catch(RedBean_Exception_NotImplemented $e){ pass(); }
 
+
+//Strict Mode
+$strict = false;
+
 //Test whether we can setup a connection
-$toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
+if ($strict) {
+	$toolbox = RedBean_Setup::kickstartDevS( "mysql:host=localhost;dbname=oodb","root","" );
+}
+else {
+	$toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
+}
 
 /**
  * Observable Mock
@@ -479,7 +488,12 @@ class MyWriter extends RedBean_QueryWriter_MySQL {
 		return $type . "_id";
 	}
 }
-$writer2 = new MyWriter($adapter);
+class MyWriterS extends RedBean_QueryWriter_MySQLS {
+	public function getIDField( $type ) {
+		return $type . "_id";
+	}
+}
+if ($strict) $writer2 = new MyWriterS($adapter); else $writer2 = new MyWriter($adapter);
 $redbean2 = new RedBean_OODB($writer2);
 $movie = $redbean2->dispense("movie");
 asrt(isset($movie->movie_id),true);
@@ -862,7 +876,7 @@ pass(); //no crash?
 $cols = $writer->getColumns("page");
 asrt($cols["name"],"varchar(254)"); //must still be same
 
-
+if (!$strict) {
 testpack("Test Plugins: Optimizer");
 $one = $redbean->dispense("one");
 $one->col = str_repeat('a long text',100);
@@ -941,7 +955,7 @@ $redbean->store($special);
 $redbean->store($special);
 $cols = $writer->getColumns("special");
 asrt(($cols["datetime"]!="datetime"),false);
-
+}
 
 testpack("Test RedBean Extended Journaling with manual Opened modification");
 $page = $redbean->dispense("page");
@@ -1154,4 +1168,11 @@ $bean->name = 1;
 $bean->id = 2;
 $redbean->trash($bean);
 pass();
+
+$book = $redbean->dispense("book");
+$id = $redbean->store($book);
+$book = $redbean->load("book", $id);
+$id = $redbean->store($book);
+pass();
+
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
