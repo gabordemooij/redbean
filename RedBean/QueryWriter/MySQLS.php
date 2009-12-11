@@ -17,7 +17,7 @@ class RedBean_QueryWriter_MySQLS extends RedBean_QueryWriter_MySQL {
 	 * Supported Column Types
 	 */
     public $typeno_sqltype = array(
-    RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>" TINYINT(1) UNSIGNED ",
+    RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  SET('1')  ",
 	RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>" TINYINT(3) UNSIGNED ",
     RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>" INT(11) UNSIGNED ",
   	RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>" DOUBLE ",
@@ -33,7 +33,7 @@ class RedBean_QueryWriter_MySQLS extends RedBean_QueryWriter_MySQL {
 	 * constants (magic numbers)
 	 */
     public $sqltype_typeno = array(
-	"tinyint(1) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL,
+	"set('1')"=>RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL,
     "tinyint(3) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8,
     "int(11) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32,
     "double" => RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE,
@@ -42,70 +42,47 @@ class RedBean_QueryWriter_MySQLS extends RedBean_QueryWriter_MySQL {
     "longtext"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32
     );
 
-
+	/**
+	 * Constructor
+	 * @param RedBean_Adapter $adapter
+	 * @param boolean $frozen
+	 */
 	public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
         $this->adapter = $adapter;
-		$this->adapter->exec("set session sql_mode='STRICT_ALL_TABLES'");
+		//try{ $this->adapter->exec("set session sql_mode='STRICT_ALL_TABLES'");
+		//}catch(Exception $e){}
 	}
 
 
+	/**
+	 * Scans the type using PHP.
+	 * @param mixed $value
+	 * @return integer $typeConstant
+	 */
 	public function scanType( $value ) {
 
-
-	if (is_bool($value)) {
-	      return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
-    }
-
-
-
-    if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
-
-      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
-
-    }
-
-
-
-    if (is_numeric($value) && (floor($value)==$value) && $value >= 0  && $value <= 4294967295 ) {
-
-      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
-
-    }
-
-
-
-    if (is_numeric($value)) {
-
-      return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
-
-    }
-
-    if (is_string($value) && strlen($value) <= 255) {
-
-      return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
-
-    }
-
-    if (is_string($value) && strlen($value) <= 65536) {
-
-      return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
-
-    }
-
-
-
-    if (is_string($value) && strlen($value) > 65536) {
-
-      return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32;
-
-    }
-
-	return 0;
-
-    
-
+		if (is_null($value)) {
+			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+		}
+		$orig = $value;
+		$value = strval($value);
+		if ($value=="1" || $value=="" || $value=="0") {
+			  return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+		}
+	    if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
+		      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
+	    }
+	    if (is_numeric($value) && (floor($value)==$value) && $value >= 0  && $value <= 4294967295 ) {
+	      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
+		}
+	    if (is_numeric($value)) {
+		  return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
+		}
+	    if (strlen($value) <= 255) {
+	      return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
+		}
+	    return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
 	}
-
 
 
 

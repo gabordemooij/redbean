@@ -72,7 +72,15 @@ class RedBean_Setup {
 			self::checkDSN($dsn);
             $pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
             $adapter = new RedBean_Adapter_DBAdapter( $pdo );
-            $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+			
+			$mode = $adapter->getCell("SELECT @@sql_mode");
+			if (strpos($mode,"STRICT")!==false){
+				$writer = new RedBean_QueryWriter_MySQLS( $adapter, $frozen );
+			}
+			else {
+				$writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+			}
+
             $redbean = new RedBean_OODB( $writer );
 
 			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );

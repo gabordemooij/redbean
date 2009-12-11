@@ -79,15 +79,14 @@ try{RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root",""); 
 
 
 //Strict Mode
-$strict = false;
+if (isset($_GET["strict"])) $strict = true; else $strict = false;
 
 //Test whether we can setup a connection
-if ($strict) {
-	$toolbox = RedBean_Setup::kickstartDevS( "mysql:host=localhost;dbname=oodb","root","" );
-}
-else {
+//	$toolbox = RedBean_Setup::kickstartDevS( "mysql:host=localhost;dbname=oodb","root","" );
+//}
+//else {
 	$toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
-}
+//}
 
 /**
  * Observable Mock
@@ -383,11 +382,23 @@ asrt((int)$page->id,$id);
 
 testpack("Test RedBean OODB: Can we Update a Record? ");
 $page->name = "new name";
+
+
+$page->rating = false;
+$newid = $redbean->store( $page ); 
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( (bool) $page->rating, false );
+asrt( !$page->rating, true );
+
+$page->rating = true;
 $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-
+asrt( (bool) $page->rating, true );
+asrt( ($page->rating==true), true );
 
 $page->rating = "1";
 $newid = $redbean->store( $page );
@@ -396,7 +407,14 @@ $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 asrt( $page->rating, "1" );
 
-
+$page->rating = "0";
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( !$page->rating, true );
+asrt( ($page->rating==0), true );
+asrt( ($page->rating==false), true );
 
 $page->rating = 5;
 //$page->__info["unique"] = array("name","rating");
