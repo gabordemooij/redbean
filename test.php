@@ -78,15 +78,7 @@ if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 try{RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root",""); fail();}catch(RedBean_Exception_NotImplemented $e){ pass(); }
 
 
-//Strict Mode
-if (isset($_GET["strict"])) $strict = true; else $strict = false;
-
-//Test whether we can setup a connection
-//	$toolbox = RedBean_Setup::kickstartDevS( "mysql:host=localhost;dbname=oodb","root","" );
-//}
-//else {
-	$toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
-//}
+$toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
 
 /**
  * Observable Mock
@@ -109,7 +101,6 @@ class ObserverMock implements RedBean_Observer {
         $this->info = $info;
     }
 }
-
 
 require("redbean/QueryWriter/NullWriter.php");
 $nullWriter = new RedBean_QueryWriter_NullWriter();
@@ -161,6 +152,8 @@ $prop = "-";
 $bean->$prop = 1;
 try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+
+
 
 
 testpack("UNIT TEST RedBean OODB: Load");
@@ -506,12 +499,7 @@ class MyWriter extends RedBean_QueryWriter_MySQL {
 		return $type . "_id";
 	}
 }
-class MyWriterS extends RedBean_QueryWriter_MySQLS {
-	public function getIDField( $type ) {
-		return $type . "_id";
-	}
-}
-if ($strict) $writer2 = new MyWriterS($adapter); else $writer2 = new MyWriter($adapter);
+$writer2 = new MyWriter($adapter);
 $redbean2 = new RedBean_OODB($writer2);
 $movie = $redbean2->dispense("movie");
 asrt(isset($movie->movie_id),true);
@@ -894,7 +882,7 @@ pass(); //no crash?
 $cols = $writer->getColumns("page");
 asrt($cols["name"],"varchar(254)"); //must still be same
 
-if (!$strict) {
+
 testpack("Test Plugins: Optimizer");
 $one = $redbean->dispense("one");
 $one->col = str_repeat('a long text',100);
@@ -905,7 +893,7 @@ $redbean->addEventListener("update", $optimizer);
 $writer  = $toolbox->getWriter();
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
-$one->col = NULL;
+$one->col = 1;
 $redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
@@ -973,7 +961,7 @@ $redbean->store($special);
 $redbean->store($special);
 $cols = $writer->getColumns("special");
 asrt(($cols["datetime"]!="datetime"),false);
-}
+
 
 testpack("Test RedBean Extended Journaling with manual Opened modification");
 $page = $redbean->dispense("page");
@@ -1037,6 +1025,7 @@ asrt($writer->scanType(255),1);
 asrt($writer->scanType(256),2);
 asrt($writer->scanType(-1),3);
 asrt($writer->scanType(1.5),3);
+asrt($writer->scanType(INF),4);
 asrt($writer->scanType("abc"),4);
 asrt($writer->scanType(str_repeat("lorem ipsum",100)),5);
 $writer->widenColumn("testtable", "c1", 2);
@@ -1187,6 +1176,7 @@ $bean->id = 2;
 $redbean->trash($bean);
 pass();
 
+//Can we save and load? -- with empty properties?
 $book = $redbean->dispense("book");
 $id = $redbean->store($book);
 $book = $redbean->load("book", $id);

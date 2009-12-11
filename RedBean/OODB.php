@@ -153,6 +153,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
             $updatevalues = array();
             foreach( $bean as $p=>$v) {
                 if ($p!=$idfield) {
+					if ($v=="") continue; //nullify if empty string
 					 if (!$this->isFrozen) {
 						//What kind of property are we dealing with?
 						$typeno = $this->writer->scanType($v);

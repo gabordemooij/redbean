@@ -44,7 +44,6 @@ require("Adapter/DBAdapter.php");
 //Load SQL drivers
 require("QueryWriter.php");
 require("QueryWriter/MySQL.php");
-require("QueryWriter/MySQLS.php");
 
 //Load required Exceptions
 require("Exception.php");

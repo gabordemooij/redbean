@@ -163,22 +163,6 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      */
     public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
         $this->adapter = $adapter;
-		if (!$frozen) {
-			$this->adapter->exec("DROP TABLE IF EXISTS `dtyp`");
-			//try{$this->adapter->exec("SET SESSION SQL_MODE=''");}catch(Exception $e){}
-			$this->adapter->exec("
-					CREATE TABLE IF NOT EXISTS `dtyp` (
-					  `id` int(11) unsigned NOT NULL auto_increment,
-					  `booleanset` set('1'),
-					  `tinyintus` tinyint(3) unsigned NOT NULL,
-					  `intus` int(11) unsigned NOT NULL,
-					  `doubles` double NOT NULL,
-					  `varchar255` varchar(255) NOT NULL,
-					  `text` text NOT NULL,
-					  PRIMARY KEY  (`id`)
-					) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-			");
-		}
     }
     
 
@@ -227,24 +211,32 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return integer $type 
 	 */
 	public function scanType( $value ) {
-        $this->adapter->exec( "truncate table dtyp" );
-        $v = "\"".$value."\"";
-        $checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v,$v )";
-        $this->adapter->exec( $checktypeSQL );
-        $id = $this->adapter->getInsertID();
-		$types = $this->dtypes;
-		array_pop($types);
-        $readtypeSQL = "SELECT ".implode(",",$types)." FROM dtyp WHERE id = $id ";
-		$row = $this->adapter->getRow($readtypeSQL);;
-        $tp = 0;
-        foreach($row as $t=>$tv) {
-            if (strval($tv) === strval($value)) {
-                return $tp;
-            }
-            $tp++;
-        }
-        return $tp;
-    }
+
+		if (is_null($value)) {
+			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+		}
+		$orig = $value;
+		$value = strval($value);
+		if ($value=="1" || $value=="" || $value=="0") {
+			  return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+		}
+	    if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
+		      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
+	    }
+	    if (is_numeric($value) && (floor($value)==$value) && $value >= 0  && $value <= 4294967295 ) {
+	      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
+		}
+	    if (is_numeric($value)) {
+		  return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
+		}
+	    if (strlen($value) <= 255) {
+	      return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
+		}
+	    return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
+	}
+
+
+
 
 	/**
 	 * Adds a column of a given type to a table
@@ -334,8 +326,6 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
         }
     }
 
-
-
 	/**
 	 * Selects a record based on type and id.
 	 * @param string $type
@@ -347,7 +337,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		$type=$this->check($type);
 		$sql = "SELECT * FROM `$type` WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);
-		return ($rows && is_array($rows) && count($rows)>0) ? $rows : NULL;
+		return ($rows) ? $rows : NULL;
+		
     }
 
 	/**
