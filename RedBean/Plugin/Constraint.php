@@ -27,6 +27,8 @@ class RedBean_Plugin_Constraint {
 		$writer = $toolbox->getWriter();
 		$oodb = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
+
+		if ($oodb->isFrozen()) return;
 		//$adapter->getDatabase()->setDebugMode(1);
 
 		$table1 = $bean1->getMeta("type");
