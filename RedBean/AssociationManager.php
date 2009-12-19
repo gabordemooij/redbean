@@ -41,7 +41,7 @@ class RedBean_AssociationManager {
 	 * @param array $types
 	 * @return string $table
 	 */
-	private function getTable( $types ) {
+	public function getTable( $types ) {
 		sort($types);
 		return implode("_", $types);
 	}

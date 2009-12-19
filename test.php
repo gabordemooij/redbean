@@ -342,6 +342,14 @@ $pdo->Execute("DROP TABLE IF EXISTS admin");
 $pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
 $pdo->Execute("DROP TABLE IF EXISTS genre");
 $pdo->Execute("DROP TABLE IF EXISTS genre_movie");
+$pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
+$pdo->Execute("DROP TABLE IF EXISTS cask_cask");
+$pdo->Execute("DROP TABLE IF EXISTS cask");
+$pdo->Execute("DROP TABLE IF EXISTS whisky");
+
+
+
+
 
 $page = $redbean->dispense("page");
 
@@ -1060,6 +1068,71 @@ asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 testpack("TEST SimpleStat ");
 $stat = new RedBean_SimpleStat( $toolbox );
 asrt( $stat->numberOf($page), 25);
+
+
+//Test constraints: cascaded delete
+testpack("Test Cascaded Delete");
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$whisky = $redbean->dispense("whisky");
+$cask->number = 100;
+$whisky->age = 10;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask, $whisky );
+//first test baseline behaviour, dead record should remain
+asrt(count($a->related($cask, "whisky")),1);
+$redbean->trash($cask);
+//no difference
+asrt(count($a->related($cask, "whisky")),1);
+$adapter->exec("TRUNCATE cask_whisky"); //clean up for real test!
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$whisky = $redbean->dispense("whisky");
+$cask->number = 101;
+$whisky->age = 12;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask, $whisky );
+
+//add cask 102 and whisky 13
+$cask2 = $redbean->dispense("cask");
+$whisky2 = $redbean->dispense("whisky");
+$cask2->number = 102;
+$whisky2->age = 13;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask2, $whisky2 );
+
+//add constraint
+RedBean_Plugin_Constraint::addConstraint($cask, $whisky);
+//no error for duplicate
+RedBean_Plugin_Constraint::addConstraint($cask, $whisky);
+pass();
+
+asrt(count($a->related($cask, "whisky")),1);
+$redbean->trash($cask);
+asrt(count($a->related($cask, "whisky")),0); //should be gone now!
+
+asrt(count($a->related($whisky2, "cask")),1);
+$redbean->trash($whisky2);
+asrt(count($a->related($whisky2, "cask")),0); //should be gone now!
+
+$pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
+$pdo->Execute("DROP TABLE IF EXISTS cask");
+$pdo->Execute("DROP TABLE IF EXISTS whisky");
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$cask->number = 201;
+$cask2 = $redbean->dispense("cask");
+$cask2->number = 202;
+$a->associate($cask,$cask2);
+RedBean_Plugin_Constraint::addConstraint($cask, $cask2);
+asrt(count($a->related($cask, "cask")),1);
+$redbean->trash( $cask2 );
+asrt(count($a->related($cask, "cask")),0);
+
+
 
 //Section D Security Tests
 testpack("Test RedBean Security - bean interface ");

@@ -66,3 +66,4 @@ require("SimpleStat.php");
 require("Plugin/ChangeLogger.php");
 require("Plugin/Cache.php");
 require("Plugin/Finder.php");
+require("Plugin/Constraint.php");
