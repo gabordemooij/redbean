@@ -37,10 +37,10 @@ class RedBean_Setup {
 		private static function checkDSN($dsn) {
 			$dsn = trim($dsn);
 			$dsn = strtolower($dsn);
-			if (strpos($dsn, "mysql:")!==0) {
+			if (strpos($dsn, "mysql:")!==0 && strpos($dsn,"sqlite:")!==0) {
 				throw new RedBean_Exception_NotImplemented("
 					Support for this DSN has not been implemented yet. \n
-					Begin your DSN with: 'mysql:'
+					Begin your DSN with: 'mysql:' or 'sqlite:'
 				");
 			}
 			else {
@@ -103,6 +103,22 @@ class RedBean_Setup {
 		public static function kickstartDev( $dsn, $username="root", $password="" ) {
 			$toolbox = self::kickstart($dsn, $username, $password);
 			return $toolbox;
+		}
+
+		/**
+		 * @param  string $dsn
+		 * @return RedBean_ToolBox $toolbox
+		 */
+		public static function kickstartDevL( $dsn ) {
+			self::checkDSN($dsn);
+            $pdo = new RedBean_Driver_PDO( $dsn ,"","");
+            $adapter = new RedBean_Adapter_DBAdapter( $pdo );
+            $writer = new RedBean_QueryWriter_SQLite( $adapter, false );
+            $redbean = new RedBean_OODB( $writer );
+			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
+            //deliver everything back in a neat toolbox
+			self::$toolbox = $toolbox;
+            return self::$toolbox;
 		}
 
 

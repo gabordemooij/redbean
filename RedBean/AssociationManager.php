@@ -92,14 +92,17 @@ class RedBean_AssociationManager {
 		$targetproperty = $type."_id";
 		$property = $bean->getMeta("type")."_id";
 		$sqlFetchKeys = " SELECT ".$this->adapter->escape($targetproperty)." FROM `$table` WHERE ".$this->adapter->escape($property)."
-			= ".$this->adapter->escape($bean->$idfield);
+			= ? ";
+		$ids=array();
+		$ids[] = $this->adapter->escape($bean->$idfield);
 		if ($cross) {
 			$sqlFetchKeys .= " UNION SELECT ".$this->adapter->escape($property)." 
 			FROM `$table`
-			WHERE ".$this->adapter->escape($targetproperty)." = ".$this->adapter->escape($bean->$idfield);;
+			WHERE ".$this->adapter->escape($targetproperty)." = ? ";
+			$ids[] = $this->adapter->escape($bean->$idfield);;
 		}
 		try{
-			return $this->adapter->getCol( $sqlFetchKeys );
+			return $this->adapter->getCol( $sqlFetchKeys, $ids );
 		}catch(RedBean_Exception_SQL $e){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 			return array();
@@ -127,14 +130,19 @@ class RedBean_AssociationManager {
 		$property2 = $bean2->getMeta("type")."_id";
 		$value1 = (int) $bean1->$idfield1;
 		$value2 = (int) $bean2->$idfield2;
+		$values = array();
 		$sqlDeleteAssoc = "DELETE FROM `$table`
 		WHERE 
-		( $property1 = $value1 AND $property2 = $value2 )	";
+		( $property1 = ? AND $property2 = ? )	";
+		$values[] = $value1;
+		$values[] = $value2;
 		if ($cross) {
-			$sqlDeleteAssoc .= " OR ( $property2 = $value1 AND $property1 = $value2 ) ";
+			$sqlDeleteAssoc .= " OR ( $property2 = ? AND $property1 = ? ) ";
+			$values[] = $value1;
+			$values[] = $value2;
 		}
 		try{
-		$this->adapter->exec( $sqlDeleteAssoc );
+		$this->adapter->exec( $sqlDeleteAssoc, $values );
 		}catch(RedBean_Exception_SQL $e){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 		}
@@ -155,12 +163,15 @@ class RedBean_AssociationManager {
 		else $cross = 0;
 		$property = $bean->getMeta("type")."_id";
 		$sql = "DELETE FROM `$table`
-		WHERE ".$this->adapter->escape($property)." = ".$this->adapter->escape($bean->$idfield);
+		WHERE ".$this->adapter->escape($property)." = ? ";
+		$ids = array();
+		$ids[] = $this->adapter->escape($bean->$idfield);
 		if ($cross){
-			$sql .= " OR  ".$this->adapter->escape($property2)." = ".$this->adapter->escape($bean->$idfield);;
+			$sql .= " OR  ".$this->adapter->escape($property2)." = ? ";
+			$ids[] = $this->adapter->escape($bean->$idfield);
 		}
 		try{
-		$this->adapter->exec($sql);
+		$this->adapter->exec($sql, $ids);
 		}catch(RedBean_Exception_SQL $e){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 		}

@@ -61,8 +61,8 @@ class RedBean_TreeManager {
 		$idfield = $this->writer->getIDField($parent->getMeta("type"));
 		try {$ids = $this->adapter->getCol("SELECT `".$idfield."` FROM
 			`".$parent->getMeta("type")."`
-			WHERE `".$this->property."` = ".intval( $parent->$idfield )."
-		");
+			WHERE `".$this->property."` = ?
+		", array(intval( $parent->$idfield )));
 		}
 		catch(RedBean_Exception_SQL $e) {
 			return array();
