@@ -55,21 +55,22 @@ class RedBean_Plugin_Optimizer implements RedBean_Plugin,RedBean_Observer {
 			$typeInField = $this->writer->code($fields[$column]);
 			//Is the type too wide?
 			if ($type < $typeInField) {
+				try{@$this->adapter->exec("alter table `$table` drop __test");}catch(Exception $e){}
 				//Try to re-fit the entire column; by testing it.
 				$type = $this->writer->typeno_sqltype[$type];
 				//Add a test column.
-				$this->adapter->exec("alter table `$table` add __test ".$type);
+				@$this->adapter->exec("alter table `$table` add __test ".$type);
 				//Copy the values and see if there are differences.
-				$this->adapter->exec("update `$table` set __test=`$column`");
+				@$this->adapter->exec("update `$table` set __test=`$column`");
 				$diff = $this->adapter->getCell("select
 							count(*) as df from `$table` where
 							strcmp(`$column`,__test) != 0");
 				if (!$diff) {
 					//No differences; shrink column.
-					$this->adapter->exec("alter table `$table` change `$column` `$column` ".$type);
+					@$this->adapter->exec("alter table `$table` change `$column` `$column` ".$type);
 				}
 				//Throw away test column; we don't need it anymore!
-				$this->adapter->exec("alter table `$table` drop __test");
+				@$this->adapter->exec("alter table `$table` drop __test");
 			}
 			else {
 				$this->MySQLSpecificColumns($table, $column, $fields[$column], $value);
@@ -78,6 +79,7 @@ class RedBean_Plugin_Optimizer implements RedBean_Plugin,RedBean_Observer {
 		}
 		}catch(RedBean_Exception_SQL $e){
 			//optimizer might make mistakes, don't care.
+			//echo $e->getMessage()."<br>";
 		}
 	}
 

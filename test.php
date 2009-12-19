@@ -77,7 +77,7 @@ if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 //Test whether a non mysql DSN throws an exception
 try{RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root",""); fail();}catch(RedBean_Exception_NotImplemented $e){ pass(); }
 
-//Test whether we can setup a connection
+
 $toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
 
 /**
@@ -101,7 +101,6 @@ class ObserverMock implements RedBean_Observer {
         $this->info = $info;
     }
 }
-
 
 require("redbean/QueryWriter/NullWriter.php");
 $nullWriter = new RedBean_QueryWriter_NullWriter();
@@ -153,6 +152,8 @@ $prop = "-";
 $bean->$prop = 1;
 try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+
+
 
 
 testpack("UNIT TEST RedBean OODB: Load");
@@ -374,11 +375,23 @@ asrt((int)$page->id,$id);
 
 testpack("Test RedBean OODB: Can we Update a Record? ");
 $page->name = "new name";
+
+
+$page->rating = false;
+$newid = $redbean->store( $page ); 
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( (bool) $page->rating, false );
+asrt( !$page->rating, true );
+
+$page->rating = true;
 $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-
+asrt( (bool) $page->rating, true );
+asrt( ($page->rating==true), true );
 
 $page->rating = "1";
 $newid = $redbean->store( $page );
@@ -387,7 +400,14 @@ $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 asrt( $page->rating, "1" );
 
-
+$page->rating = "0";
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( !$page->rating, true );
+asrt( ($page->rating==0), true );
+asrt( ($page->rating==false), true );
 
 $page->rating = 5;
 //$page->__info["unique"] = array("name","rating");
@@ -873,7 +893,7 @@ $redbean->addEventListener("update", $optimizer);
 $writer  = $toolbox->getWriter();
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
-$one->col = NULL;
+$one->col = 1;
 $redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
@@ -1005,6 +1025,7 @@ asrt($writer->scanType(255),1);
 asrt($writer->scanType(256),2);
 asrt($writer->scanType(-1),3);
 asrt($writer->scanType(1.5),3);
+asrt($writer->scanType(INF),4);
 asrt($writer->scanType("abc"),4);
 asrt($writer->scanType(str_repeat("lorem ipsum",100)),5);
 $writer->widenColumn("testtable", "c1", 2);
@@ -1154,4 +1175,12 @@ $bean->name = 1;
 $bean->id = 2;
 $redbean->trash($bean);
 pass();
+
+//Can we save and load? -- with empty properties?
+$book = $redbean->dispense("book");
+$id = $redbean->store($book);
+$book = $redbean->load("book", $id);
+$id = $redbean->store($book);
+pass();
+
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

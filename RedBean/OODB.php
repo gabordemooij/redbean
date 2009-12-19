@@ -52,6 +52,19 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
     public function freeze( $tf ) {
         $this->isFrozen = (bool) $tf;
     }
+
+
+	/**
+	 * Returns the current mode of operation of RedBean.
+	 * In fluid mode the database
+	 * structure is adjusted to accomodate your objects.
+	 * In frozen mode
+	 * this is not the case.
+	 * @return <type>
+	 */
+	public function isFrozen() {
+		return (bool) $this->isFrozen;
+	}
 	
     /**
 	 * Dispenses a new bean (a RedBean_OODBBean Bean Object)
@@ -140,6 +153,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
             $updatevalues = array();
             foreach( $bean as $p=>$v) {
                 if ($p!=$idfield) {
+					if ($v=="") continue; //nullify if empty string
 					 if (!$this->isFrozen) {
 						//What kind of property are we dealing with?
 						$typeno = $this->writer->scanType($v);
