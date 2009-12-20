@@ -16,6 +16,7 @@ class RedBean_Plugin_Constraint {
 	 * automatically removed.
 	 * @param RedBean_OODBBean $bean1
 	 * @param RedBean_OODBBean $bean2
+	 * @return boolean $addedFKS
 	 */
 	public static function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
 
@@ -28,7 +29,9 @@ class RedBean_Plugin_Constraint {
 		$oodb = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
 
-		if ($oodb->isFrozen()) return;
+		if ($oodb->isFrozen()) return false;
+
+				
 		//$adapter->getDatabase()->setDebugMode(1);
 
 		$table1 = $bean1->getMeta("type");
@@ -41,13 +44,34 @@ class RedBean_Plugin_Constraint {
 		$property2 = $bean2->getMeta("type") . "_id";
 		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
 
+		$table = $adapter->escape($table);
+		$table1 = $adapter->escape($table1);
+		$table2 = $adapter->escape($table2);
+		$property1 = $adapter->escape($property1);
+		$property2 = $adapter->escape($property2);
+
+		$db = $adapter->getCell("select database()");
+		$fks =  $adapter->getCell("
+			SELECT count(*)
+			FROM information_schema.KEY_COLUMN_USAGE
+			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='$table' AND
+			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
+		");
+
+		//already foreign keys added in this association table
+		if ($fks>0) return false;
+
 		$columns = $writer->getColumns($table);
+
 		if ($writer->code($columns[$property1])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
 			$writer->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 		}
 		if ($writer->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
 			$writer->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 		}
+
+
+
 		$sql = "
 			ALTER TABLE `$table`
 			ADD FOREIGN KEY($property1) references $table1(id) ON DELETE CASCADE;
@@ -59,7 +83,7 @@ class RedBean_Plugin_Constraint {
 			ADD FOREIGN KEY($property2) references $table2(id) ON DELETE CASCADE
 		";
 		$adapter->exec( $sql );
-
+		return true;
 
 	}
 
