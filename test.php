@@ -1104,9 +1104,9 @@ $a = new RedBean_AssociationManager( $toolbox );
 $a->associate( $cask2, $whisky2 );
 
 //add constraint
-asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true);
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true,true);
 //no error for duplicate
-asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),false);
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),false,true);
 
 
 asrt(count($a->related($cask, "whisky")),1);
@@ -1127,8 +1127,10 @@ $cask->number = 201;
 $cask2 = $redbean->dispense("cask");
 $cask2->number = 202;
 $a->associate($cask,$cask2);
-asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
-asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),false);
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true,true);
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),false,true);
+//now from cache... no way to check if this works :(
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),false,false);
 asrt(count($a->related($cask, "cask")),1);
 $redbean->trash( $cask2 );
 asrt(count($a->related($cask, "cask")),0);

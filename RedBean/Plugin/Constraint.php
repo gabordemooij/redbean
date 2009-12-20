@@ -9,6 +9,9 @@
  */
 class RedBean_Plugin_Constraint {
 
+	//Keeps track of foreign keys (only to improve fluid performance)
+	private static $fkcache = array();
+
 	/**
 	 * Ensures that given an association between
 	 * $bean1 and $bean2,
@@ -18,7 +21,7 @@ class RedBean_Plugin_Constraint {
 	 * @param RedBean_OODBBean $bean2
 	 * @return boolean $addedFKS
 	 */
-	public static function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
+	public static function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $dontCache = false ) {
 
 		//Fetch the toolbox
 		$toolbox = RedBean_Setup::getToolBox();
@@ -29,6 +32,7 @@ class RedBean_Plugin_Constraint {
 		$oodb = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
 
+		//Frozen? Then we may not alter the schema!
 		if ($oodb->isFrozen()) return false;
 
 				
@@ -50,6 +54,9 @@ class RedBean_Plugin_Constraint {
 		$property1 = $adapter->escape($property1);
 		$property2 = $adapter->escape($property2);
 
+		//In Cache? Then we dont need to bother
+		if (isset(self::$fkcache[$table])) return false;
+
 		$db = $adapter->getCell("select database()");
 		$fks =  $adapter->getCell("
 			SELECT count(*)
@@ -60,6 +67,9 @@ class RedBean_Plugin_Constraint {
 
 		//already foreign keys added in this association table
 		if ($fks>0) return false;
+
+		//add the table to the cache, so we dont have to fire the fk query all the time.
+		if (!$dontCache) self::$fkcache[ $table ] = true;
 
 		$columns = $writer->getColumns($table);
 
