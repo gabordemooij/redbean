@@ -51,10 +51,12 @@ require("Exception/SQL.php");
 require("Exception/Security.php");
 require("Exception/FailedAccessBean.php");
 require("Exception/NotImplemented.php");
+require("Exception/UnsupportedDatabase.php");
 
 //Load Core functionality
 require("OODB.php");
 require("ToolBox.php");
+require("CompatManager.php");
 
 //Load extended functionality
 require("AssociationManager.php");

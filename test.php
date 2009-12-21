@@ -17,6 +17,7 @@
  * @license			BSD
  */
 
+
 /**
  * A simple print function that works
  * both for CLI and HTML.
@@ -114,6 +115,19 @@ asrt(class_exists("RedBean_Exception_Security"),true);
 asrt(class_exists("RedBean_Exception_SQL"),true);
 
 //Section B: UNIT TESTING
+testpack("UNIT TEST RedBean CompatManager: ScanDirect");
+RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"1"));
+pass();
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+RedBean_CompatManager::ignore(TRUE);
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));pass();}catch(RedBean_Exception_UnsupportedDatabase $e){fail();}
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));pass();}catch(RedBean_Exception_UnsupportedDatabase $e){fail();}
+RedBean_CompatManager::ignore(FALSE);
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+
+
 testpack("UNIT TEST RedBean OODB: Dispense");
 //Can we dispense a bean?
 $page = $redbean->dispense("page");

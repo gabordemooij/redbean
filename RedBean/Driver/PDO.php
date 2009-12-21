@@ -283,4 +283,18 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	public function FailTrans() {
 		$this->pdo->rollback();
 	}
+
+	/**
+	 * Returns the name of the database type/brand: i.e. mysql, db2 etc.
+	 * @return string $typeName
+	 */
+	public function getDatabaseType() {
+		return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+	}
+
+
+	public function getDatabaseVersion() {
+		return $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION);
+	}
+
 }

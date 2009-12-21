@@ -5,7 +5,16 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_Plugin_Optimizer implements RedBean_Plugin,RedBean_Observer {
+class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_Plugin,RedBean_Observer {
+
+	/**
+	 * Specify what database systems are supported by this class.
+	 * @var array $databaseSpecs
+	 */
+	protected $supportedSystems = array(
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+	);
+
 
 	/**
 	 * @var RedBean_Adapter_DBAdapter
@@ -28,6 +37,7 @@ class RedBean_Plugin_Optimizer implements RedBean_Plugin,RedBean_Observer {
 	 * @param RedBean_ToolBox $toolbox
 	 */
 	public function __construct( RedBean_ToolBox $toolbox ) {
+		$this->scanToolBox( $toolbox );
 		$this->oodb = $toolbox->getRedBean();
 		$this->adapter = $toolbox->getDatabaseAdapter();
 		$this->writer = $toolbox->getWriter(); 

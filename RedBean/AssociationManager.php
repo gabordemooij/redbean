@@ -9,7 +9,15 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_AssociationManager {
+class RedBean_AssociationManager extends RedBean_CompatManager {
+
+	/**
+	 * Specify what database systems are supported by this class.
+	 * @var array $databaseSpecs
+	 */
+	protected $supportedSystems = array(
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+	);
 
 	/**
 	 * @var RedBean_OODB
@@ -32,6 +40,7 @@ class RedBean_AssociationManager {
 	 * @param RedBean_ToolBox $tools
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
+		$this->scanToolBox( $tools );
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
 		$this->writer = $tools->getWriter();

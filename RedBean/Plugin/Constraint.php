@@ -26,6 +26,9 @@ class RedBean_Plugin_Constraint {
 		//Fetch the toolbox
 		$toolbox = RedBean_Setup::getToolBox();
 
+		RedBean_CompatManager::scanDirect($toolbox, array(RedBean_CompatManager::C_SYSTEM_MYSQL => "5"));
+
+
 		//Create an association manager
 		$association = new RedBean_AssociationManager( $toolbox );
 		$writer = $toolbox->getWriter();

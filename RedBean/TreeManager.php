@@ -7,7 +7,16 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_TreeManager {
+class RedBean_TreeManager extends RedBean_CompatManager {
+
+	/**
+	 * Specify what database systems are supported by this class.
+	 * @var array $databaseSpecs
+	 */
+	protected $supportedSystems = array(
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+	);
+
 
 	/**
 	 *
@@ -35,6 +44,10 @@ class RedBean_TreeManager {
 	 * @param RedBean_ToolBox $tools
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
+		
+		//Do a compatibility check, using the Compatibility Management System
+		$this->scanToolBox( $tools );
+
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
 		$this->writer = $tools->getWriter();
