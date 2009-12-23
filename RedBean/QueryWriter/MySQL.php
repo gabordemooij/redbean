@@ -287,7 +287,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
 			$p[] = " `".$uv["property"]."` = ? ";
-			$v[]=strval( $uv["value"] );
+			$v[]=( $uv["value"] );
 		}
 		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
 		$this->adapter->exec( $sql, $v );
@@ -314,7 +314,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 			$insertSQL .= implode(",",array_fill(0,count($insertvalues),$pat));
 			foreach($insertvalues as $insertvalue) {
 				foreach($insertvalue as $v) {
-					$vs[] = strval( $v );
+					$vs[] = ( $v );
 				}
 			}
 			$this->adapter->exec( $insertSQL, $vs );

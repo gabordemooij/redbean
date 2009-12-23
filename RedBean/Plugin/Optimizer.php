@@ -72,9 +72,9 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 				@$this->adapter->exec("alter table `$table` add __test ".$type);
 				//Copy the values and see if there are differences.
 				@$this->adapter->exec("update `$table` set __test=`$column`");
-				$diff = $this->adapter->getCell("select
-							count(*) as df from `$table` where
-							strcmp(`$column`,__test) != 0");
+				$rows = $this->adapter->get("select `$column` as a, __test as b from `$table`");
+				$diff = 0;
+				foreach($rows as $row){ $diff += ($row["a"]!=$row["b"]); }
 				if (!$diff) {
 					//No differences; shrink column.
 					@$this->adapter->exec("alter table `$table` change `$column` `$column` ".$type);
