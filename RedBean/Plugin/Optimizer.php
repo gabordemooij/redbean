@@ -40,7 +40,8 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 		$this->scanToolBox( $toolbox );
 		$this->oodb = $toolbox->getRedBean();
 		$this->adapter = $toolbox->getDatabaseAdapter();
-		$this->writer = $toolbox->getWriter(); 
+		$this->writer = $toolbox->getWriter();
+		
 	}
 
 	/**
@@ -65,22 +66,22 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 			$typeInField = $this->writer->code($fields[$column]);
 			//Is the type too wide?
 			if ($type < $typeInField) {
-				try{@$this->adapter->exec("alter table `$table` drop __test");}catch(Exception $e){}
+				try{@$this->adapter->exec("alter table ".$this->writer->noKW($table)." drop __test");}catch(Exception $e){}
 				//Try to re-fit the entire column; by testing it.
 				$type = $this->writer->typeno_sqltype[$type];
 				//Add a test column.
-				@$this->adapter->exec("alter table `$table` add __test ".$type);
+				@$this->adapter->exec("alter table ".$this->writer->noKW($table)." add __test ".$type);
 				//Copy the values and see if there are differences.
-				@$this->adapter->exec("update `$table` set __test=`$column`");
-				$rows = $this->adapter->get("select `$column` as a, __test as b from `$table`");
+				@$this->adapter->exec("update ".$this->writer->noKW($table)." set __test=".$this->writer->noKW($column)."");
+				$rows = $this->adapter->get("select ".$this->writer->noKW($column)." as a, __test as b from ".$this->writer->noKW($table));
 				$diff = 0;
 				foreach($rows as $row){ $diff += ($row["a"]!=$row["b"]); }
 				if (!$diff) {
 					//No differences; shrink column.
-					@$this->adapter->exec("alter table `$table` change `$column` `$column` ".$type);
+					@$this->adapter->exec("alter table ".$this->writer->noKW($table)." change ".$this->writer->noKW($column)." ".$this->writer->noKW($column)." ".$type);
 				}
 				//Throw away test column; we don't need it anymore!
-				@$this->adapter->exec("alter table `$table` drop __test");
+				@$this->adapter->exec("alter table ".$this->writer->noKW($table)." drop __test");
 			}
 			else {
 				$this->MySQLSpecificColumns($table, $column, $fields[$column], $value);
@@ -116,10 +117,10 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 				$cnt = (int) $this->adapter->getCell("select count(*) as n from $table where
 					$column regexp '[0-9]{4}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]'
 				");
-				$total = (int) $this->adapter->getCell("SELECT count(*) FROM $table");
+				$total = (int) $this->adapter->getCell("SELECT count(*) FROM ".$this->writer->noKW($table));
 				//Is it safe to convert: ie are all values compatible?
 				if ($total===$cnt) { //yes
-					$this->adapter->exec("ALTER TABLE `$table` change `$column` `$column` datetime ");
+					$this->adapter->exec("ALTER TABLE ".$this->writer->noKW($table)." change ".$this->writer->noKW($column)." ".$this->writer->noKW($column)." datetime ");
 				}
 			}
 		}

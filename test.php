@@ -128,6 +128,7 @@ try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SY
 try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
 
 
+
 testpack("UNIT TEST RedBean OODB: Dispense");
 //Can we dispense a bean?
 $page = $redbean->dispense("page");
@@ -238,6 +239,7 @@ asrt($nullWriter->insertRecordArguments,array());
 asrt($nullWriter->addUniqueIndexArguments,array());
 asrt($nullWriter->updateRecordArguments,array("bean",array(array("property"=>"name","value"=>"chili")),9876 ));
 asrt($nullWriter->widenColumnArguments,array("bean","name", 777));
+
 
 testpack("UNIT TEST RedBean OODB: Freeze");
 $nullWriter->reset();

@@ -86,13 +86,13 @@ class RedBean_Plugin_Constraint {
 
 
 		$sql = "
-			ALTER TABLE `$table`
+			ALTER TABLE ".$writer->noKW($table)."
 			ADD FOREIGN KEY($property1) references $table1(id) ON DELETE CASCADE;
 
 		";
 		$adapter->exec( $sql );
 		$sql ="
-			ALTER TABLE `$table`
+			ALTER TABLE ".$writer->noKW($table)."
 			ADD FOREIGN KEY($property2) references $table2(id) ON DELETE CASCADE
 		";
 		$adapter->exec( $sql );

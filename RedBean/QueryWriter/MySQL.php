@@ -380,4 +380,44 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
                 ADD UNIQUE INDEX `$name` (".implode(",",$columns).")";
         $this->adapter->exec($sql);
     }
+
+	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
+		$select = $this->noKW($this->adapter->escape($select));
+		$table = $this->noKW($this->adapter->escape($table));
+		$column = $this->noKW($this->adapter->escape($column));
+		$value = $this->adapter->escape($value);
+		$sql = "SELECT $select FROM $table WHERE $column = ? ";
+		$values = array($value);
+		if ($withUnion) {
+			$sql .= " UNION SELECT $column FROM $table WHERE $select = ? ";
+			$values[] = $value;
+		}
+		return $this->adapter->getCol($sql,$values);
+	}
+	
+	
+	public function deleteByCrit( $table, $crits ) {
+		$table = $this->noKW($this->adapter->escape($table));
+		$values = array();
+		foreach($crits as $key=>$val) {
+			$key = $this->noKW($this->adapter->escape($key));
+			$values[] = $val;
+			$conditions[] = $key ."= ? ";
+		}
+		$sql = "DELETE FROM $table WHERE ".implode(" AND ", $conditions);
+		return $this->adapter->exec($sql, $values);
+	}
+
+
+
+
+
+	/**
+	 * Puts keyword escaping symbols around string.
+	 * @param string $str
+	 * @return string $keywordSafeString
+	 */
+	public function noKW($str) {
+		return "`".$str."`";
+	}
 }

@@ -23,35 +23,42 @@ _______   ____   __| _/\_ |__   ____ _____    ____
  * @license			BSD
  */
 
+//Check the current PHP version
+if (version_compare(PHP_VERSION, '5.0.0', '<')) {
+	throw new Exception("Sorry, RedBean is not compatible with PHP versions < 5.");
+}
+
+//Set the directory path
+$dir = dirname(__FILE__) . "/";
 
 //Load Core Intefaces
-require("ObjectDatabase.php");
-require("Plugin.php");
+require($dir."ObjectDatabase.php");
+require($dir."Plugin.php");
 
 //Load Database drivers
-require("Driver.php");
-require("Driver/PDO.php");
+require($dir."Driver.php");
+require($dir."Driver/PDO.php");
 
 //Load Infrastructure
-require("OODBBean.php");
-require("Observable.php");
-require("Observer.php");
+require($dir."OODBBean.php");
+require($dir."Observable.php");
+require($dir."Observer.php");
 
 //Load Database Adapters
-require("Adapter.php");
-require("Adapter/DBAdapter.php");
+require($dir."Adapter.php");
+require($dir."Adapter/DBAdapter.php");
 
 //Load SQL drivers
-require("QueryWriter.php");
-require("QueryWriter/MySQL.php");
+require($dir."QueryWriter.php");
+require($dir."QueryWriter/MySQL.php");
 
 //Load required Exceptions
-require("Exception.php");
-require("Exception/SQL.php");
-require("Exception/Security.php");
-require("Exception/FailedAccessBean.php");
-require("Exception/NotImplemented.php");
-require("Exception/UnsupportedDatabase.php");
+require($dir."Exception.php");
+require($dir."Exception/SQL.php");
+require($dir."Exception/Security.php");
+require($dir."Exception/FailedAccessBean.php");
+require($dir."Exception/NotImplemented.php");
+require($dir."Exception/UnsupportedDatabase.php");
 
 //Load Core functionality
 require("OODB.php");
