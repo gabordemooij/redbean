@@ -50,11 +50,23 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 		$adapter = $tools->getDatabaseAdapter();
 
 		//Make a standard ANSI SQL query from the SQL provided
-		$SQL = "SELECT * FROM $type WHERE ".$SQL;
+		try{
+			$SQL = "SELECT * FROM $type WHERE ".$SQL;
 
-		//Fetch the values using the SQL and value pairs provided
-		$rows = $adapter->get($SQL, $values);
+			//Fetch the values using the SQL and value pairs provided
+			$rows = $adapter->get($SQL, $values);
 
+		}
+		catch(RedBean_Exception_SQL $e) { 
+			if ($e->getSQLState()=="42S02") { //no such table? no problem. may happen.
+				return array();
+			}
+			else {
+				throw $e;
+			}
+		}
+
+		
 		//Give the rows to RedBean OODB to convert them
 		//into beans.
 		return $redbean->convertToBeans($type, $rows);
