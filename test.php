@@ -362,6 +362,7 @@ $pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
 $pdo->Execute("DROP TABLE IF EXISTS cask_cask");
 $pdo->Execute("DROP TABLE IF EXISTS cask");
 $pdo->Execute("DROP TABLE IF EXISTS whisky");
+$pdo->Execute("DROP TABLE IF EXISTS __log");
 
 
 

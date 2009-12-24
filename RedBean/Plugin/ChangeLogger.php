@@ -54,7 +54,7 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
         $this->writer = $toolbox->getWriter();
 		$this->adapter = $toolbox->getDatabaseAdapter();
 		$this->redbean = $toolbox->getRedBean();
-		if ($this->redbean->isFrozen()) {
+		if (!$this->redbean->isFrozen()) {
 			$this->adapter->exec("
 						CREATE TABLE IF NOT EXISTS `__log` (
 						`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
