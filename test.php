@@ -17,6 +17,7 @@
  * @license			BSD
  */
 
+
 /**
  * A simple print function that works
  * both for CLI and HTML.
@@ -114,6 +115,20 @@ asrt(class_exists("RedBean_Exception_Security"),true);
 asrt(class_exists("RedBean_Exception_SQL"),true);
 
 //Section B: UNIT TESTING
+testpack("UNIT TEST RedBean CompatManager: ScanDirect");
+RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"1"));
+pass();
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+RedBean_CompatManager::ignore(TRUE);
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));pass();}catch(RedBean_Exception_UnsupportedDatabase $e){fail();}
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));pass();}catch(RedBean_Exception_UnsupportedDatabase $e){fail();}
+RedBean_CompatManager::ignore(FALSE);
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+
+
+
 testpack("UNIT TEST RedBean OODB: Dispense");
 //Can we dispense a bean?
 $page = $redbean->dispense("page");
@@ -224,6 +239,7 @@ asrt($nullWriter->insertRecordArguments,array());
 asrt($nullWriter->addUniqueIndexArguments,array());
 asrt($nullWriter->updateRecordArguments,array("bean",array(array("property"=>"name","value"=>"chili")),9876 ));
 asrt($nullWriter->widenColumnArguments,array("bean","name", 777));
+
 
 testpack("UNIT TEST RedBean OODB: Freeze");
 $nullWriter->reset();
@@ -342,6 +358,15 @@ $pdo->Execute("DROP TABLE IF EXISTS admin");
 $pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
 $pdo->Execute("DROP TABLE IF EXISTS genre");
 $pdo->Execute("DROP TABLE IF EXISTS genre_movie");
+$pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
+$pdo->Execute("DROP TABLE IF EXISTS cask_cask");
+$pdo->Execute("DROP TABLE IF EXISTS cask");
+$pdo->Execute("DROP TABLE IF EXISTS whisky");
+$pdo->Execute("DROP TABLE IF EXISTS __log");
+
+
+
+
 
 $page = $redbean->dispense("page");
 
@@ -1060,6 +1085,74 @@ asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 testpack("TEST SimpleStat ");
 $stat = new RedBean_SimpleStat( $toolbox );
 asrt( $stat->numberOf($page), 25);
+
+
+//Test constraints: cascaded delete
+testpack("Test Cascaded Delete");
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$whisky = $redbean->dispense("whisky");
+$cask->number = 100;
+$whisky->age = 10;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask, $whisky );
+//first test baseline behaviour, dead record should remain
+asrt(count($a->related($cask, "whisky")),1);
+$redbean->trash($cask);
+//no difference
+asrt(count($a->related($cask, "whisky")),1);
+$adapter->exec("TRUNCATE cask_whisky"); //clean up for real test!
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$whisky = $redbean->dispense("whisky");
+$cask->number = 101;
+$whisky->age = 12;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask, $whisky );
+
+//add cask 102 and whisky 13
+$cask2 = $redbean->dispense("cask");
+$whisky2 = $redbean->dispense("whisky");
+$cask2->number = 102;
+$whisky2->age = 13;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask2, $whisky2 );
+
+//add constraint
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true,true);
+//no error for duplicate
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),false,true);
+
+
+asrt(count($a->related($cask, "whisky")),1);
+$redbean->trash($cask);
+asrt(count($a->related($cask, "whisky")),0); //should be gone now!
+
+asrt(count($a->related($whisky2, "cask")),1);
+$redbean->trash($whisky2);
+asrt(count($a->related($whisky2, "cask")),0); //should be gone now!
+
+$pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
+$pdo->Execute("DROP TABLE IF EXISTS cask");
+$pdo->Execute("DROP TABLE IF EXISTS whisky");
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$cask->number = 201;
+$cask2 = $redbean->dispense("cask");
+$cask2->number = 202;
+$a->associate($cask,$cask2);
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true,true);
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),false,true);
+//now from cache... no way to check if this works :(
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),false,false);
+asrt(count($a->related($cask, "cask")),1);
+$redbean->trash( $cask2 );
+asrt(count($a->related($cask, "cask")),0);
+
+
 
 //Section D Security Tests
 testpack("Test RedBean Security - bean interface ");

@@ -9,7 +9,15 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_AssociationManager {
+class RedBean_AssociationManager extends RedBean_CompatManager {
+
+	/**
+	 * Specify what database systems are supported by this class.
+	 * @var array $databaseSpecs
+	 */
+	protected $supportedSystems = array(
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+	);
 
 	/**
 	 * @var RedBean_OODB
@@ -32,6 +40,7 @@ class RedBean_AssociationManager {
 	 * @param RedBean_ToolBox $tools
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
+		$this->scanToolBox( $tools );
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
 		$this->writer = $tools->getWriter();
@@ -41,7 +50,7 @@ class RedBean_AssociationManager {
 	 * @param array $types
 	 * @return string $table
 	 */
-	private function getTable( $types ) {
+	public function getTable( $types ) {
 		sort($types);
 		return implode("_", $types);
 	}
@@ -91,18 +100,27 @@ class RedBean_AssociationManager {
 		else $cross=0;
 		$targetproperty = $type."_id";
 		$property = $bean->getMeta("type")."_id";
-		$sqlFetchKeys = " SELECT ".$this->adapter->escape($targetproperty)." FROM `$table` WHERE ".$this->adapter->escape($property)."
-			= ? ";
-		$ids=array();
-		$ids[] = $this->adapter->escape($bean->$idfield);
-		if ($cross) {
-			$sqlFetchKeys .= " UNION SELECT ".$this->adapter->escape($property)." 
-			FROM `$table`
-			WHERE ".$this->adapter->escape($targetproperty)." = ? ";
-			$ids[] = $this->adapter->escape($bean->$idfield);;
-		}
+
 		try{
-			return $this->adapter->getCol( $sqlFetchKeys, $ids );
+			if ($cross) {
+				$sqlFetchKeys = $this->writer->selectByCrit(
+					$targetproperty,
+					$table,
+					$property,
+					$bean->$idfield,
+					true
+				);
+			}
+			else {
+				$sqlFetchKeys = $this->writer->selectByCrit(
+					$targetproperty,
+					$table,
+					$property,
+					$bean->$idfield
+				);
+			}
+			return ( $sqlFetchKeys );
+
 		}catch(RedBean_Exception_SQL $e){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 			return array();
@@ -130,6 +148,7 @@ class RedBean_AssociationManager {
 		$property2 = $bean2->getMeta("type")."_id";
 		$value1 = (int) $bean1->$idfield1;
 		$value2 = (int) $bean2->$idfield2;
+<<<<<<< HEAD
 		$values = array();
 		$sqlDeleteAssoc = "DELETE FROM `$table`
 		WHERE 
@@ -143,6 +162,13 @@ class RedBean_AssociationManager {
 		}
 		try{
 		$this->adapter->exec( $sqlDeleteAssoc, $values );
+=======
+		try{
+			$this->writer->deleteByCrit($table,array($property1=>$value1,$property2=>$value2));
+			if ($cross) {
+				$this->writer->deleteByCrit($table,array($property2=>$value1,$property1=>$value2));
+			}
+>>>>>>> master
 		}catch(RedBean_Exception_SQL $e){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 		}
@@ -162,6 +188,7 @@ class RedBean_AssociationManager {
 		}
 		else $cross = 0;
 		$property = $bean->getMeta("type")."_id";
+<<<<<<< HEAD
 		$sql = "DELETE FROM `$table`
 		WHERE ".$this->adapter->escape($property)." = ? ";
 		$ids = array();
@@ -172,6 +199,13 @@ class RedBean_AssociationManager {
 		}
 		try{
 		$this->adapter->exec($sql, $ids);
+=======
+		try{
+			$this->writer->deleteByCrit($table,array($property=>$bean->$idfield));
+			if ($cross) {
+				$this->writer->deleteByCrit($table,array($property2=>$bean->$idfield));
+			}
+>>>>>>> master
 		}catch(RedBean_Exception_SQL $e){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 		}

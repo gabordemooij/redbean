@@ -170,7 +170,7 @@ abstract class RedBean_DomainObject {
 
 			$domainObject = new $type;
 			$typeName = $domainObject->bean->getMeta("type");
-
+			$collection = array();
 			$finder = new \RedBean_Plugin_Finder();
 			$beans = $finder->where($typeName, $query, $values);
 			foreach($beans as $bean) {
@@ -187,6 +187,10 @@ abstract class RedBean_DomainObject {
 
 	 public function save() {
 		 $this->redbean->store( $this->bean );
+	 }
+
+	 public function delete() {
+		 $this->redbean->trash( $this->bean );
 	 }
 
 }
