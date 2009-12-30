@@ -615,6 +615,22 @@ $a->associate($page, $user);
 asrt(count($a->related($user, "page" )),1);
 $a->associate($user,$page2);
 asrt(count($a->related($user, "page" )),2);
+//can we fetch the assoc ids themselves?
+$pageKeys = $a->related($user, "page" );
+$pages = $redbean->batch("page",$pageKeys);
+$links = $redbean->batch("page_user",$a->related($user,"page",true));
+//print_r($links);
+asrt(count($links),2);
+//confirm that the link beans are ok.
+$link = array_pop($links);
+asrt(isset($link->page_id),true);
+asrt(isset($link->user_id),true);
+asrt(isset($link->id),true);
+$link = array_pop($links);
+asrt(isset($link->page_id),true);
+asrt(isset($link->user_id),true);
+asrt(isset($link->id),true);
+
 $a->unassociate($page, $user);
 asrt(count($a->related($user, "page" )),1);
 $a->clearRelations($user, "page");
