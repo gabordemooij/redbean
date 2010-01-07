@@ -105,7 +105,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
-			if (version_compare(PHP_VERSION, '5.0.0', '<')) {
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
 				$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
 			}
 			else {
@@ -213,7 +213,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			catch(PDOException $e) {
 				//Unfortunately the code field is supposed to be int by default (php)
 				//So we need a property to convey the SQL State code.
-				if (version_compare(PHP_VERSION, '5.0.0', '<')) {
+				if (version_compare(PHP_VERSION, '5.3.0', '<')) {
 					$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
 				}
 				else {
