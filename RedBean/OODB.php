@@ -119,7 +119,20 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
             }
         }
     }
-	
+
+
+	/**
+	 * Checks whether the specified table already exists in the database.
+	 * Not part of the Object Database interface!
+	 * @param string $table
+	 * @return boolean $exists
+	 */
+	public function tableExists($table) {
+		 //does this table exist?
+          $tables = $this->writer->getTables();
+          return in_array($table, $tables);
+	}
+
 	/**
 	 * Stores a bean in the database. This function takes a
 	 * RedBean_OODBBean Bean Object $bean and stores it
@@ -140,10 +153,8 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
         //what table does it want
         $table = $bean->getMeta("type");
 		$idfield = $this->writer->getIDField($table);
-	        //does this table exist?
-            $tables = $this->writer->getTables();
-            //If not, create
-            if (!$this->isFrozen && !in_array($table, $tables)) {
+	        //Does table exist? If not, create
+            if (!$this->isFrozen && !$this->tableExists($table)) {
                 $this->writer->createTable( $table );
             }
             $columns = $this->writer->getColumns($table) ;
