@@ -58,7 +58,7 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 
 		}
 		catch(RedBean_Exception_SQL $e) { 
-			if ($e->getSQLState()=="42S02") { //no such table? no problem. may happen.
+			if ($e->getSQLState()=="42S02" || $e->getSQLState()=="42S22") { //no such table? no problem. may happen.
 				return array();
 			}
 			else {

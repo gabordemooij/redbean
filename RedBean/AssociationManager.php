@@ -73,7 +73,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$bean->$property1 = $bean1->$idfield1;
 		$bean->$property2 = $bean2->$idfield2;
 		try{
-			$this->oodb->store( $bean );
+			return $this->oodb->store( $bean );
 		}
 		catch(RedBean_Exception_SQL $e) {
 			//If this is a SQLSTATE[23000]: Integrity constraint violation
@@ -90,7 +90,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @param string $type
 	 * @return array $ids
 	 */
-	public function related( RedBean_OODBBean $bean, $type ) {
+	public function related( RedBean_OODBBean $bean, $type, $getLinks=false ) {
 		$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		if ($type==$bean->getMeta("type")) {// echo "<b>CROSS</b>";
@@ -98,7 +98,8 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			$cross = 1;
 		}
 		else $cross=0;
-		$targetproperty = $type."_id";
+		if (!$getLinks) $targetproperty = $type."_id"; else $targetproperty="id";
+
 		$property = $bean->getMeta("type")."_id";
 
 		try{
@@ -212,12 +213,22 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	}
 	/**
 	 * Creates a 1 to Many Association
+	 * If the association fails it throws an exception.
+	 * @throws RedBean_Exception_SQL $failedToEnforce1toN
 	 * @param RedBean_OODBBean $bean1
 	 * @param RedBean_OODBBean $bean2
+	 * @return RedBean_AssociationManager $chainable
 	 */
 	public function set1toNAssoc(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-		$this->clearRelations($bean2, $bean1->getMeta("type"));
+		$type = $bean1->getMeta("type");
+		$this->clearRelations($bean2, $type);
 		$this->associate($bean1, $bean2);
+		if (count( $this->related($bean2, $type) )===1){
+			return $this;
+		}
+		else {
+			throw new RedBean_Exception_SQL("Failed to enforce 1toN Relation for $type ");
+		}
 	}
 
 }
