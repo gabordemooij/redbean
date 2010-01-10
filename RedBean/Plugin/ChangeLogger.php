@@ -14,7 +14,7 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	 * @var array $databaseSpecs
 	 */
 	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
 	);
 
 
