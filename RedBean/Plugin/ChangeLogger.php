@@ -7,7 +7,16 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_Plugin_ChangeLogger implements RedBean_Plugin,RedBean_Observer {
+class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBean_Plugin,RedBean_Observer {
+
+	/**
+	 * Specify what database systems are supported by this class.
+	 * @var array $databaseSpecs
+	 */
+	protected $supportedSystems = array(
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+	);
+
 
     /**
      * @var RedBean_Adapter_DBAdapter
@@ -28,12 +37,35 @@ class RedBean_Plugin_ChangeLogger implements RedBean_Plugin,RedBean_Observer {
 	private $stash = array();
 
 	/**
+	 *
+	 * @var RedBean_OODB
+	 */
+	private $redbean;
+
+	/**
 	 * Constructor, requires a writer
 	 * @param RedBean_QueryWriter $writer
 	 */
     public function __construct(RedBean_ToolBox $toolbox) {
+
+		//Do a compatibility check, using the Compatibility Management System
+		$this->scanToolBox( $toolbox );
+
         $this->writer = $toolbox->getWriter();
 		$this->adapter = $toolbox->getDatabaseAdapter();
+		$this->redbean = $toolbox->getRedBean();
+		if (!$this->redbean->isFrozen()) {
+			$this->adapter->exec("
+						CREATE TABLE IF NOT EXISTS `__log` (
+						`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+						`tbl` VARCHAR( 255 ) NOT NULL ,
+						`action` TINYINT( 2 ) NOT NULL ,
+						`itemid` INT( 11 ) NOT NULL
+						) ENGINE = MYISAM ;
+				"); //Must be MyISAM! else you run in trouble if you use transactions!
+		}
+		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
+		$this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
     }
 
 	/**

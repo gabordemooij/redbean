@@ -17,6 +17,7 @@
  * @license			BSD
  */
 
+
 /**
  * A simple print function that works
  * both for CLI and HTML.
@@ -77,7 +78,7 @@ if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 //Test whether a non mysql DSN throws an exception
 try{RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root",""); fail();}catch(RedBean_Exception_NotImplemented $e){ pass(); }
 
-//Test whether we can setup a connection
+
 $toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
 
 /**
@@ -102,7 +103,6 @@ class ObserverMock implements RedBean_Observer {
     }
 }
 
-
 require("redbean/QueryWriter/NullWriter.php");
 $nullWriter = new RedBean_QueryWriter_NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
@@ -115,6 +115,20 @@ asrt(class_exists("RedBean_Exception_Security"),true);
 asrt(class_exists("RedBean_Exception_SQL"),true);
 
 //Section B: UNIT TESTING
+testpack("UNIT TEST RedBean CompatManager: ScanDirect");
+RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"1"));
+pass();
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+RedBean_CompatManager::ignore(TRUE);
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));pass();}catch(RedBean_Exception_UnsupportedDatabase $e){fail();}
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));pass();}catch(RedBean_Exception_UnsupportedDatabase $e){fail();}
+RedBean_CompatManager::ignore(FALSE);
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
+
+
+
 testpack("UNIT TEST RedBean OODB: Dispense");
 //Can we dispense a bean?
 $page = $redbean->dispense("page");
@@ -153,6 +167,8 @@ $prop = "-";
 $bean->$prop = 1;
 try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+
+
 
 
 testpack("UNIT TEST RedBean OODB: Load");
@@ -223,6 +239,7 @@ asrt($nullWriter->insertRecordArguments,array());
 asrt($nullWriter->addUniqueIndexArguments,array());
 asrt($nullWriter->updateRecordArguments,array("bean",array(array("property"=>"name","value"=>"chili")),9876 ));
 asrt($nullWriter->widenColumnArguments,array("bean","name", 777));
+
 
 testpack("UNIT TEST RedBean OODB: Freeze");
 $nullWriter->reset();
@@ -341,6 +358,15 @@ $pdo->Execute("DROP TABLE IF EXISTS admin");
 $pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
 $pdo->Execute("DROP TABLE IF EXISTS genre");
 $pdo->Execute("DROP TABLE IF EXISTS genre_movie");
+$pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
+$pdo->Execute("DROP TABLE IF EXISTS cask_cask");
+$pdo->Execute("DROP TABLE IF EXISTS cask");
+$pdo->Execute("DROP TABLE IF EXISTS whisky");
+$pdo->Execute("DROP TABLE IF EXISTS __log");
+
+
+
+
 
 $page = $redbean->dispense("page");
 
@@ -374,11 +400,23 @@ asrt((int)$page->id,$id);
 
 testpack("Test RedBean OODB: Can we Update a Record? ");
 $page->name = "new name";
+
+
+$page->rating = false;
+$newid = $redbean->store( $page ); 
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( (bool) $page->rating, false );
+asrt( !$page->rating, true );
+
+$page->rating = true;
 $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-
+asrt( (bool) $page->rating, true );
+asrt( ($page->rating==true), true );
 
 $page->rating = "1";
 $newid = $redbean->store( $page );
@@ -387,7 +425,14 @@ $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 asrt( $page->rating, "1" );
 
-
+$page->rating = "0";
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( !$page->rating, true );
+asrt( ($page->rating==0), true );
+asrt( ($page->rating==false), true );
 
 $page->rating = 5;
 //$page->__info["unique"] = array("name","rating");
@@ -570,6 +615,22 @@ $a->associate($page, $user);
 asrt(count($a->related($user, "page" )),1);
 $a->associate($user,$page2);
 asrt(count($a->related($user, "page" )),2);
+//can we fetch the assoc ids themselves?
+$pageKeys = $a->related($user, "page" );
+$pages = $redbean->batch("page",$pageKeys);
+$links = $redbean->batch("page_user",$a->related($user,"page",true));
+//print_r($links);
+asrt(count($links),2);
+//confirm that the link beans are ok.
+$link = array_pop($links);
+asrt(isset($link->page_id),true);
+asrt(isset($link->user_id),true);
+asrt(isset($link->id),true);
+$link = array_pop($links);
+asrt(isset($link->page_id),true);
+asrt(isset($link->user_id),true);
+asrt(isset($link->id),true);
+
 $a->unassociate($page, $user);
 asrt(count($a->related($user, "page" )),1);
 $a->clearRelations($user, "page");
@@ -873,7 +934,7 @@ $redbean->addEventListener("update", $optimizer);
 $writer  = $toolbox->getWriter();
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
-$one->col = NULL;
+$one->col = 1;
 $redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
@@ -1005,6 +1066,7 @@ asrt($writer->scanType(255),1);
 asrt($writer->scanType(256),2);
 asrt($writer->scanType(-1),3);
 asrt($writer->scanType(1.5),3);
+asrt($writer->scanType(INF),4);
 asrt($writer->scanType("abc"),4);
 asrt($writer->scanType(str_repeat("lorem ipsum",100)),5);
 $writer->widenColumn("testtable", "c1", 2);
@@ -1039,6 +1101,74 @@ asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 testpack("TEST SimpleStat ");
 $stat = new RedBean_SimpleStat( $toolbox );
 asrt( $stat->numberOf($page), 25);
+
+
+//Test constraints: cascaded delete
+testpack("Test Cascaded Delete");
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$whisky = $redbean->dispense("whisky");
+$cask->number = 100;
+$whisky->age = 10;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask, $whisky );
+//first test baseline behaviour, dead record should remain
+asrt(count($a->related($cask, "whisky")),1);
+$redbean->trash($cask);
+//no difference
+asrt(count($a->related($cask, "whisky")),1);
+$adapter->exec("TRUNCATE cask_whisky"); //clean up for real test!
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$whisky = $redbean->dispense("whisky");
+$cask->number = 101;
+$whisky->age = 12;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask, $whisky );
+
+//add cask 102 and whisky 13
+$cask2 = $redbean->dispense("cask");
+$whisky2 = $redbean->dispense("whisky");
+$cask2->number = 102;
+$whisky2->age = 13;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask2, $whisky2 );
+
+//add constraint
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true,true);
+//no error for duplicate
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),false,true);
+
+
+asrt(count($a->related($cask, "whisky")),1);
+$redbean->trash($cask);
+asrt(count($a->related($cask, "whisky")),0); //should be gone now!
+
+asrt(count($a->related($whisky2, "cask")),1);
+$redbean->trash($whisky2);
+asrt(count($a->related($whisky2, "cask")),0); //should be gone now!
+
+$pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
+$pdo->Execute("DROP TABLE IF EXISTS cask");
+$pdo->Execute("DROP TABLE IF EXISTS whisky");
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$cask->number = 201;
+$cask2 = $redbean->dispense("cask");
+$cask2->number = 202;
+$a->associate($cask,$cask2);
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true,true);
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),false,true);
+//now from cache... no way to check if this works :(
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),false,false);
+asrt(count($a->related($cask, "cask")),1);
+$redbean->trash( $cask2 );
+asrt(count($a->related($cask, "cask")),0);
+
+
 
 //Section D Security Tests
 testpack("Test RedBean Security - bean interface ");
@@ -1154,4 +1284,12 @@ $bean->name = 1;
 $bean->id = 2;
 $redbean->trash($bean);
 pass();
+
+//Can we save and load? -- with empty properties?
+$book = $redbean->dispense("book");
+$id = $redbean->store($book);
+$book = $redbean->load("book", $id);
+$id = $redbean->store($book);
+pass();
+
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

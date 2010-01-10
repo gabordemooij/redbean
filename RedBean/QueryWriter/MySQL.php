@@ -125,14 +125,14 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      *
      * @var RedBean_Adapter_DBAdapter
      */
-    private $adapter;
+    protected $adapter;
 
 	/**
 	 * Indicates the field name to be used for primary keys;
 	 * default is 'id'
 	 * @var string
 	 */
-	private $idfield = "id";
+	protected $idfield = "id";
 
 
 	/**
@@ -163,32 +163,6 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
      */
     public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
         $this->adapter = $adapter;
-		if (!$frozen) {
-			$this->adapter->exec("DROP TABLE IF EXISTS `dtyp`");
-			try{$this->adapter->exec("SET SESSION SQL_MODE=''");}catch(Exception $e){}
-			$this->adapter->exec("
-					CREATE TABLE IF NOT EXISTS `dtyp` (
-					  `id` int(11) unsigned NOT NULL auto_increment,
-					  `booleanset` set('1'),
-					  `tinyintus` tinyint(3) unsigned NOT NULL,
-					  `intus` int(11) unsigned NOT NULL,
-					  `doubles` double NOT NULL,
-					  `varchar255` varchar(255) NOT NULL,
-					  `text` text NOT NULL,
-					  PRIMARY KEY  (`id`)
-					) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-			");
-			$this->adapter->exec("
-					CREATE TABLE IF NOT EXISTS `__log` (
-					`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-					`tbl` VARCHAR( 255 ) NOT NULL ,
-					`action` TINYINT( 2 ) NOT NULL ,
-					`itemid` INT( 11 ) NOT NULL
-					) ENGINE = MYISAM ;
-			"); //Must be MyISAM! else you run in trouble if you use transactions!
-		}
-		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
-        $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
     }
     
 
@@ -237,24 +211,32 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return integer $type 
 	 */
 	public function scanType( $value ) {
-        $this->adapter->exec( "truncate table dtyp" );
-        $v = "\"".$value."\"";
-        $checktypeSQL = "insert into dtyp VALUES(null,$v,$v,$v,$v,$v,$v )";
-        $this->adapter->exec( $checktypeSQL );
-        $id = $this->adapter->getInsertID();
-		$types = $this->dtypes;
-		array_pop($types);
-        $readtypeSQL = "SELECT ".implode(",",$types)." FROM dtyp WHERE id = $id ";
-		$row = $this->adapter->getRow($readtypeSQL);;
-        $tp = 0;
-        foreach($row as $t=>$tv) {
-            if (strval($tv) === strval($value)) {
-                return $tp;
-            }
-            $tp++;
-        }
-        return $tp;
-    }
+
+		if (is_null($value)) {
+			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+		}
+		$orig = $value;
+		$value = strval($value);
+		if ($value=="1" || $value=="" || $value=="0") {
+			  return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+		}
+	    if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
+		      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
+	    }
+	    if (is_numeric($value) && (floor($value)==$value) && $value >= 0  && $value <= 4294967295 ) {
+	      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
+		}
+	    if (is_numeric($value)) {
+		  return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
+		}
+	    if (strlen($value) <= 255) {
+	      return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
+		}
+	    return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
+	}
+
+
+
 
 	/**
 	 * Adds a column of a given type to a table
@@ -305,7 +287,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
 			$p[] = " `".$uv["property"]."` = ? ";
-			$v[]=strval( $uv["value"] );
+			$v[]=( $uv["value"] );
 		}
 		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
 		$this->adapter->exec( $sql, $v );
@@ -332,7 +314,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 			$insertSQL .= implode(",",array_fill(0,count($insertvalues),$pat));
 			foreach($insertvalues as $insertvalue) {
 				foreach($insertvalue as $v) {
-					$vs[] = strval( $v );
+					$vs[] = ( $v );
 				}
 			}
 			$this->adapter->exec( $insertSQL, $vs );
@@ -343,8 +325,6 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
               return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
         }
     }
-
-
 
 	/**
 	 * Selects a record based on type and id.
@@ -357,7 +337,8 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		$type=$this->check($type);
 		$sql = "SELECT * FROM `$type` WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);
-		return ($rows && is_array($rows) && count($rows)>0) ? $rows : NULL;
+		return ($rows) ? $rows : NULL;
+		
     }
 
 	/**
@@ -399,4 +380,44 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
                 ADD UNIQUE INDEX `$name` (".implode(",",$columns).")";
         $this->adapter->exec($sql);
     }
+
+	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
+		$select = $this->noKW($this->adapter->escape($select));
+		$table = $this->noKW($this->adapter->escape($table));
+		$column = $this->noKW($this->adapter->escape($column));
+		$value = $this->adapter->escape($value);
+		$sql = "SELECT $select FROM $table WHERE $column = ? ";
+		$values = array($value);
+		if ($withUnion) {
+			$sql .= " UNION SELECT $column FROM $table WHERE $select = ? ";
+			$values[] = $value;
+		}
+		return $this->adapter->getCol($sql,$values);
+	}
+	
+	
+	public function deleteByCrit( $table, $crits ) {
+		$table = $this->noKW($this->adapter->escape($table));
+		$values = array();
+		foreach($crits as $key=>$val) {
+			$key = $this->noKW($this->adapter->escape($key));
+			$values[] = $val;
+			$conditions[] = $key ."= ? ";
+		}
+		$sql = "DELETE FROM $table WHERE ".implode(" AND ", $conditions);
+		return $this->adapter->exec($sql, $values);
+	}
+
+
+
+
+
+	/**
+	 * Puts keyword escaping symbols around string.
+	 * @param string $str
+	 * @return string $keywordSafeString
+	 */
+	public function noKW($str) {
+		return "`".$str."`";
+	}
 }

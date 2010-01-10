@@ -104,8 +104,26 @@ interface RedBean_QueryWriter {
 	public function getIDField( $table );
 
 	/**
-	 * Checks a table.
-	 * @param string $table
+	 * Selects a set of columns using criteria.
+	 * @param string $select - the column to be selected
+	 * @param string $table - the name of the table
+	 * @param string $column - name of the column that needs to be compared
+	 * @param string $value - value to compare against
+	 * @param boolean $withUnion - whether you want a union with inverted column
 	 */
-	public function check( $table );
+	public function selectByCrit( $select, $table, $column, $value, $withUnion=false );
+
+	/**
+	 * Deletes by criteria.
+	 * @param string $table
+	 * @param array $crits
+	 */
+	public function deleteByCrit( $table, $crits );
+
+	/**
+	 * Returns $str surrounded by keyword protecting / esc symbols
+	 * @param string $str
+	 */
+	public function noKW($str);
+
 }

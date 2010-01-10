@@ -7,7 +7,16 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_TreeManager {
+class RedBean_TreeManager extends RedBean_CompatManager {
+
+	/**
+	 * Specify what database systems are supported by this class.
+	 * @var array $databaseSpecs
+	 */
+	protected $supportedSystems = array(
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+	);
+
 
 	/**
 	 *
@@ -35,6 +44,10 @@ class RedBean_TreeManager {
 	 * @param RedBean_ToolBox $tools
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
+		
+		//Do a compatibility check, using the Compatibility Management System
+		$this->scanToolBox( $tools );
+
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
 		$this->writer = $tools->getWriter();
@@ -59,10 +72,28 @@ class RedBean_TreeManager {
 	 */
 	public function children( RedBean_OODBBean $parent ) {
 		$idfield = $this->writer->getIDField($parent->getMeta("type"));
-		try {$ids = $this->adapter->getCol("SELECT `".$idfield."` FROM
+		try {
+
+		/*
+		$ids = $this->adapter->getCol("SELECT `".$idfield."` FROM
 			`".$parent->getMeta("type")."`
 			WHERE `".$this->property."` = ".intval( $parent->$idfield )."
 		");
+		*/
+			/*
+		$ids = $this->adapter->getCol($this->writer->buildSimpleQuery(
+			"select",array($idfield),$parent->getMeta("type"),
+			array("name"=>$this->property,
+				  "value"=>intval($parent->$idfield),
+				  "operator"=>"=","structure"=>"")
+		));
+
+*/
+		$ids = $this->writer->selectByCrit( $idfield,
+			$parent->getMeta("type"),
+			$this->property,
+			intval( $parent->$idfield ) );
+
 		}
 		catch(RedBean_Exception_SQL $e) {
 			return array();

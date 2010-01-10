@@ -161,6 +161,18 @@ class RedBean_QueryWriter_NullWriter implements RedBean_QueryWriter {
 
 	public $addUniqueIndexArguments = array();
 
+	/**
+	 *
+	 * @var array
+	 */
+	public $selectByCritArguments = array();
+
+	/**
+	 *
+	 * @var array
+	 */
+	public $deleteByCrit = array();
+
 
 	/**
 	 *
@@ -236,6 +248,19 @@ class RedBean_QueryWriter_NullWriter implements RedBean_QueryWriter {
 	 *
 	 * @var mixed
 	 */
+	public $returnDeleteByCrit = NULL;
+
+
+	/**
+	 *
+	 * @var mixed
+	 */
+	public$returnSelectByCrit = NULL;
+
+	/**
+	 *
+	 * @var mixed
+	 */
 	public $returnAddUniqueIndex = NULL;
 
 	public function getTables(){ return $this->returnTables; }
@@ -279,8 +304,21 @@ class RedBean_QueryWriter_NullWriter implements RedBean_QueryWriter {
 		$this->addUniqueIndexArguments=array($table,$columns);
 		return $this->returnAddUniqueIndex;
 	}
+
+	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ){
+		$this->selectByCritArguments=array($select, $table, $column, $value, $withUnion);
+		return $this->returnSelectByCrit;
+	}
+
+	public function deleteByCrit( $table, $crits ){
+		$this->deleteByCrit=array($table, $crits );
+		return $this->returnDeleteByCrit;
+	}
+
+
 	public function getIDField( $type ) { return "id"; }
 
+	public function noKW($str) { return $str; }
 
 	/**
 	 * Resets the mock object. All public

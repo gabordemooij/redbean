@@ -120,7 +120,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
-			$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+				$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
+			}
+			else {
+				$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
+			}
 			$x->setSQLState( $e->getCode() );
 			throw $x;
 		}
@@ -230,7 +235,13 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			catch(PDOException $e) {
 				//Unfortunately the code field is supposed to be int by default (php)
 				//So we need a property to convey the SQL State code.
-				$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
+				if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+					$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
+				}
+				else {
+					$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
+				}
+				
 				$x->setSQLState( $e->getCode() );
 				throw $x;
 				
@@ -305,4 +316,18 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	public function FailTrans() {
 		$this->pdo->rollback();
 	}
+
+	/**
+	 * Returns the name of the database type/brand: i.e. mysql, db2 etc.
+	 * @return string $typeName
+	 */
+	public function getDatabaseType() {
+		return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+	}
+
+
+	public function getDatabaseVersion() {
+		return $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION);
+	}
+
 }
