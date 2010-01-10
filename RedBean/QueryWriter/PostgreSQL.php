@@ -10,18 +10,84 @@
  */
 class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 
+
+
+	/**
+	 * DATA TYPE
+	 * Boolean Data type
+	 * @var integer
+	 */
+	const C_DATATYPE_BOOL = 0;
+
+	/**
+	 * DATA TYPE
+	 * Unsigned 8BIT Integer
+	 * @var integer
+	 */
+	const C_DATATYPE_UINT8 = 1;
+
+	/**
+	 * DATA TYPE
+	 * Unsigned 32BIT Integer
+	 * @var integer
+	 */
+	const C_DATATYPE_UINT32 = 2;
+
+	/**
+	 * DATA TYPE
+	 * Double precision floating point number and
+	 * negative numbers.
+	 * @var integer
+	 */
+	const C_DATATYPE_DOUBLE = 3;
+
+	/**
+	 * DATA TYPE
+	 * Standard Text column (like varchar255)
+	 * At least 8BIT character support.
+	 * @var integer
+	 */
+	const C_DATATYPE_TEXT8 = 4;
+
+	/**
+	 * DATA TYPE
+	 * Long text column (16BIT)
+	 * @var integer
+	 */
+	const C_DATATYPE_TEXT16 = 5;
+
+	/**
+	 * DATA TYPE
+	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
+	 * This is the biggest column that RedBean supports. If possible you may write
+	 * an implementation that stores even bigger values.
+	 * @var integer
+	 */
+	const C_DATATYPE_TEXT32 = 6;
+
+	/**
+	 * DATA TYPE
+	 * Specified. This means the developer or DBA
+	 * has altered the column to a different type not
+	 * recognized by RedBean. This high number makes sure
+	 * it will not be converted back to another type by accident.
+	 * @var integer
+	 */
+	const C_DATATYPE_SPECIFIED = 99;
+
+
 	/**
 	 * @var array
 	 * Supported Column Types
 	 */
     public $typeno_sqltype = array(
-        RedBean_QueryWriter::C_DATATYPE_BOOL=>" boolean ",
-		RedBean_QueryWriter::C_DATATYPE_UINT8=>" smallint ",
-        RedBean_QueryWriter::C_DATATYPE_UINT32=>" integer ",
-		RedBean_QueryWriter::C_DATATYPE_DOUBLE=>" double precision ",
-        RedBean_QueryWriter::C_DATATYPE_TEXT8=>" text ",
-        RedBean_QueryWriter::C_DATATYPE_TEXT16=>" text ",
-        RedBean_QueryWriter::C_DATATYPE_TEXT32=>" text "
+        self::C_DATATYPE_BOOL=>" boolean ",
+		self::C_DATATYPE_UINT8=>" smallint ",
+        self::C_DATATYPE_UINT32=>" integer ",
+		self::C_DATATYPE_DOUBLE=>" double precision ",
+        self::C_DATATYPE_TEXT8=>" text ",
+        self::C_DATATYPE_TEXT16=>" text ",
+        self::C_DATATYPE_TEXT32=>" text "
     );
 
 	/**
@@ -31,13 +97,13 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * constants (magic numbers)
 	 */
     public $sqltype_typeno = array(
-	"boolean"=>RedBean_QueryWriter::C_DATATYPE_BOOL,
-    "smallint"=>RedBean_QueryWriter::C_DATATYPE_UINT8,
-    "integer"=>RedBean_QueryWriter::C_DATATYPE_UINT32,
-    "double precision" => RedBean_QueryWriter::C_DATATYPE_DOUBLE,
-    "text"=>RedBean_QueryWriter::C_DATATYPE_TEXT8,
-    "text"=>RedBean_QueryWriter::C_DATATYPE_TEXT16,
-    "text"=>RedBean_QueryWriter::C_DATATYPE_TEXT32
+	"boolean"=>self::C_DATATYPE_BOOL,
+    "smallint"=>self::C_DATATYPE_UINT8,
+    "integer"=>self::C_DATATYPE_UINT32,
+    "double precision" => self::C_DATATYPE_DOUBLE,
+    "text"=>self::C_DATATYPE_TEXT8,
+    "text"=>self::C_DATATYPE_TEXT16,
+    "text"=>self::C_DATATYPE_TEXT32
     );
 
     /**
@@ -71,35 +137,11 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
      * The Query Writer Constructor also sets up the database
      * @param RedBean_DBAdapter $adapter
      */
-    public function __construct( RedBean_DBAdapter $adapter ) {
+    public function __construct( RedBean_Adapter_DBAdapter $adapter ) {
         $this->adapter = $adapter;
-        $this->adapter->exec("DROP TABLE IF EXISTS dtyp");
-		$this->adapter->exec("
-               CREATE TABLE dtyp (
-				  id serial,
-				  booleanset boolean,
-				  tinyintus smallint,
-				  intus integer,
-				  doubles double precision,
-				  varchar255 text,
-				  text text,
-				  PRIMARY KEY  (id)
-				) 
-		");
+       
 
-
-		$tables = $this->getTables();
-		if (!in_array("__log", $tables)) {
-			$this->adapter->exec("
-					CREATE TABLE __log (
-					id serial,
-					tbl text,
-					action smallint,
-					itemid integer,
-					PRIMARY KEY (id)
-					)
-			");
-		}
+		
 		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
         $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
     
@@ -177,39 +219,27 @@ where table_schema = 'public'" );
 	 * @return integer $type
 	 */
 	public function scanType( $value ) { 
-        $this->adapter->exec( "truncate table dtyp" );
-        $v = "'".$this->adapter->escape($value)."'";
-		$nulls = array();// $this->adapter->getDatabase()->setDebugMode(1);
-		for($j=0; $j<6; $j++) {
-			if ($j) $nulls = array_fill(0,$j,"NULL");
-			$values = array_fill(0,6-$j,$v);
-			$valueString = implode(",",array_merge($nulls,$values));
-			$checktypeSQL = "insert into dtyp VALUES(DEFAULT,$valueString) RETURNING id";
-			try{
-				$id = $this->adapter->getCell( $checktypeSQL );
-				break;
-			}catch(RedBean_Exception_SQL $e){ //echo "<br>". $e->getMessage();
-				if (!$e->getSQLState()=="22P02") {
-					throw $e;
-				}
-				
-			}
+      if (is_null($value)) {
+			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
-		$types = $this->dtypes;
-		array_pop($types);
-        $readtypeSQL = "SELECT ".implode(",",$types)." FROM dtyp WHERE id = $id ";
-
-		$row = $this->adapter->getRow($readtypeSQL);
-        if (!$row) exit;
-
-		$tp = 0;
-        foreach($row as $t=>$tv) {
-            if (strval($tv) === strval($value)) {
-                return $tp;
-            }
-            $tp++;
-        }
-        return $tp;
+		$orig = $value;
+		$value = strval($value);
+		if ($value=="1" || $value=="" || $value=="0") {
+			  return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+		}
+	    if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
+		      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
+	    }
+	    if (is_numeric($value) && (floor($value)==$value) && $value >= 0  && $value <= 4294967295 ) {
+	      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
+		}
+	    if (is_numeric($value)) {
+		  return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
+		}
+	    if (strlen($value) <= 255) {
+	      return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
+		}
+	    return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
     }
 
 	/**
@@ -393,5 +423,47 @@ where table_schema = 'public'" );
 	public function getIDField( $type ) {
 		return  "id";
 	}
+
+
+	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
+		$select = $this->noKW($this->adapter->escape($select));
+		$table = $this->noKW($this->adapter->escape($table));
+		$column = $this->noKW($this->adapter->escape($column));
+		$value = $this->adapter->escape($value);
+		$sql = "SELECT $select FROM $table WHERE $column = ? ";
+		$values = array($value);
+		if ($withUnion) {
+			$sql .= " UNION SELECT $column FROM $table WHERE $select = ? ";
+			$values[] = $value;
+		}
+		return $this->adapter->getCol($sql,$values);
+	}
+
+
+	public function deleteByCrit( $table, $crits ) {
+		$table = $this->noKW($this->adapter->escape($table));
+		$values = array();
+		foreach($crits as $key=>$val) {
+			$key = $this->noKW($this->adapter->escape($key));
+			$values[] = $val;
+			$conditions[] = $key ."= ? ";
+		}
+		$sql = "DELETE FROM $table WHERE ".implode(" AND ", $conditions);
+		return $this->adapter->exec($sql, $values);
+	}
+
+
+
+
+
+	/**
+	 * Puts keyword escaping symbols around string.
+	 * @param string $str
+	 * @return string $keywordSafeString
+	 */
+	public function noKW($str) {
+		return "`".$str."`";
+	}
+
 
 }

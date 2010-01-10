@@ -76,113 +76,11 @@ class ObserverMock implements RedBean_Observer {
         $this->info = $info;
     }
 }
-
-class NullWriter implements RedBean_QueryWriter {
-
-	//Arguments
-	public $createTableArgument = NULL;
-	public $getColumnsArgument = NULL;
-	public $scanTypeArgument = NULL;
-	public $addColumnArguments = array();
-	public $codeArgument = NULL;
-	public $widenColumnArguments = array();
-	public $updateRecordArguments = array();
-	public $insertRecordArguments = array();
-	public $selectRecordArguments = array();
-	public $deleteRecordArguments = array();
-	public $checkChangesArguments = array();
-	public $addUniqueIndexArguments = array();
-
-	//Return values
-	public $returnTables = array();
-	public $returnGetColumns = array();
-	public $returnScanType = 1;
-	public $returnAddColumn = NULL;
-	public $returnCode = NULL;
-	public $returnWidenColumn = NULL;
-	public $returnUpdateRecord = NULL;
-	public $returnInsertRecord = NULL;
-	public $returnSelectRecord = NULL;
-	public $returnDeleteRecord = NULL;
-	public $returnCheckChanges = NULL;
-	public $returnAddUniqueIndex = NULL;
-
-	//Dummy implementations
-	public function getTables(){ return $this->returnTables; }
-	public function createTable( $table ){ $this->createTableArgument = $table; }
-    public function getColumns( $table ){ $this->getColumnsArgument = $table; return $this->returnGetColumns; }
-	public function scanType( $value ){ $this->scanTypeArgument = $value; return $this->returnScanType; }
-    public function addColumn( $table, $column, $type ){
-		$this->addColumnArguments = array( $table, $column, $type );
-		return $this->returnAddColumn;
-	}
-    public function code( $typedescription ){ $this->codeArgument = $typedescription;
-		return $this->returnCode;
-	}
-    public function widenColumn( $table, $column, $type ){
-		$this->widenColumnArguments = array($table, $column, $type);
-		return $this->returnWidenColumn;
-	}
-    public function updateRecord( $table, $updatevalues, $id){
-		$this->updateRecordArguments = array($table, $updatevalues, $id);
-		return $this->returnUpdateRecord;
-	}
-    public function insertRecord( $table, $insertcolumns, $insertvalues ){
-		$this->insertRecordArguments = array( $table, $insertcolumns, $insertvalues );
-		return $this->returnInsertRecord;
-	}
-    public function selectRecord($type, $ids){
-		$this->selectRecordArguments = array($type, $ids);
-		return $this->returnSelectRecord;
-	}
-	public function deleteRecord( $table, $value){
-		$column="id";
-		$this->deleteRecordArguments = array($table, $column, $value);
-		return $this->returnDeleteRecord;
-	}
-    public function checkChanges($type, $id, $logid){
-		$this->checkChangesArguments = array($type, $id, $logid);
-		return $this->returnCheckChanges;
-	}
-	public function addUniqueIndex( $table,$columns ){
-		$this->addUniqueIndexArguments=array($table,$columns);
-		return $this->returnAddUniqueIndex;
-	}
-	public function reset() {
-		$this->createTableArgument = NULL;
-		$this->getColumnsArgument = NULL;
-		$this->scanTypeArgument = NULL;
-		$this->addColumnArguments = array();
-		$this->codeArgument = NULL;
-		$this->widenColumnArguments = array();
-		$this->updateRecordArguments = array();
-		$this->insertRecordArguments = array();
-		$this->selectRecordArguments = array();
-		$this->deleteRecordArguments = array();
-		$this->checkChangesArguments = array();
-		$this->addUniqueIndexArguments = array();
-
-		$this->returnTables = array();
-		$this->returnGetColumns = array();
-		$this->returnScanType = 1;
-		$this->returnAddColumn = NULL;
-		$this->returnCode = NULL;
-		$this->returnWidenColumn = NULL;
-		$this->returnUpdateRecord = NULL;
-		$this->returnInsertRecord = NULL;
-		$this->returnSelectRecord = NULL;
-		$this->returnDeleteRecord = NULL;
-		$this->returnCheckChanges = NULL;
-		$this->returnAddUniqueIndex = NULL;
-	}
-
-	public function getIDField($t) { return "id"; }
-	public function check($t){}
-}
+require('RedBean/QueryWriter/NullWriter.php');
 
 try{
 
-$nullWriter = new NullWriter();
+$nullWriter = new RedBean_QueryWriter_NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
 
 //Section A: Config Testing

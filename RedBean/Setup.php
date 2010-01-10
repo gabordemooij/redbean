@@ -37,10 +37,12 @@ class RedBean_Setup {
 		private static function checkDSN($dsn) {
 			$dsn = trim($dsn);
 			$dsn = strtolower($dsn);
-			if (strpos($dsn, "mysql:")!==0) {
+			if (strpos($dsn, "mysql:")!==0 &&
+				strpos($dsn, "pgsql:")!==0
+			) {
 				throw new RedBean_Exception_NotImplemented("
 					Support for this DSN has not been implemented yet. \n
-					Begin your DSN with: 'mysql:'
+					Begin your DSN with: 'mysql:' or 'pgsql:'
 				");
 			}
 			else {
@@ -72,7 +74,7 @@ class RedBean_Setup {
 			self::checkDSN($dsn);
 
             $pdo = new Redbean_Driver_PDO( $dsn,$username,$password );
-            $adapter = new RedBean_DBAdapter( $pdo );
+            $adapter = new RedBean_Adapter_DBAdapter( $pdo );
 
             if (strpos($dsn,"pgsql")===0) {
                 $writer = new RedBean_QueryWriter_PostgreSQL( $adapter, $frozen );
