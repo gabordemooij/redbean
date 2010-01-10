@@ -16,7 +16,8 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @var array $databaseSpecs
 	 */
 	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+		RedBean_CompatManager::C_SYSTEM_SQLITE=>"3"
 	);
 
 	/**
@@ -123,7 +124,13 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			return ( $sqlFetchKeys );
 
 		}catch(RedBean_Exception_SQL $e){
-			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+			
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+
 			return array();
 		}
 	}
@@ -149,29 +156,17 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$property2 = $bean2->getMeta("type")."_id";
 		$value1 = (int) $bean1->$idfield1;
 		$value2 = (int) $bean2->$idfield2;
-<<<<<<< HEAD
-		$values = array();
-		$sqlDeleteAssoc = "DELETE FROM `$table`
-		WHERE 
-		( $property1 = ? AND $property2 = ? )	";
-		$values[] = $value1;
-		$values[] = $value2;
-		if ($cross) {
-			$sqlDeleteAssoc .= " OR ( $property2 = ? AND $property1 = ? ) ";
-			$values[] = $value1;
-			$values[] = $value2;
-		}
-		try{
-		$this->adapter->exec( $sqlDeleteAssoc, $values );
-=======
 		try{
 			$this->writer->deleteByCrit($table,array($property1=>$value1,$property2=>$value2));
 			if ($cross) {
 				$this->writer->deleteByCrit($table,array($property2=>$value1,$property1=>$value2));
 			}
->>>>>>> master
 		}catch(RedBean_Exception_SQL $e){
-			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
 		}
 	}
 	/**
@@ -189,26 +184,17 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		}
 		else $cross = 0;
 		$property = $bean->getMeta("type")."_id";
-<<<<<<< HEAD
-		$sql = "DELETE FROM `$table`
-		WHERE ".$this->adapter->escape($property)." = ? ";
-		$ids = array();
-		$ids[] = $this->adapter->escape($bean->$idfield);
-		if ($cross){
-			$sql .= " OR  ".$this->adapter->escape($property2)." = ? ";
-			$ids[] = $this->adapter->escape($bean->$idfield);
-		}
-		try{
-		$this->adapter->exec($sql, $ids);
-=======
 		try{
 			$this->writer->deleteByCrit($table,array($property=>$bean->$idfield));
 			if ($cross) {
 				$this->writer->deleteByCrit($table,array($property2=>$bean->$idfield));
 			}
->>>>>>> master
 		}catch(RedBean_Exception_SQL $e){
-			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
 		}
 	}
 	/**

@@ -320,6 +320,8 @@ class RedBean_QueryWriter_NullWriter implements RedBean_QueryWriter {
 
 	public function noKW($str) { return $str; }
 
+	public function sqlStateIn($state,$list) { return true; }
+
 	/**
 	 * Resets the mock object. All public
 	 * properties will be assigned values like NULL or an empty

@@ -420,4 +420,15 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	public function noKW($str) {
 		return "`".$str."`";
 	}
+
+
+
+	public function sqlStateIn($state, $list) {
+
+		$sqlState = "0";
+		if ($state == "42S02") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
+		if ($state == "42S22") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
+		return in_array($sqlState, $list);
+	}
+	
 }

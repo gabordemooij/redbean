@@ -264,7 +264,11 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		try{
         $this->writer->deleteRecord( $bean->getMeta("type"), $bean->$idfield );
 		}catch(RedBean_Exception_SQL $e){
-			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
 		}
     }
 	
@@ -285,7 +289,13 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		try{
 		$rows = $this->writer->selectRecord($type,$ids);
 		}catch(RedBean_Exception_SQL $e){
-			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+
 			$rows = false;
 		}
 		$this->stash = array();

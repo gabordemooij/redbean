@@ -14,7 +14,8 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 	 * @var array $databaseSpecs
 	 */
 	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+		RedBean_CompatManager::C_SYSTEM_SQLITE=>"3"
 	);
 
 

@@ -43,7 +43,10 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 		//First get hold of the toolbox
 		$tools = RedBean_Setup::getToolBox();
 
-		RedBean_CompatManager::scanDirect($tools, array(RedBean_CompatManager::C_SYSTEM_MYSQL => "5"));
+		RedBean_CompatManager::scanDirect($tools, array(
+				RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+				RedBean_CompatManager::C_SYSTEM_SQLITE => "3"
+			));
 
 		//Now get the two tools we need; RedBean and the Adapter
 		$redbean = $tools->getRedBean();

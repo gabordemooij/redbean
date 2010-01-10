@@ -8,7 +8,10 @@
  * @license			BSD
  */
 interface RedBean_QueryWriter {
-	
+
+	const C_SQLSTATE_NO_SUCH_TABLE = 1;
+	const C_SQLSTATE_NO_SUCH_COLUMN = 2;
+
 	/**
 	 * Returns the tables that are in the database.
 	 * @return array $arrayOfTables
@@ -125,5 +128,16 @@ interface RedBean_QueryWriter {
 	 * @param string $str
 	 */
 	public function noKW($str);
+
+
+	/**
+	 * Checks whether the SQL state is in the list of specified states
+	 * and returns true if it does appear in this list or false if it
+	 * does not.
+	 * @param string $state
+	 * @param array $list
+	 * @return boolean $isInList
+	 */
+	public function sqlStateIn( $state, $list );
 
 }
