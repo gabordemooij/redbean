@@ -93,6 +93,33 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		return $this->db->GetCol( $sql,$aValues );
 	}
 
+	
+	public function getAssoc( $sql, $aValues = array() ) {
+		$this->sql = $sql;
+		$this->signal("sql_exec", $this);
+		$rows = $this->db->GetAll( $sql, $aValues );
+		$assoc = array();
+		if ($rows) {
+			foreach($rows as $row) {
+
+				if (count($row)>0) {
+					$key = array_shift($row);
+				}
+
+				if (count($row)>0) {
+					$value = array_shift($row);
+				}
+				else {
+					$value = $key;
+				}
+
+				$assoc[ $key ] = $value;
+			}
+		}
+		return $assoc;
+	}
+
+
 	/**
 	 * Retrieves a single cell
 	 * @param $sql

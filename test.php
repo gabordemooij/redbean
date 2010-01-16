@@ -377,6 +377,11 @@ asrt( (int) $adapter->getCell("SELECT ?",array("987")) ,987);
 asrt( (int) $adapter->getCell("SELECT ?+?",array("987","2")) ,989);
 asrt( (int) $adapter->getCell("SELECT :numberOne+:numberTwo",array(
 			":numberOne"=>42,":numberTwo"=>50)) ,92);
+$pair = $adapter->getAssoc("SELECT 'thekey','thevalue' ");
+asrt(is_array($pair),true);
+asrt(count($pair),1);
+asrt(isset($pair["thekey"]),true);
+asrt($pair["thekey"],"thevalue");
 
 
 //Section C: Integration Tests / Regression Tests
