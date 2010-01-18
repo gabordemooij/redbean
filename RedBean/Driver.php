@@ -10,15 +10,15 @@
  */
 interface RedBean_Driver {
 
-	/**
-	 * Implements Singleton
-	 * Requests an instance of the database 
-	 * @param $host
-	 * @param $user
-	 * @param $pass
-	 * @param $dbname
-	 * @return RedBean_Driver $driver
-	 */
+/**
+ * Implements Singleton
+ * Requests an instance of the database
+ * @param $host
+ * @param $user
+ * @param $pass
+ * @param $dbname
+ * @return RedBean_Driver $driver
+ */
 	public static function getInstance( $host, $user, $pass, $dbname );
 
 	/**
@@ -121,5 +121,5 @@ interface RedBean_Driver {
 	 */
 	public function FailTrans();
 
-	
+
 }

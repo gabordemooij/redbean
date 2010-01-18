@@ -11,12 +11,12 @@
  */
 class RedBean_AssociationManager extends RedBean_CompatManager {
 
-	/**
-	 * Specify what database systems are supported by this class.
-	 * @var array $databaseSpecs
-	 */
+/**
+ * Specify what database systems are supported by this class.
+ * @var array $databaseSpecs
+ */
 	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+	RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
 	);
 
 	/**
@@ -72,13 +72,13 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$this->oodb->store($bean2);
 		$bean->$property1 = $bean1->$idfield1;
 		$bean->$property2 = $bean2->$idfield2;
-		try{
+		try {
 			return $this->oodb->store( $bean );
 		}
-		catch(RedBean_Exception_SQL $e) {
-			//If this is a SQLSTATE[23000]: Integrity constraint violation
-			//Then just ignore the insert
-			if ((int)$e->getSQLState()!==23000) {
+		catch(RedBean_Exception_SQL $e)  {
+		//If this is a SQLSTATE[23000]: Integrity constraint violation
+		//Then just ignore the insert
+			if ((int)$e->getSQLState()!==23000)  {
 				throw $e;
 			}
 		}
@@ -101,7 +101,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		if (!$getLinks) $targetproperty = $type."_id"; else $targetproperty="id";
 
 		$property = $bean->getMeta("type")."_id";
-		try{
+		try {
 			if ($cross) {
 				$sqlFetchKeys = $this->writer->selectByCrit(
 					$targetproperty,
@@ -120,7 +120,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 				);
 			}
 			return ( $sqlFetchKeys );
-		}catch(RedBean_Exception_SQL $e){
+		}catch(RedBean_Exception_SQL $e ){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 			return array();
 		}
@@ -147,12 +147,12 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$property2 = $bean2->getMeta("type")."_id";
 		$value1 = (int) $bean1->$idfield1;
 		$value2 = (int) $bean2->$idfield2;
-		try{
+		try {
 			$this->writer->deleteByCrit($table,array($property1=>$value1,$property2=>$value2));
 			if ($cross) {
 				$this->writer->deleteByCrit($table,array($property2=>$value1,$property1=>$value2));
 			}
-		}catch(RedBean_Exception_SQL $e){
+		}catch(RedBean_Exception_SQL $e ){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 		}
 	}
@@ -165,18 +165,18 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$this->oodb->store($bean);
 		$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
-		if ($type==$bean->getMeta("type")) { 
+		if ($type==$bean->getMeta("type")) {
 			$property2 = $type."2_id";
 			$cross = 1;
 		}
 		else $cross = 0;
 		$property = $bean->getMeta("type")."_id";
-		try{
+		try {
 			$this->writer->deleteByCrit($table,array($property=>$bean->$idfield));
 			if ($cross) {
 				$this->writer->deleteByCrit($table,array($property2=>$bean->$idfield));
 			}
-		}catch(RedBean_Exception_SQL $e){
+		}catch(RedBean_Exception_SQL $e ){
 			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
 		}
 	}
@@ -192,7 +192,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$type = $bean1->getMeta("type");
 		$this->clearRelations($bean2, $type);
 		$this->associate($bean1, $bean2);
-		if (count( $this->related($bean2, $type) )===1){
+		if (count( $this->related($bean2, $type) )===1) {
 			return $this;
 		}
 		else {

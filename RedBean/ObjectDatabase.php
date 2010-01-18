@@ -12,7 +12,7 @@ interface RedBean_ObjectDatabase {
 
 	/**
 	 * This interface describes how ANY Object Database should
-	 * behave.For detailed descriptions of RedBean specific implementation 
+	 * behave.For detailed descriptions of RedBean specific implementation
 	 * see: RedBean_OODB.
 	 * An Object Database should be able to load a bean using a $type and $id.
 	 * The $type argument indicated what kind of bean you are looking for.
@@ -56,7 +56,7 @@ interface RedBean_ObjectDatabase {
 	 * This interface describes how ANY Object Database should
 	 * behave.For detailed descriptions of RedBean specific implementation
 	 * see: RedBean_OODB.
-	*  @param string $type
+	 *  @param string $type
 	 * @return RedBean_OODBBean $bean
 	 */
 	public function dispense( $type );

@@ -11,10 +11,10 @@
 abstract class RedBean_DomainObject {
 
 
-	/**
-	 *
-	 * @var RedBean_ToolBox
-	 */
+/**
+ *
+ * @var RedBean_ToolBox
+ */
 	protected $tools;
 
 	/**
@@ -49,21 +49,21 @@ abstract class RedBean_DomainObject {
 	 */
 	public function __construct( $typeName = false ) {
 
-		/**
-		 * If no typeName has been specified,
-		 * figure out the type of this model yourself.
-		 * In this case the following rule applies:
-		 * - the name of the model is the LAST part of the
-		 * namespace.
-		 * - Within that string, the name of the model is the LAST
-		 * part of the poorman's name space.
-		 *
-		 * So the model name for class: /me/him/her is: her
-		 * So the model name for class: /me/him/her_lover is: lover
-		 */
+	/**
+	 * If no typeName has been specified,
+	 * figure out the type of this model yourself.
+	 * In this case the following rule applies:
+	 * - the name of the model is the LAST part of the
+	 * namespace.
+	 * - Within that string, the name of the model is the LAST
+	 * part of the poorman's name space.
+	 *
+	 * So the model name for class: /me/him/her is: her
+	 * So the model name for class: /me/him/her_lover is: lover
+	 */
 		if (!$typeName) {
 
-			//Fetch the bean type using the class
+		//Fetch the bean type using the class
 			$beanTypeName = get_class( $this );
 
 			//Get last part of namespace
@@ -84,7 +84,7 @@ abstract class RedBean_DomainObject {
 
 		if ($beanTypeName && strlen($beanTypeName)>0) {
 
-			//Fetch us a toolbox.
+		//Fetch us a toolbox.
 			$this->tools = RedBean_Setup::getToolBox();
 			$this->redbean = $this->tools->getRedBean();
 
@@ -117,7 +117,7 @@ abstract class RedBean_DomainObject {
 		$this->associationManager->unassociate($this->bean, $other->bean);
 	}
 
-	
+
 	/**
 	 *
 	 * @param RedBean_DomainObject $other
@@ -141,56 +141,62 @@ abstract class RedBean_DomainObject {
 		$this->treeManager->attach($this->bean, $other->bean);
 	}
 
-	
+
 	/**
 	 * PUBLIC FUNCTIONS
 	 */
-	 
-	 
-	 /**
-	  * Loads the Bean internally
-	  * @param integer $id 
-	  */
-	 public function find( $id ) {
-		 $this->bean = $this->redbean->load( $this->bean->getMeta("type"), (int) $id );
-	 }
 
 
-	 /**
-	  * Returns a collection of Domain Objects.
-	  * @param <type> $type
-	  * @param <type> $query
-	  * @return <type>
-	  */
-	 public static function getDomainObjects( $type, $query="1", $values=array() ) {
+	/**
+	 * Loads the Bean internally
+	 * @param integer $id
+	 */
+	public function find( $id ) {
+		$this->bean = $this->redbean->load( $this->bean->getMeta("type"), (int) $id );
+	}
 
-			//Fetch us a toolbox.
-			$tools = RedBean_Setup::getToolBox();
-			$redbean = $tools->getRedBean();
 
+	/**
+	 * Returns a collection of Domain Objects.
+	 * @param <type> $type
+	 * @param <type> $query
+	 * @return <type>
+	 */
+	public static function getDomainObjects( $type, $query="1", $values=array() ) {
+
+	//Fetch us a toolbox.
+		$tools = RedBean_Setup::getToolBox();
+		$redbean = $tools->getRedBean();
+
+		$domainObject = new $type;
+		$typeName = $domainObject->bean->getMeta("type");
+		$collection = array();
+		$finder = new \RedBean_Plugin_Finder();
+		$beans = $finder->where($typeName, $query, $values);
+		foreach($beans as $bean) {
 			$domainObject = new $type;
-			$typeName = $domainObject->bean->getMeta("type");
-			$collection = array();
-			$finder = new \RedBean_Plugin_Finder();
-			$beans = $finder->where($typeName, $query, $values);
-			foreach($beans as $bean) {
-				$domainObject = new $type;
-				$domainObject->bean = $bean;
-				$collection[] = $domainObject;
-			}
+			$domainObject->bean = $bean;
+			$collection[] = $domainObject;
+		}
 
-			return $collection;
+		return $collection;
 
 
-	 }
+	}
 
+	/**
+	 * Saves the current domain object.
+	 * The function saves the inner bean to the database.
+	 */
+	public function save() {
+		$this->redbean->store( $this->bean );
+	}
 
-	 public function save() {
-		 $this->redbean->store( $this->bean );
-	 }
-
-	 public function delete() {
-		 $this->redbean->trash( $this->bean );
-	 }
+	/**
+	 * Deletes the inner bean from the database.
+	 */
+	public function delete() {
+		$this->redbean->trash( $this->bean );
+	}
 
 }

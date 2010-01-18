@@ -45,7 +45,6 @@ $assoc = new RedBean_AssociationManager( $toolbox );
 //Creating a Tree Manager for you
 $tree = new RedBean_TreeManager( $toolbox );
 
-
 function assoc( $bean1, $bean2 ) {
 	global $assoc;
 	$assoc->associate($bean1, $bean2);
@@ -54,6 +53,20 @@ function assoc( $bean1, $bean2 ) {
 	RedBean_Plugin_Constraint::addConstraint($bean1, $bean2);
 }
 
+function related( $bean, $type ) {
+	global $assoc;
+	return $assoc->related($bean, $type);
+}
+
+function clearassoc($bean, $type) {
+	global $assoc;
+	$assoc->clearRelations($bean, $type);
+}
+
+function unassoc($bean1, $bean2) {
+	global $assoc;
+	$assoc->unassociate($bean1, $bean2);
+}
 
 /*
 

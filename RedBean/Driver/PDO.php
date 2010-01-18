@@ -303,7 +303,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 	}
 
-
+	/**
+	 * Returns the version number of the database.
+	 * @return mixed $version 
+	 */
 	public function getDatabaseVersion() {
 		return $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
