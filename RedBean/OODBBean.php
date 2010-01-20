@@ -143,6 +143,8 @@ class RedBean_OODBBean {
 		return $this;
 	}
 
+	//@todo copy/clone a bean
+
 
 }
 
