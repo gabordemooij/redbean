@@ -10,15 +10,6 @@
 class RedBean_TreeManager extends RedBean_CompatManager {
 
 	/**
-	 * Specify what database systems are supported by this class.
-	 * @var array $databaseSpecs
-	 */
-	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
-	);
-
-
-	/**
 	 *
 	 * @var string
 	 */
@@ -40,21 +31,19 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 	private $writer;
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 * @param RedBean_ToolBox $tools
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
-		
-		//Do a compatibility check, using the Compatibility Management System
-		$this->scanToolBox( $tools );
 
+	
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
 		$this->writer = $tools->getWriter();
 	}
 
 	/**
-	 *
+	 * Attaches the specified child node to the specified parent node.
 	 * @param RedBean_OODBBean $parent
 	 * @param RedBean_OODBBean $child
 	 */
@@ -66,33 +55,18 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 	}
 
 	/**
-	 *
+	 * Returns all the nodes that have been attached to the specified
+	 * parent node.
 	 * @param RedBean_OODBBean $parent
 	 * @return array $childObjects
 	 */
 	public function children( RedBean_OODBBean $parent ) {
 		$idfield = $this->writer->getIDField($parent->getMeta("type"));
 		try {
-
-		/*
-		$ids = $this->adapter->getCol("SELECT `".$idfield."` FROM
-			`".$parent->getMeta("type")."`
-			WHERE `".$this->property."` = ".intval( $parent->$idfield )."
-		");
-		*/
-			/*
-		$ids = $this->adapter->getCol($this->writer->buildSimpleQuery(
-			"select",array($idfield),$parent->getMeta("type"),
-			array("name"=>$this->property,
-				  "value"=>intval($parent->$idfield),
-				  "operator"=>"=","structure"=>"")
-		));
-
-*/
-		$ids = $this->writer->selectByCrit( $idfield,
-			$parent->getMeta("type"),
-			$this->property,
-			intval( $parent->$idfield ) );
+			$ids = $this->writer->selectByCrit( $idfield,
+				$parent->getMeta("type"),
+				$this->property,
+				intval( $parent->$idfield ) );
 
 		}
 		catch(RedBean_Exception_SQL $e) {
@@ -100,5 +74,5 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 		}
 		return $this->oodb->batch($parent->getMeta("type"),$ids	);
 	}
-	
+
 }

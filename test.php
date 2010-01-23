@@ -377,6 +377,11 @@ asrt( (int) $adapter->getCell("SELECT ?",array("987")) ,987);
 asrt( (int) $adapter->getCell("SELECT ?+?",array("987","2")) ,989);
 asrt( (int) $adapter->getCell("SELECT :numberOne+:numberTwo",array(
 			":numberOne"=>42,":numberTwo"=>50)) ,92);
+$pair = $adapter->getAssoc("SELECT 'thekey','thevalue' ");
+asrt(is_array($pair),true);
+asrt(count($pair),1);
+asrt(isset($pair["thekey"]),true);
+asrt($pair["thekey"],"thevalue");
 
 
 //Section C: Integration Tests / Regression Tests
@@ -401,6 +406,14 @@ asrt((int)$page->id,$id);
 testpack("Test RedBean OODB: Can we Update a Record? ");
 $page->name = "new name";
 
+//Null should == NULL after saving
+$page->rating = null;
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" ); 
+asrt( ($page->rating == null), true );
+asrt( !$page->rating, true );
 
 $page->rating = false;
 $newid = $redbean->store( $page ); 
@@ -408,6 +421,7 @@ asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 asrt( (bool) $page->rating, false );
+asrt( ($page->rating==false), true );
 asrt( !$page->rating, true );
 
 $page->rating = true;
@@ -416,6 +430,7 @@ asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 asrt( (bool) $page->rating, true );
+asrt( ($page->rating==true), true);
 asrt( ($page->rating==true), true );
 
 $page->rating = "1";
@@ -424,6 +439,13 @@ asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 asrt( $page->rating, "1" );
+
+$page->rating = "0";
+$newid = $redbean->store( $page );
+asrt( $page->rating, "0" );
+$page->rating = 0;
+$newid = $redbean->store( $page );
+asrt( $page->rating, 0 );
 
 $page->rating = "0";
 $newid = $redbean->store( $page );
@@ -461,14 +483,14 @@ $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-asrt( strval( $page->rating ), "2.5" );
+asrt(  ( $page->rating == 2.5 ), true );
 
 $page->rating = -3.3;
 $newid = $redbean->store( $page );
 asrt( $newid, $id );
 $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
-asrt( strval( $page->rating ), "-3.3" );
+asrt( ( $page->rating == -3.3 ), true );
 
 $page->rating = "good";
 $newid = $redbean->store( $page );
@@ -939,8 +961,8 @@ $redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
 $redbean->store($one);
-$cols = $writer->getColumns("one");
-asrt($cols["col"],"set('1')");
+//$cols = $writer->getColumns("one");
+//asrt($cols["col"],"set('1')");
 
 $one->col = str_repeat('a long text',100);
 $redbean->store($one);

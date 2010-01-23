@@ -17,19 +17,19 @@ class RedBean_ToolBox {
 	 *
 	 * @var RedBean_OODB
 	 */
-    private $oodb;
+	private $oodb;
 
 	/**
 	 *
 	 * @var RedBean_QueryWriter
 	 */
-    private $writer;
+	private $writer;
 
 	/**
 	 *
 	 * @var RedBean_Adapter_DBAdapter
 	 */
-    private $adapter;
+	private $adapter;
 
 	/**
 	 * Constructor.
@@ -43,15 +43,15 @@ class RedBean_ToolBox {
 	 * @param RedBean_QueryWriter $writer
 	 * return RedBean_ToolBox $toolbox
 	 */
-    public function __construct( RedBean_OODB $oodb, RedBean_Adapter $adapter, RedBean_QueryWriter $writer ) {
-        $this->oodb = $oodb;
-        $this->adapter = $adapter;
-        $this->writer = $writer;
+	public function __construct( RedBean_OODB $oodb, RedBean_Adapter $adapter, RedBean_QueryWriter $writer ) {
+		$this->oodb = $oodb;
+		$this->adapter = $adapter;
+		$this->writer = $writer;
 		return $this;
-    }
+	}
 
 	/**
-	 * The Toolbox acts as a kind of micro service locator, providing just the 
+	 * The Toolbox acts as a kind of micro service locator, providing just the
 	 * most important objects that make up RedBean. You can pass the toolkit to
 	 * any object that needs one of these objects to function properly.
 	 * Returns the QueryWriter; normally you do not use this object but other
@@ -59,9 +59,9 @@ class RedBean_ToolBox {
 	 * database independent.
 	 * @return RedBean_QueryWriter $writer
 	 */
-    public function getWriter() {
-        return $this->writer;
-    }
+	public function getWriter() {
+		return $this->writer;
+	}
 
 	/**
 	 * The Toolbox acts as a kind of micro service locator, providing just the
@@ -72,19 +72,19 @@ class RedBean_ToolBox {
 	 * beans. Extract this object immediately after invoking a kickstart method.
 	 * @return RedBean_OODB $oodb
 	 */
-    public function getRedBean() {
-        return $this->oodb;
-    }
+	public function getRedBean() {
+		return $this->oodb;
+	}
 
 	/**
-	 * The Toolbox acts as a kind of micro service locator, providing just the 
+	 * The Toolbox acts as a kind of micro service locator, providing just the
 	 * most important objects that make up RedBean. You can pass the toolkit to
 	 * any object that needs one of these objects to function properly.
 	 * Returns the adapter. The Adapter can be used to perform queries
 	 * on the database directly.
 	 * @return RedBean_Adapter_DBAdapter $adapter
 	 */
-    public function getDatabaseAdapter() {
-        return $this->adapter;
-    }
+	public function getDatabaseAdapter() {
+		return $this->adapter;
+	}
 }

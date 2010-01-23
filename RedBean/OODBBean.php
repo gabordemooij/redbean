@@ -99,7 +99,7 @@ class RedBean_OODBBean {
 	public function getMeta( $path, $default = NULL) {
 		$ref = $this->__info;
 		$parts = explode(".", $path);
-		foreach($parts as $part) { 
+		foreach($parts as $part) {
 			if (isset($ref[$part])) {
 				$ref = $ref[$part];
 			}
@@ -122,7 +122,7 @@ class RedBean_OODBBean {
 		$ref = &$this->__info;
 		$parts = explode(".", $path);
 		$lastpart = array_pop( $parts );
-		foreach($parts as $part) { 
+		foreach($parts as $part) {
 			if (!isset($ref[$part])) {
 				$ref[$part] = array();
 			}
@@ -142,6 +142,8 @@ class RedBean_OODBBean {
 		$this->__info = $bean->__info;
 		return $this;
 	}
+
+	//@todo copy/clone a bean
 
 
 }
