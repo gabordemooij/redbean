@@ -84,12 +84,12 @@ abstract class RedBean_DomainObject {
 
 		if ($beanTypeName && strlen($beanTypeName)>0) {
 
-		//Fetch us a toolbox.
+			//Fetch us a toolbox.
 			$this->tools = RedBean_Setup::getToolBox();
 			$this->redbean = $this->tools->getRedBean();
 
 			//Here the bean type is checked properly.
-			$this->bean = $this->redbean->dispense( $beanTypeName );
+			$this->bean = $this->redbean->dispense( strtolower( $beanTypeName ) );
 
 			//Create some handy modules so you dont have to do the wiring yourself.
 			$this->associationManager = new RedBean_AssociationManager($this->tools);
@@ -115,6 +115,23 @@ abstract class RedBean_DomainObject {
 	 */
 	protected function unassociate(RedBean_DomainObject $other) {
 		$this->associationManager->unassociate($this->bean, $other->bean);
+	}
+
+	protected function related( $className, $constructorArg = null ) {
+		$models = array();
+		$model = new $className;
+		$keys = $this->associationManager->related($this->bean, $model->getBeanType());
+		foreach($keys as $key) {
+			$modelItem = new $className($constructorArg);
+			$modelItem->find( (int) $key );
+			$models[$key] = $modelItem;
+		}
+		return $models;
+	}
+
+	
+	protected function getBeanType() {
+		return $this->bean->getMeta("type");
 	}
 
 
@@ -164,7 +181,7 @@ abstract class RedBean_DomainObject {
 	 */
 	public static function getDomainObjects( $type, $query="1", $values=array() ) {
 
-	//Fetch us a toolbox.
+		//Fetch us a toolbox.
 		$tools = RedBean_Setup::getToolBox();
 		$redbean = $tools->getRedBean();
 
@@ -197,6 +214,14 @@ abstract class RedBean_DomainObject {
 	 */
 	public function delete() {
 		$this->redbean->trash( $this->bean );
+	}
+
+	/**
+	 * Returns the ID of the Model.
+	 */
+	public function getID() {
+		$idField = $this->tools->getWriter()->getIDField( $this->bean->getMeta("type") );
+		return $this->bean->$idField;
 	}
 
 }

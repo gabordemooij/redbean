@@ -128,7 +128,6 @@ try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SY
 try{RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));fail();}catch(RedBean_Exception_UnsupportedDatabase $e){pass();}
 
 
-
 testpack("UNIT TEST RedBean OODB: Dispense");
 //Can we dispense a bean?
 $page = $redbean->dispense("page");
@@ -1313,5 +1312,54 @@ $id = $redbean->store($book);
 $book = $redbean->load("book", $id);
 $id = $redbean->store($book);
 pass();
+
+
+require("RedBean/DomainObject.php");
+testpack("Test Domain Object");
+
+class Book extends RedBean_DomainObject {
+
+	public function getTitle() {
+		return $this->bean->title;
+	}
+	
+	public function setTitle( $title ) {
+		$this->bean->title = $title;
+	}
+
+	public function addAuthor( Author $author ) {
+		$this->associate($author);
+	}
+
+	public function getAuthors() {
+		return $this->related( new Author );
+	}
+}
+
+class Author extends RedBean_DomainObject {
+	public function setName( $name ) {
+		$this->bean->name = $name;
+	}
+	public function getName() {
+		return $this->bean->name;
+	}
+}
+
+$book = new Book;
+$author = new Author;
+$book->setTitle("A can of beans");
+$author->setName("Mr. Bean");
+$book->addAuthor($author);
+$id = $book->getID();
+
+$book2 = new Book;
+$book2->find( $id );
+
+asrt($book2->getTitle(),"A can of beans");
+$authors = $book2->getAuthors();
+asrt((count($authors)),1);
+$he = array_pop($authors);
+asrt($he->getName(),"Mr. Bean");
+
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
