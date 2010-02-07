@@ -11,10 +11,10 @@
 abstract class RedBean_DomainObject {
 
 
-	/**
-	 *
-	 * @var RedBean_ToolBox
-	 */
+/**
+ *
+ * @var RedBean_ToolBox
+ */
 	protected $tools;
 
 	/**
@@ -49,21 +49,21 @@ abstract class RedBean_DomainObject {
 	 */
 	public function __construct( $typeName = false ) {
 
-		/**
-		 * If no typeName has been specified,
-		 * figure out the type of this model yourself.
-		 * In this case the following rule applies:
-		 * - the name of the model is the LAST part of the
-		 * namespace.
-		 * - Within that string, the name of the model is the LAST
-		 * part of the poorman's name space.
-		 *
-		 * So the model name for class: /me/him/her is: her
-		 * So the model name for class: /me/him/her_lover is: lover
-		 */
+	/**
+	 * If no typeName has been specified,
+	 * figure out the type of this model yourself.
+	 * In this case the following rule applies:
+	 * - the name of the model is the LAST part of the
+	 * namespace.
+	 * - Within that string, the name of the model is the LAST
+	 * part of the poorman's name space.
+	 *
+	 * So the model name for class: /me/him/her is: her
+	 * So the model name for class: /me/him/her_lover is: lover
+	 */
 		if (!$typeName) {
 
-			//Fetch the bean type using the class
+		//Fetch the bean type using the class
 			$beanTypeName = get_class( $this );
 
 			//Get last part of namespace
@@ -89,7 +89,7 @@ abstract class RedBean_DomainObject {
 			$this->redbean = $this->tools->getRedBean();
 
 			//Here the bean type is checked properly.
-			$this->bean = $this->redbean->dispense( $beanTypeName );
+			$this->bean = $this->redbean->dispense( strtolower( $beanTypeName ) );
 
 			//Create some handy modules so you dont have to do the wiring yourself.
 			$this->associationManager = new RedBean_AssociationManager($this->tools);
@@ -117,7 +117,24 @@ abstract class RedBean_DomainObject {
 		$this->associationManager->unassociate($this->bean, $other->bean);
 	}
 
+	protected function related( $className, $constructorArg = null ) {
+		$models = array();
+		$model = new $className;
+		$keys = $this->associationManager->related($this->bean, $model->getBeanType());
+		foreach($keys as $key) {
+			$modelItem = new $className($constructorArg);
+			$modelItem->find( (int) $key );
+			$models[$key] = $modelItem;
+		}
+		return $models;
+	}
+
 	
+	protected function getBeanType() {
+		return $this->bean->getMeta("type");
+	}
+
+
 	/**
 	 *
 	 * @param RedBean_DomainObject $other
@@ -141,56 +158,70 @@ abstract class RedBean_DomainObject {
 		$this->treeManager->attach($this->bean, $other->bean);
 	}
 
-	
+
 	/**
 	 * PUBLIC FUNCTIONS
 	 */
-	 
-	 
-	 /**
-	  * Loads the Bean internally
-	  * @param integer $id 
-	  */
-	 public function find( $id ) {
-		 $this->bean = $this->redbean->load( $this->bean->getMeta("type"), (int) $id );
-	 }
 
 
-	 /**
-	  * Returns a collection of Domain Objects.
-	  * @param <type> $type
-	  * @param <type> $query
-	  * @return <type>
-	  */
-	 public static function getDomainObjects( $type, $query="1", $values=array() ) {
+	/**
+	 * Loads the Bean internally
+	 * @param integer $id
+	 */
+	public function find( $id ) {
+		$this->bean = $this->redbean->load( $this->bean->getMeta("type"), (int) $id );
+	}
 
-			//Fetch us a toolbox.
-			$tools = RedBean_Setup::getToolBox();
-			$redbean = $tools->getRedBean();
 
+	/**
+	 * Returns a collection of Domain Objects.
+	 * @param <type> $type
+	 * @param <type> $query
+	 * @return <type>
+	 */
+	public static function getDomainObjects( $type, $query="1", $values=array() ) {
+
+		//Fetch us a toolbox.
+		$tools = RedBean_Setup::getToolBox();
+		$redbean = $tools->getRedBean();
+
+		$domainObject = new $type;
+		$typeName = $domainObject->bean->getMeta("type");
+		$collection = array();
+		$finder = new \RedBean_Plugin_Finder();
+		$beans = $finder->where($typeName, $query, $values);
+		foreach($beans as $bean) {
 			$domainObject = new $type;
-			$typeName = $domainObject->bean->getMeta("type");
-			$collection = array();
-			$finder = new \RedBean_Plugin_Finder();
-			$beans = $finder->where($typeName, $query, $values);
-			foreach($beans as $bean) {
-				$domainObject = new $type;
-				$domainObject->bean = $bean;
-				$collection[] = $domainObject;
-			}
+			$domainObject->bean = $bean;
+			$collection[] = $domainObject;
+		}
 
-			return $collection;
+		return $collection;
 
 
-	 }
+	}
 
+	/**
+	 * Saves the current domain object.
+	 * The function saves the inner bean to the database.
+	 */
+	public function save() {
+		$this->redbean->store( $this->bean );
+	}
 
-	 public function save() {
-		 $this->redbean->store( $this->bean );
-	 }
+	/**
+	 * Deletes the inner bean from the database.
+	 */
+	public function delete() {
+		$this->redbean->trash( $this->bean );
+	}
 
-	 public function delete() {
-		 $this->redbean->trash( $this->bean );
-	 }
+	/**
+	 * Returns the ID of the Model.
+	 */
+	public function getID() {
+		$idField = $this->tools->getWriter()->getIDField( $this->bean->getMeta("type") );
+		return $this->bean->$idField;
+	}
 
 }

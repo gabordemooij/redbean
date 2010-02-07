@@ -319,7 +319,7 @@ asrt(($redbean instanceof RedBean_OODB),true);
 
 
 $pdo = $adapter->getDatabase();
-$pdo->setDebugMode(1);
+//$pdo->setDebugMode(1);
 $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
 $pdo->Execute("DROP TABLE IF EXISTS movie");

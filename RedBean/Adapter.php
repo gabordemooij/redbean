@@ -40,14 +40,14 @@ interface RedBean_Adapter {
 	 * @param array $aValues
 	 */
 	public function get( $sql, $aValues = array() );
-	
+
 	/**
 	 * Executes an SQL Query and returns a resultset.
 	 * This method returns a single row (one array) resultset.
 	 * The values array can be used to bind values to the place holders in the
 	 * SQL query.
 	 * @param string $sql
-	 * @param array $aValues 
+	 * @param array $aValues
 	 * @return array $aMultiDimArray
 	 */
 	public function getRow( $sql, $aValues = array() );
@@ -73,6 +73,19 @@ interface RedBean_Adapter {
 	 * @return string $sSingleValue
 	 */
 	public function getCell( $sql, $aValues = array() );
+
+	/**
+	 * Executes the SQL query specified in $sql and takes
+	 * the first two columns of the resultset. This function transforms the
+	 * resultset into an associative array. Values from the the first column will
+	 * serve as keys while the values of the second column will be used as values.
+	 * The values array can be used to bind values to the place holders in the
+	 * SQL query.
+	 * @param string $sql
+	 * @param array $values
+	 * @return array $associativeArray
+	 */
+	public function getAssoc( $sql, $values = array() );
 
 	/**
 	 * Returns the latest insert ID.
