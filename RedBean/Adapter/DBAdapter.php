@@ -94,6 +94,16 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 
+	/**
+	 * Executes an SQL Query and fetches the first two columns only.
+	 * Then this function builds an associative array using the first
+	 * column for the keys and the second result column for the
+	 * values. For instance: SELECT id, name FROM... will produce
+	 * an array like: id => name.
+	 * @param string $sql
+	 * @param array $aValues
+	 * @return array $resultsAsAssocAray
+	 */
 	public function getAssoc( $sql, $aValues = array() ) {
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
@@ -134,8 +144,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * Returns last inserted id.
-	 * @return unknown_type
+	 * Returns latest insert id, most recently inserted id.
+	 * @return mixed $id
 	 */
 	public function getInsertID() {
 		return $this->db->getInsertID();
@@ -166,6 +176,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
+	 * Transactions.
+	 * Part of the transaction management infrastructure of RedBean.
 	 * Starts a transaction.
 	 */
 	public function startTransaction() {
@@ -173,6 +185,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
+	 * Transactions.
+	 * Part of the transaction management infrastructure of RedBean.
 	 * Commits a transaction.
 	 */
 	public function commit() {
@@ -180,6 +194,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
+	 * Transactions.
+	 * Part of the transaction management infrastructure of RedBean.
 	 * Rolls back transaction.
 	 */
 	public function rollback() {

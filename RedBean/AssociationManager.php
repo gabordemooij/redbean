@@ -159,7 +159,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	/**
 	 * Removes all relations for a bean
 	 * @param RedBean_OODBBean $bean
-	 * @param <type> $type
+	 * @param string $type
 	 */
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
 		$this->oodb->store($bean);

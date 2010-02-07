@@ -1,7 +1,7 @@
 <?php 
 /**
  * PDO Driver
- * @file 		RedBean/PDO.php
+ * @file			RedBean/PDO.php
  * @description		PDO Driver
  *					This Driver implements the RedBean Driver API
  * @author			Desfrenes
