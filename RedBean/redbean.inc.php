@@ -52,6 +52,8 @@ require($dir."Adapter/DBAdapter.php");
 require($dir."QueryWriter.php");
 require($dir."QueryWriter/MySQL.php");
 require($dir."QueryWriter/SQLite.php");
+require($dir."QueryWriter/PostgreSQL.php");
+
 
 //Load required Exceptions
 require($dir."Exception.php");
@@ -62,18 +64,18 @@ require($dir."Exception/NotImplemented.php");
 require($dir."Exception/UnsupportedDatabase.php");
 
 //Load Core functionality
-require("OODB.php");
-require("ToolBox.php");
-require("CompatManager.php");
+require($dir."OODB.php");
+require($dir."ToolBox.php");
+require($dir."CompatManager.php");
 
 //Load extended functionality
-require("AssociationManager.php");
-require("TreeManager.php");
-require("Setup.php");
-require("SimpleStat.php");
+require($dir."AssociationManager.php");
+require($dir."TreeManager.php");
+require($dir."Setup.php");
+require($dir."SimpleStat.php");
 
 //Load the default plugins
-require("Plugin/ChangeLogger.php");
-require("Plugin/Cache.php");
-require("Plugin/Finder.php");
-require("Plugin/Constraint.php");
+require($dir."Plugin/ChangeLogger.php");
+require($dir."Plugin/Cache.php");
+require($dir."Plugin/Finder.php");
+require($dir."Plugin/Constraint.php");

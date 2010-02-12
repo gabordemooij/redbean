@@ -37,7 +37,12 @@ class RedBean_Setup {
 		private static function checkDSN($dsn) {
 			$dsn = trim($dsn);
 			$dsn = strtolower($dsn);
-			if (strpos($dsn, "mysql:")!==0 && strpos($dsn,"sqlite:")!==0) {
+			if (
+				strpos($dsn, "mysql:")!==0
+				&& strpos($dsn,"sqlite:")!==0
+				&& strpos($dsn,"pgsql:")!==0
+			) {
+				
 				throw new RedBean_Exception_NotImplemented("
 					Support for this DSN has not been implemented yet. \n
 					Begin your DSN with: 'mysql:' or 'sqlite:'
@@ -70,12 +75,18 @@ class RedBean_Setup {
         public static function kickstart( $dsn, $username, $password, $frozen=false ) {
 
 			self::checkDSN($dsn);
-            $pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
-            $adapter = new RedBean_Adapter_DBAdapter( $pdo );
 
-			$writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+            $pdo = new Redbean_Driver_PDO( $dsn,$username,$password );
+            $adapter = new RedBean_Adapter_DBAdapter( $pdo );
 			
-			$redbean = new RedBean_OODB( $writer );
+            if (strpos($dsn,"pgsql")===0) {
+                $writer = new RedBean_QueryWriter_PostgreSQL( $adapter, $frozen );
+            }
+			else {
+                $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+			}
+
+            $redbean = new RedBean_OODB( $writer );
 			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
             
             //deliver everything back in a neat toolbox

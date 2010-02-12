@@ -354,4 +354,6 @@ class RedBean_QueryWriter_NullWriter implements RedBean_QueryWriter {
 		$this->returnCheckChanges = NULL;
 		$this->returnAddUniqueIndex = NULL;
 	}
+
+
 }

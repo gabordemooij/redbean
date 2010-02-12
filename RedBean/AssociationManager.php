@@ -17,7 +17,8 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
  */
 	protected $supportedSystems = array(
 		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
-		RedBean_CompatManager::C_SYSTEM_SQLITE=>"3"
+		RedBean_CompatManager::C_SYSTEM_SQLITE=>"3",
+		RedBean_CompatManager::C_SYSTEM_POSTGRESQL=>"8"
 	);
 
 	/**
@@ -41,7 +42,6 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @param RedBean_ToolBox $tools
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
-		$this->scanToolBox( $tools );
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
 		$this->writer = $tools->getWriter();
