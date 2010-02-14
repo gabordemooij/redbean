@@ -9,7 +9,18 @@
  */
 interface RedBean_QueryWriter {
 
+	/**
+	 * QueryWriter Constant Identifier.
+	 * Identifies a situation in which a table has not been found in
+	 * the database.
+	 */
 	const C_SQLSTATE_NO_SUCH_TABLE = 1;
+
+	/**
+	 * QueryWriter Constant Identifier.
+	 * Identifies a situation in which a perticular column has not
+	 * been found in the database.
+	 */
 	const C_SQLSTATE_NO_SUCH_COLUMN = 2;
 
 	/**

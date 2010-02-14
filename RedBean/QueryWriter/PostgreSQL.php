@@ -14,66 +14,27 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 
 	/**
 	 * DATA TYPE
-	 * Boolean Data type
+	 * Integer Data Type
 	 * @var integer
 	 */
-	const C_DATATYPE_BOOL = 0;
+	const C_DATATYPE_INTEGER = 0;
 
 	/**
 	 * DATA TYPE
-	 * Unsigned 8BIT Integer
+	 * Double Precision Type
 	 * @var integer
 	 */
-	const C_DATATYPE_UINT8 = 1;
+	const C_DATATYPE_DOUBLE = 1;
 
 	/**
 	 * DATA TYPE
-	 * Unsigned 32BIT Integer
+	 * String Data Type
 	 * @var integer
 	 */
-	const C_DATATYPE_UINT32 = 2;
+	const C_DATATYPE_TEXT = 3;
 
-	/**
-	 * DATA TYPE
-	 * Double precision floating point number and
-	 * negative numbers.
-	 * @var integer
-	 */
-	const C_DATATYPE_DOUBLE = 3;
+	
 
-	/**
-	 * DATA TYPE
-	 * Standard Text column (like varchar255)
-	 * At least 8BIT character support.
-	 * @var integer
-	 */
-	const C_DATATYPE_TEXT8 = 4;
-
-	/**
-	 * DATA TYPE
-	 * Long text column (16BIT)
-	 * @var integer
-	 */
-	const C_DATATYPE_TEXT16 = 5;
-
-	/**
-	 * DATA TYPE
-	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
-	 * This is the biggest column that RedBean supports. If possible you may write
-	 * an implementation that stores even bigger values.
-	 * @var integer
-	 */
-	const C_DATATYPE_TEXT32 = 6;
-
-	/**
-	 * DATA TYPE
-	 * Specified. This means the developer or DBA
-	 * has altered the column to a different type not
-	 * recognized by RedBean. This high number makes sure
-	 * it will not be converted back to another type by accident.
-	 * @var integer
-	 */
-	const C_DATATYPE_SPECIFIED = 99;
 
 
 	/**
@@ -81,13 +42,9 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * Supported Column Types
 	 */
     public $typeno_sqltype = array(
-        self::C_DATATYPE_BOOL=>" boolean ",
-		self::C_DATATYPE_UINT8=>" smallint ",
-        self::C_DATATYPE_UINT32=>" integer ",
+        self::C_DATATYPE_INTEGER=>" integer ",
 		self::C_DATATYPE_DOUBLE=>" double precision ",
-        self::C_DATATYPE_TEXT8=>" text ",
-        self::C_DATATYPE_TEXT16=>" text ",
-        self::C_DATATYPE_TEXT32=>" text "
+        self::C_DATATYPE_TEXT=>" text "
     );
 
 	/**
@@ -97,23 +54,12 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * constants (magic numbers)
 	 */
     public $sqltype_typeno = array(
-	"boolean"=>self::C_DATATYPE_BOOL,
-    "smallint"=>self::C_DATATYPE_UINT8,
-    "integer"=>self::C_DATATYPE_UINT32,
+	"integer"=>self::C_DATATYPE_INTEGER,
     "double precision" => self::C_DATATYPE_DOUBLE,
-    "text"=>self::C_DATATYPE_TEXT8,
-    "text"=>self::C_DATATYPE_TEXT16,
-    "text"=>self::C_DATATYPE_TEXT32
+    "text"=>self::C_DATATYPE_TEXT
     );
 
-    /**
-     * @var array
-	 * DTYPES code names of the supported types,
-	 * these are used for the column names
-     */
-    public $dtypes = array(
-    "booleanset","tinyintus","intus","doubles","varchar255","text","ltext"
-    );
+    
 
     /**
      *
@@ -144,30 +90,7 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 		
 		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
         $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
-    
-	
-		$addCastFunction = "
-			create or replace function b2s( boolean ) 
-			returns smallint as $$
-			begin
-				if $1=true then return 1;
-				end if;
-				return 0;
-			end;
-			$$ 
-			language plpgsql
-			immutable;";
-
-		$addCastDefinition = "
-			create cast ( boolean as smallint) with function b2s(boolean) AS IMPLICIT;
-		";
-		try {
-			$this->adapter->exec($addCastFunction);
-			$this->adapter->exec($addCastDefinition);
-
-		}
-		catch(Exception $e){}
-
+   
 
 	}
 
@@ -219,27 +142,15 @@ where table_schema = 'public'" );
 	 * @return integer $type
 	 */
 	public function scanType( $value ) { 
-      if (is_null($value)) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+		if (is_integer($value) && $value < 2147483648 && $value > -2147483648) {
+			return self::C_DATATYPE_INTEGER;
 		}
-		$orig = $value;
-		$value = strval($value);
-		if ($value=="1" || $value=="" || $value=="0") {
-			  return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+		elseif( is_double($value) ) {
+			return self::C_DATATYPE_DOUBLE;
 		}
-	    if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
-		      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
-	    }
-	    if (is_numeric($value) && (floor($value)==$value) && $value >= 0  && $value <= 4294967295 ) {
-	      return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
+		else {
+			return self::C_DATATYPE_TEXT;
 		}
-	    if (is_numeric($value)) {
-		  return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
-		}
-	    if (strlen($value) <= 255) {
-	      return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
-		}
-	    return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
     }
 
 	/**
@@ -290,7 +201,7 @@ where table_schema = 'public'" );
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
 			$p[] = " \"".$uv["property"]."\" = ? ";
-			$v[]=strval( $this->adapter->escape( $uv["value"] ) );
+			$v[]=strval( ( $uv["value"] ) );
 		}
 		$sql .= implode(",", $p ) ." WHERE id = ".intval($id);
 		
@@ -398,18 +309,49 @@ where table_schema = 'public'" );
 			$columns[$k]="".$this->adapter->escape($v)."";
 		}
 		$table = $this->adapter->escape( $this->check($table) );
-        $r = $this->adapter->get("SHOW INDEX FROM \"$table\"");
+        $r = $this->adapter->get("
+
+			select
+    t.relname as table_name,
+    i.relname as index_name,
+    a.attname as column_name
+from
+    pg_class t,
+    pg_class i,
+    pg_index ix,
+    pg_attribute a
+where
+    t.oid = ix.indrelid
+    and i.oid = ix.indexrelid
+    and a.attrelid = t.oid
+    and a.attnum = ANY(ix.indkey)
+    and t.relkind = 'r'
+    and t.relname = '$table'
+order by
+    t.relname,
+    i.relname;
+
+		");
+
+		/*
+		 *
+		 * ALTER TABLE testje ADD CONSTRAINT blabla UNIQUE (blaa, blaa2);
+		 */
+
         $name = "UQ_".sha1(implode(',',$columns));
         if ($r) {
             foreach($r as $i) {
-                if ($i["Key_name"]==$name) {
+                if (strtolower( $i["index_name"] )== strtolower( $name )) {
                     return;
                 }
             }
         }
 		
-        $sql = "ALTER IGNORE TABLE \"$table\"
-                ADD UNIQUE INDEX $name (".implode(",",$columns).")";
+        $sql = "ALTER TABLE \"$table\"
+                ADD CONSTRAINT $name UNIQUE (".implode(",",$columns).")";
+
+
+		
         $this->adapter->exec($sql);
     }
 
@@ -462,11 +404,20 @@ where table_schema = 'public'" );
 	 * @return string $keywordSafeString
 	 */
 	public function noKW($str) {
-		return "`".$str."`";
+		return "\"".$str."\"";
 	}
 
 
 
+	/**
+	 * Given an Database Specific SQLState and a list of QueryWriter
+	 * Standard SQL States this function converts the raw SQL state to a
+	 * database agnostic ANSI-92 SQL states and checks if the given state
+	 * is in the list of agnostic states.
+	 * @param string $state
+	 * @param array $list
+	 * @return boolean $isInArray
+	 */
 	public function sqlStateIn($state, $list) {
 
 		$sqlState = "0";
