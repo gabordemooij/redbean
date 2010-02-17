@@ -2,7 +2,7 @@
 /**
  * Exception NotImplemented.
  * Part of the RedBean Exceptions Mechanism.
- * @file 		RedBean/Exception/NotImplemented
+ * @file			RedBean/Exception/NotImplemented
  * @description		Represents a subtype in the RedBean Exception System.
  *					This Exception indicates a certain feature has not been
  *					implemented yet and should be handled on Application level.

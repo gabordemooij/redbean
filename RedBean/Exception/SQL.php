@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean Exception SQL
- * @file 		RedBean/Exception/SQL.php
+ * @file			RedBean/Exception/SQL.php
  * @description		Represents a generic database exception independent of the
  *					underlying driver.
  * @author			Gabor de Mooij

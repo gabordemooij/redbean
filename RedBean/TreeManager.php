@@ -2,15 +2,14 @@
 /**
  * RedBean Tree
  *
- * @file 		RedBean/TreeManager.php
- * @description		Shields you from race conditions automatically.
+ * @file			RedBean/TreeManager.php
+ * @description		Tree structure for beans.
  * @author			Gabor de Mooij
  * @license			BSD
  */
 class RedBean_TreeManager extends RedBean_CompatManager {
 
 	/**
-<<<<<<< HEAD
 	 * Specify what database systems are supported by this class.
 	 * @var array $databaseSpecs
 	 */
@@ -18,11 +17,7 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
 		RedBean_CompatManager::C_SYSTEM_SQLITE=>"3"
 	);
-
-
 	/**
-=======
->>>>>>> master
 	 *
 	 * @var string
 	 */
