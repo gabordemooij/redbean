@@ -64,7 +64,7 @@ To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
 	 */
 	public function scanToolBox( RedBean_ToolBox $toolbox ) {
 
-	//obtain the database system
+		//obtain the database system
 		$brand = strtolower(trim($toolbox->getDatabaseAdapter()->getDatabase()->getDatabaseType()));
 
 		//obtain version number
@@ -97,7 +97,6 @@ To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
 
 
 	}
-
 
 	/**
 	 * Static Variant

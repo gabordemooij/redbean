@@ -14,10 +14,10 @@
  */
 class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase {
 
-/**
- *
- * @var array
- */
+	/**
+	 *
+	 * @var array
+	 */
 	private $stash = NULL;
 
 	/**
@@ -196,7 +196,6 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			if (count($updatevalues)>0) {
 				$this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
 			}
-
 			return (int) $bean->$idfield;
 		}
 		else {
@@ -243,7 +242,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			$row = array_pop($rows);
 		}
 		foreach($row as $p=>$v) {
-		//populate the bean with the database row
+			//populate the bean with the database row
 			$bean->$p = $v;
 		}
 		$this->signal( "open", $bean );
@@ -281,7 +280,6 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	public function batch( $type, $ids ) {
 		if (!$ids) return array();
 		$collection = array();
-
 		try {
 			$rows = $this->writer->selectRecord($type,$ids);
 		}catch(RedBean_Exception_SQL $e ){
@@ -308,7 +306,6 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * @return array $collectionOfBeans
 	 */
 	public function convertToBeans($type, $rows) {
-
 		$collection = array();
 		$this->stash = array();
 		foreach($rows as $row) {
@@ -318,7 +315,6 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 
 		}
 		return $collection;
-
 	}
 
 }
