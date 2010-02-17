@@ -1,20 +1,18 @@
 <?php
 /**
  * RedBean Association
- * @file 		RedBean/AssociationManager.php
- * @description		This is actually more like an example than
- *					a real part of RedBean. Since version 0.7 you can create
- *					your own ORM structures with RedBean. Association is a
- *					simplistic example of how you might manage associated beans.
+ * @file			RedBean/AssociationManager.php
+ * @description		Manages simple bean associations.
+ *					
  * @author			Gabor de Mooij
  * @license			BSD
  */
 class RedBean_AssociationManager extends RedBean_CompatManager {
 
-/**
- * Specify what database systems are supported by this class.
- * @var array $databaseSpecs
- */
+	/**
+	 * Specify what database systems are supported by this class.
+	 * @var array $databaseSpecs
+	 */
 	protected $supportedSystems = array(
 	RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
 	);

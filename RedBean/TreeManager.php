@@ -2,8 +2,8 @@
 /**
  * RedBean Tree
  *
- * @file 		RedBean/TreeManager.php
- * @description		Shields you from race conditions automatically.
+ * @file			RedBean/TreeManager.php
+ * @description		Tree structure for beans.
  * @author			Gabor de Mooij
  * @license			BSD
  */
