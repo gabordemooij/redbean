@@ -6,6 +6,12 @@
  *					This Driver implements the RedBean Driver API
  * @author			Desfrenes
  * @license			BSD
+ *
+ *
+ * (c) Desfrenes & Gabor de Mooij
+ * This source file is subject to the BSD license that is bundled
+ * with this source code in the file license.txt.
+ *
  */
 class RedBean_Driver_PDO implements RedBean_Driver {
 
