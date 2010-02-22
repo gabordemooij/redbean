@@ -5,6 +5,11 @@
  * @description	Offers easy to use tools to check for database compatibility.
  * @author		Gabor de Mooij
  * @license		BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD license that is bundled
+ * with this source code in the file license.txt.
  */
 class RedBean_CompatManager {
 

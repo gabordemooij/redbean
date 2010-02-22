@@ -11,6 +11,10 @@
  * database as well as providing other CRUD functions. This class acts as a
  * object database.
  *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD license that is bundled
+ * with this source code in the file license.txt.
  */
 class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase {
 

@@ -9,6 +9,10 @@
  * you can therefore use this file as a starting point for your
  * project.
  *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD license that is bundled
+ * with this source code in the file license.txt.
+ *
  */
 
 //First we include redbean

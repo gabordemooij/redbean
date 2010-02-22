@@ -5,6 +5,11 @@
  * @description		An adapter class to connect various database systems to RedBean
  * @author			Gabor de Mooij
  * @license			BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD license that is bundled
+ * with this source code in the file license.txt.
  */
 class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 
