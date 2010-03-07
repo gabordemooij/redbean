@@ -61,7 +61,8 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
      * @return array $tables
      */
     public function getTables() {
-        return $this->adapter->getCol( "SELECT name FROM sqlite_master WHERE type='table';" );
+        return $this->adapter->getCol( "SELECT name FROM sqlite_master
+			WHERE type='table' AND name!='sqlite_sequence';" );
     }
 
 	/**

@@ -79,6 +79,13 @@ try{RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root",""); 
 
 //Test whether we can setup a connection
 $toolbox = RedBean_Setup::kickstartDevL( "sqlite:/Applications/XAMPP/xamppfiles/temp/base.txt" );
+//prepare... empty the database
+foreach( $toolbox->getWriter()->getTables() as $table ) {
+	$sql = "DROP TABLE `".$table."`";
+	$toolbox->getDatabaseAdapter()->exec($sql);
+}
+//check whether we emptied the database correctly...
+asrt(count($toolbox->getWriter()->getTables()),0);
 
 /**
  * Observable Mock
