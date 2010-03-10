@@ -1361,5 +1361,17 @@ asrt((count($authors)),1);
 $he = array_pop($authors);
 asrt($he->getName(),"Mr. Bean");
 
+testpack("Unit Of Work");
+require("RedBean/UnitOfWork.php");
+$uow = new RedBean_UnitOfWork();
+$count=array();
+$uow->addWork("a", function(){ global $count; $count[]="a"; });
+$uow->addWork("b", function(){ global $count; $count[]="b"; });
+$uow->doWork("a");
+$uow->doWork("a");
+$uow->doWork("b");
+$cnt = array_count_values($count);
+asrt($cnt["a"],2);
+asrt($cnt["b"],1);
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

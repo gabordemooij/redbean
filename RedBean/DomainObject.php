@@ -204,4 +204,30 @@ abstract class RedBean_DomainObject {
 		return $this->bean->$idField;
 	}
 
+	public function import( $array, $prefixSetter="set" ) {
+
+		$report = array();
+		$errorCount = 0;
+		foreach($array as $property=>$value) {
+			$error = $exception = $e = null;
+			$setter = $prefixSetter.ucfirst($property);
+			if (method_exists($this, $setter)) {
+				try {
+					$this->$setter( $value );
+				}
+				catch(Exception $e) {
+					$error = $e->getMessage();
+					$exception = $e;
+					$errorCount++;
+				}
+			}
+			$report[$property] = array(
+				"property"=>$property,
+				"error"=>$error,
+				"exception"=>$e
+			);
+		}
+		return array( "errorCount"=>$errorCount, "report"=>$report );
+	}
+
 }
