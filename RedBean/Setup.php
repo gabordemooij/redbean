@@ -87,6 +87,9 @@ class RedBean_Setup {
             if (strpos($dsn,"pgsql")===0) {
                 $writer = new RedBean_QueryWriter_PostgreSQL( $adapter, $frozen );
             }
+			else if (strpos($dsn,"sqlite")===0){
+				 $writer = new RedBean_QueryWriter_SQLite( $adapter, $frozen );
+			}
 			else {
                 $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
 			}
