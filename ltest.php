@@ -180,6 +180,10 @@ try { $bean = $redbean->load(" ",3); fail(); }catch(RedBean_Exception_Security $
 try { $bean = $redbean->load(".",3); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try { $bean = $redbean->load("type.test",3); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 
+
+testpack("Finder");
+Finder::where("whatever");
+
 testpack("UNIT TEST RedBean OODB: Batch");
 $nullWriter->reset();
 $beans = $redbean->batch("typetest",array(2));

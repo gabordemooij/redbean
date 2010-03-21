@@ -111,6 +111,11 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	        }
 
 
+		
+
+		try {
+
+
 			if (strpos("pgsql",$this->dsn)===0){
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			}
@@ -119,10 +124,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			}
 
 
-		try {
-		$s->execute($aValues);
-		$this->rs = $s->fetchAll();
-		$rows = $this->rs;
+
+			$s->execute($aValues);
+			$this->rs = $s->fetchAll();
+			$rows = $this->rs;
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.

@@ -58,6 +58,7 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 		//Now get the two tools we need; RedBean and the Adapter
 		$redbean = $tools->getRedBean();
 		$adapter = $tools->getDatabaseAdapter();
+		$writer = $tools->getWriter();
 
 		//Do we need to parse Gold SQL?
 		if (!$redbean->isFrozen()) {
@@ -75,7 +76,10 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 
 		}
 		catch(RedBean_Exception_SQL $e) { 
-			if ($e->getSQLState()=="42S02" || $e->getSQLState()=="42S22") { //no such table? no problem. may happen.
+			if ($writer->sqlStateIn($e->getSQLState(),array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
+			))){
 				return array();
 			}
 			else {
