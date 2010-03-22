@@ -31,7 +31,8 @@ class RedBean_Plugin_Constraint {
 		//Fetch the toolbox
 		$toolbox = RedBean_Setup::getToolBox();
 
-		RedBean_CompatManager::scanDirect($toolbox, array(RedBean_CompatManager::C_SYSTEM_MYSQL => "5"));
+		RedBean_CompatManager::scanDirect($toolbox, array(RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+			RedBean_CompatManager::C_SYSTEM_SQLITE => "3"));
 
 
 		//Create an association manager
@@ -42,6 +43,7 @@ class RedBean_Plugin_Constraint {
 
 		//Frozen? Then we may not alter the schema!
 		if ($oodb->isFrozen()) return false;
+
 
 				
 		//$adapter->getDatabase()->setDebugMode(1);
@@ -64,6 +66,30 @@ class RedBean_Plugin_Constraint {
 
 		//In Cache? Then we dont need to bother
 		if (isset(self::$fkcache[$table])) return false;
+
+		if ($writer instanceof RedBean_QueryWriter_SQLite) {	
+			$fkCode = "fk".md5($table.$property1.$property2);
+			$sql1 = "
+				CREATE TRIGGER IF NOT EXISTS {$fkCode}a
+					BEFORE DELETE ON $table1
+					FOR EACH ROW BEGIN
+						DELETE FROM $table WHERE  $table.$property1 = OLD.id;
+					END;
+			";
+			
+			$sql2 = "
+				CREATE TRIGGER IF NOT EXISTS {$fkCode}b
+					BEFORE DELETE ON $table2
+					FOR EACH ROW BEGIN
+						DELETE FROM $table WHERE $table.$property2 = OLD.id;
+					END;
+	
+			";
+	
+			$adapter->exec($sql1);
+			$adapter->exec($sql2);
+			return true;
+		}
 
 		$db = $adapter->getCell("select database()");
 		$fks =  $adapter->getCell("
