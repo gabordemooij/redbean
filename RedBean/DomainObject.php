@@ -210,17 +210,18 @@ abstract class RedBean_DomainObject {
 		$errorCount = 0;
 		foreach($array as $property=>$value) {
 			$error = $exception = $e = null;
-			$setter = $prefixSetter.ucfirst($property);
-			if (method_exists($this, $setter)) {
+			//$setter = $prefixSetter.ucfirst($property);
+			//if (method_exists($this, $setter)) {
 				try {
-					$this->$setter( $value );
+					//$this->$setter( $value );
+					$this->$property = $value;
 				}
 				catch(Exception $e) {
 					$error = $e->getMessage();
 					$exception = $e;
 					$errorCount++;
 				}
-			}
+			//}
 			$report[$property] = array(
 				"property"=>$property,
 				"error"=>$error,

@@ -31,8 +31,10 @@ class RedBean_Plugin_Constraint {
 		//Fetch the toolbox
 		$toolbox = RedBean_Setup::getToolBox();
 
-		RedBean_CompatManager::scanDirect($toolbox, array(RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
-			RedBean_CompatManager::C_SYSTEM_SQLITE => "3"));
+		RedBean_CompatManager::scanDirect($toolbox, array(
+			RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+			RedBean_CompatManager::C_SYSTEM_SQLITE => "3",
+			RedBean_CompatManager::C_SYSTEM_POSTGRESQL => "7",));
 
 
 		//Create an association manager
@@ -66,6 +68,56 @@ class RedBean_Plugin_Constraint {
 
 		//In Cache? Then we dont need to bother
 		if (isset(self::$fkcache[$table])) return false;
+
+		
+		if ($writer instanceof RedBean_QueryWriter_PostgreSQL) {
+
+			$fkCode = "fk".md5($table.$property1.$property2);
+			$sql = "
+					SELECT
+							c.oid,
+							n.nspname,
+							c.relname,
+							n2.nspname,
+							c2.relname,
+							cons.conname
+					FROM pg_class c
+					JOIN pg_namespace n ON n.oid = c.relnamespace
+					LEFT OUTER JOIN pg_constraint cons ON cons.conrelid = c.oid
+					LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
+					LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
+					WHERE c.relkind = 'r'
+					AND n.nspname IN ('public')
+					AND (cons.contype = 'f' OR cons.contype IS NULL)
+					AND 
+					(  cons.conname = '{$fkCode}a'	OR  cons.conname = '{$fkCode}b' )
+					
+			";
+
+			$rows = $adapter->get( $sql );
+			
+
+			
+			if (!count($rows)) { 
+
+
+				$sql1 = "ALTER TABLE $table ADD CONSTRAINT
+						{$fkCode}a FOREIGN KEY ($property1)
+						REFERENCES $table1 (id) ON DELETE CASCADE ";
+				
+		
+				$sql2 = "ALTER TABLE $table ADD CONSTRAINT
+						{$fkCode}b FOREIGN KEY ($property2)
+						REFERENCES $table2 (id) ON DELETE CASCADE ";
+				
+				
+		
+				$adapter->exec($sql1);
+				$adapter->exec($sql2);
+			}
+			return true;
+		}
+
 
 		if ($writer instanceof RedBean_QueryWriter_SQLite) {	
 			$fkCode = "fk".md5($table.$property1.$property2);

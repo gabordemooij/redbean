@@ -86,3 +86,6 @@ require($dir."Plugin/ChangeLogger.php");
 require($dir."Plugin/Cache.php");
 require($dir."Plugin/Finder.php");
 require($dir."Plugin/Constraint.php");
+
+//Load the Validator Connector
+require($dir."ValidatorConnector.php");

@@ -573,6 +573,96 @@ asrt(count($tm->children($subpage2)),1);
 asrt(intval($subpage1->parent_id),intval($id));
 
 
+
+
+
+//Test constraints: cascaded delete
+testpack("Test Cascaded Delete");
+//$adapter = $toolbox->getDatabaseAdapter();
+//$adapter->getDatabase()->setDebugMode(1);
+try { $adapter->exec("ALTER TABLE cask DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503a "); }catch(Exception $e){}
+try { $adapter->exec("ALTER TABLE whisky DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503b "); }catch(Exception $e){}
+try { $adapter->exec("ALTER TABLE cask_whisky DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503a "); }catch(Exception $e){}
+try { $adapter->exec("ALTER TABLE cask_whisky DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503b "); }catch(Exception $e){}
+
+
+//$adapter->exec("DROP TRIGGER IF EXISTS fkb8317025deb6e03fc05abaabc748a503b ");
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$whisky = $redbean->dispense("whisky");
+$cask->number = 100;
+$whisky->age = 10;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask, $whisky );
+//first test baseline behaviour, dead record should remain
+asrt(count($a->related($cask, "whisky")),1);
+$redbean->trash($cask);
+//no difference
+asrt(count($a->related($cask, "whisky")),1);
+$adapter->exec("DROP TABLE cask_whisky"); //clean up for real test!
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$whisky = $redbean->dispense("whisky");
+$cask->number = 101;
+$whisky->age = 12;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask, $whisky );
+
+//add cask 102 and whisky 13
+$cask2 = $redbean->dispense("cask");
+$whisky2 = $redbean->dispense("whisky");
+$cask2->number = 102;
+$whisky2->age = 13;
+$a = new RedBean_AssociationManager( $toolbox );
+$a->associate( $cask2, $whisky2 );
+
+//add constraint
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true);
+//no error for duplicate
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true);
+
+
+asrt(count($a->related($cask, "whisky")),1);
+
+$redbean->trash($cask);
+asrt(count($a->related($cask, "whisky")),0); //should be gone now!
+
+asrt(count($a->related($whisky2, "cask")),1);
+$redbean->trash($whisky2);
+asrt(count($a->related($whisky2, "cask")),0); //should be gone now!
+
+try { $adapter->exec("ALTER TABLE cask DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503a "); }catch(Exception $e){}
+try { $adapter->exec("ALTER TABLE whisky DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503b "); }catch(Exception $e){}
+
+try { $adapter->exec("ALTER TABLE cask DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503b "); }catch(Exception $e){}
+try { $adapter->exec("ALTER TABLE whisky DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503a "); }catch(Exception $e){}
+try { $adapter->exec("ALTER TABLE cask_whisky DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503a "); }catch(Exception $e){}
+try { $adapter->exec("ALTER TABLE cask_whisky DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503b "); }catch(Exception $e){}
+$adapter->exec("DROP TABLE IF EXISTS cask_whisky");
+try{ $adapter->exec("DROP TABLE IF EXISTS cask CASCADE "); }catch(Exception $e){ die($e->getMessage()); }
+$adapter->exec("DROP TABLE IF EXISTS whisky CASCADE ");
+
+//add cask 101 and whisky 12
+$cask = $redbean->dispense("cask");
+$cask->number = 201;
+$cask2 = $redbean->dispense("cask");
+$cask2->number = 202;
+$a->associate($cask,$cask2);
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
+//now from cache... no way to check if this works :(
+asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
+asrt(count($a->related($cask, "cask")),1);
+$redbean->trash( $cask2 );
+asrt(count($a->related($cask, "cask")),0);
+
+
+
+
+
+
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 
 
