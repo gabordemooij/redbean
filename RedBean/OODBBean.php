@@ -148,8 +148,20 @@ class RedBean_OODBBean {
 		return $this;
 	}
 
-	//@todo copy/clone a bean
 
+	/**
+	 * Convenience method to create a link to another bean;
+	 * i.e. wine -> wine_id
+	 * Chainable.
+	 * @param RedBean_OODBBean $bean
+	 * @return RedBean_OODBBean $currentBean
+	 */
+	public function setBean( RedBean_OODBBean $bean ) {
+		$type = $bean->getMeta("type");
+		$typeid = $type . "_id";
+		$this->$typeid = $bean->id;
+		return $this;
+	}
 
 }
 

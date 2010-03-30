@@ -168,6 +168,15 @@ try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 
 
+testpack("UNIT TEST RedBean OODB: setObject");
+$wine = $redbean->dispense("wine");
+$wine->id = 123;
+$cask = $redbean->dispense("cask");
+$cask->setBean( $wine );
+asrt($cask->wine_id,123);
+$wine->id = 124;
+$cask->setBean( $wine );
+asrt($cask->wine_id,124);
 
 
 testpack("UNIT TEST RedBean OODB: Load");
