@@ -26,17 +26,17 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	/**
 	 * @var RedBean_OODB
 	 */
-	private $oodb;
+	protected $oodb;
 
 	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
-	private $adapter;
+	protected $adapter;
 
 	/**
 	 * @var RedBean_QueryWriter
 	 */
-	private $writer;
+	protected $writer;
 
 
 	/**
@@ -64,9 +64,16 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 */
 	public function associate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
+		$bean = $this->oodb->dispense($table);
+		return $this->associateBeans( $bean1, $bean2, $bean );
+	}
+	
+	
+	protected function associateBeans(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean) {
+		
 		$idfield1 = $this->writer->getIDField($bean1->getMeta("type"));
 		$idfield2 = $this->writer->getIDField($bean2->getMeta("type"));
-		$bean = $this->oodb->dispense($table);
+		
 		$property1 = $bean1->getMeta("type") . "_id";
 		$property2 = $bean2->getMeta("type") . "_id";
 		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
@@ -85,7 +92,9 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 				throw $e;
 			}
 		}
+
 	}
+	
 
 	/**
 	 * Gets related beans of type $type for bean $bean
