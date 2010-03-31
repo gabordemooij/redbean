@@ -573,9 +573,6 @@ asrt(count($tm->children($subpage2)),1);
 asrt(intval($subpage1->parent_id),intval($id));
 
 
-
-
-
 //Test constraints: cascaded delete
 testpack("Test Cascaded Delete");
 //$adapter = $toolbox->getDatabaseAdapter();
