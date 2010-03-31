@@ -168,15 +168,7 @@ try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 
 
-testpack("UNIT TEST RedBean OODB: setObject");
-$wine = $redbean->dispense("wine");
-$wine->id = 123;
-$cask = $redbean->dispense("cask");
-$cask->setBean( $wine );
-asrt($cask->wine_id,123);
-$wine->id = 124;
-$cask->setBean( $wine );
-asrt($cask->wine_id,124);
+
 
 
 testpack("UNIT TEST RedBean OODB: Load");
@@ -372,9 +364,31 @@ $pdo->Execute("DROP TABLE IF EXISTS cask");
 $pdo->Execute("DROP TABLE IF EXISTS whisky");
 $pdo->Execute("DROP TABLE IF EXISTS __log");
 
-
-
-
+testpack("UNIT TEST RedBean OODB: setObject");
+$wine = $redbean->dispense("wine");
+$wine->id = 123;
+$cask = $redbean->dispense("cask");
+$cask->setBean( $wine );
+asrt($cask->wine_id,123);
+$wine->id = 124;
+$cask->setBean( $wine );
+asrt($cask->wine_id,124);
+asrt($cask->getKey("wine"),124);
+$wine = $redbean->dispense("wine");
+$cask = $redbean->dispense("cask");
+$wine->title = "my wine";
+$cask->title = "my cask";
+$redbean->store( $wine );
+$cask->setBean( $wine );
+$redbean->store( $cask );
+asrt($cask->getKey("wine"), $wine->id);
+asrt(($wine->id>0),true);
+$wine = $cask->getBean("wine");
+asrt(($wine instanceof RedBean_OODBBean), true);
+asrt($wine->title,"my wine");
+$pdo->Execute("DROP TABLE IF EXISTS cask");
+$pdo->Execute("DROP TABLE IF EXISTS wine");
+pass();
 
 $page = $redbean->dispense("page");
 

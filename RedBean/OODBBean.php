@@ -162,6 +162,29 @@ class RedBean_OODBBean {
 		$this->$typeid = $bean->id;
 		return $this;
 	}
+	
+	/**
+	 * Convenience method to get a link to another bean;
+	 * i.e. wine -> wine_id
+	 * @param string $beanType
+	 * @return integer $key
+	 */
+	public function getKey( $beanType ) {
+		$typeid = $beanType . "_id";
+		return (int) $this->$typeid;
+	}		
+	
+	/**
+	 * Convenience method to get a related bean directly.
+	 * This is a bit hacky though because it depends on
+	 * RedBean setup to get the latest toolbox, but if you are
+	 * really lazy you can use this method.
+	 * @param string $beanType
+	 * @return RedBean_OODBBean $relatedBean
+	 */
+	public function getBean( $beanType ) {
+		return RedBean_Setup::getToolBox()->getRedbean()->load( $beanType, $this->getKey($beanType) );
+	}
 
 }
 
