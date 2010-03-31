@@ -1411,5 +1411,15 @@ $uow->doWork("b");
 $cnt = array_count_values($count);
 asrt($cnt["a"],2);
 asrt($cnt["b"],1);
+$book = $redbean->dispense("book");
+$book->title = "unit of work book";
+$uow->addWork("save", function() use($redbean, $book){ $redbean->store($book); });
+$uow->addWork("all_save",function() use($uow){ $uow->doWork("save"); });
+$uow->doWork("all_save");
+asrt(count( Finder::where("book","title LIKE '%unit%'") ),1);
+
+
+
+
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
