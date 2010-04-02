@@ -133,18 +133,12 @@ abstract class RedBean_DomainObject {
 	protected function getBeanType() {
 		return $this->bean->getMeta("type");
 	}
-	/**
-	 *
-	 * @param RedBean_DomainObject $other
-	 */
-	protected function set1toNAssoc(RedBean_DomainObject $other) {
-		$this->associationManager->set1toNAssoc($this->bean, $other->bean);
-	}
+
 	/**
 	 * Clears associations
 	 */
-	protected function clearRelations() {
-		$this->associationManager->clearRelations($this->bean);
+	protected function clearRelations( $type ) {
+		$this->associationManager->clearRelations($this->bean, $type);
 	}
 	/**
 	 *
@@ -160,29 +154,7 @@ abstract class RedBean_DomainObject {
 	public function find( $id ) {
 		$this->bean = $this->redbean->load( $this->bean->getMeta("type"), (int) $id );
 	}
-	/**
-	 * Returns a collection of Domain Objects.
-	 * @param string $type
-	 * @param string $query
-	 * @return array $collection
-	 */
-	public static function getDomainObjects( $type, $query="1", $values=array() ) {
-		//Fetch us a toolbox.
-		$tools = RedBean_Setup::getToolBox();
-		$redbean = $tools->getRedBean();
-
-		$domainObject = new $type;
-		$typeName = $domainObject->bean->getMeta("type");
-		$collection = array();
-		$finder = new \RedBean_Plugin_Finder();
-		$beans = $finder->where($typeName, $query, $values);
-		foreach($beans as $bean) {
-			$domainObject = new $type;
-			$domainObject->bean = $bean;
-			$collection[] = $domainObject;
-		}
-		return $collection;
-	}
+	
 	/**
 	 * Saves the current domain object.
 	 * The function saves the inner bean to the database.
@@ -204,31 +176,16 @@ abstract class RedBean_DomainObject {
 		return $this->bean->$idField;
 	}
 
-	public function import( $array, $prefixSetter="set" ) {
+	public function export() {
+		return $this->bean;
+	}
 
-		$report = array();
-		$errorCount = 0;
-		foreach($array as $property=>$value) {
-			$error = $exception = $e = null;
-			//$setter = $prefixSetter.ucfirst($property);
-			//if (method_exists($this, $setter)) {
-				try {
-					//$this->$setter( $value );
-					$this->$property = $value;
-				}
-				catch(Exception $e) {
-					$error = $e->getMessage();
-					$exception = $e;
-					$errorCount++;
-				}
-			//}
-			$report[$property] = array(
-				"property"=>$property,
-				"error"=>$error,
-				"exception"=>$e
-			);
+	public static function exportAll( $objects ) {
+		$beans = array();
+		foreach($objects as $object) {
+			$beans[] = $object->export();
 		}
-		return array( "errorCount"=>$errorCount, "report"=>$report );
+		return $beans;
 	}
 
 }

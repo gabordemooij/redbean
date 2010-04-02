@@ -14,7 +14,7 @@ specially crafted SQL. RedBean also has excellent performance because it
 can freeze the database schema which means it no longer scans schemas.
 
 Databases Supported
------
+-------------------
 
 RedBean supports MySQL (InnoDB and MyISAM), MySQL strict, PostgreSQL and SQLite.
 There are specific database plugins though.
