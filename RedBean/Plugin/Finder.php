@@ -43,6 +43,8 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 */
 	public static function where( $type, $SQL = " 1 ", $values=array() ) {
 
+		if ($SQL==="") $SQL = " 1 ";
+
 		//Sorry, quite draconic filtering
 		$type = preg_replace("/\W/","", $type);
 

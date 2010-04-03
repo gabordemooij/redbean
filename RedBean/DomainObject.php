@@ -188,4 +188,8 @@ abstract class RedBean_DomainObject {
 		return $beans;
 	}
 
+	public function loadBean( RedBean_OODBBean $bean ) {
+		$this->bean = $bean;
+	}
+
 }
