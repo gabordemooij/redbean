@@ -327,6 +327,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			$collection[ $id ] = $this->load( $type, $id );
 
 		}
+		$this->stash = NULL;
 		return $collection;
 	}
 
