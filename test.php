@@ -1366,7 +1366,7 @@ $id = $redbean->store($book);
 pass();
 
 
-require("RedBean/DomainObject.php");
+//require("RedBean/DomainObject.php");
 testpack("Test Domain Object");
 
 class Book extends RedBean_DomainObject {
