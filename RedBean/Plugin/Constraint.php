@@ -46,10 +46,6 @@ class RedBean_Plugin_Constraint {
 		//Frozen? Then we may not alter the schema!
 		if ($oodb->isFrozen()) return false;
 
-
-				
-		//$adapter->getDatabase()->setDebugMode(1);
-
 		$table1 = $bean1->getMeta("type");
 		$table2 = $bean2->getMeta("type");
 		$table = $association->getTable( array( $table1,$table2) );
@@ -67,11 +63,41 @@ class RedBean_Plugin_Constraint {
 		$property2 = $adapter->escape($property2);
 
 		//In Cache? Then we dont need to bother
-		if (isset(self::$fkcache[$table])) return false;
+		//if (isset(self::$fkcache[$table])) return false;
+		$fkCode = "fk".md5($table.$property1.$property2);
+		if (isset(self::$fkcache[$fkCode])) return false;
+		//Dispatch to right method
 
-		
 		if ($writer instanceof RedBean_QueryWriter_PostgreSQL) {
+			return self::constraintPostgreSQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
+		}
+		if ($writer instanceof RedBean_QueryWriter_SQLite) {
+			return self::constraintSQLite($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
+		}
+		if ($writer instanceof RedBean_QueryWriter_MySQL) {
+			return self::constraintMySQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
+		}
 
+		return false;
+	
+	}
+
+	/**
+	 * Add the constraints for a specific database driver: PostgreSQL.
+	 * @todo Too many arguments; find a way to solve this in a neater way.
+	 * @param RedBean_ToolBox $toolbox
+	 * @param string $table
+	 * @param string $table1
+	 * @param string $table2
+	 * @param string $property1
+	 * @param string $property2
+	 * @param boolean $dontCache
+	 * @return boolean $succes
+	 */
+	private static function constraintPostgreSQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache) {
+			$writer = $toolbox->getWriter();
+			$oodb = $toolbox->getRedBean();
+			$adapter = $toolbox->getDatabaseAdapter();
 			$fkCode = "fk".md5($table.$property1.$property2);
 			$sql = "
 					SELECT
@@ -89,61 +115,44 @@ class RedBean_Plugin_Constraint {
 					WHERE c.relkind = 'r'
 					AND n.nspname IN ('public')
 					AND (cons.contype = 'f' OR cons.contype IS NULL)
-					AND 
+					AND
 					(  cons.conname = '{$fkCode}a'	OR  cons.conname = '{$fkCode}b' )
-					
+
 			";
 
 			$rows = $adapter->get( $sql );
-			
-
-			
-			if (!count($rows)) { 
-
-
+			if (!count($rows)) {
+				if (!$dontCache) self::$fkcache[ $fkCode ] = true;
 				$sql1 = "ALTER TABLE $table ADD CONSTRAINT
 						{$fkCode}a FOREIGN KEY ($property1)
 						REFERENCES $table1 (id) ON DELETE CASCADE ";
-				
-		
 				$sql2 = "ALTER TABLE $table ADD CONSTRAINT
 						{$fkCode}b FOREIGN KEY ($property2)
 						REFERENCES $table2 (id) ON DELETE CASCADE ";
-				
-				
-		
 				$adapter->exec($sql1);
 				$adapter->exec($sql2);
 			}
 			return true;
-		}
+	}
 
-
-		if ($writer instanceof RedBean_QueryWriter_SQLite) {	
-			$fkCode = "fk".md5($table.$property1.$property2);
-			$sql1 = "
-				CREATE TRIGGER IF NOT EXISTS {$fkCode}a
-					BEFORE DELETE ON $table1
-					FOR EACH ROW BEGIN
-						DELETE FROM $table WHERE  $table.$property1 = OLD.id;
-					END;
-			";
-			
-			$sql2 = "
-				CREATE TRIGGER IF NOT EXISTS {$fkCode}b
-					BEFORE DELETE ON $table2
-					FOR EACH ROW BEGIN
-						DELETE FROM $table WHERE $table.$property2 = OLD.id;
-					END;
-	
-			";
-	
-			$adapter->exec($sql1);
-			$adapter->exec($sql2);
-			return true;
-		}
-
+	/**
+	 * Add the constraints for a specific database driver: MySQL.
+	 * @todo Too many arguments; find a way to solve this in a neater way.
+	 * @param RedBean_ToolBox $toolbox
+	 * @param string $table
+	 * @param string $table1
+	 * @param string $table2
+	 * @param string $property1
+	 * @param string $property2
+	 * @param boolean $dontCache
+	 * @return boolean $succes
+	 */
+	private static function constraintMySQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache) {
+		$writer = $toolbox->getWriter();
+		$oodb = $toolbox->getRedBean();
+		$adapter = $toolbox->getDatabaseAdapter();
 		$db = $adapter->getCell("select database()");
+		$fkCode = "fk".md5($table.$property1.$property2);
 		$fks =  $adapter->getCell("
 			SELECT count(*)
 			FROM information_schema.KEY_COLUMN_USAGE
@@ -155,23 +164,17 @@ class RedBean_Plugin_Constraint {
 		if ($fks>0) return false;
 
 		//add the table to the cache, so we dont have to fire the fk query all the time.
-		if (!$dontCache) self::$fkcache[ $table ] = true;
-
+		if (!$dontCache) self::$fkcache[ $fkCode ] = true;
 		$columns = $writer->getColumns($table);
-
 		if ($writer->code($columns[$property1])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
 			$writer->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 		}
 		if ($writer->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
 			$writer->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 		}
-
-
-
 		$sql = "
 			ALTER TABLE ".$writer->noKW($table)."
 			ADD FOREIGN KEY($property1) references $table1(id) ON DELETE CASCADE;
-
 		";
 		$adapter->exec( $sql );
 		$sql ="
@@ -180,7 +183,44 @@ class RedBean_Plugin_Constraint {
 		";
 		$adapter->exec( $sql );
 		return true;
+	}
 
+	/**
+	 * Add the constraints for a specific database driver: SQLite.
+	 * @todo Too many arguments; find a way to solve this in a neater way.
+	 * @param RedBean_ToolBox $toolbox
+	 * @param string $table
+	 * @param string $table1
+	 * @param string $table2
+	 * @param string $property1
+	 * @param string $property2
+	 * @param boolean $dontCache
+	 * @return boolean $succes
+	 */
+	private static function constraintSQLite($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache) {
+		$writer = $toolbox->getWriter();
+		$oodb = $toolbox->getRedBean();
+		$adapter = $toolbox->getDatabaseAdapter();
+		$fkCode = "fk".md5($table.$property1.$property2);
+		$sql1 = "
+			CREATE TRIGGER IF NOT EXISTS {$fkCode}a
+				BEFORE DELETE ON $table1
+				FOR EACH ROW BEGIN
+					DELETE FROM $table WHERE  $table.$property1 = OLD.id;
+				END;
+		";
+
+		$sql2 = "
+			CREATE TRIGGER IF NOT EXISTS {$fkCode}b
+				BEFORE DELETE ON $table2
+				FOR EACH ROW BEGIN
+					DELETE FROM $table WHERE $table.$property2 = OLD.id;
+				END;
+
+		";
+		$adapter->exec($sql1);
+		$adapter->exec($sql2);
+		return true;
 	}
 
 }

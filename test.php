@@ -850,6 +850,23 @@ asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%mxore%'))),0
 asrt(count(Finder::where("page")),$stat->numberOf($redbean->dispense("page")));
 
 
+
+$bean = $redbean->dispense("wine");
+$bean->name = "bla";
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+Finder::where("wine", "id=5"); //  Finder:where call RedBean_OODB::convertToBeans
+$bean2 = $redbean->load("anotherbean", 5);
+asrt($bean2->id,0);
+
+
 testpack("Test RedBean Cache plugin");
 $adapter->exec("drop table movie");
 $querycounter->counter = 0;
