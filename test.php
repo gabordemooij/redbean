@@ -72,7 +72,8 @@ function testpack($name) {
 testpack("Test Setup");
 
 //Can we load all modules properly?
-require("RedBean/redbean.inc.php");
+//require("RedBean/redbean.inc.php");
+require("rb.pack.php");
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
 //Test whether a non mysql DSN throws an exception
@@ -103,7 +104,6 @@ class ObserverMock implements RedBean_Observer {
     }
 }
 
-require("redbean/QueryWriter/NullWriter.php");
 $nullWriter = new RedBean_QueryWriter_NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
 
@@ -1018,7 +1018,6 @@ testpack("Test Plugins: Optimizer");
 $one = $redbean->dispense("one");
 $one->col = str_repeat('a long text',100);
 $redbean->store($one);
-require("RedBean/Plugin/Optimizer.php");
 $optimizer = new RedBean_Plugin_Optimizer( $toolbox );
 $redbean->addEventListener("update", $optimizer);
 $writer  = $toolbox->getWriter();
@@ -1383,7 +1382,6 @@ $id = $redbean->store($book);
 pass();
 
 
-//require("RedBean/DomainObject.php");
 testpack("Test Domain Object");
 
 class Book extends RedBean_DomainObject {
@@ -1431,7 +1429,7 @@ $he = array_pop($authors);
 asrt($he->getName(),"Mr. Bean");
 
 testpack("Unit Of Work");
-require("RedBean/UnitOfWork.php");
+
 $uow = new RedBean_UnitOfWork();
 $count=array();
 $uow->addWork("a", function(){ global $count; $count[]="a"; });

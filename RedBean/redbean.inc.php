@@ -89,3 +89,6 @@ require($dir."Plugin/Finder.php");
 require($dir."Plugin/Constraint.php");
 
 require($dir."DomainObject.php");
+require($dir."Plugin/Optimizer.php");
+require($dir."QueryWriter/NullWriter.php");
+require($dir."UnitOfWork.php");

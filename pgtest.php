@@ -58,7 +58,8 @@ function testpack($name) {
 	printtext("testing: ".$name);
 }
 
-require("RedBean/redbean.inc.php");
+//require("RedBean/redbean.inc.php");
+require("rb.pack.php");
 $toolbox = RedBean_Setup::kickstartDev( "pgsql:host=localhost dbname=oodb","postgres","maxpass" );
 
 //Observable Mock Object
@@ -76,7 +77,7 @@ class ObserverMock implements RedBean_Observer {
         $this->info = $info;
     }
 }
-require('RedBean/QueryWriter/NullWriter.php');
+
 
 try{
 
