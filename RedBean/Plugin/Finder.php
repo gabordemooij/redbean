@@ -41,7 +41,8 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 * @param array $values
 	 * @return array $beans
 	 */
-	public static function where( $type, $SQL = " 1 ", $values=array() ) {
+	public static function where( $type, $SQL = " 1 ", $values=array(),
+			$ignoreGSQLWarn = false ) { 
 
 		if ($SQL==="") $SQL = " 1 ";
 
@@ -53,7 +54,8 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 
 		RedBean_CompatManager::scanDirect($tools, array(
 				RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
-				RedBean_CompatManager::C_SYSTEM_SQLITE => "3"
+				RedBean_CompatManager::C_SYSTEM_SQLITE => "3",
+				RedBean_CompatManager::C_SYSTEM_POSTGRESQL => "7"
 			));
 
 		
@@ -61,10 +63,17 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 		$redbean = $tools->getRedBean();
 		$adapter = $tools->getDatabaseAdapter();
 		$writer = $tools->getWriter();
-
+		
 		//Do we need to parse Gold SQL?
-		if (!$redbean->isFrozen()) {
+		if (!$redbean->isFrozen()) { 
 			$SQL = self::parseGoldSQL($SQL, $type, $tools);
+		}
+		else { 
+			if (!$ignoreGSQLWarn && strpos($SQL,"@")!==false) {
+				throw new RedBean_Exception_SQL("Gold SQL is
+					only allowed in FLUID mode,
+					to ignore use extra argument TRUE for Finder::Where");
+			}
 		}
 
 		
@@ -107,7 +116,6 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 */
 	public static function parseGoldSQL( $SQL, $currentTable,  RedBean_ToolBox $toolbox ) {
 
-
 		//array for the matching in the regex.
 		$matches = array();
 
@@ -117,45 +125,59 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 		if (preg_match_all($pattern, $SQL, $matches)) {
 
 			//Get the columns in the master table
-			$columns = $toolbox->getWriter()->getColumns($currentTable);
-
+			$columns = array_keys( $toolbox->getWriter()->getColumns($currentTable) );
 			//Get the tables
 			$tables = $toolbox->getWriter()->getTables();
-
-
+		
 			//Get the columns we need to check for
 			$checks = array_shift( $matches );
 
 			//Loop through the items we need to check...
 			foreach($checks as $checkItem) {
-
+				
 				$itemName = substr($checkItem, 1);
 
 				//Ai we need to do a table check as well
-				if (strpos($itemName,".")!==false) {
+				if (strpos($itemName,".")!==false) { 
 
 					list($table, $column) = explode(".", $itemName);
 
 					if (!in_array($table, $tables)) {
 						
 						$SQL = str_replace("@".$itemName, "NULL", $SQL);
-						continue;
+						
 					}
+					else {
 
+						$tableCols = array_keys( $toolbox->getWriter()->getColumns($table) );
+						if (!in_array($column, ($tableCols))) {
+							$SQL = str_replace("@".$itemName, "NULL", $SQL);
+						}
+						else {
+							$SQL = str_replace("@".$itemName, $itemName, $SQL);
+						}
+					}
 				}
 				else {
-					$column = $itemName;
+				
+					if (!in_array($itemName, ($columns))) {
+	
+						$SQL = str_replace("@".$itemName, "NULL", $SQL);
+						
+					}
+					else {
+						$SQL = str_replace("@".$itemName, $itemName, $SQL);
+					}
 				}
-
-				if (!in_array($itemName, $columns)) {
-
-					$SQL = str_replace("@".$itemName, "NULL", $SQL);
-					continue;
-				}
+				
 
 			}
+			
+
+			
 
 		}
+
 
 		return $SQL;
 		

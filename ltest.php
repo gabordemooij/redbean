@@ -181,8 +181,8 @@ try { $bean = $redbean->load(".",3); fail(); }catch(RedBean_Exception_Security $
 try { $bean = $redbean->load("type.test",3); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 
 
-testpack("Finder");
-Finder::where("whatever");
+
+
 
 
 testpack("UNIT TEST RedBean OODB: Batch");
@@ -328,6 +328,73 @@ testpack("UNIT TEST Toolbox");
 asrt(($adapter instanceof RedBean_Adapter_DBAdapter),true);
 asrt(($writer instanceof RedBean_QueryWriter),true);
 asrt(($redbean instanceof RedBean_OODB),true);
+
+
+
+testpack("Test RedBean Finder Plugin*");
+$page = $redbean->dispense("page");
+$page->name = "more pages about less";
+$redbean->store($page);
+$page = $redbean->dispense("page");
+$page->name = "more is worse";
+$redbean->store($page);
+$page = $redbean->dispense("page");
+$page->name = "more is better";
+$redbean->store($page);
+asrt(count(Finder::where("page", " name LIKE '%more%' ")),3);
+asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'))),3);
+asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%mxore%'))),0);
+$bean = $redbean->dispense("wine");
+$bean->name = "bla";
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+Finder::where("wine", "id=5"); //  Finder:where call RedBean_OODB::convertToBeans
+$bean2 = $redbean->load("anotherbean", 5);
+asrt($bean2->id,0);
+testpack("Test Gold SQL");
+asrt(count(Finder::where("wine"," 1 OR 1 ")),1);
+asrt(count(Finder::where("wine"," @id < 100 ")),1);
+asrt(count(Finder::where("wine"," @id > 100 ")),0);
+asrt(count(Finder::where("wine"," @id < 100 OR 1 ")),1);
+asrt(count(Finder::where("wine"," @id > 100 OR 1 ")),1);
+asrt(count(Finder::where("wine",
+		" 1 OR @grape = 'merlot' ")),1); //non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @wine.grape = 'merlot' ")),1); //non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @cork=1 OR @grape = 'merlot' ")),1); //2 non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @bottle.cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
+RedBean_Setup::getToolbox()->getRedBean()->freeze( TRUE );
+asrt(count(Finder::where("wine"," 1 OR 1 ")),1);
+try{Finder::where("wine"," 1 OR @grape = 'merlot' "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @wine.grape = 'merlot' "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @cork=1 OR @wine.grape = 'merlot'  "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @bottle.cork=1 OR @wine.grape = 'merlot'  "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @a=1",array(),true); pass(); }
+catch(RedBean_Exception_SQL $e){ fail(); }
+RedBean_Setup::getToolbox()->getRedBean()->freeze( FALSE );
+asrt(Finder::parseGoldSQL(" @name ","wine",RedBean_Setup::getToolbox())," name ");
+asrt(Finder::parseGoldSQL(" @name @id ","wine",RedBean_Setup::getToolbox())," name id ");
+asrt(Finder::parseGoldSQL(" @name @id @wine.id ","wine",RedBean_Setup::getToolbox())," name id wine.id ");
+asrt(Finder::parseGoldSQL(" @name @id @wine.id @bla ","wine",RedBean_Setup::getToolbox())," name id wine.id NULL ");
+asrt(Finder::parseGoldSQL(" @name @id @wine.id @bla @xxx ","wine",RedBean_Setup::getToolbox())," name id wine.id NULL NULL ");
+asrt(Finder::parseGoldSQL(" @bla @xxx ","wine",RedBean_Setup::getToolbox())," NULL NULL ");
+
+
 
 
 

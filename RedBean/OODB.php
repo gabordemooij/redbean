@@ -236,7 +236,14 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		}
 		else {
 			try { $rows = $this->writer->selectRecord($type,array($id));	}catch(RedBean_Exception_SQL $e ){
-				if ($e->getSQLState()=="42S02" || $e->getSQLState()=="42S22")  {
+				if (
+					$this->writer->sqlStateIn($e->getSQLState(),
+					array(
+						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+					)	
+				
+				)  {
 					$rows = 0;
 					if ($this->isFrozen) throw $e; //only throw if frozen;
 				}

@@ -867,6 +867,43 @@ $bean2 = $redbean->load("anotherbean", 5);
 asrt($bean2->id,0);
 
 
+testpack("Test Gold SQL");
+asrt(count(Finder::where("wine"," 1 OR 1 ")),1);
+asrt(count(Finder::where("wine"," @id < 100 ")),1);
+asrt(count(Finder::where("wine"," @id > 100 ")),0);
+asrt(count(Finder::where("wine"," @id < 100 OR 1 ")),1);
+asrt(count(Finder::where("wine"," @id > 100 OR 1 ")),1);
+asrt(count(Finder::where("wine",
+		" 1 OR @grape = 'merlot' ")),1); //non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @wine.grape = 'merlot' ")),1); //non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @cork=1 OR @grape = 'merlot' ")),1); //2 non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @bottle.cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
+RedBean_Setup::getToolbox()->getRedBean()->freeze( TRUE );
+asrt(count(Finder::where("wine"," 1 OR 1 ")),1);
+try{Finder::where("wine"," 1 OR @grape = 'merlot' "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @wine.grape = 'merlot' "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @cork=1 OR @wine.grape = 'merlot'  "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @bottle.cork=1 OR @wine.grape = 'merlot'  "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @a=1",array(),true); pass(); }
+catch(RedBean_Exception_SQL $e){ fail(); }
+RedBean_Setup::getToolbox()->getRedBean()->freeze( FALSE );
+asrt(Finder::parseGoldSQL(" @name ","wine",RedBean_Setup::getToolbox())," name ");
+asrt(Finder::parseGoldSQL(" @name @id ","wine",RedBean_Setup::getToolbox())," name id ");
+asrt(Finder::parseGoldSQL(" @name @id @wine.id ","wine",RedBean_Setup::getToolbox())," name id wine.id ");
+asrt(Finder::parseGoldSQL(" @name @id @wine.id @bla ","wine",RedBean_Setup::getToolbox())," name id wine.id NULL ");
+asrt(Finder::parseGoldSQL(" @name @id @wine.id @bla @xxx ","wine",RedBean_Setup::getToolbox())," name id wine.id NULL NULL ");
+asrt(Finder::parseGoldSQL(" @bla @xxx ","wine",RedBean_Setup::getToolbox())," NULL NULL ");
+
+
 testpack("Test RedBean Cache plugin");
 $adapter->exec("drop table movie");
 $querycounter->counter = 0;

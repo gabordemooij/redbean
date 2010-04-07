@@ -92,3 +92,4 @@ require($dir."DomainObject.php");
 require($dir."Plugin/Optimizer.php");
 require($dir."QueryWriter/NullWriter.php");
 require($dir."UnitOfWork.php");
+require($dir."Facade.php");
