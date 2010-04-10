@@ -81,7 +81,7 @@ class RedBean_Setup {
 
 			self::checkDSN($dsn);
 
-            $pdo = new Redbean_Driver_PDO( $dsn,$username,$password );
+            $pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
             $adapter = new RedBean_Adapter_DBAdapter( $pdo );
 			
             if (strpos($dsn,"pgsql")===0) {
