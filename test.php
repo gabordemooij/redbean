@@ -352,6 +352,7 @@ $pdo->Execute("DROP TABLE IF EXISTS special");
 $pdo->Execute("DROP TABLE IF EXISTS post");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS page_page");
+$pdo->Execute("DROP TABLE IF EXISTS testa_testb");
 $pdo->Execute("DROP TABLE IF EXISTS association");
 $pdo->Execute("DROP TABLE IF EXISTS logentry");
 $pdo->Execute("DROP TABLE IF EXISTS admin");
@@ -645,6 +646,15 @@ try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
 asrt(count($logger->testingOnly_getStash()),0); // Stash empty?
 
 testpack("Test Association ");
+$rb = $redbean;
+$testA = $rb->dispense( 'testA' ); 
+$testB = $rb->dispense( 'testB' ); 
+$a = new RedBean_AssociationManager( $toolbox ); 
+try{
+$a->related( $testA, "testB" );
+pass();
+}catch(Exception $e){fail();}
+
 $user = $redbean->dispense("user");
 $user->name = "John";
 $redbean->store( $user );

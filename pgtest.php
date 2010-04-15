@@ -284,6 +284,7 @@ if (in_array("page",$_tables)) $pdo->Execute("DROP TABLE page");
 if (in_array("user",$_tables)) $pdo->Execute("DROP TABLE \"user\"");
 if (in_array("book",$_tables)) $pdo->Execute("DROP TABLE book");
 if (in_array("author",$_tables)) $pdo->Execute("DROP TABLE author");
+if (in_array("testa_testb",$_tables)) $pdo->Execute("DROP TABLE testa_testb");
 if (in_array("one",$_tables)) $pdo->Execute("DROP TABLE one");
 if (in_array("post",$_tables)) $pdo->Execute("DROP TABLE post");
 if (in_array("page_user",$_tables)) $pdo->Execute("DROP TABLE page_user");
@@ -421,6 +422,15 @@ asrt(count($books),3);
 
 
 testpack("Test Association ");
+$rb = $redbean;
+$testA = $rb->dispense( 'testA' ); 
+$testB = $rb->dispense( 'testB' ); 
+$a = new RedBean_AssociationManager( $toolbox ); 
+try{
+$a->related( $testA, "testB" );
+pass();
+}catch(Exception $e){fail();}
+
 $user = $redbean->dispense("user");
 $user->name = "John";
 $redbean->store( $user );
