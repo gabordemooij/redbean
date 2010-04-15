@@ -102,9 +102,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		if ($this->debug) {
 			echo "<HR>" . $sql.print_r($aValues,1);
 		}
+		
+		try {
 		$s = $this->pdo->prepare($sql);
 
-		try {
 		$s->execute($aValues);
 		$this->rs = $s->fetchAll();
 		$rows = $this->rs;
