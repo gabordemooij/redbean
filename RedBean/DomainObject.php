@@ -73,6 +73,9 @@ abstract class RedBean_DomainObject {
 
 			$beanTypeName = $lastInPoormanNameSpace;
 		}
+		else {
+			$beanTypeName = $typeName;
+		}
 		/*
 		 * Now do a little check to see whether this name
 		 * can be used. - Just a quick check, we will re-check later on
