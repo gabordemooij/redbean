@@ -853,8 +853,20 @@ $redbean3->store($movie);
 asrt($redbean3->test_getColCount(),1);
 $redbean3->store($movie);
 asrt($redbean3->test_getColCount(),0);
-
-
+$movie = $redbean3->dispense("movie");
+$movie->name = "Back to the Future";
+$id=$redbean3->store($movie);
+$movie=$redbean3->load("movie", $id); 
+asrt($movie->name=="Back to the Future", true);
+$movie->language="EN";
+$redbean3->store($movie);
+$movie = $redbean3->load("movie", $id); 
+//did you store the new prop?
+asrt($movie->language,"EN");
+//really ? -- to database, not only in cache..
+$movie = $redbean->load("movie", $id); 
+//did you store the new prop?
+asrt($movie->language,"EN");
 
 testpack("Transactions");
 $adapter->startTransaction(); pass();
