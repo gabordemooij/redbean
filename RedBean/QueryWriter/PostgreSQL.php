@@ -85,13 +85,6 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
      */
     public function __construct( RedBean_Adapter_DBAdapter $adapter ) {
         $this->adapter = $adapter;
-       
-
-		
-		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
-        $this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
-   
-
 	}
 
 
