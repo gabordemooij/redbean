@@ -197,6 +197,16 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 					$dirty=true;
 				}
 			}
+			
+			//are there any new props?
+			foreach($bean as $p=>$v){
+				if (!isset($oldBean->$p)) {
+					$dirty=true;
+					$newbean->$p = $bean->$p;
+					$this->columnCounter++; 
+				}
+			}
+			
 			//If the bean is dirty; send only differences for update.
 			if ($dirty) {
 				$newbean->copyMetaFrom($bean);

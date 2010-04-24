@@ -60,7 +60,7 @@ function testpack($name) {
 
 //require("RedBean/redbean.inc.php");
 require("rb.pack.php");
-$toolbox = RedBean_Setup::kickstartDev( "pgsql:host=localhost dbname=oodb","postgres","maxpass" );
+$toolbox = RedBean_Setup::kickstartDev( "pgsql:host=localhost dbname=oodb","postgres", file_get_contents('pass.txt') );
 
 //Observable Mock Object
 class ObservableMock extends RedBean_Observable {
