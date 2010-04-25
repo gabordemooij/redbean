@@ -352,6 +352,7 @@ $pdo->Execute("DROP TABLE IF EXISTS special");
 $pdo->Execute("DROP TABLE IF EXISTS post");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS page_page");
+$pdo->Execute("DROP TABLE IF EXISTS testa_testb");
 $pdo->Execute("DROP TABLE IF EXISTS association");
 $pdo->Execute("DROP TABLE IF EXISTS logentry");
 $pdo->Execute("DROP TABLE IF EXISTS admin");
@@ -645,6 +646,15 @@ try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
 asrt(count($logger->testingOnly_getStash()),0); // Stash empty?
 
 testpack("Test Association ");
+$rb = $redbean;
+$testA = $rb->dispense( 'testA' ); 
+$testB = $rb->dispense( 'testB' ); 
+$a = new RedBean_AssociationManager( $toolbox ); 
+try{
+$a->related( $testA, "testB" );
+pass();
+}catch(Exception $e){fail();}
+
 $user = $redbean->dispense("user");
 $user->name = "John";
 $redbean->store( $user );
@@ -959,8 +969,20 @@ $redbean3->store($movie);
 asrt($redbean3->test_getColCount(),1);
 $redbean3->store($movie);
 asrt($redbean3->test_getColCount(),0);
-
-
+$movie = $redbean3->dispense("movie");
+$movie->name = "Back to the Future";
+$id=$redbean3->store($movie);
+$movie=$redbean3->load("movie", $id); 
+asrt($movie->name=="Back to the Future", true);
+$movie->language="EN";
+$redbean3->store($movie);
+$movie = $redbean3->load("movie", $id); 
+//did you store the new prop?
+asrt($movie->language,"EN");
+//really ? -- to database, not only in cache..
+$movie = $redbean->load("movie", $id); 
+//did you store the new prop?
+asrt($movie->language,"EN");
 
 testpack("Transactions");
 $adapter->startTransaction(); pass();
