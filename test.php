@@ -1232,6 +1232,10 @@ asrt( $stat->numberOf($page), 25);
 //Test constraints: cascaded delete
 testpack("Test Cascaded Delete");
 
+$n1 = $redbean->dispense("nonexistant1");
+$n2 = $redbean->dispense("nonexistant2");
+RedBean_Plugin_Constraint::addConstraint($n1, $n2);
+
 //add cask 101 and whisky 12
 $cask = $redbean->dispense("cask");
 $whisky = $redbean->dispense("whisky");

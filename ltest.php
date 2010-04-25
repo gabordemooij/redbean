@@ -947,7 +947,7 @@ $group->name ="mygroup";
 $redbean->store( $group );
 try{ $a->associate($group,$book); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
 //test issue SQL error 23000
-try { $a->associate($group,$book); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
+try { $a->associate($group,$book); pass(); }catch(RedBean_Exception_SQL $e){ echo $e->getSQLState(); fail(); }
 asrt((int)$adapter->getCell("select count(*) from book_group"),1); //just 1 rec!
 
 $pdo->Execute("DROP TABLE IF EXISTS book");

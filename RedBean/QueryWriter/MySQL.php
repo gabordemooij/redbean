@@ -450,6 +450,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		$sqlState = "0";
 		if ($state == "42S02") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
 		if ($state == "42S22") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
+		if ($state == "23000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
 		return in_array($sqlState, $list);
 	}
 	

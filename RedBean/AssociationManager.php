@@ -86,11 +86,10 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			return $this->oodb->store( $bean );
 		}
 		catch(RedBean_Exception_SQL $e)  {
-			//If this is a SQLSTATE[23000]: Integrity constraint violation
-			//Then just ignore the insert
-			if ((int)$e->getSQLState()!==23000)  {
-				throw $e;
-			}
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			))) throw $e;
 		}
 
 	}

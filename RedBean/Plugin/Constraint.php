@@ -67,17 +67,26 @@ class RedBean_Plugin_Constraint {
 		$fkCode = "fk".md5($table.$property1.$property2);
 		if (isset(self::$fkcache[$fkCode])) return false;
 		//Dispatch to right method
-
-		if ($writer instanceof RedBean_QueryWriter_PostgreSQL) {
-			return self::constraintPostgreSQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
+		
+		try{
+			if ($writer instanceof RedBean_QueryWriter_PostgreSQL) {
+				return self::constraintPostgreSQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
+			}
+			if ($writer instanceof RedBean_QueryWriter_SQLite) {
+				return self::constraintSQLite($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
+			}
+			if ($writer instanceof RedBean_QueryWriter_MySQL) {
+				return self::constraintMySQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
+			}
 		}
-		if ($writer instanceof RedBean_QueryWriter_SQLite) {
-			return self::constraintSQLite($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
+		catch(RedBean_Exception_SQL $e){
+			if (!$writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
 		}
-		if ($writer instanceof RedBean_QueryWriter_MySQL) {
-			return self::constraintMySQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
-		}
-
+		
 		return false;
 	
 	}

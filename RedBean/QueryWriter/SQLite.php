@@ -273,6 +273,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 	public function sqlStateIn($state, $list) {
 		$sqlState = "0";
 		if ($state == "HY000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
+		if ($state == "23000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
 		return in_array($sqlState, $list);
 	}
 
