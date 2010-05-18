@@ -41,9 +41,9 @@ class RedBean_OODBBean {
 		if (is_string($selection)) $selection = explode(",",$selection);
 		foreach($arr as $k=>$v) {
 			if ($k != "__info") {
-				if (!$selection || ($selection && in_array($k,$selection))) {
-					$this->$k = $v;
-				}
+                            if (!$selection || ($selection && in_array($k,$selection))) {
+                                $this->$k = $v;
+                            }
 			}
 		}
 		return $this;
@@ -185,6 +185,7 @@ class RedBean_OODBBean {
 	public function getBean( $beanType ) {
 		return RedBean_Setup::getToolBox()->getRedbean()->load( $beanType, $this->getKey($beanType) );
 	}
+
 
 }
 

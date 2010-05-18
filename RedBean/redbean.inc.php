@@ -91,5 +91,9 @@ require($dir."Plugin/Constraint.php");
 require($dir."DomainObject.php");
 require($dir."Plugin/Optimizer.php");
 require($dir."QueryWriter/NullWriter.php");
+
+/* Developer Comfort */
 require($dir."UnitOfWork.php");
+require($dir."SimpleModel.php");
+require($dir."ModelHelper.php");
 require($dir."Facade.php");
