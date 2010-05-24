@@ -23,7 +23,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
  * @license			BSD
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 
