@@ -184,12 +184,17 @@ class R {
 	
 	/**
          * Finds a bean using a type and a where clause (SQL).
+         * As with most Query tools in RedBean you can provide values to
+         * be inserted in the SQL statement by populating the value
+         * array parameter; you can either use the question mark notation
+         * or the slot-notation (:keyname).
          * @param string $type
          * @param string $where
+         * @param array $values
          * @return array $beans
          */
-	public static function find( $type, $where ) {
-		return Finder::where( $type, $where );
+	public static function find( $type, $where, $values=array() ) {
+		return Finder::where( $type, $where, $values );
 	}
 
         /**
@@ -236,7 +241,7 @@ class R {
          * @return array $results
          */
         public static function getAll( $sql, $values=array() ) {
-            return self::secureExec(function($sql, $values){return R::$adapter->getAll( $sql, $values );}, array(), $sql, $values);
+            return self::secureExec(function($sql, $values){return R::$adapter->get( $sql, $values );}, array(), $sql, $values);
         }
 
         /**

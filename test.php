@@ -1510,8 +1510,76 @@ $uow->addWork("all_save",function() use($uow){ $uow->doWork("save"); });
 $uow->doWork("all_save");
 asrt(count( Finder::where("book","title LIKE '%unit%'") ),1);
 
+testpack("Facade");
+unlink("/tmp/teststore.txt");
+asrt(file_exists("/tmp/teststore.txt"),FALSE);
+R::setup("sqlite:/tmp/teststore.txt");
+asrt(R::$redbean instanceof RedBean_OODB,TRUE);
+asrt(R::$toolbox instanceof RedBean_Toolbox,TRUE);
+asrt(R::$adapter instanceof RedBean_Adapter,TRUE);
+asrt(R::$writer instanceof RedBean_QueryWriter,TRUE);
+$book = R::dispense("book");
+asrt($book instanceof RedBean_OODBBean,TRUE);
+$book->title = "a nice book";
+$id = R::store($book);
+asrt(($id>0),TRUE);
+$book = R::load("book", (int)$id);
+asrt($book->title,"a nice book");
+$author = R::dispense("author");
+$author->name = "me";
+R::store($author);
+$book->setBean($author);
+asrt($book->author_id, $author->id);
+asrt(($book->author_id>0), TRUE);
+asrt($book->getBean("author")->name,"me");
+$book2 = R::dispense("book");
+$book2->title="second";
+R::store($book2);
+R::associate($book,$book2);
+asrt(count(R::related($book,"book")),1);
+$book3 = R::dispense("book");
+$book3->title="third";
+R::store($book3);
+R::associate($book,$book3);
+asrt(count(R::related($book,"book")),2);
+R::attach($book,$book2);
+R::attach($book,$book3);
+asrt(count(R::children($book)),2);
+asrt(count(R::find("book"," title LIKE ?", array("third"))),1);
+asrt(count(R::find("book"," title LIKE ?", array("%d%"))),2);
+R::unassociate($book, $book2);
+asrt(count(R::related($book,"book")),1);
+R::trash($book3);
+R::trash($book2);
+asrt(count(R::related($book,"book")),0);
+asrt(count(R::children($book)),0);
+asrt(count(R::getAll("SELECT * FROM book ")),1);
+asrt(count(R::getCol("SELECT title FROM book ")),1);
+asrt((int)R::getCell("SELECT 123 "),123);
+$titles = R::lst("book","title");
+asrt(count($titles),1);
+asrt(($titles[0]),"a nice book");
 
-
-
+testpack("FUSE");
+class Model_Cigar extends RedBean_SimpleModel {
+    public static $reachedDeleted = true;
+    public function update() {
+        $this->rating++;
+    }
+    public function delete() {
+        self::$reachedDeleted =true;
+    }
+    public function open() {
+        $this->rating++;
+    }
+}
+$cgr = R::dispense("cigar");
+$cgr->brand = "Pigge";
+$cgr->rating = 3;
+$id = R::store( $cgr );
+$cgr = R::load( "cigar", $id );
+asrt($cgr->rating,5);
+R::trash($cgr);
+asrt(Model_Cigar::$reachedDeleted,TRUE);
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
