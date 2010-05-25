@@ -183,7 +183,7 @@ class RedBean_OODBBean {
 	 * @return RedBean_OODBBean $relatedBean
 	 */
 	public function getBean( $beanType ) {
-		return RedBean_Setup::getToolBox()->getRedbean()->load( $beanType, $this->getKey($beanType) );
+		return $this->getMeta("sys.oodb")->load( $beanType, $this->getKey($beanType) );
 	}
 
 
