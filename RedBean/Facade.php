@@ -61,7 +61,7 @@ class R {
 	 * @param string $username
 	 * @param string $password
 	 */
-	public static function setup( $dsn, $username=NULL, $password=NULL ) {
+	public static function setup( $dsn="sqlite:/tmp/red.db", $username=NULL, $password=NULL ) {
 		RedBean_Setup::kickstart( $dsn, $username, $password );
 		self::$toolbox = RedBean_Setup::getToolBox();
 		self::$writer = self::$toolbox->getWriter();
@@ -193,7 +193,7 @@ class R {
          * @param array $values
          * @return array $beans
          */
-	public static function find( $type, $where, $values=array() ) {
+	public static function find( $type, $where="1", $values=array() ) {
 		return Finder::where( $type, $where, $values );
 	}
 
@@ -230,7 +230,7 @@ class R {
          * @param array $values
          * @return array $results
          */
-        public static function exec( $sql, $values ) {
+        public static function exec( $sql, $values=array() ) {
             return self::secureExec(function($sql, $values){return R::$adapter->exec( $sql, $values );}, NULL,$sql, $values );
         }
 

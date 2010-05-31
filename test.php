@@ -1511,6 +1511,10 @@ $uow->doWork("all_save");
 asrt(count( Finder::where("book","title LIKE '%unit%'") ),1);
 
 testpack("Facade");
+R::setup(); //should work as well
+pass();
+R::exec("select 123");
+pass();
 unlink("/tmp/teststore.txt");
 asrt(file_exists("/tmp/teststore.txt"),FALSE);
 R::setup("sqlite:/tmp/teststore.txt");
@@ -1545,6 +1549,8 @@ asrt(count(R::related($book,"book")),2);
 R::attach($book,$book2);
 R::attach($book,$book3);
 asrt(count(R::children($book)),2);
+asrt(count(R::find("book")),3);
+asrt(count(R::find("book","1")),3);
 asrt(count(R::find("book"," title LIKE ?", array("third"))),1);
 asrt(count(R::find("book"," title LIKE ?", array("%d%"))),2);
 R::unassociate($book, $book2);
