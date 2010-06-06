@@ -598,7 +598,7 @@ try{Finder::where("wine"," TRUE OR @cork=1 OR @wine.grape = 'merlot'  "); fail()
 catch(RedBean_Exception_SQL $e){ pass(); }
 try{Finder::where("wine"," TRUE OR @bottle.cork=1 OR @wine.grape = 'merlot'  "); fail(); }
 catch(RedBean_Exception_SQL $e){ pass(); }
-try{Finder::where("wine"," TRUE OR @a=1",array(),true); pass(); }
+try{Finder::where("wine"," TRUE OR @a=1",array(),false,true); pass(); }
 catch(RedBean_Exception_SQL $e){ fail(); }
 RedBean_Setup::getToolbox()->getRedBean()->freeze( FALSE );
 asrt(Finder::parseGoldSQL(" @name ","wine",RedBean_Setup::getToolbox())," name ");

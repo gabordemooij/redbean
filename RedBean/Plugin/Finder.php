@@ -42,7 +42,7 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 * @return array $beans
 	 */
 	public static function where( $type, $SQL = " 1 ", $values=array(),
-			$ignoreGSQLWarn = false ) { 
+			$tools = false, $ignoreGSQLWarn = false ) {
 
 		if ($SQL==="") $SQL = " 1 ";
 
@@ -50,7 +50,7 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 		$type = preg_replace("/\W/","", $type);
 
 		//First get hold of the toolbox
-		$tools = RedBean_Setup::getToolBox();
+		if (!$tools) $tools = RedBean_Setup::getToolBox();
 
 		RedBean_CompatManager::scanDirect($tools, array(
 				RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
