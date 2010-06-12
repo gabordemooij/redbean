@@ -90,6 +90,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$bean->$idfield = 0;
 		$this->signal( "dispense", $bean );
 		$this->check( $bean );
+		$bean->setMeta("tainted",false);
 		return $bean;
 	}
 
@@ -201,11 +202,13 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			if (count($updatevalues)>0) {
 				$this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
 			}
+			$bean->setMeta("tainted",false);
 			return (int) $bean->$idfield;
 		}
 		else {
 			$id = $this->writer->insertRecord( $table, $insertcolumns, array($insertvalues) );
 			$bean->$idfield = $id;
+			$bean->setMeta("tainted",false);
 			return (int) $id;
 		}
 	}
@@ -258,6 +261,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			$bean->$p = $v;
 		}
 		$this->signal( "open", $bean );
+		$bean->setMeta("tainted",false);
 		return $bean;
 	}
 

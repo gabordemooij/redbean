@@ -167,12 +167,18 @@ $bean->$prop = 1;
 try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 
-
-
-
+testpack("OODBBean Tainted");
+$spoon = $redbean->dispense("spoon");
+asrt($spoon->getMeta("tainted"),false);
+$spoon->dirty = "yes";
+asrt($spoon->getMeta("tainted"),true);
+$spoon = $redbean->dispense("spoon");
+$spoon->setBean( $redbean->dispense("spoon") );
+asrt($spoon->getMeta("tainted"),true);
 
 testpack("UNIT TEST RedBean OODB: Load");
 $bean = $redbean->load("typetest",2); 
+asrt($bean->getMeta("tainted"),false);
 $nullWriter->returnSelectRecord = array();
 asrt($nullWriter->selectRecordArguments[0],"typetest");
 asrt($nullWriter->selectRecordArguments[1],array(2));
@@ -208,9 +214,11 @@ testpack("UNIT TEST RedBean OODB: Store");
 $nullWriter->reset();
 $bean = $redbean->dispense("bean");
 $bean->name = "coffee";
+asrt($bean->getMeta("tainted"),true);
 $nullWriter->returnScanType = 91239;
 $nullWriter->returnInsertRecord = 1234;
 asrt($redbean->store($bean),1234);
+asrt($bean->getMeta("tainted"),false);
 asrt($nullWriter->getColumnsArgument,"bean");
 asrt($nullWriter->createTableArgument,"bean");
 asrt($nullWriter->scanTypeArgument,"coffee");

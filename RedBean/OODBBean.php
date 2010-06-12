@@ -86,6 +86,11 @@ class RedBean_OODBBean {
 	}
 
 
+	public function __set( $property, $value ) {
+		$this->setMeta("tainted",true);
+		$this->$property = $value;
+	}
+
 	/**
 	 * Returns the value of a meta property. A meta property
 	 * contains extra information about the bean object that will not
@@ -157,6 +162,7 @@ class RedBean_OODBBean {
 	 * @return RedBean_OODBBean $currentBean
 	 */
 	public function setBean( RedBean_OODBBean $bean ) {
+		$this->setMeta("tainted",true);
 		$type = $bean->getMeta("type");
 		$typeid = $type . "_id";
 		$this->$typeid = $bean->id;
