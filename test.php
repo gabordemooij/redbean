@@ -1057,6 +1057,9 @@ asrt($page->name,"test page");
 testpack("Test: Trees ");
 $tm = new RedBean_TreeManager($toolbox);
 $subpage1 = $redbean->dispense("page");
+$notapage = $redbean->dispense("notapage");
+try{ $tm->attach($notapage,$page); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $tm->attach($page,$notapage); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 $subpage2 = $redbean->dispense("page");
 $subpage3 = $redbean->dispense("page");
 $tm->attach( $page, $subpage1 );

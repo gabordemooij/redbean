@@ -55,12 +55,28 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 		$this->writer = $tools->getWriter();
 	}
 
+    /**
+     * Checks whether types of beans match. If the types do not match
+     * this method will throw a RedBean_Exception_Security exception.
+     * @param RedBean_OODBBean $bean1
+     * @param RedBean_OODBBean $bean2
+     */
+    private function equalTypes( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
+        if ($bean1->getMeta("type")!==$bean2->getMeta("type")) {
+            throw new RedBean_Exception_Security("Incompatible types, tree can only work with identical types.");
+        }
+    }
+
+
 	/**
 	 * Attaches the specified child node to the specified parent node.
 	 * @param RedBean_OODBBean $parent
 	 * @param RedBean_OODBBean $child
 	 */
 	public function attach( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
+
+                $this->equalTypes( $parent, $child );
+
 		$idfield = $this->writer->getIDField($parent->getMeta("type"));
 		if (!intval($parent->$idfield)) $this->oodb->store($parent);
 		$child->{$this->property} = $parent->$idfield;
