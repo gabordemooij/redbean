@@ -85,7 +85,16 @@ class RedBean_OODBBean {
 		return $this->$property;
 	}
 
-
+	/**
+	* Magic Setter. Sets the value for a specific property.
+	* This setter acts as a hook for OODB to mark beans as tainted.
+	* The tainted meta property can be retrieved using getMeta("tainted").
+	* The tainted meta property indicates whether a bean has been modified and
+	* can be used in various caching mechanisms.
+	* @param string $property
+	* @param  mixed $value
+	*/
+	
 	public function __set( $property, $value ) {
 		$this->setMeta("tainted",true);
 		$this->$property = $value;
