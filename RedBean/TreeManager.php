@@ -104,4 +104,9 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 		return $this->oodb->batch($parent->getMeta("type"),$ids	);
 	}
 
+
+        public function getParent( RedBean_OODBBean $bean ) {
+            return $this->oodb->load( $bean->getMeta("type"), (int)$bean->parent_id);
+        }
+
 }

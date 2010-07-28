@@ -1575,6 +1575,7 @@ R::associate($book,$book3);
 asrt(count(R::related($book,"book")),2);
 R::attach($book,$book2);
 R::attach($book,$book3);
+asrt( R::getParent($book3)->id, $book->id );
 asrt(count(R::children($book)),2);
 asrt(count(R::find("book")),3);
 asrt(count(R::find("book","1")),3);

@@ -229,6 +229,10 @@ class R {
 	public static function children( RedBean_OODBBean $parent ) {
 		return self::$treeManager->children( $parent );
 	}
+
+        public static function getParent( RedBean_OODBBean $bean ) {
+                return self::$treeManager->getParent( $bean );
+        }
 	
 	/**
          * Finds a bean using a type and a where clause (SQL).
