@@ -93,6 +93,12 @@ class R {
 		return self::$redbean->store( $bean );
 	}
 
+        
+        public static function freeze( $tf = true ) {
+            self::$redbean->freeze( $tf );
+        }
+
+
 	/**
 	 * Loads the bean with the given type and id and returns it.
 	 * @param string $type
