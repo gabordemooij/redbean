@@ -78,6 +78,7 @@ require($dir."CompatManager.php");
 //Load extended functionality
 require($dir."AssociationManager.php");
 require($dir."TreeManager.php");
+require($dir."LinkManager.php");
 require($dir."ExtAssociationManager.php");
 require($dir."Setup.php");
 require($dir."SimpleStat.php");

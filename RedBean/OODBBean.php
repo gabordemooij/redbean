@@ -20,6 +20,8 @@ class RedBean_OODBBean {
 	 */
 	private $__info = NULL;
 
+
+
 	/**
 	 * Imports all values in associative array $array. Every key is used
 	 * for a property and every value will be assigned to the property
@@ -162,44 +164,6 @@ class RedBean_OODBBean {
 		return $this;
 	}
 
-
-	/**
-	 * Convenience method to create a link to another bean;
-	 * i.e. wine -> wine_id
-	 * Chainable.
-	 * @param RedBean_OODBBean $bean
-	 * @return RedBean_OODBBean $currentBean
-	 */
-	public function setBean( RedBean_OODBBean $bean ) {
-		$this->setMeta("tainted",true);
-		$type = $bean->getMeta("type");
-		$typeid = $type . "_id";
-		$this->$typeid = $bean->id;
-		return $this;
-	}
-	
-	/**
-	 * Convenience method to get a link to another bean;
-	 * i.e. wine -> wine_id
-	 * @param string $beanType
-	 * @return integer $key
-	 */
-	public function getKey( $beanType ) {
-		$typeid = $beanType . "_id";
-		return (int) $this->$typeid;
-	}		
-	
-	/**
-	 * Convenience method to get a related bean directly.
-	 * This is a bit hacky though because it depends on
-	 * RedBean setup to get the latest toolbox, but if you are
-	 * really lazy you can use this method.
-	 * @param string $beanType
-	 * @return RedBean_OODBBean $relatedBean
-	 */
-	public function getBean( $beanType ) {
-		return $this->getMeta("sys.oodb")->load( $beanType, $this->getKey($beanType) );
-	}
 
 
 }

@@ -86,7 +86,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$bean = new RedBean_OODBBean();
 		$bean->setMeta("type", $type );
                 $bean->setMeta("sys.oodb", $this);
-		$idfield = $this->writer->getIDField($bean->getMeta("type"));
+                $idfield = $this->writer->getIDField($bean->getMeta("type"));
 		$bean->$idfield = 0;
 		$this->signal( "dispense", $bean );
 		$this->check( $bean );

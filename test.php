@@ -106,6 +106,7 @@ class ObserverMock implements RedBean_Observer {
 
 $nullWriter = new RedBean_QueryWriter_NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
+$linker = new RedBean_LinkManager( $toolbox );
 
 //Section A: Config Testing
 testpack("CONFIG TEST");
@@ -173,7 +174,7 @@ asrt($spoon->getMeta("tainted"),false);
 $spoon->dirty = "yes";
 asrt($spoon->getMeta("tainted"),true);
 $spoon = $redbean->dispense("spoon");
-$spoon->setBean( $redbean->dispense("spoon") );
+$linker->link($spoon,$redbean->dispense("spoon"));
 asrt($spoon->getMeta("tainted"),true);
 
 testpack("UNIT TEST RedBean OODB: Load");
@@ -377,22 +378,24 @@ testpack("UNIT TEST RedBean OODB: setObject");
 $wine = $redbean->dispense("wine");
 $wine->id = 123;
 $cask = $redbean->dispense("cask");
-$cask->setBean( $wine );
+
+$linker->link( $cask, $wine );
 asrt($cask->wine_id,123);
 $wine->id = 124;
-$cask->setBean( $wine );
+$linker->link($cask,$wine);
+
 asrt($cask->wine_id,124);
-asrt($cask->getKey("wine"),124);
+asrt($linker->getKey($cask,"wine"),124);
 $wine = $redbean->dispense("wine");
 $cask = $redbean->dispense("cask");
 $wine->title = "my wine";
 $cask->title = "my cask";
 $redbean->store( $wine );
-$cask->setBean( $wine );
+$linker->link($cask,$wine);
 $redbean->store( $cask );
-asrt($cask->getKey("wine"), $wine->id);
+asrt($linker->getKey($cask,"wine"), $wine->id);
 asrt(($wine->id>0),true);
-$wine = $cask->getBean("wine");
+$wine = $linker->getBean($cask,"wine");
 asrt(($wine instanceof RedBean_OODBBean), true);
 asrt($wine->title,"my wine");
 $pdo->Execute("DROP TABLE IF EXISTS cask");
@@ -1543,10 +1546,23 @@ asrt($book->title,"a nice book");
 $author = R::dispense("author");
 $author->name = "me";
 R::store($author);
-$book->setBean($author);
+R::link($book,$author);
 asrt($book->author_id, $author->id);
+asrt(R::getKey($book,"author"), $author->id);
 asrt(($book->author_id>0), TRUE);
-asrt($book->getBean("author")->name,"me");
+asrt(R::getBean($book,"author")->name,"me");
+R::breakLink($book,"author");
+asrt(($book->author_id>0), FALSE);
+$book9 = R::dispense("book");
+$author9 = R::dispense("author");
+$author9->name="mr Nine";
+R::link($book9,$author9);//wo save
+$bk9 = R::store($book9);
+$book9 = R::load("book",$bk9);
+asrt(R::getBean($book9, "author")->name,"mr Nine");
+R::trash(R::getBean($book9, "author"));
+R::trash($book9);
+pass();
 $book2 = R::dispense("book");
 $book2->title="second";
 R::store($book2);

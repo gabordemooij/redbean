@@ -55,6 +55,14 @@ class R {
 	 */
 	public static $associationManager;
 
+        /**
+	 *
+	 * Constains an instance of the RedBean Link Manager
+	 * @var RedBean_LinkManager
+	 *
+	 */
+	public static $linkManager;
+
 	/**
 	 * Kickstarts redbean for you.
 	 * @param string $dsn
@@ -69,6 +77,7 @@ class R {
 		self::$redbean = self::$toolbox->getRedBean();
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
 		self::$treeManager = new RedBean_TreeManager( self::$toolbox );
+                self::$linkManager = new RedBean_LinkManager( self::$toolbox );
                 $helper = new RedBean_ModelHelper();
                 self::$redbean->addEventListener("update", $helper );
                 self::$redbean->addEventListener("open", $helper );
@@ -172,6 +181,45 @@ class R {
 	public static function attach( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
 		return self::$treeManager->attach( $parent, $child );
 	}
+
+        /**
+         * Links two beans using a foreign key field, 1-N Assoc only.
+         * @param RedBean_OODBBean $bean1
+         * @param RedBean_OODBBean $bean2
+         * @return mixed
+         */
+        public static function link( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
+                return self::$linkManager->link( $bean1, $bean2 );
+        }
+
+        /**
+         *
+         * @param RedBean_OODBBean $bean
+         * @param string $typeName
+         * @return mixed
+         */
+        public static function getBean( RedBean_OODBBean $bean, $typeName ) {
+                return self::$linkManager->getBean($bean, $typeName );
+        }
+
+        /**
+         *
+         * @param RedBean_OODBBean $bean
+         * @param string $typeName
+         * @return mixed
+         */
+        public static function getKey( RedBean_OODBBean $bean, $typeName ) {
+                return self::$linkManager->getKey($bean, $typeName );
+        }
+
+        /**
+         *
+         * @param RedBean_OODBBean $bean
+         * @param mixed $typeName
+         */
+        public static function breakLink( RedBean_OODBBean $bean, $typeName ) {
+            return self::$linkManager->breakLink( $bean, $typeName );
+        }
 
 	/**
 	 * Returns all children beans under parent bean $parent
