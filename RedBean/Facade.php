@@ -357,9 +357,6 @@ class R {
                 }
                 return $rs;
             }
-            else {
-                throw $e;
-            }
         }
 }
 
