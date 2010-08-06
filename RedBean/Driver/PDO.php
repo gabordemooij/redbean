@@ -9,11 +9,14 @@
  *
  *
  * (c) Desfrenes & Gabor de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  *
  */
 class RedBean_Driver_PDO implements RedBean_Driver {
+
+
+	private $dsn;
 
 	/**
 	 * 
@@ -79,6 +82,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      */
     public function __construct($dsn, $user, $pass)
     {
+		$this->dsn = $dsn;
     	//PDO::MYSQL_ATTR_INIT_COMMAND
         $this->pdo = new PDO(
                 $dsn,
@@ -87,7 +91,9 @@ class RedBean_Driver_PDO implements RedBean_Driver {
                 
                 array(1002 => 'SET NAMES utf8',
                       PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC)
+                      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+
+					  )
             );
     }
 
@@ -98,17 +104,30 @@ class RedBean_Driver_PDO implements RedBean_Driver {
     public function GetAll( $sql, $aValues=array() )
     {
 		
-    	$this->exc = 0;
-		if ($this->debug) {
-			echo "<HR>" . $sql.print_r($aValues,1);
-		}
-		
-		try {
-		$s = $this->pdo->prepare($sql);
+	    	$this->exc = 0;
+    	    if ($this->debug)
+	        {
+	            echo "<HR>" . $sql.print_r($aValues,1);
+	        }
 
-		$s->execute($aValues);
-		$this->rs = $s->fetchAll();
-		$rows = $this->rs;
+
+		
+
+		try {
+
+
+			if (strpos("pgsql",$this->dsn)===0){
+				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
+			}
+			else {
+				$s = $this->pdo->prepare($sql);
+			}
+
+
+
+			$s->execute($aValues);
+			$this->rs = $s->fetchAll();
+			$rows = $this->rs;
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
@@ -212,7 +231,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	            echo "<HR>" . $sql.print_r($aValues,1);
 	        }
 			try {
-			$s = $this->pdo->prepare($sql);
+
+
+			if (strpos("pgsql",$this->dsn)===0){
+				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
+			}
+			else {
+				$s = $this->pdo->prepare($sql);
+			}
 			$s->execute($aValues);
 			$this->affected_rows=$s->rowCount();
 			return $this->affected_rows;

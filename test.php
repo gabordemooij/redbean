@@ -72,7 +72,8 @@ function testpack($name) {
 testpack("Test Setup");
 
 //Can we load all modules properly?
-require("RedBean/redbean.inc.php");
+//require("RedBean/redbean.inc.php");
+require("rb.php");
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
 //Test whether a non mysql DSN throws an exception
@@ -103,9 +104,9 @@ class ObserverMock implements RedBean_Observer {
     }
 }
 
-require("redbean/QueryWriter/NullWriter.php");
 $nullWriter = new RedBean_QueryWriter_NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
+$linker = new RedBean_LinkManager( $toolbox );
 
 //Section A: Config Testing
 testpack("CONFIG TEST");
@@ -167,11 +168,18 @@ $bean->$prop = 1;
 try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 
-
-
+testpack("OODBBean Tainted");
+$spoon = $redbean->dispense("spoon");
+asrt($spoon->getMeta("tainted"),false);
+$spoon->dirty = "yes";
+asrt($spoon->getMeta("tainted"),true);
+$spoon = $redbean->dispense("spoon");
+$linker->link($spoon,$redbean->dispense("spoon"));
+asrt($spoon->getMeta("tainted"),true);
 
 testpack("UNIT TEST RedBean OODB: Load");
 $bean = $redbean->load("typetest",2); 
+asrt($bean->getMeta("tainted"),false);
 $nullWriter->returnSelectRecord = array();
 asrt($nullWriter->selectRecordArguments[0],"typetest");
 asrt($nullWriter->selectRecordArguments[1],array(2));
@@ -207,9 +215,11 @@ testpack("UNIT TEST RedBean OODB: Store");
 $nullWriter->reset();
 $bean = $redbean->dispense("bean");
 $bean->name = "coffee";
+asrt($bean->getMeta("tainted"),true);
 $nullWriter->returnScanType = 91239;
 $nullWriter->returnInsertRecord = 1234;
 asrt($redbean->store($bean),1234);
+asrt($bean->getMeta("tainted"),false);
 asrt($nullWriter->getColumnsArgument,"bean");
 asrt($nullWriter->createTableArgument,"bean");
 asrt($nullWriter->scanTypeArgument,"coffee");
@@ -351,6 +361,7 @@ $pdo->Execute("DROP TABLE IF EXISTS special");
 $pdo->Execute("DROP TABLE IF EXISTS post");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS page_page");
+$pdo->Execute("DROP TABLE IF EXISTS testa_testb");
 $pdo->Execute("DROP TABLE IF EXISTS association");
 $pdo->Execute("DROP TABLE IF EXISTS logentry");
 $pdo->Execute("DROP TABLE IF EXISTS admin");
@@ -363,9 +374,33 @@ $pdo->Execute("DROP TABLE IF EXISTS cask");
 $pdo->Execute("DROP TABLE IF EXISTS whisky");
 $pdo->Execute("DROP TABLE IF EXISTS __log");
 
+testpack("UNIT TEST RedBean OODB: setObject");
+$wine = $redbean->dispense("wine");
+$wine->id = 123;
+$cask = $redbean->dispense("cask");
 
+$linker->link( $cask, $wine );
+asrt($cask->wine_id,123);
+$wine->id = 124;
+$linker->link($cask,$wine);
 
-
+asrt($cask->wine_id,124);
+asrt($linker->getKey($cask,"wine"),124);
+$wine = $redbean->dispense("wine");
+$cask = $redbean->dispense("cask");
+$wine->title = "my wine";
+$cask->title = "my cask";
+$redbean->store( $wine );
+$linker->link($cask,$wine);
+$redbean->store( $cask );
+asrt($linker->getKey($cask,"wine"), $wine->id);
+asrt(($wine->id>0),true);
+$wine = $linker->getBean($cask,"wine");
+asrt(($wine instanceof RedBean_OODBBean), true);
+asrt($wine->title,"my wine");
+$pdo->Execute("DROP TABLE IF EXISTS cask");
+$pdo->Execute("DROP TABLE IF EXISTS wine");
+pass();
 
 $page = $redbean->dispense("page");
 
@@ -622,6 +657,15 @@ try{ $redbean->store( $otherpage ); fail(); }catch(Exception $e){ pass(); }
 asrt(count($logger->testingOnly_getStash()),0); // Stash empty?
 
 testpack("Test Association ");
+$rb = $redbean;
+$testA = $rb->dispense( 'testA' ); 
+$testB = $rb->dispense( 'testB' ); 
+$a = new RedBean_AssociationManager( $toolbox ); 
+try{
+$a->related( $testA, "testB" );
+pass();
+}catch(Exception $e){fail();}
+
 $user = $redbean->dispense("user");
 $user->name = "John";
 $redbean->store( $user );
@@ -680,6 +724,35 @@ asrt(($page->id>0),true);
 asrt(($page2->id>0),true);
 $idpage = $page->id;
 $idpage2 = $page2->id;
+
+
+testpack("Test Ext. Association ");
+$adapter->exec("DROP TABLE IF EXISTS webpage ");
+$adapter->exec("DROP TABLE IF EXISTS ad_webpage ");
+$adapter->exec("DROP TABLE IF EXISTS ad ");
+$webpage = $redbean->dispense("webpage");
+$webpage->title = "page with ads";
+$ad = $redbean->dispense("ad");
+$ad->title = "buy this!";
+$top = $redbean->dispense("placement");
+$top->position = "top";
+$bottom = $redbean->dispense("placement");
+$bottom->position = "bottom";
+$ea = new RedBean_ExtAssociationManager( $toolbox );
+$ea->extAssociate( $ad, $webpage, $top);
+$ads = $redbean->batch( "ad", $ea->related( $webpage, "ad") );
+$adsPos = $redbean->batch( "ad_webpage", $ea->related( $webpage, "ad", true ) );
+asrt(count($ads),1);
+asrt(count($adsPos),1);
+$theAd = array_pop($ads);
+$theAdPos = array_pop($adsPos);
+asrt($theAd->title, $ad->title);
+asrt($theAdPos->position, $top->position);
+$ad2 = $redbean->dispense("ad");
+$ad2->title = "buy this too!";
+$ea->extAssociate( $ad2, $webpage, $bottom);
+$ads = $redbean->batch( "ad", $ea->related( $webpage, "ad", true ) );
+asrt(count($ads),2);
 
 testpack("Cross References");
 $ids = $a->related($page, "page");
@@ -796,6 +869,60 @@ asrt(count(Finder::where("page", " name LIKE '%more%' ")),3);
 asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'))),3);
 asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%mxore%'))),0);
 asrt(count(Finder::where("page")),$stat->numberOf($redbean->dispense("page")));
+
+
+
+$bean = $redbean->dispense("wine");
+$bean->name = "bla";
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+$redbean->store($bean);
+Finder::where("wine", "id=5"); //  Finder:where call RedBean_OODB::convertToBeans
+$bean2 = $redbean->load("anotherbean", 5);
+asrt($bean2->id,0);
+
+
+testpack("Test Gold SQL");
+asrt(count(Finder::where("wine"," 1 OR 1 ")),1);
+asrt(count(Finder::where("wine"," @id < 100 ")),1);
+asrt(count(Finder::where("wine"," @id > 100 ")),0);
+asrt(count(Finder::where("wine"," @id < 100 OR 1 ")),1);
+asrt(count(Finder::where("wine"," @id > 100 OR 1 ")),1);
+asrt(count(Finder::where("wine",
+		" 1 OR @grape = 'merlot' ")),1); //non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @wine.grape = 'merlot' ")),1); //non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @cork=1 OR @grape = 'merlot' ")),1); //2 non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
+asrt(count(Finder::where("wine",
+		" 1 OR @bottle.cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
+RedBean_Setup::getToolbox()->getRedBean()->freeze( TRUE );
+asrt(count(Finder::where("wine"," 1 OR 1 ")),1);
+try{Finder::where("wine"," 1 OR @grape = 'merlot' "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @wine.grape = 'merlot' "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @cork=1 OR @wine.grape = 'merlot'  "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @bottle.cork=1 OR @wine.grape = 'merlot'  "); fail(); }
+catch(RedBean_Exception_SQL $e){ pass(); }
+try{Finder::where("wine"," 1 OR @a=1",array(),false,true); pass(); }
+catch(RedBean_Exception_SQL $e){ fail(); }
+RedBean_Setup::getToolbox()->getRedBean()->freeze( FALSE );
+asrt(Finder::parseGoldSQL(" @name ","wine",RedBean_Setup::getToolbox())," name ");
+asrt(Finder::parseGoldSQL(" @name @id ","wine",RedBean_Setup::getToolbox())," name id ");
+asrt(Finder::parseGoldSQL(" @name @id @wine.id ","wine",RedBean_Setup::getToolbox())," name id wine.id ");
+asrt(Finder::parseGoldSQL(" @name @id @wine.id @bla ","wine",RedBean_Setup::getToolbox())," name id wine.id NULL ");
+asrt(Finder::parseGoldSQL(" @name @id @wine.id @bla @xxx ","wine",RedBean_Setup::getToolbox())," name id wine.id NULL NULL ");
+asrt(Finder::parseGoldSQL(" @bla @xxx ","wine",RedBean_Setup::getToolbox())," NULL NULL ");
 
 
 testpack("Test RedBean Cache plugin");
@@ -933,6 +1060,9 @@ asrt($page->name,"test page");
 testpack("Test: Trees ");
 $tm = new RedBean_TreeManager($toolbox);
 $subpage1 = $redbean->dispense("page");
+$notapage = $redbean->dispense("notapage");
+try{ $tm->attach($notapage,$page); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try{ $tm->attach($page,$notapage); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 $subpage2 = $redbean->dispense("page");
 $subpage3 = $redbean->dispense("page");
 $tm->attach( $page, $subpage1 );
@@ -961,7 +1091,6 @@ testpack("Test Plugins: Optimizer");
 $one = $redbean->dispense("one");
 $one->col = str_repeat('a long text',100);
 $redbean->store($one);
-require("RedBean/Plugin/Optimizer.php");
 $optimizer = new RedBean_Plugin_Optimizer( $toolbox );
 $redbean->addEventListener("update", $optimizer);
 $writer  = $toolbox->getWriter();
@@ -1138,6 +1267,10 @@ asrt( $stat->numberOf($page), 25);
 
 //Test constraints: cascaded delete
 testpack("Test Cascaded Delete");
+
+$n1 = $redbean->dispense("nonexistant1");
+$n2 = $redbean->dispense("nonexistant2");
+RedBean_Plugin_Constraint::addConstraint($n1, $n2);
 
 //add cask 101 and whisky 12
 $cask = $redbean->dispense("cask");
@@ -1326,7 +1459,6 @@ $id = $redbean->store($book);
 pass();
 
 
-require("RedBean/DomainObject.php");
 testpack("Test Domain Object");
 
 class Book extends RedBean_DomainObject {
@@ -1372,6 +1504,119 @@ $authors = $book2->getAuthors();
 asrt((count($authors)),1);
 $he = array_pop($authors);
 asrt($he->getName(),"Mr. Bean");
+
+testpack("Unit Of Work");
+
+$uow = new RedBean_UnitOfWork();
+$count=array();
+$uow->addWork("a", function(){ global $count; $count[]="a"; });
+$uow->addWork("b", function(){ global $count; $count[]="b"; });
+$uow->doWork("a");
+$uow->doWork("a");
+$uow->doWork("b");
+$cnt = array_count_values($count);
+asrt($cnt["a"],2);
+asrt($cnt["b"],1);
+$book = $redbean->dispense("book");
+$book->title = "unit of work book";
+$uow->addWork("save", function() use($redbean, $book){ $redbean->store($book); });
+$uow->addWork("all_save",function() use($uow){ $uow->doWork("save"); });
+$uow->doWork("all_save");
+asrt(count( Finder::where("book","title LIKE '%unit%'") ),1);
+
+testpack("Facade");
+R::setup(); //should work as well
+pass();
+R::exec("select 123");
+pass();
+unlink("/tmp/teststore.txt");
+asrt(file_exists("/tmp/teststore.txt"),FALSE);
+R::setup("sqlite:/tmp/teststore.txt");
+asrt(R::$redbean instanceof RedBean_OODB,TRUE);
+asrt(R::$toolbox instanceof RedBean_Toolbox,TRUE);
+asrt(R::$adapter instanceof RedBean_Adapter,TRUE);
+asrt(R::$writer instanceof RedBean_QueryWriter,TRUE);
+$book = R::dispense("book");
+asrt($book instanceof RedBean_OODBBean,TRUE);
+$book->title = "a nice book";
+$id = R::store($book);
+asrt(($id>0),TRUE);
+$book = R::load("book", (int)$id);
+asrt($book->title,"a nice book");
+$author = R::dispense("author");
+$author->name = "me";
+R::store($author);
+R::link($book,$author);
+asrt($book->author_id, $author->id);
+asrt(R::getKey($book,"author"), $author->id);
+asrt(($book->author_id>0), TRUE);
+asrt(R::getBean($book,"author")->name,"me");
+R::breakLink($book,"author");
+asrt(($book->author_id>0), FALSE);
+$book9 = R::dispense("book");
+$author9 = R::dispense("author");
+$author9->name="mr Nine";
+R::link($book9,$author9);//wo save
+$bk9 = R::store($book9);
+$book9 = R::load("book",$bk9);
+asrt(R::getBean($book9, "author")->name,"mr Nine");
+R::trash(R::getBean($book9, "author"));
+R::trash($book9);
+pass();
+$book2 = R::dispense("book");
+$book2->title="second";
+R::store($book2);
+R::associate($book,$book2);
+asrt(count(R::related($book,"book")),1);
+$book3 = R::dispense("book");
+$book3->title="third";
+R::store($book3);
+R::associate($book,$book3);
+asrt(count(R::related($book,"book")),2);
+R::attach($book,$book2);
+R::attach($book,$book3);
+asrt( R::getParent($book3)->id, $book->id );
+asrt(count(R::children($book)),2);
+asrt(count(R::find("book")),3);
+asrt(count(R::find("book","1")),3);
+asrt(count(R::find("book"," title LIKE ?", array("third"))),1);
+asrt(count(R::find("book"," title LIKE ?", array("%d%"))),2);
+R::unassociate($book, $book2);
+asrt(count(R::related($book,"book")),1);
+R::trash($book3);
+R::trash($book2);
+asrt(count(R::related($book,"book")),0);
+asrt(count(R::children($book)),0);
+asrt(count(R::getAll("SELECT * FROM book ")),1);
+asrt(count(R::getCol("SELECT title FROM book ")),1);
+asrt((int)R::getCell("SELECT 123 "),123);
+$titles = R::lst("book","title");
+asrt(count($titles),1);
+asrt(($titles[0]),"a nice book");
+
+testpack("FUSE");
+class Model_Cigar extends RedBean_SimpleModel {
+    public static $reachedDeleted = true;
+    public function update() {
+        $this->rating++;
+    }
+    public function delete() {
+        self::$reachedDeleted =true;
+    }
+    public function open() {
+        $this->rating++;
+    }
+}
+$cgr = R::dispense("cigar");
+$cgr->brand = "Pigge";
+$cgr->rating = 3;
+$id = R::store( $cgr );
+$cgr = R::load( "cigar", $id );
+asrt($cgr->rating,5);
+R::trash($cgr);
+asrt(Model_Cigar::$reachedDeleted,TRUE);
+
+
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

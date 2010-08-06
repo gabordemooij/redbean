@@ -9,7 +9,7 @@
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBean_Plugin,RedBean_Observer {
@@ -19,7 +19,7 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	 * @var array $databaseSpecs
 	 */
 	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
 	);
 
 

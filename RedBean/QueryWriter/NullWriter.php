@@ -13,7 +13,7 @@
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_QueryWriter_NullWriter implements RedBean_QueryWriter {
@@ -325,6 +325,8 @@ class RedBean_QueryWriter_NullWriter implements RedBean_QueryWriter {
 
 	public function noKW($str) { return $str; }
 
+	public function sqlStateIn($state,$list) { return true; }
+
 	/**
 	 * Resets the mock object. All public
 	 * properties will be assigned values like NULL or an empty
@@ -357,4 +359,6 @@ class RedBean_QueryWriter_NullWriter implements RedBean_QueryWriter {
 		$this->returnCheckChanges = NULL;
 		$this->returnAddUniqueIndex = NULL;
 	}
+
+
 }

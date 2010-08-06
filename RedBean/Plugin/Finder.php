@@ -9,11 +9,12 @@
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_Plugin_Finder implements RedBean_Plugin {
 
+	
 	/**
 	 * Fetches a collection of OODB Bean objects based on the SQL
 	 * criteria provided. For instance;
@@ -40,19 +41,42 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 * @param array $values
 	 * @return array $beans
 	 */
-	public static function where( $type, $SQL = " 1 ", $values=array() ) {
+	public static function where( $type, $SQL = " 1 ", $values=array(),
+			$tools = false, $ignoreGSQLWarn = false ) {
+
+		if ($SQL==="") $SQL = " 1 ";
 
 		//Sorry, quite draconic filtering
 		$type = preg_replace("/\W/","", $type);
 
 		//First get hold of the toolbox
-		$tools = RedBean_Setup::getToolBox();
+		if (!$tools) $tools = RedBean_Setup::getToolBox();
 
-		RedBean_CompatManager::scanDirect($tools, array(RedBean_CompatManager::C_SYSTEM_MYSQL => "5"));
+		RedBean_CompatManager::scanDirect($tools, array(
+				RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+				RedBean_CompatManager::C_SYSTEM_SQLITE => "3",
+				RedBean_CompatManager::C_SYSTEM_POSTGRESQL => "7"
+			));
 
+		
 		//Now get the two tools we need; RedBean and the Adapter
 		$redbean = $tools->getRedBean();
 		$adapter = $tools->getDatabaseAdapter();
+		$writer = $tools->getWriter();
+		
+		//Do we need to parse Gold SQL?
+		if (!$redbean->isFrozen()) { 
+			$SQL = self::parseGoldSQL($SQL, $type, $tools);
+		}
+		else { 
+			if (!$ignoreGSQLWarn && strpos($SQL,"@")!==false) {
+				throw new RedBean_Exception_SQL("Gold SQL is
+					only allowed in FLUID mode,
+					to ignore use extra argument TRUE for Finder::Where");
+			}
+		}
+
+		
 
 		//Make a standard ANSI SQL query from the SQL provided
 		try{
@@ -63,7 +87,10 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 
 		}
 		catch(RedBean_Exception_SQL $e) { 
-			if ($e->getSQLState()=="42S02" || $e->getSQLState()=="42S22") { //no such table? no problem. may happen.
+			if ($writer->sqlStateIn($e->getSQLState(),array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
+			))){
 				return array();
 			}
 			else {
@@ -78,6 +105,85 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 		
 
 	}
+
+	/**
+	 * Parses Gold SQL.
+	 * Checks whether columns and tables prefixed with @ exists,
+	 * if not they are being replaced by NULL leaving intact the
+	 * rest of the query and making the SQL continue to work even
+	 * if it's partially broken.
+	 * @param <type> $SQL
+	 */
+	public static function parseGoldSQL( $SQL, $currentTable,  RedBean_ToolBox $toolbox ) {
+
+		//array for the matching in the regex.
+		$matches = array();
+
+		//Pattern for our regular expression to filter the prefixes.
+		$pattern = "/@[\w\.]+/";
+		
+		if (preg_match_all($pattern, $SQL, $matches)) {
+
+			//Get the columns in the master table
+			$columns = array_keys( $toolbox->getWriter()->getColumns($currentTable) );
+			//Get the tables
+			$tables = $toolbox->getWriter()->getTables();
+		
+			//Get the columns we need to check for
+			$checks = array_shift( $matches );
+
+			//Loop through the items we need to check...
+			foreach($checks as $checkItem) {
+				
+				$itemName = substr($checkItem, 1);
+
+				//Ai we need to do a table check as well
+				if (strpos($itemName,".")!==false) { 
+
+					list($table, $column) = explode(".", $itemName);
+
+					if (!in_array($table, $tables)) {
+						
+						$SQL = str_replace("@".$itemName, "NULL", $SQL);
+						
+					}
+					else {
+
+						$tableCols = array_keys( $toolbox->getWriter()->getColumns($table) );
+						if (!in_array($column, ($tableCols))) {
+							$SQL = str_replace("@".$itemName, "NULL", $SQL);
+						}
+						else {
+							$SQL = str_replace("@".$itemName, $itemName, $SQL);
+						}
+					}
+				}
+				else {
+				
+					if (!in_array($itemName, ($columns))) {
+	
+						$SQL = str_replace("@".$itemName, "NULL", $SQL);
+						
+					}
+					else {
+						$SQL = str_replace("@".$itemName, $itemName, $SQL);
+					}
+				}
+				
+
+			}
+			
+
+			
+
+		}
+
+
+		return $SQL;
+		
+	}
+
+
 
 }
 

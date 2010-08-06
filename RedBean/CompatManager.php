@@ -8,7 +8,7 @@
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_CompatManager {
@@ -20,7 +20,7 @@ class RedBean_CompatManager {
 	const C_SYSTEM_MYSQL		= "mysql";
 	const C_SYSTEM_SQLITE		= "sqlite";
 	const C_SYSTEM_DB2			= "db2";
-	const C_SYSTEM_POSTGRESQL	= "postgresql";
+	const C_SYSTEM_POSTGRESQL	= "pgsql";
 	const C_SYSTEM_ORACLE		= "oracle";
 	const C_SYSTEM_MSSQL		= "mssql";
 	const C_SYSTEM_HYPERTABLE	= "hypertable";
@@ -71,7 +71,7 @@ To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
 
 		//obtain the database system
 		$brand = strtolower(trim($toolbox->getDatabaseAdapter()->getDatabase()->getDatabaseType()));
-
+		
 		//obtain version number
 		$version = $toolbox->getDatabaseAdapter()->getDatabase()->getDatabaseVersion();
 

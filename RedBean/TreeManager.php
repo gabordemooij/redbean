@@ -9,11 +9,19 @@
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_TreeManager extends RedBean_CompatManager {
 
+	/**
+	 * Specify what database systems are supported by this class.
+	 * @var array $databaseSpecs
+	 */
+	protected $supportedSystems = array(
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+		RedBean_CompatManager::C_SYSTEM_SQLITE=>"3"
+	);
 	/**
 	 *
 	 * @var string
@@ -47,12 +55,28 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 		$this->writer = $tools->getWriter();
 	}
 
+    /**
+     * Checks whether types of beans match. If the types do not match
+     * this method will throw a RedBean_Exception_Security exception.
+     * @param RedBean_OODBBean $bean1
+     * @param RedBean_OODBBean $bean2
+     */
+    private function equalTypes( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
+        if ($bean1->getMeta("type")!==$bean2->getMeta("type")) {
+            throw new RedBean_Exception_Security("Incompatible types, tree can only work with identical types.");
+        }
+    }
+
+
 	/**
 	 * Attaches the specified child node to the specified parent node.
 	 * @param RedBean_OODBBean $parent
 	 * @param RedBean_OODBBean $child
 	 */
 	public function attach( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
+
+                $this->equalTypes( $parent, $child );
+
 		$idfield = $this->writer->getIDField($parent->getMeta("type"));
 		if (!intval($parent->$idfield)) $this->oodb->store($parent);
 		$child->{$this->property} = $parent->$idfield;
@@ -79,5 +103,10 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 		}
 		return $this->oodb->batch($parent->getMeta("type"),$ids	);
 	}
+
+
+        public function getParent( RedBean_OODBBean $bean ) {
+            return $this->oodb->load( $bean->getMeta("type"), (int)$bean->parent_id);
+        }
 
 }

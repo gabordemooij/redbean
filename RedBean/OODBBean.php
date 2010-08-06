@@ -8,7 +8,7 @@
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_OODBBean {
@@ -19,6 +19,8 @@ class RedBean_OODBBean {
 	 * @var array
 	 */
 	private $__info = NULL;
+
+
 
 	/**
 	 * Imports all values in associative array $array. Every key is used
@@ -41,9 +43,9 @@ class RedBean_OODBBean {
 		if (is_string($selection)) $selection = explode(",",$selection);
 		foreach($arr as $k=>$v) {
 			if ($k != "__info") {
-				if (!$selection || ($selection && in_array($k,$selection))) {
-					$this->$k = $v;
-				}
+                            if (!$selection || ($selection && in_array($k,$selection))) {
+                                $this->$k = $v;
+                            }
 			}
 		}
 		return $this;
@@ -85,6 +87,20 @@ class RedBean_OODBBean {
 		return $this->$property;
 	}
 
+	/**
+	* Magic Setter. Sets the value for a specific property.
+	* This setter acts as a hook for OODB to mark beans as tainted.
+	* The tainted meta property can be retrieved using getMeta("tainted").
+	* The tainted meta property indicates whether a bean has been modified and
+	* can be used in various caching mechanisms.
+	* @param string $property
+	* @param  mixed $value
+	*/
+	
+	public function __set( $property, $value ) {
+		$this->setMeta("tainted",true);
+		$this->$property = $value;
+	}
 
 	/**
 	 * Returns the value of a meta property. A meta property
@@ -148,7 +164,6 @@ class RedBean_OODBBean {
 		return $this;
 	}
 
-	//@todo copy/clone a bean
 
 
 }

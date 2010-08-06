@@ -13,7 +13,7 @@
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase {
@@ -85,10 +85,12 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 
 		$bean = new RedBean_OODBBean();
 		$bean->setMeta("type", $type );
-		$idfield = $this->writer->getIDField($bean->getMeta("type"));
+                $bean->setMeta("sys.oodb", $this);
+                $idfield = $this->writer->getIDField($bean->getMeta("type"));
 		$bean->$idfield = 0;
 		$this->signal( "dispense", $bean );
 		$this->check( $bean );
+		$bean->setMeta("tainted",false);
 		return $bean;
 	}
 
@@ -200,11 +202,13 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			if (count($updatevalues)>0) {
 				$this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
 			}
+			$bean->setMeta("tainted",false);
 			return (int) $bean->$idfield;
 		}
 		else {
 			$id = $this->writer->insertRecord( $table, $insertcolumns, array($insertvalues) );
 			$bean->$idfield = $id;
+			$bean->setMeta("tainted",false);
 			return (int) $id;
 		}
 	}
@@ -236,7 +240,14 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		}
 		else {
 			try { $rows = $this->writer->selectRecord($type,array($id));	}catch(RedBean_Exception_SQL $e ){
-				if ($e->getSQLState()=="42S02" || $e->getSQLState()=="42S22")  {
+				if (
+					$this->writer->sqlStateIn($e->getSQLState(),
+					array(
+						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+					)	
+				
+				)  {
 					$rows = 0;
 					if ($this->isFrozen) throw $e; //only throw if frozen;
 				}
@@ -250,6 +261,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			$bean->$p = $v;
 		}
 		$this->signal( "open", $bean );
+		$bean->setMeta("tainted",false);
 		return $bean;
 	}
 
@@ -263,11 +275,15 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	public function trash( RedBean_OODBBean $bean ) {
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		$this->signal( "delete", $bean );
-		$this->check( $bean );
-		try {
-			$this->writer->deleteRecord( $bean->getMeta("type"), $bean->$idfield );
-		}catch(RedBean_Exception_SQL $e ){
-			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+        $this->check( $bean );
+		try{
+        $this->writer->deleteRecord( $bean->getMeta("type"), $bean->$idfield );
+		}catch(RedBean_Exception_SQL $e){
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
 		}
 	}
 
@@ -284,10 +300,15 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	public function batch( $type, $ids ) {
 		if (!$ids) return array();
 		$collection = array();
-		try {
-			$rows = $this->writer->selectRecord($type,$ids);
-		}catch(RedBean_Exception_SQL $e ){
-			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+		try{
+		$rows = $this->writer->selectRecord($type,$ids);
+		}catch(RedBean_Exception_SQL $e){
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+
 			$rows = false;
 		}
 		$this->stash = array();

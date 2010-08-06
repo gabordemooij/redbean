@@ -10,7 +10,7 @@
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  *
  */
@@ -136,18 +136,12 @@ abstract class RedBean_DomainObject {
 	protected function getBeanType() {
 		return $this->bean->getMeta("type");
 	}
-	/**
-	 *
-	 * @param RedBean_DomainObject $other
-	 */
-	protected function set1toNAssoc(RedBean_DomainObject $other) {
-		$this->associationManager->set1toNAssoc($this->bean, $other->bean);
-	}
+
 	/**
 	 * Clears associations
 	 */
-	protected function clearRelations() {
-		$this->associationManager->clearRelations($this->bean);
+	protected function clearRelations( $type ) {
+		$this->associationManager->clearRelations($this->bean, $type);
 	}
 	/**
 	 *
@@ -163,29 +157,7 @@ abstract class RedBean_DomainObject {
 	public function find( $id ) {
 		$this->bean = $this->redbean->load( $this->bean->getMeta("type"), (int) $id );
 	}
-	/**
-	 * Returns a collection of Domain Objects.
-	 * @param string $type
-	 * @param string $query
-	 * @return array $collection
-	 */
-	public static function getDomainObjects( $type, $query="1", $values=array() ) {
-		//Fetch us a toolbox.
-		$tools = RedBean_Setup::getToolBox();
-		$redbean = $tools->getRedBean();
-
-		$domainObject = new $type;
-		$typeName = $domainObject->bean->getMeta("type");
-		$collection = array();
-		$finder = new \RedBean_Plugin_Finder();
-		$beans = $finder->where($typeName, $query, $values);
-		foreach($beans as $bean) {
-			$domainObject = new $type;
-			$domainObject->bean = $bean;
-			$collection[] = $domainObject;
-		}
-		return $collection;
-	}
+	
 	/**
 	 * Saves the current domain object.
 	 * The function saves the inner bean to the database.
@@ -206,5 +178,22 @@ abstract class RedBean_DomainObject {
 		$idField = $this->tools->getWriter()->getIDField( $this->bean->getMeta("type") );
 		return $this->bean->$idField;
 	}
+
+	public function export() {
+		return $this->bean;
+	}
+
+	public static function exportAll( $objects ) {
+		$beans = array();
+		foreach($objects as $object) {
+			$beans[] = $object->export();
+		}
+		return $beans;
+	}
+
+	public function loadBean( RedBean_OODBBean $bean ) {
+		$this->bean = $bean;
+	}
+
 
 }

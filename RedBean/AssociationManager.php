@@ -8,7 +8,7 @@
  * @license			BSD
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_AssociationManager extends RedBean_CompatManager {
@@ -18,23 +18,25 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @var array $databaseSpecs
 	 */
 	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
+		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+		RedBean_CompatManager::C_SYSTEM_SQLITE=>"3",
+		RedBean_CompatManager::C_SYSTEM_POSTGRESQL=>"8"
 	);
 
 	/**
 	 * @var RedBean_OODB
 	 */
-	private $oodb;
+	protected $oodb;
 
 	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
-	private $adapter;
+	protected $adapter;
 
 	/**
 	 * @var RedBean_QueryWriter
 	 */
-	private $writer;
+	protected $writer;
 
 
 	/**
@@ -42,7 +44,6 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @param RedBean_ToolBox $tools
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
-		$this->scanToolBox( $tools );
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
 		$this->writer = $tools->getWriter();
@@ -63,9 +64,16 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 */
 	public function associate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
+		$bean = $this->oodb->dispense($table);
+		return $this->associateBeans( $bean1, $bean2, $bean );
+	}
+	
+	
+	protected function associateBeans(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean) {
+		
 		$idfield1 = $this->writer->getIDField($bean1->getMeta("type"));
 		$idfield2 = $this->writer->getIDField($bean2->getMeta("type"));
-		$bean = $this->oodb->dispense($table);
+		
 		$property1 = $bean1->getMeta("type") . "_id";
 		$property2 = $bean2->getMeta("type") . "_id";
 		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
@@ -78,13 +86,14 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			return $this->oodb->store( $bean );
 		}
 		catch(RedBean_Exception_SQL $e)  {
-			//If this is a SQLSTATE[23000]: Integrity constraint violation
-			//Then just ignore the insert
-			if ((int)$e->getSQLState()!==23000)  {
-				throw $e;
-			}
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			))) throw $e;
 		}
+
 	}
+	
 
 	/**
 	 * Gets related beans of type $type for bean $bean
@@ -122,8 +131,15 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 				);
 			}
 			return ( $sqlFetchKeys );
-		}catch(RedBean_Exception_SQL $e ){
-			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+
+		}catch(RedBean_Exception_SQL $e){
+			
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+
 			return array();
 		}
 	}
@@ -154,8 +170,12 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			if ($cross) {
 				$this->writer->deleteByCrit($table,array($property2=>$value1,$property1=>$value2));
 			}
-		}catch(RedBean_Exception_SQL $e ){
-			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+		}catch(RedBean_Exception_SQL $e){
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
 		}
 	}
 	/**
@@ -178,8 +198,12 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			if ($cross) {
 				$this->writer->deleteByCrit($table,array($property2=>$bean->$idfield));
 			}
-		}catch(RedBean_Exception_SQL $e ){
-			if ($e->getSQLState()!="42S02" && $e->getSQLState()!="42S22") throw $e;
+		}catch(RedBean_Exception_SQL $e){
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
 		}
 	}
 	/**

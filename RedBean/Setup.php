@@ -10,7 +10,7 @@
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_Setup {
@@ -42,10 +42,15 @@ class RedBean_Setup {
 		private static function checkDSN($dsn) {
 			$dsn = trim($dsn);
 			$dsn = strtolower($dsn);
-			if (strpos($dsn, "mysql:")!==0) {
+			if (
+				strpos($dsn, "mysql:")!==0
+				&& strpos($dsn,"sqlite:")!==0
+				&& strpos($dsn,"pgsql:")!==0
+			) {
+				
 				throw new RedBean_Exception_NotImplemented("
 					Support for this DSN has not been implemented yet. \n
-					Begin your DSN with: 'mysql:'
+					Begin your DSN with: 'mysql:' or 'sqlite:'
 				");
 			}
 			else {
@@ -75,12 +80,21 @@ class RedBean_Setup {
         public static function kickstart( $dsn, $username, $password, $frozen=false ) {
 
 			self::checkDSN($dsn);
+
             $pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
             $adapter = new RedBean_Adapter_DBAdapter( $pdo );
-
-			$writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
 			
-			$redbean = new RedBean_OODB( $writer );
+            if (strpos($dsn,"pgsql")===0) {
+                $writer = new RedBean_QueryWriter_PostgreSQL( $adapter, $frozen );
+            }
+			else if (strpos($dsn,"sqlite")===0){
+				 $writer = new RedBean_QueryWriter_SQLite( $adapter, $frozen );
+			}
+			else {
+                $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+			}
+
+            $redbean = new RedBean_OODB( $writer );
 			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
             
             //deliver everything back in a neat toolbox
@@ -112,28 +126,14 @@ class RedBean_Setup {
 		}
 
 		/**
-		 * Kickstart for development phase (strict mode).
-		 * Use this method to quickly setup RedBean for use during development phase.
-		 * This Kickstart establishes a database connection
-		 * using the $dsn, the $username and the $password you provide.
-		 * It will start RedBean in fluid mode; meaning the database will
-		 * be altered if required to store your beans.
-		 * This method returns a RedBean_Toolbox $toolbox filled with a
-		 * RedBean_Adapter, a RedBean_QueryWriter and most importantly a
-		 * RedBean_OODB; the object database. To start storing beans in the database
-		 * simply say: $redbean = $toolbox->getRedBean(); Now you have a reference
-		 * to the RedBean object.
 		 * @param  string $dsn
-		 * @param  string $username
-		 * @param  string $password
 		 * @return RedBean_ToolBox $toolbox
 		 */
-		public static function kickstartDevS( $dsn, $username="root", $password="" ) {
-			$frozen = false;
+		public static function kickstartDevL( $dsn ) {
 			self::checkDSN($dsn);
-            $pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
+            $pdo = new RedBean_Driver_PDO( $dsn ,"","");
             $adapter = new RedBean_Adapter_DBAdapter( $pdo );
-            $writer = new RedBean_QueryWriter_MySQLS( $adapter, $frozen );
+            $writer = new RedBean_QueryWriter_SQLite( $adapter, false );
             $redbean = new RedBean_OODB( $writer );
 			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
             //deliver everything back in a neat toolbox

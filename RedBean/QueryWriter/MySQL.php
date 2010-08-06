@@ -10,7 +10,7 @@
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD license that is bundled
+ * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
@@ -442,4 +442,16 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	public function noKW($str) {
 		return "`".$str."`";
 	}
+
+
+
+	public function sqlStateIn($state, $list) {
+
+		$sqlState = "0";
+		if ($state == "42S02") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
+		if ($state == "42S22") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
+		if ($state == "23000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
+		return in_array($sqlState, $list);
+	}
+	
 }
