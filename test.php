@@ -73,7 +73,7 @@ testpack("Test Setup");
 
 //Can we load all modules properly?
 //require("RedBean/redbean.inc.php");
-require("rb.pack.php");
+require("rb.php");
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
 //Test whether a non mysql DSN throws an exception
