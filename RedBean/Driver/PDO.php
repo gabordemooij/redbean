@@ -54,6 +54,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      */
     private $exc =0;
 
+    /**
+     * @var array
+     *
+     */
+    private $connectInfo = array();
+
+    private $isConnected = false;
+
 
     /**
      * Returns an instance of the PDO Driver.
@@ -82,20 +90,38 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      */
     public function __construct($dsn, $user, $pass)
     {
-		$this->dsn = $dsn;
-    	//PDO::MYSQL_ATTR_INIT_COMMAND
+	$this->dsn = $dsn;
+        $this->connectInfo = array( "pass"=>$pass, "user"=>$user );
+    	
+
+
+
+    }
+
+    public function connect() {
+
+        if ($this->isConnected) return;
+
+
+        $user = $this->connectInfo["user"];
+        $pass = $this->connectInfo["pass"];
+
+        //PDO::MYSQL_ATTR_INIT_COMMAND
         $this->pdo = new PDO(
-                $dsn,
+                $this->dsn,
                 $user,
                 $pass,
-                
+
                 array(1002 => 'SET NAMES utf8',
                       PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                       PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 
 					  )
             );
+
+        $this->isConnected = true;
     }
+
 
     /**
      * (non-PHPdoc)
@@ -103,6 +129,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      */
     public function GetAll( $sql, $aValues=array() )
     {
+        $this->connect();
 		
 	    	$this->exc = 0;
     	    if ($this->debug)
@@ -158,7 +185,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#GetCol()
      */
     public function GetCol($sql, $aValues=array())
-    {
+    {$this->connect();
     	$this->exc = 0;
 		$rows = $this->GetAll($sql,$aValues);
 		$cols = array();
@@ -178,7 +205,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#GetCell()
      */
     public function GetCell($sql, $aValues=array())
-    {
+    {$this->connect();
     	$this->exc = 0;
         $arr = $this->GetAll($sql,$aValues);
 	    $row1 = array_shift($arr);
@@ -191,7 +218,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#GetRow()
      */
     public function GetRow($sql, $aValues=array())
-    {
+    {$this->connect();
     	$this->exc = 0;
        	$arr = $this->GetAll($sql, $aValues);
         return array_shift($arr);
@@ -224,7 +251,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#Execute()
      */
     public function Execute( $sql, $aValues=array() )
-    {
+    {$this->connect();
     	$this->exc = 0;
     	    if ($this->debug)
 	        {
@@ -309,14 +336,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * Starts a transaction.
 	 */
-	public function StartTrans() {
+	public function StartTrans() {$this->connect();
 		$this->pdo->beginTransaction();
 	}
 
 	/**
 	 * Commits a transaction.
 	 */
-	public function CommitTrans() {
+	public function CommitTrans() {$this->connect();
 		$this->pdo->commit();
 	}
 
@@ -324,7 +351,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * Rolls back a transaction.
 	 */
-	public function FailTrans() {
+	public function FailTrans() {$this->connect();
 		$this->pdo->rollback();
 	}
 
@@ -332,7 +359,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * Returns the name of the database type/brand: i.e. mysql, db2 etc.
 	 * @return string $typeName
 	 */
-	public function getDatabaseType() {
+	public function getDatabaseType() {$this->connect();
 		return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 	}
 
@@ -340,7 +367,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * Returns the version number of the database.
 	 * @return mixed $version 
 	 */
-	public function getDatabaseVersion() {
+	public function getDatabaseVersion() {$this->connect();
 		return $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
 
