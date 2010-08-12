@@ -99,6 +99,11 @@ class RedBean_OODBBean {
 	
 	public function __set( $property, $value ) {
 		$this->setMeta("tainted",true);
+
+                if ($value===false) {
+                    $value = "0";
+                }
+
 		$this->$property = $value;
 	}
 

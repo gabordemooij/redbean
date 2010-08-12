@@ -73,7 +73,7 @@ testpack("Test Setup");
 
 //Can we load all modules properly?
 //require("RedBean/redbean.inc.php");
-require("rb.php");
+require("rb.cb.php");
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
 //Test whether a non mysql DSN throws an exception
@@ -1335,6 +1335,15 @@ $redbean->trash( $cask2 );
 asrt(count($a->related($cask, "cask")),0);
 
 
+
+//Zero issue (false should be stored as 0 not as '')
+testpack("Zero issue");
+$pdo->Execute("DROP TABLE IF EXISTS `zero`");
+$bean = $redbean->dispense("zero");
+$bean->zero = false;
+$bean->title = "bla";
+$redbean->store($bean);
+asrt( count(Finder::where("zero"," zero = 0 ")), 1 );
 
 //Section D Security Tests
 testpack("Test RedBean Security - bean interface ");

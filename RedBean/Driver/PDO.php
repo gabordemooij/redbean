@@ -229,7 +229,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#ErrorNo()
      */
     public function ErrorNo()
-    {
+    {$this->connect();
     	if (!$this->exc) return 0;
     	$infos = $this->pdo->errorInfo();
         return $infos[1];
@@ -240,7 +240,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#Errormsg()
      */
     public function Errormsg()
-    {
+    {$this->connect();
     	if (!$this->exc) return "";
         $infos = $this->pdo->errorInfo();
         return $infos[2];
@@ -292,7 +292,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#Escape()
      */
     public function Escape( $str )
-    {
+    {$this->connect();
         return substr(substr($this->pdo->quote($str), 1), 0, -1);
     }
     
@@ -301,7 +301,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#GetInsertID()
      */
     public function GetInsertID()
-    {
+    {$this->connect();
         return (int) $this->pdo->lastInsertId();
     }
     
@@ -310,7 +310,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#Affected_Rows()
      */
     public function Affected_Rows()
-    {
+    {$this->connect();
         return (int) $this->affected_rows;
     }
     
@@ -319,7 +319,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#setDebugMode()
      */
     public function setDebugMode( $tf )
-    {
+    {$this->connect();
         $this->debug = (bool)$tf;
     }
     
@@ -328,7 +328,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#GetRaw()
      */
     public function GetRaw()
-    {
+    {$this->connect();
         return $this->rs;
     }
 

@@ -951,6 +951,14 @@ $a->associate($book,$author1);
 $a->associate($book, $author2);
 pass();
 
+testpack("Zero issue");
+$pdo->Execute("DROP TABLE IF EXISTS `zero`");
+$bean = $redbean->dispense("zero");
+$bean->zero = false;
+$bean->title = "bla";
+$redbean->store($bean);
+asrt( count(Finder::where("zero"," zero = '0' ")), 1 );
+
 testpack("Test Association Issue Group keyword (Issues 9 and 10)");
 $pdo->Execute("DROP TABLE IF EXISTS `group`");
 $pdo->Execute("DROP TABLE IF EXISTS `book_group`");
