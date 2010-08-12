@@ -71,9 +71,9 @@ function testpack($name) {
 //Test the Setup Class
 testpack("Test Setup");
 
-//Can we load all modules properly?
-//require("RedBean/redbean.inc.php");
-require("rb.cb.php");
+//INCLUDE YOUR REDBEAN FILE HERE!
+require("rb.php");
+
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
 //Test whether a non mysql DSN throws an exception
