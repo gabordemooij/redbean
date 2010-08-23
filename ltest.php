@@ -244,7 +244,7 @@ $bean->name = "coffee";
 $nullWriter->returnScanType = 91239;
 $nullWriter->returnInsertRecord = 1234;
 asrt($redbean->store($bean),1234);
-asrt($nullWriter->getColumnsArgument,"bean");
+asrt($nullWriter->getColumnsArgument,NULL);
 asrt($nullWriter->createTableArgument,NULL);
 asrt($nullWriter->scanTypeArgument,NULL);
 asrt($nullWriter->codeArgument,NULL);

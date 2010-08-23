@@ -163,7 +163,9 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		if (!$this->isFrozen && !$this->tableExists($table)) {
 			$this->writer->createTable( $table );
 		}
-		$columns = $this->writer->getColumns($table) ;
+                if (!$this->isFrozen) {
+                    $columns = $this->writer->getColumns($table) ;
+                }
 		//does the table fit?
 		$insertvalues = array();
 		$insertcolumns = array();
