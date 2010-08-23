@@ -247,12 +247,12 @@ class R {
          * array parameter; you can either use the question mark notation
          * or the slot-notation (:keyname).
          * @param string $type
-         * @param string $where
+         * @param string $sql
          * @param array $values
          * @return array $beans
          */
-	public static function find( $type, $where="1", $values=array() ) {
-		return Finder::where( $type, $where, $values );
+	public static function find( $type, $sql="1", $values=array() ) {
+		return Finder::where( $type, $sql, $values );
 	}
 
         /**
@@ -273,8 +273,8 @@ class R {
          * @param string $where
          * @return array $list
          */
-        public static function lst( $type,$prop,$where=" 1 " ) {
-            $list = self::find($type,$where);
+        public static function lst( $type,$prop,$sql=" 1 " ) {
+            $list = self::find($type,$sql);
             $listItems = array();
             foreach($list as $id=>$item) {
                 $listItems[] = $item->$prop;
