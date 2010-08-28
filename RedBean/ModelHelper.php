@@ -19,7 +19,7 @@ class RedBean_ModelHelper implements RedBean_Observer {
      * @param RedBean_OODBBean $bean
      */
     public function onEvent( $eventName, $bean ) {
-       $className = "Model_".ucfirst( $bean->getMeta("type") );
+       $className = $this->getModelName( $bean->getMeta("type") );
        if (class_exists($className)) {
         $model = new $className;
         if ($model instanceof RedBean_SimpleModel) {
@@ -29,6 +29,15 @@ class RedBean_ModelHelper implements RedBean_Observer {
             }
            }
        }
+    }
+
+    /**
+     * Returns the model associated with a certain bean.
+     * @param string $beanType
+     * @return string $modelClassName
+     */
+    public function getModelName( $beanType ) {
+        return "Model_".ucfirst( $beanType );
     }
 
 }
