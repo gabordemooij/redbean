@@ -93,11 +93,8 @@ class RedBean_OODBBean implements IteratorAggregate {
 	 */
 	public function __get( $property ) {
 		
-		
-		if (!isset($this->properties[$property]) || $this->properties[$property]=="") {
-			if ($property == $this->getMeta("sys.idfield")) return 0;
-			return NULL;
-		}
+			
+		if (!isset($this->properties[$property]))  return NULL;
 		return $this->properties[$property];
 	}
 
@@ -122,8 +119,6 @@ class RedBean_OODBBean implements IteratorAggregate {
 				if ($value===true) {
                     $value = "1"; 
                 }
-
-
 			$this->properties[$property] = $value;
 	}
 
