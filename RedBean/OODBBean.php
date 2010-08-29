@@ -11,7 +11,10 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_OODBBean {
+class RedBean_OODBBean implements IteratorAggregate {
+
+
+	private $properties = array();
 
 	/**
 	 * Meta Data storage. This is the internal property where all
@@ -19,8 +22,11 @@ class RedBean_OODBBean {
 	 * @var array
 	 */
 	private $__info = NULL;
+	
 
-
+	public function getIterator() {
+		return new ArrayIterator($this->properties);
+	}
 
 	/**
 	 * Imports all values in associative array $array. Every key is used
@@ -62,12 +68,17 @@ class RedBean_OODBBean {
 	 */
 	public function export($meta = false) {
 		$arr = array();
-		foreach($this as $p=>$v) {
-			if ($p != "__info" || $meta) {
+		foreach($this->properties as $p=>$v) {
+			
 				$arr[ $p ] = $v;
-			}
+			
 		}
+		if ($meta) $arr["__info"] = $this->__info;
 		return $arr;
+	}
+
+	public function __isset( $property ) {
+		return (isset($this->properties[$property]));
 	}
 
 
@@ -81,10 +92,13 @@ class RedBean_OODBBean {
 	 * @return mixed $value
 	 */
 	public function __get( $property ) {
-		if (!isset($this->$property) || $this->$property=="") {
+		
+		
+		if (!isset($this->properties[$property]) || $this->properties[$property]=="") {
+			if ($property == $this->getMeta("sys.idfield")) return 0;
 			return NULL;
 		}
-		return $this->$property;
+		return $this->properties[$property];
 	}
 
 	/**
@@ -97,14 +111,20 @@ class RedBean_OODBBean {
 	* @param  mixed $value
 	*/
 	
-	public function __set( $property, $value ) {
-		$this->setMeta("tainted",true);
+	public function __set( $property, $value ) { 
+	
+				
+				$this->setMeta("tainted",true);
 
                 if ($value===false) {
                     $value = "0";
                 }
+				if ($value===true) {
+                    $value = "1"; 
+                }
 
-		$this->$property = $value;
+
+			$this->properties[$property] = $value;
 	}
 
 	/**

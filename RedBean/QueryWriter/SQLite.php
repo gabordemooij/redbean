@@ -15,14 +15,14 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
      *
      * @var RedBean_Adapter_DBAdapter
      */
-    private $adapter;
+    protected $adapter;
 
     /**
      * Indicates the field name to be used for primary keys;
      * default is 'id'
      * @var string
      */
-    private $idfield = "id";
+    protected $idfield = "id";
 
 
     /**
@@ -88,7 +88,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
         $columnsRaw = $this->adapter->get("PRAGMA table_info('$table')");
         $columns = array();
         foreach($columnsRaw as $r) {
-            $columns[$r["name"]]=1;
+            $columns[$r["name"]]=$r["type"];
         }
         return $columns;
     }

@@ -88,7 +88,7 @@ class RedBean_Setup {
                 $writer = new RedBean_QueryWriter_PostgreSQL( $adapter, $frozen );
             }
 			else if (strpos($dsn,"sqlite")===0){
-				 $writer = new RedBean_QueryWriter_SQLite( $adapter, $frozen );
+				 $writer = new RedBean_QueryWriter_SQLiteT( $adapter, $frozen );
 			}
 			else {
                 $writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
@@ -133,7 +133,7 @@ class RedBean_Setup {
 			self::checkDSN($dsn);
             $pdo = new RedBean_Driver_PDO( $dsn ,"","");
             $adapter = new RedBean_Adapter_DBAdapter( $pdo );
-            $writer = new RedBean_QueryWriter_SQLite( $adapter, false );
+            $writer = new RedBean_QueryWriter_SQLiteT( $adapter, false );
             $redbean = new RedBean_OODB( $writer );
 			$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
             //deliver everything back in a neat toolbox

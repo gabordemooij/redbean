@@ -79,7 +79,8 @@ if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 try{RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root",""); fail();}catch(RedBean_Exception_NotImplemented $e){ pass(); }
 
 //Test whether we can setup a connection
-$toolbox = RedBean_Setup::kickstartDevL( "sqlite:/Applications/XAMPP/xamppfiles/temp/base.txt" );
+//$toolbox = RedBean_Setup::kickstartDevL( "sqlite:/Applications/XAMPP/xamppfiles/temp/base.txt" );
+$toolbox = RedBean_Setup::kickstartDevL( "sqlite:/Users/prive/bla.db" );
 //prepare... empty the database
 foreach( $toolbox->getWriter()->getTables() as $table ) {
 	$sql = "DROP TABLE `".$table."`";
@@ -144,6 +145,7 @@ $bean = $redbean->dispense("page");
 //Set some illegal values in the bean; this should trugger Security exceptions.
 //Arrays are not allowed.
 $bean->name = array("1");
+//print_r( $bean );
 try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
 //Objects should not be allowed.
@@ -167,7 +169,7 @@ $bean = $redbean->load("typetest",2);
 $nullWriter->returnSelectRecord = array();
 asrt($nullWriter->selectRecordArguments[0],"typetest");
 asrt($nullWriter->selectRecordArguments[1],array(2));
-asrt($bean->id,0);
+asrt((int)$bean->id,0);
 $nullWriter->returnSelectRecord = array(array("name"=>"abc","id"=>3));
 $bean = $redbean->load("typetest",3);
 asrt($nullWriter->selectRecordArguments[0],"typetest");
@@ -211,7 +213,6 @@ asrt($nullWriter->getColumnsArgument,"bean");
 asrt($nullWriter->createTableArgument,"bean");
 asrt($nullWriter->scanTypeArgument,"coffee");
 asrt($nullWriter->codeArgument,NULL);
-//print_r($nullWriter);
 asrt($nullWriter->addColumnArguments,array("bean","name",91239));
 asrt($nullWriter->insertRecordArguments,array("bean",array("name"),array(array("coffee"))));
 asrt($nullWriter->addUniqueIndexArguments,array());
@@ -330,7 +331,6 @@ asrt(($writer instanceof RedBean_QueryWriter),true);
 asrt(($redbean instanceof RedBean_OODB),true);
 
 
-
 testpack("Test RedBean Finder Plugin*");
 $page = $redbean->dispense("page");
 $page->name = "more pages about less";
@@ -357,7 +357,7 @@ $redbean->store($bean);
 $redbean->store($bean);
 Finder::where("wine", "id=5"); //  Finder:where call RedBean_OODB::convertToBeans
 $bean2 = $redbean->load("anotherbean", 5);
-asrt($bean2->id,0);
+asrt((int)$bean2->id,0);
 testpack("Test Gold SQL");
 asrt(count(Finder::where("wine"," 1 OR 1 ")),1);
 asrt(count(Finder::where("wine"," @id < 100 ")),1);
@@ -401,7 +401,7 @@ asrt(Finder::parseGoldSQL(" @bla @xxx ","wine",RedBean_Setup::getToolbox())," NU
 //Test constraints: cascaded delete
 testpack("Test Cascaded Delete");
 $adapter = $toolbox->getDatabaseAdapter();
-//$adapter->getDatabase()->setDebugMode(1);
+
 $adapter->exec("DROP TRIGGER IF EXISTS fkb8317025deb6e03fc05abaabc748a503a ");
 $adapter->exec("DROP TRIGGER IF EXISTS fkb8317025deb6e03fc05abaabc748a503b ");
 
@@ -473,7 +473,7 @@ asrt(count($a->related($cask, "cask")),0);
 
 
 $pdo = $adapter->getDatabase();
-//$pdo->setDebugMode(1);
+
 $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
 $pdo->Execute("DROP TABLE IF EXISTS movie");
@@ -958,6 +958,72 @@ $bean->zero = false;
 $bean->title = "bla";
 $redbean->store($bean);
 asrt( count(Finder::where("zero"," zero = '0' ")), 1 );
+
+testpack("Support for Affinity for sorting order");
+
+
+$pdo->Execute("DROP TABLE IF EXISTS `project`");
+$project = $redbean->dispense("project");
+$project->name = "first project";
+$project->sequence = "2";
+$project2 = $redbean->dispense("project");
+$project2->name = "second project";
+$project2->sequence = "12";
+$redbean->store($project);
+//print_r( $adapter->get("PRAGMA table_info('project')") ); exit;
+$redbean->store($project2);
+$projects = Finder::where("project"," 1 ORDER BY sequence ");
+$firstProject = array_shift($projects);
+$secondProject = array_shift($projects);
+asrt((int)$firstProject->sequence,2);
+asrt((int)$secondProject->sequence,12);
+
+testpack("Type Affinity");
+$pdo->Execute("DROP TABLE IF EXISTS `typo`");
+$bean = $redbean->dispense("typo");
+$bean->col1 = false;
+$bean = $redbean->load("typo", $redbean->store($bean));
+asrt((bool)$bean->col1,false);
+$columns = $writer->getColumns("typo");
+asrt($columns["col1"],"INTEGER");
+$bean->col1 = true;
+$bean = $redbean->load("typo", $redbean->store($bean));
+asrt((bool)$bean->col1,true);
+$columns = $writer->getColumns("typo");
+asrt($columns["col1"],"INTEGER");
+$bean->col1 = 12;
+$bean = $redbean->load("typo", $redbean->store($bean));
+asrt((integer)$bean->col1,12);
+$columns = $writer->getColumns("typo");
+asrt($columns["col1"],"INTEGER");
+$bean->col1 = 20173;
+$bean = $redbean->load("typo", $redbean->store($bean));
+asrt((integer)$bean->col1,20173);
+$columns = $writer->getColumns("typo");
+asrt($columns["col1"],"INTEGER");
+
+$bean->col1 = 13.23;
+$bean = $redbean->load("typo", $redbean->store($bean));
+asrt((double)$bean->col1,13.23);
+$columns = $writer->getColumns("typo");
+asrt($columns["col1"],"NUMERIC");
+
+$bean->col1 = "2008-01-23";
+$bean = $redbean->load("typo", $redbean->store($bean));
+asrt((string)$bean->col1,"2008-01-23");
+$columns = $writer->getColumns("typo");
+asrt($columns["col1"],"NUMERIC");
+$bean->col1 = "2008-01-23 10:00:12";
+$bean = $redbean->load("typo", $redbean->store($bean));
+asrt((string)$bean->col1,"2008-01-23 10:00:12");
+$columns = $writer->getColumns("typo");
+asrt($columns["col1"],"NUMERIC");
+$bean->col1 = "aaaa";
+$bean = $redbean->load("typo", $redbean->store($bean));
+asrt((string)$bean->col1,"aaaa");
+$columns = $writer->getColumns("typo");
+asrt($columns["col1"],"TEXT");
+
 
 testpack("Test Association Issue Group keyword (Issues 9 and 10)");
 $pdo->Execute("DROP TABLE IF EXISTS `group`");

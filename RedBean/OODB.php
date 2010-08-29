@@ -86,8 +86,10 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$bean = new RedBean_OODBBean();
 		$bean->setMeta("type", $type );
                 $bean->setMeta("sys.oodb", $this);
+                
                 $idfield = $this->writer->getIDField($bean->getMeta("type"));
-		$bean->$idfield = 0;
+                $bean->setMeta("sys.idfield",$idfield);
+		$bean->$idfield = 0; 
 		$this->signal( "dispense", $bean );
 		$this->check( $bean );
 		$bean->setMeta("tainted",false);
@@ -103,9 +105,13 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 */
 	public function check( RedBean_OODBBean $bean ) {
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
-		//Is all meta information present?
-		if (!isset($bean->$idfield) || !($bean->getMeta("type"))) {
-			throw new RedBean_Exception_Security("Bean has incomplete Meta Information");
+		//Is all meta information present? 
+		
+		if (!isset($bean->$idfield) ) {
+			throw new RedBean_Exception_Security("Bean has incomplete Meta Information $idfield ");
+		}
+		if (!($bean->getMeta("type"))) {
+			throw new RedBean_Exception_Security("Bean has incomplete Meta Information II");
 		}
 		//Pattern of allowed characters
 		$pattern = '/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/';
@@ -114,9 +120,9 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			throw new RedBean_Exception_Security("Bean Type is invalid");
 		}
 		//Are the properties and values valid?
-		foreach($bean as $prop=>$value) {
+		foreach($bean as $prop=>$value) { 
 			if (
-			is_array($value) ||
+				is_array($value) ||
 				is_object($value) ||
 				strlen($prop)<1 ||
 				preg_match($pattern,$prop)
@@ -175,11 +181,11 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				if (!$this->isFrozen) {
 				//What kind of property are we dealing with?
 					$typeno = $this->writer->scanType($v);
-					//Is this property represented in the table?
+                                        //Is this property represented in the table?
 					if (isset($columns[$p])) {
 					//yes it is, does it still fit?
 						$sqlt = $this->writer->code($columns[$p]);
-						if ($typeno > $sqlt) {
+                                        	if ($typeno > $sqlt) {
 						//no, we have to widen the database column type
 							$this->writer->widenColumn( $table, $p, $typeno );
 						}

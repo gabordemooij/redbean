@@ -479,7 +479,7 @@ $newid = $redbean->store( $page );
 asrt( $page->rating, "0" );
 $page->rating = 0;
 $newid = $redbean->store( $page );
-asrt( $page->rating, 0 );
+asrt( (int) $page->rating, 0 );
 
 $page->rating = "0";
 $newid = $redbean->store( $page );

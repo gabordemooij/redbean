@@ -59,6 +59,7 @@ require($dir."Adapter/DBAdapter.php");
 require($dir."QueryWriter.php");
 require($dir."QueryWriter/MySQL.php");
 require($dir."QueryWriter/SQLite.php");
+require($dir."QueryWriter/SQLiteT.php");
 require($dir."QueryWriter/PostgreSQL.php");
 
 

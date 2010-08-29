@@ -84,6 +84,18 @@ class R {
                 self::$redbean->addEventListener("delete", $helper );
 	}
 
+
+        /**
+         * Toggles DEBUG mode.
+         * In Debug mode all SQL that happens under the hood will
+         * be printed to the screen.
+         *
+         * @param boolean $tf
+         */
+        public static function debug( $tf = true ) {
+            self::$adapter->getDatabase()->setDebugMode( $tf );
+        }
+
 	/**
 	 * Stores a RedBean OODB Bean and returns the ID.
 	 * @param RedBean_OODBBean $bean
