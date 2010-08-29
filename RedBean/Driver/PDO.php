@@ -319,7 +319,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
      * @see RedBean/RedBean_Driver#setDebugMode()
      */
     public function setDebugMode( $tf )
-    {$this->connect();
+    {
+    	$this->connect();
         $this->debug = (bool)$tf;
     }
     
@@ -336,14 +337,17 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * Starts a transaction.
 	 */
-	public function StartTrans() {$this->connect();
+	public function StartTrans() {
+		$this->connect();
+		
 		$this->pdo->beginTransaction();
 	}
 
 	/**
 	 * Commits a transaction.
 	 */
-	public function CommitTrans() {$this->connect();
+	public function CommitTrans() {
+		$this->connect();
 		$this->pdo->commit();
 	}
 
@@ -351,7 +355,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * Rolls back a transaction.
 	 */
-	public function FailTrans() {$this->connect();
+	public function FailTrans() {
+		$this->connect();
 		$this->pdo->rollback();
 	}
 
@@ -359,7 +364,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * Returns the name of the database type/brand: i.e. mysql, db2 etc.
 	 * @return string $typeName
 	 */
-	public function getDatabaseType() {$this->connect();
+	public function getDatabaseType() {
+		$this->connect();
 		return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 	}
 
@@ -367,8 +373,20 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * Returns the version number of the database.
 	 * @return mixed $version 
 	 */
-	public function getDatabaseVersion() {$this->connect();
+	public function getDatabaseVersion() {
+		$this->connect();
 		return $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
+	
+	
+    /**
+     * @return PDO
+     */
+    public function getPDO()
+    {
+        $this->connect();
+        return $this->pdo;
+    }
+
 
 }
