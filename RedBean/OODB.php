@@ -93,6 +93,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$this->signal( "dispense", $bean );
 		$this->check( $bean );
 		$bean->setMeta("tainted",false);
+		$this->signal( "dispense", $bean );
 		return $bean;
 	}
 
@@ -211,12 +212,14 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				$this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
 			}
 			$bean->setMeta("tainted",false);
+			$this->signal( "after_update", $bean );
 			return (int) $bean->$idfield;
 		}
 		else {
 			$id = $this->writer->insertRecord( $table, $insertcolumns, array($insertvalues) );
 			$bean->$idfield = $id;
 			$bean->setMeta("tainted",false);
+			$this->signal( "after_update", $bean );
 			return (int) $id;
 		}
 	}
@@ -240,7 +243,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * @return RedBean_OODBBean $bean
 	 */
 	public function load($type, $id) {
-                
+        $this->signal( "before_open", array($type,$id) );        
 		$id = intval( $id );
 		if ($id < 0) throw new RedBean_Exception_Security("Id less than zero not allowed");
 		$bean = $this->dispense( $type );

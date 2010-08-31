@@ -333,6 +333,7 @@ $observable->test("event3", "testsignal3");
 asrt($observer->event,"event3");
 asrt($observer->info,"testsignal3");
 
+
 $adapter = $toolbox->getDatabaseAdapter();
 $writer  = $toolbox->getWriter();
 $redbean = $toolbox->getRedBean();
@@ -373,6 +374,34 @@ $pdo->Execute("DROP TABLE IF EXISTS cask_cask");
 $pdo->Execute("DROP TABLE IF EXISTS cask");
 $pdo->Execute("DROP TABLE IF EXISTS whisky");
 $pdo->Execute("DROP TABLE IF EXISTS __log");
+$pdo->Execute("DROP TABLE IF EXISTS dummy");
+
+//Test real events: update,open,delete
+testpack("Test Real Events");
+$dummyBean = $redbean->dispense("dummy");
+$redbean->addEventListener("update",$observer);
+
+$dummyBean->prop = 1;
+$id = $redbean->store($dummyBean);
+asrt($observer->event,"update");
+asrt(($observer->info instanceof RedBean_OODBBean),true);
+
+$redbean->addEventListener("open",$observer);
+$redbean->addEventListener("dispense",$observer);
+$redbean->load("dummy",99);
+asrt($observer->event,"dispense"); //not open, no bean found
+asrt(($observer->info instanceof RedBean_OODBBean),true);
+
+$redbean->load("dummy",$id);
+asrt($observer->event,"open");
+asrt(($observer->info instanceof RedBean_OODBBean),true);
+
+$observer2 = new ObserverMock();
+$redbean->addEventListener("after_update",$observer2);
+$id = $redbean->store($dummyBean);
+asrt($observer2->event,"after_update");
+asrt(($observer2->info instanceof RedBean_OODBBean),true);
+
 
 testpack("UNIT TEST RedBean OODB: setObject");
 $wine = $redbean->dispense("wine");
