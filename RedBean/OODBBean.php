@@ -22,7 +22,7 @@ class RedBean_OODBBean implements IteratorAggregate {
 	 * @var array
 	 */
 	private $__info = NULL;
-	
+
 
 	public function getIterator() {
 		return new ArrayIterator($this->properties);
@@ -49,9 +49,9 @@ class RedBean_OODBBean implements IteratorAggregate {
 		if (is_string($selection)) $selection = explode(",",$selection);
 		foreach($arr as $k=>$v) {
 			if ($k != "__info") {
-                            if (!$selection || ($selection && in_array($k,$selection))) {
-                                $this->$k = $v;
-                            }
+				if (!$selection || ($selection && in_array($k,$selection))) {
+					$this->$k = $v;
+				}
 			}
 		}
 		return $this;
@@ -69,9 +69,9 @@ class RedBean_OODBBean implements IteratorAggregate {
 	public function export($meta = false) {
 		$arr = array();
 		foreach($this->properties as $p=>$v) {
-			
-				$arr[ $p ] = $v;
-			
+
+			$arr[ $p ] = $v;
+
 		}
 		if ($meta) $arr["__info"] = $this->__info;
 		return $arr;
@@ -92,34 +92,34 @@ class RedBean_OODBBean implements IteratorAggregate {
 	 * @return mixed $value
 	 */
 	public function __get( $property ) {
-		
-			
+
+
 		if (!isset($this->properties[$property]))  return NULL;
 		return $this->properties[$property];
 	}
 
 	/**
-	* Magic Setter. Sets the value for a specific property.
-	* This setter acts as a hook for OODB to mark beans as tainted.
-	* The tainted meta property can be retrieved using getMeta("tainted").
-	* The tainted meta property indicates whether a bean has been modified and
-	* can be used in various caching mechanisms.
-	* @param string $property
-	* @param  mixed $value
-	*/
-	
-	public function __set( $property, $value ) { 
-	
-				
-				$this->setMeta("tainted",true);
+	 * Magic Setter. Sets the value for a specific property.
+	 * This setter acts as a hook for OODB to mark beans as tainted.
+	 * The tainted meta property can be retrieved using getMeta("tainted").
+	 * The tainted meta property indicates whether a bean has been modified and
+	 * can be used in various caching mechanisms.
+	 * @param string $property
+	 * @param  mixed $value
+	 */
 
-                if ($value===false) {
-                    $value = "0";
-                }
-				if ($value===true) {
-                    $value = "1"; 
-                }
-			$this->properties[$property] = $value;
+	public function __set( $property, $value ) {
+
+
+		$this->setMeta("tainted",true);
+
+		if ($value===false) {
+			$value = "0";
+		}
+		if ($value===true) {
+			$value = "1";
+		}
+		$this->properties[$property] = $value;
 	}
 
 	/**
@@ -182,6 +182,13 @@ class RedBean_OODBBean implements IteratorAggregate {
 	public function copyMetaFrom( RedBean_OODBBean $bean ) {
 		$this->__info = $bean->__info;
 		return $this;
+	}
+
+
+	public function __sleep() {
+		$this->isConnected = false;
+		$this->pdo = null;
+		return array('dsn', 'connectInfo', 'isConnected', 'debug', 'affected_rows', 'rs', 'exc');
 	}
 
 

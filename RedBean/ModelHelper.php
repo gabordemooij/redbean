@@ -18,13 +18,13 @@ class RedBean_ModelHelper implements RedBean_Observer {
      * @param string $eventName
      * @param RedBean_OODBBean $bean
      */
-    public function onEvent( $eventName, $bean ) {
+    public function onEvent( $eventName, $bean ) { 
        $className = $this->getModelName( $bean->getMeta("type") );
        if (class_exists($className)) {
-        $model = new $className;
+        $model = new $className; 
         if ($model instanceof RedBean_SimpleModel) {
-            $model->loadBean( $bean );
-            if (method_exists($model, $eventName)){
+            $model->loadBean( $bean ); 
+            if (method_exists($model, $eventName)){ 
                 $model->$eventName();
             }
            }

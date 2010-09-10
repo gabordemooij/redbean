@@ -266,6 +266,16 @@ class R {
 	public static function find( $type, $sql="1", $values=array() ) {
 		return Finder::where( $type, $sql, $values );
 	}
+	
+	public static function findAndExport($type, $sql="1", $values=array()) {
+		$items = Finder::where( $type, $sql, $values );
+		$arr = array();
+		foreach($items as $key=>$item){
+			$arr[$key]=$item->export();
+		}
+		return $arr;
+	}
+
 
         /**
          * Returns an array of beans.
