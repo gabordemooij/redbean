@@ -276,6 +276,11 @@ class R {
 		return $arr;
 	}
 
+	public static function findOne( $type, $sql="1", $values=array()) {
+		$items = R::find($type,$sql,$values);
+		return reset($items);
+	}
+
 
         /**
          * Returns an array of beans.
@@ -380,5 +385,36 @@ class R {
                 return $rs;
             }
         }
+        
+              
+        public static function copy($bean, $associatedBeanTypesStr) {
+        	$type = $bean->getMeta("type");
+        	$copy = R::dispense($type);
+			$copy->import( $bean->export() );
+			$copy->copyMetaFrom( $bean );
+			$copy->id = 0;
+			R::store($copy);
+			$associatedBeanTypes = explode(",",$associatedBeanTypesStr);
+			foreach($associatedBeanTypes as $associatedBeanType) {
+				$assocBeans = R::related($bean, $associatedBeanType);
+				foreach($assocBeans as $assocBean) {
+					R::associate($copy,$assocBean);
+				}
+			}
+			
+			$copy->setMeta("original",$bean);
+        	return $copy;
+        }
+        
+        public static function swap( $beans, $property ) {
+        	$bean1 = array_shift($beans);
+        	$bean2 = array_shift($beans);
+        	$tmp = $bean1->$property;
+        	$bean1->$property = $bean2->$property;
+        	$bean2->$property = $tmp;
+        	R::store($bean1);
+        	R::store($bean2);
+        }
+        
 }
 

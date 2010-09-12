@@ -10,7 +10,7 @@
  * By Gabor de Mooij
  *
  */
-class BeanCan {
+class RedBean_BeanCan {
 
         /**
          * Holds a FUSE instance.

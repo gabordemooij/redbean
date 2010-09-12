@@ -1655,6 +1655,47 @@ R::trash($cgr);
 asrt(Model_Cigar::$reachedDeleted,TRUE);
 
 
+testpack("copy()");
+R::setup("mysql:host=localhost;dbname=oodb","root","");
+$book = R::dispense("book");
+$book->title = "not so original title";
+$author = R::dispense("author");
+$author->name="Bobby";
+R::store($book);
+R::store($author);
+R::associate($book,$author);
+$author = R::findOne("author"," name = ? ",array("Bobby"));
+$books = R::related($author,"book");
+$book = reset($books);
+$book2 = R::copy($book,"author");
+$authors2 = R::related($book2,"author");
+$author2 = reset($authors2);
+asrt($author2->name,$author->name);
+asrt($author2->id,$author->id);
+asrt(($book->id!==$book2->id),true);
+asrt($book->title,$book2->title);
+
+testpack("swap()");
+$book = R::dispense("book");
+$book->title = "firstbook";
+$book->rating = 2;
+$id1 = R::store($book);
+$book = R::dispense("book");
+$book->title = "secondbook";
+$book->rating = 3;
+$id2 = R::store($book);
+$book1 = R::load("book",$id1);
+$book2 = R::load("book",$id2);
+asrt($book1->rating,'2');
+asrt($book2->rating,'3');
+$books = R::batch("book",array($id1,$id2));
+R::swap($books,"rating");
+$book1 = R::load("book",$id1);
+$book2 = R::load("book",$id2);
+asrt($book1->rating,'3');
+asrt($book2->rating,'2');
+
+
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
