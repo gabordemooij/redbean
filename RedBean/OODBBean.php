@@ -184,7 +184,12 @@ class RedBean_OODBBean implements IteratorAggregate {
 		return $this;
 	}
 
-
+	/**
+	 * Sleep function fore serialize() call. This will be invoked if you
+	 * perform a serialize() operation.
+	 *
+	 * @return mixed $array
+	 */
 	public function __sleep() {
 		$this->isConnected = false;
 		$this->pdo = null;
