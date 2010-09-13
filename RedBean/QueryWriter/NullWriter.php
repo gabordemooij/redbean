@@ -7,7 +7,7 @@
  *					It can be used for so-called white box testing, to see
  *					if your algorithms active the right methods with proper
  *					arguments.
- *				
+ *
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -268,64 +268,81 @@ class RedBean_QueryWriter_NullWriter implements RedBean_QueryWriter {
 	 */
 	public $returnAddUniqueIndex = NULL;
 
-	public function getTables(){ return $this->returnTables; }
-	public function createTable( $table ){ $this->createTableArgument = $table; }
-    public function getColumns( $table ){ $this->getColumnsArgument = $table; return $this->returnGetColumns; }
-	public function scanType( $value ){ $this->scanTypeArgument = $value; return $this->returnScanType; }
-    public function addColumn( $table, $column, $type ){
+	public function getTables() {
+		return $this->returnTables;
+	}
+	public function createTable( $table ) {
+		$this->createTableArgument = $table;
+	}
+	public function getColumns( $table ) {
+		$this->getColumnsArgument = $table;
+		return $this->returnGetColumns;
+	}
+	public function scanType( $value ) {
+		$this->scanTypeArgument = $value;
+		return $this->returnScanType;
+	}
+	public function addColumn( $table, $column, $type ) {
 		$this->addColumnArguments = array( $table, $column, $type );
 		return $this->returnAddColumn;
 	}
 
-	
-    public function code( $typedescription ){ $this->codeArgument = $typedescription;
+
+	public function code( $typedescription ) {
+		$this->codeArgument = $typedescription;
 		return $this->returnCode;
 	}
-    public function widenColumn( $table, $column, $type ){
+	public function widenColumn( $table, $column, $type ) {
 		$this->widenColumnArguments = array($table, $column, $type);
 		return $this->returnWidenColumn;
 	}
-    public function updateRecord( $table, $updatevalues, $id){
+	public function updateRecord( $table, $updatevalues, $id) {
 		$this->updateRecordArguments = array($table, $updatevalues, $id);
 		return $this->returnUpdateRecord;
 	}
-    public function insertRecord( $table, $insertcolumns, $insertvalues ){
+	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
 		$this->insertRecordArguments = array( $table, $insertcolumns, $insertvalues );
 		return $this->returnInsertRecord;
 	}
-    public function selectRecord($type, $ids){
+	public function selectRecord($type, $ids) {
 		$this->selectRecordArguments = array($type, $ids);
 		return $this->returnSelectRecord;
 	}
-	public function deleteRecord( $table, $id){
+	public function deleteRecord( $table, $id) {
 		$this->deleteRecordArguments = array($table, "id", $id);
 		return $this->returnDeleteRecord;
 	}
-    public function checkChanges($type, $id, $logid){
+	public function checkChanges($type, $id, $logid) {
 		$this->checkChangesArguments = array($type, $id, $logid);
 		return $this->returnCheckChanges;
 	}
-	public function addUniqueIndex( $table,$columns ){
+	public function addUniqueIndex( $table,$columns ) {
 		$this->addUniqueIndexArguments=array($table,$columns);
 		return $this->returnAddUniqueIndex;
 	}
 
-	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ){
+	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
 		$this->selectByCritArguments=array($select, $table, $column, $value, $withUnion);
 		return $this->returnSelectByCrit;
 	}
 
-	public function deleteByCrit( $table, $crits ){
+	public function deleteByCrit( $table, $crits ) {
 		$this->deleteByCrit=array($table, $crits );
 		return $this->returnDeleteByCrit;
 	}
 
 
-	public function getIDField( $type ) { return "id"; }
+	public function getIDField( $type ) {
+		return "id";
+	}
 
-	public function noKW($str) { return $str; }
+	public function noKW($str) {
+		return $str;
+	}
 
-	public function sqlStateIn($state,$list) { return true; }
+	public function sqlStateIn($state,$list) {
+		return true;
+	}
 
 	/**
 	 * Resets the mock object. All public
@@ -360,5 +377,5 @@ class RedBean_QueryWriter_NullWriter implements RedBean_QueryWriter {
 		$this->returnAddUniqueIndex = NULL;
 	}
 
-
+	
 }

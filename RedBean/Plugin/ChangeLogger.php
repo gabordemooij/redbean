@@ -19,14 +19,14 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	 * @var array $databaseSpecs
 	 */
 	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+			  RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
 	);
 
 
-    /**
-     * @var RedBean_Adapter_DBAdapter
-     */
-    private $writer;
+	/**
+	 * @var RedBean_Adapter_DBAdapter
+	 */
+	private $writer;
 
 	/**
 	 *
@@ -51,12 +51,12 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	 * Constructor, requires a writer
 	 * @param RedBean_QueryWriter $writer
 	 */
-    public function __construct(RedBean_ToolBox $toolbox) {
+	public function __construct(RedBean_ToolBox $toolbox) {
 
 		//Do a compatibility check, using the Compatibility Management System
 		$this->scanToolBox( $toolbox );
 
-        $this->writer = $toolbox->getWriter();
+		$this->writer = $toolbox->getWriter();
 		$this->adapter = $toolbox->getDatabaseAdapter();
 		$this->redbean = $toolbox->getRedBean();
 		if (!$this->redbean->isFrozen()) {
@@ -71,7 +71,7 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 		}
 		$maxid = $this->adapter->getCell("SELECT MAX(id) FROM __log");
 		$this->adapter->exec("DELETE FROM __log WHERE id < $maxid - 200 ");
-    }
+	}
 
 	/**
 	 * Throws an exception if information in the bean has been changed
@@ -82,29 +82,29 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	 * @param string $event
 	 * @param RedBean_OODBBean $item
 	 */
-    public function onEvent( $event, $item ) { 
-        $id = $item->id;
-        if (! ((int) $id)) $event="open";
+	public function onEvent( $event, $item ) {
+		$id = $item->id;
+		if (! ((int) $id)) $event="open";
 
 
-        $type = $item->getMeta("type");
-        if ($event=="open") {
+		$type = $item->getMeta("type");
+		if ($event=="open") {
 			if (isset($this->stash[$id])) {
 				$insertid = $this->stash[$id];
 				unset($this->stash[$id]);
 				return $insertid;
 			}
 			$insertid = $this->writer->insertRecord("__log",array("action","tbl","itemid"),
-            array(array(1,  $type, $id)));
+					  array(array(1,  $type, $id)));
 			$item->setMeta("opened",$insertid);
-			
-        }
-        if ($event=="update" || $event=="delete") {
-            if (($item->getMeta("opened"))) $oldid = $item->getMeta("opened"); else $oldid=0;
-            $newid = $this->checkChanges($type,$id, $oldid);
-	        $item->setMeta("opened",$newid);
-        }
-    }
+
+		}
+		if ($event=="update" || $event=="delete") {
+			if (($item->getMeta("opened"))) $oldid = $item->getMeta("opened"); else $oldid=0;
+			$newid = $this->checkChanges($type,$id, $oldid);
+			$item->setMeta("opened",$newid);
+		}
+	}
 
 
 	/**
@@ -153,19 +153,19 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	 * @param  integer $logid
 	 * @return integer $newchangeid
 	 */
-    public function checkChanges($type, $id, $logid) {
+	public function checkChanges($type, $id, $logid) {
 		$type = $this->writer->check($type);
 		$id = (int) $id;
 		$logid = (int) $logid;
 		$num = $this->adapter->getCell("
         SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id > $logid");
-        if ($num) {
+		if ($num) {
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)");
 		}
 		$this->adapter->exec("INSERT INTO __log (id,action,tbl,itemid) VALUES(NULL, 2,:tbl,:id)",array(":tbl"=>$type, ":id"=>$id));
 		$newid = $this->adapter->getInsertID();
-	    if ($this->adapter->getCell("select id from __log where tbl=:tbl AND id < $newid and id > $logid and action=2 and itemid=$id ",
-			array(":tbl"=>$type))){
+		if ($this->adapter->getCell("select id from __log where tbl=:tbl AND id < $newid and id > $logid and action=2 and itemid=$id ",
+		array(":tbl"=>$type))) {
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access II (type:$type, id:$id)");
 		}
 		return $newid;

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * DBAdapter	    (Database Adapter)
  * @file 		RedBean/Adapter/DBAdapter.php

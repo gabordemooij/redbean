@@ -14,7 +14,7 @@
  */
 class RedBean_Plugin_Finder implements RedBean_Plugin {
 
-	
+
 	/**
 	 * Fetches a collection of OODB Bean objects based on the SQL
 	 * criteria provided. For instance;
@@ -42,7 +42,7 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 * @return array $beans
 	 */
 	public static function where( $type, $SQL = " 1 ", $values=array(),
-			$tools = false, $ignoreGSQLWarn = false ) {
+			  $tools = false, $ignoreGSQLWarn = false ) {
 
 		if ($SQL==="") $SQL = " 1 ";
 
@@ -53,22 +53,22 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 		if (!$tools) $tools = RedBean_Setup::getToolBox();
 
 		RedBean_CompatManager::scanDirect($tools, array(
-				RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
-				RedBean_CompatManager::C_SYSTEM_SQLITE => "3",
-				RedBean_CompatManager::C_SYSTEM_POSTGRESQL => "7"
-			));
+				  RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+				  RedBean_CompatManager::C_SYSTEM_SQLITE => "3",
+				  RedBean_CompatManager::C_SYSTEM_POSTGRESQL => "7"
+		));
 
-		
+
 		//Now get the two tools we need; RedBean and the Adapter
 		$redbean = $tools->getRedBean();
 		$adapter = $tools->getDatabaseAdapter();
 		$writer = $tools->getWriter();
-		
+
 		//Do we need to parse Gold SQL?
-		if (!$redbean->isFrozen()) { 
+		if (!$redbean->isFrozen()) {
 			$SQL = self::parseGoldSQL($SQL, $type, $tools);
 		}
-		else { 
+		else {
 			if (!$ignoreGSQLWarn && strpos($SQL,"@")!==false) {
 				throw new RedBean_Exception_SQL("Gold SQL is
 					only allowed in FLUID mode,
@@ -76,21 +76,21 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 			}
 		}
 
-		
+
 
 		//Make a standard ANSI SQL query from the SQL provided
-		try{
+		try {
 			$SQL = "SELECT * FROM $type WHERE ".$SQL;
 
 			//Fetch the values using the SQL and value pairs provided
 			$rows = $adapter->get($SQL, $values);
 
 		}
-		catch(RedBean_Exception_SQL $e) { 
+		catch(RedBean_Exception_SQL $e) {
 			if ($writer->sqlStateIn($e->getSQLState(),array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
-			))){
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
+			))) {
 				return array();
 			}
 			else {
@@ -98,11 +98,11 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 			}
 		}
 
-		
+
 		//Give the rows to RedBean OODB to convert them
 		//into beans.
 		return $redbean->convertToBeans($type, $rows);
-		
+
 
 	}
 
@@ -121,31 +121,31 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 
 		//Pattern for our regular expression to filter the prefixes.
 		$pattern = "/@[\w\.]+/";
-		
+
 		if (preg_match_all($pattern, $SQL, $matches)) {
 
 			//Get the columns in the master table
 			$columns = array_keys( $toolbox->getWriter()->getColumns($currentTable) );
 			//Get the tables
 			$tables = $toolbox->getWriter()->getTables();
-		
+
 			//Get the columns we need to check for
 			$checks = array_shift( $matches );
 
 			//Loop through the items we need to check...
 			foreach($checks as $checkItem) {
-				
+
 				$itemName = substr($checkItem, 1);
 
 				//Ai we need to do a table check as well
-				if (strpos($itemName,".")!==false) { 
+				if (strpos($itemName,".")!==false) {
 
 					list($table, $column) = explode(".", $itemName);
 
 					if (!in_array($table, $tables)) {
-						
+
 						$SQL = str_replace("@".$itemName, "NULL", $SQL);
-						
+
 					}
 					else {
 
@@ -159,28 +159,28 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 					}
 				}
 				else {
-				
+
 					if (!in_array($itemName, ($columns))) {
-	
+
 						$SQL = str_replace("@".$itemName, "NULL", $SQL);
-						
+
 					}
 					else {
 						$SQL = str_replace("@".$itemName, $itemName, $SQL);
 					}
 				}
-				
+
 
 			}
-			
 
-			
+
+
 
 		}
 
 
 		return $SQL;
-		
+
 	}
 
 
@@ -188,5 +188,7 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 }
 
 //Short Alias for this class
-class Finder extends RedBean_Plugin_Finder { }
+class Finder extends RedBean_Plugin_Finder {
+
+}
 

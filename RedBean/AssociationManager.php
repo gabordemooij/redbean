@@ -3,7 +3,7 @@
  * RedBean Association
  * @file			RedBean/AssociationManager.php
  * @description		Manages simple bean associations.
- *					
+ *
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -18,9 +18,9 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @var array $databaseSpecs
 	 */
 	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
-		RedBean_CompatManager::C_SYSTEM_SQLITE=>"3",
-		RedBean_CompatManager::C_SYSTEM_POSTGRESQL=>"8"
+			  RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+			  RedBean_CompatManager::C_SYSTEM_SQLITE=>"3",
+			  RedBean_CompatManager::C_SYSTEM_POSTGRESQL=>"8"
 	);
 
 	/**
@@ -67,13 +67,13 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$bean = $this->oodb->dispense($table);
 		return $this->associateBeans( $bean1, $bean2, $bean );
 	}
-	
-	
+
+
 	protected function associateBeans(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean) {
-		
+
 		$idfield1 = $this->writer->getIDField($bean1->getMeta("type"));
 		$idfield2 = $this->writer->getIDField($bean2->getMeta("type"));
-		
+
 		$property1 = $bean1->getMeta("type") . "_id";
 		$property2 = $bean2->getMeta("type") . "_id";
 		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
@@ -85,15 +85,15 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		try {
 			return $this->oodb->store( $bean );
 		}
-		catch(RedBean_Exception_SQL $e)  {
+		catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
-				array(
-					RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 			))) throw $e;
 		}
 
 	}
-	
+
 
 	/**
 	 * Gets related beans of type $type for bean $bean
@@ -115,29 +115,29 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		try {
 			if ($cross) {
 				$sqlFetchKeys = $this->writer->selectByCrit(
-					$targetproperty,
-					$table,
-					$property,
-					$bean->$idfield,
-					true
+						  $targetproperty,
+						  $table,
+						  $property,
+						  $bean->$idfield,
+						  true
 				);
 			}
 			else {
 				$sqlFetchKeys = $this->writer->selectByCrit(
-					$targetproperty,
-					$table,
-					$property,
-					$bean->$idfield
+						  $targetproperty,
+						  $table,
+						  $property,
+						  $bean->$idfield
 				);
 			}
 			return ( $sqlFetchKeys );
 
-		}catch(RedBean_Exception_SQL $e){
-			
+		}catch(RedBean_Exception_SQL $e) {
+
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
-				array(
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
 
 			return array();
@@ -170,11 +170,11 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			if ($cross) {
 				$this->writer->deleteByCrit($table,array($property2=>$value1,$property1=>$value2));
 			}
-		}catch(RedBean_Exception_SQL $e){
+		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
-				array(
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
 		}
 	}
@@ -198,11 +198,11 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			if ($cross) {
 				$this->writer->deleteByCrit($table,array($property2=>$bean->$idfield));
 			}
-		}catch(RedBean_Exception_SQL $e){
+		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
-				array(
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
 		}
 	}

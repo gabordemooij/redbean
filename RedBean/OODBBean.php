@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * RedBean_OODBBean (Object Oriented DataBase Bean)
  * @file 		RedBean/RedBean_OODBBean.php

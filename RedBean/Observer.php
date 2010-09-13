@@ -12,7 +12,7 @@
  * with this source code in the file license.txt.
  */
 interface RedBean_Observer {
-	
+
 	/**
 	 * Part of the RedBean Observer Infrastructure.
 	 * @param string $eventname

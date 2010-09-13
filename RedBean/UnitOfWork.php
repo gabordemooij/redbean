@@ -30,7 +30,7 @@ class RedBean_UnitOfWork {
 	 */
 	public function addWork( $tagName, $closure ) {
 		if (strlen($tagName)>0) {
-			if (!isset($this->todoList[$tagName])){
+			if (!isset($this->todoList[$tagName])) {
 				//make a new entry in the todolist
 				$this->todoList[$tagName]=array();
 			}
@@ -44,7 +44,7 @@ class RedBean_UnitOfWork {
 	 * @param string $tagName
 	 */
 	public function doWork( $tagName ) {
-		if (isset($this->todoList[$tagName])){
+		if (isset($this->todoList[$tagName])) {
 			foreach($this->todoList[$tagName] as $job) {
 				$job();
 			}

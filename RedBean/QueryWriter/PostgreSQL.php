@@ -33,7 +33,7 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 */
 	const C_DATATYPE_TEXT = 3;
 
-	
+
 
 
 
@@ -41,11 +41,11 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * @var array
 	 * Supported Column Types
 	 */
-    public $typeno_sqltype = array(
-        self::C_DATATYPE_INTEGER=>" integer ",
-		self::C_DATATYPE_DOUBLE=>" double precision ",
-        self::C_DATATYPE_TEXT=>" text "
-    );
+	public $typeno_sqltype = array(
+			  self::C_DATATYPE_INTEGER=>" integer ",
+			  self::C_DATATYPE_DOUBLE=>" double precision ",
+			  self::C_DATATYPE_TEXT=>" text "
+	);
 
 	/**
 	 *
@@ -53,19 +53,19 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 	 * Supported Column Types and their
 	 * constants (magic numbers)
 	 */
-    public $sqltype_typeno = array(
-	"integer"=>self::C_DATATYPE_INTEGER,
-    "double precision" => self::C_DATATYPE_DOUBLE,
-    "text"=>self::C_DATATYPE_TEXT
-    );
+	public $sqltype_typeno = array(
+			  "integer"=>self::C_DATATYPE_INTEGER,
+			  "double precision" => self::C_DATATYPE_DOUBLE,
+			  "text"=>self::C_DATATYPE_TEXT
+	);
 
-    
 
-    /**
-     *
-     * @var RedBean_DBAdapter
-     */
-    private $adapter;
+
+	/**
+	 *
+	 * @var RedBean_DBAdapter
+	 */
+	private $adapter;
 
 
 	/**
@@ -78,55 +78,55 @@ class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
 		return $this->adapter->escape($table);
 	}
 
-    /**
-     * Constructor
-     * The Query Writer Constructor also sets up the database
-     * @param RedBean_DBAdapter $adapter
-     */
-    public function __construct( RedBean_Adapter_DBAdapter $adapter ) {
-        $this->adapter = $adapter;
-    }
+	/**
+	 * Constructor
+	 * The Query Writer Constructor also sets up the database
+	 * @param RedBean_DBAdapter $adapter
+	 */
+	public function __construct( RedBean_Adapter_DBAdapter $adapter ) {
+		$this->adapter = $adapter;
+	}
 
 
 
-    /**
-     * Returns all tables in the database
-     * @return array $tables
-     */
-    public function getTables() {
-        return $this->adapter->getCol( "select table_name from information_schema.tables
+	/**
+	 * Returns all tables in the database
+	 * @return array $tables
+	 */
+	public function getTables() {
+		return $this->adapter->getCol( "select table_name from information_schema.tables
 where table_schema = 'public'" );
-    }
+	}
 
 	/**
 	 * Creates an empty, column-less table for a bean.
 	 * @param string $table
 	 */
-    public function createTable( $table ) {
+	public function createTable( $table ) {
 		$table = $this->check($table);
 		$sql = "
                      CREATE TABLE \"$table\" (
 						id SERIAL PRIMARY KEY
                      );
-            ";
-        $this->adapter->exec( $sql );
-    }
+				  ";
+		$this->adapter->exec( $sql );
+	}
 
 	/**
 	 * Returns an array containing the column names of the specified table.
 	 * @param string $table
 	 * @return array $columns
 	 */
-    public function getColumns( $table ) {
+	public function getColumns( $table ) {
 		$table = $this->check($table);
-        $columnsRaw = $this->adapter->get("select column_name, data_type from information_schema.columns where table_name='$table'");
-        
+		$columnsRaw = $this->adapter->get("select column_name, data_type from information_schema.columns where table_name='$table'");
+
 
 		foreach($columnsRaw as $r) {
-            $columns[$r["column_name"]]=$r["data_type"];
-        }
-        return $columns;
-    }
+			$columns[$r["column_name"]]=$r["data_type"];
+		}
+		return $columns;
+	}
 
 	/**
 	 * Returns the MySQL Column Type Code (integer) that corresponds
@@ -134,7 +134,7 @@ where table_schema = 'public'" );
 	 * @param string $value
 	 * @return integer $type
 	 */
-	public function scanType( $value ) { 
+	public function scanType( $value ) {
 		if (is_integer($value) && $value < 2147483648 && $value > -2147483648) {
 			return self::C_DATATYPE_INTEGER;
 		}
@@ -144,7 +144,7 @@ where table_schema = 'public'" );
 		else {
 			return self::C_DATATYPE_TEXT;
 		}
-    }
+	}
 
 	/**
 	 * Adds a column of a given type to a table
@@ -152,22 +152,22 @@ where table_schema = 'public'" );
 	 * @param string $column
 	 * @param integer $type
 	 */
-    public function addColumn( $table, $column, $type ) {
+	public function addColumn( $table, $column, $type ) {
 		$column = $this->check($column);
 		$table = $this->check($table);
-        $type=$this->typeno_sqltype[$type];
-        $sql = "ALTER TABLE \"$table\" ADD $column $type ";
-        $this->adapter->exec( $sql );
-    }
+		$type=$this->typeno_sqltype[$type];
+		$sql = "ALTER TABLE \"$table\" ADD $column $type ";
+		$this->adapter->exec( $sql );
+	}
 
 	/**
 	 * Returns the Type Code for a Column Description
 	 * @param string $typedescription
 	 * @return integer $typecode
 	 */
-    public function code( $typedescription ) {
-        return ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
-    }
+	public function code( $typedescription ) {
+		return ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
+	}
 
 	/**
 	 * Change (Widen) the column to the give type.
@@ -175,13 +175,17 @@ where table_schema = 'public'" );
 	 * @param string $column
 	 * @param integer $type
 	 */
-    public function widenColumn( $table, $column, $type ) {
-        $column = $this->check($column);
+	public function widenColumn( $table, $column, $type ) {
+		$column = $this->check($column);
 		$table = $this->check($table);
 		$newtype = $this->typeno_sqltype[$type];
-        $changecolumnSQL = "ALTER TABLE \"$table\" \n\t ALTER COLUMN $column TYPE $newtype ";
-        try { $this->adapter->exec( $changecolumnSQL ); }catch(Exception $e){ die($e->getMessage()); }
-    }
+		$changecolumnSQL = "ALTER TABLE \"$table\" \n\t ALTER COLUMN $column TYPE $newtype ";
+		try {
+			$this->adapter->exec( $changecolumnSQL );
+		}catch(Exception $e) {
+			die($e->getMessage());
+		}
+	}
 
 	/**
 	 * Update a record using a series of update values.
@@ -189,7 +193,7 @@ where table_schema = 'public'" );
 	 * @param array $updatevalues
 	 * @param integer $id
 	 */
-    public function updateRecord( $table, $updatevalues, $id) {
+	public function updateRecord( $table, $updatevalues, $id) {
 		$sql = "UPDATE \"".$this->adapter->escape($this->check($table))."\" SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
@@ -197,9 +201,9 @@ where table_schema = 'public'" );
 			$v[]=strval( ( $uv["value"] ) );
 		}
 		$sql .= implode(",", $p ) ." WHERE id = ".intval($id);
-		
+
 		$this->adapter->exec( $sql, $v );
-    }
+	}
 
 	/**
 	 * Inserts a record into the database using a series of insert columns
@@ -209,26 +213,26 @@ where table_schema = 'public'" );
 	 * @param array $insertvalues
 	 * @return integer $insertid
 	 */
-    public function insertRecord( $table, $insertcolumns, $insertvalues ) {
+	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
 		$table = $this->check($table);
-        if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
+		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k=>$v) {
-                $insertcolumns[$k] = "".$this->check($v)."";
-            }
+				$insertcolumns[$k] = "".$this->check($v)."";
+			}
 			$insertSQL = "INSERT INTO \"$table\" ( id, ".implode(",",$insertcolumns)." ) VALUES ";
 			$insertSQL .= "( DEFAULT, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) RETURNING id";
-			
+
 			$ids = array();
 			foreach($insertvalues as $insertvalue) {
 				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue );
 			}
 			if (count($ids)===1) return array_pop($ids); else	return $ids;
-			
-        }
-        else {
+
+		}
+		else {
 			return $this->adapter->getCell( "INSERT INTO \"$table\" (id) VALUES(DEFAULT) RETURNING id " );
-        }
-    }
+		}
+	}
 
 
 
@@ -238,12 +242,12 @@ where table_schema = 'public'" );
 	 * @param integer $id
 	 * @return array $row
 	 */
-    public function selectRecord($type, $ids) {
+	public function selectRecord($type, $ids) {
 		$type=$this->check($type);
 		$sql = "SELECT * FROM $type WHERE id IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);
 		return ($rows && is_array($rows) && count($rows)>0) ? $rows : NULL;
-    }
+	}
 
 	/**
 	 * Deletes a record based on a table, column, value and operator
@@ -253,11 +257,11 @@ where table_schema = 'public'" );
 	 * @param string $oper
 	 * @todo validate arguments for security
 	 */
-    public function deleteRecord( $table, $value) {
+	public function deleteRecord( $table, $value) {
 		$table = $this->check($table);
 		$column = "id";
-	    $this->adapter->exec("DELETE FROM $table WHERE $column = ? ",array(strval($value)));
-    }
+		$this->adapter->exec("DELETE FROM $table WHERE $column = ? ",array(strval($value)));
+	}
 	/**
 	 * Gets information about changed records using a type and id and a logid.
 	 * RedBean Locking shields you from race conditions by comparing the latest
@@ -272,19 +276,19 @@ where table_schema = 'public'" );
 	 * @param  integer $logid
 	 * @return integer $newchangeid
 	 */
-    public function checkChanges($type, $id, $logid) {
+	public function checkChanges($type, $id, $logid) {
 		$type = $this->check($type);
 		$id = (int) $id;
 		$logid = (int) $logid;
 		$num = $this->adapter->getCell("
         SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id > $logid");
-        if ($num) {
+		if ($num) {
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)");
 		}
 		$newid = $this->insertRecord("__log",array("action","tbl","itemid"),
-		   array(array(2,  $type, $id)));
-	    if ($this->adapter->getCell("select id from __log where tbl=:tbl AND id < $newid and id > $logid and action=2 and itemid=$id ",
-			array(":tbl"=>$type))){
+				  array(array(2,  $type, $id)));
+		if ($this->adapter->getCell("select id from __log where tbl=:tbl AND id < $newid and id > $logid and action=2 and itemid=$id ",
+		array(":tbl"=>$type))) {
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access II (type:$type, id:$id)");
 		}
 		return $newid;
@@ -296,13 +300,13 @@ where table_schema = 'public'" );
 	 * @param string $col2
 	 * @return void
 	 */
-    public function addUniqueIndex( $table,$columns ) {
+	public function addUniqueIndex( $table,$columns ) {
 		sort($columns); //else we get multiple indexes due to order-effects
-		foreach($columns as $k=>$v){
+		foreach($columns as $k=>$v) {
 			$columns[$k]="".$this->adapter->escape($v)."";
 		}
 		$table = $this->adapter->escape( $this->check($table) );
-        $r = $this->adapter->get("SELECT
+		$r = $this->adapter->get("SELECT
 									i.relname as index_name
 								FROM
 									pg_class t,
@@ -321,24 +325,24 @@ where table_schema = 'public'" );
 		/*
 		 *
 		 * ALTER TABLE testje ADD CONSTRAINT blabla UNIQUE (blaa, blaa2);
-		 */
+		*/
 
-        $name = "UQ_".sha1(implode(',',$columns));
-        if ($r) {
-            foreach($r as $i) {
-                if (strtolower( $i["index_name"] )== strtolower( $name )) {
-                    return;
-                }
-            }
-        }
-		
-        $sql = "ALTER TABLE \"$table\"
+		$name = "UQ_".sha1(implode(',',$columns));
+		if ($r) {
+			foreach($r as $i) {
+				if (strtolower( $i["index_name"] )== strtolower( $name )) {
+					return;
+				}
+			}
+		}
+
+		$sql = "ALTER TABLE \"$table\"
                 ADD CONSTRAINT $name UNIQUE (".implode(",",$columns).")";
 
 
-		
-        $this->adapter->exec($sql);
-    }
+
+		$this->adapter->exec($sql);
+	}
 
 
 	/**

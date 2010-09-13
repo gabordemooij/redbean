@@ -34,8 +34,8 @@ class RedBean_SimpleStat extends RedBean_CompatManager implements RedBean_Plugin
 	 * @var array $databaseSpecs
 	 */
 	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
-		RedBean_CompatManager::C_SYSTEM_SQLITE => "3"
+			  RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+			  RedBean_CompatManager::C_SYSTEM_SQLITE => "3"
 	);
 
 
@@ -65,7 +65,7 @@ class RedBean_SimpleStat extends RedBean_CompatManager implements RedBean_Plugin
 		return (int) $this->adapter->getCell("SELECT count(*) FROM `$type`");
 	}
 
-	
+
 
 
 }

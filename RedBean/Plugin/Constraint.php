@@ -32,9 +32,9 @@ class RedBean_Plugin_Constraint {
 		$toolbox = RedBean_Setup::getToolBox();
 
 		RedBean_CompatManager::scanDirect($toolbox, array(
-			RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
-			RedBean_CompatManager::C_SYSTEM_SQLITE => "3",
-			RedBean_CompatManager::C_SYSTEM_POSTGRESQL => "7",));
+				  RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
+				  RedBean_CompatManager::C_SYSTEM_SQLITE => "3",
+				  RedBean_CompatManager::C_SYSTEM_POSTGRESQL => "7",));
 
 
 		//Create an association manager
@@ -67,8 +67,8 @@ class RedBean_Plugin_Constraint {
 		$fkCode = "fk".md5($table.$property1.$property2);
 		if (isset(self::$fkcache[$fkCode])) return false;
 		//Dispatch to right method
-		
-		try{
+
+		try {
 			if ($writer instanceof RedBean_QueryWriter_PostgreSQL) {
 				return self::constraintPostgreSQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
 			}
@@ -79,16 +79,16 @@ class RedBean_Plugin_Constraint {
 				return self::constraintMySQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
 			}
 		}
-		catch(RedBean_Exception_SQL $e){
+		catch(RedBean_Exception_SQL $e) {
 			if (!$writer->sqlStateIn($e->getSQLState(),
-				array(
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
 		}
-		
+
 		return false;
-	
+
 	}
 
 	/**
@@ -104,11 +104,11 @@ class RedBean_Plugin_Constraint {
 	 * @return boolean $succes
 	 */
 	private static function constraintPostgreSQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache) {
-			$writer = $toolbox->getWriter();
-			$oodb = $toolbox->getRedBean();
-			$adapter = $toolbox->getDatabaseAdapter();
-			$fkCode = "fk".md5($table.$property1.$property2);
-			$sql = "
+		$writer = $toolbox->getWriter();
+		$oodb = $toolbox->getRedBean();
+		$adapter = $toolbox->getDatabaseAdapter();
+		$fkCode = "fk".md5($table.$property1.$property2);
+		$sql = "
 					SELECT
 							c.oid,
 							n.nspname,
@@ -127,21 +127,21 @@ class RedBean_Plugin_Constraint {
 					AND
 					(  cons.conname = '{$fkCode}a'	OR  cons.conname = '{$fkCode}b' )
 
-			";
+				  ";
 
-			$rows = $adapter->get( $sql );
-			if (!count($rows)) {
-				if (!$dontCache) self::$fkcache[ $fkCode ] = true;
-				$sql1 = "ALTER TABLE $table ADD CONSTRAINT
-						{$fkCode}a FOREIGN KEY ($property1)
+		$rows = $adapter->get( $sql );
+		if (!count($rows)) {
+			if (!$dontCache) self::$fkcache[ $fkCode ] = true;
+			$sql1 = "ALTER TABLE $table ADD CONSTRAINT
+					  {$fkCode}a FOREIGN KEY ($property1)
 						REFERENCES $table1 (id) ON DELETE CASCADE ";
-				$sql2 = "ALTER TABLE $table ADD CONSTRAINT
-						{$fkCode}b FOREIGN KEY ($property2)
+			$sql2 = "ALTER TABLE $table ADD CONSTRAINT
+					  {$fkCode}b FOREIGN KEY ($property2)
 						REFERENCES $table2 (id) ON DELETE CASCADE ";
-				$adapter->exec($sql1);
-				$adapter->exec($sql2);
-			}
-			return true;
+			$adapter->exec($sql1);
+			$adapter->exec($sql2);
+		}
+		return true;
 	}
 
 	/**
@@ -167,7 +167,7 @@ class RedBean_Plugin_Constraint {
 			FROM information_schema.KEY_COLUMN_USAGE
 			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='$table' AND
 			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
-		");
+				  ");
 
 		//already foreign keys added in this association table
 		if ($fks>0) return false;
@@ -184,12 +184,12 @@ class RedBean_Plugin_Constraint {
 		$sql = "
 			ALTER TABLE ".$writer->noKW($table)."
 			ADD FOREIGN KEY($property1) references $table1(id) ON DELETE CASCADE;
-		";
+				  ";
 		$adapter->exec( $sql );
 		$sql ="
 			ALTER TABLE ".$writer->noKW($table)."
 			ADD FOREIGN KEY($property2) references $table2(id) ON DELETE CASCADE
-		";
+				  ";
 		$adapter->exec( $sql );
 		return true;
 	}
@@ -217,7 +217,7 @@ class RedBean_Plugin_Constraint {
 				FOR EACH ROW BEGIN
 					DELETE FROM $table WHERE  $table.$property1 = OLD.id;
 				END;
-		";
+				  ";
 
 		$sql2 = "
 			CREATE TRIGGER IF NOT EXISTS {$fkCode}b
@@ -226,7 +226,7 @@ class RedBean_Plugin_Constraint {
 					DELETE FROM $table WHERE $table.$property2 = OLD.id;
 				END;
 
-		";
+				  ";
 		$adapter->exec($sql1);
 		$adapter->exec($sql2);
 		return true;

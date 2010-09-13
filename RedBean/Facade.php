@@ -15,7 +15,7 @@
  */
 
 class R {
-	
+
 	/**
 	 *
 	 * Constains an instance of the RedBean Toolbox
@@ -55,7 +55,7 @@ class R {
 	 */
 	public static $associationManager;
 
-        /**
+	/**
 	 *
 	 * Constains an instance of the RedBean Link Manager
 	 * @var RedBean_LinkManager
@@ -77,24 +77,24 @@ class R {
 		self::$redbean = self::$toolbox->getRedBean();
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
 		self::$treeManager = new RedBean_TreeManager( self::$toolbox );
-                self::$linkManager = new RedBean_LinkManager( self::$toolbox );
-                $helper = new RedBean_ModelHelper();
-                self::$redbean->addEventListener("update", $helper );
-                self::$redbean->addEventListener("open", $helper );
-                self::$redbean->addEventListener("delete", $helper );
+		self::$linkManager = new RedBean_LinkManager( self::$toolbox );
+		$helper = new RedBean_ModelHelper();
+		self::$redbean->addEventListener("update", $helper );
+		self::$redbean->addEventListener("open", $helper );
+		self::$redbean->addEventListener("delete", $helper );
 	}
 
 
-        /**
-         * Toggles DEBUG mode.
-         * In Debug mode all SQL that happens under the hood will
-         * be printed to the screen.
-         *
-         * @param boolean $tf
-         */
-        public static function debug( $tf = true ) {
-            self::$adapter->getDatabase()->setDebugMode( $tf );
-        }
+	/**
+	 * Toggles DEBUG mode.
+	 * In Debug mode all SQL that happens under the hood will
+	 * be printed to the screen.
+	 *
+	 * @param boolean $tf
+	 */
+	public static function debug( $tf = true ) {
+		self::$adapter->getDatabase()->setDebugMode( $tf );
+	}
 
 	/**
 	 * Stores a RedBean OODB Bean and returns the ID.
@@ -105,10 +105,10 @@ class R {
 		return self::$redbean->store( $bean );
 	}
 
-        
-        public static function freeze( $tf = true ) {
-            self::$redbean->freeze( $tf );
-        }
+
+	public static function freeze( $tf = true ) {
+		self::$redbean->freeze( $tf );
+	}
 
 
 	/**
@@ -140,16 +140,16 @@ class R {
 		return self::$redbean->dispense( $type );
 	}
 
-        /**
-         * Loads a bean if ID > 0 else dispenses.
-         * @param string $type
-         * @param integer $id
-         * @return RedBean_OODBBean $bean
-         */
-        public static function loadOrDispense( $type, $id = 0 ) {
-            return ($id ? R::load($type,(int)$id) : R::dispense($type));
-        }
-        
+	/**
+	 * Loads a bean if ID > 0 else dispenses.
+	 * @param string $type
+	 * @param integer $id
+	 * @return RedBean_OODBBean $bean
+	 */
+	public static function loadOrDispense( $type, $id = 0 ) {
+		return ($id ? R::load($type,(int)$id) : R::dispense($type));
+	}
+
 	/**
 	 * Associates two Beans.
 	 * @param RedBean_OODBBean $bean1
@@ -200,44 +200,44 @@ class R {
 		return self::$treeManager->attach( $parent, $child );
 	}
 
-        /**
-         * Links two beans using a foreign key field, 1-N Assoc only.
-         * @param RedBean_OODBBean $bean1
-         * @param RedBean_OODBBean $bean2
-         * @return mixed
-         */
-        public static function link( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
-                return self::$linkManager->link( $bean1, $bean2 );
-        }
+	/**
+	 * Links two beans using a foreign key field, 1-N Assoc only.
+	 * @param RedBean_OODBBean $bean1
+	 * @param RedBean_OODBBean $bean2
+	 * @return mixed
+	 */
+	public static function link( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
+		return self::$linkManager->link( $bean1, $bean2 );
+	}
 
-        /**
-         *
-         * @param RedBean_OODBBean $bean
-         * @param string $typeName
-         * @return mixed
-         */
-        public static function getBean( RedBean_OODBBean $bean, $typeName ) {
-                return self::$linkManager->getBean($bean, $typeName );
-        }
+	/**
+	 *
+	 * @param RedBean_OODBBean $bean
+	 * @param string $typeName
+	 * @return mixed
+	 */
+	public static function getBean( RedBean_OODBBean $bean, $typeName ) {
+		return self::$linkManager->getBean($bean, $typeName );
+	}
 
-        /**
-         *
-         * @param RedBean_OODBBean $bean
-         * @param string $typeName
-         * @return mixed
-         */
-        public static function getKey( RedBean_OODBBean $bean, $typeName ) {
-                return self::$linkManager->getKey($bean, $typeName );
-        }
+	/**
+	 *
+	 * @param RedBean_OODBBean $bean
+	 * @param string $typeName
+	 * @return mixed
+	 */
+	public static function getKey( RedBean_OODBBean $bean, $typeName ) {
+		return self::$linkManager->getKey($bean, $typeName );
+	}
 
-        /**
-         *
-         * @param RedBean_OODBBean $bean
-         * @param mixed $typeName
-         */
-        public static function breakLink( RedBean_OODBBean $bean, $typeName ) {
-            return self::$linkManager->breakLink( $bean, $typeName );
-        }
+	/**
+	 *
+	 * @param RedBean_OODBBean $bean
+	 * @param mixed $typeName
+	 */
+	public static function breakLink( RedBean_OODBBean $bean, $typeName ) {
+		return self::$linkManager->breakLink( $bean, $typeName );
+	}
 
 	/**
 	 * Returns all children beans under parent bean $parent
@@ -248,29 +248,29 @@ class R {
 		return self::$treeManager->children( $parent );
 	}
 
-        public static function getParent( RedBean_OODBBean $bean ) {
-                return self::$treeManager->getParent( $bean );
-        }
-	
+	public static function getParent( RedBean_OODBBean $bean ) {
+		return self::$treeManager->getParent( $bean );
+	}
+
 	/**
-         * Finds a bean using a type and a where clause (SQL).
-         * As with most Query tools in RedBean you can provide values to
-         * be inserted in the SQL statement by populating the value
-         * array parameter; you can either use the question mark notation
-         * or the slot-notation (:keyname).
-         * @param string $type
-         * @param string $sql
-         * @param array $values
-         * @return array $beans
-         */
+	 * Finds a bean using a type and a where clause (SQL).
+	 * As with most Query tools in RedBean you can provide values to
+	 * be inserted in the SQL statement by populating the value
+	 * array parameter; you can either use the question mark notation
+	 * or the slot-notation (:keyname).
+	 * @param string $type
+	 * @param string $sql
+	 * @param array $values
+	 * @return array $beans
+	 */
 	public static function find( $type, $sql="1", $values=array() ) {
 		return Finder::where( $type, $sql, $values );
 	}
-	
+
 	public static function findAndExport($type, $sql="1", $values=array()) {
 		$items = Finder::where( $type, $sql, $values );
 		$arr = array();
-		foreach($items as $key=>$item){
+		foreach($items as $key=>$item) {
 			$arr[$key]=$item->export();
 		}
 		return $arr;
@@ -282,139 +282,151 @@ class R {
 	}
 
 
-        /**
-         * Returns an array of beans.
-         * @param string $type
-         * @param array $ids
-         * @return array $beans
-         */
-        public static function batch( $type, $ids ) {
-            return self::$redbean->batch($type, $ids);
-        }
+	/**
+	 * Returns an array of beans.
+	 * @param string $type
+	 * @param array $ids
+	 * @return array $beans
+	 */
+	public static function batch( $type, $ids ) {
+		return self::$redbean->batch($type, $ids);
+	}
 
-        /**
-         * Returns a simple list instead of beans, based
-         * on a type, property and an SQL where clause.
-         * @param string $type
-         * @param string $prop
-         * @param string $where
-         * @return array $list
-         */
-        public static function lst( $type,$prop,$sql=" 1 " ) {
-            $list = self::find($type,$sql);
-            $listItems = array();
-            foreach($list as $id=>$item) {
-                $listItems[] = $item->$prop;
-            }
-            return $listItems;
-        }
+	/**
+	 * Returns a simple list instead of beans, based
+	 * on a type, property and an SQL where clause.
+	 * @param string $type
+	 * @param string $prop
+	 * @param string $where
+	 * @return array $list
+	 */
+	public static function lst( $type,$prop,$sql=" 1 " ) {
+		$list = self::find($type,$sql);
+		$listItems = array();
+		foreach($list as $id=>$item) {
+			$listItems[] = $item->$prop;
+		}
+		return $listItems;
+	}
 
-        /**
-         * Executes SQL.
-         * @param string $sql
-         * @param array $values
-         * @return array $results
-         */
-        public static function exec( $sql, $values=array() ) {
-            return self::secureExec(function($sql, $values){return R::$adapter->exec( $sql, $values );}, NULL,$sql, $values );
-        }
+	/**
+	 * Executes SQL.
+	 * @param string $sql
+	 * @param array $values
+	 * @return array $results
+	 */
+	public static function exec( $sql, $values=array() ) {
+		return self::secureExec(function($sql, $values) {
+			return R::$adapter->exec( $sql, $values );
+		}, NULL,$sql, $values );
+	}
 
-        /**
-         * Executes SQL.
-         * @param string $sql
-         * @param array $values
-         * @return array $results
-         */
-        public static function getAll( $sql, $values=array() ) {
-            return self::secureExec(function($sql, $values){return R::$adapter->get( $sql, $values );}, array(), $sql, $values);
-        }
+	/**
+	 * Executes SQL.
+	 * @param string $sql
+	 * @param array $values
+	 * @return array $results
+	 */
+	public static function getAll( $sql, $values=array() ) {
+		return self::secureExec(function($sql, $values) {
+			return R::$adapter->get( $sql, $values );
+		}, array(), $sql, $values);
+	}
 
-        /**
-         * Executes SQL.
-         * @param string $sql
-         * @param array $values
-         * @return array $results
-         */
-        public static function getCell( $sql, $values=array() ) {
-            return self::secureExec(function($sql, $values){return R::$adapter->getCell( $sql, $values );}, NULL, $sql, $values);
-        }
+	/**
+	 * Executes SQL.
+	 * @param string $sql
+	 * @param array $values
+	 * @return array $results
+	 */
+	public static function getCell( $sql, $values=array() ) {
+		return self::secureExec(function($sql, $values) {
+			return R::$adapter->getCell( $sql, $values );
+		}, NULL, $sql, $values);
+	}
 
-        /**
-         * Executes SQL.
-         * @param string $sql
-         * @param array $values
-         * @return array $results
-         */
-        public static function getRow( $sql, $values=array() ) {
-            return self::secureExec(function($sql, $values){return R::$adapter->getRow( $sql, $values );}, array(),$sql, $values);
-        }
+	/**
+	 * Executes SQL.
+	 * @param string $sql
+	 * @param array $values
+	 * @return array $results
+	 */
+	public static function getRow( $sql, $values=array() ) {
+		return self::secureExec(function($sql, $values) {
+			return R::$adapter->getRow( $sql, $values );
+		}, array(),$sql, $values);
+	}
 
-        /**
-         * Executes SQL.
-         * @param string $sql
-         * @param array $values
-         * @return array $results
-         */
-        public static function getCol( $sql, $values=array() ) {
-            return self::secureExec(function($sql, $values){return R::$adapter->getCol( $sql, $values );}, array(),$sql, $values);
-        }
+	/**
+	 * Executes SQL.
+	 * @param string $sql
+	 * @param array $values
+	 * @return array $results
+	 */
+	public static function getCol( $sql, $values=array() ) {
+		return self::secureExec(function($sql, $values) {
+			return R::$adapter->getCol( $sql, $values );
+		}, array(),$sql, $values);
+	}
 
-        /**
-         * Executes SQL function but corrects for SQL states.
-         * @param closure $func
-         * @param mixed $default
-         * @param string $sql
-         * @param array $values
-         * @return mixed $results
-         */
-        private static function secureExec( $func, $default=NULL, $sql, $values ) {
-            if (!self::$redbean->isFrozen()) { 
-                try{ $rs = $func($sql,$values);  }catch(RedBean_Exception_SQL $e) { //die($e);
-                    if(self::$writer->sqlStateIn($e->getSQLState(),
-                    array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-                    )){
-                       return $default;
-                    }
-                    else {
-                        throw $e;
-                    }
-                    
-                }
-                return $rs;
-            }
-        }
-        
-              
-        public static function copy($bean, $associatedBeanTypesStr) {
-        	$type = $bean->getMeta("type");
-        	$copy = R::dispense($type);
-			$copy->import( $bean->export() );
-			$copy->copyMetaFrom( $bean );
-			$copy->id = 0;
-			R::store($copy);
-			$associatedBeanTypes = explode(",",$associatedBeanTypesStr);
-			foreach($associatedBeanTypes as $associatedBeanType) {
-				$assocBeans = R::related($bean, $associatedBeanType);
-				foreach($assocBeans as $assocBean) {
-					R::associate($copy,$assocBean);
+	/**
+	 * Executes SQL function but corrects for SQL states.
+	 * @param closure $func
+	 * @param mixed $default
+	 * @param string $sql
+	 * @param array $values
+	 * @return mixed $results
+	 */
+	private static function secureExec( $func, $default=NULL, $sql, $values ) {
+		if (!self::$redbean->isFrozen()) {
+			try {
+				$rs = $func($sql,$values);
+			}catch(RedBean_Exception_SQL $e) { //die($e);
+				if(self::$writer->sqlStateIn($e->getSQLState(),
+				array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+				)) {
+					return $default;
 				}
+				else {
+					throw $e;
+				}
+
 			}
-			
-			$copy->setMeta("original",$bean);
-        	return $copy;
-        }
-        
-        public static function swap( $beans, $property ) {
-        	$bean1 = array_shift($beans);
-        	$bean2 = array_shift($beans);
-        	$tmp = $bean1->$property;
-        	$bean1->$property = $bean2->$property;
-        	$bean2->$property = $tmp;
-        	R::store($bean1);
-        	R::store($bean2);
-        }
-        
+			return $rs;
+		}
+	}
+
+
+	public static function copy($bean, $associatedBeanTypesStr) {
+		$type = $bean->getMeta("type");
+		$copy = R::dispense($type);
+		$copy->import( $bean->export() );
+		$copy->copyMetaFrom( $bean );
+		$copy->id = 0;
+		R::store($copy);
+		$associatedBeanTypes = explode(",",$associatedBeanTypesStr);
+		foreach($associatedBeanTypes as $associatedBeanType) {
+			$assocBeans = R::related($bean, $associatedBeanType);
+			foreach($assocBeans as $assocBean) {
+				R::associate($copy,$assocBean);
+			}
+		}
+
+		$copy->setMeta("original",$bean);
+		return $copy;
+	}
+
+	public static function swap( $beans, $property ) {
+		$bean1 = array_shift($beans);
+		$bean2 = array_shift($beans);
+		$tmp = $bean1->$property;
+		$bean1->$property = $bean2->$property;
+		$bean2->$property = $tmp;
+		R::store($bean1);
+		R::store($bean2);
+	}
+
 }
 

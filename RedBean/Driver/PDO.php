@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * PDO Driver
  * @file			RedBean/PDO.php
@@ -19,131 +19,126 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	private $dsn;
 
 	/**
-	 * 
+	 *
 	 * @var unknown_type
 	 */
 	private static $instance;
-    
+
 	/**
-	 * 
+	 *
 	 * @var boolean
 	 */
-    private $debug = false;
-    
-    /**
-     * 
-     * @var unknown_type
-     */
-    private $pdo;
-    
-    /**
-     * 
-     * @var unknown_type
-     */
-    private $affected_rows;
-    
-    /**
-     * 
-     * @var unknown_type
-     */
-    private $rs;
-    
-    /**
-     * 
-     * @var unknown_type
-     */
-    private $exc =0;
+	private $debug = false;
 
-    /**
-     * @var array
-     *
-     */
-    private $connectInfo = array();
+	/**
+	 *
+	 * @var unknown_type
+	 */
+	private $pdo;
 
-    private $isConnected = false;
+	/**
+	 *
+	 * @var unknown_type
+	 */
+	private $affected_rows;
+
+	/**
+	 *
+	 * @var unknown_type
+	 */
+	private $rs;
+
+	/**
+	 *
+	 * @var unknown_type
+	 */
+	private $exc =0;
+
+	/**
+	 * @var array
+	 *
+	 */
+	private $connectInfo = array();
+
+	private $isConnected = false;
 
 
-    /**
-     * Returns an instance of the PDO Driver.
-     * @param $dsn
-     * @param $user
-     * @param $pass
-     * @param $dbname
-     * @return unknown_type
-     */
-    public static function getInstance($dsn, $user, $pass, $dbname)
-    {
-        if(is_null(self::$instance))
-        {
-            self::$instance = new RedBean_Driver_PDO($dsn, $user, $pass);
-            
-        }
-        return self::$instance;
-    }
-    
-    /**
-     * Constructor.
-     * @param $dsn
-     * @param $user
-     * @param $pass
-     * @return unknown_type
-     */
-    public function __construct($dsn, $user, $pass)
-    {
-	$this->dsn = $dsn;
-        $this->connectInfo = array( "pass"=>$pass, "user"=>$user );
-    	
+	/**
+	 * Returns an instance of the PDO Driver.
+	 * @param $dsn
+	 * @param $user
+	 * @param $pass
+	 * @param $dbname
+	 * @return unknown_type
+	 */
+	public static function getInstance($dsn, $user, $pass, $dbname) {
+		if(is_null(self::$instance)) {
+			self::$instance = new RedBean_Driver_PDO($dsn, $user, $pass);
+
+		}
+		return self::$instance;
+	}
+
+	/**
+	 * Constructor.
+	 * @param $dsn
+	 * @param $user
+	 * @param $pass
+	 * @return unknown_type
+	 */
+	public function __construct($dsn, $user, $pass) {
+		$this->dsn = $dsn;
+		$this->connectInfo = array( "pass"=>$pass, "user"=>$user );
 
 
 
-    }
 
-    public function connect() {
+	}
 
-        if ($this->isConnected) return;
+	public function connect() {
 
-
-        $user = $this->connectInfo["user"];
-        $pass = $this->connectInfo["pass"];
-
-        //PDO::MYSQL_ATTR_INIT_COMMAND
-        $this->pdo = new PDO(
-                $this->dsn,
-                $user,
-                $pass,
-
-                array(1002 => 'SET NAMES utf8',
-                      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-
-					  )
-            );
-
-        $this->isConnected = true;
-    }
+		if ($this->isConnected) return;
 
 
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#GetAll()
-     */
-    public function GetAll( $sql, $aValues=array() )
-    {
-        $this->connect();
-		
-	    	$this->exc = 0;
-    	    if ($this->debug)
-	        {
-	            echo "<HR>" . $sql.print_r($aValues,1);
-	        }
+		$user = $this->connectInfo["user"];
+		$pass = $this->connectInfo["pass"];
+
+		//PDO::MYSQL_ATTR_INIT_COMMAND
+		$this->pdo = new PDO(
+				  $this->dsn,
+				  $user,
+				  $pass,
+
+				  array(1002 => 'SET NAMES utf8',
+							 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+							 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+
+				  )
+		);
+
+		$this->isConnected = true;
+	}
 
 
-		
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#GetAll()
+	 */
+	public function GetAll( $sql, $aValues=array() ) {
+		$this->connect();
+
+		$this->exc = 0;
+		if ($this->debug) {
+			echo "<HR>" . $sql.print_r($aValues,1);
+		}
+
+
+
 
 		try {
 
 
-			if (strpos("pgsql",$this->dsn)===0){
+			if (strpos("pgsql",$this->dsn)===0) {
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			}
 			else {
@@ -177,90 +172,88 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				echo "<br><b style='color:green'>resultset: " . count($rows) . " rows</b>";
 			}
 		}
-        return $rows;
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#GetCol()
-     */
-    public function GetCol($sql, $aValues=array())
-    {$this->connect();
-    	$this->exc = 0;
+		return $rows;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#GetCol()
+	 */
+	public function GetCol($sql, $aValues=array()) {
+		$this->connect();
+		$this->exc = 0;
 		$rows = $this->GetAll($sql,$aValues);
 		$cols = array();
 
-		if ($rows && is_array($rows) && count($rows)>0){
-			foreach ($rows as $row)
-			{
+		if ($rows && is_array($rows) && count($rows)>0) {
+			foreach ($rows as $row) {
 				$cols[] = array_shift($row);
 			}
 		}
 
-        return $cols;
-    }
- 
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#GetCell()
-     */
-    public function GetCell($sql, $aValues=array())
-    {$this->connect();
-    	$this->exc = 0;
-        $arr = $this->GetAll($sql,$aValues);
-	    $row1 = array_shift($arr);
-	    $col1 = array_shift($row1);
-        return $col1;
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#GetRow()
-     */
-    public function GetRow($sql, $aValues=array())
-    {$this->connect();
-    	$this->exc = 0;
-       	$arr = $this->GetAll($sql, $aValues);
-        return array_shift($arr);
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#ErrorNo()
-     */
-    public function ErrorNo()
-    {$this->connect();
-    	if (!$this->exc) return 0;
-    	$infos = $this->pdo->errorInfo();
-        return $infos[1];
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#Errormsg()
-     */
-    public function Errormsg()
-    {$this->connect();
-    	if (!$this->exc) return "";
-        $infos = $this->pdo->errorInfo();
-        return $infos[2];
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#Execute()
-     */
-    public function Execute( $sql, $aValues=array() )
-    {$this->connect();
-    	$this->exc = 0;
-    	    if ($this->debug)
-	        {
-	            echo "<HR>" . $sql.print_r($aValues,1);
-	        }
-			try {
+		return $cols;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#GetCell()
+	 */
+	public function GetCell($sql, $aValues=array()) {
+		$this->connect();
+		$this->exc = 0;
+		$arr = $this->GetAll($sql,$aValues);
+		$row1 = array_shift($arr);
+		$col1 = array_shift($row1);
+		return $col1;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#GetRow()
+	 */
+	public function GetRow($sql, $aValues=array()) {
+		$this->connect();
+		$this->exc = 0;
+		$arr = $this->GetAll($sql, $aValues);
+		return array_shift($arr);
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#ErrorNo()
+	 */
+	public function ErrorNo() {
+		$this->connect();
+		if (!$this->exc) return 0;
+		$infos = $this->pdo->errorInfo();
+		return $infos[1];
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#Errormsg()
+	 */
+	public function Errormsg() {
+		$this->connect();
+		if (!$this->exc) return "";
+		$infos = $this->pdo->errorInfo();
+		return $infos[2];
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#Execute()
+	 */
+	public function Execute( $sql, $aValues=array() ) {
+		$this->connect();
+		$this->exc = 0;
+		if ($this->debug) {
+			echo "<HR>" . $sql.print_r($aValues,1);
+		}
+		try {
 
 
-			if (strpos("pgsql",$this->dsn)===0){
+			if (strpos("pgsql",$this->dsn)===0) {
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			}
 			else {
@@ -269,69 +262,68 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$s->execute($aValues);
 			$this->affected_rows=$s->rowCount();
 			return $this->affected_rows;
+		}
+		catch(PDOException $e) {
+			//Unfortunately the code field is supposed to be int by default (php)
+			//So we need a property to convey the SQL State code.
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+				$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
 			}
-			catch(PDOException $e) {
-				//Unfortunately the code field is supposed to be int by default (php)
-				//So we need a property to convey the SQL State code.
-				if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-					$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
-				}
-				else {
-					$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
-				}
-				
-				$x->setSQLState( $e->getCode() );
-				throw $x;
-				
+			else {
+				$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
 			}
-		//	
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#Escape()
-     */
-    public function Escape( $str )
-    {$this->connect();
-        return substr(substr($this->pdo->quote($str), 1), 0, -1);
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#GetInsertID()
-     */
-    public function GetInsertID()
-    {$this->connect();
-        return (int) $this->pdo->lastInsertId();
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#Affected_Rows()
-     */
-    public function Affected_Rows()
-    {$this->connect();
-        return (int) $this->affected_rows;
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#setDebugMode()
-     */
-    public function setDebugMode( $tf )
-    {
-    	$this->connect();
-        $this->debug = (bool)$tf;
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see RedBean/RedBean_Driver#GetRaw()
-     */
-    public function GetRaw()
-    {$this->connect();
-        return $this->rs;
-    }
+
+			$x->setSQLState( $e->getCode() );
+			throw $x;
+
+		}
+		//
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#Escape()
+	 */
+	public function Escape( $str ) {
+		$this->connect();
+		return substr(substr($this->pdo->quote($str), 1), 0, -1);
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#GetInsertID()
+	 */
+	public function GetInsertID() {
+		$this->connect();
+		return (int) $this->pdo->lastInsertId();
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#Affected_Rows()
+	 */
+	public function Affected_Rows() {
+		$this->connect();
+		return (int) $this->affected_rows;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#setDebugMode()
+	 */
+	public function setDebugMode( $tf ) {
+		$this->connect();
+		$this->debug = (bool)$tf;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see RedBean/RedBean_Driver#GetRaw()
+	 */
+	public function GetRaw() {
+		$this->connect();
+		return $this->rs;
+	}
 
 
 	/**
@@ -339,7 +331,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function StartTrans() {
 		$this->connect();
-		
+
 		$this->pdo->beginTransaction();
 	}
 
@@ -371,22 +363,21 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 	/**
 	 * Returns the version number of the database.
-	 * @return mixed $version 
+	 * @return mixed $version
 	 */
 	public function getDatabaseVersion() {
 		$this->connect();
 		return $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
 	
-	
-    /**
-     * @return PDO
-     */
-    public function getPDO()
-    {
-        $this->connect();
-        return $this->pdo;
-    }
+
+	/**
+	 * @return PDO
+	 */
+	public function getPDO() {
+		$this->connect();
+		return $this->pdo;
+	}
 
 
 }

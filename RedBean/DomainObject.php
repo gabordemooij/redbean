@@ -16,9 +16,9 @@
  */
 abstract class RedBean_DomainObject {
 	/**
-	*
-	* @var RedBean_ToolBox
-	*/
+	 *
+	 * @var RedBean_ToolBox
+	 */
 	protected $tools;
 	/**
 	 *
@@ -47,18 +47,18 @@ abstract class RedBean_DomainObject {
 	 */
 	public function __construct( $typeName = false ) {
 
-	/**
-	 * If no typeName has been specified,
-	 * figure out the type of this model yourself.
-	 * In this case the following rule applies:
-	 * - the name of the model is the LAST part of the
-	 * namespace.
-	 * - Within that string, the name of the model is the LAST
-	 * part of the poorman's name space.
-	 *
-	 * So the model name for class: /me/him/her is: her
-	 * So the model name for class: /me/him/her_lover is: lover
-	 */
+		/**
+		 * If no typeName has been specified,
+		 * figure out the type of this model yourself.
+		 * In this case the following rule applies:
+		 * - the name of the model is the LAST part of the
+		 * namespace.
+		 * - Within that string, the name of the model is the LAST
+		 * part of the poorman's name space.
+		 *
+		 * So the model name for class: /me/him/her is: her
+		 * So the model name for class: /me/him/her_lover is: lover
+		 */
 		if (!$typeName) {
 			//Fetch the bean type using the class
 			$beanTypeName = get_class( $this );
@@ -79,7 +79,7 @@ abstract class RedBean_DomainObject {
 		/*
 		 * Now do a little check to see whether this name
 		 * can be used. - Just a quick check, we will re-check later on
-		 */
+		*/
 		if ($beanTypeName && strlen($beanTypeName)>0) {
 
 			//Fetch us a toolbox.
@@ -157,7 +157,7 @@ abstract class RedBean_DomainObject {
 	public function find( $id ) {
 		$this->bean = $this->redbean->load( $this->bean->getMeta("type"), (int) $id );
 	}
-	
+
 	/**
 	 * Saves the current domain object.
 	 * The function saves the inner bean to the database.

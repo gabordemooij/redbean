@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * @name RedBean OODB
  * @file RedBean
@@ -85,11 +85,11 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 
 		$bean = new RedBean_OODBBean();
 		$bean->setMeta("type", $type );
-                $bean->setMeta("sys.oodb", $this);
-                
-                $idfield = $this->writer->getIDField($bean->getMeta("type"));
-                $bean->setMeta("sys.idfield",$idfield);
-		$bean->$idfield = 0; 
+		$bean->setMeta("sys.oodb", $this);
+
+		$idfield = $this->writer->getIDField($bean->getMeta("type"));
+		$bean->setMeta("sys.idfield",$idfield);
+		$bean->$idfield = 0;
 		$this->signal( "dispense", $bean );
 		$this->check( $bean );
 		$bean->setMeta("tainted",false);
@@ -106,8 +106,8 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 */
 	public function check( RedBean_OODBBean $bean ) {
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
-		//Is all meta information present? 
-		
+		//Is all meta information present?
+
 		if (!isset($bean->$idfield) ) {
 			throw new RedBean_Exception_Security("Bean has incomplete Meta Information $idfield ");
 		}
@@ -121,12 +121,12 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			throw new RedBean_Exception_Security("Bean Type is invalid");
 		}
 		//Are the properties and values valid?
-		foreach($bean as $prop=>$value) { 
+		foreach($bean as $prop=>$value) {
 			if (
-				is_array($value) ||
-				is_object($value) ||
-				strlen($prop)<1 ||
-				preg_match($pattern,$prop)
+			is_array($value) ||
+					  is_object($value) ||
+					  strlen($prop)<1 ||
+					  preg_match($pattern,$prop)
 			) {
 				throw new RedBean_Exception_Security("Invalid Bean: property $prop  ");
 			}
@@ -141,7 +141,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * @return boolean $exists
 	 */
 	public function tableExists($table) {
-	//does this table exist?
+		//does this table exist?
 		$tables = $this->writer->getTables();
 		return in_array($table, $tables);
 	}
@@ -170,9 +170,9 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		if (!$this->isFrozen && !$this->tableExists($table)) {
 			$this->writer->createTable( $table );
 		}
-                if (!$this->isFrozen) {
-                    $columns = $this->writer->getColumns($table) ;
-                }
+		if (!$this->isFrozen) {
+			$columns = $this->writer->getColumns($table) ;
+		}
 		//does the table fit?
 		$insertvalues = array();
 		$insertcolumns = array();
@@ -180,19 +180,19 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		foreach( $bean as $p=>$v) {
 			if ($p!=$idfield) {
 				if (!$this->isFrozen) {
-				//What kind of property are we dealing with?
+					//What kind of property are we dealing with?
 					$typeno = $this->writer->scanType($v);
-                                        //Is this property represented in the table?
+					//Is this property represented in the table?
 					if (isset($columns[$p])) {
-					//yes it is, does it still fit?
+						//yes it is, does it still fit?
 						$sqlt = $this->writer->code($columns[$p]);
-                                        	if ($typeno > $sqlt) {
-						//no, we have to widen the database column type
+						if ($typeno > $sqlt) {
+							//no, we have to widen the database column type
 							$this->writer->widenColumn( $table, $p, $typeno );
 						}
 					}
 					else {
-					//no it is not
+						//no it is not
 						$this->writer->addColumn($table, $p, $typeno);
 					}
 				}
@@ -243,7 +243,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * @return RedBean_OODBBean $bean
 	 */
 	public function load($type, $id) {
-        $this->signal( "before_open", array($type,$id) );        
+		$this->signal( "before_open", array($type,$id) );
 		$id = intval( $id );
 		if ($id < 0) throw new RedBean_Exception_Security("Id less than zero not allowed");
 		$bean = $this->dispense( $type );
@@ -251,15 +251,17 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			$row = $this->stash[$id];
 		}
 		else {
-			try { $rows = $this->writer->selectRecord($type,array($id));	}catch(RedBean_Exception_SQL $e ){
+			try {
+				$rows = $this->writer->selectRecord($type,array($id));
+			}catch(RedBean_Exception_SQL $e ) {
 				if (
-					$this->writer->sqlStateIn($e->getSQLState(),
-					array(
-						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-					)	
-				
-				)  {
+				$this->writer->sqlStateIn($e->getSQLState(),
+				array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+				)
+
+				) {
 					$rows = 0;
 					if ($this->isFrozen) throw $e; //only throw if frozen;
 				}
@@ -287,14 +289,14 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	public function trash( RedBean_OODBBean $bean ) {
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		$this->signal( "delete", $bean );
-        $this->check( $bean );
-		try{
-        $this->writer->deleteRecord( $bean->getMeta("type"), $bean->$idfield );
-		}catch(RedBean_Exception_SQL $e){
+		$this->check( $bean );
+		try {
+			$this->writer->deleteRecord( $bean->getMeta("type"), $bean->$idfield );
+		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
-				array(
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
 		}
 	}
@@ -312,13 +314,13 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	public function batch( $type, $ids ) {
 		if (!$ids) return array();
 		$collection = array();
-		try{
-		$rows = $this->writer->selectRecord($type,$ids);
-		}catch(RedBean_Exception_SQL $e){
+		try {
+			$rows = $this->writer->selectRecord($type,$ids);
+		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
-				array(
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
 
 			$rows = false;

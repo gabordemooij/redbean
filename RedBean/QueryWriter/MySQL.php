@@ -92,13 +92,13 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * Supported Column Types
 	 */
 	public $typeno_sqltype = array(
-	RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>" SET('1') ",
-	RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>" TINYINT(3) UNSIGNED ",
-	RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>" INT(11) UNSIGNED ",
-	RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>" DOUBLE ",
-	RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>" VARCHAR(255) ",
-	RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>" TEXT ",
-	RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>" LONGTEXT "
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>" SET('1') ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>" TINYINT(3) UNSIGNED ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>" INT(11) UNSIGNED ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>" DOUBLE ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>" VARCHAR(255) ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>" TEXT ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>" LONGTEXT "
 	);
 
 	/**
@@ -108,13 +108,13 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * constants (magic numbers)
 	 */
 	public $sqltype_typeno = array(
-	"set('1')"=>RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL,
-	"tinyint(3) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8,
-	"int(11) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32,
-	"double" => RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE,
-	"varchar(255)"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8,
-	"text"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16,
-	"longtext"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32
+			  "set('1')"=>RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL,
+			  "tinyint(3) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8,
+			  "int(11) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32,
+			  "double" => RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE,
+			  "varchar(255)"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8,
+			  "text"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16,
+			  "longtext"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32
 	);
 
 	/**
@@ -123,7 +123,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * these are used for the column names
 	 */
 	public $dtypes = array(
-	"booleanset","tinyintus","intus","doubles","varchar255","text","ltext"
+			  "booleanset","tinyintus","intus","doubles","varchar255","text","ltext"
 	);
 
 	/**
@@ -191,7 +191,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
                     `$idfield` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
                      PRIMARY KEY ( `$idfield` )
                      ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-			";
+				  ";
 		$this->adapter->exec( $sql );
 	}
 
@@ -304,7 +304,7 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 	 * @return integer $insertid
 	 */
 	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
-	//if ($table == "__log") $idfield="id"; else
+		//if ($table == "__log") $idfield="id"; else
 		$idfield = $this->getIDField($table);
 		$table = $this->check($table);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
@@ -453,5 +453,5 @@ class RedBean_QueryWriter_MySQL implements RedBean_QueryWriter {
 		if ($state == "23000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
 		return in_array($sqlState, $list);
 	}
-	
+
 }

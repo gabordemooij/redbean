@@ -11,7 +11,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
  Written by Gabor de Mooij Copyright (c) 2009
 
- */
+*/
 
 /**
  * RedBean Loader

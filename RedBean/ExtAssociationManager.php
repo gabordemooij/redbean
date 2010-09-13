@@ -3,7 +3,7 @@
  * RedBean Extended Association
  * @file			RedBean/ExtAssociationManager.php
  * @description		Manages complex bean associations.
- *					
+ *
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -23,6 +23,6 @@ class RedBean_ExtAssociationManager extends RedBean_AssociationManager {
 		$baseBean->setMeta("type", $table );
 		return $this->associateBeans( $bean1, $bean2, $baseBean );
 	}
-	
-	
+
+
 }

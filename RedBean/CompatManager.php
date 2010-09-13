@@ -71,7 +71,7 @@ To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
 
 		//obtain the database system
 		$brand = strtolower(trim($toolbox->getDatabaseAdapter()->getDatabase()->getDatabaseType()));
-		
+
 		//obtain version number
 		$version = $toolbox->getDatabaseAdapter()->getDatabase()->getDatabaseVersion();
 
@@ -81,7 +81,7 @@ To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
 
 		//compare database
 		if (isset($this->supportedSystems[$brand])
-			&& ((float)$this->supportedSystems[$brand] <= (float) $version)
+				  && ((float)$this->supportedSystems[$brand] <= (float) $version)
 		) {
 			return true;
 		}

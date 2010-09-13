@@ -4,7 +4,7 @@
  * @file 		RedBean/Plugin/Cache.php
  * @description		Decorator for RedBean core class RedBean_OODB
  *					Adds primitive caching to RedBean.
- *					
+ *
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -169,7 +169,7 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 
 	}
 
-	
+
 	/**
 	 * Stores a bean and updates cache.
 	 * @param RedBean_OODBBean $bean
@@ -197,16 +197,16 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 					$dirty=true;
 				}
 			}
-			
+
 			//are there any new props?
-			foreach($bean as $p=>$v){
+			foreach($bean as $p=>$v) {
 				if (!isset($oldBean->$p)) {
 					$dirty=true;
 					$newbean->$p = $bean->$p;
-					$this->columnCounter++; 
+					$this->columnCounter++;
 				}
 			}
-			
+
 			//If the bean is dirty; send only differences for update.
 			if ($dirty) {
 				$newbean->copyMetaFrom($bean);
@@ -240,10 +240,10 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 	 * This function first inspects the cache; if every element in the batch
 	 * is available in the cache, the function will return the collected beans
 	 * from the cache. If one or more beans cannot be found, the function will
-	 * ask oodb for the beans and update the cache.	
+	 * ask oodb for the beans and update the cache.
 	 * @param string $type
 	 * @param integer $ids
-	 * @return array $beans 
+	 * @return array $beans
 	 */
 	public function batch( $type, $ids ) {
 		$idfield = $this->writer->getIDField($type);
@@ -252,7 +252,7 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 			$bean = $this->fetchFromCacheByTypeID($type, $id);
 			if ($bean) $collect[$id] = $bean;
 		}
-		if (count($collect) == count($ids)) { 
+		if (count($collect) == count($ids)) {
 			return $collect;
 		}
 		else {
@@ -269,7 +269,7 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 	 * @param string $type
 	 * @return RedBean_OODBBean $bean
 	 */
-	public function dispense( $type ){
+	public function dispense( $type ) {
 		return $this->oodb->dispense($type);
 	}
 

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * QueryWriter
  * Interface for QueryWriters
@@ -27,7 +27,7 @@ interface RedBean_QueryWriter {
 	 * been found in the database.
 	 */
 	const C_SQLSTATE_NO_SUCH_COLUMN = 2;
-	
+
 	/**
 	 * QueryWriter Constant Identifier.
 	 * Identifies a situation in which a perticular column has not
@@ -46,13 +46,13 @@ interface RedBean_QueryWriter {
 	 * Creates the table with the specified name.
 	 * @param string $table
 	 */
-    public function createTable( $table );
+	public function createTable( $table );
 
 	/**
 	 * Returns an array containing all the columns of the specified table.
 	 * @param string $table
 	 */
-    public function getColumns( $table );
+	public function getColumns( $table );
 
 	/**
 	 * Returns the type of a certain value.
@@ -69,14 +69,14 @@ interface RedBean_QueryWriter {
 	 * @param integer $type
 	 *
 	 */
-    public function addColumn( $table, $column, $type );
+	public function addColumn( $table, $column, $type );
 
 	/**
 	 * Codes an SQL Column Type Description to a RedBean QueryWriter type.
 	 * @param integer $typedescription
 	 * @return integer $type
 	 */
-    public function code( $typedescription );
+	public function code( $typedescription );
 
 	/**
 	 * Widens the column to support type $type.
@@ -84,7 +84,7 @@ interface RedBean_QueryWriter {
 	 * @param string $column
 	 * @param integer $type
 	 */
-    public function widenColumn( $table, $column, $type );
+	public function widenColumn( $table, $column, $type );
 
 	/**
 	 * Updates a record
@@ -92,7 +92,7 @@ interface RedBean_QueryWriter {
 	 * @param array $updatevalues
 	 * @param integer $id
 	 */
-    public function updateRecord( $table, $updatevalues, $id);
+	public function updateRecord( $table, $updatevalues, $id);
 
 	/**
 	 * Inserts a record
@@ -100,28 +100,28 @@ interface RedBean_QueryWriter {
 	 * @param array $insertcolumns
 	 * @param array $insertvalues
 	 */
-    public function insertRecord( $table, $insertcolumns, $insertvalues );
+	public function insertRecord( $table, $insertcolumns, $insertvalues );
 
 	/**
 	 * Selects a record
 	 * @param string $type
 	 * @param integer $ids
 	 */
-    public function selectRecord($type, $ids);
+	public function selectRecord($type, $ids);
 
 	/**
 	 * Removes a record from a table
 	 * @param string $table
 	 * @param integer $id
 	 */
-    public function deleteRecord( $table, $id );
+	public function deleteRecord( $table, $id );
 
 	/**
 	 * Adds a UNIQUE constraint index to a table on columns $columns.
 	 * @param string $table
 	 * @param array $columnsPartOfIndex
 	 */
-    public function addUniqueIndex( $table,$columns );
+	public function addUniqueIndex( $table,$columns );
 
 	/**
 	 * Returns the property that contains the Primary Key ID in an
