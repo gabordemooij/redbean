@@ -8,7 +8,7 @@
 // |__|    \___  >____ ||______/\____|__  /___| |____|
 //            \/     \/                \/
 
- // Written by Gabor de Mooij Copyright (c) 2009
+// Written by Gabor de Mooij Copyright (c) 2009
 /**
  * RedUNIT (Test Suite)
  * @file 		test.php
@@ -57,7 +57,7 @@ function pass() {
 
 function fail() {
 	printtext("FAILED TEST");
-        debug_print_backtrace();
+	debug_print_backtrace();
 	exit;
 }
 
@@ -76,7 +76,12 @@ require("rb.php");
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
 //Test whether a non mysql DSN throws an exception
-try{RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root",""); fail();}catch(RedBean_Exception_NotImplemented $e){ pass(); }
+try {
+	RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root","");
+	fail();
+}catch(RedBean_Exception_NotImplemented $e) {
+	pass();
+}
 
 //Test whether we can setup a connection
 //$toolbox = RedBean_Setup::kickstartDevL( "sqlite:/Applications/XAMPP/xamppfiles/temp/base.txt" );
@@ -94,21 +99,21 @@ asrt(count($toolbox->getWriter()->getTables()),0);
  * This is just for testing
  */
 class ObservableMock extends RedBean_Observable {
-    public function test( $eventname, $info ) {
-        $this->signal($eventname, $info);
-    }
+	public function test( $eventname, $info ) {
+		$this->signal($eventname, $info);
+	}
 }
 /**
  * Observer Mock
  * This is just for testing
  */
 class ObserverMock implements RedBean_Observer {
-    public $event = false;
-    public $info = false;
+	public $event = false;
+	public $info = false;
 	public function onEvent($event, $info) {
-        $this->event = $event;
-        $this->info = $info;
-    }
+		$this->event = $event;
+		$this->info = $info;
+	}
 }
 
 
@@ -135,9 +140,24 @@ asrt(($page->getMeta("type")),"page");
 //ID should be 0 because bean does not exist in database yet.
 asrt(($page->id),0);
 //Try some faulty dispense actions.
-try{ $redbean->dispense(""); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->dispense("."); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->dispense("-"); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try {
+	$redbean->dispense("");
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
+try {
+	$redbean->dispense(".");
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
+try {
+	$redbean->dispense("-");
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
 
 //Test the Check() function (also indirectly using store())
 testpack("UNIT TEST RedBean OODB: Check");
@@ -146,22 +166,62 @@ $bean = $redbean->dispense("page");
 //Arrays are not allowed.
 $bean->name = array("1");
 //print_r( $bean );
-try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try {
+	$redbean->store($bean);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
+try {
+	$redbean->check($bean);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
 //Objects should not be allowed.
 $bean->name = new RedBean_OODBBean;
-try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try {
+	$redbean->store($bean);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
+try {
+	$redbean->check($bean);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
 //Property names should be alphanumeric
 $prop = ".";
 $bean->$prop = 1;
-try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try {
+	$redbean->store($bean);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
+try {
+	$redbean->check($bean);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
 //Really...
 $prop = "-";
 $bean->$prop = 1;
-try{ $redbean->store($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try{ $redbean->check($bean); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try {
+	$redbean->store($bean);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
+try {
+	$redbean->check($bean);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
 
 
 testpack("UNIT TEST RedBean OODB: Load");
@@ -175,12 +235,42 @@ $bean = $redbean->load("typetest",3);
 asrt($nullWriter->selectRecordArguments[0],"typetest");
 asrt($nullWriter->selectRecordArguments[1],array(3));
 asrt($bean->id,3);
-try { $bean = $redbean->load("typetest",-2); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try { $bean = $redbean->load("typetest",0); pass(); }catch(RedBean_Exception_Security $e){ fail(); }
-try { $bean = $redbean->load("typetest",2.1); pass(); }catch(RedBean_Exception_Security $e){ fail(); }
-try { $bean = $redbean->load(" ",3); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try { $bean = $redbean->load(".",3); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
-try { $bean = $redbean->load("type.test",3); fail(); }catch(RedBean_Exception_Security $e){ pass(); }
+try {
+	$bean = $redbean->load("typetest",-2);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
+try {
+	$bean = $redbean->load("typetest",0);
+	pass();
+}catch(RedBean_Exception_Security $e) {
+	fail();
+}
+try {
+	$bean = $redbean->load("typetest",2.1);
+	pass();
+}catch(RedBean_Exception_Security $e) {
+	fail();
+}
+try {
+	$bean = $redbean->load(" ",3);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
+try {
+	$bean = $redbean->load(".",3);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
+try {
+	$bean = $redbean->load("type.test",3);
+	fail();
+}catch(RedBean_Exception_Security $e) {
+	pass();
+}
 
 
 
@@ -365,27 +455,52 @@ asrt(count(Finder::where("wine"," @id > 100 ")),0);
 asrt(count(Finder::where("wine"," @id < 100 OR 1 ")),1);
 asrt(count(Finder::where("wine"," @id > 100 OR 1 ")),1);
 asrt(count(Finder::where("wine",
-		" 1 OR @grape = 'merlot' ")),1); //non-existant column
+		  " 1 OR @grape = 'merlot' ")),1); //non-existant column
 asrt(count(Finder::where("wine",
-		" 1 OR @wine.grape = 'merlot' ")),1); //non-existant column
+		  " 1 OR @wine.grape = 'merlot' ")),1); //non-existant column
 asrt(count(Finder::where("wine",
-		" 1 OR @cork=1 OR @grape = 'merlot' ")),1); //2 non-existant column
+		  " 1 OR @cork=1 OR @grape = 'merlot' ")),1); //2 non-existant column
 asrt(count(Finder::where("wine",
-		" 1 OR @cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
+		  " 1 OR @cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
 asrt(count(Finder::where("wine",
-		" 1 OR @bottle.cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
+		  " 1 OR @bottle.cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
 RedBean_Setup::getToolbox()->getRedBean()->freeze( TRUE );
 asrt(count(Finder::where("wine"," 1 OR 1 ")),1);
-try{Finder::where("wine"," 1 OR @grape = 'merlot' "); fail(); }
-catch(RedBean_Exception_SQL $e){ pass(); }
-try{Finder::where("wine"," 1 OR @wine.grape = 'merlot' "); fail(); }
-catch(RedBean_Exception_SQL $e){ pass(); }
-try{Finder::where("wine"," 1 OR @cork=1 OR @wine.grape = 'merlot'  "); fail(); }
-catch(RedBean_Exception_SQL $e){ pass(); }
-try{Finder::where("wine"," 1 OR @bottle.cork=1 OR @wine.grape = 'merlot'  "); fail(); }
-catch(RedBean_Exception_SQL $e){ pass(); }
-try{Finder::where("wine"," 1 OR @a=1",array(),false,true); pass(); }
-catch(RedBean_Exception_SQL $e){ fail(); }
+try {
+	Finder::where("wine"," 1 OR @grape = 'merlot' ");
+	fail();
+}
+catch(RedBean_Exception_SQL $e) {
+	pass();
+}
+try {
+	Finder::where("wine"," 1 OR @wine.grape = 'merlot' ");
+	fail();
+}
+catch(RedBean_Exception_SQL $e) {
+	pass();
+}
+try {
+	Finder::where("wine"," 1 OR @cork=1 OR @wine.grape = 'merlot'  ");
+	fail();
+}
+catch(RedBean_Exception_SQL $e) {
+	pass();
+}
+try {
+	Finder::where("wine"," 1 OR @bottle.cork=1 OR @wine.grape = 'merlot'  ");
+	fail();
+}
+catch(RedBean_Exception_SQL $e) {
+	pass();
+}
+try {
+	Finder::where("wine"," 1 OR @a=1",array(),false,true);
+	pass();
+}
+catch(RedBean_Exception_SQL $e) {
+	fail();
+}
 RedBean_Setup::getToolbox()->getRedBean()->freeze( FALSE );
 asrt(Finder::parseGoldSQL(" @name ","wine",RedBean_Setup::getToolbox())," name ");
 asrt(Finder::parseGoldSQL(" @name @id ","wine",RedBean_Setup::getToolbox())," name id ");
@@ -442,7 +557,7 @@ asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true);
 
 
 asrt(count($a->related($cask, "whisky")),1);
- 
+
 $redbean->trash($cask); 
 asrt(count($a->related($cask, "whisky")),0); //should be gone now!
 
@@ -496,12 +611,17 @@ $pdo->Execute("DROP TABLE IF EXISTS genre_movie");
 $page = $redbean->dispense("page");
 
 testpack("UNIT TEST Database");
-try{ $adapter->exec("an invalid query"); fail(); }catch(RedBean_Exception_SQL $e ){ pass(); }
+try {
+	$adapter->exec("an invalid query");
+	fail();
+}catch(RedBean_Exception_SQL $e ) {
+	pass();
+}
 asrt( (int) $adapter->getCell("SELECT 123") ,123);
 asrt( (int) $adapter->getCell("SELECT ?",array("987")) ,987);
 asrt( (int) $adapter->getCell("SELECT ?+?",array("987","2")) ,989);
 asrt( (int) $adapter->getCell("SELECT :numberOne+:numberTwo",array(
-			":numberOne"=>42,":numberTwo"=>50)) ,92);
+		  ":numberOne"=>42,":numberTwo"=>50)) ,92);
 
 
 //Section C: Integration Tests / Regression Tests
@@ -695,10 +815,12 @@ $rb = $redbean;
 $testA = $rb->dispense( 'testA' ); 
 $testB = $rb->dispense( 'testB' ); 
 $a = new RedBean_AssociationManager( $toolbox ); 
-try{
-$a->related( $testA, "testB" );
-pass();
-}catch(Exception $e){fail();}
+try {
+	$a->related( $testA, "testB" );
+	pass();
+}catch(Exception $e) {
+	fail();
+}
 
 $user = $redbean->dispense("user");
 $user->name = "John";
@@ -769,7 +891,12 @@ $a->clearRelations($page2, "page");
 asrt(count($a->related($page2, "page")),0);
 asrt(count($a->related($page3, "page")),0);
 asrt(count($a->related($page4, "page")),0);
-try{ $a->associate($page2,$page2); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
+try {
+	$a->associate($page2,$page2);
+	pass();
+}catch(RedBean_Exception_SQL $e) {
+	fail();
+}
 //try{ $a->associate($page2,$page2); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
 $pageOne = $redbean->dispense("page");
 $pageOne->name = "one";
@@ -811,15 +938,30 @@ $redbean->freeze( true );
 $page = $redbean->dispense("page");
 $page->sections = 10;
 $page->name = "half a page";
-try{$id = $redbean->store($page); fail();}catch(RedBean_Exception_SQL $e){ pass(); }
+try {
+	$id = $redbean->store($page);
+	fail();
+}catch(RedBean_Exception_SQL $e) {
+	pass();
+}
 $post = $redbean->dispense("post");
 $post->title = "existing table";
-try{$id = $redbean->store($post); pass();}catch(RedBean_Exception_SQL $e){ fail(); }
+try {
+	$id = $redbean->store($post);
+	pass();
+}catch(RedBean_Exception_SQL $e) {
+	fail();
+}
 asrt(in_array("name",array_keys($writer->getColumns("page"))),true);
 asrt(in_array("sections",array_keys($writer->getColumns("page"))),false);
 $newtype = $redbean->dispense("newtype");
 $newtype->property=1;
-try{$id = $redbean->store($newtype); fail();}catch(RedBean_Exception_SQL $e){ pass(); }
+try {
+	$id = $redbean->store($newtype);
+	fail();
+}catch(RedBean_Exception_SQL $e) {
+	pass();
+}
 $redbean->freeze( false );
 
 
@@ -836,17 +978,24 @@ $page = $redbean->dispense("page");
 $page->name = "test page";
 $id = $redbean->store($page);
 $user = $redbean->dispense("user");
-$a->unassociate($user,$page); pass(); //no error
-$a->unassociate($page,$user); pass(); //no error
-$a->clearRelations($page, "user"); pass(); //no error
-$a->clearRelations($user, "page"); pass(); //no error
-$a->associate($user,$page); pass();
+$a->unassociate($user,$page);
+pass(); //no error
+$a->unassociate($page,$user);
+pass(); //no error
+$a->clearRelations($page, "user");
+pass(); //no error
+$a->clearRelations($user, "page");
+pass(); //no error
+$a->associate($user,$page);
+pass();
 asrt(count($a->related( $user, "page")),1);
 asrt(count($a->related( $page, "user")),1);
-$a->clearRelations($user, "page"); pass(); //no error
+$a->clearRelations($user, "page");
+pass(); //no error
 asrt(count($a->related( $user, "page")),0);
 asrt(count($a->related( $page, "user")),0);
-$page = $redbean->load("page",$id); pass();
+$page = $redbean->load("page",$id);
+pass();
 asrt($page->name,"test page");
 
 testpack("Test: Trees ");
@@ -875,43 +1024,87 @@ testpack("Test RedBean Security - bean interface ");
 asrt(in_array("hack",$writer->getTables()),true);
 $bean = $redbean->load("page","13; drop table hack");
 asrt(in_array("hack",$writer->getTables()),true);
-try{ $bean = $redbean->load("page where 1; drop table hack",1); }catch(Exception $e){}
+try {
+	$bean = $redbean->load("page where 1; drop table hack",1);
+}catch(Exception $e) {
+
+}
 asrt(in_array("hack",$writer->getTables()),true);
 $bean = $redbean->dispense("page");
 $evil = "; drop table hack";
 $bean->id = $evil;
-try{$redbean->store($bean);}catch(Exception $e){}
+try {
+	$redbean->store($bean);
+}catch(Exception $e) {
+
+}
 asrt(in_array("hack",$writer->getTables()),true);
 unset($bean->id);
 $bean->name = "\"".$evil;
-try{$redbean->store($bean);}catch(Exception $e){}
+try {
+	$redbean->store($bean);
+}catch(Exception $e) {
+
+}
 asrt(in_array("hack",$writer->getTables()),true);
 $bean->name = "'".$evil;
-try{$redbean->store($bean);}catch(Exception $e){}
+try {
+	$redbean->store($bean);
+}catch(Exception $e) {
+
+}
 asrt(in_array("hack",$writer->getTables()),true);
 $bean->$evil = 1;
-try{$redbean->store($bean);}catch(Exception $e){}
+try {
+	$redbean->store($bean);
+}catch(Exception $e) {
+
+}
 asrt(in_array("hack",$writer->getTables()),true);
 unset($bean->$evil);
 $bean->id = 1;
 $bean->name = "\"".$evil;
-try{$redbean->store($bean);}catch(Exception $e){}
+try {
+	$redbean->store($bean);
+}catch(Exception $e) {
+
+}
 asrt(in_array("hack",$writer->getTables()),true);
 $bean->name = "'".$evil;
-try{$redbean->store($bean);}catch(Exception $e){}
+try {
+	$redbean->store($bean);
+}catch(Exception $e) {
+
+}
 asrt(in_array("hack",$writer->getTables()),true);
 $bean->$evil = 1;
-try{$redbean->store($bean);}catch(Exception $e){}
+try {
+	$redbean->store($bean);
+}catch(Exception $e) {
+
+}
 asrt(in_array("hack",$writer->getTables()),true);
-try{$redbean->trash($bean);}catch(Exception $e){}
+try {
+	$redbean->trash($bean);
+}catch(Exception $e) {
+
+}
 asrt(in_array("hack",$writer->getTables()),true);
-try{Finder::where("::");}catch(Exception $e){pass();}
+try {
+	Finder::where("::");
+}catch(Exception $e) {
+	pass();
+}
 
 
 
 $adapter->exec("drop table if exists sometable");
 testpack("Test RedBean Security - query writer");
-try{$writer->createTable("sometable` ( `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT , PRIMARY KEY ( `id` ) ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ; drop table hack; --");}catch(Exception $e){}
+try {
+	$writer->createTable("sometable` ( `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT , PRIMARY KEY ( `id` ) ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ; drop table hack; --");
+}catch(Exception $e) {
+
+}
 asrt(in_array("hack",$writer->getTables()),true);
 
 //print_r( $adapter->get("select id from page where id = 1; drop table hack") );
@@ -1031,9 +1224,20 @@ $pdo->Execute("DROP TABLE IF EXISTS `book_group`");
 $group = $redbean->dispense("group");
 $group->name ="mygroup";
 $redbean->store( $group );
-try{ $a->associate($group,$book); pass(); }catch(RedBean_Exception_SQL $e){ fail(); }
+try {
+	$a->associate($group,$book);
+	pass();
+}catch(RedBean_Exception_SQL $e) {
+	fail();
+}
 //test issue SQL error 23000
-try { $a->associate($group,$book); pass(); }catch(RedBean_Exception_SQL $e){ echo $e->getSQLState(); fail(); }
+try {
+	$a->associate($group,$book);
+	pass();
+}catch(RedBean_Exception_SQL $e) {
+	echo $e->getSQLState();
+	fail();
+}
 asrt((int)$adapter->getCell("select count(*) from book_group"),1); //just 1 rec!
 
 $pdo->Execute("DROP TABLE IF EXISTS book");

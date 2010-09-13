@@ -191,9 +191,8 @@ class RedBean_OODBBean implements IteratorAggregate {
 	 * @return mixed $array
 	 */
 	public function __sleep() {
-		$this->isConnected = false;
-		$this->pdo = null;
-		return array('dsn', 'connectInfo', 'isConnected', 'debug', 'affected_rows', 'rs', 'exc');
+		$this->setMeta("sys.oodb", null);
+		return array('properties','__info');
 	}
 
 
