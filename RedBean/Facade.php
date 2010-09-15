@@ -82,6 +82,7 @@ class R {
 		self::$redbean->addEventListener("update", $helper );
 		self::$redbean->addEventListener("open", $helper );
 		self::$redbean->addEventListener("delete", $helper );
+		
 	}
 
 

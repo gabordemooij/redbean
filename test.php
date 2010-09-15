@@ -1529,8 +1529,8 @@ foreach($writer->sqltype_typeno as $key=>$type) {
 	asrt($writer->code($key),$type);
 }
 asrt($writer->code("unknown"),99);
-asrt($writer->scanType(false),0);
-asrt($writer->scanType(NULL),0);
+asrt($writer->scanType(false),1);
+asrt($writer->scanType(NULL),1);
 asrt($writer->scanType(2),1);
 asrt($writer->scanType(255),1);
 asrt($writer->scanType(256),2);
@@ -1922,7 +1922,7 @@ $uow->doWork("all_save");
 asrt(count( Finder::where("book","title LIKE '%unit%'") ),1);
 
 testpack("Facade");
-R::setup(); //should work as well
+R::setup("sqlite:/tmp/teststore.txt"); //should work as well
 pass();
 R::exec("select 123");
 pass();
@@ -2056,12 +2056,13 @@ asrt($book2->rating,'2');
 
 testpack("Test Serializing Beans");
 $bean = R::dispense("book");
-asrt(($bean->getMeta("sys.oodb") instanceof RedBean_OODB), true);
+asrt(($bean->getMeta("sys.oodb") instanceof RedBean_OODB), false);
 $str = serialize($bean);
+asrt((strlen($str)>0),true);
 $bean = unserialize($str);
 $id = R::store($bean);
 asrt(($id>0),true);
-asrt(($bean->getMeta("sys.oodb") instanceof RedBean_OODB), false);
+
 
 
 

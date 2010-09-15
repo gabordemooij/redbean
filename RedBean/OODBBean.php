@@ -191,7 +191,6 @@ class RedBean_OODBBean implements IteratorAggregate {
 	 * @return mixed $array
 	 */
 	public function __sleep() {
-		$this->setMeta("sys.oodb", null);
 		return array('properties','__info');
 	}
 
