@@ -2021,7 +2021,7 @@ $book->title = "not so original title";
 $author = R::dispense("author");
 $author->name="Bobby";
 R::store($book);
-R::store($author);
+$aid = R::store($author);
 R::associate($book,$author);
 $author = R::findOne("author"," name = ? ",array("Bobby"));
 $books = R::related($author,"book");
@@ -2064,8 +2064,15 @@ $id = R::store($bean);
 asrt(($id>0),true);
 
 
-
-
+testpack("Test R::convertToBeans");
+$SQL = "SELECT '1' as id, a.name AS name, b.title AS title, '123' as rating FROM author AS a LEFT JOIN book as b ON b.id = ?  WHERE a.id = ? ";
+$rows = R::$adapter->get($SQL,array($id2,$aid));
+$beans = R::convertToBeans("something",$rows);
+$bean = reset($beans);
+asrt($bean->getMeta("type"),"something");
+asrt($bean->name,"Bobby");
+asrt($bean->title,"secondbook");
+asrt($bean->rating,"123");
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

@@ -107,6 +107,14 @@ class R {
 	}
 
 
+	/**
+	 * Freezes RedBean. In frozen mode the schema cannot be altered.
+	 * Frozen mode is recommended for production use because it is
+	 * secure and fast.
+	 *
+	 * @param boolean $tf whether to turn it on or off.
+	 * @return void
+	 */
 	public static function freeze( $tf = true ) {
 		self::$redbean->freeze( $tf );
 	}
@@ -249,6 +257,11 @@ class R {
 		return self::$treeManager->children( $parent );
 	}
 
+	/**
+	 * Returns the parent of a bean.
+	 * @param RedBean_OODBBean $bean
+	 * @return RedBean_OODBBean $bean
+	 */
 	public static function getParent( RedBean_OODBBean $bean ) {
 		return self::$treeManager->getParent( $bean );
 	}
@@ -268,6 +281,18 @@ class R {
 		return Finder::where( $type, $sql, $values );
 	}
 
+	/**
+	 * Finds a bean using a type and a where clause (SQL).
+	 * As with most Query tools in RedBean you can provide values to
+	 * be inserted in the SQL statement by populating the value
+	 * array parameter; you can either use the question mark notation
+	 * or the slot-notation (:keyname).
+	 * The variation also exports the beans (i.e. it returns arrays).
+	 * @param string $type
+	 * @param string $sql
+	 * @param array $values
+	 * @return array $arrays
+	 */
 	public static function findAndExport($type, $sql="1", $values=array()) {
 		$items = Finder::where( $type, $sql, $values );
 		$arr = array();
@@ -277,6 +302,18 @@ class R {
 		return $arr;
 	}
 
+	/**
+	 * Finds a bean using a type and a where clause (SQL).
+	 * As with most Query tools in RedBean you can provide values to
+	 * be inserted in the SQL statement by populating the value
+	 * array parameter; you can either use the question mark notation
+	 * or the slot-notation (:keyname).
+	 * This variation returns the first bean only.
+	 * @param string $type
+	 * @param string $sql
+	 * @param array $values
+	 * @return RedBean_OODBBean $bean
+	 */
 	public static function findOne( $type, $sql="1", $values=array()) {
 		$items = R::find($type,$sql,$values);
 		return reset($items);
@@ -399,7 +436,22 @@ class R {
 		}
 	}
 
-
+	/**
+	 * Makes a copy of a bean. This method copies the bean and
+	 * adds the specified associations.
+	 *
+	 * For instance: R::copy( $book, "author,library" );
+	 *
+	 * Duplicates the $book bean and copies the association links
+	 * author and library as well. Note that only many-to-many
+	 * associations can be copied. Also note that no author or library
+	 * beans are copied, only the connections or references to these
+	 * beans.
+	 *
+	 * @param RedBean_OODBBean $bean
+	 * @param string $associatedBeanTypesStr
+	 * @return array $copiedBean
+	 */
 	public static function copy($bean, $associatedBeanTypesStr) {
 		$type = $bean->getMeta("type");
 		$copy = R::dispense($type);
@@ -419,6 +471,14 @@ class R {
 		return $copy;
 	}
 
+	/**
+	 * Given an array of two beans and a property, this method
+	 * swaps the value of the property.
+	 * This is handy if you need to swap the priority or orderNo
+	 * of an item (i.e. bug-tracking, page order).
+	 * @param array $beans
+	 * @param string $property
+	 */
 	public static function swap( $beans, $property ) {
 		$bean1 = array_shift($beans);
 		$bean2 = array_shift($beans);
@@ -427,6 +487,16 @@ class R {
 		$bean2->$property = $tmp;
 		R::store($bean1);
 		R::store($bean2);
+	}
+
+	/**
+	 * Converts a series of rows to beans.
+	 * @param string $type
+	 * @param array $rows  must contain an array of arrays.
+	 * @return array $beans
+	 */
+	public static function convertToBeans($type,$rows) {
+		return self::$redbean->convertToBeans($type,$rows);
 	}
 
 }
