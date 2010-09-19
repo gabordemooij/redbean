@@ -26,137 +26,110 @@ class RedBean_BeanCan {
 	}
 
 
-	/**
-	 * Processes a batch request.
-	 * The Bean Can Server only works with JSON (Javascript Object Notation).
-	 * XML is not supported.
-	 *
-	 * A batch for the BeanCan Server should have the following format:
-	 *
-	 * {
-	 *  "label1": REQUEST,
-	 *  "label2": REQUEST
-	 *
-	 *   ...etc...
-	 * }
-	 *
-	 * The output from a BeanCan server looks like this:
-	 *
-	 * {
-	 *  "label1": OUTPUT,
-	 *  "label2": OUTPUT
-	 * }
-	 *
-	 * If an error occurs and the Bean Can Server has no way
-	 * to handle this error it will return a tiny JSON string:
-	 *
-	 * {
-	 *  "error":"<ERRORMESSAGESTRING>"
-	 * }
-	 *
-	 * @param string $jsonBatch
-	 */
-	public function processBatch( $jsonString ) {
-
-		//Decode the JSON string using PHP native JSON parser.
-		$jsonArray = json_decode( $jsonString, true );
-
-		//Prepare output array for response.
-		$outputArray = array();
-
-		//Iterate over the request batch.
-		foreach($jsonArray as $bucketLabel=>$bucket) {
-
-			//Execute request and store result under label.
-			$outputArray[ $bucketLabel ] = $this->processRequest( $bucket );
-
+	private function resp($result=null, $id=null, $errorCode="-32603",$errorMessage="Internal Error") {
+		$response = array(
+			"jsonrpc"=>"2.0",
+		);
+		
+		if ($id) {
+			$response["id"] = $id;
 		}
 
-		//Output the JSON string directly
-		die( json_encode($outputArray) );
+		if ($result) {
+			$response["result"]=$result;
+		}
+		else {
+			$response["error"] = array(
+				"code"=>$errorCode,
+				"message"=>$errorMessage
+			);
+		}
+		return (json_encode($response));
 	}
+
 
 
 	/**
 	 * Processes a JSON object request.
 	 *
-	 * The format of the JSON Object string should be:
-	 *
-	 * {
-	 *      "bean":"<NAME OF THE BEAN YOU WANT TO INTERACT WITH>",
-	 *      "action":"<ACTION>",
-	 *      "data":"<DATA>"
-	 * }
-	 *
-	 * If Action is: "store","load" OR "trash" the data will be
-	 * imported in the bean, the bean will be passed to the R facade
-	 * and the action will be invoked on the R facade.
-	 *
-	 * If the Action is different, the BeanCan will find the model
-	 * associated with the bean and invoke the corresponding method
-	 * on the model passing the data as arguments.
-	 *
-	 *
 	 * @param array $jsonObject
 	 * @return mixed $result
 	 */
-	private function processRequest( $jsonObject ) {
+	public function handleJSONRequest( $jsonString ) {
+
+		//Decode JSON string
+		$jsonArray = json_decode($jsonString,true);
+
+		if (!$jsonArray) return $this->resp(null,null,-32700,"Cannot Parse JSON");
+
+		if (!isset($jsonArray["jsonrpc"])) return $this->resp(null,null,-32600,"No RPC version");
+		if (($jsonArray["jsonrpc"]!="2.0")) return $this->resp(null,null,-32600,"Incompatible RPC Version");
+
+		//DO we have an ID to identify this request?
+		if (!isset($jsonArray["id"])) return $this->resp(null,null,-32600,"No ID");
 
 
-		if (!isset($jsonObject["bean"])) {
-			echo "{'error':'nobean'}";
-			exit;
-		}
-		if (!isset($jsonObject["action"])) {
-			echo "{'error':'noaction'}";
-			exit;
-		}
-		if (!isset($jsonObject["data"])) {
+		//Fetch the request Identification String.
+		$id = $jsonArray["id"];
+
+		//Do we have a method?
+		if (!isset($jsonArray["method"])) return $this->resp(null,$id,-32600,"No method");
+
+		//Do we have params?
+		if (!isset($jsonArray["params"])) {
 			$data = array();
 		}
 		else {
-			$data = $jsonObject["data"];
+			$data = $jsonArray["params"];
 		}
 
-		$beanType = strtolower(trim($jsonObject["bean"]));
-		$action = $jsonObject["action"];
+		//Check method signature
+		$method = explode(":",trim($jsonArray["method"]));
+
+		if (count($method)!=2) {
+			return $this->resp(null, $id, -32600,"Invalid method signature. Use: BEAN:ACTION");
+		}
+
+		//Collect Bean and Action
+		$beanType = $method[0];
+		$action = $method[1];
+		
+		//May not contain anything other than ALPHA NUMERIC chars and _
+		if (preg_match("/\W/",$beanType)) return $this->resp(null, $id, -32600,"Invalid Bean Type String");
+		if (preg_match("/\W/",$action)) return $this->resp(null, $id, -32600,"Invalid Action String");
 
 		try {
 			switch($action) {
 				case "store":
-
+					if (!isset($data[0])) return $this->resp(null, $id, -32602,"First param needs to be Bean Object");
 					$data = $data[0];
-
 					if (!isset($data["id"])) $bean = R::dispense($beanType); else
 						$bean = R::load($beanType,$data["id"]);
-
-
 					$bean->import( $data );
-					$id = R::store($bean);
-					return $id;
+					$rid = R::store($bean);
+					return $this->resp($rid, $id);
 					break;
 				case "load":
-					$data = $data[0];
-					if (!isset($data["id"])) die("{'error':'noid'}");
-					$bean = R::load($beanType,$data["id"]);
-					return $bean->export();
+					if (!isset($data[0])) return $this->resp(null, $id, -32602,"First param needs to be Bean ID");
+					$bean = R::load($beanType,$data[0]);
+					return $this->resp($bean->export(),$id);
 					break;
 				case "trash":
-					$data = $data[0];
-					if (!isset($data["id"])) die("{'error':'noid'}");
-					$bean = R::load($beanType,$data["id"]);
+					if (!isset($data[0])) return $this->resp(null, $id, -32602,"First param needs to be Bean ID");
+					$bean = R::load($beanType,$data[0]);
 					R::trash($bean);
-					return "OK";
+					return $this->resp("OK",$id);
 					break;
 				default:
 					$modelName = $this->modelHelper->getModelName( $beanType );
+					if (!class_exists($modelName)) return $this->resp(null, $id, -32601,"No such bean in the can!");
 					$beanModel = new $modelName;
-					return ( call_user_func_array(array($beanModel,$action), $data));
+					if (!method_exists($beanModel,$action)) return $this->resp(null, $id, -32601,"Method not found in Bean: $beanType ");
+					return $this->resp( call_user_func_array(array($beanModel,$action), $data), $id);
 			}
 		}
 		catch(Exception $exception) {
-			echo "{'exception':'".$exception->getCode()."-".$exception->getMessage()."'}";
-			exit;
+			return $this->resp(null, $id, -32099,$exception->getCode()."-".$exception->getMessage());
 		}
 	}
 }
