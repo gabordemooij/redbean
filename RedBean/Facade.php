@@ -55,6 +55,13 @@ class R {
 	 */
 	public static $associationManager;
 
+
+	/**
+	 * Contains an instance of the Extended Association Manager
+	 * @var RedBean_ExtAssociationManager
+	 */
+	public static $extAssocManager;
+
 	/**
 	 *
 	 * Constains an instance of the RedBean Link Manager
@@ -78,6 +85,7 @@ class R {
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
 		self::$treeManager = new RedBean_TreeManager( self::$toolbox );
 		self::$linkManager = new RedBean_LinkManager( self::$toolbox );
+		self::$extAssocManager = new RedBean_ExtAssociationManager( self::$toolbox );
 		$helper = new RedBean_ModelHelper();
 		self::$redbean->addEventListener("update", $helper );
 		self::$redbean->addEventListener("open", $helper );
@@ -163,10 +171,28 @@ class R {
 	 * Associates two Beans.
 	 * @param RedBean_OODBBean $bean1
 	 * @param RedBean_OODBBean $bean2
+	 * @param mixed $extra
 	 * @return mixed
 	 */
-	public static function associate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
-		return self::$associationManager->associate( $bean1, $bean2 );
+	public static function associate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $extra = null ) {
+		//No extra? Just associate like always (default)
+		if (!$extra) {
+			return self::$associationManager->associate( $bean1, $bean2 );
+		}
+		else{
+			if (!is_array($extra)) {
+				$info = json_decode($extra,true);
+				if (!$info) $info = array("extra"=>$extra);
+			}
+			else {
+				$info = $extra;
+			}
+			//print_r( $info );exit;
+			$bean = R::dispense("typeLess");
+			$bean->import($info);
+			return self::$extAssocManager->extAssociate($bean1, $bean2, $bean);
+		}
+		
 	}
 
 	/**
@@ -279,6 +305,21 @@ class R {
 	 */
 	public static function find( $type, $sql="1", $values=array() ) {
 		return Finder::where( $type, $sql, $values );
+	}
+
+
+	/**
+	 * Convenience Method
+	 * @param RedBean_OODBBean $bean
+	 * @param string $type
+	 * @param string $sql
+	 * @param array $values
+	 * @return array $beans
+	 */
+	public static function findRelated( RedBean_OODBBean $bean, $type, $sql, $values=array()  ) {
+		$keys = self::$associationManager->related($bean,$type);
+		$sql=str_replace(":keys",implode(",",$keys),$sql);
+		return self::find($type,$sql,$values);
 	}
 
 	/**

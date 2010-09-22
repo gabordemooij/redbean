@@ -2075,4 +2075,41 @@ asrt($bean->title,"secondbook");
 asrt($bean->rating,"123");
 
 
+testpack("Ext Assoc with facade and findRelated");
+//R::setup("sqlite:/Users/prive/blaataap.db");
+R::exec("DROP TABLE IF EXISTS track");
+R::exec("DROP TABLE IF EXISTS cd");
+R::exec("DROP TABLE IF EXISTS cd_track");
+$cd = R::dispense("cd");
+$cd->title = "Midnight Jazzfest";
+R::store($cd);
+$track = R::dispense("track");
+$track->title="Night in Tunesia";
+$track2 = R::dispense("track");
+$track2->title="Stompin at one o clock";
+$track3 = R::dispense("track");
+$track3->title="Nightlife";
+R::store($track);
+R::store($track2);
+R::store($track3);
+//assoc ext with json
+R::associate($track,$cd,'{"order":1}');
+pass();
+//width array
+R::associate($track2,$cd,array("order"=>2));
+pass();
+R::associate($track3,$cd,'{"order":3}');
+pass();
+$tracks = R::findRelated($cd,"track"," title LIKE ? AND id IN (:keys) ",array("Night%"));
+asrt(count($tracks),2);
+$track = array_pop($tracks);
+asrt((strpos($track->title,"Night")===0),true);
+$track = array_pop($tracks);
+asrt((strpos($track->title,"Night")===0),true);
+$track = R::dispense("track");
+$track->title = "test";
+R::associate($track,$cd,"this column should be named extra");
+asrt( R::getCell("SELECT count(*) FROM cd_track WHERE extra = 'this column should be named extra' "),"1");
+
+
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
