@@ -475,6 +475,9 @@ class R {
 			}
 			return $rs;
 		}
+		else {
+			return $func($sql,$values);
+		}
 	}
 
 	/**
