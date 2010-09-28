@@ -91,6 +91,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_SQLite {
 	 * @param integer $type
 	 */
 	public function addColumn( $table, $column, $type) {
+		$table = $this->getFormattedTableName($table);
 		$column = $this->check($column);
 		$table = $this->check($table);
 		$type=$this->typeno_sqltype[$type];
@@ -121,6 +122,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_SQLite {
 	 * @param integer $type
 	 */
 	public function widenColumn( $table, $column, $type ) {
+		$table = $this->getFormattedTableName($table);
 		$idfield = $this->idfield;
 		$column = $this->check($column);
 		$table = $this->check($table);

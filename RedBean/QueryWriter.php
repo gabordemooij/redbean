@@ -35,6 +35,11 @@ interface RedBean_QueryWriter {
 	 */
 	const C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION = 3;
 
+	/**
+	 * Returns the table to store beans of a given type.
+	 * @param string $type 
+	 */
+	public function getFormattedTableName($type);
 
 	/**
 	 * Returns the tables that are in the database.

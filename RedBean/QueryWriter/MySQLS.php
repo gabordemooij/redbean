@@ -93,6 +93,7 @@ class RedBean_QueryWriter_MySQLS extends RedBean_QueryWriter_MySQL {
 	 * @return array $row
 	 */
 	public function selectRecord($type, $ids) {
+		$type = $this->getFormattedTableName($type);
 		$rows = parent::selectRecord($type, $ids);
 		if ($rows) {
 			foreach($rows as $key=>$row) {

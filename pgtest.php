@@ -921,6 +921,83 @@ try {
 
 
 
+testpack("Test Table Prefixes");
+R::setup("pgsql:host=localhost dbname=oodb","postgres", file_get_contents('pass.txt'));
+
+class MyTableFormatter {
+	public function format($table) {
+		return "xx_$table";
+	}
+}
+
+R::$writer->tableFormatter = new MyTableFormatter;
+$_tables = $writer->getTables();
+if (in_array("page",$_tables)) $pdo->Execute("DROP TABLE page");
+if (in_array("user",$_tables)) $pdo->Execute("DROP TABLE \"user\"");
+if (in_array("page_user",$_tables)) $pdo->Execute("DROP TABLE page_user");
+if (in_array("page_page",$_tables)) $pdo->Execute("DROP TABLE page_page");
+if (in_array("xx_page",$_tables)) $pdo->Execute("DROP TABLE xx_page");
+if (in_array("xx_user",$_tables)) $pdo->Execute("DROP TABLE xx_user");
+if (in_array("xx_page_user",$_tables)) $pdo->Execute("DROP TABLE xx_page_user");
+if (in_array("xx_page_page",$_tables)) $pdo->Execute("DROP TABLE xx_page_page");
+//R::debug(1);
+$page = R::dispense("page");
+$page->title = "mypage";
+$id=R::store($page);
+$page = R::dispense("page");
+$page->title = "mypage2";
+R::store($page);
+$beans = R::find("page"," id > 0");
+asrt(count($beans),2);
+$user = R::dispense("user");
+$user->name="me";
+R::store($user);
+R::associate($user,$page);
+asrt(count(R::related($user,"page")),1);
+$page = R::load("page",$id);
+asrt($page->title,"mypage");
+R::associate($user,$page);
+asrt(count(R::related($user,"page")),2);
+asrt(count(R::related($page,"user")),1);
+$user2 = R::dispense("user");
+$user2->name="Bob";
+R::store($user2);
+$user3 = R::dispense("user");
+$user3->name="Kim";
+R::store($user3);
+R::attach($user,$user3);
+asrt(count(R::children($user)),1);
+R::attach($user,$user2);
+asrt(count(R::children($user)),2);
+$usrs=R::children($user);
+$user = reset($usrs);
+asrt(($user->name=="Bob" || $user->name=="Kim"),true);
+R::link($user2,$page);
+$p = R::getBean($user2,"page");
+asrt($p->title,"mypage");
+$t = R::$writer->getTables();
+asrt(in_array("xx_page",$t),true);
+asrt(in_array("xx_page_user",$t),true);
+asrt(in_array("xx_user",$t),true);
+asrt(in_array("page",$t),false);
+asrt(in_array("page_user",$t),false);
+asrt(in_array("user",$t),false);
+$page2 = R::dispense("page");
+$page2->title = "mypagex";
+R::store($page2);
+R::associate($page,$page2,'{"bla":2}');
+$pgs = R::related($page,"page");
+$p = reset($pgs);
+asrt($p->title,"mypagex");
+asrt(R::getCell("select bla from xx_page_page where bla > 0"),2);
+$t = R::$writer->getTables();
+asrt(in_array("xx_page_page",$t),true);
+asrt(in_array("page_page",$t),false);
+
+
+
+
+
 
 
 	printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

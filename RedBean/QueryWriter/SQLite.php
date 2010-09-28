@@ -8,7 +8,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
+class RedBean_QueryWriter_SQLite extends RedBean_AQueryWriter implements RedBean_QueryWriter {
 
 
 	/**
@@ -70,6 +70,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 	 * @param string $table
 	 */
 	public function createTable( $table ) {
+		$table = $this->getFormattedTableName($table);
 		$idfield = $this->getIDfield($table);
 		$table = $this->check($table);
 		$sql = "
@@ -84,6 +85,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 	 * @return array $columns
 	 */
 	public function getColumns( $table ) {
+		$table = $this->getFormattedTableName($table);
 		$table = $this->check($table);
 		$columnsRaw = $this->adapter->get("PRAGMA table_info('$table')");
 		$columns = array();
@@ -110,6 +112,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 	 * @param integer $type
 	 */
 	public function addColumn( $table, $column, $type ) {
+		$table = $this->getFormattedTableName($table);
 		$column = $this->check($column);
 		$table = $this->check($table);
 		$sql = "ALTER TABLE `$table` ADD `$column` ";
@@ -142,6 +145,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 	 * @param integer $id
 	 */
 	public function updateRecord( $table, $updatevalues, $id) {
+		$table = $this->getFormattedTableName($table);
 		$idfield = $this->getIDField($table);
 		$sql = "UPDATE `".$this->check($table)."` SET ";
 		$p = $v = array();
@@ -162,6 +166,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 	 * @return integer $insertid
 	 */
 	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
+		$table = $this->getFormattedTableName($table);
 		//if ($table == "__log") $idfield="id"; else
 		$idfield = $this->getIDField($table);
 		$table = $this->check($table);
@@ -195,6 +200,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 	 * @return array $row
 	 */
 	public function selectRecord($type, $ids) {
+		$type = $this->getFormattedTableName($type);
 		$idfield = $this->getIDField($type);
 		$type=$this->check($type);
 		$sql = "SELECT * FROM `$type` WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
@@ -211,6 +217,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 	 * @todo validate arguments for security
 	 */
 	public function deleteRecord( $table, $id) {
+		$table = $this->getFormattedTableName($table);
 		$table = $this->check($table);
 		$this->adapter->exec("DELETE FROM `$table` WHERE `".$this->getIDField($table)."` = ? ",array(strval($id)));
 	}
@@ -223,7 +230,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function addUniqueIndex( $table,$columns ) {
-
+		$table = $this->getFormattedTableName($table);
 		$name = "UQ_".sha1(implode(',',$columns));
 		$sql = "CREATE UNIQUE INDEX IF NOT EXISTS $name ON $table (".implode(",",$columns).")";
 		$this->adapter->exec($sql);
@@ -231,6 +238,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 
 
 	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
+		$table = $this->getFormattedTableName($table);
 		$select = $this->noKW($this->adapter->escape($select));
 		$table = $this->noKW($this->adapter->escape($table));
 		$column = $this->noKW($this->adapter->escape($column));
@@ -246,6 +254,7 @@ class RedBean_QueryWriter_SQLite implements RedBean_QueryWriter {
 
 
 	public function deleteByCrit( $table, $crits ) {
+		$table = $this->getFormattedTableName($table);
 		$table = $this->noKW($this->adapter->escape($table));
 		$values = array();
 		foreach($crits as $key=>$val) {

@@ -141,7 +141,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	public function tableExists($table) {
 		//does this table exist?
 		$tables = $this->writer->getTables();
-		return in_array($table, $tables);
+		return in_array($this->writer->getFormattedTableName($table), $tables);
 	}
 
 	/**

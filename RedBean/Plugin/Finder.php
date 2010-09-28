@@ -77,10 +77,10 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 		}
 
 
-
+		$table = $writer->getFormattedTableName($type);
 		//Make a standard ANSI SQL query from the SQL provided
 		try {
-			$SQL = "SELECT * FROM $type WHERE ".$SQL;
+			$SQL = "SELECT * FROM $table WHERE ".$SQL;
 
 			//Fetch the values using the SQL and value pairs provided
 			$rows = $adapter->get($SQL, $values);

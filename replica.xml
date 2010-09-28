@@ -25,6 +25,7 @@
         <item type="php">RedBean/Adapter/DBAdapter.php</item>
 
         <item type="php">RedBean/QueryWriter.php</item>
+	<item type="php">RedBean/QueryWriter/AQueryWriter.php</item>
         <item type="php">RedBean/QueryWriter/MySQL.php</item>
         <item type="php">RedBean/QueryWriter/SQLite.php</item>
         <item type="php">RedBean/QueryWriter/SQLiteT.php</item>

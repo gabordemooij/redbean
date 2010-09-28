@@ -8,7 +8,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_QueryWriter_PostgreSQL implements RedBean_QueryWriter {
+class RedBean_QueryWriter_PostgreSQL extends RedBean_AQueryWriter implements RedBean_QueryWriter {
 
 
 
@@ -103,6 +103,7 @@ where table_schema = 'public'" );
 	 * @param string $table
 	 */
 	public function createTable( $table ) {
+		$table = $this->getFormattedTableName($table);
 		$table = $this->check($table);
 		$sql = "
                      CREATE TABLE \"$table\" (
@@ -118,6 +119,7 @@ where table_schema = 'public'" );
 	 * @return array $columns
 	 */
 	public function getColumns( $table ) {
+		$table = $this->getFormattedTableName($table);
 		$table = $this->check($table);
 		$columnsRaw = $this->adapter->get("select column_name, data_type from information_schema.columns where table_name='$table'");
 
@@ -153,6 +155,7 @@ where table_schema = 'public'" );
 	 * @param integer $type
 	 */
 	public function addColumn( $table, $column, $type ) {
+		$table = $this->getFormattedTableName($table);
 		$column = $this->check($column);
 		$table = $this->check($table);
 		$type=$this->typeno_sqltype[$type];
@@ -176,6 +179,7 @@ where table_schema = 'public'" );
 	 * @param integer $type
 	 */
 	public function widenColumn( $table, $column, $type ) {
+		$table = $this->getFormattedTableName($table);
 		$column = $this->check($column);
 		$table = $this->check($table);
 		$newtype = $this->typeno_sqltype[$type];
@@ -194,6 +198,7 @@ where table_schema = 'public'" );
 	 * @param integer $id
 	 */
 	public function updateRecord( $table, $updatevalues, $id) {
+		$table = $this->getFormattedTableName($table);
 		$sql = "UPDATE \"".$this->adapter->escape($this->check($table))."\" SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
@@ -214,6 +219,7 @@ where table_schema = 'public'" );
 	 * @return integer $insertid
 	 */
 	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
+		$table = $this->getFormattedTableName($table);
 		$table = $this->check($table);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k=>$v) {
@@ -243,6 +249,7 @@ where table_schema = 'public'" );
 	 * @return array $row
 	 */
 	public function selectRecord($type, $ids) {
+		$type = $this->getFormattedTableName($type);
 		$type=$this->check($type);
 		$sql = "SELECT * FROM $type WHERE id IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);
@@ -258,10 +265,12 @@ where table_schema = 'public'" );
 	 * @todo validate arguments for security
 	 */
 	public function deleteRecord( $table, $value) {
+		$table = $this->getFormattedTableName($table);
 		$table = $this->check($table);
 		$column = "id";
 		$this->adapter->exec("DELETE FROM $table WHERE $column = ? ",array(strval($value)));
 	}
+
 	/**
 	 * Gets information about changed records using a type and id and a logid.
 	 * RedBean Locking shields you from race conditions by comparing the latest
@@ -301,6 +310,7 @@ where table_schema = 'public'" );
 	 * @return void
 	 */
 	public function addUniqueIndex( $table,$columns ) {
+		$table = $this->getFormattedTableName($table);
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach($columns as $k=>$v) {
 			$columns[$k]="".$this->adapter->escape($v)."";
@@ -327,7 +337,7 @@ where table_schema = 'public'" );
 		 * ALTER TABLE testje ADD CONSTRAINT blabla UNIQUE (blaa, blaa2);
 		*/
 
-		$name = "UQ_".sha1(implode(',',$columns));
+		$name = "UQ_".sha1($table.implode(',',$columns));
 		if ($r) {
 			foreach($r as $i) {
 				if (strtolower( $i["index_name"] )== strtolower( $name )) {
@@ -357,6 +367,7 @@ where table_schema = 'public'" );
 
 
 	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
+		$table = $this->getFormattedTableName($table);
 		$select = $this->noKW($this->adapter->escape($select));
 		$table = $this->noKW($this->adapter->escape($table));
 		$column = $this->noKW($this->adapter->escape($column));
@@ -372,6 +383,7 @@ where table_schema = 'public'" );
 
 
 	public function deleteByCrit( $table, $crits ) {
+		$table = $this->getFormattedTableName($table);
 		$table = $this->noKW($this->adapter->escape($table));
 		$values = array();
 		foreach($crits as $key=>$val) {
