@@ -355,16 +355,7 @@ where table_schema = 'public'" );
 	}
 
 
-	/**
-	 * Returns the column name that should be used
-	 * to store and retrieve the primary key ID.
-	 * @param string $type
-	 * @return string $idfieldtobeused
-	 */
-	public function getIDField( $type ) {
-		return  "id";
-	}
-
+	
 
 	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
 		$table = $this->getFormattedTableName($table);

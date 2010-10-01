@@ -25,15 +25,6 @@ class RedBean_QueryWriter_SQLite extends RedBean_AQueryWriter implements RedBean
 	protected $idfield = "id";
 
 
-	/**
-	 * Returns the column name that should be used
-	 * to store and retrieve the primary key ID.
-	 * @param string $type
-	 * @return string $idfieldtobeused
-	 */
-	public function getIDField( $type ) {
-		return  $this->idfield;
-	}
 
 
 	/**

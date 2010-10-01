@@ -2114,9 +2114,12 @@ asrt( R::getCell("SELECT count(*) FROM cd_track WHERE extra = 'this column shoul
 testpack("Test Table Prefixes");
 R::setup("mysql:host=localhost;dbname=oodb","root","");
 
-class MyTableFormatter {
-	public function format($table) {
+class MyTableFormatter implements RedBean_IBeanFormatter{
+	public function formatBeanTable($table) {
 		return "xx_$table";
+	}
+	public function formatBeanID( $table ) {
+		return "id";
 	}
 }
 //R::debug(1);

@@ -924,9 +924,12 @@ try {
 testpack("Test Table Prefixes");
 R::setup("pgsql:host=localhost dbname=oodb","postgres", file_get_contents('pass.txt'));
 
-class MyTableFormatter {
-	public function format($table) {
+class MyTableFormatter implements RedBean_IBeanFormatter{
+	public function formatBeanTable($table) {
 		return "xx_$table";
+	}
+	public function formatBeanID( $table ) {
+		return "id";
 	}
 }
 
