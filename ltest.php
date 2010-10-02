@@ -1276,7 +1276,8 @@ class MyTableFormatter implements RedBean_IBeanFormatter{
 	}
 }
 //R::debug(1);
-R::$writer->tableFormatter = new MyTableFormatter;
+R::$writer->setBeanFormatter(  new MyTableFormatter );
+$pdo = R::$adapter->getDatabase();
 $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
