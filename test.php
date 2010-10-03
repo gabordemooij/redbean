@@ -436,6 +436,11 @@ $arr = $bean->export( true );
 asrt(isset($arr["__info"]),true);
 asrt($arr["a"],1);
 asrt($arr["b"],2);
+$exportBean = $redbean->dispense("abean");
+$exportBean->setMeta("metaitem.bla",1);
+$exportedBean = $exportBean->export(true);
+asrt($exportedBean["__info"]["metaitem"]["bla"],1);
+asrt($exportedBean["__info"]["type"],"abean");
 
 //Test observer
 testpack("UNIT TEST Observer Mechanism ");

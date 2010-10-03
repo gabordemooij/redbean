@@ -16,6 +16,7 @@
 
         <item type="php">RedBean/Driver.php</item>
         <item type="php">RedBean/Driver/PDO.php</item>
+		  
         
         <item type="php">RedBean/OODBBean.php</item>
         <item type="php">RedBean/Observable.php</item>

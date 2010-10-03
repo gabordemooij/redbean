@@ -68,15 +68,19 @@ class RedBean_OODBBean implements IteratorAggregate {
 	 */
 	public function export($meta = false) {
 		$arr = array();
-		foreach($this->properties as $p=>$v) {
-
-			$arr[ $p ] = $v;
-
-		}
+		$arr = $this->properties;
 		if ($meta) $arr["__info"] = $this->__info;
 		return $arr;
 	}
 
+	/**
+	 * Implements isset() function for use as an array.
+	 * Returns whether bean has an element with key
+	 * named $property. Returns TRUE if such an element exists
+	 * and FALSE otherwise.
+	 * @param string $property
+	 * @return boolean $hasProperty
+	 */
 	public function __isset( $property ) {
 		return (isset($this->properties[$property]));
 	}
