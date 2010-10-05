@@ -1265,7 +1265,7 @@ pass();
 
 
 testpack("Test Table Prefixes");
-R::setup();
+R::setup("sqlite:bla.txt");
 
 class MyTableFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {
@@ -1339,6 +1339,29 @@ $t = R::$writer->getTables();
 asrt(in_array("xx_page_page",$t),true);
 asrt(in_array("page_page",$t),false);
 
+
+
+testpack("Testing: combining table prefix and IDField");
+$pdo->Execute("DROP TABLE IF EXISTS cms_blog");
+class MyBeanFormatter implements RedBean_IBeanFormatter{
+    public function formatBeanTable($table) {
+        return "cms_$table";
+    }
+    public function formatBeanID( $table ) {
+        return "{$table}_id"; // append table name to id. The table should not inclide the prefix.
+    }
+}
+
+R::$writer->setBeanFormatter(new MyBeanFormatter());
+$blog = R::dispense('blog');
+$blog->title = 'testing';
+$blog->blog = 'tesing';
+R::store($blog);
+$blogpost = (R::load("blog",1));
+asrt((isset($blogpost->cms_blog_id)),false);
+asrt((isset($blogpost->blog_id)),true);
+asrt(in_array("blog_id",array_keys(R::$writer->getColumns("blog"))),true);
+asrt(in_array("cms_blog_id",array_keys(R::$writer->getColumns("blog"))),false); 
 
 
 

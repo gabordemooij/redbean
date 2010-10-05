@@ -175,7 +175,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$insertvalues = array();
 		$insertcolumns = array();
 		$updatevalues = array();
-		foreach( $bean as $p=>$v) {
+		foreach( $bean as $p=>$v ) {
 			if ($p!=$idfield) {
 				if (!$this->isFrozen) {
 					//What kind of property are we dealing with?

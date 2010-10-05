@@ -920,6 +920,69 @@ try {
 
 
 
+testpack("Test Custom ID Field");
+class MyWriter extends RedBean_QueryWriter_PostgreSQL {
+	public function getIDField( $type ) {
+		return $type . "_id";
+	}
+}
+$writer2 = new MyWriter($adapter);
+$redbean2 = new RedBean_OODB($writer2);
+$movie = $redbean2->dispense("movie");
+asrt(isset($movie->movie_id),true);
+$movie->name="movie 1";
+$movieid = $redbean2->store($movie);
+asrt(($movieid>0),true);
+$columns = array_keys( $writer->getColumns("movie") );
+asrt(in_array("movie_id",$columns),true);
+asrt(in_array("id",$columns),false);
+$movie2 = $redbean2->dispense("movie");
+asrt(isset($movie2->movie_id),true);
+$movie2->name="movie 2";
+$movieid2 = $redbean2->store($movie2);
+$movie1 = $redbean2->load("movie",$movieid);
+asrt($movie->name,"movie 1");
+$movie2 = $redbean2->load("movie",$movieid2);
+asrt($movie2->name,"movie 2");
+$movies = $redbean2->batch("movie", array($movieid,$movieid2));
+asrt(count($movies),2);
+asrt($movies[$movieid]->name,"movie 1");
+asrt($movies[$movieid2]->name,"movie 2");
+$toolbox2 = new RedBean_ToolBox($redbean2, $adapter, $writer2);
+
+$a2 = new RedBean_AssociationManager($toolbox2);
+$a2->associate($movie1,$movie2);
+$movies = $a2->related($movie1, "movie");
+asrt(count($movies),1);
+asrt((int) $movies[0],(int) $movieid2);
+$movies = $a2->related($movie2, "movie");
+asrt(count($movies),1);
+asrt((int) $movies[0],(int) $movieid);
+$genre = $redbean2->dispense("genre");
+$genre->name="western";
+$a2->associate($movie,$genre);
+$movies = $a2->related($genre, "movie");
+asrt(count($movies),1);
+asrt((int)$movies[0],(int)$movieid);
+$a2->unassociate($movie,$genre);
+$movies = $a2->related($genre, "movie");
+asrt(count($movies),0);
+$a2->clearRelations($movie, "movie");
+$movies = $a2->related($movie1, "movie");
+asrt(count($movies),0);
+$pdo->setDebugMode(0);
+$t2 = new RedBean_TreeManager($toolbox2);
+$t2->attach($movie1, $movie2);
+$movies = $t2->children($movie1);
+asrt(count($movies),1);
+asrt($movies[$movieid2]->name,"movie 2");
+$redbean2->trash($movie1);
+asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),1);
+$redbean2->trash($movie2);
+asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),0);
+$columns = array_keys($writer->getColumns("movie_movie"));
+asrt(in_array("movie_movie_id",$columns),true);
+
 
 testpack("Test Table Prefixes");
 R::setup("pgsql:host=localhost dbname=oodb","postgres", file_get_contents('pass.txt'));
@@ -998,12 +1061,34 @@ asrt(in_array("xx_page_page",$t),true);
 asrt(in_array("page_page",$t),false);
 
 
+testpack("Testing: combining table prefix and IDField");
+if (in_array("cms_blog",$_tables)) $pdo->Execute("DROP TABLE cms_blog");
+class MyBeanFormatter implements RedBean_IBeanFormatter{
+    public function formatBeanTable($table) {
+        return "cms_$table";
+    }
+    public function formatBeanID( $table ) {
+        return "{$table}_id"; // append table name to id. The table should not inclide the prefix.
+    }
+}
+
+
+R::$writer->setBeanFormatter(new MyBeanFormatter());
+$blog = R::dispense('blog');
+$blog->title = 'testing';
+$blog->blog = 'tesing';
+R::store($blog);
+$blogpost = (R::load("blog",1));
+asrt((isset($blogpost->cms_blog_id)),false);
+asrt((isset($blogpost->blog_id)),true);
+asrt(in_array("blog_id",array_keys(R::$writer->getColumns("blog"))),true);
+asrt(in_array("cms_blog_id",array_keys(R::$writer->getColumns("blog"))),false); 
 
 
 
 
 
-	printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
+printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 
 
 }catch(Exception $e) {

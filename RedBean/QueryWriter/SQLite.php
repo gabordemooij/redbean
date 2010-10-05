@@ -61,8 +61,9 @@ class RedBean_QueryWriter_SQLite extends RedBean_AQueryWriter implements RedBean
 	 * @param string $table
 	 */
 	public function createTable( $table ) {
-		$table = $this->getFormattedTableName($table);
 		$idfield = $this->getIDfield($table);
+		$table = $this->getFormattedTableName($table);
+		
 		$table = $this->check($table);
 		$sql = "
                      CREATE TABLE `$table` ( `$idfield` INTEGER PRIMARY KEY AUTOINCREMENT )
@@ -136,8 +137,8 @@ class RedBean_QueryWriter_SQLite extends RedBean_AQueryWriter implements RedBean
 	 * @param integer $id
 	 */
 	public function updateRecord( $table, $updatevalues, $id) {
-		$table = $this->getFormattedTableName($table);
 		$idfield = $this->getIDField($table);
+		$table = $this->getFormattedTableName($table);
 		$sql = "UPDATE `".$this->check($table)."` SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
@@ -157,9 +158,8 @@ class RedBean_QueryWriter_SQLite extends RedBean_AQueryWriter implements RedBean
 	 * @return integer $insertid
 	 */
 	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
-		$table = $this->getFormattedTableName($table);
-		//if ($table == "__log") $idfield="id"; else
 		$idfield = $this->getIDField($table);
+		$table = $this->getFormattedTableName($table);
 		$table = $this->check($table);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k=>$v) {
@@ -191,8 +191,8 @@ class RedBean_QueryWriter_SQLite extends RedBean_AQueryWriter implements RedBean
 	 * @return array $row
 	 */
 	public function selectRecord($type, $ids) {
-		$type = $this->getFormattedTableName($type);
 		$idfield = $this->getIDField($type);
+		$type = $this->getFormattedTableName($type);
 		$type=$this->check($type);
 		$sql = "SELECT * FROM `$type` WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);

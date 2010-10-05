@@ -103,11 +103,12 @@ where table_schema = 'public'" );
 	 * @param string $table
 	 */
 	public function createTable( $table ) {
+		$idfield = $this->getIDfield($table);
 		$table = $this->getFormattedTableName($table);
 		$table = $this->check($table);
 		$sql = "
                      CREATE TABLE \"$table\" (
-						id SERIAL PRIMARY KEY
+						$idfield SERIAL PRIMARY KEY
                      );
 				  ";
 		$this->adapter->exec( $sql );
@@ -198,6 +199,7 @@ where table_schema = 'public'" );
 	 * @param integer $id
 	 */
 	public function updateRecord( $table, $updatevalues, $id) {
+		$idfield = $this->getIDfield($table);
 		$table = $this->getFormattedTableName($table);
 		$sql = "UPDATE \"".$this->adapter->escape($this->check($table))."\" SET ";
 		$p = $v = array();
@@ -205,7 +207,7 @@ where table_schema = 'public'" );
 			$p[] = " \"".$uv["property"]."\" = ? ";
 			$v[]=strval( ( $uv["value"] ) );
 		}
-		$sql .= implode(",", $p ) ." WHERE id = ".intval($id);
+		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
 
 		$this->adapter->exec( $sql, $v );
 	}
@@ -219,14 +221,15 @@ where table_schema = 'public'" );
 	 * @return integer $insertid
 	 */
 	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
+		$idfield = $this->getIDfield($table);
 		$table = $this->getFormattedTableName($table);
 		$table = $this->check($table);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k=>$v) {
 				$insertcolumns[$k] = "".$this->check($v)."";
 			}
-			$insertSQL = "INSERT INTO \"$table\" ( id, ".implode(",",$insertcolumns)." ) VALUES ";
-			$insertSQL .= "( DEFAULT, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) RETURNING id";
+			$insertSQL = "INSERT INTO \"$table\" ( $idfield, ".implode(",",$insertcolumns)." ) VALUES ";
+			$insertSQL .= "( DEFAULT, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) RETURNING $idfield ";
 
 			$ids = array();
 			foreach($insertvalues as $insertvalue) {
@@ -236,7 +239,7 @@ where table_schema = 'public'" );
 
 		}
 		else {
-			return $this->adapter->getCell( "INSERT INTO \"$table\" (id) VALUES(DEFAULT) RETURNING id " );
+			return $this->adapter->getCell( "INSERT INTO \"$table\" ($idfield) VALUES(DEFAULT) RETURNING $idfield " );
 		}
 	}
 
@@ -249,9 +252,10 @@ where table_schema = 'public'" );
 	 * @return array $row
 	 */
 	public function selectRecord($type, $ids) {
+		$idfield = $this->getIDfield($type);
 		$type = $this->getFormattedTableName($type);
 		$type=$this->check($type);
-		$sql = "SELECT * FROM $type WHERE id IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
+		$sql = "SELECT * FROM $type WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);
 		return ($rows && is_array($rows) && count($rows)>0) ? $rows : NULL;
 	}
@@ -265,9 +269,10 @@ where table_schema = 'public'" );
 	 * @todo validate arguments for security
 	 */
 	public function deleteRecord( $table, $value) {
+		$column = $this->getIDfield($table);
 		$table = $this->getFormattedTableName($table);
 		$table = $this->check($table);
-		$column = "id";
+		
 		$this->adapter->exec("DELETE FROM $table WHERE $column = ? ",array(strval($value)));
 	}
 
@@ -286,11 +291,13 @@ where table_schema = 'public'" );
 	 * @return integer $newchangeid
 	 */
 	public function checkChanges($type, $id, $logid) {
+
 		$type = $this->check($type);
+		$idfield = $this->getIDfield($type);
 		$id = (int) $id;
 		$logid = (int) $logid;
 		$num = $this->adapter->getCell("
-        SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND id > $logid");
+        SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND $idfield > $logid");
 		if ($num) {
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)");
 		}
