@@ -55,7 +55,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 */
 	public function getTable( $types ) {
 		sort($types);
-		return implode("_", $types);
+		return ( implode("_", $types) );
 	}
 	/**
 	 * Associates two beans with eachother.

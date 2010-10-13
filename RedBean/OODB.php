@@ -82,13 +82,12 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * @return RedBean_OODBBean $bean
 	 */
 	public function dispense($type ) {
-
+		$this->signal( "before_dispense", $type );
 		$bean = new RedBean_OODBBean();
 		$bean->setMeta("type", $type );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		$bean->setMeta("sys.idfield",$idfield);
 		$bean->$idfield = 0;
-		$this->signal( "dispense", $bean );
 		$this->check( $bean );
 		$bean->setMeta("tainted",false);
 		$this->signal( "dispense", $bean );
@@ -241,7 +240,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * @return RedBean_OODBBean $bean
 	 */
 	public function load($type, $id) {
-		$this->signal( "before_open", array($type,$id) );
+		$this->signal("before_open",array("type"=>$type,"id"=>$id));
 		$id = intval( $id );
 		if ($id < 0) throw new RedBean_Exception_Security("Id less than zero not allowed");
 		$bean = $this->dispense( $type );
@@ -297,6 +296,8 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
 		}
+		$this->signal( "after_delete", $bean );
+		
 	}
 
 	/**

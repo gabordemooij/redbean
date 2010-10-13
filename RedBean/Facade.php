@@ -90,6 +90,9 @@ class R {
 		self::$redbean->addEventListener("update", $helper );
 		self::$redbean->addEventListener("open", $helper );
 		self::$redbean->addEventListener("delete", $helper );
+		self::$redbean->addEventListener("after_delete", $helper );
+		self::$redbean->addEventListener("after_update", $helper );
+		self::$redbean->addEventListener("dispense", $helper );
 		
 	}
 
@@ -545,3 +548,11 @@ class R {
 
 }
 
+//Helper functions
+function tbl($table) {
+	return R::$writer->getFormattedTableName($table);
+}
+
+function ID($id) {
+	return R::$writer->getIDField($table);
+}

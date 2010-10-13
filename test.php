@@ -458,16 +458,18 @@ $observable->test("event3", "testsignal3");
 asrt($observer->event,"event3");
 asrt($observer->info,"testsignal3");
 
-
 $adapter = $toolbox->getDatabaseAdapter();
 $writer  = $toolbox->getWriter();
 $redbean = $toolbox->getRedBean();
+
 
 
 testpack("UNIT TEST Toolbox");
 asrt(($adapter instanceof RedBean_Adapter_DBAdapter),true);
 asrt(($writer instanceof RedBean_QueryWriter),true);
 asrt(($redbean instanceof RedBean_OODB),true);
+
+
 
 
 $pdo = $adapter->getDatabase();
@@ -1998,16 +2000,34 @@ asrt(($titles[0]),"a nice book");
 
 testpack("FUSE");
 class Model_Cigar extends RedBean_SimpleModel {
-	public static $reachedDeleted = true;
+	
+	public static $reachedDeleted = false;
+	public static $reachedDispense = false;
+	public static $reachedAfterUpdate = false;
+	public static $reachedAfterDeleted = false;
+	
+	public function after_update() {
+		self::$reachedAfterUpdate = true;
+	}
+
 	public function update() {
 		$this->rating++;
 	}
 	public function delete() {
 		self::$reachedDeleted =true;
 	}
+	public function after_delete() {
+		self::$reachedAfterDeleted =true;
+	}
 	public function open() {
 		$this->rating++;
 	}
+
+	public function dispense() {
+		self::$reachedDispense = true;
+	}
+	
+
 }
 $cgr = R::dispense("cigar");
 $cgr->brand = "Pigge";
@@ -2017,6 +2037,9 @@ $cgr = R::load( "cigar", $id );
 asrt($cgr->rating,5);
 R::trash($cgr);
 asrt(Model_Cigar::$reachedDeleted,TRUE);
+asrt(Model_Cigar::$reachedAfterDeleted,TRUE);
+asrt(Model_Cigar::$reachedDispense,TRUE);
+asrt(Model_Cigar::$reachedAfterUpdate,TRUE);
 
 
 testpack("copy()");
@@ -2193,6 +2216,8 @@ asrt(in_array("page_page",$t),false);
 
 testpack("Testing: combining table prefix and IDField");
 $pdo->Execute("DROP TABLE IF EXISTS cms_blog");
+$pdo->Execute("DROP TABLE IF EXISTS cms_blog_post");
+$pdo->Execute("DROP TABLE IF EXISTS cms_post");
 class MyBeanFormatter implements RedBean_IBeanFormatter{
     public function formatBeanTable($table) {
         return "cms_$table";
@@ -2213,6 +2238,15 @@ asrt((isset($blogpost->cms_blog_id)),false);
 asrt((isset($blogpost->blog_id)),true);
 asrt(in_array("blog_id",array_keys(R::$writer->getColumns("blog"))),true);
 asrt(in_array("cms_blog_id",array_keys(R::$writer->getColumns("blog"))),false); 
+
+$post = R::dispense("post");
+$post->message = "hello";
+R::associate($blog,$post);
+asrt(count(R::related($blog,"post")),1);
+
+asrt(count(R::find("blog"," title LIKE '%est%' ")),1);
+$a = R::getAll("select * from ".tbl("blog")." ");
+asrt(count($a),1);
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

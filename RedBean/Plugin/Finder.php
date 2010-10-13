@@ -112,9 +112,14 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 * if not they are being replaced by NULL leaving intact the
 	 * rest of the query and making the SQL continue to work even
 	 * if it's partially broken.
-	 * @param <type> $SQL
+	 * @param string $SQL
+	 * @param string $currentTable
+	 * @param RedBean_ToolBox $toolbox
+	 * @return string $SQL
 	 */
 	public static function parseGoldSQL( $SQL, $currentTable,  RedBean_ToolBox $toolbox ) {
+
+		$writer = $toolbox->getWriter();
 
 		//array for the matching in the regex.
 		$matches = array();
@@ -127,7 +132,7 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 			//Get the columns in the master table
 			$columns = array_keys( $toolbox->getWriter()->getColumns($currentTable) );
 			//Get the tables
-			$tables = $toolbox->getWriter()->getTables();
+			$tables = $writer->getTables();
 
 			//Get the columns we need to check for
 			$checks = array_shift( $matches );
