@@ -2027,6 +2027,10 @@ class Model_Cigar extends RedBean_SimpleModel {
 		self::$reachedDispense = true;
 	}
 	
+	public function getTaste( $what ) {
+		return "smokey like $what";
+	}
+	
 
 }
 $cgr = R::dispense("cigar");
@@ -2040,7 +2044,7 @@ asrt(Model_Cigar::$reachedDeleted,TRUE);
 asrt(Model_Cigar::$reachedAfterDeleted,TRUE);
 asrt(Model_Cigar::$reachedDispense,TRUE);
 asrt(Model_Cigar::$reachedAfterUpdate,TRUE);
-
+asrt($cgr->getTaste("tabacco"),"smokey like tabacco");
 
 testpack("copy()");
 R::setup("mysql:host=localhost;dbname=oodb","root","");

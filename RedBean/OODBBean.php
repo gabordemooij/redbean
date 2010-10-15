@@ -198,6 +198,23 @@ class RedBean_OODBBean implements IteratorAggregate {
 		return array('properties','__info');
 	}
 
+	/**
+	 * Reroutes a call to Model if exists. (new fuse)
+	 * @param string $method
+	 * @param array $args
+	 * @return mixed $mixed
+	 */
+	public function __call($method, $args) {
+		if (!isset($this->__info["model"])) {
+			$modelName = "Model_".ucfirst( $this->getMeta("type") );
+			if (!class_exists($modelName)) return null;
+			$obj = new $modelName();
+			$obj->loadBean($this);
+			$this->__info["model"] = $obj;
+		}
+		if (!method_exists($this->__info["model"],$method)) return null;
+		return call_user_func_array(array($this->__info["model"],$method), $args);
+	}
 
 
 }
