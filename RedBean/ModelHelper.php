@@ -23,6 +23,10 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	}
 
 
+	public static function getModelName( $model ) {
+		return "Model_".ucfirst($model); //@todo duplicate code - replace
+	}
+
 	
 
 }

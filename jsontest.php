@@ -92,7 +92,7 @@ function s($data,$params=null,$id="1234") {
 R::setup();
 
 
-class Model_CandyBar {
+class Model_CandyBar extends RedBean_SimpleModel {
 	
 	public function customMethod($custom) {
 		return $custom."!";
