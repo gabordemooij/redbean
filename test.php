@@ -72,7 +72,9 @@ function testpack($name) {
 testpack("Test Setup");
 
 //INCLUDE YOUR REDBEAN FILE HERE!
-require("rb.php");
+//require("rb.php");
+require("RedBean/redbean.inc.php");
+
 
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
@@ -2252,5 +2254,18 @@ asrt(count(R::find("blog"," title LIKE '%est%' ")),1);
 $a = R::getAll("select * from ".tbl("blog")." ");
 asrt(count($a),1);
 
+
+testpack("test model formatting");
+class mymodelformatter implements RedBean_IModelFormatter{
+	public function formatModel($model){
+		return "my_weird_".$model."_model";
+	}
+}
+class my_weird_weirdo_model extends RedBean_SimpleModel {
+	public function blah(){ return "yes!"; }
+}
+RedBean_ModelHelper::setModelFormatter(new mymodelformatter);
+$w = R::dispense("weirdo");
+asrt($w->blah(),"yes!");
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

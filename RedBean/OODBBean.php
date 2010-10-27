@@ -195,6 +195,7 @@ class RedBean_OODBBean implements IteratorAggregate {
 	 * @return mixed $array
 	 */
 	public function __sleep() {
+		//return the public stuff
 		return array('properties','__info');
 	}
 
@@ -206,7 +207,8 @@ class RedBean_OODBBean implements IteratorAggregate {
 	 */
 	public function __call($method, $args) {
 		if (!isset($this->__info["model"])) {
-			$modelName = "Model_".ucfirst( $this->getMeta("type") );
+			//@todo eliminate this dependency!
+			$modelName = RedBean_ModelHelper::getModelName( $this->getMeta("type") );
 			if (!class_exists($modelName)) return null;
 			$obj = new $modelName();
 			$obj->loadBean($this);

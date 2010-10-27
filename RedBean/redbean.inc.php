@@ -57,6 +57,7 @@ require($dir."Adapter/DBAdapter.php");
 
 //Load SQL drivers
 require($dir."QueryWriter.php");
+require($dir."QueryWriter/AQueryWriter.php");
 require($dir."QueryWriter/MySQL.php");
 require($dir."QueryWriter/SQLite.php");
 require($dir."QueryWriter/SQLiteT.php");
@@ -96,6 +97,10 @@ require($dir."QueryWriter/NullWriter.php");
 
 /* Developer Comfort */
 require($dir."UnitOfWork.php");
+require($dir."IBeanFormatter.php");
+require($dir."IModelFormatter.php");
 require($dir."SimpleModel.php");
 require($dir."ModelHelper.php");
 require($dir."Facade.php");
+require($dir."BeanCan.php");
+

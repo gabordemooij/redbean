@@ -27,7 +27,6 @@
 
         <item type="php">RedBean/QueryWriter.php</item>
 		  <item type="php">RedBean/QueryWriter/AQueryWriter.php</item>
-		  <item type="php">RedBean/IBeanFormatter.php</item>
         <item type="php">RedBean/QueryWriter/MySQL.php</item>
         <item type="php">RedBean/QueryWriter/SQLite.php</item>
         <item type="php">RedBean/QueryWriter/SQLiteT.php</item>
@@ -55,6 +54,9 @@
         <item type="php">RedBean/Plugin/Cache.php</item>
         <item type="php">RedBean/Plugin/Finder.php</item>
         <item type="php">RedBean/Plugin/Constraint.php</item>
+
+		  <item type="php">RedBean/IBeanFormatter.php</item>
+		  <item type="php">RedBean/IModelFormatter.php</item>
 
         <item type="php">RedBean/DomainObject.php</item>
         <item type="php">RedBean/Plugin/Optimizer.php</item>

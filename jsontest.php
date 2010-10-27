@@ -16,7 +16,8 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-require("rb.php");
+//require("rb.php");
+require("RedBean/redbean.inc.php");
 
 /**
  * A simple print function that works
