@@ -710,6 +710,7 @@ $redbean->trash( $page );
 
 asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 0 );
 
+
 testpack("Test RedBean OODB: Batch Loader ");
 $page = $redbean->dispense("page");
 $page->name = "page no. 1";
@@ -2267,5 +2268,22 @@ class my_weird_weirdo_model extends RedBean_SimpleModel {
 RedBean_ModelHelper::setModelFormatter(new mymodelformatter);
 $w = R::dispense("weirdo");
 asrt($w->blah(),"yes!");
+
+testpack("Test Tagging");
+R::tag($post,"lousy,smart");
+asrt(R::tag($post),"lousy,smart");
+R::tag($post,"clever,smart");
+asrt(R::tag($post),"smart,clever");
+R::tag($blog,array("smart","interesting"));
+asrt(R::tag($blog),"smart,interesting");
+try{
+R::tag($blog,array(";","interesting"));
+fail();
+}catch(RedBean_Exception $e){ pass(); }
+asrt(R::tag($blog),"smart,interesting");
+R::tag($blog, false);
+asrt(R::tag($blog),"");
+
+
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

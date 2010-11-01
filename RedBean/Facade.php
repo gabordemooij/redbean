@@ -545,6 +545,58 @@ class R {
 	public static function convertToBeans($type,$rows) {
 		return self::$redbean->convertToBeans($type,$rows);
 	}
+	
+	
+	/**
+	 * Tags a bean or returns tags associated with a bean.
+	 * If $tagList is null or omitted this method will return a 
+	 * comma separated list of tags associated with the bean provided.
+	 * If $tagList is a comma separated list (string) of tags all tags will
+	 * be associated with the bean. 
+	 * You may also pass an array instead of a string.
+	 * @param RedBean_OODBBean $bean 
+	 * @param mixed $tagList 
+	 * @return string $commaSepListTags
+	 */
+	public static function tag( RedBean_OODBBean $bean, $tagList = null ) {
+
+		if (is_null($tagList)) {
+			$tags = R::related( $bean, "tag");
+			$foundTags = array();
+			foreach($tags as $tag) {
+				$foundTags[] = $tag->title;
+			}
+			return implode(",",$foundTags);
+		}
+	
+		
+		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+
+		if (is_array($tags)) {
+		foreach($tags as $tag) {
+			if (preg_match("/\W/",$tag)) throw new RedBean_Exception("Invalid Tag. Tags may only contain alpha-numeric characters");
+		}
+		}
+		
+
+		R::clearRelations( $bean, "tag" );
+		if ($tagList===false) return;
+		
+		foreach($tags as $tag) {
+			
+			$t = R::findOne("tag"," title = ? ",array($tag));
+			if (!$t) {
+				$t = R::dispense("tag");
+				$t->title = $tag;
+				R::store($t);
+			}
+			R::associate( $bean, $t ); 
+		}
+
+	}
+	
+	
+
 
 }
 
