@@ -43,10 +43,13 @@ class RedBean_OODBBean implements IteratorAggregate {
 	 * Imports data into bean
 	 * @param array $array
 	 * @param mixed $selection
+	 * @param boolean $notrim
 	 * @return RedBean_OODBBean $this
 	 */
-	public function import( $arr, $selection=false ) {
+	public function import( $arr, $selection=false, $notrim=false ) {
 		if (is_string($selection)) $selection = explode(",",$selection);
+		//trim whitespaces
+		if (!$notrim && is_array($selection)) foreach($selection as $k=>$s){ $selection[$k]=trim($s); }
 		foreach($arr as $k=>$v) {
 			if ($k != "__info") {
 				if (!$selection || ($selection && in_array($k,$selection))) {

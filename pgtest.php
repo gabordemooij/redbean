@@ -60,6 +60,7 @@ function testpack($name) {
 
 //INCLUDE YOUR REDBEAN FILE HERE!
 require("rb.php");
+//require("RedBean/redbean.inc.php");
 $toolbox = RedBean_Setup::kickstartDev( "pgsql:host=localhost dbname=oodb","postgres", file_get_contents('pass.txt') );
 
 //Observable Mock Object
