@@ -2121,6 +2121,7 @@ testpack("Ext Assoc with facade and findRelated");
 //R::setup("sqlite:/Users/prive/blaataap.db");
 R::exec("DROP TABLE IF EXISTS track");
 R::exec("DROP TABLE IF EXISTS cd");
+R::exec("DROP TABLE IF EXISTS performer");
 R::exec("DROP TABLE IF EXISTS cd_track");
 $cd = R::dispense("cd");
 $cd->title = "Midnight Jazzfest";
@@ -2152,6 +2153,18 @@ $track = R::dispense("track");
 $track->title = "test";
 R::associate($track,$cd,"this column should be named extra");
 asrt( R::getCell("SELECT count(*) FROM cd_track WHERE extra = 'this column should be named extra' "),"1");
+$composer = R::dispense("performer");
+$composer->name = "Miles Davis";
+R::store($composer);
+R::link($track, $composer);
+R::store($track);
+R::link($track2, $composer);
+R::store($track2);
+$beans = R::findLinks($composer,"track");
+asrt(count($beans),2);
+$bean = reset($beans);
+asrt($bean->getMeta("type"),"track");
+
 
 testpack("Test Table Prefixes");
 R::setup("mysql:host=localhost;dbname=oodb","root","");

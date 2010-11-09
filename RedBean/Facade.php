@@ -319,8 +319,22 @@ class R {
 	 * @param array $values
 	 * @return array $beans
 	 */
-	public static function findRelated( RedBean_OODBBean $bean, $type, $sql, $values=array()  ) {
+	public static function findRelated( RedBean_OODBBean $bean, $type, $sql=" id IN (:keys) ", $values=array()  ) {
 		$keys = self::$associationManager->related($bean,$type);
+		$sql=str_replace(":keys",implode(",",$keys),$sql);
+		return self::find($type,$sql,$values);
+	}
+
+	/**
+	 * Convenience Method
+	 * @param RedBean_OODBBean $bean
+	 * @param string $type
+	 * @param string $sql
+	 * @param array $values
+	 * @return array $beans
+	 */
+	public static function findLinks( RedBean_OODBBean $bean, $type, $sql=" id IN (:keys) ", $values=array() ) {
+		$keys = self::$linkManager->getKeys($bean,$type);
 		$sql=str_replace(":keys",implode(",",$keys),$sql);
 		return self::find($type,$sql,$values);
 	}
