@@ -1775,6 +1775,7 @@ asrt(in_array("hack",$adapter->getCol("show tables")),true);
 //$bean = $redbean->load("page","13);show tables; ");
 //exit;
 
+
 testpack("Test ANSI92 issue in clearrelations");
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");
@@ -2058,6 +2059,51 @@ asrt($cgr->getTaste("tabacco"),"smokey like tabacco");
 
 testpack("copy()");
 R::setup("mysql:host=localhost;dbname=oodb","root","");
+
+
+
+
+
+
+testpack("N:X relationships");
+
+$pdo->Execute("DROP TABLE IF EXISTS address");
+
+$person = R::dispense('person');
+$person->name = 'bill';
+R::store($person);
+
+$homeAddress = R::dispense('address');
+$homeAddress->street = '123 Street St';
+$homeAddress->city = 'Cityville';
+$homeAddress->postcode = '12345';
+
+$postalAddress = R::dispense('address');
+$postalAddress->street = '456 Road Rd';
+$postalAddress->city = 'Cityville';
+$postalAddress->postcode = '12345';
+
+R::store($homeAddress);
+R::store($postalAddress);
+
+R::link($person, $homeAddress, 'home');
+R::link($person, $postalAddress, 'postal');
+
+
+unset($homeAddress);
+unset($postalAddress);
+
+$homeAddress = R::getBean($person, 'address', 'home');
+$postalAddress = R::getBean($person, 'address', 'postal');
+
+asrt($homeAddress->street,'123 Street St');
+asrt($postalAddress->street,'456 Road Rd');
+
+
+
+
+
+
 $book = R::dispense("book");
 $book->title = "not so original title";
 $author = R::dispense("author");
@@ -2303,7 +2349,6 @@ fail();
 asrt(R::tag($blog),"smart,interesting");
 R::tag($blog, false);
 asrt(R::tag($blog),"");
-
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

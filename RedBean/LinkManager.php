@@ -54,35 +54,36 @@ class RedBean_LinkManager extends RedBean_CompatManager {
 	 * @param string $typeName
 	 * @return string $fieldName
 	 */
-	public function getLinkField( $typeName ) {
+	public function getLinkField( $typeName, $name = null ) {
 		$fieldName = strtolower( $typeName )."_id";
+		if ($name !== null) {
+			$fieldName = "{$name}_$fieldName";
+		}
 		$fieldName = preg_replace( "/\W/","", $fieldName );
 		return $fieldName;
 	}
-
 	/**
 	 * Adds a reference to bean2 in bean1.
 	 * @param RedBean_OODBBean $bean1
 	 * @param RedBean_OODBBean $bean2
 	 */
-	public function link(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+	public function link(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $name = null) {
 		if (!$bean2->id) {
-			//Not saved, then we have no ID, so first save!
+
 			$this->oodb->store( $bean2 );
 		}
-		$fieldName = $this->getLinkField( $bean2->getMeta("type") );
+		$fieldName = $this->getLinkField( $bean2->getMeta("type"), $name);
 		$bean1->$fieldName = $bean2->id;
 		return $this;
 	}
-
 	/**
 	 * Returns a linked bean.
 	 * @param RedBean_OODBBean $bean
 	 * @param string $typeName
 	 * @return RedBean_OODBBean $bean
 	 */
-	public function getBean( RedBean_OODBBean $bean, $typeName ) {
-		$fieldName = $this->getLinkField($typeName);
+	public function getBean( RedBean_OODBBean $bean, $typeName, $name = null) {
+		$fieldName = $this->getLinkField($typeName, $name);
 		$id = (int)$bean->$fieldName;
 		if ($id) {
 			return $this->oodb->load($typeName, $id);
@@ -91,29 +92,27 @@ class RedBean_LinkManager extends RedBean_CompatManager {
 			return $this->oodb->dispense($typeName);
 		}
 	}
-
 	/**
 	 * Removes a linked bean.
 	 * @param RedBean_OODBBean $bean
 	 * @param string $typeName
 	 */
-	public function breakLink( RedBean_OODBBean $bean, $typeName ) {
-		$fieldName = $this->getLinkField($typeName);
+	public function breakLink( RedBean_OODBBean $bean, $typeName, $name = null) {
+		$fieldName = $this->getLinkField($typeName, $name);
 		$bean->$fieldName = NULL;
 	}
-
-
 	/**
 	 * Returns a linked bean ID.
 	 * @param RedBean_OODBBean $bean
 	 * @param string $typeName
 	 * @return RedBean_OODB $bean
 	 */
-	public function getKey(RedBean_OODBBean $bean, $typeName) {
-		$fieldName = $this->getLinkField($typeName);
+	public function getKey(RedBean_OODBBean $bean, $typeName, $name = null) {
+		$fieldName = $this->getLinkField($typeName, $name);
 		$id = (int)$bean->$fieldName;
 		return $id;
 	}
+
 
 
 	/**

@@ -244,37 +244,34 @@ class R {
 	 * @param RedBean_OODBBean $bean2
 	 * @return mixed
 	 */
-	public static function link( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
-		return self::$linkManager->link( $bean1, $bean2 );
+	public static function link( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $name = null ) {
+		return self::$linkManager->link( $bean1, $bean2, $name );
 	}
-
 	/**
 	 *
 	 * @param RedBean_OODBBean $bean
 	 * @param string $typeName
 	 * @return mixed
 	 */
-	public static function getBean( RedBean_OODBBean $bean, $typeName ) {
-		return self::$linkManager->getBean($bean, $typeName );
+	public static function getBean( RedBean_OODBBean $bean, $typeName, $name = null ) {
+		return self::$linkManager->getBean($bean, $typeName, $name );
 	}
-
 	/**
 	 *
 	 * @param RedBean_OODBBean $bean
 	 * @param string $typeName
 	 * @return mixed
 	 */
-	public static function getKey( RedBean_OODBBean $bean, $typeName ) {
-		return self::$linkManager->getKey($bean, $typeName );
+	public static function getKey( RedBean_OODBBean $bean, $typeName, $name = null ) {
+		return self::$linkManager->getKey($bean, $typeName, $name );
 	}
-
 	/**
 	 *
 	 * @param RedBean_OODBBean $bean
 	 * @param mixed $typeName
 	 */
-	public static function breakLink( RedBean_OODBBean $bean, $typeName ) {
-		return self::$linkManager->breakLink( $bean, $typeName );
+	public static function breakLink( RedBean_OODBBean $bean, $typeName, $name = null ) {
+		return self::$linkManager->breakLink( $bean, $typeName, $name );
 	}
 
 	/**
