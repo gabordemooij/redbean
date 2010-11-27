@@ -96,10 +96,20 @@ class RedBean_LinkManager extends RedBean_CompatManager {
 	 * Removes a linked bean.
 	 * @param RedBean_OODBBean $bean
 	 * @param string $typeName
+	 * @param string $name optional name of association
 	 */
-	public function breakLink( RedBean_OODBBean $bean, $typeName, $name = null) {
+	public function unlink( RedBean_OODBBean $bean, $typeName, $name = null) {
 		$fieldName = $this->getLinkField($typeName, $name);
 		$bean->$fieldName = NULL;
+	}
+	/**
+	 * Removes a linked bean. Alias of unlink.
+	 * @param RedBean_OODBBean $bean
+	 * @param string $typeName
+	 * @deprecated since 2010.11.27
+	 */
+	public function breakLink( RedBean_OODBBean $bean, $typeName, $name = null) {
+		return $this->unlink($bean, $typeName, $name)
 	}
 	/**
 	 * Returns a linked bean ID.
