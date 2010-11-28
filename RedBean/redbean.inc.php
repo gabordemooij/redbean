@@ -104,9 +104,3 @@ require($dir."ModelHelper.php");
 require($dir."Facade.php");
 require($dir."BeanCan.php");
 
-
-
-
-
-
-
