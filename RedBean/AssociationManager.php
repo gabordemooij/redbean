@@ -53,31 +53,21 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @param array $types
 	 * @return string $table
 	 */
-	public function getTable( $types, $name = null ) {
+	public function getTable( $types ) {
 		sort($types);
-		$tableName = implode("_", $types);
-		if ($name !== null) {
-		  $tableName = "{$name}_$tableName";
-		}
-		return $tableName;
+		return ( implode("_", $types) );
 	}
 	/**
 	 * Associates two beans with eachother.
 	 * @param RedBean_OODBBean $bean1
 	 * @param RedBean_OODBBean $bean2
-	 * @param string $name optional name of relationship
-	 * @param RedBean_OODBBean $baseBean optional bean describing a complex relationship 
 	 */
-	public function associate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $name = null, RedBean_OODBBean $baseBean = null) {
-		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")), $name );
-		if ($baseBean) {
-		  $baseBean->setMeta("type", $table );
-		}
-		else {
-		  $baseBean = $this->oodb->dispense($table);
-	  }
-		return $this->associateBeans( $bean1, $bean2, $baseBean );
+	public function associate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
+		$bean = $this->oodb->dispense($table);
+		return $this->associateBeans( $bean1, $bean2, $bean );
 	}
+
 
 	protected function associateBeans(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean) {
 
@@ -111,8 +101,8 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @param string $type
 	 * @return array $ids
 	 */
-	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $name = null ) {
-		$table = $this->getTable( array($bean->getMeta("type") , $type), $name );
+	public function related( RedBean_OODBBean $bean, $type, $getLinks=false ) {
+		$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		if ($type==$bean->getMeta("type")) {// echo "<b>CROSS</b>";
 			$type .= "2";
@@ -159,10 +149,10 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @param RedBean_OODBBean $bean1
 	 * @param RedBean_OODBBean $bean2
 	 */
-	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $name = null) {
+	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
-		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")), $name );
+		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
 		$idfield1 = $this->writer->getIDField($bean1->getMeta("type"));
 		$idfield2 = $this->writer->getIDField($bean2->getMeta("type"));
 		$type = $bean1->getMeta("type");
@@ -193,9 +183,9 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @param RedBean_OODBBean $bean
 	 * @param string $type
 	 */
-	public function clearRelations(RedBean_OODBBean $bean, $type, $name = null) {
+	public function clearRelations(RedBean_OODBBean $bean, $type) {
 		$this->oodb->store($bean);
-		$table = $this->getTable( array($bean->getMeta("type") , $type), $name );
+		$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		if ($type==$bean->getMeta("type")) {
 			$property2 = $type."2_id";
