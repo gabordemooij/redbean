@@ -72,16 +72,25 @@ class RedBean_Setup {
 	 * RedBean_OODB; the object database. To start storing beans in the database
 	 * simply say: $redbean = $toolbox->getRedBean(); Now you have a reference
 	 * to the RedBean object.
-	 * @param  string $dsn
+	 * Optionally instead of using $dsn you may use an existing PDO connection.
+	 * Example: RedBean_Setup::kickstart($existingConnection, true);
+	 *
+	 * @param  string|PDO $dsn
 	 * @param  string $username
 	 * @param  string $password
 	 * @return RedBean_ToolBox $toolbox
 	 */
-	public static function kickstart( $dsn, $username, $password, $frozen=false ) {
+	public static function kickstart( $dsn, $username=NULL, $password=NULL, $frozen=false ) {
 
-		self::checkDSN($dsn);
+		if ($dsn instanceof PDO) {
+			$pdo = new RedBean_Driver_PDO($dsn);
+			$dsn = $pdo->getDatabaseType() ;
+		}
+		else {
+			self::checkDSN($dsn);
+			$pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
+		}
 
-		$pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
 		$adapter = new RedBean_Adapter_DBAdapter( $pdo );
 
 		if (strpos($dsn,"pgsql")===0) {
