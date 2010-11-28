@@ -1982,6 +1982,7 @@ $book2 = R::dispense("book");
 $book2->title="second";
 R::store($book2);
 R::associate($book,$book2);
+
 asrt(count(R::related($book,"book")),1);
 $book3 = R::dispense("book");
 $book3->title="third";
@@ -2223,7 +2224,7 @@ class MyTableFormatter implements RedBean_IBeanFormatter{
 		return "id";
 	}
 }
-//R::debug(1);
+
 R::$writer->tableFormatter = new MyTableFormatter;
 $pdo->Execute("DROP TABLE IF EXISTS page");
 $pdo->Execute("DROP TABLE IF EXISTS user");
@@ -2334,7 +2335,7 @@ class my_weird_weirdo_model extends RedBean_SimpleModel {
 RedBean_ModelHelper::setModelFormatter(new mymodelformatter);
 $w = R::dispense("weirdo");
 asrt($w->blah(),"yes!");
-
+R::debug(1);
 testpack("Test Tagging");
 R::tag($post,"lousy,smart");
 asrt(R::tag($post),"lousy,smart");
@@ -2349,6 +2350,51 @@ fail();
 asrt(R::tag($blog),"smart,interesting");
 R::tag($blog, false);
 asrt(R::tag($blog),"");
+
+
+testpack("New relations");
+$pdo->Execute("DROP TABLE IF EXISTS person");
+$pdo->Execute("DROP TABLE IF EXISTS person_person");
+R::$writer->tableFormatter = null;
+$track = R::dispense('track');
+$album = R::dispense('cd');
+$track->name = 'a';
+$track->orderNum = 1;
+$track2 = R::dispense('track');
+$track2->orderNum = 2;
+$track2->name = 'b';
+R::associate( $album, $track );
+R::associate( $album, $track2 );
+$tracks = R::related( $album, 'track', ' 1 ORDER BY orderNum ' );
+$track = array_shift($tracks);
+$track2 = array_shift($tracks);
+asrt($track->name,'a');
+asrt($track2->name,'b');
+
+$t = R::dispense('person');
+$s = R::dispense('person');
+$s2 = R::dispense('person');
+$t->name = 'a';
+$t->role = 'teacher';
+$s->role = 'student';
+$s2->role = 'student';
+$s->name = 'a';
+$s2->name = 'b';
+R::associate($t, $s);
+R::associate($t, $s2);
+$students = R::related($t, 'person', ' role = "student"  ORDER BY `name` ');
+$s = array_shift($students);
+$s2 = array_shift($students);
+asrt($s->name,'a');
+asrt($s2->name,'b');
+$s= R::relatedOne($t, 'person', ' role = "student"  ORDER BY `name` ');
+asrt($s->name,'a');
+//empty classroom
+R::clearRelations($t, 'person', $s2);
+$students = R::related($t, 'person', ' role = "student"  ORDER BY `name` ');
+asrt(count($students),1);
+$s = reset($students);
+asrt($s->name, 'b');
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
