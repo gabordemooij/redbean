@@ -170,6 +170,8 @@ class R {
 		return ($id ? R::load($type,(int)$id) : R::dispense($type));
 	}
 
+
+
 	/**
 	 * Associates two Beans.
 	 * @param RedBean_OODBBean $bean1
@@ -198,6 +200,7 @@ class R {
 		
 	}
 
+	
 	/**
 	 * Breaks the association between two beans.
 	 * @param RedBean_OODBBean $bean1
@@ -214,9 +217,24 @@ class R {
 	 * @param string $type
 	 * @return array $beans
 	 */
-	public static function related( RedBean_OODBBean $bean, $type ) {
-		return self::$redbean->batch( $type, self::$associationManager->related( $bean, $type ));
+	public static function related( RedBean_OODBBean $bean, $type, $sql = '1' ) {
+		//return self::$redbean->batch( $type, self::$associationManager->related( $bean, $type ));
+		$keys = self::$associationManager->related( $bean, $type );
+		if (count($keys)==0) return array();
+		if (!$sql || $sql=="1") return self::batch($type, $keys);
+		$idfield = self::$writer->getIDField( $type );
+		return self::find($type,
+				  " $idfield IN ( ".implode(",",$keys)." ) AND ".$sql);
 	}
+
+	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql='1' ) {
+		$beans = self::related($bean, $type, $sql);
+		if (count($beans)==0) return array();
+		return reset( $beans );
+	}
+
+
+
 
 	/**
 	 * Clears all associated beans.
@@ -224,8 +242,13 @@ class R {
 	 * @param string $type
 	 * @return mixed
 	 */
-	public static function clearRelations( RedBean_OODBBean $bean, $type ) {
-		return self::$associationManager->clearRelations( $bean, $type );
+	public static function clearRelations( RedBean_OODBBean $bean, $type, RedBean_OODBBean $bean2 = null, $extra = null ) {
+		$r = self::$associationManager->clearRelations( $bean, $type );
+		if ($bean2) {
+			self::associate($bean, $bean2, $extra);
+		}
+		return $r;
+
 	}
 
 	/**
