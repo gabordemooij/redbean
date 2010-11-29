@@ -17,6 +17,7 @@
  * @license			BSD
  */
 
+$ini = parse_ini_file("test.ini", true);
 
 /**
  * A simple print function that works
@@ -78,16 +79,26 @@ require("rb.php");
 
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
+
 //Test whether a non mysql DSN throws an exception
 try {
-	RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root","");
+	RedBean_Setup::kickstart(
+	  "blackhole:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}",
+	  $ini['mysql']['user'],
+	  $ini['mysql']['pass']
+  );
 	fail();
 }catch(RedBean_Exception_NotImplemented $e) {
 	pass();
 }
 
 
-$toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
+// $toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
+$toolbox = RedBean_Setup::kickstartDev(
+  "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}",
+  $ini['mysql']['user'],
+  $ini['mysql']['pass']
+);
 
 /**
  * Observable Mock
@@ -2059,7 +2070,11 @@ asrt(Model_Cigar::$reachedAfterUpdate,TRUE);
 asrt($cgr->getTaste("tabacco"),"smokey like tabacco");
 
 testpack("copy()");
-R::setup("mysql:host=localhost;dbname=oodb","root","");
+R::setup(
+  "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}",
+  $ini['mysql']['user'],
+  $ini['mysql']['pass']
+);
 
 
 
@@ -2214,7 +2229,11 @@ asrt($bean->getMeta("type"),"track");
 
 
 testpack("Test Table Prefixes");
-R::setup("mysql:host=localhost;dbname=oodb","root","");
+R::setup(
+  "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}",
+  $ini['mysql']['user'],
+  $ini['mysql']['pass']
+);
 
 class MyTableFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {

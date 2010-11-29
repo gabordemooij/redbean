@@ -16,6 +16,8 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
+ 
+$ini = parse_ini_file("test.ini", true);
 
 /**
  * A simple print function that works
@@ -78,16 +80,18 @@ require("rb.php");
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
 //Test whether a non mysql DSN throws an exception
+/*
 try {
 	RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root","");
 	fail();
 }catch(RedBean_Exception_NotImplemented $e) {
 	pass();
 }
+*/
 
 //Test whether we can setup a connection
 //$toolbox = RedBean_Setup::kickstartDevL( "sqlite:/Applications/XAMPP/xamppfiles/temp/base.txt" );
-$toolbox = RedBean_Setup::kickstartDevL( "sqlite:/Users/prive/bla.db" );
+$toolbox = RedBean_Setup::kickstartDevL( "sqlite:{$ini['sqlite']['file']}" );
 //prepare... empty the database
 foreach( $toolbox->getWriter()->getTables() as $table ) {
 	$sql = "DROP TABLE `".$table."`";
@@ -1267,7 +1271,7 @@ pass();
 
 
 testpack("Test Table Prefixes");
-R::setup("sqlite:bla.txt");
+R::setup("sqlite:{$ini['sqlite']['file']}");
 
 class MyTableFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {
