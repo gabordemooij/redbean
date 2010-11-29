@@ -169,7 +169,7 @@ abstract class RedBean_AQueryWriter {
 	 * @param integer $id
 	 */
 	public function updateRecord( $table, $updatevalues, $id) {
-		$idfield = $this->getIDField($table);
+		$idfield = $this->getIDField($table, true);
 		$table = $this->safeTable($table);
 		$sql = "UPDATE $table SET ";
 		$p = $v = array();
@@ -192,7 +192,7 @@ abstract class RedBean_AQueryWriter {
 	 */
 	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
 		$default = $this->defaultValue;
-		$idfield = $this->getIDField($table);
+		$idfield = $this->getIDField($table, true);
 		$suffix = $this->getInsertSuffix($table);
 		$table = $this->safeTable($table);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
@@ -223,7 +223,7 @@ abstract class RedBean_AQueryWriter {
 	 * @return array $row
 	 */
 	public function selectRecord($type, $ids) {
-		$idfield = $this->getIDField($type);
+		$idfield = $this->getIDField($type, true);
 		$table = $this->safeTable($type);
 		$sql = "SELECT * FROM $table WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);
@@ -239,7 +239,7 @@ abstract class RedBean_AQueryWriter {
 	 * @todo validate arguments for security
 	 */
 	public function deleteRecord($table, $value) {
-		$column = $this->getIDField($table);
+		$column = $this->getIDField($table, true);
 		$table = $this->safeTable($table);
 		
 		$this->adapter->exec("DELETE FROM $table WHERE $column = ? ",array(strval($value)));
