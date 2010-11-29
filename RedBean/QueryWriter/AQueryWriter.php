@@ -21,12 +21,7 @@ abstract class RedBean_AQueryWriter {
 
 	public $tableFormatter;
   
-	/**
-	 * @var string
-	 * character to escape keyword table/column names
-	 */
-  protected $quoteCharacter = '';
-
+  
 	/**
 	 * @var array
 	 * Supported Column Types
@@ -44,7 +39,50 @@ abstract class RedBean_AQueryWriter {
 	 * default is 'id'
 	 * @var string
 	 */
-	// protected $idfield = "id";
+  protected $idfield = "id";
+
+	/**
+	 * @var string default value to for blank field (passed to PK for auto-increment)
+	 */
+  protected $defaultValue = 'NULL';
+  
+	/**
+	 * @var string
+	 * character to escape keyword table/column names
+	 */
+  protected $quoteCharacter = '';
+	
+	/**
+	 * Do everything that needs to be done to format a table name
+	 * @param string $name of table
+	 * @return string table name
+	 */
+	public function safeTable($name) {
+		$name = $this->getFormattedTableName($name);
+		$name = $this->check($name);
+		$name = $this->noKW($name);
+		return $name;
+	}
+	
+	/**
+	 * Do everything that needs to be done to format a column name
+	 * @param string $name of column
+	 * @return string column name
+	 */
+	public function safeColumn($name) {
+		$name = $this->check($name);
+		$name = $this->noKW($name);
+		return $name;
+	}
+	
+	/**
+	 * Returns the sql that should follow an insert statement.
+	 * @param string $table name
+	 * @return string sql
+	 */
+  protected function getInsertSuffix ($table) {
+    return "";
+  }
 	
 	/**
 	 * Returns the string identifying a table for a given type.
@@ -55,7 +93,6 @@ abstract class RedBean_AQueryWriter {
 		if ($this->tableFormatter) return $this->tableFormatter->formatBeanTable($type);
 		return $type;
 	}
-
 
 	/**
 	 * Sets the Bean Formatter to be used to handle
@@ -73,16 +110,9 @@ abstract class RedBean_AQueryWriter {
 	 * @param int $type constant
 	 * @return string sql type
 	 */
-	public function getFieldType( $type = null ) {
-		if (array_key_exists($type, $this->typeno_sqltype)) { 
-		  return $this->typeno_sqltype[$type];
-	  }
-	  else {
-	    return "";
-	  }
+	public function getFieldType( $type = "" ) {
+		return array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : "";
 	}
-
-  protected $idfield = "id";
 
 	/**
 	 * Returns the column name that should be used
@@ -101,15 +131,22 @@ abstract class RedBean_AQueryWriter {
 	 * @return string $table
 	 */
 	public function check($table) {
-		if (strpos($table,"`")!==false) throw new Redbean_Exception_Security("Illegal chars in table name");
+		// if (strpos($table, '`')!==false || strpos($table, '"')!==false) { // maybe this?
+		if ($this->quoteCharacter && strpos($table, $this->quoteCharacter)!==false) {
+		  throw new Redbean_Exception_Security("Illegal chars in table name");
+    }
 		return $this->adapter->escape($table);
 	}
 	
-// 	getTables()
-// 	createTable()
-// 	getColumns()
-//  scanType()
-	
+	/**
+	 * Puts keyword escaping symbols around string.
+	 * @param string $str
+	 * @return string $keywordSafeString
+	 */
+	public function noKW($str) {
+		$q = $this->quoteCharacter;
+		return $q.$str.$q;
+	}
 	
 	/**
 	 * Adds a column of a given type to a table.
@@ -118,17 +155,12 @@ abstract class RedBean_AQueryWriter {
 	 * @param integer $type
 	 */
 	public function addColumn( $table, $column, $type ) {
-		$q = $this->quoteCharacter;
-		$table = $this->getFormattedTableName($table);
-		$column = $this->check($column);
-		$table = $this->check($table);
+		$table = $this->safeTable($table);
+		$column = $this->safeColumn($column);
 		$type = $this->getFieldType($type);
-		$sql = "ALTER TABLE {$q}$table{$q} ADD {$q}$column{$q} $type ";
+		$sql = "ALTER TABLE $table ADD $column $type ";
 		$this->adapter->exec( $sql );
 	}
-	
-	// code()
-	// widenColumn()
 	
 	/**
 	 * Update a record using a series of update values.
@@ -137,25 +169,18 @@ abstract class RedBean_AQueryWriter {
 	 * @param integer $id
 	 */
 	public function updateRecord( $table, $updatevalues, $id) {
-		$q = $this->quoteCharacter;
 		$idfield = $this->getIDField($table);
-		$table = $this->getFormattedTableName($table);
-		$sql = "UPDATE ".$q.$this->adapter->escape($this->check($table)).$q." SET ";
+		$table = $this->safeTable($table);
+		$sql = "UPDATE $table SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
-			$p[] = " ".$q.$uv["property"].$q." = ? ";
+			$p[] = " {$this->safeColumn($uv["property"])} = ? ";
 			//$v[]=strval( $uv["value"] );
 			$v[]=$uv["value"];
 		}
 		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
 		$this->adapter->exec( $sql, $v );
 	}
-  
-  protected $defaultValue = 'NULL';
-
-  protected function getInsertSuffix ($table) {
-    return "";
-  }  
 
 	/**
 	 * Inserts a record into the database using a series of insert columns
@@ -166,19 +191,16 @@ abstract class RedBean_AQueryWriter {
 	 * @return integer $insertid
 	 */
 	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
-		$q = $this->quoteCharacter;
 		$default = $this->defaultValue;
 		$idfield = $this->getIDField($table);
 		$suffix = $this->getInsertSuffix($table);
-		$table = $this->getFormattedTableName($table);
-		$table = $this->check($table);
-		$table = $q.$table.$q;
+		$table = $this->safeTable($table);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k=>$v) {
-				$insertcolumns[$k] = $q.$this->check($v).$q;
+				$insertcolumns[$k] = $this->safeColumn($v);
 			}
 			$insertSQL = "INSERT INTO $table ( $idfield, ".implode(",",$insertcolumns)." ) VALUES ";
-			$insertSQL .= "( $default, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) ".$suffix;
+			$insertSQL .= "( $default, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) $suffix";
 			$first=true;
 			
 			foreach($insertvalues as $i=>$insertvalue) {
@@ -187,7 +209,7 @@ abstract class RedBean_AQueryWriter {
 			$result = count($ids)===1 ? array_pop($ids) : $ids;
 		}
 		else {
-			$result = $this->adapter->getCell( "INSERT INTO $table ($idfield) VALUES($default) ".$suffix );
+			$result = $this->adapter->getCell( "INSERT INTO $table ($idfield) VALUES($default) $suffix");
 		}
 		if ($suffix) return $result;
 	  $last_id = $this->adapter->getInsertID();
@@ -201,11 +223,9 @@ abstract class RedBean_AQueryWriter {
 	 * @return array $row
 	 */
 	public function selectRecord($type, $ids) {
-		$q = $this->quoteCharacter;
 		$idfield = $this->getIDField($type);
-		$type = $this->getFormattedTableName($type);
-		$type=$this->check($type);
-		$sql = "SELECT * FROM {$q}$type{$q} WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
+		$table = $this->safeTable($type);
+		$sql = "SELECT * FROM $table WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
 		$rows = $this->adapter->get($sql,$ids);
 		return ($rows && is_array($rows) && count($rows)>0) ? $rows : NULL;
 	}
@@ -219,17 +239,12 @@ abstract class RedBean_AQueryWriter {
 	 * @todo validate arguments for security
 	 */
 	public function deleteRecord($table, $value) {
-		$q = $this->quoteCharacter;
 		$column = $this->getIDField($table);
-		$table = $this->getFormattedTableName($table);
-		$table = $this->check($table);
+		$table = $this->safeTable($table);
 		
-		$this->adapter->exec("DELETE FROM {$q}$table{$q} WHERE {$q}$column{$q} = ? ",array(strval($value)));
+		$this->adapter->exec("DELETE FROM $table WHERE $column = ? ",array(strval($value)));
 	}
 	
-	// addUniqueIndex()
-	
-
 	/**
 	 * Selects a record using a criterium.
 	 * Specify the select-column, the target table, the criterium column
@@ -248,10 +263,9 @@ abstract class RedBean_AQueryWriter {
 	 * @return array $mixedColumns
 	 */
 	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
-		$table = $this->getFormattedTableName($table);
-		$select = $this->noKW($this->adapter->escape($select));
-		$table = $this->noKW($this->adapter->escape($table));
-		$column = $this->noKW($this->adapter->escape($column));
+		$table = $this->safeTable($table);
+		$select = $this->safeColumn($select);
+		$column = $this->safeColumn($column);
 		$value = $this->adapter->escape($value);
 		$sql = "SELECT $select FROM $table WHERE $column = ? ";
 		$values = array($value);
@@ -271,26 +285,14 @@ abstract class RedBean_AQueryWriter {
 	 * @return integer $affectedRows
 	 */
 	public function deleteByCrit( $table, $crits ) {
-		$table = $this->getFormattedTableName($table);
-		$table = $this->noKW($this->adapter->escape($table));
+		$table = $this->safeTable($table);
 		$values = array();
 		foreach($crits as $key=>$val) {
-			$key = $this->noKW($this->adapter->escape($key));
 			$values[] = $this->adapter->escape($val);
-			$conditions[] = $key ."= ? ";
+			$conditions[] = $this->safeColumn($key) ."= ? ";
 		}
 		$sql = "DELETE FROM $table WHERE ".implode(" AND ", $conditions);
 		return (int) $this->adapter->exec($sql, $values);
-	}
-	
-	/**
-	 * Puts keyword escaping symbols around string.
-	 * @param string $str
-	 * @return string $keywordSafeString
-	 */
-	public function noKW($str) {
-		$q = $this->quoteCharacter;
-		return $q.$str.$q;
 	}
 	
 }
