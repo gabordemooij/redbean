@@ -181,8 +181,6 @@ abstract class RedBean_AQueryWriter {
 			$insertSQL .= "( $default, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) ".$suffix;
 			$first=true;
 			
-			echo ".....\n$insertSQL\n.....";
-			
 			foreach($insertvalues as $i=>$insertvalue) {
 				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue, $i );
 			}
