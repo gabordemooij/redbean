@@ -80,19 +80,31 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 	/**
-	 * Constructor.
-	 * @param $dsn
-	 * @param $user
-	 * @param $pass
-	 * @return unknown_type
+	 * Constructor. You may either specify dsn, user and password or
+	 * just give an existing PDO connection.
+	 * Examples:
+	 *    $driver = new RedBean_Driver_PDO($dsn, $user, $password);
+	 *    $driver = new RedBean_Driver_PDO($existingConnection);
+	 *
+	 * @param string|PDO  $dsn
+	 * @param string      $user optional
+	 * @param string      $pass optional
+	 * @return void
 	 */
-	public function __construct($dsn, $user, $pass) {
-		$this->dsn = $dsn;
-		$this->connectInfo = array( "pass"=>$pass, "user"=>$user );
+	public function __construct($dsn, $user = NULL, $pass = NULL) {
 
-
-
-
+		if ($dsn instanceof PDO) {
+			$this->pdo = $dsn;
+			$this->isConnected = true;
+			$this->pdo->setAttribute(1002, 'SET NAMES utf8');
+			$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+			// make sure that the dsn at least contains the type
+			$this->dsn = $this->getDatabaseType();
+		} else {
+			$this->dsn = $dsn;
+			$this->connectInfo = array( "pass"=>$pass, "user"=>$user );
+		}
 	}
 
 	public function connect() {
