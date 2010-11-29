@@ -71,6 +71,11 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_AQueryWriter implements Red
 	 */
   protected $quoteCharacter = '"';
 
+  protected $defaultValue = 'DEFAULT';
+	 
+  protected function getInsertSuffix($table) {
+    return "RETURNING ".$this->getIDField($table);
+  }  
 
 	/**
 	 * Constructor
@@ -96,13 +101,8 @@ where table_schema = 'public'" );
 	 */
 	public function createTable( $table ) {
 		$idfield = $this->getIDfield($table);
-		$table = $this->getFormattedTableName($table);
-		$table = $this->check($table);
-		$sql = "
-                     CREATE TABLE \"$table\" (
-						$idfield SERIAL PRIMARY KEY
-                     );
-				  ";
+		$table = $this->safeTable($table);
+		$sql = " CREATE TABLE $table ($idfield SERIAL PRIMARY KEY); ";
 		$this->adapter->exec( $sql );
 	}
 
@@ -112,11 +112,8 @@ where table_schema = 'public'" );
 	 * @return array $columns
 	 */
 	public function getColumns( $table ) {
-		$table = $this->getFormattedTableName($table);
-		$table = $this->check($table);
+		$table = $this->safeTable($table, true);
 		$columnsRaw = $this->adapter->get("select column_name, data_type from information_schema.columns where table_name='$table'");
-
-
 		foreach($columnsRaw as $r) {
 			$columns[$r["column_name"]]=$r["data_type"];
 		}
@@ -141,7 +138,6 @@ where table_schema = 'public'" );
 		}
 	}
 
-
 	/**
 	 * Returns the Type Code for a Column Description
 	 * @param string $typedescription
@@ -158,32 +154,16 @@ where table_schema = 'public'" );
 	 * @param integer $type
 	 */
 	public function widenColumn( $table, $column, $type ) {
-		$table = $this->getFormattedTableName($table);
-		$column = $this->check($column);
-		$table = $this->check($table);
+		$table = $this->safeTable($table);
+		$column = $this->safeColumn($column);
 		$newtype = $this->typeno_sqltype[$type];
-		$changecolumnSQL = "ALTER TABLE \"$table\" \n\t ALTER COLUMN $column TYPE $newtype ";
+		$changecolumnSQL = "ALTER TABLE $table \n\t ALTER COLUMN $column TYPE $newtype ";
 		try {
 			$this->adapter->exec( $changecolumnSQL );
 		}catch(Exception $e) {
 			die($e->getMessage());
 		}
 	}
-
-	/**
-	 * Inserts a record into the database using a series of insert columns
-	 * and corresponding insertvalues. Returns the insert id.
-	 * @param string $table
-	 * @param array $insertcolumns
-	 * @param array $insertvalues
-	 * @return integer $insertid
-	 */
-	 
-  protected $defaultValue = 'DEFAULT';
-	 
-  protected function getInsertSuffix($table) {
-    return "RETURNING ".$this->getIDField($table);
-  }  
 
 	/**
 	 * Gets information about changed records using a type and id and a logid.
@@ -201,12 +181,12 @@ where table_schema = 'public'" );
 	 */
 	public function checkChanges($type, $id, $logid) {
 
-		$type = $this->check($type);
+		$table = $this->safeTable($type);
 		$idfield = $this->getIDfield($type);
 		$id = (int) $id;
 		$logid = (int) $logid;
 		$num = $this->adapter->getCell("
-        SELECT count(*) FROM __log WHERE tbl=\"$type\" AND itemid=$id AND action=2 AND $idfield > $logid");
+        SELECT count(*) FROM __log WHERE tbl=$table AND itemid=$id AND action=2 AND $idfield > $logid");
 		if ($num) {
 			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)");
 		}
@@ -226,12 +206,11 @@ where table_schema = 'public'" );
 	 * @return void
 	 */
 	public function addUniqueIndex( $table,$columns ) {
-		$table = $this->getFormattedTableName($table);
+		$table = $this->safeTable($table, true);
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach($columns as $k=>$v) {
-			$columns[$k]="".$this->adapter->escape($v)."";
+			$columns[$k]=$this->safeColumn($v);
 		}
-		$table = $this->adapter->escape( $this->check($table) );
 		$r = $this->adapter->get("SELECT
 									i.relname as index_name
 								FROM

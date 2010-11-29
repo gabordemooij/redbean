@@ -48,12 +48,10 @@ class RedBean_QueryWriter_SQLite extends RedBean_AQueryWriter implements RedBean
 	 * @param string $table
 	 */
 	public function createTable( $table ) {
-		$idfield = $this->getIDfield($table);
-		$table = $this->getFormattedTableName($table);
-		
-		$table = $this->check($table);
+		$idfield = $this->getIDfield($table, true);
+		$table = $this->safeTable($table);
 		$sql = "
-                     CREATE TABLE `$table` ( `$idfield` INTEGER PRIMARY KEY AUTOINCREMENT )
+                     CREATE TABLE $table ( $idfield INTEGER PRIMARY KEY AUTOINCREMENT )
 				  ";
 		$this->adapter->exec( $sql );
 	}
@@ -64,8 +62,7 @@ class RedBean_QueryWriter_SQLite extends RedBean_AQueryWriter implements RedBean
 	 * @return array $columns
 	 */
 	public function getColumns( $table ) {
-		$table = $this->getFormattedTableName($table);
-		$table = $this->check($table);
+		$table = $this->safeTable($table, true);
 		$columnsRaw = $this->adapter->get("PRAGMA table_info('$table')");
 		$columns = array();
 		foreach($columnsRaw as $r) {
@@ -111,7 +108,7 @@ class RedBean_QueryWriter_SQLite extends RedBean_AQueryWriter implements RedBean
 	 * @return void
 	 */
 	public function addUniqueIndex( $table,$columns ) {
-		$table = $this->getFormattedTableName($table);
+		$table = $this->safeTable($table);
 		$name = "UQ_".sha1(implode(',',$columns));
 		$sql = "CREATE UNIQUE INDEX IF NOT EXISTS $name ON $table (".implode(",",$columns).")";
 		$this->adapter->exec($sql);

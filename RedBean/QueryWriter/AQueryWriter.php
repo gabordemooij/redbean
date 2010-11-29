@@ -57,10 +57,10 @@ abstract class RedBean_AQueryWriter {
 	 * @param string $name of table
 	 * @return string table name
 	 */
-	public function safeTable($name) {
+	public function safeTable($name, $noQuotes = false) {
 		$name = $this->getFormattedTableName($name);
 		$name = $this->check($name);
-		$name = $this->noKW($name);
+		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
 	}
 	
@@ -69,9 +69,9 @@ abstract class RedBean_AQueryWriter {
 	 * @param string $name of column
 	 * @return string column name
 	 */
-	public function safeColumn($name) {
+	public function safeColumn($name, $noQuotes = false) {
 		$name = $this->check($name);
-		$name = $this->noKW($name);
+		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
 	}
 	
@@ -120,9 +120,9 @@ abstract class RedBean_AQueryWriter {
 	 * @param string $type
 	 * @return string $idfieldtobeused
 	 */
-	public function getIDField( $type ) {
+	public function getIDField( $type, $safe = null ) {
 		if ($this->tableFormatter) return $this->tableFormatter->formatBeanID($type);
-		return $this->idfield;
+		return $safe ? $this->safeColumn($this->idfield) : $this->idfield;
 	}
 	
 	/**

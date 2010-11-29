@@ -151,13 +151,12 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 	 * @param string $table
 	 */
 	public function createTable( $table ) {
-		$idfield = $this->getIDfield($table);
-		$table = $this->getFormattedTableName($table);
-		$table = $this->check($table);
+		$idfield = $this->getIDfield($table, true);
+		$table = $this->safeTable($table);
 		$sql = "
-                     CREATE TABLE `$table` (
-                    `$idfield` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-                     PRIMARY KEY ( `$idfield` )
+                     CREATE TABLE $table (
+                    $idfield INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+                     PRIMARY KEY ( $idfield )
                      ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 				  ";
 		$this->adapter->exec( $sql );
@@ -169,9 +168,8 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 	 * @return array $columns
 	 */
 	public function getColumns( $table ) {
-		$table = $this->getFormattedTableName($table);
-		$table = $this->check($table);
-		$columnsRaw = $this->adapter->get("DESCRIBE `$table`");
+		$table = $this->safeTable($table);
+		$columnsRaw = $this->adapter->get("DESCRIBE $table");
 		foreach($columnsRaw as $r) {
 			$columns[$r["Field"]]=$r["Type"];
 		}
@@ -225,11 +223,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 	 * @param integer $type
 	 */
 	public function widenColumn( $table, $column, $type ) {
-		$table = $this->getFormattedTableName($table);
-		$column = $this->check($column);
-		$table = $this->check($table);
-		$newtype = $this->typeno_sqltype[$type];
-		$changecolumnSQL = "ALTER TABLE `$table` CHANGE `$column` `$column` $newtype ";
+		$table = $this->safeTable($table);
+		$column = $this->safeColumn($column);
+		$newtype = $this->getFieldType($type);
+		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
 		$this->adapter->exec( $changecolumnSQL );
 	}
 
@@ -241,23 +238,22 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 	 * @return void
 	 */
 	public function addUniqueIndex( $table,$columns ) {
-		$table = $this->getFormattedTableName($table);
+		$table = $this->safeTable($table);
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach($columns as $k=>$v) {
-			$columns[$k]="`".$this->adapter->escape($v)."`";
+			$columns[$k]= $this->safeColumn($v);
 		}
-		$table = $this->check($table);
-		$r = $this->adapter->get("SHOW INDEX FROM `$table`");
+		$r = $this->adapter->get("SHOW INDEX FROM $table");
 		$name = "UQ_".sha1(implode(',',$columns));
 		if ($r) {
 			foreach($r as $i) {
-				if ($i["Key_name"]==$name) {
+				if ($i["Key_name"]== $name) {
 					return;
 				}
 			}
 		}
-		$sql = "ALTER IGNORE TABLE `$table`
-                ADD UNIQUE INDEX `$name` (".implode(",",$columns).")";
+		$sql = "ALTER IGNORE TABLE $table
+                ADD UNIQUE INDEX $name (".implode(",",$columns).")";
 		$this->adapter->exec($sql);
 	}
 
