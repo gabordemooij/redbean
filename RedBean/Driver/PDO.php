@@ -145,10 +145,15 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				$s = $this->pdo->prepare($sql);
 			}
 
-
-
 			$s->execute($aValues);
-			$this->rs = $s->fetchAll();
+			
+		  if ($s->columnCount()) {
+		    $this->rs = $s->fetchAll();
+	    }
+		  else {
+		    $this->rs = null;
+		  }
+		  
 			$rows = $this->rs;
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)

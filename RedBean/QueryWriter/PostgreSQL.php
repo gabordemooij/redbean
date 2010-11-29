@@ -59,24 +59,18 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_AQueryWriter implements Red
 			  "text"=>self::C_DATATYPE_TEXT
 	);
 
-
-
 	/**
 	 *
 	 * @var RedBean_DBAdapter
 	 */
-	private $adapter;
-
-
+	protected $adapter;
+	
 	/**
-	 * Checks table name or column name
-	 * @param string $table
-	 * @return string $table
+	 * @var string
+	 * character to escape keyword table/column names
 	 */
-	public function check($table) {
-		if (strpos($table,"`")!==false) throw new Redbean_Exception_Security("Illegal chars in table name");
-		return $this->adapter->escape($table);
-	}
+  protected $quoteCharacter = '"';
+
 
 	/**
 	 * Constructor
@@ -86,8 +80,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_AQueryWriter implements Red
 	public function __construct( RedBean_Adapter_DBAdapter $adapter ) {
 		$this->adapter = $adapter;
 	}
-
-
 
 	/**
 	 * Returns all tables in the database
@@ -149,20 +141,6 @@ where table_schema = 'public'" );
 		}
 	}
 
-	/**
-	 * Adds a column of a given type to a table
-	 * @param string $table
-	 * @param string $column
-	 * @param integer $type
-	 */
-	public function addColumn( $table, $column, $type ) {
-		$table = $this->getFormattedTableName($table);
-		$column = $this->check($column);
-		$table = $this->check($table);
-		$type=$this->typeno_sqltype[$type];
-		$sql = "ALTER TABLE \"$table\" ADD $column $type ";
-		$this->adapter->exec( $sql );
-	}
 
 	/**
 	 * Returns the Type Code for a Column Description
@@ -193,26 +171,6 @@ where table_schema = 'public'" );
 	}
 
 	/**
-	 * Update a record using a series of update values.
-	 * @param string $table
-	 * @param array $updatevalues
-	 * @param integer $id
-	 */
-	public function updateRecord( $table, $updatevalues, $id) {
-		$idfield = $this->getIDfield($table);
-		$table = $this->getFormattedTableName($table);
-		$sql = "UPDATE \"".$this->adapter->escape($this->check($table))."\" SET ";
-		$p = $v = array();
-		foreach($updatevalues as $uv) {
-			$p[] = " \"".$uv["property"]."\" = ? ";
-			$v[]=strval( ( $uv["value"] ) );
-		}
-		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
-
-		$this->adapter->exec( $sql, $v );
-	}
-
-	/**
 	 * Inserts a record into the database using a series of insert columns
 	 * and corresponding insertvalues. Returns the insert id.
 	 * @param string $table
@@ -220,61 +178,12 @@ where table_schema = 'public'" );
 	 * @param array $insertvalues
 	 * @return integer $insertid
 	 */
-	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
-		$idfield = $this->getIDfield($table);
-		$table = $this->getFormattedTableName($table);
-		$table = $this->check($table);
-		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
-			foreach($insertcolumns as $k=>$v) {
-				$insertcolumns[$k] = "".$this->check($v)."";
-			}
-			$insertSQL = "INSERT INTO \"$table\" ( $idfield, ".implode(",",$insertcolumns)." ) VALUES ";
-			$insertSQL .= "( DEFAULT, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) RETURNING $idfield ";
-
-			$ids = array();
-			foreach($insertvalues as $insertvalue) {
-				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue );
-			}
-			if (count($ids)===1) return array_pop($ids); else	return $ids;
-
-		}
-		else {
-			return $this->adapter->getCell( "INSERT INTO \"$table\" ($idfield) VALUES(DEFAULT) RETURNING $idfield " );
-		}
-	}
-
-
-
-	/**
-	 * Selects a record based on type and id.
-	 * @param string $type
-	 * @param integer $id
-	 * @return array $row
-	 */
-	public function selectRecord($type, $ids) {
-		$idfield = $this->getIDfield($type);
-		$type = $this->getFormattedTableName($type);
-		$type=$this->check($type);
-		$sql = "SELECT * FROM $type WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
-		$rows = $this->adapter->get($sql,$ids);
-		return ($rows && is_array($rows) && count($rows)>0) ? $rows : NULL;
-	}
-
-	/**
-	 * Deletes a record based on a table, column, value and operator
-	 * @param string $table
-	 * @param string $column
-	 * @param mixed $value
-	 * @param string $oper
-	 * @todo validate arguments for security
-	 */
-	public function deleteRecord( $table, $value) {
-		$column = $this->getIDfield($table);
-		$table = $this->getFormattedTableName($table);
-		$table = $this->check($table);
-		
-		$this->adapter->exec("DELETE FROM $table WHERE $column = ? ",array(strval($value)));
-	}
+	 
+  protected $defaultValue = 'DEFAULT';
+	 
+  protected function getInsertSuffix($table) {
+    return "RETURNING ".$this->getIDField($table);
+  }  
 
 	/**
 	 * Gets information about changed records using a type and id and a logid.
@@ -360,53 +269,6 @@ where table_schema = 'public'" );
 
 		$this->adapter->exec($sql);
 	}
-
-
-	
-
-	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
-		$table = $this->getFormattedTableName($table);
-		$select = $this->noKW($this->adapter->escape($select));
-		$table = $this->noKW($this->adapter->escape($table));
-		$column = $this->noKW($this->adapter->escape($column));
-		$value = $this->adapter->escape($value);
-		$sql = "SELECT $select FROM $table WHERE $column = ? ";
-		$values = array($value);
-		if ($withUnion) {
-			$sql .= " UNION SELECT $column FROM $table WHERE $select = ? ";
-			$values[] = $value;
-		}
-		return $this->adapter->getCol($sql,$values);
-	}
-
-
-	public function deleteByCrit( $table, $crits ) {
-		$table = $this->getFormattedTableName($table);
-		$table = $this->noKW($this->adapter->escape($table));
-		$values = array();
-		foreach($crits as $key=>$val) {
-			$key = $this->noKW($this->adapter->escape($key));
-			$values[] = $val;
-			$conditions[] = $key ."= ? ";
-		}
-		$sql = "DELETE FROM $table WHERE ".implode(" AND ", $conditions);
-		return $this->adapter->exec($sql, $values);
-	}
-
-
-
-
-
-	/**
-	 * Puts keyword escaping symbols around string.
-	 * @param string $str
-	 * @return string $keywordSafeString
-	 */
-	public function noKW($str) {
-		return "\"".$str."\"";
-	}
-
-
 
 	/**
 	 * Given an Database Specific SQLState and a list of QueryWriter

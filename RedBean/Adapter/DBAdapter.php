@@ -140,10 +140,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * @param $sql
 	 * @return unknown_type
 	 */
-	public function getCell( $sql, $aValues = array() ) {
 
+	public function getCell( $sql, $aValues = array(), $noSignal = null ) {
 		$this->sql = $sql;
-		$this->signal("sql_exec", $this);
+		if (!$noSignal) $this->signal("sql_exec", $this);
 		$arr = $this->db->getCol( $sql, $aValues );
 		if ($arr && is_array($arr))	return ($arr[0]); else return false;
 	}

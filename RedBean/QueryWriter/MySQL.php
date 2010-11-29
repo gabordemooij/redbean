@@ -117,32 +117,17 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 			  "longtext"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32
 	);
 
-	
-
 	/**
 	 *
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
-
+	
 	/**
-	 * Indicates the field name to be used for primary keys;
-	 * default is 'id'
 	 * @var string
+	 * character to escape keyword table/column names
 	 */
-	protected $idfield = "id";
-
-
-
-	/**
-	 * Checks table name or column name.
-	 * @param string $table
-	 * @return string $table
-	 */
-	public function check($table) {
-		if (strpos($table,"`")!==false) throw new RedBean_Exception_Security("Illegal chars in table name");
-		return $this->adapter->escape($table);
-	}
+  protected $quoteCharacter = '`';
 
 	/**
 	 * Constructor.
@@ -152,7 +137,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 	public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
 		$this->adapter = $adapter;
 	}
-
 
 	/**
 	 * Returns all tables in the database.
@@ -224,22 +208,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 		}
 		return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
 	}
-
-	/**
-	 * Adds a column of a given type to a table.
-	 * @param string $table
-	 * @param string $column
-	 * @param integer $type
-	 */
-	public function addColumn( $table, $column, $type ) {
-		$table = $this->getFormattedTableName($table);
-		$column = $this->check($column);
-		$table = $this->check($table);
-		$type=$this->typeno_sqltype[$type];
-		$sql = "ALTER TABLE `$table` ADD `$column` $type ";
-		$this->adapter->exec( $sql );
-	}
-
+	
 	/**
 	 * Returns the Type Code for a Column Description
 	 * @param string $typedescription
@@ -262,89 +231,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 		$newtype = $this->typeno_sqltype[$type];
 		$changecolumnSQL = "ALTER TABLE `$table` CHANGE `$column` `$column` $newtype ";
 		$this->adapter->exec( $changecolumnSQL );
-	}
-
-	/**
-	 * Update a record using a series of update values.
-	 * @param string $table
-	 * @param array $updatevalues
-	 * @param integer $id
-	 */
-	public function updateRecord( $table, $updatevalues, $id) {
-		$idfield = $this->getIDField($table);
-		$table = $this->getFormattedTableName($table);
-		$sql = "UPDATE `".$this->check($table)."` SET ";
-		$p = $v = array();
-		foreach($updatevalues as $uv) {
-			$p[] = " `".$uv["property"]."` = ? ";
-			$v[]=( $uv["value"] );
-		}
-		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
-		$this->adapter->exec( $sql, $v );
-	}
-
-	/**
-	 * Inserts a record into the database using a series of insert columns
-	 * and corresponding insertvalues. Returns the insert id.
-	 * @param string $table
-	 * @param array $insertcolumns
-	 * @param array $insertvalues
-	 * @return integer $insertid
-	 */
-	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
-		$idfield = $this->getIDField($table);
-		$table = $this->getFormattedTableName($table);
-		//if ($table == "__log") $idfield="id"; else
-		$table = $this->check($table);
-		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
-			foreach($insertcolumns as $k=>$v) {
-				$insertcolumns[$k] = "`".$this->check($v)."`";
-			}
-			$insertSQL = "INSERT INTO `$table` ( $idfield, ".implode(",",$insertcolumns)." ) VALUES ";
-			$pat = "( NULL, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." )";
-			$insertSQL .= implode(",",array_fill(0,count($insertvalues),$pat));
-			foreach($insertvalues as $insertvalue) {
-				foreach($insertvalue as $v) {
-					$vs[] = ( $v );
-				}
-			}
-			$this->adapter->exec( $insertSQL, $vs );
-			return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
-		}
-		else {
-			$this->adapter->exec( "INSERT INTO `$table` ($idfield) VALUES(NULL) " );
-			return ($this->adapter->getErrorMsg()=="" ?  $this->adapter->getInsertID() : 0);
-		}
-	}
-
-	/**
-	 * Selects a record based on type and id.
-	 * @param string $type
-	 * @param integer $id
-	 * @return array $row
-	 */
-	public function selectRecord($type, $ids) {
-		$idfield = $this->getIDField($type);
-		$type = $this->getFormattedTableName($type);
-		$type=$this->check($type);
-		$sql = "SELECT * FROM `$type` WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
-		$rows = $this->adapter->get($sql,$ids);
-		return ($rows) ? $rows : NULL;
-
-	}
-
-	/**
-	 * Deletes a record based on a table, column, value and operator
-	 * @param string $table
-	 * @param string $column
-	 * @param mixed $value
-	 * @param string $oper
-	 * @todo validate arguments for security
-	 */
-	public function deleteRecord( $table, $id) {
-		$table = $this->getFormattedTableName($table);
-		$table = $this->check($table);
-		$this->adapter->exec("DELETE FROM `$table` WHERE `".$this->getIDField($table)."` = ? ",array(strval($id)));
 	}
 
 	/**
@@ -374,70 +260,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
                 ADD UNIQUE INDEX `$name` (".implode(",",$columns).")";
 		$this->adapter->exec($sql);
 	}
-
-	/**
-	 * Selects a record using a criterium.
-	 * Specify the select-column, the target table, the criterium column
-	 * and the criterium value. This method scans the specified table for
-	 * records having a criterium column with a value that matches the
-	 * specified value. For each record the select-column value will be
-	 * returned, most likely this will be a primary key column like ID.
-	 * If $withUnion equals true the method will also return the $column
-	 * values for each entry that has a matching select-column. This is
-	 * handy for cross-link tables like page_page.
-	 * @param string $select, the column to be selected
-	 * @param string $table, the table to select from
-	 * @param string $column, the column to compare the criteria value against
-	 * @param string $value, the criterium value to match against
-	 * @param boolean $withUnion (default is false)
-	 * @return array $mixedColumns
-	 */
-	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
-		$table = $this->getFormattedTableName($table);
-		$select = $this->noKW($this->adapter->escape($select));
-		$table = $this->noKW($this->adapter->escape($table));
-		$column = $this->noKW($this->adapter->escape($column));
-		$value = $this->adapter->escape($value);
-		$sql = "SELECT $select FROM $table WHERE $column = ? ";
-		$values = array($value);
-		if ($withUnion) {
-			$sql .= " UNION SELECT $column FROM $table WHERE $select = ? ";
-			$values[] = $value;
-		}
-		return $this->adapter->getCol($sql,$values);
-	}
-
-	/**
-	 * This method takes an array with key=>value pairs.
-	 * Each record that has a complete match with the array is
-	 * deleted from the table.
-	 * @param string $table
-	 * @param array $crits
-	 * @return integer $affectedRows
-	 */
-	public function deleteByCrit( $table, $crits ) {
-		$table = $this->getFormattedTableName($table);
-		$table = $this->noKW($this->adapter->escape($table));
-		$values = array();
-		foreach($crits as $key=>$val) {
-			$key = $this->noKW($this->adapter->escape($key));
-			$values[] = $this->adapter->escape($val);
-			$conditions[] = $key ."= ? ";
-		}
-		$sql = "DELETE FROM $table WHERE ".implode(" AND ", $conditions);
-		return (int) $this->adapter->exec($sql, $values);
-	}
-
-	/**
-	 * Puts keyword escaping symbols around string.
-	 * @param string $str
-	 * @return string $keywordSafeString
-	 */
-	public function noKW($str) {
-		return "`".$str."`";
-	}
-
-
 
 	public function sqlStateIn($state, $list) {
 
