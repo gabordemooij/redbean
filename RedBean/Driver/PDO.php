@@ -1,9 +1,9 @@
 <?php
 /**
  * PDO Driver
- * @file			RedBean/PDO.php
- * @description		PDO Driver
- *					This Driver implements the RedBean Driver API
+ * @file				RedBean/PDO.php
+ * @description	PDO Driver
+ *						This Driver implements the RedBean Driver API
  * @author			Desfrenes
  * @license			BSD
  *
@@ -15,41 +15,44 @@
  */
 class RedBean_Driver_PDO implements RedBean_Driver {
 
-
+	/**
+	 * @var string
+	 * Contains database DSN for connecting to database.
+	 */
 	private $dsn;
 
 	/**
-	 *
-	 * @var unknown_type
+	 * @var RedBean_Driver_PDO
+	 * Holds the instance of this class.
 	 */
 	private static $instance;
 
 	/**
-	 *
 	 * @var boolean
+	 * Whether we are in debugging mode or not.
 	 */
 	private $debug = false;
 
 	/**
-	 *
-	 * @var unknown_type
+	 * @var PDO
+	 * Holds the PDO instance.
 	 */
 	private $pdo;
 
 	/**
-	 *
-	 * @var unknown_type
+	 * @var integer
+	 * Holds integer number of affected rows from latest query
+	 * if driver supports this feature.
 	 */
 	private $affected_rows;
 
 	/**
-	 *
-	 * @var unknown_type
+	 * @var resource
+	 * Holds result resource.
 	 */
 	private $rs;
 
 	/**
-	 *
 	 * @var unknown_type
 	 */
 	private $exc =0;
@@ -381,7 +384,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->connect();
 		return $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
-	
+
 
 	/**
 	 * @return PDO

@@ -227,6 +227,16 @@ class R {
 				  " $idfield IN ( ".implode(",",$keys)." ) AND ".$sql);
 	}
 
+	/**
+	 * Returns only single associated bean. This is the default way RedBean
+	 * handles N:1 relations, by just returning the 1st one ;)
+	 *
+	 * @param RedBean_OODBBean $bean
+	 * @param string $type
+	 * @param string $sql
+	 *
+	 * @return RedBean_OODBBean $bean
+	 */
 	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql='1' ) {
 		$beans = self::related($bean, $type, $sql);
 		if (count($beans)==0) return array();
@@ -588,7 +598,8 @@ class R {
 	 * If $tagList is a comma separated list (string) of tags all tags will
 	 * be associated with the bean. 
 	 * You may also pass an array instead of a string.
-	 * @param RedBean_OODBBean $bean 
+	 *
+	 * @param RedBean_OODBBean $bean
 	 * @param mixed $tagList 
 	 * @return string $commaSepListTags
 	 */

@@ -1,8 +1,8 @@
 <?php
 /**
- * DBAdapter	    (Database Adapter)
- * @file 		RedBean/Adapter/DBAdapter.php
- * @description		An adapter class to connect various database systems to RedBean
+ * DBAdapter		(Database Adapter)
+ * @file				RedBean/Adapter/DBAdapter.php
+ * @description	An adapter class to connect various database systems to RedBean
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -14,20 +14,27 @@
 class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 
 	/**
-	 * @var ADODB compatible class
+	 * @var RedBean_Driver
+	 *
+	 * ADODB compatible class.
 	 */
 	private $db = null;
 
 	/**
 	 * @var string
+	 *
+	 * Contains SQL snippet.
 	 */
 	private $sql = "";
 
 
 	/**
 	 * Constructor.
-	 * @param $database
-	 * @return unknown_type
+	 * Creates an instance of the RedBean Adapter Class.
+	 * This class provides an interface for RedBean to work
+	 * with ADO compatible DB instances.
+	 *
+	 * @param RedBean_Driver $database ADO Compatible DB Instance.
 	 */
 	public function __construct($database) {
 		$this->db = $database;
@@ -35,7 +42,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Returns the latest SQL Statement.
-	 * @return unknown_type
+	 *
+	 * @return string $SQL Latest SQL statement.
 	 */
 	public function getSQL() {
 		return $this->sql;
@@ -43,8 +51,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Escapes a string for use in a Query.
-	 * @param $sqlvalue
-	 * @return unknown_type
+	 *
+	 * @param  string $sqlvalue     SQL value to escape.
+	 *
+	 * @return string $escapedValue Escaped value.
 	 */
 	public function escape( $sqlvalue ) {
 		return $this->db->Escape($sqlvalue);
@@ -53,8 +63,19 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * Executes SQL code; any query without
 	 * returning a resultset.
-	 * @param $sql
-	 * @return unknown_type
+	 * This function allows you to provide an array with values to bind
+	 * to query parameters. For instance you can bind values to question
+	 * marks in the query. Each value in the array corresponds to the
+	 * question mark in the query that matches the position of the value in the
+	 * array. You can also bind values using explicit keys, for instance
+	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * SQL.
+	 *
+	 * @param  string  $sql			SQL Code to execute.
+	 * @param  array   $values		Assoc. array binding values.
+	 * @param  boolean $noevent   If TRUE this will suppress the event 'sql_exec'
+	 *
+	 * @return mixed  $undefSet	Whatever driver returns, undefined.
 	 */
 	public function exec( $sql , $aValues=array(), $noevent=false) {
 		if (!$noevent) {
@@ -66,8 +87,18 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Multi array SQL fetch. Fetches a multi dimensional array.
-	 * @param $sql
-	 * @return unknown_type
+	 * This function allows you to provide an array with values to bind
+	 * to query parameters. For instance you can bind values to question
+	 * marks in the query. Each value in the array corresponds to the
+	 * question mark in the query that matches the position of the value in the
+	 * array. You can also bind values using explicit keys, for instance
+	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * SQL.
+	 *
+	 * @param  string $sql		SQL code to execute.
+	 * @param  array  $values	Assoc. array binding values.
+	 *
+	 * @return array  $result	Two dimensional array result set.
 	 */
 	public function get( $sql, $aValues = array() ) {
 		$this->sql = $sql;
@@ -76,9 +107,19 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * SQL row fetch. Fetches a single row.
-	 * @param $sql
-	 * @return unknown_type
+	 * Executes SQL and fetches a single row.
+	 * This function allows you to provide an array with values to bind
+	 * to query parameters. For instance you can bind values to question
+	 * marks in the query. Each value in the array corresponds to the
+	 * question mark in the query that matches the position of the value in the
+	 * array. You can also bind values using explicit keys, for instance
+	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * SQL.
+	 *
+	 * @param  string $sql		SQL code to execute.
+	 * @param  array  $values	Assoc. array binding values.
+	 *
+	 * @return array	$result	One dimensional array result set.
 	 */
 	public function getRow( $sql, $aValues = array() ) {
 
@@ -88,9 +129,20 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * SQL column fetch. Fetches one column of a table.
-	 * @param $sql
-	 * @return unknown_type
+	 * Executes SQL and returns a one dimensional array result set.
+	 * This function rotates the result matrix to obtain a column result set.
+	 * This function allows you to provide an array with values to bind
+	 * to query parameters. For instance you can bind values to question
+	 * marks in the query. Each value in the array corresponds to the
+	 * question mark in the query that matches the position of the value in the
+	 * array. You can also bind values using explicit keys, for instance
+	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * SQL.
+	 *
+	 * @param  string $sql		SQL code to execute.
+	 * @param  array  $values	Assoc. array binding values.
+	 *
+	 * @return array  $result	One dimensional array result set.
 	 */
 	public function getCol( $sql, $aValues = array() ) {
 		$this->sql = $sql;
@@ -105,9 +157,18 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * column for the keys and the second result column for the
 	 * values. For instance: SELECT id, name FROM... will produce
 	 * an array like: id => name.
-	 * @param string $sql
-	 * @param array $aValues
-	 * @return array $resultsAsAssocAray
+	 * This function allows you to provide an array with values to bind
+	 * to query parameters. For instance you can bind values to question
+	 * marks in the query. Each value in the array corresponds to the
+	 * question mark in the query that matches the position of the value in the
+	 * array. You can also bind values using explicit keys, for instance
+	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * SQL.
+	 *
+	 * @param  string $sql		SQL code to execute.
+	 * @param  array  $values	Assoc. array binding values.
+	 *
+	 * @return array  $result	Multi dimensional assoc. array result set.
 	 */
 	public function getAssoc( $sql, $aValues = array() ) {
 		$this->sql = $sql;
@@ -136,9 +197,19 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 
 	/**
-	 * Retrieves a single cell
-	 * @param $sql
-	 * @return unknown_type
+	 * Retrieves a single cell.
+	 * This function allows you to provide an array with values to bind
+	 * to query parameters. For instance you can bind values to question
+	 * marks in the query. Each value in the array corresponds to the
+	 * question mark in the query that matches the position of the value in the
+	 * array. You can also bind values using explicit keys, for instance
+	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * SQL.
+	 *
+	 * @param  string $sql		SQL code to execute.
+	 * @param  array  $values	Assoc. array binding values.
+	 *
+	 * @return array  $result	Scalar result set.
 	 */
 	public function getCell( $sql, $aValues = array() ) {
 
@@ -150,7 +221,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Returns latest insert id, most recently inserted id.
-	 * @return mixed $id
+	 *
+	 * @return integer $id	Latest insert ID.
 	 */
 	public function getInsertID() {
 		return $this->db->getInsertID();
@@ -158,7 +230,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Returns number of affected rows.
-	 * @return unknown_type
+	 *
+	 * @return integer $numOfAffectRows
 	 */
 	public function getAffectedRows() {
 		return $this->db->Affected_Rows();
@@ -166,7 +239,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Unwrap the original database object.
-	 * @return $database
+	 *
+	 * @return RedBean_Driver $database		Returns the inner database object
 	 */
 	public function getDatabase() {
 		return $this->db;

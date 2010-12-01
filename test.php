@@ -2335,7 +2335,7 @@ class my_weird_weirdo_model extends RedBean_SimpleModel {
 RedBean_ModelHelper::setModelFormatter(new mymodelformatter);
 $w = R::dispense("weirdo");
 asrt($w->blah(),"yes!");
-R::debug(1);
+//R::debug(1);
 testpack("Test Tagging");
 R::tag($post,"lousy,smart");
 asrt(R::tag($post),"lousy,smart");
