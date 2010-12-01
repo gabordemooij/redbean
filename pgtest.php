@@ -17,6 +17,8 @@
  * @license			BSD
  */
 
+$ini = parse_ini_file("test.ini", true);
+
 function printtext( $text ) {
 	if ($_SERVER["DOCUMENT_ROOT"]) {
 		echo "<BR>".$text;
@@ -61,7 +63,11 @@ function testpack($name) {
 //INCLUDE YOUR REDBEAN FILE HERE!
 require("rb.php");
 //require("RedBean/redbean.inc.php");
-$toolbox = RedBean_Setup::kickstartDev( "pgsql:host=localhost dbname=oodb","postgres", file_get_contents('pass.txt') );
+$toolbox = RedBean_Setup::kickstartDev(
+  "pgsql:host={$ini['pgsql']['host']} dbname={$ini['pgsql']['schema']}",
+  $ini['pgsql']['user'],
+  $ini['pgsql']['pass']
+);
 
 //Observable Mock Object
 class ObservableMock extends RedBean_Observable {
@@ -986,7 +992,11 @@ asrt(in_array("movie_movie_id",$columns),true);
 
 
 testpack("Test Table Prefixes");
-R::setup("pgsql:host=localhost dbname=oodb","postgres", file_get_contents('pass.txt'));
+R::setup(
+  "pgsql:host={$ini['pgsql']['host']} dbname={$ini['pgsql']['schema']}",
+  $ini['pgsql']['user'],
+  $ini['pgsql']['pass']
+);
 
 class MyTableFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {
