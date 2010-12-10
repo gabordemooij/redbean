@@ -1,10 +1,11 @@
 <?php
 /**
  * RedBean MySQLWriter
- * @file 		RedBean/QueryWriter/MySQL.php
- * @description		Represents a MySQL Database to RedBean
- *					To write a driver for a different database for RedBean
- *					you should only have to change this file.
+ * 
+ * @file				RedBean/QueryWriter/MySQL.php
+ * @description	Represents a MySQL Database to RedBean
+ *						To write a driver for a different database for RedBean
+ *						you should only have to change this file.
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -22,69 +23,84 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 	 */
 
 	/**
+	 * @var integer
+	 *
 	 * DATA TYPE
 	 * Boolean Data type
-	 * @var integer
 	 */
 	const C_DATATYPE_BOOL = 0;
 
 	/**
+	 *
+	 * @var integer
+	 *
 	 * DATA TYPE
 	 * Unsigned 8BIT Integer
-	 * @var integer
+	 * 
 	 */
 	const C_DATATYPE_UINT8 = 1;
 
 	/**
+	 *
+	 * @var integer
+	 *
 	 * DATA TYPE
 	 * Unsigned 32BIT Integer
-	 * @var integer
+	 * 
 	 */
 	const C_DATATYPE_UINT32 = 2;
 
 	/**
+	 * @var integer
+	 *
 	 * DATA TYPE
 	 * Double precision floating point number and
 	 * negative numbers.
-	 * @var integer
+	 * 
 	 */
 	const C_DATATYPE_DOUBLE = 3;
 
 	/**
+	 * @var integer
+	 * 
 	 * DATA TYPE
 	 * Standard Text column (like varchar255)
 	 * At least 8BIT character support.
-	 * @var integer
+	 * 
 	 */
 	const C_DATATYPE_TEXT8 = 4;
 
 	/**
+	 * @var integer
+	 * 
 	 * DATA TYPE
 	 * Long text column (16BIT)
-	 * @var integer
+	 * 
 	 */
 	const C_DATATYPE_TEXT16 = 5;
 
 	/**
+	 * @var integer
+	 *
 	 * DATA TYPE
 	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
 	 * This is the biggest column that RedBean supports. If possible you may write
 	 * an implementation that stores even bigger values.
-	 * @var integer
+	 * 
 	 */
 	const C_DATATYPE_TEXT32 = 6;
 
 	/**
+	 * @var integer
+	 * 
 	 * DATA TYPE
 	 * Specified. This means the developer or DBA
 	 * has altered the column to a different type not
 	 * recognized by RedBean. This high number makes sure
 	 * it will not be converted back to another type by accident.
-	 * @var integer
+	 * 
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
-
-
 
 
 	/**
@@ -132,7 +148,11 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 	/**
 	 * Constructor.
 	 * The Query Writer Constructor also sets up the database.
-	 * @param RedBean_Adapter_DBAdapter $adapter
+	 *
+	 * @param RedBean_Adapter_DBAdapter $adapter adapter
+	 * @param boolean							$frozen  allow schema modif.?
+	 *
+	 *
 	 */
 	public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
 		$this->adapter = $adapter;
@@ -140,7 +160,8 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 
 	/**
 	 * Returns all tables in the database.
-	 * @return array $tables
+	 * 
+	 * @return array $tables tables
 	 */
 	public function getTables() {
 		return $this->adapter->getCol( "show tables" );
@@ -148,7 +169,8 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 
 	/**
 	 * Creates an empty, column-less table for a bean.
-	 * @param string $table
+	 * 
+	 * @param string $table table
 	 */
 	public function createTable( $table ) {
 		$idfield = $this->getIDfield($table, true);
@@ -164,8 +186,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 
 	/**
 	 * Returns an array containing the column names of the specified table.
-	 * @param string $table
-	 * @return array $columns
+	 *
+	 * @param string $table table
+	 *
+	 * @return array $columns columns
 	 */
 	public function getColumns( $table ) {
 		$table = $this->safeTable($table);
@@ -179,8 +203,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 	/**
 	 * Returns the MySQL Column Type Code (integer) that corresponds
 	 * to the given value type.
-	 * @param string $value
-	 * @return integer $type
+	 *
+	 * @param string $value value
+	 * 
+	 * @return integer $type type
 	 */
 	public function scanType( $value ) {
 
@@ -208,18 +234,22 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 	}
 	
 	/**
-	 * Returns the Type Code for a Column Description
-	 * @param string $typedescription
-	 * @return integer $typecode
+	 * Returns the Type Code for a Column Description.
+	 *
+	 * @param string $typedescription description
+	 *
+	 * @return integer $typecode code
 	 */
 	public function code( $typedescription ) {
-		return ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
+		return ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
 	}
 
 	/**
 	 * Change (Widen) the column to the give type.
-	 * @param string $table
-	 * @param string $column
+	 *
+	 * @param string $table table
+	 * @param string $column column
+	 * 
 	 * @param integer $type
 	 */
 	public function widenColumn( $table, $column, $type ) {
@@ -232,9 +262,11 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 
 	/**
 	 * Adds a Unique index constrain to the table.
-	 * @param string $table
-	 * @param string $col1
-	 * @param string $col2
+	 *
+	 * @param string $table table
+	 * @param string $col1  column
+	 * @param string $col2  column
+	 *
 	 * @return void
 	 */
 	public function addUniqueIndex( $table,$columns ) {
@@ -257,6 +289,14 @@ class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_
 		$this->adapter->exec($sql);
 	}
 
+	/**
+	 * Tests whether a given SQL state is in the list of states.
+	 *
+	 * @param string $state code
+	 * @param array  $list  array of sql states
+	 *
+	 * @return boolean $yesno occurs in list
+	 */
 	public function sqlStateIn($state, $list) {
 
 		$sqlState = "0";

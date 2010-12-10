@@ -24,13 +24,15 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 
 
 	/**
-	 * @var RedBean_Adapter_DBAdapter
+	 * @var RedBean_QueryWriter
+	 * Contains a reference to the query writer.
 	 */
 	private $writer;
 
 	/**
 	 *
 	 * @var RedBean_Adapter
+	 * Contains a reference to the database adapter.
 	 */
 	private $adapter;
 
@@ -38,17 +40,20 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	/**
 	 *
 	 * @var array
+	 * Our secret stash of redbeans... ;)
 	 */
 	private $stash = array();
 
 	/**
 	 *
 	 * @var RedBean_OODB
+	 * Contains a reference to the RedBean OODB object.
 	 */
 	private $redbean;
 
 	/**
 	 * Constructor, requires a writer
+	 * 
 	 * @param RedBean_QueryWriter $writer
 	 */
 	public function __construct(RedBean_ToolBox $toolbox) {
@@ -79,8 +84,9 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	 * using timestamps however with timestamps you risk race conditions
 	 * when the measurements are not fine-grained enough; with
 	 * auto-incremented primary key ids we dont have this risk.
-	 * @param string $event
-	 * @param RedBean_OODBBean $item
+	 *
+	 * @param string $event				event name
+	 * @param RedBean_OODBBean $item item
 	 */
 	public function onEvent( $event, $item ) {
 		$id = $item->id;
@@ -115,8 +121,9 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	 * the first bean opened. This means this approach is conservative; it might
 	 * produce a higher rate of false alarms but it does not compromise
 	 * concurrency security.
-	 * @param string $type
-	 * @param array $ids
+	 *
+	 * @param string $type type
+	 * @param array  $ids  series of ids
 	 */
 	public function preLoad( $type, $ids ) {
 		$this->adapter->exec("INSERT INTO __log (id,action,tbl,itemid)
@@ -133,7 +140,8 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 
 	/**
 	 * For testing only, dont use.
-	 * @return array $stash
+	 * 
+	 * @return array $stash stash
 	 */
 	public function testingOnly_getStash() {
 		return $this->stash;
@@ -148,10 +156,12 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	 * If changes have occurred it will throw an exception. If no changes have occurred
 	 * it will insert a new change record and return the new change id.
 	 * This method locks the log table exclusively.
-	 * @param  string $type
-	 * @param  integer $id
-	 * @param  integer $logid
-	 * @return integer $newchangeid
+	 *
+	 * @param  string  $type  type
+	 * @param  integer $id    id
+	 * @param  integer $logid log id
+	 *
+	 * @return integer $newchangeid new id
 	 */
 	public function checkChanges($type, $id, $logid) {
 		$type = $this->writer->check($type);

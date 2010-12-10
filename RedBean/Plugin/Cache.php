@@ -1,9 +1,9 @@
 <?php
 /**
  * RedBean Bean Cache
- * @file 		RedBean/Plugin/Cache.php
- * @description		Decorator for RedBean core class RedBean_OODB
- *					Adds primitive caching to RedBean.
+ * @file				RedBean/Plugin/Cache.php
+ * @description	Decorator for RedBean core class RedBean_OODB
+ *						Adds primitive caching to RedBean.
  *
  * @author			Gabor de Mooij
  * @license			BSD
@@ -17,34 +17,40 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 
 	/**
 	 * @var RedBean_OODB
+	 * Contains a reference to the RedBean OODB object.
 	 */
 	private $oodb;
 
 	/**
 	 * @var RedBean_QueryWriter
+	 * Contains a reference to the query writer.
 	 */
 	private $writer;
 
 	/**
 	 * @var array
+	 * Cache array.
 	 */
 	private $cache = array();
 
 	/**
 	 * @var array
+	 * Keeps track of original beans.
 	 */
 	private $originals = array();
 
 	/**
 	 * @var integer
+	 * A simple column counter.
 	 */
 	private $columnCounter = 0;
 
 
 	/**
 	 * Constructor.
-	 * @param RedBean_OODB $oodb
-	 * @param RedBean_ToolBox $toolBox
+	 *
+	 * @param RedBean_OODB    $oodb    object database
+	 * @param RedBean_ToolBox $toolBox toolbox
 	 */
 	public function __construct( RedBean_OODB $oodb, RedBean_ToolBox $toolBox ) {
 		$this->oodb = $oodb;
@@ -53,8 +59,9 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 
 	/**
 	 * Adds event listener.
-	 * @param <type> $event
-	 * @param RedBean_Observer $o
+	 * 
+	 * @param string				$event	 event identifier
+	 * @param RedBean_Observer $observer observer
 	 */
 	public function addEventListener($event, RedBean_Observer $o) {
 		$this->oodb->addEventListener($event, $o);
@@ -64,8 +71,10 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 	/**
 	 * Generates a key based on the ID and TYPE of a bean to
 	 * identify the bean in the cache.
-	 * @param RedBean_OODBBean $bean
-	 * @return string $key
+	 *
+	 * @param RedBean_OODBBean $bean bean to make fingerprint of
+	 * 
+	 * @return string $key fingerprint of bean
 	 */
 	private function generateKey( RedBean_OODBBean $bean ) {
 		$type=$bean->getMeta("type");
@@ -78,7 +87,10 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 	/**
 	 * Puts a bean in the cache and stores a copy of the bean in the
 	 * cache archive.
-	 * @param RedBean_OODBBean $bean
+	 *
+	 * @param RedBean_OODBBean $bean bean to put in cache
+	 *
+	 * @return RedBean_Plugin_Cache $myself chainable
 	 */
 	private function putInCache( RedBean_OODBBean $bean ) {
 		$key = $this->generateKey($bean);
@@ -92,8 +104,10 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 
 	/**
 	 * Fetches a bean from the cache or returns NULL.
-	 * @param RedBean_OODBBean $bean
-	 * @return RedBean_OODBBean $bean
+	 *
+	 * @param RedBean_OODBBean $bean bean
+	 *
+	 * @return RedBean_OODBBean $bean bean
 	 */
 	private function fetchFromCache( RedBean_OODBBean $bean ) {
 		$key = $this->generateKey($bean);
@@ -109,8 +123,10 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 	/**
 	 * Fetches a bean from the cache or returns NULL.
 	 * This function takes a TYPE and ID.
-	 * @param string $type
-	 * @param integer $id
+	 *
+	 * @param string  $type type
+	 * @param integer $id	id
+	 *
 	 * @return  RedBean_OODBBean $bean
 	 */
 	private function fetchFromCacheByTypeID( $type, $id ) {
@@ -124,8 +140,10 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 	/**
 	 * Fetches the original bean as it was stored in the cache
 	 * archive or NULL.
-	 * @param RedBean_OODBBean $bean
-	 * @return RedBean_OODBBean $bean
+	 *
+	 * @param RedBean_OODBBean $bean bean
+	 *
+	 * @return RedBean_OODBBean $bean bean
 	 */
 	private function fetchOriginal(RedBean_OODBBean $bean) {
 		$key = $this->generateKey($bean);
@@ -139,7 +157,8 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 
 	/**
 	 * Removes a bean from the cache and the archive.
-	 * @param RedBean_OODBBean $bean
+	 * 
+	 * @param RedBean_OODBBean $bean bean
 	 */
 	private function removeFromCache( RedBean_OODBBean $bean ) {
 		$key = $this->generateKey($bean);
@@ -151,9 +170,11 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 	/**
 	 * Tries to load a bean from cache, if this fails, it asks
 	 * the oodb object to load the bean from the database.
-	 * @param string $type
-	 * @param integer $id
-	 * @return RedBean_OODB $bean
+	 *
+	 * @param string  $type type of bean to load
+	 * @param integer $id   primary key of bean
+	 * 
+	 * @return RedBean_OODB $bean the bean that was found in cache or DB
 	 */
 	public function load( $type, $id ) {
 
@@ -172,8 +193,10 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 
 	/**
 	 * Stores a bean and updates cache.
-	 * @param RedBean_OODBBean $bean
-	 * @return integer $id
+	 *
+	 * @param  RedBean_OODBBean $bean bean
+	 * 
+	 * @return integer $id id
 	 */
 	public function store( RedBean_OODBBean $bean ) {
 
@@ -241,9 +264,11 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 	 * is available in the cache, the function will return the collected beans
 	 * from the cache. If one or more beans cannot be found, the function will
 	 * ask oodb for the beans and update the cache.
-	 * @param string $type
-	 * @param integer $ids
-	 * @return array $beans
+	 *
+	 * @param string  $type type you are looking for
+	 * @param integer $ids  series of keys of beans you want to load in memory
+	 *
+	 * @return array $beans collection of beans
 	 */
 	public function batch( $type, $ids ) {
 		$idfield = $this->writer->getIDField($type);
@@ -266,8 +291,10 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 
 	/**
 	 * Dispenses a bean, just like oodb does
-	 * @param string $type
-	 * @return RedBean_OODBBean $bean
+	 *
+	 * @param string $type type of the bean
+	 *
+	 * @return RedBean_OODBBean $bean freshly dispensed bean
 	 */
 	public function dispense( $type ) {
 		return $this->oodb->dispense($type);
@@ -276,7 +303,8 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 	/**
 	 * For testing only; returns the number of properties that has
 	 * been updated in the latest store action.
-	 * @return integer $count
+	 * 
+	 * @return integer $count count
 	 */
 	public function test_getColCount() {
 		return $this->columnCounter;

@@ -1,19 +1,25 @@
 <?php
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
-*/
-
 /**
- * Description of MySQLS
+ * RedBean MySQLWriterS
  *
- * @author gabordemooij
+ * @file				RedBean/QueryWriter/MySQLS.php
+ * @description	Represents a MySQL STRICT Database to RedBean
+ *						To write a driver for a different database for RedBean
+ *						you should only have to change this file.
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
  */
 class RedBean_QueryWriter_MySQLS extends RedBean_QueryWriter_MySQL {
-	//put your code here
+	
 
 	/**
 	 * @var array
+	 * 
 	 * Supported Column Types
 	 */
 	public $typeno_sqltype = array(
@@ -49,15 +55,15 @@ class RedBean_QueryWriter_MySQLS extends RedBean_QueryWriter_MySQL {
 	 */
 	public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
 		$this->adapter = $adapter;
-		//try{ $this->adapter->exec("set session sql_mode='STRICT_ALL_TABLES'");
-		//}catch(Exception $e){}
 	}
 
 
 	/**
 	 * Scans the type using PHP.
-	 * @param mixed $value
-	 * @return integer $typeConstant
+	 *
+	 * @param  mixed $value value
+	 * 
+	 * @return integer $typeConstant constant
 	 */
 	public function scanType( $value ) {
 
@@ -88,9 +94,11 @@ class RedBean_QueryWriter_MySQLS extends RedBean_QueryWriter_MySQL {
 
 	/**
 	 * Selects a record based on type and id.
-	 * @param string $type
-	 * @param integer $id
-	 * @return array $row
+	 *
+	 * @param string  $type type
+	 * @param integer $id  id
+	 * 
+	 * @return array $row  row
 	 */
 	public function selectRecord($type, $ids) {
 		$type = $this->getFormattedTableName($type);

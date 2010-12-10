@@ -19,30 +19,39 @@
 
 abstract class RedBean_AQueryWriter {
 
+
+	/**
+	 *
+	 * @var RedBean_IBeanFormatter
+	 * Holds the bean formatter to be used for applying
+	 * table schema.
+	 */
 	public $tableFormatter;
   
   
 	/**
 	 * @var array
-	 * Supported Column Types
+	 * Supported Column Types.
 	 */
 	public $typeno_sqltype = array();
 	
 	/**
 	 *
 	 * @var RedBean_Adapter_DBAdapter
+	 * Holds a reference to the database adapter to be used.
 	 */
 	protected $adapter;
 
 	/**
-	 * Indicates the field name to be used for primary keys;
-	 * default is 'id'
 	 * @var string
+	 * Indicates the field name to be used for primary keys;
+	 * default is 'id'.
 	 */
   protected $idfield = "id";
 
 	/**
-	 * @var string default value to for blank field (passed to PK for auto-increment)
+	 * @var string
+	 * default value to for blank field (passed to PK for auto-increment)
 	 */
   protected $defaultValue = 'NULL';
   
@@ -53,8 +62,10 @@ abstract class RedBean_AQueryWriter {
   protected $quoteCharacter = '';
 	
 	/**
-	 * Do everything that needs to be done to format a table name
+	 * Do everything that needs to be done to format a table name.
+	 *
 	 * @param string $name of table
+	 * 
 	 * @return string table name
 	 */
 	public function safeTable($name, $noQuotes = false) {
@@ -65,9 +76,11 @@ abstract class RedBean_AQueryWriter {
 	}
 	
 	/**
-	 * Do everything that needs to be done to format a column name
+	 * Do everything that needs to be done to format a column name.
+	 *
 	 * @param string $name of column
-	 * @return string column name
+	 *
+	 * @return string $column name
 	 */
 	public function safeColumn($name, $noQuotes = false) {
 		$name = $this->check($name);
@@ -77,7 +90,9 @@ abstract class RedBean_AQueryWriter {
 	
 	/**
 	 * Returns the sql that should follow an insert statement.
+	 *
 	 * @param string $table name
+	 *
 	 * @return string sql
 	 */
   protected function getInsertSuffix ($table) {
@@ -86,7 +101,9 @@ abstract class RedBean_AQueryWriter {
 	
 	/**
 	 * Returns the string identifying a table for a given type.
+	 *
 	 * @param string $type
+	 *
 	 * @return string $table
 	 */
 	public function getFormattedTableName($type) {
@@ -97,8 +114,10 @@ abstract class RedBean_AQueryWriter {
 	/**
 	 * Sets the Bean Formatter to be used to handle
 	 * custom/advanced DB<->Bean
-	 * Mappings.
-	 * @param RedBean_IBeanFormatter $beanFormatter
+	 * Mappings. This method has no return value.
+	 *
+	 * @param RedBean_IBeanFormatter $beanFormatter the bean formatter
+	 * 
 	 * @return void
 	 */
 	public function setBeanFormatter( RedBean_IBeanFormatter $beanFormatter ) {
@@ -106,8 +125,10 @@ abstract class RedBean_AQueryWriter {
 	}
 	
 	/**
-	 * Get sql column type
-	 * @param int $type constant
+	 * Get sql column type.
+	 *
+	 * @param integer $type constant
+	 *
 	 * @return string sql type
 	 */
 	public function getFieldType( $type = "" ) {
@@ -117,8 +138,10 @@ abstract class RedBean_AQueryWriter {
 	/**
 	 * Returns the column name that should be used
 	 * to store and retrieve the primary key ID.
-	 * @param string $type
-	 * @return string $idfieldtobeused
+	 *
+	 * @param string $type type of bean to get ID Field for
+	 *
+	 * @return string $idfieldtobeused ID field to be used for this type of bean
 	 */
 	public function getIDField( $type, $safe = null ) {
 		if ($this->tableFormatter) return $this->tableFormatter->formatBeanID($type);
@@ -126,9 +149,11 @@ abstract class RedBean_AQueryWriter {
 	}
 	
 	/**
-	 * Checks table name or column name
-	 * @param string $table
-	 * @return string $table
+	 * Checks table name or column name.
+	 *
+	 * @param string $table table string
+	 *
+	 * @return string $table escaped string
 	 */
 	public function check($table) {
 		// if (strpos($table, '`')!==false || strpos($table, '"')!==false) { // maybe this?
@@ -140,8 +165,10 @@ abstract class RedBean_AQueryWriter {
 	
 	/**
 	 * Puts keyword escaping symbols around string.
-	 * @param string $str
-	 * @return string $keywordSafeString
+	 *
+	 * @param string $str keyword
+	 *
+	 * @return string $keywordSafeString escaped keyword
 	 */
 	public function noKW($str) {
 		$q = $this->quoteCharacter;
@@ -150,9 +177,11 @@ abstract class RedBean_AQueryWriter {
 	
 	/**
 	 * Adds a column of a given type to a table.
-	 * @param string $table
-	 * @param string $column
-	 * @param integer $type
+	 *
+	 * @param string  $table  name of the table
+	 * @param string  $column name of the column
+	 * @param integer $type   type
+	 *
 	 */
 	public function addColumn( $table, $column, $type ) {
 		$table = $this->safeTable($table);
@@ -164,9 +193,10 @@ abstract class RedBean_AQueryWriter {
 	
 	/**
 	 * Update a record using a series of update values.
-	 * @param string $table
-	 * @param array $updatevalues
-	 * @param integer $id
+	 *
+	 * @param string  $table		  table
+	 * @param array   $updatevalues update values
+	 * @param integer $id			  primary key for record
 	 */
 	public function updateRecord( $table, $updatevalues, $id) {
 		$idfield = $this->getIDField($table, true);
@@ -185,10 +215,12 @@ abstract class RedBean_AQueryWriter {
 	/**
 	 * Inserts a record into the database using a series of insert columns
 	 * and corresponding insertvalues. Returns the insert id.
-	 * @param string $table
-	 * @param array $insertcolumns
-	 * @param array $insertvalues
-	 * @return integer $insertid
+	 *
+	 * @param string $table			  table to perform query on
+	 * @param array  $insertcolumns columns to be inserted
+	 * @param array  $insertvalues  values to be inserted
+	 *
+	 * @return integer $insertid	  insert id from driver, new record id
 	 */
 	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
 		$default = $this->defaultValue;
@@ -218,9 +250,11 @@ abstract class RedBean_AQueryWriter {
 	
 	/**
 	 * Selects a record based on type and id.
-	 * @param string $type
-	 * @param integer $id
-	 * @return array $row
+	 *
+	 * @param string  $type type
+	 * @param integer $id   id
+	 *
+	 * @return array $row	resulting row or NULL if none has been found
 	 */
 	public function selectRecord($type, $ids) {
 		$idfield = $this->getIDField($type, true);
@@ -232,10 +266,10 @@ abstract class RedBean_AQueryWriter {
 
 	/**
 	 * Deletes a record based on a table, column, value and operator
-	 * @param string $table
-	 * @param string $column
-	 * @param mixed $value
-	 * @param string $oper
+	 *
+	 * @param string  $table  table
+	 * @param integer $value  primary key id
+	 *
 	 * @todo validate arguments for security
 	 */
 	public function deleteRecord($table, $value) {
@@ -255,12 +289,14 @@ abstract class RedBean_AQueryWriter {
 	 * If $withUnion equals true the method will also return the $column
 	 * values for each entry that has a matching select-column. This is
 	 * handy for cross-link tables like page_page.
-	 * @param string $select, the column to be selected
-	 * @param string $table, the table to select from
-	 * @param string $column, the column to compare the criteria value against
-	 * @param string $value, the criterium value to match against
-	 * @param boolean $withUnion (default is false)
-	 * @return array $mixedColumns
+	 *
+	 * @param string $select the column to be selected
+	 * @param string $table  the table to select from
+	 * @param string $column the column to compare the criteria value against
+	 * @param string $value  the criterium value to match against
+	 * @param boolean $union with union (default is false)
+	 *
+	 * @return array $array selected column with values
 	 */
 	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
 		$table = $this->safeTable($table);
@@ -280,9 +316,11 @@ abstract class RedBean_AQueryWriter {
 	 * This method takes an array with key=>value pairs.
 	 * Each record that has a complete match with the array is
 	 * deleted from the table.
-	 * @param string $table
-	 * @param array $crits
-	 * @return integer $affectedRows
+	 *
+	 * @param string $table table
+	 * @param array  $crits criteria
+	 *
+	 * @return integer $affectedRows num. of affected rows.
 	 */
 	public function deleteByCrit( $table, $crits ) {
 		$table = $this->safeTable($table);

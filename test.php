@@ -1472,6 +1472,16 @@ $redbean->store($special);
 //$optimizer->MySQLSpecificColumns("special", "datetime", "varchar", $v);
 $cols = $writer->getColumns("special");
 asrt($cols["datetime"],"datetime");
+//$adapter->getDatabase()->setDebugMode(1);
+for($i=0; $i<100; $i++){
+$special2 = $redbean->dispense("special");
+$special2->test = md5(rand());
+//$redbean->store($special2);
+$redbean->store($special);
+$cols = $writer->getColumns("special");
+if($cols["datetime"]!=="datetime") fail();
+}
+pass();
 $special->datetime = "convertmeback";
 $redbean->store($special);
 $redbean->store($special);

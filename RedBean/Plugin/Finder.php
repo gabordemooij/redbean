@@ -1,7 +1,8 @@
 <?php
 /**
  * RedBean Bean Finder
- * @file 		RedBean/Plugin/Finder.php
+ *
+ * @file					RedBean/Plugin/Finder.php
  * @description		Provides a more convenient way to find beans
  *
  * @author			Gabor de Mooij
@@ -36,10 +37,11 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 * - Finder::where("page"); //returns all pages
 	 *
 	 *
-	 * @param string $type
-	 * @param string $SQL
-	 * @param array $values
-	 * @return array $beans
+	 * @param string $type   type of bean you are looking for
+	 * @param string $SQL    SQL code, start with 1 if you want no WHERE-clause
+	 * @param array  $values values to bind to slots in query
+	 *
+	 * @return array $beans beans we come up with..
 	 */
 	public static function where( $type, $SQL = " 1 ", $values=array(),
 			  $tools = false, $ignoreGSQLWarn = false ) {
@@ -112,10 +114,12 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 * if not they are being replaced by NULL leaving intact the
 	 * rest of the query and making the SQL continue to work even
 	 * if it's partially broken.
-	 * @param string $SQL
-	 * @param string $currentTable
-	 * @param RedBean_ToolBox $toolbox
-	 * @return string $SQL
+	 * 
+	 * @param string $SQL				  sql code to execute
+	 * @param string $currentTable	  name of the table
+	 * @param RedBean_ToolBox $toolbox toolbox to use
+	 *
+	 * @return string $SQL resulting sql
 	 */
 	public static function parseGoldSQL( $SQL, $currentTable,  RedBean_ToolBox $toolbox ) {
 
@@ -174,26 +178,27 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 						$SQL = str_replace("@".$itemName, $itemName, $SQL);
 					}
 				}
-
-
 			}
-
-
-
-
 		}
-
-
 		return $SQL;
-
 	}
-
-
 
 }
 
-//Short Alias for this class
+/**
+ * RedBean Bean Finder
+ *
+ * @file					RedBean/Plugin/Finder.php
+ * @description		Provides a more convenient way to find beans
+ *
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
+ */
 class Finder extends RedBean_Plugin_Finder {
-
 }
 

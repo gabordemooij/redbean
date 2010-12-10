@@ -53,26 +53,40 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	private $rs;
 
 	/**
-	 * @var unknown_type
+	 * @var boolean
+	 * Flag, indicates whether SQL execution has taken place.
 	 */
 	private $exc =0;
 
 	/**
 	 * @var array
+	 * Contains arbitrary connection data.
 	 *
 	 */
 	private $connectInfo = array();
 
+	/**
+	 *
+	 * @var boolean
+	 * 
+	 * Whether we are currently connected or not.
+	 * This flag is being used to delay the connection until necessary.
+	 * Delaying connections is a good practice to speed up scripts that
+	 * don't need database connectivity but for some reason want to
+	 * init RedbeanPHP.
+	 */
 	private $isConnected = false;
 
 
 	/**
 	 * Returns an instance of the PDO Driver.
-	 * @param $dsn
-	 * @param $user
-	 * @param $pass
-	 * @param $dbname
-	 * @return unknown_type
+	 *
+	 * @param string $dsn    Database connection string
+	 * @param string $user   DB account to be used
+	 * @param string $pass   password
+	 * @param string $dbname name of the database you
+	 *
+	 * @return RedBean_Driver_PDO $pdo	  PDO wrapper instance
 	 */
 	public static function getInstance($dsn, $user, $pass, $dbname) {
 		if(is_null(self::$instance)) {
@@ -89,9 +103,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *    $driver = new RedBean_Driver_PDO($dsn, $user, $password);
 	 *    $driver = new RedBean_Driver_PDO($existingConnection);
 	 *
-	 * @param string|PDO  $dsn
+	 * @param string|PDO  $dsn	 database connection string
 	 * @param string      $user optional
 	 * @param string      $pass optional
+	 *
 	 * @return void
 	 */
 	public function __construct($dsn, $user = NULL, $pass = NULL) {
@@ -110,10 +125,18 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}
 	}
 
+	/**
+	 * Establishes a connection to the database using PHP PDO
+	 * functionality. If a connection has already been established this
+	 * method will simply return directly. This method also turns on
+	 * UTF8 for the database and PDO-ERRMODE-EXCEPTION as well as
+	 * PDO-FETCH-ASSOC.
+	 *
+	 * @return void
+	 */
 	public function connect() {
 
 		if ($this->isConnected) return;
-
 
 		$user = $this->connectInfo["user"];
 		$pass = $this->connectInfo["pass"];
@@ -136,8 +159,11 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#GetAll()
+	 * Runs a query and fetches results as a multi dimensional array.
+	 *
+	 * @param  string $sql SQL to be executed
+	 *
+	 * @return array $results result
 	 */
 	public function GetAll( $sql, $aValues=array() ) {
 		$this->connect();
@@ -146,10 +172,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		if ($this->debug) {
 			echo "<HR>" . $sql.print_r($aValues,1);
 		}
-
-
-
-
 		try {
 
 
@@ -195,9 +217,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		return $rows;
 	}
 
-	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#GetCol()
+	 /**
+	 * Runs a query and fetches results as a column.
+	 *
+	 * @param  string $sql SQL Code to execute
+	 *
+	 * @return array	$results Resultset
 	 */
 	public function GetCol($sql, $aValues=array()) {
 		$this->connect();
@@ -215,8 +240,11 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#GetCell()
+	 * Runs a query an returns results as a single cell.
+	 *
+	 * @param string $sql SQL to execute
+	 *
+	 * @return mixed $cellvalue result cell
 	 */
 	public function GetCell($sql, $aValues=array()) {
 		$this->connect();
@@ -228,8 +256,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#GetRow()
+	 * Runs a query and returns a flat array containing the values of
+	 * one row.
+	 *
+	 * @param string $sql SQL to execute
+	 *
+	 * @return array $row result row
 	 */
 	public function GetRow($sql, $aValues=array()) {
 		$this->connect();
@@ -239,8 +271,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#ErrorNo()
+	 * Returns the error constant of the most
+	 * recent error.
+	 *
+	 * @return mixed $error error code
 	 */
 	public function ErrorNo() {
 		$this->connect();
@@ -250,8 +284,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#Errormsg()
+	 * Returns the error message of the most recent
+	 * error.
+	 *
+	 * @return string $message error message
 	 */
 	public function Errormsg() {
 		$this->connect();
@@ -261,8 +297,19 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#Execute()
+	 * Executes SQL code and allows key-value binding.
+	 * This function allows you to provide an array with values to bind
+	 * to query parameters. For instance you can bind values to question
+	 * marks in the query. Each value in the array corresponds to the
+	 * question mark in the query that matches the position of the value in the
+	 * array. You can also bind values using explicit keys, for instance
+	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * SQL. This method has no return value.
+	 *
+	 * @param string $sql	  SQL Code to execute
+	 * @param array  $aValues Values to bind to SQL query
+	 *
+	 * @return void
 	 */
 	public function Execute( $sql, $aValues=array() ) {
 		$this->connect();
@@ -271,8 +318,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			echo "<HR>" . $sql.print_r($aValues,1);
 		}
 		try {
-
-
 			if (strpos("pgsql",$this->dsn)===0) {
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			}
@@ -292,17 +337,18 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			else {
 				$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
 			}
-
 			$x->setSQLState( $e->getCode() );
 			throw $x;
-
 		}
-		//
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#Escape()
+	 * Escapes a string for use in SQL using the currently selected
+	 * PDO driver.
+	 *
+	 * @param string $string string to be escaped
+	 *
+	 * @return string $string escaped string
 	 */
 	public function Escape( $str ) {
 		$this->connect();
@@ -310,8 +356,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#GetInsertID()
+	 * Returns the latest insert ID if driver does support this
+	 * feature.
+	 *
+	 * @return integer $id primary key ID
 	 */
 	public function GetInsertID() {
 		$this->connect();
@@ -319,8 +367,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#Affected_Rows()
+	 * Returns the number of rows affected by the most recent query
+	 * if the currently selected PDO driver supports this feature.
+	 *
+	 * @return integer $numOfRows number of rows affected
 	 */
 	public function Affected_Rows() {
 		$this->connect();
@@ -328,8 +378,15 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#setDebugMode()
+	 * Toggles debug mode. In debug mode the driver will print all
+	 * SQL to the screen together with some information about the
+	 * results. All SQL code that passes through the driver will be
+	 * passes on to the screen for inspection.
+	 * This method has no return value.
+	 *
+	 * @param boolean $trueFalse turn on/off
+	 *
+	 * @return void
 	 */
 	public function setDebugMode( $tf ) {
 		$this->connect();
@@ -337,8 +394,9 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#GetRaw()
+	 * Returns a raw result resource from the underlying PDO driver.
+	 *
+	 * @return Resource $PDOResult PDO result resource object
 	 */
 	public function GetRaw() {
 		$this->connect();
@@ -348,6 +406,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 	/**
 	 * Starts a transaction.
+	 * This method is part of the transaction mechanism of
+	 * RedBeanPHP. All queries in a transaction are executed together.
+	 * In case of an error all commands will be rolled back so none of the
+	 * SQL in the transaction will affect the DB. Using transactions is
+	 * considered best practice.
+	 * This method has no return value.
+	 *
+	 * @return void
 	 */
 	public function StartTrans() {
 		$this->connect();
@@ -357,6 +423,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 	/**
 	 * Commits a transaction.
+	 * This method is part of the transaction mechanism of
+	 * RedBeanPHP. All queries in a transaction are executed together.
+	 * In case of an error all commands will be rolled back so none of the
+	 * SQL in the transaction will affect the DB. Using transactions is
+	 * considered best practice.
+	 * This method has no return value.
+	 *
+	 * @return void
 	 */
 	public function CommitTrans() {
 		$this->connect();
@@ -366,6 +440,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 	/**
 	 * Rolls back a transaction.
+	 * This method is part of the transaction mechanism of
+	 * RedBeanPHP. All queries in a transaction are executed together.
+	 * In case of an error all commands will be rolled back so none of the
+	 * SQL in the transaction will affect the DB. Using transactions is
+	 * considered best practice.
+	 * This method has no return value.
+	 *
+	 * @return void
 	 */
 	public function FailTrans() {
 		$this->connect();
@@ -374,7 +456,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 	/**
 	 * Returns the name of the database type/brand: i.e. mysql, db2 etc.
-	 * @return string $typeName
+	 *
+	 * @return string $typeName database identification
 	 */
 	public function getDatabaseType() {
 		$this->connect();
@@ -383,7 +466,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 	/**
 	 * Returns the version number of the database.
-	 * @return mixed $version
+	 *
+	 * @return mixed $version version number of the database
 	 */
 	public function getDatabaseVersion() {
 		$this->connect();
@@ -392,7 +476,9 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 
 	/**
-	 * @return PDO
+	 * Returns the underlying PHP PDO instance.
+	 * 
+	 * @return PDO $pdo PDO instance used by PDO wrapper
 	 */
 	public function getPDO() {
 		$this->connect();

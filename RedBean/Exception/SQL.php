@@ -1,9 +1,10 @@
 <?php
 /**
  * RedBean Exception SQL
- * @file			RedBean/Exception/SQL.php
- * @description		Represents a generic database exception independent of the
- *					underlying driver.
+ * 
+ * @file				RedBean/Exception/SQL.php
+ * @description	Represents a generic database exception independent of the
+ *						underlying driver.
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -16,12 +17,14 @@ class RedBean_Exception_SQL extends Exception {
 
 	/**
 	 * @var string
+	 * Holds the current SQL Strate code.
 	 */
 	private $sqlState;
 
 	/**
 	 * Returns an ANSI-92 compliant SQL state.
-	 * @return string $state
+	 * 
+	 * @return string $state ANSI state code
 	 */
 	public function getSQLState() {
 		return $this->sqlState;
@@ -30,7 +33,8 @@ class RedBean_Exception_SQL extends Exception {
 	/**
 	 * @todo parse state to verify valid ANSI92!
 	 * Stores ANSI-92 compliant SQL state.
-	 * @param string $sqlState
+	 * 
+	 * @param string $sqlState code
 	 */
 	public function setSQLState( $sqlState ) {
 		$this->sqlState = $sqlState;
@@ -39,7 +43,8 @@ class RedBean_Exception_SQL extends Exception {
 
 	/**
 	 * To String prints both code and SQL state.
-	 * @return string
+	 *
+	 * @return string $message prints this exception instance as a string
 	 */
 	public function __toString() {
 		return "[".$this->getSQLState()."] - ".$this->getMessage();

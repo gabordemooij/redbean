@@ -16,14 +16,14 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * @var RedBean_Driver
 	 *
-	 * ADODB compatible class.
+	 * ADODB compatible class
 	 */
 	private $db = null;
 
 	/**
 	 * @var string
 	 *
-	 * Contains SQL snippet.
+	 * Contains SQL snippet
 	 */
 	private $sql = "";
 
@@ -34,7 +34,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * This class provides an interface for RedBean to work
 	 * with ADO compatible DB instances.
 	 *
-	 * @param RedBean_Driver $database ADO Compatible DB Instance.
+	 * @param RedBean_Driver $database ADO Compatible DB Instance
 	 */
 	public function __construct($database) {
 		$this->db = $database;
@@ -43,7 +43,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * Returns the latest SQL Statement.
 	 *
-	 * @return string $SQL Latest SQL statement.
+	 * @return string $SQL latest SQL statement
 	 */
 	public function getSQL() {
 		return $this->sql;
@@ -52,9 +52,9 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * Escapes a string for use in a Query.
 	 *
-	 * @param  string $sqlvalue     SQL value to escape.
+	 * @param  string $sqlvalue SQL value to escape
 	 *
-	 * @return string $escapedValue Escaped value.
+	 * @return string $escapedValue escaped value
 	 */
 	public function escape( $sqlvalue ) {
 		return $this->db->Escape($sqlvalue);
@@ -71,11 +71,11 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * array(":key"=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
-	 * @param  string  $sql			SQL Code to execute.
-	 * @param  array   $values		Assoc. array binding values.
-	 * @param  boolean $noevent   If TRUE this will suppress the event 'sql_exec'
+	 * @param  string  $sql			SQL Code to execute
+	 * @param  array   $values		assoc. array binding values
+	 * @param  boolean $noevent   if TRUE this will suppress the event 'sql_exec'
 	 *
-	 * @return mixed  $undefSet	Whatever driver returns, undefined.
+	 * @return mixed  $undefSet	whatever driver returns, undefined
 	 */
 	public function exec( $sql , $aValues=array(), $noevent=false) {
 		if (!$noevent) {
@@ -95,10 +95,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * array(":key"=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
-	 * @param  string $sql		SQL code to execute.
-	 * @param  array  $values	Assoc. array binding values.
+	 * @param  string $sql		SQL code to execute
+	 * @param  array  $values	assoc. array binding values
 	 *
-	 * @return array  $result	Two dimensional array result set.
+	 * @return array  $result	two dimensional array result set
 	 */
 	public function get( $sql, $aValues = array() ) {
 		$this->sql = $sql;
@@ -116,10 +116,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * array(":key"=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
-	 * @param  string $sql		SQL code to execute.
-	 * @param  array  $values	Assoc. array binding values.
+	 * @param  string $sql		SQL code to execute
+	 * @param  array  $values	assoc. array binding values
 	 *
-	 * @return array	$result	One dimensional array result set.
+	 * @return array	$result	one dimensional array result set
 	 */
 	public function getRow( $sql, $aValues = array() ) {
 
@@ -139,10 +139,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * array(":key"=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
-	 * @param  string $sql		SQL code to execute.
-	 * @param  array  $values	Assoc. array binding values.
+	 * @param  string $sql		SQL code to execute
+	 * @param  array  $values	assoc. array binding values
 	 *
-	 * @return array  $result	One dimensional array result set.
+	 * @return array  $result	one dimensional array result set
 	 */
 	public function getCol( $sql, $aValues = array() ) {
 		$this->sql = $sql;
@@ -165,10 +165,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * array(":key"=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
-	 * @param  string $sql		SQL code to execute.
-	 * @param  array  $values	Assoc. array binding values.
+	 * @param  string $sql		SQL code to execute
+	 * @param  array  $values	assoc. array binding values
 	 *
-	 * @return array  $result	Multi dimensional assoc. array result set.
+	 * @return array  $result	multi dimensional assoc. array result set
 	 */
 	public function getAssoc( $sql, $aValues = array() ) {
 		$this->sql = $sql;
@@ -206,10 +206,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * array(":key"=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
-	 * @param  string $sql		SQL code to execute.
-	 * @param  array  $values	Assoc. array binding values.
+	 * @param  string $sql	  sql code to execute
+	 * @param  array  $values assoc. array binding values
 	 *
-	 * @return array  $result	Scalar result set.
+	 * @return array  $result scalar result set
 	 */
 
 	public function getCell( $sql, $aValues = array(), $noSignal = null ) {
@@ -222,7 +222,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * Returns latest insert id, most recently inserted id.
 	 *
-	 * @return integer $id	Latest insert ID.
+	 * @return integer $id latest insert ID
 	 */
 	public function getInsertID() {
 		return $this->db->getInsertID();
@@ -240,7 +240,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * Unwrap the original database object.
 	 *
-	 * @return RedBean_Driver $database		Returns the inner database object
+	 * @return RedBean_Driver $database	returns the inner database object
 	 */
 	public function getDatabase() {
 		return $this->db;
@@ -248,7 +248,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Return latest error message.
-	 * @return string $message
+	 * 
+	 * @return string $message most recent error message
 	 */
 	public function getErrorMsg() {
 		return $this->db->Errormsg();

@@ -23,22 +23,26 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 
 	/**
 	 * @var RedBean_Adapter_DBAdapter
+	 * Contains a reference to the database adapter.
 	 */
 	private $adapter;
 
 	/**
 	 * @var RedBean_OODB
+	 * Contains a reference to the RedBean OODB object.
 	 */
 	private $oodb;
 
 	/**
 	 * @var RedBean_QueryWriter_MySQL
+	 * Contains a reference to the query writer.
 	 */
 	private $writer;
 
 	/**
 	 * Constructor
 	 * Handles the toolbox
+	 * 
 	 * @param RedBean_ToolBox $toolbox
 	 */
 	public function __construct( RedBean_ToolBox $toolbox ) {
@@ -51,8 +55,9 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 
 	/**
 	 * Does an optimization cycle for each UPDATE event.
-	 * @param string $event
-	 * @param RedBean_OODBBean $bean
+	 *
+	 * @param string $event				event
+	 * @param RedBean_OODBBean $bean	bean
 	 */
 	public function onEvent( $event , $bean ) {
 		try {
@@ -69,8 +74,14 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 				$fields = $this->writer->getColumns($table);
 				if (!in_array($column,array_keys($fields))) return;
 				$typeInField = $this->writer->code($fields[$column]);
+				//Specified Columns need to be verified, might be optimized already
+				if ($typeInField == RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED) {
+					//If type is SPECIFIED and value is SPECIFIED
+					if ($fields[$column]=="datetime" && $this->matchesDateTime($value)) return;
+				}
 				//Is the type too wide?
 				if ($type < $typeInField) {
+					//echo "\n\n $type < $typeInField ";
 					try {
 						@$this->adapter->exec("alter table ".$this->writer->noKW($table)." drop __test");
 					}catch(Exception $e) {
@@ -111,10 +122,11 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 	 * datetime, ENUM etc. This method is called automatically for you and
 	 * works completely in the background. You can however if you like trigger
 	 * this method by invoking it directly.
-	 * @param string $table
-	 * @param string $column
-	 * @param string $columnType
-	 * @param string $value
+	 *
+	 * @param string $table		  table
+	 * @param string $column	  column
+	 * @param string $columnType type of column
+	 * @param string $value		  value
 	 */
 	public function MySQLSpecificColumns( $table, $column, $columnType, $value ) {
 		//$this->adapter->getDatabase()->setDebugMode(1);
@@ -122,8 +134,7 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 		$column = $this->adapter->escape($column);
 		//Is column already datetime?
 		if ($columnType!="datetime") {
-			$pattern = "/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9]) (?:([0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/";
-			if (preg_match($pattern, $value)) {
+			if ($this->matchesDateTime($value)) {
 				//Ok, value is datetime, can we convert the column to support this?
 				$cnt = (int) $this->adapter->getCell("select count(*) as n from $table where
 						  $column regexp '[0-9]{4}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]'
@@ -137,5 +148,11 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 		}
 
 	}
+
+	public function matchesDateTime($value) {
+		$pattern = "/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9]) (?:([0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/";
+		return (boolean) (preg_match($pattern, $value));
+	}
+
 
 }

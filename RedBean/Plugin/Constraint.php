@@ -14,7 +14,11 @@
  */
 class RedBean_Plugin_Constraint {
 
-	//Keeps track of foreign keys (only to improve fluid performance)
+	/**
+	 *
+	 * @var array
+	 * Keeps track of foreign keys (only to improve fluid performance)
+	 */
 	private static $fkcache = array();
 
 	/**
@@ -22,9 +26,11 @@ class RedBean_Plugin_Constraint {
 	 * $bean1 and $bean2,
 	 * if one of them gets trashed the association will be
 	 * automatically removed.
-	 * @param RedBean_OODBBean $bean1
-	 * @param RedBean_OODBBean $bean2
-	 * @return boolean $addedFKS
+	 *
+	 * @param RedBean_OODBBean $bean1 bean
+	 * @param RedBean_OODBBean $bean2 bean
+	 *
+	 * @return boolean $addedFKS whether we succeeded
 	 */
 	public static function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $dontCache = false ) {
 
@@ -94,14 +100,16 @@ class RedBean_Plugin_Constraint {
 	/**
 	 * Add the constraints for a specific database driver: PostgreSQL.
 	 * @todo Too many arguments; find a way to solve this in a neater way.
-	 * @param RedBean_ToolBox $toolbox
-	 * @param string $table
-	 * @param string $table1
-	 * @param string $table2
-	 * @param string $property1
-	 * @param string $property2
-	 * @param boolean $dontCache
-	 * @return boolean $succes
+	 *
+	 * @param RedBean_ToolBox $toolbox   toolbox
+	 * @param string			  $table     table
+	 * @param string			  $table1    table1
+	 * @param string			  $table2    table2
+	 * @param string			  $property1 property1
+	 * @param string			  $property2 property2
+	 * @param boolean			  $dontCache want to have cache?
+	 *
+	 * @return boolean $succes whether the constraint has been applied
 	 */
 	private static function constraintPostgreSQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache) {
 		$writer = $toolbox->getWriter();
@@ -147,14 +155,16 @@ class RedBean_Plugin_Constraint {
 	/**
 	 * Add the constraints for a specific database driver: MySQL.
 	 * @todo Too many arguments; find a way to solve this in a neater way.
-	 * @param RedBean_ToolBox $toolbox
-	 * @param string $table
-	 * @param string $table1
-	 * @param string $table2
-	 * @param string $property1
-	 * @param string $property2
-	 * @param boolean $dontCache
-	 * @return boolean $succes
+	 *
+	 * @param RedBean_ToolBox $toolbox   toolbox
+	 * @param string			  $table     table
+	 * @param string			  $table1    table1
+	 * @param string			  $table2    table2
+	 * @param string			  $property1 property1
+	 * @param string			  $property2 property2
+	 * @param boolean			  $dontCache want to have cache?
+	 *
+	 * @return boolean $succes whether the constraint has been applied
 	 */
 	private static function constraintMySQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache) {
 		$writer = $toolbox->getWriter();
@@ -197,14 +207,16 @@ class RedBean_Plugin_Constraint {
 	/**
 	 * Add the constraints for a specific database driver: SQLite.
 	 * @todo Too many arguments; find a way to solve this in a neater way.
-	 * @param RedBean_ToolBox $toolbox
-	 * @param string $table
-	 * @param string $table1
-	 * @param string $table2
-	 * @param string $property1
-	 * @param string $property2
-	 * @param boolean $dontCache
-	 * @return boolean $succes
+	 *
+	 * @param RedBean_ToolBox $toolbox   toolbox
+	 * @param string			  $table     table
+	 * @param string			  $table1    table1
+	 * @param string			  $table2    table2
+	 * @param string			  $property1 property1
+	 * @param string			  $property2 property2
+	 * @param boolean			  $dontCache want to have cache?
+	 *
+	 * @return boolean $succes whether the constraint has been applied
 	 */
 	private static function constraintSQLite($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache) {
 		$writer = $toolbox->getWriter();
