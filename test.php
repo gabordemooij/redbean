@@ -2381,6 +2381,7 @@ R::tag($blog, false);
 asrt(R::tag($blog),"");
 
 
+
 testpack("New relations");
 $pdo->Execute("DROP TABLE IF EXISTS person");
 $pdo->Execute("DROP TABLE IF EXISTS person_person");
@@ -2425,5 +2426,39 @@ asrt(count($students),1);
 $s = reset($students);
 asrt($s->name, 'b');
 
+function getList($beans,$property) {
+	$items = array();
+	foreach($beans as $bean) {
+		$items[] = $bean->$property;
+	}
+	sort($items);
+	return implode(",",$items);
+}
 
+testpack("unrelated");
+$pdo->Execute("DROP TABLE IF EXISTS person");
+$pdo->Execute("DROP TABLE IF EXISTS person_person");
+$painter = R::dispense('person');
+$painter->job = 'painter';
+$accountant = R::dispense('person');
+$accountant->job = 'accountant';
+$developer = R::dispense('person');
+$developer->job = 'developer';
+$salesman = R::dispense('person');
+$salesman->job = 'salesman';
+R::associate($painter, $accountant);
+R::associate($salesman, $accountant);
+R::associate($developer, $accountant);
+R::associate($salesman, $developer);
+asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter,salesman" ) ;
+asrt( getList( R::unrelated($accountant,"person"),"job" ), "accountant" ) ;
+asrt( getList( R::unrelated($painter,"person"),"job" ), "developer,painter,salesman" ) ;
+R::associate($accountant, $accountant);
+R::associate($salesman, $salesman);
+R::associate($developer, $developer);
+R::associate($painter, $painter);
+asrt( getList( R::unrelated($accountant,"person"),"job" ), "" ) ;
+asrt( getList( R::unrelated($painter,"person"),"job" ), "developer,salesman" ) ;
+asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter" ) ;
+asrt( getList( R::unrelated($developer,"person"),"job" ), "painter" ) ;
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

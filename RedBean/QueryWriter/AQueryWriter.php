@@ -332,5 +332,26 @@ abstract class RedBean_AQueryWriter {
 		$sql = "DELETE FROM $table WHERE ".implode(" AND ", $conditions);
 		return (int) $this->adapter->exec($sql, $values);
 	}
-	
+
+	/**
+	 * Returns a snippet of SQL to filter records using SQL and a list of
+	 * keys.
+	 *
+	 * @param string  $idfield ID Field to use for selecting primary key
+	 * @param array   $keys		List of keys to use for filtering
+	 * @param string  $sql		SQL to append, if any
+	 * @param boolean $inverse Whether you want to inverse the selection
+	 *
+	 * @return string $snippet SQL Snippet crafted by function
+	 */
+	public function getSQLSnippetFilter( $idfield, $keys, $sql=null, $inverse=false ) {
+		if (!$sql) $sql=" 1 ";
+		if (!$inverse && count($keys)===0) return " 0 ";
+		$idfield = $this->noKW($idfield);
+		$sqlInverse = ($inverse) ? "NOT" : "";
+		$sqlKeyFilter = ($keys) ? " $idfield $sqlInverse IN (".implode(",",$keys).") AND " : " ";
+		$sqlSnippet = $sqlKeyFilter . $sql;
+		return $sqlSnippet;
+	}
+
 }

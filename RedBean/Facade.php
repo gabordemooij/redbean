@@ -217,15 +217,30 @@ class R {
 	 * @param string $type
 	 * @return array $beans
 	 */
-	public static function related( RedBean_OODBBean $bean, $type, $sql = '1' ) {
-		//return self::$redbean->batch( $type, self::$associationManager->related( $bean, $type ));
+	public static function related( RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
+
 		$keys = self::$associationManager->related( $bean, $type );
 		if (count($keys)==0) return array();
-		if (!$sql || $sql=="1") return self::batch($type, $keys);
+		if (!$sql) return self::batch($type, $keys);
 		$idfield = self::$writer->getIDField( $type );
-		return self::find($type,
-				  " $idfield IN ( ".implode(",",$keys)." ) AND ".$sql);
+		$sqlSnippet = self::$writer->getSQLSnippetFilter($idfield, $keys, $sql);
+		return self::find( $type, $sqlSnippet, $values );
+
+		
 	}
+
+
+	public static function unrelated(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
+		
+		$keys = self::$associationManager->related( $bean, $type );
+		$idfield = self::$writer->getIDField( $type );
+		$sqlSnippet = self::$writer->getSQLSnippetFilter($idfield, $keys, $sql, true);
+		return self::find( $type, $sqlSnippet, $values );
+
+	}
+
+	
+
 
 	/**
 	 * Returns only single associated bean. This is the default way RedBean
@@ -237,8 +252,8 @@ class R {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql='1' ) {
-		$beans = self::related($bean, $type, $sql);
+	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql='1', $values=array() ) {
+		$beans = self::related($bean, $type, $sql, $values);
 		if (count($beans)==0) return array();
 		return reset( $beans );
 	}

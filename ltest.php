@@ -1370,5 +1370,84 @@ asrt(in_array("blog_id",array_keys(R::$writer->getColumns("blog"))),true);
 asrt(in_array("cms_blog_id",array_keys(R::$writer->getColumns("blog"))),false); 
 
 
+testpack("New relations");
+$pdo->Execute("DROP TABLE IF EXISTS person");
+$pdo->Execute("DROP TABLE IF EXISTS person_person");
+R::$writer->tableFormatter = null;
+$track = R::dispense('track');
+$album = R::dispense('cd');
+$track->name = 'a';
+$track->orderNum = 1;
+$track2 = R::dispense('track');
+$track2->orderNum = 2;
+$track2->name = 'b';
+R::associate( $album, $track );
+R::associate( $album, $track2 );
+$tracks = R::related( $album, 'track', ' 1 ORDER BY orderNum ' );
+$track = array_shift($tracks);
+$track2 = array_shift($tracks);
+asrt($track->name,'a');
+asrt($track2->name,'b');
+
+$t = R::dispense('person');
+$s = R::dispense('person');
+$s2 = R::dispense('person');
+$t->name = 'a';
+$t->role = 'teacher';
+$s->role = 'student';
+$s2->role = 'student';
+$s->name = 'a';
+$s2->name = 'b';
+R::associate($t, $s);
+R::associate($t, $s2);
+$students = R::related($t, 'person', ' role = "student"  ORDER BY `name` ');
+$s = array_shift($students);
+$s2 = array_shift($students);
+asrt($s->name,'a');
+asrt($s2->name,'b');
+$s= R::relatedOne($t, 'person', ' role = "student"  ORDER BY `name` ');
+asrt($s->name,'a');
+//empty classroom
+R::clearRelations($t, 'person', $s2);
+$students = R::related($t, 'person', ' role = "student"  ORDER BY `name` ');
+asrt(count($students),1);
+$s = reset($students);
+asrt($s->name, 'b');
+
+function getList($beans,$property) {
+	$items = array();
+	foreach($beans as $bean) {
+		$items[] = $bean->$property;
+	}
+	sort($items);
+	return implode(",",$items);
+}
+
+testpack("unrelated");
+$pdo->Execute("DROP TABLE IF EXISTS person");
+$pdo->Execute("DROP TABLE IF EXISTS person_person");
+$painter = R::dispense('person');
+$painter->job = 'painter';
+$accountant = R::dispense('person');
+$accountant->job = 'accountant';
+$developer = R::dispense('person');
+$developer->job = 'developer';
+$salesman = R::dispense('person');
+$salesman->job = 'salesman';
+R::associate($painter, $accountant);
+R::associate($salesman, $accountant);
+R::associate($developer, $accountant);
+R::associate($salesman, $developer);
+asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter,salesman" ) ;
+asrt( getList( R::unrelated($accountant,"person"),"job" ), "accountant" ) ;
+asrt( getList( R::unrelated($painter,"person"),"job" ), "developer,painter,salesman" ) ;
+R::associate($accountant, $accountant);
+R::associate($salesman, $salesman);
+R::associate($developer, $developer);
+R::associate($painter, $painter);
+asrt( getList( R::unrelated($accountant,"person"),"job" ), "" ) ;
+asrt( getList( R::unrelated($painter,"person"),"job" ), "developer,salesman" ) ;
+asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter" ) ;
+asrt( getList( R::unrelated($developer,"person"),"job" ), "painter" ) ;
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");

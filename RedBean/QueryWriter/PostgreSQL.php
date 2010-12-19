@@ -71,8 +71,20 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_AQueryWriter implements Red
 	 */
   protected $quoteCharacter = '"';
 
+  /**
+   *
+   * @var string
+   *
+   */
   protected $defaultValue = 'DEFAULT';
-	 
+
+  /**
+   * Returns the insert suffix SQL Snippet
+   * 
+   * @param string $table table
+   *
+   * @return  string $sql SQL Snippet
+   */
   protected function getInsertSuffix($table) {
     return "RETURNING ".$this->getIDField($table);
   }  
@@ -200,9 +212,11 @@ where table_schema = 'public'" );
 	}
 	/**
 	 * Adds a Unique index constrain to the table.
+	 *
 	 * @param string $table
 	 * @param string $col1
 	 * @param string $col2
+	 *
 	 * @return void
 	 */
 	public function addUniqueIndex( $table,$columns ) {
@@ -264,6 +278,27 @@ where table_schema = 'public'" );
 		if ($state == "42P01") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
 		if ($state == "42703") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
 		return in_array($sqlState, $list);
+	}
+
+	/**
+	 * Returns a snippet of SQL to filter records using SQL and a list of
+	 * keys.
+	 *
+	 * @param string  $idfield ID Field to use for selecting primary key
+	 * @param array   $keys		List of keys to use for filtering
+	 * @param string  $sql		SQL to append, if any
+	 * @param boolean $inverse Whether you want to inverse the selection
+	 *
+	 * @return string $snippet SQL Snippet crafted by function
+	 */
+	public function getSQLSnippetFilter( $idfield, $keys, $sql=null, $inverse=false ) {
+		if (!$sql) $sql=" TRUE ";
+		if (!$inverse && count($keys)===0) return " TRUE ";
+		$idfield = $this->noKW($idfield);
+		$sqlInverse = ($inverse) ? "NOT" : "";
+		$sqlKeyFilter = ($keys) ? " $idfield $sqlInverse IN (".implode(",",$keys).") AND " : " ";
+		$sqlSnippet = $sqlKeyFilter . $sql;
+		return $sqlSnippet;
 	}
 
 

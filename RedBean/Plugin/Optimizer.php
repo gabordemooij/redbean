@@ -58,6 +58,8 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 	 *
 	 * @param string $event				event
 	 * @param RedBean_OODBBean $bean	bean
+	 *
+	 * @return void
 	 */
 	public function onEvent( $event , $bean ) {
 		try {
@@ -127,6 +129,8 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 	 * @param string $column	  column
 	 * @param string $columnType type of column
 	 * @param string $value		  value
+	 *
+	 * @return void
 	 */
 	public function MySQLSpecificColumns( $table, $column, $columnType, $value ) {
 		//$this->adapter->getDatabase()->setDebugMode(1);
@@ -149,6 +153,14 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 
 	}
 
+	/**
+	 * MatchesDateTime matches a value to determine whether it matches the
+	 * MySQL datetime type.
+	 *
+	 * @param string $value Value to match
+	 *
+	 * @return boolean $yesNo Whether it is a datetime value
+	 */
 	public function matchesDateTime($value) {
 		$pattern = "/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9]) (?:([0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/";
 		return (boolean) (preg_match($pattern, $value));
