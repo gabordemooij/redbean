@@ -15,8 +15,9 @@ class RedBean_ExtAssociationManager extends RedBean_AssociationManager {
 
 	/**
 	 * Associates two beans with eachother.
-	 * @param RedBean_OODBBean $bean1
-	 * @param RedBean_OODBBean $bean2
+	 *
+	 * @param RedBean_OODBBean $bean1 bean 1
+	 * @param RedBean_OODBBean $bean2 bean 2
 	 */
 	public function extAssociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $baseBean ) {
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );

@@ -68,8 +68,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_SQLite {
 	/**
 	 * Returns the MySQL Column Type Code (integer) that corresponds
 	 * to the given value type.
-	 * @param string $value
-	 * @return integer $type
+	 *
+	 * @param  string $value value
+	 * 
+	 * @return integer $type type
 	 */
 	public function scanType( $value ) {
 
@@ -86,9 +88,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_SQLite {
 
 	/**
 	 * Adds a column of a given type to a table
-	 * @param string $table
-	 * @param string $column
-	 * @param integer $type
+	 *
+	 * @param string  $table  table
+	 * @param string  $column column
+	 * @param integer $type	  type
 	 */
 	public function addColumn( $table, $column, $type) {
 		$table = $this->getFormattedTableName($table);
@@ -101,13 +104,22 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_SQLite {
 
 	/**
 	 * Returns the Type Code for a Column Description
-	 * @param string $typedescription
-	 * @return integer $typecode
+	 *
+	 * @param string $typedescription description
+	 *
+	 * @return integer $typecode code
 	 */
 	public function code( $typedescription ) {
 		return ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
 	}
 
+	/**
+	 * Quote Items, to prevent issues with reserved words.
+	 *
+	 * @param array $items items to quote
+	 *
+	 * @return $quotedfItems quoted items
+	 */
 	private function quote( $items ) {
 		foreach($items as $k=>$item) {
 			$items[$k]=$this->noKW($item);
@@ -117,9 +129,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_SQLite {
 
 	/**
 	 * Change (Widen) the column to the give type.
-	 * @param string $table
-	 * @param string $column
-	 * @param integer $type
+	 *
+	 * @param string  $table  table to widen
+	 * @param string  $column column to widen
+	 * @param integer $type   new column type
 	 */
 	public function widenColumn( $table, $column, $type ) {
 		$table = $this->getFormattedTableName($table);

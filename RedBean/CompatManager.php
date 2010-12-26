@@ -1,10 +1,11 @@
 <?php
 /**
  * CompatManager (Compatibility Management)
- * @file 		RedBean/CompatManager.php
+ * 
+ * @file				RedBean/CompatManager.php
  * @description	Offers easy to use tools to check for database compatibility.
- * @author		Gabor de Mooij
- * @license		BSD
+ * @author			Gabor de Mooij
+ * @license			BSD
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
@@ -63,9 +64,12 @@ To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
 	/**
 	 * Scans the toolbox to determine whether the database adapter
 	 * is compatible with the current class, plugin or module.
+	 *
 	 * @throws RedBean_Exception_UnsupportedDatabase $exception
-	 * @param RedBean_ToolBox $toolbox
-	 * @return bool $compatible
+	 *
+	 * @param RedBean_ToolBox $toolbox toolbox
+	 *
+	 * @return bool $compatible compatible
 	 */
 	public function scanToolBox( RedBean_ToolBox $toolbox ) {
 
@@ -107,10 +111,13 @@ To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
 	 * Static Variant
 	 * Scans the toolbox to determine whether the database adapter
 	 * is compatible with the current class, plugin or module.
+	 *
 	 * @throws RedBean_Exception_UnsupportedDatabase $exception
-	 * @param RedBean_ToolBox $toolbox
-	 * @param array $listOfSystemsSupported
-	 * @return bool $compatible
+	 *
+	 * @param RedBean_ToolBox $toolbox toolbox
+	 * @param array			  $list    list of systems that are supported
+	 * 
+	 * @return bool $compatible compatible
 	 */
 	public static function scanDirect( RedBean_ToolBox $toolbox, $list = array() ) {
 		$compat = new RedBean_CompatManager();

@@ -1,10 +1,10 @@
 <?php
 /**
  * RedBean Domain Object
- * @file 		RedBean/DomainObject.php
- * @description		This class serves as a source of inspiration and
- *					is an example how a layer super type pattern can be
- *					used with RedBean. This class has not been tested.
+ * @file				RedBean/DomainObject.php
+ * @description	This class serves as a source of inspiration and
+ *						is an example how a layer super type pattern can be
+ *						used with RedBean. This class has not been tested.
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -43,7 +43,7 @@ abstract class RedBean_DomainObject {
 	/**
 	 *
 	 * Constructor, requires a type name
-	 * @param string $typeName
+	 * @param string $typeName typename
 	 */
 	public function __construct( $typeName = false ) {
 
@@ -99,7 +99,8 @@ abstract class RedBean_DomainObject {
 	}
 	/**
 	 * Associates the bean inside with another OODBBean
-	 * @param RedBean_DomainObject $other
+	 *
+	 * @param RedBean_DomainObject $other other
 	 */
 	protected function associate(RedBean_DomainObject $other) {
 		$this->associationManager->associate($this->bean, $other->bean);
@@ -107,15 +108,18 @@ abstract class RedBean_DomainObject {
 	/**
 	 * Breaks the association between this OODBBean an the one belonging
 	 * to the other model.
-	 * @param RedBean_DomainObject $other
+	 *
+	 * @param RedBean_DomainObject $other other
 	 */
 	protected function unassociate(RedBean_DomainObject $other) {
 		$this->associationManager->unassociate($this->bean, $other->bean);
 	}
 	/**
 	 * Fetches related domain objects.
-	 * @param string $className
-	 * @param mixed $constructorArg
+	 *
+	 * @param string $className      class name
+	 * @param mixed  $constructorArg constructor arguments
+	 * 
 	 * @return mixed $models
 	 */
 	protected function related( $className, $constructorArg = null ) {
@@ -129,9 +133,11 @@ abstract class RedBean_DomainObject {
 		}
 		return $models;
 	}
+
 	/**
 	 * Returns the type of the bean.
-	 * @return string $type
+	 *
+	 * @return string $type type
 	 */
 	protected function getBeanType() {
 		return $this->bean->getMeta("type");
@@ -144,15 +150,16 @@ abstract class RedBean_DomainObject {
 		$this->associationManager->clearRelations($this->bean, $type);
 	}
 	/**
-	 *
-	 * @param RedBean_DomainObject $other
+	 * Attach
+	 * @param RedBean_DomainObject $other other
 	 */
 	protected function attach(RedBean_DomainObject $other) {
 		$this->treeManager->attach($this->bean, $other->bean);
 	}
 	/**
 	 * Loads the Bean internally
-	 * @param integer $id
+	 * 
+	 * @param integer $id id
 	 */
 	public function find( $id ) {
 		$this->bean = $this->redbean->load( $this->bean->getMeta("type"), (int) $id );
@@ -179,9 +186,18 @@ abstract class RedBean_DomainObject {
 		return $this->bean->$idField;
 	}
 
+	/**
+	 * Exports bean.
+	 * @return array $array array
+	 */
 	public function export() {
 		return $this->bean;
 	}
+
+	/**
+	 * Exports beans.
+	 * @return array $array array
+	 */
 
 	public static function exportAll( $objects ) {
 		$beans = array();
@@ -190,6 +206,12 @@ abstract class RedBean_DomainObject {
 		}
 		return $beans;
 	}
+
+	/**
+	 * Loads bean.
+	 * 
+	 * @param RedBean_OODBBean $bean bean to load
+	 */
 
 	public function loadBean( RedBean_OODBBean $bean ) {
 		$this->bean = $bean;

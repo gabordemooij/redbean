@@ -15,13 +15,15 @@ interface RedBean_Adapter {
 
 	/**
 	 * Returns the latest SQL statement
-	 * @return string $SQLString
+	 *
+	 * @return string $SQLString SQLString
 	 */
 	public function getSQL();
 
 	/**
 	 * Escapes a value for usage in an SQL statement
-	 * @param string $sqlvalue
+	 *
+	 * @param string $sqlvalue value
 	 */
 	public function escape( $sqlvalue );
 
@@ -30,9 +32,10 @@ interface RedBean_Adapter {
 	 * If $noevent is TRUE then this function will not signal its
 	 * observers to notify about the SQL execution; this to prevent
 	 * infinite recursion when using observers.
-	 * @param string $sql
-	 * @param array $aValues
-	 * @param boolean $noevent
+	 *
+	 * @param string  $sql     SQL
+	 * @param array   $aValues values
+	 * @param boolean $noevent no event firing
 	 */
 	public function exec( $sql , $aValues=array(), $noevent=false);
 
@@ -41,8 +44,9 @@ interface RedBean_Adapter {
 	 * This method returns a multi dimensional resultset similar to getAll
 	 * The values array can be used to bind values to the place holders in the
 	 * SQL query.
-	 * @param string $sql
-	 * @param array $aValues
+	 *
+	 * @param string $sql     SQL
+	 * @param array  $aValues values
 	 */
 	public function get( $sql, $aValues = array() );
 
@@ -51,9 +55,11 @@ interface RedBean_Adapter {
 	 * This method returns a single row (one array) resultset.
 	 * The values array can be used to bind values to the place holders in the
 	 * SQL query.
-	 * @param string $sql
-	 * @param array $aValues
-	 * @return array $aMultiDimArray
+	 *
+	 * @param string $sql	  SQL
+	 * @param array  $aValues values to bind
+	 *
+	 * @return array $aMultiDimArray row
 	 */
 	public function getRow( $sql, $aValues = array() );
 
@@ -62,9 +68,11 @@ interface RedBean_Adapter {
 	 * This method returns a single column (one array) resultset.
 	 * The values array can be used to bind values to the place holders in the
 	 * SQL query.
-	 * @param string $sql
-	 * @param array $aValues
-	 * @return array $aSingleDimArray
+	 *
+	 * @param string $sql	  SQL
+	 * @param array  $aValues values to bind
+	 *
+	 * @return array $aSingleDimArray column
 	 */
 	public function getCol( $sql, $aValues = array() );
 
@@ -73,9 +81,11 @@ interface RedBean_Adapter {
 	 * This method returns a single cell, a scalar value as the resultset.
 	 * The values array can be used to bind values to the place holders in the
 	 * SQL query.
-	 * @param string $sql
-	 * @param array $aValues
-	 * @return string $sSingleValue
+	 *
+	 * @param string $sql     SQL
+	 * @param array  $aValues values to bind
+	 *
+	 * @return string $sSingleValue value from cell
 	 */
 	public function getCell( $sql, $aValues = array() );
 
@@ -86,22 +96,26 @@ interface RedBean_Adapter {
 	 * serve as keys while the values of the second column will be used as values.
 	 * The values array can be used to bind values to the place holders in the
 	 * SQL query.
-	 * @param string $sql
-	 * @param array $values
-	 * @return array $associativeArray
+	 *
+	 * @param string $sql    SQL
+	 * @param array  $values values to bind
+	 *
+	 * @return array $associativeArray associative array result set
 	 */
 	public function getAssoc( $sql, $values = array() );
 
 	/**
 	 * Returns the latest insert ID.
-	 * @return integer $id
+	 *
+	 * @return integer $id primary key ID
 	 */
 	public function getInsertID();
 
 	/**
 	 * Returns the number of rows that have been
 	 * affected by the last update statement.
-	 * @return integer $count
+	 *
+	 * @return integer $count number of rows affected
 	 */
 	public function getAffectedRows();
 
@@ -110,13 +124,15 @@ interface RedBean_Adapter {
 	 * perform operations on the driver directly instead of working with the
 	 * adapter. RedBean will only access the adapter and never to talk
 	 * directly to the driver though.
-	 * @return object $driver
+	 *
+	 * @return object $driver driver
 	 */
 	public function getDatabase();
 
 	/**
 	 * Returns the latest error message; if any.
-	 * @return string $message
+	 *
+	 * @return string $message error message from server
 	 */
 	public function getErrorMsg();
 

@@ -110,8 +110,10 @@ class R {
 
 	/**
 	 * Stores a RedBean OODB Bean and returns the ID.
-	 * @param RedBean_OODBBean $bean
-	 * @return integer $id
+	 *
+	 * @param  RedBean_OODBBean $bean bean
+	 * 
+	 * @return integer $id id
 	 */
 	public static function store( RedBean_OODBBean $bean ) {
 		return self::$redbean->store( $bean );

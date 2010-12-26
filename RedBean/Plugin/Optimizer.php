@@ -56,8 +56,8 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 	/**
 	 * Does an optimization cycle for each UPDATE event.
 	 *
-	 * @param string $event				event
-	 * @param RedBean_OODBBean $bean	bean
+	 * @param string				$event event
+	 * @param RedBean_OODBBean $bean	 bean
 	 *
 	 * @return void
 	 */

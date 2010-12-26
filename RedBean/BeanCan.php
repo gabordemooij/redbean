@@ -25,7 +25,16 @@ class RedBean_BeanCan {
 		$this->modelHelper = new RedBean_ModelHelper;
 	}
 
-
+	/**
+	 * Writes a response object for the client (JSON encoded).
+	 *
+	 * @param mixed   $result       result
+	 * @param integer $id           request ID
+	 * @param integer $errorCode    error code from server
+	 * @param string  $errorMessage error message from server
+	 *
+	 * @return string $json JSON encoded response.
+	 */
 	private function resp($result=null, $id=null, $errorCode="-32603",$errorMessage="Internal Error") {
 		$response = array(
 			"jsonrpc"=>"2.0",

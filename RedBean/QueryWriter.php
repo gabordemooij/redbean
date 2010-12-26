@@ -169,4 +169,18 @@ interface RedBean_QueryWriter {
 	 */
 	public function sqlStateIn( $state, $list );
 
+	/**
+	 * Returns a snippet of SQL to filter records using SQL and a list of
+	 * keys.
+	 *
+	 * @param string  $idfield ID Field to use for selecting primary key
+	 * @param array   $keys		List of keys to use for filtering
+	 * @param string  $sql		SQL to append, if any
+	 * @param boolean $inverse Whether you want to inverse the selection
+	 *
+	 * @return string $snippet SQL Snippet crafted by function
+	 */
+	public function getSQLSnippetFilter( $idfield, $keys, $sql=null, $inverse=false );
+
+
 }

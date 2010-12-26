@@ -100,12 +100,9 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 			}
 		}
 
-
 		//Give the rows to RedBean OODB to convert them
 		//into beans.
 		return $redbean->convertToBeans($type, $rows);
-
-
 	}
 
 	/**

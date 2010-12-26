@@ -1,8 +1,8 @@
 <?php
 /**
  * RedBean Association
- * @file			RedBean/AssociationManager.php
- * @description		Manages simple bean associations.
+ * @file				RedBean/AssociationManager.php
+ * @description	Manages simple bean associations.
  *
  * @author			Gabor de Mooij
  * @license			BSD
@@ -41,7 +41,8 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 
 	/**
 	 * Constructor
-	 * @param RedBean_ToolBox $tools
+	 * 
+	 * @param RedBean_ToolBox $tools toolbox
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
 		$this->oodb = $tools->getRedBean();
@@ -50,8 +51,10 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	}
 	/**
 	 * Creates a table name based on a types array.
-	 * @param array $types
-	 * @return string $table
+	 *
+	 * @param array $types types
+	 *
+	 * @return string $table table
 	 */
 	public function getTable( $types ) {
 		sort($types);
@@ -59,8 +62,9 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	}
 	/**
 	 * Associates two beans with eachother.
-	 * @param RedBean_OODBBean $bean1
-	 * @param RedBean_OODBBean $bean2
+	 *
+	 * @param RedBean_OODBBean $bean1 bean1
+	 * @param RedBean_OODBBean $bean2 bean2
 	 */
 	public function associate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
@@ -69,6 +73,16 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	}
 
 
+	/**
+	 * Associates a pair of beans. This method associates two beans, no matter
+	 * what types.
+	 *
+	 * @param RedBean_OODBBean $bean1 first bean
+	 * @param RedBean_OODBBean $bean2 second bean
+	 * @param RedBean_OODBBean $bean  base bean
+	 *
+	 * @return mixed $id either the link ID or null
+	 */
 	protected function associateBeans(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean) {
 
 		$idfield1 = $this->writer->getIDField($bean1->getMeta("type"));
@@ -91,15 +105,15 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 			))) throw $e;
 		}
-
 	}
-
 
 	/**
 	 * Gets related beans of type $type for bean $bean
-	 * @param RedBean_OODBBean $bean
-	 * @param string $type
-	 * @return array $ids
+	 *
+	 * @param RedBean_OODBBean $bean bean
+	 * @param string			   $type type
+	 *
+	 * @return array $ids ids
 	 */
 	public function related( RedBean_OODBBean $bean, $type, $getLinks=false ) {
 		$table = $this->getTable( array($bean->getMeta("type") , $type) );
@@ -146,8 +160,9 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 
 	/**
 	 * Breaks the association between two beans
-	 * @param RedBean_OODBBean $bean1
-	 * @param RedBean_OODBBean $bean2
+	 *
+	 * @param RedBean_OODBBean $bean1 first bean
+	 * @param RedBean_OODBBean $bean2 second bean
 	 */
 	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$this->oodb->store($bean1);
@@ -180,8 +195,9 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	}
 	/**
 	 * Removes all relations for a bean
-	 * @param RedBean_OODBBean $bean
-	 * @param string $type
+	 *
+	 * @param RedBean_OODBBean $bean bean
+	 * @param string           $type type
 	 */
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
 		$this->oodb->store($bean);
@@ -207,12 +223,15 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		}
 	}
 	/**
+	 * @deprecated
 	 * Creates a 1 to Many Association
 	 * If the association fails it throws an exception.
 	 * @throws RedBean_Exception_SQL $failedToEnforce1toN
-	 * @param RedBean_OODBBean $bean1
-	 * @param RedBean_OODBBean $bean2
-	 * @return RedBean_AssociationManager $chainable
+	 *
+	 * @param RedBean_OODBBean $bean1 bean1
+	 * @param RedBean_OODBBean $bean2 bean2
+	 *
+	 * @return RedBean_AssociationManager $chainable chainable
 	 */
 	public function set1toNAssoc(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$type = $bean1->getMeta("type");

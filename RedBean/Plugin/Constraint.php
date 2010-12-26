@@ -69,7 +69,6 @@ class RedBean_Plugin_Constraint {
 		$property2 = $adapter->escape($property2);
 
 		//In Cache? Then we dont need to bother
-		//if (isset(self::$fkcache[$table])) return false;
 		$fkCode = "fk".md5($table.$property1.$property2);
 		if (isset(self::$fkcache[$fkCode])) return false;
 		//Dispatch to right method
