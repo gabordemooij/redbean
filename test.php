@@ -1412,6 +1412,11 @@ $one = $redbean->dispense("one");
 $one->col = str_repeat('a long text',100);
 $redbean->store($one);
 $optimizer = new RedBean_Plugin_Optimizer( $toolbox );
+
+//order is important!
+$optimizer->addOptimizer(new RedBean_Plugin_Optimizer_DateTime($toolbox));
+$optimizer->addOptimizer(new RedBean_Plugin_Optimizer_Shrink($toolbox));
+
 $redbean->addEventListener("update", $optimizer);
 $writer  = $toolbox->getWriter();
 $cols = $writer->getColumns("one");

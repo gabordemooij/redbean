@@ -60,6 +60,9 @@
 
         <item type="php">RedBean/DomainObject.php</item>
         <item type="php">RedBean/Plugin/Optimizer.php</item>
+		  <item type="php">RedBean/Plugin/IOptimizer.php</item>
+		  <item type="php">RedBean/Plugin/Optimizer/Shrink.php</item>
+		  <item type="php">RedBean/Plugin/Optimizer/Datetime.php</item>
         <item type="php">RedBean/QueryWriter/NullWriter.php</item>
         <item type="php">RedBean/UnitOfWork.php</item>
         <item type="php">RedBean/SimpleModel.php</item>
