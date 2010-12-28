@@ -133,9 +133,19 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 	 * @return void
 	 */
 	public function MySQLSpecificColumns( $table, $column, $columnType, $value ) {
+
+
+
 		//$this->adapter->getDatabase()->setDebugMode(1);
 		$table = $this->adapter->escape($table);
 		$column = $this->adapter->escape($column);
+
+		foreach($this->optimizers as $optimizer) {
+			if ($optimizer->match($value)) {
+
+			}
+		}
+
 		//Is column already datetime?
 		if ($columnType!="datetime") {
 			if ($this->matchesDateTime($value)) {
@@ -166,5 +176,15 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 		return (boolean) (preg_match($pattern, $value));
 	}
 
+
+	public function addOptimizer(IOptimizer $optimizer) {
+
+	}
+
+	public function callOptimizer( $optimizer, $call, $arguments ) {
+
+		$method = $toolbox->getDatabaseAdapter()->
+		return call_user_func(array($optimizer,$method), $arguments);
+	}
 
 }
