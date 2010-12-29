@@ -221,6 +221,10 @@ class RedBean_OODBBean implements IteratorAggregate {
 		return call_user_func_array(array($this->__info["model"],$method), $args);
 	}
 
+	public function __toString() {
+		return $this->__call('__toString',array());
+	}
+
 
 }
 
