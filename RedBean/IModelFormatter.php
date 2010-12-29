@@ -16,6 +16,7 @@ interface RedBean_IModelFormatter {
 	 * you provide to discover the model
 	 *
 	 * @param string $model
+	 * 
 	 * @return string $formattedModel
 	 */
 	public function formatModel( $model );

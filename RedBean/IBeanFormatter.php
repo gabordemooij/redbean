@@ -18,14 +18,14 @@ interface RedBean_IBeanFormatter {
 
 	/**
 	 *
-	 * @param string $type
+	 * @param string $type type
 	 */
 	public function formatBeanTable( $type );
 
 	/**
 	 *
-	 * @param string $type
+	 * @param string $id id
 	 */
-	public function formatBeanID( $type );
+	public function formatBeanID( $id );
 
 }

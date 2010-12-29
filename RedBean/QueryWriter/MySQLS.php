@@ -96,7 +96,7 @@ class RedBean_QueryWriter_MySQLS extends RedBean_QueryWriter_MySQL {
 	 * Selects a record based on type and id.
 	 *
 	 * @param string  $type type
-	 * @param integer $id  id
+	 * @param integer $id   id
 	 * 
 	 * @return array $row  row
 	 */

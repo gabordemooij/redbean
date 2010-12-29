@@ -2461,4 +2461,11 @@ asrt( getList( R::unrelated($accountant,"person"),"job" ), "" ) ;
 asrt( getList( R::unrelated($painter,"person"),"job" ), "developer,salesman" ) ;
 asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter" ) ;
 asrt( getList( R::unrelated($developer,"person"),"job" ), "painter" ) ;
+
+testpack("non-static invocations");
+$r =  R::getInstance();
+asrt( getList( $r->unrelated($developer,"person"),"job" ), "painter" ) ;
+
+
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
+

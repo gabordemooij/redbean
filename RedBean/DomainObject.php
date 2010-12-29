@@ -151,6 +151,7 @@ abstract class RedBean_DomainObject {
 	}
 	/**
 	 * Attach
+	 * 
 	 * @param RedBean_DomainObject $other other
 	 */
 	protected function attach(RedBean_DomainObject $other) {
@@ -188,6 +189,7 @@ abstract class RedBean_DomainObject {
 
 	/**
 	 * Exports bean.
+	 *
 	 * @return array $array array
 	 */
 	public function export() {
@@ -196,6 +198,7 @@ abstract class RedBean_DomainObject {
 
 	/**
 	 * Exports beans.
+	 *
 	 * @return array $array array
 	 */
 

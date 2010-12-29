@@ -61,8 +61,9 @@ class RedBean_BeanCan {
 	/**
 	 * Processes a JSON object request.
 	 *
-	 * @param array $jsonObject
-	 * @return mixed $result
+	 * @param array $jsonObject JSON request object
+	 *
+	 * @return mixed $result result
 	 */
 	public function handleJSONRequest( $jsonString ) {
 

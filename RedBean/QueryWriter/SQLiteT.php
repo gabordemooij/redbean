@@ -153,21 +153,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_SQLite {
 				}
 			}
 		}
-		/*$changeColumnTypeSQL = "
-
-            DROP TABLE IF EXISTS tmp_backup;
-            CREATE TEMPORARY TABLE tmp_backup(".implode(",",$oldColumnNames).");
-            INSERT INTO tmp_backup SELECT * FROM `$table`;
-            DROP TABLE `$table`;
-            CREATE TABLE `$table` (
-                `$idfield` INTEGER PRIMARY KEY AUTOINCREMENT
-                $newTableDefStr
-            );
-            INSERT INTO `$table` SELECT * FROM tmp_backup;
-            DROP TABLE tmp_backup;
-
-        ";*/
-
+	
 		$q = array();
 		$q[] = "DROP TABLE IF EXISTS tmp_backup;";
 		$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(",",$oldColumnNames).");";
