@@ -143,7 +143,9 @@ abstract class RedBean_AQueryWriter {
 	 *
 	 * @return string $idfieldtobeused ID field to be used for this type of bean
 	 */
-	public function getIDField( $type, $safe = null ) {
+	public function getIDField( $type ) {
+		$nArgs = func_num_args();
+		if ($nArgs>1) $safe = func_get_arg(1); else $safe = false;
 		if ($this->tableFormatter) return $this->tableFormatter->formatBeanID($type);
 		return $safe ? $this->safeColumn($this->idfield) : $this->idfield;
 	}
