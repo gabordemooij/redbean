@@ -137,7 +137,7 @@ where table_schema = 'public'" );
 	}
 
 	/**
-	 * Returns the MySQL Column Type Code (integer) that corresponds
+	 * Returns the pgSQL Column Type Code (integer) that corresponds
 	 * to the given value type.
 	 *
 	 * @param string $value value to determine type of
@@ -145,10 +145,14 @@ where table_schema = 'public'" );
 	 * @return integer $type type code for this value
 	 */
 	public function scanType( $value ) {
-		if (is_integer($value) && $value < 2147483648 && $value > -2147483648) {
+		//echo " \n\n value = $value => ".strval(intval($value))." same? ".($value===strval(intval($value)));
+		if (is_numeric($value)
+				  && floor($value)==$value
+				  && $value < 2147483648
+				  && $value > -2147483648) {
 			return self::C_DATATYPE_INTEGER;
 		}
-		elseif( is_double($value) ) {
+		elseif(is_numeric($value)) {
 			return self::C_DATATYPE_DOUBLE;
 		}
 		else {

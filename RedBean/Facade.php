@@ -22,7 +22,7 @@ class R {
 	 * If you prefer to call methods on an instance, you can
 	 * use this method.
 	 */
-	public function getInstance() {
+	public static function getInstance() {
 		return new RObj;
 	}
 	

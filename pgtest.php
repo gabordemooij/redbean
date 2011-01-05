@@ -38,7 +38,7 @@ function asrt( $a, $b ) {
 		print( "[".$tests."]" );
 	}
 	else {
-		printtext("FAILED TEST: EXPECTED $b BUT GOT: $a ");
+		printtext("FAILED TEST: EXPECTED $b (".gettype($b).") BUT GOT: $a (".gettype($a).") ");
 		fail();
 	}
 }
@@ -385,7 +385,7 @@ try {
 	if (in_array("logentry",$_tables)) $pdo->Execute("DROP TABLE logentry");
 	if (in_array("admin",$_tables)) $pdo->Execute("DROP TABLE admin");
 	if (in_array("wine",$_tables)) $pdo->Execute("DROP TABLE wine");
-	if (in_array("admin_logentry",$_tables)) $pdo->Execute("DROP TABLE admin_logentry");
+	if (in_array("admin_logentry",$_tables)) $pdo->Execute("DROP TABLE admin_logentry"); 
 	$page = $redbean->dispense("page");
 
 	testpack("UNIT TEST Database");
@@ -399,11 +399,11 @@ try {
 
 
 //Section C: Integration Tests / Regression Tests
-
+	$adapter->getDatabase()->setDebugMode(1);
 	testpack("Test RedBean OODB: Insert Record");
 	$page->name = "my page";
 	$id = (int) $redbean->store($page);
-	asrt( $page->id, 1 );
+	asrt( (int) $page->id, 1 );
 	asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 1 );
 	asrt( $pdo->GetCell("SELECT \"name\" FROM page LIMIT 1"), "my page" );
 	asrt( $id, 1 );
@@ -1066,7 +1066,7 @@ R::associate($page,$page2,'{"bla":2}');
 $pgs = R::related($page,"page");
 $p = reset($pgs);
 asrt($p->title,"mypagex");
-asrt(R::getCell("select bla from xx_page_page where bla > 0"),2);
+asrt((int)R::getCell("select bla from xx_page_page where bla > 0"),2);
 $t = R::$writer->getTables();
 asrt(in_array("xx_page_page",$t),true);
 asrt(in_array("page_page",$t),false);
@@ -1181,11 +1181,48 @@ asrt( getList( R::unrelated($painter,"person"),"job" ), "developer,salesman" ) ;
 asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter" ) ;
 asrt( getList( R::unrelated($developer,"person"),"job" ), "painter" ) ;
 
+function setget($val) {
+global $pdo;
+$bean = R::dispense("page");
+$_tables = R::$writer->getTables();
+if (in_array("page",$_tables)) $pdo->Execute("DROP TABLE page");
+$bean->prop = $val;
+$id = R::store($bean);
+$bean = R::load("page",$id);
+return $bean->prop;
+}
+
+//this module tests whether values we store are the same we get returned
+//PDO is a bit unpred. with this but using STRINGIFY attr this should work we test this here
+testpack("pdo and types");
+asrt(setget("-1"),"-1");
+asrt(setget(-1),"-1");
+asrt(setget("-0.25"),"-0.25");
+asrt(setget(-0.25),"-0.25");
+asrt(setget("-0.12345678"),"-0.12345678");
+asrt(setget(-0.12345678),"-0.12345678");
+asrt(setget("2147483647"),"2147483647");
+asrt(setget(2147483647),"2147483647");
+asrt(setget(-2147483647),"-2147483647");
+asrt(setget("-2147483647"),"-2147483647");
+asrt(setget("2147483647123456"),"2.14748364712346e+15");
+asrt(setget(2147483647123456),"2.14748364712e+15");
+asrt(setget("a"),"a");
+asrt(setget("."),".");
+asrt(setget("\""),"\"");
+asrt(setget("just some text"),"just some text");
+asrt(setget(true),"1");
+asrt(setget(false),"0");
+asrt(setget("true"),"true");
+asrt(setget("false"),"false");
+asrt(setget("null"),"null");
+asrt(setget("NULL"),"NULL");
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 
 
 }catch(Exception $e) {
+	echo "\n\n\n".$e->getMessage();
 	echo "<pre>".$e->getTraceAsString();
 }
