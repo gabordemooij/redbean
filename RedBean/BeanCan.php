@@ -70,7 +70,10 @@ class RedBean_BeanCan {
 		//Decode JSON string
 		$jsonArray = json_decode($jsonString,true);
 
-		if (!$jsonArray) return $this->resp(null,null,-32700,"Cannot Parse JSON");
+		if (!$jsonArray){
+			$jsonArray = json_decode(stripslashes($jsonString),true);
+			if (!$jsonArray) return $this->resp(null,null,-32700,"Cannot Parse JSON");	
+		} 
 
 		if (!isset($jsonArray["jsonrpc"])) return $this->resp(null,null,-32600,"No RPC version");
 		if (($jsonArray["jsonrpc"]!="2.0")) return $this->resp(null,null,-32600,"Incompatible RPC Version");
