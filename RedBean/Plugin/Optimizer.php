@@ -39,6 +39,13 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 	 */
 	private $writer;
 
+
+	/**
+	 * Contains an array filled with optimizers.
+	 * @var RedBean_Plugin_IOptimizer $optimizers
+	 */
+	protected $optimizers = array();
+
 	/**
 	 * Constructor
 	 * Handles the toolbox
@@ -54,6 +61,26 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 	}
 
 	/**
+	 * Runs optimization Queue.
+	 *
+	 * @param string $table  table to optimize
+	 * @param string $column column to optimize
+	 * @param string $value  value to scan
+	 *
+	 */
+	protected function optimize($table,$column,$value) {
+
+		foreach($this->optimizers as $optimizer) {
+			$optimizer->setTable($table);
+			$optimizer->setColumn($column);
+			$optimizer->setValue($value);
+			if (!$optimizer->optimize()) break;
+		}
+
+	}
+
+
+	/**
 	 * Does an optimization cycle for each UPDATE event.
 	 *
 	 * @param string				$event event
@@ -64,107 +91,35 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 	public function onEvent( $event , $bean ) {
 		try {
 			if ($event=="update") {
+				//export the bean as an array
 				$arr = $bean->export();
+				//remove the id property
 				unset($arr["id"]);
+				//If we are left with an empty array we might as well return
 				if (count($arr)==0) return;
+				//fetch table name for this bean
 				$table = $this->adapter->escape($bean->getMeta("type"));
+				//get the column names for this table
 				$columns = array_keys($arr);
 				//Select a random column for optimization.
 				$column = $this->adapter->escape($columns[ array_rand($columns) ]);
+				//get the value to be optimized
 				$value = $arr[$column];
-				$type = $this->writer->scanType($value);
-				$fields = $this->writer->getColumns($table);
-				if (!in_array($column,array_keys($fields))) return;
-				$typeInField = $this->writer->code($fields[$column]);
-				//Specified Columns need to be verified, might be optimized already
-				if ($typeInField == RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED) {
-					//If type is SPECIFIED and value is SPECIFIED
-					if ($fields[$column]=="datetime" && $this->matchesDateTime($value)) return;
-				}
-				//Is the type too wide?
-				if ($type < $typeInField) {
-					//echo "\n\n $type < $typeInField ";
-					try {
-						@$this->adapter->exec("alter table ".$this->writer->noKW($table)." drop __test");
-					}catch(Exception $e) {
-
-					}
-					//Try to re-fit the entire column; by testing it.
-					$type = $this->writer->typeno_sqltype[$type];
-					//Add a test column.
-					@$this->adapter->exec("alter table ".$this->writer->noKW($table)." add __test ".$type);
-					//Copy the values and see if there are differences.
-					@$this->adapter->exec("update ".$this->writer->noKW($table)." set __test=".$this->writer->noKW($column)."");
-					$rows = $this->adapter->get("select ".$this->writer->noKW($column)." as a, __test as b from ".$this->writer->noKW($table));
-					$diff = 0;
-					foreach($rows as $row) {
-						$diff += ($row["a"]!=$row["b"]);
-					}
-					if (!$diff) {
-						//No differences; shrink column.
-						@$this->adapter->exec("alter table ".$this->writer->noKW($table)." change ".$this->writer->noKW($column)." ".$this->writer->noKW($column)." ".$type);
-					}
-					//Throw away test column; we don't need it anymore!
-					@$this->adapter->exec("alter table ".$this->writer->noKW($table)." drop __test");
-				}
-				else {
-					$this->MySQLSpecificColumns($table, $column, $fields[$column], $value);
-				}
-
+				$this->optimize($table,$column,$value);
 			}
 		}catch(RedBean_Exception_SQL $e) {
 			//optimizer might make mistakes, don't care.
 			//echo $e->getMessage()."<br>";
 		}
 	}
-
-
+	
 	/**
-	 * Tries to convert columns to MySQL specific types like:
-	 * datetime, ENUM etc. This method is called automatically for you and
-	 * works completely in the background. You can however if you like trigger
-	 * this method by invoking it directly.
+	 * Adds an optimizer to the optimizer collection.
 	 *
-	 * @param string $table		  table
-	 * @param string $column	  column
-	 * @param string $columnType type of column
-	 * @param string $value		  value
-	 *
-	 * @return void
+	 * @param RedBean_Plugin_IOptimizer $optimizer
 	 */
-	public function MySQLSpecificColumns( $table, $column, $columnType, $value ) {
-		//$this->adapter->getDatabase()->setDebugMode(1);
-		$table = $this->adapter->escape($table);
-		$column = $this->adapter->escape($column);
-		//Is column already datetime?
-		if ($columnType!="datetime") {
-			if ($this->matchesDateTime($value)) {
-				//Ok, value is datetime, can we convert the column to support this?
-				$cnt = (int) $this->adapter->getCell("select count(*) as n from $table where
-						  $column regexp '[0-9]{4}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]'
-						  ");
-				$total = (int) $this->adapter->getCell("SELECT count(*) FROM ".$this->writer->noKW($table));
-				//Is it safe to convert: ie are all values compatible?
-				if ($total===$cnt) { //yes
-					$this->adapter->exec("ALTER TABLE ".$this->writer->noKW($table)." change ".$this->writer->noKW($column)." ".$this->writer->noKW($column)." datetime ");
-				}
-			}
-		}
-
+	public function addOptimizer(RedBean_Plugin_IOptimizer $optimizer) {
+		$this->optimizers[] = $optimizer;
 	}
-
-	/**
-	 * MatchesDateTime matches a value to determine whether it matches the
-	 * MySQL datetime type.
-	 *
-	 * @param string $value Value to match
-	 *
-	 * @return boolean $yesNo Whether it is a datetime value
-	 */
-	public function matchesDateTime($value) {
-		$pattern = "/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9]) (?:([0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/";
-		return (boolean) (preg_match($pattern, $value));
-	}
-
 
 }
