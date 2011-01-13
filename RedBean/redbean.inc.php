@@ -92,7 +92,12 @@ require($dir."Plugin/Finder.php");
 require($dir."Plugin/Constraint.php");
 
 require($dir."DomainObject.php");
+require($dir."Plugin/IOptimizer.php");
 require($dir."Plugin/Optimizer.php");
+require($dir."Plugin/Optimizer/Datetime.php");
+require($dir."Plugin/Optimizer/Shrink.php");
+
+
 require($dir."QueryWriter/NullWriter.php");
 
 /* Developer Comfort */
