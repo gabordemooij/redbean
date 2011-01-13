@@ -399,7 +399,7 @@ try {
 
 
 //Section C: Integration Tests / Regression Tests
-	$adapter->getDatabase()->setDebugMode(1);
+//	$adapter->getDatabase()->setDebugMode(1);
 	testpack("Test RedBean OODB: Insert Record");
 	$page->name = "my page";
 	$id = (int) $redbean->store($page);
