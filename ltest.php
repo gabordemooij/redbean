@@ -16,7 +16,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
- 
+error_reporting(E_ALL | E_STRICT);
 $ini = parse_ini_file("test.ini", true);
 
 /**

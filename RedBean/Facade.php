@@ -661,7 +661,7 @@ class R {
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
-	public static function copy($bean, $associatedBeanTypesStr) {
+	public static function copy($bean, $associatedBeanTypesStr="") {
 		$type = $bean->getMeta("type");
 		$copy = R::dispense($type);
 		$copy->import( $bean->export() );

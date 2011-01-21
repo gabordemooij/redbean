@@ -46,4 +46,18 @@ class RedBean_SimpleModel {
 	public function __set( $prop, $value ) {
 		$this->bean->$prop = $value;
 	}
+
+
+	protected function __hasProperties( $list ) {
+		$missing = array();
+		$properties = explode(",", $list);
+		foreach($properties as $property) {
+			if (empty($this->bean->$property)) {
+				$missing[] = $property;
+			}
+		}
+		return $missing;
+	}
+
+
 }
