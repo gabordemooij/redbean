@@ -14,7 +14,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_QueryWriter_MySQL extends RedBean_AQueryWriter implements RedBean_QueryWriter {
+class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 
 	/**
 	 * Here we describe the datatypes that RedBean

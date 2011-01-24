@@ -9,7 +9,7 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-class RedBean_QueryWriter_SQLite extends RedBean_AQueryWriter implements RedBean_QueryWriter {
+class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 
 
 	/**

@@ -16,7 +16,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_QueryWriter_NullWriter extends RedBean_AQueryWriter implements RedBean_QueryWriter {
+class RedBean_QueryWriter_NullWriter extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 
 
 	/**

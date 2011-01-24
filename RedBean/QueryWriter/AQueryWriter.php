@@ -17,7 +17,7 @@
  * with this source code in the file license.txt.
  */
 
-abstract class RedBean_AQueryWriter {
+abstract class RedBean_QueryWriter_AQueryWriter {
 
 
 	/**
