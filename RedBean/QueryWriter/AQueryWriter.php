@@ -246,7 +246,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$result = $this->adapter->getCell( "INSERT INTO $table ($idfield) VALUES($default) $suffix");
 		}
 		if ($suffix) return $result;
-	  $last_id = $this->adapter->getInsertID();
+	   $last_id = $this->adapter->getInsertID();
 		return ($this->adapter->getErrorMsg()=="" ?  $last_id : 0);
 	}
 	

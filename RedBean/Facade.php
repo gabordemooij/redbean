@@ -81,6 +81,16 @@ class R {
 	public static $linkManager;
 
 	/**
+	 * Returns version ID string
+	 * Version No format: <Major>.<Minor>.<Maintenance>.<Fix/Update>
+	 * 
+	 * @return string $version Version ID
+	 */
+	public static function getVersion() {
+		return "1.2.9.1";
+	}
+
+	/**
 	 * Kickstarts redbean for you.
 	 * @param string $dsn
 	 * @param string $username

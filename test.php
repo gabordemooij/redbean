@@ -126,6 +126,9 @@ $nullWriter = new RedBean_QueryWriter_NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
 $linker = new RedBean_LinkManager( $toolbox );
 
+testpack("TEST VERSIONING");
+asrt(R::getVersion(),"1.2.9.1");
+
 //Section A: Config Testing
 testpack("CONFIG TEST");
 //Can we access the required exceptions?
