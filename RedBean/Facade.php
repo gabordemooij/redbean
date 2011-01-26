@@ -318,7 +318,7 @@ class R {
 	 */
 	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql='1', $values=array() ) {
 		$beans = self::related($bean, $type, $sql, $values);
-		if (count($beans)==0) return array();
+		if (count($beans)==0) return null;
 		return reset( $beans );
 	}
 
