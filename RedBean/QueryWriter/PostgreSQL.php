@@ -318,5 +318,53 @@ where table_schema = 'public'" );
 		return $sqlSnippet;
 	}
 
+	public function createIndexIfNotExist($table, $indexName, $indexColumns, $drop=true) {
+
+		$indexName = $this->adapter->escape($indexName);
+
+		//$table = $this->safeTable($table);
+		//echo "=====================================================";
+		$sql = "select
+				 t.relname as table_name,
+				 i.relname as index_name,
+				 a.attname as column_name
+			from
+				 pg_class t,
+				 pg_class i,
+				 pg_index ix,
+				 pg_attribute a
+			where
+				 t.oid = ix.indrelid
+				 and i.oid = ix.indexrelid
+				 and a.attrelid = t.oid
+				 and a.attnum = ANY(ix.indkey)
+				 and t.relkind = 'r'
+				 and t.relname = ?
+			order by
+				 t.relname,
+				 i.relname;";
+		$indexes = $this->adapter->get($sql,array($table));
+		print_r($indexes);
+		//exit;
+		foreach($indexes as $index) {
+			if ($index["index_name"]===$indexName) {
+				if (!$drop) return false;
+				$sql = "DROP INDEX $indexName ";
+				$this->adapter->exec($sql);
+				break;
+			}
+		}
+		//Concat and escape the column names
+		foreach($indexColumns as $key=>$indexColumn) {
+			$indexColumns[$key] = $this->safeColumn($indexColumn);
+		}
+		$columnStr = implode(",", $indexColumns);
+		//create the index
+		$indexName = $this->safeTable($indexName);
+		$sql = "CREATE INDEX $indexName ON ".$this->safeTable($table)." ($columnStr) ";
+		$this->adapter->exec($sql);
+		return true;
+
+	}
 
 }

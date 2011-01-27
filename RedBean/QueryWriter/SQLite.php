@@ -145,4 +145,22 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 		return in_array($sqlState, $list);
 	}
 
+
+	public function createIndexIfNotExist($table, $indexName, $indexColumns, $drop=true) {
+
+		$table = $this->safeTable($table);
+		$indexName = $this->adapter->escape($indexName);
+		foreach($indexColumns as $key=>$indexColumn) {
+			$indexColumns[$key] = $this->safeColumn($indexColumn);
+		}
+		$columnStr = implode(",", $indexColumns);
+		if ($drop) {
+			$sql = "DROP INDEX IF EXISTS $indexName ";
+			$this->adapter->exec($sql);
+		}
+		$sql = "CREATE INDEX IF NOT EXISTS $indexName ON $table ($columnStr) ";
+		$this->adapter->exec($sql);
+		return true;
+	}
+
 }

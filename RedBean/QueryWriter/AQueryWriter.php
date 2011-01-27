@@ -356,4 +356,35 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $sqlSnippet;
 	}
 
+	public function createIndexIfNotExist($table, $indexName, $indexColumns, $drop=true) {
+		$sql = "SHOW INDEX FROM ".$this->noKW($table)."";
+		$indexes = $this->adapter->get($sql);
+		print_r($indexes);
+		foreach($indexes as $index) {
+			//Is there already such an INDEX?
+			if ($index["Key_name"]===$indexName) {
+				if (!$drop) return false; //no drop, then we are done here
+				$indexNameVar = $this->safeTable($indexName);
+				$this->adapter->exec("ALTER TABLE $table DROP INDEX $indexName ");
+				break;
+			}
+		}
+		
+		//Concat and escape the column names
+		foreach($indexColumns as $key=>$indexColumn) {
+			$indexColumns[$key] = $this->safeColumn($indexColumn);
+		}
+		$columnStr = implode(",", $indexColumns);
+		//create the index
+		$indexName = $this->safeTable($indexName);
+		$sql = "CREATE INDEX $indexName ON $table ($columnStr) ";
+		$this->adapter->exec($sql);
+		return true;
+	}
+
+	public function wipe($table) {
+		$table = $this->safeTable($table);
+		$sql = "DROP TABLE IF EXIST $table ";
+	}
+
 }
