@@ -1,5 +1,7 @@
 <?php
 /**
+ * @deprecated
+ *
  * RedBean Domain Object
  * @file				RedBean/DomainObject.php
  * @description	This class serves as a source of inspiration and

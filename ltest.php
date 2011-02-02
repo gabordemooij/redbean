@@ -921,12 +921,10 @@ asrt(count($a->related($pageEvenMore, "page")),1);
 asrt(count($a->related($pageOther, "page")),0);
 
 
-$stat = new RedBean_SimpleStat($toolbox);
 testpack("Test RedBean Finder Plugin*");
 asrt(count(Finder::where("page", " name LIKE '%more%' ")),3);
 asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'))),3);
 asrt(count(Finder::where("page", " name LIKE :str ",array(":str"=>'%mxore%'))),0);
-asrt(count(Finder::where("page")),$stat->numberOf($redbean->dispense("page")));
 
 testpack("Test Developer Interface API");
 $post = $redbean->dispense("post");
@@ -1018,10 +1016,6 @@ asrt(count($tm->children($page)),2);
 asrt(count($tm->children($subpage2)),1);
 asrt(intval($subpage1->parent_id),intval($id));
 
-
-testpack("TEST SimpleStat ");
-$stat = new RedBean_SimpleStat( $toolbox );
-asrt( $stat->numberOf($page), 16);
 
 //Section D Security Tests
 $hack = $redbean->dispense("hack");

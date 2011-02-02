@@ -356,38 +356,25 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $sqlSnippet;
 	}
 
-	public function createIndexIfNotExist($table, $indexName, $indexColumns, $drop=true) {
-		$sql = "SHOW INDEX FROM ".$this->noKW($table)."";
-		$indexes = $this->adapter->get($sql);
-		print_r($indexes);
-		foreach($indexes as $index) {
-			//Is there already such an INDEX?
-			if ($index["Key_name"]===$indexName) {
-				if (!$drop) return false; //no drop, then we are done here
-				$indexNameVar = $this->safeTable($indexName);
-				$this->adapter->exec("ALTER TABLE $table DROP INDEX $indexName ");
-				break;
-			}
-		}
-		
-		//Concat and escape the column names
-		foreach($indexColumns as $key=>$indexColumn) {
-			$indexColumns[$key] = $this->safeColumn($indexColumn);
-		}
-		$columnStr = implode(",", $indexColumns);
-		//create the index
-		$indexName = $this->safeTable($indexName);
-		$sql = "CREATE INDEX $indexName ON $table ($columnStr) ";
-		$this->adapter->exec($sql);
-		return true;
-	}
-
+	
+	/**
+	 * Truncates a table
+	 *
+	 * @param string $table
+	 */
 	public function wipe($table) {
 		$table = $this->safeTable($table);
 		$sql = "TRUNCATE $table ";
 		$this->adapter->exec($sql);
 	}
 
+	/**
+	 * Counts rows in a table.
+	 *
+	 * @param string $beanType
+	 *
+	 * @return integer $numRowsFound
+	 */
 	public function count($beanType) {
 		$table = $this->safeTable($beanType);
 		$sql = "SELECT count(*) FROM $table ";

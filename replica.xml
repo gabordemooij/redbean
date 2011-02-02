@@ -48,7 +48,7 @@
         <item type="php">RedBean/LinkManager.php</item>
         <item type="php">RedBean/ExtAssociationManager.php</item>
         <item type="php">RedBean/Setup.php</item>
-        <item type="php">RedBean/SimpleStat.php</item>
+        
 
         <item type="php">RedBean/Plugin/ChangeLogger.php</item>
         <item type="php">RedBean/Plugin/Cache.php</item>
