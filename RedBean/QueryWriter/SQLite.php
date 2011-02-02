@@ -163,4 +163,10 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 		return true;
 	}
 
+
+	public function wipe($type) {
+		$table = $this->safeTable($type);
+		$this->adapter->exec("DELETE FROM $table");
+	}
+
 }

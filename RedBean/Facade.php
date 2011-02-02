@@ -771,8 +771,27 @@ class R {
 		}
 
 	}
-	
-	
+
+	/**
+	 * Wipes all beans of type $beanType.
+	 *
+	 * @param string $beanType type of bean you want to destroy entirely.
+	 */
+	public static function wipe( $beanType ) {
+		R::$redbean->wipe($beanType);
+	}
+
+	/**
+	 * Counts beans
+	 *
+	 * @param string $beanType type of bean
+	 *
+	 * @return integer $numOfBeans
+	 */
+
+	public static function count( $beanType ) {
+		return R::$redbean->count($beanType);
+	}
 
 
 }

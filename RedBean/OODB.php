@@ -356,6 +356,44 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		return $collection;
 	}
 
+	/**
+	 * Returns the number of beans we have in DB of a given type.
+	 * 
+	 * @param string $type type of bean we are looking for
+	 * 
+	 * @return integer $num number of beans found 
+	 */
+	public function count($type) {
+		try {
+			return (int) $this->writer->count($type);
+		}catch(RedBean_Exception_SQL $e) {
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+			array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+		}
+		return 0;
+	}
+
+	/**
+	 * Trash all beans of a given type.
+	 *
+	 * @param string $type type
+	 *
+	 * @return boolean $yesNo whether we actually did some work or not..
+	 */
+	public function wipe($type) {
+		try {
+			$this->writer->wipe($type);
+			return true;
+		}catch(RedBean_Exception_SQL $e) {
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+			array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+		}
+		return false;
+	}
+
+
 }
 
 
