@@ -93,6 +93,43 @@ function s($data,$params=null,$id="1234") {
 R::setup();
 
 
+testpack("Test BeanMachine");
+
+$beanMachine = RedBean_Plugin_BeanMachine::getInstance();
+
+$beanMachine->addGroup("SELECT-CLAUSE"," SELECT @ ",",");
+$beanMachine->add(" p.name ");
+$beanMachine->reset()->addGroup("FROM-CLAUSE"," FROM @ ","")->add(" person AS p ");
+
+$beanMachine->reset()->addGroup("WHERE-CLAUSE", " WHERE @ ", " AND ");
+
+$beanMachine->add(" p.status = 'workshere' ");
+
+$beanMachine->reset();
+$beanMachine->openGroup("FROM-CLAUSE");
+$beanMachine->addGroup("JOIN-JOB", " LEFT JOIN job AS j ON ", " AND ");
+$beanMachine->add(" p.job = job ");
+
+
+$beanMachine->openGroup("SELECT-CLAUSE")->add(" p.job AS currentjob ");
+$beanMachine->openGroup("WHERE-CLAUSE")
+		   ->addGroup("QUALIFICATIONS", " (@) ", " OR ")
+			->addGroup("AGE-LIMIT", " (@) ", " AND ")
+				->add(" age < :old ")
+			->openGroup("QUALIFICATIONS")
+		    ->addGroup("EXPERIENCED", " (@) ", " AND ")
+				->add(" p.experience > :experience ")
+				->add(" p.rank = 'expert' ")
+			->openGroup("AGE-LIMIT")
+		    ->add(" age > :young ");
+
+
+$output = preg_replace("/\s/","", $beanMachine );
+
+$expected = "SELECTp.name,p.jobAScurrentjobFROMpersonASpLEFTJOINjobASjONp.job=jobWHEREp.status='workshere'AND((age<:oldANDage>:young)OR(p.experience>:experienceANDp.rank='expert'))";
+asrt($output, $expected);
+
+
 class Model_CandyBar extends RedBean_SimpleModel {
 	
 	public function customMethod($custom) {

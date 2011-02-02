@@ -346,6 +346,9 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 	public function wipe($type) {
 		try {
 			$this->writer->wipe($type);
+			//dump entire cache... :(
+			$this->cache = array();
+			$this->originals = array();
 			return true;
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),

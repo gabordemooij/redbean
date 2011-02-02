@@ -96,7 +96,7 @@ require($dir."Plugin/IOptimizer.php");
 require($dir."Plugin/Optimizer.php");
 require($dir."Plugin/Optimizer/Datetime.php");
 require($dir."Plugin/Optimizer/Shrink.php");
-
+require($dir."Plugin/BeanMachine.php");
 
 require($dir."QueryWriter/NullWriter.php");
 
