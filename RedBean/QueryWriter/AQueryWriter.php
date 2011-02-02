@@ -384,7 +384,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 
 	public function wipe($table) {
 		$table = $this->safeTable($table);
-		$sql = "DROP TABLE IF EXIST $table ";
+		$sql = "DROP TABLE IF EXISTS $table ";
+		$this->adapter->exec($sql);
 	}
 
 }

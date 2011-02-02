@@ -89,7 +89,7 @@ class RedBean_LinkManager extends RedBean_CompatManager {
 			return $this->oodb->load($typeName, $id);
 		}
 		else {
-			return $this->oodb->dispense($typeName);
+			return null;
 		}
 	}
 	/**
