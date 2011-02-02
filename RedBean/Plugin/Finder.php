@@ -20,7 +20,7 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 * Fetches a collection of OODB Bean objects based on the SQL
 	 * criteria provided. For instance;
 	 *
-	 * - Finder::where("page", " name LIKE '%more%' ");
+	 * - RedBean_Plugin_Finder::where("page", " name LIKE '%more%' ");
 	 *
 	 * Will return all pages that have the word 'more' in their name.
 	 * The second argument is actually just plain SQL; the function expects
@@ -28,13 +28,13 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 * where X is ths search string you provide in the second parameter.
 	 * Another example, using slots:
 	 *
-	 * - Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'));
+	 * - RedBean_Plugin_Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'));
 	 *
 	 * Also, note that the default search is always 1. So if you do not
 	 * specify a search parameter this function will just return every
 	 * bean of the given type:
 	 *
-	 * - Finder::where("page"); //returns all pages
+	 * - RedBean_Plugin_Finder::where("page"); //returns all pages
 	 *
 	 *
 	 * @param string $type   type of bean you are looking for
@@ -74,7 +74,7 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 			if (!$ignoreGSQLWarn && strpos($SQL,"@")!==false) {
 				throw new RedBean_Exception_SQL("Gold SQL is
 					only allowed in FLUID mode,
-					to ignore use extra argument TRUE for Finder::Where");
+					to ignore use extra argument TRUE for RedBean_Plugin_Finder::Where");
 			}
 		}
 
@@ -180,22 +180,5 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 		return $SQL;
 	}
 
-}
-
-/**
- * RedBean Bean Finder
- *
- * @file					RedBean/Plugin/Finder.php
- * @description		Provides a more convenient way to find beans
- *
- * @author			Gabor de Mooij
- * @license			BSD
- *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
- * with this source code in the file license.txt.
- */
-class Finder extends RedBean_Plugin_Finder {
 }
 

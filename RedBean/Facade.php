@@ -427,7 +427,7 @@ class R {
 	 * @return array $beans  beans
 	 */
 	public static function find( $type, $sql="1", $values=array() ) {
-		return Finder::where( $type, $sql, $values );
+		return RedBean_Plugin_Finder::where( $type, $sql, $values );
 	}
 
 
@@ -486,7 +486,7 @@ class R {
 	 * @return array $arrays arrays
 	 */
 	public static function findAndExport($type, $sql="1", $values=array()) {
-		$items = Finder::where( $type, $sql, $values );
+		$items = RedBean_Plugin_Finder::where( $type, $sql, $values );
 		$arr = array();
 		foreach($items as $key=>$item) {
 			$arr[$key]=$item->export();
