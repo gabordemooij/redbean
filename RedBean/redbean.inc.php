@@ -83,7 +83,7 @@ require($dir."TreeManager.php");
 require($dir."LinkManager.php");
 require($dir."ExtAssociationManager.php");
 require($dir."Setup.php");
-require($dir."SimpleStat.php");
+
 
 //Load the default plugins
 require($dir."Plugin/ChangeLogger.php");

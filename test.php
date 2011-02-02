@@ -725,11 +725,36 @@ $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 asrt( $page->rating, $longtext );
 
+$numAsString = "0001";
+$page->numasstring = $numAsString;
+$redbean->store($page);
+$page = $redbean->load( "page", $id );
+asrt($page->numasstring,"1");
+$numAsString = "0001";
+$page->setMeta("cast.numasstring","string");
+$page->numasstring = $numAsString;
+$redbean->store($page);
+$page = $redbean->load( "page", $id );
+asrt($page->numasstring,"0001");
+
+
 $redbean->trash( $page );
 
-
-
 asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 0 );
+
+testpack("Test RedBean Issue with converting large doubles");
+$largeDouble = 999999888889999922211111; //8.88889999922211e+17;
+$page = $redbean->dispense("page");
+$page->weight = $largeDouble;
+$id = $redbean->store($page);
+$cols = $writer->getColumns("page");
+asrt($cols["weight"],"double");
+$page = $redbean->load("page", $id);
+$page->name = "dont change the numbers!";
+$redbean->store($page);
+$page = $redbean->load("page", $id);
+$cols = $writer->getColumns("page");
+asrt($cols["weight"],"double");
 
 
 testpack("Test RedBean OODB: Batch Loader ");

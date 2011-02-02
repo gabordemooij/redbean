@@ -177,8 +177,20 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		foreach( $bean as $p=>$v ) {
 			if ($p!=$idfield) {
 				if (!$this->isFrozen) {
-					//What kind of property are we dealing with?
-					$typeno = $this->writer->scanType($v);
+					//Does the user want to specify the type?
+					if ($bean->getMeta("cast.$p",-1)!==-1) {
+						$cast = $bean->getMeta("cast.$p");
+						if ($cast=="string") {
+							$typeno = $this->writer->scanType("STRING");
+						}
+						else {
+							throw new RedBean_Exception("Invalid Cast");
+						}
+					}
+					else {
+						//What kind of property are we dealing with?
+						$typeno = $this->writer->scanType($v);
+					}
 					//Is this property represented in the table?
 					if (isset($columns[$p])) {
 						//yes it is, does it still fit?
