@@ -90,44 +90,76 @@ function s($data,$params=null,$id="1234") {
 	return $out;
 }
 
-R::setup();
+R::setup("mysql:dbname=oodb;host=localhost","root");
 
 
 testpack("Test BeanMachine");
 
 $beanMachine = RedBean_Plugin_BeanMachine::getInstance();
 
-$beanMachine->addGroup("SELECT-CLAUSE"," SELECT @ ",",");
-$beanMachine->add(" p.name ");
-$beanMachine->reset()->addGroup("FROM-CLAUSE"," FROM @ ","")->add(" person AS p ");
+$beanMachine->addGroup("SELECT-CLAUSE"," SELECT @ ", ",")
+		->addGroup("FROM-CLAUSE", "  \n FROM @ ", ",")
+		->addGroup("WHERE-CLAUSE", " \n  WHERE @ ", " AND ");
 
-$beanMachine->reset()->addGroup("WHERE-CLAUSE", " WHERE @ ", " AND ");
-
-$beanMachine->add(" p.status = 'workshere' ");
-
-$beanMachine->reset();
-$beanMachine->openGroup("FROM-CLAUSE");
-$beanMachine->addGroup("JOIN-JOB", " LEFT JOIN job AS j ON ", " AND ");
-$beanMachine->add(" p.job = job ");
-
-
-$beanMachine->openGroup("SELECT-CLAUSE")->add(" p.job AS currentjob ");
 $beanMachine->openGroup("WHERE-CLAUSE")
-		   ->addGroup("QUALIFICATIONS", " (@) ", " OR ")
-			->addGroup("AGE-LIMIT", " (@) ", " AND ")
-				->add(" age < :old ")
-			->openGroup("QUALIFICATIONS")
-		    ->addGroup("EXPERIENCED", " (@) ", " AND ")
-				->add(" p.experience > :experience ")
-				->add(" p.rank = 'expert' ")
-			->openGroup("AGE-LIMIT")
-		    ->add(" age > :young ");
+		->addGroup("QUALIFICATIONS", " \n (@) ", " OR ")
+		->open()
+		->addGroup("AGE-LIMITATION", " \n (@) ", " AND ")
+		->addGroup("EXPERIENCE", " \n (@) ", " OR ");
 
+$beanMachine->openGroup("AGE-LIMITATION")
+		->add(" age < :too_old ")
+		->add(" age > :too_young ");
+
+$beanMachine->openGroup("EXPERIENCE")
+		->add(" experience > :experience_level ")
+		->add(" experiencerank = 'expert' ");
+
+$beanMachine->openGroup("WHERE-CLAUSE")
+		->add(" workstatus = 'currently-working-here' ");
+
+$beanMachine->openGroup("FROM-CLAUSE")
+		->add(" person ");
+
+$beanMachine->openGroup("SELECT-CLAUSE")
+		->add("name")
+		->add("job");
 
 $output = preg_replace("/\s/","", $beanMachine );
+//echo "\n\n".sha1( $output )."\n\n" ; exit;
+$expected = "04586a1c347cd1ffa0e4fac3ca3ba9bcdf794371";
+asrt(sha1($output), $expected);
 
-$expected = "SELECTp.name,p.jobAScurrentjobFROMpersonASpLEFTJOINjobASjONp.job=jobWHEREp.status='workshere'AND((age<:oldANDage>:young)OR(p.experience>:experienceANDp.rank='expert'))";
-asrt($output, $expected);
+
+
+
+R::wipe("book");
+R::wipe("book_page");
+R::wipe("page");
+
+$book1 = R::dispense("book");
+$book1->title = "book1";
+R::store($book1);
+$book2 = R::dispense("book");
+$book2->title = "book2";
+R::store($book2);
+$page1 = R::dispense("page");
+$page1->text = "lorem ipsum";
+$page2 = R::dispense("page");
+$page2->text = "lorem ipsum2";
+R::associate($book1,$page1);
+R::associate($book1,$page2);
+$page3 = R::dispense("page");
+$page3->text = "lorem ipsum";
+R::associate($book2,$page3);
+
+//exit;
+
+require("RedBean/Plugin/BeanMachine/Summary.php");
+$summary = RedBean_Plugin_BeanMachine::getQueryByName("Summary");
+$beans = $summary->summarize("book", "page", "book_page");
+$summary->getBeans();
+
 
 
 class Model_CandyBar extends RedBean_SimpleModel {

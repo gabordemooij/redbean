@@ -111,11 +111,9 @@ class RedBean_Plugin_BeanMachine implements RedBean_Plugin {
 	 */
 	public function openGroup( $key ) {
 
-		foreach($this->bookmarks as $m=>$bookmark) {
-			if ($m==$key) {
-				$this->selected = $bookmark;
-				return $this;
-			}
+		if (isset($this->bookmarks[$key])) {
+			$this->selected = $this->bookmarks[$key];
+			return $this;
 		}
 
 		throw new Exception("No Such Group");
@@ -149,12 +147,16 @@ class RedBean_Plugin_BeanMachine implements RedBean_Plugin {
 	public function addGroup( $key, $template, $glue ) {
 
 
-		$this->selected = $this->selected->addGroup( $key );
-		$this->bookmarks[$key]= $this->selected;
-		$this->selected->setGlue($glue);
+		$this->bookmarks[$key]= $this->selected->addGroup( $key );
+		$this->latest = $key;
+		$this->bookmarks[$key]->setGlue($glue);
 		$templateSnippets = explode("@", $template);
-		$this->selected->setTemplate($templateSnippets[0], $templateSnippets[1]);
+		$this->bookmarks[$key]->setTemplate($templateSnippets[0], $templateSnippets[1]);
 		return $this;
+	}
+
+	public function open() {
+		return $this->openGroup($this->latest);
 	}
 
 	/**
@@ -192,6 +194,16 @@ class RedBean_Plugin_BeanMachine implements RedBean_Plugin {
 	 */
 	public function __toString() {
 		return (string) $this->groups;
+	}
+
+
+	
+	public function getQueryByName( $name ) {
+		$className = "RedBean_Plugin_BeanMachine_".$name;
+		$inst = self::getInstance();
+		$beanMachineUser = new $className( $inst );
+		$beanMachineUser->setToolbox( R::$toolbox );
+		return $beanMachineUser;
 	}
 
 

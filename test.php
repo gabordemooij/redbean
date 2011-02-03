@@ -1305,6 +1305,13 @@ $movie = $redbean->load("movie", $id);
 //did you store the new prop?
 asrt($movie->language,"EN");
 
+//wipe must clear cache
+$movie = $redbean3->load("movie", $id);
+asrt((int)$movie->id, (int)$id);
+$redbean3->wipe("movie");
+$movie = $redbean3->load("movie", $id);
+asrt((int)$movie->id, 0);
+
 testpack("Transactions");
 $adapter->startTransaction();
 pass();
@@ -1328,7 +1335,11 @@ $redbean->trash( $post );
 pass();
 
 
-testpack("Test Frozen ");
+testpack("Test Frozen");
+
+
+
+
 $redbean->freeze( true );
 $page = $redbean->dispense("page");
 $page->sections = 10;
@@ -1357,7 +1368,25 @@ try {
 }catch(RedBean_Exception_SQL $e) {
 	pass();
 }
+$logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach( $adapter );
+//now log and make sure no 'describe SQL' happens
+$page = $redbean->dispense("page");
+$page->name = "just another page that has been frozen...";
+$id = $redbean->store($page);
+$page = $redbean->load("page", $id);
+$page->name = "just a frozen page...";
+$redbean->store($page);
+$page2 = $redbean->dispense("page");
+$page2->name = "an associated frozen page";
+$a->associate($page, $page2);
+$a->related($page, "page");
+$a->unassociate($page, $page2);
+$a->clearRelations($page,"page");
+$items = RedBean_Plugin_Finder::where("page", "1");
+$redbean->trash($page);
 $redbean->freeze( false );
+asrt(count($logger->grep("select"))>0,true);
+asrt(count($logger->grep("describe"))<1,true);
 
 
 
