@@ -211,6 +211,16 @@ try {
 	pass();
 }
 
+testpack("TEST ARRAY INTERFACE");
+$bean = $redbean->dispense("testbean");
+$bean["property"] = 123;
+$bean["abc"] = "def";
+asrt($bean["property"],123);
+asrt($bean["abc"],"def");
+asrt($bean->abc,"def");
+asrt(isset($bean["abd"]),false);
+asrt(isset($bean["abc"]),true);
+
 //Test the Check() function (also indirectly using store())
 testpack("UNIT TEST RedBean OODB: Check");
 $bean = $redbean->dispense("page");

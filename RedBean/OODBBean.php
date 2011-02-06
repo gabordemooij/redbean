@@ -11,7 +11,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_OODBBean implements IteratorAggregate {
+class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 
 	private $properties = array();
@@ -221,10 +221,70 @@ class RedBean_OODBBean implements IteratorAggregate {
 		return call_user_func_array(array($this->__info["model"],$method), $args);
 	}
 
+	/**
+	 * Implementation of __toString Method
+	 * Routes call to Model.
+	 * @return string $string
+	 */
 	public function __toString() {
 		return $this->__call('__toString',array());
 	}
 
+	/**
+	 * Implementation of Array Access Interface, you can access bean objects
+	 * like an array.
+	 * Call gets routed to __set.
+	 *
+	 * @param  mixed $offset offset string
+	 * @param  mixed $value value
+	 *
+	 * @return void
+	 */
+	public function offsetSet($offset, $value) {
+        $this->__set($offset, $value);
+    }
+
+	/**
+	 * Implementation of Array Access Interface, you can access bean objects
+	 * like an array.
+	 *
+	 * @param  mixed $offset property
+	 *
+	 * @return
+	 */
+    public function offsetExists($offset) {
+        return isset($this->properties[$offset]);
+    }
+
+	/**
+	 * Implementation of Array Access Interface, you can access bean objects
+	 * like an array.
+	 * Unsets a value from the array/bean.
+	 *
+	 * @param  mixed $offset property
+	 *
+	 * @return
+	 */
+    public function offsetUnset($offset) {
+        unset($this->properties[$offset]);
+    }
+
+	/**
+	 * Implementation of Array Access Interface, you can access bean objects
+	 * like an array.
+	 * Returns value of a property.
+	 *
+	 * @param  mixed $offset property
+	 *
+	 * @return
+	 */
+    public function offsetGet($offset) {
+        return $this->__get($offset);
+    }
+
 
 }
+
+
+
 

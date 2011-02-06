@@ -95,7 +95,7 @@ R::setup("mysql:dbname=oodb;host=localhost","root");
 
 testpack("Test BeanMachine");
 
-$beanMachine = RedBean_Plugin_BeanMachine::getInstance();
+$beanMachine = RedBean_Plugin_BeanMachine::getInstance( R::$toolbox );
 
 $beanMachine->addGroup("SELECT-CLAUSE"," SELECT @ ", ",")
 		->addGroup("FROM-CLAUSE", "  \n FROM @ ", ",")
@@ -133,6 +133,7 @@ asrt(sha1($output), $expected);
 
 
 
+
 R::wipe("book");
 R::wipe("book_page");
 R::wipe("page");
@@ -156,9 +157,17 @@ R::associate($book2,$page3);
 //exit;
 
 require("RedBean/Plugin/BeanMachine/Summary.php");
-$summary = RedBean_Plugin_BeanMachine::getQueryByName("Summary");
-$beans = $summary->summarize("book", "page", "book_page");
-$summary->getBeans();
+
+
+$machine = $beanMachine->getQueryByName("Summary");
+$machine->summarize("book", "page", "book_page");
+$beanCollection = $beanMachine->getBeans( "book", $machine );
+
+asrt(count($beanCollection),2);
+asrt($beanCollection[0]->title, "book1");
+asrt($beanCollection[1]->title, "book2");
+asrt($beanCollection[0]->getMeta("_count"), "2");
+asrt($beanCollection[1]->getMeta("_count"), "1");
 
 
 

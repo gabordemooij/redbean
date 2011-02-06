@@ -33,6 +33,12 @@ class RedBean_Plugin_BeanMachine implements RedBean_Plugin {
 	 */
 	protected $bookmarks = array();
 	    
+	/**
+	 * 
+	 * Toolbox
+	 * @var RedBean_ToolBox
+	 */
+	protected $toolbox = null;
 
 	/**
 	 * Initializes the Bean Machine
@@ -50,29 +56,34 @@ class RedBean_Plugin_BeanMachine implements RedBean_Plugin {
 	 * Private - use getInstance() instead, NOT a SINGLETON.
 	 * Constructor bootstraps its own classes.
 	 *
+	 * @param RedBean_ToolBox $toolbox toolbox
+	 * 
 	 * @return void
 	 */
-	private function __construct() {
+	private function __construct(RedBean_ToolBox $toolbox) {
 
 		$this->groups = new RedBean_Plugin_BeanMachine_Group;
 		$this->groups->setTemplate("","");
 		$this->groups->setGlue(" \n ");
 		$this->selected = $this->groups;
 		$this->root = $this->groups;
+		$this->toolbox = $toolbox;
 
 	}
 
 	/**
 	 * Gets an instance of the BeanMachine.
 	 *
+	 * @param RedBean_ToolBox $toolbox toolbox
+	 * 
 	 * @return RedBean_Plugin_BeanMachine $machine the Bean Machine.
 	 */
-	public function getInstance() {
+	public function getInstance( RedBean_ToolBox $toolbox ) {
 
 		//Bootstrap own classes
 		self::init();
 
-		$inst = new self();
+		$inst = new self( $toolbox );
 		return $inst;
 
 	}
@@ -197,18 +208,65 @@ class RedBean_Plugin_BeanMachine implements RedBean_Plugin {
 	}
 
 
-	
+	/**
+	 * 
+	 * Fetches a BeanMachine Plugin from the BeanMachine folder.
+	 * 
+	 * @param string $name name ID of the BeanMachine plugin
+	 */
 	public function getQueryByName( $name ) {
+		//build the class name
 		$className = "RedBean_Plugin_BeanMachine_".$name;
-		$inst = self::getInstance();
-		$beanMachineUser = new $className( $inst );
-		$beanMachineUser->setToolbox( R::$toolbox );
-		return $beanMachineUser;
+		if (class_exists($className)) {
+			$inst = self::getInstance( $this->toolbox );
+			$beanMachineUser = new $className( $inst );
+			return $beanMachineUser;	
+		}
+		else {
+			throw new RedBean_Exception("Could not find BeanMachine $name ", 0);
+		}
+	}
+	
+	/**
+	 * 
+	 * Produces the requested beans
+	 * 
+	 * 
+	 */
+	public function getBeans($type, $machinery) {
+		$rows = $this->toolbox->getDatabaseAdapter()->get( $machinery );
+		$beanCollection = array();
+		foreach($rows as $row) {
+			$bean = $this->toolbox->getRedbean()->dispense($type);
+			foreach($row as $property=>$value) {
+				if (strpos($property,"_")===0) {
+					//supports retrieval of meta properties
+					$bean->setMeta($property, $value);
+				}
+				else {
+					$bean->$property = $value;
+				}
+			}
+			$beanCollection[] = $bean;
+		}
+		return $beanCollection;
+	}
+	
+	/**
+	 * 
+	 * Convenience function for bean machine plugins to get hold
+	 * of the toolbox.
+	 * 
+	 * @return RedBean_ToolBox $toolbox toolbox
+	 */
+	public function getToolBox() {
+		return $this->toolbox;
 	}
 
 
 }
 
+//Define Inner Classes
 function RedBean_Plugin_BeanMachine_InnerClasses() {
 	class RedBean_Plugin_BeanMachine_Group {
 

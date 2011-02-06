@@ -1,66 +1,78 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: prive
- * Date: 2-feb-2011
- * Time: 22:51:29
- * To change this template use File | Settings | File Templates.
+ * RedBean BeanMachine Example
+ * @file			RedBean/Plugin/BeanMachine/Summary.php
+ * @description		Example of a BeanMachine
+ *
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
  */
- 
+
 class RedBean_Plugin_BeanMachine_Summary {
 
+	/**
+	 * 
+	 * Contains the BeanMachine
+	 * @var RedBean_Plugin_BeanMachine
+	 */
 	protected $beanMachine;
+	
+	/**
+	 * 
+	 * Type of reference bean
+	 * @var string
+	 */
 	protected $beanType;
+	
+	/**
+	 * 
+	 * Type of summary bean
+	 * @var string
+	 */
 	protected $summaryType;
 
+	
 	/**
-	 * @var RedBean_ToolBox 
+	 * 
+	 * Constructor
+	 * 
+	 * @param RedBean_Plugin_BeanMachine $beanMachine
 	 */
-	protected $toolbox;
-
 	public function __construct(RedBean_Plugin_BeanMachine $beanMachine) {
 
 		$this->beanMachine = $beanMachine;
 
 	}
 
+	/**
+	 * 
+	 * Configures the summary.
+	 * 
+	 * @param string $beanType  Type of reference bean
+	 * @param string $summary   Type of summary bean
+	 * @param string $linkTable Name of the link table to be used
+	 * 
+	 */
 	public function summarize( $beanType, $summary, $linkTable  ) {
 		$this->beanType = $beanType;
 		$this->summary = $summary;
 		$this->linkTable = $linkTable;
-
-
 	}
 
+		
 
-	public function setToolbox(RedBean_ToolBox $toolbox) {
-		$this->toolbox = $toolbox;
-	}
-
-	public function getBeans() {
-		$rows = $this->toolbox->getDatabaseAdapter()->get( $this );
-		foreach($rows as $row) {
-			$bean = $this->toolbox->getRedbean()->dispense($this->beanType);
-		}
-
-	}
-
-
+	/**
+	 * __toString override
+	 * Returns the SQL to obtain the beans.
+	 */
 	public function __toString() {
 
 		$b = $this->beanMachine;
-/*
-		SELECT b.id, (
-
-SELECT COUNT( * )
-FROM book_page,
-PAGE WHERE book_page.book_id = b.id
-AND page.id = book_page.page_id
-)
-FROM book AS b
-LIMIT 0 , 30*/
-
-
 
 		//Define the top-level clauses
 		$b->addGroup("SELECT"," SELECT @ ",",")
@@ -88,7 +100,7 @@ LIMIT 0 , 30*/
 				->add(" summary.id = linktable.{$this->summary}_id ");
 
 
-	
+		//return the resulting SQL code as a string
 		return (string) $b;
 
 	}
