@@ -145,17 +145,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return mixed $value
 	 */
 	public function getMeta( $path, $default = NULL) {
-		$ref = $this->__info;
-		$parts = explode(".", $path);
-		foreach($parts as $part) {
-			if (isset($ref[$part])) {
-				$ref = $ref[$part];
-			}
-			else {
-				return $default;
-			}
-		}
-		return $ref;
+		return (isset($this->__info[$path])) ? $this->__info[$path] : $default;
 	}
 
 	/**
@@ -167,16 +157,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @param mixed $value
 	 */
 	public function setMeta( $path, $value ) {
-		$ref = &$this->__info;
-		$parts = explode(".", $path);
-		$lastpart = array_pop( $parts );
-		foreach($parts as $part) {
-			if (!isset($ref[$part])) {
-				$ref[$part] = array();
-			}
-			$ref = &$ref[$part];
-		}
-		$ref[$lastpart] = $value;
+		$this->__info[$path] = $value;
 	}
 
 	/**

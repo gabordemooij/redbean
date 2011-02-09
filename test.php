@@ -420,10 +420,6 @@ testpack("UNIT TEST RedBean OODBBean: Meta Information");
 $bean = new RedBean_OODBBean;
 $bean->setMeta( "this.is.a.custom.metaproperty" , "yes" );
 asrt($bean->getMeta("this.is.a.custom.metaproperty"),"yes");
-$bean->setMeta( "test", array( "one" => 123 ));
-asrt($bean->getMeta("test.one"),123);
-$bean->setMeta( "arr", array(1,2) );
-asrt(is_array($bean->getMeta("arr")),true);
 asrt($bean->getMeta("nonexistant"),NULL);
 asrt($bean->getMeta("nonexistant","abc"),"abc");
 asrt($bean->getMeta("nonexistant.nested"),NULL);
@@ -472,7 +468,7 @@ asrt($arr["b"],2);
 $exportBean = $redbean->dispense("abean");
 $exportBean->setMeta("metaitem.bla",1);
 $exportedBean = $exportBean->export(true);
-asrt($exportedBean["__info"]["metaitem"]["bla"],1);
+asrt($exportedBean["__info"]["metaitem.bla"],1);
 asrt($exportedBean["__info"]["type"],"abean");
 
 //Test observer

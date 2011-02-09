@@ -88,7 +88,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		$bean->setMeta("sys.idfield",$idfield);
 		$bean->$idfield = 0;
-		$this->check( $bean );
+		if (!$this->isFrozen) $this->check( $bean );
 		$bean->setMeta("tainted",false);
 		$this->signal( "dispense", $bean );
 		return $bean;
@@ -159,7 +159,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 */
 	public function store( RedBean_OODBBean $bean ) {
 		$this->signal( "update", $bean );
-		$this->check($bean);
+		if (!$this->isFrozen) $this->check($bean);
 		//what table does it want
 		$table = $bean->getMeta("type");
 		$idfield = $this->writer->getIDField($table);
@@ -298,7 +298,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	public function trash( RedBean_OODBBean $bean ) {
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		$this->signal( "delete", $bean );
-		$this->check( $bean );
+		if (!$this->isFrozen) $this->check( $bean );
 		try {
 			$this->writer->deleteRecord( $bean->getMeta("type"), $bean->$idfield );
 		}catch(RedBean_Exception_SQL $e) {

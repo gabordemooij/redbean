@@ -353,33 +353,6 @@ asrt($nullWriter->widenColumnArguments,array());
 $redbean->freeze(false);
 
 
-testpack("UNIT TEST RedBean OODBBean: Meta Information");
-$bean = new RedBean_OODBBean;
-$bean->setMeta( "this.is.a.custom.metaproperty" , "yes" );
-asrt($bean->getMeta("this.is.a.custom.metaproperty"),"yes");
-$bean->setMeta( "test", array( "one" => 123 ));
-asrt($bean->getMeta("test.one"),123);
-$bean->setMeta( "arr", array(1,2) );
-asrt(is_array($bean->getMeta("arr")),true);
-asrt($bean->getMeta("nonexistant"),NULL);
-asrt($bean->getMeta("nonexistant","abc"),"abc");
-asrt($bean->getMeta("nonexistant.nested"),NULL);
-asrt($bean->getMeta("nonexistant,nested","abc"),"abc");
-$bean->setMeta("test.two","second");
-asrt($bean->getMeta("test.two"),"second");
-$bean->setMeta("another.little.property","yes");
-asrt($bean->getMeta("another.little.property"),"yes");
-asrt($bean->getMeta("test.two"),"second");
-
-
-testpack("UNIT TEST RedBean OODBBean: copyMeta");
-$bean = new RedBean_OODBBean;
-$bean->setMeta("meta.meta","123");
-$bean2 = new RedBean_OODBBean;
-asrt($bean2->getMeta("meta.meta"),NULL);
-$bean2->copyMetaFrom($bean);
-asrt($bean2->getMeta("meta.meta"),"123");
-
 testpack("UNIT TEST RedBean OODBBean: import");
 $bean = new RedBean_OODBBean;
 $bean->import(array("a"=>1,"b"=>2));

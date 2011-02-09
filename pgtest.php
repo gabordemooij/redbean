@@ -302,23 +302,7 @@ try {
 	$redbean->freeze(false);
 
 
-	testpack("UNIT TEST RedBean OODBBean: Meta Information");
-	$bean = new RedBean_OODBBean;
-	$bean->setMeta( "this.is.a.custom.metaproperty" , "yes" );
-	asrt($bean->getMeta("this.is.a.custom.metaproperty"),"yes");
-	$bean->setMeta( "test", array( "one" => 123 ));
-	asrt($bean->getMeta("test.one"),123);
-	$bean->setMeta( "arr", array(1,2) );
-	asrt(is_array($bean->getMeta("arr")),true);
-	asrt($bean->getMeta("nonexistant"),NULL);
-	asrt($bean->getMeta("nonexistant","abc"),"abc");
-	asrt($bean->getMeta("nonexistant.nested"),NULL);
-	asrt($bean->getMeta("nonexistant,nested","abc"),"abc");
-	$bean->setMeta("test.two","second");
-	asrt($bean->getMeta("test.two"),"second");
-	$bean->setMeta("another.little.property","yes");
-	asrt($bean->getMeta("another.little.property"),"yes");
-	asrt($bean->getMeta("test.two"),"second");
+
 
 
 	testpack("UNIT TEST RedBean OODBBean: import");
@@ -327,20 +311,7 @@ try {
 	asrt($bean->a, 1);
 	asrt($bean->b, 2);
 
-	testpack("UNIT TEST RedBean OODBBean: export");
-	$bean->setMeta("justametaproperty","hellothere");
-	$arr = $bean->export();
-	asrt(is_array($arr),true);
-	asrt(isset($arr["a"]),true);
-	asrt(isset($arr["b"]),true);
-	asrt($arr["a"],1);
-	asrt($arr["b"],2);
-	asrt(isset($arr["__info"]),false);
-	$arr = $bean->export( true );
-	asrt(isset($arr["__info"]),true);
-	asrt($arr["a"],1);
-	asrt($arr["b"],2);
-
+	
 //Test observer
 	testpack("UNIT TEST Observer Mechanism ");
 	$observable = new ObservableMock();
