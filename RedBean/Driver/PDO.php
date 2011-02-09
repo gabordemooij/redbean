@@ -185,10 +185,28 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				$s = $this->pdo->prepare($sql);
 			}
 
-			$s->execute($aValues);
+
+			foreach($aValues as $key=>&$value) {
+			
+				if (is_integer($key)) {
+					if (is_integer($value)) $s->bindParam($key+1,$value,PDO::PARAM_INT); 
+					else $s->bindParam($key+1,$value,PDO::PARAM_STR);
+				}
+				else {
+
+					if (is_integer($value)) $s->bindParam($key,$value,PDO::PARAM_INT); 
+					else $s->bindParam($key,$value,PDO::PARAM_STR);
+				}
+				
+			}
+			
+
+			$s->execute();
 			
 		  if ($s->columnCount()) {
 		    $this->rs = $s->fetchAll();
+		    
+		    
 	    }
 		  else {
 		    $this->rs = null;
@@ -327,7 +345,25 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			else {
 				$s = $this->pdo->prepare($sql);
 			}
-			$s->execute($aValues);
+			
+			
+			
+			foreach($aValues as $key=>&$value) {
+			
+				if (is_integer($key)) {
+					if (is_integer($value)) $s->bindParam($key+1,$value,PDO::PARAM_INT); 
+					else $s->bindParam($key+1,$value,PDO::PARAM_STR);
+				}
+				else {
+
+					if (is_integer($value)) $s->bindParam($key,$value,PDO::PARAM_INT); 
+					else $s->bindParam($key,$value,PDO::PARAM_STR);
+				}
+				
+			}
+			
+			
+			$s->execute();
 			$this->affected_rows=$s->rowCount();
 			return $this->affected_rows;
 		}

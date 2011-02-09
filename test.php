@@ -625,6 +625,10 @@ asrt(isset($page->id),true);
 asrt(($page->getMeta("type")),"page");
 asrt((int)$page->id,$id);
 
+//testpack("Test param binding");
+//$pages = $adapter->exec("select * from page where 1 LIMIT :n ", array(":n"=>1));
+//print_r($pages);
+//exit;
 
 
 testpack("Test RedBean OODB: Can we Update a Record? ");

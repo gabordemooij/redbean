@@ -724,7 +724,7 @@ asrt(count($books),3);
 
 
 testpack("Test Custom ID Field");
-class MyWriter extends RedBean_QueryWriter_SQLite {
+class MyWriter extends RedBean_QueryWriter_SQLiteT {
 	public function getIDField( $type ) {
 		return $type . "_id";
 	}
@@ -753,6 +753,7 @@ asrt($movies[$movieid]->name,"movie 1");
 asrt($movies[$movieid2]->name,"movie 2");
 $toolbox2 = new RedBean_ToolBox($redbean2, $adapter, $writer2);
 
+//$adapter->getDatabase()->setDebugMode(1);
 $a2 = new RedBean_AssociationManager($toolbox2);
 $a2->associate($movie1,$movie2);
 $movies = $a2->related($movie1, "movie");
@@ -765,6 +766,7 @@ $genre = $redbean2->dispense("genre");
 $genre->name="western";
 $a2->associate($movie,$genre);
 $movies = $a2->related($genre, "movie");
+//print_r($movies);
 asrt(count($movies),1);
 asrt((int)$movies[0],(int)$movieid);
 $a2->unassociate($movie,$genre);
