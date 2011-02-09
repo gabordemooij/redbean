@@ -513,6 +513,26 @@ class R {
 		return reset($items);
 	}
 
+	/**
+	 * Finds a bean using a type and a where clause (SQL).
+	 * As with most Query tools in RedBean you can provide values to
+	 * be inserted in the SQL statement by populating the value
+	 * array parameter; you can either use the question mark notation
+	 * or the slot-notation (:keyname).
+	 * This variation returns the last bean only.
+	 *
+	 * @param string $type	 type
+	 * @param string $sql	 sql
+	 * @param array  $values values
+	 *
+	 * @return RedBean_OODBBean $bean
+	 */
+	public static function findLast( $type, $sql="1", $values=array() )
+	{
+		$items = R::find( $type, $sql, $values );
+		return end( $items );
+	}
+
 
 	/**
 	 * Returns an array of beans.
