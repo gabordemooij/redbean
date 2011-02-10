@@ -356,6 +356,9 @@ try {
 	if (in_array("logentry",$_tables)) $pdo->Execute("DROP TABLE logentry");
 	if (in_array("admin",$_tables)) $pdo->Execute("DROP TABLE admin");
 	if (in_array("wine",$_tables)) $pdo->Execute("DROP TABLE wine");
+	if (in_array("xx_barrel",$_tables)) $pdo->Execute("DROP TABLE xx_barrel CASCADE");
+	if (in_array("xx_grapes",$_tables)) $pdo->Execute("DROP TABLE xx_grapes CASCADE");
+	if (in_array("xx_barrel_grapes",$_tables)) $pdo->Execute("DROP TABLE xx_barrel_grapes CASCADE");
 	if (in_array("admin_logentry",$_tables)) $pdo->Execute("DROP TABLE admin_logentry"); 
 	$page = $redbean->dispense("page");
 
@@ -880,7 +883,10 @@ try {
 	}catch(Exception $e) {
 		die($e->getMessage());
 	}
+	
 	$adapter->exec("DROP TABLE IF EXISTS whisky CASCADE ");
+	
+
 
 //add cask 101 and whisky 12
 	$cask = $redbean->dispense("cask");
@@ -895,6 +901,39 @@ try {
 	asrt(count($a->related($cask, "cask")),1);
 	$redbean->trash( $cask2 );
 	asrt(count($a->related($cask, "cask")),0);
+//now in combination with prefixes
+
+class TestFormatter implements RedBean_IBeanFormatter{
+	public function formatBeanTable($table) {return "xx_$table";}
+	public function formatBeanID( $table ) {return "id";}
+}
+$oldwriter = $writer;
+$oldredbean = $redbean;
+$writer = new RedBean_QueryWriter_PostgreSQL( $adapter, $frozen );
+$writer->setBeanFormatter( new TestFormatter );
+$redbean = new RedBean_OODB( $writer );
+$t2 = new RedBean_ToolBox($redbean,$adapter,$writer);
+$a = new RedBean_AssociationManager($t2);
+$redbean = new RedBean_OODB( $writer );
+RedBean_Plugin_Constraint::setToolBox($t2);
+$b = $redbean->dispense("barrel");
+$g = $redbean->dispense("grapes");
+$g->type = "merlot";
+$b->texture = "wood";
+$a->associate($g, $b);
+asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
+asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),false);
+asrt($redbean->count("barrel_grapes"),1);
+$redbean->trash($g);
+asrt($redbean->count("barrel_grapes"),0);
+//put things back in order for next tests...
+$a = new RedBean_AssociationManager($toolbox);
+$writer = $oldwriter;
+$redbean=$oldredbean;
+
+
+
+
 
 
 
@@ -1178,6 +1217,18 @@ $id = R::store($bean);
 $bean = R::load("page",$id);
 return $bean->prop;
 }
+
+testpack("param binding pgsql");
+$page = R::dispense("page");
+$page->name = "abc";
+$page->number = 2;
+R::store($page);
+R::exec("insert into page (name) values(:name) ", array(":name"=>"my name"));
+R::exec("insert into page (number) values(:one) ", array(":one"=>1));
+R::exec("insert into page (number) values(:one) ", array(":one"=>"1"));
+R::exec("insert into page (number) values(:one) ", array(":one"=>"1234"));
+R::exec("insert into page (number) values(:one) ", array(":one"=>"-21"));
+pass();
 
 //this module tests whether values we store are the same we get returned
 //PDO is a bit unpred. with this but using STRINGIFY attr this should work we test this here

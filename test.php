@@ -491,8 +491,6 @@ $adapter = $toolbox->getDatabaseAdapter();
 $writer  = $toolbox->getWriter();
 $redbean = $toolbox->getRedBean();
 
-
-
 testpack("UNIT TEST Toolbox");
 asrt(($adapter instanceof RedBean_Adapter_DBAdapter),true);
 asrt(($writer instanceof RedBean_QueryWriter),true);
@@ -502,6 +500,7 @@ asrt(($redbean instanceof RedBean_OODB),true);
 
 
 $pdo = $adapter->getDatabase();
+
 $pdo->setDebugMode(0);
 $pdo->Execute("CREATE TABLE IF NOT EXISTS`hack` (
 `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY
@@ -1683,7 +1682,9 @@ try {
 }catch(RedBean_Exception_SQL $e) {
 	fail();
 }
+
 $a = $adapter->get("show index from testtable");
+
 asrt(count($a),3);
 asrt($a[1]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
@@ -1741,6 +1742,7 @@ asrt(count($a->related($whisky2, "cask")),1);
 $redbean->trash($whisky2);
 asrt(count($a->related($whisky2, "cask")),0); //should be gone now!
 
+
 $pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
 $pdo->Execute("DROP TABLE IF EXISTS cask");
 $pdo->Execute("DROP TABLE IF EXISTS whisky");
@@ -1759,7 +1761,37 @@ asrt(count($a->related($cask, "cask")),1);
 $redbean->trash( $cask2 );
 asrt(count($a->related($cask, "cask")),0);
 
-
+//now in combination with prefixes
+$pdo->Execute("DROP TABLE IF EXISTS xx_barrel_grapes");
+$pdo->Execute("DROP TABLE IF EXISTS xx_grapes");
+$pdo->Execute("DROP TABLE IF EXISTS xx_barrel");
+class TestFormatter implements RedBean_IBeanFormatter{
+	public function formatBeanTable($table) {return "xx_$table";}
+	public function formatBeanID( $table ) {return "id";}
+}
+$oldwriter = $writer;
+$oldredbean = $redbean;
+$writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+$writer->setBeanFormatter( new TestFormatter );
+$redbean = new RedBean_OODB( $writer );
+$t2 = new RedBean_ToolBox($redbean,$adapter,$writer);
+$a = new RedBean_AssociationManager($t2);
+$redbean = new RedBean_OODB( $writer );
+RedBean_Plugin_Constraint::setToolBox($t2);
+$b = $redbean->dispense("barrel");
+$g = $redbean->dispense("grapes");
+$g->type = "merlot";
+$b->texture = "wood";
+$a->associate($g, $b);
+asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
+asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),false);
+asrt($redbean->count("barrel_grapes"),1);
+$redbean->trash($g);
+asrt($redbean->count("barrel_grapes"),0);
+//put things back in order for next tests...
+$a = new RedBean_AssociationManager($toolbox);
+$writer = $oldwriter;
+$redbean=$oldredbean;
 
 //Zero issue (false should be stored as 0 not as '')
 testpack("Zero issue");

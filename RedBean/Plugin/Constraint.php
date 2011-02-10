@@ -21,6 +21,11 @@ class RedBean_Plugin_Constraint {
 	 */
 	private static $fkcache = array();
 
+	private static $toolbox = null;
+	public static function setToolBox( RedBean_ToolBox $toolbox ) {
+		self::$toolbox = $toolbox;
+	}
+
 	/**
 	 * Ensures that given an association between
 	 * $bean1 and $bean2,
@@ -35,7 +40,12 @@ class RedBean_Plugin_Constraint {
 	public static function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $dontCache = false ) {
 
 		//Fetch the toolbox
-		$toolbox = RedBean_Setup::getToolBox();
+		if ((self::$toolbox)) { 
+			$toolbox = self::$toolbox;
+		}
+		else {
+			$toolbox = RedBean_Setup::getToolBox();
+		}
 
 		RedBean_CompatManager::scanDirect($toolbox, array(
 				  RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
@@ -138,6 +148,11 @@ class RedBean_Plugin_Constraint {
 
 		$rows = $adapter->get( $sql );
 		if (!count($rows)) {
+			
+			$table = $writer->getFormattedTableName($table);
+			$table1 = $writer->getFormattedTableName($table1);
+			$table2 = $writer->getFormattedTableName($table2);
+			
 			if (!$dontCache) self::$fkcache[ $fkCode ] = true;
 			$sql1 = "ALTER TABLE $table ADD CONSTRAINT
 					  {$fkCode}a FOREIGN KEY ($property1)
@@ -174,7 +189,7 @@ class RedBean_Plugin_Constraint {
 		$fks =  $adapter->getCell("
 			SELECT count(*)
 			FROM information_schema.KEY_COLUMN_USAGE
-			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='$table' AND
+			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='".$writer->getFormattedTableName($table)."' AND
 			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
 				  ");
 
@@ -190,6 +205,11 @@ class RedBean_Plugin_Constraint {
 		if ($writer->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
 			$writer->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 		}
+		
+		$table = $writer->getFormattedTableName($table);
+		$table1 = $writer->getFormattedTableName($table1);
+		$table2 = $writer->getFormattedTableName($table2);
+			
 		$sql = "
 			ALTER TABLE ".$writer->noKW($table)."
 			ADD FOREIGN KEY($property1) references $table1(id) ON DELETE CASCADE;
@@ -222,6 +242,12 @@ class RedBean_Plugin_Constraint {
 		$oodb = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$fkCode = "fk".md5($table.$property1.$property2);
+		
+		$table = $writer->getFormattedTableName($table);
+		$table1 = $writer->getFormattedTableName($table1);
+		$table2 = $writer->getFormattedTableName($table2);
+			
+		
 		$sql1 = "
 			CREATE TRIGGER IF NOT EXISTS {$fkCode}a
 				BEFORE DELETE ON $table1

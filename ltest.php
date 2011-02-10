@@ -561,6 +561,37 @@ asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
 asrt(count($a->related($cask, "cask")),1);
 $redbean->trash( $cask2 );
 asrt(count($a->related($cask, "cask")),0);
+//now in combination with prefixes
+$adapter->exec("DROP TABLE IF EXISTS xx_barrel_grapes");
+$adapter->exec("DROP TABLE IF EXISTS xx_grapes");
+$adapter->exec("DROP TABLE IF EXISTS xx_barrel");
+class TestFormatter implements RedBean_IBeanFormatter{
+	public function formatBeanTable($table) {return "xx_$table";}
+	public function formatBeanID( $table ) {return "id";}
+}
+$oldwriter = $writer;
+$oldredbean = $redbean;
+$writer = new RedBean_QueryWriter_SQLiteT( $adapter, $frozen );
+$writer->setBeanFormatter( new TestFormatter );
+$redbean = new RedBean_OODB( $writer );
+$t2 = new RedBean_ToolBox($redbean,$adapter,$writer);
+$a = new RedBean_AssociationManager($t2);
+$redbean = new RedBean_OODB( $writer );
+RedBean_Plugin_Constraint::setToolBox($t2);
+$b = $redbean->dispense("barrel");
+$g = $redbean->dispense("grapes");
+$g->type = "merlot";
+$b->texture = "wood";
+$a->associate($g, $b);
+asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
+asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
+asrt($redbean->count("barrel_grapes"),1);
+$redbean->trash($g);
+asrt($redbean->count("barrel_grapes"),0);
+//put things back in order for next tests...
+$a = new RedBean_AssociationManager($toolbox);
+$writer = $oldwriter;
+$redbean=$oldredbean;
 
 
 
