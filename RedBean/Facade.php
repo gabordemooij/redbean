@@ -98,22 +98,8 @@ class R {
 	 */
 	public static function setup( $dsn="sqlite:/tmp/red.db", $username=NULL, $password=NULL ) {
 		RedBean_Setup::kickstart( $dsn, $username, $password );
-		self::$toolbox = RedBean_Setup::getToolBox();
-		self::$writer = self::$toolbox->getWriter();
-		self::$adapter = self::$toolbox->getDatabaseAdapter();
-		self::$redbean = self::$toolbox->getRedBean();
-		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
-		self::$treeManager = new RedBean_TreeManager( self::$toolbox );
-		self::$linkManager = new RedBean_LinkManager( self::$toolbox );
-		self::$extAssocManager = new RedBean_ExtAssociationManager( self::$toolbox );
-		$helper = new RedBean_ModelHelper();
-		self::$redbean->addEventListener("update", $helper );
-		self::$redbean->addEventListener("open", $helper );
-		self::$redbean->addEventListener("delete", $helper );
-		self::$redbean->addEventListener("after_delete", $helper );
-		self::$redbean->addEventListener("after_update", $helper );
-		self::$redbean->addEventListener("dispense", $helper );
-		
+		$toolbox = RedBean_Setup::getToolBox();
+		self::configureFacadeWithToolbox($toolbox);
 	}
 
 
@@ -811,6 +797,39 @@ class R {
 
 	public static function count( $beanType ) {
 		return R::$redbean->count($beanType);
+	}
+
+	/**
+	 * Configures the facade, want to have a new Writer? A new Object Database or a new
+	 * Adapter and you want it on-the-fly? Use this method to hot-swap your facade with a new
+	 * toolbox.
+	 *
+	 * @static
+	 * @param RedBean_ToolBox $tb toolbox
+	 *
+	 * @return RedBean_ToolBox $tb old, rusty, previously used toolbox
+	 */
+	public static function configureFacadeWithToolbox( RedBean_ToolBox $tb ) {
+
+		$oldTools = self::$toolbox;
+
+		self::$toolbox = $tb;
+		self::$writer = self::$toolbox->getWriter();
+		self::$adapter = self::$toolbox->getDatabaseAdapter();
+		self::$redbean = self::$toolbox->getRedBean();
+		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
+		self::$treeManager = new RedBean_TreeManager( self::$toolbox );
+		self::$linkManager = new RedBean_LinkManager( self::$toolbox );
+		self::$extAssocManager = new RedBean_ExtAssociationManager( self::$toolbox );
+		$helper = new RedBean_ModelHelper();
+		self::$redbean->addEventListener("update", $helper );
+		self::$redbean->addEventListener("open", $helper );
+		self::$redbean->addEventListener("delete", $helper );
+		self::$redbean->addEventListener("after_delete", $helper );
+		self::$redbean->addEventListener("after_update", $helper );
+		self::$redbean->addEventListener("dispense", $helper );
+
+		return $oldTools;
 	}
 
 
