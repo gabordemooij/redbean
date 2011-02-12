@@ -1761,6 +1761,7 @@ asrt(count($a->related($cask, "cask")),1);
 $redbean->trash( $cask2 );
 asrt(count($a->related($cask, "cask")),0);
 
+
 //now in combination with prefixes
 $pdo->Execute("DROP TABLE IF EXISTS xx_barrel_grapes");
 $pdo->Execute("DROP TABLE IF EXISTS xx_grapes");
@@ -1771,7 +1772,7 @@ class TestFormatter implements RedBean_IBeanFormatter{
 }
 $oldwriter = $writer;
 $oldredbean = $redbean;
-$writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+$writer = new RedBean_QueryWriter_MySQL( $adapter, false );
 $writer->setBeanFormatter( new TestFormatter );
 $redbean = new RedBean_OODB( $writer );
 $t2 = new RedBean_ToolBox($redbean,$adapter,$writer);
@@ -1788,10 +1789,27 @@ asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),false);
 asrt($redbean->count("barrel_grapes"),1);
 $redbean->trash($g);
 asrt($redbean->count("barrel_grapes"),0);
+//$adapter->getDatabase()->setDebugMode(1);
+//prefixes and logger
+$p=$redbean->dispense("page");
+$p->name="abc";
+$id=$redbean->store($p);
+$p=$redbean->load("page",$id);
+$p->name="def";
+$id=$redbean->store($p);
+
+$p2=$redbean->dispense("page");
+$p2->name="abc2";
+$a->associate($p2,$p);
+
+$redbean->trash($p);
+$redbean->trash($p2);
+
 //put things back in order for next tests...
 $a = new RedBean_AssociationManager($toolbox);
 $writer = $oldwriter;
 $redbean=$oldredbean;
+
 
 //Zero issue (false should be stored as 0 not as '')
 testpack("Zero issue");
@@ -2561,6 +2579,17 @@ asrt( getList( R::unrelated($painter,"person"),"job" ), "developer,salesman" ) ;
 asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter" ) ;
 asrt( getList( R::unrelated($developer,"person"),"job" ), "painter" ) ;
 
+testpack("Test parameter binding");
+R::$adapter->getDatabase()->flagUseStrinOnlyBinding = TRUE;
+try{R::getAll("select * from job limit ? ", array(1)); fail(); }catch(Exception $e){ pass(); }
+try{R::getAll("select * from job limit :l ", array(":l"=>1)); fail(); }catch(Exception $e){ pass(); }
+try{R::exec("select * from job limit ? ", array(1)); fail(); }catch(Exception $e){ pass(); }
+try{R::exec("select * from job limit :l ", array(":l"=>1)); fail(); }catch(Exception $e){ pass(); }
+R::$adapter->getDatabase()->flagUseStrinOnlyBinding = FALSE;
+try{R::getAll("select * from job limit ? ", array(1)); pass(); }catch(Exception $e){ print_r($e); fail(); }
+try{R::getAll("select * from job limit :l ", array(":l"=>1)); pass(); }catch(Exception $e){ fail(); }
+try{R::exec("select * from job limit ? ", array(1)); pass(); }catch(Exception $e){ fail(); }
+try{R::exec("select * from job limit :l ", array(":l"=>1)); pass(); }catch(Exception $e){ fail(); }
 
 
 testpack("Test count and wipe");
@@ -2605,8 +2634,9 @@ asrt(setget("2147483647"),"2147483647");
 asrt(setget(2147483647),"2147483647");
 asrt(setget(-2147483647),"-2147483647");
 asrt(setget("-2147483647"),"-2147483647");
-asrt(setget("2147483647123456"),"2.14748364712346e+15");
-asrt(setget(2147483647123456),"2.14748364712e+15");
+//Architecture dependent... only test this if you are sure what arch 
+//asrt(setget("2147483647123456"),"2.14748364712346e+15");
+//asrt(setget(2147483647123456),"2.14748364712e+15");
 asrt(setget("a"),"a");
 asrt(setget("."),".");
 asrt(setget("\""),"\"");

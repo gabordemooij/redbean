@@ -909,7 +909,7 @@ class TestFormatter implements RedBean_IBeanFormatter{
 }
 $oldwriter = $writer;
 $oldredbean = $redbean;
-$writer = new RedBean_QueryWriter_PostgreSQL( $adapter, $frozen );
+$writer = new RedBean_QueryWriter_PostgreSQL( $adapter, false );
 $writer->setBeanFormatter( new TestFormatter );
 $redbean = new RedBean_OODB( $writer );
 $t2 = new RedBean_ToolBox($redbean,$adapter,$writer);
