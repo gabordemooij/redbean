@@ -24,8 +24,8 @@ interface RedBean_IBeanFormatter {
 
 	/**
 	 *
-	 * @param string $id id
+	 * @param string $type type
 	 */
-	public function formatBeanID( $id );
+	public function formatBeanID( $type );
 
 }

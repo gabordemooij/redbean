@@ -87,7 +87,7 @@ class R {
 	 * @return string $version Version ID
 	 */
 	public static function getVersion() {
-		return "1.2.9.1";
+		return "1.3beta";
 	}
 
 	/**
