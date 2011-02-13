@@ -21,6 +21,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
  *					files for you.
  * @author			Gabor de Mooij
  * @license			BSD
+ * @replica:exclude
  *
  * (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled

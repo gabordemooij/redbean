@@ -188,6 +188,21 @@ class R {
 	}
 
 	/**
+	 * Convience method. Tries to find beans of a certain type,
+	 * if no beans are found, it dispenses a bean of that type.
+	 *
+	 * @param  string $type   type of bean you are looking for
+	 * @param  string $sql    SQL code for finding the bean
+	 * @param  array  $values parameters to bind to SQL
+	 *
+	 * @return array $beans Contains RedBean_OODBBean instances
+	 */
+	public static function findOrDispense( $type, $sql, $values ) {
+		$foundBeans = self::find($type,$sql,$values);
+		if (count($foundBeans)==0) return self::dispense($type); else return $foundBeans;
+	}
+
+	/**
 	 * Associates two Beans. This method will associate two beans with eachother.
 	 * You can then get one of the beans by using the related() function and
 	 * providing the other bean. You can also provide a base bean in the extra
