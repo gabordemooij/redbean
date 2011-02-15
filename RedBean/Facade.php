@@ -199,7 +199,7 @@ class R {
 	 */
 	public static function findOrDispense( $type, $sql, $values ) {
 		$foundBeans = self::find($type,$sql,$values);
-		if (count($foundBeans)==0) return self::dispense($type); else return $foundBeans;
+		if (count($foundBeans)==0) return array(self::dispense($type)); else return $foundBeans;
 	}
 
 	/**
