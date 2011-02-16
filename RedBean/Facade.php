@@ -15,7 +15,6 @@
  * with this source code in the file license.txt.
  *
  */
-class RObj { public function __call($f,$a){ return call_user_func_array("R::$f", $a); } }
 class R {
 
 	/**
@@ -849,13 +848,4 @@ class R {
 
 
 
-}
-
-//Helper functions
-function tbl($table) {
-	return R::$writer->getFormattedTableName($table);
-}
-
-function ID($id) {
-	return R::$writer->getIDField($table);
 }

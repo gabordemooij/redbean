@@ -16,6 +16,8 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
+ 
+ 
 error_reporting(E_ALL | E_STRICT);
 $ini = parse_ini_file("test.ini", true);
 
@@ -120,6 +122,16 @@ class ObserverMock implements RedBean_Observer {
 		$this->event = $event;
 		$this->info = $info;
 	}
+}
+
+
+//Helper functions
+function tbl($table) {
+	return R::$writer->getFormattedTableName($table);
+}
+
+function ID($id) {
+	return R::$writer->getIDField($table);
 }
 
 $nullWriter = new RedBean_QueryWriter_NullWriter();
@@ -2654,12 +2666,6 @@ asrt(setget("true"),"true");
 asrt(setget("false"),"false");
 asrt(setget("null"),"null");
 asrt(setget("NULL"),"NULL");
-
-
-testpack("non-static invocations");
-$r =  R::getInstance();
-asrt( getList( $r->unrelated($developer,"person"),"job" ), "painter" ) ;
-
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 
