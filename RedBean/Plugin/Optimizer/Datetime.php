@@ -163,7 +163,7 @@ class RedBean_Plugin_Optimizer_Datetime extends RedBean_CompatManager implements
 				//Ok, value is datetime, can we convert the column to support this?
 				$cnt = (int) $this->adapter->getCell("select count(*) as n from {$this->table} where
 						  {$this->column} regexp '[0-9]{4}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]'
-						  ");
+						  OR {$this->column} IS NULL");
 				$total = (int) $this->adapter->getCell("SELECT count(*) FROM ".$this->writer->noKW($this->table));
 				//Is it safe to convert: ie are all values compatible?
 				if ($total===$cnt) { //yes

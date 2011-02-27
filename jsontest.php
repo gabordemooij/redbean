@@ -125,7 +125,11 @@ $beanMachine->openGroup("SELECT-CLAUSE")
 		->add("name")
 		->add("job");
 
+//die($beanMachine);
+
 $output = preg_replace("/\s/","", $beanMachine );
+
+
 //echo "\n\n".sha1( $output )."\n\n" ; exit;
 $expected = "04586a1c347cd1ffa0e4fac3ca3ba9bcdf794371";
 asrt(sha1($output), $expected);

@@ -40,6 +40,10 @@ class RedBean_Plugin_QueryLogger implements RedBean_Plugin,RedBean_Observer {
 		return $found;
 	}
 
+	public function getLogs() {
+		return $this->logs;
+	}
+
 
 
 }
