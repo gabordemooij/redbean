@@ -71,7 +71,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * Whether you want to use classic String Only binding -
 	 * backward compatibility.
 	 */
-	public $flagUseStrinOnlyBinding = false;
+	public $flagUseStringOnlyBinding = false;
 
 	/**
 	 *
@@ -193,7 +193,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				$s = $this->pdo->prepare($sql);
 			}
 
-			if ($this->flagUseStrinOnlyBinding) {
+			if ($this->flagUseStringOnlyBinding) {
 				$s->execute($aValues);
 			}
 			else {
@@ -355,7 +355,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				$s = $this->pdo->prepare($sql);
 			}
 			
-			if ($this->flagUseStrinOnlyBinding) {
+			if ($this->flagUseStringOnlyBinding) {
 				$s->execute($aValues);
 			}
 			else {

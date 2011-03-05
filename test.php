@@ -2592,12 +2592,12 @@ asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter" ) ;
 asrt( getList( R::unrelated($developer,"person"),"job" ), "painter" ) ;
 
 testpack("Test parameter binding");
-R::$adapter->getDatabase()->flagUseStrinOnlyBinding = TRUE;
+R::$adapter->getDatabase()->flagUseStringOnlyBinding = TRUE;
 try{R::getAll("select * from job limit ? ", array(1)); fail(); }catch(Exception $e){ pass(); }
 try{R::getAll("select * from job limit :l ", array(":l"=>1)); fail(); }catch(Exception $e){ pass(); }
 try{R::exec("select * from job limit ? ", array(1)); fail(); }catch(Exception $e){ pass(); }
 try{R::exec("select * from job limit :l ", array(":l"=>1)); fail(); }catch(Exception $e){ pass(); }
-R::$adapter->getDatabase()->flagUseStrinOnlyBinding = FALSE;
+R::$adapter->getDatabase()->flagUseStringOnlyBinding = FALSE;
 try{R::getAll("select * from job limit ? ", array(1)); pass(); }catch(Exception $e){ print_r($e); fail(); }
 try{R::getAll("select * from job limit :l ", array(":l"=>1)); pass(); }catch(Exception $e){ fail(); }
 try{R::exec("select * from job limit ? ", array(1)); pass(); }catch(Exception $e){ fail(); }
