@@ -110,12 +110,14 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	/**
 	 * Gets related beans of type $type for bean $bean
 	 *
-	 * @param RedBean_OODBBean $bean bean
-	 * @param string			   $type type
+	 * @param RedBean_OODBBean  $bean 		bean
+	 * @param string			$type 		type
+	 * @param bool				$linksOnly  whether you want keys of links themselves
+	 * @param string			$sql		optional SQL template to use,
 	 *
-	 * @return array $ids ids
+	 * @return array $idsOrRows ids or rows
 	 */
-	public function related( RedBean_OODBBean $bean, $type, $getLinks=false ) {
+	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $sql=false ) {
 		$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		if ($type==$bean->getMeta("type")) {// echo "<b>CROSS</b>";
@@ -133,7 +135,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 						  $table,
 						  $property,
 						  $bean->$idfield,
-						  true
+						  true,$sql
 				);
 			}
 			else {
@@ -141,10 +143,10 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 						  $targetproperty,
 						  $table,
 						  $property,
-						  $bean->$idfield
+						  $bean->$idfield,false,$sql
 				);
 			}
-			return ( $sqlFetchKeys );
+			return ( $sqlFetchKeys ); //or returns rows in case of $sql != empty
 
 		}catch(RedBean_Exception_SQL $e) {
 

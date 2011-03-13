@@ -139,7 +139,7 @@ $redbean = new RedBean_OODB( $nullWriter );
 $linker = new RedBean_LinkManager( $toolbox );
 
 testpack("TEST VERSIONING");
-asrt(R::getVersion(),"1.3beta");
+asrt(R::getVersion(),"1.3");
 
 //Section A: Config Testing
 testpack("CONFIG TEST");
@@ -2666,6 +2666,29 @@ asrt(setget("true"),"true");
 asrt(setget("false"),"false");
 asrt(setget("null"),"null");
 asrt(setget("NULL"),"NULL");
+
+testpack("fetch tagged items");
+R::wipe("book");
+R::wipe("tag");
+R::wipe("book_tag");
+$b = R::dispense("book");
+$b->title = 'horror';
+R::store($b);
+$c = R::dispense("book");
+$c->title = 'creepy';
+R::store($c);
+$d = R::dispense("book");
+$d->title = "chicklit";
+R::store($d);
+R::tag($b, "horror,classic");
+R::tag($d, "women,classic");
+R::tag($c, "horror");
+$x = R::tagged("book","classic");
+asrt(count($x),2);
+$x = R::tagged("book","classic,horror");
+
+asrt(count($x),3);
+
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 

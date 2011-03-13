@@ -292,15 +292,16 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * values for each entry that has a matching select-column. This is
 	 * handy for cross-link tables like page_page.
 	 *
-	 * @param string $select the column to be selected
-	 * @param string $table  the table to select from
-	 * @param string $column the column to compare the criteria value against
-	 * @param string $value  the criterium value to match against
+	 * @param string  $select the column to be selected
+	 * @param string  $table  the table to select from
+	 * @param string  $column the column to compare the criteria value against
+	 * @param string  $value  the criterium value to match against
 	 * @param boolean $union with union (default is false)
+	 * @param string  $sql    optional template (in this case rows are returned instead of keys) 
 	 *
 	 * @return array $array selected column with values
 	 */
-	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
+	public function selectByCrit( $select, $table, $column, $value, $withUnion = false, $sqlTemplate = false ) {
 		$table = $this->safeTable($table);
 		$select = $this->safeColumn($select);
 		$column = $this->safeColumn($column);
@@ -310,6 +311,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if ($withUnion) {
 			$sql .= " UNION SELECT $column FROM $table WHERE $select = ? ";
 			$values[] = $value;
+		}
+		if ($sqlTemplate) {
+			$sql = str_replace(":sql",$sql,$sqlTemplate);
+			return $this->adapter->get($sql,$values);
 		}
 		return $this->adapter->getCol($sql,$values);
 	}
@@ -379,6 +384,15 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$table = $this->safeTable($beanType);
 		$sql = "SELECT count(*) FROM $table ";
 		return (int) $this->adapter->getCell($sql);
+	}
+
+
+
+	public function __fastSelectCritRelated($table, $idfield, $sqlSnippet) {
+		$idfield = $this->safeColumn($idfield);
+		$table = $this->safeTable($table);
+		$sqlTemplate = " SELECT * FROM $table WHERE $idfield IN ( :sql ) ";
+		return $sqlTemplate;
 	}
 
 }

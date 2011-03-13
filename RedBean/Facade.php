@@ -86,8 +86,17 @@ class R {
 	 * @return string $version Version ID
 	 */
 	public static function getVersion() {
-		return "1.3beta";
+		return "1.3";
 	}
+
+	/**
+	 * Flag to indicate whether experimental (fearless) code might be used.
+	 * If you experience any problems with new features these can be degrade
+	 * easily by doing R::$flagFearless = false;
+	 * @var bool
+	 */
+	public static $flagFearless = true;
+
 
 	/**
 	 * Kickstarts redbean for you.
@@ -264,6 +273,9 @@ class R {
 	 * values for that SQL to filter your results after fetching the
 	 * related beans.
 	 *
+	 * If 'fearless' mode is on, this method will try to take a shortcut and
+	 * use a subquery instead.
+	 *
 	 * @param RedBean_OODBBean $bean the bean you have
 	 * @param string				$type the type of beans you want
 	 * @param string				$sql  SQL snippet for extra filtering
@@ -272,6 +284,14 @@ class R {
 	 * @return array $beans	beans yielded by your query.
 	 */
 	public static function related( RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
+		if ($sql && method_exists(self::$writer,"__fastSelectCritRelated") && !isset($noFearlessCode)) {
+			//yes? go for the shortcut!
+			$idfield = self::$writer->getIDField( $type );
+			$table = self::$writer->getFormattedTableName($type);
+			$rows = self::$associationManager->related($bean,$type, false, self::$writer->__fastSelectCritRelated($table, $idfield, $sql));
+			if (count($rows)==0) return array();
+			return self::convertToBeans($type,$rows);
+		}
 
 		$keys = self::$associationManager->related( $bean, $type );
 		if (count($keys)==0) return array();
@@ -282,6 +302,8 @@ class R {
 
 		
 	}
+
+	
 
 	/**
 	 * The opposite of related(). Returns all the beans that are not
@@ -791,6 +813,28 @@ class R {
 		}
 
 	}
+
+	/**
+	 * @static
+	 * Returns all beans that have been tagged with one of the tags given.
+	 *
+	 * @param  $beanType
+	 * @param  $tagList
+	 *
+	 * @return array
+	 */
+	public static function tagged( $beanType, $tagList ) {
+		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+		$collection = array();
+		foreach($tags as $tag) {
+			$retrieved = array();
+			$tag = R::findOne("tag"," title = ? ", array($tag));
+			if ($tag) $retrieved = R::related($tag, $beanType);
+			foreach($retrieved as $key=>$bean) $collection[$key]=$bean;
+		}
+		return $collection;
+	}
+
 
 	/**
 	 * Wipes all beans of type $beanType.

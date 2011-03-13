@@ -498,7 +498,7 @@ class RedBean_QueryWriter_NullWriter extends RedBean_QueryWriter_AQueryWriter im
 	 *
 	 * @return mixed
 	 */
-	public function selectByCrit( $select, $table, $column, $value, $withUnion=false ) {
+	public function selectByCrit( $select, $table, $column, $value, $withUnion=false, $sqlSnippet = false ) {
 		$this->selectByCritArguments=array($select, $table, $column, $value, $withUnion);
 		return $this->returnSelectByCrit;
 	}
