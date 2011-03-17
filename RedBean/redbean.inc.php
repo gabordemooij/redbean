@@ -109,6 +109,7 @@ require($dir."SimpleModel.php");
 require($dir."ModelHelper.php");
 require($dir."Facade.php");
 require($dir."BeanCan.php");
+require($dir."Cooker.php");
 
 
 

@@ -73,6 +73,7 @@
         
         <item type="php">RedBean/BeanCan.php</item>
 
+		<item type="php">RedBean/Cooker.php</item>
 
     </load>
 </root>
