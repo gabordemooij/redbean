@@ -33,7 +33,7 @@ class Cooker {
 	 *
 	 * Now to associate this bean in your form:
 	 *
-	 * array("associations"=>array( "0" => "newuser-theaddress" ))
+	 * array("associations"=>array( "0" => array( "newuser-theaddress" ) ))
 	 *
 	 * - Associates the beans under keys newuser and theaddress.
 	 *
@@ -62,7 +62,7 @@ class Cooker {
 
 		//fetch associations first and remove them from the array.
 		if (isset($post["associations"])) {
-			$assoc = $post["associations"];
+			$associations = $post["associations"];
 			unset($post["associations"]);
 		}
 
@@ -96,12 +96,19 @@ class Cooker {
 			}
 		}
 
-		if (isset($assoc)) {
-			foreach($assoc as $info) {
-				$keys = explode("-", $info);
-				$bean1 = $can[$keys[0]];
-				$bean2 = $can[$keys[1]];
-				$pairs[] = array( $bean1, $bean2 );
+		if (isset($associations)) { 
+			foreach($associations as $assoc) { print_r($assoc);
+				foreach($assoc as $info) { print_r($info);
+					if ($info=="0" || $info=="") continue;
+					$keys = explode("-", $info);print_r($keys);
+					//first check if we can find the key in the can, --only key 1 is able to load
+					if (isset($can[$keys[0]])) $bean1 = $can[$keys[0]]; else {
+						$loader = explode(":",$keys[0]);print_r($loader);
+						$bean1 = R::load( $loader[0], $loader[1] );
+					} 
+					$bean2 = $can[$keys[1]];
+					$pairs[] = array( $bean1, $bean2 );
+				}
 			}
 		}
 
