@@ -90,20 +90,20 @@ class Cooker {
 				}
 				//do we need to modify this bean?
 				foreach($rawBean as $field=>$value){
-					$bean->$field = $value;
+					if (!empty($value)) $bean->$field = $value;
 				}
 				$can[$key]=$bean;
 			}
 		}
 
 		if (isset($associations)) { 
-			foreach($associations as $assoc) { print_r($assoc);
-				foreach($assoc as $info) { print_r($info);
+			foreach($associations as $assoc) {
+				foreach($assoc as $info) {
 					if ($info=="0" || $info=="") continue;
-					$keys = explode("-", $info);print_r($keys);
+					$keys = explode("-", $info);
 					//first check if we can find the key in the can, --only key 1 is able to load
 					if (isset($can[$keys[0]])) $bean1 = $can[$keys[0]]; else {
-						$loader = explode(":",$keys[0]);print_r($loader);
+						$loader = explode(":",$keys[0]);
 						$bean1 = R::load( $loader[0], $loader[1] );
 					} 
 					$bean2 = $can[$keys[1]];

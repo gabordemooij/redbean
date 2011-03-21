@@ -1648,8 +1648,8 @@ foreach($writer->sqltype_typeno as $key=>$type) {
 	asrt($writer->code($key),$type);
 }
 asrt($writer->code("unknown"),99);
-asrt($writer->scanType(false),1);
-asrt($writer->scanType(NULL),1);
+asrt($writer->scanType(false),0);
+asrt($writer->scanType(NULL),0);
 asrt($writer->scanType(2),1);
 asrt($writer->scanType(255),1);
 asrt($writer->scanType(256),2);
@@ -2661,7 +2661,7 @@ asrt(setget("."),".");
 asrt(setget("\""),"\"");
 asrt(setget("just some text"),"just some text");
 asrt(setget(true),"1");
-asrt(setget(false),"0");
+asrt(setget(false),"");
 asrt(setget("true"),"true");
 asrt(setget("false"),"false");
 asrt(setget("null"),"null");

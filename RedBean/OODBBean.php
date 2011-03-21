@@ -63,7 +63,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	/**
 	 * Exports the bean as an array.
 	 * This function exports the contents of a bean to an array and returns
-	 * the resulting array. If $meta equals boolean TRUE, then the array will
+	 * the resulting array. If $meta eq uals boolean TRUE, then the array will
 	 * also contain the __info section containing the meta data inside the
 	 * RedBean_OODBBean Bean object.
 	 * @param boolean $meta

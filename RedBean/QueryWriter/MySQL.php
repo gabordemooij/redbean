@@ -108,7 +108,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * Supported Column Types
 	 */
 	public $typeno_sqltype = array(
-			  
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  SET('1')  ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>" TINYINT(3) UNSIGNED ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>" INT(11) UNSIGNED ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>" DOUBLE ",
@@ -211,12 +211,12 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function scanType( $value ) {
 
 		if (is_null($value)) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
+			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
 		$orig = $value;
 		$value = strval($value);
 		if ($value=="1" || $value=="" || $value=="0") {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8; //RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
 		if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;

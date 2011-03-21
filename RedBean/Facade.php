@@ -18,14 +18,6 @@
 class R {
 
 	/**
-	 * If you prefer to call methods on an instance, you can
-	 * use this method.
-	 */
-	public static function getInstance() {
-		return new RObj;
-	}
-	
-	/**
 	 *
 	 * Constains an instance of the RedBean Toolbox
 	 * @var RedBean_ToolBox
@@ -889,7 +881,6 @@ class R {
 
 		return $oldTools;
 	}
-
 
 
 }
