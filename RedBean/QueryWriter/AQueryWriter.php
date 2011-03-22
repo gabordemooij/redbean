@@ -387,11 +387,20 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 
-
-	public function __fastSelectCritRelated($table, $idfield, $sqlSnippet) {
+	/**
+	 * Optimized version for related + SQL.
+	 * Facade uses this method if fearlesscode flag is 'on'.
+	 *
+	 * @param  string $table 	  reference table
+	 * @param  string $idfield    ID field to be used
+	 * @param  string $sqlSnippet SQL snippet to include in the query
+	 *
+	 * @return string $sqlTemplate the resulting SQL code.
+	 */
+	public function __fastSelectCritRelated($table, $idfield, $sqlSnippet = "1") {
+		
 		$idfield = $this->safeColumn($idfield);
-		$table = $this->safeTable($table);
-		$sqlTemplate = " SELECT * FROM $table WHERE $idfield IN ( :sql ) ";
+		$sqlTemplate = " SELECT * FROM $table WHERE $idfield IN ( :sql ) AND $sqlSnippet ";
 		return $sqlTemplate;
 	}
 

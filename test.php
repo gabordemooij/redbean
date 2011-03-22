@@ -2690,5 +2690,32 @@ $x = R::tagged("book","classic,horror");
 asrt(count($x),3);
 
 
+testpack("test optimization related() ");
+R::$writer->setBeanFormatter( new TestFormatter );
+$book = R::dispense("book");
+$book->title = "ABC";
+$page = R::dispense("page");
+$page->content = "lorem ipsum 123 ... ";
+R::associate($book,$page);
+asrt(count(R::related($book,"page"," content LIKE '%123%' ") ),1);
+
+testpack("test cooker");
+$post = array(
+	"book"=>array("type"=>"book","title"=>"programming the C64"),
+	"book2"=>array("type"=>"book","id"=>1,"title"=>"the art of doing nothing"),
+	"book3"=>array("type"=>"book","id"=>1),
+	"associations"=>array(
+		array("book-book2"),array("page:2-book"),array("0")
+	)
+);
+$beans = R::cooker($post);
+asrt(count($beans["can"]),3);
+asrt(count($beans["pairs"]),2);
+asrt($beans["can"]["book"]->getMeta("tainted"),true);
+asrt($beans["can"]["book2"]->getMeta("tainted"),true);
+asrt($beans["can"]["book3"]->getMeta("tainted"),false);
+asrt($beans["can"]["book3"]->title,"ABC"); 
+asrt($beans["pairs"][0][0]->title,"programming the C64");
+
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 

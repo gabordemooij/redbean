@@ -58,8 +58,8 @@ class Cooker {
 	 * @return array hash table containing 'can' and 'pairs'
 	 *
 	 */
-	public static function load($post) {
-
+	public static function load($post, RedBean_ToolBox $toolbox) {
+		$writer = $toolbox->getWriter();
 		//fetch associations first and remove them from the array.
 		if (isset($post["associations"])) {
 			$associations = $post["associations"];
@@ -75,7 +75,7 @@ class Cooker {
 				$type = $rawBean["type"];
 				unset($rawBean["type"]);
 				//does it have an ID?
-				$idfield = "id";
+				$idfield = $writer->getIDField($type);
 				if (isset($rawBean[$idfield])) {
 					//yupz, get the id and remove it from array
 					$id = $rawBean[$idfield];

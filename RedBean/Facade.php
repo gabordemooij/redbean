@@ -882,5 +882,16 @@ class R {
 		return $oldTools;
 	}
 
+	/**
+	 * facade method for Cooker.
+	 * 
+	 * @static
+	 * @param  $arr
+	 * @return array
+	 */
+	public static function cooker($arr) {
+		return Cooker::load($arr, R::$toolbox);
+	}
+
 
 }
