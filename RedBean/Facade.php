@@ -276,7 +276,7 @@ class R {
 	 * @return array $beans	beans yielded by your query.
 	 */
 	public static function related( RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
-		if ($sql && method_exists(self::$writer,"__fastSelectCritRelated") && !isset($noFearlessCode)) {
+		if (empty($values) && $sql && method_exists(self::$writer,"__fastSelectCritRelated") && !isset($noFearlessCode)) {
 			//yes? go for the shortcut!
 			$idfield = self::$writer->getIDField( $type );
 			$table = self::$writer->getFormattedTableName($type);

@@ -1414,6 +1414,10 @@ $students = R::related($t, 'person', ' role = "student"  ORDER BY `name` ');
 asrt(count($students),1);
 $s = reset($students);
 asrt($s->name, 'b');
+$students = R::related($t, 'person', ' role = ?  ORDER BY `name` ',array("student"));
+asrt(count($students),1);
+$s = reset($students);
+asrt($s->name, 'b');
 
 function getList($beans,$property) {
 	$items = array();
