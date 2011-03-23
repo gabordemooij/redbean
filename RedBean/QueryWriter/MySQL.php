@@ -215,7 +215,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		}
 		$orig = $value;
 		$value = strval($value);
-		if ($value=="1" || $value=="" || $value=="0") {
+		if ($value=="1" || $value=="") {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
 		if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {

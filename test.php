@@ -2660,7 +2660,7 @@ asrt(setget("."),".");
 asrt(setget("\""),"\"");
 asrt(setget("just some text"),"just some text");
 asrt(setget(true),"1");
-asrt(setget(false),"");
+asrt(setget(false),"0");
 asrt(setget("true"),"true");
 asrt(setget("false"),"false");
 asrt(setget("null"),"null");
