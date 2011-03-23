@@ -1232,7 +1232,9 @@ pass();
 
 //this module tests whether values we store are the same we get returned
 //PDO is a bit unpred. with this but using STRINGIFY attr this should work we test this here
-testpack("pdo and types");
+
+//this module tests whether values we store are the same we get returned
+testpack("setting and getting values, pdo/types");
 asrt(setget("-1"),"-1");
 asrt(setget(-1),"-1");
 asrt(setget("-0.25"),"-0.25");
@@ -1243,8 +1245,9 @@ asrt(setget("2147483647"),"2147483647");
 asrt(setget(2147483647),"2147483647");
 asrt(setget(-2147483647),"-2147483647");
 asrt(setget("-2147483647"),"-2147483647");
-asrt(setget("2147483647123456"),"2.14748364712346e+15");
-asrt(setget(2147483647123456),"2.14748364712e+15");
+//Architecture dependent... only test this if you are sure what arch 
+//asrt(setget("2147483647123456"),"2.14748364712346e+15");
+//asrt(setget(2147483647123456),"2.14748364712e+15");
 asrt(setget("a"),"a");
 asrt(setget("."),".");
 asrt(setget("\""),"\"");
@@ -1255,6 +1258,12 @@ asrt(setget("true"),"true");
 asrt(setget("false"),"false");
 asrt(setget("null"),"null");
 asrt(setget("NULL"),"NULL");
+asrt(setget(null),null);
+asrt((setget(0)==0),true);
+asrt((setget(1)==1),true);
+asrt((setget(true)==true),true);
+asrt((setget(false)==false),true);  
+
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
