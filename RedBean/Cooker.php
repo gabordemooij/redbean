@@ -70,7 +70,7 @@ class Cooker {
 		$can = $pairs = array();
 
 		foreach($post as $key => $rawBean) {
-			if (isset($rawBean["type"])) {
+			if (is_array($rawBean) && isset($rawBean["type"])) {
 				//get type and remove it from array
 				$type = $rawBean["type"];
 				unset($rawBean["type"]);
@@ -96,7 +96,7 @@ class Cooker {
 			}
 		}
 
-		if (isset($associations)) { 
+		if (isset($associations) && is_array($associations)) {
 			foreach($associations as $assoc) {
 				foreach($assoc as $info) {
 					if ($info=="0" || $info=="") continue;

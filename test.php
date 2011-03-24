@@ -2207,7 +2207,9 @@ asrt(Model_Cigar::$reachedAfterDeleted,TRUE);
 asrt(Model_Cigar::$reachedDispense,TRUE);
 asrt(Model_Cigar::$reachedAfterUpdate,TRUE);
 asrt($cgr->getTaste("tabacco"),"smokey like tabacco");
-
+//test __isset
+asrt(empty($cgr->taste),true);
+asrt(empty($cgr->brand),false);
 testpack("copy()");
 R::setup(
   "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}",

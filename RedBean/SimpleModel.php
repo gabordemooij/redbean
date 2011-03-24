@@ -59,5 +59,9 @@ class RedBean_SimpleModel {
 		return $missing;
 	}
 
+	public function __isset($key) {
+		return (isset($this->bean->$key));
+	}
+
 
 }
