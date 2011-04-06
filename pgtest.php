@@ -61,8 +61,8 @@ function testpack($name) {
 }
 
 //INCLUDE YOUR REDBEAN FILE HERE!
-require("rb.php");
-//require("RedBean/redbean.inc.php");
+//require("rb.php");
+require("RedBean/redbean.inc.php");
 $toolbox = RedBean_Setup::kickstartDev(
   "pgsql:host={$ini['pgsql']['host']} dbname={$ini['pgsql']['schema']}",
   $ini['pgsql']['user'],
@@ -183,7 +183,7 @@ try {
 		pass();
 	}
 
-
+/*
 	testpack("UNIT TEST RedBean OODB: Load");
 	$bean = $redbean->load("typetest",2);
 	$nullWriter->returnSelectRecord = array();
@@ -197,9 +197,9 @@ try {
 	asrt($bean->id,3);
 	try {
 		$bean = $redbean->load("typetest",-2);
-		fail();
-	}catch(RedBean_Exception_Security $e) {
 		pass();
+	}catch(RedBean_Exception_Security $e) {
+		fail();
 	}
 	try {
 		$bean = $redbean->load("typetest",0);
@@ -327,7 +327,7 @@ try {
 	$observable->test("event3", "testsignal3");
 	asrt($observer->event,"event3");
 	asrt($observer->info,"testsignal3");
-
+*/
 	$adapter = $toolbox->getDatabaseAdapter();
 	$writer  = $toolbox->getWriter();
 	$redbean = $toolbox->getRedBean();

@@ -107,18 +107,10 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		}
 	}
 
-	/**
-	 * Gets related beans of type $type for bean $bean
-	 *
-	 * @param RedBean_OODBBean  $bean 		bean
-	 * @param string			$type 		type
-	 * @param bool				$linksOnly  whether you want keys of links themselves
-	 * @param string			$sql		optional SQL template to use,
-	 *
-	 * @return array $idsOrRows ids or rows
-	 */
-	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $sql=false ) {
-		$table = $this->getTable( array($bean->getMeta("type") , $type) );
+	
+
+	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $sql=false) {
+	$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		if ($type==$bean->getMeta("type")) {// echo "<b>CROSS</b>";
 			$type .= "2";
@@ -129,24 +121,34 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 
 		$property = $bean->getMeta("type")."_id";
 		try {
-			if ($cross) {
-				$sqlFetchKeys = $this->writer->selectByCrit(
-						  $targetproperty,
-						  $table,
-						  $property,
-						  $bean->$idfield,
-						  true,$sql
+
+
+
+				$sqlFetchKeys = $this->writer->selectRecord(
+					  $table,
+					  array( $property => array( $bean->$idfield ) ),
+					  $sql,
+					  false
+
 				);
-			}
-			else {
-				$sqlFetchKeys = $this->writer->selectByCrit(
-						  $targetproperty,
-						  $table,
-						  $property,
-						  $bean->$idfield,false,$sql
-				);
-			}
-			return ( $sqlFetchKeys ); //or returns rows in case of $sql != empty
+				$sqlResult = array();
+				foreach( $sqlFetchKeys as $row ) {
+					$sqlResult[] = $row[$targetproperty];
+				}
+				if ($cross) {
+					$sqlFetchKeys2 = $this->writer->selectRecord(
+							  $table,
+							  array( $targetproperty => array( $bean->$idfield ) ),
+							  $sql,
+							  false
+					);
+					foreach( $sqlFetchKeys2 as $row ) {
+						$sqlResult[] = $row[$property];
+					}
+				}
+			
+
+			return $sqlResult; //or returns rows in case of $sql != empty
 
 		}catch(RedBean_Exception_SQL $e) {
 
@@ -167,6 +169,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @param RedBean_OODBBean $bean2 second bean
 	 */
 	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
@@ -182,6 +185,36 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$property2 = $bean2->getMeta("type")."_id";
 		$value1 = (int) $bean1->$idfield1;
 		$value2 = (int) $bean2->$idfield2;
+
+
+		try {
+
+			//$rows = $this->writer->selectAssocRec($table,$property1,$property2,$value1,$value2);
+			$rows = $this->writer->selectRecord($table,array(
+				$property1 => array($value1), $property2=>array($value2)
+			));
+			if ($cross) {
+				$rows2 = $this->writer->selectRecord($table,array(
+				$property2 => array($value1), $property1=>array($value2)
+				));
+				$rows = array_merge($rows,$rows2);
+			}
+
+			$beans = $this->oodb->convertToBeans($table,$rows);
+			foreach($beans as $link) {
+				$this->oodb->trash($link);
+			}
+		}catch(RedBean_Exception_SQL $e) {
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+		}
+
+		return;
+
+
 		try {
 			$this->writer->deleteByCrit($table,array($property1=>$value1,$property2=>$value2));
 			if ($cross) {
@@ -212,10 +245,17 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		else $cross = 0;
 		$property = $bean->getMeta("type")."_id";
 		try {
-			$this->writer->deleteByCrit($table,array($property=>$bean->$idfield));
+			$this->writer->selectRecord( $table, array($property=>array($bean->$idfield)),null,true);
+
 			if ($cross) {
-				$this->writer->deleteByCrit($table,array($property2=>$bean->$idfield));
+				$this->writer->selectRecord( $table, array($property2=>array($bean->$idfield)),null,true);
+
 			}
+
+			//$this->writer->deleteByCrit($table,array($property=>$bean->$idfield));
+			//if ($cross) {
+			//	$this->writer->deleteByCrit($table,array($property2=>$bean->$idfield));
+			//}
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(

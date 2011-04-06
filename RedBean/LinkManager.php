@@ -124,6 +124,18 @@ class RedBean_LinkManager extends RedBean_CompatManager {
 	public function getKeys( RedBean_OODBBean $bean, $typeName ) {
 		$fieldName = $this->getLinkField($typeName);
 		$id = (int)$bean->$fieldName;
+		$column =  $bean->getMeta("type")."_id";
+		$rows = $this->writer->selectRecord($typeName,array(
+			$column => array( $bean->id )
+		));
+		$idfield = $this->writer->getIDField($typeName);
+		$ids = array();
+		foreach($rows as $row) {
+			$ids[] = $row[$idfield];
+		}
+		return $ids;
+
+
 		$ids = $this->writer->selectByCrit($this->writer->getIDField($this->writer->getFormattedTableName($typeName)),
 				  $typeName,
 				  $bean->getMeta("type")."_id",

@@ -12,7 +12,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_CompatManager {
+class RedBean_CompatManager extends RedBean_Observable {
 
 	/**
 	 * List of Database constants to be used

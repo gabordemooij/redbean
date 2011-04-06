@@ -12,7 +12,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBean_Plugin,RedBean_Observer {
+class RedBean_Plugin_ChangeLogger extends RedBean_QueryWriter_AQueryWriter implements RedBean_Plugin,RedBean_Observer {
 
 	/**
 	 * Specify what database systems are supported by this class.
@@ -23,19 +23,6 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	);
 
 
-	/**
-	 * @var RedBean_QueryWriter
-	 * Contains a reference to the query writer.
-	 */
-	private $writer;
-
-	/**
-	 *
-	 * @var RedBean_Adapter
-	 * Contains a reference to the database adapter.
-	 */
-	private $adapter;
-
 
 	/**
 	 *
@@ -45,22 +32,13 @@ class RedBean_Plugin_ChangeLogger extends RedBean_CompatManager implements RedBe
 	private $stash = array();
 
 	/**
-	 *
-	 * @var RedBean_OODB
-	 * Contains a reference to the RedBean OODB object.
-	 */
-	private $redbean;
-
-	/**
 	 * Constructor, requires a writer
 	 * 
 	 * @param RedBean_QueryWriter $writer
 	 */
 	public function __construct(RedBean_ToolBox $toolbox) {
 
-		//Do a compatibility check, using the Compatibility Management System
-		$this->scanToolBox( $toolbox );
-
+		
 		$this->writer = $toolbox->getWriter();
 		$this->adapter = $toolbox->getDatabaseAdapter();
 		$this->redbean = $toolbox->getRedBean();

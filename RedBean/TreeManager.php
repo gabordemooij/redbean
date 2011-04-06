@@ -90,18 +90,22 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 	 * @return array $childObjects
 	 */
 	public function children( RedBean_OODBBean $parent ) {
-		$idfield = $this->writer->getIDField($parent->getMeta("type"));
+
+		$type = $parent->getMeta("type");
+		$idfield = $this->writer->getIDField($type);
+		$p = $this->property;
 		try {
-			$ids = $this->writer->selectByCrit( $idfield,
-					  $parent->getMeta("type"),
-					  $this->property,
-					  intval( $parent->$idfield ) );
+			
+			$rows = $this->writer->selectRecord($type,array(
+				 $p => array( intval( $parent->$idfield ) )
+			));
 
 		}
 		catch(RedBean_Exception_SQL $e) {
 			return array();
 		}
-		return $this->oodb->batch($parent->getMeta("type"),$ids	);
+		//return $this->oodb->batch($parent->getMeta("type"),$ids	);
+		return $this->oodb->convertToBeans( $type, $rows );
 	}
 
 

@@ -171,8 +171,15 @@ class R {
 	 *
 	 * @return RedBean_OODBBean $bean a new bean
 	 */
-	public static function dispense( $type ) {
-		return self::$redbean->dispense( $type );
+	public static function dispense( $type, $num = 1 ) {
+		if ($num==1) {
+			return self::$redbean->dispense( $type );
+		}
+		else {
+			$beans = array();
+			for($v=0; $v<$num; $v++) $beans[] = self::$redbean->dispense( $type );
+			return $beans;
+		}
 	}
 
 	/**
@@ -276,23 +283,16 @@ class R {
 	 * @return array $beans	beans yielded by your query.
 	 */
 	public static function related( RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
-		if (empty($values) && $sql && method_exists(self::$writer,"__fastSelectCritRelated") && !isset($noFearlessCode)) {
-			//yes? go for the shortcut!
-			$idfield = self::$writer->getIDField( $type );
-			$table = self::$writer->getFormattedTableName($type);
-			$rows = self::$associationManager->related($bean,$type, false, self::$writer->__fastSelectCritRelated($table, $idfield, $sql));
-			if (count($rows)==0) return array();
-			return self::convertToBeans($type,$rows);
-		}
-
 		$keys = self::$associationManager->related( $bean, $type );
 		if (count($keys)==0) return array();
 		if (!$sql) return self::batch($type, $keys);
 		$idfield = self::$writer->getIDField( $type );
+
+		$rows = self::$writer->selectRecord( $type, array($idfield=>$keys),array($sql,$values),false );
+		return self::$redbean->convertToBeans($type,$rows);
+
 		$sqlSnippet = self::$writer->getSQLSnippetFilter($idfield, $keys, $sql);
 		return self::find( $type, $sqlSnippet, $values );
-
-		
 	}
 
 	
@@ -309,12 +309,11 @@ class R {
 	 * @return array $beans beans 
 	 */
 	public static function unrelated(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
-		
-		$keys = self::$associationManager->related( $bean, $type );
 		$idfield = self::$writer->getIDField( $type );
-		$sqlSnippet = self::$writer->getSQLSnippetFilter($idfield, $keys, $sql, true);
-		return self::find( $type, $sqlSnippet, $values );
-
+		$keys = self::$associationManager->related( $bean, $type );
+		$rows = self::$writer->selectRecord( $type, array($idfield=>$keys), array($sql,$values), false, true );
+		return self::$redbean->convertToBeans($type,$rows);
+	
 	}
 
 
@@ -875,6 +874,10 @@ class R {
 		self::$redbean->addEventListener("update", $helper );
 		self::$redbean->addEventListener("open", $helper );
 		self::$redbean->addEventListener("delete", $helper );
+
+		
+		self::$associationManager->addEventListener("delete", $helper );
+
 		self::$redbean->addEventListener("after_delete", $helper );
 		self::$redbean->addEventListener("after_update", $helper );
 		self::$redbean->addEventListener("dispense", $helper );
@@ -891,6 +894,16 @@ class R {
 	 */
 	public static function cooker($arr) {
 		return Cooker::load($arr, R::$toolbox);
+	}
+
+	public static function view($viewID, $types) {
+		if (self::$redbean->isFrozen()) return false;
+		$types = explode(",",$types);
+		if (count($types)<2) throw new Exception("Creating useless view for just one type? Provide at least two types!");
+		$refType = array_pop($types);
+		$viewManager = new RedBean_ViewManager( self::$toolbox );
+		return $viewManager->createView($viewID,$refType,$types);
+
 	}
 
 

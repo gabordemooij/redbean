@@ -216,21 +216,23 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				$this->writer->addUniqueIndex( $table, $unique );
 			}
 		}
-		if ($bean->$idfield) {
-			if (count($updatevalues)>0) {
-				$this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
-			}
+
+		//if ($bean->$idfield) {
+			//if (count($updatevalues)>0) {
+				$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
+			//}
 			$bean->setMeta("tainted",false);
+			$bean->$idfield = $rs;
 			$this->signal( "after_update", $bean );
 			return (int) $bean->$idfield;
-		}
-		else {
-			$id = $this->writer->insertRecord( $table, $insertcolumns, array($insertvalues) );
-			$bean->$idfield = $id;
-			$bean->setMeta("tainted",false);
-			$this->signal( "after_update", $bean );
-			return (int) $id;
-		}
+		//}
+		//else {
+		//	$id = $this->writer->insertRecord( $table, $insertcolumns, array($insertvalues) );
+		//	$bean->$idfield = $id;
+		//	$bean->setMeta("tainted",false);
+		//	$this->signal( "after_update", $bean );
+		//	return (int) $id;
+		//}
 	}
 
 	/**
@@ -253,15 +255,16 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 */
 	public function load($type, $id) {
 		$this->signal("before_open",array("type"=>$type,"id"=>$id));
-		$tmpid = intval( $id );
-		if ($tmpid < 0) throw new RedBean_Exception_Security("Id less than zero not allowed");
+		//$tmpid = intval( $id );
+		//if ($tmpid < 0) throw new RedBean_Exception_Security("Id less than zero not allowed");
 		$bean = $this->dispense( $type );
 		if ($this->stash && isset($this->stash[$id])) {
 			$row = $this->stash[$id];
 		}
 		else {
 			try {
-				$rows = $this->writer->selectRecord($type,array($id));
+				$idfield = $this->writer->getIDField($type);
+				$rows = $this->writer->selectRecord($type,array($idfield=>array($id)));
 			}catch(RedBean_Exception_SQL $e ) {
 				if (
 				$this->writer->sqlStateIn($e->getSQLState(),
@@ -300,7 +303,8 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$this->signal( "delete", $bean );
 		if (!$this->isFrozen) $this->check( $bean );
 		try {
-			$this->writer->deleteRecord( $bean->getMeta("type"), $bean->$idfield );
+			$this->writer->selectRecord($bean->getMeta("type"),
+				array($idfield => array( $bean->$idfield) ),null,true );
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
@@ -326,7 +330,8 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		if (!$ids) return array();
 		$collection = array();
 		try {
-			$rows = $this->writer->selectRecord($type,$ids);
+			$idfield = $this->writer->getIDField($type);
+			$rows = $this->writer->selectRecord($type,array($idfield=>$ids));
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(

@@ -47,6 +47,8 @@
         <item type="php">RedBean/TreeManager.php</item>
         <item type="php">RedBean/LinkManager.php</item>
         <item type="php">RedBean/ExtAssociationManager.php</item>
+		<item type="php">RedBean/ViewManager.php</item>
+
         <item type="php">RedBean/Setup.php</item>
         
 

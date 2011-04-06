@@ -63,7 +63,8 @@ require($dir."QueryWriter/MySQL.php");
 require($dir."QueryWriter/SQLite.php");
 require($dir."QueryWriter/SQLiteT.php");
 require($dir."QueryWriter/PostgreSQL.php");
-
+require($dir."IceWriter.php");
+require($dir."IceWriter/AIceWriter.php");
 
 //Load required Exceptions
 require($dir."Exception.php");
@@ -76,6 +77,7 @@ require($dir."Exception/UnsupportedDatabase.php");
 //Load Core functionality
 require($dir."OODB.php");
 require($dir."ToolBox.php");
+require($dir."CoolBox.php");
 require($dir."CompatManager.php");
 
 //Load extended functionality
@@ -98,6 +100,7 @@ require($dir."Plugin/Optimizer.php");
 require($dir."Plugin/Optimizer/Datetime.php");
 require($dir."Plugin/Optimizer/Shrink.php");
 require($dir."Plugin/BeanMachine.php");
+require($dir."Plugin/QueryLogger.php");
 
 require($dir."QueryWriter/NullWriter.php");
 
@@ -110,6 +113,7 @@ require($dir."ModelHelper.php");
 require($dir."Facade.php");
 require($dir."BeanCan.php");
 require($dir."Cooker.php");
+require($dir."ViewManager.php");
 
 
 

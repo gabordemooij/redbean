@@ -22,19 +22,19 @@ class RedBean_ToolBox {
 	 *
 	 * @var RedBean_OODB
 	 */
-	private $oodb;
+	protected $oodb;
 
 	/**
 	 *
 	 * @var RedBean_QueryWriter
 	 */
-	private $writer;
+	protected $writer;
 
 	/**
 	 *
 	 * @var RedBean_Adapter_DBAdapter
 	 */
-	private $adapter;
+	protected $adapter;
 
 	/**
 	 * Constructor.

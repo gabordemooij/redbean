@@ -74,8 +74,8 @@ testpack("Test Setup");
 
 //Can we load all modules properly?
 //INCLUDE YOUR REDBEAN FILE HERE!
-require("rb.php");
-//require("RedBean/redbean.inc.php");
+//require("rb.php");
+require("RedBean/redbean.inc.php");
 
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
@@ -125,7 +125,7 @@ class ObserverMock implements RedBean_Observer {
 
 $nullWriter = new RedBean_QueryWriter_NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
-
+/*
 //Section A: Config Testing
 testpack("CONFIG TEST");
 //Can we access the required exceptions?
@@ -243,9 +243,9 @@ asrt($nullWriter->selectRecordArguments[1],array(3));
 asrt($bean->id,3);
 try {
 	$bean = $redbean->load("typetest",-2);
-	fail();
-}catch(RedBean_Exception_Security $e) {
 	pass();
+}catch(RedBean_Exception_Security $e) {
+	fail();
 }
 try {
 	$bean = $redbean->load("typetest",0);
@@ -388,7 +388,7 @@ asrt($observer->info,"testsignal1");
 $observable->test("event3", "testsignal3");
 asrt($observer->event,"event3");
 asrt($observer->info,"testsignal3");
-
+*/
 $adapter = $toolbox->getDatabaseAdapter();
 $writer  = $toolbox->getWriter();
 $redbean = $toolbox->getRedBean();

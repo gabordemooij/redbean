@@ -201,6 +201,15 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param integer $id			  primary key for record
 	 */
 	public function updateRecord( $table, $updatevalues, $id) {
+		if (!$id) {
+			$insertcolumns =  $insertvalues = array();
+			foreach($updatevalues as $pair) {
+				$insertcolumns[] = $pair["property"];
+				$insertvalues[] = $pair["value"];
+			}
+			return $this->insertRecord($table,$insertcolumns,array($insertvalues));
+		}
+		if ($id && !count($updatevalues)) return $id;
 		$idfield = $this->getIDField($table, true);
 		$table = $this->safeTable($table);
 		$sql = "UPDATE $table SET ";
@@ -212,6 +221,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
 		$this->adapter->exec( $sql, $v );
+		return $id;
 	}
 
 	/**
@@ -224,7 +234,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return integer $insertid	  insert id from driver, new record id
 	 */
-	public function insertRecord( $table, $insertcolumns, $insertvalues ) {
+	protected function insertRecord( $table, $insertcolumns, $insertvalues ) {
 		$default = $this->defaultValue;
 		$idfield = $this->getIDField($table, true);
 		$suffix = $this->getInsertSuffix($table);
@@ -250,116 +260,78 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return ($this->adapter->getErrorMsg()=="" ?  $last_id : 0);
 	}
 	
-	/**
-	 * Selects a record based on type and id.
-	 *
-	 * @param string  $type type
-	 * @param integer $id   id
-	 *
-	 * @return array $row	resulting row or NULL if none has been found
-	 */
-	public function selectRecord($type, $ids) {
-		$idfield = $this->getIDField($type, true);
-		$table = $this->safeTable($type);
-		$sql = "SELECT * FROM $table WHERE $idfield IN ( ".implode(',', array_fill(0, count($ids), " ? "))." )";
-		$rows = $this->adapter->get($sql,$ids);
-		return ($rows && is_array($rows) && count($rows)>0) ? $rows : NULL;
-	}
+	
 
-	/**
-	 * Deletes a record based on a table, column, value and operator
-	 *
-	 * @param string  $table  table
-	 * @param integer $value  primary key id
-	 *
-	 * @todo validate arguments for security
-	 */
-	public function deleteRecord($table, $value) {
-		$column = $this->getIDField($table, true);
-		$table = $this->safeTable($table);
+	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false ) {
+		if (!is_array($conditions)) throw new Exception("Conditions must be an array");
 		
-		$this->adapter->exec("DELETE FROM $table WHERE $column = ? ",array(strval($value)));
-	}
-	
-	/**
-	 * Selects a record using a criterium.
-	 * Specify the select-column, the target table, the criterium column
-	 * and the criterium value. This method scans the specified table for
-	 * records having a criterium column with a value that matches the
-	 * specified value. For each record the select-column value will be
-	 * returned, most likely this will be a primary key column like ID.
-	 * If $withUnion equals true the method will also return the $column
-	 * values for each entry that has a matching select-column. This is
-	 * handy for cross-link tables like page_page.
-	 *
-	 * @param string  $select the column to be selected
-	 * @param string  $table  the table to select from
-	 * @param string  $column the column to compare the criteria value against
-	 * @param string  $value  the criterium value to match against
-	 * @param boolean $union with union (default is false)
-	 * @param string  $sql    optional template (in this case rows are returned instead of keys) 
-	 *
-	 * @return array $array selected column with values
-	 */
-	public function selectByCrit( $select, $table, $column, $value, $withUnion = false, $sqlTemplate = false ) {
-		$table = $this->safeTable($table);
-		$select = $this->safeColumn($select);
-		$column = $this->safeColumn($column);
-		$value = $this->adapter->escape($value);
-		$sql = "SELECT $select FROM $table WHERE $column = ? ";
-		$values = array($value);
-		if ($withUnion) {
-			$sql .= " UNION SELECT $column FROM $table WHERE $select = ? ";
-			$values[] = $value;
+		$table = $this->safeTable($type);
+		$sqlConditions = array();
+		$bindings=array();
+		foreach($conditions as $column=>$values) {
+			$sql = $this->safeColumn($column);
+			$sql .= " ".($inverse ? " NOT ":"")." IN ( ";
+			$sql .= implode(",",array_fill(0,count($values),"?")).") ";
+			$sqlConditions[] = $sql;
+			if (!is_array($values)) throw new Exception("Values must be an array");
+			foreach($values as $k=>$v) {
+				$values[$k]=strval($v);
+			}
+			$bindings = array_merge($bindings,$values);
 		}
-		if ($sqlTemplate) {
-			$sql = str_replace(":sql",$sql,$sqlTemplate);
-			return $this->adapter->get($sql,$values);
+		//$addSql can be either just a string or array($sql, $bindings)
+		if (is_array($addSql)) {
+			$bindings = array_merge($bindings,$addSql[1]);	
+			$addSql = $addSql[0];
 		}
-		return $this->adapter->getCol($sql,$values);
-	}
-	
-	/**
-	 * This method takes an array with key=>value pairs.
-	 * Each record that has a complete match with the array is
-	 * deleted from the table.
-	 *
-	 * @param string $table table
-	 * @param array  $crits criteria
-	 *
-	 * @return integer $affectedRows num. of affected rows.
-	 */
-	public function deleteByCrit( $table, $crits ) {
-		$table = $this->safeTable($table);
-		$values = array();
-		foreach($crits as $key=>$val) {
-			$values[] = $this->adapter->escape($val);
-			$conditions[] = $this->safeColumn($key) ."= ? ";
+		$sql="";
+		if (count($sqlConditions)>0) {
+			$sql = implode(" AND ",$sqlConditions);
+			$sql = " WHERE ( $sql ) ";
+			if ($addSql) $sql .= " AND $addSql ";
 		}
-		$sql = "DELETE FROM $table WHERE ".implode(" AND ", $conditions);
-		return (int) $this->adapter->exec($sql, $values);
+		elseif ($addSql) {
+			$sql = " WHERE ".$addSql;
+		}
+		$sql = (($delete) ? "DELETE FROM " : "SELECT * FROM ").$table.$sql;
+		$rows = $this->adapter->get($sql,$bindings);
+		return $rows;
 	}
 
-	/**
-	 * Returns a snippet of SQL to filter records using SQL and a list of
-	 * keys.
-	 *
-	 * @param string  $idfield ID Field to use for selecting primary key
-	 * @param array   $keys		List of keys to use for filtering
-	 * @param string  $sql		SQL to append, if any
-	 * @param boolean $inverse Whether you want to inverse the selection
-	 *
-	 * @return string $snippet SQL Snippet crafted by function
-	 */
-	public function getSQLSnippetFilter( $idfield, $keys, $sql=null, $inverse=false ) {
-		if (!$sql) $sql=" 1 ";
-		if (!$inverse && count($keys)===0) return " 0 ";
-		$idfield = $this->noKW($idfield);
-		$sqlInverse = ($inverse) ? "NOT" : "";
-		$sqlKeyFilter = ($keys) ? " $idfield $sqlInverse IN (".implode(",",$keys).") AND " : " ";
-		$sqlSnippet = $sqlKeyFilter . $sql;
-		return $sqlSnippet;
+
+
+	public function createView($referenceTable, $constraints, $viewID) {
+
+		$viewID = $viewID;
+		try{ $this->adapter->exec("DROP VIEW $viewID"); }catch(Exception $e){}
+
+		$viewID = $this->safeTable($viewID);
+		$columns = array_keys( $this->getColumns( $referenceTable ) );
+		$referenceTable = $this->safeTable($referenceTable);
+		$joins = array();
+		foreach($constraints as $table=>$constraint) {
+			$safeTable = $this->safeTable($table);
+			$addedColumns = array_keys($this->getColumns($table));
+			foreach($addedColumns as $addedColumn) {
+				$newColName = $addedColumn."_of_".$table;
+				$newcolumns[] = $safeTable.".".$this->safeColumn($addedColumn) . " AS ".$this->safeColumn($newColName);
+			}
+			if (count($constraint)!==2) throw Exception("Invalid VIEW CONSTRAINT");
+			$referenceColumn = $this->safeColumn($constraint[0], true);
+			$compareColumn = $this->safeColumn($constraint[1], true);
+			$join = $referenceColumn." = ".$compareColumn;
+			$joins[] = " LEFT JOIN $safeTable ON $join ";
+		}
+		$joins = implode(" ", $joins);
+		foreach($columns as $k=>$column) $columns[$k]=$referenceTable.".".$this->safeColumn($column);
+		$columns = implode("\n,",array_merge($newcolumns,$columns));
+		$sql = "CREATE VIEW $viewID AS SELECT $columns FROM $referenceTable $joins "; 
+		$this->adapter->exec($sql);
+		return true;
 	}
+
+
+
 
 	
 	/**
@@ -387,21 +359,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 
-	/**
-	 * Optimized version for related + SQL.
-	 * Facade uses this method if fearlesscode flag is 'on'.
-	 *
-	 * @param  string $table 	  reference table
-	 * @param  string $idfield    ID field to be used
-	 * @param  string $sqlSnippet SQL snippet to include in the query
-	 *
-	 * @return string $sqlTemplate the resulting SQL code.
-	 */
-	public function __fastSelectCritRelated($table, $idfield, $sqlSnippet = "1") {
-		
-		$idfield = $this->safeColumn($idfield);
-		$sqlTemplate = " SELECT * FROM $table WHERE $idfield IN ( :sql ) AND $sqlSnippet ";
-		return $sqlTemplate;
-	}
+
 
 }

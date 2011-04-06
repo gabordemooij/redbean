@@ -99,27 +99,15 @@ interface RedBean_QueryWriter {
 	 */
 	public function updateRecord( $table, $updatevalues, $id);
 
-	/**
-	 * Inserts a record
-	 * @param string $table
-	 * @param array $insertcolumns
-	 * @param array $insertvalues
-	 */
-	public function insertRecord( $table, $insertcolumns, $insertvalues );
-
+	
 	/**
 	 * Selects a record
 	 * @param string $type
 	 * @param integer $ids
 	 */
-	public function selectRecord($type, $ids);
+	//public function selectRecord($type, $ids);
+	public function selectRecord( $table, $conditions, $addSql = null, $delete = false);
 
-	/**
-	 * Removes a record from a table
-	 * @param string $table
-	 * @param integer $id
-	 */
-	public function deleteRecord( $table, $id );
 
 	/**
 	 * Adds a UNIQUE constraint index to a table on columns $columns.
@@ -135,22 +123,6 @@ interface RedBean_QueryWriter {
 	 */
 	public function getIDField( $table );
 
-	/**
-	 * Selects a set of columns using criteria.
-	 * @param string $select - the column to be selected
-	 * @param string $table - the name of the table
-	 * @param string $column - name of the column that needs to be compared
-	 * @param string $value - value to compare against
-	 * @param boolean $withUnion - whether you want a union with inverted column
-	 */
-	public function selectByCrit( $select, $table, $column, $value, $withUnion=false );
-
-	/**
-	 * Deletes by criteria.
-	 * @param string $table
-	 * @param array $crits
-	 */
-	public function deleteByCrit( $table, $crits );
 
 	/**
 	 * Returns $str surrounded by keyword protecting / esc symbols
@@ -169,18 +141,20 @@ interface RedBean_QueryWriter {
 	 */
 	public function sqlStateIn( $state, $list );
 
-	/**
-	 * Returns a snippet of SQL to filter records using SQL and a list of
-	 * keys.
-	 *
-	 * @param string  $idfield ID Field to use for selecting primary key
-	 * @param array   $keys		List of keys to use for filtering
-	 * @param string  $sql		SQL to append, if any
-	 * @param boolean $inverse Whether you want to inverse the selection
-	 *
-	 * @return string $snippet SQL Snippet crafted by function
-	 */
-	public function getSQLSnippetFilter( $idfield, $keys, $sql=null, $inverse=false );
+	public function wipe($table);
 
+	public function count($type);
+
+	public function check($table);
+
+	public function setBeanFormatter(RedBean_IBeanFormatter $beanFormatter);
+
+	public function createView($referenceTable, $constraints, $viewID);
+
+	public function getFieldType( $type = "" );
+
+	public function safeColumn($name, $noQuotes = false);
+
+	public function safeTable($name, $noQuotes = false);
 
 }
