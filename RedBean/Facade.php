@@ -900,7 +900,7 @@ class R {
 		if (self::$redbean->isFrozen()) return false;
 		$types = explode(",",$types);
 		if (count($types)<2) throw new Exception("Creating useless view for just one type? Provide at least two types!");
-		$refType = array_pop($types);
+		$refType = array_shift($types);
 		$viewManager = new RedBean_ViewManager( self::$toolbox );
 		return $viewManager->createView($viewID,$refType,$types);
 

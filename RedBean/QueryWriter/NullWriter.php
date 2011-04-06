@@ -458,7 +458,7 @@ class RedBean_QueryWriter_NullWriter extends RedBean_QueryWriter_AQueryWriter im
 	 *
 	 * @return mixed
 	 */
-	public function selectRecord($table, $conditions, $sql=null,$delete=false) {
+	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false ){
 		$this->selectRecordArguments = array($table, $conditions);
 		return $this->returnSelectRecord;
 	}

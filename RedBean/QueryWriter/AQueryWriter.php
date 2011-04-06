@@ -301,31 +301,37 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 
 
 	public function createView($referenceTable, $constraints, $viewID) {
+		
+		$viewID = $this->safeTable($viewID,true);
+		$safeReferenceTable = $this->safeTable($referenceTable);
 
-		$viewID = $viewID;
 		try{ $this->adapter->exec("DROP VIEW $viewID"); }catch(Exception $e){}
 
-		$viewID = $this->safeTable($viewID);
 		$columns = array_keys( $this->getColumns( $referenceTable ) );
-		$referenceTable = $this->safeTable($referenceTable);
+
+		$referenceTable = ($referenceTable);
 		$joins = array();
 		foreach($constraints as $table=>$constraint) {
 			$safeTable = $this->safeTable($table);
 			$addedColumns = array_keys($this->getColumns($table));
 			foreach($addedColumns as $addedColumn) {
 				$newColName = $addedColumn."_of_".$table;
-				$newcolumns[] = $safeTable.".".$this->safeColumn($addedColumn) . " AS ".$this->safeColumn($newColName);
+				$newcolumns[] = $this->safeTable($table).".".$this->safeColumn($addedColumn) . " AS ".$this->safeColumn($newColName);
 			}
 			if (count($constraint)!==2) throw Exception("Invalid VIEW CONSTRAINT");
-			$referenceColumn = $this->safeColumn($constraint[0], true);
-			$compareColumn = $this->safeColumn($constraint[1], true);
+			$referenceColumn = $constraint[0];
+			$compareColumn = $constraint[1];
 			$join = $referenceColumn." = ".$compareColumn;
 			$joins[] = " LEFT JOIN $safeTable ON $join ";
 		}
+		
 		$joins = implode(" ", $joins);
-		foreach($columns as $k=>$column) $columns[$k]=$referenceTable.".".$this->safeColumn($column);
+		foreach($columns as $k=>$column) {
+			$columns[$k]=$safeReferenceTable.".".$this->safeColumn($column);
+		}
 		$columns = implode("\n,",array_merge($newcolumns,$columns));
-		$sql = "CREATE VIEW $viewID AS SELECT $columns FROM $referenceTable $joins "; 
+		$sql = "CREATE VIEW $viewID AS SELECT $columns FROM $safeReferenceTable $joins ";
+		
 		$this->adapter->exec($sql);
 		return true;
 	}
