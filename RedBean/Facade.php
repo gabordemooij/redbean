@@ -893,7 +893,7 @@ class R {
 	 * @return array
 	 */
 	public static function cooker($arr) {
-		return Cooker::load($arr, R::$toolbox);
+		return RedBean_Cooker::load($arr, R::$toolbox);
 	}
 
 	public static function view($viewID, $types) {
