@@ -2712,7 +2712,8 @@ $post = array(
 	"book3"=>array("type"=>"book","id"=>1),
 	"associations"=>array(
 		array("book-book2"),array("page:2-book"),array("0")
-	)
+	),
+	"somethingelse"=>0
 );
 $beans = R::cooker($post);
 asrt(count($beans["can"]),3);
