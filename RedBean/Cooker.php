@@ -67,7 +67,7 @@ class RedBean_Cooker {
 		}
 
 		//We store beans here
-		$can = $pairs = array();
+		$can = $pairs = $sorted = array();
 
 		foreach($post as $key => $rawBean) {
 			if (is_array($rawBean) && isset($rawBean["type"])) {
@@ -93,6 +93,8 @@ class RedBean_Cooker {
 					if (!empty($value)) $bean->$field = $value;
 				}
 				$can[$key]=$bean;
+				if (!isset($sorted[$type]))  $sorted[$type]=array();
+				$sorted[$type][]=$bean;
 			}
 		}
 
