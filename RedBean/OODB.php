@@ -43,8 +43,19 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * Constructor, requires a DBAadapter (dependency inversion)
 	 * @param RedBean_Adapter_DBAdapter $adapter
 	 */
-	public function __construct( RedBean_QueryWriter $writer ) {
-		$this->writer = $writer;
+	public function __construct( $writer ) {
+
+		if ($writer instanceof RedBean_IceWriter) {
+			$this->isFrozen = true;
+			$this->writer = $writer;
+		}
+		elseif ($writer instanceof RedBean_QueryWriter) {
+			$this->writer = $writer;
+		}
+		else {
+			throw new RedBean_Exception_Security("Passing an invalid Query Writer");
+		}
+
 	}
 
 	/**

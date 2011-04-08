@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
  
-abstract class RedBean_AIceWriter implements RedBean_IceWriter {
+abstract class RedBean_IceWriter_AIceWriter implements RedBean_IceWriter {
 
 	/**
 	 *

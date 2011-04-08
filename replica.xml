@@ -32,6 +32,9 @@
         <item type="php">RedBean/QueryWriter/SQLiteT.php</item>
         <item type="php">RedBean/QueryWriter/PostgreSQL.php</item>
 
+	<item type="php">RedBean/IceWriter.php</item>
+	<item type="php">RedBean/IceWriter/AIceWriter.php</item>
+
         <item type="php">RedBean/Exception.php</item>
         <item type="php">RedBean/Exception/SQL.php</item>
         <item type="php">RedBean/Exception/Security.php</item>
