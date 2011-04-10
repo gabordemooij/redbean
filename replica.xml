@@ -44,6 +44,7 @@
 
         <item type="php">RedBean/OODB.php</item>
         <item type="php">RedBean/ToolBox.php</item>
+		<item type="php">RedBean/CoolBox.php</item>
         <item type="php">RedBean/CompatManager.php</item>
 
         <item type="php">RedBean/AssociationManager.php</item>

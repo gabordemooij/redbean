@@ -107,6 +107,43 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		}
 	}
 
+	public function syncAssoc( RedBean_OODBBean $bean, $otherBeans = array()) {
+		if (!count($otherBeans)) return;
+		$firstBean = reset($otherBeans);
+		$type = $firstBean->getMeta("type");
+		$idfield = $this->writer->getIDField($firstBean);
+		$relBeans = $this->oodb->batch($type, $this->related($bean, $type) );
+		foreach($relBeans as $relBean) {
+			$found=0;
+			foreach($otherBeans as $k=>$otherBean) {
+				if ($relBean->$idfield == $otherBean->$idfield) {
+					//it's the same bean! has it changed?
+					$relBeanSig = (implode(",",$relBean->export()));
+					$otherBeanSig = implode(",",$otherBean->export());
+					if ($relBeanSig==$otherBeanSig) {
+						//nope not changed
+						$found=1;
+						unset($otherBeans[$k]);
+					}
+					else {
+						//yupz, changed, store new bean..
+						$this->oodb->store($otherBean);
+						$found=1;
+						unset($otherBeans[$k]);
+					}
+				}
+			}
+			if (!$found) {
+				//bean is gone!
+				$this->unassociate($relBean,$bean);
+				$this->oodb->trash($relBean);
+			}
+		}
+		foreach($otherBeans as $otherBean) {
+			$this->associate($otherBean, $bean);
+		}
+	}
+
 	
 
 	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $sql=false) {
