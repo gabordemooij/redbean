@@ -76,13 +76,15 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_SQLite {
 	public function scanType( $value ) {
 
 
-		if (is_numeric($value) && (intval($value)==$value)) return self::C_DATATYPE_INTEGER;
-		if (is_numeric($value)
+		if (is_numeric($value) && (intval($value)==$value) && $value<2147483648) return self::C_DATATYPE_INTEGER;
+		if ((is_numeric($value) && $value < 2147483648)
 				  || preg_match("/\d\d\d\d\-\d\d\-\d\d/",$value)
 				  || preg_match("/\d\d\d\d\-\d\d\-\d\d\s\d\d:\d\d:\d\d/",$value)
 		) {
 			return self::C_DATATYPE_NUMERIC;
 		}
+		
+		
 		return self::C_DATATYPE_TEXT;
 	}
 

@@ -2655,6 +2655,10 @@ asrt(setget("2147483647"),"2147483647");
 asrt(setget(2147483647),"2147483647");
 asrt(setget(-2147483647),"-2147483647");
 asrt(setget("-2147483647"),"-2147483647");
+asrt(setget("2147483648"),"2147483648");
+asrt(setget("-2147483648"),"-2147483648");
+asrt(setget("199936710040730"),"199936710040730");
+asrt(setget("-199936710040730"),"-199936710040730");
 //Architecture dependent... only test this if you are sure what arch 
 //asrt(setget("2147483647123456"),"2.14748364712346e+15");
 //asrt(setget(2147483647123456),"2.14748364712e+15");
@@ -2713,7 +2717,8 @@ $post = array(
 	"book3"=>array("type"=>"book","id"=>1),
 	"associations"=>array(
 		array("book-book2"),array("page:2-book"),array("0")
-	)
+	),
+	"somethingelse"=>0
 );
 $beans = R::cooker($post);
 asrt(count($beans["can"]),3);

@@ -61,6 +61,7 @@
         <item type="php">RedBean/Plugin/Finder.php</item>
         <item type="php">RedBean/Plugin/Constraint.php</item>
 
+
 		  <item type="php">RedBean/IBeanFormatter.php</item>
 		  <item type="php">RedBean/IModelFormatter.php</item>
 
