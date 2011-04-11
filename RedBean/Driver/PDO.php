@@ -363,12 +363,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				foreach($aValues as $key=>&$value) {
 
 					if (is_integer($key)) {
-						if (ctype_digit(strval($value))) $s->bindParam($key+1,$value,PDO::PARAM_INT);
+						if (ctype_digit(strval($value)) && $value < 2147483648) { $s->bindParam($key+1,$value,PDO::PARAM_INT); }
 						else $s->bindParam($key+1,$value,PDO::PARAM_STR);
 					}
 					else {
 
-						if (ctype_digit(strval($value))) $s->bindParam($key,$value,PDO::PARAM_INT);
+						if (ctype_digit(strval($value)) &&  $value < 2147483648) $s->bindParam($key,$value,PDO::PARAM_INT);
 						else $s->bindParam($key,$value,PDO::PARAM_STR);
 					}
 
