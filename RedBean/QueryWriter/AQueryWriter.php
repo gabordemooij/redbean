@@ -200,7 +200,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param array   $updatevalues update values
 	 * @param integer $id			  primary key for record
 	 */
-	public function updateRecord( $table, $updatevalues, $id) {
+	public function updateRecord( $table, $updatevalues, $id=null) {
 		if (!$id) {
 			$insertcolumns =  $insertvalues = array();
 			foreach($updatevalues as $pair) {
