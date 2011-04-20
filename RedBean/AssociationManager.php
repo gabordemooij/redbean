@@ -107,6 +107,12 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		}
 	}
 
+	/**
+	 * Experimental function, dont use yet...
+	 * @param RedBean_OODBBean $bean
+	 * @param array $otherBeans
+	 * @return
+	 */
 	public function syncAssoc( RedBean_OODBBean $bean, $otherBeans = array()) {
 		if (!count($otherBeans)) return;
 		$firstBean = reset($otherBeans);
@@ -145,7 +151,14 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	}
 
 	
-
+	/**
+	 * @throws RedBean_Exception_SQL
+	 * @param RedBean_OODBBean $bean
+	 * @param  $type
+	 * @param bool $getLinks
+	 * @param bool $sql
+	 * @return array
+	 */
 	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $sql=false) {
 	$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
@@ -205,7 +218,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @param RedBean_OODBBean $bean1 first bean
 	 * @param RedBean_OODBBean $bean2 second bean
 	 */
-	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $fast=null) {
 
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
@@ -228,15 +241,16 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 
 			//$rows = $this->writer->selectAssocRec($table,$property1,$property2,$value1,$value2);
 			$rows = $this->writer->selectRecord($table,array(
-				$property1 => array($value1), $property2=>array($value2)
-			));
+				$property1 => array($value1), $property2=>array($value2)),null,$fast
+			);
 			if ($cross) {
 				$rows2 = $this->writer->selectRecord($table,array(
-				$property2 => array($value1), $property1=>array($value2)
-				));
+				$property2 => array($value1), $property1=>array($value2)),null,$fast
+				);
+				if ($fast) return;
 				$rows = array_merge($rows,$rows2);
 			}
-
+			if ($fast) return;
 			$beans = $this->oodb->convertToBeans($table,$rows);
 			foreach($beans as $link) {
 				$this->oodb->trash($link);

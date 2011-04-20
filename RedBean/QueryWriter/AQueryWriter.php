@@ -261,7 +261,15 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 	
 	
-
+	/**
+	 * @throws Exception
+	 * @param  $type
+	 * @param  $conditions
+	 * @param null $addSql
+	 * @param null $delete
+	 * @param bool $inverse
+	 * @return array
+	 */
 	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false ) {
 		if (!is_array($conditions)) throw new Exception("Conditions must be an array");
 		

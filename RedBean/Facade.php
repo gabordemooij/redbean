@@ -278,8 +278,8 @@ class R {
 	 *
 	 * @return mixed
 	 */
-	public static function unassociate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
-		return self::$associationManager->unassociate( $bean1, $bean2 );
+	public static function unassociate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 , $fast=false) {
+		return self::$associationManager->unassociate( $bean1, $bean2, $fast );
 	}
 
 	/**

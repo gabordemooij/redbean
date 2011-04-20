@@ -2162,6 +2162,35 @@ asrt(count($titles),1);
 asrt(($titles[0]),"a nice book");
 
 testpack("FUSE");
+
+
+testpack("test FUSE for association removal");
+
+$marker = false;
+class Model_Book_Page extends RedBean_SimpleModel {
+
+public function update() {}
+
+public function delete() { global $marker; $marker=true; }
+}
+
+$book = R::dispense("book");
+$page = R::dispense("page");
+$book->name = "a";
+$page->name="b";
+asrt($marker,false);
+R::associate($book,$page);
+R::unassociate($book,$page);
+asrt($marker,true);
+$marker = false;
+R::associate($book,$page);
+R::unassociate($book,$page);
+asrt($marker,true);
+$marker = false;
+R::associate($book,$page);
+R::unassociate($book,$page,true);
+asrt($marker,false);
+
 class Model_Cigar extends RedBean_SimpleModel {
 	
 	public static $reachedDeleted = false;
@@ -2861,8 +2890,6 @@ testViews("prefix_");
 $tf2 = new Fm2();
 R::$writer->setBeanFormatter($tf2);
 testViews("prefix_");
-
-
 
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
