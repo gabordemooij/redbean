@@ -17,6 +17,8 @@
  */
 class R {
 
+
+	public static $toolboxes = array();
 	/**
 	 *
 	 * Constains an instance of the RedBean Toolbox
@@ -100,6 +102,23 @@ class R {
 		RedBean_Setup::kickstart( $dsn, $username, $password );
 		$toolbox = RedBean_Setup::getToolBox();
 		self::configureFacadeWithToolbox($toolbox);
+	}
+
+	public static function setupMultiple( $databases ) {
+		$objects = array();
+		foreach($databases as $key=>$database) {
+			self::$toolboxes[$key] = RedBean_Setup::kickstart($database["dsn"],$database["username"],$database["password"],$database["frozen"]);
+			$objects[$key] = new RedBean_FacadeHelper($key);
+		}
+		return $objects;
+	}
+
+	public static $currentDB = "";
+	public static function selectDatabase($key) {
+		if (self::$currentDB===$key) return 0;
+		self::configureFacadeWithToolbox(self::$toolboxes[$key]);
+		self::$currentDB = $key;
+		return 1;
 	}
 
 
@@ -885,6 +904,9 @@ class R {
 		return $oldTools;
 	}
 
+
+
+
 	/**
 	 * facade method for Cooker.
 	 * 
@@ -907,4 +929,16 @@ class R {
 	}
 
 
+}
+
+class RedBean_FacadeHelper {
+	private $key;
+	public function __construct($key) {
+		$this->key = $key;
+	}
+	public function __call($func,$args) {
+		R::selectDatabase($this->key);
+		$func = "R::$func";
+		return call_user_func_array($func,$args);
+	}
 }

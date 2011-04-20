@@ -438,7 +438,7 @@ class RedBean_QueryWriter_NullWriter extends RedBean_QueryWriter_AQueryWriter im
 	 *
 	 * @return mixed
 	 */
-	public function updateRecord( $table, $updatevalues, $id) {
+	public function updateRecord( $table, $updatevalues, $id=null) {
 		$this->updateRecordArguments = array($table, $updatevalues, $id);
 		return $this->returnUpdateRecord;
 	}
