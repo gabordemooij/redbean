@@ -31,6 +31,8 @@ abstract class RedBean_Observable {
 			$this->observers[ $eventname ] = array();
 		}
 
+		
+		foreach($this->observers[$eventname] as $o) if ($o==$observer) return;
 		$this->observers[ $eventname ][] = $observer;
 	}
 
