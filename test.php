@@ -641,7 +641,6 @@ asrt((int)$page->id,$id);
 //print_r($pages);
 //exit;
 
-
 testpack("Test RedBean OODB: Can we Update a Record? ");
 $page->name = "new name";
 
@@ -2090,7 +2089,106 @@ $uow->addWork("all_save",function() use($uow) {
 $uow->doWork("all_save");
 asrt(count( RedBean_Plugin_Finder::where("book","title LIKE '%unit%'") ),1);
 
-testpack("Facade");
+testpack("Facade Multiple DB");
+
+$databases = array(
+   "database1" => array("dsn"=>"sqlite:/tmp/testsqlite1","username"=>"","password"=>"","frozen"=>false),
+   "database2" => array("dsn"=>"sqlite:/tmp/testsqlite2","username"=>"","password"=>"","frozen"=>false),
+);
+
+$dbs = R::setupMultiple($databases);
+
+$r1 = $dbs["database1"];
+$r2 = $dbs["database2"];
+
+$r1->exec("drop table if exists book");
+$r1->exec("drop table if exists book_page");
+$r1->exec("drop table if exists page_page");
+$r1->exec("drop table if exists page");
+$r1->exec("drop table if exists shelf");
+$r2->exec("drop table if exists book");
+$r2->exec("drop table if exists book_page");
+$r2->exec("drop table if exists page_page");
+$r2->exec("drop table if exists page");
+$r2->exec("drop table if exists shelf");
+
+
+$book = $r1->dispense("book");
+$book->title = "ONE";
+$id1 = $r1->store($book);
+
+
+$book2 = $r2->dispense("book");
+$book2->title = "TWO";
+$id2 = $r2->store($book2);
+
+asrt($r1->load("book",$id1)->title,"ONE");
+asrt($r2->load("book",$id1)->title,"TWO");
+asrt($r1->findOne("book")->title,"ONE");
+asrt($r2->findOne("book")->title,"TWO");
+
+$page1 = $r1->dispense("page");
+$page1->title = "FIRST";
+
+$page2 = $r2->dispense("page");
+$page2->title = "SECOND";
+
+$r1->associate($book,$page1);
+$r2->associate($book2,$page2);
+asrt($r1->relatedOne($book,"page")->title,"FIRST");
+asrt($r2->relatedOne($book,"page")->title,"SECOND");
+$a=$r1->related($book,"page");
+$p = array_pop($a);
+asrt($p->title,"FIRST");
+$a=$r2->related($book2,"page");
+$p = array_pop($a);
+asrt($p->title,"SECOND");
+$a =$r1->related($book,"page");
+//$r1->debug(1);
+$c = count($a);
+$r1->unassociate($book,$page1);
+$c1 = count($r1->related($book,"page"));
+asrt($c,$c1+1);
+$r2->clearRelations($page2,"book");
+$c2 = count($r2->related($book2,"page"));
+asrt($c2,0);
+
+asrt(0,count($r2->getAll("select * from book where title='ONE'")));
+asrt(0,count($r1->getAll("select * from book where title='TWO'")));
+asrt(2,count($r1->getRow("select * from book where title='ONE'")));
+asrt(2,count($r2->getRow("select * from book where title='TWO'")));
+asrt("ONE",($r1->getCell("select title from book where title='ONE'")));
+asrt("TWO",($r2->getCell("select title from book where title='TWO'")));
+
+$r1->tag($book,"nice");
+asrt(count($r1->tagged("book","nice"))>0,true);
+$r2->tag($book,"better");
+asrt(count($r2->tagged("book","better"))>0,true);
+
+$book->cover = "red";
+$book2->cover = "green";
+$r1->store($book);
+$r2->store($book2);
+$form1 = array("book"=>array("title"=>"THREE IN ONE","type"=>"book","id"=>$id1));
+$form2 = array("book"=>array("title"=>"FOUR IN TWO","type"=>"book","id"=>$id2));
+$books = $r1->cooker($form1);
+$abook = array_pop($books["can"]);
+asrt("red",$abook->cover);
+$books = $r2->cooker($form2);
+$abook = array_pop($books["can"]);
+asrt("green",$abook->cover);
+
+$r1->associate($book,$page1);
+$r2->associate($book2,$page2);
+$r1->view("shelf","book,page");
+$a = $r1->getAll("select * from shelf where id = $id1 ");
+$shelf = array_pop($a);
+asrt($shelf["title_of_page"],"FIRST");
+$r2->view("shelf","book,page");
+$shelf = $r2->getCell("select title_of_page from shelf where id = $id2 ");
+asrt($shelf,"SECOND");
+
+testpack("Facade Basics");
 R::setup("sqlite:/tmp/teststore.txt"); //should work as well
 pass();
 R::exec("select 123");

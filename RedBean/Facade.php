@@ -99,6 +99,11 @@ class R {
 	 * @param string $password
 	 */
 	public static function setup( $dsn="sqlite:/tmp/red.db", $username=NULL, $password=NULL ) {
+		
+		//either use Setup() or SetupMulti(), not both.. - resets toolbox list.
+		self::$toolboxes = array();
+		self::$currentDB = false;
+
 		RedBean_Setup::kickstart( $dsn, $username, $password );
 		$toolbox = RedBean_Setup::getToolBox();
 		self::configureFacadeWithToolbox($toolbox);
@@ -459,7 +464,11 @@ class R {
 	 * @return array $beans  beans
 	 */
 	public static function find( $type, $sql="1", $values=array() ) {
-		return RedBean_Plugin_Finder::where( $type, $sql, $values );
+		if (isset(self::$toolboxes[self::$currentDB])) { $toolbox = self::$toolboxes[self::$currentDB]; } else {
+			$toolbox = false;
+		}
+		
+		return RedBean_Plugin_Finder::where( $type, $sql, $values, $toolbox );
 	}
 
 
