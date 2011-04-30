@@ -80,7 +80,7 @@ class R {
 	 * @return string $version Version ID
 	 */
 	public static function getVersion() {
-		return "1.3";
+		return "2.0 Beta";
 	}
 
 	/**
@@ -902,13 +902,11 @@ class R {
 		self::$redbean->addEventListener("update", $helper );
 		self::$redbean->addEventListener("open", $helper );
 		self::$redbean->addEventListener("delete", $helper );
-
-		
 		self::$associationManager->addEventListener("delete", $helper );
-
 		self::$redbean->addEventListener("after_delete", $helper );
 		self::$redbean->addEventListener("after_update", $helper );
 		self::$redbean->addEventListener("dispense", $helper );
+		
 
 		return $oldTools;
 	}

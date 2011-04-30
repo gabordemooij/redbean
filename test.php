@@ -75,8 +75,8 @@ function testpack($name) {
 testpack("Test Setup");
 
 //INCLUDE YOUR REDBEAN FILE HERE!
-//require("rb.php");
-require("RedBean/redbean.inc.php");
+require("rb.php");
+//require("RedBean/redbean.inc.php");
 
 
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
@@ -138,8 +138,6 @@ $nullWriter = new RedBean_QueryWriter_NullWriter();
 $redbean = new RedBean_OODB( $nullWriter );
 $linker = new RedBean_LinkManager( $toolbox );
 
-testpack("TEST VERSIONING");
-asrt(R::getVersion(),"1.3");
 
 //Section A: Config Testing
 testpack("CONFIG TEST");

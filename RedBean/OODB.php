@@ -290,7 +290,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				}
 				else throw $e;
 			}
-			if (!$rows) return $this->dispense($type);
+			if (!$rows) return $bean; // $this->dispense($type); -- no need...
 			$row = array_pop($rows);
 		}
 		foreach($row as $p=>$v) {
