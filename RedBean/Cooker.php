@@ -119,3 +119,9 @@ class RedBean_Cooker {
 	}
 
 }
+
+//Ugly but necessry to support older version
+if (!class_exists('Cooker')) {
+	eval('class Cooker extends RedBean_Cooker{
+	public static function load($a){return RedBean_Cooker::load($a,R::$toolbox);}}');
+}

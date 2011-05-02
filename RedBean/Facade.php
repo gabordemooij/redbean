@@ -935,6 +935,11 @@ class R {
 
 	}
 
+	public static function begin() { self::$adapter->startTransaction(); }
+	public static function commit() { self::$adapter->commit(); }
+	public static function rollback() { self::$adapter->rollback(); }
+	public static function getColumns($table) { return self::$writer->getColumns($table); }
+
 
 }
 
@@ -943,6 +948,11 @@ class RedBean_FacadeHelper {
 	public function __construct($key) {
 		$this->key = $key;
 	}
+
+	public function configureFacadeWithToolbox() {
+		throw new Exception("Only available on static R facade.");
+	}
+
 	public function __call($func,$args) {
 		R::selectDatabase($this->key);
 		$func = "R::$func";

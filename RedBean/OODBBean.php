@@ -90,6 +90,17 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 
 	/**
+	 * @param  $property
+	 * @return void
+	 */
+	public function __unset($property) {
+		if ((isset($this->properties[$property]))) {
+			unset($this->properties[$property]);
+		}
+	}
+
+
+	/**
 	 * Magic Getter. Gets the value for a specific property in the bean.
 	 * If the property does not exist this getter will make sure no error
 	 * occurs. This is because RedBean allows you to query (probe) for
