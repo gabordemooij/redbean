@@ -74,8 +74,8 @@ testpack("Test Setup");
 
 //Can we load all modules properly?
 //INCLUDE YOUR REDBEAN FILE HERE!
-//require("rb.php");
-require("RedBean/redbean.inc.php");
+require("rb.php");
+//require("RedBean/redbean.inc.php");
 
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
 
