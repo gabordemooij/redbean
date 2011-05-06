@@ -17,6 +17,7 @@
  * @license			BSD
  */
 //require("rb.php");
+error_reporting(E_ALL | E_STRICT);
 require("RedBean/redbean.inc.php");
 
 /**

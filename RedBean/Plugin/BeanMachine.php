@@ -305,6 +305,6 @@ function RedBean_Plugin_BeanMachine_InnerClasses() {
 			}
 
 		}
-		return RedBean_Plugin_BeanMachine_Group;
+		return new RedBean_Plugin_BeanMachine_Group;
 
 }
