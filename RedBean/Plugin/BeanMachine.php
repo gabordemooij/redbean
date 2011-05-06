@@ -44,7 +44,7 @@ class RedBean_Plugin_BeanMachine implements RedBean_Plugin {
 	 * Initializes the Bean Machine
 	 * @return void
 	 */
-	private function init() {
+	private static function init() {
 		if (!class_exists("RedBean_Plugin_BeanMachine_Group")) {
 			//create inner classes, we dont want to add files for each class,
 			//just makes a mess. this one will only be used by BeanMachine.
@@ -78,7 +78,7 @@ class RedBean_Plugin_BeanMachine implements RedBean_Plugin {
 	 * 
 	 * @return RedBean_Plugin_BeanMachine $machine the Bean Machine.
 	 */
-	public function getInstance( RedBean_ToolBox $toolbox ) {
+	public static function getInstance( RedBean_ToolBox $toolbox ) {
 
 		//Bootstrap own classes
 		self::init();
@@ -305,6 +305,6 @@ function RedBean_Plugin_BeanMachine_InnerClasses() {
 			}
 
 		}
-		return RedBean_Plugin_BeanMachine_Group;
+		return new RedBean_Plugin_BeanMachine_Group;
 
 }
