@@ -1173,6 +1173,8 @@ asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE '%more%' ")),3);
 asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'))),3);
 asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE :str ",array(":str"=>'%mxore%'))),0);
 
+testpack("Test OODB Finder");
+asrt(count($redbean->find("page",array("id"=>array(2,3)))),2);
 
 
 $bean = $redbean->dispense("wine");
@@ -2987,6 +2989,14 @@ $tf2 = new Fm2();
 R::$writer->setBeanFormatter($tf2);
 testViews("prefix_");
 
+testpack("export");
+list($p1,$p2) = R::dispense("page",2);
+$p1->name = '1';
+$p2->name = '2';
+$arr = ( R::exportAll(array($p1,$p2)) );
+asrt(count($arr),2);
+asrt($arr[0]["name"],"1");
+asrt($arr[1]["name"],"2");
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 

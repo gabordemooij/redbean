@@ -90,6 +90,15 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 
 	/**
+	 * Returns the ID of the bean no matter what the ID field is.
+	 * @return string $id record Identifier for bean
+	 */
+	public function getID() {
+		$idfield = $this->getMeta("sys.idfield");
+		return (string) $this->$idfield;
+	}
+
+	/**
 	 * @param  $property
 	 * @return void
 	 */
@@ -219,7 +228,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return string $string
 	 */
 	public function __toString() {
-		return $this->__call('__toString',array());
+		$string = $this->__call('__toString',array());
+		if ($string === null) {
+			return json_encode($this->properties);
+		}
+		else {
+			return $string;
+		}
 	}
 
 	/**

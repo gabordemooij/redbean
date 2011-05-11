@@ -48,6 +48,7 @@ class RedBean_Cooker {
 	 * array(
 	 * 	"can" => an array with beans, either loaded or dispensed and populated
 	 *  "pairs" => an array with pairs of beans to be associated
+	 *  "sorted" => sorted by type
 	 * );
 	 *
 	 * Note that this function actually does not store or associate anything at all,
@@ -114,9 +115,14 @@ class RedBean_Cooker {
 			}
 		}
 
-		return array("can"=>$can, "pairs"=>$pairs);
+		return array(
+			"can"=>$can, //contains the beans
+			"pairs"=>$pairs, //contains pairs of beans
+			"sorted"=>$sorted //contains beans sorted by type
+		);
 
 	}
+	
 
 }
 

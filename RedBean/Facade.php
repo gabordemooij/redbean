@@ -935,6 +935,14 @@ class R {
 
 	}
 
+	public static function exportAll($beans) {
+		$array = array();
+		foreach($beans as $bean) {
+			$array[] = $bean->export();
+		}
+		return $array;
+	}
+
 	public static function begin() { self::$adapter->startTransaction(); }
 	public static function commit() { self::$adapter->commit(); }
 	public static function rollback() { self::$adapter->rollback(); }

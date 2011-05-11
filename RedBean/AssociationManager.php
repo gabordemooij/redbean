@@ -94,6 +94,8 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$bean->setMeta( "buildcommand.unique" , array( array( $property1, $property2 )));
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
+		$bean->setMeta("assoc.".$bean1->getMeta("type"),$bean1);
+		$bean->setMeta("assoc.".$bean2->getMeta("type"),$bean2);
 		$bean->$property1 = $bean1->$idfield1;
 		$bean->$property2 = $bean2->$idfield2;
 		try {
@@ -107,49 +109,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		}
 	}
 
-	/**
-	 * Experimental function, dont use yet...
-	 * @param RedBean_OODBBean $bean
-	 * @param array $otherBeans
-	 * @return
-	 */
-	public function syncAssoc( RedBean_OODBBean $bean, $otherBeans = array()) {
-		if (!count($otherBeans)) return;
-		$firstBean = reset($otherBeans);
-		$type = $firstBean->getMeta("type");
-		$idfield = $this->writer->getIDField($firstBean);
-		$relBeans = $this->oodb->batch($type, $this->related($bean, $type) );
-		foreach($relBeans as $relBean) {
-			$found=0;
-			foreach($otherBeans as $k=>$otherBean) {
-				if ($relBean->$idfield == $otherBean->$idfield) {
-					//it's the same bean! has it changed?
-					$relBeanSig = (implode(",",$relBean->export()));
-					$otherBeanSig = implode(",",$otherBean->export());
-					if ($relBeanSig==$otherBeanSig) {
-						//nope not changed
-						$found=1;
-						unset($otherBeans[$k]);
-					}
-					else {
-						//yupz, changed, store new bean..
-						$this->oodb->store($otherBean);
-						$found=1;
-						unset($otherBeans[$k]);
-					}
-				}
-			}
-			if (!$found) {
-				//bean is gone!
-				$this->unassociate($relBean,$bean);
-				$this->oodb->trash($relBean);
-			}
-		}
-		foreach($otherBeans as $otherBean) {
-			$this->associate($otherBean, $bean);
-		}
-	}
-
+	
 	
 	/**
 	 * @throws RedBean_Exception_SQL
@@ -303,10 +263,6 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 
 			}
 
-			//$this->writer->deleteByCrit($table,array($property=>$bean->$idfield));
-			//if ($cross) {
-			//	$this->writer->deleteByCrit($table,array($property2=>$bean->$idfield));
-			//}
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(

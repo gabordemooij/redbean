@@ -131,7 +131,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		//Are the properties and values valid?
 		foreach($bean as $prop=>$value) {
 			if (
-			is_array($value) ||
+					  is_array($value) ||
 					  is_object($value) ||
 					  strlen($prop)<1 ||
 					  preg_match($pattern,$prop)
@@ -139,6 +139,25 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				throw new RedBean_Exception_Security("Invalid Bean: property $prop  ");
 			}
 		}
+	}
+
+
+	/**
+	 * @param  $type
+	 * @param array $conditions
+	 * @param null $addSQL
+	 * @return array
+	 */
+	public function find($type,$conditions=array(),$addSQL=null) {
+		try {
+			$beans = $this->convertToBeans($type,$this->writer->selectRecord($type,$conditions,$addSQL));
+			return $beans;
+		}catch(RedBean_Exception_SQL $e) {
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+			array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+		}
+		return array();
 	}
 
 
@@ -228,22 +247,11 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			}
 		}
 
-		//if ($bean->$idfield) {
-			//if (count($updatevalues)>0) {
-				$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
-			//}
-			$bean->setMeta("tainted",false);
-			$bean->$idfield = $rs;
-			$this->signal( "after_update", $bean );
-			return (int) $bean->$idfield;
-		//}
-		//else {
-		//	$id = $this->writer->insertRecord( $table, $insertcolumns, array($insertvalues) );
-		//	$bean->$idfield = $id;
-		//	$bean->setMeta("tainted",false);
-		//	$this->signal( "after_update", $bean );
-		//	return (int) $id;
-		//}
+		$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
+		$bean->setMeta("tainted",false);
+		$bean->$idfield = $rs;
+		$this->signal( "after_update", $bean );
+		return (int) $bean->$idfield;
 	}
 
 	/**
