@@ -63,5 +63,9 @@ class RedBean_SimpleModel {
 		return (isset($this->bean->$key));
 	}
 
+	protected function getConnected($type) {
+		return $this->bean->getMeta("assoc.$type");
+	}
+
 
 }

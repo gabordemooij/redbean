@@ -213,6 +213,9 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			if ($fast) return;
 			$beans = $this->oodb->convertToBeans($table,$rows);
 			foreach($beans as $link) {
+				$link->setMeta("assoc.".$bean1->getMeta("type"),$bean1);
+				$link->setMeta("assoc.".$bean2->getMeta("type"),$bean2);
+
 				$this->oodb->trash($link);
 			}
 		}catch(RedBean_Exception_SQL $e) {
