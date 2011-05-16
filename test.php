@@ -2089,7 +2089,7 @@ $uow->addWork("all_save",function() use($uow) {
 $uow->doWork("all_save");
 asrt(count( RedBean_Plugin_Finder::where("book","title LIKE '%unit%'") ),1);
 
-testpack("Facade Multiple DB");
+testpack("Test: Facade Multiple DB");
 
 $databases = array(
    "database1" => array("dsn"=>"sqlite:/tmp/testsqlite1","username"=>"","password"=>"","frozen"=>false),
@@ -2989,7 +2989,7 @@ $tf2 = new Fm2();
 R::$writer->setBeanFormatter($tf2);
 testViews("prefix_");
 
-testpack("export");
+testpack("Test Export All");
 list($p1,$p2) = R::dispense("page",2);
 $p1->name = '1';
 $p2->name = '2';
@@ -2997,6 +2997,15 @@ $arr = ( R::exportAll(array($p1,$p2)) );
 asrt(count($arr),2);
 asrt($arr[0]["name"],"1");
 asrt($arr[1]["name"],"2");
+//ignore arrays
+$o = new stdClass();
+$arr = ( R::exportAll(array($p1,array($p1),$o,$p2)) );
+asrt(count($arr),2);
+asrt($arr[0]["name"],"1");
+asrt($arr[1]["name"],"2");
+
+
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
+
 

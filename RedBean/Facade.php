@@ -74,6 +74,12 @@ class R {
 	public static $linkManager;
 
 	/**
+	 * Holds the Key of the current database.
+	 * @var string
+	 */
+	public static $currentDB = "";
+
+	/**
 	 * Returns version ID string
 	 * Version No format: <Major>.<Minor>.<Maintenance>.<Fix/Update>
 	 * 
@@ -93,10 +99,15 @@ class R {
 
 
 	/**
-	 * Kickstarts redbean for you.
-	 * @param string $dsn
-	 * @param string $username
-	 * @param string $password
+	 * Kickstarts redbean for you. This method should be called before you start using
+	 * RedBean. The Setup() method can be called without any arguments, in this case it will
+	 * try to create a SQLite database in /tmp called red.db (this only works on UNIX-like systems).
+	 *
+	 * @param string $dsn      Database connection string
+	 * @param string $username Username for database
+	 * @param string $password Password for database
+	 *
+	 * @return void
 	 */
 	public static function setup( $dsn="sqlite:/tmp/red.db", $username=NULL, $password=NULL ) {
 		
@@ -109,6 +120,15 @@ class R {
 		self::configureFacadeWithToolbox($toolbox);
 	}
 
+	/**
+	 * Configures RedBean to work with multiple database and multiple instances of the facade.
+	 * This method accepts an array with format:
+	 * array( $key =>array('dsn'=>$dsn,'username'=>$username,'password'=>$password,'frozen'=>$trueFalse) )
+	 * 
+	 * @static
+	 * @param  array $databases  array with database connection information
+	 * @return array $rinstances array with R-instances
+	 */
 	public static function setupMultiple( $databases ) {
 		$objects = array();
 		foreach($databases as $key=>$database) {
@@ -118,7 +138,15 @@ class R {
 		return $objects;
 	}
 
-	public static $currentDB = "";
+
+
+	/**
+	 * Selects a different database for the Facade to work with.
+	 *
+	 * @static
+	 * @param  string $key Key of the database to select
+	 * @return int 1
+	 */
 	public static function selectDatabase($key) {
 		if (self::$currentDB===$key) return 0;
 		self::configureFacadeWithToolbox(self::$toolboxes[$key]);
@@ -480,9 +508,9 @@ class R {
 	 * Convenience Method
 	 *
 	 * @param RedBean_OODBBean $bean   bean
-	 * @param string				$type   type
-	 * @param string				$sql    sql
-	 * @param array				$values values
+	 * @param string           $type   type
+	 * @param string           $sql    sql
+	 * @param array	           $values values
 	 *
 	 * @return array $beans
 	 */
@@ -500,9 +528,9 @@ class R {
 	 * Convenience Method
 	 *
 	 * @param RedBean_OODBBean $bean   bean
-	 * @param string				$type   type
-	 * @param string				$sql    sql
-	 * @param array				$values values
+	 * @param string		   $type   type
+	 * @param string		   $sql    sql
+	 * @param array			   $values values
 	 *
 	 * @return array $beans
 	 */
@@ -811,9 +839,10 @@ class R {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 
 		if (is_array($tags)) {
-		foreach($tags as $tag) {
-			if (preg_match("/\W/",$tag)) throw new RedBean_Exception("Invalid Tag. Tags may only contain alpha-numeric characters");
-		}
+			foreach($tags as $tag) {
+				if (preg_match("/\W/",$tag))
+					throw new RedBean_Exception("Invalid Tag. Tags may only contain alpha-numeric characters");
+			}
 		}
 		
 
@@ -925,42 +954,145 @@ class R {
 		return RedBean_Cooker::load($arr, R::$toolbox);
 	}
 
+	/**
+	 * Creates a view called $viewID by joining types specified in $types.
+	 * This function only works in fluid mode, in frozen mode it immediately
+	 * returns boolean false.
+	 *
+	 * @static
+	 * @throws RedBean_Exception_Security
+	 *
+	 * @param  string $viewID  name of the view you want to create
+	 * @param  string $types   comma separated list of types
+	 *
+	 * @return bool	  $success whether the view has been created or not
+	 */
 	public static function view($viewID, $types) {
 		if (self::$redbean->isFrozen()) return false;
 		$types = explode(",",$types);
-		if (count($types)<2) throw new Exception("Creating useless view for just one type? Provide at least two types!");
+		if (count($types)<2) throw new RedBean_Exception_Security("Creating useless view for just one type? Provide at least two types!");
 		$refType = array_shift($types);
 		$viewManager = new RedBean_ViewManager( self::$toolbox );
 		return $viewManager->createView($viewID,$refType,$types);
 
 	}
 
+	/**
+	 * Mass Bean Export function.
+	 * Exports all beans specified in the first argument.
+	 *
+	 * @static
+	 * @param  array $beans collection of beans to be exported
+	 *
+	 * @return array Array containing sub-arrays representing beans
+	 */
 	public static function exportAll($beans) {
 		$array = array();
 		foreach($beans as $bean) {
-			$array[] = $bean->export();
+			if ($bean instanceof RedBean_OODBBean) {
+				$array[] = $bean->export();
+			}
 		}
 		return $array;
 	}
 
-	public static function begin() { self::$adapter->startTransaction(); }
-	public static function commit() { self::$adapter->commit(); }
-	public static function rollback() { self::$adapter->rollback(); }
+	/**
+	 * Facade Convience method for adapter transaction system.
+	 * Begins a transaction.
+	 *
+	 * @static
+	 * @return void
+	 */
+	public static function begin() {
+		self::$adapter->startTransaction();
+	}
+
+	/**
+	 * Facade Convience method for adapter transaction system.
+	 * Commits a transaction.
+	 *
+	 * @static
+	 * @return void
+	 */
+	public static function commit() {
+		self::$adapter->commit();
+	}
+
+	/**
+	 * Facade Convience method for adapter transaction system.
+	 * Rolls back a transaction.
+	 *
+	 * @static
+	 * @return void
+	 */
+	public static function rollback() {
+		self::$adapter->rollback();
+	}
+
+	/**
+	 * Returns a list of columns. Format of this array:
+	 * array( fieldname => type )
+	 * Note that this method only works in fluid mode because it might be
+	 * quite heavy on production servers!
+	 *
+	 * @static
+	 * @param  string $table   name of the table (not type) you want to get columns of
+	 *
+	 * @return array  $columns list of columns and their types
+	 */
 	public static function getColumns($table) { return self::$writer->getColumns($table); }
 
 
 }
 
+/**
+ * RedBean Facade Helper
+ * A little helper bundles with the facade to allow you to have
+ * multiple instances of a facade.
+ *
+ * @throws Exception
+ *
+ */
 class RedBean_FacadeHelper {
+
+	/**
+	 * Contains the Key ID for the database this instance is connected to.
+	 * You cannot change this.
+	 *
+	 * @var string
+	 */
 	private $key;
+
+	/**
+	 * Constructor for R-facade instance, requires a Database Key ID.
+	 *
+	 * @param  $key
+	 */
 	public function __construct($key) {
 		$this->key = $key;
 	}
 
+	/**
+	 * Blocker Method. This method prevents you from messing up the facade.
+	 *
+	 * @throws RedBean_Exception_Security
+	 * @return void
+	 */
 	public function configureFacadeWithToolbox() {
-		throw new Exception("Only available on static R facade.");
+		throw new RedBean_Exception_Security("Only available on static R facade.");
 	}
 
+	/**
+	 * Call router. This function routes your call to the R-facade.
+	 * Note that this method is actually quite expensive in terms of CPU because it uses
+	 * a call_user_func, as time passes I will port methods from the static facade to this
+	 * helper to speed things up.
+	 *
+	 * @param  string $func function to call
+	 * @param  array  $args arguments to use when calling function
+	 *
+	 * @return mixed $whateverTheFunctionReturns
+	 */
 	public function __call($func,$args) {
 		R::selectDatabase($this->key);
 		$func = "R::$func";
