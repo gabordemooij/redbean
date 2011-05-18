@@ -24,20 +24,22 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	);
 
 	/**
+	 * Contains a reference to the Object Database OODB
 	 * @var RedBean_OODB
 	 */
 	protected $oodb;
 
 	/**
+	 * Contains a reference to the Database Adapter
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
 
 	/**
+	 * Contains a reference to the Query Writer
 	 * @var RedBean_QueryWriter
 	 */
 	protected $writer;
-
 
 	/**
 	 * Constructor
@@ -49,6 +51,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$this->adapter = $tools->getDatabaseAdapter();
 		$this->writer = $tools->getWriter();
 	}
+
 	/**
 	 * Creates a table name based on a types array.
 	 *
@@ -108,16 +111,25 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			))) throw $e;
 		}
 	}
-
-	
 	
 	/**
+	 * Returns all ids of beans of type $type that are related to $bean. If the
+	 * $getLinks parameter is set to boolean TRUE this method will return the ids
+	 * of the association beans instead. You can also add additional SQL. This SQL
+	 * will be appended to the original query string used by this method. Note that this
+	 * method will not return beans, just keys. For a more convenient method see the R-facade
+	 * method related(), that is in fact a wrapper for this method that offers a more
+	 * convenient solution. If you want to make use of this method, consider the
+	 * OODB batch() method to convert the ids to beans.
+	 *
 	 * @throws RedBean_Exception_SQL
-	 * @param RedBean_OODBBean $bean
-	 * @param  $type
-	 * @param bool $getLinks
-	 * @param bool $sql
-	 * @return array
+	 *
+	 * @param RedBean_OODBBean $bean     reference bean
+	 * @param string           $type     target type
+	 * @param bool             $getLinks whether you are interested in the assoc records
+	 * @param bool             $sql      room for additional SQL
+	 *
+	 * @return array $ids
 	 */
 	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $sql=false) {
 	$table = $this->getTable( array($bean->getMeta("type") , $type) );
@@ -131,15 +143,11 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 
 		$property = $bean->getMeta("type")."_id";
 		try {
-
-
-
 				$sqlFetchKeys = $this->writer->selectRecord(
 					  $table,
 					  array( $property => array( $bean->$idfield ) ),
 					  $sql,
 					  false
-
 				);
 				$sqlResult = array();
 				foreach( $sqlFetchKeys as $row ) {
@@ -156,27 +164,29 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 						$sqlResult[] = $row[$property];
 					}
 				}
-			
-
 			return $sqlResult; //or returns rows in case of $sql != empty
-
 		}catch(RedBean_Exception_SQL $e) {
-
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
-
 			return array();
 		}
 	}
 
 	/**
-	 * Breaks the association between two beans
+	 * Breaks the association between two beans. This method unassociates two beans. If the
+	 * method succeeds the beans will no longer form an association. In the database
+	 * this means that the association record will be removed. This method uses the
+	 * OODB trash() method to remove the association links, thus giving FUSE models the
+	 * opportunity to hook-in additional business logic. If the $fast parameter is
+	 * set to boolean TRUE this method will remove the beans without their consent,
+	 * bypassing FUSE. This can be used to improve performance.
 	 *
 	 * @param RedBean_OODBBean $bean1 first bean
 	 * @param RedBean_OODBBean $bean2 second bean
+	 * @param boolean          $fast  If TRUE, removes the entries by query without FUSE
 	 */
 	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $fast=null) {
 
@@ -186,7 +196,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$idfield1 = $this->writer->getIDField($bean1->getMeta("type"));
 		$idfield2 = $this->writer->getIDField($bean2->getMeta("type"));
 		$type = $bean1->getMeta("type");
-		if ($type==$bean2->getMeta("type")) { //echo "<b>CROSS</b>";
+		if ($type==$bean2->getMeta("type")) {
 			$type .= "2";
 			$cross = 1;
 		}
@@ -195,11 +205,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$property2 = $bean2->getMeta("type")."_id";
 		$value1 = (int) $bean1->$idfield1;
 		$value2 = (int) $bean2->$idfield2;
-
-
 		try {
-
-			//$rows = $this->writer->selectAssocRec($table,$property1,$property2,$value1,$value2);
 			$rows = $this->writer->selectRecord($table,array(
 				$property1 => array($value1), $property2=>array($value2)),null,$fast
 			);
@@ -225,28 +231,20 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
 		}
-
 		return;
-
-
-		try {
-			$this->writer->deleteByCrit($table,array($property1=>$value1,$property2=>$value2));
-			if ($cross) {
-				$this->writer->deleteByCrit($table,array($property2=>$value1,$property1=>$value2));
-			}
-		}catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
-		}
 	}
+
 	/**
-	 * Removes all relations for a bean
+	 * Removes all relations for a bean. This method breaks every connection between
+	 * a certain bean $bean and every other bean of type $type. Warning: this method
+	 * is really fast because it uses a direct SQL query however it does not inform the
+	 * models about this. If you want to notify FUSE models about deletion use a foreach-loop
+	 * with unassociate() instead. (that might be slower though)
 	 *
-	 * @param RedBean_OODBBean $bean bean
-	 * @param string           $type type
+	 * @param RedBean_OODBBean $bean reference bean
+	 * @param string           $type type of beans that need to be unassociated
+	 *
+	 * @return void
 	 */
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
 		$this->oodb->store($bean);
@@ -276,6 +274,11 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	}
 	/**
 	 * @deprecated
+	 * This method is deprecated. I recommend to store Foreign Keys just as integers
+	 * in models. Also try to consider an N:M relation instead, many things in our
+	 * daily lives look like N:1 but are in fact N:M. Chances are you have to
+	 * refactor anyway.
+	 *
 	 * Creates a 1 to Many Association
 	 * If the association fails it throws an exception.
 	 * @throws RedBean_Exception_SQL $failedToEnforce1toN
