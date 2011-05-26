@@ -47,19 +47,19 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * Indicates the field name to be used for primary keys;
 	 * default is 'id'.
 	 */
-  protected $idfield = "id";
+	protected $idfield = "id";
 
 	/**
 	 * @var string
 	 * default value to for blank field (passed to PK for auto-increment)
 	 */
-  protected $defaultValue = 'NULL';
-  
+	protected $defaultValue = 'NULL';
+
 	/**
 	 * @var string
 	 * character to escape keyword table/column names
 	 */
-  protected $quoteCharacter = '';
+	protected $quoteCharacter = '';
 	
 	/**
 	 * Do everything that needs to be done to format a table name.
@@ -95,9 +95,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return string sql
 	 */
-  protected function getInsertSuffix ($table) {
-    return "";
-  }
+  	protected function getInsertSuffix ($table) {
+    	return "";
+  	}
 	
 	/**
 	 * Returns the string identifying a table for a given type.
@@ -306,8 +306,19 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $rows;
 	}
 
-
-
+	/**
+	 * Creates a view by joining the specified types.
+	 * This function creates a view in fluid mode by left joining the constraints in the
+	 * given sequence to the reference table. The constraints or types have to be passed in
+	 * as a comma separated list.
+	 *
+	 * @throws Exception $exception 
+	 * @param  string $referenceTable reference table
+	 * @param  string $constraints    comma sep. list of types to be joined (ie. book,author)
+	 * @param  string $viewID		  name of the view
+	 *
+	 * @return bool
+	 */
 	public function createView($referenceTable, $constraints, $viewID) {
 		
 		$viewID = $this->safeTable($viewID,true);
@@ -344,10 +355,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return true;
 	}
 
-
-
-
-	
 	/**
 	 * Truncates a table
 	 *
@@ -372,7 +379,22 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return (int) $this->adapter->getCell($sql);
 	}
 
-
+	/**
+	 * Adds an index. Note that this function does not check whether the index already
+	 * exists. Only to be used in fluid mode by the OODB class.
+	 *
+	 * @param  string $table  name of the table that needs to get an indexed column
+	 * @param  string $name   desired name of the index
+	 * @param  string $column name of the column that needs to be indexed
+	 *
+	 * @return void
+	 */
+	public function addIndex($table, $name, $column) {
+		$table = $this->safeTable($table);
+		$name = preg_replace("/\W/","",$name);
+		$column = $this->safeColumn($column);
+		$this->adapter->exec("CREATE INDEX $name ON $table ($column) ");
+	}
 
 
 }

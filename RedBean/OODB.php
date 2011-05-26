@@ -173,6 +173,26 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		return in_array($this->writer->getFormattedTableName($table), $tables);
 	}
 
+
+	/**
+	 * Processes all column based build commands.
+	 * A build command is an additional instruction for the Query Writer. It is processed only when
+	 * a column gets created. The build command is often used to instruct the writer to write some
+	 * extra SQL to create indexes or constraints. Build commands are stored in meta data of the bean.
+	 * They are only for internal use, try to refrain from using them in your code directly.
+	 *
+	 * @param  string           $table    name of the table to process build commands for
+	 * @param  string           $property name of the property to process build commands for
+	 * @param  RedBean_OODBBean $bean     bean that contains the build commands
+	 *
+	 * @return void
+	 */
+	protected function processBuildCommands($table, $property, RedBean_OODBBean $bean) {
+		if ($inx = ($bean->getMeta("buildcommand.indexes"))) {
+			if (isset($inx[$property])) $this->writer->addIndex($table,$inx[$property],$property);
+		}
+	}
+
 	/**
 	 * Stores a bean in the database. This function takes a
 	 * RedBean_OODBBean Bean Object $bean and stores it
@@ -183,8 +203,10 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * RedBean runs in frozen mode it will throw an exception.
 	 * This function returns the primary key ID of the inserted
 	 * bean.
+	 *
 	 * @throws RedBean_Exception_Security $exception
-	 * @param RedBean_OODBBean $bean
+	 * @param RedBean_OODBBean $bean bean to store
+	 *
 	 * @return integer $newid
 	 */
 	public function store( RedBean_OODBBean $bean ) {
@@ -233,6 +255,9 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 					else {
 						//no it is not
 						$this->writer->addColumn($table, $p, $typeno);
+
+						//@todo: move build commands here... more practical
+						$this->processBuildCommands($table,$p,$bean);
 					}
 				}
 				//Okay, now we are sure that the property value will fit
@@ -241,6 +266,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				$updatevalues[] = array( "property"=>$p, "value"=>$v );
 			}
 		}
+
 		if (!$this->isFrozen && ($uniques = $bean->getMeta("buildcommand.unique"))) {
 			foreach($uniques as $unique) {
 				$this->writer->addUniqueIndex( $table, $unique );

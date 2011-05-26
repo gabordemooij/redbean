@@ -146,6 +146,8 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 	}
 
 
+
+
 	/**
 	 * Counts rows in a table.
 	 * Uses SQLite optimization for deleting all records (i.e. no WHERE)

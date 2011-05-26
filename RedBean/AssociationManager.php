@@ -94,7 +94,15 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$property1 = $bean1->getMeta("type") . "_id";
 		$property2 = $bean2->getMeta("type") . "_id";
 		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
-		$bean->setMeta( "buildcommand.unique" , array( array( $property1, $property2 )));
+
+		//add a build command for Unique Indexes
+		$bean->setMeta("buildcommand.unique" , array(array($property1, $property2)));
+
+		//add a build command for Single Column Index (to improve performance in case unqiue cant be used)
+		$indexName1 = "index_for_".$bean->getMeta("type")."_".$property1;
+		$indexName2 = "index_for_".$bean->getMeta("type")."_".$property2;
+		$bean->setMeta("buildcommand.indexes", array($property1=>$indexName1,$property2=>$indexName2));
+
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
 		$bean->setMeta("assoc.".$bean1->getMeta("type"),$bean1);
