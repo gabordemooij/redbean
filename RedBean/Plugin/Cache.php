@@ -288,6 +288,15 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 			return $beans;
 		}
 	}
+	
+	
+	public function convertToBeans( $type, $rows ){
+		$beans = $this->oodb->convertToBeans( $type, $rows );
+		foreach($beans as $bean) {
+			$this->putInCache( $bean );
+		}
+		return $beans;
+	}
 
 	/**
 	 * Dispenses a bean, just like oodb does
@@ -357,6 +366,8 @@ class RedBean_Plugin_Cache extends RedBean_Observable implements RedBean_Plugin,
 		}
 		return false;
 	}
+
+
 
 
 }
