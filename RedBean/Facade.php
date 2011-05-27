@@ -148,10 +148,10 @@ class R {
 	 * @return int 1
 	 */
 	public static function selectDatabase($key) {
-		if (self::$currentDB===$key) return 0;
+		if (self::$currentDB===$key) return false;
 		self::configureFacadeWithToolbox(self::$toolboxes[$key]);
 		self::$currentDB = $key;
-		return 1;
+		return true;
 	}
 
 
@@ -328,9 +328,9 @@ class R {
 	 * use a subquery instead.
 	 *
 	 * @param RedBean_OODBBean $bean the bean you have
-	 * @param string				$type the type of beans you want
-	 * @param string				$sql  SQL snippet for extra filtering
-	 * @param array				$val  values to be inserted in SQL slots
+	 * @param string           $type the type of beans you want
+	 * @param string           $sql  SQL snippet for extra filtering
+	 * @param array            $val  values to be inserted in SQL slots
 	 *
 	 * @return array $beans	beans yielded by your query.
 	 */
@@ -1079,7 +1079,7 @@ class RedBean_FacadeHelper {
 	 * @return void
 	 */
 	public function configureFacadeWithToolbox() {
-		throw new RedBean_Exception_Security("Only available on static R facade.");
+		throw new RedBean_Exception_Security("Only available on class R facade.");
 	}
 
 	/**

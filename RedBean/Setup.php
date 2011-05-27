@@ -75,13 +75,15 @@ class RedBean_Setup {
 	 * Optionally instead of using $dsn you may use an existing PDO connection.
 	 * Example: RedBean_Setup::kickstart($existingConnection, true);
 	 *
-	 * @param  string|PDO $dsn
-	 * @param  string $username
-	 * @param  string $password
+	 * @param  string|PDO $dsn      Database Connection String
+	 * @param  string     $username Username for database
+	 * @param  string     $password Password for database
+	 * @param  boolean    $frozen   Start in frozen mode?
+	 *
 	 * @return RedBean_ToolBox $toolbox
 	 */
 	public static function kickstart( $dsn, $username=NULL, $password=NULL, $frozen=false ) {
-
+		
 		if ($dsn instanceof PDO) {
 			$pdo = new RedBean_Driver_PDO($dsn);
 			$dsn = $pdo->getDatabaseType() ;
@@ -94,16 +96,17 @@ class RedBean_Setup {
 		$adapter = new RedBean_Adapter_DBAdapter( $pdo );
 
 		if (strpos($dsn,"pgsql")===0) {
-			$writer = new RedBean_QueryWriter_PostgreSQL( $adapter, $frozen );
+			$writer = new RedBean_QueryWriter_PostgreSQL( $adapter );
 		}
 		else if (strpos($dsn,"sqlite")===0) {
-			$writer = new RedBean_QueryWriter_SQLiteT( $adapter, $frozen );
+			$writer = new RedBean_QueryWriter_SQLiteT( $adapter );
 		}
 		else {
-			$writer = new RedBean_QueryWriter_MySQL( $adapter, $frozen );
+			$writer = new RedBean_QueryWriter_MySQL( $adapter );
 		}
 
 		$redbean = new RedBean_OODB( $writer );
+		if ($frozen) $redbean->freeze(true);
 		$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
 
 		//deliver everything back in a neat toolbox
@@ -199,7 +202,6 @@ class RedBean_Setup {
 	 */
 	public static function kickstartFrozen( $dsn, $username, $password ) {
 		$toolbox = self::kickstart($dsn, $username, $password, true);
-		$toolbox->getRedBean()->freeze(true);
 		return $toolbox;
 	}
 

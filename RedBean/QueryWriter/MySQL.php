@@ -150,11 +150,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * The Query Writer Constructor also sets up the database.
 	 *
 	 * @param RedBean_Adapter_DBAdapter $adapter adapter
-	 * @param boolean							$frozen  allow schema modif.?
-	 *
 	 *
 	 */
-	public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
+	public function __construct( RedBean_Adapter $adapter ) {
 		$this->adapter = $adapter;
 	}
 

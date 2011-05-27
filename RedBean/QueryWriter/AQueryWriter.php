@@ -216,7 +216,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
 			$p[] = " {$this->safeColumn($uv["property"])} = ? ";
-			//$v[]=strval( $uv["value"] );
 			$v[]=$uv["value"];
 		}
 		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
@@ -245,7 +244,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			}
 			$insertSQL = "INSERT INTO $table ( $idfield, ".implode(",",$insertcolumns)." ) VALUES ";
 			$insertSQL .= "( $default, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) $suffix";
-			$first=true;
 			
 			foreach($insertvalues as $i=>$insertvalue) {
 				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue, $i );

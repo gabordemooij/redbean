@@ -31,7 +31,7 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @param RedBean_Adapter_DBAdapter $adapter adapter
 	 */
-	public function __construct( RedBean_Adapter $adapter, $frozen = false ) {
+	public function __construct( RedBean_Adapter $adapter ) {
 		$this->adapter = $adapter;
 	}
 
