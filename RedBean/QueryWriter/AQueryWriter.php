@@ -391,7 +391,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$table = $this->safeTable($table);
 		$name = preg_replace("/\W/","",$name);
 		$column = $this->safeColumn($column);
-		$this->adapter->exec("CREATE INDEX $name ON $table ($column) ");
+		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
 	}
 
 
