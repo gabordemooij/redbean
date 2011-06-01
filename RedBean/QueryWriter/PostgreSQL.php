@@ -77,6 +77,10 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
    */
   protected $defaultValue = 'DEFAULT';
 
+	public function getTypeForID() {
+		return self::C_DATATYPE_INTEGER;
+	}
+
   /**
    * Returns the insert suffix SQL Snippet
    * 

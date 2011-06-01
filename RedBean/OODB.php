@@ -218,6 +218,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		//Does table exist? If not, create
 		if (!$this->isFrozen && !$this->tableExists($table)) {
 			$this->writer->createTable( $table );
+			$bean->setMeta("buildreport.flags.created",true);
 		}
 		if (!$this->isFrozen) {
 			$columns = $this->writer->getColumns($table) ;
@@ -235,6 +236,9 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 						if ($cast=="string") {
 							$typeno = $this->writer->scanType("STRING");
 						}
+						elseif ($cast=="id") {
+							$typeno = $this->writer->getTypeForID();
+						}
 						else {
 							throw new RedBean_Exception("Invalid Cast");
 						}
@@ -250,12 +254,13 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 						if ($typeno > $sqlt) {
 							//no, we have to widen the database column type
 							$this->writer->widenColumn( $table, $p, $typeno );
+							$bean->setMeta("buildreport.flags.widen",true);
 						}
 					}
 					else {
 						//no it is not
 						$this->writer->addColumn($table, $p, $typeno);
-
+						$bean->setMeta("buildreport.flags.addcolumn",true);
 						//@todo: move build commands here... more practical
 						$this->processBuildCommands($table,$p,$bean);
 					}

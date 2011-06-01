@@ -41,6 +41,8 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 */
 	protected $writer;
 
+	protected $flagUseConstraints = true;
+
 	/**
 	 * Constructor
 	 * 
@@ -50,6 +52,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
 		$this->writer = $tools->getWriter();
+		$this->toolbox = $tools;
 	}
 
 	/**
@@ -73,6 +76,10 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
 		$bean = $this->oodb->dispense($table);
 		return $this->associateBeans( $bean1, $bean2, $bean );
+	}
+
+	public function setUseConstraints( $trueFalse ) {
+		$this->flagUseConstraints = $trueFalse;
 	}
 
 
@@ -105,12 +112,23 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
+		
 		$bean->setMeta("assoc.".$bean1->getMeta("type"),$bean1);
 		$bean->setMeta("assoc.".$bean2->getMeta("type"),$bean2);
+		$bean->setMeta("cast.$property1","id");
+		$bean->setMeta("cast.$property2","id");
 		$bean->$property1 = $bean1->$idfield1;
 		$bean->$property2 = $bean2->$idfield2;
 		try {
-			return $this->oodb->store( $bean );
+			$id = $this->oodb->store( $bean );
+			//On creation, add constraints....
+			if ($this->flagUseConstraints &&
+				!$this->oodb->isFrozen() &&
+				$bean->getMeta("buildreport.flags.created")){
+				RedBean_Plugin_Constraint::setToolBox( $this->toolbox );
+				RedBean_Plugin_Constraint::addConstraint( $bean1, $bean2 );
+			}
+			return $id;
 		}
 		catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
@@ -118,6 +136,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 			))) throw $e;
 		}
+
 	}
 	
 	/**

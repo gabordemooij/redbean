@@ -156,6 +156,11 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$this->adapter = $adapter;
 	}
 
+
+	public function getTypeForID() {
+		return self::C_DATATYPE_UINT32;
+	}
+
 	/**
 	 * Returns all tables in the database.
 	 * 

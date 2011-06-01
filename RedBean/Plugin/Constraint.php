@@ -22,7 +22,7 @@ class RedBean_Plugin_Constraint {
 	private static $fkcache = array();
 
 	private static $toolbox = null;
-	public static function setToolBox( RedBean_ToolBox $toolbox ) {
+	public static function setToolBox( RedBean_ToolBox $toolbox ) { 
 		self::$toolbox = $toolbox;
 	}
 
@@ -87,7 +87,7 @@ class RedBean_Plugin_Constraint {
 			if ($writer instanceof RedBean_QueryWriter_PostgreSQL) {
 				return self::constraintPostgreSQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
 			}
-			if ($writer instanceof RedBean_QueryWriter_SQLite) {
+			if ($writer instanceof RedBean_QueryWriter_SQLite) { 
 				return self::constraintSQLite($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
 			}
 			if ($writer instanceof RedBean_QueryWriter_MySQL) {
@@ -148,18 +148,18 @@ class RedBean_Plugin_Constraint {
 
 		$rows = $adapter->get( $sql );
 		if (!count($rows)) {
-			
+
 			$table = $writer->getFormattedTableName($table);
 			$table1 = $writer->getFormattedTableName($table1);
 			$table2 = $writer->getFormattedTableName($table2);
 			
 			if (!$dontCache) self::$fkcache[ $fkCode ] = true;
-			$sql1 = "ALTER TABLE $table ADD CONSTRAINT
+			$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
 					  {$fkCode}a FOREIGN KEY ($property1)
-						REFERENCES $table1 (id) ON DELETE CASCADE ";
-			$sql2 = "ALTER TABLE $table ADD CONSTRAINT
+						REFERENCES \"$table1\" (id) ON DELETE CASCADE ";
+			$sql2 = "ALTER TABLE \"$table\" ADD CONSTRAINT
 					  {$fkCode}b FOREIGN KEY ($property2)
-						REFERENCES $table2 (id) ON DELETE CASCADE ";
+						REFERENCES \"$table2\" (id) ON DELETE CASCADE ";
 			$adapter->exec($sql1);
 			$adapter->exec($sql2);
 		}
@@ -205,19 +205,23 @@ class RedBean_Plugin_Constraint {
 		if ($writer->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
 			$writer->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 		}
+
+		$idfield1 = $writer->getIDField($table1);
+		$idfield2 = $writer->getIDField($table2);
 		
 		$table = $writer->getFormattedTableName($table);
 		$table1 = $writer->getFormattedTableName($table1);
 		$table2 = $writer->getFormattedTableName($table2);
-			
+
+
 		$sql = "
 			ALTER TABLE ".$writer->noKW($table)."
-			ADD FOREIGN KEY($property1) references $table1(id) ON DELETE CASCADE;
+			ADD FOREIGN KEY($property1) references `$table1`($idfield1) ON DELETE CASCADE;
 				  ";
 		$adapter->exec( $sql );
 		$sql ="
 			ALTER TABLE ".$writer->noKW($table)."
-			ADD FOREIGN KEY($property2) references $table2(id) ON DELETE CASCADE
+			ADD FOREIGN KEY($property2) references `$table2`($idfield2) ON DELETE CASCADE
 				  ";
 		$adapter->exec( $sql );
 		return true;
@@ -242,7 +246,10 @@ class RedBean_Plugin_Constraint {
 		$oodb = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$fkCode = "fk".md5($table.$property1.$property2);
-		
+
+		$idfield1 = $writer->getIDField($table1);
+		$idfield2 = $writer->getIDField($table2);
+
 		$table = $writer->getFormattedTableName($table);
 		$table1 = $writer->getFormattedTableName($table1);
 		$table2 = $writer->getFormattedTableName($table2);
@@ -252,7 +259,7 @@ class RedBean_Plugin_Constraint {
 			CREATE TRIGGER IF NOT EXISTS {$fkCode}a
 				BEFORE DELETE ON $table1
 				FOR EACH ROW BEGIN
-					DELETE FROM $table WHERE  $table.$property1 = OLD.id;
+					DELETE FROM $table WHERE  $table.$property1 = OLD.$idfield1;
 				END;
 				  ";
 
@@ -260,7 +267,7 @@ class RedBean_Plugin_Constraint {
 			CREATE TRIGGER IF NOT EXISTS {$fkCode}b
 				BEFORE DELETE ON $table2
 				FOR EACH ROW BEGIN
-					DELETE FROM $table WHERE $table.$property2 = OLD.id;
+					DELETE FROM $table WHERE $table.$property2 = OLD.$idfield2;
 				END;
 
 				  ";

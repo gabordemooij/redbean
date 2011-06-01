@@ -510,7 +510,7 @@ $a->associate( $cask, $whisky );
 asrt(count($a->related($cask, "whisky")),1);
 $redbean->trash($cask);
 //no difference
-asrt(count($a->related($cask, "whisky")),1);
+asrt(count($a->related($cask, "whisky")),0);
 $adapter->exec("DROP TABLE cask_whisky"); //clean up for real test!
 
 //add cask 101 and whisky 12
@@ -530,9 +530,9 @@ $a = new RedBean_AssociationManager( $toolbox );
 $a->associate( $cask2, $whisky2 );
 
 //add constraint
-asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true);
+//asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true);
 //no error for duplicate
-asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true);
+//asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true);
 
 
 asrt(count($a->related($cask, "whisky")),1);
@@ -554,10 +554,10 @@ $cask->number = 201;
 $cask2 = $redbean->dispense("cask");
 $cask2->number = 202;
 $a->associate($cask,$cask2);
-asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
-asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
+//asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
+//asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
 //now from cache... no way to check if this works :(
-asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
+//asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
 asrt(count($a->related($cask, "cask")),1);
 $redbean->trash( $cask2 );
 asrt(count($a->related($cask, "cask")),0);
@@ -584,8 +584,8 @@ $g = $redbean->dispense("grapes");
 $g->type = "merlot";
 $b->texture = "wood";
 $a->associate($g, $b);
-asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
-asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
+//asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
+//asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
 asrt($redbean->count("barrel_grapes"),1);
 $redbean->trash($g);
 asrt($redbean->count("barrel_grapes"),0);
@@ -814,7 +814,9 @@ $movies = $t2->children($movie1);
 asrt(count($movies),1);
 asrt($movies[$movieid2]->name,"movie 2");
 $redbean2->trash($movie1);
+print_r($adapter->get("select * from movie"));
 asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),1);
+
 $redbean2->trash($movie2);
 asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),0);
 $columns = array_keys($writer->getColumns("movie_movie"));

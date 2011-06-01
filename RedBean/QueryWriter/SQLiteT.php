@@ -65,6 +65,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_SQLite {
 	);
 
 
+	public function getTypeForID() {
+		return self::C_DATATYPE_INTEGER;
+	}
+
 	/**
 	 * Returns the MySQL Column Type Code (integer) that corresponds
 	 * to the given value type.
