@@ -523,21 +523,28 @@ $pdo->Execute("DROP TABLE IF EXISTS genre_movie");
 $pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
 $pdo->Execute("DROP TABLE IF EXISTS cask_cask");
 $pdo->Execute("DROP TABLE IF EXISTS `book_group`");
+$pdo->Execute("DROP TABLE IF EXISTS `book_genre`");
+
 $pdo->Execute("DROP TABLE IF EXISTS `author_book`");
 $pdo->Execute("DROP TABLE IF EXISTS `book_tag`");
 $pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
+$pdo->Execute("DROP TABLE IF EXISTS book_page");
 $pdo->Execute("DROP TABLE IF EXISTS page_page");
+
 $pdo->Execute("DROP TABLE IF EXISTS movie_movie");
 $pdo->Execute("DROP TABLE IF EXISTS page");
+
 $pdo->Execute("DROP TABLE IF EXISTS user");
 $pdo->Execute("DROP TABLE IF EXISTS movie");
 
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");
+
 $pdo->Execute("DROP TABLE IF EXISTS one");
 $pdo->Execute("DROP TABLE IF EXISTS special");
 $pdo->Execute("DROP TABLE IF EXISTS post");
+
 $pdo->Execute("DROP TABLE IF EXISTS association");
 $pdo->Execute("DROP TABLE IF EXISTS logentry");
 $pdo->Execute("DROP TABLE IF EXISTS admin");

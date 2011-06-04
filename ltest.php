@@ -814,7 +814,7 @@ $movies = $t2->children($movie1);
 asrt(count($movies),1);
 asrt($movies[$movieid2]->name,"movie 2");
 $redbean2->trash($movie1);
-print_r($adapter->get("select * from movie"));
+//print_r($adapter->get("select * from movie"));
 asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),1);
 
 $redbean2->trash($movie2);
