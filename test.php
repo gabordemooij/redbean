@@ -2651,18 +2651,29 @@ asrt($w->blah(),"yes!");
 //R::debug(1);
 testpack("Test Tagging");
 R::tag($post,"lousy,smart");
+R::$flagUseLegacyTaggingAPI = true;
 asrt(R::tag($post),"lousy,smart");
 R::tag($post,"clever,smart");
 asrt(R::tag($post),"smart,clever");
 R::tag($blog,array("smart","interesting"));
 asrt(R::tag($blog),"smart,interesting");
 try{
-R::tag($blog,array(";","interesting"));
-fail();
-}catch(RedBean_Exception $e){ pass(); }
-asrt(R::tag($blog),"smart,interesting");
+R::tag($blog,array("smart","interesting","lousy!"));
+pass();
+}catch(RedBean_Exception $e){ fail(); }
+asrt(R::tag($blog),"smart,interesting,lousy!");
+
+R::$flagUseLegacyTaggingAPI = false;
+asrt(implode(",",R::tag($blog)),"smart,interesting,lousy!");
+R::untag($blog,array("smart","interesting"));
+asrt(implode(",",R::tag($blog)),"lousy!");
+asrt(R::hasTag($blog,array("lousy!")),true);
+asrt(R::hasTag($blog,array("lousy!","smart")),true);
+asrt(R::hasTag($blog,array("lousy!","smart"),true),false);
+
 R::tag($blog, false);
-asrt(R::tag($blog),"");
+asrt(count(R::tag($blog)),0);
+
 
 
 

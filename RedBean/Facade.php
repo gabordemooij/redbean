@@ -809,8 +809,31 @@ class R {
 	public static function convertToBeans($type,$rows) {
 		return self::$redbean->convertToBeans($type,$rows);
 	}
-	
-	
+
+	public static $flagUseLegacyTaggingAPI = false;
+
+	public static function hasTag($bean, $tags, $all=false) {
+		$foundtags = R::tag($bean);
+		if (is_string($foundtags)) $foundtags = explode(",",$tags);
+		$same = array_intersect($tags,$foundtags);print_r($same);
+		if ($all) {
+			return (implode(",",$same)===implode(",",$tags));
+		}
+		return (bool) (count($same)>0);
+	}
+
+	public static function untag($bean,$tagList) {
+		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+		foreach($tags as $tag) {
+			$t = R::findOne("tag"," title = ? ",array($tag));
+			if ($t) {
+				R::unassociate( $bean, $t );
+			}
+
+		}
+
+	}
+
 	/**
 	 * Tags a bean or returns tags associated with a bean.
 	 * If $tagList is null or omitted this method will return a 
@@ -832,18 +855,20 @@ class R {
 			foreach($tags as $tag) {
 				$foundTags[] = $tag->title;
 			}
-			return implode(",",$foundTags);
+
+			if (self::$flagUseLegacyTaggingAPI) return implode(",",$foundTags);
+			return $foundTags;
 		}
 	
 		
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 
-		if (is_array($tags)) {
+		/*if (is_array($tags)) {
 			foreach($tags as $tag) {
 				if (preg_match("/\W/",$tag))
 					throw new RedBean_Exception("Invalid Tag. Tags may only contain alpha-numeric characters");
 			}
-		}
+		}*/
 		
 
 		R::clearRelations( $bean, "tag" );
