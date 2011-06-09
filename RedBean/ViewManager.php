@@ -1,16 +1,24 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
- * User: prive
- * Date: 03-04-11
- * Time: 15:17
- * To change this template use File | Settings | File Templates.
+ * @name RedBean View Manager
+ * @file RedBean
+ * @author Gabor de Mooij and the RedBean Team
+ * @copyright Gabor de Mooij (c)
+ * @license BSD
+ *
+ * The ViewManager creates on the fly views for easy querying.
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
  */
  
 class RedBean_ViewManager extends RedBean_CompatManager {
 
 	/**
 	 * Specify what database systems are supported by this class.
+	 *
 	 * @var array $databaseSpecs
 	 */
 	protected $supportedSystems = array(
@@ -46,15 +54,20 @@ class RedBean_ViewManager extends RedBean_CompatManager {
 		$this->writer = $tools->getWriter();
 	}
 
-
+	/**
+	 * Creates a view with name $viewID based on $refType bean type
+	 * and then left-joining the specified types in $types in the given
+	 * order.
+	 *
+	 * @param  string $viewID  desired name of the view
+	 * @param  string $refType first bean type to be used as base
+	 * @param  array  $types   array with types to be left-joined in view
+	 *
+	 * @return boolean $success whether we created a new view (false if already exists)
+	 */
 	public function createView( $viewID, $refType, $types ) {
-
-		
 		if ($this->oodb->isFrozen()) return false;
-		
 		$tables = array_flip( $this->writer->getTables() );
-		
-
 		$refTable = $refType; //$this->writer->safeTable($refType, true);
 		$currentTable = $refTable;
 		foreach($types as $t) {
@@ -63,7 +76,7 @@ class RedBean_ViewManager extends RedBean_CompatManager {
 			$connection = implode("_", $connection);
 			$connectionTable = $this->writer->safeTable($connection,true);
 			if (isset($tables[$connectionTable])) {
-			//this connection exists
+				//this connection exists
 				$srcPoint = $this->writer->safeTable($connection).".".$currentTable."_id"; //i.e. partic_project.project_id
 				$dstPoint = $this->writer->safeTable($currentTable).".".$this->writer->safeColumn($this->writer->getIDField($currentTable)); //i.e. project.id
 				$joins[$connection] = array($srcPoint,$dstPoint);

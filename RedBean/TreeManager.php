@@ -58,8 +58,9 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 	/**
 	 * Checks whether types of beans match. If the types do not match
 	 * this method will throw a RedBean_Exception_Security exception.
-	 * @param RedBean_OODBBean $bean1
-	 * @param RedBean_OODBBean $bean2
+	 *
+	 * @param RedBean_OODBBean $bean1 first bean
+	 * @param RedBean_OODBBean $bean2 second bean
 	 */
 	private function equalTypes( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 ) {
 		if ($bean1->getMeta("type")!==$bean2->getMeta("type")) {
@@ -70,8 +71,9 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 
 	/**
 	 * Attaches the specified child node to the specified parent node.
-	 * @param RedBean_OODBBean $parent
-	 * @param RedBean_OODBBean $child
+	 *
+	 * @param RedBean_OODBBean $parent parent
+	 * @param RedBean_OODBBean $child  child
 	 */
 	public function attach( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
 
@@ -86,8 +88,9 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 	/**
 	 * Returns all the nodes that have been attached to the specified
 	 * parent node.
-	 * @param RedBean_OODBBean $parent
-	 * @return array $childObjects
+	 * @param RedBean_OODBBean $parent parent
+	 *
+	 * @return array $childObjects child beans
 	 */
 	public function children( RedBean_OODBBean $parent ) {
 
@@ -104,11 +107,16 @@ class RedBean_TreeManager extends RedBean_CompatManager {
 		catch(RedBean_Exception_SQL $e) {
 			return array();
 		}
-		//return $this->oodb->batch($parent->getMeta("type"),$ids	);
 		return $this->oodb->convertToBeans( $type, $rows );
 	}
 
-
+	/**
+	 * Convenience method to get hold of the parent bean directly.
+	 *
+	 * @param RedBean_OODBBean $bean child bean
+	 *
+	 * @return RedBean_OODBBean $parentBean the parent bean
+	 */
 	public function getParent( RedBean_OODBBean $bean ) {
 		return $this->oodb->load( $bean->getMeta("type"), (int)$bean->parent_id);
 	}

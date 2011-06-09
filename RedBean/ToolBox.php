@@ -43,10 +43,12 @@ class RedBean_ToolBox {
 	 * RedBean_QueryWriter $writer. It stores these objects inside and acts as
 	 * a micro service locator. You can pass the toolbox to any object that needs
 	 * one of the RedBean core objects to interact with.
-	 * @param RedBean_OODB $oodb
-	 * @param RedBean_Adapter_DBAdapter $adapter
-	 * @param RedBean_QueryWriter $writer
-	 * return RedBean_ToolBox $toolbox
+	 *
+	 * @param RedBean_OODB              $oodb    Object Database
+	 * @param RedBean_Adapter_DBAdapter $adapter Adapter
+	 * @param RedBean_QueryWriter       $writer  Writer
+	 *
+	 * return RedBean_ToolBox $toolbox Toolbox
 	 */
 	public function __construct( RedBean_OODB $oodb, RedBean_Adapter $adapter, RedBean_QueryWriter $writer ) {
 		$this->oodb = $oodb;
@@ -62,7 +64,8 @@ class RedBean_ToolBox {
 	 * Returns the QueryWriter; normally you do not use this object but other
 	 * object might want to use the default RedBean query writer to be
 	 * database independent.
-	 * @return RedBean_QueryWriter $writer
+	 *
+	 * @return RedBean_QueryWriter $writer writer
 	 */
 	public function getWriter() {
 		return $this->writer;
@@ -75,7 +78,8 @@ class RedBean_ToolBox {
 	 * Retruns the RedBean OODB Core object. The RedBean OODB object is
 	 * the ultimate core of Redbean. It provides the means to store and load
 	 * beans. Extract this object immediately after invoking a kickstart method.
-	 * @return RedBean_OODB $oodb
+	 *
+	 * @return RedBean_OODB $oodb Object Database
 	 */
 	public function getRedBean() {
 		return $this->oodb;
@@ -87,7 +91,8 @@ class RedBean_ToolBox {
 	 * any object that needs one of these objects to function properly.
 	 * Returns the adapter. The Adapter can be used to perform queries
 	 * on the database directly.
-	 * @return RedBean_Adapter_DBAdapter $adapter
+	 *
+	 * @return RedBean_Adapter_DBAdapter $adapter Adapter
 	 */
 	public function getDatabaseAdapter() {
 		return $this->adapter;

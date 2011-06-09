@@ -2,8 +2,8 @@
 /**
  * SimpleModel
  * @file 		RedBean/SimpleModel.php
- * @description		Part of FUSE
- * @author              Gabor de Mooij
+ * @description	Part of FUSE
+ * @author      Gabor de Mooij and the RedBeanPHP Team
  * @license		BSD
  *
  *
@@ -22,7 +22,8 @@ class RedBean_SimpleModel {
 	/**
 	 * Used by FUSE: the ModelHelper class to connect a bean to a model.
 	 * This method loads a bean in the model.
-	 * @param RedBean_OODBBean $bean
+	 *
+	 * @param RedBean_OODBBean $bean bean
 	 */
 	public function loadBean( RedBean_OODBBean $bean ) {
 		$this->bean = $bean;
@@ -31,8 +32,10 @@ class RedBean_SimpleModel {
 	/**
 	 * Magic Getter to make the bean properties available from
 	 * the $this-scope.
-	 * @param string $prop
-	 * @return mixed $propertyValue
+	 *
+	 * @param string $prop property
+	 *
+	 * @return mixed $propertyValue value
 	 */
 	public function __get( $prop ) {
 		return $this->bean->$prop;
@@ -40,14 +43,23 @@ class RedBean_SimpleModel {
 
 	/**
 	 * Magic Setter
-	 * @param string $prop
-	 * @param mixed $value
+	 *
+	 * @param string $prop  property
+	 * @param mixed  $value value
 	 */
 	public function __set( $prop, $value ) {
 		$this->bean->$prop = $value;
 	}
 
 
+	/**
+	 * Has Properties, returns a list of properties that has not been
+	 * set on the bean.
+	 *
+	 * @param  string $list list to check; comma separated
+	 *
+	 * @return array $listOfMissing list of missing properties
+	 */
 	protected function __hasProperties( $list ) {
 		$missing = array();
 		$properties = explode(",", $list);
@@ -59,10 +71,22 @@ class RedBean_SimpleModel {
 		return $missing;
 	}
 
+	/**
+	 * Isset implementation
+	 *
+	 * @param  string $key key
+	 *
+	 * @return
+	 */
 	public function __isset($key) {
 		return (isset($this->bean->$key));
 	}
 
+	/**
+	 * 
+	 * @param  $type
+	 * @return mixed
+	 */
 	protected function getConnected($type) {
 		return $this->bean->getMeta("assoc.$type");
 	}
