@@ -810,18 +810,50 @@ class R {
 		return self::$redbean->convertToBeans($type,$rows);
 	}
 
+	/**
+	 * This static property can be set to force the system to return
+	 * comma separated lists as in legacy versions.
+	 * 
+	 * @var boolean
+	 */
 	public static $flagUseLegacyTaggingAPI = false;
 
+	/**
+	 * Tests whether a bean has been associated with one ore more
+	 * of the listed tags. If the third parameter is TRUE this method
+	 * will return TRUE only if all tags that have been specified are indeed
+	 * associated with the given bean, otherwise FALSE.
+	 * If the third parameter is FALSE this
+	 * method will return TRUE if one of the tags matches, FALSE if none
+	 * match.
+	 *
+	 * @static
+	 * @param  RedBean_OODBBean $bean bean to check for tags
+	 * @param  array            $tags list of tags
+	 * @param  boolean          $all  whether they must all match or just some
+	 *
+	 * @return boolean $didMatch Whether the bean has been assoc. with the tags
+	 */
 	public static function hasTag($bean, $tags, $all=false) {
 		$foundtags = R::tag($bean);
 		if (is_string($foundtags)) $foundtags = explode(",",$tags);
-		$same = array_intersect($tags,$foundtags);print_r($same);
+		$same = array_intersect($tags,$foundtags);
 		if ($all) {
 			return (implode(",",$same)===implode(",",$tags));
 		}
 		return (bool) (count($same)>0);
 	}
 
+	/**
+	 * Removes all sepcified tags from the bean. The tags specified in
+	 * the second parameter will no longer be associated with the bean.
+	 *
+	 * @static
+	 * @param  RedBean_OODBBean $bean    tagged bean
+	 * @param  array            $tagList list of tags (names)
+	 *
+	 * @return void
+	 */
 	public static function untag($bean,$tagList) {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		foreach($tags as $tag) {
@@ -829,9 +861,7 @@ class R {
 			if ($t) {
 				R::unassociate( $bean, $t );
 			}
-
 		}
-
 	}
 
 	/**
@@ -855,27 +885,16 @@ class R {
 			foreach($tags as $tag) {
 				$foundTags[] = $tag->title;
 			}
-
 			if (self::$flagUseLegacyTaggingAPI) return implode(",",$foundTags);
 			return $foundTags;
 		}
-	
-		
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 
-		/*if (is_array($tags)) {
-			foreach($tags as $tag) {
-				if (preg_match("/\W/",$tag))
-					throw new RedBean_Exception("Invalid Tag. Tags may only contain alpha-numeric characters");
-			}
-		}*/
-		
+		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 
 		R::clearRelations( $bean, "tag" );
 		if ($tagList===false) return;
 		
 		foreach($tags as $tag) {
-			
 			$t = R::findOne("tag"," title = ? ",array($tag));
 			if (!$t) {
 				$t = R::dispense("tag");
@@ -884,7 +903,6 @@ class R {
 			}
 			R::associate( $bean, $t ); 
 		}
-
 	}
 
 	/**
@@ -960,12 +978,8 @@ class R {
 		self::$redbean->addEventListener("after_delete", $helper );
 		self::$redbean->addEventListener("after_update", $helper );
 		self::$redbean->addEventListener("dispense", $helper );
-		
-
 		return $oldTools;
 	}
-
-
 
 
 	/**
