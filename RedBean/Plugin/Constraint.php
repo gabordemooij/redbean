@@ -94,7 +94,7 @@ class RedBean_Plugin_Constraint {
 				return self::constraintMySQL($toolbox, $table, $table1, $table2, $property1, $property2, $dontCache);
 			}
 		}
-		catch(RedBean_Exception_SQL $e) {
+		catch(RedBean_Exception_SQL $e) { 
 			if (!$writer->sqlStateIn($e->getSQLState(),
 			array(
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,

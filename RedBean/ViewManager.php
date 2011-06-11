@@ -67,30 +67,33 @@ class RedBean_ViewManager extends RedBean_CompatManager {
 	 */
 	public function createView( $viewID, $refType, $types ) {
 		if ($this->oodb->isFrozen()) return false;
+		$history = array();
 		$tables = array_flip( $this->writer->getTables() );
 		$refTable = $refType; //$this->writer->safeTable($refType, true);
 		$currentTable = $refTable;
+		$history[$refType] = $refType;
 		foreach($types as $t) {
-			$connection = array($t,$currentTable);
-			sort($connection);
-			$connection = implode("_", $connection);
-			$connectionTable = $this->writer->safeTable($connection,true);
-			if (isset($tables[$connectionTable])) {
-				//this connection exists
-				$srcPoint = $this->writer->safeTable($connection).".".$currentTable."_id"; //i.e. partic_project.project_id
-				$dstPoint = $this->writer->safeTable($currentTable).".".$this->writer->safeColumn($this->writer->getIDField($currentTable)); //i.e. project.id
-				$joins[$connection] = array($srcPoint,$dstPoint);
-				//now join the type
-				$srcPoint = $this->writer->safeTable($connection).".".$t."_id";
-				$dstPoint = $this->writer->safeTable($t).".".$this->writer->safeColumn($this->writer->getIDField($t));
-				$joins[$t] = array($srcPoint,$dstPoint);
+			if (!isset($history[$t])){ 
+				$history[$t] = $t;
+				$connection = array($t,$currentTable);
+				sort($connection);
+				$connection = implode("_", $connection);
+				$connectionTable = $this->writer->safeTable($connection,true);
+				if (isset($tables[$connectionTable])) {
+					//this connection exists
+					$srcPoint = $this->writer->safeTable($connection).".".$currentTable."_id"; //i.e. partic_project.project_id
+					$dstPoint = $this->writer->safeTable($currentTable).".".$this->writer->safeColumn($this->writer->getIDField($currentTable)); //i.e. project.id
+					$joins[$connection] = array($srcPoint,$dstPoint);
+					//now join the type
+					$srcPoint = $this->writer->safeTable($connection).".".$t."_id";
+					$dstPoint = $this->writer->safeTable($t).".".$this->writer->safeColumn($this->writer->getIDField($t));
+					$joins[$t] = array($srcPoint,$dstPoint);
 
-				//now set the new refTable
-				$currentTable=$t;
+				}
 			}
-
+			//now set the new refTable
+			$currentTable=$t;
 		}
-		
 		return (boolean) $this->writer->createView($refType,$joins,$viewID);
 	}
 

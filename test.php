@@ -1731,14 +1731,34 @@ $whisky = $redbean->dispense("whisky");
 $cask->number = 100;
 $whisky->age = 10;
 $a = new RedBean_AssociationManager( $toolbox );
+$a->setUseConstraints(false);
+$a->associate( $cask, $whisky );
+//first test baseline behaviour, dead record should remain --- ohno, not now assoc uses fks!
+asrt(count($a->related($cask, "whisky")),1);
+$redbean->trash($cask);
+//no difference
+asrt(count($a->related($cask, "whisky")),1);
+$adapter->exec("DROP TABLE cask_whisky");
+//before we do this, trash whisky!
+$redbean->trash($whisky);
+
+$cask = $redbean->dispense("cask");
+$whisky = $redbean->dispense("whisky");
+$cask->number = 100;
+$whisky->age = 10;
+
+$a->setUseConstraints(true);
+//$adapter->getDatabase()->SethMode(1);
 $a->associate( $cask, $whisky );
 //first test baseline behaviour, dead record should remain --- ohno, not now assoc uses fks!
 asrt(count($a->related($cask, "whisky")),1);
 $redbean->trash($cask);
 //no difference
 asrt(count($a->related($cask, "whisky")),0);
-$adapter->exec("TRUNCATE cask_whisky"); //clean up for real test!
 
+
+//$adapter->exec("TRUNCATE cask_whisky"); //clean up for real test!
+//exit;
 //add cask 101 and whisky 12
 $cask = $redbean->dispense("cask");
 $whisky = $redbean->dispense("whisky");

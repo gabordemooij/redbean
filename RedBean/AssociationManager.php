@@ -125,6 +125,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			if ($this->flagUseConstraints &&
 				!$this->oodb->isFrozen() &&
 				$bean->getMeta("buildreport.flags.created")){
+				$bean->setMeta("buildreport.flags.created",0); 
 				RedBean_Plugin_Constraint::setToolBox( $this->toolbox );
 				RedBean_Plugin_Constraint::addConstraint( $bean1, $bean2 );
 			}
