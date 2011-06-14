@@ -394,8 +394,22 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
 	}
 
+	/**
+	 * This is a utility service method publicly available.
+	 * It allows you to check whether you can safely treat an certain value as an integer by
+	 * comparing an int-valled string representation with a default string casted string representation and
+	 * a ctype-digit check. It does not take into account numerical limitations (X-bit INT), just that it
+	 * can be treated like an INT. This is useful for binding parameters to query statements like
+	 * Query Writers and drivers can do.
+	 *
+	 * @static
+	 *
+	 * @param  string $value string representation of a certain value
+	 *
+	 * @return boolean $value boolean result of analysis
+	 */
 	public static function canBeTreatedAsInt( $value ) {
-		return (strval($value)===strval(intval($value)));
+		return (boolean) (ctype_digit($value) && strval($value)===strval(intval($value)));
 	}
 
 
