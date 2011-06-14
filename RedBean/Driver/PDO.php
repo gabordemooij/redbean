@@ -169,6 +169,30 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 
+	protected function bindParams($s,$aValues) {
+		foreach($aValues as $key=>&$value) {
+			if (is_integer($key)) {
+				if (RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value < 2147483648) {
+					$s->bindParam($key+1,$value,PDO::PARAM_INT);
+				}
+				else {
+					$s->bindParam($key+1,$value,PDO::PARAM_STR);
+				}
+			}
+			else {
+
+				if (RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) &&  $value < 2147483648) {
+					$s->bindParam($key,$value,PDO::PARAM_INT);
+				}
+				else { 
+					$s->bindParam($key,$value,PDO::PARAM_STR);
+				}
+			}
+
+		}
+	}
+
+
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.
 	 *
@@ -197,18 +221,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				$s->execute($aValues);
 			}
 			else {
-				foreach($aValues as $key=>&$value) {
-					if (is_integer($key)) {
-						if (ctype_digit(strval($value)) && $value < 2147483648) { $s->bindParam($key+1,$value,PDO::PARAM_INT); }
-						else $s->bindParam($key+1,$value,PDO::PARAM_STR);
-					}
-					else {
+				$this->bindParams( $s, $aValues );
 
-						if (ctype_digit(strval($value)) &&  $value < 2147483648) $s->bindParam($key,$value,PDO::PARAM_INT);
-						else $s->bindParam($key,$value,PDO::PARAM_STR);
-					}
-
-				}
 				$s->execute();
 			}
 			
@@ -360,19 +374,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			}
 			else {
 			
-				foreach($aValues as $key=>&$value) {
-
-					if (is_integer($key)) {
-						if (ctype_digit(strval($value)) && $value < 2147483648) { $s->bindParam($key+1,$value,PDO::PARAM_INT); }
-						else $s->bindParam($key+1,$value,PDO::PARAM_STR);
-					}
-					else {
-
-						if (ctype_digit(strval($value)) &&  $value < 2147483648) $s->bindParam($key,$value,PDO::PARAM_INT);
-						else $s->bindParam($key,$value,PDO::PARAM_STR);
-					}
-
-				}
+				$this->bindParams( $s, $aValues );
 
 
 				$s->execute();

@@ -394,5 +394,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
 	}
 
+	public static function canBeTreatedAsInt( $value ) {
+		return (strval($value)===strval(intval($value)));
+	}
+
 
 }

@@ -256,7 +256,7 @@ class RedBean_Plugin_Constraint {
 			
 		
 		$sql1 = "
-			CREATE TRIGGER IF NOT EXISTS {$fkCode}a
+			 CREATE TRIGGER IF NOT EXISTS {$fkCode}a
 				BEFORE DELETE ON $table1
 				FOR EACH ROW BEGIN
 					DELETE FROM $table WHERE  $table.$property1 = OLD.$idfield1;

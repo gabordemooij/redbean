@@ -123,8 +123,8 @@ class ObserverMock implements RedBean_Observer {
 }
 
 
-$nullWriter = new RedBean_QueryWriter_NullWriter();
-$redbean = new RedBean_OODB( $nullWriter );
+//$nullWriter = new RedBean_QueryWriter_NullWriter();
+//$redbean = new RedBean_OODB( $nullWriter );
 /*
 //Section A: Config Testing
 testpack("CONFIG TEST");
@@ -498,7 +498,6 @@ $adapter = $toolbox->getDatabaseAdapter();
 
 $adapter->exec("DROP TRIGGER IF EXISTS fkb8317025deb6e03fc05abaabc748a503a ");
 $adapter->exec("DROP TRIGGER IF EXISTS fkb8317025deb6e03fc05abaabc748a503b ");
-
 //add cask 101 and whisky 12
 $cask = $redbean->dispense("cask");
 $whisky = $redbean->dispense("whisky");
@@ -1586,6 +1585,7 @@ R::exec(" drop table if exists prefix_band_bandmember ");
 
 
 
+
 list( $mickey, $donald, $goofy ) = R::dispense("musician",3);
 list( $vocals1, $vocals2, $keyboard1, $drums, $vocals3, $keyboard2 ) = R::dispense("bandmember",6);
 list( $band1, $band2 ) = R::dispense("band",2);
@@ -1685,6 +1685,39 @@ $tf2 = new Fm2();
 R::$writer->setBeanFormatter($tf2);
 testViews("prefix_");
 
+
+
+testpack("wipe and constraints");
+
+R::exec(" drop table if exists page ");
+R::exec(" drop table if exists book ");
+R::exec(" drop table if exists book_page ");
+R::exec(" drop table if exists prefix_page ");
+R::exec(" drop table if exists prefix_book ");
+R::exec(" drop table if exists prefix_book_page ");
+
+
+
+R::exec("DROP TRIGGER IF EXISTS fkc2d4c7ea9e656a361bc08c9d072914cca ");
+R::exec("DROP TRIGGER IF EXISTS fkc2d4c7ea9e656a361bc08c9d072914ccb ");
+
+$page1 = R::dispense("page");
+$book1 = R::dispense("book");
+$page2 = R::dispense("page");
+$book2 = R::dispense("book");
+$page1->name = "page1";
+$page2->name = "page2";
+$book1->name = "book1";
+$book2->name = "book2";
+
+R::associate($book1,$page1);
+R::associate($book2,$page2);
+//exit;
+asrt(count( R::getAll("select * from prefix_book_page")),2);
+R::trash($book1);
+asrt(count( R::getAll("select * from prefix_book_page")),1);
+R::wipe("book");
+asrt(count(R::getAll("select * from prefix_book_page")),0);
 
 
 

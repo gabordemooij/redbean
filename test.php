@@ -134,8 +134,8 @@ function ID($id) {
 	return R::$writer->getIDField($table);
 }
 
-$nullWriter = new RedBean_QueryWriter_NullWriter();
-$redbean = new RedBean_OODB( $nullWriter );
+//$nullWriter = new RedBean_QueryWriter_MySQL();
+$redbean = $toolbox->getRedBean(); //new RedBean_OODB( $nullWriter );
 $linker = new RedBean_LinkManager( $toolbox );
 
 

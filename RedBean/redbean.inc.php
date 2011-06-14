@@ -102,7 +102,7 @@ require($dir."Plugin/Optimizer/Shrink.php");
 require($dir."Plugin/BeanMachine.php");
 require($dir."Plugin/QueryLogger.php");
 
-require($dir."QueryWriter/NullWriter.php");
+
 
 /* Developer Comfort */
 require($dir."UnitOfWork.php");
