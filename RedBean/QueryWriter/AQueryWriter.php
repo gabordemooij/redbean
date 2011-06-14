@@ -409,7 +409,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return boolean $value boolean result of analysis
 	 */
 	public static function canBeTreatedAsInt( $value ) {
-		return (boolean) (ctype_digit($value) && strval($value)===strval(intval($value)));
+		return (boolean) (ctype_digit(strval($value)) && strval($value)===strval(intval($value)));
 	}
 
 

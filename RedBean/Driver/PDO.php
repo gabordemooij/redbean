@@ -172,7 +172,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	protected function bindParams($s,$aValues) {
 		foreach($aValues as $key=>&$value) {
 			if (is_integer($key)) {
-				if (RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value < 2147483648) {
+				if (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value < 2147483648) {
 					$s->bindParam($key+1,$value,PDO::PARAM_INT);
 				}
 				else {
@@ -181,7 +181,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			}
 			else {
 
-				if (RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) &&  $value < 2147483648) {
+				if (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) &&  $value < 2147483648) {
 					$s->bindParam($key,$value,PDO::PARAM_INT);
 				}
 				else { 
@@ -217,14 +217,11 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				$s = $this->pdo->prepare($sql);
 			}
 
-			if ($this->flagUseStringOnlyBinding) {
-				$s->execute($aValues);
-			}
-			else {
-				$this->bindParams( $s, $aValues );
 
-				$s->execute();
-			}
+			$this->bindParams( $s, $aValues );
+
+			$s->execute();
+
 			
 		  if ($s->columnCount()) {
 		    $this->rs = $s->fetchAll();
@@ -369,16 +366,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				$s = $this->pdo->prepare($sql);
 			}
 			
-			if ($this->flagUseStringOnlyBinding) {
-				$s->execute($aValues);
-			}
-			else {
-			
-				$this->bindParams( $s, $aValues );
+
+			$this->bindParams( $s, $aValues );
 
 
-				$s->execute();
-			}
+			$s->execute();
+
 
 			$this->affected_rows=$s->rowCount();
 			return $this->affected_rows;
