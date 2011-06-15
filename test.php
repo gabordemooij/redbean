@@ -878,35 +878,6 @@ asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),0);
 $columns = array_keys($writer->getColumns("movie_movie"));
 asrt(in_array("movie_movie_id",$columns),true);
 
-//test locking
-$logger = new RedBean_Plugin_ChangeLogger( $toolbox );
-$redbean->addEventListener( "open", $logger );
-$redbean->addEventListener( "update", $logger);
-$redbean->addEventListener( "delete", $logger);
-
-testpack("Test RedBean Locking: Change Logger method ");
-$observers = RedBean_Setup::getAttachedObservers();
-$page = $redbean->dispense("page");
-$page->name = "a page";
-$id = $redbean->store( $page );
-$page = $redbean->load("page", $id);
-$otherpage = $redbean->load("page", $id);
-asrt(((bool)$page->getMeta("opened")),true);
-asrt(((bool)$otherpage->getMeta("opened")),true);
-try {
-	$redbean->store( $page );
-	pass();
-}catch(Exception $e) {
-	fail();
-}
-try {
-	$redbean->store( $otherpage );
-	fail();
-}catch(Exception $e) {
-	pass();
-}
-asrt(count($logger->testingOnly_getStash()),0); // Stash empty?
-
 testpack("Test Association ");
 $rb = $redbean;
 $testA = $rb->dispense( 'testA' );
@@ -1056,85 +1027,6 @@ asrt(count($a->related($pageMore, "page")),1);
 asrt(count($a->related($pageEvenMore, "page")),1);
 asrt(count($a->related($pageOther, "page")),0);
 
-testpack("Test Locking with Assoc");
-$page = $redbean->dispense("page");
-$user = $redbean->dispense("page");
-$id = $redbean->store($page);
-$pageII = $redbean->load("page", $id);
-$redbean->store($page);
-try {
-	$redbean->store($pageII);
-	fail();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	pass();
-}
-try {
-	$a->associate($pageII,$user);
-	fail();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	pass();
-}
-try {
-	$a->unassociate($pageII,$user);
-	fail();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	pass();
-}
-try {
-	$a->clearRelations($pageII, "user");
-	fail();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	pass();
-}
-try {
-	$redbean->store($page);
-	pass();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	fail();
-}
-try {
-	$a->associate($page,$user);
-	pass();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	fail();
-}
-try {
-	$a->unassociate($page,$user);
-	pass();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	fail();
-}
-try {
-	$a->clearRelations($page, "user");
-	pass();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	fail();
-}
-$pageII = $redbean->load("page",$pageII->id); //reload will help
-try {
-	$redbean->store($pageII);
-	pass();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	fail();
-}
-try {
-	$a->associate($pageII,$user);
-	pass();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	fail();
-}
-try {
-	$a->unassociate($pageII,$user);
-	pass();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	fail();
-}
-try {
-	$a->clearRelations($pageII, "user");
-	pass();
-}catch(RedBean_Exception_FailedAccessBean $e) {
-	fail();
-}
 
 //Test whether we can pre-open, or prelock multiple beans at once and
 //if the logger fires less queries
@@ -1147,39 +1039,7 @@ class QueryCounter implements RedBean_Observer {
 }
 $querycounter = new QueryCounter;
 $observers = RedBean_Setup::getAttachedObservers();
-asrt(($logger instanceof RedBean_Observer),true);
-$pagea = $redbean->dispense("page");
-$pageb = $redbean->dispense("page");
-$pagec = $redbean->dispense("page");
-$paged = $redbean->dispense("page");
-$redbean->store($pagea);
-$redbean->store($pageb);
-$redbean->store($pagec);
-$redbean->store($paged);
-$a->associate($pagea, $pageb);
-$a->associate($pagea, $pagec);
-$a->associate($pagea, $paged);
-$ids = $a->related($pagea,"page");
-$adapter->exec("TRUNCATE __log");
 $adapter->addEventListener("sql_exec", $querycounter);
-asrt($querycounter->counter,0); //confirm counter works
-asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),0);
-asrt($querycounter->counter,1); //confirm counter works
-$querycounter->counter=0;
-$logger->preLoad("page",$ids);
-asrt($querycounter->counter,2); //confirm counter works
-asrt(count($ids),3);
-asrt(count($logger->testingOnly_getStash()),3); //stash filled with ids
-asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),4);
-$querycounter->counter=0;
-$pages = $redbean->batch("page",$ids);
-asrt($querycounter->counter,1);
-$querycounter->counter=0;
-$pages = $redbean->batch("page",$ids);
-asrt($querycounter->counter,4); //compare with normal batch without preloading
-//did we save queries (3 is normal, 1 is with preloading)
-asrt(intval($adapter->getCell("SELECT count(*) FROM __log")),7);
-asrt(count($logger->testingOnly_getStash()),0); //should be used up
 
 testpack("Test RedBean Finder Plugin*");
 asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE '%more%' ")),3);
@@ -1371,10 +1231,6 @@ pass();
 
 
 testpack("Test Frozen");
-
-
-
-
 $redbean->freeze( true );
 $page = $redbean->dispense("page");
 $page->sections = 10;
@@ -1420,7 +1276,7 @@ $a->clearRelations($page,"page");
 $items = RedBean_Plugin_Finder::where("page", "1");
 $redbean->trash($page);
 $redbean->freeze( false );
-asrt(count($logger->grep("select"))>0,true);
+asrt(count($logger->grep("SELECT"))>0,true);
 asrt(count($logger->grep("describe"))<1,true);
 
 
@@ -1593,56 +1449,6 @@ $redbean->store($special);
 $redbean->store($special);
 $cols = $writer->getColumns("special");
 asrt(($cols["datetime"]!="datetime"),false);
-
-
-testpack("Test RedBean Extended Journaling with manual Opened modification");
-$page = $redbean->dispense("page");
-$id = $redbean->store($page);
-$page = $redbean->load("page",$id);
-$page->name = "antique one";
-$redbean->store($page);
-$newpage = $redbean->dispense("page");
-$newpage->id  = $id;
-$newpage->name = "new one";
-try {
-	$redbean->store($newpage);
-	fail();
-}catch(Exception $e) {
-	pass();
-}
-$newpage = $redbean->dispense("page");
-$newpage->id  = $id;
-$newpage->name = "new one";
-$newpage->setMeta("opened",$page->getMeta("opened"));
-try {
-	$redbean->store($newpage);
-	pass();
-}catch(Exception $e) {
-	fail();
-}
-
-
-
-testpack("Test Logger issue");
-//issue#Michiel
-$rb=$redbean;
-$pdo = $adapter->getDatabase();
-//$pdo->setDebugMode(1);
-$l = $rb->dispense("logentry");
-$rb->store($l);
-$l = $rb->dispense("admin");
-$rb->store($l);
-$l = $rb->dispense("logentry");
-$rb->store($l);
-$l = $rb->dispense("admin");
-$rb->store($l);
-$admin = $rb->load('admin' , 1);
-$a = new RedBean_AssociationManager($toolbox);
-$log = $rb->load('logentry' , 1);
-$a->associate($log, $admin); //throws exception
-$log2 = $rb->load('logentry' , 2);
-$a->associate($log2, $admin);
-pass();//no exception? still alive? proficiat.. pass!
 
 
 
@@ -2814,12 +2620,13 @@ asrt(R::count("page"),0);
 asrt(R::$redbean->count("page"),0);
 
 
-function setget($val) {
+function setget($val,$castToString=0) {
 global $pdo;
 $bean = R::dispense("page");
 $_tables = R::$writer->getTables();
 if (in_array("page",$_tables)) $pdo->Execute("DROP TABLE page");
 $bean->prop = $val;
+if ($castToString) $bean->setMeta('cast.prop','string');
 $id = R::store($bean);
 $bean = R::load("page",$id);
 return $bean->prop;
@@ -2863,6 +2670,8 @@ asrt(setget("true"),"true");
 asrt(setget("false"),"false");
 asrt(setget("null"),"null");
 asrt(setget("NULL"),"NULL");
+asrt(setget("0123",1),"0123");
+asrt(setget("0000123",1),"0000123");
 asrt(setget(null),null);
 asrt((setget(0)==0),true);
 asrt((setget(1)==1),true);
