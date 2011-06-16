@@ -89,6 +89,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	}
 
 
+
 	/**
 	 * Returns the ID of the bean no matter what the ID field is.
 	 * @return string $id record Identifier for bean
@@ -118,10 +119,27 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @param string $property
 	 * @return mixed $value
 	 */
-	public function __get( $property ) {
+	public function &__get( $property ) {
 
 
-		if (!isset($this->properties[$property]))  return NULL;
+		if (!isset($this->properties[$property])) {
+
+			$fieldLink = $property."_id";
+			if (isset($this->$fieldLink)) {
+				return R::load($property, $this->$fieldLink);
+			}
+
+			if (strpos($property,'own')===0) {
+				$type = strtolower(str_replace('own','',$property));
+				$myFieldLink = $this->getMeta('type')."_id";
+				$beans = R::find($type,' '.$myFieldLink.' = ? ',array($this->getID()));
+				$this->properties[$property] = $beans;
+				return $this->properties[$property];
+			}
+
+			return NULL;
+
+		}
 		return $this->properties[$property];
 	}
 
@@ -291,7 +309,5 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 
 }
-
-
 
 

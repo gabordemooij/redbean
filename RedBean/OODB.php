@@ -211,6 +211,31 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 */
 	public function store( RedBean_OODBBean $bean ) {
 		$this->signal( "update", $bean );
+
+		$sharedCollection = $ownCollection = array();
+		foreach($bean as $p=>$v) {
+			if ($v instanceof RedBean_OODBBean) {
+				$idfield = $this->writer->getIDField($v->getMeta("type"));
+				if (!$v->$idfield) {
+					$this->store($v);
+				}
+				$beanID = $v->$idfield;
+				$linkField = $v->getMeta("type")."_id";
+				$bean->$linkField = $beanID;
+				unset($bean->$p);
+			}
+
+			if (is_array($v)) { echo " $p is array ";
+				if (strpos($p,'own')===0) {
+					$ownCollection = array_merge($ownCollection, $v);
+				}
+				else {
+					$sharedCollection = array_merge($sharedCollection, $v);
+				}
+				unset($bean->$p);
+			}
+		}
+
 		if (!$this->isFrozen) $this->check($bean);
 		//what table does it want
 		$table = $bean->getMeta("type");
@@ -278,9 +303,24 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			}
 		}
 
+
 		$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
-		$bean->setMeta("tainted",false);
 		$bean->$idfield = $rs;
+
+		$myFieldLink = $bean->getMeta('type').'_id';
+
+		foreach($ownCollection as $ownItem) {
+			$ownItem->$myFieldLink = $bean->$idfield;
+			$this->store($ownItem);
+		}
+
+		foreach($sharedCollection as $sharedItem) {
+			R::associate($sharedItem, $bean);
+		}
+
+
+		$bean->setMeta("tainted",false);
+
 		$this->signal( "after_update", $bean );
 		return (int) $bean->$idfield;
 	}
@@ -350,6 +390,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 */
 	public function trash( RedBean_OODBBean $bean ) {
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
+		
 		$this->signal( "delete", $bean );
 		if (!$this->isFrozen) $this->check( $bean );
 		try {
