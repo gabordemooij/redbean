@@ -137,6 +137,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 				return $this->properties[$property];
 			}
 
+			if (strpos($property,'shared')===0) {
+				$type = strtolower(str_replace('shared','',$property));
+				$beans = R::related($this, $type);
+				$this->properties[$property] = $beans;
+				return $this->properties[$property];
+			}
+
 			return NULL;
 
 		}
