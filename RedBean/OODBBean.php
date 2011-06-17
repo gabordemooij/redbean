@@ -14,6 +14,8 @@
 class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 
+	private $referenceToNull = null;
+
 	private $properties = array();
 
 	/**
@@ -104,9 +106,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return void
 	 */
 	public function __unset($property) {
+		$this->__get($property);
 		if ((isset($this->properties[$property]))) {
 			unset($this->properties[$property]);
 		}
+
+		
 	}
 
 
@@ -126,6 +131,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 			$fieldLink = $property."_id";
 			if (isset($this->$fieldLink)) {
+				$this->setMeta("tainted",true);
 				return R::load($property, $this->$fieldLink);
 			}
 
@@ -134,6 +140,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 				$myFieldLink = $this->getMeta('type')."_id";
 				$beans = R::find($type,' '.$myFieldLink.' = ? ',array($this->getID()));
 				$this->properties[$property] = $beans;
+				$this->setMeta("sys.shadow.".$property,$beans);
+				$this->setMeta("tainted",true);
 				return $this->properties[$property];
 			}
 
@@ -141,10 +149,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 				$type = strtolower(str_replace('shared','',$property));
 				$beans = R::related($this, $type);
 				$this->properties[$property] = $beans;
+				$this->setMeta("sys.shadow.".$property,$beans);
+				$this->setMeta("tainted",true);
 				return $this->properties[$property];
 			}
 
-			return NULL;
+			$this->properties[$property] = array();
 
 		}
 		return $this->properties[$property];
@@ -163,6 +173,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	public function __set( $property, $value ) {
 
 
+		$this->__get($property);
 		$this->setMeta("tainted",true);
 
 		if ($value===false) {

@@ -75,8 +75,8 @@ function testpack($name) {
 testpack("Test Setup");
 
 //INCLUDE YOUR REDBEAN FILE HERE!
-require("rb.php");
-//require("RedBean/redbean.inc.php");
+//require("rb.php");
+require("RedBean/redbean.inc.php");
 
 
 if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
@@ -524,6 +524,10 @@ $pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
 $pdo->Execute("DROP TABLE IF EXISTS cask_cask");
 $pdo->Execute("DROP TABLE IF EXISTS `book_group`");
 $pdo->Execute("DROP TABLE IF EXISTS `book_genre`");
+R::exec('drop table if exists book_page');
+R::exec('drop table if exists book_tag');
+R::exec('drop table if exists page_topic');
+R::exec('drop table if exists book_topic');
 
 $pdo->Execute("DROP TABLE IF EXISTS `author_book`");
 $pdo->Execute("DROP TABLE IF EXISTS `book_tag`");
@@ -553,6 +557,9 @@ $pdo->Execute("DROP TABLE IF EXISTS cask");
 $pdo->Execute("DROP TABLE IF EXISTS whisky");
 $pdo->Execute("DROP TABLE IF EXISTS __log");
 $pdo->Execute("DROP TABLE IF EXISTS dummy");
+R::exec('drop table if exists page');
+R::exec('drop table if exists book');
+R::exec('drop table if exists topic');
 
 //Test real events: update,open,delete
 testpack("Test Real Events");
@@ -1064,6 +1071,75 @@ $redbean->store($bean);
 RedBean_Plugin_Finder::where("wine", "id=5"); //  Finder:where call RedBean_OODB::convertToBeans
 $bean2 = $redbean->load("anotherbean", 5);
 asrt($bean2->id,0);
+
+
+
+testpack("N:1");
+
+list($book,$book2) = R::dispense('book',2);
+list($topic1, $topic2,$topic3) = R::dispense('topic',3);
+list($page1,$page2,$page3) = R::dispense('page',3);
+$book->title = 'abc';
+$page1->title = 'pagina1';
+$page2 = R::dispense('page');
+$page2->title = 'pagina2';
+$page3 = R::dispense('page');
+$page3->title = 'pagina3';
+$topic1->name = 'holiday';
+$topic2->name = 'cooking';
+
+$pageCounter = 0;
+
+class Model_Book extends RedBean_SimpleModel {
+	public function update() {
+		//echo "dit boek heeft ".count($this->ownPage)." bladzijden.";
+		global $pageCounter;
+		$pageCounter = count($this->ownPage);
+	}
+}
+
+$page1->book = $book;
+$id = R::store($page1);
+$page1 = R::load('page', $id);
+asrt(($page->book instanceof RedBean_OODBBean),true);
+asrt($page->book->getMeta('type'),'book');
+//print_r($page->book); exit;
+$book->ownPage = array( $page1, $page2);
+$id = R::store($book);
+
+
+
+$book = R::load('book', $id);
+print_r($book->ownPage);
+$book->ownPage[]=$page3;
+$id = R::store($book);
+$book = R::load('book', $id);
+print_r($book->ownPage);
+
+$book->sharedTopic = array($topic1,$topic2);
+$id = R::store($book);
+$book = R::load('book', $id);
+print_r($book->sharedTopic);
+exit;
+
+
+$book2->title = 'second book';
+$book2->ownPage[] = $page2;
+$id = R::store($book2);
+$book2 = R::load('book', $id);
+print_r($book2->ownPage);
+
+//now remove a page from book1
+print_r($book->ownPage);
+//delete a page
+R::trash( $book->ownPage[3] );
+//unset($book->ownPage[3]);
+//$book = R::load('book', $id);
+unset($book->ownPage[3]);
+print_r($book->ownPage);
+
+
+
 
 
 testpack("Test Gold SQL");
