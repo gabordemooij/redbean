@@ -90,6 +90,12 @@ class RedBean_ViewManager extends RedBean_CompatManager {
 					$joins[$t] = array($srcPoint,$dstPoint);
 
 				}
+				else {
+					//this connection does not exist
+					$srcPoint = $this->writer->safeTable($t).".".$currentTable."_id";
+					$dstPoint = $this->writer->safeTable($currentTable).".".$this->writer->safeColumn($this->writer->getIDField($currentTable));
+					$joins[$t] = array($srcPoint,$dstPoint);
+				}
 			}
 			//now set the new refTable
 			$currentTable=$t;

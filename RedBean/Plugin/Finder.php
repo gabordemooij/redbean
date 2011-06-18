@@ -45,7 +45,7 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 	 */
 	public static function where( $type, $SQL = " 1 ", $values=array(),
 			  $tools = false, $ignoreGSQLWarn = false ) {
-
+		
 		if ($SQL==="") $SQL = " 1 ";
 
 		//Sorry, quite draconic filtering
@@ -99,7 +99,6 @@ class RedBean_Plugin_Finder implements RedBean_Plugin {
 				throw $e;
 			}
 		}
-
 		//Give the rows to RedBean OODB to convert them
 		//into beans.
 		return $redbean->convertToBeans($type, $rows);

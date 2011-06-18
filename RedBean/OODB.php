@@ -98,9 +98,10 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$bean->setMeta("type", $type );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		$bean->setMeta("sys.idfield",$idfield);
+		//$bean->setMeta("sys.oodb",$this);
 		$bean->$idfield = 0;
 		if (!$this->isFrozen) $this->check( $bean );
-		$bean->setMeta("tainted",false);
+		$bean->setMeta("tainted",true);
 		$this->signal( "dispense", $bean );
 		return $bean;
 	}
@@ -229,10 +230,12 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 					$this->store($v);
 				}
 				$beanID = $v->$idfield;
-				$linkField = $v->getMeta("type")."_id";
+				$linkField = $p.'_id'; //$this->writer->getAlias($v->getMeta("type"));
+				//$linkField = $v->getMeta("type")."_id";
 				$bean->$linkField = $beanID;
 				$tmpCollectionStore[$p]=$bean->$p;
-				unset($bean->$p);
+				$bean->removeProperty($p);
+				//unset($bean->$p);
 			}
 
 
@@ -247,14 +250,20 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 					$ownTrashcan = array_merge($ownTrashcan,array_diff($originals,$v));
 					$ownResidu = array_intersect($v,$originals);
 					$tmpCollectionStore[$p]=$bean->$p;
-					unset($bean->$p);
+					$bean->removeProperty($p);
+					//unset($bean->$p);
 				}
 				elseif (strpos($p,'shared')===0) {
 					$sharedAdditions = array_merge($sharedAdditions,array_diff($v,$originals));
 					$sharedTrashcan = array_merge($sharedTrashcan,array_diff($originals,$v));
 					$sharedResidu = array_intersect($v,$originals);
 					$tmpCollectionStore[$p]=$bean->$p;
-					unset($bean->$p);
+					$bean->removeProperty($p);
+					//unset($bean->$p);
+				}
+				else {
+					//It's another kind of array, ask the model
+					
 				}
 
 			}
@@ -393,7 +402,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				R::associate($sharedItem, $bean);
 			}
 		}
-		 
+
 		 */
 
 
@@ -427,6 +436,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 */
 	public function load($type, $id) {
 		$this->signal("before_open",array("type"=>$type,"id"=>$id));
+
 		//$tmpid = intval( $id );
 		//if ($tmpid < 0) throw new RedBean_Exception_Security("Id less than zero not allowed");
 		$bean = $this->dispense( $type );
@@ -437,6 +447,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			try {
 				$idfield = $this->writer->getIDField($type);
 				$rows = $this->writer->selectRecord($type,array($idfield=>array($id)));
+
 			}catch(RedBean_Exception_SQL $e ) {
 				if (
 				$this->writer->sqlStateIn($e->getSQLState(),
@@ -454,12 +465,14 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			if (!$rows) return $bean; // $this->dispense($type); -- no need...
 			$row = array_pop($rows);
 		}
+
 		foreach($row as $p=>$v) {
 			//populate the bean with the database row
 			$bean->$p = $v;
 		}
 		$this->signal( "open", $bean );
 		$bean->setMeta("tainted",false);
+
 		return $bean;
 	}
 
@@ -538,7 +551,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	public function convertToBeans($type, $rows) {
 		$collection = array();
 		$this->stash = array();
-		foreach($rows as $row) {
+		foreach($rows as $row) { 
 			$id = $row[$this->writer->getIDField($type)];
 			$this->stash[$id] = $row;
 			$collection[ $id ] = $this->load( $type, $id );
@@ -585,6 +598,18 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		return false;
 	}
 
+	public function getWriter() {
+		return $this->writer;
+	}
+
+	public function getAssociationManager() {
+		if (!isset($this->assocManager)) throw new Exception("No association manager available.");
+		return $this->assocManager;
+	}
+
+	public function setAssociationManager(RedBean_AssociationManager $assoc) {
+		$this->assocManager = $assoc;
+	}
 
 }
 

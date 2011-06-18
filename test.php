@@ -253,9 +253,9 @@ try {
 $bean->name = new RedBean_OODBBean;
 try {
 	$redbean->store($bean);
-	fail();
-}catch(RedBean_Exception_Security $e) {
 	pass();
+}catch(RedBean_Exception_Security $e) {
+	fail();
 }
 try {
 	$redbean->check($bean);
@@ -296,7 +296,7 @@ try {
 
 testpack("OODBBean Tainted");
 $spoon = $redbean->dispense("spoon");
-asrt($spoon->getMeta("tainted"),false);
+asrt($spoon->getMeta("tainted"),true);
 $spoon->dirty = "yes";
 asrt($spoon->getMeta("tainted"),true);
 $spoon = $redbean->dispense("spoon");
@@ -524,10 +524,10 @@ $pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
 $pdo->Execute("DROP TABLE IF EXISTS cask_cask");
 $pdo->Execute("DROP TABLE IF EXISTS `book_group`");
 $pdo->Execute("DROP TABLE IF EXISTS `book_genre`");
-R::exec('drop table if exists book_page');
-R::exec('drop table if exists book_tag');
-R::exec('drop table if exists page_topic');
-R::exec('drop table if exists book_topic');
+$pdo->Execute('drop table if exists book_page');
+$pdo->Execute('drop table if exists book_tag');
+$pdo->Execute('drop table if exists page_topic');
+$pdo->Execute('drop table if exists book_topic');
 
 $pdo->Execute("DROP TABLE IF EXISTS `author_book`");
 $pdo->Execute("DROP TABLE IF EXISTS `book_tag`");
@@ -557,9 +557,9 @@ $pdo->Execute("DROP TABLE IF EXISTS cask");
 $pdo->Execute("DROP TABLE IF EXISTS whisky");
 $pdo->Execute("DROP TABLE IF EXISTS __log");
 $pdo->Execute("DROP TABLE IF EXISTS dummy");
-R::exec('drop table if exists page');
-R::exec('drop table if exists book');
-R::exec('drop table if exists topic');
+$pdo->Execute('drop table if exists page');
+$pdo->Execute('drop table if exists book');
+$pdo->Execute('drop table if exists topic');
 
 //Test real events: update,open,delete
 testpack("Test Real Events");
@@ -583,6 +583,7 @@ asrt(($observer->info instanceof RedBean_OODBBean),true);
 
 $observer2 = new ObserverMock();
 $redbean->addEventListener("after_update",$observer2);
+$dummyBean->beano = 1;
 $id = $redbean->store($dummyBean);
 asrt($observer2->event,"after_update");
 asrt(($observer2->info instanceof RedBean_OODBBean),true);
@@ -1074,70 +1075,6 @@ asrt($bean2->id,0);
 
 
 
-testpack("N:1");
-
-list($book,$book2) = R::dispense('book',2);
-list($topic1, $topic2,$topic3) = R::dispense('topic',3);
-list($page1,$page2,$page3) = R::dispense('page',3);
-$book->title = 'abc';
-$page1->title = 'pagina1';
-$page2 = R::dispense('page');
-$page2->title = 'pagina2';
-$page3 = R::dispense('page');
-$page3->title = 'pagina3';
-$topic1->name = 'holiday';
-$topic2->name = 'cooking';
-
-$pageCounter = 0;
-
-class Model_Book extends RedBean_SimpleModel {
-	public function update() {
-		//echo "dit boek heeft ".count($this->ownPage)." bladzijden.";
-		global $pageCounter;
-		$pageCounter = count($this->ownPage);
-	}
-}
-
-$page1->book = $book;
-$id = R::store($page1);
-$page1 = R::load('page', $id);
-asrt(($page->book instanceof RedBean_OODBBean),true);
-asrt($page->book->getMeta('type'),'book');
-//print_r($page->book); exit;
-$book->ownPage = array( $page1, $page2);
-$id = R::store($book);
-
-
-
-$book = R::load('book', $id);
-print_r($book->ownPage);
-$book->ownPage[]=$page3;
-$id = R::store($book);
-$book = R::load('book', $id);
-print_r($book->ownPage);
-
-$book->sharedTopic = array($topic1,$topic2);
-$id = R::store($book);
-$book = R::load('book', $id);
-print_r($book->sharedTopic);
-exit;
-
-
-$book2->title = 'second book';
-$book2->ownPage[] = $page2;
-$id = R::store($book2);
-$book2 = R::load('book', $id);
-print_r($book2->ownPage);
-
-//now remove a page from book1
-print_r($book->ownPage);
-//delete a page
-R::trash( $book->ownPage[3] );
-//unset($book->ownPage[3]);
-//$book = R::load('book', $id);
-unset($book->ownPage[3]);
-print_r($book->ownPage);
-
 
 
 
@@ -1457,6 +1394,7 @@ $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
 $one->col = 12;
 $redbean->store($one);
+$one->setMeta('tainted',true);
 $redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"tinyint(3) unsigned");
@@ -1467,6 +1405,7 @@ $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
 $one->col = 9000;
 $redbean->store($one);
+$one->setMeta('tainted',true);
 $redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"int(11) unsigned");
@@ -1477,6 +1416,7 @@ $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
 $one->col = 1.23;
 $redbean->store($one);
+$one->setMeta('tainted',true);
 $redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"double");
@@ -1486,6 +1426,7 @@ $cols = $writer->getColumns("one");
 asrt($cols["col"],"text");
 $one->col = "short text";
 $redbean->store($one);
+$one->setMeta('tainted',true);
 $redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols["col"],"varchar(255)");
@@ -1495,6 +1436,7 @@ $special = $redbean->dispense("special");
 $v = "2009-01-01 10:00:00";
 $special->datetime = $v;
 $redbean->store($special);
+$special->setMeta('tainted',true);
 $redbean->store($special);
 //$optimizer->MySQLSpecificColumns("special", "datetime", "varchar", $v);
 $cols = $writer->getColumns("special");
@@ -1511,17 +1453,20 @@ if($cols["datetime"]!=="datetime") fail();
 pass();
 $special->datetime = "convertmeback";
 $redbean->store($special);
+$special->setMeta('tainted',true);
 $redbean->store($special);
 $cols = $writer->getColumns("special");
 asrt(($cols["datetime"]!="datetime"),true);
 $special2 = $redbean->dispense("special");
 $special2->datetime = "1990-10-10 12:00:00";
 $redbean->store($special2);
+$special->setMeta('tainted',true);
 $redbean->store($special2);
 $cols = $writer->getColumns("special");
 asrt(($cols["datetime"]!="datetime"),true);
 $special->datetime = "1990-10-10 12:00:00";
 $redbean->store($special);
+$special->setMeta('tainted',true);
 $redbean->store($special);
 $cols = $writer->getColumns("special");
 asrt(($cols["datetime"]!="datetime"),false);
@@ -1619,7 +1564,8 @@ $a->associate( $cask, $whisky );
 asrt(count($a->related($cask, "whisky")),1);
 $redbean->trash($cask);
 //no difference
-asrt(count($a->related($cask, "whisky")),1);
+//asrt(count($a->related($cask, "whisky")),1);
+asrt((int)$adapter->getCell("select count(*) from cask_whisky"),1);
 $adapter->exec("DROP TABLE cask_whisky");
 //before we do this, trash whisky!
 $redbean->trash($whisky);
@@ -1632,11 +1578,12 @@ $whisky->age = 10;
 $a->setUseConstraints(true);
 //$adapter->getDatabase()->SethMode(1);
 $a->associate( $cask, $whisky );
-//first test baseline behaviour, dead record should remain --- ohno, not now assoc uses fks!
+//first test baseline behaviour, dead record should be gone --- ohno, not now assoc uses fks!
 asrt(count($a->related($cask, "whisky")),1);
 $redbean->trash($cask);
 //no difference
-asrt(count($a->related($cask, "whisky")),0);
+asrt((int)$adapter->getCell("select count(*) from cask_whisky"),0);
+//asrt(count($a->related($cask, "whisky")),0);
 
 
 //$adapter->exec("TRUNCATE cask_whisky"); //clean up for real test!
@@ -1665,11 +1612,13 @@ $a->associate( $cask2, $whisky2 );
 
 asrt(count($a->related($cask, "whisky")),1);
 $redbean->trash($cask);
-asrt(count($a->related($cask, "whisky")),0); //should be gone now!
+asrt((int)$adapter->getCell("select count(*) from cask_whisky"),1);
+//asrt(count($a->related($cask, "whisky")),0); //should be gone now!
 
 asrt(count($a->related($whisky2, "cask")),1);
 $redbean->trash($whisky2);
-asrt(count($a->related($whisky2, "cask")),0); //should be gone now!
+//asrt(count($a->related($whisky2, "cask")),0); //should be gone now!
+asrt((int)$adapter->getCell("select count(*) from cask_whisky"),0);
 
 
 $pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
@@ -1698,6 +1647,7 @@ $pdo->Execute("DROP TABLE IF EXISTS xx_barrel");
 class TestFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {return "xx_$table";}
 	public function formatBeanID( $table ) {return "id";}
+	public function getAlias($a){ return $a; }
 }
 $oldwriter = $writer;
 $oldredbean = $redbean;
@@ -2136,7 +2086,7 @@ asrt($book->author_id, $author->id);
 asrt(R::getKey($book,"author"), $author->id);
 asrt(($book->author_id>0), TRUE);
 asrt(R::getBean($book,"author")->name,"me");
-R::breakLink($book,"author");
+R::breakLink($book,"author");var_dump($book->author_id);
 asrt(($book->author_id>0), FALSE);
 $book9 = R::dispense("book");
 $author9 = R::dispense("author");
@@ -2348,15 +2298,16 @@ $book2 = R::load("book",$id2);
 asrt($book1->rating,'3');
 asrt($book2->rating,'2');
 
-testpack("Test Serializing Beans");
+/*testpack("Test Serializing Beans");
 $bean = R::dispense("book");
-asrt(($bean->getMeta("sys.oodb") instanceof RedBean_OODB), false);
+//asrt(($bean->getMeta("sys.oodb") instanceof RedBean_OODB), false);
 $str = serialize($bean);
 asrt((strlen($str)>0),true);
 $bean = unserialize($str);
 $id = R::store($bean);
 asrt(($id>0),true);
 
+*/
 
 testpack("Test R::convertToBeans");
 $SQL = "SELECT '1' as id, a.name AS name, b.title AS title, '123' as rating FROM author AS a LEFT JOIN book as b ON b.id = ?  WHERE a.id = ? ";
@@ -2433,6 +2384,7 @@ class MyTableFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanID( $table ) {
 		return "id";
 	}
+	public function getAlias($a){ return $a; }
 }
 
 R::$writer->tableFormatter = new MyTableFormatter;
@@ -2507,6 +2459,7 @@ $pdo->Execute("DROP TABLE IF EXISTS cms_post_tag");
 $pdo->Execute("DROP TABLE IF EXISTS cms_blog");
 
 $pdo->Execute("DROP TABLE IF EXISTS cms_post");
+
 class MyBeanFormatter implements RedBean_IBeanFormatter{
     public function formatBeanTable($table) {
         return "cms_$table";
@@ -2514,6 +2467,7 @@ class MyBeanFormatter implements RedBean_IBeanFormatter{
     public function formatBeanID( $table ) {
         return "{$table}_id"; // append table name to id. The table should not inclide the prefix.
     }
+    public function getAlias($a){ return '__'.$a;  }
 }
 
 
@@ -2812,12 +2766,14 @@ testpack("test views");
 class Fm implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {return "prefix_$table";}
 	public function formatBeanID( $table ) {return $table."__id";}
+	public function getAlias($a){return $a;}
 }
 
 
 class Fm2 implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {return "prefix_$table";}
 	public function formatBeanID( $table ) {return $table."_id";}
+	public function getAlias($a){return $a;}
 }
 
 function testViews($p) { 

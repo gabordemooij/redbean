@@ -74,6 +74,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	public function export($meta = false) {
 		$arr = array();
 		$arr = $this->properties;
+
+		foreach($arr as $k=>$v) {
+			if (is_array($v) || is_object($v)) unset($arr[$k]);
+		}
+
 		if ($meta) $arr["__info"] = $this->__info;
 		return $arr;
 	}
@@ -106,12 +111,26 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return void
 	 */
 	public function __unset($property) {
+
 		$this->__get($property);
+
+		$fieldLink = $property."_id";
+		if (isset($this->$fieldLink)) {
+			//wanna unset a bean reference?
+			$this->$fieldLink = 0;
+			return;
+		}
+		
 		if ((isset($this->properties[$property]))) {
 			unset($this->properties[$property]);
 		}
 
 		
+	}
+
+	public function removeProperty( $property ) {
+		
+		unset($this->properties[$property]);
 	}
 
 
@@ -126,19 +145,32 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 */
 	public function &__get( $property ) {
 
-
+		
 		if (!isset($this->properties[$property])) {
 
 			$fieldLink = $property."_id";
-			if (isset($this->$fieldLink)) {
+
+			/**
+			 * All this magic can be become very complex quicly. For instance,
+			 * my PHP CLI produced a segfault while testing this code. Turns out that
+			 * if fieldlink equals idfield, scripts tend to recusrively load beans and
+			 * instead of giving a clue they simply crash and burn isnt that nice?
+			 */
+			if (isset($this->$fieldLink) && $fieldLink != $this->getMeta('sys.idfield')) {
 				$this->setMeta("tainted",true);
-				return R::load($property, $this->$fieldLink);
+				//$type = $this->getMeta("sys.oodb")->getWriter()->getAlias($property);
+				//return $this->getMeta("sys.oodb")->load($type, $this->$fieldLink);
+				$type = R::$writer->getAlias($property);
+				$targetType = $this->properties[$fieldLink];
+				$bean =  R::load($type,$targetType);
+				return $bean;
 			}
 
 			if (strpos($property,'own')===0) {
 				$type = strtolower(str_replace('own','',$property));
 				$myFieldLink = $this->getMeta('type')."_id";
-				$beans = R::find($type,' '.$myFieldLink.' = ? ',array($this->getID()));
+				//$beans = $this->getMeta("sys.oodb")->find($type,array($myFieldLink=>array($this->getID())));
+				$beans = R::find($type," $myFieldLink = ?",array($this->getID()));
 				$this->properties[$property] = $beans;
 				$this->setMeta("sys.shadow.".$property,$beans);
 				$this->setMeta("tainted",true);
@@ -147,14 +179,17 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 			if (strpos($property,'shared')===0) {
 				$type = strtolower(str_replace('shared','',$property));
-				$beans = R::related($this, $type);
+				//$keys = $this->getMeta("sys.oodb")->getAssociationManager()->related($this, $type);
+				//if (!$keys) $beans = array(); else $beans = $this->getMeta("sys.oodb")->batch($type,$keys);
+				//$this->properties[$property] = $beans;
+				$beans = R::related($this,$type);
 				$this->properties[$property] = $beans;
 				$this->setMeta("sys.shadow.".$property,$beans);
 				$this->setMeta("tainted",true);
 				return $this->properties[$property];
 			}
 
-			$this->properties[$property] = array();
+			$this->properties[$property] = null;
 
 		}
 		return $this->properties[$property];
@@ -236,6 +271,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 */
 	public function __sleep() {
 		//return the public stuff
+		$this->setMeta("sys.oodb",null);
 		return array('properties','__info');
 	}
 
@@ -324,6 +360,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
     public function offsetGet($offset) {
         return $this->__get($offset);
     }
+
+	//public function __wakeup() {
+		//$this->setMeta("sys.oodb",R::$redbean);
+	//}
 
 
 }

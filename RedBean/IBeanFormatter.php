@@ -28,4 +28,11 @@ interface RedBean_IBeanFormatter {
 	 */
 	public function formatBeanID( $type );
 
+	/**
+	 * @abstract
+	 * @param  $type
+	 * @return void
+	 */
+	public function getAlias( $type );
+
 }

@@ -94,7 +94,7 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 				//export the bean as an array
 				$arr = $bean->export();
 				//remove the id property
-				unset($arr["id"]);
+				unset($arr["id"]); 
 				//If we are left with an empty array we might as well return
 				if (count($arr)==0) return;
 				//fetch table name for this bean

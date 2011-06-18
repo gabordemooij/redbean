@@ -967,6 +967,7 @@ class R {
 		self::$adapter = self::$toolbox->getDatabaseAdapter();
 		self::$redbean = self::$toolbox->getRedBean();
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
+		self::$redbean->setAssociationManager(self::$associationManager);
 		self::$treeManager = new RedBean_TreeManager( self::$toolbox );
 		self::$linkManager = new RedBean_LinkManager( self::$toolbox );
 		self::$extAssocManager = new RedBean_ExtAssociationManager( self::$toolbox );

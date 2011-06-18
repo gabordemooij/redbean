@@ -111,6 +111,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $type;
 	}
 
+	public function getAlias($type) {
+		if ($this->tableFormatter) {
+			return $this->tableFormatter->getAlias($type);
+		}
+		return $type;
+	}
+
+
 	/**
 	 * Sets the Bean Formatter to be used to handle
 	 * custom/advanced DB<->Bean

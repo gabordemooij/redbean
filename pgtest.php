@@ -719,6 +719,7 @@ $_tables = $writer->getTables();
 class TestFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {return "xx_$table";}
 	public function formatBeanID( $table ) {return "id";}
+	public function getAlias($a){ return '__';}
 }
 $oldwriter = $writer;
 $oldredbean = $redbean;
@@ -828,6 +829,7 @@ class MyTableFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanID( $table ) {
 		return "id";
 	}
+	public function getAlias($a){ return '__';}
 }
 
 R::$writer->tableFormatter = new MyTableFormatter;
@@ -905,6 +907,7 @@ class MyBeanFormatter implements RedBean_IBeanFormatter{
     public function formatBeanID( $table ) {
         return "{$table}_id"; // append table name to id. The table should not inclide the prefix.
     }
+    public function getAlias($a){ return '__';}
 }
 
 
@@ -1096,12 +1099,14 @@ testpack("test views");
 class Fm implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {return "prefix_$table";}
 	public function formatBeanID( $table ) {return $table."__id";}
+	public function getAlias($a){ return '__';}
 }
 
 
 class Fm2 implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {return "prefix_$table";}
 	public function formatBeanID( $table ) {return $table."_id";}
+	public function getAlias($a){ return '__';}
 }
 
 function testViews($p) { 
