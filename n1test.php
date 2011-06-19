@@ -258,8 +258,51 @@ asrt(($book3->cover instanceof RedBean_OODBBean),true);
 $justACover = $book3->cover;
 asrt($justACover->title,'cover1');
 
-
-
+//test doubling and other side effects ... should not occur..
+print_r( $book3->sharedTopic ); 
+$book3->sharedTopic = array($topic1, $topic2);
+$book3=R::load('book',R::store($book3));
+$book3->sharedTopic = array();
+$book3=R::load('book',R::store($book3));
+asrt(count($book3->sharedTopic),0);
+$book3->sharedTopic[] = $topic1;
+$book3=R::load('book',R::store($book3));
+//added really one, not more?
+asrt(count($book3->sharedTopic),1);
+asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
+//add the same
+$book3->sharedTopic[] = $topic1;
+$book3=R::load('book',R::store($book3));
+asrt(count($book3->sharedTopic),1);
+asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
+$book3->sharedTopic['differentkey'] = $topic1;
+$book3=R::load('book',R::store($book3));
+asrt(count($book3->sharedTopic),1);
+asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
+//ugly assign, auto array generation
+$book3->ownPage[] = $page1;
+$book3=R::load('book',R::store($book3));
+asrt(count($book3->ownPage),1);
+asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),1);
+$book3=R::load('book',$idb3);
+$book3->ownPage = array();
+asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),1); //no change until saved
+$book3=R::load('book',R::store($book3));
+asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),0);
+asrt(count($book3->ownPage),0);
+$book3=R::load('book',$idb3);
+//why do I need to do this ---> why does trash() not set id -> 0, because you unset() so trash is done on orign not bean
+$page1->id = 0;
+$page2->id = 0;
+$page3->id = 0;
+$book3->ownPage[] = $page1;
+$book3->ownPage[] = $page2;
+$book3->ownPage[] = $page3;
+//print_r($book3->ownPage);
+$book3=R::load('book',R::store($book3));
+asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),3);
+asrt(count($book3->ownPage),3);
+ 
 //graph
 R::exec('drop table if exists army_village');
 R::exec('drop table if exists village');
@@ -323,7 +366,28 @@ foreach($emptyHouses as $empty){
 	if ($empty->name!=='v3') pass(); else fail();
 }
 
-
+//Change the names and add the same building should not change the graph
+$v1->name = 'village I';
+$v2->name = 'village II';
+$v3->name = 'village III';
+$v1->ownBuilding[] = $b4;
+$i2=R::store($v2);
+$i1=R::store($v1);
+$i3=R::store($v3);
+$v1 = R::load('village',$i1);
+$v2 = R::load('village',$i2);
+$v3 = R::load('village',$i3);
+asrt(count($v3->ownBuilding),1);
+asrt(count(reset($v3->ownBuilding)->ownFarmer),1);
+asrt(count(reset($v3->ownBuilding)->ownFurniture),3);
+asrt(count(($v3->sharedArmy)),2);
+asrt(count($v1->sharedArmy),0);
+asrt(count($v2->sharedArmy),1);
+asrt(count($v2->ownBuilding),1);
+asrt(count($v1->ownBuilding),2);
+asrt(count(reset($v1->ownBuilding)->ownFarmer),0);
+asrt(count(end($v1->ownBuilding)->ownFarmer),1);
+asrt(count($v3->ownTapestry),0);
 
 
 
