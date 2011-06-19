@@ -195,6 +195,15 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	}
 
 
+	public static function equals( $bean1, $bean2 ) {
+		$id1 = $bean1->getID();
+		$id2 = $bean2->getID();
+		//echo "($id1>0 && $id2>0 && $id1===$id2)";
+		//return ($id1>0 && $id2>0 && $id1===$id2) ? 0 : 1;
+		//return ($id1-$id2);
+		//return strcmp( $bean1->getMeta('type').$bean1, $bean2->getMeta('type').$bean2);
+	}
+
 
 	/**
 	 * Stores a bean in the database. This function takes a
@@ -246,9 +255,21 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 
 				if (strpos($p,'own')===0) {
 					//This is an OWN group
+
 					$ownAdditions = array_merge($ownAdditions,array_diff($v,$originals));
 					$ownTrashcan = array_merge($ownTrashcan,array_diff($originals,$v));
-					$ownResidu = array_intersect($v,$originals);
+					$ownResidu = array_merge($ownResidu,array_intersect($v,$originals));
+
+
+					//$ownAdditions = array_merge($ownAdditions,array_udiff($v,$originals,array('RedBean_OODB','equals')));
+					//$ownTrashcan = array_merge($ownTrashcan,array_udiff($originals,$v,array('RedBean_OODB','equals')));
+					//$ownResidu = array_merge($ownResidu,array_uintersect($v,$originals,array('RedBean_OODB','equals')));
+
+
+					//echo "=====================CALCULATED GROUPS====================";
+					//print_r(array($ownAdditions,$ownTrashcan,$ownResidu));
+					//echo "==========================================================";
+
 					$tmpCollectionStore[$p]=$bean->$p;
 					$bean->removeProperty($p);
 					//unset($bean->$p);
@@ -256,7 +277,13 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				elseif (strpos($p,'shared')===0) {
 					$sharedAdditions = array_merge($sharedAdditions,array_diff($v,$originals));
 					$sharedTrashcan = array_merge($sharedTrashcan,array_diff($originals,$v));
-					$sharedResidu = array_intersect($v,$originals);
+					$sharedResidu = array_merge($sharedResidu,array_intersect($v,$originals));
+
+					//$sharedAdditions = array_merge($sharedAdditions,array_udiff($v,$originals,array('RedBean_OODB','equals')));
+					//$sharedTrashcan = array_merge($sharedTrashcan,array_udiff($originals,$v,array('RedBean_OODB','equals')));
+					//$sharedResidu = array_merge($sharedResidu,array_uintersect($v,$originals,array('RedBean_OODB','equals')));
+
+
 					$tmpCollectionStore[$p]=$bean->$p;
 					$bean->removeProperty($p);
 					//unset($bean->$p);
@@ -344,6 +371,16 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 
 
 		//Handle related beans
+
+		foreach($ownTrashcan as $trash) {
+
+			if ($trash instanceof RedBean_OODBBean) {
+				//$this->trash($trash);
+				$trash->$myFieldLink = 0;
+				$this->store($trash);
+			}
+		}
+
 		foreach($ownAdditions as $addition) {
 			if ($addition instanceof RedBean_OODBBean) {
 				$addition->$myFieldLink = $bean->$idfield;
@@ -365,11 +402,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			}
 		}
 
-		foreach($ownTrashcan as $trash) {
-			if ($trash instanceof RedBean_OODBBean) {
-				$this->trash($trash);
-			}
-		}
+
 
 
 		foreach($sharedAdditions as $addition) {

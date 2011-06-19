@@ -52,12 +52,18 @@ R::exec('drop table if exists page_topic');
 R::exec('drop table if exists book_topic');
 R::exec('drop table if exists book_cover');
 R::exec('drop table if exists page');
+R::exec('drop table if exists picture');
+R::exec('drop table if exists quote');
 R::exec('drop table if exists book');
 R::exec('drop table if exists topic');
 R::exec('drop table if exists cover');
+list($q1,$q2) = R::dispense('quote',2);
+list($pic1,$pic2) = R::dispense('picture',2);
 list($book,$book2,$book3) = R::dispense('book',3);
 list($topic1, $topic2,$topic3,$topic4,$topic5) = R::dispense('topic',5);
 list($page1,$page2,$page3,$page4,$page5,$page6,$page7) = R::dispense('page',7);
+$q1->text = 'lorem';
+$q2->text = 'ipsum';
 $book->title = 'abc';
 $book2->title = 'def';
 $book3->title = 'ghi';
@@ -92,8 +98,9 @@ $id = R::store($book);
 $book = R::load('book',$id);
 asrt(count($book->ownPage),1);
 asrt(reset($book->ownPage)->getMeta('type'),'page');
+asrt(R::count('page'),2);//still exists
 asrt(reset($book->ownPage)->id,'2');
-asrt(R::count('page'),1);
+
 //doing a change in one of the owned items
 $book->ownPage[2]->title='page II';
 $id = R::store($book);
@@ -139,7 +146,6 @@ asrt($page1->book->title,'def');
 $b2 = R::load('book',$id);
 asrt(count($b2->ownPage),2);
 //remove the other way around - single bean
-//$page1->book_id = 0;
 unset($page1->book);
 R::store($page1);
 $b2 = R::load('book',$book2->id);
@@ -259,7 +265,6 @@ $justACover = $book3->cover;
 asrt($justACover->title,'cover1');
 
 //test doubling and other side effects ... should not occur..
-print_r( $book3->sharedTopic ); 
 $book3->sharedTopic = array($topic1, $topic2);
 $book3=R::load('book',R::store($book3));
 $book3->sharedTopic = array();
@@ -302,6 +307,143 @@ $book3->ownPage[] = $page3;
 $book3=R::load('book',R::store($book3));
 asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),3);
 asrt(count($book3->ownPage),3);
+unset($book3->ownPage[$page2->id]);
+$book3->ownPage[] = $page3;
+$book3->ownPage['try_to_trick_ya'] = $page3;
+$book3=R::load('book',R::store($book3));
+asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),2);
+asrt(count($book3->ownPage),2);
+$book3=R::load('book',$idb3);
+
+
+
+//echo '------------------------------------------------------------------';
+//R::debug(1);
+//$page1 = R::load('page',$page1->id);
+//$page3 = R::load('page',$page3->id);
+//$page3->setMeta('tainted',true);
+//$page1->setMeta('tainted',true);
+//fix udiff instead of diff
+$book3->ownPage = array($page3,$page1);
+$i = R::store($book3);
+//exit;
+$book3=R::load('book',$i);
+asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),2);
+asrt(count($book3->ownPage),2);
+$pic1->name = 'aaa';
+$pic2->name = 'bbb';
+R::store($pic1);
+R::store($q1);
+
+$book3->ownPicture[] = $pic1;
+$book3->ownQuote[] = $q1;
+//print_r($book3->ownPicture);
+$book3=R::load('book',R::store($book3));
+//two own-arrays -->forgot array_merge
+asrt(count($book3->ownPicture),1);
+asrt(count($book3->ownQuote),1);
+asrt(count($book3->ownPage),2);
+$book3=R::load('book',R::store($book3));
+unset($book3->ownPicture[1]);
+$book3=R::load('book',R::store($book3));
+asrt(count($book3->ownPicture),0);
+asrt(count($book3->ownQuote),1);
+asrt(count($book3->ownPage),2);
+$book3=R::load('book',R::store($book3));
+
+function modgr($book3) {
+
+	global $quotes;
+	
+	$key = array_rand($quotes);
+	$quote = $quotes[$key];
+	
+	
+	//$quote = R::dispense('quote');
+	//$quote->note = 'note'.rand(0,100);
+	$p = R::dispense('picture');
+	$p->note = 'note'.rand(0,100);
+	$topic = R::dispense('topic');
+	$topic->note = 'note'.rand(0,100);
+
+	if (rand(0,1)) {
+		$f=0;
+		foreach($book3->ownQuote as $z) {
+			if ($z->id == $quote->id) { $f = 1; break; }
+		}
+		if (!$f) {
+		echo "\n add a quote ";
+		$book3->ownQuote[] = $quote;	
+		}
+	}
+	if (rand(0,1)){
+		echo "\n add a picture ";
+		$book3->ownPicture[] = $p;
+	}
+	if (rand(0,1)) {
+		echo "\n add a shared topic ";
+		$book3->sharedTopic[] = $topic;	
+	}
+	if (rand(0,1) && count($book3->ownQuote)>0) {
+		$key = array_rand($book3->ownQuote);
+		unset($book3->ownQuote[ $key ]);
+		echo "\n delete quote with key $key ";
+	}
+	if (rand(0,1) && count($book3->ownPicture)>0) {
+		$key = array_rand($book3->ownPicture);
+		unset($book3->ownPicture[ $key ]);
+		echo "\n delete picture with key $key ";
+	}
+	if (rand(0,1) && count($book3->sharedTopic)>0) {
+		$key = array_rand($book3->sharedTopic);
+		unset($book3->sharedTopic[ $key ]);
+		echo "\n delete sh topic  with key $key ";
+	}
+
+	if (rand(0,1) && count($book3->ownPicture)>0) {
+		$key = array_rand($book3->ownPicture);
+		$book3->ownPicture[ $key ]->note = rand(0,100);
+		echo "\n changed picture with key $key ";
+	}
+	if (rand(0,1) && count($book3->ownQuote)>0) {
+		$key = array_rand($book3->ownQuote);
+		$book3->ownQuote[ $key ]->note = rand(0,100);
+		echo "\n changed quote with key $key ";
+	}
+	if (rand(0,1) && count($book3->sharedTopic)>0) {
+		$key = array_rand($book3->sharedTopic);
+		$book3->sharedTopic[ $key ]->note = rand(0,100);
+		echo "\n changed sharedTopic with key $key ";
+	}
+}
+
+$quotes = R::dispense('quote',10);
+foreach($quotes as $k=>$q) {
+	$q->note = 'note'.rand(0,100);
+}
+
+for($j=0; $j<10; $j++) {
+	for($x=0;$x<rand(3,20); $x++) modgr($book3); //do several mutations
+	$qbefore = count($book3->ownQuote);
+	$pbefore = count($book3->ownPicture);
+	$tbefore = count($book3->sharedTopic);
+	$qjson = json_encode($book->ownQuote);
+	$pjson = json_encode($book->ownPicture);
+	$tjson = json_encode($book->sharedTopic);
+	//echo "\n bean before: ".print_r($book3,1);
+	$book3=R::load('book',R::store($book3));
+	echo "\n $qbefore == ".count($book3->ownQuote);
+	echo "\n $pbefore == ".count($book3->ownPicture);
+	echo "\n $tbefore == ".count($book3->sharedTopic);
+	//echo "\n bean after: ".print_r($book3,1);
+	asrt(count($book3->ownQuote),$qbefore);
+	asrt(count($book3->ownPicture),$pbefore);
+	asrt(count($book3->sharedTopic),$tbefore);
+	asrt(json_encode($book->ownQuote),$qjson);
+	asrt(json_encode($book->ownPicture),$pjson);
+	asrt(json_encode($book->sharedTopic),$tjson);
+}
+
  
 //graph
 R::exec('drop table if exists army_village');
