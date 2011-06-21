@@ -195,14 +195,6 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	}
 
 
-	public static function equals( $bean1, $bean2 ) {
-		$id1 = $bean1->getID();
-		$id2 = $bean2->getID();
-		//echo "($id1>0 && $id2>0 && $id1===$id2)";
-		//return ($id1>0 && $id2>0 && $id1===$id2) ? 0 : 1;
-		return ($id1-$id2);
-		//return strcmp( $bean1->getMeta('type').$bean1, $bean2->getMeta('type').$bean2);
-	}
 
 
 	protected function processGroups( $originals, $current, $additions, $trashcan, $residue ) {
@@ -230,11 +222,8 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * @return integer $newid
 	 */
 	public function store( RedBean_OODBBean $bean ) {
-
 		if (!$bean->getMeta('tainted')) return $bean->getID();
-
 		$this->signal( "update", $bean );
-
 		//Define groups
 		$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array();
 		$ownAdditions = $ownTrashcan = $ownresidue = array();
@@ -257,36 +246,20 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				$originals = $bean->getMeta('sys.shadow.'.$p);
 				if (!$originals) $originals = array(); //print_r($originals); print_r($v);
 				if (strpos($p,'own')===0) {
-					//This is an OWN group
-					//$ownAdditions[$p] = array_udiff($v,$originals,$f);
-					//$ownTrashcan[$p] = array_udiff($originals,$v,$f);
-					//$ownresidue[$p] = array_uintersect($v,$originals,$f);
-					//$tmpCollectionStore[$p]=$bean->$p;
 					list($ownAdditions,$ownTrashcan,$ownresidue)=$this->processGroups($originals,$v,$ownAdditions,$ownTrashcan,$ownresidue);
 					$bean->removeProperty($p);
 				}
 				elseif (strpos($p,'shared')===0) {
-					//$sharedAdditions[$p] = array_udiff($v,$originals,$f);
-					//$sharedTrashcan[$p] = array_udiff($originals,$v,$f);
-					//$sharedresidue[$p] = array_uintersect($v,$originals,$f);
-					//$tmpCollectionStore[$p]=$bean->$p;
 					list($sharedAdditions,$sharedTrashcan,$sharedresidue)=$this->processGroups($originals,$v,$sharedAdditions,$sharedTrashcan,$sharedresidue);
 					$bean->removeProperty($p);
 
 				}
 				else {
 				}
-
-
 			}
-
 		}
 
-		//echo "\n IN ORIG : ".print_r($bean->getMeta("sys.shadow.sharedTopic"),1);
-		//if (isset($tmpCollectionStore['sharedTopic'])) echo "\n IN PROP : ".print_r($tmpCollectionStore['sharedTopic'],1);
-		//if (isset($sharedTrashcan['sharedTopic'])) echo "\n IN TRASH : ".print_r($sharedTrashcan['sharedTopic'],1);
 
-		
 		if (!$this->isFrozen) $this->check($bean);
 		//what table does it want
 		$table = $bean->getMeta("type");
@@ -353,30 +326,18 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				$this->writer->addUniqueIndex( $table, $unique );
 			}
 		}
-
-
 		$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
 		$bean->$idfield = $rs;
 		$bean->setMeta("tainted",false);
-
 		$myFieldLink = $bean->getMeta('type').'_id';
-
-
-
 		//Handle related beans
-
 		foreach($ownTrashcan as $trash) {
-		//	foreach($trashcan as $trash) {
 			if ($trash instanceof RedBean_OODBBean) {
-				//$this->trash($trash);
 				$trash->$myFieldLink = 0;
 				$this->store($trash);
 			}
-		//	}
 		}
-
 		foreach($ownAdditions as $addition) {
-		//	foreach($additions as $addition){
 			if ($addition instanceof RedBean_OODBBean) {
 				$addition->$myFieldLink = $bean->$idfield;
 				$addition->setMeta('cast.'.$myFieldLink,'id');
@@ -386,75 +347,30 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 						'index_foreignkey_'.$bean->getMeta('type'),
 						 $myFieldLink);
 				}
-		//	}
 			}
 		}
-
 		foreach($ownresidue as $residue) {
-			//foreach($res as $residue) {
 			if ($residue instanceof RedBean_OODBBean) {
 				if ($residue->getMeta('tainted')) {
 					$this->store($residue);
 				}
-			//}
 			}
 		}
-
-
-		foreach($sharedTrashcan as $p=>$trash) {
-			//foreach($trashcan as $trash) {
+		foreach($sharedTrashcan as $trash) {
 			if ($trash instanceof RedBean_OODBBean) {
 				R::unassociate($trash,$bean);
-				//$bean->setMeta("sys.shadow.".$p,null);
-			//}
 			}
 		}
-
 		foreach($sharedAdditions as $addition) {
-			//foreach($additions as $addition) {
 			if ($addition instanceof RedBean_OODBBean) {
 				R::associate($addition,$bean);
-			//}
 			}
 		}
-
-		foreach($sharedresidue as $p=>$residue) {
-			//foreach($res as $residue){
+		foreach($sharedresidue as $residue) {
 			if ($residue instanceof RedBean_OODBBean) {
 				$this->store($residue);
-			//}
-			}
-			//$bean->setMeta('sys.shadow.'.$p, array_merge($sharedAdditions,$sharedresidue));
-		}
-
-
-
-
-
-		/*foreach($ownCollection as $ownItem) {
-			if ($ownItem instanceof RedBean_OODBBean) {
-				$ownItem->$myFieldLink = $bean->$idfield;
-				$this->store($ownItem);
 			}
 		}
-
-		foreach($sharedCollection as $sharedItem) {
-			if ($sharedItem instanceof RedBean_OODBBean) {
-				R::associate($sharedItem, $bean);
-			}
-		}
-
-		 */
-
-
-
-		/*foreach($tmpCollectionStore as $key=>$list) {
-			//$bean->$key = $list;
-			$bean->fastAddArray($key,$list);
-			echo "\n re-adding $key ";
-		}*/
-
-
 		$this->signal( "after_update", $bean );
 		return (int) $bean->$idfield;
 	}
