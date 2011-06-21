@@ -328,4 +328,44 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		}
 	}
 
+
+	public function areRelated(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+		if (!$bean1->getID() || !$bean2->getID()) return false;
+		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
+		$idfield1 = $this->writer->getIDField($bean1->getMeta("type"));
+		$idfield2 = $this->writer->getIDField($bean2->getMeta("type"));
+		$type = $bean1->getMeta("type");
+		if ($type==$bean2->getMeta("type")) {
+			$type .= "2";
+			$cross = 1;
+		}
+		else $cross = 0;
+		$property1 = $type."_id";
+		$property2 = $bean2->getMeta("type")."_id";
+		$value1 = (int) $bean1->$idfield1;
+		$value2 = (int) $bean2->$idfield2;
+		try {
+			$rows = $this->writer->selectRecord($table,array(
+				$property1 => array($value1), $property2=>array($value2)),null
+			);
+			if ($cross) {
+				$rows2 = $this->writer->selectRecord($table,array(
+				$property2 => array($value1), $property1=>array($value2)),null
+				);
+				$rows = array_merge($rows,$rows2);
+			}
+
+		}catch(RedBean_Exception_SQL $e) {
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+			return false;
+		}
+
+		return (count($rows)>0);
+		
+	}
+
 }

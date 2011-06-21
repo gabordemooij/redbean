@@ -44,6 +44,9 @@ class RedBean_Plugin_QueryLogger implements RedBean_Plugin,RedBean_Observer {
 		return $this->logs;
 	}
 
+	public function clear() {
+		$this->logs = array();
+	}
 
 
 }

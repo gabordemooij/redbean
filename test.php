@@ -302,129 +302,6 @@ asrt($spoon->getMeta("tainted"),true);
 $spoon = $redbean->dispense("spoon");
 $linker->link($spoon,$redbean->dispense("spoon"));
 asrt($spoon->getMeta("tainted"),true);
-/*
-testpack("UNIT TEST RedBean OODB: Load");
-$bean = $redbean->load("typetest",2);
-asrt($bean->getMeta("tainted"),false);
-$nullWriter->returnSelectRecord = array();
-asrt($nullWriter->selectRecordArguments[0],"typetest");
-asrt($nullWriter->selectRecordArguments[1],array(2));
-asrt($bean->id,0);
-$nullWriter->returnSelectRecord = array(array("name"=>"abc","id"=>3));
-$bean = $redbean->load("typetest",3);
-asrt($nullWriter->selectRecordArguments[0],"typetest");
-asrt($nullWriter->selectRecordArguments[1],array(3));
-asrt($bean->id,3);
-try {
-	$bean = $redbean->load("typetest",-2);
-	pass();
-}catch(RedBean_Exception_Security $e) {
-	fail();
-}
-try {
-	$bean = $redbean->load("typetest",0);
-	pass();
-}catch(RedBean_Exception_Security $e) {
-	fail();
-}
-try {
-	$bean = $redbean->load("typetest",2.1);
-	pass();
-}catch(RedBean_Exception_Security $e) {
-	fail();
-}
-try {
-	$bean = $redbean->load(" ",3);
-	fail();
-}catch(RedBean_Exception_Security $e) {
-	pass();
-}
-try {
-	$bean = $redbean->load(".",3);
-	fail();
-}catch(RedBean_Exception_Security $e) {
-	pass();
-}
-try {
-	$bean = $redbean->load("type.test",3);
-	fail();
-}catch(RedBean_Exception_Security $e) {
-	pass();
-}
-
-testpack("UNIT TEST RedBean OODB: Batch");
-$nullWriter->reset();
-$beans = $redbean->batch("typetest",array(2));
-$nullWriter->returnSelectRecord = array();
-asrt($nullWriter->selectRecordArguments[0],"typetest");
-asrt($nullWriter->selectRecordArguments[1],array(2));
-asrt(count($beans),0);
-$nullWriter->reset();
-$nullWriter->returnSelectRecord = array(array("name"=>"abc","id"=>3));
-$beans = $redbean->batch("typetest",array(3));
-asrt($nullWriter->selectRecordArguments[0],"typetest");
-asrt($nullWriter->selectRecordArguments[1],array(3));
-asrt(count($beans),1);
-
-
-testpack("UNIT TEST RedBean OODB: Store");
-$nullWriter->reset();
-$bean = $redbean->dispense("bean");
-$bean->name = "coffee";
-asrt($bean->getMeta("tainted"),true);
-$nullWriter->returnScanType = 91239;
-$nullWriter->returnInsertRecord = 1234;
-asrt($redbean->store($bean),1234);
-asrt($bean->getMeta("tainted"),false);
-asrt($nullWriter->getColumnsArgument,"bean");
-asrt($nullWriter->createTableArgument,"bean");
-asrt($nullWriter->scanTypeArgument,"coffee");
-asrt($nullWriter->codeArgument,NULL);
-//print_r($nullWriter);
-asrt($nullWriter->addColumnArguments,array("bean","name",91239));
-asrt($nullWriter->insertRecordArguments,array("bean",array("name"),array(array("coffee"))));
-asrt($nullWriter->addUniqueIndexArguments,array());
-asrt($nullWriter->updateRecordArguments,array());
-asrt($nullWriter->widenColumnArguments,array());
-$nullWriter->reset();
-$bean = $redbean->dispense("bean");
-$bean->name = "chili";
-$bean->id=9876;
-$nullWriter->returnCode = 0;
-$nullWriter->returnScanType = 777;
-$nullWriter->returnTables=array("bean");
-$nullWriter->returnGetColumns=array("name"=>13);
-asrt($redbean->store($bean),9876);
-asrt($nullWriter->getColumnsArgument,"bean");
-asrt($nullWriter->createTableArgument,NULL);
-asrt($nullWriter->scanTypeArgument,"chili");
-asrt($nullWriter->codeArgument,13);
-asrt($nullWriter->addColumnArguments,array());
-asrt($nullWriter->insertRecordArguments,array());
-asrt($nullWriter->addUniqueIndexArguments,array());
-asrt($nullWriter->updateRecordArguments,array("bean",array(array("property"=>"name","value"=>"chili")),9876 ));
-asrt($nullWriter->widenColumnArguments,array("bean","name", 777));
-
-
-testpack("UNIT TEST RedBean OODB: Freeze");
-$nullWriter->reset();
-$redbean->freeze(true);
-$bean = $redbean->dispense("bean");
-$bean->name = "coffee";
-$nullWriter->returnScanType = 91239;
-$nullWriter->returnInsertRecord = 1234;
-asrt($redbean->store($bean),1234);
-asrt($nullWriter->getColumnsArgument,NULL);
-asrt($nullWriter->createTableArgument,NULL);
-asrt($nullWriter->scanTypeArgument,NULL);
-asrt($nullWriter->codeArgument,NULL);
-asrt($nullWriter->addColumnArguments,array());
-asrt($nullWriter->insertRecordArguments,array("bean",array("name"),array(array("coffee"))));
-asrt($nullWriter->addUniqueIndexArguments,array());
-asrt($nullWriter->updateRecordArguments,array());
-asrt($nullWriter->widenColumnArguments,array());
-$redbean->freeze(false);
-*/
 
 testpack("UNIT TEST RedBean OODBBean: Meta Information");
 $bean = new RedBean_OODBBean;
@@ -916,7 +793,6 @@ asrt(count($a->related($user, "page" )),2);
 $pageKeys = $a->related($user, "page" );
 $pages = $redbean->batch("page",$pageKeys);
 $links = $redbean->batch("page_user",$a->related($user,"page",true));
-//print_r($links);
 asrt(count($links),2);
 //confirm that the link beans are ok.
 $link = array_pop($links);
@@ -2113,6 +1989,8 @@ R::attach($book,$book2);
 R::attach($book,$book3);
 asrt( R::getParent($book3)->id, $book->id );
 asrt(count(R::children($book)),2);
+
+
 asrt(count(R::find("book")),3);
 asrt(count(R::find("book","1")),3);
 asrt(count(R::find("book"," title LIKE ?", array("third"))),1);

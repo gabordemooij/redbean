@@ -361,10 +361,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
         return $this->__get($offset);
     }
 
-	//public function __wakeup() {
-		//$this->setMeta("sys.oodb",R::$redbean);
-	//}
-
+	
 
 }
 

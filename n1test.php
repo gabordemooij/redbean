@@ -1,5 +1,6 @@
 <?php
 
+error_reporting(E_ALL | E_STRICT);
 require("RedBean/redbean.inc.php");
 R::setup("mysql:host=localhost;dbname=oodb","root");
 function printtext( $text ) {
@@ -10,6 +11,11 @@ function printtext( $text ) {
 		echo "\n".$text;
 	}
 }
+
+function testpack($name) {
+	printtext("testing: ".$name);
+}
+
 /**
  * Tests whether a === b.
  * @global integer $tests
@@ -313,7 +319,81 @@ $book3->ownPage['try_to_trick_ya'] = $page3;
 $book3=R::load('book',R::store($book3));
 asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),2);
 asrt(count($book3->ownPage),2);
+//delete and re-add
 $book3=R::load('book',$idb3);
+unset($book3->ownPage[10]); 
+$book3->ownPage[] = $page1;
+$book3=R::load('book',R::store($book3));
+asrt(count($book3->ownPage),2);//exit;
+$book3=R::load('book',$idb3);
+print_r($book3->sharedTopic); 
+unset($book3->sharedTopic[1]); 
+$book3->sharedTopic[] = $topic1;
+$book3=R::load('book',R::store($book3));
+asrt(count($book3->sharedTopic),1);
+
+//test performance
+$logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach(R::$adapter);
+$book = R::load('book',1);
+$book->sharedTopic = array();
+//R::debug(1);
+R::store($book);
+//print_r($logger->getLogs());
+asrt(count($logger->grep('UPDATE')),1);  //no more than 1 update
+$book=R::load('book',1);
+$logger->clear();
+print_r($book->sharedTopic,1);
+asrt(count($logger->grep('SELECT')),1);  //no more than 1 select
+
+$logger->clear();
+$book->sharedTopic[] = $topic1;
+$book->sharedTopic[] = $topic2;
+asrt(count($logger->grep('SELECT')),0); 
+R::store($book);
+//$book=R::load('book',1);
+$book->sharedTopic[] = $topic3; 
+//now do NOT clear all and then add one, just add the one
+//R::debug(1);
+$logger->clear();
+R::store($book);
+$book=R::load('book',1);
+asrt(count($book->sharedTopic),3);
+asrt(count($logger->grep("DELETE")),0); //no deletes
+$book->sharedTopic['a'] = $topic3;
+unset($book->sharedTopic['a']);
+R::store($book);
+$book=R::load('book',1);
+asrt(count($book->sharedTopic),3);
+asrt(count($logger->grep("DELETE")),0); //no deletes
+//R::debug(1);
+$book->ownPage = array();
+R::store($book);
+asrt(count($book->ownPage),0);
+$book->ownPage[] = $page1;
+$book->ownPage['a'] = $page2;
+asrt(count($book->ownPage),2);
+R::store($book);
+print_r($book->ownPage);
+//keys have been renum, so this has no effect:
+unset($book->ownPage['a']);
+asrt(count($book->ownPage),2);
+unset($book->ownPage[11]);
+R::store($book);
+$book=R::load('book',1);
+asrt(count($book->ownPage),1);
+//$pageInBook = reset($book->ownPage);
+//$pageInBook->title .= ' changed ';
+$aPage = $book->ownPage[10];
+unset($book->ownPage[10]);
+$aPage->title .= ' changed ';
+$book->ownPage['anotherPage'] = $aPage;
+$logger->clear();
+R::store($book);
+asrt(count($logger->grep("SELECT")),0);
+$book=R::load('book',1);
+asrt(count($book->ownPage),1);
+$ap = reset($book->ownPage);
+asrt($ap->title,"pagina1 changed ");
 
 
 
@@ -353,23 +433,22 @@ $book3=R::load('book',R::store($book3));
 
 function modgr($book3) {
 
-	global $quotes;
+	global $quotes,$pictures,$topics;
 	
 	$key = array_rand($quotes);
 	$quote = $quotes[$key];
+	$keyPic = array_rand($pictures);
+	$picture = $pictures[$keyPic];
+	$keyTop = array_rand($topics);
+	$topic = $topics[$keyTop];
+
 	
 	
-	//$quote = R::dispense('quote');
-	//$quote->note = 'note'.rand(0,100);
-	$p = R::dispense('picture');
-	$p->note = 'note'.rand(0,100);
-	$topic = R::dispense('topic');
-	$topic->note = 'note'.rand(0,100);
 
 	if (rand(0,1)) {
 		$f=0;
 		foreach($book3->ownQuote as $z) {
-			if ($z->id == $quote->id) { $f = 1; break; }
+			if ($z->note == $quote->note) { $f = 1; break; }
 		}
 		if (!$f) {
 		echo "\n add a quote ";
@@ -377,12 +456,24 @@ function modgr($book3) {
 		}
 	}
 	if (rand(0,1)){
-		echo "\n add a picture ";
-		$book3->ownPicture[] = $p;
+		$f=0;
+		foreach($book3->ownPicture as $z) {
+			if ($z->note == $picture->note) { $f = 1; break; }
+		}
+		if (!$f) {
+			echo "\n add a picture ";
+			$book3->ownPicture[] = $picture;
+		}
 	}
 	if (rand(0,1)) {
-		echo "\n add a shared topic ";
-		$book3->sharedTopic[] = $topic;	
+		$f=0;
+		foreach($book3->sharedTopic as $z) {
+			if ($z->note == $topic->note) { $f = 1; break; }
+		}
+		if (!$f) {
+			echo "\n add a shared topic ";
+			$book3->sharedTopic[] = $topic;	
+		}
 	}
 	if (rand(0,1) && count($book3->ownQuote)>0) {
 		$key = array_rand($book3->ownQuote);
@@ -402,40 +493,55 @@ function modgr($book3) {
 
 	if (rand(0,1) && count($book3->ownPicture)>0) {
 		$key = array_rand($book3->ownPicture);
-		$book3->ownPicture[ $key ]->note = rand(0,100);
+		$book3->ownPicture[ $key ]->change = rand(0,100);
 		echo "\n changed picture with key $key ";
 	}
 	if (rand(0,1) && count($book3->ownQuote)>0) {
 		$key = array_rand($book3->ownQuote);
-		$book3->ownQuote[ $key ]->note = rand(0,100);
+		$book3->ownQuote[ $key ]->change = 'note ch '.rand(0,100);
 		echo "\n changed quote with key $key ";
 	}
 	if (rand(0,1) && count($book3->sharedTopic)>0) {
 		$key = array_rand($book3->sharedTopic);
-		$book3->sharedTopic[ $key ]->note = rand(0,100);
+		$book3->sharedTopic[ $key ]->change = rand(0,100);
 		echo "\n changed sharedTopic with key $key ";
 	}
 }
 
+
+$NOTE = 0;
+
 $quotes = R::dispense('quote',10);
-foreach($quotes as $k=>$q) {
-	$q->note = 'note'.rand(0,100);
+foreach($quotes as &$justSomeQuote) {
+	$justSomeQuote->note = 'note'.(++$NOTE);
+}
+$pictures = R::dispense('picture',10);
+foreach($pictures as &$justSomePic) {
+	$justSomePic->note = 'note'.(++$NOTE);
+}
+$topics = R::dispense('topic',10);
+foreach($topics as &$justSomeTopic) {
+	$justSomeTopic->note = 'note'.(++$NOTE);
 }
 
+
 for($j=0; $j<10; $j++) {
-	for($x=0;$x<rand(3,20); $x++) modgr($book3); //do several mutations
+	//echo "\n bean start: ".print_r($book3,1);
+	for($x=0;$x<rand(1,20); $x++) modgr($book3); //do several mutations
 	$qbefore = count($book3->ownQuote);
 	$pbefore = count($book3->ownPicture);
 	$tbefore = count($book3->sharedTopic);
 	$qjson = json_encode($book->ownQuote);
 	$pjson = json_encode($book->ownPicture);
 	$tjson = json_encode($book->sharedTopic);
+	//echo "\n bean before: ".json_encode(array($book3->ownQuote,$book3->ownPicture,$book3->sharedTopic));
 	//echo "\n bean before: ".print_r($book3,1);
 	$book3=R::load('book',R::store($book3));
 	echo "\n $qbefore == ".count($book3->ownQuote);
 	echo "\n $pbefore == ".count($book3->ownPicture);
 	echo "\n $tbefore == ".count($book3->sharedTopic);
 	//echo "\n bean after: ".print_r($book3,1);
+	//echo "\n bean after: ".json_encode(array($book3->ownQuote,$book3->ownPicture,$book3->sharedTopic));
 	asrt(count($book3->ownQuote),$qbefore);
 	asrt(count($book3->ownPicture),$pbefore);
 	asrt(count($book3->sharedTopic),$tbefore);
@@ -443,6 +549,7 @@ for($j=0; $j<10; $j++) {
 	asrt(json_encode($book->ownPicture),$pjson);
 	asrt(json_encode($book->sharedTopic),$tjson);
 }
+exit;
 
  
 //graph
@@ -505,7 +612,7 @@ asrt($noOfBuildings,1);
 $emptyHouses = R::getAll('select name,count(id_of_furniture) from people group by id having count(id_of_furniture) = 0');
 asrt(count($emptyHouses),2);
 foreach($emptyHouses as $empty){
-	if ($empty->name!=='v3') pass(); else fail();
+	if ($empty['name']!=='v3') pass(); else fail();
 }
 
 //Change the names and add the same building should not change the graph

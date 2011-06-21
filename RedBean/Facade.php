@@ -112,12 +112,18 @@ class R {
 	public static function setup( $dsn="sqlite:/tmp/red.db", $username=NULL, $password=NULL ) {
 		
 		//either use Setup() or SetupMulti(), not both.. - resets toolbox list.
-		self::$toolboxes = array();
-		self::$currentDB = false;
+		//self::$toolboxes = array();
+		//self::$currentDB = false;
 
-		RedBean_Setup::kickstart( $dsn, $username, $password );
-		$toolbox = RedBean_Setup::getToolBox();
-		self::configureFacadeWithToolbox($toolbox);
+		//RedBean_Setup::kickstart( $dsn, $username, $password );
+		//$toolbox = RedBean_Setup::getToolBox();
+		//self::configureFacadeWithToolbox($toolbox);
+		$facadeInstances = self::setupMultiple( array("default"=>array("dsn"=>$dsn,"username"=>$username,"password"=>$password,"frozen"=>false)));
+		$facadeInstance = $facadeInstances["default"];
+		//self::selectDatabase("default");
+		//$facadeInstance->selectDatabase("default");
+		self::configureFacadeWithToolbox(self::$toolboxes["default"]); 
+		return $facadeInstance;
 	}
 
 	/**
@@ -347,6 +353,10 @@ class R {
 		return self::find( $type, $sqlSnippet, $values );
 	}
 
+
+	public static function areRelated( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+		return self::$associationManager->areRelated($bean1,$bean2);
+	}
 	
 
 	/**
@@ -492,11 +502,11 @@ class R {
 	 * @return array $beans  beans
 	 */
 	public static function find( $type, $sql="1", $values=array() ) {
-		if (isset(self::$toolboxes[self::$currentDB])) { $toolbox = self::$toolboxes[self::$currentDB]; } else {
-			$toolbox = false;
-		}
+		//if (isset(self::$toolboxes[self::$currentDB])) { $toolbox = self::$toolboxes[self::$currentDB]; } else {
+		//	$toolbox = false;
+		//}
 		
-		return RedBean_Plugin_Finder::where( $type, $sql, $values, $toolbox );
+		return RedBean_Plugin_Finder::where( $type, $sql, $values, self::$toolbox );
 	}
 
 
