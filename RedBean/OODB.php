@@ -358,12 +358,12 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		}
 		foreach($sharedTrashcan as $trash) {
 			if ($trash instanceof RedBean_OODBBean) {
-				R::unassociate($trash,$bean);
+				$this->assocManager->unassociate($trash,$bean);
 			}
 		}
 		foreach($sharedAdditions as $addition) {
 			if ($addition instanceof RedBean_OODBBean) {
-				R::associate($addition,$bean);
+				$this->assocManager->associate($addition,$bean);
 			}
 		}
 		foreach($sharedresidue as $residue) {
