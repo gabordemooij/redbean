@@ -122,6 +122,48 @@ class RedBean_Cooker {
 		);
 
 	}
+
+	public function setToolbox(RedBean_Toolbox $toolbox) {
+
+		$this->toolbox = $toolbox;
+		$this->redbean = $this->toolbox->getRedbean();
+
+	}
+
+	public function graph( $array ) {
+
+		$beans = array();
+		foreach($array as $k=>$v) {
+			if (is_array($array) && isset($array["type"])) {
+				$bean = $this->redbean->dispense($array["type"]);
+				unset($array["type"]);
+				foreach($array as $property=>$value) {
+					if (is_array($value)) {
+						$bean->$property = $this->graph($value);
+					}
+					else {
+						$bean->$property = $value;
+					}
+				}
+				return $bean;
+			}
+			elseif (is_array($array)) {
+				foreach($array as $key=>$value) {
+					$beans[$key] = $this->graph($value);
+				}
+				return $beans;
+			}
+			else {
+				return $array;
+			}
+
+		}
+		return $beans;
+		
+	}
+
+
+
 	
 
 }

@@ -396,8 +396,6 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	public function load($type, $id) {
 		$this->signal("before_open",array("type"=>$type,"id"=>$id));
 
-		//$tmpid = intval( $id );
-		//if ($tmpid < 0) throw new RedBean_Exception_Security("Id less than zero not allowed");
 		$bean = $this->dispense( $type );
 		if ($this->stash && isset($this->stash[$id])) {
 			$row = $this->stash[$id];
@@ -557,9 +555,6 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		return false;
 	}
 
-	public function getWriter() {
-		return $this->writer;
-	}
 
 	public function getAssociationManager() {
 		if (!isset($this->assocManager)) throw new Exception("No association manager available.");

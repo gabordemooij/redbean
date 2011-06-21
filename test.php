@@ -257,6 +257,7 @@ try {
 }catch(RedBean_Exception_Security $e) {
 	fail();
 }
+$bean->name = new RedBean_OODBBean;
 try {
 	$redbean->check($bean);
 	fail();

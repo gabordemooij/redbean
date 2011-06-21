@@ -326,7 +326,7 @@ $book3->ownPage[] = $page1;
 $book3=R::load('book',R::store($book3));
 asrt(count($book3->ownPage),2);//exit;
 $book3=R::load('book',$idb3);
-print_r($book3->sharedTopic); 
+//print_r($book3->sharedTopic); 
 unset($book3->sharedTopic[1]); 
 $book3->sharedTopic[] = $topic1;
 $book3=R::load('book',R::store($book3));
@@ -373,7 +373,7 @@ $book->ownPage[] = $page1;
 $book->ownPage['a'] = $page2;
 asrt(count($book->ownPage),2);
 R::store($book);
-print_r($book->ownPage);
+//($book->ownPage);
 //keys have been renum, so this has no effect:
 unset($book->ownPage['a']);
 asrt(count($book->ownPage),2);
@@ -554,12 +554,18 @@ for($j=0; $j<10; $j++) {
  
 //graph
 R::exec('drop table if exists army_village');
+R::exec('drop table if exists cd_track');
+R::exec('drop table if exists song_track');
 R::exec('drop table if exists village');
 R::exec('drop table if exists building');
 R::exec('drop table if exists farmer');
 R::exec('drop table if exists furniture');
 R::exec('drop table if exists army');
 R::exec('drop table if exists people');
+R::exec('drop table if exists song');
+R::exec('drop table if exists track');
+R::exec('drop table if exists cover');
+R::exec('drop table if exists playlist');
 list($v1,$v2,$v3) = R::dispense('village',3);
 list($b1,$b2,$b3,$b4,$b5,$b6) = R::dispense('building',6);
 list($f1,$f2,$f3,$f4,$f5,$f6) = R::dispense('farmer',6);
@@ -638,6 +644,24 @@ asrt(count(reset($v1->ownBuilding)->ownFarmer),0);
 asrt(count(end($v1->ownBuilding)->ownFarmer),1);
 asrt(count($v3->ownTapestry),0);
 
+
+$json = '{"mysongs":{"type":"playlist","name":"JazzList","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","url":"music.com\/harlem"}],"cover":{"type":"cover","url":"albumart.com\/duke1"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
+
+$playList = json_decode( $json, true );
+
+$cooker = new RedBean_Cooker;
+$cooker->setToolbox(R::$toolbox);
+
+$playList = ($cooker->graph(($playList)));
+//print_r($playList);
+$id = R::store(reset($playList));
+$play = R::load("playlist", $id);
+//print_r($play);
+asrt(count($play->ownTrack),2);
+foreach($play->ownTrack as $track) {
+	asrt(count($track->sharedSong),1);
+	asrt(($track->cover instanceof RedBean_OODBBean),true);
+}
 
 
 
