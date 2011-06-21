@@ -451,7 +451,7 @@ function modgr($book3) {
 			if ($z->note == $quote->note) { $f = 1; break; }
 		}
 		if (!$f) {
-		echo "\n add a quote ";
+		//echo "\n add a quote ";
 		$book3->ownQuote[] = $quote;	
 		}
 	}
@@ -461,7 +461,7 @@ function modgr($book3) {
 			if ($z->note == $picture->note) { $f = 1; break; }
 		}
 		if (!$f) {
-			echo "\n add a picture ";
+		//	echo "\n add a picture ";
 			$book3->ownPicture[] = $picture;
 		}
 	}
@@ -471,40 +471,40 @@ function modgr($book3) {
 			if ($z->note == $topic->note) { $f = 1; break; }
 		}
 		if (!$f) {
-			echo "\n add a shared topic ";
+		//	echo "\n add a shared topic ";
 			$book3->sharedTopic[] = $topic;	
 		}
 	}
 	if (rand(0,1) && count($book3->ownQuote)>0) {
 		$key = array_rand($book3->ownQuote);
 		unset($book3->ownQuote[ $key ]);
-		echo "\n delete quote with key $key ";
+	//	echo "\n delete quote with key $key ";
 	}
 	if (rand(0,1) && count($book3->ownPicture)>0) {
 		$key = array_rand($book3->ownPicture);
 		unset($book3->ownPicture[ $key ]);
-		echo "\n delete picture with key $key ";
+	//	echo "\n delete picture with key $key ";
 	}
 	if (rand(0,1) && count($book3->sharedTopic)>0) {
 		$key = array_rand($book3->sharedTopic);
 		unset($book3->sharedTopic[ $key ]);
-		echo "\n delete sh topic  with key $key ";
+	//	echo "\n delete sh topic  with key $key ";
 	}
 
 	if (rand(0,1) && count($book3->ownPicture)>0) {
 		$key = array_rand($book3->ownPicture);
 		$book3->ownPicture[ $key ]->change = rand(0,100);
-		echo "\n changed picture with key $key ";
+	//	echo "\n changed picture with key $key ";
 	}
 	if (rand(0,1) && count($book3->ownQuote)>0) {
 		$key = array_rand($book3->ownQuote);
 		$book3->ownQuote[ $key ]->change = 'note ch '.rand(0,100);
-		echo "\n changed quote with key $key ";
+	//	echo "\n changed quote with key $key ";
 	}
 	if (rand(0,1) && count($book3->sharedTopic)>0) {
 		$key = array_rand($book3->sharedTopic);
 		$book3->sharedTopic[ $key ]->change = rand(0,100);
-		echo "\n changed sharedTopic with key $key ";
+	//	echo "\n changed sharedTopic with key $key ";
 	}
 }
 
@@ -537,9 +537,9 @@ for($j=0; $j<10; $j++) {
 	//echo "\n bean before: ".json_encode(array($book3->ownQuote,$book3->ownPicture,$book3->sharedTopic));
 	//echo "\n bean before: ".print_r($book3,1);
 	$book3=R::load('book',R::store($book3));
-	echo "\n $qbefore == ".count($book3->ownQuote);
-	echo "\n $pbefore == ".count($book3->ownPicture);
-	echo "\n $tbefore == ".count($book3->sharedTopic);
+	//echo "\n $qbefore == ".count($book3->ownQuote);
+	//echo "\n $pbefore == ".count($book3->ownPicture);
+	//echo "\n $tbefore == ".count($book3->sharedTopic);
 	//echo "\n bean after: ".print_r($book3,1);
 	//echo "\n bean after: ".json_encode(array($book3->ownQuote,$book3->ownPicture,$book3->sharedTopic));
 	asrt(count($book3->ownQuote),$qbefore);
@@ -549,7 +549,7 @@ for($j=0; $j<10; $j++) {
 	asrt(json_encode($book->ownPicture),$pjson);
 	asrt(json_encode($book->sharedTopic),$tjson);
 }
-exit;
+
 
  
 //graph
