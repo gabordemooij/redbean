@@ -645,10 +645,9 @@ asrt(count(end($v1->ownBuilding)->ownFarmer),1);
 asrt(count($v3->ownTapestry),0);
 
 
-$json = '{"mysongs":{"type":"playlist","name":"JazzList","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","url":"music.com\/harlem"}],"cover":{"type":"cover","url":"albumart.com\/duke1"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
+$json = '{"mysongs":{"type":"playlist","name":"JazzList","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","url":"music.com.harlem"}],"cover":{"type":"cover","url":"albumart.com\/duke1"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 
 $playList = json_decode( $json, true );
-
 $cooker = new RedBean_Cooker;
 $cooker->setToolbox(R::$toolbox);
 
@@ -663,7 +662,41 @@ foreach($play->ownTrack as $track) {
 	asrt(($track->cover instanceof RedBean_OODBBean),true);
 }
 
+$json = '{"mysongs":{"type":"playlist","id":"1","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","id":"1"}],"cover":{"type":"cover","id":"2"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 
+$playList = json_decode( $json, true );
+$cooker = new RedBean_Cooker;
+$cooker->setToolbox(R::$toolbox);
+$playList = ($cooker->graph(($playList)));
+$id = R::store(reset($playList));
+$play = R::load("playlist", $id);
+//print_r($play);
+asrt(count($play->ownTrack),2);
+foreach($play->ownTrack as $track) {
+	asrt(count($track->sharedSong),1);
+	asrt(($track->cover instanceof RedBean_OODBBean),true);
+}
+$track = reset($play->ownTrack);
+$song = reset($track->sharedSong);
+asrt(intval($song->id),1);
+asrt($song->url,"music.com.harlem");
 
+$json = '{"mysongs":{"type":"playlist","id":"1","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","id":"1","url":"changedurl"}],"cover":{"type":"cover","id":"2"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 
+$playList = json_decode( $json, true );
+$cooker = new RedBean_Cooker;
+$cooker->setToolbox(R::$toolbox);
+$playList = ($cooker->graph(($playList)));
+$id = R::store(reset($playList));
+$play = R::load("playlist", $id);
+//print_r($play);
+asrt(count($play->ownTrack),2);
+foreach($play->ownTrack as $track) {
+	asrt(count($track->sharedSong),1);
+	asrt(($track->cover instanceof RedBean_OODBBean),true);
+}
+$track = reset($play->ownTrack);
+$song = reset($track->sharedSong);
+asrt(intval($song->id),1);
+asrt(($song->url),"changedurl");
 

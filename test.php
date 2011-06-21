@@ -413,6 +413,7 @@ $pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS book_page");
 $pdo->Execute("DROP TABLE IF EXISTS page_page");
+$pdo->Execute("DROP TABLE IF EXISTS song_track");
 
 $pdo->Execute("DROP TABLE IF EXISTS movie_movie");
 $pdo->Execute("DROP TABLE IF EXISTS page");

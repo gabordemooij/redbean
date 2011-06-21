@@ -135,8 +135,19 @@ class RedBean_Cooker {
 		$beans = array();
 		foreach($array as $k=>$v) {
 			if (is_array($array) && isset($array["type"])) {
-				$bean = $this->redbean->dispense($array["type"]);
+
+				$type = $array["type"];
 				unset($array["type"]);
+
+				//Do we need to load the bean?
+				if (isset($array["id"])) {
+					$id = (int) $array["id"];
+					$bean = $this->redbean->load($type,$id);
+				}
+				else {
+					$bean = $this->redbean->dispense($type);
+				}
+				
 				foreach($array as $property=>$value) {
 					if (is_array($value)) {
 						$bean->$property = $this->graph($value);
