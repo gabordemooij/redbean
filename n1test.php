@@ -700,3 +700,32 @@ $song = reset($track->sharedSong);
 asrt(intval($song->id),1);
 asrt(($song->url),"changedurl");
 
+
+//Tree 
+$page = R::dispense('page');
+$page->name = 'root of all evil';
+list( $subPage, $subSubPage, $subNeighbour, $subOfSubNeighbour, $subSister ) = R::dispense('page',5);
+$subPage->name = 'subPage';
+$subSubPage->name = 'subSubPage';
+$subOfSubNeighbour->name = 'subOfSubNeighbour';
+$subNeighbour->name = 'subNeighbour';
+$subSister->name = 'subSister';
+$page->ownPage = array( $subPage, $subNeighbour, $subSister );
+R::store($page);
+asrt(count($page->ownPage),3);
+foreach($page->ownPage as $p) {
+	if ($p->name=='subPage') {
+		$p->ownPage[] = $subSubPage;
+	}
+	if ($p->name=='subNeighbour') {
+		$p->ownPage[] = $subOfSubNeighbour;
+	}
+}
+R::store($page);
+asrt(count($page->ownPage),3);
+list($first, $second) = array_keys($page->ownPage);
+asrt(count($page->ownPage[$first]->ownPage),1);
+asrt(count($page->ownPage[$second]->ownPage),1);
+
+
+

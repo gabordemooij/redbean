@@ -228,7 +228,6 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array();
 		$ownAdditions = $ownTrashcan = $ownresidue = array();
 		$tmpCollectionStore = array();
-		$f = array('RedBean_OODB','equals');
 		foreach($bean as $p=>$v) {
 
 			if ($v instanceof RedBean_OODBBean) {
@@ -237,14 +236,14 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 					$this->store($v);
 				}
 				$beanID = $v->$idfield;
-				$linkField = $p.'_id'; //$this->writer->getAlias($v->getMeta("type"));
+				$linkField = $p.'_id';
 				$bean->$linkField = $beanID;
 				$tmpCollectionStore[$p]=$bean->$p;
 				$bean->removeProperty($p);
 			}
 			if (is_array($v)) {
 				$originals = $bean->getMeta('sys.shadow.'.$p);
-				if (!$originals) $originals = array(); //print_r($originals); print_r($v);
+				if (!$originals) $originals = array(); 
 				if (strpos($p,'own')===0) {
 					list($ownAdditions,$ownTrashcan,$ownresidue)=$this->processGroups($originals,$v,$ownAdditions,$ownTrashcan,$ownresidue);
 					$bean->removeProperty($p);
