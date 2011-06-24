@@ -158,8 +158,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 			 */
 			if (isset($this->$fieldLink) && $fieldLink != $this->getMeta('sys.idfield')) {
 				$this->setMeta("tainted",true);
-				//$type = $this->getMeta("sys.oodb")->getWriter()->getAlias($property);
-				//return $this->getMeta("sys.oodb")->load($type, $this->$fieldLink);
 				$type = R::$writer->getAlias($property);
 				$targetType = $this->properties[$fieldLink];
 				$bean =  R::load($type,$targetType);
@@ -167,26 +165,28 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 			}
 
 			if (strpos($property,'own')===0) {
-				$type = strtolower(str_replace('own','',$property));
-				$myFieldLink = $this->getMeta('type')."_id";
-				//$beans = $this->getMeta("sys.oodb")->find($type,array($myFieldLink=>array($this->getID())));
-				$beans = R::find($type," $myFieldLink = ?",array($this->getID()));
-				$this->properties[$property] = $beans;
-				$this->setMeta("sys.shadow.".$property,$beans);
-				$this->setMeta("tainted",true);
-				return $this->properties[$property];
+				$firstCharCode = ord(substr($property,3,1));
+				if ($firstCharCode>=65 && $firstCharCode<=90) {
+					$type = strtolower(str_replace('own','',$property));
+					$myFieldLink = $this->getMeta('type')."_id";
+					$beans = R::find($type," $myFieldLink = ?",array($this->getID()));
+					$this->properties[$property] = $beans;
+					$this->setMeta("sys.shadow.".$property,$beans);
+					$this->setMeta("tainted",true);
+					return $this->properties[$property];
+				}
 			}
 
 			if (strpos($property,'shared')===0) {
-				$type = strtolower(str_replace('shared','',$property));
-				//$keys = $this->getMeta("sys.oodb")->getAssociationManager()->related($this, $type);
-				//if (!$keys) $beans = array(); else $beans = $this->getMeta("sys.oodb")->batch($type,$keys);
-				//$this->properties[$property] = $beans;
-				$beans = R::related($this,$type);
-				$this->properties[$property] = $beans;
-				$this->setMeta("sys.shadow.".$property,$beans);
-				$this->setMeta("tainted",true);
-				return $this->properties[$property];
+				$firstCharCode = ord(substr($property,6,1));
+				if ($firstCharCode>=65 && $firstCharCode<=90) {
+					$type = strtolower(str_replace('shared','',$property));
+					$beans = R::related($this,$type);
+					$this->properties[$property] = $beans;
+					$this->setMeta("sys.shadow.".$property,$beans);
+					$this->setMeta("tainted",true);
+					return $this->properties[$property];
+				}
 			}
 
 			$this->properties[$property] = null;
@@ -206,7 +206,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 */
 
 	public function __set( $property, $value ) {
-
 
 		$this->__get($property);
 		$this->setMeta("tainted",true);

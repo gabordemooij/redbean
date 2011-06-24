@@ -3,6 +3,7 @@
 error_reporting(E_ALL | E_STRICT);
 require("RedBean/redbean.inc.php");
 R::setup("mysql:host=localhost;dbname=oodb","root");
+
 function printtext( $text ) {
 	if ($_SERVER["DOCUMENT_ROOT"]) {
 		echo "<BR>".$text;
@@ -100,6 +101,9 @@ asrt(count($book->ownPage),2);
 //performing a deletion
 $book = R::load('book',$id);
 unset($book->ownPage[1]);
+
+//echo '>>>>>>'.print_r($book->getMeta('listaccess'));
+
 $id = R::store($book);
 $book = R::load('book',$id);
 asrt(count($book->ownPage),1);
@@ -553,9 +557,16 @@ for($j=0; $j<10; $j++) {
 
  
 //graph
+R::exec('drop table if exists band_bandmember');
+R::exec('drop table if exists band_location');
+R::exec('drop table if exists band_genre');
 R::exec('drop table if exists army_village');
 R::exec('drop table if exists cd_track');
 R::exec('drop table if exists song_track');
+R::exec('drop table if exists band');
+R::exec('drop table if exists bandmember');
+R::exec('drop table if exists location');
+R::exec('drop table if exists genre');
 R::exec('drop table if exists village');
 R::exec('drop table if exists building');
 R::exec('drop table if exists farmer');
@@ -726,6 +737,112 @@ asrt(count($page->ownPage),3);
 list($first, $second) = array_keys($page->ownPage);
 asrt(count($page->ownPage[$first]->ownPage),1);
 asrt(count($page->ownPage[$second]->ownPage),1);
+
+//test backward compatibility
+asrt($page->owner,null);
+
+
+//Test fuse
+class Model_Band extends RedBean_SimpleModel {
+
+	public function after_update() {
+	}
+	
+	public function update() {
+		//print_r($this->ownBandmember);
+		if (count($this->ownBandmember)>4) {
+			throw new Exception('too many!');
+		}
+	}
+}
+
+$band = R::dispense('band');
+$musicians = R::dispense('bandmember',5);
+$band->ownBandmember = $musicians;
+try{
+R::store($band);
+fail();
+}
+catch(Exception $e){
+pass();
+}
+$band = R::dispense('band');
+$musicians = R::dispense('bandmember',4);
+$band->ownBandmember = $musicians;
+try{
+$id=R::store($band);
+pass();
+}
+catch(Exception $e){
+fail();
+}
+
+$band=R::load('band',$id);
+$band->ownBandmember[] = R::dispense('bandmember');
+try{
+R::store($band);
+fail();
+}
+catch(Exception $e){
+pass();
+}
+
+$lifeCycle = "";
+class Model_Bandmember extends RedBean_SimpleModel {
+	
+	public function open() {
+		global $lifeCycle;
+		$lifeCycle .= "\n called open: ".$this->id;
+	}
+	
+	
+	public function dispense(){
+		global $lifeCycle;
+		$lifeCycle .= "\n called dispense() ".$this->bean;
+	}
+	
+	public function update() {
+		global $lifeCycle;
+		$lifeCycle .= "\n called update() ".$this->bean;
+	}
+	
+	public function after_update(){
+		global $lifeCycle;
+		$lifeCycle .= "\n called after_update() ".$this->bean;
+	}
+	
+	public function delete() {
+		global $lifeCycle;
+		$lifeCycle .= "\n called delete() ".$this->bean;
+	}
+	
+	public function after_delete() {
+		global $lifeCycle;
+		$lifeCycle .= "\n called after_delete() ".$this->bean;
+	}
+	
+	
+
+}
+
+$bandmember = R::dispense('bandmember');
+$bandmember->name = 'Fatz Waller';
+$id = R::store($bandmember);
+$bandmember = R::load('bandmember',$id);
+R::trash($bandmember);
+
+
+//echo "\n\n\n".$lifeCycle."\n";
+
+$expected = 'calleddispenseid0calledupdateid0nameFatzWallercalledafter_updateid5nameFatzWallercalleddispenseid0calledopen5calleddeleteid5band_idnullnameFatzWallercalledafter_deleteid0band_idnullnameFatzWaller';
+
+$lifeCycle = preg_replace("/\W/","",$lifeCycle);
+//$expected = "\n\n".preg_replace("/\W/","",$expected)."\n\n";
+
+
+asrt($lifeCycle,$expected);
+
+
 
 
 

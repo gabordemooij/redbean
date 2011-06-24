@@ -989,6 +989,8 @@ class R {
 		self::$redbean->addEventListener("after_delete", $helper );
 		self::$redbean->addEventListener("after_update", $helper );
 		self::$redbean->addEventListener("dispense", $helper );
+		//self::$redbean->addEventListener("before_dispense", $helper );
+		//self::$redbean->addEventListener("before_open", $helper );
 		return $oldTools;
 	}
 

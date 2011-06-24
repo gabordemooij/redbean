@@ -222,8 +222,17 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 * @return integer $newid
 	 */
 	public function store( RedBean_OODBBean $bean ) {
-		if (!$bean->getMeta('tainted')) return $bean->getID();
+
+		$processLists = false;
+		foreach($bean as $k=>$v) {
+			if (is_array($v) || is_object($v)) { $processLists = true; break; }
+		}
+
+
+		if (!$processLists && !$bean->getMeta('tainted')) return $bean->getID();
 		$this->signal( "update", $bean );
+
+		if ($processLists) {
 		//Define groups
 		$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array();
 		$ownAdditions = $ownTrashcan = $ownresidue = array();
@@ -243,7 +252,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			}
 			if (is_array($v)) {
 				$originals = $bean->getMeta('sys.shadow.'.$p);
-				if (!$originals) $originals = array(); 
+				if (!$originals) $originals = array();
 				if (strpos($p,'own')===0) {
 					list($ownAdditions,$ownTrashcan,$ownresidue)=$this->processGroups($originals,$v,$ownAdditions,$ownTrashcan,$ownresidue);
 					$bean->removeProperty($p);
@@ -257,12 +266,14 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				}
 			}
 		}
-
+		}
 
 		if (!$this->isFrozen) $this->check($bean);
 		//what table does it want
 		$table = $bean->getMeta("type");
 		$idfield = $this->writer->getIDField($table);
+
+		if ($bean->getMeta('tainted')) {
 		//Does table exist? If not, create
 		if (!$this->isFrozen && !$this->tableExists($table)) {
 			$this->writer->createTable( $table );
@@ -327,7 +338,12 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		}
 		$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
 		$bean->$idfield = $rs;
+
+
 		$bean->setMeta("tainted",false);
+		}
+
+		if ($processLists) {
 		$myFieldLink = $bean->getMeta('type').'_id';
 		//Handle related beans
 		foreach($ownTrashcan as $trash) {
@@ -369,6 +385,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			if ($residue instanceof RedBean_OODBBean) {
 				$this->store($residue);
 			}
+		}
 		}
 		$this->signal( "after_update", $bean );
 		return (int) $bean->$idfield;
