@@ -3,7 +3,8 @@
 error_reporting(E_ALL | E_STRICT);
 require("RedBean/redbean.inc.php");
 
-R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
+//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
 //R::setup(); $db="sqlite";
 
 function printtext( $text ) {
@@ -49,7 +50,7 @@ function fail() {
 	exit;
 }
 
-
+//R::debug(1);
 
 R::exec('drop table if exists author_page');
 R::exec('drop table if exists book_tag');
@@ -97,6 +98,7 @@ asrt(count($book->ownPage),1);
 asrt(reset($book->ownPage)->getMeta('type'),'page');
 //performing an own addition
 $book->ownPage[] = $page2;
+
 $id = R::store($book);
 $book = R::load('book',$id);
 asrt(count($book->ownPage),2);
@@ -106,6 +108,8 @@ unset($book->ownPage[1]);
 
 //echo '>>>>>>'.print_r($book->getMeta('listaccess'));
 
+//echo "\n\n\n\n==================================================  aaa";
+//print_r($book);
 $id = R::store($book);
 $book = R::load('book',$id);
 asrt(count($book->ownPage),1);
@@ -199,6 +203,7 @@ asrt(count($b2->ownPage),0);
 $book = R::load('book',$id);
 $book->sharedTopic[] = $topic1;
 $id = R::store($book);
+
 //add an item
 asrt(count($book->sharedTopic),1);
 asrt(reset($book->sharedTopic)->name,'holiday');
@@ -207,7 +212,10 @@ asrt(count($book->sharedTopic),1);
 asrt(reset($book->sharedTopic)->name,'holiday');
 //add another item
 $book->sharedTopic[] = $topic2;
+
+
 $id = R::store($book);
+
 $book = R::load('book',$id);
 asrt(count($book->sharedTopic),2);
 $t1 = $book->sharedTopic[1];
@@ -228,6 +236,7 @@ $id = R::store($book);
 $book = R::load('book',$id);
 asrt(count($book->sharedTopic),2);
 asrt(reset($book->sharedTopic)->name,'tropics');
+
 $id = R::store($book);
 $book = R::load('book',$id);
 //delete without save
@@ -239,6 +248,7 @@ $book = R::load('book',$id);
 asrt((R::count('topic')),3);
 unset($book->sharedTopic[1]);
 $id = R::store($book);
+
 asrt((R::count('topic')),3);
 asrt(count($book->sharedTopic),1);
 asrt(count($book2->sharedTopic),0);
@@ -289,15 +299,18 @@ $book3->sharedTopic = array($topic1, $topic2);
 $book3=R::load('book',R::store($book3));
 $book3->sharedTopic = array();
 $book3=R::load('book',R::store($book3));
+
 asrt(count($book3->sharedTopic),0);
 $book3->sharedTopic[] = $topic1;
 $book3=R::load('book',R::store($book3));
+
 //added really one, not more?
 asrt(count($book3->sharedTopic),1);
 asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
 //add the same
 $book3->sharedTopic[] = $topic1;
 $book3=R::load('book',R::store($book3));
+
 asrt(count($book3->sharedTopic),1);
 asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
 $book3->sharedTopic['differentkey'] = $topic1;
@@ -307,6 +320,7 @@ asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3"))
 //ugly assign, auto array generation
 $book3->ownPage[] = $page1;
 $book3=R::load('book',R::store($book3));
+
 asrt(count($book3->ownPage),1);
 asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),1);
 $book3=R::load('book',$idb3);
@@ -327,6 +341,8 @@ $book3->ownPage[] = $page3;
 $book3=R::load('book',R::store($book3));
 asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),3);
 asrt(count($book3->ownPage),3);
+
+
 unset($book3->ownPage[$page2->id]);
 $book3->ownPage[] = $page3;
 $book3->ownPage['try_to_trick_ya'] = $page3;
@@ -345,6 +361,8 @@ unset($book3->sharedTopic[1]);
 $book3->sharedTopic[] = $topic1;
 $book3=R::load('book',R::store($book3));
 asrt(count($book3->sharedTopic),1);
+
+
 
 //test performance
 $logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach(R::$adapter);
@@ -560,7 +578,7 @@ R::exec('drop table if exists location');
 R::exec('drop table if exists bandmember');
 R::exec('drop table if exists band');
 R::exec('drop table if exists genre');
-R::exec('drop table if exists farmer');
+R::exec('drop table if exists farmer cascade');
 R::exec('drop table if exists furniture');
 R::exec('drop table if exists building');
 R::exec('drop table if exists village');
@@ -612,17 +630,31 @@ asrt(count($v3->ownTapestry),0);
 //test views for N-1 - we use the village for this
 R::view('people','village,building,farmer,building,furniture');
 //count buildings
+if ($db=="mysql") {
 $noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name="v1"');
 asrt($noOfBuildings,2);
 $noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name="v2"');
 asrt($noOfBuildings,1);
 $noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name="v3"');
 asrt($noOfBuildings,1);
+}
+
+if ($db=="pgsql") {
+$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name=\'v1\'');
+asrt($noOfBuildings,2);
+$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name=\'v2\'');
+asrt($noOfBuildings,1);
+$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name=\'v3\'');
+asrt($noOfBuildings,1);
+}
+
+if ($db=="mysql") {
 //what villages does not have furniture
 $emptyHouses = R::getAll('select name,count(id_of_furniture) from people group by id having count(id_of_furniture) = 0');
 asrt(count($emptyHouses),2);
 foreach($emptyHouses as $empty){
 	if ($empty['name']!=='v3') pass(); else fail();
+}
 }
 
 //Change the names and add the same building should not change the graph
@@ -728,8 +760,17 @@ foreach($page->ownPage as $p) {
 R::store($page);
 asrt(count($page->ownPage),3);
 list($first, $second) = array_keys($page->ownPage);
-asrt(count($page->ownPage[$first]->ownPage),1);
-asrt(count($page->ownPage[$second]->ownPage),1);
+
+
+foreach($page->ownPage as $p) {
+	if ($p->name=='subPage' || $p->name=='subNeighbour') {
+		asrt(count($p->ownPage),1);
+	}
+	else {
+		asrt(count($p->ownPage),0);
+	}
+}
+
 
 //test backward compatibility
 asrt($page->owner,null);
@@ -835,6 +876,19 @@ $lifeCycle = preg_replace("/\W/","",$lifeCycle);
 
 asrt($lifeCycle,$expected);
 
+
+//NULL test
+$page = R::dispense('page');
+$book = R::dispense('book');
+$page->title = 'a null page';
+$page->book = $book;
+$book->title = 'Why NUll is painful..';
+R::store($page);
+unset($page->book);
+$id = R::store($page);
+$page = R::load('page',$id);
+print_r($page);
+R::store($page);
 
 
 

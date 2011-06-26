@@ -543,5 +543,5 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 }
 
 class RedBean_Driver_PDO_NULL {
-	
+	public function __toString(){ return "PDONULL";}
 }

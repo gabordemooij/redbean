@@ -150,16 +150,17 @@ where table_schema = 'public'" );
 	 */
 	public function scanType( $value ) {
 		//echo " \n\n value = $value => ".strval(intval($value))." same? ".($value===strval(intval($value)));
-		if (is_numeric($value)
+		if ($value===null || ($value instanceof RedBean_Driver_PDO_NULL) ||(is_numeric($value)
 				  && floor($value)==$value
 				  && $value < 2147483648
-				  && $value > -2147483648) {
+				  && $value > -2147483648)) {
 			return self::C_DATATYPE_INTEGER;
 		}
 		elseif(is_numeric($value)) {
 			return self::C_DATATYPE_DOUBLE;
 		}
 		else {
+			//echo "TEXT BECAUSE : $value";
 			return self::C_DATATYPE_TEXT;
 		}
 	}
@@ -298,6 +299,8 @@ where table_schema = 'public'" );
 		$sqlState = "0";
 		if ($state == "42P01") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
 		if ($state == "42703") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
+		if ($state == "23505") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
+
 		return in_array($sqlState, $list);
 	}
 
