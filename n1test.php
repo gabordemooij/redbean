@@ -2,7 +2,9 @@
 
 error_reporting(E_ALL | E_STRICT);
 require("RedBean/redbean.inc.php");
-R::setup("mysql:host=localhost;dbname=oodb","root");
+
+R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+//R::setup(); $db="sqlite";
 
 function printtext( $text ) {
 	if ($_SERVER["DOCUMENT_ROOT"]) {
@@ -143,6 +145,9 @@ R::store($book);
 $book = R::load('book',$id);
 asrt(count($book->ownPage),2);
 $p5 = $book->ownPage[5];
+
+
+
 asrt($p5->title,'pagina5');
 //other way around - single bean
 asrt($p5->book->title,'abc');
@@ -155,6 +160,7 @@ $page1 = R::load('page',R::store($page1));
 asrt($page1->book->title,'def');
 $b2 = R::load('book',$id);
 asrt(count($b2->ownPage),2);
+
 //remove the other way around - single bean
 unset($page1->book);
 R::store($page1);
@@ -166,9 +172,13 @@ R::store($b2);
 $b2 = R::load('book',$book2->id);
 asrt(count($b2->ownPage),1);
 //different, less elegant way to remove
+
+
 $page1 = reset($b2->ownPage);
-$page1->book_id = 0;
+$page1->book_id = new RedBean_Driver_PDO_NULL;
 R::store($page1);
+
+
 $b2 = R::load('book',$book2->id);
 asrt(count($b2->ownPage),0);
 //re-add the page
@@ -178,7 +188,7 @@ $b2 = R::load('book',$book2->id);
 asrt(count($b2->ownPage),1);
 //even uglier way, but still needs to work
 $page1 = reset($b2->ownPage);
-$page1->book_id = 0;
+$page1->book_id = new RedBean_Driver_PDO_NULL;
 R::store($b2);
 $b2 = R::load('book',$book2->id);
 asrt(count($b2->ownPage),0);
@@ -377,23 +387,19 @@ $book->ownPage[] = $page1;
 $book->ownPage['a'] = $page2;
 asrt(count($book->ownPage),2);
 R::store($book);
-//($book->ownPage);
-//keys have been renum, so this has no effect:
 unset($book->ownPage['a']);
 asrt(count($book->ownPage),2);
 unset($book->ownPage[11]);
 R::store($book);
 $book=R::load('book',1);
 asrt(count($book->ownPage),1);
-//$pageInBook = reset($book->ownPage);
-//$pageInBook->title .= ' changed ';
 $aPage = $book->ownPage[10];
 unset($book->ownPage[10]);
 $aPage->title .= ' changed ';
 $book->ownPage['anotherPage'] = $aPage;
 $logger->clear();
 R::store($book);
-asrt(count($logger->grep("SELECT")),0);
+if ($db=="mysql") asrt(count($logger->grep("SELECT")),0);
 $book=R::load('book',1);
 asrt(count($book->ownPage),1);
 $ap = reset($book->ownPage);
@@ -401,12 +407,6 @@ asrt($ap->title,"pagina1 changed ");
 
 
 
-//echo '------------------------------------------------------------------';
-//R::debug(1);
-//$page1 = R::load('page',$page1->id);
-//$page3 = R::load('page',$page3->id);
-//$page3->setMeta('tainted',true);
-//$page1->setMeta('tainted',true);
 //fix udiff instead of diff
 $book3->ownPage = array($page3,$page1);
 $i = R::store($book3);
@@ -538,14 +538,7 @@ for($j=0; $j<10; $j++) {
 	$qjson = json_encode($book->ownQuote);
 	$pjson = json_encode($book->ownPicture);
 	$tjson = json_encode($book->sharedTopic);
-	//echo "\n bean before: ".json_encode(array($book3->ownQuote,$book3->ownPicture,$book3->sharedTopic));
-	//echo "\n bean before: ".print_r($book3,1);
 	$book3=R::load('book',R::store($book3));
-	//echo "\n $qbefore == ".count($book3->ownQuote);
-	//echo "\n $pbefore == ".count($book3->ownPicture);
-	//echo "\n $tbefore == ".count($book3->sharedTopic);
-	//echo "\n bean after: ".print_r($book3,1);
-	//echo "\n bean after: ".json_encode(array($book3->ownQuote,$book3->ownPicture,$book3->sharedTopic));
 	asrt(count($book3->ownQuote),$qbefore);
 	asrt(count($book3->ownPicture),$pbefore);
 	asrt(count($book3->sharedTopic),$tbefore);
@@ -563,14 +556,14 @@ R::exec('drop table if exists band_genre');
 R::exec('drop table if exists army_village');
 R::exec('drop table if exists cd_track');
 R::exec('drop table if exists song_track');
-R::exec('drop table if exists band');
-R::exec('drop table if exists bandmember');
 R::exec('drop table if exists location');
+R::exec('drop table if exists bandmember');
+R::exec('drop table if exists band');
 R::exec('drop table if exists genre');
-R::exec('drop table if exists village');
-R::exec('drop table if exists building');
 R::exec('drop table if exists farmer');
 R::exec('drop table if exists furniture');
+R::exec('drop table if exists building');
+R::exec('drop table if exists village');
 R::exec('drop table if exists army');
 R::exec('drop table if exists people');
 R::exec('drop table if exists song');

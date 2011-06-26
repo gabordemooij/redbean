@@ -172,7 +172,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	protected function bindParams($s,$aValues) {
 		foreach($aValues as $key=>&$value) {
 			if (is_integer($key)) {
-				if (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value < 2147483648) {
+
+				if ($value instanceof RedBean_Driver_PDO_NULL){
+					$s->bindValue($key+1,null,PDO::PARAM_NULL);
+				}elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value < 2147483648) {
 					$s->bindParam($key+1,$value,PDO::PARAM_INT);
 				}
 				else {
@@ -181,7 +184,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			}
 			else {
 
-				if (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) &&  $value < 2147483648) {
+				if ($value instanceof RedBean_Driver_PDO_NULL){
+					$s->bindValue($key,null,PDO::PARAM_NULL);
+				}
+				elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) &&  $value < 2147483648) {
 					$s->bindParam($key,$value,PDO::PARAM_INT);
 				}
 				else { 
@@ -383,7 +389,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
 			}
 			else {
-				$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
+				$x = new RedBean_Exception_SQL( $e->getMessage()." SQL:".$sql, 0, $e );
 			}
 			$x->setSQLState( $e->getCode() );
 			throw $x;
@@ -534,4 +540,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	}
 
 
+}
+
+class RedBean_Driver_PDO_NULL {
+	
 }

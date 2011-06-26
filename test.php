@@ -400,15 +400,15 @@ $pdo->Execute("DROP TABLE IF EXISTS testa_testb");
 $pdo->Execute("DROP TABLE IF EXISTS genre_movie");
 $pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
 $pdo->Execute("DROP TABLE IF EXISTS cask_cask");
-$pdo->Execute("DROP TABLE IF EXISTS `book_group`");
-$pdo->Execute("DROP TABLE IF EXISTS `book_genre`");
+$pdo->Execute("DROP TABLE IF EXISTS book_group");
+$pdo->Execute("DROP TABLE IF EXISTS book_genre");
 $pdo->Execute('drop table if exists book_page');
 $pdo->Execute('drop table if exists book_tag');
 $pdo->Execute('drop table if exists page_topic');
 $pdo->Execute('drop table if exists book_topic');
 
-$pdo->Execute("DROP TABLE IF EXISTS `author_book`");
-$pdo->Execute("DROP TABLE IF EXISTS `book_tag`");
+$pdo->Execute("DROP TABLE IF EXISTS author_book");
+$pdo->Execute("DROP TABLE IF EXISTS book_tag");
 $pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
 $pdo->Execute("DROP TABLE IF EXISTS page_user");
 $pdo->Execute("DROP TABLE IF EXISTS book_page");
@@ -417,6 +417,8 @@ $pdo->Execute("DROP TABLE IF EXISTS song_track");
 
 $pdo->Execute("DROP TABLE IF EXISTS movie_movie");
 $pdo->Execute("DROP TABLE IF EXISTS page");
+$pdo->Execute("DROP TABLE IF EXISTS picture");
+$pdo->Execute("DROP TABLE IF EXISTS quote");
 
 $pdo->Execute("DROP TABLE IF EXISTS user");
 $pdo->Execute("DROP TABLE IF EXISTS movie");

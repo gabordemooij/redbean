@@ -213,7 +213,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function scanType( $value ) {
 
-		if (is_null($value)) {
+		if (is_null($value) || ($value instanceof RedBean_Driver_PDO_NULL)) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
 		$orig = $value;

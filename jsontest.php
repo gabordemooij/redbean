@@ -137,11 +137,12 @@ asrt(sha1($output), $expected);
 
 
 
-
-
-R::wipe("book");
-R::wipe("book_page");
-R::wipe("page");
+R::exec("DROP TABLE IF EXISTS book_page ");
+R::exec("DROP TABLE IF EXISTS book_topic ");
+R::exec("DROP TABLE IF EXISTS quote ");
+R::exec("DROP TABLE IF EXISTS picture ");
+R::exec("DROP TABLE IF EXISTS page ");
+R::exec("DROP TABLE IF EXISTS book ");
 
 $book1 = R::dispense("book");
 $book1->title = "book1";

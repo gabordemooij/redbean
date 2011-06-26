@@ -133,7 +133,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		foreach($bean as $prop=>$value) {
 			if (
 					  is_array($value) ||
-					  is_object($value) ||
+					  (is_object($value) && !($value instanceof RedBean_Driver_PDO_NULL)) ||
 					  strlen($prop)<1 ||
 					  preg_match($pattern,$prop)
 			) {
@@ -348,11 +348,11 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		//Handle related beans
 		foreach($ownTrashcan as $trash) {
 			if ($trash instanceof RedBean_OODBBean) {
-				//$trash->$myFieldLink = 0;
+				$trash->$myFieldLink = new RedBean_Driver_PDO_NULL();
 				//$this->writer->setNull($trash->getMeta('type'),$myFieldLink,$trash->getID());
-				//$this->store($trash);
-				$this->writer->updateRecord($trash->getMeta('type'),
-					array(array('property'=>$myFieldLink,'value'=>NULL)),$trash->getID());
+				$this->store($trash);
+				//$this->writer->updateRecord($trash->getMeta('type'),
+				//	array(array('property'=>$myFieldLink,'value'=>NULL)),$trash->getID());
 			}
 		}
 		foreach($ownAdditions as $addition) {
@@ -364,6 +364,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 					$this->writer->addIndex($addition->getMeta('type'),
 						'index_foreignkey_'.$bean->getMeta('type'),
 						 $myFieldLink);
+					$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,$idfield);
 				}
 			}
 		}

@@ -436,5 +436,20 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 
+	public function addFK( $type, $targetType, $field, $targetField) {
+		$table = $this->safeTable($type);
+		$targetTable = $this->safeTable($targetType);
+		$column = $this->safeColumn($field);
+		$targetColumn  = $this->safeColumn($targetField);
+		try{
+		$this->adapter->exec("ALTER TABLE  $table
+		ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
+		$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
+		}
+		catch(Exception $e) {
+			echo "\n".$e->getMessage();
+		}
+	}
+
 
 }

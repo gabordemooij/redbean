@@ -165,4 +165,10 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 		$this->adapter->exec("DELETE FROM $table");
 	}
 
+
+	public function addFK( $type, $targetType, $field, $targetField) {
+		//not supported yet
+	}
+
+
 }
