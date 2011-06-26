@@ -348,8 +348,11 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		//Handle related beans
 		foreach($ownTrashcan as $trash) {
 			if ($trash instanceof RedBean_OODBBean) {
-				$trash->$myFieldLink = 0;
-				$this->store($trash);
+				//$trash->$myFieldLink = 0;
+				//$this->writer->setNull($trash->getMeta('type'),$myFieldLink,$trash->getID());
+				//$this->store($trash);
+				$this->writer->updateRecord($trash->getMeta('type'),
+					array(array('property'=>$myFieldLink,'value'=>NULL)),$trash->getID());
 			}
 		}
 		foreach($ownAdditions as $addition) {

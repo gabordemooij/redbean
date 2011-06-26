@@ -421,4 +421,20 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 
+	
+	public function setNull($table,$column,$id) {
+		$idfield = $this->getIDField($table);
+		$table = $this->safeTable($table);
+		//$column = $this->safeColumn($column);
+		$id = (int) $id;
+		$idfield = $this->safeColumn($column);
+		R::debug(1);
+		//try{
+			$this->adapter->exec("UPDATE $table SET $column = NULL WHERE $idfield = $id ");
+		//}
+		//catch(Exception $e){}
+	}
+
+
+
 }
