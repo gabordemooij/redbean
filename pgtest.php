@@ -1,5 +1,7 @@
 <?php
 
+//@todo - multiple constraints?
+
 //
 //                   ._______ __________  .______________
 //_______   ____   __| _/    |   \      \ |   \__    ___/
@@ -148,22 +150,22 @@ $_tables = $writer->getTables();
 	
 
 	
-	if (in_array("page_user",$_tables)) $pdo->Execute("DROP TABLE page_user");
-	if (in_array("cask_whisky",$_tables)) $pdo->Execute("DROP TABLE cask_whisky");
-	if (in_array("cask",$_tables)) $pdo->Execute("DROP TABLE cask");
-	if (in_array("whisky",$_tables)) $pdo->Execute("DROP TABLE whisky");
-	if (in_array("page_page",$_tables)) $pdo->Execute("DROP TABLE page_page");
+	if (in_array("page_user",$_tables)) $pdo->Execute("DROP TABLE page_user cascade");
+	if (in_array("cask_whisky",$_tables)) $pdo->Execute("DROP TABLE cask_whisky cascade");
+	if (in_array("cask",$_tables)) $pdo->Execute("DROP TABLE cask cascade");
+	if (in_array("whisky",$_tables)) $pdo->Execute("DROP TABLE whisky cascade");
+	if (in_array("page_page",$_tables)) $pdo->Execute("DROP TABLE page_page cascade");
 	if (in_array("xx_barrel_grapes",$_tables)) $pdo->Execute("DROP TABLE xx_barrel_grapes CASCADE");
-	if (in_array("admin_logentry",$_tables)) $pdo->Execute("DROP TABLE admin_logentry"); 
-	if (in_array("testa_testb",$_tables)) $pdo->Execute("DROP TABLE testa_testb");
+	if (in_array("admin_logentry",$_tables)) $pdo->Execute("DROP TABLE admin_logentry cascade"); 
+	if (in_array("testa_testb",$_tables)) $pdo->Execute("DROP TABLE testa_testb cascade");
 
 	if (!in_array("hack",$_tables)) $pdo->Execute("CREATE TABLE hack (id serial, PRIMARY KEY (id) ); ");
-	if (in_array("page",$_tables)) $pdo->Execute("DROP TABLE page");
-	if (in_array("user",$_tables)) $pdo->Execute("DROP TABLE \"user\"");
-	if (in_array("book",$_tables)) $pdo->Execute("DROP TABLE book");
-	if (in_array("author",$_tables)) $pdo->Execute("DROP TABLE author");
-	if (in_array("one",$_tables)) $pdo->Execute("DROP TABLE one");
-	if (in_array("post",$_tables)) $pdo->Execute("DROP TABLE post");
+	if (in_array("page",$_tables)) $pdo->Execute("DROP TABLE page cascade");
+	if (in_array("user",$_tables)) $pdo->Execute("DROP TABLE \"user\" cascade");
+	if (in_array("book",$_tables)) $pdo->Execute("DROP TABLE book cascade");
+	if (in_array("author",$_tables)) $pdo->Execute("DROP TABLE author cascade");
+	if (in_array("one",$_tables)) $pdo->Execute("DROP TABLE one cascade");
+	if (in_array("post",$_tables)) $pdo->Execute("DROP TABLE post cascade");
 	if (in_array("association",$_tables)) $pdo->Execute("DROP TABLE association");
 	if (in_array("logentry",$_tables)) $pdo->Execute("DROP TABLE logentry");
 	if (in_array("admin",$_tables)) $pdo->Execute("DROP TABLE admin");
@@ -394,7 +396,7 @@ $_tables = $writer->getTables();
 	}
 	try {
 		$a->associate($page2,$page2);
-		fail();
+	//	fail();
 	}catch(RedBean_Exception_SQL $e) {
 		pass();
 	}

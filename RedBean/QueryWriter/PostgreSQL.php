@@ -149,6 +149,7 @@ where table_schema = 'public'" );
 	 * @return integer $type type code for this value
 	 */
 	public function scanType( $value ) {
+		// added value===null  
 		//echo " \n\n value = $value => ".strval(intval($value))." same? ".($value===strval(intval($value)));
 		if ($value===null || ($value instanceof RedBean_Driver_PDO_NULL) ||(is_numeric($value)
 				  && floor($value)==$value
@@ -325,6 +326,56 @@ where table_schema = 'public'" );
 		return $sqlSnippet;
 	}
 
-	
+
+	public function addFK( $type, $targetType, $field, $targetField) {
+
+		$table = $this->safeTable($type);
+		$column = $this->safeColumn($field);
+
+		$tableNoQ = $this->safeTable($type,true);
+		$columnNoQ = $this->safeColumn($field,true);
+
+
+		$targetTable = $this->safeTable($targetType);
+
+		$targetColumn  = $this->safeColumn($targetField);
+
+		$fkCode = $tableNoQ.'_'.$columnNoQ.'_fkey';
+
+		$sql = "
+					SELECT
+							c.oid,
+							n.nspname,
+							c.relname,
+							n2.nspname,
+							c2.relname,
+							cons.conname
+					FROM pg_class c
+					JOIN pg_namespace n ON n.oid = c.relnamespace
+					LEFT OUTER JOIN pg_constraint cons ON cons.conrelid = c.oid
+					LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
+					LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
+					WHERE c.relkind = 'r'
+					AND n.nspname IN ('public')
+					AND (cons.contype = 'f' OR cons.contype IS NULL)
+					AND
+					(  cons.conname = '{$fkCode}' )
+
+				  ";
+
+		$rows = $this->adapter->get( $sql );
+		if (!count($rows)) {
+
+			try{
+			$this->adapter->exec("ALTER TABLE  $table
+			ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
+			$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
+			}
+			catch(Exception $e) {
+				echo "\n".$e->getMessage();
+			}
+		}
+
+	}
 
 }
