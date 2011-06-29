@@ -3,9 +3,10 @@
 error_reporting(E_ALL | E_STRICT);
 require("RedBean/redbean.inc.php");
 
-R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
-//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+//R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
+R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
 //R::setup(); $db="sqlite";
+
 
 function printtext( $text ) {
 	if ($_SERVER["DOCUMENT_ROOT"]) {
@@ -50,26 +51,22 @@ function fail() {
 	exit;
 }
 
-//R::debug(1);
+function droptables() {
+global $db;	
+if ($db=='mysql') R::exec('SET FOREIGN_KEY_CHECKS=0;');
+foreach(R::$writer->getTables() as $t) {
+	if ($db=='mysql') R::exec("drop table `$t`");
+	if ($db=='pgsql') R::exec("drop table $t cascade");
+	if ($db=='sqlite') R::exec("drop table $t ");
+}
+if ($db=='mysql') R::exec('SET FOREIGN_KEY_CHECKS=1;');
+}
 
-R::exec('drop table if exists author_page');
-R::exec('drop table if exists book_tag');
-R::exec('drop table if exists book_genre');
-R::exec('drop table if exists page_tag');
-R::exec('drop table if exists book_page');
-R::exec('drop table if exists book_tag');
-R::exec('drop table if exists page_topic');
-R::exec('drop table if exists book_topic');
-R::exec('drop table if exists book_cover');
-R::exec('drop table if exists page');
-R::exec('drop table if exists picture');
-R::exec('drop table if exists quote');
-R::exec('drop table if exists book');
-R::exec('drop table if exists topic');
-R::exec('drop table if exists cover');
+droptables();
+
 list($q1,$q2) = R::dispense('quote',2);
 list($pic1,$pic2) = R::dispense('picture',2);
-list($book,$book2,$book3) = R::dispense('book',3);
+list($book,$book2,$book3) = R::dispense('book',4);
 list($topic1, $topic2,$topic3,$topic4,$topic5) = R::dispense('topic',5);
 list($page1,$page2,$page3,$page4,$page5,$page6,$page7) = R::dispense('page',7);
 $q1->text = 'lorem';
@@ -89,6 +86,7 @@ $topic2->name = 'cooking';
 $topic3->name = 'gardening';
 $topic4->name = 'computing';
 $topic5->name = 'christmas';
+//Add one page to the book
 $book->ownPage[] = $page1;
 $id = R::store($book);
 asrt(count($book->ownPage),1);
@@ -98,25 +96,18 @@ asrt(count($book->ownPage),1);
 asrt(reset($book->ownPage)->getMeta('type'),'page');
 //performing an own addition
 $book->ownPage[] = $page2;
-
 $id = R::store($book);
 $book = R::load('book',$id);
 asrt(count($book->ownPage),2);
 //performing a deletion
 $book = R::load('book',$id);
 unset($book->ownPage[1]);
-
-//echo '>>>>>>'.print_r($book->getMeta('listaccess'));
-
-//echo "\n\n\n\n==================================================  aaa";
-//print_r($book);
 $id = R::store($book);
 $book = R::load('book',$id);
 asrt(count($book->ownPage),1);
 asrt(reset($book->ownPage)->getMeta('type'),'page');
 asrt(R::count('page'),2);//still exists
-asrt(reset($book->ownPage)->id,'2');
-
+asrt(reset($book->ownPage)->id,'2'); 
 //doing a change in one of the owned items
 $book->ownPage[2]->title='page II';
 $id = R::store($book);
@@ -176,13 +167,9 @@ R::store($b2);
 $b2 = R::load('book',$book2->id);
 asrt(count($b2->ownPage),1);
 //different, less elegant way to remove
-
-
 $page1 = reset($b2->ownPage);
-$page1->book_id = new RedBean_Driver_PDO_NULL;
+$page1->book_id = null;
 R::store($page1);
-
-
 $b2 = R::load('book',$book2->id);
 asrt(count($b2->ownPage),0);
 //re-add the page
@@ -190,9 +177,22 @@ $b2->ownPage[] = $page1;
 R::store($b2);
 $b2 = R::load('book',$book2->id);
 asrt(count($b2->ownPage),1);
+//test fk, not allowed to set to 0
+$page1 = reset($b2->ownPage);
+$page1->book_id = 0;
+if ($db=='pgsql' || $db=='mysql') {
+	try{
+		R::store($page1);
+		fail();
+	}
+	catch(Exception $e){
+		pass();
+	}
+	
+}
 //even uglier way, but still needs to work
 $page1 = reset($b2->ownPage);
-$page1->book_id = new RedBean_Driver_PDO_NULL;
+$page1->book_id = null;
 R::store($b2);
 $b2 = R::load('book',$book2->id);
 asrt(count($b2->ownPage),0);
@@ -368,9 +368,7 @@ asrt(count($book3->sharedTopic),1);
 $logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach(R::$adapter);
 $book = R::load('book',1);
 $book->sharedTopic = array();
-//R::debug(1);
 R::store($book);
-//print_r($logger->getLogs());
 asrt(count($logger->grep('UPDATE')),1);  //no more than 1 update
 $book=R::load('book',1);
 $logger->clear();
@@ -382,10 +380,8 @@ $book->sharedTopic[] = $topic1;
 $book->sharedTopic[] = $topic2;
 asrt(count($logger->grep('SELECT')),0); 
 R::store($book);
-//$book=R::load('book',1);
 $book->sharedTopic[] = $topic3; 
 //now do NOT clear all and then add one, just add the one
-//R::debug(1);
 $logger->clear();
 R::store($book);
 $book=R::load('book',1);
@@ -397,7 +393,6 @@ R::store($book);
 $book=R::load('book',1);
 asrt(count($book->sharedTopic),3);
 asrt(count($logger->grep("DELETE")),0); //no deletes
-//R::debug(1);
 $book->ownPage = array();
 R::store($book);
 asrt(count($book->ownPage),0);
@@ -608,7 +603,6 @@ $b5->ownFarmer = array($f4);
 $b5->ownFurniture = array($u6,$u5,$u4);
 $v2->sharedArmy[] = $a2;
 $v3->sharedArmy = array($a2,$a1);
-//R::debug(1);
 $i2=R::store($v2);
 $i1=R::store($v1);
 $i3=R::store($v3);
@@ -884,11 +878,61 @@ $page->title = 'a null page';
 $page->book = $book;
 $book->title = 'Why NUll is painful..';
 R::store($page);
+$bookid = $page->book->id;
 unset($page->book);
 $id = R::store($page);
 $page = R::load('page',$id);
-print_r($page);
+$page->title = 'another title';
 R::store($page);
+pass();
+$page = R::load('page',$id);
+$page->title = 'another title';
+$page->book_id = null;
+R::store($page);
+pass();
+droptables();
+/*
+Here we test whether the column type is set correctly. Normally if you store NULL, the smallest
+type (bool/set) will be selected. However in case of a foreign key type INT should be selected because
+fks columns require matching types.
+*/
+$book=R::dispense('book');
+$page=R::dispense('page');
+$book->ownPage[] = $page;
+R::store($book);
+pass(); //survive?
+asrt($page->getMeta('cast.book_id'),'id'); //check cast
+droptables(); //again, but now the other way around
+$book=R::dispense('book');
+$page=R::dispense('page');
+$page->book = $book;
+R::store($page);
+pass();
+asrt($page->getMeta('cast.book_id'),'id');
+
+
+//Test combination of bean formatter and N1
+class N1AndFormatter implements RedBean_IBeanFormatter{
+	public function formatBeanTable($table) {return "xy_$table";}
+	public function formatBeanID( $table ) {return "theid";}
+	public function getAlias($a){ return $a; }
+}
+R::$writer->setBeanFormatter(new N1AndFormatter);
+droptables();
+$book=R::dispense('book');
+$page=R::dispense('page');
+$book->ownPage[] = $page;
+$bookid = R::store($book);
+pass(); //survive?
+asrt($page->getMeta('cast.book_id'),'id');
+$book = R::load('book',$bookid);
+asrt(count($book->ownPage),1);
+$book->ownPage[] = R::dispense('page');
+$bookid = R::store($book);
+$book = R::load('book',$bookid);
+asrt(count($book->ownPage),2);
+
+
 
 
 

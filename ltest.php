@@ -395,6 +395,16 @@ $page = $redbean->load( "page", $id );
 asrt( $page->name, "new name" );
 
 
+//Null should == NULL after saving
+$page->rating = null;
+$newid = $redbean->store( $page );
+asrt( $newid, $id );
+$page = $redbean->load( "page", $id );
+asrt( $page->name, "new name" );
+asrt( ($page->rating === null), true );
+asrt( !$page->rating, true );
+
+
 $page->rating = "1";
 $newid = $redbean->store( $page );
 asrt( $newid, $id );

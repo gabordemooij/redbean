@@ -237,6 +237,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array();
 		$ownAdditions = $ownTrashcan = $ownresidue = array();
 		$tmpCollectionStore = array();
+		$embeddedBeans = array();
 		foreach($bean as $p=>$v) {
 
 			if ($v instanceof RedBean_OODBBean) {
@@ -247,6 +248,12 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				$beanID = $v->$idfield;
 				$linkField = $p.'_id';
 				$bean->$linkField = $beanID;
+				$bean->setMeta('cast.'.$linkField,'id');
+				$embeddedBeans[$linkField] = $v;
+
+
+
+
 				$tmpCollectionStore[$p]=$bean->$p;
 				$bean->removeProperty($p);
 			}
@@ -306,6 +313,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 						//What kind of property are we dealing with?
 						$typeno = $this->writer->scanType($v);
 					}
+					
 					//Is this property represented in the table?
 					if (isset($columns[$p])) {
 						//yes it is, does it still fit?
@@ -343,12 +351,27 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$bean->setMeta("tainted",false);
 		}
 
+
+
+
 		if ($processLists) {
+
+		foreach($embeddedBeans as $linkField=>$embeddedBean) {
+			if (!$this->isFrozen) {
+				
+				$this->writer->addIndex($bean->getMeta('type'),
+							'index_foreignkey_'.$embeddedBean->getMeta('type'),
+							 $linkField);
+				$this->writer->addFK($bean->getMeta('type'),$embeddedBean->getMeta('type'),$linkField,$this->writer->getIDField($embeddedBean->getMeta('type')));
+				
+			}
+		}
+
 		$myFieldLink = $bean->getMeta('type').'_id';
 		//Handle related beans
 		foreach($ownTrashcan as $trash) {
 			if ($trash instanceof RedBean_OODBBean) {
-				$trash->$myFieldLink = new RedBean_Driver_PDO_NULL();
+				$trash->$myFieldLink = null; //new RedBean_Driver_PDO_NULL();
 				//$this->writer->setNull($trash->getMeta('type'),$myFieldLink,$trash->getID());
 				$this->store($trash);
 				//$this->writer->updateRecord($trash->getMeta('type'),

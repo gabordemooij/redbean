@@ -117,7 +117,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 		$fieldLink = $property."_id";
 		if (isset($this->$fieldLink)) {
 			//wanna unset a bean reference?
-			$this->$fieldLink = new RedBean_Driver_PDO_NULL;
+			$this->$fieldLink = null;
 			return;
 		}
 		
