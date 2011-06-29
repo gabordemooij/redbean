@@ -249,14 +249,6 @@ try {
 }catch(RedBean_Exception_Security $e) {
 	pass();
 }
-//Objects should not be allowed.
-$bean->name = new RedBean_OODBBean;
-try {
-	$redbean->store($bean);
-	pass();
-}catch(RedBean_Exception_Security $e) {
-	fail();
-}
 $bean->name = new RedBean_OODBBean;
 try {
 	$redbean->check($bean);
@@ -391,56 +383,25 @@ $pdo = $adapter->getDatabase();
 
 //$pdo->setDebugMode(1);
 
+function droptables() {
+global $pdo,$writer;
+$pdo->Execute('SET FOREIGN_KEY_CHECKS=0;');
+foreach($writer->getTables() as $t) {
+	 $pdo->Execute("drop table if exists`$t`");
+	 $pdo->Execute("drop view if exists`$t`");
+}
+$pdo->Execute('SET FOREIGN_KEY_CHECKS=1;');
+}
+
+
+droptables();
 $pdo->Execute("CREATE TABLE IF NOT EXISTS`hack` (
 `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY
 ) ENGINE = MYISAM ;
 ");
-$pdo->Execute("DROP TABLE IF EXISTS testa_testb");
 
-$pdo->Execute("DROP TABLE IF EXISTS genre_movie");
-$pdo->Execute("DROP TABLE IF EXISTS cask_whisky");
-$pdo->Execute("DROP TABLE IF EXISTS cask_cask");
-$pdo->Execute("DROP TABLE IF EXISTS book_group");
-$pdo->Execute("DROP TABLE IF EXISTS book_genre");
-$pdo->Execute('drop table if exists book_page');
-$pdo->Execute('drop table if exists book_tag');
-$pdo->Execute('drop table if exists page_topic');
-$pdo->Execute('drop table if exists book_topic');
 
-$pdo->Execute("DROP TABLE IF EXISTS author_book");
-$pdo->Execute("DROP TABLE IF EXISTS book_tag");
-$pdo->Execute("DROP TABLE IF EXISTS admin_logentry");
-$pdo->Execute("DROP TABLE IF EXISTS page_user");
-$pdo->Execute("DROP TABLE IF EXISTS book_page");
-$pdo->Execute("DROP TABLE IF EXISTS page_page");
-$pdo->Execute("DROP TABLE IF EXISTS song_track");
 
-$pdo->Execute("DROP TABLE IF EXISTS movie_movie");
-$pdo->Execute("DROP TABLE IF EXISTS page");
-$pdo->Execute("DROP TABLE IF EXISTS picture");
-$pdo->Execute("DROP TABLE IF EXISTS quote");
-
-$pdo->Execute("DROP TABLE IF EXISTS user");
-$pdo->Execute("DROP TABLE IF EXISTS movie");
-
-$pdo->Execute("DROP TABLE IF EXISTS book");
-$pdo->Execute("DROP TABLE IF EXISTS author");
-
-$pdo->Execute("DROP TABLE IF EXISTS one");
-$pdo->Execute("DROP TABLE IF EXISTS special");
-$pdo->Execute("DROP TABLE IF EXISTS post");
-
-$pdo->Execute("DROP TABLE IF EXISTS association");
-$pdo->Execute("DROP TABLE IF EXISTS logentry");
-$pdo->Execute("DROP TABLE IF EXISTS admin");
-$pdo->Execute("DROP TABLE IF EXISTS genre");
-$pdo->Execute("DROP TABLE IF EXISTS cask");
-$pdo->Execute("DROP TABLE IF EXISTS whisky");
-$pdo->Execute("DROP TABLE IF EXISTS __log");
-$pdo->Execute("DROP TABLE IF EXISTS dummy");
-$pdo->Execute('drop table if exists page');
-$pdo->Execute('drop table if exists book');
-$pdo->Execute('drop table if exists topic');
 
 //Test real events: update,open,delete
 testpack("Test Real Events");
