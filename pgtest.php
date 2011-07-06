@@ -1046,6 +1046,8 @@ if (in_array("page",$_tables)) $pdo->Execute("DROP TABLE page");
 $bean->prop = $val;
 $id = R::store($bean);
 $bean = R::load("page",$id);
+
+asrt((is_string($bean->prop) || is_null($bean->prop)),true);
 return $bean->prop;
 }
 

@@ -133,7 +133,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		foreach($bean as $prop=>$value) {
 			if (
 					  is_array($value) ||
-					  (is_object($value) && !($value instanceof RedBean_Driver_PDO_NULL)) ||
+					  (is_object($value)) ||
 					  strlen($prop)<1 ||
 					  preg_match($pattern,$prop)
 			) {
@@ -240,8 +240,11 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$embeddedBeans = array();
 		foreach($bean as $p=>$v) {
 
+
+
 			if ($v instanceof RedBean_OODBBean) {
-				$idfield = $this->writer->getIDField($v->getMeta("type"));
+				$embtype = $v->getMeta("type");
+				$idfield = $this->writer->getIDField($embtype);
 				if (!$v->$idfield) {
 					$this->store($v);
 				}
@@ -250,10 +253,6 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 				$bean->$linkField = $beanID;
 				$bean->setMeta('cast.'.$linkField,'id');
 				$embeddedBeans[$linkField] = $v;
-
-
-
-
 				$tmpCollectionStore[$p]=$bean->$p;
 				$bean->removeProperty($p);
 			}
@@ -371,11 +370,11 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		//Handle related beans
 		foreach($ownTrashcan as $trash) {
 			if ($trash instanceof RedBean_OODBBean) {
-				$trash->$myFieldLink = null; //new RedBean_Driver_PDO_NULL();
-				//$this->writer->setNull($trash->getMeta('type'),$myFieldLink,$trash->getID());
+				$trash->$myFieldLink = null; 
 				$this->store($trash);
-				//$this->writer->updateRecord($trash->getMeta('type'),
-				//	array(array('property'=>$myFieldLink,'value'=>NULL)),$trash->getID());
+			}
+			else {
+				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
 			}
 		}
 		foreach($ownAdditions as $addition) {
@@ -390,6 +389,9 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 					$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,$idfield);
 				}
 			}
+			else {
+				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
+			}
 		}
 		foreach($ownresidue as $residue) {
 			if ($residue instanceof RedBean_OODBBean) {
@@ -397,20 +399,32 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 					$this->store($residue);
 				}
 			}
+			else {
+				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
+			}
 		}
 		foreach($sharedTrashcan as $trash) {
 			if ($trash instanceof RedBean_OODBBean) {
 				$this->assocManager->unassociate($trash,$bean);
+			}
+			else {
+				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
 			}
 		}
 		foreach($sharedAdditions as $addition) {
 			if ($addition instanceof RedBean_OODBBean) {
 				$this->assocManager->associate($addition,$bean);
 			}
+			else {
+				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
+			}
 		}
 		foreach($sharedresidue as $residue) {
 			if ($residue instanceof RedBean_OODBBean) {
 				$this->store($residue);
+			}
+			else {
+				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
 			}
 		}
 		}

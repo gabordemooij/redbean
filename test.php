@@ -2502,6 +2502,8 @@ $bean->prop = $val;
 if ($castToString) $bean->setMeta('cast.prop','string');
 $id = R::store($bean);
 $bean = R::load("page",$id);
+
+asrt((is_string($bean->prop) || is_null($bean->prop)),true);
 return $bean->prop;
 }
 

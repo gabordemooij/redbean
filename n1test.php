@@ -293,6 +293,7 @@ $book3=R::load('book',$idb3);
 asrt(($book3->cover instanceof RedBean_OODBBean),true);
 $justACover = $book3->cover;
 asrt($justACover->title,'cover1');
+asrt(isset($book3->page),false);//no page property
 
 //test doubling and other side effects ... should not occur..
 $book3->sharedTopic = array($topic1, $topic2);
@@ -933,6 +934,104 @@ $book = R::load('book',$bookid);
 asrt(count($book->ownPage),2);
 
 
+//Invalid properties
+droptables();
+$book = R::dispense('book');
+$page = R::dispense('page');
+//wrong property name
+try{
+	$book->wrongProperty[] = $page;
+	R::store($book);
+	fail();
+}
+catch(RedBean_Exception_Security $e){ 
+	pass();
+}
+catch(Exception $e){
+	fail();
+}
+$book = R::dispense('book');
+$page = R::dispense('page');
+$book->paper = $page;
+$id = R::store($book); 
+$book = R::load('book', $id);
+asrt(false,(isset($book->paper)));
+asrt(false,(isset($book->page)));
+
+//Try to add invalid things in arrays; should not be possible...
+try{
+	$book->ownPage[] = new stdClass(); R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+try{
+	$book->sharedPage[] = new stdClass(); R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+
+try{
+	$book->ownPage[] = "a string"; R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+try{
+	$book->sharedPage[] = "a string"; R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+try{
+	$book->ownPage[] = 1928; R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+try{
+	$book->sharedPage[] = 1928; R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+try{
+	$book->ownPage[] = true; R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+try{
+	$book->sharedPage[] = false; R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+try{
+	$book->ownPage[] = null; R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+try{
+	$book->sharedPage[] = null; R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+
+try{
+	$book->ownPage[] = array(); R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
+
+try{
+	$book->sharedPage[] = array(); R::store($book); fail();
+}
+catch(RedBean_Exception_Security $e){ pass();}
+catch(Exception $e){fail();}
 
 
 

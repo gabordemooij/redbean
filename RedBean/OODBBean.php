@@ -192,6 +192,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 			$this->properties[$property] = null;
 
 		}
+
+		
 		return $this->properties[$property];
 	}
 
