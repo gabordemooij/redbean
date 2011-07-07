@@ -243,9 +243,9 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 
 
 			if ($v instanceof RedBean_OODBBean) {
-				$embtype = $v->getMeta("type");
+				$embtype = $v->getMeta('type');
 				$idfield = $this->writer->getIDField($embtype);
-				if (!$v->$idfield) {
+				if (!$v->$idfield || $v->getMeta('tainted')) {
 					$this->store($v);
 				}
 				$beanID = $v->$idfield;

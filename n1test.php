@@ -3,8 +3,8 @@
 error_reporting(E_ALL | E_STRICT);
 require("RedBean/redbean.inc.php");
 
-//R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
-R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
+//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
 //R::setup(); $db="sqlite";
 
 
@@ -932,6 +932,32 @@ $book->ownPage[] = R::dispense('page');
 $bookid = R::store($book);
 $book = R::load('book',$bookid);
 asrt(count($book->ownPage),2);
+
+//Test whether a nested bean will be saved if tainted
+droptables();
+$page = R::dispense('page');
+$page->title = 'a blank page';
+$book = R::dispense('book');
+$book->title = 'shiny white pages';
+$book->ownPage[] = $page;
+$id = R::store($book);
+$book = R::load('book', $id);
+$page = reset($book->ownPage);
+asrt($page->title,'a blank page');
+$page->title = 'slightly different white';
+R::store($book);
+$book = R::load('book', $id);
+$page = reset($book->ownPage);
+asrt($page->title,'slightly different white');
+$page = R::dispense('page');
+$page->title = 'x';
+$book = R::load('book', $id);
+$book->title = 'snow white pages';
+$page->book = $book;
+$pid = R::store($page);
+$page = R::load('page', $pid);
+asrt($page->book->title,'snow white pages');
+
 
 
 //Invalid properties
