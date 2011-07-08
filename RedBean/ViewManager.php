@@ -100,7 +100,18 @@ class RedBean_ViewManager extends RedBean_CompatManager {
 			//now set the new refTable
 			$currentTable=$t;
 		}
-		return (boolean) $this->writer->createView($refType,$joins,$viewID);
+		
+		//print_r($joins);
+		
+		try{ 
+			$rs = (boolean) $this->writer->createView($refType,$joins,$viewID); 
+		}
+		catch(Exception $e) {
+			throw new RedBean_Exception_SQL('Could not create view, types does not seem related (yet)..');
+		}
+		
+		return $rs;
+		
 	}
 
 }

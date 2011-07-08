@@ -54,7 +54,10 @@ function fail() {
 function droptables() {
 global $db;	
 if ($db=='mysql') R::exec('SET FOREIGN_KEY_CHECKS=0;');
+R::exec('drop view if exists people');
+R::exec('drop view if exists library2');
 foreach(R::$writer->getTables() as $t) {
+	
 	if ($db=='mysql') R::exec("drop table `$t`");
 	if ($db=='pgsql') R::exec("drop table $t cascade");
 	if ($db=='sqlite') R::exec("drop table $t ");
@@ -652,6 +655,11 @@ foreach($emptyHouses as $empty){
 }
 }
 
+//test invalid views - should trigger error
+try{ R::view('messy','building,village,farmer'); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
+
+//R::view('impossible','nonexistant,fictional');
+
 //Change the names and add the same building should not change the graph
 $v1->name = 'village I';
 $v2->name = 'village II';
@@ -1060,5 +1068,16 @@ catch(RedBean_Exception_Security $e){ pass();}
 catch(Exception $e){fail();}
 
 
-
+//test views icw aliases
+droptables();
+$book = R::dispense('book');
+$page = R::dispense('page');
+$book->title = 'my book';
+$page->title = 'my page';
+$book->ownPage[] = $page;
+R::store($book);
+R::view('library2','book,page');
+$l2 = R::getRow('select * from xy_library2 limit 1');
+asrt($l2['title'],'my book');
+asrt($l2['title_of_page'],'my page');
 
