@@ -14,13 +14,18 @@
 class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 
-	private $referenceToNull = null;
-
+	/**
+	 * Properties of the bean. These are kept in a private
+	 * array called properties and exposed through the array interface.
+	 *
+	 * @var array $properties
+	 */
 	private $properties = array();
 
 	/**
 	 * Meta Data storage. This is the internal property where all
 	 * Meta information gets stored.
+	 * 
 	 * @var array
 	 */
 	private $__info = NULL;

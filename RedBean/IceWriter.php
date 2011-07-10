@@ -43,7 +43,7 @@ interface RedBean_IceWriter {
 	 * @param array $updatevalues
 	 * @param integer $id
 	 */
-	public function updateRecord( $table, $updatevalues, $id);
+	public function updateRecord( $table, $updatevalues, $id=null);
 
 
 	/**

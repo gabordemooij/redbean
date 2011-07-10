@@ -82,7 +82,6 @@ require($dir."CompatManager.php");
 
 //Load extended functionality
 require($dir."AssociationManager.php");
-require($dir."TreeManager.php");
 require($dir."LinkManager.php");
 require($dir."ExtAssociationManager.php");
 require($dir."Setup.php");
@@ -93,7 +92,7 @@ require($dir."Plugin/Cache.php");
 require($dir."Plugin/Finder.php");
 require($dir."Plugin/Constraint.php");
 
-require($dir."DomainObject.php");
+
 require($dir."Plugin/IOptimizer.php");
 require($dir."Plugin/Optimizer.php");
 require($dir."Plugin/Optimizer/Datetime.php");

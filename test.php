@@ -715,8 +715,9 @@ asrt(count($movies),0);
 $a2->clearRelations($movie, "movie");
 $movies = $a2->related($movie1, "movie");
 asrt(count($movies),0);
+
 //$pdo->setDebugMode(0);
-$t2 = new RedBean_TreeManager($toolbox2);
+/*$t2 = new RedBean_TreeManager($toolbox2);
 $t2->attach($movie1, $movie2);
 $movies = $t2->children($movie1);
 asrt(count($movies),1);
@@ -726,7 +727,7 @@ asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),1);
 $redbean2->trash($movie2);
 asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),0);
 $columns = array_keys($writer->getColumns("movie_movie"));
-asrt(in_array("movie_movie_id",$columns),true);
+asrt(in_array("movie_movie_id",$columns),true);*/
 
 testpack("Test Association ");
 $rb = $redbean;
@@ -1166,33 +1167,6 @@ asrt(count($a->related( $page, "user")),0);
 $page = $redbean->load("page",$id);
 pass();
 asrt($page->name,"test page");
-
-testpack("Test: Trees ");
-$tm = new RedBean_TreeManager($toolbox);
-$subpage1 = $redbean->dispense("page");
-$notapage = $redbean->dispense("notapage");
-try {
-	$tm->attach($notapage,$page);
-	fail();
-}catch(RedBean_Exception_Security $e) {
-	pass();
-}
-try {
-	$tm->attach($page,$notapage);
-	fail();
-}catch(RedBean_Exception_Security $e) {
-	pass();
-}
-$subpage2 = $redbean->dispense("page");
-$subpage3 = $redbean->dispense("page");
-$tm->attach( $page, $subpage1 );
-asrt(count($tm->children($page)),1);
-$tm->attach( $page, $subpage2 );
-asrt(count($tm->children($page)),2);
-$tm->attach( $subpage2, $subpage3 );
-asrt(count($tm->children($page)),2);
-asrt(count($tm->children($subpage2)),1);
-asrt(intval($subpage1->parent_id),intval($id));
 
 testpack("Test Integration Pre-existing Schema");
 $adapter->exec("ALTER TABLE `page` CHANGE `name` `name` VARCHAR( 254 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL ");
@@ -1722,87 +1696,6 @@ $id = $redbean->store($book);
 pass();
 
 
-testpack("Test Domain Object");
-
-class Book extends RedBean_DomainObject {
-
-	public function getTitle() {
-		return $this->bean->title;
-	}
-
-	public function setTitle( $title ) {
-		$this->bean->title = $title;
-	}
-
-	public function addAuthor( Author $author ) {
-		$this->associate($author);
-	}
-
-	public function getAuthors() {
-		return $this->related( new Author );
-	}
-}
-
-class Author extends RedBean_DomainObject {
-	public function setName( $name ) {
-		$this->bean->name = $name;
-	}
-	public function getName() {
-		return $this->bean->name;
-	}
-}
-
-$book = new Book;
-$author = new Author;
-$book->setTitle("A can of beans");
-$author->setName("Mr. Bean");
-$book->addAuthor($author);
-$id = $book->getID();
-
-$book2 = new Book;
-$book2->find( $id );
-
-asrt($book2->getTitle(),"A can of beans");
-$authors = $book2->getAuthors();
-asrt((count($authors)),1);
-$he = array_pop($authors);
-asrt($he->getName(),"Mr. Bean");
-
-
-/*
-testpack("Unit Of Work");
-
-$uow = new RedBean_UnitOfWork();
-$count=array();
-$uow->addWork("a", function() {
-	global $count;
-	$count[]="a";
-})
-;
-$uow->addWork("b", function() {
-	global $count;
-	$count[]="b";
-})
-;
-$uow->doWork("a");
-$uow->doWork("a");
-$uow->doWork("b");
-$cnt = array_count_values($count);
-asrt($cnt["a"],2);
-asrt($cnt["b"],1);
-$book = $redbean->dispense("book");
-$book->title = "unit of work book";
-$uow->addWork("save", function() use($redbean, $book) {
-	$redbean->store($book);
-})
-;
-$uow->addWork("all_save",function() use($uow) {
-	$uow->doWork("save");
-})
-;
-$uow->doWork("all_save");
-asrt(count( RedBean_Plugin_Finder::where("book","title LIKE '%unit%'") ),1);
-*/
 
 testpack("Test: Facade Multiple DB");
 
@@ -1953,10 +1846,6 @@ $book3->title="third";
 R::store($book3);
 R::associate($book,$book3);
 asrt(count(R::related($book,"book")),2);
-R::attach($book,$book2);
-R::attach($book,$book3);
-asrt( R::getParent($book3)->id, $book->id );
-asrt(count(R::children($book)),2);
 
 
 asrt(count(R::find("book")),3);
@@ -1968,7 +1857,6 @@ asrt(count(R::related($book,"book")),1);
 R::trash($book3);
 R::trash($book2);
 asrt(count(R::related($book,"book")),0);
-asrt(count(R::children($book)),0);
 asrt(count(R::getAll("SELECT * FROM book ")),1);
 asrt(count(R::getCol("SELECT title FROM book ")),1);
 asrt((int)R::getCell("SELECT 123 "),123);
@@ -2144,17 +2032,6 @@ $book2 = R::load("book",$id2);
 asrt($book1->rating,'3');
 asrt($book2->rating,'2');
 
-/*testpack("Test Serializing Beans");
-$bean = R::dispense("book");
-//asrt(($bean->getMeta("sys.oodb") instanceof RedBean_OODB), false);
-$str = serialize($bean);
-asrt((strlen($str)>0),true);
-$bean = unserialize($str);
-$id = R::store($bean);
-asrt(($id>0),true);
-
-*/
-
 testpack("Test R::convertToBeans");
 $SQL = "SELECT '1' as id, a.name AS name, b.title AS title, '123' as rating FROM author AS a LEFT JOIN book as b ON b.id = ?  WHERE a.id = ? ";
 $rows = R::$adapter->get($SQL,array($id2,$aid));
@@ -2267,13 +2144,6 @@ R::store($user2);
 $user3 = R::dispense("user");
 $user3->name="Kim";
 R::store($user3);
-R::attach($user,$user3);
-asrt(count(R::children($user)),1);
-R::attach($user,$user2);
-asrt(count(R::children($user)),2);
-$usrs=R::children($user);
-$user = reset($usrs);
-asrt(($user->name=="Bob" || $user->name=="Kim"),true);
 R::link($user2,$page);
 $p = R::getBean($user2,"page");
 asrt($p->title,"mypage");

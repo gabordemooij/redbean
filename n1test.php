@@ -763,8 +763,6 @@ foreach($page->ownPage as $p) {
 R::store($page);
 asrt(count($page->ownPage),3);
 list($first, $second) = array_keys($page->ownPage);
-
-
 foreach($page->ownPage as $p) {
 	if ($p->name=='subPage' || $p->name=='subNeighbour') {
 		asrt(count($p->ownPage),1);
@@ -773,7 +771,32 @@ foreach($page->ownPage as $p) {
 		asrt(count($p->ownPage),0);
 	}
 }
+droptables();
 
+function candy_canes()  {
+$canes = R::dispense('cane',10);
+$i = 0;
+foreach($canes as $k=>$cane) {
+ $canes[$k]->label = 'Cane No. '.($i++);
+}
+$canes[0]->cane = $canes[1];
+$canes[1]->cane = $canes[4];
+$canes[9]->cane = $canes[4];
+$canes[6]->cane = $canes[4];
+$canes[4]->cane = $canes[7];
+$canes[8]->cane = $canes[7];
+return $canes;
+}
+
+
+$canes = candy_canes();
+$id = R::store($canes[0]);
+$cane = R::load('cane',$id);
+asrt($cane->label,'Cane No. 0');
+asrt($cane->cane->label,'Cane No. 1');
+asrt($cane->cane->cane->label,'Cane No. 4');
+asrt($cane->cane->cane->cane->label,'Cane No. 7');
+asrt($cane->cane->cane->cane->cane,NULL);
 
 //test backward compatibility
 asrt($page->owner,null);

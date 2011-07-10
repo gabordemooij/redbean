@@ -46,11 +46,6 @@ class R {
 	 */
 	public static $adapter;
 
-	/**
-	 * Contains an instance of the Tree Manager
-	 * @var RedBean_TreeManager
-	 */
-	public static $treeManager;
 
 	/**
 	 * Contains an instance of the Association Manager
@@ -412,16 +407,7 @@ class R {
 
 	}
 
-	/**
-	 * Attaches $child bean to $parent bean.
-	 *
-	 * @param RedBean_OODBBean $parent parent
-	 * @param RedBean_OODBBean $child  child
-	 * @return mixed
-	 */
-	public static function attach( RedBean_OODBBean $parent, RedBean_OODBBean $child ) {
-		return self::$treeManager->attach( $parent, $child );
-	}
+
 
 	/**
 	 * @deprecated
@@ -466,27 +452,8 @@ class R {
 		return self::$linkManager->breakLink( $bean, $typeName, $name );
 	}
 
-	/**
-	 * Returns all children beans under parent bean $parent
-	 *
-	 * @param RedBean_OODBBean $parent parent
-	 *
-	 * @return array $childBeans child beans
-	 */
-	public static function children( RedBean_OODBBean $parent ) {
-		return self::$treeManager->children( $parent );
-	}
 
-	/**
-	 * Returns the parent of a bean.
-	 *
-	 * @param RedBean_OODBBean $bean bean
-	 *
-	 * @return RedBean_OODBBean $bean bean
-	 */
-	public static function getParent( RedBean_OODBBean $bean ) {
-		return self::$treeManager->getParent( $bean );
-	}
+
 
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
@@ -1076,7 +1043,6 @@ class R {
 		self::$redbean = self::$toolbox->getRedBean();
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
 		self::$redbean->setAssociationManager(self::$associationManager);
-		self::$treeManager = new RedBean_TreeManager( self::$toolbox );
 		self::$linkManager = new RedBean_LinkManager( self::$toolbox );
 		self::$extAssocManager = new RedBean_ExtAssociationManager( self::$toolbox );
 		$helper = new RedBean_ModelHelper();

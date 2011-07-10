@@ -551,19 +551,6 @@ $a2->clearRelations($movie, "movie");
 $movies = $a2->related($movie1, "movie");
 asrt(count($movies),0);
 
-$t2 = new RedBean_TreeManager($toolbox2);
-$t2->attach($movie1, $movie2);
-$movies = $t2->children($movie1);
-asrt(count($movies),1);
-asrt($movies[$movieid2]->name,"movie 2");
-$redbean2->trash($movie1);
-//print_r($adapter->get("select * from movie"));
-asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),1);
-
-$redbean2->trash($movie2);
-asrt((int)$adapter->getCell("SELECT count(*) FROM movie"),0);
-$columns = array_keys($writer->getColumns("movie_movie"));
-asrt(in_array("movie_movie_id",$columns),true);
 
 
 testpack("Test Association ");
@@ -753,20 +740,6 @@ asrt(count($a->related( $page, "user")),0);
 $page = $redbean->load("page",$id);
 pass();
 asrt($page->name,"test page");
-
-testpack("Test: Trees ");
-$tm = new RedBean_TreeManager($toolbox);
-$subpage1 = $redbean->dispense("page");
-$subpage2 = $redbean->dispense("page");
-$subpage3 = $redbean->dispense("page");
-$tm->attach( $page, $subpage1 );
-asrt(count($tm->children($page)),1);
-$tm->attach( $page, $subpage2 );
-asrt(count($tm->children($page)),2);
-$tm->attach( $subpage2, $subpage3 );
-asrt(count($tm->children($page)),2);
-asrt(count($tm->children($subpage2)),1);
-asrt(intval($subpage1->parent_id),intval($id));
 
 
 //Section D Security Tests
@@ -1063,13 +1036,6 @@ R::store($user2);
 $user3 = R::dispense("user");
 $user3->name="Kim";
 R::store($user3);
-R::attach($user,$user3);
-asrt(count(R::children($user)),1);
-R::attach($user,$user2);
-asrt(count(R::children($user)),2);
-$usrs=R::children($user);
-$user = reset($usrs);
-asrt(($user->name=="Bob" || $user->name=="Kim"),true);
 R::link($user2,$page);
 $p = R::getBean($user2,"page");
 asrt($p->title,"mypage");

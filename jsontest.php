@@ -93,6 +93,19 @@ function s($data,$params=null,$id="1234") {
 
 R::setup("mysql:dbname=oodb;host=localhost","root");
 
+function droptables() {
+
+
+R::exec('SET FOREIGN_KEY_CHECKS=0;');
+foreach(R::$writer->getTables() as $t) {
+	 R::exec("drop table if exists`$t`");
+	 R::exec("drop view if exists`$t`");
+}
+R::exec('SET FOREIGN_KEY_CHECKS=1;');
+}
+
+
+droptables();
 
 testpack("Test BeanMachine");
 

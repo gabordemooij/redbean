@@ -39,7 +39,6 @@
 		<item type="php">RedBean/CoolBox.php</item>
 		<item type="php">RedBean/CompatManager.php</item>
 		<item type="php">RedBean/AssociationManager.php</item>
-		<item type="php">RedBean/TreeManager.php</item>
 		<item type="php">RedBean/LinkManager.php</item>
 		<item type="php">RedBean/ExtAssociationManager.php</item>
 		<item type="php">RedBean/ViewManager.php</item>
@@ -49,7 +48,6 @@
 		<item type="php">RedBean/Plugin/Constraint.php</item>
 		<item type="php">RedBean/IBeanFormatter.php</item>
 		<item type="php">RedBean/IModelFormatter.php</item>
-		<item type="php">RedBean/DomainObject.php</item>
 		<item type="php">RedBean/Plugin/Optimizer.php</item>
 		<item type="php">RedBean/Plugin/BeanMachine.php</item>
 		<item type="php">RedBean/Plugin/IOptimizer.php</item>
