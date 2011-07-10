@@ -60,7 +60,6 @@ require($dir."Adapter/DBAdapter.php");
 require($dir."QueryWriter.php");
 require($dir."QueryWriter/AQueryWriter.php");
 require($dir."QueryWriter/MySQL.php");
-require($dir."QueryWriter/SQLite.php");
 require($dir."QueryWriter/SQLiteT.php");
 require($dir."QueryWriter/PostgreSQL.php");
 require($dir."IceWriter.php");
@@ -82,22 +81,16 @@ require($dir."CompatManager.php");
 
 //Load extended functionality
 require($dir."AssociationManager.php");
-require($dir."LinkManager.php");
 require($dir."ExtAssociationManager.php");
 require($dir."Setup.php");
 
 
-//Load the default plugins
-require($dir."Plugin/Cache.php");
-require($dir."Plugin/Finder.php");
-require($dir."Plugin/Constraint.php");
 
 
 require($dir."Plugin/IOptimizer.php");
 require($dir."Plugin/Optimizer.php");
 require($dir."Plugin/Optimizer/Datetime.php");
 require($dir."Plugin/Optimizer/Shrink.php");
-require($dir."Plugin/BeanMachine.php");
 require($dir."Plugin/QueryLogger.php");
 
 

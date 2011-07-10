@@ -378,4 +378,65 @@ where table_schema = 'public'" );
 
 	}
 
+
+
+	/**
+	 * Add the constraints for a specific database driver: PostgreSQL.
+	 * @todo Too many arguments; find a way to solve this in a neater way.
+	 *
+	 * @param string			  $table     table
+	 * @param string			  $table1    table1
+	 * @param string			  $table2    table2
+	 * @param string			  $property1 property1
+	 * @param string			  $property2 property2
+	 * @param boolean			  $dontCache want to have cache?
+	 *
+	 * @return boolean $succes whether the constraint has been applied
+	 */
+	protected function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
+		$writer = $this;
+		$adapter = $this->adapter;
+		$fkCode = "fk".md5($table.$property1.$property2);
+		$sql = "
+					SELECT
+							c.oid,
+							n.nspname,
+							c.relname,
+							n2.nspname,
+							c2.relname,
+							cons.conname
+					FROM pg_class c
+					JOIN pg_namespace n ON n.oid = c.relnamespace
+					LEFT OUTER JOIN pg_constraint cons ON cons.conrelid = c.oid
+					LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
+					LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
+					WHERE c.relkind = 'r'
+					AND n.nspname IN ('public')
+					AND (cons.contype = 'f' OR cons.contype IS NULL)
+					AND
+					(  cons.conname = '{$fkCode}a'	OR  cons.conname = '{$fkCode}b' )
+
+				  ";
+
+		$rows = $adapter->get( $sql );
+		if (!count($rows)) {
+
+			$table = $writer->getFormattedTableName($table);
+			$table1 = $writer->getFormattedTableName($table1);
+			$table2 = $writer->getFormattedTableName($table2);
+
+			if (!$dontCache) $this->fkcache[ $fkCode ] = true;
+			$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
+					  {$fkCode}a FOREIGN KEY ($property1)
+						REFERENCES \"$table1\" (id) ON DELETE CASCADE ";
+			$sql2 = "ALTER TABLE \"$table\" ADD CONSTRAINT
+					  {$fkCode}b FOREIGN KEY ($property2)
+						REFERENCES \"$table2\" (id) ON DELETE CASCADE ";
+			$adapter->exec($sql1);
+			$adapter->exec($sql2);
+		}
+		return true;
+	}
+
+
 }

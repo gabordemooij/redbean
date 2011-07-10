@@ -155,7 +155,9 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 			return $beans;
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN)
 			)) throw $e;
 		}
 		return array();

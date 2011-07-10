@@ -157,4 +157,8 @@ interface RedBean_QueryWriter {
 
 	public function safeTable($name, $noQuotes = false);
 
+	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $dontCache = false );
+
+	public function getAssocTableFormat($types);
+
 }

@@ -469,11 +469,15 @@ asrt( !$page->rating, true );
 
 
 
-	testpack("Test RedBean Finder Plugin*");
+testpack("Test OODB Finder");
 //$adapter->getDatabase()->setDebugMode(1);
-	asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE '%more%' ")),3);
-	asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'))),3);
-	asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE :str ",array(":str"=>'%mxore%'))),0);
+asrt(count($redbean->find("page",array(), array(" name LIKE '%more%' ",array()))),3);
+asrt(count($redbean->find("page",array(), array(" name LIKE :str ",array(":str"=>'%more%')))),3);
+asrt(count($redbean->find("page",array(),array(" name LIKE :str ",array(":str"=>'%mxore%')))),0);
+
+
+asrt(count($redbean->find("page",array("id"=>array(2,3)))),2);
+
 	$bean = $redbean->dispense("wine");
 	$bean->name = "bla";
 	$redbean->store($bean);
@@ -485,78 +489,10 @@ asrt( !$page->rating, true );
 	$redbean->store($bean);
 	$redbean->store($bean);
 	$redbean->store($bean);
-	RedBean_Plugin_Finder::where("wine", "id=5"); //  Finder:where call RedBean_OODB::convertToBeans
+	$redbean->find("wine", array("id"=>5)); //  Finder:where call RedBean_OODB::convertToBeans
 	$bean2 = $redbean->load("anotherbean", 5);
 	asrt($bean2->id,0);
-	testpack("Test Gold SQL");
-	asrt(count(RedBean_Plugin_Finder::where("wine"," id > 0 ")),1);
-	asrt(count(RedBean_Plugin_Finder::where("wine"," @id < 100 ")),1);
-	asrt(count(RedBean_Plugin_Finder::where("wine"," @id > 100 ")),0);
-	asrt(count(RedBean_Plugin_Finder::where("wine"," @id < 100 OR TRUE ")),1);
-	asrt(count(RedBean_Plugin_Finder::where("wine"," @id > 100 OR TRUE ")),1);
-	asrt(count(RedBean_Plugin_Finder::where("wine",
-			  " TRUE OR @grape = 'merlot' ")),1); //non-existant column
-	asrt(count(RedBean_Plugin_Finder::where("wine",
-			  " TRUE OR @wine.grape = 'merlot' ")),1); //non-existant column
-	asrt(count(RedBean_Plugin_Finder::where("wine",
-			  " TRUE OR @cork=1 OR @grape = 'merlot' ")),1); //2 non-existant column
-	asrt(count(RedBean_Plugin_Finder::where("wine",
-			  " TRUE OR @cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
-	asrt(count(RedBean_Plugin_Finder::where("wine",
-			  " TRUE OR @bottle.cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
-	RedBean_Setup::getToolbox()->getRedBean()->freeze( TRUE );
-	asrt(count(RedBean_Plugin_Finder::where("wine"," TRUE OR TRUE ")),1);
-	try {
-		RedBean_Plugin_Finder::where("wine"," TRUE OR @grape = 'merlot' ");
-		fail();
-	}
-	catch(RedBean_Exception_SQL $e) {
-		pass();
-	}
-	try {
-		RedBean_Plugin_Finder::where("wine"," TRUE OR @wine.grape = 'merlot' ");
-		fail();
-	}
-	catch(RedBean_Exception_SQL $e) {
-		pass();
-	}
-	try {
-		RedBean_Plugin_Finder::where("wine"," TRUE OR @cork=1 OR @wine.grape = 'merlot'  ");
-		fail();
-	}
-	catch(RedBean_Exception_SQL $e) {
-		pass();
-	}
-	try {
-		RedBean_Plugin_Finder::where("wine"," TRUE OR @bottle.cork=1 OR @wine.grape = 'merlot'  ");
-		fail();
-	}
-	catch(RedBean_Exception_SQL $e) {
-		pass();
-	}
-	try {
-		RedBean_Plugin_Finder::where("wine"," TRUE OR @a=1",array(),false,true);
-		pass();
-	}
-	catch(RedBean_Exception_SQL $e) {
-		fail();
-	}
-	RedBean_Setup::getToolbox()->getRedBean()->freeze( FALSE );
-	asrt(RedBean_Plugin_Finder::parseGoldSQL(" @name ","wine",RedBean_Setup::getToolbox())," name ");
-	asrt(RedBean_Plugin_Finder::parseGoldSQL(" @name @id ","wine",RedBean_Setup::getToolbox())," name id ");
-	asrt(RedBean_Plugin_Finder::parseGoldSQL(" @name @id @wine.id ","wine",RedBean_Setup::getToolbox())," name id wine.id ");
-	asrt(RedBean_Plugin_Finder::parseGoldSQL(" @name @id @wine.id @bla ","wine",RedBean_Setup::getToolbox())," name id wine.id NULL ");
-	asrt(RedBean_Plugin_Finder::parseGoldSQL(" @name @id @wine.id @bla @xxx ","wine",RedBean_Setup::getToolbox())," name id wine.id NULL NULL ");
-	asrt(RedBean_Plugin_Finder::parseGoldSQL(" @bla @xxx ","wine",RedBean_Setup::getToolbox())," NULL NULL ");
-
-
-
-
-
-
-
-
-
+	
 	testpack("Test (UN)Common Scenarios");
 	$page = $redbean->dispense("page");
 	$page->name = "test page";
@@ -728,18 +664,11 @@ $redbean = new RedBean_OODB( $writer );
 $t2 = new RedBean_ToolBox($redbean,$adapter,$writer);
 $a = new RedBean_AssociationManager($t2);
 $redbean = new RedBean_OODB( $writer );
-RedBean_Plugin_Constraint::setToolBox($t2);
 $b = $redbean->dispense("barrel");
 $g = $redbean->dispense("grapes");
 $g->type = "merlot";
 $b->texture = "wood";
 $a->associate($g, $b);
-asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
-asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),false);
-asrt($redbean->count("barrel_grapes"),1);
-$redbean->trash($g);
-asrt($redbean->count("barrel_grapes"),0);
-//put things back in order for next tests...
 $a = new RedBean_AssociationManager($toolbox);
 $writer = $oldwriter;
 $redbean=$oldredbean;
@@ -856,9 +785,6 @@ R::store($user2);
 $user3 = R::dispense("user");
 $user3->name="Kim";
 R::store($user3);
-R::link($user2,$page);
-$p = R::getBean($user2,"page");
-asrt($p->title,"mypage");
 $t = R::$writer->getTables();
 asrt(in_array("xx_page",$t),true);
 asrt(in_array("xx_page_user",$t),true);

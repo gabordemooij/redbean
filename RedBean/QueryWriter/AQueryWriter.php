@@ -20,6 +20,8 @@
 abstract class RedBean_QueryWriter_AQueryWriter {
 
 
+	protected $fcache = array();
+
 	/**
 	 *
 	 * @var RedBean_IBeanFormatter
@@ -287,7 +289,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$sql .= " ".($inverse ? " NOT ":"")." IN ( ";
 			$sql .= implode(",",array_fill(0,count($values),"?")).") ";
 			$sqlConditions[] = $sql;
-			if (!is_array($values)) throw new Exception("Values must be an array");
+			if (!is_array($values)) $values = array($values);
 			foreach($values as $k=>$v) {
 				$values[$k]=strval($v);
 			}
@@ -295,8 +297,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		//$addSql can be either just a string or array($sql, $bindings)
 		if (is_array($addSql)) {
-			$bindings = array_merge($bindings,$addSql[1]);	
+			if (count($addSql)>1) {
+				$bindings = array_merge($bindings,$addSql[1]);
+			}
+			else {
+				$bindings = array();
+			}
 			$addSql = $addSql[0];
+
 		}
 		$sql="";
 		if (count($sqlConditions)>0) {
@@ -461,6 +469,66 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 
 	}
+
+	public function getAssocTableFormat($types) {
+		sort($types);
+		return ( implode("_", $types) );
+	}
+
+
+	/**
+	 * Ensures that given an association between
+	 * $bean1 and $bean2,
+	 * if one of them gets trashed the association will be
+	 * automatically removed.
+	 *
+	 * @param RedBean_OODBBean $bean1 bean
+	 * @param RedBean_OODBBean $bean2 bean
+	 *
+	 * @return boolean $addedFKS whether we succeeded
+	 */
+	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $dontCache = false ) {
+
+		$table1 = $bean1->getMeta("type");
+		$table2 = $bean2->getMeta("type");
+		$writer = $this;
+		$adapter = $this->adapter;
+		$table = $this->getAssocTableFormat( array( $table1,$table2) );
+		$idfield1 = $writer->getIDField($bean1->getMeta("type"));
+		$idfield2 = $writer->getIDField($bean2->getMeta("type"));
+		
+		$property1 = $bean1->getMeta("type") . "_id";
+		$property2 = $bean2->getMeta("type") . "_id";
+		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
+
+		$table = $adapter->escape($table);
+		$table1 = $adapter->escape($table1);
+		$table2 = $adapter->escape($table2);
+		$property1 = $adapter->escape($property1);
+		$property2 = $adapter->escape($property2);
+
+		//In Cache? Then we dont need to bother
+		$fkCode = "fk".md5($table.$property1.$property2);
+		if (isset($this->fkcache[$fkCode])) return false;
+		//Dispatch to right method
+
+		try {
+			return $this->constrain($table, $table1, $table2, $property1, $property2, $dontCache);
+		}
+		catch(RedBean_Exception_SQL $e) {
+			if (!$writer->sqlStateIn($e->getSQLState(),
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+		}
+
+		return false;
+
+	}
+
+
+	abstract protected function constrain($table, $table1, $table2, $p1, $p2, $cache);
 
 
 }

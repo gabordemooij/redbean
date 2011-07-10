@@ -63,8 +63,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	 * @return string $table table
 	 */
 	public function getTable( $types ) {
-		sort($types);
-		return ( implode("_", $types) );
+		return $this->writer->getAssocTableFormat($types);
 	}
 	/**
 	 * Associates two beans with eachother.
@@ -125,9 +124,10 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			if ($this->flagUseConstraints &&
 				!$this->oodb->isFrozen() &&
 				$bean->getMeta("buildreport.flags.created")){
-				$bean->setMeta("buildreport.flags.created",0); 
-				RedBean_Plugin_Constraint::setToolBox( $this->toolbox );
-				RedBean_Plugin_Constraint::addConstraint( $bean1, $bean2 );
+
+				$bean->setMeta("buildreport.flags.created",0);
+				if (!$this->oodb->isFrozen())
+				$this->writer->addConstraint( $bean1, $bean2 );
 			}
 			return $id;
 		}

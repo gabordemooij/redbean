@@ -60,13 +60,7 @@ class R {
 	 */
 	public static $extAssocManager;
 
-	/**
-	 *
-	 * Constains an instance of the RedBean Link Manager
-	 * @var RedBean_LinkManager
-	 *
-	 */
-	public static $linkManager;
+
 
 	/**
 	 * Holds the Key of the current database.
@@ -105,19 +99,9 @@ class R {
 	 * @return void
 	 */
 	public static function setup( $dsn="sqlite:/tmp/red.db", $username=NULL, $password=NULL ) {
-		
-		//either use Setup() or SetupMulti(), not both.. - resets toolbox list.
-		//self::$toolboxes = array();
-		//self::$currentDB = false;
-
-		//RedBean_Setup::kickstart( $dsn, $username, $password );
-		//$toolbox = RedBean_Setup::getToolBox();
-		//self::configureFacadeWithToolbox($toolbox);
 		$facadeInstances = self::setupMultiple( array("default"=>array("dsn"=>$dsn,"username"=>$username,"password"=>$password,"frozen"=>false)));
 		$facadeInstance = $facadeInstances["default"];
-		//self::selectDatabase("default");
-		//$facadeInstance->selectDatabase("default");
-		self::configureFacadeWithToolbox(self::$toolboxes["default"]); 
+		self::configureFacadeWithToolbox(self::$toolboxes["default"]);
 		return $facadeInstance;
 	}
 
@@ -410,52 +394,6 @@ class R {
 
 
 	/**
-	 * @deprecated
-	 * Links two beans using a foreign key field, 1-N Assoc only.
-	 *
-	 * @param RedBean_OODBBean $bean1 bean1
-	 * @param RedBean_OODBBean $bean2 bean2
-	 *
-	 * @return mixed
-	 */
-	public static function link( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $name = null ) {
-		return self::$linkManager->link( $bean1, $bean2, $name );
-	}
-	/**
-	 *
-	 * @deprecated
-	 * @param RedBean_OODBBean $bean     bean
-	 * @param string				$typeName type
-	 *
-	 * @return mixed
-	 */
-	public static function getBean( RedBean_OODBBean $bean, $typeName, $name = null ) {
-		return self::$linkManager->getBean($bean, $typeName, $name );
-	}
-	/**
-	 *	@deprecated
-	 * @param RedBean_OODBBean $bean		 bean
-	 * @param string				$typeName type
-	 *
-	 * @return mixed
-	 */
-	public static function getKey( RedBean_OODBBean $bean, $typeName, $name = null ) {
-		return self::$linkManager->getKey($bean, $typeName, $name );
-	}
-	/**
-	 * @deprecated
-	 *
-	 * @param RedBean_OODBBean $bean		 bean
-	 * @param string				$typeName type
-	 */
-	public static function breakLink( RedBean_OODBBean $bean, $typeName, $name = null ) {
-		return self::$linkManager->breakLink( $bean, $typeName, $name );
-	}
-
-
-
-
-	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
 	 * be inserted in the SQL statement by populating the value
@@ -469,53 +407,10 @@ class R {
 	 * @return array $beans  beans
 	 */
 	public static function find( $type, $sql="1", $values=array() ) {
-		//if (isset(self::$toolboxes[self::$currentDB])) { $toolbox = self::$toolboxes[self::$currentDB]; } else {
-		//	$toolbox = false;
-		//}
-		
-		return RedBean_Plugin_Finder::where( $type, $sql, $values, self::$toolbox );
+		return self::$redbean->find($type,array(),array($sql,$values));
 	}
 
 
-	/**
-	 * @deprecated
-	 *
-	 * Use related() instead.
-	 *
-	 * Convenience Method
-	 *
-	 * @param RedBean_OODBBean $bean   bean
-	 * @param string           $type   type
-	 * @param string           $sql    sql
-	 * @param array	           $values values
-	 *
-	 * @return array $beans
-	 */
-	public static function findRelated( RedBean_OODBBean $bean, $type, $sql=" id IN (:keys) ", $values=array()  ) {
-		$keys = self::$associationManager->related($bean,$type);
-		$sql=str_replace(":keys",implode(",",$keys),$sql);
-		return self::find($type,$sql,$values);
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * Use related() instead.
-	 *
-	 * Convenience Method
-	 *
-	 * @param RedBean_OODBBean $bean   bean
-	 * @param string		   $type   type
-	 * @param string		   $sql    sql
-	 * @param array			   $values values
-	 *
-	 * @return array $beans
-	 */
-	public static function findLinks( RedBean_OODBBean $bean, $type, $sql=" id IN (:keys) ", $values=array() ) {
-		$keys = self::$linkManager->getKeys($bean,$type);
-		$sql=str_replace(":keys",implode(",",$keys),$sql);
-		return self::find($type,$sql,$values);
-	}
 
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
@@ -532,7 +427,7 @@ class R {
 	 * @return array $arrays arrays
 	 */
 	public static function findAndExport($type, $sql="1", $values=array()) {
-		$items = RedBean_Plugin_Finder::where( $type, $sql, $values );
+		$items = self::find( $type, $sql, $values );
 		$arr = array();
 		foreach($items as $key=>$item) {
 			$arr[$key]=$item->export();
@@ -555,7 +450,7 @@ class R {
 	 * @return RedBean_OODBBean $bean
 	 */
 	public static function findOne( $type, $sql="1", $values=array()) {
-		$items = R::find($type,$sql,$values);
+		$items = self::find($type,$sql,$values);
 		return reset($items);
 	}
 
@@ -573,9 +468,8 @@ class R {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public static function findLast( $type, $sql="1", $values=array() )
-	{
-		$items = R::find( $type, $sql, $values );
+	public static function findLast( $type, $sql="1", $values=array() ) {
+		$items = self::find( $type, $sql, $values );
 		return end( $items );
 	}
 
@@ -1043,7 +937,6 @@ class R {
 		self::$redbean = self::$toolbox->getRedBean();
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
 		self::$redbean->setAssociationManager(self::$associationManager);
-		self::$linkManager = new RedBean_LinkManager( self::$toolbox );
 		self::$extAssocManager = new RedBean_ExtAssociationManager( self::$toolbox );
 		$helper = new RedBean_ModelHelper();
 		self::$redbean->addEventListener("update", $helper );

@@ -143,9 +143,17 @@ $redbean->store($page);
 $page = $redbean->dispense("page");
 $page->name = "more is better";
 $redbean->store($page);
-asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE '%more%' ")),3);
-asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'))),3);
-asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE :str ",array(":str"=>'%mxore%'))),0);
+
+
+testpack("Test OODB Finder");
+asrt(count($redbean->find("page",array(), array(" name LIKE '%more%' ",array()))),3);
+asrt(count($redbean->find("page",array(), array(" name LIKE :str ",array(":str"=>'%more%')))),3);
+asrt(count($redbean->find("page",array(),array(" name LIKE :str ",array(":str"=>'%mxore%')))),0);
+
+
+asrt(count($redbean->find("page",array("id"=>array(2,3)))),2);
+
+
 $bean = $redbean->dispense("wine");
 $bean->name = "bla";
 $redbean->store($bean);
@@ -157,180 +165,8 @@ $redbean->store($bean);
 $redbean->store($bean);
 $redbean->store($bean);
 $redbean->store($bean);
-RedBean_Plugin_Finder::where("wine", "id=5"); //  Finder:where call RedBean_OODB::convertToBeans
 $bean2 = $redbean->load("anotherbean", 5);
 asrt((int)$bean2->id,0);
-testpack("Test Gold SQL");
-asrt(count(RedBean_Plugin_Finder::where("wine"," 1 OR 1 ")),1);
-asrt(count(RedBean_Plugin_Finder::where("wine"," @id < 100 ")),1);
-asrt(count(RedBean_Plugin_Finder::where("wine"," @id > 100 ")),0);
-asrt(count(RedBean_Plugin_Finder::where("wine"," @id < 100 OR 1 ")),1);
-asrt(count(RedBean_Plugin_Finder::where("wine"," @id > 100 OR 1 ")),1);
-asrt(count(RedBean_Plugin_Finder::where("wine",
-		  " 1 OR @grape = 'merlot' ")),1); //non-existant column
-asrt(count(RedBean_Plugin_Finder::where("wine",
-		  " 1 OR @wine.grape = 'merlot' ")),1); //non-existant column
-asrt(count(RedBean_Plugin_Finder::where("wine",
-		  " 1 OR @cork=1 OR @grape = 'merlot' ")),1); //2 non-existant column
-asrt(count(RedBean_Plugin_Finder::where("wine",
-		  " 1 OR @cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
-asrt(count(RedBean_Plugin_Finder::where("wine",
-		  " 1 OR @bottle.cork=1 OR @wine.grape = 'merlot' ")),1); //2 non-existant column
-RedBean_Setup::getToolbox()->getRedBean()->freeze( TRUE );
-asrt(count(RedBean_Plugin_Finder::where("wine"," 1 OR 1 ")),1);
-try {
-	RedBean_Plugin_Finder::where("wine"," 1 OR @grape = 'merlot' ");
-	fail();
-}
-catch(RedBean_Exception_SQL $e) {
-	pass();
-}
-try {
-	RedBean_Plugin_Finder::where("wine"," 1 OR @wine.grape = 'merlot' ");
-	fail();
-}
-catch(RedBean_Exception_SQL $e) {
-	pass();
-}
-try {
-	RedBean_Plugin_Finder::where("wine"," 1 OR @cork=1 OR @wine.grape = 'merlot'  ");
-	fail();
-}
-catch(RedBean_Exception_SQL $e) {
-	pass();
-}
-try {
-	RedBean_Plugin_Finder::where("wine"," 1 OR @bottle.cork=1 OR @wine.grape = 'merlot'  ");
-	fail();
-}
-catch(RedBean_Exception_SQL $e) {
-	pass();
-}
-try {
-	RedBean_Plugin_Finder::where("wine"," 1 OR @a=1",array(),false,true);
-	pass();
-}
-catch(RedBean_Exception_SQL $e) {
-	fail();
-}
-RedBean_Setup::getToolbox()->getRedBean()->freeze( FALSE );
-asrt(RedBean_Plugin_Finder::parseGoldSQL(" @name ","wine",RedBean_Setup::getToolbox())," name ");
-asrt(RedBean_Plugin_Finder::parseGoldSQL(" @name @id ","wine",RedBean_Setup::getToolbox())," name id ");
-asrt(RedBean_Plugin_Finder::parseGoldSQL(" @name @id @wine.id ","wine",RedBean_Setup::getToolbox())," name id wine.id ");
-asrt(RedBean_Plugin_Finder::parseGoldSQL(" @name @id @wine.id @bla ","wine",RedBean_Setup::getToolbox())," name id wine.id NULL ");
-asrt(RedBean_Plugin_Finder::parseGoldSQL(" @name @id @wine.id @bla @xxx ","wine",RedBean_Setup::getToolbox())," name id wine.id NULL NULL ");
-asrt(RedBean_Plugin_Finder::parseGoldSQL(" @bla @xxx ","wine",RedBean_Setup::getToolbox())," NULL NULL ");
-
-
-
-
-
-//Test constraints: cascaded delete
-testpack("Test Cascaded Delete");
-$adapter = $toolbox->getDatabaseAdapter();
-
-$adapter->exec("DROP TRIGGER IF EXISTS fkb8317025deb6e03fc05abaabc748a503a ");
-$adapter->exec("DROP TRIGGER IF EXISTS fkb8317025deb6e03fc05abaabc748a503b ");
-//add cask 101 and whisky 12
-$cask = $redbean->dispense("cask");
-$whisky = $redbean->dispense("whisky");
-$cask->number = 100;
-$whisky->age = 10;
-$a = new RedBean_AssociationManager( $toolbox );
-$a->associate( $cask, $whisky );
-//first test baseline behaviour, dead record should remain
-asrt(count($a->related($cask, "whisky")),1);
-$redbean->trash($cask);
-//no difference
-asrt(count($a->related($cask, "whisky")),0);
-$adapter->exec("DROP TABLE cask_whisky"); //clean up for real test!
-
-//add cask 101 and whisky 12
-$cask = $redbean->dispense("cask");
-$whisky = $redbean->dispense("whisky");
-$cask->number = 101;
-$whisky->age = 12;
-$a = new RedBean_AssociationManager( $toolbox );
-$a->associate( $cask, $whisky );
-
-//add cask 102 and whisky 13
-$cask2 = $redbean->dispense("cask");
-$whisky2 = $redbean->dispense("whisky");
-$cask2->number = 102;
-$whisky2->age = 13;
-$a = new RedBean_AssociationManager( $toolbox );
-$a->associate( $cask2, $whisky2 );
-
-//add constraint
-//asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true);
-//no error for duplicate
-//asrt(RedBean_Plugin_Constraint::addConstraint($cask, $whisky),true);
-
-
-asrt(count($a->related($cask, "whisky")),1);
-
-$redbean->trash($cask); 
-asrt(count($a->related($cask, "whisky")),0); //should be gone now!
-
-asrt(count($a->related($whisky2, "cask")),1);
-$redbean->trash($whisky2);
-asrt(count($a->related($whisky2, "cask")),0); //should be gone now!
-
-$adapter->exec("DROP TABLE IF EXISTS cask_whisky");
-$adapter->exec("DROP TABLE IF EXISTS cask");
-$adapter->exec("DROP TABLE IF EXISTS whisky");
-
-//add cask 101 and whisky 12
-$cask = $redbean->dispense("cask");
-$cask->number = 201;
-$cask2 = $redbean->dispense("cask");
-$cask2->number = 202;
-$a->associate($cask,$cask2);
-//asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
-//asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
-//now from cache... no way to check if this works :(
-//asrt(RedBean_Plugin_Constraint::addConstraint($cask, $cask2),true);
-asrt(count($a->related($cask, "cask")),1);
-$redbean->trash( $cask2 );
-asrt(count($a->related($cask, "cask")),0);
-//now in combination with prefixes
-$adapter->exec("DROP TABLE IF EXISTS xx_barrel_grapes");
-$adapter->exec("DROP TABLE IF EXISTS xx_grapes");
-$adapter->exec("DROP TABLE IF EXISTS xx_barrel");
-class TestFormatter implements RedBean_IBeanFormatter{
-	public function formatBeanTable($table) {return "xx_$table";}
-	public function formatBeanID( $table ) {return "id";}
-	public function getAlias($a){ return '__';}
-}
-$oldwriter = $writer;
-$oldredbean = $redbean;
-$writer = new RedBean_QueryWriter_SQLiteT( $adapter );
-$writer->setBeanFormatter( new TestFormatter );
-$redbean = new RedBean_OODB( $writer );
-$t2 = new RedBean_ToolBox($redbean,$adapter,$writer);
-$toolbox2 = new RedBean_ToolBox($redbean,$adapter,$writer);
-$a = new RedBean_AssociationManager($t2);
-$redbean = new RedBean_OODB( $writer );
-RedBean_Plugin_Constraint::setToolBox($t2);
-$b = $redbean->dispense("barrel");
-$g = $redbean->dispense("grapes");
-$g->type = "merlot";
-$b->texture = "wood";
-$a->associate($g, $b);
-//asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
-//asrt(RedBean_Plugin_Constraint::addConstraint($b, $g),true);
-asrt($redbean->count("barrel_grapes"),1);
-$redbean->trash($g);
-asrt($redbean->count("barrel_grapes"),0);
-//put things back in order for next tests...
-$a = new RedBean_AssociationManager($toolbox);
-$writer = $oldwriter;
-$redbean=$oldredbean;
-
-
-
-
-
 $pdo = $adapter->getDatabase();
 
 $pdo->Execute("DROP TABLE IF EXISTS page");
@@ -659,12 +495,13 @@ asrt(count($a->related($pageMore, "page")),1);
 asrt(count($a->related($pageEvenMore, "page")),1);
 asrt(count($a->related($pageOther, "page")),0);
 
+testpack("Test OODB Finder");
+asrt(count($redbean->find("page",array(), array(" name LIKE '%more%' ",array()))),3);
+asrt(count($redbean->find("page",array(), array(" name LIKE :str ",array(":str"=>'%more%')))),3);
+asrt(count($redbean->find("page",array(),array(" name LIKE :str ",array(":str"=>'%mxore%')))),0);
 
-testpack("Test RedBean Finder Plugin*");
-asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE '%more%' ")),3);
-asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE :str ",array(":str"=>'%more%'))),3);
-asrt(count(RedBean_Plugin_Finder::where("page", " name LIKE :str ",array(":str"=>'%mxore%'))),0);
 
+asrt(count($redbean->find("page",array("id"=>array(2,3)))),2);
 testpack("Test Developer Interface API");
 $post = $redbean->dispense("post");
 $post->title = "My First Post";
@@ -814,13 +651,6 @@ try {
 }catch(Exception $e) {
 
 }
-asrt(in_array("hack",$writer->getTables()),true);
-try {
-	RedBean_Plugin_Finder::where("::");
-}catch(Exception $e) {
-	pass();
-}
-
 
 
 $adapter->exec("drop table if exists sometable");
@@ -875,7 +705,7 @@ $bean = $redbean->dispense("zero");
 $bean->zero = false;
 $bean->title = "bla";
 $redbean->store($bean);
-asrt( count(RedBean_Plugin_Finder::where("zero"," zero = '0' ")), 1 );
+asrt( count($redbean->find("zero",array()," zero = 0 ")), 1 );
 
 testpack("Support for Affinity for sorting order");
 
@@ -890,7 +720,8 @@ $project2->sequence = "12";
 $redbean->store($project);
 //print_r( $adapter->get("PRAGMA table_info('project')") ); exit;
 $redbean->store($project2);
-$projects = RedBean_Plugin_Finder::where("project"," 1 ORDER BY sequence ");
+
+$projects = $redbean->find("project",array()," 1 ORDER BY sequence ");
 $firstProject = array_shift($projects);
 $secondProject = array_shift($projects);
 asrt((int)$firstProject->sequence,2);
@@ -1036,9 +867,6 @@ R::store($user2);
 $user3 = R::dispense("user");
 $user3->name="Kim";
 R::store($user3);
-R::link($user2,$page);
-$p = R::getBean($user2,"page");
-asrt($p->title,"mypage");
 $t = R::$writer->getTables();
 asrt(in_array("xx_page",$t),true);
 asrt(in_array("xx_page_user",$t),true);
@@ -1061,6 +889,12 @@ asrt(in_array("page_page",$t),false);
 
 
 testpack("Testing: combining table prefix and IDField");
+class TestFormatter implements RedBean_IBeanFormatter{
+	public function formatBeanTable($table) {return "xx_$table";}
+	public function formatBeanID( $table ) {return "id";}
+	public function getAlias($a){ return $a; }
+}
+
 $pdo->Execute("DROP TABLE IF EXISTS cms_blog");
 class MyBeanFormatter implements RedBean_IBeanFormatter{
     public function formatBeanTable($table) {
