@@ -1768,6 +1768,8 @@ asrt((count($authors)),1);
 $he = array_pop($authors);
 asrt($he->getName(),"Mr. Bean");
 
+
+/*
 testpack("Unit Of Work");
 
 $uow = new RedBean_UnitOfWork();
@@ -1800,6 +1802,7 @@ $uow->addWork("all_save",function() use($uow) {
 ;
 $uow->doWork("all_save");
 asrt(count( RedBean_Plugin_Finder::where("book","title LIKE '%unit%'") ),1);
+*/
 
 testpack("Test: Facade Multiple DB");
 

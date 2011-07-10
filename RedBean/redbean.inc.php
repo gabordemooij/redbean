@@ -104,7 +104,6 @@ require($dir."Plugin/QueryLogger.php");
 
 
 /* Developer Comfort */
-require($dir."UnitOfWork.php");
 require($dir."IBeanFormatter.php");
 require($dir."IModelFormatter.php");
 require($dir."SimpleModel.php");

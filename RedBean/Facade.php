@@ -654,9 +654,29 @@ class R {
 	 * @return array $results
 	 */
 	public static function exec( $sql, $values=array() ) {
-		return self::secureExec(function($sql, $values) {
+
+		if (!self::$redbean->isFrozen()) {
+			try {
+				$rs = R::$adapter->exec( $sql, $values );
+			}catch(RedBean_Exception_SQL $e) {
+				if(self::$writer->sqlStateIn($e->getSQLState(),
+				array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+				)) {
+					return NULL;
+				}
+				else {
+					throw $e;
+				}
+
+			}
+			return $rs;
+		}
+		else {
 			return R::$adapter->exec( $sql, $values );
-		}, NULL,$sql, $values );
+		}
+
 	}
 
 	/**
@@ -669,9 +689,28 @@ class R {
 	 * @return array $results
 	 */
 	public static function getAll( $sql, $values=array() ) {
-		return self::secureExec(function($sql, $values) {
+
+		if (!self::$redbean->isFrozen()) {
+			try {
+				$rs = R::$adapter->get( $sql, $values );
+			}catch(RedBean_Exception_SQL $e) {
+				if(self::$writer->sqlStateIn($e->getSQLState(),
+				array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+				)) {
+					return array();
+				}
+				else {
+					throw $e;
+				}
+
+			}
+			return $rs;
+		}
+		else {
 			return R::$adapter->get( $sql, $values );
-		}, array(), $sql, $values);
+		}
 	}
 
 	/**
@@ -684,9 +723,28 @@ class R {
 	 * @return string $result scalar
 	 */
 	public static function getCell( $sql, $values=array() ) {
-		return self::secureExec(function($sql, $values) {
+
+		if (!self::$redbean->isFrozen()) {
+			try {
+				$rs = R::$adapter->getCell( $sql, $values );
+			}catch(RedBean_Exception_SQL $e) {
+				if(self::$writer->sqlStateIn($e->getSQLState(),
+				array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+				)) {
+					return NULL;
+				}
+				else {
+					throw $e;
+				}
+
+			}
+			return $rs;
+		}
+		else {
 			return R::$adapter->getCell( $sql, $values );
-		}, NULL, $sql, $values);
+		}
 	}
 
 	/**
@@ -699,9 +757,29 @@ class R {
 	 * @return array $results
 	 */
 	public static function getRow( $sql, $values=array() ) {
-		return self::secureExec(function($sql, $values) {
+
+		if (!self::$redbean->isFrozen()) {
+			try {
+				$rs = R::$adapter->getRow( $sql, $values );
+			}catch(RedBean_Exception_SQL $e) {
+				if(self::$writer->sqlStateIn($e->getSQLState(),
+				array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+				)) {
+					return array();
+				}
+				else {
+					throw $e;
+				}
+
+			}
+			return $rs;
+		}
+		else {
 			return R::$adapter->getRow( $sql, $values );
-		}, array(),$sql, $values);
+		}
+
 	}
 
 	/**
@@ -714,9 +792,29 @@ class R {
 	 * @return array $results
 	 */
 	public static function getCol( $sql, $values=array() ) {
-		return self::secureExec(function($sql, $values) {
+
+		if (!self::$redbean->isFrozen()) {
+			try {
+				$rs = R::$adapter->getCol( $sql, $values );
+			}catch(RedBean_Exception_SQL $e) {
+				if(self::$writer->sqlStateIn($e->getSQLState(),
+				array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+				)) {
+					return array();
+				}
+				else {
+					throw $e;
+				}
+
+			}
+			return $rs;
+		}
+		else {
 			return R::$adapter->getCol( $sql, $values );
-		}, array(),$sql, $values);
+		}
+
 	}
 
 	/**

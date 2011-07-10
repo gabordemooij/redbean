@@ -3,8 +3,8 @@
 error_reporting(E_ALL | E_STRICT);
 require("RedBean/redbean.inc.php");
 
-R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
-//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+//R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
+R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
 //R::setup(); $db="sqlite";
 
 
@@ -1068,7 +1068,7 @@ catch(RedBean_Exception_Security $e){ pass();}
 catch(Exception $e){fail();}
 
 
-//test views icw aliases
+//test views icw aliases and n1
 droptables();
 $book = R::dispense('book');
 $page = R::dispense('page');
@@ -1080,4 +1080,26 @@ R::view('library2','book,page');
 $l2 = R::getRow('select * from xy_library2 limit 1');
 asrt($l2['title'],'my book');
 asrt($l2['title_of_page'],'my page');
+
+
+class Aliaser2 implements RedBean_IBeanFormatter { 
+        public function formatBeanID($t){ return 'id'; } 
+        public function formatBeanTable($t){ return $t; } 
+        public function getAlias($a){ 
+                if ($a=='creator' || $a=='recipient') return 'user'; else return 
+$a; 
+        } 
+} 
+
+$formatter = new Aliaser2(); 
+R::$writer->setBeanFormatter($formatter); 
+$message = R::dispense('message'); 
+list($creator,$recipient) = R::dispense('user',2); 
+$recipient->name = 'r';
+$creator->name = 'c';
+$message->recipient = $recipient; 
+$message->creator = $creator; 
+$id = R::store($message); 
+$message = R::load('message', $id); 
+$recipient = $message->recipient; 
 
