@@ -42,7 +42,10 @@
 		<item type="php">RedBean/ViewManager.php</item>
 		<item type="php">RedBean/Setup.php</item>
 		<item type="php">RedBean/IBeanFormatter.php</item>
+		<item type="php">RedBean/ABeanFormatter.php</item>
 		<item type="php">RedBean/IModelFormatter.php</item>
+		<item type="php">RedBean/IBeanHelper.php</item>
+		<item type="php">RedBean/BeanHelperFacade.php</item>
 		<item type="php">RedBean/Plugin/Optimizer.php</item>
 		<item type="php">RedBean/Plugin/IOptimizer.php</item>
 		<item type="php">RedBean/Plugin/Optimizer/Shrink.php</item>

@@ -30,6 +30,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 */
 	private $__info = NULL;
 
+	private $beanHelper = NULL;
+
+	public function setBeanHelper(RedBean_IBeanHelper $helper) {
+		$this->beanHelper = $helper;
+	}
+
 
 	public function getIterator() {
 		return new ArrayIterator($this->properties);
@@ -150,7 +156,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 */
 	public function &__get( $property ) {
 
-		
+		if ($this->beanHelper)
+		$toolbox = $this->beanHelper->getToolbox();
+
 		if (!isset($this->properties[$property])) {
 
 			$fieldLink = $property."_id";
@@ -163,9 +171,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 			 */
 			if (isset($this->$fieldLink) && $fieldLink != $this->getMeta('sys.idfield')) {
 				$this->setMeta("tainted",true);
-				$type = R::$writer->getAlias($property);
+				$type =  $toolbox->getWriter()->getAlias($property);
 				$targetType = $this->properties[$fieldLink];
-				$bean =  R::load($type,$targetType);
+				$bean =  $toolbox->getRedBean()->load($type,$targetType);
 				return $bean;
 			}
 
@@ -174,7 +182,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 				if ($firstCharCode>=65 && $firstCharCode<=90) {
 					$type = strtolower(str_replace('own','',$property));
 					$myFieldLink = $this->getMeta('type')."_id";
-					$beans = R::find($type," $myFieldLink = ?",array($this->getID()));
+					$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ",array($this->getID())));
 					$this->properties[$property] = $beans;
 					$this->setMeta("sys.shadow.".$property,$beans);
 					$this->setMeta("tainted",true);
@@ -186,7 +194,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 				$firstCharCode = ord(substr($property,6,1));
 				if ($firstCharCode>=65 && $firstCharCode<=90) {
 					$type = strtolower(str_replace('shared','',$property));
-					$beans = R::related($this,$type);
+					$keys = $toolbox->getRedBean()->getAssociationManager()->related($this,$type);
+					if (!count($keys)) $beans = array(); else
+					$beans = $toolbox->getRedBean()->batch($type,$keys);
 					$this->properties[$property] = $beans;
 					$this->setMeta("sys.shadow.".$property,$beans);
 					$this->setMeta("tainted",true);

@@ -94,9 +94,13 @@ require($dir."Plugin/Optimizer/Shrink.php");
 require($dir."Plugin/QueryLogger.php");
 
 
+require($dir."IBeanHelper.php");
+require($dir."BeanHelperFacade.php");
 
 /* Developer Comfort */
 require($dir."IBeanFormatter.php");
+require($dir."ABeanFormatter.php");
+
 require($dir."IModelFormatter.php");
 require($dir."SimpleModel.php");
 require($dir."ModelHelper.php");

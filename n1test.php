@@ -1,11 +1,12 @@
 <?php
 
+
 error_reporting(E_ALL | E_STRICT);
 require("RedBean/redbean.inc.php");
 
-//R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
+R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
 //R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
-R::setup(); $db="sqlite";
+//R::setup(); $db="sqlite";
 
 
 function printtext( $text ) {
@@ -59,7 +60,7 @@ R::exec('drop view if exists library2');
 foreach(R::$writer->getTables() as $t) {
 	
 	if ($db=='mysql') R::exec("drop table `$t`");
-	if ($db=='pgsql') R::exec("drop table $t cascade");
+	if ($db=='pgsql') R::exec("drop table \"$t\" cascade");
 	if ($db=='sqlite') R::exec("drop table $t ");
 }
 if ($db=='mysql') R::exec('SET FOREIGN_KEY_CHECKS=1;');
@@ -281,9 +282,7 @@ asrt(end($book->ownPage)->title,'yet another page 4');
 
 //test aliasing
 //test with alias format
-class Aliaser implements RedBean_IBeanFormatter {
-	public function formatBeanID($t){ return 'id'; }
-	public function formatBeanTable($t){ return $t; }
+class Aliaser extends RedBean_ABeanFormatter {
 	public function getAlias($a){ 
 		if ($a=='cover') return 'page'; else return $a; 
 	}

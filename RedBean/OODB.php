@@ -35,6 +35,8 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 */
 	private $isFrozen = false;
 
+	private $beanhelper = null;
+
 	/**
 	 * The RedBean OODB Class is the main class of RedBean.
 	 * It takes RedBean_OODBBean objects and stores them to and loads them from the
@@ -55,6 +57,9 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		else {
 			throw new RedBean_Exception_Security("Passing an invalid Query Writer");
 		}
+		
+		$this->beanhelper = new RedBean_BeanHelperFacade();
+
 
 	}
 
@@ -95,6 +100,7 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	public function dispense($type ) {
 		$this->signal( "before_dispense", $type );
 		$bean = new RedBean_OODBBean();
+		$bean->setBeanHelper($this->beanhelper);
 		$bean->setMeta("type", $type );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		$bean->setMeta("sys.idfield",$idfield);
@@ -105,6 +111,11 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		$this->signal( "dispense", $bean );
 		return $bean;
 	}
+
+	public function setBeanHelper( RedBean_IBeanHelper $beanhelper) {
+		$this->beanhelper = $beanhelper;
+	}
+
 
 	/**
 	 * Checks whether a RedBean_OODBBean bean is valid.

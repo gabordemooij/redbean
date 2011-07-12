@@ -15,6 +15,7 @@
  */
 class RedBean_Driver_PDO implements RedBean_Driver {
 
+
 	/**
 	 * @var string
 	 * Contains database DSN for connecting to database.
@@ -198,7 +199,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}
 	}
 
-
+	
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.
 	 *
@@ -224,6 +225,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			}
 
 
+			
 			$this->bindParams( $s, $aValues );
 
 			$s->execute();

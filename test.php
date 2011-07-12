@@ -1649,6 +1649,8 @@ asrt($author2->id,$author->id);
 asrt(($book->id!==$book2->id),true);
 asrt($book->title,$book2->title);
 
+
+
 testpack("Test Swap function in R-facade");
 $book = R::dispense("book");
 $book->title = "firstbook";
