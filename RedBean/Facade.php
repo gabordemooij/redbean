@@ -123,6 +123,9 @@ class R {
 		return $objects;
 	}
 
+	public static function addDatabase( $key, $dsn, $user, $pass=null, $frozen=false ) {
+		self::$toolboxes[$key] = RedBean_Setup::kickstart($dsn,$user,$pass,$frozen);
+	}
 
 
 	/**

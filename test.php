@@ -1477,6 +1477,20 @@ $r2->view("shelf","book,page");
 $shelf = $r2->getCell("select title_of_page from shelf where id = $id2 ");
 asrt($shelf,"SECOND");
 
+R::addDatabase("D1","sqlite:/tmp/database_1.txt","");
+R::addDatabase("D2","sqlite:/tmp/database_2.txt","");
+R::selectDatabase("D1");
+R::wipe('bottle');
+foreach(R::dispense('bottle',5) as $bottle) R::store($bottle);
+R::selectDatabase("D2");
+R::wipe('bottle');
+foreach(R::dispense('bottle',3) as $bottle) R::store($bottle);
+R::selectDatabase("D1");
+asrt(intval(R::getCell('select count(*) from bottle')),5);
+R::selectDatabase("D2");
+asrt(intval(R::getCell('select count(*) from bottle')),3);
+
+
 testpack("Facade Basics");
 R::setup("sqlite:/tmp/teststore.txt"); //should work as well
 pass();
