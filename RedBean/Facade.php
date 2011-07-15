@@ -681,39 +681,6 @@ class R {
 
 	}
 
-	/**
-	 * Executes SQL function but corrects for SQL states.
-	 *
-	 * @param closure $func		closure
-	 * @param mixed   $default default value to return
-	 * @param string  $sql		SQL
-	 * @param array   $values  values for slots
-	 *
-	 * @return mixed $results
-	 */
-	private static function secureExec( $func, $default=NULL, $sql, $values ) {
-		if (!self::$redbean->isFrozen()) {
-			try {
-				$rs = $func($sql,$values);
-			}catch(RedBean_Exception_SQL $e) { //die($e);
-				if(self::$writer->sqlStateIn($e->getSQLState(),
-				array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-				)) {
-					return $default;
-				}
-				else {
-					throw $e;
-				}
-
-			}
-			return $rs;
-		}
-		else {
-			return $func($sql,$values);
-		}
-	}
 
 	/**
 	 * Makes a copy of a bean. This method copies the bean and
