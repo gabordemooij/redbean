@@ -312,8 +312,9 @@ class R {
 	 * values for that SQL to filter your results after fetching the
 	 * related beans.
 	 *
-	 * If 'fearless' mode is on, this method will try to take a shortcut and
-	 * use a subquery instead.
+	 * Dont try to make use of subqueries, a subquery using IN() seems to
+	 * be slower than two queries!
+	 *
 	 *
 	 * @param RedBean_OODBBean $bean the bean you have
 	 * @param string           $type the type of beans you want
@@ -327,12 +328,8 @@ class R {
 		if (count($keys)==0) return array();
 		if (!$sql) return self::batch($type, $keys);
 		$idfield = self::$writer->getIDField( $type );
-
 		$rows = self::$writer->selectRecord( $type, array($idfield=>$keys),array($sql,$values),false );
 		return self::$redbean->convertToBeans($type,$rows);
-
-		$sqlSnippet = self::$writer->getSQLSnippetFilter($idfield, $keys, $sql);
-		return self::find( $type, $sqlSnippet, $values );
 	}
 
 
