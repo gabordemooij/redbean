@@ -2,7 +2,7 @@
 /**
  * RedBean Optimizer Shrink
  * @file				RedBean/Plugin/Optimizer/Shrink.php
- * @description	An Optimizer Plugin for RedBean.
+ * @description			An Optimizer Plugin for RedBean.
  *						This optimizer tries to narrow columns on the fly.
  *						If the values in a column can be stored in a smaller
  *						column type this plugin will try to adjust the column to the

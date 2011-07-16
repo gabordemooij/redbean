@@ -1,7 +1,8 @@
 <?php
 /**
  * RedBean Abstract Query Writer
- * @file 		RedBean/QueryWriter/AQueryWriter.php
+ *
+ * @file 			RedBean/QueryWriter/AQueryWriter.php
  * @description
  *					Represents an abstract Database to RedBean
  *					To write a driver for a different database for RedBean
@@ -20,6 +21,10 @@
 abstract class RedBean_QueryWriter_AQueryWriter {
 
 
+	/**
+	 * @var array
+	 * FK Cache
+	 */
 	protected $fcache = array();
 
 	/**
@@ -113,6 +118,15 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $type;
 	}
 
+	/**
+	 * Returns an alias type based on a reference type. If the writer has
+	 * a tableformatter this method will pass the type to the writer's alias
+	 * function to get the alias of the type back.
+	 *
+	 * @param  string $type type you want an alias for
+	 *
+	 * @return
+	 */
 	public function getAlias($type) {
 		if ($this->tableFormatter) {
 			return $this->tableFormatter->getAlias($type);
@@ -194,6 +208,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param string  $column name of the column
 	 * @param integer $type   type
 	 *
+	 * @return void
+	 *
 	 */
 	public function addColumn( $table, $column, $type ) {
 		$table = $this->safeTable($table);
@@ -209,6 +225,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param string  $table		  table
 	 * @param array   $updatevalues update values
 	 * @param integer $id			  primary key for record
+	 *
+	 * @return void
 	 */
 	public function updateRecord( $table, $updatevalues, $id=null) {
 		if (!$id) {
@@ -270,13 +288,16 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	
 	
 	/**
+	 * Selects a record from a type based on conditions and SQL.
+	 *
 	 * @throws Exception
-	 * @param  $type
-	 * @param  $conditions
-	 * @param null $addSql
-	 * @param null $delete
-	 * @param bool $inverse
-	 * @return array
+	 * @param string $type       name of the type (not table) you want to select from
+	 * @param array  $conditions array of conditions
+	 * @param string $addSql     additional SQL to be appended
+	 * @param bool   $delete	 if TRUE, deletes record instead of selecting it
+	 * @param bool   $inverse	 if TRUE, selected every record except the matching ones
+	 *
+	 * @return array $rows rows
 	 */
 	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false ) {
 		if (!is_array($conditions)) throw new Exception("Conditions must be an array");
@@ -370,9 +391,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 	/**
-	 * Truncates a table
+	 * Truncates a type
 	 *
-	 * @param string $table
+	 * @param string $type type
 	 */
 	public function wipe($table) {
 		$table = $this->safeTable($table);
@@ -429,8 +450,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 
-	
-
 	/**
 	 * Adds a foreign key to a certain column.
 	 * 
@@ -469,6 +488,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 
 	}
 
+	/**
+	 * Gets the format for the link table
+	 *
+	 * @param  array $types types
+	 *
+	 * @return  string $linktablename
+	 */
 	public function getAssocTableFormat($types) {
 		sort($types);
 		return ( implode("_", $types) );
@@ -526,7 +552,20 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 
 	}
 
-
+	/**
+	 * Abstract method. Needs to be implemented by 'fluid' driver.
+	 * Add the constraints for a specific database driver.
+	 * @abstract
+	 *
+	 * @param string			  $table     table
+	 * @param string			  $table1    table1
+	 * @param string			  $table2    table2
+	 * @param string			  $property1 property1
+	 * @param string			  $property2 property2
+	 * @param boolean			  $dontCache want to have cache?
+	 *
+	 * @return boolean $succes whether the constraint has been applied
+	 */
 	abstract protected function constrain($table, $table1, $table2, $p1, $p2, $cache);
 
 

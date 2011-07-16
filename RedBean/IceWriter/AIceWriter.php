@@ -1,12 +1,18 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
- * User: prive
- * Date: 06-04-11
- * Time: 11:57
- * To change this template use File | Settings | File Templates.
+ * Abstract Ice Writer
+ * Part of the ICE API
+ *
+ * @file			RedBean/IceWriter/AIceWriter
+ * @description		Abstract Query Writer for frozen-only drivers
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
  */
- 
 abstract class RedBean_IceWriter_AIceWriter implements RedBean_IceWriter {
 
 	/**
@@ -137,10 +143,10 @@ abstract class RedBean_IceWriter_AIceWriter implements RedBean_IceWriter {
 	 * @return string $table escaped string
 	 */
 	public function check($table) {
-		// if (strpos($table, '`')!==false || strpos($table, '"')!==false) { // maybe this?
+		
 		if ($this->quoteCharacter && strpos($table, $this->quoteCharacter)!==false) {
-		  throw new Redbean_Exception_Security("Illegal chars in table name");
-    }
+			throw new Redbean_Exception_Security("Illegal chars in table name");
+   	 	}
 		return $this->adapter->escape($table);
 	}
 
@@ -155,9 +161,5 @@ abstract class RedBean_IceWriter_AIceWriter implements RedBean_IceWriter {
 		$q = $this->quoteCharacter;
 		return $q.$str.$q;
 	}
-
-
-
-
 
 }

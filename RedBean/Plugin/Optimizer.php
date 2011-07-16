@@ -1,7 +1,7 @@
 <?php
 /**
  * Optimizer
- * @file 		RedBean/Optimizer.php
+ * @file 			RedBean/Optimizer.php
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -108,8 +108,6 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 				$this->optimize($table,$column,$value);
 			}
 		}catch(RedBean_Exception_SQL $e) {
-			//optimizer might make mistakes, don't care.
-			//echo $e->getMessage()."<br>";
 		}
 	}
 	

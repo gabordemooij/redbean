@@ -169,7 +169,16 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->isConnected = true;
 	}
 
-
+	/**
+	 * Binds parameters. This method binds parameters to a PDOStatement for
+	 * Query Execution. This method binds parameters as NULL, INTEGER or STRING
+	 * and supports both named keys and question mark keys.
+	 *
+	 * @param  PDOStatement $s       PDO Statement instance
+	 * @param  array        $aValues values that need to get bound to the statement
+	 * 
+	 * @return void
+	 */
 	protected function bindParams($s,$aValues) {
 		foreach($aValues as $key=>&$value) {
 			if (is_integer($key)) {

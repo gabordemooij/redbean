@@ -1,12 +1,13 @@
 <?php
 /**
  * Interface for database drivers
- * @file					RedBean/Driver.php
+ *
+ * @file			RedBean/Driver.php
  * @description		Describes the API for database classes
- *							The Driver API conforms to the ADODB pseudo standard
- *							for database drivers.
- * @author				Gabor de Mooij
- * @license				BSD
+ *					The Driver API conforms to the ADODB pseudo standard
+ *					for database drivers.
+ * @author			Gabor de Mooij
+ * @license			BSD
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij

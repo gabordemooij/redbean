@@ -2,7 +2,7 @@
 /**
  * RedBean Optimizer DateTime
  * @file				RedBean/Plugin/Optimizer/DateTime.php
- * @description	An Optimizer Plugin for RedBean.
+ * @description			An Optimizer Plugin for RedBean.
  *						Tries to convert columns to MySQL datetime
  *						if possible.
  *

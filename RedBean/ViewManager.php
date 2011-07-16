@@ -101,8 +101,6 @@ class RedBean_ViewManager extends RedBean_CompatManager {
 			$currentTable=$t;
 		}
 		
-		//print_r($joins);
-		
 		try{ 
 			$rs = (boolean) $this->writer->createView($refType,$joins,$viewID); 
 		}

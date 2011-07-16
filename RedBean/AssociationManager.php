@@ -77,6 +77,13 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		return $this->associateBeans( $bean1, $bean2, $bean );
 	}
 
+	/**
+	 * Whether to use constraints
+	 *
+	 * @param  boolean $trueFalse yesno
+	 *
+	 * @return void
+	 */
 	public function setUseConstraints( $trueFalse ) {
 		$this->flagUseConstraints = $trueFalse;
 	}
@@ -329,6 +336,17 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 	}
 
 
+	/**
+	 * Given two beans this function returns TRUE if they are associated using a
+	 * many-to-many association, FALSE otherwise.
+	 *
+	 * @throws RedBean_Exception_SQL
+	 *
+	 * @param RedBean_OODBBean $bean1 bean
+	 * @param RedBean_OODBBean $bean2 bean
+	 *
+	 * @return bool $related whether they are associated N-M
+	 */
 	public function areRelated(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		if (!$bean1->getID() || !$bean2->getID()) return false;
 		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );

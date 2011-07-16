@@ -1,12 +1,16 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
- * User: prive
- * Date: 11-07-11
- * Time: 08:25
- * To change this template use File | Settings | File Templates.
+ * RedBean Bean Helper
+ * @file				RedBean/BeanHelperFacade.php
+ * @description	
+ *
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
  */
- 
 class RedBean_BeanHelperFacade implements RedBean_IBeanHelper {
 
 	/**

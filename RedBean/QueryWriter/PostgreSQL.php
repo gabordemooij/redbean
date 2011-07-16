@@ -75,7 +75,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
    * @var string
    * Default Value
    */
-  protected $defaultValue = 'DEFAULT';
+ 	protected $defaultValue = 'DEFAULT';
 
 	public function getTypeForID() {
 		return self::C_DATATYPE_INTEGER;
@@ -150,7 +150,6 @@ where table_schema = 'public'" );
 	 */
 	public function scanType( $value ) {
 		// added value===null  
-		//echo " \n\n value = $value => ".strval(intval($value))." same? ".($value===strval(intval($value)));
 		if ($value===null || ($value instanceof RedBean_Driver_PDO_NULL) ||(is_numeric($value)
 				  && floor($value)==$value
 				  && $value < 2147483648
@@ -161,7 +160,6 @@ where table_schema = 'public'" );
 			return self::C_DATATYPE_DOUBLE;
 		}
 		else {
-			//echo "TEXT BECAUSE : $value";
 			return self::C_DATATYPE_TEXT;
 		}
 	}
@@ -327,6 +325,17 @@ where table_schema = 'public'" );
 	}
 
 
+	/**
+	 * Adds a foreign key to a table. The foreign key will not have any action; you
+	 * may configure this afterwards.
+	 *
+	 * @param  string $type        type you want to modify table of
+	 * @param  string $targetType  target type
+	 * @param  string $field       field of the type that needs to get the fk
+	 * @param  string $targetField field where the fk needs to point to
+	 *
+	 * @return bool $success whether an FK has been added
+	 */
 	public function addFK( $type, $targetType, $field, $targetField) {
 		try{
 			$table = $this->safeTable($type);
@@ -367,20 +376,20 @@ where table_schema = 'public'" );
 			if (!count($rows)) {
 
 				try{
-				$this->adapter->exec("ALTER TABLE  $table
-				ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
-				$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
+					$this->adapter->exec("ALTER TABLE  $table
+					ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
+					$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
+					return true;
+
 				}
 				catch(Exception $e) {
-					echo "\n".$e->getMessage();
+					//echo "\n".$e->getMessage();
 				}
 			}
-		
 		}
 		catch(Exception $e){
 			return false;
 		}
-
 	}
 
 
@@ -447,6 +456,5 @@ where table_schema = 'public'" );
 			return false;
 		}
 	}
-
 
 }

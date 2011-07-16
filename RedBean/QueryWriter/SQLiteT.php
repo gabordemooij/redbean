@@ -1,5 +1,14 @@
 <?php
-
+/**
+ * RedBean SQLiteWriter with support for SQLite types
+ *
+ * @file				RedBean/QueryWriter/SQLiteT.php
+ * @description			Represents a SQLite Database to RedBean
+ *						To write a driver for a different database for RedBean
+ *						you should only have to change this file.
+ * @author				Gabor de Mooij
+ * @license				BSD
+ */
 class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 	/**
 	 *

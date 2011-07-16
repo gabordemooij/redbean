@@ -141,24 +141,92 @@ interface RedBean_QueryWriter {
 	 */
 	public function sqlStateIn( $state, $list );
 
+	/**
+	 * @abstract
+	 * @param  $table
+	 * @return void
+	 */
 	public function wipe($table);
 
+	/**
+	 * @abstract
+	 * @param  $type
+	 * @return void
+	 */
 	public function count($type);
 
+	/**
+	 * @abstract
+	 * @param  $table
+	 * @return void
+	 */
 	public function check($table);
 
+	/**
+	 * @abstract
+	 * @param RedBean_IBeanFormatter $beanFormatter
+	 * @return void
+	 */
 	public function setBeanFormatter(RedBean_IBeanFormatter $beanFormatter);
 
+	/**
+	 * @abstract
+	 * @param  $referenceTable
+	 * @param  $constraints
+	 * @param  $viewID
+	 * @return void
+	 */
 	public function createView($referenceTable, $constraints, $viewID);
 
+	/**
+	 * @abstract
+	 * @param string $type
+	 * @return void
+	 */
 	public function getFieldType( $type = "" );
 
+	/**
+	 * @abstract
+	 * @param  $name
+	 * @param bool $noQuotes
+	 * @return void
+	 */
 	public function safeColumn($name, $noQuotes = false);
 
+	/**
+	 * @abstract
+	 * @param  $name
+	 * @param bool $noQuotes
+	 * @return void
+	 */
 	public function safeTable($name, $noQuotes = false);
 
+	/**
+	 * @abstract
+	 * @param RedBean_OODBBean $bean1
+	 * @param RedBean_OODBBean $bean2
+	 * @param bool $dontCache
+	 * @return void
+	 */
 	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $dontCache = false );
 
+	/**
+	 * @abstract
+	 * @param  $types
+	 * @return void
+	 */
 	public function getAssocTableFormat($types);
+
+	/**
+	 * Adds a foreign key to a certain column.
+	 *
+	 * @param  $type
+	 * @param  $targetType
+	 * @param  $field
+	 * @param  $targetField
+	 * @return void
+	 */
+	public function addFK( $type, $targetType, $field, $targetField);
+
 
 }

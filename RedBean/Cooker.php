@@ -123,6 +123,12 @@ class RedBean_Cooker {
 
 	}
 
+	/**
+	 * Sets the toolbox to be used by graph()
+	 * 
+	 * @param RedBean_Toolbox $toolbox toolbox
+	 * @return void
+	 */
 	public function setToolbox(RedBean_Toolbox $toolbox) {
 
 		$this->toolbox = $toolbox;
@@ -130,6 +136,13 @@ class RedBean_Cooker {
 
 	}
 
+	/**
+	 * Turns a request array into a collection of beans
+	 *
+	 * @param  $array array
+	 *
+	 * @return array $beans beans
+	 */
 	public function graph( $array ) {
 
 		$beans = array();

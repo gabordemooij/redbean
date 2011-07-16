@@ -2,7 +2,7 @@
 /**
  * RedBean IOptimizer
  * @file				RedBean/Plugin/IOptimizer.php
- * @description	Describes the interface of an optimizer.
+ * @description			Describes the interface of an optimizer.
  *
  * @author			Gabor de Mooij
  * @license			BSD

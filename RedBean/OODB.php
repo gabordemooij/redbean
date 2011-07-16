@@ -112,6 +112,13 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 		return $bean;
 	}
 
+	/**
+	 * Sets bean helper
+	 *
+	 * @param RedBean_IBeanHelper $beanhelper helper
+	 * 
+	 * @return void
+	 */
 	public function setBeanHelper( RedBean_IBeanHelper $beanhelper) {
 		$this->beanhelper = $beanhelper;
 	}
@@ -626,11 +633,19 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	}
 
 
+	/**
+	 * @throws Exception
+	 * @return
+	 */
 	public function getAssociationManager() {
 		if (!isset($this->assocManager)) throw new Exception("No association manager available.");
 		return $this->assocManager;
 	}
 
+	/**
+	 * @param RedBean_AssociationManager $assoc
+	 * @return void
+	 */
 	public function setAssociationManager(RedBean_AssociationManager $assoc) {
 		$this->assocManager = $assoc;
 	}

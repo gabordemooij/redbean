@@ -1,12 +1,17 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: prive
- * Date: 06-04-11
- * Time: 11:54
- * To change this template use File | Settings | File Templates.
+ /**
+ * @name RedBean IceWriter
+ * @file RedBean/IceWriter.php
+ * @author Gabor de Mooij and the RedBean Team
+ * @copyright Gabor de Mooij (c)
+ * @license BSD
+ *
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
  */
- 
 interface RedBean_IceWriter {
 
 	/**
@@ -69,14 +74,41 @@ interface RedBean_IceWriter {
 	 */
 	public function noKW($str);
 
+	/**
+	 * @abstract
+	 * @param  $type
+	 * @return void
+	 */
 	public function count($type);
 
+	/**
+	 * @abstract
+	 * @param  $table
+	 * @return void
+	 */
 	public function check($table);
 
+	/**
+	 * @abstract
+	 * @param RedBean_IBeanFormatter $beanFormatter
+	 * @return void
+	 */
 	public function setBeanFormatter(RedBean_IBeanFormatter $beanFormatter);
 
+	/**
+	 * @abstract
+	 * @param  $name
+	 * @param bool $noQuotes
+	 * @return void
+	 */
 	public function safeColumn($name, $noQuotes = false);
 
+	/**
+	 * @abstract
+	 * @param  $name
+	 * @param bool $noQuotes
+	 * @return void
+	 */
 	public function safeTable($name, $noQuotes = false);
 
 

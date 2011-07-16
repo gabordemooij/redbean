@@ -139,6 +139,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 		
 	}
 
+	/**
+	 * @param  $property
+	 * @return void
+	 */
 	public function removeProperty( $property ) {
 		
 		unset($this->properties[$property]);

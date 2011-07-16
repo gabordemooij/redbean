@@ -156,7 +156,11 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$this->adapter = $adapter;
 	}
 
-
+	/**
+	 * Returns the type to be used for IDS.
+	 * 
+	 * @return integer $constant IDTYPE
+	 */
 	public function getTypeForID() {
 		return self::C_DATATYPE_UINT32;
 	}

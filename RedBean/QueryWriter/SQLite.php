@@ -3,16 +3,14 @@
  * RedBean SQLiteWriter
  * 
  * @file				RedBean/QueryWriter/SQLite.php
- * @description	Represents a SQLite Database to RedBean
+ * @description			Represents a SQLite Database to RedBean
  *						To write a driver for a different database for RedBean
  *						you should only have to change this file.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @author				Gabor de Mooij
+ * @license				BSD
  */
 class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 
-
-	
 
 	/**
 	 * Constructor
@@ -155,6 +153,18 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 	}
 
 
+
+	/**
+	 * Adds a foreign key to a table. The foreign key will not have any action; you
+	 * may configure this afterwards.
+	 *
+	 * @param  string $type        type you want to modify table of
+	 * @param  string $targetType  target type
+	 * @param  string $field       field of the type that needs to get the fk
+	 * @param  string $targetField field where the fk needs to point to
+	 *
+	 * @return bool $success whether an FK has been added
+	 */
 	public function addFK( $type, $targetType, $field, $targetField) {
 		//not supported yet
 	}
