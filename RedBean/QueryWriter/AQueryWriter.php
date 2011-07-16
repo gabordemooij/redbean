@@ -441,7 +441,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return void
 	 */
 	public function addFK( $type, $targetType, $field, $targetField) {
-
 		$table = $this->safeTable($type);
 		$tableNoQ = $this->safeTable($type,true);
 		$targetTable = $this->safeTable($targetType);
@@ -464,7 +463,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
 			}
 			catch(Exception $e) {
-				echo "\n".$e->getMessage();
+				
 			}
 		}
 

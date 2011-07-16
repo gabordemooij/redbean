@@ -328,52 +328,57 @@ where table_schema = 'public'" );
 
 
 	public function addFK( $type, $targetType, $field, $targetField) {
+		try{
+			$table = $this->safeTable($type);
+			$column = $this->safeColumn($field);
 
-		$table = $this->safeTable($type);
-		$column = $this->safeColumn($field);
-
-		$tableNoQ = $this->safeTable($type,true);
-		$columnNoQ = $this->safeColumn($field,true);
+			$tableNoQ = $this->safeTable($type,true);
+			$columnNoQ = $this->safeColumn($field,true);
 
 
-		$targetTable = $this->safeTable($targetType);
+			$targetTable = $this->safeTable($targetType);
 
-		$targetColumn  = $this->safeColumn($targetField);
+			$targetColumn  = $this->safeColumn($targetField);
 
-		$fkCode = $tableNoQ.'_'.$columnNoQ.'_fkey';
+			$fkCode = $tableNoQ.'_'.$columnNoQ.'_fkey';
 
-		$sql = "
-					SELECT
-							c.oid,
-							n.nspname,
-							c.relname,
-							n2.nspname,
-							c2.relname,
-							cons.conname
-					FROM pg_class c
-					JOIN pg_namespace n ON n.oid = c.relnamespace
-					LEFT OUTER JOIN pg_constraint cons ON cons.conrelid = c.oid
-					LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
-					LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
-					WHERE c.relkind = 'r'
-					AND n.nspname IN ('public')
-					AND (cons.contype = 'f' OR cons.contype IS NULL)
-					AND
-					(  cons.conname = '{$fkCode}' )
+			$sql = "
+						SELECT
+								c.oid,
+								n.nspname,
+								c.relname,
+								n2.nspname,
+								c2.relname,
+								cons.conname
+						FROM pg_class c
+						JOIN pg_namespace n ON n.oid = c.relnamespace
+						LEFT OUTER JOIN pg_constraint cons ON cons.conrelid = c.oid
+						LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
+						LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
+						WHERE c.relkind = 'r'
+						AND n.nspname IN ('public')
+						AND (cons.contype = 'f' OR cons.contype IS NULL)
+						AND
+						(  cons.conname = '{$fkCode}' )
 
-				  ";
+					  ";
 
-		$rows = $this->adapter->get( $sql );
-		if (!count($rows)) {
+			$rows = $this->adapter->get( $sql );
+			if (!count($rows)) {
 
-			try{
-			$this->adapter->exec("ALTER TABLE  $table
-			ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
-			$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
+				try{
+				$this->adapter->exec("ALTER TABLE  $table
+				ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
+				$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
+				}
+				catch(Exception $e) {
+					echo "\n".$e->getMessage();
+				}
 			}
-			catch(Exception $e) {
-				echo "\n".$e->getMessage();
-			}
+		
+		}
+		catch(Exception $e){
+			return false;
 		}
 
 	}
