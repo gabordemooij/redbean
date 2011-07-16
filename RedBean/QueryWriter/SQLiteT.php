@@ -314,38 +314,43 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return boolean $succes whether the constraint has been applied
 	 */
 	protected  function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
-		$writer = $this;
+		try{
+			$writer = $this;
 
-		$adapter = $this->adapter;
-		$fkCode = "fk".md5($table.$property1.$property2);
+			$adapter = $this->adapter;
+			$fkCode = "fk".md5($table.$property1.$property2);
 
-		$idfield1 = $writer->getIDField($table1);
-		$idfield2 = $writer->getIDField($table2);
+			$idfield1 = $writer->getIDField($table1);
+			$idfield2 = $writer->getIDField($table2);
 
-		$table = $writer->getFormattedTableName($table);
-		$table1 = $writer->getFormattedTableName($table1);
-		$table2 = $writer->getFormattedTableName($table2);
+			$table = $writer->getFormattedTableName($table);
+			$table1 = $writer->getFormattedTableName($table1);
+			$table2 = $writer->getFormattedTableName($table2);
 
 
-		$sql1 = "
-			 CREATE TRIGGER IF NOT EXISTS {$fkCode}a
-				BEFORE DELETE ON $table1
-				FOR EACH ROW BEGIN
-					DELETE FROM $table WHERE  $table.$property1 = OLD.$idfield1;
-				END;
-				  ";
+			$sql1 = "
+				 CREATE TRIGGER IF NOT EXISTS {$fkCode}a
+					BEFORE DELETE ON $table1
+					FOR EACH ROW BEGIN
+						DELETE FROM $table WHERE  $table.$property1 = OLD.$idfield1;
+					END;
+					  ";
 
-		$sql2 = "
-			CREATE TRIGGER IF NOT EXISTS {$fkCode}b
-				BEFORE DELETE ON $table2
-				FOR EACH ROW BEGIN
-					DELETE FROM $table WHERE $table.$property2 = OLD.$idfield2;
-				END;
+			$sql2 = "
+				CREATE TRIGGER IF NOT EXISTS {$fkCode}b
+					BEFORE DELETE ON $table2
+					FOR EACH ROW BEGIN
+						DELETE FROM $table WHERE $table.$property2 = OLD.$idfield2;
+					END;
 
-				  ";
-		$adapter->exec($sql1);
-		$adapter->exec($sql2);
-		return true;
+					  ";
+			$adapter->exec($sql1);
+			$adapter->exec($sql2);
+			return true;
+		}
+		catch(Exception $e){
+			return false;
+		}
 	}
 
 

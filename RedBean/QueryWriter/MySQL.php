@@ -324,49 +324,54 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return boolean $succes whether the constraint has been applied
 	 */
 	protected function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
-		$writer = $this;
-		$adapter = $this->adapter;
-		$db = $adapter->getCell("select database()");
-		$fkCode = "fk".md5($table.$property1.$property2);
-		$fks =  $adapter->getCell("
-			SELECT count(*)
-			FROM information_schema.KEY_COLUMN_USAGE
-			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='".$writer->getFormattedTableName($table)."' AND
-			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
-				  ");
+		try{
+			$writer = $this;
+			$adapter = $this->adapter;
+			$db = $adapter->getCell("select database()");
+			$fkCode = "fk".md5($table.$property1.$property2);
+			$fks =  $adapter->getCell("
+				SELECT count(*)
+				FROM information_schema.KEY_COLUMN_USAGE
+				WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='".$writer->getFormattedTableName($table)."' AND
+				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
+					  ");
 
-		//already foreign keys added in this association table
-		if ($fks>0) return false;
+			//already foreign keys added in this association table
+			if ($fks>0) return false;
 
-		//add the table to the cache, so we dont have to fire the fk query all the time.
-		if (!$dontCache) $this->fkcache[ $fkCode ] = true;
-		$columns = $writer->getColumns($table);
-		if ($writer->code($columns[$property1])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
-			$writer->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
+			//add the table to the cache, so we dont have to fire the fk query all the time.
+			if (!$dontCache) $this->fkcache[ $fkCode ] = true;
+			$columns = $writer->getColumns($table);
+			if ($writer->code($columns[$property1])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
+				$writer->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
+			}
+			if ($writer->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
+				$writer->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
+			}
+
+			$idfield1 = $writer->getIDField($table1);
+			$idfield2 = $writer->getIDField($table2);
+
+			$table = $writer->getFormattedTableName($table);
+			$table1 = $writer->getFormattedTableName($table1);
+			$table2 = $writer->getFormattedTableName($table2);
+
+
+			$sql = "
+				ALTER TABLE ".$writer->noKW($table)."
+				ADD FOREIGN KEY($property1) references `$table1`($idfield1) ON DELETE CASCADE;
+					  ";
+			$adapter->exec( $sql );
+			$sql ="
+				ALTER TABLE ".$writer->noKW($table)."
+				ADD FOREIGN KEY($property2) references `$table2`($idfield2) ON DELETE CASCADE
+					  ";
+			$adapter->exec( $sql );
+			return true;
 		}
-		if ($writer->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
-			$writer->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
+		catch(Exception $e){
+			return false;
 		}
-
-		$idfield1 = $writer->getIDField($table1);
-		$idfield2 = $writer->getIDField($table2);
-
-		$table = $writer->getFormattedTableName($table);
-		$table1 = $writer->getFormattedTableName($table1);
-		$table2 = $writer->getFormattedTableName($table2);
-
-
-		$sql = "
-			ALTER TABLE ".$writer->noKW($table)."
-			ADD FOREIGN KEY($property1) references `$table1`($idfield1) ON DELETE CASCADE;
-				  ";
-		$adapter->exec( $sql );
-		$sql ="
-			ALTER TABLE ".$writer->noKW($table)."
-			ADD FOREIGN KEY($property2) references `$table2`($idfield2) ON DELETE CASCADE
-				  ";
-		$adapter->exec( $sql );
-		return true;
 	}
 
 
