@@ -229,4 +229,21 @@ interface RedBean_QueryWriter {
 	public function addFK( $type, $targetType, $field, $targetField);
 
 
+	/**
+	 * @abstract
+	 * @param  $table
+	 * @param  $name
+	 * @param  $column
+	 * @return void
+	 */
+	public function addIndex($table, $name, $column);
+
+
+	/**
+	 * @abstract
+	 * @param  $type
+	 * @return void
+	 */
+	public function getAlias($type);
+
 }
