@@ -175,9 +175,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	}
 
 	/**
-	 * Creates an empty, column-less table for a bean.
+	 * Creates an empty, column-less table for a bean based on it's type.
+	 * This function creates an empty table for a bean. It uses the
+	 * safeTable() function to convert the type name to a table name.
 	 * 
-	 * @param string $table table
+	 * @param string $table type of bean you want to create a table for
+	 *
+	 * @return void
 	 */
 	public function createTable( $table ) {
 		$idfield = $this->getIDfield($table, true);

@@ -182,10 +182,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return string $table escaped string
 	 */
 	public function check($table) {
-		// if (strpos($table, '`')!==false || strpos($table, '"')!==false) { // maybe this?
 		if ($this->quoteCharacter && strpos($table, $this->quoteCharacter)!==false) {
 		  throw new Redbean_Exception_Security("Illegal chars in table name");
-    }
+	    }
 		return $this->adapter->escape($table);
 	}
 	
