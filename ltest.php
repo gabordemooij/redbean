@@ -77,20 +77,8 @@ testpack("Test Setup");
 //require("rb.php");
 require("RedBean/redbean.inc.php");
 
-if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
-
-//Test whether a non mysql DSN throws an exception
-/*
-try {
-	RedBean_Setup::kickstart("blackhole:host=localhost;dbname=oodb","root","");
-	fail();
-}catch(RedBean_Exception_NotImplemented $e) {
-	pass();
-}
-*/
 
 //Test whether we can setup a connection
-//$toolbox = RedBean_Setup::kickstartDevL( "sqlite:/Applications/XAMPP/xamppfiles/temp/base.txt" );
 $toolbox = RedBean_Setup::kickstartDevL( "sqlite:{$ini['sqlite']['file']}" );
 //prepare... empty the database
 foreach( $toolbox->getWriter()->getTables() as $table ) {

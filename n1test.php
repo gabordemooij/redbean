@@ -437,7 +437,6 @@ R::store($q1);
 
 $book3->ownPicture[] = $pic1;
 $book3->ownQuote[] = $q1;
-//print_r($book3->ownPicture);
 $book3=R::load('book',R::store($book3));
 //two own-arrays -->forgot array_merge
 asrt(count($book3->ownPicture),1);
@@ -690,10 +689,8 @@ $cooker = new RedBean_Cooker;
 $cooker->setToolbox(R::$toolbox);
 
 $playList = ($cooker->graph(($playList)));
-//print_r($playList);
 $id = R::store(reset($playList));
 $play = R::load("playlist", $id);
-//print_r($play);
 asrt(count($play->ownTrack),2);
 foreach($play->ownTrack as $track) {
 	asrt(count($track->sharedSong),1);
@@ -708,7 +705,6 @@ $cooker->setToolbox(R::$toolbox);
 $playList = ($cooker->graph(($playList)));
 $id = R::store(reset($playList));
 $play = R::load("playlist", $id);
-//print_r($play);
 asrt(count($play->ownTrack),2);
 foreach($play->ownTrack as $track) {
 	asrt(count($track->sharedSong),1);
@@ -727,7 +723,6 @@ $cooker->setToolbox(R::$toolbox);
 $playList = ($cooker->graph(($playList)));
 $id = R::store(reset($playList));
 $play = R::load("playlist", $id);
-//print_r($play);
 asrt(count($play->ownTrack),2);
 foreach($play->ownTrack as $track) {
 	asrt(count($track->sharedSong),1);
@@ -808,7 +803,6 @@ class Model_Band extends RedBean_SimpleModel {
 	}
 	
 	public function update() {
-		//print_r($this->ownBandmember);
 		if (count($this->ownBandmember)>4) {
 			throw new Exception('too many!');
 		}
@@ -992,7 +986,6 @@ asrt($page->book->title,'snow white pages');
 asrt(count($book->ownPage),2);
 unset($book->ownPage);
 $book=R::load('book',R::store($book));
-print_r($book->ownPage); 
 asrt(count($book->ownPage),2);
 
 
