@@ -77,6 +77,12 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
    */
  	protected $defaultValue = 'DEFAULT';
 
+	/**
+	* This method returns the datatype to be used for primary key IDS and
+	* foreign keys. Returns one if the data type constants.
+	*
+	* @return integer $const data type to be used for IDS.
+	*/
 	public function getTypeForID() {
 		return self::C_DATATYPE_INTEGER;
 	}
@@ -176,13 +182,18 @@ where table_schema = 'public'" );
 	}
 
 	/**
-	 * Change (Widen) the column to the give type.
+	 * This method upgrades the column to the specified data type.
+	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string  $table  table to widen
-	 * @param string  $column column to widen
-	 * @param integer $type   new column type
+	 * @param string  $type       type / table that needs to be adjusted
+	 * @param string  $column     column that needs to be altered
+	 * @param integer $datatype   target data type
+	 *
+	 * @return void
 	 */
-	public function widenColumn( $table, $column, $type ) {
+	public function widenColumn( $type, $column, $datatype ) {
+		$table = $type;
+		$type = $datatype;
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
 		$newtype = $this->typeno_sqltype[$type];

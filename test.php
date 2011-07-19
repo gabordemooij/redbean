@@ -78,10 +78,6 @@ testpack("Test Setup");
 //require("rb.php");
 require("RedBean/redbean.inc.php");
 
-
-if (interface_exists("RedBean_ObjectDatabase")) pass(); else fail();
-
-
 //Test whether a non mysql DSN throws an exception
 try {
 	RedBean_Setup::kickstart(
@@ -1489,7 +1485,9 @@ R::selectDatabase("D1");
 asrt(intval(R::getCell('select count(*) from bottle')),5);
 R::selectDatabase("D2");
 asrt(intval(R::getCell('select count(*) from bottle')),3);
-
+asrt(count(R::findAndExport('bottle')),3);
+R::selectDatabase("D1");
+asrt(count(R::findAndExport('bottle')),5);
 
 testpack("Facade Basics");
 R::setup("sqlite:/tmp/teststore.txt"); //should work as well

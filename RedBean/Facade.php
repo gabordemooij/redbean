@@ -17,7 +17,10 @@
  */
 class R {
 
-
+	/**
+	 * Collection of toolboxes
+	 * @var array
+	 */
 	public static $toolboxes = array();
 	/**
 	 *
@@ -75,7 +78,7 @@ class R {
 	 * @return string $version Version ID
 	 */
 	public static function getVersion() {
-		return "2.0 Beta";
+		return "2.0";
 	}
 
 	/**
@@ -333,6 +336,16 @@ class R {
 	}
 
 
+	/**
+	 * Checks whether a pair of beans is related N-M. This function does not
+	 * check whether the beans are related in N:1 way.
+	 *
+	 * @static
+	 * @param RedBean_OODBBean $bean1 first bean
+	 * @param RedBean_OODBBean $bean2 second bean
+	 *
+	 * @return bool $yesNo whether they are related
+	 */
 	public static function areRelated( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		return self::$associationManager->areRelated($bean1,$bean2);
 	}
@@ -378,8 +391,10 @@ class R {
 
 	/**
 	 * Clears all associated beans.
+	 *
 	 * @param RedBean_OODBBean $bean
-	 * @param string $type
+	 * @param string $type type
+	 * 
 	 * @return mixed
 	 */
 	public static function clearRelations( RedBean_OODBBean $bean, $type, RedBean_OODBBean $bean2 = null, $extra = null ) {
@@ -1016,7 +1031,18 @@ class R {
 	 *
 	 * @return array  $columns list of columns and their types
 	 */
-	public static function getColumns($table) { return self::$writer->getColumns($table); }
+	public static function getColumns($table) {
+		return self::$writer->getColumns($table);
+	}
 
+	/**
+	 * Returns a SQL formatted date string (i.e. 1980-01-01 10:00:00)
+	 *
+	 * @static
+	 * @return string $SQLTimeString SQL Formatted time string
+	 */
+	public static function now() {
+		return date('Y-m-d H:i:s');
+	}
 
 }

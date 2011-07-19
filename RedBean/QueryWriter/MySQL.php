@@ -157,9 +157,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	}
 
 	/**
-	 * Returns the type to be used for IDS.
-	 * 
-	 * @return integer $constant IDTYPE
+	 * This method returns the datatype to be used for primary key IDS and
+	 * foreign keys. Returns one if the data type constants.
+	 *
+	 * @return integer $const data type to be used for IDS.
 	 */
 	public function getTypeForID() {
 		return self::C_DATATYPE_UINT32;
@@ -256,14 +257,18 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	}
 
 	/**
-	 * Change (Widen) the column to the give type.
+	 * This method upgrades the column to the specified data type.
+	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string $table table
-	 * @param string $column column
-	 * 
-	 * @param integer $type
+	 * @param string  $type       type / table that needs to be adjusted
+	 * @param string  $column     column that needs to be altered
+	 * @param integer $datatype   target data type
+	 *
+	 * @return void
 	 */
-	public function widenColumn( $table, $column, $type ) {
+	public function widenColumn( $type, $column, $datatype ) {
+		$table = $type;
+		$type = $datatype;
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
 		$newtype = $this->getFieldType($type);

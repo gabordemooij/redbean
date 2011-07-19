@@ -138,13 +138,14 @@ interface RedBean_QueryWriter {
 	 * a table name, a list of update values ( $field => $value ) and an
 	 * primary key ID (optional). If no primary key ID is provided, an
 	 * INSERT will take place.
+	 * Returns the new ID.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 * @param string  $type         name of the table to update
 	 * @param array   $updatevalues list of update values
 	 * @param integer $id			optional primary key ID value
 	 *
-	 * @return void
+	 * @return integer $id the primary key ID value of the new record
 	 */
 	public function updateRecord($type, $updatevalues, $id=null);
 
@@ -162,11 +163,12 @@ interface RedBean_QueryWriter {
 	 * @param string  $type   type of bean to select records from
 	 * @param array   $cond   conditions using the specified format
 	 * @param string  $asql   additional sql
-	 * @param boolean $delete delete records
+	 * @param boolean $delete  IF TRUE delete records (optional)
+	 * @param boolean $inverse IF TRUE inverse the selection (optional)
 	 *
-	 * @return void
+	 * @return array $records selected records
 	 */
-	public function selectRecord($type, $conditions, $addSql = null, $delete = false);
+	public function selectRecord($type, $conditions, $addSql = null, $delete = false, $inverse = false);
 
 
 	/**
@@ -319,8 +321,11 @@ interface RedBean_QueryWriter {
 
 	/**
 	 * This method should return the format for link tables.
+	 * Given an array containing two type names this method returns the
+	 * name of the link table to be used to store and retrieve
+	 * association records.
 	 *
-	 * @param  array $types two types
+	 * @param  array $types two types array($type1,$type2)
 	 *
 	 * @return string $linktable name of the link table
 	 */
@@ -329,12 +334,17 @@ interface RedBean_QueryWriter {
 	/**
 	 * This method should add a foreign key from type and field to
 	 * target type and target field.
+	 * The foreign key is created without an action. On delete/update
+	 * no action will be triggered. The FK is only used to allow database
+	 * tools to generate pretty diagrams and to make it easy to add actions
+	 * later on.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param  string $type	       type
-	 * @param  string $targetType  type
-	 * @param  string $field       field
-	 * @param  string $targetField field
+	 *
+	 * @param  string $type	       type that will have a foreign key field
+	 * @param  string $targetType  points to this type
+	 * @param  string $field       field that contains the foreign key value
+	 * @param  string $targetField field where the fk points to
 	 *
 	 * @return void
 	 */
@@ -365,5 +375,14 @@ interface RedBean_QueryWriter {
 	 * @return string $realType type
 	 */
 	public function getAlias($type);
+
+
+	/**
+	 * This method should return the datatype to be used for primary key IDS and
+	 * foreign keys. Return one if the data type constants.
+	 *
+	 * @return integer $const data type to be used for IDS.
+	 */
+	public function getTypeForID();
 
 }

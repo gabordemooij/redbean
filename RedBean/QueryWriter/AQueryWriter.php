@@ -136,12 +136,12 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 
 
 	/**
-	 * Sets the Bean Formatter to be used to handle
-	 * custom/advanced DB<->Bean
-	 * Mappings. This method has no return value.
+	 * Sets the new bean formatter. A bean formatter is an instance
+	 * of the class BeanFormatter that determines how a bean should be represented
+	 * in the database.
 	 *
-	 * @param RedBean_IBeanFormatter $beanFormatter the bean formatter
-	 * 
+	 * @param RedBean_IBeanFormatter $beanFormatter bean format
+	 *
 	 * @return void
 	 */
 	public function setBeanFormatter( RedBean_IBeanFormatter $beanFormatter ) {
@@ -201,16 +201,19 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 	
 	/**
-	 * Adds a column of a given type to a table.
+	 * This method adds a column to a table.
+	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string  $table  name of the table
+	 * @param string  $type   name of the table
 	 * @param string  $column name of the column
-	 * @param integer $type   type
+	 * @param integer $field  data type for field
 	 *
 	 * @return void
 	 *
 	 */
-	public function addColumn( $table, $column, $type ) {
+	public function addColumn( $type, $column, $field ) {
+		$table = $type;
+		$type = $field;
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
 		$type = $this->getFieldType($type);
@@ -219,15 +222,21 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 	
 	/**
-	 * Update a record using a series of update values.
+	 * This method updates (or inserts) a record, it takes
+	 * a table name, a list of update values ( $field => $value ) and an
+	 * primary key ID (optional). If no primary key ID is provided, an
+	 * INSERT will take place.
+	 * Returns the new ID.
+	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string  $table		  table
-	 * @param array   $updatevalues update values
-	 * @param integer $id			  primary key for record
+	 * @param string  $type         name of the table to update
+	 * @param array   $updatevalues list of update values
+	 * @param integer $id			optional primary key ID value
 	 *
-	 * @return void
+	 * @return integer $id the primary key ID value of the new record
 	 */
-	public function updateRecord( $table, $updatevalues, $id=null) {
+	public function updateRecord( $type, $updatevalues, $id=null) {
+		$table = $type;
 		if (!$id) {
 			$insertcolumns =  $insertvalues = array();
 			foreach($updatevalues as $pair) {
@@ -287,16 +296,23 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	
 	
 	/**
-	 * Selects a record from a type based on conditions and SQL.
+	 * This selects a record. You provide a
+	 * collection of conditions using the following format:
+	 * array( $field1 => array($possibleValue1, $possibleValue2,... $possibleValueN ),
+	 * ...$fieldN=>array(...));
+	 * Also, additional SQL can be provided. This SQL snippet will be appended to the
+	 * query string. If the $delete parameter is set to TRUE instead of selecting the
+	 * records they will be deleted.
+	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 * @throws Exception
-	 * @param string $type       name of the type (not table) you want to select from
-	 * @param array  $conditions array of conditions
-	 * @param string $addSql     additional SQL to be appended
-	 * @param bool   $delete	 if TRUE, deletes record instead of selecting it
-	 * @param bool   $inverse	 if TRUE, selected every record except the matching ones
+	 * @param string  $type    type of bean to select records from
+	 * @param array   $cond    conditions using the specified format
+	 * @param string  $asql    additional sql
+	 * @param boolean $delete  IF TRUE delete records (optional)
+	 * @param boolean $inverse IF TRUE inverse the selection (optional)
 	 *
-	 * @return array $rows rows
+	 * @return array $records selected records
 	 */
 	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false ) {
 		if (!is_array($conditions)) throw new Exception("Conditions must be an array");
@@ -341,20 +357,23 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 	/**
-	 * Creates a view by joining the specified types.
-	 * This function creates a view in fluid mode by left joining the constraints in the
-	 * given sequence to the reference table. The constraints or types have to be passed in
-	 * as a comma separated list.
+	 * This creates a view with name $viewID and
+	 * based on the reference type. A list of types
+	 * will be provided in the second argument. This method should create
+	 * a view by joining each type in the list (using LEFT OUTER JOINS) to the
+	 * reference type. If a type is mentioned multiple times it does not need
+	 * to be re-joined but the next type should be joined to that type instead.
+	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @throws Exception $exception 
-	 * @param  string $referenceTable reference table
-	 * @param  string $constraints    comma sep. list of types to be joined (ie. book,author)
-	 * @param  string $viewID		  name of the view
+	 * @param  string $referenceType reference type
+	 * @param  array  $constraints   list of types
+	 * @param  string $viewID		 name of the new view
 	 *
-	 * @return bool
+	 * @return boolean $success whether a view has been generated
 	 */
-	public function createView($referenceTable, $constraints, $viewID) {
-		
+	public function createView($referenceType, $constraints, $viewID) {
+
+		$referenceTable = $referenceType;
 		$viewID = $this->safeTable($viewID,true);
 		$safeReferenceTable = $this->safeTable($referenceTable);
 
@@ -390,11 +409,15 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 	/**
-	 * Truncates a type
+	 * This method removes all beans of a certain type.
+	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string $type type
+	 * @param  string $type bean type
+	 *
+	 * @return void
 	 */
-	public function wipe($table) {
+	public function wipe($type) {
+		$table = $type;
 		$table = $this->safeTable($table);
 		$sql = "TRUNCATE $table ";
 		$this->adapter->exec($sql);
@@ -414,16 +437,18 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 	/**
-	 * Adds an index. Note that this function does not check whether the index already
-	 * exists. Only to be used in fluid mode by the OODB class.
+	 * This method should add an index to a type and field with name
+	 * $name.
+	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param  string $table  name of the table that needs to get an indexed column
-	 * @param  string $name   desired name of the index
-	 * @param  string $column name of the column that needs to be indexed
+	 * @param  $type   type to add index to
+	 * @param  $name   name of the new index
+	 * @param  $column field to index
 	 *
 	 * @return void
 	 */
-	public function addIndex($table, $name, $column) {
+	public function addIndex($type, $name, $column) {
+		$table = $type;
 		$table = $this->safeTable($table);
 		$name = preg_replace("/\W/","",$name);
 		$column = $this->safeColumn($column);
@@ -450,12 +475,20 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 
 
 	/**
-	 * Adds a foreign key to a certain column.
-	 * 
-	 * @param  $type
-	 * @param  $targetType
-	 * @param  $field
-	 * @param  $targetField
+	 * This method adds a foreign key from type and field to
+	 * target type and target field.
+	 * The foreign key is created without an action. On delete/update
+	 * no action will be triggered. The FK is only used to allow database
+	 * tools to generate pretty diagrams and to make it easy to add actions
+	 * later on.
+	 * This methods accepts a type and infers the corresponding table name.
+	 *
+	 *
+	 * @param  string $type	       type that will have a foreign key field
+	 * @param  string $targetType  points to this type
+	 * @param  string $field       field that contains the foreign key value
+	 * @param  string $targetField field where the fk points to
+	 *
 	 * @return void
 	 */
 	public function addFK( $type, $targetType, $field, $targetField) {
@@ -464,8 +497,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$targetTable = $this->safeTable($targetType);
 		$column = $this->safeColumn($field);
 		$targetColumn  = $this->safeColumn($targetField);
-
-
 		$db = $this->adapter->getCell("select database()");
 		$fks =  $this->adapter->getCell("
 			SELECT count(*)
@@ -488,11 +519,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 	/**
-	 * Gets the format for the link table
+	 * Returns the format for link tables.
+	 * Given an array containing two type names this method returns the
+	 * name of the link table to be used to store and retrieve
+	 * association records.
 	 *
-	 * @param  array $types types
+	 * @param  array $types two types array($type1,$type2)
 	 *
-	 * @return  string $linktablename
+	 * @return string $linktable name of the link table
 	 */
 	public function getAssocTableFormat($types) {
 		sort($types);
@@ -501,15 +535,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 
 
 	/**
-	 * Ensures that given an association between
-	 * $bean1 and $bean2,
-	 * if one of them gets trashed the association will be
-	 * automatically removed.
+	 * Adds a constraint. If one of the beans gets trashed
+	 * the other, related bean should be removed as well.
 	 *
-	 * @param RedBean_OODBBean $bean1 bean
-	 * @param RedBean_OODBBean $bean2 bean
+	 * @param RedBean_OODBBean $bean1      first bean
+	 * @param RedBean_OODBBean $bean2      second bean
+	 * @param bool 			   $dontCache  by default we use a cache, TRUE = NO CACHING (optional)
 	 *
-	 * @return boolean $addedFKS whether we succeeded
+	 * @return void
 	 */
 	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $dontCache = false ) {
 

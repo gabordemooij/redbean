@@ -16,7 +16,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase {
+class RedBean_OODB extends RedBean_Observable {
 
 	/**
 	 *
@@ -35,6 +35,9 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 	 */
 	private $isFrozen = false;
 
+	/**
+	 * @var null|\RedBean_BeanHelperFacade
+	 */
 	private $beanhelper = null;
 
 	/**
@@ -634,8 +637,10 @@ class RedBean_OODB extends RedBean_Observable implements RedBean_ObjectDatabase 
 
 
 	/**
+	 * Returns an Association Manager for use with OODB.
+	 * 
 	 * @throws Exception
-	 * @return
+	 * @return RedBean_AssociationManager $assoc Assoction Manager
 	 */
 	public function getAssociationManager() {
 		if (!isset($this->assocManager)) throw new Exception("No association manager available.");

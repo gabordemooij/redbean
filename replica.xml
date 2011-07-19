@@ -11,7 +11,6 @@
 <root>
 	<load>
 		<item type="txt">RedBean/license.txt</item>
-		<item type="php">RedBean/ObjectDatabase.php</item>
 		<item type="php">RedBean/Plugin.php</item>
 		<item type="php">RedBean/Driver.php</item>
 		<item type="php">RedBean/Driver/PDO.php</item>

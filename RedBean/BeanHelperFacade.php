@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean Bean Helper
- * @file				RedBean/BeanHelperFacade.php
+ * @file			RedBean/BeanHelperFacade.php
  * @description	
  *
  * @author			Gabor de Mooij

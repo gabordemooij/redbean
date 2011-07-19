@@ -40,7 +40,6 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 $dir = dirname(__FILE__) . "/";
 
 //Load Core Intefaces
-require($dir."ObjectDatabase.php");
 require($dir."Plugin.php");
 
 //Load Database drivers

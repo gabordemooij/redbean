@@ -86,6 +86,22 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	);
 
 
+	/**
+	 * Constructor
+	 * The Query Writer Constructor also sets up the database
+	 *
+	 * @param RedBean_Adapter_DBAdapter $adapter adapter
+	 */
+	public function __construct( RedBean_Adapter $adapter ) {
+		$this->adapter = $adapter;
+	}
+
+	/**
+	 * This method returns the datatype to be used for primary key IDS and
+	 * foreign keys. Returns one if the data type constants.
+	 *
+	 * @return integer $const data type to be used for IDS.
+	 */
 	public function getTypeForID() {
 		return self::C_DATATYPE_INTEGER;
 	}
@@ -155,13 +171,18 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * Change (Widen) the column to the give type.
+	 * This method upgrades the column to the specified data type.
+	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string  $table  table to widen
-	 * @param string  $column column to widen
-	 * @param integer $type   new column type
+	 * @param string  $type       type / table that needs to be adjusted
+	 * @param string  $column     column that needs to be altered
+	 * @param integer $datatype   target data type
+	 *
+	 * @return void
 	 */
-	public function widenColumn( $table, $column, $type ) {
+	public function widenColumn( $type, $column, $datatype ) {
+		$table = $type;
+		$type = $datatype;
 		$table = $this->getFormattedTableName($table);
 		$idfield = $this->idfield;
 		$column = $this->check($column);
@@ -196,17 +217,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 
 	}
 
-
-
-	/**
-	 * Constructor
-	 * The Query Writer Constructor also sets up the database
-	 *
-	 * @param RedBean_Adapter_DBAdapter $adapter adapter
-	 */
-	public function __construct( RedBean_Adapter $adapter ) {
-		$this->adapter = $adapter;
-	}
 
 	/**
 	 * Returns all tables in the database
@@ -303,7 +313,17 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->adapter->exec("DELETE FROM $table");
 	}
 
-
+	/**
+	 * Not implemented for SQLite, uses triggers.
+	 *
+	 *
+	 * @param  string $type        type you want to modify table of
+	 * @param  string $targetType  target type
+	 * @param  string $field       field of the type that needs to get the fk
+	 * @param  string $targetField field where the fk needs to point to
+	 *
+	 * @return bool $success whether an FK has been added
+	 */
 	public function addFK( $type, $targetType, $field, $targetField) {
 		//not supported yet
 	}

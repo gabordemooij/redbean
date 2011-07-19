@@ -155,8 +155,8 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 
 
 	/**
-	 * Adds a foreign key to a table. The foreign key will not have any action; you
-	 * may configure this afterwards.
+	 * Not implemented for SQLite, uses triggers.
+	 *
 	 *
 	 * @param  string $type        type you want to modify table of
 	 * @param  string $targetType  target type

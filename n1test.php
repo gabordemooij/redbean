@@ -988,6 +988,13 @@ $pid = R::store($page);
 $page = R::load('page', $pid);
 asrt($page->book->title,'snow white pages');
 
+//test you cannot unset a relation list
+asrt(count($book->ownPage),2);
+unset($book->ownPage);
+$book=R::load('book',R::store($book));
+print_r($book->ownPage); 
+asrt(count($book->ownPage),2);
+
 
 
 //Invalid properties

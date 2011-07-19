@@ -30,13 +30,35 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 */
 	private $__info = NULL;
 
+	/**
+	 * Contains a BeanHelper to access service objects like
+	 * te association manager and OODB.
+	 *
+	 * @var RedBean_BeanHelper
+	 */
 	private $beanHelper = NULL;
 
+	/**
+	 * Sets the Bean Helper. Normally the Bean Helper is set by OODB.
+	 * Here you can change the Bean Helper. The Bean Helper is an object
+	 * providing access to a toolbox for the bean necessary to retrieve
+	 * nested beans (bean lists: ownBean,sharedBean) without the need to
+	 * rely on static calls to the facade (or make this class dep. on OODB).
+	 * 
+	 * @param RedBean_IBeanHelper $helper
+	 * @return void
+	 */
 	public function setBeanHelper(RedBean_IBeanHelper $helper) {
 		$this->beanHelper = $helper;
 	}
 
 
+	/**
+	 * Returns an ArrayIterator so you can treat the bean like
+	 * an array with the properties container as its contents.
+	 *
+	 * @return ArrayIterator $arrayIt an array iterator instance with $properties
+	 */
 	public function getIterator() {
 		return new ArrayIterator($this->properties);
 	}
@@ -54,10 +76,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * pass a comma separated list of property names. This method is
 	 * chainable because it returns its own object.
 	 * Imports data into bean
-	 * @param array $array
-	 * @param mixed $selection
-	 * @param boolean $notrim
-	 * @return RedBean_OODBBean $this
+	 *
+	 * @param array        $array     what you want to import
+	 * @param string|array $selection selection of values
+	 * @param boolean      $notrim    if TRUE values will not be trimmed
+	 *
+	 *    @return RedBean_OODBBean $this
 	 */
 	public function import( $arr, $selection=false, $notrim=false ) {
 		if (is_string($selection)) $selection = explode(",",$selection);
@@ -110,6 +134,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 	/**
 	 * Returns the ID of the bean no matter what the ID field is.
+	 * 
 	 * @return string $id record Identifier for bean
 	 */
 	public function getID() {
@@ -118,7 +143,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	}
 
 	/**
-	 * @param  $property
+	 * Unsets a property. This method will load the property first using
+	 * __get.
+	 *
+	 * @param  string $property property
+	 *
 	 * @return void
 	 */
 	public function __unset($property) {
@@ -140,7 +169,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	}
 
 	/**
-	 * @param  $property
+	 * Removes a property from the properties list without invoking
+	 * an __unset on the bean.
+	 *
+	 * @param  string $property property that needs to be unset
+	 *
 	 * @return void
 	 */
 	public function removeProperty( $property ) {

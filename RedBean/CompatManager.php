@@ -18,12 +18,12 @@ class RedBean_CompatManager extends RedBean_Observable {
 	 * List of Database constants to be used
 	 * for version detection.
 	 */
-	const C_SYSTEM_MYSQL			= "mysql";
+	const C_SYSTEM_MYSQL		= "mysql";
 	const C_SYSTEM_SQLITE		= "sqlite";
 	const C_SYSTEM_DB2			= "db2";
 	const C_SYSTEM_POSTGRESQL	= "pgsql";
 	const C_SYSTEM_ORACLE		= "oracle";
-	const C_SYSTEM_MSSQL			= "mssql";
+	const C_SYSTEM_MSSQL		= "mssql";
 	const C_SYSTEM_HYPERTABLE	= "hypertable";
 	const C_SYSTEM_INFORMIX		= "informix";
 	const C_SYSTEM_SYBASE		= "sybase";
