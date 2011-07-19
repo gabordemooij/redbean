@@ -39,9 +39,6 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 //Set the directory path
 $dir = dirname(__FILE__) . "/";
 
-//Load Core Intefaces
-require($dir."Plugin.php");
-
 //Load Database drivers
 require($dir."Driver.php");
 require($dir."Driver/PDO.php");
@@ -61,8 +58,6 @@ require($dir."QueryWriter/AQueryWriter.php");
 require($dir."QueryWriter/MySQL.php");
 require($dir."QueryWriter/SQLiteT.php");
 require($dir."QueryWriter/PostgreSQL.php");
-require($dir."IceWriter.php");
-require($dir."IceWriter/AIceWriter.php");
 
 //Load required Exceptions
 require($dir."Exception.php");
@@ -75,7 +70,6 @@ require($dir."Exception/UnsupportedDatabase.php");
 //Load Core functionality
 require($dir."OODB.php");
 require($dir."ToolBox.php");
-require($dir."CoolBox.php");
 require($dir."CompatManager.php");
 
 //Load extended functionality

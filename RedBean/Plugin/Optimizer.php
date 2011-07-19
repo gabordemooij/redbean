@@ -10,7 +10,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_Plugin,RedBean_Observer {
+class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_Observer {
 
 	/**
 	 * Specify what database systems are supported by this class.
