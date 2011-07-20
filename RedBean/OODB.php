@@ -219,7 +219,17 @@ class RedBean_OODB extends RedBean_Observable {
 
 
 
-
+	/**
+	 * Process groups
+	 *
+	 * @param  array $originals originals
+	 * @param  array $current   the current beans
+	 * @param  array $additions beans that have been added
+	 * @param  array $trashcan  beans that have been deleted
+	 * @param  array $residue   beans that have been left untouched
+	 *
+	 * @return array $result 	new relational state
+	 */
 	protected function processGroups( $originals, $current, $additions, $trashcan, $residue ) {
 		return array(
 			array_merge($additions,array_diff($current,$originals)),
