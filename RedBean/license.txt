@@ -10,7 +10,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
 
 RedBean Database Objects -
-Written by Gabor de Mooij (c) copyright 2010
+Written by Gabor de Mooij (c) copyright 2009-2011
 
 RedBean is DUAL Licensed BSD and GPLv2. You may choose the license that fits
 best for your project.
@@ -41,7 +41,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-RedBeanPHP is Written by Gabor de Mooij (G.J.G.T de Mooij) Copyright (c) 2010.
+RedBeanPHP is Written by Gabor de Mooij (G.J.G.T de Mooij) Copyright (c) 2011.
 
 
 GPLv2 LICENSE
