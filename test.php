@@ -1108,7 +1108,36 @@ $redbean->store($special);
 $cols = $writer->getColumns("special");
 asrt(($cols["datetime"]!="datetime"),false);
 
+//test optimizer icw table format
+class BF extends RedBean_ABeanFormatter {
+	public function formatBeanTable($t) {
+		return '_'.$t;
+	}
+}
+$writer->setBeanFormatter(new BF);
+$one = $redbean->dispense("one");
+$one->col = 'some text';
+$redbean->store($one);
+$one->col = '2010-10-10 10:00:00';
+$redbean->store($one);
+$one->col = '2012-10-10 12:00:00';
+$redbean->store($one);
+$cols = $writer->getColumns("one");
+asrt($cols["col"],"datetime");
+$one->col2 = 'some text';
+$redbean->store($one);
+$cols = $writer->getColumns("one");
+$one->col2 = '1';
+$redbean->store($one);
+for($i=0; $i<20; $i++){
+$one->col2 = '1';
+$redbean->store($one);
+}
+$cols = $writer->getColumns("one");
+asrt($cols['col2'],"set('1')");
 
+class DFBF extends RedBean_ABeanFormatter{}
+$writer->setBeanFormatter(new DFBF);
 
 testpack("Test Query Writer MySQL");
 $adapter->exec("DROP TABLE IF EXISTS testtable");

@@ -92,22 +92,22 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 		try {
 			if ($event=="update") {
 				//export the bean as an array
-				$arr = $bean->export();
+				$arr = $bean->export(); //print_r($arr);
 				//remove the id property
 				unset($arr["id"]); 
 				//If we are left with an empty array we might as well return
 				if (count($arr)==0) return;
 				//fetch table name for this bean
-				$table = $this->adapter->escape($bean->getMeta("type"));
 				//get the column names for this table
+				$table = $bean->getMeta("type");
 				$columns = array_keys($arr);
 				//Select a random column for optimization.
-				$column = $this->adapter->escape($columns[ array_rand($columns) ]);
+				$column = $columns[ array_rand($columns) ];
 				//get the value to be optimized
 				$value = $arr[$column];
 				$this->optimize($table,$column,$value);
 			}
-		}catch(RedBean_Exception_SQL $e) {
+		}catch(RedBean_Exception_SQL $e) { 
 		}
 	}
 	

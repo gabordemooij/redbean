@@ -126,6 +126,19 @@ class R {
 		return $objects;
 	}
 
+	/**
+	 * Adds a database to the facade, afterwards you can select the database using
+	 * selectDatabase($key).
+	 *
+	 * @static
+	 * @param string      $key    ID for the database
+	 * @param string      $dsn    DSN for the database
+	 * @param string      $user   User for connection
+	 * @param null|string $pass   Password for connection
+	 * @param bool        $frozen Whether this database is frozen or not
+	 *
+	 * @return void
+	 */
 	public static function addDatabase( $key, $dsn, $user, $pass=null, $frozen=false ) {
 		self::$toolboxes[$key] = RedBean_Setup::kickstart($dsn,$user,$pass,$frozen);
 	}
