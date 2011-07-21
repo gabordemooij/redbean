@@ -194,16 +194,6 @@ interface RedBean_QueryWriter {
 
 
 	/**
-	 * Returns $str surrounded by keyword protecting / esc symbols
-	 *
-	 * @param string $str string
-	 *
-	 * @return void
-	 */
-	public function noKW($str);
-
-
-	/**
 	 * This method should check whether the SQL state is in the list of specified states
 	 * and returns true if it does appear in this list or false if it
 	 * does not. The purpose of this method is to translate the database specific state to
@@ -237,14 +227,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function count($type);
 
-	/**
-	 * @deprecated
-	 * This method should return a cleaned up table name (not a bean type)
-	 *
-	 * @param  string $table
-	 * @return void
-	 */
-	public function check($table);
+
 
 	/**
 	 * This method should set the new bean formatter. A bean formatter is an instance

@@ -181,7 +181,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return string $table escaped string
 	 */
-	public function check($table) {
+	protected function check($table) {
 		if ($this->quoteCharacter && strpos($table, $this->quoteCharacter)!==false) {
 		  throw new Redbean_Exception_Security("Illegal chars in table name");
 	    }
@@ -195,7 +195,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return string $keywordSafeString escaped keyword
 	 */
-	public function noKW($str) {
+	protected function noKW($str) {
 		$q = $this->quoteCharacter;
 		return $q.$str.$q;
 	}
