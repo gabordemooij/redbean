@@ -92,7 +92,7 @@ require($dir."BeanHelperFacade.php");
 
 /* Developer Comfort */
 require($dir."IBeanFormatter.php");
-require($dir."ABeanFormatter.php");
+require($dir."DefaultBeanFormatter.php");
 
 require($dir."IModelFormatter.php");
 require($dir."SimpleModel.php");

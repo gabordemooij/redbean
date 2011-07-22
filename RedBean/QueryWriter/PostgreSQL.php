@@ -106,6 +106,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	public function __construct( RedBean_Adapter_DBAdapter $adapter ) {
 		$this->adapter = $adapter;
+		parent::__construct();
 	}
 
 	/**

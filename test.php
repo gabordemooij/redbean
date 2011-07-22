@@ -1109,7 +1109,7 @@ $cols = $writer->getColumns("special");
 asrt(($cols["datetime"]!="datetime"),false);
 
 //test optimizer icw table format
-class BF extends RedBean_ABeanFormatter {
+class BF extends RedBean_DefaultBeanFormatter {
 	public function formatBeanTable($t) {
 		return '_'.$t;
 	}
@@ -1136,7 +1136,7 @@ $redbean->store($one);
 $cols = $writer->getColumns("one");
 asrt($cols['col2'],"set('1')");
 
-class DFBF extends RedBean_ABeanFormatter{}
+class DFBF extends RedBean_DefaultBeanFormatter{}
 $writer->setBeanFormatter(new DFBF);
 
 testpack("Test Query Writer MySQL");
@@ -1922,7 +1922,7 @@ testpack("New relations");
 $pdo->Execute("DROP TABLE IF EXISTS person_person");
 $pdo->Execute("DROP TABLE IF EXISTS person");
 
-R::$writer->tableFormatter = null;
+R::$writer->tableFormatter = new RedBean_DefaultBeanFormatter;
 $track = R::dispense('track');
 $album = R::dispense('cd');
 $track->name = 'a';

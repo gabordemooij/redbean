@@ -154,6 +154,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function __construct( RedBean_Adapter $adapter ) {
 		$this->adapter = $adapter;
+		parent::__construct();
 	}
 
 	/**
@@ -185,7 +186,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return void
 	 */
 	public function createTable( $table ) {
-		$idfield = $this->getIDfield($table, true);
+		$idfield = $this->safeColumn($this->getIDfield($table));
 		$table = $this->safeTable($table);
 		$sql = "
                      CREATE TABLE $table (

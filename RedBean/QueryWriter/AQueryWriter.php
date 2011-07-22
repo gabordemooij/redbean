@@ -67,7 +67,17 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * character to escape keyword table/column names
 	 */
 	protected $quoteCharacter = '';
-	
+
+
+	/**
+	 * Constructor
+	 * Sets the default Bean Formatter, use parent::__construct() in
+	 * subclass to achieve this.
+	 */
+	public function __construct() {
+		$this->tableFormatter = new RedBean_DefaultBeanFormatter();
+	}
+
 	/**
 	 * Do everything that needs to be done to format a table name.
 	 *
@@ -114,8 +124,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return string $table
 	 */
 	public function getFormattedTableName($type) {
-		if ($this->tableFormatter) return $this->tableFormatter->formatBeanTable($type);
-		return $type;
+		return $this->tableFormatter->formatBeanTable($type);
 	}
 
 	/**
@@ -128,10 +137,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return
 	 */
 	public function getAlias($type) {
-		if ($this->tableFormatter) {
-			return $this->tableFormatter->getAlias($type);
-		}
-		return $type;
+		return $this->tableFormatter->getAlias($type);
 	}
 
 
@@ -169,9 +175,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function getIDField( $type ) {
 		$nArgs = func_num_args();
-		if ($nArgs>1) $safe = func_get_arg(1); else $safe = false;
-		if ($this->tableFormatter) return $this->tableFormatter->formatBeanID($type);
-		return $safe ? $this->safeColumn($this->idfield) : $this->idfield;
+		if ($nArgs>1) throw new Exception("Deprecated parameter SAFE, use safeColumn() instead.");
+		return $this->tableFormatter->formatBeanID($type);
 	}
 	
 	/**
@@ -246,7 +251,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			return $this->insertRecord($table,$insertcolumns,array($insertvalues));
 		}
 		if ($id && !count($updatevalues)) return $id;
-		$idfield = $this->getIDField($table, true);
+		$idfield = $this->safeColumn($this->getIDField($table));
 		$table = $this->safeTable($table);
 		$sql = "UPDATE $table SET ";
 		$p = $v = array();
@@ -271,7 +276,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected function insertRecord( $table, $insertcolumns, $insertvalues ) {
 		$default = $this->defaultValue;
-		$idfield = $this->getIDField($table, true);
+		$idfield = $this->safeColumn($this->getIDField($table));
 		$suffix = $this->getInsertSuffix($table);
 		$table = $this->safeTable($table);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {

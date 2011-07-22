@@ -909,7 +909,7 @@ asrt(in_array("cms_blog_id",array_keys(R::$writer->getColumns("blog"))),false);
 testpack("New relations");
 $pdo->Execute("DROP TABLE IF EXISTS person");
 $pdo->Execute("DROP TABLE IF EXISTS person_person");
-R::$writer->tableFormatter = null;
+R::$writer->tableFormatter = new RedBean_DefaultBeanFormatter();
 $track = R::dispense('track');
 $album = R::dispense('cd');
 $track->name = 'a';

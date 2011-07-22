@@ -282,7 +282,7 @@ asrt(end($book->ownPage)->title,'yet another page 4');
 
 //test aliasing
 //test with alias format
-class Aliaser extends RedBean_ABeanFormatter {
+class Aliaser extends RedBean_DefaultBeanFormatter {
 	public function getAlias($a){ 
 		if ($a=='cover') return 'page'; else return $a; 
 	}

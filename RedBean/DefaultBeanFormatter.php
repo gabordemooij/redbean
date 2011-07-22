@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract Bean Formatter
+ * Default Bean Formatter
  *
  * @file				RedBean/QueryWriter/SQLite.php
  * @description			Abstract Bean Formatter
@@ -9,7 +9,7 @@
  * @author				Gabor de Mooij
  * @license				BSD
  */
-abstract class RedBean_ABeanFormatter implements RedBean_IBeanFormatter {
+class RedBean_DefaultBeanFormatter implements RedBean_IBeanFormatter {
 
 
 	/**

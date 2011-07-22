@@ -837,7 +837,7 @@ testpack("New relations");
 if (in_array("person_person",$_tables)) $pdo->Execute("DROP TABLE person_person");
 if (in_array("person",$_tables)) $pdo->Execute("DROP TABLE person");
 
-R::$writer->tableFormatter = null;
+R::$writer->tableFormatter = new RedBean_DefaultBeanFormatter();
 $track = R::dispense('track');
 $album = R::dispense('cd');
 $track->name = 'a';

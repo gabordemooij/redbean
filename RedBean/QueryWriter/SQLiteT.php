@@ -94,6 +94,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	public function __construct( RedBean_Adapter $adapter ) {
 		$this->adapter = $adapter;
+		parent::__construct($adapter);
 	}
 
 	/**
@@ -234,7 +235,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param string $table table
 	 */
 	public function createTable( $table ) {
-		$idfield = $this->getIDfield($table, true);
+		$idfield = $this->safeColumn($this->getIDfield($table));
 		$table = $this->safeTable($table);
 		$sql = "
                      CREATE TABLE $table ( $idfield INTEGER PRIMARY KEY AUTOINCREMENT )
