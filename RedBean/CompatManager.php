@@ -41,8 +41,7 @@ class RedBean_CompatManager extends RedBean_Observable {
 	 */
 	protected $messageUnsupported = "
 Unfortunately ##YOU## is not supported by this module or class.
-Supported System(s): ##DBS##.
-To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
+Supported System(s): ##DBS##.";
 
 	/**
 	 *
@@ -50,16 +49,7 @@ To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
 	 */
 	protected $supportedSystems = array();
 
-	/**
-	 * This method toggles the exception system globally.
-	 * If you set this to true exceptions will not be thrown. Use this
-	 * if you think the version specification of a module is incorrect
-	 * or too narrow.
-	 * @param bool $ignore
-	 */
-	public static function ignore( $tf = TRUE ) {
-		self::$ignoreVersion = (bool) $tf;
-	}
+	
 
 	/**
 	 * Scans the toolbox to determine whether the database adapter
@@ -75,15 +65,10 @@ To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
 
 		//obtain the database system
 		$brand = strtolower(trim($toolbox->getDatabaseAdapter()->getDatabase()->getDatabaseType()));
-
-		//obtain version number
 		$version = $toolbox->getDatabaseAdapter()->getDatabase()->getDatabaseVersion();
-
 		if (!is_numeric($version)) {
 			$version = 999; //No version number? Ignore!
 		}
-
-		//compare database
 		if (isset($this->supportedSystems[$brand])
 				  && ((float)$this->supportedSystems[$brand] <= (float) $version)
 		) {
@@ -97,14 +82,12 @@ To suppress this Exception use: RedBean_CompatManager::ignore(TRUE); ";
 					$list[] = " ".$supported . " v".$version."+";
 				}
 				$this->messageUnsupported = str_replace("##DBS##",implode(",",$list),$this->messageUnsupported);
-				throw new RedBean_Exception_UnsupportedDatabase($this->messageUnsupported);
+				trigger_error($this->messageUnsupported);
 			}
 			else {
 				return false;
 			}
 		}
-
-
 	}
 
 	/**

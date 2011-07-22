@@ -416,7 +416,6 @@ class R {
 			self::associate($bean, $bean2, $extra);
 		}
 		return $r;
-
 	}
 
 
@@ -515,25 +514,6 @@ class R {
 	}
 
 	/**
-	 * Returns a simple list instead of beans, based
-	 * on a type, property and an SQL where clause.
-	 *
-	 * @param string $type  type
-	 * @param string $prop  property
-	 * @param string $where SQL
-	 *
-	 * @return array $list array items
-	 */
-	public static function lst( $type,$prop,$sql=" 1 " ) {
-		$list = self::find($type,$sql);
-		$listItems = array();
-		foreach($list as $id=>$item) {
-			$listItems[] = $item->$prop;
-		}
-		return $listItems;
-	}
-
-	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
@@ -543,7 +523,6 @@ class R {
 	 * @return array $results
 	 */
 	public static function exec( $sql, $values=array() ) {
-
 		if (!self::$redbean->isFrozen()) {
 			try {
 				$rs = R::$adapter->exec( $sql, $values );
@@ -565,7 +544,6 @@ class R {
 		else {
 			return R::$adapter->exec( $sql, $values );
 		}
-
 	}
 
 	/**
@@ -703,7 +681,6 @@ class R {
 		else {
 			return R::$adapter->getCol( $sql, $values );
 		}
-
 	}
 
 
@@ -738,7 +715,6 @@ class R {
 				R::associate($copy,$assocBean);
 			}
 		}
-
 		$copy->setMeta("original",$bean);
 		return $copy;
 	}
@@ -842,7 +818,6 @@ class R {
 	 * @return string $commaSepListTags
 	 */
 	public static function tag( RedBean_OODBBean $bean, $tagList = null ) {
-
 		if (is_null($tagList)) {
 			$tags = R::related( $bean, "tag");
 			$foundTags = array();
@@ -923,9 +898,7 @@ class R {
 	 * @return RedBean_ToolBox $tb old, rusty, previously used toolbox
 	 */
 	public static function configureFacadeWithToolbox( RedBean_ToolBox $tb ) {
-
 		$oldTools = self::$toolbox;
-
 		self::$toolbox = $tb;
 		self::$writer = self::$toolbox->getWriter();
 		self::$adapter = self::$toolbox->getDatabaseAdapter();
@@ -941,8 +914,6 @@ class R {
 		self::$redbean->addEventListener("after_delete", $helper );
 		self::$redbean->addEventListener("after_update", $helper );
 		self::$redbean->addEventListener("dispense", $helper );
-		//self::$redbean->addEventListener("before_dispense", $helper );
-		//self::$redbean->addEventListener("before_open", $helper );
 		return $oldTools;
 	}
 

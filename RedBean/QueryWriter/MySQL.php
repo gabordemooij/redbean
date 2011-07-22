@@ -143,7 +143,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @var string
 	 * character to escape keyword table/column names
 	 */
-  protected $quoteCharacter = '`';
+  	protected $quoteCharacter = '`';
 
 	/**
 	 * Constructor.
@@ -222,11 +222,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return integer $type type
 	 */
 	public function scanType( $value ) {
-
 		if (is_null($value)) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
-		$orig = $value;
 		$value = strval($value);
 		if ($value=="1" || $value=="") {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
@@ -315,7 +313,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return boolean $yesno occurs in list
 	 */
 	public function sqlStateIn($state, $list) {
-
 		$sqlState = "0";
 		if ($state == "42S02") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
 		if ($state == "42S22") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
@@ -352,7 +349,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 
 			//already foreign keys added in this association table
 			if ($fks>0) return false;
-
 			//add the table to the cache, so we dont have to fire the fk query all the time.
 			if (!$dontCache) $this->fkcache[ $fkCode ] = true;
 			$columns = $writer->getColumns($table);
@@ -365,12 +361,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 
 			$idfield1 = $writer->getIDField($table1);
 			$idfield2 = $writer->getIDField($table2);
-
 			$table = $writer->getFormattedTableName($table);
 			$table1 = $writer->getFormattedTableName($table1);
 			$table2 = $writer->getFormattedTableName($table2);
-
-
 			$sql = "
 				ALTER TABLE ".$writer->noKW($table)."
 				ADD FOREIGN KEY($property1) references `$table1`($idfield1) ON DELETE CASCADE;

@@ -51,26 +51,6 @@ class RedBean_SimpleModel {
 		$this->bean->$prop = $value;
 	}
 
-
-	/**
-	 * Has Properties, returns a list of properties that has not been
-	 * set on the bean.
-	 *
-	 * @param  string $list list to check; comma separated
-	 *
-	 * @return array $listOfMissing list of missing properties
-	 */
-	protected function __hasProperties( $list ) {
-		$missing = array();
-		$properties = explode(",", $list);
-		foreach($properties as $property) {
-			if (empty($this->bean->$property)) {
-				$missing[] = $property;
-			}
-		}
-		return $missing;
-	}
-
 	/**
 	 * Isset implementation
 	 *

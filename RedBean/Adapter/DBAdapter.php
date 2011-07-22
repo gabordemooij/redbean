@@ -122,7 +122,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * @return array	$result	one dimensional array result set
 	 */
 	public function getRow( $sql, $aValues = array() ) {
-
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
 		return $this->db->GetRow( $sql,$aValues );
@@ -177,7 +176,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		$assoc = array();
 		if ($rows) {
 			foreach($rows as $row) {
-
 				if (count($row)>0) {
 					$key = array_shift($row);
 				}

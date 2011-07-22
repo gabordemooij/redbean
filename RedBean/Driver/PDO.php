@@ -100,7 +100,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	public static function getInstance($dsn, $user, $pass, $dbname) {
 		if(is_null(self::$instance)) {
 			self::$instance = new RedBean_Driver_PDO($dsn, $user, $pass);
-
 		}
 		return self::$instance;
 	}
@@ -119,15 +118,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @return void
 	 */
 	public function __construct($dsn, $user = NULL, $pass = NULL) {
-
 		if ($dsn instanceof PDO) {
 			$this->pdo = $dsn;
 			$this->isConnected = true;
 			$this->pdo->setAttribute(1002, 'SET NAMES utf8');
 			$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-			
-			
 			// make sure that the dsn at least contains the type
 			$this->dsn = $this->getDatabaseType();
 		} else {
@@ -148,23 +144,19 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	public function connect() {
 
 		if ($this->isConnected) return;
-
 		$user = $this->connectInfo["user"];
 		$pass = $this->connectInfo["pass"];
-
 		//PDO::MYSQL_ATTR_INIT_COMMAND
 		$this->pdo = new PDO(
 				  $this->dsn,
 				  $user,
 				  $pass,
-
 				  array(1002 => 'SET NAMES utf8',
 							 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 							 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 
 				  )
 		);
-
 		$this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, TRUE);
 		$this->isConnected = true;
 	}
@@ -218,37 +210,25 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function GetAll( $sql, $aValues=array() ) {
 		$this->connect();
-
 		$this->exc = 0;
 		if ($this->debug) {
 			echo "<HR>" . $sql.print_r($aValues,1);
 		}
 		try {
-
-
 			if (strpos("pgsql",$this->dsn)===0) {
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			}
 			else {
 				$s = $this->pdo->prepare($sql);
 			}
-
-
-			
 			$this->bindParams( $s, $aValues );
-
 			$s->execute();
-
-			
-		  if ($s->columnCount()) {
-		    $this->rs = $s->fetchAll();
-		    
-		    
-	    }
-		  else {
-		    $this->rs = null;
-		  }
-		  
+		  	if ($s->columnCount()) {
+		    	$this->rs = $s->fetchAll();
+	    	}
+		  	else {
+		    	$this->rs = null;
+		  	}
 			$rows = $this->rs;
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
@@ -262,11 +242,9 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$x->setSQLState( $e->getCode() );
 			throw $x;
 		}
-
 		if(!$rows) {
 			$rows = array();
 		}
-
 		if ($this->debug) {
 			if (count($rows) > 0) {
 				echo "<br><b style='color:green'>resultset: " . count($rows) . " rows</b>";
@@ -287,13 +265,11 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->exc = 0;
 		$rows = $this->GetAll($sql,$aValues);
 		$cols = array();
-
 		if ($rows && is_array($rows) && count($rows)>0) {
 			foreach ($rows as $row) {
 				$cols[] = array_shift($row);
 			}
 		}
-
 		return $cols;
 	}
 
@@ -382,14 +358,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			else {
 				$s = $this->pdo->prepare($sql);
 			}
-			
-
 			$this->bindParams( $s, $aValues );
-
-
 			$s->execute();
-
-
 			$this->affected_rows=$s->rowCount();
 			return $this->affected_rows;
 		}
@@ -482,7 +452,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function StartTrans() {
 		$this->connect();
-
 		$this->pdo->beginTransaction();
 	}
 
@@ -501,7 +470,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->connect();
 		$this->pdo->commit();
 	}
-
 
 	/**
 	 * Rolls back a transaction.
@@ -539,7 +507,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		return $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
 
-
 	/**
 	 * Returns the underlying PHP PDO instance.
 	 * 
@@ -549,7 +516,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->connect();
 		return $this->pdo;
 	}
-
 
 }
 

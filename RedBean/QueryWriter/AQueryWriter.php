@@ -115,7 +115,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
   	protected function getInsertSuffix ($table) {
     	return "";
   	}
-	
+
 	/**
 	 * Returns the string identifying a table for a given type.
 	 *
@@ -401,14 +401,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$join = $referenceColumn." = ".$compareColumn;
 			$joins[] = " LEFT JOIN $safeTable ON $join ";
 		}
-		
+
 		$joins = implode(" ", $joins);
 		foreach($columns as $k=>$column) {
 			$columns[$k]=$safeReferenceTable.".".$this->safeColumn($column);
 		}
 		$columns = implode("\n,",array_merge($newcolumns,$columns));
 		$sql = "CREATE VIEW $viewID AS SELECT $columns FROM $safeReferenceTable $joins ";
-		
+
 		$this->adapter->exec($sql);
 		return true;
 	}
@@ -558,7 +558,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$table = $this->getAssocTableFormat( array( $table1,$table2) );
 		$idfield1 = $writer->getIDField($bean1->getMeta("type"));
 		$idfield2 = $writer->getIDField($bean2->getMeta("type"));
-		
+
 		$property1 = $bean1->getMeta("type") . "_id";
 		$property2 = $bean2->getMeta("type") . "_id";
 		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";

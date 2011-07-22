@@ -26,9 +26,6 @@
 		<item type="php">RedBean/Exception.php</item>
 		<item type="php">RedBean/Exception/SQL.php</item>
 		<item type="php">RedBean/Exception/Security.php</item>
-		<item type="php">RedBean/Exception/FailedAccessBean.php</item>
-		<item type="php">RedBean/Exception/NotImplemented.php</item>
-		<item type="php">RedBean/Exception/UnsupportedDatabase.php</item>
 		<item type="php">RedBean/OODB.php</item>
 		<item type="php">RedBean/ToolBox.php</item>
 		<item type="php">RedBean/CompatManager.php</item>

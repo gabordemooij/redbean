@@ -63,9 +63,6 @@ require($dir."QueryWriter/PostgreSQL.php");
 require($dir."Exception.php");
 require($dir."Exception/SQL.php");
 require($dir."Exception/Security.php");
-require($dir."Exception/FailedAccessBean.php");
-require($dir."Exception/NotImplemented.php");
-require($dir."Exception/UnsupportedDatabase.php");
 
 //Load Core functionality
 require($dir."OODB.php");

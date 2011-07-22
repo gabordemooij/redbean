@@ -89,14 +89,14 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 
   /**
    * Returns the insert suffix SQL Snippet
-   * 
+   *
    * @param string $table table
    *
    * @return  string $sql SQL Snippet
    */
   protected function getInsertSuffix($table) {
     return "RETURNING ".$this->getIDField($table);
-  }  
+  }
 
 	/**
 	 * Constructor
@@ -272,11 +272,6 @@ where table_schema = 'public'" );
 									AND t.relname = '$table'
 								ORDER BY  t.relname,  i.relname;");
 
-		/*
-		 *
-		 * ALTER TABLE testje ADD CONSTRAINT blabla UNIQUE (blaa, blaa2);
-		*/
-
 		$name = "UQ_".sha1($table.implode(',',$columns));
 		if ($r) {
 			foreach($r as $i) {
@@ -285,12 +280,8 @@ where table_schema = 'public'" );
 				}
 			}
 		}
-
 		$sql = "ALTER TABLE \"$table\"
                 ADD CONSTRAINT $name UNIQUE (".implode(",",$columns).")";
-
-
-
 		$this->adapter->exec($sql);
 	}
 
@@ -352,17 +343,11 @@ where table_schema = 'public'" );
 		try{
 			$table = $this->safeTable($type);
 			$column = $this->safeColumn($field);
-
 			$tableNoQ = $this->safeTable($type,true);
 			$columnNoQ = $this->safeColumn($field,true);
-
-
 			$targetTable = $this->safeTable($targetType);
-
 			$targetColumn  = $this->safeColumn($targetField);
-
 			$fkCode = $tableNoQ.'_'.$columnNoQ.'_fkey';
-
 			$sql = "
 						SELECT
 								c.oid,
@@ -383,19 +368,15 @@ where table_schema = 'public'" );
 						(  cons.conname = '{$fkCode}' )
 
 					  ";
-
 			$rows = $this->adapter->get( $sql );
 			if (!count($rows)) {
-
 				try{
 					$this->adapter->exec("ALTER TABLE  $table
 					ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
 					$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
 					return true;
-
 				}
 				catch(Exception $e) {
-					//echo "\n".$e->getMessage();
 				}
 			}
 		}

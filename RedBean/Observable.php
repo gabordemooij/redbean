@@ -26,12 +26,9 @@ abstract class RedBean_Observable {
 	 * @return unknown_type
 	 */
 	public function addEventListener( $eventname, RedBean_Observer $observer ) {
-
 		if (!isset($this->observers[ $eventname ])) {
 			$this->observers[ $eventname ] = array();
 		}
-
-		
 		foreach($this->observers[$eventname] as $o) if ($o==$observer) return;
 		$this->observers[ $eventname ][] = $observer;
 	}
@@ -42,11 +39,9 @@ abstract class RedBean_Observable {
 	 * @return unknown_type
 	 */
 	public function signal( $eventname, $info ) {
-
 		if (!isset($this->observers[ $eventname ])) {
 			$this->observers[ $eventname ] = array();
 		}
-
 		foreach($this->observers[$eventname] as $observer) {
 			$observer->onEvent( $eventname, $info );
 		}

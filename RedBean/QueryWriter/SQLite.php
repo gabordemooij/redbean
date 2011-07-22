@@ -169,6 +169,4 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 	public function addFK( $type, $targetType, $field, $targetField) {
 		//not supported yet
 	}
-
-
 }

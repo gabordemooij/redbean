@@ -185,6 +185,4 @@ interface RedBean_Driver {
 	 * @return void
 	 */
 	public function FailTrans();
-
-
 }

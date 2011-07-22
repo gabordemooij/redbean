@@ -78,18 +78,6 @@ testpack("Test Setup");
 //require("rb.php");
 require("RedBean/redbean.inc.php");
 
-//Test whether a non mysql DSN throws an exception
-try {
-	RedBean_Setup::kickstart(
-	  "blackhole:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}",
-	  $ini['mysql']['user'],
-	  $ini['mysql']['pass']
-  );
-	fail();
-}catch(RedBean_Exception_NotImplemented $e) {
-	pass();
-}
-
 
 // $toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
 $toolbox = RedBean_Setup::kickstart(
@@ -134,56 +122,6 @@ function ID($id) {
 $redbean = $toolbox->getRedBean(); //new RedBean_OODB( $nullWriter );
 
 
-
-//Section A: Config Testing
-testpack("CONFIG TEST");
-//Can we access the required exceptions?
-asrt(class_exists("RedBean_Exception_FailedAccessBean"),true);
-asrt(class_exists("RedBean_Exception_Security"),true);
-asrt(class_exists("RedBean_Exception_SQL"),true);
-
-//Section B: UNIT TESTING
-testpack("UNIT TEST RedBean CompatManager: ScanDirect");
-RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"1"));
-pass();
-try {
-	RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));
-	fail();
-}catch(RedBean_Exception_UnsupportedDatabase $e) {
-	pass();
-}
-try {
-	RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));
-	fail();
-}catch(RedBean_Exception_UnsupportedDatabase $e) {
-	pass();
-}
-RedBean_CompatManager::ignore(TRUE);
-try {
-	RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));
-	pass();
-}catch(RedBean_Exception_UnsupportedDatabase $e) {
-	fail();
-}
-try {
-	RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));
-	pass();
-}catch(RedBean_Exception_UnsupportedDatabase $e) {
-	fail();
-}
-RedBean_CompatManager::ignore(FALSE);
-try {
-	RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_MYSQL=>"9999"));
-	fail();
-}catch(RedBean_Exception_UnsupportedDatabase $e) {
-	pass();
-}
-try {
-	RedBean_CompatManager::scanDirect($toolbox,array(RedBean_CompatManager::C_SYSTEM_FOXPRO=>"1"));
-	fail();
-}catch(RedBean_Exception_UnsupportedDatabase $e) {
-	pass();
-}
 
 
 testpack("UNIT TEST RedBean OODB: Dispense");
@@ -742,11 +680,27 @@ $a->clearRelations($user, "page");
 asrt(count($a->related($user, "page" )),0);
 $user2 = $redbean->dispense("user");
 $user2->name = "Second User";
-$a->set1toNAssoc($user2, $page);
-$a->set1toNAssoc($user, $page);
+
+
+function set1toNAssoc(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+		global $a;
+        $type = $bean1->getMeta("type");
+        $a->clearRelations($bean2, $type);
+        $a->associate($bean1, $bean2);
+        if (count( $a->related($bean2, $type) )===1) {
+               // return $this;
+        }
+        else {
+                throw new RedBean_Exception_SQL("Failed to enforce 1toN Relation for $type ");
+        }
+}
+
+
+set1toNAssoc($user2, $page);
+set1toNAssoc($user, $page);
 asrt(count($a->related($user2, "page" )),0);
 asrt(count($a->related($user, "page" )),1);
-$a->set1toNAssoc($user, $page2);
+set1toNAssoc($user, $page2);
 asrt(count($a->related($user, "page" )),2);
 $pages = ($redbean->batch("page", $a->related($user, "page" )));
 asrt(count($pages),2);
@@ -835,9 +789,9 @@ $pageEvenMore = $redbean->dispense("page");
 $pageEvenMore->name = "evenmore";
 $pageOther = $redbean->dispense("page");
 $pageOther->name = "othermore";
-$a->set1toNAssoc($pageOther, $pageMore);
-$a->set1toNAssoc($pageOne, $pageMore);
-$a->set1toNAssoc($pageOne, $pageEvenMore);
+set1toNAssoc($pageOther, $pageMore);
+set1toNAssoc($pageOne, $pageMore);
+set1toNAssoc($pageOne, $pageEvenMore);
 asrt(count($a->related($pageOne, "page")),2);
 asrt(count($a->related($pageMore, "page")),1);
 asrt(count($a->related($pageEvenMore, "page")),1);
@@ -1328,8 +1282,8 @@ $author2 = $redbean->dispense("author");
 $book->title = "My First Post";
 $author1->name="Derek";
 $author2->name="Whoever";
-$a->set1toNAssoc($book,$author1);
-$a->set1toNAssoc($book, $author2);
+set1toNAssoc($book,$author1);
+set1toNAssoc($book, $author2);
 pass();
 $pdo->Execute("DROP TABLE IF EXISTS book_group");
 $pdo->Execute("DROP TABLE IF EXISTS book_author");
@@ -1577,10 +1531,6 @@ asrt(count(R::related($book,"book")),0);
 asrt(count(R::getAll("SELECT * FROM book ")),1);
 asrt(count(R::getCol("SELECT title FROM book ")),1);
 asrt((int)R::getCell("SELECT 123 "),123);
-$titles = R::lst("book","title");
-asrt(count($titles),1);
-asrt(($titles[0]),"a nice book");
-
 testpack("FUSE");
 
 

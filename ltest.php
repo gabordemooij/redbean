@@ -411,11 +411,28 @@ $a->clearRelations($user, "page");
 asrt(count($a->related($user, "page" )),0);
 $user2 = $redbean->dispense("user");
 $user2->name = "Second User";
-$a->set1toNAssoc($user2, $page);
-$a->set1toNAssoc($user, $page);
+
+
+function set1toNAssoc(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+		global $a;
+        $type = $bean1->getMeta("type");
+        $a->clearRelations($bean2, $type);
+        $a->associate($bean1, $bean2);
+        if (count( $a->related($bean2, $type) )===1) {
+               // return $this;
+        }
+        else {
+                throw new RedBean_Exception_SQL("Failed to enforce 1toN Relation for $type ");
+        }
+}
+
+
+
+set1toNAssoc($user2, $page);
+set1toNAssoc($user, $page);
 asrt(count($a->related($user2, "page" )),0);
 asrt(count($a->related($user, "page" )),1);
-$a->set1toNAssoc($user, $page2);
+set1toNAssoc($user, $page2);
 asrt(count($a->related($user, "page" )),2);
 $pages = ($redbean->batch("page", $a->related($user, "page" )));
 asrt(count($pages),2);
@@ -475,9 +492,9 @@ $pageEvenMore = $redbean->dispense("page");
 $pageEvenMore->name = "evenmore";
 $pageOther = $redbean->dispense("page");
 $pageOther->name = "othermore";
-$a->set1toNAssoc($pageOther, $pageMore);
-$a->set1toNAssoc($pageOne, $pageMore);
-$a->set1toNAssoc($pageOne, $pageEvenMore);
+set1toNAssoc($pageOther, $pageMore);
+set1toNAssoc($pageOne, $pageMore);
+set1toNAssoc($pageOne, $pageEvenMore);
 asrt(count($a->related($pageOne, "page")),2);
 asrt(count($a->related($pageMore, "page")),1);
 asrt(count($a->related($pageEvenMore, "page")),1);
@@ -668,8 +685,8 @@ $author2 = $redbean->dispense("author");
 $book->title = "My First Post";
 $author1->name="Derek";
 $author2->name="Whoever";
-$a->set1toNAssoc($book,$author1);
-$a->set1toNAssoc($book, $author2);
+set1toNAssoc($book,$author1);
+set1toNAssoc($book, $author2);
 pass();
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");

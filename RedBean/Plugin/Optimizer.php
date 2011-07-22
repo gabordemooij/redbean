@@ -69,14 +69,12 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 	 *
 	 */
 	protected function optimize($table,$column,$value) {
-
 		foreach($this->optimizers as $optimizer) {
 			$optimizer->setTable($table);
 			$optimizer->setColumn($column);
 			$optimizer->setValue($value);
 			if (!$optimizer->optimize()) break;
 		}
-
 	}
 
 
@@ -107,8 +105,7 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 				$value = $arr[$column];
 				$this->optimize($table,$column,$value);
 			}
-		}catch(RedBean_Exception_SQL $e) { 
-		}
+		}catch(RedBean_Exception_SQL $e) { }
 	}
 	
 	/**

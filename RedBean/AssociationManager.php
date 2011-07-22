@@ -103,7 +103,6 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 
 		$idfield1 = $this->writer->getIDField($bean1->getMeta("type"));
 		$idfield2 = $this->writer->getIDField($bean2->getMeta("type"));
-
 		$property1 = $bean1->getMeta("type") . "_id";
 		$property2 = $bean2->getMeta("type") . "_id";
 		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
@@ -118,7 +117,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
-		
+
 		$bean->setMeta("assoc.".$bean1->getMeta("type"),$bean1);
 		$bean->setMeta("assoc.".$bean2->getMeta("type"),$bean2);
 		$bean->setMeta("cast.$property1","id");
@@ -307,35 +306,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 			)) throw $e;
 		}
 	}
-	/**
-	 * @deprecated
-	 * This method is deprecated. I recommend to store Foreign Keys just as integers
-	 * in models. Also try to consider an N:M relation instead, many things in our
-	 * daily lives look like N:1 but are in fact N:M. Chances are you have to
-	 * refactor anyway.
-	 *
-	 * Creates a 1 to Many Association
-	 * If the association fails it throws an exception.
-	 * @throws RedBean_Exception_SQL $failedToEnforce1toN
-	 *
-	 * @param RedBean_OODBBean $bean1 bean1
-	 * @param RedBean_OODBBean $bean2 bean2
-	 *
-	 * @return RedBean_AssociationManager $chainable chainable
-	 */
-	public function set1toNAssoc(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-		$type = $bean1->getMeta("type");
-		$this->clearRelations($bean2, $type);
-		$this->associate($bean1, $bean2);
-		if (count( $this->related($bean2, $type) )===1) {
-			return $this;
-		}
-		else {
-			throw new RedBean_Exception_SQL("Failed to enforce 1toN Relation for $type ");
-		}
-	}
-
-
+	
 	/**
 	 * Given two beans this function returns TRUE if they are associated using a
 	 * many-to-many association, FALSE otherwise.
@@ -383,7 +354,7 @@ class RedBean_AssociationManager extends RedBean_CompatManager {
 		}
 
 		return (count($rows)>0);
-		
+
 	}
 
 }

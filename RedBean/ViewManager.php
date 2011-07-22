@@ -88,7 +88,6 @@ class RedBean_ViewManager extends RedBean_CompatManager {
 					$srcPoint = $this->writer->safeTable($connection).".".$t."_id";
 					$dstPoint = $this->writer->safeTable($t).".".$this->writer->safeColumn($this->writer->getIDField($t));
 					$joins[$t] = array($srcPoint,$dstPoint);
-
 				}
 				else {
 					//this connection does not exist
@@ -100,16 +99,12 @@ class RedBean_ViewManager extends RedBean_CompatManager {
 			//now set the new refTable
 			$currentTable=$t;
 		}
-		
-		try{ 
+		try{
 			$rs = (boolean) $this->writer->createView($refType,$joins,$viewID); 
 		}
 		catch(Exception $e) {
 			throw new RedBean_Exception_SQL('Could not create view, types does not seem related (yet)..');
 		}
-		
 		return $rs;
-		
 	}
-
 }

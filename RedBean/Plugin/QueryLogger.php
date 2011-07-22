@@ -39,9 +39,7 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer {
 	 * Singleton pattern
 	 * Constructor - private
 	 */
-	private function __construct(){
-
-	}
+	private function __construct(){}
 
 	/**
 	 * Implementation of the onEvent() method for Observer interface.
@@ -74,7 +72,6 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer {
 			if (strpos($log,$word)!==false) {
 				$found[] = $log;
 			}
-
 		}
 		return $found;
 	}
@@ -96,6 +93,4 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer {
 	public function clear() {
 		$this->logs = array();
 	}
-
-
 }

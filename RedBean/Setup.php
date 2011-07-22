@@ -48,7 +48,7 @@ class RedBean_Setup {
 				  && strpos($dsn,"pgsql:")!==0
 		) {
 
-			throw new RedBean_Exception_NotImplemented("
+			trigger_error("
 					Support for this DSN has not been implemented yet. \n
 					Begin your DSN with: 'mysql:' or 'sqlite:'
 				");
@@ -127,17 +127,6 @@ class RedBean_Setup {
 		return self::$observers;
 	}
 
-	/**
-	 * This is a convenience method. By default a kickstart method
-	 * returns the RedBean_ToolBox $toolbox for you with all necessary
-	 * objects inside. If for some reason you need to have access to the
-	 * latest toolbox that Setup has assembled you can use this function
-	 * to retrieve it.
-	 * Returns the most recently assembled toolbox
-	 * @return RedBean_ToolBox $toolbox
-	 */
-	public static function getToolBox() {
-		return self::$toolbox;
-	}
+	
 
 }
