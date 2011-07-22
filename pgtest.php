@@ -65,7 +65,7 @@ function testpack($name) {
 //INCLUDE YOUR REDBEAN FILE HERE!
 //require("rb.php");
 require("RedBean/redbean.inc.php");
-$toolbox = RedBean_Setup::kickstartDev(
+$toolbox = RedBean_Setup::kickstart(
   "pgsql:host={$ini['pgsql']['host']} dbname={$ini['pgsql']['schema']}",
   $ini['pgsql']['user'],
   $ini['pgsql']['pass']

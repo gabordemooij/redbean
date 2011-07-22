@@ -79,7 +79,7 @@ require("RedBean/redbean.inc.php");
 
 
 //Test whether we can setup a connection
-$toolbox = RedBean_Setup::kickstartDevL( "sqlite:{$ini['sqlite']['file']}" );
+$toolbox = RedBean_Setup::kickstart( "sqlite:{$ini['sqlite']['file']}" );
 //prepare... empty the database
 foreach( $toolbox->getWriter()->getTables() as $table ) {
 	$sql = "DROP TABLE `".$table."`";

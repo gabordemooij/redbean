@@ -92,7 +92,7 @@ try {
 
 
 // $toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );
-$toolbox = RedBean_Setup::kickstartDev(
+$toolbox = RedBean_Setup::kickstart(
   "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}",
   $ini['mysql']['user'],
   $ini['mysql']['pass']
