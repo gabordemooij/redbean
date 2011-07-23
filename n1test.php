@@ -1108,8 +1108,8 @@ class Aliaser2 implements RedBean_IBeanFormatter {
         public function formatBeanID($t){ return 'id'; } 
         public function formatBeanTable($t){ return $t; } 
         public function getAlias($a){ 
-                if ($a=='creator' || $a=='recipient') return 'user'; else return 
-$a; 
+                if ($a=='creator' || $a=='recipient') return 'user'; 
+                return $a; 
         } 
 } 
 
@@ -1124,4 +1124,49 @@ $message->creator = $creator;
 $id = R::store($message); 
 $message = R::load('message', $id); 
 $recipient = $message->recipient; 
+
+//test alias other way around 
+droptables();
+$message = R::dispense('message');
+list($creator,$friend1,$friend2) = R::dispense('user',3);
+$creator->name = 'Leonard';
+$friend1->name = 'Sheldon';
+$friend2->name = 'Penny';
+$message->content = 'How are you?';
+$message->creator = $creator;
+$message->sharedRecipient = array($friend1,$friend2);
+$id = R::store($message);
+$message = R::load('message',$id);
+asrt($message->creator->name,'Leonard');
+$recipients = $message->sharedRecipient;
+foreach($recipients as $r) $names[] = $r->name;
+sort($names);
+asrt(implode(',',$names),'Penny,Sheldon');
+list($raj,$howard) = R::dispense('user',2);
+$raj->name = 'Rajesh';
+$howard->name = 'Howard';
+$message->ownRecipient[] = $raj;
+$message->ownRecipient[] = $howard;
+R::store($message);
+$message = R::load('message',$id);
+$recipients = $message->sharedRecipient;
+$names=array();
+foreach($recipients as $r) $names[] = $r->name;
+sort($names);
+asrt(implode(',',$names),'Penny,Sheldon');
+$recipients = $message->ownRecipient;
+$names=array();
+foreach($recipients as $r) $names[] = $r->name;
+sort($names);
+asrt(implode(',',$names),'Howard,Rajesh');
+asrt($raj->message->content,'How are you?');
+asrt($howard->message->content,'How are you?');
+$m = reset($friend1->sharedMessage);
+asrt($m->content,'How are you?');
+$m = reset($friend2->sharedMessage);
+asrt($m->content,'How are you?');
+
+
+
+
 
