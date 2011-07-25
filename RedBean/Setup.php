@@ -83,7 +83,6 @@ class RedBean_Setup {
 	 * @return RedBean_ToolBox $toolbox
 	 */
 	public static function kickstart( $dsn, $username=NULL, $password=NULL, $frozen=false ) {
-		
 		if ($dsn instanceof PDO) {
 			$pdo = new RedBean_Driver_PDO($dsn);
 			$dsn = $pdo->getDatabaseType() ;

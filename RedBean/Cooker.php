@@ -15,8 +15,6 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Cooker {
-
-
 	/**
 	 * This method will inspect the array provided and load/dispense the
 	 * desired beans. To dispense a new bean, the array must contain:
@@ -66,10 +64,8 @@ class RedBean_Cooker {
 			$associations = $post["associations"];
 			unset($post["associations"]);
 		}
-
 		//We store beans here
 		$can = $pairs = $sorted = array();
-
 		foreach($post as $key => $rawBean) {
 			if (is_array($rawBean) && isset($rawBean["type"])) {
 				//get type and remove it from array
@@ -98,7 +94,6 @@ class RedBean_Cooker {
 				$sorted[$type][]=$bean;
 			}
 		}
-
 		if (isset($associations) && is_array($associations)) {
 			foreach($associations as $assoc) {
 				foreach($assoc as $info) {
@@ -114,13 +109,11 @@ class RedBean_Cooker {
 				}
 			}
 		}
-
 		return array(
 			"can"=>$can, //contains the beans
 			"pairs"=>$pairs, //contains pairs of beans
 			"sorted"=>$sorted //contains beans sorted by type
 		);
-
 	}
 
 	/**
@@ -130,10 +123,8 @@ class RedBean_Cooker {
 	 * @return void
 	 */
 	public function setToolbox(RedBean_Toolbox $toolbox) {
-
 		$this->toolbox = $toolbox;
 		$this->redbean = $this->toolbox->getRedbean();
-
 	}
 
 	/**
@@ -144,56 +135,37 @@ class RedBean_Cooker {
 	 * @return array $beans beans
 	 */
 	public function graph( $array ) {
-
 		$beans = array();
-		foreach($array as $k=>$v) {
-			if (is_array($array) && isset($array["type"])) {
-
-				$type = $array["type"];
-				unset($array["type"]);
-
-				//Do we need to load the bean?
-				if (isset($array["id"])) {
-					$id = (int) $array["id"];
-					$bean = $this->redbean->load($type,$id);
-				}
-				else {
-					$bean = $this->redbean->dispense($type);
-				}
-				
-				foreach($array as $property=>$value) {
-					if (is_array($value)) {
-						$bean->$property = $this->graph($value);
-					}
-					else {
-						$bean->$property = $value;
-					}
-				}
-				return $bean;
-			}
-			elseif (is_array($array)) {
-				foreach($array as $key=>$value) {
-					$beans[$key] = $this->graph($value);
-				}
-				return $beans;
+		if (is_array($array) && isset($array["type"])) {
+			$type = $array["type"];
+			unset($array["type"]);
+			//Do we need to load the bean?
+			if (isset($array["id"])) {
+				$id = (int) $array["id"];
+				$bean = $this->redbean->load($type,$id);
 			}
 			else {
-				return $array;
+				$bean = $this->redbean->dispense($type);
 			}
-
+			foreach($array as $property=>$value) {
+				if (is_array($value)) {
+					$bean->$property = $this->graph($value);
+				}
+				else {
+					$bean->$property = $value;
+				}
+			}
+			return $bean;
+		}
+		elseif (is_array($array)) {
+			foreach($array as $key=>$value) {
+				$beans[$key] = $this->graph($value);
+			}
+			return $beans;
+		}
+		else {
+			return $array;
 		}
 		return $beans;
-		
 	}
-
-
-
-	
-
-}
-
-//Ugly but necessry to support older version
-if (!class_exists('Cooker')) {
-	eval('class Cooker {
-	public static function load($a){return RedBean_Cooker::load($a,R::$toolbox);}}');
 }

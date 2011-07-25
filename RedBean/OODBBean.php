@@ -107,13 +107,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return array $arr
 	 */
 	public function export($meta = false) {
-		$arr = array();
 		$arr = $this->properties;
-
 		foreach($arr as $k=>$v) {
 			if (is_array($v) || is_object($v)) unset($arr[$k]);
 		}
-
 		if ($meta) $arr["__info"] = $this->__info;
 		return $arr;
 	}
@@ -177,7 +174,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return void
 	 */
 	public function removeProperty( $property ) {
-		
 		unset($this->properties[$property]);
 	}
 
@@ -217,7 +213,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 			if (strpos($property,'own')===0) {
 				$firstCharCode = ord(substr($property,3,1));
 				if ($firstCharCode>=65 && $firstCharCode<=90) {
-					$type = $toolbox->getWriter()->getAlias(strtolower(str_replace('own','',$property)));
+					$type = (strtolower(str_replace('own','',$property)));
 					$myFieldLink = $this->getMeta('type')."_id";
 					$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ",array($this->getID())));
 					$this->properties[$property] = $beans;
@@ -230,7 +226,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 			if (strpos($property,'shared')===0) {
 				$firstCharCode = ord(substr($property,6,1));
 				if ($firstCharCode>=65 && $firstCharCode<=90) {
-					$type = $toolbox->getWriter()->getAlias(strtolower(str_replace('shared','',$property)));
+					$type = (strtolower(str_replace('shared','',$property)));
 					$keys = $toolbox->getRedBean()->getAssociationManager()->related($this,$type);
 					if (!count($keys)) $beans = array(); else
 					$beans = $toolbox->getRedBean()->batch($type,$keys);

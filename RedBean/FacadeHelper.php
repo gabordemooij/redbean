@@ -27,16 +27,6 @@ class RedBean_FacadeHelper {
 	}
 
 	/**
-	 * Blocker Method. This method prevents you from messing up the facade.
-	 *
-	 * @throws RedBean_Exception_Security
-	 * @return void
-	 */
-	public function configureFacadeWithToolbox() {
-		throw new RedBean_Exception_Security("Only available on class R facade.");
-	}
-
-	/**
 	 * Call router. This function routes your call to the R-facade.
 	 * Note that this method is actually quite expensive in terms of CPU because it uses
 	 * a call_user_func, as time passes I will port methods from the static facade to this

@@ -10,8 +10,6 @@
  * @license				BSD
  */
 class RedBean_DefaultBeanFormatter implements RedBean_IBeanFormatter {
-
-
 	/**
 	 * Formats a table
 	 *
@@ -20,7 +18,6 @@ class RedBean_DefaultBeanFormatter implements RedBean_IBeanFormatter {
 	public function formatBeanTable( $type ){
 		return $type;
 	}
-
 	/**
 	 * Formats an ID
 	 * 
@@ -29,7 +26,6 @@ class RedBean_DefaultBeanFormatter implements RedBean_IBeanFormatter {
 	public function formatBeanID( $type ){
 		return 'id';
 	}
-
 	/**
 	 * @abstract
 	 * 
@@ -40,5 +36,4 @@ class RedBean_DefaultBeanFormatter implements RedBean_IBeanFormatter {
 	public function getAlias( $type ) {
 		return $type;
 	}
-
 }

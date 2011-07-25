@@ -66,6 +66,13 @@ foreach(R::$writer->getTables() as $t) {
 if ($db=='mysql') R::exec('SET FOREIGN_KEY_CHECKS=1;');
 }
 
+
+
+
+
+
+
+
 droptables();
 
 list($q1,$q2) = R::dispense('quote',2);
@@ -1125,48 +1132,44 @@ $id = R::store($message);
 $message = R::load('message', $id); 
 $recipient = $message->recipient; 
 
-//test alias other way around 
+
 droptables();
-$message = R::dispense('message');
-list($creator,$friend1,$friend2) = R::dispense('user',3);
-$creator->name = 'Leonard';
-$friend1->name = 'Sheldon';
-$friend2->name = 'Penny';
-$message->content = 'How are you?';
-$message->creator = $creator;
-$message->sharedRecipient = array($friend1,$friend2);
-$id = R::store($message);
-$message = R::load('message',$id);
-asrt($message->creator->name,'Leonard');
-$recipients = $message->sharedRecipient;
-foreach($recipients as $r) $names[] = $r->name;
-sort($names);
-asrt(implode(',',$names),'Penny,Sheldon');
-list($raj,$howard) = R::dispense('user',2);
-$raj->name = 'Rajesh';
-$howard->name = 'Howard';
-$message->ownRecipient[] = $raj;
-$message->ownRecipient[] = $howard;
-R::store($message);
-$message = R::load('message',$id);
-$recipients = $message->sharedRecipient;
-$names=array();
-foreach($recipients as $r) $names[] = $r->name;
-sort($names);
-asrt(implode(',',$names),'Penny,Sheldon');
-$recipients = $message->ownRecipient;
-$names=array();
-foreach($recipients as $r) $names[] = $r->name;
-sort($names);
-asrt(implode(',',$names),'Howard,Rajesh');
-asrt($raj->message->content,'How are you?');
-asrt($howard->message->content,'How are you?');
-$m = reset($friend1->sharedMessage);
-asrt($m->content,'How are you?');
-$m = reset($friend2->sharedMessage);
-asrt($m->content,'How are you?');
+class Alias3 extends RedBean_DefaultBeanFormatter {
+	public function getAlias($type) { 
+		if ($type=='familyman' || $type=='buddy') return 'person';
+		return $type;
+	}
+}
+
+R::$writer->setBeanFormatter(new Alias3);
+
+list($p1,$p2,$p3)  = R::dispense('person',3);
+$p1->name = 'Joe';
+$p2->name = 'Jack';
+$p3->name = 'James';
+$fm = R::dispense('familymember');
+$fr = R::dispense('friend');
+$fr->buddy = $p1;
+$fm->familyman = $p2;
+$p3->ownFamilymember[] = $fm;
+$p3->ownFriend[] = $fr;
+$id = R::store($p3);
 
 
+$friend = R::load('person', $id);
+asrt(reset($friend->ownFamilymember)->familyman->name,'Jack');
+asrt(reset($friend->ownFriend)->buddy->name,'Joe');
 
+$Jill = R::dispense('person');
+$Jill->name = 'Jill';
+$familyJill = R::dispense('familymember');
+$friend->ownFamilymember[] = $familyJill;
+R::store($friend);
+$friend = R::load('person', $id);
+asrt(count($friend->ownFamilymember),2);
+array_pop($friend->ownFamilymember);
+R::store($friend);
+$friend = R::load('person', $id);
+asrt(count($friend->ownFamilymember),1);
 
 

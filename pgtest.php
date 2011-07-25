@@ -71,6 +71,17 @@ $toolbox = RedBean_Setup::kickstart(
   $ini['pgsql']['pass']
 );
 
+
+function droptables() {
+	global $toolbox;
+foreach($toolbox->getWriter()->getTables() as $t) {
+	$toolbox->getDatabaseAdapter()->Exec("drop table \"$t\" cascade");
+	
+}
+}
+
+
+
 //Observable Mock Object
 class ObservableMock extends RedBean_Observable {
 	public function test( $eventname, $info ) {
@@ -185,7 +196,7 @@ $_tables = $writer->getTables();
 	}
 	asrt( (int) $adapter->getCell("SELECT 123") ,123);
 
-
+droptables();
 //Section C: Integration Tests / Regression Tests
 //	$adapter->getDatabase()->setDebugMode(1);
 	testpack("Test RedBean OODB: Insert Record");
