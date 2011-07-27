@@ -27,13 +27,17 @@ class RedBean_DefaultBeanFormatter implements RedBean_IBeanFormatter {
 		return 'id';
 	}
 	/**
-	 * @abstract
+	 * Returns the alias for a type
 	 * 
 	 * @param  $type aliased type
 	 *
 	 * @return string $type type
 	 */
 	public function getAlias( $type ) {
+		if ($t = RedBean_OODBBean::$fetchType) {
+			$type = $t;
+			RedBean_OODBBean::$fetchType = null;
+		}
 		return $type;
 	}
 }

@@ -39,6 +39,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	private $beanHelper = NULL;
 
 	/**
+	 * Contains the latest Fetch Type.
+	 * A Fetch Type is a preferred type for the next nested bean.
+	 *
+	 * @var null
+	 */
+	public static $fetchType = NULL;
+
+	/**
 	 * Sets the Bean Helper. Normally the Bean Helper is set by OODB.
 	 * Here you can change the Bean Helper. The Bean Helper is an object
 	 * providing access to a toolbox for the bean necessary to retrieve
@@ -409,6 +417,23 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
     public function offsetGet($offset) {
         return $this->__get($offset);
     }
+
+
+	/**
+	 * Chainable method to cast a certain ID to a bean; for instance:
+	 * $person = $club->fetchAs('person')->member;
+	 * This will load a bean of type person using member_id as ID.
+	 * 
+	 * @param  string $type preferred fetch type
+	 *
+	 * @return RedBean_OODBBean
+	 */
+	public function fetchAs($type) {
+		self::$fetchType = $type;
+		return $this;
+	}
+
+
 
 
 

@@ -4,8 +4,8 @@
 error_reporting(E_ALL | E_STRICT);
 require("RedBean/redbean.inc.php");
 
-//R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
-R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
+//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
 //R::setup(); $db="sqlite";
 
 
@@ -1171,5 +1171,76 @@ array_pop($friend->ownFamilymember);
 R::store($friend);
 $friend = R::load('person', $id);
 asrt(count($friend->ownFamilymember),1);
+
+droptables();
+R::$writer->setBeanFormatter(new RedBean_DefaultBeanFormatter);
+$message = R::dispense('message');
+$message->subject = 'Roommate agreement';
+list($sender,$recipient) = R::dispense('person',2);
+$sender->name = 'Sheldon';
+$recipient->name = 'Leonard';
+$message->sender = $sender;
+$message->recipient = $recipient;
+$id = R::store($message);
+$message = R::load('message', $id);
+asrt($message->fetchAs('person')->sender->name,'Sheldon');
+asrt($message->fetchAs('person')->recipient->name,'Leonard');
+$otherRecipient = R::dispense('person');
+$otherRecipient->name = 'Penny';
+$message->recipient = $otherRecipient;
+R::store($message);
+$message = R::load('message', $id);
+asrt($message->fetchAs('person')->sender->name,'Sheldon');
+asrt($message->fetchAs('person')->recipient->name,'Penny');
+
+
+droptables();
+$project = R::dispense('project');
+$project->name = 'Mutant Project';
+list($teacher,$student) = R::dispense('person',2);
+$teacher->name = 'Charles Xavier';
+$project->student = $student;
+$project->student->name = 'Wolverine';
+$project->teacher = $teacher;
+$id = R::store($project);
+$project = R::load('project',$id);
+asrt($project->fetchAs('person')->teacher->name,'Charles Xavier');
+asrt($project->fetchAs('person')->student->name,'Wolverine');
+
+droptables();
+$farm = R::dispense('building');
+$village = R::dispense('village');
+$farm->name = 'farm';
+$village->name = 'Dusty Mountains';
+$farm->village = $village;
+$id = R::store($farm);
+$farm = R::load('building',$id);
+asrt($farm->name,'farm');
+asrt($farm->village->name,'Dusty Mountains');
+
+$village = R::dispense('village');
+list($mill,$tavern) = R::dispense('building',2);
+$mill->name = 'Mill';
+$tavern->name = 'Tavern';
+$village->ownBuilding = array($mill,$tavern);
+$id = R::store($village);
+$village = R::load('village',$id);
+asrt(count($village->ownBuilding),2);
+
+
+$village2 = R::dispense('village');
+$army = R::dispense('army');
+$village->sharedArmy[] = $army;
+$village2->sharedArmy[] = $army;
+$id1=R::store($village);
+$id2=R::store($village2);
+$village1 = R::load('village',$id1);
+$village2 = R::load('village',$id2);
+asrt(count($village1->sharedArmy),1);
+asrt(count($village2->sharedArmy),1);
+asrt(count($village1->ownArmy),0);
+asrt(count($village2->ownArmy),0);
+
+
 
 
