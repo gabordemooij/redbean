@@ -67,7 +67,6 @@ require($dir."Exception/Security.php");
 //Load Core functionality
 require($dir."OODB.php");
 require($dir."ToolBox.php");
-require($dir."CompatManager.php");
 
 //Load extended functionality
 require($dir."AssociationManager.php");

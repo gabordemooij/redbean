@@ -13,7 +13,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Plugin_Optimizer_Datetime extends RedBean_CompatManager implements RedBean_Plugin_IOptimizer {
+class RedBean_Plugin_Optimizer_Datetime  implements RedBean_Plugin_IOptimizer {
 
 	/**
 	 * An optimizer takes three arguments; a table, column and value.
@@ -72,16 +72,6 @@ class RedBean_Plugin_Optimizer_Datetime extends RedBean_CompatManager implements
 	 */
 	protected $adapter;
 
-	/**
-	 * Describes to RedBean what kind of systems are supported.
-	 * Associative array: keys are database brands, values are
-	 * integer version numbers.
-	 *
-	 * @var array $collection Collection of Supported Systems and Version.
-	 */
-	protected $supportedSystems = array(
-		RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
-	);
 
 	/**
 	 * Constructor.
@@ -90,7 +80,6 @@ class RedBean_Plugin_Optimizer_Datetime extends RedBean_CompatManager implements
 	 * @param RedBean_ToolBox $toolbox toolbox for DB operations.
 	 */
 	public function __construct( RedBean_ToolBox $toolbox ) {
-		$this->scanToolBox($toolbox);
 		$this->writer = $toolbox->getWriter();
 		$this->adapter = $toolbox->getDatabaseAdapter();
 	}

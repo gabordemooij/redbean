@@ -28,7 +28,6 @@
 		<item type="php">RedBean/Exception/Security.php</item>
 		<item type="php">RedBean/OODB.php</item>
 		<item type="php">RedBean/ToolBox.php</item>
-		<item type="php">RedBean/CompatManager.php</item>
 		<item type="php">RedBean/AssociationManager.php</item>
 		<item type="php">RedBean/ExtAssociationManager.php</item>
 		<item type="php">RedBean/ViewManager.php</item>

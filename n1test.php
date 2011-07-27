@@ -2,11 +2,12 @@
 
 
 error_reporting(E_ALL | E_STRICT);
-require("RedBean/redbean.inc.php");
+//require("RedBean/redbean.inc.php");
+require('rb.php');
 
-R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
+//R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
 //R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
-//R::setup(); $db="sqlite";
+R::setup(); $db="sqlite";
 
 
 function printtext( $text ) {

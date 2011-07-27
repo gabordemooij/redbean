@@ -11,17 +11,9 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_AssociationManager extends RedBean_CompatManager {
+class RedBean_AssociationManager extends RedBean_Observable {
 
-	/**
-	 * Specify what database systems are supported by this class.
-	 * @var array $databaseSpecs
-	 */
-	protected $supportedSystems = array(
-			  RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
-			  RedBean_CompatManager::C_SYSTEM_SQLITE=>"3",
-			  RedBean_CompatManager::C_SYSTEM_POSTGRESQL=>"8"
-	);
+
 
 	/**
 	 * Contains a reference to the Object Database OODB

@@ -10,16 +10,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_Observer {
-
-	/**
-	 * Specify what database systems are supported by this class.
-	 * @var array $databaseSpecs
-	 */
-	protected $supportedSystems = array(
-			  RedBean_CompatManager::C_SYSTEM_MYSQL => "5"
-	);
-
+class RedBean_Plugin_Optimizer implements RedBean_Observer {
 
 	/**
 	 * @var RedBean_Adapter_DBAdapter
@@ -53,7 +44,6 @@ class RedBean_Plugin_Optimizer extends RedBean_CompatManager implements RedBean_
 	 * @param RedBean_ToolBox $toolbox
 	 */
 	public function __construct( RedBean_ToolBox $toolbox ) {
-		$this->scanToolBox( $toolbox );
 		$this->oodb = $toolbox->getRedBean();
 		$this->adapter = $toolbox->getDatabaseAdapter();
 		$this->writer = $toolbox->getWriter();

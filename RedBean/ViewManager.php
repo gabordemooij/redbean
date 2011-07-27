@@ -14,18 +14,9 @@
  * with this source code in the file license.txt.
  */
  
-class RedBean_ViewManager extends RedBean_CompatManager {
+class RedBean_ViewManager {
 
-	/**
-	 * Specify what database systems are supported by this class.
-	 *
-	 * @var array $databaseSpecs
-	 */
-	protected $supportedSystems = array(
-			  RedBean_CompatManager::C_SYSTEM_MYSQL => "5",
-			  RedBean_CompatManager::C_SYSTEM_SQLITE=>"3",
-			  RedBean_CompatManager::C_SYSTEM_POSTGRESQL=>"8"
-	);
+	
 
 	/**
 	 * @var RedBean_OODB
