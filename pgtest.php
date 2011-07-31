@@ -75,7 +75,7 @@ $toolbox = RedBean_Setup::kickstart(
 function droptables() {
 	global $toolbox;
 foreach($toolbox->getWriter()->getTables() as $t) {
-	$toolbox->getDatabaseAdapter()->Exec("drop table \"$t\" cascade");
+	try{$toolbox->getDatabaseAdapter()->Exec("drop table \"$t\" cascade");}catch(Exception $e){}
 	
 }
 }

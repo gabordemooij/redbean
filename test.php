@@ -75,8 +75,8 @@ function testpack($name) {
 testpack("Test Setup");
 
 //INCLUDE YOUR REDBEAN FILE HERE!
-//require("rb.php");
-require("RedBean/redbean.inc.php");
+require("rb.php");
+//require("RedBean/redbean.inc.php");
 
 
 // $toolbox = RedBean_Setup::kickstartDev( "mysql:host=localhost;dbname=oodb","root","" );

@@ -16,9 +16,9 @@
  * @author			Gabor de Mooij
  * @license			BSD
  */
-//require("rb.php");
+require("rb.php");
 error_reporting(E_ALL | E_STRICT);
-require("RedBean/redbean.inc.php");
+//require("RedBean/redbean.inc.php");
 
 /**
  * A simple print function that works

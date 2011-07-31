@@ -15,8 +15,14 @@ interface RedBean_Observer {
 
 	/**
 	 * Part of the RedBean Observer Infrastructure.
+	 * The on-event method is called by an observable once the
+	 * event the observer has been registered for occurs.
+	 * Once the even occurs, the observable will signal the observer
+	 * using this method, sending the event name and the bean or
+	 * an information array.
+	 *
 	 * @param string $eventname
-	 * @param RedBean_OODBBean $bean
+	 * @param RedBean_OODBBean mixed $info
 	 */
 	public function onEvent( $eventname, $bean );
 }
