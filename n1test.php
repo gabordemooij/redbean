@@ -6,8 +6,8 @@ error_reporting(E_ALL | E_STRICT);
 require('rb.php');
 
 //R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
-//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
-R::setup(); $db="sqlite";
+R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+//R::setup(); $db="sqlite";
 
 
 function printtext( $text ) {
@@ -70,7 +70,11 @@ if ($db=='mysql') R::exec('SET FOREIGN_KEY_CHECKS=1;');
 
 
 
-
+function testids($array) {
+	foreach($array as $key=>$bean) {
+		asrt(intval($key),intval($bean->getID()));
+	}
+}
 
 
 
@@ -227,7 +231,7 @@ $book->sharedTopic[] = $topic2;
 
 
 $id = R::store($book);
-
+$tidx = R::store(R::dispense('topic'));
 $book = R::load('book',$id);
 asrt(count($book->sharedTopic),2);
 $t1 = $book->sharedTopic[1];
@@ -248,7 +252,8 @@ $id = R::store($book);
 $book = R::load('book',$id);
 asrt(count($book->sharedTopic),2);
 asrt(reset($book->sharedTopic)->name,'tropics');
-
+testids($book->sharedTopic);
+R::trash(R::load('topic',$tidx));
 $id = R::store($book);
 $book = R::load('book',$id);
 //delete without save
@@ -287,7 +292,7 @@ $book= R::load('book',$id);
 asrt(count($book->ownPage),2);
 asrt(reset($book->ownPage)->title,'yet another page 2');
 asrt(end($book->ownPage)->title,'yet another page 4');
-
+testids($book->ownPage);
 //test aliasing
 //test with alias format
 class Aliaser extends RedBean_DefaultBeanFormatter {
@@ -568,6 +573,10 @@ for($j=0; $j<10; $j++) {
 	asrt(json_encode($book->ownQuote),$qjson);
 	asrt(json_encode($book->ownPicture),$pjson);
 	asrt(json_encode($book->sharedTopic),$tjson);
+	testids($book->ownQuote);
+	testids($book->ownPicture);
+	testids($book->sharedTopic);
+	
 }
 
 
