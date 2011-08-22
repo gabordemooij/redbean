@@ -13,6 +13,13 @@
  */
 class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
+    /**
+     * Reference to NULL property for magic getter.
+     *
+     * @var Null $null
+     */
+    private $null = null;
+
 
 	/**
 	 * Properties of the bean. These are kept in a private
@@ -245,7 +252,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 				}
 			}
 
-			$this->properties[$property] = null;
+			return $this->null;
 
 		}
 

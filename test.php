@@ -2046,6 +2046,9 @@ asrt((setget(true)==true),true);
 asrt((setget(false)==false),true);  
 
 testpack("fetch tagged items");
+R::exec("drop table author_book");
+R::exec("drop table author");
+R::exec("drop table book");
 R::wipe("book");
 R::wipe("tag");
 R::wipe("book_tag");

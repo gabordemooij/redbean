@@ -5,8 +5,8 @@ error_reporting(E_ALL | E_STRICT);
 //require("RedBean/redbean.inc.php");
 require('rb.php');
 
-//R::setup("pgsql:host=localhost;dbname=oodb","postgres","maxpass"); $db="pgsql";
-R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+R::setup("pgsql:host=localhost;dbname=oodb","postgres",""); $db="pgsql";
+//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
 //R::setup(); $db="sqlite";
 
 
@@ -1012,6 +1012,7 @@ droptables();
 $book = R::dispense('book');
 $page = R::dispense('page');
 //wrong property name
+$book->wrongProperty = array($page);
 try{
 	$book->wrongProperty[] = $page;
 	R::store($book);
@@ -1023,6 +1024,16 @@ catch(RedBean_Exception_Security $e){
 catch(Exception $e){
 	fail();
 }
+
+//Test for quick detect change
+droptables();
+$book = R::dispense('book');
+if ($book->prop) { }
+//echo $book;
+asrt(isset($book->prop),false);//not a very good test
+asrt(in_array('prop',array_keys($book->export())),false);//better...
+
+
 $book = R::dispense('book');
 $page = R::dispense('page');
 $book->paper = $page;
