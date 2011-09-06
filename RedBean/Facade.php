@@ -64,6 +64,11 @@ class R {
 	public static $extAssocManager;
 
 
+	/**
+	 * Holds an instance of Bean Exporter
+	 * @var RedBean_Plugin_BeanExport
+	 */
+	public static $exporter;
 
 	/**
 	 * Holds the Key of the current database.
@@ -961,14 +966,25 @@ class R {
 	 *
 	 * @return array Array containing sub-arrays representing beans
 	 */
-	public static function exportAll($beans) {
-		$array = array();
-		foreach($beans as $bean) {
-			if ($bean instanceof RedBean_OODBBean) {
-				$array[] = $bean->export();
+	public static function exportAll($beans,$recursively=false) {
+
+		if ($recursively) {
+			if (!self::$exporter) {
+				self::$exporter = new RedBean_Plugin_BeanExport(self::$toolbox);
+				self::$exporter->loadSchema();
 			}
+			return self::$exporter->export($beans);
 		}
-		return $array;
+		else {
+
+			$array = array();
+			foreach($beans as $bean) {
+				if ($bean instanceof RedBean_OODBBean) {
+					$array[] = $bean->export();
+				}
+			}
+			return $array;
+		}
 	}
 
 	/**
