@@ -321,42 +321,40 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	public function addFK( $type, $targetType, $field, $targetField) {
 			try{
+				$table = $this->safeTable($type,true);
+				$targetTable = $this->safeTable($targetType,true);
+				$field = $this->safeColumn($field,true);
+				$targetField = $this->safeColumn($targetField,true);
+				$idfield = $this->safeColumn($this->getIDfield($type),true);
+				$oldColumns = $this->getColumns($type);
+				$oldColumnNames = $this->quote(array_keys($oldColumns));
+				$newTableDefStr="";
+				foreach($oldColumns as $oldName=>$oldType) {
+					if ($oldName != $idfield) {
+						$newTableDefStr .= ",`$oldName` $oldType";
+					}
+				}
 
-			$table = $this->safeTable($type,true);
-			$targetTable = $this->safeTable($targetType,true);
-			$field = $this->safeColumn($field,true);
-			$targetField = $this->safeColumn($targetField,true);
-			$idfield = $this->safeColumn($this->getIDfield($type),true);
+				$fkDef = ', FOREIGN KEY('.$field.') REFERENCES '.$targetTable.'('.$targetField.') ';
 
-			$oldColumns = $this->getColumns($type);
-			$oldColumnNames = $this->quote(array_keys($oldColumns));
-			$newTableDefStr="";
-			foreach($oldColumns as $oldName=>$oldType) {
-				if ($oldName != $idfield) {
-					$newTableDefStr .= ",`$oldName` $oldType";
+				$q = array();
+				$q[] = "DROP TABLE IF EXISTS tmp_backup;";
+				$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(",",$oldColumnNames).");";
+				$q[] = "INSERT INTO tmp_backup SELECT * FROM `$table`;";
+				$q[] = "PRAGMA foreign_keys = 0 ";
+				$q[] = "DROP TABLE `$table`;";
+				$q[] = "CREATE TABLE `$table` ( `$idfield` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr $fkDef );";
+				$q[] = "INSERT INTO `$table` SELECT * FROM tmp_backup;";
+				$q[] = "DROP TABLE tmp_backup;";
+				$q[] = "PRAGMA foreign_keys = 1 ";
+
+
+				foreach($q as $sq) {
+					$this->adapter->exec($sq);
 				}
 			}
-
-			$fkDef = ', FOREIGN KEY('.$field.') REFERENCES '.$targetTable.'('.$targetField.') ';
-
-			$q = array();
-			$q[] = "DROP TABLE IF EXISTS tmp_backup;";
-			$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(",",$oldColumnNames).");";
-			$q[] = "INSERT INTO tmp_backup SELECT * FROM `$table`;";
-			$q[] = "PRAGMA foreign_keys = 0 ";
-			$q[] = "DROP TABLE `$table`;";
-			$q[] = "CREATE TABLE `$table` ( `$idfield` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr $fkDef );";
-			$q[] = "INSERT INTO `$table` SELECT * FROM tmp_backup;";
-			$q[] = "DROP TABLE tmp_backup;";
-			$q[] = "PRAGMA foreign_keys = 1 ";
-			
-
-			foreach($q as $sq) {
-				$this->adapter->exec($sq);
-			}
-			}
 			catch(Exception $e){
-				echo $e->getMessage();print_r($q);
+				
 			}
 
 	}
