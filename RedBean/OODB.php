@@ -470,7 +470,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * It searches for a RedBean_OODBBean Bean Object in the
 	 * database. It does not matter how this bean has been stored.
 	 * RedBean uses the primary key ID $id and the string $type
-	 * to find the bean. The $type specifies what kind of bean your
+	 * to find the bean. The $type specifies what kind of bean you
 	 * are looking for; this is the same type as used with the
 	 * dispense() function. If RedBean finds the bean it will return
 	 * the RedBean_OODB Bean object; if it cannot find the bean
