@@ -114,6 +114,7 @@ $adapter = $toolbox->getDatabaseAdapter();
 $writer  = $toolbox->getWriter();
 $redbean = $toolbox->getRedBean();
 
+$adapter->exec(' PRAGMA foreign_keys = ON ');
 
 testpack("UNIT TEST Toolbox");
 asrt(($adapter instanceof RedBean_Adapter_DBAdapter),true);
