@@ -80,11 +80,9 @@ require('RedBean/redbean.inc.php');
 
 
 // $toolbox = RedBean_Setup::kickstartDev( 'mysql:host=localhost;dbname=oodb','root','' );
-$toolbox = RedBean_Setup::kickstart(
-  'mysql:host='. $ini['mysql']['host']. ';dbname='. $ini['mysql']['schema'],
+$toolbox = RedBean_Setup::kickstart('mysql:host='. $ini['mysql']['host']. ';dbname='. $ini['mysql']['schema'],
   $ini['mysql']['user'],
-  $ini['mysql']['pass']
-);
+  $ini['mysql']['pass']);
 
 /**
  * Observable Mock
@@ -120,9 +118,6 @@ function ID($id) {
 
 //$nullWriter = new RedBean_QueryWriter_MySQL();
 $redbean = $toolbox->getRedBean(); //new RedBean_OODB( $nullWriter );
-
-
-
 
 testpack('UNIT TEST RedBean OODB: Dispense');
 //Can we dispense a bean?
@@ -318,21 +313,14 @@ function droptables() {
 global $pdo,$writer;
 $pdo->Execute('SET FOREIGN_KEY_CHECKS=0;');
 foreach($writer->getTables() as $t) {
-	 $pdo->Execute('DROP TABLE IF EXISTS`$t`');
-	 $pdo->Execute('drop view if exists`$t`');
+	 $pdo->Execute('DROP TABLE IF EXISTS `' . $t . '`');
+	 $pdo->Execute('DROP VIEW IF EXISTS `' . $t . '`');
 }
 $pdo->Execute('SET FOREIGN_KEY_CHECKS=1;');
 }
 
-
 droptables();
-$pdo->Execute('CREATE TABLE IF NOT EXISTS`hack` (
-`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY
-) ENGINE = MYISAM ;
-');
-
-
-
+$pdo->Execute('CREATE TABLE IF NOT EXISTS `hack` (`id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE = MYISAM;');
 
 //Test real events: update,open,delete
 testpack('Test Real Events');
@@ -360,8 +348,6 @@ $dummyBean->beano = 1;
 $id = $redbean->store($dummyBean);
 asrt($observer2->event,'after_update');
 asrt(($observer2->info instanceof RedBean_OODBBean),true);
-
-
 
 $page = $redbean->dispense('page');
 
@@ -807,7 +793,7 @@ $observers = RedBean_Setup::getAttachedObservers();
 $adapter->addEventListener('sql_exec', $querycounter);
 
 testpack('Test OODB Finder');
-asrt(count($redbean->find('page',array(), array(' name LIKE '%more%' ',array()))),3);
+asrt(count($redbean->find('page',array(), array(' name LIKE \'%more%\' ',array()))),3);
 asrt(count($redbean->find('page',array(), array(' name LIKE :str ',array(':str'=>'%more%')))),3);
 asrt(count($redbean->find('page',array(),array(' name LIKE :str ',array(':str'=>'%mxore%')))),0);
 
@@ -908,7 +894,7 @@ asrt(count($logger->grep('describe'))<1,true);
 
 
 testpack('Test Finding');
-$keys = $adapter->getCol('SELECT id FROM page WHERE `name` LIKE '%John%'');
+$keys = $adapter->getCol('SELECT id FROM page WHERE `name` LIKE \'%John%\'');
 asrt(count($keys),2);
 $pages = $redbean->batch('page', $keys);
 asrt(count($pages),2);
@@ -2060,7 +2046,7 @@ $book->title = 'ABC';
 $page = R::dispense('page');
 $page->content = 'lorem ipsum 123 ... ';
 R::associate($book,$page);
-asrt(count(R::related($book,'page',' content LIKE '%123%' ') ),1);
+asrt(count(R::related($book,'page',' content LIKE \'%123%\' ') ),1);
 
 testpack('test cooker');
 $post = array(

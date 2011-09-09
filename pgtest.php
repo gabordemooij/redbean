@@ -385,10 +385,10 @@ function set1toNAssoc(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 	$pages = ($redbean->batch('page', $a->related($user, 'page' )));
 	asrt(count($pages),2);
 	$apage = array_shift($pages);
-	asrt(($apage->name=='John's page' || $apage->name=='John's second page'),true);
+	asrt(($apage->name=='John\'s page' || $apage->name=='John\'s second page'),true);
 	$apage = array_shift($pages);
 
-	asrt(($apage->name=='John's page' || $apage->name=='John's second page'),true);
+	asrt(($apage->name=='John\'s page' || $apage->name=='John\'s second page'),true);
 //test save on the fly
 	$page = $redbean->dispense('page');
 	$page2 = $redbean->dispense('page');
@@ -499,7 +499,7 @@ function set1toNAssoc(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 
 testpack('Test OODB Finder');
 //$adapter->getDatabase()->setDebugMode(1);
-asrt(count($redbean->find('page',array(), array(' name LIKE '%more%' ',array()))),3);
+asrt(count($redbean->find('page',array(), array(' name LIKE \'%more%\' ',array()))),3);
 asrt(count($redbean->find('page',array(), array(' name LIKE :str ',array(':str'=>'%more%')))),3);
 asrt(count($redbean->find('page',array(),array(' name LIKE :str ',array(':str'=>'%mxore%')))),0);
 
@@ -761,11 +761,9 @@ asrt(count($movies),0);
 
 
 testpack('Test Table Prefixes');
-R::setup(
-  'pgsql:host={$ini['pgsql']['host']} dbname={$ini['pgsql']['schema']}',
+R::setup('pgsql:host=' . $ini['pgsql']['host'] . ' dbname=' . $ini['pgsql']['schema'],
   $ini['pgsql']['user'],
-  $ini['pgsql']['pass']
-);
+  $ini['pgsql']['pass']);
 
 class MyTableFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {
@@ -875,7 +873,7 @@ $track2->orderNum = 2;
 $track2->name = 'b';
 R::associate( $album, $track );
 R::associate( $album, $track2 );
-$tracks = R::related( $album, 'track', ' TRUE ORDER BY 'orderNum' ' );
+$tracks = R::related( $album, 'track', ' TRUE ORDER BY \'orderNum\' ' );
 $track = array_shift($tracks);
 $track2 = array_shift($tracks);
 asrt($track->name,'a');
@@ -892,16 +890,16 @@ $s->name = 'a';
 $s2->name = 'b';
 R::associate($t, $s);
 R::associate($t, $s2);
-$students = R::related($t, 'person', ' 'role' = ?  ORDER BY 'name' ',array('student'));
+$students = R::related($t, 'person', ' \'role\' = ?  ORDER BY \'name\' ',array('student'));
 $s = array_shift($students);
 $s2 = array_shift($students);
 asrt($s->name,'a');
 asrt($s2->name,'b');
-$s= R::relatedOne($t, 'person', ' role = ?  ORDER BY 'name' ',array('student'));
+$s= R::relatedOne($t, 'person', ' role = ?  ORDER BY \'name\' ',array('student'));
 asrt($s->name,'a');
 //empty classroom
 R::clearRelations($t, 'person', $s2);
-$students = R::related($t, 'person', ' role = ?  ORDER BY 'name' ',array('student'));
+$students = R::related($t, 'person', ' role = ?  ORDER BY \'name\' ',array('student'));
 asrt(count($students),1);
 $s = reset($students);
 asrt($s->name, 'b');
@@ -1159,14 +1157,9 @@ $tf2 = new Fm2();
 R::$writer->setBeanFormatter($tf2);
 testViews('prefix_');
 
-
-
-
-
 printtext('\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n');
 
-
-}catch(Exception $e) {
+} catch(Exception $e) {
 	echo '\n\n\n'.$e->getMessage();
 	echo '<pre>'.$e->getTraceAsString();
 }

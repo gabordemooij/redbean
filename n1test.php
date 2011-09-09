@@ -324,28 +324,28 @@ $book3=R::load('book',R::store($book3));
 
 //added really one, not more?
 asrt(count($book3->sharedTopic),1);
-asrt(intval(R::getCell('SELECT count(*) from book_topic where book_id = $idb3')),1);
+asrt(intval(R::getCell('SELECT count(*) from book_topic where book_id = ' . $idb3)),1);
 //add the same
 $book3->sharedTopic[] = $topic1;
 $book3=R::load('book',R::store($book3));
 
 asrt(count($book3->sharedTopic),1);
-asrt(intval(R::getCell('SELECT count(*) from book_topic where book_id = $idb3')),1);
+asrt(intval(R::getCell('SELECT count(*) from book_topic where book_id = ' . $idb3)),1);
 $book3->sharedTopic['differentkey'] = $topic1;
 $book3=R::load('book',R::store($book3));
 asrt(count($book3->sharedTopic),1);
-asrt(intval(R::getCell('SELECT count(*) from book_topic where book_id = $idb3')),1);
+asrt(intval(R::getCell('SELECT count(*) from book_topic where book_id = ' . $idb3)),1);
 //ugly assign, auto array generation
 $book3->ownPage[] = $page1;
 $book3=R::load('book',R::store($book3));
 
 asrt(count($book3->ownPage),1);
-asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),1);
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = ' . $idb3)),1);
 $book3=R::load('book',$idb3);
 $book3->ownPage = array();
-asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),1); //no change until saved
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = ' . $idb3)),1); //no change until saved
 $book3=R::load('book',R::store($book3));
-asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),0);
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = ' . $idb3)),0);
 asrt(count($book3->ownPage),0);
 $book3=R::load('book',$idb3);
 //why do I need to do this ---> why does trash() not set id -> 0, because you unset() so trash is done on orign not bean
@@ -357,7 +357,7 @@ $book3->ownPage[] = $page2;
 $book3->ownPage[] = $page3;
 //print_r($book3->ownPage);
 $book3=R::load('book',R::store($book3));
-asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),3);
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = ' . $idb3)),3);
 asrt(count($book3->ownPage),3);
 
 
@@ -365,7 +365,7 @@ unset($book3->ownPage[$page2->id]);
 $book3->ownPage[] = $page3;
 $book3->ownPage['try_to_trick_ya'] = $page3;
 $book3=R::load('book',R::store($book3));
-asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),2);
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = ' . $idb3)),2);
 asrt(count($book3->ownPage),2);
 //delete and re-add
 $book3=R::load('book',$idb3);
@@ -443,7 +443,7 @@ $book3->ownPage = array($page3,$page1);
 $i = R::store($book3);
 //exit;
 $book3=R::load('book',$i);
-asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),2);
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = ' . $idb3)),2);
 asrt(count($book3->ownPage),2);
 $pic1->name = 'aaa';
 $pic2->name = 'bbb';
@@ -701,7 +701,7 @@ asrt(count(end($v1->ownBuilding)->ownFarmer),1);
 asrt(count($v3->ownTapestry),0);
 
 
-$json = '{'mysongs':{'type':'playlist','name':'JazzList','ownTrack':[{'type':'track','name':'harlem nocturne','order':'1','sharedSong':[{'type':'song','url':'music.com.harlem'}],'cover':{'type':'cover','url':'albumart.com\/duke1'}},{'type':'track','name':'brazil','order':'2','sharedSong':[{'type':'song','url':'music.com\/djan'}],'cover':{'type':'cover','url':'picasa\/django'}}]}}';
+$json = '{"mysongs":{"type":"playlist","name":"JazzList","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","url":"music.com.harlem"}],"cover":{"type":"cover","url":"albumart.com\/duke1"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 
 $playList = json_decode( $json, true );
 $cooker = new RedBean_Cooker;
@@ -716,7 +716,7 @@ foreach($play->ownTrack as $track) {
 	asrt(($track->cover instanceof RedBean_OODBBean),true);
 }
 
-$json = '{'mysongs':{'type':'playlist','id':'1','ownTrack':[{'type':'track','name':'harlem nocturne','order':'1','sharedSong':[{'type':'song','id':'1'}],'cover':{'type':'cover','id':'2'}},{'type':'track','name':'brazil','order':'2','sharedSong':[{'type':'song','url':'music.com\/djan'}],'cover':{'type':'cover','url':'picasa\/django'}}]}}';
+$json = '{"mysongs":{"type":"playlist","id":"1","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","id":"1"}],"cover":{"type":"cover","id":"2"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 
 $playList = json_decode( $json, true );
 $cooker = new RedBean_Cooker;
@@ -734,7 +734,7 @@ $song = reset($track->sharedSong);
 asrt(intval($song->id),1);
 asrt($song->url,'music.com.harlem');
 
-$json = '{'mysongs':{'type':'playlist','id':'1','ownTrack':[{'type':'track','name':'harlem nocturne','order':'1','sharedSong':[{'type':'song','id':'1','url':'changedurl'}],'cover':{'type':'cover','id':'2'}},{'type':'track','name':'brazil','order':'2','sharedSong':[{'type':'song','url':'music.com\/djan'}],'cover':{'type':'cover','url':'picasa\/django'}}]}}';
+$json = '{"mysongs":{"type":"playlist","id":"1","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","id":"1","url":"changedurl"}],"cover":{"type":"cover","id":"2"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 
 $playList = json_decode( $json, true );
 $cooker = new RedBean_Cooker;
@@ -864,33 +864,33 @@ class Model_Bandmember extends RedBean_SimpleModel {
 	
 	public function open() {
 		global $lifeCycle;
-		$lifeCycle .= '\n called open: '.$this->id;
+		$lifeCycle .= "\n called open: ".$this->id;
 	}
 	
 	
 	public function dispense(){
 		global $lifeCycle;
-		$lifeCycle .= '\n called dispense() '.$this->bean;
+		$lifeCycle .= "\n called dispense() ".$this->bean;
 	}
 	
 	public function update() {
 		global $lifeCycle;
-		$lifeCycle .= '\n called update() '.$this->bean;
+		$lifeCycle .= "\n called update() ".$this->bean;
 	}
 	
 	public function after_update(){
 		global $lifeCycle;
-		$lifeCycle .= '\n called after_update() '.$this->bean;
+		$lifeCycle .= "\n called after_update() ".$this->bean;
 	}
 	
 	public function delete() {
 		global $lifeCycle;
-		$lifeCycle .= '\n called delete() '.$this->bean;
+		$lifeCycle .= "\n called delete() ".$this->bean;
 	}
 	
 	public function after_delete() {
 		global $lifeCycle;
-		$lifeCycle .= '\n called after_delete() '.$this->bean;
+		$lifeCycle .= "\n called after_delete() ".$this->bean;
 	}
 	
 	
@@ -1328,7 +1328,7 @@ $e->loadSchema();
 
 $export = $e->export($v2);
 $out = json_encode($export);
-$expected = '{'2':{'id':'2','name':'Sandy winds','world_id':null,'universe_id':'1','universe':{'1':{'id':'1','name':'Middle Earth','ownVillage':{'1':{'id':'1','name':'Ole Town','world_id':'1','universe_id':null,'world':{'1':null},'ownBuilding':{'1':{'id':'1','kind':'pub','village_id':'1','village':{'1':null},'ownAmulet':{'1':{'id':'1','name':'4','building_id':'1','building':{'1':null}}}},'2':{'id':'2','kind':'tower','village_id':'1','village':{'1':null},'ownAmulet':[]}},'sharedArmy':[]}}}},'ownBuilding':{'3':{'id':'3','kind':'mill','village_id':'2','village':{'2':null},'ownAmulet':[]},'4':{'id':'4','kind':'shed','village_id':'2','village':{'2':null},'ownAmulet':[]},'5':{'id':'5','kind':'shop','village_id':'2','village':{'2':null},'ownAmulet':{'2':{'id':'2','name':'3','building_id':'5','building':{'5':null}}}}},'sharedArmy':{'1':{'id':'1','name':'Army 1','sharedVillage':{'2':null}},'2':{'id':'2','name':'Army 2','sharedVillage':{'2':null,'3':{'id':'3','name':'Autumn Hill','world_id':null,'universe_id':null,'ownBuilding':{'6':{'id':'6','kind':'farm','village_id':'3','village':{'3':null},'ownAmulet':{'3':{'id':'3','name':'1','building_id':'6','building':{'6':null}},'4':{'id':'4','name':'2','building_id':'6','building':{'6':null}}}}},'sharedArmy':{'2':null}}}}}}}';
+$expected = '{"2":{"id":"2","name":"Sandy winds","world_id":null,"universe_id":"1","universe":{"1":{"id":"1","name":"Middle Earth","ownVillage":{"1":{"id":"1","name":"Ole Town","world_id":"1","universe_id":null,"world":{"1":null},"ownBuilding":{"1":{"id":"1","kind":"pub","village_id":"1","village":{"1":null},"ownAmulet":{"1":{"id":"1","name":"4","building_id":"1","building":{"1":null}}}},"2":{"id":"2","kind":"tower","village_id":"1","village":{"1":null},"ownAmulet":[]}},"sharedArmy":[]}}}},"ownBuilding":{"3":{"id":"3","kind":"mill","village_id":"2","village":{"2":null},"ownAmulet":[]},"4":{"id":"4","kind":"shed","village_id":"2","village":{"2":null},"ownAmulet":[]},"5":{"id":"5","kind":"shop","village_id":"2","village":{"2":null},"ownAmulet":{"2":{"id":"2","name":"3","building_id":"5","building":{"5":null}}}}},"sharedArmy":{"1":{"id":"1","name":"Army 1","sharedVillage":{"2":null}},"2":{"id":"2","name":"Army 2","sharedVillage":{"2":null,"3":{"id":"3","name":"Autumn Hill","world_id":null,"universe_id":null,"ownBuilding":{"6":{"id":"6","kind":"farm","village_id":"3","village":{"3":null},"ownAmulet":{"3":{"id":"3","name":"1","building_id":"6","building":{"6":null}},"4":{"id":"4","name":"2","building_id":"6","building":{"6":null}}}}},"sharedArmy":{"2":null}}}}}}}';
 asrt(preg_replace('/\W/','',trim($out)),preg_replace('/\W/','',trim($expected)));
 $export=R::exportAll($v2,true);
 $out = json_encode($export);
