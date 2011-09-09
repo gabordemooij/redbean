@@ -39,7 +39,7 @@ class RedBean_FacadeHelper {
 	 */
 	public function __call($func,$args) {
 		R::selectDatabase($this->key);
-		$func = "R::$func";
-		return call_user_func_array($func,$args);
+//		$func = "R::$func";
+		return call_user_func_array(R::$func,$args);
 	}
 }

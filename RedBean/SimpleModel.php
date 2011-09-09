@@ -68,7 +68,7 @@ class RedBean_SimpleModel {
 	 * @return mixed
 	 */
 	protected function getConnected($type) {
-		return $this->bean->getMeta("assoc.$type");
+		return $this->bean->getMeta('assoc.' . $type);
 	}
 
 

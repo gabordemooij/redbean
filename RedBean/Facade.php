@@ -74,7 +74,7 @@ class R {
 	 * Holds the Key of the current database.
 	 * @var string
 	 */
-	public static $currentDB = "";
+	public static $currentDB = '';
 
 	/**
 	 * Returns version ID string
@@ -83,7 +83,7 @@ class R {
 	 * @return string $version Version ID
 	 */
 	public static function getVersion() {
-		return "2.0";
+		return '2.0';
 	}
 
 	/**
@@ -106,10 +106,10 @@ class R {
 	 *
 	 * @return void
 	 */
-	public static function setup( $dsn="sqlite:/tmp/red.db", $username=NULL, $password=NULL ) {
-		$facadeInstances = self::setupMultiple( array("default"=>array("dsn"=>$dsn,"username"=>$username,"password"=>$password,"frozen"=>false)));
-		$facadeInstance = $facadeInstances["default"];
-		self::configureFacadeWithToolbox(self::$toolboxes["default"]);
+	public static function setup( $dsn='sqlite:/tmp/red.db', $username=NULL, $password=NULL ) {
+		$facadeInstances = self::setupMultiple( array('default'=>array('dsn'=>$dsn,'username'=>$username,'password'=>$password,'frozen'=>false)));
+		$facadeInstance = $facadeInstances['default'];
+		self::configureFacadeWithToolbox(self::$toolboxes['default']);
 		return $facadeInstance;
 	}
 
@@ -125,7 +125,7 @@ class R {
 	public static function setupMultiple( $databases ) {
 		$objects = array();
 		foreach($databases as $key=>$database) {
-			self::$toolboxes[$key] = RedBean_Setup::kickstart($database["dsn"],$database["username"],$database["password"],$database["frozen"]);
+			self::$toolboxes[$key] = RedBean_Setup::kickstart($database['dsn'],$database['username'],$database['password'],$database['frozen']);
 			$objects[$key] = new RedBean_FacadeHelper($key);
 		}
 		return $objects;
@@ -295,12 +295,12 @@ class R {
 		else{
 			if (!is_array($extra)) {
 				$info = json_decode($extra,true);
-				if (!$info) $info = array("extra"=>$extra);
+				if (!$info) $info = array('extra'=>$extra);
 			}
 			else {
 				$info = $extra;
 			}
-			$bean = R::dispense("typeLess");
+			$bean = R::dispense('typeLess');
 			$bean->import($info);
 			return self::$extAssocManager->extAssociate($bean1, $bean2, $bean);
 		}
@@ -438,7 +438,7 @@ class R {
 	 *
 	 * @return array $beans  beans
 	 */
-	public static function find( $type, $sql="1", $values=array() ) {
+	public static function find( $type, $sql='1', $values=array() ) {
 		return self::$redbean->find($type,array(),array($sql,$values));
 	}
 
@@ -458,7 +458,7 @@ class R {
 	 *
 	 * @return array $arrays arrays
 	 */
-	public static function findAndExport($type, $sql="1", $values=array()) {
+	public static function findAndExport($type, $sql='1', $values=array()) {
 		$items = self::find( $type, $sql, $values );
 		$arr = array();
 		foreach($items as $key=>$item) {
@@ -481,7 +481,7 @@ class R {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public static function findOne( $type, $sql="1", $values=array()) {
+	public static function findOne( $type, $sql='1', $values=array()) {
 		$items = self::find($type,$sql,$values);
 		return reset($items);
 	}
@@ -500,7 +500,7 @@ class R {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public static function findLast( $type, $sql="1", $values=array() ) {
+	public static function findLast( $type, $sql='1', $values=array() ) {
 		$items = self::find( $type, $sql, $values );
 		return end( $items );
 	}
@@ -693,7 +693,7 @@ class R {
 	 * Makes a copy of a bean. This method copies the bean and
 	 * adds the specified associations.
 	 *
-	 * For instance: R::copy( $book, "author,library" );
+	 * For instance: R::copy( $book, 'author,library' );
 	 *
 	 * Duplicates the $book bean and copies the association links
 	 * author and library as well. Note that only many-to-many
@@ -706,21 +706,21 @@ class R {
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
-	public static function copy($bean, $associatedBeanTypesStr="") {
-		$type = $bean->getMeta("type");
+	public static function copy($bean, $associatedBeanTypesStr='') {
+		$type = $bean->getMeta('type');
 		$copy = R::dispense($type);
 		$copy->import( $bean->export() );
 		$copy->copyMetaFrom( $bean );
 		$copy->id = 0;
 		R::store($copy);
-		$associatedBeanTypes = explode(",",$associatedBeanTypesStr);
+		$associatedBeanTypes = explode(',',$associatedBeanTypesStr);
 		foreach($associatedBeanTypes as $associatedBeanType) {
 			$assocBeans = R::related($bean, $associatedBeanType);
 			foreach($assocBeans as $assocBean) {
 				R::associate($copy,$assocBean);
 			}
 		}
-		$copy->setMeta("original",$bean);
+		$copy->setMeta('original',$bean);
 		return $copy;
 	}
 
@@ -781,10 +781,10 @@ class R {
 	 */
 	public static function hasTag($bean, $tags, $all=false) {
 		$foundtags = R::tag($bean);
-		if (is_string($foundtags)) $foundtags = explode(",",$tags);
+		if (is_string($foundtags)) $foundtags = explode(',',$tags);
 		$same = array_intersect($tags,$foundtags);
 		if ($all) {
-			return (implode(",",$same)===implode(",",$tags));
+			return (implode(',',$same)===implode(',',$tags));
 		}
 		return (bool) (count($same)>0);
 	}
@@ -800,9 +800,9 @@ class R {
 	 * @return void
 	 */
 	public static function untag($bean,$tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+		if ($tagList!==false && !is_array($tagList)) $tags = explode( ',', (string)$tagList); else $tags=$tagList;
 		foreach($tags as $tag) {
-			$t = R::findOne("tag"," title = ? ",array($tag));
+			$t = R::findOne('tag',' title = ? ',array($tag));
 			if ($t) {
 				R::unassociate( $bean, $t );
 			}
@@ -824,24 +824,24 @@ class R {
 	 */
 	public static function tag( RedBean_OODBBean $bean, $tagList = null ) {
 		if (is_null($tagList)) {
-			$tags = R::related( $bean, "tag");
+			$tags = R::related( $bean, 'tag');
 			$foundTags = array();
 			foreach($tags as $tag) {
 				$foundTags[] = $tag->title;
 			}
-			if (self::$flagUseLegacyTaggingAPI) return implode(",",$foundTags);
+			if (self::$flagUseLegacyTaggingAPI) return implode(',',$foundTags);
 			return $foundTags;
 		}
 
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+		if ($tagList!==false && !is_array($tagList)) $tags = explode( ',', (string)$tagList); else $tags=$tagList;
 
-		R::clearRelations( $bean, "tag" );
+		R::clearRelations( $bean, 'tag' );
 		if ($tagList===false) return;
 		
 		foreach($tags as $tag) {
-			$t = R::findOne("tag"," title = ? ",array($tag));
+			$t = R::findOne('tag',' title = ? ',array($tag));
 			if (!$t) {
-				$t = R::dispense("tag");
+				$t = R::dispense('tag');
 				$t->title = $tag;
 				R::store($t);
 			}
@@ -859,11 +859,11 @@ class R {
 	 * @return array
 	 */
 	public static function tagged( $beanType, $tagList ) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+		if ($tagList!==false && !is_array($tagList)) $tags = explode( ',', (string)$tagList); else $tags=$tagList;
 		$collection = array();
 		foreach($tags as $tag) {
 			$retrieved = array();
-			$tag = R::findOne("tag"," title = ? ", array($tag));
+			$tag = R::findOne('tag',' title = ? ', array($tag));
 			if ($tag) $retrieved = R::related($tag, $beanType);
 			foreach($retrieved as $key=>$bean) $collection[$key]=$bean;
 		}
@@ -912,13 +912,13 @@ class R {
 		self::$redbean->setAssociationManager(self::$associationManager);
 		self::$extAssocManager = new RedBean_ExtAssociationManager( self::$toolbox );
 		$helper = new RedBean_ModelHelper();
-		self::$redbean->addEventListener("update", $helper );
-		self::$redbean->addEventListener("open", $helper );
-		self::$redbean->addEventListener("delete", $helper );
-		self::$associationManager->addEventListener("delete", $helper );
-		self::$redbean->addEventListener("after_delete", $helper );
-		self::$redbean->addEventListener("after_update", $helper );
-		self::$redbean->addEventListener("dispense", $helper );
+		self::$redbean->addEventListener('update', $helper );
+		self::$redbean->addEventListener('open', $helper );
+		self::$redbean->addEventListener('delete', $helper );
+		self::$associationManager->addEventListener('delete', $helper );
+		self::$redbean->addEventListener('after_delete', $helper );
+		self::$redbean->addEventListener('after_update', $helper );
+		self::$redbean->addEventListener('dispense', $helper );
 		return $oldTools;
 	}
 
@@ -949,8 +949,8 @@ class R {
 	 */
 	public static function view($viewID, $types) {
 		if (self::$redbean->isFrozen()) return false;
-		$types = explode(",",$types);
-		if (count($types)<2) throw new RedBean_Exception_Security("Creating useless view for just one type? Provide at least two types!");
+		$types = explode(',',$types);
+		if (count($types)<2) throw new RedBean_Exception_Security('Creating useless view for just one type? Provide at least two types!');
 		$refType = array_shift($types);
 		$viewManager = new RedBean_ViewManager( self::$toolbox );
 		return $viewManager->createView($viewID,$refType,$types);

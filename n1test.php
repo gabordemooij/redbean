@@ -2,25 +2,25 @@
 
 
 error_reporting(E_ALL | E_STRICT);
-//require("RedBean/redbean.inc.php");
+//require('RedBean/redbean.inc.php');
 require('rb.php');
 
-//R::setup("pgsql:host=localhost;dbname=oodb","postgres",""); $db="pgsql";
-//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
-R::setup(); $db="sqlite";
+//R::setup('pgsql:host=localhost;dbname=oodb','postgres',''); $db='pgsql';
+//R::setup('mysql:host=localhost;dbname=oodb','root'); $db='mysql';
+R::setup(); $db='sqlite';
 
 
 function printtext( $text ) {
-	if ($_SERVER["DOCUMENT_ROOT"]) {
-		echo "<BR>".$text;
+	if ($_SERVER['DOCUMENT_ROOT']) {
+		echo '<BR>'.$text;
 	}
 	else {
-		echo "\n".$text;
+		echo '\n'.$text;
 	}
 }
 
 function testpack($name) {
-	printtext("testing: ".$name);
+	printtext('testing: '.$name);
 }
 
 /**
@@ -33,10 +33,10 @@ function asrt( $a, $b ) {
 	if ($a === $b) {
 		global $tests;
 		$tests++;
-		print( "[".$tests."]" );
+		print( '['.$tests.']' );
 	}
 	else {
-		printtext("FAILED TEST: EXPECTED $b BUT GOT: $a ");
+		printtext('FAILED TEST: EXPECTED ' . $b . ' BUT GOT: ' . $a);
 		fail();
 	}
 }
@@ -44,39 +44,41 @@ function asrt( $a, $b ) {
 function pass() {
 	global $tests;
 	$tests++;
-	print( "[".$tests."]" );
+	print( '['.$tests.']' );
 }
 
 function fail() {
-	printtext("FAILED TEST");
+	printtext('FAILED TEST');
 	debug_print_backtrace();
 	exit;
 }
 
 function droptables() {
-global $db;	
-if ($db=='mysql') R::exec('SET FOREIGN_KEY_CHECKS=0;');
-R::exec('drop view if exists people');
-R::exec('drop view if exists library2');
-foreach(R::$writer->getTables() as $t) {
-	
-	if ($db=='mysql') R::exec("drop table `$t`");
-	if ($db=='pgsql') R::exec("drop table \"$t\" cascade");
-	if ($db=='sqlite') R::exec("drop table $t ");
+  global $db;	
+  if ($db=='mysql') {
+    R::exec('SET FOREIGN_KEY_CHECKS=0;');
+  }
+  R::exec('DROP VIEW IF EXISTS people');
+  R::exec('DROP VIEW IF EXISTS library2');
+  foreach(R::$writer->getTables() as $t) {
+	  if ($db=='mysql') {
+	    R::exec('drop table `' . $t .'`');
+    } elseif($db=='pgsql') {
+      R::exec('drop table \'' . $t . '\' cascade');
+    } elseif ($db=='sqlite') {
+      R::exec('drop table ' . $t);
+    }
+  }
+  if ($db=='mysql') {
+    R::exec('SET FOREIGN_KEY_CHECKS=1;');
+  }
 }
-if ($db=='mysql') R::exec('SET FOREIGN_KEY_CHECKS=1;');
-}
-
-
-
 
 function testids($array) {
 	foreach($array as $key=>$bean) {
 		asrt(intval($key),intval($bean->getID()));
 	}
 }
-
-
 
 droptables();
 
@@ -141,7 +143,7 @@ R::store($book);
 $book = R::load('book',$id);
 unset($book->ownPage[2]); 
 $book->ownPage['customkey'] = $page4; //and test custom key
-$book->ownPage[3]->title = "THIRD";
+$book->ownPage[3]->title = 'THIRD';
 R::store($book);
 $book = R::load('book',$id);
 asrt(count($book->ownPage),2);
@@ -322,28 +324,28 @@ $book3=R::load('book',R::store($book3));
 
 //added really one, not more?
 asrt(count($book3->sharedTopic),1);
-asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
+asrt(intval(R::getCell('SELECT count(*) from book_topic where book_id = $idb3')),1);
 //add the same
 $book3->sharedTopic[] = $topic1;
 $book3=R::load('book',R::store($book3));
 
 asrt(count($book3->sharedTopic),1);
-asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
+asrt(intval(R::getCell('SELECT count(*) from book_topic where book_id = $idb3')),1);
 $book3->sharedTopic['differentkey'] = $topic1;
 $book3=R::load('book',R::store($book3));
 asrt(count($book3->sharedTopic),1);
-asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
+asrt(intval(R::getCell('SELECT count(*) from book_topic where book_id = $idb3')),1);
 //ugly assign, auto array generation
 $book3->ownPage[] = $page1;
 $book3=R::load('book',R::store($book3));
 
 asrt(count($book3->ownPage),1);
-asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),1);
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),1);
 $book3=R::load('book',$idb3);
 $book3->ownPage = array();
-asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),1); //no change until saved
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),1); //no change until saved
 $book3=R::load('book',R::store($book3));
-asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),0);
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),0);
 asrt(count($book3->ownPage),0);
 $book3=R::load('book',$idb3);
 //why do I need to do this ---> why does trash() not set id -> 0, because you unset() so trash is done on orign not bean
@@ -355,7 +357,7 @@ $book3->ownPage[] = $page2;
 $book3->ownPage[] = $page3;
 //print_r($book3->ownPage);
 $book3=R::load('book',R::store($book3));
-asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),3);
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),3);
 asrt(count($book3->ownPage),3);
 
 
@@ -363,7 +365,7 @@ unset($book3->ownPage[$page2->id]);
 $book3->ownPage[] = $page3;
 $book3->ownPage['try_to_trick_ya'] = $page3;
 $book3=R::load('book',R::store($book3));
-asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),2);
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),2);
 asrt(count($book3->ownPage),2);
 //delete and re-add
 $book3=R::load('book',$idb3);
@@ -402,13 +404,13 @@ $logger->clear();
 R::store($book);
 $book=R::load('book',1);
 asrt(count($book->sharedTopic),3);
-asrt(count($logger->grep("DELETE")),0); //no deletes
+asrt(count($logger->grep('DELETE')),0); //no deletes
 $book->sharedTopic['a'] = $topic3;
 unset($book->sharedTopic['a']);
 R::store($book);
 $book=R::load('book',1);
 asrt(count($book->sharedTopic),3);
-asrt(count($logger->grep("DELETE")),0); //no deletes
+asrt(count($logger->grep('DELETE')),0); //no deletes
 $book->ownPage = array();
 R::store($book);
 asrt(count($book->ownPage),0);
@@ -428,11 +430,11 @@ $aPage->title .= ' changed ';
 $book->ownPage['anotherPage'] = $aPage;
 $logger->clear();
 R::store($book);
-if ($db=="mysql") asrt(count($logger->grep("SELECT")),0);
+if ($db=='mysql') asrt(count($logger->grep('SELECT')),0);
 $book=R::load('book',1);
 asrt(count($book->ownPage),1);
 $ap = reset($book->ownPage);
-asrt($ap->title,"pagina1 changed ");
+asrt($ap->title,'pagina1 changed ');
 
 
 
@@ -441,7 +443,7 @@ $book3->ownPage = array($page3,$page1);
 $i = R::store($book3);
 //exit;
 $book3=R::load('book',$i);
-asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),2);
+asrt(intval(R::getCell('SELECT count(*) from page where book_id = $idb3 ')),2);
 asrt(count($book3->ownPage),2);
 $pic1->name = 'aaa';
 $pic2->name = 'bbb';
@@ -483,7 +485,7 @@ function modgr($book3) {
 			if ($z->note == $quote->note) { $f = 1; break; }
 		}
 		if (!$f) {
-		//echo "\n add a quote ";
+		//echo '\n add a quote ';
 		$book3->ownQuote[] = $quote;	
 		}
 	}
@@ -493,7 +495,7 @@ function modgr($book3) {
 			if ($z->note == $picture->note) { $f = 1; break; }
 		}
 		if (!$f) {
-		//	echo "\n add a picture ";
+		//	echo '\n add a picture ';
 			$book3->ownPicture[] = $picture;
 		}
 	}
@@ -503,40 +505,40 @@ function modgr($book3) {
 			if ($z->note == $topic->note) { $f = 1; break; }
 		}
 		if (!$f) {
-		//	echo "\n add a shared topic ";
+		//	echo '\n add a shared topic ';
 			$book3->sharedTopic[] = $topic;	
 		}
 	}
 	if (rand(0,1) && count($book3->ownQuote)>0) {
 		$key = array_rand($book3->ownQuote);
 		unset($book3->ownQuote[ $key ]);
-	//	echo "\n delete quote with key $key ";
+	//	echo '\n delete quote with key $key ';
 	}
 	if (rand(0,1) && count($book3->ownPicture)>0) {
 		$key = array_rand($book3->ownPicture);
 		unset($book3->ownPicture[ $key ]);
-	//	echo "\n delete picture with key $key ";
+	//	echo '\n delete picture with key $key ';
 	}
 	if (rand(0,1) && count($book3->sharedTopic)>0) {
 		$key = array_rand($book3->sharedTopic);
 		unset($book3->sharedTopic[ $key ]);
-	//	echo "\n delete sh topic  with key $key ";
+	//	echo '\n delete sh topic  with key $key ';
 	}
 
 	if (rand(0,1) && count($book3->ownPicture)>0) {
 		$key = array_rand($book3->ownPicture);
 		$book3->ownPicture[ $key ]->change = rand(0,100);
-	//	echo "\n changed picture with key $key ";
+	//	echo '\n changed picture with key $key ';
 	}
 	if (rand(0,1) && count($book3->ownQuote)>0) {
 		$key = array_rand($book3->ownQuote);
 		$book3->ownQuote[ $key ]->change = 'note ch '.rand(0,100);
-	//	echo "\n changed quote with key $key ";
+	//	echo '\n changed quote with key $key ';
 	}
 	if (rand(0,1) && count($book3->sharedTopic)>0) {
 		$key = array_rand($book3->sharedTopic);
 		$book3->sharedTopic[ $key ]->change = rand(0,100);
-	//	echo "\n changed sharedTopic with key $key ";
+	//	echo '\n changed sharedTopic with key $key ';
 	}
 }
 
@@ -558,7 +560,7 @@ foreach($topics as &$justSomeTopic) {
 
 
 for($j=0; $j<10; $j++) {
-	//echo "\n bean start: ".print_r($book3,1);
+	//echo '\n bean start: '.print_r($book3,1);
 	for($x=0;$x<rand(1,20); $x++) modgr($book3); //do several mutations
 	$qbefore = count($book3->ownQuote);
 	$pbefore = count($book3->ownPicture);
@@ -582,26 +584,26 @@ for($j=0; $j<10; $j++) {
 
  
 //graph
-R::exec('drop table if exists band_bandmember');
-R::exec('drop table if exists band_location');
-R::exec('drop table if exists band_genre');
-R::exec('drop table if exists army_village');
-R::exec('drop table if exists cd_track');
-R::exec('drop table if exists song_track');
-R::exec('drop table if exists location');
-R::exec('drop table if exists bandmember');
-R::exec('drop table if exists band');
-R::exec('drop table if exists genre');
-R::exec('drop table if exists farmer cascade');
-R::exec('drop table if exists furniture');
-R::exec('drop table if exists building');
-R::exec('drop table if exists village');
-R::exec('drop table if exists army');
-R::exec('drop table if exists people');
-R::exec('drop table if exists song');
-R::exec('drop table if exists track');
-R::exec('drop table if exists cover');
-R::exec('drop table if exists playlist');
+R::exec('DROP TABLE IF EXISTS band_bandmember');
+R::exec('DROP TABLE IF EXISTS band_location');
+R::exec('DROP TABLE IF EXISTS band_genre');
+R::exec('DROP TABLE IF EXISTS army_village');
+R::exec('DROP TABLE IF EXISTS cd_track');
+R::exec('DROP TABLE IF EXISTS song_track');
+R::exec('DROP TABLE IF EXISTS location');
+R::exec('DROP TABLE IF EXISTS bandmember');
+R::exec('DROP TABLE IF EXISTS band');
+R::exec('DROP TABLE IF EXISTS genre');
+R::exec('DROP TABLE IF EXISTS farmer cascade');
+R::exec('DROP TABLE IF EXISTS furniture');
+R::exec('DROP TABLE IF EXISTS building');
+R::exec('DROP TABLE IF EXISTS village');
+R::exec('DROP TABLE IF EXISTS army');
+R::exec('DROP TABLE IF EXISTS people');
+R::exec('DROP TABLE IF EXISTS song');
+R::exec('DROP TABLE IF EXISTS track');
+R::exec('DROP TABLE IF EXISTS cover');
+R::exec('DROP TABLE IF EXISTS playlist');
 list($v1,$v2,$v3) = R::dispense('village',3);
 list($b1,$b2,$b3,$b4,$b5,$b6) = R::dispense('building',6);
 list($f1,$f2,$f3,$f4,$f5,$f6) = R::dispense('farmer',6);
@@ -643,27 +645,27 @@ asrt(count($v3->ownTapestry),0);
 //test views for N-1 - we use the village for this
 R::view('people','village,building,farmer,building,furniture');
 //count buildings
-if ($db=="mysql") {
-$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name="v1"');
+if ($db=='mysql') {
+$noOfBuildings = (int) R::getCell('SELECT count(distinct id_of_building) as n from people where name='v1'');
 asrt($noOfBuildings,2);
-$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name="v2"');
+$noOfBuildings = (int) R::getCell('SELECT count(distinct id_of_building) as n from people where name='v2'');
 asrt($noOfBuildings,1);
-$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name="v3"');
+$noOfBuildings = (int) R::getCell('SELECT count(distinct id_of_building) as n from people where name='v3'');
 asrt($noOfBuildings,1);
 }
 
-if ($db=="pgsql") {
-$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name=\'v1\'');
+if ($db=='pgsql') {
+$noOfBuildings = (int) R::getCell('SELECT count(distinct id_of_building) as n from people where name=\'v1\'');
 asrt($noOfBuildings,2);
-$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name=\'v2\'');
+$noOfBuildings = (int) R::getCell('SELECT count(distinct id_of_building) as n from people where name=\'v2\'');
 asrt($noOfBuildings,1);
-$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name=\'v3\'');
+$noOfBuildings = (int) R::getCell('SELECT count(distinct id_of_building) as n from people where name=\'v3\'');
 asrt($noOfBuildings,1);
 }
 
-if ($db=="mysql") {
+if ($db=='mysql') {
 //what villages does not have furniture
-$emptyHouses = R::getAll('select name,count(id_of_furniture) from people group by id having count(id_of_furniture) = 0');
+$emptyHouses = R::getAll('SELECT name,count(id_of_furniture) from people group by id having count(id_of_furniture) = 0');
 asrt(count($emptyHouses),2);
 foreach($emptyHouses as $empty){
 	if ($empty['name']!=='v3') pass(); else fail();
@@ -699,7 +701,7 @@ asrt(count(end($v1->ownBuilding)->ownFarmer),1);
 asrt(count($v3->ownTapestry),0);
 
 
-$json = '{"mysongs":{"type":"playlist","name":"JazzList","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","url":"music.com.harlem"}],"cover":{"type":"cover","url":"albumart.com\/duke1"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
+$json = '{'mysongs':{'type':'playlist','name':'JazzList','ownTrack':[{'type':'track','name':'harlem nocturne','order':'1','sharedSong':[{'type':'song','url':'music.com.harlem'}],'cover':{'type':'cover','url':'albumart.com\/duke1'}},{'type':'track','name':'brazil','order':'2','sharedSong':[{'type':'song','url':'music.com\/djan'}],'cover':{'type':'cover','url':'picasa\/django'}}]}}';
 
 $playList = json_decode( $json, true );
 $cooker = new RedBean_Cooker;
@@ -707,39 +709,21 @@ $cooker->setToolbox(R::$toolbox);
 
 $playList = ($cooker->graph(($playList)));
 $id = R::store(reset($playList));
-$play = R::load("playlist", $id);
+$play = R::load('playlist', $id);
 asrt(count($play->ownTrack),2);
 foreach($play->ownTrack as $track) {
 	asrt(count($track->sharedSong),1);
 	asrt(($track->cover instanceof RedBean_OODBBean),true);
 }
 
-$json = '{"mysongs":{"type":"playlist","id":"1","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","id":"1"}],"cover":{"type":"cover","id":"2"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
+$json = '{'mysongs':{'type':'playlist','id':'1','ownTrack':[{'type':'track','name':'harlem nocturne','order':'1','sharedSong':[{'type':'song','id':'1'}],'cover':{'type':'cover','id':'2'}},{'type':'track','name':'brazil','order':'2','sharedSong':[{'type':'song','url':'music.com\/djan'}],'cover':{'type':'cover','url':'picasa\/django'}}]}}';
 
 $playList = json_decode( $json, true );
 $cooker = new RedBean_Cooker;
 $cooker->setToolbox(R::$toolbox);
 $playList = ($cooker->graph(($playList)));
 $id = R::store(reset($playList));
-$play = R::load("playlist", $id);
-asrt(count($play->ownTrack),2);
-foreach($play->ownTrack as $track) {
-	asrt(count($track->sharedSong),1);
-	asrt(($track->cover instanceof RedBean_OODBBean),true);
-}
-$track = reset($play->ownTrack);
-$song = reset($track->sharedSong);
-asrt(intval($song->id),1);
-asrt($song->url,"music.com.harlem");
-
-$json = '{"mysongs":{"type":"playlist","id":"1","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","id":"1","url":"changedurl"}],"cover":{"type":"cover","id":"2"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
-
-$playList = json_decode( $json, true );
-$cooker = new RedBean_Cooker;
-$cooker->setToolbox(R::$toolbox);
-$playList = ($cooker->graph(($playList)));
-$id = R::store(reset($playList));
-$play = R::load("playlist", $id);
+$play = R::load('playlist', $id);
 asrt(count($play->ownTrack),2);
 foreach($play->ownTrack as $track) {
 	asrt(count($track->sharedSong),1);
@@ -748,7 +732,25 @@ foreach($play->ownTrack as $track) {
 $track = reset($play->ownTrack);
 $song = reset($track->sharedSong);
 asrt(intval($song->id),1);
-asrt(($song->url),"changedurl");
+asrt($song->url,'music.com.harlem');
+
+$json = '{'mysongs':{'type':'playlist','id':'1','ownTrack':[{'type':'track','name':'harlem nocturne','order':'1','sharedSong':[{'type':'song','id':'1','url':'changedurl'}],'cover':{'type':'cover','id':'2'}},{'type':'track','name':'brazil','order':'2','sharedSong':[{'type':'song','url':'music.com\/djan'}],'cover':{'type':'cover','url':'picasa\/django'}}]}}';
+
+$playList = json_decode( $json, true );
+$cooker = new RedBean_Cooker;
+$cooker->setToolbox(R::$toolbox);
+$playList = ($cooker->graph(($playList)));
+$id = R::store(reset($playList));
+$play = R::load('playlist', $id);
+asrt(count($play->ownTrack),2);
+foreach($play->ownTrack as $track) {
+	asrt(count($track->sharedSong),1);
+	asrt(($track->cover instanceof RedBean_OODBBean),true);
+}
+$track = reset($play->ownTrack);
+$song = reset($track->sharedSong);
+asrt(intval($song->id),1);
+asrt(($song->url),'changedurl');
 
 
 //Tree 
@@ -857,38 +859,38 @@ catch(Exception $e){
 pass();
 }
 
-$lifeCycle = "";
+$lifeCycle = '';
 class Model_Bandmember extends RedBean_SimpleModel {
 	
 	public function open() {
 		global $lifeCycle;
-		$lifeCycle .= "\n called open: ".$this->id;
+		$lifeCycle .= '\n called open: '.$this->id;
 	}
 	
 	
 	public function dispense(){
 		global $lifeCycle;
-		$lifeCycle .= "\n called dispense() ".$this->bean;
+		$lifeCycle .= '\n called dispense() '.$this->bean;
 	}
 	
 	public function update() {
 		global $lifeCycle;
-		$lifeCycle .= "\n called update() ".$this->bean;
+		$lifeCycle .= '\n called update() '.$this->bean;
 	}
 	
 	public function after_update(){
 		global $lifeCycle;
-		$lifeCycle .= "\n called after_update() ".$this->bean;
+		$lifeCycle .= '\n called after_update() '.$this->bean;
 	}
 	
 	public function delete() {
 		global $lifeCycle;
-		$lifeCycle .= "\n called delete() ".$this->bean;
+		$lifeCycle .= '\n called delete() '.$this->bean;
 	}
 	
 	public function after_delete() {
 		global $lifeCycle;
-		$lifeCycle .= "\n called after_delete() ".$this->bean;
+		$lifeCycle .= '\n called after_delete() '.$this->bean;
 	}
 	
 	
@@ -902,12 +904,12 @@ $bandmember = R::load('bandmember',$id);
 R::trash($bandmember);
 
 
-//echo "\n\n\n".$lifeCycle."\n";
+//echo '\n\n\n'.$lifeCycle.'\n';
 
 $expected = 'calleddispenseid0calledupdateid0nameFatzWallercalledafter_updateid5nameFatzWallercalleddispenseid0calledopen5calleddeleteid5band_idnullnameFatzWallercalledafter_deleteid0band_idnullnameFatzWaller';
 
-$lifeCycle = preg_replace("/\W/","",$lifeCycle);
-//$expected = "\n\n".preg_replace("/\W/","",$expected)."\n\n";
+$lifeCycle = preg_replace('/\W/','',$lifeCycle);
+//$expected = '\n\n'.preg_replace('/\W/','',$expected).'\n\n';
 
 
 asrt($lifeCycle,$expected);
@@ -955,8 +957,8 @@ asrt($page->getMeta('cast.book_id'),'id');
 
 //Test combination of bean formatter and N1
 class N1AndFormatter implements RedBean_IBeanFormatter{
-	public function formatBeanTable($table) {return "xy_$table";}
-	public function formatBeanID( $table ) {return "theid";}
+	public function formatBeanTable($table) {return 'xy_' . $table;}
+	public function formatBeanID( $table ) {return 'theid';}
 	public function getAlias($a){ return $a; }
 }
 R::$writer->setBeanFormatter(new N1AndFormatter);
@@ -1057,13 +1059,13 @@ catch(Exception $e){fail();}
 
 
 try{
-	$book->ownPage[] = "a string"; R::store($book); fail();
+	$book->ownPage[] = 'a string'; R::store($book); fail();
 }
 catch(RedBean_Exception_Security $e){ pass();}
 catch(Exception $e){fail();}
 
 try{
-	$book->sharedPage[] = "a string"; R::store($book); fail();
+	$book->sharedPage[] = 'a string'; R::store($book); fail();
 }
 catch(RedBean_Exception_Security $e){ pass();}
 catch(Exception $e){fail();}
@@ -1127,7 +1129,7 @@ $page->title = 'my page';
 $book->ownPage[] = $page;
 R::store($book);
 R::view('library2','book,page');
-$l2 = R::getRow('select * from xy_library2 limit 1');
+$l2 = R::getRow('SELECT * from xy_library2 limit 1');
 asrt($l2['title'],'my book');
 asrt($l2['title_of_page'],'my page');
 
@@ -1326,9 +1328,9 @@ $e->loadSchema();
 
 $export = $e->export($v2);
 $out = json_encode($export);
-$expected = '{"2":{"id":"2","name":"Sandy winds","world_id":null,"universe_id":"1","universe":{"1":{"id":"1","name":"Middle Earth","ownVillage":{"1":{"id":"1","name":"Ole Town","world_id":"1","universe_id":null,"world":{"1":null},"ownBuilding":{"1":{"id":"1","kind":"pub","village_id":"1","village":{"1":null},"ownAmulet":{"1":{"id":"1","name":"4","building_id":"1","building":{"1":null}}}},"2":{"id":"2","kind":"tower","village_id":"1","village":{"1":null},"ownAmulet":[]}},"sharedArmy":[]}}}},"ownBuilding":{"3":{"id":"3","kind":"mill","village_id":"2","village":{"2":null},"ownAmulet":[]},"4":{"id":"4","kind":"shed","village_id":"2","village":{"2":null},"ownAmulet":[]},"5":{"id":"5","kind":"shop","village_id":"2","village":{"2":null},"ownAmulet":{"2":{"id":"2","name":"3","building_id":"5","building":{"5":null}}}}},"sharedArmy":{"1":{"id":"1","name":"Army 1","sharedVillage":{"2":null}},"2":{"id":"2","name":"Army 2","sharedVillage":{"2":null,"3":{"id":"3","name":"Autumn Hill","world_id":null,"universe_id":null,"ownBuilding":{"6":{"id":"6","kind":"farm","village_id":"3","village":{"3":null},"ownAmulet":{"3":{"id":"3","name":"1","building_id":"6","building":{"6":null}},"4":{"id":"4","name":"2","building_id":"6","building":{"6":null}}}}},"sharedArmy":{"2":null}}}}}}}';
-asrt(preg_replace("/\W/","",trim($out)),preg_replace("/\W/","",trim($expected)));
+$expected = '{'2':{'id':'2','name':'Sandy winds','world_id':null,'universe_id':'1','universe':{'1':{'id':'1','name':'Middle Earth','ownVillage':{'1':{'id':'1','name':'Ole Town','world_id':'1','universe_id':null,'world':{'1':null},'ownBuilding':{'1':{'id':'1','kind':'pub','village_id':'1','village':{'1':null},'ownAmulet':{'1':{'id':'1','name':'4','building_id':'1','building':{'1':null}}}},'2':{'id':'2','kind':'tower','village_id':'1','village':{'1':null},'ownAmulet':[]}},'sharedArmy':[]}}}},'ownBuilding':{'3':{'id':'3','kind':'mill','village_id':'2','village':{'2':null},'ownAmulet':[]},'4':{'id':'4','kind':'shed','village_id':'2','village':{'2':null},'ownAmulet':[]},'5':{'id':'5','kind':'shop','village_id':'2','village':{'2':null},'ownAmulet':{'2':{'id':'2','name':'3','building_id':'5','building':{'5':null}}}}},'sharedArmy':{'1':{'id':'1','name':'Army 1','sharedVillage':{'2':null}},'2':{'id':'2','name':'Army 2','sharedVillage':{'2':null,'3':{'id':'3','name':'Autumn Hill','world_id':null,'universe_id':null,'ownBuilding':{'6':{'id':'6','kind':'farm','village_id':'3','village':{'3':null},'ownAmulet':{'3':{'id':'3','name':'1','building_id':'6','building':{'6':null}},'4':{'id':'4','name':'2','building_id':'6','building':{'6':null}}}}},'sharedArmy':{'2':null}}}}}}}';
+asrt(preg_replace('/\W/','',trim($out)),preg_replace('/\W/','',trim($expected)));
 $export=R::exportAll($v2,true);
 $out = json_encode($export);
-asrt(preg_replace("/\W/","",trim($out)),preg_replace("/\W/","",trim($expected)));
+asrt(preg_replace('/\W/','',trim($out)),preg_replace('/\W/','',trim($expected)));
 

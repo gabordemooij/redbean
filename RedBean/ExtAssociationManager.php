@@ -28,8 +28,8 @@ class RedBean_ExtAssociationManager extends RedBean_AssociationManager {
 	 *
 	 */
 	public function extAssociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $baseBean ) {
-		$table = $this->getTable( array($bean1->getMeta("type") , $bean2->getMeta("type")) );
-		$baseBean->setMeta("type", $table );
+		$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
+		$baseBean->setMeta('type', $table );
 		return $this->associateBeans( $bean1, $bean2, $baseBean );
 	}
 }

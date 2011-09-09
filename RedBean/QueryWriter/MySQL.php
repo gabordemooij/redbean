@@ -86,7 +86,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
 	 * This is the biggest column that RedBean supports. If possible you may write
 	 * an implementation that stores even bigger values.
-	 * 
+	 * '
 	 */
 	const C_DATATYPE_TEXT32 = 6;
 
@@ -108,13 +108,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * Supported Column Types
 	 */
 	public $typeno_sqltype = array(
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  SET('1')  ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>" TINYINT(3) UNSIGNED ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>" INT(11) UNSIGNED ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>" DOUBLE ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>" VARCHAR(255) ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>" TEXT ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>" LONGTEXT "
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>'  SET(\'1\')  ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>' TINYINT(3) UNSIGNED ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>' INT(11) UNSIGNED ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>' DOUBLE ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>' VARCHAR(255) ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>' TEXT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>' LONGTEXT '
 	);
 
 	/**
@@ -124,13 +124,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * constants (magic numbers)
 	 */
 	public $sqltype_typeno = array(
-			  "set('1')"=>RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL,
-			  "tinyint(3) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8,
-			  "int(11) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32,
-			  "double" => RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE,
-			  "varchar(255)"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8,
-			  "text"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16,
-			  "longtext"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32
+			  'set(\'1\')'=>RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL,
+			  'tinyint(3) unsigned'=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8,
+			  'int(11) unsigned'=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32,
+			  'double' => RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE,
+			  'varchar(255)'=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8,
+			  'text'=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16,
+			  'longtext'=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32
 	);
 
 	/**
@@ -173,7 +173,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return array $tables tables
 	 */
 	public function getTables() {
-		return $this->adapter->getCol( "show tables" );
+		return $this->adapter->getCol( 'show tables' );
 	}
 
 	/**
@@ -188,12 +188,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function createTable( $table ) {
 		$idfield = $this->safeColumn($this->getIDfield($table));
 		$table = $this->safeTable($table);
-		$sql = "
-                     CREATE TABLE $table (
-                    $idfield INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-                     PRIMARY KEY ( $idfield )
-                     ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-				  ";
+		$sql = 'CREATE TABLE ' . $table . ' ( ' . $idfield . ' INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+      PRIMARY KEY ( ' . $idfield . ' )
+      ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
 		$this->adapter->exec( $sql );
 	}
 
@@ -206,9 +203,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function getColumns( $table ) {
 		$table = $this->safeTable($table);
-		$columnsRaw = $this->adapter->get("DESCRIBE $table");
+		$columnsRaw = $this->adapter->get('DESCRIBE ' . $table);
 		foreach($columnsRaw as $r) {
-			$columns[$r["Field"]]=$r["Type"];
+			$columns[$r['Field']]=$r['Type'];
 		}
 		return $columns;
 	}
@@ -226,7 +223,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
 		$value = strval($value);
-		if ($value=="1" || $value=="") {
+		if ($value=='1' || $value=='') {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
 		if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
@@ -271,7 +268,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
 		$newtype = $this->getFieldType($type);
-		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
+		$changecolumnSQL = 'ALTER TABLE ' . $table . ' CHANGE ' . $column . ' ' . $column . ' ' . $newtype;
 		$this->adapter->exec( $changecolumnSQL );
 	}
 
@@ -290,17 +287,17 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		foreach($columns as $k=>$v) {
 			$columns[$k]= $this->safeColumn($v);
 		}
-		$r = $this->adapter->get("SHOW INDEX FROM $table");
-		$name = "UQ_".sha1(implode(',',$columns));
+		$r = $this->adapter->get('SHOW INDEX FROM ' . $table);
+		$name = 'UQ_'.sha1(implode(',',$columns));
 		if ($r) {
 			foreach($r as $i) {
-				if ($i["Key_name"]== $name) {
+				if ($i['Key_name']== $name) {
 					return;
 				}
 			}
 		}
-		$sql = "ALTER IGNORE TABLE $table
-                ADD UNIQUE INDEX $name (".implode(",",$columns).")";
+		$sql = 'ALTER IGNORE TABLE $table
+                ADD UNIQUE INDEX $name ('.implode(',',$columns).')';
 		$this->adapter->exec($sql);
 	}
 
@@ -313,10 +310,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return boolean $yesno occurs in list
 	 */
 	public function sqlStateIn($state, $list) {
-		$sqlState = "0";
-		if ($state == "42S02") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
-		if ($state == "42S22") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
-		if ($state == "23000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
+		$sqlState = '0';
+		if ($state == '42S02') $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
+		if ($state == '42S22') $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
+		if ($state == '23000') $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
 		return in_array($sqlState, $list);
 	}
 
@@ -338,14 +335,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		try{
 			$writer = $this;
 			$adapter = $this->adapter;
-			$db = $adapter->getCell("select database()");
-			$fkCode = "fk".md5($table.$property1.$property2);
-			$fks =  $adapter->getCell("
+			$db = $adapter->getCell('select database()');
+			$fkCode = 'fk'.md5($table.$property1.$property2);
+			$fks =  $adapter->getCell('
 				SELECT count(*)
 				FROM information_schema.KEY_COLUMN_USAGE
-				WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='".$writer->getFormattedTableName($table)."' AND
-				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
-					  ");
+				WHERE TABLE_SCHEMA =' . $db . ' AND TABLE_NAME =' . $writer->getFormattedTableName($table) . ' AND
+				CONSTRAINT_NAME <> \'PRIMARY\' AND REFERENCED_TABLE_NAME is not null');
 
 			//already foreign keys added in this association table
 			if ($fks>0) return false;
@@ -364,15 +360,15 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			$table = $writer->getFormattedTableName($table);
 			$table1 = $writer->getFormattedTableName($table1);
 			$table2 = $writer->getFormattedTableName($table2);
-			$sql = "
-				ALTER TABLE ".$writer->noKW($table)."
-				ADD FOREIGN KEY($property1) references `$table1`($idfield1) ON DELETE CASCADE;
-					  ";
+			$sql = '
+				ALTER TABLE '.$writer->noKW($table).'
+				ADD FOREIGN KEY(' . $property1 . ') references `'.$table1.'`('.$idfield1.') ON DELETE CASCADE;
+					  ';
 			$adapter->exec( $sql );
-			$sql ="
-				ALTER TABLE ".$writer->noKW($table)."
-				ADD FOREIGN KEY($property2) references `$table2`($idfield2) ON DELETE CASCADE
-					  ";
+			$sql ='
+				ALTER TABLE '.$writer->noKW($table).'
+				ADD FOREIGN KEY(' . $property2 . ') references `'.$table2.'`('.$idfield2.') ON DELETE CASCADE
+					  ';
 			$adapter->exec( $sql );
 			return true;
 		}

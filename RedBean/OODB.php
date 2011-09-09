@@ -58,7 +58,7 @@ class RedBean_OODB extends RedBean_Observable {
 			$this->writer = $writer;
 		}
 		else {
-			throw new RedBean_Exception_Security("Passing an invalid Query Writer");
+			throw new RedBean_Exception_Security('Passing an invalid Query Writer');
 		}
 		
 		$this->beanhelper = new RedBean_BeanHelperFacade();
@@ -101,17 +101,17 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return RedBean_OODBBean $bean
 	 */
 	public function dispense($type ) {
-		$this->signal( "before_dispense", $type );
+		$this->signal( 'before_dispense', $type );
 		$bean = new RedBean_OODBBean();
 		$bean->setBeanHelper($this->beanhelper);
-		$bean->setMeta("type", $type );
-		$idfield = $this->writer->getIDField($bean->getMeta("type"));
-		$bean->setMeta("sys.idfield",$idfield);
-		//$bean->setMeta("sys.oodb",$this);
+		$bean->setMeta('type', $type );
+		$idfield = $this->writer->getIDField($bean->getMeta('type'));
+		$bean->setMeta('sys.idfield',$idfield);
+		//$bean->setMeta('sys.oodb',$this);
 		$bean->$idfield = 0;
 		if (!$this->isFrozen) $this->check( $bean );
-		$bean->setMeta("tainted",true);
-		$this->signal( "dispense", $bean );
+		$bean->setMeta('tainted',true);
+		$this->signal( 'dispense', $bean );
 		return $bean;
 	}
 
@@ -135,20 +135,20 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean
 	 */
 	public function check( RedBean_OODBBean $bean ) {
-		$idfield = $this->writer->getIDField($bean->getMeta("type"));
+		$idfield = $this->writer->getIDField($bean->getMeta('type'));
 		//Is all meta information present?
 
 		if (!isset($bean->$idfield) ) {
-			throw new RedBean_Exception_Security("Bean has incomplete Meta Information $idfield ");
+			throw new RedBean_Exception_Security('Bean has incomplete Meta Information ' . $idfield);
 		}
-		if (!($bean->getMeta("type"))) {
-			throw new RedBean_Exception_Security("Bean has incomplete Meta Information II");
+		if (!($bean->getMeta('type'))) {
+			throw new RedBean_Exception_Security('Bean has incomplete Meta Information II');
 		}
 		//Pattern of allowed characters
 		$pattern = '/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/';
 		//Does the type contain invalid characters?
-		if (preg_match($pattern,$bean->getMeta("type"))) {
-			throw new RedBean_Exception_Security("Bean Type is invalid");
+		if (preg_match($pattern,$bean->getMeta('type'))) {
+			throw new RedBean_Exception_Security('Bean Type is invalid');
 		}
 		//Are the properties and values valid?
 		foreach($bean as $prop=>$value) {
@@ -158,7 +158,7 @@ class RedBean_OODB extends RedBean_Observable {
 					  strlen($prop)<1 ||
 					  preg_match($pattern,$prop)
 			) {
-				throw new RedBean_Exception_Security("Invalid Bean: property $prop  ");
+				throw new RedBean_Exception_Security('Invalid Bean: property $prop  ');
 			}
 		}
 	}
@@ -212,7 +212,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return void
 	 */
 	protected function processBuildCommands($table, $property, RedBean_OODBBean $bean) {
-		if ($inx = ($bean->getMeta("buildcommand.indexes"))) {
+		if ($inx = ($bean->getMeta('buildcommand.indexes'))) {
 			if (isset($inx[$property])) $this->writer->addIndex($table,$inx[$property],$property);
 		}
 	}
@@ -255,7 +255,6 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return integer $newid
 	 */
 	public function store( RedBean_OODBBean $bean ) {
-
 		$processLists = false;
 		foreach($bean as $k=>$v) {
 			if (is_array($v) || is_object($v)) { $processLists = true; break; }
@@ -263,7 +262,7 @@ class RedBean_OODB extends RedBean_Observable {
 
 
 		if (!$processLists && !$bean->getMeta('tainted')) return $bean->getID();
-		$this->signal( "update", $bean );
+		$this->signal( 'update', $bean );
 
 		if ($processLists) {
 		//Define groups
@@ -309,14 +308,14 @@ class RedBean_OODB extends RedBean_Observable {
 
 		if (!$this->isFrozen) $this->check($bean);
 		//what table does it want
-		$table = $bean->getMeta("type");
+		$table = $bean->getMeta('type');
 		$idfield = $this->writer->getIDField($table);
 
 		if ($bean->getMeta('tainted')) {
 		//Does table exist? If not, create
 		if (!$this->isFrozen && !$this->tableExists($table)) {
 			$this->writer->createTable( $table );
-			$bean->setMeta("buildreport.flags.created",true);
+			$bean->setMeta('buildreport.flags.created',true);
 		}
 		if (!$this->isFrozen) {
 			$columns = $this->writer->getColumns($table) ;
@@ -329,16 +328,16 @@ class RedBean_OODB extends RedBean_Observable {
 			if ($p!=$idfield) {
 				if (!$this->isFrozen) {
 					//Does the user want to specify the type?
-					if ($bean->getMeta("cast.$p",-1)!==-1) {
-						$cast = $bean->getMeta("cast.$p");
-						if ($cast=="string") {
-							$typeno = $this->writer->scanType("STRING");
+					if ($bean->getMeta('cast.' . $p,-1)!==-1) {
+						$cast = $bean->getMeta('cast.' . $p);
+						if ($cast=='string') {
+							$typeno = $this->writer->scanType('STRING');
 						}
-						elseif ($cast=="id") {
+						elseif ($cast=='id') {
 							$typeno = $this->writer->getTypeForID();
 						}
 						else {
-							throw new RedBean_Exception("Invalid Cast");
+							throw new RedBean_Exception('Invalid Cast');
 						}
 					}
 					else {
@@ -353,13 +352,13 @@ class RedBean_OODB extends RedBean_Observable {
 						if ($typeno > $sqlt) {
 							//no, we have to widen the database column type
 							$this->writer->widenColumn( $table, $p, $typeno );
-							$bean->setMeta("buildreport.flags.widen",true);
+							$bean->setMeta('buildreport.flags.widen',true);
 						}
 					}
 					else {
 						//no it is not
 						$this->writer->addColumn($table, $p, $typeno);
-						$bean->setMeta("buildreport.flags.addcolumn",true);
+						$bean->setMeta('buildreport.flags.addcolumn',true);
 						//@todo: move build commands here... more practical
 						$this->processBuildCommands($table,$p,$bean);
 					}
@@ -367,11 +366,11 @@ class RedBean_OODB extends RedBean_Observable {
 				//Okay, now we are sure that the property value will fit
 				$insertvalues[] = $v;
 				$insertcolumns[] = $p;
-				$updatevalues[] = array( "property"=>$p, "value"=>$v );
+				$updatevalues[] = array( 'property'=>$p, 'value'=>$v );
 			}
 		}
 
-		if (!$this->isFrozen && ($uniques = $bean->getMeta("buildcommand.unique"))) {
+		if (!$this->isFrozen && ($uniques = $bean->getMeta('buildcommand.unique'))) {
 			foreach($uniques as $unique) {
 				$this->writer->addUniqueIndex( $table, $unique );
 			}
@@ -380,7 +379,7 @@ class RedBean_OODB extends RedBean_Observable {
 		$bean->$idfield = $rs;
 
 
-		$bean->setMeta("tainted",false);
+		$bean->setMeta('tainted',false);
 		}
 
 
@@ -461,7 +460,7 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 		}
-		$this->signal( "after_update", $bean );
+		$this->signal( 'after_update', $bean );
 		return (int) $bean->$idfield;
 	}
 
@@ -484,7 +483,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return RedBean_OODBBean $bean
 	 */
 	public function load($type, $id) {
-		$this->signal("before_open",array("type"=>$type,"id"=>$id));
+		$this->signal('before_open',array('type'=>$type,'id'=>$id));
 
 		$bean = $this->dispense( $type );
 		if ($this->stash && isset($this->stash[$id])) {
@@ -517,8 +516,8 @@ class RedBean_OODB extends RedBean_Observable {
 			//populate the bean with the database row
 			$bean->$p = $v;
 		}
-		$this->signal( "open", $bean );
-		$bean->setMeta("tainted",false);
+		$this->signal( 'open', $bean );
+		$bean->setMeta('tainted',false);
 
 		return $bean;
 	}
@@ -531,12 +530,12 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean
 	 */
 	public function trash( RedBean_OODBBean $bean ) {
-		$idfield = $this->writer->getIDField($bean->getMeta("type"));
+		$idfield = $this->writer->getIDField($bean->getMeta('type'));
 		
-		$this->signal( "delete", $bean );
+		$this->signal( 'delete', $bean );
 		if (!$this->isFrozen) $this->check( $bean );
 		try {
-			$this->writer->selectRecord($bean->getMeta("type"),
+			$this->writer->selectRecord($bean->getMeta('type'),
 				array($idfield => array( $bean->$idfield) ),null,true );
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
@@ -547,7 +546,7 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		$bean->$idfield = 0;
 		
-		$this->signal( "after_delete", $bean );
+		$this->signal( 'after_delete', $bean );
 		
 	}
 
@@ -653,7 +652,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return RedBean_AssociationManager $assoc Assoction Manager
 	 */
 	public function getAssociationManager() {
-		if (!isset($this->assocManager)) throw new Exception("No association manager available.");
+		if (!isset($this->assocManager)) throw new Exception('No association manager available.');
 		return $this->assocManager;
 	}
 

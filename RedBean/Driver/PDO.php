@@ -128,7 +128,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->dsn = $this->getDatabaseType();
 		} else {
 			$this->dsn = $dsn;
-			$this->connectInfo = array( "pass"=>$pass, "user"=>$user );
+			$this->connectInfo = array( 'pass'=>$pass, 'user'=>$user );
 		}
 	}
 
@@ -144,8 +144,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	public function connect() {
 
 		if ($this->isConnected) return;
-		$user = $this->connectInfo["user"];
-		$pass = $this->connectInfo["pass"];
+		$user = $this->connectInfo['user'];
+		$pass = $this->connectInfo['pass'];
 		//PDO::MYSQL_ATTR_INIT_COMMAND
 		$this->pdo = new PDO(
 				  $this->dsn,
@@ -212,16 +212,17 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->connect();
 		$this->exc = 0;
 		if ($this->debug) {
-			echo "<HR>" . $sql.print_r($aValues,1);
+			echo '<HR>' . $sql.print_r($aValues,1);
 		}
 		try {
-			if (strpos("pgsql",$this->dsn)===0) {
+			if (strpos('pgsql',$this->dsn)===0) {
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			}
 			else {
 				$s = $this->pdo->prepare($sql);
 			}
 			$this->bindParams( $s, $aValues );
+
 			$s->execute();
 		  	if ($s->columnCount()) {
 		    	$this->rs = $s->fetchAll();
@@ -247,7 +248,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}
 		if ($this->debug) {
 			if (count($rows) > 0) {
-				echo "<br><b style='color:green'>resultset: " . count($rows) . " rows</b>";
+				echo '<br><b style=\'color:green\'>resultset: ' . count($rows) . ' rows</b>';
 			}
 		}
 		return $rows;
@@ -325,7 +326,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function Errormsg() {
 		$this->connect();
-		if (!$this->exc) return "";
+		if (!$this->exc) return '';
 		$infos = $this->pdo->errorInfo();
 		return $infos[2];
 	}
@@ -337,7 +338,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * marks in the query. Each value in the array corresponds to the
 	 * question mark in the query that matches the position of the value in the
 	 * array. You can also bind values using explicit keys, for instance
-	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * array(':key'=>123) will bind the integer 123 to the key :key in the
 	 * SQL. This method has no return value.
 	 *
 	 * @param string $sql	  SQL Code to execute
@@ -349,10 +350,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->connect();
 		$this->exc = 0;
 		if ($this->debug) {
-			echo "<HR>" . $sql.print_r($aValues,1);
+			echo '<HR>' . $sql.print_r($aValues,1);
 		}
 		try {
-			if (strpos("pgsql",$this->dsn)===0) {
+			if (strpos('pgsql',$this->dsn)===0) {
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			}
 			else {
@@ -368,9 +369,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			//So we need a property to convey the SQL State code.
 			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
 				$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
-			}
-			else {
-				$x = new RedBean_Exception_SQL( $e->getMessage()." SQL:".$sql, 0, $e );
+			}	else {
+				$x = new RedBean_Exception_SQL( $e->getMessage().' SQL:'.$sql, 0, $e );
 			}
 			$x->setSQLState( $e->getCode() );
 			throw $x;
