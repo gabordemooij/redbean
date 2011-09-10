@@ -2,13 +2,12 @@
 
 
 error_reporting(E_ALL | E_STRICT);
-//require('RedBean/redbean.inc.php');
-require('rb.php');
+require('RedBean/redbean.inc.php');
+//require('rb.php');
 
-//R::setup('pgsql:host=localhost;dbname=oodb','postgres',''); $db='pgsql';
+//R::setup('pgsql:host=localhost;dbname=oodb','postgres'); $db='pgsql';
 //R::setup('mysql:host=localhost;dbname=oodb','root'); $db='mysql';
-R::setup(); $db='sqlite';
-
+R::setup(); $db="sqlite"; R::exec(' PRAGMA foreign_keys = ON ');
 
 function printtext( $text ) {
 	if ($_SERVER['DOCUMENT_ROOT']) {
@@ -57,13 +56,15 @@ function droptables() {
   global $db;	
   if ($db=='mysql') {
     R::exec('SET FOREIGN_KEY_CHECKS=0;');
+  } elseif ($db=='sqlite') {
+    R::exec('PRAGMA foreign_keys = 0 ');
   }
   R::exec('DROP VIEW IF EXISTS people');
   R::exec('DROP VIEW IF EXISTS library2');
   foreach(R::$writer->getTables() as $t) {
 	  if ($db=='mysql') {
 	    R::exec('drop table `' . $t .'`');
-    } elseif($db=='pgsql') {
+    } elseif ($db=='pgsql') {
       R::exec('drop table \'' . $t . '\' cascade');
     } elseif ($db=='sqlite') {
       R::exec('drop table ' . $t);
@@ -71,6 +72,8 @@ function droptables() {
   }
   if ($db=='mysql') {
     R::exec('SET FOREIGN_KEY_CHECKS=1;');
+  } elseif ($db=='sqlite') {
+    R::exec('PRAGMA foreign_keys = 1 ');
   }
 }
 
@@ -82,6 +85,39 @@ function testids($array) {
 
 droptables();
 
+if ($db=='sqlite') {
+testpack('Test widen column in combination with bean formatter. (discovered while testing FKs)');
+class BF extends RedBean_DefaultBeanFormatter {
+	public function formatBeanTable($type){ return 'prefixed_'.$type; }
+	public function formatBeanID($type){ return 'lousy_shitty_id'; }
+}
+
+R::$writer->setBeanFormatter(new BF);
+$bean = R::dispense('page');
+$bean->rating = 1;
+R::store($bean);
+$cols = R::$writer->getColumns('page');
+asrt($cols['rating'],'INTEGER');
+
+$bean->rating = 1.4;
+R::store($bean);
+$cols = R::$writer->getColumns('page');
+asrt($cols['rating'],'NUMERIC');
+
+$bean->rating = '1999-02-02';
+R::store($bean);
+$cols = R::$writer->getColumns('page');
+asrt($cols['rating'],'NUMERIC');
+
+$bean->rating = 'reasonable';
+R::store($bean);
+$cols = R::$writer->getColumns('page');
+asrt($cols['rating'],'TEXT');
+R::$writer->setBeanFormatter(new RedBean_DefaultBeanFormatter);
+>>>>>>> upstream/master
+
+droptables();
+}
 list($q1,$q2) = R::dispense('quote',2);
 list($pic1,$pic2) = R::dispense('picture',2);
 list($book,$book2,$book3) = R::dispense('book',4);
