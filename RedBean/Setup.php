@@ -42,16 +42,11 @@ class RedBean_Setup {
 	private static function checkDSN($dsn) {
 		$dsn = trim($dsn);
 		$dsn = strtolower($dsn);
-		if (
-		strpos($dsn, "mysql:")!==0
-				  && strpos($dsn,"sqlite:")!==0
-				  && strpos($dsn,"pgsql:")!==0
-		) {
-
-			trigger_error("
-					Support for this DSN has not been implemented yet. \n
-					Begin your DSN with: 'mysql:' or 'sqlite:'
-				");
+		if (strpos($dsn, 'mysql:') !== FALSE && 
+		  strpos($dsn,'sqlite:') !== FALSE && 
+		  strpos($dsn,'pgsql:') !== FALSE) {
+			trigger_error('Support for this DSN has not been implemented yet. \n
+					Begin your DSN with: \'mysql:\' or \'sqlite:\'');
 		}
 		else {
 			return true;
@@ -94,10 +89,10 @@ class RedBean_Setup {
 
 		$adapter = new RedBean_Adapter_DBAdapter( $pdo );
 
-		if (strpos($dsn,"pgsql")===0) {
+		if (strpos($dsn,'pgsql')===0) {
 			$writer = new RedBean_QueryWriter_PostgreSQL( $adapter );
 		}
-		else if (strpos($dsn,"sqlite")===0) {
+		else if (strpos($dsn,'sqlite')===0) {
 			$writer = new RedBean_QueryWriter_SQLiteT( $adapter );
 		}
 		else {

@@ -40,9 +40,9 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * Supported Column Types
 	 */
 	public $typeno_sqltype = array(
-			  self::C_DATATYPE_INTEGER=>" integer ",
-			  self::C_DATATYPE_DOUBLE=>" double precision ",
-			  self::C_DATATYPE_TEXT=>" text "
+			  self::C_DATATYPE_INTEGER=>' integer ',
+			  self::C_DATATYPE_DOUBLE=>' double precision ',
+			  self::C_DATATYPE_TEXT=>' text '
 	);
 
 	/**
@@ -52,9 +52,9 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * constants (magic numbers)
 	 */
 	public $sqltype_typeno = array(
-			  "integer"=>self::C_DATATYPE_INTEGER,
-			  "double precision" => self::C_DATATYPE_DOUBLE,
-			  "text"=>self::C_DATATYPE_TEXT
+			  'integer'=>self::C_DATATYPE_INTEGER,
+			  'double precision' => self::C_DATATYPE_DOUBLE,
+			  'text'=>self::C_DATATYPE_TEXT
 	);
 
 	/**
@@ -68,7 +68,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @var string
 	 * character to escape keyword table/column names
 	 */
-  protected $quoteCharacter = '"';
+  protected $quoteCharacter = '';
 
   /**
    *
@@ -95,7 +95,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
    * @return  string $sql SQL Snippet
    */
   protected function getInsertSuffix($table) {
-    return "RETURNING ".$this->getIDField($table);
+    return 'RETURNING '.$this->getIDField($table);
   }
 
 	/**
@@ -115,8 +115,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @return array $tables tables
 	 */
 	public function getTables() {
-		return $this->adapter->getCol( "select table_name from information_schema.tables
-where table_schema = 'public'" );
+		return $this->adapter->getCol( 'select table_name from information_schema.tables where table_schema = \'public\'');
 	}
 
 	/**
@@ -127,7 +126,7 @@ where table_schema = 'public'" );
 	public function createTable( $table ) {
 		$idfield = $this->getIDfield($table);
 		$table = $this->safeTable($table);
-		$sql = " CREATE TABLE $table ($idfield SERIAL PRIMARY KEY); ";
+		$sql = ' CREATE TABLE $table ($idfield SERIAL PRIMARY KEY); ';
 		$this->adapter->exec( $sql );
 	}
 
@@ -140,9 +139,9 @@ where table_schema = 'public'" );
 	 */
 	public function getColumns( $table ) {
 		$table = $this->safeTable($table, true);
-		$columnsRaw = $this->adapter->get("select column_name, data_type from information_schema.columns where table_name='$table'");
+		$columnsRaw = $this->adapter->get('select column_name, data_type from information_schema.columns where table_name=' . $table);
 		foreach($columnsRaw as $r) {
-			$columns[$r["column_name"]]=$r["data_type"];
+			$columns[$r['column_name']]=$r['data_type'];
 		}
 		return $columns;
 	}
@@ -198,7 +197,7 @@ where table_schema = 'public'" );
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
 		$newtype = $this->typeno_sqltype[$type];
-		$changecolumnSQL = "ALTER TABLE $table \n\t ALTER COLUMN $column TYPE $newtype ";
+		$changecolumnSQL = 'ALTER TABLE ' . $table . ' \n\t ALTER COLUMN ' . $column . ' TYPE ' . $newtype;
 		try {
 			$this->adapter->exec( $changecolumnSQL );
 		}catch(Exception $e) {
@@ -228,16 +227,15 @@ where table_schema = 'public'" );
 		$idfield = $this->getIDfield($type);
 		$id = (int) $id;
 		$logid = (int) $logid;
-		$num = $this->adapter->getCell("
-        SELECT count(*) FROM __log WHERE tbl=$table AND itemid=$id AND action=2 AND $idfield > $logid");
+		$num = $this->adapter->getCell('
+        SELECT count(*) FROM __log WHERE tbl='.$table.' AND itemid='.$id.' AND action=2 AND '.$idfield.' > '. $logid);
 		if ($num) {
-			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)");
+			throw new RedBean_Exception_FailedAccessBean('Locked, failed to access (type:'.$type.', id:'.$id.')');
 		}
-		$newid = $this->insertRecord("__log",array("action","tbl","itemid"),
+		$newid = $this->insertRecord('__log',array('action','tbl','itemid'),
 				  array(array(2,  $type, $id)));
-		if ($this->adapter->getCell("select id from __log where tbl=:tbl AND id < $newid and id > $logid and action=2 and itemid=$id ",
-		array(":tbl"=>$type))) {
-			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access II (type:$type, id:$id)");
+		if ($this->adapter->getCell('select id from __log where tbl=:tbl AND id < '.$newid.' and id > '.$logid.' and action=2 and itemid=' . $id, array(':tbl'=>$type))) {
+			throw new RedBean_Exception_FailedAccessBean('Locked, failed to access II (type:'.$type.', id:'.$id.')');
 		}
 		return $newid;
 	}
@@ -256,7 +254,7 @@ where table_schema = 'public'" );
 		foreach($columns as $k=>$v) {
 			$columns[$k]=$this->safeColumn($v);
 		}
-		$r = $this->adapter->get("SELECT
+		$r = $this->adapter->get('SELECT
 									i.relname as index_name
 								FROM
 									pg_class t,
@@ -268,20 +266,20 @@ where table_schema = 'public'" );
 									AND i.oid = ix.indexrelid
 									AND a.attrelid = t.oid
 									AND a.attnum = ANY(ix.indkey)
-									AND t.relkind = 'r'
-									AND t.relname = '$table'
-								ORDER BY  t.relname,  i.relname;");
+									AND t.relkind = \'r\'
+									AND t.relname = \'' . $table . '\'
+								ORDER BY  t.relname,  i.relname;');
 
-		$name = "UQ_".sha1($table.implode(',',$columns));
+		$name = 'UQ_'.sha1($table.implode(',',$columns));
 		if ($r) {
 			foreach($r as $i) {
-				if (strtolower( $i["index_name"] )== strtolower( $name )) {
+				if (strtolower( $i['index_name'] )== strtolower( $name )) {
 					return;
 				}
 			}
 		}
-		$sql = "ALTER TABLE \"$table\"
-                ADD CONSTRAINT $name UNIQUE (".implode(",",$columns).")";
+		$sql = 'ALTER TABLE \'$table\'
+                ADD CONSTRAINT $name UNIQUE ('.implode(',',$columns).')';
 		$this->adapter->exec($sql);
 	}
 
@@ -298,10 +296,10 @@ where table_schema = 'public'" );
 	 */
 	public function sqlStateIn($state, $list) {
 
-		$sqlState = "0";
-		if ($state == "42P01") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
-		if ($state == "42703") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
-		if ($state == "23505") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
+		$sqlState = '0';
+		if ($state == '42P01') $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
+		if ($state == '42703') $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
+		if ($state == '23505') $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
 
 		return in_array($sqlState, $list);
 	}
@@ -318,11 +316,11 @@ where table_schema = 'public'" );
 	 * @return string $snippet SQL Snippet crafted by function
 	 */
 	public function getSQLSnippetFilter( $idfield, $keys, $sql=null, $inverse=false ) {
-		if (!$sql) $sql=" TRUE ";
-		if (!$inverse && count($keys)===0) return " TRUE ";
+		if (!$sql) $sql=' TRUE ';
+		if (!$inverse && count($keys)===0) return ' TRUE ';
 		$idfield = $this->noKW($idfield);
-		$sqlInverse = ($inverse) ? "NOT" : "";
-		$sqlKeyFilter = ($keys) ? " $idfield $sqlInverse IN (".implode(",",$keys).") AND " : " ";
+		$sqlInverse = ($inverse) ? 'NOT' : '';
+		$sqlKeyFilter = ($keys) ?  $idfield . ' ' . $sqlInverse . ' IN ('.implode(',',$keys).') AND ' : ' ';
 		$sqlSnippet = $sqlKeyFilter . $sql;
 		return $sqlSnippet;
 	}
@@ -348,8 +346,7 @@ where table_schema = 'public'" );
 			$targetTable = $this->safeTable($targetType);
 			$targetColumn  = $this->safeColumn($targetField);
 			$fkCode = $tableNoQ.'_'.$columnNoQ.'_fkey';
-			$sql = "
-						SELECT
+			$sql = 'SELECT
 								c.oid,
 								n.nspname,
 								c.relname,
@@ -361,19 +358,17 @@ where table_schema = 'public'" );
 						LEFT OUTER JOIN pg_constraint cons ON cons.conrelid = c.oid
 						LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
 						LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
-						WHERE c.relkind = 'r'
-						AND n.nspname IN ('public')
-						AND (cons.contype = 'f' OR cons.contype IS NULL)
+						WHERE c.relkind = \'r\'
+						AND n.nspname IN (\'public\')
+						AND (cons.contype = \'f\' OR cons.contype IS NULL)
 						AND
-						(  cons.conname = '{$fkCode}' )
-
-					  ";
+						(  cons.conname = ' . $fkCode . ')';
 			$rows = $this->adapter->get( $sql );
 			if (!count($rows)) {
 				try{
-					$this->adapter->exec("ALTER TABLE  $table
-					ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
-					$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
+					$this->adapter->exec('ALTER TABLE ' . $table . '
+					ADD FOREIGN KEY (' . $column . ') REFERENCES ' . $targetTable . ' (
+					' . $targetColumn . ') ON DELETE NO ACTION ON UPDATE NO ACTION ;');
 					return true;
 				}
 				catch(Exception $e) {
@@ -404,9 +399,8 @@ where table_schema = 'public'" );
 		try{
 			$writer = $this;
 			$adapter = $this->adapter;
-			$fkCode = "fk".md5($table.$property1.$property2);
-			$sql = "
-						SELECT
+			$fkCode = 'fk'.md5($table.$property1.$property2);
+			$sql = 'SELECT
 								c.oid,
 								n.nspname,
 								c.relname,
@@ -418,13 +412,13 @@ where table_schema = 'public'" );
 						LEFT OUTER JOIN pg_constraint cons ON cons.conrelid = c.oid
 						LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
 						LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
-						WHERE c.relkind = 'r'
-						AND n.nspname IN ('public')
-						AND (cons.contype = 'f' OR cons.contype IS NULL)
+						WHERE c.relkind = \'r\'
+						AND n.nspname IN (\'public\')
+						AND (cons.contype = \'f\' OR cons.contype IS NULL)
 						AND
-						(  cons.conname = '{$fkCode}a'	OR  cons.conname = '{$fkCode}b' )
+						(  cons.conname = \'' . $fkCode. 'a\'	OR  cons.conname = \'' . $fkCode . 'b\' )
 
-					  ";
+					  ';
 
 			$rows = $adapter->get( $sql );
 			if (!count($rows)) {
@@ -434,12 +428,12 @@ where table_schema = 'public'" );
 				$table2 = $writer->getFormattedTableName($table2);
 
 				if (!$dontCache) $this->fkcache[ $fkCode ] = true;
-				$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
+				$sql1 = 'ALTER TABLE \''. $table . '\' ADD CONSTRAINT
 						  {$fkCode}a FOREIGN KEY ($property1)
-							REFERENCES \"$table1\" (id) ON DELETE CASCADE ";
-				$sql2 = "ALTER TABLE \"$table\" ADD CONSTRAINT
-						  {$fkCode}b FOREIGN KEY ($property2)
-							REFERENCES \"$table2\" (id) ON DELETE CASCADE ";
+							REFERENCES \''. $table1 . '\' (id) ON DELETE CASCADE ';
+				$sql2 = 'ALTER TABLE \'' . $table . '\' ADD CONSTRAINT
+						  '.$fkCode.'b FOREIGN KEY ('.$property2.')
+							REFERENCES \''.$table2.'\' (id) ON DELETE CASCADE ';
 				$adapter->exec($sql1);
 				$adapter->exec($sql2);
 			}

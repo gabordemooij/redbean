@@ -68,9 +68,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * Supported Column Types
 	 */
 	public $typeno_sqltype = array(
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER=>"INTEGER",
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC=>"NUMERIC",
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT=>"TEXT",
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER=>'INTEGER',
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC=>'NUMERIC',
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT=>'TEXT',
 	);
 
 	/**
@@ -80,9 +80,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * constants (magic numbers)
 	 */
 	public $sqltype_typeno = array(
-			  "INTEGER"=>RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER,
-			  "NUMERIC"=>RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC,
-			  "TEXT"=>RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT,
+			  'INTEGER' => RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER,
+			  'NUMERIC' => RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC,
+			  'TEXT' => RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT,
 	);
 
 
@@ -120,8 +120,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		if ($value===null) return self::C_DATATYPE_INTEGER; //for fks
 		if (is_numeric($value) && (intval($value)==$value) && $value<2147483648) return self::C_DATATYPE_INTEGER;
 		if ((is_numeric($value) && $value < 2147483648)
-				  || preg_match("/\d\d\d\d\-\d\d\-\d\d/",$value)
-				  || preg_match("/\d\d\d\d\-\d\d\-\d\d\s\d\d:\d\d:\d\d/",$value)
+				  || preg_match('/\d\d\d\d\-\d\d\-\d\d/',$value)
+				  || preg_match('/\d\d\d\d\-\d\d\-\d\d\s\d\d:\d\d:\d\d/',$value)
 		) {
 			return self::C_DATATYPE_NUMERIC;
 		}
@@ -142,7 +142,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$column = $this->check($column);
 		$table = $this->check($table);
 		$type=$this->typeno_sqltype[$type];
-		$sql = "ALTER TABLE `$table` ADD `$column` $type ";
+		$sql = 'ALTER TABLE `' . $table . '` ADD `' . $column . '` '. $type;
 		$this->adapter->exec( $sql );
 	}
 
@@ -188,25 +188,25 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$newtype = $this->typeno_sqltype[$datatype];
 		$oldColumns = $this->getColumns($type);
 		$oldColumnNames = $this->quote(array_keys($oldColumns));
-		$newTableDefStr="";
+		$newTableDefStr='';
 		foreach($oldColumns as $oldName=>$oldType) {
 			if ($oldName != $idfield) {
 				if ($oldName!=$column) {
-					$newTableDefStr .= ",`$oldName` $oldType";
+					$newTableDefStr .= ',`' . $oldName . '` '. $oldType;
 				}
 				else {
-					$newTableDefStr .= ",`$oldName` $newtype";
+					$newTableDefStr .= ',`'. $oldName . '` '. $newtype;
 				}
 			}
 		}
 		$q = array();
-		$q[] = "DROP TABLE IF EXISTS tmp_backup;";
-		$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(",",$oldColumnNames).");";
-		$q[] = "INSERT INTO tmp_backup SELECT * FROM `$table`;";
-		$q[] = "DROP TABLE `$table`;";
-		$q[] = "CREATE TABLE `$table` ( `$idfield` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr  );";
-		$q[] = "INSERT INTO `$table` SELECT * FROM tmp_backup;";
-		$q[] = "DROP TABLE tmp_backup;";
+		$q[] = 'DROP TABLE IF EXISTS tmp_backup;';
+		$q[] = 'CREATE TEMPORARY TABLE tmp_backup('.implode(',',$oldColumnNames).');';
+		$q[] = 'INSERT INTO tmp_backup SELECT * FROM `' . $table . '`;';
+		$q[] = 'DROP TABLE `' . $table . '`;';
+		$q[] = 'CREATE TABLE `' . $table . '` ( `' . $idfield . '` INTEGER PRIMARY KEY AUTOINCREMENT ' . $newTableDefStr . ');';
+		$q[] = 'INSERT INTO `' . $table . '` SELECT * FROM tmp_backup;';
+		$q[] = 'DROP TABLE tmp_backup;';
 		foreach($q as $sq) {
 			$this->adapter->exec($sq);
 		}
@@ -219,8 +219,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return array $tables tables
 	 */
 	public function getTables() {
-		return $this->adapter->getCol( "SELECT name FROM sqlite_master
-			WHERE type='table' AND name!='sqlite_sequence';" );
+		return $this->adapter->getCol( 'SELECT name FROM sqlite_master
+			WHERE type=\'table\' AND name != \'sqlite_sequence\';' );
 	}
 
 	/**
@@ -231,9 +231,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	public function createTable( $table ) {
 		$idfield = $this->safeColumn($this->getIDfield($table));
 		$table = $this->safeTable($table);
-		$sql = "
-                     CREATE TABLE $table ( $idfield INTEGER PRIMARY KEY AUTOINCREMENT )
-				  ";
+		$sql = 'CREATE TABLE ' . $table . ' ( ' . $idfield . ' INTEGER PRIMARY KEY AUTOINCREMENT )';
 		$this->adapter->exec( $sql );
 	}
 
@@ -246,10 +244,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	public function getColumns( $table ) {
 		$table = $this->safeTable($table, true);
-		$columnsRaw = $this->adapter->get("PRAGMA table_info('$table')");
+		$columnsRaw = $this->adapter->get('PRAGMA table_info(\''. $table . '\')');
 		$columns = array();
 		foreach($columnsRaw as $r) {
-			$columns[$r["name"]]=$r["type"];
+			$columns[$r['name']]=$r['type'];
 		}
 		return $columns;
 	}
@@ -269,8 +267,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	public function addUniqueIndex( $table,$columns ) {
 		$table = $this->safeTable($table);
-		$name = "UQ_".sha1(implode(',',$columns));
-		$sql = "CREATE UNIQUE INDEX IF NOT EXISTS $name ON $table (".implode(",",$columns).")";
+		$name = 'UQ_'.sha1(implode(',',$columns));
+		$sql = 'CREATE UNIQUE INDEX IF NOT EXISTS '.$name.' ON '.$table.' ('.implode(',',$columns).')';
 		$this->adapter->exec($sql);
 	}
 
@@ -286,9 +284,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return boolean $isInArray whether state is in list
 	 */
 	public function sqlStateIn($state, $list) {
-		$sqlState = "0";
-		if ($state == "HY000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
-		if ($state == "23000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
+		$sqlState = '0';
+		if ($state == 'HY000') $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
+		if ($state == '23000') $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
 		return in_array($sqlState, $list);
 	}
 
@@ -296,16 +294,14 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 
 
 	/**
-	 * Counts rows in a table.
 	 * Uses SQLite optimization for deleting all records (i.e. no WHERE)
 	 *
 	 * @param string $beanType
 	 *
-	 * @return integer $numRowsFound
 	 */
 	public function wipe($type) {
 		$table = $this->safeTable($type);
-		$this->adapter->exec("DELETE FROM $table");
+		$this->adapter->exec('DELETE FROM ' . $table);
 	}
 
 	/**
@@ -373,12 +369,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 *
 	 * @return boolean $succes whether the constraint has been applied
 	 */
-	protected  function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
-		try{
+	protected function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
+		try {
 			$writer = $this;
 
 			$adapter = $this->adapter;
-			$fkCode = "fk".md5($table.$property1.$property2);
+			$fkCode = 'fk'.md5($table.$property1.$property2);
 
 			$idfield1 = $writer->getIDField($table1);
 			$idfield2 = $writer->getIDField($table2);
@@ -388,27 +384,21 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 			$table2 = $writer->getFormattedTableName($table2);
 
 
-			$sql1 = "
-				 CREATE TRIGGER IF NOT EXISTS {$fkCode}a
-					BEFORE DELETE ON $table1
+			$sql1 = 'CREATE TRIGGER IF NOT EXISTS '.$fkCode.'a
+					BEFORE DELETE ON '.$table1.'
 					FOR EACH ROW BEGIN
-						DELETE FROM $table WHERE  $table.$property1 = OLD.$idfield1;
-					END;
-					  ";
+						DELETE FROM '.$table.' WHERE  '.$table.'.'.$property1.' = OLD.'.$idfield1.';
+					END;';
 
-			$sql2 = "
-				CREATE TRIGGER IF NOT EXISTS {$fkCode}b
-					BEFORE DELETE ON $table2
+			$sql2 = 'CREATE TRIGGER IF NOT EXISTS '.$fkCode.'b
+					BEFORE DELETE ON '.$table2.'
 					FOR EACH ROW BEGIN
-						DELETE FROM $table WHERE $table.$property2 = OLD.$idfield2;
-					END;
-
-					  ";
+						DELETE FROM '.$table.' WHERE '.$table.'.'.$property2.' = OLD.'.$idfield2.';
+					END;';
 			$adapter->exec($sql1);
 			$adapter->exec($sql2);
 			return true;
-		}
-		catch(Exception $e){
+		} catch(Exception $e){
 			return false;
 		}
 	}

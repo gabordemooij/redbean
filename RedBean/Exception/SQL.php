@@ -47,6 +47,6 @@ class RedBean_Exception_SQL extends Exception {
 	 * @return string $message prints this exception instance as a string
 	 */
 	public function __toString() {
-		return "[".$this->getSQLState()."] - ".$this->getMessage();
+		return '['.$this->getSQLState().'] - '.$this->getMessage();
 	}
 }

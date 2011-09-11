@@ -142,22 +142,21 @@ class RedBean_Plugin_Optimizer_Datetime  implements RedBean_Plugin_IOptimizer {
 		//get all the fields in the table
 		$fields = $this->writer->getColumns($this->table);
 		//If the column for some reason does not occur in fields, return
-		//print_r($fields);
 		if (!in_array($this->column,array_keys($fields))) return false;
 		//get the type we got in the field of the table
 		$typeInField = $this->writer->code($fields[$this->column]);
 
 		//Is column already datetime?
-		if ($typeInField!="datetime") {
+		if ($typeInField!='datetime') {
 			if ($this->matchesDateTime($this->value)) {
 				//Ok, value is datetime, can we convert the column to support this?
-				$cnt = (int) $this->adapter->getCell("select count(*) as n from ".$this->writer->safeTable($this->table)." where
-						  {$this->column} regexp '[0-9]{4}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]'
-						  OR {$this->column} IS NULL");
-				$total = (int) $this->adapter->getCell("SELECT count(*) FROM ".$this->writer->safeTable($this->table));
+				$cnt = (int) $this->adapter->getCell('select count(*) as n from '.$this->writer->safeTable($this->table).' where ' .
+						  $this->column . ' regexp \'[0-9]{4}-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]\'
+						  OR ' . $this->column . ' IS NULL');
+				$total = (int) $this->adapter->getCell('SELECT count(*) FROM '.$this->writer->safeTable($this->table));
 				//Is it safe to convert: ie are all values compatible?
 				if ($total===$cnt) { //yes
-					$this->adapter->exec("ALTER TABLE ".$this->writer->safeTable($this->table)." change ".$this->writer->safeColumn($this->column)." ".$this->writer->safeColumn($this->column)." datetime ");
+					$this->adapter->exec('ALTER TABLE '.$this->writer->safeTable($this->table).' change '.$this->writer->safeColumn($this->column).' '.$this->writer->safeColumn($this->column).' datetime ');
 				}
 				//No further optimization required.
 				return false;
@@ -181,7 +180,7 @@ class RedBean_Plugin_Optimizer_Datetime  implements RedBean_Plugin_IOptimizer {
 	 * @return boolean $yesNo Whether it is a datetime value
 	 */
 	public function matchesDateTime($value) {
-		$pattern = "/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9]) (?:([0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/";
+		$pattern = '/^([0-9]{2,4})-([0-1][0-9])-([0-3][0-9]) (?:([0-2][0-9]):([0-5][0-9]):([0-5][0-9]))?$/';
 		return (boolean) (preg_match($pattern, $value));
 	}
 

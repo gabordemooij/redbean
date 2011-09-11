@@ -99,11 +99,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 *    @return RedBean_OODBBean $this
 	 */
 	public function import( $arr, $selection=false, $notrim=false ) {
-		if (is_string($selection)) $selection = explode(",",$selection);
+		if (is_string($selection)) $selection = explode(',',$selection);
 		//trim whitespaces
 		if (!$notrim && is_array($selection)) foreach($selection as $k=>$s){ $selection[$k]=trim($s); }
 		foreach($arr as $k=>$v) {
-			if ($k != "__info") {
+			if ($k != '__info') {
 				if (!$selection || ($selection && in_array($k,$selection))) {
 					$this->$k = $v;
 				}
@@ -126,7 +126,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 		foreach($arr as $k=>$v) {
 			if (is_array($v) || is_object($v)) unset($arr[$k]);
 		}
-		if ($meta) $arr["__info"] = $this->__info;
+		if ($meta) $arr['__info'] = $this->__info;
 		return $arr;
 	}
 
@@ -150,7 +150,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return string $id record Identifier for bean
 	 */
 	public function getID() {
-		$idfield = $this->getMeta("sys.idfield");
+		$idfield = $this->getMeta('sys.idfield');
 		return (string) $this->$idfield;
 	}
 
@@ -166,7 +166,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 		$this->__get($property);
 
-		$fieldLink = $property."_id";
+		$fieldLink = $property.'_id';
 		if (isset($this->$fieldLink)) {
 			//wanna unset a bean reference?
 			$this->$fieldLink = null;
@@ -209,7 +209,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 		if (!isset($this->properties[$property])) {
 
-			$fieldLink = $property."_id";
+			$fieldLink = $property.'_id';
 
 			/**
 			 * All this magic can be become very complex quicly. For instance,
@@ -218,7 +218,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 			 * instead of giving a clue they simply crash and burn isnt that nice?
 			 */
 			if (isset($this->$fieldLink) && $fieldLink != $this->getMeta('sys.idfield')) {
-				$this->setMeta("tainted",true);
+				$this->setMeta('tainted',true);
 				$type =  $toolbox->getWriter()->getAlias($property);
 				$targetType = $this->properties[$fieldLink];
 				$bean =  $toolbox->getRedBean()->load($type,$targetType);
@@ -229,11 +229,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 				$firstCharCode = ord(substr($property,3,1));
 				if ($firstCharCode>=65 && $firstCharCode<=90) {
 					$type = (strtolower(str_replace('own','',$property)));
-					$myFieldLink = $this->getMeta('type')."_id";
-					$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ",array($this->getID())));
+					$myFieldLink = $this->getMeta('type').'_id';
+					$beans = $toolbox->getRedBean()->find($type,array(),array(' $myFieldLink = ? ',array($this->getID())));
 					$this->properties[$property] = $beans;
-					$this->setMeta("sys.shadow.".$property,$beans);
-					$this->setMeta("tainted",true);
+					$this->setMeta('sys.shadow.'.$property,$beans);
+					$this->setMeta('tainted',true);
 					return $this->properties[$property];
 				}
 			}
@@ -246,8 +246,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 					if (!count($keys)) $beans = array(); else
 					$beans = $toolbox->getRedBean()->batch($type,$keys);
 					$this->properties[$property] = $beans;
-					$this->setMeta("sys.shadow.".$property,$beans);
-					$this->setMeta("tainted",true);
+					$this->setMeta('sys.shadow.'.$property,$beans);
+					$this->setMeta('tainted',true);
 					return $this->properties[$property];
 				}
 			}
@@ -263,7 +263,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	/**
 	 * Magic Setter. Sets the value for a specific property.
 	 * This setter acts as a hook for OODB to mark beans as tainted.
-	 * The tainted meta property can be retrieved using getMeta("tainted").
+	 * The tainted meta property can be retrieved using getMeta('tainted').
 	 * The tainted meta property indicates whether a bean has been modified and
 	 * can be used in various caching mechanisms.
 	 * @param string $property
@@ -273,13 +273,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	public function __set( $property, $value ) {
 
 		$this->__get($property);
-		$this->setMeta("tainted",true);
+		$this->setMeta('tainted',true);
 
 		if ($value===false) {
-			$value = "0";
+			$value = '0';
 		}
 		if ($value===true) {
-			$value = "1";
+			$value = '1';
 		}
 		$this->properties[$property] = $value;
 	}
@@ -289,8 +289,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * contains extra information about the bean object that will not
 	 * get stored in the database. Meta information is used to instruct
 	 * RedBean as well as other systems how to deal with the bean.
-	 * For instance: $bean->setMeta("buildcommand.unique.0", array(
-	 * "column1", "column2", "column3") );
+	 * For instance: $bean->setMeta('buildcommand.unique.0', array(
+	 * 'column1', 'column2', 'column3') );
 	 * Will add a UNIQUE constaint for the bean on columns: column1, column2 and
 	 * column 3.
 	 * To access a Meta property we use a dot separated notation.
@@ -306,8 +306,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	/**
 	 * Stores a value in the specified Meta information property. $value contains
 	 * the value you want to store in the Meta section of the bean and $path
-	 * specifies the dot separated path to the property. For instance "my.meta.property".
-	 * If "my" and "meta" do not exist they will be created automatically.
+	 * specifies the dot separated path to the property. For instance 'my.meta.property'.
+	 * If 'my' and 'meta' do not exist they will be created automatically.
 	 * @param string $path
 	 * @param mixed $value
 	 */
@@ -335,7 +335,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 */
 	public function __sleep() {
 		//return the public stuff
-		$this->setMeta("sys.oodb",null);
+		$this->setMeta('sys.oodb',null);
 		return array('properties','__info');
 	}
 
@@ -346,16 +346,16 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return mixed $mixed
 	 */
 	public function __call($method, $args) {
-		if (!isset($this->__info["model"])) {
+		if (!isset($this->__info['model'])) {
 			//@todo eliminate this dependency!
-			$modelName = RedBean_ModelHelper::getModelName( $this->getMeta("type") );
+			$modelName = RedBean_ModelHelper::getModelName( $this->getMeta('type') );
 			if (!class_exists($modelName)) return null;
 			$obj = new $modelName();
 			$obj->loadBean($this);
-			$this->__info["model"] = $obj;
+			$this->__info['model'] = $obj;
 		}
-		if (!method_exists($this->__info["model"],$method)) return null;
-		return call_user_func_array(array($this->__info["model"],$method), $args);
+		if (!method_exists($this->__info['model'],$method)) return null;
+		return call_user_func_array(array($this->__info['model'],$method), $args);
 	}
 
 	/**

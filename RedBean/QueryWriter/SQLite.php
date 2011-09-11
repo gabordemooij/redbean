@@ -29,8 +29,8 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return array $tables tables
 	 */
 	public function getTables() {
-		return $this->adapter->getCol( "SELECT name FROM sqlite_master
-			WHERE type='table' AND name!='sqlite_sequence';" );
+		return $this->adapter->getCol( 'SELECT name FROM sqlite_master
+			WHERE type=\'table\' AND name != \'sqlite_sequence\';' );
 	}
 
 	/**
@@ -41,9 +41,7 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 	public function createTable( $table ) {
 		$idfield = $this->safeColumn($this->getIDfield($table));
 		$table = $this->safeTable($table);
-		$sql = "
-                     CREATE TABLE $table ( $idfield INTEGER PRIMARY KEY AUTOINCREMENT )
-				  ";
+		$sql = 'CREATE TABLE '.$table.' ( '.$idfield.' INTEGER PRIMARY KEY AUTOINCREMENT )';
 		$this->adapter->exec( $sql );
 	}
 
@@ -56,10 +54,10 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function getColumns( $table ) {
 		$table = $this->safeTable($table, true);
-		$columnsRaw = $this->adapter->get("PRAGMA table_info('$table')");
+		$columnsRaw = $this->adapter->get('PRAGMA table_info(\''.$table.'\')');
 		$columns = array();
 		foreach($columnsRaw as $r) {
-			$columns[$r["name"]]=$r["type"];
+			$columns[$r['name']]=$r['type'];
 		}
 		return $columns;
 	}
@@ -114,8 +112,8 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function addUniqueIndex( $table,$columns ) {
 		$table = $this->safeTable($table);
-		$name = "UQ_".sha1(implode(',',$columns));
-		$sql = "CREATE UNIQUE INDEX IF NOT EXISTS $name ON $table (".implode(",",$columns).")";
+		$name = 'UQ_'.sha1(implode(',',$columns));
+		$sql = 'CREATE UNIQUE INDEX IF NOT EXISTS ' . $name . ' ON ' . $table . ' ('.implode(',',$columns).')';
 		$this->adapter->exec($sql);
 	}
 
@@ -131,9 +129,9 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return boolean $isInArray whether state is in list
 	 */
 	public function sqlStateIn($state, $list) {
-		$sqlState = "0";
-		if ($state == "HY000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
-		if ($state == "23000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
+		$sqlState = '0';
+		if ($state == 'HY000') $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
+		if ($state == '23000') $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
 		return in_array($sqlState, $list);
 	}
 
@@ -150,7 +148,7 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function wipe($type) {
 		$table = $this->safeTable($type);
-		$this->adapter->exec("DELETE FROM $table");
+		$this->adapter->exec('DELETE FROM ' . $table);
 	}
 
 

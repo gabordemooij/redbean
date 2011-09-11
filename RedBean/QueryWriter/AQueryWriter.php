@@ -54,7 +54,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * Indicates the field name to be used for primary keys;
 	 * default is 'id'.
 	 */
-	protected $idfield = "id";
+	protected $idfield = 'id';
 
 	/**
 	 * @var string
@@ -113,7 +113,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return string sql
 	 */
   	protected function getInsertSuffix ($table) {
-    	return "";
+    	return '';
   	}
 
 	/**
@@ -161,8 +161,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return string sql type
 	 */
-	public function getFieldType( $type = "" ) {
-		return array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : "";
+	public function getFieldType( $type = '' ) {
+		return array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 	}
 
 	/**
@@ -175,7 +175,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function getIDField( $type ) {
 		$nArgs = func_num_args();
-		if ($nArgs>1) throw new Exception("Deprecated parameter SAFE, use safeColumn() instead.");
+		if ($nArgs>1) throw new Exception('Deprecated parameter SAFE, use safeColumn() instead.');
 		return $this->tableFormatter->formatBeanID($type);
 	}
 	
@@ -188,7 +188,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected function check($table) {
 		if ($this->quoteCharacter && strpos($table, $this->quoteCharacter)!==false) {
-		  throw new Redbean_Exception_Security("Illegal chars in table name");
+		  throw new Redbean_Exception_Security('Illegal chars in table name');
 	    }
 		return $this->adapter->escape($table);
 	}
@@ -222,7 +222,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
 		$type = $this->getFieldType($type);
-		$sql = "ALTER TABLE $table ADD $column $type ";
+		$sql = 'ALTER TABLE ' . $table . ' ADD ' . $column . ' ' .$type;
 		$this->adapter->exec( $sql );
 	}
 	
@@ -245,21 +245,21 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (!$id) {
 			$insertcolumns =  $insertvalues = array();
 			foreach($updatevalues as $pair) {
-				$insertcolumns[] = $pair["property"];
-				$insertvalues[] = $pair["value"];
+				$insertcolumns[] = $pair['property'];
+				$insertvalues[] = $pair['value'];
 			}
 			return $this->insertRecord($table,$insertcolumns,array($insertvalues));
 		}
 		if ($id && !count($updatevalues)) return $id;
 		$idfield = $this->safeColumn($this->getIDField($table));
 		$table = $this->safeTable($table);
-		$sql = "UPDATE $table SET ";
+		$sql = 'UPDATE ' . $table . ' SET ';
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
-			$p[] = " {$this->safeColumn($uv["property"])} = ? ";
-			$v[]=$uv["value"];
+			$p[] = $this->safeColumn($uv['property']) . '= ?';
+			$v[]=$uv['value'];
 		}
-		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
+		$sql .= implode(',', $p ) .' WHERE ' . $idfield . ' = '.intval($id);
 		$this->adapter->exec( $sql, $v );
 		return $id;
 	}
@@ -279,24 +279,24 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$idfield = $this->safeColumn($this->getIDField($table));
 		$suffix = $this->getInsertSuffix($table);
 		$table = $this->safeTable($table);
-		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
-			foreach($insertcolumns as $k=>$v) {
+		if (count($insertvalues) > 0 && is_array($insertvalues[0]) && count($insertvalues[0]) > 0) {
+			foreach($insertcolumns as $k => $v) {
 				$insertcolumns[$k] = $this->safeColumn($v);
 			}
-			$insertSQL = "INSERT INTO $table ( $idfield, ".implode(",",$insertcolumns)." ) VALUES ";
-			$insertSQL .= "( $default, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) $suffix";
+			$insertSQL = 'INSERT INTO ' . $table . ' ( ' . $idfield . ', '.implode(',',$insertcolumns).' ) VALUES ';
+			$insertSQL .= '( '. $default . ', '. implode(',',array_fill(0,count($insertcolumns),' ? ')).' ) '. $suffix;
 			
 			foreach($insertvalues as $i=>$insertvalue) {
 				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue, $i );
 			}
-			$result = count($ids)===1 ? array_pop($ids) : $ids;
+			$result = count($ids) === 1 ? array_pop($ids) : $ids;
 		}
 		else {
-			$result = $this->adapter->getCell( "INSERT INTO $table ($idfield) VALUES($default) $suffix");
+			$result = $this->adapter->getCell('INSERT INTO ' . $table . ' (' . $idfield . ') VALUES ('. $default . ') ' . $suffix);
 		}
 		if ($suffix) return $result;
 	   $last_id = $this->adapter->getInsertID();
-		return ($this->adapter->getErrorMsg()=="" ?  $last_id : 0);
+		return ($this->adapter->getErrorMsg()=='' ?  $last_id : 0);
 	}
 	
 	
@@ -320,15 +320,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return array $records selected records
 	 */
 	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false ) {
-		if (!is_array($conditions)) throw new Exception("Conditions must be an array");
-		
+		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
 		$table = $this->safeTable($type);
 		$sqlConditions = array();
-		$bindings=array();
+		$bindings = array();
 		foreach($conditions as $column=>$values) {
 			$sql = $this->safeColumn($column);
-			$sql .= " ".($inverse ? " NOT ":"")." IN ( ";
-			$sql .= implode(",",array_fill(0,count($values),"?")).") ";
+			$sql .= ' ' . ($inverse ? ' NOT ' : '') . ' IN ( ';
+			$sql .= implode(',',array_fill(0,count($values),'?')).') ';
 			$sqlConditions[] = $sql;
 			if (!is_array($values)) $values = array($values);
 			foreach($values as $k=>$v) {
@@ -340,24 +339,23 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (is_array($addSql)) {
 			if (count($addSql)>1) {
 				$bindings = array_merge($bindings,$addSql[1]);
-			}
-			else {
+			} else {
 				$bindings = array();
 			}
 			$addSql = $addSql[0];
-
 		}
-		$sql="";
-		if (count($sqlConditions)>0) {
-			$sql = implode(" AND ",$sqlConditions);
-			$sql = " WHERE ( $sql ) ";
-			if ($addSql) $sql .= " AND $addSql ";
+		$sql='';
+		if (count($sqlConditions) > 0) {
+			$sql = implode(' AND ', $sqlConditions);
+			$sql = ' WHERE (' . $sql . ') ';
+			if ($addSql) $sql .= ' AND ' . $addSql;
 		}
 		elseif ($addSql) {
-			$sql = " WHERE ".$addSql;
+			$sql = ' WHERE '.$addSql;
 		}
-		$sql = (($delete) ? "DELETE FROM " : "SELECT * FROM ").$table.$sql;
-		$rows = $this->adapter->get($sql,$bindings);
+		$sql = (($delete) ? 'DELETE FROM ' : 'SELECT * FROM ') . $table . $sql;
+		
+		$rows = $this->adapter->get($sql, $bindings);
 		return $rows;
 	}
 
@@ -377,12 +375,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return boolean $success whether a view has been generated
 	 */
 	public function createView($referenceType, $constraints, $viewID) {
-
 		$referenceTable = $referenceType;
 		$viewID = $this->safeTable($viewID,true);
 		$safeReferenceTable = $this->safeTable($referenceTable);
 
-		try{ $this->adapter->exec("DROP VIEW $viewID"); }catch(Exception $e){}
+		try { 
+		  $this->adapter->exec('DROP VIEW ' . $viewID);
+		} catch (Exception $e) { }
 
 		$columns = array_keys( $this->getColumns( $referenceTable ) );
 
@@ -392,23 +391,22 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$safeTable = $this->safeTable($table);
 			$addedColumns = array_keys($this->getColumns($table));
 			foreach($addedColumns as $addedColumn) {
-				$newColName = $addedColumn."_of_".$table;
-				$newcolumns[] = $this->safeTable($table).".".$this->safeColumn($addedColumn) . " AS ".$this->safeColumn($newColName);
+				$newColName = $addedColumn.'_of_'.$table;
+				$newcolumns[] = $this->safeTable($table).'.'.$this->safeColumn($addedColumn) . ' AS '.$this->safeColumn($newColName);
 			}
-			if (count($constraint)!==2) throw Exception("Invalid VIEW CONSTRAINT");
+			if (count($constraint) !== 2) throw Exception('Invalid VIEW CONSTRAINT');
 			$referenceColumn = $constraint[0];
 			$compareColumn = $constraint[1];
-			$join = $referenceColumn." = ".$compareColumn;
-			$joins[] = " LEFT JOIN $safeTable ON $join ";
+			$join = $referenceColumn . ' = ' . $compareColumn;
+			$joins[] = ' LEFT JOIN ' . $safeTable . ' ON ' . $join;
 		}
 
-		$joins = implode(" ", $joins);
+		$joins = implode(' ', $joins);
 		foreach($columns as $k=>$column) {
-			$columns[$k]=$safeReferenceTable.".".$this->safeColumn($column);
+			$columns[$k]=$safeReferenceTable.'.'.$this->safeColumn($column);
 		}
 		$columns = implode("\n,",array_merge($newcolumns,$columns));
-		$sql = "CREATE VIEW $viewID AS SELECT $columns FROM $safeReferenceTable $joins ";
-
+		$sql = 'CREATE VIEW '. $viewID . ' AS SELECT ' . $columns . ' FROM ' . $safeReferenceTable . ' ' . $joins;
 		$this->adapter->exec($sql);
 		return true;
 	}
@@ -424,7 +422,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function wipe($type) {
 		$table = $type;
 		$table = $this->safeTable($table);
-		$sql = "TRUNCATE $table ";
+		$sql = 'TRUNCATE ' . $table;
 		$this->adapter->exec($sql);
 	}
 
@@ -437,7 +435,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function count($beanType) {
 		$table = $this->safeTable($beanType);
-		$sql = "SELECT count(*) FROM $table ";
+		$sql = 'SELECT count(*) FROM ' . $table;
 		return (int) $this->adapter->getCell($sql);
 	}
 
@@ -455,9 +453,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function addIndex($type, $name, $column) {
 		$table = $type;
 		$table = $this->safeTable($table);
-		$name = preg_replace("/\W/","",$name);
+		$name = preg_replace('/\W/','',$name);
 		$column = $this->safeColumn($column);
-		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
+		try{ $this->adapter->exec('CREATE INDEX ' . $name . ' ON ' . $table . ' (' . $column . ') '); }catch(Exception $e){}
 	}
 
 	/**
@@ -502,23 +500,17 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$targetTable = $this->safeTable($targetType);
 		$column = $this->safeColumn($field);
 		$targetColumn  = $this->safeColumn($targetField);
-		$db = $this->adapter->getCell("select database()");
-		$fks =  $this->adapter->getCell("
-			SELECT count(*)
+		$db = $this->adapter->getCell('SELECT DATABASE()');
+		$fks =  $this->adapter->getCell('SELECT COUNT(*)
 			FROM information_schema.KEY_COLUMN_USAGE
-			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME = '$tableNoQ'  AND
-			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
-		");
+			WHERE TABLE_SCHEMA ='.$db.' AND TABLE_NAME = '.$tableNoQ.'  AND
+			CONSTRAINT_NAME <> \'PRIMARY\' AND REFERENCED_TABLE_NAME IS NOT NULL');
 
 		if ($fks==0) {
-			try{
-				$this->adapter->exec("ALTER TABLE  $table
-				ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
-				$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
-			}
-			catch(Exception $e) {
-				
-			}
+			try {
+				$this->adapter->exec('ALTER TABLE '. $table . 'ADD FOREIGN KEY ( ' . $column . ' ) REFERENCES  ' . 
+				$targetTable . ' (' . $targetColumn . ') ON DELETE NO ACTION ON UPDATE NO ACTION;');
+			} catch(Exception $e) { }
 		}
 
 	}
@@ -535,7 +527,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function getAssocTableFormat($types) {
 		sort($types);
-		return ( implode("_", $types) );
+		return ( implode('_', $types) );
 	}
 
 
@@ -551,17 +543,17 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $dontCache = false ) {
 
-		$table1 = $bean1->getMeta("type");
-		$table2 = $bean2->getMeta("type");
+		$table1 = $bean1->getMeta('type');
+		$table2 = $bean2->getMeta('type');
 		$writer = $this;
 		$adapter = $this->adapter;
 		$table = $this->getAssocTableFormat( array( $table1,$table2) );
-		$idfield1 = $writer->getIDField($bean1->getMeta("type"));
-		$idfield2 = $writer->getIDField($bean2->getMeta("type"));
+		$idfield1 = $writer->getIDField($bean1->getMeta('type'));
+		$idfield2 = $writer->getIDField($bean2->getMeta('type'));
 
-		$property1 = $bean1->getMeta("type") . "_id";
-		$property2 = $bean2->getMeta("type") . "_id";
-		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
+		$property1 = $bean1->getMeta('type') . '_id';
+		$property2 = $bean2->getMeta('type') . '_id';
+		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
 
 		$table = $adapter->escape($table);
 		$table1 = $adapter->escape($table1);
@@ -570,7 +562,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$property2 = $adapter->escape($property2);
 
 		//In Cache? Then we dont need to bother
-		$fkCode = "fk".md5($table.$property1.$property2);
+		$fkCode = 'fk'.md5($table.$property1.$property2);
 		if (isset($this->fkcache[$fkCode])) return false;
 		//Dispatch to right method
 

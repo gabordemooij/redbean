@@ -78,16 +78,16 @@ class RedBean_Plugin_Optimizer implements RedBean_Observer {
 	 */
 	public function onEvent( $event , $bean ) {
 		try {
-			if ($event=="update") {
+			if ($event=='update') {
 				//export the bean as an array
-				$arr = $bean->export(); //print_r($arr);
+				$arr = $bean->export();
 				//remove the id property
-				unset($arr["id"]); 
+				unset($arr['id']); 
 				//If we are left with an empty array we might as well return
 				if (count($arr)==0) return;
 				//fetch table name for this bean
 				//get the column names for this table
-				$table = $bean->getMeta("type");
+				$table = $bean->getMeta('type');
 				$columns = array_keys($arr);
 				//Select a random column for optimization.
 				$column = $columns[ array_rand($columns) ];

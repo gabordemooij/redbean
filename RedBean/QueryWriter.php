@@ -265,7 +265,7 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return void
 	 */
-	public function getFieldType($type = "");
+	public function getFieldType($type = '');
 
 	/**
 	 * This method should filter a column name so that it can

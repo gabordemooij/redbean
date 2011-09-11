@@ -25,7 +25,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 *
 	 * Contains SQL snippet
 	 */
-	private $sql = "";
+	private $sql = '';
 
 
 	/**
@@ -68,7 +68,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * marks in the query. Each value in the array corresponds to the
 	 * question mark in the query that matches the position of the value in the
 	 * array. You can also bind values using explicit keys, for instance
-	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * array(':key'=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
 	 * @param  string  $sql			SQL Code to execute
@@ -80,7 +80,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function exec( $sql , $aValues=array(), $noevent=false) {
 		if (!$noevent) {
 			$this->sql = $sql;
-			$this->signal("sql_exec", $this);
+			$this->signal('sql_exec', $this);
 		}
 		return $this->db->Execute( $sql, $aValues );
 	}
@@ -92,7 +92,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * marks in the query. Each value in the array corresponds to the
 	 * question mark in the query that matches the position of the value in the
 	 * array. You can also bind values using explicit keys, for instance
-	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * array(':key'=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
 	 * @param  string $sql		SQL code to execute
@@ -102,7 +102,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function get( $sql, $aValues = array() ) {
 		$this->sql = $sql;
-		$this->signal("sql_exec", $this);
+		$this->signal('sql_exec', $this);
 		return $this->db->GetAll( $sql,$aValues );
 	}
 
@@ -113,7 +113,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * marks in the query. Each value in the array corresponds to the
 	 * question mark in the query that matches the position of the value in the
 	 * array. You can also bind values using explicit keys, for instance
-	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * array(':key'=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
 	 * @param  string $sql		SQL code to execute
@@ -123,7 +123,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function getRow( $sql, $aValues = array() ) {
 		$this->sql = $sql;
-		$this->signal("sql_exec", $this);
+		$this->signal('sql_exec', $this);
 		return $this->db->GetRow( $sql,$aValues );
 	}
 
@@ -135,7 +135,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * marks in the query. Each value in the array corresponds to the
 	 * question mark in the query that matches the position of the value in the
 	 * array. You can also bind values using explicit keys, for instance
-	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * array(':key'=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
 	 * @param  string $sql		SQL code to execute
@@ -145,7 +145,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function getCol( $sql, $aValues = array() ) {
 		$this->sql = $sql;
-		$this->signal("sql_exec", $this);
+		$this->signal('sql_exec', $this);
 		return $this->db->GetCol( $sql,$aValues );
 	}
 
@@ -161,7 +161,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * marks in the query. Each value in the array corresponds to the
 	 * question mark in the query that matches the position of the value in the
 	 * array. You can also bind values using explicit keys, for instance
-	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * array(':key'=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
 	 * @param  string $sql		SQL code to execute
@@ -171,7 +171,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function getAssoc( $sql, $aValues = array() ) {
 		$this->sql = $sql;
-		$this->signal("sql_exec", $this);
+		$this->signal('sql_exec', $this);
 		$rows = $this->db->GetAll( $sql, $aValues );
 		$assoc = array();
 		if ($rows) {
@@ -201,7 +201,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * marks in the query. Each value in the array corresponds to the
 	 * question mark in the query that matches the position of the value in the
 	 * array. You can also bind values using explicit keys, for instance
-	 * array(":key"=>123) will bind the integer 123 to the key :key in the
+	 * array(':key'=>123) will bind the integer 123 to the key :key in the
 	 * SQL.
 	 *
 	 * @param  string $sql	  sql code to execute
@@ -212,7 +212,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	public function getCell( $sql, $aValues = array(), $noSignal = null ) {
 		$this->sql = $sql;
-		if (!$noSignal) $this->signal("sql_exec", $this);
+		if (!$noSignal) $this->signal('sql_exec', $this);
 		$arr = $this->db->getCol( $sql, $aValues );
 		if ($arr && is_array($arr))	return ($arr[0]); else return false;
 	}
