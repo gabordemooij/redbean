@@ -296,7 +296,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				}
 			}
 		}
-		$sql = 'ALTER IGNORE TABLE ' . $table . ' ADD UNIQUE INDEX $name ('.implode(',',$columns).')';
+		$sql = 'ALTER IGNORE TABLE ' . $table . ' ADD UNIQUE INDEX ' . $name . ' ('.implode(',',$columns).')';
 		$this->adapter->exec($sql);
 	}
 

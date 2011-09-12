@@ -1739,7 +1739,7 @@ asrt(in_array('user',$t),false);
 $page2 = R::dispense('page');
 $page2->title = 'mypagex';
 R::store($page2);
-R::associate($page,$page2,'{\'bla\':2}');
+R::associate($page,$page2,'{"bla":2}');
 $pgs = R::related($page,'page');
 $p = reset($pgs);
 asrt($p->title,'mypagex');

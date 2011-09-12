@@ -354,8 +354,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		try {
 			if (strpos('pgsql',$this->dsn)===0) {
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
-			}
-			else {
+			} else {
 				$s = $this->pdo->prepare($sql);
 			}
 			$this->bindParams( $s, $aValues );
