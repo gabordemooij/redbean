@@ -1171,5 +1171,3 @@ printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 	echo "\n\n\n".$e->getMessage();
 	echo "<pre>".$e->getTraceAsString();
 }
-'<pre>'.$e->getTraceAsString();
-}
