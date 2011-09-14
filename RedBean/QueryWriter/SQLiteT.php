@@ -334,8 +334,26 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 						$newTableDefStr .= ",`$oldName` $oldType";
 					}
 				}
-
-				$fkDef = ', FOREIGN KEY('.$field.') REFERENCES '.$targetTable.'('.$targetField.') ';
+				
+				//retrieve old foreign keys
+				$sqlGetOldFKS = "PRAGMA foreign_key_list('$table'); ";
+				$oldFKs = $this->adapter->get($sqlGetOldFKS);
+				
+				$restoreFKSQLSnippets = "";
+				foreach($oldFKs as $oldFKInfo) {
+					if ($oldFKInfo['from']==$field) { 
+						//this field already has a FK.
+						return false;
+					}
+					$oldTable = $table; 
+					$oldField = $oldFKInfo['from'];
+					$oldTargetTable = $oldFKInfo['table'];
+					$oldTargetField = $oldFKInfo['to'];
+					$restoreFKSQLSnippets .= ", FOREIGN KEY($oldField) REFERENCES $oldTargetTable($oldTargetField) ";
+				}
+				
+				$fkDef = $restoreFKSQLSnippets; 
+				$fkDef .= ', FOREIGN KEY('.$field.') REFERENCES '.$targetTable.'('.$targetField.') ';
 
 				$q = array();
 				$q[] = "DROP TABLE IF EXISTS tmp_backup;";

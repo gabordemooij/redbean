@@ -501,15 +501,15 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$tableNoQ = $this->safeTable($type,true);
 		$targetTable = $this->safeTable($targetType);
 		$column = $this->safeColumn($field);
+		$columnNoQ = $this->safeColumn($field,true);
 		$targetColumn  = $this->safeColumn($targetField);
 		$db = $this->adapter->getCell("select database()");
 		$fks =  $this->adapter->getCell("
 			SELECT count(*)
 			FROM information_schema.KEY_COLUMN_USAGE
-			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME = '$tableNoQ'  AND
+			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME = '$tableNoQ'  AND COLUMN_NAME = '$columnNoQ' AND
 			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
 		");
-
 		if ($fks==0) {
 			try{
 				$this->adapter->exec("ALTER TABLE  $table
@@ -517,7 +517,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
 			}
 			catch(Exception $e) {
-				
 			}
 		}
 
