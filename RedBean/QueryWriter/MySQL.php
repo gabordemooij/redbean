@@ -188,9 +188,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function createTable( $table ) {
 		$idfield = $this->safeColumn($this->getIDfield($table));
 		$table = $this->safeTable($table);
-		$sql = 'CREATE TABLE ' . $table . ' ( ' . $idfield . ' INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-      PRIMARY KEY ( ' . $idfield . ' )
-      ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci';
+		$sql = "CREATE TABLE $table ($idfield INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ($idfield)) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 		$this->adapter->exec( $sql );
 	}
 
@@ -268,7 +266,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
 		$newtype = $this->getFieldType($type);
-		$changecolumnSQL = 'ALTER TABLE ' . $table . ' CHANGE ' . $column . ' ' . $column . ' ' . $newtype;
+		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype";
 		$this->adapter->exec( $changecolumnSQL );
 	}
 
@@ -296,7 +294,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				}
 			}
 		}
-		$sql = 'ALTER IGNORE TABLE ' . $table . ' ADD UNIQUE INDEX ' . $name . ' ('.implode(',',$columns).')';
+		$sql = "ALTER IGNORE TABLE $table ADD UNIQUE INDEX $name (" . implode(',', $columns) . ")";
 		$this->adapter->exec($sql);
 	}
 

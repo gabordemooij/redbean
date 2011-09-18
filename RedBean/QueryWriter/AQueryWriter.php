@@ -292,7 +292,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$result = count($ids) === 1 ? array_pop($ids) : $ids;
 		}
 		else {
-			$result = $this->adapter->getCell('INSERT INTO ' . $table . ' (' . $idfield . ') VALUES ('. $default . ') ' . $suffix);
+			$result = $this->adapter->getCell("INSERT INTO $table ($idfield) VALUES ($default) $suffix");
 		}
 		if ($suffix) return $result;
 	   $last_id = $this->adapter->getInsertID();
@@ -347,8 +347,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$sql='';
 		if (count($sqlConditions) > 0) {
 			$sql = implode(' AND ', $sqlConditions);
-			$sql = ' WHERE (' . $sql . ') ';
-			if ($addSql) $sql .= ' AND ' . $addSql;
+			$sql = "WHERE ($sql) ";
+			if ($addSql) $sql .= " AND $addSql";
 		}
 		elseif ($addSql) {
 			$sql = ' WHERE '.$addSql;
@@ -406,7 +406,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$columns[$k]=$safeReferenceTable.'.'.$this->safeColumn($column);
 		}
 		$columns = implode("\n,",array_merge($newcolumns,$columns));
-		$sql = 'CREATE VIEW '. $viewID . ' AS SELECT ' . $columns . ' FROM ' . $safeReferenceTable . ' ' . $joins;
+		$sql = "CREATE VIEW $viewID AS SELECT $columns FROM $safeReferenceTable $joins";
 		$this->adapter->exec($sql);
 		return true;
 	}
@@ -455,7 +455,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$table = $this->safeTable($table);
 		$name = preg_replace('/\W/','',$name);
 		$column = $this->safeColumn($column);
-		try{ $this->adapter->exec('CREATE INDEX ' . $name . ' ON ' . $table . ' (' . $column . ') '); }catch(Exception $e){}
+		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column)"); }catch(Exception $e){}
 	}
 
 	/**
@@ -508,9 +508,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 
 		if ($fks==0) {
 			try {
-				$this->adapter->exec('ALTER TABLE '. $table . 'ADD FOREIGN KEY ( ' . $column . ' ) REFERENCES  ' . 
-				$targetTable . ' (' . $targetColumn . ') ON DELETE NO ACTION ON UPDATE NO ACTION;');
-			} catch(Exception $e) { }
+			  $this->adapter->exec("ALTER TABLE $table ADD FOREIGN KEY ($column) REFERENCES $targetTable ($targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
+      } catch(Exception $e) {
+      
+      }
 		}
 
 	}
