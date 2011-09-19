@@ -188,6 +188,12 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function createTable( $table ) {
 		$idfield = $this->safeColumn($this->getIDfield($table));
 		$table = $this->safeTable($table);
+		/**
+		* CREATE TABLE $table (
+		*   $idfield INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
+		*   PRIMARY KEY ($idfield)
+		* ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
+		*/
 		$sql = "CREATE TABLE $table ($idfield INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ($idfield)) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
 		$this->adapter->exec( $sql );
 	}
