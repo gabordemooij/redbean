@@ -376,6 +376,7 @@ class RedBean_OODB extends RedBean_Observable {
 				$this->writer->addUniqueIndex( $table, $unique );
 			}
 		}
+		
 		$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
 		$bean->$idfield = $rs;
 

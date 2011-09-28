@@ -74,8 +74,8 @@ testpack("Test Setup");
 
 //Can we load all modules properly?
 //INCLUDE YOUR REDBEAN FILE HERE!
-require("rb.php");
-//require("RedBean/redbean.inc.php");
+//require("rb.php");
+require("RedBean/redbean.inc.php");
 
 
 //Test whether we can setup a connection
@@ -674,10 +674,12 @@ asrt(in_array("hack",$writer->getTables()),true);
 //exit;
 
 testpack("Test ANSI92 issue in clearrelations");
+
+//$adapter->getDatabase()->setDebugMode(1);
+
+$pdo->Execute("DROP TABLE IF EXISTS author_book");
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");
-$pdo->Execute("DROP TABLE IF EXISTS book_author");
-$pdo->Execute("DROP TABLE IF EXISTS author_book");
 $redbean = $toolbox->getRedBean();
 $a = new RedBean_AssociationManager( $toolbox );
 $book = $redbean->dispense("book");
@@ -689,10 +691,9 @@ $author2->name="Whoever";
 set1toNAssoc($book,$author1);
 set1toNAssoc($book, $author2);
 pass();
+$pdo->Execute("DROP TABLE IF EXISTS author_book");
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");
-$pdo->Execute("DROP TABLE IF EXISTS book_author");
-$pdo->Execute("DROP TABLE IF EXISTS author_book");
 $redbean = $toolbox->getRedBean();
 $a = new RedBean_AssociationManager( $toolbox );
 $book = $redbean->dispense("book");
@@ -781,8 +782,8 @@ asrt($columns["col1"],"TEXT");
 
 
 testpack("Test Association Issue Group keyword (Issues 9 and 10)");
-$pdo->Execute("DROP TABLE IF EXISTS `group`");
 $pdo->Execute("DROP TABLE IF EXISTS `book_group`");
+$pdo->Execute("DROP TABLE IF EXISTS `group`");
 $group = $redbean->dispense("group");
 $group->name ="mygroup";
 $redbean->store( $group );
@@ -802,10 +803,9 @@ try {
 }
 asrt((int)$adapter->getCell("select count(*) from book_group"),1); //just 1 rec!
 
+$pdo->Execute("DROP TABLE IF EXISTS author_book");
 $pdo->Execute("DROP TABLE IF EXISTS book");
 $pdo->Execute("DROP TABLE IF EXISTS author");
-$pdo->Execute("DROP TABLE IF EXISTS book_author");
-$pdo->Execute("DROP TABLE IF EXISTS author_book");
 $redbean = $toolbox->getRedBean();
 $a = new RedBean_AssociationManager( $toolbox );
 $book = $redbean->dispense("book");
@@ -1112,6 +1112,7 @@ asrt($beans["pairs"][0][0]->title,"programming the C64");
 
 testpack("test views");
 
+
 class Fm implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {return "prefix_$table";}
 	public function formatBeanID( $table ) {return $table."__id";}
@@ -1127,16 +1128,16 @@ class Fm2 implements RedBean_IBeanFormatter{
 
 function testViews($p) { 
 
+R::exec(" drop table if exists prefix_bandmember_musician ");
+R::exec(" drop table if exists prefix_band_bandmember ");
+R::exec(" drop table if exists bandmember_musician ");
+R::exec(" drop table if exists band_bandmember ");
 R::exec(" drop table if exists musician ");
 R::exec(" drop table if exists bandmember ");
 R::exec(" drop table if exists band ");
-R::exec(" drop table if exists bandmember_musician ");
-R::exec(" drop table if exists band_bandmember ");
 R::exec(" drop table if exists prefix_musician ");
 R::exec(" drop table if exists prefix_bandmember ");
 R::exec(" drop table if exists prefix_band ");
-R::exec(" drop table if exists prefix_bandmember_musician ");
-R::exec(" drop table if exists prefix_band_bandmember ");
 
 
 

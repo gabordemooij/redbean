@@ -154,7 +154,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $sql=false) {
 	$table = $this->getTable( array($bean->getMeta("type") , $type) );
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
-		if ($type==$bean->getMeta("type")) {// echo "<b>CROSS</b>";
+		if ($type==$bean->getMeta("type")) {
 			$type .= "2";
 			$cross = 1;
 		}

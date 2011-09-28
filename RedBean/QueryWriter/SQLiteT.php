@@ -309,8 +309,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * Not implemented for SQLite, uses triggers.
-	 *
+	 * Adds a foreign key to a type
 	 *
 	 * @param  string $type        type you want to modify table of
 	 * @param  string $targetType  target type
@@ -320,6 +319,23 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return bool $success whether an FK has been added
 	 */
 	public function addFK( $type, $targetType, $field, $targetField) {
+		return $this->buildFK($type, $targetType, $field, $targetField);
+	}
+	
+	/**
+	 * Adds a foreign key to a type
+	 *
+	 * @param  string $type        type you want to modify table of
+	 * @param  string $targetType  target type
+	 * @param  string $field       field of the type that needs to get the fk
+	 * @param  string $targetField field where the fk needs to point to
+	 * @param  integer $buildopt   0 = NO ACTION, 1 = ON DELETE CASCADE
+	 * 
+	 * @return bool $success whether an FK has been added
+	 */
+	
+	protected function buildFK($type, $targetType, $field, $targetField,$constraint=false) {
+	
 			try{
 				$table = $this->safeTable($type,true);
 				$targetTable = $this->safeTable($targetType,true);
@@ -349,11 +365,19 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 					$oldField = $oldFKInfo['from'];
 					$oldTargetTable = $oldFKInfo['table'];
 					$oldTargetField = $oldFKInfo['to'];
-					$restoreFKSQLSnippets .= ", FOREIGN KEY($oldField) REFERENCES $oldTargetTable($oldTargetField) ";
+					$restoreFKSQLSnippets .= ", FOREIGN KEY(`$oldField`) REFERENCES `$oldTargetTable`(`$oldTargetField`) ON DELETE ".$oldFKInfo['on_delete'];
 				}
 				
 				$fkDef = $restoreFKSQLSnippets; 
-				$fkDef .= ', FOREIGN KEY('.$field.') REFERENCES '.$targetTable.'('.$targetField.') ';
+				
+				if ($constraint) { 
+					$fkDef .= ', FOREIGN KEY(`'.$field.'`) REFERENCES `'.$targetTable.'`(`'.$targetField.'`) ON DELETE CASCADE ';
+
+				}
+				else {
+					$fkDef .= ', FOREIGN KEY(`'.$field.'`) REFERENCES `'.$targetTable.'`(`'.$targetField.'`) ';
+	
+				}
 
 				$q = array();
 				$q[] = "DROP TABLE IF EXISTS tmp_backup;";
@@ -392,41 +416,24 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return boolean $succes whether the constraint has been applied
 	 */
 	protected  function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
+		
+		
 		try{
 			$writer = $this;
 
 			$adapter = $this->adapter;
-			$fkCode = "fk".md5($table.$property1.$property2);
+			//$fkCode = "fk".md5($table.$property1.$property2);
 
 			$idfield1 = $writer->getIDField($table1);
 			$idfield2 = $writer->getIDField($table2);
-
-			$table = $writer->getFormattedTableName($table);
-			$table1 = $writer->getFormattedTableName($table1);
-			$table2 = $writer->getFormattedTableName($table2);
-
-
-			$sql1 = "
-				 CREATE TRIGGER IF NOT EXISTS {$fkCode}a
-					BEFORE DELETE ON $table1
-					FOR EACH ROW BEGIN
-						DELETE FROM $table WHERE  $table.$property1 = OLD.$idfield1;
-					END;
-					  ";
-
-			$sql2 = "
-				CREATE TRIGGER IF NOT EXISTS {$fkCode}b
-					BEFORE DELETE ON $table2
-					FOR EACH ROW BEGIN
-						DELETE FROM $table WHERE $table.$property2 = OLD.$idfield2;
-					END;
-
-					  ";
-			$adapter->exec($sql1);
-			$adapter->exec($sql2);
+			
+			$this->buildFK($table,$table1,$property1,$idfield1,true);
+			$this->buildFK($table,$table2,$property2,$idfield2,true);
+			
 			return true;
 		}
 		catch(Exception $e){
+			
 			return false;
 		}
 	}
