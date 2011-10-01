@@ -1865,6 +1865,21 @@ asrt(R::hasTag($blog,array("lousy!","smart"),true),false);
 R::tag($blog, false);
 asrt(count(R::tag($blog)),0);
 
+R::tag($blog,array("funny","comic"));
+asrt(count(R::tag($blog)),2);
+R::addTags($blog,array("halloween"));
+asrt(count(R::tag($blog)),3);
+asrt(R::hasTag($blog,array("funny","commic","halloween"),true),false);
+R::unTag($blog,array("funny"));
+R::$flagUseLegacyTaggingAPI = true;
+R::addTags($blog,"horror");
+R::$flagUseLegacyTaggingAPI = false;
+asrt(count(R::tag($blog)),3);
+asrt(R::hasTag($blog,array("horror","commic","halloween"),true),false);
+//no double tags
+R::addTags($blog,"horror");
+asrt(R::hasTag($blog,array("horror","commic","halloween"),true),false);
+asrt(count(R::tag($blog)),3);
 
 
 
