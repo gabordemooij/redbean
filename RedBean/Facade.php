@@ -833,9 +833,23 @@ class R {
 			return $foundTags;
 		}
 
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
-
 		R::clearRelations( $bean, "tag" );
+		R::addTags( $bean, $tagList );
+	}
+	
+	/**
+	 * Adds tags to a bean.
+	 * If $tagList is a comma separated list (string) of tags all tags will
+	 * be associated with the bean. 
+	 * You may also pass an array instead of a string.
+	 *
+	 * @param RedBean_OODBBean $bean    bean
+	 * @param mixed				$tagList tags
+	 *
+	 * @return void
+	 */
+	public static function addTags( RedBean_OODBBean $bean, $tagList ) {
+		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		if ($tagList===false) return;
 		
 		foreach($tags as $tag) {
@@ -848,7 +862,7 @@ class R {
 			R::associate( $bean, $t ); 
 		}
 	}
-
+	
 	/**
 	 * @static
 	 * Returns all beans that have been tagged with one of the tags given.
