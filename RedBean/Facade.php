@@ -1000,6 +1000,27 @@ class R {
 			return $array;
 		}
 	}
+	
+	/**
+	 * Mass export beans to object instances of a certain class.
+	 * 
+	 * @param array  $beans collection of beans to be exported
+	 * @param string $class name of the class to be used
+	 * 
+	 * @return array $instances collection of instances of $class filled with beans 
+	 */
+	public static function exportAllToObj($beans, $classname='stdClass') {
+		$array = array();
+		foreach($beans as $bean) {
+			if ($bean instanceof RedBean_OODBBean) {
+				$inst = new $classname;	
+				$bean->exportToObj($inst);	
+				$array[] = $inst;
+			}
+		}
+		return $array;
+	}
+	
 
 	/**
 	 * Facade Convience method for adapter transaction system.
