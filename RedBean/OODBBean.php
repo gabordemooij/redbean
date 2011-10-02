@@ -129,6 +129,19 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 		if ($meta) $arr["__info"] = $this->__info;
 		return $arr;
 	}
+	
+	/**
+	 * Exports the bean to an object.
+	 * This function exports the contents of a bean to an object.
+	 * @param object $obj
+	 * @return array $arr
+	 */
+	public function exportToObj($obj) {
+		foreach($this->properties as $k=>$v) {
+			if (!is_array($v) && !is_object($v)) 
+			$obj->$k = $v;
+		}
+	}
 
 	/**
 	 * Implements isset() function for use as an array.

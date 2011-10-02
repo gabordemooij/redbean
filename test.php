@@ -2265,6 +2265,21 @@ asrt($arr[0]["name"],"1");
 asrt($arr[1]["name"],"2");
 
 
+testpack("Test Export to objects");
+list($b1,$b2) = R::dispense('book',2);
+$b1->title = 'Notes from a small island';
+$b2->title = 'Neither here nor there';
+R::store($b1);
+R::store($b2);
+$exportArray = $b1->export();
+asrt(count($exportArray),2);
+$exportObject = new stdClass;
+$b1->exportToObj($exportObject);
+asrt(is_object($exportObject),true);
+asrt($exportObject->title,$b1->title);
+$objs = R::exportAllToObj(array($b1,$b2));
+asrt(count($objs),2);
+foreach($objs as $o) asrt(is_object($o),true);
 
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 
