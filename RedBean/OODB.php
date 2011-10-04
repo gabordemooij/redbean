@@ -535,6 +535,24 @@ class RedBean_OODB extends RedBean_Observable {
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
 		
 		$this->signal( "delete", $bean );
+		
+		foreach($bean as $p=>$v) {
+
+
+
+			if ($v instanceof RedBean_OODBBean) {
+				$bean->removeProperty($p);
+			}
+			if (is_array($v)) {
+				if (strpos($p,'own')===0) {
+					$bean->removeProperty($p);
+				}
+				elseif (strpos($p,'shared')===0) {
+					$bean->removeProperty($p);
+				}
+			}
+		}
+		
 		if (!$this->isFrozen) $this->check( $bean );
 		try {
 			$this->writer->selectRecord($bean->getMeta("type"),
