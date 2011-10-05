@@ -1079,5 +1079,21 @@ class R {
 	public static function now() {
 		return date('Y-m-d H:i:s');
 	}
+	
+	/**
+	 * Generates question mark slots for an array of values.
+	 * 
+	 * @param array $array
+	 * @return string $slots
+	 */
+	public static function genSlots($array) {
+		if (count($array)>0) {  	
+			$filler = array_fill(0,count($array),'?');
+			return implode(',',$filler);	
+		}
+		else {
+			return '';
+		}	
+	}
 
 }
