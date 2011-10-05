@@ -1421,6 +1421,26 @@ if ($db=='pgsql') {
 
 asrt($j,$json);
 
+testpack('Test issue #90 - cannot trash bean with ownproperty if checked in model');
+droptables();
+class Model_Box extends RedBean_SimpleModel {
+        public function delete() {
+                $a = $this->bean->ownBottle;
+        }
+}
+
+$s = R::dispense('box');
+$s->name = 'a';
+$f = R::dispense('bottle');
+$s->ownBottle[] = $f;
+R::store($s);
+$s2 = R::dispense('box');
+$s2->name = 'a';
+R::store($s2);
+R::trash($s2);
+pass();
+
+
 
 
 
