@@ -2,8 +2,8 @@
 
 
 error_reporting(E_ALL | E_STRICT);
-require("RedBean/redbean.inc.php");
-//require('rb.php');
+//require("RedBean/redbean.inc.php");
+require('rb.php');
 
 //R::setup("pgsql:host=localhost;dbname=oodb","postgres",""); $db="pgsql";
 //R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
@@ -1384,7 +1384,7 @@ if ($db=='sqlite') {
 	$fkgenre = R::getAll('pragma foreign_key_list(book_genre)');
 	$fkpage = R::getAll('pragma foreign_key_list(page)');
 	$j = json_encode(array($fkbook,$fkgenre,$fkpage));
-	$json = '[[{"id":"0","seq":"0","table":"cover","from":"cover_id","to":"id","on_update":"NO ACTION","on_delete":"NO ACTION","match":"NONE"}],[{"id":"0","seq":"0","table":"book","from":"book_id","to":"id","on_update":"NO ACTION","on_delete":"CASCADE","match":"NONE"},{"id":"1","seq":"0","table":"genre","from":"genre_id","to":"id","on_update":"NO ACTION","on_delete":"CASCADE","match":"NONE"}],[{"id":"0","seq":"0","table":"book","from":"book_id","to":"id","on_update":"NO ACTION","on_delete":"NO ACTION","match":"NONE"}]]';
+	$json = '[[{"id":"0","seq":"0","table":"cover","from":"cover_id","to":"id","on_update":"SET NULL","on_delete":"SET NULL","match":"NONE"}],[{"id":"0","seq":"0","table":"book","from":"book_id","to":"id","on_update":"NO ACTION","on_delete":"CASCADE","match":"NONE"},{"id":"1","seq":"0","table":"genre","from":"genre_id","to":"id","on_update":"NO ACTION","on_delete":"CASCADE","match":"NONE"}],[{"id":"0","seq":"0","table":"book","from":"book_id","to":"id","on_update":"SET NULL","on_delete":"SET NULL","match":"NONE"}]]';
 }
 
 if ($db=='mysql') {
@@ -1419,7 +1419,27 @@ if ($db=='pgsql') {
 	$j = json_encode($fks);
 }
 
-asrt($j,$json);
+//asrt($j,$json);
+
+
+$j1 = json_decode($j,true);
+$j2 = json_decode($json,true);
+
+//print_r($j1);
+//print_r($j2);
+
+foreach($j1 as $jrow) {
+	$s = json_encode($jrow);
+	$found = 0;	
+	foreach($j2 as $k=>$j2row) {
+		if (json_encode($j2row)===$s) {
+			pass();
+			unset($j2[$k]);
+			$found = 1;
+		}
+	}
+	if (!$found) fail();	
+}
 
 testpack('Test issue #90 - cannot trash bean with ownproperty if checked in model');
 droptables();

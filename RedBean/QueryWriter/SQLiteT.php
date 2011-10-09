@@ -375,7 +375,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 
 				}
 				else {
-					$fkDef .= ', FOREIGN KEY(`'.$field.'`) REFERENCES `'.$targetTable.'`(`'.$targetField.'`) ';
+					$fkDef .= ', FOREIGN KEY(`'.$field.'`) REFERENCES `'.$targetTable.'`(`'.$targetField.'`) ON DELETE SET NULL ON UPDATE SET NULL';
 	
 				}
 

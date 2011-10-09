@@ -373,7 +373,7 @@ where table_schema = 'public'" );
 				try{
 					$this->adapter->exec("ALTER TABLE  $table
 					ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
-					$targetColumn) ON DELETE NO ACTION ON UPDATE NO ACTION ;");
+					$targetColumn) ON DELETE SET NULL ON UPDATE SET NULL ;");
 					return true;
 				}
 				catch(Exception $e) {
