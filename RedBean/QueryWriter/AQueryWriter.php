@@ -604,5 +604,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	abstract protected function constrain($table, $table1, $table2, $p1, $p2, $cache);
 
+	protected function startsWithZeros($value) {
+		$value = strval($value);
+		if (strlen($value)>1 && strpos($value,'0')===0 && strpos($value,'0.')!==0) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
 }

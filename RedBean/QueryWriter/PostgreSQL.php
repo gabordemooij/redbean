@@ -156,7 +156,10 @@ where table_schema = 'public'" );
 	 * @return integer $type type code for this value
 	 */
 	public function scanType( $value ) {
-		// added value===null  
+		
+		// added value===null
+		$sz = ($this->startsWithZeros($value));  
+		if ($sz) return self::C_DATATYPE_TEXT;
 		if ($value===null || ($value instanceof RedBean_Driver_PDO_NULL) ||(is_numeric($value)
 				  && floor($value)==$value
 				  && $value < 2147483648

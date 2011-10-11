@@ -294,6 +294,28 @@ asrt( !$page->rating, true );
 	asrt( $page->name, "new name" );
 	asrt( $page->rating, $longtext );
 
+
+testpack('Leading zeros');
+$numAsString = "0001";
+/*$page->numasstring = $numAsString;
+$redbean->store($page);
+$page = $redbean->load( "page", $id );
+asrt($page->numasstring,"1");
+$numAsString = "0001";*/
+//$page->setMeta("cast.numasstring","string");
+$page->numasstring = $numAsString;
+$redbean->store($page);
+$page = $redbean->load( "page", $id );
+asrt($page->numasstring,"0001");
+$page->numnotstring = "0.123";
+$redbean->store($page);
+$page = $redbean->load( "page", $id );
+asrt($page->numnotstring,"0.123");
+$page->numasstring2 = "00.123";
+$redbean->store($page);
+$page = $redbean->load( "page", $id );
+asrt($page->numasstring2,"00.123");
+
 	$redbean->trash( $page );
 
 

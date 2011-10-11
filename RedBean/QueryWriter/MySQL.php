@@ -226,17 +226,20 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
 		$value = strval($value);
-		if ($value=="1" || $value=="") {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
-		}
-		if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
-		}
-		if (is_numeric($value) && (floor($value)==$value) && $value >= 0  && $value <= 4294967295 ) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
-		}
-		if (is_numeric($value)) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
+		if (!$this->startsWithZeros($value)) { 
+		
+			if ($value=="1" || $value=="") {
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+			}
+			if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
+			}
+			if (is_numeric($value) && (floor($value)==$value) && $value >= 0  && $value <= 4294967295 ) {
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
+			}
+			if (is_numeric($value)) {
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
+			}
 		}
 		if (strlen($value) <= 255) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
