@@ -210,41 +210,6 @@ where table_schema = 'public'" );
 	}
 
 	/**
-	 * Gets information about changed records using a type and id and a logid.
-	 * RedBean Locking shields you from race conditions by comparing the latest
-	 * cached insert id with a the highest insert id associated with a write action
-	 * on the same table. If there is any id between these two the record has
-	 * been changed and RedBean will throw an exception. This function checks for changes.
-	 * If changes have occurred it will throw an exception. If no changes have occurred
-	 * it will insert a new change record and return the new change id.
-	 * This method locks the log table exclusively.
-	 *
-	 * @param  string  $type  type
-	 * @param  integer $id    id
-	 * @param  integer $logid log id
-	 *
-	 * @return integer $newchangeid new change id
-	 */
-	public function checkChanges($type, $id, $logid) {
-
-		$table = $this->safeTable($type);
-		$idfield = $this->getIDfield($type);
-		$id = (int) $id;
-		$logid = (int) $logid;
-		$num = $this->adapter->getCell("
-        SELECT count(*) FROM __log WHERE tbl=$table AND itemid=$id AND action=2 AND $idfield > $logid");
-		if ($num) {
-			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access (type:$type, id:$id)");
-		}
-		$newid = $this->insertRecord("__log",array("action","tbl","itemid"),
-				  array(array(2,  $type, $id)));
-		if ($this->adapter->getCell("select id from __log where tbl=:tbl AND id < $newid and id > $logid and action=2 and itemid=$id ",
-		array(":tbl"=>$type))) {
-			throw new RedBean_Exception_FailedAccessBean("Locked, failed to access II (type:$type, id:$id)");
-		}
-		return $newid;
-	}
-	/**
 	 * Adds a Unique index constrain to the table.
 	 *
 	 * @param string $table table to add index to
