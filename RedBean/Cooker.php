@@ -80,10 +80,10 @@ class RedBean_Cooker {
 					if ($id==0 && count($rawBean)===1) continue;
 					unset($rawBean[$idfield]);
 					//now we have the id, load the bean and store it in the can
-					$bean = R::load($type, $id);
+					$bean = RedBean_Facade::load($type, $id);
 				}
 				else { //no id? then get a new bean...
-					$bean = R::dispense($type);
+					$bean = RedBean_Facade::dispense($type);
 				}
 				//do we need to modify this bean?
 				foreach($rawBean as $field=>$value){
@@ -102,7 +102,7 @@ class RedBean_Cooker {
 					//first check if we can find the key in the can, --only key 1 is able to load
 					if (isset($can[$keys[0]])) $bean1 = $can[$keys[0]]; else {
 						$loader = explode(":",$keys[0]);
-						$bean1 = R::load( $loader[0], $loader[1] );
+						$bean1 = RedBean_Facade::load( $loader[0], $loader[1] );
 					} 
 					$bean2 = $can[$keys[1]];
 					$pairs[] = array( $bean1, $bean2 );

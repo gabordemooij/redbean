@@ -5,7 +5,7 @@ error_reporting(E_ALL | E_STRICT);
 //require("RedBean/redbean.inc.php");
 require('rb.php');
 
-//R::setup("pgsql:host=localhost;dbname=oodb","postgres",""); $db="pgsql";
+//R::setup("pgsql:host=localhost;dbname=oodb","gabor","xippydoo"); $db="pgsql";
 //R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
 R::setup(); $db="sqlite"; R::exec(' PRAGMA foreign_keys = ON ');
 
@@ -53,8 +53,16 @@ function fail() {
 	exit;
 }
 
+$nukepass=0;
 function droptables() {
-global $db;	
+global $nukepass;
+R::nuke();
+if (!count($t=R::$writer->getTables())) $nukepass++; else {
+echo "\nFailed to clean up database: ".print_r($t,1);
+fail();
+}
+return;
+	
 if ($db=='mysql') R::exec('SET FOREIGN_KEY_CHECKS=0;');
 if ($db=='sqlite') R::exec('PRAGMA foreign_keys = 0 ');
 R::exec('drop view if exists people');
@@ -1459,6 +1467,21 @@ $s2->name = 'a';
 R::store($s2);
 R::trash($s2);
 pass();
+
+testpack('Test Nuke()');
+for($i=0; $i<$nukepass; $i++) pass();
+R::nuke();
+$bean = R::dispense('bean');
+R::store($bean);
+asrt(count(R::$writer->getTables()),1);
+R::nuke();
+asrt(count(R::$writer->getTables()),0);
+$bean = R::dispense('bean');
+R::store($bean);
+asrt(count(R::$writer->getTables()),1);
+R::freeze();
+R::nuke();
+asrt(count(R::$writer->getTables()),1); //no effect
 
 
 

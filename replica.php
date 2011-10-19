@@ -24,6 +24,11 @@ foreach($items as $item) {
     $code.=clean($raw);
     
 }
+$code .= "
+
+class R extends RedBean_Facade{
+}
+";
 //echo $code;
 file_put_contents("rb.php", $code);
 

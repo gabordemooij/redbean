@@ -384,5 +384,23 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		}
 	}
 
+	/**
+	 * Drops all tables in database
+	 */	
+	public function wipeAll() {
+		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=0;');
+		foreach($this->getTables() as $t) {
+	 		try{
+	 			$this->adapter->exec("drop table if exists`$t`");
+	 		}
+	 		catch(Exception $e){}
+	 		try{
+	 			$this->adapter->exec("drop view if exists`$t`");
+	 		}
+	 		catch(Exception $e){}	
+		}
+		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=1;');
+	}
+
 
 }

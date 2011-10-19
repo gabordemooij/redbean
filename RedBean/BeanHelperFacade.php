@@ -17,6 +17,6 @@ class RedBean_BeanHelperFacade implements RedBean_IBeanHelper {
 	 * @return RedBean_ToolBox $toolbox
 	 */
 	public function getToolbox() {
-		return R::$toolbox;
+		return RedBean_Facade::$toolbox;
 	}
 }
