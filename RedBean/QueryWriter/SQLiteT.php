@@ -437,6 +437,25 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 			return false;
 		}
 	}
+	
+	/**
+	 * Removes all tables and views from the database.
+	 */
+	public function wipeAll() {
+		$this->adapter->exec('PRAGMA foreign_keys = 0 ');
+		foreach($this->getTables() as $t) {
+	 		try{
+	 			$this->adapter->exec("drop table if exists`$t`");
+	 		}
+	 		catch(Exception $e){}
+	 		try{
+	 			$this->adapter->exec("drop view if exists`$t`");
+	 		}
+	 		catch(Exception $e){}	
+		}
+		$this->adapter->exec('PRAGMA foreign_keys = 1 ');
+
+	}
 
 
 

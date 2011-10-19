@@ -2291,6 +2291,16 @@ $objs = R::exportAllToObj(array($b1,$b2));
 asrt(count($objs),2);
 foreach($objs as $o) asrt(is_object($o),true);
 
+testpack("Test Simple Facade Prefix");
+droptables();
+R::prefix('bla');
+$t = R::dispense('testje');
+R::store($t);
+$tables = R::$writer->getTables();
+asrt(true,in_array('blatestje',$tables));
+
+
+
 printtext("\nALL TESTS PASSED. REDBEAN SHOULD WORK FINE.\n");
 
 

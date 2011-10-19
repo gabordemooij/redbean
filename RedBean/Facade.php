@@ -15,7 +15,7 @@
  * with this source code in the file license.txt.
  *
  */
-class R {
+class RedBean_Facade {
 
 	/**
 	 * Collection of toolboxes
@@ -252,7 +252,7 @@ class R {
 	 * @return RedBean_OODBBean $bean bean
 	 */
 	public static function loadOrDispense( $type, $id = 0 ) {
-		return ($id ? R::load($type,(int)$id) : R::dispense($type));
+		return ($id ? RedBean_Facade::load($type,(int)$id) : RedBean_Facade::dispense($type));
 	}
 
 	/**
@@ -300,7 +300,7 @@ class R {
 			else {
 				$info = $extra;
 			}
-			$bean = R::dispense("typeLess");
+			$bean = RedBean_Facade::dispense("typeLess");
 			$bean->import($info);
 			return self::$extAssocManager->extAssociate($bean1, $bean2, $bean);
 		}
@@ -530,7 +530,7 @@ class R {
 	public static function exec( $sql, $values=array() ) {
 		if (!self::$redbean->isFrozen()) {
 			try {
-				$rs = R::$adapter->exec( $sql, $values );
+				$rs = RedBean_Facade::$adapter->exec( $sql, $values );
 			}catch(RedBean_Exception_SQL $e) {
 				if(self::$writer->sqlStateIn($e->getSQLState(),
 				array(
@@ -547,7 +547,7 @@ class R {
 			return $rs;
 		}
 		else {
-			return R::$adapter->exec( $sql, $values );
+			return RedBean_Facade::$adapter->exec( $sql, $values );
 		}
 	}
 
@@ -564,7 +564,7 @@ class R {
 
 		if (!self::$redbean->isFrozen()) {
 			try {
-				$rs = R::$adapter->get( $sql, $values );
+				$rs = RedBean_Facade::$adapter->get( $sql, $values );
 			}catch(RedBean_Exception_SQL $e) {
 				if(self::$writer->sqlStateIn($e->getSQLState(),
 				array(
@@ -581,7 +581,7 @@ class R {
 			return $rs;
 		}
 		else {
-			return R::$adapter->get( $sql, $values );
+			return RedBean_Facade::$adapter->get( $sql, $values );
 		}
 	}
 
@@ -598,7 +598,7 @@ class R {
 
 		if (!self::$redbean->isFrozen()) {
 			try {
-				$rs = R::$adapter->getCell( $sql, $values );
+				$rs = RedBean_Facade::$adapter->getCell( $sql, $values );
 			}catch(RedBean_Exception_SQL $e) {
 				if(self::$writer->sqlStateIn($e->getSQLState(),
 				array(
@@ -615,7 +615,7 @@ class R {
 			return $rs;
 		}
 		else {
-			return R::$adapter->getCell( $sql, $values );
+			return RedBean_Facade::$adapter->getCell( $sql, $values );
 		}
 	}
 
@@ -632,7 +632,7 @@ class R {
 
 		if (!self::$redbean->isFrozen()) {
 			try {
-				$rs = R::$adapter->getRow( $sql, $values );
+				$rs = RedBean_Facade::$adapter->getRow( $sql, $values );
 			}catch(RedBean_Exception_SQL $e) {
 				if(self::$writer->sqlStateIn($e->getSQLState(),
 				array(
@@ -649,7 +649,7 @@ class R {
 			return $rs;
 		}
 		else {
-			return R::$adapter->getRow( $sql, $values );
+			return RedBean_Facade::$adapter->getRow( $sql, $values );
 		}
 
 	}
@@ -667,7 +667,7 @@ class R {
 
 		if (!self::$redbean->isFrozen()) {
 			try {
-				$rs = R::$adapter->getCol( $sql, $values );
+				$rs = RedBean_Facade::$adapter->getCol( $sql, $values );
 			}catch(RedBean_Exception_SQL $e) {
 				if(self::$writer->sqlStateIn($e->getSQLState(),
 				array(
@@ -684,7 +684,7 @@ class R {
 			return $rs;
 		}
 		else {
-			return R::$adapter->getCol( $sql, $values );
+			return RedBean_Facade::$adapter->getCol( $sql, $values );
 		}
 	}
 
@@ -708,16 +708,16 @@ class R {
 	 */
 	public static function copy($bean, $associatedBeanTypesStr="") {
 		$type = $bean->getMeta("type");
-		$copy = R::dispense($type);
+		$copy = RedBean_Facade::dispense($type);
 		$copy->import( $bean->export() );
 		$copy->copyMetaFrom( $bean );
 		$copy->id = 0;
-		R::store($copy);
+		RedBean_Facade::store($copy);
 		$associatedBeanTypes = explode(",",$associatedBeanTypesStr);
 		foreach($associatedBeanTypes as $associatedBeanType) {
-			$assocBeans = R::related($bean, $associatedBeanType);
+			$assocBeans = RedBean_Facade::related($bean, $associatedBeanType);
 			foreach($assocBeans as $assocBean) {
-				R::associate($copy,$assocBean);
+				RedBean_Facade::associate($copy,$assocBean);
 			}
 		}
 		$copy->setMeta("original",$bean);
@@ -739,8 +739,8 @@ class R {
 		$tmp = $bean1->$property;
 		$bean1->$property = $bean2->$property;
 		$bean2->$property = $tmp;
-		R::store($bean1);
-		R::store($bean2);
+		RedBean_Facade::store($bean1);
+		RedBean_Facade::store($bean2);
 	}
 
 	/**
@@ -780,7 +780,7 @@ class R {
 	 * @return boolean $didMatch Whether the bean has been assoc. with the tags
 	 */
 	public static function hasTag($bean, $tags, $all=false) {
-		$foundtags = R::tag($bean);
+		$foundtags = RedBean_Facade::tag($bean);
 		if (is_string($foundtags)) $foundtags = explode(",",$tags);
 		$same = array_intersect($tags,$foundtags);
 		if ($all) {
@@ -802,9 +802,9 @@ class R {
 	public static function untag($bean,$tagList) {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		foreach($tags as $tag) {
-			$t = R::findOne("tag"," title = ? ",array($tag));
+			$t = RedBean_Facade::findOne("tag"," title = ? ",array($tag));
 			if ($t) {
-				R::unassociate( $bean, $t );
+				RedBean_Facade::unassociate( $bean, $t );
 			}
 		}
 	}
@@ -824,7 +824,7 @@ class R {
 	 */
 	public static function tag( RedBean_OODBBean $bean, $tagList = null ) {
 		if (is_null($tagList)) {
-			$tags = R::related( $bean, "tag");
+			$tags = RedBean_Facade::related( $bean, "tag");
 			$foundTags = array();
 			foreach($tags as $tag) {
 				$foundTags[] = $tag->title;
@@ -833,8 +833,8 @@ class R {
 			return $foundTags;
 		}
 
-		R::clearRelations( $bean, "tag" );
-		R::addTags( $bean, $tagList );
+		RedBean_Facade::clearRelations( $bean, "tag" );
+		RedBean_Facade::addTags( $bean, $tagList );
 	}
 	
 	/**
@@ -853,13 +853,13 @@ class R {
 		if ($tagList===false) return;
 		
 		foreach($tags as $tag) {
-			$t = R::findOne("tag"," title = ? ",array($tag));
+			$t = RedBean_Facade::findOne("tag"," title = ? ",array($tag));
 			if (!$t) {
-				$t = R::dispense("tag");
+				$t = RedBean_Facade::dispense("tag");
 				$t->title = $tag;
-				R::store($t);
+				RedBean_Facade::store($t);
 			}
-			R::associate( $bean, $t ); 
+			RedBean_Facade::associate( $bean, $t ); 
 		}
 	}
 	
@@ -877,8 +877,8 @@ class R {
 		$collection = array();
 		foreach($tags as $tag) {
 			$retrieved = array();
-			$tag = R::findOne("tag"," title = ? ", array($tag));
-			if ($tag) $retrieved = R::related($tag, $beanType);
+			$tag = RedBean_Facade::findOne("tag"," title = ? ", array($tag));
+			if ($tag) $retrieved = RedBean_Facade::related($tag, $beanType);
 			foreach($retrieved as $key=>$bean) $collection[$key]=$bean;
 		}
 		return $collection;
@@ -891,7 +891,7 @@ class R {
 	 * @param string $beanType type of bean you want to destroy entirely.
 	 */
 	public static function wipe( $beanType ) {
-		R::$redbean->wipe($beanType);
+		RedBean_Facade::$redbean->wipe($beanType);
 	}
 
 	/**
@@ -903,7 +903,7 @@ class R {
 	 */
 
 	public static function count( $beanType ) {
-		return R::$redbean->count($beanType);
+		return RedBean_Facade::$redbean->count($beanType);
 	}
 
 	/**
@@ -945,7 +945,7 @@ class R {
 	 * @return array
 	 */
 	public static function cooker($arr) {
-		return RedBean_Cooker::load($arr, R::$toolbox);
+		return RedBean_Cooker::load($arr, RedBean_Facade::$toolbox);
 	}
 
 	/**
@@ -1095,5 +1095,25 @@ class R {
 			return '';
 		}	
 	}
+	
+	/**
+	 * Installs the default bean formatter with a prefix.
+	 * 
+	 * @param string $prefix prefix
+	 */
+	public static function prefix($prefix) {
+		$beanFormatter = new RedBean_DefaultBeanFormatter;
+		$beanFormatter->setPrefix($prefix);
+		self::$writer->setBeanFormatter($beanFormatter);	
+	}
+	
+	/**
+	 * Nukes the entire database.
+	 */
+	public static function nuke() {
+		if (!self::$redbean->isFrozen()) {
+			self::$writer->wipeAll();
+		}
+	}	
 
 }

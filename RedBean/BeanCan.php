@@ -113,21 +113,21 @@ class RedBean_BeanCan {
 				case "store":
 					if (!isset($data[0])) return $this->resp(null, $id, -32602,"First param needs to be Bean Object");
 					$data = $data[0];
-					if (!isset($data["id"])) $bean = R::dispense($beanType); else
-						$bean = R::load($beanType,$data["id"]);
+					if (!isset($data["id"])) $bean = RedBean_Facade::dispense($beanType); else
+						$bean = RedBean_Facade::load($beanType,$data["id"]);
 					$bean->import( $data );
-					$rid = R::store($bean);
+					$rid = RedBean_Facade::store($bean);
 					return $this->resp($rid, $id);
 					break;
 				case "load":
 					if (!isset($data[0])) return $this->resp(null, $id, -32602,"First param needs to be Bean ID");
-					$bean = R::load($beanType,$data[0]);
+					$bean = RedBean_Facade::load($beanType,$data[0]);
 					return $this->resp($bean->export(),$id);
 					break;
 				case "trash":
 					if (!isset($data[0])) return $this->resp(null, $id, -32602,"First param needs to be Bean ID");
-					$bean = R::load($beanType,$data[0]);
-					R::trash($bean);
+					$bean = RedBean_Facade::load($beanType,$data[0]);
+					RedBean_Facade::trash($bean);
 					return $this->resp("OK",$id);
 					break;
 				default:

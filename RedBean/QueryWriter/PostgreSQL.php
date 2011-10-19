@@ -341,7 +341,7 @@ where table_schema = 'public'" );
 				try{
 					$this->adapter->exec("ALTER TABLE  $table
 					ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
-					$targetColumn) ON DELETE SET NULL ON UPDATE SET NULL ;");
+					$targetColumn) ON DELETE SET NULL ON UPDATE SET NULL DEFERRABLE ;");
 					return true;
 				}
 				catch(Exception $e) {
@@ -416,6 +416,30 @@ where table_schema = 'public'" );
 		catch(Exception $e){
 			return false;
 		}
+	}
+	
+	/**
+	 * Removes all tables and views from the database.
+	 */
+	public function wipeAll() {
+	
+		
+      	$this->adapter->exec('SET CONSTRAINTS ALL DEFERRED');
+      	$this->adapter->startTransaction();
+      	foreach($this->getTables() as $t) {
+      		$t = $this->noKW($t);
+	 		try{
+	 			$this->adapter->exec("drop table if exists $t CASCADE ");
+	 		}
+	 		catch(Exception $e){ throw $e; }
+	 		try{
+	 			$this->adapter->exec("drop view if exists $t CASCADE ");
+	 		}
+	 		catch(Exception $e){ throw $e; }	
+		}
+		$this->adapter->commit();
+		$this->adapter->exec('SET CONSTRAINTS ALL IMMEDIATE');
+	
 	}
 
 }

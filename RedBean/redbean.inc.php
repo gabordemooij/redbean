@@ -100,6 +100,8 @@ require($dir."BeanCan.php");
 require($dir."Cooker.php");
 require($dir."ViewManager.php");
 
+class R extends RedBean_Facade{
+}
 
 
 
