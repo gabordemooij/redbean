@@ -404,7 +404,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 
 		$joins = implode(" ", $joins);
 		foreach($columns as $k=>$column) {
-			$columns[$k]=$safeReferenceTable.".".$this->safeColumn($column);
+			$columns[$k]=$safeReferenceTable.".".$this->safeColumn($column)." as ".$this->safeColumn($column);
 		}
 		$columns = implode("\n,",array_merge($newcolumns,$columns));
 		$sql = "CREATE VIEW $viewID AS SELECT $columns FROM $safeReferenceTable $joins ";
