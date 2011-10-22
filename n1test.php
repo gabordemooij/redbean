@@ -5,7 +5,7 @@ error_reporting(E_ALL | E_STRICT);
 //require("RedBean/redbean.inc.php");
 require('rb.php');
 
-//R::setup("pgsql:host=localhost;dbname=oodb","gabor","xippydoo"); $db="pgsql";
+//R::setup("pgsql:host=localhost;dbname=oodb","postgres"); $db="pgsql";
 //R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
 R::setup(); $db="sqlite"; R::exec(' PRAGMA foreign_keys = ON ');
 
