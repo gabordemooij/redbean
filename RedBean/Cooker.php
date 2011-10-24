@@ -15,6 +15,9 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Cooker {
+
+	public static $dontSetEmptyValues = false;
+
 	/**
 	 * This method will inspect the array provided and load/dispense the
 	 * desired beans. To dispense a new bean, the array must contain:
@@ -87,7 +90,10 @@ class RedBean_Cooker {
 				}
 				//do we need to modify this bean?
 				foreach($rawBean as $field=>$value){
-					if (!empty($value)) $bean->$field = $value;
+					if (!empty($value)) 
+						$bean->$field = $value;
+					elseif (!self::$dontSetEmptyValues)
+						$bean->$field = $value; 
 				}
 				$can[$key]=$bean;
 				if (!isset($sorted[$type]))  $sorted[$type]=array();
