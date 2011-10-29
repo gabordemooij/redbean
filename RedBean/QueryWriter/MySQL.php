@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean MySQLWriter
- * 
+ *
  * @file				RedBean/QueryWriter/MySQL.php
  * @description	Represents a MySQL Database to RedBean
  *						To write a driver for a different database for RedBean
@@ -36,7 +36,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * DATA TYPE
 	 * Unsigned 8BIT Integer
-	 * 
+	 *
 	 */
 	const C_DATATYPE_UINT8 = 1;
 
@@ -46,7 +46,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * DATA TYPE
 	 * Unsigned 32BIT Integer
-	 * 
+	 *
 	 */
 	const C_DATATYPE_UINT32 = 2;
 
@@ -56,26 +56,26 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * DATA TYPE
 	 * Double precision floating point number and
 	 * negative numbers.
-	 * 
+	 *
 	 */
 	const C_DATATYPE_DOUBLE = 3;
 
 	/**
 	 * @var integer
-	 * 
+	 *
 	 * DATA TYPE
 	 * Standard Text column (like varchar255)
 	 * At least 8BIT character support.
-	 * 
+	 *
 	 */
 	const C_DATATYPE_TEXT8 = 4;
 
 	/**
 	 * @var integer
-	 * 
+	 *
 	 * DATA TYPE
 	 * Long text column (16BIT)
-	 * 
+	 *
 	 */
 	const C_DATATYPE_TEXT16 = 5;
 
@@ -86,19 +86,19 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
 	 * This is the biggest column that RedBean supports. If possible you may write
 	 * an implementation that stores even bigger values.
-	 * 
+	 *
 	 */
 	const C_DATATYPE_TEXT32 = 6;
 
 	/**
 	 * @var integer
-	 * 
+	 *
 	 * DATA TYPE
 	 * Specified. This means the developer or DBA
 	 * has altered the column to a different type not
 	 * recognized by RedBean. This high number makes sure
 	 * it will not be converted back to another type by accident.
-	 * 
+	 *
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
 
@@ -138,7 +138,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
-	
+
 	/**
 	 * @var string
 	 * character to escape keyword table/column names
@@ -169,7 +169,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 
 	/**
 	 * Returns all tables in the database.
-	 * 
+	 *
 	 * @return array $tables tables
 	 */
 	public function getTables() {
@@ -180,7 +180,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * Creates an empty, column-less table for a bean based on it's type.
 	 * This function creates an empty table for a bean. It uses the
 	 * safeTable() function to convert the type name to a table name.
-	 * 
+	 *
 	 * @param string $table type of bean you want to create a table for
 	 *
 	 * @return void
@@ -218,7 +218,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * to the given value type.
 	 *
 	 * @param string $value value
-	 * 
+	 *
 	 * @return integer $type type
 	 */
 	public function scanType( $value ) {
@@ -226,8 +226,8 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
 		$value = strval($value);
-		if (!$this->startsWithZeros($value)) { 
-		
+		if (!$this->startsWithZeros($value)) {
+
 			if ($value=="1" || $value=="") {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 			}
@@ -246,7 +246,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		}
 		return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
 	}
-	
+
 	/**
 	 * Returns the Type Code for a Column Description.
 	 *
@@ -386,7 +386,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 
 	/**
 	 * Drops all tables in database
-	 */	
+	 */
 	public function wipeAll() {
 		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=0;');
 		foreach($this->getTables() as $t) {
@@ -397,7 +397,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 		try{
 	 			$this->adapter->exec("drop view if exists`$t`");
 	 		}
-	 		catch(Exception $e){}	
+	 		catch(Exception $e){}
 		}
 		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=1;');
 	}

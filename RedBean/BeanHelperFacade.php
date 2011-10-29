@@ -2,7 +2,7 @@
 /**
  * RedBean Bean Helper
  * @file			RedBean/BeanHelperFacade.php
- * @description	
+ * @description
  *
  * @author			Gabor de Mooij
  * @license			BSD

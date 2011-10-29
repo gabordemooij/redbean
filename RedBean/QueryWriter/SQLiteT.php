@@ -112,7 +112,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * to the given value type.
 	 *
 	 * @param  string $value value
-	 * 
+	 *
 	 * @return integer $type type
 	 */
 	public function scanType( $value ) {
@@ -125,8 +125,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		) {
 			return self::C_DATATYPE_NUMERIC;
 		}
-		
-		
+
+
 		return self::C_DATATYPE_TEXT;
 	}
 
@@ -254,10 +254,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return $columns;
 	}
 
-	
 
 
-	
+
+
 	/**
 	 * Adds a Unique index constrain to the table.
 	 *
@@ -321,7 +321,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	public function addFK( $type, $targetType, $field, $targetField) {
 		return $this->buildFK($type, $targetType, $field, $targetField);
 	}
-	
+
 	/**
 	 * Adds a foreign key to a type
 	 *
@@ -330,12 +330,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param  string $field       field of the type that needs to get the fk
 	 * @param  string $targetField field where the fk needs to point to
 	 * @param  integer $buildopt   0 = NO ACTION, 1 = ON DELETE CASCADE
-	 * 
+	 *
 	 * @return bool $success whether an FK has been added
 	 */
-	
+
 	protected function buildFK($type, $targetType, $field, $targetField,$constraint=false) {
-	
+
 			try{
 				$table = $this->safeTable($type,true);
 				$targetTable = $this->safeTable($targetType,true);
@@ -350,33 +350,33 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 						$newTableDefStr .= ",`$oldName` $oldType";
 					}
 				}
-				
+
 				//retrieve old foreign keys
 				$sqlGetOldFKS = "PRAGMA foreign_key_list('$table'); ";
 				$oldFKs = $this->adapter->get($sqlGetOldFKS);
-				
+
 				$restoreFKSQLSnippets = "";
 				foreach($oldFKs as $oldFKInfo) {
-					if ($oldFKInfo['from']==$field) { 
+					if ($oldFKInfo['from']==$field) {
 						//this field already has a FK.
 						return false;
 					}
-					$oldTable = $table; 
+					$oldTable = $table;
 					$oldField = $oldFKInfo['from'];
 					$oldTargetTable = $oldFKInfo['table'];
 					$oldTargetField = $oldFKInfo['to'];
 					$restoreFKSQLSnippets .= ", FOREIGN KEY(`$oldField`) REFERENCES `$oldTargetTable`(`$oldTargetField`) ON DELETE ".$oldFKInfo['on_delete'];
 				}
-				
-				$fkDef = $restoreFKSQLSnippets; 
-				
-				if ($constraint) { 
+
+				$fkDef = $restoreFKSQLSnippets;
+
+				if ($constraint) {
 					$fkDef .= ', FOREIGN KEY(`'.$field.'`) REFERENCES `'.$targetTable.'`(`'.$targetField.'`) ON DELETE CASCADE ';
 
 				}
 				else {
 					$fkDef .= ', FOREIGN KEY(`'.$field.'`) REFERENCES `'.$targetTable.'`(`'.$targetField.'`) ON DELETE SET NULL ON UPDATE SET NULL';
-	
+
 				}
 
 				$q = array();
@@ -396,7 +396,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 				}
 			}
 			catch(Exception $e){
-				
+
 			}
 
 	}
@@ -416,8 +416,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return boolean $succes whether the constraint has been applied
 	 */
 	protected  function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
-		
-		
+
+
 		try{
 			$writer = $this;
 
@@ -426,18 +426,18 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 
 			$idfield1 = $writer->getIDField($table1);
 			$idfield2 = $writer->getIDField($table2);
-			
+
 			$this->buildFK($table,$table1,$property1,$idfield1,true);
 			$this->buildFK($table,$table2,$property2,$idfield2,true);
-			
+
 			return true;
 		}
 		catch(Exception $e){
-			
+
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Removes all tables and views from the database.
 	 */
@@ -451,7 +451,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 		try{
 	 			$this->adapter->exec("drop view if exists`$t`");
 	 		}
-	 		catch(Exception $e){}	
+	 		catch(Exception $e){}
 		}
 		$this->adapter->exec('PRAGMA foreign_keys = 1 ');
 

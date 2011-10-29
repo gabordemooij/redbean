@@ -32,7 +32,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	/**
 	 * Meta Data storage. This is the internal property where all
 	 * Meta information gets stored.
-	 * 
+	 *
 	 * @var array
 	 */
 	private $__info = NULL;
@@ -59,7 +59,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * providing access to a toolbox for the bean necessary to retrieve
 	 * nested beans (bean lists: ownBean,sharedBean) without the need to
 	 * rely on static calls to the facade (or make this class dep. on OODB).
-	 * 
+	 *
 	 * @param RedBean_IBeanHelper $helper
 	 * @return void
 	 */
@@ -129,7 +129,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 		if ($meta) $arr["__info"] = $this->__info;
 		return $arr;
 	}
-	
+
 	/**
 	 * Exports the bean to an object.
 	 * This function exports the contents of a bean to an object.
@@ -138,7 +138,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 */
 	public function exportToObj($obj) {
 		foreach($this->properties as $k=>$v) {
-			if (!is_array($v) && !is_object($v)) 
+			if (!is_array($v) && !is_object($v))
 			$obj->$k = $v;
 		}
 	}
@@ -159,7 +159,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 
 	/**
 	 * Returns the ID of the bean no matter what the ID field is.
-	 * 
+	 *
 	 * @return string $id record Identifier for bean
 	 */
 	public function getID() {
@@ -185,12 +185,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 			$this->$fieldLink = null;
 			return;
 		}
-		
+
 		if ((isset($this->properties[$property]))) {
 			unset($this->properties[$property]);
 		}
 
-		
+
 	}
 
 	/**
@@ -443,7 +443,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * Chainable method to cast a certain ID to a bean; for instance:
 	 * $person = $club->fetchAs('person')->member;
 	 * This will load a bean of type person using member_id as ID.
-	 * 
+	 *
 	 * @param  string $type preferred fetch type
 	 *
 	 * @return RedBean_OODBBean

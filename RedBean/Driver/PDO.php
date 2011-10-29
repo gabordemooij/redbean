@@ -77,7 +77,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 *
 	 * @var boolean
-	 * 
+	 *
 	 * Whether we are currently connected or not.
 	 * This flag is being used to delay the connection until necessary.
 	 * Delaying connections is a good practice to speed up scripts that
@@ -168,7 +168,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *
 	 * @param  PDOStatement $s       PDO Statement instance
 	 * @param  array        $aValues values that need to get bound to the statement
-	 * 
+	 *
 	 * @return void
 	 */
 	protected function bindParams($s,$aValues) {
@@ -192,7 +192,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) &&  $value < 2147483648) {
 					$s->bindParam($key,$value,PDO::PARAM_INT);
 				}
-				else { 
+				else {
 					$s->bindParam($key,$value,PDO::PARAM_STR);
 				}
 			}
@@ -200,7 +200,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}
 	}
 
-	
+
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.
 	 *
@@ -509,7 +509,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 	/**
 	 * Returns the underlying PHP PDO instance.
-	 * 
+	 *
 	 * @return PDO $pdo PDO instance used by PDO wrapper
 	 */
 	public function getPDO() {

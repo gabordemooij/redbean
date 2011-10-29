@@ -56,6 +56,6 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	public static function setModelFormatter( RedBean_IModelFormatter $modelFormatter ) {
 		self::$modelFormatter = $modelFormatter;
 	}
-	
+
 
 }

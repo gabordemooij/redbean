@@ -62,13 +62,13 @@ echo "\nFailed to clean up database: ".print_r($t,1);
 fail();
 }
 return;
-	
+
 if ($db=='mysql') R::exec('SET FOREIGN_KEY_CHECKS=0;');
 if ($db=='sqlite') R::exec('PRAGMA foreign_keys = 0 ');
 R::exec('drop view if exists people');
 R::exec('drop view if exists library2');
 foreach(R::$writer->getTables() as $t) {
-	
+
 	if ($db=='mysql') R::exec("drop table `$t`");
 	if ($db=='pgsql') R::exec("drop table \"$t\" cascade");
 	if ($db=='sqlite') R::exec("drop table $t ");
@@ -164,7 +164,7 @@ $book = R::load('book',$id);
 asrt(count($book->ownPage),1);
 asrt(reset($book->ownPage)->getMeta('type'),'page');
 asrt(R::count('page'),2);//still exists
-asrt(reset($book->ownPage)->id,'2'); 
+asrt(reset($book->ownPage)->id,'2');
 //doing a change in one of the owned items
 $book->ownPage[2]->title='page II';
 $id = R::store($book);
@@ -180,7 +180,7 @@ asrt(reset($book->ownPage)->title,'page II b');
 $book->ownPage[] = $page3;
 R::store($book);
 $book = R::load('book',$id);
-unset($book->ownPage[2]); 
+unset($book->ownPage[2]);
 $book->ownPage['customkey'] = $page4; //and test custom key
 $book->ownPage[3]->title = "THIRD";
 R::store($book);
@@ -245,7 +245,7 @@ if ($db=='pgsql' || $db=='mysql') {
 	catch(Exception $e){
 		pass();
 	}
-	
+
 }
 //even uglier way, but still needs to work
 $page1 = reset($b2->ownPage);
@@ -337,8 +337,8 @@ testids($book->ownPage);
 //test aliasing
 //test with alias format
 class Aliaser extends RedBean_DefaultBeanFormatter {
-	public function getAlias($a){ 
-		if ($a=='cover') return 'page'; else return $a; 
+	public function getAlias($a){
+		if ($a=='cover') return 'page'; else return $a;
 	}
 }
 $formatter = new Aliaser();
@@ -408,13 +408,13 @@ asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),2);
 asrt(count($book3->ownPage),2);
 //delete and re-add
 $book3=R::load('book',$idb3);
-unset($book3->ownPage[10]); 
+unset($book3->ownPage[10]);
 $book3->ownPage[] = $page1;
 $book3=R::load('book',R::store($book3));
 asrt(count($book3->ownPage),2);//exit;
 $book3=R::load('book',$idb3);
-//print_r($book3->sharedTopic); 
-unset($book3->sharedTopic[1]); 
+//print_r($book3->sharedTopic);
+unset($book3->sharedTopic[1]);
 $book3->sharedTopic[] = $topic1;
 $book3=R::load('book',R::store($book3));
 asrt(count($book3->sharedTopic),1);
@@ -435,9 +435,9 @@ asrt(count($logger->grep('SELECT')),1);  //no more than 1 select
 $logger->clear();
 $book->sharedTopic[] = $topic1;
 $book->sharedTopic[] = $topic2;
-asrt(count($logger->grep('SELECT')),0); 
+asrt(count($logger->grep('SELECT')),0);
 R::store($book);
-$book->sharedTopic[] = $topic3; 
+$book->sharedTopic[] = $topic3;
 //now do NOT clear all and then add one, just add the one
 $logger->clear();
 R::store($book);
@@ -507,7 +507,7 @@ $book3=R::load('book',R::store($book3));
 function modgr($book3) {
 
 	global $quotes,$pictures,$topics;
-	
+
 	$key = array_rand($quotes);
 	$quote = $quotes[$key];
 	$keyPic = array_rand($pictures);
@@ -515,8 +515,8 @@ function modgr($book3) {
 	$keyTop = array_rand($topics);
 	$topic = $topics[$keyTop];
 
-	
-	
+
+
 
 	if (rand(0,1)) {
 		$f=0;
@@ -525,7 +525,7 @@ function modgr($book3) {
 		}
 		if (!$f) {
 		//echo "\n add a quote ";
-		$book3->ownQuote[] = $quote;	
+		$book3->ownQuote[] = $quote;
 		}
 	}
 	if (rand(0,1)){
@@ -545,7 +545,7 @@ function modgr($book3) {
 		}
 		if (!$f) {
 		//	echo "\n add a shared topic ";
-			$book3->sharedTopic[] = $topic;	
+			$book3->sharedTopic[] = $topic;
 		}
 	}
 	if (rand(0,1) && count($book3->ownQuote)>0) {
@@ -617,11 +617,11 @@ for($j=0; $j<10; $j++) {
 	testids($book->ownQuote);
 	testids($book->ownPicture);
 	testids($book->sharedTopic);
-	
+
 }
 
 
- 
+
 //graph
 R::exec('drop table if exists band_bandmember');
 R::exec('drop table if exists band_location');
@@ -792,7 +792,7 @@ asrt(intval($song->id),1);
 asrt(($song->url),"changedurl");
 
 
-//Tree 
+//Tree
 $page = R::dispense('page');
 $page->name = 'root of all evil';
 list( $subPage, $subSubPage, $subNeighbour, $subOfSubNeighbour, $subSister ) = R::dispense('page',5);
@@ -859,7 +859,7 @@ class Model_Band extends RedBean_SimpleModel {
 
 	public function after_update() {
 	}
-	
+
 	public function update() {
 		if (count($this->ownBandmember)>4) {
 			throw new Exception('too many!');
@@ -900,39 +900,39 @@ pass();
 
 $lifeCycle = "";
 class Model_Bandmember extends RedBean_SimpleModel {
-	
+
 	public function open() {
 		global $lifeCycle;
 		$lifeCycle .= "\n called open: ".$this->id;
 	}
-	
-	
+
+
 	public function dispense(){
 		global $lifeCycle;
 		$lifeCycle .= "\n called dispense() ".$this->bean;
 	}
-	
+
 	public function update() {
 		global $lifeCycle;
 		$lifeCycle .= "\n called update() ".$this->bean;
 	}
-	
+
 	public function after_update(){
 		global $lifeCycle;
 		$lifeCycle .= "\n called after_update() ".$this->bean;
 	}
-	
+
 	public function delete() {
 		global $lifeCycle;
 		$lifeCycle .= "\n called delete() ".$this->bean;
 	}
-	
+
 	public function after_delete() {
 		global $lifeCycle;
 		$lifeCycle .= "\n called after_delete() ".$this->bean;
 	}
-	
-	
+
+
 
 }
 
@@ -1059,7 +1059,7 @@ try{
 	R::store($book);
 	fail();
 }
-catch(RedBean_Exception_Security $e){ 
+catch(RedBean_Exception_Security $e){
 	pass();
 }
 catch(Exception $e){
@@ -1078,7 +1078,7 @@ asrt(in_array('prop',array_keys($book->export())),false);//better...
 $book = R::dispense('book');
 $page = R::dispense('page');
 $book->paper = $page;
-$id = R::store($book); 
+$id = R::store($book);
 $book = R::load('book', $id);
 asrt(false,(isset($book->paper)));
 asrt(false,(isset($book->page)));
@@ -1173,31 +1173,31 @@ asrt($l2['title'],'my book');
 asrt($l2['title_of_page'],'my page');
 
 
-class Aliaser2 implements RedBean_IBeanFormatter { 
-        public function formatBeanID($t){ return 'id'; } 
-        public function formatBeanTable($t){ return $t; } 
-        public function getAlias($a){ 
-                if ($a=='creator' || $a=='recipient') return 'user'; 
-                return $a; 
-        } 
-} 
+class Aliaser2 implements RedBean_IBeanFormatter {
+        public function formatBeanID($t){ return 'id'; }
+        public function formatBeanTable($t){ return $t; }
+        public function getAlias($a){
+                if ($a=='creator' || $a=='recipient') return 'user';
+                return $a;
+        }
+}
 
-$formatter = new Aliaser2(); 
-R::$writer->setBeanFormatter($formatter); 
-$message = R::dispense('message'); 
-list($creator,$recipient) = R::dispense('user',2); 
+$formatter = new Aliaser2();
+R::$writer->setBeanFormatter($formatter);
+$message = R::dispense('message');
+list($creator,$recipient) = R::dispense('user',2);
 $recipient->name = 'r';
 $creator->name = 'c';
-$message->recipient = $recipient; 
-$message->creator = $creator; 
-$id = R::store($message); 
-$message = R::load('message', $id); 
-$recipient = $message->recipient; 
+$message->recipient = $recipient;
+$message->creator = $creator;
+$id = R::store($message);
+$message = R::load('message', $id);
+$recipient = $message->recipient;
 
 
 droptables();
 class Alias3 extends RedBean_DefaultBeanFormatter {
-	public function getAlias($type) { 
+	public function getAlias($type) {
 		if ($type=='familyman' || $type=='buddy') return 'person';
 		return $type;
 	}
@@ -1414,11 +1414,11 @@ if ($db=='mysql') {
 
 if ($db=='pgsql') {
 	$sql="SELECT
-	    tc.constraint_name, tc.table_name, kcu.column_name, 
+	    tc.constraint_name, tc.table_name, kcu.column_name,
 	    ccu.table_name AS foreign_table_name,
-	    ccu.column_name AS foreign_column_name 
-	FROM 
-	    information_schema.table_constraints AS tc 
+	    ccu.column_name AS foreign_column_name
+	FROM
+	    information_schema.table_constraints AS tc
 	    JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
 	    JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
 	WHERE constraint_type = 'FOREIGN KEY' AND (tc.table_name='book' OR tc.table_name='book_genre' OR tc.table_name='page');";
@@ -1438,7 +1438,7 @@ $j2 = json_decode($json,true);
 
 foreach($j1 as $jrow) {
 	$s = json_encode($jrow);
-	$found = 0;	
+	$found = 0;
 	foreach($j2 as $k=>$j2row) {
 		if (json_encode($j2row)===$s) {
 			pass();
@@ -1446,7 +1446,7 @@ foreach($j1 as $jrow) {
 			$found = 1;
 		}
 	}
-	if (!$found) fail();	
+	if (!$found) fail();
 }
 
 testpack('Test issue #90 - cannot trash bean with ownproperty if checked in model');
