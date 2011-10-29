@@ -79,7 +79,7 @@ class RedBean_Facade {
 	/**
 	 * Returns version ID string
 	 * Version No format: <Major>.<Minor>.<Maintenance>.<Fix/Update>
-	 * 
+	 *
 	 * @return string $version Version ID
 	 */
 	public static function getVersion() {
@@ -117,7 +117,7 @@ class RedBean_Facade {
 	 * Configures RedBean to work with multiple database and multiple instances of the facade.
 	 * This method accepts an array with format:
 	 * array( $key =>array('dsn'=>$dsn,'username'=>$username,'password'=>$password,'frozen'=>$trueFalse) )
-	 * 
+	 *
 	 * @static
 	 * @param  array $databases  array with database connection information
 	 * @return array $rinstances array with R-instances
@@ -179,7 +179,7 @@ class RedBean_Facade {
 	 * Stores a RedBean OODB Bean and returns the ID.
 	 *
 	 * @param  RedBean_OODBBean $bean bean
-	 * 
+	 *
 	 * @return integer $id id
 	 */
 	public static function store( RedBean_OODBBean $bean ) {
@@ -304,10 +304,10 @@ class RedBean_Facade {
 			$bean->import($info);
 			return self::$extAssocManager->extAssociate($bean1, $bean2, $bean);
 		}
-		
+
 	}
 
-	
+
 	/**
 	 * Breaks the association between two beans.
 	 * This functions breaks the association between a pair of beans. After
@@ -367,7 +367,7 @@ class RedBean_Facade {
 	public static function areRelated( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		return self::$associationManager->areRelated($bean1,$bean2);
 	}
-	
+
 
 	/**
 	 * The opposite of related(). Returns all the beans that are not
@@ -378,14 +378,14 @@ class RedBean_Facade {
 	 * @param string				$sql    SQL for extra filtering
 	 * @param array				$values values to be inserted in SQL slots
 	 *
-	 * @return array $beans beans 
+	 * @return array $beans beans
 	 */
 	public static function unrelated(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
 		$idfield = self::$writer->getIDField( $type );
 		$keys = self::$associationManager->related( $bean, $type );
 		$rows = self::$writer->selectRecord( $type, array($idfield=>$keys), array($sql,$values), false, true );
 		return self::$redbean->convertToBeans($type,$rows);
-	
+
 	}
 
 
@@ -412,7 +412,7 @@ class RedBean_Facade {
 	 *
 	 * @param RedBean_OODBBean $bean
 	 * @param string $type type
-	 * 
+	 *
 	 * @return mixed
 	 */
 	public static function clearRelations( RedBean_OODBBean $bean, $type, RedBean_OODBBean $bean2 = null, $extra = null ) {
@@ -511,7 +511,7 @@ class RedBean_Facade {
 	 *
 	 * @param string $type type
 	 * @param array  $ids  ids
-	 * 
+	 *
 	 * @return array $beans
 	 */
 	public static function batch( $type, $ids ) {
@@ -758,7 +758,7 @@ class RedBean_Facade {
 	/**
 	 * This static property can be set to force the system to return
 	 * comma separated lists as in legacy versions.
-	 * 
+	 *
 	 * @var boolean
 	 */
 	public static $flagUseLegacyTaggingAPI = false;
@@ -811,10 +811,10 @@ class RedBean_Facade {
 
 	/**
 	 * Tags a bean or returns tags associated with a bean.
-	 * If $tagList is null or omitted this method will return a 
+	 * If $tagList is null or omitted this method will return a
 	 * comma separated list of tags associated with the bean provided.
 	 * If $tagList is a comma separated list (string) of tags all tags will
-	 * be associated with the bean. 
+	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
 	 *
 	 * @param RedBean_OODBBean $bean    bean
@@ -836,11 +836,11 @@ class RedBean_Facade {
 		RedBean_Facade::clearRelations( $bean, "tag" );
 		RedBean_Facade::addTags( $bean, $tagList );
 	}
-	
+
 	/**
 	 * Adds tags to a bean.
 	 * If $tagList is a comma separated list (string) of tags all tags will
-	 * be associated with the bean. 
+	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
 	 *
 	 * @param RedBean_OODBBean $bean    bean
@@ -851,7 +851,7 @@ class RedBean_Facade {
 	public static function addTags( RedBean_OODBBean $bean, $tagList ) {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		if ($tagList===false) return;
-		
+
 		foreach($tags as $tag) {
 			$t = RedBean_Facade::findOne("tag"," title = ? ",array($tag));
 			if (!$t) {
@@ -859,10 +859,10 @@ class RedBean_Facade {
 				$t->title = $tag;
 				RedBean_Facade::store($t);
 			}
-			RedBean_Facade::associate( $bean, $t ); 
+			RedBean_Facade::associate( $bean, $t );
 		}
 	}
-	
+
 	/**
 	 * @static
 	 * Returns all beans that have been tagged with one of the tags given.
@@ -939,7 +939,7 @@ class RedBean_Facade {
 
 	/**
 	 * facade method for Cooker.
-	 * 
+	 *
 	 * @static
 	 * @param  $arr
 	 * @return array
@@ -1000,27 +1000,27 @@ class RedBean_Facade {
 			return $array;
 		}
 	}
-	
+
 	/**
 	 * Mass export beans to object instances of a certain class.
-	 * 
+	 *
 	 * @param array  $beans collection of beans to be exported
 	 * @param string $class name of the class to be used
-	 * 
-	 * @return array $instances collection of instances of $class filled with beans 
+	 *
+	 * @return array $instances collection of instances of $class filled with beans
 	 */
 	public static function exportAllToObj($beans, $classname='stdClass') {
 		$array = array();
 		foreach($beans as $bean) {
 			if ($bean instanceof RedBean_OODBBean) {
-				$inst = new $classname;	
-				$bean->exportToObj($inst);	
+				$inst = new $classname;
+				$bean->exportToObj($inst);
 				$array[] = $inst;
 			}
 		}
 		return $array;
 	}
-	
+
 
 	/**
 	 * Facade Convience method for adapter transaction system.
@@ -1079,34 +1079,34 @@ class RedBean_Facade {
 	public static function now() {
 		return date('Y-m-d H:i:s');
 	}
-	
+
 	/**
 	 * Generates question mark slots for an array of values.
-	 * 
+	 *
 	 * @param array $array
 	 * @return string $slots
 	 */
 	public static function genSlots($array) {
-		if (count($array)>0) {  	
+		if (count($array)>0) {
 			$filler = array_fill(0,count($array),'?');
-			return implode(',',$filler);	
+			return implode(',',$filler);
 		}
 		else {
 			return '';
-		}	
+		}
 	}
-	
+
 	/**
 	 * Installs the default bean formatter with a prefix.
-	 * 
+	 *
 	 * @param string $prefix prefix
 	 */
 	public static function prefix($prefix) {
 		$beanFormatter = new RedBean_DefaultBeanFormatter;
 		$beanFormatter->setPrefix($prefix);
-		self::$writer->setBeanFormatter($beanFormatter);	
+		self::$writer->setBeanFormatter($beanFormatter);
 	}
-	
+
 	/**
 	 * Nukes the entire database.
 	 */
@@ -1114,6 +1114,6 @@ class RedBean_Facade {
 		if (!self::$redbean->isFrozen()) {
 			self::$writer->wipeAll();
 		}
-	}	
+	}
 
 }

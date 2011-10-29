@@ -49,25 +49,25 @@ class RedBean_Plugin_BeanExport {
 		}
 		$this->tables = $tables;
 	}
-	
+
 	/**
 	 *Returs a serialized representation of the schema
 	 *
-	 *@return string $serialized serialized representation 
+	 *@return string $serialized serialized representation
 	 */
 	public function getSchema() {
 		return serialize($this->tables);
 	}
-	
+
 	/**
 	 * Loads a schema from a string (containing serialized export of schema)
-	 * 
+	 *
 	 * @param string $schema
 	 */
 	public function loadSchemaFromString($schema) {
 		$this->tables = unserialize($schema);
 	}
-	
+
 
 	/**
 	 * Exports a collection of beans

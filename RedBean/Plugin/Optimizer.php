@@ -40,7 +40,7 @@ class RedBean_Plugin_Optimizer implements RedBean_Observer {
 	/**
 	 * Constructor
 	 * Handles the toolbox
-	 * 
+	 *
 	 * @param RedBean_ToolBox $toolbox
 	 */
 	public function __construct( RedBean_ToolBox $toolbox ) {
@@ -82,7 +82,7 @@ class RedBean_Plugin_Optimizer implements RedBean_Observer {
 				//export the bean as an array
 				$arr = $bean->export(); //print_r($arr);
 				//remove the id property
-				unset($arr["id"]); 
+				unset($arr["id"]);
 				//If we are left with an empty array we might as well return
 				if (count($arr)==0) return;
 				//fetch table name for this bean
@@ -97,7 +97,7 @@ class RedBean_Plugin_Optimizer implements RedBean_Observer {
 			}
 		}catch(RedBean_Exception_SQL $e) { }
 	}
-	
+
 	/**
 	 * Adds an optimizer to the optimizer collection.
 	 *

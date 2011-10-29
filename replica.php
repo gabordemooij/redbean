@@ -22,7 +22,7 @@ foreach($items as $item) {
     echo "Adding: $item \n";
     $raw = file_get_contents( $item );
     $code.=clean($raw);
-    
+
 }
 $code .= "
 

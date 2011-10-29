@@ -63,7 +63,7 @@ class RedBean_SimpleModel {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param  $type
 	 * @return mixed
 	 */

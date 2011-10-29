@@ -10,22 +10,22 @@
  * @license				BSD
  */
 class RedBean_DefaultBeanFormatter implements RedBean_IBeanFormatter {
-	
+
 	/**
 	 * Holds the prefix to be used for tables.
-	 * @var string 
+	 * @var string
 	 */
 	protected $tablePrefixStr = '';
-	
+
 	/**
 	 * Sets the prefix to be used for tables
-	 * 
-	 * @param string $tablePrefixStr prefix string for tables  
+	 *
+	 * @param string $tablePrefixStr prefix string for tables
 	 */
 	public function setPrefix($prefix) {
 		$this->tablePrefixStr = preg_replace('/\W/','',$prefix);
 	}
-	
+
 	/**
 	 * Formats a table
 	 *
@@ -36,7 +36,7 @@ class RedBean_DefaultBeanFormatter implements RedBean_IBeanFormatter {
 	}
 	/**
 	 * Formats an ID
-	 * 
+	 *
 	 * @param string $type type
 	 */
 	public function formatBeanID( $type ){
@@ -44,7 +44,7 @@ class RedBean_DefaultBeanFormatter implements RedBean_IBeanFormatter {
 	}
 	/**
 	 * Returns the alias for a type
-	 * 
+	 *
 	 * @param  $type aliased type
 	 *
 	 * @return string $type type

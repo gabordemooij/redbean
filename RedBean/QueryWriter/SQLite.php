@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean SQLiteWriter
- * 
+ *
  * @file				RedBean/QueryWriter/SQLite.php
  * @description			Represents a SQLite Database to RedBean
  *						To write a driver for a different database for RedBean
@@ -35,7 +35,7 @@ class RedBean_QueryWriter_SQLite extends RedBean_QueryWriter_AQueryWriter implem
 
 	/**
 	 * Creates an empty, column-less table for a bean.
-	 * 
+	 *
 	 * @param string $table table
 	 */
 	public function createTable( $table ) {

@@ -39,7 +39,7 @@ class RedBean_BeanCan {
 		$response = array(
 			"jsonrpc"=>"2.0",
 		);
-		
+
 		if ($id) {
 			$response["id"] = $id;
 		}
@@ -103,7 +103,7 @@ class RedBean_BeanCan {
 		//Collect Bean and Action
 		$beanType = $method[0];
 		$action = $method[1];
-		
+
 		//May not contain anything other than ALPHA NUMERIC chars and _
 		if (preg_match("/\W/",$beanType)) return $this->resp(null, $id, -32600,"Invalid Bean Type String");
 		if (preg_match("/\W/",$action)) return $this->resp(null, $id, -32600,"Invalid Action String");
