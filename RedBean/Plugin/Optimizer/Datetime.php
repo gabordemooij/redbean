@@ -51,7 +51,7 @@ class RedBean_Plugin_Optimizer_Datetime  implements RedBean_Plugin_IOptimizer {
 	/**
 	 * Toolbox, contains everyting required for this instance to
 	 * perform database operations within the RedBean framework.
-	 * 
+	 *
 	 * @var RedBean_Toolbox $toolbox a toolbox
 	 */
 	protected $toolbox;
@@ -167,7 +167,7 @@ class RedBean_Plugin_Optimizer_Datetime  implements RedBean_Plugin_IOptimizer {
 		}
 		else {
 			//yes column is datetime, if value is stop further optimizing
-			return false; 
+			return false;
 		}
 
 	}
@@ -185,6 +185,6 @@ class RedBean_Plugin_Optimizer_Datetime  implements RedBean_Plugin_IOptimizer {
 		return (boolean) (preg_match($pattern, $value));
 	}
 
-	
+
 
 }

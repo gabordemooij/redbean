@@ -74,20 +74,20 @@ function testpack($name) {
 testpack("Test JSON RPC");
 
 function s($data,$params=null,$id="1234") {
-	
+
 	$j = array(
 		"jsonrpc"=>"2.0",
 		"method"=>$data,
 		"params"=>$params,
 		"id"=>$id
 	);
-	
+
 	$can = new RedBean_BeanCan;
 	$request = json_encode($j);
 	$out =  $can->handleJSONRequest( $request );
-	
+
 	//echo "\n $out "; //--debugging
-	
+
 	return $out;
 }
 
@@ -108,10 +108,10 @@ R::exec('SET FOREIGN_KEY_CHECKS=1;');
 droptables();
 
 class Model_CandyBar extends RedBean_SimpleModel {
-	
+
 	public function customMethod($custom) {
 		return $custom."!";
-	}	
+	}
 
 }
 

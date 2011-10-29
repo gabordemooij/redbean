@@ -63,7 +63,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * Holds Database Adapter
 	 */
 	protected $adapter;
-	
+
 	/**
 	 * @var string
 	 * character to escape keyword table/column names
@@ -156,9 +156,9 @@ where table_schema = 'public'" );
 	 * @return integer $type type code for this value
 	 */
 	public function scanType( $value ) {
-		
+
 		// added value===null
-		$sz = ($this->startsWithZeros($value));  
+		$sz = ($this->startsWithZeros($value));
 		if ($sz) return self::C_DATATYPE_TEXT;
 		if ($value===null || ($value instanceof RedBean_Driver_PDO_NULL) ||(is_numeric($value)
 				  && floor($value)==$value
@@ -417,13 +417,13 @@ where table_schema = 'public'" );
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Removes all tables and views from the database.
 	 */
 	public function wipeAll() {
-	
-		
+
+
       	$this->adapter->exec('SET CONSTRAINTS ALL DEFERRED');
       	$this->adapter->startTransaction();
       	foreach($this->getTables() as $t) {
@@ -435,11 +435,11 @@ where table_schema = 'public'" );
 	 		try{
 	 			$this->adapter->exec("drop view if exists $t CASCADE ");
 	 		}
-	 		catch(Exception $e){ throw $e; }	
+	 		catch(Exception $e){ throw $e; }
 		}
 		$this->adapter->commit();
 		$this->adapter->exec('SET CONSTRAINTS ALL IMMEDIATE');
-	
+
 	}
 
 }

@@ -76,7 +76,7 @@ function droptables() {
 	global $toolbox;
 foreach($toolbox->getWriter()->getTables() as $t) {
 	try{$toolbox->getDatabaseAdapter()->Exec("drop table \"$t\" cascade");}catch(Exception $e){}
-	
+
 }
 }
 
@@ -112,10 +112,10 @@ try {
 
 	$pdo = $adapter->getDatabase();
 	//$pdo->setDebugMode(1);
-	
-	
-	
-	
+
+
+
+
 	try {
 		$adapter->exec("ALTER TABLE cask DROP CONSTRAINT fkb8317025deb6e03fc05abaabc748a503a ");
 	}catch(Exception $e) {
@@ -153,21 +153,21 @@ try {
 	}catch(Exception $e) {
 		die($e->getMessage());
 	}
-	
+
 	$adapter->exec("DROP TABLE IF EXISTS whisky CASCADE ");
-	
+
 $_tables = $writer->getTables();
 
-	
 
-	
+
+
 	if (in_array("page_user",$_tables)) $pdo->Execute("DROP TABLE page_user cascade");
 	if (in_array("cask_whisky",$_tables)) $pdo->Execute("DROP TABLE cask_whisky cascade");
 	if (in_array("cask",$_tables)) $pdo->Execute("DROP TABLE cask cascade");
 	if (in_array("whisky",$_tables)) $pdo->Execute("DROP TABLE whisky cascade");
 	if (in_array("page_page",$_tables)) $pdo->Execute("DROP TABLE page_page cascade");
 	if (in_array("xx_barrel_grapes",$_tables)) $pdo->Execute("DROP TABLE xx_barrel_grapes CASCADE");
-	if (in_array("admin_logentry",$_tables)) $pdo->Execute("DROP TABLE admin_logentry cascade"); 
+	if (in_array("admin_logentry",$_tables)) $pdo->Execute("DROP TABLE admin_logentry cascade");
 	if (in_array("testa_testb",$_tables)) $pdo->Execute("DROP TABLE testa_testb cascade");
 
 	if (!in_array("hack",$_tables)) $pdo->Execute("CREATE TABLE hack (id serial, PRIMARY KEY (id) ); ");
@@ -183,8 +183,8 @@ $_tables = $writer->getTables();
 	if (in_array("wine",$_tables)) $pdo->Execute("DROP TABLE wine");
 	if (in_array("xx_barrel",$_tables)) $pdo->Execute("DROP TABLE xx_barrel CASCADE");
 	if (in_array("xx_grapes",$_tables)) $pdo->Execute("DROP TABLE xx_grapes CASCADE");
-	
-		
+
+
 	$page = $redbean->dispense("page");
 
 	testpack("UNIT TEST Database");
@@ -224,7 +224,7 @@ droptables();
 	asrt( $page->name, "new name" );
 
 
-	
+
 //Null should == NULL after saving
 $page->rating = null;
 $newid = $redbean->store( $page );
@@ -381,10 +381,10 @@ asrt($page->numasstring2,"00.123");
 	asrt(count($a->related($user, "page" )),0);
 	$user2 = $redbean->dispense("user");
 	$user2->name = "Second User";
-	
-	
-	
-	
+
+
+
+
 function set1toNAssoc(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		global $a;
         $type = $bean1->getMeta("type");
@@ -542,7 +542,7 @@ asrt(count($redbean->find("page",array("id"=>array(2,3)))),2);
 	$redbean->find("wine", array("id"=>5)); //  Finder:where call RedBean_OODB::convertToBeans
 	$bean2 = $redbean->load("anotherbean", 5);
 	asrt($bean2->id,0);
-	
+
 	testpack("Test (UN)Common Scenarios");
 	$page = $redbean->dispense("page");
 	$page->name = "test page";
@@ -681,9 +681,9 @@ asrt(count($redbean->find("page",array("id"=>array(2,3)))),2);
 	}catch(Exception $e) {
 		die($e->getMessage());
 	}
-	
+
 	$adapter->exec("DROP TABLE IF EXISTS whisky CASCADE ");
-	
+
 
 
 //add cask 101 and whisky 12
@@ -877,7 +877,7 @@ $blogpost = (R::load("blog",1));
 asrt((isset($blogpost->cms_blog_id)),false);
 asrt((isset($blogpost->blog_id)),true);
 asrt(in_array("blog_id",array_keys(R::$writer->getColumns("blog"))),true);
-asrt(in_array("cms_blog_id",array_keys(R::$writer->getColumns("blog"))),false); 
+asrt(in_array("cms_blog_id",array_keys(R::$writer->getColumns("blog"))),false);
 
 
 
@@ -1029,7 +1029,7 @@ asrt(setget("2147483648"),"2147483648");
 asrt(setget("-2147483648"),"-2147483648");
 asrt(setget("199936710040730"),"199936710040730");
 asrt(setget("-199936710040730"),"-199936710040730");
-//Architecture dependent... only test this if you are sure what arch 
+//Architecture dependent... only test this if you are sure what arch
 //asrt(setget("2147483647123456"),"2.14748364712346e+15");
 //asrt(setget(2147483647123456),"2.14748364712e+15");
 asrt(setget("2010-10-11"),"2010-10-11");
@@ -1050,7 +1050,7 @@ asrt(setget(null),null);
 asrt((setget(0)==0),true);
 asrt((setget(1)==1),true);
 asrt((setget(true)==true),true);
-asrt((setget(false)==false),true);  
+asrt((setget(false)==false),true);
 
 
 testpack("test views");
@@ -1068,7 +1068,7 @@ class Fm2 implements RedBean_IBeanFormatter{
 	public function getAlias($a){ return '__';}
 }
 
-function testViews($p) { 
+function testViews($p) {
 
 R::exec(" drop table if exists bandmember_musician CASCADE");
 R::exec(" drop table if exists band_bandmember CASCADE");
@@ -1129,14 +1129,14 @@ catch(Exception $e) {
 }
 
 //can we do a simple query?
-$nameOfBandWithID1 = R::getCell("select name from ".$p."bandlist where ".R::$writer->getIDField("band")." = 1 
+$nameOfBandWithID1 = R::getCell("select name from ".$p."bandlist where ".R::$writer->getIDField("band")." = 1
 group by  ".R::$writer->getIDField("band").",\"name\"");
 asrt($nameOfBandWithID1,"The Groofy");
 
 //can we generate a report? list all bandleaders
 $bandleaders = R::getAll("select  bandleader_of_bandmember,name_of_musician,\"name\" AS bandname
 	from ".$p."bandlist where bandleader_of_bandmember =  1 group by id ");
-	
+
 foreach($bandleaders as $bl) {
 	if ($bl["bandname"]=="Wickey Mickey") {
 		asrt($bl["name_of_musician"],"Mickey");
@@ -1146,9 +1146,9 @@ foreach($bandleaders as $bl) {
 	}
 }
 //can we draw statistics?
-$inHowManyBandsDoYouPlay = R::getAll("select 
-name_of_musician ,count( distinct ".R::$writer->getIDField("band").") as bands 
-from ".$p."bandlist group by ".R::$writer->getIDField("musician")."_of_musician,name_of_musician order by name_of_musician asc 
+$inHowManyBandsDoYouPlay = R::getAll("select
+name_of_musician ,count( distinct ".R::$writer->getIDField("band").") as bands
+from ".$p."bandlist group by ".R::$writer->getIDField("musician")."_of_musician,name_of_musician order by name_of_musician asc
 ");
 
 asrt($inHowManyBandsDoYouPlay[0]["name_of_musician"],"Donald");
@@ -1162,7 +1162,7 @@ asrt($inHowManyBandsDoYouPlay[2]["bands"],'2');
 //can we make a selectbox
 $selectbox = R::getAll("
 	select m.".R::$writer->getIDField("musician").", m.name, b.".R::$writer->getIDField("band")." as selected from ".$p."musician as m
-	left join ".$p."bandlist as b on b.".R::$writer->getIDField("musician")."_of_musician = m.".R::$writer->getIDField("musician")." and 
+	left join ".$p."bandlist as b on b.".R::$writer->getIDField("musician")."_of_musician = m.".R::$writer->getIDField("musician")." and
 	b.".R::$writer->getIDField("band")." =2
 	order by m.name asc
 ");

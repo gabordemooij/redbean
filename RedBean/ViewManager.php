@@ -13,10 +13,10 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
- 
+
 class RedBean_ViewManager {
 
-	
+
 
 	/**
 	 * @var RedBean_OODB
@@ -64,7 +64,7 @@ class RedBean_ViewManager {
 		$currentTable = $refTable;
 		$history[$refType] = $refType;
 		foreach($types as $t) {
-			if (!isset($history[$t])){ 
+			if (!isset($history[$t])){
 				$history[$t] = $t;
 				$connection = array($t,$currentTable);
 				sort($connection);
@@ -91,7 +91,7 @@ class RedBean_ViewManager {
 			$currentTable=$t;
 		}
 		try{
-			$rs = (boolean) $this->writer->createView($refType,$joins,$viewID); 
+			$rs = (boolean) $this->writer->createView($refType,$joins,$viewID);
 		}
 		catch(Exception $e) {
 			throw new RedBean_Exception_SQL('Could not create view, types does not seem related (yet)..');
