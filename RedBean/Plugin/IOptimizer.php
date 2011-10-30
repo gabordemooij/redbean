@@ -27,7 +27,7 @@ interface RedBean_Plugin_IOptimizer {
 	 * @param string $column column
 	 */
 	public function setColumn($column);
-	
+
 	/**
 	 * Sets the value.
 	 *

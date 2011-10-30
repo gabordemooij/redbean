@@ -404,9 +404,9 @@ testpack("Test Association ");
 
 
 $rb = $redbean;
-$testA = $rb->dispense( 'testA' ); 
-$testB = $rb->dispense( 'testB' ); 
-$a = new RedBean_AssociationManager( $toolbox ); 
+$testA = $rb->dispense( 'testA' );
+$testB = $rb->dispense( 'testB' );
+$a = new RedBean_AssociationManager( $toolbox );
 try {
 	$a->related( $testA, "testB" );
 	pass();
@@ -943,7 +943,7 @@ $blogpost = (R::load("blog",1));
 asrt((isset($blogpost->cms_blog_id)),false);
 asrt((isset($blogpost->blog_id)),true);
 asrt(in_array("blog_id",array_keys(R::$writer->getColumns("blog"))),true);
-asrt(in_array("cms_blog_id",array_keys(R::$writer->getColumns("blog"))),false); 
+asrt(in_array("cms_blog_id",array_keys(R::$writer->getColumns("blog"))),false);
 
 
 testpack("New relations");
@@ -1080,7 +1080,7 @@ asrt(setget("2147483648"),"2147483648");
 asrt(setget("-2147483648"),"-2147483648");
 asrt(setget("199936710040730"),"199936710040730");
 asrt(setget("-199936710040730"),"-199936710040730");
-//Architecture dependent... only test this if you are sure what arch 
+//Architecture dependent... only test this if you are sure what arch
 //asrt(setget("2147483647123456"),"2.14748364712346e+15");
 //asrt(setget(2147483647123456),"2.14748364712e+15");
 asrt(setget("2010-10-11"),"2010-10-11");
@@ -1101,7 +1101,7 @@ asrt(setget(null),null);
 asrt((setget(0)==0),true);
 asrt((setget(1)==1),true);
 asrt((setget(true)==true),true);
-asrt((setget(false)==false),true);  
+asrt((setget(false)==false),true);
 
 
 testpack("test optimization related() ");
@@ -1128,7 +1128,7 @@ asrt(count($beans["pairs"]),2);
 asrt($beans["can"]["book"]->getMeta("tainted"),true);
 asrt($beans["can"]["book2"]->getMeta("tainted"),true);
 asrt($beans["can"]["book3"]->getMeta("tainted"),false);
-asrt($beans["can"]["book3"]->title,"ABC"); 
+asrt($beans["can"]["book3"]->title,"ABC");
 asrt($beans["pairs"][0][0]->title,"programming the C64");
 
 
@@ -1148,7 +1148,7 @@ class Fm2 implements RedBean_IBeanFormatter{
 	public function getAlias($a){ return '__';}
 }
 
-function testViews($p) { 
+function testViews($p) {
 
 R::exec(" drop table if exists prefix_bandmember_musician ");
 R::exec(" drop table if exists prefix_band_bandmember ");
@@ -1215,7 +1215,7 @@ asrt($nameOfBandWithID1,"The Groofy");
 //can we generate a report? list all bandleaders
 $bandleaders = R::getAll("select bandleader_of_bandmember,name_of_musician,name AS bandname
 	from ".$p."bandlist where bandleader_of_bandmember =  1 group by id ");
-	
+
 foreach($bandleaders as $bl) {
 	if ($bl["bandname"]=="Wickey Mickey") {
 		asrt($bl["name_of_musician"],"Mickey");
@@ -1225,9 +1225,9 @@ foreach($bandleaders as $bl) {
 	}
 }
 //can we draw statistics?
-$inHowManyBandsDoYouPlay = R::getAll("select 
- name_of_musician ,count( distinct ".R::$writer->getIDField("band").") as bands 
-from ".$p."bandlist group by ".R::$writer->getIDField("musician")."_of_musician  order by name_of_musician asc 
+$inHowManyBandsDoYouPlay = R::getAll("select
+ name_of_musician ,count( distinct ".R::$writer->getIDField("band").") as bands
+from ".$p."bandlist group by ".R::$writer->getIDField("musician")."_of_musician  order by name_of_musician asc
 ");
 
 
@@ -1243,7 +1243,7 @@ asrt($inHowManyBandsDoYouPlay[2]["bands"],'2');
 //can we make a selectbox
 $selectbox = R::getAll("
 	select m.".R::$writer->getIDField("musician").", m.name, b.".R::$writer->getIDField("band")." as selected from ".$p."musician as m
-	left join ".$p."bandlist as b on b.".R::$writer->getIDField("musician")."_of_musician = m.".R::$writer->getIDField("musician")." and 
+	left join ".$p."bandlist as b on b.".R::$writer->getIDField("musician")."_of_musician = m.".R::$writer->getIDField("musician")." and
 	b.".R::$writer->getIDField("band")." =2
 	order by m.name asc
 ");

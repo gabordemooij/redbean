@@ -29,7 +29,7 @@ class RedBean_Cooker {
 	 * To load a bean (for association):
 	 *
 	 * array( "theaddress"=> array("type"=>"address","id"=>2) )
-	 * 
+	 *
 	 * - Loads a bean of type address with ID 2
 	 *
 	 * Now to associate this bean in your form:
@@ -90,10 +90,10 @@ class RedBean_Cooker {
 				}
 				//do we need to modify this bean?
 				foreach($rawBean as $field=>$value){
-					if (!empty($value)) 
+					if (!empty($value))
 						$bean->$field = $value;
 					elseif (!self::$dontSetEmptyValues)
-						$bean->$field = $value; 
+						$bean->$field = $value;
 				}
 				$can[$key]=$bean;
 				if (!isset($sorted[$type]))  $sorted[$type]=array();
@@ -109,7 +109,7 @@ class RedBean_Cooker {
 					if (isset($can[$keys[0]])) $bean1 = $can[$keys[0]]; else {
 						$loader = explode(":",$keys[0]);
 						$bean1 = RedBean_Facade::load( $loader[0], $loader[1] );
-					} 
+					}
 					$bean2 = $can[$keys[1]];
 					$pairs[] = array( $bean1, $bean2 );
 				}
@@ -124,7 +124,7 @@ class RedBean_Cooker {
 
 	/**
 	 * Sets the toolbox to be used by graph()
-	 * 
+	 *
 	 * @param RedBean_Toolbox $toolbox toolbox
 	 * @return void
 	 */

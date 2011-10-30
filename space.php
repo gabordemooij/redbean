@@ -20,7 +20,7 @@ $n = $_SERVER["argv"][1];
 
 if (preg_match("/\w+/",$n)) {
 	echo "\n selected namespace: $n ";
-} 
+}
 else {
 	die("\n namespace contains illegal characters. ");
 }

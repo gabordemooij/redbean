@@ -34,14 +34,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * table schema.
 	 */
 	public $tableFormatter;
-  
-  
+
+
 	/**
 	 * @var array
 	 * Supported Column Types.
 	 */
 	public $typeno_sqltype = array();
-	
+
 	/**
 	 *
 	 * @var RedBean_Adapter_DBAdapter
@@ -82,7 +82,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * Do everything that needs to be done to format a table name.
 	 *
 	 * @param string $name of table
-	 * 
+	 *
 	 * @return string table name
 	 */
 	public function safeTable($name, $noQuotes = false) {
@@ -91,7 +91,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
 	}
-	
+
 	/**
 	 * Do everything that needs to be done to format a column name.
 	 *
@@ -104,7 +104,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
 	}
-	
+
 	/**
 	 * Returns the sql that should follow an insert statement.
 	 *
@@ -153,7 +153,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function setBeanFormatter( RedBean_IBeanFormatter $beanFormatter ) {
 		$this->tableFormatter = $beanFormatter;
 	}
-	
+
 	/**
 	 * Get sql column type.
 	 *
@@ -178,7 +178,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if ($nArgs>1) throw new Exception("Deprecated parameter SAFE, use safeColumn() instead.");
 		return $this->tableFormatter->formatBeanID($type);
 	}
-	
+
 	/**
 	 * Checks table name or column name.
 	 *
@@ -192,7 +192,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	    }
 		return $this->adapter->escape($table);
 	}
-	
+
 	/**
 	 * Puts keyword escaping symbols around string.
 	 *
@@ -204,7 +204,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$q = $this->quoteCharacter;
 		return $q.$str.$q;
 	}
-	
+
 	/**
 	 * This method adds a column to a table.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -225,7 +225,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$sql = "ALTER TABLE $table ADD $column $type ";
 		$this->adapter->exec( $sql );
 	}
-	
+
 	/**
 	 * This method updates (or inserts) a record, it takes
 	 * a table name, a list of update values ( $field => $value ) and an
@@ -285,7 +285,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			}
 			$insertSQL = "INSERT INTO $table ( $idfield, ".implode(",",$insertcolumns)." ) VALUES ";
 			$insertSQL .= "( $default, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) $suffix";
-			
+
 			foreach($insertvalues as $i=>$insertvalue) {
 				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue, $i );
 			}
@@ -298,8 +298,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	   $last_id = $this->adapter->getInsertID();
 		return ($this->adapter->getErrorMsg()=="" ?  $last_id : 0);
 	}
-	
-	
+
+
 	/**
 	 * This selects a record. You provide a
 	 * collection of conditions using the following format:
@@ -321,7 +321,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false ) {
 		if (!is_array($conditions)) throw new Exception("Conditions must be an array");
-		
+
 		$table = $this->safeTable($type);
 		$sqlConditions = array();
 		$bindings=array();
