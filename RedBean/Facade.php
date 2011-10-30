@@ -83,17 +83,8 @@ class RedBean_Facade {
 	 * @return string $version Version ID
 	 */
 	public static function getVersion() {
-		return "2.1";
+		return "2.2";
 	}
-
-	/**
-	 * Flag to indicate whether experimental (fearless) code might be used.
-	 * If you experience any problems with new features these can be degrade
-	 * easily by doing R::$flagFearless = false;
-	 * @var bool
-	 */
-	public static $flagFearless = true;
-
 
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
