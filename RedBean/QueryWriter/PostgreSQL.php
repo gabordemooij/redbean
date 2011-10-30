@@ -425,19 +425,19 @@ where table_schema = 'public'" );
 
 
       	$this->adapter->exec('SET CONSTRAINTS ALL DEFERRED');
-      	$this->adapter->startTransaction();
+      	//$this->adapter->startTransaction();
       	foreach($this->getTables() as $t) {
       		$t = $this->noKW($t);
 	 		try{
 	 			$this->adapter->exec("drop table if exists $t CASCADE ");
 	 		}
-	 		catch(Exception $e){ throw $e; }
+	 		catch(Exception $e){  }
 	 		try{
 	 			$this->adapter->exec("drop view if exists $t CASCADE ");
 	 		}
-	 		catch(Exception $e){ throw $e; }
+	 		catch(Exception $e){  throw $e; }
 		}
-		$this->adapter->commit();
+		//$this->adapter->commit();
 		$this->adapter->exec('SET CONSTRAINTS ALL IMMEDIATE');
 
 	}
