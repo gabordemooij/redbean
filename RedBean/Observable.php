@@ -14,7 +14,7 @@
  */
 abstract class RedBean_Observable {
 	/**
-	 *	 
+	 *
 	 * @var array
 	 */
 	private $observers = array();
@@ -48,7 +48,7 @@ abstract class RedBean_Observable {
 	 * This method is provided by the abstract class Observable for
 	 * convience. Observables can use this method to notify their
 	 * observers by sending an event ID and information parameter.
-	 * 
+	 *
 	 * @param string $eventname eventname
 	 * @param mixed  $info      info
 	 * @return unknown_ty

@@ -149,7 +149,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function updateRecord($type, $updatevalues, $id=null);
 
-	
+
 	/**
 	 * This method should select a record. You should be able to provide a
 	 * collection of conditions using the following format:
@@ -185,7 +185,7 @@ interface RedBean_QueryWriter {
 	/**
 	 * Returns the property that contains the Primary Key ID in an
 	 * OODBBean instance.
-	 * 
+	 *
 	 * @param string $tableOfTheBean
 	 *
 	 * @return void

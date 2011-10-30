@@ -60,7 +60,7 @@ class RedBean_OODB extends RedBean_Observable {
 		else {
 			throw new RedBean_Exception_Security("Passing an invalid Query Writer");
 		}
-		
+
 		$this->beanhelper = new RedBean_BeanHelperFacade();
 
 
@@ -119,7 +119,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * Sets bean helper
 	 *
 	 * @param RedBean_IBeanHelper $beanhelper helper
-	 * 
+	 *
 	 * @return void
 	 */
 	public function setBeanHelper( RedBean_IBeanHelper $beanhelper) {
@@ -345,7 +345,7 @@ class RedBean_OODB extends RedBean_Observable {
 						//What kind of property are we dealing with?
 						$typeno = $this->writer->scanType($v);
 					}
-					
+
 					//Is this property represented in the table?
 					if (isset($columns[$p])) {
 						//yes it is, does it still fit?
@@ -376,7 +376,7 @@ class RedBean_OODB extends RedBean_Observable {
 				$this->writer->addUniqueIndex( $table, $unique );
 			}
 		}
-		
+
 		$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
 		$bean->$idfield = $rs;
 
@@ -391,12 +391,12 @@ class RedBean_OODB extends RedBean_Observable {
 
 		foreach($embeddedBeans as $linkField=>$embeddedBean) {
 			if (!$this->isFrozen) {
-				
+
 				$this->writer->addIndex($bean->getMeta('type'),
 							'index_foreignkey_'.$embeddedBean->getMeta('type'),
 							 $linkField);
 				$this->writer->addFK($bean->getMeta('type'),$embeddedBean->getMeta('type'),$linkField,$this->writer->getIDField($embeddedBean->getMeta('type')));
-				
+
 			}
 		}
 
@@ -404,7 +404,7 @@ class RedBean_OODB extends RedBean_Observable {
 		//Handle related beans
 		foreach($ownTrashcan as $trash) {
 			if ($trash instanceof RedBean_OODBBean) {
-				$trash->$myFieldLink = null; 
+				$trash->$myFieldLink = null;
 				$this->store($trash);
 			}
 			else {
@@ -533,9 +533,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	public function trash( RedBean_OODBBean $bean ) {
 		$idfield = $this->writer->getIDField($bean->getMeta("type"));
-		
+
 		$this->signal( "delete", $bean );
-		
+
 		foreach($bean as $p=>$v) {
 
 
@@ -552,7 +552,7 @@ class RedBean_OODB extends RedBean_Observable {
 				}
 			}
 		}
-		
+
 		if (!$this->isFrozen) $this->check( $bean );
 		try {
 			$this->writer->selectRecord($bean->getMeta("type"),
@@ -565,9 +565,9 @@ class RedBean_OODB extends RedBean_Observable {
 			)) throw $e;
 		}
 		$bean->$idfield = 0;
-		
+
 		$this->signal( "after_delete", $bean );
-		
+
 	}
 
 	/**
@@ -617,7 +617,7 @@ class RedBean_OODB extends RedBean_Observable {
 	public function convertToBeans($type, $rows) {
 		$collection = array();
 		$this->stash = array();
-		foreach($rows as $row) { 
+		foreach($rows as $row) {
 			$id = $row[$this->writer->getIDField($type)];
 			$this->stash[$id] = $row;
 			$collection[ $id ] = $this->load( $type, $id );
@@ -629,10 +629,10 @@ class RedBean_OODB extends RedBean_Observable {
 
 	/**
 	 * Returns the number of beans we have in DB of a given type.
-	 * 
+	 *
 	 * @param string $type type of bean we are looking for
-	 * 
-	 * @return integer $num number of beans found 
+	 *
+	 * @return integer $num number of beans found
 	 */
 	public function count($type) {
 		try {
@@ -667,7 +667,7 @@ class RedBean_OODB extends RedBean_Observable {
 
 	/**
 	 * Returns an Association Manager for use with OODB.
-	 * 
+	 *
 	 * @throws Exception
 	 * @return RedBean_AssociationManager $assoc Assoction Manager
 	 */

@@ -37,7 +37,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param RedBean_ToolBox $tools toolbox
 	 */
 	public function __construct( RedBean_ToolBox $tools ) {
@@ -131,7 +131,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			))) throw $e;
 		}
 	}
-	
+
 	/**
 	 * Returns all ids of beans of type $type that are related to $bean. If the
 	 * $getLinks parameter is set to boolean TRUE this method will return the ids
@@ -291,7 +291,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			)) throw $e;
 		}
 	}
-	
+
 	/**
 	 * Given two beans this function returns TRUE if they are associated using a
 	 * many-to-many association, FALSE otherwise.

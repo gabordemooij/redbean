@@ -126,6 +126,6 @@ class RedBean_Setup {
 		return self::$observers;
 	}
 
-	
+
 
 }
