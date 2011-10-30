@@ -6,8 +6,8 @@ error_reporting(E_ALL | E_STRICT);
 require('rb.php');
 
 //R::setup("pgsql:host=localhost;dbname=oodb","postgres"); $db="pgsql";
-R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
-//R::setup(); $db="sqlite"; R::exec(' PRAGMA foreign_keys = ON ');
+//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+R::setup(); $db="sqlite"; R::exec(' PRAGMA foreign_keys = ON ');
 
 
 function printtext( $text ) {
@@ -1483,7 +1483,8 @@ R::freeze();
 R::nuke();
 asrt(count(R::$writer->getTables()),1); //no effect
 
-
+testpack('ext keyword test');
+R::freeze(false);
 
 $keywords = array('anokeyword','znokeyword','group','DROP','inner','JOIN','select',
 'table','int','cascade','float','CALL','in','status','order',
