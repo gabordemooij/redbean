@@ -275,28 +275,6 @@ where table_schema = 'public'" );
 	}
 
 	/**
-	 * Returns a snippet of SQL to filter records using SQL and a list of
-	 * keys.
-	 *
-	 * @param string  $idfield ID Field to use for selecting primary key
-	 * @param array   $keys		List of keys to use for filtering
-	 * @param string  $sql		SQL to append, if any
-	 * @param boolean $inverse Whether you want to inverse the selection
-	 *
-	 * @return string $snippet SQL Snippet crafted by function
-	 */
-	public function getSQLSnippetFilter( $idfield, $keys, $sql=null, $inverse=false ) {
-		if (!$sql) $sql=" TRUE ";
-		if (!$inverse && count($keys)===0) return " TRUE ";
-		$idfield = $this->noKW($idfield);
-		$sqlInverse = ($inverse) ? "NOT" : "";
-		$sqlKeyFilter = ($keys) ? " $idfield $sqlInverse IN (".implode(",",$keys).") AND " : " ";
-		$sqlSnippet = $sqlKeyFilter . $sql;
-		return $sqlSnippet;
-	}
-
-
-	/**
 	 * Adds a foreign key to a table. The foreign key will not have any action; you
 	 * may configure this afterwards.
 	 *
