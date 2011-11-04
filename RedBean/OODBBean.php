@@ -183,7 +183,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 		if (isset($this->$fieldLink)) {
 			//wanna unset a bean reference?
 			$this->$fieldLink = null;
-			return;
+			//return;
 		}
 
 		if ((isset($this->properties[$property]))) {
@@ -235,7 +235,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 				$type =  $toolbox->getWriter()->getAlias($property);
 				$targetType = $this->properties[$fieldLink];
 				$bean =  $toolbox->getRedBean()->load($type,$targetType);
-				return $bean;
+				//return $bean;
+				$this->properties[$property] = $bean;
+				return $this->properties[$property];
 			}
 
 			if (strpos($property,'own')===0) {

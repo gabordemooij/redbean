@@ -1522,6 +1522,22 @@ foreach($keywords as $k) {
 	
 }
 
+testpack('Test single nested bean modification issue');
+
+R::nuke();
+$farm = R::dispense('building');
+$village = R::dispense('village') ;
+$village->name = 'potterville' ;
+$farm->village = $village ;
+$id = R::store($farm);
+
+$farm = R::load('building',$id);
+$farm->name = 123;
+$farm->village->name = 'somewheresville';
+asrt($farm->village->name,'somewheresville');
+$id = R::store($farm);
+$f=R::load('building',$id);
+asrt($farm->village->name,'somewheresville');
 
 
 
