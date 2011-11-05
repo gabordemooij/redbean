@@ -548,14 +548,16 @@ class RedBean_Facade {
 	 *
 	 * @param string $sql	 sql
 	 * @param array  $values values
+	 * @param string $key Field for the array key (optional)
+	 * @param string $value Field for the value of the array (optional)
 	 *
 	 * @return array $results
 	 */
-	public static function getAll( $sql, $values=array() ) {
+	public static function getAll( $sql, $values=array(), $key=null, $value=null ) {
 
 		if (!self::$redbean->isFrozen()) {
 			try {
-				$rs = RedBean_Facade::$adapter->get( $sql, $values );
+				$rs = RedBean_Facade::$adapter->get( $sql, $values, $key, $value );
 			}catch(RedBean_Exception_SQL $e) {
 				if(self::$writer->sqlStateIn($e->getSQLState(),
 				array(
@@ -572,7 +574,41 @@ class RedBean_Facade {
 			return $rs;
 		}
 		else {
-			return RedBean_Facade::$adapter->get( $sql, $values );
+			return RedBean_Facade::$adapter->get( $sql, $values, $key, $value );
+		}
+	}
+
+	/**
+	 * Convenience function to execute Queries directly.
+	 * Executes SQL.
+	 *
+	 * @param string $sql	 sql
+	 * @param array  $values values
+	 *
+	 * @return string $result scalar
+	 */
+	public static function getCell( $sql, $values=array() ) {
+
+		if (!self::$redbean->isFrozen()) {
+			try {
+				$rs = RedBean_Facade::$adapter->getCell( $sql, $values );
+			}catch(RedBean_Exception_SQL $e) {
+				if(self::$writer->sqlStateIn($e->getSQLState(),
+				array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+				)) {
+					return NULL;
+				}
+				else {
+					throw $e;
+				}
+
+			}
+			return $rs;
+		}
+		else {
+			return RedBean_Facade::$adapter->getCell( $sql, $values );
 		}
 	}
 
