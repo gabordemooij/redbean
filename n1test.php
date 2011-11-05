@@ -1540,5 +1540,34 @@ $f=R::load('building',$id);
 asrt($farm->village->name,'somewheresville');
 
 
+R::nuke();
+$farm = R::dispense('building');
+$village = R::dispense('village') ;
+$village->name = 'potterville' ;
+$farm->village = $village ;
+$id = R::store($farm);
+
+$farm = R::load('building',$id);
+$farm->village->name = 'somewheresville';
+asrt($farm->village->name,'somewheresville');
+$id = R::store($farm);
+$f=R::load('building',$id);
+asrt($farm->village->name,'somewheresville');
+
+
+$village->country = R::dispense('country');
+$village->country->name = 'Holland';
+R::store($village);
+$farm= R::load('building',$id);
+$farm->village->country->name = 'Belgium';
+R::store($farm);
+$farm = R::load('building',$id);
+asrt($farm->village->country->name,'Belgium');
+
+$farm->village->ownBuilding[$id]->village->name = 'Snowville';
+R::store($farm);
+$farm = R::load('building',$id);
+asrt($farm->village->name,'Snowville');
+
 
 
