@@ -205,10 +205,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * Runs a query and fetches results as a multi dimensional array.
 	 *
 	 * @param  string $sql SQL to be executed
+	 * @param string $key Field for the array key (optional)
+	 * @param string $value Field for the value of the array (optional)
 	 *
 	 * @return array $results result
 	 */
-	public function GetAll( $sql, $aValues=array() ) {
+	public function GetAll( $sql, $aValues=array(), $key=null, $value=null ) {
 		$this->connect();
 		$this->exc = 0;
 		if ($this->debug) {
@@ -229,7 +231,17 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		  	else {
 		    	$this->rs = null;
 		  	}
-			$rows = $this->rs;
+
+			if( !$key )
+				$rows = $this->rs;
+			elseif( !$value )
+				foreach( $this->rs as $row )
+					$rows[ $row[$key] ] = $row;
+			else
+				foreach( $this->rs as $row )
+					$rows[ $row[$key] ] = $row[$value];
+
+
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
