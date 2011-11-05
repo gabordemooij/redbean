@@ -97,13 +97,15 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 *
 	 * @param  string $sql		SQL code to execute
 	 * @param  array  $values	assoc. array binding values
+	 * @param string $key Field for the array key (optional)
+	 * @param string $value Field for the value of the array (optional)
 	 *
 	 * @return array  $result	two dimensional array result set
 	 */
-	public function get( $sql, $aValues = array() ) {
+	public function get( $sql, $aValues = array(), $key = null, $value = null ) {
 		$this->sql = $sql;
 		$this->signal("sql_exec", $this);
-		return $this->db->GetAll( $sql,$aValues );
+		return $this->db->GetAll( $sql,$aValues,$key,$value );
 	}
 
 	/**
