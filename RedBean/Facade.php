@@ -587,18 +587,18 @@ class RedBean_Facade {
 	 *
 	 * @return string $result scalar
 	 */
-	public static function getCell( $sql, $values=array() ) {
+	public static function getAll( $sql, $values=array(), $key=null, $value=null ) {
 
 		if (!self::$redbean->isFrozen()) {
 			try {
-				$rs = RedBean_Facade::$adapter->getCell( $sql, $values );
+				$rs = RedBean_Facade::$adapter->get( $sql, $values, $key, $value );
 			}catch(RedBean_Exception_SQL $e) {
 				if(self::$writer->sqlStateIn($e->getSQLState(),
 				array(
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 				)) {
-					return NULL;
+					return array();
 				}
 				else {
 					throw $e;
@@ -608,7 +608,7 @@ class RedBean_Facade {
 			return $rs;
 		}
 		else {
-			return RedBean_Facade::$adapter->getCell( $sql, $values );
+			return RedBean_Facade::$adapter->get( $sql, $values, $key, $value );
 		}
 	}
 
