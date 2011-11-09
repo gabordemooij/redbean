@@ -223,6 +223,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			}
 			$this->bindParams( $s, $aValues );
 			$s->execute();
+			$this->affected_rows=$s->rowCount();
 		  	if ($s->columnCount()) {
 		    	$this->rs = $s->fetchAll();
 	    	}

@@ -1108,3 +1108,12 @@ class RedBean_Facade {
 	}
 
 }
+
+//Compatibility with PHP 5.2 and earlier.
+if (function_exists('lcfirst')===false){
+	function lcfirst( $str ){
+		return (string)(strtolower(substr($str,0,1)).substr($str,1));
+    }
+}
+
+

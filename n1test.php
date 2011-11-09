@@ -6,8 +6,8 @@ error_reporting(E_ALL | E_STRICT);
 require('rb.php');
 
 //R::setup("pgsql:host=localhost;dbname=oodb","postgres"); $db="pgsql";
-//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
-R::setup(); $db="sqlite"; R::exec(' PRAGMA foreign_keys = ON ');
+R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+//R::setup(); $db="sqlite"; R::exec(' PRAGMA foreign_keys = ON ');
 
 
 function printtext( $text ) {
@@ -1581,4 +1581,13 @@ $farm->village->sharedArmy[$sid]->sharedVillage[$vid]->name = 'Knightsville';
 R::store($farm);
 $farm = R::load('building',$id);
 asrt($farm->village->name,'Knightsville');
+
+
+testpack('affected rows');
+R::nuke();
+$b=R::dispense('book');
+$b->title = 'aaa';
+R::store($b);
+asrt(R::$adapter->getAffectedRows(),1);
+
 
