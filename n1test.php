@@ -1557,7 +1557,7 @@ asrt($farm->village->name,'somewheresville');
 
 $village->country = R::dispense('country');
 $village->country->name = 'Holland';
-R::store($village);
+$vid=R::store($village);
 $farm= R::load('building',$id);
 $farm->village->country->name = 'Belgium';
 R::store($farm);
@@ -1570,4 +1570,15 @@ $farm = R::load('building',$id);
 asrt($farm->village->name,'Snowville');
 
 
+$army = R::dispense('army');
+$army->name = 'knights';
+$farm->village->sharedArmy = array($army);
+R::store($farm);
+$farm = R::load('building',$id);
+$sa = reset($farm->village->sharedArmy);
+$sid = $sa->getID();
+$farm->village->sharedArmy[$sid]->sharedVillage[$vid]->name = 'Knightsville';
+R::store($farm);
+$farm = R::load('building',$id);
+asrt($farm->village->name,'Knightsville');
 
