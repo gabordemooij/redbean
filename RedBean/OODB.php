@@ -257,14 +257,21 @@ class RedBean_OODB extends RedBean_Observable {
 	public function store( RedBean_OODBBean $bean ) {
 
 		$processLists = false;
+
 		foreach($bean as $k=>$v) {
 			if (is_array($v) || is_object($v)) { $processLists = true; break; }
 		}
 
-
 		if (!$processLists && !$bean->getMeta('tainted')) return $bean->getID();
+	
+		
 		$this->signal( "update", $bean );
 
+		foreach($bean as $k=>$v) {
+			if (is_array($v) || is_object($v)) { $processLists = true; break; }
+		}
+
+		
 		if ($processLists) {
 		//Define groups
 		$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array();

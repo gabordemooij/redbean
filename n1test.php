@@ -6,8 +6,8 @@ error_reporting(E_ALL | E_STRICT);
 require('rb.php');
 
 //R::setup("pgsql:host=localhost;dbname=oodb","postgres"); $db="pgsql";
-R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
-//R::setup(); $db="sqlite"; R::exec(' PRAGMA foreign_keys = ON ');
+//R::setup("mysql:host=localhost;dbname=oodb","root"); $db="mysql";
+R::setup(); $db="sqlite"; R::exec(' PRAGMA foreign_keys = ON ');
 
 
 function printtext( $text ) {
@@ -78,7 +78,7 @@ if ($db=='sqlite') R::exec('PRAGMA foreign_keys = 1 ');
 
 }
 
-
+//goto blaat;
 
 
 function testids($array) {
@@ -1589,5 +1589,60 @@ $b=R::dispense('book');
 $b->title = 'aaa';
 R::store($b);
 asrt(R::$adapter->getAffectedRows(),1);
+
+
+blaat:
+
+testpack('FUSE models cant touch nested beans in update() - issue 106');
+R::nuke();
+
+Class Model_Test extends RedBean_SimpleModel {
+
+  public function update() {
+    if($this->bean->item->val) {
+      $this->bean->item->val='Test2';
+      $can = R::dispense('can');
+      $can->name = 'can for bean';
+      $s = reset($this->bean->sharedSpoon);
+      $s->name = "S2";
+      $this->bean->item->deep->name = '123';	      
+      $this->bean->ownCan[] = $can;
+      $this->bean->sharedPeas = R::dispense('peas',10);
+      $this->bean->ownChip = R::dispense('chip',9);
+      
+    }
+  }
+
+}
+
+
+$spoon = R::dispense('spoon');
+$spoon->name = 'spoon for test bean';
+$deep = R::dispense('deep');
+$deep->name = 'deepbean';
+$item = R::dispense('item');
+$item->val = 'Test';
+$item->deep = $deep;
+
+$test = R::dispense('test');
+$test->item = $item;
+$test->sharedSpoon[] = $spoon;
+
+
+$test->isNowTainted = true;
+$id=R::store($test); 
+$test = R::load('test',$id);
+asrt($test->item->val,'Test2');
+$can = reset($test->ownCan);
+$spoon = reset($test->sharedSpoon);
+asrt($can->name,'can for bean');
+asrt($spoon->name,'S2');
+asrt($test->item->deep->name,'123');
+asrt(count($test->ownCan),1);
+asrt(count($test->sharedSpoon),1);
+asrt(count($test->sharedPeas),10);
+asrt(count($test->ownChip),9);
+
+
 
 
