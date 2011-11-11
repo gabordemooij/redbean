@@ -1129,6 +1129,8 @@ asrt($writer->scanType(1.5),3);
 asrt($writer->scanType(INF),4);
 asrt($writer->scanType("abc"),4);
 asrt($writer->scanType(str_repeat("lorem ipsum",100)),5);
+asrt($writer->scanType(str_repeat("A",65535)),5);
+asrt($writer->scanType(str_repeat("A",65536)),6);
 $writer->widenColumn("testtable", "c1", 2);
 $cols=$writer->getColumns("testtable");
 asrt($writer->code($cols["c1"]),2);
