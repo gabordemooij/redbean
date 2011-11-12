@@ -28,7 +28,7 @@ interface RedBean_Driver {
 	 *
 	 * @return RedBean_Driver $driver	  driver wrapper instance
 	 */
-	public static function getInstance( $host, $user, $pass, $dbname );
+	public static function getInstance( $host, $user, $pass );
 
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.
