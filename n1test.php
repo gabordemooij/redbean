@@ -1643,6 +1643,140 @@ asrt(count($test->sharedSpoon),1);
 asrt(count($test->sharedPeas),10);
 asrt(count($test->ownChip),9);
 
+R::nuke();
+
+
+
+Class Model_Coffee extends RedBean_SimpleModel {
+
+  public function update() {
+  
+  	
+   	while (count($this->bean->ownSugar)>3) {
+   		array_pop($this->bean->ownSugar);
+   	}
+  }
+
+}
+
+$coffee = R::dispense('coffee');
+$coffee->size = 'XL';
+$coffee->ownSugar = R::dispense('sugar',5);
+
+$id = R::store($coffee);
+
+
+$coffee=R::load('coffee',$id);
+asrt(count($coffee->ownSugar),3);
+$coffee->ownSugar = R::dispense('sugar',2);
+$id = R::store($coffee);
+$coffee=R::load('coffee',$id);
+asrt(count($coffee->ownSugar),2);
+
+
+
+
+class Model_Cocoa extends RedBean_SimpleModel {
+	public function update() {
+		//print_r($this->sharedTaste);
+	}
+}
+
+class Model_Taste extends RedBean_SimpleModel {
+	public function after_update() {
+		asrt(count($this->bean->ownCocoa),0);
+	}
+}
+
+$cocoa = R::dispense('cocoa');
+$cocoa->name = 'Fair Cocoa';
+list($taste1,$taste2) = R::dispense('taste',2);
+$taste1->name = 'sweet';
+$taste2->name = 'bitter';
+$cocoa->ownTaste = array($taste1, $taste2);
+R::store($cocoa);
+
+$cocoa->name = 'Koko';
+R::store($cocoa);
+
+
+
+R::nuke();
+testpack('Extended export algorithm, feature issue 105');
+$city = R::dispense('city');
+$people = R::dispense('person',10);
+$me = reset($people);
+$him = end($people);
+$city->sharedPeople = $people;
+$me->name = 'me';
+$suitcase = R::dispense('suitcase');
+$him->suitcase = $suitcase;
+$him->ownShoes = R::dispense('shoe',2);
+R::store($city);
+$id = $him->getID();
+
+$e = new RedBean_Plugin_BeanExport(R::$toolbox);
+$e->loadSchema();
+
+$data = $e->exportLimited($me,true);
+$arr = ( reset( $data) );
+
+asrt(is_array($arr['sharedCity']),true);
+asrt(count($arr['sharedCity']),1);
+$s = reset($arr['sharedCity']);
+asrt(count($s['sharedPerson']),0);
+
+
+$data = $e->exportLimited($me,false);
+$arr = ( reset( $data) );
+
+asrt(is_array($arr['sharedCity']),true);
+asrt(count($arr['sharedCity']),1);
+$s = reset($arr['sharedCity']);
+asrt(count($s['sharedPerson']),10);
+asrt(count($s['sharedPerson'][$id]['ownShoe']),2);
+asrt(count($s['sharedPerson'][$id]['suitcase']),1);
+
+$data = $e->exportLimited($me,false,4);
+$arr = ( reset( $data) );
+
+asrt(is_array($arr['sharedCity']),true);
+asrt(count($arr['sharedCity']),1);
+$s = reset($arr['sharedCity']);
+asrt(count($s['sharedPerson']),10);
+asrt(count($s['sharedPerson'][$id]['ownShoe']),2);
+asrt(count($s['sharedPerson'][$id]['suitcase']),1);
+
+$data = $e->exportLimited($me,false,3);
+$arr = ( reset( $data) );
+asrt(is_array($arr['sharedCity']),true);
+asrt(count($arr['sharedCity']),1);
+$s = reset($arr['sharedCity']);
+asrt(count($s['sharedPerson']),10);
+asrt(count($s['sharedPerson'][$id]['ownShoe']),0);
+asrt(count($s['sharedPerson'][$id]['suitcase']),0);
+
+
+$data = $e->exportLimited($me,false,2);
+$arr = ( reset( $data) );
+asrt(is_array($arr['sharedCity']),true);
+asrt(count($arr['sharedCity']),1);
+$s = reset($arr['sharedCity']);
+asrt(count($s['sharedPerson']),0);
+
+$data = $e->exportLimited($me,false,1);
+$arr = ( reset( $data) );
+asrt(is_array($arr['sharedCity']),true);
+asrt(count($arr['sharedCity']),0);
+
+$data = $e->exportLimited($me,false,0);
+$arr = ( reset( $data) );
+asrt(count($arr),1);
+
+$data = $e->exportLimited($me,true,0);
+$arr = ( reset( $data) );
+asrt(count($arr),1);
+
 
 
 

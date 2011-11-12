@@ -24,6 +24,30 @@ class RedBean_Plugin_BeanExport {
 	 * Array used to check for recursion. This avoids infinite loops.
 	 */
 	protected $recurCheck = array();
+	
+	/**
+	 * @var array
+	 * Recursion shield for types
+	 */
+	protected $recurTypeCheck = array();
+	
+	/**
+	 * @var boolean
+	 * Whether to use a type shield for recursion
+	 */
+	protected $typeShield = false;
+	
+	/**
+	 * @var integer
+	 * Current level of recursion depth
+	 */
+	protected $depth = 0;
+	
+	/**
+	 * @var integer
+	 * Maximum level of recursions allowed by user
+	 */
+	protected $maxDepth = false;
 
 	/**
 	 * Constructor
@@ -78,18 +102,69 @@ class RedBean_Plugin_BeanExport {
 	 * @return	array $export Exported beans
 	 */
 	public function export( $beans, $resetRecur=true ) {
+		
 		if ($resetRecur) {
 			$this->recurCheck = array();
 		}
 		if (!is_array($beans)) {
 			$beans = array($beans);
 		}
+		
+		if ($this->maxDepth!==false) {
+			$this->depth ++;
+			if ($this->depth > $this->maxDepth) {
+				$this->depth--; 
+				return array();
+			}
+		}
+		
+		if ($this->typeShield===true) {
+			if (count($beans)>0) {
+				$firstBean = reset($beans);
+				$type = $firstBean->getMeta('type');
+				if (isset($this->recurTypeCheck[$type])){
+					if ($this->maxDepth!==false) {
+						$this->depth --;
+					}
+					return array();
+				}
+				$this->recurTypeCheck[ $type ] = true;
+			}
+		}
+		
+		
+		
 		$export = array();
 		foreach($beans as $bean) {
 			$export[$bean->getID()] = $this->exportBean( $bean );
 		}
+		
+		if ($this->maxDepth!==false) {
+			$this->depth --;
+		}
+		
 		return $export;
 	}
+	
+	
+	/**
+	 * Exports beans, just like export() but with additional
+	 * parameters for limitation on recursion and depth.
+	 * 
+	 * @param array   		  $beans      beans to export
+	 * @param boolean 		  $typeShield whether to use a type recursion shield
+	 * @param boolean|integer $depth      maximum number of iterations allowed (boolean FALSE to turn off)
+	 */
+	public function exportLimited($beans, $typeShield = true, $depth = false) {
+		$this->depth = 0;
+		$this->maxDepth = $depth;
+		$this->typeShield = $typeShield;
+		$export = $this->export($beans);
+		$this->typeShield = false;
+		$this->maxDepth = false;
+		return $export;
+	}
+	
 
 	/**
 	 * Exports a single bean

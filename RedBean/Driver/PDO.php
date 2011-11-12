@@ -93,11 +93,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @param string $dsn    Database connection string
 	 * @param string $user   DB account to be used
 	 * @param string $pass   password
-	 * @param string $dbname name of the database you
 	 *
 	 * @return RedBean_Driver_PDO $pdo	  PDO wrapper instance
 	 */
-	public static function getInstance($dsn, $user, $pass, $dbname) {
+	public static function getInstance($dsn, $user, $pass) {
 		if(is_null(self::$instance)) {
 			self::$instance = new RedBean_Driver_PDO($dsn, $user, $pass);
 		}
