@@ -542,6 +542,7 @@ class RedBean_Facade {
 		}
 	}
 
+
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
@@ -549,13 +550,13 @@ class RedBean_Facade {
 	 * @param string $sql	 sql
 	 * @param array  $values values
 	 *
-	 * @return array $results
+	 * @return string $result scalar
 	 */
-	public static function getAll( $sql, $values=array() ) {
+	public static function getAll( $sql, $values=array(), $key=null, $value=null ) {
 
 		if (!self::$redbean->isFrozen()) {
 			try {
-				$rs = RedBean_Facade::$adapter->get( $sql, $values );
+				$rs = RedBean_Facade::$adapter->get( $sql, $values, $key, $value );
 			}catch(RedBean_Exception_SQL $e) {
 				if(self::$writer->sqlStateIn($e->getSQLState(),
 				array(
@@ -572,7 +573,7 @@ class RedBean_Facade {
 			return $rs;
 		}
 		else {
-			return RedBean_Facade::$adapter->get( $sql, $values );
+			return RedBean_Facade::$adapter->get( $sql, $values, $key, $value );
 		}
 	}
 
