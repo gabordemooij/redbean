@@ -50,15 +50,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	public function __construct( $writer ) {
 
-		if ($writer instanceof RedBean_IceWriter) {
-			$this->isFrozen = true;
+		if ($writer instanceof RedBean_QueryWriter) {
 			$this->writer = $writer;
-		}
-		elseif ($writer instanceof RedBean_QueryWriter) {
-			$this->writer = $writer;
-		}
-		else {
-			throw new RedBean_Exception_Security("Passing an invalid Query Writer");
 		}
 
 		$this->beanhelper = new RedBean_BeanHelperFacade();

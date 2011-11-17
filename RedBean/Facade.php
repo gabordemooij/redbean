@@ -429,7 +429,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $beans  beans
 	 */
-	public static function find( $type, $sql="1", $values=array() ) {
+	public static function find( $type, $sql=null, $values=array() ) {
 		return self::$redbean->find($type,array(),array($sql,$values));
 	}
 
@@ -449,7 +449,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $arrays arrays
 	 */
-	public static function findAndExport($type, $sql="1", $values=array()) {
+	public static function findAndExport($type, $sql=null, $values=array()) {
 		$items = self::find( $type, $sql, $values );
 		$arr = array();
 		foreach($items as $key=>$item) {
@@ -472,7 +472,7 @@ class RedBean_Facade {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public static function findOne( $type, $sql="1", $values=array()) {
+	public static function findOne( $type, $sql=null, $values=array()) {
 		$items = self::find($type,$sql,$values);
 		return reset($items);
 	}
@@ -491,7 +491,7 @@ class RedBean_Facade {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public static function findLast( $type, $sql="1", $values=array() ) {
+	public static function findLast( $type, $sql=null, $values=array() ) {
 		$items = self::find( $type, $sql, $values );
 		return end( $items );
 	}
