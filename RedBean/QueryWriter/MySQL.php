@@ -90,6 +90,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	const C_DATATYPE_TEXT32 = 6;
 
+	
+	const C_DATATYPE_SPECIAL_DATE = 80;
+	
+	const C_DATATYPE_SPECIAL_DATETIME = 81;
+	
+	
+
 	/**
 	 * @var integer
 	 *
@@ -114,7 +121,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>" DOUBLE ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>" VARCHAR(255) ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>" TEXT ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>" LONGTEXT "
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>" LONGTEXT ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>" DATE ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>" DATETIME "
 	);
 
 	/**
@@ -130,7 +139,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			  "double" => RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE,
 			  "varchar(255)"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8,
 			  "text"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16,
-			  "longtext"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32
+			  "longtext"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32,
+			  "date"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE,
+			  "datetime"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME
 	);
 
 	/**
@@ -224,6 +235,12 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function scanType( $value ) {
 		if (is_null($value)) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+		}
+		if (preg_match('/^\d\d\d\d\-\d\d-\d\d$/',$value)) {
+			return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE;
+		}
+		if (preg_match('/^\d\d\d\d\-\d\d-\d\d\s\d\d:\d\d:\d\d$/',$value)) {
+			return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME;
 		}
 		$value = strval($value);
 		if (!$this->startsWithZeros($value)) {

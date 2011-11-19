@@ -94,11 +94,10 @@ if ($mode == 'all') {
 		'Postgres/Views',
 		'Postgres/Foreignkeys',
 		'Postgres/Parambind',
+		'Postgres/Writer',
 		'Sqlite/Setget',
 		'Sqlite/Views',
-		'Sqlite/Foreignkeys',
-		//optimizers last
-		'Mysql/Optimizer'
+		'Sqlite/Foreignkeys'
 	);
 }
 else {

@@ -75,11 +75,6 @@ require($dir."Setup.php");
 
 
 
-
-require($dir."Plugin/IOptimizer.php");
-require($dir."Plugin/Optimizer.php");
-require($dir."Plugin/Optimizer/Datetime.php");
-require($dir."Plugin/Optimizer/Shrink.php");
 require($dir."Plugin/QueryLogger.php");
 require($dir."Plugin/BeanExport.php");
 
