@@ -34,6 +34,12 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT = 3;
+	
+	
+	const C_DATATYPE_SPECIAL_DATE = 80;
+	
+	const C_DATETYPE_SPECIFIED = 99;
+	
 
 	/**
 	 * @var array
@@ -42,7 +48,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	public $typeno_sqltype = array(
 			  self::C_DATATYPE_INTEGER=>" integer ",
 			  self::C_DATATYPE_DOUBLE=>" double precision ",
-			  self::C_DATATYPE_TEXT=>" text "
+			  self::C_DATATYPE_TEXT=>" text ",
+			  self::C_DATATYPE_SPECIAL_DATE => " date "
 	);
 
 	/**
@@ -54,7 +61,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	public $sqltype_typeno = array(
 			  "integer"=>self::C_DATATYPE_INTEGER,
 			  "double precision" => self::C_DATATYPE_DOUBLE,
-			  "text"=>self::C_DATATYPE_TEXT
+			  "text"=>self::C_DATATYPE_TEXT,
+			  "date"=>self::C_DATATYPE_SPECIAL_DATE
 	);
 
 	/**
@@ -157,7 +165,10 @@ where table_schema = 'public'" );
 	 */
 	public function scanType( $value ) {
 
-		// added value===null
+		if ($value && preg_match('/^\d\d\d\d\-\d\d-\d\d$/',$value)) {
+			return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE;
+		}
+		
 		$sz = ($this->startsWithZeros($value));
 		if ($sz) return self::C_DATATYPE_TEXT;
 		if ($value===null || ($value instanceof RedBean_Driver_PDO_NULL) ||(is_numeric($value)

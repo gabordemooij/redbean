@@ -37,10 +37,6 @@
 		<item type="php">RedBean/IModelFormatter.php</item>
 		<item type="php">RedBean/IBeanHelper.php</item>
 		<item type="php">RedBean/BeanHelperFacade.php</item>
-		<item type="php">RedBean/Plugin/Optimizer.php</item>
-		<item type="php">RedBean/Plugin/IOptimizer.php</item>
-		<item type="php">RedBean/Plugin/Optimizer/Shrink.php</item>
-		<item type="php">RedBean/Plugin/Optimizer/Datetime.php</item>
 		<item type="php">RedBean/Plugin/QueryLogger.php</item>
 		<item type="php">RedBean/Plugin/BeanExport.php</item>
 		<item type="php">RedBean/SimpleModel.php</item>

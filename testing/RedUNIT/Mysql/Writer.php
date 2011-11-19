@@ -36,6 +36,8 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt($writer->scanType(1.5),3);
 		asrt($writer->scanType(INF),4);
 		asrt($writer->scanType("abc"),4);
+		asrt($writer->scanType("2001-10-10"),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE);
+		asrt($writer->scanType("2001-10-10 10:00:00"),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME);
 		asrt($writer->scanType(str_repeat("lorem ipsum",100)),5);
 		$writer->widenColumn("testtable", "c1", 2);
 		$cols=$writer->getColumns("testtable");
@@ -263,6 +265,32 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$bean->id = 2;
 		$redbean->trash($bean);
 		pass();
+		
+		testpack('Special data types');
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->date = 'someday';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['date'],'varchar(255)');
+		$bean = R::dispense('bean');
+		$bean->date = '2011-10-10';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['date'],'date');
+		$bean = R::dispense('bean');
+		$bean->date = '2011-10-10 10:00:00';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['date'],'datetime');
+		$bean = R::dispense('bean');
+		$bean->date = 'soon';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['date'],'datetime');
+		
+		
+		
 			
 		
 		
