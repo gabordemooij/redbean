@@ -152,14 +152,14 @@ class RedBean_BeanCan {
 	 */
 	public function handleRESTGetRequest( $pathToResource ) {
 		$resourceInfo = explode('/',$pathToResource);
-		if (count($resourceInfo) < 1) return array();
+		if (count($resourceInfo) < 1) return $this->resp('no beans found',0);
 		$type = $resourceInfo[0];
 		if (count($resourceInfo) < 2) {
-			return RedBean_Facade::find($type);
+			return $this->resp(RedBean_Facade::findAndExport($type));
 		}
 		else {
 			$id = (int) $resourceInfo[1];
-			return RedBean_Facade::load($type,$id);
+			return $this->resp(RedBean_Facade::load($type,$id)->export(),$id);
 		}
 	}
 }
