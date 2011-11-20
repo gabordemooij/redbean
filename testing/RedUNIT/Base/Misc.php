@@ -10,6 +10,17 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		
+		$bean=$redbean->dispense('bean');
+		$bean->prop = 1;
+		$redbean->store($bean);
+		$adapter->exec('UPDATE bean SET prop = 2');
+		asrt($adapter->getAffectedRows(),1);
+		asrt($adapter->getDatabase()->getPDO() instanceof PDO, true);
+		
+		asrt(strlen($adapter->getDatabase()->getDatabaseVersion())>0,true);
+		asrt(strlen($adapter->getDatabase()->getDatabaseType())>0,true);
+		 
+		
 		R::nuke();
 		$track = R::dispense('track');
 		$album = R::dispense('cd');

@@ -130,13 +130,7 @@ interface RedBean_Adapter {
 	 */
 	public function getDatabase();
 
-	/**
-	 * Returns the latest error message; if any.
-	 *
-	 * @return string $message error message from server
-	 */
-	public function getErrorMsg();
-
+	
 	/**
 	 * This method is part of the RedBean Transaction Management
 	 * mechanisms.

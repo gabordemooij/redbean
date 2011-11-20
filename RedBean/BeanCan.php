@@ -142,5 +142,25 @@ class RedBean_BeanCan {
 			return $this->resp(null, $id, -32099,$exception->getCode()."-".$exception->getMessage());
 		}
 	}
+	
+	/**
+	 * Support for RESTFul GET-requests
+	 * 
+	 * @param string $pathToResource RESTFul path to resource
+	 * 
+	 * @return array $resultArray
+	 */
+	public function handleRESTGetRequest( $pathToResource ) {
+		$resourceInfo = explode('/',$pathToResource);
+		if (count($resourceInfo) < 1) return array();
+		$type = $resourceInfo[0];
+		if (count($resourceInfo) < 2) {
+			return RedBean_Facade::find($type);
+		}
+		else {
+			$id = (int) $resourceInfo[1];
+			return RedBean_Facade::load($type,$id);
+		}
+	}
 }
 

@@ -38,7 +38,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	
 	const C_DATATYPE_SPECIAL_DATE = 80;
 	
-	const C_DATETYPE_SPECIFIED = 99;
+	const C_DATATYPE_SPECIFIED = 99;
 	
 
 	/**
@@ -193,7 +193,9 @@ where table_schema = 'public'" );
 	 * @return integer $typecode type code
 	 */
 	public function code( $typedescription ) {
-		return ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
+		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
+		if ($r > self::C_DATATYPE_SPECIFIED) return self::C_DATATYPE_SPECIFIED;
+		return $r;
 	}
 
 	/**

@@ -24,7 +24,12 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt(count(array_keys($writer->getColumns("testtable"))),2);
 		asrt(in_array("c1",array_keys($writer->getColumns("testtable"))),true);
 		foreach($writer->sqltype_typeno as $key=>$type) {
-			asrt($writer->code($key),$type);
+			if ($type < 100) {
+				asrt($writer->code($key),$type);
+			}
+			else {
+				asrt($writer->code($key),99);
+			}
 		}
 		asrt($writer->code("unknown"),99);
 		asrt($writer->scanType(false),0);
@@ -290,10 +295,24 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt($cols['date'],'datetime');
 		
 		
+		$this->setGetSpatial('point','POINT(1 2)');
+		$this->setGetSpatial('linestring','LINESTRING(3 3,4 4)');
+		$this->setGetSpatial('polygon','POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))');
+		$this->setGetSpatial('geometrycollection','GEOMETRYCOLLECTION(POINT(1 1),LINESTRING(0 0,1 1,2 2,3 3,4 4))');
 		
-			
 		
 		
 	}	
+	
+	protected function setGetSpatial( $type, $data ) {
+		R::nuke();
+		$place = R::dispense('place');
+		$place->setMeta('cast.location',strtolower($type));
+		$place->location = R::$f->GeomFromText('"'.$data.'"');
+		R::store($place);
+		asrt(R::getCell('SELECT AsText(location) FROM place LIMIT 1'),$data);
+	
+	} 
+	
 	
 }

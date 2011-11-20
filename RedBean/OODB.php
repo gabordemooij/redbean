@@ -337,6 +337,9 @@ class RedBean_OODB extends RedBean_Observable {
 						elseif ($cast=="id") {
 							$typeno = $this->writer->getTypeForID();
 						}
+						elseif(isset($this->writer->sqltype_typeno[$cast])) {
+							$typeno = $this->writer->sqltype_typeno[$cast];
+						}
 						else {
 							throw new RedBean_Exception("Invalid Cast");
 						}
@@ -344,6 +347,7 @@ class RedBean_OODB extends RedBean_Observable {
 					else {
 						//What kind of property are we dealing with?
 						$typeno = $this->writer->scanType($v);
+						
 					}
 
 					//Is this property represented in the table?
