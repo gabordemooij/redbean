@@ -216,6 +216,19 @@ class RedUNIT_Blackhole_Beancan extends RedUNIT_Blackhole {
 		asrt($rs["error"]["code"],-32601);
 		$rs = json_decode( s("stdClass:__toString",array("abc")), true );
 		asrt($rs["error"]["code"],-32601);
+		
+		R::nuke();
+		$server = new RedBean_BeanCan();
+		$book = R::dispense('book');
+		$book->title = 'book 1';
+		$id1 = R::store($book);
+		$book = R::dispense('book');
+		$book->title = 'book 2';
+		$id2 = R::store($book);
+		asrt($server->handleRESTGetRequest('book/'.$id1)->title,'book 1');
+		asrt($server->handleRESTGetRequest('book/'.$id2)->title,'book 2');
+		asrt(count($server->handleRESTGetRequest('book')),2);
+		
 			
 	}
 
