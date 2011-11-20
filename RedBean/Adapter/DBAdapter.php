@@ -245,15 +245,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * Return latest error message.
-	 *
-	 * @return string $message most recent error message
-	 */
-	public function getErrorMsg() {
-		return $this->db->Errormsg();
-	}
-
-	/**
 	 * Transactions.
 	 * Part of the transaction management infrastructure of RedBean.
 	 * Starts a transaction.

@@ -96,6 +96,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
 	
 	
+	
 
 	/**
 	 * @var integer
@@ -109,6 +110,14 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
 
+	const C_DATATYPE_SPECIFIED_POINT = 100;
+	const C_DATATYPE_SPECIFIED_LINESTRING = 101;
+	const C_DATATYPE_SPECIFIED_GEOMETRY = 102;
+	const C_DATATYPE_SPECIFIED_POLYGON = 103;
+	const C_DATATYPE_SPECIFIED_MULTIPOINT = 104;
+	const C_DATATYPE_SPECIFIED_MULTIPOLYGON = 105;
+	const C_DATATYPE_SPECIFIED_GEOMETRYCOLLECTION = 106;
+	
 
 	/**
 	 * @var array
@@ -123,7 +132,18 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>" TEXT ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>" LONGTEXT ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>" DATE ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>" DATETIME "
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>" DATETIME ",
+			  
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POINT=>" POINT ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_LINESTRING=>" LINESTRING  ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_GEOMETRY=>" GEOMETRY ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POLYGON=>" POLYGON ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_MULTIPOINT=>" MULTIPOINT ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_MULTIPOLYGON=>" MULTIPOLYGON ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_GEOMETRYCOLLECTION=>" GEOMETRYCOLLECTION ",
+			  
+			  
+			  
 	);
 
 	/**
@@ -141,7 +161,14 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			  "text"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16,
 			  "longtext"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32,
 			  "date"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE,
-			  "datetime"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME
+			  "datetime"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME,
+			  "point"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POINT,
+			  "linestring"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_LINESTRING,
+			  "geometry"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_GEOMETRY,
+			  "polygon"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POLYGON,
+			  "multipoint"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_MULTIPOINT,
+			  "multipolygon"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_MULTIPOLYGON,
+			  "geometrycollection"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_GEOMETRYCOLLECTION,
 	);
 
 	/**
@@ -275,7 +302,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return integer $typecode code
 	 */
 	public function code( $typedescription ) {
-		return ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
+		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
+		if ($r > self::C_DATATYPE_SPECIFIED) return self::C_DATATYPE_SPECIFIED;
+		return $r;
 	}
 
 	/**

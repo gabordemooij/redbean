@@ -75,6 +75,11 @@ class RedBean_Facade {
 	 * @var string
 	 */
 	public static $currentDB = "";
+	
+	/**
+	 * Holds reference to SQL Helper
+	 */
+	public static $f;
 
 	/**
 	 * Returns version ID string
@@ -98,6 +103,7 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function setup( $dsn="sqlite:/tmp/red.db", $username=NULL, $password=NULL ) {
+		self::$f = new RedBean_SQLHelper();
 		$facadeInstances = self::setupMultiple( array("default"=>array("dsn"=>$dsn,"username"=>$username,"password"=>$password,"frozen"=>false)));
 		$facadeInstance = $facadeInstances["default"];
 		self::configureFacadeWithToolbox(self::$toolboxes["default"]);
@@ -136,6 +142,7 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function addDatabase( $key, $dsn, $user, $pass=null, $frozen=false ) {
+		self::$f = new RedBean_SQLHelper();
 		self::$toolboxes[$key] = RedBean_Setup::kickstart($dsn,$user,$pass,$frozen);
 	}
 
@@ -1106,7 +1113,8 @@ class RedBean_Facade {
 			self::$writer->wipeAll();
 		}
 	}
-
+	
+	
 }
 
 //Compatibility with PHP 5.2 and earlier.

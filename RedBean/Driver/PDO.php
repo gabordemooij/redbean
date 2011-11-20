@@ -209,7 +209,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function GetAll( $sql, $aValues=array() ) {
 		$this->connect();
-		$this->exc = 0;
 		if ($this->debug) {
 			echo "<HR>" . $sql.print_r($aValues,1);
 		}
@@ -262,7 +261,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function GetCol($sql, $aValues=array()) {
 		$this->connect();
-		$this->exc = 0;
 		$rows = $this->GetAll($sql,$aValues);
 		$cols = array();
 		if ($rows && is_array($rows) && count($rows)>0) {
@@ -282,7 +280,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function GetCell($sql, $aValues=array()) {
 		$this->connect();
-		$this->exc = 0;
 		$arr = $this->GetAll($sql,$aValues);
 		$row1 = array_shift($arr);
 		$col1 = array_shift($row1);
@@ -299,36 +296,11 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function GetRow($sql, $aValues=array()) {
 		$this->connect();
-		$this->exc = 0;
 		$arr = $this->GetAll($sql, $aValues);
 		return array_shift($arr);
 	}
 
-	/**
-	 * Returns the error constant of the most
-	 * recent error.
-	 *
-	 * @return mixed $error error code
-	 */
-	public function ErrorNo() {
-		$this->connect();
-		if (!$this->exc) return 0;
-		$infos = $this->pdo->errorInfo();
-		return $infos[1];
-	}
-
-	/**
-	 * Returns the error message of the most recent
-	 * error.
-	 *
-	 * @return string $message error message
-	 */
-	public function Errormsg() {
-		$this->connect();
-		if (!$this->exc) return "";
-		$infos = $this->pdo->errorInfo();
-		return $infos[2];
-	}
+	
 
 	/**
 	 * Executes SQL code and allows key-value binding.
@@ -347,7 +319,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function Execute( $sql, $aValues=array() ) {
 		$this->connect();
-		$this->exc = 0;
 		if ($this->debug) {
 			echo "<HR>" . $sql.print_r($aValues,1);
 		}
@@ -426,16 +397,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	public function setDebugMode( $tf ) {
 		$this->connect();
 		$this->debug = (bool)$tf;
-	}
-
-	/**
-	 * Returns a raw result resource from the underlying PDO driver.
-	 *
-	 * @return Resource $PDOResult PDO result resource object
-	 */
-	public function GetRaw() {
-		$this->connect();
-		return $this->rs;
 	}
 
 

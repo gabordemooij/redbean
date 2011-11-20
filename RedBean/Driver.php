@@ -68,22 +68,6 @@ interface RedBean_Driver {
 	public function GetRow( $sql, $aValues=array() );
 
 	/**
-	 * Returns the error constant of the most
-	 * recent error.
-	 *
-	 * @return mixed $error error code
-	 */
-	public function ErrorNo();
-
-	/**
-	 * Returns the error message of the most recent
-	 * error.
-	 *
-	 * @return string $message error message
-	 */
-	public function Errormsg();
-
-	/**
 	 * Executes SQL code and allows key-value binding.
 	 * This function allows you to provide an array with values to bind
 	 * to query parameters. For instance you can bind values to question
@@ -140,12 +124,6 @@ interface RedBean_Driver {
 	 */
 	public function setDebugMode( $tf );
 
-	/**
-	 * Returns a raw result resource from the underlying driver driver.
-	 *
-	 * @return Resource $driverResult driver result resource object
-	 */
-	public function GetRaw();
 
 	/**
 	 * Starts a transaction.

@@ -296,7 +296,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		if ($suffix) return $result;
 	   $last_id = $this->adapter->getInsertID();
-		return ($this->adapter->getErrorMsg()=="" ?  $last_id : 0);
+		return $last_id;
 	}
 
 
