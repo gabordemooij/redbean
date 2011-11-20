@@ -10,6 +10,30 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		
+		R::exec('select * from nowhere');
+		pass();
+		R::getAll('select * from nowhere');
+		pass();
+		R::getAssoc('select * from nowhere');
+		pass();
+		R::getCol('select * from nowhere');
+		pass();
+		R::getCell('select * from nowhere');
+		pass();
+		R::getRow('select * from nowhere');
+		pass();
+		
+		R::freeze(true);
+		try{ R::exec('select * from nowhere'); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
+		try{ R::getAll('select * from nowhere'); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
+		try{ R::getCell('select * from nowhere'); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
+		try{ R::getAssoc('select * from nowhere'); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
+		try{ R::getRow('select * from nowhere'); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
+		try{ R::getCol('select * from nowhere'); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
+		R::freeze(false);
+		
+		
+		R::nuke();
 		$bean=$redbean->dispense('bean');
 		$bean->prop = 1;
 		$redbean->store($bean);

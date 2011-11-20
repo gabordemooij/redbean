@@ -662,7 +662,6 @@ class RedBean_Facade {
 	 * @return array $results
 	 */
 	public static function getCol( $sql, $values=array() ) {
-
 		if (!self::$redbean->isFrozen()) {
 			try {
 				$rs = RedBean_Facade::$adapter->getCol( $sql, $values );
@@ -685,6 +684,38 @@ class RedBean_Facade {
 			return RedBean_Facade::$adapter->getCol( $sql, $values );
 		}
 	}
+	
+	/**
+	 * Convenience function to execute Queries directly.
+	 * Executes SQL.
+	 *
+	 * @param string $sql	 sql
+	 * @param array  $values values
+	 *
+	 * @return array $results
+	 */
+	public static function getAssoc($sql,$value) {
+		if (!self::$redbean->isFrozen()) {
+			try {
+				$rs = RedBean_Facade::$adapter->getAssoc( $sql, $values );
+			}catch(RedBean_Exception_SQL $e) {
+				if(self::$writer->sqlStateIn($e->getSQLState(),
+				array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+				)) {
+					return array();
+				}
+				else {
+					throw $e;
+				}
+			}
+			return $rs;
+		}
+		else {
+			return RedBean_Facade::$adapter->getCol( $sql, $values );
+		}
+	}	
 
 
 	/**
