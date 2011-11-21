@@ -259,15 +259,38 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * @return integer $type type
 	 */
-	public function scanType( $value ) {
+	public function scanType( $refVal, $flagSpecial=false ) {
+		$value = $refVal;
+		
 		if (is_null($value)) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
-		if (preg_match('/^\d\d\d\d\-\d\d-\d\d$/',$value)) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE;
-		}
-		if (preg_match('/^\d\d\d\d\-\d\d-\d\d\s\d\d:\d\d:\d\d$/',$value)) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME;
+		
+		if ($flagSpecial) {
+			if (strpos($value,'POINT(')===0) {
+				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POINT;
+			}
+			if (strpos($value,'LINESTRING(')===0) {
+				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_LINESTRING;
+			}
+			if (strpos($value,'POLYGON(')===0) {
+				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POLYGON;
+			}
+			if (strpos($value,'MULTIPOINT(')===0) {
+				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_MULTIPOINT;
+			}
+			
+			
+			if (preg_match('/^\d\d\d\d\-\d\d-\d\d$/',$value)) {
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE;
+			}
+			if (preg_match('/^\d\d\d\d\-\d\d-\d\d\s\d\d:\d\d:\d\d$/',$value)) {
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME;
+			}
 		}
 		$value = strval($value);
 		if (!$this->startsWithZeros($value)) {

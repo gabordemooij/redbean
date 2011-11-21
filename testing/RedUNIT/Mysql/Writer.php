@@ -41,8 +41,14 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt($writer->scanType(1.5),3);
 		asrt($writer->scanType(INF),4);
 		asrt($writer->scanType("abc"),4);
-		asrt($writer->scanType("2001-10-10"),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE);
-		asrt($writer->scanType("2001-10-10 10:00:00"),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME);
+		asrt($writer->scanType("2001-10-10",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE);
+		asrt($writer->scanType("2001-10-10 10:00:00",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME);
+		asrt($writer->scanType("2001-10-10"),4);
+		asrt($writer->scanType("2001-10-10 10:00:00"),4);
+		asrt($writer->scanType("POINT(1 2)",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POINT);
+		asrt($writer->scanType("POINT(1 2)"),4);
+		
+		
 		asrt($writer->scanType(str_repeat("lorem ipsum",100)),5);
 		$writer->widenColumn("testtable", "c1", 2);
 		$cols=$writer->getColumns("testtable");
@@ -282,7 +288,16 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$bean->date = '2011-10-10';
 		R::store($bean);
 		$cols = R::getColumns('bean');
+		asrt($cols['date'],'varchar(255)');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->date = '2011-10-10';
+		R::store($bean);
+		$cols = R::getColumns('bean');
 		asrt($cols['date'],'date');
+		
+		R::nuke();
 		$bean = R::dispense('bean');
 		$bean->date = '2011-10-10 10:00:00';
 		R::store($bean);
@@ -295,20 +310,19 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt($cols['date'],'datetime');
 		
 		
-		$this->setGetSpatial('point','POINT(1 2)');
-		$this->setGetSpatial('linestring','LINESTRING(3 3,4 4)');
-		$this->setGetSpatial('polygon','POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))');
-		$this->setGetSpatial('geometrycollection','GEOMETRYCOLLECTION(POINT(1 1),LINESTRING(0 0,1 1,2 2,3 3,4 4))');
+		$this->setGetSpatial('POINT(1 2)');
+		$this->setGetSpatial('LINESTRING(3 3,4 4)');
+		$this->setGetSpatial('POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))');
 		
 		
 		
 	}	
 	
-	protected function setGetSpatial( $type, $data ) {
+	protected function setGetSpatial( $data) {
 		R::nuke();
 		$place = R::dispense('place');
-		$place->setMeta('cast.location',strtolower($type));
-		$place->location = R::$f->GeomFromText('"'.$data.'"');
+		//$place->setMeta('cast.location',strtolower($type));
+		$place->location = $data; //R::$f->GeomFromText('"'.$data.'"');
 		R::store($place);
 		asrt(R::getCell('SELECT AsText(location) FROM place LIMIT 1'),$data);
 	

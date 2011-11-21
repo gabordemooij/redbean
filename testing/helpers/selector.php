@@ -97,7 +97,8 @@ if ($mode == 'all') {
 		'Postgres/Writer',
 		'Sqlite/Setget',
 		'Sqlite/Views',
-		'Sqlite/Foreignkeys'
+		'Sqlite/Foreignkeys',
+		'Sqlite/Writer'
 	);
 }
 else {
