@@ -76,7 +76,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @var string
 	 * character to escape keyword table/column names
 	 */
-  protected $quoteCharacter = '"';
+	  protected $quoteCharacter = '"';
 
   /**
    *
@@ -163,10 +163,14 @@ where table_schema = 'public'" );
 	 *
 	 * @return integer $type type code for this value
 	 */
-	public function scanType( $value ) {
-
-		if ($value && preg_match('/^\d\d\d\d\-\d\d-\d\d$/',$value)) {
-			return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE;
+	public function scanType( $refVal, $flagSpecial=false ) {
+		
+		$value = $refVal;
+		
+		if ($flagSpecial) {
+			if ($value && preg_match('/^\d\d\d\d\-\d\d-\d\d$/',$value)) {
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE;
+			}
 		}
 		
 		$sz = ($this->startsWithZeros($value));

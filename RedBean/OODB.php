@@ -326,8 +326,10 @@ class RedBean_OODB extends RedBean_Observable {
 		$insertcolumns = array();
 		$updatevalues = array();
 		foreach( $bean as $p=>$v ) {
+			$origV = $v;
 			if ($p!=$idfield) {
 				if (!$this->isFrozen) {
+					
 					//Does the user want to specify the type?
 					if ($bean->getMeta("cast.$p",-1)!==-1) {
 						$cast = $bean->getMeta("cast.$p");
@@ -345,13 +347,17 @@ class RedBean_OODB extends RedBean_Observable {
 						}
 					}
 					else {
+						$cast = false;		
 						//What kind of property are we dealing with?
-						$typeno = $this->writer->scanType($v);
+						$typeno = $this->writer->scanType(&$v,true);
 						
 					}
 
 					//Is this property represented in the table?
 					if (isset($columns[$p])) {
+						//rescan
+						$v = $origV;
+						if (!$cast) $typeno = $this->writer->scanType(&$v,false);
 						//yes it is, does it still fit?
 						$sqlt = $this->writer->code($columns[$p]);
 						if ($typeno > $sqlt) {

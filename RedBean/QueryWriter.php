@@ -94,7 +94,7 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return integer $type type
 	 */
-	public function scanType($value);
+	public function scanType($value, $alsoScanSpecialForTypes=false);
 
 	/**
 	 * This method should add a column to a table.
