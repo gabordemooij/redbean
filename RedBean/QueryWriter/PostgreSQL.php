@@ -36,8 +36,16 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	const C_DATATYPE_TEXT = 3;
 	
 	
+	/**
+	 * @var integer
+	 * Special type date for storing date values: YYYY-MM-DD
+	 */
 	const C_DATATYPE_SPECIAL_DATE = 80;
 	
+	/**
+	 * @var integer
+	 * Specified field type cannot be overruled
+	 */
 	const C_DATATYPE_SPECIFIED = 99;
 	
 
