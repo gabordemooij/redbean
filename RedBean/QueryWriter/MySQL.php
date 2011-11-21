@@ -110,13 +110,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
 
-	const C_DATATYPE_SPECIFIED_POINT = 100;
-	const C_DATATYPE_SPECIFIED_LINESTRING = 101;
-	const C_DATATYPE_SPECIFIED_GEOMETRY = 102;
-	const C_DATATYPE_SPECIFIED_POLYGON = 103;
-	const C_DATATYPE_SPECIFIED_MULTIPOINT = 104;
-	const C_DATATYPE_SPECIFIED_MULTIPOLYGON = 105;
-	const C_DATATYPE_SPECIFIED_GEOMETRYCOLLECTION = 106;
+	const C_DATATYPE_SPECIAL_POINT = 100;
+	const C_DATATYPE_SPECIAL_LINESTRING = 101;
+	const C_DATATYPE_SPECIAL_GEOMETRY = 102;
+	const C_DATATYPE_SPECIAL_POLYGON = 103;
+	const C_DATATYPE_SPECIAL_MULTIPOINT = 104;
+	const C_DATATYPE_SPECIAL_MULTIPOLYGON = 105;
+	const C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION = 106;
 	
 
 	/**
@@ -134,13 +134,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>" DATE ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>" DATETIME ",
 			  
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POINT=>" POINT ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_LINESTRING=>" LINESTRING  ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_GEOMETRY=>" GEOMETRY ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POLYGON=>" POLYGON ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_MULTIPOINT=>" MULTIPOINT ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_MULTIPOLYGON=>" MULTIPOLYGON ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_GEOMETRYCOLLECTION=>" GEOMETRYCOLLECTION ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT=>" POINT ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING=>" LINESTRING  ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY=>" GEOMETRY ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON=>" POLYGON ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT=>" MULTIPOINT ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON=>" MULTIPOLYGON ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION=>" GEOMETRYCOLLECTION ",
 			  
 			  
 			  
@@ -162,13 +162,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			  "longtext"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32,
 			  "date"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE,
 			  "datetime"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME,
-			  "point"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POINT,
-			  "linestring"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_LINESTRING,
-			  "geometry"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_GEOMETRY,
-			  "polygon"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POLYGON,
-			  "multipoint"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_MULTIPOINT,
-			  "multipolygon"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_MULTIPOLYGON,
-			  "geometrycollection"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_GEOMETRYCOLLECTION,
+			  "point"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT,
+			  "linestring"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING,
+			  "geometry"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY,
+			  "polygon"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON,
+			  "multipoint"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT,
+			  "multipolygon"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON,
+			  "geometrycollection"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION,
 	);
 
 	/**
@@ -269,19 +269,19 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		if ($flagSpecial) {
 			if (strpos($value,'POINT(')===0) {
 				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POINT;
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT;
 			}
 			if (strpos($value,'LINESTRING(')===0) {
 				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_LINESTRING;
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING;
 			}
 			if (strpos($value,'POLYGON(')===0) {
 				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POLYGON;
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON;
 			}
 			if (strpos($value,'MULTIPOINT(')===0) {
 				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_MULTIPOINT;
+				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT;
 			}
 			
 			
