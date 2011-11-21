@@ -90,12 +90,17 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	const C_DATATYPE_TEXT32 = 6;
 
-	
+	/**
+	 * @var integer
+	 * Special type date for storing date values: YYYY-MM-DD
+	 */	
 	const C_DATATYPE_SPECIAL_DATE = 80;
 	
+	/**
+	 * @var integer
+	 * Special type datetime for store date-time values: YYYY-MM-DD HH:II:SS
+	 */
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
-	
-	
 	
 
 	/**
@@ -110,6 +115,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
 
+	/**
+	 * @var integer
+	 * Spatial types
+	 */
 	const C_DATATYPE_SPECIAL_POINT = 100;
 	const C_DATATYPE_SPECIAL_LINESTRING = 101;
 	const C_DATATYPE_SPECIAL_GEOMETRY = 102;
@@ -133,7 +142,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>" LONGTEXT ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>" DATE ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>" DATETIME ",
-			  
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT=>" POINT ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING=>" LINESTRING  ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY=>" GEOMETRY ",
@@ -141,8 +149,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT=>" MULTIPOINT ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON=>" MULTIPOLYGON ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION=>" GEOMETRYCOLLECTION ",
-			  
-			  
 			  
 	);
 
