@@ -45,7 +45,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt($writer->scanType("2001-10-10 10:00:00",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME);
 		asrt($writer->scanType("2001-10-10"),4);
 		asrt($writer->scanType("2001-10-10 10:00:00"),4);
-		asrt($writer->scanType("POINT(1 2)",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED_POINT);
+		asrt($writer->scanType("POINT(1 2)",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT);
 		asrt($writer->scanType("POINT(1 2)"),4);
 		
 		
