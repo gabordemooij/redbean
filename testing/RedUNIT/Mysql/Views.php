@@ -13,26 +13,30 @@
  * with this source code in the file license.txt.
  */
 class RedUNIT_Mysql_Views extends RedUNIT_Mysql {
-	public function run() {
-		
-		
-		testpack("test views");
-		
 	
-		//$this->views();
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
+	public function run() {
+		testpack("test views");
 		$tf = new Fm();
 		R::$writer->setBeanFormatter($tf);
 		$this->views("prefix_");
 		$tf2 = new Fm2();
 		R::$writer->setBeanFormatter($tf2);
 		$this->views("prefix_");
-		
 	}
-	
+
+	/**
+	 * Helper function to generate views
+	 * 
+	 * @param string $p prefix for views
+	 */	
 	public function views($p='') {
-			
 		R::nuke();
-				
 		R::exec(" drop table if exists prefix_bandmember_musician ");
 		R::exec(" drop table if exists prefix_band_bandmember ");
 		R::exec(" drop table if exists bandmember_musician ");
@@ -88,11 +92,9 @@ class RedUNIT_Mysql_Views extends RedUNIT_Mysql {
 			print_r($e);
 			fail();
 		}
-		
 		//can we do a simple query?
 		$nameOfBandWithID1 = R::getCell("select `name` from ".$p."bandlist where ".R::$writer->getIDField("band")." = 1 group by  ".R::$writer->getIDField("band"));
 		asrt($nameOfBandWithID1,"The Groofy");
-		
 		//can we generate a report? list all bandleaders
 		$bandleaders = R::getAll("select  `bandleader_of_bandmember`,`name_of_musician`,`name` AS bandname
 			from ".$p."bandlist where `bandleader_of_bandmember` =  1 group by id ");
@@ -116,7 +118,6 @@ class RedUNIT_Mysql_Views extends RedUNIT_Mysql {
 		asrt($inHowManyBandsDoYouPlay[1]["bands"],'1');
 		asrt($inHowManyBandsDoYouPlay[2]["name_of_musician"],"Mickey");
 		asrt($inHowManyBandsDoYouPlay[2]["bands"],'2');
-		
 		//who plays in band 2
 		//can we make a selectbox
 		$selectbox = R::getAll("

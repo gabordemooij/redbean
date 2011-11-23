@@ -14,16 +14,19 @@
  */
 class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		$a = new RedBean_AssociationManager( $toolbox );
-		
-		
 		$adapter->exec("DROP TABLE IF EXISTS testtable");
 		asrt(in_array("testtable",$adapter->getCol("show tables")),false);
 		$writer->createTable("testtable");
@@ -59,8 +62,6 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt($writer->scanType("2001-10-10 10:00:00"),4);
 		asrt($writer->scanType("POINT(1 2)",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT);
 		asrt($writer->scanType("POINT(1 2)"),4);
-		
-		
 		asrt($writer->scanType(str_repeat("lorem ipsum",100)),5);
 		$writer->widenColumn("testtable", "c1", 2);
 		$cols=$writer->getColumns("testtable");
@@ -74,7 +75,6 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$writer->widenColumn("testtable", "c1", 5);
 		$cols=$writer->getColumns("testtable");
 		asrt($writer->code($cols["c1"]),5);
-		//$id = $writer->insertRecord("testtable", array("c1"), array(array("lorem ipsum")));
 		$id = $writer->updateRecord("testtable", array(array("property"=>"c1","value"=>"lorem ipsum")));
 		$row = $writer->selectRecord("testtable", array("id"=>array($id)));
 		asrt($row[0]["c1"],"lorem ipsum");
@@ -99,15 +99,10 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		}catch(RedBean_Exception_SQL $e) {
 			fail();
 		}
-		
 		$a = $adapter->get("show index from testtable");
-		
 		asrt(count($a),3);
 		asrt($a[1]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 		asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
-		
-		
-		
 		//Zero issue (false should be stored as 0 not as '')
 		testpack("Zero issue");
 		$pdo->Execute("DROP TABLE IF EXISTS `zero`");
@@ -116,8 +111,6 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$bean->title = "bla";
 		$redbean->store($bean);
 		asrt( count($redbean->find("zero",array()," zero = 0 ")), 1 );
-		
-		//Section D Security Tests
 		R::store(R::dispense('hack'));
 		testpack("Test RedBean Security - bean interface ");
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
@@ -125,94 +118,67 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
 		try {
 			$bean = $redbean->load("page where 1; drop table hack",1);
-		}catch(Exception $e) {
-		
-		}
+		}catch(Exception $e) {}
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
 		$bean = $redbean->dispense("page");
 		$evil = "; drop table hack";
 		$bean->id = $evil;
 		try {
 			$redbean->store($bean);
-		}catch(Exception $e) {
-		
-		}
+		}catch(Exception $e) {}
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
 		unset($bean->id);
 		$bean->name = "\"".$evil;
 		try {
 			$redbean->store($bean);
-		}catch(Exception $e) {
-		
-		}
+		}catch(Exception $e) {}
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
 		$bean->name = "'".$evil;
 		try {
 			$redbean->store($bean);
-		}catch(Exception $e) {
-		
-		}
+		}catch(Exception $e) {}
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
 		$bean->$evil = 1;
 		try {
 			$redbean->store($bean);
-		}catch(Exception $e) {
-		
-		}
+		}catch(Exception $e) {}
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
 		unset($bean->$evil);
 		$bean->id = 1;
 		$bean->name = "\"".$evil;
 		try {
 			$redbean->store($bean);
-		}catch(Exception $e) {
-		
-		}
+		}catch(Exception $e) {}
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
 		$bean->name = "'".$evil;
 		try {
 			$redbean->store($bean);
-		}catch(Exception $e) {
-		
-		}
+		}catch(Exception $e) {}
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
 		$bean->$evil = 1;
 		try {
 			$redbean->store($bean);
-		}catch(Exception $e) {
-		
-		}
+		}catch(Exception $e) {}
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
 		try {
 			$redbean->trash($bean);
-		}catch(Exception $e) {
-		
-		}
+		}catch(Exception $e) {}
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
 		try {
 			$redbean->find("::",array(),"");
 		}catch(Exception $e) {
 			pass();
 		}
-		
-		
-		
 		$adapter->exec("drop table if exists sometable");
 		testpack("Test RedBean Security - query writer");
 		try {
 			$writer->createTable("sometable` ( `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT , PRIMARY KEY ( `id` ) ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ; drop table hack; --");
-		}catch(Exception $e) {
-		
-		}
+		}catch(Exception $e) {}
 		asrt(in_array("hack",$adapter->getCol("show tables")),true);
-		
-		
 				
 		testpack("Test ANSI92 issue in clearrelations");
-		
 		$pdo->Execute("DROP TABLE IF EXISTS book_group");
 		$pdo->Execute("DROP TABLE IF EXISTS author_book");
-		
 		$pdo->Execute("DROP TABLE IF EXISTS book");
 		$pdo->Execute("DROP TABLE IF EXISTS author");
 		$redbean = $toolbox->getRedBean();
@@ -229,7 +195,6 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$pdo->Execute("DROP TABLE IF EXISTS book_group");
 		$pdo->Execute("DROP TABLE IF EXISTS book_author");
 		$pdo->Execute("DROP TABLE IF EXISTS author_book");
-		
 		$pdo->Execute("DROP TABLE IF EXISTS book");
 		$pdo->Execute("DROP TABLE IF EXISTS author");
 		$redbean = $toolbox->getRedBean();
@@ -243,11 +208,9 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$a->associate($book,$author1);
 		$a->associate($book, $author2);
 		pass();
-		
 		testpack("Test Association Issue Group keyword (Issues 9 and 10)");
 		$pdo->Execute("DROP TABLE IF EXISTS `book_group`");
 		$pdo->Execute("DROP TABLE IF EXISTS `group`");
-		
 		$group = $redbean->dispense("group");
 		$group->name ="mygroup";
 		$redbean->store( $group );
@@ -267,7 +230,6 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt((int)$adapter->getCell("select count(*) from book_group"),1); //just 1 rec!
 		$pdo->Execute("DROP TABLE IF EXISTS book_group");
 		$pdo->Execute("DROP TABLE IF EXISTS author_book");
-		
 		$pdo->Execute("DROP TABLE IF EXISTS book");
 		$pdo->Execute("DROP TABLE IF EXISTS author");
 		$redbean = $toolbox->getRedBean();
@@ -320,25 +282,20 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		R::store($bean);
 		$cols = R::getColumns('bean');
 		asrt($cols['date'],'datetime');
-		
-		
 		$this->setGetSpatial('POINT(1 2)');
 		$this->setGetSpatial('LINESTRING(3 3,4 4)');
 		$this->setGetSpatial('POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))');
-		
-		
-		
 	}	
 	
+	/**
+	 * Stored and reloads spatial data to see if the
+	 * value is preserved correctly.
+	 */
 	protected function setGetSpatial( $data) {
 		R::nuke();
 		$place = R::dispense('place');
-		//$place->setMeta('cast.location',strtolower($type));
 		$place->location = $data; //R::$f->GeomFromText('"'.$data.'"');
 		R::store($place);
 		asrt(R::getCell('SELECT AsText(location) FROM place LIMIT 1'),$data);
-	
 	} 
-	
-	
 }

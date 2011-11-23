@@ -21,6 +21,18 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
+		
+		$person = R::dispense('person');
+		$person->name = 'John';
+		R::store($person);
+		$course = R::dispense('course');
+		$course->name = 'Math';
+		R::store($course);
+		$course->teacher = $person;
+		$id = R::store($course);
+		$course = R::load('course',$id);
+		$teacher = $course->fetchAs('person')->teacher;
+		asrt($teacher->name,'John');	
 			
 		//Invalid properties
 		$book = R::dispense('book');

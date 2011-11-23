@@ -13,11 +13,13 @@
  * with this source code in the file license.txt.
  */
 class RedUNIT_Base_Typechecking extends RedUNIT_Base {
-	
-
-	
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
- 
  		$redbean = R::$redbean;
 		 $bean = $redbean->dispense("page");
 		//Set some illegal values in the bean; this should trugger Security exceptions.

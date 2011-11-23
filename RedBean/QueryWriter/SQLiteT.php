@@ -60,9 +60,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
 
-
-
-
 	/**
 	 * @var array
 	 * Supported Column Types

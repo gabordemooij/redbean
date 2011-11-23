@@ -13,7 +13,12 @@
  * with this source code in the file license.txt.
  */
 class RedUNIT_Blackhole_Tainted extends RedUNIT_Blackhole {
-
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
 		$redbean = R::$redbean;
 		$spoon = $redbean->dispense("spoon");

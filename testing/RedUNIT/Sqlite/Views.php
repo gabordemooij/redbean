@@ -14,26 +14,29 @@
  */
 class RedUNIT_Sqlite_Views extends RedUNIT_Sqlite {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
-		
 		testpack("test views");
-		
-	
-		//$this->views();
 		$tf = new Fm();
 		R::$writer->setBeanFormatter($tf);
 		$this->views("prefix_");
 		$tf2 = new Fm2();
 		R::$writer->setBeanFormatter($tf2);
 		$this->views("prefix_");
-		
 	}
 	
+	/**
+	 * Helper function to test views
+	 * 
+	 * @param string $p prefix for views
+	 */
 	public function views($p='') {
-			
 		R::nuke();		
-		
 		R::exec(" drop table if exists prefix_bandmember_musician ");
 		R::exec(" drop table if exists prefix_band_bandmember ");
 		R::exec(" drop table if exists bandmember_musician ");
@@ -44,10 +47,6 @@ class RedUNIT_Sqlite_Views extends RedUNIT_Sqlite {
 		R::exec(" drop table if exists prefix_musician ");
 		R::exec(" drop table if exists prefix_bandmember ");
 		R::exec(" drop table if exists prefix_band ");
-		
-		
-		
-		
 		list( $mickey, $donald, $goofy ) = R::dispense("musician",3);
 		list( $vocals1, $vocals2, $keyboard1, $drums, $vocals3, $keyboard2 ) = R::dispense("bandmember",6);
 		list( $band1, $band2 ) = R::dispense("band",2);
@@ -59,7 +58,6 @@ class RedUNIT_Sqlite_Views extends RedUNIT_Sqlite {
 		$drums->bandleader=true;
 		$drums->notes = "noisy";
 		$vocals3->notes = "tenor";
-		
 		R::associate($mickey,$vocals1);
 		R::associate($donald,$vocals2);
 		R::associate($donald,$keyboard1);
@@ -113,16 +111,12 @@ class RedUNIT_Sqlite_Views extends RedUNIT_Sqlite {
 		 name_of_musician ,count( distinct ".R::$writer->getIDField("band").") as bands
 		from ".$p."bandlist group by ".R::$writer->getIDField("musician")."_of_musician  order by name_of_musician asc
 		");
-		
-		
-		
 		asrt($inHowManyBandsDoYouPlay[0]["name_of_musician"],"Donald");
 		asrt($inHowManyBandsDoYouPlay[0]["bands"],'2');
 		asrt($inHowManyBandsDoYouPlay[1]["name_of_musician"],"Goofy");
 		asrt($inHowManyBandsDoYouPlay[1]["bands"],'1');
 		asrt($inHowManyBandsDoYouPlay[2]["name_of_musician"],"Mickey");
 		asrt($inHowManyBandsDoYouPlay[2]["bands"],'2');
-		
 		//who plays in band 2
 		//can we make a selectbox
 		$selectbox = R::getAll("
@@ -131,14 +125,12 @@ class RedUNIT_Sqlite_Views extends RedUNIT_Sqlite {
 			b.".R::$writer->getIDField("band")." =2
 			order by m.name asc
 		");
-		
 		asrt($selectbox[0]["name"],"Donald");
 		asrt($selectbox[0]["selected"],"2");
 		asrt($selectbox[1]["name"],"Goofy");
 		asrt($selectbox[1]["selected"],null);
 		asrt($selectbox[2]["name"],"Mickey");
 		asrt($selectbox[2]["selected"],"2");
-	
 	}
 
 }

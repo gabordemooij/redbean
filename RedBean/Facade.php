@@ -692,7 +692,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $results
 	 */
-	public static function getAssoc($sql,$value) {
+	public static function getAssoc($sql,$values) {
 		if (!self::$redbean->isFrozen()) {
 			try {
 				$rs = RedBean_Facade::$adapter->getAssoc( $sql, $values );
@@ -1157,8 +1157,7 @@ class RedBean_Facade {
 			self::$writer->wipeAll();
 		}
 	}
-	
-	
+		
 }
 
 //Compatibility with PHP 5.2 and earlier.

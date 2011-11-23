@@ -14,17 +14,17 @@
  */
 class RedUNIT_Base_Null extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
-		
-		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
-			
-				
-				
 		//NULL test
 		$page = R::dispense('page');
 		$book = R::dispense('book');

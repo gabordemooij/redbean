@@ -14,10 +14,13 @@
  */
 class RedUNIT_Base_Beancan extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
-		
-
 		$rs = ( s("candybar:store",array( array("brand"=>"funcandy","taste"=>"sweet") ) ) );
 		testpack("Test create");
 		asrt(is_string($rs),true);
@@ -238,14 +241,11 @@ class RedUNIT_Base_Beancan extends RedUNIT_Base {
 		$book->title = 'book 2';
 		$id2 = R::store($book);
 		
-		
 		asrt(json_decode($server->handleRESTGetRequest('book/'.$id1))->result->title,'book 1');
 		asrt(json_decode($server->handleRESTGetRequest('book/'.$id2))->result->title,'book 2');
 		$r = json_decode($server->handleRESTGetRequest('book'),true);
 		$a = $r['result'];
 		asrt(count($a),2);
-		
-			
 	}
 
 }

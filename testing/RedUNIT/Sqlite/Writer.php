@@ -14,16 +14,19 @@
  */
 class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		$a = new RedBean_AssociationManager( $toolbox );
-		
-		
 		$adapter->exec("DROP TABLE IF EXISTS testtable");
 		asrt(in_array("testtable",$writer->getTables()),false);
 		$writer->createTable("testtable");
@@ -50,9 +53,6 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite {
 		asrt($writer->scanType('2010-10-10'),RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC);
 		asrt($writer->scanType('2010-10-10 10:00:00'),RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC);
 		asrt($writer->scanType(str_repeat("lorem ipsum",100)),RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT);
-		
-		
-		
 		$writer->widenColumn("testtable", "c1", 2);
 		$cols=$writer->getColumns("testtable");
 		asrt($writer->code($cols["c1"]),2);
@@ -66,7 +66,6 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite {
 		$writer->selectRecord("testtable", array("id"=>array($id)),null,true);
 		$row = $writer->selectRecord("testtable", array("id"=>array($id)));
 		asrt(empty($row),true);
-		
 		//Zero issue (false should be stored as 0 not as '')
 		testpack("Zero issue");
 		R::nuke();
@@ -75,11 +74,7 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite {
 		$bean->title = "bla";
 		$redbean->store($bean);
 		asrt( count($redbean->find("zero",array()," zero = 0 ")), 1 );
-		
-		
-				
 		testpack("Test ANSI92 issue in clearrelations");
-		
 		$redbean = $toolbox->getRedBean();
 		$a = new RedBean_AssociationManager( $toolbox );
 		$book = $redbean->dispense("book");
@@ -103,7 +98,6 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite {
 		$a->associate($book,$author1);
 		$a->associate($book, $author2);
 		pass();
-		
 		testpack("Test Association Issue Group keyword (Issues 9 and 10)");
 		$group = $redbean->dispense("group");
 		$group->name ="mygroup";
@@ -141,31 +135,20 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite {
 		$bean->id = 2;
 		$redbean->trash($bean);
 		pass();
-		
 		testpack('Special data types');
 		R::nuke();
 		$bean = R::dispense('bean');
 		$bean->date = 'someday';
 		R::store($bean);
 		$cols = R::getColumns('bean');
-		
 		asrt($cols['date'],'TEXT');
 		$bean = R::dispense('bean');
 		$bean->date = '2011-10-10';
-		
-		
-		
 		R::nuke();
 		$bean = R::dispense('bean');
 		$bean->date = '2011-10-10';
 		R::store($bean);
 		$cols = R::getColumns('bean');
 		asrt($cols['date'],'NUMERIC');
-		
-		
-			
-		
-		
 	}	
-	
 }

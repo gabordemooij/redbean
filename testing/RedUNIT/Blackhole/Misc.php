@@ -14,14 +14,17 @@
  */
 
 class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
-	
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
 		R::debug(1);
 		pass();
 		R::debug(0);
 		pass();
-				
 	}
 	
 }

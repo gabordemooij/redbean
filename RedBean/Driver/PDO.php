@@ -21,13 +21,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * Contains database DSN for connecting to database.
 	 */
 	private $dsn;
-
-	/**
-	 * @var RedBean_Driver_PDO
-	 * Holds the instance of this class.
-	 */
-	private static $instance;
-
+	
 	/**
 	 * @var boolean
 	 * Whether we are in debugging mode or not.
@@ -87,21 +81,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	private $isConnected = false;
 
 
-	/**
-	 * Returns an instance of the PDO Driver.
-	 *
-	 * @param string $dsn    Database connection string
-	 * @param string $user   DB account to be used
-	 * @param string $pass   password
-	 *
-	 * @return RedBean_Driver_PDO $pdo	  PDO wrapper instance
-	 */
-	public static function getInstance($dsn, $user, $pass) {
-		if(is_null(self::$instance)) {
-			self::$instance = new RedBean_Driver_PDO($dsn, $user, $pass);
-		}
-		return self::$instance;
-	}
 
 	/**
 	 * Constructor. You may either specify dsn, user and password or
@@ -232,12 +211,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
-			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-				$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
-			}
-			else {
-				$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
-			}
+			$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
 			$x->setSQLState( $e->getCode() );
 			throw $x;
 		}
@@ -337,12 +311,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
-			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-				$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
-			}
-			else {
-				$x = new RedBean_Exception_SQL( $e->getMessage()." SQL:".$sql, 0, $e );
-			}
+			$x = new RedBean_Exception_SQL( $e->getMessage()." SQL:".$sql, 0, $e );
 			$x->setSQLState( $e->getCode() );
 			throw $x;
 		}

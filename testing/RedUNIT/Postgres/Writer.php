@@ -14,6 +14,12 @@
  */
 class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
 		
 		$toolbox = R::$toolbox;
@@ -151,20 +157,12 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 		asrt($cols['date'],'text');
 		$bean = R::dispense('bean');
 		$bean->date = '2011-10-10';
-		
-		
-		
 		R::nuke();
 		$bean = R::dispense('bean');
 		$bean->date = '2011-10-10';
 		R::store($bean);
 		$cols = R::getColumns('bean');
 		asrt($cols['date'],'date');
-		
-		
-			
-		
-		
 	}	
 	
 }

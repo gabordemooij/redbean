@@ -14,17 +14,20 @@
  */
 class RedUNIT_Base_Observers extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
-		
 		asrt(($adapter instanceof RedBean_Adapter_DBAdapter),true);
 		asrt(($writer instanceof RedBean_QueryWriter),true);
 		asrt(($redbean instanceof RedBean_OODB),true);
-
 		$observable = new ObservableMock();
 		$observer = new ObserverMock();
 		$observable->addEventListener("event1",$observer);
@@ -38,9 +41,6 @@ class RedUNIT_Base_Observers extends RedUNIT_Base {
 		$observable->test("event3", "testsignal3");
 		asrt($observer->event,"event3");
 		asrt($observer->info,"testsignal3");
-		
-		
-		
 	}	
 	
 }

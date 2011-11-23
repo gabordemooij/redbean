@@ -605,6 +605,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	abstract protected function constrain($table, $table1, $table2, $p1, $p2, $cache);
 
+	/**
+	 * Checks whether a value starts with zeros. In this case
+	 * the value should probably be stored using a text datatype instead of a
+	 * numerical type in order to preserve the zeros.
+	 * 
+	 * @param string $value value to be checked.
+	 */
 	protected function startsWithZeros($value) {
 		$value = strval($value);
 		if (strlen($value)>1 && strpos($value,'0')===0 && strpos($value,'0.')!==0) {

@@ -14,23 +14,25 @@
  */
 class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		$a = new RedBean_AssociationManager( $toolbox );
-				
 		$post = $redbean->dispense('post');
 		$post->title = 'title';
 		$redbean->store($post);
-		
 		$page = $redbean->dispense('page');
 		$page->name = 'title';
 		$redbean->store($page);		
-		
 		$page = $redbean->dispense("page");
 		$page->name = "John's page";
 		$idpage = $redbean->store($page);
@@ -38,7 +40,6 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql {
 		$page2->name = "John's second page";
 		$idpage2 = $redbean->store($page2);
 		$a->associate($page, $page2);
-				
 		$redbean->freeze( true );
 		$page = $redbean->dispense("page");
 		$page->sections = 10;
@@ -86,8 +87,6 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql {
 		$redbean->freeze( false );
 		asrt(count($logger->grep("SELECT"))>0,true);
 		asrt(count($logger->grep("describe"))<1,true);
-		
-		
 	}
 	
 }

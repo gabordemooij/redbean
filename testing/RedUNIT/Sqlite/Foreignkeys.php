@@ -14,9 +14,13 @@
  */
 class RedUNIT_Sqlite_Foreignkeys extends RedUNIT_Sqlite {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
-				
 		$book = R::dispense('book');
 		$page = R::dispense('page');
 		$cover = R::dispense('cover');

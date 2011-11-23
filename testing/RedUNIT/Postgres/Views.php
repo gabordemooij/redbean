@@ -14,40 +14,39 @@
  */
 class RedUNIT_Postgres_Views extends RedUNIT_Postgres {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
-		
 		testpack("test views");
-		
-	
-		//$this->views();
 		$tf = new Fm();
 		R::$writer->setBeanFormatter($tf);
 		$this->views("prefix_");
 		$tf2 = new Fm2();
 		R::$writer->setBeanFormatter($tf2);
 		$this->views("prefix_");
-		
 	}
-	
+
+	/**
+	 * Helper function to test views.
+	 * 
+	 * @param string $p prefix to be used for views.
+	 */	
 	public function views($p='') {
-			
 		R::nuke();		
-		
 		R::exec(" drop table if exists bandmember_musician CASCADE");
 		R::exec(" drop table if exists band_bandmember CASCADE");
 		R::exec(" drop table if exists prefix_bandmember_musician CASCADE");
 		R::exec(" drop table if exists prefix_band_bandmember CASCADE");
-		
 		R::exec(" drop table if exists musician CASCADE ");
 		R::exec(" drop table if exists bandmember CASCADE");
 		R::exec(" drop table if exists band CASCADE");
 		R::exec(" drop table if exists prefix_musician CASCADE");
 		R::exec(" drop table if exists prefix_bandmember CASCADE");
 		R::exec(" drop table if exists prefix_band CASCADE");
-		
-		
-		
 		list( $mickey, $donald, $goofy ) = R::dispense("musician",3);
 		list( $vocals1, $vocals2, $keyboard1, $drums, $vocals3, $keyboard2 ) = R::dispense("bandmember",6);
 		list( $band1, $band2 ) = R::dispense("band",2);

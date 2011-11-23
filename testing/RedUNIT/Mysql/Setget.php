@@ -14,9 +14,13 @@
  */
 class RedUNIT_Mysql_Setget extends RedUNIT_Mysql {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-	
-	
 		asrt(setget("-1"),"-1");
 		asrt(setget(-1),"-1");
 		asrt(setget("-0.25"),"-0.25");

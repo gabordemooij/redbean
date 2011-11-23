@@ -14,6 +14,12 @@
  */
 class RedUNIT_Base_Misc extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
 	
 		$toolbox = R::$toolbox;
@@ -21,7 +27,6 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
-		
 		R::exec('select * from nowhere');
 		pass();
 		R::getAll('select * from nowhere');
@@ -170,86 +175,47 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		asrt(count($test->ownChip),9);
 		
 		R::nuke();
-
-
-
-
-	$coffee = R::dispense('coffee');
-	$coffee->size = 'XL';
-	$coffee->ownSugar = R::dispense('sugar',5);
+		$coffee = R::dispense('coffee');
+		$coffee->size = 'XL';
+		$coffee->ownSugar = R::dispense('sugar',5);
+		
+		$id = R::store($coffee);
+		
+		
+		$coffee=R::load('coffee',$id);
+		asrt(count($coffee->ownSugar),3);
+		$coffee->ownSugar = R::dispense('sugar',2);
+		$id = R::store($coffee);
+		$coffee=R::load('coffee',$id);
+		asrt(count($coffee->ownSugar),2);
+		
+		
+		
+		$cocoa = R::dispense('cocoa');
+		$cocoa->name = 'Fair Cocoa';
+		list($taste1,$taste2) = R::dispense('taste',2);
+		$taste1->name = 'sweet';
+		$taste2->name = 'bitter';
+		$cocoa->ownTaste = array($taste1, $taste2);
+		R::store($cocoa);
+		
+		$cocoa->name = 'Koko';
+		R::store($cocoa);
+		
+		$pdo = R::$adapter->getDatabase()->getPDO();
+		$driver = new RedBean_Driver_PDO($pdo);
+		pass();
+		asrt($pdo->getAttribute(PDO::ATTR_ERRMODE), PDO::ERRMODE_EXCEPTION);
+		asrt($pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE), PDO::FETCH_ASSOC);
+		asrt(strval($driver->GetCell('select 123')),'123');
 	
-	$id = R::store($coffee);
-	
-	
-	$coffee=R::load('coffee',$id);
-	asrt(count($coffee->ownSugar),3);
-	$coffee->ownSugar = R::dispense('sugar',2);
-	$id = R::store($coffee);
-	$coffee=R::load('coffee',$id);
-	asrt(count($coffee->ownSugar),2);
-	
-	
-	
-	$cocoa = R::dispense('cocoa');
-	$cocoa->name = 'Fair Cocoa';
-	list($taste1,$taste2) = R::dispense('taste',2);
-	$taste1->name = 'sweet';
-	$taste2->name = 'bitter';
-	$cocoa->ownTaste = array($taste1, $taste2);
-	R::store($cocoa);
-	
-	$cocoa->name = 'Koko';
-	R::store($cocoa);
+		$a = new RedBean_Exception_SQL;
+		$a->setSqlState('test');
+		$b = strval($a);
+		asrt($b,'[test] - ');
 	}
 
 }
 
 
-
-
-
-class Model_Cocoa extends RedBean_SimpleModel {
-	public function update() {
-		//print_r($this->sharedTaste);
-	}
-}
-
-class Model_Taste extends RedBean_SimpleModel {
-	public function after_update() {
-		asrt(count($this->bean->ownCocoa),0);
-	}
-}
-
-
-class Model_Coffee extends RedBean_SimpleModel {
-
-  public function update() {
-  
-  	
-   	while (count($this->bean->ownSugar)>3) {
-   		array_pop($this->bean->ownSugar);
-   	}
-  }
-
-}
-
-
-class Model_Test extends RedBean_SimpleModel {
-
-  public function update() {
-    if($this->bean->item->val) {
-      $this->bean->item->val='Test2';
-      $can = R::dispense('can');
-      $can->name = 'can for bean';
-      $s = reset($this->bean->sharedSpoon);
-      $s->name = "S2";
-      $this->bean->item->deep->name = '123';	      
-      $this->bean->ownCan[] = $can;
-      $this->bean->sharedPeas = R::dispense('peas',10);
-      $this->bean->ownChip = R::dispense('chip',9);
-      
-    }
-  }
-
-}
 

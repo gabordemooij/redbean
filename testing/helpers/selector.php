@@ -88,6 +88,7 @@ if ($mode == 'all') {
 		'Mysql/Freeze',
 		'Mysql/Setget',
 		'Mysql/Views',
+		'Mysql/Mix',
 		'Mysql/Foreignkeys',
 		'Mysql/Parambind',
 		'Postgres/Setget',

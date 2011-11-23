@@ -13,15 +13,18 @@
  * with this source code in the file license.txt.
  */
 class RedUNIT_Base_Tags extends RedUNIT_Base {
-
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
-		
 		$blog = R::dispense('blog');
 		$blog->title = 'testing';
 		$blog->blog = 'tesing';
@@ -29,7 +32,6 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		$blogpost = (R::load("blog",1));
 		$post = R::dispense("post");
 		$post->message = "hello";
-		
 		R::tag($post,"lousy,smart");
 		R::$flagUseLegacyTaggingAPI = true;
 		asrt(R::tag($post),"lousy,smart");
@@ -39,11 +41,10 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		R::tag($blog,array("smart","interesting"));
 		asrt(R::tag($blog),"smart,interesting");
 		try{
-		R::tag($blog,array("smart","interesting","lousy!"));
-		pass();
+			R::tag($blog,array("smart","interesting","lousy!"));
+			pass();
 		}catch(RedBean_Exception $e){ fail(); }
 		asrt(R::tag($blog),"smart,interesting,lousy!");
-		
 		R::$flagUseLegacyTaggingAPI = false;
 		asrt(implode(",",R::tag($blog)),"smart,interesting,lousy!");
 		R::untag($blog,array("smart","interesting"));
@@ -51,10 +52,8 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		asrt(R::hasTag($blog,array("lousy!")),true);
 		asrt(R::hasTag($blog,array("lousy!","smart")),true);
 		asrt(R::hasTag($blog,array("lousy!","smart"),true),false);
-		
 		R::tag($blog, false);
 		asrt(count(R::tag($blog)),0);
-		
 		R::tag($blog,array("funny","comic"));
 		asrt(count(R::tag($blog)),2);
 		R::addTags($blog,array("halloween"));
@@ -70,8 +69,6 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		R::addTags($blog,"horror");
 		asrt(R::hasTag($blog,array("horror","commic","halloween"),true),false);
 		asrt(count(R::tag($blog)),3);
-		
-		
 		testpack("fetch tagged items");
 		R::exec("drop table author_book");
 		R::exec("drop table author");
@@ -94,9 +91,7 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		$x = R::tagged("book","classic");
 		asrt(count($x),2);
 		$x = R::tagged("book","classic,horror");
-		
 		asrt(count($x),3);
-				
 		
 	}
 

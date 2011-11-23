@@ -14,16 +14,19 @@
  */
 class RedUNIT_Mysql_Preexist extends RedUNIT_Mysql {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-	
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		$a = new RedBean_AssociationManager( $toolbox );
-		
-		
 		$page = $redbean->dispense("page");
 		$page->name = "John's page";
 		$idpage = $redbean->store($page);
@@ -31,7 +34,6 @@ class RedUNIT_Mysql_Preexist extends RedUNIT_Mysql {
 		$page2->name = "John's second page";
 		$idpage2 = $redbean->store($page2);
 		$a->associate($page, $page2);
-	
 		$adapter->exec("ALTER TABLE ".$writer->safeColumn('page')." 
 		CHANGE ".$writer->safeColumn('name')." ".$writer->safeColumn('name')." 
 		VARCHAR( 254 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL ");
@@ -44,7 +46,6 @@ class RedUNIT_Mysql_Preexist extends RedUNIT_Mysql {
 		pass(); //no crash?
 		$cols = $writer->getColumns("page");
 		asrt($cols["name"],"varchar(254)"); //must still be same
-	
 	}
 
 }

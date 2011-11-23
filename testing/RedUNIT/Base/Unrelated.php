@@ -14,14 +14,18 @@
  */
 class RedUNIT_Base_Unrelated extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-	
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
-				
 		$painter = R::dispense('person');
 		$painter->job = 'painter';
 		$accountant = R::dispense('person');
@@ -45,21 +49,16 @@ class RedUNIT_Base_Unrelated extends RedUNIT_Base {
 		asrt( getList( R::unrelated($painter,"person"),"job" ), "developer,salesman" ) ;
 		asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter" ) ;
 		asrt( getList( R::unrelated($developer,"person"),"job" ), "painter" ) ;
-				
 		$manufacturer = R::dispense('manufacturer');
 		$manufacturer->name = 'Ford';
 		R::store($manufacturer);
-		
 		$car_a = R::dispense('car');
 		$car_a->model = 'Taurus';
 		R::store($car_a);
-		
 		$car_b = R::dispense('car');
 		$car_b->model = 'Focus';
 		R::store($car_b);
-		
 		R::associate($car_a, $manufacturer);
-		
 		R::unrelated($car_a, 'manufacturer'); // No error
 		asrt(count(R::unrelated($car_b, 'manufacturer')),1); // Error
 		pass();
