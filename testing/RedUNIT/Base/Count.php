@@ -35,14 +35,9 @@ class RedUNIT_Base_Count extends RedUNIT_Base {
 		asrt(R::count("page"),0);
 		asrt(R::$redbean->count("page"),0);
 		asrt(R::$redbean->count("kazoo"),0); //non existing table
-		R::freeze(1);
-		try {
-			asrt(R::$redbean->count("kazoo"),0); //non existing table
-			fail();
-		}
-		catch(RedBean_Exception_SQL $e) {
-			pass();
-		}	
+		R::freeze(true);
+		asrt(R::$redbean->count("kazoo"),0); //non existing table
+		R::freeze(false);	
 	}
 
 }
