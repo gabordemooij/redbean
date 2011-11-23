@@ -2,6 +2,7 @@
 /**
  * RedUNIT
  * Base class for RedUNIT, the micro unit test suite for RedBeanPHP
+ * 
  * @file			RedUNIT/RedUNIT.php
  * @description		Provides the basic logic for any unit test in RedUNIT.
  * @author			Gabor de Mooij

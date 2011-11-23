@@ -1,5 +1,17 @@
 <?php
-
+/**
+ * RedUNIT_Sqlite_Setget
+ * @file 			RedUNIT/Sqlite/Setget.php
+ * @description		Tests whether values are stored correctly.
+ * 					This class is part of the RedUNIT test suite for RedBeanPHP.
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
+ */
 class RedUNIT_Sqlite_Setget extends RedUNIT_Sqlite {
 
 	public function run() {

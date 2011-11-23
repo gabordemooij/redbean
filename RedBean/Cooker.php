@@ -172,6 +172,6 @@ class RedBean_Cooker {
 		else {
 			return $array;
 		}
-		return $beans;
 	}
+	
 }

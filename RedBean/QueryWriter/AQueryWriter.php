@@ -326,6 +326,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$sqlConditions = array();
 		$bindings=array();
 		foreach($conditions as $column=>$values) {
+			if (!count($values)) continue;
 			$sql = $this->safeColumn($column);
 			$sql .= " ".($inverse ? " NOT ":"")." IN ( ";
 			$sql .= implode(",",array_fill(0,count($values),"?")).") ";

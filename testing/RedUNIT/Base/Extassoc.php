@@ -1,5 +1,18 @@
 <?php
-
+/**
+ * RedUNIT_Base_Association 
+ * @file 			RedUNIT/Base/RedBean_OODBBean.php
+ * @description		Tests extended associations, associations with additional properties in
+ * 					link table.
+ * 					This class is part of the RedUNIT test suite for RedBeanPHP.
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
+ */
 class RedUNIT_Base_Extassoc extends RedUNIT_Base {
 
 	public function run() {

@@ -1,5 +1,17 @@
 <?php
-
+/**
+ * RedUNIT_Base_Unrelated 
+ * @file 			RedUNIT/Base/Unrelated.php
+ * @description		Tests finding of unrelated beans.
+ * 					This class is part of the RedUNIT test suite for RedBeanPHP.
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
+ */
 class RedUNIT_Base_Unrelated extends RedUNIT_Base {
 
 	public function run() {
@@ -34,7 +46,23 @@ class RedUNIT_Base_Unrelated extends RedUNIT_Base {
 		asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter" ) ;
 		asrt( getList( R::unrelated($developer,"person"),"job" ), "painter" ) ;
 				
-	
+		$manufacturer = R::dispense('manufacturer');
+		$manufacturer->name = 'Ford';
+		R::store($manufacturer);
+		
+		$car_a = R::dispense('car');
+		$car_a->model = 'Taurus';
+		R::store($car_a);
+		
+		$car_b = R::dispense('car');
+		$car_b->model = 'Focus';
+		R::store($car_b);
+		
+		R::associate($car_a, $manufacturer);
+		
+		R::unrelated($car_a, 'manufacturer'); // No error
+		asrt(count(R::unrelated($car_b, 'manufacturer')),1); // Error
+		pass();
 	
 	}
 

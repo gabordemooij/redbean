@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * RedUNIT Shared Test Classes / Mock Objects
+ * This file contains a collection of test classes that can be used by
+ * and shared by tests.
+ */
 
 /**
  * Observable Mock
@@ -20,36 +25,48 @@ class ObserverMock implements RedBean_Observer {
 	public function onEvent($event, $info) {
 		$this->event = $event;
 		$this->info = $info;
-		
 	}
 }
-
-//test optimizer icw table format
+/**
+ * Shared helper class for tests.
+ * A Basic Bean Formatter.
+ */
 class BF extends RedBean_DefaultBeanFormatter {
 	public function formatBeanTable($t) {
 		return '_'.$t;
 	}
 }
-
+/**
+ * Shared helper class for tests.
+ * A Basic Bean Formatter.
+ */
 class Fm implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {return "prefix_$table";}
 	public function formatBeanID( $table ) {return $table."__id";}
 	public function getAlias($a){return $a;}
 }
-
-
+/**
+ * Shared helper class for tests.
+ * A Basic Bean Formatter.
+ */
 class Fm2 implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {return "prefix_$table";}
 	public function formatBeanID( $table ) {return $table."_id";}
 	public function getAlias($a){return $a;}
 }
-
+/**
+ * Shared helper class for tests.
+ * A Basic Bean Formatter.
+ */
 class TestFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {return "xx_$table";}
 	public function formatBeanID( $table ) {return "id";}
 	public function getAlias($a){ return $a; }
 }
-
+/**
+ * Shared helper class for tests.
+ * A Basic Bean Formatter.
+ */
 class MyTableFormatter implements RedBean_IBeanFormatter{
 	public function formatBeanTable($table) {
 		return "xx_$table";
@@ -59,7 +76,10 @@ class MyTableFormatter implements RedBean_IBeanFormatter{
 	}
 	public function getAlias($a){ return '__';}
 }
-
+/**
+ * Shared helper class for tests.
+ * A Basic Bean Formatter.
+ */
 class MyBeanFormatter implements RedBean_IBeanFormatter{
     public function formatBeanTable($table) {
         return "cms_$table";
@@ -69,44 +89,61 @@ class MyBeanFormatter implements RedBean_IBeanFormatter{
     }
     public function getAlias($a){ return '__'.$a;  }
 }
-
-
+/**
+ * Shared helper class for tests.
+ * A Basic Model Formatter for FUSE tests.
+ */
 class mymodelformatter implements RedBean_IModelFormatter{
 	public function formatModel($model){
 		return "my_weird_".$model."_model";
 	}
 }
-
+/**
+ * Shared helper class for tests.
+ * Default Model Formatter to reset model formatting in FUSE tests.
+ */
 class DefaultModelFormatter implements RedBean_IModelFormatter {
 	public function formatModel($model) {
 		return 'Model_'.ucfirst($model);
 	}
 }
-
+/**
+ * Shared helper class for tests.
+ * A Basic Model Formatter for FUSE tests.
+ */
 class my_weird_weirdo_model extends RedBean_SimpleModel {
 	public function blah(){ return "yes!"; }
 }
-
+/**
+ * Shared helper class for tests.
+ * Default Bean Formatter to reset bean formatting rules for Format tests.
+ */
 class DF extends RedBean_DefaultBeanFormatter {}
-
-
+/**
+ * Shared helper class for tests.
+ * Bean Formatter to test aliasing of beans in N:1 relations. See Aliasing tests.
+ */
 class Aliaser extends RedBean_DefaultBeanFormatter {
 		public function getAlias($a){
 			if ($a=='cover') return 'page'; else return $a;
 		}
 }
+/**
+ * Shared helper class for tests.
+ * A test model to test FUSE functions.
+ */
 class Model_Band extends RedBean_SimpleModel {
-
-	public function after_update() {
-	}
-
+	public function after_update() {}
 	public function update() {
 		if (count($this->ownBandmember)>4) {
 			throw new Exception('too many!');
 		}
 	}
 }
-
+/**
+ * Shared helper class for tests.
+ * Bean Formatter to test aliasing of beans in N:1 relations. See Aliasing tests.
+ */
 class Aliaser2 implements RedBean_IBeanFormatter {
     public function formatBeanID($t){ return 'id'; }
     public function formatBeanTable($t){ return $t; }
@@ -115,31 +152,36 @@ class Aliaser2 implements RedBean_IBeanFormatter {
             return $a;
     }
 }
-		
+/**
+ * Shared helper class for tests.
+ * Bean Formatter to test aliasing of beans in N:1 relations. See Aliasing tests.
+ */		
 class Alias3 extends RedBean_DefaultBeanFormatter {
 	public function getAlias($type) {
 		if ($type=='familyman' || $type=='buddy') return 'person';
 		return $type;
 	}
 }
-
+/**
+ * Shared helper class for tests.
+ * Bean Formatter to test aliasing of beans in N:1 relations. See Aliasing tests.
+ */
 class ExportBeanFormatter extends RedBean_DefaultBeanFormatter{
    public function getAlias( $type ) {
    	if ($type == 'universe') return 'world'; else return $type;
    }
 }
-
+/**
+ * Shared helper class for tests.
+ * A Model class for testing Models/FUSE and related features.
+ */
 class Model_Box extends RedBean_SimpleModel {
-        public function delete() {
-                $a = $this->bean->ownBottle;
-        }
+        public function delete() { $a = $this->bean->ownBottle;}
 }
-
-
+/**
+ * Shared helper class for tests.
+ * A Model class for testing Models/FUSE and related features.
+ */
 class Model_CandyBar extends RedBean_SimpleModel {
-
-	public function customMethod($custom) {
-		return $custom."!";
-	}
-
+	public function customMethod($custom) { return $custom."!"; }
 }
