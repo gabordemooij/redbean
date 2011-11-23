@@ -14,6 +14,12 @@
  */
 class RedUNIT_Base_Association extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
 	
 		$toolbox = R::$toolbox;

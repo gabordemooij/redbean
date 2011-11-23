@@ -16,8 +16,6 @@
 
 class RedBean_ViewManager {
 
-
-
 	/**
 	 * @var RedBean_OODB
 	 */
@@ -32,7 +30,6 @@ class RedBean_ViewManager {
 	 * @var RedBean_QueryWriter
 	 */
 	protected $writer;
-
 
 	/**
 	 * Constructor

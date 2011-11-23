@@ -14,9 +14,13 @@
  */
 class RedUNIT_Base_Relations extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
-				
 		list($q1,$q2) = R::dispense('quote',2);
 		list($pic1,$pic2) = R::dispense('picture',2);
 		list($book,$book2,$book3) = R::dispense('book',4);
@@ -93,9 +97,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$book = R::load('book',$id);
 		asrt(count($book->ownPage),2);
 		$p5 = $book->ownPage[5];
-		
-		
-		
 		asrt($p5->title,'pagina5');
 		//other way around - single bean
 		asrt($p5->book->title,'abc'); 
@@ -108,7 +109,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt($page1->book->title,'def');
 		$b2 = R::load('book',$id);
 		asrt(count($b2->ownPage),2);
-		
 		//remove the other way around - single bean
 		unset($page1->book);
 		R::store($page1);
@@ -133,30 +133,16 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		//test fk, not allowed to set to 0
 		$page1 = reset($b2->ownPage);
 		$page1->book_id = 0;
-	/*	if ($db=='pgsql' || $db=='mysql') {
-			try{
-				R::store($page1);
-				fail();
-			}
-			catch(Exception $e){
-				pass();
-			}
-		
-		}*/
 		//even uglier way, but still needs to work
 		$page1 = reset($b2->ownPage);
 		$page1->book_id = null;
 		R::store($b2);
 		$b2 = R::load('book',$book2->id);
 		asrt(count($b2->ownPage),0);
-		
-		
-		
 		//test shared items
 		$book = R::load('book',$id);
 		$book->sharedTopic[] = $topic1;
 		$id = R::store($book);
-		
 		//add an item
 		asrt(count($book->sharedTopic),1);
 		asrt(reset($book->sharedTopic)->name,'holiday');
@@ -165,8 +151,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(reset($book->sharedTopic)->name,'holiday');
 		//add another item
 		$book->sharedTopic[] = $topic2;
-		
-		
 		$id = R::store($book);
 		$tidx = R::store(R::dispense('topic'));
 		$book = R::load('book',$id);
@@ -230,9 +214,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(reset($book->ownPage)->title,'yet another page 2');
 		asrt(end($book->ownPage)->title,'yet another page 4');
 		testids($book->ownPage);
-		//test aliasing
 		//test with alias format
-		
 		$formatter = new Aliaser();
 		R::$writer->setBeanFormatter($formatter);
 		$book3->cover = $page6;
@@ -242,24 +224,20 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$justACover = $book3->cover;
 		asrt($justACover->title,'cover1');
 		asrt(isset($book3->page),false);//no page property
-		
 		//test doubling and other side effects ... should not occur..
 		$book3->sharedTopic = array($topic1, $topic2);
 		$book3=R::load('book',R::store($book3));
 		$book3->sharedTopic = array();
 		$book3=R::load('book',R::store($book3));
-		
 		asrt(count($book3->sharedTopic),0);
 		$book3->sharedTopic[] = $topic1;
 		$book3=R::load('book',R::store($book3));
-		
 		//added really one, not more?
 		asrt(count($book3->sharedTopic),1);
 		asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
 		//add the same
 		$book3->sharedTopic[] = $topic1;
 		$book3=R::load('book',R::store($book3));
-		
 		asrt(count($book3->sharedTopic),1);
 		asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
 		$book3->sharedTopic['differentkey'] = $topic1;
@@ -269,7 +247,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		//ugly assign, auto array generation
 		$book3->ownPage[] = $page1;
 		$book3=R::load('book',R::store($book3));
-		
 		asrt(count($book3->ownPage),1);
 		asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),1);
 		$book3=R::load('book',$idb3);
@@ -290,8 +267,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$book3=R::load('book',R::store($book3));
 		asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")),3);
 		asrt(count($book3->ownPage),3);
-		
-		
 		unset($book3->ownPage[$page2->id]);
 		$book3->ownPage[] = $page3;
 		$book3->ownPage['try_to_trick_ya'] = $page3;
@@ -310,9 +285,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$book3->sharedTopic[] = $topic1;
 		$book3=R::load('book',R::store($book3));
 		asrt(count($book3->sharedTopic),1);
-		
-		
-		
 		//test performance
 		$logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach(R::$adapter);
 		$book = R::load('book',1);
@@ -323,7 +295,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$logger->clear();
 		print_r($book->sharedTopic,1);
 		asrt(count($logger->grep('SELECT')),1);  //no more than 1 select
-		
 		$logger->clear();
 		$book->sharedTopic[] = $topic1;
 		$book->sharedTopic[] = $topic2;
@@ -366,9 +337,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(count($book->ownPage),1);
 		$ap = reset($book->ownPage);
 		asrt($ap->title,"pagina1 changed ");
-		
-		
-		
 		//fix udiff instead of diff
 		$book3->ownPage = array($page3,$page1);
 		$i = R::store($book3);
@@ -380,7 +348,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$pic2->name = 'bbb';
 		R::store($pic1);
 		R::store($q1);
-		
 		$book3->ownPicture[] = $pic1;
 		$book3->ownQuote[] = $q1;
 		$book3=R::load('book',R::store($book3));
@@ -395,11 +362,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(count($book3->ownQuote),1);
 		asrt(count($book3->ownPage),2);
 		$book3=R::load('book',R::store($book3));
-		
-		
-		
 		$NOTE = 0;
-		
 		$quotes = R::dispense('quote',10);
 		foreach($quotes as &$justSomeQuote) {
 			$justSomeQuote->note = 'note'.(++$NOTE);
@@ -412,10 +375,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		foreach($topics as &$justSomeTopic) {
 			$justSomeTopic->note = 'note'.(++$NOTE);
 		}
-		
-		
 		for($j=0; $j<10; $j++) {
-			//echo "\n bean start: ".print_r($book3,1);
 			for($x=0;$x<rand(1,20); $x++) modgr($book3,$quotes,$pictures,$topics); //do several mutations
 			$qbefore = count($book3->ownQuote);
 			$pbefore = count($book3->ownPicture);
@@ -433,10 +393,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 			testids($book->ownQuote);
 			testids($book->ownPicture);
 			testids($book->sharedTopic);
-		
 		}
-				
-		
 	}
-
 }

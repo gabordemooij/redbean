@@ -13,15 +13,18 @@
  * with this source code in the file license.txt.
  */
 class RedUNIT_Base_Fuse extends RedUNIT_Base {
-
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-	
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
-		
 		R::$writer->setBeanFormatter(new MyBeanFormatter());
 		$blog = R::dispense('blog');
 		$blog->title = 'testing';
@@ -32,12 +35,9 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base {
 		$post->message = "hello";
 		R::associate($blog,$post);
 		$a = R::getAll("select * from ".tbl("blog")." ");
-		
-		
 		RedBean_ModelHelper::setModelFormatter(new mymodelformatter);
 		$w = R::dispense("weirdo");
 		asrt($w->blah(),"yes!");
-		
 		R::tag($post,"lousy,smart");
 		R::$flagUseLegacyTaggingAPI = true;
 		asrt(R::tag($post),"lousy,smart");
@@ -59,10 +59,8 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base {
 		asrt(R::hasTag($blog,array("lousy!")),true);
 		asrt(R::hasTag($blog,array("lousy!","smart")),true);
 		asrt(R::hasTag($blog,array("lousy!","smart"),true),false);
-		
 		R::tag($blog, false);
 		asrt(count(R::tag($blog)),0);
-		
 		R::tag($blog,array("funny","comic"));
 		asrt(count(R::tag($blog)),2);
 		R::addTags($blog,array("halloween"));
@@ -78,8 +76,5 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base {
 		R::addTags($blog,"horror");
 		asrt(R::hasTag($blog,array("horror","commic","halloween"),true),false);
 		asrt(count(R::tag($blog)),3);
-		
-	
 	}
-	
 }

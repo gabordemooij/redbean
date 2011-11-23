@@ -14,6 +14,12 @@
  */
 class RedUNIT_Base_Database extends RedUNIT_Base {
 	
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
 	
 		$toolbox = R::$toolbox;
@@ -30,9 +36,6 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 			pass();
 		}
 		asrt( (int) $adapter->getCell("SELECT 123") ,123);
-		
-		
-		
 		$page->aname = "my page";
 		$id = (int) $redbean->store($page);
 		asrt( (int) $page->id, 1 );

@@ -14,7 +14,12 @@
  */
 
 class RedUNIT_Blackhole_Import extends RedUNIT_Blackhole {
-
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
 		$bean = new RedBean_OODBBean;
 		$bean->import(array("a"=>1,"b"=>2));

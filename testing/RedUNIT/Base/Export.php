@@ -14,8 +14,13 @@
  */
 class RedUNIT_Base_Export extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
 		
 		$sheep = R::dispense('sheep');
 		$sheep->aname = 'Shawn';
@@ -202,13 +207,7 @@ class RedUNIT_Base_Export extends RedUNIT_Base {
 		R::store($t);
 		$tables = R::$writer->getTables();
 		asrt(true,in_array('blatestje',$tables));
-	
-	
-		
-
-
-	
-			
+				
 	}
 
 }

@@ -15,21 +15,6 @@
  * with this source code in the file license.txt.
  */
 interface RedBean_Driver {
-
-	/**
-	 * Implements Singleton (or multiton)
-	 * Requests an instance of the database
-	 * Returns an instance of the driver Driver wrapper.
-	 *
-	 * @param string $dsn    Database connection string
-	 * @param string $user   DB account to be used
-	 * @param string $pass   password
-	 * @param string $dbname name of the database you
-	 *
-	 * @return RedBean_Driver $driver	  driver wrapper instance
-	 */
-	public static function getInstance( $host, $user, $pass );
-
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.
 	 *
@@ -123,7 +108,6 @@ interface RedBean_Driver {
 	 * @return void
 	 */
 	public function setDebugMode( $tf );
-
 
 	/**
 	 * Starts a transaction.

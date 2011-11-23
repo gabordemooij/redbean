@@ -14,14 +14,18 @@
  */
 class RedUNIT_Base_Formats extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-	
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
-		
 		R::$writer->tableFormatter = new MyTableFormatter;
 		$page = R::dispense("page");
 		$page->title = "mypage";
@@ -65,8 +69,6 @@ class RedUNIT_Base_Formats extends RedUNIT_Base {
 		$t = R::$writer->getTables();
 		asrt(in_array("xx_page_page",$t),true);
 		asrt(in_array("page_page",$t),false);
-		
-				
 		R::$writer->setBeanFormatter(new MyBeanFormatter());
 		$blog = R::dispense('blog');
 		$blog->title = 'testing';
@@ -77,19 +79,13 @@ class RedUNIT_Base_Formats extends RedUNIT_Base {
 		asrt((isset($blogpost->blog_id)),true);
 		asrt(in_array("blog_id",array_keys(R::$writer->getColumns("blog"))),true);
 		asrt(in_array("cms_blog_id",array_keys(R::$writer->getColumns("blog"))),false);
-		
 		$post = R::dispense("post");
 		$post->message = "hello";
 		R::associate($blog,$post);
 		asrt(count(R::related($blog,"post")),1);
-		
 		asrt(count(R::find("blog"," title LIKE '%est%' ")),1);
 		$a = R::getAll("select * from ".tbl("blog")." ");
 		asrt(count($a),1);
-
-		
-		
-		
 	}
 
 }

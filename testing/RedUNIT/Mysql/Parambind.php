@@ -14,14 +14,18 @@
  */
 class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-				
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
-		
 		R::$adapter->getDatabase()->flagUseStringOnlyBinding = TRUE;
 		try{R::getAll("select * from job limit ? ", array(1)); fail(); }catch(Exception $e){ pass(); }
 		try{R::getAll("select * from job limit :l ", array(":l"=>1)); fail(); }catch(Exception $e){ pass(); }
@@ -32,7 +36,6 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql {
 		try{R::getAll("select * from job limit :l ", array(":l"=>1)); pass(); }catch(Exception $e){ fail(); }
 		try{R::exec("select * from job limit ? ", array(1)); pass(); }catch(Exception $e){ fail(); }
 		try{R::exec("select * from job limit :l ", array(":l"=>1)); pass(); }catch(Exception $e){ fail(); }
-		
 		testpack("Test findOrDispense");
 		$person = R::findOrDispense("person", " job = ? ", array("developer"));
 		asrt((count($person)>0), true);
@@ -40,7 +43,6 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql {
 		asrt((count($person)>0), true);
 		$musician = array_pop($person);
 		asrt(intval($musician->id),0);
-		
 		try {
 			$adapter->exec("an invalid query");
 			fail();
@@ -57,7 +59,6 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql {
 		asrt(count($pair),1);
 		asrt(isset($pair["thekey"]),true);
 		asrt($pair["thekey"],"thevalue");
-					
 	}
 
 }

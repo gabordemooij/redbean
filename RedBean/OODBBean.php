@@ -440,7 +440,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
         return $this->__get($offset);
     }
 
-
 	/**
 	 * Chainable method to cast a certain ID to a bean; for instance:
 	 * $person = $club->fetchAs('person')->member;
@@ -454,10 +453,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 		self::$fetchType = $type;
 		return $this;
 	}
-
-
-
-
 
 }
 

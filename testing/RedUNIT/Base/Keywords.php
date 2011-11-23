@@ -14,6 +14,12 @@
  */
 class RedUNIT_Base_Keywords extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
 	
 		$keywords = array('anokeyword','znokeyword','group','DROP','inner','JOIN','select',

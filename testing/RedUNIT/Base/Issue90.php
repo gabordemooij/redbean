@@ -14,6 +14,12 @@
  */
 class RedUNIT_Base_Issue90 extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
 		$s = R::dispense('box');
 		$s->name = 'a';

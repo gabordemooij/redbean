@@ -14,9 +14,13 @@
  */
 class RedUNIT_Base_Count extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-		
-				
 		testpack("Test count and wipe");
 		$page = R::dispense("page");
 		$page->name = "ABC";
@@ -30,8 +34,15 @@ class RedUNIT_Base_Count extends RedUNIT_Base {
 		R::wipe("page");
 		asrt(R::count("page"),0);
 		asrt(R::$redbean->count("page"),0);
-				
-		
+		asrt(R::$redbean->count("kazoo"),0); //non existing table
+		R::freeze(1);
+		try {
+			asrt(R::$redbean->count("kazoo"),0); //non existing table
+			fail();
+		}
+		catch(RedBean_Exception_SQL $e) {
+			pass();
+		}	
 	}
 
 }

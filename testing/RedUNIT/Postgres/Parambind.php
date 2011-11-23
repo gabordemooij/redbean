@@ -14,6 +14,12 @@
  */
 class RedUNIT_Postgres_Parambind extends RedUNIT_Postgres {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
 		testpack("param binding pgsql");
 		$page = R::dispense("page");

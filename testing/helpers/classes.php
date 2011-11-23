@@ -144,6 +144,15 @@ class Model_Band extends RedBean_SimpleModel {
  * Shared helper class for tests.
  * Bean Formatter to test aliasing of beans in N:1 relations. See Aliasing tests.
  */
+class N1AndFormatter implements RedBean_IBeanFormatter{
+	public function formatBeanTable($table) {return "xy_$table";}
+	public function formatBeanID( $table ) {return "theid";}
+	public function getAlias($a){ return $a; }
+}
+/**
+ * Shared helper class for tests.
+ * Bean Formatter to test aliasing of beans in N:1 relations. See Aliasing tests.
+ */
 class Aliaser2 implements RedBean_IBeanFormatter {
     public function formatBeanID($t){ return 'id'; }
     public function formatBeanTable($t){ return $t; }
@@ -184,4 +193,87 @@ class Model_Box extends RedBean_SimpleModel {
  */
 class Model_CandyBar extends RedBean_SimpleModel {
 	public function customMethod($custom) { return $custom."!"; }
+}
+/**
+ * Shared helper class for tests.
+ * A Model class for testing Models/FUSE and related features.
+ */
+class Model_Cocoa extends RedBean_SimpleModel {
+	public function update() {
+		//print_r($this->sharedTaste);
+	}
+}
+/**
+ * Shared helper class for tests.
+ * A Model class for testing Models/FUSE and related features.
+ */
+class Model_Taste extends RedBean_SimpleModel {
+	public function after_update() {
+		asrt(count($this->bean->ownCocoa),0);
+	}
+}
+
+/**
+ * Shared helper class for tests.
+ * A Model class for testing Models/FUSE and related features.
+ */
+class Model_Coffee extends RedBean_SimpleModel {
+  public function update() {
+   	while (count($this->bean->ownSugar)>3) {
+   		array_pop($this->bean->ownSugar);
+   	}
+  }
+}
+
+/**
+ * Shared helper class for tests.
+ * A Model class for testing Models/FUSE and related features.
+ */
+class Model_Test extends RedBean_SimpleModel {
+  public function update() {
+    if($this->bean->item->val) {
+      $this->bean->item->val='Test2';
+      $can = R::dispense('can');
+      $can->name = 'can for bean';
+      $s = reset($this->bean->sharedSpoon);
+      $s->name = "S2";
+      $this->bean->item->deep->name = '123';	      
+      $this->bean->ownCan[] = $can;
+      $this->bean->sharedPeas = R::dispense('peas',10);
+      $this->bean->ownChip = R::dispense('chip',9);
+    }
+  }
+}
+
+/**
+ * Shared helper class for tests.
+ * A Model class for testing Models/FUSE and related features.
+ */
+global $lifeCycle;
+class Model_Bandmember extends RedBean_SimpleModel {
+	public function open() {
+		global $lifeCycle;
+		$lifeCycle .= "\n called open: ".$this->id;
+	}
+	public function dispense(){
+		global $lifeCycle;
+		$lifeCycle .= "\n called dispense() ".$this->bean;
+	}
+	public function update() {
+		global $lifeCycle;
+		$lifeCycle .= "\n called update() ".$this->bean;
+	}
+	public function after_update(){
+		global $lifeCycle;
+		$lifeCycle .= "\n called after_update() ".$this->bean;
+	}
+	public function delete() {
+		global $lifeCycle;
+		$lifeCycle .= "\n called delete() ".$this->bean;
+	}
+	public function after_delete() {
+		global $lifeCycle;
+		$lifeCycle .= "\n called after_delete() ".$this->bean;
+	}
+
 }

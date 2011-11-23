@@ -244,3 +244,23 @@ function s($data,$params=null,$id="1234") {
 	$out =  $can->handleJSONRequest( $request );
 	return $out;
 }
+
+
+/**
+ * Candy Cane Factory. Produces lots of candy canes.
+ * @return array $canes canes
+ */	
+function candy_canes()  {
+	$canes = R::dispense('cane',10);
+	$i = 0;
+	foreach($canes as $k=>$cane) {
+	 $canes[$k]->label = 'Cane No. '.($i++);
+	}
+	$canes[0]->cane = $canes[1];
+	$canes[1]->cane = $canes[4];
+	$canes[9]->cane = $canes[4];
+	$canes[6]->cane = $canes[4];
+	$canes[4]->cane = $canes[7];
+	$canes[8]->cane = $canes[7];
+	return $canes;
+}

@@ -129,7 +129,6 @@ interface RedBean_Adapter {
 	 * @return object $driver driver
 	 */
 	public function getDatabase();
-
 	
 	/**
 	 * This method is part of the RedBean Transaction Management

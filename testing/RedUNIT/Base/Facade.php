@@ -15,6 +15,12 @@
  */
 class RedUNIT_Base_Facade extends RedUNIT_Base {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
 	
 		$toolbox = R::$toolbox;
@@ -23,8 +29,6 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		$a = new RedBean_AssociationManager( $toolbox );
-		
-		
 		asrt(R::$redbean instanceof RedBean_OODB,TRUE);
 		asrt(R::$toolbox instanceof RedBean_Toolbox,TRUE);
 		asrt(R::$adapter instanceof RedBean_Adapter,TRUE);
@@ -167,8 +171,6 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		$composer = R::dispense("performer");
 		$composer->name = "Miles Davis";
 		R::store($composer);
-				
-	
 	}
 	
 }

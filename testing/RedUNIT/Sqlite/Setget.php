@@ -14,8 +14,13 @@
  */
 class RedUNIT_Sqlite_Setget extends RedUNIT_Sqlite {
 
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 * 
+	 * @return void
+	 */
 	public function run() {
-	
 		asrt(setget("-1"),"-1");
 		asrt(setget(-1),"-1");
 		asrt(setget("-0.25"),"-0.25");
@@ -51,9 +56,6 @@ class RedUNIT_Sqlite_Setget extends RedUNIT_Sqlite {
 		asrt((setget(1)==1),true);
 		asrt((setget(true)==true),true);
 		asrt((setget(false)==false),true);
-				
-	
-	
 	}
 
 }
