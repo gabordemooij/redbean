@@ -1,5 +1,17 @@
 <?php
-
+/**
+ * RedUNIT_Base_Graph 
+ * @file 			RedUNIT/Base/Graph.php
+ * @description		Tests converting arrays into persistable bean collections.
+ * 					This class is part of the RedUNIT test suite for RedBeanPHP.
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
+ */
 class RedUNIT_Base_Graph extends RedUNIT_Base {
 
 	public function run() {
@@ -112,10 +124,9 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		$json = '{"mysongs":{"type":"playlist","name":"JazzList","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","url":"music.com.harlem"}],"cover":{"type":"cover","url":"albumart.com\/duke1"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 		
 		$playList = json_decode( $json, true );
-		$cooker = new RedBean_Cooker;
-		$cooker->setToolbox(R::$toolbox);
 		
-		$playList = ($cooker->graph(($playList)));
+		$playList = R::graph($playList);
+		
 		$id = R::store(reset($playList));
 		$play = R::load("playlist", $id);
 		asrt(count($play->ownTrack),2);

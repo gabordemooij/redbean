@@ -1,8 +1,9 @@
 <?php
 /**
- * Unit Test: Dispense
- * @file			RedUNIT/Testpacks/RedUNIT.php
- * @description		Provides the basic logic for any unit test in RedUNIT.
+ * RedUNIT_Base_Dispense 
+ * @file 			RedUNIT/Base/Dispense.php
+ * @description		Tests bean dispensing functionality.
+ * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
  * @license			BSD
  *

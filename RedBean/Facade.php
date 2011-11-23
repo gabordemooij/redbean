@@ -140,7 +140,7 @@ class RedBean_Facade {
 	 *
 	 * @return void
 	 */
-	public static function addDatabase( $key, $dsn, $user, $pass=null, $frozen=false ) {
+	public static function addDatabase( $key, $dsn, $user=null, $pass=null, $frozen=false ) {
 		self::$toolboxes[$key] = RedBean_Setup::kickstart($dsn,$user,$pass,$frozen);
 	}
 
@@ -974,6 +974,20 @@ class RedBean_Facade {
 	 */
 	public static function cooker($arr) {
 		return RedBean_Cooker::load($arr, RedBean_Facade::$toolbox);
+	}
+	
+	/**
+	 * facade method for Cooker Graph.
+	 * 
+	 * @static
+	 * @param array $array array containing POST/GET fields or other data
+	 * 
+	 * @return array $arrayOfBeans Beans
+	 */
+	public static function graph($array) {
+		$cooker = new RedBean_Cooker();
+		$cooker->setToolbox(self::$toolbox);
+		return $cooker->graph($array);
 	}
 
 	/**
