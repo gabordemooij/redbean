@@ -105,8 +105,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$bean->setMeta("buildcommand.indexes", array($property1=>$indexName1,$property2=>$indexName2));
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
-		$bean->setMeta("assoc.".$bean1->getMeta("type"),$bean1);
-		$bean->setMeta("assoc.".$bean2->getMeta("type"),$bean2);
 		$bean->setMeta("cast.$property1","id");
 		$bean->setMeta("cast.$property2","id");
 		$bean->$property1 = $bean1->$idfield1;
@@ -238,9 +236,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			if ($fast) return;
 			$beans = $this->oodb->convertToBeans($table,$rows);
 			foreach($beans as $link) {
-				$link->setMeta("assoc.".$bean1->getMeta("type"),$bean1);
-				$link->setMeta("assoc.".$bean2->getMeta("type"),$bean2);
-
 				$this->oodb->trash($link);
 			}
 		}catch(RedBean_Exception_SQL $e) {

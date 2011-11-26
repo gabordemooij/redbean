@@ -88,7 +88,7 @@ class RedBean_Facade {
 	 * @return string $version Version ID
 	 */
 	public static function getVersion() {
-		return "2.2";
+		return "3.0";
 	}
 
 	/**
@@ -524,27 +524,7 @@ class RedBean_Facade {
 	 * @return array $results
 	 */
 	public static function exec( $sql, $values=array() ) {
-		if (!self::$redbean->isFrozen()) {
-			try {
-				$rs = RedBean_Facade::$adapter->exec( $sql, $values );
-			}catch(RedBean_Exception_SQL $e) {
-				if(self::$writer->sqlStateIn($e->getSQLState(),
-				array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-				)) {
-					return NULL;
-				}
-				else {
-					throw $e;
-				}
-
-			}
-			return $rs;
-		}
-		else {
-			return RedBean_Facade::$adapter->exec( $sql, $values );
-		}
+		return self::query('exec',$sql,$values);
 	}
 
 	/**
@@ -557,28 +537,7 @@ class RedBean_Facade {
 	 * @return array $results
 	 */
 	public static function getAll( $sql, $values=array() ) {
-
-		if (!self::$redbean->isFrozen()) {
-			try {
-				$rs = RedBean_Facade::$adapter->get( $sql, $values );
-			}catch(RedBean_Exception_SQL $e) {
-				if(self::$writer->sqlStateIn($e->getSQLState(),
-				array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-				)) {
-					return array();
-				}
-				else {
-					throw $e;
-				}
-
-			}
-			return $rs;
-		}
-		else {
-			return RedBean_Facade::$adapter->get( $sql, $values );
-		}
+		return self::query('get',$sql,$values);
 	}
 
 	/**
@@ -591,28 +550,7 @@ class RedBean_Facade {
 	 * @return string $result scalar
 	 */
 	public static function getCell( $sql, $values=array() ) {
-
-		if (!self::$redbean->isFrozen()) {
-			try {
-				$rs = RedBean_Facade::$adapter->getCell( $sql, $values );
-			}catch(RedBean_Exception_SQL $e) {
-				if(self::$writer->sqlStateIn($e->getSQLState(),
-				array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-				)) {
-					return NULL;
-				}
-				else {
-					throw $e;
-				}
-
-			}
-			return $rs;
-		}
-		else {
-			return RedBean_Facade::$adapter->getCell( $sql, $values );
-		}
+		return self::query('getCell',$sql,$values);
 	}
 
 	/**
@@ -625,29 +563,7 @@ class RedBean_Facade {
 	 * @return array $results
 	 */
 	public static function getRow( $sql, $values=array() ) {
-
-		if (!self::$redbean->isFrozen()) {
-			try {
-				$rs = RedBean_Facade::$adapter->getRow( $sql, $values );
-			}catch(RedBean_Exception_SQL $e) {
-				if(self::$writer->sqlStateIn($e->getSQLState(),
-				array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-				)) {
-					return array();
-				}
-				else {
-					throw $e;
-				}
-
-			}
-			return $rs;
-		}
-		else {
-			return RedBean_Facade::$adapter->getRow( $sql, $values );
-		}
-
+		return self::query('getRow',$sql,$values);
 	}
 
 	/**
@@ -660,9 +576,13 @@ class RedBean_Facade {
 	 * @return array $results
 	 */
 	public static function getCol( $sql, $values=array() ) {
+		return self::query('getCol',$sql,$values);
+	}
+	
+	private static function query($method,$sql,$values) {
 		if (!self::$redbean->isFrozen()) {
 			try {
-				$rs = RedBean_Facade::$adapter->getCol( $sql, $values );
+				$rs = RedBean_Facade::$adapter->$method( $sql, $values );
 			}catch(RedBean_Exception_SQL $e) {
 				if(self::$writer->sqlStateIn($e->getSQLState(),
 				array(
@@ -674,12 +594,11 @@ class RedBean_Facade {
 				else {
 					throw $e;
 				}
-
 			}
 			return $rs;
 		}
 		else {
-			return RedBean_Facade::$adapter->getCol( $sql, $values );
+			return RedBean_Facade::$adapter->$method( $sql, $values );
 		}
 	}
 	
@@ -693,26 +612,7 @@ class RedBean_Facade {
 	 * @return array $results
 	 */
 	public static function getAssoc($sql,$values) {
-		if (!self::$redbean->isFrozen()) {
-			try {
-				$rs = RedBean_Facade::$adapter->getAssoc( $sql, $values );
-			}catch(RedBean_Exception_SQL $e) {
-				if(self::$writer->sqlStateIn($e->getSQLState(),
-				array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-				)) {
-					return array();
-				}
-				else {
-					throw $e;
-				}
-			}
-			return $rs;
-		}
-		else {
-			return RedBean_Facade::$adapter->getCol( $sql, $values );
-		}
+		return self::query('getAssoc',$sql,$values);
 	}	
 
 
@@ -965,16 +865,6 @@ class RedBean_Facade {
 	}
 
 
-	/**
-	 * facade method for Cooker.
-	 *
-	 * @static
-	 * @param  $arr
-	 * @return array
-	 */
-	public static function cooker($arr) {
-		return RedBean_Cooker::load($arr, RedBean_Facade::$toolbox);
-	}
 	
 	/**
 	 * facade method for Cooker Graph.
@@ -1112,15 +1002,6 @@ class RedBean_Facade {
 		return self::$writer->getColumns($table);
 	}
 
-	/**
-	 * Returns a SQL formatted date string (i.e. 1980-01-01 10:00:00)
-	 *
-	 * @static
-	 * @return string $SQLTimeString SQL Formatted time string
-	 */
-	public static function now() {
-		return date('Y-m-d H:i:s');
-	}
 
 	/**
 	 * Generates question mark slots for an array of values.
