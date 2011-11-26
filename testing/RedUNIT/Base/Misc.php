@@ -119,22 +119,6 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		asrt(R::count('bean'),0);
 		R::freeze(false);
 		
-		testpack("test old cooker");
-		$post = array(
-			"book"=>array("type"=>"book","title"=>"programming the C64"),
-			"book2"=>array("type"=>"book","id"=>1,"title"=>"the art of doing nothing"),
-			"book3"=>array("type"=>"book","id"=>1),
-			"associations"=>array(
-				array("book-book2"),array("page:2-book"),array("0")
-			),
-			"somethingelse"=>0
-		);
-		$beans = R::cooker($post);
-		asrt(count($beans["can"]),3);
-		asrt(count($beans["pairs"]),2);
-		asrt($beans["can"]["book"]->getMeta("tainted"),true);
-		asrt($beans["can"]["book2"]->getMeta("tainted"),true);
-		asrt($beans["pairs"][0][0]->title,"programming the C64");
 		
 		testpack('genSlots');
 		asrt(R::genSlots(array('a','b')),'?,?');				

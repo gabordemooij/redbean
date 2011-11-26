@@ -48,10 +48,7 @@ class RedBean_Setup {
 				  && strpos($dsn,"pgsql:")!==0
 		) {
 
-			trigger_error("
-					Support for this DSN has not been implemented yet. \n
-					Begin your DSN with: 'mysql:' or 'sqlite:'
-				");
+			trigger_error("Unsupported DSN");
 		}
 		else {
 			return true;
