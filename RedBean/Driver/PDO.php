@@ -178,15 +178,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}
 	}
 
-
-	/**
-	 * Runs a query and fetches results as a multi dimensional array.
-	 *
-	 * @param  string $sql SQL to be executed
-	 *
-	 * @return array $results result
-	 */
-	public function GetAll( $sql, $aValues=array() ) {
+	protected function runQuery($sql,$aValues) {
 		$this->connect();
 		if ($this->debug) {
 			echo "<HR>" . $sql.print_r($aValues,1);
@@ -200,14 +192,16 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			}
 			$this->bindParams( $s, $aValues );
 			$s->execute();
-			$this->affected_rows=$s->rowCount();
-		  	if ($s->columnCount()) {
+			$this->affected_rows = $s->rowCount();
+			if ($s->columnCount()) {
 		    	$this->rs = $s->fetchAll();
+		    	if ($this->debug) echo "<br><b style='color:green'>resultset: " . count($this->rs) . " rows</b>";
 	    	}
 		  	else {
-		    	$this->rs = null;
+		    	$this->rs = array();
 		  	}
-			$rows = $this->rs;
+		  	
+		  	//$rows = $this->rs;
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
@@ -215,15 +209,19 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$x->setSQLState( $e->getCode() );
 			throw $x;
 		}
-		if(!$rows) {
-			$rows = array();
-		}
-		if ($this->debug) {
-			if (count($rows) > 0) {
-				echo "<br><b style='color:green'>resultset: " . count($rows) . " rows</b>";
-			}
-		}
-		return $rows;
+	}
+
+
+	/**
+	 * Runs a query and fetches results as a multi dimensional array.
+	 *
+	 * @param  string $sql SQL to be executed
+	 *
+	 * @return array $results result
+	 */
+	public function GetAll( $sql, $aValues=array() ) {
+		$this->runQuery($sql,$aValues);
+		return $this->rs;
 	}
 
 	 /**
@@ -234,7 +232,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @return array	$results Resultset
 	 */
 	public function GetCol($sql, $aValues=array()) {
-		$this->connect();
 		$rows = $this->GetAll($sql,$aValues);
 		$cols = array();
 		if ($rows && is_array($rows) && count($rows)>0) {
@@ -253,7 +250,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @return mixed $cellvalue result cell
 	 */
 	public function GetCell($sql, $aValues=array()) {
-		$this->connect();
 		$arr = $this->GetAll($sql,$aValues);
 		$row1 = array_shift($arr);
 		$col1 = array_shift($row1);
@@ -269,7 +265,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @return array $row result row
 	 */
 	public function GetRow($sql, $aValues=array()) {
-		$this->connect();
 		$arr = $this->GetAll($sql, $aValues);
 		return array_shift($arr);
 	}
@@ -292,29 +287,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @return void
 	 */
 	public function Execute( $sql, $aValues=array() ) {
-		$this->connect();
-		if ($this->debug) {
-			echo "<HR>" . $sql.print_r($aValues,1);
-		}
-		try {
-			if (strpos("pgsql",$this->dsn)===0) {
-				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
-			}
-			else {
-				$s = $this->pdo->prepare($sql);
-			}
-			$this->bindParams( $s, $aValues );
-			$s->execute();
-			$this->affected_rows=$s->rowCount();
-			return $this->affected_rows;
-		}
-		catch(PDOException $e) {
-			//Unfortunately the code field is supposed to be int by default (php)
-			//So we need a property to convey the SQL State code.
-			$x = new RedBean_Exception_SQL( $e->getMessage()." SQL:".$sql, 0, $e );
-			$x->setSQLState( $e->getCode() );
-			throw $x;
-		}
+		$this->runQuery($sql,$aValues);
+		return $this->affected_rows;
 	}
 
 	/**
