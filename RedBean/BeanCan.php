@@ -36,22 +36,13 @@ class RedBean_BeanCan {
 	 * @return string $json JSON encoded response.
 	 */
 	private function resp($result=null, $id=null, $errorCode="-32603",$errorMessage="Internal Error") {
-		$response = array(
-			"jsonrpc"=>"2.0",
-		);
-
-		if ($id) {
-			$response["id"] = $id;
-		}
-
+		$response = array("jsonrpc"=>"2.0");
+		if ($id) { $response["id"] = $id; }
 		if ($result) {
 			$response["result"]=$result;
 		}
 		else {
-			$response["error"] = array(
-				"code"=>$errorCode,
-				"message"=>$errorMessage
-			);
+			$response["error"] = array("code"=>$errorCode,"message"=>$errorMessage);
 		}
 		return (json_encode($response));
 	}
@@ -69,22 +60,15 @@ class RedBean_BeanCan {
 
 		//Decode JSON string
 		$jsonArray = json_decode($jsonString,true);
-
 		if (!$jsonArray) return $this->resp(null,null,-32700,"Cannot Parse JSON");
-
 		if (!isset($jsonArray["jsonrpc"])) return $this->resp(null,null,-32600,"No RPC version");
 		if (($jsonArray["jsonrpc"]!="2.0")) return $this->resp(null,null,-32600,"Incompatible RPC Version");
-
 		//DO we have an ID to identify this request?
 		if (!isset($jsonArray["id"])) return $this->resp(null,null,-32600,"No ID");
-
-
 		//Fetch the request Identification String.
 		$id = $jsonArray["id"];
-
 		//Do we have a method?
 		if (!isset($jsonArray["method"])) return $this->resp(null,$id,-32600,"No method");
-
 		//Do we have params?
 		if (!isset($jsonArray["params"])) {
 			$data = array();
@@ -92,18 +76,14 @@ class RedBean_BeanCan {
 		else {
 			$data = $jsonArray["params"];
 		}
-
 		//Check method signature
 		$method = explode(":",trim($jsonArray["method"]));
-
 		if (count($method)!=2) {
 			return $this->resp(null, $id, -32600,"Invalid method signature. Use: BEAN:ACTION");
 		}
-
 		//Collect Bean and Action
 		$beanType = $method[0];
 		$action = $method[1];
-
 		//May not contain anything other than ALPHA NUMERIC chars and _
 		if (preg_match("/\W/",$beanType)) return $this->resp(null, $id, -32600,"Invalid Bean Type String");
 		if (preg_match("/\W/",$action)) return $this->resp(null, $id, -32600,"Invalid Action String");
@@ -151,15 +131,20 @@ class RedBean_BeanCan {
 	 * @return array $resultArray
 	 */
 	public function handleRESTGetRequest( $pathToResource ) {
+		if (!is_string($pathToResource)) return $this->resp(null,0,-32099,'IR');
 		$resourceInfo = explode('/',$pathToResource);
-		if (count($resourceInfo) < 1) return $this->resp('no beans found',0);
 		$type = $resourceInfo[0];
-		if (count($resourceInfo) < 2) {
-			return $this->resp(RedBean_Facade::findAndExport($type));
+		try {
+			if (count($resourceInfo) < 2) {
+				return $this->resp(RedBean_Facade::findAndExport($type));
+			}
+			else {
+				$id = (int) $resourceInfo[1];
+				return $this->resp(RedBean_Facade::load($type,$id)->export(),$id);
+			}
 		}
-		else {
-			$id = (int) $resourceInfo[1];
-			return $this->resp(RedBean_Facade::load($type,$id)->export(),$id);
+		catch(Exception $e) {
+			return $this->resp(null,0,-32099);
 		}
 	}
 }
