@@ -246,6 +246,16 @@ class RedUNIT_Base_Beancan extends RedUNIT_Base {
 		$r = json_decode($server->handleRESTGetRequest('book'),true);
 		$a = $r['result'];
 		asrt(count($a),2);
+		
+		$r = json_decode($server->handleRESTGetRequest(''),true);
+		$a = $r['error']['message'];
+		asrt($a,'Internal Error');
+		
+		$r = json_decode($server->handleRESTGetRequest(array()),true);
+		$a = $r['error']['message'];
+		asrt($a,'IR');
+		
 	}
-
+	
+	
 }
