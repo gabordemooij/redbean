@@ -1,8 +1,9 @@
 <?php
 /**
  * RedBean PostgreSQL Query Writer
- * @file				RedBean/QueryWriter/PostgreSQL.php
- * @description	QueryWriter for the PostgreSQL database system.
+ * 
+ * @file			RedBean/QueryWriter/PostgreSQL.php
+ * @description		QueryWriter for the PostgreSQL database system.
  *
  * @author			Gabor de Mooij
  * @license			BSD
@@ -13,7 +14,7 @@
  * with this source code in the file license.txt.
  */
 class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
-
+	
 	/**
 	 * DATA TYPE
 	 * Integer Data Type
@@ -54,10 +55,10 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * Supported Column Types
 	 */
 	public $typeno_sqltype = array(
-			  self::C_DATATYPE_INTEGER=>" integer ",
-			  self::C_DATATYPE_DOUBLE=>" double precision ",
-			  self::C_DATATYPE_TEXT=>" text ",
-			  self::C_DATATYPE_SPECIAL_DATE => " date "
+			  self::C_DATATYPE_INTEGER=>' integer ',
+			  self::C_DATATYPE_DOUBLE=>' double precision ',
+			  self::C_DATATYPE_TEXT=>' text ',
+			  self::C_DATATYPE_SPECIAL_DATE => ' date '
 	);
 
 	/**
@@ -67,12 +68,12 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * constants (magic numbers)
 	 */
 	public $sqltype_typeno = array(
-			  "integer"=>self::C_DATATYPE_INTEGER,
-			  "double precision" => self::C_DATATYPE_DOUBLE,
-			  "text"=>self::C_DATATYPE_TEXT,
-			  "date"=>self::C_DATATYPE_SPECIAL_DATE
+			  'integer'=>self::C_DATATYPE_INTEGER,
+			  'double precision' => self::C_DATATYPE_DOUBLE,
+			  'text'=>self::C_DATATYPE_TEXT,
+			  'date'=>self::C_DATATYPE_SPECIAL_DATE
 	);
-
+	
 	/**
 	 *
 	 * @var RedBean_DBAdapter
@@ -84,15 +85,15 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @var string
 	 * character to escape keyword table/column names
 	 */
-	  protected $quoteCharacter = '"';
+	 protected $quoteCharacter = '"';
 
-  /**
-   *
-   * @var string
-   * Default Value
-   */
- 	protected $defaultValue = 'DEFAULT';
-
+	/**
+	 * 
+	 * @var string
+	 * Default Value
+	 */
+	protected $defaultValue = 'DEFAULT';
+	
 	/**
 	* This method returns the datatype to be used for primary key IDS and
 	* foreign keys. Returns one if the data type constants.
@@ -102,17 +103,17 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	public function getTypeForID() {
 		return self::C_DATATYPE_INTEGER;
 	}
-
-  /**
-   * Returns the insert suffix SQL Snippet
-   *
-   * @param string $table table
-   *
-   * @return  string $sql SQL Snippet
-   */
-  protected function getInsertSuffix($table) {
-    return "RETURNING ".$this->getIDField($table);
-  }
+	
+	/**
+	 * Returns the insert suffix SQL Snippet
+	 *
+	 * @param string $table table
+	 *
+	 * @return  string $sql SQL Snippet
+	 */
+	protected function getInsertSuffix($table) {
+		return "RETURNING ".$this->getIDField($table);
+	}
 
 	/**
 	 * Constructor
@@ -158,7 +159,7 @@ where table_schema = 'public'" );
 		$table = $this->safeTable($table, true);
 		$columnsRaw = $this->adapter->get("select column_name, data_type from information_schema.columns where table_name='$table'");
 		foreach($columnsRaw as $r) {
-			$columns[$r["column_name"]]=$r["data_type"];
+			$columns[$r['column_name']]=$r['data_type'];
 		}
 		return $columns;
 	}
@@ -268,7 +269,7 @@ where table_schema = 'public'" );
 		$name = "UQ_".sha1($table.implode(',',$columns));
 		if ($r) {
 			foreach($r as $i) {
-				if (strtolower( $i["index_name"] )== strtolower( $name )) {
+				if (strtolower( $i['index_name'] )== strtolower( $name )) {
 					return;
 				}
 			}
@@ -290,13 +291,12 @@ where table_schema = 'public'" );
 	 * @return boolean $isInArray whether state is in list
 	 */
 	public function sqlStateIn($state, $list) {
-
-		$sqlState = "0";
-		if ($state == "42P01") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
-		if ($state == "42703") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
-		if ($state == "23505") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
-
-		return in_array($sqlState, $list);
+		$stateMap = array(
+			'42P01'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			'42703'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			'23505'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+		);
+		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list);
 	}
 
 	/**
@@ -425,10 +425,7 @@ where table_schema = 'public'" );
 	 * Removes all tables and views from the database.
 	 */
 	public function wipeAll() {
-
-
-      	$this->adapter->exec('SET CONSTRAINTS ALL DEFERRED');
-      	//$this->adapter->startTransaction();
+      	$this->adapter->exec("SET CONSTRAINTS ALL DEFERRED");
       	foreach($this->getTables() as $t) {
       		$t = $this->noKW($t);
 	 		try{
@@ -440,9 +437,7 @@ where table_schema = 'public'" );
 	 		}
 	 		catch(Exception $e){  throw $e; }
 		}
-		//$this->adapter->commit();
-		$this->adapter->exec('SET CONSTRAINTS ALL IMMEDIATE');
-
+		$this->adapter->exec("SET CONSTRAINTS ALL IMMEDIATE");
 	}
 
 }

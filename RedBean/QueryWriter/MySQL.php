@@ -2,10 +2,10 @@
 /**
  * RedBean MySQLWriter
  *
- * @file				RedBean/QueryWriter/MySQL.php
- * @description	Represents a MySQL Database to RedBean
- *						To write a driver for a different database for RedBean
- *						you should only have to change this file.
+ * @file			RedBean/QueryWriter/MySQL.php
+ * @description		Represents a MySQL Database to RedBean
+ *					To write a driver for a different database for RedBean
+ *					you should only have to change this file.
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -134,21 +134,21 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public $typeno_sqltype = array(
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  SET('1')  ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>" TINYINT(3) UNSIGNED ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>" INT(11) UNSIGNED ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>" DOUBLE ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>" VARCHAR(255) ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>" TEXT ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>" LONGTEXT ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>" DATE ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>" DATETIME ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT=>" POINT ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING=>" LINESTRING  ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY=>" GEOMETRY ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON=>" POLYGON ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT=>" MULTIPOINT ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON=>" MULTIPOLYGON ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION=>" GEOMETRYCOLLECTION ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>' TINYINT(3) UNSIGNED ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>' INT(11) UNSIGNED ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>' DOUBLE ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>' VARCHAR(255) ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>' TEXT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>' LONGTEXT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>' DATE ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>' DATETIME ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT=>' POINT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING=>' LINESTRING  ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY=>' GEOMETRY ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON=>' POLYGON ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT=>' MULTIPOINT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON=>' MULTIPOLYGON ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION=>' GEOMETRYCOLLECTION ',
 			  
 	);
 
@@ -160,21 +160,21 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public $sqltype_typeno = array(
 			  "set('1')"=>RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL,
-			  "tinyint(3) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8,
-			  "int(11) unsigned"=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32,
-			  "double" => RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE,
-			  "varchar(255)"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8,
-			  "text"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16,
-			  "longtext"=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32,
-			  "date"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE,
-			  "datetime"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME,
-			  "point"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT,
-			  "linestring"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING,
-			  "geometry"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY,
-			  "polygon"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON,
-			  "multipoint"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT,
-			  "multipolygon"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON,
-			  "geometrycollection"=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION,
+			  'tinyint(3) unsigned'=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8,
+			  'int(11) unsigned'=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32,
+			  'double' => RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE,
+			  'varchar(255)'=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8,
+			  'text'=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16,
+			  'longtext'=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32,
+			  'date'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE,
+			  'datetime'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME,
+			  'point'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT,
+			  'linestring'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING,
+			  'geometry'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY,
+			  'polygon'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON,
+			  'multipoint'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT,
+			  'multipolygon'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON,
+			  'geometrycollection'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION,
 	);
 
 	/**
@@ -252,7 +252,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$table = $this->safeTable($table);
 		$columnsRaw = $this->adapter->get("DESCRIBE $table");
 		foreach($columnsRaw as $r) {
-			$columns[$r["Field"]]=$r["Type"];
+			$columns[$r['Field']]=$r['Type'];
 		}
 		return $columns;
 	}
@@ -301,7 +301,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$value = strval($value);
 		if (!$this->startsWithZeros($value)) {
 
-			if ($value=="1" || $value=="") {
+			if ($value=='1' || $value=='') {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 			}
 			if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
@@ -372,10 +372,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			$columns[$k]= $this->safeColumn($v);
 		}
 		$r = $this->adapter->get("SHOW INDEX FROM $table");
-		$name = "UQ_".sha1(implode(',',$columns));
+		$name = 'UQ_'.sha1(implode(',',$columns));
 		if ($r) {
 			foreach($r as $i) {
-				if ($i["Key_name"]== $name) {
+				if ($i['Key_name']== $name) {
 					return;
 				}
 			}
@@ -394,13 +394,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return boolean $yesno occurs in list
 	 */
 	public function sqlStateIn($state, $list) {
-		$sqlState = "0";
-		if ($state == "42S02") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE;
-		if ($state == "42S22") $sqlState = RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN;
-		if ($state == "23000") $sqlState = RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION;
-		return in_array($sqlState, $list);
+		$stateMap = array(
+			'42S02'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			'42S22'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			'23000'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+		);
+		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list); 
 	}
-
 
 	/**
 	 * Add the constraints for a specific database driver: MySQL.
@@ -420,14 +420,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			$writer = $this;
 			$adapter = $this->adapter;
 			$db = $adapter->getCell("select database()");
-			$fkCode = "fk".md5($table.$property1.$property2);
+			$fkCode = 'fk'.md5($table.$property1.$property2);
 			$fks =  $adapter->getCell("
 				SELECT count(*)
 				FROM information_schema.KEY_COLUMN_USAGE
 				WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='".$writer->getFormattedTableName($table)."' AND
 				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
 					  ");
-
 			//already foreign keys added in this association table
 			if ($fks>0) return false;
 			//add the table to the cache, so we dont have to fire the fk query all the time.
@@ -466,7 +465,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * Drops all tables in database
 	 */
 	public function wipeAll() {
-		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=0;');
+		$this->adapter->exec("SET FOREIGN_KEY_CHECKS=0;");
 		foreach($this->getTables() as $t) {
 	 		try{
 	 			$this->adapter->exec("drop table if exists`$t`");
@@ -477,7 +476,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 		}
 	 		catch(Exception $e){}
 		}
-		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=1;');
+		$this->adapter->exec("SET FOREIGN_KEY_CHECKS=1;");
 	}
 
 

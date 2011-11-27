@@ -1,22 +1,20 @@
 <?php
- /**
- * @name RedBean Cooker
- * @file RedBean
- * @author Gabor de Mooij and the RedBean Team
- * @copyright Gabor de Mooij (c)
- * @license BSD
+/**
+ * RedBean Cooker
+ * @file			RedBean/Cooker.php
+ * @description		Turns arrays into bean collections for easy persistence.
+ * @author			Gabor de Mooij
+ * @license			BSD
  *
  * The Cooker is a little candy to make it easier to read-in an HTML form.
  * This class turns a form into a collection of beans plus an array
  * describing the desired associations.
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_Cooker {
-
-	public static $dontSetEmptyValues = false;
 
 	/**
 	 * Sets the toolbox to be used by graph()
@@ -38,12 +36,12 @@ class RedBean_Cooker {
 	 */
 	public function graph( $array ) {
 		$beans = array();
-		if (is_array($array) && isset($array["type"])) {
-			$type = $array["type"];
-			unset($array["type"]);
+		if (is_array($array) && isset($array['type'])) {
+			$type = $array['type'];
+			unset($array['type']);
 			//Do we need to load the bean?
-			if (isset($array["id"])) {
-				$id = (int) $array["id"];
+			if (isset($array['id'])) {
+				$id = (int) $array['id'];
 				$bean = $this->redbean->load($type,$id);
 			}
 			else {
@@ -69,5 +67,4 @@ class RedBean_Cooker {
 			return $array;
 		}
 	}
-	
 }

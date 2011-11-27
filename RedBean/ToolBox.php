@@ -2,6 +2,7 @@
 /**
  * ToolBox
  * Contains most important redbean tools
+ * 
  * @file			RedBean/ToolBox.php
  * @description		The ToolBox acts as a resource locator for RedBean but can
  *					be integrated in larger resource locators (nested).
@@ -12,7 +13,7 @@
  * @license			BSD
  *
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -50,7 +51,7 @@ class RedBean_ToolBox {
 	 *
 	 * return RedBean_ToolBox $toolbox Toolbox
 	 */
-	public function __construct( RedBean_OODB $oodb, RedBean_Adapter $adapter, RedBean_QueryWriter $writer ) {
+	public function __construct(RedBean_OODB $oodb,RedBean_Adapter $adapter,RedBean_QueryWriter $writer) {
 		$this->oodb = $oodb;
 		$this->adapter = $adapter;
 		$this->writer = $writer;

@@ -26,7 +26,7 @@
  * @license				BSD
  *
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -65,7 +65,6 @@
 		$this->adapter = $adapter;
 	}
 
-
 	/**
 	 * Magic method to construct SQL query
 	 * 
@@ -74,7 +73,7 @@
 	 * 
 	 * @return mixed $result   either self or result depending on mode 
 	 */
-	public function __call( $funcName, $args=array() ) {
+	public function __call($funcName,$args=array()) {
 		if ($this->capture) {
 			$this->sql .= ' '.$funcName . ' '.implode(',', $args);
 			return $this;

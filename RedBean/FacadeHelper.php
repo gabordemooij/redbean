@@ -1,10 +1,18 @@
 <?php
 /**
  * RedBean Facade Helper
- * A little helper bundles with the facade to allow you to have
- * multiple instances of a facade.
+ * 
+ * @file			RedBean/FacadeHelper.php
+ * @description		Helper for Facade:
+ *					A little helper bundles with the facade to allow you to have
+ * 					multiple instances of a facade.
  *
- * @throws Exception
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ * copyright (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
  *
  */
 class RedBean_FacadeHelper {

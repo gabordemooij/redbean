@@ -21,12 +21,40 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
-	
+		global $currentDriver; 
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
+		
+		$painting = R::dispense('painting');
+		$painting->name = 'Nighthawks';
+		$id=R::store($painting);
+		
+		$fHelper = new RedBean_FacadeHelper($currentDriver);
+		asrt($fHelper->dispense('bean') instanceof RedBean_OODBBean,true);
+		$found =$fHelper->find('painting',' name = ? ', array('Nighthawks'));
+		asrt(count($found),1);
+		
+		asrt($fHelper->loadOrDispense('painting',$id+1) instanceof RedBean_OODBBean,true);
+		asrt($fHelper->loadOrDispense('painting',$id) instanceof RedBean_OODBBean,true);
+		asrt($fHelper->loadOrDispense('painting',$id)->name,'Nighthawks');
+		
+		
+		$cooker = new RedBean_Cooker();
+		$cooker->setToolbox($toolbox);
+		asrt($cooker->graph('abc'),'abc');
+		
+		foreach($writer->typeno_sqltype as $code=>$text) {
+			asrt(is_integer($code),true);
+			asrt(is_string($text),true);
+		}
+		foreach($writer->sqltype_typeno as $text=>$code) {
+			asrt(is_integer($code),true);
+			asrt(is_string($text),true);
+		}
+		
 		R::exec('select * from nowhere');
 		pass();
 		R::getAll('select * from nowhere');
