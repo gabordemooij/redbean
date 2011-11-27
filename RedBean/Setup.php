@@ -1,15 +1,15 @@
 <?php
-
 /**
  * RedBean Setup
- * Helper class to quickly setup RedBean for you
- * @file 		RedBean/Setup.php
+ * Helper class to quickly setup RedBean for you.
+ * 
+ * @file 			RedBean/Setup.php
  * @description		Helper class to quickly setup RedBean for you
  * @author			Gabor de Mooij
  * @license			BSD
  *
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -43,12 +43,11 @@ class RedBean_Setup {
 		$dsn = trim($dsn);
 		$dsn = strtolower($dsn);
 		if (
-		strpos($dsn, "mysql:")!==0
-				  && strpos($dsn,"sqlite:")!==0
-				  && strpos($dsn,"pgsql:")!==0
+		strpos($dsn, 'mysql:')!==0
+				  && strpos($dsn,'sqlite:')!==0
+				  && strpos($dsn,'pgsql:')!==0
 		) {
-
-			trigger_error("Unsupported DSN");
+			trigger_error('Unsupported DSN');
 		}
 		else {
 			return true;
@@ -79,50 +78,41 @@ class RedBean_Setup {
 	 *
 	 * @return RedBean_ToolBox $toolbox
 	 */
-	public static function kickstart( $dsn, $username=NULL, $password=NULL, $frozen=false ) {
+	public static function kickstart($dsn,$username=NULL,$password=NULL,$frozen=false ) {
 		if ($dsn instanceof PDO) {
 			$pdo = new RedBean_Driver_PDO($dsn);
 			$dsn = $pdo->getDatabaseType() ;
 		}
 		else {
 			self::checkDSN($dsn);
-			$pdo = new RedBean_Driver_PDO( $dsn,$username,$password );
+			$pdo = new RedBean_Driver_PDO($dsn,$username,$password);
 		}
-
-		$adapter = new RedBean_Adapter_DBAdapter( $pdo );
-
-		if (strpos($dsn,"pgsql")===0) {
-			$writer = new RedBean_QueryWriter_PostgreSQL( $adapter );
+		$adapter = new RedBean_Adapter_DBAdapter($pdo);
+		if (strpos($dsn,'pgsql')===0) {
+			$writer = new RedBean_QueryWriter_PostgreSQL($adapter);
 		}
-		else if (strpos($dsn,"sqlite")===0) {
-			$writer = new RedBean_QueryWriter_SQLiteT( $adapter );
+		else if (strpos($dsn,'sqlite')===0) {
+			$writer = new RedBean_QueryWriter_SQLiteT($adapter);
 		}
 		else {
-			$writer = new RedBean_QueryWriter_MySQL( $adapter );
+			$writer = new RedBean_QueryWriter_MySQL($adapter);
 		}
-
-		$redbean = new RedBean_OODB( $writer );
+		$redbean = new RedBean_OODB($writer);
 		if ($frozen) $redbean->freeze(true);
-		$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
-
+		$toolbox = new RedBean_ToolBox($redbean,$adapter,$writer);
 		//deliver everything back in a neat toolbox
 		self::$toolbox = $toolbox;
 		return self::$toolbox;
-
 	}
-
-
 
 	/**
 	 * During a kickstart method observers may be attached to the RedBean_OODB object.
 	 * Setup keeps track of the observers that are connected to RedBean.
 	 * Returns the observers that have been attached by Setup.
+	 *
 	 * @return array $observers
 	 */
 	public static function getAttachedObservers() {
 		return self::$observers;
 	}
-
-
-
 }

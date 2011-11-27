@@ -1,18 +1,18 @@
 <?php
 /**
- * @name RedBean IBeanFormatter
- * @file RedBean/IBeanFormatter.php
- * @author Gabor de Mooij and the RedBean Team
- * @copyright Gabor de Mooij (c)
- * @license BSD
+ * RedBean Bean Formatter
+ * 
+ * @file			RedBean/IBeanFormatter.php
+ * @description		The RedBean IBeanFormatter interface describes what methods
+ *					a BeanFormatter class should implement.
+ * 		
+ * @author			Gabor de Mooij
+ * @license			BSD
  *
- * The RedBean IBeanFormatter interface describes what methods
- * a BeanFormatter class should implement.
- *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
+ *
  */
 interface RedBean_IBeanFormatter {
 

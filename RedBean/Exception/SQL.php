@@ -2,9 +2,9 @@
 /**
  * RedBean Exception SQL
  *
- * @file				RedBean/Exception/SQL.php
- * @description	Represents a generic database exception independent of the
- *						underlying driver.
+ * @file			RedBean/Exception/SQL.php
+ * @description		Represents a generic database exception independent of the
+ *					underlying driver.
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -40,13 +40,12 @@ class RedBean_Exception_SQL extends Exception {
 		$this->sqlState = $sqlState;
 	}
 
-
 	/**
 	 * To String prints both code and SQL state.
 	 *
 	 * @return string $message prints this exception instance as a string
 	 */
 	public function __toString() {
-		return "[".$this->getSQLState()."] - ".$this->getMessage();
+		return '['.$this->getSQLState().'] - '.$this->getMessage();
 	}
 }

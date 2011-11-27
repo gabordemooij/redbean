@@ -3,7 +3,7 @@
  * RedBean Abstract Query Writer
  *
  * @file 			RedBean/QueryWriter/AQueryWriter.php
- * @description
+ * @description		Quert Writer
  *					Represents an abstract Database to RedBean
  *					To write a driver for a different database for RedBean
  *					Contains a number of functions all implementors can
@@ -17,7 +17,6 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-
 abstract class RedBean_QueryWriter_AQueryWriter {
 
 
@@ -174,8 +173,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return string $idfieldtobeused ID field to be used for this type of bean
 	 */
 	public function getIDField( $type ) {
-		$nArgs = func_num_args();
-		if ($nArgs>1) throw new Exception("Deprecated parameter SAFE, use safeColumn() instead.");
 		return $this->tableFormatter->formatBeanID($type);
 	}
 
@@ -188,7 +185,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected function check($table) {
 		if ($this->quoteCharacter && strpos($table, $this->quoteCharacter)!==false) {
-		  throw new Redbean_Exception_Security("Illegal chars in table name");
+		  throw new Redbean_Exception_Security('Illegal chars in table name');
 	    }
 		return $this->adapter->escape($table);
 	}
@@ -320,8 +317,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return array $records selected records
 	 */
 	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false ) { 
-		if (!is_array($conditions)) throw new Exception("Conditions must be an array");
-
+		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
 		$table = $this->safeTable($type);
 		$sqlConditions = array();
 		$bindings=array();
@@ -456,7 +452,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function addIndex($type, $name, $column) {
 		$table = $type;
 		$table = $this->safeTable($table);
-		$name = preg_replace("/\W/","",$name);
+		$name = preg_replace('/\W/','',$name);
 		$column = $this->safeColumn($column);
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
 	}
@@ -551,17 +547,17 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $dontCache = false ) {
 
-		$table1 = $bean1->getMeta("type");
-		$table2 = $bean2->getMeta("type");
+		$table1 = $bean1->getMeta('type');
+		$table2 = $bean2->getMeta('type');
 		$writer = $this;
 		$adapter = $this->adapter;
 		$table = $this->getAssocTableFormat( array( $table1,$table2) );
-		$idfield1 = $writer->getIDField($bean1->getMeta("type"));
-		$idfield2 = $writer->getIDField($bean2->getMeta("type"));
+		$idfield1 = $writer->getIDField($bean1->getMeta('type'));
+		$idfield2 = $writer->getIDField($bean2->getMeta('type'));
 
-		$property1 = $bean1->getMeta("type") . "_id";
-		$property2 = $bean2->getMeta("type") . "_id";
-		if ($property1==$property2) $property2 = $bean2->getMeta("type")."2_id";
+		$property1 = $bean1->getMeta('type') . '_id';
+		$property2 = $bean2->getMeta('type') . '_id';
+		if ($property1==$property2) $property2 = $bean2->getMeta("type").'2_id';
 
 		$table = $adapter->escape($table);
 		$table1 = $adapter->escape($table1);

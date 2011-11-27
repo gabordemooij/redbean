@@ -1,10 +1,11 @@
 <?php
 /**
  * PDO Driver
- * @file				RedBean/PDO.php
- * @description	PDO Driver
- *						This Driver implements the RedBean Driver API
+ * @file			RedBean/PDO.php
+ * @description		PDO Driver
+ *					This Driver implements the RedBean Driver API
  * @author			Desfrenes
+ * @author			G.J.G.T. de Mooij
  * @license			BSD
  *
  *
@@ -195,7 +196,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->affected_rows = $s->rowCount();
 			if ($s->columnCount()) {
 		    	$this->rs = $s->fetchAll();
-		    	if ($this->debug) echo "<br><b style='color:green'>resultset: " . count($this->rs) . " rows</b>";
+		    	if ($this->debug) echo '<br><b style="color:green">resultset: ' . count($this->rs) . ' rows</b>';
 	    	}
 		  	else {
 		    	$this->rs = array();
@@ -420,6 +421,5 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->connect();
 		return $this->pdo;
 	}
-
 }
 

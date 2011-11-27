@@ -3,6 +3,8 @@
  * Query Logger
  *
  * @file 			RedBean/Plugin/QueryLogger.php
+ * @description		Query logger, can be attached to an observer that
+ * 					signals the sql_exec event.
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -31,7 +33,7 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer {
 	 */
 	public static function getInstanceAndAttach( RedBean_Observable $adapter ) {
 		$queryLog = new RedBean_Plugin_QueryLogger;
-		$adapter->addEventListener( "sql_exec", $queryLog );
+		$adapter->addEventListener( 'sql_exec', $queryLog );
 		return $queryLog;
 	}
 
@@ -52,9 +54,8 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer {
 	 * @return void
 	 */
 	public function onEvent( $eventName, $adapter ) {
-		if ($eventName=="sql_exec") {
-			$sql = $adapter->getSQL();
-			$this->logs[] = $sql;
+		if ($eventName=='sql_exec') {
+			$this->logs[] = $adapter->getSQL();
 		}
 	}
 

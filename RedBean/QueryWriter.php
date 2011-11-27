@@ -2,6 +2,7 @@
 /**
  * QueryWriter
  * Interface for QueryWriters
+ * 
  * @file			RedBean/QueryWriter.php
  * @description		Describes the API for a QueryWriter
  * @author			Gabor de Mooij
@@ -17,7 +18,7 @@
  * just FROZEN mode should implement the IceWriter instead.
  *
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */

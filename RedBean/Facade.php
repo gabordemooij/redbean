@@ -1,16 +1,16 @@
 <?php
 /**
  * RedBean Facade
- * @file				RedBean/Facade.php
- * @description	Convenience class for RedBeanPHP.
- *						This class hides the object landscape of
- *						RedBean behind a single letter class providing
- *						almost all functionality with simple static calls.
+ * @file			RedBean/Facade.php
+ * @description		Convenience class for RedBeanPHP.
+ *					This class hides the object landscape of
+ *					RedBean behind a single letter class providing
+ *					almost all functionality with simple static calls.
  *
  * @author			Gabor de Mooij
  * @license			BSD
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  *
@@ -102,10 +102,10 @@ class RedBean_Facade {
 	 *
 	 * @return void
 	 */
-	public static function setup( $dsn="sqlite:/tmp/red.db", $username=NULL, $password=NULL ) {
-		$facadeInstances = self::setupMultiple( array("default"=>array("dsn"=>$dsn,"username"=>$username,"password"=>$password,"frozen"=>false)));
-		$facadeInstance = $facadeInstances["default"];
-		self::configureFacadeWithToolbox(self::$toolboxes["default"]);
+	public static function setup( $dsn='sqlite:/tmp/red.db', $username=NULL, $password=NULL ) {
+		$facadeInstances = self::setupMultiple( array('default'=>array('dsn'=>$dsn,'username'=>$username,'password'=>$password,'frozen'=>false)));
+		$facadeInstance = $facadeInstances['default'];
+		self::configureFacadeWithToolbox(self::$toolboxes['default']);
 		return $facadeInstance;
 	}
 
@@ -121,7 +121,7 @@ class RedBean_Facade {
 	public static function setupMultiple( $databases ) {
 		$objects = array();
 		foreach($databases as $key=>$database) {
-			self::$toolboxes[$key] = RedBean_Setup::kickstart($database["dsn"],$database["username"],$database["password"],$database["frozen"]);
+			self::$toolboxes[$key] = RedBean_Setup::kickstart($database['dsn'],$database['username'],$database['password'],$database['frozen']);
 			$objects[$key] = new RedBean_FacadeHelper($key);
 		}
 		return $objects;
@@ -291,12 +291,12 @@ class RedBean_Facade {
 		else{
 			if (!is_array($extra)) {
 				$info = json_decode($extra,true);
-				if (!$info) $info = array("extra"=>$extra);
+				if (!$info) $info = array('extra'=>$extra);
 			}
 			else {
 				$info = $extra;
 			}
-			$bean = RedBean_Facade::dispense("typeLess");
+			$bean = RedBean_Facade::dispense('typeLess');
 			$bean->import($info);
 			return self::$extAssocManager->extAssociate($bean1, $bean2, $bean);
 		}
@@ -419,8 +419,6 @@ class RedBean_Facade {
 		return $r;
 	}
 
-
-
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
@@ -437,8 +435,6 @@ class RedBean_Facade {
 	public static function find( $type, $sql=null, $values=array() ) {
 		return self::$redbean->find($type,array(),array($sql,$values));
 	}
-
-
 
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
@@ -500,7 +496,6 @@ class RedBean_Facade {
 		$items = self::find( $type, $sql, $values );
 		return end( $items );
 	}
-
 
 	/**
 	 * Returns an array of beans.
@@ -579,6 +574,18 @@ class RedBean_Facade {
 		return self::query('getCol',$sql,$values);
 	}
 	
+	/**
+	 * Internal Query function, executes the desired query. Used by
+	 * all facade query functions. This keeps things DRY.
+	 * 
+	 * @throws RedBean_Exception_SQL 
+	 * 
+	 * @param string $method desired query method (i.e. 'cell','col','exec' etc..)
+	 * @param string $sql    the sql you want to execute
+	 * @param array  $values array of values to be bound to query statement
+	 * 
+	 * @return array $results results of query
+	 */
 	private static function query($method,$sql,$values) {
 		if (!self::$redbean->isFrozen()) {
 			try {
@@ -611,7 +618,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $results
 	 */
-	public static function getAssoc($sql,$values) {
+	public static function getAssoc($sql,$values=array()) {
 		return self::query('getAssoc',$sql,$values);
 	}	
 
@@ -634,7 +641,7 @@ class RedBean_Facade {
 	 * @return array $copiedBean the duplicated bean
 	 */
 	public static function copy($bean, $associatedBeanTypesStr="") {
-		$type = $bean->getMeta("type");
+		$type = $bean->getMeta('type');
 		$copy = RedBean_Facade::dispense($type);
 		$copy->import( $bean->export() );
 		$copy->copyMetaFrom( $bean );
@@ -647,7 +654,7 @@ class RedBean_Facade {
 				RedBean_Facade::associate($copy,$assocBean);
 			}
 		}
-		$copy->setMeta("original",$bean);
+		$copy->setMeta('original',$bean);
 		return $copy;
 	}
 
@@ -729,7 +736,7 @@ class RedBean_Facade {
 	public static function untag($bean,$tagList) {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		foreach($tags as $tag) {
-			$t = RedBean_Facade::findOne("tag"," title = ? ",array($tag));
+			$t = RedBean_Facade::findOne('tag'," title = ? ",array($tag));
 			if ($t) {
 				RedBean_Facade::unassociate( $bean, $t );
 			}
@@ -751,16 +758,15 @@ class RedBean_Facade {
 	 */
 	public static function tag( RedBean_OODBBean $bean, $tagList = null ) {
 		if (is_null($tagList)) {
-			$tags = RedBean_Facade::related( $bean, "tag");
+			$tags = RedBean_Facade::related( $bean, 'tag');
 			$foundTags = array();
 			foreach($tags as $tag) {
 				$foundTags[] = $tag->title;
 			}
-			if (self::$flagUseLegacyTaggingAPI) return implode(",",$foundTags);
+			if (self::$flagUseLegacyTaggingAPI) return implode(',',$foundTags);
 			return $foundTags;
 		}
-
-		RedBean_Facade::clearRelations( $bean, "tag" );
+		RedBean_Facade::clearRelations( $bean, 'tag' );
 		RedBean_Facade::addTags( $bean, $tagList );
 	}
 
@@ -778,11 +784,10 @@ class RedBean_Facade {
 	public static function addTags( RedBean_OODBBean $bean, $tagList ) {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		if ($tagList===false) return;
-
 		foreach($tags as $tag) {
-			$t = RedBean_Facade::findOne("tag"," title = ? ",array($tag));
+			$t = RedBean_Facade::findOne('tag',' title = ? ',array($tag));
 			if (!$t) {
-				$t = RedBean_Facade::dispense("tag");
+				$t = RedBean_Facade::dispense('tag');
 				$t->title = $tag;
 				RedBean_Facade::store($t);
 			}
@@ -804,7 +809,7 @@ class RedBean_Facade {
 		$collection = array();
 		foreach($tags as $tag) {
 			$retrieved = array();
-			$tag = RedBean_Facade::findOne("tag"," title = ? ", array($tag));
+			$tag = RedBean_Facade::findOne('tag',' title = ? ', array($tag));
 			if ($tag) $retrieved = RedBean_Facade::related($tag, $beanType);
 			foreach($retrieved as $key=>$bean) $collection[$key]=$bean;
 		}
@@ -853,13 +858,13 @@ class RedBean_Facade {
 		self::$redbean->setAssociationManager(self::$associationManager);
 		self::$extAssocManager = new RedBean_ExtAssociationManager( self::$toolbox );
 		$helper = new RedBean_ModelHelper();
-		self::$redbean->addEventListener("update", $helper );
-		self::$redbean->addEventListener("open", $helper );
-		self::$redbean->addEventListener("delete", $helper );
-		self::$associationManager->addEventListener("delete", $helper );
-		self::$redbean->addEventListener("after_delete", $helper );
-		self::$redbean->addEventListener("after_update", $helper );
-		self::$redbean->addEventListener("dispense", $helper );
+		self::$redbean->addEventListener('update', $helper );
+		self::$redbean->addEventListener('open', $helper );
+		self::$redbean->addEventListener('delete', $helper );
+		self::$associationManager->addEventListener('delete', $helper );
+		self::$redbean->addEventListener('after_delete', $helper );
+		self::$redbean->addEventListener('after_update', $helper );
+		self::$redbean->addEventListener('dispense', $helper );
 		self::$f = new RedBean_SQLHelper(self::$adapter);
 		return $oldTools;
 	}
@@ -896,11 +901,10 @@ class RedBean_Facade {
 	public static function view($viewID, $types) {
 		if (self::$redbean->isFrozen()) return false;
 		$types = explode(",",$types);
-		if (count($types)<2) throw new RedBean_Exception_Security("Creating useless view for just one type? Provide at least two types!");
+		if (count($types)<2) throw new RedBean_Exception_Security('Creating useless view for just one type? Provide at least 2 types!');
 		$refType = array_shift($types);
 		$viewManager = new RedBean_ViewManager( self::$toolbox );
 		return $viewManager->createView($viewID,$refType,$types);
-
 	}
 
 	/**
@@ -913,7 +917,6 @@ class RedBean_Facade {
 	 * @return array Array containing sub-arrays representing beans
 	 */
 	public static function exportAll($beans,$recursively=false) {
-
 		if ($recursively) {
 			if (!self::$exporter) {
 				self::$exporter = new RedBean_Plugin_BeanExport(self::$toolbox);
@@ -922,7 +925,6 @@ class RedBean_Facade {
 			return self::$exporter->export($beans);
 		}
 		else {
-
 			$array = array();
 			foreach($beans as $bean) {
 				if ($bean instanceof RedBean_OODBBean) {

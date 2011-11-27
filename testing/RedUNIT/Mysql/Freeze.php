@@ -87,6 +87,7 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql {
 		$redbean->freeze( false );
 		asrt(count($logger->grep("SELECT"))>0,true);
 		asrt(count($logger->grep("describe"))<1,true);
+		asrt(is_array($logger->getLogs()),true);
 	}
 	
 }

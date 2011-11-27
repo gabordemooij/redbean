@@ -1,8 +1,8 @@
 <?php
 /**
  * DBAdapter		(Database Adapter)
- * @file				RedBean/Adapter/DBAdapter.php
- * @description	An adapter class to connect various database systems to RedBean
+ * @file			RedBean/Adapter/DBAdapter.php
+ * @description		An adapter class to connect various database systems to RedBean
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -80,7 +80,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function exec( $sql , $aValues=array(), $noevent=false) {
 		if (!$noevent) {
 			$this->sql = $sql;
-			$this->signal("sql_exec", $this);
+			$this->signal('sql_exec', $this);
 		}
 		return $this->db->Execute( $sql, $aValues );
 	}
@@ -102,7 +102,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function get( $sql, $aValues = array() ) {
 		$this->sql = $sql;
-		$this->signal("sql_exec", $this);
+		$this->signal('sql_exec', $this);
 		return $this->db->GetAll( $sql,$aValues );
 	}
 
@@ -123,7 +123,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function getRow( $sql, $aValues = array() ) {
 		$this->sql = $sql;
-		$this->signal("sql_exec", $this);
+		$this->signal('sql_exec', $this);
 		return $this->db->GetRow( $sql,$aValues );
 	}
 
@@ -145,7 +145,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function getCol( $sql, $aValues = array() ) {
 		$this->sql = $sql;
-		$this->signal("sql_exec", $this);
+		$this->signal('sql_exec', $this);
 		return $this->db->GetCol( $sql,$aValues );
 	}
 
@@ -171,7 +171,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function getAssoc( $sql, $aValues = array() ) {
 		$this->sql = $sql;
-		$this->signal("sql_exec", $this);
+		$this->signal('sql_exec', $this);
 		$rows = $this->db->GetAll( $sql, $aValues );
 		$assoc = array();
 		if ($rows) {
@@ -212,7 +212,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	public function getCell( $sql, $aValues = array(), $noSignal = null ) {
 		$this->sql = $sql;
-		if (!$noSignal) $this->signal("sql_exec", $this);
+		if (!$noSignal) $this->signal('sql_exec', $this);
 		$arr = $this->db->getCol( $sql, $aValues );
 		if ($arr && is_array($arr))	return ($arr[0]); else return false;
 	}
