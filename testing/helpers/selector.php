@@ -66,6 +66,7 @@ if ($mode == 'all') {
 		'Base/Beancan',
 		'Base/Relations',
 		'Base/Association',
+		'Base/Aliasing',
 		'Base/Extassoc',
 		'Base/Cross',
 		'Base/Finding',

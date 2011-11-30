@@ -43,7 +43,6 @@
 		<item type="php">RedBean/ModelHelper.php</item>
 		<item type="php">RedBean/SQLHelper.php</item>
 		<item type="php">RedBean/Facade.php</item>
-		<item type="php">RedBean/FacadeHelper.php</item>
 		<item type="php">RedBean/BeanCan.php</item>
 		<item type="php">RedBean/Cooker.php</item>
 

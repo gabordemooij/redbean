@@ -39,20 +39,18 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base {
 		$w = R::dispense("weirdo");
 		asrt($w->blah(),"yes!");
 		R::tag($post,"lousy,smart");
-		R::$flagUseLegacyTaggingAPI = true;
-		asrt(R::tag($post),"lousy,smart");
+		asrt(implode(',',R::tag($post)),"lousy,smart");
 		R::tag($post,"clever,smart");
-		$tagz = R::tag($post);
+		$tagz = implode(',',R::tag($post));
 		asrt(($tagz=="smart,clever" || $tagz=="clever,smart"),true);
 		R::tag($blog,array("smart","interesting"));
-		asrt(R::tag($blog),"smart,interesting");
+		asrt(implode(',',R::tag($blog)),"smart,interesting");
 		try{
 		R::tag($blog,array("smart","interesting","lousy!"));
 		pass();
 		}catch(RedBean_Exception $e){ fail(); }
-		asrt(R::tag($blog),"smart,interesting,lousy!");
+		asrt(implode(',',R::tag($blog)),"smart,interesting,lousy!");
 		
-		R::$flagUseLegacyTaggingAPI = false;
 		asrt(implode(",",R::tag($blog)),"smart,interesting,lousy!");
 		R::untag($blog,array("smart","interesting"));
 		asrt(implode(",",R::tag($blog)),"lousy!");
@@ -67,9 +65,7 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base {
 		asrt(count(R::tag($blog)),3);
 		asrt(R::hasTag($blog,array("funny","commic","halloween"),true),false);
 		R::unTag($blog,array("funny"));
-		R::$flagUseLegacyTaggingAPI = true;
 		R::addTags($blog,"horror");
-		R::$flagUseLegacyTaggingAPI = false;
 		asrt(count(R::tag($blog)),3);
 		asrt(R::hasTag($blog,array("horror","commic","halloween"),true),false);
 		//no double tags

@@ -285,6 +285,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$this->setGetSpatial('POINT(1 2)');
 		$this->setGetSpatial('LINESTRING(3 3,4 4)');
 		$this->setGetSpatial('POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))');
+		$this->setGetSpatial('MULTIPOINT(0 0,20 20,60 60)');
 	}	
 	
 	/**

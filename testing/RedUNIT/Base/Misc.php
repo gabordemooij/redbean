@@ -32,14 +32,10 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$painting->name = 'Nighthawks';
 		$id=R::store($painting);
 		
-		$fHelper = new RedBean_FacadeHelper($currentDriver);
-		asrt($fHelper->dispense('bean') instanceof RedBean_OODBBean,true);
-		$found =$fHelper->find('painting',' name = ? ', array('Nighthawks'));
-		asrt(count($found),1);
 		
-		asrt($fHelper->loadOrDispense('painting',$id+1) instanceof RedBean_OODBBean,true);
-		asrt($fHelper->loadOrDispense('painting',$id) instanceof RedBean_OODBBean,true);
-		asrt($fHelper->loadOrDispense('painting',$id)->name,'Nighthawks');
+		asrt(R::loadOrDispense('painting',$id+1) instanceof RedBean_OODBBean,true);
+		asrt(R::loadOrDispense('painting',$id) instanceof RedBean_OODBBean,true);
+		asrt(R::loadOrDispense('painting',$id)->name,'Nighthawks');
 		
 		
 		$cooker = new RedBean_Cooker();
@@ -122,8 +118,6 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$s2 = array_shift($students);
 		asrt(($s->name=='a' || $s2->name=='a'),true);
 		asrt(($s->name=='b' || $s2->name=='b'),true);
-		$s= R::relatedOne($t, 'person', ' role = ?  ',array("student"));
-		asrt($s->name,'a');
 		//empty classroom
 		R::clearRelations($t, 'person', $s2);
 		$students = R::related($t, 'person', ' role = ?  ',array("student"));

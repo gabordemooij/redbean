@@ -4,7 +4,7 @@
  * @file			RedBean/Facade.php
  * @description		Convenience class for RedBeanPHP.
  *					This class hides the object landscape of
- *					RedBean behind a single letter class providing
+ *					RedBeanPHP behind a single letter class providing
  *					almost all functionality with simple static calls.
  *
  * @author			Gabor de Mooij
@@ -103,29 +103,11 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function setup( $dsn='sqlite:/tmp/red.db', $username=NULL, $password=NULL ) {
-		$facadeInstances = self::setupMultiple( array('default'=>array('dsn'=>$dsn,'username'=>$username,'password'=>$password,'frozen'=>false)));
-		$facadeInstance = $facadeInstances['default'];
-		self::configureFacadeWithToolbox(self::$toolboxes['default']);
-		return $facadeInstance;
+		self::addDatabase('default',$dsn,$username,$password);
+		self::selectDatabase('default');
+		return self::$toolbox;
 	}
 
-	/**
-	 * Configures RedBean to work with multiple database and multiple instances of the facade.
-	 * This method accepts an array with format:
-	 * array( $key =>array('dsn'=>$dsn,'username'=>$username,'password'=>$password,'frozen'=>$trueFalse) )
-	 *
-	 * @static
-	 * @param  array $databases  array with database connection information
-	 * @return array $rinstances array with R-instances
-	 */
-	public static function setupMultiple( $databases ) {
-		$objects = array();
-		foreach($databases as $key=>$database) {
-			self::$toolboxes[$key] = RedBean_Setup::kickstart($database['dsn'],$database['username'],$database['password'],$database['frozen']);
-			$objects[$key] = new RedBean_FacadeHelper($key);
-		}
-		return $objects;
-	}
 
 	/**
 	 * Adds a database to the facade, afterwards you can select the database using
@@ -385,23 +367,6 @@ class RedBean_Facade {
 	}
 
 
-	/**
-	 * Returns only single associated bean. This is the default way RedBean
-	 * handles N:1 relations, by just returning the 1st one ;)
-	 *
-	 * @param RedBean_OODBBean $bean   bean provided
-	 * @param string				$type   type of bean you are searching for
-	 * @param string				$sql    SQL for extra filtering
-	 * @param array				$values values to be inserted in SQL slots
-	 *
-	 *
-	 * @return RedBean_OODBBean $bean
-	 */
-	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql='1', $values=array() ) {
-		$beans = self::related($bean, $type, $sql, $values);
-		if (count($beans)==0) return null;
-		return reset( $beans );
-	}
 
 	/**
 	 * Clears all associated beans.
@@ -689,13 +654,6 @@ class RedBean_Facade {
 		return self::$redbean->convertToBeans($type,$rows);
 	}
 
-	/**
-	 * This static property can be set to force the system to return
-	 * comma separated lists as in legacy versions.
-	 *
-	 * @var boolean
-	 */
-	public static $flagUseLegacyTaggingAPI = false;
 
 	/**
 	 * Tests whether a bean has been associated with one ore more
@@ -763,7 +721,6 @@ class RedBean_Facade {
 			foreach($tags as $tag) {
 				$foundTags[] = $tag->title;
 			}
-			if (self::$flagUseLegacyTaggingAPI) return implode(',',$foundTags);
 			return $foundTags;
 		}
 		RedBean_Facade::clearRelations( $bean, 'tag' );
