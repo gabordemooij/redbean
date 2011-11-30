@@ -33,20 +33,17 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		$post = R::dispense("post");
 		$post->message = "hello";
 		R::tag($post,"lousy,smart");
-		R::$flagUseLegacyTaggingAPI = true;
-		asrt(R::tag($post),"lousy,smart");
+		asrt(implode(',',R::tag($post)),"lousy,smart");
 		R::tag($post,"clever,smart");
-		$tagz = R::tag($post);
+		$tagz = implode(',',R::tag($post));
 		asrt(($tagz=="smart,clever" || $tagz=="clever,smart"),true);
 		R::tag($blog,array("smart","interesting"));
-		asrt(R::tag($blog),"smart,interesting");
+		asrt(implode(',',R::tag($blog)),"smart,interesting");
 		try{
 			R::tag($blog,array("smart","interesting","lousy!"));
 			pass();
 		}catch(RedBean_Exception $e){ fail(); }
-		asrt(R::tag($blog),"smart,interesting,lousy!");
-		R::$flagUseLegacyTaggingAPI = false;
-		asrt(implode(",",R::tag($blog)),"smart,interesting,lousy!");
+		asrt(implode(',',R::tag($blog)),"smart,interesting,lousy!");
 		R::untag($blog,array("smart","interesting"));
 		asrt(implode(",",R::tag($blog)),"lousy!");
 		asrt(R::hasTag($blog,array("lousy!")),true);
@@ -60,9 +57,7 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		asrt(count(R::tag($blog)),3);
 		asrt(R::hasTag($blog,array("funny","commic","halloween"),true),false);
 		R::unTag($blog,array("funny"));
-		R::$flagUseLegacyTaggingAPI = true;
 		R::addTags($blog,"horror");
-		R::$flagUseLegacyTaggingAPI = false;
 		asrt(count(R::tag($blog)),3);
 		asrt(R::hasTag($blog,array("horror","commic","halloween"),true),false);
 		//no double tags
@@ -70,12 +65,7 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		asrt(R::hasTag($blog,array("horror","commic","halloween"),true),false);
 		asrt(count(R::tag($blog)),3);
 		testpack("fetch tagged items");
-		R::exec("drop table author_book");
-		R::exec("drop table author");
-		R::exec("drop table book");
-		R::wipe("book");
-		R::wipe("tag");
-		R::wipe("book_tag");
+		R::nuke();
 		$b = R::dispense("book");
 		$b->title = 'horror';
 		R::store($b);
