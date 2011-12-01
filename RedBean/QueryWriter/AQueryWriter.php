@@ -19,6 +19,7 @@
  */
 abstract class RedBean_QueryWriter_AQueryWriter {
 
+	protected $svalue;
 
 	/**
 	 * @var array
@@ -616,6 +617,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		else {
 			return false;
 		}
+	}
+	
+	public function getValue(){
+		return $this->svalue;
 	}
 
 }

@@ -359,13 +359,14 @@ class RedBean_OODB extends RedBean_Observable {
 						else {
 							$cast = false;		
 							//What kind of property are we dealing with?
-							$typeno = $this->writer->scanType(&$v,true);
+							$typeno = $this->writer->scanType($v,true);
+							$v = $this->writer->getValue();
 						}
 						//Is this property represented in the table?
 						if (isset($columns[$p])) {
 							//rescan
 							$v = $origV;
-							if (!$cast) $typeno = $this->writer->scanType(&$v,false);
+							if (!$cast) $typeno = $this->writer->scanType($v,false);
 							//yes it is, does it still fit?
 							$sqlt = $this->writer->code($columns[$p]);
 							if ($typeno > $sqlt) {

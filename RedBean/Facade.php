@@ -222,18 +222,6 @@ class RedBean_Facade {
 	}
 
 	/**
-	 * Loads a bean if ID > 0 else dispenses.
-	 *
-	 * @param string  $type type
-	 * @param integer $id   id
-	 *
-	 * @return RedBean_OODBBean $bean bean
-	 */
-	public static function loadOrDispense( $type, $id = 0 ) {
-		return ($id ? RedBean_Facade::load($type,(int)$id) : RedBean_Facade::dispense($type));
-	}
-
-	/**
 	 * Convience method. Tries to find beans of a certain type,
 	 * if no beans are found, it dispenses a bean of that type.
 	 *

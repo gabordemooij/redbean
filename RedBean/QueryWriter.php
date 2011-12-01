@@ -368,5 +368,7 @@ interface RedBean_QueryWriter {
 	 * @return integer $const data type to be used for IDS.
 	 */
 	public function getTypeForID();
+	
+	public function getValue();
 
 }
