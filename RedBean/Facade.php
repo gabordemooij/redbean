@@ -589,37 +589,38 @@ class RedBean_Facade {
 
 
 	/**
-	 * Makes a copy of a bean. This method copies the bean and
-	 * adds the specified associations.
-	 *
-	 * For instance: R::copy( $book, "author,library" );
-	 *
-	 * Duplicates the $book bean and copies the association links
-	 * author and library as well. Note that only many-to-many
-	 * associations can be copied. Also note that no author or library
-	 * beans are copied, only the connections or references to these
-	 * beans.
+	 * Makes a copy of a bean. This method makes a deep copy
+	 * of the bean.
 	 *
 	 * @param RedBean_OODBBean $bean							bean
-	 * @param string				$associatedBeanTypesStr bean types associated
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
-	public static function copy($bean, $associatedBeanTypesStr="") {
+	public static function dup($bean,$trail=array()) {
+		
 		$type = $bean->getMeta('type');
+		$key = $type.$bean->getID();
+		if (isset($trail[$key])) throw new Exception('Recursion: '.$key);
+		$trail[$key]=true;
 		$copy = RedBean_Facade::dispense($type);
 		$copy->import( $bean->export() );
-		$copy->copyMetaFrom( $bean );
+		//$copy->copyMetaFrom( $bean );
 		$copy->id = 0;
-		RedBean_Facade::store($copy);
-		$associatedBeanTypes = explode(",",$associatedBeanTypesStr);
-		foreach($associatedBeanTypes as $associatedBeanType) {
-			$assocBeans = RedBean_Facade::related($bean, $associatedBeanType);
-			foreach($assocBeans as $assocBean) {
-				RedBean_Facade::associate($copy,$assocBean);
+		$tables = self::$writer->getTables();
+		foreach($tables as $table) {
+			$owned = 'own'.ucfirst($table);
+			$shared = 'shared'.ucfirst($table);
+			if ($beans = $bean->$owned) {
+				foreach($beans as $subBean) {
+					array_push($copy->$owned,self::dup($subBean,$trail));	
+				}
+			}
+			if ($beans = $bean->$shared) {
+				foreach($beans as $subBean) {
+					array_push($copy->$shared,$subBean);
+				}
 			}
 		}
-		$copy->setMeta('original',$bean);
 		return $copy;
 	}
 
