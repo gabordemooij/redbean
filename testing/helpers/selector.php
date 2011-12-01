@@ -61,6 +61,7 @@ if ($mode == 'all') {
 		'Base/Typechecking',
 		'Base/Observers',
 		'Base/Database',
+		'Base/Copy',
 		'Base/Update',
 		'Base/Batch',
 		'Base/Beancan',
