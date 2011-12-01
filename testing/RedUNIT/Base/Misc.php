@@ -32,12 +32,6 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$painting->name = 'Nighthawks';
 		$id=R::store($painting);
 		
-		
-		asrt(R::loadOrDispense('painting',$id+1) instanceof RedBean_OODBBean,true);
-		asrt(R::loadOrDispense('painting',$id) instanceof RedBean_OODBBean,true);
-		asrt(R::loadOrDispense('painting',$id)->name,'Nighthawks');
-		
-		
 		$cooker = new RedBean_Cooker();
 		$cooker->setToolbox($toolbox);
 		asrt($cooker->graph('abc'),'abc');

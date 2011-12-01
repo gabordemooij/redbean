@@ -112,8 +112,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 *
 	 * @return integer $type type
 	 */
-	public function scanType( $refVal, $flagSpecial=false ) {
-		$value = $refVal;
+	public function scanType( $value, $flagSpecial=false ) {
+		$this->svalue=$value;
 		if ($value===false) return self::C_DATATYPE_INTEGER;
 		if ($value===null) return self::C_DATATYPE_INTEGER; //for fks
 		if ($this->startsWithZeros($value)) return self::C_DATATYPE_TEXT;

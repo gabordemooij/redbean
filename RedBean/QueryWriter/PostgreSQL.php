@@ -172,9 +172,9 @@ where table_schema = 'public'" );
 	 *
 	 * @return integer $type type code for this value
 	 */
-	public function scanType( $refVal, $flagSpecial=false ) {
+	public function scanType( $value, $flagSpecial=false ) {
 		
-		$value = $refVal;
+		$this->svalue=$value;
 		
 		if ($flagSpecial) {
 			if ($value && preg_match('/^\d\d\d\d\-\d\d-\d\d$/',$value)) {

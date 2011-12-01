@@ -265,8 +265,8 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * @return integer $type type
 	 */
-	public function scanType( $refVal, $flagSpecial=false ) {
-		$value = $refVal;
+	public function scanType( $value, $flagSpecial=false ) {
+		$this->svalue = $value;
 		
 		if (is_null($value)) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
@@ -274,19 +274,19 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		
 		if ($flagSpecial) {
 			if (strpos($value,'POINT(')===0) {
-				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
+				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT;
 			}
 			if (strpos($value,'LINESTRING(')===0) {
-				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
+				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING;
 			}
 			if (strpos($value,'POLYGON(')===0) {
-				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
+				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON;
 			}
 			if (strpos($value,'MULTIPOINT(')===0) {
-				$refVal = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
+				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT;
 			}
 			
