@@ -91,13 +91,6 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		$author = R::findOne("author"," name = ? ",array("Bobby"));
 		$books = R::related($author,"book");
 		$book = reset($books);
-		$book2 = R::copy($book,"author");
-		$authors2 = R::related($book2,"author");
-		$author2 = reset($authors2);
-		asrt($author2->name,$author->name);
-		asrt($author2->id,$author->id);
-		asrt(($book->id!==$book2->id),true);
-		asrt($book->title,$book2->title);
 				
 				
 		testpack("Test Swap function in R-facade");
