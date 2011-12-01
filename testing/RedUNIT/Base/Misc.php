@@ -28,6 +28,18 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		
+		$u1 = R::dispense('user');
+		$u1->name = 'Gabor';
+		$u1->login = 'g';
+		$u2 = R::dispense('user');
+		$u2->name = 'Eric';
+		$u2->login = 'e';
+		R::store($u1);
+		R::store($u2);
+		$list = R::getAssoc('select login,'.R::$writer->safeColumn('name').' from '.R::$writer->safeTable('user').' ');
+		asrt($list['e'],'Eric');
+		asrt($list['g'],'Gabor');
+		
 		$painting = R::dispense('painting');
 		$painting->name = 'Nighthawks';
 		$id=R::store($painting);
@@ -67,17 +79,6 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		try{ R::getCol('select * from nowhere'); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
 		R::freeze(false);
 		
-		$u1 = R::dispense('user');
-		$u1->name = 'Gabor';
-		$u1->login = 'g';
-		$u2 = R::dispense('user');
-		$u2->name = 'Eric';
-		$u2->login = 'e';
-		R::store($u1);
-		R::store($u2);
-		$list = R::getAssoc('select login,'.R::$writer->safeColumn('name').' from user ');
-		asrt($list['e'],'Eric');
-		asrt($list['g'],'Gabor');
 		
 		
 		R::nuke();
