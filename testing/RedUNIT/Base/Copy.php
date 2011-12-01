@@ -24,6 +24,18 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 	 */
 	public function run() {
 		
+		
+		//test recursion
+		$page = R::dispense('page');
+		$page->ownPage[] = $page;
+		R::store($page);
+		try{
+			$page2 = R::dup($page);
+		}
+		catch(Exception $e) {
+			pass();
+		}
+		
 		$phillies = R::dispense('diner');
 		list($lonelyman,$man,$woman) = R::dispense('guest',3);
 		$attendent = R::dispense('employee');
@@ -87,7 +99,13 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		R::count('guest',3);
 		R::count('shared_prop',1);
 		$arthur = R::findOne('guest',' '.R::$writer->safeColumn('name').' = ? ',array('Arthur Dent'));
-		asrt($arthur->name,'Arthur Dent');			
+		asrt($arthur->name,'Arthur Dent');	
+		
+		
+		
+		
+		
+				
 	}
 
 }
