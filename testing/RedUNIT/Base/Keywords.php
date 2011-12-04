@@ -42,19 +42,8 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base {
 			$id = R::store($bean);
 			
 			R::view('perspective',$k.',other');
-			$e = new RedBean_Plugin_BeanExport(R::$toolbox);
-			$e->loadSchema();
-			$s=((unserialize($e->getSchema())));
-			ksort($s);
-			$s = json_encode($s);
-			asrt((strlen($s)>20),true);
-			
-			if (!$counter) $refs1 = $s; 
-			if ($counter==1) $refs2 = $s;
-			
-			if (str_replace('anokeyword',$k,$refs1)===$s || str_replace('znokeyword',$k,$refs2)===$s) pass(); else fail(); 
-			$counter++;
 			R::trash($bean);
+			pass();
 				
 		}
 	}

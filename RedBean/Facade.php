@@ -584,22 +584,22 @@ class RedBean_Facade {
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
-	public static function dup($bean,$trail=array()) {
-		
+	public static function dup($bean,$trail=array(),$pid=false) {
 		$type = $bean->getMeta('type');
 		$key = $type.$bean->getID();
-		if (isset($trail[$key])) throw new Exception('Recursion: '.$key);
+		if (isset($trail[$key])) return $bean->id;
 		$trail[$key]=true;
 		$copy = RedBean_Facade::dispense($type);
 		$copy->import( $bean->export() );
 		$copy->id = 0;
 		$tables = self::$writer->getTables();
 		foreach($tables as $table) {
+			if (strpos($table,'_')!==false || $table==$type) continue;
 			$owned = 'own'.ucfirst($table);
 			$shared = 'shared'.ucfirst($table);
 			if ($beans = $bean->$owned) {
 				foreach($beans as $subBean) {
-					array_push($copy->$owned,self::dup($subBean,$trail));	
+					array_push($copy->$owned,self::dup($subBean,$trail,$pid));	
 				}
 			}
 			if ($beans = $bean->$shared) {
@@ -608,8 +608,20 @@ class RedBean_Facade {
 				}
 			}
 		}
+		if ($pid) $copy->id = $bean->id;
 		return $copy;
 	}
+
+	public static function exportAll($beans) {
+		$array = array();
+		if (!is_array($beans)) $beans = array($beans);
+		foreach($beans as $bean) {
+			$f = self::dup($bean,array(),true);
+			$array[] = $f->export();
+		}
+		return $array;
+	}
+	
 
 	/**
 	 * Given an array of two beans and a property, this method
@@ -852,54 +864,7 @@ class RedBean_Facade {
 		return $viewManager->createView($viewID,$refType,$types);
 	}
 
-	/**
-	 * Mass Bean Export function.
-	 * Exports all beans specified in the first argument.
-	 *
-	 * @static
-	 * @param  array $beans collection of beans to be exported
-	 *
-	 * @return array Array containing sub-arrays representing beans
-	 */
-	public static function exportAll($beans,$recursively=false) {
-		if ($recursively) {
-			if (!self::$exporter) {
-				self::$exporter = new RedBean_Plugin_BeanExport(self::$toolbox);
-				self::$exporter->loadSchema();
-			}
-			return self::$exporter->export($beans);
-		}
-		else {
-			$array = array();
-			foreach($beans as $bean) {
-				if ($bean instanceof RedBean_OODBBean) {
-					$array[] = $bean->export();
-				}
-			}
-			return $array;
-		}
-	}
-
-	/**
-	 * Mass export beans to object instances of a certain class.
-	 *
-	 * @param array  $beans collection of beans to be exported
-	 * @param string $class name of the class to be used
-	 *
-	 * @return array $instances collection of instances of $class filled with beans
-	 */
-	public static function exportAllToObj($beans, $classname='stdClass') {
-		$array = array();
-		foreach($beans as $bean) {
-			if ($bean instanceof RedBean_OODBBean) {
-				$inst = new $classname;
-				$bean->exportToObj($inst);
-				$array[] = $inst;
-			}
-		}
-		return $array;
-	}
-
+	
 
 	/**
 	 * Facade Convience method for adapter transaction system.
@@ -948,6 +913,8 @@ class RedBean_Facade {
 	public static function getColumns($table) {
 		return self::$writer->getColumns($table);
 	}
+
+
 
 
 	/**
