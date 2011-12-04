@@ -21,22 +21,8 @@ class RedUNIT_Postgres_Views extends RedUNIT_Postgres {
 	 * @return void
 	 */
 	public function run() {
-		testpack("test views");
-		$tf = new Fm();
-		R::$writer->setBeanFormatter($tf);
-		$this->views("prefix_");
-		$tf2 = new Fm2();
-		R::$writer->setBeanFormatter($tf2);
-		$this->views("prefix_");
-	}
-
-	/**
-	 * Helper function to test views.
-	 * 
-	 * @param string $p prefix to be used for views.
-	 */	
-	public function views($p='') {
-		R::nuke();		
+		R::nuke();
+		$p='';
 		R::exec(" drop table if exists bandmember_musician CASCADE");
 		R::exec(" drop table if exists band_bandmember CASCADE");
 		R::exec(" drop table if exists prefix_bandmember_musician CASCADE");
@@ -92,13 +78,13 @@ class RedUNIT_Postgres_Views extends RedUNIT_Postgres {
 		}
 		
 		//can we do a simple query?
-		$nameOfBandWithID1 = R::getCell("select name from ".$p."bandlist where ".R::$writer->getIDField("band")." = 1
-		group by  ".R::$writer->getIDField("band").",\"name\"");
+		$nameOfBandWithID1 = R::getCell("select name from ".$p."bandlist where id = 1
+		group by  id,\"name\"");
 		asrt($nameOfBandWithID1,"The Groofy");
 		
 		//can we generate a report? list all bandleaders
 		$bandleaders = R::getAll("select  bandleader_of_bandmember,name_of_musician,\"name\" AS bandname
-			from ".$p."bandlist where bandleader_of_bandmember =  1 group by id ");
+			from ".$p."bandlist where bandleader_of_bandmember =  1 ");
 		
 		foreach($bandleaders as $bl) {
 			if ($bl["bandname"]=="Wickey Mickey") {
@@ -110,8 +96,8 @@ class RedUNIT_Postgres_Views extends RedUNIT_Postgres {
 		}
 		//can we draw statistics?
 		$inHowManyBandsDoYouPlay = R::getAll("select
-		name_of_musician ,count( distinct ".R::$writer->getIDField("band").") as bands
-		from ".$p."bandlist group by ".R::$writer->getIDField("musician")."_of_musician,name_of_musician order by name_of_musician asc
+		name_of_musician ,count( distinct id ) as bands
+		from ".$p."bandlist group by id_of_musician,name_of_musician order by name_of_musician asc
 		");
 		
 		asrt($inHowManyBandsDoYouPlay[0]["name_of_musician"],"Donald");
@@ -124,9 +110,9 @@ class RedUNIT_Postgres_Views extends RedUNIT_Postgres {
 		//who plays in band 2
 		//can we make a selectbox
 		$selectbox = R::getAll("
-			select m.".R::$writer->getIDField("musician").", m.name, b.".R::$writer->getIDField("band")." as selected from ".$p."musician as m
-			left join ".$p."bandlist as b on b.".R::$writer->getIDField("musician")."_of_musician = m.".R::$writer->getIDField("musician")." and
-			b.".R::$writer->getIDField("band")." =2
+			select m.id, m.name, b.id as selected from ".$p."musician as m
+			left join ".$p."bandlist as b on b.id_of_musician = m.id and
+			b.id =2
 			order by m.name asc
 		");
 		
