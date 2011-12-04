@@ -74,7 +74,6 @@ if ($mode == 'all') {
 		'Base/Facade',
 		'Base/Unrelated',
 		'Base/Fuse',
-		'Base/Formats',
 		'Base/Tags',
 		'Base/Graph',
 		'Base/Null',

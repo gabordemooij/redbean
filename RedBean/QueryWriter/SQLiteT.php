@@ -135,7 +135,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param integer $type	  type
 	 */
 	public function addColumn( $table, $column, $type) {
-		$table = $this->getFormattedTableName($table);
 		$column = $this->check($column);
 		$table = $this->check($table);
 		$type=$this->typeno_sqltype[$type];
@@ -183,7 +182,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	public function widenColumn( $type, $column, $datatype ) {
 		$table = $this->safeTable($type,true);
 		$column = $this->safeColumn($column,true);
-		$idfield = $this->safeColumn($this->getIDfield($type),true);
+		$idfield = 'id';
 		$newtype = $this->typeno_sqltype[$datatype];
 		$oldColumns = $this->getColumns($type);
 		$oldColumnNames = $this->quote(array_keys($oldColumns));
@@ -228,7 +227,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param string $table table
 	 */
 	public function createTable( $table ) {
-		$idfield = $this->safeColumn($this->getIDfield($table));
+		$idfield = 'id';
 		$table = $this->safeTable($table);
 		$sql = "
                      CREATE TABLE $table ( $idfield INTEGER PRIMARY KEY AUTOINCREMENT )
@@ -334,7 +333,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 				$targetTable = $this->safeTable($targetType,true);
 				$field = $this->safeColumn($field,true);
 				$targetField = $this->safeColumn($targetField,true);
-				$idfield = $this->safeColumn($this->getIDfield($type),true);
+				$idfield = 'id';
 				$oldColumns = $this->getColumns($type);
 				$oldColumnNames = $this->quote(array_keys($oldColumns));
 				$newTableDefStr='';
@@ -400,8 +399,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		try{
 			$writer = $this;
 			$adapter = $this->adapter;
-			$idfield1 = $writer->getIDField($table1);
-			$idfield2 = $writer->getIDField($table2);
+			$idfield1 = $idfield2 = 'id';
 			$this->buildFK($table,$table1,$property1,$idfield1,true);
 			$this->buildFK($table,$table2,$property2,$idfield2,true);
 			return true;

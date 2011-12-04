@@ -253,22 +253,6 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		
 	
 
-		//Test combination of bean formatter and N1
-		
-		R::$writer->setBeanFormatter(new N1AndFormatter);
-		R::nuke();
-		$book=R::dispense('book');
-		$page=R::dispense('page');
-		$book->ownPage[] = $page;
-		$bookid = R::store($book);
-		pass(); //survive?
-		asrt($page->getMeta('cast.book_id'),'id');
-		$book = R::load('book',$bookid);
-		asrt(count($book->ownPage),1);
-		$book->ownPage[] = R::dispense('page');
-		$bookid = R::store($book);
-		$book = R::load('book',$bookid);
-		asrt(count($book->ownPage),2);
 		
 		//Test whether a nested bean will be saved if tainted
 		R::nuke();

@@ -230,7 +230,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return void
 	 */
 	public function createTable( $table ) {
-		$idfield = $this->safeColumn($this->getIDfield($table));
+		$idfield = 'id';
 		$table = $this->safeTable($table);
 		$sql = "
                      CREATE TABLE $table (
@@ -424,7 +424,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			$fks =  $adapter->getCell("
 				SELECT count(*)
 				FROM information_schema.KEY_COLUMN_USAGE
-				WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='".$writer->getFormattedTableName($table)."' AND
+				WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='".($table)."' AND
 				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
 					  ");
 			//already foreign keys added in this association table
@@ -439,11 +439,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				$writer->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 			}
 
-			$idfield1 = $writer->getIDField($table1);
-			$idfield2 = $writer->getIDField($table2);
-			$table = $writer->getFormattedTableName($table);
-			$table1 = $writer->getFormattedTableName($table1);
-			$table2 = $writer->getFormattedTableName($table2);
+			$idfield1 = $idfield2 = 'id';
 			$sql = "
 				ALTER TABLE ".$writer->noKW($table)."
 				ADD FOREIGN KEY($property1) references `$table1`($idfield1) ON DELETE CASCADE;

@@ -90,8 +90,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return mixed $id either the link ID or null
 	 */
 	protected function associateBeans(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean) {
-		$idfield1 = $this->writer->getIDField($bean1->getMeta('type'));
-		$idfield2 = $this->writer->getIDField($bean2->getMeta('type'));
+		$idfield1 = $idfield2 = 'id';
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
 		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
@@ -148,7 +147,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 */
 	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $sql=false) {
 	$table = $this->getTable( array($bean->getMeta('type') , $type) );
-		$idfield = $this->writer->getIDField($bean->getMeta('type'));
+		$idfield = 'id';
 		if ($type==$bean->getMeta('type')) {
 			$type .= '2';
 			$cross = 1;
@@ -207,8 +206,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
 		$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
-		$idfield1 = $this->writer->getIDField($bean1->getMeta('type'));
-		$idfield2 = $this->writer->getIDField($bean2->getMeta('type'));
+		$idfield1 = $idfield2 = 'id';
 		$type = $bean1->getMeta('type');
 		if ($type==$bean2->getMeta('type')) {
 			$type .= '2';
@@ -260,7 +258,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
 		$this->oodb->store($bean);
 		$table = $this->getTable( array($bean->getMeta('type') , $type) );
-		$idfield = $this->writer->getIDField($bean->getMeta('type'));
+		$idfield = 'id';
 		if ($type==$bean->getMeta('type')) {
 			$property2 = $type.'2_id';
 			$cross = 1;
@@ -295,8 +293,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	public function areRelated(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		if (!$bean1->getID() || !$bean2->getID()) return false;
 		$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
-		$idfield1 = $this->writer->getIDField($bean1->getMeta('type'));
-		$idfield2 = $this->writer->getIDField($bean2->getMeta('type'));
+		$idfield1 = $idfield2 = 'id';
 		$type = $bean1->getMeta('type');
 		if ($type==$bean2->getMeta('type')) {
 			$type .= '2';

@@ -144,70 +144,7 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base {
 		catch(Exception $e){fail();}
 		
 		
-		//test views icw aliases and n1
 		R::nuke();
-		$book = R::dispense('book');
-		$page = R::dispense('page');
-		$book->title = 'my book';
-		$page->title = 'my page';
-		$book->ownPage[] = $page;
-		R::store($book);
-		R::view('library2','book,page');
-		$l2 = R::getRow('select * from library2 limit 1');
-		asrt($l2['title'],'my book');
-		asrt($l2['title_of_page'],'my page');
-		
-		
-		
-		$formatter = new Aliaser2();
-		R::$writer->setBeanFormatter($formatter);
-		$message = R::dispense('message');
-		list($creator,$recipient) = R::dispense('user',2);
-		$recipient->name = 'r';
-		$creator->name = 'c';
-		$message->recipient = $recipient;
-		$message->creator = $creator;
-		$id = R::store($message);
-		$message = R::load('message', $id);
-		$recipient = $message->recipient;
-		
-		
-		R::nuke();
-	
-		
-		R::$writer->setBeanFormatter(new Alias3);
-		
-		list($p1,$p2,$p3)  = R::dispense('person',3);
-		$p1->name = 'Joe';
-		$p2->name = 'Jack';
-		$p3->name = 'James';
-		$fm = R::dispense('familymember');
-		$fr = R::dispense('friend');
-		$fr->buddy = $p1;
-		$fm->familyman = $p2;
-		$p3->ownFamilymember[] = $fm;
-		$p3->ownFriend[] = $fr;
-		$id = R::store($p3);
-		
-		
-		$friend = R::load('person', $id);
-		asrt(reset($friend->ownFamilymember)->familyman->name,'Jack');
-		asrt(reset($friend->ownFriend)->buddy->name,'Joe');
-		
-		$Jill = R::dispense('person');
-		$Jill->name = 'Jill';
-		$familyJill = R::dispense('familymember');
-		$friend->ownFamilymember[] = $familyJill;
-		R::store($friend);
-		$friend = R::load('person', $id);
-		asrt(count($friend->ownFamilymember),2);
-		array_pop($friend->ownFamilymember);
-		R::store($friend);
-		$friend = R::load('person', $id);
-		asrt(count($friend->ownFamilymember),1);
-		
-		R::nuke();
-		R::$writer->setBeanFormatter(new RedBean_DefaultBeanFormatter);
 		$message = R::dispense('message');
 		$message->subject = 'Roommate agreement';
 		list($sender,$recipient) = R::dispense('person',2);

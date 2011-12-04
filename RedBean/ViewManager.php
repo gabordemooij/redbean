@@ -69,17 +69,17 @@ class RedBean_ViewManager {
 				if (isset($tables[$connectionTable])) {
 					//this connection exists
 					$srcPoint = $this->writer->safeTable($connection).'.'.$this->writer->safeColumn($currentTable.'_id'); //i.e. partic_project.project_id
-					$dstPoint = $this->writer->safeTable($currentTable).'.'.$this->writer->safeColumn($this->writer->getIDField($currentTable)); //i.e. project.id
+					$dstPoint = $this->writer->safeTable($currentTable).'.id'; //i.e. project.id
 					$joins[$connection] = array($srcPoint,$dstPoint);
 					//now join the type
 					$srcPoint = $this->writer->safeTable($connection).'.'.$this->writer->safeColumn($t.'_id');
-					$dstPoint = $this->writer->safeTable($t).'.'.$this->writer->safeColumn($this->writer->getIDField($t));
+					$dstPoint = $this->writer->safeTable($t).'.id';
 					$joins[$t] = array($srcPoint,$dstPoint);
 				}
 				else {
 					//this connection does not exist
 					$srcPoint = $this->writer->safeTable($t).'.'.$this->writer->safeColumn($currentTable.'_id');
-					$dstPoint = $this->writer->safeTable($currentTable).'.'.$this->writer->safeColumn($this->writer->getIDField($currentTable));
+					$dstPoint = $this->writer->safeTable($currentTable).'.id';
 					$joins[$t] = array($srcPoint,$dstPoint);
 				}
 			}
