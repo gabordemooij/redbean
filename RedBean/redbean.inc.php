@@ -76,15 +76,12 @@ require($dir.'Setup.php');
 
 
 require($dir.'Plugin/QueryLogger.php');
-require($dir.'Plugin/BeanExport.php');
 
 
 require($dir.'IBeanHelper.php');
 require($dir.'BeanHelperFacade.php');
 
 /* Developer Comfort */
-require($dir.'IBeanFormatter.php');
-require($dir.'DefaultBeanFormatter.php');
 
 require($dir.'IModelFormatter.php');
 require($dir.'SimpleModel.php');
@@ -93,7 +90,7 @@ require($dir.'Facade.php');;
 require($dir.'BeanCan.php');
 require($dir.'Cooker.php');
 require($dir.'ViewManager.php');
-require($dir.'SQLHelper');
+require($dir.'SQLHelper.php');
 
 class R extends RedBean_Facade{}
 

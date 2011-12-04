@@ -137,9 +137,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return array $arr
 	 */
 	public function export($meta = false) {
-		$arr = $this->properties;
-		foreach($arr as $k=>$v) {
-			if (is_array($v) || is_object($v)) unset($arr[$k]);
+		//$arr = $this->properties;
+		$arr=array();
+		foreach($this as $k=>$v) {
+			//if (is_array($v) || is_object($v)) unset($arr[$k]);
+			if (is_array($v)) foreach($v as $i=>$b) $v[$i]=$b->export(); 
+			$arr[$k] = $v;
 		}
 		if ($meta) $arr['__info'] = $this->__info;
 		return $arr;
