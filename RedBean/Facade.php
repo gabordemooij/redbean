@@ -592,7 +592,6 @@ class RedBean_Facade {
 		$trail[$key]=true;
 		$copy = RedBean_Facade::dispense($type);
 		$copy->import( $bean->export() );
-		//$copy->copyMetaFrom( $bean );
 		$copy->id = 0;
 		$tables = self::$writer->getTables();
 		foreach($tables as $table) {
@@ -965,17 +964,6 @@ class RedBean_Facade {
 		else {
 			return '';
 		}
-	}
-
-	/**
-	 * Installs the default bean formatter with a prefix.
-	 *
-	 * @param string $prefix prefix
-	 */
-	public static function prefix($prefix) {
-		$beanFormatter = new RedBean_DefaultBeanFormatter;
-		$beanFormatter->setPrefix($prefix);
-		self::$writer->setBeanFormatter($beanFormatter);
 	}
 
 	/**
