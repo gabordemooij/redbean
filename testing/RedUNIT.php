@@ -24,7 +24,6 @@ abstract class RedUNIT {
 	 */
 	public function prepare() {
 		R::freeze(false);
-		R::$writer->setBeanFormatter(new DF);
 		RedBean_ModelHelper::setModelFormatter(new DefaultModelFormatter);
 		R::nuke();
 		

@@ -314,7 +314,7 @@ class RedBean_Facade {
 		$keys = self::$associationManager->related( $bean, $type );
 		if (count($keys)==0) return array();
 		if (!$sql) return self::batch($type, $keys);
-		$idfield = self::$writer->getIDField( $type );
+		$idfield = 'id';
 		$rows = self::$writer->selectRecord( $type, array($idfield=>$keys),array($sql,$values),false );
 		return self::$redbean->convertToBeans($type,$rows);
 	}
@@ -347,7 +347,7 @@ class RedBean_Facade {
 	 * @return array $beans beans
 	 */
 	public static function unrelated(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
-		$idfield = self::$writer->getIDField( $type );
+		$idfield = 'id';
 		$keys = self::$associationManager->related( $bean, $type );
 		$rows = self::$writer->selectRecord( $type, array($idfield=>$keys), array($sql,$values), false, true );
 		return self::$redbean->convertToBeans($type,$rows);

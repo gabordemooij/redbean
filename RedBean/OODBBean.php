@@ -52,7 +52,21 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 *
 	 * @var null
 	 */
-	public static $fetchType = NULL;
+	private $fetchType = NULL;
+
+	/** Returns the alias for a type
+	 *
+	 * @param  $type aliased type
+	 *
+	 * @return string $type type
+	 */
+	private function getAlias( $type ) {
+		if ($this->fetchType) {
+			$type = $this->fetchType;
+			$this->fetchType = null;
+		}
+		return $type;
+	}
 
 	/**
 	 * Sets the Bean Helper. Normally the Bean Helper is set by OODB.
@@ -211,11 +225,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return mixed $value
 	 */
 	public function &__get( $property ) {
-
 		if ($this->beanHelper)
 		$toolbox = $this->beanHelper->getToolbox();
-		if (!isset($this->properties[$property])) {
-			$fieldLink = $property.'_id';
+		if (!isset($this->properties[$property])) { 
+			$fieldLink = $property.'_id'; 
 			/**
 			 * All this magic can be become very complex quicly. For instance,
 			 * my PHP CLI produced a segfault while testing this code. Turns out that
@@ -223,8 +236,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 			 * instead of giving a clue they simply crash and burn isnt that nice?
 			 */
 			if (isset($this->$fieldLink) && $fieldLink != $this->getMeta('sys.idfield')) {
-				$this->setMeta('tainted',true);
-				$type =  $toolbox->getWriter()->getAlias($property);
+				$this->setMeta('tainted',true); 
+				$type =  $this->getAlias($property);
 				$targetType = $this->properties[$fieldLink];
 				$bean =  $toolbox->getRedBean()->load($type,$targetType);
 				//return $bean;
@@ -434,7 +447,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	 * @return RedBean_OODBBean
 	 */
 	public function fetchAs($type) {
-		self::$fetchType = $type;
+		$this->fetchType = $type;
 		return $this;
 	}
 

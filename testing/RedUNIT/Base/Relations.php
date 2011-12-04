@@ -215,13 +215,11 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(end($book->ownPage)->title,'yet another page 4');
 		testids($book->ownPage);
 		//test with alias format
-		$formatter = new Aliaser();
-		R::$writer->setBeanFormatter($formatter);
 		$book3->cover = $page6;
 		$idb3=R::store($book3);
 		$book3=R::load('book',$idb3);
+		$justACover = $book3->fetchAs('page')->cover;
 		asrt(($book3->cover instanceof RedBean_OODBBean),true);
-		$justACover = $book3->cover;
 		asrt($justACover->title,'cover1');
 		asrt(isset($book3->page),false);//no page property
 		//test doubling and other side effects ... should not occur..

@@ -25,7 +25,7 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base {
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
-		R::$writer->setBeanFormatter(new MyBeanFormatter());
+
 		$blog = R::dispense('blog');
 		$blog->title = 'testing';
 		$blog->blog = 'tesing';
@@ -34,7 +34,7 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base {
 		$post = R::dispense("post");
 		$post->message = "hello";
 		R::associate($blog,$post);
-		$a = R::getAll("select * from ".tbl("blog")." ");
+		$a = R::getAll("select * from blog ");
 		RedBean_ModelHelper::setModelFormatter(new mymodelformatter);
 		$w = R::dispense("weirdo");
 		asrt($w->blah(),"yes!");

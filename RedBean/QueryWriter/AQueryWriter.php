@@ -27,14 +27,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected $fcache = array();
 
-	/**
-	 *
-	 * @var RedBean_IBeanFormatter
-	 * Holds the bean formatter to be used for applying
-	 * table schema.
-	 */
-	public $tableFormatter;
-
 
 	/**
 	 * @var array
@@ -75,7 +67,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * subclass to achieve this.
 	 */
 	public function __construct() {
-		$this->tableFormatter = new RedBean_DefaultBeanFormatter();
+		
 	}
 
 	/**
@@ -86,7 +78,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return string table name
 	 */
 	public function safeTable($name, $noQuotes = false) {
-		$name = $this->getFormattedTableName($name);
 		$name = $this->check($name);
 		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
@@ -116,43 +107,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
     	return "";
   	}
 
-	/**
-	 * Returns the string identifying a table for a given type.
-	 *
-	 * @param string $type
-	 *
-	 * @return string $table
-	 */
-	public function getFormattedTableName($type) {
-		return $this->tableFormatter->formatBeanTable($type);
-	}
 
-	/**
-	 * Returns an alias type based on a reference type. If the writer has
-	 * a tableformatter this method will pass the type to the writer's alias
-	 * function to get the alias of the type back.
-	 *
-	 * @param  string $type type you want an alias for
-	 *
-	 * @return
-	 */
-	public function getAlias($type) {
-		return $this->tableFormatter->getAlias($type);
-	}
-
-
-	/**
-	 * Sets the new bean formatter. A bean formatter is an instance
-	 * of the class BeanFormatter that determines how a bean should be represented
-	 * in the database.
-	 *
-	 * @param RedBean_IBeanFormatter $beanFormatter bean format
-	 *
-	 * @return void
-	 */
-	public function setBeanFormatter( RedBean_IBeanFormatter $beanFormatter ) {
-		$this->tableFormatter = $beanFormatter;
-	}
 
 	/**
 	 * Get sql column type.
@@ -163,18 +118,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function getFieldType( $type = "" ) {
 		return array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : "";
-	}
-
-	/**
-	 * Returns the column name that should be used
-	 * to store and retrieve the primary key ID.
-	 *
-	 * @param string $type type of bean to get ID Field for
-	 *
-	 * @return string $idfieldtobeused ID field to be used for this type of bean
-	 */
-	public function getIDField( $type ) {
-		return $this->tableFormatter->formatBeanID($type);
 	}
 
 	/**
@@ -249,7 +192,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			return $this->insertRecord($table,$insertcolumns,array($insertvalues));
 		}
 		if ($id && !count($updatevalues)) return $id;
-		$idfield = $this->safeColumn($this->getIDField($table));
+		
 		$table = $this->safeTable($table);
 		$sql = "UPDATE $table SET ";
 		$p = $v = array();
@@ -257,7 +200,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$p[] = " {$this->safeColumn($uv["property"])} = ? ";
 			$v[]=$uv["value"];
 		}
-		$sql .= implode(",", $p ) ." WHERE $idfield = ".intval($id);
+		$sql .= implode(",", $p ) ." WHERE id = ".intval($id);
 		$this->adapter->exec( $sql, $v );
 		return $id;
 	}
@@ -274,7 +217,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected function insertRecord( $table, $insertcolumns, $insertvalues ) {
 		$default = $this->defaultValue;
-		$idfield = $this->safeColumn($this->getIDField($table));
+		$idfield = 'id';
 		$suffix = $this->getInsertSuffix($table);
 		$table = $this->safeTable($table);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
@@ -553,9 +496,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$writer = $this;
 		$adapter = $this->adapter;
 		$table = $this->getAssocTableFormat( array( $table1,$table2) );
-		$idfield1 = $writer->getIDField($bean1->getMeta('type'));
-		$idfield2 = $writer->getIDField($bean2->getMeta('type'));
-
+		$idfield1 = $idfield2 = 'id'; 
+		
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
 		if ($property1==$property2) $property2 = $bean2->getMeta("type").'2_id';

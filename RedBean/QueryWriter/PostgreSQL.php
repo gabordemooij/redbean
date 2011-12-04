@@ -112,7 +112,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @return  string $sql SQL Snippet
 	 */
 	protected function getInsertSuffix($table) {
-		return "RETURNING ".$this->getIDField($table);
+		return "RETURNING id ";
 	}
 
 	/**
@@ -142,9 +142,8 @@ where table_schema = 'public'" );
 	 * @param string $table table to create
 	 */
 	public function createTable( $table ) {
-		$idfield = $this->getIDfield($table);
 		$table = $this->safeTable($table);
-		$sql = " CREATE TABLE $table ($idfield SERIAL PRIMARY KEY); ";
+		$sql = " CREATE TABLE $table (id SERIAL PRIMARY KEY); ";
 		$this->adapter->exec( $sql );
 	}
 
@@ -399,11 +398,6 @@ where table_schema = 'public'" );
 
 			$rows = $adapter->get( $sql );
 			if (!count($rows)) {
-
-				$table = $writer->getFormattedTableName($table);
-				$table1 = $writer->getFormattedTableName($table1);
-				$table2 = $writer->getFormattedTableName($table2);
-
 				if (!$dontCache) $this->fkcache[ $fkCode ] = true;
 				$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
 						  {$fkCode}a FOREIGN KEY ($property1)

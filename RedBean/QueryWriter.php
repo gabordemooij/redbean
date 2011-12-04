@@ -46,15 +46,6 @@ interface RedBean_QueryWriter {
 	const C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION = 3;
 
 	/**
-	 * Returns the table to store beans of a given type.
-	 *
-	 * @param string $type type of bean you want the table name of
-	 *
-	 * @return string $tableName name of the table where bean records are stored
-	 */
-	public function getFormattedTableName($type);
-
-	/**
 	 * Returns the tables that are in the database.
 	 *
 	 * @return array $arrayOfTables list of tables
@@ -183,17 +174,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function addUniqueIndex($type,$columns);
 
-	/**
-	 * Returns the property that contains the Primary Key ID in an
-	 * OODBBean instance.
-	 *
-	 * @param string $tableOfTheBean
-	 *
-	 * @return void
-	 */
-	public function getIDField($type);
-
-
+	
 	/**
 	 * This method should check whether the SQL state is in the list of specified states
 	 * and returns true if it does appear in this list or false if it
@@ -229,17 +210,6 @@ interface RedBean_QueryWriter {
 	public function count($type);
 
 
-
-	/**
-	 * This method should set the new bean formatter. A bean formatter is an instance
-	 * of the class BeanFormatter that determines how a bean should be represented
-	 * in the database.
-	 *
-	 * @param RedBean_IBeanFormatter $beanFormatter bean format
-	 *
-	 * @return void
-	 */
-	public function setBeanFormatter(RedBean_IBeanFormatter $beanFormatter);
 
 	/**
 	 * This method should create a view with name $viewID and
@@ -347,27 +317,6 @@ interface RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function addIndex($type, $name, $column);
-
-
-	/**
-	 * This method should return the true type name of a given alias.
-	 * For instance 'magazine' -> 'book' if magazine is just another name
-	 * of the real 'type' called book.
-	 *
-	 * @param  string $type type
-	 *
-	 * @return string $realType type
-	 */
-	public function getAlias($type);
-
-
-	/**
-	 * This method should return the datatype to be used for primary key IDS and
-	 * foreign keys. Return one if the data type constants.
-	 *
-	 * @return integer $const data type to be used for IDS.
-	 */
-	public function getTypeForID();
 	
 	public function getValue();
 
