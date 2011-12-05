@@ -293,6 +293,26 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt(R::count('page'),$c);
 		asrt(R::count('tree'),1);
 		
+		R::nuke();
+
+		$v = R::dispense('village');
+		list($b1,$b2) = R::dispense('building',2);
+		$b1->name = 'a';
+		$b2->name = 'b';
+		$b2->village = $v;
+		$v->ownBuilding[] = $b1;
+		$b1->ownFurniture[] = R::dispense('furniture');
+		$id=R::store($b2);
+		$b2=R::load('building',$id);
+		asrt(count($b2->village->ownBuilding),2);
+		$buildings = $b2->village->ownBuilding;
+		foreach($buildings as $b) {
+			if ($b->id!=$id) {
+				asrt(count($b->ownFurniture),1);
+			}
+		}
+		
+				
 	}
 	
 }
