@@ -51,30 +51,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	
 
 	/**
-	 * @var array
-	 * Supported Column Types
-	 */
-	public $typeno_sqltype = array(
-			  self::C_DATATYPE_INTEGER=>' integer ',
-			  self::C_DATATYPE_DOUBLE=>' double precision ',
-			  self::C_DATATYPE_TEXT=>' text ',
-			  self::C_DATATYPE_SPECIAL_DATE => ' date '
-	);
-
-	/**
-	 *
-	 * @var array
-	 * Supported Column Types and their
-	 * constants (magic numbers)
-	 */
-	public $sqltype_typeno = array(
-			  'integer'=>self::C_DATATYPE_INTEGER,
-			  'double precision' => self::C_DATATYPE_DOUBLE,
-			  'text'=>self::C_DATATYPE_TEXT,
-			  'date'=>self::C_DATATYPE_SPECIAL_DATE
-	);
-	
-	/**
 	 *
 	 * @var RedBean_DBAdapter
 	 * Holds Database Adapter
@@ -122,6 +98,22 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @param RedBean_DBAdapter $adapter adapter
 	 */
 	public function __construct( RedBean_Adapter_DBAdapter $adapter ) {
+		
+		
+	$this->typeno_sqltype = array(
+			  self::C_DATATYPE_INTEGER=>' integer ',
+			  self::C_DATATYPE_DOUBLE=>' double precision ',
+			  self::C_DATATYPE_TEXT=>' text ',
+			  self::C_DATATYPE_SPECIAL_DATE => ' date '
+	);
+
+	
+		
+		$this->sqltype_typeno = array();
+		foreach($this->typeno_sqltype as $k=>$v)
+		$this->sqltype_typeno[trim(strtolower($v))]=$k;
+		
+		
 		$this->adapter = $adapter;
 		parent::__construct();
 	}

@@ -60,27 +60,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
 
-	/**
-	 * @var array
-	 * Supported Column Types
-	 */
-	public $typeno_sqltype = array(
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER=>'INTEGER',
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC=>'NUMERIC',
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT=>'TEXT',
-	);
-
-	/**
-	 *
-	 * @var array
-	 * Supported Column Types and their
-	 * constants (magic numbers)
-	 */
-	public $sqltype_typeno = array(
-			  'INTEGER'=>RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER,
-			  'NUMERIC'=>RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC,
-			  'TEXT'=>RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT,
-	);
+	
 
 
 	/**
@@ -90,6 +70,18 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param RedBean_Adapter_DBAdapter $adapter adapter
 	 */
 	public function __construct( RedBean_Adapter $adapter ) {
+		
+	$this->typeno_sqltype = array(
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER=>'INTEGER',
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC=>'NUMERIC',
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT=>'TEXT',
+	);
+		
+		$this->sqltype_typeno = array();
+		foreach($this->typeno_sqltype as $k=>$v)
+		$this->sqltype_typeno[$v]=$k;
+		
+				
 		$this->adapter = $adapter;
 		parent::__construct($adapter);
 	}
