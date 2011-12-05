@@ -127,56 +127,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	const C_DATATYPE_SPECIAL_MULTIPOLYGON = 105;
 	const C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION = 106;
 	
-
-	/**
-	 * @var array
-	 * Supported Column Types
-	 */
-	public $typeno_sqltype = array(
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  SET('1')  ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>' TINYINT(3) UNSIGNED ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>' INT(11) UNSIGNED ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>' DOUBLE ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>' VARCHAR(255) ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>' TEXT ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>' LONGTEXT ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>' DATE ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>' DATETIME ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT=>' POINT ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING=>' LINESTRING  ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY=>' GEOMETRY ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON=>' POLYGON ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT=>' MULTIPOINT ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON=>' MULTIPOLYGON ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION=>' GEOMETRYCOLLECTION ',
-			  
-	);
-
-	/**
-	 *
-	 * @var array
-	 * Supported Column Types and their
-	 * constants (magic numbers)
-	 */
-	public $sqltype_typeno = array(
-			  "set('1')"=>RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL,
-			  'tinyint(3) unsigned'=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8,
-			  'int(11) unsigned'=>RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32,
-			  'double' => RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE,
-			  'varchar(255)'=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8,
-			  'text'=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16,
-			  'longtext'=>RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32,
-			  'date'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE,
-			  'datetime'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME,
-			  'point'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT,
-			  'linestring'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING,
-			  'geometry'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY,
-			  'polygon'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON,
-			  'multipoint'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT,
-			  'multipolygon'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON,
-			  'geometrycollection'=>RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION,
-	);
-
 	/**
 	 *
 	 * @var RedBean_Adapter_DBAdapter
@@ -197,6 +147,31 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 */
 	public function __construct( RedBean_Adapter $adapter ) {
+		
+		$this->typeno_sqltype = array(
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  SET('1')  ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>' TINYINT(3) UNSIGNED ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>' INT(11) UNSIGNED ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>' DOUBLE ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>' VARCHAR(255) ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>' TEXT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>' LONGTEXT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>' DATE ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>' DATETIME ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT=>' POINT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING=>' LINESTRING  ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY=>' GEOMETRY ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON=>' POLYGON ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT=>' MULTIPOINT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON=>' MULTIPOLYGON ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION=>' GEOMETRYCOLLECTION ',
+		);
+		
+		$this->sqltype_typeno = array();
+		foreach($this->typeno_sqltype as $k=>$v)
+		$this->sqltype_typeno[trim(strtolower($v))]=$k;
+		
+		
 		$this->adapter = $adapter;
 		parent::__construct();
 	}

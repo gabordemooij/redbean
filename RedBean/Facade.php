@@ -208,7 +208,7 @@ class RedBean_Facade {
 	 *
 	 * @param string $type type
 	 *
-	 * @return RedBean_OODBBean $bean a new bean
+	 *
 	 */
 	public static function dispense( $type, $num = 1 ) {
 		if ($num==1) {
