@@ -48,11 +48,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	private $rs;
 
-	/**
-	 * @var boolean
-	 * Flag, indicates whether SQL execution has taken place.
-	 */
-	private $exc =0;
 
 	/**
 	 * @var array
@@ -201,8 +196,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		  	else {
 		    	$this->rs = array();
 		  	}
-		  	
-		  	//$rows = $this->rs;
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
