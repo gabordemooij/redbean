@@ -31,8 +31,6 @@ class RedUNIT_Base_Export extends RedUNIT_Base {
 		asrt(count($sheep),2);
 		asrt($sheep['aname'],'Shawn');
 		
-		//$e = new RedBean_Plugin_BeanExport( R::$toolbox );
-		
 		R::nuke();
 		testpack('Extended export algorithm, feature issue 105');
 		

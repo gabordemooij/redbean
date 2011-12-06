@@ -561,6 +561,12 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 	}
 	
+	/**
+	 * Returns a modified value from ScanType.
+	 * Used for special types.
+	 * 
+	 * @return mixed $value changed value 
+	 */
 	public function getValue(){
 		return $this->svalue;
 	}

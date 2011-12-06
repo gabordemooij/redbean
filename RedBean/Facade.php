@@ -580,7 +580,7 @@ class RedBean_Facade {
 	 * Makes a copy of a bean. This method makes a deep copy
 	 * of the bean.
 	 *
-	 * @param RedBean_OODBBean $bean							bean
+	 * @param RedBean_OODBBean $bean bean
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
@@ -612,6 +612,18 @@ class RedBean_Facade {
 		return $copy;
 	}
 
+	/**
+	 * Exports a collection of beans. Handy for XML/JSON exports with a 
+	 * Javascript framework like Dojo or ExtJS.
+	 * What will be exported:
+	 * - contents of the bean
+	 * - all own bean lists (recursively)
+	 * - all shared beans (not THEIR own lists)
+	 *
+	 * @param	array|RedBean_OODBBean $beans beans to be exported
+	 * 
+	 * @return	array $array exported structure 
+	 */
 	public static function exportAll($beans) {
 		$array = array();
 		if (!is_array($beans)) $beans = array($beans);
