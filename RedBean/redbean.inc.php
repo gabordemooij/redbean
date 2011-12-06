@@ -73,11 +73,6 @@ require($dir.'AssociationManager.php');
 require($dir.'ExtAssociationManager.php');
 require($dir.'Setup.php');
 
-
-
-require($dir.'Plugin/QueryLogger.php');
-
-
 require($dir.'IBeanHelper.php');
 require($dir.'BeanHelperFacade.php');
 
