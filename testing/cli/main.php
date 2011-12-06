@@ -1,4 +1,15 @@
 <?php
+
+function loadfiles() {
+	
+	require_once "testcontainer/rb.php";
+  	require "../../RedBean/Plugin/QueryLogger.php";
+	
+	require "../RedUNIT.php";
+    require "../helpers/selector.php";	
+}
+
+
 if (file_exists('phpcoverage.inc.php')) {
 	echo "\n Starting with Coverage...";
     require_once "phpcoverage.inc.php";
@@ -10,16 +21,17 @@ if (file_exists('phpcoverage.inc.php')) {
     $excludePaths = array();
     $cov = new CoverageRecorder($includePaths, $excludePaths, $reporter);
     $cov->startInstrumentation();
-    require_once "testcontainer/rb.php";
-  	require "../RedUNIT.php";
-    require "../helpers/selector.php";	
-    $cov->stopInstrumentation();
+    
+	loadfiles();
+	
+	$cov->stopInstrumentation();
     $cov->generateReport();
     $reporter->printTextSummary();
 }
 else {
-	require_once "testcontainer/rb.php";
-  	require "../RedUNIT.php";
-    require "../helpers/selector.php";	
+	
+	loadfiles();
+	
 }
+
 
