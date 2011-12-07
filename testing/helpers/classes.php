@@ -80,6 +80,9 @@ class Model_Box extends RedBean_SimpleModel {
  */
 class Model_CandyBar extends RedBean_SimpleModel {
 	public function customMethod($custom) { return $custom."!"; }
+	public function __toString() {
+		return 'candy!';
+	}
 }
 /**
  * Shared helper class for tests.

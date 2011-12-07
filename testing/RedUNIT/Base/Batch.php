@@ -53,6 +53,26 @@ class RedUNIT_Base_Batch extends RedUNIT_Base {
 		$redbean->store($book);
 		$books = $redbean->batch("book", $adapter->getCol("SELECT id FROM book"));
 		asrt(count($books),3);
-	
+		
+		$a = $redbean->batch('book',9919);
+		asrt(is_array($a),true);
+		asrt(count($a),0);
+		$a = $redbean->batch('triangle',1);
+		asrt(is_array($a),true);
+		asrt(count($a),0);
+		
+		R::freeze(true);
+		
+		$a = $redbean->batch('book',9919);
+		asrt(is_array($a),true);
+		asrt(count($a),0);
+		$a = $redbean->batch('triangle',1);
+		asrt(is_array($a),true);
+		asrt(count($a),0);
+		
+		R::freeze(false);
+		
+		asrt(R::wipe('spaghettimonster'),false);
+		
 	}	
 }

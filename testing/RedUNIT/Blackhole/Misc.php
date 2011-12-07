@@ -21,6 +21,17 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 	 * @return void
 	 */
 	public function run() {
+		
+		$candy = R::dispense('CandyBar');
+		$s = strval($candy);
+		asrt($s,'candy!');
+		
+		$obj = new stdClass;
+		$bean = R::dispense('bean');
+		$bean->property1 = 'property1';
+		$bean->exportToObj($obj);
+		asrt($obj->property1,'property1');
+		
 		R::debug(1);
 		pass();
 		R::debug(0);
