@@ -792,7 +792,7 @@ class RedBean_Facade {
 	 * @param string $beanType type of bean you want to destroy entirely.
 	 */
 	public static function wipe( $beanType ) {
-		RedBean_Facade::$redbean->wipe($beanType);
+		return RedBean_Facade::$redbean->wipe($beanType);
 	}
 
 	/**

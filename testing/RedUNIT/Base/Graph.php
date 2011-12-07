@@ -114,6 +114,21 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt(count(reset($v1->ownBuilding)->ownFarmer),0);
 		asrt(count(end($v1->ownBuilding)->ownFarmer),1);
 		asrt(count($v3->ownTapestry),0);
+		
+		$b = reset($v1->ownBuilding);
+		R::trash($b);
+		$n = R::count('village');
+		asrt($n,3);
+				
+		$n = R::count('army');
+		R::trash($v1);
+		asrt(R::count('army'),$n);
+		R::trash($v2);
+		asrt(R::count('army'),$n);
+		R::trash($v3);
+		asrt(R::count('army'),$n);
+		
+		
 		$json = '{"mysongs":{"type":"playlist","name":"JazzList","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","url":"music.com.harlem"}],"cover":{"type":"cover","url":"albumart.com\/duke1"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 		$playList = json_decode( $json, true );
 		$playList = R::graph($playList);
@@ -200,7 +215,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt($cane->cane->cane->cane->cane,NULL);
 		//test backward compatibility
 		asrt($page->owner,null);
-		RedBean_ModelHelper::setModelFormatter(new DefaultModelFormatter);
+		RedBean_ModelHelper::setModelFormatter(null);
 		$band = R::dispense('band');
 		$musicians = R::dispense('bandmember',5);
 		$band->ownBandmember = $musicians;

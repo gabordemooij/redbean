@@ -342,18 +342,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 		return $this;
 	}
 
-	/**
-	 * Sleep function fore serialize() call. This will be invoked if you
-	 * perform a serialize() operation.
-	 *
-	 * @return mixed $array
-	 */
-	public function __sleep() {
-		//return the public stuff
-		$this->setMeta('sys.oodb',null);
-		return array('properties','__info');
-	}
-
+	
 	/**
 	 * Reroutes a call to Model if exists. (new fuse)
 	 * @param string $method

@@ -661,8 +661,8 @@ class RedBean_OODB extends RedBean_Observable {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
+			return false;
 		}
-		return false;
 	}
 
 	/**
