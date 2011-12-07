@@ -33,7 +33,27 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		asrt($obj->property1,'property1');
 		
 		R::debug(1);
+		flush();
+		ob_flush();
+		ob_clean();
+		ob_start();
+		R::exec('SELECT 123');
+		$out = ob_get_contents();
+		ob_end_clean();
+		flush();
 		pass();
+		asrt((strpos($out,'SELECT 123')!==false),true);
+		R::debug(0);
+		flush();
+		ob_flush();
+		ob_clean();
+		ob_start();
+		R::exec('SELECT 123');
+		$out = ob_get_contents();
+		ob_end_clean();
+		flush();
+		pass();
+		asrt($out,'');
 		R::debug(0);
 		pass();
 	}
