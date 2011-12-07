@@ -41,7 +41,6 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base {
 			$bean->sharedBean[] = $bean2;
 			$id = R::store($bean);
 			
-			R::view('perspective',$k.',other');
 			R::trash($bean);
 			pass();
 				

@@ -63,35 +63,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt(count(reset($v1->ownBuilding)->ownFarmer),0);
 		asrt(count(end($v1->ownBuilding)->ownFarmer),1);
 		asrt(count($v3->ownTapestry),0);
-		//test views for N-1 - we use the village for this
-		R::view('people','village,building,farmer,building,furniture');
-		//count buildings
-		if ($currentDriver=="mysql") {
-		$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name="v1"');
-		asrt($noOfBuildings,2);
-		$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name="v2"');
-		asrt($noOfBuildings,1);
-		$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name="v3"');
-		asrt($noOfBuildings,1);
-		}
-		if ($currentDriver=="pgsql") {
-		$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name=\'v1\'');
-		asrt($noOfBuildings,2);
-		$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name=\'v2\'');
-		asrt($noOfBuildings,1);
-		$noOfBuildings = (int) R::getCell('select count(distinct id_of_building) as n from people where name=\'v3\'');
-		asrt($noOfBuildings,1);
-		}
-		if ($currentDriver=="mysql") {
-			//what villages does not have furniture
-			$emptyHouses = R::getAll('select name,count(id_of_furniture) from people group by id having count(id_of_furniture) = 0');
-			asrt(count($emptyHouses),2);
-			foreach($emptyHouses as $empty){
-				if ($empty['name']!=='v3') pass(); else fail();
-			}
-		}
-		//test invalid views - should trigger error
-		try{ R::view('messy','building,village,farmer'); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
+		
 		//Change the names and add the same building should not change the graph
 		$v1->name = 'village I';
 		$v2->name = 'village II';

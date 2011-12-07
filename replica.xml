@@ -30,7 +30,6 @@
 		<item type="php">RedBean/ToolBox.php</item>
 		<item type="php">RedBean/AssociationManager.php</item>
 		<item type="php">RedBean/ExtAssociationManager.php</item>
-		<item type="php">RedBean/ViewManager.php</item>
 		<item type="php">RedBean/Setup.php</item>
 		<item type="php">RedBean/IModelFormatter.php</item>
 		<item type="php">RedBean/IBeanHelper.php</item>

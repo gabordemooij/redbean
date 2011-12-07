@@ -854,28 +854,6 @@ class RedBean_Facade {
 		return $cooker->graph($array);
 	}
 
-	/**
-	 * Creates a view called $viewID by joining types specified in $types.
-	 * This function only works in fluid mode, in frozen mode it immediately
-	 * returns boolean false.
-	 *
-	 * @static
-	 * @throws RedBean_Exception_Security
-	 *
-	 * @param  string $viewID  name of the view you want to create
-	 * @param  string $types   comma separated list of types
-	 *
-	 * @return bool	  $success whether the view has been created or not
-	 */
-	public static function view($viewID, $types) {
-		if (self::$redbean->isFrozen()) return false;
-		$types = explode(",",$types);
-		if (count($types)<2) throw new RedBean_Exception_Security('Creating useless view for just one type? Provide at least 2 types!');
-		$refType = array_shift($types);
-		$viewManager = new RedBean_ViewManager( self::$toolbox );
-		return $viewManager->createView($viewID,$refType,$types);
-	}
-
 	
 
 	/**
@@ -925,9 +903,6 @@ class RedBean_Facade {
 	public static function getColumns($table) {
 		return self::$writer->getColumns($table);
 	}
-
-
-
 
 	/**
 	 * Generates question mark slots for an array of values.

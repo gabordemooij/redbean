@@ -88,17 +88,14 @@ if ($mode == 'all') {
 		'Mysql/Writer',
 		'Mysql/Freeze',
 		'Mysql/Setget',
-		'Mysql/Views',
 		'Mysql/Mix',
 		'Mysql/Foreignkeys',
 		'Mysql/Parambind',
 		'Postgres/Setget',
-		'Postgres/Views',
 		'Postgres/Foreignkeys',
 		'Postgres/Parambind',
 		'Postgres/Writer',
 		'Sqlite/Setget',
-		'Sqlite/Views',
 		'Sqlite/Foreignkeys',
 		'Sqlite/Writer'
 	);
