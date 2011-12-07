@@ -84,7 +84,6 @@ require($dir.'ModelHelper.php');
 require($dir.'Facade.php');;
 require($dir.'BeanCan.php');
 require($dir.'Cooker.php');
-require($dir.'ViewManager.php');
 require($dir.'SQLHelper.php');
 
 class R extends RedBean_Facade{}

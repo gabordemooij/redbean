@@ -302,57 +302,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $rows;
 	}
 
-	/**
-	 * This creates a view with name $viewID and
-	 * based on the reference type. A list of types
-	 * will be provided in the second argument. This method should create
-	 * a view by joining each type in the list (using LEFT OUTER JOINS) to the
-	 * reference type. If a type is mentioned multiple times it does not need
-	 * to be re-joined but the next type should be joined to that type instead.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param  string $referenceType reference type
-	 * @param  array  $constraints   list of types
-	 * @param  string $viewID		 name of the new view
-	 *
-	 * @return boolean $success whether a view has been generated
-	 */
-	public function createView($referenceType, $constraints, $viewID) {
-
-		$referenceTable = $referenceType;
-		$viewID = $this->safeTable($viewID,true);
-		$safeReferenceTable = $this->safeTable($referenceTable);
-
-		try{ $this->adapter->exec("DROP VIEW $viewID"); }catch(Exception $e){}
-
-		$columns = array_keys( $this->getColumns( $referenceTable ) );
-
-		$referenceTable = ($referenceTable);
-		$joins = array();
-		foreach($constraints as $table=>$constraint) {
-			$safeTable = $this->safeTable($table);
-			$addedColumns = array_keys($this->getColumns($table));
-			foreach($addedColumns as $addedColumn) {
-				$newColName = $addedColumn."_of_".$table;
-				$newcolumns[] = $this->safeTable($table).".".$this->safeColumn($addedColumn) . " AS ".$this->safeColumn($newColName);
-			}
-			if (count($constraint)!==2) throw Exception("Invalid VIEW CONSTRAINT");
-			$referenceColumn = $constraint[0];
-			$compareColumn = $constraint[1];
-			$join = $referenceColumn." = ".$compareColumn;
-			$joins[] = " LEFT JOIN $safeTable ON $join ";
-		}
-
-		$joins = implode(" ", $joins);
-		foreach($columns as $k=>$column) {
-			$columns[$k]=$safeReferenceTable.".".$this->safeColumn($column)." as ".$this->safeColumn($column);
-		}
-		$columns = implode("\n,",array_merge($newcolumns,$columns));
-		$sql = "CREATE VIEW $viewID AS SELECT $columns FROM $safeReferenceTable $joins ";
-
-		$this->adapter->exec($sql);
-		return true;
-	}
 
 	/**
 	 * This method removes all beans of a certain type.

@@ -212,23 +212,6 @@ interface RedBean_QueryWriter {
 
 
 	/**
-	 * This method should create a view with name $viewID and
-	 * based on the reference type. A list of types
-	 * will be provided in the second argument. This method should create
-	 * a view by joining each type in the list (using LEFT OUTER JOINS) to the
-	 * reference type. If a type is mentioned multiple times it does not need
-	 * to be re-joined but the next type should be joined to that type instead.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param  string $referenceType reference type
-	 * @param  array  $constraints   list of types
-	 * @param  string $viewID		 name of the new view
-	 *
-	 * @return void
-	 */
-	public function createView($referenceType, $types, $viewID);
-
-	/**
 	 * Given a field type const. from this class this method should
 	 * return the database specific SQL description of the data type.
 	 *
