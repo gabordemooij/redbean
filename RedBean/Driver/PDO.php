@@ -199,7 +199,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
-			$x = new RedBean_Exception_SQL( $e->getMessage(), 0, $e );
+			$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
 			$x->setSQLState( $e->getCode() );
 			throw $x;
 		}
