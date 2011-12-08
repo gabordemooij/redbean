@@ -428,7 +428,9 @@ class RedBean_Facade {
 	 */
 	public static function findOne( $type, $sql=null, $values=array()) {
 		$items = self::find($type,$sql,$values);
-		return reset($items);
+		$found = reset($items);
+		if (!$found) return null;
+		return $found;
 	}
 
 	/**
