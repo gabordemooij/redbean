@@ -65,6 +65,15 @@ class Model_Band extends RedBean_SimpleModel {
 			throw new Exception('too many!');
 		}
 	}
+	public function __toString() {
+		return 'bigband';
+	}
+	public function setProperty($prop,$value) {
+		$this->$prop= $value;
+	}
+	public function checkProperty($prop) {
+		return isset($this->$prop);
+	}
 }
 
 /**

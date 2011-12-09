@@ -286,6 +286,28 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$this->setGetSpatial('LINESTRING(3 3,4 4)');
 		$this->setGetSpatial('POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))');
 		$this->setGetSpatial('MULTIPOINT(0 0,20 20,60 60)');
+		
+		try{
+			$bean = R::dispense('bean');
+			$bean->title = 123;
+			$bean->setMeta('cast.title','invalid');
+			R::store($bean);
+			fail();
+		}
+		catch(RedBean_Exception $e) {
+			pass();
+		}
+		catch(Exception $e){
+			fail();
+		}
+		
+		$bean = R::dispense('bean');
+		$bean->title = 123;
+		$bean->setMeta('cast.title','text');
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['title'],'text');
+		
 	}	
 	
 	/**

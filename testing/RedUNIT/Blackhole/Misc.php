@@ -56,6 +56,30 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		asrt($out,'');
 		R::debug(0);
 		pass();
+		
+		testpack('test to string override');
+		$band = R::dispense('band');
+		$str = strval($band);
+		asrt($str,'bigband');
+		
+		testpack('test whether we can use isset/set in model');
+		$band->setProperty('property1',123);
+		asrt($band->property1,123);
+		asrt($band->checkProperty('property1'),true);
+		asrt($band->checkProperty('property2'),false);
+		$band = new Model_Band;
+		$bean = R::dispense('band');
+		$bean->property3 = 123;
+		$band->loadBean($bean);
+		$bean->property4 = 345;
+		$band->setProperty('property1',123);
+		asrt($band->property1,123);
+		asrt($band->checkProperty('property1'),true);
+		asrt($band->checkProperty('property2'),false);
+		asrt($band->property3,123);
+		asrt($band->property4,345);
+		
+		
 	}
 	
 }

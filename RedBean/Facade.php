@@ -449,7 +449,9 @@ class RedBean_Facade {
 	 */
 	public static function findLast( $type, $sql=null, $values=array() ) {
 		$items = self::find( $type, $sql, $values );
-		return end( $items );
+		$found = end( $items );
+		if (!$found) return null;
+		return $found;
 	}
 
 	/**
