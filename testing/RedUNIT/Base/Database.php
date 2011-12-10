@@ -49,6 +49,29 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 		asrt(isset($page->id),true);
 		asrt(($page->getMeta("type")),"page");
 		asrt((int)$page->id,$id);
-				
+		
+		R::nuke();
+		$rooms = R::dispense('room',2);
+		$rooms[0]->kind = 'suite';
+		$rooms[1]->kind = 'classic';
+		$rooms[0]->number = 6;
+		$rooms[1]->number = 7;
+		R::store($rooms[0]);
+		R::store($rooms[1]);
+		$rooms = R::getAssoc('SELECT `number`, kind FROM rooms ORDER BY kind ASC');
+		foreach($rooms as $key=>$room) {
+			asrt(($key===6 || $key===7),true);
+			asrt(($room=='classic' || $room=='suite'),true);
+		}
+		$rooms = R::getAssoc('SELECT kind FROM rooms');
+		foreach($rooms as $key=>$room) {
+			asrt(($room=='classic' || $room=='suite'),true);
+			asrt($room,$key);
+			
+		}
+		$rooms = R::getAssoc('SELECT `number`, kind FROM rooms2 ORDER BY kind ASC');
+		asrt(count($rooms),0);
+		asrt(is_array($rooms),true);
+		
 	}
 }

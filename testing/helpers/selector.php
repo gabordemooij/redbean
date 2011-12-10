@@ -97,6 +97,7 @@ if ($mode == 'all') {
 		'Postgres/Writer',
 		'Sqlite/Setget',
 		'Sqlite/Foreignkeys',
+		'Sqlite/Parambind',
 		'Sqlite/Writer'
 	);
 }

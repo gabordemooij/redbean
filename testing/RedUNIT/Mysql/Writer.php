@@ -56,6 +56,8 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt($writer->scanType(1.5),3);
 		asrt($writer->scanType(INF),4);
 		asrt($writer->scanType("abc"),4);
+		asrt($writer->scanType(str_repeat('abcd',100000)),RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32);
+		
 		asrt($writer->scanType("2001-10-10",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE);
 		asrt($writer->scanType("2001-10-10 10:00:00",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME);
 		asrt($writer->scanType("2001-10-10"),4);
@@ -307,6 +309,15 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		R::store($bean);
 		$cols = R::getColumns('bean');
 		asrt($cols['title'],'text');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->title = 123;
+		$bean->setMeta('cast.title','string');
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['title'],'varchar(255)');
+		
 		
 	}	
 	

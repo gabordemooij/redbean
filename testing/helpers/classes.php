@@ -76,6 +76,8 @@ class Model_Band extends RedBean_SimpleModel {
 	}
 }
 
+
+
 /**
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.

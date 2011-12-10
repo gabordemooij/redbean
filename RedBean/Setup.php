@@ -16,21 +16,6 @@
 class RedBean_Setup {
 
 	/**
-	 *
-	 * @var array
-	 * Keeps track of the observers
-	 */
-	private static $observers = array();
-
-
-	/**
-	 *
-	 * @var RedBean_ToolBox $toolbox
-	 */
-	private static $toolbox = NULL;
-
-
-	/**
 	 * This method checks the DSN string. If the DSN string contains a
 	 * database name that is not supported by RedBean yet then it will
 	 * throw an exception RedBean_Exception_NotImplemented. In any other
@@ -101,18 +86,6 @@ class RedBean_Setup {
 		if ($frozen) $redbean->freeze(true);
 		$toolbox = new RedBean_ToolBox($redbean,$adapter,$writer);
 		//deliver everything back in a neat toolbox
-		self::$toolbox = $toolbox;
-		return self::$toolbox;
-	}
-
-	/**
-	 * During a kickstart method observers may be attached to the RedBean_OODB object.
-	 * Setup keeps track of the observers that are connected to RedBean.
-	 * Returns the observers that have been attached by Setup.
-	 *
-	 * @return array $observers
-	 */
-	public static function getAttachedObservers() {
-		return self::$observers;
+		return $toolbox;
 	}
 }

@@ -392,5 +392,24 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 			testids($book->ownPicture);
 			testids($book->sharedTopic);
 		}
+		
+		R::nuke();
+		$village = R::dispense('village');
+		$village->name = 'village';
+		$home = R::dispense('building');
+		$home->village = $village;
+		$id = R::store($home);
+		$home = R::load('building',$id);
+		asrt($home->village->name,'village');
+		asrt(R::count('village'),1);
+		asrt(R::count('building'),1);
+		R::trash($home);
+		pass();
+		asrt(R::count('village'),1);
+		asrt(R::count('building'),0);
+		
+		
+		
+		
 	}
 }

@@ -33,6 +33,12 @@ class RedUNIT_Postgres_Parambind extends RedUNIT_Postgres {
 		R::exec("insert into page (number) values(:one) ", array(":one"=>"-21"));
 		pass();
 		
+		testpack('Test whether we can properly bind and receive NULL values');
+		$adapter = R::$adapter;
+		asrt( $adapter->getCell('SELECT TEXT( :nil ) ',array(':nil'=>'null')), 'null' );
+		asrt( $adapter->getCell('SELECT TEXT( :nil ) ',array(':nil'=>null)), null );
+		asrt( $adapter->getCell('SELECT TEXT( ? ) ',array('null')), 'null' );
+		asrt( $adapter->getCell('SELECT TEXT( ? ) ',array(null)), null );
 	}
 
 }

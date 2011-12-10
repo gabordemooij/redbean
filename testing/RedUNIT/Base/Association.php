@@ -152,8 +152,8 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		asrt( getList( R::unrelated($painter,"person"),"job" ), "developer,salesman" ) ;
 		asrt( getList( R::unrelated($salesman,"person"),"job" ), "painter" ) ;
 		asrt( getList( R::unrelated($developer,"person"),"job" ), "painter" ) ;
-
-
+			
+		R::nuke();
 		$sheep = R::dispense('sheep');
 		$sheep->name = 'Shawn';
 		$sheep2 = R::dispense('sheep');
@@ -164,8 +164,16 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		R::associate($sheep,$sheep2);
 		asrt(R::areRelated($sheep,$sheep2),true);
 		asrt(R::areRelated($sheep,$sheep3),false);
-		
-		
+		$pig = R::dispense('pig');
+		asrt(R::areRelated($sheep,$pig),false);
+		R::freeze(true);
+		asrt(R::areRelated($sheep,$pig),false);
+		R::freeze(false);
+		$foo = R::dispense('foo');
+		$bar = R::dispense('bar');
+		$foo->id = 1;
+		$bar->id = 2;
+		asrt(R::areRelated($foo,$bar),false);
 		
 		
 	}	

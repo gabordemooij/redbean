@@ -177,17 +177,16 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		if ($rows) {
 			foreach($rows as $row) {
 				if (count($row)>0) {
-					$key = array_shift($row);
+					if (count($row)>1) {
+						$key = array_shift($row);
+						$value = array_shift($row);
+					}
+					elseif (count($row)==1) {
+						$key = array_shift($row);
+						$key=$value;
+					}
+					$assoc[ $key ] = $value;
 				}
-
-				if (count($row)>0) {
-					$value = array_shift($row);
-				}
-				else {
-					$value = $key;
-				}
-
-				$assoc[ $key ] = $value;
 			}
 		}
 		return $assoc;

@@ -31,7 +31,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 */
 	protected $writer;
 
-	protected $flagUseConstraints = true;
 
 	/**
 	 * Constructor
@@ -67,18 +66,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		return $this->associateBeans( $bean1, $bean2, $bean );
 	}
 
-	/**
-	 * Whether to use constraints
-	 *
-	 * @param  boolean $trueFalse yesno
-	 *
-	 * @return void
-	 */
-	public function setUseConstraints( $trueFalse ) {
-		$this->flagUseConstraints = $trueFalse;
-	}
-
-
+	
 	/**
 	 * Associates a pair of beans. This method associates two beans, no matter
 	 * what types.
@@ -109,8 +97,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		try {
 			$id = $this->oodb->store( $bean );
 			//On creation, add constraints....
-			if ($this->flagUseConstraints &&
-				!$this->oodb->isFrozen() &&
+			if (!$this->oodb->isFrozen() &&
 				$bean->getMeta('buildreport.flags.created')){
 				$bean->setMeta('buildreport.flags.created',0);
 				if (!$this->oodb->isFrozen())
