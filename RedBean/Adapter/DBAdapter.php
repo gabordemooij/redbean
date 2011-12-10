@@ -183,7 +183,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 					}
 					elseif (count($row)==1) {
 						$key = array_shift($row);
-						$key=$value;
+						$value=$key;
 					}
 					$assoc[ $key ] = $value;
 				}
