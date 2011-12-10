@@ -414,13 +414,8 @@ class RedBean_OODB extends RedBean_Observable {
 			$myFieldLink = $bean->getMeta('type').'_id';
 			//Handle related beans
 			foreach($ownTrashcan as $trash) {
-				if ($trash instanceof RedBean_OODBBean) {
-					$trash->$myFieldLink = null;
-					$this->store($trash);
-				}
-				else {
-					throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
-				}
+				$trash->$myFieldLink = null;
+				$this->store($trash);
 			}
 			foreach($ownAdditions as $addition) {
 				if ($addition instanceof RedBean_OODBBean) {
@@ -439,22 +434,12 @@ class RedBean_OODB extends RedBean_Observable {
 				}
 			}
 			foreach($ownresidue as $residue) {
-				if ($residue instanceof RedBean_OODBBean) {
-					if ($residue->getMeta('tainted')) {
-						$this->store($residue);
-					}
-				}
-				else {
-					throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
+				if ($residue->getMeta('tainted')) {
+					$this->store($residue);
 				}
 			}
 			foreach($sharedTrashcan as $trash) {
-				if ($trash instanceof RedBean_OODBBean) {
-					$this->assocManager->unassociate($trash,$bean);
-				}
-				else {
-					throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
-				}
+				$this->assocManager->unassociate($trash,$bean);
 			}
 			foreach($sharedAdditions as $addition) {
 				if ($addition instanceof RedBean_OODBBean) {
@@ -465,12 +450,7 @@ class RedBean_OODB extends RedBean_Observable {
 				}
 			}
 			foreach($sharedresidue as $residue) {
-				if ($residue instanceof RedBean_OODBBean) {
-					$this->store($residue);
-				}
-				else {
-					throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
-				}
+				$this->store($residue);
 			}
 		}
 		$this->signal('after_update',$bean);

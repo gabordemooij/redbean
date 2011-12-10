@@ -12,7 +12,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
+class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 
     /**
      * Reference to NULL property for magic getter.
@@ -441,6 +441,16 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess {
 	public function fetchAs($type) {
 		$this->fetchType = $type;
 		return $this;
+	}
+	
+	/**
+	 * Implementation of Countable interface. Makes it possible to use
+	 * count() function on a bean.
+	 * 
+	 * @return integer $numberOfProperties number of properties in the bean. 
+	 */
+	public function count() {
+		return count($this->properties);
 	}
 
 }

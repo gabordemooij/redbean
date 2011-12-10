@@ -21,6 +21,7 @@ class RedUNIT_Mysql_Foreignkeys extends RedUNIT_Mysql {
 	 * @return void
 	 */
 	public function run() {
+		
 		$book = R::dispense('book');
 		$page = R::dispense('page');
 		$cover = R::dispense('cover');
@@ -59,5 +60,22 @@ class RedUNIT_Mysql_Foreignkeys extends RedUNIT_Mysql {
 			}
 			if (!$found) fail();
 		}
+		
+		
+		testpack('widening column for constraint');
+		R::nuke();
+		$bean1 = R::dispense('project');
+		$bean2 = R::dispense('invoice');
+		$bean3 = R::dispense('invoice_project');
+		$bean3->project_id = 1;
+		$bean3->invoice_id = 2;
+		R::store($bean3);
+		$cols = R::getColumns('invoice_project');
+		asrt($cols['project_id'],"set('1')");
+		asrt($cols['invoice_id'],"tinyint(3) unsigned");
+		R::$writer->addConstraint($bean1,$bean2);
+		$cols = R::getColumns('invoice_project');
+		asrt($cols['project_id'],"int(11) unsigned");
+		asrt($cols['invoice_id'],"int(11) unsigned");
 	}	
 }

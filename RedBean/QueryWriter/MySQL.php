@@ -399,9 +399,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			$fks =  $adapter->getCell("
 				SELECT count(*)
 				FROM information_schema.KEY_COLUMN_USAGE
-				WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME ='".($table)."' AND
+				WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND
 				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
-					  ");
+					  ",array($db,$table));
 			//already foreign keys added in this association table
 			if ($fks>0) return false;
 			//add the table to the cache, so we dont have to fire the fk query all the time.

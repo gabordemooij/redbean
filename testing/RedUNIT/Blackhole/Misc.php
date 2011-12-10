@@ -79,7 +79,50 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		asrt($band->property3,123);
 		asrt($band->property4,345);
 		
+		testpack('Test blackhold DSN and setup()');
 		
+		R::setup('blackhole:database');
+		pass();
+		asrt(isset(R::$toolboxes['default']),true);
+		try{
+			(R::$toolboxes['default']->getDatabaseAdapter()->getDatabase()->connect());
+			fail();
+		}
+		catch(PDOException $e){
+			pass();
+		}
+		
+		testpack('Can we pass a PDO object to Setup?');
+		$pdo = new PDO('sqlite:test.db');
+		$toolbox = RedBean_Setup::kickstart($pdo);
+		asrt(($toolbox instanceof RedBean_ToolBox),true);
+		asrt(($toolbox->getDatabaseAdapter() instanceof RedBean_Adapter),true);
+		asrt(($toolbox->getDatabaseAdapter()->getDatabase()->getPDO() instanceof PDO),true);
+		
+		
+		testpack('Test array interface of beans');
+		$bean = R::dispense('bean');
+		$bean->hello = 'hi';
+		$bean->world = 'planet';
+		asrt($bean['hello'],'hi');
+		$bean['world'] = 'sphere';
+		asrt($bean->world,'sphere');
+		foreach($bean as $key=>$el) { 
+			if ($el=='sphere' || $el=='hi' || $el==0) pass(); else fail();
+			if ($key=='hello' || $key=='world' || $key=='id') pass(); else fail();
+		}
+		asrt(count($bean),3);
+		unset($bean['hello']);
+		asrt(count($bean),2);
+		asrt(count(R::dispense('countable')),1);
+		
+		//otherwise untestable...
+		$bean->setBeanHelper( new RedBean_BeanHelperFacade() );
+		pass();
+		
+		
+		
+			
 	}
 	
 }

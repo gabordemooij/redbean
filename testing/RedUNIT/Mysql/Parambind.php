@@ -59,6 +59,16 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql {
 		asrt(count($pair),1);
 		asrt(isset($pair["thekey"]),true);
 		asrt($pair["thekey"],"thevalue");
+		
+		testpack('Test whether we can properly bind and receive NULL values');
+		asrt( $adapter->getCell('SELECT :nil ',array(':nil'=>'null')), 'null' );
+		asrt( $adapter->getCell('SELECT :nil ',array(':nil'=>null)), null );
+		asrt( $adapter->getCell('SELECT ? ',array('null')), 'null' );
+		asrt( $adapter->getCell('SELECT ? ',array(null)), null );
+		
+		
+		
+		
 	}
 
 }

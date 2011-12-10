@@ -461,37 +461,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$fkCode = "fk".md5($table.$property1.$property2);
 		if (isset($this->fkcache[$fkCode])) return false;
 		//Dispatch to right method
-
-		try {
-			return $this->constrain($table, $table1, $table2, $property1, $property2, $dontCache);
-		}
-		catch(RedBean_Exception_SQL $e) {
-			if (!$writer->sqlStateIn($e->getSQLState(),
-			array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
-		}
-
-		return false;
-
+		return $this->constrain($table, $table1, $table2, $property1, $property2, $dontCache);
 	}
-
-	/**
-	 * Abstract method. Needs to be implemented by 'fluid' driver.
-	 * Add the constraints for a specific database driver.
-	 * @abstract
-	 *
-	 * @param string			  $table     table
-	 * @param string			  $table1    table1
-	 * @param string			  $table2    table2
-	 * @param string			  $property1 property1
-	 * @param string			  $property2 property2
-	 * @param boolean			  $dontCache want to have cache?
-	 *
-	 * @return boolean $succes whether the constraint has been applied
-	 */
-	abstract protected function constrain($table, $table1, $table2, $p1, $p2, $cache);
 
 	/**
 	 * Checks whether a value starts with zeros. In this case
