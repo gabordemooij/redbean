@@ -117,7 +117,7 @@ foreach($packList as $testPack) {
 	$testClass = 'RedUNIT_'.ucfirst($testClassName);
 	$test = new $testClass();
 	$drivers = $test->getTargetDrivers();
-	testpack(str_replace('_',' ',get_class($test)));
+	maintestpack(str_replace('_',' ',get_class($test)));
 	if ($drivers && is_array($drivers)) {
 		foreach($drivers as $driver) {
 			echo '('.$driver.'):';

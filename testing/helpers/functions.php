@@ -57,7 +57,15 @@ function fail() {
  * @param string $name name of the test pack
  */
 function testpack($name) {
-	printtext("testing: ".$name);
+	printtext("\n\tSub testpack: ".$name." \n\t");
+}
+
+/**
+ * prints out the name of the current test pack.
+ * @param string $name name of the test pack
+ */
+function maintestpack($name) {
+	printtext("\n\nTestpack: ".$name." \n\t");
 }
 
 
