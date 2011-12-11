@@ -126,7 +126,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		asrt(($s->name=='a' || $s2->name=='a'),true);
 		asrt(($s->name=='b' || $s2->name=='b'),true);
 		//empty classroom
-		R::clearRelations($t, 'person', $s2);
+		R::clearRelations($t, 'person');
+		R::associate($t,$s2);
 		$students = R::related($t, 'person', ' role = ?  ',array("student"));
 		asrt(count($students),1);
 		$s = reset($students);
