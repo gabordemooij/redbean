@@ -91,6 +91,7 @@ class Model_Box extends RedBean_SimpleModel {
  */
 class Model_CandyBar extends RedBean_SimpleModel {
 	public function customMethod($custom) { return $custom."!"; }
+	public function customMethodWithException(){ throw new Exception('Oops!'); }
 	public function __toString() {
 		return 'candy!';
 	}

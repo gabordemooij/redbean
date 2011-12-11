@@ -396,9 +396,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 			$this->buildFK($table,$table2,$property2,$idfield2,true);
 			return true;
 		}
-		catch(Exception $e){
-			return false;
-		}
+		catch(Exception $e){ return false; }
 	}
 
 	/**

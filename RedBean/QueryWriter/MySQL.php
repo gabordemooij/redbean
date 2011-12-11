@@ -427,9 +427,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			$adapter->exec( $sql );
 			return true;
 		}
-		catch(Exception $e){
-			return false;
-		}
+		catch(Exception $e){ return false; }
 	}
 
 	/**
