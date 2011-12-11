@@ -48,9 +48,8 @@ $path = '../RedUNIT/';
 
 //Possible Selections
 $packList = array();
-//Default (mode == all)
-if ($mode == 'all') {
-	$packList = array(
+
+$allPacks = array(
 		'Blackhole/Version',
 		'Blackhole/Tainted',
 		'Blackhole/Meta',
@@ -99,10 +98,16 @@ if ($mode == 'all') {
 		'Sqlite/Foreignkeys',
 		'Sqlite/Parambind',
 		'Sqlite/Writer'
-	);
+);
+
+//Default (mode == all)
+if ($mode == 'all') {
+	$packList = $allPacks;
 }
 else {
-	$packList = array($mode);
+	foreach($allPacks as $pack) {
+		if (strpos($pack,$mode)===0) $packList[] = $pack;
+	}
 }
 
 global $currentDriver;
