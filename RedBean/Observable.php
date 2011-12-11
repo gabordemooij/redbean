@@ -15,7 +15,7 @@
  */
 abstract class RedBean_Observable {
 	/**
-	 *
+	 * Array that keeps track of observers.
 	 * @var array
 	 */
 	private $observers = array();
@@ -61,8 +61,5 @@ abstract class RedBean_Observable {
 		foreach($this->observers[$eventname] as $observer) {
 			$observer->onEvent( $eventname, $info );
 		}
-
 	}
-
-
 }

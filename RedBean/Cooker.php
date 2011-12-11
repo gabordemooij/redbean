@@ -28,11 +28,40 @@ class RedBean_Cooker {
 	}
 
 	/**
-	 * Turns a request array into a collection of beans
+	 * Turns an array (post/request array) into a collection of beans.
+	 * Handy for turning forms into bean structures that can be stored with a
+	 * single call.
+	 * 
+	 * Typical usage:
+	 * 
+	 * $struct = R::graph($_POST);
+	 * R::store($struct);
+	 * 
+	 * Example of a valid array:
+	 * 
+	 *	$form = array(
+	 *		'type'=>'order',
+	 *		'ownProduct'=>array(
+	 *			array('id'=>171,'type'=>'product'),
+	 *		),
+	 *		'ownCustomer'=>array(
+	 *			array('type'=>'customer','name'=>'Bill')
+	 *		),
+	 * 		'sharedCoupon'=>array(
+	 *			array('type'=>'coupon','name'=>'123'),
+	 *			array('type'=>'coupon','id'=>3)
+	 *		)
+	 *	);
+	 * 
+	 * Each entry in the array will become a property of the bean.
+	 * The array needs to have a type-field indicating the type of bean it is
+	 * going to be. The array can have nested arrays. A nested array has to be
+	 * named conform the bean-relation conventions, i.e. ownPage/sharedPage
+	 * each entry in the nested array represents another bean.
+	 *  
+	 * @param	array $array array to be turned into a bean collection
 	 *
-	 * @param  $array array
-	 *
-	 * @return array $beans beans
+	 * @return	array $beans beans
 	 */
 	public function graph( $array ) {
 		$beans = array();

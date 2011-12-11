@@ -20,23 +20,27 @@
 class RedBean_OODB extends RedBean_Observable {
 
 	/**
-	 *
+	 * Secret stash. Used for batch loading.
 	 * @var array
 	 */
 	private $stash = NULL;
 
 	/**
-	 *
+	 * Contains the writer for OODB.
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	private $writer;
 	/**
-	 *
+	 * Whether this instance of OODB is frozen or not.
+	 * In frozen mode the schema will not de modified, in fluid mode
+	 * the schema can be adjusted to meet the needs of the developer.
 	 * @var boolean
 	 */
 	private $isFrozen = false;
 
 	/**
+	 * Bean Helper. The bean helper to give to the beans. Bean Helpers
+	 * assist beans in getting hold of a toolbox.
 	 * @var null|\RedBean_BeanHelperFacade
 	 */
 	private $beanhelper = null;
@@ -73,7 +77,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * structure is adjusted to accomodate your objects.
 	 * In frozen mode
 	 * this is not the case.
-	 * @return <type>
+	 * 
+	 * @return boolean $yesNo TRUE if frozen, FALSE otherwise
 	 */
 	public function isFrozen() {
 		return (bool) $this->isFrozen;
@@ -106,7 +111,8 @@ class RedBean_OODB extends RedBean_Observable {
 	}
 
 	/**
-	 * Sets bean helper
+	 * Sets bean helper to be given to beans.
+	 * Bean helpers assist beans in getting a reference to a toolbox.
 	 *
 	 * @param RedBean_IBeanHelper $beanhelper helper
 	 *
@@ -122,7 +128,10 @@ class RedBean_OODB extends RedBean_Observable {
 	 * If the type is not valid or the ID is not valid it will
 	 * throw an exception: RedBean_Exception_Security.
 	 * @throws RedBean_Exception_Security $exception
-	 * @param RedBean_OODBBean $bean
+	 * 
+	 * @param RedBean_OODBBean $bean the bean that needs to be checked
+	 * 
+	 * @return void
 	 */
 	public function check( RedBean_OODBBean $bean ) {
 		//Is all meta information present?
@@ -228,7 +237,11 @@ class RedBean_OODB extends RedBean_Observable {
 
 
 	/**
-	 * Process groups
+	 * Process groups. Internal function. Processes different kind of groups for
+	 * storage function. Given a list of original beans and a list of current beans,
+	 * this function calculates which beans remain in the list (residue), which
+	 * have been deleted (are in the trashcan) and which beans have been added
+	 * (additions). 
 	 *
 	 * @param  array $originals originals
 	 * @param  array $current   the current beans
@@ -463,6 +476,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * RedBean will return a new bean of type $type and with
 	 * primary key ID 0. In the latter case it acts basically the
 	 * same as dispense().
+	 * 
+	 * Important note:
 	 * If the bean cannot be found in the database a new bean of
 	 * the specified type will be generated and returned.
 	 * 
@@ -544,14 +559,18 @@ class RedBean_OODB extends RedBean_Observable {
 	}
 
 	/**
-	 * Loads and returns a series of beans of type $type.
-	 * The beans are loaded all at once.
-	 * The beans are retrieved using their primary key IDs
-	 * specified in the second argument.
-	 * @throws RedBean_Exception_Security $exception
-	 * @param string $type
-	 * @param array $ids
-	 * @return array $beans
+	 * Returns an array of beans. Pass a type and a series of ids and
+	 * this method will bring you the correspondig beans.
+	 * 
+	 * important note: Because this method loads beans using the load()
+	 * function (but faster) it will return empty beans with ID 0 for 
+	 * every bean that could not be located. The resulting beans will have the
+	 * passed IDs as their keys.
+	 *
+	 * @param string $type type of beans 
+	 * @param array  $ids  ids to load
+	 *
+	 * @return array $beans resulting beans (may include empty ones)
 	 */
 	public function batch( $type, $ids ) {
 		if (!$ids) return array();
@@ -581,10 +600,14 @@ class RedBean_OODB extends RedBean_Observable {
 
 	/**
 	 * This is a convenience method; it converts database rows
-	 * (arrays) into beans.
-	 * @param string $type
-	 * @param array $rows
-	 * @return array $collectionOfBeans
+	 * (arrays) into beans. Given a type and a set of rows this method
+	 * will return an array of beans of the specified type loaded with
+	 * the data fields provided by the result set from the database.
+	 * 
+	 * @param string $type type of beans you would like to have
+	 * @param array  $rows rows from the database result
+	 * 
+	 * @return array $collectionOfBeans collection of beans
 	 */
 	public function convertToBeans($type, $rows) {
 		$collection = array();
@@ -637,9 +660,11 @@ class RedBean_OODB extends RedBean_Observable {
 
 	/**
 	 * Returns an Association Manager for use with OODB.
+	 * A simple getter function to obtain a reference to the association manager used for
+	 * storage and more.
 	 *
 	 * @throws Exception
-	 * @return RedBean_AssociationManager $assoc Assoction Manager
+	 * @return RedBean_AssociationManager $assoc Association Manager
 	 */
 	public function getAssociationManager() {
 		if (!isset($this->assocManager)) throw new Exception('No association manager available.');
@@ -647,7 +672,12 @@ class RedBean_OODB extends RedBean_Observable {
 	}
 
 	/**
-	 * @param RedBean_AssociationManager $assoc
+	 * Sets the association manager instance to be used by this OODB.
+	 * A simple setter function to set the association manager to be used for storage and
+	 * more.
+	 * 
+	 * @param RedBean_AssociationManager $assoc sets the association manager to be used
+	 * 
 	 * @return void
 	 */
 	public function setAssociationManager(RedBean_AssociationManager $assoc) {

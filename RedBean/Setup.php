@@ -42,7 +42,7 @@ class RedBean_Setup {
 
 	/**
 	 * Generic Kickstart method.
-	 * This is the generic kickstarter. It will establish a database connection
+	 * This is the generic kickstarter. It will prepare a database connection
 	 * using the $dsn, the $username and the $password you provide.
 	 * If $frozen is boolean TRUE it will start RedBean in frozen mode, meaning
 	 * that the database cannot be altered. If RedBean is started in fluid mode
@@ -56,7 +56,7 @@ class RedBean_Setup {
 	 * Optionally instead of using $dsn you may use an existing PDO connection.
 	 * Example: RedBean_Setup::kickstart($existingConnection, true);
 	 *
-	 * @param  string|PDO $dsn      Database Connection String
+	 * @param  string|PDO $dsn      Database Connection String (or PDO instance)
 	 * @param  string     $username Username for database
 	 * @param  string     $password Password for database
 	 * @param  boolean    $frozen   Start in frozen mode?
