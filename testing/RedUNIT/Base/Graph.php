@@ -21,7 +21,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
-		/*
+		
 		global $currentDriver;
 		global $lifeCycle;
 		$toolbox = R::$toolbox;
@@ -299,7 +299,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 				asrt(count($b->ownFurniture),1);
 			}
 		}
-	*/
+	
 		
 		R::nuke();
 		$product = R::dispense('product');
