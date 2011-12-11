@@ -118,6 +118,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		
 		//otherwise untestable...
 		$bean->setBeanHelper( new RedBean_BeanHelperFacade() );
+		R::$redbean->setBeanHelper( new RedBean_BeanHelperFacade() );
 		pass();
 		
 		

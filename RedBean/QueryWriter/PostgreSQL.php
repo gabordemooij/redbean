@@ -219,11 +219,7 @@ where table_schema = 'public'" );
 		$column = $this->safeColumn($column);
 		$newtype = $this->typeno_sqltype[$type];
 		$changecolumnSQL = "ALTER TABLE $table \n\t ALTER COLUMN $column TYPE $newtype ";
-		try {
-			$this->adapter->exec( $changecolumnSQL );
-		}catch(Exception $e) {
-			die($e->getMessage());
-		}
+		$this->adapter->exec( $changecolumnSQL );
 	}
 
 	/**
@@ -332,19 +328,14 @@ where table_schema = 'public'" );
 					  ";
 			$rows = $this->adapter->get( $sql );
 			if (!count($rows)) {
-				try{
-					$this->adapter->exec("ALTER TABLE  $table
+				$this->adapter->exec("ALTER TABLE  $table
 					ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
 					$targetColumn) ON DELETE SET NULL ON UPDATE SET NULL DEFERRABLE ;");
 					return true;
-				}
-				catch(Exception $e) {
-				}
+				
 			}
 		}
-		catch(Exception $e){
-			return false;
-		}
+		catch(Exception $e){ return false; }
 	}
 
 
@@ -402,9 +393,7 @@ where table_schema = 'public'" );
 			}
 			return true;
 		}
-		catch(Exception $e){
-			return false;
-		}
+		catch(Exception $e){ return false; }
 	}
 
 	/**

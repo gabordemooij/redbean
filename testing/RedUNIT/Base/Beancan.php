@@ -104,6 +104,9 @@ class RedUNIT_Base_Beancan extends RedUNIT_Base {
 		asrt(isset($rs["result"]),true);
 		asrt(isset($rs["error"]),false);
 		asrt($rs["result"],"test!");
+		$rs = json_decode( s("candybar:customMethodWithException",array( "test" )), true );
+		asrt($rs["error"]["code"],-32099);
+		asrt($rs["error"]["message"],'0-Oops!');
 		
 		testpack("Test Negatives: parse error");
 		$can = new RedBean_BeanCan;
