@@ -349,11 +349,10 @@ where table_schema = 'public'" );
 	 * @param string			  $table2    table2
 	 * @param string			  $property1 property1
 	 * @param string			  $property2 property2
-	 * @param boolean			  $dontCache want to have cache?
 	 *
 	 * @return boolean $succes whether the constraint has been applied
 	 */
-	protected function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
+	protected function constrain($table, $table1, $table2, $property1, $property2) {
 		try{
 			$writer = $this;
 			$adapter = $this->adapter;
@@ -381,7 +380,6 @@ where table_schema = 'public'" );
 
 			$rows = $adapter->get( $sql );
 			if (!count($rows)) {
-				if (!$dontCache) $this->fkcache[ $fkCode ] = true;
 				$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
 						  {$fkCode}a FOREIGN KEY ($property1)
 							REFERENCES \"$table1\" (id) ON DELETE CASCADE ";

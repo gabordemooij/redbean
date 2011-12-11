@@ -174,13 +174,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	public function widenColumn( $type, $column, $datatype ) {
 		$table = $this->safeTable($type,true);
 		$column = $this->safeColumn($column,true);
-		$idfield = 'id';
 		$newtype = $this->typeno_sqltype[$datatype];
 		$oldColumns = $this->getColumns($type);
 		$oldColumnNames = $this->quote(array_keys($oldColumns));
 		$newTableDefStr="";
 		foreach($oldColumns as $oldName=>$oldType) {
-			if ($oldName != $idfield) {
+			if ($oldName != 'id') {
 				if ($oldName!=$column) {
 					$newTableDefStr .= ",`$oldName` $oldType";
 				}
@@ -194,7 +193,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(",",$oldColumnNames).");";
 		$q[] = "INSERT INTO tmp_backup SELECT * FROM `$table`;";
 		$q[] = "DROP TABLE `$table`;";
-		$q[] = "CREATE TABLE `$table` ( `$idfield` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr  );";
+		$q[] = "CREATE TABLE `$table` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr  );";
 		$q[] = "INSERT INTO `$table` SELECT * FROM tmp_backup;";
 		$q[] = "DROP TABLE tmp_backup;";
 		foreach($q as $sq) {
@@ -219,11 +218,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param string $table table
 	 */
 	public function createTable( $table ) {
-		$idfield = 'id';
 		$table = $this->safeTable($table);
-		$sql = "
-                     CREATE TABLE $table ( $idfield INTEGER PRIMARY KEY AUTOINCREMENT )
-				  ";
+		$sql = "CREATE TABLE $table ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ";
 		$this->adapter->exec( $sql );
 	}
 
@@ -325,12 +321,11 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 				$targetTable = $this->safeTable($targetType,true);
 				$field = $this->safeColumn($field,true);
 				$targetField = $this->safeColumn($targetField,true);
-				$idfield = 'id';
 				$oldColumns = $this->getColumns($type);
 				$oldColumnNames = $this->quote(array_keys($oldColumns));
 				$newTableDefStr='';
 				foreach($oldColumns as $oldName=>$oldType) {
-					if ($oldName != $idfield) {
+					if ($oldName != 'id') {
 						$newTableDefStr .= ",`$oldName` $oldType";
 					}
 				}
@@ -362,7 +357,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 				$q[] = "INSERT INTO tmp_backup SELECT * FROM `$table`;";
 				$q[] = "PRAGMA foreign_keys = 0 ";
 				$q[] = "DROP TABLE `$table`;";
-				$q[] = "CREATE TABLE `$table` ( `$idfield` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr $fkDef );";
+				$q[] = "CREATE TABLE `$table` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr $fkDef );";
 				$q[] = "INSERT INTO `$table` SELECT * FROM tmp_backup;";
 				$q[] = "DROP TABLE tmp_backup;";
 				$q[] = "PRAGMA foreign_keys = 1 ";
@@ -384,16 +379,14 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param string			  $table2    table2
 	 * @param string			  $property1 property1
 	 * @param string			  $property2 property2
-	 * @param boolean			  $dontCache want to have cache?
 	 *
 	 * @return boolean $succes whether the constraint has been applied
 	 */
-	protected  function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
+	protected  function constrain($table, $table1, $table2, $property1, $property2) {
 		$writer = $this;
 		$adapter = $this->adapter;
-		$idfield1 = $idfield2 = 'id';
-		$firstState = $this->buildFK($table,$table1,$property1,$idfield1,true);
-		$secondState = $this->buildFK($table,$table2,$property2,$idfield2,true);
+		$firstState = $this->buildFK($table,$table1,$property1,'id',true);
+		$secondState = $this->buildFK($table,$table2,$property2,'id',true);
 		return ($firstState && $secondState);
 	}
 

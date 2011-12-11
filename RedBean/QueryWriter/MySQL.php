@@ -205,14 +205,11 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return void
 	 */
 	public function createTable( $table ) {
-		$idfield = 'id';
 		$table = $this->safeTable($table);
-		$sql = "
-                     CREATE TABLE $table (
-                    $idfield INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
-                     PRIMARY KEY ( $idfield )
-                     ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-				  ";
+		$sql = "     CREATE TABLE $table (
+                     id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
+                     PRIMARY KEY ( id )
+                     ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ";
 		$this->adapter->exec( $sql );
 	}
 
@@ -326,7 +323,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$type = $datatype;
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
-		$newtype = $this->getFieldType($type);
+		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : "";
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
 		$this->adapter->exec( $changecolumnSQL );
 	}
@@ -390,13 +387,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * @return boolean $succes whether the constraint has been applied
 	 */
-	protected function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
+	protected function constrain($table, $table1, $table2, $property1, $property2) {
 		try{
-			$writer = $this;
-			$adapter = $this->adapter;
-			$db = $adapter->getCell("select database()");
-			$fkCode = 'fk'.md5($table.$property1.$property2);
-			$fks =  $adapter->getCell("
+			$db = $this->adapter->getCell("select database()");
+			$fks =  $this->adapter->getCell("
 				SELECT count(*)
 				FROM information_schema.KEY_COLUMN_USAGE
 				WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND
@@ -404,27 +398,24 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 					  ",array($db,$table));
 			//already foreign keys added in this association table
 			if ($fks>0) return false;
-			//add the table to the cache, so we dont have to fire the fk query all the time.
-			if (!$dontCache) $this->fkcache[ $fkCode ] = true;
-			$columns = $writer->getColumns($table);
-			if ($writer->code($columns[$property1])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
-				$writer->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
+			$columns = $this->getColumns($table);
+			if ($this->code($columns[$property1])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
+				$this->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 			}
-			if ($writer->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
-				$writer->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
+			if ($this->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
+				$this->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 			}
 
-			$idfield1 = $idfield2 = 'id';
 			$sql = "
-				ALTER TABLE ".$writer->noKW($table)."
-				ADD FOREIGN KEY($property1) references `$table1`($idfield1) ON DELETE CASCADE;
+				ALTER TABLE ".$this->noKW($table)."
+				ADD FOREIGN KEY($property1) references `$table1`(id) ON DELETE CASCADE;
 					  ";
-			$adapter->exec( $sql );
+			$this->adapter->exec( $sql );
 			$sql ="
-				ALTER TABLE ".$writer->noKW($table)."
-				ADD FOREIGN KEY($property2) references `$table2`($idfield2) ON DELETE CASCADE
+				ALTER TABLE ".$this->noKW($table)."
+				ADD FOREIGN KEY($property2) references `$table2`(id) ON DELETE CASCADE
 					  ";
-			$adapter->exec( $sql );
+			$this->adapter->exec( $sql );
 			return true;
 		} catch(Exception $e){ return false; }
 	}

@@ -116,7 +116,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @return void
 	 */
 	public function connect() {
-
 		if ($this->isConnected) return;
 		$user = $this->connectInfo["user"];
 		$pass = $this->connectInfo["pass"];
@@ -159,7 +158,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				}
 			}
 			else {
-
 				if (is_null($value)){
 					$s->bindValue($key,null,PDO::PARAM_NULL);
 				}
