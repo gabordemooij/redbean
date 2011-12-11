@@ -61,7 +61,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @var string
 	 * character to escape keyword table/column names
 	 */
-	 protected $quoteCharacter = '"';
+	protected $quoteCharacter = '"';
 
 	/**
 	 * 

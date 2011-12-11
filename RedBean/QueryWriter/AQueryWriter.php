@@ -19,14 +19,11 @@
  */
 abstract class RedBean_QueryWriter_AQueryWriter {
 
-	protected $svalue;
-
 	/**
-	 * @var array
-	 * FK Cache
+	 * @var type
+	 * Scanned value (scanType) 
 	 */
-	protected $fcache = array();
-
+	protected $svalue;
 
 	/**
 	 * @var array

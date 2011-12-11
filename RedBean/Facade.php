@@ -339,9 +339,9 @@ class RedBean_Facade {
 	 * associated with the bean provided.
 	 *
 	 * @param RedBean_OODBBean $bean   bean provided
-	 * @param string				$type   type of bean you are searching for
-	 * @param string				$sql    SQL for extra filtering
-	 * @param array				$values values to be inserted in SQL slots
+	 * @param string           $type   type of bean you are searching for
+	 * @param string           $sql    SQL for extra filtering
+	 * @param array            $values values to be inserted in SQL slots
 	 *
 	 * @return array $beans beans
 	 */
@@ -356,18 +356,15 @@ class RedBean_Facade {
 
 	/**
 	 * Clears all associated beans.
+	 * Breaks all many-to-many associations of a bean and a specified type.
 	 *
-	 * @param RedBean_OODBBean $bean
-	 * @param string $type type
+	 * @param RedBean_OODBBean $bean bean you wish to clear many-to-many relations for
+	 * @param string           $type type of bean you wish to break associatons with
 	 *
-	 * @return mixed
+	 * @return void
 	 */
-	public static function clearRelations( RedBean_OODBBean $bean, $type, RedBean_OODBBean $bean2 = null, $extra = null ) {
-		$r = self::$associationManager->clearRelations( $bean, $type );
-		if ($bean2) {
-			self::associate($bean, $bean2, $extra);
-		}
-		return $r;
+	public static function clearRelations( RedBean_OODBBean $bean, $type ) {
+		self::$associationManager->clearRelations( $bean, $type );
 	}
 
 	/**
@@ -377,9 +374,9 @@ class RedBean_Facade {
 	 * array parameter; you can either use the question mark notation
 	 * or the slot-notation (:keyname).
 	 *
-	 * @param string $type   type
-	 * @param string $sql    sql
-	 * @param array  $values values
+	 * @param string $type   type   the type of bean you are looking for
+	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $values values array of values to be bound to parameters in query
 	 *
 	 * @return array $beans  beans
 	 */
@@ -395,9 +392,9 @@ class RedBean_Facade {
 	 * or the slot-notation (:keyname).
 	 * The variation also exports the beans (i.e. it returns arrays).
 	 *
-	 * @param string $type   type
-	 * @param string $sql    sql
-	 * @param array  $values values
+	 * @param string $type   type   the type of bean you are looking for
+	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $values values array of values to be bound to parameters in query
 	 *
 	 * @return array $arrays arrays
 	 */
@@ -418,9 +415,9 @@ class RedBean_Facade {
 	 * or the slot-notation (:keyname).
 	 * This variation returns the first bean only.
 	 *
-	 * @param string $type	 type
-	 * @param string $sql	 sql
-	 * @param array  $values values
+	 * @param string $type   type   the type of bean you are looking for
+	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $values values array of values to be bound to parameters in query
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
@@ -439,9 +436,9 @@ class RedBean_Facade {
 	 * or the slot-notation (:keyname).
 	 * This variation returns the last bean only.
 	 *
-	 * @param string $type	 type
-	 * @param string $sql	 sql
-	 * @param array  $values values
+	 * @param string $type   type   the type of bean you are looking for
+	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $values values array of values to be bound to parameters in query
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
@@ -453,12 +450,18 @@ class RedBean_Facade {
 	}
 
 	/**
-	 * Returns an array of beans.
+	 * Returns an array of beans. Pass a type and a series of ids and
+	 * this method will bring you the correspondig beans.
+	 * 
+	 * important note: Because this method loads beans using the load()
+	 * function (but faster) it will return empty beans with ID 0 for 
+	 * every bean that could not be located. The resulting beans will have the
+	 * passed IDs as their keys.
 	 *
-	 * @param string $type type
-	 * @param array  $ids  ids
+	 * @param string $type type of beans 
+	 * @param array  $ids  ids to load
 	 *
-	 * @return array $beans
+	 * @return array $beans resulting beans (may include empty ones)
 	 */
 	public static function batch( $type, $ids ) {
 		return self::$redbean->batch($type, $ids);
@@ -468,10 +471,10 @@ class RedBean_Facade {
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql	 sql
-	 * @param array  $values values
+	 * @param string $sql	 sql    SQL query to execute
+	 * @param array  $values values a list of values to be bound to query parameters
 	 *
-	 * @return array $results
+	 * @return integer $affected  number of affected rows
 	 */
 	public static function exec( $sql, $values=array() ) {
 		return self::query('exec',$sql,$values);
@@ -481,8 +484,8 @@ class RedBean_Facade {
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql	 sql
-	 * @param array  $values values
+	 * @param string $sql	 sql    SQL query to execute
+	 * @param array  $values values a list of values to be bound to query parameters
 	 *
 	 * @return array $results
 	 */
@@ -494,8 +497,8 @@ class RedBean_Facade {
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql	 sql
-	 * @param array  $values values
+	 * @param string $sql	 sql    SQL query to execute
+	 * @param array  $values values a list of values to be bound to query parameters
 	 *
 	 * @return string $result scalar
 	 */
@@ -507,8 +510,8 @@ class RedBean_Facade {
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql	 sql
-	 * @param array  $values values
+	 * @param string $sql	 sql    SQL query to execute
+	 * @param array  $values values a list of values to be bound to query parameters
 	 *
 	 * @return array $results
 	 */
@@ -520,8 +523,8 @@ class RedBean_Facade {
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql	 sql
-	 * @param array  $values values
+	 * @param string $sql	 sql    SQL query to execute
+	 * @param array  $values values a list of values to be bound to query parameters
 	 *
 	 * @return array $results
 	 */
@@ -567,9 +570,14 @@ class RedBean_Facade {
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
+	 * Results will be returned as an associative array. The first
+	 * column in the select clause will be used for the keys in this array and
+	 * the second column will be used for the values. If only one column is
+	 * selected in the query, both key and value of the array will have the
+	 * value of this field for each row.
 	 *
-	 * @param string $sql	 sql
-	 * @param array  $values values
+	 * @param string $sql	 sql    SQL query to execute
+	 * @param array  $values values a list of values to be bound to query parameters
 	 *
 	 * @return array $results
 	 */
