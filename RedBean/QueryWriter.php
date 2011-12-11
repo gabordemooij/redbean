@@ -209,18 +209,6 @@ interface RedBean_QueryWriter {
 	 */
 	public function count($type);
 
-
-
-	/**
-	 * Given a field type const. from this class this method should
-	 * return the database specific SQL description of the data type.
-	 *
-	 * @param integer $type data type constant
-	 *
-	 * @return void
-	 */
-	public function getFieldType($type = "");
-
 	/**
 	 * This method should filter a column name so that it can
 	 * be used safely in a query for a specific database.
@@ -250,23 +238,10 @@ interface RedBean_QueryWriter {
 	 *
 	 * @param RedBean_OODBBean $bean1      first bean
 	 * @param RedBean_OODBBean $bean2      second bean
-	 * @param bool 			   $dontCache  by default we use a cache, TRUE = NO CACHING (optional)
 	 *
 	 * @return void
 	 */
-	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $dontCache = false );
-
-	/**
-	 * This method should return the format for link tables.
-	 * Given an array containing two type names this method returns the
-	 * name of the link table to be used to store and retrieve
-	 * association records.
-	 *
-	 * @param  array $types two types array($type1,$type2)
-	 *
-	 * @return string $linktable name of the link table
-	 */
-	public function getAssocTableFormat($types);
+	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 );
 
 	/**
 	 * This method should add a foreign key from type and field to

@@ -52,7 +52,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return string $table table
 	 */
 	public function getTable( $types ) {
-		return $this->writer->getAssocTableFormat($types);
+		return RedBean_QueryWriter_AQueryWriter::getAssocTableFormat($types);
 	}
 	/**
 	 * Associates two beans with eachother.
@@ -78,7 +78,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return mixed $id either the link ID or null
 	 */
 	protected function associateBeans(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean) {
-		$idfield1 = $idfield2 = 'id';
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
 		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
@@ -92,8 +91,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$this->oodb->store($bean2);
 		$bean->setMeta("cast.$property1","id");
 		$bean->setMeta("cast.$property2","id");
-		$bean->$property1 = $bean1->$idfield1;
-		$bean->$property2 = $bean2->$idfield2;
+		$bean->$property1 = $bean1->id;
+		$bean->$property2 = $bean2->id;
 		try {
 			$id = $this->oodb->store( $bean );
 			//On creation, add constraints....
@@ -134,7 +133,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 */
 	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $sql=false) {
 	$table = $this->getTable( array($bean->getMeta('type') , $type) );
-		$idfield = 'id';
 		if ($type==$bean->getMeta('type')) {
 			$type .= '2';
 			$cross = 1;
@@ -146,7 +144,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		try {
 				$sqlFetchKeys = $this->writer->selectRecord(
 					  $table,
-					  array( $property => array( $bean->$idfield ) ),
+					  array( $property => array( $bean->id ) ),
 					  $sql,
 					  false
 				);
@@ -157,7 +155,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 				if ($cross) {
 					$sqlFetchKeys2 = $this->writer->selectRecord(
 							  $table,
-							  array( $targetproperty => array( $bean->$idfield ) ),
+							  array( $targetproperty => array( $bean->id ) ),
 							  $sql,
 							  false
 					);
@@ -193,7 +191,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
 		$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
-		$idfield1 = $idfield2 = 'id';
 		$type = $bean1->getMeta('type');
 		if ($type==$bean2->getMeta('type')) {
 			$type .= '2';
@@ -202,8 +199,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		else $cross = 0;
 		$property1 = $type.'_id';
 		$property2 = $bean2->getMeta('type').'_id';
-		$value1 = (int) $bean1->$idfield1;
-		$value2 = (int) $bean2->$idfield2;
+		$value1 = (int) $bean1->id;
+		$value2 = (int) $bean2->id;
 		try {
 			$rows = $this->writer->selectRecord($table,array(
 				$property1 => array($value1), $property2=>array($value2)),null,$fast
@@ -245,7 +242,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
 		$this->oodb->store($bean);
 		$table = $this->getTable( array($bean->getMeta('type') , $type) );
-		$idfield = 'id';
 		if ($type==$bean->getMeta('type')) {
 			$property2 = $type.'2_id';
 			$cross = 1;
@@ -253,9 +249,9 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		else $cross = 0;
 		$property = $bean->getMeta('type').'_id';
 		try {
-			$this->writer->selectRecord( $table, array($property=>array($bean->$idfield)),null,true);
+			$this->writer->selectRecord( $table, array($property=>array($bean->id)),null,true);
 			if ($cross) {
-				$this->writer->selectRecord( $table, array($property2=>array($bean->$idfield)),null,true);
+				$this->writer->selectRecord( $table, array($property2=>array($bean->id)),null,true);
 			}
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
@@ -280,7 +276,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	public function areRelated(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		if (!$bean1->getID() || !$bean2->getID()) return false;
 		$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
-		$idfield1 = $idfield2 = 'id';
 		$type = $bean1->getMeta('type');
 		if ($type==$bean2->getMeta('type')) {
 			$type .= '2';
@@ -289,8 +284,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		else $cross = 0;
 		$property1 = $type.'_id';
 		$property2 = $bean2->getMeta('type').'_id';
-		$value1 = (int) $bean1->$idfield1;
-		$value2 = (int) $bean2->$idfield2;
+		$value1 = (int) $bean1->id;
+		$value2 = (int) $bean2->id;
 		try {
 			$rows = $this->writer->selectRecord($table,array(
 				$property1 => array($value1), $property2=>array($value2)),null

@@ -181,8 +181,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return string $id record Identifier for bean
 	 */
 	public function getID() {
-		$idfield = $this->getMeta('sys.idfield');
-		return (string) $this->$idfield;
+		return (string) $this->id;
 	}
 
 	/**

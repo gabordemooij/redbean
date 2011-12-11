@@ -97,9 +97,8 @@ class RedBean_OODB extends RedBean_Observable {
 		$bean = new RedBean_OODBBean();
 		$bean->setBeanHelper($this->beanhelper);
 		$bean->setMeta('type',$type );
-		$idfield = 'id';
-		$bean->setMeta('sys.idfield',$idfield);
-		$bean->$idfield = 0;
+		$bean->setMeta('sys.id','id');
+		$bean->id = 0;
 		if (!$this->isFrozen) $this->check( $bean );
 		$bean->setMeta('tainted',true);
 		$this->signal('dispense',$bean );
@@ -126,11 +125,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean
 	 */
 	public function check( RedBean_OODBBean $bean ) {
-		$idfield ='id';
 		//Is all meta information present?
-
-		if (!isset($bean->$idfield) ) {
-			throw new RedBean_Exception_Security("Bean has incomplete Meta Information $idfield ");
+		if (!isset($bean->id) ) {
+			throw new RedBean_Exception_Security("Bean has incomplete Meta Information id ");
 		}
 		if (!($bean->getMeta("type"))) {
 			throw new RedBean_Exception_Security('Bean has incomplete Meta Information II');
@@ -288,11 +285,10 @@ class RedBean_OODB extends RedBean_Observable {
 			foreach($bean as $p=>$v) {
 				if ($v instanceof RedBean_OODBBean) {
 					$embtype = $v->getMeta('type');
-					$idfield = 'id';
-					if (!$v->$idfield || $v->getMeta('tainted')) {
+					if (!$v->id || $v->getMeta('tainted')) {
 						$this->store($v);
 					}
-					$beanID = $v->$idfield;
+					$beanID = $v->id;
 					$linkField = $p.'_id';
 					$bean->$linkField = $beanID;
 					$bean->setMeta('cast.'.$linkField,'id');
@@ -321,8 +317,6 @@ class RedBean_OODB extends RedBean_Observable {
 		if (!$this->isFrozen) $this->check($bean);
 		//what table does it want
 		$table = $bean->getMeta("type");
-		$idfield = 'id';
-
 		if ($bean->getMeta('tainted')) {
 			//Does table exist? If not, create
 			if (!$this->isFrozen && !$this->tableExists($table)) {
@@ -338,7 +332,7 @@ class RedBean_OODB extends RedBean_Observable {
 			$updatevalues = array();
 			foreach( $bean as $p=>$v ) {
 				$origV = $v;
-				if ($p!=$idfield) {
+				if ($p!='id') {
 					if (!$this->isFrozen) {
 						//Does the user want to specify the type?
 						if ($bean->getMeta("cast.$p",-1)!==-1) {
@@ -395,8 +389,8 @@ class RedBean_OODB extends RedBean_Observable {
 					$this->writer->addUniqueIndex( $table, $unique );
 				}
 			}
-			$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->$idfield );
-			$bean->$idfield = $rs;
+			$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->id );
+			$bean->id = $rs;
 			$bean->setMeta("tainted",false);
 		}
 
@@ -419,14 +413,14 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 			foreach($ownAdditions as $addition) {
 				if ($addition instanceof RedBean_OODBBean) {
-					$addition->$myFieldLink = $bean->$idfield;
+					$addition->$myFieldLink = $bean->id;
 					$addition->setMeta('cast.'.$myFieldLink,'id');
 					$this->store($addition);
 					if (!$this->isFrozen) {
 						$this->writer->addIndex($addition->getMeta('type'),
 							'index_foreignkey_'.$bean->getMeta('type'),
 							 $myFieldLink);
-						$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,$idfield);
+						$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,'id');
 					}
 				}
 				else {
@@ -454,7 +448,7 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 		$this->signal('after_update',$bean);
-		return (int) $bean->$idfield;
+		return (int) $bean->id;
 	}
 
 	/**
@@ -485,8 +479,7 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		else {
 			try {
-				$idfield = 'id';
-				$rows = $this->writer->selectRecord($type,array($idfield=>array($id)));
+				$rows = $this->writer->selectRecord($type,array('id'=>array($id)));
 			}catch(RedBean_Exception_SQL $e ) {
 				if (
 				$this->writer->sqlStateIn($e->getSQLState(),
@@ -521,7 +514,6 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean bean you want to remove from database
 	 */
 	public function trash( RedBean_OODBBean $bean ) {
-		$idfield ='id';
 		$this->signal('delete',$bean);
 		foreach($bean as $p=>$v) {
 			if ($v instanceof RedBean_OODBBean) {
@@ -539,7 +531,7 @@ class RedBean_OODB extends RedBean_Observable {
 		if (!$this->isFrozen) $this->check( $bean );
 		try {
 			$this->writer->selectRecord($bean->getMeta('type'),
-				array($idfield => array( $bean->$idfield) ),null,true );
+				array('id' => array( $bean->id) ),null,true );
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
@@ -547,7 +539,7 @@ class RedBean_OODB extends RedBean_Observable {
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
 		}
-		$bean->$idfield = 0;
+		$bean->id = 0;
 		$this->signal('after_delete', $bean );
 	}
 
@@ -565,8 +557,7 @@ class RedBean_OODB extends RedBean_Observable {
 		if (!$ids) return array();
 		$collection = array();
 		try {
-			$idfield = 'id';
-			$rows = $this->writer->selectRecord($type,array($idfield=>$ids));
+			$rows = $this->writer->selectRecord($type,array('id'=>$ids));
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
