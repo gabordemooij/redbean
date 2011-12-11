@@ -74,5 +74,15 @@ class RedUNIT_Base_Batch extends RedUNIT_Base {
 		
 		asrt(R::wipe('spaghettimonster'),false);
 		
+		testpack('deal with missing beans');
+		R::nuke();
+		$id = R::store(R::dispense('beer'));
+		$bottles = R::batch('beer',array($id,$id+1,$id+2));
+		asrt(count($bottles),3);
+		asrt((int)$bottles[$id]->id,(int)$id);
+		asrt((int)$bottles[$id+1]->id,0);
+		asrt((int)$bottles[$id+2]->id,0);
+		
+		
 	}	
 }

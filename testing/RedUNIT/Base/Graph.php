@@ -21,6 +21,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
+		/*
 		global $currentDriver;
 		global $lifeCycle;
 		$toolbox = R::$toolbox;
@@ -298,6 +299,38 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 				asrt(count($b->ownFurniture),1);
 			}
 		}
+	*/
+		
+		R::nuke();
+		$product = R::dispense('product');
+		$product->name = 'shampoo';
+		$productID = R::store($product);
+		$coupon = R::dispense('coupon');
+		$coupon->name = '567';
+		$couponID = R::store($coupon);
+		
+		$form = array(
+			'type'=>'order',
+			'ownProduct'=>array(
+				array('id'=>$productID,'type'=>'product'),
+			),
+			'ownCustomer'=>array(
+				array('type'=>'customer','name'=>'Bill')
+			),
+			'sharedCoupon'=>array(
+				array('type'=>'coupon','name'=>'123'),
+				array('type'=>'coupon','id'=>$couponID)
+			)
+		);
+		$order = R::graph($form);
+		asrt($order->getMeta('type'),'order');
+		asrt(count($order->ownProduct),1);
+		asrt(count($order->ownCustomer),1);
+		asrt(count($order->sharedCoupon),2);
+		asrt(end($order->ownProduct)->id,$productID);
+		asrt(end($order->ownProduct)->name,'shampoo');
+		asrt(end($order->ownCustomer)->name,'Bill');
+		asrt($order->sharedCoupon[$couponID]->name,'567');
 		
 				
 	}
