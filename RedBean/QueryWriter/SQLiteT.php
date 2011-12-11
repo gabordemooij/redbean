@@ -369,8 +369,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 				foreach($q as $sq) {
 					$this->adapter->exec($sq);
 				}
+				return true;
 			}
-			catch(Exception $e){ }
+			catch(Exception $e){ return false; }
 	}
 
 
@@ -388,15 +389,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return boolean $succes whether the constraint has been applied
 	 */
 	protected  function constrain($table, $table1, $table2, $property1, $property2, $dontCache) {
-		try{
-			$writer = $this;
-			$adapter = $this->adapter;
-			$idfield1 = $idfield2 = 'id';
-			$this->buildFK($table,$table1,$property1,$idfield1,true);
-			$this->buildFK($table,$table2,$property2,$idfield2,true);
-			return true;
-		}
-		catch(Exception $e){ return false; }
+		$writer = $this;
+		$adapter = $this->adapter;
+		$idfield1 = $idfield2 = 'id';
+		$firstState = $this->buildFK($table,$table1,$property1,$idfield1,true);
+		$secondState = $this->buildFK($table,$table2,$property2,$idfield2,true);
+		return ($firstState && $secondState);
 	}
 
 	/**
