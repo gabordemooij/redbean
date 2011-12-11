@@ -315,7 +315,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 
 	protected function buildFK($type, $targetType, $field, $targetField,$constraint=false) {
-
 			try{
 				$table = $this->safeTable($type,true);
 				$targetTable = $this->safeTable($targetType,true);

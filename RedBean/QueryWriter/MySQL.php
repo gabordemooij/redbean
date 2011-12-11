@@ -383,7 +383,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @param string			  $table2    table2
 	 * @param string			  $property1 property1
 	 * @param string			  $property2 property2
-	 * @param boolean			  $dontCache want to have cache?
 	 *
 	 * @return boolean $succes whether the constraint has been applied
 	 */

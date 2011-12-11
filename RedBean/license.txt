@@ -10,7 +10,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
 
 RedBean Database Objects -
-Written by Gabor de Mooij (c) copyright 2009-2011
+Written by Gabor de Mooij (c) copyright 2009-2012
 
 RedBean is DUAL Licensed BSD and GPLv2. You may choose the license that fits
 best for your project.
