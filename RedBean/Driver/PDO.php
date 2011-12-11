@@ -18,65 +18,60 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 
 	/**
-	 * @var string
 	 * Contains database DSN for connecting to database.
+	 * @var string
 	 */
 	private $dsn;
 	
 	/**
-	 * @var boolean
 	 * Whether we are in debugging mode or not.
+	 * @var boolean
 	 */
 	private $debug = false;
 
 	/**
-	 * @var PDO
 	 * Holds the PDO instance.
+	 * @var PDO
 	 */
 	private $pdo;
 
 	/**
-	 * @var integer
 	 * Holds integer number of affected rows from latest query
 	 * if driver supports this feature.
+	 * @var integer
 	 */
 	private $affected_rows;
 
 	/**
-	 * @var resource
 	 * Holds result resource.
+	 * @var integer
 	 */
 	private $rs;
 
 
 	/**
-	 * @var array
 	 * Contains arbitrary connection data.
-	 *
+	 * @var array
 	 */
 	private $connectInfo = array();
 
 
 	/**
-	 * @var bool
 	 * Whether you want to use classic String Only binding -
 	 * backward compatibility.
+	 * @var bool
 	 */
 	public $flagUseStringOnlyBinding = false;
 
 	/**
-	 *
-	 * @var boolean
-	 *
 	 * Whether we are currently connected or not.
 	 * This flag is being used to delay the connection until necessary.
 	 * Delaying connections is a good practice to speed up scripts that
 	 * don't need database connectivity but for some reason want to
 	 * init RedbeanPHP.
+	 * @var boolean
 	 */
 	private $isConnected = false;
-
-
 
 	/**
 	 * Constructor. You may either specify dsn, user and password or

@@ -46,8 +46,12 @@ class RedBean_AssociationManager extends RedBean_Observable {
 
 	/**
 	 * Creates a table name based on a types array.
+	 * Manages the get the correct name for the linking table for the
+	 * types provided.
 	 *
-	 * @param array $types types
+	 * @todo find a nice way to decouple this class from QueryWriter?
+	 * 
+	 * @param array $types 2 types as strings
 	 *
 	 * @return string $table table
 	 */
@@ -55,7 +59,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		return RedBean_QueryWriter_AQueryWriter::getAssocTableFormat($types);
 	}
 	/**
-	 * Associates two beans with eachother.
+	 * Associates two beans with eachother using a many-to-many relation.
 	 *
 	 * @param RedBean_OODBBean $bean1 bean1
 	 * @param RedBean_OODBBean $bean2 bean2
@@ -69,7 +73,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	
 	/**
 	 * Associates a pair of beans. This method associates two beans, no matter
-	 * what types.
+	 * what types.Accepts a base bean that contains data for the linking record.
 	 *
 	 * @param RedBean_OODBBean $bean1 first bean
 	 * @param RedBean_OODBBean $bean2 second bean

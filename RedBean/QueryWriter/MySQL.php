@@ -23,101 +23,88 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 
 	/**
-	 * @var integer
-	 *
 	 * DATA TYPE
 	 * Boolean Data type
+	 * @var integer
 	 */
 	const C_DATATYPE_BOOL = 0;
 
 	/**
 	 *
-	 * @var integer
-	 *
 	 * DATA TYPE
 	 * Unsigned 8BIT Integer
-	 *
+	 * @var integer
 	 */
 	const C_DATATYPE_UINT8 = 1;
 
 	/**
 	 *
-	 * @var integer
-	 *
 	 * DATA TYPE
 	 * Unsigned 32BIT Integer
-	 *
+	 * @var integer
 	 */
 	const C_DATATYPE_UINT32 = 2;
 
 	/**
-	 * @var integer
-	 *
 	 * DATA TYPE
 	 * Double precision floating point number and
 	 * negative numbers.
-	 *
+	 * @var integer
 	 */
 	const C_DATATYPE_DOUBLE = 3;
 
 	/**
-	 * @var integer
-	 *
 	 * DATA TYPE
 	 * Standard Text column (like varchar255)
 	 * At least 8BIT character support.
-	 *
+	 * @var integer
 	 */
 	const C_DATATYPE_TEXT8 = 4;
 
 	/**
-	 * @var integer
-	 *
 	 * DATA TYPE
 	 * Long text column (16BIT)
-	 *
+	 * @var integer
 	 */
 	const C_DATATYPE_TEXT16 = 5;
 
 	/**
-	 * @var integer
-	 *
+	 * 
 	 * DATA TYPE
 	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
 	 * This is the biggest column that RedBean supports. If possible you may write
 	 * an implementation that stores even bigger values.
-	 *
+	 * @var integer
 	 */
 	const C_DATATYPE_TEXT32 = 6;
 
 	/**
-	 * @var integer
 	 * Special type date for storing date values: YYYY-MM-DD
+	 * @var integer
 	 */	
 	const C_DATATYPE_SPECIAL_DATE = 80;
 	
 	/**
-	 * @var integer
 	 * Special type datetime for store date-time values: YYYY-MM-DD HH:II:SS
+	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
 	
 
 	/**
-	 * @var integer
-	 *
+	 * 
 	 * DATA TYPE
 	 * Specified. This means the developer or DBA
 	 * has altered the column to a different type not
 	 * recognized by RedBean. This high number makes sure
 	 * it will not be converted back to another type by accident.
-	 *
+	 * @var integer
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
 
 	/**
-	 * @var integer
 	 * Spatial types
+	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_POINT = 100;
 	const C_DATATYPE_SPECIAL_LINESTRING = 101;
@@ -128,14 +115,14 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	const C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION = 106;
 	
 	/**
-	 *
+	 * Holds the RedBean Database Adapter.
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
 
 	/**
-	 * @var string
 	 * character to escape keyword table/column names
+	 * @var string
 	 */
   	protected $quoteCharacter = '`';
 

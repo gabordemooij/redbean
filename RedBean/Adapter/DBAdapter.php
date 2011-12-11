@@ -14,16 +14,14 @@
 class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 
 	/**
-	 * @var RedBean_Driver
-	 *
 	 * ADODB compatible class
+	 * @var RedBean_Driver
 	 */
 	private $db = null;
 
 	/**
-	 * @var string
-	 *
 	 * Contains SQL snippet
+	 * @var string
 	 */
 	private $sql = "";
 

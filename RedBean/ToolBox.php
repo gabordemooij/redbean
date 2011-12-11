@@ -20,19 +20,19 @@
 class RedBean_ToolBox {
 
 	/**
-	 *
+	 * Reference to the RedBeanPHP OODB Object Database instance
 	 * @var RedBean_OODB
 	 */
 	protected $oodb;
 
 	/**
-	 *
+	 * Reference to the Query Writer
 	 * @var RedBean_QueryWriter
 	 */
 	protected $writer;
 
 	/**
-	 *
+	 * Reference to the database adapter
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;

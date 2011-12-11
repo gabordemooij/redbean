@@ -16,8 +16,8 @@
 class RedBean_Exception_SQL extends Exception {
 
 	/**
-	 * @var string
 	 * Holds the current SQL Strate code.
+	 * @var string
 	 */
 	private $sqlState;
 

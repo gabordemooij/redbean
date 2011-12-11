@@ -16,7 +16,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 
     /**
      * Reference to NULL property for magic getter.
-     *
      * @var Null $null
      */
     private $null = null;
@@ -25,7 +24,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
 	 * Properties of the bean. These are kept in a private
 	 * array called properties and exposed through the array interface.
-	 *
 	 * @var array $properties
 	 */
 	private $properties = array();
@@ -33,7 +31,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
 	 * Meta Data storage. This is the internal property where all
 	 * Meta information gets stored.
-	 *
 	 * @var array
 	 */
 	private $__info = NULL;
@@ -41,7 +38,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
 	 * Contains a BeanHelper to access service objects like
 	 * te association manager and OODB.
-	 *
 	 * @var RedBean_BeanHelper
 	 */
 	private $beanHelper = NULL;
@@ -49,7 +45,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
 	 * Contains the latest Fetch Type.
 	 * A Fetch Type is a preferred type for the next nested bean.
-	 *
 	 * @var null
 	 */
 	private $fetchType = NULL;

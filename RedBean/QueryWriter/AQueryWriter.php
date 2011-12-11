@@ -20,34 +20,33 @@
 abstract class RedBean_QueryWriter_AQueryWriter {
 
 	/**
-	 * @var type
 	 * Scanned value (scanType) 
+	 * @var type
 	 */
 	protected $svalue;
 
 	/**
-	 * @var array
 	 * Supported Column Types.
+	 * @var array
 	 */
 	public $typeno_sqltype = array();
 
 	/**
-	 *
-	 * @var RedBean_Adapter_DBAdapter
 	 * Holds a reference to the database adapter to be used.
+	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
 
 	
 	/**
-	 * @var string
 	 * default value to for blank field (passed to PK for auto-increment)
+	 * @var string
 	 */
 	protected $defaultValue = 'NULL';
 
 	/**
-	 * @var string
 	 * character to escape keyword table/column names
+	 * @var string
 	 */
 	protected $quoteCharacter = '';
 
@@ -97,9 +96,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
   	protected function getInsertSuffix ($table) {
     	return "";
   	}
-
-
-
 
 	/**
 	 * Checks table name or column name.

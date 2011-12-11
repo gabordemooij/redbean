@@ -60,9 +60,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
 
-	
-
-
 	/**
 	 * Constructor
 	 * The Query Writer Constructor also sets up the database
@@ -70,12 +67,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param RedBean_Adapter_DBAdapter $adapter adapter
 	 */
 	public function __construct( RedBean_Adapter $adapter ) {
-		
-	$this->typeno_sqltype = array(
+	
+		$this->typeno_sqltype = array(
 			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER=>'INTEGER',
 			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC=>'NUMERIC',
 			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT=>'TEXT',
-	);
+		);
 		
 		$this->sqltype_typeno = array();
 		foreach($this->typeno_sqltype as $k=>$v)
