@@ -38,35 +38,33 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	
 	
 	/**
-	 * @var integer
 	 * Special type date for storing date values: YYYY-MM-DD
+	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_DATE = 80;
 	
 	/**
-	 * @var integer
 	 * Specified field type cannot be overruled
+	 * @var integer
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
 	
 
 	/**
-	 *
-	 * @var RedBean_DBAdapter
 	 * Holds Database Adapter
+	 * @var RedBean_DBAdapter
 	 */
 	protected $adapter;
 
 	/**
-	 * @var string
 	 * character to escape keyword table/column names
+	 * @var string
 	 */
 	protected $quoteCharacter = '"';
 
 	/**
-	 * 
-	 * @var string
 	 * Default Value
+	 * @var string
 	 */
 	protected $defaultValue = 'DEFAULT';
 	
@@ -100,15 +98,13 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	public function __construct( RedBean_Adapter_DBAdapter $adapter ) {
 		
 		
-	$this->typeno_sqltype = array(
-			  self::C_DATATYPE_INTEGER=>' integer ',
-			  self::C_DATATYPE_DOUBLE=>' double precision ',
-			  self::C_DATATYPE_TEXT=>' text ',
-			  self::C_DATATYPE_SPECIAL_DATE => ' date '
-	);
+		$this->typeno_sqltype = array(
+				  self::C_DATATYPE_INTEGER=>' integer ',
+				  self::C_DATATYPE_DOUBLE=>' double precision ',
+				  self::C_DATATYPE_TEXT=>' text ',
+				  self::C_DATATYPE_SPECIAL_DATE => ' date '
+		);
 
-	
-		
 		$this->sqltype_typeno = array();
 		foreach($this->typeno_sqltype as $k=>$v)
 		$this->sqltype_typeno[trim(strtolower($v))]=$k;
@@ -125,7 +121,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	public function getTables() {
 		return $this->adapter->getCol( "select table_name from information_schema.tables
-where table_schema = 'public'" );
+		where table_schema = 'public'" );
 	}
 
 	/**
