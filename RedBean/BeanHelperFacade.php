@@ -13,7 +13,11 @@
 class RedBean_BeanHelperFacade implements RedBean_IBeanHelper {
 
 	/**
-	 * @return RedBean_ToolBox $toolbox
+	 * Returns a reference to the toolbox. This method returns a toolbox
+	 * for beans that need to use toolbox functions. Since beans can contain
+	 * lists they need a toolbox to lazy-load their relationships.
+	 *  
+	 * @return RedBean_ToolBox $toolbox toolbox containing all kinds of goodies
 	 */
 	public function getToolbox() {
 		return RedBean_Facade::$toolbox;

@@ -26,15 +26,38 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		
 		
 		//test recursion
+		R::nuke();
+		list($d1,$d2) = R::dispense('document',2);
 		$page = R::dispense('page');
-		$page->ownPage[] = $page;
-		R::store($page);
-		try{
-			$page2 = R::dup($page);
+		list($p1,$p2) = R::dispense('paragraph',2);
+		list($e1,$e2) = R::dispense('excerpt',2);
+		$id2 = R::store($d2);
+		$p1->name = 'a';
+		$p2->name = 'b';
+		$page->title = 'my page';
+		$page->ownParagraph = array($p1,$p2);
+		$p1->ownExcerpt[] = $e1;
+		$p2->ownExcerpt[] = $e2;
+		$e1->ownDocument[] = $d2;
+		$e2->ownDocument[] = $d1;
+		$d1->ownPage[] = $page;
+		$id1 = R::store($d1);
+		$d1 = R::load('document',$id1);
+		$d = R::dup($d1);
+		$ids = array();
+		asrt(($d instanceof RedBean_OODBBean),true);
+		asrt(count($d->ownPage),1);
+		foreach(end($d->ownPage)->ownParagraph as $p) {
+			foreach($p->ownExcerpt as $e) {
+				$ids[] = end($e->ownDocument)->id;
+			}
 		}
-		catch(Exception $e) {
-			pass();
-		}
+		sort($ids);
+		asrt((int)$ids[0],0);
+		asrt((int)$ids[1],$id1);
+		R::store($d);
+		pass();
+		
 		
 		$phillies = R::dispense('diner');
 		list($lonelyman,$man,$woman) = R::dispense('guest',3);
