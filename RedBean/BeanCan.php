@@ -31,7 +31,7 @@ class RedBean_BeanCan {
 	}
 
 	/**
-	 * Writes a response object for the client (JSON encoded).
+	 * Writes a response object for the client (JSON encoded). Internal method.
 	 *
 	 * @param mixed   $result       result
 	 * @param integer $id           request ID
@@ -123,11 +123,13 @@ class RedBean_BeanCan {
 	}
 	
 	/**
-	 * Support for RESTFul GET-requests
+	 * Support for RESTFul GET-requests.
+	 * Only supports very BASIC REST requests, for more functionality please use
+	 * the JSON-RPC 2 interface.
 	 * 
 	 * @param string $pathToResource RESTFul path to resource
 	 * 
-	 * @return array $resultArray
+	 * @return string $json a JSON encoded response ready for sending to client
 	 */
 	public function handleRESTGetRequest( $pathToResource ) {
 		if (!is_string($pathToResource)) return $this->resp(null,0,-32099,'IR');

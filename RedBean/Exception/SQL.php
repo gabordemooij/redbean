@@ -35,6 +35,8 @@ class RedBean_Exception_SQL extends Exception {
 	 * Stores ANSI-92 compliant SQL state.
 	 *
 	 * @param string $sqlState code
+	 * 
+	 * @return void
 	 */
 	public function setSQLState( $sqlState ) {
 		$this->sqlState = $sqlState;

@@ -21,39 +21,39 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * Contains database DSN for connecting to database.
 	 * @var string
 	 */
-	private $dsn;
+	protected $dsn;
 	
 	/**
 	 * Whether we are in debugging mode or not.
 	 * @var boolean
 	 */
-	private $debug = false;
+	protected $debug = false;
 
 	/**
 	 * Holds the PDO instance.
 	 * @var PDO
 	 */
-	private $pdo;
+	protected $pdo;
 
 	/**
 	 * Holds integer number of affected rows from latest query
 	 * if driver supports this feature.
 	 * @var integer
 	 */
-	private $affected_rows;
+	protected $affected_rows;
 
 	/**
 	 * Holds result resource.
 	 * @var integer
 	 */
-	private $rs;
+	protected $rs;
 
 
 	/**
 	 * Contains arbitrary connection data.
 	 * @var array
 	 */
-	private $connectInfo = array();
+	protected $connectInfo = array();
 
 
 	/**
@@ -71,7 +71,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * init RedbeanPHP.
 	 * @var boolean
 	 */
-	private $isConnected = false;
+	protected $isConnected = false;
 
 	/**
 	 * Constructor. You may either specify dsn, user and password or
@@ -167,6 +167,19 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}
 	}
 
+	/**
+	 * Runs a query. Internal function, available for subclasses. This method
+	 * runs the actual SQL query and binds a list of parameters to the query.
+	 * slots. The result of the query will be stored in the protected property
+	 * $rs (always array). The number of rows affected (result of rowcount, if supported by database)
+	 * is stored in protected property $affected_rows. If the debug flag is set
+	 * this function will send debugging output to screen buffer.
+	 * 
+	 * @throws RedBean_Exception_SQL 
+	 * 
+	 * @param string $sql     the SQL string to be send to database server
+	 * @param array  $aValues the values that need to get bound to the query slots
+	 */
 	protected function runQuery($sql,$aValues) {
 		$this->connect();
 		if ($this->debug) {
