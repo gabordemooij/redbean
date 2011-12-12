@@ -130,6 +130,43 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		R::store($b2);
 		$b2 = R::load('book',$book2->id);
 		asrt(count($b2->ownPage),1);
+		//another less elegant way to remove
+		$page1->book = null;
+		R::store($page1);
+		$cols = R::getColumns('page');
+		asrt(isset($cols['book']),false);
+		$b2 = R::load('book',$book2->id);
+		asrt(count($b2->ownPage),0);
+		//re-add the page
+		$b2->ownPage[] = $page1;
+		R::store($b2);
+		$b2 = R::load('book',$book2->id);
+		asrt(count($b2->ownPage),1);
+		//another less elegant... just plain ugly... way to remove
+		$page1->book = false;
+		R::store($page1);
+		$cols = R::getColumns('page');
+		asrt(isset($cols['book']),false);
+		$b2 = R::load('book',$book2->id);
+		asrt(count($b2->ownPage),0);
+		//re-add the page
+		$b2->ownPage[] = $page1;
+		R::store($b2);
+		$b2 = R::load('book',$book2->id);
+		asrt(count($b2->ownPage),1);
+	
+		//not allowed to re-use the field for something else
+		try { $page1->book = 1; fail(); } catch(RedBean_Exception_Security $e) { pass(); }
+		try { $page1->book = -2.1; fail(); } catch(RedBean_Exception_Security $e) { pass(); }
+		try { $page1->book = array(); fail(); } catch(RedBean_Exception_Security $e) { pass(); }
+		try { $page1->book = true; fail(); } catch(RedBean_Exception_Security $e) { pass(); }
+		try { $page1->book = 'null'; fail(); } catch(RedBean_Exception_Security $e) { pass(); }
+		try { $page1->book = new stdClass; } catch(RedBean_Exception_Security $e) { pass(); }
+		try { $page1->book = 'just a string'; } catch(RedBean_Exception_Security $e) { pass(); }
+		try { $page1->book = array('a'=>1); fail(); } catch(RedBean_Exception_Security $e) { pass(); }
+		try { $page1->book = 0; fail(); } catch(RedBean_Exception_Security $e) { pass(); }
+		
+		
 		//test fk, not allowed to set to 0
 		$page1 = reset($b2->ownPage);
 		$page1->book_id = 0;

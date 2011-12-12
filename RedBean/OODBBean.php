@@ -284,6 +284,15 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	public function __set($property,$value) {
 		$this->__get($property);
 		$this->setMeta("tainted",true);
+		$linkField = $property.'_id';
+		if (isset($this->properties[$linkField]) && !($value instanceof RedBean_OODBBean)) {
+			if (is_null($value) || $value === false) {
+				return $this->__unset($property);
+			}
+			else {
+				throw new RedBean_Exception_Security('Cannot cast to bean.');
+			}
+		}
 		if ($value===false) {
 			$value = '0';
 		}
