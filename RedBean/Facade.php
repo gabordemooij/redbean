@@ -113,7 +113,6 @@ class RedBean_Facade {
 	 * Adds a database to the facade, afterwards you can select the database using
 	 * selectDatabase($key).
 	 *
-	 * @static
 	 * @param string      $key    ID for the database
 	 * @param string      $dsn    DSN for the database
 	 * @param string      $user   User for connection
@@ -130,7 +129,6 @@ class RedBean_Facade {
 	/**
 	 * Selects a different database for the Facade to work with.
 	 *
-	 * @static
 	 * @param  string $key Key of the database to select
 	 * @return int 1
 	 */
@@ -323,7 +321,6 @@ class RedBean_Facade {
 	 * Checks whether a pair of beans is related N-M. This function does not
 	 * check whether the beans are related in N:1 way.
 	 *
-	 * @static
 	 * @param RedBean_OODBBean $bean1 first bean
 	 * @param RedBean_OODBBean $bean2 second bean
 	 *
@@ -588,17 +585,29 @@ class RedBean_Facade {
 
 	/**
 	 * Makes a copy of a bean. This method makes a deep copy
-	 * of the bean.
+	 * of the bean.The copy will have the following features.
+	 * - All beans in own-lists will be duplicated as well
+	 * - All references to shared beans will be copied but not the shared beans themselves
+	 * - All references to parent objects (_id fields) will be copied but not the parents themselves
+	 * In most cases this is the desired scenario for copying beans.
+	 * This function uses a trail-array to prevent infinite recursion, if a recursive bean is found
+	 * (i.e. one that already has been processed) the ID of the bean will be returned. 
+	 * This should not happen though.
+	 * 
+	 * Note:
+	 * This function does a reflectional database query so it may be slow. 
 	 *
-	 * @param RedBean_OODBBean $bean bean
+	 * @param RedBean_OODBBean $bean  bean to be copied
+	 * @param array            $trail for internal usage, pass array()
+	 * @param boolean          $pid   for internal usage
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
 	public static function dup($bean,$trail=array(),$pid=false) {
 		$type = $bean->getMeta('type');
 		$key = $type.$bean->getID();
-		if (isset($trail[$key])) return $bean->id;
-		$trail[$key]=true;
+		if (isset($trail[$key])) return $bean;
+		$trail[$key]=$bean;
 		$copy = RedBean_Facade::dispense($type);
 		$copy->import( $bean->export() );
 		$copy->id = 0;
@@ -678,6 +687,7 @@ class RedBean_Facade {
 
 
 	/**
+	 * Part of RedBeanPHP Tagging API.
 	 * Tests whether a bean has been associated with one ore more
 	 * of the listed tags. If the third parameter is TRUE this method
 	 * will return TRUE only if all tags that have been specified are indeed
@@ -686,12 +696,11 @@ class RedBean_Facade {
 	 * method will return TRUE if one of the tags matches, FALSE if none
 	 * match.
 	 *
-	 * @static
 	 * @param  RedBean_OODBBean $bean bean to check for tags
 	 * @param  array            $tags list of tags
 	 * @param  boolean          $all  whether they must all match or just some
 	 *
-	 * @return boolean $didMatch Whether the bean has been assoc. with the tags
+	 * @return boolean $didMatch whether the bean has been assoc. with the tags
 	 */
 	public static function hasTag($bean, $tags, $all=false) {
 		$foundtags = RedBean_Facade::tag($bean);
@@ -704,10 +713,10 @@ class RedBean_Facade {
 	}
 
 	/**
+	 * Part of RedBeanPHP Tagging API.
 	 * Removes all sepcified tags from the bean. The tags specified in
 	 * the second parameter will no longer be associated with the bean.
 	 *
-	 * @static
 	 * @param  RedBean_OODBBean $bean    tagged bean
 	 * @param  array            $tagList list of tags (names)
 	 *
@@ -724,6 +733,7 @@ class RedBean_Facade {
 	}
 
 	/**
+	 * Part of RedBeanPHP Tagging API.
 	 * Tags a bean or returns tags associated with a bean.
 	 * If $tagList is null or omitted this method will return a
 	 * comma separated list of tags associated with the bean provided.
@@ -750,13 +760,14 @@ class RedBean_Facade {
 	}
 
 	/**
+	 * Part of RedBeanPHP Tagging API.
 	 * Adds tags to a bean.
-	 * If $tagList is a comma separated list (string) of tags all tags will
+	 * If $tagList is a comma separated list of tags all tags will
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
 	 *
-	 * @param RedBean_OODBBean $bean    bean
-	 * @param mixed				$tagList tags
+	 * @param RedBean_OODBBean  $bean    bean
+	 * @param array				$tagList list of tags to add to bean
 	 *
 	 * @return void
 	 */
@@ -775,11 +786,11 @@ class RedBean_Facade {
 	}
 
 	/**
-	 * @static
+	 * Part of RedBeanPHP Tagging API.
 	 * Returns all beans that have been tagged with one of the tags given.
 	 *
-	 * @param  $beanType
-	 * @param  $tagList
+	 * @param  $beanType type of bean you are looking for
+	 * @param  $tagList  list of tags to match
 	 *
 	 * @return array
 	 */
@@ -822,7 +833,6 @@ class RedBean_Facade {
 	 * Adapter and you want it on-the-fly? Use this method to hot-swap your facade with a new
 	 * toolbox.
 	 *
-	 * @static
 	 * @param RedBean_ToolBox $tb toolbox
 	 *
 	 * @return RedBean_ToolBox $tb old, rusty, previously used toolbox
@@ -853,7 +863,6 @@ class RedBean_Facade {
 	/**
 	 * facade method for Cooker Graph.
 	 * 
-	 * @static
 	 * @param array $array array containing POST/GET fields or other data
 	 * 
 	 * @return array $arrayOfBeans Beans
@@ -870,7 +879,6 @@ class RedBean_Facade {
 	 * Facade Convience method for adapter transaction system.
 	 * Begins a transaction.
 	 *
-	 * @static
 	 * @return void
 	 */
 	public static function begin() {
@@ -881,7 +889,6 @@ class RedBean_Facade {
 	 * Facade Convience method for adapter transaction system.
 	 * Commits a transaction.
 	 *
-	 * @static
 	 * @return void
 	 */
 	public static function commit() {
@@ -892,7 +899,6 @@ class RedBean_Facade {
 	 * Facade Convience method for adapter transaction system.
 	 * Rolls back a transaction.
 	 *
-	 * @static
 	 * @return void
 	 */
 	public static function rollback() {
@@ -905,7 +911,6 @@ class RedBean_Facade {
 	 * Note that this method only works in fluid mode because it might be
 	 * quite heavy on production servers!
 	 *
-	 * @static
 	 * @param  string $table   name of the table (not type) you want to get columns of
 	 *
 	 * @return array  $columns list of columns and their types
