@@ -332,6 +332,12 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt(end($order->ownCustomer)->name,'Bill');
 		asrt($order->sharedCoupon[$couponID]->name,'567');
 		
+		
+		//make sure zeros are preserved
+		$form = array('type'=>'laptop','price'=>0);
+		$product = R::graph($form);
+		asrt(isset($product->price),true);
+		asrt($product->price,0);
 				
 	}
 	
