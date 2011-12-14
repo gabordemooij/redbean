@@ -456,6 +456,24 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return count($this->properties);
 	}
 
+	/**
+	 * Checks wether a bean is empty or not.
+	 * A bean is empty if it has no other properties than the id field OR
+	 * if all the other property are empty().
+	 * 
+	 * @return boolean 
+	 */
+	public function isEmpty() {
+		$empty = true;
+		foreach($this->properties as $key=>$value) {
+			if ($key=='id') continue;
+			if (!empty($value)) { 
+				$empty = false;
+		
+			}	
+		}
+		return $empty;
+	}
 }
 
 

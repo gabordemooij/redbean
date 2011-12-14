@@ -868,14 +868,15 @@ class RedBean_Facade {
 	/**
 	 * facade method for Cooker Graph.
 	 * 
-	 * @param array $array array containing POST/GET fields or other data
+	 * @param array   $array            array containing POST/GET fields or other data
+	 * @param boolean $filterEmptyBeans whether you want to exclude empty beans
 	 * 
 	 * @return array $arrayOfBeans Beans
 	 */
-	public static function graph($array) {
+	public static function graph($array,$filterEmpty=false) {
 		$cooker = new RedBean_Cooker();
 		$cooker->setToolbox(self::$toolbox);
-		return $cooker->graph($array);
+		return $cooker->graph($array,$filterEmpty);
 	}
 
 	
