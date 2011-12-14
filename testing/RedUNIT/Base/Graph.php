@@ -301,6 +301,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		}
 	
 		
+		//save a form using graph and ignore empty beans
 		R::nuke();
 		$product = R::dispense('product');
 		$product->name = 'shampoo';
@@ -315,14 +316,15 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 				array('id'=>$productID,'type'=>'product'),
 			),
 			'ownCustomer'=>array(
-				array('type'=>'customer','name'=>'Bill')
+				array('type'=>'customer','name'=>'Bill'),
+				array('type'=>'customer','name'=>'') //this one should be ignored
 			),
 			'sharedCoupon'=>array(
 				array('type'=>'coupon','name'=>'123'),
 				array('type'=>'coupon','id'=>$couponID)
 			)
 		);
-		$order = R::graph($form);
+		$order = R::graph($form, true);
 		asrt($order->getMeta('type'),'order');
 		asrt(count($order->ownProduct),1);
 		asrt(count($order->ownCustomer),1);
@@ -331,6 +333,36 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt(end($order->ownProduct)->name,'shampoo');
 		asrt(end($order->ownCustomer)->name,'Bill');
 		asrt($order->sharedCoupon[$couponID]->name,'567');
+		
+		//without ignore empty beans
+		R::nuke();
+		$product = R::dispense('product');
+		$product->name = 'shampoo';
+		$productID = R::store($product);
+		$coupon = R::dispense('coupon');
+		$coupon->name = '567';
+		$couponID = R::store($coupon);
+		
+		$form = array(
+			'type'=>'order',
+			'ownProduct'=>array(
+				array('id'=>$productID,'type'=>'product'),
+			),
+			'ownCustomer'=>array(
+				array('type'=>'customer','name'=>'Bill'),
+				array('type'=>'customer','name'=>'') //this one should be ignored
+			),
+			'sharedCoupon'=>array(
+				array('type'=>'coupon','name'=>'123'),
+				array('type'=>'coupon','id'=>$couponID)
+			)
+		);
+		$order = R::graph($form, true);
+		asrt($order->getMeta('type'),'order');
+		asrt(count($order->ownProduct),1);
+		asrt(count($order->ownCustomer),2);
+		asrt(count($order->sharedCoupon),2);
+		asrt(end($order->ownProduct)->id,$productID);
 		
 		
 		//make sure zeros are preserved

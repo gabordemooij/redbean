@@ -59,11 +59,12 @@ class RedBean_Cooker {
 	 * named conform the bean-relation conventions, i.e. ownPage/sharedPage
 	 * each entry in the nested array represents another bean.
 	 *  
-	 * @param	array $array array to be turned into a bean collection
+	 * @param	array   $array       array to be turned into a bean collection
+	 * @param   boolean $filterEmpty whether you want to exclude empty beans
 	 *
 	 * @return	array $beans beans
 	 */
-	public function graph( $array ) {
+	public function graph( $array, $filterEmpty = false ) {
 		$beans = array();
 		if (is_array($array) && isset($array['type'])) {
 			$type = $array['type'];
@@ -78,7 +79,7 @@ class RedBean_Cooker {
 			}
 			foreach($array as $property=>$value) {
 				if (is_array($value)) {
-					$bean->$property = $this->graph($value);
+					$bean->$property = $this->graph($value,$filterEmpty);
 				}
 				else {
 					$bean->$property = $value;
@@ -88,7 +89,15 @@ class RedBean_Cooker {
 		}
 		elseif (is_array($array)) {
 			foreach($array as $key=>$value) {
-				$beans[$key] = $this->graph($value);
+				$listBean = $this->graph($value,$filterEmpty);
+				if ($listBean->isEmpty()) {  
+					if (!$filterEmpty) { 
+						$beans[$key] = $listBean;
+					}
+				}
+				else { 
+					$beans[$key] = $listBean;
+				}
 			}
 			return $beans;
 		}
