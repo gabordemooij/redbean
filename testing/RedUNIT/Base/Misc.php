@@ -46,8 +46,14 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		
 		$cooker = new RedBean_Cooker();
 		$cooker->setToolbox($toolbox);
-		asrt($cooker->graph('abc'),'abc');
-		
+		try {
+			asrt($cooker->graph('abc'),'abc');
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+			
 		foreach($writer->typeno_sqltype as $code=>$text) {
 			asrt(is_integer($code),true);
 			asrt(is_string($text),true);
