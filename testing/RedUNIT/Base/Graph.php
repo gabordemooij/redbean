@@ -28,6 +28,39 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
+		
+		try{
+			R::graph(array(array(array('a'=>'b'))));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e){
+			pass();
+		}
+		
+		try{
+			R::graph('ABC');
+			fail();
+		}
+		catch(RedBean_Exception_Security $e){
+			pass();
+		}
+		
+		try{
+			R::graph(123);
+			fail();
+		}
+		catch(RedBean_Exception_Security $e){
+			pass();
+		}
+		
+		try{
+			R::graph(array(new stdClass));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e){
+			pass();
+		}
+		
 		list($v1,$v2,$v3) = R::dispense('village',3);
 		list($b1,$b2,$b3,$b4,$b5,$b6) = R::dispense('building',6);
 		list($f1,$f2,$f3,$f4,$f5,$f6) = R::dispense('farmer',6);
@@ -334,6 +367,32 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt(end($order->ownCustomer)->name,'Bill');
 		asrt($order->sharedCoupon[$couponID]->name,'567');
 		
+		
+		//save a form using graph and ignore empty beans, wrong nesting
+		R::nuke();
+		$product = R::dispense('product');
+		$product->name = 'shampoo';
+		$productID = R::store($product);
+		$coupon = R::dispense('coupon');
+		$coupon->name = '567';
+		$couponID = R::store($coupon);
+		
+		$form = array(
+			'type'=>'order',
+			'ownProduct'=>array(
+				array(
+					array('id'=>$productID,'type'=>'product')
+				),
+			),
+		);
+		try{
+			$order = R::graph($form, true);
+			fail();
+		}
+		catch(RedBean_Exception_Security $e){
+			pass();
+		}
+		
 		//without ignore empty beans
 		R::nuke();
 		$product = R::dispense('product');
@@ -357,7 +416,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 				array('type'=>'coupon','id'=>$couponID)
 			)
 		);
-		$order = R::graph($form, true);
+		$order = R::graph($form);
 		asrt($order->getMeta('type'),'order');
 		asrt(count($order->ownProduct),1);
 		asrt(count($order->ownCustomer),2);

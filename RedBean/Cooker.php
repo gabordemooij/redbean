@@ -90,6 +90,9 @@ class RedBean_Cooker {
 		elseif (is_array($array)) {
 			foreach($array as $key=>$value) {
 				$listBean = $this->graph($value,$filterEmpty);
+				if (!($listBean instanceof RedBean_OODBBean)) {
+					throw new RedBean_Exception_Security('Expected bean but got :'.gettype($listBean)); 
+				}
 				if ($listBean->isEmpty()) {  
 					if (!$filterEmpty) { 
 						$beans[$key] = $listBean;
@@ -102,7 +105,7 @@ class RedBean_Cooker {
 			return $beans;
 		}
 		else {
-			return $array;
+			throw new RedBean_Exception_Security('Expected array but got :'.gettype($array)); 
 		}
 	}
 }
