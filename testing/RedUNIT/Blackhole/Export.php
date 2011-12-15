@@ -20,6 +20,8 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole {
 	 * @return void
 	 */
 	public function run() {
+		
+		
 		$redbean = R::$redbean;
 		$bean = new RedBean_OODBBean;
 		$bean->import(array("a"=>1,"b"=>2));
@@ -40,6 +42,29 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole {
 		$exportedBean = $exportBean->export(true);
 		asrt($exportedBean["__info"]["metaitem.bla"],1);
 		asrt($exportedBean["__info"]["type"],"abean");
+		
+		//can we determine whether a bean is empty?
+		testpack('test $bean->isEmpty() function');
+		$bean = R::dispense('bean');
+		asrt($bean->isEmpty(),true);
+		asrt((count($bean)>0),true);
+		$bean->property = 1;
+		asrt($bean->isEmpty(),false);
+		asrt((count($bean)>0),true);
+		$bean->property = 0;
+		asrt($bean->isEmpty(),true);
+		asrt((count($bean)>0),true);
+		$bean->property = false;
+		asrt($bean->isEmpty(),true);
+		asrt((count($bean)>0),true);
+		$bean->property = null;
+		asrt($bean->isEmpty(),true);
+		asrt((count($bean)>0),true);
+		unset($bean->property);
+		asrt($bean->isEmpty(),true);
+		asrt((count($bean)>0),true);
+		
+		
 	}
 
 }

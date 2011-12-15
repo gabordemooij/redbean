@@ -105,6 +105,8 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		$bean->hello = 'hi';
 		$bean->world = 'planet';
 		asrt($bean['hello'],'hi');
+		asrt(isset($bean['hello']),true);
+		asrt(isset($bean['bye']),false);
 		$bean['world'] = 'sphere';
 		asrt($bean->world,'sphere');
 		foreach($bean as $key=>$el) { 
