@@ -91,6 +91,34 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		asrt(R::count('page'),3);
 		asrt(R::count('spaceship'),0);
 		
+		
+		//same, but now with intermediate save, counts must be same
+		R::freeze(true);
+		$document = R::dispense('document');
+		$page = R::dispense('page');
+		$document->title = 'test';
+		$page->content = 'lorem ipsum';
+		$user = R::dispense('user');
+		$user->name = 'Leo';
+		$document->sharedUser[] = $user;
+		$document->ownPage[] = $page;
+		$document->starship_id = 3;
+		$document->planet = R::dispense('planet');
+		R::store($document);
+		$duplicate = R::dup($document);
+		R::store($document);
+		R::store($duplicate);
+		R::store($document);
+		$duplicate = R::dup($document);
+		R::store($document);
+		R::store($duplicate);
+		asrt(R::count('planet'),2);
+		asrt(R::count('user'),2);
+		asrt(R::count('document'),6);
+		asrt(R::count('page'),6);
+		asrt(R::count('spaceship'),0);
+		R::freeze(false);
+		
 		//test recursion
 		R::nuke();
 		list($d1,$d2) = R::dispense('document',2);
