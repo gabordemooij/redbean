@@ -64,6 +64,15 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole {
 		asrt($bean->isEmpty(),true);
 		asrt((count($bean)>0),true);
 		
+		//export bug I found
+		$object = R::graph(json_decode('{"type":"bandmember","name":"Duke","ownInstrument":[{"type":"instrument","name":"Piano"}]}',true));
+		$a = R::exportAll($object);
+		pass();
+		asrt(isset($a[0]),true);
+		asrt((int)$a[0]['id'],0);
+		asrt($a[0]['name'],'Duke');
+		asrt($a[0]['ownInstrument'][0]['name'],'Piano');
+
 		
 	}
 
