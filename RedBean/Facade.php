@@ -609,7 +609,7 @@ class RedBean_Facade {
 		if (isset($trail[$key])) return $bean;
 		$trail[$key]=$bean;
 		$copy = RedBean_Facade::dispense($type);
-		$copy->import( $bean->export() );
+		$copy->import( $bean->getProperties() );
 		$copy->id = 0;
 		$tables = self::$writer->getTables();
 		foreach($tables as $table) {

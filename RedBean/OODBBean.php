@@ -123,6 +123,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	}
 
 	/**
+	 * Very superficial export function
+	 * @return array $properties 
+	 */
+	public function getProperties() {
+		return $this->properties;
+	}
+	
+	/**
 	 * Exports the bean as an array.
 	 * This function exports the contents of a bean to an array and returns
 	 * the resulting array. If $meta eq uals boolean TRUE, then the array will
@@ -135,7 +143,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		//$arr = $this->properties;
 		$arr=array();
 		foreach($this as $k=>$v) {
-			//if (is_array($v) || is_object($v)) unset($arr[$k]);
 			if (is_array($v)) foreach($v as $i=>$b) $v[$i]=$b->export(); 
 			$arr[$k] = $v;
 		}
