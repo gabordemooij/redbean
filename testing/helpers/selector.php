@@ -61,6 +61,7 @@ $allPacks = array(
 		'Base/Observers',
 		'Base/Database',
 		'Base/Copy',
+		'Base/Dup',
 		'Base/Update',
 		'Base/Batch',
 		'Base/Beancan',
