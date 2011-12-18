@@ -617,19 +617,19 @@ class RedBean_Facade {
 			$owned = 'own'.ucfirst($table);
 			$shared = 'shared'.ucfirst($table);
 			if ($beans = $bean->$owned) {
+				$copy->$owned = array();
 				foreach($beans as $subBean) {
 					array_push($copy->$owned,self::dup($subBean,$trail,$pid));	
 				}
 				
 			}
-			$bean->removeProperty($owned);
 			if ($beans = $bean->$shared) {
+				$copy->$shared = array();
 				foreach($beans as $subBean) {
 					array_push($copy->$shared,$subBean);
 				}
 			}
-			$bean->removeProperty($shared);
-		
+			
 		}
 		
 		if ($pid) $copy->id = $bean->id;
