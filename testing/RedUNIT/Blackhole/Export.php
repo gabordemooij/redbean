@@ -72,7 +72,52 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole {
 		asrt((int)$a[0]['id'],0);
 		asrt($a[0]['name'],'Duke');
 		asrt($a[0]['ownInstrument'][0]['name'],'Piano');
-
+		
+		R::nuke();
+		$v = R::dispense('village');
+		$b = R::dispense('building');
+		$v->name = 'a';
+		$b->name = 'b';
+		$v->ownBuilding[] = $b;
+		$id = R::store($v);
+		$a = R::exportAll($v);
+		asrt($a[0]['name'],'a');
+		asrt($a[0]['ownBuilding'][0]['name'],'b');
+		$v = R::load('village',$id);
+		$b2 = R::dispense('building');
+		$b2->name = 'c';
+		$v->ownBuilding[] = $b2;
+		$a = R::exportAll($v);
+		asrt($a[0]['name'],'a');
+		asrt($a[0]['ownBuilding'][0]['name'],'b');
+	    asrt(count($a[0]['ownBuilding']),2);
+		list($r1,$r2) = R::dispense('army',2);
+		$r1->name = '1';
+		$r2->name = '2';
+		$v->sharedArmy[] = $r2;
+		$a = R::exportAll($v);
+		asrt(count($a[0]['sharedArmy']),1);
+		R::store($v);
+		$v = R::load('village',$id);
+		$a = R::exportAll($v);
+		asrt(count($a[0]['sharedArmy']),1);
+		asrt($a[0]['name'],'a');
+		asrt($a[0]['ownBuilding'][0]['name'],'b');
+	    asrt(count($a[0]['ownBuilding']),2);
+		$v->sharedArmy[] = $r1;
+		$a = R::exportAll($v);
+		asrt(count($a[0]['sharedArmy']),2);
+		$v = R::load('village',$id);
+		$a = R::exportAll($v);
+		asrt(count($a[0]['sharedArmy']),1);
+		$v->sharedArmy[] = $r1;
+		R::store($v);
+		$v = R::load('village',$id);
+		$a = R::exportAll($v);
+		asrt(count($a[0]['sharedArmy']),2);
+		
+	
+		
 		
 	}
 
