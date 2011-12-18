@@ -23,7 +23,13 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
+		R::nuke();
 		$this->runOnce();
+		R::freeze(true);
+		$this->runOnce(false);
+		R::freeze(false);
+		
+		
 	}
 
 	/**
@@ -58,9 +64,9 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 	/**
 	 * Run tests
 	 */
-	public function runOnce() {
+	public function runOnce($n=true) {
 	
-		R::nuke();
+		
 		$books = R::dispense('book',10);
 		$pages = R::dispense('page',10);
 		$readers = R::dispense('reader',10);
@@ -129,18 +135,23 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 			$this->compare($modifiedCopy,$exportMod[0]);
 			asrt(count($modifiedCopy->ownPage),count($copiedBook->ownPage)+1);
 			R::store($modifiedCopy);
+			
+			if ($n) {
 			asrt((int)R::getCell('SELECT count(*) FROM book'),$i*4);
 			asrt((int)R::getCell('SELECT count(*) FROM page'),($noOfPages*4)+$i);
 			asrt((int)R::getCell('SELECT count(*) FROM text'),$noOfTexts*4);
 			asrt((int)R::getCell('SELECT count(*) FROM book_reader'),$noOfReaders*4);
 			asrt((int)R::getCell('SELECT count(*) FROM reader'),$noOfReaders);
-			
+			}
 			
 		}
+		
+		if ($n) {
 		asrt($noOfTexts,10);
 		asrt($noOfReaders,10);
 		asrt($noOfPages,10);
 		asrt($i,10);
+		}
 	}
 	
 	
