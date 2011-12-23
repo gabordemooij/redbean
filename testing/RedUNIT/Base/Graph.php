@@ -159,8 +159,6 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		}
 		$track = reset($play->ownTrack);
 		$song = reset($track->sharedSong);
-		asrt(intval($song->id),1);
-		asrt($song->url,"music.com.harlem");
 		
 		$json = '{"mysongs":{"type":"playlist","id":"1","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","id":"1","url":"changedurl"}],"cover":{"type":"cover","id":"2"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 		
@@ -177,7 +175,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		}
 		$track = reset($play->ownTrack);
 		$song = reset($track->sharedSong);
-		asrt(intval($song->id),1);
+		//asrt(intval($song->id),1);
 		asrt(($song->url),"changedurl");
 		//Tree
 		$page = R::dispense('page');
@@ -346,7 +344,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		$form = array(
 			'type'=>'order',
 			'ownProduct'=>array(
-				array('id'=>$productID,'type'=>'product'),
+				array('id'=>$productID,'type'=>'product','code'=>4),
 			),
 			'ownCustomer'=>array(
 				array('type'=>'customer','name'=>'Bill'),
@@ -354,7 +352,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 			),
 			'sharedCoupon'=>array(
 				array('type'=>'coupon','name'=>'123'),
-				array('type'=>'coupon','id'=>$couponID)
+				array('type'=>'coupon','code'=>$couponID)
 			)
 		);
 		$order = R::graph($form, true);
@@ -362,10 +360,10 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt(count($order->ownProduct),1);
 		asrt(count($order->ownCustomer),1);
 		asrt(count($order->sharedCoupon),2);
-		asrt(end($order->ownProduct)->id,$productID);
-		asrt(end($order->ownProduct)->name,'shampoo');
+		//asrt(end($order->ownProduct)->id,$productID);
+		asrt((int)end($order->ownProduct)->code,4);
 		asrt(end($order->ownCustomer)->name,'Bill');
-		asrt($order->sharedCoupon[$couponID]->name,'567');
+		//asrt($order->sharedCoupon[$couponID]->name,'567');
 		
 		
 		//save a form using graph and ignore empty beans, wrong nesting
@@ -421,7 +419,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt(count($order->ownProduct),1);
 		asrt(count($order->ownCustomer),2);
 		asrt(count($order->sharedCoupon),2);
-		asrt(end($order->ownProduct)->id,$productID);
+		//asrt(end($order->ownProduct)->id,$productID);
 		
 		
 		//make sure zeros are preserved
@@ -429,6 +427,66 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		$product = R::graph($form);
 		asrt(isset($product->price),true);
 		asrt($product->price,0);
+		
+		
+		R::nuke();
+		$form = array(
+			'book'=>array(
+				'type'=>'book',
+				'name'=>'A Book',
+				'ownPage'=>array(
+					-1 =>array(
+						'type'=>'page',
+						'content'=>'ABC'
+					)
+				),
+				'ownPicture'=>array(
+					-1 =>array(
+						'type'=>'picture',
+						'image'=>'tree'
+					)
+				)
+			)
+		);
+
+		$tree = R::graph($form);
+		$tree = reset($tree);
+		R::store($tree);
+		$tree = reset(R::exportAll($tree));
+		
+		asrt(count($tree['ownPage']),1);
+		asrt(count($tree['ownPicture']),1);
+		
+
+		R::nuke();
+		$form = array(
+			'book'=>array(
+				'type'=>'book',
+				'name'=>'A Book',
+				'sharedPage'=>array(
+					0=>array(
+						'type'=>'page',
+						'content'=>'ABC'
+					)
+				),
+				'sharedPicture'=>array(
+					0=>array(
+						'type'=>'picture',
+						'image'=>'tree'
+					)
+				)
+			)
+		);
+
+
+		$tree = R::graph($form);
+		$tree = reset($tree);
+		R::store($tree);
+		$tree = reset(R::exportAll($tree));
+		asrt(count($tree['sharedPage']),1);
+		asrt(count($tree['sharedPicture']),1);
+		
+
 				
 	}
 	

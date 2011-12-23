@@ -19,6 +19,8 @@
  */
 class RedBean_OODB extends RedBean_Observable {
 
+	private $dep = array();
+	
 	/**
 	 * Secret stash. Used for batch loading.
 	 * @var array
@@ -421,8 +423,13 @@ class RedBean_OODB extends RedBean_Observable {
 			$myFieldLink = $bean->getMeta('type').'_id';
 			//Handle related beans
 			foreach($ownTrashcan as $trash) {
-				$trash->$myFieldLink = null;
-				$this->store($trash);
+				if (isset($this->dep[$trash->getMeta('type')]) && in_array($bean->getMeta('type'),$this->dep[$trash->getMeta('type')])) {
+					$this->trash($trash);
+				}
+				else {
+					$trash->$myFieldLink = null;
+					$this->store($trash);
+				}
 			}
 			foreach($ownAdditions as $addition) {
 				if ($addition instanceof RedBean_OODBBean) {
@@ -682,6 +689,10 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	public function setAssociationManager(RedBean_AssociationManager $assoc) {
 		$this->assocManager = $assoc;
+	}
+	
+	public function setDepList($list) {
+		$this->dep = $list;
 	}
 
 }
