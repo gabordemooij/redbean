@@ -91,6 +91,10 @@ class RedBean_Facade {
 		return "3.0";
 	}
 
+	public static function dependencies($dep) {
+		self::$redbean->setDepList($dep);
+	}
+	
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
 	 * RedBean. The Setup() method can be called without any arguments, in this case it will

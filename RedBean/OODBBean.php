@@ -113,7 +113,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		//trim whitespaces
 		if (!$notrim && is_array($selection)) foreach($selection as $k=>$s){ $selection[$k]=trim($s); }
 		foreach($arr as $k=>$v) {
-			if ($k!='__info') {
+			if ($k!='__info' && $k!='id') {
 				if (!$selection || ($selection && in_array($k,$selection))) {
 					$this->$k = $v;
 				}
