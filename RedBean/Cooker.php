@@ -70,8 +70,13 @@ class RedBean_Cooker {
 			$type = $array['type'];
 			unset($array['type']);
 			//Do we need to load the bean?
-			if (isset($array['id'])) unset($array['id']); 
-			$bean = $this->redbean->dispense($type);
+			if (isset($array['id'])) {
+				$id = (int) $array['id'];
+				$bean = $this->redbean->load($type,$id);
+			}
+			else {
+				$bean = $this->redbean->dispense($type);
+			}
 			foreach($array as $property=>$value) {
 				if (is_array($value)) {
 					$bean->$property = $this->graph($value,$filterEmpty);
@@ -103,6 +108,4 @@ class RedBean_Cooker {
 			throw new RedBean_Exception_Security('Expected array but got :'.gettype($array)); 
 		}
 	}
-	
-	
 }
