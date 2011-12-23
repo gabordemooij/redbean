@@ -949,6 +949,11 @@ class RedBean_Facade {
 			self::$writer->wipeAll();
 		}
 	}
+	
+	 public static function dependencies($dep) {
+               self::$redbean->setDepList($dep);
+       }
+
 		
 }
 
