@@ -21,19 +21,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
-		
-		R::dependencies(array('anchor'=>array('boat')));
-		$b = R::dispense('anchor');
-		$p = R::dispense('boat');
-		$b->title = 'a';
-		$p->name = 'b';
-		$b->ownAnchor[] = $p;
-		R::store($b);
-		$b->ownAnchor = array();
-		R::store($b);
-		asrt(R::count('anchor'),0);
-
-		
 		list($q1,$q2) = R::dispense('quote',2);
 		list($pic1,$pic2) = R::dispense('picture',2);
 		list($book,$book2,$book3) = R::dispense('book',4);
