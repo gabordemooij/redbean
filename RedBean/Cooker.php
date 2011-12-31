@@ -76,8 +76,7 @@ class RedBean_Cooker {
                         
                     }
                     $array = $new;
-                    unset($new);
-                    print_r($array);
+                    unset($new);                    
                 }
                 
 		$beans = array();
