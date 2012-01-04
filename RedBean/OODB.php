@@ -423,7 +423,9 @@ class RedBean_OODB extends RedBean_Observable {
 			$myFieldLink = $bean->getMeta('type').'_id';
 			//Handle related beans
 			foreach($ownTrashcan as $trash) {
-			if (isset($this->dep[$trash->getMeta('type')])) {
+			if (isset($this->dep[$trash->getMeta('type')]) && in_array($bean->getMeta('type'),$this->dep[$trash->getMeta('type')])) {
+
+
 					   $this->trash($trash);
 			   }
 			   else {
