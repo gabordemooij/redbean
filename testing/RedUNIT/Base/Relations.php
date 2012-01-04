@@ -23,7 +23,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 	public function run() {
 		
 		R::nuke();
-		R::dependencies(array('page'=>array('book')));
+		R::dependencies(array('page'=>array('book','paper')));
 
 		$b = R::dispense('book');
 		$p = R::dispense('page');
@@ -34,6 +34,21 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$b->ownPage = array();
 		R::store($b);
 		asrt(R::count('page'),0);
+		$p = R::dispense('page');
+		$z = R::dispense('paper');
+		$z->ownPage[] = $p;
+		R::store($z);
+		asrt(R::count('page'),1);
+		$z->ownPage = array();
+		R::store($z);
+		asrt(R::count('page'),0);
+		$i=R::dispense('magazine');
+		$i->ownPage[] = R::dispense('page');
+		R::store($i);
+		asrt(R::count('page'),1);
+		$i->ownPage=array();
+		R::store($i);
+		asrt(R::count('page'),1);	
 		R::dependencies(array());
 		R::nuke();
 		
