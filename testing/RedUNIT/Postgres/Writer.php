@@ -54,6 +54,7 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 		asrt($writer->scanType(INF),1);
 		asrt($writer->scanType("abc"),3);
 		asrt($writer->scanType("2001-10-10",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE);
+		asrt($writer->scanType("2001-10-10 10:00:00",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME);
 		asrt($writer->scanType("2001-10-10 10:00:00"),3);
 		asrt($writer->scanType("2001-10-10"),3);
 		asrt($writer->scanType(str_repeat("lorem ipsum",100)),3);
@@ -157,12 +158,23 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 		asrt($cols['date'],'text');
 		$bean = R::dispense('bean');
 		$bean->date = '2011-10-10';
-		R::nuke();
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['date'],'text');
+
+        R::nuke();
 		$bean = R::dispense('bean');
 		$bean->date = '2011-10-10';
 		R::store($bean);
 		$cols = R::getColumns('bean');
 		asrt($cols['date'],'date');
-	}	
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->date = '2011-10-10 10:00:00';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['date'],'timestamp without time zone');
+        }	
 	
 }
