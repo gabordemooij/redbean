@@ -108,8 +108,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 				  self::C_DATATYPE_INTEGER=>' integer ',
 				  self::C_DATATYPE_DOUBLE=>' double precision ',
 				  self::C_DATATYPE_TEXT=>' text ',
-				  self::C_DATATYPE_SPECIAL_DATE => ' date '
-				  self::C_DATATYPE_SPECIAL_DATETIME => ' timestamp without time zone '
+				  self::C_DATATYPE_SPECIAL_DATE => ' date ',
+				  self::C_DATATYPE_SPECIAL_DATETIME => ' timestamp without time zone ',
 		);
 
 		$this->sqltype_typeno = array();
