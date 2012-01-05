@@ -44,6 +44,12 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	const C_DATATYPE_SPECIAL_DATE = 80;
 	
 	/**
+	 * Special type date for storing date values: YYYY-MM-DD HH:MM:SS
+	 * @var integer
+	 */
+	const C_DATATYPE_SPECIAL_DATETIME = 81;
+	
+	/**
 	 * Specified field type cannot be overruled
 	 * @var integer
 	 */
@@ -102,7 +108,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 				  self::C_DATATYPE_INTEGER=>' integer ',
 				  self::C_DATATYPE_DOUBLE=>' double precision ',
 				  self::C_DATATYPE_TEXT=>' text ',
-				  self::C_DATATYPE_SPECIAL_DATE => ' date '
+				  self::C_DATATYPE_SPECIAL_DATE => ' date ',
+				  self::C_DATATYPE_SPECIAL_DATETIME => ' timestamp without time zone ',
 		);
 
 		$this->sqltype_typeno = array();
@@ -163,9 +170,12 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		
 		$this->svalue=$value;
 		
-		if ($flagSpecial) {
-			if ($value && preg_match('/^\d\d\d\d\-\d\d-\d\d$/',$value)) {
+		if ($flagSpecial && $value) {
+			if (preg_match('/^\d\d\d\d\-\d\d-\d\d$/',$value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE;
+			}
+			if (preg_match('/^\d\d\d\d\-\d\d-\d\d\s\d\d:\d\d:\d\d$/',$value)) {
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME;
 			}
 		}
 		
