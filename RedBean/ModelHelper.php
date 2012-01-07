@@ -39,9 +39,11 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * full model name.
 	 *
 	 * @param string $model
+	 * @param RedBean_OODBBean $bean
+	 * 
 	 * @return string $fullname
 	 */
-	public static function getModelName( $model ) {
+	public static function getModelName( $model, $bean = null ) {
 		if (self::$modelFormatter){
 			return self::$modelFormatter->formatModel($model);
 		}
