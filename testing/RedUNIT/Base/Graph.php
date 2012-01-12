@@ -134,6 +134,28 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		R::trash($v3);
 		asrt(R::count('army'),$n);
 		
+		$page = R::dispense('page');
+		$page->ownArticle[] = R::dispense('article');
+		$id =R::store($page);
+		$array = array(
+			'page'=>array(
+				'type'=>'page',
+				'id'=>$id,
+				'title'=>'my page',
+				'ownArticle'=>array()
+			)
+		);
+		$page = R::load('page',$id);
+		//print_r($page->ownArticle);
+		$cooker = new RedBean_Cooker;
+		$cooker->setToolbox(R::$toolbox);
+		$cooker->addToPool($page,'w');
+		$beans = $cooker->graph($array);
+		$beans = reset($beans);
+		R::store($beans);
+		$page = R::load('page',$id);
+		//print_r($page->ownArticle);
+		//exit;
 		
 		$json = '{"mysongs":{"type":"playlist","name":"JazzList","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","url":"music.com.harlem"}],"cover":{"type":"cover","url":"albumart.com\/duke1"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 		$playList = json_decode( $json, true );
@@ -148,7 +170,16 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		$json = '{"mysongs":{"type":"playlist","id":"1","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","id":"1"}],"cover":{"type":"cover","id":"2"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 		$playList = json_decode( $json, true );
 		$cooker = new RedBean_Cooker;
+		
+		
 		$cooker->setToolbox(R::$toolbox);
+		$cooker->addToPool($play,'w');
+		$cooker->addToPool($play->ownTrack,'r');
+		foreach($play->ownTrack as $track) {
+			$cooker->addToPool($track->sharedSong,'r');
+			$cooker->addToPool($track->cover,'r');
+		}
+		
 		$playList = ($cooker->graph(($playList)));
 		$id = R::store(reset($playList));
 		$play = R::load("playlist", $id);
@@ -167,6 +198,15 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		$playList = json_decode( $json, true );
 		$cooker = new RedBean_Cooker;
 		$cooker->setToolbox(R::$toolbox);
+		
+		$cooker->addToPool($play,'w');
+		$cooker->addToPool($play->ownTrack,'r');
+		foreach($play->ownTrack as $track) {
+			$cooker->addToPool($track->sharedSong,'w');
+			$cooker->addToPool($track->cover,'r');
+		}
+		$cooker->addToPool(R::load('song',1),'w');
+		
 		$playList = ($cooker->graph(($playList)));
 		$id = R::store(reset($playList));
 		$play = R::load("playlist", $id);
@@ -357,12 +397,16 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 				array('type'=>'coupon','id'=>$couponID)
 			)
 		);
-		$order = R::graph($form, true);
+		
+		$order = R::graph($form, true, array(
+			array('beans'=>$product,'policy'=>'r'),
+			array('beans'=>$coupon,'policy'=>'r'),
+		));
 		asrt($order->getMeta('type'),'order');
 		asrt(count($order->ownProduct),1);
 		asrt(count($order->ownCustomer),1);
 		asrt(count($order->sharedCoupon),2);
-		asrt(end($order->ownProduct)->id,$productID);
+		asrt((int)end($order->ownProduct)->id,(int)$productID);
 		asrt(end($order->ownProduct)->name,'shampoo');
 		asrt(end($order->ownCustomer)->name,'Bill');
 		asrt($order->sharedCoupon[$couponID]->name,'567');
@@ -386,7 +430,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 			),
 		);
 		try{
-			$order = R::graph($form, true);
+			$order = R::graph($form, true, false);
 			fail();
 		}
 		catch(RedBean_Exception_Security $e){
@@ -416,12 +460,12 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 				array('type'=>'coupon','id'=>$couponID)
 			)
 		);
-		$order = R::graph($form);
+		$order = R::graph($form, false, false);
 		asrt($order->getMeta('type'),'order');
 		asrt(count($order->ownProduct),1);
 		asrt(count($order->ownCustomer),2);
 		asrt(count($order->sharedCoupon),2);
-		asrt(end($order->ownProduct)->id,$productID);
+		asrt((int)end($order->ownProduct)->id,(int)$productID);
 		
 		
 		//make sure zeros are preserved

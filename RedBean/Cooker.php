@@ -16,6 +16,8 @@
  */
 class RedBean_Cooker {
 
+	private $flagUnsafe = false;
+	
 	/**
 	 * Sets the toolbox to be used by graph()
 	 *
@@ -86,16 +88,29 @@ class RedBean_Cooker {
 			//Do we need to load the bean?
 			if (isset($array['id'])) {
 				$id = (int) $array['id'];
-				$bean = $this->redbean->load($type,$id);
+				unset($array['id']);
+				if (count($array)>0) {
+					//$bean = $this->redbean->load($type,$id);
+					$bean = $this->loadFromPool($type,$id,'w');
+				}
+				else {
+					//no more properties besides type and id, read is enough.
+					$bean = $this->loadFromPool($type,$id,'r');
+				}
 			}
 			else {
 				$bean = $this->redbean->dispense($type);
 			}
+			
 			foreach($array as $property=>$value) {
 				if (is_array($value)) {
 					$bean->$property = $this->graph($value,$filterEmpty);
 				}
 				else {
+					if (strpos($property,'_id')!==false) {
+						//property contains a reference -- must be checked
+						$this->loadFromPool(substr($property,0,-3), $value,'r');
+					}
 					$bean->$property = $value;
 				}
 			}
@@ -122,4 +137,39 @@ class RedBean_Cooker {
 			throw new RedBean_Exception_Security('Expected array but got :'.gettype($array)); 
 		}
 	}
+	
+	public function loadFromPool($type, $id, $policy) {
+		if ($this->flagUnsafe) return R::load($type,$id);
+		if ($policy!='r' && $policy!='w') {
+			throw new RedBean_Security_Exception('Illegal policy.');
+		}
+		if (!isset($this->pool[$policy][$type][$id])) {
+			throw new RedBean_Exception_Security('Access Denied, user has no '.$policy.'-access to: '.$type.' - '.$id);
+		}
+		else {
+			return $this->pool[$policy][$type][$id];
+		}
+	}
+	
+	public function addToPool($beans, $policy='r') {
+		if ($policy!='r' && $policy!='w') {
+			throw new RedBean_Security_Exception('Illegal policy.');
+		}
+		if (is_array($beans)) {
+			foreach($beans as $bean) $this->addToPool($bean);
+		}
+		else {
+			$bean = $beans;
+			$this->pool[$policy][$bean->getMeta('type')][$bean->id] = $bean;
+		}
+	} 
+	
+	public function cleanPool() {
+		$this->pool = array();
+	}
+	
+	public function setUnsafe($tf) {
+		$this->flagUnsafe = $tf;
+	}
+	
 }
