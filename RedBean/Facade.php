@@ -873,10 +873,20 @@ class RedBean_Facade {
 	 * 
 	 * @return array $arrayOfBeans Beans
 	 */
-	public static function graph($array,$filterEmpty=false) {
+	public static function graph($array,$filterEmpty=false,$policies=array()) {
 		$cooker = new RedBean_Cooker();
+		if ($policies===false) $cooker->setUnsafe(true);
 		$cooker->setToolbox(self::$toolbox);
-		return $cooker->graph($array,$filterEmpty);
+		
+		if (is_array($policies)) {
+			foreach($policies as $policy) {
+				$cooker->addToPool($policy['beans'],$policy['policy']);
+			}
+		}
+		
+		$beans = $cooker->graph($array,$filterEmpty);
+		$cooker->cleanPool();
+		return $beans;
 	}
 
 	
