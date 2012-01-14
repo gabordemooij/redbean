@@ -23,6 +23,27 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 	public function run() {
 		
 		R::nuke();
+		$cities = R::dispense('city',2);
+		$cities[0]->name = 'Amsterdam';
+		$cities[1]->name = 'Stockholm';
+		$offices = R::dispense('office',3);
+		$cities[0]->ownOffice = array($offices[0],$offices[1]);
+		$cities[1]->ownOffice[] = $offices[2];
+		$partners = R::dispense('partner',4);
+		$offices[0]->sharedPartner[] = $partners[0];
+		$offices[1]->sharedPartner[] = $partners[1];
+		$offices[2]->sharedPartner[] = $partners[2];
+		$offices[1]->sharedPartner[] = $partners[3];
+		R::store($cities[0]);
+		R::store($cities[1]);
+		
+		$offices = R::related($partners[2],'office');
+		$office = reset($offices);
+		asrt($office->city->name,'Stockholm');
+		
+		//@todo -- test path finding!
+		
+		R::nuke();
 		R::dependencies(array('page'=>array('book','paper')));
 
 		$b = R::dispense('book');

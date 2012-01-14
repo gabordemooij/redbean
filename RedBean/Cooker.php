@@ -16,12 +16,69 @@
  */
 class RedBean_Cooker {
 
+	/**
+	 * Flag indicating mode of operation for Cooker. If this flag is set
+	 * to TRUE, the Cooker will not enforce policies.
+	 * 
+	 * @var boolean
+	 */
 	private $flagUnsafe = false;
+
+	/**
+	 * An array containing all valid policy codes.
+	 * 
+	 * @var array
+	 */
+	private $policyCodes;
 	
 	/**
-	 * Sets the toolbox to be used by graph()
+	 * Constants defining the valid policy codes
+	 */
+	
+	/**
+	 * Constant Policy Read.
+	 * Represents the READ policy. Adding a bean with READ policy allows
+	 * the Cooker to load this bean but it cannot be modified in any way.
+	 * The primary key ID of the bean may be used to reference the bean in
+	 * other beans though.
+	 */
+	const C_POLICY_READ = 'r';
+	
+	/**
+	 * Constant Policy Write.
+	 * Represents the WRITE Policy. Adding a bean with WRITE policy allows
+	 * the Cooker to modify this bean and add other beans to this bean.
+	 */
+	const C_POLICY_WRITE = 'w';
+	
+	/**
+	 * Constant Policy New.
+	 * Represents the NEW Policy. Adding a type string with a NEW Policy
+	 * allows the Cooker to dispense beans of this type.
+	 */
+	const C_POLICY_NEW = 'n';
+	
+	/**
+	 * Constructor.
+	 * The task of the constructor is to prepare an array of valid codes
+	 * for the policy methods.
+	 */
+	public function __construct() {
+		
+		$this->policyCodes = array(
+			self::C_POLICY_READ => true,
+			self::C_POLICY_WRITE => true,
+			self::C_POLICY_NEW => true
+		);
+		
+	}
+	
+	/**
+	 * Sets the toolbox to be used by graph(). The Cooker requires
+	 * a toolbox for service location.
 	 *
-	 * @param RedBean_Toolbox $toolbox toolbox
+	 * @param RedBean_Toolbox $toolbox toolbox to be used to perform operations
+	 * 
 	 * @return void
 	 */
 	public function setToolbox(RedBean_Toolbox $toolbox) {
@@ -90,16 +147,19 @@ class RedBean_Cooker {
 				$id = (int) $array['id'];
 				unset($array['id']);
 				if (count($array)>0) {
-					//$bean = $this->redbean->load($type,$id);
+					//the array contains more properties, we are going to change the bean,
+					//ask for a bean with write policy.
 					$bean = $this->loadFromPool($type,$id,'w');
 				}
 				else {
 					//no more properties besides type and id, read is enough.
-					$bean = $this->loadFromPool($type,$id,'r');
+					//ask for a bean to read.
+					return $this->loadFromPool($type,$id,'r');
 				}
 			}
 			else {
-				$bean = $this->redbean->dispense($type);
+				//ask for bean dispense
+				$bean = $this->loadFromPool($type,0,'n');
 			}
 			
 			foreach($array as $property=>$value) {
@@ -138,38 +198,118 @@ class RedBean_Cooker {
 		}
 	}
 	
+	/**
+	 * Tries to load a bean from the pool. If the bean has been added to the pool of
+	 * accesible beans. If the bean can be found in the pool and the policy code
+	 * matches the required policy the bean will be returned. If the bean cannot be
+	 * found in the pool or the policy does not match this method will throw a
+	 * security exception notifying the developer about the possible security issue.
+	 * 
+	 * @param string  $type   the name of the type of bean you want to load or dispense
+	 * @param integer $id     either 0 or a valid primary key ID to load the desired bean
+	 * @param string  $policy a valid policy code (i.e. 'r','w' or 'n')
+	 * 
+	 * @return RedBean_OODBBean $bean the desired RedBean_OODBBean instance 
+	 */
 	public function loadFromPool($type, $id, $policy) {
 		if ($this->flagUnsafe) return R::load($type,$id);
-		if ($policy!='r' && $policy!='w') {
-			throw new RedBean_Security_Exception('Illegal policy.');
-		}
+		$this->checkPolicyCode($policy);
 		if (!isset($this->pool[$policy][$type][$id])) {
-			throw new RedBean_Exception_Security('Access Denied, user has no '.$policy.'-access to: '.$type.' - '.$id);
+			throw new RedBean_Exception_Security('Denied, no '.$policy.'-access to:'.$type.'-'.$id);
 		}
 		else {
-			return $this->pool[$policy][$type][$id];
+			if ($policy == self::C_POLICY_NEW) {
+				$bean = $this->redbean->dispense($type);
+			}
+			else {
+				$bean = $this->pool[$policy][$type][$id];
+			}
+			return $bean;
 		}
 	}
 	
-	public function addToPool($beans, $policy='r') {
-		if ($policy!='r' && $policy!='w') {
-			throw new RedBean_Security_Exception('Illegal policy.');
+	/**
+	 * Checks the existance of a security policy. If the code does not represent
+	 * a security policy this method will throw a security exception notifying the
+	 * developer about a malformed security policy code string.
+	 * 
+	 * @param string $code the security code string to be verified
+	 */
+	private function checkPolicyCode($code) {
+		if (!$this->policyCodes[$code]) {
+			throw new RedBean_Exception_Security('Invalid security policy.');
 		}
+	}
+	
+
+	/**
+	 * Adds one or more beans to the bean pool of the Cooker with a certain
+	 * policy code attached to it. By sending a bean with a policy to the
+	 * pool you make this bean availabe for reading or writing by the Cooker.
+	 * 
+	 * Example: $cooker->addPolicy($bean,'r');
+	 * Adding a bean with READ policy allows
+	 * the Cooker to load this bean but it cannot be modified in any way.
+	 * The primary key ID of the bean may be used to reference the bean in
+	 * other beans though.
+	 * 
+	 * Example: $cooker->addPolicy($bean,'w');
+	 * Adding a bean with WRITE policy allows
+	 * the Cooker to modify this bean and add other beans to this bean.
+	 * 
+	 * @param RedBean_OODBBean|array $beans  one or more beans to be added to the pool
+	 * @param string                 $policy send the beans with this policy
+	 */
+	public function addPolicy($beans, $policy='r') {
+		$this->checkPolicyCode($policy);
+		if ($policy == self::C_POLICY_NEW) throw new RedBean_Exception_Security('Method cannot handle new-policy.');
 		if (is_array($beans)) {
-			foreach($beans as $bean) $this->addToPool($bean);
+			foreach($beans as $bean) $this->addPolicy($bean);
 		}
 		else {
 			$bean = $beans;
 			$this->pool[$policy][$bean->getMeta('type')][$bean->id] = $bean;
 		}
-	} 
+	}
 	
-	public function cleanPool() {
+	/**
+	 * Sets the policy to allow the Cooker to dispense beans of the indicated types.
+	 * 
+	 * @param string|array $types one or more types.
+	 */
+	public function allowCreationOfTypes($types) {
+		if (is_array($types)) {
+			foreach($types as $type) $this->allowCreationOfTypes ($type);
+		}
+		else {
+			$type = $types;
+			$this->pool[self::C_POLICY_NEW][$type][0] = true;
+		}
+	}
+	
+	/**
+	 * This method resets all policies. After invocation there will be no more
+	 * active policies for the Cooker. Cleaning the policies will render the
+	 * Cooker powerless to handle any form. Use this method before you start
+	 * adding new policies for a new array processing task. Also make sure
+	 * you use this method before calling setUnsafe(TRUE). You cannot turn the
+	 * Cooker in unsafe mode if there are still any policies active.
+	 */
+	public function cleanPolicies() {
 		$this->pool = array();
 	}
 	
+	/**
+	 * Toggles unsafe mode. Be very careful with this method. Setting the unsafe mode
+	 * in the Cooker will no longer enforce any policies on bean processing.
+	 * 
+	 * @param boolean $tf TRUE means unsafe, FALSE means safe. 
+	 */
 	public function setUnsafe($tf) {
-		$this->flagUnsafe = $tf;
+		if (!empty($this->pool)) {
+			throw new RedBean_Exception_Security('Policies active.');
+		}
+		$this->flagUnsafe = (boolean) $tf;
 	}
 	
 }

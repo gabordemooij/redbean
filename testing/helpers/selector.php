@@ -56,6 +56,7 @@ $allPacks = array(
 		'Blackhole/Import',
 		'Blackhole/Export',
 		'Blackhole/Misc',
+		'Blackhole/Policy',
 		'Base/Dispense',
 		'Base/Typechecking',
 		'Base/Observers',

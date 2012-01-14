@@ -880,12 +880,17 @@ class RedBean_Facade {
 		
 		if (is_array($policies)) {
 			foreach($policies as $policy) {
-				$cooker->addToPool($policy['beans'],$policy['policy']);
+				if (isset($policy['types'])) {
+					$cooker->allowCreationOfTypes($policy['types']);
+				}
+				elseif (isset($policy['beans'])) {
+					$cooker->addPolicy($policy['beans'],$policy['policy']);
+				}
 			}
 		}
 		
 		$beans = $cooker->graph($array,$filterEmpty);
-		$cooker->cleanPool();
+		$cooker->cleanPolicies();
 		return $beans;
 	}
 
