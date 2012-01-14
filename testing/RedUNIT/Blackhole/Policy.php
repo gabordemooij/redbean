@@ -27,14 +27,18 @@ class RedUNIT_Blackhole_Policy extends RedUNIT_Blackhole {
 		testpack('Test Cooker Policies');
 		R::nuke();
 		$city = R::dispense('city');
+		$city->name = 'Oslo';
 		$banks = R::dispense('bank',2);
 		$accounts = R::dispense('account',3);
 		$persons = R::dispense('person',4);
+		$persons[0]->name = 'Jacky';
 		$city->ownBank = $banks;
 		$banks[0]->ownAccount = array($accounts[0],$accounts[1]);
 		$banks[1]->ownAccount = array($accounts[2]);
 		$accounts[0]->sharedPerson = array($persons[0],$persons[1]);
 		$accounts[1]->sharedPerson = array($persons[2],$persons[3]);
+		$accounts[0]->comment = 'account from a black hat hacker.';
+		$accounts[0]->money = -1000;
 		R::store($city);
 		$myAccount = $accounts[0];
 		$myAccountID = $accounts[0]->id;
@@ -45,6 +49,7 @@ class RedUNIT_Blackhole_Policy extends RedUNIT_Blackhole {
 		$myPartnerID = $persons[0]->id;
 		$otherPersonID = $persons[2]->id;
 		$otherBankID = $banks[1]->id;
+		
 		
 		//People are allowed to open a new account.
 		$defaultPolicies = array(
@@ -232,8 +237,6 @@ class RedUNIT_Blackhole_Policy extends RedUNIT_Blackhole {
 			fail();
 		}
 		
-		
-		
 		//invalid policy code
 		try {
 			$cooker->addPolicy($me,'?');
@@ -242,6 +245,47 @@ class RedUNIT_Blackhole_Policy extends RedUNIT_Blackhole {
 		catch(RedBean_Exception_Security $e) {
 			pass();
 		}
+		
+		//Test Bean Purification
+		testpack('Test Bean Purification');
+		R::freeze(true);
+		
+		//hacker is adds additional information
+		$hacker = array(
+			'account'=>array(
+				'type'=>'account','id'=>$myAccountID,'balance'=>100
+			)
+		);
+		
+		try {
+			R::graph($hacker,false,$defaultPolicies);
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		//hacker is adds no additional information
+		$hacker = array(
+			'account'=>array(
+				'type'=>'account','id'=>$myAccountID,'comment'=>'Black hat hacker now has white hat.'
+			)
+		);
+		
+		unset($accounts[0]->balance);
+		
+		try {
+			R::graph($hacker,false,$defaultPolicies);
+			pass();
+		}
+		catch(RedBean_Exception_Security $e) {
+			fail();
+		}
+		
+		
+		
+		R::freeze(false);
+		
 		
 	}
 }
