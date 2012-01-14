@@ -212,6 +212,7 @@ class RedBean_Cooker {
 	 * @return RedBean_OODBBean $bean the desired RedBean_OODBBean instance 
 	 */
 	public function loadFromPool($type, $id, $policy) {
+		$id = (int) $id;
 		if ($this->flagUnsafe) return R::load($type,$id);
 		$this->checkPolicyCode($policy);
 		if (!isset($this->pool[$policy][$type][$id])) {
@@ -236,7 +237,7 @@ class RedBean_Cooker {
 	 * @param string $code the security code string to be verified
 	 */
 	private function checkPolicyCode($code) {
-		if (!$this->policyCodes[$code]) {
+		if (!isset($this->policyCodes[$code])) {
 			throw new RedBean_Exception_Security('Invalid security policy.');
 		}
 	}
@@ -264,11 +265,11 @@ class RedBean_Cooker {
 		$this->checkPolicyCode($policy);
 		if ($policy == self::C_POLICY_NEW) throw new RedBean_Exception_Security('Method cannot handle new-policy.');
 		if (is_array($beans)) {
-			foreach($beans as $bean) $this->addPolicy($bean);
+			foreach($beans as $bean) $this->addPolicy($bean,$policy);
 		}
 		else {
 			$bean = $beans;
-			$this->pool[$policy][$bean->getMeta('type')][$bean->id] = $bean;
+			$this->pool[$policy][$bean->getMeta('type')][(int)$bean->id] = $bean;
 		}
 	}
 	
@@ -279,7 +280,7 @@ class RedBean_Cooker {
 	 */
 	public function allowCreationOfTypes($types) {
 		if (is_array($types)) {
-			foreach($types as $type) $this->allowCreationOfTypes ($type);
+			foreach($types as $type) $this->allowCreationOfTypes($type);
 		}
 		else {
 			$type = $types;
