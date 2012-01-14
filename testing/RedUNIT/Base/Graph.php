@@ -149,7 +149,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		//print_r($page->ownArticle);
 		$cooker = new RedBean_Cooker;
 		$cooker->setToolbox(R::$toolbox);
-		$cooker->addToPool($page,'w');
+		$cooker->addPolicy($page,'w');
 		$beans = $cooker->graph($array);
 		$beans = reset($beans);
 		R::store($beans);
@@ -159,7 +159,9 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		
 		$json = '{"mysongs":{"type":"playlist","name":"JazzList","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","url":"music.com.harlem"}],"cover":{"type":"cover","url":"albumart.com\/duke1"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 		$playList = json_decode( $json, true );
-		$playList = R::graph($playList);
+		$playList = R::graph($playList,false,array(
+			array('types'=>array('playlist','track','song','cover'),'policy'=>'n')
+		));
 		$id = R::store(reset($playList));
 		$play = R::load("playlist", $id);
 		asrt(count($play->ownTrack),2);
@@ -173,11 +175,15 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		
 		
 		$cooker->setToolbox(R::$toolbox);
-		$cooker->addToPool($play,'w');
-		$cooker->addToPool($play->ownTrack,'r');
+		
+		$cooker->allowCreationOfTypes('track');
+		$cooker->allowCreationOfTypes(array('song','cover'));
+		
+		$cooker->addPolicy($play,'w');
+		$cooker->addPolicy($play->ownTrack,'r');
 		foreach($play->ownTrack as $track) {
-			$cooker->addToPool($track->sharedSong,'r');
-			$cooker->addToPool($track->cover,'r');
+			$cooker->addPolicy($track->sharedSong,'r');
+			$cooker->addPolicy($track->cover,'r');
 		}
 		
 		$playList = ($cooker->graph(($playList)));
@@ -199,13 +205,14 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		$cooker = new RedBean_Cooker;
 		$cooker->setToolbox(R::$toolbox);
 		
-		$cooker->addToPool($play,'w');
-		$cooker->addToPool($play->ownTrack,'r');
+		$cooker->allowCreationOfTypes(array('playlist','track','song','cover'));
+		$cooker->addPolicy($play,'w');
+		$cooker->addPolicy($play->ownTrack,'r');
 		foreach($play->ownTrack as $track) {
-			$cooker->addToPool($track->sharedSong,'w');
-			$cooker->addToPool($track->cover,'r');
+			$cooker->addPolicy($track->sharedSong,'w');
+			$cooker->addPolicy($track->cover,'r');
 		}
-		$cooker->addToPool(R::load('song',1),'w');
+		$cooker->addPolicy(R::load('song',1),'w');
 		
 		$playList = ($cooker->graph(($playList)));
 		$id = R::store(reset($playList));
@@ -401,7 +408,9 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		$order = R::graph($form, true, array(
 			array('beans'=>$product,'policy'=>'r'),
 			array('beans'=>$coupon,'policy'=>'r'),
+			array('types'=>array('order','customer','coupon'))
 		));
+		
 		asrt($order->getMeta('type'),'order');
 		asrt(count($order->ownProduct),1);
 		asrt(count($order->ownCustomer),1);
@@ -470,7 +479,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		
 		//make sure zeros are preserved
 		$form = array('type'=>'laptop','price'=>0);
-		$product = R::graph($form);
+		$product = R::graph($form,false,false);
 		asrt(isset($product->price),true);
 		asrt($product->price,0);
 				
