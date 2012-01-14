@@ -17,6 +17,13 @@
 class RedBean_Cooker {
 
 	/**
+	 * Reference to RedBean OODB instance from toolbox.
+	 * 
+	 * @var RedBean_OODB 
+	 */
+	private $redbean;
+	
+	/**
 	 * Flag indicating mode of operation for Cooker. If this flag is set
 	 * to TRUE, the Cooker will not enforce policies.
 	 * 
@@ -30,6 +37,13 @@ class RedBean_Cooker {
 	 * @var array
 	 */
 	private $policyCodes;
+	
+	/**
+	 * Contains the schema of the database, this can be cached. 
+	 * 
+	 * @var array 
+	 */
+	private $schema;
 	
 	/**
 	 * Constants defining the valid policy codes
@@ -62,8 +76,11 @@ class RedBean_Cooker {
 	 * Constructor.
 	 * The task of the constructor is to prepare an array of valid codes
 	 * for the policy methods.
+	 * 
+	 * @param $schema schema of database (optional for caching).
+	 * 
 	 */
-	public function __construct() {
+	public function __construct($schema = null) {
 		
 		$this->policyCodes = array(
 			self::C_POLICY_READ => true,
@@ -71,6 +88,9 @@ class RedBean_Cooker {
 			self::C_POLICY_NEW => true
 		);
 		
+		if ($schema) {
+			$this->schema = $schema;
+		}
 	}
 	
 	/**
@@ -160,6 +180,7 @@ class RedBean_Cooker {
 					$bean->$property = $value;
 				}
 			}
+			$this->purify($bean);
 			return $bean;
 		}
 		elseif (is_array($array)) {
@@ -297,6 +318,52 @@ class RedBean_Cooker {
 			throw new RedBean_Exception_Security('Policies active.');
 		}
 		$this->flagUnsafe = (boolean) $tf;
+	}
+	
+	
+	/**
+	 * Returns the entire schema of the database.
+	 * Format:
+	 * 
+	 * array(
+	 *	'table' => array(
+	 *			'column1'=>'fieldtype',
+	 *			'columns2'=>'fieldtype' ... )
+	 * )
+	 * 
+	 * @return array $schema the schema of the database
+	 */
+	public function getSchema() {
+		$tables = array_flip($this->toolbox->getWriter()->getTables());
+		foreach($tables as $table=>$columns) {
+			try{
+				$tables[$table] = $this->toolbox->getWriter()->getColumns($table);
+			}
+			catch(RedBean_Exception_SQL $e) {
+				$tables[$table] = array();
+			}
+		}
+		return $tables;
+	}
+	
+	
+	/**
+	 * Validates bean against schema (in frozen mode only).
+	 * Purify will check whether:
+	 * 1. The type of bean exists in the current schema
+	 * 2. The fields are correct
+	 * 
+	 * @param RedBean_OODBBean $bean bean to be validated.
+	 */
+	public function purify(RedBean_OODBBean $bean) {
+		if (!$this->redbean->isFrozen()) return;
+		if (!$this->schema) {
+			$this->schema = $this->getSchema();
+		}
+		if (!isset($this->schema[$bean->getMeta('type')])) throw new RedBean_Exception_Security('No table for type: '.$bean->getMeta('type'));
+		foreach($bean as $key=>$value) { 
+			if (!isset($this->schema[$bean->getMeta('type')][$key]) && !is_object($value) && !is_array($value)) throw new RedBean_Exception_Security('Invalid field: '.preg_replace('/\W/','',$key));
+		}
 	}
 	
 }
