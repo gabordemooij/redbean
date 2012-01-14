@@ -124,21 +124,7 @@ class RedBean_Cooker {
 	 * @return	array $beans beans
 	 */
 	public function graph( $array, $filterEmpty = false ) {
-                if(is_array($array) && isset($array['type']) && is_array(@$array['id'])){ // allowing multi-select and multi-checkbox by restructuring the array.
-                    foreach($array['id'] as $key=>$value){
-                        foreach($array as $kk=>$vv){
-                            if(is_array($vv)) {
-                                if(isset($vv[$key])) $new[$key][$kk] = $vv[$key];
-                            }
-                            else $new[$key][$kk] = $vv;
-                        }
-                        
-                    }
-                    $array = $new;
-                    unset($new);                    
-                }
-                
-		$beans = array();
+       $beans = array();
 		if (is_array($array) && isset($array['type'])) {
 			$type = $array['type'];
 			unset($array['type']);
