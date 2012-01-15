@@ -73,6 +73,41 @@ class RedUNIT_Blackhole_Policy extends RedUNIT_Blackhole {
 			pass();
 		}
 		
+		//hacker tries to create a new bank
+		$hacker = array(
+			'bank'=>array(
+				array('type'=>'bank','name'=>'Fake Bank')
+			)
+		);
+		
+		try {
+			R::graph($hacker,false,$defaultPolicies);
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		//form has effect on objects in policies
+		$hacker = array(
+			'account'=>array(
+				'type'=>'account','id'=>(int)$myAccountID,
+				'money'=>'123'
+			)
+		);
+		
+		try {
+			R::graph($hacker,false,$defaultPolicies);
+			pass();
+		}
+		catch(RedBean_Exception_Security $e) {
+			fail();
+		}
+		
+		asrt((int)$myAccount->money,123);
+		
+		
+		
 		//hacker behaves correctly, inspects own account
 		$hacker = array(
 			'account'=>array(
@@ -282,10 +317,166 @@ class RedUNIT_Blackhole_Policy extends RedUNIT_Blackhole {
 			fail();
 		}
 		
+		//Not allowed to create a non existant type
+		try {
+			R::graph(array('bean'=>array('type'=>'hat','color'=>'red')),false,array(array('types'=>'hat','policy'=>'n')));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		//Not allowed to read a non-existant type
+		try {
+			$hat = R::dispense('hat');
+			$hat->id = 2;
+			R::graph(array('bean'=>array('type'=>'hat','id'=>2)),false,array(array('beans'=>$hat,'policy'=>'r')));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		//Not allowed to write a non-existant type
+		try {
+			$hat = R::dispense('hat');
+			$hat->id = 2;
+			R::graph(array('bean'=>array('type'=>'hat','id'=>2,'color'=>'red')),false,array(array('beans'=>$hat,'policy'=>'r')));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
 		
 		
 		R::freeze(false);
 		
+		testpack('Test Multiple Select and Labels');
+		
+		//test multiple select feature
+		$ids = R::storeAll(R::dispenseLabels('preference',array('meat','fish','vegetarian','veganist')));
+		
+		$form = array(
+			'guest'=>array(
+				'type'=>'customer',
+				'ownPreference'=>array(
+					$ids[0],
+					$ids[1]
+				)
+			)
+		);
+		
+		$beans = reset(R::graph($form,false,false));
+		asrt(implode(',',R::gatherLabels($beans->ownPreference)),'fish,meat');
+		
+		
+		//test multiple select feature
+		$form = array(
+			'guest'=>array(
+				'type'=>'customer',
+				'sharedPreference'=>array(
+					$ids[0],
+					$ids[1]
+				)
+			)
+		);
+		
+		$beans = reset(R::graph($form,false,false));
+		asrt(implode(',',R::gatherLabels($beans->sharedPreference)),'fish,meat');
+		
+		//test multiple select feature
+		$rids = R::storeAll(R::dispenseLabels('reservation',array('Jan','Feb','Mar','Apr')));
+		
+		
+		$form = array(
+			'guest'=>array(
+				'type'=>'customer',
+				'sharedPreference'=>array(
+					$ids[0],
+					$ids[1]
+				),
+				'ownReservation'=>array(
+					$rids[2],
+					$rids[3]
+				)
+			)
+		);
+		
+		$beans = reset(R::graph($form,false,false));
+		asrt(implode(',',R::gatherLabels($beans->sharedPreference)),'fish,meat');
+		asrt(implode(',',R::gatherLabels($beans->ownReservation)),'Apr,Mar');
+		
+		//Test Type Checking
+		testpack('Test Type Checking');
+		R::nuke();
+		
+		$form = array(
+			'guest'=>array(
+				'type'=>'customer',
+				'sharedPreference'=>array(
+					array('type'=>'preference','name'=>'fish')
+				)
+			)
+		);
+		
+		$beans = reset(R::graph($form,false,false));
+		asrt(implode(',',R::gatherLabels($beans->sharedPreference)),'fish');
+		
+		$form = array(
+			'guest'=>array(
+				'type'=>'customer',
+				'sharedPreference'=>array(
+					array('type'=>'reservation','name'=>'fish')
+				)
+			)
+		);
+		
+		try{
+			$beans = reset(R::graph($form,false,false));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		
+		
+		$form = array(
+			'guest'=>array(
+				'type'=>'customer',
+				'ownPreference'=>array(
+					array('type'=>'reservation','name'=>'fish')
+				)
+			)
+		);
+		
+		try{
+			$beans = reset(R::graph($form,false,false));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		
+		$form = array(
+			'guest'=>array(
+				'type'=>'customer',
+				'ownPreference'=>array(
+					array('type'=>'reservation','name'=>'fish')
+				)
+			)
+		);
+		
+		try{
+			$beans = reset(R::graph($form,false,array(
+				array('types'=>array('customer','preference','reservation'),'policy'=>'n')
+			)));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
 		
 	}
 }
