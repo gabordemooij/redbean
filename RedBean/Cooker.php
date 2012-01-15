@@ -360,9 +360,7 @@ class RedBean_Cooker {
 			try{
 				$tables[$table] = $this->toolbox->getWriter()->getColumns($table);
 			}
-			catch(RedBean_Exception_SQL $e) {
-				$tables[$table] = array();
-			}
+			catch(RedBean_Exception_SQL $e) { $tables[$table] = array(); }
 		}
 		return $tables;
 	}
