@@ -233,6 +233,15 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$a->setSqlState('test');
 		$b = strval($a);
 		asrt($b,'[test] - ');
+		
+		testpack('test multi delete and multi update');
+		R::nuke();
+		$beans = R::dispenseLabels('bean',array('a','b'));
+		$ids = R::storeAll($beans);
+		asrt((int)R::count('bean'),2);
+		R::trashAll(R::batch('bean',$ids));
+		asrt((int)R::count('bean'),0);
+		
 	}
 
 }

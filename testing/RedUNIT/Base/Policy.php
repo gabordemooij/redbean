@@ -348,7 +348,96 @@ class RedUNIT_Base_Policy extends RedUNIT_Base {
 			pass();
 		}
 		
+		//Now test purification with cached schema... ==============
+		$cooker = new RedBean_Cooker();
+		$cooker->setToolbox(R::$toolbox);
+		$schema = $cooker->getSchema();
+		asrt(is_array($schema),true);
+		asrt(isset($schema['account']),true);
+		asrt(isset($schema['account']['id']),true);
+		asrt(!isset($schema['hat']),true);
+		//add coffee.price
+		$schema['coffee'] = array('id'=>'int', 'price'=>'int');
+		$cooker = new RedBean_Cooker($schema);
+		$cooker->setToolbox(R::$toolbox);
+		$cooker->addPolicy($accounts[0],'w');
+		$cooker->addPolicy($accounts[0]->sharedPerson,'r');
+		$cooker->allowCreationOfTypes('account');
+		$cooker->allowCreationOfTypes(array('hat','coffee'));
+			
 		
+		//hacker is adds additional information
+		$hacker = array(
+			'account'=>array(
+				'type'=>'account','id'=>$myAccountID,'balance'=>100
+			)
+		);
+		
+		try {
+			$cooker->graph($hacker,false);
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		//hacker is adds no additional information
+		$hacker = array(
+			'account'=>array(
+				'type'=>'account','id'=>$myAccountID,'comment'=>'Black hat hacker now has white hat.'
+			)
+		);
+		
+		unset($accounts[0]->balance);
+		
+		try {
+			$cooker->graph($hacker);
+			pass();
+		}
+		catch(RedBean_Exception_Security $e) {
+			fail();
+		}
+		
+		//Not allowed to create a non existant type
+		try {
+			
+			$cooker->graph(array('bean'=>array('type'=>'hat','color'=>'red')));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		//Not allowed to read a non-existant type
+		try {
+			$hat = R::dispense('hat');
+			$hat->id = 2;
+			$cooker->addPolicy($hat,'r');
+			$cooker->graph(array('bean'=>array('type'=>'hat','id'=>2)));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		//Not allowed to write a non-existant type
+		try {
+			$cooker->graph(array('bean'=>array('type'=>'hat','id'=>2,'color'=>'red')));
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		//But we added a new table
+		try {
+			$cooker->graph(array('bean'=>array('type'=>'coffee','price'=>'3')));
+			pass();
+		}
+		catch(RedBean_Exception_Security $e) {
+			fail();
+		}
+	
 		R::freeze(false);
 		
 		testpack('Test Multiple Select and Labels');
@@ -478,5 +567,23 @@ class RedUNIT_Base_Policy extends RedUNIT_Base {
 			pass();
 		}
 		
+		//Test unsafe mode with policies active (should not be possible)
+		try{
+			$cooker->setUnsafe(true);
+			fail();
+		}
+		catch(RedBean_Exception_Security $e){
+			pass();
+		}
+		
+		$cooker->cleanPolicies();
+		
+		try{
+			$cooker->setUnsafe(true);
+			pass();
+		}
+		catch(RedBean_Exception_Security $e){
+			fail();
+		}
 	}
 }
