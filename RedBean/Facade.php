@@ -950,10 +950,101 @@ class RedBean_Facade {
 		}
 	}
 	
-	 public static function dependencies($dep) {
-               self::$redbean->setDepList($dep);
-       }
+	/**
+	 * Sets a list of dependencies.
+	 * A dependency list contains an entry for each dependent bean. 
+	 * A dependent bean will be removed if the relation with one of the
+	 * dependencies gets broken. 
+	 * 
+	 * Example:
+	 * 
+	 * array(
+	 *	'page' => array('book','magazine')
+	 * )
+	 * 
+	 * A page will be removed if:
+	 * 
+	 * unset($book->ownPage[$pageID]);
+	 * 
+	 * or:
+	 * 
+	 * unset($magazine->ownPage[$pageID]);
+	 * 
+	 * but not if:
+	 * 
+	 * unset($paper->ownPage[$pageID]);
+	 * 
+	 * 
+	 * @param array $dep list of dependencies 
+	 */
+	public static function dependencies($dep) {
+		self::$redbean->setDepList($dep);
+    }
 
+	/**
+	 * Short hand function to store a set of beans at once, IDs will be
+	 * returned as an array. For information please consult the R::store()
+	 * function.
+	 * A loop saver.
+	 * 
+	 * @param array $beans list of beans to be stored
+	 * 
+	 * @return array $ids list of resulting IDs 
+	 */
+	public static function storeAll($beans) {
+		$ids = array();
+		foreach($beans as $bean) $ids[] = self::store($bean);
+		return $ids;
+	}
+	
+	/**
+	 * Short hand function to trash a set of beans at once.
+	 * For information please consult the R::trash() function.
+	 * A loop saver.
+	 * 
+	 * @param array $beans list of beans to be trashed 
+	 */
+	public static function trashAll($beans) {
+		foreach($beans as $bean) self::trash($bean);
+	}
+	
+	/**
+	 * A label is a bean with only an id, type and name property.
+	 * This function will dispense beans for all entries in the array. The
+	 * values of the array will be assigned to the name property of each
+	 * individual bean.
+	 * 
+	 * @param string $type   type of beans you would like to have
+	 * @param array  $labels list of labels, names for each bean
+	 * 
+	 * @return array $bean a list of beans with type and name property 
+	 */
+	public static function dispenseLabels($type,$labels) {
+		$labelBeans = array();
+		foreach($labels as $label) {
+			$labelBean = self::dispense($type);
+			$labelBean->name = $label;
+			$labelBeans[] = $labelBean;
+		}
+		return $labelBeans;
+	}
+	
+	/**
+	 * Gathers labels from beans. This function loops through the beans,
+	 * collects the values of the name properties of each individual bean
+	 * and stores the names in a new array. The array then gets sorted using the
+	 * default sort function of PHP (sort).
+	 * 
+	 * @param array $beans list of beans to loop
+	 * 
+	 * @return array $array list of names of beans 
+	 */
+	public function gatherLabels($beans) {
+		$labels = array();
+		foreach($beans as $bean) $labels[] = $bean->name;
+		sort($labels);
+		return $labels;
+	}
 		
 }
 
