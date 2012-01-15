@@ -140,11 +140,12 @@ class RedBean_Cooker {
 	 *  
 	 * @param	array   $array       array to be turned into a bean collection
 	 * @param   boolean $filterEmpty whether you want to exclude empty beans
+	 * @param   string  $parentKey	 name of the property that contains these beans
 	 *
 	 * @return	array $beans beans
 	 */
-	public function graph( $array, $filterEmpty = false ) {
-       $beans = array();
+	public function graph( $array, $filterEmpty = false, $parentKey = false ) {
+		$beans = array();
 		if (is_array($array) && isset($array['type'])) {
 			$type = $array['type'];
 			unset($array['type']);
@@ -160,7 +161,9 @@ class RedBean_Cooker {
 				else {
 					//no more properties besides type and id, read is enough.
 					//ask for a bean to read.
-					return $this->loadFromPool($type,$id,'r');
+					$bean = $this->loadFromPool($type,$id,'r');
+					$this->purify($bean);
+					return $bean;
 				}
 			}
 			else {
@@ -170,7 +173,7 @@ class RedBean_Cooker {
 			
 			foreach($array as $property=>$value) {
 				if (is_array($value)) {
-					$bean->$property = $this->graph($value,$filterEmpty);
+					$bean->$property = $this->graph($value,$filterEmpty,$property);
 				}
 				else {
 					if (strpos($property,'_id')!==false) {
@@ -185,10 +188,28 @@ class RedBean_Cooker {
 		}
 		elseif (is_array($array)) {
 			foreach($array as $key=>$value) {
+				
+				$mustBeA = null;
+				if (strpos($parentKey,'own')===0) $mustBeA = __lcfirst(substr($parentKey,3));
+				if (strpos($parentKey,'shared')===0) $mustBeA = __lcfirst(substr($parentKey,6));
+				
+				//Allow multi selects 
+				if (!is_array($value)) { 
+					$value = array('type'=>$mustBeA, 'id'=>$value);
+					if ($value < 1) throw new RedBean_Exception_Security('Expected ID value but got invalid ID.');
+					if (empty($mustBeA)) throw new RedBean_Exception_Security('Invalid type for multi select bean: '.$mustBeA);
+				}
+				
 				$listBean = $this->graph($value,$filterEmpty);
 				if (!($listBean instanceof RedBean_OODBBean)) {
 					throw new RedBean_Exception_Security('Expected bean but got :'.gettype($listBean)); 
 				}
+				
+				//Type checking
+				if ($mustBeA && $listBean->getMeta('type')!==$mustBeA) 
+					throw new RedBean_Exception_Security('List '.$parentKey.' may not contain '.$listBean->getMeta('type'));
+				
+				//Empty value filtering
 				if ($listBean->isEmpty()) {  
 					if (!$filterEmpty) { 
 						$beans[$key] = $listBean;
