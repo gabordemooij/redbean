@@ -284,13 +284,19 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 
 	/**
 	 * Returns the Type Code for a Column Description.
+	 * Given an SQL column description this method will return the corresponding
+	 * code for the writer. If the include specials flag is set it will also
+	 * return codes for special columns. Otherwise special columns will be identified
+	 * as specified columns.
 	 *
-	 * @param string $typedescription description
+	 * @param string  $typedescription description
+	 * @param boolean $includeSpecials whether you want to get codes for special columns as well
 	 *
 	 * @return integer $typecode code
 	 */
-	public function code( $typedescription ) {
+	public function code( $typedescription, $includeSpecials = false ) {
 		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
+		if ($includeSpecials) return $r;
 		if ($r > self::C_DATATYPE_SPECIFIED) return self::C_DATATYPE_SPECIFIED;
 		return $r;
 	}
