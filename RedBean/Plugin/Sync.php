@@ -21,6 +21,7 @@ class RedBean_Plugin_Sync implements RedBean_Observer {
 	 */
 	private $sqlCode;
 	
+	
 	/**
 	 * Captures the SQL required to adjust source database to match
 	 * schema of target database.
@@ -58,7 +59,9 @@ class RedBean_Plugin_Sync implements RedBean_Observer {
 		
 		$missingTables = array_diff($sourceTables,$targetTables);
 		foreach($missingTables as $missingTable) {
+			
 			$nullWriter->createTable($missingTable);
+			
 		}
 		
 		foreach($sourceTables as $sourceTable) {
@@ -70,6 +73,14 @@ class RedBean_Plugin_Sync implements RedBean_Observer {
 				$targetColumns = $targetWriter->getColumns($sourceTable);
 			}
 			unset($sourceColumns['id']);
+			
+			//Is it a link table? -- Add Unique constraint and FK constraint
+			if (strpos($sourceTable,'_')!==false) {
+				$nullWriter->addUniqueIndex($sourceTable, array_keys($sourceColumns));
+				$types = explode('_',$sourceTable);
+				$nullWriter->addConstraint(R::dispense($types[0]),R::dispense($types[1]));
+			}
+			
 			foreach($sourceColumns as $sourceColumn => $sourceType) {
 				$sourceCode = $sourceWriter->code($sourceType,true);
 				if (!isset($targetColumns[$sourceColumn])) {
@@ -85,6 +96,7 @@ class RedBean_Plugin_Sync implements RedBean_Observer {
 				}
 			}
 		}
+		
 		
 		return $this->sqlCode;
 		
