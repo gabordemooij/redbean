@@ -23,11 +23,38 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
+		
+		
+		testpack('Test issue with ownItems and stealing Ids.');
+		R::nuke();
+		$bill = R::dispense('bill');
+		$item = R::dispense('item');
+		$element = R::dispense('element');
+		$bill->ownItem[] = $item;
+		$bill->sharedElement[] = $element;
+		R::store($bill);
+		$bill = R::load('bill',1);
+		$bill->ownItem;
+		$bill->sharedElement;
+		$copy = R::dup($bill);
+		R::store($copy);
+		
+		$rows=(R::getAll('select * from bill_element'));
+		asrt(count($rows),2);
+		
+		$rows=(R::getAll('select * from item'));
+		
+		foreach($rows as $row) {
+			asrt(($row['bill_id']>0),true);
+		}
+		
 		R::nuke();
 		$this->runOnce();
 		R::freeze(true);
 		$this->runOnce(false);
 		R::freeze(false);
+		
+		
 		
 		
 	}
