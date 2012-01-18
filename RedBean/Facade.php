@@ -621,14 +621,15 @@ class RedBean_Facade {
 				foreach($beans as $subBean) {
 					array_push($copy->$owned,self::dup($subBean,$trail,$pid));	
 				}
-				
 			}
+			$copy->setMeta('sys.shadow.'.$owned,null);
 			if ($beans = $bean->$shared) {
 				$copy->$shared = array();
 				foreach($beans as $subBean) {
 					array_push($copy->$shared,$subBean);
 				}
 			}
+			$copy->setMeta('sys.shadow.'.$shared,null);
 			
 		}
 		
