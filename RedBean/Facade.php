@@ -316,6 +316,22 @@ class RedBean_Facade {
 		return self::$redbean->convertToBeans($type,$rows);
 	}
 
+	/**
+	* Returns only single associated bean.
+	*
+	* @param RedBean_OODBBean $bean bean provided
+	* @param string $type type of bean you are searching for
+	* @param string $sql SQL for extra filtering
+	* @param array $values values to be inserted in SQL slots
+	*
+	*
+	* @return RedBean_OODBBean $bean
+	*/
+	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql=null, $values=array() ) {
+		$beans = self::related($bean, $type, $sql, $values);
+		if (count($beans)==0) return null;
+		return reset( $beans );
+	}
 
 	/**
 	 * Checks whether a pair of beans is related N-M. This function does not
