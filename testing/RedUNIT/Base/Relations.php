@@ -267,6 +267,10 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(count($book2->sharedTopic),1);
 		//get books for topic
 		asrt(count(R::related($topic3,'book')),2);
+		asrt((R::relatedOne($topic3,'book') instanceof RedBean_OODBBean),true);
+		$items = R::related($topic3,'book');
+		$a = reset($items);
+		asrt(R::relatedOne($topic3,'book')->id,$a->id);
 		$t3 = R::load('topic',$topic3->id);
 		asrt(count($t3->sharedBook),2);
 		//nuke an own-array, replace entire array at once without getting first
