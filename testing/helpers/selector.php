@@ -99,7 +99,8 @@ $allPacks = array(
 		'Sqlite/Setget',
 		'Sqlite/Foreignkeys',
 		'Sqlite/Parambind',
-		'Sqlite/Writer'
+		'Sqlite/Writer',
+		'Base/Close'
 );
 
 //Default (mode == all)

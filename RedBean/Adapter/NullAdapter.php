@@ -227,5 +227,13 @@ class RedBean_Adapter_NullAdapter extends RedBean_Observable implements RedBean_
 	public function rollback() {
 		return null;
 	}
+	
+	
+	/**
+	 * Null implementation of close database connection function.
+	 */
+	public function close() {
+		return null;
+	}
 
 }
