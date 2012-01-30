@@ -420,5 +420,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->connect();
 		return $this->pdo;
 	}
+	
+	/**
+	 * Closes database connection by destructing PDO.
+	 */
+	public function close() {
+		$this->pdo = null;
+	}
 }
 

@@ -1062,6 +1062,14 @@ class RedBean_Facade {
 		sort($labels);
 		return $labels;
 	}
+	
+	
+	/**
+	 * Closes the database connection.
+	 */
+	public static function close() {
+		self::$adapter->close();
+	}
 		
 }
 

@@ -150,5 +150,10 @@ interface RedBean_Adapter {
 	 * Rolls back the transaction.
 	 */
 	public function rollback();
+	
+	/**
+	 * Closes database connection.
+	 */
+	public function close();
 
 }
