@@ -45,7 +45,7 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 */
 	public static function getModelName( $model, $bean = null ) {
 		if (self::$modelFormatter){
-			return self::$modelFormatter->formatModel($model);
+			return self::$modelFormatter->formatModel($model,$bean);
 		}
 		else {
 			return 'Model_'.ucfirst($model);
