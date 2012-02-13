@@ -1,23 +1,12 @@
 <?php
 $pat = "/\/\*([\n]|.)+?\*\//";
 
-
-
-function clean($raw) {
-   global $pat;
-   $raw = str_replace("<?php", "", $raw);
-   $raw = str_replace("?>", "", $raw);
-   return $raw;
-}
-
-$code = "<?php ";
+$code = "";
 $loader = simplexml_load_file("replica.xml");
 $items = $loader->load->item;
 foreach($items as $item) {
     echo "Adding: $item \n";
-    $raw = file_get_contents( $item );
-    $code.=clean($raw);
-
+    $code .= file_get_contents( $item ) . "\n";
 }
 $code .= "
 
@@ -25,5 +14,8 @@ class R extends RedBean_Facade{
 }
 ";
 
+//Clean php tags and whitespace from codebase.
+$code = "<?php ".str_replace( array("<?php", "<?", "?>"), array("", "", ""), $code);
 file_put_contents("rb.php", $code);
-file_put_contents("rb.php",php_strip_whitespace("rb.php"));
+file_put_contents("rb.php", php_strip_whitespace("rb.php"));
+?>
