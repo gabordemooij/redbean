@@ -35,7 +35,7 @@ namespace $n;
 ?>".$code;
 
 $natObjects = array(
-"IteratorAggregate","ArrayAccess","Exception","PDO","ArrayIterator"
+"IteratorAggregate","ArrayAccess","Exception","PDO","ArrayIterator","Countable"
 );
 
 foreach($natObjects as $natObj) {
