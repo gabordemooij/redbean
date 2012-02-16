@@ -62,5 +62,23 @@ class RedBean_SimpleModel {
 	public function __isset($key) {
 		return (isset($this->bean->$key));
 	}
+	
+	/**
+	 * Box the bean using the current model.
+	 * 
+	 * @return RedBean_SimpleModel $box a bean in a box
+	 */
+	public function box() {
+		return $this;
+	}
+	
+	/**
+	 * Unbox the bean from the model.
+	 * 
+	 * @return RedBean_OODBBean $bean bean 
+	 */
+	public function unbox(){
+		return $this->bean;
+	}
 
 }
