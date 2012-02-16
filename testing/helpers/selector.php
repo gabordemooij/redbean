@@ -51,13 +51,13 @@ $packList = array();
 
 $allPacks = array(
 		'Blackhole/Version',
+		'Blackhole/Fusebox',
 		'Blackhole/Labels',
 		'Blackhole/Tainted',
 		'Blackhole/Meta',
 		'Blackhole/Import',
 		'Blackhole/Export',
 		'Blackhole/Misc',
-		'Blackhole/Fusebox',
 		'Base/Dispense',
 		'Base/Typechecking',
 		'Base/Observers',
