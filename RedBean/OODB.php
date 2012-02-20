@@ -144,7 +144,7 @@ class RedBean_OODB extends RedBean_Observable {
 			throw new RedBean_Exception_Security('Bean has incomplete Meta Information II');
 		}
 		//Pattern of allowed characters
-		$pattern = '/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]/';
+		$pattern = '/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-]/';
 		//Does the type contain invalid characters?
 		if (preg_match($pattern,$bean->getMeta('type'))) {
 			throw new RedBean_Exception_Security('Bean Type is invalid');
