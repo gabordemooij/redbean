@@ -233,10 +233,11 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param string  $asql    additional sql
 	 * @param boolean $delete  IF TRUE delete records (optional)
 	 * @param boolean $inverse IF TRUE inverse the selection (optional)
+	 * @param boolean $all     IF TRUE suppress WHERE keyword, omitting WHERE clause
 	 *
 	 * @return array $records selected records
 	 */
-	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false ) { 
+	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false, $all=false ) { 
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
 		$table = $this->safeTable($type);
 		$sqlConditions = array();
@@ -271,7 +272,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			if ($addSql) $sql .= " AND $addSql ";
 		}
 		elseif ($addSql) {
-			$sql = " WHERE $addSql";
+			if ($all)
+				$sql = " $addSql ";
+			else
+				$sql = " WHERE $addSql ";
 		}
 		$sql = (($delete) ? "DELETE FROM " : "SELECT * FROM ").$table.$sql;
 		$rows = $this->adapter->get($sql,$bindings);
