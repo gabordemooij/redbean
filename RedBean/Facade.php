@@ -394,6 +394,7 @@ class RedBean_Facade {
 	 * @return array $beans  beans
 	 */
 	public static function find( $type, $sql=null, $values=array() ) {
+		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
 		return self::$redbean->find($type,array(),array($sql,$values));
 	}
 
