@@ -15,6 +15,14 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Cooker {
+	
+	/**
+	 * This flag indicates whether empty strings in beans will be
+	 * interpreted as NULL or not. TRUE means Yes, will be converted to NULL,
+	 * FALSE means empty strings will be stored as such (conversion to 0 for integer fields).
+	 * @var boolean
+	 */
+	private static $useNULLForEmptyString = false;
 
 	/**
 	 * Sets the toolbox to be used by graph()
@@ -82,6 +90,10 @@ class RedBean_Cooker {
 					$bean->$property = $this->graph($value,$filterEmpty);
 				}
 				else {
+					if($value == '' && self::$useNULLForEmptyString){
+						$bean->$property = null;
+                    }
+					else
 					$bean->$property = $value;
 				}
 			}
@@ -108,4 +120,14 @@ class RedBean_Cooker {
 			throw new RedBean_Exception_Security('Expected array but got :'.gettype($array)); 
 		}
 	}
+	
+	/**
+	 * Toggles the use-NULL flag.
+	 *  
+	 * @param boolean $yesNo 
+	 */
+	public function setUseNullFlag($yesNo) {
+		self::$useNULLForEmptyString = (boolean) $yesNo;
+	}
+	
 }

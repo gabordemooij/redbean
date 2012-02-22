@@ -368,6 +368,29 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt($order->sharedCoupon[$couponID]->name,'567');
 		
 		
+		
+		R::nuke();
+		$form = array(
+			'type'=>'person',
+			'name'=>'Fred',
+			'phone'=>''
+		);
+		$bean = R::graph($form);
+		asrt($bean->name,'Fred');
+		asrt($bean->phone,'');
+		
+		RedBean_Cooker::setUseNullFlag(true);
+		$form = array(
+			'type'=>'person',
+			'name'=>'Fred',
+			'phone'=>''
+		);
+		$bean = R::graph($form);
+		asrt($bean->name,'Fred');
+		asrt($bean->phone,null);
+		RedBean_Cooker::setUseNullFlag(false);
+		
+		
 		//save a form using graph and ignore empty beans, wrong nesting
 		R::nuke();
 		$product = R::dispense('product');
