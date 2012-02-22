@@ -102,7 +102,9 @@ class RedBean_Facade {
 	 *
 	 * @return void
 	 */
-	public static function setup( $dsn='sqlite:/tmp/red.db', $username=NULL, $password=NULL ) {
+	public static function setup( $dsn=NULL, $username=NULL, $password=NULL ) {
+		if (function_exists('sys_get_temp_dir')) $tmp = sys_get_temp_dir(); else $tmp = 'tmp';
+		if (is_null($dsn)) $dsn = 'sqlite:/'.$tmp.'/red.db';
 		self::addDatabase('default',$dsn,$username,$password);
 		self::selectDatabase('default');
 		return self::$toolbox;
