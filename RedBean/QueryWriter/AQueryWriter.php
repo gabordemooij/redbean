@@ -177,7 +177,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$p[] = " {$this->safeColumn($uv["property"])} = ? ";
 			$v[]=$uv["value"];
 		}
-		$sql .= implode(",", $p ) ." WHERE id = ".intval($id);
+		$sql .= implode(",", $p ) ." WHERE id = ".(string) $id;
 		$this->adapter->exec( $sql, $v );
 		return $id;
 	}
