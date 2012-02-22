@@ -68,6 +68,10 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		asrt(count(R::related($book,"book")),2);
 		
 		asrt(count(R::find("book")),3);
+		asrt(count(R::findAll("book")),3);
+		asrt(count(R::findAll("book"," LIMIT 2")),2);
+		
+		
 		asrt(count(R::find("book"," id=id ")),3);
 		asrt(count(R::find("book"," title LIKE ?", array("third"))),1);
 		asrt(count(R::find("book"," title LIKE ?", array("%d%"))),2);

@@ -182,14 +182,16 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @throws RedBean_Exception_SQL 
 	 * 
-	 * @param string $type       type of beans you are looking for
-	 * @param array  $conditions list of conditions
-	 * @param null $addSQL
-	 * @return array
+	 * @param string  $type       type of beans you are looking for
+	 * @param array   $conditions list of conditions
+	 * @param string  $addSQL	  SQL to be used in query
+	 * @param boolean $all        whether you prefer to use a WHERE clause or not (TRUE = not)
+	 * 
+	 * @return array $beans		  resulting beans
 	 */
-	public function find($type,$conditions=array(),$addSQL=null) {
+	public function find($type,$conditions=array(),$addSQL=null,$all=false) {
 		try {
-			$beans = $this->convertToBeans($type,$this->writer->selectRecord($type,$conditions,$addSQL));
+			$beans = $this->convertToBeans($type,$this->writer->selectRecord($type,$conditions,$addSQL,false,false,$all));
 			return $beans;
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
