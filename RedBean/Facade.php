@@ -88,7 +88,7 @@ class RedBean_Facade {
 	 * @return string $version Version ID
 	 */
 	public static function getVersion() {
-		return "3.0";
+		return "3.2";
 	}
 
 	/**
