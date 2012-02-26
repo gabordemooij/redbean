@@ -17,5 +17,8 @@ class R extends RedBean_Facade{
 //Clean php tags and whitespace from codebase.
 $code = "<?php ".str_replace( array("<?php", "<?", "?>"), array("", "", ""), $code);
 file_put_contents("rb.php", $code);
+
+if ($_SERVER['argc']>1 && $_SERVER['argv'][1]=='-s')
 file_put_contents("rb.php", php_strip_whitespace("rb.php"));
+
 ?>
