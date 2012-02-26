@@ -16,7 +16,24 @@
 
 class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger {
 	
+	/**
+	 * Path to file to write SQL and comments to.
+	 * 
+	 * @var string 
+	 */
 	protected $file;
+	
+	/**
+	 * Constructor.
+	 * Requires a path to an existing and writable file.
+	 * 
+	 * @param string $outputPath path to file to write schema changes to. 
+	 */
+	public function __construct($outputPath) {
+		if (!file_exists($outputPath) || !is_writable($outputPath)) 
+			throw new RedBean_Exception_Security('Cannot write to file: '.$outputPath);
+		$this->file = $outputPath;
+	}
 	
 	/**
 	 * Implementation of the onEvent() method for Observer interface.
@@ -48,12 +65,5 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger {
 		}
 	}
 	
-	
-	public function __construct($outputPath) {
-		if (!file_exists($outputPath) || !is_writable($outputPath)) 
-			throw new RedBean_Exception_Security('Cannot write to file: '.$outputPath);
-		$this->file = $outputPath;
-	}
-
 	
 }
