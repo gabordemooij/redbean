@@ -81,15 +81,6 @@ class RedBean_Facade {
 	 */
 	public static $f;
 
-	/**
-	 * Returns version ID string
-	 * Version No format: <Major>.<Minor>.<Maintenance>.<Fix/Update>
-	 *
-	 * @return string $version Version ID
-	 */
-	public static function getVersion() {
-		return "3.2";
-	}
 
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
@@ -1096,6 +1087,17 @@ class RedBean_Facade {
 	 */
 	public static function close() {
 		self::$adapter->close();
+	}
+	
+	/**
+	 * Activates TimeLine Schema Alteration monitoring and
+	 * Query logging.
+	 * 
+	 * @param type $filename 
+	 */
+	public static function log($filename) {
+		$tl = new RedBean_Plugin_TimeLine($filename);
+		self::$adapter->addEventListener('sql_exec',$tl);
 	}
 		
 }
