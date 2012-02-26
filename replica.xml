@@ -40,6 +40,7 @@
 		<item type="php">RedBean/Facade.php</item>
 		<item type="php">RedBean/BeanCan.php</item>
 		<item type="php">RedBean/Cooker.php</item>
-
+		<item type="php">RedBean/Plugin/QueryLogger.php</item>
+		<item type="php">RedBean/Plugin/TimeLine.php</item>
 	</load>
 </root>
