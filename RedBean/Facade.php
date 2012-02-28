@@ -1099,6 +1099,34 @@ class RedBean_Facade {
 		$tl = new RedBean_Plugin_TimeLine($filename);
 		self::$adapter->addEventListener('sql_exec',$tl);
 	}
+	
+	
+	/**
+	 * Simple convenience function, returns ISO date formatted representation
+	 * of $time.
+	 * 
+	 * @param mixed $time UNIX timestamp
+	 *  
+	 * @return type 
+	 */
+	public static function isoDate( $time = null ) {
+		if (!$time) $time = time();
+		return @date('Y-m-d',$time);
+	}
+	
+	/**
+	 * Simple convenience function, returns ISO date time
+	 * formatted representation
+	 * of $time.
+	 * 
+	 * @param mixed $time UNIX timestamp
+	 *  
+	 * @return type 
+	 */
+	public static function isoDateTime( $time = null) {
+		if (!$time) $time = time();
+		return @date('Y-m-d H:i:s',$time);
+	}
 		
 }
 
