@@ -300,7 +300,8 @@ class RedBean_OODB extends RedBean_Observable {
 			$tmpCollectionStore = array();
 			$embeddedBeans = array();
 			foreach($bean as $p=>$v) {
-				if ($v instanceof RedBean_OODBBean) {
+				if ($v instanceof RedBean_OODBBean || $v instanceof RedBean_SimpleModel) {
+					if ($v instanceof RedBean_SimpleModel) $v = $v->unbox(); 
 					$embtype = $v->getMeta('type');
 					if (!$v->id || $v->getMeta('tainted')) {
 						$this->store($v);
