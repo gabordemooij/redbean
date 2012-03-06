@@ -81,6 +81,14 @@ class RedBean_Facade {
 	 */
 	public static $f;
 
+	
+	/**
+	 * Get version
+	 * @return string 
+	 */
+	public static function getVersion() { 
+		return '3.2';
+	}
 
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
@@ -387,6 +395,7 @@ class RedBean_Facade {
 	 * @return array $beans  beans
 	 */
 	public static function find( $type, $sql=null, $values=array() ) {
+		if ($sql instanceof RedBean_SQLHelper) list($sql,$values) = $sql->getQuery();
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
 		return self::$redbean->find($type,array(),array($sql,$values));
 	}
