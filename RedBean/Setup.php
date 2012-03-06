@@ -31,6 +31,7 @@ class RedBean_Setup {
 		strpos($dsn, 'mysql:')!==0
 				  && strpos($dsn,'sqlite:')!==0
 				  && strpos($dsn,'pgsql:')!==0
+				  && strpos($dsn,'cubrid:')!==0
 		) {
 			trigger_error('Unsupported DSN');
 		}
@@ -78,6 +79,9 @@ class RedBean_Setup {
 		}
 		else if (strpos($dsn,'sqlite')===0) {
 			$writer = new RedBean_QueryWriter_SQLiteT($adapter);
+		}
+		else if (strpos($dsn,'cubrid')===0) {
+			$writer = new RedBean_QueryWriter_Cubrid($adapter);
 		}
 		else {
 			$writer = new RedBean_QueryWriter_MySQL($adapter);
