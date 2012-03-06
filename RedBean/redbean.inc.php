@@ -58,6 +58,7 @@ require($dir.'QueryWriter/AQueryWriter.php');
 require($dir.'QueryWriter/MySQL.php');
 require($dir.'QueryWriter/SQLiteT.php');
 require($dir.'QueryWriter/PostgreSQL.php');
+require($dir.'QueryWriter/Cubrid.php');
 
 //Load required Exceptions
 require($dir.'Exception.php');
