@@ -309,43 +309,65 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 *
 	 * @return bool $success whether an FK has been added
 	 */
-	public function addFK( $type, $targetType, $field, $targetField) {
+	public function addFK( $type, $targetType, $field, $targetField, $isDep = false) {
 		try{
 			$table = $this->safeTable($type);
 			$column = $this->safeColumn($field);
 			$tableNoQ = $this->safeTable($type,true);
 			$columnNoQ = $this->safeColumn($field,true);
 			$targetTable = $this->safeTable($targetType);
+			$targetTableNoQ = $this->safeTable($targetType,true);
 			$targetColumn  = $this->safeColumn($targetField);
-			$fkCode = $tableNoQ.'_'.$columnNoQ.'_fkey';
-			$sql = "
-						SELECT
-								c.oid,
-								n.nspname,
-								c.relname,
-								n2.nspname,
-								c2.relname,
-								cons.conname
-						FROM pg_class c
-						JOIN pg_namespace n ON n.oid = c.relnamespace
-						LEFT OUTER JOIN pg_constraint cons ON cons.conrelid = c.oid
-						LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
-						LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
-						WHERE c.relkind = 'r'
-						AND n.nspname IN ('public')
-						AND (cons.contype = 'f' OR cons.contype IS NULL)
-						AND
-						(  cons.conname = '{$fkCode}' )
-
-					  ";
-			$rows = $this->adapter->get( $sql );
-			if (!count($rows)) {
-				$this->adapter->exec("ALTER TABLE  $table
-					ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
-					$targetColumn) ON DELETE SET NULL ON UPDATE SET NULL DEFERRABLE ;");
-					return true;
+			$targetColumnNoQ  = $this->safeColumn($targetField,true);
+			
+			
+			$sql = "SELECT
+					tc.constraint_name, 
+					tc.table_name, 
+					kcu.column_name, 
+					ccu.table_name AS foreign_table_name,
+					ccu.column_name AS foreign_column_name,
+					rc.delete_rule
+					FROM 
+					information_schema.table_constraints AS tc 
+					JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
+					JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
+					JOIN information_schema.referential_constraints AS rc ON ccu.constraint_name = rc.constraint_name
+					WHERE constraint_type = 'FOREIGN KEY' AND tc.table_catalog=current_database()
+					AND tc.table_name = '$tableNoQ' 
+					AND ccu.table_name = '$targetTableNoQ'
+					AND kcu.column_name = '$columnNoQ'
+					AND ccu.column_name = '$targetColumnNoQ'
+					";
+	
+			
+			$row = $this->adapter->getRow($sql);
+			
+			$flagAddKey = false;
+			
+			if (!$row) $flagAddKey = true;
+			
+			if ($row) { 
+				if (($row['delete_rule']=='SET NULL' && $isDep) || 
+					($row['delete_rule']!='SET NULL' && !$isDep)) {
+					//delete old key
+					$flagAddKey = true; //and order a new one
+					$cName = $row['constraint_name'];
+					$sql = "ALTER TABLE $table DROP CONSTRAINT $cName ";
+					$this->adapter->exec($sql);
+				} 
 				
 			}
+			
+			if ($flagAddKey) {
+			$delRule = ($isDep ? 'CASCADE' : 'SET NULL');	
+			$this->adapter->exec("ALTER TABLE  $table
+					ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
+					$targetColumn) ON DELETE $delRule ON UPDATE SET NULL DEFERRABLE ;");
+					return true;
+			}
+			return false;
+			
 		}
 		catch(Exception $e){ return false; }
 	}

@@ -294,15 +294,16 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	/**
 	 * Adds a foreign key to a type
 	 *
-	 * @param  string $type        type you want to modify table of
-	 * @param  string $targetType  target type
-	 * @param  string $field       field of the type that needs to get the fk
-	 * @param  string $targetField field where the fk needs to point to
+	 * @param string  $type        type you want to modify table of
+	 * @param string  $targetType  target type
+	 * @param string  $field       field of the type that needs to get the fk
+	 * @param string  $targetField field where the fk needs to point to
+	 * @param boolean $isDep       whether this field is dependent on it's referenced record
 	 *
 	 * @return bool $success whether an FK has been added
 	 */
-	public function addFK( $type, $targetType, $field, $targetField) {
-		return $this->buildFK($type, $targetType, $field, $targetField);
+	public function addFK( $type, $targetType, $field, $targetField, $isDep=false) {
+		return $this->buildFK($type, $targetType, $field, $targetField, $isDep);
 	}
 
 	/**
@@ -319,6 +320,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 
 	protected function buildFK($type, $targetType, $field, $targetField,$constraint=false) {
 			try{
+				$consSQL = ($constraint ? 'CASCADE' : 'SET NULL');
 				$table = $this->safeTable($type,true);
 				$targetTable = $this->safeTable($targetType,true);
 				$field = $this->safeColumn($field,true);
@@ -336,9 +338,13 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 				$oldFKs = $this->adapter->get($sqlGetOldFKS);
 				$restoreFKSQLSnippets = "";
 				foreach($oldFKs as $oldFKInfo) {
-					if ($oldFKInfo['from']==$field) {
+					if ($oldFKInfo['from']==$field && $oldFKInfo['on_delete']==$consSQL) {
 						//this field already has a FK.
 						return false;
+					}
+					if ($oldFKInfo['from']==$field && $oldFKInfo['on_delete']!=$consSQL) {
+						//this field already has a FK.but needs to be replaced
+						continue;
 					}
 					$oldTable = $table;
 					$oldField = $oldFKInfo['from'];
@@ -366,6 +372,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 				foreach($q as $sq) {
 					$this->adapter->exec($sq);
 				}
+				
+				
 				return true;
 			}
 			catch(Exception $e){ return false; }

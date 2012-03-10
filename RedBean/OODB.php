@@ -300,7 +300,8 @@ class RedBean_OODB extends RedBean_Observable {
 			$tmpCollectionStore = array();
 			$embeddedBeans = array();
 			foreach($bean as $p=>$v) {
-				if ($v instanceof RedBean_OODBBean) {
+				if ($v instanceof RedBean_OODBBean || $v instanceof RedBean_SimpleModel) {
+					if ($v instanceof RedBean_SimpleModel) $v = $v->unbox(); 
 					$embtype = $v->getMeta('type');
 					if (!$v->id || $v->getMeta('tainted')) {
 						$this->store($v);
@@ -417,7 +418,8 @@ class RedBean_OODB extends RedBean_Observable {
 					$this->writer->addIndex($bean->getMeta('type'),
 								'index_foreignkey_'.$embeddedBean->getMeta('type'),
 								 $linkField);
-					$this->writer->addFK($bean->getMeta('type'),$embeddedBean->getMeta('type'),$linkField,'id');
+					$isDep = $this->isDependentOn($bean->getMeta('type'),$embeddedBean->getMeta('type'));
+					$this->writer->addFK($bean->getMeta('type'),$embeddedBean->getMeta('type'),$linkField,'id',$isDep);
 	
 				}
 			}
@@ -444,7 +446,8 @@ class RedBean_OODB extends RedBean_Observable {
 						$this->writer->addIndex($addition->getMeta('type'),
 							'index_foreignkey_'.$bean->getMeta('type'),
 							 $myFieldLink);
-						$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,'id');
+						$isDep = $this->isDependentOn($addition->getMeta('type'),$bean->getMeta('type'));
+						$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,'id',$isDep);
 					}
 				}
 				else {
@@ -474,6 +477,21 @@ class RedBean_OODB extends RedBean_Observable {
 		$this->signal('after_update',$bean);
 		return (int) $bean->id;
 	}
+	
+	/**
+	 * Checks whether reference type has been marked as dependent on target type.
+	 * This is the result of setting reference type as a key in R::dependencies() and
+	 * putting target type in its array. 
+	 * 
+	 * @param string $refType   reference type
+	 * @param string $otherType other type / target type
+	 * 
+	 * @return boolean 
+	 */
+	protected function isDependentOn($refType,$otherType) {
+		return (boolean) (isset($this->dep[$refType]) && in_array($otherType,$this->dep[$refType]));
+	}
+	
 
 	/**
 	 * Loads a bean from the object database.
