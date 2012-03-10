@@ -127,5 +127,31 @@
 		$this->params = array();
 		return $this;
 	}
+	
+	/**
+	 * To explicitly add a piece of SQL.
+	 * 
+	 * @param string $sql sql
+	 * 
+	 * @return RedBean_SQLHelper 
+	 */
+	public function addSQL($sql) {
+		if ($this->capture) {
+			$this->sql .= ' '.$sql . ' ';
+			return $this;
+		}
+	}
+	
+	
+	/**
+	 * Returns query parts.
+	 * 
+	 * @return array $queryParts query parts. 
+	 */
+	public function getQuery() {
+		$list = array($this->sql,$this->params);
+		$this->clear();
+		return $list;
+	}
 
 }

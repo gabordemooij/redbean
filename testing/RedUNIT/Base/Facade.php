@@ -75,6 +75,15 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		asrt(count(R::find("book"," id=id ")),3);
 		asrt(count(R::find("book"," title LIKE ?", array("third"))),1);
 		asrt(count(R::find("book"," title LIKE ?", array("%d%"))),2);
+		
+		//now with new SQL Helper argument
+		asrt(count(R::find("book",R::$f->begin()->addSQL('title LIKE ? ')->put('third'))),1);
+		asrt(count(R::find("book",R::$f->begin()->addSQL('title LIKE ? ')->put('%d%'))),2);
+		asrt(count(R::find("book",R::$f->begin()->addSQL('title')->like(' ? ')->addSQL(' ORDER BY id ')->desc()->put('%d%'))),2);
+		
+		//find without where clause
+		asrt(count(R::findAll('book',' order by id')),3);
+		
 		R::unassociate($book, $book2);
 		asrt(count(R::related($book,"book")),1);
 		R::trash($book3);

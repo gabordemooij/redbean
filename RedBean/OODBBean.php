@@ -231,7 +231,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	public function &__get( $property ) {
 		if ($this->beanHelper)
 		$toolbox = $this->beanHelper->getToolbox();
-		if (!isset($this->properties[$property])) { 
+		//if (!isset($this->properties[$property])) { 
 			$fieldLink = $property.'_id'; 
 			/**
 			 * All this magic can be become very complex quicly. For instance,
@@ -248,6 +248,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$this->properties[$property] = $bean;
 				return $this->properties[$property];
 			}
+			if (!isset($this->properties[$property])) {
 			if (strpos($property,'own')===0) {
 				$firstCharCode = ord(substr($property,3,1));
 				if ($firstCharCode>=65 && $firstCharCode<=90) {

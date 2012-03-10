@@ -62,6 +62,7 @@ $allPacks = array(
 		'Base/Typechecking',
 		'Base/Observers',
 		'Base/Database',
+		'Base/Foreignkeys',
 		'Base/Copy',
 		'Base/Dup',
 		'Base/Update',

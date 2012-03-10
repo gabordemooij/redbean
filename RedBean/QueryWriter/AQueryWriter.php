@@ -365,28 +365,42 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return void
 	 */
-	public function addFK( $type, $targetType, $field, $targetField) {
+	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false) {
 		$table = $this->safeTable($type);
 		$tableNoQ = $this->safeTable($type,true);
 		$targetTable = $this->safeTable($targetType);
 		$column = $this->safeColumn($field);
 		$columnNoQ = $this->safeColumn($field,true);
 		$targetColumn  = $this->safeColumn($targetField);
+		$targetColumnNoQ  = $this->safeColumn($targetField,true);
 		$db = $this->adapter->getCell("select database()");
-		$fks =  $this->adapter->getCell("
-			SELECT count(*)
+		$fkName = 'fk_'.$tableNoQ.'_'.$columnNoQ.'_'.$targetColumnNoQ.($isDependent ? '_casc':'');
+		$cName = 'cons_'.$fkName;
+		$cfks =  $this->adapter->getCell("
+			SELECT CONSTRAINT_NAME
 			FROM information_schema.KEY_COLUMN_USAGE
 			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME = '$tableNoQ'  AND COLUMN_NAME = '$columnNoQ' AND
 			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
 		");
-		if ($fks==0) {
-			try{
-				$this->adapter->exec("ALTER TABLE  $table
-				ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
-				$targetColumn) ON DELETE SET NULL ON UPDATE SET NULL ;");
+		$flagAddKey = false;
+		
+		try{
+			//No keys
+			if (!$cfks) {
+				$flagAddKey = true; //go get a new key
 			}
-			catch(Exception $e) { } //Failure of fk-constraints is not a problem
+			//has fk, but different setting, --remove
+			if ($cfks && $cfks!=$cName) {
+				$this->adapter->exec("ALTER TABLE $table DROP FOREIGN KEY $cfks ");
+				$flagAddKey = true; //go get a new key.
+			}
+			if ($flagAddKey) { 
+				$this->adapter->exec("ALTER TABLE  $table
+				ADD CONSTRAINT $cName FOREIGN KEY $fkName (  $column ) REFERENCES  $targetTable (
+				$targetColumn) ON DELETE ".($isDependent ? 'CASCADE':'SET NULL')." ON UPDATE SET NULL ;");
+			}
 		}
+		catch(Exception $e) { } //Failure of fk-constraints is not a problem
 
 	}
 

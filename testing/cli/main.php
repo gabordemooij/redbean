@@ -3,8 +3,7 @@
 function loadfiles() {
 	
 	require_once "testcontainer/rb.php";
-  	require "../../RedBean/Plugin/QueryLogger.php";
-	
+  	
 	require "../RedUNIT.php";
     require "../helpers/selector.php";	
 }
