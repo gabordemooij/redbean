@@ -301,7 +301,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function Escape( $str ) {
 		$this->connect();
-		echo '------->>>'. $this->pdo->quote($str); exit;
 		return substr(substr($this->pdo->quote($str), 1), 0, -1);
 	}
 

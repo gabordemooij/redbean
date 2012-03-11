@@ -19,61 +19,29 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 
 	/**
+	 *
 	 * DATA TYPE
-	 * Boolean Data type
+	 * Signed 4 byte Integer
 	 * @var integer
 	 */
-	const C_DATATYPE_BOOL = 0;
+	const C_DATATYPE_INTEGER = 0;
 
+	/**
+	 * DATA TYPE
+	 * Double precision floating point number
+	 * @var integer
+	 */
+	const C_DATATYPE_DOUBLE = 1;
+	
 	/**
 	 *
 	 * DATA TYPE
-	 * Unsigned 8BIT Integer
+	 * Variable length text
 	 * @var integer
 	 */
-	const C_DATATYPE_UINT8 = 1;
+	const C_DATATYPE_STRING = 2;
 
-	/**
-	 *
-	 * DATA TYPE
-	 * Unsigned 32BIT Integer
-	 * @var integer
-	 */
-	const C_DATATYPE_UINT32 = 2;
-
-	/**
-	 * DATA TYPE
-	 * Double precision floating point number and
-	 * negative numbers.
-	 * @var integer
-	 */
-	const C_DATATYPE_DOUBLE = 3;
-
-	/**
-	 * DATA TYPE
-	 * Standard Text column (like varchar255)
-	 * At least 8BIT character support.
-	 * @var integer
-	 */
-	const C_DATATYPE_TEXT8 = 4;
-
-	/**
-	 * DATA TYPE
-	 * Long text column (16BIT)
-	 * @var integer
-	 */
-	const C_DATATYPE_TEXT16 = 5;
-
-	/**
-	 * 
-	 * DATA TYPE
-	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
-	 * This is the biggest column that RedBean supports. If possible you may write
-	 * an implementation that stores even bigger values.
-	 * @var integer
-	 */
-	const C_DATATYPE_TEXT32 = 6;
-
+	
 	/**
 	 * Special type date for storing date values: YYYY-MM-DD
 	 * @var integer
@@ -98,17 +66,7 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
 
-	/**
-	 * Spatial types
-	 * @var integer
-	 */
-	const C_DATATYPE_SPECIAL_POINT = 100;
-	const C_DATATYPE_SPECIAL_LINESTRING = 101;
-	const C_DATATYPE_SPECIAL_GEOMETRY = 102;
-	const C_DATATYPE_SPECIAL_POLYGON = 103;
-	const C_DATATYPE_SPECIAL_MULTIPOINT = 104;
-	const C_DATATYPE_SPECIAL_MULTIPOLYGON = 105;
-	const C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION = 106;
+	
 	
 	/**
 	 * Holds the RedBean Database Adapter.
@@ -132,28 +90,17 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	public function __construct( RedBean_Adapter $adapter ) {
 		
 		$this->typeno_sqltype = array(
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  SET('1')  ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>' TINYINT(3) UNSIGNED ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>' INT(11) UNSIGNED ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>' DOUBLE ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>' VARCHAR(255) ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>' TEXT ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>' LONGTEXT ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>' DATE ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>' DATETIME ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT=>' POINT ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING=>' LINESTRING  ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRY=>' GEOMETRY ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON=>' POLYGON ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT=>' MULTIPOINT ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOLYGON=>' MULTIPOLYGON ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION=>' GEOMETRYCOLLECTION ',
+			RedBean_QueryWriter_Cubrid::C_DATATYPE_INTEGER => ' INTEGER ',
+			RedBean_QueryWriter_Cubrid::C_DATATYPE_DOUBLE => ' DOUBLE ',
+			RedBean_QueryWriter_Cubrid::C_DATATYPE_STRING => ' STRING ',
+			RedBean_QueryWriter_Cubrid::C_DATATYPE_SPECIAL_DATE => ' DATE ',
+			RedBean_QueryWriter_Cubrid::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
 		);
 		
 		$this->sqltype_typeno = array();
 		foreach($this->typeno_sqltype as $k=>$v)
-		$this->sqltype_typeno[trim(strtolower($v))]=$k;
-		
+		$this->sqltype_typeno[trim(($v))]=$k;
+		$this->sqltype_typeno['STRING(1073741823)'] = self::C_DATATYPE_STRING;
 		
 		$this->adapter = $adapter;
 		parent::__construct();
@@ -166,7 +113,7 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return integer $const data type to be used for IDS.
 	 */
 	public function getTypeForID() {
-		return self::C_DATATYPE_UINT32;
+		return self::C_DATATYPE_INTEGER;
 	}
 
 	/**
@@ -174,7 +121,7 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return array $tables tables
 	 */
-	public function getTables() {
+	public function getTables() { 
 		return $this->adapter->getCol( "show tables" );
 	}
 
@@ -209,7 +156,7 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function getColumns( $table ) {
 		$table = $this->safeTable($table);
-		$columnsRaw = $this->adapter->get("DESCRIBE $table");
+		$columnsRaw = $this->adapter->get("SHOW COLUMNS FROM $table");
 		foreach($columnsRaw as $r) {
 			$columns[$r['Field']]=$r['Type'];
 		}
@@ -217,7 +164,7 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	}
 
 	/**
-	 * Returns the MySQL Column Type Code (integer) that corresponds
+	 * Returns the Column Type Code (integer) that corresponds
 	 * to the given value type.
 	 *
 	 * @param string $value value
@@ -228,58 +175,29 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 		$this->svalue = $value;
 		
 		if (is_null($value)) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+			return self::C_DATATYPE_INTEGER;
 		}
 		
 		if ($flagSpecial) {
-			if (strpos($value,'POINT(')===0) {
-				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT;
-			}
-			if (strpos($value,'LINESTRING(')===0) {
-				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_LINESTRING;
-			}
-			if (strpos($value,'POLYGON(')===0) {
-				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POLYGON;
-			}
-			if (strpos($value,'MULTIPOINT(')===0) {
-				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)',array($value));
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_MULTIPOINT;
-			}
-			
-			
 			if (preg_match('/^\d{4}\-\d\d-\d\d$/',$value)) {
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE;
+				return self::C_DATATYPE_SPECIAL_DATE;
 			}
 			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d$/',$value)) {
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME;
+				return self::C_DATATYPE_SPECIAL_DATETIME;
 			}
 		}
 		$value = strval($value);
 		if (!$this->startsWithZeros($value)) {
 
-			if ($value=='1' || $value=='') {
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
-			}
-			if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
-			}
-			if (is_numeric($value) && (floor($value)==$value) && $value >= 0  && $value <= 4294967295 ) {
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
+			if (is_numeric($value) && (floor($value)==$value) && $value >= -2147483648  && $value <= 2147483648 ) {
+				return self::C_DATATYPE_INTEGER;
 			}
 			if (is_numeric($value)) {
-				return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
+				return self::C_DATATYPE_DOUBLE;
 			}
 		}
-		if (strlen($value) <= 255) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
-		}
-		if (strlen($value) <= 65535) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
-		}
-		return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32;
+		
+		return self::C_DATATYPE_STRING;
 	}
 
 	/**
@@ -295,11 +213,36 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return integer $typecode code
 	 */
 	public function code( $typedescription, $includeSpecials = false ) {
+		
+		
 		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
+		
 		if ($includeSpecials) return $r;
 		if ($r > self::C_DATATYPE_SPECIFIED) return self::C_DATATYPE_SPECIFIED;
 		return $r;
 	}
+	
+	/**
+	 * This method adds a column to a table.
+	 * This methods accepts a type and infers the corresponding table name.
+	 *
+	 * @param string  $type   name of the table
+	 * @param string  $column name of the column
+	 * @param integer $field  data type for field
+	 *
+	 * @return void
+	 *
+	 */
+	public function addColumn( $type, $column, $field ) {
+		$table = $type;
+		$type = $field;
+		$table = $this->safeTable($table);
+		$column = $this->safeColumn($column);
+		$type = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : "";
+		$sql = "ALTER TABLE $table ADD COLUMN $column $type ";
+		$this->adapter->exec( $sql );
+	}
+
 
 	/**
 	 * This method upgrades the column to the specified data type.
@@ -339,14 +282,14 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 		$r = $this->adapter->get("SHOW INDEX FROM $table");
 		$name = 'UQ_'.sha1(implode(',',$columns));
 		if ($r) {
-			foreach($r as $i) {
-				if ($i['Key_name']== $name) {
+			foreach($r as $i) { 
+				if (strtoupper($i['Key_name'])== strtoupper($name)) {
 					return;
 				}
 			}
 		}
-		$sql = "ALTER IGNORE TABLE $table
-                ADD UNIQUE INDEX $name (".implode(",",$columns).")";
+		$sql = "ALTER TABLE $table
+                ADD CONSTRAINT UNIQUE $name (".implode(",",$columns).")";
 		$this->adapter->exec($sql);
 	}
 
@@ -360,15 +303,40 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function sqlStateIn($state, $list) {
 		$stateMap = array(
-			'42S02'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			'HY000'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 			'42S22'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 			'23000'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list); 
 	}
 
+	
 	/**
-	 * Add the constraints for a specific database driver: MySQL.
+	 * Adds a constraint. If one of the beans gets trashed
+	 * the other, related bean should be removed as well.
+	 *
+	 * @param RedBean_OODBBean $bean1      first bean
+	 * @param RedBean_OODBBean $bean2      second bean
+	 * @param bool 			   $dontCache  by default we use a cache, TRUE = NO CACHING (optional)
+	 *
+	 * @return void
+	 */
+	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+		$table1 = $bean1->getMeta('type');
+		$table2 = $bean2->getMeta('type');
+		$writer = $this;
+		$adapter = $this->adapter;
+		$table = RedBean_QueryWriter_AQueryWriter::getAssocTableFormat( array( $table1,$table2) );
+		$property1 = $bean1->getMeta('type') . '_id';
+		$property2 = $bean2->getMeta('type') . '_id';
+		if ($property1==$property2) $property2 = $bean2->getMeta("type").'2_id';
+		//Dispatch to right method
+		return $this->constrain($table, $table1, $table2, $property1, $property2);
+	}
+
+	
+	/**
+	 * Add the constraints for a specific database driver: Cubrid
 	 * @todo Too many arguments; find a way to solve this in a neater way.
 	 *
 	 * @param string			  $table     table
@@ -380,47 +348,121 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return boolean $succes whether the constraint has been applied
 	 */
 	protected function constrain($table, $table1, $table2, $property1, $property2) {
-		try{
-			$db = $this->adapter->getCell("select database()");
-			$fks =  $this->adapter->getCell("
-				SELECT count(*)
-				FROM information_schema.KEY_COLUMN_USAGE
-				WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND
-				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
-					  ",array($db,$table));
-			//already foreign keys added in this association table
-			if ($fks>0) return false;
-			$columns = $this->getColumns($table);
-			if ($this->code($columns[$property1])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
-				$this->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
-			}
-			if ($this->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
-				$this->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
-			}
-
-			$sql = "
-				ALTER TABLE ".$this->noKW($table)."
-				ADD FOREIGN KEY($property1) references `$table1`(id) ON DELETE CASCADE;
-					  ";
-			$this->adapter->exec( $sql );
-			$sql ="
-				ALTER TABLE ".$this->noKW($table)."
-				ADD FOREIGN KEY($property2) references `$table2`(id) ON DELETE CASCADE
-					  ";
-			$this->adapter->exec( $sql );
-			return true;
-		} catch(Exception $e){ return false; }
+		$writer = $this;
+		$adapter = $this->adapter;
+		$firstState = $this->buildFK($table,$table1,$property1,'id',true);
+		$secondState = $this->buildFK($table,$table2,$property2,'id',true);
+		return ($firstState && $secondState);
 	}
 
+	
+	/**
+	 * This method adds a foreign key from type and field to
+	 * target type and target field.
+	 * The foreign key is created without an action. On delete/update
+	 * no action will be triggered. The FK is only used to allow database
+	 * tools to generate pretty diagrams and to make it easy to add actions
+	 * later on.
+	 * This methods accepts a type and infers the corresponding table name.
+	 *
+	 *
+	 * @param  string $type	       type that will have a foreign key field
+	 * @param  string $targetType  points to this type
+	 * @param  string $field       field that contains the foreign key value
+	 * @param  string $targetField field where the fk points to
+	 *
+	 * @return void
+	 */
+	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false) {
+		return $this->buildFK($type, $targetType, $field, $targetField, $isDependent);
+	}
+	
+	
+	/**
+	 * This method adds a foreign key from type and field to
+	 * target type and target field.
+	 * The foreign key is created without an action. On delete/update
+	 * no action will be triggered. The FK is only used to allow database
+	 * tools to generate pretty diagrams and to make it easy to add actions
+	 * later on.
+	 * This methods accepts a type and infers the corresponding table name.
+	 *
+	 *
+	 * @param  string $type	       type that will have a foreign key field
+	 * @param  string $targetType  points to this type
+	 * @param  string $field       field that contains the foreign key value
+	 * @param  string $targetField field where the fk points to
+	 *
+	 * @return void
+	 */
+	protected function buildFK($type, $targetType, $field, $targetField,$isDep=false) {
+		$table = $this->safeTable($type);
+		$tableNoQ = $this->safeTable($type,true);
+		$targetTable = $this->safeTable($targetType);
+		$targetTableNoQ = $this->safeTable($targetType,true);
+		$column = $this->safeColumn($field);
+		$columnNoQ = $this->safeColumn($field,true);
+		$targetColumn  = $this->safeColumn($targetField);
+		$targetColumnNoQ  = $this->safeColumn($targetField,true);
+		
+		
+		$keys = $this->getKeys($targetType);
+		
+		$needsToAddFK = true;
+		$needsToDropFK = false;
+		
+		foreach($keys as $key) {
+			if ($key['FKTABLE_NAME']==$tableNoQ && $key['FKCOLUMN_NAME']==$columnNoQ) {
+				//already has an FK
+				$needsToDropFK = true;
+				if ((($isDep && $key['DELETE_RULE']==0) || (!$isDep && $key['DELETE_RULE']==3))) {
+					return false;
+				}
+				
+			}
+		}
+		
+		if ($needsToDropFK) {
+			$sql = "ALTER TABLE $tableNoQ DROP FOREIGN KEY {$key['FK_NAME']} ";
+			$this->adapter->exec($sql);
+		}
+		
+		$casc = ($isDep ? 'CASCADE' : 'SET NULL');
+		$sql = "ALTER TABLE $tableNoQ ADD CONSTRAINT FOREIGN KEY($columnNoQ) REFERENCES $targetTableNoQ($targetColumnNoQ) ON DELETE $casc ";
+		$this->adapter->exec($sql);
+		
+	}	
+	
+	
 	/**
 	 * Drops all tables in database
 	 */
 	public function wipeAll() {
 		try{
-			$this->adapter->exec("DROP TABLE ALL");
+			foreach($this->getTables() as $t) {
+				foreach($this->getKeys($t) as $k) {
+					$this->adapter->exec("ALTER TABLE {$k['FKTABLE_NAME']} DROP FOREIGN KEY {$k['FK_NAME']}");
+				}
+				$this->adapter->exec("DROP TABLE $t");
+			}
+			foreach($this->getTables() as $t) {
+				$this->adapter->exec("DROP TABLE $t");
+			}
 		}
 		catch(Exception $e){}
-
+	}
+	
+	
+	/**
+	 * Obtains the keys of a table using the PDO schema function.
+	 * 
+	 * @param type $table
+	 * @return type 
+	 */
+	protected function getKeys($table) {
+		$pdo = $this->adapter->getDatabase()->getPDO();
+		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS,$table);
+		return $keys;
 	}
 	
 	/**
