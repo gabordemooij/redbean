@@ -123,7 +123,7 @@ class RedUNIT_Base_Update extends RedUNIT_Base {
 		$page->numnotstring = "0.123";
 		$redbean->store($page);
 		$page = $redbean->load( "page", $id );
-		asrt($page->numnotstring,"0.123");
+		asrt($page->numnotstring==0.123,true);
 		$page->numasstring2 = "00.123";
 		$redbean->store($page);
 		$page = $redbean->load( "page", $id );
