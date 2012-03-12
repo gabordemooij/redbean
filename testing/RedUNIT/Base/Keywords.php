@@ -40,7 +40,6 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base {
 			$bean->ownBean[] = $bean2;
 			$bean->sharedBean[] = $bean2;
 			$id = R::store($bean);
-			
 			R::trash($bean);
 			pass();
 				

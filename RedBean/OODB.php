@@ -337,7 +337,7 @@ class RedBean_OODB extends RedBean_Observable {
 		$table = $bean->getMeta("type");
 		if ($bean->getMeta('tainted')) {
 			//Does table exist? If not, create
-			if (!$this->isFrozen && !$this->tableExists($table)) {
+			if (!$this->isFrozen && !$this->tableExists($this->writer->safeTable($table,true))) {
 				$this->writer->createTable( $table );
 				$bean->setMeta('buildreport.flags.created',true);
 			}
@@ -375,12 +375,12 @@ class RedBean_OODB extends RedBean_Observable {
 							$v = $this->writer->getValue();
 						}
 						//Is this property represented in the table?
-						if (isset($columns[$p])) {
+						if (isset($columns[$this->writer->safeColumn($p,true)])) {
 							//rescan
 							$v = $origV;
 							if (!$cast) $typeno = $this->writer->scanType($v,false);
 							//yes it is, does it still fit?
-							$sqlt = $this->writer->code($columns[$p]);
+							$sqlt = $this->writer->code($columns[$this->writer->safeColumn($p,true)]);
 							if ($typeno > $sqlt) {
 								//no, we have to widen the database column type
 								$this->writer->widenColumn( $table, $p, $typeno );

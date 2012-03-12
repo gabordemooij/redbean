@@ -78,8 +78,51 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * character to escape keyword table/column names
 	 * @var string
 	 */
-  	protected $quoteCharacter = '"';
+  	protected $quoteCharacter = '`';
+	
+	/**
+	 * Do everything that needs to be done to format a table name.
+	 *
+	 * @param string $name of table
+	 *
+	 * @return string table name
+	 */
+	public function safeTable($name, $noQuotes = false) {
+		$name = strtolower($name);
+		$reserved = array('int'=>true,'float'=>true,'bigint'=>true,
+			'bit'=>true,'blob'=>true,'char'=>true,'character'=>true,
+			'clob'=>true,'date'=>true,'datetime'=>true,'double'=>true,
+			'glo'=>true,'monetary'=>true,'multiset_of'=>true,
+			'numeric'=>true,'sequence_of'=>true,'set_of'=>true,
+			'smallint'=>true,'time'=>true,'timestamp'=>true);
+		if (isset($reserved[$name])) $name = '_'.$name;
+		$name = $this->check($name);
+		if (!$noQuotes) $name = $this->noKW($name);
+		return $name;
+	}
 
+	
+	/**
+	 * Do everything that needs to be done to format a column name.
+	 *
+	 * @param string $name of column
+	 *
+	 * @return string $column name
+	 */
+	public function safeColumn($name, $noQuotes = false) {
+		$name = strtolower($name);
+		$reserved = array('int'=>true,'float'=>true,'bigint'=>true,
+			'bit'=>true,'blob'=>true,'char'=>true,'character'=>true,
+			'clob'=>true,'date'=>true,'datetime'=>true,'double'=>true,
+			'glo'=>true,'monetary'=>true,'multiset_of'=>true,
+			'numeric'=>true,'sequence_of'=>true,'set_of'=>true,
+			'smallint'=>true,'time'=>true,'timestamp'=>true);
+		if (isset($reserved[$name])) $name = '_'.$name;
+		$name = $this->check($name);
+		if (!$noQuotes) $name = $this->noKW($name);
+		return $name;
+	}
+	
 	/**
 	 * Constructor.
 	 * The Query Writer Constructor also sets up the database.
@@ -122,7 +165,8 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return array $tables tables
 	 */
 	public function getTables() { 
-		return $this->adapter->getCol( "show tables" );
+		$rows = $this->adapter->getCol( "SELECT class_name FROM db_class WHERE is_system_class = 'NO';" );
+		return $rows;
 	}
 
 	/**
@@ -155,6 +199,7 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return array $columns columns
 	 */
 	public function getColumns( $table ) {
+		$columns = array();
 		$table = $this->safeTable($table);
 		$columnsRaw = $this->adapter->get("SHOW COLUMNS FROM $table");
 		foreach($columnsRaw as $r) {
@@ -302,12 +347,19 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return boolean $yesno occurs in list
 	 */
 	public function sqlStateIn($state, $list) {
-		$stateMap = array(
+		/*$stateMap = array(
 			'HY000'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 			'42S22'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			'23000'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
-		);
-		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list); 
+			'HY000'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+		);*/
+		
+		if ($state=='HY000') {
+			if (in_array(RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,$list)) return true;
+			if (in_array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,$list)) return true;
+			if (in_array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,$list)) return true;
+		}
+		return false;
+		//return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list); 
 	}
 
 	
@@ -406,13 +458,14 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 		$targetColumnNoQ  = $this->safeColumn($targetField,true);
 		
 		
-		$keys = $this->getKeys($targetType);
+		$keys = $this->getKeys($targetTableNoQ,$tableNoQ);
 		
 		$needsToAddFK = true;
 		$needsToDropFK = false;
-		
+		//print_r($keys);
+		//echo " tablenoq=$tableNoQ columnnoq = $columnNoQ ";
 		foreach($keys as $key) {
-			if ($key['FKTABLE_NAME']==$tableNoQ && $key['FKCOLUMN_NAME']==$columnNoQ) {
+			if ($key['FKTABLE_NAME']==$tableNoQ && $key['FKCOLUMN_NAME']==$columnNoQ) { 
 				//already has an FK
 				$needsToDropFK = true;
 				if ((($isDep && $key['DELETE_RULE']==0) || (!$isDep && $key['DELETE_RULE']==3))) {
@@ -423,12 +476,12 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 		}
 		
 		if ($needsToDropFK) {
-			$sql = "ALTER TABLE $tableNoQ DROP FOREIGN KEY {$key['FK_NAME']} ";
+			$sql = "ALTER TABLE $table DROP FOREIGN KEY {$key['FK_NAME']} ";
 			$this->adapter->exec($sql);
 		}
 		
 		$casc = ($isDep ? 'CASCADE' : 'SET NULL');
-		$sql = "ALTER TABLE $tableNoQ ADD CONSTRAINT FOREIGN KEY($columnNoQ) REFERENCES $targetTableNoQ($targetColumnNoQ) ON DELETE $casc ";
+		$sql = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
 		$this->adapter->exec($sql);
 		
 	}	
@@ -438,18 +491,18 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * Drops all tables in database
 	 */
 	public function wipeAll() {
-		try{
+	//	try{
 			foreach($this->getTables() as $t) {
 				foreach($this->getKeys($t) as $k) {
-					$this->adapter->exec("ALTER TABLE {$k['FKTABLE_NAME']} DROP FOREIGN KEY {$k['FK_NAME']}");
+					$this->adapter->exec("ALTER TABLE \"{$k['FKTABLE_NAME']}\" DROP FOREIGN KEY \"{$k['FK_NAME']}\"");
 				}
-				$this->adapter->exec("DROP TABLE $t");
+				$this->adapter->exec("DROP TABLE \"$t\"");
 			}
 			foreach($this->getTables() as $t) {
-				$this->adapter->exec("DROP TABLE $t");
+				$this->adapter->exec("DROP TABLE \"$t\"");
 			}
-		}
-		catch(Exception $e){}
+	//	}
+	//	catch(Exception $e){}
 	}
 	
 	
@@ -459,9 +512,13 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * @param type $table
 	 * @return type 
 	 */
-	protected function getKeys($table) {
+	protected function getKeys($table,$table2=null) {
+		
+		//echo "getting keys for table... $table $table2 ";
 		$pdo = $this->adapter->getDatabase()->getPDO();
-		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS,$table);
+		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS,$table);//print_r($keys);
+		if ($table2) $keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS,$table2) );//print_r($keys);
+		
 		return $keys;
 	}
 	
