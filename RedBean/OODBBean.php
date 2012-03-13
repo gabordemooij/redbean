@@ -307,7 +307,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		if ($value===true) {
 			$value = '1';
 		}
-		$this->properties[$property] = $value;
+    		if(isset($this->__info['model'])) {
+      			$this->__info['model']->__set($property, $value);      
+    		}
+    		else {
+		  	$this->properties[$property] = $value;
+    		} 
 	}
 
 	/**
