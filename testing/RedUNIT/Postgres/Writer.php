@@ -41,7 +41,12 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 		asrt(count(array_keys($writer->getColumns("testtable"))),2);
 		asrt(in_array("c1",array_keys($writer->getColumns("testtable"))),true);
 		foreach($writer->sqltype_typeno as $key=>$type) {
-			asrt($writer->code($key),$type);
+			if ($type < 100) {
+				asrt($writer->code($key),$type);
+			}
+			else {
+				asrt($writer->code($key),99);
+			}
 		}
 		asrt($writer->code("unknown"),99);
 		asrt($writer->scanType(false),3);
