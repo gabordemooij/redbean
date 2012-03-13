@@ -49,6 +49,15 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
 	
+	const C_DATATYPE_SPECIAL_POINT		= 101;
+	const C_DATATYPE_SPECIAL_LINE		= 102;
+	const C_DATATYPE_SPECIAL_LSEG		= 103;
+	const C_DATATYPE_SPECIAL_BOX		= 104;
+	const C_DATATYPE_SPECIAL_CIRCLE		= 105;
+	const C_DATATYPE_SPECIAL_POLYGON	= 106;
+	
+	
+	
 	/**
 	 * Specified field type cannot be overruled
 	 * @var integer
@@ -110,6 +119,13 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 				  self::C_DATATYPE_TEXT=>' text ',
 				  self::C_DATATYPE_SPECIAL_DATE => ' date ',
 				  self::C_DATATYPE_SPECIAL_DATETIME => ' timestamp without time zone ',
+				  self::C_DATATYPE_SPECIAL_POINT => ' point ',
+				  self::C_DATATYPE_SPECIAL_LINE => ' line ',
+				  self::C_DATATYPE_SPECIAL_LSEG => ' lseg ',
+				  self::C_DATATYPE_SPECIAL_BOX => ' box ',
+				  self::C_DATATYPE_SPECIAL_CIRCLE => ' circle ',
+				  self::C_DATATYPE_SPECIAL_POLYGON => ' polygon ',
+			
 		);
 
 		$this->sqltype_typeno = array();
@@ -176,6 +192,30 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			}
 			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d$/',$value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME;
+			}
+			if (strpos($value,'POINT(')===0) {
+				$this->svalue = str_replace('POINT','',$value);
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_POINT;
+			}
+			if (strpos($value,'LINE(')===0) {
+				$this->svalue = str_replace('LINE','',$value);
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_LINE;
+			}
+			if (strpos($value,'LSEG(')===0) {
+				$this->svalue = str_replace('LSEG','',$value);
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_LSEG;
+			}
+			if (strpos($value,'BOX(')===0) {
+				$this->svalue = str_replace('BOX','',$value);
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_BOX;
+			}
+			if (strpos($value,'CIRCLE(')===0) {
+				$this->svalue = str_replace('CIRCLE','',$value);
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_CIRCLE;
+			}
+			if (strpos($value,'POLYGON(')===0) {
+				$this->svalue = str_replace('POLYGON','',$value);
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_POLYGON;
 			}
 		}
 		
