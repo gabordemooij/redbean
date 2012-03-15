@@ -165,13 +165,15 @@ class RedBean_Facade {
 
 
 	/**
-	 * Freezes RedBean. In frozen mode the schema cannot be altered.
-	 * Frozen mode is recommended for production use because it is
-	 * secure and fast.
-	 *
-	 * @param boolean $tf whether to turn it on or off.
-	 *
-	 * @return void
+	 * Toggles fluid or frozen mode. In fluid mode the database
+	 * structure is adjusted to accomodate your objects. In frozen mode
+	 * this is not the case.
+	 * 
+	 * You can also pass an array containing a selection of frozen types.
+	 * Let's call this chilly mode, it's just like fluid mode except that
+	 * certain types (i.e. tables) aren't touched.
+	 * 
+	 * @param boolean|array $trueFalse
 	 */
 	public static function freeze( $tf = true ) {
 		self::$redbean->freeze( $tf );

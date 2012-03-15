@@ -18,7 +18,18 @@
  * with this source code in the file license.txt.
  */
 class RedBean_OODB extends RedBean_Observable {
+
+	/**
+	 * Chill mode, for fluid mode but with a list of beans / types that
+	 * are considered to be stable and don't need to be modified.
+	 * @var array 
+	 */
+	private $chillList = array();
 	
+	/**
+	 * List of dependencies. Format: $type => array($depensOnMe, $andMe)
+	 * @var array
+	 */
 	private $dep = array();
 
 	/**
@@ -66,10 +77,20 @@ class RedBean_OODB extends RedBean_Observable {
 	 * Toggles fluid or frozen mode. In fluid mode the database
 	 * structure is adjusted to accomodate your objects. In frozen mode
 	 * this is not the case.
-	 * @param boolean $trueFalse
+	 * 
+	 * You can also pass an array containing a selection of frozen types.
+	 * Let's call this chilly mode, it's just like fluid mode except that
+	 * certain types (i.e. tables) aren't touched.
+	 * 
+	 * @param boolean|array $trueFalse
 	 */
 	public function freeze( $tf ) {
-		$this->isFrozen = (bool) $tf;
+		if (is_array($tf)) {
+			$this->chillList = $tf;
+			$this->isFrozen = false;
+		}
+		else
+		$this->isFrozen = (boolean) $tf;
 	}
 
 
@@ -352,53 +373,56 @@ class RedBean_OODB extends RedBean_Observable {
 				$origV = $v;
 				if ($p!='id') {
 					if (!$this->isFrozen) {
-						//Does the user want to specify the type?
-						if ($bean->getMeta("cast.$p",-1)!==-1) {
-							$cast = $bean->getMeta("cast.$p");
-							if ($cast=='string') {
-								$typeno = $this->writer->scanType('STRING');
-							}
-							elseif ($cast=='id') {
-								$typeno = $this->writer->getTypeForID();
-							}
-							elseif(isset($this->writer->sqltype_typeno[$cast])) {
-								$typeno = $this->writer->sqltype_typeno[$cast];
+						//Not in the chill list?
+						if (!in_array($bean->getMeta('type'),$this->chillList)) {
+							//Does the user want to specify the type?
+							if ($bean->getMeta("cast.$p",-1)!==-1) {
+								$cast = $bean->getMeta("cast.$p");
+								if ($cast=='string') {
+									$typeno = $this->writer->scanType('STRING');
+								}
+								elseif ($cast=='id') {
+									$typeno = $this->writer->getTypeForID();
+								}
+								elseif(isset($this->writer->sqltype_typeno[$cast])) {
+									$typeno = $this->writer->sqltype_typeno[$cast];
+								}
+								else {
+									throw new RedBean_Exception('Invalid Cast');
+								}
 							}
 							else {
-								throw new RedBean_Exception('Invalid Cast');
+								$cast = false;		
+								//What kind of property are we dealing with?
+								$typeno = $this->writer->scanType($v,true);
+								$v = $this->writer->getValue();
+							}
+							//Is this property represented in the table?
+							if (isset($columns[$this->writer->safeColumn($p,true)])) {
+								//rescan
+								$v = $origV;
+								if (!$cast) $typeno = $this->writer->scanType($v,false);
+								//yes it is, does it still fit?
+								$sqlt = $this->writer->code($columns[$this->writer->safeColumn($p,true)]);
+								if ($typeno > $sqlt) {
+									//no, we have to widen the database column type
+									$this->writer->widenColumn( $table, $p, $typeno );
+									$bean->setMeta("buildreport.flags.widen",true);
+								}
+							}
+							else {
+								//no it is not
+								$this->writer->addColumn($table, $p, $typeno);
+								$bean->setMeta("buildreport.flags.addcolumn",true);
+								//@todo: move build commands here... more practical
+								$this->processBuildCommands($table,$p,$bean);
 							}
 						}
-						else {
-							$cast = false;		
-							//What kind of property are we dealing with?
-							$typeno = $this->writer->scanType($v,true);
-							$v = $this->writer->getValue();
-						}
-						//Is this property represented in the table?
-						if (isset($columns[$this->writer->safeColumn($p,true)])) {
-							//rescan
-							$v = $origV;
-							if (!$cast) $typeno = $this->writer->scanType($v,false);
-							//yes it is, does it still fit?
-							$sqlt = $this->writer->code($columns[$this->writer->safeColumn($p,true)]);
-							if ($typeno > $sqlt) {
-								//no, we have to widen the database column type
-								$this->writer->widenColumn( $table, $p, $typeno );
-								$bean->setMeta("buildreport.flags.widen",true);
-							}
-						}
-						else {
-							//no it is not
-							$this->writer->addColumn($table, $p, $typeno);
-							$bean->setMeta("buildreport.flags.addcolumn",true);
-							//@todo: move build commands here... more practical
-							$this->processBuildCommands($table,$p,$bean);
-						}
+						//Okay, now we are sure that the property value will fit
+						$insertvalues[] = $v;
+						$insertcolumns[] = $p;
+						$updatevalues[] = array( "property"=>$p, "value"=>$v );
 					}
-					//Okay, now we are sure that the property value will fit
-					$insertvalues[] = $v;
-					$insertcolumns[] = $p;
-					$updatevalues[] = array( "property"=>$p, "value"=>$v );
 				}
 			}
 	
