@@ -48,6 +48,10 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql {
 				->get('cell');
 		
 		asrt($cell,'a');
+		$cell = $mixer->begin()->select_field1_from('bean')
+				->get('cell');
+		
+		asrt($cell,'a');
 	}
 
 }
