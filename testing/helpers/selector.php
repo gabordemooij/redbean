@@ -91,6 +91,7 @@ $allPacks = array(
 		'Base/Nuke',
 		'Base/Keywords',
 		'Base/Count',
+		'Base/Chill',
 		'Base/Misc',
 		'Mysql/Preexist',
 		'Mysql/Double',
