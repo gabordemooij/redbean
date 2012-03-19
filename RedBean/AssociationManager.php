@@ -169,7 +169,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 				if ($cross) {
 					$sqlFetchKeys2 = $this->writer->selectRecord(
 							  $table,
-							  array( $targetproperty => array( $bean->id ) ),
+							  array( $targetproperty => $ids),
 							  $sql,
 							  false
 					);

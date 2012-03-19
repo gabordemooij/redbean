@@ -22,7 +22,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 	 */
 	public function run() {
 	
-		
+		R::nuke();
 		list($r1,$r2,$r3) = R::dispense('reader',3);
 		$r1->name = 'MrOdd';
 		$r2->name = 'MrEven';
@@ -51,7 +51,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 			if ($r->name=='MrAll') $found = 1;
 		}
 		asrt($found,1);
-	
+		R::nuke();
 		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
