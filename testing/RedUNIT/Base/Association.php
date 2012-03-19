@@ -22,6 +22,37 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 	 */
 	public function run() {
 	
+		
+		list($r1,$r2,$r3) = R::dispense('reader',3);
+		$r1->name = 'MrOdd';
+		$r2->name = 'MrEven';
+		$r3->name = 'MrAll';
+		$books = R::dispense('book',5);
+		$i=1;
+		foreach($books as $b) { 
+			$b->title = 'b'.($i++);
+			if ($i % 2) R::associate($b,$r2); else R::associate($b,$r1);
+		}
+		$readersOdd = R::related(array($books[0],$books[2],$books[4]),'reader');
+		asrt(count($readersOdd),1);
+		$readerOdd = reset($readersOdd);
+		asrt($readerOdd->name,'MrOdd');
+		$readersEven = R::related(array($books[1],$books[3]),'reader');
+		asrt(count($readersEven),1);
+		$readerEven = reset($readersEven);
+		asrt($readerEven->name,'MrEven');
+		foreach($books as $b) R::associate($b,$r3);
+		$readersOdd = R::related(array($books[0],$books[2],$books[4]),'reader');
+		asrt(count($readersOdd),2);
+		$readersEven = R::related(array($books[1],$books[3]),'reader');
+		asrt(count($readersEven),2);
+		$found = 0;
+		foreach($readersEven as $r) {
+			if ($r->name=='MrAll') $found = 1;
+		}
+		asrt($found,1);
+	
+		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();

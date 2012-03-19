@@ -303,15 +303,17 @@ class RedBean_Facade {
 	 * Dont try to make use of subqueries, a subquery using IN() seems to
 	 * be slower than two queries!
 	 *
+	 * Since 3.2, you can now also pass an array of beans instead just one
+	 * bean as the first parameter.
 	 *
-	 * @param RedBean_OODBBean $bean the bean you have
-	 * @param string           $type the type of beans you want
-	 * @param string           $sql  SQL snippet for extra filtering
-	 * @param array            $val  values to be inserted in SQL slots
+	 * @param RedBean_OODBBean|array $bean the bean you have
+	 * @param string				 $type the type of beans you want
+	 * @param string				 $sql  SQL snippet for extra filtering
+	 * @param array					 $val  values to be inserted in SQL slots
 	 *
 	 * @return array $beans	beans yielded by your query.
 	 */
-	public static function related( RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
+	public static function related( $bean, $type, $sql=null, $values=array()) {
 		$keys = self::$associationManager->related( $bean, $type );
 		if (count($keys)==0) return array();
 		if (!$sql) return self::batch($type, $keys);
