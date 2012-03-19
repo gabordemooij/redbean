@@ -125,18 +125,28 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * method related(), that is in fact a wrapper for this method that offers a more
 	 * convenient solution. If you want to make use of this method, consider the
 	 * OODB batch() method to convert the ids to beans.
+	 * 
+	 * Since 3.2, you can now also pass an array of beans instead just one
+	 * bean as the first parameter.
 	 *
 	 * @throws RedBean_Exception_SQL
 	 *
-	 * @param RedBean_OODBBean $bean     reference bean
-	 * @param string           $type     target type
-	 * @param bool             $getLinks whether you are interested in the assoc records
-	 * @param bool             $sql      room for additional SQL
+	 * @param RedBean_OODBBean|array $bean     reference bean
+	 * @param string				 $type     target type
+	 * @param bool					 $getLinks whether you are interested in the assoc records
+	 * @param bool					 $sql      room for additional SQL
 	 *
 	 * @return array $ids
 	 */
-	public function related( RedBean_OODBBean $bean, $type, $getLinks=false, $sql=false) {
-	$table = $this->getTable( array($bean->getMeta('type') , $type) );
+	public function related(  $bean, $type, $getLinks=false, $sql=false) {
+		$ids = array();
+		if (is_array($bean)) {
+			$beans = $bean;
+			foreach($beans as $b) $ids[] = $b->id;
+			$bean = reset($beans);
+		}
+		else $ids[] = $bean->id;
+		$table = $this->getTable( array($bean->getMeta('type') , $type) );
 		if ($type==$bean->getMeta('type')) {
 			$type .= '2';
 			$cross = 1;
@@ -148,7 +158,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		try {
 				$sqlFetchKeys = $this->writer->selectRecord(
 					  $table,
-					  array( $property => array( $bean->id ) ),
+					  array( $property => $ids ),
 					  $sql,
 					  false
 				);
