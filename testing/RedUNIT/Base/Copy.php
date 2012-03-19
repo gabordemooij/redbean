@@ -58,7 +58,6 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		$duplicate = R::dup($document);
 		R::store($duplicate);
 		$duplicate = R::dup($document);
-		//print_r($duplicate);
 		R::store($duplicate);
 		
 		

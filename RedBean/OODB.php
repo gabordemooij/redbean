@@ -301,7 +301,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @return integer $newid resulting ID of the new bean
 	 */
-	public function store( RedBean_OODBBean $bean ) {
+	public function store( RedBean_OODBBean $bean ) { 
 
 		$processLists = false;
 
@@ -418,11 +418,12 @@ class RedBean_OODB extends RedBean_Observable {
 								$this->processBuildCommands($table,$p,$bean);
 							}
 						}
+					}
 						//Okay, now we are sure that the property value will fit
 						$insertvalues[] = $v;
 						$insertcolumns[] = $p;
 						$updatevalues[] = array( "property"=>$p, "value"=>$v );
-					}
+					
 				}
 			}
 	
@@ -462,7 +463,7 @@ class RedBean_OODB extends RedBean_Observable {
 			   }
 			}
 			foreach($ownAdditions as $addition) {
-				if ($addition instanceof RedBean_OODBBean) {
+				if ($addition instanceof RedBean_OODBBean) {  
 					$addition->$myFieldLink = $bean->id;
 					$addition->setMeta('cast.'.$myFieldLink,'id');
 					$this->store($addition);
