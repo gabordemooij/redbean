@@ -1099,7 +1099,9 @@ class RedBean_Facade {
 	 * Closes the database connection.
 	 */
 	public static function close() {
-		self::$adapter->close();
+		if (isset(self::$adapter)){
+			self::$adapter->close();
+		}
 	}
 	
 	/**
