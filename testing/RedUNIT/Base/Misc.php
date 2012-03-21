@@ -126,7 +126,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$role = R::$writer->safeColumn('role');
 		R::associate($t, $s);
 		R::associate($t, $s2);
-		$students = R::related($t, 'person', ' '.$role.' = ?  ',array("student"));
+		$students = R::related($t, 'person', sprintf(' %s  = ? ',$role),array("student"));
 		$s = array_shift($students);
 		$s2 = array_shift($students);
 		asrt(($s->name=='a' || $s2->name=='a'),true);
@@ -134,7 +134,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		//empty classroom
 		R::clearRelations($t, 'person');
 		R::associate($t,$s2);
-		$students = R::related($t, 'person', ' '.$role.' = ?  ',array("student"));
+		$students = R::related($t, 'person', sprintf(' %s  = ? ',$role),array("student"));
 		asrt(count($students),1);
 		$s = reset($students);
 		asrt($s->name, 'b');
