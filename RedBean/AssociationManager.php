@@ -138,11 +138,15 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 *
 	 * @return array $ids
 	 */
-	public function related(  $bean, $type, $getLinks=false, $sql=false) {
+	public function related( $bean, $type, $getLinks=false, $sql=false) {
+		if (!is_array($bean) && !($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
 		$ids = array();
 		if (is_array($bean)) {
 			$beans = $bean;
-			foreach($beans as $b) $ids[] = $b->id;
+			foreach($beans as $b) {
+				if (!($b instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected RedBean_OODBBean in array but got:'.gettype($b));
+				$ids[] = $b->id;
+			}
 			$bean = reset($beans);
 		}
 		else $ids[] = $bean->id;

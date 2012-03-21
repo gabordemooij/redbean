@@ -23,6 +23,25 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 	public function run() {
 	
 		R::nuke();
+		
+		try{
+			R::related(null,'book');
+		}catch(Exception $e){ 
+			asrt(($e instanceof RedBean_Exception_Security),true);
+		}
+		
+		try{
+			R::related(100,'book');
+		}catch(Exception $e){ 
+			asrt(($e instanceof RedBean_Exception_Security),true);
+		}
+		
+		try{
+			R::related(array('fakeBean'),'book');
+		}catch(Exception $e){ 
+			asrt(($e instanceof RedBean_Exception_Security),true);
+		}
+		
 		list($r1,$r2,$r3) = R::dispense('reader',3);
 		$r1->name = 'MrOdd';
 		$r2->name = 'MrEven';
