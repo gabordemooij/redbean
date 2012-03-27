@@ -361,10 +361,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	public function __call($method, $args) {
 		if (!isset($this->__info["model"])) {
-			//@todo eliminate this dependency!
 			$modelName = RedBean_ModelHelper::getModelName( $this->getMeta("type"), $this );
 			if (!class_exists($modelName)) return null;
-			$obj = new $modelName();
+			$obj = RedBean_ModelHelper::factory($modelName);
 			$obj->loadBean($this);
 			$this->__info["model"] = $obj;
 		}

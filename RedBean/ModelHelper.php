@@ -21,6 +21,13 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * @var RedBean_IModelFormatter
 	 */
 	private static $modelFormatter;
+	
+	
+	/**
+	 * Holds a dependency injector
+	 * @var type 
+	 */
+	private static $dependencyInjector;
 
 	/**
 	 * Connects OODB to a model if a model exists for that
@@ -61,6 +68,36 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	public static function setModelFormatter( $modelFormatter ) {
 		self::$modelFormatter = $modelFormatter;
 	}
+	
+	
+	/**
+	 * Obtains a new instance of $modelClassName, using a dependency injection
+	 * container if possible.
+	 * 
+	 * @param string $modelClassName name of the model
+	 */
+	public static function factory( $modelClassName ) {
+		if (self::$dependencyInjector) {
+			return self::$dependencyInjector->getInstance($modelClassName);
+		}
+		return new $modelClassName();
+	}
 
-
+	/**
+	 * Sets the dependency injector to be used.
+	 * 
+	 * @param RedBean_DependencyInjector $di injecto to be used
+	 */
+	public static function setDepdencyInjector( RedBean_DependencyInjector $di ) {
+		self::$dependencyInjector = $di;
+	}
+	
+	/**
+	 * Stops the dependency injector from resolving dependencies. Removes the
+	 * reference to the dependency injector.
+	 */
+	public static function clearDependencyInjector() {
+		self::$dependencyInjector = null;
+	}
+	
 }

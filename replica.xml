@@ -42,5 +42,6 @@
 		<item type="php">RedBean/Cooker.php</item>
 		<item type="php">RedBean/Plugin/QueryLogger.php</item>
 		<item type="php">RedBean/Plugin/TimeLine.php</item>
+		<item type="php">RedBean/DependencyInjector.php</item>
 	</load>
 </root>
