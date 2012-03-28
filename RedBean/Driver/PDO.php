@@ -426,6 +426,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function close() {
 		$this->pdo = null;
+		$this->isConnected = false;
 	}
 }
 
