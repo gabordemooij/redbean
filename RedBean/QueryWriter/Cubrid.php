@@ -89,13 +89,6 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function safeTable($name, $noQuotes = false) {
 		$name = strtolower($name);
-		$reserved = array('int'=>true,'float'=>true,'bigint'=>true,
-			'bit'=>true,'blob'=>true,'char'=>true,'character'=>true,
-			'clob'=>true,'date'=>true,'datetime'=>true,'double'=>true,
-			'glo'=>true,'monetary'=>true,'multiset_of'=>true,
-			'numeric'=>true,'sequence_of'=>true,'set_of'=>true,
-			'smallint'=>true,'time'=>true,'timestamp'=>true);
-		if (isset($reserved[$name])) $name = '_'.$name;
 		$name = $this->check($name);
 		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
@@ -111,13 +104,6 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function safeColumn($name, $noQuotes = false) {
 		$name = strtolower($name);
-		$reserved = array('int'=>true,'float'=>true,'bigint'=>true,
-			'bit'=>true,'blob'=>true,'char'=>true,'character'=>true,
-			'clob'=>true,'date'=>true,'datetime'=>true,'double'=>true,
-			'glo'=>true,'monetary'=>true,'multiset_of'=>true,
-			'numeric'=>true,'sequence_of'=>true,'set_of'=>true,
-			'smallint'=>true,'time'=>true,'timestamp'=>true);
-		if (isset($reserved[$name])) $name = '_'.$name;
 		$name = $this->check($name);
 		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
