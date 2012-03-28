@@ -15,13 +15,20 @@
 class RedUNIT_Base_Keywords extends RedUNIT_Base {
 
 	/**
+	 * What drivers should be loaded for this test pack? 
+	 */
+	public function getTargetDrivers() {
+		return array('mysql','pgsql','sqlite'); //cubrid excluded for now.
+	}
+	
+	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
 	 * 
 	 * @return void
 	 */
 	public function run() {
-	
+		
 		$keywords = array('anokeyword','znokeyword','group','DROP','inner','JOIN','select',
 		'table','int','cascade','float','CALL','in','status','order',
 		'limit','having','else','if','while','distinct','like');
