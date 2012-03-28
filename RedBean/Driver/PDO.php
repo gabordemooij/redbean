@@ -86,7 +86,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *
 	 * @return void
 	 */
-	public function __construct($dsn, $user = NULL, $pass = NULL) {
+	public function __construct($dsn, $user = null, $pass = null) {
 		if ($dsn instanceof PDO) {
 			$this->pdo = $dsn;
 			$this->isConnected = true;
@@ -125,7 +125,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 				  )
 		);
-		$this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, TRUE);
+		$this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
 		$this->isConnected = true;
 	}
 
@@ -145,7 +145,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 				if (is_null($value)){
 					$s->bindValue($key+1,null,PDO::PARAM_NULL);
-				}elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value < 2147483648) {
+				}
+				elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value < 2147483648) {
 					$s->bindParam($key+1,$value,PDO::PARAM_INT);
 				}
 				else {
