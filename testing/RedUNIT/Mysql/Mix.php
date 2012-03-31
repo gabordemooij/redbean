@@ -24,7 +24,7 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql {
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$mixer = new RedBean_SQLHelper($adapter);
-		$now = $mixer->now(); echo $now;
+		$now = $mixer->now();
 		asrt(is_string($now),true);
 		asrt((strlen($now)>5),true);
 		$bean = R::dispense('bean');
@@ -52,6 +52,18 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql {
 				->get('cell');
 		
 		asrt($cell,'a');
+		
+		//now swictch back to non-capture mode (issue #142)
+		$value = $mixer->now();
+		asrt(is_object($value),false);
+		asrt(is_scalar($value),true);
+		asrt($value>0,true);
+		
+		$mixer->begin()->select_field1_from('bean');
+		$mixer->clear();
+		$value = $mixer->now();
+		asrt(is_scalar($value),true);
+		
 	}
 
 }
