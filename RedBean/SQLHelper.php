@@ -126,6 +126,7 @@
 	public function clear() {
 		$this->sql = '';
 		$this->params = array();
+		$this->capture = false; //turn off capture mode (issue #142)
 		return $this;
 	}
 	
