@@ -429,5 +429,17 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->pdo = null;
 		$this->isConnected = false;
 	}
+	
+	/**
+	 * Returns TRUE if the current PDO instance is connected.
+	 * 
+	 * @return boolean $yesNO 
+	 */
+	public function isConnected() {
+		if (!$this->isConnected && !$this->pdo) return false;
+		return true;
+	}
+	
+	
 }
 
