@@ -146,7 +146,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				if (is_null($value)){
 					$s->bindValue($key+1,null,PDO::PARAM_NULL);
 				}
-				elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value <= PHP_INT_MAX) {
+				elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value < 2147483648) {
 					$s->bindParam($key+1,$value,PDO::PARAM_INT);
 				}
 				else {
@@ -157,7 +157,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 				if (is_null($value)){
 					$s->bindValue($key,null,PDO::PARAM_NULL);
 				}
-				elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) &&  $value <= PHP_INT_MAX) {
+				elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) &&  $value < 2147483648) {
 					$s->bindParam($key,$value,PDO::PARAM_INT);
 				}
 				else {
