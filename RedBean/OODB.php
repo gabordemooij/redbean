@@ -276,7 +276,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @return array $result 	new relational state
 	 */
-	protected function processGroups( $originals, $current, $additions, $trashcan, $residue ) {
+	private function processGroups( $originals, $current, $additions, $trashcan, $residue ) {
 		return array(
 			array_merge($additions,array_diff($current,$originals)),
 			array_merge($trashcan,array_diff($originals,$current)),
@@ -284,6 +284,47 @@ class RedBean_OODB extends RedBean_Observable {
 		);
 	}
 
+	
+	/**
+	 * Figures out the desired type given the cast string ID.
+	 * 
+	 * @param string $cast cast identifier
+	 * 
+	 * @return integer $typeno 
+	 */
+	private function getTypeFromCast($cast) {
+		if ($cast=='string') {
+			$typeno = $this->writer->scanType('STRING');
+		}
+		elseif ($cast=='id') {
+			$typeno = $this->writer->getTypeForID();
+		}
+		elseif(isset($this->writer->sqltype_typeno[$cast])) {
+			$typeno = $this->writer->sqltype_typeno[$cast];
+		}
+		else {
+			throw new RedBean_Exception('Invalid Cast');
+		}
+		return $typeno;
+	}
+	
+	/**
+	 * Processes an embedded bean. First the bean gets unboxed if possible.
+	 * Then, the bean is stored if needed and finally the ID of the bean
+	 * will be returned.
+	 * 
+	 * @param RedBean_OODBBean|Model $v the bean or model
+	 * 
+	 * @return  integer $id
+	 */
+	private function prepareEmbeddedBean($v) {
+		if ($v instanceof RedBean_SimpleModel) $v = $v->unbox(); 
+			if (!$v->id || $v->getMeta('tainted')) {
+			$this->store($v);
+		}
+		return $v->id;
+	}
+	
 	/**
 	 * Stores a bean in the database. This function takes a
 	 * RedBean_OODBBean Bean Object $bean and stores it
@@ -302,18 +343,11 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return integer $newid resulting ID of the new bean
 	 */
 	public function store( RedBean_OODBBean $bean ) { 
-
 		$processLists = false;
-
-		foreach($bean as $k=>$v) {
-			if (is_array($v) || is_object($v)) { $processLists = true; break; }
-		}
-
+		foreach($bean as $k=>$v) if (is_array($v) || is_object($v)) { $processLists = true; break; }
 		if (!$processLists && !$bean->getMeta('tainted')) return $bean->getID();
 		$this->signal('update', $bean );
-		foreach($bean as $k=>$v) {
-			if (is_array($v) || is_object($v)) { $processLists = true; break; }
-		}
+		foreach($bean as $k=>$v) if (is_array($v) || is_object($v)) { $processLists = true; break; }
 		if ($processLists) {
 			//Define groups
 			$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array();
@@ -322,14 +356,8 @@ class RedBean_OODB extends RedBean_Observable {
 			$embeddedBeans = array();
 			foreach($bean as $p=>$v) {
 				if ($v instanceof RedBean_OODBBean || $v instanceof RedBean_SimpleModel) {
-					if ($v instanceof RedBean_SimpleModel) $v = $v->unbox(); 
-					$embtype = $v->getMeta('type');
-					if (!$v->id || $v->getMeta('tainted')) {
-						$this->store($v);
-					}
-					$beanID = $v->id;
 					$linkField = $p.'_id';
-					$bean->$linkField = $beanID;
+					$bean->$linkField = $this->prepareEmbeddedBean($v);
 					$bean->setMeta('cast.'.$linkField,'id');
 					$embeddedBeans[$linkField] = $v;
 					$tmpCollectionStore[$p]=$bean->$p;
@@ -345,14 +373,37 @@ class RedBean_OODB extends RedBean_Observable {
 					elseif (strpos($p,'shared')===0) {
 						list($sharedAdditions,$sharedTrashcan,$sharedresidue)=$this->processGroups($originals,$v,$sharedAdditions,$sharedTrashcan,$sharedresidue);
 						$bean->removeProperty($p);
-	
 					}
-					else {
-					}
+					else {}
 				}
 			}
 		}
+		$this->storeBean($bean);
 
+		if ($processLists) {
+			$this->processEmbeddedBeans($bean,$embeddedBeans);
+			$myFieldLink = $bean->getMeta('type').'_id';
+			//Handle related beans
+			$this->processTrashcan($bean,$ownTrashcan);
+			$this->processAdditions($bean,$ownAdditions);
+			$this->processResidue($ownresidue);
+			foreach($sharedTrashcan as $trash) $this->assocManager->unassociate($trash,$bean);
+			$this->processSharedAdditions($bean,$sharedAdditions);
+			foreach($sharedresidue as $residue) $this->store($residue);
+		}
+		$this->signal('after_update',$bean);
+		return (int) $bean->id;
+	}
+	
+	/**
+	 * Stores a cleaned bean; i.e. only scalar values. This is the core of the store()
+	 * method. When all lists and embedded beans (parent objects) have been processed and
+	 * removed from the original bean the bean is passed to this method to be stored
+	 * in the database.
+	 * 
+	 * @param RedBean_OODBBean $bean the clean bean 
+	 */
+	private function storeBean($bean) {
 		if (!$this->isFrozen) $this->check($bean);
 		//what table does it want
 		$table = $bean->getMeta("type");
@@ -378,18 +429,7 @@ class RedBean_OODB extends RedBean_Observable {
 							//Does the user want to specify the type?
 							if ($bean->getMeta("cast.$p",-1)!==-1) {
 								$cast = $bean->getMeta("cast.$p");
-								if ($cast=='string') {
-									$typeno = $this->writer->scanType('STRING');
-								}
-								elseif ($cast=='id') {
-									$typeno = $this->writer->getTypeForID();
-								}
-								elseif(isset($this->writer->sqltype_typeno[$cast])) {
-									$typeno = $this->writer->sqltype_typeno[$cast];
-								}
-								else {
-									throw new RedBean_Exception('Invalid Cast');
-								}
+								$typeno = $this->getTypeFromCast($cast);
 							}
 							else {
 								$cast = false;		
@@ -419,88 +459,133 @@ class RedBean_OODB extends RedBean_Observable {
 							}
 						}
 					}
-						//Okay, now we are sure that the property value will fit
-						$insertvalues[] = $v;
-						$insertcolumns[] = $p;
-						$updatevalues[] = array( "property"=>$p, "value"=>$v );
-					
+					//Okay, now we are sure that the property value will fit
+					$insertvalues[] = $v;
+					$insertcolumns[] = $p;
+					$updatevalues[] = array( "property"=>$p, "value"=>$v );
 				}
 			}
-	
 			if (!$this->isFrozen && ($uniques = $bean->getMeta("buildcommand.unique"))) {
-				foreach($uniques as $unique) {
-					$this->writer->addUniqueIndex( $table, $unique );
-				}
+				foreach($uniques as $unique) $this->writer->addUniqueIndex( $table, $unique );
 			}
 			$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->id );
 			$bean->id = $rs;
 			$bean->setMeta("tainted",false);
 		}
-
-		if ($processLists) {
-			foreach($embeddedBeans as $linkField=>$embeddedBean) {
-				if (!$this->isFrozen) {
-					$this->writer->addIndex($bean->getMeta('type'),
-								'index_foreignkey_'.$embeddedBean->getMeta('type'),
-								 $linkField);
-					$isDep = $this->isDependentOn($bean->getMeta('type'),$embeddedBean->getMeta('type'));
-					$this->writer->addFK($bean->getMeta('type'),$embeddedBean->getMeta('type'),$linkField,'id',$isDep);
+	}
 	
-				}
+	/**
+	 * Processes a list of beans from a bean. A bean may contain lists. This
+	 * method handles shared addition lists; i.e. the $bean->sharedObject properties.
+	 * 
+	 * @param RedBean_OODBBean $bean             the bean
+	 * @param array            $sharedAdditions  list with shared additions
+	 */
+	private function processSharedAdditions($bean,$sharedAdditions) {
+		foreach($sharedAdditions as $addition) {
+			if ($addition instanceof RedBean_OODBBean) {
+				$this->assocManager->associate($addition,$bean);
 			}
+			else {
+				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
+			}
+		}
+	}
 	
-			$myFieldLink = $bean->getMeta('type').'_id';
-			//Handle related beans
-			foreach($ownTrashcan as $trash) {
-			if (isset($this->dep[$trash->getMeta('type')]) && in_array($bean->getMeta('type'),$this->dep[$trash->getMeta('type')])) {
-
-
-					   $this->trash($trash);
-			   }
-			   else {
-					   $trash->$myFieldLink = null;
-					   $this->store($trash);
-			   }
-			}
-			foreach($ownAdditions as $addition) {
-				if ($addition instanceof RedBean_OODBBean) {  
-					$addition->$myFieldLink = $bean->id;
-					$addition->setMeta('cast.'.$myFieldLink,'id');
-					$this->store($addition);
-					if (!$this->isFrozen) {
-						$this->writer->addIndex($addition->getMeta('type'),
-							'index_foreignkey_'.$bean->getMeta('type'),
-							 $myFieldLink);
-						$isDep = $this->isDependentOn($addition->getMeta('type'),$bean->getMeta('type'));
-						$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,'id',$isDep);
-					}
-				}
-				else {
-					throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
-				}
-			}
-			foreach($ownresidue as $residue) {
-				if ($residue->getMeta('tainted')) {
-					$this->store($residue);
-				}
-			}
-			foreach($sharedTrashcan as $trash) {
-				$this->assocManager->unassociate($trash,$bean);
-			}
-			foreach($sharedAdditions as $addition) {
-				if ($addition instanceof RedBean_OODBBean) {
-					$this->assocManager->associate($addition,$bean);
-				}
-				else {
-					throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
-				}
-			}
-			foreach($sharedresidue as $residue) {
+	/**
+	 * Processes a list of beans from a bean. A bean may contain lists. This
+	 * method handles own lists; i.e. the $bean->ownObject properties.
+	 * A residue is a bean in an own-list that stays where it is. This method
+	 * checks if there have been any modification to this bean, in that case
+	 * the bean is stored once again, otherwise the bean will be left untouched.
+	 *  
+	 * @param RedBean_OODBBean $bean       the bean
+	 * @param array            $ownresidue list 
+	 */
+	private function processResidue($ownresidue) {
+		foreach($ownresidue as $residue) {
+			if ($residue->getMeta('tainted')) {
 				$this->store($residue);
 			}
 		}
-		$this->signal('after_update',$bean);
-		return (int) $bean->id;
+	}
+	
+	/**
+	 * Processes a list of beans from a bean. A bean may contain lists. This
+	 * method handles own lists; i.e. the $bean->ownObject properties.
+	 * A trash can bean is a bean in an own-list that has been removed 
+	 * (when checked with the shadow). This method
+	 * checks if the bean is also in the dependency list. If it is the bean will be removed.
+	 * If not, the connection between the bean and the owner bean will be broken by
+	 * setting the ID to NULL.
+	 *  
+	 * @param RedBean_OODBBean $bean        the bean
+	 * @param array            $ownTrashcan list 
+	 */
+	private function processTrashcan($bean,$ownTrashcan) {
+		$myFieldLink = $bean->getMeta('type').'_id';
+		foreach($ownTrashcan as $trash) {
+			if (isset($this->dep[$trash->getMeta('type')]) && in_array($bean->getMeta('type'),$this->dep[$trash->getMeta('type')])) {
+				$this->trash($trash);
+			}
+			else {
+				$trash->$myFieldLink = null;
+				$this->store($trash);
+			}
+		}
+	}
+	
+	/**
+	 * Processes embedded beans.
+	 * Each embedded bean will be indexed and foreign keys will
+	 * be created if the bean is in the dependency list.
+	 * 
+	 * @param RedBean_OODBBean $bean          bean
+	 * @param array            $embeddedBeans embedded beans
+	 */
+	private function processEmbeddedBeans($bean, $embeddedBeans) {
+		foreach($embeddedBeans as $linkField=>$embeddedBean) {
+			if (!$this->isFrozen) {
+				$this->writer->addIndex($bean->getMeta('type'),
+							'index_foreignkey_'.$embeddedBean->getMeta('type'),
+							 $linkField);
+				$isDep = $this->isDependentOn($bean->getMeta('type'),$embeddedBean->getMeta('type'));
+				$this->writer->addFK($bean->getMeta('type'),$embeddedBean->getMeta('type'),$linkField,'id',$isDep);
+			}
+		}
+		
+	}
+	
+	/**
+	 * Part of the store() functionality.
+	 * Handles all new additions after the bean has been saved.
+	 * Stores addition bean in own-list, extracts the id and
+	 * adds a foreign key. Also adds a constraint in case the type is
+	 * in the dependent list.
+	 * 
+	 * @param RedBean_OODBBean $bean         bean
+	 * @param array            $ownAdditions list of addition beans in own-list 
+	 */
+	private function processAdditions($bean,$ownAdditions) {
+		$myFieldLink = $bean->getMeta('type').'_id';
+		foreach($ownAdditions as $addition) {
+			if ($addition instanceof RedBean_OODBBean) {  
+				$addition->$myFieldLink = $bean->id;
+				$addition->setMeta('cast.'.$myFieldLink,'id');
+				$this->store($addition);
+				if (!$this->isFrozen) {
+					$this->writer->addIndex($addition->getMeta('type'),
+						'index_foreignkey_'.$bean->getMeta('type'),
+						 $myFieldLink);
+					$isDep = $this->isDependentOn($addition->getMeta('type'),$bean->getMeta('type'));
+					$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,'id',$isDep);
+				}
+			}
+			else {
+				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
+			}
+		}
+		
 	}
 	
 	/**
