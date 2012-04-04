@@ -73,5 +73,6 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		$row = R::getRow('select * from page limit 1');
 		asrt(is_array($row),true);
 		asrt(isset($row['name']),true);
+		asrt(count(R::findAll('page'))>0,true);
 	}
 }
