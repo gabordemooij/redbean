@@ -154,6 +154,47 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 		pass();
 		
 		testpack('Special data types');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->location = "POINT(3,3)";
+		$id = R::store($bean);
+		$bean =R::load('bean',$id);
+		$cols = R::getColumns('bean');
+		asrt($cols['location'],'point');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->location = "LSEG((3,3),(4,4))";
+		$id = R::store($bean);
+		$bean =R::load('bean',$id);
+		$cols = R::getColumns('bean');
+		asrt($cols['location'],'lseg');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->location = "BOX((3,3),(4,4))";
+		$id = R::store($bean);
+		$bean =R::load('bean',$id);
+		$cols = R::getColumns('bean');
+		asrt($cols['location'],'box');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->location = "CIRCLE((3,3),10)";
+		$id = R::store($bean);
+		$bean =R::load('bean',$id);
+		$cols = R::getColumns('bean');
+		asrt($cols['location'],'circle');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->location = "POLYGON((1,1),(1,10),(10,10),(10,1),(1,1))";
+		$id = R::store($bean);
+		$bean =R::load('bean',$id);
+		$cols = R::getColumns('bean');
+		asrt($cols['location'],'polygon');
+		
 		R::nuke();
 		$bean = R::dispense('bean');
 		$bean->date = 'someday';

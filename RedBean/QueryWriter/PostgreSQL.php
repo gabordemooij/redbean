@@ -197,10 +197,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 				$this->svalue = str_replace('POINT','',$value);
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_POINT;
 			}
-			if (strpos($value,'LINE(')===0) {
-				$this->svalue = str_replace('LINE','',$value);
-				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_LINE;
-			}
 			if (strpos($value,'LSEG(')===0) {
 				$this->svalue = str_replace('LSEG','',$value);
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_LSEG;
