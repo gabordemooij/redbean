@@ -144,12 +144,13 @@ class RedBean_Facade {
 	/**
 	 * Toggles DEBUG mode.
 	 * In Debug mode all SQL that happens under the hood will
-	 * be printed to the screen.
+	 * be printed to the screen or logged by provided logger.
 	 *
 	 * @param boolean $tf
+	 * @param RedBean_ILogger $logger
 	 */
-	public static function debug( $tf = true ) {
-		self::$adapter->getDatabase()->setDebugMode( $tf );
+	public static function debug( $tf = true, $logger = NULL ) {
+		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
 	}
 
 	/**
