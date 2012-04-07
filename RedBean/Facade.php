@@ -74,18 +74,18 @@ class RedBean_Facade {
 	 * @var string
 	 */
 	public static $currentDB = '';
-	
+
 	/**
 	 * Holds reference to SQL Helper
 	 */
 	public static $f;
 
-	
+
 	/**
 	 * Get version
-	 * @return string 
+	 * @return string
 	 */
-	public static function getVersion() { 
+	public static function getVersion() {
 		return '3.2';
 	}
 
@@ -169,11 +169,11 @@ class RedBean_Facade {
 	 * Toggles fluid or frozen mode. In fluid mode the database
 	 * structure is adjusted to accomodate your objects. In frozen mode
 	 * this is not the case.
-	 * 
+	 *
 	 * You can also pass an array containing a selection of frozen types.
 	 * Let's call this chilly mode, it's just like fluid mode except that
 	 * certain types (i.e. tables) aren't touched.
-	 * 
+	 *
 	 * @param boolean|array $trueFalse
 	 */
 	public static function freeze( $tf = true ) {
@@ -404,7 +404,7 @@ class RedBean_Facade {
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
 		return self::$redbean->find($type,array(),array($sql,$values));
 	}
-	
+
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
@@ -413,11 +413,11 @@ class RedBean_Facade {
 	 * or the slot-notation (:keyname).
 	 * The findAll() method differs from the find() method in that it does
 	 * not assume a WHERE-clause, so this is valid:
-	 * 
+	 *
 	 * R::findAll('person',' ORDER BY name DESC ');
 	 *
 	 * Your SQL does not have to start with a valid WHERE-clause condition.
-	 * 
+	 *
 	 * @param string $type   type   the type of bean you are looking for
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
@@ -497,13 +497,13 @@ class RedBean_Facade {
 	/**
 	 * Returns an array of beans. Pass a type and a series of ids and
 	 * this method will bring you the correspondig beans.
-	 * 
+	 *
 	 * important note: Because this method loads beans using the load()
-	 * function (but faster) it will return empty beans with ID 0 for 
+	 * function (but faster) it will return empty beans with ID 0 for
 	 * every bean that could not be located. The resulting beans will have the
 	 * passed IDs as their keys.
 	 *
-	 * @param string $type type of beans 
+	 * @param string $type type of beans
 	 * @param array  $ids  ids to load
 	 *
 	 * @return array $beans resulting beans (may include empty ones)
@@ -576,17 +576,17 @@ class RedBean_Facade {
 	public static function getCol( $sql, $values=array() ) {
 		return self::query('getCol',$sql,$values);
 	}
-	
+
 	/**
 	 * Internal Query function, executes the desired query. Used by
 	 * all facade query functions. This keeps things DRY.
-	 * 
-	 * @throws RedBean_Exception_SQL 
-	 * 
+	 *
+	 * @throws RedBean_Exception_SQL
+	 *
 	 * @param string $method desired query method (i.e. 'cell','col','exec' etc..)
 	 * @param string $sql    the sql you want to execute
 	 * @param array  $values array of values to be bound to query statement
-	 * 
+	 *
 	 * @return array $results results of query
 	 */
 	private static function query($method,$sql,$values) {
@@ -611,7 +611,7 @@ class RedBean_Facade {
 			return RedBean_Facade::$adapter->$method( $sql, $values );
 		}
 	}
-	
+
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
@@ -628,7 +628,7 @@ class RedBean_Facade {
 	 */
 	public static function getAssoc($sql,$values=array()) {
 		return self::query('getAssoc',$sql,$values);
-	}	
+	}
 
 
 	/**
@@ -639,11 +639,11 @@ class RedBean_Facade {
 	 * - All references to parent objects (_id fields) will be copied but not the parents themselves
 	 * In most cases this is the desired scenario for copying beans.
 	 * This function uses a trail-array to prevent infinite recursion, if a recursive bean is found
-	 * (i.e. one that already has been processed) the ID of the bean will be returned. 
+	 * (i.e. one that already has been processed) the ID of the bean will be returned.
 	 * This should not happen though.
-	 * 
+	 *
 	 * Note:
-	 * This function does a reflectional database query so it may be slow. 
+	 * This function does a reflectional database query so it may be slow.
 	 *
 	 * @param RedBean_OODBBean $bean  bean to be copied
 	 * @param array            $trail for internal usage, pass array()
@@ -667,7 +667,7 @@ class RedBean_Facade {
 			if ($beans = $bean->$owned) {
 				$copy->$owned = array();
 				foreach($beans as $subBean) {
-					array_push($copy->$owned,self::dup($subBean,$trail,$pid));	
+					array_push($copy->$owned,self::dup($subBean,$trail,$pid));
 				}
 			}
 			$copy->setMeta('sys.shadow.'.$owned,null);
@@ -678,15 +678,15 @@ class RedBean_Facade {
 				}
 			}
 			$copy->setMeta('sys.shadow.'.$shared,null);
-			
+
 		}
-		
+
 		if ($pid) $copy->id = $bean->id;
 		return $copy;
 	}
 
 	/**
-	 * Exports a collection of beans. Handy for XML/JSON exports with a 
+	 * Exports a collection of beans. Handy for XML/JSON exports with a
 	 * Javascript framework like Dojo or ExtJS.
 	 * What will be exported:
 	 * - contents of the bean
@@ -694,8 +694,8 @@ class RedBean_Facade {
 	 * - all shared beans (not THEIR own lists)
 	 *
 	 * @param	array|RedBean_OODBBean $beans beans to be exported
-	 * 
-	 * @return	array $array exported structure 
+	 *
+	 * @return	array $array exported structure
 	 */
 	public static function exportAll($beans) {
 		$array = array();
@@ -706,7 +706,7 @@ class RedBean_Facade {
 		}
 		return $array;
 	}
-	
+
 
 	/**
 	 * Given an array of two beans and a property, this method
@@ -913,13 +913,13 @@ class RedBean_Facade {
 	}
 
 
-	
+
 	/**
 	 * facade method for Cooker Graph.
-	 * 
+	 *
 	 * @param array   $array            array containing POST/GET fields or other data
 	 * @param boolean $filterEmptyBeans whether you want to exclude empty beans
-	 * 
+	 *
 	 * @return array $arrayOfBeans Beans
 	 */
 	public static function graph($array,$filterEmpty=false) {
@@ -928,7 +928,7 @@ class RedBean_Facade {
 		return $cooker->graph($array,$filterEmpty);
 	}
 
-	
+
 
 	/**
 	 * Facade Convience method for adapter transaction system.
@@ -998,33 +998,33 @@ class RedBean_Facade {
 			self::$writer->wipeAll();
 		}
 	}
-	
+
 	/**
 	 * Sets a list of dependencies.
-	 * A dependency list contains an entry for each dependent bean. 
+	 * A dependency list contains an entry for each dependent bean.
 	 * A dependent bean will be removed if the relation with one of the
-	 * dependencies gets broken. 
-	 * 
+	 * dependencies gets broken.
+	 *
 	 * Example:
-	 * 
+	 *
 	 * array(
 	 *	'page' => array('book','magazine')
 	 * )
-	 * 
+	 *
 	 * A page will be removed if:
-	 * 
+	 *
 	 * unset($book->ownPage[$pageID]);
-	 * 
+	 *
 	 * or:
-	 * 
+	 *
 	 * unset($magazine->ownPage[$pageID]);
-	 * 
+	 *
 	 * but not if:
-	 * 
+	 *
 	 * unset($paper->ownPage[$pageID]);
-	 * 
-	 * 
-	 * @param array $dep list of dependencies 
+	 *
+	 *
+	 * @param array $dep list of dependencies
 	 */
 	public static function dependencies($dep) {
 		self::$redbean->setDepList($dep);
@@ -1035,38 +1035,38 @@ class RedBean_Facade {
 	 * returned as an array. For information please consult the R::store()
 	 * function.
 	 * A loop saver.
-	 * 
+	 *
 	 * @param array $beans list of beans to be stored
-	 * 
-	 * @return array $ids list of resulting IDs 
+	 *
+	 * @return array $ids list of resulting IDs
 	 */
 	public static function storeAll($beans) {
 		$ids = array();
 		foreach($beans as $bean) $ids[] = self::store($bean);
 		return $ids;
 	}
-	
+
 	/**
 	 * Short hand function to trash a set of beans at once.
 	 * For information please consult the R::trash() function.
 	 * A loop saver.
-	 * 
-	 * @param array $beans list of beans to be trashed 
+	 *
+	 * @param array $beans list of beans to be trashed
 	 */
 	public static function trashAll($beans) {
 		foreach($beans as $bean) self::trash($bean);
 	}
-	
+
 	/**
 	 * A label is a bean with only an id, type and name property.
 	 * This function will dispense beans for all entries in the array. The
 	 * values of the array will be assigned to the name property of each
 	 * individual bean.
-	 * 
+	 *
 	 * @param string $type   type of beans you would like to have
 	 * @param array  $labels list of labels, names for each bean
-	 * 
-	 * @return array $bean a list of beans with type and name property 
+	 *
+	 * @return array $bean a list of beans with type and name property
 	 */
 	public static function dispenseLabels($type,$labels) {
 		$labelBeans = array();
@@ -1077,16 +1077,16 @@ class RedBean_Facade {
 		}
 		return $labelBeans;
 	}
-	
+
 	/**
 	 * Gathers labels from beans. This function loops through the beans,
 	 * collects the values of the name properties of each individual bean
 	 * and stores the names in a new array. The array then gets sorted using the
 	 * default sort function of PHP (sort).
-	 * 
+	 *
 	 * @param array $beans list of beans to loop
-	 * 
-	 * @return array $array list of names of beans 
+	 *
+	 * @return array $array list of names of beans
 	 */
 	public function gatherLabels($beans) {
 		$labels = array();
@@ -1094,8 +1094,8 @@ class RedBean_Facade {
 		sort($labels);
 		return $labels;
 	}
-	
-	
+
+
 	/**
 	 * Closes the database connection.
 	 */
@@ -1104,49 +1104,47 @@ class RedBean_Facade {
 			self::$adapter->close();
 		}
 	}
-	
+
 	/**
 	 * Activates TimeLine Schema Alteration monitoring and
 	 * Query logging.
-	 * 
-	 * @param type $filename 
+	 *
+	 * @param type $filename
 	 */
 	public static function log($filename) {
 		$tl = new RedBean_Plugin_TimeLine($filename);
 		self::$adapter->addEventListener('sql_exec',$tl);
 	}
-	
-	
+
+
 	/**
 	 * Simple convenience function, returns ISO date formatted representation
 	 * of $time.
-	 * 
+	 *
 	 * @param mixed $time UNIX timestamp
-	 *  
-	 * @return type 
+	 *
+	 * @return type
 	 */
 	public static function isoDate( $time = null ) {
 		if (!$time) $time = time();
 		return @date('Y-m-d',$time);
 	}
-	
+
 	/**
 	 * Simple convenience function, returns ISO date time
 	 * formatted representation
 	 * of $time.
-	 * 
+	 *
 	 * @param mixed $time UNIX timestamp
-	 *  
-	 * @return type 
+	 *
+	 * @return type
 	 */
 	public static function isoDateTime( $time = null) {
 		if (!$time) $time = time();
 		return @date('Y-m-d H:i:s',$time);
 	}
-		
+
 }
 
 //Compatibility with PHP 5.2 and earlier
 function __lcfirst( $str ){	return (string)(strtolower(substr($str,0,1)).substr($str,1)); }
-
-
