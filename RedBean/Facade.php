@@ -884,7 +884,7 @@ class RedBean_Facade {
 			}
 		}
 		foreach($beanSet as $key => $tags) {
-			$diff = array_diff($set, $tags);
+			$diff = array_diff_key($set, $tags);
 			if(!empty($diff)) unset($collection[$key]);
 		}
 		return $collection;
