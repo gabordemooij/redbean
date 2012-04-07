@@ -5,10 +5,10 @@
  * @file			RedBean/AssociationManager.php
  * @description		Manages simple bean associations.
  *
- * @author			Gabor de Mooij
- * @license			BSD
+ * @author			Gabor de Mooij and the RedBeanPHP Community
+ * @license			BSD/GPLv2
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -158,7 +158,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		else $cross=0;
 		if (!$getLinks) $targetproperty = $type.'_id'; else $targetproperty='id';
 
-		$property = $bean->getMeta('type')."_id";
+		$property = $bean->getMeta('type').'_id';
 		try {
 				$sqlFetchKeys = $this->writer->selectRecord(
 					  $table,
