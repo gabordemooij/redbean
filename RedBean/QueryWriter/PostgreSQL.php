@@ -4,12 +4,10 @@
  * 
  * @file			RedBean/QueryWriter/PostgreSQL.php
  * @description		QueryWriter for the PostgreSQL database system.
+ * @author			Gabor de Mooij and the RedBeanPHP Community
+ * @license			BSD/GPLv2
  *
- * @author			Gabor de Mooij
- * @license			BSD
- *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -101,7 +99,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @return  string $sql SQL Snippet
 	 */
 	protected function getInsertSuffix($table) {
-		return "RETURNING id ";
+		return 'RETURNING id ';
 	}
 
 	/**
@@ -310,7 +308,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			}
 		}
 		$sql = "ALTER TABLE \"$table\"
-                ADD CONSTRAINT $name UNIQUE (".implode(",",$columns).")";
+                ADD CONSTRAINT $name UNIQUE (".implode(',',$columns).")";
 		$this->adapter->exec($sql);
 	}
 
@@ -426,7 +424,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		try{
 			$writer = $this;
 			$adapter = $this->adapter;
-			$fkCode = "fk".md5($table.$property1.$property2);
+			$fkCode = 'fk'.md5($table.$property1.$property2);
 			$sql = "
 						SELECT
 								c.oid,
@@ -468,7 +466,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * Removes all tables and views from the database.
 	 */
 	public function wipeAll() {
-      	$this->adapter->exec("SET CONSTRAINTS ALL DEFERRED");
+      	$this->adapter->exec('SET CONSTRAINTS ALL DEFERRED');
       	foreach($this->getTables() as $t) {
       		$t = $this->noKW($t);
 	 		try{
@@ -480,7 +478,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 		}
 	 		catch(Exception $e){  throw $e; }
 		}
-		$this->adapter->exec("SET CONSTRAINTS ALL IMMEDIATE");
+		$this->adapter->exec('SET CONSTRAINTS ALL IMMEDIATE');
 	}
 
 }

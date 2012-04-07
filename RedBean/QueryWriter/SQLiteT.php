@@ -6,8 +6,12 @@
  * @description			Represents a SQLite Database to RedBean
  *						To write a driver for a different database for RedBean
  *						you should only have to change this file.
- * @author				Gabor de Mooij
- * @license				BSD
+ * @author				Gabor de Mooij and the RedBeanPHP Community
+ * @license				BSD/GPLv2
+ * 
+ * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
  */
 class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 	/**
@@ -180,7 +184,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$newtype = $this->typeno_sqltype[$datatype];
 		$oldColumns = $this->getColumns($type);
 		$oldColumnNames = $this->quote(array_keys($oldColumns));
-		$newTableDefStr="";
+		$newTableDefStr='';
 		foreach($oldColumns as $oldName=>$oldType) {
 			if ($oldName != 'id') {
 				if ($oldName!=$column) {
@@ -254,8 +258,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	public function addUniqueIndex( $table,$columns ) {
 		$table = $this->safeTable($table);
-		$name = "UQ_".sha1(implode(',',$columns));
-		$sql = "CREATE UNIQUE INDEX IF NOT EXISTS $name ON $table (".implode(",",$columns).")";
+		$name = 'UQ_'.sha1(implode(',',$columns));
+		$sql = "CREATE UNIQUE INDEX IF NOT EXISTS $name ON $table (".implode(',',$columns).")";
 		$this->adapter->exec($sql);
 	}
 
@@ -406,7 +410,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return void
 	 */
 	public function wipeAll() {
-		$this->adapter->exec("PRAGMA foreign_keys = 0 ");
+		$this->adapter->exec('PRAGMA foreign_keys = 0 ');
 		foreach($this->getTables() as $t) {
 	 		try{
 	 			$this->adapter->exec("drop table if exists`$t`");
@@ -417,7 +421,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 		}
 	 		catch(Exception $e){}
 		}
-		$this->adapter->exec("PRAGMA foreign_keys = 1 ");
+		$this->adapter->exec('PRAGMA foreign_keys = 1 ');
 	}
 
 }

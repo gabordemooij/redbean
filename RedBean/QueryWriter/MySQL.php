@@ -6,11 +6,11 @@
  * @description		Represents a MySQL Database to RedBean
  *					To write a driver for a different database for RedBean
  *					you should only have to change this file.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @author			Gabor de Mooij and the RedBeanPHP Community
+ * @license			BSD/GPLv2
  *
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -179,7 +179,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return array $tables tables
 	 */
 	public function getTables() {
-		return $this->adapter->getCol( "show tables" );
+		return $this->adapter->getCol( 'show tables' );
 	}
 
 	/**
@@ -316,7 +316,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$type = $datatype;
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
-		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : "";
+		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
 		$this->adapter->exec( $changecolumnSQL );
 	}
@@ -346,7 +346,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			}
 		}
 		$sql = "ALTER IGNORE TABLE $table
-                ADD UNIQUE INDEX $name (".implode(",",$columns).")";
+                ADD UNIQUE INDEX $name (".implode(',',$columns).")";
 		$this->adapter->exec($sql);
 	}
 
@@ -381,7 +381,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	protected function constrain($table, $table1, $table2, $property1, $property2) {
 		try{
-			$db = $this->adapter->getCell("select database()");
+			$db = $this->adapter->getCell('select database()');
 			$fks =  $this->adapter->getCell("
 				SELECT count(*)
 				FROM information_schema.KEY_COLUMN_USAGE
@@ -416,7 +416,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * Drops all tables in database
 	 */
 	public function wipeAll() {
-		$this->adapter->exec("SET FOREIGN_KEY_CHECKS=0;");
+		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=0;');
 		foreach($this->getTables() as $t) {
 	 		try{
 	 			$this->adapter->exec("drop table if exists`$t`");
@@ -427,7 +427,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 		}
 	 		catch(Exception $e){}
 		}
-		$this->adapter->exec("SET FOREIGN_KEY_CHECKS=1;");
+		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=1;');
 	}
 
 
