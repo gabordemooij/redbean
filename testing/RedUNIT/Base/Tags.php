@@ -82,7 +82,9 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		asrt(count($x),2);
 		$x = R::tagged("book","classic,horror");
 		asrt(count($x),3);
-		
+		$x = R::taggedAll("book","classic,horror");
+		asrt(count($x),1);
+
 	}
 
 }
