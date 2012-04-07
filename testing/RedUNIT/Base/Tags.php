@@ -1,6 +1,6 @@
 <?php
 /**
- * RedUNIT_Base_Tags 
+ * RedUNIT_Base_Tags
  * @file 			RedUNIT/Base/Tags.php
  * @description		Tests the tagging of beans.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
@@ -16,7 +16,7 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function run() {
@@ -82,7 +82,9 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		asrt(count($x),2);
 		$x = R::tagged("book","classic,horror");
 		asrt(count($x),3);
-		
+		$x = R::taggedAll("book","classic,horror");
+		asrt(count($x),1);
+
 	}
 
 }
