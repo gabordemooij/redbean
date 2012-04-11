@@ -40,6 +40,8 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 $dir = dirname(__FILE__) . '/';
 
 //Load Database drivers
+require($dir.'ILogger.php');
+require($dir.'Logger.php');
 require($dir.'Driver.php');
 require($dir.'Driver/PDO.php');
 
