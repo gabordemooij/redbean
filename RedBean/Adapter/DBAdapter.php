@@ -3,11 +3,11 @@
  * DBAdapter		(Database Adapter)
  * @file			RedBean/Adapter/DBAdapter.php
  * @description		An adapter class to connect various database systems to RedBean
- * @author			Gabor de Mooij
- * @license			BSD
+ * @author			Gabor de Mooij and the RedBeanPHP Community. 
+ * @license			BSD/GPLv2
  *
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -23,7 +23,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * Contains SQL snippet
 	 * @var string
 	 */
-	private $sql = "";
+	private $sql = '';
 
 
 	/**

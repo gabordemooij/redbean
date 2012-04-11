@@ -4,12 +4,10 @@
  *
  * @file 			RedBean/Plugin/TimeLine.php
  * @description		Monitors schema changes to ease deployment.
- * 					
- * @author			Gabor de Mooij
- * @license			BSD
+ * @author			Gabor de Mooij and the RedBeanPHP Community
+ * @license			BSD/GPLv2
  *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */

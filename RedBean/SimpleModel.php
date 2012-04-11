@@ -5,10 +5,9 @@
  * @file 		RedBean/SimpleModel.php
  * @description	Part of FUSE
  * @author      Gabor de Mooij and the RedBeanPHP Team
- * @license		BSD
+ * @license		BSD/GPLv2
  *
- *
- * copyright (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */

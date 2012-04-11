@@ -8,12 +8,11 @@
  *					To write a driver for a different database for RedBean
  *					Contains a number of functions all implementors can
  *					inherit or override.
+ * @author			Gabor de Mooij and the RedBeanPHP Community
+ * @license			BSD/GPLv2
  *
- * @author			Gabor de Mooij
- * @license			BSD
  *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -94,7 +93,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return string sql
 	 */
   	protected function getInsertSuffix ($table) {
-    	return "";
+    	return '';
   	}
 
 	/**
@@ -139,7 +138,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$type = $field;
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
-		$type = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : "";
+		$type = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$sql = "ALTER TABLE $table ADD $column $type ";
 		$this->adapter->exec( $sql );
 	}
@@ -163,8 +162,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (!$id) {
 			$insertcolumns =  $insertvalues = array();
 			foreach($updatevalues as $pair) {
-				$insertcolumns[] = $pair["property"];
-				$insertvalues[] = $pair["value"];
+				$insertcolumns[] = $pair['property'];
+				$insertvalues[] = $pair['value'];
 			}
 			return $this->insertRecord($table,$insertcolumns,array($insertvalues));
 		}
@@ -175,9 +174,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
 			$p[] = " {$this->safeColumn($uv["property"])} = ? ";
-			$v[]=$uv["value"];
+			$v[]=$uv['value'];
 		}
-		$sql .= implode(",", $p ) ." WHERE id = ".intval($id);
+		$sql .= implode(',', $p ) .' WHERE id = '.intval($id);
 		$this->adapter->exec( $sql, $v );
 		return $id;
 	}
@@ -200,8 +199,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			foreach($insertcolumns as $k=>$v) {
 				$insertcolumns[$k] = $this->safeColumn($v);
 			}
-			$insertSQL = "INSERT INTO $table ( id, ".implode(",",$insertcolumns)." ) VALUES 
-			( $default, ". implode(",",array_fill(0,count($insertcolumns)," ? "))." ) $suffix";
+			$insertSQL = "INSERT INTO $table ( id, ".implode(',',$insertcolumns)." ) VALUES 
+			( $default, ". implode(',',array_fill(0,count($insertcolumns),' ? '))." ) $suffix";
 
 			foreach($insertvalues as $i=>$insertvalue) {
 				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue, $i );
@@ -267,7 +266,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		$sql = '';
 		if (count($sqlConditions)>0) {
-			$sql = implode(" AND ",$sqlConditions);
+			$sql = implode(' AND ',$sqlConditions);
 			$sql = " WHERE ( $sql ) ";
 			if ($addSql) $sql .= " AND $addSql ";
 		}
@@ -277,7 +276,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			else
 				$sql = " WHERE $addSql ";
 		}
-		$sql = (($delete) ? "DELETE FROM " : "SELECT * FROM ").$table.$sql;
+		$sql = (($delete) ? 'DELETE FROM ' : 'SELECT * FROM ').$table.$sql;
 		$rows = $this->adapter->get($sql,$bindings);
 		return $rows;
 	}
@@ -373,7 +372,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$columnNoQ = $this->safeColumn($field,true);
 		$targetColumn  = $this->safeColumn($targetField);
 		$targetColumnNoQ  = $this->safeColumn($targetField,true);
-		$db = $this->adapter->getCell("select database()");
+		$db = $this->adapter->getCell('select database()');
 		$fkName = 'fk_'.$tableNoQ.'_'.$columnNoQ.'_'.$targetColumnNoQ.($isDependent ? '_casc':'');
 		$cName = 'cons_'.$fkName;
 		$cfks =  $this->adapter->getCell("
@@ -397,7 +396,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			if ($flagAddKey) { 
 				$this->adapter->exec("ALTER TABLE  $table
 				ADD CONSTRAINT $cName FOREIGN KEY $fkName (  $column ) REFERENCES  $targetTable (
-				$targetColumn) ON DELETE ".($isDependent ? 'CASCADE':'SET NULL')." ON UPDATE SET NULL ;");
+				$targetColumn) ON DELETE ".($isDependent ? 'CASCADE':'SET NULL').' ON UPDATE SET NULL ;');
 			}
 		}
 		catch(Exception $e) { } //Failure of fk-constraints is not a problem
@@ -416,7 +415,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public static function getAssocTableFormat($types) {
 		sort($types);
-		return ( implode("_", $types) );
+		return ( implode('_', $types) );
 	}
 
 
@@ -439,7 +438,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
-		if ($property1==$property2) $property2 = $bean2->getMeta("type").'2_id';
+		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
 
 		$table = $adapter->escape($table);
 		$table1 = $adapter->escape($table1);

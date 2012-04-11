@@ -5,8 +5,8 @@
  * 
  * @file			RedBean/QueryWriter.php
  * @description		Describes the API for a QueryWriter
- * @author			Gabor de Mooij
- * @license			BSD
+ * @author			Gabor de Mooij and the RedBeanPHP community
+ * @license			BSD/GPLv2
  *
  * Notes:
  * - Whenever you see a parameter called $table or $type you should always
@@ -18,7 +18,7 @@
  * just FROZEN mode should implement the IceWriter instead.
  *
  *
- * copyright (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */

@@ -3,14 +3,14 @@
  * RedBean Cooker
  * @file			RedBean/Cooker.php
  * @description		Turns arrays into bean collections for easy persistence.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @author			Gabor de Mooij and the RedBeanPHP Community
+ * @license			BSD/GPLv2
  *
  * The Cooker is a little candy to make it easier to read-in an HTML form.
  * This class turns a form into a collection of beans plus an array
  * describing the desired associations.
  *
- * copyright (c) G.J.G.T. (Gabor) de Mooij
+ * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
