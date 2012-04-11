@@ -29,6 +29,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	protected $debug = false;
 
 	/**
+	 * Holds an instance of ILogger implementation.
+	 * @var RedBean_ILogger
+	 */
+	protected $logger = NULL;
+
+	/**
 	 * Holds the PDO instance.
 	 * @var PDO
 	 */
@@ -182,8 +188,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	protected function runQuery($sql,$aValues) {
 		$this->connect();
-		if ($this->debug) {
-			echo '<HR>' . $sql.print_r($aValues,1);
+		if ($this->debug && $this->logger) {
+			$this->logger->log($sql, $aValues);
 		}
 		try {
 			if (strpos('pgsql',$this->dsn)===0) {
@@ -197,7 +203,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->affected_rows = $s->rowCount();
 			if ($s->columnCount()) {
 		    	$this->rs = $s->fetchAll();
-		    	if ($this->debug) echo '<br><b style="color:green">resultset: ' . count($this->rs) . ' rows</b>';
+		    	if ($this->debug && $this->logger) $this->logger->log('resultset: ' . count($this->rs) . ' rows');
 	    	}
 		  	else {
 		    	$this->rs = array();
@@ -333,15 +339,39 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * passes on to the screen for inspection.
 	 * This method has no return value.
 	 *
+	 * Additionally you can inject RedBean_ILogger implementation
+	 * where you can define your own log() method
+	 *
 	 * @param boolean $trueFalse turn on/off
+	 * @param RedBean_ILogger $logger 
 	 *
 	 * @return void
 	 */
-	public function setDebugMode( $tf ) {
+	public function setDebugMode( $tf, $logger = NULL ) {
 		$this->connect();
 		$this->debug = (bool)$tf;
+		if ($this->debug and !$logger) $logger = new RedBean_Logger();
+		$this->setLogger($logger);
 	}
 
+
+	/**
+	 * Injects RedBean_ILogger object.
+	 *
+	 * @param RedBean_ILogger $logger
+	 */
+	public function setLogger( RedBean_ILogger $logger ) {
+		$this->logger = $logger;
+	}
+
+	/**
+	 * Gets RedBean_ILogger object.
+	 *
+	 * @return RedBean_ILogger
+	 */
+	public function getLogger() {
+		return $this->logger;
+	}
 
 	/**
 	 * Starts a transaction.
