@@ -73,6 +73,8 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		$row = R::getRow('select * from page limit 1');
 		asrt(is_array($row),true);
 		asrt(isset($row['name']),true);
+		//test findAll -- should not throw an exception
 		asrt(count(R::findAll('page'))>0,true);
+		asrt(count(R::findAll('page',' ORDER BY id '))>0,true);
 	}
 }

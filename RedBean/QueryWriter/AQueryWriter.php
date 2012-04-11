@@ -271,10 +271,12 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			if ($addSql) $sql .= " AND $addSql ";
 		}
 		elseif ($addSql) {
-			if ($all)
+			if ($all) {
 				$sql = " $addSql ";
-			else
+			} 
+			else {
 				$sql = " WHERE $addSql ";
+			}
 		}
 		$sql = (($delete) ? 'DELETE FROM ' : 'SELECT * FROM ').$table.$sql;
 		$rows = $this->adapter->get($sql,$bindings);
