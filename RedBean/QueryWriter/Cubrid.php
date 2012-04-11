@@ -6,8 +6,13 @@
  * @description			Represents a Cubrid Database to RedBean
  *						To write a driver for a different database for RedBean
  *						you should only have to change this file.
- * @author				Gabor de Mooij
- * @license				BSD
+ * @author				Gabor de Mooij and the RedBeanPHP Community
+ * @license				BSD/GPLv2
+ *
+ * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
+ 
  */
 class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 
@@ -269,7 +274,7 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 		$type = $field;
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
-		$type = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : "";
+		$type = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$sql = "ALTER TABLE $table ADD COLUMN $column $type ";
 		$this->adapter->exec( $sql );
 	}
@@ -290,7 +295,7 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 		$type = $datatype;
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
-		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : "";
+		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
 		$this->adapter->exec( $changecolumnSQL );
 	}
@@ -320,7 +325,7 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 			}
 		}
 		$sql = "ALTER TABLE $table
-                ADD CONSTRAINT UNIQUE $name (".implode(",",$columns).")";
+                ADD CONSTRAINT UNIQUE $name (".implode(',',$columns).")";
 		$this->adapter->exec($sql);
 	}
 
@@ -367,7 +372,7 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 		$table = RedBean_QueryWriter_AQueryWriter::getAssocTableFormat( array( $table1,$table2) );
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
-		if ($property1==$property2) $property2 = $bean2->getMeta("type").'2_id';
+		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
 		//Dispatch to right method
 		return $this->constrain($table, $table1, $table2, $property1, $property2);
 	}
@@ -442,14 +447,9 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 		$columnNoQ = $this->safeColumn($field,true);
 		$targetColumn  = $this->safeColumn($targetField);
 		$targetColumnNoQ  = $this->safeColumn($targetField,true);
-		
-		
 		$keys = $this->getKeys($targetTableNoQ,$tableNoQ);
-		
 		$needsToAddFK = true;
 		$needsToDropFK = false;
-		//print_r($keys);
-		//echo " tablenoq=$tableNoQ columnnoq = $columnNoQ ";
 		foreach($keys as $key) {
 			if ($key['FKTABLE_NAME']==$tableNoQ && $key['FKCOLUMN_NAME']==$columnNoQ) { 
 				//already has an FK
@@ -477,18 +477,15 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * Drops all tables in database
 	 */
 	public function wipeAll() {
-	//	try{
-			foreach($this->getTables() as $t) {
-				foreach($this->getKeys($t) as $k) {
-					$this->adapter->exec("ALTER TABLE \"{$k['FKTABLE_NAME']}\" DROP FOREIGN KEY \"{$k['FK_NAME']}\"");
-				}
-				$this->adapter->exec("DROP TABLE \"$t\"");
+		foreach($this->getTables() as $t) {
+			foreach($this->getKeys($t) as $k) {
+				$this->adapter->exec("ALTER TABLE \"{$k['FKTABLE_NAME']}\" DROP FOREIGN KEY \"{$k['FK_NAME']}\"");
 			}
-			foreach($this->getTables() as $t) {
-				$this->adapter->exec("DROP TABLE \"$t\"");
-			}
-	//	}
-	//	catch(Exception $e){}
+			$this->adapter->exec("DROP TABLE \"$t\"");
+		}
+		foreach($this->getTables() as $t) {
+			$this->adapter->exec("DROP TABLE \"$t\"");
+		}
 	}
 	
 	
@@ -499,8 +496,6 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return type 
 	 */
 	protected function getKeys($table,$table2=null) {
-		
-		//echo "getting keys for table... $table $table2 ";
 		$pdo = $this->adapter->getDatabase()->getPDO();
 		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS,$table);//print_r($keys);
 		if ($table2) $keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS,$table2) );//print_r($keys);

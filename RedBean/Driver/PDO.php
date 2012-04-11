@@ -4,12 +4,11 @@
  * @file			RedBean/PDO.php
  * @description		PDO Driver
  *					This Driver implements the RedBean Driver API
- * @author			Desfrenes
- * @author			G.J.G.T. de Mooij
- * @license			BSD
+ * @author			Gabor de Mooij and the RedBeanPHP Community, Desfrenes
+ * @license			BSD/GPLv2
  *
  *
- * (c) Desfrenes & Gabor de Mooij
+ * (c) copyright Desfrenes & Gabor de Mooij and the RedBeanPHP community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  *
@@ -103,7 +102,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->dsn = $this->getDatabaseType();
 		} else {
 			$this->dsn = $dsn;
-			$this->connectInfo = array( "pass"=>$pass, "user"=>$user );
+			$this->connectInfo = array( 'pass'=>$pass, 'user'=>$user );
 		}
 	}
 
@@ -118,8 +117,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function connect() {
 		if ($this->isConnected) return;
-		$user = $this->connectInfo["user"];
-		$pass = $this->connectInfo["pass"];
+		$user = $this->connectInfo['user'];
+		$pass = $this->connectInfo['pass'];
 		//PDO::MYSQL_ATTR_INIT_COMMAND
 		$this->pdo = new PDO(
 				  $this->dsn,
@@ -193,7 +192,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->logger->log($sql, $aValues);
 		}
 		try {
-			if (strpos("pgsql",$this->dsn)===0) {
+			if (strpos('pgsql',$this->dsn)===0) {
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			}
 			else {

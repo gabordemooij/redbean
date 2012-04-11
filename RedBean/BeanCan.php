@@ -4,14 +4,14 @@
  *  
  * @file			RedBean/BeanCan.php
  * @description		A Server Interface for RedBean and Fuse.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @author			Gabor de Mooij and the RedBeanPHP Community
+ * @license			BSD/GPLv2
  * 
  * The BeanCan Server is a lightweight, minimalistic server interface for
  * RedBean that can perfectly act as an ORM middleware solution or a backend
  * for an AJAX application.
  * 
- * copyright (c) G.J.G.T. (Gabor) de Mooij
+ * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -118,7 +118,7 @@ class RedBean_BeanCan {
 			}
 		}
 		catch(Exception $exception) {
-			return $this->resp(null, $id, -32099,$exception->getCode()."-".$exception->getMessage());
+			return $this->resp(null, $id, -32099,$exception->getCode().'-'.$exception->getMessage());
 		}
 	}
 	

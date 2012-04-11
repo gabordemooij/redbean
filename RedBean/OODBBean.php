@@ -4,11 +4,12 @@
  * 
  * @file 			RedBean/RedBean_OODBBean.php
  * @description		The Bean class used for passing information
- * @author			Gabor de Mooij
- * @license			BSD
+ * 
+ * @author			Gabor de Mooij and the RedBeanPHP community
+ * @license			BSD/GPLv2
  *
  *
- * copyright (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -109,7 +110,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 *    @return RedBean_OODBBean $this
 	 */
 	public function import( $arr, $selection=false, $notrim=false ) {
-		if (is_string($selection)) $selection = explode(",",$selection);
+		if (is_string($selection)) $selection = explode(',',$selection);
 		//trim whitespaces
 		if (!$notrim && is_array($selection)) foreach($selection as $k=>$s){ $selection[$k]=trim($s); }
 		foreach($arr as $k=>$v) {
@@ -252,7 +253,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$firstCharCode = ord(substr($property,3,1));
 				if ($firstCharCode>=65 && $firstCharCode<=90) {
 					$type = (__lcfirst(str_replace('own','',$property)));
-					$myFieldLink = $this->getMeta('type')."_id";
+					$myFieldLink = $this->getMeta('type').'_id';
 					$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ",array($this->getID())));
 					$this->properties[$property] = $beans;
 					$this->setMeta('sys.shadow.'.$property,$beans);
@@ -290,7 +291,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 
 	public function __set($property,$value) {
 		$this->__get($property);
-		$this->setMeta("tainted",true);
+		$this->setMeta('tainted',true);
 		$linkField = $property.'_id';
 		if (isset($this->properties[$linkField]) && !($value instanceof RedBean_OODBBean)) {
 			if (is_null($value) || $value === false) {
@@ -360,15 +361,15 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return mixed $mixed
 	 */
 	public function __call($method, $args) {
-		if (!isset($this->__info["model"])) {
-			$modelName = RedBean_ModelHelper::getModelName( $this->getMeta("type"), $this );
+		if (!isset($this->__info['model'])) {
+			$modelName = RedBean_ModelHelper::getModelName( $this->getMeta('type'), $this );
 			if (!class_exists($modelName)) return null;
 			$obj = RedBean_ModelHelper::factory($modelName);
 			$obj->loadBean($this);
-			$this->__info["model"] = $obj;
+			$this->__info['model'] = $obj;
 		}
-		if (!method_exists($this->__info["model"],$method)) return null;
-		return call_user_func_array(array($this->__info["model"],$method), $args);
+		if (!method_exists($this->__info['model'],$method)) return null;
+		return call_user_func_array(array($this->__info['model'],$method), $args);
 	}
 
 	/**

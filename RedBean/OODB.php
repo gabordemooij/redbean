@@ -2,18 +2,18 @@
 /**
  * RedBean Object Oriented DataBase
  * 
- * @name 		RedBean OODB
- * @file 		RedBean/OODB.php
- * @author 		Gabor de Mooij and the RedBean Team
- * @copyright 	Gabor de Mooij (c)
- * @license 	BSD
+ * @file			RedBean/OODB.php
+ * @description 	RedBean OODB
+ * 
+ * @author			Gabor de Mooij and the RedBeanPHP community
+ * @license			BSD/GPLv2
  *
  * The RedBean OODB Class is the main class of RedBeanPHP.
  * It takes RedBean_OODBBean objects and stores them to and loads them from the
  * database as well as providing other CRUD functions. This class acts as a
  * object database.
  *
- * copyright (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
@@ -159,9 +159,9 @@ class RedBean_OODB extends RedBean_Observable {
 	public function check( RedBean_OODBBean $bean ) {
 		//Is all meta information present?
 		if (!isset($bean->id) ) {
-			throw new RedBean_Exception_Security("Bean has incomplete Meta Information id ");
+			throw new RedBean_Exception_Security('Bean has incomplete Meta Information id ');
 		}
-		if (!($bean->getMeta("type"))) {
+		if (!($bean->getMeta('type'))) {
 			throw new RedBean_Exception_Security('Bean has incomplete Meta Information II');
 		}
 		//Pattern of allowed characters
@@ -406,7 +406,7 @@ class RedBean_OODB extends RedBean_Observable {
 	private function storeBean($bean) {
 		if (!$this->isFrozen) $this->check($bean);
 		//what table does it want
-		$table = $bean->getMeta("type");
+		$table = $bean->getMeta('type');
 		if ($bean->getMeta('tainted')) {
 			//Does table exist? If not, create
 			if (!$this->isFrozen && !$this->tableExists($this->writer->safeTable($table,true))) {
@@ -447,13 +447,13 @@ class RedBean_OODB extends RedBean_Observable {
 								if ($typeno > $sqlt) {
 									//no, we have to widen the database column type
 									$this->writer->widenColumn( $table, $p, $typeno );
-									$bean->setMeta("buildreport.flags.widen",true);
+									$bean->setMeta('buildreport.flags.widen',true);
 								}
 							}
 							else {
 								//no it is not
 								$this->writer->addColumn($table, $p, $typeno);
-								$bean->setMeta("buildreport.flags.addcolumn",true);
+								$bean->setMeta('buildreport.flags.addcolumn',true);
 								//@todo: move build commands here... more practical
 								$this->processBuildCommands($table,$p,$bean);
 							}
@@ -462,15 +462,15 @@ class RedBean_OODB extends RedBean_Observable {
 					//Okay, now we are sure that the property value will fit
 					$insertvalues[] = $v;
 					$insertcolumns[] = $p;
-					$updatevalues[] = array( "property"=>$p, "value"=>$v );
+					$updatevalues[] = array( 'property'=>$p, 'value'=>$v );
 				}
 			}
-			if (!$this->isFrozen && ($uniques = $bean->getMeta("buildcommand.unique"))) {
+			if (!$this->isFrozen && ($uniques = $bean->getMeta('buildcommand.unique'))) {
 				foreach($uniques as $unique) $this->writer->addUniqueIndex( $table, $unique );
 			}
 			$rs = $this->writer->updateRecord( $table, $updatevalues, $bean->id );
 			$bean->id = $rs;
-			$bean->setMeta("tainted",false);
+			$bean->setMeta('tainted',false);
 		}
 	}
 	

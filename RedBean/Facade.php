@@ -6,11 +6,10 @@
  *					This class hides the object landscape of
  *					RedBeanPHP behind a single letter class providing
  *					almost all functionality with simple static calls.
+ * @author			Gabor de Mooij and the RedBeanPHP Community
+ * @license			BSD/GPLv2
  *
- * @author			Gabor de Mooij
- * @license			BSD
- *
- * copyright (c) G.J.G.T. (Gabor) de Mooij
+ * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  *
@@ -74,7 +73,7 @@ class RedBean_Facade {
 	 * Holds the Key of the current database.
 	 * @var string
 	 */
-	public static $currentDB = "";
+	public static $currentDB = '';
 	
 	/**
 	 * Holds reference to SQL Helper
