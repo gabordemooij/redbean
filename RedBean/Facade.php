@@ -149,6 +149,7 @@ class RedBean_Facade {
 	 * @param RedBean_ILogger $logger
 	 */
 	public static function debug( $tf = true, $logger = NULL ) {
+		if (!$logger) $logger = new RedBean_Logger;
 		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
 	}
 
