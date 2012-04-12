@@ -38,7 +38,7 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole {
 		//succesful scenario, one missing
 		$di = new RedBean_DependencyInjector;
 		$di->addDependency('Coffee',new Dependency_Coffee);
-		RedBean_ModelHelper::setDepdencyInjector( $di );
+		RedBean_ModelHelper::setDependencyInjector( $di );
 		$geek = R::dispense('geek');
 		list($coffee,$cocoa) = $geek->getObjects();
 		asrt(($coffee instanceof Dependency_Coffee),true);
@@ -48,7 +48,7 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole {
 		$di = new RedBean_DependencyInjector;
 		$di->addDependency('Coffee',new Dependency_Coffee);
 		$di->addDependency('Cocoa',new Dependency_Cocoa);
-		RedBean_ModelHelper::setDepdencyInjector( $di );
+		RedBean_ModelHelper::setDependencyInjector( $di );
 		$geek = R::dispense('geek');
 		list($coffee,$cocoa) = $geek->getObjects();
 		asrt(($coffee instanceof Dependency_Coffee),true);

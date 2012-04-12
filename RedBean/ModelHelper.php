@@ -88,7 +88,7 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * 
 	 * @param RedBean_DependencyInjector $di injecto to be used
 	 */
-	public static function setDepdencyInjector( RedBean_DependencyInjector $di ) {
+	public static function setDependencyInjector( RedBean_DependencyInjector $di ) {
 		self::$dependencyInjector = $di;
 	}
 	
