@@ -20,6 +20,25 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
+		
+		list($c,$d,$e,$f) = R::dispense('coffee',4);
+		R::tag($c,'strong,black');
+		R::tag($d,'black');
+		R::tag($e,'strong,sweet');
+		R::tag($f,'black,strong');
+		
+		//$x = array_intersect(R::tagged('coffee','sweet'),R::tagged('coffee','strong'));
+		asrt(count(R::taggedAll('coffee','strong,sweet')),1);
+		asrt(count(R::taggedAll('coffee','strong')),3);
+		asrt(count(R::taggedAll('coffee','')),0);
+		asrt(count(R::taggedAll('coffee','sweet')),1);
+		asrt(count(R::taggedAll('coffee','sweet,strong')),1);
+		asrt(count(R::taggedAll('coffee','black,strong')),2);
+		asrt(count(R::taggedAll('coffee','salty')),0);
+		
+		
+
+		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
