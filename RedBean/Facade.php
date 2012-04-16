@@ -851,13 +851,29 @@ class RedBean_Facade {
 	public static function tagged( $beanType, $tagList ) {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		$collection = array();
-		foreach($tags as $tag) {
-			$retrieved = array();
-			$tag = RedBean_Facade::findOne('tag',' title = ? ', array($tag));
-			if ($tag) $retrieved = RedBean_Facade::related($tag, $beanType);
-			foreach($retrieved as $key=>$bean) $collection[$key]=$bean;
-		}
+		$tags = self::$redbean->find('tag',array('title'=>$tags));
+		if (count($tags)>0) $collection = self::related($tags,$beanType);
 		return $collection;
+	}
+
+	/**
+	 * Part of RedBeanPHP Tagging API.
+	 * Returns all beans that have been tagged with ALL of the tags given.
+	 *
+	 * @param  $beanType type of bean you are looking for
+	 * @param  $tagList  list of tags to match
+	 *
+	 * @return array
+	 */
+	public static function taggedAll( $beanType, $tagList ) {
+		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+		$beans = array();
+		foreach($tags as $tag) {
+			$beans = self::tagged($beanType,$tag);
+			if (isset($oldBeans)) $beans = array_intersect_assoc($beans,$oldBeans);
+			$oldBeans = $beans;
+		}
+		return $beans;
 	}
 
 
