@@ -84,6 +84,7 @@ require($dir.'BeanHelperFacade.php');
 require($dir.'IModelFormatter.php');
 require($dir.'SimpleModel.php');
 require($dir.'ModelHelper.php');
+require($dir.'TagManager.php');
 require($dir.'Facade.php');;
 require($dir.'BeanCan.php');
 require($dir.'Cooker.php');
