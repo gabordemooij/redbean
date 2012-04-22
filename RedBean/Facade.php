@@ -68,6 +68,12 @@ class RedBean_Facade {
 	 * @var RedBean_Plugin_BeanExport
 	 */
 	public static $exporter;
+	
+	/**
+	 * Holds the tag manager
+	 * @var RedBean_TagManager
+	 */
+	public static $tagManager;
 
 	/**
 	 * Holds the Key of the current database.
@@ -757,13 +763,7 @@ class RedBean_Facade {
 	 * @return boolean $didMatch whether the bean has been assoc. with the tags
 	 */
 	public static function hasTag($bean, $tags, $all=false) {
-		$foundtags = RedBean_Facade::tag($bean);
-		if (is_string($foundtags)) $foundtags = explode(",",$tags);
-		$same = array_intersect($tags,$foundtags);
-		if ($all) {
-			return (implode(",",$same)===implode(",",$tags));
-		}
-		return (bool) (count($same)>0);
+		return self::$tagManager->hasTag($bean,$tags,$all);
 	}
 
 	/**
@@ -777,13 +777,7 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function untag($bean,$tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
-		foreach($tags as $tag) {
-			$t = RedBean_Facade::findOne('tag'," title = ? ",array($tag));
-			if ($t) {
-				RedBean_Facade::unassociate( $bean, $t );
-			}
-		}
+		return self::$tagManager->untag($bean,$tagList);
 	}
 
 	/**
@@ -801,16 +795,7 @@ class RedBean_Facade {
 	 * @return string $commaSepListTags
 	 */
 	public static function tag( RedBean_OODBBean $bean, $tagList = null ) {
-		if (is_null($tagList)) {
-			$tags = RedBean_Facade::related( $bean, 'tag');
-			$foundTags = array();
-			foreach($tags as $tag) {
-				$foundTags[] = $tag->title;
-			}
-			return $foundTags;
-		}
-		RedBean_Facade::clearRelations( $bean, 'tag' );
-		RedBean_Facade::addTags( $bean, $tagList );
+		return self::$tagManager->tag($bean,$tagList);
 	}
 
 	/**
@@ -826,17 +811,7 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function addTags( RedBean_OODBBean $bean, $tagList ) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
-		if ($tagList===false) return;
-		foreach($tags as $tag) {
-			$t = RedBean_Facade::findOne('tag',' title = ? ',array($tag));
-			if (!$t) {
-				$t = RedBean_Facade::dispense('tag');
-				$t->title = $tag;
-				RedBean_Facade::store($t);
-			}
-			RedBean_Facade::associate( $bean, $t );
-		}
+		return self::$tagManager->addTags($bean,$tagList);
 	}
 
 	/**
@@ -849,11 +824,7 @@ class RedBean_Facade {
 	 * @return array
 	 */
 	public static function tagged( $beanType, $tagList ) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
-		$collection = array();
-		$tags = self::$redbean->find('tag',array('title'=>$tags));
-		if (count($tags)>0) $collection = self::related($tags,$beanType);
-		return $collection;
+		return self::$tagManager->tagged($beanType,$tagList);
 	}
 
 	/**
@@ -866,14 +837,7 @@ class RedBean_Facade {
 	 * @return array
 	 */
 	public static function taggedAll( $beanType, $tagList ) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
-		$beans = array();
-		foreach($tags as $tag) {
-			$beans = self::tagged($beanType,$tag);
-			if (isset($oldBeans)) $beans = array_intersect_assoc($beans,$oldBeans);
-			$oldBeans = $beans;
-		}
-		return $beans;
+		return self::$tagManager->taggedAll($beanType,$tagList);
 	}
 
 
@@ -924,6 +888,7 @@ class RedBean_Facade {
 		self::$redbean->addEventListener('after_delete', $helper );
 		self::$redbean->addEventListener('after_update', $helper );
 		self::$redbean->addEventListener('dispense', $helper );
+		self::$tagManager = new RedBean_TagManager( self::$toolbox );
 		self::$f = new RedBean_SQLHelper(self::$adapter);
 		return $oldTools;
 	}
