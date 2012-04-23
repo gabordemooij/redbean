@@ -162,11 +162,11 @@ class RedBean_Facade {
 	/**
 	 * Stores a RedBean OODB Bean and returns the ID.
 	 *
-	 * @param  RedBean_OODBBean $bean bean
+	 * @param  RedBean_OODBBean|RedBean_SimpleModel $bean bean
 	 *
 	 * @return integer $id id
 	 */
-	public static function store( RedBean_OODBBean $bean ) {
+	public static function store( $bean ) {
 		return self::$redbean->store( $bean );
 	}
 
@@ -202,11 +202,11 @@ class RedBean_Facade {
 	/**
 	 * Deletes the specified bean.
 	 *
-	 * @param RedBean_OODBBean $bean bean to be deleted
+	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean to be deleted
 	 *
 	 * @return mixed
 	 */
-	public static function trash( RedBean_OODBBean $bean ) {
+	public static function trash( $bean ) {
 		return self::$redbean->trash( $bean );
 	}
 

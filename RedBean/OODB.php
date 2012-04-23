@@ -318,8 +318,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return  integer $id
 	 */
 	private function prepareEmbeddedBean($v) {
-		if ($v instanceof RedBean_SimpleModel) $v = $v->unbox(); 
-			if (!$v->id || $v->getMeta('tainted')) {
+		if (!$v->id || $v->getMeta('tainted')) {
 			$this->store($v);
 		}
 		return $v->id;
@@ -338,11 +337,13 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @throws RedBean_Exception_Security $exception
 	 * 
-	 * @param RedBean_OODBBean $bean bean to store
+	 * @param RedBean_OODBBean | RedBean_SimpleModel $bean bean to store
 	 *
 	 * @return integer $newid resulting ID of the new bean
 	 */
-	public function store( RedBean_OODBBean $bean ) { 
+	public function store( $bean ) { 
+		if ($bean instanceof RedBean_SimpleModel) $bean = $bean->unbox();
+		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
 		$processLists = false;
 		foreach($bean as $k=>$v) if (is_array($v) || is_object($v)) { $processLists = true; break; }
 		if (!$processLists && !$bean->getMeta('tainted')) return $bean->getID();
@@ -355,7 +356,8 @@ class RedBean_OODB extends RedBean_Observable {
 			$tmpCollectionStore = array();
 			$embeddedBeans = array();
 			foreach($bean as $p=>$v) {
-				if ($v instanceof RedBean_OODBBean || $v instanceof RedBean_SimpleModel) {
+				if ($v instanceof RedBean_SimpleModel) $v = $v->unbox(); 
+				if ($v instanceof RedBean_OODBBean) {
 					$linkField = $p.'_id';
 					$bean->$linkField = $this->prepareEmbeddedBean($v);
 					$bean->setMeta('cast.'.$linkField,'id');
@@ -403,7 +405,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param RedBean_OODBBean $bean the clean bean 
 	 */
-	private function storeBean($bean) {
+	private function storeBean(RedBean_OODBBean $bean) {
 		if (!$this->isFrozen) $this->check($bean);
 		//what table does it want
 		$table = $bean->getMeta('type');
@@ -665,9 +667,11 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @throws RedBean_Exception_Security $exception
 	 * 
-	 * @param RedBean_OODBBean $bean bean you want to remove from database
+	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean you want to remove from database
 	 */
-	public function trash( RedBean_OODBBean $bean ) {
+	public function trash( $bean ) {
+		if ($bean instanceof RedBean_SimpleModel) $bean = $bean->unbox();
+		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
 		$this->signal('delete',$bean);
 		foreach($bean as $p=>$v) {
 			if ($v instanceof RedBean_OODBBean) {
