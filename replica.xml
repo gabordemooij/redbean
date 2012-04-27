@@ -46,5 +46,6 @@
 		<item type="php">RedBean/Plugin/QueryLogger.php</item>
 		<item type="php">RedBean/Plugin/TimeLine.php</item>
 		<item type="php">RedBean/DependencyInjector.php</item>
+		<item type="php">RedBean/DuplicationManager.php</item>
 	</load>
 </root>

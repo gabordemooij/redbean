@@ -658,37 +658,8 @@ class RedBean_Facade {
 	 * @return array $copiedBean the duplicated bean
 	 */
 	public static function dup($bean,$trail=array(),$pid=false) {
-		$type = $bean->getMeta('type');
-		$key = $type.$bean->getID();
-		if (isset($trail[$key])) return $bean;
-		$trail[$key]=$bean;
-		$copy = RedBean_Facade::dispense($type);
-		$copy->import( $bean->getProperties() );
-		$copy->id = 0;
-		$tables = self::$writer->getTables();
-		foreach($tables as $table) {
-			if (strpos($table,'_')!==false || $table==$type) continue;
-			$owned = 'own'.ucfirst($table);
-			$shared = 'shared'.ucfirst($table);
-			if ($beans = $bean->$owned) {
-				$copy->$owned = array();
-				foreach($beans as $subBean) {
-					array_push($copy->$owned,self::dup($subBean,$trail,$pid));
-				}
-			}
-			$copy->setMeta('sys.shadow.'.$owned,null);
-			if ($beans = $bean->$shared) {
-				$copy->$shared = array();
-				foreach($beans as $subBean) {
-					array_push($copy->$shared,$subBean);
-				}
-			}
-			$copy->setMeta('sys.shadow.'.$shared,null);
-
-		}
-
-		if ($pid) $copy->id = $bean->id;
-		return $copy;
+		$duplicationManager = new RedBean_DuplicationManager(self::$toolbox);
+		return $duplicationManager->dup($bean, $trail,$pid);
 	}
 
 	/**

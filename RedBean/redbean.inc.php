@@ -91,6 +91,8 @@ require($dir.'Cooker.php');
 require($dir.'SQLHelper.php');
 
 require($dir.'DependencyInjector.php');
+require($dir.'DuplicationManager.php');
+
 
 class R extends RedBean_Facade{}
 
