@@ -25,6 +25,22 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 	public function run() {
 		
 		
+		testpack('Dup() and Export() should not taint beans');
+		R::nuke();
+		
+		$p = R::dispense('page');
+		$b = R::dispense('book');
+		$b->ownPage[] = $p;
+		$b->title = 'a';
+		$id = R::store($b);
+		$b = R::load('book',$id);
+		asrt((!$b->getMeta('tainted')),true);
+		R::exportAll($b);
+		asrt((!$b->getMeta('tainted')),true);
+		R::dup($b);
+		asrt((!$b->getMeta('tainted')),true);
+		
+		
 		testpack('Test issue with ownItems and stealing Ids.');
 		R::nuke();
 		$bill = R::dispense('bill');
