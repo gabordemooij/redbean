@@ -168,7 +168,9 @@ class RedBean_AssociationManager extends RedBean_Observable {
 				);
 				$sqlResult = array();
 				foreach( $sqlFetchKeys as $row ) {
-					$sqlResult[] = $row[$targetproperty];
+					if (isset($row[$targetproperty])) {
+						$sqlResult[] = $row[$targetproperty];
+					}
 				}
 				if ($cross) {
 					$sqlFetchKeys2 = $this->writer->selectRecord(
