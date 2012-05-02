@@ -180,7 +180,9 @@ class RedBean_AssociationManager extends RedBean_Observable {
 							  false
 					);
 					foreach( $sqlFetchKeys2 as $row ) {
-						$sqlResult[] = $row[$property];
+						if (isset($row[$property])) {
+							$sqlResult[] = $row[$property];
+						}
 					}
 				}
 			return $sqlResult; //or returns rows in case of $sql != empty
