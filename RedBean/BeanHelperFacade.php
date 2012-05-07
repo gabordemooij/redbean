@@ -22,4 +22,17 @@ class RedBean_BeanHelperFacade implements RedBean_IBeanHelper {
 	public function getToolbox() {
 		return RedBean_Facade::$toolbox;
 	}
+	
+	/**
+	 * Fuse connector
+	 * @return type 
+	 */
+	public function getModelForBean(RedBean_OODBBean $bean) {
+		$modelName = RedBean_ModelHelper::getModelName( $bean->getMeta('type'), $bean );
+		if (!class_exists($modelName)) return null;
+		$obj = RedBean_ModelHelper::factory($modelName);
+		$obj->loadBean($bean);
+		return $obj;
+	}
+	
 }

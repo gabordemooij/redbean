@@ -21,4 +21,7 @@ interface RedBean_IBeanHelper {
 	 * @return RedBean_Toolbox $toolbox toolbox
 	 */
 	public function getToolbox();
+	
+	public function getModelForBean(RedBean_OODBBean $bean);
+	
 }
