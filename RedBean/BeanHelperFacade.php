@@ -24,7 +24,14 @@ class RedBean_BeanHelperFacade implements RedBean_IBeanHelper {
 	}
 	
 	/**
-	 * Fuse connector
+	 * Fuse connector.
+	 * Gets the model for a bean $bean.
+	 * Allows you to implement your own way to find the
+	 * right model for a bean and to do dependency injection
+	 * etc.
+	 *
+	 * @param RedBean_OODBBean $bean bean
+	 *  
 	 * @return type 
 	 */
 	public function getModelForBean(RedBean_OODBBean $bean) {
