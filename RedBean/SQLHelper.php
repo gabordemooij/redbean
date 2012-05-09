@@ -156,4 +156,24 @@
 		return $list;
 	}
 
+	/**
+	 * Writes a '(' to the sql query.
+	 */
+	public function open() {
+		if ($this->capture) {
+			$this->sql .= ' ( ';
+			return $this;
+		}
+	}
+	
+	/**
+	 * Writes a ')' to the sql query.
+	 */
+	public function close() {
+		if ($this->capture) {
+			$this->sql .= ' ) ';
+			return $this;
+		}
+	}
+	
 }
