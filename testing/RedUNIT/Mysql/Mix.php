@@ -64,6 +64,18 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql {
 		$value = $mixer->now();
 		asrt(is_scalar($value),true);
 		
+		//test open and close block commands
+		$bean = R::dispense('bean');
+		$bean->num = 2;
+		R::store($bean);
+		$value = $mixer->begin()
+				->select('num')->from('bean')->where('num IN')
+					->open()
+						->addSQL('2')
+					->close()
+				->get('cell');
+		asrt(($value == 2),true);
+		
 	}
 
 }
