@@ -16,8 +16,7 @@ can freeze the database schema which means it no longer scans schemas.
 Databases Supported
 -------------------
 
-RedBean supports MySQL (InnoDB and MyISAM), MySQL strict, PostgreSQL and SQLite.
-There are specific database plugins though.
+RedBean supports MySQL (InnoDB), PostgreSQL, SQLite3 and CUBRID.
 
 
 Quick Example
