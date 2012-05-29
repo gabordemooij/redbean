@@ -24,7 +24,6 @@ require_once('../RedUNIT/Mysql.php');
 require_once('../RedUNIT/Postgres.php');
 require_once('../RedUNIT/Sqlite.php');
 
-require_once('../../RedBean/QueryWriter/Cubrid.php');
 
 //Configure the databases
 $dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";
