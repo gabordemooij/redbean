@@ -18,7 +18,7 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base {
 	 * What drivers should be loaded for this test pack? 
 	 */
 	public function getTargetDrivers() {
-		return array('mysql','pgsql','sqlite'); //cubrid excluded for now.
+		return array('mysql','pgsql','sqlite'); //CUBRID excluded for now.
 	}
 	
 	/**
