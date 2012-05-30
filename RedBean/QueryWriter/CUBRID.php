@@ -14,7 +14,7 @@
  * with this source code in the file license.txt.
  
  */
-class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
+class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 
 	
 	/**
@@ -124,11 +124,11 @@ class RedBean_QueryWriter_Cubrid extends RedBean_QueryWriter_AQueryWriter implem
 	public function __construct( RedBean_Adapter $adapter ) {
 		
 		$this->typeno_sqltype = array(
-			RedBean_QueryWriter_Cubrid::C_DATATYPE_INTEGER => ' INTEGER ',
-			RedBean_QueryWriter_Cubrid::C_DATATYPE_DOUBLE => ' DOUBLE ',
-			RedBean_QueryWriter_Cubrid::C_DATATYPE_STRING => ' STRING ',
-			RedBean_QueryWriter_Cubrid::C_DATATYPE_SPECIAL_DATE => ' DATE ',
-			RedBean_QueryWriter_Cubrid::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
+			RedBean_QueryWriter_CUBRID::C_DATATYPE_INTEGER => ' INTEGER ',
+			RedBean_QueryWriter_CUBRID::C_DATATYPE_DOUBLE => ' DOUBLE ',
+			RedBean_QueryWriter_CUBRID::C_DATATYPE_STRING => ' STRING ',
+			RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATE => ' DATE ',
+			RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
 		);
 		
 		$this->sqltype_typeno = array();

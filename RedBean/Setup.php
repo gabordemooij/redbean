@@ -82,7 +82,7 @@ class RedBean_Setup {
 			$writer = new RedBean_QueryWriter_SQLiteT($adapter);
 		}
 		else if (strpos($dsn,'cubrid')===0) {
-			$writer = new RedBean_QueryWriter_Cubrid($adapter);
+			$writer = new RedBean_QueryWriter_CUBRID($adapter);
 		}
 		else {
 			$writer = new RedBean_QueryWriter_MySQL($adapter);
