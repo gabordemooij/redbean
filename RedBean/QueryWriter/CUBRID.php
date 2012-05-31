@@ -1,9 +1,9 @@
 <?php
 /**
- * RedBean Cubrid Writer 
+ * RedBean CUBRID Writer 
  *
- * @file				RedBean/QueryWriter/Cubrid.php
- * @description			Represents a Cubrid Database to RedBean
+ * @file				RedBean/QueryWriter/CUBRID.php
+ * @description			Represents a CUBRID Database to RedBean
  *						To write a driver for a different database for RedBean
  *						you should only have to change this file.
  * @author				Gabor de Mooij and the RedBeanPHP Community
@@ -379,7 +379,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 
 	
 	/**
-	 * Add the constraints for a specific database driver: Cubrid
+	 * Add the constraints for a specific database driver: CUBRID
 	 * @todo Too many arguments; find a way to solve this in a neater way.
 	 *
 	 * @param string			  $table     table
