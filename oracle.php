@@ -59,6 +59,9 @@ class RedBean_Driver_OCI implements RedBean_Driver {
     private $exc =0;
 
     private $autocommit = true;
+    
+    /* Hold the statement for the last query */
+    private $statement;
 
 
     /**
@@ -107,9 +110,9 @@ class RedBean_Driver_OCI implements RedBean_Driver {
      */
     public function GetAll( $sql, $aValues=array() )
     {
-	$this->Execute($sql);
+	$this->Execute($sql, $aValues);
         $rows = array();
-	while($rs=oci_fetch_assoc($this->connection)) $rows[]=$rs;
+	while($rs=oci_fetch_assoc($this->statement)) $rows[]=$rs;
         return $rows;
     }
     
@@ -182,27 +185,26 @@ class RedBean_Driver_OCI implements RedBean_Driver {
     public function Execute( $sql, $aValues=array() )
     {
 	echo $sql;
-	$sql2="";
-	$counter = 0;
-    	if (strpos($sql,"?")!==false) {
-		foreach($sql as $sqlchar) {
-			if ($sqlchar) $sql2.=" :SLOT".($counter++)." ";
-			else $sql2.=$sqlchar;
-		}	
-	}
+        foreach($aValues as $key=>$value)
+        {
+             $sql = preg_replace('/\?/', ' :SLOT'.$key.' ', $sql, 1); 
+        }
 
-	die($sql2);
+        $stid = oci_parse($this->connection, $sql);
+
 	foreach($aValues as $key=>$value) {
-		if (is_integer($key)) {
-			//oops			
-		}
+             ${'SLOT'.$key} = $value;
+            oci_bind_by_name($stid, ':SLOT'.$key, ${'SLOT'.$key});
 	}
 
-	$stid = oci_parse($this->connection, $sql);
+
 	if (!$this->autocommit)
-	oci_execute($stid, OCI_NO_AUTO_COMMIT);  // data not committed
+            oci_execute($stid, OCI_NO_AUTO_COMMIT);  // data not committed
 	else 
-	oci_execute($stid);
+            oci_execute($stid);
+        
+        $this->statement = $stid;
+        
 		
     }
 
@@ -315,9 +317,7 @@ throw new RedBean_Exception_SQL("This extension is for frozen mode only.");
     public function getColumns( $table ){ return array();
 throw new RedBean_Exception_SQL("This extension is for frozen mode only.");
 }
-	public function scanType( $value ){ 
-throw new RedBean_Exception_SQL("This extension is for frozen mode only.");
-}
+
     public function addColumn( $table, $column, $type ){
 		throw new RedBean_Exception_SQL("This extension is for frozen mode only.");
 	}
@@ -328,10 +328,7 @@ throw new RedBean_Exception_SQL("This extension is for frozen mode only.");
     public function widenColumn( $table, $column, $type ){
 		throw new RedBean_Exception_SQL("This extension is for frozen mode only.");
 	}
-    public function updateRecord( $table, $updatevalues, $id){
-		$this->updateRecordArguments = array($table, $updatevalues, $id);
-		return $this->returnUpdateRecord;
-	}
+
     public function insertRecord( $table, $insertcolumns, $insertvalues ){
                
 		foreach($insertcolumns as $key=>$column) {
@@ -346,10 +343,7 @@ throw new RedBean_Exception_SQL("This extension is for frozen mode only.");
 		}
 
 	}
-    public function selectRecord($type, $ids){
-		$this->selectRecordArguments = array($type, $ids);
-		return $this->returnSelectRecord;
-	}
+
 	public function deleteRecord( $table, $id){
 		$this->deleteRecordArguments = array($table, "id", $id);
 		return $this->returnDeleteRecord;
@@ -382,11 +376,24 @@ throw new RedBean_Exception_SQL("This extension is for frozen mode only.");
 	}
 
 	public function sqlStateIn($state,$list) { return true; }
+        
+	/**
+	 * Returns the Column Type Code (integer) that corresponds
+	 * to the given value type. This method is used to determine the minimum
+	 * column type required to represent the given value.
+	 *
+	 * @param string $value value
+	 *
+	 * @return integer $type type
+	 */
+	public function scanType($value, $alsoScanSpecialForTypes=false){
+            
+        }      
 
 	
 }
 
-$driver = RedBean_Driver_OCI::getInstance("oci","hr","hr");
+$driver = RedBean_Driver_OCI::getInstance("oci","hr","hr","");
 $adapter = new RedBean_Adapter_DBAdapter( $driver );
 $writer = new RedBean_QueryWriter_OCI( $adapter );
 $redbean = new RedBean_OODB( $writer );
@@ -394,12 +401,14 @@ $toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
 
 //regular table read/write
 $redbean->freeze( true );
-$book = $redbean->dispense("book");
+//$book = $redbean->dispense("book");
+//
+//$book->title = "Harry Potter";
+//$book->rating = 3;
+//$redbean->store( $book );
 
-$book->title = "Harry Potter";
-$book->rating = 3;
-$redbean->store( $book );
-
+$test = $redbean->load('book',1);
+var_dump($test);
 
 
 
