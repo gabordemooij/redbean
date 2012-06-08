@@ -1,0 +1,50 @@
+################################################################################
+#  $Id: README 49493 2006-04-08 00:16:04Z hkodungallur $
+#  
+#  Copyright(c) 2004-2006, SpikeSource Inc. All Rights Reserved.
+#  Licensed under the Open Software License version 2.1
+#  (See http://www.spikesource.com/license.html)
+################################################################################
+################################################
+# Spike PHPCoverage Remote Code Coverage Sample
+################################################
+
+This sample has a single PHP file taken straight from the Xdebug 
+documentation - named as "sample.php". 
+
+The codeCoverageMain.php is the wrapper script that sets up the 
+remote code coverage recording and then executes the "sample.php" file
+deployed in your web server. The code coverage report is generated in a 
+directory called "report" in the current working directory.
+
+To execute this sample, run the following commands assuming that 
+the PHP command line executable is in your path. The following alose assumes 
+that your web server deploy directory is "/var/www".
+
+Linux:
+  # Depoly application
+  $ export PHPCOVERAGE_HOME=/path/to/phpcoverage/src
+  $ cp -rp web /var/www
+  # Instrument
+  $ php ${PHPCOVERAGE_HOME}/cli/instrument.php -b /var/www/web /var/www/web/*.php
+  # Execute
+  $ php codeCoverageMain.php PHPCOVERAGE_APPBASE_PATH=/var/www/web
+
+Windows: 
+  Copy the web directory to the Web server deploy directory.
+  C:\> set PHPCOVERAGE_HOME=\path\to\phpcoverage\src
+  # Instrument
+  C:\> php ${PHPCOVERAGE_HOME}\cli\instrument.php -b <ws-deploy-dir> <ws-deploy-dir>\web\*.php
+  # Execute
+  C:\> php codeCoverageMain.php PHPCOVERAGE_APPBASE_PATH=<ws-deploy-dir>\web
+
+
+The expected output should be something like this:
+
+[phpcoverage.inc.php] PHPCOVERAGE_HOME=/opt/cache/common/spikephpcoverage/src
+[phpcoverage.inc.php] PHPCOVERAGE_REPORT_DIR=
+[phpcoverage.inc.php] PHPCOVERAGE_APPBASE_PATH=/opt/oss/share/apache2/htdocs/web
+[CoverageRecorder::generateReport()] Writing report.
+[CoverageRecorder::generateReport()] [done]
+
+The expected code coverage reading is 100%.

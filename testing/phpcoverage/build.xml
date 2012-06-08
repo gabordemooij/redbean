@@ -1,0 +1,96 @@
+<project name="spikephpcoverage" default="nogoal" basedir=".">
+
+  <property environment="env"/>
+  <property name="install.root" value="${env.OSS_HOME}"/>
+  <property name="comp.displayname" value="Spike PHPCoverage"/>
+  <property name="comp.name" value="spikephpcoverage"/>
+  <property name="comp.version" value="0.00"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="phpcoverage.web.dir" 
+    value="${basedir}"/>
+
+  <target name="generate-docs" description="Generate the PHP API Docs.">
+    <delete dir="doc" failonerror="false"/>
+    <exec dir="${basedir}" executable="sudo" failonerror="true">
+      <arg line="${install.root}/bin/phpdoc --title &quot;${comp.displayname} ${comp.version} API Documentation&quot; --defaultpackagename &quot;SpikePHPCoverage&quot; --ignore sample.php -q -d src -t doc"/> 
+    </exec>
+    <exec dir="${basedir}" executable="sudo" failonerror="true">
+      <arg line="chown -R ${env.USER} doc"/>
+    </exec>
+  </target>
+
+  <target name="prepare-dist" depends="generate-docs"
+    description="Prepares the distribution directory">
+    <mkdir dir="${dist.dir}"/>
+    <delete dir="${comp.name}-${comp.version}" failonerror="false"/>
+    <mkdir dir="${comp.name}-${comp.version}"/>
+    <copy todir="${comp.name}-${comp.version}" failonerror="true">
+      <fileset dir="${basedir}">
+        <include name="**"/>
+        <exclude name="build.xml"/>
+        <exclude name="${comp.name}-*/**"/>
+        <exclude name="${dist.dir}/**"/>
+        <exclude name="BUILD"/>
+        <exclude name="copy.sh"/>
+      </fileset>
+      <fileset dir="${phpcoverage.web.dir}">
+        <include name="screenshots/**"/>
+      </fileset>
+    </copy>
+    <replace file="${comp.name}-${comp.version}/src/CoverageRecorder.php" token="%%version%%" 
+      value="${comp.version}"/>
+    <replace file="${comp.name}-${comp.version}/README" token="%%version%%" 
+      value="${comp.version}"/>
+    <replace file="${comp.name}-${comp.version}/RELEASE_NOTES" token="%%version%%" 
+      value="${comp.version}"/>
+    <replace file="${comp.name}-${comp.version}/CHANGES" token="%%version%%" 
+      value="${comp.version}"/>
+  </target>
+
+  <target name="tar-gz" depends="prepare-dist"
+    description="Create tar ball for distribution">
+    <tar destfile="${dist.dir}/${comp.name}-${comp.version}.tar.gz" 
+      basedir="${basedir}"
+      compression="gzip"
+      includes="${comp.name}-${comp.version}/**"
+      excludes="**/.*,${comp.name}-${comp.version}/${dist.dir}">
+    </tar> 
+  </target>
+
+  <target name="tar-bz2" depends="prepare-dist"
+    description="Create bz2 zipped tar ball for distribution.">
+    <tar destfile="${dist.dir}/${comp.name}-${comp.version}.tar.bz2" 
+      basedir="${basedir}"
+      compression="bzip2"
+      includes="${comp.name}-${comp.version}/**"
+      excludes="**/.*,${comp.name}-${comp.version}/${dist.dir}">
+    </tar> 
+  </target>
+
+  <target name="zip" depends="prepare-dist"
+    description="Create a zip file for distribution.">
+    <zip destfile="${dist.dir}/${comp.name}-${comp.version}.zip"
+      basedir="${basedir}"
+      includes="${comp.name}-${comp.version}/**"
+      excludes="**/.*,${comp.name}-${comp.version}/${dist.dir}">
+    </zip>
+  </target>
+
+  <target name="clean-dist" description="Clean the distribution files.">
+    <delete dir="${comp.name}-${comp.version}"/>
+    <delete dir="${dist.dir}"/>
+  </target>
+
+  <target name="distribute" depends="tar-gz, tar-bz2, zip"
+    description="Create a distribution">
+    <checksum todir="${dist.dir}" algorithm="md5"
+      forceoverwrite="true">
+      <fileset dir="${dist.dir}">
+        <include name="${comp.name}-${comp.version}.tar.gz"/>
+        <include name="${comp.name}-${comp.version}.tar.bz2"/>
+        <include name="${comp.name}-${comp.version}.zip"/>
+      </fileset>
+    </checksum>
+  </target>
+
+</project>

@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Code Coverage Report</title>
+    <link href="css/spikesource.css" rel="stylesheet" type="text/css"/>
+    <script  language="JavaScript" type="text/javascript" src="js/sort_spikesource.js"> </script> 
+    <script language="JavaScript" type="text/javascript">
+
+      var tableSorter = null;
+
+      function initSorting() {
+        if (document.getElementById("table2sort")) {
+          tableSorter = new TableSorter(document.getElementById("table2sort"));
+          // initialize table
+          tableSorter.initTable();
+          // collapse all
+          collapseAll();
+        }
+      }
+
+function sort(col, type) {
+  if (tableSorter != null) {
+    tableSorter.sort(col, type);
+  }
+}
+
+function toggleShowChildren(id) { tableSorter.togglechildren(id); }
+function collapseAll() { tableSorter.collapseAllChildren(); }
+function expandAll() { tableSorter.expandAllChildren(); }
+
+</script>
+  </head>
+  <body onload="initSorting(); sort(5, 'percentage'); sort(5,'percentage');">
+    <div id="pageBox" >
+      <table id="navBox" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style=""><img align="bottom" name="logo" src="images/spikesource/phpcoverage.gif" alt="home" border="0" height="82" width="800"/></td>
+        </td>
+      </tr>
+    </table>
+
+<br/><h1>Code Coverage Report</h1><br/><table border="0" cellpadding="0" cellspacing="0" id="contentBox" width="800"> <tr><td align="left" valign="top"><h1>Summary</h1><table class="spikeVerticalTable" cellpadding="4" cellspacing="0" width="800" style="margin-bottom:10px" border="0"><td width="380" class="spikeVerticalTableHead" style="font-size:14px">Overall Code Coverage&nbsp;</td><td class="spikeVerticalTableCell" style="font-size:14px" colspan="2"><strong>49.14%</td></tr><tr><td class="spikeVerticalTableHead">Total Covered Lines of Code&nbsp;</td><td width="30" class="spikeVerticalTableCell"><span class="emphasis">917</span></td><td class="spikeVerticalTableCell"><span class="note">(lines of code that were executed)</span></td></tr><tr><td class="spikeVerticalTableHead">Total Missed Lines of Code&nbsp;</td><td class="spikeVerticalTableCell"><span class="emphasis">949</span></td><td class="spikeVerticalTableCell"><span class="note">(lines of executable code that were not executed)</span></td></tr><tr><td class="spikeVerticalTableHead">Total Lines of Code&nbsp;</td><td class="spikeVerticalTableCell"><span class="emphasis">1866</span></td><td class="spikeVerticalTableCell"><span class="note">(lines of executable code)</span></td></tr><tr><td class="spikeVerticalTableHead" >Total Lines&nbsp;</td><td class="spikeVerticalTableCell"><span class="emphasis">8587</span></td><td class="spikeVerticalTableCell"><span class="note">(includes comments and whitespaces)</span></td></tr><tr><td class="spikeVerticalTableHeadLast" >Total Files&nbsp;</td><td class="spikeVerticalTableCellLast"><span class="emphasis">1</span></td><td class="spikeVerticalTableCellLast"><span class="note">(count of included source code files)</span></td></tr></table><h1>Details</h1> <table class="spikeDataTable" cellpadding="4" cellspacing="0" border="0" id="table2sort" width="800"><thead><tr><td class="spikeDataTableHeadLeft" id="sortCell0" rowspan="2" style="white-space:nowrap" width="52%"><a id="sortCellLink0" class="headerlink" href="javascript:sort(0)" title="Sort Ascending">File Name </a></td><td colspan="4" class="spikeDataTableHeadCenter">Lines</td><td class="spikeDataTableHeadCenterLast" id="sortCell5" rowspan="2"  width="16%" style="white-space:nowrap"><a id="sortCellLink5" class="headerlink" href="javascript:sort(5, 'percentage')" title="Sort Ascending">Code Coverage </a></td></tr><tr><td class="spikeDataTableSubHeadCenter" id="sortCell1" style="white-space:nowrap" width="8%"><a id="sortCellLink1" title="Sort Ascending" class="headerlink" href="javascript:sort(1, 'number')">Total </a></td><td class="spikeDataTableSubHeadCenter"  id="sortCell2" style="white-space:nowrap" width="9%"><a id="sortCellLink2" title="Sort Ascending" class="headerlink" href="javascript:sort(2, 'number')">Covered </a></td><td class="spikeDataTableSubHeadCenter" id="sortCell3" style="white-space:nowrap" width="8%"><a id="sortCellLink3" title="Sort Ascending" class="headerlink" href="javascript:sort(3, 'number')">Missed </a></td><td class="spikeDataTableSubHeadCenter" id="sortCell4" style="white-space:nowrap" width="10%"><a id="sortCellLink4" title="Sort Ascending" class="headerlink" href="javascript:sort(4, 'number')">Executable </a></td></tr></thead><tbody><tr><td class="spikeDataTableCellLeft"><a class="contentlink" href="home/stef/redbean/testing/cli/testcontainer/rb.php.html" title="/home/stef/redbean/testing/cli/testcontainer/rb.php">/home/stef/redbean/testing/cli/testcontainer/rb.php</a></td><td class="spikeDataTableCellCenter">8587</td><td class="spikeDataTableCellCenter">917</td><td class="spikeDataTableCellCenter">949</td><td class="spikeDataTableCellCenter">1866</td><td class="spikeDataTableCellCenter">49.14%</td></tr></tbody></table></td></tr><tr><td><p align="right" class="content">Report Generated On: Friday June 8, 2012 16:43:02<br/>Generated using Spike PHPCoverage 0.8.2</p></td></tr></table><div id="footerBox">
+  <table width="800" border="0" cellspacing="0" cellpadding="0" >
+    <tr>
+      <td class="copyright" ><a class="footerlink" href="http://www.spikesource.com/projects/phpcoverage/" >Spike PHPCoverage Home</a></td>
+      <td class="copyright" align="right">&copy; 2004<script language="JavaScript" type="text/javascript">
+          var d=new Date();
+          yr=d.getFullYear();
+          if (yr!=2004) {
+            document.write("-"+yr);
+          }
+      </script>, SpikeSource, Inc.</td>
+    </tr>
+  </table>
+  <a href="mailto:ip@spikesource.com"><img src="images/spacer.gif" width="1" height="1" border="0"  alt="spacer"/></a> </div>
+                                            </div>
+                                          </body>
+                                        </html>
+
