@@ -33,6 +33,7 @@ class RedBean_Setup {
 				  && strpos($dsn,'sqlite:')!==0
 				  && strpos($dsn,'pgsql:')!==0
 				  && strpos($dsn,'cubrid:')!==0
+                  && strpos($dsn,'oracle:')!==0
 		) {
 			trigger_error('Unsupported DSN');
 		}
@@ -71,21 +72,33 @@ class RedBean_Setup {
 			$dsn = $pdo->getDatabaseType() ;
 		}
 		else {
-			self::checkDSN($dsn);
-			$pdo = new RedBean_Driver_PDO($dsn,$username,$password);
+			self::checkDSN($dsn);			
 		}
-		$adapter = new RedBean_Adapter_DBAdapter($pdo);
+		
 		if (strpos($dsn,'pgsql')===0) {
+            $pdo = new RedBean_Driver_PDO($dsn,$username,$password);
+            $adapter = new RedBean_Adapter_DBAdapter($pdo);
 			$writer = new RedBean_QueryWriter_PostgreSQL($adapter);
 		}
 		else if (strpos($dsn,'sqlite')===0) {
+            $pdo = new RedBean_Driver_PDO($dsn,$username,$password);
+            $adapter = new RedBean_Adapter_DBAdapter($pdo);                        
 			$writer = new RedBean_QueryWriter_SQLiteT($adapter);
 		}
 		else if (strpos($dsn,'cubrid')===0) {
+            $pdo = new RedBean_Driver_PDO($dsn,$username,$password);
+            $adapter = new RedBean_Adapter_DBAdapter($pdo);                    
 			$writer = new RedBean_QueryWriter_CUBRID($adapter);
 		}
-		else {
+		else if (strpos($dsn,'mysql')===0) {
+            $pdo = new RedBean_Driver_PDO($dsn,$username,$password);
+            $adapter = new RedBean_Adapter_DBAdapter($pdo);                    
 			$writer = new RedBean_QueryWriter_MySQL($adapter);
+        }
+		else if (strpos($dsn,'oracle')===0) {
+            $oci = new RedBean_Driver_OCI($dsn,$username,$password);
+            $adapter = new RedBean_Adapter_DBAdapter($oci);                    
+			$writer = new RedBean_QueryWriter_OCI($adapter);
 		}
 		$redbean = new RedBean_OODB($writer);
 		if ($frozen) $redbean->freeze(true);

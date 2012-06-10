@@ -43,6 +43,7 @@ require($dir.'ILogger.php');
 require($dir.'Logger.php');
 require($dir.'Driver.php');
 require($dir.'Driver/PDO.php');
+require($dir.'Driver/OCI.php');
 
 //Load Infrastructure
 require($dir.'OODBBean.php');
@@ -60,10 +61,12 @@ require($dir.'QueryWriter/MySQL.php');
 require($dir.'QueryWriter/SQLiteT.php');
 require($dir.'QueryWriter/PostgreSQL.php');
 require($dir.'QueryWriter/CUBRID.php');
+require($dir.'QueryWriter/Oracle.php');
 
 //Load required Exceptions
 require($dir.'Exception.php');
 require($dir.'Exception/SQL.php');
+require($dir.'Exception/OCI.php');
 require($dir.'Exception/Security.php');
 
 //Load Core functionality

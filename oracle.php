@@ -401,14 +401,21 @@ $toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
 
 //regular table read/write
 $redbean->freeze( true );
-//$book = $redbean->dispense("book");
-//
-//$book->title = "Harry Potter";
-//$book->rating = 3;
-//$redbean->store( $book );
+$book = $redbean->dispense("book");
 
-$test = $redbean->load('book',1);
-var_dump($test);
+$book->title = "Harry Potter";
+$book->rating = 3;
+$redbean->store( $book );
+
+$book = $redbean->load('book',1);
+
+
+//$village = $redbean->dispense('village');
+//$building1 = $redbean->dispense('building');
+//$building2 = $redbean->dispense('building');
+//
+//$village->ownBuilding = array($building1,$building2); //replaces entire list
+//$redbean->store($village); 
 
 
 
