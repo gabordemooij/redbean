@@ -23,6 +23,7 @@ require_once('../RedUNIT/Blackhole.php');
 require_once('../RedUNIT/Mysql.php');
 require_once('../RedUNIT/Postgres.php');
 require_once('../RedUNIT/Sqlite.php');
+require_once('../RedUNIT/Oracle.php');
 
 
 //Configure the databases
@@ -31,6 +32,7 @@ R::addDatabase('mysql',$dsn,$ini['mysql']['user'],$ini['mysql']['pass'],false);
 $dsn="pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
 R::addDatabase('pgsql',$dsn,$ini['pgsql']['user'],$ini['pgsql']['pass'],false);
 R::addDatabase('sqlite','sqlite:'.$ini['sqlite']['file'],null,null,false);
+R::addDatabase('oracle','oracle:',$ini['oracle']['user'],$ini['oracle']['pass'],false);
 //$dsn="cubrid:host={$ini['CUBRID']['host']};port=33000;dbname={$ini['CUBRID']['schema']}";
 //R::addDatabase('CUBRID',$dsn,$ini['CUBRID']['user'],$ini['CUBRID']['pass'],false);
 //R::selectDatabase('CUBRID');
@@ -102,6 +104,7 @@ $allPacks = array(
 		'Mysql/Mix',
 		'Mysql/Foreignkeys',
 		'Mysql/Parambind',
+	    'Oracle/Base',
 		'Postgres/Setget',
 		'Postgres/Foreignkeys',
 		'Postgres/Parambind',
@@ -134,7 +137,7 @@ foreach($packList as $testPack) {
 	maintestpack(str_replace('_',' ',get_class($test)));
 	if ($drivers && is_array($drivers)) {
 		foreach($drivers as $driver) {
-			echo '('.$driver.'):';
+			echo PHP_EOL.'('.$driver.'):';
 			activate_driver($driver);
 			$currentDriver = $driver;
 			$test->prepare();

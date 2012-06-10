@@ -10,8 +10,12 @@
 <?php
     $PHPCOVERAGE_REPORT_DIR = false;
     $PHPCOVERAGE_HOME = false;
+	$PHPCOVERAGE_APPBASE_PATH = false;
+	
+	
     global $PHPCOVERAGE_REPORT_DIR;
     global $PHPCOVERAGE_HOME;
+	global $PHPCOVERAGE_APPBASE_PATH;
 
     $basedir = dirname(__FILE__);
     for($ii=1; $ii < $argc; $ii++) {

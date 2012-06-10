@@ -1040,7 +1040,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $array list of names of beans
 	 */
-	public function gatherLabels($beans) {
+	public static function gatherLabels($beans) {
 		$labels = array();
 		foreach($beans as $bean) $labels[] = $bean->name;
 		sort($labels);

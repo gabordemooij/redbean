@@ -95,6 +95,10 @@ require($dir.'SQLHelper.php');
 require($dir.'DependencyInjector.php');
 require($dir.'DuplicationManager.php');
 
+require($dir.'Plugin/BeanExport.php');
+require($dir.'Plugin/QueryLogger.php');
+require($dir.'Plugin/TimeLine.php');
+
 
 class R extends RedBean_Facade{}
 
