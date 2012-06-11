@@ -11,7 +11,10 @@ class RedUNIT_Oracle_Base extends RedUNIT_Oracle {
 		
 		R::nuke();
 		$village = R::dispense('village');
-		R::store($village);
+		$village->name = 'Lutry';
+		$id =R::store($village);
+		$village = R::load('village',$id);
+		asrt($village->name,'Lutry');
 		list($mill,$tavern) = R::dispense('building',2);
 		$village->ownBuilding = array($mill,$tavern); //replaces entire list
 		$id =R::store($village);    
@@ -31,7 +34,7 @@ class RedUNIT_Oracle_Base extends RedUNIT_Oracle {
 		$village =R::load('village',$id);
 		$army = $village->sharedArmy;
 		$myVillages = R::related($army,'village');
-		asrt(count($myVillages),2)
+		asrt(count($myVillages),2);
 		
 		
 		

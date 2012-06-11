@@ -69,7 +69,7 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		
 		asrt(count(R::find("book")),3);
 		asrt(count(R::findAll("book")),3);
-		asrt(count(R::findAll("book"," LIMIT 2")),2);
+		asrt(count(R::findAll("book"," LIMIT WHERE ROWNUM<=2")),2);
 		
 		
 		asrt(count(R::find("book"," id=id ")),3);
@@ -91,7 +91,7 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		asrt(count(R::related($book,"book")),0);
 		asrt(count(R::getAll("SELECT * FROM book ")),1);
 		asrt(count(R::getCol("SELECT title FROM book ")),1);
-		asrt((int)R::getCell("SELECT 123 "),123);
+		asrt((int)R::getCell("SELECT 123 FROM DUAL"),123);
 		
 		
 		$book = R::dispense("book");
@@ -128,6 +128,7 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		
 		testpack("Test R::convertToBeans");
 		$SQL = "SELECT '1' as id, a.name AS name, b.title AS title, '123' as rating FROM author AS a LEFT JOIN book as b ON b.id = ?  WHERE a.id = ? ";
+		$SQL = "SELECT '1' as id,  a.name AS name ,b.title AS title, '123' as rating FROM author a LEFT JOIN book b ON b.id = ? WHERE a.id = ?";
 		$rows = R::$adapter->get($SQL,array($id2,$aid));
 		$beans = R::convertToBeans("something",$rows);
 		$bean = reset($beans);
@@ -139,11 +140,12 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 	
 		testpack("Ext Assoc with facade and findRelated");
 		//R::setup("sqlite:/Users/prive/blaataap.db");
-		R::exec("DROP TABLE IF EXISTS performer");
-		R::exec("DROP TABLE IF EXISTS cd_track");
-		
-		R::exec("DROP TABLE IF EXISTS track");
-		R::exec("DROP TABLE IF EXISTS cd");
+		R::nuke();
+//		R::exec("DROP TABLE IF EXISTS performer");
+//		R::exec("DROP TABLE IF EXISTS cd_track");
+//		
+//		R::exec("DROP TABLE IF EXISTS track");
+//		R::exec("DROP TABLE IF EXISTS cd");
 		$cd = R::dispense("cd");
 		$cd->title = "Midnight Jazzfest";
 		R::store($cd);

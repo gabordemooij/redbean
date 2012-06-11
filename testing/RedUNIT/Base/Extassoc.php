@@ -28,11 +28,12 @@ class RedUNIT_Base_Extassoc extends RedUNIT_Base {
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
-		
-		$adapter->exec("DROP TABLE IF EXISTS ad_webpage ");
-		$adapter->exec("DROP TABLE IF EXISTS webpage ");
-		$adapter->exec("DROP TABLE IF EXISTS ad ");
-		$webpage = $redbean->dispense("webpage");
+//		
+//		$adapter->exec("DROP TABLE IF EXISTS ad_webpage ");
+//		$adapter->exec("DROP TABLE IF EXISTS webpage ");
+//		$adapter->exec("DROP TABLE IF EXISTS ad ");
+		R::nuke();
+		$webpage = $redbean->dispense("webpage");		
 		$webpage->title = "page with ads";
 		$ad = $redbean->dispense("ad");
 		$ad->title = "buy this!";

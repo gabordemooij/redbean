@@ -307,7 +307,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
 		//add the same
 		$book3->sharedTopic[] = $topic1;
-		$book3=R::load('book',R::store($book3));
+		$id=R::store($book3);
+		$book3=R::load('book',$id);
 		asrt(count($book3->sharedTopic),1);
 		asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")),1);
 		$book3->sharedTopic['differentkey'] = $topic1;

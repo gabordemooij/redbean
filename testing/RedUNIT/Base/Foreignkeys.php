@@ -28,7 +28,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base {
 		//Unit test for dependency
 		R::nuke();
 		$can = $this->createBeanInCan();
-		asrt(1, R::count('bean'));
+		asrt(R::count('bean'), 1);
 		R::trash($can);
 		asrt(1, R::count('bean')); //bean stays.
 		R::nuke();

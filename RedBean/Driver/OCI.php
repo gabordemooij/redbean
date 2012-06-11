@@ -51,6 +51,12 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 */
 	protected $isConnected = false;
 
+	const OCI_NO_SUCH_TABLE = '942';
+	const OCI_NO_SUCH_COLUMN= '904';
+	const OCI_INTEGRITY_CONSTRAINT_VIOLATION = '2292';
+	const OCI_UNIQUE_CONSTRAINT_VIOLATION = '1';
+	
+	
 	/**
 	 * Returns an instance of the PDO Driver.
 	 * @param $dsn
@@ -66,39 +72,24 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		return self::$instance;
 	}
 
-//    /**
-//     * Constructor.
-//     * @param $dsn
-//     * @param $user
-//     * @param $pass
-//     * @return unknown_type
-//     */
-//    public function __construct($db, $user, $pass) {
-//        echo "$user, $pass, $db";
-//        $conn = oci_connect($user, $pass); //todo add handling of $db
-//        $this->connection = $conn;
-//    }
 
 	/**
 	 * Constructor. You may either specify dsn, user and password or
-	 * just give an existing PDO connection.
+	 * just give an existing OCI connection.
 	 * Examples:
 	 *    $driver = new RedBean_Driver_PDO($dsn, $user, $password);
 	 *    $driver = new RedBean_Driver_PDO($existingConnection);
 	 *
-	 * @param string|PDO  $dsn	 database connection string
-	 * @param string      $user optional
-	 * @param string      $pass optional
+	 * @param string|resrouce  $dsn	 database connection string
+	 * @param string           $user optional
+	 * @param string           $pass optional
 	 *
 	 * @return void
 	 */
 	public function __construct($dsn, $user = null, $pass = null) {
-		if ($dsn instanceof PDO) {
-			$this->pdo = $dsn;
+		if ($dsn instanceof resource) {
+			$this->connection = $dsn;
 			$this->isConnected = true;
-			$this->pdo->setAttribute(1002, 'SET NAMES utf8');
-			$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 			// make sure that the dsn at least contains the type
 			$this->dsn = $this->getDatabaseType();
 		} else {
@@ -126,7 +117,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$user = $this->connectInfo['user'];
 		$pass = $this->connectInfo['pass'];
 
-		$this->connection = oci_connect($user, $pass); //todo add handling of $db
+		$this->connection = oci_connect($user, $pass); 
 		$this->isConnected = true;
 	}
 
@@ -292,8 +283,14 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$stid = oci_parse($this->connection, $sql);
 
 		foreach ($aValues as $key => $value) {
-			${'SLOT' . $key} = $value;
-			oci_bind_by_name($stid, ':SLOT' . $key, ${'SLOT' . $key});
+			if(!is_int($key)) {
+				$keyv = str_replace (':', '', $key);
+				${'SLOT' . $keyv} = $value;
+				oci_bind_by_name($stid, $key, ${'SLOT' . $keyv});
+			}else {
+				${'SLOT' . $key} = $value;
+				oci_bind_by_name($stid, ':SLOT' . $key, ${'SLOT' . $key});
+			}
 		}
 
 		if ($isInsert) {
@@ -307,12 +304,32 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			$result = @oci_execute($stid);
 
 		if (!$result) {
-			$error = oci_error($stid);
+			$error = oci_error($stid);	
 			$x = new RedBean_Exception_SQL( $error['message'] .':'.$error['sqltext'], 0);
-			$x->setSQLState( $error['code'] );
+			
+			$x->setSQLState( $this->mergeErrors($error['code']) );
 			throw $x;			
 		}
 		$this->statement = $stid;
+	}
+	
+	/**
+	 * Returns the underlying PHP OCI instance.
+	 *
+	 * @return OCI 
+	 */
+	public function getOCI() {
+		$this->connect();
+		return $this->connection;
+	}	
+	
+	// Function is used to be compatible wiht Redbean
+	private function mergeErrors($code)
+	{
+		if ($code == self::OCI_UNIQUE_CONSTRAINT_VIOLATION)
+			return self::OCI_INTEGRITY_CONSTRAINT_VIOLATION;
+	    else
+		    return $code;
 	}
 
 	/**
@@ -335,11 +352,14 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#Affected_Rows()
+	 * Returns the number of rows affected by the most recent query
+	 * if the currently selected PDO driver supports this feature.
+	 *
+	 * @return integer $numOfRows number of rows affected
 	 */
 	public function Affected_Rows() {
-		throw new Exception('TO BE IMPLEMENTED');
+		$this->connect();
+		return (int) $this->affected_rows;
 	}
 
 	/**
@@ -362,7 +382,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * Starts a transaction.
 	 */
 	public function StartTrans() {
-		
+		$this->autocommit = false;
 	}
 
 	/**
