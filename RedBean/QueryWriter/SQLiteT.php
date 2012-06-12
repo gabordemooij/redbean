@@ -283,6 +283,29 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
+	 * This method should add an index to a type and field with name
+	 * $name.
+	 * This methods accepts a type and infers the corresponding table name.
+	 *
+	 * @param  $type   type to add index to
+	 * @param  $name   name of the new index
+	 * @param  $column field to index
+	 *
+	 * @return void
+	 */
+	public function addIndex($type, $name, $column) {
+		$table = $type;
+		$table = $this->safeTable($table);
+		$name = preg_replace('/\W/','',$name);
+		$column = $this->safeColumn($column);
+		foreach( $this->adapter->get("PRAGMA INDEX_LIST($table) ") as $ind) {
+			if ($ind['name']===$name) return;
+		}
+		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
+	}
+	
+	
+	/**
 	 * Counts rows in a table.
 	 * Uses SQLite optimization for deleting all records (i.e. no WHERE)
 	 *
