@@ -493,6 +493,23 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		$this->properties[$property] = $value;
 		return $this;
 	}
+	
+	/**
+	 * Comfort method.
+	 * Unsets all properties in array.
+	 * 
+	 * @param array $properties properties you want to unset.
+	 * 
+	 * @return RedBean_OODBBean 
+	 */
+	public function unsetAll($properties) {
+		foreach($properties as $prop) {
+			if (isset($this->properties[$prop])) {
+				unset($this->properties[$prop]);
+			}
+		}
+		return $this;
+	}
 }
 
 
