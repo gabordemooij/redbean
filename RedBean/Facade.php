@@ -1095,7 +1095,67 @@ class RedBean_Facade {
 		if (!$time) $time = time();
 		return @date('Y-m-d H:i:s',$time);
 	}
+	
+	/**
+	 * Optional accessor for neat code.
+	 * Sets the database adapter you want to use.
+	 * 
+	 * @param RedBean_DatabaseAdapter $adapter 
+	 */
+	public static function setDatabaseAdapter(RedBean_DatabaseAdapter $adapter) {
+		self::$adapter = $adapter;
+	}
 
+	/**
+	 * Optional accessor for neat code.
+	 * Sets the database adapter you want to use.
+	 *
+	 * @param RedBean_QueryWriter $writer 
+	 */
+	public static function setWriter(RedBean_QueryWriter $writer) {
+		self::$writer = $writer;
+	}
+	
+	/**
+	 * Optional accessor for neat code.
+	 * Sets the database adapter you want to use.
+	 *
+	 * @param RedBean_OODB $redbean 
+	 */
+	public static function setRedBean(RedBean_OODB $redbean) {
+		self::$redbean = $redbean;
+	}
+	
+	/**
+	 * Optional accessor for neat code.
+	 * Sets the database adapter you want to use.
+	 *
+	 * @return RedBean_DatabaseAdapter $adapter
+	 */
+	public static function getDatabaseAdapter() {
+		return self::$adapter;
+	}
+
+	/**
+	 * Optional accessor for neat code.
+	 * Sets the database adapter you want to use.
+	 *
+	 * @return RedBean_QueryWriter $writer
+	 */
+	public static function getWriter() {
+		return self::$writer;
+	}
+	
+	/**
+	 * Optional accessor for neat code.
+	 * Sets the database adapter you want to use.
+	 *
+	 * @return RedBean_RedBean $redbean
+	 */
+	public static function getRedBean() {
+		return self::$redbean;
+	}
+	
 }
 
 //Compatibility with PHP 5.2 and earlier
