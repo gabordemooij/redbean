@@ -398,6 +398,27 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		return ($firstState && $secondState);
 	}
 
+	/**
+	 * This method should add an index to a type and field with name
+	 * $name.
+	 * This methods accepts a type and infers the corresponding table name.
+	 *
+	 * @param  $type   type to add index to
+	 * @param  $name   name of the new index
+	 * @param  $column field to index
+	 *
+	 * @return void
+	 */
+	public function addIndex($type, $name, $column) {
+		$table = $type;
+		$table = $this->safeTable($table);
+		$name = preg_replace('/\W/','',$name);
+		$column = $this->safeColumn($column);
+		foreach( $this->adapter->get("SHOW INDEX FROM $table ") as $ind) {
+			if ($ind['Key_name']===$name) return;
+		}
+		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
+	}
 	
 	/**
 	 * This method adds a foreign key from type and field to
