@@ -479,6 +479,20 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		}
 		return $empty;
 	}
+	
+	
+	/**
+	 * Chainable setter.
+	 * 
+	 * @param string $property the property of the bean
+	 * @param mixed  $value    the value you want to set 
+	 * 
+	 * @return RedBean_OODBBean the bean 
+	 */
+	public function setAttr($property,$value) {
+		$this->properties[$property] = $value;
+		return $this;
+	}
 }
 
 
