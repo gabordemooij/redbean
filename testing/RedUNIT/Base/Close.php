@@ -20,7 +20,9 @@ class RedUNIT_Base_Close extends RedUNIT_Base {
 	 * 
 	 * @return void
 	 */
+
 	public function run() {
+		$a=1;
 		asrt(R::$adapter->getDatabase()->isConnected(),true);
 		R::close();
 		asrt(R::$adapter->getDatabase()->isConnected(),false);

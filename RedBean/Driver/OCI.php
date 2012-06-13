@@ -118,6 +118,10 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$pass = $this->connectInfo['pass'];
 
 		$this->connection = oci_connect($user, $pass); 
+
+		$s = oci_parse($this->connection,"alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS'");
+		oci_execute($s);
+		
 		$this->isConnected = true;
 	}
 
@@ -378,6 +382,23 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		//return $this->rs;
 	}
 
+		/**
+	 * Returns TRUE if the current PDO instance is connected.
+	 * 
+	 * @return boolean $yesNO 
+	 */
+	public function isConnected() {
+		if (!$this->isConnected && !$this->connection) return false;
+		return true;
+	}
+	
+	/**
+	 * Closes database connection by destructing PDO.
+	 */
+	public function close() {
+		$this->connection = null;
+		$this->isConnected = false;
+	}	
 	/**
 	 * Starts a transaction.
 	 */

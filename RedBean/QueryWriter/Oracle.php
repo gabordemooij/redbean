@@ -288,7 +288,9 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return void
 	 */
     public function createTable($table) {
-  
+		if (strtolower($table) != $table ){
+			throw new Exception($table.' is not lowercase. With ORACLE you MUST only use lowercase table in PHP, sorry!');
+		}
         $table_with_quotes = strtoupper($this->safeTable($table));
 		$safe_table_without_quotes = strtoupper($this->safeTable($table,true));
         $sql = "CREATE TABLE $table_with_quotes(
@@ -331,7 +333,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		// 
 		$columnTested = preg_replace('/^((own)|(shared))./', '', $column);
 		if (strtolower($columnTested) != $columnTested ){
-			throw new Exception('With ORACLE you MUST only use lowercase properties in PHP, sorry!');
+			throw new Exception($column.' is not lowercase. With ORACLE you MUST only use lowercase properties in PHP, sorry!');
 		}
 		$table = $type;
 		$type = $field;
@@ -742,7 +744,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			if (preg_match('/^\d{4}\-\d\d-\d\d$/',$value)) {
 				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE;
 			}
-			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d$/',$value)) {
+			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d(:\d\d)?$/',$value)) {
 				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATETIME;
 			}
 		}
