@@ -51,16 +51,16 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	const OCI_UNIQUE_CONSTRAINT_VIOLATION = '1';
 
 	/**
-	 * Returns an instance of the PDO Driver.
+	 * Returns an instance of the OCI Driver.
 	 * @param $dsn
 	 * @param $user
 	 * @param $pass
 	 * @param $dbname
 	 * @return unknown_type
 	 */
-	public static function getInstance($dsn, $user, $pass, $dbname) {
+	public static function getInstance($dsn, $user, $pass) {
 		if (is_null(self::$instance)) {
-			self::$instance = new RedBean_Driver_OCI($dbname, $user, $pass);
+			self::$instance = new RedBean_Driver_OCI($dsn, $user, $pass);
 		}
 		return self::$instance;
 	}
@@ -69,8 +69,8 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * Constructor. You may either specify dsn, user and password or
 	 * just give an existing OCI connection.
 	 * Examples:
-	 *    $driver = new RedBean_Driver_PDO($dsn, $user, $password);
-	 *    $driver = new RedBean_Driver_PDO($existingConnection);
+	 *    $driver = new RedBean_Driver_OCI($dsn, $user, $password);
+	 *    $driver = new RedBean_Driver_OCI($existingConnection);
 	 *
 	 * @param string|resrouce  $dsn	 database connection string
 	 * @param string           $user optional
@@ -85,7 +85,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			// make sure that the dsn at least contains the type
 			$this->dsn = $this->getDatabaseType();
 		} else {
-			$this->dsn = substr($dsn, 7);
+			$this->dsn = substr($dsn, 7);  // remove 'oracle:'
 			$this->connectInfo = array('pass' => $pass, 'user' => $user);
 		}
 	}
@@ -135,8 +135,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @param array  $aValues the values that need to get bound to the query slots
 	 */
 	protected function runQuery($sql, $aValues) {
-
-
 		$this->connect();
 		if ($this->debug && $this->logger) {
 			$this->logger->log($sql, $aValues);
@@ -249,7 +247,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @see RedBean/RedBean_Driver#ErrorNo()
 	 */
 	public function ErrorNo() {
-		
+		throw new Exception('Not implemented');
 	}
 
 	/**
@@ -257,7 +255,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @see RedBean/RedBean_Driver#Errormsg()
 	 */
 	public function Errormsg() {
-		
+		throw new Exception ('Not implemented');
 	}
 
 	/**
@@ -276,7 +274,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		}
 
 		//if we insert we fetch the inserted id
-		$isInsert = preg_match('/^INSERT/', $sql);
+		$isInsert = preg_match('/^insert/i', $sql);
 		if ($isInsert) {
 			$sql .= ' RETURN ID INTO :ID';
 		}
@@ -296,12 +294,19 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		if ($isInsert) {
 			oci_bind_by_name($stid, ':ID', $this->lastInsertedId, 20, SQLT_INT);
 		}
+		
 
-
-		if (!$this->autocommit)
-			$result = @oci_execute($stid, OCI_NO_AUTO_COMMIT);  // data not committed
-		else
-			$result = @oci_execute($stid);
+		if ($this->debug){
+			if (!$this->autocommit)
+				$result = oci_execute($stid, OCI_NO_AUTO_COMMIT);  // data not committed
+			else
+				$result = oci_execute($stid);
+		}else {  // no supression of warning
+			if (!$this->autocommit)
+				$result = @oci_execute($stid, OCI_NO_AUTO_COMMIT);  // data not committed
+			else
+				$result = @oci_execute($stid);			
+		}
 
 		if (!$result) {
 			$error = oci_error($stid);
@@ -323,7 +328,8 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		return $this->connection;
 	}
 
-	// Function is used to be compatible wiht Redbean
+	// This function is used to be compatible with the Redbean actual behaviour. Oracle makes a difference between the 
+	// two errors belows, Redbean doesnt'
 	private function mergeErrors($code) {
 		if ($code == self::OCI_UNIQUE_CONSTRAINT_VIOLATION)
 			return self::OCI_INTEGRITY_CONSTRAINT_VIOLATION;
@@ -362,11 +368,25 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#setDebugMode()
+	 * Toggles debug mode. In debug mode the driver will print all
+	 * SQL to the screen together with some information about the
+	 * results. All SQL code that passes through the driver will be
+	 * passes on to the screen for inspection.
+	 * This method has no return value.
+	 *
+	 * Additionally you can inject RedBean_ILogger implementation
+	 * where you can define your own log() method
+	 *
+	 * @param boolean $trueFalse turn on/off
+	 * @param RedBean_ILogger $logger 
+	 *
+	 * @return void
 	 */
-	public function setDebugMode($tf) {
-		
+	public function setDebugMode( $tf, $logger = NULL ) {
+		$this->connect();
+		$this->debug = (bool)$tf;
+		if ($this->debug and !$logger) $logger = new RedBean_Logger();
+		$this->setLogger($logger);
 	}
 
 	/**
@@ -374,7 +394,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @see RedBean/RedBean_Driver#GetRaw()
 	 */
 	public function GetRaw() {
-		//return $this->rs;
+		throw new Exception('Not implemented');
 	}
 
 	/**
@@ -430,7 +450,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @return mixed $version 
 	 */
 	public function getDatabaseVersion() {
-		return "8";
+		throw new Exception('Not implemented');
 	}
 
 }
