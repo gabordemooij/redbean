@@ -10,7 +10,7 @@ require_once('RedBean/redbean.inc.php');
 //If you work on Mac OSX or Linux (or another UNIX like system)
 //You can simply use this line:
 
-R::setup('oracle:host=localhost:1521;dbname=hr','hr','hr'); 
+R::setup("oracle:(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = stef-PC)(PORT = 1521)))(CONNECT_DATA =(SID = ORCL)(SERVER = DEDICATED)))",'hr','hr'); 
 //R::setup();
 //R::setup('database.txt'); -- for other systems
 

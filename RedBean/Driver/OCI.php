@@ -93,7 +93,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			// make sure that the dsn at least contains the type
 			$this->dsn = $this->getDatabaseType();
 		} else {
-			$this->dsn = $dsn;
+			$this->dsn = substr($dsn,7);
 			$this->connectInfo = array('pass' => $pass, 'user' => $user);
 		}
 	}
@@ -117,8 +117,17 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$user = $this->connectInfo['user'];
 		$pass = $this->connectInfo['pass'];
 
-		$this->connection = oci_connect($user, $pass); 
+                 //$con = oci_connect($config->db->username , $config->db->password, $config->db->connection_string, $character_set);
+		echo $this->dsn.PHP_EOL;
+                $this->connection = oci_connect($user, $pass, $this->dsn, 'utf8'); 
+                if (!$this->connection )
+                {
+                    $e = oci_error();
+                    print_r($e);
+                    $this->isConnected = false;
+                }   else {
 		$this->isConnected = true;
+                }
 	}
 
 	/**

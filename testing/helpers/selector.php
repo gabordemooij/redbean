@@ -28,11 +28,12 @@ require_once('../RedUNIT/Oracle.php');
 
 //Configure the databases
 $dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";
-R::addDatabase('mysql',$dsn,$ini['mysql']['user'],$ini['mysql']['pass'],false);
+R::addDatabase('mysql',$dsn,$ini['mysql']['user'],$ini['mysql']['pass'],false);  
 $dsn="pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
 R::addDatabase('pgsql',$dsn,$ini['pgsql']['user'],$ini['pgsql']['pass'],false);
 R::addDatabase('sqlite','sqlite:'.$ini['sqlite']['file'],null,null,false);
-R::addDatabase('oracle','oracle:',$ini['oracle']['user'],$ini['oracle']['pass'],false);
+$dsn="oracle:(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = stef-PC)(PORT = 1521)))(CONNECT_DATA =(SID = ORCL)(SERVER = DEDICATED)))";
+R::addDatabase('oracle',$dsn,$ini['oracle']['user'],$ini['oracle']['pass'],false);
 //$dsn="cubrid:host={$ini['CUBRID']['host']};port=33000;dbname={$ini['CUBRID']['schema']}";
 //R::addDatabase('CUBRID',$dsn,$ini['CUBRID']['user'],$ini['CUBRID']['pass'],false);
 //R::selectDatabase('CUBRID');
