@@ -1,16 +1,16 @@
--- 2012-06-14 19:04 | Creating new table. 
+-- 2012-06-14 20:12 | Creating new table. 
 CREATE TABLE "BEAN"(
                 ID NUMBER(11) NOT NULL,  
                 CONSTRAINT BEAN_PK PRIMARY KEY (ID)
                 )
 
--- 2012-06-14 19:04 | Creating new table. 
+-- 2012-06-14 20:12 | Creating new table. 
 CREATE SEQUENCE BEAN_SEQ
             START WITH 1 
             INCREMENT BY 1
             NOCACHE
 
--- 2012-06-14 19:04 | Creating new table. 
+-- 2012-06-14 20:12 | Creating new table. 
 CREATE OR REPLACE TRIGGER BEAN_SEQ_TRI
             BEFORE INSERT ON "BEAN"
             FOR EACH ROW
@@ -20,15 +20,15 @@ CREATE OR REPLACE TRIGGER BEAN_SEQ_TRI
             FROM   DUAL;
             END BEAN_SEQ_TRI;
 
--- 2012-06-14 19:04 | Altering table. 
+-- 2012-06-14 20:12 | Altering table. 
 ALTER TABLE "BEAN" ADD "NAME" number(1,0) 
 
--- 2012-06-14 19:04 | Altering table. 
+-- 2012-06-14 20:12 | Altering table. 
 ALTER TABLE "BEAN" ADD (HOPEFULLYNOTEXIST nvarchar2(255))
 
--- 2012-06-14 19:04 | Altering table. 
+-- 2012-06-14 20:12 | Altering table. 
 ALTER TABLE "BEAN" DROP COLUMN "NAME"
 
--- 2012-06-14 19:04 | Altering table. 
+-- 2012-06-14 20:12 | Altering table. 
 ALTER TABLE "BEAN" RENAME COLUMN HOPEFULLYNOTEXIST TO "NAME"
 

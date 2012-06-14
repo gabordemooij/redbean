@@ -218,10 +218,8 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return integer $numRowsFound
 	 */
-	public function count($beanType) {
-		$table = strtoupper($this->safeTable($beanType));
-		$sql = "SELECT count(*) FROM $table";
-		return (int) $this->adapter->getCell($sql);
+	public function count($beanType) {	    
+		return parent::count(strtoupper($beanType));
 	}
 	
 
@@ -229,34 +227,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
             return $this->adapter->getCol( 'SELECT LOWER(table_name) FROM user_tables' );
     }
 
-	
-	/**
-	 * Do everything that needs to be done to format a table name.
-	 *
-	 * @param string $name of table
-	 *
-	 * @return string table name
-	 */
-	public function safeTable($name, $noQuotes = false) {
-		$name = $this->check($name);
-		if (!$noQuotes) $name = $this->noKW($name);
-		return $name;
-	}	
-	
-	
-	/**
-	 * Do everything that needs to be done to format a column name.
-	 *
-	 * @param string $name of column
-	 *
-	 * @return string $column name
-	 */
-	public function safeColumn($name, $noQuotes = false) {
-		$name = $this->check($name);
-		if (!$noQuotes) $name = $this->noKW($name);
-		return $name;
-	}	
-	
+		
 	
 	/**
 	 * This method should add an index to a type and field with name
@@ -349,27 +320,11 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return integer $insertid	  insert id from driver, new record id
 	 */
 	protected function insertRecord( $table, $insertcolumns, $insertvalues ) {
-
-		$suffix = $this->getInsertSuffix($table);
-		$table = strtoupper($this->safeTable($table));
-		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
-			foreach($insertcolumns as $k=>$v) {
-				$insertcolumns[$k] = strtoupper($this->safeColumn($v));
-			}
-			$insertSQL = "INSERT INTO $table (  ".implode(',',$insertcolumns)." ) VALUES 
-			(  ". implode(',',array_fill(0,count($insertcolumns),' ? '))." ) $suffix";
-
-			foreach($insertvalues as $i=>$insertvalue) {
-				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue, $i );
-			}
-			$result = count($ids)===1 ? array_pop($ids) : $ids;
+		foreach($insertcolumns as &$col){
+			$col = strtoupper($col);
 		}
-		else {
-			$result = $this->adapter->getCell( "INSERT INTO $table (ID) VALUES(NULL) $suffix");
-		}
-		if ($suffix) return $result;
-		$last_id = $this->adapter->getInsertID();
-		return $last_id;
+			
+		return parent::insertRecord(strtoupper($table), $insertcolumns, $insertvalues);
 	}
 	
 	/**
@@ -552,28 +507,10 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return integer $id the primary key ID value of the new record
 	 */
 	public function updateRecord( $type, $updatevalues, $id=null) {
-		$table = $type;
-		if (!$id) {
-			$insertcolumns =  $insertvalues = array();
-			foreach($updatevalues as $pair) {
-				$insertcolumns[] = $pair['property'];
-				$insertvalues[] = $pair['value'];
-			}
-			return $this->insertRecord($table,$insertcolumns,array($insertvalues));
+		foreach($updatevalues as &$updatevalue){
+			$updatevalue['property'] = strtoupper($updatevalue['property']);
 		}
-		if ($id && !count($updatevalues)) return $id;
-		
-		$table = strtoupper($this->safeTable($table));
-		$sql = "UPDATE $table SET ";
-		$p = $v = array();
-		foreach($updatevalues as $uv) {
-			$upperColumn = strtoupper($this->safeColumn($uv["property"]));
-			$p[] = " {$upperColumn} = ? ";
-			$v[]=$uv['value'];
-		}
-		$sql .= implode(',', $p ) .' WHERE ID = '.intval($id);
-		$this->adapter->exec( $sql, $v );
-		return $id;
+		return parent::updateRecord(strtoupper($type), $updatevalues, $id);
 	}	
 	/**
 	 * This method adds a foreign key from type and field to
@@ -654,52 +591,13 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return array $records selected records
 	 */
 	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false, $all=false ) { 
-		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
-		$table = strtoupper($this->safeTable($type));
-		$sqlConditions = array();
-		$bindings=array();
-		foreach($conditions as $column=>$values) {
-			if (!count($values)) continue;
-			$sql = strtoupper($this->safeColumn($column));
-			$sql .= ' '.($inverse ? ' NOT ':'').' IN ( ';
-			$sql .= implode(',',array_fill(0,count($values),'?')).') ';
-			$sqlConditions[] = $sql;
-			if (!is_array($values)) $values = array($values);
-			foreach($values as $k=>$v) {
-				$values[$k]=strval($v);
-			}
-			$bindings = array_merge($bindings,$values);
+		$upperCaseConditions = array();
+		foreach($conditions as $column=>$value){
+			$upperCaseConditions[strtoupper($column)]= $value;
 		}
-		//$addSql can be either just a string or array($sql, $bindings)
-		if (is_array($addSql)) {
-			if (count($addSql)>1) {
-				$bindings = array_merge($bindings,$addSql[1]);
-			}
-			else {
-				$bindings = array();
-			}
-			$addSql = $addSql[0];
 
-		}
-		$sql = '';
-		if (count($sqlConditions)>0) {
-			$sql = implode(' AND ',$sqlConditions);
-			$sql = " WHERE ( $sql ) ";
-			if ($addSql) $sql .= " AND $addSql ";
-		}
-		elseif ($addSql) {
-			if ($all) {
-				$sql = " $addSql ";
-			} 
-			else {
-				$sql = " WHERE $addSql ";
-			}
-		}
-		$sql = (($delete) ? 'DELETE FROM ' : 'SELECT * FROM ').$table.$sql;
-		$rows = $this->adapter->get($sql,$bindings);
-		return $rows;
-	}
-	
+		return parent::selectRecord(strtoupper($type),$upperCaseConditions, $addSql, $delete, $inverse, $all);
+	}	
     /**
      * Returns the Column Type Code (integer) that corresponds
      * to the given value type. This method is used to determine the minimum
