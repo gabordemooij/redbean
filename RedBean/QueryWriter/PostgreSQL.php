@@ -332,6 +332,27 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list);
 	}
 
+	
+	/**
+	 * This method should add an index to a type and field with name
+	 * $name.
+	 * This methods accepts a type and infers the corresponding table name.
+	 *
+	 * @param  $type   type to add index to
+	 * @param  $name   name of the new index
+	 * @param  $column field to index
+	 *
+	 * @return void
+	 */
+	public function addIndex($type, $name, $column) {
+		$table = $type;
+		$table = $this->safeTable($table);
+		$name = preg_replace('/\W/','',$name);
+		$column = $this->safeColumn($column);
+		if ($this->adapter->getCell("SELECT COUNT(*) FROM pg_class WHERE relname = '$name'")) return;
+		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
+	}
+	
 	/**
 	 * Adds a foreign key to a table. The foreign key will not have any action; you
 	 * may configure this afterwards.

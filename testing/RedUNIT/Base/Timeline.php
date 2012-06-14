@@ -22,14 +22,14 @@ class RedUNIT_Base_Timeline extends RedUNIT_Base {
 	 */
 	public function run() {
 		R::nuke();
-		file_put_contents('/tmp/test_log.txt','');
-		R::log('/tmp/test_log.txt');
+		file_put_contents('test_log.txt','');
+		R::log('test_log.txt');
 		$bean = R::dispense('bean');
 		$bean->name = true;
 		R::store($bean);
 		$bean->name = 'test';
 		R::store($bean);
-		$log = file_get_contents('/tmp/test_log.txt');
+		$log = file_get_contents('test_log.txt');
 		asrt(strlen($log)>0,true);
 		echo $log;
 	}

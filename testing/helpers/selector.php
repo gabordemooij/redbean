@@ -27,17 +27,27 @@ require_once('../RedUNIT/Oracle.php');
 
 
 //Configure the databases
-$dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";
-R::addDatabase('mysql',$dsn,$ini['mysql']['user'],$ini['mysql']['pass'],false);  
-$dsn="pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
-R::addDatabase('pgsql',$dsn,$ini['pgsql']['user'],$ini['pgsql']['pass'],false);
-R::addDatabase('sqlite','sqlite:'.$ini['sqlite']['file'],null,null,false);
-$dsn="oracle:(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = stef-PC)(PORT = 1521)))(CONNECT_DATA =(SID = ORCL)(SERVER = DEDICATED)))";
-R::addDatabase('oracle',$dsn,$ini['oracle']['user'],$ini['oracle']['pass'],false);
-//$dsn="cubrid:host={$ini['CUBRID']['host']};port=33000;dbname={$ini['CUBRID']['schema']}";
-//R::addDatabase('CUBRID',$dsn,$ini['CUBRID']['user'],$ini['CUBRID']['pass'],false);
-//R::selectDatabase('CUBRID');
-//R::exec('AUTOCOMMIT IS ON');
+if (isset($ini['mysql'])) {
+	$dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";
+	R::addDatabase('mysql',$dsn,$ini['mysql']['user'],$ini['mysql']['pass'],false);
+}
+if (isset($ini['pgsql'])) {
+	$dsn="pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
+	R::addDatabase('pgsql',$dsn,$ini['pgsql']['user'],$ini['pgsql']['pass'],false);
+}
+if (isset($ini['sqlite'])) {
+	R::addDatabase('sqlite','sqlite:'.$ini['sqlite']['file'],null,null,false);
+}
+if (isset($ini['CUBRID'])) {
+	$dsn="cubrid:host={$ini['CUBRID']['host']};port=33000;dbname={$ini['CUBRID']['schema']}";
+	R::addDatabase('CUBRID',$dsn,$ini['CUBRID']['user'],$ini['CUBRID']['pass'],false);
+	R::selectDatabase('CUBRID');
+	R::exec('AUTOCOMMIT IS ON');
+}
+if (isset($ini['oracle'])){
+    $dsn="oracle:(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = stef-PC)(PORT = 1521)))(CONNECT_DATA =(SID = ORCL)(SERVER = DEDICATED)))";
+    R::addDatabase('oracle',$dsn,$ini['oracle']['user'],$ini['oracle']['pass'],false);
+}
 R::selectDatabase('sqlite');
 
 //Function to activate a driver
@@ -138,7 +148,8 @@ foreach($packList as $testPack) {
 	maintestpack(str_replace('_',' ',get_class($test)));
 	if ($drivers && is_array($drivers)) {
 		foreach($drivers as $driver) {
-			echo PHP_EOL.'('.$driver.'):';
+			if (!isset($ini[$driver])) continue; 
+			echo '('.$driver.'):';
 			activate_driver($driver);
 			$currentDriver = $driver;
 			$test->prepare();

@@ -73,6 +73,11 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 		$rooms = R::getAssoc('SELECT '.R::$writer->safeColumn('number').', kind FROM rooms2 ORDER BY kind ASC');
 		asrt(count($rooms),0);
 		asrt(is_array($rooms),true);
-		
+		$date = R::dispense('mydate');
+		$date->date= '2012-12-12 20:50';
+		$date->time = '12:15';
+		$id =R::store($date);
+		$ok = R::load('mydate',1);
+			
 	}
 }
