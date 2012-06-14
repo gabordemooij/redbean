@@ -335,14 +335,8 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		if (strtolower($columnTested) != $columnTested ){
 			throw new Exception($column.' is not lowercase. With ORACLE you MUST only use lowercase properties in PHP, sorry!');
 		}
-		$table = $type;
-		$type = $field;
-		$table = strtoupper($this->safeTable($table));
-		$column = strtoupper($this->safeColumn($column));
-		$type = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
-		$sql = "ALTER TABLE $table ADD $column $type ";
-		$this->adapter->exec( $sql );
-	}	
+                parent::addColumn(strtoupper($type), strtoupper($column), $field);
+	}       
 
 	/**
 	 * Inserts a record into the database using a series of insert columns
