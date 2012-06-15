@@ -6,4 +6,4 @@ php:
 before_script:
   - cd testing/cli
    
-script: php testing/cli/start.sh
+script: ./start.sh
