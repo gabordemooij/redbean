@@ -8,7 +8,7 @@ require "../RedUNIT.php";
 require "../helpers/selector.php";	
 
 
-	
+exit(0);
 
 
 

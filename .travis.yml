@@ -10,6 +10,5 @@ before_script:
   - php replica.php
   - cp rb.php testing/cli/testcontainer/rb.php  
   - cd testing/cli
-  - php main_nocov.php 
  
-script: ./start.sh
+script: ./startnc.sh
