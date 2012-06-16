@@ -9,7 +9,12 @@
  */
  
 error_reporting(E_ALL);
-$ini = parse_ini_file("../config/test.ini", true);
+
+//Load configuration file
+if (file_exists('../config/test.ini')) $ini = parse_ini_file("../config/test.ini", true);
+elseif (file_exists('../config/test-travis.ini')) $ini = parse_ini_file("../config/test-travis.ini", true);
+else die('Cant find configuration file.');
+
 global $a;
 global $pdo;
 
