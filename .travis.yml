@@ -10,6 +10,8 @@ before_script:
   - /etc/profile.d/cubrid.sh
   - sudo apt-get install cubrid-demodb
   - sudo apt-get install php5-cubrid
+  - sudo su cubrid
+  - /etc/profile.d/cubrid.sh
   - cubrid service start
   - cubrid server start demodb  
   - touch /tmp/oodb.db
