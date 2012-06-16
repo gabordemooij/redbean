@@ -10,9 +10,7 @@ before_script:
   - /etc/profile.d/cubrid.sh
   - sudo apt-get install cubrid-demodb
   - sudo apt-get install php5-cubrid
-  - /etc/profile.d/cubrid.sh
-  - cubrid service start
-  - cubrid server start demodb  
+  - /etc/profile.d/cubrid.sh  
   - touch /tmp/oodb.db
   - mysql -e 'create database oodb;'
   - psql -c 'create database oodb;' -U postgres
