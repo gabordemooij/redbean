@@ -4,7 +4,6 @@ php:
   - 5.4
 
 before_script:
-  - rm /tmp/oodb.db
   - touch /tmp/oodb.db
   - mysql -e 'create database oodb;'
   - psql -c 'create database oodb;' -U postgres
