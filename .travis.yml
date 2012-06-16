@@ -4,7 +4,7 @@ php:
   - 5.4
 
 before_script:
-  - sudo yes | add-apt-repository ppa:cubrid/cubrid
+  - echo "yes" | add-apt-repository ppa:cubrid/cubrid
   - sudo apt-get update
   - sudo apt-get install cubrid
   - /etc/profile.d/cubrid.sh
