@@ -10,7 +10,7 @@ before_script:
   - /etc/profile.d/cubrid.sh
   - sudo apt-get install cubrid-demodb
   - sudo apt-get install php5-cubrid
-  - echo '/usr/share/CUBRID' | pecl install pdo_cubrid
+  - echo '/usr/share/CUBRID/' | pecl install pdo_cubrid
   - sudo echo "extension=pdo_cubrid.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
   - /etc/profile.d/cubrid.sh  
   - touch /tmp/oodb.db
