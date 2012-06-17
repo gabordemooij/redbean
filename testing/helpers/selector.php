@@ -45,8 +45,8 @@ if (isset($ini['CUBRID'])) {
 	R::exec('AUTOCOMMIT IS ON');
 }
 if (isset($ini['oracle'])){
-    $dsn="oracle:(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = stef-PC)(PORT = 1521)))(CONNECT_DATA =(SID = ORCL)(SERVER = DEDICATED)))";
-    R::addDatabase('oracle',$dsn,$ini['oracle']['user'],$ini['oracle']['pass'],false);
+
+    R::addDatabase('oracle',$ini['oracle']['dsn'],$ini['oracle']['user'],$ini['oracle']['pass'],false);
 }
 R::selectDatabase('sqlite');
 

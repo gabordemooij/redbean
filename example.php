@@ -26,7 +26,7 @@ $leaflet = R::load('leaflet1',$id);
 
 //Display the title
 echo $leaflet->title;
-
+echo R::$adapter->getDatabase()->getDatabaseVersion();
 echo PHP_EOL;
 
 

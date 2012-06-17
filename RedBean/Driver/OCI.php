@@ -450,7 +450,12 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @return mixed $version 
 	 */
 	public function getDatabaseVersion() {
-		throw new Exception('Not implemented');
+		$this->connect();
+		$output = array();
+		$s = oci_parse($this->connection, 'select * from v$version where banner like '."'Oracle%'");
+		oci_execute($s);
+		$e = oci_fetch_all($s, $output);
+		return $output['BANNER'][0];
 	}
 
 }
