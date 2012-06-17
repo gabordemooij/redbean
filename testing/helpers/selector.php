@@ -45,7 +45,6 @@ if (isset($ini['CUBRID'])) {
 	R::exec('AUTOCOMMIT IS ON');
 }
 if (isset($ini['oracle'])){
-
     R::addDatabase('oracle',$ini['oracle']['dsn'],$ini['oracle']['user'],$ini['oracle']['pass'],false);
 }
 R::selectDatabase('sqlite');
