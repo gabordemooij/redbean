@@ -276,8 +276,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 *
 	 * @return void
 	 */
-	private function doBinding($sql, $aValues = array()) {
-		//echo $sql . PHP_EOL;
+	private function doBinding($sql, $aValues = array()) {		
 		foreach ($aValues as $key => $value) {
 			$sql = preg_replace('/\?/', ' :SLOT' . $key . ' ', $sql, 1);
 		}
