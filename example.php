@@ -27,6 +27,13 @@ $leaflet = R::load('leaflet1',$id);
 //Display the title
 echo $leaflet->title;
 echo R::$adapter->getDatabase()->getDatabaseVersion();
+$oci = R::$adapter->getDatabase();
+try {
+	$oci->GetCell("SELECT aname FROM page WHERE ROWNUM<=1");
+}catch (Exception $e){};
+$e = oci_execute($s);
+echo R::$adapter->getDatabase()->Errormsg();
+echo R::$adapter->getDatabase()->ErrorNo();
 echo PHP_EOL;
 
 
