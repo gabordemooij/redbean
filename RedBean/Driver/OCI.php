@@ -247,7 +247,11 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @see RedBean/RedBean_Driver#ErrorNo()
 	 */
 	public function ErrorNo() {
-		throw new Exception('Not implemented');
+		$error = oci_error($this->statement);
+		if (is_array($error)) 
+			return $error['code'];
+	    else 
+			return null;		
 	}
 
 	/**
@@ -255,7 +259,12 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @see RedBean/RedBean_Driver#Errormsg()
 	 */
 	public function Errormsg() {
-		throw new Exception ('Not implemented');
+		$error = oci_error($this->statement);
+		if (is_array($error)) 
+			return $error['message'];
+	    else 
+			return null;
+		
 	}
 
 	/**
@@ -278,44 +287,43 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		if ($isInsert) {
 			$sql .= ' RETURN ID INTO :ID';
 		}
-		$stid = oci_parse($this->connection, $sql);
+		$this->statement  = oci_parse($this->connection, $sql);
 
 		foreach ($aValues as $key => $value) {
 			if (!is_int($key)) {
 				$keyv = str_replace(':', '', $key);
 				${'SLOT' . $keyv} = $value;
-				oci_bind_by_name($stid, $key, ${'SLOT' . $keyv});
+				oci_bind_by_name($this->statement, $key, ${'SLOT' . $keyv});
 			} else {
 				${'SLOT' . $key} = $value;
-				oci_bind_by_name($stid, ':SLOT' . $key, ${'SLOT' . $key});
+				oci_bind_by_name($this->statement, ':SLOT' . $key, ${'SLOT' . $key});
 			}
 		}
 
 		if ($isInsert) {
-			oci_bind_by_name($stid, ':ID', $this->lastInsertedId, 20, SQLT_INT);
+			oci_bind_by_name($this->statement, ':ID', $this->lastInsertedId, 20, SQLT_INT);
 		}
 		
 
 		if ($this->debug){
 			if (!$this->autocommit)
-				$result = oci_execute($stid, OCI_NO_AUTO_COMMIT);  // data not committed
+				$result = oci_execute($this->statement, OCI_NO_AUTO_COMMIT);  // data not committed
 			else
-				$result = oci_execute($stid);
+				$result = oci_execute($this->statement);
 		}else {  // no supression of warning
 			if (!$this->autocommit)
-				$result = @oci_execute($stid, OCI_NO_AUTO_COMMIT);  // data not committed
+				$result = @oci_execute($this->statement, OCI_NO_AUTO_COMMIT);  // data not committed
 			else
-				$result = @oci_execute($stid);			
+				$result = @oci_execute($this->statement);			
 		}
 
 		if (!$result) {
-			$error = oci_error($stid);
+			$error = oci_error($this->statement);
 			$x = new RedBean_Exception_SQL($error['message'] . ':' . $error['sqltext'], 0);
 
 			$x->setSQLState($this->mergeErrors($error['code']));
 			throw $x;
 		}
-		$this->statement = $stid;
 	}
 
 	/**
@@ -394,7 +402,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @see RedBean/RedBean_Driver#GetRaw()
 	 */
 	public function GetRaw() {
-		throw new Exception('Not implemented');
+		return null;
 	}
 
 	/**
