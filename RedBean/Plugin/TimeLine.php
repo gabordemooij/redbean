@@ -28,7 +28,7 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger {
 	 * @param string $outputPath path to file to write schema changes to. 
 	 */
 	public function __construct($outputPath) {
-		if (!file_exists($outputPath) || !is_writable($outputPath)) 
+		if (!is_writable(dirname($outputPath))) 
 			throw new RedBean_Exception_Security('Cannot write to file: '.$outputPath);
 		$this->file = $outputPath;
 	}
@@ -52,14 +52,17 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger {
 				$write .= $sql;
 				$write .= "\n\n";
 			}
-			if (strpos($sql,'CREATE')===0) {
+			elseif (strpos($sql,'CREATE')===0) {
 				$write = "-- ".date('Y-m-d H:i')." | Creating new table. \n";
 				$write .= $sql;
 				$write .= "\n\n";
 			}
-			if (isset($write)) {
-				file_put_contents($this->file,$write,FILE_APPEND);
+			else {
+				$write = "-- ".date('Y-m-d H:i')." | Executing SQL. \n";
+				$write .= $sql;
+				$write .= "\n\n";				
 			}
+			file_put_contents($this->file,$write,FILE_APPEND);
 		}
 	}
 	
