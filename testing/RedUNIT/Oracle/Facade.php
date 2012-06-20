@@ -140,12 +140,7 @@ class RedUNIT_Oracle_Facade extends RedUNIT_Oracle {
 
 	
 		testpack("Ext Assoc with facade and findRelated");
-		//R::setup("sqlite:/Users/prive/blaataap.db");
-		R::exec("DROP TABLE IF EXISTS performer");
-		R::exec("DROP TABLE IF EXISTS cd_track");
-		
-		R::exec("DROP TABLE IF EXISTS track");
-		R::exec("DROP TABLE IF EXISTS cd");
+		R::nuke();
 		$cd = R::dispense("cd");
 		$cd->title = "Midnight Jazzfest";
 		R::store($cd);
