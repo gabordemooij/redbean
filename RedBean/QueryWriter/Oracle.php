@@ -107,6 +107,16 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	const C_DATATYPE_SPECIAL_MULTIPOLYGON = 105;
 	const C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION = 106;
 
+	
+	public function safeColumn($c,$q=false) {
+			return parent::safeColumn((!$q) ? strtoupper($c):$c,$q);
+	}
+
+	public function safeTable($type,$q=false) {
+			return parent::safeTable((!$q) ? strtoupper($type) : $type,$q);
+	}
+
+	
 	public function __construct(RedBean_Adapter $a) {
 
 		$this->adapter = $a;

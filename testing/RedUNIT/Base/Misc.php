@@ -102,9 +102,9 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$track = R::dispense('track');
 		$album = R::dispense('cd');
 		$track->name = 'a';
-		$track->orderNum = 1;
+		$track->ordernum = 1;
 		$track2 = R::dispense('track');
-		$track2->orderNum = 2;
+		$track2->ordernum = 2;
 		$track2->name = 'b';
 		R::associate( $album, $track );
 		R::associate( $album, $track2 );
@@ -180,7 +180,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$test->sharedSpoon[] = $spoon;
 		
 		
-		$test->isNowTainted = true;
+		$test->isnowtainted = true;
 		$id=R::store($test); 
 		$test = R::load('test',$id);
 		asrt($test->item->val,'Test2');
@@ -222,13 +222,15 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$cocoa->name = 'Koko';
 		R::store($cocoa);
 		
-		$pdo = R::$adapter->getDatabase()->getPDO();
-		$driver = new RedBean_Driver_PDO($pdo);
-		pass();
-		asrt($pdo->getAttribute(PDO::ATTR_ERRMODE), PDO::ERRMODE_EXCEPTION);
-		asrt($pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE), PDO::FETCH_ASSOC);
-		asrt(strval($driver->GetCell('select 123')),'123');
-	
+		if (method_exists(R::$adapter->getDatabase(),'getPDO')) {
+			$pdo = R::$adapter->getDatabase()->getPDO();
+			$driver = new RedBean_Driver_PDO($pdo);
+			pass();
+			asrt($pdo->getAttribute(PDO::ATTR_ERRMODE), PDO::ERRMODE_EXCEPTION);
+			asrt($pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE), PDO::FETCH_ASSOC);
+			asrt(strval($driver->GetCell('select 123')),'123');
+		}
+		
 		$a = new RedBean_Exception_SQL;
 		$a->setSqlState('test');
 		$b = strval($a);
