@@ -92,6 +92,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$redbean->store($bean);
 		$adapter->exec('UPDATE bean SET prop = 2');
 		asrt($adapter->getAffectedRows(),1);
+		
+		if (method_exists(R::$adapter->getDatabase(),'getPDO')) 
 		asrt($adapter->getDatabase()->getPDO() instanceof PDO, true);
 		
 		asrt(strlen($adapter->getDatabase()->getDatabaseVersion())>0,true);
