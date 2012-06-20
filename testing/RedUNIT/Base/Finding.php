@@ -70,7 +70,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		asrt(count($pages),2);
 		$p = R::findLast('page');
 		pass();
-		$row = R::getRow('select * from page limit 1');
+		$row = R::getRow('select * from page ');
 		asrt(is_array($row),true);
 		asrt(isset($row['name']),true);
 		//test findAll -- should not throw an exception

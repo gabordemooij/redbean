@@ -28,6 +28,9 @@ require_once('../RedUNIT/Blackhole.php');
 require_once('../RedUNIT/Mysql.php');
 require_once('../RedUNIT/Postgres.php');
 require_once('../RedUNIT/Sqlite.php');
+require_once('../RedUNIT/Oracle.php');
+
+
 
 
 //Configure the databases
@@ -47,6 +50,9 @@ if (isset($ini['CUBRID'])) {
 	R::addDatabase('CUBRID',$dsn,$ini['CUBRID']['user'],$ini['CUBRID']['pass'],false);
 	R::selectDatabase('CUBRID');
 	R::exec('AUTOCOMMIT IS ON');
+}
+if (isset($ini['oracle'])){
+    R::addDatabase('oracle',$ini['oracle']['dsn'],$ini['oracle']['user'],$ini['oracle']['pass'],false);
 }
 R::selectDatabase('sqlite');
 
@@ -107,6 +113,8 @@ $allPacks = array(
 		'Base/Count',
 		'Base/Chill',
 		'Base/Misc',
+		'Oracle/Base',
+		'Oracle/Database',
 		'Mysql/Preexist',
 		'Mysql/Double',
 		'Mysql/Writer',
@@ -162,4 +170,3 @@ foreach($packList as $testPack) {
 		$test->cleanUp();
 	}
 }
-

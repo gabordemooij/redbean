@@ -29,10 +29,11 @@ class RedBean_Setup {
 		$dsn = trim($dsn);
 		$dsn = strtolower($dsn);
 		if (
-		strpos($dsn, 'mysql:')!==0
+					 strpos($dsn, 'mysql:')!==0
 				  && strpos($dsn,'sqlite:')!==0
 				  && strpos($dsn,'pgsql:')!==0
 				  && strpos($dsn,'cubrid:')!==0
+				  && strpos($dsn,'oracle:')!==0
 		) {
 			trigger_error('Unsupported DSN');
 		}
@@ -67,14 +68,18 @@ class RedBean_Setup {
 	 */
 	public static function kickstart($dsn,$username=NULL,$password=NULL,$frozen=false ) {
 		if ($dsn instanceof PDO) {
-			$pdo = new RedBean_Driver_PDO($dsn);
-			$dsn = $pdo->getDatabaseType() ;
+			$db = new RedBean_Driver_PDO($dsn);
+			$dsn = $db->getDatabaseType();
 		}
 		else {
 			self::checkDSN($dsn);
-			$pdo = new RedBean_Driver_PDO($dsn,$username,$password);
+			if (strpos($dsn, 'oracle') === 0) 
+				$db = new RedBean_Driver_OCI($dsn,$username,$password);	
+			else
+				$db = new RedBean_Driver_PDO($dsn,$username,$password);
+						
 		}
-		$adapter = new RedBean_Adapter_DBAdapter($pdo);
+		$adapter = new RedBean_Adapter_DBAdapter($db);
 		if (strpos($dsn,'pgsql')===0) {
 			$writer = new RedBean_QueryWriter_PostgreSQL($adapter);
 		}
@@ -84,6 +89,9 @@ class RedBean_Setup {
 		else if (strpos($dsn,'cubrid')===0) {
 			$writer = new RedBean_QueryWriter_CUBRID($adapter);
 		}
+		else if (strpos($dsn,'oracle')===0) {
+			$writer = new RedBean_QueryWriter_Oracle($adapter);
+		}		
 		else {
 			$writer = new RedBean_QueryWriter_MySQL($adapter);
 		}

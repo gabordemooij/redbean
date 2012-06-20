@@ -1,0 +1,25 @@
+language: php
+php:
+  - 5.3
+  - 5.4
+
+before_script:
+  - echo 'yes' | sudo add-apt-repository ppa:cubrid/cubrid
+  - sudo apt-get update
+  - sudo apt-get install cubrid
+  - /etc/profile.d/cubrid.sh
+  - sudo apt-get install cubrid-demodb
+  - sudo apt-get install php5-cubrid
+  - cat /etc/profile.d/cubrid.sh
+  - echo '/opt/cubrid/' | pecl install pdo_cubrid
+  - sudo echo "extension=pdo_cubrid.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+  - /etc/profile.d/cubrid.sh  
+  - touch /tmp/oodb.db
+  - mysql -e 'create database oodb;'
+  - psql -c 'create database oodb;' -U postgres
+  - php replica.php
+  - cp rb.php testing/cli/testcontainer/rb.php  
+  - cd testing/cli
+    
+ 
+script: ./startnc.sh

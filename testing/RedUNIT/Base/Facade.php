@@ -15,6 +15,15 @@
  */
 class RedUNIT_Base_Facade extends RedUNIT_Base {
 
+	
+	/**
+	 * What drivers should be loaded for this test pack? 
+	 * This pack contains some SQL incomp. with OCI
+	 */
+	public function getTargetDrivers() {
+		return array('mysql','pgsql','sqlite','CUBRID');
+	}
+	
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
