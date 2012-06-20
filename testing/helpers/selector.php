@@ -115,6 +115,8 @@ $allPacks = array(
 		'Base/Misc',
 		'Oracle/Base',
 		'Oracle/Database',
+		'Oracle/Facade',
+		'Oracle/Writer',
 		'Mysql/Preexist',
 		'Mysql/Double',
 		'Mysql/Writer',
