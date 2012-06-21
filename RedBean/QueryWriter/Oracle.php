@@ -107,31 +107,41 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	const C_DATATYPE_SPECIAL_MULTIPOLYGON = 105;
 	const C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION = 106;
 
+	
+	public function safeColumn($c,$q=false) {
+			return parent::safeColumn((!$q) ? strtoupper($c):$c,$q);
+	}
+
+	public function safeTable($type,$q=false) {
+			return parent::safeTable((!$q) ? strtoupper($type) : $type,$q);
+	}
+
+	
 	public function __construct(RedBean_Adapter $a) {
 
 		$this->adapter = $a;
 		$this->typeno_sqltype = array(
-			RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL => 'number(1,0)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_UINT8 => 'number(3,0)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 => 'number(11,0)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_DOUBLE => 'float',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT8 => 'nvarchar2(255)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT16 => 'nvarchar2(2000)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT32 => 'clob',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE => 'date',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATETIME => 'date',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_POINT => 'point',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_LINESTRING => 'linestring',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_GEOMETRY => 'geometry',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_POLYGON => 'polygon',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_MULTIPOINT => 'multipoint',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_MULTIPOLYGON => 'multipolygon',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION => 'geometrycollection',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL => 'NUMBER(1,0)',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_UINT8 => 'NUMBER(3,0)',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 => 'NUMBER(11,0)',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_DOUBLE => 'FLOAT',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT8 => 'NVARCHAR2(255)',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT16 => 'NVARCHAR2(2000)',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT32 => 'CLOB',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE => 'DATE',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATETIME => 'DATE',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_POINT => 'POINT',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_LINESTRING => 'LINESTRING',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_GEOMETRY => 'GEOMETRY',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_POLYGON => 'POLYGON',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_MULTIPOINT => 'MULTIPOINT',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_MULTIPOLYGON => 'MULTIPOLYGON',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION => 'GEOMETRYCOLLECTION',
 		);
 
 		$this->sqltype_typeno = array();
 		foreach ($this->typeno_sqltype as $k => $v)
-			$this->sqltype_typeno[trim(strtolower($v))] = $k;
+			$this->sqltype_typeno[$v] = $k;
 	}
 
 	/**
@@ -377,7 +387,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return integer $typecode code
 	 */
 	public function code($typedescription, $includeSpecials = false) {
-		$r = ((isset($this->sqltype_typeno[strtolower($typedescription)])) ? $this->sqltype_typeno[strtolower($typedescription)] : self::C_DATATYPE_SPECIFIED);
+		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
 		if ($includeSpecials)
 			return $r;
 		if ($r > self::C_DATATYPE_SPECIFIED)
@@ -636,7 +646,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function wipe($type) {
 		$table = $type;
-		$table = strtoupper($this->safeTable($table));
+		$table = $this->safeTable($table);
 		$sql = "TRUNCATE TABLE $table ";
 		$this->adapter->exec($sql);
 	}

@@ -1,8 +1,8 @@
 <?php
 /**
- * RedUNIT_Base_Facade
+ * RedUNIT_Oracle_Facade
  * 
- * @file 			RedUNIT/Base/Facade.php
+ * @file 			RedUNIT/Oracle/Facade.php
  * @description		Tests basic functions through facade.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
@@ -13,16 +13,9 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Facade extends RedUNIT_Base {
+class RedUNIT_Oracle_Facade extends RedUNIT_Oracle {
 
 	
-	/**
-	 * What drivers should be loaded for this test pack? 
-	 * This pack contains some SQL incomp. with OCI
-	 */
-	public function getTargetDrivers() {
-		return array('mysql','pgsql','sqlite','CUBRID');
-	}
 	
 	/**
 	 * Begin testing.
@@ -78,7 +71,7 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		
 		asrt(count(R::find("book")),3);
 		asrt(count(R::findAll("book")),3);
-		asrt(count(R::findAll("book"," LIMIT WHERE ROWNUM<=2")),2);
+		asrt(count(R::findAll("book"," WHERE ROWNUM <= 2")),2);
 		
 		
 		asrt(count(R::find("book"," id=id ")),3);
@@ -100,7 +93,7 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		asrt(count(R::related($book,"book")),0);
 		asrt(count(R::getAll("SELECT * FROM book ")),1);
 		asrt(count(R::getCol("SELECT title FROM book ")),1);
-		asrt((int)R::getCell("SELECT 123 FROM DUAL"),123);
+		asrt((int)R::getCell("SELECT 123 FROM DUAL "),123);
 		
 		
 		$book = R::dispense("book");
@@ -136,8 +129,7 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		asrt($book2->rating,'2');
 		
 		testpack("Test R::convertToBeans");
-		$SQL = "SELECT '1' as id, a.name AS name, b.title AS title, '123' as rating FROM author AS a LEFT JOIN book as b ON b.id = ?  WHERE a.id = ? ";
-		$SQL = "SELECT '1' as id,  a.name AS name ,b.title AS title, '123' as rating FROM author a LEFT JOIN book b ON b.id = ? WHERE a.id = ?";
+		$SQL = "SELECT '1' as id, a.name AS name, b.title AS title, '123' as rating FROM author a LEFT JOIN book b ON b.id = ?  WHERE a.id = ? ";
 		$rows = R::$adapter->get($SQL,array($id2,$aid));
 		$beans = R::convertToBeans("something",$rows);
 		$bean = reset($beans);
@@ -148,13 +140,7 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 
 	
 		testpack("Ext Assoc with facade and findRelated");
-		//R::setup("sqlite:/Users/prive/blaataap.db");
 		R::nuke();
-//		R::exec("DROP TABLE IF EXISTS performer");
-//		R::exec("DROP TABLE IF EXISTS cd_track");
-//		
-//		R::exec("DROP TABLE IF EXISTS track");
-//		R::exec("DROP TABLE IF EXISTS cd");
 		$cd = R::dispense("cd");
 		$cd->title = "Midnight Jazzfest";
 		R::store($cd);

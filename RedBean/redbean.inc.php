@@ -66,7 +66,6 @@ require($dir.'QueryWriter/Oracle.php');
 //Load required Exceptions
 require($dir.'Exception.php');
 require($dir.'Exception/SQL.php');
-require($dir.'Exception/OCI.php');
 require($dir.'Exception/Security.php');
 
 //Load Core functionality

@@ -414,9 +414,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$table = $this->safeTable($table);
 		$name = preg_replace('/\W/','',$name);
 		$column = $this->safeColumn($column);
-		foreach( $this->adapter->get("SHOW INDEX FROM $table ") as $ind) {
-			if ($ind['Key_name']===$name) return;
-		}
+		$index = $this->adapter->get("SELECT 1 as `exists` FROM db_index WHERE index_name = ? ",array($name));
+		if ($index && $index['exists']) return;   // positive number will return, 0 will continue.
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
 	}
 	

@@ -92,7 +92,9 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$redbean->store($bean);
 		$adapter->exec('UPDATE bean SET prop = 2');
 		asrt($adapter->getAffectedRows(),1);
-		//asrt($adapter->getDatabase()->getPDO() instanceof PDO, true);
+		
+		if (method_exists(R::$adapter->getDatabase(),'getPDO')) 
+		asrt($adapter->getDatabase()->getPDO() instanceof PDO, true);
 		
 		asrt(strlen($adapter->getDatabase()->getDatabaseVersion())>0,true);
 		asrt(strlen($adapter->getDatabase()->getDatabaseType())>0,true);
@@ -222,17 +224,19 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$cocoa->name = 'Koko';
 		R::store($cocoa);
 		
-//		$pdo = R::$adapter->getDatabase()->getPDO();
-//		$driver = new RedBean_Driver_PDO($pdo);
-//		pass();
-//		asrt($pdo->getAttribute(PDO::ATTR_ERRMODE), PDO::ERRMODE_EXCEPTION);
-//		asrt($pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE), PDO::FETCH_ASSOC);
-//		asrt(strval($driver->GetCell('select 123')),'123');
-//	
-//		$a = new RedBean_Exception_SQL;
-//		$a->setSqlState('test');
-//		$b = strval($a);
-//		asrt($b,'[test] - ');
+		if (method_exists(R::$adapter->getDatabase(),'getPDO')) {
+			$pdo = R::$adapter->getDatabase()->getPDO();
+			$driver = new RedBean_Driver_PDO($pdo);
+			pass();
+			asrt($pdo->getAttribute(PDO::ATTR_ERRMODE), PDO::ERRMODE_EXCEPTION);
+			asrt($pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE), PDO::FETCH_ASSOC);
+			asrt(strval($driver->GetCell('select 123')),'123');
+		}
+		
+		$a = new RedBean_Exception_SQL;
+		$a->setSqlState('test');
+		$b = strval($a);
+		asrt($b,'[test] - ');
 		
 		
 		testpack('test multi delete and multi update');

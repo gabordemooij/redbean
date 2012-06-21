@@ -48,7 +48,7 @@ function pass() {
 function fail() {
 	printtext("FAILED TEST");
 	debug_print_backtrace();
-	exit;
+	exit(1);
 }
 
 

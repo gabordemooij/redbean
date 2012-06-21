@@ -1,7 +1,7 @@
 <?php
 /**
- * RedUNIT_Base_Database 
- * @file 			RedUNIT/Base/Database.php
+ * RedUNIT_Oracle_Database 
+ * @file 			RedUNIT/Oracle/Database.php
  * @description		Tests basic database behaviors
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
@@ -12,15 +12,8 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Database extends RedUNIT_Base {
-
-	/**
-	 * What drivers should be loaded for this test pack? 
-	 */
-	public function getTargetDrivers() {
-		return array('mysql','pgsql','sqlite','CUBRID');
-	}
-
+class RedUNIT_Oracle_Database extends RedUNIT_Oracle {
+	
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
