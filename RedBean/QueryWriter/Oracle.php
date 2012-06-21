@@ -585,32 +585,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			return RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL;
 		}
 
-		if ($flagSpecial) {
-			if (strpos($value, 'POINT(') === 0) {
-				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)', array($value));
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_POINT;
-			}
-			if (strpos($value, 'LINESTRING(') === 0) {
-				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)', array($value));
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_LINESTRING;
-			}
-			if (strpos($value, 'POLYGON(') === 0) {
-				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)', array($value));
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_POLYGON;
-			}
-			if (strpos($value, 'MULTIPOINT(') === 0) {
-				$this->svalue = $this->adapter->getCell('SELECT GeomFromText(?)', array($value));
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_MULTIPOINT;
-			}
-
-
-			if (preg_match('/^\d{4}\-\d\d-\d\d$/', $value)) {
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE;
-			}
-			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d(:\d\d)?$/', $value)) {
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATETIME;
-			}
-		}
 		$value = strval($value);
 		if (!$this->startsWithZeros($value)) {
 

@@ -89,6 +89,16 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			$this->connectInfo = array('pass' => $pass, 'user' => $user);
 		}
 	}
+	
+	
+	/**
+	 * Gets RedBean_ILogger object.
+	 *
+	 * @return RedBean_ILogger
+	 */	
+	public function setLogger( RedBean_ILogger $logger ) {
+		$this->logger = $logger;
+	}
 
 	public function setAutoCommit($toggle) {
 		$this->autocommit = (bool) $toggle;
