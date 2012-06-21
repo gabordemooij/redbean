@@ -225,7 +225,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$value = strval($value);
 		if (!$this->startsWithZeros($value)) {
 
-			if (is_numeric($value) && (floor($value)==$value) && $value >= -2147483648  && $value <= 2147483648 ) {
+			if (is_numeric($value) && (floor($value)==$value) && $value >= -2147483647  && $value <= 2147483647 ) {
 				return self::C_DATATYPE_INTEGER;
 			}
 			if (is_numeric($value)) {
