@@ -39,6 +39,7 @@ require_once('../RedUNIT/Oracle.php');
 if (isset($ini['mysql'])) {
 	$dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";
 	R::addDatabase('mysql',$dsn,$ini['mysql']['user'],$ini['mysql']['pass'],false);
+	
 }
 if (isset($ini['pgsql'])) {
 	$dsn="pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
@@ -140,9 +141,19 @@ $allPacks = array(
 		'Base/Close'
 );
 
+$pluginPacks = array(
+	'Plugin/Cache'
+);
+
 //Default (mode == all)
 if ($mode == 'all') {
 	$packList = $allPacks;
+}
+elseif ($mode == 'plugins') {
+	$packList = $pluginPacks;
+}
+elseif ($mode == 'all+plugins') {
+	$packList = array_merge($allPacks,$pluginPacks);
 }
 else {
 	foreach($allPacks as $pack) {
