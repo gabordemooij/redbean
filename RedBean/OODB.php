@@ -549,7 +549,7 @@ class RedBean_OODB extends RedBean_Observable {
 		foreach($embeddedBeans as $linkField=>$embeddedBean) {
 			if (!$this->isFrozen) {
 				$this->writer->addIndex($bean->getMeta('type'),
-							'index_foreignkey_'.$embeddedBean->getMeta('type'),
+							'index_foreignkey_'.$bean->getMeta('type').'_'.$embeddedBean->getMeta('type'),
 							 $linkField);
 				$isDep = $this->isDependentOn($bean->getMeta('type'),$embeddedBean->getMeta('type'));
 				$this->writer->addFK($bean->getMeta('type'),$embeddedBean->getMeta('type'),$linkField,'id',$isDep);
@@ -577,7 +577,7 @@ class RedBean_OODB extends RedBean_Observable {
 				$this->store($addition);
 				if (!$this->isFrozen) {
 					$this->writer->addIndex($addition->getMeta('type'),
-						'index_foreignkey_'.$bean->getMeta('type'),
+						'index_foreignkey_'.$addition->getMeta('type').'_'.$bean->getMeta('type'),
 						 $myFieldLink);
 					$isDep = $this->isDependentOn($addition->getMeta('type'),$bean->getMeta('type'));
 					$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,'id',$isDep);
