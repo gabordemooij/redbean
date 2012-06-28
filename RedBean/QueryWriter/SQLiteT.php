@@ -168,6 +168,79 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return $items;
 	}
 
+	
+	
+	/**
+	 * Gets all information about a table (from a type).
+	 * 
+	 * Format:
+	 * array(
+	 *		name => name of the table
+	 *		columns => array( name => datatype )
+	 *		indexes => array() raw index information rows from PRAGMA query
+	 *		keys => array() raw key information rows from PRAGMA query
+	 * )
+	 * 
+	 * @param string $type type you want to get info of
+	 * 
+	 * @return array $info 
+	 */
+	protected function getTable($type) {
+		$table = $this->safeTable($type,true);
+		$columns = $this->getColumns($type);
+		$indexes = $this->getIndexes($type);
+		$keys = $this->getKeys($type);
+		$table = array('columns'=>$columns,'indexes'=>$indexes,'keys'=>$keys,'name'=>$table);
+		return $table;
+	}
+	
+	/**
+	 * Puts a table. Updates the table structure.
+	 * In SQLite we can't change columns, drop columns, change or add foreign keys so we
+	 * have a table-rebuild function. You simply load your table with getTable(), modify it and
+	 * then store it with putTable()...
+	 * 
+	 * @param array $tableMap information array 
+	 */
+	protected function putTable($tableMap) {
+		$table = $tableMap['name'];
+		$q = array();
+		$q[] = "DROP TABLE IF EXISTS tmp_backup;";
+		$oldColumnNames = array_keys($this->getColumns($table));
+		foreach($oldColumnNames as $k=>$v) $oldColumnNames[$k] = "`$v`";
+		$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(",",$oldColumnNames).");";
+		$q[] = "INSERT INTO tmp_backup SELECT * FROM `$table`;";
+		$q[] = "PRAGMA foreign_keys = 0 ";
+		$q[] = "DROP TABLE `$table`;";
+		$newTableDefStr = '';
+		foreach($tableMap['columns'] as $column=>$type) {
+			if ($column != 'id') {
+				$newTableDefStr .= ",`$column` $type";
+			}
+		}
+		$fkDef = '';
+		foreach($tableMap['keys'] as $key) {
+			$fkDef .= ", FOREIGN KEY(`{$key['from']}`) 
+						 REFERENCES `{$key['table']}`(`{$key['to']}`) 
+						 ON DELETE {$key['on_delete']} ON UPDATE {$key['on_update']}";
+		}
+		$q[] = "CREATE TABLE `$table` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr  $fkDef );";
+		foreach($tableMap['indexes'] as $name=>$index)  {
+			if (strpos($name,'UQ_')===0) {
+				if (strpos($name,'__')===false) continue; //old  index, forget.
+				$cols = explode('__',substr($name,strlen('UQ_'.$table)));
+				foreach($cols as $k=>$v) $cols[$k] = "`$v`";
+				$q[] = "CREATE UNIQUE INDEX $name ON `$table` (".implode(',',$cols).")";
+			}
+			else $q[] = "CREATE INDEX $name ON `$table` ({$index['name']}) ";
+		}
+		$q[] = "INSERT INTO `$table` SELECT * FROM tmp_backup;";
+		$q[] = "DROP TABLE tmp_backup;";
+		$q[] = "PRAGMA foreign_keys = 1 ";
+		foreach($q as $sq) $this->adapter->exec($sq);
+		
+	}
+	
 	/**
 	 * This method upgrades the column to the specified data type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -179,33 +252,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return void
 	 */
 	public function widenColumn( $type, $column, $datatype ) {
-		$table = $this->safeTable($type,true);
-		$column = $this->safeColumn($column,true);
-		$newtype = $this->typeno_sqltype[$datatype];
-		$oldColumns = $this->getColumns($type);
-		$oldColumnNames = $this->quote(array_keys($oldColumns));
-		$newTableDefStr='';
-		foreach($oldColumns as $oldName=>$oldType) {
-			if ($oldName != 'id') {
-				if ($oldName!=$column) {
-					$newTableDefStr .= ",`$oldName` $oldType";
-				}
-				else {
-					$newTableDefStr .= ",`$oldName` $newtype";
-				}
-			}
-		}
-		$q = array();
-		$q[] = "DROP TABLE IF EXISTS tmp_backup;";
-		$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(",",$oldColumnNames).");";
-		$q[] = "INSERT INTO tmp_backup SELECT * FROM `$table`;";
-		$q[] = "DROP TABLE `$table`;";
-		$q[] = "CREATE TABLE `$table` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr  );";
-		$q[] = "INSERT INTO `$table` SELECT * FROM tmp_backup;";
-		$q[] = "DROP TABLE tmp_backup;";
-		foreach($q as $sq) {
-			$this->adapter->exec($sq);
-		}
+		$t = $this->getTable($type);
+		$t['columns'][$column] = $this->typeno_sqltype[$datatype];
+		$this->putTable($t);
 	}
 
 
@@ -248,6 +297,41 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
+	 * Returns the indexes for type $type.
+	 * 
+	 * @param string $type
+	 * 
+	 * @return array $indexInfo index information
+	 */
+	protected function getIndexes($type) {
+		$table = $this->safeTable($type, true);
+		$indexes = $this->adapter->get("PRAGMA index_list('$table')");
+		$indexInfoList = array();
+		foreach($indexes as $i) {
+			$indexInfoList[$i['name']] = $this->adapter->getRow("PRAGMA index_info('{$i['name']}') ");
+			$indexInfoList[$i['name']]['unique'] = $i['unique'];
+		}
+		return $indexInfoList;
+	}
+	
+	/**
+	 * Returns the keys for type $type.
+	 * 
+	 * @param string $type
+	 * 
+	 * @return array $keysInfo keys information
+	 */
+	protected function getKeys($type) {
+		$table = $this->safeTable($type,true);
+		$keys = $this->adapter->get("PRAGMA foreign_key_list('$table')");
+		$keyInfoList = array();
+		foreach($keys as $k) {
+			$keyInfoList['from_'.$k['from'].'_to_table_'.$k['table'].'_col_'.$k['to']] = $k;
+		}
+		return $keyInfoList;
+	}
+	
+	/**
 	 * Adds a Unique index constrain to the table.
 	 *
 	 * @param string $table   table
@@ -256,11 +340,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 *
 	 * @return void
 	 */
-	public function addUniqueIndex( $table,$columns ) {
-		$table = $this->safeTable($table);
-		$name = 'UQ_'.sha1(implode(',',$columns));
-		$sql = "CREATE UNIQUE INDEX IF NOT EXISTS $name ON $table (".implode(',',$columns).")";
-		$this->adapter->exec($sql);
+	public function addUniqueIndex( $type,$columns ) {
+		$table = $this->safeTable($type,true);
+		$name = 'UQ_'.$table.implode('__',$columns);
+		$t = $this->getTable($type);
+		$t['indexes'][$name] = array('name'=>$name);
+		$this->putTable($t);
 	}
 
 	/**
@@ -297,11 +382,13 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$table = $type;
 		$table = $this->safeTable($table);
 		$name = preg_replace('/\W/','',$name);
-		$column = $this->safeColumn($column);
+		$column = $this->safeColumn($column,true);
 		foreach( $this->adapter->get("PRAGMA INDEX_LIST($table) ") as $ind) {
 			if ($ind['name']===$name) return;
 		}
-		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
+		$t = $this->getTable($type);
+		$t['indexes'][$name] = array('name'=>$column);
+		return $this->putTable($t);
 	}
 	
 	
@@ -342,68 +429,24 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param  string $targetField field where the fk needs to point to
 	 * @param  integer $buildopt   0 = NO ACTION, 1 = ON DELETE CASCADE
 	 *
-	 * @return bool $success whether an FK has been added
+	 * @return boolean $true always succeeds, crashes otherwise (SQLite needs to rebuild table)
+	 * 
+	 * @note: cant put this in try-catch because that can hide the fact
+	 * that database has been damaged. 
 	 */
 
 	protected function buildFK($type, $targetType, $field, $targetField,$constraint=false) {
-			try{
-				$consSQL = ($constraint ? 'CASCADE' : 'SET NULL');
-				$table = $this->safeTable($type,true);
-				$targetTable = $this->safeTable($targetType,true);
-				$field = $this->safeColumn($field,true);
-				$targetField = $this->safeColumn($targetField,true);
-				$oldColumns = $this->getColumns($type);
-				$oldColumnNames = $this->quote(array_keys($oldColumns));
-				$newTableDefStr='';
-				foreach($oldColumns as $oldName=>$oldType) {
-					if ($oldName != 'id') {
-						$newTableDefStr .= ",`$oldName` $oldType";
-					}
-				}
-				//retrieve old foreign keys
-				$sqlGetOldFKS = "PRAGMA foreign_key_list('$table'); ";
-				$oldFKs = $this->adapter->get($sqlGetOldFKS);
-				$restoreFKSQLSnippets = "";
-				foreach($oldFKs as $oldFKInfo) {
-					if ($oldFKInfo['from']==$field && $oldFKInfo['on_delete']==$consSQL) {
-						//this field already has a FK.
-						return false;
-					}
-					if ($oldFKInfo['from']==$field && $oldFKInfo['on_delete']!=$consSQL) {
-						//this field already has a FK.but needs to be replaced
-						continue;
-					}
-					$oldTable = $table;
-					$oldField = $oldFKInfo['from'];
-					$oldTargetTable = $oldFKInfo['table'];
-					$oldTargetField = $oldFKInfo['to'];
-					$restoreFKSQLSnippets .= ", FOREIGN KEY(`$oldField`) REFERENCES `$oldTargetTable`(`$oldTargetField`) ON DELETE ".$oldFKInfo['on_delete'];
-				}
-				$fkDef = $restoreFKSQLSnippets;
-				if ($constraint) {
-					$fkDef .= ", FOREIGN KEY(`$field`) REFERENCES `$targetTable`(`$targetField`) ON DELETE CASCADE ";
-				}
-				else {
-					$fkDef .= ", FOREIGN KEY(`$field`) REFERENCES `$targetTable`(`$targetField`) ON DELETE SET NULL ON UPDATE SET NULL";
-				}
-				$q = array();
-				$q[] = "DROP TABLE IF EXISTS tmp_backup;";
-				$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(',',$oldColumnNames).");";
-				$q[] = "INSERT INTO tmp_backup SELECT * FROM `$table`;";
-				$q[] = "PRAGMA foreign_keys = 0 ";
-				$q[] = "DROP TABLE `$table`;";
-				$q[] = "CREATE TABLE `$table` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr $fkDef );";
-				$q[] = "INSERT INTO `$table` SELECT * FROM tmp_backup;";
-				$q[] = "DROP TABLE tmp_backup;";
-				$q[] = "PRAGMA foreign_keys = 1 ";
-				foreach($q as $sq) {
-					$this->adapter->exec($sq);
-				}
-				
-				
-				return true;
-			}
-			catch(Exception $e){ return false; }
+		$consSQL = ($constraint ? 'CASCADE' : 'SET NULL');
+		$t = $this->getTable($type);
+		$t['keys']['from_'.$field.'_to_table_'.$targetType.'_col_'.$targetField] = array(
+			'table' => $targetType,
+			'from' => $field,
+			'to' => $targetField,
+			'on_update' => 'SET NULL',
+			'on_delete' => $consSQL
+		);
+		$this->putTable($t);
+		return true;
 	}
 
 

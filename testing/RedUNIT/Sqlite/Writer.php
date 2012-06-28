@@ -27,15 +27,6 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite {
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		
-		$type= 'unknown';
-		$targetType = 'alsounknown';
-		$field = 'blah';
-		$targetField = 'blah2';
-		asrt($writer->addFK($type, $targetType, $field, $targetField),false);
-		$table = 'combinethem';
-		$bean1 = R::dispense('nonexist1');
-		$bean2 = R::dispense('nonexist2');
-		asrt($writer->addConstraint($bean1,$bean2),false);
 		
 		$a = new RedBean_AssociationManager( $toolbox );
 		$adapter->exec("DROP TABLE IF EXISTS testtable");

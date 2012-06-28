@@ -376,13 +376,13 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		R::store($book);
 		$book=R::load('book',1);
 		asrt(count($book->sharedTopic),3);
-		asrt(count($logger->grep("DELETE")),0); //no deletes
+		asrt(count($logger->grep("DELETE FROM")),0); //no deletes
 		$book->sharedTopic['a'] = $topic3;
 		unset($book->sharedTopic['a']);
 		R::store($book);
 		$book=R::load('book',1);
 		asrt(count($book->sharedTopic),3);
-		asrt(count($logger->grep("DELETE")),0); //no deletes
+		asrt(count($logger->grep("DELETE FROM")),0); //no deletes
 		$book->ownPage = array();
 		R::store($book);
 		asrt(count($book->ownPage),0);
