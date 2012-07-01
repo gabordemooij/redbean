@@ -137,6 +137,7 @@ $allPacks = array(
 		'Sqlite/Foreignkeys',
 		'Sqlite/Parambind',
 		'Sqlite/Writer',
+		'Sqlite/Rebuild',
 		'Base/Timeline',
 		'Base/Close'
 );
