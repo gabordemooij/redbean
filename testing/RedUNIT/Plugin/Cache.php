@@ -91,6 +91,23 @@ class RedUNIT_Plugin_Cache extends RedUNIT {
 		asrt($cachedOODB->getHits(),8);
 		asrt($cachedOODB->getMisses(),5);
 		
+		testpack('Does bean cache benefit from find()?');
+		R::storeAll(R::dispense('pancake',10));
+		$pancakes = R::findAll('pancake');
+		asrt($cachedOODB->getMisses(),16);
+		$p = reset($pancakes);
+		R::load('pancake',$p->id);
+		asrt($cachedOODB->getHits(),9);
+		
+		testpack('Does bean cache benefit from batch()?');
+		$burgers = R::dispense('hamburger',10);
+		$ids = array();
+		foreach($burgers as $b) $ids[] = R::store($b);
+		$burgers = R::batch('hamburger',$ids);
+		asrt($cachedOODB->getMisses(),27);
+		$b = reset($burgers);
+		R::load('hamburger',$b->id);
+		asrt($cachedOODB->getHits(),10);
 		
 	}	
 

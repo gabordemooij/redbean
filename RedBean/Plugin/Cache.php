@@ -105,6 +105,29 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Observer {
 	}
 	
 	/**
+	 * Method to update cache from lists of beans.
+	 * This provides us with the means to cache the results from batch
+	 * and find operations.
+	 * 
+	 * @param array $beans beans
+	 * 
+	 * @return void
+	 */
+	private function updateCache($beans = array()) {
+		if (!count($beans)) return;
+		$bean = reset($beans);
+		if (!($bean instanceof RedBean_OODBBean)) return;
+		$type = $bean->getMeta('type');
+		foreach($beans as $bean) {
+			$label = $type.'-'.$bean->id;
+			if (!isset($this->cache[$label])) {
+				$this->cache[$label] = $bean;
+			}
+		}
+	}
+	
+	
+	/**
 	 * Loads a batch of beans from the database. Loads beans by type and id
 	 * collection. If the beans are in the cache they will be served from cache.
 	 * 
@@ -124,6 +147,62 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Observer {
 			$beans = parent::batch($type,$ids);
 			$this->misses ++;
 			$this->cache[$label] = $beans;
+			$this->updateCache($beans);
+		}
+		$this->flushCache = true;
+		return $beans;
+	}
+	
+	/**
+	 * Cached version of OODB::find.
+	 * Retrieves as much beans from the cache as possible and updates cache.
+	 * 
+	 * Searches the database for a bean that matches conditions $conditions and sql $addSQL
+	 * and returns an array containing all the beans that have been found.
+	 * 
+	 * Conditions need to take form:
+	 * 
+	 * array(
+	 * 		'PROPERTY' => array( POSSIBLE VALUES... 'John','Steve' )
+	 * 		'PROPERTY' => array( POSSIBLE VALUES... )
+	 * );
+	 * 
+	 * All conditions are glued together using the AND-operator, while all value lists
+	 * are glued using IN-operators thus acting as OR-conditions.
+	 * 
+	 * Note that you can use property names; the columns will be extracted using the
+	 * appropriate bean formatter.
+	 * 
+	 * @throws RedBean_Exception_SQL 
+	 * 
+	 * @param string  $type       type of beans you are looking for
+	 * @param array   $conditions list of conditions
+	 * @param string  $addSQL	  SQL to be used in query
+	 * @param boolean $all        whether you prefer to use a WHERE clause or not (TRUE = not)
+	 * 
+	 * @return array $beans		  resulting beans
+	 */
+	public function find($type, $conditions=array(),$addSQL=null,$all=false) {
+		/**
+		 * If $addSQL is filled in the query might update the database,
+		 * in this case dont use the cache but clear cache instead.
+		 */
+		if ($this->flushCache && (is_array($addSQL) && strlen($addSQL[0])>0)) {
+			$this->cache = array();
+			return parent::find($type, $conditions, $addSQL, $all);
+		
+		}
+		$this->flushCache = false;
+		$label = 'find-'.$type.'-'.sha1(serialize(array($conditions,$addSQL,$all)));
+		if (isset($this->cache[$label])) {
+			$this->hits ++;
+			$beans = $this->cache[$label];
+		}
+		else {
+			$beans = parent::find($type,$conditions,$addSQL,$all);
+			$this->misses ++;
+			$this->cache[$label] = $beans;
+			$this->updateCache($beans);
 		}
 		$this->flushCache = true;
 		return $beans;
@@ -156,7 +235,9 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Observer {
 	 */
 	public function onEvent($eventname, $bean) {
 		if ($eventname=='sql_exec') {
-			if ($this->flushCache) $this->cache = array();
+			if ($this->flushCache) { 
+				$this->cache = array();
+			}
 		}
 	}
 	
