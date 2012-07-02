@@ -121,7 +121,6 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return RedBean_OODBBean $bean the new bean instance
 	 */
 	public function dispense($type ) {
-		$this->signal( 'before_dispense', $type );
 		$bean = new RedBean_OODBBean();
 		$bean->setBeanHelper($this->beanhelper);
 		$bean->setMeta('type',$type );
@@ -628,7 +627,6 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return RedBean_OODBBean $bean loaded bean
 	 */
 	public function load($type,$id) {
-		$this->signal('before_open',array('type'=>$type,'id'=>$id));
 		$bean = $this->dispense( $type );
 		if ($this->stash && isset($this->stash[$id])) {
 			$row = $this->stash[$id];
