@@ -22,7 +22,16 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 	 */
 	public function run() {
 		
-		$candy = R::dispense('CandyBar');
+		try {
+			$candy = R::dispense('CandyBar');
+			fail();
+		}
+		catch(RedBean_Exception_Security $e){
+			pass();
+		}
+		
+		$candy = R::dispense('candybar');
+		
 		$s = strval($candy);
 		asrt($s,'candy!');
 		
