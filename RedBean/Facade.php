@@ -86,6 +86,9 @@ class RedBean_Facade {
 	 */
 	public static $f;
 
+	
+	private static $strictType = true;
+	
 
 	/**
 	 * Get version
@@ -219,6 +222,7 @@ class RedBean_Facade {
 	 *
 	 */
 	public static function dispense( $type, $num = 1 ) {
+		if (!preg_match('/^[a-z0-9]+$/',$type) && self::$strictType) throw new RedBean_Exception_Security('Invalid type: '.$type); 
 		if ($num==1) {
 			return self::$redbean->dispense( $type );
 		}
@@ -227,6 +231,11 @@ class RedBean_Facade {
 			for($v=0; $v<$num; $v++) $beans[] = self::$redbean->dispense( $type );
 			return $beans;
 		}
+	}
+	
+	
+	public static function setStrictTyping($trueFalse) {
+		self::$strictType = (boolean) $trueFalse;
 	}
 
 	/**
@@ -274,7 +283,7 @@ class RedBean_Facade {
 			else {
 				$info = $extra;
 			}
-			$bean = RedBean_Facade::dispense('typeLess');
+			$bean = RedBean_Facade::dispense('xtypeless');
 			$bean->import($info);
 			return self::$extAssocManager->extAssociate($bean1, $bean2, $bean);
 		}
@@ -1040,7 +1049,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $array list of names of beans
 	 */
-	public function gatherLabels($beans) {
+	public static function gatherLabels($beans) {
 		$labels = array();
 		foreach($beans as $bean) $labels[] = $bean->name;
 		sort($labels);
