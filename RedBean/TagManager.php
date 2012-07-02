@@ -36,13 +36,6 @@ class RedBean_TagManager {
 	protected $redbean;
 	
 	/**
-	 * Quick tag cache for simple lookups.
-	 * @var array 
-	 */
-	protected $tagCache = array();
-	
-	
-	/**
 	 * Constructor,
 	 * creates a new instance of TagManager.
 	 * @param RedBean_Toolbox $toolbox 
@@ -61,11 +54,9 @@ class RedBean_TagManager {
 	 * @return RedBean_OODBBean $bean | null
 	 */
 	public function findTagByTitle($title) {
-		if (isset($this->tagCache[$title])) return $this->tagCache[$title];
 		$beans = $this->redbean->find('tag',array('title'=>array($title)));
 		if ($beans) {
 			$bean = reset($beans);
-			$this->tagCache[$bean->title] = $bean;
 			return $bean;
 		}
 		return null;
