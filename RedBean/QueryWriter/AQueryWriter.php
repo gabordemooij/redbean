@@ -216,6 +216,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 
+	
+
 	/**
 	 * This selects a record. You provide a
 	 * collection of conditions using the following format:
@@ -245,13 +247,22 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			if (!count($values)) continue;
 			$sql = $this->safeColumn($column);
 			$sql .= ' '.($inverse ? ' NOT ':'').' IN ( ';
-			$sql .= implode(',',array_fill(0,count($values),'?')).') ';
-			$sqlConditions[] = $sql;
-			if (!is_array($values)) $values = array($values);
-			foreach($values as $k=>$v) {
-				$values[$k]=strval($v);
+			//If its safe to not use bindings please do... (fixes SQLite PDO issue limit 256 bindings)
+			if (count($conditions)===1 
+				&& isset($conditions['id']) 
+				&& is_array($values) 
+				&& preg_match('/^\d+$/',implode('',$values))) {
+				$sql .= implode(',',$values); 
 			}
-			$bindings = array_merge($bindings,$values);
+			else {
+				$sql .= implode(',',array_fill(0,count($values),'?')).') ';
+				$sqlConditions[] = $sql;
+				if (!is_array($values)) $values = array($values);
+				foreach($values as $k=>$v) {
+					$values[$k]=strval($v);
+				}
+				$bindings = array_merge($bindings,$values);
+			}
 		}
 		//$addSql can be either just a string or array($sql, $bindings)
 		if (is_array($addSql)) {
