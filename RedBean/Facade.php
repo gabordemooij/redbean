@@ -158,7 +158,7 @@ class RedBean_Facade {
 	 * @param RedBean_ILogger $logger
 	 */
 	public static function debug( $tf = true, $logger = NULL ) {
-		if (!$logger) $logger = new RedBean_Logger;
+		if (!$logger) $logger = new RedBean_Logger_Default;
 		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
 	}
 
@@ -270,10 +270,10 @@ class RedBean_Facade {
 	 *
 	 * @return mixed
 	 */
-	public static function associate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $extra = null ) {
+	public static function associate( $beans1, $beans2, $extra = null ) {
 		//No extra? Just associate like always (default)
 		if (!$extra) {
-			return self::$associationManager->associate( $bean1, $bean2 );
+			return self::$associationManager->associate( $beans1, $beans2 );
 		}
 		else{
 			if (!is_array($extra)) {
@@ -285,9 +285,8 @@ class RedBean_Facade {
 			}
 			$bean = RedBean_Facade::dispense('xtypeless');
 			$bean->import($info);
-			return self::$extAssocManager->extAssociate($bean1, $bean2, $bean);
+			return self::$extAssocManager->extAssociate($beans1, $beans2, $bean);
 		}
-
 	}
 
 
@@ -303,8 +302,9 @@ class RedBean_Facade {
 	 *
 	 * @return mixed
 	 */
-	public static function unassociate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 , $fast=false) {
-		return self::$associationManager->unassociate( $bean1, $bean2, $fast );
+	public static function unassociate( $beans1,  $beans2 , $fast=false) {
+		return self::$associationManager->unassociate( $beans1, $beans2, $fast );
+		
 	}
 
 	/**
@@ -859,7 +859,7 @@ class RedBean_Facade {
 		self::$redbean = self::$toolbox->getRedBean();
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
 		self::$redbean->setAssociationManager(self::$associationManager);
-		self::$extAssocManager = new RedBean_ExtAssociationManager( self::$toolbox );
+		self::$extAssocManager = new RedBean_AssociationManager_ExtAssociationManager( self::$toolbox );
 		$helper = new RedBean_ModelHelper();
 		self::$redbean->addEventListener('update', $helper );
 		self::$redbean->addEventListener('open', $helper );
@@ -884,7 +884,7 @@ class RedBean_Facade {
 	 * @return array $arrayOfBeans Beans
 	 */
 	public static function graph($array,$filterEmpty=false) {
-		$cooker = new RedBean_Cooker();
+		$cooker = new RedBean_Plugin_Cooker();
 		$cooker->setToolbox(self::$toolbox);
 		return $cooker->graph($array,$filterEmpty);
 	}

@@ -64,10 +64,18 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean1 bean1
 	 * @param RedBean_OODBBean $bean2 bean2
 	 */
-	public function associate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-		$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
-		$bean = $this->oodb->dispense($table);
-		return $this->associateBeans( $bean1, $bean2, $bean );
+	public function associate($beans1, $beans2) {
+		$results = array();
+		if (!is_array($beans1)) $beans1 = array($beans1);
+		if (!is_array($beans2)) $beans2 = array($beans2);
+		foreach($beans1 as $bean1) {
+			foreach($beans2 as $bean2) {
+				$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
+				$bean = $this->oodb->dispense($table);
+				$results[] = $this->associateBeans( $bean1, $bean2, $bean );
+			}
+		}
+		return (count($results)>1) ? $results : reset($results);
 	}
 
 	
@@ -82,6 +90,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return mixed $id either the link ID or null
 	 */
 	protected function associateBeans(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean) {
+	
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
 		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
@@ -106,7 +115,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 				if (!$this->oodb->isFrozen())
 				$this->writer->addConstraint( $bean1, $bean2 );
 			}
-			return $id;
+			$results[] = $id;
 		}
 		catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
@@ -114,6 +123,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 			))) throw $e;
 		}
+			
 	}
 
 	/**
@@ -209,44 +219,50 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean2 second bean
 	 * @param boolean          $fast  If TRUE, removes the entries by query without FUSE
 	 */
-	public function unassociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $fast=null) {
-		$this->oodb->store($bean1);
-		$this->oodb->store($bean2);
-		$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
-		$type = $bean1->getMeta('type');
-		if ($type==$bean2->getMeta('type')) {
-			$type .= '2';
-			$cross = 1;
-		}
-		else $cross = 0;
-		$property1 = $type.'_id';
-		$property2 = $bean2->getMeta('type').'_id';
-		$value1 = (int) $bean1->id;
-		$value2 = (int) $bean2->id;
-		try {
-			$rows = $this->writer->selectRecord($table,array(
-				$property1 => array($value1), $property2=>array($value2)),null,$fast
-			);
-			if ($cross) {
-				$rows2 = $this->writer->selectRecord($table,array(
-				$property2 => array($value1), $property1=>array($value2)),null,$fast
-				);
-				if ($fast) return;
-				$rows = array_merge($rows,$rows2);
+	public function unassociate($beans1, $beans2, $fast=null) {
+		if (!is_array($beans1)) $beans1 = array($beans1);
+		if (!is_array($beans2)) $beans2 = array($beans2);
+		foreach($beans1 as $bean1) {
+			foreach($beans2 as $bean2) {
+		
+				$this->oodb->store($bean1);
+				$this->oodb->store($bean2);
+				$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
+				$type = $bean1->getMeta('type');
+				if ($type==$bean2->getMeta('type')) {
+					$type .= '2';
+					$cross = 1;
+				}
+				else $cross = 0;
+				$property1 = $type.'_id';
+				$property2 = $bean2->getMeta('type').'_id';
+				$value1 = (int) $bean1->id;
+				$value2 = (int) $bean2->id;
+				try {
+					$rows = $this->writer->selectRecord($table,array(
+						$property1 => array($value1), $property2=>array($value2)),null,$fast
+					);
+					if ($cross) {
+						$rows2 = $this->writer->selectRecord($table,array(
+						$property2 => array($value1), $property1=>array($value2)),null,$fast
+						);
+						if ($fast) continue;
+						$rows = array_merge($rows,$rows2);
+					}
+					if ($fast) continue;
+					$beans = $this->oodb->convertToBeans($table,$rows);
+					foreach($beans as $link) {
+						$this->oodb->trash($link);
+					}
+				}catch(RedBean_Exception_SQL $e) {
+					if (!$this->writer->sqlStateIn($e->getSQLState(),
+					array(
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+					)) throw $e;
+				}
 			}
-			if ($fast) return;
-			$beans = $this->oodb->convertToBeans($table,$rows);
-			foreach($beans as $link) {
-				$this->oodb->trash($link);
-			}
-		}catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
 		}
-		return;
 	}
 
 	/**
