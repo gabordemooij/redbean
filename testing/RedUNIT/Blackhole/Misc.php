@@ -128,8 +128,8 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		asrt(count(R::dispense('countable')),1);
 		
 		//otherwise untestable...
-		$bean->setBeanHelper( new RedBean_BeanHelperFacade() );
-		R::$redbean->setBeanHelper( new RedBean_BeanHelperFacade() );
+		$bean->setBeanHelper( new RedBean_BeanHelper_Facade() );
+		R::$redbean->setBeanHelper( new RedBean_BeanHelper_Facade() );
 		pass();
 		
 		

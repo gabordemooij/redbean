@@ -147,7 +147,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		}
 		$json = '{"mysongs":{"type":"playlist","id":"1","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","id":"1"}],"cover":{"type":"cover","id":"2"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 		$playList = json_decode( $json, true );
-		$cooker = new RedBean_Cooker;
+		$cooker = new RedBean_Plugin_Cooker;
 		$cooker->setToolbox(R::$toolbox);
 		$playList = ($cooker->graph(($playList)));
 		$id = R::store(reset($playList));
@@ -165,7 +165,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		$json = '{"mysongs":{"type":"playlist","id":"1","ownTrack":[{"type":"track","name":"harlem nocturne","order":"1","sharedSong":[{"type":"song","id":"1","url":"changedurl"}],"cover":{"type":"cover","id":"2"}},{"type":"track","name":"brazil","order":"2","sharedSong":[{"type":"song","url":"music.com\/djan"}],"cover":{"type":"cover","url":"picasa\/django"}}]}}';
 		
 		$playList = json_decode( $json, true );
-		$cooker = new RedBean_Cooker;
+		$cooker = new RedBean_Plugin_Cooker;
 		$cooker->setToolbox(R::$toolbox);
 		$playList = ($cooker->graph(($playList)));
 		$id = R::store(reset($playList));
@@ -379,7 +379,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		asrt($bean->name,'Fred');
 		asrt($bean->phone,'');
 		
-		RedBean_Cooker::setUseNullFlag(true);
+		RedBean_Plugin_Cooker::setUseNullFlag(true);
 		$form = array(
 			'type'=>'person',
 			'name'=>'Fred',
@@ -388,7 +388,7 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 		$bean = R::graph($form);
 		asrt($bean->name,'Fred');
 		asrt($bean->phone,null);
-		RedBean_Cooker::setUseNullFlag(false);
+		RedBean_Plugin_Cooker::setUseNullFlag(false);
 		
 		
 		//save a form using graph and ignore empty beans, wrong nesting

@@ -17,7 +17,7 @@
  * with this source code in the file license.txt.
  */
 
-class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Observer {
+class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Observer,RedBean_Plugin {
 	
 	/**
 	 * Bean cache, contains the cached beans identified by

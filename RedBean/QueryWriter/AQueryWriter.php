@@ -252,7 +252,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				&& isset($conditions['id']) 
 				&& is_array($values) 
 				&& preg_match('/^\d+$/',implode('',$values))) {
-				$sql .= implode(',',$values); 
+				$sql .= implode(',',$values).') ';
+				$sqlConditions[] = $sql;
 			}
 			else {
 				$sql .= implode(',',array_fill(0,count($values),'?')).') ';

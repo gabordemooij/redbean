@@ -352,7 +352,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	public function setDebugMode( $tf, $logger = NULL ) {
 		$this->connect();
 		$this->debug = (bool)$tf;
-		if ($this->debug and !$logger) $logger = new RedBean_Logger();
+		if ($this->debug and !$logger) $logger = new RedBean_Logger_Default();
 		$this->setLogger($logger);
 	}
 
@@ -362,7 +362,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *
 	 * @param RedBean_ILogger $logger
 	 */
-	public function setLogger( RedBean_ILogger $logger ) {
+	public function setLogger( RedBean_Logger_Default $logger ) {
 		$this->logger = $logger;
 	}
 

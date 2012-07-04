@@ -14,7 +14,7 @@
  * with this source code in the file license.txt.
  *
  */
-interface RedBean_IBeanHelper {
+interface RedBean_BeanHelper {
 
 	/**
 	 * @abstract

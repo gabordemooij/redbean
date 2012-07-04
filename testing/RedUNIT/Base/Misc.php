@@ -43,7 +43,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$painting->name = 'Nighthawks';
 		$id=R::store($painting);
 		
-		$cooker = new RedBean_Cooker();
+		$cooker = new RedBean_Plugin_Cooker();
 		$cooker->setToolbox($toolbox);
 		try {
 			asrt($cooker->graph('abc'),'abc');

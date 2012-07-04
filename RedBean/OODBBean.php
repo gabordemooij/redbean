@@ -74,7 +74,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param RedBean_IBeanHelper $helper
 	 * @return void
 	 */
-	public function setBeanHelper(RedBean_IBeanHelper $helper) {
+	public function setBeanHelper(RedBean_BeanHelper $helper) {
 		$this->beanHelper = $helper;
 	}
 

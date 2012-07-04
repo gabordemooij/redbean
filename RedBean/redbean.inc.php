@@ -31,7 +31,7 @@ _______   ____   __| _/\_ |__   ____ _____    ____
 
 
 //Check the current PHP version
-if (version_compare(PHP_VERSION, '5.0.0', '<')) {
+if (version_compare(PHP_VERSION, '5.2', '<')) {
 	throw new Exception('Sorry, RedBean is not compatible with PHP versions < 5.');
 }
 
@@ -39,8 +39,8 @@ if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 $dir = dirname(__FILE__) . '/';
 
 //Load Database drivers
-require($dir.'ILogger.php');
 require($dir.'Logger.php');
+require($dir.'Logger/Default.php');
 require($dir.'Driver.php');
 require($dir.'Driver/PDO.php');
 
@@ -72,11 +72,11 @@ require($dir.'ToolBox.php');
 
 //Load extended functionality
 require($dir.'AssociationManager.php');
-require($dir.'ExtAssociationManager.php');
+require($dir.'AssociationManager/ExtAssociationManager.php');
 require($dir.'Setup.php');
 
-require($dir.'IBeanHelper.php');
-require($dir.'BeanHelperFacade.php');
+require($dir.'BeanHelper.php');
+require($dir.'BeanHelper/Facade.php');
 
 /* Developer Comfort */
 
@@ -85,8 +85,6 @@ require($dir.'SimpleModel.php');
 require($dir.'ModelHelper.php');
 require($dir.'TagManager.php');
 require($dir.'Facade.php');;
-require($dir.'BeanCan.php');
-require($dir.'Cooker.php');
 require($dir.'SQLHelper.php');
 
 require($dir.'DependencyInjector.php');

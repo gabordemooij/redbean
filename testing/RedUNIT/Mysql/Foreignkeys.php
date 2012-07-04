@@ -67,7 +67,9 @@ class RedUNIT_Mysql_Foreignkeys extends RedUNIT_Mysql {
 		R::nuke();
 		$bean1 = R::dispense('project');
 		$bean2 = R::dispense('invoice');
+		R::setStrictTyping(false);
 		$bean3 = R::dispense('invoice_project');
+		R::setStrictTyping(true);
 		$bean3->project_id = 1;
 		$bean3->invoice_id = 2;
 		R::store($bean3);

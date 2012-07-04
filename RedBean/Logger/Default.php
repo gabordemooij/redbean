@@ -12,7 +12,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Logger implements RedBean_ILogger {
+class RedBean_Logger_Default implements RedBean_Logger {
 
   /**
    * Default logger method logging to STDOUT

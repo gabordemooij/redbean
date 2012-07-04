@@ -13,7 +13,7 @@
  * with this source code in the file license.txt.
  */
 
-class RedBean_Plugin_BeanExport {
+class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 
 	/**
 	 * @var null|\RedBean_Toolbox

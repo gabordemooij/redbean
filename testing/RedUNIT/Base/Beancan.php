@@ -109,7 +109,7 @@ class RedUNIT_Base_Beancan extends RedUNIT_Base {
 		asrt($rs["error"]["message"],'0-Oops!');
 		
 		testpack("Test Negatives: parse error");
-		$can = new RedBean_BeanCan;
+		$can = new RedBean_Plugin_BeanCan;
 		$rs =  json_decode( $can->handleJSONRequest( "crap" ), true);
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
@@ -122,7 +122,7 @@ class RedUNIT_Base_Beancan extends RedUNIT_Base {
 		asrt(isset($rs["error"]["code"]),true);
 		asrt($rs["error"]["code"],-32700);
 		testpack("invalid request");
-		$can = new RedBean_BeanCan;
+		$can = new RedBean_Plugin_BeanCan;
 		$rs =  json_decode( $can->handleJSONRequest( '{"aa":"bb"}' ), true);
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
@@ -236,7 +236,7 @@ class RedUNIT_Base_Beancan extends RedUNIT_Base {
 		asrt($rs["error"]["code"],-32601);
 		
 		R::nuke();
-		$server = new RedBean_BeanCan();
+		$server = new RedBean_Plugin_BeanCan();
 		$book = R::dispense('book');
 		$book->title = 'book 1';
 		$id1 = R::store($book);

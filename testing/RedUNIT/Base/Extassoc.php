@@ -37,7 +37,7 @@ class RedUNIT_Base_Extassoc extends RedUNIT_Base {
 		$top->position = "top";
 		$bottom = $redbean->dispense("placement");
 		$bottom->position = "bottom";
-		$ea = new RedBean_ExtAssociationManager( $toolbox );
+		$ea = new RedBean_AssociationManager_ExtAssociationManager( $toolbox );
 		$ea->extAssociate( $ad, $webpage, $top);
 		$ads = $redbean->batch( "ad", $ea->related( $webpage, "ad") );
 		$adsPos = $redbean->batch( "ad_webpage", $ea->related( $webpage, "ad", true ) );

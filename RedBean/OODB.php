@@ -70,7 +70,7 @@ class RedBean_OODB extends RedBean_Observable {
 		if ($writer instanceof RedBean_QueryWriter) {
 			$this->writer = $writer;
 		}
-		$this->beanhelper = new RedBean_BeanHelperFacade();
+		$this->beanhelper = new RedBean_BeanHelper_Facade();
 	}
 
 	/**
@@ -140,7 +140,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @return void
 	 */
-	public function setBeanHelper( RedBean_IBeanHelper $beanhelper) {
+	public function setBeanHelper( RedBean_BeanHelper $beanhelper) {
 		$this->beanhelper = $beanhelper;
 	}
 
