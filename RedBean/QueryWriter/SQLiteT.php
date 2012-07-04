@@ -186,11 +186,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return array $info 
 	 */
 	protected function getTable($type) {
-		$table = $this->safeTable($type,true);
+		$tableName = $this->safeTable($type,true);
 		$columns = $this->getColumns($type);
 		$indexes = $this->getIndexes($type);
 		$keys = $this->getKeys($type);
-		$table = array('columns'=>$columns,'indexes'=>$indexes,'keys'=>$keys,'name'=>$table);
+		$table = array('columns'=>$columns,'indexes'=>$indexes,'keys'=>$keys,'name'=>$tableName);
+		$this->tableArchive[$tableName] = $table;
 		return $table;
 	}
 	
@@ -344,8 +345,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$table = $this->safeTable($type,true);
 		$name = 'UQ_'.$table.implode('__',$columns);
 		$t = $this->getTable($type);
+		if (isset($t['indexes'][$name])) return;
 		$t['indexes'][$name] = array('name'=>$name);
 		$this->putTable($t);
+		
 	}
 
 	/**
@@ -429,7 +432,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param  string $targetField field where the fk needs to point to
 	 * @param  integer $buildopt   0 = NO ACTION, 1 = ON DELETE CASCADE
 	 *
-	 * @return boolean $true always succeeds, crashes otherwise (SQLite needs to rebuild table)
+	 * @return boolean $didIt
 	 * 
 	 * @note: cant put this in try-catch because that can hide the fact
 	 * that database has been damaged. 
@@ -438,7 +441,15 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	protected function buildFK($type, $targetType, $field, $targetField,$constraint=false) {
 		$consSQL = ($constraint ? 'CASCADE' : 'SET NULL');
 		$t = $this->getTable($type);
-		$t['keys']['from_'.$field.'_to_table_'.$targetType.'_col_'.$targetField] = array(
+		$label = 'from_'.$field.'_to_table_'.$targetType.'_col_'.$targetField;
+		if (isset($t['keys'][$label]) 
+				&& $t['keys'][$label]['table']===$targetType 
+				&& $t['keys'][$label]['from']===$field
+				&& $t['keys'][$label]['to']===$targetField
+				&& $t['keys'][$label]['on_delete']===$consSQL
+		) return false;
+		
+		$t['keys'][$label] = array(
 			'table' => $targetType,
 			'from' => $field,
 			'to' => $targetField,
@@ -489,5 +500,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		$this->adapter->exec('PRAGMA foreign_keys = 1 ');
 	}
+	
 
 }
