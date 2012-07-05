@@ -646,7 +646,7 @@ class RedBean_OODB extends RedBean_Observable {
 					if ($this->isFrozen) throw $e; //only throw if frozen;
 				}
 			}
-			if (!$rows) return $bean; // $this->dispense($type); -- no need...
+			if (empty($rows)) return $bean; // $this->dispense($type); -- no need...
 			$row = array_pop($rows);
 		}
 		foreach($row as $p=>$v) {
