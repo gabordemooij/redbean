@@ -14,6 +14,9 @@
  */
 class RedUNIT_Base_Beancan extends RedUNIT_Base {
 
+	
+	
+	
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
@@ -21,6 +24,9 @@ class RedUNIT_Base_Beancan extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
+		
+		
+		
 		$rs = ( s("candybar:store",array( array("brand"=>"funcandy","taste"=>"sweet") ) ) );
 		testpack("Test create");
 		asrt(is_string($rs),true);
@@ -257,6 +263,41 @@ class RedUNIT_Base_Beancan extends RedUNIT_Base {
 		$r = json_decode($server->handleRESTGetRequest(array()),true);
 		$a = $r['error']['message'];
 		asrt($a,'IR');
+		
+		
+		testpack('Test BeanCan:export');
+		
+		R::nuke();
+		
+		$briefcase = R::dispense('briefcase');
+		$documents = R::dispense('document',2);
+		$page = R::dispense('page');
+		$author = R::dispense('author');
+		
+		$briefcase->name = 'green';
+		$documents[0]->name = 'document 1';
+		$page->content = 'Lorem Ipsum';
+		$author->name = 'Someone';
+		$briefcase->ownDocument = $documents;
+		$documents[1]->ownPage[] = $page;
+		$page->sharedAuthor[] = $author;
+		$id = R::store($briefcase);
+		
+		$rs = json_decode(s('briefcase:export',array($id)),true);
+		
+		asrt((int)$rs['result'][0]['id'],(int)$id);
+		asrt($rs['result'][0]['name'],'green');
+		asrt($rs['result'][0]['ownDocument'][0]['name'],'document 1');
+		asrt($rs['result'][0]['ownDocument'][1]['ownPage'][0]['content'],'Lorem Ipsum');
+		asrt($rs['result'][0]['ownDocument'][1]['ownPage'][0]['sharedAuthor'][0]['name'],'Someone');
+		
+		$rs = json_decode(s('document:export',array($documents[1]->id)),true);
+		
+		asrt((int)$rs['result'][0]['id'],(int)$documents[1]->id);
+		asrt($rs['result'][0]['ownPage'][0]['content'],'Lorem Ipsum');
+		asrt($rs['result'][0]['ownPage'][0]['sharedAuthor'][0]['name'],'Someone');
+		asrt($rs['result'][0]['briefcase']['name'],'green');
+		
 		
 	}
 	

@@ -109,6 +109,11 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 					$bean = RedBean_Facade::load($beanType,$data[0]);
 					RedBean_Facade::trash($bean);
 					return $this->resp('OK',$id);
+				case 'export':
+					if (!isset($data[0])) return $this->resp(null, $id, -32602,'First param needs to be Bean ID');
+					$bean = RedBean_Facade::load($beanType,$data[0]);
+					$array = RedBean_Facade::exportAll(array($bean),true);
+					return $this->resp($array,$id);
 				default:
 					$modelName = $this->modelHelper->getModelName( $beanType );
 					if (!class_exists($modelName)) return $this->resp(null, $id, -32601,'No such bean in the can!');
