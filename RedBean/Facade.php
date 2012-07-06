@@ -683,12 +683,12 @@ class RedBean_Facade {
 	 *
 	 * @return	array $array exported structure
 	 */
-	public static function exportAll($beans) {
+	public static function exportAll($beans,$parents=false) {
 		$array = array();
 		if (!is_array($beans)) $beans = array($beans);
 		foreach($beans as $bean) {
 			$f = self::dup($bean,array(),true);
-			$array[] = $f->export();
+			$array[] = $f->export(false,$parents);
 		}
 		return $array;
 	}
