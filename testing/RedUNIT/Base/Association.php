@@ -22,6 +22,44 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 	 */
 	public function run() {
 	
+		//Multiple Associations and Dissociations
+		R::nuke();
+		$wines = R::dispense('wine',3);
+		$cheese = R::dispense('cheese',3);
+		$olives = R::dispense('olive',3);
+		R::associate($wines,array_merge($cheese,$olives));
+		asrt(R::count('cheese'),3);
+		asrt(R::count('olive'),3);
+		asrt(R::count('wine'),3);
+		asrt(count($wines[0]->sharedCheese),3);
+		asrt(count($wines[0]->sharedOlive),3);
+		asrt(count($wines[1]->sharedCheese),3);
+		asrt(count($wines[1]->sharedOlive),3);
+		asrt(count($wines[2]->sharedCheese),3);
+		asrt(count($wines[2]->sharedOlive),3);
+		R::unassociate($wines,$olives);
+		asrt(count($wines[0]->sharedCheese),3);
+		asrt(count($wines[0]->sharedOlive),0);
+		asrt(count($wines[1]->sharedCheese),3);
+		asrt(count($wines[1]->sharedOlive),0);
+		asrt(count($wines[2]->sharedCheese),3);
+		asrt(count($wines[2]->sharedOlive),0);
+		R::unassociate(array($wines[1]),$cheese);
+		asrt(count($wines[0]->sharedCheese),3);
+		asrt(count($wines[0]->sharedOlive),0);
+		asrt(count($wines[1]->sharedCheese),0);
+		asrt(count($wines[1]->sharedOlive),0);
+		asrt(count($wines[2]->sharedCheese),3);
+		asrt(count($wines[2]->sharedOlive),0);
+		R::unassociate(array($wines[2]),$cheese);
+		asrt(count($wines[0]->sharedCheese),3);
+		asrt(count($wines[0]->sharedOlive),0);
+		asrt(count($wines[1]->sharedCheese),0);
+		asrt(count($wines[1]->sharedOlive),0);
+		asrt(count($wines[2]->sharedCheese),0);
+		asrt(count($wines[2]->sharedOlive),0);
+		
+		
 		R::nuke();
 		
 		try{
