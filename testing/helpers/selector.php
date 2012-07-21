@@ -116,6 +116,7 @@ $allPacks = array(
 		'Base/Count',
 		'Base/Chill',
 		'Base/Misc',
+		'Base/Sync',
 		'CUBRID/Setget',
 		'Oracle/Base',
 		'Oracle/Database',
