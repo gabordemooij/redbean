@@ -11,7 +11,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_ExtAssociationManager extends RedBean_AssociationManager {
+class RedBean_AssociationManager_ExtAssociationManager extends RedBean_AssociationManager {
 
 	/**
 	 * Associates two beans with eachother. This method connects two beans with eachother, just

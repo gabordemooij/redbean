@@ -247,7 +247,7 @@ function s($data,$params=null,$id="1234") {
 		"params"=>$params,
 		"id"=>$id
 	);
-	$can = new RedBean_BeanCan;
+	$can = new RedBean_Plugin_BeanCan;
 	$request = json_encode($j);
 	$out =  $can->handleJSONRequest( $request );
 	return $out;

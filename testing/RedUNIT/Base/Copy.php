@@ -155,7 +155,6 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		R::store($d);
 		pass();
 		
-		
 		$phillies = R::dispense('diner');
 		list($lonelyman,$man,$woman) = R::dispense('guest',3);
 		$attendent = R::dispense('employee');

@@ -86,6 +86,9 @@ class RedBean_Facade {
 	 */
 	public static $f;
 
+	
+	private static $strictType = true;
+	
 
 	/**
 	 * Get version
@@ -155,7 +158,7 @@ class RedBean_Facade {
 	 * @param RedBean_ILogger $logger
 	 */
 	public static function debug( $tf = true, $logger = NULL ) {
-		if (!$logger) $logger = new RedBean_Logger;
+		if (!$logger) $logger = new RedBean_Logger_Default;
 		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
 	}
 
@@ -219,6 +222,7 @@ class RedBean_Facade {
 	 *
 	 */
 	public static function dispense( $type, $num = 1 ) {
+		if (!preg_match('/^[a-z0-9]+$/',$type) && self::$strictType) throw new RedBean_Exception_Security('Invalid type: '.$type); 
 		if ($num==1) {
 			return self::$redbean->dispense( $type );
 		}
@@ -227,6 +231,11 @@ class RedBean_Facade {
 			for($v=0; $v<$num; $v++) $beans[] = self::$redbean->dispense( $type );
 			return $beans;
 		}
+	}
+	
+	
+	public static function setStrictTyping($trueFalse) {
+		self::$strictType = (boolean) $trueFalse;
 	}
 
 	/**
@@ -261,10 +270,10 @@ class RedBean_Facade {
 	 *
 	 * @return mixed
 	 */
-	public static function associate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, $extra = null ) {
+	public static function associate( $beans1, $beans2, $extra = null ) {
 		//No extra? Just associate like always (default)
 		if (!$extra) {
-			return self::$associationManager->associate( $bean1, $bean2 );
+			return self::$associationManager->associate( $beans1, $beans2 );
 		}
 		else{
 			if (!is_array($extra)) {
@@ -274,11 +283,10 @@ class RedBean_Facade {
 			else {
 				$info = $extra;
 			}
-			$bean = RedBean_Facade::dispense('typeLess');
+			$bean = RedBean_Facade::dispense('xtypeless');
 			$bean->import($info);
-			return self::$extAssocManager->extAssociate($bean1, $bean2, $bean);
+			return self::$extAssocManager->extAssociate($beans1, $beans2, $bean);
 		}
-
 	}
 
 
@@ -294,8 +302,9 @@ class RedBean_Facade {
 	 *
 	 * @return mixed
 	 */
-	public static function unassociate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 , $fast=false) {
-		return self::$associationManager->unassociate( $bean1, $bean2, $fast );
+	public static function unassociate( $beans1,  $beans2 , $fast=false) {
+		return self::$associationManager->unassociate( $beans1, $beans2, $fast );
+		
 	}
 
 	/**
@@ -674,12 +683,12 @@ class RedBean_Facade {
 	 *
 	 * @return	array $array exported structure
 	 */
-	public static function exportAll($beans) {
+	public static function exportAll($beans,$parents=false) {
 		$array = array();
 		if (!is_array($beans)) $beans = array($beans);
 		foreach($beans as $bean) {
 			$f = self::dup($bean,array(),true);
-			$array[] = $f->export();
+			$array[] = $f->export(false,$parents);
 		}
 		return $array;
 	}
@@ -850,7 +859,7 @@ class RedBean_Facade {
 		self::$redbean = self::$toolbox->getRedBean();
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
 		self::$redbean->setAssociationManager(self::$associationManager);
-		self::$extAssocManager = new RedBean_ExtAssociationManager( self::$toolbox );
+		self::$extAssocManager = new RedBean_AssociationManager_ExtAssociationManager( self::$toolbox );
 		$helper = new RedBean_ModelHelper();
 		self::$redbean->addEventListener('update', $helper );
 		self::$redbean->addEventListener('open', $helper );
@@ -875,7 +884,7 @@ class RedBean_Facade {
 	 * @return array $arrayOfBeans Beans
 	 */
 	public static function graph($array,$filterEmpty=false) {
-		$cooker = new RedBean_Cooker();
+		$cooker = new RedBean_Plugin_Cooker();
 		$cooker->setToolbox(self::$toolbox);
 		return $cooker->graph($array,$filterEmpty);
 	}

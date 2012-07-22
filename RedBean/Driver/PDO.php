@@ -211,8 +211,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
-			$x = new RedBean_Exception_SQL( $e->getMessage(), 0);
-			$x->setSQLState( $e->getCode() );
+			$err = $e->getMessage();
+			if ($this->debug && $this->logger) $this->logger->log('An error occurred: '.$err);
+            $x = new RedBean_Exception_SQL( $err, 0);
+      		$x->setSQLState( $e->getCode() );
 			throw $x;
 		}
 	}
@@ -350,7 +352,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	public function setDebugMode( $tf, $logger = NULL ) {
 		$this->connect();
 		$this->debug = (bool)$tf;
-		if ($this->debug and !$logger) $logger = new RedBean_Logger();
+		if ($this->debug and !$logger) $logger = new RedBean_Logger_Default();
 		$this->setLogger($logger);
 	}
 
@@ -360,7 +362,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *
 	 * @param RedBean_ILogger $logger
 	 */
-	public function setLogger( RedBean_ILogger $logger ) {
+	public function setLogger( RedBean_Logger_Default $logger ) {
 		$this->logger = $logger;
 	}
 

@@ -35,6 +35,8 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base {
 		
 		$counter = 0;
 		
+		R::setStrictTyping(false);
+		
 		foreach($keywords as $k) {
 			R::nuke();
 			$bean = R::dispense($k);
@@ -51,5 +53,7 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base {
 			pass();
 				
 		}
+		
+		R::setStrictTyping(true);
 	}
 }

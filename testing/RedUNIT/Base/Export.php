@@ -22,6 +22,51 @@ class RedUNIT_Base_Export extends RedUNIT_Base {
 	 */
 	public function run() {
 		
+		//Export with parents / embedded objects
+		R::nuke();
+		$wines = R::dispense('wine',3);
+		$wines[0]->name = 'Cabernet Franc';
+		$wines[1]->name = 'Chardonnay';
+		$wines[2]->name = 'Malbec';
+		$shelves = R::dispense('shelf',2);
+		$shelves[0]->number = 1;
+		$shelves[1]->number = 2;
+		$cellar = R::dispense('cellar');
+		$cellar->name = 'My Cellar';
+		$cellar->ownShelf = $shelves;
+		$shelves[0]->ownWine = array($wines[0],$wines[1]);
+		$shelves[1]->ownWine[] = $wines[2];
+		$id = R::store($cellar);
+		$wine = R::load('wine',$wines[1]->id);
+		$list1 = R::exportAll(array($wine,$shelves[1]));
+		$list2 = R::exportAll(array($wine,$shelves[1]),true);
+		
+		asrt($list1[0]['name'],'Chardonnay');
+		asrt(isset($list1[0]['shelf']),false);
+		asrt(isset($list1[0]['shelf_id']),true);
+		asrt(isset($list1[0]['shelf']['cellar']),false);
+		
+		asrt($list2[0]['name'],'Chardonnay');
+		asrt(isset($list2[0]['shelf']),true);
+		asrt(intval($list2[0]['shelf']['number']),1);
+		asrt(isset($list2[0]['shelf']['ownWine']),false);
+		asrt(isset($list2[0]['shelf']['cellar']),true);
+		asrt(isset($list2[0]['shelf']['cellar']['name']),true);
+		asrt(isset($list2[0]['shelf_id']),true);
+		
+		asrt(intval($list1[1]['number']),2);
+		asrt(isset($list1[1]['ownWine']),true);
+		asrt(isset($list1[1]['cellar']),false);
+		asrt(isset($list1[1]['cellar']['name']),false);
+		
+		asrt(intval($list2[1]['number']),2);
+		asrt(isset($list2[1]['ownWine']),true);
+		asrt(isset($list2[1]['cellar']),true);
+		asrt(isset($list2[1]['cellar']['name']),true);
+		
+		
+		
+		R::nuke();
 		$sheep = R::dispense('sheep');
 		$sheep->aname = 'Shawn';
 		R::store($sheep);

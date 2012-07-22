@@ -14,7 +14,7 @@
  * with this source code in the file license.txt.
  */
 
-class RedBean_Plugin_QueryLogger implements RedBean_Observer {
+class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 
 	/**
 	 * @var array

@@ -28,6 +28,15 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * @var type 
 	 */
 	private static $dependencyInjector;
+	
+	/**
+	 * Cache for model names to avoid unnecessary
+	 * reflections.
+	 * 
+	 * @var array 
+	 */
+	private static $modelCache = array();
+	
 
 	/**
 	 * Connects OODB to a model if a model exists for that
@@ -51,12 +60,15 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * @return string $fullname
 	 */
 	public static function getModelName( $model, $bean = null ) {
+		if (isset(self::$modelCache[$model])) return self::$modelCache[$model];
 		if (self::$modelFormatter){
-			return self::$modelFormatter->formatModel($model,$bean);
+			$modelID = self::$modelFormatter->formatModel($model,$bean);
 		}
 		else {
-			return 'Model_'.ucfirst($model);
+			$modelID = 'Model_'.ucfirst($model);
 		}
+		self::$modelCache[$model] = $modelID;
+		return self::$modelCache[$model];
 	}
 
 	/**

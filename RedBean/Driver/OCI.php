@@ -15,12 +15,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @var boolean
 	 */
 	private $debug = false;
-	
-	/**
-	 * Holds an instance of ILogger implementation.
-	 * @var RedBean_ILogger
-	 */	
-	protected $logger = NULL;
+
 	/**
 	 * 
 	 * @var unknown_type
@@ -95,16 +90,16 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		}
 	}
 	
+	
 	/**
-	 * Gets RedBean_ILogger object.
+	 * Gets RedBean_Logger object.
 	 *
-	 * @return RedBean_ILogger
+	 * @return RedBean_Logger
 	 */	
-	public function setLogger( RedBean_ILogger $logger ) {
+	public function setLogger( RedBean_Logger $logger ) {
 		$this->logger = $logger;
 	}
-	
-	
+
 	public function setAutoCommit($toggle) {
 		$this->autocommit = (bool) $toggle;
 	}
@@ -292,7 +287,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @return void
 	 */
 	private function doBinding($sql, $aValues = array()) {
-
+		//echo $sql . PHP_EOL;
 		foreach ($aValues as $key => $value) {
 			$sql = preg_replace('/\?/', ' :SLOT' . $key . ' ', $sql, 1);
 		}
@@ -408,7 +403,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function setDebugMode( $tf, $logger = NULL ) {
 		$this->connect();
 		$this->debug = (bool)$tf;
-		if ($this->debug and !$logger) $logger = new RedBean_Logger();
+		if ($this->debug and !$logger) $logger = new RedBean_Logger_Default();
 		$this->setLogger($logger);
 	}
 
@@ -480,7 +475,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$e = oci_fetch_all($s, $output);
 		return $output['BANNER'][0];
 	}
-	
 
 }
 

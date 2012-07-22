@@ -70,7 +70,7 @@ class RedBean_OODB extends RedBean_Observable {
 		if ($writer instanceof RedBean_QueryWriter) {
 			$this->writer = $writer;
 		}
-		$this->beanhelper = new RedBean_BeanHelperFacade();
+		$this->beanhelper = new RedBean_BeanHelper_Facade();
 	}
 
 	/**
@@ -121,7 +121,6 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return RedBean_OODBBean $bean the new bean instance
 	 */
 	public function dispense($type ) {
-		$this->signal( 'before_dispense', $type );
 		$bean = new RedBean_OODBBean();
 		$bean->setBeanHelper($this->beanhelper);
 		$bean->setMeta('type',$type );
@@ -141,7 +140,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @return void
 	 */
-	public function setBeanHelper( RedBean_IBeanHelper $beanhelper) {
+	public function setBeanHelper( RedBean_BeanHelper $beanhelper) {
 		$this->beanhelper = $beanhelper;
 	}
 
@@ -549,7 +548,7 @@ class RedBean_OODB extends RedBean_Observable {
 		foreach($embeddedBeans as $linkField=>$embeddedBean) {
 			if (!$this->isFrozen) {
 				$this->writer->addIndex($bean->getMeta('type'),
-							'index_foreignkey_'.$embeddedBean->getMeta('type'),
+							'index_foreignkey_'.$bean->getMeta('type').'_'.$embeddedBean->getMeta('type'),
 							 $linkField);
 				$isDep = $this->isDependentOn($bean->getMeta('type'),$embeddedBean->getMeta('type'));
 				$this->writer->addFK($bean->getMeta('type'),$embeddedBean->getMeta('type'),$linkField,'id',$isDep);
@@ -577,7 +576,7 @@ class RedBean_OODB extends RedBean_Observable {
 				$this->store($addition);
 				if (!$this->isFrozen) {
 					$this->writer->addIndex($addition->getMeta('type'),
-						'index_foreignkey_'.$bean->getMeta('type'),
+						'index_foreignkey_'.$addition->getMeta('type').'_'.$bean->getMeta('type'),
 						 $myFieldLink);
 					$isDep = $this->isDependentOn($addition->getMeta('type'),$bean->getMeta('type'));
 					$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,'id',$isDep);
@@ -628,7 +627,6 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return RedBean_OODBBean $bean loaded bean
 	 */
 	public function load($type,$id) {
-		$this->signal('before_open',array('type'=>$type,'id'=>$id));
 		$bean = $this->dispense( $type );
 		if ($this->stash && isset($this->stash[$id])) {
 			$row = $this->stash[$id];
@@ -648,7 +646,7 @@ class RedBean_OODB extends RedBean_Observable {
 					if ($this->isFrozen) throw $e; //only throw if frozen;
 				}
 			}
-			if (!$rows) return $bean; // $this->dispense($type); -- no need...
+			if (empty($rows)) return $bean; // $this->dispense($type); -- no need...
 			$row = array_pop($rows);
 		}
 		foreach($row as $p=>$v) {

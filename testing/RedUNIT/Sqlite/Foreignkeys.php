@@ -35,24 +35,28 @@ class RedUNIT_Sqlite_Foreignkeys extends RedUNIT_Sqlite {
 		$fkbook = R::getAll('pragma foreign_key_list(book)');
 		$fkgenre = R::getAll('pragma foreign_key_list(book_genre)');
 		$fkpage = R::getAll('pragma foreign_key_list(page)');
-		$j = json_encode(array($fkbook,$fkgenre,$fkpage));
-		$json = '[[{"id":"0","seq":"0","table":"cover","from":"cover_id","to":"id","on_update":"SET NULL","on_delete":"SET NULL","match":"NONE"}],[{"id":"0","seq":"0","table":"book","from":"book_id","to":"id","on_update":"NO ACTION","on_delete":"CASCADE","match":"NONE"},{"id":"1","seq":"0","table":"genre","from":"genre_id","to":"id","on_update":"NO ACTION","on_delete":"CASCADE","match":"NONE"}],[{"id":"0","seq":"0","table":"book","from":"book_id","to":"id","on_update":"SET NULL","on_delete":"SET NULL","match":"NONE"}]]';
+	
 		
-		$j1 = json_decode($j,true);
-		$j2 = json_decode($json,true);
-		foreach($j1 as $jrow) {
-			$s = json_encode($jrow);
-			$found = 0;
-			foreach($j2 as $k=>$j2row) {
-				if (json_encode($j2row)===$s) {
-					pass();
-					unset($j2[$k]);
-					$found = 1;
-				}
-			}
-			if (!$found) fail();
+		
+		asrt($fkpage[0]['from'],'book_id');
+		asrt($fkpage[0]['to'],'id');
+		asrt($fkpage[0]['table'],'book');
+		
+		asrt(count($fkgenre),2);
+		
+		if ($fkgenre[0]['from']=='book') {
+			asrt($fkgenre[0]['to'],'id');
+			asrt($fkgenre[0]['table'],'book');
 		}
-				
-	}	
+		if ($fkgenre[0]['from']=='genre') {
+			asrt($fkgenre[0]['to'],'id');
+			asrt($fkgenre[0]['table'],'genre');
+		}
+		
+		asrt($fkbook[0]['from'],'cover_id');
+		asrt($fkbook[0]['to'],'id');
+		asrt($fkbook[0]['table'],'cover');
+		
+	}
 	
 }

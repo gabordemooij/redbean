@@ -74,7 +74,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param RedBean_IBeanHelper $helper
 	 * @return void
 	 */
-	public function setBeanHelper(RedBean_IBeanHelper $helper) {
+	public function setBeanHelper(RedBean_BeanHelper $helper) {
 		$this->beanHelper = $helper;
 	}
 
@@ -140,11 +140,20 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param boolean $meta
 	 * @return array $arr
 	 */
-	public function export($meta = false) {
+	public function export($meta = false, $parents = false, $onlyMe = false) {
 		//$arr = $this->properties;
 		$arr=array();
+		if ($parents) {
+			foreach($this as $k=>$v) {
+				if (substr($k,-3)=='_id') {
+					$prop = substr($k,0,strlen($k)-3);
+					$this->$prop;
+				}
+			}
+		}
 		foreach($this as $k=>$v) {
-			if (is_array($v)) foreach($v as $i=>$b) $v[$i]=$b->export(); 
+			if (!$onlyMe && is_array($v)) foreach($v as $i=>$b) $v[$i]=$b->export($meta,false,false);
+			if ($v instanceof RedBean_OODBBean) $v = $v->export($meta,$parents,true);
 			$arr[$k] = $v;
 		}
 		if ($meta) $arr['__info'] = $this->__info;

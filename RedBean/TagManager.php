@@ -35,7 +35,6 @@ class RedBean_TagManager {
 	 */
 	protected $redbean;
 	
-	
 	/**
 	 * Constructor,
 	 * creates a new instance of TagManager.
@@ -57,7 +56,8 @@ class RedBean_TagManager {
 	public function findTagByTitle($title) {
 		$beans = $this->redbean->find('tag',array('title'=>array($title)));
 		if ($beans) {
-			return reset($beans);
+			$bean = reset($beans);
+			return $bean;
 		}
 		return null;
 	}

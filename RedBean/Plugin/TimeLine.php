@@ -12,7 +12,7 @@
  * with this source code in the file license.txt.
  */
 
-class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger {
+class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedBean_Plugin {
 	
 	/**
 	 * Path to file to write SQL and comments to.

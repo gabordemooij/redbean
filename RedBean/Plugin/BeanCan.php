@@ -15,7 +15,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_BeanCan {
+class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 
 	/**
 	 * Holds a FUSE instance.
@@ -109,6 +109,11 @@ class RedBean_BeanCan {
 					$bean = RedBean_Facade::load($beanType,$data[0]);
 					RedBean_Facade::trash($bean);
 					return $this->resp('OK',$id);
+				case 'export':
+					if (!isset($data[0])) return $this->resp(null, $id, -32602,'First param needs to be Bean ID');
+					$bean = RedBean_Facade::load($beanType,$data[0]);
+					$array = RedBean_Facade::exportAll(array($bean),true);
+					return $this->resp($array,$id);
 				default:
 					$modelName = $this->modelHelper->getModelName( $beanType );
 					if (!class_exists($modelName)) return $this->resp(null, $id, -32601,'No such bean in the can!');

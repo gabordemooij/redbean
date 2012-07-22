@@ -10,7 +10,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_BeanHelperFacade implements RedBean_IBeanHelper {
+class RedBean_BeanHelper_Facade implements RedBean_BeanHelper {
 
 	/**
 	 * Returns a reference to the toolbox. This method returns a toolbox

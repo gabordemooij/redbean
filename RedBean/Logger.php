@@ -1,6 +1,6 @@
 <?php
 /**
- * RedBean class for Logging
+ * RedBean interface for Logging
  * 
  * @name    RedBean ILogger
  * @file    RedBean/ILogger.php
@@ -12,21 +12,14 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Logger implements RedBean_ILogger {
+interface RedBean_Logger {
 
   /**
-   * Default logger method logging to STDOUT
+   * Redbean will call this method to log your data
    *
    * @param ...
    */
-  public function log() {
-    if (func_num_args() > 0) {
-      foreach (func_get_args() as $argument) {
-        if (is_array($argument)) echo print_r($argument,true); else echo $argument;
-		echo "<br>\n";
-      }
-    }
-  }
+  public function log();
+
+
 }
-
-

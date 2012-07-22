@@ -35,7 +35,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$u2->login = 'e';
 		R::store($u1);
 		R::store($u2);
-		$list = R::getAssoc('select login,'.R::$writer->safeColumn('NAME').' from '.R::$writer->safeTable('USER').' ');
+		$list = R::getAssoc('select login,'.R::$writer->safeColumn('name').' from '.R::$writer->safeTable('user').' ');
 		asrt($list['e'],'Eric');
 		asrt($list['g'],'Gabor');
 		
@@ -43,7 +43,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$painting->name = 'Nighthawks';
 		$id=R::store($painting);
 		
-		$cooker = new RedBean_Cooker();
+		$cooker = new RedBean_Plugin_Cooker();
 		$cooker->setToolbox($toolbox);
 		try {
 			asrt($cooker->graph('abc'),'abc');
@@ -100,7 +100,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		asrt(strlen($adapter->getDatabase()->getDatabaseType())>0,true);
 		 
 		
-		R::nuke();		
+		R::nuke();
 		$track = R::dispense('track');
 		$album = R::dispense('cd');
 		$track->name = 'a';
@@ -125,7 +125,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$s2->role = 'student';
 		$s->name = 'a';
 		$s2->name = 'b';
-		$role = R::$writer->safeColumn('ROLE');
+		$role = R::$writer->safeColumn('role');
 		R::associate($t, $s);
 		R::associate($t, $s2);
 		$students = R::related($t, 'person', sprintf(' %s  = ? ',$role),array("student"));
