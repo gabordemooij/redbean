@@ -43,6 +43,7 @@ require($dir.'Logger.php');
 require($dir.'Logger/Default.php');
 require($dir.'Driver.php');
 require($dir.'Driver/PDO.php');
+require($dir.'Driver/OCI.php');
 
 //Load Infrastructure
 require($dir.'OODBBean.php');
@@ -60,6 +61,7 @@ require($dir.'QueryWriter/MySQL.php');
 require($dir.'QueryWriter/SQLiteT.php');
 require($dir.'QueryWriter/PostgreSQL.php');
 require($dir.'QueryWriter/CUBRID.php');
+require($dir.'QueryWriter/Oracle.php');
 
 //Load required Exceptions
 require($dir.'Exception.php');
@@ -89,6 +91,14 @@ require($dir.'SQLHelper.php');
 
 require($dir.'DependencyInjector.php');
 require($dir.'DuplicationManager.php');
+
+require($dir.'Plugin.php');
+require($dir.'Plugin/BeanExport.php');
+require($dir.'Plugin/QueryLogger.php');
+require($dir.'Plugin/TimeLine.php');
+require($dir.'Plugin/BeanCan.php');
+require($dir.'Plugin/Cooker.php');
+require($dir.'Plugin/Cache.php');
 
 
 class R extends RedBean_Facade{}

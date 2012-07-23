@@ -35,7 +35,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer 
 		//Unit test for dependency
 		R::nuke();
 		$can = $this->createBeanInCan();
-		asrt(1, R::count('bean'));
+		asrt(R::count('bean'), 1);
 		R::trash($can);
 		asrt(1, R::count('bean')); //bean stays.
 		R::nuke();
@@ -82,7 +82,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer 
 		$this->queries = array();
 		$account->ownPlayer[] = $player;
 		R::store($account);
-		asrt(strpos(implode(',',$this->queries),'index_foreignkey_player_account')!==false,true);
+		asrt(strpos(implode(',',$this->queries),'index_foreignkey_player_accoun')!==false,true);
 		R::nuke();
 		$this->queries = array();
 		$account = R::dispense('account');
@@ -94,7 +94,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer 
 		$this->queries = array();
 		$player->account = $account;
 		R::store($player);
-		asrt(strpos(implode(',',$this->queries),'index_foreignkey_player_account')!==false,true);
+		asrt(strpos(implode(',',$this->queries),'index_foreignkey_player_accoun')!==false,true);
 		
 		
 	}

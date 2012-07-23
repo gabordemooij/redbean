@@ -13,14 +13,14 @@
  * with this source code in the file license.txt.
  */
 class RedUNIT_Base_Database extends RedUNIT_Base {
-	
+
 	/**
 	 * What drivers should be loaded for this test pack? 
 	 */
 	public function getTargetDrivers() {
 		return array('mysql','pgsql','sqlite','CUBRID');
 	}
-	
+
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
@@ -42,12 +42,12 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 		}catch(RedBean_Exception_SQL $e ) {
 			pass();
 		}
-		asrt( (int) $adapter->getCell("SELECT 123") ,123);
+		asrt( (int) $adapter->getCell("SELECT 123 FROM DUAL") ,123);
 		$page->aname = "my page";
 		$id = (int) $redbean->store($page);
 		asrt( (int) $page->id, 1 );
 		asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 1 );
-		asrt( $pdo->GetCell("SELECT aname FROM page LIMIT 1"), "my page" );
+		asrt( $pdo->GetCell("SELECT aname FROM page WHERE ROWNUM<=1"), "my page" );
 		asrt( (int) $id, 1 );
 		
 		$page = $redbean->load( "page", 1 );
@@ -77,9 +77,14 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 			asrt($room,$key);
 			
 		}
-		$rooms = R::getAssoc('SELECT `number`, kind FROM rooms2 ORDER BY kind ASC');
+		$rooms = R::getAssoc('SELECT '.R::$writer->safeColumn('number').', kind FROM rooms2 ORDER BY kind ASC');
 		asrt(count($rooms),0);
 		asrt(is_array($rooms),true);
-		
+		$date = R::dispense('mydate');
+		$date->date= '2012-12-12 20:50';
+		$date->time = '12:15';
+		$id =R::store($date);
+		$ok = R::load('mydate',1);
+			
 	}
 }

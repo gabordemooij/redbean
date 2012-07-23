@@ -15,7 +15,12 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @var boolean
 	 */
 	private $debug = false;
-
+	
+	/**
+	 * Holds an instance of ILogger implementation.
+	 * @var RedBean_ILogger
+	 */	
+	protected $logger = NULL;
 	/**
 	 * 
 	 * @var unknown_type
@@ -44,6 +49,9 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @var boolean
 	 */
 	protected $isConnected = false;
+	
+	private $nlsDateFormat = 'YYYY-MM-DD HH24:MI:SS';
+	private $nlsTimeStampFormat = 'YYYY-MM-DD HH24:MI:SS.FF';
 
 	const OCI_NO_SUCH_TABLE = '942';
 	const OCI_NO_SUCH_COLUMN = '904';
@@ -91,15 +99,33 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	}
 	
 	
+	public function getNlsDateFormat(){
+		return $this->nlsDateFormat;
+	}
+	public function setNlsDateFormat($nlsDateFormat){
+		$this->nlsDateFormat = $nlsDateFormat;
+	}
+	
+	
+	public function getNlsTimestampFormat(){
+		return $this->nlsTimeStampFormat;
+	}
+	public function setNlsTimestampFormat($nlsTimestampFormat){
+		$this->nlsTimeStampFormat = $nlsTimestampFormat;
+	}
+		
+	
+	
 	/**
-	 * Gets RedBean_Logger object.
+	 * Gets RedBean_ILogger object.
 	 *
-	 * @return RedBean_Logger
+	 * @return RedBean_ILogger
 	 */	
-	public function setLogger( RedBean_Logger $logger ) {
+	public function setLogger( RedBean_ILogger $logger ) {
 		$this->logger = $logger;
 	}
-
+	
+	
 	public function setAutoCommit($toggle) {
 		$this->autocommit = (bool) $toggle;
 	}
@@ -125,7 +151,9 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			print_r($e);
 			$this->isConnected = false;
 		} else {
-			$s = oci_parse($this->connection, "alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS'");
+			$s = oci_parse($this->connection, "alter session set nls_date_format='$this->nlsDateFormat'");
+			$e = oci_execute($s);
+			$s = oci_parse($this->connection, "alter session set nls_timestamp_format='$this->nlsTimeStampFormat'");
 			$e = oci_execute($s);
 			$this->isConnected = true;
 		}
@@ -287,7 +315,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @return void
 	 */
 	private function doBinding($sql, $aValues = array()) {
-		//echo $sql . PHP_EOL;
+
 		foreach ($aValues as $key => $value) {
 			$sql = preg_replace('/\?/', ' :SLOT' . $key . ' ', $sql, 1);
 		}
@@ -403,7 +431,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function setDebugMode( $tf, $logger = NULL ) {
 		$this->connect();
 		$this->debug = (bool)$tf;
-		if ($this->debug and !$logger) $logger = new RedBean_Logger_Default();
+		if ($this->debug and !$logger) $logger = new RedBean_Logger();
 		$this->setLogger($logger);
 	}
 
@@ -475,6 +503,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$e = oci_fetch_all($s, $output);
 		return $output['BANNER'][0];
 	}
+	
 
 }
 

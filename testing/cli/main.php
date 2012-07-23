@@ -2,7 +2,7 @@
 
 function loadfiles() {
 	
-	require_once "testcontainer/rb.php";
+	require_once "../../RedBean/redbean.inc.php";
   	
 	require "../RedUNIT.php";
     require "../helpers/selector.php";	

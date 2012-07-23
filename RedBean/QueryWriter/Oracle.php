@@ -72,17 +72,16 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	const C_DATATYPE_TEXT32 = 6;
 
 	/**
-	 * Special type date for storing date values: YYYY-MM-DD
+	 * Special type date for storing date values: YYYY-MM-DD or YYYY-MM-DD HH:MM(:SS)
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_DATE = 80;
 
 	/**
-	 * Special type datetime for store date-time values: YYYY-MM-DD HH:II:SS
+	 * Special type date for storing date values: YYYY-MM-DD HH:MM:SS.FF
 	 * @var integer
-	 */
-	const C_DATATYPE_SPECIAL_DATETIME = 81;
-
+	 */	
+	const C_DATATYPE_SPECIAL_TIMESTAMP = 81;
 
 	/**
 	 * 
@@ -121,27 +120,19 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 
 		$this->adapter = $a;
 		$this->typeno_sqltype = array(
-			RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL => 'number(1,0)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_UINT8 => 'number(3,0)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 => 'number(11,0)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_DOUBLE => 'float',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT8 => 'nvarchar2(255)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT16 => 'nvarchar2(2000)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT32 => 'clob',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE => 'date',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATETIME => 'date',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_POINT => 'point',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_LINESTRING => 'linestring',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_GEOMETRY => 'geometry',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_POLYGON => 'polygon',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_MULTIPOINT => 'multipoint',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_MULTIPOLYGON => 'multipolygon',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION => 'geometrycollection',
-		);
+			RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL => 'NUMBER(1,0)',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_UINT8 => 'NUMBER(3,0)',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 => 'NUMBER(11,0)',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_DOUBLE => 'FLOAT',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT8 => 'NVARCHAR2(255)',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT16 => 'NVARCHAR2(2000)',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT32 => 'CLOB',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE => 'DATE',
+			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP => 'TIMESTAMP(6)');
 
 		$this->sqltype_typeno = array();
 		foreach ($this->typeno_sqltype as $k => $v)
-			$this->sqltype_typeno[trim(strtolower($v))] = $k;
+			$this->sqltype_typeno[$v] = $k;
 	}
 
 	/**
@@ -365,6 +356,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 					$columns[$field] = $r['data_type'] . '(' . ($r['data_length'] / 2) . ')';
 					break;
 				case 'FLOAT':
+				case 'TIMESTAMP(6)':
 				case 'CLOB':
 				case 'DATE':
 					$columns[$field] = $r['data_type'];
@@ -387,7 +379,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return integer $typecode code
 	 */
 	public function code($typedescription, $includeSpecials = false) {
-		$r = ((isset($this->sqltype_typeno[strtolower($typedescription)])) ? $this->sqltype_typeno[strtolower($typedescription)] : self::C_DATATYPE_SPECIFIED);
+		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
 		if ($includeSpecials)
 			return $r;
 		if ($r > self::C_DATATYPE_SPECIFIED)
@@ -585,6 +577,15 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			return RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL;
 		}
 
+		if ($flagSpecial) {
+
+			if (preg_match('/^\d{4}\-\d\d-\d\d(\s\d\d:\d\d(:\d\d)?)?$/', $value)) {
+				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE;
+			}
+			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d.\d\d$/', $value)) {
+				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP;
+			}
+		}
 		$value = strval($value);
 		if (!$this->startsWithZeros($value)) {
 
@@ -620,7 +621,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function wipe($type) {
 		$table = $type;
-		$table = strtoupper($this->safeTable($table));
+		$table = $this->safeTable($table);
 		$sql = "TRUNCATE TABLE $table ";
 		$this->adapter->exec($sql);
 	}

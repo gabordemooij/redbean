@@ -14,12 +14,12 @@
  */
 class RedUNIT_Base_Keywords extends RedUNIT_Base {
 
-	/**
-	 * What drivers should be loaded for this test pack? 
-	 */
-	public function getTargetDrivers() {
-		return array('mysql','pgsql','sqlite'); //CUBRID excluded for now.
-	}
+//	/**
+//	 * What drivers should be loaded for this test pack? 
+//	 */
+//	public function getTargetDrivers() {
+//		return array('mysql','pgsql','sqlite'); //CUBRID excluded for now.
+//	}
 	
 	/**
 	 * Begin testing.
@@ -29,8 +29,8 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base {
 	 */
 	public function run() {
 		
-		$keywords = array('anokeyword','znokeyword','group','DROP','inner','JOIN','select',
-		'table','int','cascade','float','CALL','in','status','order',
+		$keywords = array('anokeyword','znokeyword','group','drop','inner','join','select',
+		'table','int','cascade','float','call','in','status','order',
 		'limit','having','else','if','while','distinct','like');
 		
 		$counter = 0;
