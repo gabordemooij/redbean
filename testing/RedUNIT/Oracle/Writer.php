@@ -64,10 +64,12 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle {
 		asrt($writer->scanType("abc"),4);
 		asrt($writer->scanType(str_repeat('abcd',100000)),RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32);
 		
-		asrt($writer->scanType("2001-10-10",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE);
-		asrt($writer->scanType("2001-10-10 10:00:00",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME);
+		asrt($writer->scanType("2001-10-10",true),  RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE);
+		asrt($writer->scanType("2001-10-10 10:00:00",true),RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE);
+		asrt($writer->scanType("2001-10-10 10:00:00.99",true),RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP);		
 		asrt($writer->scanType("2001-10-10"),4);
 		asrt($writer->scanType("2001-10-10 10:00:00"),4);
+		asrt($writer->scanType("2001-10-10 10:00:00.99"),4);	
 		//asrt($writer->scanType("POINT(1 2)",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT);
 		//asrt($writer->scanType("POINT(1 2)"),4);
 		asrt($writer->scanType(str_repeat("lorem ipsum",100)),5);
@@ -290,15 +292,20 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle {
 		R::store($bean);
 		$cols = R::getColumns('bean');
 		asrt($cols['date'],'DATE');
-//		$bean = R::dispense('bean');
-//		$bean->date = 'soon';
-//		R::store($bean);
-//		$cols = R::getColumns('bean');
-//		asrt($cols['date'],'datetime');
-//		$this->setGetSpatial('POINT(1 2)');
-//		$this->setGetSpatial('LINESTRING(3 3,4 4)');
-//		$this->setGetSpatial('POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))');
-//		$this->setGetSpatial('MULTIPOINT(0 0,20 20,60 60)');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->date = '2011-10-10 10:00';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['date'],'DATE');		
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->date = '2011-10-10 10:00:20.99';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['date'],'TIMESTAMP(6)');		
 		
 		try{
 			$bean = R::dispense('bean');
