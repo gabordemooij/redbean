@@ -18,3 +18,5 @@
 ehthumbs.db
 Icon?
 Thumbs.db
+/nbproject/private/
+/testing/cli/report/

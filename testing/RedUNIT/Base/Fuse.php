@@ -49,9 +49,11 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base {
 		R::tag($blog,array("smart","interesting","lousy!"));
 		pass();
 		}catch(RedBean_Exception $e){ fail(); }
-		asrt(implode(',',R::tag($blog)),"smart,interesting,lousy!");
+
+        $tags = R::tag($blog);
+		asrt( in_array('smart', $tags) && in_array('interesting',$tags) && in_array('lousy!',$tags),true);
+		//asrt(implode(',',R::tag($blog)),"smart,interesting,lousy!");
 		
-		asrt(implode(",",R::tag($blog)),"smart,interesting,lousy!");
 		R::untag($blog,array("smart","interesting"));
 		asrt(implode(",",R::tag($blog)),"lousy!");
 		asrt(R::hasTag($blog,array("lousy!")),true);

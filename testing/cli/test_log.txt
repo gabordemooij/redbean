@@ -1,0 +1,34 @@
+-- 2012-06-21 20:19 | Creating new table. 
+CREATE TABLE "BEAN"(
+                ID NUMBER(11) NOT NULL,  
+                CONSTRAINT BEAN_PK PRIMARY KEY (ID)
+                )
+
+-- 2012-06-21 20:19 | Creating new table. 
+CREATE SEQUENCE BEAN_SEQ
+            START WITH 1 
+            INCREMENT BY 1
+            NOCACHE
+
+-- 2012-06-21 20:19 | Creating new table. 
+CREATE OR REPLACE TRIGGER BEAN_SEQ_TRI
+            BEFORE INSERT ON "BEAN"
+            FOR EACH ROW
+            BEGIN
+            SELECT BEAN_SEQ.NEXTVAL
+            INTO   :NEW.ID
+            FROM   DUAL;
+            END BEAN_SEQ_TRI;
+
+-- 2012-06-21 20:19 | Altering table. 
+ALTER TABLE "BEAN" ADD "NAME" NUMBER(1,0) 
+
+-- 2012-06-21 20:19 | Altering table. 
+ALTER TABLE "BEAN" ADD (HOPEFULLYNOTEXIST NVARCHAR2(255))
+
+-- 2012-06-21 20:19 | Altering table. 
+ALTER TABLE "BEAN" DROP COLUMN "NAME"
+
+-- 2012-06-21 20:19 | Altering table. 
+ALTER TABLE "BEAN" RENAME COLUMN HOPEFULLYNOTEXIST TO "NAME"
+
