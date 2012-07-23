@@ -49,6 +49,9 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @var boolean
 	 */
 	protected $isConnected = false;
+	
+	private $nlsDateFormat = 'YYYY-MM-DD HH24:MI:SS';
+	private $nlsTimeStampFormat = 'YYYY-MM-DD HH24:MI:SS.FF';
 
 	const OCI_NO_SUCH_TABLE = '942';
 	const OCI_NO_SUCH_COLUMN = '904';
@@ -95,6 +98,24 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		}
 	}
 	
+	
+	public function getNlsDateFormat(){
+		return $this->nlsDateFormat;
+	}
+	public function setNlsDateFormat($nlsDateFormat){
+		$this->nlsDateFormat = $nlsDateFormat;
+	}
+	
+	
+	public function getNlsTimestampFormat(){
+		return $this->nlsTimeStampFormat;
+	}
+	public function setNlsTimestampFormat($nlsTimestampFormat){
+		$this->nlsTimeStampFormat = $nlsTimestampFormat;
+	}
+		
+	
+	
 	/**
 	 * Gets RedBean_ILogger object.
 	 *
@@ -130,7 +151,9 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			print_r($e);
 			$this->isConnected = false;
 		} else {
-			$s = oci_parse($this->connection, "alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS'");
+			$s = oci_parse($this->connection, "alter session set nls_date_format='$this->nlsDateFormat'");
+			$e = oci_execute($s);
+			$s = oci_parse($this->connection, "alter session set nls_timestamp_format='$this->nlsTimeStampFormat'");
 			$e = oci_execute($s);
 			$this->isConnected = true;
 		}
