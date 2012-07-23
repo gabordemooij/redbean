@@ -74,10 +74,19 @@ class RedUNIT_Oracle_Database extends RedUNIT_Oracle {
 		asrt(count($rooms),0);
 		asrt(is_array($rooms),true);
 		$date = R::dispense('mydate');
-		$date->date= '2012-12-12 20:50';
+		$date->date1='2012-01-12';
+		$date->date2= '2012-12-12 20:50';
+		$date->date3= '2012-12-12 20:50:00';
+		$date->date4='2012-12-12 20:50:55.78';
 		$date->time = '12:15';
 		$id =R::store($date);
 		$ok = R::load('mydate',1);
+		
+		asrt($ok->date1,'2012-01-12 00:00:00');
+		asrt($ok->date2,'2012-12-12 20:50:00');
+		asrt($ok->date3,'2012-12-12 20:50:00');
+		asrt($ok->date4,'2012-12-12 20:50:55.780000');
+		asrt($ok->time,'12:15');
 			
 	}
 }
