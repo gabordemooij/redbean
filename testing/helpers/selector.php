@@ -85,7 +85,7 @@ $allPacks = array(
 		'Blackhole/Meta',
 		'Blackhole/Import',
 		'Blackhole/Export',
-		'Blackhole/Misc',
+		
 		'Base/Dispense',
 		'Base/Boxing',
 		'Base/Typechecking',
@@ -140,6 +140,7 @@ $allPacks = array(
 		'Sqlite/Writer',
 		'Sqlite/Rebuild',
 		'Base/Timeline',
+		'Blackhole/Misc',
 		'Base/Close'
 );
 
