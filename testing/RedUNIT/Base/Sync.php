@@ -4,6 +4,10 @@
  * @file 			RedUNIT/Base/Sync.php
  * @description		Tests sync functionality.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
+ *					This class tests whether we can sync() two schemas 
+ *					and also tests whether we can sync between two different
+ *					database systems, for instance PostgreSQL -> MySQL etc.
+ *					All combinations are tested. 
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -15,6 +19,14 @@
 class RedUNIT_Base_Sync extends RedUNIT_Base {
 	
 	
+	/**
+	 * Dispense an artist named Monet and add a painting of a garden with
+	 * a bridge and ten lillies floating on the water as well as another 
+	 * painting of a lady in a garden. And before we dream away at the
+	 * sight of these pictures return the primary key of Monet.
+	 * 
+	 * @return integer $id 
+	 */
 	private function createAPaintiningByMonet() {
 		$artist = R::dispense('monet');
 		$paintings = R::dispense('painting',2);
@@ -42,10 +54,8 @@ class RedUNIT_Base_Sync extends RedUNIT_Base {
 		testpack('Test Schema Syncing. Setup...');
 		R::nuke();
 		$this->createAPaintiningByMonet();
-		
 		$source = R::$toolbox;
 		$sync = new RedBean_Plugin_Sync;
-		
 		foreach(R::$toolboxes as $toolbox) {
 			if ($toolbox!==R::$toolbox) {
 				testpack('Testing schema sync from '.get_class($source->getWriter()).' to: -> '.get_class($toolbox->getWriter()));
@@ -81,10 +91,7 @@ class RedUNIT_Base_Sync extends RedUNIT_Base {
 				}
 				R::freeze(false);
 				R::configureFacadeWithToolbox($source);
-				
 			}
 		}
-		
 	}
-	
 }
