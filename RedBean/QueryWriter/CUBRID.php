@@ -470,6 +470,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$keys = $this->getKeys($targetTableNoQ,$tableNoQ);
 		$needsToAddFK = true;
 		$needsToDropFK = false;
+		echo "---> $type $targetType $field $targetField $isDep <--- \n";
+		print_r($keys);
 		foreach($keys as $key) {
 			if ($key['FKTABLE_NAME']==$tableNoQ && $key['FKCOLUMN_NAME']==$columnNoQ) { 
 				//already has an FK
@@ -477,7 +479,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 				if ((($isDep && $key['DELETE_RULE']==0) || (!$isDep && $key['DELETE_RULE']==3))) {
 					return false;
 				}
-				
+				break;
 			}
 		}
 		
