@@ -88,7 +88,5 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 				$targetWriter->addConstraint(R::dispense($types[0]), R::dispense($types[1]));
 			}
 		}
-		return $this->sqlCode;
 	}
-
 }
