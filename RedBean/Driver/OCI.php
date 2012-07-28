@@ -1,7 +1,23 @@
 <?php
-
+/**
+ * RedBean OCI Driver 
+ *
+ * @file				RedBean/Driver/OCI.php
+ * @description			OCI Driver for RedBeanPHP. The OCI
+ *						driver is required to facilitate a connection to 
+ *						an Oracle database.
+ *						Stephane Gerber
+ * @license				BSD/GPLv2
+ *
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt. 
+ */
 class RedBean_Driver_OCI implements RedBean_Driver {
 
+	/**
+	 * Database connection string
+	 * @var string 
+	 */
 	private $dsn;
 
 	/**
@@ -98,23 +114,41 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		}
 	}
 	
-	
+	/**
+	 * @todo add Documentation
+	 * 
+	 * @return type 
+	 */
 	public function getNlsDateFormat(){
 		return $this->nlsDateFormat;
 	}
+	
+	/**
+	 * @todo add Documentation
+	 * 
+	 * @return type 
+	 */
 	public function setNlsDateFormat($nlsDateFormat){
 		$this->nlsDateFormat = $nlsDateFormat;
 	}
 	
-	
+	/**
+	 * @todo add Documentation
+	 * 
+	 * @return type 
+	 */
 	public function getNlsTimestampFormat(){
 		return $this->nlsTimeStampFormat;
 	}
+	
+	/**
+	 * @todo add Documentation
+	 * 
+	 * @return type 
+	 */
 	public function setNlsTimestampFormat($nlsTimestampFormat){
 		$this->nlsTimeStampFormat = $nlsTimestampFormat;
 	}
-		
-	
 	
 	/**
 	 * Gets RedBean_Logger object.
@@ -125,7 +159,11 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$this->logger = $logger;
 	}
 	
-	
+	/**
+	 * Toggles auto-commit.
+	 * 
+	 * @param boolean $toggle 
+	 */
 	public function setAutoCommit($toggle) {
 		$this->autocommit = (bool) $toggle;
 	}

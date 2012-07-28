@@ -1,7 +1,24 @@
 <?php
-
+/**
+ * RedBean Oracle Driver
+ *
+ * @file			RedBean/QueryWriter/Oracle.php
+ * @description		Query Writer for Oracle databases.
+ * 
+ * @author			Stephane Gerber
+ * @license			BSD/GPLv2
+ *
+ *
+ * RedBeanPHP Community
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
+ */
 class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 
+	/**
+	 * Adapter
+	 * @var RedBean_Adapter 
+	 */
 	protected $adapter;
 
 	/**
@@ -106,16 +123,36 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	const C_DATATYPE_SPECIAL_MULTIPOLYGON = 105;
 	const C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION = 106;
 
-	
+	/**
+	 * Do everything that needs to be done to format a column name.
+	 *
+	 * @param string $name of column
+	 *
+	 * @return string $column name
+	 */
 	public function safeColumn($c,$q=false) {
 			return parent::safeColumn((!$q) ? strtoupper($c):$c,$q);
 	}
 
+	/**
+	 * Do everything that needs to be done to format a column name.
+	 *
+	 * @param string $name of column
+	 *
+	 * @return string $column name
+	 */
 	public function safeTable($type,$q=false) {
 			return parent::safeTable((!$q) ? strtoupper($type) : $type,$q);
 	}
 
 	
+	/**
+	 * Do everything that needs to be done to format a table name.
+	 *
+	 * @param string $name of table
+	 *
+	 * @return string table name
+	 */
 	public function __construct(RedBean_Adapter $a) {
 
 		$this->adapter = $a;
@@ -228,6 +265,11 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		return parent::count(strtoupper($beanType));
 	}
 
+	/**
+	 * Returns all tables in the database.
+	 *
+	 * @return array $tables tables
+	 */
 	public function getTables() {
 		return $this->adapter->getCol('SELECT LOWER(table_name) FROM user_tables');
 	}
@@ -342,6 +384,13 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		return self::C_DATATYPE_UINT32;
 	}
 
+	/**
+	 * Returns an array containing the column names of the specified table.
+	 *
+	 * @param string $table table
+	 *
+	 * @return array $columns columns
+	 */
 	public function getColumns($table) {
 		$table = $this->safeTable($table, true);
 		$columnsRaw = $this->adapter->get("SELECT LOWER(COLUMN_NAME) COLUMN_NAME, DATA_TYPE, DATA_LENGTH, DATA_PRECISION FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = UPPER('$table')");
@@ -411,29 +460,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		$this->adapter->exec("ALTER TABLE $table RENAME COLUMN HOPEFULLYNOTEXIST TO $column");
 	}
 
-	public function deleteRecord($table, $id) {
-		throw new Exception('Not defined');
-		$this->deleteRecordArguments = array($table, "id", $id);
-		return $this->returnDeleteRecord;
-	}
-
-	public function selectByCrit($select, $table, $column, $value, $withUnion = false) {
-		throw new Exception('Not defined');
-		$this->selectByCritArguments = array($select, $table, $column, $value, $withUnion);
-		return $this->returnSelectByCrit;
-	}
-
-	public function deleteByCrit($table, $crits) {
-		throw new Exception('Not defined');
-		$this->deleteByCrit = array($table, $crits);
-		return $this->returnDeleteByCrit;
-	}
-
-	public function getIDField($type) {
-		return "id";
-	}
-
-
 	/**
 	 * Tests whether a given SQL state is in the list of states.
 	 *
@@ -451,6 +477,13 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list);
 	}
 
+	/**
+	 * @todo Add documentation
+	 * 
+	 * @param integer $id
+	 * 
+	 * @return mixed $returnValue 
+	 */
 	private function limitOracleIdentifierLength($id) {
 		return substr($id, 0, 30);
 	}
@@ -647,5 +680,4 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 
 			END;");
 	}
-
 }
