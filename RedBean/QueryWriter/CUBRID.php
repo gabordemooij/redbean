@@ -470,8 +470,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$keys = $this->getKeys($targetTableNoQ,$tableNoQ);
 		$needsToAddFK = true;
 		$needsToDropFK = false;
-		echo "---> $type $targetType $field $targetField $isDep <--- \n";
-		print_r($keys);
 		foreach($keys as $key) {
 			if ($key['FKTABLE_NAME']==$tableNoQ && $key['FKCOLUMN_NAME']==$columnNoQ) { 
 				//already has an FK
@@ -487,11 +485,9 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			$sql = "ALTER TABLE $table DROP FOREIGN KEY {$key['FK_NAME']} ";
 			$this->adapter->exec($sql);
 		}
-		
 		$casc = ($isDep ? 'CASCADE' : 'SET NULL');
 		$sql = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
 		$this->adapter->exec($sql);
-		
 	}	
 	
 	
