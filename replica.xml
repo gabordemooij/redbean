@@ -13,7 +13,7 @@
 		<item type="txt">RedBean/license.txt</item>
 		<item type="php">RedBean/Driver.php</item>
 		<item type="php">RedBean/Driver/PDO.php</item>
-		<item type="php">RedBean/Driver/OCI.php</item>
+		<item type="php" flavour="oci">RedBean/Driver/OCI.php</item>
 		<item type="php">RedBean/OODBBean.php</item>
 		<item type="php">RedBean/Observable.php</item>
 		<item type="php">RedBean/Observer.php</item>
@@ -25,7 +25,7 @@
 		<item type="php">RedBean/QueryWriter/SQLiteT.php</item>
 		<item type="php">RedBean/QueryWriter/PostgreSQL.php</item>
 		<item type="php">RedBean/QueryWriter/CUBRID.php</item>
-		<item type="php">RedBean/QueryWriter/Oracle.php</item>
+		<item type="php" flavour="oci">RedBean/QueryWriter/Oracle.php</item>
 		<item type="php">RedBean/Exception.php</item>
 		<item type="php">RedBean/Exception/SQL.php</item>
 		<item type="php">RedBean/Exception/Security.php</item>
