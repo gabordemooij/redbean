@@ -108,7 +108,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 *
 	 * @param RedBean_DBAdapter $adapter adapter
 	 */
-	public function __construct( RedBean_Adapter_DBAdapter $adapter ) {
+	public function __construct( RedBean_Adapter $adapter ) {
 		
 		
 		$this->typeno_sqltype = array(

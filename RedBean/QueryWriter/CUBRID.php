@@ -477,7 +477,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 				if ((($isDep && $key['DELETE_RULE']==0) || (!$isDep && $key['DELETE_RULE']==3))) {
 					return false;
 				}
-				
+				break;
 			}
 		}
 		
@@ -485,11 +485,9 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			$sql = "ALTER TABLE $table DROP FOREIGN KEY {$key['FK_NAME']} ";
 			$this->adapter->exec($sql);
 		}
-		
 		$casc = ($isDep ? 'CASCADE' : 'SET NULL');
 		$sql = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
 		$this->adapter->exec($sql);
-		
 	}	
 	
 	
