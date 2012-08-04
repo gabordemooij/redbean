@@ -1109,9 +1109,9 @@ class RedBean_Facade {
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 * 
-	 * @param RedBean_DatabaseAdapter $adapter 
+	 * @param RedBean_Adapter $adapter 
 	 */
-	public static function setDatabaseAdapter(RedBean_DatabaseAdapter $adapter) {
+	public static function setDatabaseAdapter(RedBean_Adapter $adapter) {
 		self::$adapter = $adapter;
 	}
 
