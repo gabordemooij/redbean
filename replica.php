@@ -19,13 +19,14 @@ foreach($items as $item) {
    }
 }
 foreach($code as $f=>$codeFlav) {
-$code[$f] .= "
 
+$m = array(array());
+preg_match_all('/@plugin\s+.*/',$codeFlav,$m);
+$code[$f] .= "
 class R extends RedBean_Facade{
+  ".str_replace('@plugin','',trim(implode("\n",$m[0])))." 
 }
 ";
-
-
 
 //Clean php tags and whitespace from codebase.
 $code[$f] = "<?php ".str_replace( array("<?php", "<?", "?>"), array("", "", ""), $code[$f]);
