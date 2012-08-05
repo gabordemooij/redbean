@@ -2,6 +2,9 @@
 /**
  * RedBean Cooker
  * @file			RedBean/Cooker.php
+ * 
+ * @plugin			public static function graph($array,$filterEmpty=false) { $c = new RedBean_Plugin_Cooker(); $c->setToolbox(self::$toolbox);return $c->graph($array,$filterEmpty);}
+ * 
  * @description		Turns arrays into bean collections for easy persistence.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2

@@ -873,24 +873,6 @@ class RedBean_Facade {
 		return $oldTools;
 	}
 
-
-
-	/**
-	 * facade method for Cooker Graph.
-	 *
-	 * @param array   $array            array containing POST/GET fields or other data
-	 * @param boolean $filterEmptyBeans whether you want to exclude empty beans
-	 *
-	 * @return array $arrayOfBeans Beans
-	 */
-	public static function graph($array,$filterEmpty=false) {
-		$cooker = new RedBean_Plugin_Cooker();
-		$cooker->setToolbox(self::$toolbox);
-		return $cooker->graph($array,$filterEmpty);
-	}
-
-
-
 	/**
 	 * Facade Convience method for adapter transaction system.
 	 * Begins a transaction.
@@ -1066,16 +1048,7 @@ class RedBean_Facade {
 		}
 	}
 
-	/**
-	 * Activates TimeLine Schema Alteration monitoring and
-	 * Query logging.
-	 *
-	 * @param type $filename
-	 */
-	public static function log($filename) {
-		$tl = new RedBean_Plugin_TimeLine($filename);
-		self::$adapter->addEventListener('sql_exec',$tl);
-	}
+	
 
 
 	/**

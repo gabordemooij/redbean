@@ -4,6 +4,9 @@
  *
  * @file 			RedBean/Plugin/TimeLine.php
  * @description		Monitors schema changes to ease deployment.
+ * 
+ * @plugin			public static function log($filename) { $tl = new RedBean_Plugin_TimeLine($filename); self::$adapter->addEventListener('sql_exec',$tl);}
+ * 
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *

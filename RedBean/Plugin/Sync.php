@@ -4,6 +4,8 @@
  *
  * @file                       RedBean/Plugin/Sync.php
  * @description                Plugin for Synchronizing databases.
+ * 
+ * @plugin					   public static function sync($from,$to) { return RedBean_Plugin_Sync::plugin($a,$b); }
  *
  * @author                     Gabor de Mooij
  * @license                    BSD
