@@ -1,13 +1,13 @@
 <?php
 /**
  * RedUNIT_Base_Sync 
- * @file 			RedUNIT/Base/Sync.php
- * @description		Tests sync functionality.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- *					This class tests whether we can sync() two schemas 
- *					and also tests whether we can sync between two different
- *					database systems, for instance PostgreSQL -> MySQL etc.
- *					All combinations are tested. 
+ * @file 			RedUNIT/Plugin/Sync.php
+ * @description			Tests sync functionality.
+ * 				This class is part of the RedUNIT test suite for RedBeanPHP.
+ *				This class tests whether we can sync() two schemas 
+ *				and also tests whether we can sync between two different
+ *				database systems, for instance PostgreSQL -> MySQL etc.
+ *				All combinations are tested. 
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -16,7 +16,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Sync extends RedUNIT_Base {
+class RedUNIT_Plugin_Sync extends RedUNIT_Base {
 	
 	
 	/**
@@ -53,10 +53,10 @@ class RedUNIT_Base_Sync extends RedUNIT_Base {
 		
 		testpack('Test Schema Syncing. Setup...');
 		R::nuke();
-		$this->createAPaintiningByMonet();
 		$source = R::$toolbox;
-		$sync = new RedBean_Plugin_Sync;
-		foreach(R::$toolboxes as $toolbox) {
+		foreach(R::$toolboxes as $sKey=>$tb) if ($tb===$source) { $sourceKey = $sKey; }
+		$this->createAPaintiningByMonet();
+		foreach(R::$toolboxes as $key=>$toolbox) {
 			if ($toolbox!==R::$toolbox) {
 				testpack('Testing schema sync from '.get_class($source->getWriter()).' to: -> '.get_class($toolbox->getWriter()));
 				//$toolbox->getDatabaseAdapter()->getDatabase()->setDebugMode(1); //keep this here, might be handy for debugging.
@@ -68,7 +68,7 @@ class RedUNIT_Base_Sync extends RedUNIT_Base {
 				asrt(!isset($tables['garden_painting']),true);
 				asrt(!isset($tables['lilly']),true);
 				asrt(!isset($tables['bridge']),true);
-				$sync->sync($source,$toolbox);
+				R::syncSchema($sourceKey,$key);
 				$tables = array_flip($toolbox->getWriter()->getTables());
 				asrt(isset($tables['monet']),true);
 				asrt(isset($tables['painting']),true);

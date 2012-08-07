@@ -5,7 +5,7 @@
  * @file                       RedBean/Plugin/Sync.php
  * @description                Plugin for Synchronizing databases.
  * 
- * @plugin					   public static function sync($from,$to) { return RedBean_Plugin_Sync::plugin($a,$b); }
+ * @plugin					   public static function syncSchema($from,$to) { return RedBean_Plugin_Sync::syncSchema($from,$to); }
  *
  * @author                     Gabor de Mooij
  * @license                    BSD
@@ -25,7 +25,7 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 	 * @param RedBean_Toolbox $source toolbox of source database
 	 * @param RedBean_Toolbox $target toolbox of target database
 	 */
-	public function sync(RedBean_Toolbox $source, RedBean_Toolbox $target) {
+	public function doSync(RedBean_Toolbox $source, RedBean_Toolbox $target) {
 
 		$sourceWriter = $source->getWriter();
 		$targetWriter = $target->getWriter();
@@ -91,4 +91,22 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 			}
 		}
 	}
+	
+
+	/**
+	 * Performs a database schema sync. For use with facade.
+	 * Instead of toolboxes this method accepts simply string keys and is static.
+	 * 
+	 * @param string $database1 the source database
+	 * @param string $database2 the target database
+	 */
+	public static function syncSchema($database1,$database2) {
+		if (!isset(RedBean_Facade::$toolboxes[$database1])) throw new RedBean_Exception_Security('No database for this key: '.$database1);
+		if (!isset(RedBean_Facade::$toolboxes[$database2])) throw new RedBean_Exception_Security('No database for this key: '.$database2);
+		$db1 = RedBean_Facade::$toolboxes[$database1];
+		$db2 = RedBean_Facade::$toolboxes[$database2];
+		$sync = new self;
+		$sync->doSync($db1, $db2);
+	}
+	
 }

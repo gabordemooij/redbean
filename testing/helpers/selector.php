@@ -116,7 +116,6 @@ $allPacks = array(
 		'Base/Count',
 		'Base/Chill',
 		'Base/Misc',
-		'Base/Sync',
 		'CUBRID/Setget',
 		'Oracle/Base',
 		'Oracle/Database',
@@ -139,13 +138,17 @@ $allPacks = array(
 		'Sqlite/Parambind',
 		'Sqlite/Writer',
 		'Sqlite/Rebuild',
-		'Base/Timeline',
-		'Blackhole/Misc',
-		'Base/Close'
+		'Base/Timeline'
+);
+
+$suffix = array(
+	'Blackhole/Misc',
+	'Base/Close'
 );
 
 $pluginPacks = array(
-	'Plugin/Cache'
+	'Plugin/Cache',
+	'Plugin/Sync'
 );
 
 //Default (mode == all)
@@ -159,10 +162,13 @@ elseif ($mode == 'all+plugins') {
 	$packList = array_merge($allPacks,$pluginPacks);
 }
 else {
-	foreach($allPacks as $pack) {
+	foreach(array_merge($allPacks,$pluginPacks) as $pack) {
 		if (strpos($pack,$mode)===0) $packList[] = $pack;
 	}
 }
+
+//Always include the last ones.
+$packList = array_merge($packList,$suffix);
 
 global $currentDriver;
 foreach($packList as $testPack) {
