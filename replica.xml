@@ -19,7 +19,6 @@
 		<item type="php">RedBean/Observer.php</item>
 		<item type="php">RedBean/Adapter.php</item>
 		<item type="php">RedBean/Adapter/DBAdapter.php</item>
-		<item type="php">RedBean/Adapter/NullAdapter.php</item>
 		<item type="php">RedBean/QueryWriter.php</item>
 		<item type="php">RedBean/QueryWriter/AQueryWriter.php</item>
 		<item type="php">RedBean/QueryWriter/MySQL.php</item>
