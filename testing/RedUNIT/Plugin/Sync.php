@@ -31,10 +31,17 @@ class RedUNIT_Plugin_Sync extends RedUNIT_Base {
 		$artist = R::dispense('monet');
 		$paintings = R::dispense('painting',2);
 		$artist->ownPainting = $paintings;
+		$parasol = R::dispense('parasol');
+		$parasol->color = 'red';
+		$parasol->length = 1.2;
 		$bridge = R::dispense('bridge');
 		$lillies = R::dispense('lilly',10);
 		$garden = R::dispense('garden');
+		$garden->size = 10;
+		foreach($lillies as $lilly) $lilly->color = 'purple';
+		$bridge->broken = false;
 		$lady = R::dispense('lady');
+		$lady->parasol = $parasol;
 		$paintings[0]->sharedGarden[] = $garden;
 		$paintings[1]->sharedGarden[] = $garden;
 		$paintings[0]->ownLady = array( $lady );
@@ -60,7 +67,11 @@ class RedUNIT_Plugin_Sync extends RedUNIT_Base {
 			if ($toolbox!==R::$toolbox) {
 				testpack('Testing schema sync from '.get_class($source->getWriter()).' to: -> '.get_class($toolbox->getWriter()));
 				//$toolbox->getDatabaseAdapter()->getDatabase()->setDebugMode(1); //keep this here, might be handy for debugging.
-				$toolbox->getWriter()->wipeAll();
+				$w = $toolbox->getWriter();
+				$w->wipeAll();
+				$parasol = R::dispense('parasol');
+				$parasol->color = 'white';
+				$toolbox->getRedBean()->store($parasol);
 				$tables = array_flip($toolbox->getWriter()->getTables());
 				asrt(!isset($tables['monet']),true);
 				asrt(!isset($tables['painting']),true);
@@ -68,6 +79,11 @@ class RedUNIT_Plugin_Sync extends RedUNIT_Base {
 				asrt(!isset($tables['garden_painting']),true);
 				asrt(!isset($tables['lilly']),true);
 				asrt(!isset($tables['bridge']),true);
+				asrt(isset($tables['parasol']),true);
+				$columns = $toolbox->getWriter()->getColumns('parasol');
+				asrt(count($columns),2);
+				asrt(isset($columns['color']),true);
+				asrt(isset($columns['length']),false);
 				R::syncSchema($sourceKey,$key);
 				$tables = array_flip($toolbox->getWriter()->getTables());
 				asrt(isset($tables['monet']),true);
@@ -76,6 +92,11 @@ class RedUNIT_Plugin_Sync extends RedUNIT_Base {
 				asrt(isset($tables['garden_painting']),true);
 				asrt(isset($tables['lilly']),true);
 				asrt(isset($tables['bridge']),true);
+				asrt(isset($tables['parasol']),true);
+				$columns = $source->getWriter()->getColumns('parasol');
+				asrt(count($columns),3);
+				asrt(isset($columns['color']),true);
+				asrt(isset($columns['length']),true);
 				R::configureFacadeWithToolbox($toolbox);
 				R::freeze(true);
 				$id = $this->createAPaintiningByMonet();
@@ -88,6 +109,20 @@ class RedUNIT_Plugin_Sync extends RedUNIT_Base {
 							|| 
 							(count($painting->ownLady)===1)
 						 ),true);
+					if (count($painting->ownLady)===1) {
+						$lady = reset($painting->ownLady);
+						asrt($lady->parasol->color,'red');
+						asrt(($lady->parasol->length==1.2),true);
+					}
+					if (count($painting->ownLilly)) {
+						$lilly = reset($painting->ownLilly);
+						asrt($lilly->color,'purple');
+
+						$bridge = reset($painting->ownBridge);
+						asrt((boolean)$bridge->broken,false);
+					}
+					$garden = reset($painting->sharedGarden);
+					asrt((int)$garden->size,10);	
 				}
 				R::freeze(false);
 				R::configureFacadeWithToolbox($source);

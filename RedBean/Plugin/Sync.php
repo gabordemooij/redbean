@@ -40,7 +40,7 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 			$translation = $targetWriter->scanType($v, true);
 			if (!isset($translations[$code]))
 				$translations[$code] = $translation;
-			if ($translation > $translations[$code])
+			if ($translation > $translations[$code] && $translation < 50)
 				$translations[$code] = $translation;
 		}
 		$defaultCode = $targetWriter->scanType('string');
