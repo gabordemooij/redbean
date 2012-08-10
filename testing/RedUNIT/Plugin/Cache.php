@@ -15,7 +15,7 @@ require_once('../../RedBean/Plugin/Cache.php');
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Plugin_Cache extends RedUNIT {
+class RedUNIT_Plugin_Cache extends RedUNIT_Plugin {
 
 	
 	/**
@@ -28,6 +28,7 @@ class RedUNIT_Plugin_Cache extends RedUNIT {
 	public function run() {
 		
 		R::nuke();
+		$old = R::$redbean;//backup redbean to clean up after test!
 		R::$redbean = new RedBean_Plugin_Cache(R::$writer);
 		$cachedOODB = R::$redbean;
 		$cachedOODB->addListener(R::$adapter);
@@ -109,6 +110,7 @@ class RedUNIT_Plugin_Cache extends RedUNIT {
 		R::load('hamburger',$b->id);
 		asrt($cachedOODB->getHits(),10);
 		
+		R::$redbean = $old; //reset for next test
 	}	
 
 }
