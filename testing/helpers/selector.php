@@ -30,7 +30,7 @@ require_once('../RedUNIT/Postgres.php');
 require_once('../RedUNIT/Sqlite.php');
 require_once('../RedUNIT/CUBRID.php');
 require_once('../RedUNIT/Oracle.php');
-
+require_once('../RedUNIT/Plugin.php');
 
 
 
