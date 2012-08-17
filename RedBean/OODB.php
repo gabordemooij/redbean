@@ -27,11 +27,17 @@ class RedBean_OODB extends RedBean_Observable {
 	private $chillList = array();
 	
 	/**
-	 * List of dependencies. Format: $type => array($depensOnMe, $andMe)
+	 * List of dependencies. Format: $type => array($dependsOnMe, $andMe)
 	 * @var array
 	 */
 	private $dep = array();
 
+	/**
+	 * List of reverse dependencies. Format: $type => array($meIsDepended, $andMe)
+	 * @var array
+	 */
+	private $rdep = array();
+	
 	/**
 	 * Secret stash. Used for batch loading.
 	 * @var array
@@ -667,9 +673,19 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean you want to remove from database
 	 */
-	public function trash( $bean ) {
+	public function trash( $bean, $recursive = false ) {
 		if ($bean instanceof RedBean_SimpleModel) $bean = $bean->unbox();
-		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
+		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('OODB Trash requires a bean, got: '.gettype($bean));
+		if ($recursive && array_key_exists($bean->getMeta('type'), $this->rdep)) {
+			foreach ($this->rdep[$bean->getMeta('type')] as $dependedType => $dependencyParams) {
+				if ($dependencyParams['type'] == 0) {
+					$dependedBeans = $this->find($dependedType, array($dependencyParams['ref_id'] => $bean->id));
+					foreach ($dependedBeans as $dependedBean) {
+						$this->trash($dependedBean, $recursive);
+					}
+				}
+			}
+		}
 		$this->signal('delete',$bean);
 		foreach($bean as $p=>$v) {
 			if ($v instanceof RedBean_OODBBean) {
@@ -825,9 +841,38 @@ class RedBean_OODB extends RedBean_Observable {
 		$this->assocManager = $assoc;
 	}
 	
-	
+	/**
+	 * Sets the dependency list to be used by this OODB.
+	 * Also calculates and store the reverse dependency list.
+	 * Format: $type => array(
+	 *				$dependsOnMe,
+	 *				$andMe => 'field_name',
+	 *				$andMeToo => array(of <parameters>))
+	 * parameters:
+	 *		'ref_id' => 'relation_field_name'
+	 *		'type'	=> 0 | 1 - 0: 'not null' (default), 1: 'nullable'
+	 * 
+	 * @param array $dep 
+	 * 
+	 * @return void
+	 */
 	public function setDepList($dep) {
-		$this->dep = $dep;
+		$this->dep = array(); 
+		$this->rdep = array();
+		foreach ($dep as $refType => $dependedOnTypes) {
+			foreach ($dependedOnTypes as $dependedOnType => $dependencyParams) {
+				// auto calculated params
+				if (is_int($dependedOnType)) {
+					$dependedOnType = $dependencyParams;
+					$dependencyParams = array( 'ref_id' => $dependencyParams.'_id', 'type' => 0);
+				} // only ref field as parameter
+				elseif (is_string($dependencyParams)) {
+					$dependencyParams = array( 'ref_id' => $dependencyParams, 'type' => 0);
+				}
+				$this->rdep[$dependedOnType][$refType] = $dependencyParams;
+				$this->dep[$refType][$dependedOnType] = $dependencyParams;
+			}
+		}
 	}
 
 }
