@@ -501,5 +501,22 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		}
 		$this->adapter->exec('SET CONSTRAINTS ALL IMMEDIATE');
 	}
+	
+	
+	
+	/**
+	 * This method removes all beans of a certain type.
+	 * This methods accepts a type and infers the corresponding table name.
+	 *
+	 * @param  string $type bean type
+	 *
+	 * @return void
+	 */
+	public function wipe($type) {
+		$table = $type;
+		$table = $this->safeTable($table);
+		$sql = "TRUNCATE $table CASCADE";
+		$this->adapter->exec($sql);
+	}
 
 }
