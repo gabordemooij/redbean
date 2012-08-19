@@ -826,6 +826,28 @@ class RedBean_OODB extends RedBean_Observable {
 	}
 	
 	
+	/**
+	 * Sets a dependency list. Dependencies can be used to make
+	 * certain beans depend on others. This causes dependent beans to get removed
+	 * once the bean they depend on has been removed as well.
+	 * A dependency takes the form:
+	 * 
+	 * $me => depends on array( $bean1, $bean2 )
+	 * 
+	 * For instance a to inform RedBeanPHP about the fact that a page
+	 * depends on a book:
+	 * 
+	 * 'page' => array('book')
+	 * 
+	 * A bean can depend on multiple other beans.
+	 * 
+	 * A dependency does two things:
+	 * 
+	 * 1. Adds a ON CASCADE DELETE 
+	 * 2. trashes the depending bean if the entry in the ownList is removed 
+	 * 
+	 * @param array $dep 
+	 */
 	public function setDepList($dep) {
 		$this->dep = $dep;
 	}
