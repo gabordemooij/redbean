@@ -17,6 +17,8 @@
         "php": ">=5.2.0"
     },
     "autoload": {
-	"files":["RedBean/redbean.inc.php"]
+        "psr-0" : {
+            "RedBean_" : ""
+        }
     }
 }
