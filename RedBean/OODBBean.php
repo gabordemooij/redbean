@@ -387,7 +387,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	public function __toString() {
 		$string = $this->__call('__toString',array());
 		if ($string === null) {
-			return json_encode($this->properties);
+			return var_export($this->properties, 1);
 		}
 		else {
 			return $string;
