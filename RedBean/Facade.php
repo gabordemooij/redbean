@@ -209,8 +209,8 @@ class RedBean_Facade {
 	 *
 	 * @return mixed
 	 */
-	public static function trash( $bean ) {
-		return self::$redbean->trash( $bean );
+	public static function trash( $bean, $recursive = false ) {
+		return self::$redbean->trash( $bean, $recursive );
 	}
 
 	/**
