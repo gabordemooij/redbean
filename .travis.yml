@@ -22,4 +22,4 @@ before_script:
   - cd testing/cli
     
  
-script: ./startnc.sh
+script: ./startnc.sh all+plugins

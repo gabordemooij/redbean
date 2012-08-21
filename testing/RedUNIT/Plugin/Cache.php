@@ -1,7 +1,5 @@
 <?php
 
-require_once('../../RedBean/Plugin/Cache.php');
-
 /**
  * RedUNIT_Plugin_Cache
  * @file 			RedUNIT/Plugin/Cache.php
