@@ -21,7 +21,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @var string
 	 */
 	protected $dsn;
-
+	
 	/**
 	 * Whether we are in debugging mode or not.
 	 * @var boolean
@@ -180,9 +180,9 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * $rs (always array). The number of rows affected (result of rowcount, if supported by database)
 	 * is stored in protected property $affected_rows. If the debug flag is set
 	 * this function will send debugging output to screen buffer.
-	 *
-	 * @throws RedBean_Exception_SQL
-	 *
+	 * 
+	 * @throws RedBean_Exception_SQL 
+	 * 
 	 * @param string $sql     the SQL string to be send to database server
 	 * @param array  $aValues the values that need to get bound to the query slots
 	 */
@@ -277,7 +277,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		return array_shift($arr);
 	}
 
-
+	
 
 	/**
 	 * Executes SQL code and allows key-value binding.
@@ -345,7 +345,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * where you can define your own log() method
 	 *
 	 * @param boolean $trueFalse turn on/off
-	 * @param RedBean_Logger $logger
+	 * @param RedBean_Logger $logger 
 	 *
 	 * @return void
 	 */
@@ -452,7 +452,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->connect();
 		return $this->pdo;
 	}
-
+	
 	/**
 	 * Closes database connection by destructing PDO.
 	 */
@@ -460,17 +460,17 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->pdo = null;
 		$this->isConnected = false;
 	}
-
+	
 	/**
 	 * Returns TRUE if the current PDO instance is connected.
-	 *
-	 * @return boolean $yesNO
+	 * 
+	 * @return boolean $yesNO 
 	 */
 	public function isConnected() {
 		if (!$this->isConnected && !$this->pdo) return false;
 		return true;
 	}
-
-
+	
+	
 }
 

@@ -1,50 +1,50 @@
 <?php
 /**
- * RedBean OCI Driver
+ * RedBean OCI Driver 
  *
  * @file				RedBean/Driver/OCI.php
  * @description			OCI Driver for RedBeanPHP. The OCI
- *						driver is required to facilitate a connection to
+ *						driver is required to facilitate a connection to 
  *						an Oracle database.
  *						Stephane Gerber
  * @license				BSD/GPLv2
  *
  * This source file is subject to the BSD/GPLv2 License that is bundled
- * with this source code in the file license.txt.
+ * with this source code in the file license.txt. 
  */
 class RedBean_Driver_OCI implements RedBean_Driver {
 
 	/**
 	 * Database connection string
-	 * @var string
+	 * @var string 
 	 */
 	private $dsn;
 
 	/**
-	 *
+	 * 
 	 * @var unknown_type
 	 */
 	private static $instance;
 
 	/**
-	 *
+	 * 
 	 * @var boolean
 	 */
 	private $debug = false;
-
+	
 	/**
 	 * Holds an instance of Logger implementation.
 	 * @var RedBean_Logger
-	 */
+	 */	
 	protected $logger = NULL;
 	/**
-	 *
+	 * 
 	 * @var unknown_type
 	 */
 	private $affected_rows;
 
 	/**
-	 *
+	 * 
 	 * @var unknown_type
 	 */
 	private $rs;
@@ -65,7 +65,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @var boolean
 	 */
 	protected $isConnected = false;
-
+	
 	private $nlsDateFormat = 'YYYY-MM-DD HH24:MI:SS';
 	private $nlsTimeStampFormat = 'YYYY-MM-DD HH24:MI:SS.FF';
 
@@ -113,56 +113,56 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			$this->connectInfo = array('pass' => $pass, 'user' => $user);
 		}
 	}
-
+	
 	/**
 	 * @todo add Documentation
-	 *
-	 * @return type
+	 * 
+	 * @return type 
 	 */
 	public function getNlsDateFormat(){
 		return $this->nlsDateFormat;
 	}
-
+	
 	/**
 	 * @todo add Documentation
-	 *
-	 * @return type
+	 * 
+	 * @return type 
 	 */
 	public function setNlsDateFormat($nlsDateFormat){
 		$this->nlsDateFormat = $nlsDateFormat;
 	}
-
+	
 	/**
 	 * @todo add Documentation
-	 *
-	 * @return type
+	 * 
+	 * @return type 
 	 */
 	public function getNlsTimestampFormat(){
 		return $this->nlsTimeStampFormat;
 	}
-
+	
 	/**
 	 * @todo add Documentation
-	 *
-	 * @return type
+	 * 
+	 * @return type 
 	 */
 	public function setNlsTimestampFormat($nlsTimestampFormat){
 		$this->nlsTimeStampFormat = $nlsTimestampFormat;
 	}
-
+	
 	/**
 	 * Gets RedBean_Logger object.
 	 *
 	 * @return RedBean_Logger
-	 */
+	 */	
 	public function setLogger( RedBean_Logger $logger ) {
 		$this->logger = $logger;
 	}
-
+	
 	/**
 	 * Toggles auto-commit.
-	 *
-	 * @param boolean $toggle
+	 * 
+	 * @param boolean $toggle 
 	 */
 	public function setAutoCommit($toggle) {
 		$this->autocommit = (bool) $toggle;
@@ -204,9 +204,9 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * $rs (always array). The number of rows affected (result of rowcount, if supported by database)
 	 * is stored in protected property $affected_rows. If the debug flag is set
 	 * this function will send debugging output to screen buffer.
-	 *
-	 * @throws RedBean_Exception_SQL
-	 *
+	 * 
+	 * @throws RedBean_Exception_SQL 
+	 * 
 	 * @param string $sql     the SQL string to be send to database server
 	 * @param array  $aValues the values that need to get bound to the query slots
 	 */
@@ -324,10 +324,10 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 */
 	public function ErrorNo() {
 		$error = oci_error($this->statement);
-		if (is_array($error))
+		if (is_array($error)) 
 			return $error['code'];
-	    else
-			return null;
+	    else 
+			return null;		
 	}
 
 	/**
@@ -336,16 +336,16 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 */
 	public function Errormsg() {
 		$error = oci_error($this->statement);
-		if (is_array($error))
+		if (is_array($error)) 
 			return $error['message'];
-	    else
+	    else 
 			return null;
-
+		
 	}
 
 	/**
 	 * Use oci binding to execute the binding and execute the query
-	 *
+	 * 
 	 *
 	 * @param string $sql	  SQL Code to execute
 	 * @param array  $aValues Values to bind to SQL query
@@ -379,7 +379,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		if ($isInsert) {
 			oci_bind_by_name($this->statement, ':ID', $this->lastInsertedId, 20, SQLT_INT);
 		}
-
+		
 
 		if ($this->debug){
 			if (!$this->autocommit)
@@ -390,7 +390,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			if (!$this->autocommit)
 				$result = @oci_execute($this->statement, OCI_NO_AUTO_COMMIT);  // data not committed
 			else
-				$result = @oci_execute($this->statement);
+				$result = @oci_execute($this->statement);			
 		}
 
 		if (!$result) {
@@ -405,14 +405,14 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	/**
 	 * Returns the underlying PHP OCI instance.
 	 *
-	 * @return OCI
+	 * @return OCI 
 	 */
 	public function getOCI() {
 		$this->connect();
 		return $this->connection;
 	}
 
-	// This function is used to be compatible with the Redbean actual behaviour. Oracle makes a difference between the
+	// This function is used to be compatible with the Redbean actual behaviour. Oracle makes a difference between the 
 	// two errors belows, Redbean doesnt'
 	private function mergeErrors($code) {
 		if ($code == self::OCI_UNIQUE_CONSTRAINT_VIOLATION)
@@ -462,7 +462,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * where you can define your own log() method
 	 *
 	 * @param boolean $trueFalse turn on/off
-	 * @param RedBean_Logger $logger
+	 * @param RedBean_Logger $logger 
 	 *
 	 * @return void
 	 */
@@ -483,8 +483,8 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 
 	/**
 	 * Returns TRUE if the current PDO instance is connected.
-	 *
-	 * @return boolean $yesNO
+	 * 
+	 * @return boolean $yesNO 
 	 */
 	public function isConnected() {
 		if (!$this->isConnected && !$this->connection)
@@ -531,7 +531,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 
 	/**
 	 * Returns the version number of the database.
-	 * @return mixed $version
+	 * @return mixed $version 
 	 */
 	public function getDatabaseVersion() {
 		$this->connect();
@@ -541,7 +541,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$e = oci_fetch_all($s, $output);
 		return $output['BANNER'][0];
 	}
-
+	
 
 }
 

@@ -68,7 +68,7 @@ class RedBean_Facade {
 	 * @var RedBean_Plugin_BeanExport
 	 */
 	public static $exporter;
-
+	
 	/**
 	 * Holds the tag manager
 	 * @var RedBean_TagManager
@@ -86,9 +86,9 @@ class RedBean_Facade {
 	 */
 	public static $f;
 
-
+	
 	private static $strictType = true;
-
+	
 
 	/**
 	 * Get version
@@ -222,7 +222,7 @@ class RedBean_Facade {
 	 *
 	 */
 	public static function dispense( $type, $num = 1 ) {
-		if (!preg_match('/^[a-z0-9]+$/',$type) && self::$strictType) throw new RedBean_Exception_Security('Invalid type: '.$type);
+		if (!preg_match('/^[a-z0-9]+$/',$type) && self::$strictType) throw new RedBean_Exception_Security('Invalid type: '.$type); 
 		if ($num==1) {
 			return self::$redbean->dispense( $type );
 		}
@@ -232,8 +232,8 @@ class RedBean_Facade {
 			return $beans;
 		}
 	}
-
-
+	
+	
 	public static function setStrictTyping($trueFalse) {
 		self::$strictType = (boolean) $trueFalse;
 	}
@@ -304,7 +304,7 @@ class RedBean_Facade {
 	 */
 	public static function unassociate( $beans1,  $beans2 , $fast=false) {
 		return self::$associationManager->unassociate( $beans1, $beans2, $fast );
-
+		
 	}
 
 	/**
@@ -1048,7 +1048,7 @@ class RedBean_Facade {
 		}
 	}
 
-
+	
 
 
 	/**
@@ -1077,12 +1077,12 @@ class RedBean_Facade {
 		if (!$time) $time = time();
 		return @date('Y-m-d H:i:s',$time);
 	}
-
+	
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
-	 *
-	 * @param RedBean_Adapter $adapter
+	 * 
+	 * @param RedBean_Adapter $adapter 
 	 */
 	public static function setDatabaseAdapter(RedBean_Adapter $adapter) {
 		self::$adapter = $adapter;
@@ -1092,22 +1092,22 @@ class RedBean_Facade {
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @param RedBean_QueryWriter $writer
+	 * @param RedBean_QueryWriter $writer 
 	 */
 	public static function setWriter(RedBean_QueryWriter $writer) {
 		self::$writer = $writer;
 	}
-
+	
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @param RedBean_OODB $redbean
+	 * @param RedBean_OODB $redbean 
 	 */
 	public static function setRedBean(RedBean_OODB $redbean) {
 		self::$redbean = $redbean;
 	}
-
+	
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
@@ -1127,7 +1127,7 @@ class RedBean_Facade {
 	public static function getWriter() {
 		return self::$writer;
 	}
-
+	
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
@@ -1137,7 +1137,7 @@ class RedBean_Facade {
 	public static function getRedBean() {
 		return self::$redbean;
 	}
-
+	
 }
 
 //Compatibility with PHP 5.2 and earlier

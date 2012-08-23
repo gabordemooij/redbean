@@ -1,7 +1,7 @@
 <?php
 /**
  * RedBean class for Logging
- *
+ * 
  * @name    RedBean Logger
  * @file    RedBean/Logger.php
  * @author    Gabor de Mooij
