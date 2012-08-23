@@ -1,9 +1,9 @@
 <?php
 /**
  * RedBean interface for Logging
- * 
- * @name    RedBean ILogger
- * @file    RedBean/ILogger.php
+ *
+ * @name    RedBean Logger
+ * @file    RedBean/Logger.php
  * @author    Gabor de Mooij
  * @license   BSD
  *

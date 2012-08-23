@@ -21,7 +21,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @var string
 	 */
 	protected $dsn;
-	
+
 	/**
 	 * Whether we are in debugging mode or not.
 	 * @var boolean
@@ -29,8 +29,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	protected $debug = false;
 
 	/**
-	 * Holds an instance of ILogger implementation.
-	 * @var RedBean_ILogger
+	 * Holds an instance of Logger implementation.
+	 * @var RedBean_Logger
 	 */
 	protected $logger = NULL;
 
@@ -180,9 +180,9 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * $rs (always array). The number of rows affected (result of rowcount, if supported by database)
 	 * is stored in protected property $affected_rows. If the debug flag is set
 	 * this function will send debugging output to screen buffer.
-	 * 
-	 * @throws RedBean_Exception_SQL 
-	 * 
+	 *
+	 * @throws RedBean_Exception_SQL
+	 *
 	 * @param string $sql     the SQL string to be send to database server
 	 * @param array  $aValues the values that need to get bound to the query slots
 	 */
@@ -277,7 +277,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		return array_shift($arr);
 	}
 
-	
+
 
 	/**
 	 * Executes SQL code and allows key-value binding.
@@ -341,11 +341,11 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * passes on to the screen for inspection.
 	 * This method has no return value.
 	 *
-	 * Additionally you can inject RedBean_ILogger implementation
+	 * Additionally you can inject RedBean_Logger implementation
 	 * where you can define your own log() method
 	 *
 	 * @param boolean $trueFalse turn on/off
-	 * @param RedBean_ILogger $logger 
+	 * @param RedBean_Logger $logger
 	 *
 	 * @return void
 	 */
@@ -358,18 +358,18 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 
 	/**
-	 * Injects RedBean_ILogger object.
+	 * Injects RedBean_Logger object.
 	 *
-	 * @param RedBean_ILogger $logger
+	 * @param RedBean_Logger $logger
 	 */
-	public function setLogger( RedBean_Logger_Default $logger ) {
+	public function setLogger( RedBean_Logger $logger ) {
 		$this->logger = $logger;
 	}
 
 	/**
-	 * Gets RedBean_ILogger object.
+	 * Gets RedBean_Logger object.
 	 *
-	 * @return RedBean_ILogger
+	 * @return RedBean_Logger
 	 */
 	public function getLogger() {
 		return $this->logger;
@@ -452,7 +452,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->connect();
 		return $this->pdo;
 	}
-	
+
 	/**
 	 * Closes database connection by destructing PDO.
 	 */
@@ -460,17 +460,17 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$this->pdo = null;
 		$this->isConnected = false;
 	}
-	
+
 	/**
 	 * Returns TRUE if the current PDO instance is connected.
-	 * 
-	 * @return boolean $yesNO 
+	 *
+	 * @return boolean $yesNO
 	 */
 	public function isConnected() {
 		if (!$this->isConnected && !$this->pdo) return false;
 		return true;
 	}
-	
-	
+
+
 }
 
