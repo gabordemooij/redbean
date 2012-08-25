@@ -24,39 +24,41 @@ class RedBean_OODB extends RedBean_Observable {
 	 * are considered to be stable and don't need to be modified.
 	 * @var array 
 	 */
-	private $chillList = array();
+	protected $chillList = array();
 	
 	/**
 	 * List of dependencies. Format: $type => array($depensOnMe, $andMe)
 	 * @var array
 	 */
-	private $dep = array();
+	protected $dep = array();
 
 	/**
 	 * Secret stash. Used for batch loading.
 	 * @var array
 	 */
-	private $stash = NULL;
+	protected $stash = NULL;
 
 	/**
 	 * Contains the writer for OODB.
 	 * @var RedBean_Adapter_DBAdapter
 	 */
-	private $writer;
+	protected $writer;
 	/**
 	 * Whether this instance of OODB is frozen or not.
 	 * In frozen mode the schema will not de modified, in fluid mode
 	 * the schema can be adjusted to meet the needs of the developer.
 	 * @var boolean
 	 */
-	private $isFrozen = false;
+	protected $isFrozen = false;
 
 	/**
 	 * Bean Helper. The bean helper to give to the beans. Bean Helpers
 	 * assist beans in getting hold of a toolbox.
 	 * @var null|\RedBean_BeanHelperFacade
 	 */
-	private $beanhelper = null;
+	protected $beanhelper = null;
+	
+	protected $assocManager = null;
 
 	/**
 	 * The RedBean OODB Class is the main class of RedBean.

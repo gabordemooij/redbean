@@ -9,15 +9,13 @@
  * @license			BSD/GPLv2
  *
  * Provides a means to cache beans after loading or batch loading.
- * Any other action will flush the cache unless keepCache() has been
- * called.
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 
-class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Observer,RedBean_Plugin {
+class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	
 	/**
 	 * Bean cache, contains the cached beans identified by
@@ -28,15 +26,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Observer,RedB
 	 */
 	private $cache = array();
 	
-	/**
-	 * Flag, indicating the current cache handling mode.
-	 * TRUE means to flush the cache after the next SQL query, 
-	 * FALSE means keep the cache whatever happens.
-	 * By default the flag is set to TRUE to avoid caching issues.
-	 * 
-	 * @var boolean
-	 */
-	private $flushCache = true;
+	
 	
 	/**
 	 * Number of hits (beans/calls being served from cache). 
@@ -64,16 +54,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Observer,RedB
 		parent::__construct($writer);
 	}
 	
-	/**
-	 * In order for the cache to work properly you need to attach
-	 * a listener to the database adapter. This enables the cache to be flushed
-	 * whenever a possible destructive SQL query gets executed.
-	 * 
-	 * @param RedBean_Adapter $adapter 
-	 */
-	public function addListener(RedBean_Adapter $adapter) {
-		$adapter->addEventListener('sql_exec',$this);
-	}
+	
 	
 	/**
 	 * Loads a bean by type and id. If the bean cannot be found an
@@ -88,158 +69,69 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Observer,RedB
 	 * @return RedBean_OODBBean $bean the bean object found
 	 */
 	public function load($type,$id) {
-		$this->flushCache = false;
-		$label = $type.'-'.$id;
-		if (isset($this->cache[$label])) {
+		if (isset($this->cache[$type][$id])) {
 			$this->hits ++;
-			$bean = $this->cache[$label];
+			$bean = $this->cache[$type][$id];
 		}
 		else {
 			$this->misses ++;
 			$bean = parent::load($type,$id);
-			$this->cache[$label] = $bean;
+			if (!isset($this->cache[$type])) $this->cache[$type]=array();
+			$this->cache[$type][$id] = $bean;
 		}
-		$this->flushCache = true;
 		return $bean;
-		
 	}
 	
 	/**
-	 * Method to update cache from lists of beans.
-	 * This provides us with the means to cache the results from batch
-	 * and find operations.
+	 * Stores a RedBean OODBBean and caches it.
 	 * 
-	 * @param array $beans beans
+	 * @param RedBean_OODBBean $bean the bean you want to store
 	 * 
-	 * @return void
+	 * @return integer $id 
 	 */
-	private function updateCache($beans = array()) {
-		if (!count($beans)) return;
-		$bean = reset($beans);
-		if (!($bean instanceof RedBean_OODBBean)) return;
+	public function store(RedBean_OODBBean $bean) {
+		$id = parent::store($bean);
 		$type = $bean->getMeta('type');
-		foreach($beans as $bean) {
-			$label = $type.'-'.$bean->id;
-			if (!isset($this->cache[$label])) {
-				$this->cache[$label] = $bean;
-			}
-		}
-	}
-	
-	
-	/**
-	 * Loads a batch of beans from the database. Loads beans by type and id
-	 * collection. If the beans are in the cache they will be served from cache.
-	 * 
-	 * @param string $type type of bean you are looking for
-	 * @param array  $ids  list of identifiers to look for
-	 * 
-	 * @return array $beans beans 
-	 */
-	public function batch($type,$ids) {
-		$this->flushCache = false;
-		$label = 'batch-'.$type.'-'.implode(',',$ids);
-		if (isset($this->cache[$label])) {
-			$this->hits ++;
-			$beans = $this->cache[$label];
-		}
-		else {
-			$beans = parent::batch($type,$ids);
-			$this->misses ++;
-			$this->cache[$label] = $beans;
-			$this->updateCache($beans);
-		}
-		$this->flushCache = true;
-		return $beans;
+		if (!isset($this->cache[$type])) $this->cache[$type]=array();
+		$this->cache[$type][$id] = $bean;
+		return $id;
 	}
 	
 	/**
-	 * Cached version of OODB::find.
-	 * Retrieves as much beans from the cache as possible and updates cache.
+	 * Trashes a RedBean OODBBean and removes it from cache.
 	 * 
-	 * Searches the database for a bean that matches conditions $conditions and sql $addSQL
-	 * and returns an array containing all the beans that have been found.
-	 * 
-	 * Conditions need to take form:
-	 * 
-	 * array(
-	 * 		'PROPERTY' => array( POSSIBLE VALUES... 'John','Steve' )
-	 * 		'PROPERTY' => array( POSSIBLE VALUES... )
-	 * );
-	 * 
-	 * All conditions are glued together using the AND-operator, while all value lists
-	 * are glued using IN-operators thus acting as OR-conditions.
-	 * 
-	 * Note that you can use property names; the columns will be extracted using the
-	 * appropriate bean formatter.
-	 * 
-	 * @throws RedBean_Exception_SQL 
-	 * 
-	 * @param string  $type       type of beans you are looking for
-	 * @param array   $conditions list of conditions
-	 * @param string  $addSQL	  SQL to be used in query
-	 * @param boolean $all        whether you prefer to use a WHERE clause or not (TRUE = not)
-	 * 
-	 * @return array $beans		  resulting beans
+	 * @param RedBean_OODBBean $bean bean
+	 * @return mixed 
 	 */
-	public function find($type, $conditions=array(),$addSQL=null,$all=false) {
-		/**
-		 * If $addSQL is filled in the query might update the database,
-		 * in this case dont use the cache but clear cache instead.
-		 */
-		if ($this->flushCache && (is_array($addSQL) && strlen($addSQL[0])>0)) {
-			$this->cache = array();
-			return parent::find($type, $conditions, $addSQL, $all);
-		
-		}
-		$this->flushCache = false;
-		$label = 'find-'.$type.'-'.sha1(serialize(array($conditions,$addSQL,$all)));
-		if (isset($this->cache[$label])) {
-			$this->hits ++;
-			$beans = $this->cache[$label];
-		}
-		else {
-			$beans = parent::find($type,$conditions,$addSQL,$all);
-			$this->misses ++;
-			$this->cache[$label] = $beans;
-			$this->updateCache($beans);
-		}
-		$this->flushCache = true;
-		return $beans;
+	public function trash(RedBean_OODBBean $bean) {
+		$type = $bean->getMeta('type');
+		$id = $bean->id;
+		if (isset($this->cache[$type][$id])) unset($this->cache[$type][$id]);
+		return parent::trash($bean);
 	}
 	
 	/**
-	 * Instructs cache to not flush the cache after the
-	 * upcoming SQL queries.
+	 * Flushes the cache for a given type.
+	 * 
+	 * @param string $type
+	 * 
+	 * @return RedBean_Plugin_Cache 
 	 */
-	public function keepCache() {
-		$this->flushCache = false;
+	public function flush($type) {
+		if (isset($this->cache[$type])) $this->cache[$type]=array();
+		return $this;
 	}
 	
 	/**
-	 * Instructs the cache to flush itself after the next SQL
-	 * Query and flushes the cache directly as well.
+	 * Flushes the cache completely.
+	 * 
+	 * @return RedBean_Plugin_Cache 
 	 */
-	public function flushCache() {
+	public function flushAll() {
 		$this->cache = array();
-		$this->flushCache = true;
+		return $this;
 	}
 	
-	/**
-	 * Event handler.
-	 * If an SQL query is executed and the flush-cache flag has been set
-	 * the cache will be flushed.
-	 * 
-	 * @param string $eventname identifier string of the event
-	 * @param mixed  $bean      info 
-	 */
-	public function onEvent($eventname, $bean) {
-		if ($eventname=='sql_exec') {
-			if ($this->flushCache) { 
-				$this->cache = array();
-			}
-		}
-	}
 	
 	/**
 	 * Returns the number of hits. If a call to load() or
