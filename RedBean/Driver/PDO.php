@@ -60,6 +60,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	protected $connectInfo = array();
 
+	
+	/**
+	 * Contains driver specific connection options.
+	 * @var array
+	 */
+	protected $connectOptions = array();
 
 	/**
 	 * Whether you want to use classic String Only binding -
@@ -91,7 +97,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *
 	 * @return void
 	 */
-	public function __construct($dsn, $user = null, $pass = null) {
+	public function __construct($dsn, $user = null, $pass = null, $options = null) {
 		if ($dsn instanceof PDO) {
 			$this->pdo = $dsn;
 			$this->isConnected = true;
@@ -103,6 +109,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		} else {
 			$this->dsn = $dsn;
 			$this->connectInfo = array( 'pass'=>$pass, 'user'=>$user );
+			$this->connectOptions = $options;
 		}
 	}
 
@@ -120,15 +127,20 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		$user = $this->connectInfo['user'];
 		$pass = $this->connectInfo['pass'];
 		//PDO::MYSQL_ATTR_INIT_COMMAND
+		if ($this->connectOptions === NULL) {
+			$options = array(1002 => 'SET NAMES utf8',
+				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+			);
+		}
+		else {
+			$options = $this->connectOptions;
+		}
 		$this->pdo = new PDO(
 				  $this->dsn,
 				  $user,
 				  $pass,
-				  array(1002 => 'SET NAMES utf8',
-							 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-							 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-
-				  )
+				  $options
 		);
 		$this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
 		$this->isConnected = true;

@@ -65,7 +65,13 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @var boolean
 	 */
 	protected $isConnected = false;
-	
+
+	/**
+	 * Contains driver specific connection options.
+	 * @var array
+	 */
+	protected $connectOptions = array();
+
 	private $nlsDateFormat = 'YYYY-MM-DD HH24:MI:SS';
 	private $nlsTimeStampFormat = 'YYYY-MM-DD HH24:MI:SS.FF';
 
@@ -102,7 +108,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 *
 	 * @return void
 	 */
-	public function __construct($dsn, $user = null, $pass = null) {
+	public function __construct($dsn, $user = null, $pass = null, $options = null) {
 		if ($dsn instanceof resource) {
 			$this->connection = $dsn;
 			$this->isConnected = true;
@@ -111,6 +117,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		} else {
 			$this->dsn = substr($dsn, 7);  // remove 'oracle:'
 			$this->connectInfo = array('pass' => $pass, 'user' => $user);
+			$this->connectOptions = $options;
 		}
 	}
 	
@@ -171,9 +178,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	/**
 	 * Establishes a connection to the database using PHP PDO
 	 * functionality. If a connection has already been established this
-	 * method will simply return directly. This method also turns on
-	 * UTF8 for the database and PDO-ERRMODE-EXCEPTION as well as
-	 * PDO-FETCH-ASSOC.
+	 * method will simply return directly. 
 	 *
 	 * @return void
 	 */
@@ -182,8 +187,14 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			return;
 		$user = $this->connectInfo['user'];
 		$pass = $this->connectInfo['pass'];
+		if (is_array($this->connectOptions) && array_key_exists('charset', $this->connectOptions)) {
+			$charset = $this->connectOptions['charset'];
+		}
+		else {
+			$charset = 'utf8';
+		}
 
-		$this->connection = oci_connect($user, $pass, $this->dsn, 'utf8');
+		$this->connection = oci_connect($user, $pass, $this->dsn, $charset);
 		if (!$this->connection) {
 			$e = oci_error();
 			print_r($e);

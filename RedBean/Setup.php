@@ -66,7 +66,7 @@ class RedBean_Setup {
 	 *
 	 * @return RedBean_ToolBox $toolbox
 	 */
-	public static function kickstart($dsn,$username=NULL,$password=NULL,$frozen=false ) {
+	public static function kickstart($dsn,$username=NULL,$password=NULL,$frozen=false,$options=NULL) {
 		if ($dsn instanceof PDO) {
 			$db = new RedBean_Driver_PDO($dsn);
 			$dsn = $db->getDatabaseType();
@@ -74,9 +74,9 @@ class RedBean_Setup {
 		else {
 			self::checkDSN($dsn);
 			if (strpos($dsn, 'oracle') === 0) 
-				$db = new RedBean_Driver_OCI($dsn,$username,$password);	
+				$db = new RedBean_Driver_OCI($dsn,$username,$password,$options);	
 			else
-				$db = new RedBean_Driver_PDO($dsn,$username,$password);
+				$db = new RedBean_Driver_PDO($dsn,$username,$password,$options);
 						
 		}
 		$adapter = new RedBean_Adapter_DBAdapter($db);
