@@ -155,7 +155,7 @@ class RedBean_Facade {
 	 * be printed to the screen or logged by provided logger.
 	 *
 	 * @param boolean $tf
-	 * @param RedBean_ILogger $logger
+	 * @param RedBean_Logger $logger
 	 */
 	public static function debug( $tf = true, $logger = NULL ) {
 		if (!$logger) $logger = new RedBean_Logger_Default;

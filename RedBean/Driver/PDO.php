@@ -29,8 +29,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	protected $debug = false;
 
 	/**
-	 * Holds an instance of ILogger implementation.
-	 * @var RedBean_ILogger
+	 * Holds an instance of Logger implementation.
+	 * @var RedBean_Logger
 	 */
 	protected $logger = NULL;
 
@@ -341,11 +341,11 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * passes on to the screen for inspection.
 	 * This method has no return value.
 	 *
-	 * Additionally you can inject RedBean_ILogger implementation
+	 * Additionally you can inject RedBean_Logger implementation
 	 * where you can define your own log() method
 	 *
 	 * @param boolean $trueFalse turn on/off
-	 * @param RedBean_ILogger $logger 
+	 * @param RedBean_Logger $logger 
 	 *
 	 * @return void
 	 */
@@ -358,18 +358,18 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 
 
 	/**
-	 * Injects RedBean_ILogger object.
+	 * Injects RedBean_Logger object.
 	 *
-	 * @param RedBean_ILogger $logger
+	 * @param RedBean_Logger $logger
 	 */
-	public function setLogger( RedBean_Logger_Default $logger ) {
+	public function setLogger( RedBean_Logger $logger ) {
 		$this->logger = $logger;
 	}
 
 	/**
-	 * Gets RedBean_ILogger object.
+	 * Gets RedBean_Logger object.
 	 *
-	 * @return RedBean_ILogger
+	 * @return RedBean_Logger
 	 */
 	public function getLogger() {
 		return $this->logger;
