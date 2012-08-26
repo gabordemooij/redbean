@@ -85,7 +85,6 @@ $allPacks = array(
 		'Blackhole/Meta',
 		'Blackhole/Import',
 		'Blackhole/Export',
-		
 		'Base/Dispense',
 		'Base/Boxing',
 		'Base/Typechecking',
@@ -96,7 +95,6 @@ $allPacks = array(
 		'Base/Dup',
 		'Base/Update',
 		'Base/Batch',
-		'Base/Beancan',
 		'Base/Relations',
 		'Base/Association',
 		'Base/Aliasing',
@@ -107,9 +105,7 @@ $allPacks = array(
 		'Base/Unrelated',
 		'Base/Fuse',
 		'Base/Tags',
-		'Base/Graph',
 		'Base/Null',
-		'Base/Export',
 		'Base/Issue90',
 		'Base/Nuke',
 		'Base/Keywords',
@@ -138,7 +134,6 @@ $allPacks = array(
 		'Sqlite/Parambind',
 		'Sqlite/Writer',
 		'Sqlite/Rebuild',
-		'Base/Timeline'
 );
 
 $suffix = array(
@@ -147,8 +142,12 @@ $suffix = array(
 );
 
 $pluginPacks = array(
+	'Plugin/Export',
+	'Plugin/Graph',
+	'Plugin/Timeline',
+	'Plugin/Sync',
+	'Plugin/Beancan',
 	'Plugin/Cache',
-	'Plugin/Sync'
 );
 
 //Default (mode == all)

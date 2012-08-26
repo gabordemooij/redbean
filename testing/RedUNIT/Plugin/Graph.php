@@ -12,7 +12,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Graph extends RedUNIT_Base {
+class RedUNIT_Plugin_Graph extends RedUNIT_Plugin {
 
 	/**
 	 * Begin testing.
@@ -21,7 +21,8 @@ class RedUNIT_Base_Graph extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
-		
+		R::nuke();
+		R::dependencies(array());
 		global $currentDriver;
 		global $lifeCycle;
 		$toolbox = R::$toolbox;

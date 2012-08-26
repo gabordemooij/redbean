@@ -12,7 +12,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Export extends RedUNIT_Base {
+class RedUNIT_Plugin_Export extends RedUNIT_Plugin {
 
 	/**
 	 * Begin testing.
