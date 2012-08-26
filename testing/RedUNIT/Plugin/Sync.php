@@ -29,6 +29,7 @@ class RedUNIT_Plugin_Sync extends RedUNIT_Plugin {
 	 */
 	private function createAPaintiningByMonet() {
 		$artist = R::dispense('monet');
+		$artist->born = '1840-11-14';
 		$paintings = R::dispense('painting',2);
 		$artist->ownPainting = $paintings;
 		$parasol = R::dispense('parasol');
@@ -100,7 +101,10 @@ class RedUNIT_Plugin_Sync extends RedUNIT_Plugin {
 				R::configureFacadeWithToolbox($toolbox);
 				R::freeze(true);
 				$id = $this->createAPaintiningByMonet();
+				$columns = R::$writer->getColumns('monet');
 				$monet = R::load('monet',$id);
+				$wclass = get_class($toolbox->getWriter());
+				asrt($monet->born,'1840-11-14');
 				asrt(count($monet->ownPainting),2);
 				foreach($monet->ownPainting as $painting) {
 					asrt(count($painting->sharedGarden),1);

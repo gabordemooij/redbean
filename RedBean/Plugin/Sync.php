@@ -35,6 +35,7 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 			false, 1, 2.5, -10, 1000, 'abc', $longText, '2010-10-10', '2010-10-10 10:00:00', '10:00:00', 'POINT(1 2)'
 		);
 		$translations = array();
+		$defaultCode = $targetWriter->scanType('string');
 		foreach ($testmap as $v) {
 			$code = $sourceWriter->scanType($v, true);
 			$translation = $targetWriter->scanType($v, true);
@@ -43,7 +44,13 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 			if ($translation > $translations[$code] && $translation < 50)
 				$translations[$code] = $translation;
 		}
-		$defaultCode = $targetWriter->scanType('string');
+		
+		
+		//Fix narrow translations SQLiteT stores date as double. (double != really double)
+		if (get_class($sourceWriter)==='RedBean_QueryWriter_SQLiteT') {
+			$translations[1] = $defaultCode;  //use magic number in case writer not loaded.
+		}
+		
 		$sourceTables = $sourceWriter->getTables();
 		$targetTables = $targetWriter->getTables();
 		$missingTables = array_diff($sourceTables, $targetTables);
