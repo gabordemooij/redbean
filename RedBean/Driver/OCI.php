@@ -33,8 +33,8 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	private $debug = false;
 	
 	/**
-	 * Holds an instance of ILogger implementation.
-	 * @var RedBean_ILogger
+	 * Holds an instance of Logger implementation.
+	 * @var RedBean_Logger
 	 */	
 	protected $logger = NULL;
 	/**
@@ -458,18 +458,18 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * passes on to the screen for inspection.
 	 * This method has no return value.
 	 *
-	 * Additionally you can inject RedBean_ILogger implementation
+	 * Additionally you can inject RedBean_Logger implementation
 	 * where you can define your own log() method
 	 *
 	 * @param boolean $trueFalse turn on/off
-	 * @param RedBean_ILogger $logger 
+	 * @param RedBean_Logger $logger 
 	 *
 	 * @return void
 	 */
 	public function setDebugMode( $tf, $logger = NULL ) {
 		$this->connect();
 		$this->debug = (bool)$tf;
-		if ($this->debug and !$logger) $logger = new RedBean_Logger();
+		if ($this->debug and !$logger) $logger = new RedBean_Logger_Default();
 		$this->setLogger($logger);
 	}
 
