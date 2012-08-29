@@ -62,13 +62,6 @@ class RedBean_Facade {
 	 */
 	public static $extAssocManager;
 
-
-	/**
-	 * Holds an instance of Bean Exporter
-	 * @var RedBean_Plugin_BeanExport
-	 */
-	public static $exporter;
-	
 	/**
 	 * Holds the tag manager
 	 * @var RedBean_TagManager

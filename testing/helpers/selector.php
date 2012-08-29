@@ -111,6 +111,7 @@ $allPacks = array(
 		'Base/Keywords',
 		'Base/Count',
 		'Base/Chill',
+		'Base/With',
 		'Base/Misc',
 		'CUBRID/Setget',
 		'Oracle/Base',

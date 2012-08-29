@@ -49,6 +49,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @var null
 	 */
 	private $fetchType = NULL;
+	
+	private $withSql = '';
+	private $aliasName = NULL;
 
 	/** Returns the alias for a type
 	 *
@@ -228,7 +231,29 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		unset($this->properties[$property]);
 	}
 
-
+	/**
+	 * Adds WHERE clause conditions to ownList retrieval
+	 * 
+	 * @param string $sql
+	 * 
+	 * @return RedBean_OODBBean 
+	 */
+	public function with($sql) {
+		$this->withSql = $sql;
+		return $this;
+	}
+	
+	public function withCondition($sql) {
+		$this->withSql = ' AND '.$sql;
+		return $this;
+	}
+	
+	public function alias($aliasName) {
+		$this->aliasName = $aliasName;
+		return $this;
+	}	
+	
+	
 	/**
 	 * Magic Getter. Gets the value for a specific property in the bean.
 	 * If the property does not exist this getter will make sure no error
@@ -262,8 +287,16 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$firstCharCode = ord(substr($property,3,1));
 				if ($firstCharCode>=65 && $firstCharCode<=90) {
 					$type = (__lcfirst(str_replace('own','',$property)));
-					$myFieldLink = $this->getMeta('type').'_id';
-					$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ",array($this->getID())));
+					if ($this->aliasName) {
+						$myFieldLink = $this->aliasName.'_id';
+						$this->setMeta('sys.alias.'.$type,$this->aliasName);
+						$this->aliasName = null;
+					}
+					else {
+						$myFieldLink =  $this->getMeta('type').'_id';
+					}
+					$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ".$this->withSql,array($this->getID())));
+					$this->withSql = '';
 					$this->properties[$property] = $beans;
 					$this->setMeta('sys.shadow.'.$property,$beans);
 					$this->setMeta('tainted',true);
