@@ -314,13 +314,16 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * Counts rows in a table.
 	 *
-	 * @param string $beanType
+	 * @param string $beanType type of bean to count
+	 * @param string $addSQL   additional SQL
+	 * @param array  $params   parameters to bind to SQL
 	 *
 	 * @return integer $numRowsFound
 	 */
-	public function count($beanType) {
+	public function count($beanType,$addSQL = '',$params = array()) {
 		$sql = "SELECT count(*) FROM {$this->safeTable($beanType)} ";
-		return (int) $this->adapter->getCell($sql);
+		if ($addSQL!='') $addSQL = ' WHERE '.$addSQL; 
+		return (int) $this->adapter->getCell($sql.$addSQL,$params);
 	}
 
 	/**

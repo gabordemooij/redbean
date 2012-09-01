@@ -782,13 +782,15 @@ class RedBean_OODB extends RedBean_Observable {
 	/**
 	 * Returns the number of beans we have in DB of a given type.
 	 *
-	 * @param string $type type of bean we are looking for
+	 * @param string $type   type of bean we are looking for
+	 * @param string $addSQL additional SQL snippet
+	 * @param array  $params parameters to bind to SQL
 	 *
 	 * @return integer $num number of beans found
 	 */
-	public function count($type) {
+	public function count($type,$addSQL='',$params=array()) {
 		try {
-			return (int) $this->writer->count($type);
+			return (int) $this->writer->count($type,$addSQL,$params);
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)

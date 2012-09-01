@@ -827,12 +827,14 @@ class RedBean_Facade {
 	 * Counts beans
 	 *
 	 * @param string $beanType type of bean
+	 * @param string $addSQL   additional SQL snippet (for filtering, limiting)
+	 * @param array  $params   parameters to bind to SQL
 	 *
 	 * @return integer $numOfBeans
 	 */
 
-	public static function count( $beanType ) {
-		return RedBean_Facade::$redbean->count($beanType);
+	public static function count( $beanType, $addSQL = '', $params = array() ) {
+		return RedBean_Facade::$redbean->count($beanType,$addSQL,$params);
 	}
 
 	/**

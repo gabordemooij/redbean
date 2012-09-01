@@ -256,12 +256,15 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 
 	/**
 	 * Counts rows in a table.
+	 * Overridden because OCI want upper cased table name.
 	 *
-	 * @param string $beanType
+	 * @param string $beanType type of bean you want to count
+	 * @param string $assSQL   additional SQL snippet for filtering
+	 * @param array  $params   parameters to bind to SQL snippet
 	 *
 	 * @return integer $numRowsFound
 	 */
-	public function count($beanType) {
+	public function count($beanType,$addSQL = '', $params = array()) {
 		return parent::count(strtoupper($beanType));
 	}
 
