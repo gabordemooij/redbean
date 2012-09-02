@@ -326,24 +326,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return (int) $this->adapter->getCell($sql.$addSQL,$params);
 	}
 
-	/**
-	 * This method should add an index to a type and field with name
-	 * $name.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param  $type   type to add index to
-	 * @param  $name   name of the new index
-	 * @param  $column field to index
-	 *
-	 * @return void
-	 */
-	public function addIndex($type, $name, $column) {
-		$table = $type;
-		$table = $this->safeTable($table);
-		$name = preg_replace('/\W/','',$name);
-		$column = $this->safeColumn($column);
-		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
-	}
+	
 
 	/**
 	 * This is a utility service method publicly available.

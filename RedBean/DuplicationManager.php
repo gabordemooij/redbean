@@ -34,7 +34,9 @@ class RedBean_DuplicationManager {
 	 */
 	protected $redbean;
 	
-	
+	protected $tables = array();
+	protected $filters = array();
+	protected $cacheTables = false;
 	/**
 	 * Constructor,
 	 * creates a new instance of DupManager.
@@ -45,6 +47,21 @@ class RedBean_DuplicationManager {
 		$this->redbean = $toolbox->getRedBean();
 		$this->associationManager = $this->redbean->getAssociationManager();
 	}
+	
+	
+	public function setTables($tables) {
+		$this->tables = $tables;
+		$this->cacheTables = true;
+	}
+	
+	public function setCacheTables($yesNo) {
+		$this->cacheTables = $yesNo;
+	}
+	
+	public function setFilters($filters) {
+		$this->filters = $filters;
+	}
+	
 	
 	/**
 	 * Makes a copy of a bean. This method makes a deep copy
@@ -72,8 +89,11 @@ class RedBean_DuplicationManager {
 	 * @return array $copiedBean the duplicated bean
 	 */
 	public function dup($bean,$trail=array(),$pid=false) {
+		if (!count($this->tables))  $this->tables = $this->toolbox->getWriter()->getTables();
 		$beanCopy = clone($bean);
-		return $this->duplicate($beanCopy,$trail,$pid);
+		$rs = $this->duplicate($beanCopy,$trail,$pid);
+		if (!$this->cacheTables) $this->tables = array();
+		return $rs;
 	}
 	
 	/**
@@ -97,6 +117,7 @@ class RedBean_DuplicationManager {
 	 * @return array $copiedBean the duplicated bean
 	 */
 	protected function duplicate($bean,$trail=array(),$pid=false) {
+	
 	$type = $bean->getMeta('type');
 		$key = $type.$bean->getID();
 		if (isset($trail[$key])) return $bean;
@@ -104,8 +125,9 @@ class RedBean_DuplicationManager {
 		$copy =$this->redbean->dispense($type);
 		$copy->import( $bean->getProperties() );
 		$copy->id = 0;
-		$tables = $this->toolbox->getWriter()->getTables();
+		$tables = $this->tables;
 		foreach($tables as $table) {
+			if (in_array($table,$this->filters)) continue;
 			if (strpos($table,'_')!==false || $table==$type) continue;
 			$owned = 'own'.ucfirst($table);
 			$shared = 'shared'.ucfirst($table);

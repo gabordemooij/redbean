@@ -27,6 +27,29 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		
+		R::$adapter->getDatabase()->setLogger( new RedBean_Logger_Default);
+		asrt((R::$adapter->getDatabase()->getLogger() instanceof RedBean_Logger),true);
+		asrt((R::$adapter->getDatabase()->getLogger() instanceof RedBean_Logger_Default),true);
+		
+		$bean = R::dispense('bean');
+		$bean->property = 1;
+		$bean->unsetAll(array('property'));
+		asrt($bean->property,null);
+		
+		asrt(($bean->setAttr('property',2) instanceof RedBean_OODBBean),true);
+		asrt($bean->property,2);
+		
+		asrt(preg_match('/\d\d\d\d\-\d\d\-\d\d/',R::isoDate()),1);
+		asrt(preg_match('/\d\d\d\d\-\d\d\-\d\d\s\d\d:\d\d:\d\d/',R::isoDateTime()),1);
+		
+		$redbean = R::getRedBean();
+		$adapter = R::getDatabaseAdapter();
+		$writer = R::getWriter();
+		asrt(($redbean instanceof RedBean_OODB),true);
+		asrt(($adapter instanceof RedBean_Adapter),true);
+		asrt(($writer instanceof RedBean_QueryWriter),true);
+		
+		
 		$u1 = R::dispense('user');
 		$u1->name = 'Gabor';
 		$u1->login = 'g';

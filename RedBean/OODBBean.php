@@ -125,6 +125,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		}
 		return $this;
 	}
+	
+	public function inject(RedBean_OODBBean $otherBean) {
+		$myID = $this->id;
+		$array = $otherBean->export();
+		$this->import($array);
+		$this->id = $myID;
+		return $this;
+	}
 
 	/**
 	 * Very superficial export function
@@ -143,8 +151,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param boolean $meta
 	 * @return array $arr
 	 */
-	public function export($meta = false, $parents = false, $onlyMe = false) {
-		//$arr = $this->properties;
+	public function export($meta = false, $parents = false, $onlyMe = false, $filters = array()) {
 		$arr=array();
 		if ($parents) {
 			foreach($this as $k=>$v) {
@@ -155,8 +162,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			}
 		}
 		foreach($this as $k=>$v) {
-			if (!$onlyMe && is_array($v)) foreach($v as $i=>$b) $v[$i]=$b->export($meta,false,false);
-			if ($v instanceof RedBean_OODBBean) $v = $v->export($meta,$parents,true);
+			if (!$onlyMe && is_array($v)) foreach($v as $i=>$b) $v[$i]=$b->export($meta,false,false,$filters);
+			if ($v instanceof RedBean_OODBBean) {
+				if (in_array(strtolower($v->getMeta('type')),$filters)) {
+					continue;
+				}
+				$v = $v->export($meta,$parents,true,$filters);
+			}
 			$arr[$k] = $v;
 		}
 		if ($meta) $arr['__info'] = $this->__info;

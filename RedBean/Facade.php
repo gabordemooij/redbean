@@ -67,6 +67,12 @@ class RedBean_Facade {
 	 * @var RedBean_TagManager
 	 */
 	public static $tagManager;
+	
+	/**
+	 * holds the duplication manager
+	 * @var RedBean_DuplicationManager 
+	 */
+	public static $duplicationManager;
 
 	/**
 	 * Holds the Key of the current database.
@@ -659,9 +665,9 @@ class RedBean_Facade {
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
-	public static function dup($bean,$trail=array(),$pid=false) {
-		$duplicationManager = new RedBean_DuplicationManager(self::$toolbox);
-		return $duplicationManager->dup($bean, $trail,$pid);
+	public static function dup($bean,$trail=array(),$pid=false,$filters=array()) {
+		self::$duplicationManager->setFilters($filters);
+		return self::$duplicationManager->dup($bean, $trail,$pid);
 	}
 
 	/**
@@ -676,12 +682,12 @@ class RedBean_Facade {
 	 *
 	 * @return	array $array exported structure
 	 */
-	public static function exportAll($beans,$parents=false) {
+	public static function exportAll($beans,$parents=false,$filters=array()) {
 		$array = array();
 		if (!is_array($beans)) $beans = array($beans);
 		foreach($beans as $bean) {
-			$f = self::dup($bean,array(),true);
-			$array[] = $f->export(false,$parents);
+			$f = self::dup($bean,array(),true,$filters);
+			$array[] = $f->export(false,$parents,false,$filters);
 		}
 		return $array;
 	}
@@ -860,6 +866,7 @@ class RedBean_Facade {
 		self::$redbean->addEventListener('open', $helper );
 		self::$redbean->addEventListener('delete', $helper );
 		self::$associationManager->addEventListener('delete', $helper );
+		self::$duplicationManager = new RedBean_DuplicationManager(self::$toolbox);
 		self::$redbean->addEventListener('after_delete', $helper );
 		self::$redbean->addEventListener('after_update', $helper );
 		self::$redbean->addEventListener('dispense', $helper );

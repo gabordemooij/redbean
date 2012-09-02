@@ -501,9 +501,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			}
 			$this->adapter->exec("DROP TABLE \"$t\"");
 		}
-		foreach($this->getTables() as $t) {
-			$this->adapter->exec("DROP TABLE \"$t\"");
-		}
+		
 	}
 	
 	

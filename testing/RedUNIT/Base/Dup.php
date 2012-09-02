@@ -24,7 +24,6 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 	 */
 	public function run() {
 		
-		
 		testpack('Dup() and Export() should not taint beans');
 		R::nuke();
 		
@@ -70,8 +69,27 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		$this->runOnce(false);
 		R::freeze(false);
 		
-		
-		
+		testpack('Export with filters');
+		R::nuke();
+		$book = R::dispense('book');
+		$pages = R::dispense('page',2);
+		$author = R::dispense('author');
+		$book->ownPage = $pages;
+		$book->author = $author;
+		R::store($book);
+		R::$duplicationManager->setTables( R::$writer->getTables() );
+		$objects = (R::exportAll(array($book),true,array()));
+		asrt(isset($objects[0]['ownPage']),true);
+		asrt(count($objects[0]['ownPage']),2);
+		asrt(isset($objects[0]['author']),true);
+		$objects = (R::exportAll(array($book),true,array('page')));
+		asrt(isset($objects[0]['ownPage']),false);
+		$objects = (R::exportAll(array($book),true,array('author')));
+		asrt(isset($objects[0]['author']),false);
+		$objects = (R::exportAll(array($book),true,array('author','page')));
+		asrt(isset($objects[0]['author']),false);
+		asrt(isset($objects[0]['ownPage']),false);
+		R::$duplicationManager->setCacheTables(false);
 		
 	}
 

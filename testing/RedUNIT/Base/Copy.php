@@ -215,8 +215,8 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		asrt($emplOld->name,'Gus Cannon');
 		
 		//However the shared beans must not be copied
-		R::count('guest',3);
-		R::count('shared_prop',1);
+		asrt(R::count('guest'),3);
+		asrt(R::count('guest_prop'),1);
 		$arthur = R::findOne('guest',' '.R::$writer->safeColumn('name').' = ? ',array('Arthur Dent'));
 		asrt($arthur->name,'Arthur Dent');	
 				

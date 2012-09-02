@@ -44,8 +44,6 @@ class RedUNIT_Base_Count extends RedUNIT_Base {
 		$page = R::dispense('page');
 		$page->name = 'bar';
 		R::store($page);
-		//asrt(R::count('page'),2);
-		R::debug(1);
 		asrt(R::count('page',' name = ? ',array('foo')),1);
 		
 	}

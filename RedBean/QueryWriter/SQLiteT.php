@@ -154,20 +154,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return $r;
 	}
 
-	/**
-	 * Quote Items, to prevent issues with reserved words.
-	 *
-	 * @param array $items items to quote
-	 *
-	 * @return $quotedfItems quoted items
-	 */
-	private function quote( $items ) {
-		foreach($items as $k=>$item) {
-			$items[$k]=$this->noKW($item);
-		}
-		return $items;
-	}
-
+	
 	
 	
 	/**
