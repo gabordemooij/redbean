@@ -164,10 +164,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		foreach($this as $k=>$v) {
 			if (!$onlyMe && is_array($v)) foreach($v as $i=>$b) $v[$i]=$b->export($meta,false,false,$filters);
 			if ($v instanceof RedBean_OODBBean) {
-				if (in_array(strtolower($v->getMeta('type')),$filters)) {
+				if (count($filters) && !in_array(strtolower($v->getMeta('type')),$filters)) {
 					continue;
 				}
-				$v = $v->export($meta,$parents,true,$filters);
+				$v = $v->export($meta,$parents,true,false,$filters);
 			}
 			$arr[$k] = $v;
 		}

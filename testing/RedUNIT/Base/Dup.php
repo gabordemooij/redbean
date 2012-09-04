@@ -26,7 +26,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		
 		testpack('Dup() and Export() should not taint beans');
 		R::nuke();
-		
+		/*
 		$p = R::dispense('page');
 		$b = R::dispense('book');
 		$b->ownPage[] = $p;
@@ -68,12 +68,18 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		R::freeze(true);
 		$this->runOnce(false);
 		R::freeze(false);
-		
+		*/
 		testpack('Export with filters');
 		R::nuke();
 		$book = R::dispense('book');
 		$pages = R::dispense('page',2);
+		$texts = R::dispense('text',2);
+		$images = R::dispense('image',2);
 		$author = R::dispense('author');
+		$pages[0]->ownText = array( $texts[0] );
+		$pages[0]->ownImage = array( $images[0] );
+		$pages[1]->ownText = array( $texts[1] );
+		$pages[1]->ownImage = array( $images[1] );
 		$book->ownPage = $pages;
 		$book->author = $author;
 		R::store($book);
@@ -82,11 +88,31 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		asrt(isset($objects[0]['ownPage']),true);
 		asrt(count($objects[0]['ownPage']),2);
 		asrt(isset($objects[0]['author']),true);
-		$objects = (R::exportAll(array($book),true,array('page')));
-		asrt(isset($objects[0]['ownPage']),false);
+		asrt(isset($objects[0]['ownPage'][0]['ownText']),true);
+		asrt(count($objects[0]['ownPage'][0]['ownText']),1);
+		asrt(isset($objects[0]['ownPage'][0]['ownImage']),true);
+		asrt(count($objects[0]['ownPage'][0]['ownImage']),1);
+		$objects = (R::exportAll(array($book),true,array('page','author','text','image')));
+		asrt(isset($objects[0]['ownPage']),true);
+		asrt(count($objects[0]['ownPage']),2);
+		asrt(isset($objects[0]['author']),true);
+		asrt(isset($objects[0]['ownPage'][0]['ownText']),true);
+		asrt(count($objects[0]['ownPage'][0]['ownText']),1);
+		asrt(isset($objects[0]['ownPage'][0]['ownImage']),true);
+		asrt(count($objects[0]['ownPage'][0]['ownImage']),1);
 		$objects = (R::exportAll(array($book),true,array('author')));
+		asrt(isset($objects[0]['ownPage']),false);
+		asrt(isset($objects[0]['ownPage'][0]['ownText']),false);
+		$objects = (R::exportAll(array($book),true,array('page')));
 		asrt(isset($objects[0]['author']),false);
-		$objects = (R::exportAll(array($book),true,array('author','page')));
+		asrt(isset($objects[0]['ownPage'][0]['ownText']),false);
+		$objects = (R::exportAll(array($book),true,array('page','text')));
+		asrt(isset($objects[0]['author']),false);
+		asrt(isset($objects[0]['ownPage']),true);
+		asrt(isset($objects[0]['ownPage'][0]['ownText']),true);
+		asrt(count($objects[0]['ownPage'][0]['ownText']),1);
+		asrt(isset($objects[0]['ownPage'][0]['ownImage']),false);
+		$objects = (R::exportAll(array($book),true,array('none')));
 		asrt(isset($objects[0]['author']),false);
 		asrt(isset($objects[0]['ownPage']),false);
 		R::$duplicationManager->setCacheTables(false);
