@@ -50,7 +50,19 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	private $fetchType = NULL;
 	
+	/**
+	 * Used store store SQL snippet for use with with()
+	 * method.
+	 * 
+	 * @var string 
+	 */
 	private $withSql = '';
+	
+	/**
+	 * Alias name for a type.
+	 * 
+	 * @var string 
+	 */
 	private $aliasName = NULL;
 
 	/** Returns the alias for a type
@@ -126,6 +138,15 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return $this;
 	}
 	
+	/**
+	 * Injects the properties of another bean but keeps the original ID.
+	 * Just like import() but keeps the original ID.
+	 * Chainable.
+	 * 
+	 * @param RedBean_OODBBean $otherBean the bean whose properties you would like to copy
+	 * 
+	 * @return RedBean_OODBBean $self
+	 */
 	public function inject(RedBean_OODBBean $otherBean) {
 		$myID = $this->id;
 		$array = $otherBean->export();
@@ -162,14 +183,25 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			}
 		}
 		foreach($this as $k=>$v) {
-			if (!$onlyMe && is_array($v)) foreach($v as $i=>$b) $v[$i]=$b->export($meta,false,false,$filters);
-			if ($v instanceof RedBean_OODBBean) {
+			if (!$onlyMe && is_array($v)) {
+				$vn = array();
+				foreach($v as $i=>$b) {
+					if (is_numeric($i)) {
+						$vn[]=$b->export($meta,false,false,$filters);
+					}
+					else {
+						$vn[$i]=$b->export($meta,false,false,$filters);
+					}
+					$v = $vn;
+				}
+			}
+			elseif ($v instanceof RedBean_OODBBean) {
 				if (count($filters) && !in_array(strtolower($v->getMeta('type')),$filters)) {
 					continue;
 				}
 				$v = $v->export($meta,$parents,false,$filters);
 			}
-			$arr[$k] = $v;
+			if (is_numeric($k)) $arr[] = $k; else $arr[$k] = $v;
 		}
 		if ($meta) $arr['__info'] = $this->__info;
 		return $arr;
@@ -244,17 +276,39 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	}
 
 	/**
-	 * Adds WHERE clause conditions to ownList retrieval
+	 * Adds WHERE clause conditions to ownList retrieval.
+	 * For instance to get the pages that belong to a book you would
+	 * issue the following command: $book->ownPage
+	 * However, to order these pages by number use:
 	 * 
-	 * @param string $sql
+	 * $book->with(' ORDER BY `number` ASC ')->ownPage
 	 * 
-	 * @return RedBean_OODBBean 
+	 * the additional SQL snippet will be merged into the final
+	 * query.
+	 * 
+	 * @param string $sql SQL to be added to retrieval query.
+	 * 
+	 * @return RedBean_OODBBean $self
 	 */
 	public function with($sql) {
 		$this->withSql = $sql;
 		return $this;
 	}
 	
+	/**
+	 * Just like with(). Except that this method prepends the SQL query snippet 
+	 * with AND which makes it slightly more comfortable to use a conditional
+	 * SQL snippet. For instance to filter an own-list with pages (belonging to
+	 * a book) on specific chapters you can use:
+	 * 
+	 * $book->withCondition(' chapter = 3 ')->ownPage
+	 * 
+	 * This will return in the own list only the pages having 'chapter == 3'. 
+	 * 
+	 * @param string $sql SQL to be added to retrieval query (prefixed by AND)
+	 * 
+	 * @return RedBean_OODBBean $self
+	 */
 	public function withCondition($sql) {
 		$this->withSql = ' AND '.$sql;
 		return $this;
