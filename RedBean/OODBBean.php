@@ -167,7 +167,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				if (count($filters) && !in_array(strtolower($v->getMeta('type')),$filters)) {
 					continue;
 				}
-				$v = $v->export($meta,$parents,true,false,$filters);
+				$v = $v->export($meta,$parents,false,$filters);
 			}
 			$arr[$k] = $v;
 		}
