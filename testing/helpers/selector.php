@@ -145,10 +145,10 @@ $suffix = array(
 $pluginPacks = array(
 	'Plugin/Export',
 	'Plugin/Graph',
-	'Plugin/Timeline',
 	'Plugin/Sync',
 	'Plugin/Beancan',
 	'Plugin/Cache',
+	'Plugin/Timeline',
 );
 
 //Default (mode == all)
