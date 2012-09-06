@@ -89,7 +89,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	 * 
 	 * @return integer $id 
 	 */
-	public function store(RedBean_OODBBean $bean) {
+	public function store( $bean ) {
 		$id = parent::store($bean);
 		$type = $bean->getMeta('type');
 		if (!isset($this->cache[$type])) $this->cache[$type]=array();
@@ -103,7 +103,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	 * @param RedBean_OODBBean $bean bean
 	 * @return mixed 
 	 */
-	public function trash(RedBean_OODBBean $bean) {
+	public function trash( $bean ) {
 		$type = $bean->getMeta('type');
 		$id = $bean->id;
 		if (isset($this->cache[$type][$id])) unset($this->cache[$type][$id]);
