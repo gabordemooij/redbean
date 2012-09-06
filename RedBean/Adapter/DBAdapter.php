@@ -268,12 +268,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		return $this->db->FailTrans();
 	}
 	
-	
 	/**
 	 * Closes the database connection.
 	 */
 	public function close() {
 		$this->db->close();
 	}
-
 }

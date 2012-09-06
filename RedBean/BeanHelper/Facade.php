@@ -41,5 +41,4 @@ class RedBean_BeanHelper_Facade implements RedBean_BeanHelper {
 		$obj->loadBean($bean);
 		return $obj;
 	}
-	
 }

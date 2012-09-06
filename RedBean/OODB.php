@@ -43,6 +43,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $writer;
+	
 	/**
 	 * Whether this instance of OODB is frozen or not.
 	 * In frozen mode the schema will not de modified, in fluid mode
@@ -58,6 +59,13 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	protected $beanhelper = null;
 	
+	/**
+	 * Association Manager.
+	 * Reference to the Association Manager. The OODB class uses
+	 * the association manager to store many-to-many relations.
+	 * 
+	 * @var RedBean_AssociationManager
+	 */
 	protected $assocManager = null;
 
 	/**

@@ -38,22 +38,33 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 */	
 	protected $logger = NULL;
 	/**
-	 * 
-	 * @var unknown_type
+	 * Number of affected rows for update/insert query.
+	 * @var integer
 	 */
 	private $affected_rows;
 
 	/**
-	 * 
-	 * @var unknown_type
+	 * Result storage.
+	 * @var mixed
 	 */
 	private $rs;
+	
+	/**
+	 * Whether to automatically commit query or not.
+	 * @var boolean
+	 */
 	private $autocommit = true;
 
-	/* Hold the statement for the last query */
+	/**
+	 * Hold the statement for the last query.
+	 * @var mixed 
+	 */
 	private $statement;
 
-	/* Hold the last inserted Id for the last statement */
+	/**
+	 * Hold the last inserted Id for the last statement.
+	 * @var mixed 
+	 */
 	private $lastInsertedId;
 
 	/**
@@ -66,9 +77,21 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 */
 	protected $isConnected = false;
 	
+	/**
+	 * OCI NLS date format.
+	 * @var string 
+	 */
 	private $nlsDateFormat = 'YYYY-MM-DD HH24:MI:SS';
+	
+	/**
+	 * OCI NLS date format.
+	 * @var string
+	 */
 	private $nlsTimeStampFormat = 'YYYY-MM-DD HH24:MI:SS.FF';
 
+	/**
+	 * OCI constants
+	 */
 	const OCI_NO_SUCH_TABLE = '942';
 	const OCI_NO_SUCH_COLUMN = '904';
 	const OCI_INTEGRITY_CONSTRAINT_VIOLATION = '2292';
@@ -541,7 +564,5 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$e = oci_fetch_all($s, $output);
 		return $output['BANNER'][0];
 	}
-	
-
 }
 

@@ -15,7 +15,6 @@
  */
 class RedBean_Driver_PDO implements RedBean_Driver {
 
-
 	/**
 	 * Contains database DSN for connecting to database.
 	 * @var string
@@ -85,9 +84,9 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *    $driver = new RedBean_Driver_PDO($dsn, $user, $password);
 	 *    $driver = new RedBean_Driver_PDO($existingConnection);
 	 *
-	 * @param string|PDO  $dsn	 database connection string
-	 * @param string      $user optional
-	 * @param string      $pass optional
+	 * @param string|PDO  $dsn	database connection string
+	 * @param string      $user optional, usename to sign in 
+	 * @param string      $pass optional, password for connection login
 	 *
 	 * @return void
 	 */
