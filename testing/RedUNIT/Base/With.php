@@ -1,9 +1,10 @@
 <?php
 /**
- * RedUNIT_Base_Update 
- * @file 			RedUNIT/Base/Update.php
- * @description		Tests basic storage features through OODB class.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
+ * RedUNIT_Base_With
+ *  
+ * @file 			RedUNIT/Base/With.php
+ * @description		Tests query modification of own-lists with prefix-with
+ * 					method.
  * @author			Gabor de Mooij
  * @license			BSD
  *
@@ -14,6 +15,10 @@
  */
 class RedUNIT_Base_With extends RedUNIT_Base {
 	
+	/**
+	 * This test suite uses specific SQL, only suited for MySQL.
+	 * @return array 
+	 */
 	public function getTargetDrivers() {
 		return array('mysql');
 	}
@@ -27,7 +32,6 @@ class RedUNIT_Base_With extends RedUNIT_Base {
 	public function run(){
 	
 		R::nuke();
-		
 		list($book1,$book2,$book3) = R::dispense('book',3);
 		$book1->position = 1;
 		$book2->position = 2;
@@ -36,8 +40,6 @@ class RedUNIT_Base_With extends RedUNIT_Base {
 		$shelf->ownBook = array($book1,$book2,$book3);
 		$id = R::store($shelf);
 		$shelf = R::load('shelf',$id);
-		
-		
 		$books = $shelf->with(' ORDER BY position ASC ')->ownBook;
 		$book1 = array_shift($books);
 		asrt((int)$book1->position,1);
@@ -65,7 +67,6 @@ class RedUNIT_Base_With extends RedUNIT_Base {
 		$shelf = R::load('shelf',$id);
 		$books = $shelf->withCondition(' position > -1 ')->ownBook;
 		asrt(count($books),3);
-		
 		
 		//alias
 		list($game1,$game2,$game3) = R::dispense('game',3);
@@ -126,15 +127,5 @@ class RedUNIT_Base_With extends RedUNIT_Base {
 		$team1 = R::load('team',$t1->id);
 		asrt(count($team1->alias('team1')->ownGame),0);
 		asrt(count($team1->ownBook),1);
-		
-		
-		
-		
-		
-		
-		
-		
-		
 	}
-	
 }
