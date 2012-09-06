@@ -26,7 +26,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		
 		testpack('Dup() and Export() should not taint beans');
 		R::nuke();
-		/*
+		
 		$p = R::dispense('page');
 		$b = R::dispense('book');
 		$b->ownPage[] = $p;
@@ -68,7 +68,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		R::freeze(true);
 		$this->runOnce(false);
 		R::freeze(false);
-		*/
+		
 		testpack('Export with filters');
 		R::nuke();
 		$book = R::dispense('book');

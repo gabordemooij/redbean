@@ -169,7 +169,6 @@ else {
 
 //Always include the last ones.
 $packList = array_merge($packList,$suffix);
-
 global $currentDriver;
 foreach($packList as $testPack) {
 	require_once($path.$testPack.'.php');
