@@ -28,7 +28,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$pdo = $adapter->getDatabase();
 		
 		$bean=$redbean->dispense('bean');
-		$bean->prop = 3;
+		$bean->prop = 1;
 		$redbean->store($bean);
 		$adapter->exec('UPDATE bean SET prop = 2');
 		asrt($adapter->getAffectedRows(),1);

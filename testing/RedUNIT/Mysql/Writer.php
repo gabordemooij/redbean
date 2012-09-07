@@ -280,10 +280,10 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$cols = R::getColumns('bean');
 		asrt($cols['date'],'datetime');
 		$bean = R::dispense('bean');
-		//$bean->date = 'soon';
-		//R::store($bean);
-		//$cols = R::getColumns('bean');
-		//asrt($cols['date'],'datetime'); --due to strict mode.
+		$bean->date = 'soon';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['date'],'datetime');
 		$this->setGetSpatial('POINT(1 2)');
 		$this->setGetSpatial('LINESTRING(3 3,4 4)');
 		$this->setGetSpatial('POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))');
