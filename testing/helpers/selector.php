@@ -39,6 +39,8 @@ require_once('../RedUNIT/Plugin.php');
 if (isset($ini['mysql'])) {
 	$dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";
 	R::addDatabase('mysql',$dsn,$ini['mysql']['user'],$ini['mysql']['pass'],false);
+	R::selectDatabase('mysql');
+	R::exec("SET @@global.sql_mode= '';");
 	
 }
 if (isset($ini['pgsql'])) {
