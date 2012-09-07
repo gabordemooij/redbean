@@ -283,7 +283,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$bean->date = 'soon';
 		R::store($bean);
 		$cols = R::getColumns('bean');
-		asrt($cols['date'],'datetime');
+		//asrt($cols['date'],'datetime'); --due to strict mode.
 		$this->setGetSpatial('POINT(1 2)');
 		$this->setGetSpatial('LINESTRING(3 3,4 4)');
 		$this->setGetSpatial('POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))');
