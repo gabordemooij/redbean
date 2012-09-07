@@ -28,7 +28,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$pdo = $adapter->getDatabase();
 		
 		$bean=$redbean->dispense('bean');
-		$bean->prop = 1;
+		$bean->prop = 3; //make test run with strict mode as well
 		$redbean->store($bean);
 		$adapter->exec('UPDATE bean SET prop = 2');
 		asrt($adapter->getAffectedRows(),1);
