@@ -27,6 +27,13 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		
+		$bean=$redbean->dispense('bean');
+		$bean->prop = 1;
+		$redbean->store($bean);
+		$adapter->exec('UPDATE bean SET prop = 2');
+		asrt($adapter->getAffectedRows(),1);
+		
+		
 		R::$adapter->getDatabase()->setLogger( new RedBean_Logger_Default);
 		asrt((R::$adapter->getDatabase()->getLogger() instanceof RedBean_Logger),true);
 		asrt((R::$adapter->getDatabase()->getLogger() instanceof RedBean_Logger_Default),true);
@@ -110,11 +117,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		
 		
 		R::nuke();
-		$bean=$redbean->dispense('bean');
-		$bean->prop = 1;
-		$redbean->store($bean);
-		$adapter->exec('UPDATE bean SET prop = 2');
-		asrt($adapter->getAffectedRows(),1);
+		
 		
 		if (method_exists(R::$adapter->getDatabase(),'getPDO')) 
 		asrt($adapter->getDatabase()->getPDO() instanceof PDO, true);

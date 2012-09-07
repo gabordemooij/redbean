@@ -82,7 +82,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		$pages[1]->ownImage = array( $images[1] );
 		$book->ownPage = $pages;
 		$book->author = $author;
-		R::store($book);
+		$bookID = R::store($book);
 		R::$duplicationManager->setTables( R::$writer->getTables() );
 		$objects = (R::exportAll(array($book),true,array()));
 		asrt(isset($objects[0]['ownPage']),true);
@@ -116,6 +116,12 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		asrt(isset($objects[0]['author']),false);
 		asrt(isset($objects[0]['ownPage']),false);
 		R::$duplicationManager->setCacheTables(false);
+		
+		testpack('Keyless export');
+		$book = R::load('book',$bookID);
+		$book->ownPage;
+		$export = $book->export();
+		asrt(isset($export['ownPage'][0]),true);
 		
 	}
 

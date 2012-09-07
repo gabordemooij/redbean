@@ -201,7 +201,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				}
 				$v = $v->export($meta,$parents,false,$filters);
 			}
-			if (is_numeric($k)) $arr[] = $k; else $arr[$k] = $v;
+			$arr[$k] = $v;
 		}
 		if ($meta) $arr['__info'] = $this->__info;
 		return $arr;
