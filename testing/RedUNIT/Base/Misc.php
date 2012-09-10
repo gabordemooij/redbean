@@ -20,6 +20,13 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
+		
+		testpack('Accept datetime objects.');
+		$cal = R::dispense('calendar');
+		$cal->when = new DateTime('2000-01-01', new DateTimeZone('Pacific/Nauru'));
+		asrt($cal->when,'2000-01-01 00:00:00');
+		
+		testpack('Affected rows test');
 		global $currentDriver; 
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
@@ -33,7 +40,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$adapter->exec('UPDATE bean SET prop = 2');
 		asrt($adapter->getAffectedRows(),1);
 		
-		
+		testpack('Testing Logger');
 		R::$adapter->getDatabase()->setLogger( new RedBean_Logger_Default);
 		asrt((R::$adapter->getDatabase()->getLogger() instanceof RedBean_Logger),true);
 		asrt((R::$adapter->getDatabase()->getLogger() instanceof RedBean_Logger_Default),true);

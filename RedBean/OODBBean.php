@@ -435,8 +435,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		if ($value===false) {
 			$value = '0';
 		}
-		if ($value===true) {
+		elseif ($value===true) {
 			$value = '1';
+		}
+		elseif ($value instanceof DateTime) {
+			$value = $value->format('Y-m-d H:i:s');
 		}
 		$this->properties[$property] = $value;
 	}
