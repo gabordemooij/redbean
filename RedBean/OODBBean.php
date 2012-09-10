@@ -15,6 +15,17 @@
  */
 class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 
+	
+	/**
+	 * By default own-lists and shared-lists no longer have IDs as keys (3.3+),
+	 * this is because exportAll also does not offer this feature and we want the
+	 * ORM to be more consistent. Also, exporting without keys makes it easier to
+	 * export lists to Javascript because unlike in PHP in JS arrays will fill up gaps.
+	 * 
+	 * @var boolean  
+	 */
+	private static $flagKeyedExport = false;
+	
     /**
      * Reference to NULL property for magic getter.
      * @var Null $null
@@ -65,6 +76,18 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	private $aliasName = NULL;
 
+	/**
+	 * By default own-lists and shared-lists no longer have IDs as keys (3.3+),
+	 * this is because exportAll also does not offer this feature and we want the
+	 * ORM to be more consistent. Also, exporting without keys makes it easier to
+	 * export lists to Javascript because unlike in PHP in JS arrays will fill up gaps.
+	 * 
+	 * @var boolean $yesNo 
+	 */
+	public static function setFlagKeyedExport($flag) {
+		self::$flagKeyedExport = (boolean) $flag;
+	}
+	
 	/** Returns the alias for a type
 	 *
 	 * @param  $type aliased type
@@ -186,7 +209,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			if (!$onlyMe && is_array($v)) {
 				$vn = array();
 				foreach($v as $i=>$b) {
-					if (is_numeric($i)) {
+					if (is_numeric($i) && !self::$flagKeyedExport) {
 						$vn[]=$b->export($meta,false,false,$filters);
 					}
 					else {

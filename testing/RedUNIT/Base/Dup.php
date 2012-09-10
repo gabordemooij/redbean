@@ -122,6 +122,13 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		$book->ownPage;
 		$export = $book->export();
 		asrt(isset($export['ownPage'][0]),true);
+		RedBean_OODBBean::setFlagKeyedExport(true);
+		$export = $book->export();
+		asrt(isset($export['ownPage'][1]),true);
+		RedBean_OODBBean::setFlagKeyedExport(false);
+		$export = $book->export();
+		asrt(isset($export['ownPage'][0]),true);
+		
 		
 	}
 
