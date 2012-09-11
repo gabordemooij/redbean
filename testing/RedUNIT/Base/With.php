@@ -49,11 +49,11 @@ class RedUNIT_Base_With extends RedUNIT_Base {
 		asrt((int)$book3->position,3);
 		$books = $shelf->with(' ORDER BY position DESC ')->ownBook;
 		$book1 = array_shift($books);
-		asrt((int)$book1->position,1);
+		asrt((int)$book1->position,3);
 		$book2 = array_shift($books);
 		asrt((int)$book2->position,2);
 		$book3 = array_shift($books);
-		asrt((int)$book3->position,3);
+		asrt((int)$book3->position,1);
 		//R::debug(1);
 		$shelf = R::load('shelf',$id);
 		$books = $shelf->with(' AND position > 2 ')->ownBook;
@@ -67,6 +67,35 @@ class RedUNIT_Base_With extends RedUNIT_Base {
 		$shelf = R::load('shelf',$id);
 		$books = $shelf->withCondition(' position > -1 ')->ownBook;
 		asrt(count($books),3);
+		
+		//with-condition should not affect storing
+		$shelf = R::load('shelf',$id);
+		$books = $shelf->with(' AND position = 1 ')->ownBook;
+		asrt(count($books),1);
+		asrt(count($shelf->ownBook),1);
+		$book = reset($shelf->ownBook);
+		$book->title = 'Trees and other Poems';
+		R::store($shelf);
+		$books = $shelf->withCondition(' position > -1 ')->ownBook;
+		asrt(count($books),3);
+		asrt(count($shelf->ownBook),3);
+		$shelf = R::load('shelf',$id);
+		$books = $shelf->with(' AND position = 1 ')->ownBook;
+		$shelf->ownBook = array(); //also with trashing -- just trash one!
+		R::store($shelf);
+		$books = $shelf->withCondition(' position > -1 ')->ownBook;
+		asrt(count($books),2);
+		//with should cause a reload of a list
+		$shelf = R::load('shelf',$id);
+		$books = $shelf->with(' AND position = 2 ')->ownBook;
+		asrt(count($books),1);
+		$books = $shelf->withCondition(' position > -1 ')->ownBook;
+		asrt(count($books),2);
+		$book = reset($books);
+		$book->title = 'Venetian Music';
+		R::store($shelf); //should not affect storage (fact that we used with twice, unsetting prop)
+		$shelf = R::load('shelf',$id);
+		asrt(count($shelf->ownBook),2);
 		
 		//alias
 		list($game1,$game2,$game3) = R::dispense('game',3);
