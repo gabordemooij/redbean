@@ -337,11 +337,35 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return $this;
 	}
 	
+	/**
+	 * Prepares an own-list to use an alias. This is best explained using
+	 * an example. Imagine a project and a person. The project always involves
+	 * two persons: a teacher and a student. The person beans have been aliased in this
+	 * case, so to the project has a teacher_id pointing to a person, and a student_id
+	 * also pointing to a person. Given a project, we obtain the teacher like this:
+	 * 
+	 * $project->fetchAs('person')->teacher;
+	 * 
+	 * Now, if we want all projects of a teacher we cant say:
+	 * 
+	 * $teacher->ownProject
+	 * 
+	 * because the $teacher is a bean of type 'person' and no project has been
+	 * assigned to a person. Instead we use the alias() method like this:
+	 * 
+	 * $teacher->alias('teacher')->ownProject
+	 * 
+	 * now we get the projects associated with the person bean aliased as
+	 * a teacher.
+	 * 
+	 * @param string $aliasName the alias name to use
+	 * 
+	 * @return RedBean_OODBBean 
+	 */
 	public function alias($aliasName) {
 		$this->aliasName = $aliasName;
 		return $this;
 	}	
-	
 	
 	/**
 	 * Magic Getter. Gets the value for a specific property in the bean.
