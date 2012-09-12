@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Postgres
+ * 
  * @file 			RedUNIT/Postgres.php
  * @description		Parent class for all Postgres tests.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

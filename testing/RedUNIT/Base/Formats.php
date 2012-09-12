@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Formats 
+ * 
  * @file 			RedUNIT/Base/Formats.php
  * @description		Tests bean formatting, custom table mapping features.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

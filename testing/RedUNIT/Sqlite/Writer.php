@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Sqlite_Writer
+ * 
  * @file 			RedUNIT/Sqlite/Writer.php
  * @description		Tests writer specific functions.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

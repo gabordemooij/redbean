@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Mysql_Views 
+ * RedUNIT_Mysql_Views
+ * 
  * @file 			RedUNIT/Mysql/Views.php
  * @description		Tests creation of database views.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

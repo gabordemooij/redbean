@@ -1,11 +1,12 @@
 <?php
 /**
  * RedUNIT_Sqlite_Rebuild
- * @file 		RedUNIT/Sqlite/Rebuild.php
+ * 
+ * @file			RedUNIT/Sqlite/Rebuild.php
  * @description		Test rebuilding of tables for SQLite
- * 			This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author		Gabor de Mooij
- * @license		BSD
+ *					This class is part of the RedUNIT test suite for RedBeanPHP.
+ * @author			Gabor de Mooij
+ * @license			BSD
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij

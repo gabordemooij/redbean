@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Observers 
+ * 
  * @file 			RedUNIT/Base/Observers.php
  * @description		Tests the observer pattern in RedBeanPHP.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

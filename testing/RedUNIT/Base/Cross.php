@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Cross 
+ * 
  * @file 			RedUNIT/Base/Cross.php
  * @description		Tests associations within the same table (i.e. page_page2 alike)
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

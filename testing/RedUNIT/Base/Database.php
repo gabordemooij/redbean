@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Database 
+ * 
  * @file 			RedUNIT/Base/Database.php
  * @description		Tests basic database behaviors
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

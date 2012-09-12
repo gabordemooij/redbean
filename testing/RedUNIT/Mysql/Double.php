@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Mysql_Double 
+ * 
  * @file 			RedUNIT/Mysql/Double.php
  * @description		Tests handling of double precision values.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

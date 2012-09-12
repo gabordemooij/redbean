@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Sqlite_Setget
+ * 
  * @file 			RedUNIT/Sqlite/Setget.php
  * @description		Tests whether values are stored correctly.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

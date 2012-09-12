@@ -1,8 +1,10 @@
 <?php
 /**
- * RedUNIT_Base_Graph 
- * @file 			RedUNIT/Base/Graph.php
+ * RedUNIT_Plugin_Graph
+ *  
+ * @file 			RedUNIT/Plugin/Graph.php
  * @description		Tests converting arrays into persistable bean collections.
+ *					This test pack is part of the RedBeanPHP ORM Plugin test suite.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
  * @license			BSD

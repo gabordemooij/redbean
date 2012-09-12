@@ -1,7 +1,8 @@
 <?php
 /**
- * RedUNIT_Base_Association 
- * @file 			RedUNIT/Base/RedBean_OODBBean.php
+ * RedUNIT_Base_ExtAssoc
+ * 
+ * @file 			RedUNIT/Base/ExtAssoc.php
  * @description		Tests extended associations, associations with additional properties in
  * 					link table.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

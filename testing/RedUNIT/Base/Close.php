@@ -1,8 +1,9 @@
 <?php
 /**
  * RedUNIT_Base_Close 
+ * 
  * @file 			RedUNIT/Base/Close.php
- * @description		Tests bean closing functionality.
+ * @description		Tests database closing functionality.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
  * @license			BSD

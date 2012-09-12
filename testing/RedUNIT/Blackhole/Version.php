@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Blackhole_Version 
+ * 
  * @file 			RedUNIT/Blackhole/Version.php
  * @description		Tests identification features.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Postgres_Parambind
+ * 
  * @file 			RedUNIT/Postgres/Parambind.php
  * @description		Tests PDO parameter binding for Postgres.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

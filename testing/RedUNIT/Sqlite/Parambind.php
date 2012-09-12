@@ -1,7 +1,8 @@
 <?php
 /**
- * RedUNIT_Mysql_Parambind 
- * @file 			RedUNIT/Mysql/Parambind.php
+ * RedUNIT_Sqlite_Parambind 
+ * 
+ * @file 			RedUNIT/Sqlite/Parambind.php
  * @description		Tests PDO parameter binding.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij

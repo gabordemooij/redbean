@@ -1,8 +1,9 @@
 <?php
 /**
- * RedUNIT_Mysql
- * @file 			RedUNIT/Mysql.php
- * @description		Parent class for all MySQL tests.
+ * RedUNIT_Oracle
+ * 
+ * @file 			RedUNIT/Oracle.php
+ * @description		Parent class for all Oracle tests.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
  * @license			BSD

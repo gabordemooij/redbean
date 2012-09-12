@@ -1,8 +1,10 @@
 <?php
 /**
- * RedUNIT_Base_Export 
- * @file 			RedUNIT/Base/Export.php
+ * RedUNIT_Plugin_Export
+ *  
+ * @file 			RedUNIT/Plugin/Export.php
  * @description		Tests export functions for beans.
+ *					This test pack is part of the RedBeanPHP ORM Plugin test suite.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
  * @license			BSD

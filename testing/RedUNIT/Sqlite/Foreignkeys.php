@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Sqlite_Foreignkeys
+ * 
  * @file 			RedUNIT/Sqlite/Foreignkeys.php
  * @description		Tests the creation of foreign keys.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

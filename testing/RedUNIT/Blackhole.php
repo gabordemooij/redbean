@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Blackhole
+ * 
  * @file 			RedUNIT/Blackhole.php
  * @description		Parent class for all tests that don't need a database connection.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

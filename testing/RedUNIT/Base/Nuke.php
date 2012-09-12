@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Base_Nuke 
+ * RedUNIT_Base_Nuke
+ * 
  * @file 			RedUNIT/Base/Nuke.php
  * @description		Test the nuke() function.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

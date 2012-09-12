@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Copy 
+ * 
  * @file 			RedUNIT/Base/Copy.php
  * @description		Intensive test for dup()
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

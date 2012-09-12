@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Mysql_Writer
+ * 
  * @file 			RedUNIT/Mysql/Writer.php
  * @description		A collection of database specific writer functions.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Boxing 
+ * 
  * @file 			RedUNIT/Base/Boxing.php
  * @description		Tests bean boxing and unboxing functionality.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

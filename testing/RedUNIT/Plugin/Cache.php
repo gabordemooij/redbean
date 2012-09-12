@@ -1,10 +1,10 @@
 <?php
-
 /**
  * RedUNIT_Plugin_Cache
+ * 
  * @file 			RedUNIT/Plugin/Cache.php
  * @description		Tests caching plugin.
- * 					
+ * 					This test pack is part of the RedBeanPHP ORM Plugin test suite.
  * @author			Gabor de Mooij
  * @license			BSD
  *

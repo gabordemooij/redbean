@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Mysql_Freeze 
+ * 
  * @file 			RedUNIT/Mysql/Freeze.php
  * @description		Tests freezing of databases for production environments.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

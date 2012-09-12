@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Mysql_Foreignkeys 
+ * RedUNIT_Mysql_Foreignkeys
+ * 
  * @file 			RedUNIT/Mysql/Foreignkeys.php
  * @description		Tests creation of foreign keys.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

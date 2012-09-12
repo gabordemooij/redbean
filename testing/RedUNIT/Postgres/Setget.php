@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Postgres_Setget
+ * 
  * @file 			RedUNIT/Postgres/Setget.php
  * @description		Tests whether values are correctly stored.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

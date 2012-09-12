@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Sqlite_Formats
+ * 
  * @file 			RedUNIT/Sqlite/Formats.php
  * @description		Tests bean formatting with various data types.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

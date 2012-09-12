@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Association 
+ * 
  * @file 			RedUNIT/Base/Association.php
  * @description		Tests Association API (N:N associations)
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

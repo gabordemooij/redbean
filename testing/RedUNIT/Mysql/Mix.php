@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Mysql_Mix 
+ * RedUNIT_Mysql_Mix
+ * 
  * @file 			RedUNIT/Mysql/Mix.php
  * @description		Tests mixing SQL with PHP, SQLHelper class.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

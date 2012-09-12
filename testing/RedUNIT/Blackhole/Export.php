@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Blackhole_Export 
+ * RedUNIT_Blackhole_Export
+ * 
  * @file 			RedUNIT/Blackhole/Export.php
  * @description		Tests basic bean exporting features.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Typechecking 
+ * 
  * @file 			RedUNIT/Base/Typechecking.php
  * @description		Tests basic bean validation rules; invalid bean handling.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

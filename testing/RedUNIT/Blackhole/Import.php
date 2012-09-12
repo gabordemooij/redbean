@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Blackhole_Import 
+ * RedUNIT_Blackhole_Import
+ * 
  * @file 			RedUNIT/Blackhole/Import.php
  * @description		Tests basic bean importing features.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Postgres_Writer
+ * 
  * @file 			RedUNIT/Postgres/Writer.php
  * @description		A collection of writer specific tests.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

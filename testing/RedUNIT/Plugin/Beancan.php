@@ -1,8 +1,10 @@
 <?php
 /**
- * RedUNIT_Base_Association 
- * @file 			RedUNIT/Base/Beancan.php
+ * RedUNIT_Plugin_Association
+ * 
+ * @file 			RedUNIT/Plugin/Beancan.php
  * @description		Tests BeanCan Server
+ *					This test pack is part of the RedBeanPHP ORM Plugin test suite.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
  * @license			BSD

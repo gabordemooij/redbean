@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Keywords 
+ * 
  * @file 			RedUNIT/Base/Keywords.php
  * @description		Tests for possible keyword clashes.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

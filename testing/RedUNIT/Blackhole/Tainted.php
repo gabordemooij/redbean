@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Blackhole_Tainted 
+ * 
  * @file 			RedUNIT/Blackhole/Tainted.php
  * @description		Tests tainted flag for OODBBean objects.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

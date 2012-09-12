@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Dispense 
+ * 
  * @file 			RedUNIT/Base/Dispense.php
  * @description		Tests bean dispensing functionality.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

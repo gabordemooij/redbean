@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Mysql_Setget 
+ * RedUNIT_Mysql_Setget
+ * 
  * @file 			RedUNIT/Mysql/Setget.php
  * @description		Tests whether values are stored correctly.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Base_Unrelated 
+ * RedUNIT_Base_Unrelated
+ * 
  * @file 			RedUNIT/Base/Unrelated.php
  * @description		Tests finding of unrelated beans.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

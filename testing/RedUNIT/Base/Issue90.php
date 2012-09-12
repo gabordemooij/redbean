@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Issue90 
+ * 
  * @file 			RedUNIT/Base/Issue90.php
  * @description		Issue #90 - cannot trash bean with ownproperty if checked in model.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

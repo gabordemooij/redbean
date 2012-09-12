@@ -1,4 +1,19 @@
 <?php
+/**
+ * RedUNIT_Oracle_Base
+ * 
+ * @file 			RedUNIT/Oracle/Base.php
+ * @description		Basic tests for Oracle database.
+ * 					This class is part of the RedUNIT test suite for RedBeanPHP.
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
+ */
+
 class RedUNIT_Oracle_Base extends RedUNIT_Oracle {
 
 	/**

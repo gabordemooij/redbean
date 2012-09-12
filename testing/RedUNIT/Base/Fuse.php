@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Fuse 
+ * 
  * @file 			RedUNIT/Base/Fuse.php
  * @description		Tests Fuse feature; coupling beans to models.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

@@ -1,8 +1,10 @@
 <?php
 /**
- * RedUNIT_Base_Timeline 
- * @file 			RedUNIT/Base/Timeline.php
+ * RedUNIT_Plugin_Timeline 
+ * 
+ * @file 			RedUNIT/Plugin/Timeline.php
  * @description		Tests the Time Line feature for logging schema modifications.
+ *					This test pack is part of the RedBeanPHP ORM Plugin test suite.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
  * @license			BSD

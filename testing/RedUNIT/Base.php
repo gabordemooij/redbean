@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base
+ * 
  * @file 			RedUNIT/Base.php
  * @description		Parent class for all tests that should be ran for all databases.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

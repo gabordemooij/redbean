@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Oracle_Setget 
+ * RedUNIT_Oracle_Setget
+ * 
  * @file 			RedUNIT/Oracle/Setget.php
  * @description		Tests whether values are stored correctly.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

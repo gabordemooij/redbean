@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Blackhole_Fusebox 
+ * RedUNIT_Blackhole_Fusebox
+ * 
  * @file 			RedUNIT/Blackhole/Fusebox.php
  * @description		Tests Boxing/Unboxing of beans.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

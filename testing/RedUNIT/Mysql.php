@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Mysql
+ * 
  * @file 			RedUNIT/Mysql.php
  * @description		Parent class for all MySQL tests.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

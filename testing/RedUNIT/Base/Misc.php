@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Base_Misc 
+ * RedUNIT_Base_Misc
+ * 
  * @file 			RedUNIT/Base/Misc.php
  * @description		Various tests.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

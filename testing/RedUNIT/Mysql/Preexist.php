@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Mysql_Preexist 
+ * RedUNIT_Mysql_Preexist
+ * 
  * @file 			RedUNIT/Mysql/Preexist.php
  * @description		Tests integration with pre-existing schemas.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

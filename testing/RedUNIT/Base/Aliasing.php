@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Aliasing 
+ * 
  * @file 			RedUNIT/Base/Aliasing.php
  * @description		Tests for nested beans with aliases, i.e. teacher alias for person etc.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

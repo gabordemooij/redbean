@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Base_Null 
+ * RedUNIT_Base_Null
+ * 
  * @file 			RedUNIT/Base/Null.php
  * @description		Tests handling of NULL values.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

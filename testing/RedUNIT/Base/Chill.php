@@ -1,8 +1,9 @@
 <?php
 /**
  * RedUNIT_Base_Chill
+ * 
  * @file 			RedUNIT/Base/Chill.php
- * @description		Tests chill list functionality.
+ * @description		Tests chill list functionality, i.e. freezing a subset of all types.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
  * @license			BSD

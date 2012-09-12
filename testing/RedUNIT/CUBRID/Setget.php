@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_CUBRID_Setget 
+ * 
  * @file 			RedUNIT/CUBRID/Setget.php
  * @description		Tests whether values are stored correctly.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

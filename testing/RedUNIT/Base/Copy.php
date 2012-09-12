@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Copy 
+ * 
  * @file 			RedUNIT/Base/Copy.php
  * @description		Tests whether we can make a deep copy of a bean.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

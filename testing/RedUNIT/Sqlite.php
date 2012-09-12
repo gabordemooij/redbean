@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Sqlite
+ * 
  * @file 			RedUNIT/Sqlite.php
  * @description		Parent class for all Sqlite tests.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

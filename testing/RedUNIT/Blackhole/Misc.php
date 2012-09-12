@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Blackhole_Misc 
+ * RedUNIT_Blackhole_Misc
+ *  
  * @file 			RedUNIT/Blackhole/Misc.php
  * @description		Tests various features that do not rely on a database connection.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

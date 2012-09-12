@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Finding 
+ * 
  * @file 			RedUNIT/Base/Finding.php
  * @description		Tests finding beans.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

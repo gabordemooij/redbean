@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Postgres_Views
+ * 
  * @file 			RedUNIT/Postgres/Views.php
  * @description		Tests the creation of views.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

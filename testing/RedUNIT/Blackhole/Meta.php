@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Blackhole_Meta 
+ * RedUNIT_Blackhole_Meta
+ * 
  * @file 			RedUNIT/Blackhole/Meta.php
  * @description		Tests meta data features on OODBBean class.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Postgres_Foreignkeys
+ * 
  * @file 			RedUNIT/Postgres/Foreignkeys.php
  * @description		Tests the creation of foreign keys.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

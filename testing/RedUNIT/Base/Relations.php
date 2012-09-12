@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Base_Relations 
+ * RedUNIT_Base_Relations
+ * 
  * @file 			RedUNIT/Base/Relations.php
  * @description		Tests N:1 relations, nested beans.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Base_Update 
+ * RedUNIT_Base_Update
+ * 
  * @file 			RedUNIT/Base/Update.php
  * @description		Tests basic storage features through OODB class.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

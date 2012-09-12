@@ -1,6 +1,7 @@
 <?php
 /**
  * RedUNIT_Sqlite_Views
+ * 
  * @file 			RedUNIT/Sqlite/Views.php
  * @description		Tests creation of views.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

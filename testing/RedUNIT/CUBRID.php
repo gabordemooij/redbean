@@ -1,8 +1,9 @@
 <?php
 /**
- * RedUNIT_Mysql
- * @file 			RedUNIT/Mysql.php
- * @description		Parent class for all MySQL tests.
+ * RedUNIT_CUBRID
+ * 
+ * @file 			RedUNIT/CUBRID.php
+ * @description		Parent class for all CUBRID tests.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
  * @license			BSD

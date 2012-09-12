@@ -1,6 +1,7 @@
 <?php
 /**
- * RedUNIT_Blackhole_Import 
+ * RedUNIT_Blackhole_Import
+ * 
  * @file 			RedUNIT/Blackhole/Labels.php
  * @description		Tests Facade Label functions.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.

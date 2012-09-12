@@ -1,8 +1,9 @@
 <?php
 /**
  * RedUNIT_Plugin
+ * 
  * @file 			RedUNIT/Plugin.php
- * @description		Parent class for all tests that should be ran for all databases.
+ * @description		Parent class for all tests that should be ran for all plugin tests.
  * 					This class is part of the RedUNIT test suite for RedBeanPHP.
  * @author			Gabor de Mooij
  * @license			BSD
