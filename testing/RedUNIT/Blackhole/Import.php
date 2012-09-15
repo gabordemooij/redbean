@@ -22,6 +22,7 @@ class RedUNIT_Blackhole_Import extends RedUNIT_Blackhole {
 	 * @return void
 	 */
 	public function run() {
+		testpack('Test basic import() feature.');
 		$bean = new RedBean_OODBBean;
 		$bean->import(array("a"=>1,"b"=>2));
 		asrt($bean->a, 1);
@@ -33,6 +34,16 @@ class RedUNIT_Blackhole_Import extends RedUNIT_Blackhole {
 		asrt($bean->a, 5);
 		asrt($bean->b, 6);
 		$bean->import(array("a"=>1,"b"=>2));
+		testpack('Test inject() feature.');
+		$coffee = R::dispense('coffee');
+		$coffee->id = 2;
+		$coffee->liquid = 'black';
+		$cup = R::dispense('cup');
+		$cup->color = 'green';
+		$cup->inject($coffee); //pour coffee in cup
+		asrt($cup->color,'green'); //do we still have our own property?
+		asrt($cup->liquid,'black'); //did we pour the liquid in the cup?
+		asrt($cup->id, 0);//id should not be transferred
 	}
 
 }
