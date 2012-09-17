@@ -265,7 +265,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return integer $numRowsFound
 	 */
 	public function count($beanType,$addSQL = '', $params = array()) {
-		return parent::count(strtoupper($beanType));
+		return parent::count(strtoupper($beanType),$addSQL,$params);
 	}
 
 	/**

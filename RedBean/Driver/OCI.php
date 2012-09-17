@@ -183,6 +183,15 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	}
 	
 	/**
+	 * Gets RedBean_Logger object.
+	 *
+	 * @return RedBean_Logger
+	 */
+	public function getLogger() {
+		return $this->logger;
+	}
+
+	/**
 	 * Toggles auto-commit.
 	 * 
 	 * @param boolean $toggle 

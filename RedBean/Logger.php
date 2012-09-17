@@ -22,8 +22,8 @@ interface RedBean_Logger {
    * that may be (files, database etc). Provides a uniform
    * interface for logging throughout RedBeanPHP.
    *
-   * @param string $message the message to log.
+   * @param string $message the message to log. (optional)
    */
-  public function log($message);
+  public function log();
 
 }
