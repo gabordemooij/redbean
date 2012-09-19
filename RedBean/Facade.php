@@ -1140,7 +1140,15 @@ class RedBean_Facade {
 		return self::$redbean;
 	}
 	
-	
+	/**
+	 * Preloads certain properties for beans.
+	 * Understands aliases.
+	 * 
+	 * Usage: R::preload($books,array('coauthor'=>'author'));
+	 * 
+	 * @param array $beans beans
+	 * @param array $types types to load
+	 */
 	public static function preload($beans,$types) {
 		foreach($types as $key => $type) {
 			$field = (is_numeric($key)) ? $type : $key;

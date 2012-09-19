@@ -473,6 +473,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		$this->properties[$property] = $value;
 	}
 
+	/**
+	 * Sets a property directly, for internal use only.
+	 * 
+	 * @param string $property property
+	 * @param mixed  $value    value
+	 */
 	public function setProperty($property,$value) {
 		$this->properties[$property] = $value;
 	}
