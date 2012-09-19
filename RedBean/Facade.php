@@ -1140,6 +1140,24 @@ class RedBean_Facade {
 		return self::$redbean;
 	}
 	
+	
+	public static function preload($beans,$types) {
+		foreach($types as $key => $type) {
+			$field = (is_numeric($key)) ? $type : $key;
+			$ids = array();
+			foreach($beans as $bean) {
+				$id = $bean->{$field.'_id'};
+				$ids[] = $id;
+				$map[$id] = $bean;
+			}	
+			$parents = R::batch($type,$ids);
+			foreach($parents as $parent) {
+				$map[$parent->id]->setProperty($field,$parent);
+			}
+			
+		}
+	}
+	
 }
 
 //Compatibility with PHP 5.2 and earlier

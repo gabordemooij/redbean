@@ -473,6 +473,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		$this->properties[$property] = $value;
 	}
 
+	public function setProperty($property,$value) {
+		$this->properties[$property] = $value;
+	}
+	
+	
 	/**
 	 * Returns the value of a meta property. A meta property
 	 * contains extra information about the bean object that will not
