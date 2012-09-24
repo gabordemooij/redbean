@@ -590,7 +590,7 @@ class RedBean_OODB extends RedBean_Observable {
 			$first = reset($ownAdditions);
 			if ($first instanceof RedBean_OODBBean) {
 				$alias = $bean->getMeta('sys.alias.'.$first->getMeta('type'));
-				if ($alias) $myFieldLink = $alias.'_id';
+				if ($alias) $myFieldLink = $alias;
 			}
 		}
 		foreach($ownAdditions as $addition) {
