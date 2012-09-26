@@ -301,6 +301,12 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($rs['result'][0]['briefcase']['name'],'green');
 		
 		
+		testpack('BeanCan does not include the request id in the response if it is 0');
+		$id = R::store(R::dispense('foo')->setAttr('prop1','val1'));
+		$rs =  json_decode( $can->handleJSONRequest('{"jsonrpc":"2.0","method":"foo:load","params":['.$id.'],"id":0}'), true);
+		asrt(isset($rs['id']),true);
+		asrt($rs['id'],0);
+		
 	}
 	
 	

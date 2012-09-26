@@ -42,7 +42,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 */
 	private function resp($result=null, $id=null, $errorCode='-32603',$errorMessage='Internal Error') {
 		$response = array('jsonrpc'=>'2.0');
-		if ($id) { $response['id'] = $id; }
+		 if (!is_null($id)) { $response['id'] = $id; }
 		if ($result) {
 			$response['result']=$result;
 		}
