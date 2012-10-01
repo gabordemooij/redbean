@@ -64,6 +64,9 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		asrt(($adapter instanceof RedBean_Adapter),true);
 		asrt(($writer instanceof RedBean_QueryWriter),true);
 		
+		R::setRedBean($redbean); pass(); //cant really test this
+		R::setDatabaseAdapter($adapter); pass(); //cant really test this
+		R::setWriter($writer); pass(); //cant really test this
 		
 		$u1 = R::dispense('user');
 		$u1->name = 'Gabor';

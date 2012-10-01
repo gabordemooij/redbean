@@ -89,9 +89,7 @@ class RedBean_Setup {
 		else if (strpos($dsn,'cubrid')===0) {
 			$writer = new RedBean_QueryWriter_CUBRID($adapter);
 		}
-		else if (strpos($dsn,'oracle')===0) {
-			$writer = new RedBean_QueryWriter_Oracle($adapter);
-		}		
+		else if (strpos($dsn,'oracle')===0) { $writer = new RedBean_QueryWriter_Oracle($adapter); }	//layout important for unit test - this line cannot always be tested. 	
 		else {
 			$writer = new RedBean_QueryWriter_MySQL($adapter);
 		}
