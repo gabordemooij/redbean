@@ -40,6 +40,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Returns the latest SQL Statement.
+	 * This method returns the most recently executed SQL statement string.
+	 * This can be used for building logging features.
 	 *
 	 * @return string $SQL latest SQL statement
 	 */
@@ -49,6 +51,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Escapes a string for use in a Query.
+	 * This method escapes the value argument using the native
+	 * driver escaping functions.
 	 *
 	 * @param  string $sqlvalue SQL value to escape
 	 *
@@ -216,6 +220,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Returns latest insert id, most recently inserted id.
+	 * Following an insert-SQL statement this method will return the most recently
+	 * primary key ID of an inserted record.
 	 *
 	 * @return integer $id latest insert ID
 	 */
@@ -225,6 +231,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Returns number of affected rows.
+	 * Returns the number of rows that have been affected by the most recent
+	 * SQL query.
 	 *
 	 * @return integer $numOfAffectRows
 	 */
@@ -234,6 +242,8 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Unwrap the original database object.
+	 * Returns the database driver instance. For instance this can be
+	 * an OCI object or a PDO instance or some other third party driver.
 	 *
 	 * @return RedBean_Driver $database	returns the inner database object
 	 */
@@ -243,8 +253,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Transactions.
-	 * Part of the transaction management infrastructure of RedBean.
+	 * Part of the transaction management infrastructure of RedBeanPHP.
 	 * Starts a transaction.
+	 * Note that transactions may not work in fluid mode depending on your 
+	 * database platform.
 	 */
 	public function startTransaction() {
 		return $this->db->StartTrans();
@@ -252,8 +264,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Transactions.
-	 * Part of the transaction management infrastructure of RedBean.
+	 * Part of the transaction management infrastructure of RedBeanPHP.
 	 * Commits a transaction.
+	 * Note that transactions may not work in fluid mode depending on your 
+	 * database platform.
 	 */
 	public function commit() {
 		return $this->db->CommitTrans();
@@ -261,8 +275,11 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 	/**
 	 * Transactions.
-	 * Part of the transaction management infrastructure of RedBean.
-	 * Rolls back transaction.
+	 * Part of the transaction management infrastructure of RedBeanPHP.
+	 * Rolls back transaction. This will undo all changes that have been
+	 * part of the transaction.
+	 * Note that transactions may not work in fluid mode depending on your 
+	 * database platform.
 	 */
 	public function rollback() {
 		return $this->db->FailTrans();

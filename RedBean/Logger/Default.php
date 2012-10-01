@@ -15,9 +15,11 @@
 class RedBean_Logger_Default implements RedBean_Logger {
 
   /**
-   * Default logger method logging to STDOUT
+   * Default logger method logging to STDOUT.
+   * This is the default/reference implementation of a logger.
+   * This method will write the message value to STDOUT (screen).
    *
-   * @param ...
+   * @param $message (optional)
    */
   public function log() {
     if (func_num_args() > 0) {

@@ -48,16 +48,39 @@ class RedBean_DuplicationManager {
 		$this->associationManager = $this->redbean->getAssociationManager();
 	}
 	
-	
+	/**
+	 * For better performance you can pass the tables in an array to this method.
+	 * If the tables are available the duplication manager will not query them so
+	 * this might be beneficial for performance.
+	 * 
+	 * @param array $tables 
+	 */
 	public function setTables($tables) {
 		$this->tables = $tables;
 		$this->cacheTables = true;
 	}
 	
+	/**
+	 * Indicates whether you want the duplication manager to cache the database schema.
+	 * If this flag is set to TRUE the duplication manager will query the database schema
+	 * only once. Otherwise the duplicationmanager will, by default, query the schema
+	 * every time a duplication action is performed (dup()).
+	 * 
+	 * @param boolean $yesNo 
+	 */
 	public function setCacheTables($yesNo) {
 		$this->cacheTables = $yesNo;
 	}
 	
+	/**
+	 * A filter array is an array with table names.
+	 * By setting a table filter you can make the duplication manager only take into account
+	 * certain bean types. Other bean types will be ignored when exporting or making a
+	 * deep copy. If no filters are set all types will be taking into account, this is
+	 * the default behavior.
+	 * 
+	 * @param array $filters 
+	 */
 	public function setFilters($filters) {
 		$this->filters = $filters;
 	}
@@ -147,7 +170,6 @@ class RedBean_DuplicationManager {
 			$copy->setMeta('sys.shadow.'.$shared,null);
 
 		}
-
 		if ($pid) $copy->id = $bean->id;
 		return $copy;
 	}
