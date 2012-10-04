@@ -27,8 +27,14 @@ class RedUNIT_Base_Update extends RedUNIT_Base {
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
 		$page = $redbean->dispense("page");
-		$page->name = "new name";
+		$page->name = "old name";
 		$id = $redbean->store($page);
+		asrt($page->getMeta('tainted'),false);
+		$page->setAttr('name',"new name");
+		asrt($page->getMeta('tainted'),true);
+		$id = $redbean->store($page);
+		$page = $redbean->load( "page", $id );
+		asrt( $page->name, "new name" );
 		//Null should == NULL after saving
 		$page->rating = null;
 		$newid = $redbean->store( $page );

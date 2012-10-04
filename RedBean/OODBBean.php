@@ -664,7 +664,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return RedBean_OODBBean the bean 
 	 */
 	public function setAttr($property,$value) {
-		$this->properties[$property] = $value;
+		$this->$property = $value;
 		return $this;
 	}
 	
