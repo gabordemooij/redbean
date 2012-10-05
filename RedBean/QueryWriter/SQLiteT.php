@@ -215,7 +215,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$q[] = "CREATE TABLE `$table` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr  $fkDef );";
 		foreach($tableMap['indexes'] as $name=>$index)  {
 			if (strpos($name,'UQ_')===0) {
-				if (strpos($name,'__')===false) continue; //old  index, forget.
 				$cols = explode('__',substr($name,strlen('UQ_'.$table)));
 				foreach($cols as $k=>$v) $cols[$k] = "`$v`";
 				$q[] = "CREATE UNIQUE INDEX $name ON `$table` (".implode(',',$cols).")";
@@ -335,7 +334,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		if (isset($t['indexes'][$name])) return;
 		$t['indexes'][$name] = array('name'=>$name);
 		$this->putTable($t);
-		
 	}
 
 	/**
