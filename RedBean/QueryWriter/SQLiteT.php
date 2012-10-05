@@ -322,20 +322,17 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	/**
 	 * Adds a Unique index constrain to the table.
 	 *
-	 * @param string $table   table
+	 * @param string $type    bean type (table name)
 	 * @param string $column1 first column
 	 * @param string $column2 second column
 	 *
 	 * @return void
 	 */
 	public function addUniqueIndex( $type,$columns ) {
-		$table = $this->safeTable($type,true);
-		$name = 'UQ_'.$table.implode('__',$columns);
-		$t = $this->getTable($type);
-		if (isset($t['indexes'][$name])) return;
-		$t['indexes'][$name] = array('name'=>$name);
-		$this->putTable($t);
-		
+		$type = $this->safeTable($type);
+		$name = 'UQ_'.sha1(implode(',',$columns));
+		$sql  = "CREATE UNIQUE INDEX IF NOT EXISTS $name ON $type (".implode(',',$columns).")";
+		$this->adapter->exec($sql);
 	}
 
 	/**
