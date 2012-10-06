@@ -8,7 +8,7 @@
  *						you should only have to change this file.
  * @author				Gabor de Mooij and the RedBeanPHP Community
  * @license				BSD/GPLv2
- * 
+ *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
@@ -71,18 +71,18 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param RedBean_Adapter_DBAdapter $adapter adapter
 	 */
 	public function __construct( RedBean_Adapter $adapter ) {
-	
+
 		$this->typeno_sqltype = array(
 			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER=>'INTEGER',
 			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC=>'NUMERIC',
 			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT=>'TEXT',
 		);
-		
+
 		$this->sqltype_typeno = array();
 		foreach($this->typeno_sqltype as $k=>$v)
 		$this->sqltype_typeno[$v]=$k;
-		
-				
+
+
 		$this->adapter = $adapter;
 		parent::__construct($adapter);
 	}
@@ -154,12 +154,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return $r;
 	}
 
-	
-	
-	
+
+
+
 	/**
 	 * Gets all information about a table (from a type).
-	 * 
+	 *
 	 * Format:
 	 * array(
 	 *		name => name of the table
@@ -167,10 +167,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 *		indexes => array() raw index information rows from PRAGMA query
 	 *		keys => array() raw key information rows from PRAGMA query
 	 * )
-	 * 
+	 *
 	 * @param string $type type you want to get info of
-	 * 
-	 * @return array $info 
+	 *
+	 * @return array $info
 	 */
 	protected function getTable($type) {
 		$tableName = $this->safeTable($type,true);
@@ -181,14 +181,14 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->tableArchive[$tableName] = $table;
 		return $table;
 	}
-	
+
 	/**
 	 * Puts a table. Updates the table structure.
 	 * In SQLite we can't change columns, drop columns, change or add foreign keys so we
 	 * have a table-rebuild function. You simply load your table with getTable(), modify it and
 	 * then store it with putTable()...
-	 * 
-	 * @param array $tableMap information array 
+	 *
+	 * @param array $tableMap information array
 	 */
 	protected function putTable($tableMap) {
 		$table = $tableMap['name'];
@@ -208,14 +208,13 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		$fkDef = '';
 		foreach($tableMap['keys'] as $key) {
-			$fkDef .= ", FOREIGN KEY(`{$key['from']}`) 
-						 REFERENCES `{$key['table']}`(`{$key['to']}`) 
+			$fkDef .= ", FOREIGN KEY(`{$key['from']}`)
+						 REFERENCES `{$key['table']}`(`{$key['to']}`)
 						 ON DELETE {$key['on_delete']} ON UPDATE {$key['on_update']}";
 		}
 		$q[] = "CREATE TABLE `$table` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr  $fkDef );";
 		foreach($tableMap['indexes'] as $name=>$index)  {
 			if (strpos($name,'UQ_')===0) {
-				if (strpos($name,'__')===false) continue; //old  index, forget.
 				$cols = explode('__',substr($name,strlen('UQ_'.$table)));
 				foreach($cols as $k=>$v) $cols[$k] = "`$v`";
 				$q[] = "CREATE UNIQUE INDEX $name ON `$table` (".implode(',',$cols).")";
@@ -226,9 +225,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$q[] = "DROP TABLE tmp_backup;";
 		$q[] = "PRAGMA foreign_keys = 1 ";
 		foreach($q as $sq) $this->adapter->exec($sq);
-		
+
 	}
-	
+
 	/**
 	 * This method upgrades the column to the specified data type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -286,9 +285,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 
 	/**
 	 * Returns the indexes for type $type.
-	 * 
+	 *
 	 * @param string $type
-	 * 
+	 *
 	 * @return array $indexInfo index information
 	 */
 	protected function getIndexes($type) {
@@ -301,12 +300,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		return $indexInfoList;
 	}
-	
+
 	/**
 	 * Returns the keys for type $type.
-	 * 
+	 *
 	 * @param string $type
-	 * 
+	 *
 	 * @return array $keysInfo keys information
 	 */
 	protected function getKeys($type) {
@@ -318,7 +317,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		return $keyInfoList;
 	}
-	
+
 	/**
 	 * Adds a Unique index constrain to the table.
 	 *
@@ -329,10 +328,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return void
 	 */
 	public function addUniqueIndex( $type,$columns ) {
-		$type = $this->safeTable($type);
-		$name = 'UQ_'.sha1(implode(',',$columns));
-		$sql  = "CREATE UNIQUE INDEX IF NOT EXISTS $name ON $type (".implode(',',$columns).")";
-		$this->adapter->exec($sql);
+		$table = $this->safeTable($type,true);
+		$name = 'UQ_'.$table.implode('__',$columns);
+		$t = $this->getTable($type);
+		if (isset($t['indexes'][$name])) return;
+		$t['indexes'][$name] = array('name'=>$name);
+		$this->putTable($t);
 	}
 
 	/**
@@ -377,8 +378,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$t['indexes'][$name] = array('name'=>$column);
 		return $this->putTable($t);
 	}
-	
-	
+
+
 	/**
 	 * Counts rows in a table.
 	 * Uses SQLite optimization for deleting all records (i.e. no WHERE)
@@ -417,22 +418,22 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param  integer $buildopt   0 = NO ACTION, 1 = ON DELETE CASCADE
 	 *
 	 * @return boolean $didIt
-	 * 
+	 *
 	 * @note: cant put this in try-catch because that can hide the fact
-	 * that database has been damaged. 
+	 * that database has been damaged.
 	 */
 
 	protected function buildFK($type, $targetType, $field, $targetField,$constraint=false) {
 		$consSQL = ($constraint ? 'CASCADE' : 'SET NULL');
 		$t = $this->getTable($type);
 		$label = 'from_'.$field.'_to_table_'.$targetType.'_col_'.$targetField;
-		if (isset($t['keys'][$label]) 
-				&& $t['keys'][$label]['table']===$targetType 
+		if (isset($t['keys'][$label])
+				&& $t['keys'][$label]['table']===$targetType
 				&& $t['keys'][$label]['from']===$field
 				&& $t['keys'][$label]['to']===$targetField
 				&& $t['keys'][$label]['on_delete']===$consSQL
 		) return false;
-		
+
 		$t['keys'][$label] = array(
 			'table' => $targetType,
 			'from' => $field,
@@ -467,7 +468,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 
 	/**
 	 * Removes all tables and views from the database.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function wipeAll() {
@@ -484,6 +485,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		$this->adapter->exec('PRAGMA foreign_keys = 1 ');
 	}
-	
+
 
 }

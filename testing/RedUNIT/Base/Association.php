@@ -23,6 +23,42 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 	 */
 	public function run() {
 	
+		//unique constraint for single column
+		R::nuke();
+		$book = R::dispense('book');
+		$book->setMeta('buildcommand.unique',array(array('title')));
+		$book->title = 'bla';
+		$book->extra = 2;
+		$id = R::store($book);
+		$book =	R::dispense('book');
+		$book->title = 'bla';
+		$expected = null;
+		try {
+			R::store($book);
+			fail();
+		}
+		catch(RedBean_Exception_SQL $e) {
+			$expected = $e;
+		}
+		asrt(($expected instanceof RedBean_Exception_SQL),true);
+		asrt(R::count('book'),1);
+		$book = R::load('book',$id);
+		$book->extra = 'CHANGE'; //causes failure, table will be rebuild
+		$id2 = R::store($book);
+		$book2 = R::load('book',$id2);
+		$book =	R::dispense('book');
+		$book->title = 'bla';
+		try {
+			R::store($book);
+			fail(); //fails here
+		}
+		catch(RedBean_Exception_SQL $e) {
+			$expected = $e;
+		}
+		asrt(($expected instanceof RedBean_Exception_SQL),true);
+		asrt(R::count('book'),1);
+		
+		
 		//Multiple Associations and Dissociations
 		R::nuke();
 		$wines = R::dispense('wine',3);
