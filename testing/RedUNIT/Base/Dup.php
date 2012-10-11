@@ -25,6 +25,23 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 	 */
 	public function run() {
 		
+		testpack('Dup() and Cache');
+		R::nuke();
+		$can = R::dispense('can')->setAttr('size', 3);
+		$can->ownCoffee[] = R::dispense('coffee')->setAttr('color', 'black');
+		$can->sharedTag[] = R::dispense('tag')->setAttr('name', 'cool');
+		$can = R::load('can', R::store($can));
+		$d = new RedBean_DuplicationManager(R::$toolbox);
+		$cache = '{"book":{"id":"INTEGER","title":"TEXT"},"bean":{"id":"INTEGER","prop":"INTEGER"},"pessoa":{"id":"INTEGER","nome":"TEXT","nome_meio":"TEXT","sobrenome":"TEXT","nascimento":"NUMERIC","reg_owner":"TEXT"},"documento":{"id":"INTEGER","nome_documento":"TEXT","numero_documento":"TEXT","reg_owner":"TEXT","ownPessoa_id":"INTEGER"},"can":{"id":"INTEGER","size":"INTEGER"},"coffee":{"id":"INTEGER","color":"TEXT","can_id":"INTEGER"},"tag":{"id":"INTEGER","name":"TEXT"},"can_tag":{"id":"INTEGER","tag_id":"INTEGER","can_id":"INTEGER"}}';
+		$d->setTables(json_decode($cache, 1));
+		$x = $d->dup($can);
+		asrt(isset($x->ownCoffee),true);
+		asrt(count($x->ownCoffee),1);
+		asrt(isset($x->sharedTag),true);
+		asrt(count($x->sharedTag),1);
+		asrt($cache,json_encode($d->getSchema()));
+
+
 		testpack('Dup() and Export() should not taint beans');
 		R::nuke();
 		

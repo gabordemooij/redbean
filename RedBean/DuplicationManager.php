@@ -35,6 +35,7 @@ class RedBean_DuplicationManager {
 	protected $redbean;
 	
 	protected $tables = array();
+	protected $columns = array();
 	protected $filters = array();
 	protected $cacheTables = false;
 	/**
@@ -56,8 +57,25 @@ class RedBean_DuplicationManager {
 	 * @param array $tables 
 	 */
 	public function setTables($tables) {
-		$this->tables = $tables;
+		foreach($tables as $key=>$value) {
+			if (is_numeric($key)) {
+				$this->tables[] = $value;
+			}
+			else {
+				$this->tables[] = $key;
+				$this->columns[$key] = $value;
+			}
+		}
 		$this->cacheTables = true;
+	}
+	
+	/**
+	 * Returns a schema array for cache.
+	 * 
+	 * @return array 
+	 */
+	public function getSchema() {
+		return $this->columns;
 	}
 	
 	/**
@@ -85,6 +103,34 @@ class RedBean_DuplicationManager {
 		$this->filters = $filters;
 	}
 	
+	/**
+	 * Determines whether the bean has an own list based on
+	 * schema inspection from realtime schema or cache.
+	 * 
+	 * @param string $type   bean type
+	 * @param string $target type of list you want to detect
+	 * 
+	 * @return boolean 
+	 */
+	protected function hasOwnList($type,$target) {
+		return (isset($this->columns[$target][$type.'_id']));
+	}
+	
+	/**
+	 * Determines whether the bea has a shared list based on
+	 * schema inspection from realtime schema or cache.
+	 * 
+	 * @param string $type   bean type
+	 * @param string $target type of list you are looking for
+	 * 
+	 * @return boolean 
+	 */
+	protected function hasSharedList($type,$target) {
+		$linkType = array($type,$target);
+		sort($linkType);
+		$linkType = implode('_',$linkType);
+		return (in_array($linkType,$this->tables));
+	}
 	
 	/**
 	 * Makes a copy of a bean. This method makes a deep copy
@@ -113,9 +159,13 @@ class RedBean_DuplicationManager {
 	 */
 	public function dup($bean,$trail=array(),$pid=false) {
 		if (!count($this->tables))  $this->tables = $this->toolbox->getWriter()->getTables();
+		if (!count($this->columns)) foreach($this->tables as $table) $this->columns[$table] = $this->toolbox->getWriter()->getColumns($table);
 		$beanCopy = clone($bean);
 		$rs = $this->duplicate($beanCopy,$trail,$pid);
-		if (!$this->cacheTables) $this->tables = array();
+		if (!$this->cacheTables) {
+			$this->tables = array();
+			$this->columns = array();
+		}
 		return $rs;
 	}
 	
@@ -154,17 +204,21 @@ class RedBean_DuplicationManager {
 			if (strpos($table,'_')!==false || $table==$type) continue;
 			$owned = 'own'.ucfirst($table);
 			$shared = 'shared'.ucfirst($table);
-			if ($beans = $bean->$owned) {
-				$copy->$owned = array();
-				foreach($beans as $subBean) {
-					array_push($copy->$owned,$this->duplicate($subBean,$trail,$pid));
+			if ($this->hasOwnList($type,$table)) {
+				if ($beans = $bean->$owned) {
+					$copy->$owned = array();
+					foreach($beans as $subBean) {
+						array_push($copy->$owned,$this->duplicate($subBean,$trail,$pid));
+					}
 				}
+				$copy->setMeta('sys.shadow.'.$owned,null);
 			}
-			$copy->setMeta('sys.shadow.'.$owned,null);
-			if ($beans = $bean->$shared) {
-				$copy->$shared = array();
-				foreach($beans as $subBean) {
-					array_push($copy->$shared,$subBean);
+			if ($this->hasSharedList($type, $table)) {
+				if ($beans = $bean->$shared) {
+					$copy->$shared = array();
+					foreach($beans as $subBean) {
+						array_push($copy->$shared,$subBean);
+					}
 				}
 			}
 			$copy->setMeta('sys.shadow.'.$shared,null);
