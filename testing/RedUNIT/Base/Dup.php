@@ -25,6 +25,61 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 	 */
 	public function run() {
 		
+		testpack('exportAll() and Cache');
+		
+		$can = R::dispense('can')->setAttr('size', 3);
+		$can->ownCoffee[] = R::dispense('coffee')->setAttr('color', 'black');
+		$can->sharedTag[] = R::dispense('tag')->setAttr('name', 'cool');
+		$id = R::store($can);
+		R::debug(true);
+		ob_start();
+		$can = R::load('can', $id);
+		$cache = array('coffee'=>array('color'=>'color','id'=>'id','can_id'=>'can_id'),'can'=>array('size'=>'size','id'=>'id'),
+			'can_tag'=>array('id'=>'id','can_id'=>'can_id','tag_id'=>'tag_id'),'tag'=>array('id'=>'id','name'=>'name'));
+		$data = R::exportAll(array($can),true);
+		$queries = ob_get_contents();
+		R::debug(false);
+		ob_end_clean();
+		$len1 = strlen($queries);
+		
+		$can = R::dispense('can')->setAttr('size', 3);
+		$can->ownCoffee[] = R::dispense('coffee')->setAttr('color', 'black');
+		$can->sharedTag[] = R::dispense('tag')->setAttr('name', 'cool');
+		$id = R::store($can);
+		R::debug(true);
+		ob_start();
+		$can = R::load('can', $id);
+		$cache = array('coffee'=>array('color'=>'color','id'=>'id','can_id'=>'can_id'),'can'=>array('size'=>'size','id'=>'id'),
+			'can_tag'=>array('id'=>'id','can_id'=>'can_id','tag_id'=>'tag_id'),'tag'=>array('id'=>'id','name'=>'name'));
+		$data = R::exportAll(array($can),true);
+		$queries = ob_get_contents();
+		R::debug(false);
+		ob_end_clean();
+		$len2 = strlen($queries);
+		asrt(($len1),($len2));
+		
+		$can = R::dispense('can')->setAttr('size', 3);
+		$can->ownCoffee[] = R::dispense('coffee')->setAttr('color', 'black');
+		$can->sharedTag[] = R::dispense('tag')->setAttr('name', 'cool');
+		$id = R::store($can);
+		R::debug(true);
+		ob_start();
+		$can = R::load('can', $id);
+		$cache = array('coffee'=>array('color'=>'color','id'=>'id','can_id'=>'can_id'),'can'=>array('size'=>'size','id'=>'id'),
+			'can_tag'=>array('id'=>'id','can_id'=>'can_id','tag_id'=>'tag_id'),'tag'=>array('id'=>'id','name'=>'name'));
+		R::$duplicationManager->setTables($cache);
+		$data = R::exportAll(array($can),true);
+		
+		$queries = ob_get_contents();
+		R::debug(false);
+		ob_end_clean();
+		$len3 = strlen($queries);
+		asrt((($len3)<($len2)),true);
+		asrt(count($data),1);
+		asrt($data[0]['ownCoffee'][0]['color'],'black');
+		R::$duplicationManager->setCacheTables(false);
+	
+		
 		testpack('Dup() and Cache');
 		R::nuke();
 		$can = R::dispense('can')->setAttr('size', 3);
@@ -32,16 +87,43 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		$can->sharedTag[] = R::dispense('tag')->setAttr('name', 'cool');
 		$can = R::load('can', R::store($can));
 		$d = new RedBean_DuplicationManager(R::$toolbox);
-		$cache = '{"book":{"id":"INTEGER","title":"TEXT"},"bean":{"id":"INTEGER","prop":"INTEGER"},"pessoa":{"id":"INTEGER","nome":"TEXT","nome_meio":"TEXT","sobrenome":"TEXT","nascimento":"NUMERIC","reg_owner":"TEXT"},"documento":{"id":"INTEGER","nome_documento":"TEXT","numero_documento":"TEXT","reg_owner":"TEXT","ownPessoa_id":"INTEGER"},"can":{"id":"INTEGER","size":"INTEGER"},"coffee":{"id":"INTEGER","color":"TEXT","can_id":"INTEGER"},"tag":{"id":"INTEGER","name":"TEXT"},"can_tag":{"id":"INTEGER","tag_id":"INTEGER","can_id":"INTEGER"}}';
-		$d->setTables(json_decode($cache, 1));
+		$d->setCacheTables(true);
+		ob_start();
+		R::debug(1);
 		$x = $d->dup($can);
+		$queries = ob_get_contents();
+		R::debug(0);
+		ob_end_clean();
+		$len1 = strlen($queries);
+		asrt(($len1>40),true);
 		asrt(isset($x->ownCoffee),true);
 		asrt(count($x->ownCoffee),1);
 		asrt(isset($x->sharedTag),true);
 		asrt(count($x->sharedTag),1);
-		asrt($cache,json_encode($d->getSchema()));
-
-
+		$cache = $d->getSchema();
+		
+		R::nuke();
+		$can = R::dispense('can')->setAttr('size', 3);
+		$can->ownCoffee[] = R::dispense('coffee')->setAttr('color', 'black');
+		$can->sharedTag[] = R::dispense('tag')->setAttr('name', 'cool');
+		$can = R::load('can', R::store($can));
+		$d = new RedBean_DuplicationManager(R::$toolbox);
+		//$cache = '{"book":{"id":"INTEGER","title":"TEXT"},"bean":{"id":"INTEGER","prop":"INTEGER"},"pessoa":{"id":"INTEGER","nome":"TEXT","nome_meio":"TEXT","sobrenome":"TEXT","nascimento":"NUMERIC","reg_owner":"TEXT"},"documento":{"id":"INTEGER","nome_documento":"TEXT","numero_documento":"TEXT","reg_owner":"TEXT","ownPessoa_id":"INTEGER"},"can":{"id":"INTEGER","size":"INTEGER"},"coffee":{"id":"INTEGER","color":"TEXT","can_id":"INTEGER"},"tag":{"id":"INTEGER","name":"TEXT"},"can_tag":{"id":"INTEGER","tag_id":"INTEGER","can_id":"INTEGER"}}';
+		$d->setTables($cache, 1);
+		ob_start();
+		R::debug(1);
+		$x = $d->dup($can);
+		$queries = ob_get_contents();
+		ob_end_clean();
+		R::debug(0);
+		$len2 = strlen($queries);
+		asrt(isset($x->ownCoffee),true);
+		asrt(count($x->ownCoffee),1);
+		asrt(isset($x->sharedTag),true);
+		asrt(count($x->sharedTag),1);
+		asrt(json_encode($cache),json_encode($d->getSchema()));
+		asrt(($len1 > $len2),true);
+		
 		testpack('Dup() and Export() should not taint beans');
 		R::nuke();
 		
