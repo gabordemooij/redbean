@@ -138,6 +138,7 @@ class RedBean_OODB extends RedBean_Observable {
 		$bean->id = 0;
 		if (!$this->isFrozen) $this->check( $bean );
 		$bean->setMeta('tainted',true);
+		$bean->setMeta('sys.orig',array('id'=>0));
 		$this->signal('dispense',$bean );
 		return $bean;
 	}
@@ -674,6 +675,7 @@ class RedBean_OODB extends RedBean_Observable {
 			if (empty($rows)) return $bean; // $this->dispense($type); -- no need...
 			$row = array_pop($rows);
 		}
+		$bean->setMeta('sys.orig',$row);
 		foreach($row as $p=>$v) {
 			//populate the bean with the database row
 			$bean->$p = $v;

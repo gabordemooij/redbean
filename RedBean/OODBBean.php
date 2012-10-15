@@ -684,6 +684,51 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		}
 		return $this;
 	}
+	
+	/**
+	 * Returns original (old) value of a property. 
+	 * You can use this method to see what has changed in a
+	 * bean.
+	 * 
+	 * @param string $property name of the property you want the old value of
+	 * 
+	 * @return mixed
+	 */
+	public function old($property) {
+		$old = $this->getMeta('sys.orig',array());
+		if (isset($old[$property])) {
+			return $old[$property];
+		}
+	}
+	
+	/**
+	 * Convenience method.
+	 * Returns true if the bean has been changed, or false otherwise.
+	 * Same as $bean->getMeta('tainted');
+	 * Note that a bean becomes tainted as soon as you retrieve a list from
+	 * the bean. This is because the bean lists are arrays and the bean cannot 
+	 * determine whether you have made modifications to a list so RedBeanPHP
+	 * will mark the whole bean as tainted.
+	 * 
+	 * @return boolean 
+	 */
+	public function isTainted() {
+		return $this->getMeta('tainted');
+	}
+	
+	
+	/**
+	 * Returns TRUE if the value of a certain property of the bean has been changed and
+	 * FALSE otherwise.
+	 * 
+	 * @param string $property name of the property you want the change-status of
+	 * 
+	 * @return boolean 
+	 */
+	public function hasChanged($property) {
+		if (!isset($this->properties[$property])) return false;
+		return ($this->old($property)!=$this->properties[$property]);
+	}
 }
 
 
