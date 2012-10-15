@@ -57,8 +57,5 @@ class RedUNIT_Blackhole_Tainted extends RedUNIT_Blackhole {
 		$bean = R::dispense('bean');
 		$bean->hasChanged('prop');
 		$bean->old('prop');
-		
-		
-		
 	}
 }
