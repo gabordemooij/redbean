@@ -3,7 +3,7 @@
  * RedBean Association
  * 
  * @file			RedBean/AssociationManager.php
- * @description		Manages simple bean associations.
+ * @desc			Manages simple bean associations.
  *
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2

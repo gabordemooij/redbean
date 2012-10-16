@@ -3,7 +3,7 @@
  * RedBean Bean Helper Interface
  * 
  * @file			RedBean/IBeanHelper.php
- * @description		Interface for Bean Helper.
+ * @desc			Interface for Bean Helper.
  *					A little bolt that glues the whole machinery together.
  * 		
  * @author			Gabor de Mooij and the RedBeanPHP Community
