@@ -3,7 +3,7 @@
  * RedBean Extended Association
  * 
  * @file			RedBean/ExtAssociationManager.php
- * @description		Manages complex bean associations.
+ * @description			Manages complex bean associations.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *
