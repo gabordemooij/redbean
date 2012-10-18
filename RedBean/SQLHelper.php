@@ -2,29 +2,26 @@
 /**
  * RedBean SQL Helper
  *
- * @file				RedBean/SQLHelper.php
- * @description			Allows you to mix PHP and SQL as if they were
- * 						a unified language
+ * @file			RedBean/SQLHelper.php
+ * @desc			Allows you to mix PHP and SQL as if they were one language
+ * @author			Gabor de Mooij and the RedBeanPHP community
+ * @license			BSD/GPLv2
+ *
+ * Allows you to mix PHP and SQL as if they were one language
  *					
- *						Simplest case:
+ * Simplest case:
  *
- *						$r->now(); //returns SQL time
+ * $r->now(); //returns SQL time
  *
+ * Another Example:
  *
- *						Another Example:
+ * $f->begin()
+ *  ->select('*')
+ *  ->from('island')->where('id = ? ')->put(1)->get();
  *
- *						$f->begin()
- * 						->select('*')
- * 						->from('island')->where('id = ? ')->put(1)->get();
- *
- *						Another example:
+ * Another example:
  *			
- *						$f->begin()->show('tables')->get('col');
- *
- *	
- * @author				Gabor de Mooij and the RedBeanPHP community
- * @license				BSD/GPLv2
- *
+ * $f->begin()->show('tables')->get('col');
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled

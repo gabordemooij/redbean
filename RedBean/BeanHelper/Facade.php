@@ -1,8 +1,9 @@
 <?php
 /**
  * RedBean Bean Helper
+ * 
  * @file			RedBean/BeanHelperFacade.php
- * @description		Finds the toolbox for the bean.
+ * @desc			Finds the toolbox for the bean.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *

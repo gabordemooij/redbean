@@ -3,7 +3,7 @@
  * BeanCan
  *  
  * @file			RedBean/BeanCan.php
- * @description		A Server Interface for RedBean and Fuse.
+ * @desc			Server Interface for RedBean and Fuse.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  * 

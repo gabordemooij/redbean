@@ -2,11 +2,10 @@
 /**
  * RedBean class for Logging
  * 
- * @name    RedBean Logger
- * @file    RedBean/Logger.php
- * @author    Gabor de Mooij
- * @license   BSD
- *
+ * @file			RedBean/Logger.php
+ * @desc			Logger
+ * @author			Gabor de Mooij and the RedBeanPHP Community
+ * @license			BSD/GPLv2
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled

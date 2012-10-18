@@ -4,7 +4,7 @@
  * Interface for QueryWriters
  * 
  * @file			RedBean/QueryWriter.php
- * @description		Describes the API for a QueryWriter
+ * @desc			Describes the API for a QueryWriter
  * @author			Gabor de Mooij and the RedBeanPHP community
  * @license			BSD/GPLv2
  *

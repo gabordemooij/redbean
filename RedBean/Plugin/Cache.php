@@ -3,8 +3,7 @@
  * RedBeanPHP Cache Plugin
  * 
  * @file			RedBean/Plugin/Cache.php
- * @description 	Cache plugin, caches beans.
- * 
+ * @desc			Cache plugin, caches beans.
  * @author			Gabor de Mooij and the RedBeanPHP community
  * @license			BSD/GPLv2
  *

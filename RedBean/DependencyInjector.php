@@ -3,11 +3,13 @@
  * RedBean Dependency Injector
  * 
  * @file			RedBean/DependencyInjector.php
- * @description		A default dependency injector that can be subclassed to
- *					suit your needs.
- * 		
+ * @desc			Simple dependency injector
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
+ *
+ * A default dependency injector that can be subclassed to
+ * suit your needs. This injetor can be used to inject helper objects into
+ * FUSE(d) models.
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled

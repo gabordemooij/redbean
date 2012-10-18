@@ -4,7 +4,7 @@
  * Part of the RedBean Exceptions Mechanism.
  *
  * @file			RedBean/Exception
- * @description		Represents a subtype in the RedBean Exception System.
+ * @desc			Represents a subtype in the RedBean Exception System.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *

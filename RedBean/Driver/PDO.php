@@ -2,11 +2,11 @@
 /**
  * PDO Driver
  * @file			RedBean/PDO.php
- * @description		PDO Driver
- *					This Driver implements the RedBean Driver API
+ * @desc			PDO Driver
  * @author			Gabor de Mooij and the RedBeanPHP Community, Desfrenes
  * @license			BSD/GPLv2
  *
+ * This Driver implements the RedBean Driver API
  *
  * (c) copyright Desfrenes & Gabor de Mooij and the RedBeanPHP community
  * This source file is subject to the BSD/GPLv2 License that is bundled

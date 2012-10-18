@@ -2,12 +2,13 @@
 /**
  * RedBean Facade
  * @file			RedBean/Facade.php
- * @description		Convenience class for RedBeanPHP.
- *					This class hides the object landscape of
- *					RedBeanPHP behind a single letter class providing
- *					almost all functionality with simple static calls.
+ * @desc			Convenience class for RedBeanPHP.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
+ * 
+ * This class hides the object landscape of
+ * RedBeanPHP behind a single letter class providing
+ * almost all functionality with simple static calls.
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled

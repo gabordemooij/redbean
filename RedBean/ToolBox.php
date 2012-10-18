@@ -4,15 +4,16 @@
  * Contains most important redbean tools
  * 
  * @file			RedBean/ToolBox.php
- * @description		The ToolBox acts as a resource locator for RedBean but can
- *					be integrated in larger resource locators (nested).
- *					It does not do anything more than just store the three most
- *					important RedBean resources (tools): the database adapter,
- *					the redbean core class (oodb) and the query writer.
+ * @desc			A RedBeanPHP-wide service locator
  * @author			Gabor de Mooij and the RedBeanPHP community
  * @license			BSD/GPLv2
  *
- *
+ * The ToolBox acts as a resource locator for RedBean but can
+ * be integrated in larger resource locators (nested).
+ * It does not do anything more than just store the three most
+ * important RedBean resources (tools): the database adapter,
+ * the RedBeanPHP core class (oodb) and the query writer.
+ * 
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

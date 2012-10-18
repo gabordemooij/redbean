@@ -3,8 +3,7 @@
  * RedBean Plugin
  * 
  * @file			RedBean/Plugin.php
- * @description		Marker interface for plugins.
- * 		
+ * @desc			Marker interface for plugins.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *

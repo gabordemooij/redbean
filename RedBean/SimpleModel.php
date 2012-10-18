@@ -2,10 +2,10 @@
 /**
  * SimpleModel
  * 
- * @file 		RedBean/SimpleModel.php
- * @description	Part of FUSE
- * @author      Gabor de Mooij and the RedBeanPHP Team
- * @license		BSD/GPLv2
+ * @file			RedBean/SimpleModel.php
+ * @desc			Part of FUSE
+ * @author			Gabor de Mooij and the RedBeanPHP Team
+ * @license			BSD/GPLv2
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled

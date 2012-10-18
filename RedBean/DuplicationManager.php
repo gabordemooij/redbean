@@ -3,8 +3,7 @@
  * RedBean Duplication Manager
  * 
  * @file			RedBean/DuplicationManager.php
- * @description		Creates deep copies of beans
- * 		
+ * @desc			Creates deep copies of beans
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *

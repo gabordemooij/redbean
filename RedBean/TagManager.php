@@ -3,8 +3,7 @@
  * RedBean Tag Manager
  * 
  * @file			RedBean/TagManager.php
- * @description 	RedBean Tag Manager
- * 
+ * @desc			RedBean Tag Manager
  * @author			Gabor de Mooij and the RedBeanPHP community
  * @license			BSD/GPLv2
  *

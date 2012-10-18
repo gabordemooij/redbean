@@ -3,11 +3,9 @@
  * RedBean_OODBBean (Object Oriented DataBase Bean)
  * 
  * @file 			RedBean/RedBean_OODBBean.php
- * @description		The Bean class used for passing information
- * 
+ * @desc			The Bean class used for passing information
  * @author			Gabor de Mooij and the RedBeanPHP community
  * @license			BSD/GPLv2
- *
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled

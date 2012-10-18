@@ -3,11 +3,9 @@
  * Query Logger
  *
  * @file 			RedBean/Plugin/QueryLogger.php
- * @description		Query logger, can be attached to an observer that
- * 					signals the sql_exec event.
+ * @desc			Query logger, can be attached to an observer that signals the sql_exec event.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
- *
  *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled

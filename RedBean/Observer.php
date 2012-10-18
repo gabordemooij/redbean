@@ -3,8 +3,7 @@
  * Observer
  * 
  * @file 			RedBean/Observer.php
- * @description		Part of the observer pattern in RedBean
- * 
+ * @desc			Part of the observer pattern in RedBean
  * @author			Gabor de Mooijand the RedBeanPHP community
  * @license			BSD/GPLv2
  *

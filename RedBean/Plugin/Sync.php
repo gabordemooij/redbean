@@ -2,13 +2,13 @@
 /**
  * Sync
  *
- * @file                       RedBean/Plugin/Sync.php
- * @description                Plugin for Synchronizing databases.
+ * @file			RedBean/Plugin/Sync.php
+ * @desc			Plugin for Synchronizing databases.
  * 
- * @plugin					   public static function syncSchema($from,$to) { return RedBean_Plugin_Sync::syncSchema($from,$to); }
+ * @plugin			public static function syncSchema($from,$to) { return RedBean_Plugin_Sync::syncSchema($from,$to); }
  *
- * @author                     Gabor de Mooij
- * @license                    BSD
+ * @author			Gabor de Mooij and the RedBeanPHP Community
+ * @license			BSD/GPLv2
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij

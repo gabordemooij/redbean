@@ -3,12 +3,13 @@
  * RedBean Logging
  * 
  * @file			RedBean/Logging.php
- * @description		Logging interface for RedBeanPHP ORM,
- *					provides a uniform and convenient logging 
- *					interface throughout RedBeanPHP.
+ * @desc			Logging interface for RedBeanPHP ORM
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *
+ * Provides a uniform and convenient logging 
+ * interface throughout RedBeanPHP.
+ * 
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

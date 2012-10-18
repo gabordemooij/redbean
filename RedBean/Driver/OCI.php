@@ -3,12 +3,13 @@
  * RedBean OCI Driver 
  *
  * @file				RedBean/Driver/OCI.php
- * @description			OCI Driver for RedBeanPHP. The OCI
- *						driver is required to facilitate a connection to 
- *						an Oracle database.
- *						Stephane Gerber
+ * @desc				OCI Driver for RedBeanPHP
+ * @author				Stephane Gerber
  * @license				BSD/GPLv2
  *
+ * The OCI driver is required to facilitate a connection to 
+ * an Oracle database.
+ * 
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt. 
  */

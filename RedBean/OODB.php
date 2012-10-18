@@ -3,8 +3,7 @@
  * RedBean Object Oriented DataBase
  * 
  * @file			RedBean/OODB.php
- * @description 	RedBean OODB
- * 
+ * @desc			RedBean OODB
  * @author			Gabor de Mooij and the RedBeanPHP community
  * @license			BSD/GPLv2
  *

@@ -4,11 +4,9 @@
  * Helper class to quickly setup RedBean for you.
  * 
  * @file 			RedBean/Setup.php
- * @description		Helper class to quickly setup RedBean for you
- * 
+ * @desc			Helper class to quickly setup RedBean for you
  * @author			Gabor de Mooij and the RedBeanPHP community
  * @license			BSD/GPLv2
- *
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled

@@ -3,11 +3,11 @@
  * RedBean Model Helper
  * 
  * @file			RedBean/ModelHelper.php
- * @description		Connects beans to models, in essence 
- *					this is the core of so-called FUSE.
- * 		
+ * @desc			Connects beans to models, in essence 
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
+ * 
+ * This is the core of so-called FUSE.
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled

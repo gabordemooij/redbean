@@ -2,10 +2,9 @@
 /**
  * DBAdapter		(Database Adapter)
  * @file			RedBean/Adapter/DBAdapter.php
- * @description		An adapter class to connect various database systems to RedBean
+ * @desc			An adapter class to connect various database systems to RedBean
  * @author			Gabor de Mooij and the RedBeanPHP Community. 
  * @license			BSD/GPLv2
- *
  *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP community.
  * This source file is subject to the BSD/GPLv2 License that is bundled

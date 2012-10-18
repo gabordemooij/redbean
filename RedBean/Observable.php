@@ -5,10 +5,8 @@
  * 
  * @file 			RedBean/Observable.php
  * @description		Part of the observer pattern in RedBean
- *
  * @author			Gabor de Mooij and the RedBeanPHP community
  * @license			BSD/GPLv2
- *
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled

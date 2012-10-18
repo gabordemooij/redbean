@@ -3,7 +3,7 @@
  * Adapter Interface
  *
  * @file 			RedBean/Adapter.php
- * @description			Describes the API for a RedBean Database Adapter.
+ * @desc			Describes the API for a RedBean Database Adapter.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *
