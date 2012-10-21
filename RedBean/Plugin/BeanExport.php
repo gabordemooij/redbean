@@ -119,7 +119,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		}
 		
 		if ($this->typeShield===true) {
-			if (count($beans)>0) {
+			if (is_array($beans) && count($beans)>0) {
 				$firstBean = reset($beans);
 				$type = $firstBean->getMeta('type');
 				if (isset($this->recurTypeCheck[$type])){

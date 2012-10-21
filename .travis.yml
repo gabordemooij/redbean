@@ -6,7 +6,7 @@ php:
 before_script:
   - echo 'yes' | sudo add-apt-repository ppa:cubrid/cubrid
   - sudo apt-get update
-  - sudo apt-get install cubrid
+  - sudo apt-get install cubrid-8.4.0
   - /etc/profile.d/cubrid.sh
   - sudo apt-get install cubrid-demodb
   - sudo apt-get install php5-cubrid

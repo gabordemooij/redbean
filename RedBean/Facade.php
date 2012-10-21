@@ -331,7 +331,7 @@ class RedBean_Facade {
 	 */
 	public static function related( $bean, $type, $sql=null, $values=array()) {
 		$keys = self::$associationManager->related( $bean, $type );
-		if (count($keys)==0) return array();
+		if (count($keys)==0 || !is_array($keys)) return array();
 		if (!$sql) return self::batch($type, $keys);
 		$rows = self::$writer->selectRecord( $type, array('id'=>$keys),array($sql,$values),false );
 		return self::$redbean->convertToBeans($type,$rows);
@@ -350,7 +350,7 @@ class RedBean_Facade {
 	*/
 	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql=null, $values=array() ) {
 		$beans = self::related($bean, $type, $sql, $values);
-		if (count($beans)==0) return null;
+		if (count($beans)==0 || !is_array($beans)) return null;
 		return reset( $beans );
 	}
 
@@ -927,7 +927,7 @@ class RedBean_Facade {
 	 * @return string $slots
 	 */
 	public static function genSlots($array) {
-		if (count($array)>0) {
+		if (is_array($array) && count($array)>0) {
 			$filler = array_fill(0,count($array),'?');
 			return implode(',',$filler);
 		}

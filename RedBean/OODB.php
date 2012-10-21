@@ -535,7 +535,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	private function processTrashcan($bean,$ownTrashcan) {
 		$myFieldLink = $bean->getMeta('type').'_id';
-		if (count($ownTrashcan)>0) {
+		if (is_array($ownTrashcan) && count($ownTrashcan)>0) {
 			$first = reset($ownTrashcan);
 			if ($first instanceof RedBean_OODBBean) {
 				$alias = $bean->getMeta('sys.alias.'.$first->getMeta('type'));

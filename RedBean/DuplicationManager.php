@@ -199,7 +199,7 @@ class RedBean_DuplicationManager {
 		$copy->id = 0;
 		$tables = $this->tables;
 		foreach($tables as $table) {
-			if (count($this->filters) && !in_array($table,$this->filters)) continue;
+			if (is_array($this->filters) && count($this->filters) && !in_array($table,$this->filters)) continue;
 			if (strpos($table,'_')!==false || $table==$type) continue;
 			$owned = 'own'.ucfirst($table);
 			$shared = 'shared'.ucfirst($table);

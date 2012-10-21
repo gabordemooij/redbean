@@ -44,12 +44,14 @@ class RedUNIT_Mysql_Foreignkeys extends RedUNIT_Mysql {
 		information_schema.KEY_COLUMN_USAGE ke
 		WHERE
 		ke.referenced_table_name IS NOT NULL
+		AND ke.CONSTRAINT_SCHEMA="oodb"
 		ORDER BY
 		constraint_name;'));
 		
 		$json = '[{"parent":"genre","child":"book_genre","constraint_name":"book_genre_ibfk_1"},{"parent":"book","child":"book_genre","constraint_name":"book_genre_ibfk_2"},{"parent":"cover","child":"book","constraint_name":"cons_fk_book_cover_id_id"},{"parent":"book","child":"page","constraint_name":"cons_fk_page_book_id_id"}]';
 		$j1 = json_decode($j,true);
 		$j2 = json_decode($json,true);
+	
 		foreach($j1 as $jrow) {
 			$s = json_encode($jrow);
 			$found = 0;

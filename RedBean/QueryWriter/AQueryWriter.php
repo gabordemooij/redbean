@@ -248,7 +248,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$sql = $this->safeColumn($column);
 			$sql .= ' '.($inverse ? ' NOT ':'').' IN ( ';
 			//If its safe to not use bindings please do... (fixes SQLite PDO issue limit 256 bindings)
-			if (count($conditions)===1 
+			if (is_array($conditions)
+				&& count($conditions)===1 
 				&& isset($conditions['id']) 
 				&& is_array($values) 
 				&& preg_match('/^\d+$/',implode('',$values))) {
@@ -277,7 +278,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 
 		}
 		$sql = '';
-		if (count($sqlConditions)>0) {
+		if (is_array($sqlConditions) && count($sqlConditions)>0) {
 			$sql = implode(' AND ',$sqlConditions);
 			$sql = " WHERE ( $sql ) ";
 			if ($addSql) $sql .= " AND $addSql ";
