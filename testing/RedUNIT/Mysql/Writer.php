@@ -63,8 +63,6 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		asrt($writer->scanType("2001-10-10 10:00:00",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME);
 		asrt($writer->scanType("2001-10-10"),4);
 		asrt($writer->scanType("2001-10-10 10:00:00"),4);
-		asrt($writer->scanType("POINT(1 2)",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT);
-		asrt($writer->scanType("POINT(1 2)"),4);
 		asrt($writer->scanType(str_repeat("lorem ipsum",100)),5);
 		$writer->widenColumn("testtable", "c1", 2);
 		$cols=$writer->getColumns("testtable");
@@ -281,14 +279,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql {
 		$cols = R::getColumns('bean');
 		asrt($cols['date'],'datetime');
 		$bean = R::dispense('bean');
-		//$bean->date = 'soon';
-		//R::store($bean);
-		//$cols = R::getColumns('bean');
-		//asrt($cols['date'],'datetime');
-		$this->setGetSpatial('POINT(1 2)');
-		$this->setGetSpatial('LINESTRING(3 3,4 4)');
-		$this->setGetSpatial('POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))');
-		$this->setGetSpatial('MULTIPOINT(0 0,20 20,60 60)');
+		
 		
 		try{
 			$bean = R::dispense('bean');

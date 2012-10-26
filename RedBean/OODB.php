@@ -446,7 +446,6 @@ class RedBean_OODB extends RedBean_Observable {
 								$cast = false;		
 								//What kind of property are we dealing with?
 								$typeno = $this->writer->scanType($v,true);
-								$v = $this->writer->getValue();
 							}
 							//Is this property represented in the table?
 							if (isset($columns[$this->writer->safeColumn($p,true)])) {
