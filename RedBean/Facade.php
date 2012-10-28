@@ -217,9 +217,10 @@ class RedBean_Facade {
 	 * Dispenses a new RedBean OODB Bean for use with
 	 * the rest of the methods.
 	 *
-	 * @param string $type type
-	 *
-	 *
+	 * @param string  $type   type
+	 * @param integer $number number of beans to dispense
+	 * 
+	 * @return array $oneOrMoreBeans
 	 */
 	public static function dispense( $type, $num = 1 ) {
 		if (!preg_match('/^[a-z0-9]+$/',$type) && self::$strictType) throw new RedBean_Exception_Security('Invalid type: '.$type); 
@@ -233,7 +234,13 @@ class RedBean_Facade {
 		}
 	}
 	
-	
+	/**
+	 * Toggles strict bean type names.
+	 * If set to true (default) this will forbid the use of underscores and 
+	 * uppercase characters in bean type strings (R::dispense).
+	 * 
+	 * @param boolean $trueFalse 
+	 */
 	public static function setStrictTyping($trueFalse) {
 		self::$strictType = (boolean) $trueFalse;
 	}
