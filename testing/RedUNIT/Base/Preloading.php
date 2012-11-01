@@ -131,6 +131,23 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		$i=0;
 		foreach($books as $book) asrt($book->collection->name,strval(++$i).'nth');
 		
+		//test with multiple same parents
+		R::nuke();
+		$author = R::dispense('author');
+		$author->setAttr('name', 'John');
+		R::store($author);
+		$books = R::dispense('book', 3);
+		$books[0]->title = 'First book';
+		$books[1]->title = 'Second book';
+		$books[2]->title = 'Third book';
+		$author->ownBook = $books;
+		R::store($author);
+		$collection = R::findAll('book');
+		R::preload($collection, array('author'));
+		R::nuke();
+		foreach ($collection as $item) {
+			asrt($item->author->name,'John');
+		}
 		
 	}	
 	

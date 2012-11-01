@@ -112,4 +112,21 @@ class RedBean_ModelHelper implements RedBean_Observer {
 		self::$dependencyInjector = null;
 	}
 	
+	/**
+	 * Attaches the FUSE event listeners. Now the Model Helper will listen for
+	 * CRUD events. If a CRUD event occurs it will send a signal to the model
+	 * that belongs to the CRUD bean and this model will take over control from
+	 * there.
+	 * 
+	 * @param Observable $observable 
+	 */
+	public function attachEventListeners( RedBean_Observable $observable ) {
+		$observable->addEventListener('update', $this );
+		$observable->addEventListener('open', $this );
+		$observable->addEventListener('delete', $this );
+		$observable->addEventListener('after_delete', $this );
+		$observable->addEventListener('after_update', $this );
+		$observable->addEventListener('dispense', $this );
+	}
+	
 }

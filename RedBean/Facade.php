@@ -870,14 +870,9 @@ class RedBean_Facade {
 		self::$redbean->setAssociationManager(self::$associationManager);
 		self::$extAssocManager = new RedBean_AssociationManager_ExtAssociationManager( self::$toolbox );
 		$helper = new RedBean_ModelHelper();
-		self::$redbean->addEventListener('update', $helper );
-		self::$redbean->addEventListener('open', $helper );
-		self::$redbean->addEventListener('delete', $helper );
+		$helper->attachEventListeners(self::$redbean);
 		self::$associationManager->addEventListener('delete', $helper );
 		self::$duplicationManager = new RedBean_DuplicationManager(self::$toolbox);
-		self::$redbean->addEventListener('after_delete', $helper );
-		self::$redbean->addEventListener('after_update', $helper );
-		self::$redbean->addEventListener('dispense', $helper );
 		self::$tagManager = new RedBean_TagManager( self::$toolbox );
 		self::$f = new RedBean_SQLHelper(self::$adapter);
 		return $oldTools;
@@ -1158,20 +1153,7 @@ class RedBean_Facade {
 	 * @param array $types types to load
 	 */
 	public static function preload($beans,$types) {
-		foreach($types as $key => $type) {
-			$field = (is_numeric($key)) ? $type : $key;
-			$ids = array();
-			foreach($beans as $bean) {
-				$id = $bean->{$field.'_id'};
-				$ids[] = $id;
-				$map[$id] = $bean;
-			}	
-			$parents = R::batch($type,$ids);
-			foreach($parents as $parent) {
-				$map[$parent->id]->setProperty($field,$parent);
-			}
-			
-		}
+		return self::$redbean->preload($beans,$types);
 	}
 	
 }

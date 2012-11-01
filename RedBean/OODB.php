@@ -878,6 +878,35 @@ class RedBean_OODB extends RedBean_Observable {
 	public function setDepList($dep) {
 		$this->dep = $dep;
 	}
+	
+	/**
+	 * Preloads certain properties for beans.
+	 * Understands aliases.
+	 * 
+	 * Usage: $redbean->preload($books,array('coauthor'=>'author'));
+	 * 
+	 * @param array $beans beans
+	 * @param array $types types to load
+	 */
+	public function preload($beans, $types) {
+		foreach($types as $key => $type) {
+			$map = array();
+			$field = (is_numeric($key)) ? $type : $key;
+			$ids = array();
+			foreach($beans as $bean) {
+				$id = $bean->{$field.'_id'};
+				$ids[$id] = $id;
+				if (!isset($map[$id])) $map[$id] = array();
+				$map[$id][] = $bean;
+			}
+			$parents = $this->batch($type,$ids);
+			foreach($parents as $parent) {
+				foreach($map[$parent->id] as $childBean) {
+					$childBean->setProperty($field,$parent);
+				}
+			}
+		}
+	}
 
 }
 
