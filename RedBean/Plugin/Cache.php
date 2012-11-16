@@ -23,7 +23,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	 *  
 	 * @var array 
 	 */
-	private $cache = array();
+	protected $cache = array();
 	
 	
 	
@@ -33,7 +33,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	 *  
 	 * @var integer 
 	 */
-	private $hits = 0;
+	protected $hits = 0;
 	
 	/**
 	 * Number of misses (beans not being served from cache), can be
@@ -41,7 +41,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	 * 
 	 * @var integer 
 	 */
-	private $misses = 0;
+	protected $misses = 0;
 	
 	/**
 	 * Constructor.
@@ -75,8 +75,10 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 		else {
 			$this->misses ++;
 			$bean = parent::load($type,$id);
-			if (!isset($this->cache[$type])) $this->cache[$type]=array();
-			$this->cache[$type][$id] = $bean;
+			if ($bean->id) {
+				if (!isset($this->cache[$type])) $this->cache[$type]=array();
+				$this->cache[$type][$id] = $bean;
+			}
 		}
 		return $bean;
 	}
