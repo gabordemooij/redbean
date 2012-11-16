@@ -894,10 +894,11 @@ class RedBean_OODB extends RedBean_Observable {
 			$field = (is_numeric($key)) ? $type : $key;
 			$ids = array();
 			foreach($beans as $bean) {
-				$id = $bean->{$field.'_id'};
-				$ids[$id] = $id;
-				if (!isset($map[$id])) $map[$id] = array();
-				$map[$id][] = $bean;
+				if($id = $bean->{$field.'_id'}){
+					$ids[$id] = $id;
+					if (!isset($map[$id])) $map[$id] = array();
+					$map[$id][] = $bean;
+				}
 			}
 			$parents = $this->batch($type,$ids);
 			foreach($parents as $parent) {
