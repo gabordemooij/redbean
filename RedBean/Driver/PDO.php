@@ -116,21 +116,26 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 */
 	public function connect() {
 		if ($this->isConnected) return;
-		$user = $this->connectInfo['user'];
-		$pass = $this->connectInfo['pass'];
-		//PDO::MYSQL_ATTR_INIT_COMMAND
-		$this->pdo = new PDO(
-				  $this->dsn,
-				  $user,
-				  $pass,
-				  array(1002 => 'SET NAMES utf8',
-							 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-							 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+		try {
+			$user = $this->connectInfo['user'];
+			$pass = $this->connectInfo['pass'];
+			//PDO::MYSQL_ATTR_INIT_COMMAND
+			$this->pdo = new PDO(
+					  $this->dsn,
+					  $user,
+					  $pass,
+					  array(1002 => 'SET NAMES utf8',
+								 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+								 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 
-				  )
-		);
-		$this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
-		$this->isConnected = true;
+					  )
+			);
+			$this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
+			$this->isConnected = true;
+		}
+		catch(PDOException $e) {
+			throw new PDOException('Could not connect to database.');
+		}
 	}
 
 	/**
