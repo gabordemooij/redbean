@@ -186,6 +186,14 @@ class RedUNIT_Plugin_Cache extends RedUNIT_Plugin {
 		$b = reset($burgers);
 		R::load('hamburger',$b->id);
 		asrt($cachedOODB->getHits(),11);
+		
+		testpack('Test 0-loading issue');
+		$bean = R::load('nocacheplease',0);
+		$bean->name = 'test';
+		$bean = R::load('nocacheplease',0);
+		asrt(!isset($bean->name),true);
+		asrt(!($bean->name=='test'),true);
+		
 		R::configureFacadeWithToolbox($old);
 	}	
 
