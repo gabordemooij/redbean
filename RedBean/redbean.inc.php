@@ -84,6 +84,7 @@ require($dir.'IModelFormatter.php');
 require($dir.'SimpleModel.php');
 require($dir.'ModelHelper.php');
 require($dir.'TagManager.php');
+require($dir.'LabelMaker.php');
 require($dir.'Facade.php');;
 require($dir.'SQLHelper.php');
 

@@ -76,6 +76,13 @@ class RedBean_Facade {
 	public static $duplicationManager;
 
 	/**
+	 * Holds the Label Maker instance.
+	 * This facility allows you to make label beans.
+	 * @var RedBean_LabelMaker 
+	 */
+	public static $labelMaker;
+	
+	/**
 	 * Holds the Key of the current database.
 	 * @var string
 	 */
@@ -868,6 +875,7 @@ class RedBean_Facade {
 		self::$redbean = self::$toolbox->getRedBean();
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
 		self::$redbean->setAssociationManager(self::$associationManager);
+		self::$labelMaker = new RedBean_LabelMaker(self::$toolbox);
 		self::$extAssocManager = new RedBean_AssociationManager_ExtAssociationManager( self::$toolbox );
 		$helper = new RedBean_ModelHelper();
 		$helper->attachEventListeners(self::$redbean);
@@ -1017,13 +1025,7 @@ class RedBean_Facade {
 	 * @return array $bean a list of beans with type and name property
 	 */
 	public static function dispenseLabels($type,$labels) {
-		$labelBeans = array();
-		foreach($labels as $label) {
-			$labelBean = self::dispense($type);
-			$labelBean->name = $label;
-			$labelBeans[] = $labelBean;
-		}
-		return $labelBeans;
+		return self::$labelMaker->dispenseLabels($type,$labels);
 	}
 
 	/**
@@ -1037,10 +1039,7 @@ class RedBean_Facade {
 	 * @return array $array list of names of beans
 	 */
 	public static function gatherLabels($beans) {
-		$labels = array();
-		foreach($beans as $bean) $labels[] = $bean->name;
-		sort($labels);
-		return $labels;
+		return self::$labelMaker->gatherLabels($beans);
 	}
 
 

@@ -43,6 +43,7 @@
 		<item type="php">RedBean/ModelHelper.php</item>
 		<item type="php">RedBean/SQLHelper.php</item>
 		<item type="php">RedBean/TagManager.php</item>
+		<item type="php">RedBean/LabelMaker.php</item>
 		<item type="php">RedBean/Facade.php</item>
 		<item type="php">RedBean/Plugin.php</item>
 		<item type="php">RedBean/Plugin/Sync.php</item>
