@@ -343,4 +343,88 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		}
 		return (count($rows)>0);
 	}
+	
+	/**
+	 * Given an array of two beans and a property, this method
+	 * swaps the value of the property.
+	 * This is handy if you need to swap the priority or orderNo
+	 * of an item (i.e. bug-tracking, page order).
+	 *
+	 * @param array  $beans    beans
+	 * @param string $property property
+	 */
+	public function swap( $beans, $property ) {
+		$bean1 = array_shift($beans);
+		$bean2 = array_shift($beans);
+		$tmp = $bean1->$property;
+		$bean1->$property = $bean2->$property;
+		$bean2->$property = $tmp;
+		$this->oodb->store($bean1);
+		$this->oodb->store($bean2);
+	}
+	
+	/**
+	 * Returns all the beans associated with $bean.
+	 * This method will return an array containing all the beans that have
+	 * been associated once with the associate() function and are still
+	 * associated with the bean specified. The type parameter indicates the
+	 * type of beans you are looking for. You can also pass some extra SQL and
+	 * values for that SQL to filter your results after fetching the
+	 * related beans.
+	 *
+	 * Dont try to make use of subqueries, a subquery using IN() seems to
+	 * be slower than two queries!
+	 *
+	 * Since 3.2, you can now also pass an array of beans instead just one
+	 * bean as the first parameter.
+	 *
+	 * @param RedBean_OODBBean|array $bean the bean you have
+	 * @param string				 $type the type of beans you want
+	 * @param string				 $sql  SQL snippet for extra filtering
+	 * @param array					 $val  values to be inserted in SQL slots
+	 *
+	 * @return array $beans	beans yielded by your query.
+	 */
+	public function relatedSimple($bean, $type, $sql=null, $values=array()) {
+		$keys = $this->related( $bean, $type );
+		if (count($keys)==0 || !is_array($keys)) return array();
+		if (!$sql) return $this->oodb->batch($type, $keys);
+		$rows = $this->writer->selectRecord( $type, array('id'=>$keys),array($sql,$values),false );
+		return $this->oodb->convertToBeans($type,$rows);
+	}
+	
+	/**
+	* Returns only single associated bean.
+	*
+	* @param RedBean_OODBBean $bean bean provided
+	* @param string $type type of bean you are searching for
+	* @param string $sql SQL for extra filtering
+	* @param array $values values to be inserted in SQL slots
+	*
+	*
+	* @return RedBean_OODBBean $bean
+	*/
+	public function relatedOne( RedBean_OODBBean $bean, $type, $sql=null, $values=array() ) {
+		$beans = $this->relatedSimple($bean, $type, $sql, $values);
+		if (count($beans)==0 || !is_array($beans)) return null;
+		return reset( $beans );
+	}
+	
+	
+	/**
+	 * The opposite of related(). Returns all the beans that are not
+	 * associated with the bean provided.
+	 *
+	 * @param RedBean_OODBBean $bean   bean provided
+	 * @param string           $type   type of bean you are searching for
+	 * @param string           $sql    SQL for extra filtering
+	 * @param array            $values values to be inserted in SQL slots
+	 *
+	 * @return array $beans beans
+	 */
+	public function unrelated(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
+		$keys = $this->related( $bean, $type );
+		$rows = $this->writer->selectRecord( $type, array('id'=>$keys), array($sql,$values), false, true );
+		return $this->oodb->convertToBeans($type,$rows);
+	}
 }

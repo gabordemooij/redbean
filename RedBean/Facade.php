@@ -83,6 +83,12 @@ class RedBean_Facade {
 	public static $labelMaker;
 	
 	/**
+	 * Holds the Finder instance for the facade.
+	 * @var RedBean_Finder
+	 */
+	public static $finder;
+	
+	/**
 	 * Holds the Key of the current database.
 	 * @var string
 	 */
@@ -94,6 +100,10 @@ class RedBean_Facade {
 	public static $f;
 
 	
+	/**
+	 * Flag indicates whether strict type checking is on or off.
+	 * @var boolean
+	 */
 	private static $strictType = true;
 	
 
@@ -223,6 +233,9 @@ class RedBean_Facade {
 	/**
 	 * Dispenses a new RedBean OODB Bean for use with
 	 * the rest of the methods.
+	 * 
+	 * @todo extract from facade
+	 * 
 	 *
 	 * @param string  $type   type
 	 * @param integer $number number of beans to dispense
@@ -231,14 +244,7 @@ class RedBean_Facade {
 	 */
 	public static function dispense( $type, $num = 1 ) {
 		if (!preg_match('/^[a-z0-9]+$/',$type) && self::$strictType) throw new RedBean_Exception_Security('Invalid type: '.$type); 
-		if ($num==1) {
-			return self::$redbean->dispense( $type );
-		}
-		else {
-			$beans = array();
-			for($v=0; $v<$num; $v++) $beans[] = self::$redbean->dispense( $type );
-			return $beans;
-		}
+		return self::$redbean->dispense($type,$num);
 	}
 	
 	/**
@@ -262,9 +268,8 @@ class RedBean_Facade {
 	 *
 	 * @return array $beans Contains RedBean_OODBBean instances
 	 */
-	public static function findOrDispense( $type, $sql, $values ) {
-		$foundBeans = self::find($type,$sql,$values);
-		if (count($foundBeans)==0) return array(self::dispense($type)); else return $foundBeans;
+	public static function findOrDispense( $type, $sql=null, $values=array()) {
+		return self::$finder->findOrDispense($type,$sql,$values);
 	}
 
 	/**
@@ -278,6 +283,8 @@ class RedBean_Facade {
 	 * pass a scalar this function will interpret the base bean as having one
 	 * property called 'extra' with the value of the scalar.
 	 *
+	 * @todo extract from facade
+	 * 
 	 * @param RedBean_OODBBean $bean1 bean that will be part of the association
 	 * @param RedBean_OODBBean $bean2 bean that will be part of the association
 	 * @param mixed $extra            bean, scalar, array or JSON providing extra data.
@@ -290,16 +297,7 @@ class RedBean_Facade {
 			return self::$associationManager->associate( $beans1, $beans2 );
 		}
 		else{
-			if (!is_array($extra)) {
-				$info = json_decode($extra,true);
-				if (!$info) $info = array('extra'=>$extra);
-			}
-			else {
-				$info = $extra;
-			}
-			$bean = RedBean_Facade::dispense('xtypeless');
-			$bean->import($info);
-			return self::$extAssocManager->extAssociate($beans1, $beans2, $bean);
+			return self::$extAssocManager->extAssociateSimple($beans1,$beans2,$extra);
 		}
 	}
 
@@ -344,11 +342,7 @@ class RedBean_Facade {
 	 * @return array $beans	beans yielded by your query.
 	 */
 	public static function related( $bean, $type, $sql=null, $values=array()) {
-		$keys = self::$associationManager->related( $bean, $type );
-		if (count($keys)==0 || !is_array($keys)) return array();
-		if (!$sql) return self::batch($type, $keys);
-		$rows = self::$writer->selectRecord( $type, array('id'=>$keys),array($sql,$values),false );
-		return self::$redbean->convertToBeans($type,$rows);
+		return self::$associationManager->relatedSimple($bean,$type,$sql,$values);
 	}
 
 	/**
@@ -363,9 +357,7 @@ class RedBean_Facade {
 	* @return RedBean_OODBBean $bean
 	*/
 	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql=null, $values=array() ) {
-		$beans = self::related($bean, $type, $sql, $values);
-		if (count($beans)==0 || !is_array($beans)) return null;
-		return reset( $beans );
+		return self::$associationManager->relatedOne($bean,$type,$sql,$values);
 	}
 
 	/**
@@ -394,13 +386,8 @@ class RedBean_Facade {
 	 * @return array $beans beans
 	 */
 	public static function unrelated(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
-		$keys = self::$associationManager->related( $bean, $type );
-		$rows = self::$writer->selectRecord( $type, array('id'=>$keys), array($sql,$values), false, true );
-		return self::$redbean->convertToBeans($type,$rows);
-
+		return self::$associationManager->unrelated($bean,$type,$sql,$values);
 	}
-
-
 
 	/**
 	 * Clears all associated beans.
@@ -429,9 +416,7 @@ class RedBean_Facade {
 	 * @return array $beans  beans
 	 */
 	public static function find( $type, $sql=null, $values=array() ) {
-		if ($sql instanceof RedBean_SQLHelper) list($sql,$values) = $sql->getQuery();
-		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
-		return self::$redbean->find($type,array(),array($sql,$values));
+		return self::$finder->find($type,$sql,$values);
 	}
 
 	/**
@@ -446,7 +431,7 @@ class RedBean_Facade {
 	 * R::findAll('person',' ORDER BY name DESC ');
 	 *
 	 * Your SQL does not have to start with a valid WHERE-clause condition.
-	 *
+	 * 
 	 * @param string $type   type   the type of bean you are looking for
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
@@ -454,8 +439,7 @@ class RedBean_Facade {
 	 * @return array $beans  beans
 	 */
 	public static function findAll( $type, $sql=null, $values=array() ) {
-		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
-		return self::$redbean->find($type,array(),array($sql,$values),true);
+		return self::$finder->findAll($type,$sql,$values);
 	}
 
 	/**
@@ -465,7 +449,7 @@ class RedBean_Facade {
 	 * array parameter; you can either use the question mark notation
 	 * or the slot-notation (:keyname).
 	 * The variation also exports the beans (i.e. it returns arrays).
-	 *
+	 * 
 	 * @param string $type   type   the type of bean you are looking for
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
@@ -473,12 +457,7 @@ class RedBean_Facade {
 	 * @return array $arrays arrays
 	 */
 	public static function findAndExport($type, $sql=null, $values=array()) {
-		$items = self::find( $type, $sql, $values );
-		$arr = array();
-		foreach($items as $key=>$item) {
-			$arr[$key]=$item->export();
-		}
-		return $arr;
+		return self::$finder->findAndExport($type,$sql,$values);
 	}
 
 	/**
@@ -488,7 +467,7 @@ class RedBean_Facade {
 	 * array parameter; you can either use the question mark notation
 	 * or the slot-notation (:keyname).
 	 * This variation returns the first bean only.
-	 *
+	 * 
 	 * @param string $type   type   the type of bean you are looking for
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
@@ -496,10 +475,7 @@ class RedBean_Facade {
 	 * @return RedBean_OODBBean $bean
 	 */
 	public static function findOne( $type, $sql=null, $values=array()) {
-		$items = self::find($type,$sql,$values);
-		$found = reset($items);
-		if (!$found) return null;
-		return $found;
+		return self::$finder->findOne($type,$sql,$values);
 	}
 
 	/**
@@ -509,7 +485,7 @@ class RedBean_Facade {
 	 * array parameter; you can either use the question mark notation
 	 * or the slot-notation (:keyname).
 	 * This variation returns the last bean only.
-	 *
+	 * 
 	 * @param string $type   type   the type of bean you are looking for
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
@@ -517,10 +493,7 @@ class RedBean_Facade {
 	 * @return RedBean_OODBBean $bean
 	 */
 	public static function findLast( $type, $sql=null, $values=array() ) {
-		$items = self::find( $type, $sql, $values );
-		$found = end( $items );
-		if (!$found) return null;
-		return $found;
+		return self::$finder->findLast($type,$sql,$values);
 	}
 
 	/**
@@ -698,13 +671,7 @@ class RedBean_Facade {
 	 * @return	array $array exported structure
 	 */
 	public static function exportAll($beans,$parents=false,$filters=array()) {
-		$array = array();
-		if (!is_array($beans)) $beans = array($beans);
-		foreach($beans as $bean) {
-			$f = self::dup($bean,array(),true,$filters);
-			$array[] = $f->export(false,$parents,false,$filters);
-		}
-		return $array;
+		return self::$duplicationManager->exportAll($beans,$parents,$filters);
 	}
 
 
@@ -718,13 +685,7 @@ class RedBean_Facade {
 	 * @param string $property property
 	 */
 	public static function swap( $beans, $property ) {
-		$bean1 = array_shift($beans);
-		$bean2 = array_shift($beans);
-		$tmp = $bean1->$property;
-		$bean1->$property = $bean2->$property;
-		$bean2->$property = $tmp;
-		RedBean_Facade::store($bean1);
-		RedBean_Facade::store($bean2);
+		return self::$associationManager->swap($beans,$property);
 	}
 
 	/**
@@ -873,6 +834,7 @@ class RedBean_Facade {
 		self::$writer = self::$toolbox->getWriter();
 		self::$adapter = self::$toolbox->getDatabaseAdapter();
 		self::$redbean = self::$toolbox->getRedBean();
+		self::$finder = new RedBean_Finder( self::$toolbox );
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
 		self::$redbean->setAssociationManager(self::$associationManager);
 		self::$labelMaker = new RedBean_LabelMaker(self::$toolbox);
@@ -937,13 +899,7 @@ class RedBean_Facade {
 	 * @return string $slots
 	 */
 	public static function genSlots($array) {
-		if (is_array($array) && count($array)>0) {
-			$filler = array_fill(0,count($array),'?');
-			return implode(',',$filler);
-		}
-		else {
-			return '';
-		}
+		return self::$f->genSlots($array);
 	}
 
 	/**
@@ -1051,9 +1007,6 @@ class RedBean_Facade {
 			self::$adapter->close();
 		}
 	}
-
-	
-
 
 	/**
 	 * Simple convenience function, returns ISO date formatted representation

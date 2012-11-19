@@ -125,21 +125,26 @@ class RedBean_OODB extends RedBean_Observable {
 	 * function applies the appropriate initialization /
 	 * configuration for you.
 	 * 
-	 * @param string $type type of bean you want to dispense
+	 * @param string $type   type of bean you want to dispense
+	 * @param string $number number of beans you would like to get
 	 * 
 	 * @return RedBean_OODBBean $bean the new bean instance
 	 */
-	public function dispense($type ) {
-		$bean = new RedBean_OODBBean();
-		$bean->setBeanHelper($this->beanhelper);
-		$bean->setMeta('type',$type );
-		$bean->setMeta('sys.id','id');
-		$bean->id = 0;
-		if (!$this->isFrozen) $this->check( $bean );
-		$bean->setMeta('tainted',true);
-		$bean->setMeta('sys.orig',array('id'=>0));
-		$this->signal('dispense',$bean );
-		return $bean;
+	public function dispense($type, $number = 1) {
+		$beans = array();
+		for($i=0; $i< $number; $i++){
+			$bean = new RedBean_OODBBean();
+			$bean->setBeanHelper($this->beanhelper);
+			$bean->setMeta('type',$type );
+			$bean->setMeta('sys.id','id');
+			$bean->id = 0;
+			if (!$this->isFrozen) $this->check( $bean );
+			$bean->setMeta('tainted',true);
+			$bean->setMeta('sys.orig',array('id'=>0));
+			$this->signal('dispense',$bean );
+			$beans[] = $bean;
+		}
+		return (count($beans)===1) ? array_pop($beans) : $beans; 
 	}
 
 	/**

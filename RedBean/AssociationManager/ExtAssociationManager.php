@@ -31,4 +31,26 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 		$baseBean->setMeta('type', $table );
 		return $this->associateBeans( $bean1, $bean2, $baseBean );
 	}
+	
+	
+	/**
+	 * Deprecated
+	 * 
+	 * @param RedBean_OODBBean $beans1 bean
+	 * @param RedBean_OODBBean $beans2 bean
+	 * @param mixed $extra
+	 * @return mixed 
+	 */
+	public function extAssociateSimple( $beans1, $beans2, $extra = null) {
+		if (!is_array($extra)) {
+			$info = json_decode($extra,true);
+			if (!$info) $info = array('extra'=>$extra);
+		}
+		else {
+			$info = $extra;
+		}
+		$bean = $this->oodb->dispense('xtypeless');
+		$bean->import($info);
+		return $this->extAssociate($beans1, $beans2, $bean);
+	}
 }

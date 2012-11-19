@@ -226,4 +226,29 @@ class RedBean_DuplicationManager {
 		if ($pid) $copy->id = $bean->id;
 		return $copy;
 	}
+	
+	/**
+	 * Exports a collection of beans. Handy for XML/JSON exports with a
+	 * Javascript framework like Dojo or ExtJS.
+	 * What will be exported:
+	 * - contents of the bean
+	 * - all own bean lists (recursively)
+	 * - all shared beans (not THEIR own lists)
+	 *
+	 * @param	array|RedBean_OODBBean $beans   beans to be exported
+	 * @param   boolean				   $parents also export parents
+	 * @param   array                  $filters only these types (whitelist)
+	 * 
+	 * @return	array $array exported structure
+	 */
+	public function exportAll($beans,$parents=false,$filters=array()) {
+		$array = array();
+		if (!is_array($beans)) $beans = array($beans);
+		foreach($beans as $bean) {
+			$this->setFilters($filters);
+			$f = $this->dup($bean,array(),true);
+			$array[] = $f->export(false,$parents,false,$filters);
+		}
+		return $array;
+	}
 }

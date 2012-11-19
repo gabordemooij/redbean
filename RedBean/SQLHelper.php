@@ -173,4 +173,20 @@
 		}
 	}
 	
+	/**
+	 * Generates question mark slots for an array of values.
+	 *
+	 * @param array $array
+	 * @return string $slots
+	 */
+	public function genSlots($array) {
+		if (is_array($array) && count($array)>0) {
+			$filler = array_fill(0,count($array),'?');
+			return implode(',',$filler);
+		}
+		else {
+			return '';
+		}
+	}
+	
 }
