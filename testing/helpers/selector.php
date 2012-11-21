@@ -98,6 +98,7 @@ $allPacks = array(
 		'Base/Dup',
 		'Base/Update',
 		'Base/Batch',
+		'Base/Writecache',
 		'Base/Relations',
 		'Base/Association',
 		'Base/Aliasing',

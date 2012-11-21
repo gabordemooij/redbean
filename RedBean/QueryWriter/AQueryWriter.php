@@ -49,6 +49,26 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected $quoteCharacter = '';
 
+	/**
+	 * Flag indicating whether we are using caching.
+	 * @var boolean
+	 */
+	protected $flagUseCache = false;
+	
+	/**
+	 * Flush key. A hash-like string that acts as a lock to verify
+	 * no intermediate queries have taken place.
+	 * @var string 
+	 */
+	protected $flushKey = '';
+	
+	/**
+	 * A storage for cached databasse result rows.
+	 * Each entry is a row.
+	 * @var array 
+	 */
+	protected $cache = array();
+	
 
 	/**
 	 * Constructor
@@ -240,6 +260,19 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false, $all=false ) { 
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
+		if (!$delete && $this->flagUseCache) {
+			$key = serialize(array($type,$conditions,$addSql,$inverse,$all));
+			if ($this->flushKey!==$this->adapter->getSQL()) {
+				//If SQL has been taken place outside of this method then something else then
+				//a select query might have happened!
+				$this->cache = array();
+			}
+			else {
+				if (isset($this->cache[$key])) { 
+					return $this->cache[$key];
+				}
+			}
+		}
 		$table = $this->safeTable($type);
 		$sqlConditions = array();
 		$bindings=array();
@@ -293,6 +326,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		$sql = (($delete) ? 'DELETE FROM ' : 'SELECT * FROM ').$table.$sql;
 		$rows = $this->adapter->get($sql,$bindings);
+		if (!$delete && $this->flagUseCache) {
+			$this->flushKey = $this->adapter->getSQL();
+			$this->cache[$key] = $rows;
+		}
 		return $rows;
 	}
 
@@ -476,6 +513,17 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function getValue(){
 		return $this->svalue;
+	}
+	
+	/**
+	 * Turns caching on or off. Default: off.
+	 * If caching is turned on retrieval queries fired after eachother will
+	 * use a result row cache.
+	 * 
+	 * @param boolean $yesNo 
+	 */
+	public function setUseCache($yesNo) {
+		$this->flagUseCache = (boolean) $yesNo;
 	}
 
 }
