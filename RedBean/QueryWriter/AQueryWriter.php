@@ -523,7 +523,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param boolean $yesNo 
 	 */
 	public function setUseCache($yesNo) {
+		$this->flushCache();
 		$this->flagUseCache = (boolean) $yesNo;
 	}
-
+	
+	/**
+	 * Flushes the Query Writer Cache.
+	 */
+	public function flushCache() {
+		$this->cache = array();
+	}
 }

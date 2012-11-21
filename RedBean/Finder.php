@@ -53,7 +53,7 @@ class RedBean_Finder {
 	 *
 	 * @return array $beans  beans
 	 */
-	public function find( $type, $sql=null, $values=array() ) {	
+	public function find( $type, $sql=null, $values=array() ) {
 		if ($sql instanceof RedBean_SQLHelper) list($sql,$values) = $sql->getQuery();
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
 		return $this->redbean->find($type,array(),array($sql,$values));
