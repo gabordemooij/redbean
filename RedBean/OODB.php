@@ -895,25 +895,52 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	public function preload($beans, $types) {
 		foreach($types as $key => $type) {
-			$map = array();
-			$field = (is_numeric($key)) ? $type : $key;
-			$ids = array();
-			foreach($beans as $bean) {
-				if($id = $bean->{$field.'_id'}){
+			$map = $ids = array();
+			$field = (is_numeric($key)) ? $type : $key;//use an alias?
+			$filteredBeans = $beans;
+			while($p = strpos($field,'.')) { //filtering: find the right beans in the path
+				$nesting = substr($field,0,$p);
+				$filtered = array();
+				foreach($filteredBeans as $bean) {
+					if (is_array($bean->$nesting)) {
+						$filtered = array_merge($filtered,$bean->$nesting);
+					} elseif (!is_null($bean->$nesting)) {
+						$filtered[] = $bean->$nesting;
+					}
+				}
+				$filteredBeans = $filtered;
+				$field = substr($field,$p+1);
+			}
+			if (strpos($type,'.')) $type = $field;
+			foreach($filteredBeans as $bean) { //gather ids to load the desired bean collections
+				if (strpos($field,'own')===0) { //based on bean->id for ownlist
+					$id = $bean->id;
+					$ids[$id] = $id;
+				} elseif($id = $bean->{$field.'_id'}){ //based on bean_id for parent
 					$ids[$id] = $id;
 					if (!isset($map[$id])) $map[$id] = array();
 					$map[$id][] = $bean;
 				}
 			}
-			$parents = $this->batch($type,$ids);
-			foreach($parents as $parent) {
-				foreach($map[$parent->id] as $childBean) {
-					$childBean->setProperty($field,$parent);
+			if (strpos($field,'own')===0) {//preload for own-list using find
+				$link = $bean->getMeta('type').'_id';
+				$children = $this->find($type,array($link=>$ids));
+				foreach($filteredBeans as $bean) {
+					$list = array();
+					foreach($children as $child) {
+						if ($child->$link==$bean->id) $list[$child->id] = $child;
+					}
+					$bean->setProperty($field,$list);
 				}
-			}
+			} else { //preload for parent objects using batch()
+				foreach($this->batch($type,$ids) as $parent) {
+					foreach($map[$parent->id] as $childBean) {
+						$childBean->setProperty($field,$parent);
+					}
+				}
+			}			
 		}
 	}
-
 }
 
 

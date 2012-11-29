@@ -149,6 +149,96 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 			asrt($item->author->name,'John');
 		}
 		
+		//test nested bean preloading
+		R::nuke();
+		$authors = R::dispense('author',2);
+		foreach($authors as $author) { 
+			$author->ownBook = R::dispense('book',2);
+			foreach($author->ownBook as $book) {
+				$book->ownPage = R::dispense('page',2);
+				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',1);
+			}
+		}
+		R::storeAll($authors);
+		$texts = R::find('text');
+		R::nuke();
+		$text = reset($texts);
+		asrt(($text->page),null);
+		
+		//now with preloading
+		R::nuke();
+		$authors = R::dispense('author',2);
+		foreach($authors as $author) { 
+			$author->ownBook = R::dispense('book',2);
+			foreach($author->ownBook as $book) {
+				$book->ownPage = R::dispense('page',2);
+				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+			}
+		}
+		R::storeAll($authors);
+		$texts = R::find('text');
+		R::preload($texts,array('page','page.book','page.book.author'));
+		R::nuke();
+		$text = reset($texts);
+		asrt(($text->page->id)>0,true);
+		asrt(($text->page->book->id)>0,true);
+		asrt(($text->page->book->author->id)>0,true);
+		
+		R::nuke();
+		$authors = R::dispense('author',2);
+		foreach($authors as $author) { 
+			$author->alias('coauthor')->ownBook = R::dispense('book',2);
+			foreach($author->alias('coauthor')->ownBook as $book) {
+				$book->ownPage = R::dispense('page',2);
+				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+			}
+		}
+		R::storeAll($authors);
+		$texts = R::find('text');
+		R::preload($texts,array('page','page.book','page.book.coauthor'=>'author'));
+		R::nuke();
+		$text = reset($texts);
+		asrt(($text->page->id)>0,true);
+		asrt(($text->page->book->id)>0,true);
+		asrt(($text->page->book->fetchAs('author')->coauthor->id)>0,true);
+		
+		//now test preloading of own-lists
+		R::nuke();
+		$authors = R::dispense('author',2);
+		foreach($authors as $author) { 
+			$author->ownBook = R::dispense('book',2);
+			foreach($author->ownBook as $book) {
+				$book->ownPage = R::dispense('page',2);
+				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+			}
+		}
+		R::storeAll($authors);
+		$authors = R::find('author');
+		R::preload($authors,array('ownBook'=>'book','ownBook.ownPage'=>'page','ownBook.ownPage.ownText'=>'text'));
+		R::nuke();
+		$author = reset($authors);
+		asrt(count($author->ownBook),2);
+		$book = reset($author->ownBook);
+		asrt(count($book->ownPage),2);
+		$page = reset($book->ownPage);
+		asrt(count($page->ownText),2);
+		
+		//now test with empty beans
+		$authors = R::dispense('author',2);
+		R::storeAll($authors);
+		$authors = R::find('author');
+		R::preload($authors,array('ownBook'=>'book','ownBook.ownPage'=>'page','ownBook.ownPage.ownText'=>'text'));
+		$author = reset($authors);
+		asrt(count($author->ownBook),0);
+		
+		$texts = R::dispense('text',2);
+		R::storeAll($texts);
+		$texts = R::find('text');
+		R::preload($texts,array('page','page.book'));
+		$text = reset($texts);
+		asrt($text->page,null);
+		
+		
 	}	
 	
 }
