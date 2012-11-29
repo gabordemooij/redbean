@@ -21,6 +21,12 @@
 class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	
 	/**
+	 * Flag, determines whether it's possible to load beans with graph().
+	 * @var boolean
+	 */
+	private static $loadBeans = false;
+	
+	/**
 	 * This flag indicates whether empty strings in beans will be
 	 * interpreted as NULL or not. TRUE means Yes, will be converted to NULL,
 	 * FALSE means empty strings will be stored as such (conversion to 0 for integer fields).
@@ -28,6 +34,17 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	 */
 	private static $useNULLForEmptyString = false;
 
+	/**
+	 * If you enable bean loading graph will load beans if there is an ID in the array.
+	 * This is very powerful but can also cause security issues if a user knows how to
+	 * manipulate beans and there is no model based ID validation.
+	 * 
+	 * @param boolean $yesNo 
+	 */
+	public static function enableBeanLoading($yesNo) {
+		self::$loadBeans = ($yesNo);
+	}
+	
 	/**
 	 * Sets the toolbox to be used by graph()
 	 *
@@ -83,8 +100,13 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 			unset($array['type']);
 			//Do we need to load the bean?
 			if (isset($array['id'])) {
-				$id = (int) $array['id'];
-				$bean = $this->redbean->load($type,$id);
+				if (self::$loadBeans) {
+					$id = (int) $array['id'];
+					$bean = $this->redbean->load($type,$id);
+				}
+				else {
+					throw new RedBean_Exception_Security('Attempt to load a bean in Cooker. Use enableBeanLoading to override but please read security notices first.');
+				}
 			}
 			else {
 				$bean = $this->redbean->dispense($type);

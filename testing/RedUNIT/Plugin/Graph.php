@@ -24,6 +24,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin {
 	 */
 	public function run() {
 		R::nuke();
+		RedBean_Plugin_Cooker::enableBeanLoading(true);
 		R::dependencies(array());
 		global $currentDriver;
 		global $lifeCycle;
@@ -442,6 +443,21 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin {
 				array('type'=>'coupon','id'=>$couponID)
 			)
 		);
+		RedBean_Plugin_Cooker::enableBeanLoading(false);
+		
+		$exc = false;
+		try{ 
+			$order = R::graph($form);
+			fail();
+		}
+		catch(Exception $e) {
+			$exc = $e;
+		}
+		
+		asrt(($exc instanceof RedBean_Exception_Security),true);
+		
+		RedBean_Plugin_Cooker::enableBeanLoading(true);
+		
 		$order = R::graph($form);
 		asrt($order->getMeta('type'),'order');
 		asrt(count($order->ownProduct),1);
