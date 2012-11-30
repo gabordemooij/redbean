@@ -890,13 +890,32 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * Usage: $redbean->preload($books,array('coauthor'=>'author'));
 	 * 
+	 * Usage for nested beans:
+	 * 
+	 * $redbean->preload($texts,array('page','page.book','page.book.author'));
+	 * 
+	 * preloads pages, books and authors.
+	 * You may also use a shortcut here: 
+	 * 
+	 * $redbean->preload($texts,array('page','*.book','*.author'));
+	 * 
+	 * Can also load preload lists:
+	 * 
+	 * $redbean->preload($books,'ownPage'=>'page','*.ownText'=>'text');
+	 * 
 	 * @param array $beans beans
 	 * @param array $types types to load
 	 */
-	public function preload($beans, $types) {
+	public function preload($beans, $types, $closure = null) {
+		if (is_string($types)) $types = explode(',',$types);
+		$oldFields = array(); $i=0; $retrievals = array();
 		foreach($types as $key => $type) {
+			$retrievals[$i] = array();
 			$map = $ids = array();
 			$field = (is_numeric($key)) ? $type : $key;//use an alias?
+			$addToStack = true;
+			if (strpos($field,'*')!==false) { $field = str_replace('*',implode('.',$oldFields),$field); $addToStack = true; }
+			if (strpos($field,'&')!==false) { $field = str_replace('&',implode('.',$oldFields),$field); $addToStack = false; }
 			$filteredBeans = $beans;
 			while($p = strpos($field,'.')) { //filtering: find the right beans in the path
 				$nesting = substr($field,0,$p);
@@ -912,13 +931,12 @@ class RedBean_OODB extends RedBean_Observable {
 				$field = substr($field,$p+1);
 			}
 			if (strpos($type,'.')) $type = $field;
+			if ($addToStack) $oldFields[]= $field;
 			foreach($filteredBeans as $bean) { //gather ids to load the desired bean collections
 				if (strpos($field,'own')===0) { //based on bean->id for ownlist
-					$id = $bean->id;
-					$ids[$id] = $id;
+					$id = $bean->id; $ids[$id] = $id;
 				} elseif($id = $bean->{$field.'_id'}){ //based on bean_id for parent
-					$ids[$id] = $id;
-					if (!isset($map[$id])) $map[$id] = array();
+					$ids[$id] = $id; if (!isset($map[$id])) $map[$id] = array();
 					$map[$id][] = $bean;
 				}
 			}
@@ -931,14 +949,26 @@ class RedBean_OODB extends RedBean_Observable {
 						if ($child->$link==$bean->id) $list[$child->id] = $child;
 					}
 					$bean->setProperty($field,$list);
+					$retrievals[$i][] = $list;
 				}
 			} else { //preload for parent objects using batch()
 				foreach($this->batch($type,$ids) as $parent) {
 					foreach($map[$parent->id] as $childBean) {
 						$childBean->setProperty($field,$parent);
+						$retrievals[$i][] = $parent;
 					}
 				}
-			}			
+			}
+			$i++;
+		}
+		if ($closure) {
+			$key = 0; foreach($beans as $bean) {
+				$params = array();
+				foreach($retrievals as $r) $params[] = (isset($r[$key])) ? $r[$key] : null; 
+				array_unshift($params,$bean);
+				call_user_func_array($closure,$params);
+				$key ++;
+			}
 		}
 	}
 }

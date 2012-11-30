@@ -22,7 +22,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
-		 
+		
 		//test without preload
 		R::nuke();
 		$books = R::dispense('book',3);
@@ -238,6 +238,108 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		$text = reset($texts);
 		asrt($text->page,null);
 		
+		
+		
+		//test with closure
+		R::nuke();
+		$books = R::dispense('book',3);
+		$i=0;
+		foreach($books as $book) {
+			$i++;
+			$book->name = $i;
+			$book->ownPage[] = R::dispense('page')->setAttr('name',$i);
+			$book->author = R::dispense('author')->setAttr('name',$i);
+			$book->coauthor = R::dispense('author')->setArr('name',$i);
+		}
+		R::storeAll($books);
+		$books = R::find('book');
+		$hasNuked = false;
+		R::preload($books,'author',function($book,$author){
+			global $hasNuked;
+			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
+			asrt($book->getMeta('type'),'book');
+			asrt($author->getMeta('type'),'author');
+		});
+		
+		//test with closure and abbrevations
+		R::nuke();
+		$authors = R::dispense('author',2);
+		foreach($authors as $author) { 
+			$author->ownBook = R::dispense('book',2);
+			foreach($author->ownBook as $book) {
+				$book->ownPage = R::dispense('page',2);
+				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+			}
+		}
+		R::storeAll($authors);
+		$texts = R::find('text');
+		$hasNuked = false;
+		R::preload($texts,'page,*.book,*.author',function($text,$page,$book,$author){
+			global $hasNuked;
+			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
+			asrt($text->getMeta('type'),'text');
+			asrt($page->getMeta('type'),'page');
+			asrt($book->getMeta('type'),'book');
+			asrt($author->getMeta('type'),'author');
+		});
+		
+		//test with closure and abbrevations and same-level abbr
+		R::nuke();
+		$authors = R::dispense('author',2);
+		foreach($authors as $author) { 
+			$author->ownBook = R::dispense('book',2);
+			foreach($author->ownBook as $book) {
+				$book->ownPage = R::dispense('page',2);
+				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+			}
+		}
+		foreach($authors as $author) {
+			foreach($author->ownBook as $book) {
+				$book->shelf = R::dispense('shelf')->setAttr('name','abc');
+			}
+		}
+		R::storeAll($authors);
+		$texts = R::find('text');
+		$hasNuked = false;
+		R::preload($texts,'page,*.book,&.author,*.shelf',function($text,$page,$book,$author,$shelf){
+			global $hasNuked;
+			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
+			asrt($text->getMeta('type'),'text');
+			asrt($page->getMeta('type'),'page');
+			asrt(($page->id>0),true);
+			asrt($book->getMeta('type'),'book');
+			asrt(($book->id>0),true);
+			asrt($author->getMeta('type'),'author');
+			asrt($shelf->getMeta('type'),'shelf');
+		});
+		
+		//test with closure, abbreviation and own-list
+		R::nuke();
+		$authors = R::dispense('author',2);
+		foreach($authors as $author) { 
+			$author->ownBook = R::dispense('book',2);
+			foreach($author->ownBook as $book) {
+				$book->ownPage = R::dispense('page',2);
+				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+			}
+		}
+		R::storeAll($authors);
+		$pages = R::find('page');
+		$hasNuked = false;
+		R::preload($pages,array('book','*.author','ownText'=>'text'),function($page,$book,$author,$texts){
+			global $hasNuked;
+			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
+			asrt($page->getMeta('type'),'page');
+			asrt(($page->id>0),true);
+			asrt($book->getMeta('type'),'book');
+			asrt(($book->id>0),true);
+			asrt($author->getMeta('type'),'author');
+			asrt(($author->id>0),true);
+			asrt(is_array($texts),true);
+			asrt(count($texts),2);
+			$first = reset($texts);
+			asrt($first->getMeta('type'),'text');
+		});
 		
 	}	
 	

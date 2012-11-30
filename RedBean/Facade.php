@@ -1104,8 +1104,8 @@ class RedBean_Facade {
 	 * @param array $beans beans
 	 * @param array $types types to load
 	 */
-	public static function preload($beans,$types) {
-		return self::$redbean->preload($beans,$types);
+	public static function preload($beans,$types,$closure = null) {
+		return self::$redbean->preload($beans,$types,$closure);
 	}
 	
 }
