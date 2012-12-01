@@ -47,7 +47,11 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
 	
-	
+	/**
+	 * Special type point. Only available through explicit cast.
+	 * @var integer
+	 */
+	const C_DATATYPE_SPECIAL_POINT = 90;
 	
 	/**
 	 * Specified field type cannot be overruled
@@ -110,8 +114,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 				  self::C_DATATYPE_TEXT=>' text ',
 				  self::C_DATATYPE_SPECIAL_DATE => ' date ',
 				  self::C_DATATYPE_SPECIAL_DATETIME => ' timestamp without time zone ',
-				 
-			
+				  self::C_DATATYPE_SPECIAL_POINT => ' point ',
 		);
 
 		$this->sqltype_typeno = array();

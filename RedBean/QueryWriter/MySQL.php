@@ -90,6 +90,11 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
 	
+	/**
+	 * Special type point. Only available through explicit cast.
+	 * @var integer
+	 */
+	const C_DATATYPE_SPECIAL_POINT = 90;
 
 	/**
 	 * 
@@ -135,6 +140,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>' LONGTEXT ',
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>' DATE ',
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>' DATETIME ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT=>' POINT ',
 			);
 		
 		$this->sqltype_typeno = array();
