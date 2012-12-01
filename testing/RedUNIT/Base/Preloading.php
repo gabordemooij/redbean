@@ -301,7 +301,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::storeAll($authors);
 		$texts = R::find('text');
 		$hasNuked = false;
-		R::preload($texts,'page,*.book,&.author,*.shelf',function($text,$page,$book,$author,$shelf){
+		R::preload($texts,'page,*.book,*.author,&.shelf',function($text,$page,$book,$author,$shelf){
 			global $hasNuked;
 			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
 			asrt($text->getMeta('type'),'text');

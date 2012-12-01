@@ -908,14 +908,13 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	public function preload($beans, $types, $closure = null) {
 		if (is_string($types)) $types = explode(',',$types);
-		$oldFields = array(); $i=0; $retrievals = array();
+		$oldFields = array(); $i=0; $retrievals = array(); $oldField = '';
 		foreach($types as $key => $type) {
 			$retrievals[$i] = array();
 			$map = $ids = array();
 			$field = (is_numeric($key)) ? $type : $key;//use an alias?
-			$addToStack = true;
-			if (strpos($field,'*')!==false) { $field = str_replace('*',implode('.',$oldFields),$field); $addToStack = true; }
-			if (strpos($field,'&')!==false) { $field = str_replace('&',implode('.',$oldFields),$field); $addToStack = false; }
+			if (strpos($field,'*')!==false) { $oldFields[]= $oldField; $field = str_replace('*',implode('.',$oldFields),$field);}
+			if (strpos($field,'&')!==false) { $field = str_replace('&',implode('.',$oldFields),$field);}
 			$filteredBeans = $beans;
 			while($p = strpos($field,'.')) { //filtering: find the right beans in the path
 				$nesting = substr($field,0,$p);
@@ -930,8 +929,8 @@ class RedBean_OODB extends RedBean_Observable {
 				$filteredBeans = $filtered;
 				$field = substr($field,$p+1);
 			}
+			$oldField = $field;
 			if (strpos($type,'.')) $type = $field;
-			if ($addToStack) $oldFields[]= $field;
 			foreach($filteredBeans as $bean) { //gather ids to load the desired bean collections
 				if (strpos($field,'own')===0) { //based on bean->id for ownlist
 					$id = $bean->id; $ids[$id] = $id;
