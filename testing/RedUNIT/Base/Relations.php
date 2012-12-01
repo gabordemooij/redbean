@@ -481,8 +481,42 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(R::count('village'),1);
 		asrt(R::count('building'),0);
 		
-		
-		
+		//test N-M relations through intermediate beans
+		R::nuke();
+		list($mrA,$mrB,$mrC) = R::dispense('person',3);
+		list($projA,$projB,$projC) = R::dispense('project',3);
+		$projA->title = 'A';
+		$projB->title = 'B';
+		$projC->title = 'C';
+		$participant = R::dispense('participant');
+		$projA->link('participant',array('role'=>'manager'))->person = $mrA;
+		$projA->link($participant->setAttr('role','developer'))->person = $mrB;
+		$projB->link(R::dispense('participant')->setAttr('role','developer'))->person = $mrB;
+		$projB->link('participant','{"role":"helpdesk"}')->person = $mrC;
+		$projC->link('participant','{"role":"sales"}')->person = $mrC;
+		R::storeAll(array($projA,$projB,$projC));
+		$a = R::findOne('project',' title = ? ',array('A'));
+		$b = R::findOne('project',' title = ? ',array('B'));
+		$c = R::findOne('project',' title = ? ',array('C'));
+		asrt(count($a->ownParticipant),2);
+		asrt(count($b->ownParticipant),2);
+		asrt(count($c->ownParticipant),1);
+		$managers = $developers = 0;
+		foreach($a->ownParticipant as $p) {
+			if ($p->role === 'manager') {
+				$managers ++;
+			}
+			if ($p->role === 'developer') {
+				$developers ++;
+			}
+		}
+		$p = reset($a->ownParticipant);
+		asrt($p->person->getMeta('type'),'person');
+		asrt(($p->person->id >0),true);
+		asrt($managers,1);
+		asrt($developers,1);
+		asrt((int)R::count('participant'),5);
+		asrt((int)R::count('person'),3);
 		
 	}
 }

@@ -727,6 +727,48 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		if (!isset($this->properties[$property])) return false;
 		return ($this->old($property)!=$this->properties[$property]);
 	}
+	
+	/**
+	 * Creates a N-M relation by linking an intermediate bean.
+	 * This method can be used to quickly connect beans using indirect
+	 * relations. For instance, given an album and a song you can connect the two
+	 * using a track with a number like this:
+	 * 
+	 * Usage:
+	 * 
+	 * $album->link('track',array('number'=>1))->song = $song;
+	 * 
+	 * or:
+	 * 
+	 * $album->link($trackBean)->song = $song;
+	 * 	
+	 * What this method does is adding the link bean to the own-list, in this case
+	 * ownTrack. If the first argument is a string and the second is an array or
+	 * a JSON string then the linking bean gets dispensed on-the-fly as seen in
+	 * example #1. After preparing the linking bean, the bean is returned thus
+	 * allowing the chained setter: ->song = $song.
+	 * 
+	 * @param string|RedBean_OODBBean $type          type of bean to dispense or the full bean
+	 * @param string|array            $qualification JSON string or array (optional)
+	 */
+	public function link($typeOrBean,$qualification = array()) {
+		if (is_string($typeOrBean)) {
+			$bean = $this->beanHelper->getToolBox()->getRedBean()->dispense($typeOrBean);
+			if (is_string($qualification)) {
+				$data = json_decode($qualification, true);
+			} else {
+				$data = $qualification;
+			}
+			foreach($data as $key=>$value) {
+				$bean->$key = $value;
+			}
+		} else {
+			$bean = $typeOrBean;
+		}		
+		$list = 'own'.ucfirst($bean->getMeta('type'));
+		array_push($this->$list,$bean);
+		return $bean;
+	}
 }
 
 
