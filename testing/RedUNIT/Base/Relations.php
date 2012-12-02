@@ -518,5 +518,29 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt((int)R::count('participant'),5);
 		asrt((int)R::count('person'),3);
 		
+		//test emulation of sharedList through intermediate beans
+		R::nuke();
+		list($v1,$v2,$v3) = R::dispense('village',3);
+		list($a1,$a2,$a3) = R::dispense('army',3);
+		$a1->name = 'one';
+		$a2->name = 'two';
+		$a3->name = 'three';
+		$v1->name = 'Ville 1';
+		$v2->name = 'Ville 2';
+		$v3->name = 'Ville 3';
+		$v1->link('army_village')->army = $a3;
+		$v2->link('army_village')->army = $a2;
+		$v3->link('army_village')->army = $a1;
+		$a2->link('army_village')->village = $v1;
+		$id1 = R::store($v1);
+		$id2 = R::store($v2);
+		$id3 = R::store($v3);
+		$village1 = R::load('village',$id1);
+		$village2 = R::load('village',$id2);
+		$village3 = R::load('village',$id3);
+		asrt(count($village1->sharedArmy),2);
+		asrt(count($village2->sharedArmy),1);
+		asrt(count($village3->sharedArmy),1);
+		
 	}
 }
