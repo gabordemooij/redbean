@@ -274,8 +274,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::storeAll($authors);
 		$texts = R::find('text');
 		$hasNuked = false;
-		R::preload($texts,'page,*.book,*.author',function($text,$page,$book,$author){
-			global $hasNuked;
+		R::preload($texts,'page,*.book,*.author',function($text,$page,$book,$author)use(&$hasNuked){
 			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
 			asrt($text->getMeta('type'),'text');
 			asrt($page->getMeta('type'),'page');
@@ -301,8 +300,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::storeAll($authors);
 		$texts = R::find('text');
 		$hasNuked = false;
-		R::preload($texts,'page,*.book,*.author,&.shelf',function($text,$page,$book,$author,$shelf){
-			global $hasNuked;
+		R::preload($texts,'page,*.book,*.author,&.shelf',function($text,$page,$book,$author,$shelf)use(&$hasNuked){
 			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
 			asrt($text->getMeta('type'),'text');
 			asrt($page->getMeta('type'),'page');
@@ -326,8 +324,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::storeAll($authors);
 		$pages = R::find('page');
 		$hasNuked = false;
-		R::preload($pages,array('book','*.author','ownText'=>'text'),function($page,$book,$author,$texts){
-			global $hasNuked;
+		R::preload($pages,array('book','*.author','ownText'=>'text'),function($page,$book,$author,$texts)use(&$hasNuked){
 			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
 			asrt($page->getMeta('type'),'page');
 			asrt(($page->id>0),true);
@@ -340,7 +337,50 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 			$first = reset($texts);
 			asrt($first->getMeta('type'),'text');
 		});
+	
+		//test variations
+		R::nuke();
+		$authors = R::dispense('author',2);
+		foreach($authors as $author) { 
+			$author->ownBook = R::dispense('book',2);
+			foreach($author->ownBook as $book) {
+				$book->ownPage = R::dispense('page',2);
+				$book->cover = R::dispense('cover',1);
+				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+				foreach($book->ownPage as $page) $page->ownPicture = R::dispense('picture',3);
 		
+			}
+		}
+		R::storeAll($authors);
+		$texts = R::find('text');
+		$hasNuked = false;
+		$i = 0;
+		R::each($texts,array(
+			'page',
+			'*.ownPicture'=>'picture',
+			'&.book',
+			'*.cover',
+			'&.author'
+			),
+			function($t,$p,$x,$b,$c,$a)use(&$hasNuked,&$i){
+				if (!$hasNuked) { R::nuke(); $hasNuked = true; }
+				$i++;
+				asrt(count($x),3);
+				asrt(($p->id>0),true);
+				asrt(($c->id>0),true);
+				asrt(($t->id>0),true);
+				asrt(($b->id>0),true);
+				asrt(($a->id>0),true);
+				asrt($t->getMeta('type'),'text');
+				asrt($p->getMeta('type'),'page');
+				asrt($c->getMeta('type'),'cover');
+				asrt($b->getMeta('type'),'book');
+				asrt($a->getMeta('type'),'author');
+				$x1 = reset($x);
+				asrt($x1->getMeta('type'),'picture');
+			}
+		);
+		asrt($i,16); //follows the first parameter 
 	}	
 	
 }

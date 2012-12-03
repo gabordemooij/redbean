@@ -1108,6 +1108,9 @@ class RedBean_Facade {
 		return self::$redbean->preload($beans,$types,$closure);
 	}
 	
+	//Alias for Preload.
+	public static function each($beans,$types,$closure = null) { return self::preload($beans,$types,$closure); }
+	
 }
 
 //Compatibility with PHP 5.2 and earlier

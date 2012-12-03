@@ -121,12 +121,7 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * @param Observable $observable 
 	 */
 	public function attachEventListeners( RedBean_Observable $observable ) {
-		$observable->addEventListener('update', $this );
-		$observable->addEventListener('open', $this );
-		$observable->addEventListener('delete', $this );
-		$observable->addEventListener('after_delete', $this );
-		$observable->addEventListener('after_update', $this );
-		$observable->addEventListener('dispense', $this );
+		foreach(array('update','open','delete','after_delete','after_update','dispense') as $e) $observable->addEventListener('update', $e );
 	}
 	
 }
