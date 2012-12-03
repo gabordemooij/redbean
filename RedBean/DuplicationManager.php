@@ -1,6 +1,6 @@
 <?php
 /**
- * RedBean Duplication Manager
+ * Duplication Manager
  * 
  * @file			RedBean/DuplicationManager.php
  * @desc			Creates deep copies of beans
@@ -13,26 +13,21 @@
  *
  */
 class RedBean_DuplicationManager {
-	
-	
 	/**
 	 * The Dup Manager requires a toolbox
 	 * @var RedBean_Toolbox 
 	 */
 	protected $toolbox;
-	
 	/**
 	 * Association Manager 
 	 * @var RedBean_AssociationManager
 	 */
 	protected $associationManager;
-	
 	/**
 	 * RedBeanPHP OODB instance
 	 * @var RedBean_OODBBean 
 	 */
 	protected $redbean;
-	
 	protected $tables = array();
 	protected $columns = array();
 	protected $filters = array();
@@ -47,7 +42,6 @@ class RedBean_DuplicationManager {
 		$this->redbean = $toolbox->getRedBean();
 		$this->associationManager = $this->redbean->getAssociationManager();
 	}
-	
 	/**
 	 * For better performance you can pass the tables in an array to this method.
 	 * If the tables are available the duplication manager will not query them so
@@ -59,15 +53,13 @@ class RedBean_DuplicationManager {
 		foreach($tables as $key=>$value) {
 			if (is_numeric($key)) {
 				$this->tables[] = $value;
-			}
-			else {
+			} else {
 				$this->tables[] = $key;
 				$this->columns[$key] = $value;
 			}
 		}
 		$this->cacheTables = true;
 	}
-	
 	/**
 	 * Returns a schema array for cache.
 	 * 
@@ -76,7 +68,6 @@ class RedBean_DuplicationManager {
 	public function getSchema() {
 		return $this->columns;
 	}
-	
 	/**
 	 * Indicates whether you want the duplication manager to cache the database schema.
 	 * If this flag is set to TRUE the duplication manager will query the database schema
@@ -88,7 +79,6 @@ class RedBean_DuplicationManager {
 	public function setCacheTables($yesNo) {
 		$this->cacheTables = $yesNo;
 	}
-	
 	/**
 	 * A filter array is an array with table names.
 	 * By setting a table filter you can make the duplication manager only take into account
@@ -101,7 +91,6 @@ class RedBean_DuplicationManager {
 	public function setFilters($filters) {
 		$this->filters = $filters;
 	}
-	
 	/**
 	 * Determines whether the bean has an own list based on
 	 * schema inspection from realtime schema or cache.
@@ -114,7 +103,6 @@ class RedBean_DuplicationManager {
 	protected function hasOwnList($type,$target) {
 		return (isset($this->columns[$target][$type.'_id']));
 	}
-	
 	/**
 	 * Determines whether the bea has a shared list based on
 	 * schema inspection from realtime schema or cache.
@@ -130,7 +118,6 @@ class RedBean_DuplicationManager {
 		$linkType = implode('_',$linkType);
 		return (in_array($linkType,$this->tables));
 	}
-	
 	/**
 	 * Makes a copy of a bean. This method makes a deep copy
 	 * of the bean.The copy will have the following features.
@@ -167,7 +154,6 @@ class RedBean_DuplicationManager {
 		}
 		return $rs;
 	}
-	
 	/**
 	 * Makes a copy of a bean. This method makes a deep copy
 	 * of the bean.The copy will have the following features.
@@ -189,7 +175,6 @@ class RedBean_DuplicationManager {
 	 * @return array $copiedBean the duplicated bean
 	 */
 	protected function duplicate($bean,$trail=array(),$pid=false) {
-	
 	$type = $bean->getMeta('type');
 		$key = $type.$bean->getID();
 		if (isset($trail[$key])) return $bean;
@@ -221,12 +206,10 @@ class RedBean_DuplicationManager {
 				}
 			}
 			$copy->setMeta('sys.shadow.'.$shared,null);
-
 		}
 		if ($pid) $copy->id = $bean->id;
 		return $copy;
 	}
-	
 	/**
 	 * Exports a collection of beans. Handy for XML/JSON exports with a
 	 * Javascript framework like Dojo or ExtJS.

@@ -16,20 +16,17 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Plugin_BeanCan implements RedBean_Plugin {
-
 	/**
 	 * Holds a FUSE instance.
 	 * @var RedBean_ModelHelper
 	 */
 	private $modelHelper;
-
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->modelHelper = new RedBean_ModelHelper;
 	}
-
 	/**
 	 * Writes a response object for the client (JSON encoded). Internal method.
 	 *
@@ -42,16 +39,14 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 */
 	private function resp($result=null, $id=null, $errorCode='-32603',$errorMessage='Internal Error') {
 		$response = array('jsonrpc'=>'2.0');
-		 if (!is_null($id)) { $response['id'] = $id; }
+		if (!is_null($id)) { $response['id'] = $id; }
 		if ($result) {
 			$response['result']=$result;
-		}
-		else {
+		} else {
 			$response['error'] = array('code'=>$errorCode,'message'=>$errorMessage);
 		}
 		return (json_encode($response));
 	}
-
 	/**
 	 * Processes a JSON object request.
 	 *
@@ -89,7 +84,6 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		//May not contain anything other than ALPHA NUMERIC chars and _
 		if (preg_match('/\W/',$beanType)) return $this->resp(null, $id, -32600,'Invalid Bean Type String');
 		if (preg_match('/\W/',$action)) return $this->resp(null, $id, -32600,'Invalid Action String');
-
 		try {
 			switch($action) {
 				case 'store':
@@ -121,12 +115,10 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 					if (!method_exists($beanModel,$action)) return $this->resp(null, $id, -32601,"Method not found in Bean: $beanType ");
 					return $this->resp( call_user_func_array(array($beanModel,$action), $data), $id);
 			}
-		}
-		catch(Exception $exception) {
+		} catch(Exception $exception) {
 			return $this->resp(null, $id, -32099,$exception->getCode().'-'.$exception->getMessage());
 		}
 	}
-	
 	/**
 	 * Support for RESTFul GET-requests.
 	 * Only supports very BASIC REST requests, for more functionality please use
@@ -154,4 +146,3 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		}
 	}
 }
-

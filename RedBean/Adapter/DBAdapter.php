@@ -11,20 +11,16 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
-
 	/**
 	 * ADODB compatible class
 	 * @var RedBean_Driver
 	 */
 	private $db = null;
-
 	/**
 	 * Contains SQL snippet
 	 * @var string
 	 */
 	private $sql = '';
-
-
 	/**
 	 * Constructor.
 	 * Creates an instance of the RedBean Adapter Class.
@@ -36,7 +32,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function __construct($database) {
 		$this->db = $database;
 	}
-
 	/**
 	 * Returns the latest SQL Statement.
 	 * This method returns the most recently executed SQL statement string.
@@ -47,7 +42,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function getSQL() {
 		return $this->sql;
 	}
-
 	/**
 	 * Escapes a string for use in a Query.
 	 * This method escapes the value argument using the native
@@ -60,7 +54,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function escape( $sqlvalue ) {
 		return $this->db->Escape($sqlvalue);
 	}
-
 	/**
 	 * Executes SQL code; any query without
 	 * returning a resultset.
@@ -85,7 +78,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		}
 		return $this->db->Execute( $sql, $aValues );
 	}
-
 	/**
 	 * Multi array SQL fetch. Fetches a multi dimensional array.
 	 * This function allows you to provide an array with values to bind
@@ -106,7 +98,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		$this->signal('sql_exec', $this);
 		return $this->db->GetAll( $sql,$aValues );
 	}
-
 	/**
 	 * Executes SQL and fetches a single row.
 	 * This function allows you to provide an array with values to bind
@@ -127,7 +118,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		$this->signal('sql_exec', $this);
 		return $this->db->GetRow( $sql,$aValues );
 	}
-
 	/**
 	 * Executes SQL and returns a one dimensional array result set.
 	 * This function rotates the result matrix to obtain a column result set.
@@ -149,8 +139,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		$this->signal('sql_exec', $this);
 		return $this->db->GetCol( $sql,$aValues );
 	}
-
-
 	/**
 	 * Executes an SQL Query and fetches the first two columns only.
 	 * Then this function builds an associative array using the first
@@ -192,8 +180,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		}
 		return $assoc;
 	}
-
-
 	/**
 	 * Retrieves a single cell.
 	 * This function allows you to provide an array with values to bind
@@ -209,14 +195,12 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 *
 	 * @return array  $result scalar result set
 	 */
-
 	public function getCell( $sql, $aValues = array(), $noSignal = null ) {
 		$this->sql = $sql;
 		if (!$noSignal) $this->signal('sql_exec', $this);
 		$arr = $this->db->getCol( $sql, $aValues );
 		if ($arr && is_array($arr))	return ($arr[0]); else return false;
 	}
-
 	/**
 	 * Returns latest insert id, most recently inserted id.
 	 * Following an insert-SQL statement this method will return the most recently
@@ -227,7 +211,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function getInsertID() {
 		return $this->db->getInsertID();
 	}
-
 	/**
 	 * Returns number of affected rows.
 	 * Returns the number of rows that have been affected by the most recent
@@ -238,7 +221,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function getAffectedRows() {
 		return $this->db->Affected_Rows();
 	}
-
 	/**
 	 * Unwrap the original database object.
 	 * Returns the database driver instance. For instance this can be
@@ -249,7 +231,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function getDatabase() {
 		return $this->db;
 	}
-
 	/**
 	 * Transactions.
 	 * Part of the transaction management infrastructure of RedBeanPHP.
@@ -260,7 +241,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function startTransaction() {
 		return $this->db->StartTrans();
 	}
-
 	/**
 	 * Transactions.
 	 * Part of the transaction management infrastructure of RedBeanPHP.
@@ -271,7 +251,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function commit() {
 		return $this->db->CommitTrans();
 	}
-
 	/**
 	 * Transactions.
 	 * Part of the transaction management infrastructure of RedBeanPHP.
@@ -283,7 +262,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function rollback() {
 		return $this->db->FailTrans();
 	}
-	
 	/**
 	 * Closes the database connection.
 	 */

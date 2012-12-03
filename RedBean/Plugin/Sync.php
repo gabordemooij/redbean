@@ -1,7 +1,6 @@
 <?php
 /**
  * Sync
- *
  * @file			RedBean/Plugin/Sync.php
  * @desc			Plugin for Synchronizing databases.
  * 
@@ -16,7 +15,6 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Plugin_Sync implements RedBean_Plugin {
-
 	/**
 	 * Captures the SQL required to adjust source database to match
 	 * schema of target database and feeds this sql code to the
@@ -26,10 +24,8 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 	 * @param RedBean_Toolbox $target toolbox of target database
 	 */
 	public function doSync(RedBean_Toolbox $source, RedBean_Toolbox $target) {
-
 		$sourceWriter = $source->getWriter();
 		$targetWriter = $target->getWriter();
-
 		$longText = str_repeat('lorem ipsum', 9000);
 		$testmap = array(
 			false, 1, 2.5, -10, 1000, 'abc', $longText, '2010-10-10', '2010-10-10 10:00:00', '10:00:00', 'POINT(1 2)'
@@ -44,13 +40,10 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 			if ($translation > $translations[$code] && $translation < 50)
 				$translations[$code] = $translation;
 		}
-		
-		
 		//Fix narrow translations SQLiteT stores date as double. (double != really double)
 		if (get_class($sourceWriter)==='RedBean_QueryWriter_SQLiteT') {
 			$translations[1] = $defaultCode;  //use magic number in case writer not loaded.
 		}
-		
 		$sourceTables = $sourceWriter->getTables();
 		$targetTables = $targetWriter->getTables();
 		$missingTables = array_diff($sourceTables, $targetTables);
@@ -78,7 +71,6 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 				}
 			}
 		}
-
 		foreach ($sourceTables as $sourceTable) {
 			$sourceColumns = $sourceWriter->getColumns($sourceTable);
 			foreach ($sourceColumns as $sourceColumn => $sourceType) {
@@ -98,8 +90,6 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 			}
 		}
 	}
-	
-
 	/**
 	 * Performs a database schema sync. For use with facade.
 	 * Instead of toolboxes this method accepts simply string keys and is static.
@@ -115,5 +105,4 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 		$sync = new self;
 		$sync->doSync($db1, $db2);
 	}
-	
 }

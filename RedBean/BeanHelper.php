@@ -16,13 +16,10 @@
  *
  */
 interface RedBean_BeanHelper {
-
 	/**
 	 * @abstract
 	 * @return RedBean_Toolbox $toolbox toolbox
 	 */
 	public function getToolbox();
-	
-	public function getModelForBean(RedBean_OODBBean $bean);
-	
+	public function getModelForBean(RedBean_OODBBean $bean);	
 }

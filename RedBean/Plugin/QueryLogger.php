@@ -11,15 +11,12 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-
 class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
-
 	/**
 	 * @var array
 	 * contains log messages
 	 */
 	protected $logs = array();
-
 	/**
 	 * Creates a new instance of the Query Logger and attaches
 	 * this logger to the adapter.
@@ -34,13 +31,11 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 		$adapter->addEventListener( 'sql_exec', $queryLog );
 		return $queryLog;
 	}
-
 	/**
 	 * Singleton pattern
 	 * Constructor - private
 	 */
 	private function __construct(){}
-
 	/**
 	 * Implementation of the onEvent() method for Observer interface.
 	 * If a query gets executed this method gets invoked because the
@@ -56,7 +51,6 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 			$this->logs[] = $adapter->getSQL();
 		}
 	}
-
 	/**
 	 * Searches the logs for the given word and returns the entries found in
 	 * the log container.
@@ -74,22 +68,16 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 		}
 		return $found;
 	}
-
 	/**
 	 * Returns all the logs.
 	 *
 	 * @return array $logs logs
 	 */
-	public function getLogs() {
-		return $this->logs;
-	}
-
+	public function getLogs() { return $this->logs; }
 	/**
 	 * Clears the logs.
 	 *
 	 * @return void
 	 */
-	public function clear() {
-		$this->logs = array();
-	}
+	public function clear() { $this->logs = array();}
 }

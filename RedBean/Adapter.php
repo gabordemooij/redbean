@@ -13,21 +13,18 @@
  *
  */
 interface RedBean_Adapter {
-
 	/**
 	 * Returns the latest SQL statement
 	 *
 	 * @return string $SQLString SQLString
 	 */
 	public function getSQL();
-
 	/**
 	 * Escapes a value for usage in an SQL statement
 	 *
 	 * @param string $sqlvalue value
 	 */
 	public function escape( $sqlvalue );
-
 	/**
 	 * Executes an SQL Statement using an array of values to bind
 	 * If $noevent is TRUE then this function will not signal its
@@ -39,7 +36,6 @@ interface RedBean_Adapter {
 	 * @param boolean $noevent no event firing
 	 */
 	public function exec( $sql , $aValues=array(), $noevent=false);
-
 	/**
 	 * Executes an SQL Query and returns a resultset.
 	 * This method returns a multi dimensional resultset similar to getAll
@@ -50,7 +46,6 @@ interface RedBean_Adapter {
 	 * @param array  $aValues values
 	 */
 	public function get( $sql, $aValues = array() );
-
 	/**
 	 * Executes an SQL Query and returns a resultset.
 	 * This method returns a single row (one array) resultset.
@@ -63,7 +58,6 @@ interface RedBean_Adapter {
 	 * @return array $aMultiDimArray row
 	 */
 	public function getRow( $sql, $aValues = array() );
-
 	/**
 	 * Executes an SQL Query and returns a resultset.
 	 * This method returns a single column (one array) resultset.
@@ -76,7 +70,6 @@ interface RedBean_Adapter {
 	 * @return array $aSingleDimArray column
 	 */
 	public function getCol( $sql, $aValues = array() );
-
 	/**
 	 * Executes an SQL Query and returns a resultset.
 	 * This method returns a single cell, a scalar value as the resultset.
@@ -89,7 +82,6 @@ interface RedBean_Adapter {
 	 * @return string $sSingleValue value from cell
 	 */
 	public function getCell( $sql, $aValues = array() );
-
 	/**
 	 * Executes the SQL query specified in $sql and takes
 	 * the first two columns of the resultset. This function transforms the
@@ -104,14 +96,12 @@ interface RedBean_Adapter {
 	 * @return array $associativeArray associative array result set
 	 */
 	public function getAssoc( $sql, $values = array() );
-
 	/**
 	 * Returns the latest insert ID.
 	 *
 	 * @return integer $id primary key ID
 	 */
 	public function getInsertID();
-
 	/**
 	 * Returns the number of rows that have been
 	 * affected by the last update statement.
@@ -119,7 +109,6 @@ interface RedBean_Adapter {
 	 * @return integer $count number of rows affected
 	 */
 	public function getAffectedRows();
-
 	/**
 	 * Returns the original database resource. This is useful if you want to
 	 * perform operations on the driver directly instead of working with the
@@ -129,31 +118,26 @@ interface RedBean_Adapter {
 	 * @return object $driver driver
 	 */
 	public function getDatabase();
-	
 	/**
 	 * This method is part of the RedBean Transaction Management
 	 * mechanisms.
 	 * Starts a transaction.
 	 */
 	public function startTransaction();
-
 	/**
 	 * This method is part of the RedBean Transaction Management
 	 * mechanisms.
 	 * Commits the transaction.
 	 */
 	public function commit();
-
 	/**
 	 * This method is part of the RedBean Transaction Management
 	 * mechanisms.
 	 * Rolls back the transaction.
 	 */
 	public function rollback();
-	
 	/**
 	 * Closes database connection.
 	 */
 	public function close();
-
 }

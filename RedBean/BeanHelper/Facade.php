@@ -12,7 +12,6 @@
  * with this source code in the file license.txt.
  */
 class RedBean_BeanHelper_Facade implements RedBean_BeanHelper {
-
 	/**
 	 * Returns a reference to the toolbox. This method returns a toolbox
 	 * for beans that need to use toolbox functions. Since beans can contain
@@ -23,7 +22,6 @@ class RedBean_BeanHelper_Facade implements RedBean_BeanHelper {
 	public function getToolbox() {
 		return RedBean_Facade::$toolbox;
 	}
-	
 	/**
 	 * Fuse connector.
 	 * Gets the model for a bean $bean.

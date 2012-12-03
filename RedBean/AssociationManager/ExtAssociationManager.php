@@ -12,7 +12,6 @@
  * with this source code in the file license.txt.
  */
 class RedBean_AssociationManager_ExtAssociationManager extends RedBean_AssociationManager {
-
 	/**
 	 * Associates two beans with eachother. This method connects two beans with eachother, just
 	 * like the other associate() method in the Association Manager. The difference is however
@@ -31,8 +30,6 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 		$baseBean->setMeta('type', $table );
 		return $this->associateBeans( $bean1, $bean2, $baseBean );
 	}
-	
-	
 	/**
 	 * Deprecated
 	 * 
@@ -45,8 +42,7 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 		if (!is_array($extra)) {
 			$info = json_decode($extra,true);
 			if (!$info) $info = array('extra'=>$extra);
-		}
-		else {
+		} else {
 			$info = $extra;
 		}
 		$bean = $this->oodb->dispense('xtypeless');

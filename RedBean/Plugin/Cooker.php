@@ -19,13 +19,11 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Plugin_Cooker implements RedBean_Plugin {
-	
 	/**
 	 * Flag, determines whether it's possible to load beans with graph().
 	 * @var boolean
 	 */
 	private static $loadBeans = false;
-	
 	/**
 	 * This flag indicates whether empty strings in beans will be
 	 * interpreted as NULL or not. TRUE means Yes, will be converted to NULL,
@@ -33,7 +31,6 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	 * @var boolean
 	 */
 	private static $useNULLForEmptyString = false;
-
 	/**
 	 * If you enable bean loading graph will load beans if there is an ID in the array.
 	 * This is very powerful but can also cause security issues if a user knows how to
@@ -44,7 +41,6 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	public static function enableBeanLoading($yesNo) {
 		self::$loadBeans = ($yesNo);
 	}
-	
 	/**
 	 * Sets the toolbox to be used by graph()
 	 *
@@ -55,7 +51,6 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 		$this->toolbox = $toolbox;
 		$this->redbean = $this->toolbox->getRedbean();
 	}
-
 	/**
 	 * Turns an array (post/request array) into a collection of beans.
 	 * Handy for turning forms into bean structures that can be stored with a
@@ -103,29 +98,23 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 				if (self::$loadBeans) {
 					$id = (int) $array['id'];
 					$bean = $this->redbean->load($type,$id);
-				}
-				else {
+				} else {
 					throw new RedBean_Exception_Security('Attempt to load a bean in Cooker. Use enableBeanLoading to override but please read security notices first.');
 				}
-			}
-			else {
+			} else {
 				$bean = $this->redbean->dispense($type);
 			}
 			foreach($array as $property=>$value) {
 				if (is_array($value)) {
 					$bean->$property = $this->graph($value,$filterEmpty);
-				}
-				else {
+				} else {
 					if($value == '' && self::$useNULLForEmptyString){
 						$bean->$property = null;
-                    }
-					else
-					$bean->$property = $value;
+                    } else $bean->$property = $value;
 				}
 			}
 			return $bean;
-		}
-		elseif (is_array($array)) {
+		} elseif (is_array($array)) {
 			foreach($array as $key=>$value) {
 				$listBean = $this->graph($value,$filterEmpty);
 				if (!($listBean instanceof RedBean_OODBBean)) {
@@ -135,18 +124,15 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 					if (!$filterEmpty) { 
 						$beans[$key] = $listBean;
 					}
-				}
-				else { 
+				} else { 
 					$beans[$key] = $listBean;
 				}
 			}
 			return $beans;
-		}
-		else {
+		} else {
 			throw new RedBean_Exception_Security('Expected array but got :'.gettype($array)); 
 		}
 	}
-	
 	/**
 	 * Toggles the use-NULL flag.
 	 *  
@@ -155,5 +141,4 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	public function setUseNullFlag($yesNo) {
 		self::$useNULLForEmptyString = (boolean) $yesNo;
 	}
-	
 }

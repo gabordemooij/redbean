@@ -17,13 +17,11 @@
  *
  */
 class RedBean_DependencyInjector {
-	
 	/**
 	 * List of dependencies.
 	 * @var array 
 	 */
 	protected $dependencies = array();
-	
 	/**
 	 * Adds a dependency to the list.
 	 * You can add dependencies using this method. Pass both the key of the
@@ -39,7 +37,6 @@ class RedBean_DependencyInjector {
 	public function addDependency($dependencyID,$dependency) {
 		$this->dependencies[$dependencyID] = $dependency;
 	}
-	
 	/**
 	 * Returns an instance of the class $modelClassName completely
 	 * configured as far as possible with all the available

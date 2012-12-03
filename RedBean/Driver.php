@@ -23,7 +23,6 @@ interface RedBean_Driver {
 	 * @return array $results result
 	 */
 	public function GetAll( $sql, $aValues=array() );
-
 	/**
 	 * Runs a query and fetches results as a column.
 	 *
@@ -32,7 +31,6 @@ interface RedBean_Driver {
 	 * @return array	$results Resultset
 	 */
 	public function GetCol( $sql, $aValues=array() );
-
 	/**
 	 * Runs a query an returns results as a single cell.
 	 *
@@ -41,7 +39,6 @@ interface RedBean_Driver {
 	 * @return mixed $cellvalue result cell
 	 */
 	public function GetCell( $sql, $aValues=array() );
-
 	/**
 	 * Runs a query and returns a flat array containing the values of
 	 * one row.
@@ -51,7 +48,6 @@ interface RedBean_Driver {
 	 * @return array $row result row
 	 */
 	public function GetRow( $sql, $aValues=array() );
-
 	/**
 	 * Executes SQL code and allows key-value binding.
 	 * This function allows you to provide an array with values to bind
@@ -68,7 +64,6 @@ interface RedBean_Driver {
 	 * @return void
 	 */
 	public function Execute( $sql, $aValues=array() );
-
 	/**
 	 * Escapes a string for use in SQL using the currently selected
 	 * driver driver.
@@ -78,7 +73,6 @@ interface RedBean_Driver {
 	 * @return string $string escaped string
 	 */
 	public function Escape( $str );
-
 	/**
 	 * Returns the latest insert ID if driver does support this
 	 * feature.
@@ -86,8 +80,6 @@ interface RedBean_Driver {
 	 * @return integer $id primary key ID
 	 */
 	public function GetInsertID();
-
-
 	/**
 	 * Returns the number of rows affected by the most recent query
 	 * if the currently selected driver driver supports this feature.
@@ -95,7 +87,6 @@ interface RedBean_Driver {
 	 * @return integer $numOfRows number of rows affected
 	 */
 	public function Affected_Rows();
-
 	/**
 	 * Toggles debug mode. In debug mode the driver will print all
 	 * SQL to the screen together with some information about the
@@ -108,42 +99,18 @@ interface RedBean_Driver {
 	 * @return void
 	 */
 	public function setDebugMode( $tf );
-
 	/**
 	 * Starts a transaction.
-	 * This method is part of the transaction mechanism of
-	 * RedBeanPHP. All queries in a transaction are executed together.
-	 * In case of an error all commands will be rolled back so none of the
-	 * SQL in the transaction will affect the DB. Using transactions is
-	 * considered best practice.
-	 * This method has no return value.
-	 *
 	 * @return void
 	 */
 	public function CommitTrans();
-
 	/**
 	 * Commits a transaction.
-	 * This method is part of the transaction mechanism of
-	 * RedBeanPHP. All queries in a transaction are executed together.
-	 * In case of an error all commands will be rolled back so none of the
-	 * SQL in the transaction will affect the DB. Using transactions is
-	 * considered best practice.
-	 * This method has no return value.
-	 *
 	 * @return void
 	 */
 	public function StartTrans();
-
 	/**
 	 * Rolls back a transaction.
-	 * This method is part of the transaction mechanism of
-	 * RedBeanPHP. All queries in a transaction are executed together.
-	 * In case of an error all commands will be rolled back so none of the
-	 * SQL in the transaction will affect the DB. Using transactions is
-	 * considered best practice.
-	 * This method has no return value.
-	 *
 	 * @return void
 	 */
 	public function FailTrans();

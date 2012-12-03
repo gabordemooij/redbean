@@ -14,16 +14,13 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-
 class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedBean_Plugin {
-	
 	/**
 	 * Path to file to write SQL and comments to.
 	 * 
 	 * @var string 
 	 */
 	protected $file;
-	
 	/**
 	 * Constructor.
 	 * Requires a path to an existing and writable file.
@@ -35,7 +32,6 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 			throw new RedBean_Exception_Security('Cannot write to file: '.$outputPath);
 		$this->file = $outputPath;
 	}
-	
 	/**
 	 * Implementation of the onEvent() method for Observer interface.
 	 * If a query gets executed this method gets invoked because the
@@ -65,6 +61,4 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 			}
 		}
 	}
-	
-	
 }

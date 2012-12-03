@@ -12,13 +12,11 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Exception_SQL extends RuntimeException {
-
 	/**
 	 * Holds the current SQL Strate code.
 	 * @var string
 	 */
 	private $sqlState;
-
 	/**
 	 * Returns an ANSI-92 compliant SQL state.
 	 *
@@ -27,7 +25,6 @@ class RedBean_Exception_SQL extends RuntimeException {
 	public function getSQLState() {
 		return $this->sqlState;
 	}
-
 	/**
 	 * @todo parse state to verify valid ANSI92!
 	 * Stores ANSI-92 compliant SQL state.
@@ -39,7 +36,6 @@ class RedBean_Exception_SQL extends RuntimeException {
 	public function setSQLState( $sqlState ) {
 		$this->sqlState = $sqlState;
 	}
-
 	/**
 	 * To String prints both code and SQL state.
 	 *
