@@ -15,28 +15,25 @@
  * with this source code in the file license.txt.
  */
 class RedBean_TagManager {
-	
 	/**
 	 * The Tag Manager requires a toolbox
 	 * @var RedBean_Toolbox 
 	 */
 	protected $toolbox;
-	
 	/**
 	 * Association Manager to manage tag-bean relations
 	 * @var RedBean_AssociationManager
 	 */
 	protected $associationManager;
-	
 	/**
 	 * RedBeanPHP OODB instance
 	 * @var RedBean_OODBBean 
 	 */
 	protected $redbean;
-	
 	/**
 	 * Constructor,
 	 * creates a new instance of TagManager.
+	 *
 	 * @param RedBean_Toolbox $toolbox 
 	 */
 	public function __construct( RedBean_Toolbox $toolbox ) {
@@ -44,7 +41,6 @@ class RedBean_TagManager {
 		$this->redbean = $toolbox->getRedBean();
 		$this->associationManager = $this->redbean->getAssociationManager();
 	}
-	
 	/**
 	 * Finds a tag bean by it's title.
 	 * 
@@ -60,7 +56,6 @@ class RedBean_TagManager {
 		}
 		return null;
 	}
-	
 	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Tests whether a bean has been associated with one ore more
@@ -88,7 +83,6 @@ class RedBean_TagManager {
 	}
 
 	/**
-	 * Part of RedBeanPHP Tagging API.
 	 * Removes all sepcified tags from the bean. The tags specified in
 	 * the second parameter will no longer be associated with the bean.
 	 *
@@ -105,9 +99,7 @@ class RedBean_TagManager {
 			}
 		}
 	}
-
 	/**
-	 * Part of RedBeanPHP Tagging API.
 	 * Tags a bean or returns tags associated with a bean.
 	 * If $tagList is null or omitted this method will return a
 	 * comma separated list of tags associated with the bean provided.
@@ -136,9 +128,7 @@ class RedBean_TagManager {
 		$this->associationManager->clearRelations( $bean, 'tag' );
 		$this->addTags( $bean, $tagList );
 	}
-
 	/**
-	 * Part of RedBeanPHP Tagging API.
 	 * Adds tags to a bean.
 	 * If $tagList is a comma separated list of tags all tags will
 	 * be associated with the bean.
@@ -161,9 +151,7 @@ class RedBean_TagManager {
 			$this->associationManager->associate( $bean, $t );
 		}
 	}
-
 	/**
-	 * Part of RedBeanPHP Tagging API.
 	 * Returns all beans that have been tagged with one of the tags given.
 	 *
 	 * @param  $beanType type of bean you are looking for
@@ -183,7 +171,6 @@ class RedBean_TagManager {
 		}
 		return $collection;
 	}
-
 	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Returns all beans that have been tagged with ALL of the tags given.
@@ -203,5 +190,4 @@ class RedBean_TagManager {
 		}
 		return $beans;
 	}
-
 }

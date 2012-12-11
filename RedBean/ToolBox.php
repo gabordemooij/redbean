@@ -19,25 +19,21 @@
  * with this source code in the file license.txt.
  */
 class RedBean_ToolBox {
-
 	/**
 	 * Reference to the RedBeanPHP OODB Object Database instance
 	 * @var RedBean_OODB
 	 */
 	protected $oodb;
-
 	/**
 	 * Reference to the Query Writer
 	 * @var RedBean_QueryWriter
 	 */
 	protected $writer;
-
 	/**
 	 * Reference to the database adapter
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
-
 	/**
 	 * Constructor.
 	 * The Constructor of the ToolBox takes three arguments: a RedBean_OODB $redbean
@@ -58,7 +54,6 @@ class RedBean_ToolBox {
 		$this->writer = $writer;
 		return $this;
 	}
-
 	/**
 	 * The Toolbox acts as a kind of micro service locator, providing just the
 	 * most important objects that make up RedBean. You can pass the toolkit to
@@ -72,7 +67,6 @@ class RedBean_ToolBox {
 	public function getWriter() {
 		return $this->writer;
 	}
-
 	/**
 	 * The Toolbox acts as a kind of micro service locator, providing just the
 	 * most important objects that make up RedBean. You can pass the toolkit to
@@ -86,7 +80,6 @@ class RedBean_ToolBox {
 	public function getRedBean() {
 		return $this->oodb;
 	}
-
 	/**
 	 * The Toolbox acts as a kind of micro service locator, providing just the
 	 * most important objects that make up RedBean. You can pass the toolkit to

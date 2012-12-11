@@ -13,7 +13,6 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Setup {
-
 	/**
 	 * This method checks the DSN string. If the DSN string contains a
 	 * database name that is not supported by RedBean yet then it will
@@ -39,23 +38,10 @@ class RedBean_Setup {
 			return true;
 		}
 	}
-
-
 	/**
 	 * Generic Kickstart method.
 	 * This is the generic kickstarter. It will prepare a database connection
 	 * using the $dsn, the $username and the $password you provide.
-	 * If $frozen is boolean TRUE it will start RedBean in frozen mode, meaning
-	 * that the database cannot be altered. If RedBean is started in fluid mode
-	 * it will adjust the schema of the database if it detects an
-	 * incompatible bean.
-	 * This method returns a RedBean_Toolbox $toolbox filled with a
-	 * RedBean_Adapter, a RedBean_QueryWriter and most importantly a
-	 * RedBean_OODB; the object database. To start storing beans in the database
-	 * simply say: $redbean = $toolbox->getRedBean(); Now you have a reference
-	 * to the RedBean object.
-	 * Optionally instead of using $dsn you may use an existing PDO connection.
-	 * Example: RedBean_Setup::kickstart($existingConnection, true);
 	 *
 	 * @param  string|PDO $dsn      Database Connection String (or PDO instance)
 	 * @param  string     $username Username for database

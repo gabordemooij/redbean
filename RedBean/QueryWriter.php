@@ -17,41 +17,28 @@
  * - This is the interface for FLUID database drivers. Drivers intended to support
  * just FROZEN mode should implement the IceWriter instead.
  *
- *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 interface RedBean_QueryWriter {
-
 	/**
-	 * QueryWriter Constant Identifier.
-	 * Identifies a situation in which a table has not been found in
-	 * the database.
+	 * Query Writer constants.
+	 * These constants are used to identify common SQL problems.
+	 * These are used for FLUID-mode to determine whether we should throw
+	 * an exception or not. In FLUID-mode some errors are allowed; for instance,
+	 * if a column does not exist: C_SQLSTATE_NO_SUCH_COLUMN this is no reason
+	 * to throw an error because in FLUID mode we build the schema on the fly..
 	 */
 	const C_SQLSTATE_NO_SUCH_TABLE = 1;
-
-	/**
-	 * QueryWriter Constant Identifier.
-	 * Identifies a situation in which a perticular column has not
-	 * been found in the database.
-	 */
 	const C_SQLSTATE_NO_SUCH_COLUMN = 2;
-
-	/**
-	 * QueryWriter Constant Identifier.
-	 * Identifies a situation in which a perticular column has not
-	 * been found in the database.
-	 */
 	const C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION = 3;
-
 	/**
 	 * Returns the tables that are in the database.
 	 *
 	 * @return array $arrayOfTables list of tables
 	 */
 	public function getTables();
-
 	/**
 	 * This method should create a table for the bean.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -61,7 +48,6 @@ interface RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function createTable($type);
-
 	/**
 	 * Returns an array containing all the columns of the specified type.
 	 * The format of the return array looks like this:
@@ -75,8 +61,6 @@ interface RedBean_QueryWriter {
 	 * @return array $listOfColumns list of columns ($field=>$type)
 	 */
 	public function getColumns($type);
-
-
 	/**
 	 * Returns the Column Type Code (integer) that corresponds
 	 * to the given value type. This method is used to determine the minimum
@@ -87,7 +71,6 @@ interface RedBean_QueryWriter {
 	 * @return integer $type type
 	 */
 	public function scanType($value, $alsoScanSpecialForTypes=false);
-
 	/**
 	 * This method should add a column to a table.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -100,7 +83,6 @@ interface RedBean_QueryWriter {
 	 *
 	 */
 	public function addColumn($type, $column, $field);
-
 	/**
 	 * This method should return a data type constant based on the
 	 * SQL type definition. This function is meant to compare column data
@@ -112,7 +94,6 @@ interface RedBean_QueryWriter {
 	 * @return integer $type
 	 */
 	public function code($typedescription);
-
 	/**
 	 * This method should widen the column to the specified data type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -124,7 +105,6 @@ interface RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function widenColumn($type, $column, $datatype);
-
 	/**
 	 * This method should update (or insert a record), it takes
 	 * a table name, a list of update values ( $field => $value ) and an
@@ -140,8 +120,6 @@ interface RedBean_QueryWriter {
 	 * @return integer $id the primary key ID value of the new record
 	 */
 	public function updateRecord($type, $updatevalues, $id=null);
-
-
 	/**
 	 * This method should select a record. You should be able to provide a
 	 * collection of conditions using the following format:
@@ -161,8 +139,6 @@ interface RedBean_QueryWriter {
 	 * @return array $records selected records
 	 */
 	public function selectRecord($type, $conditions, $addSql = null, $delete = false, $inverse = false);
-
-
 	/**
 	 * This method should add a UNIQUE constraint index to a table on columns $columns.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -173,8 +149,6 @@ interface RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function addUniqueIndex($type,$columns);
-
-	
 	/**
 	 * This method should check whether the SQL state is in the list of specified states
 	 * and returns true if it does appear in this list or false if it
@@ -188,7 +162,6 @@ interface RedBean_QueryWriter {
 	 * @return boolean $isInList
 	 */
 	public function sqlStateIn( $state, $list );
-
 	/**
 	 * This method should remove all beans of a certain type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -198,7 +171,6 @@ interface RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function wipe($type);
-
 	/**
 	 * This method should count the number of beans of the given type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -208,7 +180,6 @@ interface RedBean_QueryWriter {
 	 * @return integer $numOfBeans number of beans found
 	 */
 	public function count($type);
-
 	/**
 	 * This method should filter a column name so that it can
 	 * be used safely in a query for a specific database.
@@ -219,7 +190,6 @@ interface RedBean_QueryWriter {
 	 * @return string $clean the clean version of the column name
 	 */
 	public function safeColumn($name, $noQuotes = false);
-
 	/**
 	 * This method should filter a type name so that it can
 	 * be used safely in a query for a specific database. It actually
@@ -231,7 +201,6 @@ interface RedBean_QueryWriter {
 	 * @return string $tablename clean table name for use in query
 	 */
 	public function safeTable($name, $noQuotes = false);
-
 	/**
 	 * This method should add a constraint. If one of the beans gets trashed
 	 * the other, related bean should be removed as well.
@@ -242,7 +211,6 @@ interface RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 );
-
 	/**
 	 * This method should add a foreign key from type and field to
 	 * target type and target field.
@@ -261,8 +229,6 @@ interface RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function addFK( $type, $targetType, $field, $targetField);
-
-
 	/**
 	 * This method should add an index to a type and field with name
 	 * $name.
@@ -275,7 +241,6 @@ interface RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function addIndex($type, $name, $column);
-	
 	/**
 	 * Returns a modified value from ScanType.
 	 * Used for special types.
@@ -283,5 +248,4 @@ interface RedBean_QueryWriter {
 	 * @return mixed $value changed value 
 	 */
 	public function getValue();
-
 }

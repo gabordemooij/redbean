@@ -12,7 +12,6 @@
  * with this source code in the file license.txt.
  */
 interface RedBean_Observer {
-
 	/**
 	 * Part of the RedBean Observer Infrastructure.
 	 * The on-event method is called by an observable once the

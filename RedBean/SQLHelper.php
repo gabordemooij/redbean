@@ -28,31 +28,26 @@
  * with this source code in the file license.txt.
  */
  class RedBean_SQLHelper {
-
 	/**
 	 * Holds the database adapter for executing SQL queries.
 	 * @var RedBean_Adapter 
 	 */
 	protected $adapter;
-
 	/**
 	 * Holds current mode
 	 * @var boolean
 	 */
 	protected $capture = false;
-
 	/**
 	 * Holds SQL until now
 	 * @var string
 	 */
 	protected $sql = '';
-	
 	/**
 	 * Holds list of parameters for SQL Query
 	 * @var array
 	 */
 	protected $params = array();
-
 	/**
 	 * Constructor
 	 * 
@@ -61,7 +56,6 @@
 	public function __construct(RedBean_Adapter $adapter) {
 		$this->adapter = $adapter;
 	}
-
 	/**
 	 * Magic method to construct SQL query
 	 * 
@@ -80,7 +74,6 @@
 			return $this->adapter->getCell('SELECT '.$funcName.'('.implode(',',$args).')');	
 		}	
 	}
-
 	/**
 	 * Begins SQL query
 	 * 
@@ -90,7 +83,6 @@
 		$this->capture = true;
 		return $this;
 	}
-	
 	/**
 	 * Adds a value to the parameter list
 	 * 
@@ -102,7 +94,6 @@
 		$this->params[] = $param;
 		return $this;
 	}
-	
 	/**
 	 * Executes query and returns result
 	 * 
@@ -114,7 +105,6 @@
 		$this->clear();
 		return $rs;
 	}
-	
 	/**
 	 * Clears the parameter list as well as the SQL query string.
 	 * 
@@ -126,7 +116,6 @@
 		$this->capture = false; //turn off capture mode (issue #142)
 		return $this;
 	}
-	
 	/**
 	 * To explicitly add a piece of SQL.
 	 * 
@@ -140,8 +129,6 @@
 			return $this;
 		}
 	}
-	
-	
 	/**
 	 * Returns query parts.
 	 * 
@@ -152,7 +139,6 @@
 		$this->clear();
 		return $list;
 	}
-
 	/**
 	 * Writes a '(' to the sql query.
 	 */
@@ -162,7 +148,6 @@
 			return $this;
 		}
 	}
-	
 	/**
 	 * Writes a ')' to the sql query.
 	 */
@@ -172,7 +157,6 @@
 			return $this;
 		}
 	}
-	
 	/**
 	 * Generates question mark slots for an array of values.
 	 *
@@ -188,5 +172,4 @@
 			return '';
 		}
 	}
-	
 }

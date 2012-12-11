@@ -1,6 +1,7 @@
 <?php
 /**
  * SimpleModel
+ * Base Model For All RedBeanPHP Models using FUSE.
  * 
  * @file			RedBean/SimpleModel.php
  * @desc			Part of FUSE
@@ -12,7 +13,6 @@
  * with this source code in the file license.txt.
  */
 class RedBean_SimpleModel {
-
 	/**
 	 * Contains the inner bean.
 	 * @var RedBean_OODBBean
@@ -28,7 +28,6 @@ class RedBean_SimpleModel {
 	public function loadBean( RedBean_OODBBean $bean ) {
 		$this->bean = $bean;
 	}
-
 	/**
 	 * Magic Getter to make the bean properties available from
 	 * the $this-scope.
@@ -40,7 +39,6 @@ class RedBean_SimpleModel {
 	public function __get( $prop ) {
 		return $this->bean->$prop;
 	}
-
 	/**
 	 * Magic Setter
 	 *
@@ -50,7 +48,6 @@ class RedBean_SimpleModel {
 	public function __set( $prop, $value ) {
 		$this->bean->$prop = $value;
 	}
-
 	/**
 	 * Isset implementation
 	 *
@@ -61,7 +58,6 @@ class RedBean_SimpleModel {
 	public function __isset($key) {
 		return (isset($this->bean->$key));
 	}
-	
 	/**
 	 * Box the bean using the current model.
 	 * 
@@ -70,7 +66,6 @@ class RedBean_SimpleModel {
 	public function box() {
 		return $this;
 	}
-	
 	/**
 	 * Unbox the bean from the model.
 	 * 
@@ -79,5 +74,4 @@ class RedBean_SimpleModel {
 	public function unbox(){
 		return $this->bean;
 	}
-
 }
