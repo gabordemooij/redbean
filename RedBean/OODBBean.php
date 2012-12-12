@@ -384,53 +384,39 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		}
 		if (!isset($this->properties[$property])) { 
 			$fieldLink = $property.'_id'; 
-			/**
-			 * All this magic can be become very complex quicly. For instance,
-			 * my PHP CLI produced a segfault while testing this code. Turns out that
-			 * if fieldlink equals idfield, scripts tend to recusrively load beans and
-			 * instead of giving a clue they simply crash and burn isnt that nice?
-			 */
 			if (isset($this->$fieldLink) && $fieldLink != $this->getMeta('sys.idfield')) {
 				$this->setMeta('tainted',true); 
 				$type =  $this->getAlias($property);
 				$targetType = $this->properties[$fieldLink];
 				$bean =  $toolbox->getRedBean()->load($type,$targetType);
-				//return $bean;
 				$this->properties[$property] = $bean;
 				return $this->properties[$property];
 			}
 			if (strpos($property,'own')===0) {
-				$firstCharCode = ord(substr($property,3,1));
-				if ($firstCharCode>=65 && $firstCharCode<=90) {
-					$type = (__lcfirst(str_replace('own','',$property)));
-					if ($this->aliasName) {
-						$myFieldLink = $this->aliasName.'_id';
-						$this->setMeta('sys.alias.'.$type,$this->aliasName);
-						$this->aliasName = null;
-					}
-					else {
-						$myFieldLink =  $this->getMeta('type').'_id';
-					}
-					$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ".$this->withSql,array($this->getID())));
-					$this->withSql = '';
-					$this->properties[$property] = $beans;
-					$this->setMeta('sys.shadow.'.$property,$beans);
-					$this->setMeta('tainted',true);
-					return $this->properties[$property];
+				$type = (__lcfirst(str_replace('own','',$property)));
+				if ($this->aliasName) {
+					$myFieldLink = $this->aliasName.'_id';
+					$this->setMeta('sys.alias.'.$type,$this->aliasName);
+					$this->aliasName = null;
+				} else {
+					$myFieldLink =  $this->getMeta('type').'_id';
 				}
+				$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ".$this->withSql,array($this->getID())));
+				$this->withSql = '';
+				$this->properties[$property] = $beans;
+				$this->setMeta('sys.shadow.'.$property,$beans);
+				$this->setMeta('tainted',true);
+				return $this->properties[$property];
 			}
 			if (strpos($property,'shared')===0) {
-				$firstCharCode = ord(substr($property,6,1));
-				if ($firstCharCode>=65 && $firstCharCode<=90) {
-					$type = (__lcfirst(str_replace('shared','',$property)));
-					$keys = $toolbox->getRedBean()->getAssociationManager()->related($this,$type);
-					if (!count($keys)) $beans = array(); else
-					$beans = $toolbox->getRedBean()->batch($type,$keys);
-					$this->properties[$property] = $beans;
-					$this->setMeta('sys.shadow.'.$property,$beans);
-					$this->setMeta('tainted',true);
-					return $this->properties[$property];
-				}
+				$type = (__lcfirst(str_replace('shared','',$property)));
+				$keys = $toolbox->getRedBean()->getAssociationManager()->related($this,$type);
+				if (!count($keys)) $beans = array(); else
+				$beans = $toolbox->getRedBean()->batch($type,$keys);
+				$this->properties[$property] = $beans;
+				$this->setMeta('sys.shadow.'.$property,$beans);
+				$this->setMeta('tainted',true);
+				return $this->properties[$property];
 			}
 			return $this->null;
 		}
@@ -646,7 +632,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			if ($key=='id') continue;
 			if (!empty($value)) { 
 				$empty = false;
-		
 			}	
 		}
 		return $empty;
