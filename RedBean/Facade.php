@@ -1,6 +1,10 @@
 <?php
 /**
  * RedBean Facade
+ * 
+ * Version Information
+ * RedBean Version @version 3.4a3
+ * 
  * @file			RedBean/Facade.php
  * @desc			Convenience class for RedBeanPHP.
  * @author			Gabor de Mooij and the RedBeanPHP Community
