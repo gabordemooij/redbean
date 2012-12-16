@@ -392,7 +392,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$this->properties[$property] = $bean;
 				return $this->properties[$property];
 			}
-			if (strpos($property,'own')===0) {
+			if (strpos($property,'own')===0 && ctype_upper(substr($property,3))) {
 				$type = (__lcfirst(str_replace('own','',$property)));
 				if ($this->aliasName) {
 					$myFieldLink = $this->aliasName.'_id';
@@ -408,7 +408,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$this->setMeta('tainted',true);
 				return $this->properties[$property];
 			}
-			if (strpos($property,'shared')===0) {
+			if (strpos($property,'shared')===0 && ctype_upper(substr($property,3))) {
 				$type = (__lcfirst(str_replace('shared','',$property)));
 				$keys = $toolbox->getRedBean()->getAssociationManager()->related($this,$type);
 				if (!count($keys)) $beans = array(); else
