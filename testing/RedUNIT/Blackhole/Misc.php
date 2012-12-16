@@ -143,9 +143,17 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		R::$redbean->setBeanHelper( new RedBean_BeanHelper_Facade() );
 		pass();
 		
-		
-		
-			
+		//test whether properties like owner and shareditem are still possible
+		testpack('Test Bean Interface for Lists');
+		$bean = R::dispense('bean');
+		asrt(is_array($bean->owner),false); //must not be list, because first char after own is lowercase
+		asrt(is_array($bean->shareditem),false); //must not be list, because first char after shared is lowercase
+		asrt(is_array($bean->own),false);
+		asrt(is_array($bean->shared),false);
+		asrt(is_array($bean->own_item),false);
+		asrt(is_array($bean->shared_item),false);
+		asrt(is_array($bean->{'own item'}),false);
+		asrt(is_array($bean->{'shared Item'}),false);
 	}
 	
 }
