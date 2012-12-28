@@ -24,11 +24,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	private static $flagKeyedExport = false;
 	
-    /**
-     * Reference to NULL property for magic getter.
-     * @var Null $null
-     */
-    private $null = null;
+	/**
+	* Reference to NULL property for magic getter.
+	* @var Null $null
+	*/
+	private $null = null;
 
 
 	/**
@@ -43,7 +43,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * Meta information gets stored.
 	 * @var array
 	 */
-	private $__info = NULL;
+	private $__info = array();
 
 	/**
 	 * Contains a BeanHelper to access service objects like
@@ -156,6 +156,20 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				}
 			}
 		}
+		return $this;
+	}
+
+	/**
+	* A Quick way to import bean data from a source bean.
+	* 
+	* @param RedBean_OODBBean $sourceBean the source bean to take properties from
+	*
+	* @return RedBean_OODBBean $self
+	*/
+	public function importFrom(RedBean_OODBBean $sourceBean) {
+		$this->__info['tainted'] = true;
+		$array = $sourceBean->properties;
+		$this->properties = $array;
 		return $this;
 	}
 	
@@ -554,8 +568,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return void
 	 */
 	public function offsetSet($offset, $value) {
-        $this->__set($offset, $value);
-    }
+		$this->__set($offset, $value);
+	}
 
 	/**
 	 * Implementation of Array Access Interface, you can access bean objects
@@ -565,9 +579,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 *
 	 * @return
 	 */
-    public function offsetExists($offset) {
-        return isset($this->properties[$offset]);
-    }
+	public function offsetExists($offset) {
+		return isset($this->properties[$offset]);
+	}
 
 	/**
 	 * Implementation of Array Access Interface, you can access bean objects
@@ -578,9 +592,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 *
 	 * @return
 	 */
-    public function offsetUnset($offset) {
-        unset($this->properties[$offset]);
-    }
+	public function offsetUnset($offset) {
+		unset($this->properties[$offset]);
+	}
 
 	/**
 	 * Implementation of Array Access Interface, you can access bean objects
@@ -591,9 +605,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 *
 	 * @return
 	 */
-    public function offsetGet($offset) {
-        return $this->__get($offset);
-    }
+	public function offsetGet($offset) {
+		return $this->__get($offset);
+	}
 
 	/**
 	 * Chainable method to cast a certain ID to a bean; for instance:

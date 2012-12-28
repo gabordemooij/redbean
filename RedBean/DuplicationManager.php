@@ -175,12 +175,13 @@ class RedBean_DuplicationManager {
 	 * @return array $copiedBean the duplicated bean
 	 */
 	protected function duplicate($bean,$trail=array(),$pid=false) {
-	$type = $bean->getMeta('type');
+		$type = $bean->getMeta('type');
 		$key = $type.$bean->getID();
 		if (isset($trail[$key])) return $bean;
 		$trail[$key]=$bean;
 		$copy =$this->redbean->dispense($type);
 		$copy->import( $bean->getProperties() );
+		$copy->importFrom($bean);
 		$copy->id = 0;
 		$tables = $this->tables;
 		foreach($tables as $table) {
@@ -225,12 +226,31 @@ class RedBean_DuplicationManager {
 	 * @return	array $array exported structure
 	 */
 	public function exportAll($beans,$parents=false,$filters=array()) {
-		$array = array();
+		$array = array(); $copies = array(); $parentTypes = array();
 		if (!is_array($beans)) $beans = array($beans);
 		foreach($beans as $bean) {
 			$this->setFilters($filters);
 			$f = $this->dup($bean,array(),true);
-			$array[] = $f->export(false,$parents,false,$filters);
+			$copies[] = $f; //$f->export(false,$parents,false,$filters);
+		}
+		if ($parents) {
+			$firstCopy = reset($copies);
+			$properties = $firstCopy->getProperties();
+			foreach($properties as $property=>$value) {
+				if (strpos($property,'_id')!==false) {
+					$parentTypes[] = substr($property,0,-3);
+				}
+			}
+			//Try to preload as much parents as possible by analyzing first bean		
+			$this->redbean->preload($copies,implode(',',$parentTypes));
+			foreach($copies as $bean) {
+				$array[] = $bean->export(false,true,false,$filters);
+			}
+		}
+		else {
+			foreach($copies as $bean) {
+				$array[] = $bean->export(false,false,false,$filters);
+			}
 		}
 		return $array;
 	}

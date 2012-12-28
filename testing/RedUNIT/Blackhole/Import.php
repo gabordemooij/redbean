@@ -22,6 +22,23 @@ class RedUNIT_Blackhole_Import extends RedUNIT_Blackhole {
 	 * @return void
 	 */
 	public function run() {
+		testpack('Test importFrom() and Tainted');
+		$bean = R::dispense('bean');
+		R::store($bean);
+		$bean->name = 'abc';
+		asrt($bean->getMeta('tainted'),true);
+		R::store($bean);
+		asrt($bean->getMeta('tainted'),false);
+		$copy = R::dispense('bean');
+		R::store($copy);
+		$copy = R::load('bean',$copy->id);
+		asrt($copy->getMeta('tainted'),false);
+		$copy->import(array('name'=>'xyz'));
+		asrt($copy->getMeta('tainted'),true);
+		$copy->setMeta('tainted',false);
+		asrt($copy->getMeta('tainted'),false);
+		$copy->importFrom($bean);
+		asrt($copy->getMeta('tainted'),true);
 		testpack('Test basic import() feature.');
 		$bean = new RedBean_OODBBean;
 		$bean->import(array("a"=>1,"b"=>2));
