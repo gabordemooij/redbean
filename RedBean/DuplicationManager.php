@@ -231,7 +231,7 @@ class RedBean_DuplicationManager {
 		foreach($beans as $bean) {
 			$this->setFilters($filters);
 			$f = $this->dup($bean,array(),true);
-			$copies[] = $f; //$f->export(false,$parents,false,$filters);
+			$copies[] = $f;
 		}
 		if ($parents) {
 			$firstCopy = reset($copies);
