@@ -69,6 +69,7 @@ require($dir.'Exception/Security.php');
 //Load Core functionality
 require($dir.'OODB.php');
 require($dir.'ToolBox.php');
+require($dir.'Finder.php');
 
 //Load extended functionality
 require($dir.'AssociationManager.php');
