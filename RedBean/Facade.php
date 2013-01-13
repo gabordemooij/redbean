@@ -5,7 +5,7 @@
  * @desc			Convenience class for RedBeanPHP.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
- * 
+ *
  * This class hides the object landscape of
  * RedBeanPHP behind a single letter class providing
  * almost all functionality with simple static calls.
@@ -68,10 +68,10 @@ class RedBean_Facade {
 	 * @var RedBean_TagManager
 	 */
 	public static $tagManager;
-	
+
 	/**
 	 * holds the duplication manager
-	 * @var RedBean_DuplicationManager 
+	 * @var RedBean_DuplicationManager
 	 */
 	public static $duplicationManager;
 
@@ -86,9 +86,9 @@ class RedBean_Facade {
 	 */
 	public static $f;
 
-	
+
 	private static $strictType = true;
-	
+
 
 	/**
 	 * Get version
@@ -97,6 +97,15 @@ class RedBean_Facade {
 	public static function getVersion() {
 		return '3.3';
 	}
+
+    /**
+     * Forbids RedBean from using 'Model_' as the standard model
+     * prefix. This default behaviour is prone to conflicts with
+     * various frameworks.
+     */
+    public static function dontUseDefaultModelPrefix() {
+        RedBean_ModelHelper::setUseSimpleModelPrefix(false);
+    }
 
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
@@ -219,11 +228,11 @@ class RedBean_Facade {
 	 *
 	 * @param string  $type   type
 	 * @param integer $number number of beans to dispense
-	 * 
+	 *
 	 * @return array $oneOrMoreBeans
 	 */
 	public static function dispense( $type, $num = 1 ) {
-		if (!preg_match('/^[a-z0-9]+$/',$type) && self::$strictType) throw new RedBean_Exception_Security('Invalid type: '.$type); 
+		if (!preg_match('/^[a-z0-9]+$/',$type) && self::$strictType) throw new RedBean_Exception_Security('Invalid type: '.$type);
 		if ($num==1) {
 			return self::$redbean->dispense( $type );
 		}
@@ -233,13 +242,13 @@ class RedBean_Facade {
 			return $beans;
 		}
 	}
-	
+
 	/**
 	 * Toggles strict bean type names.
-	 * If set to true (default) this will forbid the use of underscores and 
+	 * If set to true (default) this will forbid the use of underscores and
 	 * uppercase characters in bean type strings (R::dispense).
-	 * 
-	 * @param boolean $trueFalse 
+	 *
+	 * @param boolean $trueFalse
 	 */
 	public static function setStrictTyping($trueFalse) {
 		self::$strictType = (boolean) $trueFalse;
@@ -311,7 +320,7 @@ class RedBean_Facade {
 	 */
 	public static function unassociate( $beans1,  $beans2 , $fast=false) {
 		return self::$associationManager->unassociate( $beans1, $beans2, $fast );
-		
+
 	}
 
 	/**
@@ -1053,7 +1062,7 @@ class RedBean_Facade {
 		}
 	}
 
-	
+
 
 
 	/**
@@ -1082,12 +1091,12 @@ class RedBean_Facade {
 		if (!$time) $time = time();
 		return @date('Y-m-d H:i:s',$time);
 	}
-	
+
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
-	 * 
-	 * @param RedBean_Adapter $adapter 
+	 *
+	 * @param RedBean_Adapter $adapter
 	 */
 	public static function setDatabaseAdapter(RedBean_Adapter $adapter) {
 		self::$adapter = $adapter;
@@ -1097,22 +1106,22 @@ class RedBean_Facade {
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @param RedBean_QueryWriter $writer 
+	 * @param RedBean_QueryWriter $writer
 	 */
 	public static function setWriter(RedBean_QueryWriter $writer) {
 		self::$writer = $writer;
 	}
-	
+
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @param RedBean_OODB $redbean 
+	 * @param RedBean_OODB $redbean
 	 */
 	public static function setRedBean(RedBean_OODB $redbean) {
 		self::$redbean = $redbean;
 	}
-	
+
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
@@ -1132,7 +1141,7 @@ class RedBean_Facade {
 	public static function getWriter() {
 		return self::$writer;
 	}
-	
+
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
@@ -1142,20 +1151,20 @@ class RedBean_Facade {
 	public static function getRedBean() {
 		return self::$redbean;
 	}
-	
+
 	/**
 	 * Preloads certain properties for beans.
 	 * Understands aliases.
-	 * 
+	 *
 	 * Usage: R::preload($books,array('coauthor'=>'author'));
-	 * 
+	 *
 	 * @param array $beans beans
 	 * @param array $types types to load
 	 */
 	public static function preload($beans,$types) {
 		return self::$redbean->preload($beans,$types);
 	}
-	
+
 }
 
 //Compatibility with PHP 5.2 and earlier
