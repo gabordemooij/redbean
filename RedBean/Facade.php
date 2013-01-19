@@ -1115,6 +1115,13 @@ class RedBean_Facade {
 	//Alias for Preload.
 	public static function each($beans,$types,$closure = null) { return self::preload($beans,$types,$closure); }
 	
+	/**
+	 * Facade method for RedBean_QueryWriter_AQueryWriter::renameAssocation()
+	 * 
+	 * @param string|array $from
+	 * @param string $to 
+	 */
+	public static function renameAssociation($from,$to) { RedBean_QueryWriter_AQueryWriter::renameAssociation($from, $to); }
 }
 
 //Compatibility with PHP 5.2 and earlier

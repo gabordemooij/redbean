@@ -69,6 +69,11 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected $cache = array();
 	
+	/**
+	 * Contains aliases for association tables.
+	 * @var array
+	 */
+	protected static $renames = array();
 
 	/**
 	 * Constructor
@@ -442,6 +447,34 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 
 	/**
+	 * Renames an association. For instance if you would like to refer to
+	 * album_song as: track you can specify this by calling this method like:
+	 * 
+	 * renameAssociation('album_song','track')
+	 * 
+	 * This allows:
+	 * 
+	 * $album->sharedSong 
+	 * 
+	 * to add/retrieve beans from track instead of album_song.
+	 * Also works for exportAll().
+	 * 
+	 * This method also accepts a single associative array as
+	 * its first argument.
+	 * 
+	 * @param string|array $from
+	 * @param string $to (optional)
+	 * 
+	 * @return void 
+	 */
+	public static function renameAssociation($from,$to) {
+		if (is_array($from)) {
+			foreach($from as $key => $value) self::$renames[$key] = $value;
+			return;
+		}
+		self::$renames[$from] = $to;
+	}
+	/**
 	 * Returns the format for link tables.
 	 * Given an array containing two type names this method returns the
 	 * name of the link table to be used to store and retrieve
@@ -453,7 +486,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public static function getAssocTableFormat($types) {
 		sort($types);
-		return ( implode('_', $types) );
+		$assoc = ( implode('_', $types) );
+		return (isset(self::$renames[$assoc])) ? self::$renames[$assoc] : $assoc;
 	}
 
 

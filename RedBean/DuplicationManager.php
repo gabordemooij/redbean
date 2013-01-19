@@ -113,10 +113,7 @@ class RedBean_DuplicationManager {
 	 * @return boolean 
 	 */
 	protected function hasSharedList($type,$target) {
-		$linkType = array($type,$target);
-		sort($linkType);
-		$linkType = implode('_',$linkType);
-		return (in_array($linkType,$this->tables));
+		return (in_array(RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($type,$target)),$this->tables));
 	}
 	/**
 	 * Makes a copy of a bean. This method makes a deep copy

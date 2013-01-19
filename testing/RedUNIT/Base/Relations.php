@@ -542,5 +542,52 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(count($village2->sharedArmy),1);
 		asrt(count($village3->sharedArmy),1);
 		
+		//test emulation via association renaming
+		R::nuke();
+		list($p1,$p2,$p3) = R::dispense('painting',3);
+		list($m1,$m2,$m3) = R::dispense('museum',3);
+		$p1->name = 'painting1';
+		$p2->name = 'painting2';
+		$p3->name = 'painting3';
+		$m1->thename = 'a';
+		$m2->thename = 'b';
+		$m3->thename = 'c';
+		R::renameAssociation('museum_painting','exhibited');
+		$m1->link('exhibited','{"from":"2014-02-01","til":"2014-07-02"}')->painting = $p3;
+		$m2->link('exhibited','{"from":"2014-07-03","til":"2014-10-02"}')->painting = $p3;
+		$m3->link('exhibited','{"from":"2014-02-01","til":"2014-07-02"}')->painting = $p1;
+		$m2->link('exhibited','{"from":"2014-02-01","til":"2014-07-02"}')->painting = $p2;
+		R::storeAll(array($m1,$m2,$m3));
+		list($m1,$m2,$m3) = array_values(R::findAll('museum',' ORDER BY thename ASC'));
+		asrt(count($m1->sharedPainting),1);
+		asrt(count($m2->sharedPainting),2);
+		asrt(count($m3->sharedPainting),1);
+		$p3 = reset($m1->sharedPainting);
+		asrt(count($p3->ownExhibited),2);
+		asrt(count($m2->ownExhibited),2);
+		R::storeAll(array($m1,$m2,$m3));
+		list($m1,$m2,$m3) = array_values(R::findAll('museum',' ORDER BY thename ASC'));
+		asrt(count($m1->sharedPainting),1);
+		asrt(count($m2->sharedPainting),2);
+		asrt(count($m3->sharedPainting),1);
+		$p3 = reset($m1->sharedPainting);
+		asrt(count($p3->ownExhibited),2);
+		$paintings = $m2->sharedPainting;
+		foreach($paintings as $painting) {
+			if ($painting->name === 'painting2') {
+				pass();	
+				$paintingX = $painting;
+			}
+		}
+		unset($m2->sharedPainting[$paintingX->id]);
+		R::store($m2);
+		$m2 = R::load('museum',$m2->id);
+		asrt(count($m2->sharedPainting),1);
+		$left = reset($m2->sharedPainting);
+		asrt($left->name,'painting3');
+		asrt(count($m2->ownExhibited),1);
+		$exhibition = reset($m2->ownExhibited);
+		asrt($exhibition->from,'2014-07-03');
+		asrt($exhibition->til,'2014-10-02');
 	}
 }
