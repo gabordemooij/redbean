@@ -738,16 +738,17 @@ class RedBean_OODB extends RedBean_Observable {
 	 * every bean that could not be located. The resulting beans will have the
 	 * passed IDs as their keys.
 	 *
-	 * @param string $type type of beans 
-	 * @param array  $ids  ids to load
+	 * @param string $type   type of beans 
+	 * @param array  $ids    ids to load
+	 * @param string $addSQL SQL to be used in query
 	 *
 	 * @return array $beans resulting beans (may include empty ones)
 	 */
-	public function batch( $type, $ids ) {
+	public function batch( $type, $ids, $addSQL=null ) {
 		if (!$ids) return array();
 		$collection = array();
 		try {
-			$rows = $this->writer->selectRecord($type,array('id'=>$ids));
+			$rows = $this->writer->selectRecord($type,array('id'=>$ids),$addSQL);
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(

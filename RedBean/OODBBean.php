@@ -392,7 +392,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		if ($this->beanHelper)
 		$toolbox = $this->beanHelper->getToolbox();
 		if ($this->withSql!=='') {
-			if (strpos($property,'own')===0) {
+			if (strpos($property,'own')===0 || strpos($property,'shared')===0) {
 				unset($this->properties[$property]);
 			}
 		}
@@ -426,7 +426,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$type = (__lcfirst(str_replace('shared','',$property)));
 				$keys = $toolbox->getRedBean()->getAssociationManager()->related($this,$type);
 				if (!count($keys)) $beans = array(); else
-				$beans = $toolbox->getRedBean()->batch($type,$keys);
+				$beans = $toolbox->getRedBean()->batch($type,$keys,$this->withSql);
+				$this->withSql = '';
 				$this->properties[$property] = $beans;
 				$this->setMeta('sys.shadow.'.$property,$beans);
 				$this->setMeta('tainted',true);
