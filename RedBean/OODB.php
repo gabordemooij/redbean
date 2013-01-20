@@ -762,9 +762,12 @@ class RedBean_OODB extends RedBean_Observable {
 		if (!$rows) return array();
 		foreach($rows as $row) {
 			$this->stash[$row['id']] = $row;
+			$collection[$row['id']] = $this->load( $type, $row['id'] );
 		}
-		foreach($rows as $row) {
-			$collection[ $row['id'] ] = $this->load( $type, $row['id'] );
+		foreach($ids as $id){
+			if(!isset($collection[ $id ])){
+				$collection[ $id ] = $this->load( $type, $id );
+			}
 		}
 		$this->stash = NULL;
 		return $collection;
