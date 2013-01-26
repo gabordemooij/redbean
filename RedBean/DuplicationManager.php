@@ -183,18 +183,9 @@ class RedBean_DuplicationManager {
 		$tables = $this->tables;
 		foreach($tables as $table) {
 			if (is_array($this->filters) && count($this->filters) && !in_array($table,$this->filters)) continue;
-			if (strpos($table,'_')!==false || $table==$type) continue;
+			if ($table==$type) continue;
 			$owned = 'own'.ucfirst($table);
 			$shared = 'shared'.ucfirst($table);
-			if ($this->hasOwnList($type,$table)) {
-				if ($beans = $bean->$owned) {
-					$copy->$owned = array();
-					foreach($beans as $subBean) {
-						array_push($copy->$owned,$this->duplicate($subBean,$trail,$pid));
-					}
-				}
-				$copy->setMeta('sys.shadow.'.$owned,null);
-			}
 			if ($this->hasSharedList($type, $table)) {
 				if ($beans = $bean->$shared) {
 					$copy->$shared = array();
@@ -202,6 +193,15 @@ class RedBean_DuplicationManager {
 						array_push($copy->$shared,$subBean);
 					}
 				}
+			}
+			elseif ($this->hasOwnList($type,$table)) {
+				if ($beans = $bean->$owned) {
+					$copy->$owned = array();
+					foreach($beans as $subBean) {
+						array_push($copy->$owned,$this->duplicate($subBean,$trail,$pid));
+					}
+				}
+				$copy->setMeta('sys.shadow.'.$owned,null);
 			}
 			$copy->setMeta('sys.shadow.'.$shared,null);
 		}
