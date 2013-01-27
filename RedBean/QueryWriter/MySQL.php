@@ -244,10 +244,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
 			}
 		}
-		if (strlen($value) <= 255) {
+		if (mb_strlen($value) <= 255) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
 		}
-		if (strlen($value) <= 65535) {
+		if (mb_strlen($value) <= 65535) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
 		}
 		return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32;
