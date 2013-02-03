@@ -901,7 +901,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * Can also load preload lists:
 	 * 
-	 * $redbean->preload($books,'ownPage'=>'page','*.ownText'=>'text');
+	 * $redbean->preload($books,array('ownPage'=>'page','*.ownText'=>'text'));
 	 * 
 	 * @param array $beans beans
 	 * @param array $types types to load
@@ -931,15 +931,54 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 			$oldField = $field;
 			if (strpos($type,'.')) $type = $field;
-			foreach($filteredBeans as $bean) { //gather ids to load the desired bean collections
-				if (strpos($field,'own')===0) { //based on bean->id for ownlist
-					$id = $bean->id; $ids[$id] = $id;
-				} elseif($id = $bean->{$field.'_id'}){ //based on bean_id for parent
-					$ids[$id] = $id; if (!isset($map[$id])) $map[$id] = array();
-					$map[$id][] = $bean;
+			if (strpos($field,'shared')!==0) {
+				foreach($filteredBeans as $bean) { //gather ids to load the desired bean collections
+					if (strpos($field,'own')===0) { //based on bean->id for ownlist
+						$id = $bean->id; $ids[$id] = $id;
+					} elseif($id = $bean->{$field.'_id'}){ //based on bean_id for parent
+						$ids[$id] = $id; if (!isset($map[$id])) $map[$id] = array();
+						$map[$id][] = $bean;
+					}
 				}
 			}
-			if (strpos($field,'own')===0) {//preload for own-list using find
+			if (strpos($field,'shared')===0) {
+				$bean = reset($filteredBeans);
+				$link = $bean->getMeta('type').'_id';
+				$keys = $this->assocManager->related($filteredBeans,$type,true);
+				$linkTable = $this->assocManager->getTable(array($type,$bean->getMeta('type')));
+				$linkBeans = $this->batch($linkTable,$keys);
+				$linked = array();
+				$targetIDs = array();
+				$targetIDField = $type.'_id';
+				foreach($linkBeans as $linkBean) {
+					$linkID = $linkBean->$link;
+					if (!isset($linked[$linkID])) {
+						$linked[$linkID] = array();
+					}
+					$linked[$linkID][] = $linkBean;
+					$targetIDs[$linkBean->$targetIDField] = $linkBean->$targetIDField;
+				}
+				$sharedRecords = $this->writer->selectRecord($type, array('id' => $targetIDs));
+				foreach($filteredBeans as $filteredBean) {
+					$list = $toConvert = array();
+					if (isset($linked[$filteredBean->id])) {
+						foreach($linked[$filteredBean->id] as $linkBean) {
+							foreach($sharedRecords as $sharedRecord) {
+								if ($sharedRecord['id'] == $linkBean->$targetIDField) {
+									$toConvert[] = $sharedRecord; 
+								}
+							}
+						}
+						if (count($toConvert) > 0) {
+							$list = $this->convertToBeans($type, $toConvert);
+						}
+					}
+					$filteredBean->setProperty($field,$list);
+					$retrievals[$i][] = $list; 
+				}
+				
+			}
+			elseif (strpos($field,'own')===0) {//preload for own-list using find
 				$link = $bean->getMeta('type').'_id';
 				$children = $this->find($type,array($link=>$ids));
 				foreach($filteredBeans as $bean) {
