@@ -319,7 +319,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (is_array($sqlConditions) && count($sqlConditions)>0) {
 			$sql = implode(' AND ',$sqlConditions);
 			$sql = " WHERE ( $sql ) ";
-			if ($addSql) $sql .= " AND $addSql ";
+			if ($addSql) $sql .= ($all ? '': ' AND ') . " $addSql ";
 		}
 		elseif ($addSql) {
 			if ($all) {

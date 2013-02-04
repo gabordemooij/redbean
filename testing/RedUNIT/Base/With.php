@@ -30,7 +30,28 @@ class RedUNIT_Base_With extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run(){
-	
+		R::nuke();
+		list($page1,$page2,$page3) = R::dispense('page',3);
+		list($ad1,$ad2,$ad3) = R::dispense('ad',3);
+		$ad2->name = 'shampoo';
+		$page3->name = 'homepage';
+		$page1->sharedAd = array($ad1, $ad3);
+		$page2->sharedAd = array($ad2, $ad3);
+		$page3->sharedAd = array($ad3, $ad2, $ad1);
+		R::storeAll(array($page1,$page2,$page3));
+		$page1 = R::load('page',$page1->id);
+		asrt(1,count($page1->with(' LIMIT 1 ')->sharedAd));
+		$page2 = R::load('page',$page2->id);
+		$adsOnPage2 = $page2->withCondition(' `name` = ? ',array('shampoo'))->sharedAd;
+		asrt(1,count($adsOnPage2));
+		$ad = reset($adsOnPage2);
+		asrt($ad->name,'shampoo');
+		$ad = R::load('ad',$ad->id);
+		asrt(count($ad->sharedPage),2);
+		$ad = R::load('ad',$ad->id);
+		$homepage = reset($ad->withCondition(' `name` LIKE ? AND id > 0 ORDER BY id DESC ',array('%ome%'))->sharedPage);
+		asrt($homepage->name,'homepage');
+
 		R::nuke();
 		list($book1,$book2,$book3) = R::dispense('book',3);
 		$book1->position = 1;
@@ -59,7 +80,7 @@ class RedUNIT_Base_With extends RedUNIT_Base {
 		$books = $shelf->with(' AND position > 2 ')->ownBook;
 		asrt(count($books),1);
 		$shelf = R::load('shelf',$id);
-		$books = $shelf->with(' AND position < 3 ')->ownBook;
+		$books = $shelf->with(' AND position < ? ',array(3))->ownBook;
 		asrt(count($books),2);
 		$shelf = R::load('shelf',$id);
 		$books = $shelf->with(' AND position = 1 ')->ownBook;

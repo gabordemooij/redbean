@@ -68,6 +68,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	private $withSql = '';
 	
 	/**
+	 * Parameters for with-SQL snippets.
+	 * 
+	 * @var string 
+	 */
+	private $withParams = array();
+	
+	
+	/**
 	 * Alias name for a type.
 	 * 
 	 * @var string 
@@ -322,11 +330,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * query.
 	 * 
 	 * @param string $sql SQL to be added to retrieval query.
+	 * @param array  $params array with parameters to bind to SQL snippet
 	 * 
 	 * @return RedBean_OODBBean $self
 	 */
-	public function with($sql) {
+	public function with($sql,$params = array()) {
 		$this->withSql = $sql;
+		$this->withParams = $params;
 		return $this;
 	}
 	
@@ -340,12 +350,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * 
 	 * This will return in the own list only the pages having 'chapter == 3'. 
 	 * 
-	 * @param string $sql SQL to be added to retrieval query (prefixed by AND)
+	 * @param string $sql    SQL to be added to retrieval query (prefixed by AND)
+	 * @param array  $params array with parameters to bind to SQL snippet
 	 * 
 	 * @return RedBean_OODBBean $self
 	 */
-	public function withCondition($sql) {
+	public function withCondition($sql,$params = array()) {
 		$this->withSql = ' AND '.$sql;
+		$this->withParams = $params;
 		return $this;
 	}
 	
@@ -415,8 +427,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				} else {
 					$myFieldLink =  $this->getMeta('type').'_id';
 				}
-				$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ".$this->withSql,array($this->getID())));
+				$params = array_merge(array($this->getID()),$this->withParams);
+				$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ".$this->withSql,$params));
 				$this->withSql = '';
+				$this->withParams = array();
 				$this->properties[$property] = $beans;
 				$this->setMeta('sys.shadow.'.$property,$beans);
 				$this->setMeta('tainted',true);
@@ -426,7 +440,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$type = (__lcfirst(str_replace('shared','',$property)));
 				$keys = $toolbox->getRedBean()->getAssociationManager()->related($this,$type);
 				if (!count($keys)) $beans = array(); else
-				$beans = $toolbox->getRedBean()->batch($type,$keys);
+				if (trim($this->withSql)!=='') {
+					$beans = $toolbox->getRedBean()->find($type,array('id'=>$keys),array($this->withSql,$this->withParams),true);
+				}
+				else {
+					$beans = $toolbox->getRedBean()->batch($type,$keys);
+				}
+				$this->withSql = '';
+				$this->withParams = array();
 				$this->properties[$property] = $beans;
 				$this->setMeta('sys.shadow.'.$property,$beans);
 				$this->setMeta('tainted',true);
