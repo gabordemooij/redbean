@@ -223,6 +223,103 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		$page = reset($book->ownPage);
 		asrt(count($page->ownText),2);
 		
+		//test preloading of shared lists
+		R::nuke();
+		list($a1,$a2,$a3) = R::dispense('army',3);
+		list($v1,$v2,$v3) = R::dispense('village',3);
+		$v1->name = 'a'; $v2->name='b'; $v3->name = 'c';
+		$a1->name = 'one'; $a2->name = 'two'; $a3->name = 'three';
+		$a1->sharedVillage = array($v1,$v3);
+		$a2->sharedVillage = array($v3,$v1,$v2);
+		$a3->sharedVillage = array();
+		list($g,$e) = R::dispense('people',2);
+		$g->nature = 'good';
+		$e->nature = 'evil';
+		$v1->sharedPeople = array( $g );
+		$v2->sharedPeople = array( $e,$g );
+		$v3->sharedPeople = array( $g );
+		R::storeAll(array($a1,$a2,$a3));
+		$armies = R::find('army');
+		R::each($armies,array('sharedVillage'=>'village','sharedVillage.sharedPeople'=>'people'),function($army,$villages,$people){
+			if ($army->name == 'one') {
+				$names = array();
+				foreach($villages as $village) {
+					$names[] = $village->name;
+				}
+				sort($names);
+				$names = implode(',',$names);
+				asrt($names,'a,c');
+			}
+			if ($army->name == 'two') {
+				$names = array();
+				foreach($villages as $village) {
+					$names[] = $village->name;
+				}
+				sort($names);
+				$names = implode(',',$names);
+				asrt($names,'a,b,c');
+			}
+			if ($army->name == 'three') {
+				asrt(count($villages),0);
+			}
+		});
+		
+		R::nuke();
+		
+		foreach($armies as $army) {
+			$villages = $army->sharedVillage;
+			$ppl = array();
+			foreach($villages as $village) {
+				$ppl = array_merge($ppl, $village->sharedPeople);
+			}
+			if ($army->name == 'one') {
+				asrt(count($villages),2);
+				asrt(count($ppl),2);
+				foreach($ppl as $p) {
+					if ($p->nature !== 'good') fail();
+				}
+				$names = array();
+				foreach($villages as $village) {
+					$names[] = $village->name;
+				}
+				sort($names);
+				$names = implode(',',$names);
+				asrt($names,'a,c');
+				
+				$natures = array();
+				foreach($ppl as $p) {
+					$natures[] = $p->nature;
+				}
+				sort($natures);
+				$natures = implode(',',$natures);
+				asrt($natures,'good,good');
+			}
+			
+			if ($army->name == 'two') {
+				asrt(count($villages),3);
+				asrt(count($ppl),4);
+				$names = array();
+				foreach($villages as $village) {
+					$names[] = $village->name;
+				}
+				sort($names);
+				$names = implode(',',$names);
+				asrt($names,'a,b,c');
+				
+				$natures = array();
+				foreach($ppl as $p) {
+					$natures[] = $p->nature;
+				}
+				sort($natures);
+				$natures = implode(',',$natures);
+				asrt($natures,'evil,good,good,good');
+			}
+			if ($army->name == 'three') {
+				asrt(count($villages),0);
+				asrt(count($ppl),0);
+			}
+		}
+		
 		//now test with empty beans
 		$authors = R::dispense('author',2);
 		R::storeAll($authors);

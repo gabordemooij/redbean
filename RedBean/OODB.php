@@ -901,7 +901,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * Can also load preload lists:
 	 * 
-	 * $redbean->preload($books,array('ownPage'=>'page','*.ownText'=>'text'));
+	 * $redbean->preload($books,array('ownPage'=>'page','*.ownText'=>'text','sharedTag'=>'tag'));
 	 * 
 	 * @param array $beans beans
 	 * @param array $types types to load
@@ -958,25 +958,21 @@ class RedBean_OODB extends RedBean_Observable {
 					$linked[$linkID][] = $linkBean;
 					$targetIDs[$linkBean->$targetIDField] = $linkBean->$targetIDField;
 				}
-				$sharedRecords = $this->writer->selectRecord($type, array('id' => $targetIDs));
+				$sharedBeans = $this->batch($type,$targetIDs);
 				foreach($filteredBeans as $filteredBean) {
-					$list = $toConvert = array();
+					$list = array();
 					if (isset($linked[$filteredBean->id])) {
 						foreach($linked[$filteredBean->id] as $linkBean) {
-							foreach($sharedRecords as $sharedRecord) {
-								if ($sharedRecord['id'] == $linkBean->$targetIDField) {
-									$toConvert[] = $sharedRecord; 
+							foreach($sharedBeans as $sharedBean) {
+								if ($sharedBean->id == $linkBean->$targetIDField) {
+									$list[$sharedBean->id] = $sharedBean; 
 								}
 							}
 						}
-						if (count($toConvert) > 0) {
-							$list = $this->convertToBeans($type, $toConvert);
-						}
 					}
 					$filteredBean->setProperty($field,$list);
-					$retrievals[$i][] = $list; 
+					$retrievals[$i][] = $list;
 				}
-				
 			}
 			elseif (strpos($field,'own')===0) {//preload for own-list using find
 				$link = $bean->getMeta('type').'_id';
