@@ -15,6 +15,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 
 	
 	/**
+	 * Flag indicates whether column names with CamelCase are supported and automatically
+	 * converted; example: isForSale -> is_for_sale
+	 * @var boolean
+	 */
+	private static $flagUseBeautyfulColumnnames = true;
+	
+	/**
 	 * By default own-lists and shared-lists no longer have IDs as keys (3.3+),
 	 * this is because exportAll also does not offer this feature and we want the
 	 * ORM to be more consistent. Also, exporting without keys makes it easier to
@@ -92,6 +99,16 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	public static function setFlagKeyedExport($flag) {
 		self::$flagKeyedExport = (boolean) $flag;
+	}
+	
+	/**
+	 * Flag indicates whether column names with CamelCase are supported and automatically
+	 * converted; example: isForSale -> is_for_sale
+	 * 
+	 * @param boolean
+	 */
+	public static function setFlagBeautifulColumnNames($flag) {
+		self::$flagUseBeautyfulColumnnames = (boolean) $flag;
 	}
 	
 	/** Returns the alias for a type
@@ -401,8 +418,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return mixed $value
 	 */
 	public function &__get( $property ) {
-		if (strpos($property,'own')!==0 && strpos($property,'shared')!==0) {
-			$property = strtolower(preg_replace('/([A-Z])/', '_$1',$property));
+		if (self::$flagUseBeautyfulColumnnames) {
+			if (strpos($property,'own')!==0 && strpos($property,'shared')!==0) {
+				$property = strtolower(preg_replace('/([A-Z])/', '_$1',$property));
+			}
 		}
 		if ($this->beanHelper)
 		$toolbox = $this->beanHelper->getToolbox();
@@ -472,8 +491,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 
 	public function __set($property,$value) {
-		if (strpos($property,'own')!==0 && strpos($property,'shared')!==0) {
-			$property = strtolower(preg_replace('/([A-Z])/', '_$1',$property));
+		if (self::$flagUseBeautyfulColumnnames) {
+			if (strpos($property,'own')!==0 && strpos($property,'shared')!==0) {
+				$property = strtolower(preg_replace('/([A-Z])/', '_$1',$property));
+			}
 		}
 		$this->__get($property);
 		$this->setMeta('tainted',true);

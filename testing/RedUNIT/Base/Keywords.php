@@ -37,6 +37,7 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base {
 		$counter = 0;
 		
 		R::setStrictTyping(false);
+		RedBean_OODBBean::setFlagBeautifulColumnNames(false);
 		
 		foreach($keywords as $k) {
 			R::nuke();
@@ -55,6 +56,7 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base {
 				
 		}
 		
+		RedBean_OODBBean::setFlagBeautifulColumnNames(true);
 		R::setStrictTyping(true);
 	}
 }
