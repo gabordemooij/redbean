@@ -401,6 +401,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return mixed $value
 	 */
 	public function &__get( $property ) {
+		if (strpos($property,'own')!==0 && strpos($property,'shared')!==0) {
+			$property = strtolower(preg_replace('/([A-Z])/', '_$1',$property));
+		}
 		if ($this->beanHelper)
 		$toolbox = $this->beanHelper->getToolbox();
 		if ($this->withSql!=='') {
@@ -469,6 +472,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 
 	public function __set($property,$value) {
+		if (strpos($property,'own')!==0 && strpos($property,'shared')!==0) {
+			$property = strtolower(preg_replace('/([A-Z])/', '_$1',$property));
+		}
 		$this->__get($property);
 		$this->setMeta('tainted',true);
 		$linkField = $property.'_id';
