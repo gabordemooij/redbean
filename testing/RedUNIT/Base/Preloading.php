@@ -478,6 +478,111 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 			}
 		);
 		asrt($i,16); //follows the first parameter 
-	}	
+
 	
+		$villages = R::dispense('village',3);
+		foreach($villages as $v) $v->ownBuilding = R::dispense('building',3);
+		foreach($villages as $v) foreach($v->ownBuilding as $b) $b->ownFurniture = R::dispense('furniture',2);
+		$armies = R::dispense('army',3);
+		$villages[0]->sharedArmy = array($armies[1],$armies[2]);
+		$villages[1]->sharedArmy = array($armies[0],$armies[1]);
+		$villages[2]->sharedArmy = array($armies[2]);
+		$soldiers = R::dispense('soldier',4);
+		$armies[0]->sharedSoldier = array($soldiers[0],$soldiers[1],$soldiers[2]);
+		$armies[1]->sharedSoldier = array($soldiers[2],$soldiers[1]);
+		$armies[2]->sharedSoldier = array($soldiers[2]);
+		$counter = 0; foreach($villages as $v) $v->name = $counter++;
+		$counter = 0; foreach($armies as $a) $a->name = $counter++;
+		$counter = 0; foreach($soldiers as $s) $s->name = $counter++;
+		$buildings = R::dispense('building',4);
+		$villages[0]->ownBuilding = array($buildings[0]);
+		$villages[1]->ownBuilding = array($buildings[1],$buildings[2]);
+		$villages[2]->ownBuilding = array($buildings[3]);
+		$counter = 0; foreach($buildings as $b) $b->name = $counter++;
+		$books = R::dispense('book',5);
+		$counter = 0; foreach($books as $b) $b->name = $counter++;
+		$buildings[0]->ownBook = array($books[0],$books[1]);
+		$buildings[1]->ownBook = array($books[2]);
+		$buildings[2]->ownBook = array($books[3],$books[4]);
+		R::storeAll($villages);
+		$towns = R::find('village');
+		$counter = 0;
+		R::each($towns,array('sharedArmy'=>'army','sharedArmy.sharedSoldier'=>'soldier','ownBuilding'=>'building','ownBuilding.ownBook'=>'book'),function($t,$a,$s,$b,$x) use(&$counter) {
+			if ($counter === 0) {
+				asrt((string)$t->name,'0');
+				asrt(count($t->sharedArmy),2);
+				$list = array(); foreach($a as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'1,2');
+				$list = array(); foreach($s as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'1,2');
+				$list = array(); foreach($b as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'0');
+				$list = array(); foreach($x as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'0,1');
+				
+				$first = reset($a);
+				asrt($first->getMeta('type'),'army');
+				$first = reset($s);
+				asrt($first->getMeta('type'),'soldier');
+				$first = reset($b);
+				asrt($first->getMeta('type'),'building');
+				$first = reset($x);
+				asrt($first->getMeta('type'),'book');
+				
+				
+			}
+			elseif ($counter === 1) {
+				asrt((string)$t->name,'1');
+				asrt(count($t->sharedArmy),2);
+				$list = array(); foreach($a as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'0,1');
+				$list = array(); foreach($s as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'0,1,2');
+				$list = array(); foreach($b as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'1,2');
+				$list = array(); foreach($x as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'2,3,4');
+				
+				$first = reset($a);
+				asrt($first->getMeta('type'),'army');
+				$first = reset($s);
+				asrt($first->getMeta('type'),'soldier');
+				$first = reset($b);
+				asrt($first->getMeta('type'),'building');
+				$first = reset($x);
+				asrt($first->getMeta('type'),'book');
+			}
+			elseif ($counter === 2) {
+				asrt((string)$t->name,'2');
+				asrt(count($t->sharedArmy),1);
+				$list = array(); foreach($a as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'2');
+				$list = array(); foreach($s as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'2');
+				$list = array(); foreach($b as $item) $list[] = $item->name;
+				sort($list);
+				asrt(implode(',',$list),'3');
+				asrt(count($x),0);
+				
+				$first = reset($a);
+				asrt($first->getMeta('type'),'army');
+				$first = reset($s);
+				asrt($first->getMeta('type'),'soldier');
+				$first = reset($b);
+				asrt($first->getMeta('type'),'building');
+			}
+			$counter++;
+	
+		});
+	}	
 }
