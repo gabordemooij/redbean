@@ -180,6 +180,7 @@ class RedBean_Facade {
 	 */
 	public static function debug( $tf = true, $logger = NULL ) {
 		if (!$logger) $logger = new RedBean_Logger_Default;
+		if (!isset(self::$adapter)) throw new RedBean_Exception_Security('Use R::setup() first.');
 		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
 	}
 

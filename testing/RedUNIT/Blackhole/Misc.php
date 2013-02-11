@@ -31,6 +31,21 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 	 */
 	public function run() {
 		
+		testpack('Test debugger check.');
+		$old = R::$adapter;
+		R::$adapter = null;
+		try {
+			R::debug(true);
+			fail();
+		}
+		catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		R::$adapter = $old;
+		R::debug(false);
+		
+		testpack('Misc Tests');
+		
 		try {
 			$candy = R::dispense('CandyBar');
 			fail();
