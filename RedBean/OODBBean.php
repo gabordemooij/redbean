@@ -406,7 +406,18 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	public function alias($aliasName) {
 		$this->aliasName = $aliasName;
 		return $this;
-	}	
+	}
+	
+	
+	/**
+	 * For use with 1-1 relations. Returns a one-one proxy.
+	 * 
+	 * @return RedBean_OneProxy 
+	 */
+	public function one() {
+		return new RedBean_OneProxy($this,$this->beanHelper);
+	}
+	
 	
 	/**
 	 * Magic Getter. Gets the value for a specific property in the bean.
@@ -817,5 +828,3 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return $bean;
 	}
 }
-
-

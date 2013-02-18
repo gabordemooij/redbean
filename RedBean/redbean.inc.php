@@ -68,6 +68,7 @@ require($dir.'Exception/Security.php');
 
 //Load Core functionality
 require($dir.'OODB.php');
+require($dir.'OneProxy.php');
 require($dir.'ToolBox.php');
 require($dir.'Finder.php');
 
