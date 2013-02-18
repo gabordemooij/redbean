@@ -230,16 +230,22 @@ class RedBean_DuplicationManager {
 			$f = $this->dup($bean,array(),true);
 			$copies[] = $f;
 		}
-		if ($parents) {
-			$firstCopy = reset($copies);
-			$properties = $firstCopy->getProperties();
-			foreach($properties as $property=>$value) {
-				if (strpos($property,'_id')!==false) {
-					$parentTypes[] = substr($property,0,-3);
+		if ($parents!==false) {
+			if ($parents === true) {
+				$firstCopy = reset($copies);
+				$properties = $firstCopy->getProperties();
+				foreach($properties as $property=>$value) {
+					if (strpos($property,'_id')!==false) {
+						$parentTypes[] = substr($property,0,-3);
+					}
 				}
+				$parentTypes = implode(',',$parentTypes);
+			}
+			else {
+				$parentTypes = $parents;
 			}
 			//Try to preload as much parents as possible by analyzing first bean		
-			$this->redbean->preload($copies,implode(',',$parentTypes));
+			$this->redbean->preload($copies,$parentTypes);
 			foreach($copies as $bean) {
 				$array[] = $bean->export(false,true,false,$filters);
 			}
