@@ -175,6 +175,9 @@ class RedBean_OODB extends RedBean_Observable {
 		if (!isset($bean->id) ) {
 			throw new RedBean_Exception_Security('Bean has incomplete Meta Information id ');
 		}
+		if (!is_numeric($bean->id)) {
+			throw new RedBean_Exception_Security('ID must be numeric.');
+		}
 		if (!($bean->getMeta('type'))) {
 			throw new RedBean_Exception_Security('Bean has incomplete Meta Information II');
 		}
