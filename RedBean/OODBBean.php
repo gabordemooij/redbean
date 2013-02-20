@@ -681,6 +681,20 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		$this->fetchType = $type;
 		return $this;
 	}
+
+	/**
+	* For polymorphic bean relations.
+	* Same as fetchAs but uses a column instead of a direct value.
+	*
+	* @param string $column
+	*
+	* @return RedBean_OODBean
+	*
+	*/
+	public function poly($field) {
+		return $this->fetchAs($this->$field);
+	}
+
 	
 	/**
 	 * Implementation of Countable interface. Makes it possible to use
