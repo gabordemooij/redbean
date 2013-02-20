@@ -32,7 +32,7 @@ interface RedBean_Driver {
 	 */
 	public function GetCol( $sql, $aValues=array() );
 	/**
-	 * Runs a query an returns results as a single cell.
+	 * Runs a query and returns results as a single cell.
 	 *
 	 * @param string $sql SQL to execute
 	 *
