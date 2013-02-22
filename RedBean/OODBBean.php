@@ -408,17 +408,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return $this;
 	}
 	
-	
-	/**
-	 * For use with 1-1 relations. Returns a one-one proxy.
-	 * 
-	 * @return RedBean_OneProxy 
-	 */
-	public function one() {
-		return new RedBean_OneProxy($this,$this->beanHelper);
-	}
-	
-	
 	/**
 	 * Magic Getter. Gets the value for a specific property in the bean.
 	 * If the property does not exist this getter will make sure no error
@@ -441,29 +430,42 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				unset($this->properties[$property]);
 			}
 		}
+		
 		if (!isset($this->properties[$property])) { 
 			$fieldLink = $property.'_id'; 
 			if (isset($this->$fieldLink) && $fieldLink != $this->getMeta('sys.idfield')) {
 				$this->setMeta('tainted',true); 
+				$bean = $this->getMeta('sys.parentcache.'.$property);
+				if (!$bean) { 
 				$type =  $this->getAlias($property);
 				$targetType = $this->properties[$fieldLink];
 				$bean =  $toolbox->getRedBean()->load($type,$targetType);
+				}
 				$this->properties[$property] = $bean;
 				return $this->properties[$property];
 			}
+
 			if (strpos($property,'own')===0 && ctype_upper(substr($property,3,1))) {
 				$type = (__lcfirst(str_replace('own','',$property)));
 				if ($this->aliasName) {
+					$parentField = $this->aliasName;
 					$myFieldLink = $this->aliasName.'_id';
 					$this->setMeta('sys.alias.'.$type,$this->aliasName);
 					$this->aliasName = null;
 				} else {
-					$myFieldLink =  $this->getMeta('type').'_id';
+					$myFieldLink = $this->getMeta('type').'_id';
+					$parentField = $this->getMeta('type');
 				}
-				$params = array_merge(array($this->getID()),$this->withParams);
-				$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ".$this->withSql,$params));
+				$beans = array();
+				if ($this->getID()>0) {
+					$params = array_merge(array($this->getID()),$this->withParams);
+					$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ".$this->withSql,$params));
+				}
 				$this->withSql = '';
 				$this->withParams = array();
+				foreach($beans as $b) {
+					$b->__info['sys.parentcache.'.$parentField] = $this;
+				}
 				$this->properties[$property] = $beans;
 				$this->setMeta('sys.shadow.'.$property,$beans);
 				$this->setMeta('tainted',true);

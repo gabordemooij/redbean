@@ -15,7 +15,6 @@
 		<item type="php">RedBean/Driver/PDO.php</item>
 		<item type="php" flavour="oci">RedBean/Driver/OCI.php</item>
 		<item type="php">RedBean/OODBBean.php</item>
-		<item type="php">RedBean/OneProxy.php</item>
 		<item type="php">RedBean/Observable.php</item>
 		<item type="php">RedBean/Observer.php</item>
 		<item type="php">RedBean/Adapter.php</item>
