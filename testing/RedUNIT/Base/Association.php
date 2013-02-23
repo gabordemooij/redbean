@@ -22,8 +22,47 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
-	
+
+		//Test poly
+		testpack('Testing poly');
+		R::nuke();
+		$shoe = R::dispense('shoe');
+		$lace = R::dispense('lace');
+		$lace->color = 'white';
+		$id = R::store($lace);
+		$shoe->itemType = 'lace';
+		$shoe->item = $lace;
+		$id = R::store($shoe);
+		$shoe = R::load('shoe',$id);
+		$x = $shoe->poly('itemType')->item;
+		asrt($x->color,'white');
+
+		//Test one-to-one
+		testpack('Testing one-to-ones');
+		R::nuke();
+		$author = R::dispense('author')->setAttr('name','a');;
+		$bio = R::dispense('bio')->setAttr('name','a');
+		R::storeAll(array($author,$bio));
+		$id1 = $author->id;
+		$author = R::dispense('author')->setAttr('name','b');;
+		$bio = R::dispense('bio')->setAttr('name','b');
+		R::storeAll(array($author,$bio));
+		$id2 = $author->id;
+		list($a,$b) = R::loadMulti('author,bio',$id1);
+		asrt($a->name,$b->name);
+		asrt($a->name,'a');
+		list($a,$b) = R::loadMulti('author,bio',$id2);
+		asrt($a->name,$b->name);
+		asrt($a->name,'b');
+		list($a,$b) = R::loadMulti(array('author','bio'),$id1);
+		asrt($a->name,$b->name);
+		asrt($a->name,'a');
+		list($a,$b) = R::loadMulti(array('author','bio'),$id2);
+		asrt($a->name,$b->name);
+		asrt($a->name,'b');
+		
 		//unique constraint for single column
+		testpack('Testing unique constraint on single column');
 		R::nuke();
 		$book = R::dispense('book');
 		$book->setMeta('buildcommand.unique',array(array('title')));

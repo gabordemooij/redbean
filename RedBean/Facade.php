@@ -225,7 +225,7 @@ class RedBean_Facade {
 	* @return RedBean_OODBBean $bean
 	*/ 
 	public static function loadMulti( $types, $id ) {
-		if (strpos($types,',')!==false) $types = explode(',',$types);
+		if (is_string($types) && strpos($types,',')!==false) $types = explode(',',$types);
 		if (is_array($types)) {
 			$list = array();
 			foreach($types as $typeItem) {
