@@ -504,11 +504,15 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		$buildings[0]->ownBook = array($books[0],$books[1]);
 		$buildings[1]->ownBook = array($books[2]);
 		$buildings[2]->ownBook = array($books[3],$books[4]);
+		$world = R::dispense('world');
+		$world->name = 'w1';
+		$villages[1]->world = $world;
 		R::storeAll($villages);
 		$towns = R::find('village');
 		$counter = 0;
-		R::each($towns,array('sharedArmy'=>'army','sharedArmy.sharedSoldier'=>'soldier','ownBuilding'=>'building','ownBuilding.ownBook'=>'book'),function($t,$a,$s,$b,$x) use(&$counter) {
+		R::each($towns,array('sharedArmy'=>'army','sharedArmy.sharedSoldier'=>'soldier','ownBuilding'=>'building','ownBuilding.ownBook'=>'book','world'),function($t,$a,$s,$b,$x,$w) use(&$counter) {
 			if ($counter === 0) {
+				asrt($w,null);
 				asrt((string)$t->name,'0');
 				asrt(count($t->sharedArmy),2);
 				$list = array(); foreach($a as $item) $list[] = $item->name;
@@ -536,6 +540,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 				
 			}
 			elseif ($counter === 1) {
+				asrt($w->name,'w1');
 				asrt((string)$t->name,'1');
 				asrt(count($t->sharedArmy),2);
 				$list = array(); foreach($a as $item) $list[] = $item->name;
@@ -561,6 +566,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 				asrt($first->getMeta('type'),'book');
 			}
 			elseif ($counter === 2) {
+				asrt($w,null);
 				asrt((string)$t->name,'2');
 				asrt(count($t->sharedArmy),1);
 				$list = array(); foreach($a as $item) $list[] = $item->name;
