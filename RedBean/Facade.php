@@ -211,10 +211,38 @@ class RedBean_Facade {
 		self::$redbean->freeze( $tf );
 	}
 
-
+	/**
+	* Loads multiple types of beans with the same ID.
+	* This might look like a strange method, however it can be useful
+	* for loading a one-to-one relation.
+	* 
+	* Usage:
+	* list($author, $bio) = R::load('author,bio',$id);
+	*
+	* @param string|array $types
+	* @param mixed        $id
+	*
+	* @return RedBean_OODBBean $bean
+	*/ 
+	public static function loadMulti( $types, $id ) {
+		if (strpos($types,',')!==false) $types = explode(',',$types);
+		if (is_array($types)) {
+			$list = array();
+			foreach($types as $typeItem) {
+				$list[] = self::$redbean->load($typeItem,$id);
+			}
+			return $list;
+		}
+	}
+		
 	/**
 	 * Loads the bean with the given type and id and returns it.
 	 *
+	 * Usage:
+	 * $book = R::load('book',$id); -- loads a book bean
+	 *
+	 * Can also load one-to-one related beans:
+	 * 
 	 * @param string  $type type
 	 * @param integer $id   id of the bean you want to load
 	 *
@@ -945,7 +973,7 @@ class RedBean_Facade {
 	 */
 	public static function dependencies($dep) {
 		self::$redbean->setDepList($dep);
-    }
+    	}
 
 	/**
 	 * Short hand function to store a set of beans at once, IDs will be
