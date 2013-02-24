@@ -30,6 +30,23 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 	 * @return void
 	 */
 	public function run() {
+
+		testpack('Test Camelcase 2 underscore');
+		$names = array(
+			'oneACLRoute'=>'one_acl_route',
+			'ALLUPPERCASE'=>'alluppercase',
+			'clientServerArchitecture'=>'client_server_architecture',
+			'camelCase'=>'camel_case',
+			'peer2peer'=>'peer2peer',
+			'fromUs4You'=>'from_us4_you',
+			'lowercase'=>'lowercase',
+			'a1A2b'=>'a1a2b',
+		);
+		$bean = R::dispense('bean');
+		foreach($names as $name => $becomes) {
+			$bean->$name = 1;
+			asrt(isset($bean->$becomes),true);
+		}
 		
 		testpack('Test debugger check.');
 		$old = R::$adapter;

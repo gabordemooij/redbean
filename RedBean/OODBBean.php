@@ -21,6 +21,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	private static $flagUseBeautyfulColumnnames = true;
 	
+
+	/**
+	* Cache for so-called beautiful column names.
+	* @var array
+	*/
+	private static $beautifulColumns = array();
+
 	/**
 	 * By default own-lists and shared-lists no longer have IDs as keys (3.3+),
 	 * this is because exportAll also does not offer this feature and we want the
@@ -407,6 +414,35 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		$this->aliasName = $aliasName;
 		return $this;
 	}
+
+
+	/**
+	* Turns a camelcase property name into an underscored property name.
+	* Examples:
+	*	oneACLRoute -> one_acl_route
+	*	camelCase -> camel_case
+	*
+	* Also caches the result to improve performance.
+	*
+	* @param string $property
+	*
+	* @return string	
+	*/
+	public function beau($property) {
+		if (strpos($property,'own')!==0 && strpos($property,'shared')!==0) {
+			if (isset(self::$beautifulColumns[$property])) {
+				$propertyBeau = self::$beautifulColumns[$property];
+			}
+			else {
+				$propertyBeau = strtolower(preg_replace('/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2',$property));
+				self::$beautifulColumns[$property] = $propertyBeau;
+			}
+			return $propertyBeau;
+		}
+		else {
+			return $property;
+		}
+	}
 	
 	/**
 	 * Magic Getter. Gets the value for a specific property in the bean.
@@ -419,9 +455,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	public function &__get( $property ) {
 		if (self::$flagUseBeautyfulColumnnames) {
-			if (strpos($property,'own')!==0 && strpos($property,'shared')!==0) {
-				$property = strtolower(preg_replace('/([A-Z])/', '_$1',$property));
-			}
+			$property = $this->beau($property);	
 		}
 		if ($this->beanHelper)
 		$toolbox = $this->beanHelper->getToolbox();
@@ -502,14 +536,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param string $property
 	 * @param  mixed $value
 	 */
-
 	public function __set($property,$value) {
-		if (self::$flagUseBeautyfulColumnnames) {
-			if (strpos($property,'own')!==0 && strpos($property,'shared')!==0) {
-				$property = strtolower(preg_replace('/([A-Z])/', '_$1',$property));
-			}
-		}
-		$this->__get($property);
+		//if (self::$flagUseBeautyfulColumnnames) {
+		//	$property = $this->beau($property);
+		//}
+		$this->__get(&$property);
 		$this->setMeta('tainted',true);
 		$linkField = $property.'_id';
 		if (isset($this->properties[$linkField]) && !($value instanceof RedBean_OODBBean)) {
