@@ -454,7 +454,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return mixed $value
 	 */
 	public function &__get( $property ) {
-		if (self::$flagUseBeautyfulColumnnames) {
+		if (self::$flagUseBeautyfulColumnnames && !$this->flagSkipBeau) {
 			$property = $this->beau($property);	
 		}
 		if ($this->beanHelper)
@@ -527,6 +527,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return $this->properties[$property];
 	}
 
+	private $flagSkipBeau = false;
 	/**
 	 * Magic Setter. Sets the value for a specific property.
 	 * This setter acts as a hook for OODB to mark beans as tainted.
@@ -537,10 +538,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param  mixed $value
 	 */
 	public function __set($property,$value) {
-		//if (self::$flagUseBeautyfulColumnnames) {
-		//	$property = $this->beau($property);
-		//}
-		$this->__get(&$property);
+		if (self::$flagUseBeautyfulColumnnames) {
+			$property = $this->beau($property);
+		}
+		$this->flagSkipBeau = true;
+		$this->__get($property);
+		$this->flagSkipBeau = false;
 		$this->setMeta('tainted',true);
 		$linkField = $property.'_id';
 		if (isset($this->properties[$linkField]) && !($value instanceof RedBean_OODBBean)) {
