@@ -483,7 +483,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			}
 
 			if (strpos($property,'own')===0 && ctype_upper(substr($property,3,1))) {
-				$type = (__lcfirst(str_replace('own','',$property)));
+				$type = (lcfirst(str_replace('own','',$property)));
 				if (self::$flagUseBeautyfulColumnnames ) {
 					$type = $this->beau($type);
 				}
@@ -512,7 +512,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				return $this->properties[$property];
 			}
 			if (strpos($property,'shared')===0 && ctype_upper(substr($property,6,1))) {
-				$type = (__lcfirst(str_replace('shared','',$property)));
+				$type = (lcfirst(str_replace('shared','',$property)));
 				if (self::$flagUseBeautyfulColumnnames ) {
 					$type = $this->beau($type);
 				}	
