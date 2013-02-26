@@ -44,6 +44,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	*/
 	private $null = null;
 
+	/**
+	* Flag,indicates whether we still need to perform
+	* column beautification.
+	* @var boolean
+	*/
+	private $flagSkipBeau = false;
 
 	/**
 	 * Properties of the bean. These are kept in a private
@@ -299,8 +305,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return (isset($this->properties[$property]));
 	}
 
-
-
 	/**
 	 * Returns the ID of the bean no matter what the ID field is.
 	 *
@@ -415,7 +419,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return $this;
 	}
 
-
 	/**
 	* Turns a camelcase property name into an underscored property name.
 	* Examples:
@@ -481,6 +484,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 
 			if (strpos($property,'own')===0 && ctype_upper(substr($property,3,1))) {
 				$type = (__lcfirst(str_replace('own','',$property)));
+				if (self::$flagUseBeautyfulColumnnames ) {
+					$type = $this->beau($type);
+				}
 				if ($this->aliasName) {
 					$parentField = $this->aliasName;
 					$myFieldLink = $this->aliasName.'_id';
@@ -507,6 +513,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			}
 			if (strpos($property,'shared')===0 && ctype_upper(substr($property,6,1))) {
 				$type = (__lcfirst(str_replace('shared','',$property)));
+				if (self::$flagUseBeautyfulColumnnames ) {
+					$type = $this->beau($type);
+				}	
 				$keys = $toolbox->getRedBean()->getAssociationManager()->related($this,$type);
 				if (!count($keys)) $beans = array(); else
 				if (trim($this->withSql)!=='') {
@@ -527,7 +536,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return $this->properties[$property];
 	}
 
-	private $flagSkipBeau = false;
 	/**
 	 * Magic Setter. Sets the value for a specific property.
 	 * This setter acts as a hook for OODB to mark beans as tainted.

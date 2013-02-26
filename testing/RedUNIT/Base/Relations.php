@@ -23,6 +23,28 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 	 */
 	public function run() {
 		
+		testpack('Test list beautifications');
+		R::nuke();
+		$book = R::dispense('book');
+		$page = R::dispense('page')->setAttr('name','a');
+		$book->sharedPage[] = $page;
+		$id = R::store($book);
+		$book = R::load('book',$id);
+		$p = reset( $book->ownBookPage );
+		asrt($p->page->name,'a');
+		$bean = R::dispense('bean');
+		$bean->sharedAclRole[] = R::dispense('role')->setAttr('name','x');
+		R::store($bean);
+		asrt(R::count('role'),1);
+
+		$aclrole = R::$redbean->dispense('acl_role');
+		$aclrole->name = 'role';
+		$bean = R::dispense('bean');
+		$bean->sharedAclRole[] = $aclrole;
+		R::store($bean);
+		asrt(count($bean->sharedAclRole),1);
+		
+		testpack('Test list add/delete scenarios.');
 		R::nuke();
 		R::dependencies(array('page'=>array('book','paper')));
 
