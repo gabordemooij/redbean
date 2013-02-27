@@ -39,12 +39,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	private static $flagKeyedExport = false;
 	
 	/**
-	* Reference to NULL property for magic getter.
-	* @var Null $null
-	*/
-	private $null = null;
-
-	/**
 	* Flag,indicates whether we still need to perform
 	* column beautification.
 	* @var boolean
@@ -184,7 +178,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 *    @return RedBean_OODBBean $this
 	 */
 	public function import( $arr, $selection=false, $notrim=false ) {
-		if (is_string($selection)) $selection = explode(',',$selection);
+		if (is_string($selection)) {
+			$selection = explode(',',$selection);
+		}
 		//trim whitespaces
 		if (!$notrim && is_array($selection)) foreach($selection as $k=>$s){ $selection[$k]=trim($s); }
 		foreach($arr as $k=>$v) {
@@ -457,11 +453,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return mixed $value
 	 */
 	public function &__get( $property ) {
+
 		if (self::$flagUseBeautyfulColumnnames && !$this->flagSkipBeau) {
 			$property = $this->beau($property);	
 		}
-		if ($this->beanHelper)
-		$toolbox = $this->beanHelper->getToolbox();
+		if ($this->beanHelper) {
+			$toolbox = $this->beanHelper->getToolbox();
+			$redbean = $toolbox->getRedBean();
+		}
 		if ($this->withSql!=='') {
 			if (strpos($property,'own')===0) {
 				unset($this->properties[$property]);
@@ -470,36 +469,35 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		
 		if (!isset($this->properties[$property])) { 
 			$fieldLink = $property.'_id'; 
-			if (isset($this->$fieldLink) && $fieldLink != $this->getMeta('sys.idfield')) {
-				$this->setMeta('tainted',true); 
+			if (isset($this->$fieldLink) && $fieldLink !== $this->getMeta('sys.idfield')) {
+				$this->__info['tainted'] = true; 
 				$bean = $this->getMeta('sys.parentcache.'.$property);
 				if (!$bean) { 
-				$type =  $this->getAlias($property);
-				$targetType = $this->properties[$fieldLink];
-				$bean =  $toolbox->getRedBean()->load($type,$targetType);
+					$type =  $this->getAlias($property);
+					$targetType = $this->properties[$fieldLink];
+					$bean =  $redbean->load($type,$targetType);
 				}
 				$this->properties[$property] = $bean;
 				return $this->properties[$property];
 			}
-
-			if (strpos($property,'own')===0 && ctype_upper(substr($property,3,1))) {
-				$type = (lcfirst(str_replace('own','',$property)));
+			elseif (strpos($property,'own')===0 && ctype_upper(substr($property,3,1))) {
+				$type = lcfirst(substr($property,3));
 				if (self::$flagUseBeautyfulColumnnames ) {
 					$type = $this->beau($type);
 				}
 				if ($this->aliasName) {
 					$parentField = $this->aliasName;
 					$myFieldLink = $this->aliasName.'_id';
-					$this->setMeta('sys.alias.'.$type,$this->aliasName);
+					$this->__info['sys.alias.'.$type] = $this->aliasName;
 					$this->aliasName = null;
 				} else {
-					$myFieldLink = $this->getMeta('type').'_id';
-					$parentField = $this->getMeta('type');
+					$myFieldLink = $this->__info['type'].'_id';
+					$parentField = $this->__info['type'];
 				}
 				$beans = array();
 				if ($this->getID()>0) {
 					$params = array_merge(array($this->getID()),$this->withParams);
-					$beans = $toolbox->getRedBean()->find($type,array(),array(" $myFieldLink = ? ".$this->withSql,$params));
+					$beans = $redbean->find($type,array(),array(" $myFieldLink = ? ".$this->withSql,$params));
 				}
 				$this->withSql = '';
 				$this->withParams = array();
@@ -507,33 +505,38 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 					$b->__info['sys.parentcache.'.$parentField] = $this;
 				}
 				$this->properties[$property] = $beans;
-				$this->setMeta('sys.shadow.'.$property,$beans);
-				$this->setMeta('tainted',true);
+				$this->__info['sys.shadow.'.$property] = $beans;
+				$this->__info['tainted'] = true;
 				return $this->properties[$property];
 			}
-			if (strpos($property,'shared')===0 && ctype_upper(substr($property,6,1))) {
-				$type = (lcfirst(str_replace('shared','',$property)));
+			elseif (strpos($property,'shared')===0 && ctype_upper(substr($property,6,1))) {
+				$type = lcfirst(substr($property,6));
 				if (self::$flagUseBeautyfulColumnnames ) {
 					$type = $this->beau($type);
 				}	
-				$keys = $toolbox->getRedBean()->getAssociationManager()->related($this,$type);
+				$keys = $redbean->getAssociationManager()->related($this,$type);
 				if (!count($keys)) $beans = array(); else
 				if (trim($this->withSql)!=='') {
-					$beans = $toolbox->getRedBean()->find($type,array('id'=>$keys),array($this->withSql,$this->withParams),true);
+					$beans = $redbean->find($type,array('id'=>$keys),array($this->withSql,$this->withParams),true);
 				}
 				else {
-					$beans = $toolbox->getRedBean()->batch($type,$keys);
+					$beans = $redbean->batch($type,$keys);
 				}
 				$this->withSql = '';
 				$this->withParams = array();
 				$this->properties[$property] = $beans;
-				$this->setMeta('sys.shadow.'.$property,$beans);
-				$this->setMeta('tainted',true);
+				$this->__info['sys.shadow.'.$property] = $beans;
+				$this->__info['tainted'] = true;
 				return $this->properties[$property];
 			}
-			return $this->null;
+			else {
+				$null = null;
+				return $null;
+			}
 		}
-		return $this->properties[$property];
+		else {
+			return $this->properties[$property];
+		}
 	}
 
 	/**
