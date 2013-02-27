@@ -467,9 +467,11 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * 
 	 * @return void 
 	 */
-	public static function renameAssociation($from,$to) {
+	public static function renameAssociation($from,$to = null) {
 		if (is_array($from)) {
-			foreach($from as $key => $value) self::$renames[$key] = $value;
+			foreach($from as $key => $value) {
+				self::$renames[$key] = $value;
+			}
 			return;
 		}
 		self::$renames[$from] = $to;

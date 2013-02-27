@@ -575,12 +575,15 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$m2->thename = 'b';
 		$m3->thename = 'c';
 		R::renameAssociation('museum_painting','exhibited');
+		R::renameAssociation(array('museum_museum'=>'center')); //also test array syntax
+		$m1->link('center',array('name'=>'History Center'))->museum2 = $m2;
 		$m1->link('exhibited','{"from":"2014-02-01","til":"2014-07-02"}')->painting = $p3;
 		$m2->link('exhibited','{"from":"2014-07-03","til":"2014-10-02"}')->painting = $p3;
 		$m3->link('exhibited','{"from":"2014-02-01","til":"2014-07-02"}')->painting = $p1;
 		$m2->link('exhibited','{"from":"2014-02-01","til":"2014-07-02"}')->painting = $p2;
 		R::storeAll(array($m1,$m2,$m3));
 		list($m1,$m2,$m3) = array_values(R::findAll('museum',' ORDER BY thename ASC'));
+		asrt(count($m1->sharedMuseum),1);
 		asrt(count($m1->sharedPainting),1);
 		asrt(count($m2->sharedPainting),2);
 		asrt(count($m3->sharedPainting),1);
