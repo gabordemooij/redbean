@@ -186,6 +186,7 @@ class RedBean_Facade {
 		}
 		catch(Exception $e)
 		{
+			$depth--;
 			if($depth == 0)
 				self::rollback();
 			throw $e;
