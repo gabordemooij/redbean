@@ -110,6 +110,13 @@ class RedBean_Facade {
 	 */
 	private static $strictType = true;
 	
+	/**
+	 * Counter to indicate transaction depth.
+	 * This helps emulate a nested transaction.
+	 * @var integer
+	 */
+	public static $transactionDepth = 0;
+	
 
 	/**
 	 * Get version
@@ -136,6 +143,58 @@ class RedBean_Facade {
 		self::addDatabase('default',$dsn,$username,$password);
 		self::selectDatabase('default');
 		return self::$toolbox;
+	}
+	
+	
+	/**
+	 * Starts a transaction within a closure (or other valid callback).
+	 * If an Exception is thrown inside, the operation is automatically rolled back.
+	 * If no Exception happens, it commits automatically.
+	 * It also supports (simulated) nested transactions (that is useful when 
+	 * you have many methods that needs transactions but are unaware of
+	 * each other).
+	 * ex:
+	 * 		$from = 1;
+	 * 		$to = 2;
+	 * 		$ammount = 300;
+	 * 		
+	 * 		R::transaction(function() use($from, $to, $ammount)
+	 * 	    {
+	 * 			$accountFrom = R::load('account', $from);
+	 * 			$accountTo = R::load('account', $to);
+	 * 			
+	 * 			$accountFrom->money -= $ammount;
+	 * 			$accountTo->money += $ammount;
+	 * 			
+	 * 			R::store($accountFrom);
+	 * 			R::store($accountTo);
+	 *      });
+	 * 
+	 * @param callable $callback Closure (or other callable) with the transaction logic
+	 * 
+	 * @return void
+	 */
+	public static function transaction($callback)
+	{
+		if( ! is_callable($callback))
+			throw new InvalidArgumentException('RedBean_Facade::transaction needs a valid callback.');
+		
+		try
+		{
+			if(self::$transactionDepth == 0)
+				self::begin();
+			self::$transactionDepth++;
+			$callback();
+			self::$transactionDepth--;
+			if(self::$transactionDepth == 0)
+				self::commit();
+		}
+		catch(Exception $e)
+		{
+			if(self::$transactionDepth == 0)
+				self::rollback();
+			throw $e;
+		}
 	}
 
 
@@ -973,7 +1032,7 @@ class RedBean_Facade {
 	 */
 	public static function dependencies($dep) {
 		self::$redbean->setDepList($dep);
-    	}
+		}
 
 	/**
 	 * Short hand function to store a set of beans at once, IDs will be
