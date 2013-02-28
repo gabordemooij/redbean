@@ -110,13 +110,6 @@ class RedBean_Facade {
 	 */
 	private static $strictType = true;
 	
-	/**
-	 * Counter to indicate transaction depth.
-	 * This helps emulate a nested transaction.
-	 * @var integer
-	 */
-	public static $transactionDepth = 0;
-	
 
 	/**
 	 * Get version
@@ -177,21 +170,23 @@ class RedBean_Facade {
 	public static function transaction($callback)
 	{
 		if( ! is_callable($callback))
-			throw new InvalidArgumentException('RedBean_Facade::transaction needs a valid callback.');
+			throw new InvalidArgumentException('R::transaction needs a valid callback.');
+		
+		static $depth = 0;
 		
 		try
 		{
-			if(self::$transactionDepth == 0)
+			if($depth == 0)
 				self::begin();
-			self::$transactionDepth++;
+			$depth++;
 			$callback();
-			self::$transactionDepth--;
-			if(self::$transactionDepth == 0)
+			$depth--;
+			if($depth == 0)
 				self::commit();
 		}
 		catch(Exception $e)
 		{
-			if(self::$transactionDepth == 0)
+			if($depth == 0)
 				self::rollback();
 			throw $e;
 		}
