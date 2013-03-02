@@ -167,28 +167,18 @@ class RedBean_Facade {
 	 * 
 	 * @return void
 	 */
-	public static function transaction($callback)
-	{
-		if( ! is_callable($callback))
-			throw new InvalidArgumentException('R::transaction needs a valid callback.');
-		
+	public static function transaction($callback) {
+		if (!is_callable($callback)) throw new InvalidArgumentException('R::transaction needs a valid callback.');
 		static $depth = 0;
-		
-		try
-		{
-			if($depth == 0)
-				self::begin();
+		try {
+			if ($depth == 0) self::begin();
 			$depth++;
-			$callback();
+			call_user_func($callback); //maintain 5.2 compatibility
 			$depth--;
-			if($depth == 0)
-				self::commit();
-		}
-		catch(Exception $e)
-		{
+			if ($depth == 0) self::commit();
+		} catch(Exception $e) {
 			$depth--;
-			if($depth == 0)
-				self::rollback();
+			if ($depth == 0) self::rollback();
 			throw $e;
 		}
 	}
