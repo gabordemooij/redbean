@@ -933,7 +933,9 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function begin() {
+		if (!self::$redbean->isFrozen()) return false;
 		self::$adapter->startTransaction();
+		return true;
 	}
 
 	/**
@@ -943,7 +945,9 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function commit() {
+		if (!self::$redbean->isFrozen()) return false;
 		self::$adapter->commit();
+		return true;
 	}
 
 	/**
@@ -953,7 +957,9 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function rollback() {
+		if (!self::$redbean->isFrozen()) return false;
 		self::$adapter->rollback();
+		return true;
 	}
 
 	/**

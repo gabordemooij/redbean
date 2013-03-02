@@ -353,14 +353,19 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * the additional SQL snippet will be merged into the final
 	 * query.
 	 * 
-	 * @param string $sql SQL to be added to retrieval query.
-	 * @param array  $params array with parameters to bind to SQL snippet
+	 * @param string|RedBean_SQLHelper $sql SQL to be added to retrieval query.
+	 * @param array                    $params array with parameters to bind to SQL snippet
 	 * 
 	 * @return RedBean_OODBBean $self
 	 */
 	public function with($sql,$params = array()) {
-		$this->withSql = $sql;
-		$this->withParams = $params;
+		if ($sql instanceof RedBean_SQLHelper) {
+			list($this->withSql,$this->withParams) = $sql->getQuery();
+		} 
+		else {
+			$this->withSql = $sql;
+			$this->withParams = $params;
+		}
 		return $this;
 	}
 	
@@ -374,12 +379,15 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * 
 	 * This will return in the own list only the pages having 'chapter == 3'. 
 	 * 
-	 * @param string $sql    SQL to be added to retrieval query (prefixed by AND)
-	 * @param array  $params array with parameters to bind to SQL snippet
+	 * @param string|RedBean_SQLHelper $sql    SQL to be added to retrieval query (prefixed by AND)
+	 * @param array                    $params array with parameters to bind to SQL snippet
 	 * 
 	 * @return RedBean_OODBBean $self
 	 */
 	public function withCondition($sql,$params = array()) {
+		if ($sql instanceof RedBean_SQLHelper) {
+			list($sql,$params) = $sql->getQuery();
+		} 
 		$this->withSql = ' AND '.$sql;
 		$this->withParams = $params;
 		return $this;

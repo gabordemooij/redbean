@@ -31,6 +31,16 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 	 */
 	public function run() {
 
+		testpack('Transaction suppr. in fluid mode');
+		R::freeze(false);
+		asrt(R::begin(),false);
+		asrt(R::commit(),false);
+		asrt(R::rollback(),false);
+		R::freeze(true);
+		asrt(R::begin(),true);
+		asrt(R::commit(),true);
+		R::freeze(false);
+
 		testpack('Test Camelcase 2 underscore');
 		$names = array(
 			'oneACLRoute'=>'one_acl_route',
