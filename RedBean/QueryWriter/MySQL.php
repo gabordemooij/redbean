@@ -131,7 +131,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function __construct( RedBean_Adapter $adapter ) {
 		
 		$this->typeno_sqltype = array(
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  SET('1')  ",
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  TINYINT(1) UNSIGNED ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>' TINYINT(3) UNSIGNED ',
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>' INT(11) UNSIGNED ',
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>' DOUBLE ',

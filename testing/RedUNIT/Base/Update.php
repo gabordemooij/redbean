@@ -58,6 +58,10 @@ class RedUNIT_Base_Update extends RedUNIT_Base {
 		asrt( (bool) $page->rating, true );
 		asrt( ($page->rating==true), true);
 		asrt( ($page->rating==true), true );
+		$page->rating = null;
+		R::store($page);
+		$page = R::load('page',$page->id);
+		asrt($page->rating,null);
 		$page->rating = "1";
 		$newid = $redbean->store( $page );
 		asrt( $newid, $id );
