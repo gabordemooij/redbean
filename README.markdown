@@ -4,7 +4,7 @@ RedBean
 Current Build Status:
 [![Build Status](https://secure.travis-ci.org/gabordemooij/redbean.png)](http://travis-ci.org/gabordemooij/redbean)
 
-RedBean is an easy to use ORM tool that stores beans directly in the
+RedBeanPHP is an easy to use ORM tool that stores beans directly in the
 database and creates all tables and columns required on the fly.
 On the other hand it allows plain SQL to search the database. In fact
 RedBean is some sort of combination between document oriented database
@@ -19,8 +19,7 @@ can freeze the database schema which means it no longer scans schemas.
 Databases Supported
 -------------------
 
-RedBean supports MySQL (InnoDB), PostgreSQL, SQLite3 and CUBRID.
-
+RedBean supports MySQL (InnoDB), PostgreSQL, SQLite3, CUBRID and Oracle.
 
 Quick Example
 -------------
@@ -41,5 +40,5 @@ More information
 For more information about RedBeanPHP please consult
 the RedBeanPHP online manual at:
 
-http://www.redbeanphp.com/manual
+http://www.redbeanphp.com/
 
