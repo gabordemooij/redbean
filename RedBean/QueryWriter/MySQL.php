@@ -15,44 +15,30 @@
  * with this source code in the file license.txt.
  */
 class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
-
-	/**
-	 * Here we describe the datatypes that RedBean
-	 * Uses internally. If you write a QueryWriter for
-	 * RedBean you should provide a list of types like this.
-	 */
-
 	/**
 	 * DATA TYPE
 	 * Boolean Data type
 	 * @var integer
 	 */
 	const C_DATATYPE_BOOL = 0;
-
 	/**
-	 *
 	 * DATA TYPE
 	 * Unsigned 8BIT Integer
 	 * @var integer
 	 */
 	const C_DATATYPE_UINT8 = 1;
-
 	/**
-	 *
 	 * DATA TYPE
 	 * Unsigned 32BIT Integer
 	 * @var integer
 	 */
 	const C_DATATYPE_UINT32 = 2;
-
 	/**
-	 * DATA TYPE
 	 * Double precision floating point number and
 	 * negative numbers.
 	 * @var integer
 	 */
 	const C_DATATYPE_DOUBLE = 3;
-
 	/**
 	 * DATA TYPE
 	 * Standard Text column (like varchar255)
@@ -60,16 +46,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT8 = 4;
-
 	/**
 	 * DATA TYPE
 	 * Long text column (16BIT)
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT16 = 5;
-
 	/**
-	 * 
 	 * DATA TYPE
 	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
 	 * This is the biggest column that RedBean supports. If possible you may write
@@ -77,27 +60,22 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT32 = 6;
-
 	/**
 	 * Special type date for storing date values: YYYY-MM-DD
 	 * @var integer
 	 */	
 	const C_DATATYPE_SPECIAL_DATE = 80;
-	
 	/**
 	 * Special type datetime for store date-time values: YYYY-MM-DD HH:II:SS
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
-	
 	/**
 	 * Special type point. Only available through explicit cast.
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_POINT = 90;
-
 	/**
-	 * 
 	 * DATA TYPE
 	 * Specified. This means the developer or DBA
 	 * has altered the column to a different type not
@@ -106,21 +84,16 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
-
-	
-	
 	/**
 	 * Holds the RedBean Database Adapter.
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
-
 	/**
 	 * character to escape keyword table/column names
 	 * @var string
 	 */
   	protected $quoteCharacter = '`';
-
 	/**
 	 * Constructor.
 	 * The Query Writer Constructor also sets up the database.
@@ -128,8 +101,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @param RedBean_Adapter_DBAdapter $adapter adapter
 	 *
 	 */
-	public function __construct( RedBean_Adapter $adapter ) {
-		
+	public function __construct(RedBean_Adapter $adapter) {
 		$this->typeno_sqltype = array(
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  TINYINT(1) UNSIGNED ",
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>' TINYINT(3) UNSIGNED ',
@@ -142,16 +114,12 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>' DATETIME ',
 			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT=>' POINT ',
 			);
-		
 		$this->sqltype_typeno = array();
 		foreach($this->typeno_sqltype as $k=>$v)
 		$this->sqltype_typeno[trim(strtolower($v))]=$k;
-		
-		
 		$this->adapter = $adapter;
 		parent::__construct();
 	}
-
 	/**
 	 * This method returns the datatype to be used for primary key IDS and
 	 * foreign keys. Returns one if the data type constants.
@@ -161,7 +129,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function getTypeForID() {
 		return self::C_DATATYPE_UINT32;
 	}
-
 	/**
 	 * Returns all tables in the database.
 	 *
@@ -170,7 +137,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function getTables() {
 		return $this->adapter->getCol( 'show tables' );
 	}
-
 	/**
 	 * Creates an empty, column-less table for a bean based on it's type.
 	 * This function creates an empty table for a bean. It uses the
@@ -180,7 +146,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * @return void
 	 */
-	public function createTable( $table ) {
+	public function createTable($table) {
 		$table = $this->safeTable($table);
 		$sql = "     CREATE TABLE $table (
                      id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -188,7 +154,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
                      ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ";
 		$this->adapter->exec( $sql );
 	}
-
 	/**
 	 * Returns an array containing the column names of the specified table.
 	 *
@@ -196,7 +161,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * @return array $columns columns
 	 */
-	public function getColumns( $table ) {
+	public function getColumns($table) {
 		$table = $this->safeTable($table);
 		$columnsRaw = $this->adapter->get("DESCRIBE $table");
 		foreach($columnsRaw as $r) {
@@ -204,7 +169,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		}
 		return $columns;
 	}
-
 	/**
 	 * Returns the MySQL Column Type Code (integer) that corresponds
 	 * to the given value type.
@@ -213,13 +177,11 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * @return integer $type type
 	 */
-	public function scanType( $value, $flagSpecial=false ) {
+	public function scanType($value, $flagSpecial=false) {
 		$this->svalue = $value;
-		
 		if (is_null($value)) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
-		
 		if ($flagSpecial) {
 			if (preg_match('/^\d{4}\-\d\d-\d\d$/',$value)) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE;
@@ -252,7 +214,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		}
 		return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32;
 	}
-
 	/**
 	 * Returns the Type Code for a Column Description.
 	 * Given an SQL column description this method will return the corresponding
@@ -265,13 +226,12 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * @return integer $typecode code
 	 */
-	public function code( $typedescription, $includeSpecials = false ) {
+	public function code($typedescription, $includeSpecials = false) {
 		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
 		if ($includeSpecials) return $r;
 		if ($r > self::C_DATATYPE_SPECIFIED) return self::C_DATATYPE_SPECIFIED;
 		return $r;
 	}
-
 	/**
 	 * This method upgrades the column to the specified data type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -282,7 +242,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * @return void
 	 */
-	public function widenColumn( $type, $column, $datatype ) {
+	public function widenColumn($type, $column, $datatype) {
 		$table = $type;
 		$type = $datatype;
 		$table = $this->safeTable($table);
@@ -291,7 +251,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
 		$this->adapter->exec( $changecolumnSQL );
 	}
-
 	/**
 	 * Adds a Unique index constrain to the table.
 	 *
@@ -301,7 +260,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 *
 	 * @return void
 	 */
-	public function addUniqueIndex( $table,$columns ) {
+	public function addUniqueIndex($table,$columns) {
 		$table = $this->safeTable($table);
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach($columns as $k=>$v) {
@@ -320,7 +279,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
                 ADD UNIQUE INDEX $name (".implode(',',$columns).")";
 		$this->adapter->exec($sql);
 	}
-
 	/**
 	 * This method should add an index to a type and field with name
 	 * $name.
@@ -359,7 +317,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		);
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list); 
 	}
-
 	/**
 	 * Add the constraints for a specific database driver: MySQL.
 	 * @todo Too many arguments; find a way to solve this in a neater way.
@@ -374,7 +331,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	protected function constrain($table, $table1, $table2, $property1, $property2) {
 		try{
-			$db = $this->adapter->getCell('select database()');
+			$db = $this->adapter->getCell('SELECT database()');
 			$fks =  $this->adapter->getCell("
 				SELECT count(*)
 				FROM information_schema.KEY_COLUMN_USAGE
@@ -404,7 +361,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			return true;
 		} catch(Exception $e){ return false; }
 	}
-
 	/**
 	 * Drops all tables in database
 	 */
@@ -412,16 +368,14 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=0;');
 		foreach($this->getTables() as $t) {
 	 		try{
-	 			$this->adapter->exec("drop table if exists`$t`");
+	 			$this->adapter->exec("DROP TABLE IF EXISTS `$t`");
 	 		}
 	 		catch(Exception $e){}
 	 		try{
-	 			$this->adapter->exec("drop view if exists`$t`");
+	 			$this->adapter->exec("DROP VIEW IF EXISTS `$t`");
 	 		}
 	 		catch(Exception $e){}
 		}
 		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=1;');
 	}
-
-
 }

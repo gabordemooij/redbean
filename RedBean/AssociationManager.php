@@ -32,7 +32,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 *
 	 * @param RedBean_ToolBox $tools toolbox
 	 */
-	public function __construct( RedBean_ToolBox $tools ) {
+	public function __construct(RedBean_ToolBox $tools) {
 		$this->oodb = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
 		$this->writer = $tools->getWriter();
@@ -49,7 +49,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 *
 	 * @return string $table table
 	 */
-	public function getTable( $types ) {
+	public function getTable($types) {
 		return RedBean_QueryWriter_AQueryWriter::getAssocTableFormat($types);
 	}
 	/**
@@ -334,7 +334,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param array  $beans    beans
 	 * @param string $property property
 	 */
-	public function swap( $beans, $property ) {
+	public function swap($beans, $property) {
 		$bean1 = array_shift($beans);
 		$bean2 = array_shift($beans);
 		$tmp = $bean1->$property;
@@ -383,7 +383,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	*
 	* @return RedBean_OODBBean $bean
 	*/
-	public function relatedOne( RedBean_OODBBean $bean, $type, $sql=null, $values=array() ) {
+	public function relatedOne(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
 		$beans = $this->relatedSimple($bean, $type, $sql, $values);
 		if (count($beans)==0 || !is_array($beans)) return null;
 		return reset( $beans );

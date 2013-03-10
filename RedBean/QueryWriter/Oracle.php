@@ -14,47 +14,34 @@
  * with this source code in the file license.txt.
  */
 class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
-
 	/**
 	 * Adapter
 	 * @var RedBean_Adapter 
 	 */
 	protected $adapter;
-
-	/**
-	 * Here we describe the datatypes that RedBean
-	 * Uses internally. 
-
-	  /**
+	 /**
 	 * character to escape keyword table/column names
 	 * @var string
 	 */
 	protected $quoteCharacter = '"';
-
 	/**
 	 * DATA TYPE
 	 * Boolean Data type
 	 * @var integer
 	 */
-
 	const C_DATATYPE_BOOL = 0;
-
 	/**
-	 *
 	 * DATA TYPE
 	 * Unsigned 8BIT Integer
 	 * @var integer
 	 */
 	const C_DATATYPE_UINT8 = 1;
-
 	/**
-	 *
 	 * DATA TYPE
 	 * Unsigned 32BIT Integer
 	 * @var integer
 	 */
 	const C_DATATYPE_UINT32 = 2;
-
 	/**
 	 * DATA TYPE
 	 * Double precision floating point number and
@@ -62,7 +49,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @var integer
 	 */
 	const C_DATATYPE_DOUBLE = 3;
-
 	/**
 	 * DATA TYPE
 	 * Standard Text column (like varchar255)
@@ -70,16 +56,13 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT8 = 4;
-
 	/**
 	 * DATA TYPE
 	 * Long text column (16BIT)
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT16 = 5;
-
 	/**
-	 * 
 	 * DATA TYPE
 	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
 	 * This is the biggest column that RedBean supports. If possible you may write
@@ -87,21 +70,17 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT32 = 6;
-
 	/**
 	 * Special type date for storing date values: YYYY-MM-DD or YYYY-MM-DD HH:MM(:SS)
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_DATE = 80;
-
 	/**
 	 * Special type date for storing date values: YYYY-MM-DD HH:MM:SS.FF
 	 * @var integer
 	 */	
 	const C_DATATYPE_SPECIAL_TIMESTAMP = 81;
-
 	/**
-	 * 
 	 * DATA TYPE
 	 * Specified. This means the developer or DBA
 	 * has altered the column to a different type not
@@ -110,7 +89,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
-
 	/**
 	 * Spatial types
 	 * @var integer
@@ -122,7 +100,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	const C_DATATYPE_SPECIAL_MULTIPOINT = 104;
 	const C_DATATYPE_SPECIAL_MULTIPOLYGON = 105;
 	const C_DATATYPE_SPECIAL_GEOMETRYCOLLECTION = 106;
-
 	/**
 	 * Do everything that needs to be done to format a column name.
 	 *
@@ -130,10 +107,9 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return string $column name
 	 */
-	public function safeColumn($c,$q=false) {
+	public function safeColumn($c, $q=false) {
 			return parent::safeColumn((!$q) ? strtoupper($c):$c,$q);
 	}
-
 	/**
 	 * Do everything that needs to be done to format a column name.
 	 *
@@ -141,11 +117,9 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return string $column name
 	 */
-	public function safeTable($type,$q=false) {
+	public function safeTable($type, $q=false) {
 			return parent::safeTable((!$q) ? strtoupper($type) : $type,$q);
 	}
-
-	
 	/**
 	 * Do everything that needs to be done to format a table name.
 	 *
@@ -154,7 +128,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return string table name
 	 */
 	public function __construct(RedBean_Adapter $a) {
-
 		$this->adapter = $a;
 		$this->typeno_sqltype = array(
 			RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL => 'NUMBER(1,0)',
@@ -166,12 +139,10 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT32 => 'CLOB',
 			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE => 'DATE',
 			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP => 'TIMESTAMP(6)');
-
 		$this->sqltype_typeno = array();
 		foreach ($this->typeno_sqltype as $k => $v)
 			$this->sqltype_typeno[$v] = $k;
 	}
-
 	/**
 	 * Adds a Unique index constrain to the table.
 	 *
@@ -201,7 +172,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
                 ADD CONSTRAINT  $name UNIQUE (" . implode(',', $columns) . ")";
 		$this->adapter->exec($sql);
 	}
-
 	/**
 	 * Add the constraints for a specific database driver: Oracle.
 	 * @todo Too many arguments; find a way to solve this in a neater way.
@@ -216,13 +186,11 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	protected function constrain($table, $table1, $table2, $property1, $property2) {
 		try {
-
 			$table = strtoupper($this->safeTable($table));
 			$table1 = strtoupper($this->safeTable($table1));
 			$table2 = strtoupper($this->safeTable($table2));
 			$property1 = strtoupper($this->safeColumn($property1));
 			$property2 = strtoupper($this->safeColumn($property2));
-
 			$fks = $this->adapter->getCell("
 				SELECT COUNT(*)
 		        FROM ALL_CONS_COLUMNS A JOIN ALL_CONSTRAINTS C  ON A.CONSTRAINT_NAME = C.CONSTRAINT_NAME 
@@ -238,8 +206,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			if ($this->code($columns[$property2]) !== RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32) {
 				$this->widenColumn($table, $property2, edBean_QueryWriter_Oracle::C_DATATYPE_UINT32);
 			}
-
-
 			$sql = "
 				ALTER TABLE " . $table . "
 				ADD FOREIGN KEY($property1) references $table1(id) ON DELETE CASCADE";
@@ -253,7 +219,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			return false;
 		}
 	}
-
 	/**
 	 * Counts rows in a table.
 	 * Overridden because OCI want upper cased table name.
@@ -264,10 +229,9 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return integer $numRowsFound
 	 */
-	public function count($beanType,$addSQL = '', $params = array()) {
+	public function count($beanType, $addSQL = '', $params = array()) {
 		return parent::count(strtoupper($beanType),$addSQL,$params);
 	}
-
 	/**
 	 * Returns all tables in the database.
 	 *
@@ -276,7 +240,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	public function getTables() {
 		return $this->adapter->getCol('SELECT LOWER(table_name) FROM user_tables');
 	}
-
 	/**
 	 * This method should add an index to a type and field with name
 	 * $name.
@@ -297,7 +260,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			$this->adapter->exec("CREATE INDEX $name ON $table ($column) ");
 		} catch (Exception $e) {}
 	}
-
 	/**
 	 * Creates an empty, column-less table for a bean based on it's type.
 	 * This function creates an empty table for a bean. It uses the
@@ -320,7 +282,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
                 CONSTRAINT " . $safe_table_without_quotes . "_PK PRIMARY KEY (ID)
                 )";
 		$this->adapter->exec($sql);
-
 		$sql =
 				"CREATE SEQUENCE " . $safe_table_without_quotes . "_SEQ
             START WITH 1 
@@ -338,7 +299,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
             END " . $safe_table_without_quotes . "_SEQ_TRI;";
 		$this->adapter->exec($sql);
 	}
-
 	/**
 	 * This method adds a column to a table.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -351,14 +311,12 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 */
 	public function addColumn($type, $column, $field) {
-		// 
 		$columnTested = preg_replace('/^((own)|(shared))./', '', $column);
 		if (strtolower($columnTested) != $columnTested) {
 			throw new Exception($column . ' is not lowercase. With ORACLE you MUST only use lowercase properties in PHP, sorry!');
 		}
 		parent::addColumn(strtoupper($type), strtoupper($column), $field);
 	}
-
 	/**
 	 * Inserts a record into the database using a series of insert columns
 	 * and corresponding insertvalues. Returns the insert id.
@@ -373,10 +331,8 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		foreach ($insertcolumns as &$col) {
 			$col = strtoupper($col);
 		}
-
 		return parent::insertRecord(strtoupper($table), $insertcolumns, $insertvalues);
 	}
-
 	/**
 	 * This method returns the datatype to be used for primary key IDS and
 	 * foreign keys. Returns one if the data type constants.
@@ -386,7 +342,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	public function getTypeForID() {
 		return self::C_DATATYPE_UINT32;
 	}
-
 	/**
 	 * Returns an array containing the column names of the specified table.
 	 *
@@ -417,7 +372,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		}
 		return $columns;
 	}
-
 	/**
 	 * Returns the Type Code for a Column Description.
 	 * Given an SQL column description this method will return the corresponding
@@ -438,7 +392,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			return self::C_DATATYPE_SPECIFIED;
 		return $r;
 	}
-
 	/**
 	 * This method upgrades the column to the specified data type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -462,7 +415,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		$this->adapter->exec("ALTER TABLE $table DROP COLUMN $column");
 		$this->adapter->exec("ALTER TABLE $table RENAME COLUMN HOPEFULLYNOTEXIST TO $column");
 	}
-
 	/**
 	 * Tests whether a given SQL state is in the list of states.
 	 *
@@ -479,7 +431,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		);
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list);
 	}
-
 	/**
 	 * @todo Add documentation
 	 * 
@@ -490,7 +441,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	private function limitOracleIdentifierLength($id) {
 		return substr($id, 0, 30);
 	}
-
 	/**
 	 * This method updates (or inserts) a record, it takes
 	 * a table name, a list of update values ( $field => $value ) and an
@@ -511,7 +461,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		}
 		return parent::updateRecord(strtoupper($type), $updatevalues, $id);
 	}
-
 	/**
 	 * This method adds a foreign key from type and field to
 	 * target type and target field.
@@ -537,17 +486,13 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		$columnNoQ = strtoupper($this->safeColumn($field, true));
 		$targetColumn = strtoupper($this->safeColumn($targetField));
 		$targetColumnNoQ = strtoupper($this->safeColumn($targetField, true));
-		//$db = $this->adapter->getCell('select database()');
 		$fkName = 'FK_' . ($isDependent ? 'C_' : '') . $tableNoQ . '_' . $columnNoQ . '_' . $targetColumnNoQ;
 		$fkName = $this->limitOracleIdentifierLength($fkName);
-
 		$cfks = $this->adapter->getCell("
 			SELECT A.CONSTRAINT_NAME
 		    FROM ALL_CONS_COLUMNS A JOIN ALL_CONSTRAINTS C  ON A.CONSTRAINT_NAME = C.CONSTRAINT_NAME 
 			WHERE C.TABLE_NAME = '$tableNoQ' AND C.CONSTRAINT_TYPE = 'R'	AND COLUMN_NAME='$columnNoQ'");
-
 		$flagAddKey = false;
-
 		try {
 			//No keys
 			if (!$cfks) {
@@ -567,7 +512,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			}
 		} catch (Exception $e) {} //Failure of fk-constraints is not a problem
 	}
-
 	/**
 	 * This selects a record. You provide a
 	 * collection of conditions using the following format:
@@ -593,10 +537,8 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		foreach ($conditions as $column => $value) {
 			$upperCaseConditions[strtoupper($column)] = $value;
 		}
-
 		return parent::selectRecord(strtoupper($type), $upperCaseConditions, $addSql, $delete, $inverse, $all);
 	}
-
 	/**
 	 * Returns the Column Type Code (integer) that corresponds
 	 * to the given value type. This method is used to determine the minimum
@@ -608,13 +550,10 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function scanType($value, $flagSpecial = false) {
 		$this->svalue = $value;
-
 		if (is_null($value)) {
 			return RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL;
 		}
-
 		if ($flagSpecial) {
-
 			if (preg_match('/^\d{4}\-\d\d-\d\d(\s\d\d:\d\d(:\d\d)?)?$/', $value)) {
 				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE;
 			}
@@ -624,7 +563,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		}
 		$value = strval($value);
 		if (!$this->startsWithZeros($value)) {
-
 			if ($value == '1' || $value == '') {
 				return RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL;
 			}
@@ -646,7 +584,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		}
 		return RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT32;
 	}
-
 	/**
 	 * This method removes all beans of a certain type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -661,7 +598,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		$sql = "TRUNCATE TABLE $table ";
 		$this->adapter->exec($sql);
 	}
-
 	/**
 	 * Drops all tables in database
 	 */

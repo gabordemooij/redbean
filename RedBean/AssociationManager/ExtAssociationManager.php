@@ -25,10 +25,10 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 	 *
 	 * @return void
 	 */
-	public function extAssociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $baseBean ) {
-		$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
-		$baseBean->setMeta('type', $table );
-		return $this->associateBeans( $bean1, $bean2, $baseBean );
+	public function extAssociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $baseBean) {
+		$table = $this->getTable(array($bean1->getMeta('type') , $bean2->getMeta('type')));
+		$baseBean->setMeta('type', $table);
+		return $this->associateBeans($bean1, $bean2, $baseBean);
 	}
 	/**
 	 * Deprecated
@@ -38,7 +38,7 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 	 * @param mixed $extra
 	 * @return mixed 
 	 */
-	public function extAssociateSimple( $beans1, $beans2, $extra = null) {
+	public function extAssociateSimple($beans1, $beans2, $extra = null) {
 		if (!is_array($extra)) {
 			$info = json_decode($extra,true);
 			if (!$info) $info = array('extra'=>$extra);

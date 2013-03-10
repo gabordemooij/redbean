@@ -167,7 +167,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @param string $sql     the SQL string to be send to database server
 	 * @param array  $aValues the values that need to get bound to the query slots
 	 */
-	protected function runQuery($sql,$aValues) {
+	protected function runQuery($sql, $aValues) {
 		$this->connect();
 		if ($this->debug && $this->logger) {
 			$this->logger->log($sql, $aValues);
@@ -178,7 +178,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			} else {
 				$s = $this->pdo->prepare($sql);
 			}
-			$this->bindParams( $s, $aValues );
+			$this->bindParams($s, $aValues);
 			$s->execute();
 			$this->affected_rows = $s->rowCount();
 			if ($s->columnCount()) {
@@ -187,13 +187,13 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	    	} else {
 		    	$this->rs = array();
 		  	}
-		}catch(PDOException $e) {
+		} catch(PDOException $e) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
 			$err = $e->getMessage();
 			if ($this->debug && $this->logger) $this->logger->log('An error occurred: '.$err);
-            $x = new RedBean_Exception_SQL( $err, 0);
-      		$x->setSQLState( $e->getCode() );
+            $x = new RedBean_Exception_SQL($err, 0);
+      		$x->setSQLState($e->getCode());
 			throw $x;
 		}
 	}
@@ -204,7 +204,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *
 	 * @return array $results result
 	 */
-	public function GetAll( $sql, $aValues=array() ) {
+	public function GetAll($sql, $aValues=array()) {
 		$this->runQuery($sql,$aValues);
 		return $this->rs;
 	}
@@ -317,9 +317,9 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *
 	 * @return void
 	 */
-	public function setDebugMode( $tf, $logger = NULL ) {
+	public function setDebugMode($tf, $logger = NULL) {
 		$this->connect();
-		$this->debug = (bool)$tf;
+		$this->debug = (bool) $tf;
 		if ($this->debug and !$logger) $logger = new RedBean_Logger_Default();
 		$this->setLogger($logger);
 	}
@@ -328,7 +328,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *
 	 * @param RedBean_Logger $logger
 	 */
-	public function setLogger( RedBean_Logger $logger ) {
+	public function setLogger(RedBean_Logger $logger) {
 		$this->logger = $logger;
 	}
 	/**

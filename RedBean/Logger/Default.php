@@ -28,5 +28,3 @@ class RedBean_Logger_Default implements RedBean_Logger {
     }
   }
 }
-
-

@@ -24,7 +24,7 @@ interface RedBean_Adapter {
 	 *
 	 * @param string $sqlvalue value
 	 */
-	public function escape( $sqlvalue );
+	public function escape($sqlvalue);
 	/**
 	 * Executes an SQL Statement using an array of values to bind
 	 * If $noevent is TRUE then this function will not signal its
@@ -35,7 +35,7 @@ interface RedBean_Adapter {
 	 * @param array   $aValues values
 	 * @param boolean $noevent no event firing
 	 */
-	public function exec( $sql , $aValues=array(), $noevent=false);
+	public function exec($sql , $aValues=array(), $noevent=false);
 	/**
 	 * Executes an SQL Query and returns a resultset.
 	 * This method returns a multi dimensional resultset similar to getAll
@@ -45,7 +45,7 @@ interface RedBean_Adapter {
 	 * @param string $sql     SQL
 	 * @param array  $aValues values
 	 */
-	public function get( $sql, $aValues = array() );
+	public function get($sql, $aValues = array());
 	/**
 	 * Executes an SQL Query and returns a resultset.
 	 * This method returns a single row (one array) resultset.
@@ -57,7 +57,7 @@ interface RedBean_Adapter {
 	 *
 	 * @return array $aMultiDimArray row
 	 */
-	public function getRow( $sql, $aValues = array() );
+	public function getRow($sql, $aValues = array());
 	/**
 	 * Executes an SQL Query and returns a resultset.
 	 * This method returns a single column (one array) resultset.
@@ -69,7 +69,7 @@ interface RedBean_Adapter {
 	 *
 	 * @return array $aSingleDimArray column
 	 */
-	public function getCol( $sql, $aValues = array() );
+	public function getCol($sql, $aValues = array());
 	/**
 	 * Executes an SQL Query and returns a resultset.
 	 * This method returns a single cell, a scalar value as the resultset.
@@ -81,7 +81,7 @@ interface RedBean_Adapter {
 	 *
 	 * @return string $sSingleValue value from cell
 	 */
-	public function getCell( $sql, $aValues = array() );
+	public function getCell($sql, $aValues = array());
 	/**
 	 * Executes the SQL query specified in $sql and takes
 	 * the first two columns of the resultset. This function transforms the
@@ -95,7 +95,7 @@ interface RedBean_Adapter {
 	 *
 	 * @return array $associativeArray associative array result set
 	 */
-	public function getAssoc( $sql, $values = array() );
+	public function getAssoc($sql, $values = array());
 	/**
 	 * Returns the latest insert ID.
 	 *

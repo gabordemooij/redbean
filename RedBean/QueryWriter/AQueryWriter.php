@@ -17,73 +17,59 @@
  * with this source code in the file license.txt.
  */
 abstract class RedBean_QueryWriter_AQueryWriter {
-
 	/**
 	 * Scanned value (scanType) 
 	 * @var type
 	 */
 	protected $svalue;
-
 	/**
 	 * Supported Column Types.
 	 * @var array
 	 */
 	public $typeno_sqltype = array();
-
 	/**
 	 * Holds a reference to the database adapter to be used.
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
-
-	
 	/**
 	 * default value to for blank field (passed to PK for auto-increment)
 	 * @var string
 	 */
 	protected $defaultValue = 'NULL';
-
 	/**
 	 * character to escape keyword table/column names
 	 * @var string
 	 */
 	protected $quoteCharacter = '';
-
 	/**
 	 * Flag indicating whether we are using caching.
 	 * @var boolean
 	 */
 	protected $flagUseCache = false;
-	
 	/**
 	 * Flush key. A hash-like string that acts as a lock to verify
 	 * no intermediate queries have taken place.
 	 * @var string 
 	 */
 	protected $flushKey = '';
-	
 	/**
 	 * A storage for cached databasse result rows.
 	 * Each entry is a row.
 	 * @var array 
 	 */
 	protected $cache = array();
-	
 	/**
 	 * Contains aliases for association tables.
 	 * @var array
 	 */
 	protected static $renames = array();
-
 	/**
 	 * Constructor
 	 * Sets the default Bean Formatter, use parent::__construct() in
 	 * subclass to achieve this.
 	 */
-	public function __construct() {
-		
-	}
-
+	public function __construct() {}
 	/**
 	 * Do everything that needs to be done to format a table name.
 	 *
@@ -96,7 +82,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
 	}
-
 	/**
 	 * Do everything that needs to be done to format a column name.
 	 *
@@ -109,7 +94,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
 	}
-
 	/**
 	 * Returns the sql that should follow an insert statement.
 	 *
@@ -120,7 +104,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
   	protected function getInsertSuffix ($table) {
     	return '';
   	}
-
 	/**
 	 * Checks table name or column name.
 	 *
@@ -134,7 +117,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	    }
 		return $this->adapter->escape($table);
 	}
-
 	/**
 	 * Puts keyword escaping symbols around string.
 	 *
@@ -146,7 +128,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$q = $this->quoteCharacter;
 		return $q.$str.$q;
 	}
-
 	/**
 	 * This method adds a column to a table.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -156,9 +137,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param integer $field  data type for field
 	 *
 	 * @return void
-	 *
 	 */
-	public function addColumn( $type, $column, $field ) {
+	public function addColumn($type, $column, $field) {
 		$table = $type;
 		$type = $field;
 		$table = $this->safeTable($table);
@@ -167,7 +147,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$sql = "ALTER TABLE $table ADD $column $type ";
 		$this->adapter->exec( $sql );
 	}
-
 	/**
 	 * This method updates (or inserts) a record, it takes
 	 * a table name, a list of update values ( $field => $value ) and an
@@ -182,7 +161,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return integer $id the primary key ID value of the new record
 	 */
-	public function updateRecord( $type, $updatevalues, $id=null) {
+	public function updateRecord($type, $updatevalues, $id=null) {
 		$table = $type;
 		if (!$id) {
 			$insertcolumns =  $insertvalues = array();
@@ -202,10 +181,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$v[]=$uv['value'];
 		}
 		$sql .= implode(',', $p ) .' WHERE id = '.intval($id);
-		$this->adapter->exec( $sql, $v );
+		$this->adapter->exec($sql, $v);
 		return $id;
 	}
-
 	/**
 	 * Inserts a record into the database using a series of insert columns
 	 * and corresponding insertvalues. Returns the insert id.
@@ -216,7 +194,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return integer $insertid	  insert id from driver, new record id
 	 */
-	protected function insertRecord( $table, $insertcolumns, $insertvalues ) {
+	protected function insertRecord($table, $insertcolumns, $insertvalues) {
 		$default = $this->defaultValue;
 		$suffix = $this->getInsertSuffix($table);
 		$table = $this->safeTable($table);
@@ -231,18 +209,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue, $i );
 			}
 			$result = count($ids)===1 ? array_pop($ids) : $ids;
-		}
-		else {
+		} else {
 			$result = $this->adapter->getCell( "INSERT INTO $table (id) VALUES($default) $suffix");
 		}
 		if ($suffix) return $result;
 		$last_id = $this->adapter->getInsertID();
 		return $last_id;
 	}
-
-
-	
-
 	/**
 	 * This selects a record. You provide a
 	 * collection of conditions using the following format:
@@ -263,7 +236,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return array $records selected records
 	 */
-	public function selectRecord( $type, $conditions, $addSql=null, $delete=null, $inverse=false, $all=false ) { 
+	public function selectRecord($type, $conditions, $addSql=null, $delete=null, $inverse=false, $all=false) { 
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
 		if (!$delete && $this->flagUseCache) {
 			$key = serialize(array($type,$conditions,$addSql,$inverse,$all));
@@ -271,11 +244,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				//If SQL has been taken place outside of this method then something else then
 				//a select query might have happened!
 				$this->cache = array();
-			}
-			else {
-				if (isset($this->cache[$key])) { 
-					return $this->cache[$key];
-				}
+			} else {
+				if (isset($this->cache[$key])) return $this->cache[$key];
 			}
 		}
 		$table = $this->safeTable($type);
@@ -293,8 +263,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				&& preg_match('/^\d+$/',implode('',$values))) {
 				$sql .= implode(',',$values).') ';
 				$sqlConditions[] = $sql;
-			}
-			else {
+			} else {
 				$sql .= implode(',',array_fill(0,count($values),'?')).') ';
 				$sqlConditions[] = $sql;
 				if (!is_array($values)) $values = array($values);
@@ -308,12 +277,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (is_array($addSql)) {
 			if (count($addSql)>1) {
 				$bindings = array_merge($bindings,$addSql[1]);
-			}
-			else {
+			} else {
 				$bindings = array();
 			}
 			$addSql = $addSql[0];
-
 		}
 		$sql = '';
 		if (is_array($sqlConditions) && count($sqlConditions)>0) {
@@ -324,8 +291,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		elseif ($addSql) {
 			if ($all) {
 				$sql = " $addSql ";
-			} 
-			else {
+			} else {
 				$sql = " WHERE $addSql ";
 			}
 		}
@@ -337,8 +303,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		return $rows;
 	}
-
-
 	/**
 	 * This method removes all beans of a certain type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -353,7 +317,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$sql = "TRUNCATE $table ";
 		$this->adapter->exec($sql);
 	}
-
 	/**
 	 * Counts rows in a table.
 	 *
@@ -363,14 +326,11 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return integer $numRowsFound
 	 */
-	public function count($beanType,$addSQL = '',$params = array()) {
+	public function count($beanType, $addSQL = '', $params = array()) {
 		$sql = "SELECT count(*) FROM {$this->safeTable($beanType)} ";
 		if ($addSQL!='') $addSQL = ' WHERE '.$addSQL; 
 		return (int) $this->adapter->getCell($sql.$addSQL,$params);
 	}
-
-	
-
 	/**
 	 * This is a utility service method publicly available.
 	 * It allows you to check whether you can safely treat an certain value as an integer by
@@ -385,11 +345,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return boolean $value boolean result of analysis
 	 */
-	public static function canBeTreatedAsInt( $value ) {
+	public static function canBeTreatedAsInt($value) {
 		return (boolean) (ctype_digit(strval($value)) && strval($value)===strval(intval($value)));
 	}
-
-
 	/**
 	 * This method adds a foreign key from type and field to
 	 * target type and target field.
@@ -407,7 +365,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return void
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false) {
+	public function addFK($type, $targetType, $field, $targetField, $isDependent = false) {
 		$table = $this->safeTable($type);
 		$tableNoQ = $this->safeTable($type,true);
 		$targetTable = $this->safeTable($targetType);
@@ -425,7 +383,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
 		");
 		$flagAddKey = false;
-		
 		try{
 			//No keys
 			if (!$cfks) {
@@ -443,9 +400,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			}
 		}
 		catch(Exception $e) { } //Failure of fk-constraints is not a problem
-
 	}
-
 	/**
 	 * Renames an association. For instance if you would like to refer to
 	 * album_song as: track you can specify this by calling this method like:
@@ -469,9 +424,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public static function renameAssociation($from,$to = null) {
 		if (is_array($from)) {
-			foreach($from as $key => $value) {
-				self::$renames[$key] = $value;
-			}
+			foreach($from as $key => $value) self::$renames[$key] = $value;
 			return;
 		}
 		self::$renames[$from] = $to;
@@ -491,8 +444,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$assoc = ( implode('_', $types) );
 		return (isset(self::$renames[$assoc])) ? self::$renames[$assoc] : $assoc;
 	}
-
-
 	/**
 	 * Adds a constraint. If one of the beans gets trashed
 	 * the other, related bean should be removed as well.
@@ -503,27 +454,23 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return void
 	 */
-	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+	public function addConstraint(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$table1 = $bean1->getMeta('type');
 		$table2 = $bean2->getMeta('type');
 		$writer = $this;
 		$adapter = $this->adapter;
-		$table = RedBean_QueryWriter_AQueryWriter::getAssocTableFormat( array( $table1,$table2) );
-		
+		$table = RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($table1, $table2));
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
 		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
-
 		$table = $adapter->escape($table);
 		$table1 = $adapter->escape($table1);
 		$table2 = $adapter->escape($table2);
 		$property1 = $adapter->escape($property1);
 		$property2 = $adapter->escape($property2);
-
 		//Dispatch to right method
 		return $this->constrain($table, $table1, $table2, $property1, $property2);
 	}
-
 	/**
 	 * Checks whether a value starts with zeros. In this case
 	 * the value should probably be stored using a text datatype instead of a
@@ -535,22 +482,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$value = strval($value);
 		if (strlen($value)>1 && strpos($value,'0')===0 && strpos($value,'0.')!==0) {
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
-	
-	/**
-	 * Returns a modified value from ScanType.
-	 * Used for special types.
-	 * 
-	 * @return mixed $value changed value 
-	 */
-	public function getValue(){
-		return $this->svalue;
-	}
-	
 	/**
 	 * Turns caching on or off. Default: off.
 	 * If caching is turned on retrieval queries fired after eachother will
@@ -562,7 +497,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$this->flushCache();
 		$this->flagUseCache = (boolean) $yesNo;
 	}
-	
 	/**
 	 * Flushes the Query Writer Cache.
 	 */

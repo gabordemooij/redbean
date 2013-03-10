@@ -42,7 +42,7 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 	 *
 	 * @return void
 	 */
-	public function onEvent( $eventName, $adapter ) {
+	public function onEvent($eventName, $adapter) {
 		if ($eventName=='sql_exec') {
 			$sql = $adapter->getSQL();
 			$this->logs[] = $sql;

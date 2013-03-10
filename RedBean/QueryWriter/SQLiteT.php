@@ -15,45 +15,33 @@
  */
 class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 	/**
-	 *
 	 * @var RedBean_Adapter_DBAdapter
 	 * Holds database adapter
 	 */
 	protected $adapter;
-
 	/**
 	 * @var string
 	 * character to escape keyword table/column names
 	 */
   	protected $quoteCharacter = '`';
-
-	/**
-	 * Here we describe the datatypes that RedBean
-	 * Uses internally. If you write a QueryWriter for
-	 * RedBean you should provide a list of types like this.
-	 */
-
 	/**
 	 * DATA TYPE
 	 * Integer Data type
 	 * @var integer
 	 */
 	const C_DATATYPE_INTEGER = 0;
-
 	/**
 	 * DATA TYPE
 	 * Numeric Data type (for REAL and date/time)
 	 * @var integer
 	 */
 	const C_DATATYPE_NUMERIC = 1;
-
 	/**
 	 * DATA TYPE
 	 * Text type
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT = 2;
-
 	/**
 	 * DATA TYPE
 	 * Specified. This means the developer or DBA
@@ -63,30 +51,24 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
-
 	/**
 	 * Constructor
 	 * The Query Writer Constructor also sets up the database
 	 *
 	 * @param RedBean_Adapter_DBAdapter $adapter adapter
 	 */
-	public function __construct( RedBean_Adapter $adapter ) {
-	
+	public function __construct(RedBean_Adapter $adapter) {
 		$this->typeno_sqltype = array(
 			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER=>'INTEGER',
 			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC=>'NUMERIC',
 			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT=>'TEXT',
 		);
-		
 		$this->sqltype_typeno = array();
 		foreach($this->typeno_sqltype as $k=>$v)
 		$this->sqltype_typeno[$v]=$k;
-		
-				
 		$this->adapter = $adapter;
 		parent::__construct($adapter);
 	}
-
 	/**
 	 * This method returns the datatype to be used for primary key IDS and
 	 * foreign keys. Returns one if the data type constants.
@@ -96,7 +78,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	public function getTypeForID() {
 		return self::C_DATATYPE_INTEGER;
 	}
-
 	/**
 	 * Returns the MySQL Column Type Code (integer) that corresponds
 	 * to the given value type.
@@ -105,7 +86,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 *
 	 * @return integer $type type
 	 */
-	public function scanType( $value, $flagSpecial=false ) {
+	public function scanType($value, $flagSpecial=false) {
 		$this->svalue=$value;
 		if ($value===false) return self::C_DATATYPE_INTEGER;
 		if ($value===null) return self::C_DATATYPE_INTEGER; //for fks
@@ -119,7 +100,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		return self::C_DATATYPE_TEXT;
 	}
-
 	/**
 	 * Adds a column of a given type to a table
 	 *
@@ -127,14 +107,13 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param string  $column column
 	 * @param integer $type	  type
 	 */
-	public function addColumn( $table, $column, $type) {
+	public function addColumn($table, $column, $type) {
 		$column = $this->check($column);
 		$table = $this->check($table);
 		$type=$this->typeno_sqltype[$type];
 		$sql = "ALTER TABLE `$table` ADD `$column` $type ";
 		$this->adapter->exec( $sql );
 	}
-
 	/**
 	 * Returns the Type Code for a Column Description.
 	 * Given an SQL column description this method will return the corresponding
@@ -147,16 +126,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 *
 	 * @return integer $typecode code
 	 */
-	public function code( $typedescription, $includeSpecials = false ) {
+	public function code($typedescription, $includeSpecials = false) {
 		$r =  ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
 		if ($includeSpecials) return $r;
 		if ($r > self::C_DATATYPE_SPECIFIED) return self::C_DATATYPE_SPECIFIED;
 		return $r;
 	}
-
-	
-	
-	
 	/**
 	 * Gets all information about a table (from a type).
 	 * 
@@ -181,7 +156,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->tableArchive[$tableName] = $table;
 		return $table;
 	}
-	
 	/**
 	 * Puts a table. Updates the table structure.
 	 * In SQLite we can't change columns, drop columns, change or add foreign keys so we
@@ -225,9 +199,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$q[] = "DROP TABLE tmp_backup;";
 		$q[] = "PRAGMA foreign_keys = 1 ";
 		foreach($q as $sq) $this->adapter->exec($sq);
-		
 	}
-	
 	/**
 	 * This method upgrades the column to the specified data type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -238,13 +210,11 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 *
 	 * @return void
 	 */
-	public function widenColumn( $type, $column, $datatype ) {
+	public function widenColumn($type, $column, $datatype) {
 		$t = $this->getTable($type);
 		$t['columns'][$column] = $this->typeno_sqltype[$datatype];
 		$this->putTable($t);
 	}
-
-
 	/**
 	 * Returns all tables in the database
 	 *
@@ -254,18 +224,16 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return $this->adapter->getCol( "SELECT name FROM sqlite_master
 			WHERE type='table' AND name!='sqlite_sequence';" );
 	}
-
 	/**
 	 * Creates an empty, column-less table for a bean.
 	 *
 	 * @param string $table table
 	 */
-	public function createTable( $table ) {
+	public function createTable($table) {
 		$table = $this->safeTable($table);
 		$sql = "CREATE TABLE $table ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ";
 		$this->adapter->exec( $sql );
 	}
-
 	/**
 	 * Returns an array containing the column names of the specified table.
 	 *
@@ -273,7 +241,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 *
 	 * @return array $columns columns
 	 */
-	public function getColumns( $table ) {
+	public function getColumns($table) {
 		$table = $this->safeTable($table, true);
 		$columnsRaw = $this->adapter->get("PRAGMA table_info('$table')");
 		$columns = array();
@@ -282,7 +250,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		return $columns;
 	}
-
 	/**
 	 * Returns the indexes for type $type.
 	 * 
@@ -300,7 +267,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		return $indexInfoList;
 	}
-	
 	/**
 	 * Returns the keys for type $type.
 	 * 
@@ -317,7 +283,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		return $keyInfoList;
 	}
-	
 	/**
 	 * Adds a Unique index constrain to the table.
 	 *
@@ -335,7 +300,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$t['indexes'][$name] = array('name'=>$name);
 		$this->putTable($t);
 	}
-
 	/**
 	 * Given an Database Specific SQLState and a list of QueryWriter
 	 * Standard SQL States this function converts the raw SQL state to a
@@ -354,7 +318,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		);
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list);
 	}
-
 	/**
 	 * This method should add an index to a type and field with name
 	 * $name.
@@ -378,8 +341,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$t['indexes'][$name] = array('name'=>$column);
 		return $this->putTable($t);
 	}
-	
-	
 	/**
 	 * Counts rows in a table.
 	 * Uses SQLite optimization for deleting all records (i.e. no WHERE)
@@ -392,7 +353,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$table = $this->safeTable($type);
 		$this->adapter->exec("DELETE FROM $table");
 	}
-
 	/**
 	 * Adds a foreign key to a type
 	 *
@@ -404,10 +364,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 *
 	 * @return bool $success whether an FK has been added
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDep=false) {
+	public function addFK($type, $targetType, $field, $targetField, $isDep=false) {
 		return $this->buildFK($type, $targetType, $field, $targetField, $isDep);
 	}
-
 	/**
 	 * Adds a foreign key to a type
 	 *
@@ -422,7 +381,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @note: cant put this in try-catch because that can hide the fact
 	 * that database has been damaged. 
 	 */
-
 	protected function buildFK($type, $targetType, $field, $targetField,$constraint=false) {
 		$consSQL = ($constraint ? 'CASCADE' : 'SET NULL');
 		$t = $this->getTable($type);
@@ -444,8 +402,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->putTable($t);
 		return true;
 	}
-
-
 	/**
 	 * Add the constraints for a specific database driver: SQLite.
 	 * @todo Too many arguments; find a way to solve this in a neater way.
@@ -465,7 +421,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$secondState = $this->buildFK($table,$table2,$property2,'id',true);
 		return ($firstState && $secondState);
 	}
-
 	/**
 	 * Removes all tables and views from the database.
 	 * 
@@ -485,6 +440,4 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		$this->adapter->exec('PRAGMA foreign_keys = 1 ');
 	}
-	
-
 }

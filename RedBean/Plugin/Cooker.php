@@ -88,7 +88,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	 *
 	 * @return	array $beans beans
 	 */
-	public function graph( $array, $filterEmpty = false ) {
+	public function graph($array, $filterEmpty = false) {
       	$beans = array();
 		if (is_array($array) && isset($array['type'])) {
 			$type = $array['type'];
@@ -97,7 +97,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 			if (isset($array['id'])) {
 				if (self::$loadBeans) {
 					$id = (int) $array['id'];
-					$bean = $this->redbean->load($type,$id);
+					$bean = $this->redbean->load($type, $id);
 				} else {
 					throw new RedBean_Exception_Security('Attempt to load a bean in Cooker. Use enableBeanLoading to override but please read security notices first.');
 				}
@@ -106,7 +106,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 			}
 			foreach($array as $property=>$value) {
 				if (is_array($value)) {
-					$bean->$property = $this->graph($value,$filterEmpty);
+					$bean->$property = $this->graph($value, $filterEmpty);
 				} else {
 					if($value == '' && self::$useNULLForEmptyString){
 						$bean->$property = null;
@@ -116,7 +116,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 			return $bean;
 		} elseif (is_array($array)) {
 			foreach($array as $key=>$value) {
-				$listBean = $this->graph($value,$filterEmpty);
+				$listBean = $this->graph($value, $filterEmpty);
 				if (!($listBean instanceof RedBean_OODBBean)) {
 					throw new RedBean_Exception_Security('Expected bean but got :'.gettype($listBean)); 
 				}

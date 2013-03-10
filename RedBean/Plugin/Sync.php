@@ -97,7 +97,7 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 	 * @param string $database1 the source database
 	 * @param string $database2 the target database
 	 */
-	public static function syncSchema($database1,$database2) {
+	public static function syncSchema($database1, $database2) {
 		if (!isset(RedBean_Facade::$toolboxes[$database1])) throw new RedBean_Exception_Security('No database for this key: '.$database1);
 		if (!isset(RedBean_Facade::$toolboxes[$database2])) throw new RedBean_Exception_Security('No database for this key: '.$database2);
 		$db1 = RedBean_Facade::$toolboxes[$database1];

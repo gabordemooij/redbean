@@ -51,7 +51,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 *
 	 * @return string $escapedValue escaped value
 	 */
-	public function escape( $sqlvalue ) {
+	public function escape($sqlvalue) {
 		return $this->db->Escape($sqlvalue);
 	}
 	/**
@@ -71,12 +71,12 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 *
 	 * @return mixed  $undefSet	whatever driver returns, undefined
 	 */
-	public function exec( $sql , $aValues=array(), $noevent=false) {
+	public function exec($sql , $aValues=array(), $noevent=false) {
 		if (!$noevent) {
 			$this->sql = $sql;
 			$this->signal('sql_exec', $this);
 		}
-		return $this->db->Execute( $sql, $aValues );
+		return $this->db->Execute($sql, $aValues);
 	}
 	/**
 	 * Multi array SQL fetch. Fetches a multi dimensional array.
@@ -93,10 +93,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 *
 	 * @return array  $result	two dimensional array result set
 	 */
-	public function get( $sql, $aValues = array() ) {
+	public function get($sql, $aValues = array()) {
 		$this->sql = $sql;
 		$this->signal('sql_exec', $this);
-		return $this->db->GetAll( $sql,$aValues );
+		return $this->db->GetAll($sql, $aValues);
 	}
 	/**
 	 * Executes SQL and fetches a single row.
@@ -113,10 +113,10 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 *
 	 * @return array	$result	one dimensional array result set
 	 */
-	public function getRow( $sql, $aValues = array() ) {
+	public function getRow($sql, $aValues = array()) {
 		$this->sql = $sql;
 		$this->signal('sql_exec', $this);
-		return $this->db->GetRow( $sql,$aValues );
+		return $this->db->GetRow($sql, $aValues);
 	}
 	/**
 	 * Executes SQL and returns a one dimensional array result set.
@@ -134,7 +134,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 *
 	 * @return array  $result	one dimensional array result set
 	 */
-	public function getCol( $sql, $aValues = array() ) {
+	public function getCol($sql, $aValues = array()) {
 		$this->sql = $sql;
 		$this->signal('sql_exec', $this);
 		return $this->db->GetCol( $sql,$aValues );
@@ -158,7 +158,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 *
 	 * @return array  $result	multi dimensional assoc. array result set
 	 */
-	public function getAssoc( $sql, $aValues = array() ) {
+	public function getAssoc($sql, $aValues = array()) {
 		$this->sql = $sql;
 		$this->signal('sql_exec', $this);
 		$rows = $this->db->GetAll( $sql, $aValues );
@@ -174,7 +174,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 						$key = array_shift($row);
 						$value=$key;
 					}
-					$assoc[ $key ] = $value;
+					$assoc[$key] = $value;
 				}
 			}
 		}

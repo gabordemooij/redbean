@@ -33,7 +33,7 @@ class RedBean_Exception_SQL extends RuntimeException {
 	 * 
 	 * @return void
 	 */
-	public function setSQLState( $sqlState ) {
+	public function setSQLState($sqlState) {
 		$this->sqlState = $sqlState;
 	}
 	/**

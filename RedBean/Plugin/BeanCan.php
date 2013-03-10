@@ -54,7 +54,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 *
 	 * @return mixed $result result
 	 */
-	public function handleJSONRequest( $jsonString ) {
+	public function handleJSONRequest($jsonString) {
 		//Decode JSON string
 		$jsonArray = json_decode($jsonString,true);
 		if (!$jsonArray) return $this->resp(null,null,-32700,'Cannot Parse JSON');
@@ -69,8 +69,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		//Do we have params?
 		if (!isset($jsonArray['params'])) {
 			$data = array();
-		}
-		else {
+		} else {
 			$data = $jsonArray['params'];
 		}
 		//Check method signature
@@ -128,15 +127,14 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 * 
 	 * @return string $json a JSON encoded response ready for sending to client
 	 */
-	public function handleRESTGetRequest( $pathToResource ) {
+	public function handleRESTGetRequest($pathToResource) {
 		if (!is_string($pathToResource)) return $this->resp(null,0,-32099,'IR');
 		$resourceInfo = explode('/',$pathToResource);
 		$type = $resourceInfo[0];
 		try {
 			if (count($resourceInfo) < 2) {
 				return $this->resp(RedBean_Facade::findAndExport($type));
-			}
-			else {
+			} else {
 				$id = (int) $resourceInfo[1];
 				return $this->resp(RedBean_Facade::load($type,$id)->export(),$id);
 			}

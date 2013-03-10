@@ -241,11 +241,4 @@ interface RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function addIndex($type, $name, $column);
-	/**
-	 * Returns a modified value from ScanType.
-	 * Used for special types.
-	 * 
-	 * @return mixed $value changed value 
-	 */
-	public function getValue();
 }

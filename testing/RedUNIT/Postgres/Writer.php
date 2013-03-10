@@ -183,6 +183,15 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 		R::store($bean);
 		$cols = R::getColumns('bean');
 		asrt($cols['date'],'timestamp without time zone');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->point = '(92,12)';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['point'],'point');
+		
+		
         }	
 	
 }

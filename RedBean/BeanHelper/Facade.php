@@ -34,7 +34,7 @@ class RedBean_BeanHelper_Facade implements RedBean_BeanHelper {
 	 * @return type 
 	 */
 	public function getModelForBean(RedBean_OODBBean $bean) {
-		$modelName = RedBean_ModelHelper::getModelName( $bean->getMeta('type'), $bean );
+		$modelName = RedBean_ModelHelper::getModelName($bean->getMeta('type'), $bean);
 		if (!class_exists($modelName)) return null;
 		$obj = RedBean_ModelHelper::factory($modelName);
 		$obj->loadBean($bean);

@@ -137,7 +137,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			$this->connectInfo = array('pass' => $pass, 'user' => $user);
 		}
 	}
-	
 	/**
 	 * @todo add Documentation
 	 * 
@@ -146,7 +145,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function getNlsDateFormat(){
 		return $this->nlsDateFormat;
 	}
-	
 	/**
 	 * @todo add Documentation
 	 * 
@@ -155,7 +153,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function setNlsDateFormat($nlsDateFormat){
 		$this->nlsDateFormat = $nlsDateFormat;
 	}
-	
 	/**
 	 * @todo add Documentation
 	 * 
@@ -164,7 +161,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function getNlsTimestampFormat(){
 		return $this->nlsTimeStampFormat;
 	}
-	
 	/**
 	 * @todo add Documentation
 	 * 
@@ -173,16 +169,14 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function setNlsTimestampFormat($nlsTimestampFormat){
 		$this->nlsTimeStampFormat = $nlsTimestampFormat;
 	}
-	
 	/**
 	 * Gets RedBean_Logger object.
 	 *
 	 * @return RedBean_Logger
 	 */	
-	public function setLogger( RedBean_Logger $logger ) {
+	public function setLogger(RedBean_Logger $logger) {
 		$this->logger = $logger;
 	}
-	
 	/**
 	 * Gets RedBean_Logger object.
 	 *
@@ -191,7 +185,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function getLogger() {
 		return $this->logger;
 	}
-
 	/**
 	 * Toggles auto-commit.
 	 * 
@@ -200,7 +193,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function setAutoCommit($toggle) {
 		$this->autocommit = (bool) $toggle;
 	}
-
 	/**
 	 * Establishes a connection to the database using PHP PDO
 	 * functionality. If a connection has already been established this
@@ -229,7 +221,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			$this->isConnected = true;
 		}
 	}
-
 	/**
 	 * Runs a query. Internal function, available for subclasses. This method
 	 * runs the actual SQL query and binds a list of parameters to the query.
@@ -255,7 +246,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			if (oci_num_fields($this->statement)) {
 				$rows = array();
 				oci_fetch_all($this->statement, $rows, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
-
 				// This rewrite all the php properties in lowercase
 				foreach ($rows as $key => $row) {
 					foreach ($row as $field => $value) {
@@ -267,8 +257,7 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 				$this->rs = $rows;
 				if ($this->debug && $this->logger)
 					$this->logger->log('resultset: ' . count($this->rs) . ' rows');
-			}
-			else {
+			} else {
 				$this->rs = array();
 			}
 		} catch (PDOException $e) {
@@ -279,7 +268,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			throw $x;
 		}
 	}
-
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.
 	 *
@@ -291,7 +279,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$this->runQuery($sql, $aValues);
 		return $this->rs;
 	}
-
 	/**
 	 * Executes SQL code and allows key-value binding.
 	 * This function allows you to provide an array with values to bind
@@ -311,7 +298,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$this->runQuery($sql, $aValues);
 		return $this->affected_rows;
 	}
-
 	/**
 	 * Runs a query and fetches results as a column.
 	 *
@@ -329,7 +315,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		}
 		return $cols;
 	}
-
 	/**
 	 * (non-PHPdoc)
 	 * @see RedBean/RedBean_Driver#GetCell()
@@ -340,42 +325,30 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$col1 = array_shift($row1);
 		return $col1;
 	}
-
 	/**
 	 * (non-PHPdoc)
 	 * @see RedBean/RedBean_Driver#GetRow()
 	 */
 	public function GetRow($sql, $aValues = array()) {
-
 		$arr = $this->GetAll($sql, $aValues);
 		return array_shift($arr);
 	}
-
 	/**
 	 * (non-PHPdoc)
 	 * @see RedBean/RedBean_Driver#ErrorNo()
 	 */
 	public function ErrorNo() {
 		$error = oci_error($this->statement);
-		if (is_array($error)) 
-			return $error['code'];
-	    else 
-			return null;		
+		if (is_array($error)) return $error['code']; else return null;		
 	}
-
 	/**
 	 * (non-PHPdoc)
 	 * @see RedBean/RedBean_Driver#Errormsg()
 	 */
 	public function Errormsg() {
 		$error = oci_error($this->statement);
-		if (is_array($error)) 
-			return $error['message'];
-	    else 
-			return null;
-		
+		if (is_array($error)) return $error['message']; else return null;	
 	}
-
 	/**
 	 * Use oci binding to execute the binding and execute the query
 	 * 
@@ -408,33 +381,29 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 				oci_bind_by_name($this->statement, ':SLOT' . $key, ${'SLOT' . $key});
 			}
 		}
-
 		if ($isInsert) {
 			oci_bind_by_name($this->statement, ':ID', $this->lastInsertedId, 20, SQLT_INT);
 		}
-		
-
 		if ($this->debug){
-			if (!$this->autocommit)
+			if (!$this->autocommit) {
 				$result = oci_execute($this->statement, OCI_NO_AUTO_COMMIT);  // data not committed
-			else
+			} else {
 				$result = oci_execute($this->statement);
-		}else {  // no supression of warning
-			if (!$this->autocommit)
+			}
+		} else {  // no supression of warning
+			if (!$this->autocommit) {
 				$result = @oci_execute($this->statement, OCI_NO_AUTO_COMMIT);  // data not committed
-			else
-				$result = @oci_execute($this->statement);			
+			} else {
+				$result = @oci_execute($this->statement);
+			}
 		}
-
 		if (!$result) {
 			$error = oci_error($this->statement);
 			$x = new RedBean_Exception_SQL($error['message'] . ':' . $error['sqltext'], 0);
-
 			$x->setSQLState($this->mergeErrors($error['code']));
 			throw $x;
 		}
 	}
-
 	/**
 	 * Returns the underlying PHP OCI instance.
 	 *
@@ -453,7 +422,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		else
 			return $code;
 	}
-
 	/**
 	 * (non-PHPdoc)
 	 * @see RedBean/RedBean_Driver#Escape()
@@ -461,7 +429,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function Escape($str) {
 		return $str;
 	}
-
 	/**
 	 * Returns the latest insert ID if driver does support this
 	 * feature.
@@ -469,10 +436,8 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @return integer $id primary key ID
 	 */
 	public function GetInsertID() {
-		//$this->connect();
 		return $this->lastInsertedId;
 	}
-
 	/**
 	 * Returns the number of rows affected by the most recent query
 	 * if the currently selected PDO driver supports this feature.
@@ -483,7 +448,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$this->connect();
 		return (int) $this->affected_rows;
 	}
-
 	/**
 	 * Toggles debug mode. In debug mode the driver will print all
 	 * SQL to the screen together with some information about the
@@ -499,13 +463,12 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 *
 	 * @return void
 	 */
-	public function setDebugMode( $tf, $logger = NULL ) {
+	public function setDebugMode($tf, $logger = NULL) {
 		$this->connect();
 		$this->debug = (bool)$tf;
 		if ($this->debug and !$logger) $logger = new RedBean_Logger_Default();
 		$this->setLogger($logger);
 	}
-
 	/**
 	 * (non-PHPdoc)
 	 * @see RedBean/RedBean_Driver#GetRaw()
@@ -513,18 +476,15 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function GetRaw() {
 		return null;
 	}
-
 	/**
 	 * Returns TRUE if the current PDO instance is connected.
 	 * 
 	 * @return boolean $yesNO 
 	 */
 	public function isConnected() {
-		if (!$this->isConnected && !$this->connection)
-			return false;
+		if (!$this->isConnected && !$this->connection) return false;
 		return true;
 	}
-
 	/**
 	 * Closes database connection by destructing PDO.
 	 */
@@ -532,28 +492,24 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		$this->connection = null;
 		$this->isConnected = false;
 	}
-
 	/**
 	 * Starts a transaction.
 	 */
 	public function StartTrans() {
 		$this->autocommit = false;
 	}
-
 	/**
 	 * Commits a transaction.
 	 */
 	public function CommitTrans() {
 		oci_commit($this->connection);
 	}
-
 	/**
 	 * Rolls back a transaction.
 	 */
 	public function FailTrans() {
 		oci_rollback($this->connection);
 	}
-
 	/**
 	 * Returns the name of the database type/brand: i.e. mysql, db2 etc.
 	 * @return string $typeName
@@ -561,7 +517,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	public function getDatabaseType() {
 		return "OCI";
 	}
-
 	/**
 	 * Returns the version number of the database.
 	 * @return mixed $version 
@@ -575,4 +530,3 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		return $output['BANNER'][0];
 	}
 }
-

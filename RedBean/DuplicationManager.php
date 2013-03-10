@@ -37,7 +37,7 @@ class RedBean_DuplicationManager {
 	 * creates a new instance of DupManager.
 	 * @param RedBean_Toolbox $toolbox 
 	 */
-	public function __construct( RedBean_Toolbox $toolbox ) {
+	public function __construct(RedBean_Toolbox $toolbox) {
 		$this->toolbox = $toolbox;
 		$this->redbean = $toolbox->getRedBean();
 		$this->associationManager = $this->redbean->getAssociationManager();
@@ -100,7 +100,7 @@ class RedBean_DuplicationManager {
 	 * 
 	 * @return boolean 
 	 */
-	protected function hasOwnList($type,$target) {
+	protected function hasOwnList($type, $target) {
 		return (isset($this->columns[$target][$type.'_id']));
 	}
 	/**
@@ -112,7 +112,7 @@ class RedBean_DuplicationManager {
 	 * 
 	 * @return boolean 
 	 */
-	protected function hasSharedList($type,$target) {
+	protected function hasSharedList($type, $target) {
 		return (in_array(RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($type,$target)),$this->tables));
 	}
 	/**
@@ -140,7 +140,7 @@ class RedBean_DuplicationManager {
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
-	public function dup($bean,$trail=array(),$pid=false) {
+	public function dup($bean, $trail=array(), $pid=false) {
 		if (!count($this->tables))  $this->tables = $this->toolbox->getWriter()->getTables();
 		if (!count($this->columns)) foreach($this->tables as $table) $this->columns[$table] = $this->toolbox->getWriter()->getColumns($table);
 		$beanCopy = clone($bean);
@@ -171,7 +171,7 @@ class RedBean_DuplicationManager {
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
-	protected function duplicate($bean,$trail=array(),$pid=false) {
+	protected function duplicate($bean, $trail=array(), $pid=false) {
 		$type = $bean->getMeta('type');
 		$key = $type.$bean->getID();
 		if (isset($trail[$key])) return $bean;
@@ -222,7 +222,7 @@ class RedBean_DuplicationManager {
 	 * 
 	 * @return	array $array exported structure
 	 */
-	public function exportAll($beans,$parents=false,$filters=array()) {
+	public function exportAll($beans, $parents=false, $filters=array()) {
 		$array = array(); $copies = array(); $parentTypes = array();
 		if (!is_array($beans)) $beans = array($beans);
 		foreach($beans as $bean) {

@@ -26,9 +26,9 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 	 *
 	 * @return RedBean_Plugin_QueryLogger $querylogger instance of the Query Logger
 	 */
-	public static function getInstanceAndAttach( RedBean_Observable $adapter ) {
+	public static function getInstanceAndAttach(RedBean_Observable $adapter) {
 		$queryLog = new RedBean_Plugin_QueryLogger;
-		$adapter->addEventListener( 'sql_exec', $queryLog );
+		$adapter->addEventListener('sql_exec', $queryLog);
 		return $queryLog;
 	}
 	/**
@@ -46,7 +46,7 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 	 *
 	 * @return void
 	 */
-	public function onEvent( $eventName, $adapter ) {
+	public function onEvent($eventName, $adapter) {
 		if ($eventName=='sql_exec') {
 			$this->logs[] = $adapter->getSQL();
 		}
@@ -59,7 +59,7 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 	 *
 	 * @return array $entries entries that contain the keyword
 	 */
-	public function grep( $word ) {
+	public function grep($word) {
 		$found = array();
 		foreach($this->logs as $log) {
 			if (strpos($log,$word)!==false) {

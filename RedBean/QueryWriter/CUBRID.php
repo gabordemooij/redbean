@@ -15,53 +15,35 @@
  
  */
 class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
-
-	
 	/**
-	 * Here we describe the datatypes that RedBean
-	 * Uses internally. If you write a QueryWriter for
-	 * RedBean you should provide a list of types like this.
-	 */
-
-	/**
-	 *
 	 * DATA TYPE
 	 * Signed 4 byte Integer
 	 * @var integer
 	 */
 	const C_DATATYPE_INTEGER = 0;
-
 	/**
 	 * DATA TYPE
 	 * Double precision floating point number
 	 * @var integer
 	 */
 	const C_DATATYPE_DOUBLE = 1;
-	
 	/**
-	 *
 	 * DATA TYPE
 	 * Variable length text
 	 * @var integer
 	 */
 	const C_DATATYPE_STRING = 2;
-
-	
 	/**
 	 * Special type date for storing date values: YYYY-MM-DD
 	 * @var integer
 	 */	
 	const C_DATATYPE_SPECIAL_DATE = 80;
-	
 	/**
 	 * Special type datetime for store date-time values: YYYY-MM-DD HH:II:SS
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
-	
-
 	/**
-	 * 
 	 * DATA TYPE
 	 * Specified. This means the developer or DBA
 	 * has altered the column to a different type not
@@ -70,21 +52,16 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
-
-	
-	
 	/**
 	 * Holds the RedBean Database Adapter.
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
-
 	/**
 	 * character to escape keyword table/column names
 	 * @var string
 	 */
   	protected $quoteCharacter = '`';
-	
 	/**
 	 * Do everything that needs to be done to format a table name.
 	 *
@@ -98,8 +75,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
 	}
-
-	
 	/**
 	 * Do everything that needs to be done to format a column name.
 	 *
@@ -113,16 +88,13 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		if (!$noQuotes) $name = $this->noKW($name);
 		return $name;
 	}
-	
 	/**
 	 * Constructor.
 	 * The Query Writer Constructor also sets up the database.
 	 *
 	 * @param RedBean_Adapter_DBAdapter $adapter adapter
-	 *
 	 */
-	public function __construct( RedBean_Adapter $adapter ) {
-		
+	public function __construct(RedBean_Adapter $adapter) {
 		$this->typeno_sqltype = array(
 			RedBean_QueryWriter_CUBRID::C_DATATYPE_INTEGER => ' INTEGER ',
 			RedBean_QueryWriter_CUBRID::C_DATATYPE_DOUBLE => ' DOUBLE ',
@@ -130,16 +102,13 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATE => ' DATE ',
 			RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
 		);
-		
 		$this->sqltype_typeno = array();
 		foreach($this->typeno_sqltype as $k=>$v)
 		$this->sqltype_typeno[trim(($v))]=$k;
 		$this->sqltype_typeno['STRING(1073741823)'] = self::C_DATATYPE_STRING;
-		
 		$this->adapter = $adapter;
 		parent::__construct();
 	}
-
 	/**
 	 * This method returns the datatype to be used for primary key IDS and
 	 * foreign keys. Returns one if the data type constants.
@@ -149,7 +118,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	public function getTypeForID() {
 		return self::C_DATATYPE_INTEGER;
 	}
-
 	/**
 	 * Returns all tables in the database.
 	 *
@@ -159,7 +127,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$rows = $this->adapter->getCol( "SELECT class_name FROM db_class WHERE is_system_class = 'NO';" );
 		return $rows;
 	}
-
 	/**
 	 * Creates an empty, column-less table for a bean based on it's type.
 	 * This function creates an empty table for a bean. It uses the
@@ -169,19 +136,15 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return void
 	 */
-	public function createTable( $table ) {
+	public function createTable($table) {
 		$rawTable = $this->safeTable($table,true);
 		$table = $this->safeTable($table);
-		
-		$sql = '     CREATE TABLE '.$table.' (
-                     "id" integer AUTO_INCREMENT,
-					 CONSTRAINT "pk_'.$rawTable.'_id" PRIMARY KEY("id")
-		             )';
+		$sql = 'CREATE TABLE '.$table.' (
+                   "id" integer AUTO_INCREMENT,
+					CONSTRAINT "pk_'.$rawTable.'_id" PRIMARY KEY("id")
+		            )';
 		$this->adapter->exec( $sql );
 	}
-
-
-
 	/**
 	 * Returns an array containing the column names of the specified table.
 	 *
@@ -189,7 +152,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return array $columns columns
 	 */
-	public function getColumns( $table ) {
+	public function getColumns($table) {
 		$columns = array();
 		$table = $this->safeTable($table);
 		$columnsRaw = $this->adapter->get("SHOW COLUMNS FROM $table");
@@ -198,7 +161,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		}
 		return $columns;
 	}
-
 	/**
 	 * Returns the Column Type Code (integer) that corresponds
 	 * to the given value type.
@@ -207,13 +169,11 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return integer $type type
 	 */
-	public function scanType( $value, $flagSpecial=false ) {
-		$this->svalue = $value;
-		
+	public function scanType($value, $flagSpecial=false) {
+		$this->svalue = $value;		
 		if (is_null($value)) {
 			return self::C_DATATYPE_INTEGER;
 		}
-		
 		if ($flagSpecial) {
 			if (preg_match('/^\d{4}\-\d\d-\d\d$/',$value)) {
 				return self::C_DATATYPE_SPECIAL_DATE;
@@ -224,7 +184,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		}
 		$value = strval($value);
 		if (!$this->startsWithZeros($value)) {
-
 			if (is_numeric($value) && (floor($value)==$value) && $value >= -2147483647  && $value <= 2147483647 ) {
 				return self::C_DATATYPE_INTEGER;
 			}
@@ -232,10 +191,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 				return self::C_DATATYPE_DOUBLE;
 			}
 		}
-		
 		return self::C_DATATYPE_STRING;
 	}
-
 	/**
 	 * Returns the Type Code for a Column Description.
 	 * Given an SQL column description this method will return the corresponding
@@ -248,16 +205,12 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return integer $typecode code
 	 */
-	public function code( $typedescription, $includeSpecials = false ) {
-		
-		
+	public function code($typedescription, $includeSpecials = false) {
 		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
-		
 		if ($includeSpecials) return $r;
 		if ($r > self::C_DATATYPE_SPECIFIED) return self::C_DATATYPE_SPECIFIED;
 		return $r;
 	}
-	
 	/**
 	 * This method adds a column to a table.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -269,7 +222,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return void
 	 *
 	 */
-	public function addColumn( $type, $column, $field ) {
+	public function addColumn($type, $column, $field) {
 		$table = $type;
 		$type = $field;
 		$table = $this->safeTable($table);
@@ -278,8 +231,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$sql = "ALTER TABLE $table ADD COLUMN $column $type ";
 		$this->adapter->exec( $sql );
 	}
-
-
 	/**
 	 * This method upgrades the column to the specified data type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -290,7 +241,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return void
 	 */
-	public function widenColumn( $type, $column, $datatype ) {
+	public function widenColumn($type, $column, $datatype) {
 		$table = $type;
 		$type = $datatype;
 		$table = $this->safeTable($table);
@@ -299,7 +250,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
 		$this->adapter->exec( $changecolumnSQL );
 	}
-
 	/**
 	 * Adds a Unique index constrain to the table.
 	 *
@@ -309,7 +259,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return void
 	 */
-	public function addUniqueIndex( $table,$columns ) {
+	public function addUniqueIndex($table, $columns) {
 		$table = $this->safeTable($table);
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach($columns as $k=>$v) {
@@ -328,7 +278,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
                 ADD CONSTRAINT UNIQUE $name (".implode(',',$columns).")";
 		$this->adapter->exec($sql);
 	}
-
 	/**
 	 * Tests whether a given SQL state is in the list of states.
 	 *
@@ -345,8 +294,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		}
 		return false;
 	}
-
-	
 	/**
 	 * Adds a constraint. If one of the beans gets trashed
 	 * the other, related bean should be removed as well.
@@ -357,20 +304,18 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return void
 	 */
-	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
+	public function addConstraint(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$table1 = $bean1->getMeta('type');
 		$table2 = $bean2->getMeta('type');
 		$writer = $this;
 		$adapter = $this->adapter;
-		$table = RedBean_QueryWriter_AQueryWriter::getAssocTableFormat( array( $table1,$table2) );
+		$table = RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($table1, $table2));
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
 		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
 		//Dispatch to right method
 		return $this->constrain($table, $table1, $table2, $property1, $property2);
 	}
-
-	
 	/**
 	 * Add the constraints for a specific database driver: CUBRID
 	 * @todo Too many arguments; find a way to solve this in a neater way.
@@ -386,11 +331,10 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	protected function constrain($table, $table1, $table2, $property1, $property2) {
 		$writer = $this;
 		$adapter = $this->adapter;
-		$firstState = $this->buildFK($table,$table1,$property1,'id',true);
-		$secondState = $this->buildFK($table,$table2,$property2,'id',true);
+		$firstState = $this->buildFK($table, $table1, $property1, 'id', true);
+		$secondState = $this->buildFK($table, $table2, $property2, 'id', true);
 		return ($firstState && $secondState);
 	}
-
 	/**
 	 * This method should add an index to a type and field with name
 	 * $name.
@@ -405,13 +349,12 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	public function addIndex($type, $name, $column) {
 		$table = $type;
 		$table = $this->safeTable($table);
-		$name = preg_replace('/\W/','',$name);
+		$name = preg_replace('/\W/', '', $name);
 		$column = $this->safeColumn($column);
 		$index = $this->adapter->getRow("SELECT 1 as `exists` FROM db_index WHERE index_name = ? ",array($name));
 		if ($index && $index['exists']) return;   // positive number will return, 0 will continue.
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
 	}
-	
 	/**
 	 * This method adds a foreign key from type and field to
 	 * target type and target field.
@@ -432,8 +375,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false) {
 		return $this->buildFK($type, $targetType, $field, $targetField, $isDependent);
 	}
-	
-	
 	/**
 	 * This method adds a foreign key from type and field to
 	 * target type and target field.
@@ -451,7 +392,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return void
 	 */
-	protected function buildFK($type, $targetType, $field, $targetField,$isDep=false) {
+	protected function buildFK($type, $targetType, $field, $targetField, $isDep=false) {
 		$table = $this->safeTable($type);
 		$tableNoQ = $this->safeTable($type,true);
 		$targetTable = $this->safeTable($targetType);
@@ -472,8 +413,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 				}
 				break;
 			}
-		}
-		
+		}	
 		if ($needsToDropFK) {
 			$sql = "ALTER TABLE $table DROP FOREIGN KEY {$key['FK_NAME']} ";
 			$this->adapter->exec($sql);
@@ -481,9 +421,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$casc = ($isDep ? 'CASCADE' : 'SET NULL');
 		$sql = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
 		$this->adapter->exec($sql);
-	}	
-	
-	
+	}
 	/**
 	 * Drops all tables in database
 	 */
@@ -494,24 +432,19 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			}
 			$this->adapter->exec("DROP TABLE \"$t\"");
 		}
-		
 	}
-	
-	
 	/**
 	 * Obtains the keys of a table using the PDO schema function.
 	 * 
 	 * @param type $table
 	 * @return type 
 	 */
-	protected function getKeys($table,$table2=null) {
+	protected function getKeys($table, $table2=null) {
 		$pdo = $this->adapter->getDatabase()->getPDO();
-		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS,$table);//print_r($keys);
-		if ($table2) $keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS,$table2) );//print_r($keys);
-		
+		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS,$table);
+		if ($table2) $keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS,$table2) );
 		return $keys;
 	}
-	
 	/**
 	 * Checks table name or column name.
 	 *
@@ -525,5 +458,4 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	    }
 		return $table;
 	}
-	
 }

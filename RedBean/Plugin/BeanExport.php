@@ -13,50 +13,42 @@
  */
 
 class RedBean_Plugin_BeanExport implements RedBean_Plugin {
-
 	/**
 	 * @var null|\RedBean_Toolbox
 	 */
 	protected $toolbox = null;
-
 	/**
 	 * @var array
 	 * Array used to check for recursion. This avoids infinite loops.
 	 */
 	protected $recurCheck = array();
-	
 	/**
 	 * @var array
 	 * Recursion shield for types
 	 */
 	protected $recurTypeCheck = array();
-	
 	/**
 	 * @var boolean
 	 * Whether to use a type shield for recursion
 	 */
 	protected $typeShield = false;
-	
 	/**
 	 * @var integer
 	 * Current level of recursion depth
 	 */
 	protected $depth = 0;
-	
 	/**
 	 * @var integer
 	 * Maximum level of recursions allowed by user
 	 */
 	protected $maxDepth = false;
-
 	/**
 	 * Constructor
 	 * @param RedBean_Toolbox $toolbox
 	 */
-	public function __construct( RedBean_Toolbox $toolbox ) {
+	public function __construct(RedBean_Toolbox $toolbox) {
 		$this->toolbox = $toolbox;
 	}
-
 	/**
 	 * Loads Schema
 	 * @return void
@@ -73,7 +65,6 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		}
 		$this->tables = $tables;
 	}
-
 	/**
 	 *Returs a serialized representation of the schema
 	 *
@@ -82,7 +73,6 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	public function getSchema() {
 		return serialize($this->tables);
 	}
-
 	/**
 	 * Loads a schema from a string (containing serialized export of schema)
 	 *
@@ -91,8 +81,6 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	public function loadSchemaFromString($schema) {
 		$this->tables = unserialize($schema);
 	}
-
-
 	/**
 	 * Exports a collection of beans
 	 *
@@ -101,15 +89,13 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	 *
 	 * @return	array $export Exported beans
 	 */
-	public function export( $beans, $resetRecur=true ) {
-		
+	public function export($beans, $resetRecur=true) {
 		if ($resetRecur) {
 			$this->recurCheck = array();
 		}
 		if (!is_array($beans)) {
 			$beans = array($beans);
 		}
-		
 		if ($this->maxDepth!==false) {
 			$this->depth ++;
 			if ($this->depth > $this->maxDepth) {
@@ -117,7 +103,6 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 				return array();
 			}
 		}
-		
 		if ($this->typeShield===true) {
 			if (is_array($beans) && count($beans)>0) {
 				$firstBean = reset($beans);
@@ -131,22 +116,15 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 				$this->recurTypeCheck[ $type ] = true;
 			}
 		}
-		
-		
-		
 		$export = array();
 		foreach($beans as $bean) {
 			$export[$bean->getID()] = $this->exportBean( $bean );
 		}
-		
 		if ($this->maxDepth!==false) {
 			$this->depth --;
 		}
-		
 		return $export;
 	}
-	
-	
 	/**
 	 * Exports beans, just like export() but with additional
 	 * parameters for limitation on recursion and depth.
@@ -164,8 +142,6 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		$this->maxDepth = false;
 		return $export;
 	}
-	
-
 	/**
 	 * Exports a single bean
 	 *
