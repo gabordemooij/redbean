@@ -12,7 +12,6 @@
  * with this source code in the file license.txt.
  */
 interface RedBean_IModelFormatter {
-
 	/**
 	 * ModelHelper will call this method of the class
 	 * you provide to discover the model
@@ -21,7 +20,5 @@ interface RedBean_IModelFormatter {
 	 *
 	 * @return string $formattedModel
 	 */
-	public function formatModel( $model );
-
-
+	public function formatModel($model);
 }

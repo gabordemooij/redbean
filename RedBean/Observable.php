@@ -18,7 +18,6 @@ abstract class RedBean_Observable {
 	 * @var array
 	 */
 	private $observers = array();
-
 	/**
 	 * Implementation of the Observer Pattern.
 	 * Adds a listener to this instance.
@@ -34,14 +33,13 @@ abstract class RedBean_Observable {
 	 *
 	 * @return void
 	 */
-	public function addEventListener( $eventname, RedBean_Observer $observer ) {
-		if (!isset($this->observers[ $eventname ])) {
-			$this->observers[ $eventname ] = array();
+	public function addEventListener($eventname, RedBean_Observer $observer) {
+		if (!isset($this->observers[$eventname])) {
+			$this->observers[$eventname] = array();
 		}
 		foreach($this->observers[$eventname] as $o) if ($o==$observer) return;
-		$this->observers[ $eventname ][] = $observer;
+		$this->observers[$eventname][] = $observer;
 	}
-
 	/**
 	 * Implementation of the Observer Pattern.
 	 * Sends an event (signal) to the registered listeners
@@ -53,12 +51,8 @@ abstract class RedBean_Observable {
 	 * @param mixed  $info      info
 	 * @return unknown_ty
 	 */
-	public function signal( $eventname, $info ) {
-		if (!isset($this->observers[ $eventname ])) {
-			$this->observers[ $eventname ] = array();
-		}
-		foreach($this->observers[$eventname] as $observer) {
-			$observer->onEvent( $eventname, $info );
-		}
+	public function signal($eventname, $info) {
+		if (!isset($this->observers[ $eventname ])) $this->observers[$eventname] = array();
+		foreach($this->observers[$eventname] as $observer) $observer->onEvent( $eventname, $info );
 	}
 }

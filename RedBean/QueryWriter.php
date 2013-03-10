@@ -161,7 +161,7 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return boolean $isInList
 	 */
-	public function sqlStateIn( $state, $list );
+	public function sqlStateIn($state, $list);
 	/**
 	 * This method should remove all beans of a certain type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -210,7 +210,7 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return void
 	 */
-	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 );
+	public function addConstraint(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2);
 	/**
 	 * This method should add a foreign key from type and field to
 	 * target type and target field.
@@ -228,7 +228,7 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return void
 	 */
-	public function addFK( $type, $targetType, $field, $targetField);
+	public function addFK($type, $targetType, $field, $targetField);
 	/**
 	 * This method should add an index to a type and field with name
 	 * $name.

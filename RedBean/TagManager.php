@@ -36,7 +36,7 @@ class RedBean_TagManager {
 	 *
 	 * @param RedBean_Toolbox $toolbox 
 	 */
-	public function __construct( RedBean_Toolbox $toolbox ) {
+	public function __construct(RedBean_Toolbox $toolbox) {
 		$this->toolbox = $toolbox;
 		$this->redbean = $toolbox->getRedBean();
 		$this->associationManager = $this->redbean->getAssociationManager();
@@ -49,7 +49,7 @@ class RedBean_TagManager {
 	 * @return RedBean_OODBBean $bean | null
 	 */
 	public function findTagByTitle($title) {
-		$beans = $this->redbean->find('tag',array('title'=>array($title)));
+		$beans = $this->redbean->find('tag', array('title'=>array($title)));
 		if ($beans) {
 			$bean = reset($beans);
 			return $bean;
@@ -81,7 +81,6 @@ class RedBean_TagManager {
 		}
 		return (bool) (count($same)>0);
 	}
-
 	/**
 	 * Removes all sepcified tags from the bean. The tags specified in
 	 * the second parameter will no longer be associated with the bean.
@@ -91,11 +90,11 @@ class RedBean_TagManager {
 	 *
 	 * @return void
 	 */
-	public function untag($bean,$tagList) {
+	public function untag($bean, $tagList) {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		foreach($tags as $tag) {
 			if ($t = $this->findTagByTitle($tag)) {
-				$this->associationManager->unassociate( $bean, $t );
+				$this->associationManager->unassociate($bean, $t);
 			}
 		}
 	}
@@ -112,7 +111,7 @@ class RedBean_TagManager {
 	 *
 	 * @return string $commaSepListTags
 	 */
-	public function tag( RedBean_OODBBean $bean, $tagList = null ) {
+	public function tag(RedBean_OODBBean $bean, $tagList = null) {
 		if (is_null($tagList)) {
 			$tags = array();
 			$keys = $this->associationManager->related($bean, 'tag'); 
@@ -125,8 +124,8 @@ class RedBean_TagManager {
 			}
 			return $foundTags;
 		}
-		$this->associationManager->clearRelations( $bean, 'tag' );
-		$this->addTags( $bean, $tagList );
+		$this->associationManager->clearRelations($bean, 'tag');
+		$this->addTags($bean, $tagList);
 	}
 	/**
 	 * Adds tags to a bean.
@@ -139,7 +138,7 @@ class RedBean_TagManager {
 	 *
 	 * @return void
 	 */
-	public function addTags( RedBean_OODBBean $bean, $tagList ) {
+	public function addTags(RedBean_OODBBean $bean, $tagList) {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		if ($tagList===false) return;
 		foreach($tags as $tag) {
@@ -148,7 +147,7 @@ class RedBean_TagManager {
 				$t->title = $tag;
 				$this->redbean->store($t);
 			}
-			$this->associationManager->associate( $bean, $t );
+			$this->associationManager->associate($bean, $t);
 		}
 	}
 	/**
@@ -159,14 +158,14 @@ class RedBean_TagManager {
 	 *
 	 * @return array
 	 */
-	public function tagged( $beanType, $tagList ) {
+	public function tagged($beanType, $tagList) {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		$collection = array();
 		$tags = $this->redbean->find('tag',array('title'=>$tags));
 		if (is_array($tags) && count($tags)>0) {
-			$collectionKeys = $this->associationManager->related($tags,$beanType);
+			$collectionKeys = $this->associationManager->related($tags, $beanType);
 			if ($collectionKeys) {
-				$collection = $this->redbean->batch($beanType,$collectionKeys);
+				$collection = $this->redbean->batch($beanType, $collectionKeys);
 			}
 		}
 		return $collection;
@@ -180,7 +179,7 @@ class RedBean_TagManager {
 	 *
 	 * @return array
 	 */
-	public function taggedAll( $beanType, $tagList ) {
+	public function taggedAll($beanType, $tagList) {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
 		$beans = array();
 		foreach($tags as $tag) {

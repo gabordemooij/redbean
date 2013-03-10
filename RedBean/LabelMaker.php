@@ -12,14 +12,12 @@
  * with this source code in the file license.txt.
  *
  */
-class RedBean_LabelMaker {
-	
+class RedBean_LabelMaker {	
 	/**
 	 * Holds the toolbox for this instance.
 	 * @var RedBean_Toolbox 
 	 */
 	protected $toolbox;
-	
 	/**
 	 * Constructor.
 	 * The label maker requires a toolbox to function well.
@@ -29,7 +27,6 @@ class RedBean_LabelMaker {
 	public function __construct(RedBean_ToolBox $toolbox) {
 		$this->toolbox = $toolbox;
 	}
-	
 	/**
 	 * A label is a bean with only an id, type and name property.
 	 * This function will dispense beans for all entries in the array. The
@@ -41,7 +38,7 @@ class RedBean_LabelMaker {
 	 *
 	 * @return array $bean a list of beans with type and name property
 	 */
-	public function dispenseLabels($type,$labels) {
+	public function dispenseLabels($type, $labels) {
 		$labelBeans = array();
 		foreach($labels as $label) {
 			$labelBean = $this->toolbox->getRedBean()->dispense($type);
@@ -50,7 +47,6 @@ class RedBean_LabelMaker {
 		}
 		return $labelBeans;
 	}
-	
 	/**
 	 * Gathers labels from beans. This function loops through the beans,
 	 * collects the values of the name properties of each individual bean

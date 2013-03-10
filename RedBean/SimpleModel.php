@@ -18,14 +18,13 @@ class RedBean_SimpleModel {
 	 * @var RedBean_OODBBean
 	 */
 	protected $bean;
-
 	/**
 	 * Used by FUSE: the ModelHelper class to connect a bean to a model.
 	 * This method loads a bean in the model.
 	 *
 	 * @param RedBean_OODBBean $bean bean
 	 */
-	public function loadBean( RedBean_OODBBean $bean ) {
+	public function loadBean(RedBean_OODBBean $bean) {
 		$this->bean = $bean;
 	}
 	/**
@@ -36,7 +35,7 @@ class RedBean_SimpleModel {
 	 *
 	 * @return mixed $propertyValue value
 	 */
-	public function __get( $prop ) {
+	public function __get($prop) {
 		return $this->bean->$prop;
 	}
 	/**
@@ -45,7 +44,7 @@ class RedBean_SimpleModel {
 	 * @param string $prop  property
 	 * @param mixed  $value value
 	 */
-	public function __set( $prop, $value ) {
+	public function __set($prop, $value) {
 		$this->bean->$prop = $value;
 	}
 	/**

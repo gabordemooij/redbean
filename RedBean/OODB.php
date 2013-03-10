@@ -17,32 +17,27 @@
  * with this source code in the file license.txt.
  */
 class RedBean_OODB extends RedBean_Observable {
-
 	/**
 	 * Chill mode, for fluid mode but with a list of beans / types that
 	 * are considered to be stable and don't need to be modified.
 	 * @var array 
 	 */
 	protected $chillList = array();
-	
 	/**
 	 * List of dependencies. Format: $type => array($depensOnMe, $andMe)
 	 * @var array
 	 */
 	protected $dep = array();
-
 	/**
 	 * Secret stash. Used for batch loading.
 	 * @var array
 	 */
 	protected $stash = NULL;
-
 	/**
 	 * Contains the writer for OODB.
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $writer;
-	
 	/**
 	 * Whether this instance of OODB is frozen or not.
 	 * In frozen mode the schema will not de modified, in fluid mode
@@ -50,14 +45,12 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @var boolean
 	 */
 	protected $isFrozen = false;
-
 	/**
 	 * Bean Helper. The bean helper to give to the beans. Bean Helpers
 	 * assist beans in getting hold of a toolbox.
 	 * @var null|\RedBean_BeanHelperFacade
 	 */
 	protected $beanhelper = null;
-	
 	/**
 	 * Association Manager.
 	 * Reference to the Association Manager. The OODB class uses
@@ -66,7 +59,6 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @var RedBean_AssociationManager
 	 */
 	protected $assocManager = null;
-
 	/**
 	 * The RedBean OODB Class is the main class of RedBean.
 	 * It takes RedBean_OODBBean objects and stores them to and loads them from the
@@ -75,13 +67,12 @@ class RedBean_OODB extends RedBean_Observable {
 	 * Constructor, requires a DBAadapter (dependency inversion)
 	 * @param RedBean_Adapter_DBAdapter $adapter
 	 */
-	public function __construct( $writer ) {
+	public function __construct($writer) {
 		if ($writer instanceof RedBean_QueryWriter) {
 			$this->writer = $writer;
 		}
 		$this->beanhelper = new RedBean_BeanHelper_Facade();
 	}
-
 	/**
 	 * Toggles fluid or frozen mode. In fluid mode the database
 	 * structure is adjusted to accomodate your objects. In frozen mode
@@ -93,7 +84,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param boolean|array $trueFalse
 	 */
-	public function freeze( $tf ) {
+	public function freeze($tf) {
 		if (is_array($tf)) {
 			$this->chillList = $tf;
 			$this->isFrozen = false;
@@ -101,8 +92,6 @@ class RedBean_OODB extends RedBean_Observable {
 		else
 		$this->isFrozen = (boolean) $tf;
 	}
-
-
 	/**
 	 * Returns the current mode of operation of RedBean.
 	 * In fluid mode the database
@@ -115,7 +104,6 @@ class RedBean_OODB extends RedBean_Observable {
 	public function isFrozen() {
 		return (bool) $this->isFrozen;
 	}
-
 	/**
 	 * Dispenses a new bean (a RedBean_OODBBean Bean Object)
 	 * of the specified type. Always
@@ -146,7 +134,6 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		return (count($beans)===1) ? array_pop($beans) : $beans; 
 	}
-
 	/**
 	 * Sets bean helper to be given to beans.
 	 * Bean helpers assist beans in getting a reference to a toolbox.
@@ -155,11 +142,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @return void
 	 */
-	public function setBeanHelper( RedBean_BeanHelper $beanhelper) {
+	public function setBeanHelper(RedBean_BeanHelper $beanhelper) {
 		$this->beanhelper = $beanhelper;
 	}
-
-
 	/**
 	 * Checks whether a RedBean_OODBBean bean is valid.
 	 * If the type is not valid or the ID is not valid it will
@@ -170,7 +155,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @return void
 	 */
-	public function check( RedBean_OODBBean $bean ) {
+	public function check(RedBean_OODBBean $bean) {
 		//Is all meta information present?
 		if (!isset($bean->id) ) {
 			throw new RedBean_Exception_Security('Bean has incomplete Meta Information id ');
@@ -199,8 +184,6 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 	}
-
-
 	/**
 	 * Searches the database for a bean that matches conditions $conditions and sql $addSQL
 	 * and returns an array containing all the beans that have been found.
@@ -227,9 +210,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @return array $beans		  resulting beans
 	 */
-	public function find($type,$conditions=array(),$addSQL=null,$all=false) {
+	public function find($type,$conditions=array(), $addSQL=null, $all=false) {
 		try {
-			$beans = $this->convertToBeans($type,$this->writer->selectRecord($type,$conditions,$addSQL,false,false,$all));
+			$beans = $this->convertToBeans($type, $this->writer->selectRecord($type, $conditions, $addSQL, false, false, $all));
 			return $beans;
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
@@ -240,8 +223,6 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		return array();
 	}
-
-
 	/**
 	 * Checks whether the specified table already exists in the database.
 	 * Not part of the Object Database interface!
@@ -251,12 +232,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @return boolean $exists whether the given table exists within this database.
 	 */
 	public function tableExists($table) {
-		//does this table exist?
 		$tables = $this->writer->getTables();
 		return in_array(($table), $tables);
 	}
-
-
 	/**
 	 * Processes all column based build commands.
 	 * A build command is an additional instruction for the Query Writer. It is processed only when
@@ -272,12 +250,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	protected function processBuildCommands($table, $property, RedBean_OODBBean $bean) {
 		if ($inx = ($bean->getMeta('buildcommand.indexes'))) {
-			if (isset($inx[$property])) $this->writer->addIndex($table,$inx[$property],$property);
+			if (isset($inx[$property])) $this->writer->addIndex($table, $inx[$property], $property);
 		}
 	}
-
-
-
 	/**
 	 * Process groups. Internal function. Processes different kind of groups for
 	 * storage function. Given a list of original beans and a list of current beans,
@@ -293,15 +268,13 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @return array $result 	new relational state
 	 */
-	private function processGroups( $originals, $current, $additions, $trashcan, $residue ) {
+	private function processGroups($originals, $current, $additions, $trashcan, $residue) {
 		return array(
-			array_merge($additions,array_diff($current,$originals)),
-			array_merge($trashcan,array_diff($originals,$current)),
-			array_merge($residue,array_intersect($current,$originals))
+			array_merge($additions, array_diff($current, $originals)),
+			array_merge($trashcan, array_diff($originals, $current)),
+			array_merge($residue, array_intersect($current, $originals))
 		);
 	}
-
-	
 	/**
 	 * Figures out the desired type given the cast string ID.
 	 * 
@@ -324,7 +297,6 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		return $typeno;
 	}
-	
 	/**
 	 * Processes an embedded bean. First the bean gets unboxed if possible.
 	 * Then, the bean is stored if needed and finally the ID of the bean
@@ -340,7 +312,6 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		return $v->id;
 	}
-	
 	/**
 	 * Stores a bean in the database. This function takes a
 	 * RedBean_OODBBean Bean Object $bean and stores it
@@ -358,7 +329,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @return integer $newid resulting ID of the new bean
 	 */
-	public function store( $bean ) { 
+	public function store($bean) { 
 		if ($bean instanceof RedBean_SimpleModel) $bean = $bean->unbox();
 		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
 		$processLists = false;
@@ -413,7 +384,6 @@ class RedBean_OODB extends RedBean_Observable {
 		$this->signal('after_update',$bean);
 		return (int) $bean->id;
 	}
-	
 	/**
 	 * Stores a cleaned bean; i.e. only scalar values. This is the core of the store()
 	 * method. When all lists and embedded beans (parent objects) have been processed and
@@ -491,7 +461,6 @@ class RedBean_OODB extends RedBean_Observable {
 			$bean->setMeta('tainted',false);
 		}
 	}
-	
 	/**
 	 * Processes a list of beans from a bean. A bean may contain lists. This
 	 * method handles shared addition lists; i.e. the $bean->sharedObject properties.
@@ -499,17 +468,16 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean             the bean
 	 * @param array            $sharedAdditions  list with shared additions
 	 */
-	private function processSharedAdditions($bean,$sharedAdditions) {
+	private function processSharedAdditions($bean, $sharedAdditions) {
 		foreach($sharedAdditions as $addition) {
 			if ($addition instanceof RedBean_OODBBean) {
-				$this->assocManager->associate($addition,$bean);
+				$this->assocManager->associate($addition, $bean);
 			}
 			else {
 				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
 			}
 		}
 	}
-	
 	/**
 	 * Processes a list of beans from a bean. A bean may contain lists. This
 	 * method handles own lists; i.e. the $bean->ownObject properties.
@@ -527,7 +495,6 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 	}
-	
 	/**
 	 * Processes a list of beans from a bean. A bean may contain lists. This
 	 * method handles own lists; i.e. the $bean->ownObject properties.
@@ -540,7 +507,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean        the bean
 	 * @param array            $ownTrashcan list 
 	 */
-	private function processTrashcan($bean,$ownTrashcan) {
+	private function processTrashcan($bean, $ownTrashcan) {
 		$myFieldLink = $bean->getMeta('type').'_id';
 		if (is_array($ownTrashcan) && count($ownTrashcan)>0) {
 			$first = reset($ownTrashcan);
@@ -559,7 +526,6 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 	}
-	
 	/**
 	 * Processes embedded beans.
 	 * Each embedded bean will be indexed and foreign keys will
@@ -575,12 +541,10 @@ class RedBean_OODB extends RedBean_Observable {
 							'index_foreignkey_'.$bean->getMeta('type').'_'.$embeddedBean->getMeta('type'),
 							 $linkField);
 				$isDep = $this->isDependentOn($bean->getMeta('type'),$embeddedBean->getMeta('type'));
-				$this->writer->addFK($bean->getMeta('type'),$embeddedBean->getMeta('type'),$linkField,'id',$isDep);
+				$this->writer->addFK($bean->getMeta('type'), $embeddedBean->getMeta('type'), $linkField, 'id', $isDep);
 			}
-		}
-		
+		}	
 	}
-	
 	/**
 	 * Part of the store() functionality.
 	 * Handles all new additions after the bean has been saved.
@@ -591,7 +555,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean         bean
 	 * @param array            $ownAdditions list of addition beans in own-list 
 	 */
-	private function processAdditions($bean,$ownAdditions) {
+	private function processAdditions($bean, $ownAdditions) {
 		$myFieldLink = $bean->getMeta('type').'_id';
 		if ($bean && count($ownAdditions)>0) {
 			$first = reset($ownAdditions);
@@ -605,7 +569,6 @@ class RedBean_OODB extends RedBean_Observable {
 				$addition->$myFieldLink = $bean->id;
 				$addition->setMeta('cast.'.$myFieldLink,'id');
 				$this->store($addition);
-				
 				if (!$this->isFrozen) {
 					$this->writer->addIndex($addition->getMeta('type'),
 						'index_foreignkey_'.$addition->getMeta('type').'_'.$bean->getMeta('type'),
@@ -618,9 +581,7 @@ class RedBean_OODB extends RedBean_Observable {
 				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
 			}
 		}
-		
 	}
-	
 	/**
 	 * Checks whether reference type has been marked as dependent on target type.
 	 * This is the result of setting reference type as a key in R::dependencies() and
@@ -631,11 +592,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @return boolean 
 	 */
-	protected function isDependentOn($refType,$otherType) {
-		return (boolean) (isset($this->dep[$refType]) && in_array($otherType,$this->dep[$refType]));
+	protected function isDependentOn($refType, $otherType) {
+		return (boolean) (isset($this->dep[$refType]) && in_array($otherType, $this->dep[$refType]));
 	}
-	
-
 	/**
 	 * Loads a bean from the object database.
 	 * It searches for a RedBean_OODBBean Bean Object in the
@@ -658,14 +617,14 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @return RedBean_OODBBean $bean loaded bean
 	 */
-	public function load($type,$id) {
-		$bean = $this->dispense( $type );
+	public function load($type, $id) {
+		$bean = $this->dispense($type);
 		if ($this->stash && isset($this->stash[$id])) {
 			$row = $this->stash[$id];
 		}
 		else {
 			try {
-				$rows = $this->writer->selectRecord($type,array('id'=>array($id)));
+				$rows = $this->writer->selectRecord($type, array('id'=>array($id)));
 			}catch(RedBean_Exception_SQL $e ) {
 				if (
 				$this->writer->sqlStateIn($e->getSQLState(),
@@ -681,16 +640,15 @@ class RedBean_OODB extends RedBean_Observable {
 			if (empty($rows)) return $bean; // $this->dispense($type); -- no need...
 			$row = array_pop($rows);
 		}
-		$bean->setMeta('sys.orig',$row);
+		$bean->setMeta('sys.orig', $row);
 		foreach($row as $p=>$v) {
 			//populate the bean with the database row
 			$bean->$p = $v;
 		}
-		$this->signal('open',$bean );
-		$bean->setMeta('tainted',false);
+		$this->signal('open', $bean);
+		$bean->setMeta('tainted', false);
 		return $bean;
 	}
-
 	/**
 	 * Removes a bean from the database.
 	 * This function will remove the specified RedBean_OODBBean
@@ -700,7 +658,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean you want to remove from database
 	 */
-	public function trash( $bean ) {
+	public function trash($bean) {
 		if ($bean instanceof RedBean_SimpleModel) $bean = $bean->unbox();
 		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
 		$this->signal('delete',$bean);
@@ -709,10 +667,10 @@ class RedBean_OODB extends RedBean_Observable {
 				$bean->removeProperty($p);
 			}
 			if (is_array($v)) {
-				if (strpos($p,'own')===0) {
+				if (strpos($p, 'own')===0) {
 					$bean->removeProperty($p);
 				}
-				elseif (strpos($p,'shared')===0) {
+				elseif (strpos($p, 'shared')===0) {
 					$bean->removeProperty($p);
 				}
 			}
@@ -731,7 +689,6 @@ class RedBean_OODB extends RedBean_Observable {
 		$bean->id = 0;
 		$this->signal('after_delete', $bean );
 	}
-
 	/**
 	 * Returns an array of beans. Pass a type and a series of ids and
 	 * this method will bring you the correspondig beans.
@@ -746,7 +703,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @return array $beans resulting beans (may include empty ones)
 	 */
-	public function batch( $type, $ids ) {
+	public function batch($type, $ids) {
 		if (!$ids) return array();
 		$collection = array();
 		try {
@@ -771,7 +728,6 @@ class RedBean_OODB extends RedBean_Observable {
 		$this->stash = NULL;
 		return $collection;
 	}
-
 	/**
 	 * This is a convenience method; it converts database rows
 	 * (arrays) into beans. Given a type and a set of rows this method
@@ -789,12 +745,11 @@ class RedBean_OODB extends RedBean_Observable {
 		foreach($rows as $row) {
 			$id = $row['id'];
 			$this->stash[$id] = $row;
-			$collection[ $id ] = $this->load( $type, $id );
+			$collection[ $id ] = $this->load($type, $id);
 		}
 		$this->stash = NULL;
 		return $collection;
 	}
-
 	/**
 	 * Returns the number of beans we have in DB of a given type.
 	 *
@@ -804,9 +759,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @return integer $num number of beans found
 	 */
-	public function count($type,$addSQL='',$params=array()) {
+	public function count($type, $addSQL='', $params=array()) {
 		try {
-			return (int) $this->writer->count($type,$addSQL,$params);
+			return (int) $this->writer->count($type, $addSQL, $params);
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
@@ -814,7 +769,6 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		return 0;
 	}
-
 	/**
 	 * Trash all beans of a given type.
 	 *
@@ -833,7 +787,6 @@ class RedBean_OODB extends RedBean_Observable {
 			return false;
 		}
 	}
-
 	/**
 	 * Returns an Association Manager for use with OODB.
 	 * A simple getter function to obtain a reference to the association manager used for
@@ -846,7 +799,6 @@ class RedBean_OODB extends RedBean_Observable {
 		if (!isset($this->assocManager)) throw new Exception('No association manager available.');
 		return $this->assocManager;
 	}
-
 	/**
 	 * Sets the association manager instance to be used by this OODB.
 	 * A simple setter function to set the association manager to be used for storage and
@@ -859,8 +811,6 @@ class RedBean_OODB extends RedBean_Observable {
 	public function setAssociationManager(RedBean_AssociationManager $assoc) {
 		$this->assocManager = $assoc;
 	}
-	
-	
 	/**
 	 * Sets a dependency list. Dependencies can be used to make
 	 * certain beans depend on others. This causes dependent beans to get removed
@@ -886,7 +836,6 @@ class RedBean_OODB extends RedBean_Observable {
 	public function setDepList($dep) {
 		$this->dep = $dep;
 	}
-	
 	/**
 	 * Preloads certain properties for beans.
 	 * Understands aliases.
@@ -1060,5 +1009,3 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 	}
 }
-
-

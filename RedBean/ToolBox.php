@@ -48,7 +48,7 @@ class RedBean_ToolBox {
 	 *
 	 * return RedBean_ToolBox $toolbox Toolbox
 	 */
-	public function __construct(RedBean_OODB $oodb,RedBean_Adapter $adapter,RedBean_QueryWriter $writer) {
+	public function __construct(RedBean_OODB $oodb, RedBean_Adapter $adapter, RedBean_QueryWriter $writer) {
 		$this->oodb = $oodb;
 		$this->adapter = $adapter;
 		$this->writer = $writer;

@@ -16,19 +16,16 @@
  *
  */
 class RedBean_Finder {
-
 	/**
 	 * ToolBox for the Finder instance.
 	 * @var RedBean_ToolBox 
 	 */
 	protected $toolbox;
-	
 	/**
 	 * Holds the RedBeanPHP OODB instance for this object.
 	 * @var RedBean_OODB
 	 */
 	protected $redbean;
-	
 	/**
 	 * Constructor.
 	 * The Finder requires a toolbox.
@@ -39,7 +36,6 @@ class RedBean_Finder {
 		$this->toolbox = $toolbox;
 		$this->redbean = $toolbox->getRedBean();
 	}
-
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
@@ -53,12 +49,11 @@ class RedBean_Finder {
 	 *
 	 * @return array $beans  beans
 	 */
-	public function find( $type, $sql=null, $values=array() ) {
+	public function find($type, $sql=null, $values=array()) {
 		if ($sql instanceof RedBean_SQLHelper) list($sql,$values) = $sql->getQuery();
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
 		return $this->redbean->find($type,array(),array($sql,$values));
 	}
-	
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
@@ -78,12 +73,11 @@ class RedBean_Finder {
 	 *
 	 * @return array $beans  beans
 	 */
-	public function findAll( $type, $sql=null, $values=array() ) {
+	public function findAll($type, $sql=null, $values=array()) {
 		if ($sql instanceof RedBean_SQLHelper) list($sql,$values) = $sql->getQuery();
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
 		return $this->redbean->find($type,array(),array($sql,$values),true);
 	}
-	
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
@@ -99,14 +93,13 @@ class RedBean_Finder {
 	 * @return array $arrays arrays
 	 */
 	public function findAndExport($type, $sql=null, $values=array()) {
-		$items = $this->find( $type, $sql, $values );
+		$items = $this->find($type, $sql, $values);
 		$arr = array();
 		foreach($items as $key=>$item) {
 			$arr[$key]=$item->export();
 		}
 		return $arr;
 	}
-	
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
@@ -122,12 +115,11 @@ class RedBean_Finder {
 	 * @return RedBean_OODBBean $bean
 	 */
 	public function findOne( $type, $sql=null, $values=array()) {
-		$items = $this->find($type,$sql,$values);
+		$items = $this->find($type, $sql, $values);
 		$found = reset($items);
 		if (!$found) return null;
 		return $found;
 	}
-	
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
@@ -142,13 +134,12 @@ class RedBean_Finder {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public function findLast( $type, $sql=null, $values=array() ) {
-		$items = $this->find( $type, $sql, $values );
+	public function findLast($type, $sql=null, $values=array()) {
+		$items = $this->find($type, $sql, $values);
 		$found = end( $items );
 		if (!$found) return null;
 		return $found;
 	}
-	
 	/**
 	 * Convience method. Tries to find beans of a certain type,
 	 * if no beans are found, it dispenses a bean of that type.
@@ -159,7 +150,7 @@ class RedBean_Finder {
 	 *
 	 * @return array $beans Contains RedBean_OODBBean instances
 	 */
-	public function findOrDispense( $type, $sql=null, $values=array()) {
+	public function findOrDispense($type, $sql=null, $values=array()) {
 		$foundBeans = $this->find($type,$sql,$values);
 		if (count($foundBeans)==0) return array($this->redbean->dispense($type)); else return $foundBeans;
 	}
