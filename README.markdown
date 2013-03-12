@@ -46,11 +46,14 @@ Create `composer.json` in project root:
 	}
 	
 
-Setup:
+Install via composer:
+
+	php composer.phar install
+
+Autoloading:
 
 	require 'vendor/autoload.php';
 	use RedBean_Facade as R;
-
 
 
 More information
