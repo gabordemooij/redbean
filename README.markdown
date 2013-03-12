@@ -35,7 +35,7 @@ Yep, it's that simple.
 
 Install with Composer
 ------------------------
-You can use Redbean with [Composer](http://getcomposer.org/).
+You can use RedBean with [Composer](http://getcomposer.org/).
 
 Create `composer.json` in project root:
 
