@@ -33,6 +33,28 @@ How we store a book object with RedBean:
 
 Yep, it's that simple.
 
+Install with Composer
+------------------------
+You can use RedBean with [Composer](http://getcomposer.org/).
+
+Create `composer.json` in project root:
+
+	{
+    	"require": {
+        	"gabordemooij/redbean": "dev-master"
+    	}
+	}
+	
+
+Install via composer:
+
+	php composer.phar install
+
+Autoloading:
+
+	require 'vendor/autoload.php';
+	use RedBean_Facade as R;
+
 
 More information
 ----------------
