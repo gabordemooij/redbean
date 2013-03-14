@@ -41,25 +41,25 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
 	/**
-	 * Special type point. Only available through explicit cast.
+	 * Special type point.
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_POINT = 90;
 	/**
-	 * Special type line. Only available through explicit cast.
+	 * Special type line segment.
 	 * @var integer
 	 */
-	const C_DATATYPE_SPECIAL_LINE = 91;
+	const C_DATATYPE_SPECIAL_LSEG = 91;
 	/**
-	 * Special type path. Only available through explicit cast.
+	 * Special type circle.
 	 * @var integer
 	 */
-	const C_DATATYPE_SPECIAL_PATH = 92;
+	const C_DATATYPE_SPECIAL_CIRCLE = 92;
 	/**
-	 * Special type path. Only available through explicit cast.
+	 * Special type money.
 	 * @var integer
 	 */
-	const C_DATATYPE_SPECIAL_POLYGON = 93;
+	const C_DATATYPE_SPECIAL_MONEY = 93;
 	/**
 	 * Specified field type cannot be overruled
 	 * @var integer
@@ -113,9 +113,9 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 				  self::C_DATATYPE_SPECIAL_DATE => ' date ',
 				  self::C_DATATYPE_SPECIAL_DATETIME => ' timestamp without time zone ',
 				  self::C_DATATYPE_SPECIAL_POINT => ' point ',
-				  self::C_DATATYPE_SPECIAL_LINE => ' line ',
-				  self::C_DATATYPE_SPECIAL_PATH => ' path ',
-				  self::C_DATATYPE_SPECIAL_POLYGON => ' polygon ',
+				  self::C_DATATYPE_SPECIAL_LSEG => ' lseg ',
+				  self::C_DATATYPE_SPECIAL_CIRCLE => ' circle ',
+				  self::C_DATATYPE_SPECIAL_MONEY => ' money ',
 		);
 		$this->sqltype_typeno = array();
 		foreach($this->typeno_sqltype as $k=>$v)
@@ -177,8 +177,17 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d(\.\d{1,6})?$/',$value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME;
 			}
-			if (preg_match('/^\(\d+,\d+\)$/',$value)) {
+			if (preg_match('/^\([\d\.]+,[\d\.]+\)$/',$value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_POINT;
+			}
+			if (preg_match('/^\[\([\d\.]+,[\d\.]+\),\([\d\.]+,[\d\.]+\)\]$/',$value)) {
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_LSEG;
+			}
+			if (preg_match('/^\<\([\d\.]+,[\d\.]+\),[\d\.]+\>$/',$value)) {
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_CIRCLE;
+			}
+			if (preg_match('/^\$\s?\d+/',$value)) {
+				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_MONEY;
 			}
 		}
 		$sz = ($this->startsWithZeros($value));

@@ -190,6 +190,64 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 		R::store($bean);
 		$cols = R::getColumns('bean');
 		asrt($cols['point'],'point');
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->point,'(92,12)');
+		$bean->note = 'taint';
+		R::store($bean);
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->point,'(92,12)');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->point = '(9.2,1.2)';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['point'],'point');
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->point,'(9.2,1.2)');
+		$bean->note = 'taint';
+		R::store($bean);
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->point,'(9.2,1.2)');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->line = '[(1.2,1.4),(2.2,34)]';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['line'],'lseg');
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->line,'[(1.2,1.4),(2.2,34)]');
+		$bean->note = 'taint';
+		R::store($bean);
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->line,'[(1.2,1.4),(2.2,34)]');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->circle = '<(9.2,1.2),7.9>';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['circle'],'circle');
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->circle,'<(9.2,1.2),7.9>');
+		$bean->note = 'taint';
+		R::store($bean);
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->circle,'<(9.2,1.2),7.9>');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->money = '$123.45';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['money'],'money');
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->money,'$123.45');
+		$bean->note = 'taint';
+		R::store($bean);
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->money,'$123.45');
 		
 		
         }	
