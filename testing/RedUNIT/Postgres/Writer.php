@@ -249,6 +249,63 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 		$bean = R::load('bean',$bean->id);
 		asrt($bean->money,'$123.45');
 		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->money = '$123.45';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['money'],'money');
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->money,'$123.45');
+		$bean->note = 'taint';
+		R::store($bean);
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->money,'$123.45');
+		
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->money = '-$123.45';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['money'],'money');
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->money,'-$123.45');
+		$bean->note = 'taint';
+		R::store($bean);
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->money,'-$123.45');
+		
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->data = 'abcdefghijk';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['data'],'text');
+		$bean = R::load('bean',$bean->id);
+		asrt($bean->data,'abcdefghijk');
+		$bean->data = '(1,2)';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['data'],'text');
+		$bean->data = '[(1.2,1.4),(2.2,34)]';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['data'],'text');
+		$bean->data = '<(9.2,1.2),7.9>';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['data'],'text');
+		$bean->data = '$25';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['data'],'text');
+		$bean->data = '2012-10-10 10:00:00';
+		R::store($bean);
+		$cols = R::getColumns('bean');
+		asrt($cols['data'],'text');
+		
+		
 		
         }	
 	

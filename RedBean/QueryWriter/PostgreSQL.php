@@ -186,7 +186,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			if (preg_match('/^\<\([\d\.]+,[\d\.]+\),[\d\.]+\>$/',$value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_CIRCLE;
 			}
-			if (preg_match('/^\$\s?\d+/',$value)) {
+			if (preg_match('/^\-?\$\d+/',$value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_MONEY;
 			}
 		}
