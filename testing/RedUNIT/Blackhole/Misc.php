@@ -31,6 +31,29 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 	 */
 	public function run() {
 
+		testpack('Test with- and withCondition with Query Builder');
+		R::nuke();
+		$book = R::dispense('book');
+		$page = R::dispense('page');
+		$page->num = 1;
+		$book->ownPage[] = $page;
+		$page = R::dispense('page');
+		$page->num = 2;
+		$book->ownPage[] = $page;
+		$id = R::store($book);
+		$book = R::load('book',$id);
+		asrt(count($book->ownPage),2);
+		$book = R::load('book',$id);
+		asrt(count($book->withCondition(R::$f->begin()->num(' > 1'))->ownPage),1);
+		$book = R::load('book',$id); 
+		asrt(count($book->withCondition(R::$f->begin()->num(' < ?')->put(2))->ownPage),1);
+		$book = R::load('book',$id);
+		asrt(count($book->with(R::$f->begin()->limit(' 1 '))->ownPage),1);
+		$book = R::load('book',$id);
+		asrt(count($book->withCondition(R::$f->begin()->num(' < 3'))->ownPage),2);
+		$book = R::load('book',$id);
+		asrt(count($book->with(R::$f->begin()->limit(' 2 '))->ownPage),2);
+		
 		testpack('Transaction suppr. in fluid mode');
 		R::freeze(false);
 		asrt(R::begin(),false);
@@ -40,7 +63,69 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		asrt(R::begin(),true);
 		asrt(R::commit(),true);
 		R::freeze(false);
-
+		
+		testpack('Test transaction in facade');
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->name = 'a';
+		R::store($bean);
+		R::trash($bean);
+		R::freeze(true);
+		$bean = R::dispense('bean');
+		$bean->name = 'a';
+		R::store($bean);	
+		asrt(R::count('bean'),1);
+		R::trash($bean);
+		asrt(R::count('bean'),0);
+		$bean = R::dispense('bean');
+		$bean->name = 'a';
+		try {
+			R::transaction(function()use($bean){
+				R::store($bean);	
+				R::transaction(function(){
+					throw new Exception();
+				});
+			});
+		}
+		catch(Exception $e) {
+			pass();
+		}
+		asrt(R::count('bean'),0);
+		$bean = R::dispense('bean');
+		$bean->name = 'a';
+		try {
+			R::transaction(function()use($bean){
+				R::transaction(function()use($bean){
+					R::store($bean);
+					throw new Exception();
+				});
+			});
+		}
+		catch(Exception $e) {
+			pass();
+		}
+		asrt(R::count('bean'),0);
+		$bean = R::dispense('bean');
+		$bean->name = 'a';
+		try {
+			R::transaction(function()use($bean){
+				R::transaction(function()use($bean){
+					R::store($bean);
+				});
+			});
+		}
+		catch(Exception $e) {
+			pass();
+		}
+		asrt(R::count('bean'),1);
+		R::freeze(false);
+		try {
+			R::transaction('nope');
+			fail();
+		}
+		catch(Exception $e) {
+			pass();
+		}
 		testpack('Test Camelcase 2 underscore');
 		$names = array(
 			'oneACLRoute'=>'one_acl_route',
