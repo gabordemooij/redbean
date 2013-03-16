@@ -77,6 +77,16 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql {
 				->get('cell');
 		asrt(($value == 2),true);
 		
+		//test nesting
+		$bean = R::dispense('bean');
+		$bean->num = 2;
+		R::store($bean);
+		$value = $mixer->begin()
+				->select('num')->from('bean')->where('num IN')
+					->nest($mixer->getNew()->begin()->addSQL(' ( 2 ) '))
+				->get('cell');
+		asrt(($value == 2),true);
+		
 	}
 
 }

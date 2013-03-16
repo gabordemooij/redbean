@@ -140,6 +140,17 @@
 		return $list;
 	}
 	/**
+	 * Nests another query builder query in the current query.
+	 * 
+	 * @param RedBean_SQLHelper $sqlHelper 
+	 */
+	public function nest(RedBean_SQLHelper $sqlHelper) {
+		list($sql, $params) = $sqlHelper->getQuery();
+		$this->sql .= $sql;
+		$this->params += $params;
+		return $this;
+	}
+	/**
 	 * Writes a '(' to the sql query.
 	 */
 	public function open() {
@@ -171,5 +182,13 @@
 		else {
 			return '';
 		}
+	}
+	/**
+	 * Returns a new SQL Helper with the same adapter as the current one.
+	 * 
+	 * @return RedBean_SQLHelper 
+	 */
+	public function getNew() {
+		return new self($this->adapter);
 	}
 }
