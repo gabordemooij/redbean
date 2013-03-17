@@ -125,7 +125,7 @@
 	 */
 	public function addSQL($sql) {
 		if ($this->capture) {
-			$this->sql .= ' '.$sql . ' ';
+			$this->sql .= ' '.$sql.' ';
 			return $this;
 		}
 	}
@@ -135,7 +135,7 @@
 	 * @return array $queryParts query parts. 
 	 */
 	public function getQuery() {
-		$list = array($this->sql,$this->params);
+		$list = array($this->sql, $this->params);
 		$this->clear();
 		return $list;
 	}
@@ -171,15 +171,15 @@
 	/**
 	 * Generates question mark slots for an array of values.
 	 *
-	 * @param array $array
+	 * @param array $array Array with values to generate slots for
+	 * 
 	 * @return string $slots
 	 */
 	public function genSlots($array) {
 		if (is_array($array) && count($array)>0) {
-			$filler = array_fill(0,count($array),'?');
-			return implode(',',$filler);
-		}
-		else {
+			$filler = array_fill(0, count($array), '?');
+			return implode(',', $filler);
+		} else {
 			return '';
 		}
 	}

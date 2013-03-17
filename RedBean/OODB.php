@@ -625,7 +625,7 @@ class RedBean_OODB extends RedBean_Observable {
 		else {
 			try {
 				$rows = $this->writer->selectRecord($type, array('id'=>array($id)));
-			}catch(RedBean_Exception_SQL $e ) {
+			} catch(RedBean_Exception_SQL $e ) {
 				if (
 				$this->writer->sqlStateIn($e->getSQLState(),
 				array(
@@ -637,7 +637,7 @@ class RedBean_OODB extends RedBean_Observable {
 					if ($this->isFrozen) throw $e; //only throw if frozen;
 				}
 			}
-			if (empty($rows)) return $bean; // $this->dispense($type); -- no need...
+			if (empty($rows)) return $bean;
 			$row = array_pop($rows);
 		}
 		$bean->setMeta('sys.orig', $row);
@@ -675,10 +675,10 @@ class RedBean_OODB extends RedBean_Observable {
 				}
 			}
 		}
-		if (!$this->isFrozen) $this->check( $bean );
+		if (!$this->isFrozen) $this->check($bean);
 		try {
 			$this->writer->selectRecord($bean->getMeta('type'),
-				array('id' => array( $bean->id) ),null,true );
+				array('id' => array( $bean->id) ), null, true );
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
@@ -687,7 +687,7 @@ class RedBean_OODB extends RedBean_Observable {
 			)) throw $e;
 		}
 		$bean->id = 0;
-		$this->signal('after_delete', $bean );
+		$this->signal('after_delete', $bean);
 	}
 	/**
 	 * Returns an array of beans. Pass a type and a series of ids and
@@ -714,7 +714,6 @@ class RedBean_OODB extends RedBean_Observable {
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
-
 			$rows = false;
 		}
 		$this->stash = array();
@@ -723,7 +722,7 @@ class RedBean_OODB extends RedBean_Observable {
 			$this->stash[$row['id']] = $row;
 		}
 		foreach($ids as $id) {
-			$collection[ $id ] = $this->load( $type, $id );
+			$collection[$id] = $this->load($type, $id);
 		}
 		$this->stash = NULL;
 		return $collection;
@@ -745,7 +744,7 @@ class RedBean_OODB extends RedBean_Observable {
 		foreach($rows as $row) {
 			$id = $row['id'];
 			$this->stash[$id] = $row;
-			$collection[ $id ] = $this->load($type, $id);
+			$collection[$id] = $this->load($type, $id);
 		}
 		$this->stash = NULL;
 		return $collection;
@@ -762,7 +761,7 @@ class RedBean_OODB extends RedBean_Observable {
 	public function count($type, $addSQL='', $params=array()) {
 		try {
 			return (int) $this->writer->count($type, $addSQL, $params);
-		}catch(RedBean_Exception_SQL $e) {
+		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
@@ -780,7 +779,7 @@ class RedBean_OODB extends RedBean_Observable {
 		try {
 			$this->writer->wipe($type);
 			return true;
-		}catch(RedBean_Exception_SQL $e) {
+		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 			)) throw $e;
@@ -903,7 +902,6 @@ class RedBean_OODB extends RedBean_Observable {
 								$currentInputBeanIDs[$addInputID] = $addInputID;
 							}
 							$nestedBean->setMeta('sys.input-bean-id',$currentInputBeanIDs);	
-						
 						$filtered[] = $bean->$nesting;
 					}
 				}
@@ -962,8 +960,7 @@ class RedBean_OODB extends RedBean_Observable {
 						}
 					}
 				}
-			}
-			elseif (strpos($field,'own')===0) {//preload for own-list using find
+			} elseif (strpos($field,'own')===0) {//preload for own-list using find
 				$link = $bean->getMeta('type').'_id';
 				$children = $this->find($type,array($link=>$ids));
 				foreach($filteredBeans as $filteredBean) {
