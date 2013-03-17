@@ -1,7 +1,6 @@
 <?php
 /**
  * ToolBox
- * Contains most important redbean tools
  * 
  * @file			RedBean/ToolBox.php
  * @desc			A RedBeanPHP-wide service locator
@@ -11,7 +10,7 @@
  * The ToolBox acts as a resource locator for RedBean but can
  * be integrated in larger resource locators (nested).
  * It does not do anything more than just store the three most
- * important RedBean resources (tools): the database adapter,
+ * important RedBeanPHP resources (tools): the database adapter,
  * the RedBeanPHP core class (oodb) and the query writer.
  * 
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
@@ -55,38 +54,24 @@ class RedBean_ToolBox {
 		return $this;
 	}
 	/**
-	 * The Toolbox acts as a kind of micro service locator, providing just the
-	 * most important objects that make up RedBean. You can pass the toolkit to
-	 * any object that needs one of these objects to function properly.
-	 * Returns the QueryWriter; normally you do not use this object but other
-	 * object might want to use the default RedBean query writer to be
-	 * database independent.
-	 *
+	 * Returns the query writer in this toolbox.
+	 * 
 	 * @return RedBean_QueryWriter $writer writer
 	 */
 	public function getWriter() {
 		return $this->writer;
 	}
 	/**
-	 * The Toolbox acts as a kind of micro service locator, providing just the
-	 * most important objects that make up RedBean. You can pass the toolkit to
-	 * any object that needs one of these objects to function properly.
-	 * Retruns the RedBean OODB Core object. The RedBean OODB object is
-	 * the ultimate core of Redbean. It provides the means to store and load
-	 * beans. Extract this object immediately after invoking a kickstart method.
-	 *
+	 * Returns the OODB instance in this toolbox.
+	 * 
 	 * @return RedBean_OODB $oodb Object Database
 	 */
 	public function getRedBean() {
 		return $this->oodb;
 	}
 	/**
-	 * The Toolbox acts as a kind of micro service locator, providing just the
-	 * most important objects that make up RedBean. You can pass the toolkit to
-	 * any object that needs one of these objects to function properly.
-	 * Returns the adapter. The Adapter can be used to perform queries
-	 * on the database directly.
-	 *
+	 * Returns the database adapter in this toolbox.
+	 * 
 	 * @return RedBean_Adapter_DBAdapter $adapter Adapter
 	 */
 	public function getDatabaseAdapter() {

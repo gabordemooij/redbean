@@ -139,7 +139,7 @@ class RedBean_TagManager {
 	 * @return void
 	 */
 	public function addTags(RedBean_OODBBean $bean, $tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+		if ($tagList!==false && !is_array($tagList)) $tags = explode(",", (string) $tagList); else $tags=$tagList;
 		if ($tagList===false) return;
 		foreach($tags as $tag) {
 			if (!$t = $this->findTagByTitle($tag)) {
@@ -159,7 +159,7 @@ class RedBean_TagManager {
 	 * @return array
 	 */
 	public function tagged($beanType, $tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string) $tagList); else $tags=$tagList;
 		$collection = array();
 		$tags = $this->redbean->find('tag',array('title'=>$tags));
 		if (is_array($tags) && count($tags)>0) {
@@ -180,7 +180,7 @@ class RedBean_TagManager {
 	 * @return array
 	 */
 	public function taggedAll($beanType, $tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+		if ($tagList!==false && !is_array($tagList)) $tags = explode(",", (string)$tagList); else $tags=$tagList;
 		$beans = array();
 		foreach($tags as $tag) {
 			$beans = $this->tagged($beanType,$tag);

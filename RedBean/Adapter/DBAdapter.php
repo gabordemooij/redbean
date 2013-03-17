@@ -71,7 +71,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 *
 	 * @return mixed  $undefSet	whatever driver returns, undefined
 	 */
-	public function exec($sql , $aValues=array(), $noevent=false) {
+	public function exec($sql, $aValues=array(), $noevent=false) {
 		if (!$noevent) {
 			$this->sql = $sql;
 			$this->signal('sql_exec', $this);
@@ -232,8 +232,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		return $this->db;
 	}
 	/**
-	 * Transactions.
-	 * Part of the transaction management infrastructure of RedBeanPHP.
 	 * Starts a transaction.
 	 * Note that transactions may not work in fluid mode depending on your 
 	 * database platform.
@@ -242,8 +240,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		return $this->db->StartTrans();
 	}
 	/**
-	 * Transactions.
-	 * Part of the transaction management infrastructure of RedBeanPHP.
 	 * Commits a transaction.
 	 * Note that transactions may not work in fluid mode depending on your 
 	 * database platform.
@@ -252,8 +248,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		return $this->db->CommitTrans();
 	}
 	/**
-	 * Transactions.
-	 * Part of the transaction management infrastructure of RedBeanPHP.
 	 * Rolls back transaction. This will undo all changes that have been
 	 * part of the transaction.
 	 * Note that transactions may not work in fluid mode depending on your 

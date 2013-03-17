@@ -69,9 +69,8 @@
 		if ($this->capture) {
 			$this->sql .= ' '.$funcName . ' '.implode(',', $args);
 			return $this;
-		}
-		else {
-			return $this->adapter->getCell('SELECT '.$funcName.'('.implode(',',$args).')');	
+		} else {
+			return $this->adapter->getCell('SELECT '.$funcName.'('.implode(',', $args).')');	
 		}	
 	}
 	/**
@@ -101,7 +100,7 @@
 	 */
 	public function get($what='') {
 		$what = 'get'.ucfirst($what);
-		$rs = $this->adapter->$what($this->sql,$this->params);
+		$rs = $this->adapter->$what($this->sql, $this->params);
 		$this->clear();
 		return $rs;
 	}
