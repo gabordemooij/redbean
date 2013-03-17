@@ -143,7 +143,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$type = $field;
 		$table = $this->safeTable($table);
 		$column = $this->safeColumn($column);
-		$type = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
+		$type = (isset($this->typeno_sqltype[$type])) ? $this->typeno_sqltype[$type] : '';
 		$sql = "ALTER TABLE $table ADD $column $type ";
 		$this->adapter->exec( $sql );
 	}
