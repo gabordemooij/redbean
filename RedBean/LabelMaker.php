@@ -1,6 +1,6 @@
 <?php
 /**
- * RedBean Label Maker
+ * Label Maker
  * 
  * @file			RedBean/LabelMaker.php
  * @desc			Makes so-called label beans

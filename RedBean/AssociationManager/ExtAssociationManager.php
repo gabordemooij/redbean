@@ -1,6 +1,6 @@
 <?php
 /**
- * RedBean Extended Association
+ * Extended Association Manager
  * 
  * @file			RedBean/ExtAssociationManager.php
  * @desc			Manages complex bean associations.

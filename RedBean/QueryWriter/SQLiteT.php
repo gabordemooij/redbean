@@ -25,25 +25,21 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
   	protected $quoteCharacter = '`';
 	/**
-	 * DATA TYPE
 	 * Integer Data type
 	 * @var integer
 	 */
 	const C_DATATYPE_INTEGER = 0;
 	/**
-	 * DATA TYPE
 	 * Numeric Data type (for REAL and date/time)
 	 * @var integer
 	 */
 	const C_DATATYPE_NUMERIC = 1;
 	/**
-	 * DATA TYPE
 	 * Text type
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT = 2;
 	/**
-	 * DATA TYPE
 	 * Specified. This means the developer or DBA
 	 * has altered the column to a different type not
 	 * recognized by RedBean. This high number makes sure
@@ -112,7 +108,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$table = $this->check($table);
 		$type=$this->typeno_sqltype[$type];
 		$sql = "ALTER TABLE `$table` ADD `$column` $type ";
-		$this->adapter->exec( $sql );
+		$this->adapter->exec($sql);
 	}
 	/**
 	 * Returns the Type Code for a Column Description.

@@ -1,6 +1,6 @@
 <?php
 /**
- * RedBean Association
+ * Association Manager
  * 
  * @file			RedBean/AssociationManager.php
  * @desc			Manages simple bean associations.

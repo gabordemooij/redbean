@@ -1,6 +1,7 @@
 <?php
 /**
  * PDO Driver
+ *
  * @file			RedBean/PDO.php
  * @desc			PDO Driver
  * @author			Gabor de Mooij and the RedBeanPHP Community, Desfrenes
@@ -11,7 +12,6 @@
  * (c) copyright Desfrenes & Gabor de Mooij and the RedBeanPHP community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
- *
  */
 class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
@@ -106,7 +106,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		try {
 			$user = $this->connectInfo['user'];
 			$pass = $this->connectInfo['pass'];
-			//PDO::MYSQL_ATTR_INIT_COMMAND
 			$this->pdo = new PDO(
 					  $this->dsn,
 					  $user,
@@ -114,7 +113,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 					  array(1002 => 'SET NAMES utf8',
 								 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 								 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-
 					  )
 			);
 			$this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);

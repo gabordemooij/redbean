@@ -1,6 +1,6 @@
 <?php
 /**
- * RedBean Bean Helper Interface
+ * Bean Helper Interface
  * 
  * @file			RedBean/IBeanHelper.php
  * @desc			Interface for Bean Helper.
@@ -21,5 +21,12 @@ interface RedBean_BeanHelper {
 	 * @return RedBean_Toolbox $toolbox toolbox
 	 */
 	public function getToolbox();
+	
+	/**
+	 * Given a certain bean this method will
+	 * return the corresponding model.
+	 * 
+	 * @param RedBean_OODBBean $bean
+	 */
 	public function getModelForBean(RedBean_OODBBean $bean);	
 }

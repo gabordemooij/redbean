@@ -121,7 +121,7 @@ class RedBean_OODB extends RedBean_Observable {
 	public function dispense($type, $number = 1) {
 		$beans = array();
 		for($i=0; $i< $number; $i++){
-			$bean = new RedBean_OODBBean();
+			$bean = new RedBean_OODBBean;
 			$bean->setBeanHelper($this->beanhelper);
 			$bean->setMeta('type',$type );
 			$bean->setMeta('sys.id','id');

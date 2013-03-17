@@ -1,6 +1,6 @@
 <?php
 /**
- * RedBean Bean Helper
+ * Bean Helper
  * 
  * @file			RedBean/BeanHelperFacade.php
  * @desc			Finds the toolbox for the bean.

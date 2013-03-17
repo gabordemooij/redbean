@@ -1,6 +1,6 @@
 <?php
 /**
- * RedBean class for Logging
+ * Logger
  * 
  * @file			RedBean/Logger.php
  * @desc			Logger

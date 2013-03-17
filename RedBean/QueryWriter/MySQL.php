@@ -16,19 +16,16 @@
  */
 class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 	/**
-	 * DATA TYPE
 	 * Boolean Data type
 	 * @var integer
 	 */
 	const C_DATATYPE_BOOL = 0;
 	/**
-	 * DATA TYPE
 	 * Unsigned 8BIT Integer
 	 * @var integer
 	 */
 	const C_DATATYPE_UINT8 = 1;
 	/**
-	 * DATA TYPE
 	 * Unsigned 32BIT Integer
 	 * @var integer
 	 */
@@ -40,20 +37,17 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	const C_DATATYPE_DOUBLE = 3;
 	/**
-	 * DATA TYPE
 	 * Standard Text column (like varchar255)
 	 * At least 8BIT character support.
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT8 = 4;
 	/**
-	 * DATA TYPE
 	 * Long text column (16BIT)
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT16 = 5;
 	/**
-	 * DATA TYPE
 	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
 	 * This is the biggest column that RedBean supports. If possible you may write
 	 * an implementation that stores even bigger values.
@@ -76,7 +70,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	const C_DATATYPE_SPECIAL_POINT = 90;
 	/**
-	 * DATA TYPE
 	 * Specified. This means the developer or DBA
 	 * has altered the column to a different type not
 	 * recognized by RedBean. This high number makes sure
@@ -99,7 +92,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * The Query Writer Constructor also sets up the database.
 	 *
 	 * @param RedBean_Adapter_DBAdapter $adapter adapter
-	 *
 	 */
 	public function __construct(RedBean_Adapter $adapter) {
 		$this->typeno_sqltype = array(
@@ -148,11 +140,11 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function createTable($table) {
 		$table = $this->safeTable($table);
-		$sql = "     CREATE TABLE $table (
+		$sql = "CREATE TABLE $table (
                      id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
                      PRIMARY KEY ( id )
                      ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ";
-		$this->adapter->exec( $sql );
+		$this->adapter->exec($sql);
 	}
 	/**
 	 * Returns an array containing the column names of the specified table.
@@ -164,9 +156,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function getColumns($table) {
 		$table = $this->safeTable($table);
 		$columnsRaw = $this->adapter->get("DESCRIBE $table");
-		foreach($columnsRaw as $r) {
-			$columns[$r['Field']]=$r['Type'];
-		}
+		foreach($columnsRaw as $r) $columns[$r['Field']]=$r['Type'];
 		return $columns;
 	}
 	/**
@@ -347,17 +337,16 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			if ($this->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
 				$this->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 			}
-
 			$sql = "
 				ALTER TABLE ".$this->noKW($table)."
 				ADD FOREIGN KEY($property1) references `$table1`(id) ON DELETE CASCADE;
 					  ";
-			$this->adapter->exec( $sql );
+			$this->adapter->exec($sql);
 			$sql ="
 				ALTER TABLE ".$this->noKW($table)."
 				ADD FOREIGN KEY($property2) references `$table2`(id) ON DELETE CASCADE
 					  ";
-			$this->adapter->exec( $sql );
+			$this->adapter->exec($sql);
 			return true;
 		} catch(Exception $e){ return false; }
 	}

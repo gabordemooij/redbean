@@ -16,19 +16,16 @@
  */
 class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 	/**
-	 * DATA TYPE
 	 * Signed 4 byte Integer
 	 * @var integer
 	 */
 	const C_DATATYPE_INTEGER = 0;
 	/**
-	 * DATA TYPE
 	 * Double precision floating point number
 	 * @var integer
 	 */
 	const C_DATATYPE_DOUBLE = 1;
 	/**
-	 * DATA TYPE
 	 * Variable length text
 	 * @var integer
 	 */

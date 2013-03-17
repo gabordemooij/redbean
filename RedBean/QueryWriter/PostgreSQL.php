@@ -13,19 +13,16 @@
  */
 class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 	/**
-	 * DATA TYPE
 	 * Integer Data Type
 	 * @var integer
 	 */
 	const C_DATATYPE_INTEGER = 0;
 	/**
-	 * DATA TYPE
 	 * Double Precision Type
 	 * @var integer
 	 */
 	const C_DATATYPE_DOUBLE = 1;
 	/**
-	 * DATA TYPE
 	 * String Data Type
 	 * @var integer
 	 */
@@ -378,7 +375,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 				} 
 				
 			}
-			
 			if ($flagAddKey) {
 			$delRule = ($isDep ? 'CASCADE' : 'SET NULL');	
 			$this->adapter->exec("ALTER TABLE  $table
@@ -388,8 +384,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			}
 			return false;
 			
-		}
-		catch(Exception $e){ return false; }
+		} catch(Exception $e){ return false; }
 	}
 	/**
 	 * Add the constraints for a specific database driver: PostgreSQL.

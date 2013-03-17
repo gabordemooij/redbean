@@ -1,6 +1,6 @@
 <?php
 /**
- * RedBean OCI Driver 
+ * OCI Driver 
  *
  * @file				RedBean/Driver/OCI.php
  * @desc				OCI Driver for RedBeanPHP
