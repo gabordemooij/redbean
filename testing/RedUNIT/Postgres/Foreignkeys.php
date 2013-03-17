@@ -22,6 +22,12 @@ class RedUNIT_Postgres_Foreignkeys extends RedUNIT_Postgres {
 	 * @return void
 	 */
 	public function run() {
+		
+		testpack('Test Postgres Foreign keys');
+		R::nuke();
+		$a = R::$writer->addFK('a','b','c','d'); //must fail
+		pass(); //survive without exception
+		asrt($a,false); //must return false
 		$book = R::dispense('book');
 		$page = R::dispense('page');
 		$cover = R::dispense('cover');

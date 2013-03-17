@@ -176,12 +176,18 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		$texts = R::dispense('text',2);
 		$images = R::dispense('image',2);
 		$author = R::dispense('author');
+		$pub = R::dispense('publisher');
+		$bookmarks = R::dispense('bookmark',2);
 		$pages[0]->ownText = array( $texts[0] );
 		$pages[0]->ownImage = array( $images[0] );
 		$pages[1]->ownText = array( $texts[1] );
 		$pages[1]->ownImage = array( $images[1] );
+		$pages[0]->sharedBookmark[] = $bookmarks[0];
+		$pages[1]->sharedBookmark[] = $bookmarks[1];
 		$book->ownPage = $pages;
 		$book->author = $author;
+		
+		$author->publisher = $pub;
 		$bookID = R::store($book);
 		R::$duplicationManager->setTables( R::$writer->getTables() );
 		$objects = (R::exportAll(array($book),true,array()));
@@ -215,8 +221,14 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		$objects = (R::exportAll(array($book),true,array('none')));
 		asrt(isset($objects[0]['author']),false);
 		asrt(isset($objects[0]['ownPage']),false);
+		$text = R::find('text');
+		$objects = (R::exportAll($text,'page,*.book,*.author'));
+		asrt(isset($objects[0]['page']['book']['author']['publisher']),true);
+		asrt(isset($objects[0]['page']['sharedBookmark']),false);
+		$objects = (R::exportAll($text,array('page','page.sharedBookmark'=>'bookmark')));
+		asrt(isset($objects[0]['page']['book']['author']['publisher']),true);
+		asrt(isset($objects[0]['page']['sharedBookmark']),true);
 		R::$duplicationManager->setCacheTables(false);
-		
 		testpack('Keyless export');
 		$book = R::load('book',$bookID);
 		$book->ownPage;

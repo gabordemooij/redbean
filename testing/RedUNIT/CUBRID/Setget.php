@@ -59,7 +59,17 @@ class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID {
 		asrt((setget(1)==1),true);
 		asrt((setget(true)==true),true);
 		asrt((setget(false)==false),true);
-	
+		
+		//minor test sqltest
+		$a = R::$writer->sqlStateIn('000', array());
+		asrt($a,false);//unknown state must return false.
+		
+		try {
+			R::$writer->safeColumn('`aaa`');
+			fail();
+		}
+		catch(Exception $e) { pass(); }
+		asrt(($e instanceof Redbean_Exception_Security),true);
 	}
 
 }
