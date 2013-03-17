@@ -10,7 +10,7 @@
 
 <root>
 	<load>
-		<item type="txt">RedBean/license.txt</item>
+		<item type="txt">RedBean/header.txt</item>
 		<item type="php">RedBean/Driver.php</item>
 		<item type="php">RedBean/Driver/PDO.php</item>
 		<item type="php" flavour="oci">RedBean/Driver/OCI.php</item>
