@@ -284,12 +284,11 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return boolean $yesno occurs in list
 	 */
 	public function sqlStateIn($state, $list) {
-		if ($state=='HY000') {
-			if (in_array(RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,$list)) return true;
-			if (in_array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,$list)) return true;
-			if (in_array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,$list)) return true;
-		}
-		return false;
+		return ($state == 'HY000') ? (count(array_diff(array(
+				RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
+				), $list))!==3) : false;
 	}
 	/**
 	 * Adds a constraint. If one of the beans gets trashed
