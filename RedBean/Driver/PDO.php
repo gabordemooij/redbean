@@ -89,7 +89,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->dsn = $this->getDatabaseType();
 		} else {
 			$this->dsn = $dsn;
-			$this->connectInfo = array( 'pass'=>$pass, 'user'=>$user );
+			$this->connectInfo = array('pass'=>$pass, 'user'=>$user);
 		}
 	}
 	/**
