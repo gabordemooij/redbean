@@ -177,7 +177,6 @@ class RedBean_DuplicationManager {
 		if (isset($trail[$key])) return $bean;
 		$trail[$key]=$bean;
 		$copy =$this->redbean->dispense($type);
-		$copy->import( $bean->getProperties() );
 		$copy->importFrom($bean);
 		$copy->id = 0;
 		$tables = $this->tables;
