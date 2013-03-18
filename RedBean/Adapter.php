@@ -20,12 +20,6 @@ interface RedBean_Adapter {
 	 */
 	public function getSQL();
 	/**
-	 * Escapes a value for usage in an SQL statement
-	 *
-	 * @param string $sqlvalue value
-	 */
-	public function escape($sqlvalue);
-	/**
 	 * Executes an SQL Statement using an array of values to bind
 	 * If $noevent is TRUE then this function will not signal its
 	 * observers to notify about the SQL execution; this to prevent

@@ -139,7 +139,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return void
 	 */
 	public function createTable($table) {
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$sql = "CREATE TABLE $table (
                      id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT ,
                      PRIMARY KEY ( id )
@@ -154,7 +154,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return array $columns columns
 	 */
 	public function getColumns($table) {
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$columnsRaw = $this->adapter->get("DESCRIBE $table");
 		foreach($columnsRaw as $r) $columns[$r['Field']]=$r['Type'];
 		return $columns;
@@ -235,8 +235,8 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function widenColumn($type, $column, $datatype) {
 		$table = $type;
 		$type = $datatype;
-		$table = $this->safeTable($table);
-		$column = $this->safeColumn($column);
+		$table = $this->esc($table);
+		$column = $this->esc($column);
 		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
 		$this->adapter->exec( $changecolumnSQL );
@@ -251,10 +251,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @return void
 	 */
 	public function addUniqueIndex($table,$columns) {
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach($columns as $k=>$v) {
-			$columns[$k]= $this->safeColumn($v);
+			$columns[$k]= $this->esc($v);
 		}
 		$r = $this->adapter->get("SHOW INDEX FROM $table");
 		$name = 'UQ_'.sha1(implode(',',$columns));
@@ -282,9 +282,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function addIndex($type, $name, $column) {
 		$table = $type;
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$name = preg_replace('/\W/','',$name);
-		$column = $this->safeColumn($column);
+		$column = $this->esc($column);
 		foreach( $this->adapter->get("SHOW INDEX FROM $table ") as $ind) {
 			if ($ind['Key_name']===$name) return;
 		}
@@ -338,12 +338,12 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				$this->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 			}
 			$sql = "
-				ALTER TABLE ".$this->noKW($table)."
+				ALTER TABLE ".$this->esc($table)."
 				ADD FOREIGN KEY($property1) references `$table1`(id) ON DELETE CASCADE;
 					  ";
 			$this->adapter->exec($sql);
 			$sql ="
-				ALTER TABLE ".$this->noKW($table)."
+				ALTER TABLE ".$this->esc($table)."
 				ADD FOREIGN KEY($property2) references `$table2`(id) ON DELETE CASCADE
 					  ";
 			$this->adapter->exec($sql);

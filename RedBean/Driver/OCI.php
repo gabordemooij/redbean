@@ -423,13 +423,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			return $code;
 	}
 	/**
-	 * (non-PHPdoc)
-	 * @see RedBean/RedBean_Driver#Escape()
-	 */
-	public function Escape($str) {
-		return $str;
-	}
-	/**
 	 * Returns the latest insert ID if driver does support this
 	 * feature.
 	 *

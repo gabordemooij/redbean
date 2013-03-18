@@ -26,7 +26,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 	public function run() {
 		
 		testpack('exportAll() and Cache');
-		/*
+		
 		$can = R::dispense('can')->setAttr('size', 3);
 		$can->ownCoffee[] = R::dispense('coffee')->setAttr('color', 'black');
 		$can->sharedTag[] = R::dispense('tag')->setAttr('name', 'cool');
@@ -168,7 +168,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		R::freeze(true);
 		$this->runOnce(false);
 		R::freeze(false);
-		*/
+		
 		testpack('Export with filters');
 		R::nuke();
 		$book = R::dispense('book');

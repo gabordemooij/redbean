@@ -135,7 +135,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @param string $table table to create
 	 */
 	public function createTable($table) {
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$sql = " CREATE TABLE $table (id SERIAL PRIMARY KEY); ";
 		$this->adapter->exec( $sql );
 	}
@@ -147,7 +147,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @return array $columns array filled with column (name=>type)
 	 */
 	public function getColumns($table) {
-		$table = $this->safeTable($table, true);
+		$table = $this->esc($table, true);
 		$columnsRaw = $this->adapter->get("select column_name, data_type from information_schema.columns where table_name='$table'");
 		foreach($columnsRaw as $r) {
 			$columns[$r['column_name']]=$r['data_type'];
@@ -230,8 +230,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	public function widenColumn($type, $column, $datatype) {
 		$table = $type;
 		$type = $datatype;
-		$table = $this->safeTable($table);
-		$column = $this->safeColumn($column);
+		$table = $this->esc($table);
+		$column = $this->esc($column);
 		$newtype = $this->typeno_sqltype[$type];
 		$changecolumnSQL = "ALTER TABLE $table \n\t ALTER COLUMN $column TYPE $newtype ";
 		$this->adapter->exec( $changecolumnSQL );
@@ -246,10 +246,10 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @return void
 	 */
 	public function addUniqueIndex($table,$columns) {
-		$table = $this->safeTable($table, true);
+		$table = $this->esc($table, true);
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach($columns as $k=>$v) {
-			$columns[$k]=$this->safeColumn($v);
+			$columns[$k]=$this->esc($v);
 		}
 		$r = $this->adapter->get("SELECT
 									i.relname as index_name
@@ -311,9 +311,9 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	public function addIndex($type, $name, $column) {
 		$table = $type;
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$name = preg_replace('/\W/','',$name);
-		$column = $this->safeColumn($column);
+		$column = $this->esc($column);
 		if ($this->adapter->getCell("SELECT COUNT(*) FROM pg_class WHERE relname = '$name'")) return;
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
 	}
@@ -330,14 +330,14 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	public function addFK($type, $targetType, $field, $targetField, $isDep = false) {
 		try{
-			$table = $this->safeTable($type);
-			$column = $this->safeColumn($field);
-			$tableNoQ = $this->safeTable($type,true);
-			$columnNoQ = $this->safeColumn($field,true);
-			$targetTable = $this->safeTable($targetType);
-			$targetTableNoQ = $this->safeTable($targetType,true);
-			$targetColumn  = $this->safeColumn($targetField);
-			$targetColumnNoQ  = $this->safeColumn($targetField,true);
+			$table = $this->esc($type);
+			$column = $this->esc($field);
+			$tableNoQ = $this->esc($type,true);
+			$columnNoQ = $this->esc($field,true);
+			$targetTable = $this->esc($targetType);
+			$targetTableNoQ = $this->esc($targetType,true);
+			$targetColumn  = $this->esc($targetField);
+			$targetColumnNoQ  = $this->esc($targetField,true);
 			$sql = "SELECT
 					tc.constraint_name, 
 					tc.table_name, 
@@ -445,7 +445,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	public function wipeAll() {
       	$this->adapter->exec('SET CONSTRAINTS ALL DEFERRED');
       	foreach($this->getTables() as $t) {
-      		$t = $this->noKW($t);
+      		$t = $this->esc($t);
 	 		try{
 	 			$this->adapter->exec("drop table if exists $t CASCADE ");
 	 		}
@@ -467,7 +467,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	public function wipe($type) {
 		$table = $type;
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$sql = "TRUNCATE $table CASCADE";
 		$this->adapter->exec($sql);
 	}

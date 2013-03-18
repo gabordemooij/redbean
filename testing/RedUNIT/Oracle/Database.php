@@ -59,7 +59,7 @@ class RedUNIT_Oracle_Database extends RedUNIT_Oracle {
 		$rooms[1]->number = 7;
 		R::store($rooms[0]);
 		R::store($rooms[1]);
-		$rooms = R::getAssoc('SELECT '.R::$writer->safeColumn('number').', kind FROM room ORDER BY kind ASC');
+		$rooms = R::getAssoc('SELECT '.R::$writer->esc('number').', kind FROM room ORDER BY kind ASC');
 		foreach($rooms as $key=>$room) {
 			asrt(($key===6 || $key===7),true);
 			asrt(($room=='classic' || $room=='suite'),true);
@@ -71,7 +71,7 @@ class RedUNIT_Oracle_Database extends RedUNIT_Oracle {
 			asrt($room,$key);
 			
 		}
-		$rooms = R::getAssoc('SELECT '.R::$writer->safeColumn('number').', kind FROM rooms2 ORDER BY kind ASC');
+		$rooms = R::getAssoc('SELECT '.R::$writer->esc('number').', kind FROM rooms2 ORDER BY kind ASC');
 		asrt(count($rooms),0);
 		asrt(is_array($rooms),true);
 		$date = R::dispense('mydate');

@@ -99,18 +99,8 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return string $column name
 	 */
-	public function safeColumn($c, $q=false) {
-			return parent::safeColumn((!$q) ? strtoupper($c):$c,$q);
-	}
-	/**
-	 * Do everything that needs to be done to format a column name.
-	 *
-	 * @param string $name of column
-	 *
-	 * @return string $column name
-	 */
-	public function safeTable($type, $q=false) {
-			return parent::safeTable((!$q) ? strtoupper($type) : $type,$q);
+	public function esc($c, $q=false) {
+			return parent::esc((!$q) ? strtoupper($c):$c,$q);
 	}
 	/**
 	 * Do everything that needs to be done to format a table name.
@@ -145,11 +135,11 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return void
 	 */
 	public function addUniqueIndex($table, $columns) {
-		$tableNoQuote = strtoupper($this->safeTable($table, true));
-		$tableWithQuote = strtoupper($this->safeTable($table));
+		$tableNoQuote = strtoupper($this->esc($table, true));
+		$tableWithQuote = strtoupper($this->esc($table));
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach ($columns as $k => $v) {
-			$columns[$k] = strtoupper($this->safeColumn($v, true));
+			$columns[$k] = strtoupper($this->esc($v, true));
 		}
 		$r = $this->adapter->get("SELECT INDEX_NAME FROM USER_INDEXES WHERE TABLE_NAME='$tableNoQuote' AND UNIQUENESS='UNIQUE'");
 		$name = strtoupper('UQ_' . substr(sha1(implode(',', $columns)), 0, 20));
@@ -178,11 +168,11 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	protected function constrain($table, $table1, $table2, $property1, $property2) {
 		try {
-			$table = strtoupper($this->safeTable($table));
-			$table1 = strtoupper($this->safeTable($table1));
-			$table2 = strtoupper($this->safeTable($table2));
-			$property1 = strtoupper($this->safeColumn($property1));
-			$property2 = strtoupper($this->safeColumn($property2));
+			$table = strtoupper($this->esc($table));
+			$table1 = strtoupper($this->esc($table1));
+			$table2 = strtoupper($this->esc($table2));
+			$property1 = strtoupper($this->esc($property1));
+			$property2 = strtoupper($this->esc($property2));
 			$fks = $this->adapter->getCell("
 				SELECT COUNT(*)
 		        FROM ALL_CONS_COLUMNS A JOIN ALL_CONSTRAINTS C  ON A.CONSTRAINT_NAME = C.CONSTRAINT_NAME 
@@ -245,9 +235,9 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function addIndex($type, $name, $column) {
 		$table = $type;
-		$table = strtoupper($this->safeTable($table));
+		$table = strtoupper($this->esc($table));
 		$name = $this->limitOracleIdentifierLength(preg_replace('/\W/', '', $name));
-		$column = strtoupper($this->safeColumn($column));
+		$column = strtoupper($this->esc($column));
 		try {
 			$this->adapter->exec("CREATE INDEX $name ON $table ($column) ");
 		} catch (Exception $e) {}
@@ -267,8 +257,8 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		if (strtolower($table) != $table) {
 			throw new Exception($table . ' is not lowercase. With ORACLE you MUST only use lowercase table in PHP, sorry!');
 		}
-		$table_with_quotes = strtoupper($this->safeTable($table));
-		$safe_table_without_quotes = strtoupper($this->safeTable($table, true));
+		$table_with_quotes = strtoupper($this->esc($table));
+		$safe_table_without_quotes = strtoupper($this->esc($table, true));
 		$sql = "CREATE TABLE $table_with_quotes(
                 ID NUMBER(11) NOT NULL,  
                 CONSTRAINT " . $safe_table_without_quotes . "_PK PRIMARY KEY (ID)
@@ -342,7 +332,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return array $columns columns
 	 */
 	public function getColumns($table) {
-		$table = $this->safeTable($table, true);
+		$table = $this->esc($table, true);
 		$columnsRaw = $this->adapter->get("SELECT LOWER(COLUMN_NAME) COLUMN_NAME, DATA_TYPE, DATA_LENGTH, DATA_PRECISION FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = UPPER('$table')");
 
 		foreach ($columnsRaw as $r) {
@@ -397,8 +387,8 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	public function widenColumn($type, $column, $datatype) {
 		$table = $type;
 		$type = $datatype;
-		$table = strtoupper($this->safeTable($table));
-		$column = strtoupper($this->safeColumn($column));
+		$table = strtoupper($this->esc($table));
+		$column = strtoupper($this->esc($column));
 		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$addTempColumn = "ALTER TABLE $table ADD (HOPEFULLYNOTEXIST $newtype)";
 		$this->adapter->exec($addTempColumn);
@@ -471,13 +461,13 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return void
 	 */
 	public function addFK($type, $targetType, $field, $targetField, $isDependent = false) {
-		$table = strtoupper($this->safeTable($type));
-		$tableNoQ = strtoupper($this->safeTable($type, true));
-		$targetTable = strtoupper($this->safeTable($targetType));
-		$column = strtoupper($this->safeColumn($field));
-		$columnNoQ = strtoupper($this->safeColumn($field, true));
-		$targetColumn = strtoupper($this->safeColumn($targetField));
-		$targetColumnNoQ = strtoupper($this->safeColumn($targetField, true));
+		$table = strtoupper($this->esc($type));
+		$tableNoQ = strtoupper($this->esc($type, true));
+		$targetTable = strtoupper($this->esc($targetType));
+		$column = strtoupper($this->esc($field));
+		$columnNoQ = strtoupper($this->esc($field, true));
+		$targetColumn = strtoupper($this->esc($targetField));
+		$targetColumnNoQ = strtoupper($this->esc($targetField, true));
 		$fkName = 'FK_' . ($isDependent ? 'C_' : '') . $tableNoQ . '_' . $columnNoQ . '_' . $targetColumnNoQ;
 		$fkName = $this->limitOracleIdentifierLength($fkName);
 		$cfks = $this->adapter->getCell("
@@ -586,7 +576,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function wipe($type) {
 		$table = $type;
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$sql = "TRUNCATE TABLE $table ";
 		$this->adapter->exec($sql);
 	}

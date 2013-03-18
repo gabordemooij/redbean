@@ -43,18 +43,6 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		return $this->sql;
 	}
 	/**
-	 * Escapes a string for use in a Query.
-	 * This method escapes the value argument using the native
-	 * driver escaping functions.
-	 *
-	 * @param  string $sqlvalue SQL value to escape
-	 *
-	 * @return string $escapedValue escaped value
-	 */
-	public function escape($sqlvalue) {
-		return $this->db->Escape($sqlvalue);
-	}
-	/**
 	 * Executes SQL code; any query without
 	 * returning a resultset.
 	 * This function allows you to provide an array with values to bind

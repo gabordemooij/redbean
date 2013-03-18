@@ -65,15 +65,6 @@ interface RedBean_Driver {
 	 */
 	public function Execute($sql, $aValues=array());
 	/**
-	 * Escapes a string for use in SQL using the currently selected
-	 * driver driver.
-	 *
-	 * @param string $string string to be escaped
-	 *
-	 * @return string $string escaped string
-	 */
-	public function Escape($str);
-	/**
 	 * Returns the latest insert ID if driver does support this
 	 * feature.
 	 *

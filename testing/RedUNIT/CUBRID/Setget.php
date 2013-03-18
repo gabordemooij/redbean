@@ -65,7 +65,7 @@ class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID {
 		asrt($a,false);//unknown state must return false.
 		
 		try {
-			R::$writer->safeColumn('`aaa`');
+			R::$writer->esc('`aaa`');
 			fail();
 		}
 		catch(Exception $e) { pass(); }

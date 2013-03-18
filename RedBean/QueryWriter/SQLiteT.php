@@ -144,7 +144,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return array $info 
 	 */
 	protected function getTable($type) {
-		$tableName = $this->safeTable($type,true);
+		$tableName = $this->esc($type,true);
 		$columns = $this->getColumns($type);
 		$indexes = $this->getIndexes($type);
 		$keys = $this->getKeys($type);
@@ -226,7 +226,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param string $table table
 	 */
 	public function createTable($table) {
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$sql = "CREATE TABLE $table ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ";
 		$this->adapter->exec( $sql );
 	}
@@ -238,7 +238,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return array $columns columns
 	 */
 	public function getColumns($table) {
-		$table = $this->safeTable($table, true);
+		$table = $this->esc($table, true);
 		$columnsRaw = $this->adapter->get("PRAGMA table_info('$table')");
 		$columns = array();
 		foreach($columnsRaw as $r) {
@@ -254,7 +254,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return array $indexInfo index information
 	 */
 	protected function getIndexes($type) {
-		$table = $this->safeTable($type, true);
+		$table = $this->esc($type, true);
 		$indexes = $this->adapter->get("PRAGMA index_list('$table')");
 		$indexInfoList = array();
 		foreach($indexes as $i) {
@@ -271,7 +271,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return array $keysInfo keys information
 	 */
 	protected function getKeys($type) {
-		$table = $this->safeTable($type,true);
+		$table = $this->esc($type,true);
 		$keys = $this->adapter->get("PRAGMA foreign_key_list('$table')");
 		$keyInfoList = array();
 		foreach($keys as $k) {
@@ -289,7 +289,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return void
 	 */
 	public function addUniqueIndex( $type,$columns ) {
-		$table = $this->safeTable($type,true);
+		$table = $this->esc($type,true);
 		$name = 'UQ_'.$table.implode('__',$columns);
 		$t = $this->getTable($type);
 		if (isset($t['indexes'][$name])) return;
@@ -327,9 +327,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	public function addIndex($type, $name, $column) {
 		$table = $type;
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$name = preg_replace('/\W/','',$name);
-		$column = $this->safeColumn($column,true);
+		$column = $this->esc($column,true);
 		foreach( $this->adapter->get("PRAGMA INDEX_LIST($table) ") as $ind) {
 			if ($ind['name']===$name) return;
 		}
@@ -346,7 +346,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return integer $numRowsFound
 	 */
 	public function wipe($type) {
-		$table = $this->safeTable($type);
+		$table = $this->esc($type);
 		$this->adapter->exec("DELETE FROM $table");
 	}
 	/**

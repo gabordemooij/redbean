@@ -181,27 +181,6 @@ interface RedBean_QueryWriter {
 	 */
 	public function count($type);
 	/**
-	 * This method should filter a column name so that it can
-	 * be used safely in a query for a specific database.
-	 *
-	 * @param  string $name		the column name
-	 * @param  bool   $noQuotes whether you want to omit quotes
-	 *
-	 * @return string $clean the clean version of the column name
-	 */
-	public function safeColumn($name, $noQuotes = false);
-	/**
-	 * This method should filter a type name so that it can
-	 * be used safely in a query for a specific database. It actually
-	 * converts a type to a table. TYPE -> TABLE
-	 *
-	 * @param string $name     the name of the type
-	 * @param bool   $noQuotes whether you want to omit quotes in table name
-	 *
-	 * @return string $tablename clean table name for use in query
-	 */
-	public function safeTable($name, $noQuotes = false);
-	/**
 	 * This method should add a constraint. If one of the beans gets trashed
 	 * the other, related bean should be removed as well.
 	 *

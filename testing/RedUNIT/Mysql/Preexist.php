@@ -35,8 +35,8 @@ class RedUNIT_Mysql_Preexist extends RedUNIT_Mysql {
 		$page2->name = "John's second page";
 		$idpage2 = $redbean->store($page2);
 		$a->associate($page, $page2);
-		$adapter->exec("ALTER TABLE ".$writer->safeColumn('page')." 
-		CHANGE ".$writer->safeColumn('name')." ".$writer->safeColumn('name')." 
+		$adapter->exec("ALTER TABLE ".$writer->esc('page')." 
+		CHANGE ".$writer->esc('name')." ".$writer->esc('name')." 
 		VARCHAR( 254 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL ");
 		$page = $redbean->dispense("page");
 		$page->name = "Just Another Page In a Table";

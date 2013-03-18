@@ -66,7 +66,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 		$rooms[1]->number = 7;
 		R::store($rooms[0]);
 		R::store($rooms[1]);
-		$rooms = R::getAssoc('SELECT '.R::$writer->safeColumn('number').', kind FROM room ORDER BY kind ASC');
+		$rooms = R::getAssoc('SELECT '.R::$writer->esc('number').', kind FROM room ORDER BY kind ASC');
 		foreach($rooms as $key=>$room) {
 			asrt(($key===6 || $key===7),true);
 			asrt(($room=='classic' || $room=='suite'),true);

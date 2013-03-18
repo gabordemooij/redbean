@@ -60,32 +60,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
   	protected $quoteCharacter = '`';
 	/**
-	 * Do everything that needs to be done to format a table name.
-	 *
-	 * @param string $name of table
-	 *
-	 * @return string table name
-	 */
-	public function safeTable($name, $noQuotes = false) {
-		$name = strtolower($name);
-		$name = $this->check($name);
-		if (!$noQuotes) $name = $this->noKW($name);
-		return $name;
-	}
-	/**
-	 * Do everything that needs to be done to format a column name.
-	 *
-	 * @param string $name of column
-	 *
-	 * @return string $column name
-	 */
-	public function safeColumn($name, $noQuotes = false) {
-		$name = strtolower($name);
-		$name = $this->check($name);
-		if (!$noQuotes) $name = $this->noKW($name);
-		return $name;
-	}
-	/**
 	 * Constructor.
 	 * The Query Writer Constructor also sets up the database.
 	 *
@@ -134,8 +108,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return void
 	 */
 	public function createTable($table) {
-		$rawTable = $this->safeTable($table,true);
-		$table = $this->safeTable($table);
+		$rawTable = $this->esc($table,true);
+		$table = $this->esc($table);
 		$sql = 'CREATE TABLE '.$table.' (
                    "id" integer AUTO_INCREMENT,
 					CONSTRAINT "pk_'.$rawTable.'_id" PRIMARY KEY("id")
@@ -151,7 +125,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function getColumns($table) {
 		$columns = array();
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$columnsRaw = $this->adapter->get("SHOW COLUMNS FROM $table");
 		foreach($columnsRaw as $r) {
 			$columns[$r['Field']]=$r['Type'];
@@ -222,8 +196,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	public function addColumn($type, $column, $field) {
 		$table = $type;
 		$type = $field;
-		$table = $this->safeTable($table);
-		$column = $this->safeColumn($column);
+		$table = $this->esc($table);
+		$column = $this->esc($column);
 		$type = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$sql = "ALTER TABLE $table ADD COLUMN $column $type ";
 		$this->adapter->exec( $sql );
@@ -241,8 +215,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	public function widenColumn($type, $column, $datatype) {
 		$table = $type;
 		$type = $datatype;
-		$table = $this->safeTable($table);
-		$column = $this->safeColumn($column);
+		$table = $this->esc($table);
+		$column = $this->esc($column);
 		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
 		$this->adapter->exec( $changecolumnSQL );
@@ -257,10 +231,10 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return void
 	 */
 	public function addUniqueIndex($table, $columns) {
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach($columns as $k=>$v) {
-			$columns[$k]= $this->safeColumn($v);
+			$columns[$k]= $this->esc($v);
 		}
 		$r = $this->adapter->get("SHOW INDEX FROM $table");
 		$name = 'UQ_'.sha1(implode(',',$columns));
@@ -344,9 +318,9 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function addIndex($type, $name, $column) {
 		$table = $type;
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$name = preg_replace('/\W/', '', $name);
-		$column = $this->safeColumn($column);
+		$column = $this->esc($column);
 		$index = $this->adapter->getRow("SELECT 1 as `exists` FROM db_index WHERE index_name = ? ",array($name));
 		if ($index && $index['exists']) return;   // positive number will return, 0 will continue.
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
@@ -389,14 +363,14 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return void
 	 */
 	protected function buildFK($type, $targetType, $field, $targetField, $isDep=false) {
-		$table = $this->safeTable($type);
-		$tableNoQ = $this->safeTable($type,true);
-		$targetTable = $this->safeTable($targetType);
-		$targetTableNoQ = $this->safeTable($targetType,true);
-		$column = $this->safeColumn($field);
-		$columnNoQ = $this->safeColumn($field,true);
-		$targetColumn  = $this->safeColumn($targetField);
-		$targetColumnNoQ  = $this->safeColumn($targetField,true);
+		$table = $this->esc($type);
+		$tableNoQ = $this->esc($type,true);
+		$targetTable = $this->esc($targetType);
+		$targetTableNoQ = $this->esc($targetType,true);
+		$column = $this->esc($field);
+		$columnNoQ = $this->esc($field,true);
+		$targetColumn  = $this->esc($targetField);
+		$targetColumnNoQ  = $this->esc($targetField,true);
 		$keys = $this->getKeys($targetTableNoQ,$tableNoQ);
 		$needsToAddFK = true;
 		$needsToDropFK = false;
@@ -441,17 +415,10 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		if ($table2) $keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS,$table2) );
 		return $keys;
 	}
-	/**
-	 * Checks table name or column name.
-	 *
-	 * @param string $table table string
-	 *
-	 * @return string $table escaped string
-	 */
-	protected function check($table) {
-		if ($this->quoteCharacter && strpos($table, $this->quoteCharacter)!==false) {
-		  throw new Redbean_Exception_Security('Illegal chars in table name');
-	    }
-		return $table;
+	
+	
+	public function esc($dbStructure, $noQuotes = false) {
+		return parent::esc(strtolower($dbStructure),$noQuotes);
 	}
+	
 }

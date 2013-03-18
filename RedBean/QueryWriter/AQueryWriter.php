@@ -71,30 +71,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function __construct() {}
 	/**
-	 * Do everything that needs to be done to format a table name.
-	 *
-	 * @param string $name of table
-	 *
-	 * @return string table name
-	 */
-	public function safeTable($name, $noQuotes = false) {
-		$name = $this->check($name);
-		if (!$noQuotes) $name = $this->noKW($name);
-		return $name;
-	}
-	/**
-	 * Do everything that needs to be done to format a column name.
-	 *
-	 * @param string $name of column
-	 *
-	 * @return string $column name
-	 */
-	public function safeColumn($name, $noQuotes = false) {
-		$name = $this->check($name);
-		if (!$noQuotes) $name = $this->noKW($name);
-		return $name;
-	}
-	/**
 	 * Returns the sql that should follow an insert statement.
 	 *
 	 * @param string $table name
@@ -105,28 +81,29 @@ abstract class RedBean_QueryWriter_AQueryWriter {
     	return '';
   	}
 	/**
+	 * Checks a database structure identifier and escapes it.
+	 * 
+	 * @param string  $dbStructure structure identifier
+	 * @param boolean $dontQuote   whether you want to put quotes around it
+	 * 
+	 * @return string $result 
+	 */
+	public function esc($dbStructure, $dontQuote = false) {
+		$this->check($dbStructure);
+		return ($dontQuote) ? $dbStructure : $this->quoteCharacter.$dbStructure.$this->quoteCharacter;
+	}
+	/**
 	 * Checks table name or column name.
 	 *
 	 * @param string $table table string
 	 *
 	 * @return string $table escaped string
 	 */
-	protected function check($table) {
-		if ($this->quoteCharacter && strpos($table, $this->quoteCharacter)!==false) {
-		  throw new Redbean_Exception_Security('Illegal chars in table name');
+	protected function check($struct) {
+		if (!preg_match('/^[a-zA-Z0-9_]+$/',$struct)) {
+		  throw new Redbean_Exception_Security('Identifier does not conform to RedBeanPHP security policies.');
 	    }
-		return $this->adapter->escape($table);
-	}
-	/**
-	 * Puts keyword escaping symbols around string.
-	 *
-	 * @param string $str keyword
-	 *
-	 * @return string $keywordSafeString escaped keyword
-	 */
-	protected function noKW($str) {
-		$q = $this->quoteCharacter;
-		return $q.$str.$q;
+		return $struct;
 	}
 	/**
 	 * This method adds a column to a table.
@@ -141,8 +118,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function addColumn($type, $column, $field) {
 		$table = $type;
 		$type = $field;
-		$table = $this->safeTable($table);
-		$column = $this->safeColumn($column);
+		$table = $this->esc($table);
+		$column = $this->esc($column);
 		$type = (isset($this->typeno_sqltype[$type])) ? $this->typeno_sqltype[$type] : '';
 		$sql = "ALTER TABLE $table ADD $column $type ";
 		$this->adapter->exec( $sql );
@@ -173,11 +150,11 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		if ($id && !count($updatevalues)) return $id;
 		
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$sql = "UPDATE $table SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
-			$p[] = " {$this->safeColumn($uv["property"])} = ? ";
+			$p[] = " {$this->esc($uv["property"])} = ? ";
 			$v[]=$uv['value'];
 		}
 		$sql .= implode(',', $p ) .' WHERE id = '.intval($id);
@@ -197,10 +174,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	protected function insertRecord($table, $insertcolumns, $insertvalues) {
 		$default = $this->defaultValue;
 		$suffix = $this->getInsertSuffix($table);
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k=>$v) {
-				$insertcolumns[$k] = $this->safeColumn($v);
+				$insertcolumns[$k] = $this->esc($v);
 			}
 			$insertSQL = "INSERT INTO $table ( id, ".implode(',',$insertcolumns)." ) VALUES 
 			( $default, ". implode(',',array_fill(0,count($insertcolumns),' ? '))." ) $suffix";
@@ -248,12 +225,12 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				if (isset($this->cache[$key])) return $this->cache[$key];
 			}
 		}
-		$table = $this->safeTable($type);
+		$table = $this->esc($type);
 		$sqlConditions = array();
 		$bindings=array();
 		foreach($conditions as $column=>$values) {
 			if (!count($values)) continue;
-			$sql = $this->safeColumn($column);
+			$sql = $this->esc($column);
 			$sql .= ' '.($inverse ? ' NOT ':'').' IN ( ';
 			//If its safe to not use bindings please do... (fixes SQLite PDO issue limit 256 bindings)
 			if (is_array($conditions)
@@ -313,7 +290,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function wipe($type) {
 		$table = $type;
-		$table = $this->safeTable($table);
+		$table = $this->esc($table);
 		$sql = "TRUNCATE $table ";
 		$this->adapter->exec($sql);
 	}
@@ -327,7 +304,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return integer $numRowsFound
 	 */
 	public function count($beanType, $addSQL = '', $params = array()) {
-		$sql = "SELECT count(*) FROM {$this->safeTable($beanType)} ";
+		$sql = "SELECT count(*) FROM {$this->esc($beanType)} ";
 		if ($addSQL!='') $addSQL = ' WHERE '.$addSQL; 
 		return (int) $this->adapter->getCell($sql.$addSQL,$params);
 	}
@@ -366,13 +343,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return void
 	 */
 	public function addFK($type, $targetType, $field, $targetField, $isDependent = false) {
-		$table = $this->safeTable($type);
-		$tableNoQ = $this->safeTable($type,true);
-		$targetTable = $this->safeTable($targetType);
-		$column = $this->safeColumn($field);
-		$columnNoQ = $this->safeColumn($field,true);
-		$targetColumn  = $this->safeColumn($targetField);
-		$targetColumnNoQ  = $this->safeColumn($targetField,true);
+		$table = $this->esc($type);
+		$tableNoQ = $this->esc($type,true);
+		$targetTable = $this->esc($targetType);
+		$column = $this->esc($field);
+		$columnNoQ = $this->esc($field,true);
+		$targetColumn  = $this->esc($targetField);
+		$targetColumnNoQ  = $this->esc($targetField,true);
 		$db = $this->adapter->getCell('select database()');
 		$fkName = 'fk_'.$tableNoQ.'_'.$columnNoQ.'_'.$targetColumnNoQ.($isDependent ? '_casc':'');
 		$cName = 'cons_'.$fkName;
@@ -463,11 +440,11 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
 		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
-		$table = $adapter->escape($table);
-		$table1 = $adapter->escape($table1);
-		$table2 = $adapter->escape($table2);
-		$property1 = $adapter->escape($property1);
-		$property2 = $adapter->escape($property2);
+		$table = $this->esc($table, true);
+		$table1 = $this->esc($table1, true);
+		$table2 = $this->esc($table2, true);
+		$property1 = $this->esc($property1, true);
+		$property2 = $this->esc($property2, true);
 		//Dispatch to right method
 		return $this->constrain($table, $table1, $table2, $property1, $property2);
 	}

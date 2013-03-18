@@ -65,7 +65,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		$redbean->find("wine", array("id"=>5)); //  Finder:where call RedBean_OODB::convertToBeans
 		$bean2 = $redbean->load("anotherbean", 5);
 		asrt($bean2->id,0);
-		$keys = $adapter->getCol("SELECT id FROM page WHERE ".$writer->safeColumn('name')." LIKE '%John%'");
+		$keys = $adapter->getCol("SELECT id FROM page WHERE ".$writer->esc('name')." LIKE '%John%'");
 		asrt(count($keys),2);
 		$pages = $redbean->batch("page", $keys);
 		asrt(count($pages),2);

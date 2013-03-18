@@ -97,7 +97,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$u2->login = 'e';
 		R::store($u1);
 		R::store($u2);
-		$list = R::getAssoc('select login,'.R::$writer->safeColumn('name').' from '.R::$writer->safeTable('user').' ');
+		$list = R::getAssoc('select login,'.R::$writer->esc('name').' from '.R::$writer->esc('user').' ');
 		asrt($list['e'],'Eric');
 		asrt($list['g'],'Gabor');
 		
@@ -183,7 +183,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		$s2->role = 'student';
 		$s->name = 'a';
 		$s2->name = 'b';
-		$role = R::$writer->safeColumn('role');
+		$role = R::$writer->esc('role');
 		R::associate($t, $s);
 		R::associate($t, $s2);
 		$students = R::related($t, 'person', sprintf(' %s  = ? ',$role),array("student"));

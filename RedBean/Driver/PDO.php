@@ -268,19 +268,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		return $this->affected_rows;
 	}
 	/**
-	 * Escapes a string for use in SQL using the currently selected
-	 * PDO driver.
-	 *
-	 * @param string $string string to be escaped
-	 *
-	 * @return string $string escaped string
-	 */
-	public function Escape( $str ) {
-		$this->connect();
-		return substr(substr($this->pdo->quote($str), 1), 0, -1);
-	}
-
-	/**
 	 * Returns the latest insert ID if driver does support this
 	 * feature.
 	 *
