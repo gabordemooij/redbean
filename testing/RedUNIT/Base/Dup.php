@@ -26,7 +26,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 	public function run() {
 		
 		testpack('exportAll() and Cache');
-		
+		/*
 		$can = R::dispense('can')->setAttr('size', 3);
 		$can->ownCoffee[] = R::dispense('coffee')->setAttr('color', 'black');
 		$can->sharedTag[] = R::dispense('tag')->setAttr('name', 'cool');
@@ -168,7 +168,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		R::freeze(true);
 		$this->runOnce(false);
 		R::freeze(false);
-		
+		*/
 		testpack('Export with filters');
 		R::nuke();
 		$book = R::dispense('book');
@@ -184,6 +184,8 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		$pages[1]->ownImage = array( $images[1] );
 		$pages[0]->sharedBookmark[] = $bookmarks[0];
 		$pages[1]->sharedBookmark[] = $bookmarks[1];
+		$bookmarks[0]->ownNote[] = R::dispense('note')->setAttr('text','a note');
+		$bookmarks[1]->ownNote[] = R::dispense('note')->setAttr('text','a note');
 		$book->ownPage = $pages;
 		$book->author = $author;
 		
@@ -221,13 +223,23 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		$objects = (R::exportAll(array($book),true,array('none')));
 		asrt(isset($objects[0]['author']),false);
 		asrt(isset($objects[0]['ownPage']),false);
-		$text = R::find('text');
-		$objects = (R::exportAll($text,'page,*.book,*.author'));
+		$texts = R::find('text');
+		R::preload($texts,'page,*.book,*.author');
+		$objects = (R::exportAll($texts,true));
 		asrt(isset($objects[0]['page']['book']['author']['publisher']),true);
 		asrt(isset($objects[0]['page']['sharedBookmark']),false);
-		$objects = (R::exportAll($text,array('page','page.sharedBookmark'=>'bookmark')));
+		$texts = R::find('text');
+		R::preload($texts,array('page','page.sharedBookmark'=>'bookmark'));
+		$objects = (R::exportAll($texts,true));
 		asrt(isset($objects[0]['page']['book']['author']['publisher']),true);
 		asrt(isset($objects[0]['page']['sharedBookmark']),true);
+		asrt(isset($objects[0]['page']['sharedBookmark'][0]['ownNote']),false);
+		$texts = R::find('text');
+		R::preload($texts,array('page','page.sharedBookmark'=>'bookmark','page.sharedBookmark.ownNote'=>'note'));
+		$objects = (R::exportAll($texts,true));
+		asrt(isset($objects[0]['page']['book']['author']['publisher']),true);
+		asrt(isset($objects[0]['page']['sharedBookmark']),true);
+		asrt(isset($objects[0]['page']['sharedBookmark'][0]['ownNote']),true);
 		R::$duplicationManager->setCacheTables(false);
 		testpack('Keyless export');
 		$book = R::load('book',$bookID);
@@ -240,8 +252,6 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		RedBean_OODBBean::setFlagKeyedExport(false);
 		$export = $book->export();
 		asrt(isset($export['ownPage'][0]),true);
-		
-		
 	}
 
 	/**
@@ -355,7 +365,6 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 			asrt((int)R::getCell('SELECT count(*) FROM book_reader'),$noOfReaders*4);
 			asrt((int)R::getCell('SELECT count(*) FROM reader'),$noOfReaders);
 			}
-			
 		}
 		
 		if ($n) {
@@ -365,6 +374,4 @@ class RedUNIT_Base_Dup extends RedUNIT_Base {
 		asrt($i,10);
 		}
 	}
-	
-	
 }

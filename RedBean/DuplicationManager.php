@@ -166,8 +166,8 @@ class RedBean_DuplicationManager {
 	 * This function does a reflectional database query so it may be slow.
 	 *
 	 * @param RedBean_OODBBean $bean  bean to be copied
-	 * @param array            $trail for internal usage, pass array()
-	 * @param boolean          $pid   for internal usage
+	 * @param array            $trail trail to prevent infinite loops
+	 * @param boolean          $pid   preserve IDs
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
@@ -222,37 +222,12 @@ class RedBean_DuplicationManager {
 	 * @return	array $array exported structure
 	 */
 	public function exportAll($beans, $parents=false, $filters=array()) {
-		$array = array(); $copies = array(); $parentTypes = array();
+		$array = array();
 		if (!is_array($beans)) $beans = array($beans);
 		foreach($beans as $bean) {
-			$this->setFilters($filters);
-			$f = $this->dup($bean,array(),true);
-			$copies[] = $f;
-		}
-		if ($parents!==false) {
-			if ($parents === true) {
-				$firstCopy = reset($copies);
-				$properties = $firstCopy->getProperties();
-				foreach($properties as $property=>$value) {
-					if (strpos($property,'_id')!==false) {
-						$parentTypes[] = substr($property,0,-3);
-					}
-				}
-				$parentTypes = implode(',',$parentTypes);
-			}
-			else {
-				$parentTypes = $parents;
-			}
-			//Try to preload as much parents as possible by analyzing first bean		
-			$this->redbean->preload($copies,$parentTypes);
-			foreach($copies as $bean) {
-				$array[] = $bean->export(false,true,false,$filters);
-			}
-		}
-		else {
-			foreach($copies as $bean) {
-				$array[] = $bean->export(false,false,false,$filters);
-			}
+			   $this->setFilters($filters);
+			   $f = $this->dup($bean,array(),true);
+			   $array[] = $f->export(false,$parents,false,$filters);
 		}
 		return $array;
 	}

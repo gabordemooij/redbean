@@ -683,7 +683,9 @@ class RedBean_Facade {
 	 * - all own bean lists (recursively)
 	 * - all shared beans (not THEIR own lists)
 	 *
-	 * @param	array|RedBean_OODBBean $beans beans to be exported
+	 * @param	array|RedBean_OODBBean $beans   beans to be exported
+	 * @param	boolean                $parents whether you want parent beans to be exported
+	 * @param   array                  $filters whitelist of types
 	 *
 	 * @return	array $array exported structure
 	 */
