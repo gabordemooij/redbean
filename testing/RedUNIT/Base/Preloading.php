@@ -156,14 +156,14 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 			$author->ownBook = R::dispense('book',2);
 			foreach($author->ownBook as $book) {
 				$book->ownPage = R::dispense('page',2);
-				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',1);
+				foreach($book->ownPage as $page) $page->ownText[] = R::dispense('text',1);
 			}
 		}
 		R::storeAll($authors);
 		$texts = R::find('text');
 		R::nuke();
 		$text = reset($texts);
-		asrt(($text->page),null);
+		asrt((int)($text->page->id),0);
 		
 		//now with preloading
 		R::nuke();
