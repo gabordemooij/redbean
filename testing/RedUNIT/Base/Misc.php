@@ -21,27 +21,29 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
-		global $currentDriver;
-		if ($currentDriver !== 'CUBRID') {
-			testpack('Beautiful column names');
-			R::nuke();
-			$town = R::dispense('town');
-			$town->isCapital = false;
-			$town->hasTrainStation = true;
-			$town->name = 'BeautyVille';
-			$houses = R::dispense('house',2);
-			$houses[0]->isForSale = true;
-			$town->ownHouse = $houses;
-			R::store($town);
-			$town = R::load('town',$town->id);
-			asrt(($town->isCapital==false),true);
-			asrt(($town->hasTrainStation==true),true);
-			asrt(($town->name=='BeautyVille'),true);
-		}
-		else {
-			testpack('Beautiful column names - SKIP for CUBRID (case insens.)');
-			pass();
-		}
+		
+		//test backward compatibility functions
+		testpack('Test backward compatability methods');
+		asrt(R::$writer->safeColumn('column',true),R::$writer->esc('column',true));
+		asrt(R::$writer->safeColumn('column',false),R::$writer->esc('column',false));
+		asrt(R::$writer->safeTable('table',true),R::$writer->esc('table',true));
+		asrt(R::$writer->safeTable('table',false),R::$writer->esc('table',false));
+		
+		testpack('Beautiful column names');
+		R::nuke();
+		$town = R::dispense('town');
+		$town->isCapital = false;
+		$town->hasTrainStation = true;
+		$town->name = 'BeautyVille';
+		$houses = R::dispense('house',2);
+		$houses[0]->isForSale = true;
+		$town->ownHouse = $houses;
+		R::store($town);
+		$town = R::load('town',$town->id);
+		asrt(($town->isCapital==false),true);
+		asrt(($town->hasTrainStation==true),true);
+		asrt(($town->name=='BeautyVille'),true);
+
 		
 		testpack('Accept datetime objects.');
 		$cal = R::dispense('calendar');

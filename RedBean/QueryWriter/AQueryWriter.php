@@ -480,4 +480,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function flushCache() {
 		$this->cache = array();
 	}
+	/**
+	 * Deprecated. Use esc() instead.
+	 */
+	public function safeColumn($a, $b = false) { return $this->esc($a, $b); }
+	public function safeTable($a, $b = false) { return $this->esc($a, $b); }
 }
