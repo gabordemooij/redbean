@@ -60,17 +60,12 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	protected $assocManager = null;
 	/**
-	 * The RedBean OODB Class is the main class of RedBean.
-	 * It takes RedBean_OODBBean objects and stores them to and loads them from the
-	 * database as well as providing other CRUD functions. This class acts as a
-	 * object database.
-	 * Constructor, requires a DBAadapter (dependency inversion)
-	 * @param RedBean_Adapter_DBAdapter $adapter
+	 * Constructor, requires a query writer.
+	 *
+	 * @param RedBean_QueryWriter $writer
 	 */
-	public function __construct($writer) {
-		if ($writer instanceof RedBean_QueryWriter) {
-			$this->writer = $writer;
-		}
+	public function __construct(RedBean_QueryWriter $writer) {
+		if ($writer instanceof RedBean_QueryWriter) $this->writer = $writer;
 		$this->beanhelper = new RedBean_BeanHelper_Facade();
 	}
 	/**
@@ -88,9 +83,7 @@ class RedBean_OODB extends RedBean_Observable {
 		if (is_array($tf)) {
 			$this->chillList = $tf;
 			$this->isFrozen = false;
-		}
-		else
-		$this->isFrozen = (boolean) $tf;
+		} else $this->isFrozen = (boolean) $tf;
 	}
 	/**
 	 * Returns the current mode of operation of RedBean.
@@ -214,7 +207,7 @@ class RedBean_OODB extends RedBean_Observable {
 		try {
 			$beans = $this->convertToBeans($type, $this->writer->selectRecord($type, $conditions, $addSQL, false, false, $all));
 			return $beans;
-		}catch(RedBean_Exception_SQL $e) {
+		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
@@ -285,14 +278,11 @@ class RedBean_OODB extends RedBean_Observable {
 	private function getTypeFromCast($cast) {
 		if ($cast=='string') {
 			$typeno = $this->writer->scanType('STRING');
-		}
-		elseif ($cast=='id') {
+		} elseif ($cast=='id') {
 			$typeno = $this->writer->getTypeForID();
-		}
-		elseif(isset($this->writer->sqltype_typeno[$cast])) {
+		} elseif(isset($this->writer->sqltype_typeno[$cast])) {
 			$typeno = $this->writer->sqltype_typeno[$cast];
-		}
-		else {
+		} else {
 			throw new RedBean_Exception('Invalid Cast');
 		}
 		return $typeno;
@@ -861,19 +851,21 @@ class RedBean_OODB extends RedBean_Observable {
 		if (is_string($types)) $types = explode(',',$types);
 		$oldFields = array(); $i=0; $retrievals = array(); $oldField = '';
 		foreach($types as $key => $type) {
-			$retrievals[$i] = array();
-			$map = $ids = array();
+			$map = $ids = $retrievals[$i] = array();
 			$field = (is_numeric($key)) ? $type : $key;//use an alias?
-			if (strpos($field,'*')!==false) { $oldFields[]= $oldField; $field = str_replace('*',implode('.',$oldFields),$field);}
-			if (strpos($field,'&')!==false) { $field = str_replace('&',implode('.',$oldFields),$field);}
+			if (strpos($field, '*')!==false) { 
+				$oldFields[]= $oldField; 
+				$field = str_replace('*', implode('.', $oldFields), $field);
+			}
+			if (strpos($field,'&')!==false) $field = str_replace('&',implode('.', $oldFields), $field);
 			$filteredBeans = $beans;
 			$counterID = 0;
 			foreach($filteredBeans as $bean) {
-				$bean->setMeta('sys.input-bean-id',array($counterID => $counterID));
+				$bean->setMeta('sys.input-bean-id', array($counterID => $counterID));
 				$counterID++;
 			}
-			while($p = strpos($field,'.')) { //filtering: find the right beans in the path
-				$nesting = substr($field,0,$p);
+			while($p = strpos($field, '.')) { //filtering: find the right beans in the path
+				$nesting = substr($field, 0, $p);
 				$filtered = array();
 				foreach($filteredBeans as $bean) {
 					$inputBeanID = $bean->getMeta('sys.input-bean-id');
@@ -881,83 +873,67 @@ class RedBean_OODB extends RedBean_Observable {
 						$nestedBeans = $bean->$nesting;
 						foreach($nestedBeans as $nestedBean) {
 							$currentInputBeanIDs = $nestedBean->getMeta('sys.input-bean-id'); 
-							if (!is_array($currentInputBeanIDs)) {
-								$currentInputBeanIDs = array();
-							}
+							if (!is_array($currentInputBeanIDs)) $currentInputBeanIDs = array();
 							$addInputIDs = $bean->getMeta('sys.input-bean-id');
-							foreach($addInputIDs as $addInputID) {
-								$currentInputBeanIDs[$addInputID] = $addInputID;
-							}
+							foreach($addInputIDs as $addInputID) $currentInputBeanIDs[$addInputID] = $addInputID;
 							$nestedBean->setMeta('sys.input-bean-id',$currentInputBeanIDs);
 						}
 						$filtered = array_merge($filtered,$nestedBeans);
 					} elseif (!is_null($bean->$nesting)) {
-							$nestedBean = $bean->$nesting;
-							$currentInputBeanIDs = $nestedBean->getMeta('sys.input-bean-id'); 
-							if (!is_array($currentInputBeanIDs)) {
-								$currentInputBeanIDs = array();
-							}
-							$addInputIDs = $bean->getMeta('sys.input-bean-id');
-							foreach($addInputIDs as $addInputID) {
-								$currentInputBeanIDs[$addInputID] = $addInputID;
-							}
-							$nestedBean->setMeta('sys.input-bean-id',$currentInputBeanIDs);	
+						$nestedBean = $bean->$nesting;
+						$currentInputBeanIDs = $nestedBean->getMeta('sys.input-bean-id'); 
+						if (!is_array($currentInputBeanIDs)) $currentInputBeanIDs = array();
+						$addInputIDs = $bean->getMeta('sys.input-bean-id');
+						foreach($addInputIDs as $addInputID) $currentInputBeanIDs[$addInputID] = $addInputID;
+						$nestedBean->setMeta('sys.input-bean-id', $currentInputBeanIDs);	
 						$filtered[] = $bean->$nesting;
 					}
 				}
 				$filteredBeans = $filtered;
-				$field = substr($field,$p+1);
+				$field = substr($field, $p+1);
 			}
 			$oldField = $field;
-			if (strpos($type,'.')) $type = $field;
-			if (strpos($field,'shared')!==0) {
+			if (strpos($type, '.')) $type = $field;
+			if (strpos($field, 'shared')!==0) {
 				foreach($filteredBeans as $bean) { //gather ids to load the desired bean collections
-					if (strpos($field,'own')===0) { //based on bean->id for ownlist
+					if (strpos($field, 'own')===0) { //based on bean->id for ownlist
 						$id = $bean->id; $ids[$id] = $id;
 					} elseif($id = $bean->{$field.'_id'}){ //based on bean_id for parent
-						$ids[$id] = $id; if (!isset($map[$id])) $map[$id] = array();
+						$ids[$id] = $id; 
+						if (!isset($map[$id])) $map[$id] = array();
 						$map[$id][] = $bean;
 					}
 				}
 			}
-			if (strpos($field,'shared')===0) {
+			if (strpos($field, 'shared')===0) {
 				$bean = reset($filteredBeans);
 				$link = $bean->getMeta('type').'_id';
-				$keys = $this->assocManager->related($filteredBeans,$type,true);
-				$linkTable = $this->assocManager->getTable(array($type,$bean->getMeta('type')));
-				$linkBeans = $this->batch($linkTable,$keys);
-				$linked = array();
-				$targetIDs = array();
+				$keys = $this->assocManager->related($filteredBeans, $type,true);
+				$linkTable = $this->assocManager->getTable(array($type, $bean->getMeta('type')));
+				$linkBeans = $this->batch($linkTable, $keys);
+				$linked = $targetIDs = array();
 				$targetIDField = $type.'_id';
 				foreach($linkBeans as $linkBean) {
 					$linkID = $linkBean->$link;
-					if (!isset($linked[$linkID])) {
-						$linked[$linkID] = array();
-					}
+					if (!isset($linked[$linkID])) $linked[$linkID] = array();
 					$linked[$linkID][] = $linkBean;
 					$targetIDs[$linkBean->$targetIDField] = $linkBean->$targetIDField;
 				}
-				$sharedBeans = $this->batch($type,$targetIDs);
+				$sharedBeans = $this->batch($type, $targetIDs);
 				foreach($filteredBeans as $filteredBean) {
 					$list = array();
 					if (isset($linked[$filteredBean->id])) {
 						foreach($linked[$filteredBean->id] as $linkBean) {
 							foreach($sharedBeans as $sharedBean) {
-								if ($sharedBean->id == $linkBean->$targetIDField) {
-									$list[$sharedBean->id] = $sharedBean; 
-								}
+								if ($sharedBean->id == $linkBean->$targetIDField) $list[$sharedBean->id] = $sharedBean; 
 							}
 						}
 					}
-					$filteredBean->setProperty($field,$list);
+					$filteredBean->setProperty($field, $list);
 					$inputBeanIDs = $filteredBean->getMeta('sys.input-bean-id');
 					foreach($inputBeanIDs as $inputBeanID) {
-						if (!isset($retrievals[$i][$inputBeanID])) {
-							$retrievals[$i][$inputBeanID] = array();
-						}
-						foreach($list as $listKey=>$listBean) {
-							$retrievals[$i][$inputBeanID][$listKey] = $listBean;
-						}
+						if (!isset($retrievals[$i][$inputBeanID])) $retrievals[$i][$inputBeanID] = array();
+						foreach($list as $listKey=>$listBean) $retrievals[$i][$inputBeanID][$listKey] = $listBean;
 					}
 				}
 			} elseif (strpos($field,'own')===0) {//preload for own-list using find
@@ -965,42 +941,32 @@ class RedBean_OODB extends RedBean_Observable {
 				$children = $this->find($type,array($link=>$ids));
 				foreach($filteredBeans as $filteredBean) {
 					$list = array();
-					foreach($children as $child) {
-						if ($child->$link==$filteredBean->id) $list[$child->id] = $child;
-					}
-					$filteredBean->setProperty($field,$list);
+					foreach($children as $child) if ($child->$link==$filteredBean->id) $list[$child->id] = $child;
+					$filteredBean->setProperty($field, $list);
 					$inputBeanIDs = $filteredBean->getMeta('sys.input-bean-id');
 					foreach($inputBeanIDs as $inputBeanID) {
-						if (!isset($retrievals[$i][$inputBeanID])) {
-							$retrievals[$i][$inputBeanID] = array();
-						}
-						foreach($list as $listKey=>$listBean) {
-							$retrievals[$i][$inputBeanID][$listKey] = $listBean;
-						}
+						if (!isset($retrievals[$i][$inputBeanID])) $retrievals[$i][$inputBeanID] = array();
+						foreach($list as $listKey=>$listBean) $retrievals[$i][$inputBeanID][$listKey] = $listBean;
 					}
 				}
 			} else { //preload for parent objects using batch()
 				foreach($this->batch($type,$ids) as $parent) {
 					foreach($map[$parent->id] as $childBean) {
-						$childBean->setProperty($field,$parent);
-						
+						$childBean->setProperty($field, $parent);
 						$inputBeanIDs = $childBean->getMeta('sys.input-bean-id');
-						foreach($inputBeanIDs as $inputBeanID) {
-							$retrievals[$i][$inputBeanID] = $parent;
-						}
-						
+						foreach($inputBeanIDs as $inputBeanID) $retrievals[$i][$inputBeanID] = $parent;
 					}
 				}
-				
 			}
 			$i++;
 		}
 		if ($closure) {
-			$key = 0; foreach($beans as $bean) {
+			$key = 0; 
+			foreach($beans as $bean) {
 				$params = array();
 				foreach($retrievals as $r) $params[] = (isset($r[$key])) ? $r[$key] : null; 
-				array_unshift($params,$bean);
-				call_user_func_array($closure,$params);
+				array_unshift($params, $bean);
+				call_user_func_array($closure, $params);
 				$key ++;
 			}
 		}
