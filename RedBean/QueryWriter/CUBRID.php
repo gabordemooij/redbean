@@ -418,7 +418,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	
 	
 	public function esc($dbStructure, $noQuotes = false) {
-		return parent::esc(strtolower($dbStructure),$noQuotes);
+		return parent::esc(strtolower($dbStructure), $noQuotes);
 	}
 	
 }
