@@ -415,8 +415,14 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		if ($table2) $keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS,$table2) );
 		return $keys;
 	}
-	
-	
+	/**
+	 * Filters the column or table name for use in a query.
+	 * 
+	 * @param string $dbStructure
+	 * @param boolean $noQuotes
+	 * 
+	 * @return string
+	 */
 	public function esc($dbStructure, $noQuotes = false) {
 		return parent::esc(strtolower($dbStructure), $noQuotes);
 	}
