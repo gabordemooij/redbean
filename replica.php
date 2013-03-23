@@ -9,13 +9,13 @@ foreach($items as $item) {
     if ($a && isset($a->flavour)) { 
 	$fl = $a->flavour->__toString();  
 	if (!isset($code[$fl])) $code[$fl] = $code['default'];
-	$code[$fl] .= file_get_contents( $item ) . "\n";
+	$code[$fl] .= '===BOUNDARY==='.file_get_contents( $item ) . "\n";
 	echo "Adding: $item to flavour: $fl \n";
     }
     else {	
     	echo "Adding: $item \n";
     	$c = file_get_contents( $item ) . "\n";
-	foreach($code as $k=>$codeFlav) $code[$k] .= $c;
+	foreach($code as $k=>$codeFlav) $code[$k] .= '===BOUNDARY==='.$c;
    }
 }
 foreach($code as $f=>$codeFlav) {
@@ -27,6 +27,17 @@ class R extends RedBean_Facade{
   ".str_replace('@plugin','',trim(implode("\n",$m[0])))." 
 }
 ";
+
+//Remove headers
+$x = explode('===BOUNDARY===',$code[$f]);
+$clean = '';
+$i = 0;
+foreach($x as $file) {
+	$i++;
+	if ($i < 3) { $clean .= $file; continue; }
+	$clean .= substr($file,strpos($file,'*/')+2);
+}
+$code[$f] = $clean;
 
 //Clean php tags and whitespace from codebase.
 $code[$f] = "<?php ".str_replace( array("<?php", "<?", "?>"), array("", "", ""), $code[$f]);
