@@ -20,77 +20,58 @@
  */
 class RedBean_Facade {
 	/**
-	 * Collection of toolboxes
 	 * @var array
 	 */
 	public static $toolboxes = array();
 	/**
-	 *
-	 * Constains an instance of the RedBean Toolbox
 	 * @var RedBean_ToolBox
-	 *
 	 */
 	public static $toolbox;
 	/**
-	 * Constains an instance of RedBean OODB
 	 * @var RedBean_OODB
 	 */
 	public static $redbean;
 	/**
-	 * Contains an instance of the Query Writer
 	 * @var RedBean_QueryWriter
 	 */
 	public static $writer;
 	/**
-	 * Contains an instance of the Database
-	 * Adapter.
 	 * @var RedBean_DBAdapter
 	 */
 	public static $adapter;
 	/**
-	 * Contains an instance of the Association Manager
 	 * @var RedBean_AssociationManager
 	 */
 	public static $associationManager;
 	/**
-	 * Contains an instance of the Extended Association Manager
 	 * @var RedBean_ExtAssociationManager
 	 */
 	public static $extAssocManager;
 	/**
-	 * Holds the tag manager
 	 * @var RedBean_TagManager
 	 */
 	public static $tagManager;
 	/**
-	 * holds the duplication manager
 	 * @var RedBean_DuplicationManager 
 	 */
 	public static $duplicationManager;
 	/**
-	 * Holds the Label Maker instance.
-	 * This facility allows you to make label beans.
 	 * @var RedBean_LabelMaker 
 	 */
 	public static $labelMaker;
-	
 	/**
-	 * Holds the Finder instance for the facade.
 	 * @var RedBean_Finder
 	 */
 	public static $finder;
-	
 	/**
-	 * Holds the Key of the current database.
 	 * @var string
 	 */
 	public static $currentDB = '';
 	/**
-	 * Holds reference to SQL Helper
+	 * @var RedBean_SQLHelper
 	 */
 	public static $f;
 	/**
-	 * Flag indicates whether strict type checking is on or off.
 	 * @var boolean
 	 */
 	private static $strictType = true;
@@ -334,11 +315,9 @@ class RedBean_Facade {
 	 * @return mixed
 	 */
 	public static function associate($beans1, $beans2, $extra = null) {
-		//No extra? Just associate like always (default)
 		if (!$extra) {
 			return self::$associationManager->associate($beans1, $beans2);
-		}
-		else{
+		} else {
 			return self::$extAssocManager->extAssociateSimple($beans1,$beans2,$extra);
 		}
 	}
@@ -451,11 +430,7 @@ class RedBean_Facade {
 		return self::$finder->find($type,$sql,$values);
 	}
 	/**
-	 * Finds a bean using a type and a where clause (SQL).
-	 * As with most Query tools in RedBean you can provide values to
-	 * be inserted in the SQL statement by populating the value
-	 * array parameter; you can either use the question mark notation
-	 * or the slot-notation (:keyname).
+	 * @see RedBean_Facade::find
 	 * The findAll() method differs from the find() method in that it does
 	 * not assume a WHERE-clause, so this is valid:
 	 *
@@ -473,11 +448,7 @@ class RedBean_Facade {
 		return self::$finder->findAll($type,$sql,$values);
 	}
 	/**
-	 * Finds a bean using a type and a where clause (SQL).
-	 * As with most Query tools in RedBean you can provide values to
-	 * be inserted in the SQL statement by populating the value
-	 * array parameter; you can either use the question mark notation
-	 * or the slot-notation (:keyname).
+	 * @see RedBean_Facade::find
 	 * The variation also exports the beans (i.e. it returns arrays).
 	 * 
 	 * @param string $type   type   the type of bean you are looking for
@@ -490,11 +461,7 @@ class RedBean_Facade {
 		return self::$finder->findAndExport($type, $sql, $values);
 	}
 	/**
-	 * Finds a bean using a type and a where clause (SQL).
-	 * As with most Query tools in RedBean you can provide values to
-	 * be inserted in the SQL statement by populating the value
-	 * array parameter; you can either use the question mark notation
-	 * or the slot-notation (:keyname).
+	 * @see RedBean_Facade::find
 	 * This variation returns the first bean only.
 	 * 
 	 * @param string $type   type   the type of bean you are looking for
@@ -507,11 +474,7 @@ class RedBean_Facade {
 		return self::$finder->findOne($type, $sql, $values);
 	}
 	/**
-	 * Finds a bean using a type and a where clause (SQL).
-	 * As with most Query tools in RedBean you can provide values to
-	 * be inserted in the SQL statement by populating the value
-	 * array parameter; you can either use the question mark notation
-	 * or the slot-notation (:keyname).
+	 * @see RedBean_Facade::find
 	 * This variation returns the last bean only.
 	 * 
 	 * @param string $type   type   the type of bean you are looking for

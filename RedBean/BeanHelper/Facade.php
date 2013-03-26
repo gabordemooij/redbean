@@ -13,25 +13,13 @@
  */
 class RedBean_BeanHelper_Facade implements RedBean_BeanHelper {
 	/**
-	 * Returns a reference to the toolbox. This method returns a toolbox
-	 * for beans that need to use toolbox functions. Since beans can contain
-	 * lists they need a toolbox to lazy-load their relationships.
-	 *  
-	 * @return RedBean_ToolBox $toolbox toolbox containing all kinds of goodies
+	 * @see RedBean_BeanHelper::getToolbox
 	 */
 	public function getToolbox() {
 		return RedBean_Facade::$toolbox;
 	}
 	/**
-	 * Fuse connector.
-	 * Gets the model for a bean $bean.
-	 * Allows you to implement your own way to find the
-	 * right model for a bean and to do dependency injection
-	 * etc.
-	 *
-	 * @param RedBean_OODBBean $bean bean
-	 *  
-	 * @return type 
+	 * @see RedBean_BeanHelper::getModelForBean
 	 */
 	public function getModelForBean(RedBean_OODBBean $bean) {
 		$modelName = RedBean_ModelHelper::getModelName($bean->getMeta('type'), $bean);

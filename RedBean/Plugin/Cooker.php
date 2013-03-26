@@ -10,24 +10,16 @@
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *
- * The Cooker is a little candy to make it easier to read-in an HTML form.
- * This class turns a form into a collection of beans plus an array
- * describing the desired associations.
- *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	/**
-	 * Flag, determines whether it's possible to load beans with graph().
 	 * @var boolean
 	 */
 	private static $loadBeans = false;
 	/**
-	 * This flag indicates whether empty strings in beans will be
-	 * interpreted as NULL or not. TRUE means Yes, will be converted to NULL,
-	 * FALSE means empty strings will be stored as such (conversion to 0 for integer fields).
 	 * @var boolean
 	 */
 	private static $useNULLForEmptyString = false;

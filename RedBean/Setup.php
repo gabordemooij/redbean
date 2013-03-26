@@ -14,12 +14,12 @@
  */
 class RedBean_Setup {
 	/**
-	 * This method checks the DSN string. If the DSN string contains a
-	 * database name that is not supported by RedBean yet then it will
-	 * throw an exception RedBean_Exception_NotImplemented. In any other
-	 * case this method will just return boolean TRUE.
+	 * This method checks the DSN string.
+	 * 
 	 * @throws RedBean_Exception_NotImplemented
+	 * 
 	 * @param string $dsn
+	 * 
 	 * @return boolean $true
 	 */
 	private static function checkDSN($dsn) {
@@ -27,9 +27,7 @@ class RedBean_Setup {
 		return true;
 	}
 	/**
-	 * Generic Kickstart method.
-	 * This is the generic kickstarter. It will prepare a database connection
-	 * using the $dsn, the $username and the $password you provide.
+	 * Initializes the database and prepares a toolbox.
 	 *
 	 * @param  string|PDO $dsn      Database Connection String (or PDO instance)
 	 * @param  string     $username Username for database
@@ -64,7 +62,6 @@ class RedBean_Setup {
 		$redbean = new RedBean_OODB($writer);
 		if ($frozen) $redbean->freeze(true);
 		$toolbox = new RedBean_ToolBox($redbean,$adapter,$writer);
-		//deliver everything back in a neat toolbox
 		return $toolbox;
 	}
 }

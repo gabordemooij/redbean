@@ -4,9 +4,6 @@
  * 
  * @file			RedBean/Finder.php
  * @desc			Helper class to harmonize APIs.
- *					This convenience class offers additional find-methods
- *					that are somewhat easier to use than the find() method in OODB.
- *					These methods used to be defined in the facade only.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *
@@ -17,12 +14,10 @@
  */
 class RedBean_Finder {
 	/**
-	 * ToolBox for the Finder instance.
 	 * @var RedBean_ToolBox 
 	 */
 	protected $toolbox;
 	/**
-	 * Holds the RedBeanPHP OODB instance for this object.
 	 * @var RedBean_OODB
 	 */
 	protected $redbean;
@@ -55,11 +50,7 @@ class RedBean_Finder {
 		return $this->redbean->find($type,array(),array($sql,$values));
 	}
 	/**
-	 * Finds a bean using a type and a where clause (SQL).
-	 * As with most Query tools in RedBean you can provide values to
-	 * be inserted in the SQL statement by populating the value
-	 * array parameter; you can either use the question mark notation
-	 * or the slot-notation (:keyname).
+	 * @see RedBean_Finder::find
 	 * The findAll() method differs from the find() method in that it does
 	 * not assume a WHERE-clause, so this is valid:
 	 *
@@ -79,11 +70,7 @@ class RedBean_Finder {
 		return $this->redbean->find($type,array(),array($sql,$values),true);
 	}
 	/**
-	 * Finds a bean using a type and a where clause (SQL).
-	 * As with most Query tools in RedBean you can provide values to
-	 * be inserted in the SQL statement by populating the value
-	 * array parameter; you can either use the question mark notation
-	 * or the slot-notation (:keyname).
+	 * @see RedBean_Finder::find
 	 * The variation also exports the beans (i.e. it returns arrays).
 	 * 
 	 * @param string $type   type   the type of bean you are looking for
@@ -101,11 +88,7 @@ class RedBean_Finder {
 		return $arr;
 	}
 	/**
-	 * Finds a bean using a type and a where clause (SQL).
-	 * As with most Query tools in RedBean you can provide values to
-	 * be inserted in the SQL statement by populating the value
-	 * array parameter; you can either use the question mark notation
-	 * or the slot-notation (:keyname).
+	 * @see RedBean_Finder::find
 	 * This variation returns the first bean only.
 	 * 
 	 * @param string $type   type   the type of bean you are looking for
@@ -121,11 +104,7 @@ class RedBean_Finder {
 		return $found;
 	}
 	/**
-	 * Finds a bean using a type and a where clause (SQL).
-	 * As with most Query tools in RedBean you can provide values to
-	 * be inserted in the SQL statement by populating the value
-	 * array parameter; you can either use the question mark notation
-	 * or the slot-notation (:keyname).
+	 * @see RedBean_Finder::find
 	 * This variation returns the last bean only.
 	 * 
 	 * @param string $type   type   the type of bean you are looking for

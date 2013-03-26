@@ -14,7 +14,6 @@
 class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 	/**
 	 * @var array
-	 * contains log messages
 	 */
 	protected $logs = array();
 	/**

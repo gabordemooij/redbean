@@ -18,58 +18,37 @@
  */
 abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
-	 * Scanned value (scanType) 
-	 * @var type
-	 */
-	protected $svalue;
-	/**
-	 * Supported Column Types.
 	 * @var array
 	 */
 	public $typeno_sqltype = array();
 	/**
-	 * Holds a reference to the database adapter to be used.
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
 	/**
-	 * default value to for blank field (passed to PK for auto-increment)
 	 * @var string
 	 */
 	protected $defaultValue = 'NULL';
 	/**
-	 * character to escape keyword table/column names
 	 * @var string
 	 */
 	protected $quoteCharacter = '';
 	/**
-	 * Flag indicating whether we are using caching.
 	 * @var boolean
 	 */
 	protected $flagUseCache = false;
 	/**
-	 * Flush key. A hash-like string that acts as a lock to verify
-	 * no intermediate queries have taken place.
 	 * @var string 
 	 */
 	protected $flushKey = '';
 	/**
-	 * A storage for cached databasse result rows.
-	 * Each entry is a row.
 	 * @var array 
 	 */
 	protected $cache = array();
 	/**
-	 * Contains aliases for association tables.
 	 * @var array
 	 */
 	protected static $renames = array();
-	/**
-	 * Constructor
-	 * Sets the default Bean Formatter, use parent::__construct() in
-	 * subclass to achieve this.
-	 */
-	public function __construct() {}
 	/**
 	 * Returns the sql that should follow an insert statement.
 	 *
@@ -81,12 +60,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
     	return '';
   	}
 	/**
-	 * Checks a database structure identifier and escapes it.
-	 * 
-	 * @param string  $dbStructure structure identifier
-	 * @param boolean $dontQuote   whether you want to put quotes around it
-	 * 
-	 * @return string $result 
+	 * @see RedBean_QueryWriter::esc
 	 */
 	public function esc($dbStructure, $dontQuote = false) {
 		$this->check($dbStructure);
@@ -106,14 +80,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $struct;
 	}
 	/**
-	 * This method adds a column to a table.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param string  $type   name of the table
-	 * @param string  $column name of the column
-	 * @param integer $field  data type for field
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::addColumn
 	 */
 	public function addColumn($type, $column, $field) {
 		$table = $type;
@@ -125,18 +92,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$this->adapter->exec( $sql );
 	}
 	/**
-	 * This method updates (or inserts) a record, it takes
-	 * a table name, a list of update values ( $field => $value ) and an
-	 * primary key ID (optional). If no primary key ID is provided, an
-	 * INSERT will take place.
-	 * Returns the new ID.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param string  $type         name of the table to update
-	 * @param array   $updatevalues list of update values
-	 * @param integer $id			optional primary key ID value
-	 *
-	 * @return integer $id the primary key ID value of the new record
+	 * @see RedBean_QueryWriter::updateRecord
 	 */
 	public function updateRecord($type, $updatevalues, $id=null) {
 		$table = $type;
@@ -148,8 +104,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			}
 			return $this->insertRecord($table,$insertcolumns,array($insertvalues));
 		}
-		if ($id && !count($updatevalues)) return $id;
-		
+		if ($id && !count($updatevalues)) return $id;	
 		$table = $this->esc($table);
 		$sql = "UPDATE $table SET ";
 		$p = $v = array();
@@ -194,24 +149,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $last_id;
 	}
 	/**
-	 * This selects a record. You provide a
-	 * collection of conditions using the following format:
-	 * array( $field1 => array($possibleValue1, $possibleValue2,... $possibleValueN ),
-	 * ...$fieldN=>array(...));
-	 * Also, additional SQL can be provided. This SQL snippet will be appended to the
-	 * query string. If the $delete parameter is set to TRUE instead of selecting the
-	 * records they will be deleted.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @throws Exception
-	 * @param string  $type    type of bean to select records from
-	 * @param array   $cond    conditions using the specified format
-	 * @param string  $asql    additional sql
-	 * @param boolean $delete  IF TRUE delete records (optional)
-	 * @param boolean $inverse IF TRUE inverse the selection (optional)
-	 * @param boolean $all     IF TRUE suppress WHERE keyword, omitting WHERE clause
-	 *
-	 * @return array $records selected records
+	 * @see RedBean_QueryWriter::selectRecord
 	 */
 	public function selectRecord($type, $conditions, $addSql=null, $delete=null, $inverse=false, $all=false) { 
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
@@ -250,7 +188,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$bindings = array_merge($bindings,$values);
 			}
 		}
-		//$addSql can be either just a string or array($sql, $bindings)
 		if (is_array($addSql)) {
 			if (count($addSql)>1) {
 				$bindings = array_merge($bindings,$addSql[1]);
@@ -281,12 +218,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $rows;
 	}
 	/**
-	 * This method removes all beans of a certain type.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param  string $type bean type
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::wipe
 	 */
 	public function wipe($type) {
 		$table = $type;
@@ -295,13 +227,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$this->adapter->exec($sql);
 	}
 	/**
-	 * Counts rows in a table.
-	 *
-	 * @param string $beanType type of bean to count
-	 * @param string $addSQL   additional SQL
-	 * @param array  $params   parameters to bind to SQL
-	 *
-	 * @return integer $numRowsFound
+	 * @see RedBean_QueryWriter::count
 	 */
 	public function count($beanType, $addSQL = '', $params = array()) {
 		$sql = "SELECT count(*) FROM {$this->esc($beanType)} ";
@@ -326,21 +252,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return (boolean) (ctype_digit(strval($value)) && strval($value)===strval(intval($value)));
 	}
 	/**
-	 * This method adds a foreign key from type and field to
-	 * target type and target field.
-	 * The foreign key is created without an action. On delete/update
-	 * no action will be triggered. The FK is only used to allow database
-	 * tools to generate pretty diagrams and to make it easy to add actions
-	 * later on.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 *
-	 * @param  string $type	       type that will have a foreign key field
-	 * @param  string $targetType  points to this type
-	 * @param  string $field       field that contains the foreign key value
-	 * @param  string $targetField field where the fk points to
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::addFK
 	 */
 	public function addFK($type, $targetType, $field, $targetField, $isDependent = false) {
 		$table = $this->esc($type);
@@ -422,14 +334,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return (isset(self::$renames[$assoc])) ? self::$renames[$assoc] : $assoc;
 	}
 	/**
-	 * Adds a constraint. If one of the beans gets trashed
-	 * the other, related bean should be removed as well.
-	 *
-	 * @param RedBean_OODBBean $bean1      first bean
-	 * @param RedBean_OODBBean $bean2      second bean
-	 * @param bool 			   $dontCache  by default we use a cache, TRUE = NO CACHING (optional)
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::addConstraint
 	 */
 	public function addConstraint(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		$table1 = $bean1->getMeta('type');

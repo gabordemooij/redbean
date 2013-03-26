@@ -13,17 +13,7 @@
  */
 class RedBean_AssociationManager_ExtAssociationManager extends RedBean_AssociationManager {
 	/**
-	 * Associates two beans with eachother. This method connects two beans with eachother, just
-	 * like the other associate() method in the Association Manager. The difference is however
-	 * that this method accepts a base bean, this bean will be used as the basis of the
-	 * association record in the link table. You can thus add additional properties and
-	 * even foreign keys.
-	 *
-	 * @param RedBean_OODBBean $bean1 bean 1
-	 * @param RedBean_OODBBean $bean2 bean 2
-	 * @param RedBean_OODBBean $bbean base bean for association record
-	 *
-	 * @return void
+	 * @deprecated
 	 */
 	public function extAssociate(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $baseBean) {
 		$table = $this->getTable(array($bean1->getMeta('type') , $bean2->getMeta('type')));
@@ -31,12 +21,7 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 		return $this->associateBeans($bean1, $bean2, $baseBean);
 	}
 	/**
-	 * Deprecated
-	 * 
-	 * @param RedBean_OODBBean $beans1 bean
-	 * @param RedBean_OODBBean $beans2 bean
-	 * @param mixed $extra
-	 * @return mixed 
+	 * @deprecated
 	 */
 	public function extAssociateSimple($beans1, $beans2, $extra = null) {
 		if (!is_array($extra)) {

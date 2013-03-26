@@ -16,17 +16,14 @@
  */
 class RedBean_TagManager {
 	/**
-	 * The Tag Manager requires a toolbox
 	 * @var RedBean_Toolbox 
 	 */
 	protected $toolbox;
 	/**
-	 * Association Manager to manage tag-bean relations
 	 * @var RedBean_AssociationManager
 	 */
 	protected $associationManager;
 	/**
-	 * RedBeanPHP OODB instance
 	 * @var RedBean_OODBBean 
 	 */
 	protected $redbean;

@@ -18,44 +18,30 @@
  */
 class RedBean_OODB extends RedBean_Observable {
 	/**
-	 * Chill mode, for fluid mode but with a list of beans / types that
-	 * are considered to be stable and don't need to be modified.
 	 * @var array 
 	 */
 	protected $chillList = array();
 	/**
-	 * List of dependencies. Format: $type => array($depensOnMe, $andMe)
 	 * @var array
 	 */
 	protected $dep = array();
 	/**
-	 * Secret stash. Used for batch loading.
 	 * @var array
 	 */
 	protected $stash = NULL;
 	/**
-	 * Contains the writer for OODB.
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $writer;
 	/**
-	 * Whether this instance of OODB is frozen or not.
-	 * In frozen mode the schema will not de modified, in fluid mode
-	 * the schema can be adjusted to meet the needs of the developer.
 	 * @var boolean
 	 */
 	protected $isFrozen = false;
 	/**
-	 * Bean Helper. The bean helper to give to the beans. Bean Helpers
-	 * assist beans in getting hold of a toolbox.
 	 * @var null|\RedBean_BeanHelperFacade
 	 */
 	protected $beanhelper = null;
 	/**
-	 * Association Manager.
-	 * Reference to the Association Manager. The OODB class uses
-	 * the association manager to store many-to-many relations.
-	 * 
 	 * @var RedBean_AssociationManager
 	 */
 	protected $assocManager = null;

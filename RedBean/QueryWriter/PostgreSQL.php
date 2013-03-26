@@ -13,67 +13,27 @@
  */
 class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 	/**
-	 * Integer Data Type
-	 * @var integer
+	 * Data types
 	 */
 	const C_DATATYPE_INTEGER = 0;
-	/**
-	 * Double Precision Type
-	 * @var integer
-	 */
 	const C_DATATYPE_DOUBLE = 1;
-	/**
-	 * String Data Type
-	 * @var integer
-	 */
 	const C_DATATYPE_TEXT = 3;
-	/**
-	 * Special type date for storing date values: YYYY-MM-DD
-	 * @var integer
-	 */
 	const C_DATATYPE_SPECIAL_DATE = 80;
-	/**
-	 * Special type date for storing date values: YYYY-MM-DD HH:MM:SS
-	 * @var integer
-	 */
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
-	/**
-	 * Special type point.
-	 * @var integer
-	 */
 	const C_DATATYPE_SPECIAL_POINT = 90;
-	/**
-	 * Special type line segment.
-	 * @var integer
-	 */
 	const C_DATATYPE_SPECIAL_LSEG = 91;
-	/**
-	 * Special type circle.
-	 * @var integer
-	 */
 	const C_DATATYPE_SPECIAL_CIRCLE = 92;
-	/**
-	 * Special type money.
-	 * @var integer
-	 */
 	const C_DATATYPE_SPECIAL_MONEY = 93;
-	/**
-	 * Specified field type cannot be overruled
-	 * @var integer
-	 */
 	const C_DATATYPE_SPECIFIED = 99;
 	/**
-	 * Holds Database Adapter
 	 * @var RedBean_DBAdapter
 	 */
 	protected $adapter;
 	/**
-	 * character to escape keyword table/column names
 	 * @var string
 	 */
 	protected $quoteCharacter = '"';
 	/**
-	 * Default Value
 	 * @var string
 	 */
 	protected $defaultValue = 'DEFAULT';
@@ -98,9 +58,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	}
 	/**
 	 * Constructor
-	 * The Query Writer Constructor also sets up the database
-	 *
-	 * @param RedBean_DBAdapter $adapter adapter
+	 * 
+	 * @param RedBean_Adapter $adapter Database Adapter
 	 */
 	public function __construct(RedBean_Adapter $adapter) {	
 		$this->typeno_sqltype = array(
@@ -118,21 +77,16 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		foreach($this->typeno_sqltype as $k=>$v)
 		$this->sqltype_typeno[trim(strtolower($v))]=$k;	
 		$this->adapter = $adapter;
-		parent::__construct();
 	}
 	/**
-	 * Returns all tables in the database
-	 *
-	 * @return array $tables tables
+	 * @see RedBean_QueryWriter::getTables
 	 */
 	public function getTables() {
 		return $this->adapter->getCol( "select table_name from information_schema.tables
 		where table_schema = 'public'" );
 	}
 	/**
-	 * Creates an empty, column-less table for a bean.
-	 *
-	 * @param string $table table to create
+	 * @see RedBean_QueryWriter::createTable
 	 */
 	public function createTable($table) {
 		$table = $this->esc($table);
@@ -140,11 +94,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		$this->adapter->exec( $sql );
 	}
 	/**
-	 * Returns an array containing the column names of the specified table.
-	 *
-	 * @param string $table table to get columns from
-	 *
-	 * @return array $columns array filled with column (name=>type)
+	 * @see RedBean_QueryWriter::getColumns
 	 */
 	public function getColumns($table) {
 		$table = $this->esc($table, true);
@@ -155,12 +105,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		return $columns;
 	}
 	/**
-	 * Returns the pgSQL Column Type Code (integer) that corresponds
-	 * to the given value type.
-	 *
-	 * @param string $value value to determine type of
-	 *
-	 * @return integer $type type code for this value
+	 * @see RedBean_QueryWriter::scanType
 	 */
 	public function scanType($value, $flagSpecial=false) {
 		$this->svalue=$value;
@@ -200,16 +145,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		}
 	}
 	/**
-	 * Returns the Type Code for a Column Description.
-	 * Given an SQL column description this method will return the corresponding
-	 * code for the writer. If the include specials flag is set it will also
-	 * return codes for special columns. Otherwise special columns will be identified
-	 * as specified columns.
-	 *
-	 * @param string  $typedescription description
-	 * @param boolean $includeSpecials whether you want to get codes for special columns as well
-	 *
-	 * @return integer $typecode code
+	 * @see RedBean_QueryWriter::code
 	 */
 	public function code($typedescription, $includeSpecials = false) {
 		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
@@ -218,14 +154,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		return $r;
 	}
 	/**
-	 * This method upgrades the column to the specified data type.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param string  $type       type / table that needs to be adjusted
-	 * @param string  $column     column that needs to be altered
-	 * @param integer $datatype   target data type
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::widenColumn
 	 */
 	public function widenColumn($type, $column, $datatype) {
 		$table = $type;
@@ -237,13 +166,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		$this->adapter->exec( $changecolumnSQL );
 	}
 	/**
-	 * Adds a Unique index constrain to the table.
-	 *
-	 * @param string $table table to add index to
-	 * @param string $col1  column to be part of index
-	 * @param string $col2  column 2 to be part of index
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::addUniqueIndex
 	 */
 	public function addUniqueIndex($table,$columns) {
 		$table = $this->esc($table, true);
@@ -280,15 +203,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		$this->adapter->exec($sql);
 	}
 	/**
-	 * Given an Database Specific SQLState and a list of QueryWriter
-	 * Standard SQL States this function converts the raw SQL state to a
-	 * database agnostic ANSI-92 SQL states and checks if the given state
-	 * is in the list of agnostic states.
-	 *
-	 * @param string $state state
-	 * @param array  $list  list of states
-	 *
-	 * @return boolean $isInArray whether state is in list
+	 * @see RedBean_QueryWriter::sqlStateIn
 	 */
 	public function sqlStateIn($state, $list) {
 		$stateMap = array(
@@ -299,15 +214,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list);
 	}
 	/**
-	 * This method should add an index to a type and field with name
-	 * $name.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param  $type   type to add index to
-	 * @param  $name   name of the new index
-	 * @param  $column field to index
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::addIndex
 	 */
 	public function addIndex($type, $name, $column) {
 		$table = $type;
@@ -318,15 +225,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
 	}
 	/**
-	 * Adds a foreign key to a table. The foreign key will not have any action; you
-	 * may configure this afterwards.
-	 *
-	 * @param  string $type        type you want to modify table of
-	 * @param  string $targetType  target type
-	 * @param  string $field       field of the type that needs to get the fk
-	 * @param  string $targetField field where the fk needs to point to
-	 *
-	 * @return bool $success whether an FK has been added
+	 * @see RedBean_QueryWriter::addFK
 	 */
 	public function addFK($type, $targetType, $field, $targetField, $isDep = false) {
 		try{
@@ -440,7 +339,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		catch(Exception $e){ return false; }
 	}
 	/**
-	 * Removes all tables and views from the database.
+	 * @see RedBean_QueryWriter::wipeAll
 	 */
 	public function wipeAll() {
       	$this->adapter->exec('SET CONSTRAINTS ALL DEFERRED');
@@ -458,12 +357,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		$this->adapter->exec('SET CONSTRAINTS ALL IMMEDIATE');
 	}
 	/**
-	 * This method removes all beans of a certain type.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param  string $type bean type
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::wipe
 	 */
 	public function wipe($type) {
 		$table = $type;

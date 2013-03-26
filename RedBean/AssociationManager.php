@@ -13,17 +13,14 @@
  */
 class RedBean_AssociationManager extends RedBean_Observable {
 	/**
-	 * Contains a reference to the Object Database OODB
 	 * @var RedBean_OODB
 	 */
 	protected $oodb;
 	/**
-	 * Contains a reference to the Database Adapter
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
 	/**
-	 * Contains a reference to the Query Writer
 	 * @var RedBean_QueryWriter
 	 */
 	protected $writer;

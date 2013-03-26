@@ -14,7 +14,6 @@
  */
 class RedBean_LabelMaker {	
 	/**
-	 * Holds the toolbox for this instance.
 	 * @var RedBean_Toolbox 
 	 */
 	protected $toolbox;

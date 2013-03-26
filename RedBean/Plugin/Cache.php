@@ -16,24 +16,14 @@
 
 class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	/**
-	 * Bean cache, contains the cached beans identified by
-	 * label keys containing the type id and the fetch method;
-	 * i.e. single load or batch load.
-	 *  
 	 * @var array 
 	 */
 	protected $cache = array();
 	/**
-	 * Number of hits (beans/calls being served from cache). 
-	 * Can be used to monitor cache performance.
-	 *  
 	 * @var integer 
 	 */
 	protected $hits = 0;
 	/**
-	 * Number of misses (beans not being served from cache), can be
-	 * used to monitor cache performance.
-	 * 
 	 * @var integer 
 	 */
 	protected $misses = 0;

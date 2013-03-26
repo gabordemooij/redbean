@@ -33,51 +33,34 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	private static $flagKeyedExport = false;
 	/**
-	* Flag,indicates whether we still need to perform
-	* column beautification.
 	* @var boolean
 	*/
 	private $flagSkipBeau = false;
 	/**
-	 * Properties of the bean. These are kept in a private
-	 * array called properties and exposed through the array interface.
 	 * @var array $properties
 	 */
 	private $properties = array();
 	/**
-	 * Meta Data storage. This is the internal property where all
-	 * Meta information gets stored.
 	 * @var array
 	 */
 	private $__info = array();
 	/**
-	 * Contains a BeanHelper to access service objects like
-	 * te association manager and OODB.
 	 * @var RedBean_BeanHelper
 	 */
 	private $beanHelper = NULL;
 	/**
-	 * Contains the latest Fetch Type.
-	 * A Fetch Type is a preferred type for the next nested bean.
 	 * @var null
 	 */
 	private $fetchType = NULL;
 	/**
-	 * Used store store SQL snippet for use with with()
-	 * method.
-	 * 
 	 * @var string 
 	 */
 	private $withSql = '';
 	/**
-	 * Parameters for with-SQL snippets.
-	 * 
-	 * @var string 
+	 * @var array 
 	 */
 	private $withParams = array();
 	/**
-	 * Alias name for a type.
-	 * 
 	 * @var string 
 	 */
 	private $aliasName = NULL;
@@ -137,24 +120,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return new ArrayIterator($this->properties);
 	}
 	/**
-	 * Imports all values in associative array $array. Every key is used
-	 * for a property and every value will be assigned to the property
-	 * identified by the key. So basically this method converts the
-	 * associative array to a bean by loading the array. You can filter
-	 * the values using the $selection parameter. If $selection is boolean
-	 * false, no filtering will be applied. If $selection is an array
-	 * only the properties specified (as values) in the $selection
-	 * array will be taken into account. To skip a property, omit it from
-	 * the $selection array. Also, instead of providing an array you may
-	 * pass a comma separated list of property names. This method is
-	 * chainable because it returns its own object.
-	 * Imports data into bean
+	 * Imports all values from an associative array $array. Chainable.
 	 *
 	 * @param array        $array     what you want to import
 	 * @param string|array $selection selection of values
 	 * @param boolean      $notrim    if TRUE values will not be trimmed
 	 *
-	 *    @return RedBean_OODBBean $this
+	 * @return RedBean_OODBBean $this
 	 */
 	public function import($arr, $selection=false, $notrim=false) {
 		if (is_string($selection)) {
@@ -172,7 +144,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return $this;
 	}
 	/**
-	* A Quick way to import bean data from a source bean.
+	* Imports data from another bean. Chainable.
 	* 
 	* @param RedBean_OODBBean $sourceBean the source bean to take properties from
 	*
@@ -204,10 +176,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
 	 * Exports the bean as an array.
 	 * This function exports the contents of a bean to an array and returns
-	 * the resulting array. If $meta eq uals boolean TRUE, then the array will
-	 * also contain the __info section containing the meta data inside the
-	 * RedBean_OODBBean Bean object.
-	 * @param boolean $meta
+	 * the resulting array. 
+	 * 
+	 * @param boolean $meta    set to TRUE if you want to export meta data as well 
+	 * @param boolean $parents set to TRUE if you want to export parents as well
+	 * @param boolean $onlyMe  set to TRUE if you want to export only this bean
+	 * @param array   $filters optional whitelist for export
+	 * 
 	 * @return array $arr
 	 */
 	public function export($meta = false, $parents = false, $onlyMe = false, $filters = array()) {
@@ -244,8 +219,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	}
 	/**
 	 * Exports the bean to an object.
-	 * This function exports the contents of a bean to an object.
-	 * @param object $obj
+	 * 
+	 * @param object $obj target object
+	 * 
 	 * @return array $arr
 	 */
 	public function exportToObj($obj) {
@@ -256,11 +232,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	}
 	/**
 	 * Implements isset() function for use as an array.
-	 * Returns whether bean has an element with key
-	 * named $property. Returns TRUE if such an element exists
-	 * and FALSE otherwise.
-	 * @param string $property
-	 * @return boolean $hasProperty
+	 * 
+	 * @param string $property name of the property you want to check
+	 * 
+	 * @return boolean
 	 */
 	public function __isset($property) {
 		return (isset($this->properties[$property]));

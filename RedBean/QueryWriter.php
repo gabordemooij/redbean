@@ -24,15 +24,11 @@
 interface RedBean_QueryWriter {
 	/**
 	 * Query Writer constants.
-	 * These constants are used to identify common SQL problems.
-	 * These are used for FLUID-mode to determine whether we should throw
-	 * an exception or not. In FLUID-mode some errors are allowed; for instance,
-	 * if a column does not exist: C_SQLSTATE_NO_SUCH_COLUMN this is no reason
-	 * to throw an error because in FLUID mode we build the schema on the fly..
 	 */
 	const C_SQLSTATE_NO_SUCH_TABLE = 1;
 	const C_SQLSTATE_NO_SUCH_COLUMN = 2;
 	const C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION = 3;
+
 	/**
 	 * Returns the tables that are in the database.
 	 *
@@ -40,7 +36,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function getTables();
 	/**
-	 * This method should create a table for the bean.
+	 * This method will create a table for the bean.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 * @param string $type type of bean you want to create a table for
@@ -72,7 +68,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function scanType($value, $alsoScanSpecialForTypes=false);
 	/**
-	 * This method should add a column to a table.
+	 * This method will add a column to a table.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 * @param string  $type   name of the table
@@ -84,18 +80,20 @@ interface RedBean_QueryWriter {
 	 */
 	public function addColumn($type, $column, $field);
 	/**
-	 * This method should return a data type constant based on the
-	 * SQL type definition. This function is meant to compare column data
-	 * type to check whether a column is wide enough to represent the desired
-	 * values.
+	 * Returns the Type Code for a Column Description.
+	 * Given an SQL column description this method will return the corresponding
+	 * code for the writer. If the include specials flag is set it will also
+	 * return codes for special columns. Otherwise special columns will be identified
+	 * as specified columns.
 	 *
-	 * @param integer $typedescription SQL type description from database
+	 * @param string  $typedescription description
+	 * @param boolean $includeSpecials whether you want to get codes for special columns as well
 	 *
-	 * @return integer $type
+	 * @return integer $typecode code
 	 */
-	public function code($typedescription);
+	public function code($typedescription, $includeSpecials = false);
 	/**
-	 * This method should widen the column to the specified data type.
+	 * This method will widen the column to the specified data type.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 * @param string  $type       type / table that needs to be adjusted
@@ -121,7 +119,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function updateRecord($type, $updatevalues, $id=null);
 	/**
-	 * This method should select a record. You should be able to provide a
+	 * This method selects a record. You can provide a
 	 * collection of conditions using the following format:
 	 * array( $field1 => array($possibleValue1, $possibleValue2,... $possibleValueN ),
 	 * ...$fieldN=>array(...));
@@ -130,17 +128,19 @@ interface RedBean_QueryWriter {
 	 * records they will be deleted.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string  $type   type of bean to select records from
-	 * @param array   $cond   conditions using the specified format
-	 * @param string  $asql   additional sql
+	 * @throws Exception
+	 * @param string  $type    type of bean to select records from
+	 * @param array   $cond    conditions using the specified format
+	 * @param string  $asql    additional sql
 	 * @param boolean $delete  IF TRUE delete records (optional)
 	 * @param boolean $inverse IF TRUE inverse the selection (optional)
+	 * @param boolean $all     IF TRUE suppress WHERE keyword, omitting WHERE clause
 	 *
 	 * @return array $records selected records
 	 */
 	public function selectRecord($type, $conditions, $addSql = null, $delete = false, $inverse = false);
 	/**
-	 * This method should add a UNIQUE constraint index to a table on columns $columns.
+	 * This method will add a UNIQUE constraint index to a table on columns $columns.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 * @param string $type               type
@@ -150,7 +150,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function addUniqueIndex($type,$columns);
 	/**
-	 * This method should check whether the SQL state is in the list of specified states
+	 * This method will check whether the SQL state is in the list of specified states
 	 * and returns true if it does appear in this list or false if it
 	 * does not. The purpose of this method is to translate the database specific state to
 	 * a one of the constants defined in this class and then check whether it is in the list
@@ -163,7 +163,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function sqlStateIn($state, $list);
 	/**
-	 * This method should remove all beans of a certain type.
+	 * This method will remove all beans of a certain type.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 * @param  string $type bean type
@@ -172,7 +172,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function wipe($type);
 	/**
-	 * This method should count the number of beans of the given type.
+	 * This method will count the number of beans of the given type.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 * @param  string $type type of bean to count
@@ -181,8 +181,8 @@ interface RedBean_QueryWriter {
 	 */
 	public function count($type);
 	/**
-	 * This method should add a constraint. If one of the beans gets trashed
-	 * the other, related bean should be removed as well.
+	 * This method will add a constraint. If one of the beans gets trashed
+	 * the other, related bean will be removed as well.
 	 *
 	 * @param RedBean_OODBBean $bean1      first bean
 	 * @param RedBean_OODBBean $bean2      second bean
@@ -191,7 +191,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function addConstraint(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2);
 	/**
-	 * This method should add a foreign key from type and field to
+	 * This method will add a foreign key from type and field to
 	 * target type and target field.
 	 * The foreign key is created without an action. On delete/update
 	 * no action will be triggered. The FK is only used to allow database
@@ -209,7 +209,7 @@ interface RedBean_QueryWriter {
 	 */
 	public function addFK($type, $targetType, $field, $targetField);
 	/**
-	 * This method should add an index to a type and field with name
+	 * This method will add an index to a type and field with name
 	 * $name.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
@@ -220,4 +220,23 @@ interface RedBean_QueryWriter {
 	 * @return void
 	 */
 	public function addIndex($type, $name, $column);
+	
+	/**
+	 * Checks and filters a database structure element like a table of column
+	 * for safe use in a query. A database structure has to conform to the
+	 * RedBeanPHP DB security policy which basically means only alphanumeric
+	 * symbols are allowed. This security policy is more strict than conventional
+	 * SQL policies and does therefore not require database specific escaping rules.
+	 * 
+	 * @param string  $databaseStructure name of the column/table to check
+	 * @param boolean $noQuotes          TRUE to NOT put backticks or quotes around the string
+	 * 
+	 * @return string 
+	 */
+	public function esc($databaseStructure, $dontQuote = false);
+	
+	/**
+	 * Removes all tables and views from the database. 
+	 */
+	public function wipeAll();
 }

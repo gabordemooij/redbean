@@ -14,23 +14,32 @@
  */
 class RedBean_DuplicationManager {
 	/**
-	 * The Dup Manager requires a toolbox
-	 * @var RedBean_Toolbox 
+	 * @var RedBean_Toolbox
 	 */
 	protected $toolbox;
 	/**
-	 * Association Manager 
 	 * @var RedBean_AssociationManager
 	 */
 	protected $associationManager;
 	/**
-	 * RedBeanPHP OODB instance
-	 * @var RedBean_OODBBean 
+	 * @var RedBean_OODB
 	 */
 	protected $redbean;
+	/**
+	 * @var array
+	 */
 	protected $tables = array();
+	/**
+	 * @var array
+	 */
 	protected $columns = array();
+	/**
+	 * @var array
+	 */
 	protected $filters = array();
+	/**
+	 * @var array
+	 */
 	protected $cacheTables = false;
 	/**
 	 * Constructor,

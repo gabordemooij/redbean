@@ -15,53 +15,38 @@
  */
 class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
-	 * Contains database DSN for connecting to database.
 	 * @var string
 	 */
 	protected $dsn;
 	/**
-	 * Whether we are in debugging mode or not.
 	 * @var boolean
 	 */
 	protected $debug = false;
 	/**
-	 * Holds an instance of Logger implementation.
 	 * @var RedBean_Logger
 	 */
 	protected $logger = NULL;
 	/**
-	 * Holds the PDO instance.
 	 * @var PDO
 	 */
 	protected $pdo;
 	/**
-	 * Holds integer number of affected rows from latest query
-	 * if driver supports this feature.
 	 * @var integer
 	 */
 	protected $affected_rows;
 	/**
-	 * Holds result resource.
 	 * @var integer
 	 */
 	protected $rs;
 	/**
-	 * Contains arbitrary connection data.
 	 * @var array
 	 */
 	protected $connectInfo = array();
 	/**
-	 * Whether you want to use classic String Only binding -
-	 * backward compatibility.
 	 * @var bool
 	 */
 	public $flagUseStringOnlyBinding = false;
 	/**
-	 * Whether we are currently connected or not.
-	 * This flag is being used to delay the connection until necessary.
-	 * Delaying connections is a good practice to speed up scripts that
-	 * don't need database connectivity but for some reason want to
-	 * init RedbeanPHP.
 	 * @var boolean
 	 */
 	protected $isConnected = false;
@@ -153,8 +138,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}
 	}
 	/**
-	 * Runs a query. Internal function, available for subclasses. This method
-	 * runs the actual SQL query and binds a list of parameters to the query.
+	 * This method runs the actual SQL query and binds a list of parameters to the query.
 	 * slots. The result of the query will be stored in the protected property
 	 * $rs (always array). The number of rows affected (result of rowcount, if supported by database)
 	 * is stored in protected property $affected_rows. If the debug flag is set
@@ -196,22 +180,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}
 	}
 	/**
-	 * Runs a query and fetches results as a multi dimensional array.
-	 *
-	 * @param  string $sql SQL to be executed
-	 *
-	 * @return array $results result
+	 * @see RedBean_Driver::GetAll
 	 */
 	public function GetAll($sql, $aValues=array()) {
 		$this->runQuery($sql,$aValues);
 		return $this->rs;
 	}
 	 /**
-	 * Runs a query and fetches results as a column.
-	 *
-	 * @param  string $sql SQL Code to execute
-	 *
-	 * @return array	$results Resultset
+	 * @see RedBean_Driver::GetCol
 	 */
 	public function GetCol($sql, $aValues=array()) {
 		$rows = $this->GetAll($sql,$aValues);
@@ -224,11 +200,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		return $cols;
 	}
 	/**
-	 * Runs a query an returns results as a single cell.
-	 *
-	 * @param string $sql SQL to execute
-	 *
-	 * @return mixed $cellvalue result cell
+	 * @see RedBean_Driver::GetCell
 	 */
 	public function GetCell($sql, $aValues=array()) {
 		$arr = $this->GetAll($sql,$aValues);
@@ -237,51 +209,28 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		return $col1;
 	}
 	/**
-	 * Runs a query and returns a flat array containing the values of
-	 * one row.
-	 *
-	 * @param string $sql SQL to execute
-	 *
-	 * @return array $row result row
+	 * @see RedBean_Driver::GetRow
 	 */
 	public function GetRow($sql, $aValues=array()) {
 		$arr = $this->GetAll($sql, $aValues);
 		return array_shift($arr);
 	}
 	/**
-	 * Executes SQL code and allows key-value binding.
-	 * This function allows you to provide an array with values to bind
-	 * to query parameters. For instance you can bind values to question
-	 * marks in the query. Each value in the array corresponds to the
-	 * question mark in the query that matches the position of the value in the
-	 * array. You can also bind values using explicit keys, for instance
-	 * array(":key"=>123) will bind the integer 123 to the key :key in the
-	 * SQL. This method has no return value.
-	 *
-	 * @param string $sql	  SQL Code to execute
-	 * @param array  $aValues Values to bind to SQL query
-	 *
-	 * @return void
+	 * @see RedBean_Driver::Excecute
 	 */
 	public function Execute( $sql, $aValues=array() ) {
 		$this->runQuery($sql,$aValues);
 		return $this->affected_rows;
 	}
 	/**
-	 * Returns the latest insert ID if driver does support this
-	 * feature.
-	 *
-	 * @return integer $id primary key ID
+	 * @see RedBean_Driver::GetInsertID
 	 */
 	public function GetInsertID() {
 		$this->connect();
 		return (int) $this->pdo->lastInsertId();
 	}
 	/**
-	 * Returns the number of rows affected by the most recent query
-	 * if the currently selected PDO driver supports this feature.
-	 *
-	 * @return integer $numOfRows number of rows affected
+	 * @see RedBean_Driver::Affected_Rows
 	 */
 	public function Affected_Rows() {
 		$this->connect();
@@ -290,12 +239,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * Toggles debug mode. In debug mode the driver will print all
 	 * SQL to the screen together with some information about the
-	 * results. All SQL code that passes through the driver will be
-	 * passes on to the screen for inspection.
-	 * This method has no return value.
-	 *
-	 * Additionally you can inject RedBean_Logger implementation
-	 * where you can define your own log() method
+	 * results. 
 	 *
 	 * @param boolean $trueFalse turn on/off
 	 * @param RedBean_Logger $logger 
@@ -325,45 +269,21 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		return $this->logger;
 	}
 	/**
-	 * Starts a transaction.
-	 * This method is part of the transaction mechanism of
-	 * RedBeanPHP. All queries in a transaction are executed together.
-	 * In case of an error all commands will be rolled back so none of the
-	 * SQL in the transaction will affect the DB. Using transactions is
-	 * considered best practice.
-	 * This method has no return value.
-	 *
-	 * @return void
+	 * @see RedBean_Driver::StartTrans
 	 */
 	public function StartTrans() {
 		$this->connect();
 		$this->pdo->beginTransaction();
 	}
 	/**
-	 * Commits a transaction.
-	 * This method is part of the transaction mechanism of
-	 * RedBeanPHP. All queries in a transaction are executed together.
-	 * In case of an error all commands will be rolled back so none of the
-	 * SQL in the transaction will affect the DB. Using transactions is
-	 * considered best practice.
-	 * This method has no return value.
-	 *
-	 * @return void
+	 * @see RedBean_Driver::CommitTrans
 	 */
 	public function CommitTrans() {
 		$this->connect();
 		$this->pdo->commit();
 	}
 	/**
-	 * Rolls back a transaction.
-	 * This method is part of the transaction mechanism of
-	 * RedBeanPHP. All queries in a transaction are executed together.
-	 * In case of an error all commands will be rolled back so none of the
-	 * SQL in the transaction will affect the DB. Using transactions is
-	 * considered best practice.
-	 * This method has no return value.
-	 *
-	 * @return void
+	 * @see RedBean_Driver::FailTrans
 	 */
 	public function FailTrans() {
 		$this->connect();

@@ -16,42 +16,23 @@
 class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
 	/**
 	 * @var RedBean_Adapter_DBAdapter
-	 * Holds database adapter
 	 */
 	protected $adapter;
 	/**
 	 * @var string
-	 * character to escape keyword table/column names
 	 */
   	protected $quoteCharacter = '`';
 	/**
-	 * Integer Data type
-	 * @var integer
+	 * Data types
 	 */
 	const C_DATATYPE_INTEGER = 0;
-	/**
-	 * Numeric Data type (for REAL and date/time)
-	 * @var integer
-	 */
 	const C_DATATYPE_NUMERIC = 1;
-	/**
-	 * Text type
-	 * @var integer
-	 */
 	const C_DATATYPE_TEXT = 2;
-	/**
-	 * Specified. This means the developer or DBA
-	 * has altered the column to a different type not
-	 * recognized by RedBean. This high number makes sure
-	 * it will not be converted back to another type by accident.
-	 * @var integer
-	 */
 	const C_DATATYPE_SPECIFIED = 99;
 	/**
 	 * Constructor
-	 * The Query Writer Constructor also sets up the database
-	 *
-	 * @param RedBean_Adapter_DBAdapter $adapter adapter
+	 * 
+	 * @param RedBean_Adapter $adapter Database Adapter
 	 */
 	public function __construct(RedBean_Adapter $adapter) {
 		$this->typeno_sqltype = array(
@@ -63,7 +44,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		foreach($this->typeno_sqltype as $k=>$v)
 		$this->sqltype_typeno[$v]=$k;
 		$this->adapter = $adapter;
-		parent::__construct($adapter);
 	}
 	/**
 	 * This method returns the datatype to be used for primary key IDS and
@@ -75,12 +55,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return self::C_DATATYPE_INTEGER;
 	}
 	/**
-	 * Returns the MySQL Column Type Code (integer) that corresponds
-	 * to the given value type.
-	 *
-	 * @param  string $value value
-	 *
-	 * @return integer $type type
+	 * @see RedBean_QueryWriter::scanType
 	 */
 	public function scanType($value, $flagSpecial=false) {
 		$this->svalue=$value;
@@ -97,11 +72,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return self::C_DATATYPE_TEXT;
 	}
 	/**
-	 * Adds a column of a given type to a table
-	 *
-	 * @param string  $table  table
-	 * @param string  $column column
-	 * @param integer $type	  type
+	 * @see RedBean_QueryWriter::addColumn
 	 */
 	public function addColumn($table, $column, $type) {
 		$column = $this->check($column);
@@ -111,16 +82,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->adapter->exec($sql);
 	}
 	/**
-	 * Returns the Type Code for a Column Description.
-	 * Given an SQL column description this method will return the corresponding
-	 * code for the writer. If the include specials flag is set it will also
-	 * return codes for special columns. Otherwise special columns will be identified
-	 * as specified columns.
-	 *
-	 * @param string  $typedescription description
-	 * @param boolean $includeSpecials whether you want to get codes for special columns as well
-	 *
-	 * @return integer $typecode code
+	 * @see RedBean_QueryWriter::code
 	 */
 	public function code($typedescription, $includeSpecials = false) {
 		$r =  ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
@@ -197,14 +159,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		foreach($q as $sq) $this->adapter->exec($sq);
 	}
 	/**
-	 * This method upgrades the column to the specified data type.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param string  $type       type / table that needs to be adjusted
-	 * @param string  $column     column that needs to be altered
-	 * @param integer $datatype   target data type
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::widenColumn
 	 */
 	public function widenColumn($type, $column, $datatype) {
 		$t = $this->getTable($type);
@@ -212,18 +167,14 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->putTable($t);
 	}
 	/**
-	 * Returns all tables in the database
-	 *
-	 * @return array $tables tables
+	 * @see RedBean_QueryWriter::getTables();
 	 */
 	public function getTables() {
 		return $this->adapter->getCol( "SELECT name FROM sqlite_master
 			WHERE type='table' AND name!='sqlite_sequence';" );
 	}
 	/**
-	 * Creates an empty, column-less table for a bean.
-	 *
-	 * @param string $table table
+	 * @see RedBean_QueryWriter::createTable
 	 */
 	public function createTable($table) {
 		$table = $this->esc($table);
@@ -231,11 +182,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->adapter->exec( $sql );
 	}
 	/**
-	 * Returns an array containing the column names of the specified table.
-	 *
-	 * @param string $table table
-	 *
-	 * @return array $columns columns
+	 * @see RedBean_QueryWriter::getColumns
 	 */
 	public function getColumns($table) {
 		$table = $this->esc($table, true);
@@ -280,13 +227,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return $keyInfoList;
 	}
 	/**
-	 * Adds a Unique index constrain to the table.
-	 *
-	 * @param string $table   table
-	 * @param string $column1 first column
-	 * @param string $column2 second column
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::addUniqueIndex
 	 */
 	public function addUniqueIndex( $type,$columns ) {
 		$table = $this->esc($type,true);
@@ -297,15 +238,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->putTable($t);
 	}
 	/**
-	 * Given an Database Specific SQLState and a list of QueryWriter
-	 * Standard SQL States this function converts the raw SQL state to a
-	 * database agnostic ANSI-92 SQL states and checks if the given state
-	 * is in the list of agnostic states.
-	 *
-	 * @param string $state state
-	 * @param array  $list  list of states
-	 *
-	 * @return boolean $isInArray whether state is in list
+	 * @see RedBean_QueryWriter::sqlStateIn
 	 */
 	public function sqlStateIn($state, $list) {
 		$stateMap = array(
@@ -315,15 +248,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list);
 	}
 	/**
-	 * This method should add an index to a type and field with name
-	 * $name.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param  $type   type to add index to
-	 * @param  $name   name of the new index
-	 * @param  $column field to index
-	 *
-	 * @return void
+	 * @see RedBean_QueryWriter::addIndex
 	 */
 	public function addIndex($type, $name, $column) {
 		$table = $type;
@@ -338,27 +263,14 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return $this->putTable($t);
 	}
 	/**
-	 * Counts rows in a table.
-	 * Uses SQLite optimization for deleting all records (i.e. no WHERE)
-	 *
-	 * @param string $beanType
-	 *
-	 * @return integer $numRowsFound
+	 * @see RedBean_QueryWriter::wipe
 	 */
 	public function wipe($type) {
 		$table = $this->esc($type);
 		$this->adapter->exec("DELETE FROM $table");
 	}
 	/**
-	 * Adds a foreign key to a type
-	 *
-	 * @param string  $type        type you want to modify table of
-	 * @param string  $targetType  target type
-	 * @param string  $field       field of the type that needs to get the fk
-	 * @param string  $targetField field where the fk needs to point to
-	 * @param boolean $isDep       whether this field is dependent on it's referenced record
-	 *
-	 * @return bool $success whether an FK has been added
+	 * @see RedBean_QueryWriter::addFK
 	 */
 	public function addFK($type, $targetType, $field, $targetField, $isDep=false) {
 		return $this->buildFK($type, $targetType, $field, $targetField, $isDep);
@@ -418,9 +330,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return ($firstState && $secondState);
 	}
 	/**
-	 * Removes all tables and views from the database.
-	 * 
-	 * @return void
+	 * @see RedBean_QueryWriter::wipeAll
 	 */
 	public function wipeAll() {
 		$this->adapter->exec('PRAGMA foreign_keys = 0 ');

@@ -13,7 +13,6 @@
  */
 class RedBean_Exception_SQL extends RuntimeException {
 	/**
-	 * Holds the current SQL Strate code.
 	 * @var string
 	 */
 	private $sqlState;

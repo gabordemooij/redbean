@@ -18,7 +18,6 @@
  */
 class RedBean_DependencyInjector {
 	/**
-	 * List of dependencies.
 	 * @var array 
 	 */
 	protected $dependencies = array();

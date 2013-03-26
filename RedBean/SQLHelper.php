@@ -8,20 +8,6 @@
  * @license			BSD/GPLv2
  *
  * Allows you to mix PHP and SQL as if they were one language
- *					
- * Simplest case:
- *
- * $r->now(); //returns SQL time
- *
- * Another Example:
- *
- * $f->begin()
- *  ->select('*')
- *  ->from('island')->where('id = ? ')->put(1)->get();
- *
- * Another example:
- *			
- * $f->begin()->show('tables')->get('col');
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
@@ -29,22 +15,18 @@
  */
  class RedBean_SQLHelper {
 	/**
-	 * Holds the database adapter for executing SQL queries.
 	 * @var RedBean_Adapter 
 	 */
 	protected $adapter;
 	/**
-	 * Holds current mode
 	 * @var boolean
 	 */
 	protected $capture = false;
 	/**
-	 * Holds SQL until now
 	 * @var string
 	 */
 	protected $sql = '';
 	/**
-	 * Holds list of parameters for SQL Query
 	 * @var array
 	 */
 	protected $params = array();

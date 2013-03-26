@@ -14,7 +14,6 @@
  */
 class RedBean_SimpleModel {
 	/**
-	 * Contains the inner bean.
 	 * @var RedBean_OODBBean
 	 */
 	protected $bean;

@@ -17,7 +17,6 @@
  */
 class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	/**
-	 * Holds a FUSE instance.
 	 * @var RedBean_ModelHelper
 	 */
 	private $modelHelper;

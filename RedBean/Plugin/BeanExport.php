@@ -19,27 +19,22 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	protected $toolbox = null;
 	/**
 	 * @var array
-	 * Array used to check for recursion. This avoids infinite loops.
 	 */
 	protected $recurCheck = array();
 	/**
 	 * @var array
-	 * Recursion shield for types
 	 */
 	protected $recurTypeCheck = array();
 	/**
 	 * @var boolean
-	 * Whether to use a type shield for recursion
 	 */
 	protected $typeShield = false;
 	/**
 	 * @var integer
-	 * Current level of recursion depth
 	 */
 	protected $depth = 0;
 	/**
 	 * @var integer
-	 * Maximum level of recursions allowed by user
 	 */
 	protected $maxDepth = false;
 	/**
