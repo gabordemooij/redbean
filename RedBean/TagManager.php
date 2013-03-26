@@ -54,7 +54,6 @@ class RedBean_TagManager {
 		return null;
 	}
 	/**
-	 * Part of RedBeanPHP Tagging API.
 	 * Tests whether a bean has been associated with one ore more
 	 * of the listed tags. If the third parameter is TRUE this method
 	 * will return TRUE only if all tags that have been specified are indeed
@@ -168,7 +167,6 @@ class RedBean_TagManager {
 		return $collection;
 	}
 	/**
-	 * Part of RedBeanPHP Tagging API.
 	 * Returns all beans that have been tagged with ALL of the tags given.
 	 *
 	 * @param  $beanType type of bean you are looking for

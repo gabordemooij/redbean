@@ -13,22 +13,14 @@
  */
 class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
-	 * Flag indicates whether column names with CamelCase are supported and automatically
-	 * converted; example: isForSale -> is_for_sale
 	 * @var boolean
 	 */
 	private static $flagUseBeautyfulColumnnames = true;
 	/**
-	* Cache for so-called beautiful column names.
-	* @var array
-	*/
+	 * @var array
+	 */
 	private static $beautifulColumns = array();
 	/**
-	 * By default own-lists and shared-lists no longer have IDs as keys (3.3+),
-	 * this is because exportAll also does not offer this feature and we want the
-	 * ORM to be more consistent. Also, exporting without keys makes it easier to
-	 * export lists to Javascript because unlike in PHP in JS arrays will fill up gaps.
-	 * 
 	 * @var boolean  
 	 */
 	private static $flagKeyedExport = false;

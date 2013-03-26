@@ -14,60 +14,42 @@
  * with this source code in the file license.txt. 
  */
 class RedBean_Driver_OCI implements RedBean_Driver {
-
 	/**
-	 * Database connection string
 	 * @var string 
 	 */
 	private $dsn;
-
 	/**
-	 * 
 	 * @var unknown_type
 	 */
 	private static $instance;
-
 	/**
-	 * 
 	 * @var boolean
 	 */
 	private $debug = false;
-	
 	/**
-	 * Holds an instance of Logger implementation.
 	 * @var RedBean_Logger
 	 */	
 	protected $logger = NULL;
 	/**
-	 * Number of affected rows for update/insert query.
 	 * @var integer
 	 */
 	private $affected_rows;
-
 	/**
-	 * Result storage.
 	 * @var mixed
 	 */
 	private $rs;
-	
 	/**
-	 * Whether to automatically commit query or not.
 	 * @var boolean
 	 */
 	private $autocommit = true;
-
 	/**
-	 * Hold the statement for the last query.
 	 * @var mixed 
 	 */
 	private $statement;
-
 	/**
-	 * Hold the last inserted Id for the last statement.
 	 * @var mixed 
 	 */
 	private $lastInsertedId;
-
 	/**
 	 * Whether we are currently connected or not.
 	 * This flag is being used to delay the connection until necessary.
@@ -77,19 +59,16 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	 * @var boolean
 	 */
 	protected $isConnected = false;
-	
 	/**
 	 * OCI NLS date format.
 	 * @var string 
 	 */
 	private $nlsDateFormat = 'YYYY-MM-DD HH24:MI:SS';
-	
 	/**
 	 * OCI NLS date format.
 	 * @var string
 	 */
 	private $nlsTimeStampFormat = 'YYYY-MM-DD HH24:MI:SS.FF';
-
 	/**
 	 * OCI constants
 	 */
@@ -97,7 +76,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 	const OCI_NO_SUCH_COLUMN = '904';
 	const OCI_INTEGRITY_CONSTRAINT_VIOLATION = '2292';
 	const OCI_UNIQUE_CONSTRAINT_VIOLATION = '1';
-
 	/**
 	 * Returns an instance of the OCI Driver.
 	 * @param $dsn
@@ -112,7 +90,6 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 		}
 		return self::$instance;
 	}
-
 	/**
 	 * Constructor. You may either specify dsn, user and password or
 	 * just give an existing OCI connection.

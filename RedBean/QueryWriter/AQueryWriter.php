@@ -221,10 +221,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @see RedBean_QueryWriter::wipe
 	 */
 	public function wipe($type) {
-		$table = $type;
-		$table = $this->esc($table);
-		$sql = "TRUNCATE $table ";
-		$this->adapter->exec($sql);
+		$table = $this->esc($type);
+		$this->adapter->exec("TRUNCATE $table ");
 	}
 	/**
 	 * @see RedBean_QueryWriter::count
@@ -235,14 +233,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return (int) $this->adapter->getCell($sql.$addSQL,$params);
 	}
 	/**
-	 * This is a utility service method publicly available.
-	 * It allows you to check whether you can safely treat an certain value as an integer by
-	 * comparing an int-valled string representation with a default string casted string representation and
-	 * a ctype-digit check. It does not take into account numerical limitations (X-bit INT), just that it
-	 * can be treated like an INT. This is useful for binding parameters to query statements like
-	 * Query Writers and drivers can do.
-	 *
-	 * @static
+	 * Checks whether a number can be treated like an int.
 	 *
 	 * @param  string $value string representation of a certain value
 	 *
@@ -386,7 +377,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$this->cache = array();
 	}
 	/**
-	 * Deprecated. Use esc() instead.
+	 * @deprecated Use esc() instead.
 	 */
 	public function safeColumn($a, $b = false) { return $this->esc($a, $b); }
 	public function safeTable($a, $b = false) { return $this->esc($a, $b); }

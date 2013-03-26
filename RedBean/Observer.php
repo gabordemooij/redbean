@@ -13,7 +13,6 @@
  */
 interface RedBean_Observer {
 	/**
-	 * Part of the RedBean Observer Infrastructure.
 	 * @param string $eventname
 	 * @param RedBean_OODBBean mixed $info
 	 */

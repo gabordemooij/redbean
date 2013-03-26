@@ -15,19 +15,14 @@
  */
 class RedBean_ModelHelper implements RedBean_Observer {
 	/**
-	 * Holds a model formatter
 	 * @var RedBean_IModelFormatter
 	 */
 	private static $modelFormatter;
 	/**
-	 * Holds a dependency injector
 	 * @var type 
 	 */
 	private static $dependencyInjector;
 	/**
-	 * Cache for model names to avoid unnecessary
-	 * reflections.
-	 * 
 	 * @var array 
 	 */
 	private static $modelCache = array();

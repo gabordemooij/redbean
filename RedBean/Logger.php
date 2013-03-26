@@ -17,11 +17,6 @@
  */
 interface RedBean_Logger {
   /**
-   * Method used to log messages.
-   * Writes the specified message to the log document whatever
-   * that may be (files, database etc). Provides a uniform
-   * interface for logging throughout RedBeanPHP.
-   *
    * @param string $message the message to log. (optional)
    */
   public function log();

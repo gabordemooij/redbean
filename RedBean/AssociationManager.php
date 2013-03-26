@@ -323,11 +323,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		return (count($rows)>0);
 	}
 	/**
-	 * Given an array of two beans and a property, this method
-	 * swaps the value of the property.
-	 * This is handy if you need to swap the priority or orderNo
-	 * of an item (i.e. bug-tracking, page order).
-	 *
+	 * @deprecated
 	 * @param array  $beans    beans
 	 * @param string $property property
 	 */
