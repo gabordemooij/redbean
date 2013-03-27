@@ -11,7 +11,6 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
-
 	private $db = null;
 	private $sql = '';
 	/**
@@ -71,7 +70,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function getAssoc($sql, $aValues = array()) {
 		$this->sql = $sql;
 		$this->signal('sql_exec', $this);
-		$rows = $this->db->GetAll( $sql, $aValues );
+		$rows = $this->db->GetAll($sql, $aValues);
 		$assoc = array();
 		if ($rows) {
 			foreach($rows as $row) {

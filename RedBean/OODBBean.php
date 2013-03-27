@@ -97,6 +97,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * rely on static calls to the facade (or make this class dep. on OODB).
 	 *
 	 * @param RedBean_IBeanHelper $helper
+	 * 
 	 * @return void
 	 */
 	public function setBeanHelper(RedBean_BeanHelper $helper) {
@@ -148,7 +149,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		$this->properties = $array;
 		return $this;
 	}
-	
 	/**
 	 * Injects the properties of another bean but keeps the original ID.
 	 * Just like import() but keeps the original ID.
@@ -520,8 +520,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
      * column 3.
 	 * To access a Meta property we use a dot separated notation.
 	 * If the property cannot be found this getter will return NULL instead.
-	 * @param string $path
-	 * @param mixed $default
+	 * 
+	 * @param string $path    path
+	 * @param mixed  $default default value
+	 * 
 	 * @return mixed $value
 	 */
 	public function getMeta($path, $default = NULL) {
@@ -532,8 +534,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * the value you want to store in the Meta section of the bean and $path
 	 * specifies the dot separated path to the property. For instance "my.meta.property".
 	 * If "my" and "meta" do not exist they will be created automatically.
-	 * @param string $path
-	 * @param mixed $value
+	 * 
+	 * @param string $path  path
+	 * @param mixed  $value value
 	 */
 	public function setMeta($path, $value) {
 		$this->__info[$path] = $value;
@@ -542,7 +545,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * Copies the meta information of the specified bean
 	 * This is a convenience method to enable you to
 	 * exchange meta information easily.
+	 * 
 	 * @param RedBean_OODBBean $bean
+	 * 
 	 * @return RedBean_OODBBean
 	 */
 	public function copyMetaFrom(RedBean_OODBBean $bean) {
@@ -551,8 +556,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	}
 	/**
 	 * Reroutes a call to Model if exists. (new fuse)
+	 * 
 	 * @param string $method
 	 * @param array $args
+	 * 
 	 * @return mixed $mixed
 	 */
 	public function __call($method, $args) {
@@ -567,6 +574,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
 	 * Implementation of __toString Method
 	 * Routes call to Model.
+	 * 
 	 * @return string $string
 	 */
 	public function __toString() {

@@ -73,7 +73,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @see RedBean_QueryWriter::getTables
 	 */
 	public function getTables() {
-		return $this->adapter->getCol( 'show tables' );
+		return $this->adapter->getCol('show tables');
 	}
 	/**
 	 * @see RedBean_QueryWriter::createTable
@@ -104,10 +104,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		}
 		if ($flagSpecial) {
-			if (preg_match('/^\d{4}\-\d\d-\d\d$/',$value)) {
+			if (preg_match('/^\d{4}\-\d\d-\d\d$/', $value)) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE;
 			}
-			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d$/',$value)) {
+			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d$/', $value)) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME;
 			}
 		}
@@ -127,10 +127,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
 			}
 		}
-		if (mb_strlen($value,'UTF-8') <= 255) {
+		if (mb_strlen($value, 'UTF-8') <= 255) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
 		}
-		if (mb_strlen($value,'UTF-8') <= 65535) {
+		if (mb_strlen($value, 'UTF-8') <= 65535) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
 		}
 		return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32;
@@ -166,7 +166,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			$columns[$k]= $this->esc($v);
 		}
 		$r = $this->adapter->get("SHOW INDEX FROM $table");
-		$name = 'UQ_'.sha1(implode(',',$columns));
+		$name = 'UQ_'.sha1(implode(',', $columns));
 		if ($r) {
 			foreach($r as $i) {
 				if ($i['Key_name']== $name) {
@@ -175,7 +175,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			}
 		}
 		$sql = "ALTER IGNORE TABLE $table
-                ADD UNIQUE INDEX $name (".implode(',',$columns).")";
+                ADD UNIQUE INDEX $name (".implode(',', $columns).")";
 		$this->adapter->exec($sql);
 	}
 	/**
@@ -184,7 +184,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function addIndex($type, $name, $column) {
 		$table = $type;
 		$table = $this->esc($table);
-		$name = preg_replace('/\W/','',$name);
+		$name = preg_replace('/\W/', '', $name);
 		$column = $this->esc($column);
 		foreach( $this->adapter->get("SHOW INDEX FROM $table ") as $ind) {
 			if ($ind['Key_name']===$name) return;
@@ -201,7 +201,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			'42S22'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 			'23000'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
-		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list); 
+		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list); 
 	}
 	/**
 	 * Add the constraints for a specific database driver: MySQL.

@@ -27,11 +27,7 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 */
 	private static $modelCache = array();
 	/**
-	 * Connects OODB to a model if a model exists for that
-	 * type of bean. This connector is used in the facade.
-	 *
-	 * @param string $eventName
-	 * @param RedBean_OODBBean $bean
+	 * @see RedBean_Observer::onEvent
 	 */
 	public function onEvent($eventName, $bean) {
 		$bean->$eventName();

@@ -42,7 +42,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		if ($result) {
 			$response['result']=$result;
 		} else {
-			$response['error'] = array('code'=>$errorCode,'message'=>$errorMessage);
+			$response['error'] = array('code'=>$errorCode, 'message'=>$errorMessage);
 		}
 		return (json_encode($response));
 	}

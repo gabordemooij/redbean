@@ -77,7 +77,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
                    "id" integer AUTO_INCREMENT,
 					CONSTRAINT "pk_'.$rawTable.'_id" PRIMARY KEY("id")
 		            )';
-		$this->adapter->exec( $sql );
+		$this->adapter->exec($sql);
 	}
 	/**
 	 * @see RedBean_QueryWriter::getColumns
@@ -100,10 +100,10 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			return self::C_DATATYPE_INTEGER;
 		}
 		if ($flagSpecial) {
-			if (preg_match('/^\d{4}\-\d\d-\d\d$/',$value)) {
+			if (preg_match('/^\d{4}\-\d\d-\d\d$/', $value)) {
 				return self::C_DATATYPE_SPECIAL_DATE;
 			}
-			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d$/',$value)) {
+			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d$/', $value)) {
 				return self::C_DATATYPE_SPECIAL_DATETIME;
 			}
 		}
@@ -138,7 +138,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$column = $this->esc($column);
 		$type = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$sql = "ALTER TABLE $table ADD COLUMN $column $type ";
-		$this->adapter->exec( $sql );
+		$this->adapter->exec($sql);
 	}
 	/**
 	 * @see RedBean_QueryWriter::widenColumn
@@ -150,7 +150,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$column = $this->esc($column);
 		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
-		$this->adapter->exec( $changecolumnSQL );
+		$this->adapter->exec($changecolumnSQL);
 	}
 	/**
 	 * @see RedBean_QueryWriter::addUniqueIndex
@@ -162,16 +162,16 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			$columns[$k]= $this->esc($v);
 		}
 		$r = $this->adapter->get("SHOW INDEX FROM $table");
-		$name = 'UQ_'.sha1(implode(',',$columns));
+		$name = 'UQ_'.sha1(implode(',', $columns));
 		if ($r) {
 			foreach($r as $i) { 
-				if (strtoupper($i['Key_name'])== strtoupper($name)) {
+				if (strtoupper($i['Key_name'])==strtoupper($name)) {
 					return;
 				}
 			}
 		}
 		$sql = "ALTER TABLE $table
-                ADD CONSTRAINT UNIQUE $name (".implode(',',$columns).")";
+                ADD CONSTRAINT UNIQUE $name (".implode(',', $columns).")";
 		$this->adapter->exec($sql);
 	}
 	/**
@@ -226,9 +226,9 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$table = $this->esc($table);
 		$name = preg_replace('/\W/', '', $name);
 		$column = $this->esc($column);
-		$index = $this->adapter->getRow("SELECT 1 as `exists` FROM db_index WHERE index_name = ? ",array($name));
+		$index = $this->adapter->getRow("SELECT 1 as `exists` FROM db_index WHERE index_name = ? ", array($name));
 		if ($index && $index['exists']) return;   // positive number will return, 0 will continue.
-		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
+		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); } catch(Exception $e){}
 	}
 	/**
 	 * @see RedBean_QueryWriter::addFK
@@ -255,14 +255,14 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	protected function buildFK($type, $targetType, $field, $targetField, $isDep=false) {
 		$table = $this->esc($type);
-		$tableNoQ = $this->esc($type,true);
+		$tableNoQ = $this->esc($type, true);
 		$targetTable = $this->esc($targetType);
-		$targetTableNoQ = $this->esc($targetType,true);
+		$targetTableNoQ = $this->esc($targetType, true);
 		$column = $this->esc($field);
-		$columnNoQ = $this->esc($field,true);
+		$columnNoQ = $this->esc($field, true);
 		$targetColumn  = $this->esc($targetField);
-		$targetColumnNoQ  = $this->esc($targetField,true);
-		$keys = $this->getKeys($targetTableNoQ,$tableNoQ);
+		$targetColumnNoQ  = $this->esc($targetField, true);
+		$keys = $this->getKeys($targetTableNoQ, $tableNoQ);
 		$needsToAddFK = true;
 		$needsToDropFK = false;
 		foreach($keys as $key) {

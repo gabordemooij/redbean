@@ -110,22 +110,22 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	public function scanType($value, $flagSpecial=false) {
 		$this->svalue=$value;
 		if ($flagSpecial && $value) {
-			if (preg_match('/^\d{4}\-\d\d-\d\d$/',$value)) {
+			if (preg_match('/^\d{4}\-\d\d-\d\d$/', $value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE;
 			}
-			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d(\.\d{1,6})?$/',$value)) {
+			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d(\.\d{1,6})?$/', $value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME;
 			}
-			if (preg_match('/^\([\d\.]+,[\d\.]+\)$/',$value)) {
+			if (preg_match('/^\([\d\.]+,[\d\.]+\)$/', $value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_POINT;
 			}
-			if (preg_match('/^\[\([\d\.]+,[\d\.]+\),\([\d\.]+,[\d\.]+\)\]$/',$value)) {
+			if (preg_match('/^\[\([\d\.]+,[\d\.]+\),\([\d\.]+,[\d\.]+\)\]$/', $value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_LSEG;
 			}
-			if (preg_match('/^\<\([\d\.]+,[\d\.]+\),[\d\.]+\>$/',$value)) {
+			if (preg_match('/^\<\([\d\.]+,[\d\.]+\),[\d\.]+\>$/', $value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_CIRCLE;
 			}
-			if (preg_match('/^\-?\$\d+/',$value)) {
+			if (preg_match('/^\-?\$\d+/', $value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_MONEY;
 			}
 		}
@@ -163,7 +163,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		$column = $this->esc($column);
 		$newtype = $this->typeno_sqltype[$type];
 		$changecolumnSQL = "ALTER TABLE $table \n\t ALTER COLUMN $column TYPE $newtype ";
-		$this->adapter->exec( $changecolumnSQL );
+		$this->adapter->exec($changecolumnSQL);
 	}
 	/**
 	 * @see RedBean_QueryWriter::addUniqueIndex
@@ -190,16 +190,16 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 									AND t.relname = '$table'
 								ORDER BY  t.relname,  i.relname;");
 
-		$name = "UQ_".sha1($table.implode(',',$columns));
+		$name = "UQ_".sha1($table.implode(',', $columns));
 		if ($r) {
 			foreach($r as $i) {
-				if (strtolower( $i['index_name'] )== strtolower( $name )) {
+				if (strtolower($i['index_name'])== strtolower($name)) {
 					return;
 				}
 			}
 		}
 		$sql = "ALTER TABLE \"$table\"
-                ADD CONSTRAINT $name UNIQUE (".implode(',',$columns).")";
+                ADD CONSTRAINT $name UNIQUE (".implode(',', $columns).")";
 		$this->adapter->exec($sql);
 	}
 	/**
@@ -211,7 +211,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			'42703'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 			'23505'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
-		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list);
+		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list);
 	}
 	/**
 	 * @see RedBean_QueryWriter::addIndex
@@ -219,7 +219,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	public function addIndex($type, $name, $column) {
 		$table = $type;
 		$table = $this->esc($table);
-		$name = preg_replace('/\W/','',$name);
+		$name = preg_replace('/\W/', '', $name);
 		$column = $this->esc($column);
 		if ($this->adapter->getCell("SELECT COUNT(*) FROM pg_class WHERE relname = '$name'")) return;
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
@@ -258,11 +258,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	
 			
 			$row = $this->adapter->getRow($sql);
-			
 			$flagAddKey = false;
-			
 			if (!$row) $flagAddKey = true;
-			
 			if ($row) { 
 				if (($row['delete_rule']=='SET NULL' && $isDep) || 
 					($row['delete_rule']!='SET NULL' && !$isDep)) {
@@ -272,7 +269,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 					$sql = "ALTER TABLE $table DROP CONSTRAINT $cName ";
 					$this->adapter->exec($sql);
 				} 
-				
 			}
 			if ($flagAddKey) {
 			$delRule = ($isDep ? 'CASCADE' : 'SET NULL');	
@@ -282,7 +278,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 					return true;
 			}
 			return false;
-			
 		} catch(Exception $e){ return false; }
 	}
 	/**
@@ -323,7 +318,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 
 					  ";
 
-			$rows = $adapter->get( $sql );
+			$rows = $adapter->get($sql);
 			if (!count($rows)) {
 				$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
 						  {$fkCode}a FOREIGN KEY ($property1)
@@ -347,12 +342,10 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
       		$t = $this->esc($t);
 	 		try{
 	 			$this->adapter->exec("drop table if exists $t CASCADE ");
-	 		}
-	 		catch(Exception $e){  }
+	 		} catch(Exception $e){}
 	 		try{
 	 			$this->adapter->exec("drop view if exists $t CASCADE ");
-	 		}
-	 		catch(Exception $e){  throw $e; }
+	 		} catch(Exception $e){  throw $e; }
 		}
 		$this->adapter->exec('SET CONSTRAINTS ALL IMMEDIATE');
 	}

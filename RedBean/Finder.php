@@ -91,9 +91,9 @@ class RedBean_Finder {
 	 * @see RedBean_Finder::find
 	 * This variation returns the first bean only.
 	 * 
-	 * @param string $type   type   the type of bean you are looking for
-	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $values values array of values to be bound to parameters in query
+	 * @param string $type   type  
+	 * @param string $sql    sql    
+	 * @param array  $values values 
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
@@ -107,9 +107,9 @@ class RedBean_Finder {
 	 * @see RedBean_Finder::find
 	 * This variation returns the last bean only.
 	 * 
-	 * @param string $type   type   the type of bean you are looking for
-	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $values values array of values to be bound to parameters in query
+	 * @param string $type   type   
+	 * @param string $sql    sql    
+	 * @param array  $values values 
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
@@ -120,12 +120,13 @@ class RedBean_Finder {
 		return $found;
 	}
 	/**
+	 * @see RedBean_Finder::find
 	 * Convience method. Tries to find beans of a certain type,
 	 * if no beans are found, it dispenses a bean of that type.
 	 *
-	 * @param  string $type   type of bean you are looking for
-	 * @param  string $sql    SQL code for finding the bean
-	 * @param  array  $values parameters to bind to SQL
+	 * @param  string $type   type
+	 * @param  string $sql    sql
+	 * @param  array  $values values
 	 *
 	 * @return array $beans Contains RedBean_OODBBean instances
 	 */

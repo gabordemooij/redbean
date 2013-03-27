@@ -19,7 +19,6 @@ class RedBean_LabelMaker {
 	protected $toolbox;
 	/**
 	 * Constructor.
-	 * The label maker requires a toolbox to function well.
 	 * 
 	 * @param RedBean_ToolBox $toolbox 
 	 */

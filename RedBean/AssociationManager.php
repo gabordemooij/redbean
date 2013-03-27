@@ -61,7 +61,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		if (!is_array($beans2)) $beans2 = array($beans2);
 		foreach($beans1 as $bean1) {
 			foreach($beans2 as $bean2) {
-				$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
+				$table = $this->getTable(array($bean1->getMeta('type') , $bean2->getMeta('type')));
 				$bean = $this->oodb->dispense($table);
 				$results[] = $this->associateBeans( $bean1, $bean2, $bean );
 			}
@@ -131,7 +131,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 *
 	 * @return array $ids
 	 */
-	public function related( $bean, $type, $getLinks=false, $sql=false) {
+	public function related($bean, $type, $getLinks=false, $sql=false) {
 		if (!is_array($bean) && !($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
 		$ids = array();
 		if (is_array($bean)) {
@@ -141,25 +141,23 @@ class RedBean_AssociationManager extends RedBean_Observable {
 				$ids[] = $b->id;
 			}
 			$bean = reset($beans);
-		}
-		else $ids[] = $bean->id;
-		$table = $this->getTable( array($bean->getMeta('type') , $type) );
+		} else $ids[] = $bean->id;
+		$table = $this->getTable(array($bean->getMeta('type') , $type));
 		if ($type==$bean->getMeta('type')) {
 			$type .= '2';
 			$cross = 1;
-		}
-		else $cross=0;
+		} else $cross=0;
 		if (!$getLinks) $targetproperty = $type.'_id'; else $targetproperty='id';
 		$property = $bean->getMeta('type').'_id';
 		try {
 				$sqlFetchKeys = $this->writer->selectRecord(
 					  $table,
-					  array( $property => $ids ),
+					  array($property => $ids),
 					  $sql,
 					  false
 				);
 				$sqlResult = array();
-				foreach( $sqlFetchKeys as $row ) {
+				foreach($sqlFetchKeys as $row) {
 					if (isset($row[$targetproperty])) {
 						$sqlResult[] = $row[$targetproperty];
 					}
@@ -178,7 +176,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 					}
 				}
 			return $sqlResult; //or returns rows in case of $sql != empty
-		}catch(RedBean_Exception_SQL $e) {
+		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
@@ -205,37 +203,35 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		if (!is_array($beans2)) $beans2 = array($beans2);
 		foreach($beans1 as $bean1) {
 			foreach($beans2 as $bean2) {
-		
 				$this->oodb->store($bean1);
 				$this->oodb->store($bean2);
-				$table = $this->getTable( array($bean1->getMeta('type') , $bean2->getMeta('type')) );
+				$table = $this->getTable(array($bean1->getMeta('type') , $bean2->getMeta('type')));
 				$type = $bean1->getMeta('type');
 				if ($type==$bean2->getMeta('type')) {
 					$type .= '2';
 					$cross = 1;
-				}
-				else $cross = 0;
+				} else $cross = 0;
 				$property1 = $type.'_id';
 				$property2 = $bean2->getMeta('type').'_id';
 				$value1 = (int) $bean1->id;
 				$value2 = (int) $bean2->id;
 				try {
 					$rows = $this->writer->selectRecord($table,array(
-						$property1 => array($value1), $property2=>array($value2)),null,$fast
+						$property1 => array($value1), $property2=>array($value2)), null, $fast
 					);
 					if ($cross) {
 						$rows2 = $this->writer->selectRecord($table,array(
-						$property2 => array($value1), $property1=>array($value2)),null,$fast
+						$property2 => array($value1), $property1=>array($value2)), null, $fast
 						);
 						if ($fast) continue;
-						$rows = array_merge($rows,$rows2);
+						$rows = array_merge($rows, $rows2);
 					}
 					if ($fast) continue;
-					$beans = $this->oodb->convertToBeans($table,$rows);
+					$beans = $this->oodb->convertToBeans($table, $rows);
 					foreach($beans as $link) {
 						$this->oodb->trash($link);
 					}
-				}catch(RedBean_Exception_SQL $e) {
+				} catch(RedBean_Exception_SQL $e) {
 					if (!$this->writer->sqlStateIn($e->getSQLState(),
 					array(
 					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
@@ -259,7 +255,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 */
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
 		$this->oodb->store($bean);
-		$table = $this->getTable( array($bean->getMeta('type') , $type) );
+		$table = $this->getTable(array($bean->getMeta('type') ,$type));
 		if ($type==$bean->getMeta('type')) {
 			$property2 = $type.'2_id';
 			$cross = 1;
@@ -267,11 +263,11 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		else $cross = 0;
 		$property = $bean->getMeta('type').'_id';
 		try {
-			$this->writer->selectRecord( $table, array($property=>array($bean->id)),null,true);
+			$this->writer->selectRecord($table, array($property=>array($bean->id)), null, true);
 			if ($cross) {
-				$this->writer->selectRecord( $table, array($property2=>array($bean->id)),null,true);
+				$this->writer->selectRecord($table, array($property2=>array($bean->id)), null, true);
 			}
-		}catch(RedBean_Exception_SQL $e) {
+		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
@@ -303,14 +299,14 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$value1 = (int) $bean1->id;
 		$value2 = (int) $bean2->id;
 		try {
-			$rows = $this->writer->selectRecord($table,array(
-				$property1 => array($value1), $property2=>array($value2)),null
+			$rows = $this->writer->selectRecord($table, array(
+				$property1 => array($value1), $property2=>array($value2)), null
 			);
 			if ($cross) {
-				$rows2 = $this->writer->selectRecord($table,array(
-				$property2 => array($value1), $property1=>array($value2)),null
+				$rows2 = $this->writer->selectRecord($table, array(
+				$property2 => array($value1), $property1=>array($value2)), null
 				);
-				$rows = array_merge($rows,$rows2);
+				$rows = array_merge($rows, $rows2);
 			}
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
@@ -359,11 +355,11 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return array $beans	beans yielded by your query.
 	 */
 	public function relatedSimple($bean, $type, $sql=null, $values=array()) {
-		$keys = $this->related( $bean, $type );
+		$keys = $this->related($bean, $type);
 		if (count($keys)==0 || !is_array($keys)) return array();
 		if (!$sql) return $this->oodb->batch($type, $keys);
-		$rows = $this->writer->selectRecord( $type, array('id'=>$keys),array($sql,$values),false );
-		return $this->oodb->convertToBeans($type,$rows);
+		$rows = $this->writer->selectRecord($type, array('id'=>$keys), array($sql,$values), false);
+		return $this->oodb->convertToBeans($type, $rows);
 	}
 	/**
 	* Returns only single associated bean.
@@ -379,7 +375,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	public function relatedOne(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
 		$beans = $this->relatedSimple($bean, $type, $sql, $values);
 		if (count($beans)==0 || !is_array($beans)) return null;
-		return reset( $beans );
+		return reset($beans);
 	}
 	/**
 	 * The opposite of related(). Returns all the beans that are not
@@ -393,8 +389,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return array $beans beans
 	 */
 	public function unrelated(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
-		$keys = $this->related( $bean, $type );
-		$rows = $this->writer->selectRecord( $type, array('id'=>$keys), array($sql,$values), false, true );
-		return $this->oodb->convertToBeans($type,$rows);
+		$keys = $this->related($bean, $type);
+		$rows = $this->writer->selectRecord($type, array('id'=>$keys), array($sql,$values), false, true);
+		return $this->oodb->convertToBeans($type, $rows);
 	}
 }

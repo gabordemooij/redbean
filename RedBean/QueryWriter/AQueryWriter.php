@@ -89,7 +89,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$column = $this->esc($column);
 		$type = (isset($this->typeno_sqltype[$type])) ? $this->typeno_sqltype[$type] : '';
 		$sql = "ALTER TABLE $table ADD $column $type ";
-		$this->adapter->exec( $sql );
+		$this->adapter->exec($sql);
 	}
 	/**
 	 * @see RedBean_QueryWriter::updateRecord
@@ -102,17 +102,17 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$insertcolumns[] = $pair['property'];
 				$insertvalues[] = $pair['value'];
 			}
-			return $this->insertRecord($table,$insertcolumns,array($insertvalues));
+			return $this->insertRecord($table, $insertcolumns, array($insertvalues));
 		}
 		if ($id && !count($updatevalues)) return $id;	
 		$table = $this->esc($table);
 		$sql = "UPDATE $table SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
-			$p[] = " {$this->esc($uv["property"])} = ? ";
+			$p[]=" {$this->esc($uv["property"])} = ? ";
 			$v[]=$uv['value'];
 		}
-		$sql .= implode(',', $p ) .' WHERE id = '.intval($id);
+		$sql .= implode(',', $p).' WHERE id = '.intval($id);
 		$this->adapter->exec($sql, $v);
 		return $id;
 	}
@@ -134,13 +134,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			foreach($insertcolumns as $k=>$v) {
 				$insertcolumns[$k] = $this->esc($v);
 			}
-			$insertSQL = "INSERT INTO $table ( id, ".implode(',',$insertcolumns)." ) VALUES 
-			( $default, ". implode(',',array_fill(0,count($insertcolumns),' ? '))." ) $suffix";
+			$insertSQL = "INSERT INTO $table ( id, ".implode(',', $insertcolumns)." ) VALUES 
+			( $default, ". implode(',', array_fill(0, count($insertcolumns),' ? '))." ) $suffix";
 
 			foreach($insertvalues as $i=>$insertvalue) {
-				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue, $i );
+				$ids[] = $this->adapter->getCell($insertSQL, $insertvalue, $i);
 			}
-			$result = count($ids)===1 ? array_pop($ids) : $ids;
+			$result = count($ids) === 1 ? array_pop($ids) : $ids;
 		} else {
 			$result = $this->adapter->getCell( "INSERT INTO $table (id) VALUES($default) $suffix");
 		}
@@ -175,22 +175,22 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				&& count($conditions)===1 
 				&& isset($conditions['id']) 
 				&& is_array($values) 
-				&& preg_match('/^\d+$/',implode('',$values))) {
-				$sql .= implode(',',$values).') ';
+				&& preg_match('/^\d+$/', implode('',$values))) {
+				$sql .= implode(',', $values).') ';
 				$sqlConditions[] = $sql;
 			} else {
-				$sql .= implode(',',array_fill(0,count($values),'?')).') ';
+				$sql .= implode(',',array_fill(0, count($values), '?')).') ';
 				$sqlConditions[] = $sql;
 				if (!is_array($values)) $values = array($values);
 				foreach($values as $k=>$v) {
 					$values[$k]=strval($v);
 				}
-				$bindings = array_merge($bindings,$values);
+				$bindings = array_merge($bindings, $values);
 			}
 		}
 		if (is_array($addSql)) {
 			if (count($addSql)>1) {
-				$bindings = array_merge($bindings,$addSql[1]);
+				$bindings = array_merge($bindings, $addSql[1]);
 			} else {
 				$bindings = array();
 			}
@@ -198,7 +198,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		$sql = '';
 		if (is_array($sqlConditions) && count($sqlConditions)>0) {
-			$sql = implode(' AND ',$sqlConditions);
+			$sql = implode(' AND ', $sqlConditions);
 			$sql = " WHERE ( $sql ) ";
 			if ($addSql) $sql .= ($all ? '': ' AND ') . " $addSql ";
 		}
@@ -210,7 +210,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			}
 		}
 		$sql = (($delete) ? 'DELETE FROM ' : 'SELECT * FROM ').$table.$sql;
-		$rows = $this->adapter->get($sql,$bindings);
+		$rows = $this->adapter->get($sql, $bindings);
 		if (!$delete && $this->flagUseCache) {
 			$this->flushKey = $this->adapter->getSQL();
 			$this->cache[$key] = $rows;
@@ -230,7 +230,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function count($beanType, $addSQL = '', $params = array()) {
 		$sql = "SELECT count(*) FROM {$this->esc($beanType)} ";
 		if ($addSQL!='') $addSQL = ' WHERE '.$addSQL; 
-		return (int) $this->adapter->getCell($sql.$addSQL,$params);
+		return (int) $this->adapter->getCell($sql.$addSQL, $params);
 	}
 	/**
 	 * Checks whether a number can be treated like an int.
@@ -247,12 +247,12 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function addFK($type, $targetType, $field, $targetField, $isDependent = false) {
 		$table = $this->esc($type);
-		$tableNoQ = $this->esc($type,true);
+		$tableNoQ = $this->esc($type, true);
 		$targetTable = $this->esc($targetType);
 		$column = $this->esc($field);
-		$columnNoQ = $this->esc($field,true);
+		$columnNoQ = $this->esc($field, true);
 		$targetColumn  = $this->esc($targetField);
-		$targetColumnNoQ  = $this->esc($targetField,true);
+		$targetColumnNoQ  = $this->esc($targetField, true);
 		$db = $this->adapter->getCell('select database()');
 		$fkName = 'fk_'.$tableNoQ.'_'.$columnNoQ.'_'.$targetColumnNoQ.($isDependent ? '_casc':'');
 		$cName = 'cons_'.$fkName;
@@ -278,8 +278,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				ADD CONSTRAINT $cName FOREIGN KEY $fkName (  $column ) REFERENCES  $targetTable (
 				$targetColumn) ON DELETE ".($isDependent ? 'CASCADE':'SET NULL').' ON UPDATE SET NULL ;');
 			}
-		}
-		catch(Exception $e) { } //Failure of fk-constraints is not a problem
+		} catch(Exception $e) {} //Failure of fk-constraints is not a problem
 	}
 	/**
 	 * Renames an association. For instance if you would like to refer to
@@ -353,7 +352,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected function startsWithZeros($value) {
 		$value = strval($value);
-		if (strlen($value)>1 && strpos($value,'0')===0 && strpos($value,'0.')!==0) {
+		if (strlen($value)>1 && strpos($value, '0')===0 && strpos($value, '0.')!==0) {
 			return true;
 		} else {
 			return false;

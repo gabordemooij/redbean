@@ -110,7 +110,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$columns = $this->getColumns($type);
 		$indexes = $this->getIndexes($type);
 		$keys = $this->getKeys($type);
-		$table = array('columns'=>$columns,'indexes'=>$indexes,'keys'=>$keys,'name'=>$tableName);
+		$table = array('columns'=>$columns, 'indexes'=>$indexes, 'keys'=>$keys, 'name'=>$tableName);
 		$this->tableArchive[$tableName] = $table;
 		return $table;
 	}
@@ -128,7 +128,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$q[] = "DROP TABLE IF EXISTS tmp_backup;";
 		$oldColumnNames = array_keys($this->getColumns($table));
 		foreach($oldColumnNames as $k=>$v) $oldColumnNames[$k] = "`$v`";
-		$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(",",$oldColumnNames).");";
+		$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(",", $oldColumnNames).");";
 		$q[] = "INSERT INTO tmp_backup SELECT * FROM `$table`;";
 		$q[] = "PRAGMA foreign_keys = 0 ";
 		$q[] = "DROP TABLE `$table`;";
@@ -146,10 +146,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		$q[] = "CREATE TABLE `$table` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr  $fkDef );";
 		foreach($tableMap['indexes'] as $name=>$index)  {
-			if (strpos($name,'UQ_')===0) {
-				$cols = explode('__',substr($name,strlen('UQ_'.$table)));
+			if (strpos($name, 'UQ_')===0) {
+				$cols = explode('__', substr($name, strlen('UQ_'.$table)));
 				foreach($cols as $k=>$v) $cols[$k] = "`$v`";
-				$q[] = "CREATE UNIQUE INDEX $name ON `$table` (".implode(',',$cols).")";
+				$q[] = "CREATE UNIQUE INDEX $name ON `$table` (".implode(',', $cols).")";
 			}
 			else $q[] = "CREATE INDEX $name ON `$table` ({$index['name']}) ";
 		}
@@ -179,7 +179,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	public function createTable($table) {
 		$table = $this->esc($table);
 		$sql = "CREATE TABLE $table ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ";
-		$this->adapter->exec( $sql );
+		$this->adapter->exec($sql);
 	}
 	/**
 	 * @see RedBean_QueryWriter::getColumns
@@ -229,9 +229,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	/**
 	 * @see RedBean_QueryWriter::addUniqueIndex
 	 */
-	public function addUniqueIndex( $type,$columns ) {
+	public function addUniqueIndex($type,$columns) {
 		$table = $this->esc($type,true);
-		$name = 'UQ_'.$table.implode('__',$columns);
+		$name = 'UQ_'.$table.implode('__', $columns);
 		$t = $this->getTable($type);
 		if (isset($t['indexes'][$name])) return;
 		$t['indexes'][$name] = array('name'=>$name);
@@ -245,7 +245,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 			'HY000'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 			'23000'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
-		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'),$list);
+		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list);
 	}
 	/**
 	 * @see RedBean_QueryWriter::addIndex
@@ -253,9 +253,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	public function addIndex($type, $name, $column) {
 		$table = $type;
 		$table = $this->esc($table);
-		$name = preg_replace('/\W/','',$name);
-		$column = $this->esc($column,true);
-		foreach( $this->adapter->get("PRAGMA INDEX_LIST($table) ") as $ind) {
+		$name = preg_replace('/\W/', '', $name);
+		$column = $this->esc($column, true);
+		foreach($this->adapter->get("PRAGMA INDEX_LIST($table) ") as $ind) {
 			if ($ind['name']===$name) return;
 		}
 		$t = $this->getTable($type);
@@ -299,7 +299,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 				&& $t['keys'][$label]['to']===$targetField
 				&& $t['keys'][$label]['on_delete']===$consSQL
 		) return false;
-		
 		$t['keys'][$label] = array(
 			'table' => $targetType,
 			'from' => $field,
@@ -337,12 +336,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		foreach($this->getTables() as $t) {
 	 		try{
 	 			$this->adapter->exec("drop table if exists`$t`");
-	 		}
-	 		catch(Exception $e){}
+	 		} catch(Exception $e){}
 	 		try{
 	 			$this->adapter->exec("drop view if exists`$t`");
-	 		}
-	 		catch(Exception $e){}
+	 		} catch(Exception $e){}
 		}
 		$this->adapter->exec('PRAGMA foreign_keys = 1 ');
 	}

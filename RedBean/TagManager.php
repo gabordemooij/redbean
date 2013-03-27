@@ -28,8 +28,7 @@ class RedBean_TagManager {
 	 */
 	protected $redbean;
 	/**
-	 * Constructor,
-	 * creates a new instance of TagManager.
+	 * Constructor
 	 *
 	 * @param RedBean_Toolbox $toolbox 
 	 */

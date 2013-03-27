@@ -335,21 +335,17 @@ class RedBean_OODB extends RedBean_Observable {
 					if (strpos($p,'own')===0) {
 						list($ownAdditions,$ownTrashcan,$ownresidue)=$this->processGroups($originals,$v,$ownAdditions,$ownTrashcan,$ownresidue);
 						$bean->removeProperty($p);
-					}
-					elseif (strpos($p,'shared')===0) {
+					} elseif (strpos($p, 'shared')===0) {
 						list($sharedAdditions,$sharedTrashcan,$sharedresidue)=$this->processGroups($originals,$v,$sharedAdditions,$sharedTrashcan,$sharedresidue);
 						$bean->removeProperty($p);
-					}
-					else {}
+					} else {}
 				}
 			}
 		}
 		$this->storeBean($bean);
-
 		if ($processLists) {
 			$this->processEmbeddedBeans($bean,$embeddedBeans);
 			$myFieldLink = $bean->getMeta('type').'_id';
-			//Handle related beans
 			$this->processTrashcan($bean,$ownTrashcan);
 			$this->processAdditions($bean,$ownAdditions);
 			$this->processResidue($ownresidue);
@@ -395,8 +391,7 @@ class RedBean_OODB extends RedBean_Observable {
 							if ($bean->getMeta("cast.$p",-1)!==-1) {
 								$cast = $bean->getMeta("cast.$p");
 								$typeno = $this->getTypeFromCast($cast);
-							}
-							else {
+							} else {
 								$cast = false;		
 								//What kind of property are we dealing with?
 								$typeno = $this->writer->scanType($v,true);
@@ -448,8 +443,7 @@ class RedBean_OODB extends RedBean_Observable {
 		foreach($sharedAdditions as $addition) {
 			if ($addition instanceof RedBean_OODBBean) {
 				$this->assocManager->associate($addition, $bean);
-			}
-			else {
+			} else {
 				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
 			}
 		}
@@ -493,10 +487,9 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 		foreach($ownTrashcan as $trash) {
-			if (isset($this->dep[$trash->getMeta('type')]) && in_array($bean->getMeta('type'),$this->dep[$trash->getMeta('type')])) {
+			if (isset($this->dep[$trash->getMeta('type')]) && in_array($bean->getMeta('type'), $this->dep[$trash->getMeta('type')])) {
 				$this->trash($trash);
-			}
-			else {
+			} else {
 				$trash->$myFieldLink = null;
 				$this->store($trash);
 			}
@@ -516,7 +509,7 @@ class RedBean_OODB extends RedBean_Observable {
 				$this->writer->addIndex($bean->getMeta('type'),
 							'index_foreignkey_'.$bean->getMeta('type').'_'.$embeddedBean->getMeta('type'),
 							 $linkField);
-				$isDep = $this->isDependentOn($bean->getMeta('type'),$embeddedBean->getMeta('type'));
+				$isDep = $this->isDependentOn($bean->getMeta('type'), $embeddedBean->getMeta('type'));
 				$this->writer->addFK($bean->getMeta('type'), $embeddedBean->getMeta('type'), $linkField, 'id', $isDep);
 			}
 		}	
@@ -552,8 +545,7 @@ class RedBean_OODB extends RedBean_Observable {
 					$isDep = $this->isDependentOn($addition->getMeta('type'),$bean->getMeta('type'));
 					$this->writer->addFK($addition->getMeta('type'),$bean->getMeta('type'),$myFieldLink,'id',$isDep);
 				}
-			}
-			else {
+			} else {
 				throw new RedBean_Exception_Security('Array may only contain RedBean_OODBBeans');
 			}
 		}
@@ -618,7 +610,6 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		$bean->setMeta('sys.orig', $row);
 		foreach($row as $p=>$v) {
-			//populate the bean with the database row
 			$bean->$p = $v;
 		}
 		$this->signal('open', $bean);
@@ -645,8 +636,7 @@ class RedBean_OODB extends RedBean_Observable {
 			if (is_array($v)) {
 				if (strpos($p, 'own')===0) {
 					$bean->removeProperty($p);
-				}
-				elseif (strpos($p, 'shared')===0) {
+				} elseif (strpos($p, 'shared')===0) {
 					$bean->removeProperty($p);
 				}
 			}
@@ -654,7 +644,7 @@ class RedBean_OODB extends RedBean_Observable {
 		if (!$this->isFrozen) $this->check($bean);
 		try {
 			$this->writer->selectRecord($bean->getMeta('type'),
-				array('id' => array( $bean->id) ), null, true );
+				array('id' => array($bean->id)), null, true );
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
@@ -684,7 +674,7 @@ class RedBean_OODB extends RedBean_Observable {
 		$collection = array();
 		try {
 			$rows = $this->writer->selectRecord($type,array('id'=>$ids));
-		}catch(RedBean_Exception_SQL $e) {
+		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
 			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
