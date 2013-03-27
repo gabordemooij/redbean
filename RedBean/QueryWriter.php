@@ -148,7 +148,7 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return void
 	 */
-	public function addUniqueIndex($type,$columns);
+	public function addUniqueIndex($type, $columns);
 	/**
 	 * This method will check whether the SQL state is in the list of specified states
 	 * and returns true if it does appear in this list or false if it

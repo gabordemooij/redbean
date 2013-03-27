@@ -64,8 +64,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		if ($this->startsWithZeros($value)) return self::C_DATATYPE_TEXT;
 		if (is_numeric($value) && (intval($value)==$value) && $value<2147483648) return self::C_DATATYPE_INTEGER;
 		if ((is_numeric($value) && $value < 2147483648)
-				  || preg_match('/\d{4}\-\d\d\-\d\d/',$value)
-				  || preg_match('/\d{4}\-\d\d\-\d\d\s\d\d:\d\d:\d\d/',$value)
+				  || preg_match('/\d{4}\-\d\d\-\d\d/', $value)
+				  || preg_match('/\d{4}\-\d\d\-\d\d\s\d\d:\d\d:\d\d/', $value)
 		) {
 			return self::C_DATATYPE_NUMERIC;
 		}
@@ -106,7 +106,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return array $info 
 	 */
 	protected function getTable($type) {
-		$tableName = $this->esc($type,true);
+		$tableName = $this->esc($type, true);
 		$columns = $this->getColumns($type);
 		$indexes = $this->getIndexes($type);
 		$keys = $this->getKeys($type);
@@ -170,8 +170,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @see RedBean_QueryWriter::getTables();
 	 */
 	public function getTables() {
-		return $this->adapter->getCol( "SELECT name FROM sqlite_master
-			WHERE type='table' AND name!='sqlite_sequence';" );
+		return $this->adapter->getCol("SELECT name FROM sqlite_master
+			WHERE type='table' AND name!='sqlite_sequence';");
 	}
 	/**
 	 * @see RedBean_QueryWriter::createTable
@@ -218,7 +218,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @return array $keysInfo keys information
 	 */
 	protected function getKeys($type) {
-		$table = $this->esc($type,true);
+		$table = $this->esc($type, true);
 		$keys = $this->adapter->get("PRAGMA foreign_key_list('$table')");
 		$keyInfoList = array();
 		foreach($keys as $k) {
@@ -229,8 +229,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	/**
 	 * @see RedBean_QueryWriter::addUniqueIndex
 	 */
-	public function addUniqueIndex($type,$columns) {
-		$table = $this->esc($type,true);
+	public function addUniqueIndex($type, $columns) {
+		$table = $this->esc($type, true);
 		$name = 'UQ_'.$table.implode('__', $columns);
 		$t = $this->getTable($type);
 		if (isset($t['indexes'][$name])) return;
@@ -289,7 +289,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @note: cant put this in try-catch because that can hide the fact
 	 * that database has been damaged. 
 	 */
-	protected function buildFK($type, $targetType, $field, $targetField,$constraint=false) {
+	protected function buildFK($type, $targetType, $field, $targetField, $constraint=false) {
 		$consSQL = ($constraint ? 'CASCADE' : 'SET NULL');
 		$t = $this->getTable($type);
 		$label = 'from_'.$field.'_to_table_'.$targetType.'_col_'.$targetField;
@@ -324,8 +324,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	protected  function constrain($table, $table1, $table2, $property1, $property2) {
 		$writer = $this;
 		$adapter = $this->adapter;
-		$firstState = $this->buildFK($table,$table1,$property1,'id',true);
-		$secondState = $this->buildFK($table,$table2,$property2,'id',true);
+		$firstState = $this->buildFK($table, $table1, $property1, 'id', true);
+		$secondState = $this->buildFK($table, $table2, $property2, 'id', true);
 		return ($firstState && $secondState);
 	}
 	/**

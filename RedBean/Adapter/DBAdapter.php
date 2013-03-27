@@ -62,7 +62,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function getCol($sql, $aValues = array()) {
 		$this->sql = $sql;
 		$this->signal('sql_exec', $this);
-		return $this->db->GetCol( $sql,$aValues );
+		return $this->db->GetCol($sql, $aValues);
 	}
 	/**
 	 * @see RedBean_Adapter::getAssoc
@@ -95,7 +95,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function getCell($sql, $aValues = array(), $noSignal = null) {
 		$this->sql = $sql;
 		if (!$noSignal) $this->signal('sql_exec', $this);
-		$arr = $this->db->getCol( $sql, $aValues );
+		$arr = $this->db->getCol($sql, $aValues);
 		if ($arr && is_array($arr))	return ($arr[0]); else return false;
 	}
 	/**

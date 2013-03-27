@@ -45,16 +45,16 @@ class RedBean_Finder {
 	 * @return array $beans  beans
 	 */
 	public function find($type, $sql=null, $values=array()) {
-		if ($sql instanceof RedBean_SQLHelper) list($sql,$values) = $sql->getQuery();
+		if ($sql instanceof RedBean_SQLHelper) list($sql, $values) = $sql->getQuery();
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
-		return $this->redbean->find($type,array(),array($sql,$values));
+		return $this->redbean->find($type, array(), array($sql, $values));
 	}
 	/**
 	 * @see RedBean_Finder::find
 	 * The findAll() method differs from the find() method in that it does
 	 * not assume a WHERE-clause, so this is valid:
 	 *
-	 * R::findAll('person',' ORDER BY name DESC ');
+	 * R::findAll('person', ' ORDER BY name DESC ');
 	 *
 	 * Your SQL does not have to start with a valid WHERE-clause condition.
 	 * 
@@ -65,9 +65,9 @@ class RedBean_Finder {
 	 * @return array $beans  beans
 	 */
 	public function findAll($type, $sql=null, $values=array()) {
-		if ($sql instanceof RedBean_SQLHelper) list($sql,$values) = $sql->getQuery();
+		if ($sql instanceof RedBean_SQLHelper) list($sql, $values) = $sql->getQuery();
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
-		return $this->redbean->find($type,array(),array($sql,$values),true);
+		return $this->redbean->find($type, array(), array($sql, $values), true);
 	}
 	/**
 	 * @see RedBean_Finder::find
@@ -97,7 +97,7 @@ class RedBean_Finder {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public function findOne( $type, $sql=null, $values=array()) {
+	public function findOne($type, $sql=null, $values=array()) {
 		$items = $this->find($type, $sql, $values);
 		$found = reset($items);
 		if (!$found) return null;
@@ -115,7 +115,7 @@ class RedBean_Finder {
 	 */
 	public function findLast($type, $sql=null, $values=array()) {
 		$items = $this->find($type, $sql, $values);
-		$found = end( $items );
+		$found = end($items);
 		if (!$found) return null;
 		return $found;
 	}
@@ -131,7 +131,7 @@ class RedBean_Finder {
 	 * @return array $beans Contains RedBean_OODBBean instances
 	 */
 	public function findOrDispense($type, $sql=null, $values=array()) {
-		$foundBeans = $this->find($type,$sql,$values);
+		$foundBeans = $this->find($type, $sql, $values);
 		if (count($foundBeans)==0) return array($this->redbean->dispense($type)); else return $foundBeans;
 	}
 }

@@ -47,7 +47,7 @@
 	 * @return mixed $result   either self or result depending on mode 
 	 */
 	public function __call($funcName, $args=array()) {
-		$funcName = str_replace('_',' ',$funcName);
+		$funcName = str_replace('_', ' ', $funcName);
 		if ($this->capture) {
 			$this->sql .= ' '.$funcName . ' '.implode(',', $args);
 			return $this;

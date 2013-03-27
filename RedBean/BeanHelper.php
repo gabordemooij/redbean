@@ -20,8 +20,7 @@ interface RedBean_BeanHelper {
 	 * @abstract
 	 * @return RedBean_Toolbox $toolbox toolbox
 	 */
-	public function getToolbox();
-	
+	public function getToolbox();	
 	/**
 	 * Given a certain bean this method will
 	 * return the corresponding model.

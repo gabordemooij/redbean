@@ -122,7 +122,7 @@ class RedBean_DuplicationManager {
 	 * @return boolean 
 	 */
 	protected function hasSharedList($type, $target) {
-		return (in_array(RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($type,$target)),$this->tables));
+		return (in_array(RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($type, $target)), $this->tables));
 	}
 	/**
 	 * Makes a copy of a bean. This method makes a deep copy
@@ -153,7 +153,7 @@ class RedBean_DuplicationManager {
 		if (!count($this->tables))  $this->tables = $this->toolbox->getWriter()->getTables();
 		if (!count($this->columns)) foreach($this->tables as $table) $this->columns[$table] = $this->toolbox->getWriter()->getColumns($table);
 		$beanCopy = clone($bean);
-		$rs = $this->duplicate($beanCopy,$trail,$pid);
+		$rs = $this->duplicate($beanCopy, $trail, $pid);
 		if (!$this->cacheTables) {
 			$this->tables = array();
 			$this->columns = array();
@@ -179,7 +179,7 @@ class RedBean_DuplicationManager {
 		$copy->id = 0;
 		$tables = $this->tables;
 		foreach($tables as $table) {
-			if (is_array($this->filters) && count($this->filters) && !in_array($table,$this->filters)) continue;
+			if (is_array($this->filters) && count($this->filters) && !in_array($table, $this->filters)) continue;
 			if ($table==$type) continue;
 			$owned = 'own'.ucfirst($table);
 			$shared = 'shared'.ucfirst($table);
@@ -187,19 +187,19 @@ class RedBean_DuplicationManager {
 				if ($beans = $bean->$shared) {
 					$copy->$shared = array();
 					foreach($beans as $subBean) {
-						array_push($copy->$shared,$subBean);
+						array_push($copy->$shared, $subBean);
 					}
 				}
-			} elseif ($this->hasOwnList($type,$table)) {
+			} elseif ($this->hasOwnList($type, $table)) {
 				if ($beans = $bean->$owned) {
 					$copy->$owned = array();
 					foreach($beans as $subBean) {
-						array_push($copy->$owned,$this->duplicate($subBean,$trail,$pid));
+						array_push($copy->$owned, $this->duplicate($subBean, $trail, $pid));
 					}
 				}
-				$copy->setMeta('sys.shadow.'.$owned,null);
+				$copy->setMeta('sys.shadow.'.$owned, null);
 			}
-			$copy->setMeta('sys.shadow.'.$shared,null);
+			$copy->setMeta('sys.shadow.'.$shared, null);
 		}
 		if ($pid) $copy->id = $bean->id;
 		return $copy;
@@ -223,8 +223,8 @@ class RedBean_DuplicationManager {
 		if (!is_array($beans)) $beans = array($beans);
 		foreach($beans as $bean) {
 			   $this->setFilters($filters);
-			   $f = $this->dup($bean,array(),true);
-			   $array[] = $f->export(false,$parents,false,$filters);
+			   $f = $this->dup($bean, array(), true);
+			   $array[] = $f->export(false, $parents, false, $filters);
 		}
 		return $array;
 	}

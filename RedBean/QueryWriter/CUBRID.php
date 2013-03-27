@@ -64,14 +64,14 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 * @see RedBean_QueryWriter::getTables
 	 */
 	public function getTables() { 
-		$rows = $this->adapter->getCol( "SELECT class_name FROM db_class WHERE is_system_class = 'NO';" );
+		$rows = $this->adapter->getCol("SELECT class_name FROM db_class WHERE is_system_class = 'NO';");
 		return $rows;
 	}
 	/**
 	 * @see RedBean_QueryWriter::createTable
 	 */
 	public function createTable($table) {
-		$rawTable = $this->esc($table,true);
+		$rawTable = $this->esc($table, true);
 		$table = $this->esc($table);
 		$sql = 'CREATE TABLE '.$table.' (
                    "id" integer AUTO_INCREMENT,
@@ -233,7 +233,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	/**
 	 * @see RedBean_QueryWriter::addFK
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false) {
+	public function addFK($type, $targetType, $field, $targetField, $isDependent = false) {
 		return $this->buildFK($type, $targetType, $field, $targetField, $isDependent);
 	}
 	/**
@@ -302,8 +302,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	protected function getKeys($table, $table2=null) {
 		$pdo = $this->adapter->getDatabase()->getPDO();
-		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS,$table);
-		if ($table2) $keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS,$table2) );
+		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS, $table);
+		if ($table2) $keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS, $table2) );
 		return $keys;
 	}
 	/**

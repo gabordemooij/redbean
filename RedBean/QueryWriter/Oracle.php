@@ -100,7 +100,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return string $column name
 	 */
 	public function esc($c, $q=false) {
-			return parent::esc((!$q) ? strtoupper($c):$c,$q);
+			return parent::esc((!$q) ? strtoupper($c):$c, $q);
 	}
 	/**
 	 * Do everything that needs to be done to format a table name.
@@ -212,7 +212,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @return integer $numRowsFound
 	 */
 	public function count($beanType, $addSQL = '', $params = array()) {
-		return parent::count(strtoupper($beanType),$addSQL,$params);
+		return parent::count(strtoupper($beanType), $addSQL, $params);
 	}
 	/**
 	 * Returns all tables in the database.

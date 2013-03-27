@@ -82,8 +82,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @see RedBean_QueryWriter::getTables
 	 */
 	public function getTables() {
-		return $this->adapter->getCol( "select table_name from information_schema.tables
-		where table_schema = 'public'" );
+		return $this->adapter->getCol("select table_name from information_schema.tables
+		where table_schema = 'public'");
 	}
 	/**
 	 * @see RedBean_QueryWriter::createTable
@@ -91,7 +91,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	public function createTable($table) {
 		$table = $this->esc($table);
 		$sql = " CREATE TABLE $table (id SERIAL PRIMARY KEY); ";
-		$this->adapter->exec( $sql );
+		$this->adapter->exec($sql);
 	}
 	/**
 	 * @see RedBean_QueryWriter::getColumns
@@ -168,7 +168,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	/**
 	 * @see RedBean_QueryWriter::addUniqueIndex
 	 */
-	public function addUniqueIndex($table,$columns) {
+	public function addUniqueIndex($table, $columns) {
 		$table = $this->esc($table, true);
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach($columns as $k=>$v) {
@@ -231,12 +231,12 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		try{
 			$table = $this->esc($type);
 			$column = $this->esc($field);
-			$tableNoQ = $this->esc($type,true);
-			$columnNoQ = $this->esc($field,true);
+			$tableNoQ = $this->esc($type, true);
+			$columnNoQ = $this->esc($field, true);
 			$targetTable = $this->esc($targetType);
-			$targetTableNoQ = $this->esc($targetType,true);
+			$targetTableNoQ = $this->esc($targetType, true);
 			$targetColumn  = $this->esc($targetField);
-			$targetColumnNoQ  = $this->esc($targetField,true);
+			$targetColumnNoQ  = $this->esc($targetField, true);
 			$sql = "SELECT
 					tc.constraint_name, 
 					tc.table_name, 

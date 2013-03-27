@@ -50,7 +50,7 @@ class RedBean_DependencyInjector {
 		if ($this->dependencies && is_array($this->dependencies)) {
 			foreach($this->dependencies as $key=>$dep) {
 				$depSetter = 'set'.$key;
-				if (method_exists($object,$depSetter)) {
+				if (method_exists($object, $depSetter)) {
 					$object->$depSetter($dep);
 				}
 			}

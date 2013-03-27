@@ -69,10 +69,10 @@ class RedBean_TagManager {
 	 */
 	public function hasTag($bean, $tags, $all=false) {
 		$foundtags = $this->tag($bean);
-		if (is_string($foundtags)) $foundtags = explode(",",$tags);
-		$same = array_intersect($tags,$foundtags);
+		if (is_string($foundtags)) $foundtags = explode(",", $tags);
+		$same = array_intersect($tags, $foundtags);
 		if ($all) {
-			return (implode(",",$same)===implode(",",$tags));
+			return (implode(",", $same)===implode(",", $tags));
 		}
 		return (bool) (count($same)>0);
 	}
@@ -86,7 +86,7 @@ class RedBean_TagManager {
 	 * @return void
 	 */
 	public function untag($bean, $tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string)$tagList); else $tags=$tagList;
+		if ($tagList!==false && !is_array($tagList)) $tags = explode(",", (string)$tagList); else $tags=$tagList;
 		foreach($tags as $tag) {
 			if ($t = $this->findTagByTitle($tag)) {
 				$this->associationManager->unassociate($bean, $t);
@@ -111,7 +111,7 @@ class RedBean_TagManager {
 			$tags = array();
 			$keys = $this->associationManager->related($bean, 'tag'); 
 			if ($keys) {
-				$tags = $this->redbean->batch('tag',$keys);
+				$tags = $this->redbean->batch('tag', $keys);
 			}
 			$foundTags = array();
 			foreach($tags as $tag) {
@@ -154,9 +154,9 @@ class RedBean_TagManager {
 	 * @return array
 	 */
 	public function tagged($beanType, $tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode( ",", (string) $tagList); else $tags=$tagList;
+		if ($tagList!==false && !is_array($tagList)) $tags = explode(",", (string) $tagList); else $tags=$tagList;
 		$collection = array();
-		$tags = $this->redbean->find('tag',array('title'=>$tags));
+		$tags = $this->redbean->find('tag', array('title'=>$tags));
 		if (is_array($tags) && count($tags)>0) {
 			$collectionKeys = $this->associationManager->related($tags, $beanType);
 			if ($collectionKeys) {
@@ -177,8 +177,8 @@ class RedBean_TagManager {
 		if ($tagList!==false && !is_array($tagList)) $tags = explode(",", (string)$tagList); else $tags=$tagList;
 		$beans = array();
 		foreach($tags as $tag) {
-			$beans = $this->tagged($beanType,$tag);
-			if (isset($oldBeans)) $beans = array_intersect_assoc($beans,$oldBeans);
+			$beans = $this->tagged($beanType, $tag);
+			if (isset($oldBeans)) $beans = array_intersect_assoc($beans, $oldBeans);
 			$oldBeans = $beans;
 		}
 		return $beans;

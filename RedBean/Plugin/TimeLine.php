@@ -5,7 +5,7 @@
  * @file 			RedBean/Plugin/TimeLine.php
  * @desc			Monitors schema changes to ease deployment.
  * 
- * @plugin			public static function log($filename) { $tl = new RedBean_Plugin_TimeLine($filename); self::$adapter->addEventListener('sql_exec',$tl);}
+ * @plugin			public static function log($filename) { $tl = new RedBean_Plugin_TimeLine($filename); self::$adapter->addEventListener('sql_exec', $tl);}
  * 
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
@@ -46,18 +46,18 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 		if ($eventName=='sql_exec') {
 			$sql = $adapter->getSQL();
 			$this->logs[] = $sql;
-			if (strpos($sql,'ALTER')===0) {
+			if (strpos($sql, 'ALTER')===0) {
 				$write = "-- ".date('Y-m-d H:i')." | Altering table. \n";
 				$write .= $sql;
 				$write .= "\n\n";
 			}
-			if (strpos($sql,'CREATE')===0) {
+			if (strpos($sql, 'CREATE')===0) {
 				$write = "-- ".date('Y-m-d H:i')." | Creating new table. \n";
 				$write .= $sql;
 				$write .= "\n\n";
 			}
 			if (isset($write)) {
-				file_put_contents($this->file,$write,FILE_APPEND);
+				file_put_contents($this->file, $write, FILE_APPEND);
 			}
 		}
 	}

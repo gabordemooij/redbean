@@ -4,7 +4,7 @@
  *
  * @file			RedBean/Cooker.php
  * 
- * @plugin			public static function graph($array,$filterEmpty=false) { $c = new RedBean_Plugin_Cooker(); $c->setToolbox(self::$toolbox);return $c->graph($array,$filterEmpty);}
+ * @plugin			public static function graph($array, $filterEmpty=false) { $c = new RedBean_Plugin_Cooker(); $c->setToolbox(self::$toolbox);return $c->graph($array, $filterEmpty);}
  * 
  * @desc			Turns arrays into bean collections for easy persistence.
  * @author			Gabor de Mooij and the RedBeanPHP Community
@@ -58,14 +58,14 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	 *	$form = array(
 	 *		'type'=>'order',
 	 *		'ownProduct'=>array(
-	 *			array('id'=>171,'type'=>'product'),
+	 *			array('id'=>171, 'type'=>'product'),
 	 *		),
 	 *		'ownCustomer'=>array(
-	 *			array('type'=>'customer','name'=>'Bill')
+	 *			array('type'=>'customer', 'name'=>'Bill')
 	 *		),
 	 * 		'sharedCoupon'=>array(
-	 *			array('type'=>'coupon','name'=>'123'),
-	 *			array('type'=>'coupon','id'=>3)
+	 *			array('type'=>'coupon', 'name'=>'123'),
+	 *			array('type'=>'coupon', 'id'=>3)
 	 *		)
 	 *	);
 	 * 

@@ -54,7 +54,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 			$bean = $this->cache[$type][$id];
 		} else {
 			$this->misses ++;
-			$bean = parent::load($type,$id);
+			$bean = parent::load($type, $id);
 			if ($bean->id) {
 				if (!isset($this->cache[$type])) $this->cache[$type]=array();
 				$this->cache[$type][$id] = $bean;

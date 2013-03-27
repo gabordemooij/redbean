@@ -22,7 +22,7 @@ class RedBean_Logger_Default implements RedBean_Logger {
   public function log() {
     if (func_num_args() > 0) {
       foreach (func_get_args() as $argument) {
-        if (is_array($argument)) echo print_r($argument,true); else echo $argument;
+        if (is_array($argument)) echo print_r($argument, true); else echo $argument;
 		echo "<br>\n";
       }
     }

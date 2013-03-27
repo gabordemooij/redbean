@@ -113,7 +113,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		}
 		$export = array();
 		foreach($beans as $bean) {
-			$export[$bean->getID()] = $this->exportBean( $bean );
+			$export[$bean->getID()] = $this->exportBean($bean);
 		}
 		if ($this->maxDepth!==false) {
 			$this->depth --;
@@ -150,8 +150,8 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		$this->recurCheck[$bid]=$bid;
 		$export = $bean->export();
 		foreach($export as $key=>$value) {
-			if (strpos($key,'_id')!==false) {
-				$sub = str_replace('_id','',$key);
+			if (strpos($key, '_id')!==false) {
+				$sub = str_replace('_id', '', $key);
 				$subBean = $bean->$sub;
 				if ($subBean) {
 					$export[$sub] = $this->export($subBean, false);
@@ -162,8 +162,8 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		$linkField = $type . '_id';
 		//get all ownProperties
 		foreach($this->tables as $table=>$cols) {
-			if (strpos($table,'_')===false) {
-				if (in_array($linkField,array_keys($cols))) {
+			if (strpos($table, '_')===false) {
+				if (in_array($linkField, array_keys($cols))) {
 					$field = 'own'.ucfirst($table);
 					$export[$field] = self::export($bean->$field, false);
 				}
@@ -171,9 +171,9 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		}
 		//get all sharedProperties
 		foreach($this->tables as $table=>$cols) {
-			if (strpos($table,'_')!==false) {
+			if (strpos($table, '_')!==false) {
 				$parts = explode('_', $table);
-				if (is_array($parts) && in_array($type,$parts)) {
+				if (is_array($parts) && in_array($type, $parts)) {
 					$other = $parts[0];
 					if ($other==$type) $other=$parts[1];
 					$field = 'shared'.ucfirst($other);

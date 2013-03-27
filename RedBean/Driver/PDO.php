@@ -116,23 +116,23 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 *
 	 * @return void
 	 */
-	protected function bindParams($s,$aValues) {
+	protected function bindParams($s, $aValues) {
 		foreach($aValues as $key=>&$value) {
 			if (is_integer($key)) {
 				if (is_null($value)){
-					$s->bindValue($key+1,null,PDO::PARAM_NULL);
+					$s->bindValue($key+1, null, PDO::PARAM_NULL);
 				} elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value < 2147483648) {
-					$s->bindParam($key+1,$value,PDO::PARAM_INT);
+					$s->bindParam($key+1, $value, PDO::PARAM_INT);
 				} else {
-					$s->bindParam($key+1,$value,PDO::PARAM_STR);
+					$s->bindParam($key+1, $value, PDO::PARAM_STR);
 				}
 			} else {
 				if (is_null($value)){
-					$s->bindValue($key,null,PDO::PARAM_NULL);
+					$s->bindValue($key, null, PDO::PARAM_NULL);
 				} elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) &&  $value < 2147483648) {
-					$s->bindParam($key,$value,PDO::PARAM_INT);
+					$s->bindParam($key, $value, PDO::PARAM_INT);
 				} else {
-					$s->bindParam($key,$value,PDO::PARAM_STR);
+					$s->bindParam($key, $value, PDO::PARAM_STR);
 				}
 			}
 		}
@@ -155,7 +155,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->logger->log($sql, $aValues);
 		}
 		try {
-			if (strpos('pgsql',$this->dsn)===0) {
+			if (strpos('pgsql', $this->dsn)===0) {
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			} else {
 				$s = $this->pdo->prepare($sql);
@@ -183,14 +183,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @see RedBean_Driver::GetAll
 	 */
 	public function GetAll($sql, $aValues=array()) {
-		$this->runQuery($sql,$aValues);
+		$this->runQuery($sql, $aValues);
 		return $this->rs;
 	}
 	 /**
 	 * @see RedBean_Driver::GetCol
 	 */
 	public function GetCol($sql, $aValues=array()) {
-		$rows = $this->GetAll($sql,$aValues);
+		$rows = $this->GetAll($sql, $aValues);
 		$cols = array();
 		if ($rows && is_array($rows) && count($rows)>0) {
 			foreach ($rows as $row) {
@@ -203,7 +203,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @see RedBean_Driver::GetCell
 	 */
 	public function GetCell($sql, $aValues=array()) {
-		$arr = $this->GetAll($sql,$aValues);
+		$arr = $this->GetAll($sql, $aValues);
 		$row1 = array_shift($arr);
 		$col1 = array_shift($row1);
 		return $col1;
@@ -218,8 +218,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * @see RedBean_Driver::Excecute
 	 */
-	public function Execute( $sql, $aValues=array() ) {
-		$this->runQuery($sql,$aValues);
+	public function Execute($sql, $aValues=array()) {
+		$this->runQuery($sql, $aValues);
 		return $this->affected_rows;
 	}
 	/**

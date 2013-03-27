@@ -74,7 +74,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return string $table escaped string
 	 */
 	protected function check($struct) {
-		if (!preg_match('/^[a-zA-Z0-9_]+$/',$struct)) {
+		if (!preg_match('/^[a-zA-Z0-9_]+$/', $struct)) {
 		  throw new Redbean_Exception_Security('Identifier does not conform to RedBeanPHP security policies.');
 	    }
 		return $struct;
@@ -135,14 +135,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$insertcolumns[$k] = $this->esc($v);
 			}
 			$insertSQL = "INSERT INTO $table ( id, ".implode(',', $insertcolumns)." ) VALUES 
-			( $default, ". implode(',', array_fill(0, count($insertcolumns),' ? '))." ) $suffix";
+			( $default, ". implode(',', array_fill(0, count($insertcolumns), ' ? '))." ) $suffix";
 
 			foreach($insertvalues as $i=>$insertvalue) {
 				$ids[] = $this->adapter->getCell($insertSQL, $insertvalue, $i);
 			}
 			$result = count($ids) === 1 ? array_pop($ids) : $ids;
 		} else {
-			$result = $this->adapter->getCell( "INSERT INTO $table (id) VALUES($default) $suffix");
+			$result = $this->adapter->getCell("INSERT INTO $table (id) VALUES($default) $suffix");
 		}
 		if ($suffix) return $result;
 		$last_id = $this->adapter->getInsertID();
@@ -154,7 +154,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function selectRecord($type, $conditions, $addSql=null, $delete=null, $inverse=false, $all=false) { 
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
 		if (!$delete && $this->flagUseCache) {
-			$key = serialize(array($type,$conditions,$addSql,$inverse,$all));
+			$key = serialize(array($type, $conditions, $addSql, $inverse, $all));
 			if ($this->flushKey!==$this->adapter->getSQL()) {
 				//If SQL has been taken place outside of this method then something else then
 				//a select query might have happened!
@@ -175,11 +175,11 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				&& count($conditions)===1 
 				&& isset($conditions['id']) 
 				&& is_array($values) 
-				&& preg_match('/^\d+$/', implode('',$values))) {
+				&& preg_match('/^\d+$/', implode('', $values))) {
 				$sql .= implode(',', $values).') ';
 				$sqlConditions[] = $sql;
 			} else {
-				$sql .= implode(',',array_fill(0, count($values), '?')).') ';
+				$sql .= implode(',', array_fill(0, count($values), '?')).') ';
 				$sqlConditions[] = $sql;
 				if (!is_array($values)) $values = array($values);
 				foreach($values as $k=>$v) {
@@ -301,7 +301,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * 
 	 * @return void 
 	 */
-	public static function renameAssociation($from,$to = null) {
+	public static function renameAssociation($from, $to = null) {
 		if (is_array($from)) {
 			foreach($from as $key => $value) self::$renames[$key] = $value;
 			return;
@@ -314,13 +314,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * name of the link table to be used to store and retrieve
 	 * association records.
 	 *
-	 * @param  array $types two types array($type1,$type2)
+	 * @param  array $types two types array($type1, $type2)
 	 *
 	 * @return string $linktable name of the link table
 	 */
 	public static function getAssocTableFormat($types) {
 		sort($types);
-		$assoc = ( implode('_', $types) );
+		$assoc = (implode('_', $types));
 		return (isset(self::$renames[$assoc])) ? self::$renames[$assoc] : $assoc;
 	}
 	/**

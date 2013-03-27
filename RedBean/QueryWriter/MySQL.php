@@ -154,12 +154,12 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$column = $this->esc($column);
 		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
-		$this->adapter->exec( $changecolumnSQL );
+		$this->adapter->exec($changecolumnSQL);
 	}
 	/**
 	 * @see RedBean_QueryWriter::addUniqueIndex
 	 */
-	public function addUniqueIndex($table,$columns) {
+	public function addUniqueIndex($table, $columns) {
 		$table = $this->esc($table);
 		sort($columns); //else we get multiple indexes due to order-effects
 		foreach($columns as $k=>$v) {
@@ -186,7 +186,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$table = $this->esc($table);
 		$name = preg_replace('/\W/', '', $name);
 		$column = $this->esc($column);
-		foreach( $this->adapter->get("SHOW INDEX FROM $table ") as $ind) {
+		foreach($this->adapter->get("SHOW INDEX FROM $table ") as $ind) {
 			if ($ind['Key_name']===$name) return;
 		}
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
@@ -223,7 +223,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				FROM information_schema.KEY_COLUMN_USAGE
 				WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND
 				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
-					  ",array($db,$table));
+					  ", array($db, $table));
 			//already foreign keys added in this association table
 			if ($fks>0) return false;
 			$columns = $this->getColumns($table);

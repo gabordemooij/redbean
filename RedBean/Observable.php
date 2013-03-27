@@ -41,6 +41,6 @@ abstract class RedBean_Observable {
 	 */
 	public function signal($eventname, $info) {
 		if (!isset($this->observers[ $eventname ])) $this->observers[$eventname] = array();
-		foreach($this->observers[$eventname] as $observer) $observer->onEvent( $eventname, $info );
+		foreach($this->observers[$eventname] as $observer) $observer->onEvent($eventname, $info);
 	}
 }
