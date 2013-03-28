@@ -229,6 +229,7 @@ class RedBean_Facade {
 			}
 			return $list;
 		}
+		return array();
 	}
 	/**
 	 * Loads the bean with the given type and id and returns it.
@@ -586,14 +587,12 @@ class RedBean_Facade {
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 				)) {
 					return array();
-				}
-				else {
+				} else {
 					throw $e;
 				}
 			}
 			return $rs;
-		}
-		else {
+		} else {
 			return RedBean_Facade::$adapter->$method($sql, $values);
 		}
 	}
@@ -960,9 +959,7 @@ class RedBean_Facade {
 	 * Closes the database connection.
 	 */
 	public static function close() {
-		if (isset(self::$adapter)){
-			self::$adapter->close();
-		}
+		if (isset(self::$adapter)) self::$adapter->close();
 	}
 	/**
 	 * Simple convenience function, returns ISO date formatted representation

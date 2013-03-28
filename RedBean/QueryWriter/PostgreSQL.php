@@ -139,8 +139,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		}
 		elseif(is_numeric($value)) {
 			return self::C_DATATYPE_DOUBLE;
-		}
-		else {
+		} else {
 			return self::C_DATATYPE_TEXT;
 		}
 	}

@@ -408,8 +408,7 @@ class RedBean_OODB extends RedBean_Observable {
 									$this->writer->widenColumn($table, $p, $typeno);
 									$bean->setMeta('buildreport.flags.widen', true);
 								}
-							}
-							else {
+							} else {
 								//no it is not
 								$this->writer->addColumn($table, $p, $typeno);
 								$bean->setMeta('buildreport.flags.addcolumn', true);
@@ -589,8 +588,7 @@ class RedBean_OODB extends RedBean_Observable {
 		$bean = $this->dispense($type);
 		if ($this->stash && isset($this->stash[$id])) {
 			$row = $this->stash[$id];
-		}
-		else {
+		} else {
 			try {
 				$rows = $this->writer->selectRecord($type, array('id'=>array($id)));
 			} catch(RedBean_Exception_SQL $e ) {

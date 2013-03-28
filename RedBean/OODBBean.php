@@ -368,8 +368,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				self::$beautifulColumns[$property] = $propertyBeau;
 			}
 			return $propertyBeau;
-		}
-		else {
+		} else {
 			return $property;
 		}
 	}
@@ -446,8 +445,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				if (!count($keys)) $beans = array(); else
 				if (trim($this->withSql)!=='') {
 					$beans = $redbean->find($type, array('id'=>$keys), array($this->withSql, $this->withParams), true);
-				}
-				else {
+				} else {
 					$beans = $redbean->batch($type, $keys);
 				}
 				$this->withSql = '';
@@ -456,13 +454,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$this->__info['sys.shadow.'.$property] = $beans;
 				$this->__info['tainted'] = true;
 				return $this->properties[$property];
-			}
-			else {
+			} else {
 				$null = null;
 				return $null;
 			}
-		}
-		else {
+		} else {
 			return $this->properties[$property];
 		}
 	}
