@@ -60,6 +60,8 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		list($a,$b) = R::loadMulti(array('author','bio'),$id2);
 		asrt($a->name,$b->name);
 		asrt($a->name,'b');
+		asrt(is_array(R::loadMulti(null, 1)), true);
+		asrt((count(R::loadMulti(null, 1))===0), true);
 		
 		//unique constraint for single column
 		testpack('Testing unique constraint on single column');
