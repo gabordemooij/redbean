@@ -38,10 +38,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected $flagUseCache = false;
 	/**
-	 * @var string 
-	 */
-	protected $flushKey = '';
-	/**
 	 * @var array 
 	 */
 	protected $cache = array();
@@ -155,9 +151,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
 		if (!$delete && $this->flagUseCache) {
 			$key = serialize(array($type, $conditions, $addSql, $inverse, $all));
-			if ($this->flushKey!==$this->adapter->getSQL()) {
+			$sql = $this->adapter->getSQL();
+			if (strpos($sql, '-- keep-cache')!==strlen($sql)-13) {
 				//If SQL has been taken place outside of this method then something else then
-				//a select query might have happened!
+				//a select query might have happened! (or instruct to keep cache)
 				$this->cache = array();
 			} else {
 				if (isset($this->cache[$key])) return $this->cache[$key];
@@ -210,9 +207,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			}
 		}
 		$sql = (($delete) ? 'DELETE FROM ' : 'SELECT * FROM ').$table.$sql;
-		$rows = $this->adapter->get($sql, $bindings);
+		$rows = $this->adapter->get($sql.(($delete) ? '' : ' -- keep-cache'), $bindings);
 		if (!$delete && $this->flagUseCache) {
-			$this->flushKey = $this->adapter->getSQL();
 			$this->cache[$key] = $rows;
 		}
 		return $rows;
