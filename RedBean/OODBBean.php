@@ -512,7 +512,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * For instance: $bean->setMeta("buildcommand.unique", array(
 	 * array("column1", "column2", "column3") ) );
 	 * Will add a UNIQUE constaint for the bean on columns: column1, column2 and
-     * column 3.
+	 * column 3.
 	 * To access a Meta property we use a dot separated notation.
 	 * If the property cannot be found this getter will return NULL instead.
 	 * 

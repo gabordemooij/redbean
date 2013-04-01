@@ -174,8 +174,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			//So we need a property to convey the SQL State code.
 			$err = $e->getMessage();
 			if ($this->debug && $this->logger) $this->logger->log('An error occurred: '.$err);
-            $x = new RedBean_Exception_SQL($err, 0);
-      		$x->setSQLState($e->getCode());
+			$x = new RedBean_Exception_SQL($err, 0);
+			$x->setSQLState($e->getCode());
 			throw $x;
 		}
 	}
