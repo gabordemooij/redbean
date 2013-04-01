@@ -3,7 +3,7 @@
  * RedBean Facade
  * 
  * Version Information
- * RedBean Version @version 3.4beta
+ * RedBean Version @version 3.4
  * 
  * @file			RedBean/Facade.php
  * @desc			Convenience class for RedBeanPHP.
