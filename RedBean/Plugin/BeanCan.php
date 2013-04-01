@@ -36,13 +36,13 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 *
 	 * @return string $json JSON encoded response.
 	 */
-	private function resp($result=null, $id=null, $errorCode='-32603', $errorMessage='Internal Error') {
-		$response = array('jsonrpc'=>'2.0');
+	private function resp($result = null, $id = null, $errorCode = '-32603', $errorMessage = 'Internal Error') {
+		$response = array('jsonrpc' => '2.0');
 		if (!is_null($id)) { $response['id'] = $id; }
 		if ($result) {
-			$response['result']=$result;
+			$response['result'] = $result;
 		} else {
-			$response['error'] = array('code'=>$errorCode, 'message'=>$errorMessage);
+			$response['error'] = array('code' => $errorCode, 'message' => $errorMessage);
 		}
 		return (json_encode($response));
 	}
@@ -58,7 +58,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		$jsonArray = json_decode($jsonString, true);
 		if (!$jsonArray) return $this->resp(null, null, -32700, 'Cannot Parse JSON');
 		if (!isset($jsonArray['jsonrpc'])) return $this->resp(null, null, -32600, 'No RPC version');
-		if (($jsonArray['jsonrpc']!='2.0')) return $this->resp(null, null, -32600, 'Incompatible RPC Version');
+		if (($jsonArray['jsonrpc'] != '2.0')) return $this->resp(null, null, -32600, 'Incompatible RPC Version');
 		//DO we have an ID to identify this request?
 		if (!isset($jsonArray['id'])) return $this->resp(null, null, -32600, 'No ID');
 		//Fetch the request Identification String.
@@ -73,7 +73,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		}
 		//Check method signature
 		$method = explode(':', trim($jsonArray['method']));
-		if (count($method)!=2) {
+		if (count($method) != 2) {
 			return $this->resp(null, $id, -32600, 'Invalid method signature. Use: BEAN:ACTION');
 		}
 		//Collect Bean and Action

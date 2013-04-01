@@ -44,20 +44,20 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function __construct(RedBean_Adapter $adapter) {
 		$this->typeno_sqltype = array(
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL=>"  TINYINT(1) UNSIGNED ",
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8=>' TINYINT(3) UNSIGNED ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32=>' INT(11) UNSIGNED ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE=>' DOUBLE ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8=>' VARCHAR(255) ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16=>' TEXT ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32=>' LONGTEXT ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE=>' DATE ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME=>' DATETIME ',
-			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT=>' POINT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL => ' TINYINT(1) UNSIGNED ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8 => ' TINYINT(3) UNSIGNED ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32 => ' INT(11) UNSIGNED ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE => ' DOUBLE ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8 => ' VARCHAR(255) ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16 => ' TEXT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32 => ' LONGTEXT ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE => ' DATE ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
+			  RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT => ' POINT ',
 			);
 		$this->sqltype_typeno = array();
-		foreach($this->typeno_sqltype as $k=>$v)
-		$this->sqltype_typeno[trim(strtolower($v))]=$k;
+		foreach($this->typeno_sqltype as $k => $v)
+		$this->sqltype_typeno[trim(strtolower($v))] = $k;
 		$this->adapter = $adapter;
 	}
 	/**
@@ -92,17 +92,15 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function getColumns($table) {
 		$table = $this->esc($table);
 		$columnsRaw = $this->adapter->get("DESCRIBE $table");
-		foreach($columnsRaw as $r) $columns[$r['Field']]=$r['Type'];
+		foreach($columnsRaw as $r) $columns[$r['Field']] = $r['Type'];
 		return $columns;
 	}
 	/**
 	 * @see RedBean_QueryWriter::scanType
 	 */
-	public function scanType($value, $flagSpecial=false) {
+	public function scanType($value, $flagSpecial = false) {
 		$this->svalue = $value;
-		if (is_null($value)) {
-			return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
-		}
+		if (is_null($value)) return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 		if ($flagSpecial) {
 			if (preg_match('/^\d{4}\-\d\d-\d\d$/', $value)) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE;
@@ -117,10 +115,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			if ($value === true || $value === false || $value === '1' || $value === '') {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 			}
-			if (is_numeric($value) && (floor($value)==$value) && $value >= 0 && $value <= 255 ) {
+			if (is_numeric($value) && (floor($value) == $value) && $value >= 0 && $value <= 255 ) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
 			}
-			if (is_numeric($value) && (floor($value)==$value) && $value >= 0  && $value <= 4294967295 ) {
+			if (is_numeric($value) && (floor($value) == $value) && $value >= 0  && $value <= 4294967295 ) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
 			}
 			if (is_numeric($value)) {
@@ -162,14 +160,14 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function addUniqueIndex($table, $columns) {
 		$table = $this->esc($table);
 		sort($columns); //else we get multiple indexes due to order-effects
-		foreach($columns as $k=>$v) {
+		foreach($columns as $k => $v) {
 			$columns[$k]= $this->esc($v);
 		}
 		$r = $this->adapter->get("SHOW INDEX FROM $table");
 		$name = 'UQ_'.sha1(implode(',', $columns));
 		if ($r) {
 			foreach($r as $i) {
-				if ($i['Key_name']== $name) {
+				if ($i['Key_name'] == $name) {
 					return;
 				}
 			}
@@ -186,9 +184,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$table = $this->esc($table);
 		$name = preg_replace('/\W/', '', $name);
 		$column = $this->esc($column);
-		foreach($this->adapter->get("SHOW INDEX FROM $table ") as $ind) {
-			if ($ind['Key_name']===$name) return;
-		}
+		foreach($this->adapter->get("SHOW INDEX FROM $table ") as $ind) if ($ind['Key_name'] === $name) return;
 		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); }catch(Exception $e){}
 	}
 	
@@ -197,9 +193,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function sqlStateIn($state, $list) {
 		$stateMap = array(
-			'42S02'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'42S22'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			'23000'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'42S02' => RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			'42S22' => RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			'23000' => RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list); 
 	}
@@ -222,15 +218,15 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				SELECT count(*)
 				FROM information_schema.KEY_COLUMN_USAGE
 				WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND
-				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
+				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME IS NOT NULL
 					  ", array($db, $table));
 			//already foreign keys added in this association table
 			if ($fks>0) return false;
 			$columns = $this->getColumns($table);
-			if ($this->code($columns[$property1])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
+			if ($this->code($columns[$property1]) !== RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
 				$this->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 			}
-			if ($this->code($columns[$property2])!==RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
+			if ($this->code($columns[$property2]) !== RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
 				$this->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
 			}
 			$sql = "
@@ -238,7 +234,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				ADD FOREIGN KEY($property1) references `$table1`(id) ON DELETE CASCADE;
 			";
 			$this->adapter->exec($sql);
-			$sql ="
+			$sql = "
 				ALTER TABLE ".$this->esc($table)."
 				ADD FOREIGN KEY($property2) references `$table2`(id) ON DELETE CASCADE
 			";
@@ -250,7 +246,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 * @see RedBean_QueryWriter::wipeAll
 	 */
 	public function wipeAll() {
-		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=0;');
+		$this->adapter->exec('SET FOREIGN_KEY_CHECKS = 0;');
 		foreach($this->getTables() as $t) {
 	 		try{
 	 			$this->adapter->exec("DROP TABLE IF EXISTS `$t`");
@@ -261,6 +257,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 		}
 	 		catch(Exception $e){}
 		}
-		$this->adapter->exec('SET FOREIGN_KEY_CHECKS=1;');
+		$this->adapter->exec('SET FOREIGN_KEY_CHECKS = 1;');
 	}
 }

@@ -66,7 +66,7 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return integer $type type
 	 */
-	public function scanType($value, $alsoScanSpecialForTypes=false);
+	public function scanType($value, $alsoScanSpecialForTypes = false);
 	/**
 	 * This method will add a column to a table.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -117,7 +117,7 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return integer $id the primary key ID value of the new record
 	 */
-	public function updateRecord($type, $updatevalues, $id=null);
+	public function updateRecord($type, $updatevalues, $id = null);
 	/**
 	 * This method selects a record. You can provide a
 	 * collection of conditions using the following format:

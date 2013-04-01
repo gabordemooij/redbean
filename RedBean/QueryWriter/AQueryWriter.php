@@ -90,7 +90,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * @see RedBean_QueryWriter::updateRecord
 	 */
-	public function updateRecord($type, $updatevalues, $id=null) {
+	public function updateRecord($type, $updatevalues, $id = null) {
 		$table = $type;
 		if (!$id) {
 			$insertcolumns =  $insertvalues = array();
@@ -105,8 +105,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$sql = "UPDATE $table SET ";
 		$p = $v = array();
 		foreach($updatevalues as $uv) {
-			$p[]=" {$this->esc($uv["property"])} = ? ";
-			$v[]=$uv['value'];
+			$p[] = " {$this->esc($uv["property"])} = ? ";
+			$v[] = $uv['value'];
 		}
 		$sql .= implode(',', $p).' WHERE id = '.intval($id);
 		$this->adapter->exec($sql, $v);
@@ -127,13 +127,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$suffix = $this->getInsertSuffix($table);
 		$table = $this->esc($table);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
-			foreach($insertcolumns as $k=>$v) {
+			foreach($insertcolumns as $k => $v) {
 				$insertcolumns[$k] = $this->esc($v);
 			}
 			$insertSQL = "INSERT INTO $table ( id, ".implode(',', $insertcolumns)." ) VALUES 
 			( $default, ". implode(',', array_fill(0, count($insertcolumns), ' ? '))." ) $suffix";
 
-			foreach($insertvalues as $i=>$insertvalue) {
+			foreach($insertvalues as $i => $insertvalue) {
 				$ids[] = $this->adapter->getCell($insertSQL, $insertvalue, $i);
 			}
 			$result = count($ids) === 1 ? array_pop($ids) : $ids;
@@ -147,12 +147,12 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * @see RedBean_QueryWriter::selectRecord
 	 */
-	public function selectRecord($type, $conditions, $addSql=null, $delete=null, $inverse=false, $all=false) { 
+	public function selectRecord($type, $conditions, $addSql = null, $delete = null, $inverse = false, $all = false) { 
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
 		if (!$delete && $this->flagUseCache) {
 			$key = serialize(array($type, $conditions, $addSql, $inverse, $all));
 			$sql = $this->adapter->getSQL();
-			if (strpos($sql, '-- keep-cache')!==strlen($sql)-13) {
+			if (strpos($sql, '-- keep-cache') !== strlen($sql)-13) {
 				//If SQL has been taken place outside of this method then something else then
 				//a select query might have happened! (or instruct to keep cache)
 				$this->cache = array();
@@ -162,14 +162,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		$table = $this->esc($type);
 		$sqlConditions = array();
-		$bindings=array();
-		foreach($conditions as $column=>$values) {
+		$bindings = array();
+		foreach($conditions as $column => $values) {
 			if (!count($values)) continue;
 			$sql = $this->esc($column);
 			$sql .= ' '.($inverse ? ' NOT ':'').' IN ( ';
 			//If its safe to not use bindings please do... (fixes SQLite PDO issue limit 256 bindings)
 			if (is_array($conditions)
-				&& count($conditions)===1 
+				&& count($conditions) === 1 
 				&& isset($conditions['id']) 
 				&& is_array($values) 
 				&& preg_match('/^\d+$/', implode('', $values))) {
@@ -179,8 +179,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$sql .= implode(',', array_fill(0, count($values), '?')).') ';
 				$sqlConditions[] = $sql;
 				if (!is_array($values)) $values = array($values);
-				foreach($values as $k=>$v) {
-					$values[$k]=strval($v);
+				foreach($values as $k => $v) {
+					$values[$k] = strval($v);
 				}
 				$bindings = array_merge($bindings, $values);
 			}
@@ -225,7 +225,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function count($beanType, $addSQL = '', $params = array()) {
 		$sql = "SELECT count(*) FROM {$this->esc($beanType)} ";
-		if ($addSQL!='') $addSQL = ' WHERE '.$addSQL; 
+		if ($addSQL != '') $addSQL = ' WHERE '.$addSQL; 
 		return (int) $this->adapter->getCell($sql.$addSQL, $params);
 	}
 	/**
@@ -236,7 +236,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return boolean $value boolean result of analysis
 	 */
 	public static function canBeTreatedAsInt($value) {
-		return (boolean) (ctype_digit(strval($value)) && strval($value)===strval(intval($value)));
+		return (boolean) (ctype_digit(strval($value)) && strval($value) === strval(intval($value)));
 	}
 	/**
 	 * @see RedBean_QueryWriter::addFK
@@ -265,7 +265,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$flagAddKey = true; //go get a new key
 			}
 			//has fk, but different setting, --remove
-			if ($cfks && $cfks!=$cName) {
+			if ($cfks && $cfks != $cName) {
 				$this->adapter->exec("ALTER TABLE $table DROP FOREIGN KEY $cfks ");
 				$flagAddKey = true; //go get a new key.
 			}
@@ -330,7 +330,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$table = RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($table1, $table2));
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
-		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
+		if ($property1 == $property2) $property2 = $bean2->getMeta('type').'2_id';
 		$table = $this->esc($table, true);
 		$table1 = $this->esc($table1, true);
 		$table2 = $this->esc($table2, true);
@@ -348,7 +348,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected function startsWithZeros($value) {
 		$value = strval($value);
-		if (strlen($value)>1 && strpos($value, '0')===0 && strpos($value, '0.')!==0) {
+		if (strlen($value)>1 && strpos($value, '0') === 0 && strpos($value, '0.') !==0) {
 			return true;
 		} else {
 			return false;

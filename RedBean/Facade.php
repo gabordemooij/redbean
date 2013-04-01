@@ -93,7 +93,7 @@ class RedBean_Facade {
 	 *
 	 * @return void
 	 */
-	public static function setup($dsn=NULL, $username=NULL, $password=NULL) {
+	public static function setup($dsn = null, $username = null, $password = null) {
 		if (function_exists('sys_get_temp_dir')) $tmp = sys_get_temp_dir(); else $tmp = 'tmp';
 		if (is_null($dsn)) $dsn = 'sqlite:/'.$tmp.'/red.db';
 		self::addDatabase('default', $dsn, $username, $password);
@@ -155,7 +155,7 @@ class RedBean_Facade {
 	 *
 	 * @return void
 	 */
-	public static function addDatabase($key, $dsn, $user=null, $pass=null, $frozen=false) {
+	public static function addDatabase($key, $dsn, $user = null, $pass = null, $frozen = false) {
 		self::$toolboxes[$key] = RedBean_Setup::kickstart($dsn, $user, $pass, $frozen);
 	}
 	/**
@@ -165,7 +165,7 @@ class RedBean_Facade {
 	 * @return int 1
 	 */
 	public static function selectDatabase($key) {
-		if (self::$currentDB===$key) return false;
+		if (self::$currentDB === $key) return false;
 		self::configureFacadeWithToolbox(self::$toolboxes[$key]);
 		self::$currentDB = $key;
 		return true;
@@ -221,7 +221,7 @@ class RedBean_Facade {
 	* @return RedBean_OODBBean $bean
 	*/ 
 	public static function loadMulti($types, $id) {
-		if (is_string($types) && strpos($types, ',')!==false) $types = explode(',', $types);
+		if (is_string($types) && strpos($types, ',') !== false) $types = explode(',', $types);
 		if (is_array($types)) {
 			$list = array();
 			foreach($types as $typeItem) {
@@ -293,7 +293,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $beans Contains RedBean_OODBBean instances
 	 */
-	public static function findOrDispense($type, $sql=null, $values=array()) {
+	public static function findOrDispense($type, $sql = null, $values = array()) {
 		return self::$finder->findOrDispense($type, $sql, $values);
 	}
 	/**
@@ -334,7 +334,7 @@ class RedBean_Facade {
 	 *
 	 * @return mixed
 	 */
-	public static function unassociate($beans1,  $beans2, $fast=false) {
+	public static function unassociate($beans1,  $beans2, $fast = false) {
 		return self::$associationManager->unassociate($beans1, $beans2, $fast);
 	}
 	/**
@@ -359,7 +359,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $beans	beans yielded by your query.
 	 */
-	public static function related($bean, $type, $sql=null, $values=array()) {
+	public static function related($bean, $type, $sql = null, $values = array()) {
 		return self::$associationManager->relatedSimple($bean, $type, $sql, $values);
 	}
 	/**
@@ -373,7 +373,7 @@ class RedBean_Facade {
 	*
 	* @return RedBean_OODBBean $bean
 	*/
-	public static function relatedOne(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
+	public static function relatedOne(RedBean_OODBBean $bean, $type, $sql = null, $values = array()) {
 		return self::$associationManager->relatedOne($bean, $type, $sql, $values);
 	}
 	/**
@@ -399,7 +399,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $beans beans
 	 */
-	public static function unrelated(RedBean_OODBBean $bean, $type, $sql=null, $values=array()) {
+	public static function unrelated(RedBean_OODBBean $bean, $type, $sql = null, $values = array()) {
 		return self::$associationManager->unrelated($bean, $type, $sql, $values);
 	}
 	/**
@@ -427,7 +427,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $beans  beans
 	 */
-	public static function find($type, $sql=null, $values=array()) {
+	public static function find($type, $sql = null, $values = array()) {
 		return self::$finder->find($type, $sql, $values);
 	}
 	/**
@@ -445,7 +445,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $beans  beans
 	 */
-	public static function findAll($type, $sql=null, $values=array()) {
+	public static function findAll($type, $sql = null, $values = array()) {
 		return self::$finder->findAll($type, $sql, $values);
 	}
 	/**
@@ -458,7 +458,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $arrays arrays
 	 */
-	public static function findAndExport($type, $sql=null, $values=array()) {
+	public static function findAndExport($type, $sql = null, $values = array()) {
 		return self::$finder->findAndExport($type, $sql, $values);
 	}
 	/**
@@ -471,7 +471,7 @@ class RedBean_Facade {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public static function findOne($type, $sql=null, $values=array()) {
+	public static function findOne($type, $sql = null, $values = array()) {
 		return self::$finder->findOne($type, $sql, $values);
 	}
 	/**
@@ -484,7 +484,7 @@ class RedBean_Facade {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public static function findLast($type, $sql=null, $values=array()) {
+	public static function findLast($type, $sql = null, $values = array()) {
 		return self::$finder->findLast($type, $sql, $values);
 	}
 	/**
@@ -513,7 +513,7 @@ class RedBean_Facade {
 	 *
 	 * @return integer $affected  number of affected rows
 	 */
-	public static function exec($sql, $values=array()) {
+	public static function exec($sql, $values = array()) {
 		return self::query('exec', $sql, $values);
 	}
 	/**
@@ -525,7 +525,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $results
 	 */
-	public static function getAll($sql, $values=array()) {
+	public static function getAll($sql, $values = array()) {
 		return self::query('get', $sql, $values);
 	}
 	/**
@@ -537,7 +537,7 @@ class RedBean_Facade {
 	 *
 	 * @return string $result scalar
 	 */
-	public static function getCell($sql, $values=array()) {
+	public static function getCell($sql, $values = array()) {
 		return self::query('getCell', $sql, $values);
 	}
 	/**
@@ -549,7 +549,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $results
 	 */
-	public static function getRow($sql, $values=array()) {
+	public static function getRow($sql, $values = array()) {
 		return self::query('getRow', $sql, $values);
 	}
 	/**
@@ -561,7 +561,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $results
 	 */
-	public static function getCol($sql, $values=array()) {
+	public static function getCol($sql, $values = array()) {
 		return self::query('getCol', $sql, $values);
 	}
 	/**
@@ -610,7 +610,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $results
 	 */
-	public static function getAssoc($sql, $values=array()) {
+	public static function getAssoc($sql, $values = array()) {
 		return self::query('getAssoc', $sql, $values);
 	}
 	/**
@@ -633,7 +633,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
-	public static function dup($bean, $trail=array(), $pid=false, $filters=array()) {
+	public static function dup($bean, $trail = array(), $pid = false, $filters = array()) {
 		self::$duplicationManager->setFilters($filters);
 		return self::$duplicationManager->dup($bean, $trail, $pid);
 	}
@@ -651,7 +651,7 @@ class RedBean_Facade {
 	 *
 	 * @return	array $array exported structure
 	 */
-	public static function exportAll($beans, $parents=false, $filters=array()) {
+	public static function exportAll($beans, $parents = false, $filters = array()) {
 		return self::$duplicationManager->exportAll($beans, $parents, $filters);
 	}
 	/**
@@ -690,7 +690,7 @@ class RedBean_Facade {
 	 *
 	 * @return boolean $didMatch whether the bean has been assoc. with the tags
 	 */
-	public static function hasTag($bean, $tags, $all=false) {
+	public static function hasTag($bean, $tags, $all = false) {
 		return self::$tagManager->hasTag($bean, $tags, $all);
 	}
 	/**

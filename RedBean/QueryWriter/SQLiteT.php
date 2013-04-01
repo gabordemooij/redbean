@@ -36,13 +36,13 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	public function __construct(RedBean_Adapter $adapter) {
 		$this->typeno_sqltype = array(
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER=>'INTEGER',
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC=>'NUMERIC',
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT=>'TEXT',
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER => 'INTEGER',
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC => 'NUMERIC',
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT => 'TEXT',
 		);
 		$this->sqltype_typeno = array();
-		foreach($this->typeno_sqltype as $k=>$v)
-		$this->sqltype_typeno[$v]=$k;
+		foreach($this->typeno_sqltype as $k => $v)
+		$this->sqltype_typeno[$v] = $k;
 		$this->adapter = $adapter;
 	}
 	/**
@@ -57,12 +57,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	/**
 	 * @see RedBean_QueryWriter::scanType
 	 */
-	public function scanType($value, $flagSpecial=false) {
-		$this->svalue=$value;
-		if ($value===false) return self::C_DATATYPE_INTEGER;
-		if ($value===null) return self::C_DATATYPE_INTEGER; //for fks
+	public function scanType($value, $flagSpecial = false) {
+		$this->svalue = $value;
+		if ($value === false) return self::C_DATATYPE_INTEGER;
+		if ($value === null) return self::C_DATATYPE_INTEGER;
 		if ($this->startsWithZeros($value)) return self::C_DATATYPE_TEXT;
-		if (is_numeric($value) && (intval($value)==$value) && $value<2147483648) return self::C_DATATYPE_INTEGER;
+		if (is_numeric($value) && (intval($value) == $value) && $value<2147483648) return self::C_DATATYPE_INTEGER;
 		if ((is_numeric($value) && $value < 2147483648)
 				  || preg_match('/\d{4}\-\d\d\-\d\d/', $value)
 				  || preg_match('/\d{4}\-\d\d\-\d\d\s\d\d:\d\d:\d\d/', $value)
@@ -77,7 +77,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	public function addColumn($table, $column, $type) {
 		$column = $this->check($column);
 		$table = $this->check($table);
-		$type=$this->typeno_sqltype[$type];
+		$type = $this->typeno_sqltype[$type];
 		$sql = "ALTER TABLE `$table` ADD `$column` $type ";
 		$this->adapter->exec($sql);
 	}
@@ -110,7 +110,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$columns = $this->getColumns($type);
 		$indexes = $this->getIndexes($type);
 		$keys = $this->getKeys($type);
-		$table = array('columns'=>$columns, 'indexes'=>$indexes, 'keys'=>$keys, 'name'=>$tableName);
+		$table = array('columns' => $columns, 'indexes' => $indexes, 'keys' => $keys, 'name' => $tableName);
 		$this->tableArchive[$tableName] = $table;
 		return $table;
 	}
@@ -127,13 +127,13 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$q = array();
 		$q[] = "DROP TABLE IF EXISTS tmp_backup;";
 		$oldColumnNames = array_keys($this->getColumns($table));
-		foreach($oldColumnNames as $k=>$v) $oldColumnNames[$k] = "`$v`";
+		foreach($oldColumnNames as $k => $v) $oldColumnNames[$k] = "`$v`";
 		$q[] = "CREATE TEMPORARY TABLE tmp_backup(".implode(",", $oldColumnNames).");";
 		$q[] = "INSERT INTO tmp_backup SELECT * FROM `$table`;";
 		$q[] = "PRAGMA foreign_keys = 0 ";
 		$q[] = "DROP TABLE `$table`;";
 		$newTableDefStr = '';
-		foreach($tableMap['columns'] as $column=>$type) {
+		foreach($tableMap['columns'] as $column => $type) {
 			if ($column != 'id') {
 				$newTableDefStr .= ",`$column` $type";
 			}
@@ -145,10 +145,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 						 ON DELETE {$key['on_delete']} ON UPDATE {$key['on_update']}";
 		}
 		$q[] = "CREATE TABLE `$table` ( `id` INTEGER PRIMARY KEY AUTOINCREMENT  $newTableDefStr  $fkDef );";
-		foreach($tableMap['indexes'] as $name=>$index)  {
-			if (strpos($name, 'UQ_')===0) {
+		foreach($tableMap['indexes'] as $name => $index)  {
+			if (strpos($name, 'UQ_') === 0) {
 				$cols = explode('__', substr($name, strlen('UQ_'.$table)));
-				foreach($cols as $k=>$v) $cols[$k] = "`$v`";
+				foreach($cols as $k => $v) $cols[$k] = "`$v`";
 				$q[] = "CREATE UNIQUE INDEX $name ON `$table` (".implode(',', $cols).")";
 			}
 			else $q[] = "CREATE INDEX $name ON `$table` ({$index['name']}) ";
@@ -188,9 +188,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$table = $this->esc($table, true);
 		$columnsRaw = $this->adapter->get("PRAGMA table_info('$table')");
 		$columns = array();
-		foreach($columnsRaw as $r) {
-			$columns[$r['name']]=$r['type'];
-		}
+		foreach($columnsRaw as $r) $columns[$r['name']] = $r['type'];
 		return $columns;
 	}
 	/**
@@ -234,7 +232,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$name = 'UQ_'.$table.implode('__', $columns);
 		$t = $this->getTable($type);
 		if (isset($t['indexes'][$name])) return;
-		$t['indexes'][$name] = array('name'=>$name);
+		$t['indexes'][$name] = array('name' => $name);
 		$this->putTable($t);
 	}
 	/**
@@ -242,8 +240,8 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	public function sqlStateIn($state, $list) {
 		$stateMap = array(
-			'HY000'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'23000'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'HY000' => RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			'23000' => RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list);
 	}
@@ -255,11 +253,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$table = $this->esc($table);
 		$name = preg_replace('/\W/', '', $name);
 		$column = $this->esc($column, true);
-		foreach($this->adapter->get("PRAGMA INDEX_LIST($table) ") as $ind) {
-			if ($ind['name']===$name) return;
-		}
+		foreach($this->adapter->get("PRAGMA INDEX_LIST($table) ") as $ind) if ($ind['name'] === $name) return;
 		$t = $this->getTable($type);
-		$t['indexes'][$name] = array('name'=>$column);
+		$t['indexes'][$name] = array('name' => $column);
 		return $this->putTable($t);
 	}
 	/**
@@ -272,7 +268,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	/**
 	 * @see RedBean_QueryWriter::addFK
 	 */
-	public function addFK($type, $targetType, $field, $targetField, $isDep=false) {
+	public function addFK($type, $targetType, $field, $targetField, $isDep = false) {
 		return $this->buildFK($type, $targetType, $field, $targetField, $isDep);
 	}
 	/**
@@ -289,15 +285,15 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @note: cant put this in try-catch because that can hide the fact
 	 * that database has been damaged. 
 	 */
-	protected function buildFK($type, $targetType, $field, $targetField, $constraint=false) {
+	protected function buildFK($type, $targetType, $field, $targetField, $constraint = false) {
 		$consSQL = ($constraint ? 'CASCADE' : 'SET NULL');
 		$t = $this->getTable($type);
 		$label = 'from_'.$field.'_to_table_'.$targetType.'_col_'.$targetField;
 		if (isset($t['keys'][$label]) 
-				&& $t['keys'][$label]['table']===$targetType 
-				&& $t['keys'][$label]['from']===$field
-				&& $t['keys'][$label]['to']===$targetField
-				&& $t['keys'][$label]['on_delete']===$consSQL
+				&& $t['keys'][$label]['table'] === $targetType 
+				&& $t['keys'][$label]['from'] === $field
+				&& $t['keys'][$label]['to'] === $targetField
+				&& $t['keys'][$label]['on_delete'] === $consSQL
 		) return false;
 		$t['keys'][$label] = array(
 			'table' => $targetType,

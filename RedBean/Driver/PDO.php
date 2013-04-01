@@ -74,7 +74,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->dsn = $this->getDatabaseType();
 		} else {
 			$this->dsn = $dsn;
-			$this->connectInfo = array('pass'=>$pass, 'user'=>$user);
+			$this->connectInfo = array('pass' => $pass, 'user' => $user);
 		}
 	}
 	/**
@@ -117,7 +117,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @return void
 	 */
 	protected function bindParams($s, $aValues) {
-		foreach($aValues as $key=>&$value) {
+		foreach($aValues as $key => &$value) {
 			if (is_integer($key)) {
 				if (is_null($value)){
 					$s->bindValue($key+1, null, PDO::PARAM_NULL);
@@ -155,7 +155,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->logger->log($sql, $aValues);
 		}
 		try {
-			if (strpos('pgsql', $this->dsn)===0) {
+			if (strpos('pgsql', $this->dsn) === 0) {
 				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			} else {
 				$s = $this->pdo->prepare($sql);
@@ -165,7 +165,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->affected_rows = $s->rowCount();
 			if ($s->columnCount()) {
 		    	$this->rs = $s->fetchAll();
-		    	if ($this->debug && $this->logger) $this->logger->log('resultset: ' . count($this->rs) . ' rows');
+		    	if ($this->debug && $this->logger) $this->logger->log('resultset: '.count($this->rs).' rows');
 	    	} else {
 		    	$this->rs = array();
 		  	}
@@ -182,14 +182,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * @see RedBean_Driver::GetAll
 	 */
-	public function GetAll($sql, $aValues=array()) {
+	public function GetAll($sql, $aValues = array()) {
 		$this->runQuery($sql, $aValues);
 		return $this->rs;
 	}
 	 /**
 	 * @see RedBean_Driver::GetCol
 	 */
-	public function GetCol($sql, $aValues=array()) {
+	public function GetCol($sql, $aValues = array()) {
 		$rows = $this->GetAll($sql, $aValues);
 		$cols = array();
 		if ($rows && is_array($rows) && count($rows)>0) {
@@ -202,7 +202,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * @see RedBean_Driver::GetCell
 	 */
-	public function GetCell($sql, $aValues=array()) {
+	public function GetCell($sql, $aValues = array()) {
 		$arr = $this->GetAll($sql, $aValues);
 		$row1 = array_shift($arr);
 		$col1 = array_shift($row1);
@@ -211,14 +211,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * @see RedBean_Driver::GetRow
 	 */
-	public function GetRow($sql, $aValues=array()) {
+	public function GetRow($sql, $aValues = array()) {
 		$arr = $this->GetAll($sql, $aValues);
 		return array_shift($arr);
 	}
 	/**
 	 * @see RedBean_Driver::Excecute
 	 */
-	public function Execute($sql, $aValues=array()) {
+	public function Execute($sql, $aValues = array()) {
 		$this->runQuery($sql, $aValues);
 		return $this->affected_rows;
 	}

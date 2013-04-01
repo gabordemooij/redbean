@@ -63,9 +63,9 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	public function __construct(RedBean_Adapter $adapter) {	
 		$this->typeno_sqltype = array(
-				  self::C_DATATYPE_INTEGER=>' integer ',
-				  self::C_DATATYPE_DOUBLE=>' double precision ',
-				  self::C_DATATYPE_TEXT=>' text ',
+				  self::C_DATATYPE_INTEGER => ' integer ',
+				  self::C_DATATYPE_DOUBLE => ' double precision ',
+				  self::C_DATATYPE_TEXT => ' text ',
 				  self::C_DATATYPE_SPECIAL_DATE => ' date ',
 				  self::C_DATATYPE_SPECIAL_DATETIME => ' timestamp without time zone ',
 				  self::C_DATATYPE_SPECIAL_POINT => ' point ',
@@ -74,8 +74,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 				  self::C_DATATYPE_SPECIAL_MONEY => ' money ',
 		);
 		$this->sqltype_typeno = array();
-		foreach($this->typeno_sqltype as $k=>$v)
-		$this->sqltype_typeno[trim(strtolower($v))]=$k;	
+		foreach($this->typeno_sqltype as $k => $v)
+		$this->sqltype_typeno[trim(strtolower($v))] = $k;	
 		$this->adapter = $adapter;
 	}
 	/**
@@ -100,15 +100,15 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		$table = $this->esc($table, true);
 		$columnsRaw = $this->adapter->get("select column_name, data_type from information_schema.columns where table_name='$table'");
 		foreach($columnsRaw as $r) {
-			$columns[$r['column_name']]=$r['data_type'];
+			$columns[$r['column_name']] = $r['data_type'];
 		}
 		return $columns;
 	}
 	/**
 	 * @see RedBean_QueryWriter::scanType
 	 */
-	public function scanType($value, $flagSpecial=false) {
-		$this->svalue=$value;
+	public function scanType($value, $flagSpecial = false) {
+		$this->svalue = $value;
 		if ($flagSpecial && $value) {
 			if (preg_match('/^\d{4}\-\d\d-\d\d$/', $value)) {
 				return RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE;
@@ -131,8 +131,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		}
 		$sz = ($this->startsWithZeros($value));
 		if ($sz) return self::C_DATATYPE_TEXT;
-		if ($value===null || ($value instanceof RedBean_Driver_PDO_NULL) ||(is_numeric($value)
-				  && floor($value)==$value
+		if ($value === null || ($value instanceof RedBean_Driver_PDO_NULL) ||(is_numeric($value)
+				  && floor($value) == $value
 				  && $value < 2147483648
 				  && $value > -2147483648)) {
 			return self::C_DATATYPE_INTEGER;
@@ -170,8 +170,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	public function addUniqueIndex($table, $columns) {
 		$table = $this->esc($table, true);
 		sort($columns); //else we get multiple indexes due to order-effects
-		foreach($columns as $k=>$v) {
-			$columns[$k]=$this->esc($v);
+		foreach($columns as $k => $v) {
+			$columns[$k] = $this->esc($v);
 		}
 		$r = $this->adapter->get("SELECT
 									i.relname as index_name
@@ -192,7 +192,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		$name = "UQ_".sha1($table.implode(',', $columns));
 		if ($r) {
 			foreach($r as $i) {
-				if (strtolower($i['index_name'])== strtolower($name)) {
+				if (strtolower($i['index_name']) == strtolower($name)) {
 					return;
 				}
 			}
@@ -206,9 +206,9 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	public function sqlStateIn($state, $list) {
 		$stateMap = array(
-			'42P01'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'42703'=>RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			'23505'=>RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'42P01' => RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			'42703' => RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			'23505' => RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list);
 	}
@@ -260,8 +260,8 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			$flagAddKey = false;
 			if (!$row) $flagAddKey = true;
 			if ($row) { 
-				if (($row['delete_rule']=='SET NULL' && $isDep) || 
-					($row['delete_rule']!='SET NULL' && !$isDep)) {
+				if (($row['delete_rule'] == 'SET NULL' && $isDep) || 
+					($row['delete_rule'] != 'SET NULL' && !$isDep)) {
 					//delete old key
 					$flagAddKey = true; //and order a new one
 					$cName = $row['constraint_name'];

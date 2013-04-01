@@ -191,9 +191,9 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			print_r($e);
 			$this->isConnected = false;
 		} else {
-			$s = oci_parse($this->connection, "alter session set nls_date_format='$this->nlsDateFormat'");
+			$s = oci_parse($this->connection, "alter session set nls_date_format = '$this->nlsDateFormat'");
 			$e = oci_execute($s);
-			$s = oci_parse($this->connection, "alter session set nls_timestamp_format='$this->nlsTimeStampFormat'");
+			$s = oci_parse($this->connection, "alter session set nls_timestamp_format = '$this->nlsTimeStampFormat'");
 			$e = oci_execute($s);
 			$this->isConnected = true;
 		}

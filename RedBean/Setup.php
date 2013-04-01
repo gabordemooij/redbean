@@ -36,10 +36,9 @@ class RedBean_Setup {
 	 *
 	 * @return RedBean_ToolBox $toolbox
 	 */
-	public static function kickstart($dsn, $username=NULL, $password=NULL, $frozen=false ) {
+	public static function kickstart($dsn, $username = null, $password = null, $frozen = false ) {
 		if ($dsn instanceof PDO) {
-			$db = new RedBean_Driver_PDO($dsn);
-			$dsn = $db->getDatabaseType();
+			$db = new RedBean_Driver_PDO($dsn); $dsn = $db->getDatabaseType();
 		} else {
 			self::checkDSN($dsn);
 			if (strpos($dsn, 'oracle') === 0) 
@@ -48,16 +47,11 @@ class RedBean_Setup {
 				$db = new RedBean_Driver_PDO($dsn, $username, $password);			
 		}
 		$adapter = new RedBean_Adapter_DBAdapter($db);
-		if (strpos($dsn, 'pgsql')===0) {
-			$writer = new RedBean_QueryWriter_PostgreSQL($adapter);
-		} else if (strpos($dsn, 'sqlite')===0) {
-			$writer = new RedBean_QueryWriter_SQLiteT($adapter);
-		} else if (strpos($dsn, 'cubrid')===0) {
-			$writer = new RedBean_QueryWriter_CUBRID($adapter);
-		} else if (strpos($dsn, 'oracle')===0) { $writer = new RedBean_QueryWriter_Oracle($adapter); //layout important for unit test - this line cannot always be tested. 	
-		} else {
-			$writer = new RedBean_QueryWriter_MySQL($adapter);
-		}
+		if (strpos($dsn, 'pgsql') === 0) $writer = new RedBean_QueryWriter_PostgreSQL($adapter);
+		else if (strpos($dsn, 'sqlite') === 0) $writer = new RedBean_QueryWriter_SQLiteT($adapter);
+		else if (strpos($dsn, 'cubrid') === 0) $writer = new RedBean_QueryWriter_CUBRID($adapter);
+		else if (strpos($dsn, 'oracle') === 0) $writer = new RedBean_QueryWriter_Oracle($adapter);	
+		else $writer = new RedBean_QueryWriter_MySQL($adapter);
 		$redbean = new RedBean_OODB($writer);
 		if ($frozen) $redbean->freeze(true);
 		$toolbox = new RedBean_ToolBox($redbean, $adapter, $writer);

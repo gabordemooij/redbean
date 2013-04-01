@@ -46,8 +46,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
 		);
 		$this->sqltype_typeno = array();
-		foreach($this->typeno_sqltype as $k=>$v)
-		$this->sqltype_typeno[trim(($v))]=$k;
+		foreach($this->typeno_sqltype as $k => $v)
+		$this->sqltype_typeno[trim(($v))] = $k;
 		$this->sqltype_typeno['STRING(1073741823)'] = self::C_DATATYPE_STRING;
 		$this->adapter = $adapter;
 	}
@@ -87,14 +87,14 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$table = $this->esc($table);
 		$columnsRaw = $this->adapter->get("SHOW COLUMNS FROM $table");
 		foreach($columnsRaw as $r) {
-			$columns[$r['Field']]=$r['Type'];
+			$columns[$r['Field']] = $r['Type'];
 		}
 		return $columns;
 	}
 	/**
 	 * @see RedBean_QueryWriter::scanType
 	 */
-	public function scanType($value, $flagSpecial=false) {
+	public function scanType($value, $flagSpecial = false) {
 		$this->svalue = $value;		
 		if (is_null($value)) {
 			return self::C_DATATYPE_INTEGER;
@@ -109,7 +109,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		}
 		$value = strval($value);
 		if (!$this->startsWithZeros($value)) {
-			if (is_numeric($value) && (floor($value)==$value) && $value >= -2147483647  && $value <= 2147483647 ) {
+			if (is_numeric($value) && (floor($value) == $value) && $value >= -2147483647  && $value <= 2147483647 ) {
 				return self::C_DATATYPE_INTEGER;
 			}
 			if (is_numeric($value)) {
@@ -158,14 +158,14 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	public function addUniqueIndex($table, $columns) {
 		$table = $this->esc($table);
 		sort($columns); //else we get multiple indexes due to order-effects
-		foreach($columns as $k=>$v) {
-			$columns[$k]= $this->esc($v);
+		foreach($columns as $k => $v) {
+			$columns[$k] = $this->esc($v);
 		}
 		$r = $this->adapter->get("SHOW INDEX FROM $table");
 		$name = 'UQ_'.sha1(implode(',', $columns));
 		if ($r) {
 			foreach($r as $i) { 
-				if (strtoupper($i['Key_name'])==strtoupper($name)) {
+				if (strtoupper($i['Key_name']) == strtoupper($name)) {
 					return;
 				}
 			}
@@ -182,7 +182,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 				RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
-				), $list))!==3) : false;
+				), $list)) !== 3) : false;
 	}
 	/**
 	 * @see RedBean_QueryWriter::addConstraint
@@ -195,7 +195,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$table = RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($table1, $table2));
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
-		if ($property1==$property2) $property2 = $bean2->getMeta('type').'2_id';
+		if ($property1 == $property2) $property2 = $bean2->getMeta('type').'2_id';
 		//Dispatch to right method
 		return $this->constrain($table, $table1, $table2, $property1, $property2);
 	}
@@ -253,7 +253,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return void
 	 */
-	protected function buildFK($type, $targetType, $field, $targetField, $isDep=false) {
+	protected function buildFK($type, $targetType, $field, $targetField, $isDep = false) {
 		$table = $this->esc($type);
 		$tableNoQ = $this->esc($type, true);
 		$targetTable = $this->esc($targetType);
@@ -266,10 +266,10 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$needsToAddFK = true;
 		$needsToDropFK = false;
 		foreach($keys as $key) {
-			if ($key['FKTABLE_NAME']==$tableNoQ && $key['FKCOLUMN_NAME']==$columnNoQ) { 
+			if ($key['FKTABLE_NAME'] == $tableNoQ && $key['FKCOLUMN_NAME'] == $columnNoQ) { 
 				//already has an FK
 				$needsToDropFK = true;
-				if ((($isDep && $key['DELETE_RULE']==0) || (!$isDep && $key['DELETE_RULE']==3))) {
+				if ((($isDep && $key['DELETE_RULE'] == 0) || (!$isDep && $key['DELETE_RULE'] == 3))) {
 					return false;
 				}
 				break;
@@ -300,10 +300,10 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 * @param type $table
 	 * @return type 
 	 */
-	protected function getKeys($table, $table2=null) {
+	protected function getKeys($table, $table2 = null) {
 		$pdo = $this->adapter->getDatabase()->getPDO();
 		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS, $table);
-		if ($table2) $keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS, $table2) );
+		if ($table2) $keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS, $table2));
 		return $keys;
 	}
 	/**

@@ -22,7 +22,7 @@ interface RedBean_Driver {
 	 *
 	 * @return array $results result
 	 */
-	public function GetAll($sql, $aValues=array());
+	public function GetAll($sql, $aValues = array());
 	/**
 	 * Runs a query and fetches results as a column.
 	 *
@@ -30,7 +30,7 @@ interface RedBean_Driver {
 	 *
 	 * @return array	$results Resultset
 	 */
-	public function GetCol($sql, $aValues=array());
+	public function GetCol($sql, $aValues = array());
 	/**
 	 * Runs a query and returns results as a single cell.
 	 *
@@ -38,7 +38,7 @@ interface RedBean_Driver {
 	 *
 	 * @return mixed $cellvalue result cell
 	 */
-	public function GetCell($sql, $aValues=array());
+	public function GetCell($sql, $aValues = array());
 	/**
 	 * Runs a query and returns a flat array containing the values of
 	 * one row.
@@ -47,7 +47,7 @@ interface RedBean_Driver {
 	 *
 	 * @return array $row result row
 	 */
-	public function GetRow($sql, $aValues=array());
+	public function GetRow($sql, $aValues = array());
 	/**
 	 * Executes SQL code and allows key-value binding.
 	 * This function allows you to provide an array with values to bind
@@ -63,7 +63,7 @@ interface RedBean_Driver {
 	 *
 	 * @return void
 	 */
-	public function Execute($sql, $aValues=array());
+	public function Execute($sql, $aValues = array());
 	/**
 	 * Returns the latest insert ID if driver does support this
 	 * feature.

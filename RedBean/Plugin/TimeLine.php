@@ -43,15 +43,15 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 	 * @return void
 	 */
 	public function onEvent($eventName, $adapter) {
-		if ($eventName=='sql_exec') {
+		if ($eventName == 'sql_exec') {
 			$sql = $adapter->getSQL();
 			$this->logs[] = $sql;
-			if (strpos($sql, 'ALTER')===0) {
+			if (strpos($sql, 'ALTER') === 0) {
 				$write = "-- ".date('Y-m-d H:i')." | Altering table. \n";
 				$write .= $sql;
 				$write .= "\n\n";
 			}
-			if (strpos($sql, 'CREATE')===0) {
+			if (strpos($sql, 'CREATE') === 0) {
 				$write = "-- ".date('Y-m-d H:i')." | Creating new table. \n";
 				$write .= $sql;
 				$write .= "\n\n";

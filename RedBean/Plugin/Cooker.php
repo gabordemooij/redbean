@@ -56,16 +56,16 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	 * Example of a valid array:
 	 * 
 	 *	$form = array(
-	 *		'type'=>'order',
-	 *		'ownProduct'=>array(
-	 *			array('id'=>171, 'type'=>'product'),
+	 *		'type' => 'order',
+	 *		'ownProduct' => array(
+	 *			array('id' => 171, 'type' => 'product'),
 	 *		),
-	 *		'ownCustomer'=>array(
-	 *			array('type'=>'customer', 'name'=>'Bill')
+	 *		'ownCustomer' => array(
+	 *			array('type' => 'customer', 'name' => 'Bill')
 	 *		),
-	 * 		'sharedCoupon'=>array(
-	 *			array('type'=>'coupon', 'name'=>'123'),
-	 *			array('type'=>'coupon', 'id'=>3)
+	 * 		'sharedCoupon' => array(
+	 *			array('type' => 'coupon', 'name' => '123'),
+	 *			array('type' => 'coupon', 'id' => 3)
 	 *		)
 	 *	);
 	 * 
@@ -96,7 +96,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 			} else {
 				$bean = $this->redbean->dispense($type);
 			}
-			foreach($array as $property=>$value) {
+			foreach($array as $property => $value) {
 				if (is_array($value)) {
 					$bean->$property = $this->graph($value, $filterEmpty);
 				} else {
@@ -107,7 +107,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 			}
 			return $bean;
 		} elseif (is_array($array)) {
-			foreach($array as $key=>$value) {
+			foreach($array as $key => $value) {
 				$listBean = $this->graph($value, $filterEmpty);
 				if (!($listBean instanceof RedBean_OODBBean)) {
 					throw new RedBean_Exception_Security('Expected bean but got :'.gettype($listBean)); 

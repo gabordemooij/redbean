@@ -33,7 +33,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * @see RedBean_Adapter::exec
 	 */
-	public function exec($sql, $aValues=array(), $noevent=false) {
+	public function exec($sql, $aValues = array(), $noevent = false) {
 		if (!$noevent) {
 			$this->sql = $sql;
 			$this->signal('sql_exec', $this);
@@ -79,9 +79,9 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 						$key = array_shift($row);
 						$value = array_shift($row);
 					}
-					elseif (count($row)==1) {
+					elseif (count($row) == 1) {
 						$key = array_shift($row);
-						$value=$key;
+						$value = $key;
 					}
 					$assoc[$key] = $value;
 				}

@@ -46,7 +46,7 @@
 	 * 
 	 * @return mixed $result   either self or result depending on mode 
 	 */
-	public function __call($funcName, $args=array()) {
+	public function __call($funcName, $args = array()) {
 		$funcName = str_replace('_', ' ', $funcName);
 		if ($this->capture) {
 			$this->sql .= ' '.$funcName . ' '.implode(',', $args);
@@ -80,7 +80,7 @@
 	 * 
 	 * @return mixed $result
 	 */
-	public function get($what='') {
+	public function get($what = '') {
 		$what = 'get'.ucfirst($what);
 		$rs = $this->adapter->$what($this->sql, $this->params);
 		$this->clear();

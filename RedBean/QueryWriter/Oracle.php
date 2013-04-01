@@ -99,7 +99,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return string $column name
 	 */
-	public function esc($c, $q=false) {
+	public function esc($c, $q = false) {
 			return parent::esc((!$q) ? strtoupper($c):$c, $q);
 	}
 	/**

@@ -59,7 +59,7 @@ class RedBean_DuplicationManager {
 	 * @param array $tables 
 	 */
 	public function setTables($tables) {
-		foreach($tables as $key=>$value) {
+		foreach($tables as $key => $value) {
 			if (is_numeric($key)) {
 				$this->tables[] = $value;
 			} else {
@@ -149,7 +149,7 @@ class RedBean_DuplicationManager {
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
-	public function dup($bean, $trail=array(), $pid=false) {
+	public function dup($bean, $trail = array(), $pid = false) {
 		if (!count($this->tables))  $this->tables = $this->toolbox->getWriter()->getTables();
 		if (!count($this->columns)) foreach($this->tables as $table) $this->columns[$table] = $this->toolbox->getWriter()->getColumns($table);
 		$beanCopy = clone($bean);
@@ -169,18 +169,18 @@ class RedBean_DuplicationManager {
 	 *
 	 * @return array $copiedBean the duplicated bean
 	 */
-	protected function duplicate($bean, $trail=array(), $pid=false) {
+	protected function duplicate($bean, $trail = array(), $pid = false) {
 		$type = $bean->getMeta('type');
 		$key = $type.$bean->getID();
 		if (isset($trail[$key])) return $bean;
-		$trail[$key]=$bean;
-		$copy =$this->redbean->dispense($type);
+		$trail[$key] = $bean;
+		$copy = $this->redbean->dispense($type);
 		$copy->importFrom($bean);
 		$copy->id = 0;
 		$tables = $this->tables;
 		foreach($tables as $table) {
 			if (is_array($this->filters) && count($this->filters) && !in_array($table, $this->filters)) continue;
-			if ($table==$type) continue;
+			if ($table == $type) continue;
 			$owned = 'own'.ucfirst($table);
 			$shared = 'shared'.ucfirst($table);
 			if ($this->hasSharedList($type, $table)) {
@@ -218,7 +218,7 @@ class RedBean_DuplicationManager {
 	 * 
 	 * @return	array $array exported structure
 	 */
-	public function exportAll($beans, $parents=false, $filters=array()) {
+	public function exportAll($beans, $parents = false, $filters = array()) {
 		$array = array();
 		if (!is_array($beans)) $beans = array($beans);
 		foreach($beans as $bean) {

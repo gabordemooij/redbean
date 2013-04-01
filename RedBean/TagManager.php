@@ -45,7 +45,7 @@ class RedBean_TagManager {
 	 * @return RedBean_OODBBean $bean | null
 	 */
 	public function findTagByTitle($title) {
-		$beans = $this->redbean->find('tag', array('title'=>array($title)));
+		$beans = $this->redbean->find('tag', array('title' => array($title)));
 		if ($beans) {
 			$bean = reset($beans);
 			return $bean;
@@ -67,13 +67,11 @@ class RedBean_TagManager {
 	 *
 	 * @return boolean $didMatch whether the bean has been assoc. with the tags
 	 */
-	public function hasTag($bean, $tags, $all=false) {
+	public function hasTag($bean, $tags, $all = false) {
 		$foundtags = $this->tag($bean);
-		if (is_string($foundtags)) $foundtags = explode(",", $tags);
+		if (is_string($foundtags)) $foundtags = explode(',', $tags);
 		$same = array_intersect($tags, $foundtags);
-		if ($all) {
-			return (implode(",", $same)===implode(",", $tags));
-		}
+		if ($all) return (implode(',', $same) === implode(',', $tags));
 		return (bool) (count($same)>0);
 	}
 	/**
@@ -86,12 +84,8 @@ class RedBean_TagManager {
 	 * @return void
 	 */
 	public function untag($bean, $tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode(",", (string)$tagList); else $tags=$tagList;
-		foreach($tags as $tag) {
-			if ($t = $this->findTagByTitle($tag)) {
-				$this->associationManager->unassociate($bean, $t);
-			}
-		}
+		if ($tagList !== false && !is_array($tagList)) $tags = explode(",", (string)$tagList); else $tags = $tagList;
+		foreach($tags as $tag) if ($t = $this->findTagByTitle($tag)) $this->associationManager->unassociate($bean, $t);
 	}
 	/**
 	 * Tags a bean or returns tags associated with a bean.
@@ -134,8 +128,8 @@ class RedBean_TagManager {
 	 * @return void
 	 */
 	public function addTags(RedBean_OODBBean $bean, $tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode(",", (string) $tagList); else $tags=$tagList;
-		if ($tagList===false) return;
+		if ($tagList !== false && !is_array($tagList)) $tags = explode(",", (string)$tagList); else $tags = $tagList;
+		if ($tagList === false) return;
 		foreach($tags as $tag) {
 			if (!$t = $this->findTagByTitle($tag)) {
 				$t = $this->redbean->dispense('tag');
@@ -154,9 +148,9 @@ class RedBean_TagManager {
 	 * @return array
 	 */
 	public function tagged($beanType, $tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode(",", (string) $tagList); else $tags=$tagList;
+		if ($tagList !== false && !is_array($tagList)) $tags = explode(",", (string) $tagList); else $tags = $tagList;
 		$collection = array();
-		$tags = $this->redbean->find('tag', array('title'=>$tags));
+		$tags = $this->redbean->find('tag', array('title' => $tags));
 		if (is_array($tags) && count($tags)>0) {
 			$collectionKeys = $this->associationManager->related($tags, $beanType);
 			if ($collectionKeys) {
@@ -174,7 +168,7 @@ class RedBean_TagManager {
 	 * @return array
 	 */
 	public function taggedAll($beanType, $tagList) {
-		if ($tagList!==false && !is_array($tagList)) $tags = explode(",", (string)$tagList); else $tags=$tagList;
+		if ($tagList !== false && !is_array($tagList)) $tags = explode(",", (string)$tagList); else $tags = $tagList;
 		$beans = array();
 		foreach($tags as $tag) {
 			$beans = $this->tagged($beanType, $tag);

@@ -29,7 +29,7 @@ interface RedBean_Adapter {
 	 * @param array   $aValues values
 	 * @param boolean $noevent no event firing
 	 */
-	public function exec($sql , $aValues=array(), $noevent=false);
+	public function exec($sql , $aValues = array(), $noevent = false);
 	/**
 	 * Executes an SQL Query and returns a resultset.
 	 * This method returns a multi dimensional resultset similar to getAll

@@ -29,7 +29,7 @@ abstract class RedBean_Observable {
 		if (!isset($this->observers[$eventname])) {
 			$this->observers[$eventname] = array();
 		}
-		foreach($this->observers[$eventname] as $o) if ($o==$observer) return;
+		foreach($this->observers[$eventname] as $o) if ($o == $observer) return;
 		$this->observers[$eventname][] = $observer;
 	}
 	/**

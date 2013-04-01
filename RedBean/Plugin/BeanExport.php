@@ -50,7 +50,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	 */
 	public function loadSchema() {
 		$tables = array_flip($this->toolbox->getWriter()->getTables());
-		foreach($tables as $table=>$columns) {
+		foreach($tables as $table => $columns) {
 			try{
 				$tables[$table] = $this->toolbox->getWriter()->getColumns($table);
 			}
@@ -84,27 +84,27 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	 *
 	 * @return	array $export Exported beans
 	 */
-	public function export($beans, $resetRecur=true) {
+	public function export($beans, $resetRecur = true) {
 		if ($resetRecur) {
 			$this->recurCheck = array();
 		}
 		if (!is_array($beans)) {
 			$beans = array($beans);
 		}
-		if ($this->maxDepth!==false) {
+		if ($this->maxDepth !== false) {
 			$this->depth ++;
 			if ($this->depth > $this->maxDepth) {
 				$this->depth--; 
 				return array();
 			}
 		}
-		if ($this->typeShield===true) {
+		if ($this->typeShield === true) {
 			if (is_array($beans) && count($beans)>0) {
 				$firstBean = reset($beans);
 				$type = $firstBean->getMeta('type');
 				if (isset($this->recurTypeCheck[$type])){
-					if ($this->maxDepth!==false) {
-						$this->depth --;
+					if ($this->maxDepth !== false) {
+						$this->depth--;
 					}
 					return array();
 				}
@@ -115,8 +115,8 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		foreach($beans as $bean) {
 			$export[$bean->getID()] = $this->exportBean($bean);
 		}
-		if ($this->maxDepth!==false) {
-			$this->depth --;
+		if ($this->maxDepth !== false) {
+			$this->depth--;
 		}
 		return $export;
 	}
@@ -147,10 +147,10 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	public function exportBean(RedBean_OODBBean $bean) {
 		$bid = $bean->getMeta('type').'-'.$bean->getID();
 		if (isset($this->recurCheck[$bid])) return null;
-		$this->recurCheck[$bid]=$bid;
+		$this->recurCheck[$bid] = $bid;
 		$export = $bean->export();
-		foreach($export as $key=>$value) {
-			if (strpos($key, '_id')!==false) {
+		foreach($export as $key => $value) {
+			if (strpos($key, '_id') !== false) {
 				$sub = str_replace('_id', '', $key);
 				$subBean = $bean->$sub;
 				if ($subBean) {
@@ -161,8 +161,8 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		$type = $bean->getMeta('type');
 		$linkField = $type . '_id';
 		//get all ownProperties
-		foreach($this->tables as $table=>$cols) {
-			if (strpos($table, '_')===false) {
+		foreach($this->tables as $table => $cols) {
+			if (strpos($table, '_') === false) {
 				if (in_array($linkField, array_keys($cols))) {
 					$field = 'own'.ucfirst($table);
 					$export[$field] = self::export($bean->$field, false);
@@ -170,12 +170,12 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 			}
 		}
 		//get all sharedProperties
-		foreach($this->tables as $table=>$cols) {
-			if (strpos($table, '_')!==false) {
+		foreach($this->tables as $table => $cols) {
+			if (strpos($table, '_') !== false) {
 				$parts = explode('_', $table);
 				if (is_array($parts) && in_array($type, $parts)) {
 					$other = $parts[0];
-					if ($other==$type) $other=$parts[1];
+					if ($other == $type) $other = $parts[1];
 					$field = 'shared'.ucfirst($other);
 					$export[$field] = self::export($bean->$field, false);
 				}

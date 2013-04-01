@@ -41,7 +41,7 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 				$translations[$code] = $translation;
 		}
 		//Fix narrow translations SQLiteT stores date as double. (double != really double)
-		if (get_class($sourceWriter)==='RedBean_QueryWriter_SQLiteT') {
+		if (get_class($sourceWriter) === 'RedBean_QueryWriter_SQLiteT') {
 			$translations[1] = $defaultCode;  //use magic number in case writer not loaded.
 		}
 		$sourceTables = $sourceWriter->getTables();

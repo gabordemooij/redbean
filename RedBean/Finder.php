@@ -44,7 +44,7 @@ class RedBean_Finder {
 	 *
 	 * @return array $beans  beans
 	 */
-	public function find($type, $sql=null, $values=array()) {
+	public function find($type, $sql = null, $values = array()) {
 		if ($sql instanceof RedBean_SQLHelper) list($sql, $values) = $sql->getQuery();
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
 		return $this->redbean->find($type, array(), array($sql, $values));
@@ -64,9 +64,9 @@ class RedBean_Finder {
 	 *
 	 * @return array $beans  beans
 	 */
-	public function findAll($type, $sql=null, $values=array()) {
+	public function findAll($type, $sql = null, $values = array()) {
 		if ($sql instanceof RedBean_SQLHelper) list($sql, $values) = $sql->getQuery();
-		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
+		if (!is_array($values)) throw new InvalidArgumentException('Expected array, '.gettype($values).' given.');
 		return $this->redbean->find($type, array(), array($sql, $values), true);
 	}
 	/**
@@ -79,12 +79,10 @@ class RedBean_Finder {
 	 *
 	 * @return array $arrays arrays
 	 */
-	public function findAndExport($type, $sql=null, $values=array()) {
+	public function findAndExport($type, $sql = null, $values = array()) {
 		$items = $this->find($type, $sql, $values);
 		$arr = array();
-		foreach($items as $key=>$item) {
-			$arr[$key]=$item->export();
-		}
+		foreach($items as $key => $item) $arr[$key] = $item->export();
 		return $arr;
 	}
 	/**
@@ -97,7 +95,7 @@ class RedBean_Finder {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public function findOne($type, $sql=null, $values=array()) {
+	public function findOne($type, $sql = null, $values = array()) {
 		$items = $this->find($type, $sql, $values);
 		$found = reset($items);
 		if (!$found) return null;
@@ -113,7 +111,7 @@ class RedBean_Finder {
 	 *
 	 * @return RedBean_OODBBean $bean
 	 */
-	public function findLast($type, $sql=null, $values=array()) {
+	public function findLast($type, $sql = null, $values = array()) {
 		$items = $this->find($type, $sql, $values);
 		$found = end($items);
 		if (!$found) return null;
@@ -130,8 +128,8 @@ class RedBean_Finder {
 	 *
 	 * @return array $beans Contains RedBean_OODBBean instances
 	 */
-	public function findOrDispense($type, $sql=null, $values=array()) {
+	public function findOrDispense($type, $sql = null, $values = array()) {
 		$foundBeans = $this->find($type, $sql, $values);
-		if (count($foundBeans)==0) return array($this->redbean->dispense($type)); else return $foundBeans;
+		if (count($foundBeans) == 0) return array($this->redbean->dispense($type)); else return $foundBeans;
 	}
 }

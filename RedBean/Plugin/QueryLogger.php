@@ -46,7 +46,7 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 	 * @return void
 	 */
 	public function onEvent($eventName, $adapter) {
-		if ($eventName=='sql_exec') {
+		if ($eventName == 'sql_exec') {
 			$this->logs[] = $adapter->getSQL();
 		}
 	}
@@ -61,7 +61,7 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 	public function grep($word) {
 		$found = array();
 		foreach($this->logs as $log) {
-			if (strpos($log, $word)!==false) {
+			if (strpos($log, $word) !== false) {
 				$found[] = $log;
 			}
 		}

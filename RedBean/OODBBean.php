@@ -121,14 +121,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 *
 	 * @return RedBean_OODBBean $this
 	 */
-	public function import($arr, $selection=false, $notrim=false) {
+	public function import($arr, $selection = false, $notrim = false) {
 		if (is_string($selection)) {
 			$selection = explode(',', $selection);
 		}
-		//trim whitespaces
-		if (!$notrim && is_array($selection)) foreach($selection as $k=>$s){ $selection[$k]=trim($s); }
-		foreach($arr as $k=>$v) {
-			if ($k!='__info') {
+		if (!$notrim && is_array($selection)) foreach($selection as $k => $s){ $selection[$k] = trim($s); }
+		foreach($arr as $k => $v) {
+			if ($k != '__info') {
 				if (!$selection || ($selection && in_array($k, $selection))) {
 					$this->$k = $v;
 				}
@@ -178,23 +177,23 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return array $arr
 	 */
 	public function export($meta = false, $parents = false, $onlyMe = false, $filters = array()) {
-		$arr=array();
+		$arr = array();
 		if ($parents) {
-			foreach($this as $k=>$v) {
-				if (substr($k, -3)=='_id') {
+			foreach($this as $k => $v) {
+				if (substr($k, -3) == '_id') {
 					$prop = substr($k, 0, strlen($k)-3);
 					$this->$prop;
 				}
 			}
 		}
-		foreach($this as $k=>$v) {
+		foreach($this as $k => $v) {
 			if (!$onlyMe && is_array($v)) {
 				$vn = array();
-				foreach($v as $i=>$b) {
+				foreach($v as $i => $b) {
 					if (is_numeric($i) && !self::$flagKeyedExport) {
-						$vn[]=$b->export($meta, false, false, $filters);
+						$vn[] = $b->export($meta, false, false, $filters);
 					} else {
-						$vn[$i]=$b->export($meta, false, false, $filters);
+						$vn[$i] = $b->export($meta, false, false, $filters);
 					}
 					$v = $vn;
 				}
@@ -217,7 +216,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return array $arr
 	 */
 	public function exportToObj($obj) {
-		foreach($this->properties as $k=>$v) {
+		foreach($this->properties as $k => $v) {
 			if (!is_array($v) && !is_object($v))
 			$obj->$k = $v;
 		}
@@ -360,7 +359,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	* @return string	
 	*/
 	public function beau($property) {
-		if (strpos($property, 'own')!==0 && strpos($property, 'shared')!==0) {
+		if (strpos($property, 'own') !== 0 && strpos($property, 'shared') !== 0) {
 			if (isset(self::$beautifulColumns[$property])) {
 				$propertyBeau = self::$beautifulColumns[$property];
 			} else {
@@ -389,8 +388,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			$toolbox = $this->beanHelper->getToolbox();
 			$redbean = $toolbox->getRedBean();
 		}
-		if ($this->withSql!=='') {
-			if (strpos($property, 'own')===0) {
+		if ($this->withSql !== '') {
+			if (strpos($property, 'own') === 0) {
 				unset($this->properties[$property]);
 			}
 		}	
@@ -407,7 +406,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$this->properties[$property] = $bean;
 				return $this->properties[$property];
 			}
-			elseif (strpos($property, 'own')===0 && ctype_upper(substr($property, 3, 1))) {
+			elseif (strpos($property, 'own') === 0 && ctype_upper(substr($property, 3, 1))) {
 				$type = lcfirst(substr($property, 3));
 				if (self::$flagUseBeautyfulColumnnames) {
 					$type = $this->beau($type);
@@ -436,15 +435,15 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$this->__info['tainted'] = true;
 				return $this->properties[$property];
 			}
-			elseif (strpos($property, 'shared')===0 && ctype_upper(substr($property, 6, 1))) {
+			elseif (strpos($property, 'shared') === 0 && ctype_upper(substr($property, 6, 1))) {
 				$type = lcfirst(substr($property, 6));
 				if (self::$flagUseBeautyfulColumnnames ) {
 					$type = $this->beau($type);
 				}	
 				$keys = $redbean->getAssociationManager()->related($this, $type);
 				if (!count($keys)) $beans = array(); else
-				if (trim($this->withSql)!=='') {
-					$beans = $redbean->find($type, array('id'=>$keys), array($this->withSql, $this->withParams), true);
+				if (trim($this->withSql) !== '') {
+					$beans = $redbean->find($type, array('id' => $keys), array($this->withSql, $this->withParams), true);
 				} else {
 					$beans = $redbean->batch($type, $keys);
 				}
@@ -487,9 +486,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				throw new RedBean_Exception_Security('Cannot cast to bean.');
 			}
 		}
-		if ($value===false) {
+		if ($value === false) {
 			$value = '0';
-		} elseif ($value===true) {
+		} elseif ($value === true) {
 			$value = '1';
 		} elseif ($value instanceof DateTime) {
 			$value = $value->format('Y-m-d H:i:s');
@@ -672,8 +671,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	public function isEmpty() {
 		$empty = true;
-		foreach($this->properties as $key=>$value) {
-			if ($key=='id') continue;
+		foreach($this->properties as $key => $value) {
+			if ($key == 'id') continue;
 			if (!empty($value)) { 
 				$empty = false;
 			}	
@@ -780,7 +779,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			} else {
 				$data = $qualification;
 			}
-			foreach($data as $key=>$value) {
+			foreach($data as $key => $value) {
 				$bean->$key = $value;
 			}
 		} else {
