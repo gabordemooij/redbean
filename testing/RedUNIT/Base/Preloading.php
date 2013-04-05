@@ -595,6 +595,27 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		
 		R::nuke();
 		R::$writer->setUseCache(false);
+		$books = R::dispense('book',4);
+		foreach($books as $b) $b->ownPage = R::dispense('page',2);
+		foreach($books as $b) $b->sharedAd = R::dispense('ad',2);
+		R::storeAll($books);
+		$books = R::find('book');
+		R::preload($books,array(
+				'ownPage' => array('page',array(' AND id > 0 LIMIT ? ', array(2))),
+				'sharedAd' => array('ad',array(' AND id > 0 LIMIT ? ',array(4)))
+			)
+		);
+		asrt(count($books[1]->ownPage),2);
+		asrt(count($books[1]->sharedAd),2);
+		asrt(count($books[2]->ownPage),0);
+		asrt(count($books[2]->sharedAd),2);
+		asrt(count($books[3]->ownPage),0);
+		asrt(count($books[3]->sharedAd),0);
+		
+		
+		
+		R::nuke();
+		R::$writer->setUseCache(false);
 		
 		$villages = R::dispense('village',3);
 		foreach($villages as $v) $v->ownBuilding = R::dispense('building',3);
@@ -626,7 +647,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::storeAll($villages);
 		$towns = R::find('village');
 		$counter = 0;
-		R::each($towns,array('sharedArmy'=>'army','sharedArmy.sharedSoldier'=>'soldier','ownBuilding'=>'building','ownBuilding.ownBook'=>'book','world'),function($t,$a,$s,$b,$x,$w) use(&$counter) {
+		R::each($towns,array(
+			'sharedArmy'=>'army',
+			'sharedArmy.sharedSoldier' => array('soldier', array(' ORDER BY name DESC ',array())),
+			'ownBuilding'=> array('building', array(' ORDER BY name DESC ',array())),
+			'ownBuilding.ownBook'=>'book','world'),function($t,$a,$s,$b,$x,$w) use(&$counter) {
 			if ($counter === 0) {
 				asrt($w,null);
 				asrt((string)$t->name,'0');
@@ -635,8 +660,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 				sort($list);
 				asrt(implode(',',$list),'1,2');
 				$list = array(); foreach($s as $item) $list[] = $item->name;
-				sort($list);
-				asrt(implode(',',$list),'1,2');
+				asrt(implode(',',$list),'2,1');
 				$list = array(); foreach($b as $item) $list[] = $item->name;
 				sort($list);
 				asrt(implode(',',$list),'0');
@@ -666,8 +690,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 				sort($list);
 				asrt(implode(',',$list),'0,1,2');
 				$list = array(); foreach($b as $item) $list[] = $item->name;
-				sort($list);
-				asrt(implode(',',$list),'1,2');
+				asrt(implode(',',$list),'2,1');
 				$list = array(); foreach($x as $item) $list[] = $item->name;
 				sort($list);
 				asrt(implode(',',$list),'2,3,4');
@@ -706,5 +729,5 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 			$counter++;
 	
 		});
-	}	
+	}
 }

@@ -822,7 +822,8 @@ class RedBean_OODB extends RedBean_Observable {
 	public function preload($beans, $types, $closure = null) {
 		if (is_string($types)) $types = explode(',', $types);
 		$oldFields = array(); $i = 0; $retrievals = array(); $oldField = '';
-		foreach($types as $key => $type) {
+		foreach($types as $key => $typeInfo) {
+			list($type,$sqlObj) = (is_array($typeInfo) ? $typeInfo : array($typeInfo, null));
 			$map = $ids = $retrievals[$i] = array();
 			$field = (is_numeric($key)) ? $type : $key;//use an alias?
 			if (strpos($field, '*') !== false) { 
@@ -891,7 +892,7 @@ class RedBean_OODB extends RedBean_Observable {
 					$linked[$linkID][] = $linkBean;
 					$targetIDs[$linkBean->$targetIDField] = $linkBean->$targetIDField;
 				}
-				$sharedBeans = $this->batch($type, $targetIDs);
+				$sharedBeans = $this->find($type, array('id' => $targetIDs), $sqlObj, (!is_null($sqlObj)));
 				foreach($filteredBeans as $filteredBean) {
 					$list = array();
 					if (isset($linked[$filteredBean->id])) {
@@ -910,7 +911,7 @@ class RedBean_OODB extends RedBean_Observable {
 				}
 			} elseif (strpos($field, 'own') === 0) {//preload for own-list using find
 				$link = $bean->getMeta('type').'_id';
-				$children = $this->find($type, array($link => $ids));
+				$children = $this->find($type, array($link => $ids), $sqlObj, (!is_null($sqlObj)));
 				foreach($filteredBeans as $filteredBean) {
 					$list = array();
 					foreach($children as $child) if ($child->$link == $filteredBean->id) $list[$child->id] = $child;
