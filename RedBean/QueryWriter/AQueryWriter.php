@@ -71,7 +71,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	protected function check($struct) {
 		if (!preg_match('/^[a-zA-Z0-9_]+$/', $struct)) {
-		  throw new Redbean_Exception_Security('Identifier does not conform to RedBeanPHP security policies.');
+		  throw new RedBean_Exception_Security('Identifier does not conform to RedBeanPHP security policies.');
 	    }
 		return $struct;
 	}
