@@ -69,7 +69,7 @@ class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID {
 			fail();
 		}
 		catch(Exception $e) { pass(); }
-		asrt(($e instanceof Redbean_Exception_Security),true);
+		asrt(($e instanceof RedBean_Exception_Security),true);
 	}
 
 }
