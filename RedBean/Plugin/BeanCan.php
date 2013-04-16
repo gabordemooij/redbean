@@ -48,12 +48,15 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	}
 	/**
 	 * Processes a JSON object request.
-	 *
-	 * @param array $jsonObject JSON request object
+	 * Second parameter can be a white list with format: array('beantype'=>array('update','customMethod')) etc.
+	 * or simply string 'all' (for backward compatibility).
+	 * 
+	 * @param array $jsonObject        JSON request object
+	 * @param array|string $whiteList  a white list of beans and methods that should be accessible through the BeanCan Server.
 	 *
 	 * @return mixed $result result
 	 */
-	public function handleJSONRequest($jsonString) {
+	public function handleJSONRequest($jsonString, $whiteList = array()) {
 		//Decode JSON string
 		$jsonArray = json_decode($jsonString, true);
 		if (!$jsonArray) return $this->resp(null, null, -32700, 'Cannot Parse JSON');
@@ -73,12 +76,15 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		}
 		//Check method signature
 		$method = explode(':', trim($jsonArray['method']));
-		if (count($method) != 2) {
+		if (count($method) !== 2) {
 			return $this->resp(null, $id, -32600, 'Invalid method signature. Use: BEAN:ACTION');
 		}
 		//Collect Bean and Action
 		$beanType = $method[0];
 		$action = $method[1];
+		if (!($whiteList === 'all' || (isset($whiteList[$beanType]) && in_array($action,$whiteList[$beanType])))) {
+			return $this->resp(null, $id, -32600, 'This bean is not available. Set whitelist to "all" or add to whitelist');
+		}
 		//May not contain anything other than ALPHA NUMERIC chars and _
 		if (preg_match('/\W/', $beanType)) return $this->resp(null, $id, -32600, 'Invalid Bean Type String');
 		if (preg_match('/\W/', $action)) return $this->resp(null, $id, -32600, 'Invalid Action String');
