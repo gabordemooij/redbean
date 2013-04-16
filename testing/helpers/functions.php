@@ -249,7 +249,7 @@ function s($data,$params=null,$id="1234") {
 	);
 	$can = new RedBean_Plugin_BeanCan;
 	$request = json_encode($j);
-	$out =  $can->handleJSONRequest( $request );
+	$out =  $can->handleJSONRequest( $request , 'all');
 	return $out;
 }
 
