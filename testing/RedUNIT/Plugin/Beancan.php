@@ -118,7 +118,8 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		
 		testpack("Test Negatives: parse error");
 		$can = new RedBean_Plugin_BeanCan;
-		$rs =  json_decode( $can->handleJSONRequest( "crap" , 'all'), true);
+		$can->setWhitelist('all');
+		$rs =  json_decode( $can->handleJSONRequest( "crap" ), true);
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),2);
@@ -131,7 +132,8 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($rs["error"]["code"],-32700);
 		testpack("invalid request");
 		$can = new RedBean_Plugin_BeanCan;
-		$rs =  json_decode( $can->handleJSONRequest( '{"aa":"bb"}' ,'all'), true);
+		$can->setWhitelist('all');
+		$rs =  json_decode( $can->handleJSONRequest( '{"aa":"bb"}' ), true);
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),2);
@@ -142,7 +144,8 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(isset($rs["error"]),true);
 		asrt(isset($rs["error"]["code"]),true);
 		asrt($rs["error"]["code"],-32600);
-		$rs =  json_decode( $can->handleJSONRequest( '{"jsonrpc":"9.1"}' ,'all'), true);
+		$can->setWhitelist('all');
+		$rs =  json_decode( $can->handleJSONRequest( '{"jsonrpc":"9.1"}' ), true);
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),2);
@@ -153,7 +156,8 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(isset($rs["error"]),true);
 		asrt(isset($rs["error"]["code"]),true);
 		asrt($rs["error"]["code"],-32600);
-		$rs =  json_decode( $can->handleJSONRequest( '{"id":9876,"jsonrpc":"9.1"}','all' ), true);
+		$can->setWhitelist('all');
+		$rs =  json_decode( $can->handleJSONRequest( '{"id":9876,"jsonrpc":"9.1"}' ), true);
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),2);
@@ -303,7 +307,8 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		
 		testpack('BeanCan does not include the request id in the response if it is 0');
 		$id = R::store(R::dispense('foo')->setAttr('prop1','val1'));
-		$rs =  json_decode( $can->handleJSONRequest('{"jsonrpc":"2.0","method":"foo:load","params":['.$id.'],"id":0}','all'), true);
+		$can->setWhitelist('all');
+		$rs =  json_decode( $can->handleJSONRequest('{"jsonrpc":"2.0","method":"foo:load","params":['.$id.'],"id":0}'), true);
 		asrt(isset($rs['id']),true);
 		asrt($rs['id'],0);
 		

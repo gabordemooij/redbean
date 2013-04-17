@@ -21,6 +21,10 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 */
 	private $modelHelper;
 	/**
+	 * @var array
+	 */
+	private $whitelist;
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -47,16 +51,27 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		return (json_encode($response));
 	}
 	/**
+	 * Sets a whitelist with format: array('beantype'=>array('update','customMethod')) etc.
+	 * or simply string 'all' (for backward compatibility).
+	 * 
+	 * @param array|string $whitelist  a white list of beans and methods that should be accessible through the BeanCan Server.
+	 *
+	 * @return RedBean_Plugin_BeanCan
+	 */
+	public function setWhitelist($whitelist) {
+		$this->whitelist = $whitelist;
+	}
+	/**
 	 * Processes a JSON object request.
 	 * Second parameter can be a white list with format: array('beantype'=>array('update','customMethod')) etc.
 	 * or simply string 'all' (for backward compatibility).
 	 * 
 	 * @param array $jsonObject        JSON request object
-	 * @param array|string $whiteList  a white list of beans and methods that should be accessible through the BeanCan Server.
+	 * @param array|string $whitelist  a white list of beans and methods that should be accessible through the BeanCan Server.
 	 *
 	 * @return mixed $result result
 	 */
-	public function handleJSONRequest($jsonString, $whiteList = array()) {
+	public function handleJSONRequest($jsonString) {
 		//Decode JSON string
 		$jsonArray = json_decode($jsonString, true);
 		if (!$jsonArray) return $this->resp(null, null, -32700, 'Cannot Parse JSON');
@@ -82,7 +97,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		//Collect Bean and Action
 		$beanType = $method[0];
 		$action = $method[1];
-		if (!($whiteList === 'all' || (isset($whiteList[$beanType]) && in_array($action,$whiteList[$beanType])))) {
+		if (!($this->whitelist === 'all' || (isset($this->whitelist[$beanType]) && in_array($action,$this->whitelist[$beanType])))) {
 			return $this->resp(null, $id, -32600, 'This bean is not available. Set whitelist to "all" or add to whitelist');
 		}
 		//May not contain anything other than ALPHA NUMERIC chars and _

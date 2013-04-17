@@ -249,7 +249,8 @@ function s($data,$params=null,$id="1234") {
 	);
 	$can = new RedBean_Plugin_BeanCan;
 	$request = json_encode($j);
-	$out =  $can->handleJSONRequest( $request , 'all');
+	$can->setWhitelist('all');
+	$out =  $can->handleJSONRequest( $request );
 	return $out;
 }
 
