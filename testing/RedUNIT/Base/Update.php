@@ -21,6 +21,18 @@ class RedUNIT_Base_Update extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run(){
+		
+		testpack('Test basic support UUID/override ID default value');
+		R::nuke();
+		$bean = R::dispense('bean');
+		R::store($bean);
+		R::$writer->widenColumn('bean','id',R::$writer->scanType('abc'));		
+		$bean->id = 'abc';
+		R::store($bean);
+		asrt($bean->id,'abc');
+		
+		testpack('Test Update');
+		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();

@@ -55,6 +55,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
   	protected function getInsertSuffix ($table) {
     	return '';
   	}
+	public function setNewIDSQL($sql) {
+		$this->defaultValue = $sql;
+	}
 	/**
 	 * @see RedBean_QueryWriter::esc
 	 */
@@ -108,7 +111,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$p[] = " {$this->esc($uv["property"])} = ? ";
 			$v[] = $uv['value'];
 		}
-		$sql .= implode(',', $p).' WHERE id = '.intval($id);
+		$sql .= implode(',', $p).' WHERE id = ? ';
+		$v[] = $id;
 		$this->adapter->exec($sql, $v);
 		return $id;
 	}
