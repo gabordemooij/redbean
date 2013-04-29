@@ -111,6 +111,7 @@ $allPacks = array(
 		'Base/Tags',
 		'Base/Null',
 		'Base/Issue90',
+		'Base/Issue259',
 		'Base/Nuke',
 		'Base/Keywords',
 		'Base/Count',
