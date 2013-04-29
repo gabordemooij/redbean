@@ -132,4 +132,17 @@ class RedBean_Finder {
 		$foundBeans = $this->find($type, $sql, $values);
 		if (count($foundBeans) == 0) return array($this->redbean->dispense($type)); else return $foundBeans;
 	}
+
+
+	public function findByPath($bean, $steps) {
+		$n = count($steps);
+		if ($n % 2) throw new RedBean_Exception_Security('Invalid path: needs 1 more element.');
+		for($i = 0; $i < $n; $i += 2) {
+			$listName = 'own'.ucfirst($steps[$i]);
+			$bean = $bean->withCondition(' id = ? ',array($steps[$i + 1]))->$listName[$steps[$i + 1]];
+			return null;
+		}
+		return $bean;
+	}
+
 }

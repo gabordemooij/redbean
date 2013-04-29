@@ -161,4 +161,47 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 			return $this->resp(null, 0, -32099);
 		}
 	}
+
+
+	public function handleREST($root, $uri, $method, $payload = array()) {
+		try {
+			$finder = new RedBean_Finder(RedBean_Facade::getToolbox());
+			$uri = explode('/', $uri);
+			if ($method == 'PUT') {
+				$list = array_pop($uri); //grab the list
+			}
+			$bean = $finder->findByPath($root, $uri);
+			if ($bean) {
+				if ($method == 'GET') {
+					return $this->resp($bean->export()); 
+				}
+				elseif ($method == 'DELETE') {
+					RedBean_Facade::trash($bean);
+					return $this->resp('OK');
+				}
+				elseif ($method == 'POST') {
+					$bean->import($payload['bean']);
+					$id = RedBean_Facade::store($bean);
+					return $this->resp($id);
+				}
+				elseif ($method == 'PUT') {
+					$newBean = RedBean_Facade::dispense($payload['type']);
+					$newBean->import($payload['bean']);
+					$bean->$list[] = $newBean;
+					RedBean_Facade::store($bean);
+					return $this->resp($newBean->id);	
+				}
+				else {
+					$answer = call_user_func(array($bean,$payload['param']));
+					$this->resp($answer);
+				}
+			}
+		}
+		catch(Exception $e) {
+			return $this->resp(null, 0, -32099);
+		}
+	}
+
+
+
 }

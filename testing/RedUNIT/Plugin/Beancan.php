@@ -27,7 +27,22 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 	 */
 	public function run() {
 		
-		
+		testpack('Test new Resty BeanCan');
+		R::nuke();
+		$user = R::dispense('user');
+		$user->name = 'me';
+		$site = R::dispense('site');
+		$site->name = 'site 1';
+		$page = R::dispense('page');
+		$page->name = 'page 1';
+		$site->sharedPage[] = $page;
+		$user->ownSite[] = $site;
+		R::store($user);
+
+		$can = new RedBean_Plugin_BeanCan;
+			
+		$resp = $can->handleREST($user, 'page/'.$page->id , 'GET');
+		echo $resp;
 		
 		$rs = ( s("candybar:store",array( array("brand"=>"funcandy","taste"=>"sweet") ) ) );
 		testpack("Test create");
