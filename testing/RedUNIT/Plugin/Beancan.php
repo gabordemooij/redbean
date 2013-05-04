@@ -35,17 +35,105 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$site->name = 'site 1';
 		$page = R::dispense('page');
 		$page->name = 'page 1';
-		$site->sharedPage[] = $page;
+		$ad = R::dispense('ad');
+		$ad->name = 'an ad';
+		$ad2 = R::dispense('ad');
+		$ad2->name = 'an ad2';
+		$page->sharedAd[] = $ad;
+		$page->sharedAd[] = $ad2;
+		$site->ownPage[] = $page;
 		$user->ownSite[] = $site;
 		R::store($user);
 
 		$can = new RedBean_Plugin_BeanCan;
-			
-		$resp = $can->handleREST($user, 'page/'.$page->id , 'GET');
-		echo $resp;
 		
+		//Send a GET /site/1 request to BeanCan Server 
+		$resp = $can->handleREST($user, 'site/'.$site->id , 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['result']['id'], (string)$site->id);
+		asrt((string)$resp['result']['name'], (string)$site->name);
+		asrt((string)$resp['result']['user_id'], (string)$site->user_id);
+		//Send a GET /site/1/page/1 request to BeanCan Server
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id , 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['result']['id'], (string)$page->id);
+		asrt((string)$resp['result']['name'], (string)$page->name);
+		asrt((string)$resp['result']['site_id'], (string)$page->site_id);
+		//Send a GET /site/1/page/1/shared-ad/1
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/'.$ad->id, 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['result']['id'], (string)$ad->id);
+		asrt((string)$resp['result']['name'], (string)$ad->name);
+		//Send a PUT /site/1/page
+		$payLoad = array(
+			'type' => 'page',
+			'bean' => array(
+				'name' => 'my new page'
+			)
+		);
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page', 'PUT', $payLoad);
+		$resp = json_decode($resp, true);
+		$newPage = R::findOne('page',' name = ? ',array('my new page'));
+		asrt((string)$resp['result']['id'], (string)$newPage->id);
+		asrt((string)$resp['result']['name'], (string)$newPage->name);
+		//Send a PUT /site/1/page/2/shared-ad
+		$payLoad = array(
+			'type' => 'ad',
+			'bean' => array(
+				'name' => 'my new ad'
+			)
+		);
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad', 'PUT', $payLoad);
+		$resp = json_decode($resp, true);
+		$newAd = R::findOne('ad',' name = ? ',array('my new ad'));
+		asrt((string)$resp['result']['id'], (string)$newAd->id);
+		asrt((string)$resp['result']['name'], (string)$newAd->name);
+		//Send a POST /site/1
+		$payLoad = array(
+			'bean' => array(
+				'name' => 'The Original'
+			)
+		);
+		$resp = $can->handleREST($user, 'site/'.$site->id, 'POST', $payLoad);
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['result']['id'], (string)$site->id);
+		asrt((string)$resp['result']['name'], 'The Original');
+		
+		//Send a DELETE /site/1/page/2/shared-ad/2
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/'.$newAd->id, 'DELETE');
+		$resp = json_decode($resp, true);
+		$newAd = R::findOne('ad',' name = ? ',array('my new ad'));
+		asrt((string)$resp['result'], 'OK');
+		asrt($newAd, null);
+		
+		//Send a MAIL /site/1/page/1
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id, 'mail', array('param'=>array('me')));
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['result'], 'mail has been sent to me');
+		
+		//test Access control
+		$setting = R::dispense('setting');
+		$option = R::dispense('option');
+		$setting->ownOption[] = $option;
+		$user->ownSetting[] = $setting;
+		$option->name = 'secret';
+		R::store($user);
+		$resp = $can->handleREST($user, 'setting/'.$setting->id.'/option/'.$option->id, 'GET');
+		$resp = json_decode($resp, true);
+		asrt($resp['result']['name'], 'secret');
+		$user2 = R::load('user', R::store(R::dispense('user')));
+		$resp = $can->handleREST($user2, 'setting/'.$setting->id.'/option/'.$option->id, 'GET');
+		$resp = json_decode($resp, true);
+		asrt(isset($resp['error']),true);
+		Model_Setting::$closed = true;
+		$resp = $can->handleREST($user, 'setting/'.$setting->id.'/option/'.$option->id, 'GET');
+		$resp = json_decode($resp, true);
+		asrt(isset($resp['error']),true);
+		Model_Setting::$closed = false;
+		
+		testpack("Test BeanCan Server 1 / create");
+		R::nuke();
 		$rs = ( s("candybar:store",array( array("brand"=>"funcandy","taste"=>"sweet") ) ) );
-		testpack("Test create");
 		asrt(is_string($rs),true);
 		$rs = json_decode($rs,true);
 		asrt(is_array($rs),true);
@@ -325,9 +413,20 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$can->setWhitelist('all');
 		$rs =  json_decode( $can->handleJSONRequest('{"jsonrpc":"2.0","method":"foo:load","params":['.$id.'],"id":0}'), true);
 		asrt(isset($rs['id']),true);
-		asrt($rs['id'],0);
-		
+		asrt($rs['id'],0);	
 	}
-	
-	
+}
+
+
+class Model_Page extends RedBean_SimpleModel {
+	public function mail($who) {
+		return 'mail has been sent to '.$who;
+	}
+}
+
+class Model_Setting extends RedBean_SimpleModel {
+	public static $closed = false;	
+	public function open() {
+		if (self::$closed) throw new Exception('closed');
+	}
 }

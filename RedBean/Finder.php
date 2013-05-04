@@ -132,17 +132,39 @@ class RedBean_Finder {
 		$foundBeans = $this->find($type, $sql, $values);
 		if (count($foundBeans) == 0) return array($this->redbean->dispense($type)); else return $foundBeans;
 	}
-
-
+	/**
+	 * Returns the bean identified by the RESTful path.
+	 * For instance:
+	 *		
+	 *		$user 
+	 * 		/site/1/page/3
+	 * 
+	 * returns page with ID 3 in ownPage of site 1 in ownSite of 
+	 * $user bean.
+	 * 
+	 * Works with shared lists as well:
+	 * 
+	 *		$user
+	 *		/site/1/page/3/shared-ad/4
+	 * 
+	 * Note that this method will open all intermediate beans so you can
+	 * attach access control rules to each bean in the path.
+	 * 
+	 * @param RedBean_OODBBean $bean
+	 * @param array            $steps  (an array representation of a REST path)
+	 * 
+	 * @return RedBean_OODBBean 
+	 */
 	public function findByPath($bean, $steps) {
 		$n = count($steps);
 		if ($n % 2) throw new RedBean_Exception_Security('Invalid path: needs 1 more element.');
 		for($i = 0; $i < $n; $i += 2) {
-			$listName = 'own'.ucfirst($steps[$i]);
-			$bean = $bean->withCondition(' id = ? ',array($steps[$i + 1]))->$listName[$steps[$i + 1]];
-			return null;
+			if (strpos($steps[$i],'shared-') === false) $listName = 'own'.ucfirst($steps[$i]); else $listName = 'shared'.ucfirst(substr($steps[$i],7));
+			$list = $bean->withCondition(' id = ? ',array($steps[$i + 1]))->$listName;
+			if (!is_array($list)) throw new RedBean_Exception_Security('Cannot access list.');
+			if (!isset($list[$steps[$i + 1]])) throw new RedBean_Exception_Security('Cannot access bean.');
+			$bean = $list[$steps[$i + 1]];
 		}
 		return $bean;
 	}
-
 }

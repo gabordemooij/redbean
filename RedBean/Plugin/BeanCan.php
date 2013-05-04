@@ -162,10 +162,20 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		}
 	}
 
-
+	/**
+	 * Handles a REST request.
+	 * Returns a JSON response string.
+	 * 
+	 * @param RedBean_Bean $root    root bean for REST action
+	 * @param string       $uri     the URI of the RESTful operation
+	 * @param string       $method  the method you want to apply
+	 * @param array        $payload payload (for POSTs)
+	 * 
+	 * @return string 
+	 */
 	public function handleREST($root, $uri, $method, $payload = array()) {
 		try {
-			$finder = new RedBean_Finder(RedBean_Facade::getToolbox());
+			$finder = new RedBean_Finder(RedBean_Facade::$toolbox);
 			$uri = explode('/', $uri);
 			if ($method == 'PUT') {
 				$list = array_pop($uri); //grab the list
@@ -174,26 +184,29 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 			if ($bean) {
 				if ($method == 'GET') {
 					return $this->resp($bean->export()); 
-				}
-				elseif ($method == 'DELETE') {
+				} elseif ($method == 'DELETE') {
 					RedBean_Facade::trash($bean);
 					return $this->resp('OK');
-				}
-				elseif ($method == 'POST') {
+				} elseif ($method == 'POST') {
 					$bean->import($payload['bean']);
 					$id = RedBean_Facade::store($bean);
-					return $this->resp($id);
-				}
-				elseif ($method == 'PUT') {
+					$bean = RedBean_Facade::load($bean->getMeta('type'), $bean->id);
+					return $this->resp($bean->export());
+				} elseif ($method == 'PUT') {
 					$newBean = RedBean_Facade::dispense($payload['type']);
 					$newBean->import($payload['bean']);
-					$bean->$list[] = $newBean;
+					if (strpos($list, 'shared-') === false) {
+						$listName = 'own'.ucfirst($list);
+					} else {
+						$listName = 'shared'.ucfirst(substr($list,7));
+					}
+					array_push($bean->$listName, $newBean); 
 					RedBean_Facade::store($bean);
-					return $this->resp($newBean->id);	
-				}
-				else {
-					$answer = call_user_func(array($bean,$payload['param']));
-					$this->resp($answer);
+					$newBean = RedBean_Facade::load($newBean->getMeta('type'), $newBean->id);
+					return $this->resp($newBean->export());	
+				} else {
+					$answer = call_user_func_array(array($bean,$method),$payload['param']);
+					return $this->resp($answer);
 				}
 			}
 		}
@@ -201,7 +214,4 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 			return $this->resp(null, 0, -32099);
 		}
 	}
-
-
-
 }
