@@ -263,7 +263,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$id = R::store($book);
 		$book = R::load('book',$id);
 		asrt(count($book->sharedTopic),2);
-		asrt(reset($book->sharedTopic)->name,'tropics');
+		asrt($book->sharedTopic[1]->name,'tropics');
 		testids($book->sharedTopic);
 		R::trash(R::load('topic',$tidx));
 		$id = R::store($book);

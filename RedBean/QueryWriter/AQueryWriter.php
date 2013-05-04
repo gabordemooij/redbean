@@ -218,6 +218,23 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $rows;
 	}
 	/**
+	 * Returns an SQL snippet for use with selectRecord to obtain records
+	 * from a link table.
+	 *  
+	 * @param string $sourceType the type of bean you want to use as a link reference
+	 * @param string $destType   the target type
+	 * @param string $linkType   link table to use
+	 * 
+	 * @return string 
+	 */
+	public function getLinkBlock($sourceType, $destType, $linkType) {
+		$sourceTable = $this->esc($sourceType.'_id');
+		$destTable = $this->esc($destType.'_id');
+		$linkTable = $this->esc($linkType);
+		$sql = " WHERE id IN ( SELECT {$destTable} FROM {$linkTable} WHERE {$sourceTable} = ? ) ";
+		return $sql;
+	}
+	/**
 	 * @see RedBean_QueryWriter::wipe
 	 */
 	public function wipe($type) {

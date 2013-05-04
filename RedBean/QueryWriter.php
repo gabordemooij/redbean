@@ -134,7 +134,6 @@ interface RedBean_QueryWriter {
 	 * @param string  $asql    additional sql
 	 * @param boolean $delete  IF TRUE delete records (optional)
 	 * @param boolean $inverse IF TRUE inverse the selection (optional)
-	 * @param boolean $all     IF TRUE suppress WHERE keyword, omitting WHERE clause
 	 *
 	 * @return array $records selected records
 	 */

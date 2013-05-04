@@ -439,13 +439,24 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$type = lcfirst(substr($property, 6));
 				if (self::$flagUseBeautyfulColumnnames ) {
 					$type = $this->beau($type);
-				}	
-				$keys = $redbean->getAssociationManager()->related($this, $type);
-				if (!count($keys)) $beans = array(); else
-				if (trim($this->withSql) !== '') {
-					$beans = $redbean->find($type, array('id' => $keys), array($this->withSql, $this->withParams), true);
+				}
+				//can we go for the fast-track?
+				if ($type !== $this->__info['type']) {
+					//yes, association is simple, go for fast-track using link-block
+					$writer = $toolbox->getWriter();
+					$types = array($this->__info['type'], $type);
+					$withSql = $writer->getLinkBlock($this->__info['type'], $type, $redbean->getAssociationManager()->getTable($types), $this->withSql);
+					$withSql .= $this->withSql;
+					array_unshift($this->withParams, $this->properties['id']);
+					$beans = $redbean->find($type, array(), array($withSql, $this->withParams), true);
 				} else {
-					$beans = $redbean->batch($type, $keys);
+					$keys = $redbean->getAssociationManager()->related($this, $type);
+					if (!count($keys)) $beans = array(); else
+					if (trim($this->withSql) !== '') {
+						$beans = $redbean->find($type, array('id' => $keys), array($this->withSql, $this->withParams), true);
+					} else {
+						$beans = $redbean->batch($type, $keys);
+					}
 				}
 				$this->withSql = '';
 				$this->withParams = array();
