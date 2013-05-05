@@ -23,6 +23,40 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 	 */
 	public function run() {
 		
+		testpack('Test fast-track linkBlock exceptions');
+		//Fast track link block code should not affect self-referential N-M relations.
+		R::nuke();
+		list($donald, $mickey, $goofy, $pluto) = R::dispense('friend', 4);
+		$donald->name = 'D';
+		$mickey->name = 'M';
+		$goofy->name = 'G';
+		$pluto->name = 'P';
+		$donald->sharedFriend = array($mickey, $goofy);
+		$mickey->sharedFriend = array($pluto, $goofy);
+		R::storeAll(array($mickey, $donald, $goofy, $pluto));
+		$donald = R::load('friend', $donald->id);
+		$mickey = R::load('friend', $mickey->id);
+		$goofy = R::load('friend', $goofy->id);
+		$pluto = R::load('friend', $pluto->id);
+		$names = implode(',', R::gatherLabels($donald->sharedFriend));
+		asrt($names, 'G,M');
+		$names = implode(',', R::gatherLabels($goofy->sharedFriend));
+		asrt($names, 'D,M');
+		$names = implode(',', R::gatherLabels($mickey->sharedFriend));
+		asrt($names, 'D,G,P');
+		$names = implode(',', R::gatherLabels($pluto->sharedFriend));
+		asrt($names, 'M');
+		
+		//now in combination with with() conditions...
+		$donald = R::load('friend', $donald->id);
+		$names = implode(',', R::gatherLabels($donald->withCondition(' name = ? ', array('M'))->sharedFriend));
+		asrt($names, 'M');
+		
+		//now in combination with with() conditions...
+		$donald = R::load('friend', $donald->id);
+		$names = implode(',', R::gatherLabels($donald->with(' ORDER BY name ')->sharedFriend));
+		asrt($names, 'G,M');
+		
 		testpack('Test list beautifications');
 		R::nuke();
 		$book = R::dispense('book');
