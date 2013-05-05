@@ -55,9 +55,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
   	protected function getInsertSuffix ($table) {
     	return '';
   	}
+	
 	public function setNewIDSQL($sql) {
+		$old = $this->defaultValue;
 		$this->defaultValue = $sql;
+		return $old;
 	}
+	
 	/**
 	 * @see RedBean_QueryWriter::esc
 	 */

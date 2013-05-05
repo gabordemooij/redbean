@@ -22,6 +22,20 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 	 */
 	public function run() {
 		
+		//test basic support UUIDs
+		testpack('Test basic support UUIDs');
+		R::nuke();
+		$book = R::dispense('book');
+		$book->name = 'abc';
+		$old = R::$writer->setNewIDSQL('100');
+		pass();
+		asrt(is_string($old), true);
+		R::store($book);
+		$book = R::load('book',100);
+		asrt($book->name,'abc');
+		R::$writer->setNewIDSQL($old);
+		pass();
+		
 		//test backward compatibility functions
 		testpack('Test backward compatability methods');
 		asrt(R::$writer->safeColumn('column',true),R::$writer->esc('column',true));
