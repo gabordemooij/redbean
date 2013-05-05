@@ -180,7 +180,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				&& count($conditions) === 1 
 				&& isset($conditions['id']) 
 				&& is_array($values) 
-				&& preg_match('/^\d+$/', implode('', $values))) {
+				&& preg_match('/^[\d\w\-]+$/', implode('', $values))) {
 				$sql .= implode(',', $values).') ';
 				$sqlConditions[] = $sql;
 			} else {
