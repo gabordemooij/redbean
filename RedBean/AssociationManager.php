@@ -79,6 +79,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return mixed $id either the link ID or null
 	 */
 	protected function associateBeans(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean) {
+		$results = array();
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
 		if ($property1 == $property2) $property2 = $bean2->getMeta('type').'2_id';
@@ -108,6 +109,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION))) throw $e;
 		}
+		return $results;
 	}
 	/**
 	 * Returns all ids of beans of type $type that are related to $bean. If the
