@@ -495,32 +495,45 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		} catch (Exception $e) {} //Failure of fk-constraints is not a problem
 	}
 	/**
-	 * This selects a record. You provide a
-	 * collection of conditions using the following format:
-	 * array( $field1 => array($possibleValue1, $possibleValue2,... $possibleValueN ),
-	 * ...$fieldN=>array(...));
-	 * Also, additional SQL can be provided. This SQL snippet will be appended to the
-	 * query string. If the $delete parameter is set to TRUE instead of selecting the
-	 * records they will be deleted.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @throws Exception
-	 * @param string  $type    type of bean to select records from
-	 * @param array   $cond    conditions using the specified format
-	 * @param string  $asql    additional sql
-	 * @param boolean $delete  IF TRUE delete records (optional)
-	 * @param boolean $inverse IF TRUE inverse the selection (optional)
-	 * @param boolean $all     IF TRUE suppress WHERE keyword, omitting WHERE clause
-	 *
-	 * @return array $records selected records
+	 * @deprecated
 	 */
 	public function selectRecord($type, $conditions, $addSql = null, $delete = null, $inverse = false, $all = false) {
+		return parent::selectRecord(strtoupper($type), $this->filterConditions($conditions), $addSql, $delete, $inverse, $all);
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::queryRecord
+	 */
+	public function queryRecord($type, $conditions, $addSql = null, $all = false) { 
+		return parent::queryRecord($type, $this->filterConditions($conditions), $addSql, $all);
+	}
+	/**
+	 * @see RedBean_QueryWriter::deleteRecord
+	 */
+	public function deleteRecord($type, $conditions, $addSql = null) {
+		return parent::deleteRecord($type, $this->filterConditions($conditions), $addSql);
+	}
+	/**
+	 * @see RedBean_QueryWriter::queryRecordInverse
+	 */
+	public function queryRecordInverse($type, $conditions, $addSql = null) {
+		return parent::queryRecordInverse($type, $this->filterConditions($conditions), $addSql, $all);
+	}
+	/**
+	 * Uppercase the conditions.
+	 * 
+	 * @param array $conditions conditions
+	 * 
+	 * @return array 
+	 */
+	private function filterConditions($conditions) {
 		$upperCaseConditions = array();
 		foreach ($conditions as $column => $value) {
 			$upperCaseConditions[strtoupper($column)] = $value;
 		}
-		return parent::selectRecord(strtoupper($type), $upperCaseConditions, $addSql, $delete, $inverse, $all);
-	}
+		return $upperCaseConditions;
+	} 
+	
 	/**
 	 * Returns the Column Type Code (integer) that corresponds
 	 * to the given value type. This method is used to determine the minimum
