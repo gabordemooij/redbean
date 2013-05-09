@@ -3,7 +3,7 @@
  * RedBean Facade
  * 
  * Version Information
- * RedBean Version @version 3.4.2
+ * RedBean Version @version 3.4.4
  * 
  * @file			RedBean/Facade.php
  * @desc			Convenience class for RedBeanPHP.
@@ -80,7 +80,7 @@ class RedBean_Facade {
 	 * @return string
 	 */
 	public static function getVersion() {
-		return '3.4.3';
+		return '3.4.4';
 	}
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
