@@ -193,7 +193,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	public function find($type, $conditions = array(), $addSQL = null, $all = false) {
 		try {
-			$beans = $this->convertToBeans($type, $this->writer->selectRecord($type, $conditions, $addSQL, false, false, $all));
+			$beans = $this->convertToBeans($type, $this->writer->queryRecord($type, $conditions, $addSQL, $all));
 			return $beans;
 		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
@@ -592,7 +592,7 @@ class RedBean_OODB extends RedBean_Observable {
 			$row = $this->stash[$this->nesting][$id];
 		} else {
 			try {
-				$rows = $this->writer->selectRecord($type, array('id' => array($id)));
+				$rows = $this->writer->queryRecord($type, array('id' => array($id)));
 			} catch(RedBean_Exception_SQL $e ) {
 				if (
 				$this->writer->sqlStateIn($e->getSQLState(),
@@ -645,8 +645,8 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		if (!$this->isFrozen) $this->check($bean);
 		try {
-			$this->writer->selectRecord($bean->getMeta('type'),
-				array('id' => array($bean->id)), null, true );
+			$this->writer->deleteRecord($bean->getMeta('type'),
+				array('id' => array($bean->id)), null);
 		}catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
@@ -675,7 +675,7 @@ class RedBean_OODB extends RedBean_Observable {
 		if (!$ids) return array();
 		$collection = array();
 		try {
-			$rows = $this->writer->selectRecord($type, array('id' => $ids));
+			$rows = $this->writer->queryRecord($type, array('id' => $ids));
 		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(

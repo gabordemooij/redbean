@@ -152,7 +152,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		if (!$getLinks) $targetproperty = $type.'_id'; else $targetproperty = 'id';
 		$property = $bean->getMeta('type').'_id';
 		try {
-			$sqlFetchKeys = $this->writer->selectRecord($table, array($property => $ids), $sql, false);
+			$sqlFetchKeys = $this->writer->queryRecord($table, array($property => $ids), $sql);
 			$sqlResult = array();
 			foreach($sqlFetchKeys as $row) {
 				if (isset($row[$targetproperty])) {
@@ -160,7 +160,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 				}
 			}
 			if ($cross) {
-				$sqlFetchKeys2 = $this->writer->selectRecord($table, array($targetproperty => $ids), $sql, false);
+				$sqlFetchKeys2 = $this->writer->queryRecord($table, array($targetproperty => $ids), $sql);
 				foreach($sqlFetchKeys2 as $row) {
 					if (isset($row[$property])) {
 						$sqlResult[] = $row[$property];
@@ -208,17 +208,19 @@ class RedBean_AssociationManager extends RedBean_Observable {
 				$value1 = (int) $bean1->id;
 				$value2 = (int) $bean2->id;
 				try {
-					$rows = $this->writer->selectRecord($table, array(
-						$property1 => array($value1), $property2 => array($value2)), null, $fast
-					);
+					$condA = array($property1 => array($value1), $property2 => array($value2));
+					$condB = array($property2 => array($value1), $property1 => array($value2));
+					if ($fast) {
+						$rows = $this->writer->deleteRecord($table, $condA, null);
+						if ($cross) {
+							$rows2 = $this->writer->deleteRecord($table, $condB, null);
+						}
+					}
+					$rows = $this->writer->queryRecord($table, $condA, null);
 					if ($cross) {
-						$rows2 = $this->writer->selectRecord($table, array(
-						$property2 => array($value1), $property1 => array($value2)), null, $fast
-						);
-						if ($fast) continue;
+						$rows2 = $this->writer->queryRecord($table, $condB, null);
 						$rows = array_merge($rows, $rows2);
 					}
-					if ($fast) continue;
 					$beans = $this->oodb->convertToBeans($table, $rows);
 					foreach($beans as $link) $this->oodb->trash($link);
 				} catch(RedBean_Exception_SQL $e) {
@@ -253,9 +255,9 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		else $cross = 0;
 		$property = $bean->getMeta('type').'_id';
 		try {
-			$this->writer->selectRecord($table, array($property => array($bean->id)), null, true);
+			$this->writer->deleteRecord($table, array($property => array($bean->id)), null);
 			if ($cross) {
-				$this->writer->selectRecord($table, array($property2 => array($bean->id)), null, true);
+				$this->writer->deleteRecord($table, array($property2 => array($bean->id)), null);
 			}
 		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
@@ -289,11 +291,11 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$value1 = (int) $bean1->id;
 		$value2 = (int) $bean2->id;
 		try {
-			$rows = $this->writer->selectRecord($table, array(
+			$rows = $this->writer->queryRecord($table, array(
 				$property1 => array($value1), $property2 => array($value2)), null
 			);
 			if ($cross) {
-				$rows2 = $this->writer->selectRecord($table, array(
+				$rows2 = $this->writer->queryRecord($table, array(
 				$property2 => array($value1), $property1 => array($value2)), null
 				);
 				$rows = array_merge($rows, $rows2);
@@ -348,7 +350,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$keys = $this->related($bean, $type);
 		if (count($keys) == 0 || !is_array($keys)) return array();
 		if (!$sql) return $this->oodb->batch($type, $keys);
-		$rows = $this->writer->selectRecord($type, array('id' => $keys), array($sql, $values), false);
+		$rows = $this->writer->queryRecord($type, array('id' => $keys), array($sql, $values));
 		return $this->oodb->convertToBeans($type, $rows);
 	}
 	/**
@@ -380,7 +382,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 */
 	public function unrelated(RedBean_OODBBean $bean, $type, $sql = null, $values = array()) {
 		$keys = $this->related($bean, $type);
-		$rows = $this->writer->selectRecord($type, array('id' => $keys), array($sql, $values), false, true);
+		$rows = $this->writer->queryRecordInverse($type, array('id' => $keys), array($sql, $values));
 		return $this->oodb->convertToBeans($type, $rows);
 	}
 }

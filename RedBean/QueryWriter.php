@@ -119,25 +119,36 @@ interface RedBean_QueryWriter {
 	 */
 	public function updateRecord($type, $updatevalues, $id = null);
 	/**
-	 * This method selects a record. You can provide a
-	 * collection of conditions using the following format:
-	 * array( $field1 => array($possibleValue1, $possibleValue2,... $possibleValueN ),
-	 * ...$fieldN=>array(...));
-	 * Also, additional SQL can be provided. This SQL snippet will be appended to the
-	 * query string. If the $delete parameter is set to TRUE instead of selecting the
-	 * records they will be deleted.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @throws Exception
-	 * @param string  $type    type of bean to select records from
-	 * @param array   $cond    conditions using the specified format
-	 * @param string  $asql    additional sql
-	 * @param boolean $delete  IF TRUE delete records (optional)
-	 * @param boolean $inverse IF TRUE inverse the selection (optional)
-	 *
-	 * @return array $records selected records
+	 * @deprecated
 	 */
 	public function selectRecord($type, $conditions, $addSql = null, $delete = false, $inverse = false);
+	/**
+	 * Selects records from the database.
+	 * 
+	 * @param string       $type       name of the table you want to query
+	 * @param array        $conditions criteria ( $column => array( $values ) )
+	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
+	 * @param boolean      $all        if FALSE and $addSQL is SET prefixes $addSQL with ' WHERE ' or ' AND ' 
+	 */
+	public function queryRecord($type, $conditions, $addSql = null, $all = false);
+	/**
+	 * Deletes records from the database.
+	 * @note $addSql is always prefixed with ' WHERE ' or ' AND .'
+	 * 
+	 * @param string       $type       name of the table you want to query
+	 * @param array        $conditions criteria ( $column => array( $values ) )
+	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
+	 */
+	public function deleteRecord($type, $conditions, $addSql = null);
+	/**
+	 * Selects records from the database using an 'NOT IN'-clause for conditions..
+	 * @note $addSql is always prefixed with ' WHERE ' or ' AND .'
+	 * 
+	 * @param string       $type       name of the table you want to query
+	 * @param array        $conditions criteria ( $column => array( $values ) )
+	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
+	 */
+	public function queryRecordInverse($type, $conditions, $addSql = null);
 	/**
 	 * This method will add a UNIQUE constraint index to a table on columns $columns.
 	 * This methods accepts a type and infers the corresponding table name.
