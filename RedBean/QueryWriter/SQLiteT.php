@@ -331,10 +331,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->adapter->exec('PRAGMA foreign_keys = 0 ');
 		foreach($this->getTables() as $t) {
 	 		try{
-	 			$this->adapter->exec("drop table if exists`$t`");
+	 			$this->adapter->exec("DROP TABLE IF EXISTS `$t`");
 	 		} catch(Exception $e){}
 	 		try{
-	 			$this->adapter->exec("drop view if exists`$t`");
+	 			$this->adapter->exec("DROP TABLE IF EXISTS `$t`");
 	 		} catch(Exception $e){}
 		}
 		$this->adapter->exec('PRAGMA foreign_keys = 1 ');

@@ -314,7 +314,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$columnNoQ = $this->esc($field, true);
 		$targetColumn  = $this->esc($targetField);
 		$targetColumnNoQ  = $this->esc($targetField, true);
-		$db = $this->adapter->getCell('select database()');
+		$db = $this->adapter->getCell('SELECT DATABASE()');
 		$fkName = 'fk_'.$tableNoQ.'_'.$columnNoQ.'_'.$targetColumnNoQ.($isDependent ? '_casc':'');
 		$cName = 'cons_'.$fkName;
 		$cfks =  $this->adapter->getCell("

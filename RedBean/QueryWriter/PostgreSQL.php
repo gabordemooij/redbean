@@ -82,8 +82,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @see RedBean_QueryWriter::getTables
 	 */
 	public function getTables() {
-		return $this->adapter->getCol("select table_name from information_schema.tables
-		where table_schema = 'public'");
+		return $this->adapter->getCol("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
 	}
 	/**
 	 * @see RedBean_QueryWriter::createTable
@@ -98,7 +97,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	public function getColumns($table) {
 		$table = $this->esc($table, true);
-		$columnsRaw = $this->adapter->get("select column_name, data_type from information_schema.columns where table_name='$table'");
+		$columnsRaw = $this->adapter->get("SELECT column_name, data_type FROM information_schema.columns WHERE table_name='$table'");
 		foreach($columnsRaw as $r) {
 			$columns[$r['column_name']] = $r['data_type'];
 		}
@@ -174,7 +173,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			$columns[$k] = $this->esc($v);
 		}
 		$r = $this->adapter->get("SELECT
-									i.relname as index_name
+									i.relname AS index_name
 								FROM
 									pg_class t,
 									pg_class i,
@@ -187,7 +186,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 									AND a.attnum = ANY(ix.indkey)
 									AND t.relkind = 'r'
 									AND t.relname = '$table'
-								ORDER BY  t.relname,  i.relname;");
+								ORDER BY t.relname, i.relname;");
 
 		$name = "UQ_".sha1($table.implode(',', $columns));
 		if ($r) {
@@ -254,8 +253,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 					AND kcu.column_name = '$columnNoQ'
 					AND ccu.column_name = '$targetColumnNoQ'
 					";
-	
-			
 			$row = $this->adapter->getRow($sql);
 			$flagAddKey = false;
 			if (!$row) $flagAddKey = true;
@@ -296,8 +293,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			$writer = $this;
 			$adapter = $this->adapter;
 			$fkCode = 'fk'.md5($table.$property1.$property2);
-			$sql = "
-						SELECT
+			$sql = "SELECT
 								c.oid,
 								n.nspname,
 								c.relname,
@@ -314,9 +310,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 						AND (cons.contype = 'f' OR cons.contype IS NULL)
 						AND
 						(  cons.conname = '{$fkCode}a'	OR  cons.conname = '{$fkCode}b' )
-
-					  ";
-
+					";
 			$rows = $adapter->get($sql);
 			if (!count($rows)) {
 				$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
@@ -340,10 +334,10 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
       	foreach($this->getTables() as $t) {
       		$t = $this->esc($t);
 	 		try{
-	 			$this->adapter->exec("drop table if exists $t CASCADE ");
+	 			$this->adapter->exec("DROP TABLE IF EXISTS $t CASCADE ");
 	 		} catch(Exception $e){}
 	 		try{
-	 			$this->adapter->exec("drop view if exists $t CASCADE ");
+	 			$this->adapter->exec("DROP TABLE IF EXISTS $t CASCADE ");
 	 		} catch(Exception $e){  throw $e; }
 		}
 		$this->adapter->exec('SET CONSTRAINTS ALL IMMEDIATE');

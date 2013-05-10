@@ -73,10 +73,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	public function createTable($table) {
 		$rawTable = $this->esc($table, true);
 		$table = $this->esc($table);
-		$sql = 'CREATE TABLE '.$table.' (
-                   "id" integer AUTO_INCREMENT,
-					CONSTRAINT "pk_'.$rawTable.'_id" PRIMARY KEY("id")
-		            )';
+		$sql = 'CREATE TABLE '.$table.' ("id" integer AUTO_INCREMENT, CONSTRAINT "pk_'.$rawTable.'_id" PRIMARY KEY("id"))';
 		$this->adapter->exec($sql);
 	}
 	/**
@@ -170,8 +167,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 				}
 			}
 		}
-		$sql = "ALTER TABLE $table
-                ADD CONSTRAINT UNIQUE $name (".implode(',', $columns).")";
+		$sql = "ALTER TABLE $table ADD CONSTRAINT UNIQUE $name (".implode(',', $columns).")";
 		$this->adapter->exec($sql);
 	}
 	/**
