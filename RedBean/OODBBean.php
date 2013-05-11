@@ -372,6 +372,79 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		}
 	}
 	/**
+	* Internal method.
+	* Obtains a shared list for a certain type.
+	*
+	* @param string $type the name of the list you want to retrieve.
+	*
+	* @return array
+	*/
+	private function getSharedList($type) {
+		$toolbox = $this->beanHelper->getToolbox();
+		$redbean = $toolbox->getRedBean();
+		if (self::$flagUseBeautyfulColumnnames ) {
+			$type = $this->beau($type);
+		}
+		//can we go for the fast-track?
+		if ($type !== $this->__info['type']) {
+			//yes, association is simple, go for fast-track using link-block
+			$writer = $toolbox->getWriter();
+			$types = array($this->__info['type'], $type);
+			$withSql = $writer->getLinkBlock($this->__info['type'], $type, $redbean->getAssociationManager()->getTable($types), $this->withSql);
+			$withSql .= $this->withSql;
+			array_unshift($this->withParams, $this->properties['id']);
+			$beans = $redbean->find($type, array(), array($withSql, $this->withParams), true);
+		} else {
+			$keys = $redbean->getAssociationManager()->related($this, $type);
+			if (!count($keys)) { 
+				$beans = array();
+			} else {
+				if (trim($this->withSql) !== '') {
+					$beans = $redbean->find($type, array('id' => $keys), array($this->withSql, $this->withParams), true);
+				} else {
+					$beans = $redbean->batch($type, $keys);
+				}
+			}
+		}
+		$this->withSql = '';
+		$this->withParams = array();
+		return $beans;
+	}
+	/**
+	* Internal method.
+	* Obtains the own list of a certain type.
+	*
+	* @param string $type name of the list you want to retrieve
+	*
+	* @return array
+	*/
+	private function getOwnList($type) {
+		if (self::$flagUseBeautyfulColumnnames) {
+			$type = $this->beau($type);
+		}
+		if ($this->aliasName) {
+			$parentField = $this->aliasName;
+			$myFieldLink = $this->aliasName.'_id';
+			$this->__info['sys.alias.'.$type] = $this->aliasName;
+			$this->aliasName = null;
+		} else {
+			$myFieldLink = $this->__info['type'].'_id';
+			$parentField = $this->__info['type'];
+		}
+		$beans = array();
+		if ($this->getID()>0) {
+			$params = array_merge(array($this->getID()), $this->withParams);
+			$beans = $this->beanHelper->getToolbox()->getRedBean()->find($type, array(), array(" $myFieldLink = ? ".$this->withSql, $params));
+		}
+		$this->withSql = '';
+		$this->withParams = array();
+		foreach($beans as $b) {
+			$b->__info['sys.parentcache.'.$parentField] = $this;
+		}
+		return $beans;
+	}
+
+	/**
 	 * Magic Getter. Gets the value for a specific property in the bean.
 	 * If the property does not exist this getter will make sure no error
 	 * occurs. This is because RedBean allows you to query (probe) for
@@ -408,28 +481,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			}
 			elseif (strpos($property, 'own') === 0 && ctype_upper(substr($property, 3, 1))) {
 				$type = lcfirst(substr($property, 3));
-				if (self::$flagUseBeautyfulColumnnames) {
-					$type = $this->beau($type);
-				}
-				if ($this->aliasName) {
-					$parentField = $this->aliasName;
-					$myFieldLink = $this->aliasName.'_id';
-					$this->__info['sys.alias.'.$type] = $this->aliasName;
-					$this->aliasName = null;
-				} else {
-					$myFieldLink = $this->__info['type'].'_id';
-					$parentField = $this->__info['type'];
-				}
-				$beans = array();
-				if ($this->getID()>0) {
-					$params = array_merge(array($this->getID()), $this->withParams);
-					$beans = $redbean->find($type, array(), array(" $myFieldLink = ? ".$this->withSql, $params));
-				}
-				$this->withSql = '';
-				$this->withParams = array();
-				foreach($beans as $b) {
-					$b->__info['sys.parentcache.'.$parentField] = $this;
-				}
+				$beans = $this->getOwnList($type);
 				$this->properties[$property] = $beans;
 				$this->__info['sys.shadow.'.$property] = $beans;
 				$this->__info['tainted'] = true;
@@ -437,29 +489,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			}
 			elseif (strpos($property, 'shared') === 0 && ctype_upper(substr($property, 6, 1))) {
 				$type = lcfirst(substr($property, 6));
-				if (self::$flagUseBeautyfulColumnnames ) {
-					$type = $this->beau($type);
-				}
-				//can we go for the fast-track?
-				if ($type !== $this->__info['type']) {
-					//yes, association is simple, go for fast-track using link-block
-					$writer = $toolbox->getWriter();
-					$types = array($this->__info['type'], $type);
-					$withSql = $writer->getLinkBlock($this->__info['type'], $type, $redbean->getAssociationManager()->getTable($types), $this->withSql);
-					$withSql .= $this->withSql;
-					array_unshift($this->withParams, $this->properties['id']);
-					$beans = $redbean->find($type, array(), array($withSql, $this->withParams), true);
-				} else {
-					$keys = $redbean->getAssociationManager()->related($this, $type);
-					if (!count($keys)) $beans = array(); else
-					if (trim($this->withSql) !== '') {
-						$beans = $redbean->find($type, array('id' => $keys), array($this->withSql, $this->withParams), true);
-					} else {
-						$beans = $redbean->batch($type, $keys);
-					}
-				}
-				$this->withSql = '';
-				$this->withParams = array();
+				$beans = $this->getSharedList($type);
 				$this->properties[$property] = $beans;
 				$this->__info['sys.shadow.'.$property] = $beans;
 				$this->__info['tainted'] = true;
