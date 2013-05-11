@@ -472,22 +472,19 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$this->__info['tainted'] = true; 
 				$bean = $this->getMeta('sys.parentcache.'.$property);
 				if (!$bean) { 
-					$type =  $this->getAlias($property);
-					$targetType = $this->properties[$fieldLink];
-					$bean =  $redbean->load($type, $targetType);
+					$type = $this->getAlias($property);
+					$bean = $redbean->load($type, $this->properties[$fieldLink]);
 				}
 				$this->properties[$property] = $bean;
 				return $this->properties[$property];
-			}
-			elseif (strpos($property, 'own') === 0 && ctype_upper(substr($property, 3, 1))) {
+			} elseif (strpos($property, 'own') === 0 && ctype_upper(substr($property, 3, 1))) {
 				$type = lcfirst(substr($property, 3));
 				$beans = $this->getOwnList($type);
 				$this->properties[$property] = $beans;
 				$this->__info['sys.shadow.'.$property] = $beans;
 				$this->__info['tainted'] = true;
 				return $this->properties[$property];
-			}
-			elseif (strpos($property, 'shared') === 0 && ctype_upper(substr($property, 6, 1))) {
+			} elseif (strpos($property, 'shared') === 0 && ctype_upper(substr($property, 6, 1))) {
 				$type = lcfirst(substr($property, 6));
 				$beans = $this->getSharedList($type);
 				$this->properties[$property] = $beans;
