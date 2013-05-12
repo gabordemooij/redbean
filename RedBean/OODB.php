@@ -845,13 +845,12 @@ class RedBean_OODB extends RedBean_Observable {
 				$nesting = substr($field, 0, $p);
 				$filtered = array();
 				foreach($filteredBeans as $bean) {
-					$inputBeanID = $bean->getMeta('sys.input-bean-id');
+					$addInputIDs = $bean->getMeta('sys.input-bean-id');
 					if (is_array($bean->$nesting)) {
 						$nestedBeans = $bean->$nesting;
 						foreach($nestedBeans as $nestedBean) {
 							$currentInputBeanIDs = $nestedBean->getMeta('sys.input-bean-id'); 
 							if (!is_array($currentInputBeanIDs)) $currentInputBeanIDs = array();
-							$addInputIDs = $bean->getMeta('sys.input-bean-id');
 							foreach($addInputIDs as $addInputID) $currentInputBeanIDs[$addInputID] = $addInputID;
 							$nestedBean->setMeta('sys.input-bean-id', $currentInputBeanIDs);
 						}
@@ -860,7 +859,6 @@ class RedBean_OODB extends RedBean_Observable {
 						$nestedBean = $bean->$nesting;
 						$currentInputBeanIDs = $nestedBean->getMeta('sys.input-bean-id'); 
 						if (!is_array($currentInputBeanIDs)) $currentInputBeanIDs = array();
-						$addInputIDs = $bean->getMeta('sys.input-bean-id');
 						foreach($addInputIDs as $addInputID) $currentInputBeanIDs[$addInputID] = $addInputID;
 						$nestedBean->setMeta('sys.input-bean-id', $currentInputBeanIDs);	
 						$filtered[] = $bean->$nesting;
