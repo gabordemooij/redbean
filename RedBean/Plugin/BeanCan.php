@@ -175,43 +175,48 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 */
 	public function handleREST($root, $uri, $method, $payload = array()) {
 		try {
+			if (!preg_match('|^[\w\-/]*$|', $uri)) return $this->resp(null, 0, -32700, 'URI contains invalid characters.');
+			if (!is_array($payload)) return $this->resp(null, 0, -32700, 'Payload needs to be array.');
 			$finder = new RedBean_Finder(RedBean_Facade::$toolbox);
-			$uri = explode('/', $uri);
+			$uri = ((strlen($uri))) ? explode('/', ($uri)) : array();
 			if ($method == 'PUT') {
 				$list = array_pop($uri); //grab the list
 			}
-			$bean = $finder->findByPath($root, $uri);
-			if ($bean) {
-				if ($method == 'GET') {
-					return $this->resp($bean->export()); 
-				} elseif ($method == 'DELETE') {
-					RedBean_Facade::trash($bean);
-					return $this->resp('OK');
-				} elseif ($method == 'POST') {
-					$bean->import($payload['bean']);
-					$id = RedBean_Facade::store($bean);
-					$bean = RedBean_Facade::load($bean->getMeta('type'), $bean->id);
-					return $this->resp($bean->export());
-				} elseif ($method == 'PUT') {
-					$newBean = RedBean_Facade::dispense($payload['type']);
-					$newBean->import($payload['bean']);
-					if (strpos($list, 'shared-') === false) {
-						$listName = 'own'.ucfirst($list);
-					} else {
-						$listName = 'shared'.ucfirst(substr($list,7));
-					}
-					array_push($bean->$listName, $newBean); 
-					RedBean_Facade::store($bean);
-					$newBean = RedBean_Facade::load($newBean->getMeta('type'), $newBean->id);
-					return $this->resp($newBean->export());	
+			try {
+				$bean = $finder->findByPath($root, $uri);
+			} catch(Exception $e) {
+				return $this->resp(null, 0, -32600, $e->getMessage());
+			}
+			if ($method == 'GET') {
+				return $this->resp($bean->export()); 
+			} elseif ($method == 'DELETE') {
+				RedBean_Facade::trash($bean);
+				return $this->resp('OK');
+			} elseif ($method == 'POST') {
+				$bean->import($payload['bean']);
+				$id = RedBean_Facade::store($bean);
+				$bean = RedBean_Facade::load($bean->getMeta('type'), $bean->id);
+				return $this->resp($bean->export());
+			} elseif ($method == 'PUT') {
+				$newBean = RedBean_Facade::dispense($payload['type']);
+				$newBean->import($payload['bean']);
+				if (strpos($list, 'shared-') === false) {
+					$listName = 'own'.ucfirst($list);
 				} else {
-					$answer = call_user_func_array(array($bean,$method),$payload['param']);
-					return $this->resp($answer);
+					$listName = 'shared'.ucfirst(substr($list,7));
 				}
+				array_push($bean->$listName, $newBean); 
+				RedBean_Facade::store($bean);
+				$newBean = RedBean_Facade::load($newBean->getMeta('type'), $newBean->id);
+				return $this->resp($newBean->export());	
+			} else {
+				if (!isset($payload['param'])) return $this->resp(null, 0, -32600, 'No parameters.'); 
+				$answer = call_user_func_array(array($bean,$method),$payload['param']);
+				return $this->resp($answer);
 			}
 		}
 		catch(Exception $e) {
-			return $this->resp(null, 0, -32099);
+			return $this->resp(null, 0, -32099, 'Exception: '.$e->getCode());
 		}
 	}
 }

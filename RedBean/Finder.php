@@ -157,6 +157,7 @@ class RedBean_Finder {
 	 */
 	public function findByPath($bean, $steps) {
 		$n = count($steps);
+		if (!$n) return $bean;
 		if ($n % 2) throw new RedBean_Exception_Security('Invalid path: needs 1 more element.');
 		for($i = 0; $i < $n; $i += 2) {
 			if (strpos($steps[$i],'shared-') === false) $listName = 'own'.ucfirst($steps[$i]); else $listName = 'shared'.ucfirst(substr($steps[$i],7));

@@ -46,6 +46,35 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		R::store($user);
 
 		$can = new RedBean_Plugin_BeanCan;
+		$resp = $can->handleREST($user, '@!#?', 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'URI contains invalid characters.');
+		asrt((string)$resp['error']['code'], '-32700');
+		$resp = $can->handleREST($user, 'blah', 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'Invalid path: needs 1 more element.');
+		asrt((string)$resp['error']['code'], '-32600');
+		asrt((string)$resp['jsonrpc'], '2.0');
+		asrt((string)$resp['id'], '0');
+		$resp = $can->handleREST($user, '/blah', 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'Cannot access list.');
+		asrt((string)$resp['error']['code'], '-32600');
+		asrt((string)$resp['jsonrpc'], '2.0');
+		asrt((string)$resp['id'], '0');
+		$resp = $can->handleREST($user, 'site/2', 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'Cannot access bean.');
+		asrt((string)$resp['error']['code'], '-32600');
+		asrt((string)$resp['jsonrpc'], '2.0');
+		asrt((string)$resp['id'], '0');
+		$resp = $can->handleREST($user, 'blah/2', 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'Cannot access bean.');
+		$resp = $can->handleREST($user, '', 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['jsonrpc'], '2.0');
+		asrt((string)$resp['result']['name'], 'me');
 		
 		//Send a GET /site/1 request to BeanCan Server 
 		$resp = $can->handleREST($user, 'site/'.$site->id , 'GET');
