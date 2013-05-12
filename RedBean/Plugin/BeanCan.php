@@ -98,7 +98,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		$beanType = $method[0];
 		$action = $method[1];
 		if (!($this->whitelist === 'all' || (isset($this->whitelist[$beanType]) && in_array($action,$this->whitelist[$beanType])))) {
-			return $this->resp(null, $id, -32600, 'This bean is not available. Set whitelist to "all" or add to whitelist');
+			return $this->resp(null, $id, -32600, 'This bean is not available. Set whitelist to "all" or add to whitelist.');
 		}
 		//May not contain anything other than ALPHA NUMERIC chars and _
 		if (preg_match('/\W/', $beanType)) return $this->resp(null, $id, -32600, 'Invalid Bean Type String');
@@ -186,6 +186,10 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 				$bean = $finder->findByPath($root, $uri);
 			} catch(Exception $e) {
 				return $this->resp(null, 0, -32600, $e->getMessage());
+			}
+			$beanType = $bean->getMeta('type');
+			if (!($this->whitelist === 'all' || (isset($this->whitelist[$beanType]) && in_array($method,$this->whitelist[$beanType])))) {
+				return $this->resp(null, 0, -32600, 'This bean is not available. Set whitelist to "all" or add to whitelist.');
 			}
 			if ($method == 'GET') {
 				return $this->resp($bean->export()); 

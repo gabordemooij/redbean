@@ -46,6 +46,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		R::store($user);
 
 		$can = new RedBean_Plugin_BeanCan;
+		$can->setWhitelist('all');
 		$resp = $can->handleREST($user, '@!#?', 'GET');
 		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'URI contains invalid characters.');
@@ -79,9 +80,28 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		//Send a GET /site/1 request to BeanCan Server 
 		$resp = $can->handleREST($user, 'site/'.$site->id , 'GET');
 		$resp = json_decode($resp, true);
+	 	asrt((string)$resp['result']['id'], (string)$site->id);
+		asrt((string)$resp['result']['name'], (string)$site->name);
+		asrt((string)$resp['result']['user_id'], (string)$site->user_id);
+		$can->setWhitelist(array('page'=>array('POST')));
+		$resp = $can->handleREST($user, 'site/'.$site->id , 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'],'This bean is not available. Set whitelist to "all" or add to whitelist.');
+		asrt((string)$resp['error']['code'], '-32600');
+		$can->setWhitelist(array('site'=>array('POST')));
+		$resp = $can->handleREST($user, 'site/'.$site->id , 'GET');
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'],'This bean is not available. Set whitelist to "all" or add to whitelist.');
+		asrt((string)$resp['error']['code'], '-32600');
+		$can->setWhitelist(array('site'=>array('GET')));
+		$resp = $can->handleREST($user, 'site/'.$site->id , 'GET');
+		$resp = json_decode($resp, true);
 		asrt((string)$resp['result']['id'], (string)$site->id);
 		asrt((string)$resp['result']['name'], (string)$site->name);
 		asrt((string)$resp['result']['user_id'], (string)$site->user_id);
+		asrt(!isset($resp['error']), true);
+		$can->setWhitelist('all');
+
 		//Send a GET /site/1/page/1 request to BeanCan Server
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id , 'GET');
 		$resp = json_decode($resp, true);
