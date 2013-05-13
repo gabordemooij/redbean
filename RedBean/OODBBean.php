@@ -780,9 +780,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * 
 	 * @return boolean 
 	 */
-	public function hasChanged($property) {
-		if (!isset($this->properties[$property])) return false;
-		return ($this->old($property) != $this->properties[$property]);
+	public function hasChanged($property){
+		return (array_key_exists($property, $this->properties)) ? 
+			$this->old($property) != $this->properties[$property] : false;
 	}
 	/**
 	 * Creates a N-M relation by linking an intermediate bean.
