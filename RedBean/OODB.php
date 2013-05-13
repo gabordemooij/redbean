@@ -823,8 +823,19 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param array $beans beans
 	 * @param array $types types to load
 	 */
-	public function preload($beans, $types, $closure = null) {
-		if (is_string($types)) $types = explode(',', $types);
+	public function preload($beans, $typeList, $closure = null) {
+		if (!is_array($beans)) {
+			$beans = array($beans);
+		}
+		if (is_string($typeList)) {
+			$typeList = explode(',', $typeList);
+			foreach($typeList as $value) {
+				if (strpos($value, '|') !== false) {
+					list($key, $newValue) = explode('|', $value);
+					$types[$key] = $newValue;
+				} else $types[] = $value;
+			}
+		} else $types = $typeList;
 		$oldFields = array(); $i = 0; $retrievals = array(); $oldField = '';
 		foreach($types as $key => $typeInfo) {
 			list($type,$sqlObj) = (is_array($typeInfo) ? $typeInfo : array($typeInfo, null));

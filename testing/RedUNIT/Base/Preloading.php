@@ -202,6 +202,16 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		asrt(($text->page->book->id)>0,true);
 		asrt(($text->page->book->fetchAs('author')->coauthor->id)>0,true);
 		
+		//now test preloading of own-list using short notation
+		R::nuke();
+		$tree = R::dispense('tree');
+		$tree->ownLeaf = R::dispense('leaf', 3);
+		$id = R::store($tree);
+		$tree = R::load('tree', $id);
+		R::preload($tree,'ownLeaf|leaf');
+		R::nuke();
+		asrt(count($tree->ownLeaf), 3);
+		
 		//now test preloading of own-lists
 		R::nuke();
 		$authors = R::dispense('author',2);
@@ -214,7 +224,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		}
 		R::storeAll($authors);
 		$authors = R::find('author');
-		R::preload($authors,array('ownBook'=>'book','ownBook.ownPage'=>'page','ownBook.ownPage.ownText'=>'text'));
+		R::preload($authors,'ownBook|book,ownBook.ownPage|page,ownBook.ownPage.ownText|text');
 		R::nuke();
 		$author = reset($authors);
 		asrt(count($author->ownBook),2);
