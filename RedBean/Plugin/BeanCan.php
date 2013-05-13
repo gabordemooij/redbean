@@ -197,11 +197,23 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 				RedBean_Facade::trash($bean);
 				return $this->resp('OK');
 			} elseif ($method == 'POST') {
+				if (!isset($payload['bean'])) return $this->resp(null, 0, -32602, 'Missing parameter \'bean\'.');
+				if (!is_array($payload['bean'])) return $this->resp(null, 0, -32602, 'Parameter \'type\' must be object/array.');
+				foreach($payload['bean'] as $key => $value) {
+					if (!is_string($key) || !is_string($value)) return $this->resp(null, 0, -32602, 'Object "bean" invalid.');
+				}
 				$bean->import($payload['bean']);
 				$id = RedBean_Facade::store($bean);
 				$bean = RedBean_Facade::load($bean->getMeta('type'), $bean->id);
 				return $this->resp($bean->export());
 			} elseif ($method == 'PUT') {
+				if (!isset($payload['type'])) return $this->resp(null, 0, -32602, 'Missing parameter \'type\'.');
+				if (!isset($payload['bean'])) return $this->resp(null, 0, -32602, 'Missing parameter \'bean\'.');
+				if (!is_string($payload['type'])) return $this->resp(null, 0, -32602, 'Parameter \'type\' must be string.');
+				if (!is_array($payload['bean'])) return $this->resp(null, 0, -32602, 'Parameter \'type\' must be object/array.');
+				foreach($payload['bean'] as $key => $value) {
+					if (!is_string($key) || !is_string($value)) return $this->resp(null, 0, -32602, 'Object \'bean\' invalid.');
+				}
 				$newBean = RedBean_Facade::dispense($payload['type']);
 				$newBean->import($payload['bean']);
 				if (strpos($list, 'shared-') === false) {
@@ -215,7 +227,8 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 				return $this->resp($newBean->export());	
 			} else {
 				if (!isset($payload['param'])) return $this->resp(null, 0, -32600, 'No parameters.'); 
-				$answer = call_user_func_array(array($bean,$method),$payload['param']);
+				if (!is_array($payload['param'])) return $this->resp(null, 0, -32602, 'Parameter \'param\' must be object/array.');
+				$answer = call_user_func_array(array($bean,$method), $payload['param']);
 				return $this->resp($answer);
 			}
 		}
