@@ -249,4 +249,52 @@ interface RedBean_QueryWriter {
 	 * Removes all tables and views from the database. 
 	 */
 	public function wipeAll();
+	
+	/**
+	 * Renames an association. For instance if you would like to refer to
+	 * album_song as: track you can specify this by calling this method like:
+	 * 
+	 * renameAssociation('album_song','track')
+	 * 
+	 * This allows:
+	 * 
+	 * $album->sharedSong 
+	 * 
+	 * to add/retrieve beans from track instead of album_song.
+	 * Also works for exportAll().
+	 * 
+	 * This method also accepts a single associative array as
+	 * its first argument.
+	 * 
+	 * @param string|array $from
+	 * @param string $to (optional)
+	 * 
+	 * @return void 
+	 */
+	public function renameAssocTable($from, $to = null);
+	
+	/**
+	 * Returns an SQL snippet for use with selectRecord to obtain records
+	 * from a link table.
+	 *  
+	 * @param string $sourceType the type of bean you want to use as a link reference
+	 * @param string $destType   the target type
+	 * @param string $linkType   link table to use
+	 * 
+	 * @return string 
+	 */
+	public function getLinkBlock($sourceType, $destType, $linkType);
+	
+	
+	/** 
+	 * Returns the format for link tables.
+	 * Given an array containing two type names this method returns the
+	 * name of the link table to be used to store and retrieve
+	 * association records.
+	 *
+	 * @param  array $types two types array($type1, $type2)
+	 *
+	 * @return string $linktable name of the link table
+	 */
+	public function getAssocTable($types);
 }

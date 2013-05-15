@@ -262,14 +262,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $rows;
 	}
 	/**
-	 * Returns an SQL snippet for use with selectRecord to obtain records
-	 * from a link table.
-	 *  
-	 * @param string $sourceType the type of bean you want to use as a link reference
-	 * @param string $destType   the target type
-	 * @param string $linkType   link table to use
-	 * 
-	 * @return string 
+	 * @see RedBean_QueryWriter::getLinkBlock
 	 */
 	public function getLinkBlock($sourceType, $destType, $linkType) {
 		$sourceTable = $this->esc($sourceType.'_id');
@@ -342,25 +335,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		} catch(Exception $e) {} //Failure of fk-constraints is not a problem
 	}
 	/**
-	 * Renames an association. For instance if you would like to refer to
-	 * album_song as: track you can specify this by calling this method like:
-	 * 
-	 * renameAssociation('album_song','track')
-	 * 
-	 * This allows:
-	 * 
-	 * $album->sharedSong 
-	 * 
-	 * to add/retrieve beans from track instead of album_song.
-	 * Also works for exportAll().
-	 * 
-	 * This method also accepts a single associative array as
-	 * its first argument.
-	 * 
-	 * @param string|array $from
-	 * @param string $to (optional)
-	 * 
-	 * @return void 
+	 * @see RedBean_QueryWriter::renameAssociation
 	 */
 	public static function renameAssociation($from, $to = null) {
 		if (is_array($from)) {
@@ -369,21 +344,30 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		self::$renames[$from] = $to;
 	}
+	
 	/**
-	 * Returns the format for link tables.
-	 * Given an array containing two type names this method returns the
-	 * name of the link table to be used to store and retrieve
-	 * association records.
-	 *
-	 * @param  array $types two types array($type1, $type2)
-	 *
-	 * @return string $linktable name of the link table
+	 * @see RedBean_QueryWriter::renameAssocTable
+	 */
+	public function renameAssocTable($from, $to = null) {
+		return self::renameAssociation($from, $to);
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::getAssocTableFormat
 	 */
 	public static function getAssocTableFormat($types) {
 		sort($types);
 		$assoc = (implode('_', $types));
 		return (isset(self::$renames[$assoc])) ? self::$renames[$assoc] : $assoc;
 	}
+	
+	/**
+	 * @see RedBean_QueryWriter::getAssocTable
+	 */
+	public function getAssocTable($types) {
+		return self::getAssocTableFormat($types);
+	}
+	
 	/**
 	 * @see RedBean_QueryWriter::addConstraint
 	 */

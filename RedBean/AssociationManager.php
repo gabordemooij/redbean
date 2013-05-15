@@ -47,7 +47,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return string $table table
 	 */
 	public function getTable($types) {
-		return RedBean_QueryWriter_AQueryWriter::getAssocTableFormat($types);
+		return $this->writer->getAssocTable($types);
 	}
 	/**
 	 * Associates two beans with eachother using a many-to-many relation.
