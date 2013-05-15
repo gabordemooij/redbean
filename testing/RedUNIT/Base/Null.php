@@ -26,6 +26,14 @@ class RedUNIT_Base_Null extends RedUNIT_Base {
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
+		//NULL can change bean
+		$bean = R::dispense('bean');
+		$bean->bla = 'a';
+		R::store($bean);
+		$bean = $bean->fresh();
+		asrt($bean->hasChanged('bla'), false);
+		$bean->bla = null;
+		asrt($bean->hasChanged('bla'), true);
 		//NULL test
 		$page = R::dispense('page');
 		$book = R::dispense('book');

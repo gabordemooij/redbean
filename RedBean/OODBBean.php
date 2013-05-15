@@ -825,4 +825,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		array_push($this->$list, $bean);
 		return $bean;
 	}
+	
+	/**
+	 * Returns the same bean freshly loaded from the database.
+	 * 
+	 * @return RedBean_OODBBean 
+	 */
+	public function fresh() {
+		return $this->beanHelper->getToolbox()->getRedBean()->load($this->getMeta('type'), $this->id);
+	}
 }
