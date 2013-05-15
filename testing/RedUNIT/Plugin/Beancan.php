@@ -76,10 +76,6 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$resp = json_decode($resp, true);
 		asrt((string)$resp['jsonrpc'], '2.0');
 		asrt((string)$resp['result']['name'], 'me');
-		$resp = $can->handleREST($user, 'book', 'PUT', array('title'=>'A nice book'));
-		$resp = json_decode($resp, true);
-		asrt((string)$resp['error']['code'], '-32602');
-		asrt((string)$resp['error']['message'], 'Missing parameter \'type\'.');
 		$resp = $can->handleREST($user, 'book', 'PUT', '');
 		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['code'], '-32700');
