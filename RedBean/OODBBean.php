@@ -57,6 +57,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	private $aliasName = NULL;
 	/**
+	 * @var string
+	 */
+	private $via = NULL;
+	/**
 	 * By default own-lists and shared-lists no longer have IDs as keys (3.3+),
 	 * this is because exportAll also does not offer this feature and we want the
 	 * ORM to be more consistent. Also, exporting without keys makes it easier to
@@ -382,13 +386,21 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	private function getSharedList($type) {
 		$toolbox = $this->beanHelper->getToolbox();
 		$redbean = $toolbox->getRedBean();
+		$writer = $toolbox->getWriter();
+		if ($this->via) {
+			$oldName = $writer->getAssocTable(array($this->__info['type'],$type));
+			if ($oldName !== $this->via) {
+				//set the new renaming rule
+				$writer->renameAssocTable($oldName, $this->via);
+				$this->via = null;
+			} 
+		}
 		if (self::$flagUseBeautyfulColumnnames ) {
 			$type = $this->beau($type);
 		}
 		//can we go for the fast-track?
 		if ($type !== $this->__info['type']) {
 			//yes, association is simple, go for fast-track using link-block
-			$writer = $toolbox->getWriter();
 			$types = array($this->__info['type'], $type);
 			$withSql = $writer->getLinkBlock($this->__info['type'], $type, $redbean->getAssociationManager()->getTable($types), $this->withSql);
 			$withSql .= $this->withSql;
@@ -834,4 +846,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	public function fresh() {
 		return $this->beanHelper->getToolbox()->getRedBean()->load($this->getMeta('type'), $this->id);
 	}
+	
+	/**
+	 * Registers a association renaming globally.
+	 * 
+	 * @param string $via 
+	 */
+	public function via($via) {
+		$this->via = $via;
+		return $this;
+	}	
 }

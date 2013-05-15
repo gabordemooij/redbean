@@ -23,6 +23,22 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 	 */
 	public function run() {
 		
+		testpack('Test via()');
+		R::nuke();
+		$d = R::dispense('doctor')->setAttr('name', 'd1');
+		$p = R::dispense('patient')->setAttr('name', 'p1');
+		$d->via('consult')->sharedPatient[] = $p;
+		R::store($d);
+		$d = R::load('doctor', $d->id);
+		asrt(count($d->sharedPatient), 1);
+		asrt(in_array('consult', R::$writer->getTables()), true);
+		R::nuke();
+		asrt(in_array('consult', R::$writer->getTables()), false);
+		$d = R::dispense('doctor')->setAttr('name', 'd1');
+		$p = R::dispense('patient')->setAttr('name', 'p1');
+		R::associate($d,$p);
+		asrt(in_array('consult', R::$writer->getTables()), true);
+		
 		testpack('Test fast-track linkBlock exceptions');
 		//Fast track link block code should not affect self-referential N-M relations.
 		R::nuke();
