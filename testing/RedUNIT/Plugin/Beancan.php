@@ -80,6 +80,16 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['code'], '-32700');
 		asrt((string)$resp['error']['message'], 'Payload needs to be array.');
+		
+		$resp = $can->handleREST($user, '', 'PUT',array());
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['code'], '-32602');
+		asrt((string)$resp['error']['message'], 'Missing list.');
+		$resp = $can->handleREST($user, 'shared-bo-ok', 'PUT',array());
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['code'], '-32700');
+		asrt((string)$resp['error']['message'], 'Invalid list.');
+		
 		$resp = $can->handleREST($user, 'book', 'PUT', array('type'=>'book'));
 		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['code'], '-32602');

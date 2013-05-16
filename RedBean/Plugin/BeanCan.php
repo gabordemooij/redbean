@@ -181,11 +181,10 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 			$uri = ((strlen($uri))) ? explode('/', ($uri)) : array();
 			if ($method == 'PUT') {
 				if (count($uri)<1) {
-					 return $this->resp(null, 0, -32602, 'Missing \'list\'.');
+					 return $this->resp(null, 0, -32602, 'Missing list.');
 				}
 				$list = array_pop($uri); //grab the list
-				$parts = explode('-', $list);
-				$type = end($parts);
+				$type = (strpos($list, 'shared-')===0) ? substr($list, 7) : $list;
 				if (!preg_match('|^[\w]+$|', $type)) return $this->resp(null, 0, -32700, 'Invalid list.');
 			}
 			try {
