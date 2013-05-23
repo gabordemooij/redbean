@@ -212,6 +212,23 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base {
 		asrt(count($village2->sharedArmy),1);
 		asrt(count($village1->ownArmy),0);
 		asrt(count($village2->ownArmy),0);
+		
+		//aliased column should be beautified
+		R::nuke();
+		$points = R::dispense('point', 2);
+		$line = R::dispense('line');
+		$line->pointA = $points[0];
+		$line->pointB = $points[1];
+		R::store($line);
+		$line2 = R::dispense('line');
+		$line2->pointA = $line->pointA;
+		$line2->pointB = R::dispense('point');
+		R::store($line2);
+		//now we have two points per line (1-to-x)
+		//I want to know which lines cross A:
+		$a = R::load('point', $line->pointA->id); //reload A
+		$lines = $a->alias('pointA')->ownLine;
+		asrt(count($lines), 2);
 	}	
 }
 

@@ -347,6 +347,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return RedBean_OODBBean 
 	 */
 	public function alias($aliasName) {
+		if (self::$flagUseBeautyfulColumnnames ) {
+			$aliasName = $this->beau($aliasName);
+		}
 		$this->aliasName = $aliasName;
 		return $this;
 	}
