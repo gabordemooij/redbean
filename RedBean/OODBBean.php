@@ -351,6 +351,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		return $this;
 	}
 	/**
+	* Returns properties of bean as an array.
+	*
+	* @return array
+	*/
+	public function getProperties() { 
+		return $this->properties; 
+	}
+	/**
 	* Turns a camelcase property name into an underscored property name.
 	* Examples:
 	*	oneACLRoute -> one_acl_route
