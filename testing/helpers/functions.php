@@ -240,7 +240,7 @@ function setget($val) {
  * 
  * @return string $out Output JSON from BeanCan server. 
  */
-function s($data,$params=null,$id="1234") {
+function s($data,$params=null,$id="1234", $whiteList = 'all') {
 	$j = array(
 		"jsonrpc"=>"2.0",
 		"method"=>$data,
@@ -249,7 +249,7 @@ function s($data,$params=null,$id="1234") {
 	);
 	$can = new RedBean_Plugin_BeanCan;
 	$request = json_encode($j);
-	$can->setWhitelist('all');
+	$can->setWhitelist($whiteList);
 	$out =  $can->handleJSONRequest( $request );
 	return $out;
 }
