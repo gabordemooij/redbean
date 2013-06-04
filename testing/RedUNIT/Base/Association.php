@@ -23,6 +23,30 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 	 */
 	public function run() {
 
+		testpack('Test fast-track deletion');
+		R::nuke();
+		$ghost = R::dispense('ghost');
+		$house = R::dispense('house');
+		R::associate($house, $ghost);
+		Model_Ghost_House::$deleted = false;
+		R::unassociate($house, $ghost);
+		asrt(Model_Ghost_House::$deleted, true); //no fast-track, assoc bean got trashed
+		Model_Ghost_House::$deleted = false;
+		R::unassociate($house, $ghost, true);
+		asrt(Model_Ghost_House::$deleted, false); //fast-track, assoc bean got deleted right away
+		
+		//same but for cross-assoc
+		R::nuke();
+		$ghost = R::dispense('ghost');
+		$ghost2 = R::dispense('ghost');
+		R::associate($ghost, $ghost2);
+		Model_Ghost_Ghost::$deleted = false;
+		R::unassociate($ghost, $ghost2);
+		asrt(Model_Ghost_Ghost::$deleted, true); //no fast-track, assoc bean got trashed
+		Model_Ghost_Ghost::$deleted = false;
+		R::unassociate($ghost, $ghost2, true);
+		asrt(Model_Ghost_Ghost::$deleted, false); //fast-track, assoc bean got deleted right away
+		
 		//Test poly
 		testpack('Testing poly');
 		R::nuke();
@@ -344,4 +368,18 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		
 	}	
 	
+}
+
+class Model_Ghost_House extends RedBean_SimpleModel {
+	public static $deleted = false;
+	public function delete() {
+		self::$deleted = true;
+	}
+}
+
+class Model_Ghost_Ghost extends RedBean_SimpleModel {
+	public static $deleted = false;
+	public function delete() {
+		self::$deleted = true;
+	}
 }
