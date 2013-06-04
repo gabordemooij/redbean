@@ -31,6 +31,13 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 	 */
 	public function run() {
 
+		testpack('Test bean->getProperties method');
+		$bean = R::dispense('bean');
+		$bean->property = 'hello';
+		$props = $bean->getProperties();
+		asrt(isset($props['property']), true);
+		asrt($props['property'], 'hello');
+		
 		testpack('Test with- and withCondition with Query Builder');
 		R::nuke();
 		$book = R::dispense('book');
