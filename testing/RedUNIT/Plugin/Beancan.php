@@ -178,6 +178,10 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$resp = json_decode($resp, true);
 		asrt((string)$resp['result'], 'mail has been sent to me');
 		
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id, 'err', array('param'=>array('me')));
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'Exception: 123');
+		
 		//test Access control
 		$setting = R::dispense('setting');
 		$option = R::dispense('option');
@@ -525,6 +529,9 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 class Model_Page extends RedBean_SimpleModel {
 	public function mail($who) {
 		return 'mail has been sent to '.$who;
+	}
+	public function err() {
+		throw new Exception('fake error',123);
 	}
 }
 
