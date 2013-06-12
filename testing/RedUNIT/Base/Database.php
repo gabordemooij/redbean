@@ -81,6 +81,9 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 		$rooms = R::getAssoc('SELECT `number`, kind FROM rooms2 ORDER BY kind ASC');
 		asrt(count($rooms),0);
 		asrt(is_array($rooms),true);
+
+		//getCell should return NULL in case of exception
+		asrt(null, R::getCell('SELECT dream FROM fantasy'));
 		
 	}
 }

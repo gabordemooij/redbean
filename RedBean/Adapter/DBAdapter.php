@@ -96,7 +96,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		$this->sql = $sql;
 		if (!$noSignal) $this->signal('sql_exec', $this);
 		$arr = $this->db->getCol($sql, $aValues);
-		if ($arr && is_array($arr))	return ($arr[0]); else return false;
+		if ($arr && is_array($arr) && isset($arr[0])) return ($arr[0]); else return null;
 	}
 	/**
 	 * @see RedBean_Adapter::getInsertID

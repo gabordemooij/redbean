@@ -586,7 +586,7 @@ class RedBean_Facade {
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 				)) {
-					return array();
+					return ($method === 'getCell') ? null : array();
 				} else {
 					throw $e;
 				}
