@@ -133,4 +133,14 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	public function setUseNullFlag($yesNo) {
 		self::$useNULLForEmptyString = (boolean) $yesNo;
 	}
+
+	/**
+	* Static version of setUseNullFlag.
+	*
+	* @param boolean $yesNo
+	*/
+	public static function setUseNullFlagSt($yesNo){
+		self::$useNULLForEmptyString = (boolean) $yesNo;
+	}
+
 }

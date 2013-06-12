@@ -383,7 +383,9 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin {
 		asrt($bean->name,'Fred');
 		asrt($bean->phone,'');
 		
-		RedBean_Plugin_Cooker::setUseNullFlag(true);
+		$cooker = new RedBean_Plugin_Cooker;
+		$cooker->setUseNullFlag(true);
+		
 		$form = array(
 			'type'=>'person',
 			'name'=>'Fred',
@@ -392,7 +394,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin {
 		$bean = R::graph($form);
 		asrt($bean->name,'Fred');
 		asrt($bean->phone,null);
-		RedBean_Plugin_Cooker::setUseNullFlag(false);
+		RedBean_Plugin_Cooker::setUseNullFlagSt(false);
 		
 		
 		//save a form using graph and ignore empty beans, wrong nesting
