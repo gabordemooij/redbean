@@ -243,7 +243,20 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		catch(PDOException $e){
 			pass();
 			//make sure the message is non-descriptive - avoid revealing security details if user hasnt configured error reporting improperly.
-			asrt($e->getMessage(),'Could not connect to database.');
+			asrt($e->getMessage(),'Could not connect to database (?).');
+		}
+
+		R::setup('blackhole:dbname=mydatabase;password=dontshowthisone');
+		pass();
+		asrt(isset(R::$toolboxes['default']),true);
+		try{
+			(R::$toolboxes['default']->getDatabaseAdapter()->getDatabase()->connect());
+			fail();
+		}
+		catch(PDOException $e){
+			pass();
+			//make sure the message is non-descriptive - avoid revealing security details if user hasnt configured error reporting improperly.
+			asrt($e->getMessage(),'Could not connect to database (mydatabase).');
 		}
 		
 		testpack('Can we pass a PDO object to Setup?');
