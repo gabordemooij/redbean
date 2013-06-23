@@ -18,6 +18,13 @@
  */
 abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
+	 * Query writer mode
+	 */
+	const C_MODE_SELECT = 0;
+	const C_MODE_DELETE = 1;
+	const C_MODE_COUNT = 2;
+	
+	/**
 	 * @var array
 	 */
 	public $typeno_sqltype = array();
@@ -163,27 +170,35 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * @see RedBean_QueryWriter::queryRecord
 	 */
-	public function queryRecord($type, $conditions, $addSql = null, $all = false) { 
-		return $this->writeStandardQuery($type, $conditions, $addSql, false, false, $all);
+	public function queryRecord($type, $conditions, $addSql = null, $all = false) {
+		return $this->writeStandardQuery($type, $conditions, $addSql, self::C_MODE_SELECT, false, $all);
+	}
+	/**
+	 * @see RedBean_QueryWriter::queryRecordCount
+	 */
+	public function queryRecordCount($type, $conditions, $addSql = null) {
+		$rows = $this->writeStandardQuery($type, $conditions, $addSql, self::C_MODE_COUNT, false, false);
+		if (is_array($rows) && is_array($rows[0])) return (integer) reset($rows[0]);
+		return 0;
 	}
 	/**
 	 * @see RedBean_QueryWriter::deleteRecord
 	 */
 	public function deleteRecord($type, $conditions, $addSql = null) {
-		return $this->writeStandardQuery($type, $conditions, $addSql, true, false, false);
+		return $this->writeStandardQuery($type, $conditions, $addSql, self::C_MODE_DELETE, false, false);
 	}
 	/**
 	 * @see RedBean_QueryWriter::queryRecordInverse
 	 */
 	public function queryRecordInverse($type, $conditions, $addSql = null) {
-		return $this->writeStandardQuery($type, $conditions, $addSql, false, true, false);
+		return $this->writeStandardQuery($type, $conditions, $addSql, self::C_MODE_SELECT, true, false);
 	}
 	/**
 	 * @deprecated
 	 * @see RedBean_QueryWriter::selectRecord
 	 */
 	public function selectRecord($type, $conditions, $addSql = null, $delete = null, $inverse = false, $all = false) { 
-		return $this->writeStandardQuery($type, $conditions, $addSql, $delete, $inverse, $all);
+		return $this->writeStandardQuery($type, $conditions, $addSql, ($delete) ? self::C_MODE_DELETE : self::C_MODE_SELECT, $inverse, $all);
 	}
 	/**
 	 * Internal method to build query.
@@ -191,13 +206,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param string       $type       name of the table you want to query
 	 * @param array        $conditions criteria ( $column => array( $values ) )
 	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
-	 * @param boolean      $delete     selects query mode: TRUE is DELETE, FALSE is SELECT
+	 * @param boolean      $mode		  selects query mode: 1 is DELETE, 0 is SELECT, 2 is COUNT(*)
 	 * @param boolean      $inverse    if TRUE uses 'NOT IN'-clause for conditions
 	 * @param boolean      $all        if FALSE and $addSQL is SET prefixes $addSQL with ' WHERE ' or ' AND ' 
 	 */		
-	private function writeStandardQuery($type, $conditions, $addSql = null, $delete = null, $inverse = false, $all = false) {	
+	private function writeStandardQuery($type, $conditions, $addSql = null, $mode = null, $inverse = false, $all = false) {	
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
-		if (!$delete && $this->flagUseCache) {
+		if (!($mode===self::C_MODE_DELETE) && $this->flagUseCache) {
 			$key = serialize(array($type, $conditions, $addSql, $inverse, $all));
 			$sql = $this->adapter->getSQL();
 			if (strpos($sql, '-- keep-cache') !== strlen($sql)-13) {
@@ -254,9 +269,12 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$sql = " WHERE $addSql ";
 			}
 		}
-		$sql = (($delete) ? 'DELETE FROM ' : 'SELECT * FROM ').$table.$sql;
-		$rows = $this->adapter->get($sql.(($delete) ? '' : ' -- keep-cache'), $bindings);
-		if (!$delete && $this->flagUseCache) {
+		if ($mode === self::C_MODE_DELETE) $sqlBegin = 'DELETE FROM ';
+		elseif($mode === self::C_MODE_COUNT) $sqlBegin = 'SELECT COUNT(*) FROM ';
+		else $sqlBegin = 'SELECT * FROM ';
+		$sql = $sqlBegin . $table . $sql;
+		$rows = $this->adapter->get($sql.(($mode === 1) ? '' : ' -- keep-cache'), $bindings);
+		if (!($mode === 1) && $this->flagUseCache) {
 			$this->cache[$key] = $rows;
 		}
 		return $rows;
@@ -285,6 +303,35 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$sql = "SELECT count(*) FROM {$this->esc($beanType)} ";
 		if ($addSQL != '') $addSQL = ' WHERE '.$addSQL; 
 		return (int) $this->adapter->getCell($sql.$addSQL, $params);
+	}
+	/**
+	 * @see RedBean_QueryWriter::queryRecordCountRelated
+	 */
+	public function queryRecordCountRelated($sourceType, $targetType, $linkType, $linkID, $addSQL = '', $params = array()) {
+		$sourceTable = $this->esc($sourceType);
+		$targetTable = $this->esc($targetType);
+		$sourceColumn = $this->esc($sourceType.'_id');
+		$targetColumn = $this->esc($targetType.'_id');
+		$linkTable = $this->esc($linkType);
+		$sql = "SELECT count(*) FROM {$targetTable} WHERE id IN (
+			SELECT {$targetColumn} FROM {$linkTable} WHERE {$sourceColumn} = ? ";
+		array_unshift($params, $linkID);
+		if ($sourceColumn === $targetColumn) {
+			$crossColumn = $this->esc($sourceType.'2_id');
+			$sql .= " OR {$crossColumn} = ? ";
+			array_unshift($params, $linkID);
+		}
+		$sql .= ") ";
+		if ($addSQL === '' || $addSQL === null || $addSQL === false) {
+			//do nothing
+		} else {
+			if (strpos(ltrim($addSQL), 'AND')===0) {
+				$sql .= $addSQL;
+			} else {
+				$sql .= ' AND '.$addSQL;
+			}
+		}
+		return (int) $this->adapter->getCell($sql, $params);
 	}
 	/**
 	 * Checks whether a number can be treated like an int.

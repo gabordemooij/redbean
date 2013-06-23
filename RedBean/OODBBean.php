@@ -866,5 +866,71 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	public function via($via) {
 		$this->via = $via;
 		return $this;
-	}	
+	}
+	
+	/**
+	 * Counts all own beans of type $type.
+	 * Also works with alias(), with() and withCondition().
+	 * 
+	 * @param string $type the type of bean you want to count
+	 *
+	 * @return integer
+	 */
+	public function countOwn($type) {
+		if (self::$flagUseBeautyfulColumnnames) {
+			$type = $this->beau($type);
+		}
+		if ($this->aliasName) {
+			$parentField = $this->aliasName;
+			$myFieldLink = $this->aliasName.'_id';
+			$this->aliasName = null;
+		} else {
+			$myFieldLink = $this->__info['type'].'_id';
+			$parentField = $this->__info['type'];
+		}
+		$count = 0;
+		if ($this->getID()>0) {
+			$params = array_merge(array($this->getID()), $this->withParams);
+			$count = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount($type, array(), array(" $myFieldLink = ? ".$this->withSql, $params));
+		}
+		$this->withSql = '';
+		$this->withParams = array();
+		return $count;
+	}
+	
+	/**
+	 * Counts all shared beans of type $type.
+	 * Also works with via(), with() and withCondition().
+	 * 
+	 * @param string $type type of bean you wish to count
+	 * 
+	 * @return integer
+	 */
+	public function countShared($type) {
+		$toolbox = $this->beanHelper->getToolbox();
+		$redbean = $toolbox->getRedBean();
+		$writer = $toolbox->getWriter();
+		if ($this->via) {
+			$oldName = $writer->getAssocTable(array($this->__info['type'],$type));
+			if ($oldName !== $this->via) {
+				//set the new renaming rule
+				$writer->renameAssocTable($oldName, $this->via);
+				$this->via = null;
+			} 
+		}
+		if (self::$flagUseBeautyfulColumnnames ) {
+			$type = $this->beau($type);
+		}
+		$count = 0;
+		if ($this->getID()>0) {
+			if (trim($this->withSql) !== '') {
+				$count = $redbean->getAssociationManager()->relatedCount($this, $type, $this->withSql, $this->withParams, true);
+			} else {
+				$count = $redbean->getAssociationManager()->relatedCount($this, $type);
+			}
+		}
+		$this->withSql = '';
+		$this->withParams = array();
+		return $count;
+	}
 }

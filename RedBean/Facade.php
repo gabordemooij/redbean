@@ -362,6 +362,19 @@ class RedBean_Facade {
 	public static function related($bean, $type, $sql = null, $values = array()) {
 		return self::$associationManager->relatedSimple($bean, $type, $sql, $values);
 	}
+	
+	/**
+	 * Counts the number of related beans in an N-M relation.
+	 * 
+	 * @param RedBean_OODBBean $bean
+	 * @param string           $type
+	 * @param string           $sql
+	 * @param array            $values
+	 */
+	public static function relatedCount($bean, $type, $sql = null, $values = array()) {
+		return self::$associationManager->relatedCount($bean, $type, $sql, $values);
+	}
+	
 	/**
 	* Returns only single associated bean.
 	*

@@ -22,7 +22,55 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
+	
+		testpack('Test relatedCount()');
+		R::nuke();
+		list($d, $d2) = R::dispense('document', 2);
+		list($p, $p2, $p3) = R::dispense('page', 3);
+		$d->sharedPage = array($p, $p3);
+		$d2->sharedPage = array($p, $p2, $p3);
+		R::storeAll(array($d, $d2));
+		asrt(R::relatedCount($d, 'page', ' id = ? ', array($p->id)), 1);
+		asrt(R::relatedCount($d, 'page'), 2);
+		asrt(R::relatedCount($d2, 'page'), 3);
+		//now using bean methods..
+		asrt($d2->countShared('page'), 3);
+		asrt($d->countShared('page'), 2);
+		//n-1 counts
+		$author = R::dispense('author');
+		$author->ownDocument = array($d, $d2);
+		R::store($author);
 		
+		R::nuke();
+		$book = R::dispense('book');
+		$book->ownPage = R::dispense('page',10);
+		$book2 = R::dispense('book');
+		$book2->ownPage = R::dispense('page', 4);
+		list($Bill, $James, $Andy) = R::dispense('person', 3);
+		$book->author = $Bill;
+		$book->coAuthor = $James;
+		$book2->author = $Bill;
+		$book2->coAuthor = $Andy;
+		$book->price = 25;
+		$book2->price = 50;
+		$notes = R::dispense('note',10);
+		$book->sharedNote = array($notes[0], $notes[1], $notes[2]);
+		$book2->sharedNote = array($notes[3], $notes[4], $notes[1], $notes[0]);
+		$books = R::dispense('book', 5);
+		$books[2]->title = 'boe';
+		$book->sharedBook = array($books[0], $books[1]);
+		$book2->sharedBook = array($books[0], $books[2], $books[4]);
+		R::storeAll(array($book, $book2));
+		asrt($book->countOwn('page'),10);
+		asrt($book->withCondition(' id < 5 ')->countOwn('page'), 4);
+		asrt($Bill->alias('author')->countOwn('book'), 2);
+		asrt($Andy->alias('coAuthor')->countOwn('book'), 1);
+		asrt($James->alias('coAuthor')->countOwn('book'), 1);
+		asrt($Bill->alias('author')->countOwn('book'), 2);
+		asrt($book->countShared('note'), 3);
+		asrt($book2->countShared('note'), 4);
+		asrt($book2->countShared('book'), 3);
+		asrt($book2->withCondition(' title = ? ',array('boe'))->countShared('book'), 1);
 		testpack('Test via()');
 		R::nuke();
 		$d = R::dispense('doctor')->setAttr('name', 'd1');

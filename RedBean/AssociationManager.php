@@ -111,6 +111,34 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		}
 		return $results;
 	}
+	
+	/**
+	 * Counts the number of related beans in an N-M relation.
+	 * 
+	 * @param RedBean_OODBBean|array $bean   a bean object or an array of beans
+	 * @param string                 $type   type of bean you're interested in
+	 * @param string                 $sql    SQL snippet (optional)
+	 * @param array                  $values bindings for your SQL string
+	 * 
+	 * @return integer
+	 * @throws RedBean_Exception_Security
+	 */
+	public function relatedCount($bean, $type, $sql = null, $values = array()) {
+		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
+		if (!$bean->id) return 0;
+		$beanType = $bean->getMeta('type');
+		$table = $this->getTable(array($beanType, $type));
+		try {
+			return $this->writer->queryRecordCountRelated($beanType, $type, $table, $bean->id, $sql, $values);
+		} catch(RedBean_Exception_SQL $e) {
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+			return 0;
+		}
+	}
 	/**
 	 * Returns all ids of beans of type $type that are related to $bean. If the
 	 * $getLinks parameter is set to boolean TRUE this method will return the ids

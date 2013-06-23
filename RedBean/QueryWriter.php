@@ -28,7 +28,7 @@ interface RedBean_QueryWriter {
 	const C_SQLSTATE_NO_SUCH_TABLE = 1;
 	const C_SQLSTATE_NO_SUCH_COLUMN = 2;
 	const C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION = 3;
-
+	
 	/**
 	 * Returns the tables that are in the database.
 	 *
@@ -131,6 +131,27 @@ interface RedBean_QueryWriter {
 	 * @param boolean      $all        if FALSE and $addSQL is SET prefixes $addSQL with ' WHERE ' or ' AND ' 
 	 */
 	public function queryRecord($type, $conditions, $addSql = null, $all = false);
+	/**
+	 * Selects records from the database.
+	 * 
+	 * @param string       $type       name of the table you want to query
+	 * @param array        $conditions criteria ( $column => array( $values ) )
+	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
+	 */
+	public function queryRecordCount($type, $conditions, $addSql = null);
+	/**
+	 * Returns the number of records linked through $linkType and satisfying the SQL in $addSQL/$params.
+	 *  
+	 * @param string $sourceType source type
+	 * @param string $targetType the thing you want to count
+	 * @param string $linkType   the type used to link those two above
+	 * @param mixed  $linkID     the of the source type
+	 * @param string $addSQL     additional SQL snippet
+	 * @param array  $params     bindings for SQL snippet
+	 * 
+	 * @return integer
+	 */
+	public function queryRecordCountRelated($sourceType, $targetType, $linkType, $linkID, $addSQL = '', $params = array());
 	/**
 	 * Deletes records from the database.
 	 * @note $addSql is always prefixed with ' WHERE ' or ' AND .'
