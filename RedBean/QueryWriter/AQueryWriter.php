@@ -3,11 +3,11 @@
  * RedBean Abstract Query Writer
  *
  * @file 			RedBean/QueryWriter/AQueryWriter.php
- * @description		Quert Writer
- *					Represents an abstract Database to RedBean
- *					To write a driver for a different database for RedBean
- *					Contains a number of functions all implementors can
- *					inherit or override.
+ * @description	Query Writer
+ *						Represents an abstract Database to RedBean
+ *						To write a driver for a different database for RedBean
+ *						Contains a number of functions all implementors can
+ *						inherit or override.
  * @author			Gabor de Mooij and the RedBeanPHP Community
  * @license			BSD/GPLv2
  *
