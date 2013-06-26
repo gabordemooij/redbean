@@ -282,12 +282,22 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * @see RedBean_QueryWriter::getLinkBlock
 	 */
-	public function getLinkBlock($sourceType, $destType, $linkType) {
+	public function getLinkBlock($sourceType, $destType, $linkType, $linkID) {
 		$sourceTable = $this->esc($sourceType.'_id');
 		$destTable = $this->esc($destType.'_id');
 		$linkTable = $this->esc($linkType);
-		$sql = " WHERE id IN ( SELECT {$destTable} FROM {$linkTable} WHERE {$sourceTable} = ? ) ";
-		return $sql;
+		if ($sourceType !== $destType) {
+			$sql = " WHERE id IN ( SELECT {$destTable} FROM {$linkTable} WHERE {$sourceTable} = ? ) ";
+			return array($sql, array($linkID));
+		} else {
+			$destTable2 = $this->esc($sourceType.'2_id');
+			$sql = " WHERE id IN ( 
+					SELECT COALESCE(NULLIF({$destTable},?), NULLIF({$destTable2},?))
+				 FROM {$linkTable} 
+				 WHERE {$sourceTable} = ? OR {$destTable2} = ? )
+			";
+			return array($sql, array($linkID, $linkID, $linkID, $linkID));
+		}
 	}
 	/**
 	 * @see RedBean_QueryWriter::wipe
@@ -313,15 +323,18 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$sourceColumn = $this->esc($sourceType.'_id');
 		$targetColumn = $this->esc($targetType.'_id');
 		$linkTable = $this->esc($linkType);
-		$sql = "SELECT count(*) FROM {$targetTable} WHERE id IN (
-			SELECT {$targetColumn} FROM {$linkTable} WHERE {$sourceColumn} = ? ";
-		array_unshift($params, $linkID);
 		if ($sourceColumn === $targetColumn) {
 			$crossColumn = $this->esc($sourceType.'2_id');
-			$sql .= " OR {$crossColumn} = ? ";
+			$sql = "SELECT count(*) FROM {$targetTable} WHERE id IN (
+			SELECT COALESCE(NULLIF({$targetColumn},?),NULLIF({$crossColumn},?)) FROM {$linkTable} WHERE {$sourceColumn} = ? OR {$crossColumn} = ? ) ";
 			array_unshift($params, $linkID);
+			array_unshift($params, $linkID);
+			array_unshift($params, $linkID);
+		} else {
+			$sql = "SELECT count(*) FROM {$targetTable} WHERE id IN (
+			SELECT {$targetColumn} FROM {$linkTable} WHERE {$sourceColumn} = ? ) ";
 		}
-		$sql .= ") ";
+		array_unshift($params, $linkID);
 		if ($addSQL === '' || $addSQL === null || $addSQL === false) {
 			//do nothing
 		} else {

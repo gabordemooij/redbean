@@ -304,7 +304,7 @@ interface RedBean_QueryWriter {
 	 * 
 	 * @return string 
 	 */
-	public function getLinkBlock($sourceType, $destType, $linkType);
+	public function getLinkBlock($sourceType, $destType, $linkType, $linkID);
 	
 	
 	/** 

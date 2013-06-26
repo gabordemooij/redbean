@@ -121,6 +121,13 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$names = implode(',', R::gatherLabels($donald->with(' ORDER BY name ')->sharedFriend));
 		asrt($names, 'G,M');
 		
+		//now counting
+		$goofy = R::load('friend', $goofy->id);
+		asrt((int)$goofy->countShared('friend'), 2);
+		asrt((int)$donald->countShared('friend'), 2);
+		asrt((int)$mickey->countShared('friend'), 3);
+		asrt((int)$pluto->countShared('friend'), 1);
+		
 		testpack('Test list beautifications');
 		R::nuke();
 		$book = R::dispense('book');
