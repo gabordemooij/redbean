@@ -35,6 +35,26 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$this->writer = $tools->getWriter();
 		$this->toolbox = $tools;
 	}
+
+	public function relatedVia($bean, $targetType, $sql='', $params=array()) {
+		$beans = array();
+		if (!$bean->id) return $beans;
+		try {	
+			$sourceType = $bean->getMeta('type');
+			$linkID = $bean->id;
+                        $rows = $this->writer->queryRecordRelated($sourceType, $targetType, $linkID, $sql, $params);
+       			$beans = $this->oodb->convertToBeans($targetType, $rows);         	
+			
+		} catch(RedBean_Exception_SQL $e) {
+                        if (!$this->writer->sqlStateIn($e->getSQLState(),
+                        array(
+                                RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+                                RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN)
+                        )) throw $e;
+                }
+		return $beans;
+	}
+
 	/**
 	 * Creates a table name based on a types array.
 	 * Manages the get the correct name for the linking table for the
@@ -127,9 +147,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
 		if (!$bean->id) return 0;
 		$beanType = $bean->getMeta('type');
-		$table = $this->getTable(array($beanType, $type));
 		try {
-			return $this->writer->queryRecordCountRelated($beanType, $type, $table, $bean->id, $sql, $values);
+			return $this->writer->queryRecordCountRelated($beanType, $type, $bean->id, $sql, $values);
 		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(

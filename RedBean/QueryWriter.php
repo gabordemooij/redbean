@@ -144,14 +144,26 @@ interface RedBean_QueryWriter {
 	 *  
 	 * @param string $sourceType source type
 	 * @param string $targetType the thing you want to count
-	 * @param string $linkType   the type used to link those two above
 	 * @param mixed  $linkID     the of the source type
 	 * @param string $addSQL     additional SQL snippet
 	 * @param array  $params     bindings for SQL snippet
 	 * 
 	 * @return integer
 	 */
-	public function queryRecordCountRelated($sourceType, $targetType, $linkType, $linkID, $addSQL = '', $params = array());
+	public function queryRecordCountRelated($sourceType, $targetType, $linkID, $addSQL = '', $params = array());
+	
+	/**
+	 * Returns records through an intermediate type. This method is used to obtain records using a link table and
+	 * allows the SQL snippets to reference columns in the link table for additional filtering or ordering.
+	 * 
+	 * @param string $sourceType source type, the reference type you want to use to fetch related items on the other side
+	 * @param string $destType   destination type, the target type you want to get beans of
+	 * @param mixed  $linkID     ID to use for the link table
+	 * @param string $addSql     Additional SQL snippet
+	 * @param array  $params     Bindings for SQL snippet
+	 */
+	public function queryRecordRelated($sourceType, $destType, $linkID, $addSql = '', $params = array());
+	
 	/**
 	 * Deletes records from the database.
 	 * @note $addSql is always prefixed with ' WHERE ' or ' AND .'
@@ -304,8 +316,9 @@ interface RedBean_QueryWriter {
 	 * 
 	 * @return string 
 	 */
-	public function getLinkBlock($sourceType, $destType, $linkType, $linkID);
+	//public function getLinkBlock($sourceType, $destType, $linkType, $linkID);
 	
+
 	
 	/** 
 	 * Returns the format for link tables.

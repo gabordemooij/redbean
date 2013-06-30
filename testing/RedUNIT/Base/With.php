@@ -49,7 +49,7 @@ class RedUNIT_Base_With extends RedUNIT_Base {
 		$ad = R::load('ad',$ad->id);
 		asrt(count($ad->sharedPage),2);
 		$ad = R::load('ad',$ad->id);
-		$homepage = reset($ad->withCondition(' `name` LIKE ? AND id > 0 ORDER BY id DESC ',array('%ome%'))->sharedPage);
+		$homepage = reset($ad->withCondition(' `name` LIKE ? AND page.id > 0 ORDER BY id DESC ',array('%ome%'))->sharedPage);
 		asrt($homepage->name,'homepage');
 
 		R::nuke();

@@ -200,12 +200,66 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function selectRecord($type, $conditions, $addSql = null, $delete = null, $inverse = false, $all = false) { 
 		return $this->writeStandardQuery($type, $conditions, $addSql, ($delete) ? self::C_MODE_DELETE : self::C_MODE_SELECT, $inverse, $all);
 	}
+	
+	/**
+	 * Returns a cache key for the cache values passed.
+	 * This method returns a fingerprint string to be used as a key to store
+	 * data in the writer cache.
+	 * 
+	 * @param array $keyValues
+	 * @return string
+	 */
+	private function getCacheKey($keyValues) {
+		return serialize($keyValues);
+	}
+	
+	/**
+	 * Returns the values associated with the provided cache tag and key.
+	 * 
+	 * @param string $cacheTag
+	 * @param string $key
+	 * 
+	 * @return mixed
+	 */
+	private function getCached($cacheTag, $key) {
+		$sql = $this->adapter->getSQL();
+		if (strpos($sql, '-- keep-cache') !== strlen($sql)-13) {
+			//If SQL has been taken place outside of this method then something else then
+			//a select query might have happened! (or instruct to keep cache)
+			$this->cache = array();
+		} else {
+			if (isset($this->cache[$cacheTag][$key])) {
+				return $this->cache[$cacheTag][$key];
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Stores data from the writer in the cache under a specific key and cache tag.
+	 * A cache tag is used to make sure the cache remains consistent. In most cases the cache tag
+	 * will be the bean type, this makes sure queries associated with a certain reference type will
+	 * never contain conflicting data.
+	 * You can only store one item under a cache tag. Why not use the cache tag as a key? Well
+	 * we need to make sure the cache contents fits the key (and key is based on the cache values).
+	 * Otherwise it would be possible to store two different result sets under the same key (the cache tag).
+	 * 
+	 * @param string $cacheTag cache tag (secondary key)
+	 * @param string $key      key
+	 * @param array  $values   content to be stored
+	 */
+	private function putResultInCache($cacheTag, $key, $values) {
+		$this->cache[$cacheTag] = array(
+			 $key => $values
+		);
+	}
+	
 	/**
 	 * Internal method to build query.
 	 * 
 	 * @param string       $type       name of the table you want to query
 	 * @param array        $conditions criteria ( $column => array( $values ) )
-	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
+	 * @param string|array $addSql     additional SQL snippet, either a string or: array($SQL, $bindings)
 	 * @param boolean      $mode		  selects query mode: 1 is DELETE, 0 is SELECT, 2 is COUNT(*)
 	 * @param boolean      $inverse    if TRUE uses 'NOT IN'-clause for conditions
 	 * @param boolean      $all        if FALSE and $addSQL is SET prefixes $addSQL with ' WHERE ' or ' AND ' 
@@ -213,15 +267,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	private function writeStandardQuery($type, $conditions, $addSql = null, $mode = null, $inverse = false, $all = false) {	
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
 		if (!($mode===self::C_MODE_DELETE) && $this->flagUseCache) {
-			$key = serialize(array($type, $conditions, $addSql, $inverse, $all));
-			$sql = $this->adapter->getSQL();
-			if (strpos($sql, '-- keep-cache') !== strlen($sql)-13) {
-				//If SQL has been taken place outside of this method then something else then
-				//a select query might have happened! (or instruct to keep cache)
-				$this->cache = array();
-			} else {
-				if (isset($this->cache[$key])) return $this->cache[$key];
-			}
+			$key = $this->getCacheKey(array($conditions, $addSql, $mode, $inverse, $all));
+			if ($cached = $this->getCached($type, $key)) return $cached;
 		}
 		$table = $this->esc($type);
 		$sqlConditions = array();
@@ -274,31 +321,85 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		else $sqlBegin = 'SELECT * FROM ';
 		$sql = $sqlBegin . $table . $sql;
 		$rows = $this->adapter->get($sql.(($mode === 1) ? '' : ' -- keep-cache'), $bindings);
-		if (!($mode === 1) && $this->flagUseCache) {
-			$this->cache[$key] = $rows;
+		if (!($mode === 1) && $this->flagUseCache && $key) {
+			$this->putResultInCache($type, $key, $rows);
 		}
 		return $rows;
 	}
-	/**
-	 * @see RedBean_QueryWriter::getLinkBlock
-	 */
-	public function getLinkBlock($sourceType, $destType, $linkType, $linkID) {
-		$sourceTable = $this->esc($sourceType.'_id');
-		$destTable = $this->esc($destType.'_id');
-		$linkTable = $this->esc($linkType);
-		if ($sourceType !== $destType) {
-			$sql = " WHERE id IN ( SELECT {$destTable} FROM {$linkTable} WHERE {$sourceTable} = ? ) ";
-			return array($sql, array($linkID));
-		} else {
-			$destTable2 = $this->esc($sourceType.'2_id');
-			$sql = " WHERE id IN ( 
-					SELECT COALESCE(NULLIF({$destTable},?), NULLIF({$destTable2},?))
-				 FROM {$linkTable} 
-				 WHERE {$sourceTable} = ? OR {$destTable2} = ? )
-			";
-			return array($sql, array($linkID, $linkID, $linkID, $linkID));
-		}
+	
+	
+	public function queryRecordRelated($sourceType, $destType, $linkID, $addSql = '', $params = array()) {
+		return $this->writeRelationalQuery($sourceType, $destType, $linkID, $addSql, $params, self::C_MODE_SELECT);
 	}
+	
+	/**
+	 * @see RedBean_QueryWriter::queryRecordCountRelated
+	 */
+	public function queryRecordCountRelated($sourceType, $destType, $linkID, $addSql = '', $params = array()) {
+		return $this->writeRelationalQuery($sourceType, $destType, $linkID, $addSql, $params, self::C_MODE_COUNT);
+	}
+	
+	/**
+	 * Writes a relational query.
+	 * 
+	 * @param type $sourceType
+	 * @param type $destType
+	 * @param type $linkID
+	 * @param type $addSql
+	 * @param type $params
+	 * @param type $mode
+	 * @return type
+	 * @throws RedBean_Exception_SQL
+	 */
+	private function writeRelationalQuery($sourceType, $destType, $linkID, $addSql = '', $params = array(), $mode = self::C_MODE_SELECT) {
+		$key = $this->getCacheKey(array($sourceType, $destType, $linkID, $addSql, $params, $mode));
+		if ($this->flagUseCache && $mode === self::C_MODE_SELECT && $cached = $this->getCached($destType, $key)) {
+			return $cached;
+		}
+		$sourceTable = $this->esc($sourceType);
+		$destTable = $this->esc($destType);
+		$linkTable = $this->getAssocTable(array($sourceType, $destType));
+		$sourceCol = $this->esc($sourceType.'_id');
+		$destCol = $this->esc($destType.'_id');
+		$selector = ($mode === self::C_MODE_SELECT) ? "{$destTable}.*" : "count(*)";
+		if ($sourceType === $destType) {
+			$destCol = $this->esc($sourceType.'2_id');
+			$sql = "
+			SELECT {$selector} FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? ) OR
+			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} = ? )
+			$addSql
+			-- keep-cache";
+			array_unshift($params, $linkID);
+		} else {
+			$sql = "
+			SELECT {$selector} FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? )
+			$addSql	
+			-- keep-cache";
+		}
+		array_unshift($params, $linkID);	
+		$rows = ($mode === self::C_MODE_COUNT) ? 0 : array();
+		try {
+			if ($mode === self::C_MODE_COUNT) {
+				return (int) $this->adapter->getCell($sql, $params);
+			} else {
+				$rows = $this->adapter->get($sql, $params);
+				$this->putResultInCache($destType, $key, $rows);
+				return $rows;
+			}
+		} catch(RedBean_Exception_SQL $e) {
+			if (!$this->sqlStateIn($e->getSQLState(),
+			array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN)
+			)) throw $e;
+		}
+		return $rows;
+	}
+	
 	/**
 	 * @see RedBean_QueryWriter::wipe
 	 */
@@ -313,38 +414,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$sql = "SELECT count(*) FROM {$this->esc($beanType)} ";
 		if ($addSQL != '') $addSQL = ' WHERE '.$addSQL; 
 		return (int) $this->adapter->getCell($sql.$addSQL, $params);
-	}
-	/**
-	 * @see RedBean_QueryWriter::queryRecordCountRelated
-	 */
-	public function queryRecordCountRelated($sourceType, $targetType, $linkType, $linkID, $addSQL = '', $params = array()) {
-		$sourceTable = $this->esc($sourceType);
-		$targetTable = $this->esc($targetType);
-		$sourceColumn = $this->esc($sourceType.'_id');
-		$targetColumn = $this->esc($targetType.'_id');
-		$linkTable = $this->esc($linkType);
-		if ($sourceColumn === $targetColumn) {
-			$crossColumn = $this->esc($sourceType.'2_id');
-			$sql = "SELECT count(*) FROM {$targetTable} WHERE id IN (
-			SELECT COALESCE(NULLIF({$targetColumn},?),NULLIF({$crossColumn},?)) FROM {$linkTable} WHERE {$sourceColumn} = ? OR {$crossColumn} = ? ) ";
-			array_unshift($params, $linkID);
-			array_unshift($params, $linkID);
-			array_unshift($params, $linkID);
-		} else {
-			$sql = "SELECT count(*) FROM {$targetTable} WHERE id IN (
-			SELECT {$targetColumn} FROM {$linkTable} WHERE {$sourceColumn} = ? ) ";
-		}
-		array_unshift($params, $linkID);
-		if ($addSQL === '' || $addSQL === null || $addSQL === false) {
-			//do nothing
-		} else {
-			if (strpos(ltrim($addSQL), 'AND')===0) {
-				$sql .= $addSQL;
-			} else {
-				$sql .= ' AND '.$addSQL;
-			}
-		}
-		return (int) $this->adapter->getCell($sql, $params);
 	}
 	/**
 	 * Checks whether a number can be treated like an int.

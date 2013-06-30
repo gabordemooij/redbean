@@ -411,11 +411,17 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		}
 		$types = array($this->__info['type'], $type);
 		$linkID = $this->properties['id'];
+		$a = $redbean->getAssociationManager();
+		$beans = $a->relatedVia($this, $type, $this->withSql, $this->withParams);
+
+		//$writer->queryRecordVia($this->__info['type'], $type, $redbean->getAssociationManager()->getTable($types), $linkID, $this->withSql, $this->withParams);
+		/*
 		list($withSql, $bindings) = $writer->getLinkBlock($this->__info['type'], $type, $redbean->getAssociationManager()->getTable($types), $linkID);
 		$this->withParams = array_merge($bindings, $this->withParams);
 		$withSql .= $this->withSql;
 		$beans = $redbean->find($type, array(), array($withSql, $this->withParams), true);
-		$this->withSql = '';
+		
+		 */ $this->withSql = '';
 		$this->withParams = array();
 		return $beans;
 	}
@@ -909,11 +915,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		}
 		$count = 0;
 		if ($this->getID()>0) {
-			if (trim($this->withSql) !== '') {
+			//if (trim($this->withSql) !== '') {
 				$count = $redbean->getAssociationManager()->relatedCount($this, $type, $this->withSql, $this->withParams, true);
-			} else {
-				$count = $redbean->getAssociationManager()->relatedCount($this, $type);
-			}
+			//} else {
+			//	$count = $redbean->getAssociationManager()->relatedCount($this, $type);
+			//}
 		}
 		$this->withSql = '';
 		$this->withParams = array();

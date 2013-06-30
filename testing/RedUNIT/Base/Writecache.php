@@ -72,12 +72,11 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base {
 		asrt(count($logger->grep('SELECT')),6);
 		R::$writer->setUseCache(true); //with cache
 		$logger->clear();
-		$book = R::findOne('book',' id = ? ', array($id));
-		$book->ownPage;
 		R::batch('book',array($id));
 		$book = R::findOne('book',' id = ? ', array($id));
 		$book->ownPage;
-		R::batch('book',array($id));
+		$book = R::findOne('book',' id = ? ', array($id));
+		$book->ownPage;
 		asrt(count($logger->grep('SELECT')),3);
 		R::$writer->setUseCache(false);
 		

@@ -23,6 +23,75 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 	 */
 	public function run() {
 	
+		
+		testpack('Test new shared relations with link conditions');
+		R::nuke();
+		$w = R::$writer;
+		list($b1, $b2) = R::dispense('book', 2);
+		$b1->name = 'book1';
+		$b2->name = 'book2';
+		list($p1, $p2, $p3) = R::dispense('page', 3);
+		$p1->text = 'page1';
+		$p1->number = 3;
+		$p2->text = 'page2';
+		$p3->text = 'page3';
+		$b1->link('book_page', array('order'=>1))->page = $p1;
+		$b1->link('book_page', array('order'=>2))->page = $p2;
+		$b2->link('book_page', array('order'=>1))->page = $p3;
+		$b2->link('book_page', array('order'=>2))->page = $p2;
+		$b2->link('book_page', array('order'=>3))->page = $p1;
+		R::storeAll(array($b1, $b2));
+		$b1 = R::load('book', $b1->id);
+		$b2 = R::load('book', $b2->id);
+		$pages = $b1->withCondition(' book_page.'.$w->esc('order').' = 2 ')->sharedPage;
+		$page = reset($pages);
+		asrt($page->text, 'page2');
+		$pages = $b2->withCondition(' '.$w->esc('order').' = 3 ')->sharedPage;
+		$page = reset($pages);
+		asrt($page->text, 'page1');
+		$b1 = R::load('book', $b1->id);
+		$b2 = R::load('book', $b2->id);
+		$pages = $b1->withCondition(' book_page.'.$w->esc('order').' < 3  AND page.number = 3')->sharedPage;
+		$page = reset($pages);
+		asrt($page->text, 'page1');
+		$pages = $b2->withCondition(' '.$w->esc('order').' > 1  ORDER BY book_page.'.$w->esc('order').' ASC ')->sharedPage;
+		$page = array_shift($pages);
+		asrt($page->text, 'page2');
+		$page = array_shift($pages);
+		asrt($page->text, 'page1');
+		
+		testpack('Test new shared relations and cache');
+		R::exec('UPDATE page SET '.$w->esc('number').' = 1 '); //why does this not destroy cache in psql? ah: An error occurred: SQLSTATE[42703]: Undefined column: 7 ERROR:  column "page" of relation "page" does not exist
+		R::$writer->setUseCache(true);
+		$p1 = R::load('page', (int)$p1->id);
+		R::exec(' UPDATE page SET '.$w->esc('number').' = 9 -- keep-cache'); //someone else changes the records. Cache remains.
+		$b1 = R::load('book', $b1->id);
+		$p1 = R::load('page', (int)$p1->id);
+		asrt((int)$p1->number, 1);//yupz a stale cache, phantom read!
+		$pages = $b1->withCondition(' book_page.'.$w->esc('order').' = 1 ')->sharedPage;
+		$page = reset($pages);
+		asrt((int)$page->number, 9);//inconsistent, sad but true, different query -> cache key is different
+		//however, cache must have been invalidated by this query
+		$p1 = R::load('page', (int)$p1->id);
+		asrt((int)$page->number, 9); //yes! we're consistent again! -- as if the change just happened later!
+		$b1->fresh()->withCondition(' book_page.'.$w->esc('order').' = 1 ')->sharedPage; //by doing this we keep getting 9 instead of 8
+		R::exec(' UPDATE page SET '.$w->esc('number').' = 8 -- keep-cache'); //someone else is busy again...
+		$b1 = R::load('book', $b1->id);
+		$pages = $b1->withCondition(' book_page.'.$w->esc('order').' = 1 ')->sharedPage;
+		$page = reset($pages);
+		asrt((int)$page->number, 9); //yes! we get 9 instead of 8, why because the 
+		//cache key has not changed, our last query was PAGE-BOOK-RELATION and now we ask for PAGE-BOOK-RELATION again.
+		//if we would have used just a load page query we would have gotten the new value (8).... let's test that!
+		R::exec(' UPDATE page SET '.$w->esc('number').' = 9');
+		$p1 = R::load('page', (int)$p1->id);
+		asrt((int)$page->number, 9);
+		R::exec(' UPDATE page SET '.$w->esc('number').' = 8 -- keep-cache'); //someone else is busy again...
+		$b1 = R::load('book', $b1->id);
+		$pages = $b1->withCondition(' book_page.'.$w->esc('order').' = 1 ')->sharedPage;
+		$page = reset($pages);
+		asrt((int)$page->number, 8); //yes, keep-cache wont help, cache key changed!
+		R::$writer->setUseCache(false);
+		
 		testpack('Test relatedCount()');
 		R::nuke();
 		list($d, $d2) = R::dispense('document', 2);
@@ -30,7 +99,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$d->sharedPage = array($p, $p3);
 		$d2->sharedPage = array($p, $p2, $p3);
 		R::storeAll(array($d, $d2));
-		asrt(R::relatedCount($d, 'page', ' id = ? ', array($p->id)), 1);
+		
+		asrt(R::relatedCount($d, 'page', ' WHERE page.id = ? ', array($p->id)), 1);
 		asrt(R::relatedCount($d, 'page'), 2);
 		asrt(R::relatedCount($d2, 'page'), 3);
 		//now using bean methods..
