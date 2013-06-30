@@ -170,35 +170,42 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * @see RedBean_QueryWriter::queryRecord
 	 */
-	public function queryRecord($type, $conditions, $addSql = null, $all = false) {
-		return $this->writeStandardQuery($type, $conditions, $addSql, self::C_MODE_SELECT, false, $all);
+	public function queryRecord($type, $conditions, $addSql = null, $params = array(), $all = false) {
+		return $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_SELECT, false, $all);
 	}
 	/**
 	 * @see RedBean_QueryWriter::queryRecordCount
 	 */
-	public function queryRecordCount($type, $conditions, $addSql = null) {
-		$rows = $this->writeStandardQuery($type, $conditions, $addSql, self::C_MODE_COUNT, false, false);
+	public function queryRecordCount($type, $conditions, $addSql = null, $params = array()) {
+		$rows = $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_COUNT, false, false);
 		if (is_array($rows) && is_array($rows[0])) return (integer) reset($rows[0]);
 		return 0;
 	}
 	/**
 	 * @see RedBean_QueryWriter::deleteRecord
 	 */
-	public function deleteRecord($type, $conditions, $addSql = null) {
-		return $this->writeStandardQuery($type, $conditions, $addSql, self::C_MODE_DELETE, false, false);
+	public function deleteRecord($type, $conditions, $addSql = null, $params = array()) {
+		return $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_DELETE, false, false);
 	}
 	/**
 	 * @see RedBean_QueryWriter::queryRecordInverse
 	 */
-	public function queryRecordInverse($type, $conditions, $addSql = null) {
-		return $this->writeStandardQuery($type, $conditions, $addSql, self::C_MODE_SELECT, true, false);
+	public function queryRecordInverse($type, $conditions, $addSql = null, $params = array()) {
+		return $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_SELECT, true, false);
 	}
 	/**
 	 * @deprecated
 	 * @see RedBean_QueryWriter::selectRecord
 	 */
-	public function selectRecord($type, $conditions, $addSql = null, $delete = null, $inverse = false, $all = false) { 
-		return $this->writeStandardQuery($type, $conditions, $addSql, ($delete) ? self::C_MODE_DELETE : self::C_MODE_SELECT, $inverse, $all);
+	public function selectRecord($type, $conditions, $addSqlArr = null, $delete = null, $inverse = false, $all = false) {
+		if (is_array($addSqlArr) && isset($addSqlArr[0])) {
+			$addSql = $addSqlArr[0];
+			$params = (isset($addSqlArr[1])) ? $addSqlArr[1] : array();	
+		} else {
+			$addSql = $addSqlArr;
+			$params = array();
+		}
+		return $this->writeStandardQuery($type, $conditions, $addSql, $params, ($delete) ? self::C_MODE_DELETE : self::C_MODE_SELECT, $inverse, $all);
 	}
 	
 	/**
@@ -259,12 +266,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * 
 	 * @param string       $type       name of the table you want to query
 	 * @param array        $conditions criteria ( $column => array( $values ) )
-	 * @param string|array $addSql     additional SQL snippet, either a string or: array($SQL, $bindings)
-	 * @param boolean      $mode		  selects query mode: 1 is DELETE, 0 is SELECT, 2 is COUNT(*)
+	 * @param string       $addSql     additional SQL snippet
+	 * @param array        $params     bindings for SQL
+	 * @param boolean      $mode       selects query mode: 1 is DELETE, 0 is SELECT, 2 is COUNT(*)
 	 * @param boolean      $inverse    if TRUE uses 'NOT IN'-clause for conditions
 	 * @param boolean      $all        if FALSE and $addSQL is SET prefixes $addSQL with ' WHERE ' or ' AND ' 
 	 */		
-	private function writeStandardQuery($type, $conditions, $addSql = null, $mode = null, $inverse = false, $all = false) {	
+	private function writeStandardQuery($type, $conditions, $addSql = null, $params = array(), $mode = null, $inverse = false, $all = false) {	
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
 		if (!($mode===self::C_MODE_DELETE) && $this->flagUseCache) {
 			$key = $this->getCacheKey(array($conditions, $addSql, $mode, $inverse, $all));
@@ -295,13 +303,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$bindings = array_merge($bindings, $values);
 			}
 		}
-		if (is_array($addSql)) {
-			if (count($addSql)>1) {
-				$bindings = array_merge($bindings, $addSql[1]);
-			} else {
-				$bindings = array();
-			}
-			$addSql = $addSql[0];
+		if (count($params) > 0) {
+			$bindings = array_merge($bindings, $params);
 		}
 		$sql = '';
 		if (is_array($sqlConditions) && count($sqlConditions)>0) {

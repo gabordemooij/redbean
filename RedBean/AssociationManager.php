@@ -397,7 +397,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$keys = $this->related($bean, $type);
 		if (count($keys) == 0 || !is_array($keys)) return array();
 		if (!$sql) return $this->oodb->batch($type, $keys);
-		$rows = $this->writer->queryRecord($type, array('id' => $keys), array($sql, $values));
+		$rows = $this->writer->queryRecord($type, array('id' => $keys), $sql, $values);
 		return $this->oodb->convertToBeans($type, $rows);
 	}
 	/**
@@ -429,7 +429,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 */
 	public function unrelated(RedBean_OODBBean $bean, $type, $sql = null, $values = array()) {
 		$keys = $this->related($bean, $type);
-		$rows = $this->writer->queryRecordInverse($type, array('id' => $keys), array($sql, $values));
+		$rows = $this->writer->queryRecordInverse($type, array('id' => $keys), $sql, $values);
 		return $this->oodb->convertToBeans($type, $rows);
 	}
 }

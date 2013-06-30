@@ -47,7 +47,7 @@ class RedBean_Finder {
 	public function find($type, $sql = null, $values = array()) {
 		if ($sql instanceof RedBean_SQLHelper) list($sql, $values) = $sql->getQuery();
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
-		return $this->redbean->find($type, array(), array($sql, $values));
+		return $this->redbean->find($type, array(), $sql, $values);
 	}
 	/**
 	 * @see RedBean_Finder::find
@@ -67,7 +67,7 @@ class RedBean_Finder {
 	public function findAll($type, $sql = null, $values = array()) {
 		if ($sql instanceof RedBean_SQLHelper) list($sql, $values) = $sql->getQuery();
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, '.gettype($values).' given.');
-		return $this->redbean->find($type, array(), array($sql, $values), true);
+		return $this->redbean->find($type, array(), $sql, $values, true);
 	}
 	/**
 	 * @see RedBean_Finder::find

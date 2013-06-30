@@ -186,14 +186,14 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param string  $type       type of beans you are looking for
 	 * @param array   $conditions list of conditions
-	 * @param string  $addSQL	  SQL to be used in query
+	 * @param string  $addSQL     SQL to be used in query
 	 * @param boolean $all        whether you prefer to use a WHERE clause or not (TRUE = not)
 	 * 
 	 * @return array $beans		  resulting beans
 	 */
-	public function find($type, $conditions = array(), $addSQL = null, $all = false) {
+	public function find($type, $conditions = array(), $sql = null, $params = array(), $all = false) {
 		try {
-			$beans = $this->convertToBeans($type, $this->writer->queryRecord($type, $conditions, $addSQL, $all));
+			$beans = $this->convertToBeans($type, $this->writer->queryRecord($type, $conditions, $sql, $params, $all));
 			return $beans;
 		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
@@ -839,6 +839,7 @@ class RedBean_OODB extends RedBean_Observable {
 		$oldFields = array(); $i = 0; $retrievals = array(); $oldField = '';
 		foreach($types as $key => $typeInfo) {
 			list($type,$sqlObj) = (is_array($typeInfo) ? $typeInfo : array($typeInfo, null));
+			list($sql, $params) = $sqlObj;
 			$map = $ids = $retrievals[$i] = array();
 			$field = (is_numeric($key)) ? $type : $key;//use an alias?
 			if (strpos($field, '*') !== false) { 
@@ -905,7 +906,7 @@ class RedBean_OODB extends RedBean_Observable {
 					$linked[$linkID][] = $linkBean;
 					$targetIDs[$linkBean->$targetIDField] = $linkBean->$targetIDField;
 				}
-				$sharedBeans = $this->find($type, array('id' => $targetIDs), $sqlObj, (!is_null($sqlObj)));
+				$sharedBeans = $this->find($type, array('id' => $targetIDs), $sql, $params, (!is_null($sqlObj)));
 				foreach($filteredBeans as $filteredBean) {
 					$list = array();
 					if (isset($linked[$filteredBean->id])) {
@@ -924,7 +925,7 @@ class RedBean_OODB extends RedBean_Observable {
 				}
 			} elseif (strpos($field, 'own') === 0) {//preload for own-list using find
 				$link = $bean->getMeta('type').'_id';
-				$children = $this->find($type, array($link => $ids), $sqlObj, (!is_null($sqlObj)));
+				$children = $this->find($type, array($link => $ids), $sql, $params, (!is_null($sqlObj)));
 				foreach($filteredBeans as $filteredBean) {
 					$list = array();
 					foreach($children as $child) if ($child->$link == $filteredBean->id) $list[$child->id] = $child;

@@ -125,20 +125,22 @@ interface RedBean_QueryWriter {
 	/**
 	 * Selects records from the database.
 	 * 
-	 * @param string       $type       name of the table you want to query
-	 * @param array        $conditions criteria ( $column => array( $values ) )
-	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
-	 * @param boolean      $all        if FALSE and $addSQL is SET prefixes $addSQL with ' WHERE ' or ' AND ' 
+	 * @param string  $type       name of the table you want to query
+	 * @param array   $conditions criteria ( $column => array( $values ) )
+	 * @param string  $addSQL     additional SQL snippet
+	 * @param array   $params     bindings for SQL snippet
+	 * @param boolean $all        if FALSE and $addSQL is SET prefixes $addSQL with ' WHERE ' or ' AND ' 
 	 */
-	public function queryRecord($type, $conditions, $addSql = null, $all = false);
+	public function queryRecord($type, $conditions, $addSql = null, $params = array(), $all = false);
 	/**
 	 * Selects records from the database.
 	 * 
-	 * @param string       $type       name of the table you want to query
-	 * @param array        $conditions criteria ( $column => array( $values ) )
-	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
+	 * @param string $type       name of the table you want to query
+	 * @param array  $conditions criteria ( $column => array( $values ) )
+	 * @param string $addSQL     additional SQL snippet
+	 * @param array  $params     bindings for SQL snippet
 	 */
-	public function queryRecordCount($type, $conditions, $addSql = null);
+	public function queryRecordCount($type, $conditions, $addSql = null, $params = array());
 	/**
 	 * Returns the number of records linked through $linkType and satisfying the SQL in $addSQL/$params.
 	 *  
@@ -170,9 +172,10 @@ interface RedBean_QueryWriter {
 	 * 
 	 * @param string       $type       name of the table you want to query
 	 * @param array        $conditions criteria ( $column => array( $values ) )
-	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
+	 * @param string       $sql        additional SQL
+	 * @param array        $params     bindings
 	 */
-	public function deleteRecord($type, $conditions, $addSql = null);
+	public function deleteRecord($type, $conditions, $addSql = '', $params = array());
 	/**
 	 * Selects records from the database using an 'NOT IN'-clause for conditions..
 	 * @note $addSql is always prefixed with ' WHERE ' or ' AND .'
@@ -181,7 +184,7 @@ interface RedBean_QueryWriter {
 	 * @param array        $conditions criteria ( $column => array( $values ) )
 	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
 	 */
-	public function queryRecordInverse($type, $conditions, $addSql = null);
+	public function queryRecordInverse($type, $conditions, $addSql = null, $params = array());
 	/**
 	 * This method will add a UNIQUE constraint index to a table on columns $columns.
 	 * This methods accepts a type and infers the corresponding table name.
