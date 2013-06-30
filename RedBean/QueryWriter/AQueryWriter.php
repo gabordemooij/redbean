@@ -268,7 +268,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param array        $conditions criteria ( $column => array( $values ) )
 	 * @param string       $addSql     additional SQL snippet
 	 * @param array        $params     bindings for SQL
-	 * @param boolean      $mode       selects query mode: 1 is DELETE, 0 is SELECT, 2 is COUNT(*)
+	 * @param integer      $mode       selects query mode: 1 is DELETE, 0 is SELECT, 2 is COUNT(*)
 	 * @param boolean      $inverse    if TRUE uses 'NOT IN'-clause for conditions
 	 * @param boolean      $all        if FALSE and $addSQL is SET prefixes $addSQL with ' WHERE ' or ' AND ' 
 	 */		
@@ -330,7 +330,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $rows;
 	}
 	
-	
+	/**
+	 * @see RedBean_QueryWriter::queryRecordRelated
+	 */
 	public function queryRecordRelated($sourceType, $destType, $linkID, $addSql = '', $params = array()) {
 		return $this->writeRelationalQuery($sourceType, $destType, $linkID, $addSql, $params, self::C_MODE_SELECT);
 	}
@@ -343,7 +345,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 	
 	/**
-	 * Writes a relational query.
+	 * Writes a relational query. For internal use only.
 	 * 
 	 * @param type $sourceType
 	 * @param type $destType
