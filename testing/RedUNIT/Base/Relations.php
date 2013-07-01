@@ -111,7 +111,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$author->ownDocument = array($d, $d2);
 		R::store($author);
 		
-		R::nuke();R::debug(1);
+		R::nuke();
 		$book = R::dispense('book');
 		$book->ownPage = R::dispense('page',10);
 		$book2 = R::dispense('book');

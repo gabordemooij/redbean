@@ -119,10 +119,6 @@ interface RedBean_QueryWriter {
 	 */
 	public function updateRecord($type, $updatevalues, $id = null);
 	/**
-	 * @deprecated
-	 */
-	public function selectRecord($type, $conditions, $addSql = null, $delete = false, $inverse = false);
-	/**
 	 * Selects records from the database.
 	 * 
 	 * @param string  $type       name of the table you want to query
@@ -131,7 +127,7 @@ interface RedBean_QueryWriter {
 	 * @param array   $params     bindings for SQL snippet
 	 * @param boolean $all        if FALSE and $addSQL is SET prefixes $addSQL with ' WHERE ' or ' AND ' 
 	 */
-	public function queryRecord($type, $conditions, $addSql = null, $params = array(), $all = false);
+	public function queryRecord($type, $conditions, $addSql = null, $params = array());
 	/**
 	 * Selects records from the database.
 	 * 
@@ -166,6 +162,17 @@ interface RedBean_QueryWriter {
 	 */
 	public function queryRecordRelated($sourceType, $destType, $linkID, $addSql = '', $params = array());
 	
+	/**
+	 * Returns linking records. This method is used to obtain records using a link table and
+	 * allows the SQL snippets to reference columns in the link table for additional filtering or ordering.
+	 * 
+	 * @param string $sourceType source type, the reference type you want to use to fetch related items on the other side
+	 * @param string $destType   destination type, the target type you want to get beans of
+	 * @param mixed  $linkID     ID to use for the link table
+	 * @param string $addSql     Additional SQL snippet
+	 * @param array  $params     Bindings for SQL snippet
+	 */
+	public function queryRecordLinks($sourceType, $destType, $linkIDs, $addSql = '', $params = array());
 	/**
 	 * Deletes records from the database.
 	 * @note $addSql is always prefixed with ' WHERE ' or ' AND .'

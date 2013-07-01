@@ -36,9 +36,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$this->toolbox = $tools;
 	}
 
-	
-	
-	
 	/**
 	 * Creates a table name based on a types array.
 	 * Manages the get the correct name for the linking table for the
@@ -116,6 +113,20 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		return $results;
 	}
 	
+	/**
+	 * Internal method.
+	 * Returns the many-to-many related rows of table $type for bean $bean using additional SQL in $sql and
+	 * $param bindings. If $getLinks is TRUE, link rows are returned instead.
+	 * 
+	 * @param RedBean_OODBBean $bean     reference bean
+	 * @param string           $type     target type
+	 * @param boolean          $getLinks TRUE returns rows from the link table
+	 * @param string           $sql      additional SQL snippet
+	 * @param array            $params   bindings
+	 * @return array
+	 * @throws RedBean_Exception_Security
+	 * @throws RedBean_Exception_SQL
+	 */
 	private function relatedRows($bean, $type, $getLinks = false, $sql = '', $params = array()) {
 		if (!is_array($bean) && !($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
 		$ids = array();
@@ -132,9 +143,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			if (!$getLinks) {
 				return $this->writer->queryRecordRelated($sourceType, $type, $ids, $sql, $params);
 			} else {
-				return $this->writer->queryRecordRelatedKeys($sourceType, $type, $ids, $sql, $params);
+				return $this->writer->queryRecordLinks($sourceType, $type, $ids, $sql, $params);
 			}
-	
 		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
@@ -193,7 +203,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return array $ids
 	 */
 	public function related($bean, $type, $getLinks = false, $sql = '', $params = array()) {
-		if ($sql !== '') $sql = ' WHERE '.$sql;
+		$sql = $this->writer->glueSQLCondition($sql);
 		$rows = $this->relatedRows($bean, $type, $getLinks, $sql, $params);
 		$ids = array();
 		foreach($rows as $row) $ids[] = $row['id'];
@@ -364,12 +374,13 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param RedBean_OODBBean|array $bean the bean you have
 	 * @param string				 $type the type of beans you want
 	 * @param string				 $sql  SQL snippet for extra filtering
-	 * @param array					 $val  values to be inserted in SQL slots
+	 * @param array				 $val  values to be inserted in SQL slots
+	 * @param boolean				 $glue whether the SQL should be prefixed with WHERE
 	 *
 	 * @return array $beans	beans yielded by your query.
 	 */
 	public function relatedSimple($bean, $type, $sql = '', $values = array()) {
-		if ($sql !== '') $sql = ' WHERE '.$sql;
+		$sql = $this->writer->glueSQLCondition($sql);
 		$rows = $this->relatedRows($bean, $type, false, $sql, $values);
 		return $this->oodb->convertToBeans($type, $rows);
 	}

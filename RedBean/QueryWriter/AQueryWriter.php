@@ -63,6 +63,30 @@ abstract class RedBean_QueryWriter_AQueryWriter {
   	protected function getInsertSuffix ($table) {
     	return '';
   	}
+	
+	/**
+	 * Glues an SQL snippet to the beginning of a WHERE clause.
+	 * If the snippet begins with a condition glue (OR/AND) or a non-condition
+	 * keyword then no glue is required.
+	 * 
+	 * @staticvar array $snippetCache
+	 * 
+	 * @param string $sql SQL Snippet
+	 * 
+	 * @return array|string
+	 */
+	public function glueSQLCondition($sql) {
+		static $snippetCache = array();
+		if (isset($snippetCache[$sql])) return $snippetCache[$sql];
+		if (trim($sql) === '') return $sql;
+		if (preg_match('/^(AND|OR|WHERE|ORDER|GROUP|HAVING|LIMIT|OFFSET)\s+/i', ltrim($sql))) {
+			$snippetCache[$sql] = $sql;
+		} else {
+			$snippetCache[$sql] = ' WHERE '.$sql;
+		}
+		return $snippetCache[$sql];
+	}
+	
 	/**
 	 * Sets the ID SQL Snippet to use.
 	 * This can be used to use something different than NULL for the ID value,
@@ -171,14 +195,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * @see RedBean_QueryWriter::queryRecord
 	 */
-	public function queryRecord($type, $conditions, $addSql = null, $params = array(), $all = false) {
-		return $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_SELECT, false, $all);
+	public function queryRecord($type, $conditions, $addSql = null, $params = array()) {
+		return $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_SELECT, false);
 	}
 	/**
 	 * @see RedBean_QueryWriter::queryRecordCount
 	 */
 	public function queryRecordCount($type, $conditions, $addSql = null, $params = array()) {
-		$rows = $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_COUNT, false, false);
+		$rows = $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_COUNT, false);
 		if (is_array($rows) && is_array($rows[0])) return (integer) reset($rows[0]);
 		return 0;
 	}
@@ -186,19 +210,19 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @see RedBean_QueryWriter::deleteRecord
 	 */
 	public function deleteRecord($type, $conditions, $addSql = null, $params = array()) {
-		return $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_DELETE, false, false);
+		return $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_DELETE, false);
 	}
 	/**
 	 * @see RedBean_QueryWriter::queryRecordInverse
 	 */
 	public function queryRecordInverse($type, $conditions, $addSql = null, $params = array()) {
-		return $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_SELECT, true, false);
+		return $this->writeStandardQuery($type, $conditions, $addSql, $params, self::C_MODE_SELECT, true);
 	}
 	/**
 	 * @deprecated
 	 * @see RedBean_QueryWriter::selectRecord
 	 */
-	public function selectRecord($type, $conditions, $addSqlArr = null, $delete = null, $inverse = false, $all = false) {
+	public function selectRecord($type, $conditions, $addSqlArr = null, $delete = null, $inverse = false) {
 		if (is_array($addSqlArr) && isset($addSqlArr[0])) {
 			$addSql = $addSqlArr[0];
 			$params = (isset($addSqlArr[1])) ? $addSqlArr[1] : array();	
@@ -206,7 +230,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$addSql = $addSqlArr;
 			$params = array();
 		}
-		return $this->writeStandardQuery($type, $conditions, $addSql, $params, ($delete) ? self::C_MODE_DELETE : self::C_MODE_SELECT, $inverse, $all);
+		return $this->writeStandardQuery($type, $conditions, $addSql, $params, ($delete) ? self::C_MODE_DELETE : self::C_MODE_SELECT, $inverse);
 	}
 	
 	/**
@@ -271,12 +295,12 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param array        $params     bindings for SQL
 	 * @param integer      $mode       selects query mode: 1 is DELETE, 0 is SELECT, 2 is COUNT(*)
 	 * @param boolean      $inverse    if TRUE uses 'NOT IN'-clause for conditions
-	 * @param boolean      $all        if FALSE and $addSQL is SET prefixes $addSQL with ' WHERE ' or ' AND ' 
 	 */		
-	private function writeStandardQuery($type, $conditions, $addSql = null, $params = array(), $mode = null, $inverse = false, $all = false) {	
+	private function writeStandardQuery($type, $conditions, $addSql = null, $params = array(), $mode = null, $inverse = false) {
+		$addSql = $this->glueSQLCondition($addSql);
 		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
 		if (!($mode===self::C_MODE_DELETE) && $this->flagUseCache) {
-			$key = $this->getCacheKey(array($conditions, $addSql, $mode, $inverse, $all));
+			$key = $this->getCacheKey(array($conditions, $addSql, $mode, $inverse));
 			if ($cached = $this->getCached($type, $key)) return $cached;
 		}
 		$table = $this->esc($type);
@@ -311,14 +335,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if (is_array($sqlConditions) && count($sqlConditions)>0) {
 			$sql = implode(' AND ', $sqlConditions);
 			$sql = " WHERE ( $sql ) ";
-			if ($addSql) $sql .= ($all ? '': ' AND ') . " $addSql ";
+			if ($addSql) $sql .= $addSql;
 		}
 		elseif ($addSql) {
-			if ($all) {
-				$sql = " $addSql ";
-			} else {
-				$sql = " WHERE $addSql ";
-			}
+			$sql = $addSql;
 		}
 		if ($mode === self::C_MODE_DELETE) $sqlBegin = 'DELETE FROM ';
 		elseif($mode === self::C_MODE_COUNT) $sqlBegin = 'SELECT COUNT(*) FROM ';
@@ -338,7 +358,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $this->writeRelationalQuery($sourceType, $destType, $linkIDs, $addSql, $params, self::C_MODE_SELECT);
 	}
 	
-	public function queryRecordRelatedKeys($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
+	/**
+	 * @see RedBean_QueryWriter::queryRecordLinks
+	 */
+	public function queryRecordLinks($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
 		return $this->writeRelationalQuery($sourceType, $destType, $linkIDs, $addSql, $params, self::C_MODE_KEYS);
 	}
 	
@@ -362,9 +385,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @throws RedBean_Exception_SQL
 	 */
 	private function writeRelationalQuery($sourceType, $destType, $linkIDs, $addSql = '', $params = array(), $mode = self::C_MODE_SELECT) {
-		var_dump($addSql);
 		$key = $this->getCacheKey(array($sourceType, $destType, implode(',',$linkIDs), $addSql, $params, $mode));
-		if ($this->flagUseCache && $mode === self::C_MODE_SELECT && $cached = $this->getCached($destType, $key)) { echo 'HIT!';
+		if ($this->flagUseCache && $mode === self::C_MODE_SELECT && $cached = $this->getCached($destType, $key)) {
 			return $cached;
 		}
 		$inClause = implode(',', array_fill(0, count($linkIDs), '?'));
