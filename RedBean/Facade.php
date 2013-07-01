@@ -359,7 +359,7 @@ class RedBean_Facade {
 	 *
 	 * @return array $beans	beans yielded by your query.
 	 */
-	public static function related($bean, $type, $sql = null, $values = array()) {
+	public static function related($bean, $type, $sql = '', $values = array()) {
 		return self::$associationManager->relatedSimple($bean, $type, $sql, $values);
 	}
 	

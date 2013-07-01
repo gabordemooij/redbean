@@ -111,7 +111,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$author->ownDocument = array($d, $d2);
 		R::store($author);
 		
-		R::nuke();
+		R::nuke();R::debug(1);
 		$book = R::dispense('book');
 		$book->ownPage = R::dispense('page',10);
 		$book2 = R::dispense('book');
@@ -140,6 +140,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt($book->countShared('note'), 3);
 		asrt($book2->countShared('note'), 4);
 		asrt($book2->countShared('book'), 3);
+		$book2 = $book2->fresh();
 		asrt($book2->withCondition(' title = ? ',array('boe'))->countShared('book'), 1);
 		testpack('Test via()');
 		R::nuke();

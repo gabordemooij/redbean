@@ -36,25 +36,9 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$this->toolbox = $tools;
 	}
 
-	public function relatedVia($bean, $targetType, $sql='', $params=array()) {
-		$beans = array();
-		if (!$bean->id) return $beans;
-		try {	
-			$sourceType = $bean->getMeta('type');
-			$linkID = $bean->id;
-                        $rows = $this->writer->queryRecordRelated($sourceType, $targetType, $linkID, $sql, $params);
-       			$beans = $this->oodb->convertToBeans($targetType, $rows);         	
-			
-		} catch(RedBean_Exception_SQL $e) {
-                        if (!$this->writer->sqlStateIn($e->getSQLState(),
-                        array(
-                                RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-                                RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN)
-                        )) throw $e;
-                }
-		return $beans;
-	}
-
+	
+	
+	
 	/**
 	 * Creates a table name based on a types array.
 	 * Manages the get the correct name for the linking table for the
@@ -132,6 +116,34 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		return $results;
 	}
 	
+	private function relatedRows($bean, $type, $getLinks = false, $sql = '', $params = array()) {
+		if (!is_array($bean) && !($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
+		$ids = array();
+		if (is_array($bean)) {
+			$beans = $bean;
+			foreach($beans as $b) {
+				if (!($b instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected RedBean_OODBBean in array but got:'.gettype($b));
+				$ids[] = $b->id;
+			}
+			$bean = reset($beans);
+		} else $ids[] = $bean->id;
+		$sourceType = $bean->getMeta('type');
+		try {		
+			if (!$getLinks) {
+				return $this->writer->queryRecordRelated($sourceType, $type, $ids, $sql, $params);
+			} else {
+				return $this->writer->queryRecordRelatedKeys($sourceType, $type, $ids, $sql, $params);
+			}
+	
+		} catch(RedBean_Exception_SQL $e) {
+			if (!$this->writer->sqlStateIn($e->getSQLState(),
+			array(
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+			)) throw $e;
+			return array();
+		}
+	}
 	/**
 	 * Counts the number of related beans in an N-M relation.
 	 * 
@@ -180,49 +192,12 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 *
 	 * @return array $ids
 	 */
-	public function related($bean, $type, $getLinks = false, $sql = false) {
-		if (!is_array($bean) && !($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
+	public function related($bean, $type, $getLinks = false, $sql = '', $params = array()) {
+		if ($sql !== '') $sql = ' WHERE '.$sql;
+		$rows = $this->relatedRows($bean, $type, $getLinks, $sql, $params);
 		$ids = array();
-		if (is_array($bean)) {
-			$beans = $bean;
-			foreach($beans as $b) {
-				if (!($b instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected RedBean_OODBBean in array but got:'.gettype($b));
-				$ids[] = $b->id;
-			}
-			$bean = reset($beans);
-		} else $ids[] = $bean->id;
-		$table = $this->getTable(array($bean->getMeta('type') , $type));
-		if ($type == $bean->getMeta('type')) {
-			$type .= '2';
-			$cross = 1;
-		} else $cross = 0;
-		if (!$getLinks) $targetproperty = $type.'_id'; else $targetproperty = 'id';
-		$property = $bean->getMeta('type').'_id';
-		try {
-			$sqlFetchKeys = $this->writer->queryRecord($table, array($property => $ids), $sql);
-			$sqlResult = array();
-			foreach($sqlFetchKeys as $row) {
-				if (isset($row[$targetproperty])) {
-					$sqlResult[] = $row[$targetproperty];
-				}
-			}
-			if ($cross) {
-				$sqlFetchKeys2 = $this->writer->queryRecord($table, array($targetproperty => $ids), $sql);
-				foreach($sqlFetchKeys2 as $row) {
-					if (isset($row[$property])) {
-						$sqlResult[] = $row[$property];
-					}
-				}
-			}
-			return $sqlResult; //or returns rows in case of $sql != empty
-		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
-			return array();
-		}
+		foreach($rows as $row) $ids[] = $row['id'];
+		return $ids;
 	}
 	/**
 	 * Breaks the association between two beans. This method unassociates two beans. If the
@@ -393,11 +368,9 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 *
 	 * @return array $beans	beans yielded by your query.
 	 */
-	public function relatedSimple($bean, $type, $sql = null, $values = array()) {
-		$keys = $this->related($bean, $type);
-		if (count($keys) == 0 || !is_array($keys)) return array();
-		if (!$sql) return $this->oodb->batch($type, $keys);
-		$rows = $this->writer->queryRecord($type, array('id' => $keys), $sql, $values);
+	public function relatedSimple($bean, $type, $sql = '', $values = array()) {
+		if ($sql !== '') $sql = ' WHERE '.$sql;
+		$rows = $this->relatedRows($bean, $type, false, $sql, $values);
 		return $this->oodb->convertToBeans($type, $rows);
 	}
 	/**

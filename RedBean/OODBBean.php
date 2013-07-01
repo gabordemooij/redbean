@@ -412,7 +412,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		$types = array($this->__info['type'], $type);
 		$linkID = $this->properties['id'];
 		$a = $redbean->getAssociationManager();
-		$beans = $a->relatedVia($this, $type, $this->withSql, $this->withParams);
+		R::debug(1);
+		$rows = $a->relatedSimple($this, $type, $this->withSql, $this->withParams);
+		var_dump($rows);
+		R::debug(0);
+		$beans = $redbean->convertToBeans($type, $rows);
 		$this->withSql = '';
 		$this->withParams = array();
 		return $beans;

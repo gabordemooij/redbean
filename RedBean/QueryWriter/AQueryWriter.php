@@ -23,6 +23,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	const C_MODE_SELECT = 0;
 	const C_MODE_DELETE = 1;
 	const C_MODE_COUNT = 2;
+	const C_MODE_KEYS = 3;
 	
 	/**
 	 * @var array
@@ -333,15 +334,19 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * @see RedBean_QueryWriter::queryRecordRelated
 	 */
-	public function queryRecordRelated($sourceType, $destType, $linkID, $addSql = '', $params = array()) {
-		return $this->writeRelationalQuery($sourceType, $destType, $linkID, $addSql, $params, self::C_MODE_SELECT);
+	public function queryRecordRelated($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
+		return $this->writeRelationalQuery($sourceType, $destType, $linkIDs, $addSql, $params, self::C_MODE_SELECT);
+	}
+	
+	public function queryRecordRelatedKeys($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
+		return $this->writeRelationalQuery($sourceType, $destType, $linkIDs, $addSql, $params, self::C_MODE_KEYS);
 	}
 	
 	/**
 	 * @see RedBean_QueryWriter::queryRecordCountRelated
 	 */
 	public function queryRecordCountRelated($sourceType, $destType, $linkID, $addSql = '', $params = array()) {
-		return $this->writeRelationalQuery($sourceType, $destType, $linkID, $addSql, $params, self::C_MODE_COUNT);
+		return $this->writeRelationalQuery($sourceType, $destType, array($linkID), $addSql, $params, self::C_MODE_COUNT);
 	}
 	
 	/**
@@ -356,40 +361,54 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return type
 	 * @throws RedBean_Exception_SQL
 	 */
-	private function writeRelationalQuery($sourceType, $destType, $linkID, $addSql = '', $params = array(), $mode = self::C_MODE_SELECT) {
-		$key = $this->getCacheKey(array($sourceType, $destType, $linkID, $addSql, $params, $mode));
-		if ($this->flagUseCache && $mode === self::C_MODE_SELECT && $cached = $this->getCached($destType, $key)) {
+	private function writeRelationalQuery($sourceType, $destType, $linkIDs, $addSql = '', $params = array(), $mode = self::C_MODE_SELECT) {
+		var_dump($addSql);
+		$key = $this->getCacheKey(array($sourceType, $destType, implode(',',$linkIDs), $addSql, $params, $mode));
+		if ($this->flagUseCache && $mode === self::C_MODE_SELECT && $cached = $this->getCached($destType, $key)) { echo 'HIT!';
 			return $cached;
 		}
+		$inClause = implode(',', array_fill(0, count($linkIDs), '?'));
 		$sourceTable = $this->esc($sourceType);
 		$destTable = $this->esc($destType);
 		$linkTable = $this->getAssocTable(array($sourceType, $destType));
 		$sourceCol = $this->esc($sourceType.'_id');
 		$destCol = $this->esc($destType.'_id');
-		$selector = ($mode === self::C_MODE_SELECT) ? "{$destTable}.*" : "count(*)";
+		if ($mode === self::C_MODE_SELECT) {
+			$selector = "{$destTable}.*";
+		}
+		elseif ($mode === self::C_MODE_KEYS) {
+			$selector = "{$linkTable}.id"; 
+		}
+		else {
+			$selector = "COUNT(*)";
+		}
 		if ($sourceType === $destType) {
 			$destCol = $this->esc($sourceType.'2_id');
 			$sql = "
 			SELECT {$selector} FROM {$linkTable}
 			INNER JOIN {$destTable} ON 
-			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? ) OR
-			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} = ? )
-			$addSql
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
+			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
+			{$addSql}
 			-- keep-cache";
-			array_unshift($params, $linkID);
+			$linkIDs = array_merge($linkIDs,$linkIDs);
 		} else {
 			$sql = "
 			SELECT {$selector} FROM {$linkTable}
 			INNER JOIN {$destTable} ON 
-			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? )
-			$addSql	
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) )
+			{$addSql}	
 			-- keep-cache";
 		}
-		array_unshift($params, $linkID);	
+		$params = array_merge($linkIDs, $params);	
 		$rows = ($mode === self::C_MODE_COUNT) ? 0 : array();
 		try {
 			if ($mode === self::C_MODE_COUNT) {
 				return (int) $this->adapter->getCell($sql, $params);
+			} elseif ($mode === self::C_MODE_KEYS) {
+			 	$rows = $this->adapter->get($sql, $params);
+				$this->putResultInCache($linkTable, $key, $rows);
+				return $rows;
 			} else {
 				$rows = $this->adapter->get($sql, $params);
 				$this->putResultInCache($destType, $key, $rows);

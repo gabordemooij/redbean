@@ -173,6 +173,7 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		pass();
 		R::associate($track3,$cd,'{"order":3}');
 		pass();
+		R::debug(1);
 		$tracks = R::related($cd,"track"," title LIKE ? ",array("Night%"));
 		asrt(count($tracks),2);
 		$track = array_pop($tracks);
