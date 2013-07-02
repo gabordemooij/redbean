@@ -173,6 +173,12 @@ interface RedBean_QueryWriter {
 	 * @param array  $params     Bindings for SQL snippet
 	 */
 	public function queryRecordLinks($sourceType, $destType, $linkIDs, $addSql = '', $params = array());
+	
+	public function queryRecordLink($sourceType, $destType, $sourceID, $destID);
+	
+	public function deleteRelations($sourceType, $destType, $sourceID);
+	
+	
 	/**
 	 * Deletes records from the database.
 	 * @note $addSql is always prefixed with ' WHERE ' or ' AND .'
@@ -233,16 +239,8 @@ interface RedBean_QueryWriter {
 	 * @return integer $numOfBeans number of beans found
 	 */
 	public function count($type);
-	/**
-	 * This method will add a constraint. If one of the beans gets trashed
-	 * the other, related bean will be removed as well.
-	 *
-	 * @param RedBean_OODBBean $bean1      first bean
-	 * @param RedBean_OODBBean $bean2      second bean
-	 *
-	 * @return void
-	 */
-	public function addConstraint(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2);
+	
+	public function addConstraintForTypes($sourceType, $destType);
 	/**
 	 * This method will add a foreign key from type and field to
 	 * target type and target field.

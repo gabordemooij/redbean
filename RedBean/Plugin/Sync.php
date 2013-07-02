@@ -86,7 +86,7 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 			if (strpos($sourceTable, '_') !== false) {
 				$targetWriter->addUniqueIndex($sourceTable, array_keys($sourceColumns));
 				$types = explode('_', $sourceTable);
-				$targetWriter->addConstraint(R::dispense($types[0]), R::dispense($types[1]));
+				$targetWriter->addConstraintForTypes(R::dispense($types[0])->getMeta('type'), R::dispense($types[1])->getMeta('type'));
 			}
 		}
 	}

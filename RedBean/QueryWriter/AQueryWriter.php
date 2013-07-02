@@ -170,10 +170,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @return integer $insertid	  insert id from driver, new record id
 	 */
-	protected function insertRecord($table, $insertcolumns, $insertvalues) {
+	protected function insertRecord($type, $insertcolumns, $insertvalues) {
 		$default = $this->defaultValue;
-		$suffix = $this->getInsertSuffix($table);
-		$table = $this->esc($table);
+		$suffix = $this->getInsertSuffix($type);
+		$table = $this->esc($type);
 		if (count($insertvalues)>0 && is_array($insertvalues[0]) && count($insertvalues[0])>0) {
 			foreach($insertcolumns as $k => $v) {
 				$insertcolumns[$k] = $this->esc($v);
@@ -286,26 +286,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		);
 	}
 	
-	/**
-	 * Internal method to build query.
-	 * 
-	 * @param string       $type       name of the table you want to query
-	 * @param array        $conditions criteria ( $column => array( $values ) )
-	 * @param string       $addSql     additional SQL snippet
-	 * @param array        $params     bindings for SQL
-	 * @param integer      $mode       selects query mode: 1 is DELETE, 0 is SELECT, 2 is COUNT(*)
-	 * @param boolean      $inverse    if TRUE uses 'NOT IN'-clause for conditions
-	 */		
-	private function writeStandardQuery($type, $conditions, $addSql = null, $params = array(), $mode = null, $inverse = false) {
-		$addSql = $this->glueSQLCondition($addSql);
-		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
-		if (!($mode===self::C_MODE_DELETE) && $this->flagUseCache) {
-			$key = $this->getCacheKey(array($conditions, $addSql, $mode, $inverse));
-			if ($cached = $this->getCached($type, $key)) return $cached;
-		}
-		$table = $this->esc($type);
+	private function makeSQLFromConditions($conditions, $inverse, &$params, $addSql = '') {
 		$sqlConditions = array();
-		$bindings = array();
 		foreach($conditions as $column => $values) {
 			if (!count($values)) continue;
 			$sql = $this->esc($column);
@@ -324,12 +306,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				if (!is_array($values)) $values = array($values);
 				foreach($values as $k => $v) {
 					$values[$k] = strval($v);
+					array_unshift($params, $v);
 				}
-				$bindings = array_merge($bindings, $values);
 			}
-		}
-		if (count($params) > 0) {
-			$bindings = array_merge($bindings, $params);
 		}
 		$sql = '';
 		if (is_array($sqlConditions) && count($sqlConditions)>0) {
@@ -340,11 +319,34 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		elseif ($addSql) {
 			$sql = $addSql;
 		}
+		return $sql;
+	}
+	
+	/**
+	 * Internal method to build query.
+	 * 
+	 * @param string       $type       name of the table you want to query
+	 * @param array        $conditions criteria ( $column => array( $values ) )
+	 * @param string       $addSql     additional SQL snippet
+	 * @param array        $params     bindings for SQL
+	 * @param integer      $mode       selects query mode: 1 is DELETE, 0 is SELECT, 2 is COUNT(*)
+	 * @param boolean      $inverse    if TRUE uses 'NOT IN'-clause for conditions
+	 */		
+	private function writeStandardQuery($type, $conditions, $addSql = null, $params = array(), $mode = null, $inverse = false) {
+		$addSql = $this->glueSQLCondition($addSql);
+		if (!is_array($conditions)) throw new Exception('Conditions must be an array');
+		if (!($mode===self::C_MODE_DELETE) && $this->flagUseCache) {
+			$key = $this->getCacheKey(array($conditions, $addSql, $mode, $inverse));
+			if ($cached = $this->getCached($type, $key)) return $cached;
+		}
+		$table = $this->esc($type);
+		if (is_null($params)) $params = array();
+		$sql = $this->makeSQLFromConditions($conditions, $inverse, $params, $addSql);
 		if ($mode === self::C_MODE_DELETE) $sqlBegin = 'DELETE FROM ';
 		elseif($mode === self::C_MODE_COUNT) $sqlBegin = 'SELECT COUNT(*) FROM ';
 		else $sqlBegin = 'SELECT * FROM ';
 		$sql = $sqlBegin . $table . $sql;
-		$rows = $this->adapter->get($sql.(($mode === 1) ? '' : ' -- keep-cache'), $bindings);
+		$rows = $this->adapter->get($sql.(($mode === 1) ? '' : ' -- keep-cache'), $params);
 		if (!($mode === 1) && $this->flagUseCache && $key) {
 			$this->putResultInCache($type, $key, $rows);
 		}
@@ -355,57 +357,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @see RedBean_QueryWriter::queryRecordRelated
 	 */
 	public function queryRecordRelated($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
-		return $this->writeRelationalQuery($sourceType, $destType, $linkIDs, $addSql, $params, self::C_MODE_SELECT);
-	}
-	
-	/**
-	 * @see RedBean_QueryWriter::queryRecordLinks
-	 */
-	public function queryRecordLinks($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
-		return $this->writeRelationalQuery($sourceType, $destType, $linkIDs, $addSql, $params, self::C_MODE_KEYS);
-	}
-	
-	/**
-	 * @see RedBean_QueryWriter::queryRecordCountRelated
-	 */
-	public function queryRecordCountRelated($sourceType, $destType, $linkID, $addSql = '', $params = array()) {
-		return $this->writeRelationalQuery($sourceType, $destType, array($linkID), $addSql, $params, self::C_MODE_COUNT);
-	}
-	
-	/**
-	 * Writes a relational query. For internal use only.
-	 * 
-	 * @param type $sourceType
-	 * @param type $destType
-	 * @param type $linkID
-	 * @param type $addSql
-	 * @param type $params
-	 * @param type $mode
-	 * @return type
-	 * @throws RedBean_Exception_SQL
-	 */
-	private function writeRelationalQuery($sourceType, $destType, $linkIDs, $addSql = '', $params = array(), $mode = self::C_MODE_SELECT) {
-		$key = $this->getCacheKey(array($sourceType, $destType, implode(',',$linkIDs), $addSql, $params, $mode));
-		if ($this->flagUseCache && $mode === self::C_MODE_SELECT && $cached = $this->getCached($destType, $key)) {
+		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
+		$key = $this->getCacheKey(array($sourceType, $destType, implode(',',$linkIDs), $addSql, $params));
+		if ($this->flagUseCache && $cached = $this->getCached($destType, $key)) {
 			return $cached;
 		}
 		$inClause = implode(',', array_fill(0, count($linkIDs), '?'));
-		$sourceTable = $this->esc($sourceType);
-		$destTable = $this->esc($destType);
-		$linkTable = $this->getAssocTable(array($sourceType, $destType));
-		$sourceCol = $this->esc($sourceType.'_id');
-		$destCol = $this->esc($destType.'_id');
-		if ($mode === self::C_MODE_SELECT) {
-			$selector = "{$destTable}.*";
-		}
-		elseif ($mode === self::C_MODE_KEYS) {
-			$selector = "{$linkTable}.id"; 
-		}
-		else {
-			$selector = "COUNT(*)";
-		}
+		$selector = "{$destTable}.*";
 		if ($sourceType === $destType) {
-			$destCol = $this->esc($sourceType.'2_id');
 			$sql = "
 			SELECT {$selector} FROM {$linkTable}
 			INNER JOIN {$destTable} ON 
@@ -423,28 +382,118 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			-- keep-cache";
 		}
 		$params = array_merge($linkIDs, $params);	
-		$rows = ($mode === self::C_MODE_COUNT) ? 0 : array();
-		try {
-			if ($mode === self::C_MODE_COUNT) {
-				return (int) $this->adapter->getCell($sql, $params);
-			} elseif ($mode === self::C_MODE_KEYS) {
-			 	$rows = $this->adapter->get($sql, $params);
-				$this->putResultInCache($linkTable, $key, $rows);
-				return $rows;
-			} else {
-				$rows = $this->adapter->get($sql, $params);
-				$this->putResultInCache($destType, $key, $rows);
-				return $rows;
-			}
-		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->sqlStateIn($e->getSQLState(),
-			array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN)
-			)) throw $e;
-		}
+		$rows = array();
+		$rows = $this->adapter->get($sql, $params);
+		$this->putResultInCache($destType, $key, $rows);
 		return $rows;
 	}
+	
+	/**
+	 * @see RedBean_QueryWriter::queryRecordLinks
+	 */
+	public function queryRecordLinks($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
+		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
+		$key = $this->getCacheKey(array($sourceType, $destType, implode(',',$linkIDs), $addSql, $params));
+		if ($this->flagUseCache && $cached = $this->getCached($linkTable, $key)) {
+			return $cached;
+		}
+		$inClause = implode(',', array_fill(0, count($linkIDs), '?'));
+		$selector = "{$linkTable}.id"; 
+		if ($sourceType === $destType) {
+			$sql = "
+			SELECT {$selector} FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
+			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
+			{$addSql}
+			-- keep-cache";
+			$linkIDs = array_merge($linkIDs,$linkIDs);
+		} else {
+			$sql = "
+			SELECT {$selector} FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) )
+			{$addSql}	
+			-- keep-cache";
+		}
+		$params = array_merge($linkIDs, $params);	
+		$rows = array();
+		$rows = $this->adapter->get($sql, $params);
+		$this->putResultInCache($linkTable, $key, $rows);
+		return $rows;
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::queryRecordCountRelated
+	 */
+	public function queryRecordCountRelated($sourceType, $destType, $linkID, $addSql = '', $params = array()) {
+		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
+		if ($sourceType === $destType) {
+			$sql = "
+			SELECT COUNT(*) FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? ) OR
+			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} = ? )
+			{$addSql}
+			-- keep-cache";
+			$params = array_merge(array($linkID, $linkID), $params);	
+		} else {
+			$sql = "
+			SELECT COUNT(*) FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? )
+			{$addSql}	
+			-- keep-cache";
+			$params = array_merge(array($linkID), $params);	
+		}
+		return (int) $this->adapter->getCell($sql, $params);
+	}
+	
+	private function getRelationalTablesAndColumns($sourceType, $destType, $noQuote = false) {
+		$linkTable = $this->esc($this->getAssocTable(array($sourceType, $destType)), $noQuote);
+		$sourceCol = $this->esc($sourceType.'_id', $noQuote);
+		$destCol = ($sourceType === $destType) ? $this->esc($destType.'2_id', $noQuote) : $this->esc($destType.'_id', $noQuote);
+		$sourceTable = $this->esc($sourceType, $noQuote);
+		$destTable = $this->esc($destType, $noQuote);
+		return array($sourceTable, $destTable, $linkTable, $sourceCol, $destCol);
+	}
+	
+	public function deleteRelations($sourceType, $destType, $sourceID) {
+		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
+		if ($sourceTable === $destTable) {
+			$sql = "DELETE FROM {$linkTable} 
+				WHERE ( {$sourceCol} = ? ) OR 
+				( {$destCol} = ?  )
+			";
+			$this->adapter->exec($sql, array($sourceID, $sourceID));	
+		} else {
+			$sql = "DELETE FROM {$linkTable} 
+				WHERE {$sourceCol} = ? ";
+			$this->adapter->exec($sql, array($sourceID));
+		}
+	}
+	
+	public function queryRecordLink($sourceType, $destType, $sourceID, $destID) {
+		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
+		$key = $this->getCacheKey(array($sourceType, $destType, $sourceID, $destID));
+		if ($this->flagUseCache && $cached = $this->getCached($linkTable, $key)) {
+			return $cached;
+		}
+		if ($sourceTable === $destTable) {
+			$sql = "SELECT {$linkTable}.* FROM {$linkTable} 
+				WHERE ( {$sourceCol} = ? AND {$destCol} = ? ) OR 
+				 ( {$destCol} = ? AND {$sourceCol} = ? ) 
+				";
+			$row = $this->adapter->getRow($sql, array($sourceID, $destID, $sourceID, $destID));
+		} else {
+			$sql = "SELECT {$linkTable}.* FROM {$linkTable} 
+				WHERE {$sourceCol} = ? AND {$destCol} = ? ";
+			$row = $this->adapter->getRow($sql, array($sourceID, $destID));	
+		}
+		$this->putResultInCache($linkTable, $key, $row);
+		return $row;
+	}
+	
 	
 	/**
 	 * @see RedBean_QueryWriter::wipe
@@ -545,23 +594,11 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	
 	/**
 	 * @see RedBean_QueryWriter::addConstraint
+	 * @todo pass types instead of beans!
 	 */
-	public function addConstraint(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-		$table1 = $bean1->getMeta('type');
-		$table2 = $bean2->getMeta('type');
-		$writer = $this;
-		$adapter = $this->adapter;
-		$table = RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($table1, $table2));
-		$property1 = $bean1->getMeta('type') . '_id';
-		$property2 = $bean2->getMeta('type') . '_id';
-		if ($property1 == $property2) $property2 = $bean2->getMeta('type').'2_id';
-		$table = $this->esc($table, true);
-		$table1 = $this->esc($table1, true);
-		$table2 = $this->esc($table2, true);
-		$property1 = $this->esc($property1, true);
-		$property2 = $this->esc($property2, true);
-		//Dispatch to right method
-		return $this->constrain($table, $table1, $table2, $property1, $property2);
+	public function addConstraintForTypes($sourceType, $destType) {
+		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType, true);
+		return $this->constrain($linkTable, $sourceTable, $destTable, $sourceCol, $destCol);
 	}
 	/**
 	 * Checks whether a value starts with zeros. In this case
@@ -600,4 +637,5 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public function safeColumn($a, $b = false) { return $this->esc($a, $b); }
 	public function safeTable($a, $b = false) { return $this->esc($a, $b); }
+	public function addConstraint(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) { return $this->addConstraintForTypes($bean1->getMeta('type'), $bean2->getMeta('type')); }
 }

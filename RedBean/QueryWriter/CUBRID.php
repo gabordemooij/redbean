@@ -181,21 +181,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 				), $list)) !== 3) : false;
 	}
 	/**
-	 * @see RedBean_QueryWriter::addConstraint
-	 */
-	public function addConstraint(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-		$table1 = $bean1->getMeta('type');
-		$table2 = $bean2->getMeta('type');
-		$writer = $this;
-		$adapter = $this->adapter;
-		$table = RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($table1, $table2));
-		$property1 = $bean1->getMeta('type') . '_id';
-		$property2 = $bean2->getMeta('type') . '_id';
-		if ($property1 == $property2) $property2 = $bean2->getMeta('type').'2_id';
-		//Dispatch to right method
-		return $this->constrain($table, $table1, $table2, $property1, $property2);
-	}
-	/**
 	 * Add the constraints for a specific database driver: CUBRID
 	 * @todo Too many arguments; find a way to solve this in a neater way.
 	 *

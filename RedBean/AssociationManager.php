@@ -35,7 +35,14 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$this->writer = $tools->getWriter();
 		$this->toolbox = $tools;
 	}
-
+	
+	private function handleException(Exception $e) {
+		if (!$this->writer->sqlStateIn($e->getSQLState(),
+			array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN)
+			)) throw $e;
+	}
 	/**
 	 * Creates a table name based on a types array.
 	 * Manages the get the correct name for the linking table for the
@@ -103,7 +110,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 				$bean->getMeta('buildreport.flags.created')){
 				$bean->setMeta('buildreport.flags.created', 0);
 				if (!$this->oodb->isFrozen())
-				$this->writer->addConstraint($bean1, $bean2);
+				$this->writer->addConstraintForTypes($bean1->getMeta('type'), $bean2->getMeta('type'));
 			}
 			$results[] = $id;
 		} catch(RedBean_Exception_SQL $e) {
@@ -146,11 +153,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 				return $this->writer->queryRecordLinks($sourceType, $type, $ids, $sql, $params);
 			}
 		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
+			$this->handleException($e);
 			return array();
 		}
 	}
@@ -172,11 +175,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		try {
 			return $this->writer->queryRecordCountRelated($beanType, $type, $bean->id, $sql, $values);
 		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
+			$this->handleException($e);
 			return 0;
 		}
 	}
@@ -227,40 +226,22 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		if (!is_array($beans2)) $beans2 = array($beans2);
 		foreach($beans1 as $bean1) {
 			foreach($beans2 as $bean2) {
-				$this->oodb->store($bean1);
-				$this->oodb->store($bean2);
-				$table = $this->getTable(array($bean1->getMeta('type') , $bean2->getMeta('type')));
-				$type = $bean1->getMeta('type');
-				if ($type == $bean2->getMeta('type')) {
-					$type .= '2';
-					$cross = 1;
-				} else $cross = 0;
-				$property1 = $type.'_id';
-				$property2 = $bean2->getMeta('type').'_id';
-				$value1 = (int) $bean1->id;
-				$value2 = (int) $bean2->id;
 				try {
-					$condA = array($property1 => array($value1), $property2 => array($value2));
-					$condB = array($property2 => array($value1), $property1 => array($value2));
+					$this->oodb->store($bean1);
+					$this->oodb->store($bean2);
+					$row = $this->writer->queryRecordLink($bean1->getMeta('type'), $bean2->getMeta('type'), $bean1->id, $bean2->id);
+					$linkType = $this->getTable(array($bean1->getMeta('type') , $bean2->getMeta('type')));
 					if ($fast) {
-						$rows = $this->writer->deleteRecord($table, $condA, null);
-						if ($cross) {
-							$rows2 = $this->writer->deleteRecord($table, $condB, null);
-						}
+						$this->writer->deleteRecord($linkType, array('id' => $row['id']));
+						return; 
 					}
-					$rows = $this->writer->queryRecord($table, $condA, null);
-					if ($cross) {
-						$rows2 = $this->writer->queryRecord($table, $condB, null);
-						$rows = array_merge($rows, $rows2);
+					$beans = $this->oodb->convertToBeans($linkType, array($row));
+					if (count($beans) > 0) {
+						$bean = reset($beans);
+						$this->oodb->trash($bean);
 					}
-					$beans = $this->oodb->convertToBeans($table, $rows);
-					foreach($beans as $link) $this->oodb->trash($link);
 				} catch(RedBean_Exception_SQL $e) {
-					if (!$this->writer->sqlStateIn($e->getSQLState(),
-					array(
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-					)) throw $e;
+					$this->handleException($e);
 				}
 			}
 		}
@@ -279,24 +260,10 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 */
 	public function clearRelations(RedBean_OODBBean $bean, $type) {
 		$this->oodb->store($bean);
-		$table = $this->getTable(array($bean->getMeta('type'), $type));
-		if ($type == $bean->getMeta('type')) {
-			$property2 = $type.'2_id';
-			$cross = 1;
-		}
-		else $cross = 0;
-		$property = $bean->getMeta('type').'_id';
 		try {
-			$this->writer->deleteRecord($table, array($property => array($bean->id)), null);
-			if ($cross) {
-				$this->writer->deleteRecord($table, array($property2 => array($bean->id)), null);
-			}
+			$this->writer->deleteRelations($bean->getMeta('type'), $type, $bean->id);
 		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
+			$this->handleException($e);
 		}
 	}
 	/**
@@ -311,36 +278,13 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return bool $related whether they are associated N-M
 	 */
 	public function areRelated(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
-		if (!$bean1->getID() || !$bean2->getID()) return false;
-		$table = $this->getTable(array($bean1->getMeta('type'), $bean2->getMeta('type')));
-		$type = $bean1->getMeta('type');
-		if ($type == $bean2->getMeta('type')) {
-			$type .= '2';
-			$cross = 1;
-		} else $cross = 0;
-		$property1 = $type.'_id';
-		$property2 = $bean2->getMeta('type').'_id';
-		$value1 = (int) $bean1->id;
-		$value2 = (int) $bean2->id;
 		try {
-			$rows = $this->writer->queryRecord($table, array(
-				$property1 => array($value1), $property2 => array($value2)), null
-			);
-			if ($cross) {
-				$rows2 = $this->writer->queryRecord($table, array(
-				$property2 => array($value1), $property1 => array($value2)), null
-				);
-				$rows = array_merge($rows, $rows2);
-			}
-		}catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
+			$row = $this->writer->queryRecordLink($bean1->getMeta('type'), $bean2->getMeta('type'), $bean1->id, $bean2->id);
+			return (boolean) $row;
+		} catch(RedBean_Exception_SQL $e) {
+			$this->handleException($e);
 			return false;
 		}
-		return (count($rows)>0);
 	}
 	/**
 	 * @deprecated
