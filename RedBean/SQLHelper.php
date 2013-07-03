@@ -27,9 +27,21 @@
 	 */
 	protected $sql = '';
 	/**
-	 * @var array
+	 * @var boolean
 	 */
+	protected static $flagUseCamelCase = true;
+	/**
+	* @var array
+	*/
 	protected $params = array();
+	/**
+	* Toggles support for camelCased statements.
+	*
+	* @param boolean $yesNo
+	*/
+	public static function useCamelCase($yesNo) {
+		self::$flagUseCamelCase = (boolean) $yesNo;
+	}
 	/**
 	 * Constructor
 	 * 
@@ -47,6 +59,13 @@
 	 * @return mixed $result   either self or result depending on mode 
 	 */
 	public function __call($funcName, $args = array()) {
+		if (self::$flagUseCamelCase) {
+			static $funcCache = array();
+			if (!isset($funcCache[$funcName])) {
+				$funcCache[$funcName] = strtolower(preg_replace('/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $funcName));
+			}
+			$funcName = $funcCache[$funcName]; 
+		}
 		$funcName = str_replace('_', ' ', $funcName);
 		if ($this->capture) {
 			$this->sql .= ' '.$funcName . ' '.implode(',', $args);

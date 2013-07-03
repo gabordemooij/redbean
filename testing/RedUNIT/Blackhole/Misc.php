@@ -37,7 +37,14 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		$props = $bean->getProperties();
 		asrt(isset($props['property']), true);
 		asrt($props['property'], 'hello');
-		
+
+		testpack('Test snake_case vs CamelCase with Query Builder');
+		list($sql, $params) = R::$f->begin()->camelCase()->getQuery();	
+		asrt(trim($sql),'camel case');
+		RedBean_SQLHelper::useCamelCase(false);
+		list($sql, $params) = R::$f->begin()->camelCase()->getQuery();		
+		asrt(trim($sql), 'camelCase');
+
 		testpack('Test with- and withCondition with Query Builder');
 		R::nuke();
 		$book = R::dispense('book');
