@@ -15,7 +15,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
 	 * @var boolean
 	 */
-	private static $flagUseBeautyfulColumnnames = true;
+	private static $flagUseBeautyCols = true;
 	/**
 	 * @var array
 	 */
@@ -78,7 +78,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param boolean
 	 */
 	public static function setFlagBeautifulColumnNames($flag) {
-		self::$flagUseBeautyfulColumnnames = (boolean) $flag;
+		self::$flagUseBeautyCols = (boolean) $flag;
 	}
 	/** Returns the alias for a type
 	 *
@@ -347,9 +347,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return RedBean_OODBBean 
 	 */
 	public function alias($aliasName) {
-		if (self::$flagUseBeautyfulColumnnames ) {
-			$aliasName = $this->beau($aliasName);
-		}
+		$aliasName = $this->beau($aliasName);
 		$this->aliasName = $aliasName;
 		return $this;
 	}
@@ -374,6 +372,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	* @return string	
 	*/
 	public function beau($property) {
+		if (!self::$flagUseBeautyCols) return $property;
 		if (strpos($property, 'own') !== 0 && strpos($property, 'shared') !== 0) {
 			if (isset(self::$beautifulColumns[$property])) {
 				$propertyBeau = self::$beautifulColumns[$property];
@@ -406,9 +405,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$this->via = null;
 			} 
 		}
-		if (self::$flagUseBeautyfulColumnnames ) {
-			$type = $this->beau($type);
-		}
+		$type = $this->beau($type);
 		$types = array($this->__info['type'], $type);
 		$linkID = $this->properties['id'];
 		$a = $redbean->getAssociationManager();
@@ -426,9 +423,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	* @return array
 	*/
 	private function getOwnList($type) {
-		if (self::$flagUseBeautyfulColumnnames) {
-			$type = $this->beau($type);
-		}
+		$type = $this->beau($type);
 		if ($this->aliasName) {
 			$parentField = $this->aliasName;
 			$myFieldLink = $this->aliasName.'_id';
@@ -461,7 +456,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return mixed $value
 	 */
 	public function &__get($property) {
-		if (self::$flagUseBeautyfulColumnnames && !$this->flagSkipBeau) {
+		if (!$this->flagSkipBeau) {
 			$property = $this->beau($property);	
 		}
 		if ($this->beanHelper) {
@@ -514,9 +509,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param  mixed $value
 	 */
 	public function __set($property, $value) {
-		if (self::$flagUseBeautyfulColumnnames) {
-			$property = $this->beau($property);
-		}
+		$property = $this->beau($property);
 		$this->flagSkipBeau = true;
 		$this->__get($property);
 		$this->flagSkipBeau = false;
@@ -861,9 +854,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return integer
 	 */
 	public function countOwn($type) {
-		if (self::$flagUseBeautyfulColumnnames) {
-			$type = $this->beau($type);
-		}
+		$type = $this->beau($type);
 		if ($this->aliasName) {
 			$parentField = $this->aliasName;
 			$myFieldLink = $this->aliasName.'_id';
@@ -902,9 +893,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$this->via = null;
 			} 
 		}
-		if (self::$flagUseBeautyfulColumnnames ) {
-			$type = $this->beau($type);
-		}
+		$type = $this->beau($type);
 		$count = 0;
 		if ($this->getID()>0) {
 			$count = $redbean->getAssociationManager()->relatedCount($this, $type, $this->withSql, $this->withParams, true);

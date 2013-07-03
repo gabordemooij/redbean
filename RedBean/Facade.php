@@ -459,7 +459,7 @@ class RedBean_Facade {
 	 * @return array $beans  beans
 	 */
 	public static function findAll($type, $sql = null, $values = array()) {
-		return self::$finder->findAll($type, $sql, $values);
+		return self::$finder->find($type, $sql, $values);
 	}
 	/**
 	 * @see RedBean_Facade::find

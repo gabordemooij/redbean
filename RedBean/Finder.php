@@ -50,24 +50,10 @@ class RedBean_Finder {
 		return $this->redbean->find($type, array(), $sql, $values);
 	}
 	/**
-	 * @see RedBean_Finder::find
-	 * The findAll() method differs from the find() method in that it does
-	 * not assume a WHERE-clause, so this is valid:
-	 *
-	 * R::findAll('person', ' ORDER BY name DESC ');
-	 *
-	 * Your SQL does not have to start with a valid WHERE-clause condition.
-	 * 
-	 * @param string $type   type   the type of bean you are looking for
-	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $values values array of values to be bound to parameters in query
-	 *
-	 * @return array $beans  beans
+	 * @deprecated
 	 */
 	public function findAll($type, $sql = null, $values = array()) {
-		if ($sql instanceof RedBean_SQLHelper) list($sql, $values) = $sql->getQuery();
-		if (!is_array($values)) throw new InvalidArgumentException('Expected array, '.gettype($values).' given.');
-		return $this->redbean->find($type, array(), $sql, $values, true);
+		return $this->find($type, $sql, $values);
 	}
 	/**
 	 * @see RedBean_Finder::find
