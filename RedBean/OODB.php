@@ -59,6 +59,20 @@ class RedBean_OODB extends RedBean_Observable {
 		if ($writer instanceof RedBean_QueryWriter) $this->writer = $writer;
 		$this->beanhelper = new RedBean_BeanHelper_Facade();
 	}
+	
+	/**
+	 * Handles Exceptions. Suppresses exceptions caused by missing structures.
+	 * 
+	 * @param Exception $e
+	 * @throws Exception
+	 */
+	private function handleException(Exception $e) {
+		if (!$this->writer->sqlStateIn($e->getSQLState(),
+			array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN)
+			)) throw $e;
+	}
 	/**
 	 * Toggles fluid or frozen mode. In fluid mode the database
 	 * structure is adjusted to accomodate your objects. In frozen mode
@@ -201,11 +215,7 @@ class RedBean_OODB extends RedBean_Observable {
 			$beans = $this->convertToBeans($type, $this->writer->queryRecord($type, $conditions, $sql, $params));
 			return $beans;
 		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN)
-			)) throw $e;
+			$this->handleException($e);
 		}
 		return array();
 	}
@@ -653,11 +663,7 @@ class RedBean_OODB extends RedBean_Observable {
 			$this->writer->deleteRecord($bean->getMeta('type'),
 				array('id' => array($bean->id)), null);
 		}catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
+			$this->handleException($e);
 		}
 		$bean->id = 0;
 		$this->signal('after_delete', $bean);
@@ -682,11 +688,7 @@ class RedBean_OODB extends RedBean_Observable {
 		try {
 			$rows = $this->writer->queryRecord($type, array('id' => $ids));
 		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
+			$this->handleException($e);
 			$rows = false;
 		}
 		$this->stash[$this->nesting] = array();
@@ -806,6 +808,27 @@ class RedBean_OODB extends RedBean_Observable {
 	public function setDepList($dep) {
 		$this->dep = $dep;
 	}
+	
+	/**
+	 * Extracts the type list for preloader.
+	 * 
+	 * @param array|string $typeList
+	 * 
+	 * @return array
+	 */
+	private function extractTypesFromTypeList($typeList) {
+		if (is_string($typeList)) {
+			$typeList = explode(',', $typeList);
+			foreach($typeList as $value) {
+				if (strpos($value, '|') !== false) {
+					list($key, $newValue) = explode('|', $value);
+					$types[$key] = $newValue;
+				} else $types[] = $value;
+			}
+		} else $types = $typeList;
+		return $types;
+	}
+	
 	/**
 	 * Preloads certain properties for beans.
 	 * Understands aliases.
@@ -829,18 +852,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param array $types types to load
 	 */
 	public function preload($beans, $typeList, $closure = null) {
-		if (!is_array($beans)) {
-			$beans = array($beans);
-		}
-		if (is_string($typeList)) {
-			$typeList = explode(',', $typeList);
-			foreach($typeList as $value) {
-				if (strpos($value, '|') !== false) {
-					list($key, $newValue) = explode('|', $value);
-					$types[$key] = $newValue;
-				} else $types[] = $value;
-			}
-		} else $types = $typeList;
+		if (!is_array($beans)) $beans = array($beans);
+		$types = $this->extractTypesFromTypeList($typeList);
 		$oldFields = array(); $i = 0; $retrievals = array(); $oldField = '';
 		foreach($types as $key => $typeInfo) {
 			list($type,$sqlObj) = (is_array($typeInfo) ? $typeInfo : array($typeInfo, null));

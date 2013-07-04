@@ -1,18 +1,29 @@
 <?php
 /**
- * DBAdapter		(Database Adapter)
- * @file			RedBean/Adapter/DBAdapter.php
- * @desc			An adapter class to connect various database systems to RedBean
- * @author			Gabor de Mooij and the RedBeanPHP Community. 
- * @license			BSD/GPLv2
+ * DBAdapter (Database Adapter)
+ * @file    RedBean/Adapter/DBAdapter.php
+ * @desc    An adapter class to connect various database systems to RedBean
+ * @author  Gabor de Mooij and the RedBeanPHP Community. 
+ * @license BSD/GPLv2
  *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
+	
+	/**
+	 * Database driver reference.
+	 * @var RedBean_Driver 
+	 */
 	private $db = null;
+	
+	/**
+	 * SQL query
+	 * @var string
+	 */
 	private $sql = '';
+	
 	/**
 	 * Constructor.
 	 * Creates an instance of the RedBean Adapter Class.
@@ -24,12 +35,14 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function __construct($database) {
 		$this->db = $database;
 	}
+	
 	/**
 	 * @see RedBean_Adapter::getSQL
 	 */
 	public function getSQL() {
 		return $this->sql;
 	}
+	
 	/**
 	 * @see RedBean_Adapter::exec
 	 */
@@ -40,6 +53,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		}
 		return $this->db->Execute($sql, $aValues);
 	}
+	
 	/**
 	 * @see RedBean_Adapter::get
 	 */
@@ -48,6 +62,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		$this->signal('sql_exec', $this);
 		return $this->db->GetAll($sql, $aValues);
 	}
+	
 	/**
 	 * @see RedBean_Adapter::getRow
 	 */
@@ -56,6 +71,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		$this->signal('sql_exec', $this);
 		return $this->db->GetRow($sql, $aValues);
 	}
+	
 	/**
 	 * @see RedBean_Adapter::getCol
 	 */
@@ -64,6 +80,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		$this->signal('sql_exec', $this);
 		return $this->db->GetCol($sql, $aValues);
 	}
+	
 	/**
 	 * @see RedBean_Adapter::getAssoc
 	 */
@@ -78,8 +95,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 					if (count($row)>1) {
 						$key = array_shift($row);
 						$value = array_shift($row);
-					}
-					elseif (count($row) == 1) {
+					} elseif (count($row) == 1) {
 						$key = array_shift($row);
 						$value = $key;
 					}
@@ -89,51 +105,64 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 		}
 		return $assoc;
 	}
+	
 	/**
 	 * @see RedBean_Adapter::getCell
 	 */
 	public function getCell($sql, $aValues = array(), $noSignal = null) {
 		$this->sql = $sql;
-		if (!$noSignal) $this->signal('sql_exec', $this);
+		if (!$noSignal) {
+			$this->signal('sql_exec', $this);
+		}
 		$arr = $this->db->getCol($sql, $aValues);
-		if ($arr && is_array($arr) && isset($arr[0])) return ($arr[0]); else return null;
+		if ($arr && is_array($arr) && isset($arr[0])) {
+			return ($arr[0]); 
+		} 
+		return null;
 	}
+	
 	/**
 	 * @see RedBean_Adapter::getInsertID
 	 */
 	public function getInsertID() {
 		return $this->db->getInsertID();
 	}
+	
 	/**
 	 * @see RedBean_Adapter::getAffectedRows
 	 */
 	public function getAffectedRows() {
 		return $this->db->Affected_Rows();
 	}
+	
 	/**
 	 * @see RedBean_Adapter::getDatabase
 	 */
 	public function getDatabase() {
 		return $this->db;
 	}
+	
 	/**
 	 * @see RedBean_Adapter::startTransaction
 	 */
 	public function startTransaction() {
 		return $this->db->StartTrans();
 	}
+	
 	/**
 	 * @see RedBean_Adapter::commit
 	 */
 	public function commit() {
 		return $this->db->CommitTrans();
 	}
+	
 	/**
 	 * @see RedBean_Adapter::rollback
 	 */
 	public function rollback() {
 		return $this->db->FailTrans();
 	}
+	
 	/**
 	 * @see RedBean_Adapter::close.
 	 */

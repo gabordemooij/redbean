@@ -1,20 +1,21 @@
 <?php
 /**
- * Sync
- * @file			RedBean/Plugin/Sync.php
- * @desc			Plugin for Synchronizing databases.
+ * Syncs schemas
  * 
- * @plugin			public static function syncSchema($from, $to) { return RedBean_Plugin_Sync::syncSchema($from, $to); }
+ * @file    RedBean/Plugin/Sync.php
+ * @desc    Plugin for Synchronizing databases.
+ * 
+ * @plugin  public static function syncSchema($from, $to) { return RedBean_Plugin_Sync::syncSchema($from, $to); }
  *
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
- *
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_Plugin_Sync implements RedBean_Plugin {
+	
 	/**
 	 * Captures the SQL required to adjust source database to match
 	 * schema of target database and feeds this sql code to the
@@ -35,10 +36,12 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 		foreach ($testmap as $v) {
 			$code = $sourceWriter->scanType($v, true);
 			$translation = $targetWriter->scanType($v, true);
-			if (!isset($translations[$code]))
+			if (!isset($translations[$code])) {
 				$translations[$code] = $translation;
-			if ($translation > $translations[$code] && $translation < 50)
+			}
+			if ($translation > $translations[$code] && $translation < 50) {
 				$translations[$code] = $translation;
+			}
 		}
 		//Fix narrow translations SQLiteT stores date as double. (double != really double)
 		if (get_class($sourceWriter) === 'RedBean_QueryWriter_SQLiteT') {
@@ -90,6 +93,7 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 			}
 		}
 	}
+	
 	/**
 	 * Performs a database schema sync. For use with facade.
 	 * Instead of toolboxes this method accepts simply string keys and is static.
@@ -98,8 +102,12 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 	 * @param string $database2 the target database
 	 */
 	public static function syncSchema($database1, $database2) {
-		if (!isset(RedBean_Facade::$toolboxes[$database1])) throw new RedBean_Exception_Security('No database for this key: '.$database1);
-		if (!isset(RedBean_Facade::$toolboxes[$database2])) throw new RedBean_Exception_Security('No database for this key: '.$database2);
+		if (!isset(RedBean_Facade::$toolboxes[$database1])) {
+			throw new RedBean_Exception_Security('No database for this key: '.$database1);
+		}
+		if (!isset(RedBean_Facade::$toolboxes[$database2])) {
+			throw new RedBean_Exception_Security('No database for this key: '.$database2);
+		}
 		$db1 = RedBean_Facade::$toolboxes[$database1];
 		$db2 = RedBean_Facade::$toolboxes[$database2];
 		$sync = new self;

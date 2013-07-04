@@ -2,10 +2,10 @@
 /**
  * RedBean Model Helper
  * 
- * @file			RedBean/ModelHelper.php
- * @desc			Connects beans to models, in essence 
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @file    RedBean/ModelHelper.php
+ * @desc    Connects beans to models, in essence 
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  * 
  * This is the core of so-called FUSE.
  *
@@ -14,24 +14,29 @@
  * with this source code in the file license.txt.
  */
 class RedBean_ModelHelper implements RedBean_Observer {
+	
 	/**
 	 * @var RedBean_IModelFormatter
 	 */
 	private static $modelFormatter;
+	
 	/**
 	 * @var type 
 	 */
 	private static $dependencyInjector;
+	
 	/**
 	 * @var array 
 	 */
 	private static $modelCache = array();
+	
 	/**
 	 * @see RedBean_Observer::onEvent
 	 */
 	public function onEvent($eventName, $bean) {
 		$bean->$eventName();
 	}
+	
 	/**
 	 * Given a model ID (model identifier) this method returns the
 	 * full model name.
@@ -39,10 +44,12 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * @param string $model
 	 * @param RedBean_OODBBean $bean
 	 * 
-	 * @return string $fullname
+	 * @return string
 	 */
 	public static function getModelName($model, $bean = null) {
-		if (isset(self::$modelCache[$model])) return self::$modelCache[$model];
+		if (isset(self::$modelCache[$model])) {
+			return self::$modelCache[$model];
+		}
 		if (self::$modelFormatter){
 			$modelID = self::$modelFormatter->formatModel($model, $bean);
 		} else {
@@ -51,6 +58,7 @@ class RedBean_ModelHelper implements RedBean_Observer {
 		self::$modelCache[$model] = $modelID;
 		return self::$modelCache[$model];
 	}
+	
 	/**
 	 * Sets the model formatter to be used to discover a model
 	 * for Fuse.
@@ -60,6 +68,7 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	public static function setModelFormatter($modelFormatter) {
 		self::$modelFormatter = $modelFormatter;
 	}
+	
 	/**
 	 * Obtains a new instance of $modelClassName, using a dependency injection
 	 * container if possible.
@@ -72,6 +81,7 @@ class RedBean_ModelHelper implements RedBean_Observer {
 		}
 		return new $modelClassName();
 	}
+	
 	/**
 	 * Sets the dependency injector to be used.
 	 * 
@@ -80,6 +90,7 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	public static function setDependencyInjector(RedBean_DependencyInjector $di) {
 		self::$dependencyInjector = $di;
 	}
+	
 	/**
 	 * Stops the dependency injector from resolving dependencies. Removes the
 	 * reference to the dependency injector.
@@ -87,6 +98,7 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	public static function clearDependencyInjector() {
 		self::$dependencyInjector = null;
 	}
+	
 	/**
 	 * Attaches the FUSE event listeners. Now the Model Helper will listen for
 	 * CRUD events. If a CRUD event occurs it will send a signal to the model
@@ -96,6 +108,8 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * @param Observable $observable 
 	 */
 	public function attachEventListeners(RedBean_Observable $observable) {
-		foreach(array('update', 'open', 'delete', 'after_delete', 'after_update', 'dispense') as $e) $observable->addEventListener($e, $this);
+		foreach(array('update', 'open', 'delete', 'after_delete', 'after_update', 'dispense') as $e) {
+			$observable->addEventListener($e, $this);
+		}
 	}
 }

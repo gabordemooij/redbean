@@ -2,27 +2,30 @@
 /**
  * RedBean Cooker
  *
- * @file			RedBean/Cooker.php
+ * @file    RedBean/Cooker.php
  * 
- * @plugin			public static function graph($array, $filterEmpty=false) { $c = new RedBean_Plugin_Cooker(); $c->setToolbox(self::$toolbox);return $c->graph($array, $filterEmpty);}
+ * @plugin  public static function graph($array, $filterEmpty=false) { $c = new RedBean_Plugin_Cooker(); $c->setToolbox(self::$toolbox);return $c->graph($array, $filterEmpty);}
  * 
- * @desc			Turns arrays into bean collections for easy persistence.
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @desc    Turns arrays into bean collections for easy persistence.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_Plugin_Cooker implements RedBean_Plugin {
+	
 	/**
 	 * @var boolean
 	 */
 	private static $loadBeans = false;
+	
 	/**
 	 * @var boolean
 	 */
 	private static $useNULLForEmptyString = false;
+	
 	/**
 	 * If you enable bean loading graph will load beans if there is an ID in the array.
 	 * This is very powerful but can also cause security issues if a user knows how to
@@ -33,16 +36,19 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	public static function enableBeanLoading($yesNo) {
 		self::$loadBeans = ($yesNo);
 	}
+	
 	/**
 	 * Sets the toolbox to be used by graph()
 	 *
 	 * @param RedBean_Toolbox $toolbox toolbox
+	 * 
 	 * @return void
 	 */
 	public function setToolbox(RedBean_Toolbox $toolbox) {
 		$this->toolbox = $toolbox;
 		$this->redbean = $this->toolbox->getRedbean();
 	}
+	
 	/**
 	 * Turns an array (post/request array) into a collection of beans.
 	 * Handy for turning forms into bean structures that can be stored with a
@@ -78,7 +84,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	 * @param	array   $array       array to be turned into a bean collection
 	 * @param   boolean $filterEmpty whether you want to exclude empty beans
 	 *
-	 * @return	array $beans beans
+	 * @return	array
 	 */
 	public function graph($array, $filterEmpty = false) {
       	$beans = array();
@@ -100,9 +106,11 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 				if (is_array($value)) {
 					$bean->$property = $this->graph($value, $filterEmpty);
 				} else {
-					if($value == '' && self::$useNULLForEmptyString){
+					if ($value == '' && self::$useNULLForEmptyString){
 						$bean->$property = null;
-                    } else $bean->$property = $value;
+               } else { 
+						$bean->$property = $value;
+					}
 				}
 			}
 			return $bean;
@@ -125,6 +133,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 			throw new RedBean_Exception_Security('Expected array but got :'.gettype($array)); 
 		}
 	}
+	
 	/**
 	 * Toggles the use-NULL flag.
 	 *  
@@ -142,5 +151,4 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	public static function setUseNullFlagSt($yesNo){
 		self::$useNULLForEmptyString = (boolean) $yesNo;
 	}
-
 }

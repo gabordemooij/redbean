@@ -2,28 +2,32 @@
 /**
  * ToolBox
  * 
- * @file			RedBean/ToolBox.php
- * @desc			A RedBeanPHP-wide service locator
- * @author			Gabor de Mooij and the RedBeanPHP community
- * @license			BSD/GPLv2
+ * @file    RedBean/ToolBox.php
+ * @desc    A RedBeanPHP-wide service locator
+ * @author	Gabor de Mooij and the RedBeanPHP community
+ * @license BSD/GPLv2
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_ToolBox {
+	
 	/**
 	 * @var RedBean_OODB
 	 */
 	protected $oodb;
+	
 	/**
 	 * @var RedBean_QueryWriter
 	 */
 	protected $writer;
+	
 	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
+	
 	/**
 	 * Constructor.
 	 *
@@ -31,7 +35,7 @@ class RedBean_ToolBox {
 	 * @param RedBean_Adapter_DBAdapter $adapter Adapter
 	 * @param RedBean_QueryWriter       $writer  Writer
 	 *
-	 * return RedBean_ToolBox $toolbox Toolbox
+	 * @return RedBean_ToolBox
 	 */
 	public function __construct(RedBean_OODB $oodb, RedBean_Adapter $adapter, RedBean_QueryWriter $writer) {
 		$this->oodb = $oodb;
@@ -39,26 +43,29 @@ class RedBean_ToolBox {
 		$this->writer = $writer;
 		return $this;
 	}
+	
 	/**
 	 * Returns the query writer in this toolbox.
 	 * 
-	 * @return RedBean_QueryWriter $writer writer
+	 * @return RedBean_QueryWriter
 	 */
 	public function getWriter() {
 		return $this->writer;
 	}
+	
 	/**
 	 * Returns the OODB instance in this toolbox.
 	 * 
-	 * @return RedBean_OODB $oodb Object Database
+	 * @return RedBean_OODB
 	 */
 	public function getRedBean() {
 		return $this->oodb;
 	}
+	
 	/**
 	 * Returns the database adapter in this toolbox.
 	 * 
-	 * @return RedBean_Adapter_DBAdapter $adapter Adapter
+	 * @return RedBean_Adapter_DBAdapter
 	 */
 	public function getDatabaseAdapter() {
 		return $this->adapter;

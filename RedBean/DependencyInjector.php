@@ -2,10 +2,10 @@
 /**
  * RedBean Dependency Injector
  * 
- * @file			RedBean/DependencyInjector.php
- * @desc			Simple dependency injector
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @file    RedBean/DependencyInjector.php
+ * @desc    Simple dependency injector
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * A default dependency injector that can be subclassed to
  * suit your needs. This injetor can be used to inject helper objects into
@@ -14,13 +14,14 @@
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
- *
  */
 class RedBean_DependencyInjector {
+	
 	/**
 	 * @var array 
 	 */
 	protected $dependencies = array();
+	
 	/**
 	 * Adds a dependency to the list.
 	 * You can add dependencies using this method. Pass both the key of the
@@ -36,6 +37,7 @@ class RedBean_DependencyInjector {
 	public function addDependency($dependencyID, $dependency) {
 		$this->dependencies[$dependencyID] = $dependency;
 	}
+	
 	/**
 	 * Returns an instance of the class $modelClassName completely
 	 * configured as far as possible with all the available
@@ -43,7 +45,7 @@ class RedBean_DependencyInjector {
 	 * 
 	 * @param string $modelClassName the name of the class of the model
 	 * 
-	 * @return mixed $object the model/object
+	 * @return mixed
 	 */
 	public function getInstance($modelClassName) {
 		$object = new $modelClassName;

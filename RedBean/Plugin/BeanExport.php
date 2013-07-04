@@ -2,41 +2,47 @@
 /**
  * Recursive Bean Export
  *
- * @file 			RedBean/Plugin/BeanExport.php
- * @desc			Plugin to export beans to arrays recursively
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @file    RedBean/Plugin/BeanExport.php
+ * @desc    Plugin to export beans to arrays recursively
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-
 class RedBean_Plugin_BeanExport implements RedBean_Plugin {
+	
 	/**
 	 * @var null|\RedBean_Toolbox
 	 */
 	protected $toolbox = null;
+	
 	/**
 	 * @var array
 	 */
 	protected $recurCheck = array();
+	
 	/**
 	 * @var array
 	 */
 	protected $recurTypeCheck = array();
+	
 	/**
 	 * @var boolean
 	 */
 	protected $typeShield = false;
+	
 	/**
 	 * @var integer
 	 */
 	protected $depth = 0;
+	
 	/**
 	 * @var integer
 	 */
 	protected $maxDepth = false;
+	
 	/**
 	 * Constructor
 	 * @param RedBean_Toolbox $toolbox
@@ -44,6 +50,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	public function __construct(RedBean_Toolbox $toolbox) {
 		$this->toolbox = $toolbox;
 	}
+	
 	/**
 	 * Loads Schema
 	 * @return void
@@ -60,6 +67,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		}
 		$this->tables = $tables;
 	}
+	
 	/**
 	 *Returs a serialized representation of the schema
 	 *
@@ -68,6 +76,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	public function getSchema() {
 		return serialize($this->tables);
 	}
+	
 	/**
 	 * Loads a schema from a string (containing serialized export of schema)
 	 *
@@ -76,6 +85,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	public function loadSchemaFromString($schema) {
 		$this->tables = unserialize($schema);
 	}
+	
 	/**
 	 * Exports a collection of beans
 	 *
@@ -120,6 +130,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		}
 		return $export;
 	}
+	
 	/**
 	 * Exports beans, just like export() but with additional
 	 * parameters for limitation on recursion and depth.
@@ -137,6 +148,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		$this->maxDepth = false;
 		return $export;
 	}
+	
 	/**
 	 * Exports a single bean
 	 *

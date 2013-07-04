@@ -2,26 +2,30 @@
 /**
  * RedBean SQLiteWriter with support for SQLite types
  *
- * @file				RedBean/QueryWriter/SQLiteT.php
- * @description			Represents a SQLite Database to RedBean
- *						To write a driver for a different database for RedBean
- *						you should only have to change this file.
- * @author				Gabor de Mooij and the RedBeanPHP Community
- * @license				BSD/GPLv2
+ * @file	RedBean/QueryWriter/SQLiteT.php
+ * @desc	Represents a SQLite Database to RedBean
+ *		To write a driver for a different database for RedBean
+ *		you should only have to change this file.
+ * @author	Gabor de Mooij and the RedBeanPHP Community
+ * @license	BSD/GPLv2
  * 
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
+	
 	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
+
 	protected $adapter;
+	
 	/**
 	 * @var string
 	 */
   	protected $quoteCharacter = '`';
+	
 	/**
 	 * Data types
 	 */
@@ -29,6 +33,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	const C_DATATYPE_NUMERIC = 1;
 	const C_DATATYPE_TEXT = 2;
 	const C_DATATYPE_SPECIFIED = 99;
+	
 	/**
 	 * Constructor
 	 * 
@@ -45,6 +50,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->sqltype_typeno[$v] = $k;
 		$this->adapter = $adapter;
 	}
+	
 	/**
 	 * This method returns the datatype to be used for primary key IDS and
 	 * foreign keys. Returns one if the data type constants.
@@ -54,6 +60,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	public function getTypeForID() {
 		return self::C_DATATYPE_INTEGER;
 	}
+	
 	/**
 	 * @see RedBean_QueryWriter::scanType
 	 */
@@ -71,6 +78,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		return self::C_DATATYPE_TEXT;
 	}
+	
 	/**
 	 * @see RedBean_QueryWriter::addColumn
 	 */
@@ -81,6 +89,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$sql = "ALTER TABLE `$table` ADD `$column` $type ";
 		$this->adapter->exec($sql);
 	}
+	
 	/**
 	 * @see RedBean_QueryWriter::code
 	 */
@@ -90,15 +99,16 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		if ($r > self::C_DATATYPE_SPECIFIED) return self::C_DATATYPE_SPECIFIED;
 		return $r;
 	}
+	
 	/**
 	 * Gets all information about a table (from a type).
 	 * 
 	 * Format:
 	 * array(
-	 *		name => name of the table
-	 *		columns => array( name => datatype )
-	 *		indexes => array() raw index information rows from PRAGMA query
-	 *		keys => array() raw key information rows from PRAGMA query
+	 *	name => name of the table
+	 *	columns => array( name => datatype )
+	 *	indexes => array() raw index information rows from PRAGMA query
+	 *	keys => array() raw key information rows from PRAGMA query
 	 * )
 	 * 
 	 * @param string $type type you want to get info of
@@ -114,6 +124,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->tableArchive[$tableName] = $table;
 		return $table;
 	}
+
 	/**
 	 * Puts a table. Updates the table structure.
 	 * In SQLite we can't change columns, drop columns, change or add foreign keys so we
@@ -158,6 +169,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$q[] = "PRAGMA foreign_keys = 1 ";
 		foreach($q as $sq) $this->adapter->exec($sq);
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::widenColumn
 	 */
@@ -166,6 +178,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$t['columns'][$column] = $this->typeno_sqltype[$datatype];
 		$this->putTable($t);
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::getTables();
 	 */
@@ -173,6 +186,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		return $this->adapter->getCol("SELECT name FROM sqlite_master
 			WHERE type='table' AND name!='sqlite_sequence';");
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::createTable
 	 */
@@ -181,6 +195,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$sql = "CREATE TABLE $table ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ";
 		$this->adapter->exec($sql);
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::getColumns
 	 */
@@ -191,6 +206,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		foreach($columnsRaw as $r) $columns[$r['name']] = $r['type'];
 		return $columns;
 	}
+
 	/**
 	 * Returns the indexes for type $type.
 	 * 
@@ -208,6 +224,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		return $indexInfoList;
 	}
+
 	/**
 	 * Returns the keys for type $type.
 	 * 
@@ -224,6 +241,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		return $keyInfoList;
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::addUniqueIndex
 	 */
@@ -235,6 +253,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$t['indexes'][$name] = array('name' => $name);
 		$this->putTable($t);
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::sqlStateIn
 	 */
@@ -245,6 +264,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		);
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list);
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::addIndex
 	 */
@@ -258,6 +278,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$t['indexes'][$name] = array('name' => $column);
 		return $this->putTable($t);
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::wipe
 	 */
@@ -265,20 +286,22 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$table = $this->esc($type);
 		$this->adapter->exec("DELETE FROM $table");
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::addFK
 	 */
 	public function addFK($type, $targetType, $field, $targetField, $isDep = false) {
 		return $this->buildFK($type, $targetType, $field, $targetField, $isDep);
 	}
+
 	/**
 	 * Adds a foreign key to a type
 	 *
-	 * @param  string $type        type you want to modify table of
-	 * @param  string $targetType  target type
-	 * @param  string $field       field of the type that needs to get the fk
-	 * @param  string $targetField field where the fk needs to point to
-	 * @param  integer $buildopt   0 = NO ACTION, 1 = ON DELETE CASCADE
+	 * @param  string  $type        type you want to modify table of
+	 * @param  string  $targetType  target type
+	 * @param  string  $field       field of the type that needs to get the fk
+	 * @param  string  $targetField field where the fk needs to point to
+	 * @param  integer $buildopt    0 = NO ACTION, 1 = ON DELETE CASCADE
 	 *
 	 * @return boolean $didIt
 	 * 
@@ -305,15 +328,15 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$this->putTable($t);
 		return true;
 	}
+
 	/**
 	 * Add the constraints for a specific database driver: SQLite.
-	 * @todo Too many arguments; find a way to solve this in a neater way.
 	 *
-	 * @param string			  $table     table
-	 * @param string			  $table1    table1
-	 * @param string			  $table2    table2
-	 * @param string			  $property1 property1
-	 * @param string			  $property2 property2
+	 * @param string $table     table to add fk constrains to
+	 * @param string $table1    first reference table
+	 * @param string $table2    second reference table
+	 * @param string $property1 first reference column
+	 * @param string $property2 second reference column
 	 *
 	 * @return boolean $succes whether the constraint has been applied
 	 */
@@ -324,6 +347,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$secondState = $this->buildFK($table, $table2, $property2, 'id', true);
 		return ($firstState && $secondState);
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::wipeAll
 	 */

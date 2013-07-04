@@ -2,20 +2,22 @@
 /**
  * RedBean Exception SQL
  *
- * @file			RedBean/Exception/SQL.php
- * @desc			Represents a generic database exception independent of the underlying driver.
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @file	   RedBean/Exception/SQL.php
+ * @desc    Represents a generic database exception independent of the underlying driver.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_Exception_SQL extends RuntimeException {
+	
 	/**
 	 * @var string
 	 */
 	private $sqlState;
+	
 	/**
 	 * Returns an ANSI-92 compliant SQL state.
 	 *
@@ -24,6 +26,7 @@ class RedBean_Exception_SQL extends RuntimeException {
 	public function getSQLState() {
 		return $this->sqlState;
 	}
+	
 	/**
 	 * @todo parse state to verify valid ANSI92!
 	 * Stores ANSI-92 compliant SQL state.
@@ -35,6 +38,7 @@ class RedBean_Exception_SQL extends RuntimeException {
 	public function setSQLState($sqlState) {
 		$this->sqlState = $sqlState;
 	}
+	
 	/**
 	 * To String prints both code and SQL state.
 	 *

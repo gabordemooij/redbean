@@ -2,16 +2,17 @@
 /**
  * Extended Association Manager
  * 
- * @file			RedBean/ExtAssociationManager.php
- * @desc			Manages complex bean associations.
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @file    RedBean/ExtAssociationManager.php
+ * @desc    Manages complex bean associations.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_AssociationManager_ExtAssociationManager extends RedBean_AssociationManager {
+	
 	/**
 	 * @deprecated
 	 */
@@ -20,6 +21,7 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 		$baseBean->setMeta('type', $table);
 		return $this->associateBeans($bean1, $bean2, $baseBean);
 	}
+	
 	/**
 	 * @deprecated
 	 */

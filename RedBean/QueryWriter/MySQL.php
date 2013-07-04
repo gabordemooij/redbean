@@ -2,19 +2,19 @@
 /**
  * RedBean MySQLWriter
  *
- * @file			RedBean/QueryWriter/MySQL.php
- * @description		Represents a MySQL Database to RedBean
- *					To write a driver for a different database for RedBean
- *					you should only have to change this file.
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
- *
+ * @file    RedBean/QueryWriter/MySQL.php
+ * @desc    Represents a MySQL Database to RedBean
+ *          To write a driver for a different database for RedBean
+ *          you should only have to change this file.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
+
 	/**
 	 * Data types
 	 */
@@ -29,14 +29,17 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
 	const C_DATATYPE_SPECIAL_POINT = 90;
 	const C_DATATYPE_SPECIFIED = 99;
+
 	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
+
 	/**
 	 * @var string
 	 */
   	protected $quoteCharacter = '`';
+
 	/**
 	 * Constructor
 	 * 
@@ -60,6 +63,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$this->sqltype_typeno[trim(strtolower($v))] = $k;
 		$this->adapter = $adapter;
 	}
+
 	/**
 	 * This method returns the datatype to be used for primary key IDS and
 	 * foreign keys. Returns one if the data type constants.
@@ -69,12 +73,14 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function getTypeForID() {
 		return self::C_DATATYPE_UINT32;
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::getTables
 	 */
 	public function getTables() {
 		return $this->adapter->getCol('show tables');
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::createTable
 	 */
@@ -83,6 +89,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$sql = "CREATE TABLE $table (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ";
 		$this->adapter->exec($sql);
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::getColumns
 	 */
@@ -92,6 +99,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		foreach($columnsRaw as $r) $columns[$r['Field']] = $r['Type'];
 		return $columns;
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::scanType
 	 */
@@ -130,18 +138,24 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		}
 		return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32;
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::code
 	 */
 	public function code($typedescription, $includeSpecials = false) {
 		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
-		if ($includeSpecials) return $r;
-		if ($r > self::C_DATATYPE_SPECIFIED) return self::C_DATATYPE_SPECIFIED;
+		if ($includeSpecials) {
+			return $r;
+		}
+		if ($r > self::C_DATATYPE_SPECIFIED) {
+			return self::C_DATATYPE_SPECIFIED;
+		}
 		return $r;
 	}
+
 	/**
 	  * @see RedBean_QueryWriter::wideColumn
-	 */
+	  */
 	public function widenColumn($type, $column, $datatype) {
 		$table = $type;
 		$type = $datatype;
@@ -151,6 +165,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
 		$this->adapter->exec($changecolumnSQL);
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::addUniqueIndex
 	 */
@@ -173,6 +188,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
                 ADD UNIQUE INDEX $name (".implode(',', $columns).")";
 		$this->adapter->exec($sql);
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::addIndex
 	 */
@@ -196,15 +212,16 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		);
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list); 
 	}
+
 	/**
 	 * Add the constraints for a specific database driver: MySQL.
 	 * @todo Too many arguments; find a way to solve this in a neater way.
 	 *
-	 * @param string			  $table     table
-	 * @param string			  $table1    table1
-	 * @param string			  $table2    table2
-	 * @param string			  $property1 property1
-	 * @param string			  $property2 property2
+	 * @param string $table     table     table to add constrains to
+	 * @param string $table1    table1    first reference table
+	 * @param string $table2    table2    second reference table
+	 * @param string $property1 property1 first column
+	 * @param string $property2 property2 second column
 	 *
 	 * @return boolean $succes whether the constraint has been applied
 	 */
@@ -218,7 +235,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME IS NOT NULL
 					  ", array($db, $table));
 			//already foreign keys added in this association table
-			if ($fks>0) return false;
+			if ($fks>0) {
+				return false;
+			}
 			$columns = $this->getColumns($table);
 			if ($this->code($columns[$property1]) !== RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
 				$this->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
@@ -237,8 +256,11 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			";
 			$this->adapter->exec($sql);
 			return true;
-		} catch(Exception $e){ return false; }
+		} catch(Exception $e) { 
+			return false; 
+		}
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::wipeAll
 	 */

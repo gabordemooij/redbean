@@ -1,13 +1,14 @@
 <?php
 /**
- * BeanCan
+ * BeanCan Server.
+ * A JSON-RPC/RESTy server for RedBeanPHP.
  *  
- * @file			RedBean/BeanCan.php
- * @desc			Server Interface for RedBean and Fuse.
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @file    RedBean/BeanCan.php
+ * @desc    PHP Server Component for RedBean and Fuse.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  * 
- * The BeanCan Server is a lightweight, minimalistic server interface for
+ * The BeanCan Server is a lightweight, minimalistic server component for
  * RedBean that can perfectly act as an ORM middleware solution or a backend
  * for an AJAX application.
  * 
@@ -16,20 +17,24 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Plugin_BeanCan implements RedBean_Plugin {
+	
 	/**
 	 * @var RedBean_ModelHelper
 	 */
 	private $modelHelper;
+	
 	/**
 	 * @var array
 	 */
 	private $whitelist;
+	
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->modelHelper = new RedBean_ModelHelper;
 	}
+	
 	/**
 	 * Writes a response object for the client (JSON encoded). Internal method.
 	 *
@@ -38,18 +43,26 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 * @param integer $errorCode    error code from server
 	 * @param string  $errorMessage error message from server
 	 *
-	 * @return string $json JSON encoded response.
+	 * @return string $json
 	 */
 	private function resp($result = null, $id = null, $errorCode = '-32603', $errorMessage = 'Internal Error') {
-		$response = array('jsonrpc' => '2.0');
-		if (!is_null($id)) { $response['id'] = $id; }
+		$response = array(
+			 'jsonrpc' => '2.0'
+		);
+		if (!is_null($id)) { 
+			$response['id'] = $id; 
+		}
 		if ($result) {
 			$response['result'] = $result;
 		} else {
-			$response['error'] = array('code' => $errorCode, 'message' => $errorMessage);
+			$response['error'] = array(
+				 'code' => $errorCode, 
+				 'message' => $errorMessage					  
+			);
 		}
-		return (json_encode($response));
+		return json_encode($response);
 	}
+	
 	/**
 	 * Sets a whitelist with format: array('beantype'=>array('update','customMethod')) etc.
 	 * or simply string 'all' (for backward compatibility).
@@ -61,12 +74,13 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	public function setWhitelist($whitelist) {
 		$this->whitelist = $whitelist;
 	}
+	
 	/**
 	 * Processes a JSON object request.
 	 * Second parameter can be a white list with format: array('beantype'=>array('update','customMethod')) etc.
 	 * or simply string 'all' (for backward compatibility).
 	 * 
-	 * @param array $jsonObject        JSON request object
+	 * @param array        $jsonObject JSON request object
 	 * @param array|string $whitelist  a white list of beans and methods that should be accessible through the BeanCan Server.
 	 *
 	 * @return mixed $result result
@@ -74,15 +88,25 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	public function handleJSONRequest($jsonString) {
 		//Decode JSON string
 		$jsonArray = json_decode($jsonString, true);
-		if (!$jsonArray) return $this->resp(null, null, -32700, 'Cannot Parse JSON');
-		if (!isset($jsonArray['jsonrpc'])) return $this->resp(null, null, -32600, 'No RPC version');
-		if (($jsonArray['jsonrpc'] != '2.0')) return $this->resp(null, null, -32600, 'Incompatible RPC Version');
+		if (!$jsonArray) {
+			return $this->resp(null, null, -32700, 'Cannot Parse JSON');
+		}
+		if (!isset($jsonArray['jsonrpc'])) {
+			return $this->resp(null, null, -32600, 'No RPC version');
+		}
+		if (($jsonArray['jsonrpc'] != '2.0')) {
+			return $this->resp(null, null, -32600, 'Incompatible RPC Version');
+		}
 		//DO we have an ID to identify this request?
-		if (!isset($jsonArray['id'])) return $this->resp(null, null, -32600, 'No ID');
+		if (!isset($jsonArray['id'])) {
+			return $this->resp(null, null, -32600, 'No ID');
+		}
 		//Fetch the request Identification String.
 		$id = $jsonArray['id'];
 		//Do we have a method?
-		if (!isset($jsonArray['method'])) return $this->resp(null, $id, -32600, 'No method');
+		if (!isset($jsonArray['method'])) {
+			return $this->resp(null, $id, -32600, 'No method');
+		}
 		//Do we have params?
 		if (!isset($jsonArray['params'])) {
 			$data = array();
@@ -101,42 +125,63 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 			return $this->resp(null, $id, -32600, 'This bean is not available. Set whitelist to "all" or add to whitelist.');
 		}
 		//May not contain anything other than ALPHA NUMERIC chars and _
-		if (preg_match('/\W/', $beanType)) return $this->resp(null, $id, -32600, 'Invalid Bean Type String');
-		if (preg_match('/\W/', $action)) return $this->resp(null, $id, -32600, 'Invalid Action String');
+		if (preg_match('/\W/', $beanType)) {
+			return $this->resp(null, $id, -32600, 'Invalid Bean Type String');
+		}
+		if (preg_match('/\W/', $action)) {
+			return $this->resp(null, $id, -32600, 'Invalid Action String');
+		}
 		try {
 			switch($action) {
 				case 'store':
-					if (!isset($data[0])) return $this->resp(null, $id, -32602, 'First param needs to be Bean Object');
+					if (!isset($data[0])) {
+						return $this->resp(null, $id, -32602, 'First param needs to be Bean Object');
+					}
 					$data = $data[0];
-					if (!isset($data['id'])) $bean = RedBean_Facade::dispense($beanType); else $bean = RedBean_Facade::load($beanType, $data['id']);
+					if (!isset($data['id'])) {
+						$bean = RedBean_Facade::dispense($beanType); 
+					} else {
+						$bean = RedBean_Facade::load($beanType, $data['id']);
+					}
 					$bean->import($data);
 					$rid = RedBean_Facade::store($bean);
 					return $this->resp($rid, $id);
 				case 'load':
-					if (!isset($data[0])) return $this->resp(null, $id, -32602, 'First param needs to be Bean ID');
+					if (!isset($data[0])) {
+						return $this->resp(null, $id, -32602, 'First param needs to be Bean ID');
+					}
 					$bean = RedBean_Facade::load($beanType, $data[0]);
 					return $this->resp($bean->export(), $id);
 				case 'trash':
-					if (!isset($data[0])) return $this->resp(null, $id, -32602, 'First param needs to be Bean ID');
+					if (!isset($data[0])) {
+						return $this->resp(null, $id, -32602, 'First param needs to be Bean ID');
+					}
 					$bean = RedBean_Facade::load($beanType, $data[0]);
 					RedBean_Facade::trash($bean);
 					return $this->resp('OK', $id);
 				case 'export':
-					if (!isset($data[0])) return $this->resp(null, $id, -32602, 'First param needs to be Bean ID');
+					if (!isset($data[0])) {
+						return $this->resp(null, $id, -32602, 'First param needs to be Bean ID');
+					}
 					$bean = RedBean_Facade::load($beanType, $data[0]);
 					$array = RedBean_Facade::exportAll(array($bean), true);
 					return $this->resp($array, $id);
 				default:
 					$modelName = $this->modelHelper->getModelName($beanType);
-					if (!class_exists($modelName)) return $this->resp(null, $id, -32601, 'No such bean in the can!');
+					if (!class_exists($modelName)) {
+						return $this->resp(null, $id, -32601, 'No such bean in the can!');
+					}
 					$beanModel = new $modelName;
-					if (!method_exists($beanModel, $action)) return $this->resp(null, $id, -32601, "Method not found in Bean: $beanType ");
+					if (!method_exists($beanModel, $action)) {
+						return $this->resp(null, $id, -32601, "Method not found in Bean: $beanType ");
+					}
 					return $this->resp(call_user_func_array(array($beanModel, $action), $data), $id);
 			}
 		} catch(Exception $exception) {
 			return $this->resp(null, $id, -32099, $exception->getCode().'-'.$exception->getMessage());
 		}
 	}
+	
 	/**
 	 * Support for RESTFul GET-requests.
 	 * Only supports very BASIC REST requests, for more functionality please use
@@ -175,8 +220,12 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 */
 	public function handleREST($root, $uri, $method, $payload = array()) {
 		try {
-			if (!preg_match('|^[\w\-/]*$|', $uri)) return $this->resp(null, 0, -32700, 'URI contains invalid characters.');
-			if (!is_array($payload)) return $this->resp(null, 0, -32700, 'Payload needs to be array.');
+			if (!preg_match('|^[\w\-/]*$|', $uri)) {
+				return $this->resp(null, 0, -32700, 'URI contains invalid characters.');
+			}
+			if (!is_array($payload)) {
+				return $this->resp(null, 0, -32700, 'Payload needs to be array.');
+			}
 			$finder = new RedBean_Finder(RedBean_Facade::$toolbox);
 			$uri = ((strlen($uri))) ? explode('/', ($uri)) : array();
 			if ($method == 'PUT') {
@@ -185,7 +234,9 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 				}
 				$list = array_pop($uri); //grab the list
 				$type = (strpos($list, 'shared-')===0) ? substr($list, 7) : $list;
-				if (!preg_match('|^[\w]+$|', $type)) return $this->resp(null, 0, -32700, 'Invalid list.');
+				if (!preg_match('|^[\w]+$|', $type)) {
+					return $this->resp(null, 0, -32700, 'Invalid list.');
+				}
 			}
 			try {
 				$bean = $finder->findByPath($root, $uri);
@@ -193,7 +244,8 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 				return $this->resp(null, 0, -32600, $e->getMessage());
 			}
 			$beanType = $bean->getMeta('type');
-			if (!($this->whitelist === 'all' || (isset($this->whitelist[$beanType]) && in_array($method,$this->whitelist[$beanType])))) {
+			if (!($this->whitelist === 'all' 
+					  || (isset($this->whitelist[$beanType]) && in_array($method,$this->whitelist[$beanType])))) {
 				return $this->resp(null, 0, -32600, 'This bean is not available. Set whitelist to "all" or add to whitelist.');
 			}
 			if ($method == 'GET') {
@@ -202,8 +254,12 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 				RedBean_Facade::trash($bean);
 				return $this->resp('OK');
 			} elseif ($method == 'POST') {
-				if (!isset($payload['bean'])) return $this->resp(null, 0, -32602, 'Missing parameter \'bean\'.');
-				if (!is_array($payload['bean'])) return $this->resp(null, 0, -32602, 'Parameter \'bean\' must be object/array.');
+				if (!isset($payload['bean'])) {
+					return $this->resp(null, 0, -32602, 'Missing parameter \'bean\'.');
+				}
+				if (!is_array($payload['bean'])) {
+					return $this->resp(null, 0, -32602, 'Parameter \'bean\' must be object/array.');
+				}
 				foreach($payload['bean'] as $key => $value) {
 					if (!is_string($key) || !is_string($value)) return $this->resp(null, 0, -32602, 'Object "bean" invalid.');
 				}
@@ -212,8 +268,12 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 				$bean = RedBean_Facade::load($bean->getMeta('type'), $bean->id);
 				return $this->resp($bean->export());
 			} elseif ($method == 'PUT') {
-				if (!isset($payload['bean'])) return $this->resp(null, 0, -32602, 'Missing parameter \'bean\'.');
-				if (!is_array($payload['bean'])) return $this->resp(null, 0, -32602, 'Parameter \'bean\' must be object/array.');
+				if (!isset($payload['bean'])) {
+					return $this->resp(null, 0, -32602, 'Missing parameter \'bean\'.');
+				}
+				if (!is_array($payload['bean'])) {
+					return $this->resp(null, 0, -32602, 'Parameter \'bean\' must be object/array.');
+				}
 				foreach($payload['bean'] as $key => $value) {
 					if (!is_string($key) || !is_string($value)) return $this->resp(null, 0, -32602, 'Object \'bean\' invalid.');
 				}
@@ -229,13 +289,16 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 				$newBean = RedBean_Facade::load($newBean->getMeta('type'), $newBean->id);
 				return $this->resp($newBean->export());	
 			} else {
-				if (!isset($payload['param'])) return $this->resp(null, 0, -32600, 'No parameters.'); 
-				if (!is_array($payload['param'])) return $this->resp(null, 0, -32602, 'Parameter \'param\' must be object/array.');
-				$answer = call_user_func_array(array($bean,$method), $payload['param']);
+				if (!isset($payload['param'])) {
+					return $this->resp(null, 0, -32600, 'No parameters.'); 
+				}
+				if (!is_array($payload['param'])) {
+					return $this->resp(null, 0, -32602, 'Parameter \'param\' must be object/array.');
+				}
+				$answer = call_user_func_array(array($bean, $method), $payload['param']);
 				return $this->resp($answer);
 			}
-		}
-		catch(Exception $e) {
+		} catch(Exception $e) {
 			return $this->resp(null, 0, -32099, 'Exception: '.$e->getCode());
 		}
 	}

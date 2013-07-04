@@ -2,28 +2,32 @@
 /**
  * Association Manager
  * 
- * @file			RedBean/AssociationManager.php
- * @desc			Manages simple bean associations.
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @file    RedBean/AssociationManager.php
+ * @desc    Manages simple bean associations.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedBean_AssociationManager extends RedBean_Observable {
+	
 	/**
 	 * @var RedBean_OODB
 	 */
 	protected $oodb;
+	
 	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
+	
 	/**
 	 * @var RedBean_QueryWriter
 	 */
 	protected $writer;
+	
 	/**
 	 * Constructor
 	 *
@@ -36,13 +40,23 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$this->toolbox = $tools;
 	}
 	
+	/**
+	 * Handles Exceptions. Suppresses exceptions caused by missing structures.
+	 * 
+	 * @param Exception $e
+	 * @throws Exception
+	 */
 	private function handleException(Exception $e) {
 		if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN)
-			)) throw $e;
+			)
+		) {
+			throw $e;
+		}
 	}
+	
 	/**
 	 * Creates a table name based on a types array.
 	 * Manages the get the correct name for the linking table for the
@@ -52,11 +66,12 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * 
 	 * @param array $types 2 types as strings
 	 *
-	 * @return string $table table
+	 * @return string
 	 */
 	public function getTable($types) {
 		return $this->writer->getAssocTable($types);
 	}
+	
 	/**
 	 * Associates two beans with eachother using a many-to-many relation.
 	 *
@@ -65,8 +80,12 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 */
 	public function associate($beans1, $beans2) {
 		$results = array();
-		if (!is_array($beans1)) $beans1 = array($beans1);
-		if (!is_array($beans2)) $beans2 = array($beans2);
+		if (!is_array($beans1)) {
+			$beans1 = array($beans1);
+		}
+		if (!is_array($beans2)) {
+			$beans2 = array($beans2);
+		}
 		foreach($beans1 as $bean1) {
 			foreach($beans2 as $bean2) {
 				$table = $this->getTable(array($bean1->getMeta('type') , $bean2->getMeta('type')));
@@ -76,6 +95,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		}
 		return (count($results)>1) ? $results : reset($results);
 	}
+	
 	/**
 	 * Associates a pair of beans. This method associates two beans, no matter
 	 * what types.Accepts a base bean that contains data for the linking record.
@@ -84,13 +104,15 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean2 second bean
 	 * @param RedBean_OODBBean $bean  base bean
 	 *
-	 * @return mixed $id either the link ID or null
+	 * @return mixed
 	 */
 	protected function associateBeans(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean) {
 		$results = array();
 		$property1 = $bean1->getMeta('type') . '_id';
 		$property2 = $bean2->getMeta('type') . '_id';
-		if ($property1 == $property2) $property2 = $bean2->getMeta('type').'2_id';
+		if ($property1 == $property2) {
+			$property2 = $bean2->getMeta('type').'2_id';
+		}
 		//add a build command for Unique Indexes
 		$bean->setMeta('buildcommand.unique' , array(array($property1, $property2)));
 		//add a build command for Single Column Index (to improve performance in case unqiue cant be used)
@@ -109,13 +131,17 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			if (!$this->oodb->isFrozen() &&
 				$bean->getMeta('buildreport.flags.created')){
 				$bean->setMeta('buildreport.flags.created', 0);
-				if (!$this->oodb->isFrozen())
-				$this->writer->addConstraintForTypes($bean1->getMeta('type'), $bean2->getMeta('type'));
+				if (!$this->oodb->isFrozen()) {
+					$this->writer->addConstraintForTypes($bean1->getMeta('type'), $bean2->getMeta('type'));
+				}
 			}
 			$results[] = $id;
 		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION))) throw $e;
+				array(RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION))
+			) {
+				throw $e;
+			}
 		}
 		return $results;
 	}
@@ -130,21 +156,29 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param boolean          $getLinks TRUE returns rows from the link table
 	 * @param string           $sql      additional SQL snippet
 	 * @param array            $params   bindings
+	 * 
 	 * @return array
+	 * 
 	 * @throws RedBean_Exception_Security
 	 * @throws RedBean_Exception_SQL
 	 */
 	private function relatedRows($bean, $type, $getLinks = false, $sql = '', $params = array()) {
-		if (!is_array($bean) && !($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
+		if (!is_array($bean) && !($bean instanceof RedBean_OODBBean)) {
+			throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
+		}
 		$ids = array();
 		if (is_array($bean)) {
 			$beans = $bean;
 			foreach($beans as $b) {
-				if (!($b instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected RedBean_OODBBean in array but got:'.gettype($b));
+				if (!($b instanceof RedBean_OODBBean)) {
+					throw new RedBean_Exception_Security('Expected RedBean_OODBBean in array but got:'.gettype($b));
+				}
 				$ids[] = $b->id;
 			}
 			$bean = reset($beans);
-		} else $ids[] = $bean->id;
+		} else {
+			$ids[] = $bean->id;
+		}
 		$sourceType = $bean->getMeta('type');
 		try {		
 			if (!$getLinks) {
@@ -157,6 +191,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			return array();
 		}
 	}
+	
 	/**
 	 * Counts the number of related beans in an N-M relation.
 	 * 
@@ -166,11 +201,16 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param array                  $values bindings for your SQL string
 	 * 
 	 * @return integer
+	 * 
 	 * @throws RedBean_Exception_Security
 	 */
 	public function relatedCount($bean, $type, $sql = null, $values = array()) {
-		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
-		if (!$bean->id) return 0;
+		if (!($bean instanceof RedBean_OODBBean)) {
+			throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
+		}
+		if (!$bean->id) {
+			return 0;
+		}
 		$beanType = $bean->getMeta('type');
 		try {
 			return $this->writer->queryRecordCountRelated($beanType, $type, $bean->id, $sql, $values);
@@ -179,6 +219,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			return 0;
 		}
 	}
+	
 	/**
 	 * Returns all ids of beans of type $type that are related to $bean. If the
 	 * $getLinks parameter is set to boolean TRUE this method will return the ids
@@ -195,11 +236,11 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @throws RedBean_Exception_SQL
 	 *
 	 * @param RedBean_OODBBean|array $bean     reference bean
-	 * @param string				 $type     target type
-	 * @param bool					 $getLinks whether you are interested in the assoc records
-	 * @param bool					 $sql      room for additional SQL
+	 * @param string                 $type     target type
+	 * @param boolean                $getLinks whether you are interested in the assoc records
+	 * @param boolean                $sql      room for additional SQL
 	 *
-	 * @return array $ids
+	 * @return array
 	 */
 	public function related($bean, $type, $getLinks = false, $sql = '', $params = array()) {
 		$sql = $this->writer->glueSQLCondition($sql);
@@ -208,6 +249,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		foreach($rows as $row) $ids[] = $row['id'];
 		return $ids;
 	}
+	
 	/**
 	 * Breaks the association between two beans. This method unassociates two beans. If the
 	 * method succeeds the beans will no longer form an association. In the database
@@ -222,8 +264,12 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param boolean          $fast  If TRUE, removes the entries by query without FUSE
 	 */
 	public function unassociate($beans1, $beans2, $fast = null) {
-		if (!is_array($beans1)) $beans1 = array($beans1);
-		if (!is_array($beans2)) $beans2 = array($beans2);
+		if (!is_array($beans1)) {
+			$beans1 = array($beans1);
+		}
+		if (!is_array($beans2)) {
+			$beans2 = array($beans2);
+		}
 		foreach($beans1 as $bean1) {
 			foreach($beans2 as $bean2) {
 				try {
@@ -246,6 +292,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			}
 		}
 	}
+	
 	/**
 	 * Removes all relations for a bean. This method breaks every connection between
 	 * a certain bean $bean and every other bean of type $type. Warning: this method
@@ -266,6 +313,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			$this->handleException($e);
 		}
 	}
+	
 	/**
 	 * Given two beans this function returns TRUE if they are associated using a
 	 * many-to-many association, FALSE otherwise.
@@ -275,7 +323,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean1 bean
 	 * @param RedBean_OODBBean $bean2 bean
 	 *
-	 * @return bool $related whether they are associated N-M
+	 * @return boolean
 	 */
 	public function areRelated(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		try {
@@ -286,6 +334,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			return false;
 		}
 	}
+	
 	/**
 	 * @deprecated
 	 * @param array  $beans    beans
@@ -300,6 +349,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$this->oodb->store($bean1);
 		$this->oodb->store($bean2);
 	}
+	
 	/**
 	 * Returns all the beans associated with $bean.
 	 * This method will return an array containing all the beans that have
@@ -321,13 +371,14 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param array				 $val  values to be inserted in SQL slots
 	 * @param boolean				 $glue whether the SQL should be prefixed with WHERE
 	 *
-	 * @return array $beans	beans yielded by your query.
+	 * @return array
 	 */
 	public function relatedSimple($bean, $type, $sql = '', $values = array()) {
 		$sql = $this->writer->glueSQLCondition($sql);
 		$rows = $this->relatedRows($bean, $type, false, $sql, $values);
 		return $this->oodb->convertToBeans($type, $rows);
 	}
+	
 	/**
 	* Returns only single associated bean.
 	*
@@ -337,13 +388,16 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	* @param array $values values to be inserted in SQL slots
 	*
 	*
-	* @return RedBean_OODBBean $bean
+	* @return RedBean_OODBBean
 	*/
 	public function relatedOne(RedBean_OODBBean $bean, $type, $sql = null, $values = array()) {
 		$beans = $this->relatedSimple($bean, $type, $sql, $values);
-		if (!count($beans) || !is_array($beans)) return null;
+		if (!count($beans) || !is_array($beans)) {
+			return null;
+		}
 		return reset($beans);
 	}
+	
 	/**
 	 * The opposite of related(). Returns all the beans that are not
 	 * associated with the bean provided.
@@ -353,7 +407,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param string           $sql    SQL for extra filtering
 	 * @param array            $values values to be inserted in SQL slots
 	 *
-	 * @return array $beans beans
+	 * @return array
 	 */
 	public function unrelated(RedBean_OODBBean $bean, $type, $sql = null, $values = array()) {
 		$keys = $this->related($bean, $type);

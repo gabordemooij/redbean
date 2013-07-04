@@ -2,21 +2,22 @@
 /**
  * Label Maker
  * 
- * @file			RedBean/LabelMaker.php
- * @desc			Makes so-called label beans
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @file    RedBean/LabelMaker.php
+ * @desc    Makes so-called label beans
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license	BSD/GPLv2
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
- *
  */
 class RedBean_LabelMaker {	
+	
 	/**
 	 * @var RedBean_Toolbox 
 	 */
 	protected $toolbox;
+	
 	/**
 	 * Constructor.
 	 * 
@@ -25,6 +26,7 @@ class RedBean_LabelMaker {
 	public function __construct(RedBean_ToolBox $toolbox) {
 		$this->toolbox = $toolbox;
 	}
+	
 	/**
 	 * A label is a bean with only an id, type and name property.
 	 * This function will dispense beans for all entries in the array. The
@@ -34,7 +36,7 @@ class RedBean_LabelMaker {
 	 * @param string $type   type of beans you would like to have
 	 * @param array  $labels list of labels, names for each bean
 	 *
-	 * @return array $bean a list of beans with type and name property
+	 * @return array
 	 */
 	public function dispenseLabels($type, $labels) {
 		$labelBeans = array();
@@ -45,6 +47,7 @@ class RedBean_LabelMaker {
 		}
 		return $labelBeans;
 	}
+	
 	/**
 	 * Gathers labels from beans. This function loops through the beans,
 	 * collects the values of the name properties of each individual bean
@@ -53,11 +56,13 @@ class RedBean_LabelMaker {
 	 *
 	 * @param array $beans list of beans to loop
 	 *
-	 * @return array $array list of names of beans
+	 * @return array
 	 */
 	public function gatherLabels($beans) {
 		$labels = array();
-		foreach($beans as $bean) $labels[] = $bean->name;
+		foreach($beans as $bean) {
+			$labels[] = $bean->name;
+		}
 		sort($labels);
 		return $labels;
 	}

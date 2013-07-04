@@ -3,12 +3,12 @@
  * RedBean Facade
  * 
  * Version Information
- * RedBean Version @version 3.4.4
+ * RedBean Version @version 3.5
  * 
- * @file			RedBean/Facade.php
- * @desc			Convenience class for RedBeanPHP.
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @file    RedBean/Facade.php
+ * @desc    Convenience class for RedBeanPHP.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  * 
  * This class hides the object landscape of
  * RedBeanPHP behind a single letter class providing
@@ -19,69 +19,86 @@
  * with this source code in the file license.txt.
  */
 class RedBean_Facade {
+	
 	/**
 	 * @var array
 	 */
 	public static $toolboxes = array();
+	
 	/**
 	 * @var RedBean_ToolBox
 	 */
 	public static $toolbox;
+	
 	/**
 	 * @var RedBean_OODB
 	 */
 	public static $redbean;
+	
 	/**
 	 * @var RedBean_QueryWriter
 	 */
 	public static $writer;
+	
 	/**
 	 * @var RedBean_DBAdapter
 	 */
 	public static $adapter;
+	
 	/**
 	 * @var RedBean_AssociationManager
 	 */
 	public static $associationManager;
+	
 	/**
 	 * @var RedBean_ExtAssociationManager
 	 */
 	public static $extAssocManager;
+	
 	/**
 	 * @var RedBean_TagManager
 	 */
 	public static $tagManager;
+	
 	/**
 	 * @var RedBean_DuplicationManager 
 	 */
 	public static $duplicationManager;
+	
 	/**
 	 * @var RedBean_LabelMaker 
 	 */
 	public static $labelMaker;
+	
 	/**
 	 * @var RedBean_Finder
 	 */
 	public static $finder;
+	
 	/**
 	 * @var string
 	 */
 	public static $currentDB = '';
+	
 	/**
 	 * @var RedBean_SQLHelper
 	 */
 	public static $f;
+	
 	/**
 	 * @var boolean
 	 */
 	private static $strictType = true;
+	
 	/**
 	 * Get version
+	 * 
 	 * @return string
 	 */
 	public static function getVersion() {
-		return '3.4.4';
+		return '3.5';
 	}
+	
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
 	 * RedBean. The Setup() method can be called without any arguments, in this case it will
@@ -94,12 +111,19 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function setup($dsn = null, $username = null, $password = null) {
-		if (function_exists('sys_get_temp_dir')) $tmp = sys_get_temp_dir(); else $tmp = 'tmp';
-		if (is_null($dsn)) $dsn = 'sqlite:/'.$tmp.'/red.db';
+		if (function_exists('sys_get_temp_dir')) {
+			$tmp = sys_get_temp_dir(); 
+		} else {
+			$tmp = 'tmp';
+		}
+		if (is_null($dsn)) {
+			$dsn = 'sqlite:/'.$tmp.'/red.db';
+		}
 		self::addDatabase('default', $dsn, $username, $password);
 		self::selectDatabase('default');
 		return self::$toolbox;
 	}
+	
 	/**
 	 * Starts a transaction within a closure (or other valid callback).
 	 * If an Exception is thrown inside, the operation is automatically rolled back.
@@ -129,20 +153,29 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function transaction($callback) {
-		if (!is_callable($callback)) throw new InvalidArgumentException('R::transaction needs a valid callback.');
+		if (!is_callable($callback)) {
+			throw new InvalidArgumentException('R::transaction needs a valid callback.');
+		}
 		static $depth = 0;
 		try {
-			if ($depth == 0) self::begin();
+			if ($depth == 0) {
+				self::begin();
+			}
 			$depth++;
 			call_user_func($callback); //maintain 5.2 compatibility
 			$depth--;
-			if ($depth == 0) self::commit();
+			if ($depth == 0) {
+				self::commit();
+			}
 		} catch(Exception $e) {
 			$depth--;
-			if ($depth == 0) self::rollback();
+			if ($depth == 0) {
+				self::rollback();
+			}
 			throw $e;
 		}
 	}
+	
 	/**
 	 * Adds a database to the facade, afterwards you can select the database using
 	 * selectDatabase($key).
@@ -158,6 +191,7 @@ class RedBean_Facade {
 	public static function addDatabase($key, $dsn, $user = null, $pass = null, $frozen = false) {
 		self::$toolboxes[$key] = RedBean_Setup::kickstart($dsn, $user, $pass, $frozen);
 	}
+	
 	/**
 	 * Selects a different database for the Facade to work with.
 	 *
@@ -165,7 +199,9 @@ class RedBean_Facade {
 	 * @return int 1
 	 */
 	public static function selectDatabase($key) {
-		if (self::$currentDB === $key) return false;
+		if (self::$currentDB === $key) {
+			return false;
+		}
 		self::configureFacadeWithToolbox(self::$toolboxes[$key]);
 		self::$currentDB = $key;
 		return true;
@@ -183,16 +219,18 @@ class RedBean_Facade {
 		if (!isset(self::$adapter)) throw new RedBean_Exception_Security('Use R::setup() first.');
 		self::$adapter->getDatabase()->setDebugMode($tf, $logger);
 	}
+	
 	/**
 	 * Stores a RedBean OODB Bean and returns the ID.
 	 *
 	 * @param  RedBean_OODBBean|RedBean_SimpleModel $bean bean
 	 *
-	 * @return integer $id id
+	 * @return mixed
 	 */
 	public static function store($bean) {
 		return self::$redbean->store($bean);
 	}
+	
 	/**
 	 * Toggles fluid or frozen mode. In fluid mode the database
 	 * structure is adjusted to accomodate your objects. In frozen mode
@@ -207,6 +245,7 @@ class RedBean_Facade {
 	public static function freeze($tf = true) {
 		self::$redbean->freeze($tf);
 	}
+	
 	/**
 	* Loads multiple types of beans with the same ID.
 	* This might look like a strange method, however it can be useful
@@ -218,10 +257,12 @@ class RedBean_Facade {
 	* @param string|array $types
 	* @param mixed        $id
 	*
-	* @return RedBean_OODBBean $bean
+	* @return RedBean_OODBBean
 	*/ 
 	public static function loadMulti($types, $id) {
-		if (is_string($types) && strpos($types, ',') !== false) $types = explode(',', $types);
+		if (is_string($types) && strpos($types, ',') !== false) {
+			$types = explode(',', $types);
+		}
 		if (is_array($types)) {
 			$list = array();
 			foreach($types as $typeItem) {
@@ -231,6 +272,7 @@ class RedBean_Facade {
 		}
 		return array();
 	}
+	
 	/**
 	 * Loads the bean with the given type and id and returns it.
 	 *
@@ -242,11 +284,12 @@ class RedBean_Facade {
 	 * @param string  $type type
 	 * @param integer $id   id of the bean you want to load
 	 *
-	 * @return RedBean_OODBBean $bean
+	 * @return RedBean_OODBBean
 	 */
 	public static function load($type, $id) {
 		return self::$redbean->load($type, $id);
 	}
+	
 	/**
 	 * Deletes the specified bean.
 	 *
@@ -257,32 +300,34 @@ class RedBean_Facade {
 	public static function trash($bean) {
 		return self::$redbean->trash($bean);
 	}
+	
 	/**
 	 * Dispenses a new RedBean OODB Bean for use with
 	 * the rest of the methods.
-	 * 
-	 * @todo extract from facade
-	 * 
 	 *
 	 * @param string  $type   type
 	 * @param integer $number number of beans to dispense
 	 * 
-	 * @return array $oneOrMoreBeans
+	 * @return array
 	 */
 	public static function dispense($type, $num = 1) {
-		if (!preg_match('/^[a-z0-9]+$/', $type) && self::$strictType) throw new RedBean_Exception_Security('Invalid type: '.$type); 
+		if (!preg_match('/^[a-z0-9]+$/', $type) && self::$strictType) {
+			throw new RedBean_Exception_Security('Invalid type: '.$type); 
+		}
 		return self::$redbean->dispense($type, $num);
 	}
+	
 	/**
 	 * Toggles strict bean type names.
 	 * If set to true (default) this will forbid the use of underscores and 
 	 * uppercase characters in bean type strings (R::dispense).
 	 * 
-	 * @param boolean $trueFalse 
+	 * @param boolean 
 	 */
 	public static function setStrictTyping($trueFalse) {
 		self::$strictType = (boolean) $trueFalse;
 	}
+	
 	/**
 	 * Convience method. Tries to find beans of a certain type,
 	 * if no beans are found, it dispenses a bean of that type.
@@ -291,11 +336,12 @@ class RedBean_Facade {
 	 * @param  string $sql    SQL code for finding the bean
 	 * @param  array  $values parameters to bind to SQL
 	 *
-	 * @return array $beans Contains RedBean_OODBBean instances
+	 * @return array
 	 */
 	public static function findOrDispense($type, $sql = null, $values = array()) {
 		return self::$finder->findOrDispense($type, $sql, $values);
 	}
+	
 	/**
 	 * Associates two Beans. This method will associate two beans with eachother.
 	 * You can then get one of the beans by using the related() function and
@@ -322,6 +368,7 @@ class RedBean_Facade {
 			return self::$extAssocManager->extAssociateSimple($beans1, $beans2, $extra);
 		}
 	}
+	
 	/**
 	 * Breaks the association between two beans.
 	 * This functions breaks the association between a pair of beans. After
@@ -337,6 +384,7 @@ class RedBean_Facade {
 	public static function unassociate($beans1,  $beans2, $fast = false) {
 		return self::$associationManager->unassociate($beans1, $beans2, $fast);
 	}
+	
 	/**
 	 * Returns all the beans associated with $bean.
 	 * This method will return an array containing all the beans that have
@@ -357,7 +405,7 @@ class RedBean_Facade {
 	 * @param string				 $sql  SQL snippet for extra filtering
 	 * @param array					 $val  values to be inserted in SQL slots
 	 *
-	 * @return array $beans	beans yielded by your query.
+	 * @return array
 	 */
 	public static function related($bean, $type, $sql = '', $values = array()) {
 		return self::$associationManager->relatedSimple($bean, $type, $sql, $values);
@@ -383,12 +431,12 @@ class RedBean_Facade {
 	* @param string $sql SQL for extra filtering
 	* @param array $values values to be inserted in SQL slots
 	*
-	*
-	* @return RedBean_OODBBean $bean
+	* @return RedBean_OODBBean
 	*/
 	public static function relatedOne(RedBean_OODBBean $bean, $type, $sql = null, $values = array()) {
 		return self::$associationManager->relatedOne($bean, $type, $sql, $values);
 	}
+	
 	/**
 	 * Checks whether a pair of beans is related N-M. This function does not
 	 * check whether the beans are related in N:1 way.
@@ -396,11 +444,12 @@ class RedBean_Facade {
 	 * @param RedBean_OODBBean $bean1 first bean
 	 * @param RedBean_OODBBean $bean2 second bean
 	 *
-	 * @return bool $yesNo whether they are related
+	 * @return boolean
 	 */
 	public static function areRelated(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) {
 		return self::$associationManager->areRelated($bean1, $bean2);
 	}
+	
 	/**
 	 * The opposite of related(). Returns all the beans that are not
 	 * associated with the bean provided.
@@ -410,11 +459,12 @@ class RedBean_Facade {
 	 * @param string           $sql    SQL for extra filtering
 	 * @param array            $values values to be inserted in SQL slots
 	 *
-	 * @return array $beans beans
+	 * @return array
 	 */
 	public static function unrelated(RedBean_OODBBean $bean, $type, $sql = null, $values = array()) {
 		return self::$associationManager->unrelated($bean, $type, $sql, $values);
 	}
+	
 	/**
 	 * Clears all associated beans.
 	 * Breaks all many-to-many associations of a bean and a specified type.
@@ -427,6 +477,7 @@ class RedBean_Facade {
 	public static function clearRelations(RedBean_OODBBean $bean, $type) {
 		self::$associationManager->clearRelations($bean, $type);
 	}
+	
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
@@ -438,11 +489,12 @@ class RedBean_Facade {
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
 	 *
-	 * @return array $beans  beans
+	 * @return array
 	 */
 	public static function find($type, $sql = null, $values = array()) {
 		return self::$finder->find($type, $sql, $values);
 	}
+	
 	/**
 	 * @see RedBean_Facade::find
 	 * The findAll() method differs from the find() method in that it does
@@ -456,11 +508,12 @@ class RedBean_Facade {
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
 	 *
-	 * @return array $beans  beans
+	 * @return array
 	 */
 	public static function findAll($type, $sql = null, $values = array()) {
 		return self::$finder->find($type, $sql, $values);
 	}
+	
 	/**
 	 * @see RedBean_Facade::find
 	 * The variation also exports the beans (i.e. it returns arrays).
@@ -469,11 +522,12 @@ class RedBean_Facade {
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
 	 *
-	 * @return array $arrays arrays
+	 * @return array
 	 */
 	public static function findAndExport($type, $sql = null, $values = array()) {
 		return self::$finder->findAndExport($type, $sql, $values);
 	}
+	
 	/**
 	 * @see RedBean_Facade::find
 	 * This variation returns the first bean only.
@@ -482,11 +536,12 @@ class RedBean_Facade {
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
 	 *
-	 * @return RedBean_OODBBean $bean
+	 * @return RedBean_OODBBean
 	 */
 	public static function findOne($type, $sql = null, $values = array()) {
 		return self::$finder->findOne($type, $sql, $values);
 	}
+	
 	/**
 	 * @see RedBean_Facade::find
 	 * This variation returns the last bean only.
@@ -495,11 +550,12 @@ class RedBean_Facade {
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
 	 *
-	 * @return RedBean_OODBBean $bean
+	 * @return RedBean_OODBBean
 	 */
 	public static function findLast($type, $sql = null, $values = array()) {
 		return self::$finder->findLast($type, $sql, $values);
 	}
+	
 	/**
 	 * Returns an array of beans. Pass a type and a series of ids and
 	 * this method will bring you the correspondig beans.
@@ -512,11 +568,12 @@ class RedBean_Facade {
 	 * @param string $type type of beans
 	 * @param array  $ids  ids to load
 	 *
-	 * @return array $beans resulting beans (may include empty ones)
+	 * @return array
 	 */
 	public static function batch($type, $ids) {
 		return self::$redbean->batch($type, $ids);
 	}
+	
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
@@ -524,11 +581,12 @@ class RedBean_Facade {
 	 * @param string $sql	 sql    SQL query to execute
 	 * @param array  $values values a list of values to be bound to query parameters
 	 *
-	 * @return integer $affected  number of affected rows
+	 * @return integer
 	 */
 	public static function exec($sql, $values = array()) {
 		return self::query('exec', $sql, $values);
 	}
+	
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
@@ -536,11 +594,12 @@ class RedBean_Facade {
 	 * @param string $sql	 sql    SQL query to execute
 	 * @param array  $values values a list of values to be bound to query parameters
 	 *
-	 * @return array $results
+	 * @return array
 	 */
 	public static function getAll($sql, $values = array()) {
 		return self::query('get', $sql, $values);
 	}
+	
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
@@ -548,11 +607,12 @@ class RedBean_Facade {
 	 * @param string $sql	 sql    SQL query to execute
 	 * @param array  $values values a list of values to be bound to query parameters
 	 *
-	 * @return string $result scalar
+	 * @return string
 	 */
 	public static function getCell($sql, $values = array()) {
 		return self::query('getCell', $sql, $values);
 	}
+	
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
@@ -560,11 +620,12 @@ class RedBean_Facade {
 	 * @param string $sql	 sql    SQL query to execute
 	 * @param array  $values values a list of values to be bound to query parameters
 	 *
-	 * @return array $results
+	 * @return array
 	 */
 	public static function getRow($sql, $values = array()) {
 		return self::query('getRow', $sql, $values);
 	}
+	
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
@@ -572,11 +633,12 @@ class RedBean_Facade {
 	 * @param string $sql	 sql    SQL query to execute
 	 * @param array  $values values a list of values to be bound to query parameters
 	 *
-	 * @return array $results
+	 * @return array
 	 */
 	public static function getCol($sql, $values = array()) {
 		return self::query('getCol', $sql, $values);
 	}
+	
 	/**
 	 * Internal Query function, executes the desired query. Used by
 	 * all facade query functions. This keeps things DRY.
@@ -587,13 +649,13 @@ class RedBean_Facade {
 	 * @param string $sql    the sql you want to execute
 	 * @param array  $values array of values to be bound to query statement
 	 *
-	 * @return array $results results of query
+	 * @return array
 	 */
 	private static function query($method, $sql, $values) {
 		if (!self::$redbean->isFrozen()) {
 			try {
 				$rs = RedBean_Facade::$adapter->$method($sql, $values);
-			}catch(RedBean_Exception_SQL $e) {
+			} catch(RedBean_Exception_SQL $e) {
 				if(self::$writer->sqlStateIn($e->getSQLState(),
 				array(
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
@@ -609,6 +671,7 @@ class RedBean_Facade {
 			return RedBean_Facade::$adapter->$method($sql, $values);
 		}
 	}
+	
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
@@ -621,11 +684,12 @@ class RedBean_Facade {
 	 * @param string $sql	 sql    SQL query to execute
 	 * @param array  $values values a list of values to be bound to query parameters
 	 *
-	 * @return array $results
+	 * @return array
 	 */
 	public static function getAssoc($sql, $values = array()) {
 		return self::query('getAssoc', $sql, $values);
 	}
+	
 	/**
 	 * Makes a copy of a bean. This method makes a deep copy
 	 * of the bean.The copy will have the following features.
@@ -644,12 +708,13 @@ class RedBean_Facade {
 	 * @param array            $trail for internal usage, pass array()
 	 * @param boolean          $pid   for internal usage
 	 *
-	 * @return array $copiedBean the duplicated bean
+	 * @return array
 	 */
 	public static function dup($bean, $trail = array(), $pid = false, $filters = array()) {
 		self::$duplicationManager->setFilters($filters);
 		return self::$duplicationManager->dup($bean, $trail, $pid);
 	}
+	
 	/**
 	 * Exports a collection of beans. Handy for XML/JSON exports with a
 	 * Javascript framework like Dojo or ExtJS.
@@ -667,6 +732,7 @@ class RedBean_Facade {
 	public static function exportAll($beans, $parents = false, $filters = array()) {
 		return self::$duplicationManager->exportAll($beans, $parents, $filters);
 	}
+	
 	/**
 	 * @deprecated
 	 * 
@@ -676,17 +742,19 @@ class RedBean_Facade {
 	public static function swap($beans, $property) {
 		return self::$associationManager->swap($beans, $property);
 	}
+	
 	/**
 	 * Converts a series of rows to beans.
 	 *
 	 * @param string $type type
 	 * @param array  $rows must contain an array of arrays.
 	 *
-	 * @return array $beans
+	 * @return array
 	 */
 	public static function convertToBeans($type, $rows) {
 		return self::$redbean->convertToBeans($type, $rows);
 	}
+	
 	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Tests whether a bean has been associated with one ore more
@@ -701,11 +769,12 @@ class RedBean_Facade {
 	 * @param  array            $tags list of tags
 	 * @param  boolean          $all  whether they must all match or just some
 	 *
-	 * @return boolean $didMatch whether the bean has been assoc. with the tags
+	 * @return boolean
 	 */
 	public static function hasTag($bean, $tags, $all = false) {
 		return self::$tagManager->hasTag($bean, $tags, $all);
 	}
+	
 	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Removes all sepcified tags from the bean. The tags specified in
@@ -719,6 +788,7 @@ class RedBean_Facade {
 	public static function untag($bean, $tagList) {
 		return self::$tagManager->untag($bean, $tagList);
 	}
+	
 	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Tags a bean or returns tags associated with a bean.
@@ -731,11 +801,12 @@ class RedBean_Facade {
 	 * @param RedBean_OODBBean $bean    bean
 	 * @param mixed				$tagList tags
 	 *
-	 * @return string $commaSepListTags
+	 * @return string
 	 */
 	public static function tag(RedBean_OODBBean $bean, $tagList = null) {
 		return self::$tagManager->tag($bean, $tagList);
 	}
+	
 	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Adds tags to a bean.
@@ -751,6 +822,7 @@ class RedBean_Facade {
 	public static function addTags(RedBean_OODBBean $bean, $tagList) {
 		return self::$tagManager->addTags($bean, $tagList);
 	}
+	
 	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Returns all beans that have been tagged with one of the tags given.
@@ -763,6 +835,7 @@ class RedBean_Facade {
 	public static function tagged($beanType, $tagList) {
 		return self::$tagManager->tagged($beanType, $tagList);
 	}
+	
 	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Returns all beans that have been tagged with ALL of the tags given.
@@ -775,6 +848,7 @@ class RedBean_Facade {
 	public static function taggedAll($beanType, $tagList) {
 		return self::$tagManager->taggedAll($beanType, $tagList);
 	}
+	
 	/**
 	 * Wipes all beans of type $beanType.
 	 *
@@ -783,6 +857,7 @@ class RedBean_Facade {
 	public static function wipe($beanType) {
 		return RedBean_Facade::$redbean->wipe($beanType);
 	}
+	
 	/**
 	 * Counts beans
 	 *
@@ -790,11 +865,12 @@ class RedBean_Facade {
 	 * @param string $addSQL   additional SQL snippet (for filtering, limiting)
 	 * @param array  $params   parameters to bind to SQL
 	 *
-	 * @return integer $numOfBeans
+	 * @return integer
 	 */
 	public static function count($beanType, $addSQL = '', $params = array()) {
 		return RedBean_Facade::$redbean->count($beanType, $addSQL, $params);
 	}
+	
 	/**
 	 * Configures the facade, want to have a new Writer? A new Object Database or a new
 	 * Adapter and you want it on-the-fly? Use this method to hot-swap your facade with a new
@@ -802,7 +878,7 @@ class RedBean_Facade {
 	 *
 	 * @param RedBean_ToolBox $tb toolbox
 	 *
-	 * @return RedBean_ToolBox $tb old, rusty, previously used toolbox
+	 * @return RedBean_ToolBox
 	 */
 	public static function configureFacadeWithToolbox(RedBean_ToolBox $tb) {
 		$oldTools = self::$toolbox;
@@ -823,6 +899,7 @@ class RedBean_Facade {
 		self::$f = new RedBean_SQLHelper(self::$adapter);
 		return $oldTools;
 	}
+	
 	/**
 	 * Facade Convience method for adapter transaction system.
 	 * Begins a transaction.
@@ -830,10 +907,13 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function begin() {
-		if (!self::$redbean->isFrozen()) return false;
+		if (!self::$redbean->isFrozen()) {
+			return false;
+		}
 		self::$adapter->startTransaction();
 		return true;
 	}
+	
 	/**
 	 * Facade Convience method for adapter transaction system.
 	 * Commits a transaction.
@@ -841,10 +921,13 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function commit() {
-		if (!self::$redbean->isFrozen()) return false;
+		if (!self::$redbean->isFrozen()) {
+			return false;
+		}
 		self::$adapter->commit();
 		return true;
 	}
+	
 	/**
 	 * Facade Convience method for adapter transaction system.
 	 * Rolls back a transaction.
@@ -852,10 +935,13 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function rollback() {
-		if (!self::$redbean->isFrozen()) return false;
+		if (!self::$redbean->isFrozen()) {
+			return false;
+		}
 		self::$adapter->rollback();
 		return true;
 	}
+	
 	/**
 	 * Returns a list of columns. Format of this array:
 	 * array( fieldname => type )
@@ -864,20 +950,23 @@ class RedBean_Facade {
 	 *
 	 * @param  string $table   name of the table (not type) you want to get columns of
 	 *
-	 * @return array  $columns list of columns and their types
+	 * @return array
 	 */
 	public static function getColumns($table) {
 		return self::$writer->getColumns($table);
 	}
+	
 	/**
 	 * Generates question mark slots for an array of values.
 	 *
 	 * @param array $array
-	 * @return string $slots
+	 * 
+	 * @return string
 	 */
 	public static function genSlots($array) {
 		return self::$f->genSlots($array);
 	}
+	
 	/**
 	 * Nukes the entire database.
 	 */
@@ -886,6 +975,7 @@ class RedBean_Facade {
 			self::$writer->wipeAll();
 		}
 	}
+	
 	/**
 	 * Sets a list of dependencies.
 	 * A dependency list contains an entry for each dependent bean.
@@ -909,8 +999,7 @@ class RedBean_Facade {
 	 * but not if:
 	 *
 	 * unset($paper->ownPage[$pageID]);
-	 *
-	 *
+	 * 
 	 * @param array $dep list of dependencies
 	 */
 	public static function dependencies($dep) {
@@ -924,13 +1013,16 @@ class RedBean_Facade {
 	 *
 	 * @param array $beans list of beans to be stored
 	 *
-	 * @return array $ids list of resulting IDs
+	 * @return array
 	 */
 	public static function storeAll($beans) {
 		$ids = array();
-		foreach($beans as $bean) $ids[] = self::store($bean);
+		foreach($beans as $bean) {
+			$ids[] = self::store($bean);
+		}
 		return $ids;
 	}
+	
 	/**
 	 * Short hand function to trash a set of beans at once.
 	 * For information please consult the R::trash() function.
@@ -939,8 +1031,11 @@ class RedBean_Facade {
 	 * @param array $beans list of beans to be trashed
 	 */
 	public static function trashAll($beans) {
-		foreach($beans as $bean) self::trash($bean);
+		foreach($beans as $bean) {
+			self::trash($bean);
+		}
 	}
+	
 	/**
 	 * A label is a bean with only an id, type and name property.
 	 * This function will dispense beans for all entries in the array. The
@@ -950,11 +1045,12 @@ class RedBean_Facade {
 	 * @param string $type   type of beans you would like to have
 	 * @param array  $labels list of labels, names for each bean
 	 *
-	 * @return array $bean a list of beans with type and name property
+	 * @return array
 	 */
 	public static function dispenseLabels($type, $labels) {
 		return self::$labelMaker->dispenseLabels($type, $labels);
 	}
+	
 	/**
 	 * Gathers labels from beans. This function loops through the beans,
 	 * collects the values of the name properties of each individual bean
@@ -963,29 +1059,36 @@ class RedBean_Facade {
 	 *
 	 * @param array $beans list of beans to loop
 	 *
-	 * @return array $array list of names of beans
+	 * @return array
 	 */
 	public static function gatherLabels($beans) {
 		return self::$labelMaker->gatherLabels($beans);
 	}
+	
 	/**
 	 * Closes the database connection.
 	 */
 	public static function close() {
-		if (isset(self::$adapter)) self::$adapter->close();
+		if (isset(self::$adapter)) {
+			self::$adapter->close();
+		}
 	}
+	
 	/**
 	 * Simple convenience function, returns ISO date formatted representation
 	 * of $time.
 	 *
 	 * @param mixed $time UNIX timestamp
 	 *
-	 * @return type
+	 * @return string
 	 */
 	public static function isoDate($time = null) {
-		if (!$time) $time = time();
+		if (!$time) {
+			$time = time();
+		}
 		return @date('Y-m-d', $time);
 	}
+	
 	/**
 	 * Simple convenience function, returns ISO date time
 	 * formatted representation
@@ -993,7 +1096,7 @@ class RedBean_Facade {
 	 *
 	 * @param mixed $time UNIX timestamp
 	 *
-	 * @return type
+	 * @return string
 	 */
 	public static function isoDateTime($time = null) {
 		if (!$time) $time = time();
@@ -1026,20 +1129,22 @@ class RedBean_Facade {
 	public static function setRedBean(RedBean_OODB $redbean) {
 		self::$redbean = $redbean;
 	}
+	
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @return RedBean_DatabaseAdapter $adapter
+	 * @return RedBean_DatabaseAdapter
 	 */
 	public static function getDatabaseAdapter() {
 		return self::$adapter;
 	}
+	
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @return RedBean_QueryWriter $writer
+	 * @return RedBean_QueryWriter
 	 */
 	public static function getWriter() {
 		return self::$writer;
@@ -1048,11 +1153,12 @@ class RedBean_Facade {
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @return RedBean_RedBean $redbean
+	 * @return RedBean_RedBean
 	 */
 	public static function getRedBean() {
 		return self::$redbean;
 	}
+	
 	/**
 	 * Preloads certain properties for beans.
 	 * Understands aliases.
@@ -1065,10 +1171,12 @@ class RedBean_Facade {
 	public static function preload($beans, $types, $closure = null) {
 		return self::$redbean->preload($beans, $types, $closure);
 	}
+	
 	//Alias for Preload.
 	public static function each($beans, $types, $closure = null) { 
 		return self::preload($beans, $types, $closure); 
 	}
+	
 	/**
 	 * Facade method for RedBean_QueryWriter_AQueryWriter::renameAssocation()
 	 * 

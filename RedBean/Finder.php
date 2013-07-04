@@ -2,25 +2,27 @@
 /**
  * RedBean Finder
  * 
- * @file			RedBean/Finder.php
- * @desc			Helper class to harmonize APIs.
- * @author			Gabor de Mooij and the RedBeanPHP Community
- * @license			BSD/GPLv2
+ * @file    RedBean/Finder.php
+ * @desc    Helper class to harmonize APIs.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
- *
  */
 class RedBean_Finder {
+	
 	/**
 	 * @var RedBean_ToolBox 
 	 */
 	protected $toolbox;
+	
 	/**
 	 * @var RedBean_OODB
 	 */
 	protected $redbean;
+	
 	/**
 	 * Constructor.
 	 * The Finder requires a toolbox.
@@ -31,6 +33,7 @@ class RedBean_Finder {
 		$this->toolbox = $toolbox;
 		$this->redbean = $toolbox->getRedBean();
 	}
+	
 	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
@@ -42,19 +45,21 @@ class RedBean_Finder {
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
 	 *
-	 * @return array $beans  beans
+	 * @return array
 	 */
 	public function find($type, $sql = null, $values = array()) {
 		if ($sql instanceof RedBean_SQLHelper) list($sql, $values) = $sql->getQuery();
 		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
 		return $this->redbean->find($type, array(), $sql, $values);
 	}
+	
 	/**
 	 * @deprecated
 	 */
 	public function findAll($type, $sql = null, $values = array()) {
 		return $this->find($type, $sql, $values);
 	}
+	
 	/**
 	 * @see RedBean_Finder::find
 	 * The variation also exports the beans (i.e. it returns arrays).
@@ -68,9 +73,12 @@ class RedBean_Finder {
 	public function findAndExport($type, $sql = null, $values = array()) {
 		$items = $this->find($type, $sql, $values);
 		$arr = array();
-		foreach($items as $key => $item) $arr[$key] = $item->export();
+		foreach($items as $key => $item) {
+			$arr[$key] = $item->export();
+		}
 		return $arr;
 	}
+	
 	/**
 	 * @see RedBean_Finder::find
 	 * This variation returns the first bean only.
@@ -84,9 +92,12 @@ class RedBean_Finder {
 	public function findOne($type, $sql = null, $values = array()) {
 		$items = $this->find($type, $sql, $values);
 		$found = reset($items);
-		if (!$found) return null;
+		if (!$found) {
+			return null;
+		}
 		return $found;
 	}
+	
 	/**
 	 * @see RedBean_Finder::find
 	 * This variation returns the last bean only.
@@ -95,14 +106,17 @@ class RedBean_Finder {
 	 * @param string $sql    sql    
 	 * @param array  $values values 
 	 *
-	 * @return RedBean_OODBBean $bean
+	 * @return RedBean_OODBBean
 	 */
 	public function findLast($type, $sql = null, $values = array()) {
 		$items = $this->find($type, $sql, $values);
 		$found = end($items);
-		if (!$found) return null;
+		if (!$found) {
+			return null;
+		}
 		return $found;
 	}
+	
 	/**
 	 * @see RedBean_Finder::find
 	 * Convience method. Tries to find beans of a certain type,
@@ -112,12 +126,17 @@ class RedBean_Finder {
 	 * @param  string $sql    sql
 	 * @param  array  $values values
 	 *
-	 * @return array $beans Contains RedBean_OODBBean instances
+	 * @return array
 	 */
 	public function findOrDispense($type, $sql = null, $values = array()) {
 		$foundBeans = $this->find($type, $sql, $values);
-		if (count($foundBeans) == 0) return array($this->redbean->dispense($type)); else return $foundBeans;
+		if (count($foundBeans) == 0) {
+			return array($this->redbean->dispense($type)); 		
+		} else {
+			return $foundBeans;
+		}
 	}
+	
 	/**
 	 * Returns the bean identified by the RESTful path.
 	 * For instance:
@@ -143,10 +162,16 @@ class RedBean_Finder {
 	 */
 	public function findByPath($bean, $steps) {
 		$n = count($steps);
-		if (!$n) return $bean;
-		if ($n % 2) throw new RedBean_Exception_Security('Invalid path: needs 1 more element.');
+		if (!$n) {
+			return $bean;
+		}
+		if ($n % 2) {
+			throw new RedBean_Exception_Security('Invalid path: needs 1 more element.');
+		}
 		for($i = 0; $i < $n; $i += 2) {
-			if (trim($steps[$i])==='') throw new RedBean_Exception_Security('Cannot access list.');
+			if (trim($steps[$i])==='') {
+				throw new RedBean_Exception_Security('Cannot access list.');
+			}
 			if (strpos($steps[$i],'shared-') === false) {
 				$listName = 'own'.ucfirst($steps[$i]);
 				$listType = $this->toolbox->getWriter()->esc($steps[$i]);
@@ -155,8 +180,12 @@ class RedBean_Finder {
 				$listType = $this->toolbox->getWriter()->esc(substr($steps[$i],7));
 			}
 			$list = $bean->withCondition(" {$listType}.id = ? ",array($steps[$i + 1]))->$listName;
-			if (!is_array($list)) throw new RedBean_Exception_Security('Cannot access list.');
-			if (!isset($list[$steps[$i + 1]])) throw new RedBean_Exception_Security('Cannot access bean.');
+			if (!is_array($list)) {
+				throw new RedBean_Exception_Security('Cannot access list.');
+			}
+			if (!isset($list[$steps[$i + 1]])) {
+				throw new RedBean_Exception_Security('Cannot access bean.');
+			}
 			$bean = $list[$steps[$i + 1]];
 		}
 		return $bean;

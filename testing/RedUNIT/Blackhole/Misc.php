@@ -41,10 +41,15 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		testpack('Test snake_case vs CamelCase with Query Builder');
 		list($sql, $params) = R::$f->begin()->camelCase()->getQuery();	
 		asrt(trim($sql),'camel case');
+		list($sql, $params) = R::$f->begin()->personASTeacher()->getQuery();		
+		asrt(trim($sql), 'person as teacher');
+		list($sql, $params) = R::$f->begin()->JOIN()->getQuery();		
+		asrt(trim($sql), 'join');
 		RedBean_SQLHelper::useCamelCase(false);
 		list($sql, $params) = R::$f->begin()->camelCase()->getQuery();		
 		asrt(trim($sql), 'camelCase');
-
+		
+		
 		testpack('Test with- and withCondition with Query Builder');
 		R::nuke();
 		$book = R::dispense('book');

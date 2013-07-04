@@ -2,10 +2,10 @@
 /**
  * RedBeanPHP Cache Plugin
  * 
- * @file			RedBean/Plugin/Cache.php
- * @desc			Cache plugin, caches beans.
- * @author			Gabor de Mooij and the RedBeanPHP community
- * @license			BSD/GPLv2
+ * @file    RedBean/Plugin/Cache.php
+ * @desc    Cache plugin, caches beans.
+ * @author  Gabor de Mooij and the RedBeanPHP community
+ * @license BSD/GPLv2
  *
  * Provides a means to cache beans after loading or batch loading.
  *
@@ -13,20 +13,23 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-
 class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
+	
 	/**
 	 * @var array 
 	 */
 	protected $cache = array();
+	
 	/**
 	 * @var integer 
 	 */
 	protected $hits = 0;
+	
 	/**
 	 * @var integer 
 	 */
 	protected $misses = 0;
+	
 	/**
 	 * Constructor.
 	 * Cache decorates RedBeanPHP OODB class, so needs a writer.
@@ -36,6 +39,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	public function __construct(RedBean_QueryWriter $writer) {
 		parent::__construct($writer);
 	}
+	
 	/**
 	 * Loads a bean by type and id. If the bean cannot be found an
 	 * empty bean will be returned instead. This is a cached version
@@ -56,38 +60,48 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 			$this->misses ++;
 			$bean = parent::load($type, $id);
 			if ($bean->id) {
-				if (!isset($this->cache[$type])) $this->cache[$type] = array();
+				if (!isset($this->cache[$type])) {
+					$this->cache[$type] = array();
+				}
 				$this->cache[$type][$id] = $bean;
 			}
 		}
 		return $bean;
 	}
+	
 	/**
 	 * Stores a RedBean OODBBean and caches it.
 	 * 
 	 * @param RedBean_OODBBean $bean the bean you want to store
 	 * 
-	 * @return integer $id 
+	 * @return mixed 
 	 */
 	public function store($bean) {
 		$id = parent::store($bean);
 		$type = $bean->getMeta('type');
-		if (!isset($this->cache[$type])) $this->cache[$type] = array();
+		if (!isset($this->cache[$type])) {
+			$this->cache[$type] = array();
+		}
 		$this->cache[$type][$id] = $bean;
 		return $id;
 	}
+	
 	/**
 	 * Trashes a RedBean OODBBean and removes it from cache.
 	 * 
 	 * @param RedBean_OODBBean $bean bean
+	 * 
 	 * @return mixed 
 	 */
 	public function trash($bean) {
 		$type = $bean->getMeta('type');
 		$id = $bean->id;
-		if (isset($this->cache[$type][$id])) unset($this->cache[$type][$id]);
+		if (isset($this->cache[$type][$id])) {
+			unset($this->cache[$type][$id]);
+		}
 		return parent::trash($bean);
 	}
+	
 	/**
 	 * Flushes the cache for a given type.
 	 * 
@@ -96,9 +110,12 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	 * @return RedBean_Plugin_Cache 
 	 */
 	public function flush($type) {
-		if (isset($this->cache[$type])) $this->cache[$type] = array();
+		if (isset($this->cache[$type])) {
+			$this->cache[$type] = array();
+		}
 		return $this;
 	}
+	
 	/**
 	 * Flushes the cache completely.
 	 * 
@@ -108,6 +125,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 		$this->cache = array();
 		return $this;
 	}
+	
 	/**
 	 * Returns the number of hits. If a call to load() or
 	 * batch() can use the cache this counts as a hit.
@@ -118,6 +136,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	public function getHits() {
 		return $this->hits;
 	}
+	
 	/**
 	 * Returns the number of hits. If a call to load() or
 	 * batch() can use the cache this counts as a hit.
@@ -128,12 +147,14 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin {
 	public function getMisses() {
 		return $this->misses;
 	}
+	
 	/**
 	 * Resets hits counter to 0.
 	 */
 	public function resetHits() {
 		$this->hits = 0;
 	}
+	
 	/**
 	 * Resets misses counter to 0.
 	 */
