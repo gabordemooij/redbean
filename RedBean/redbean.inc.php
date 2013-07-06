@@ -73,6 +73,7 @@ require($dir.'Finder.php');
 
 //Load extended functionality
 require($dir.'AssociationManager.php');
+require($dir.'Preloader.php');
 require($dir.'AssociationManager/ExtAssociationManager.php');
 require($dir.'Setup.php');
 
