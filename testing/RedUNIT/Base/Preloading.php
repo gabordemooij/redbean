@@ -2,11 +2,11 @@
 /**
  * RedUNIT_Base_Preloading 
  * 
- * @file 			RedUNIT/Base/Preloading.php
- * @description		Tests eager loading for parent beans.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @file    RedUNIT/Base/Preloading.php
+ * @desc    Tests eager loading for parent beans.
+ *          This class is part of the RedUNIT test suite for RedBeanPHP.
+ * @author  Gabor de Mooij
+ * @license BSD
  *
  *
  * (c) G.J.G.T. (Gabor) de Mooij
@@ -611,8 +611,8 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::storeAll($books);
 		$books = R::find('book');
 		R::preload($books,array(
-				'ownPage' => array('page',array(' AND id > 0 LIMIT ? ', array(2))),
-				'sharedAd' => array('ad',array(' AND id > 0 LIMIT ? ',array(4)))
+				'ownPage' => array('page',array(' AND page.id > 0 LIMIT ? ', array(2))),
+				'sharedAd' => array('ad',array(' AND ad.id > 0 LIMIT ? ',array(4)))
 			)
 		);
 		asrt(count($books[1]->ownPage),2);
@@ -659,8 +659,8 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		$counter = 0;
 		R::each($towns,array(
 			'sharedArmy'=>'army',
-			'sharedArmy.sharedSoldier' => array('soldier', array(' ORDER BY name DESC ',array())),
-			'ownBuilding'=> array('building', array(' ORDER BY name DESC ',array())),
+			'sharedArmy.sharedSoldier' => array('soldier', array(' ORDER BY soldier.name DESC ',array())),
+			'ownBuilding'=> array('building', array(' ORDER BY building.name DESC ',array())),
 			'ownBuilding.ownBook'=>'book','world'),function($t,$a,$s,$b,$x,$w) use(&$counter) {
 			if ($counter === 0) {
 				asrt($w,null);

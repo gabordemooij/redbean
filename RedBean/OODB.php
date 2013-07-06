@@ -2,10 +2,10 @@
 /**
  * RedBean Object Oriented DataBase
  * 
- * @file			RedBean/OODB.php
- * @desc			RedBean OODB
- * @author			Gabor de Mooij and the RedBeanPHP community
- * @license			BSD/GPLv2
+ * @file    RedBean/OODB.php
+ * @desc    RedBean Object Database
+ * @author  Gabor de Mooij and the RedBeanPHP community
+ * @license BSD/GPLv2
  *
  * The RedBean OODB Class is the main class of RedBeanPHP.
  * It takes RedBean_OODBBean objects and stores them to and loads them from the
@@ -17,46 +17,57 @@
  * with this source code in the file license.txt.
  */
 class RedBean_OODB extends RedBean_Observable {
+
 	/**
 	 * @var array 
 	 */
 	protected $chillList = array();
+
 	/**
 	 * @var array
 	 */
 	protected $dep = array();
+
 	/**
 	 * @var array
 	 */
 	protected $stash = NULL;
+
 	/*
 	 * @var integer
 	 * Keeps track of the nesting level of the OODB object
 	 */
 	protected $nesting = 0;
+
 	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $writer;
+
 	/**
 	 * @var boolean
 	 */
 	protected $isFrozen = false;
+	
 	/**
 	 * @var null|\RedBean_BeanHelperFacade
 	 */
 	protected $beanhelper = null;
+	
 	/**
 	 * @var RedBean_AssociationManager
 	 */
 	protected $assocManager = null;
+	
 	/**
 	 * Constructor, requires a query writer.
 	 *
 	 * @param RedBean_QueryWriter $writer
 	 */
 	public function __construct(RedBean_QueryWriter $writer) {
-		if ($writer instanceof RedBean_QueryWriter) $this->writer = $writer;
+		if ($writer instanceof RedBean_QueryWriter) {
+			$this->writer = $writer;
+		}
 		$this->beanhelper = new RedBean_BeanHelper_Facade();
 	}
 	
@@ -70,9 +81,12 @@ class RedBean_OODB extends RedBean_Observable {
 		if (!$this->writer->sqlStateIn($e->getSQLState(),
 			array(
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN)
-			)) throw $e;
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN))
+		) {
+			throw $e;
+		}
 	}
+
 	/**
 	 * Toggles fluid or frozen mode. In fluid mode the database
 	 * structure is adjusted to accomodate your objects. In frozen mode
@@ -82,14 +96,17 @@ class RedBean_OODB extends RedBean_Observable {
 	 * Let's call this chilly mode, it's just like fluid mode except that
 	 * certain types (i.e. tables) aren't touched.
 	 * 
-	 * @param boolean|array $trueFalse
+	 * @param boolean|array $toggle
 	 */
-	public function freeze($tf) {
-		if (is_array($tf)) {
-			$this->chillList = $tf;
+	public function freeze($toggle) {
+		if (is_array($toggle)) {
+			$this->chillList = $toggle;
 			$this->isFrozen = false;
-		} else $this->isFrozen = (boolean) $tf;
+		} else { 
+			$this->isFrozen = (boolean) $toggle;
+		}
 	}
+
 	/**
 	 * Returns the current mode of operation of RedBean.
 	 * In fluid mode the database
@@ -97,11 +114,12 @@ class RedBean_OODB extends RedBean_Observable {
 	 * In frozen mode
 	 * this is not the case.
 	 * 
-	 * @return boolean $yesNo TRUE if frozen, FALSE otherwise
+	 * @return boolean
 	 */
 	public function isFrozen() {
 		return (bool) $this->isFrozen;
 	}
+
 	/**
 	 * Dispenses a new bean (a RedBean_OODBBean Bean Object)
 	 * of the specified type. Always
@@ -114,7 +132,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param string $type   type of bean you want to dispense
 	 * @param string $number number of beans you would like to get
 	 * 
-	 * @return RedBean_OODBBean $bean the new bean instance
+	 * @return RedBean_OODBBean
 	 */
 	public function dispense($type, $number = 1) {
 		$beans = array();
@@ -124,7 +142,9 @@ class RedBean_OODB extends RedBean_Observable {
 			$bean->setMeta('type', $type );
 			$bean->setMeta('sys.id', 'id');
 			$bean->id = 0;
-			if (!$this->isFrozen) $this->check($bean);
+			if (!$this->isFrozen) {
+				$this->check($bean);
+			}
 			$bean->setMeta('tainted', true);
 			$bean->setMeta('sys.orig', array('id' => 0));
 			$this->signal('dispense', $bean );
@@ -132,17 +152,18 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		return (count($beans) === 1) ? array_pop($beans) : $beans; 
 	}
+
 	/**
 	 * Sets bean helper to be given to beans.
 	 * Bean helpers assist beans in getting a reference to a toolbox.
 	 *
 	 * @param RedBean_IBeanHelper $beanhelper helper
 	 *
-	 * @return void
 	 */
 	public function setBeanHelper(RedBean_BeanHelper $beanhelper) {
 		$this->beanhelper = $beanhelper;
 	}
+
 	/**
 	 * Checks whether a RedBean_OODBBean bean is valid.
 	 * If the type is not valid or the ID is not valid it will
@@ -151,7 +172,6 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param RedBean_OODBBean $bean the bean that needs to be checked
 	 * 
-	 * @return void
 	 */
 	public function check(RedBean_OODBBean $bean) {
 		//Is all meta information present?
@@ -170,15 +190,16 @@ class RedBean_OODB extends RedBean_Observable {
 		//Are the properties and values valid?
 		foreach($bean as $prop => $value) {
 			if (
-					  is_array($value) ||
-					  (is_object($value)) ||
-					  strlen($prop) < 1 ||
-					  preg_match($pattern, $prop)
+				is_array($value)
+				|| (is_object($value))
+				|| strlen($prop) < 1
+				|| preg_match($pattern, $prop)
 			) {
 				throw new RedBean_Exception_Security("Invalid Bean: property $prop  ");
 			}
 		}
 	}
+
 	/**
 	 * Searches the database for a bean that matches conditions $conditions and sql $addSQL
 	 * and returns an array containing all the beans that have been found.
@@ -186,8 +207,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * Conditions need to take form:
 	 * 
 	 * array(
-	 * 		'PROPERTY' => array( POSSIBLE VALUES... 'John', 'Steve' )
-	 * 		'PROPERTY' => array( POSSIBLE VALUES... )
+	 * 	'PROPERTY' => array( POSSIBLE VALUES... 'John', 'Steve' )
+	 * 	'PROPERTY' => array( POSSIBLE VALUES... )
 	 * );
 	 * 
 	 * All conditions are glued together using the AND-operator, while all value lists
@@ -203,7 +224,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param string  $addSQL     SQL to be used in query
 	 * @param boolean $all        whether you prefer to use a WHERE clause or not (TRUE = not)
 	 * 
-	 * @return array $beans		  resulting beans
+	 * @return array
 	 */
 	public function find($type, $conditions = array(), $sql = null, $params = array()) {
 		//for backward compatibility, allow mismatch arguments:
@@ -219,18 +240,20 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		return array();
 	}
+
 	/**
 	 * Checks whether the specified table already exists in the database.
 	 * Not part of the Object Database interface!
 	 * 
 	 * @param string $table table name (not type!)
 	 * 
-	 * @return boolean $exists whether the given table exists within this database.
+	 * @return boolean
 	 */
 	public function tableExists($table) {
 		$tables = $this->writer->getTables();
 		return in_array(($table), $tables);
 	}
+
 	/**
 	 * Processes all column based build commands.
 	 * A build command is an additional instruction for the Query Writer. It is processed only when
@@ -242,13 +265,15 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param  string           $property name of the property to process build commands for
 	 * @param  RedBean_OODBBean $bean     bean that contains the build commands
 	 *
-	 * @return void
 	 */
 	protected function processBuildCommands($table, $property, RedBean_OODBBean $bean) {
 		if ($inx = ($bean->getMeta('buildcommand.indexes'))) {
-			if (isset($inx[$property])) $this->writer->addIndex($table, $inx[$property], $property);
+			if (isset($inx[$property])) { 
+				$this->writer->addIndex($table, $inx[$property], $property);
+			}
 		}
 	}
+
 	/**
 	 * Process groups. Internal function. Processes different kind of groups for
 	 * storage function. Given a list of original beans and a list of current beans,
@@ -262,7 +287,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param  array $trashcan  beans that have been deleted
 	 * @param  array $residue   beans that have been left untouched
 	 *
-	 * @return array $result 	new relational state
+	 * @return array
 	 */
 	private function processGroups($originals, $current, $additions, $trashcan, $residue) {
 		return array(
@@ -271,12 +296,13 @@ class RedBean_OODB extends RedBean_Observable {
 			array_merge($residue, array_intersect($current, $originals))
 		);
 	}
+
 	/**
 	 * Figures out the desired type given the cast string ID.
 	 * 
 	 * @param string $cast cast identifier
 	 * 
-	 * @return integer $typeno 
+	 * @return integer 
 	 */
 	private function getTypeFromCast($cast) {
 		if ($cast == 'string') {
@@ -290,6 +316,7 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		return $typeno;
 	}
+
 	/**
 	 * Processes an embedded bean. First the bean gets unboxed if possible.
 	 * Then, the bean is stored if needed and finally the ID of the bean
@@ -297,7 +324,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param RedBean_OODBBean|Model $v the bean or model
 	 * 
-	 * @return  integer $id
+	 * @return integer
 	 */
 	private function prepareEmbeddedBean($v) {
 		if (!$v->id || $v->getMeta('tainted')) {
@@ -305,6 +332,7 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		return $v->id;
 	}
+
 	/**
 	 * Stores a bean in the database. This function takes a
 	 * RedBean_OODBBean Bean Object $bean and stores it
@@ -318,18 +346,32 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @throws RedBean_Exception_Security $exception
 	 * 
-	 * @param RedBean_OODBBean | RedBean_SimpleModel $bean bean to store
+	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean to store
 	 *
-	 * @return integer $newid resulting ID of the new bean
+	 * @return integer
 	 */
 	public function store($bean) { 
-		if ($bean instanceof RedBean_SimpleModel) $bean = $bean->unbox();
-		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
+		if ($bean instanceof RedBean_SimpleModel) {
+			$bean = $bean->unbox();
+		}
+		if (!($bean instanceof RedBean_OODBBean)) {
+			throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
+		}
 		$processLists = false;
-		foreach($bean as $k => $v) if (is_array($v) || is_object($v)) { $processLists = true; break; }
-		if (!$processLists && !$bean->getMeta('tainted')) return $bean->getID();
+		foreach($bean as $k => $v) {
+			if (is_array($v) || is_object($v)) { 
+				$processLists = true; break; 
+			}
+		}
+		if (!$processLists && !$bean->getMeta('tainted')) {
+			return $bean->getID();
+		}
 		$this->signal('update', $bean );
-		foreach($bean as $k => $v) if (is_array($v) || is_object($v)) { $processLists = true; break; }
+		foreach($bean as $k => $v) {
+			if (is_array($v) || is_object($v)) { 
+				$processLists = true; break; 
+			}
+		}
 		if ($processLists) {
 			//Define groups
 			$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array();
@@ -337,7 +379,9 @@ class RedBean_OODB extends RedBean_Observable {
 			$tmpCollectionStore = array();
 			$embeddedBeans = array();
 			foreach($bean as $p => $v) {
-				if ($v instanceof RedBean_SimpleModel) $v = $v->unbox(); 
+				if ($v instanceof RedBean_SimpleModel) {
+					$v = $v->unbox();
+				} 
 				if ($v instanceof RedBean_OODBBean) {
 					$linkField = $p.'_id';
 					$bean->$linkField = $this->prepareEmbeddedBean($v);
@@ -366,13 +410,18 @@ class RedBean_OODB extends RedBean_Observable {
 			$this->processTrashcan($bean, $ownTrashcan);
 			$this->processAdditions($bean, $ownAdditions);
 			$this->processResidue($ownresidue);
-			foreach($sharedTrashcan as $trash) $this->assocManager->unassociate($trash, $bean);
+			foreach($sharedTrashcan as $trash) {
+				$this->assocManager->unassociate($trash, $bean);
+			}
 			$this->processSharedAdditions($bean, $sharedAdditions);
-			foreach($sharedresidue as $residue) $this->store($residue);
+			foreach($sharedresidue as $residue) {
+				$this->store($residue);
+			}
 		}
 		$this->signal('after_update', $bean);
 		return (int) $bean->id;
 	}
+
 	/**
 	 * Stores a cleaned bean; i.e. only scalar values. This is the core of the store()
 	 * method. When all lists and embedded beans (parent objects) have been processed and
@@ -382,7 +431,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean the clean bean 
 	 */
 	private function storeBean(RedBean_OODBBean $bean) {
-		if (!$this->isFrozen) $this->check($bean);
+		if (!$this->isFrozen) {
+			$this->check($bean);
+		}
 		//what table does it want
 		$table = $bean->getMeta('type');
 		if ($bean->getMeta('tainted')) {
@@ -417,7 +468,9 @@ class RedBean_OODB extends RedBean_Observable {
 							if (isset($columns[$this->writer->esc($p, true)])) {
 								//rescan
 								$v = $origV;
-								if (!$cast) $typeno = $this->writer->scanType($v, false);
+								if (!$cast) {
+									$typeno = $this->writer->scanType($v, false);
+								}
 								//yes it is, does it still fit?
 								$sqlt = $this->writer->code($columns[$this->writer->esc($p, true)]);
 								if ($typeno > $sqlt) {
@@ -441,13 +494,16 @@ class RedBean_OODB extends RedBean_Observable {
 				}
 			}
 			if (!$this->isFrozen && ($uniques = $bean->getMeta('buildcommand.unique'))) {
-				foreach($uniques as $unique) $this->writer->addUniqueIndex($table, $unique);
+				foreach($uniques as $unique) {
+					$this->writer->addUniqueIndex($table, $unique);
+				}
 			}
 			$rs = $this->writer->updateRecord($table, $updatevalues, $bean->id);
 			$bean->id = $rs;
 			$bean->setMeta('tainted', false);
 		}
 	}
+
 	/**
 	 * Processes a list of beans from a bean. A bean may contain lists. This
 	 * method handles shared addition lists; i.e. the $bean->sharedObject properties.
@@ -464,6 +520,7 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 	}
+
 	/**
 	 * Processes a list of beans from a bean. A bean may contain lists. This
 	 * method handles own lists; i.e. the $bean->ownObject properties.
@@ -481,6 +538,7 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 	}
+
 	/**
 	 * Processes a list of beans from a bean. A bean may contain lists. This
 	 * method handles own lists; i.e. the $bean->ownObject properties.
@@ -499,7 +557,9 @@ class RedBean_OODB extends RedBean_Observable {
 			$first = reset($ownTrashcan);
 			if ($first instanceof RedBean_OODBBean) {
 				$alias = $bean->getMeta('sys.alias.'.$first->getMeta('type'));
-				if ($alias) $myFieldLink = $alias.'_id';
+				if ($alias) {
+					$myFieldLink = $alias.'_id';
+				}
 			}
 		}
 		foreach($ownTrashcan as $trash) {
@@ -511,6 +571,7 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 	}
+
 	/**
 	 * Processes embedded beans.
 	 * Each embedded bean will be indexed and foreign keys will
@@ -523,13 +584,14 @@ class RedBean_OODB extends RedBean_Observable {
 		foreach($embeddedBeans as $linkField => $embeddedBean) {
 			if (!$this->isFrozen) {
 				$this->writer->addIndex($bean->getMeta('type'),
-							'index_foreignkey_'.$bean->getMeta('type').'_'.$embeddedBean->getMeta('type'),
-							 $linkField);
+					'index_foreignkey_'.$bean->getMeta('type').'_'.$embeddedBean->getMeta('type'),
+					$linkField);
 				$isDep = $this->isDependentOn($bean->getMeta('type'), $embeddedBean->getMeta('type'));
 				$this->writer->addFK($bean->getMeta('type'), $embeddedBean->getMeta('type'), $linkField, 'id', $isDep);
 			}
 		}	
 	}
+
 	/**
 	 * Part of the store() functionality.
 	 * Handles all new additions after the bean has been saved.
@@ -546,7 +608,9 @@ class RedBean_OODB extends RedBean_Observable {
 			$first = reset($ownAdditions);
 			if ($first instanceof RedBean_OODBBean) {
 				$alias = $bean->getMeta('sys.alias.'.$first->getMeta('type'));
-				if ($alias) $myFieldLink = $alias.'_id';
+				if ($alias) { 
+					$myFieldLink = $alias.'_id';
+				}
 			}
 		}
 		foreach($ownAdditions as $addition) {
@@ -566,6 +630,7 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 	}
+
 	/**
 	 * Checks whether reference type has been marked as dependent on target type.
 	 * This is the result of setting reference type as a key in R::dependencies() and
@@ -579,6 +644,7 @@ class RedBean_OODB extends RedBean_Observable {
 	protected function isDependentOn($refType, $otherType) {
 		return (boolean) (isset($this->dep[$refType]) && in_array($otherType, $this->dep[$refType]));
 	}
+
 	/**
 	 * Loads a bean from the object database.
 	 * It searches for a RedBean_OODBBean Bean Object in the
@@ -599,7 +665,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param string  $type type of bean you want to load
 	 * @param integer $id   ID of the bean you want to load
 	 * 
-	 * @return RedBean_OODBBean $bean loaded bean
+	 * @return RedBean_OODBBean
 	 */
 	public function load($type, $id) {
 		$bean = $this->dispense($type);
@@ -609,18 +675,21 @@ class RedBean_OODB extends RedBean_Observable {
 			try {
 				$rows = $this->writer->queryRecord($type, array('id' => array($id)));
 			} catch(RedBean_Exception_SQL $e ) {
-				if (
-				$this->writer->sqlStateIn($e->getSQLState(),
-				array(
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-					RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-				)
+				if ($this->writer->sqlStateIn($e->getSQLState(),
+					array(
+						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+					)
 				) {
 					$rows = 0;
-					if ($this->isFrozen) throw $e; //only throw if frozen;
+					if ($this->isFrozen) {
+						throw $e; //only throw if frozen
+					}
 				}
 			}
-			if (empty($rows)) return $bean;
+			if (empty($rows)) {
+				return $bean;
+			}
 			$row = array_pop($rows);
 		}
 		$bean->setMeta('sys.orig', $row);
@@ -633,6 +702,7 @@ class RedBean_OODB extends RedBean_Observable {
 		$bean->setMeta('tainted', false);
 		return $bean;
 	}
+
 	/**
 	 * Removes a bean from the database.
 	 * This function will remove the specified RedBean_OODBBean
@@ -643,8 +713,12 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean you want to remove from database
 	 */
 	public function trash($bean) {
-		if ($bean instanceof RedBean_SimpleModel) $bean = $bean->unbox();
-		if (!($bean instanceof RedBean_OODBBean)) throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
+		if ($bean instanceof RedBean_SimpleModel) {
+			$bean = $bean->unbox();
+		}
+		if (!($bean instanceof RedBean_OODBBean)) {
+			throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
+		}
 		$this->signal('delete', $bean);
 		foreach($bean as $p => $v) {
 			if ($v instanceof RedBean_OODBBean) {
@@ -658,16 +732,18 @@ class RedBean_OODB extends RedBean_Observable {
 				}
 			}
 		}
-		if (!$this->isFrozen) $this->check($bean);
+		if (!$this->isFrozen) {
+			$this->check($bean);
+		}
 		try {
-			$this->writer->deleteRecord($bean->getMeta('type'),
-				array('id' => array($bean->id)), null);
+			$this->writer->deleteRecord($bean->getMeta('type'),array('id' => array($bean->id)), null);
 		}catch(RedBean_Exception_SQL $e) {
 			$this->handleException($e);
 		}
 		$bean->id = 0;
 		$this->signal('after_delete', $bean);
 	}
+
 	/**
 	 * Returns an array of beans. Pass a type and a series of ids and
 	 * this method will bring you the correspondig beans.
@@ -680,10 +756,12 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param string $type type of beans 
 	 * @param array  $ids  ids to load
 	 *
-	 * @return array $beans resulting beans (may include empty ones)
+	 * @return array
 	 */
 	public function batch($type, $ids) {
-		if (!$ids) return array();
+		if (!$ids) {
+			return array();
+		}
 		$collection = array();
 		try {
 			$rows = $this->writer->queryRecord($type, array('id' => $ids));
@@ -692,7 +770,9 @@ class RedBean_OODB extends RedBean_Observable {
 			$rows = false;
 		}
 		$this->stash[$this->nesting] = array();
-		if (!$rows) return array();
+		if (!$rows) {
+			return array();
+		}
 		foreach($rows as $row) {
 			$this->stash[$this->nesting][$row['id']] = $row;
 		}
@@ -702,6 +782,7 @@ class RedBean_OODB extends RedBean_Observable {
 		$this->stash[$this->nesting] = NULL;
 		return $collection;
 	}
+
 	/**
 	 * This is a convenience method; it converts database rows
 	 * (arrays) into beans. Given a type and a set of rows this method
@@ -711,7 +792,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param string $type type of beans you would like to have
 	 * @param array  $rows rows from the database result
 	 * 
-	 * @return array $collectionOfBeans collection of beans
+	 * @return array
 	 */
 	public function convertToBeans($type, $rows) {
 		$collection = array();
@@ -724,6 +805,7 @@ class RedBean_OODB extends RedBean_Observable {
 		$this->stash[$this->nesting] = NULL;
 		return $collection;
 	}
+	
 	/**
 	 * Returns the number of beans we have in DB of a given type.
 	 *
@@ -731,46 +813,54 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param string $addSQL additional SQL snippet
 	 * @param array  $params parameters to bind to SQL
 	 *
-	 * @return integer $num number of beans found
+	 * @return integer
 	 */
 	public function count($type, $addSQL = '', $params = array()) {
 		try {
 			return (int) $this->writer->count($type, $addSQL, $params);
 		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) throw $e;
+			if (!$this->writer->sqlStateIn($e->getSQLState(),array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) {
+				throw $e;
+			}
 		}
 		return 0;
 	}
+
 	/**
 	 * Trash all beans of a given type.
 	 *
 	 * @param string $type type
 	 *
-	 * @return boolean $yesNo whether we actually did some work or not..
+	 * @return boolean
 	 */
 	public function wipe($type) {
 		try {
 			$this->writer->wipe($type);
 			return true;
 		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
-			array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-			)) throw $e;
+			if (!$this->writer->sqlStateIn($e->getSQLState(),array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) {
+				throw $e;
+			}
 			return false;
 		}
 	}
+
 	/**
 	 * Returns an Association Manager for use with OODB.
 	 * A simple getter function to obtain a reference to the association manager used for
 	 * storage and more.
 	 *
 	 * @throws Exception
-	 * @return RedBean_AssociationManager $assoc Association Manager
+
+	 * @return RedBean_AssociationManager
 	 */
 	public function getAssociationManager() {
-		if (!isset($this->assocManager)) throw new Exception('No association manager available.');
+		if (!isset($this->assocManager)) {
+			throw new Exception('No association manager available.');
+		}
 		return $this->assocManager;
 	}
+
 	/**
 	 * Sets the association manager instance to be used by this OODB.
 	 * A simple setter function to set the association manager to be used for storage and
@@ -778,11 +868,11 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param RedBean_AssociationManager $assoc sets the association manager to be used
 	 * 
-	 * @return void
 	 */
 	public function setAssociationManager(RedBean_AssociationManager $assoc) {
 		$this->assocManager = $assoc;
 	}
+
 	/**
 	 * Sets a dependency list. Dependencies can be used to make
 	 * certain beans depend on others. This causes dependent beans to get removed
@@ -823,10 +913,165 @@ class RedBean_OODB extends RedBean_Observable {
 				if (strpos($value, '|') !== false) {
 					list($key, $newValue) = explode('|', $value);
 					$types[$key] = $newValue;
-				} else $types[] = $value;
+				} else { 
+					$types[] = $value;
+				}
 			}
-		} else $types = $typeList;
+		} else {
+			$types = $typeList;
+		}
 		return $types;
+	}
+	
+	/**
+	* Expands * and & symbols in preload syntax.
+	* Also adds the returned field name to the list of fields.
+	*
+	* @param string $key       key value for this field
+	* @param string $type      type of bean
+	* @param string $oldField  last field we've processed
+	* @param array  $oldFields list of previously gathered field names
+	*
+	* @return string
+	*/
+	private function getPreloadField($key, $type, $oldField, &$oldFields) {
+		$field = (is_numeric($key)) ? $type : $key;//use an alias?
+		if (strpos($field, '*') !== false) { 
+			$oldFields[] = $oldField; 
+			$field = str_replace('*', implode('.', $oldFields), $field);
+		}
+		if (strpos($field, '&') !== false) {
+			$field = str_replace('&', implode('.', $oldFields), $field);
+		}
+		return $field;
+	}
+	
+	/**
+	 * For Preloader: adds the IDs of your input beans to the nested beans, otherwise
+	 * we dont know how to pass them to the each-function later on.
+	 * 
+	 * @param RedBean_OODBBean $nestedBean
+	 * @param array $addInputIDs
+	 */
+	private function addInputBeanIDsToBean($nestedBean, $addInputIDs) {
+		$currentInputBeanIDs = $nestedBean->getMeta('sys.input-bean-id'); 
+		if (!is_array($currentInputBeanIDs)) {
+			$currentInputBeanIDs = array();
+		}
+		foreach($addInputIDs as $addInputID) {
+			$currentInputBeanIDs[$addInputID] = $addInputID;
+		}
+		$nestedBean->setMeta('sys.input-bean-id', $currentInputBeanIDs);
+	}
+
+	/**
+	 * For preloader: calls the function defined in $closure with retrievals for each
+	 * bean in the first parameter.
+	 * 
+	 * @param closure|string $closure    closure to invoke per bean
+	 * @param array          $beans      beans to iterate over
+	 * @param array          $retrievals retrievals to send as arguments to closure
+	 */
+	private function invokePreloadEachFunction($closure, $beans, $retrievals) {
+		if ($closure) {
+			$key = 0; 
+			foreach($beans as $bean) {
+				$params = array();
+				foreach($retrievals as $r) $params[] = (isset($r[$key])) ? $r[$key] : null; 
+				array_unshift($params, $bean);
+				call_user_func_array($closure, $params);
+				$key ++;
+			}
+		}
+	}
+	
+	/**
+	 * Fills the retrieval array with the beans in the (recently) retrieved
+	 * shared/own list. This method asks the $filteredBean which original input bean
+	 * it belongs to, then it will fill the parameter array for the specified 
+	 * iteration with the beans obtained for the filtered bean. This ensures the
+	 * callback function for ::each will receive the correct bean lists as
+	 * parameters for every iteration.
+	 * 
+	 * @param array            $retrievals     reference to the retrieval array
+	 * @param RedBean_OODBBean $filteredBean   the bean we've retrieved lists for
+	 * @param array            $list				 the list we've retrieved for the bean	
+	 * @param integer          $iterationIndex the iteration index of the param array we're going to fill
+	 */
+	private function fillParamArrayRetrievals(&$retrievals, $filteredBean, $list, $iterationIndex) {
+		$inputBeanIDs = $filteredBean->getMeta('sys.input-bean-id');
+		foreach($inputBeanIDs as $inputBeanID) {
+			if (!isset($retrievals[$iterationIndex][$inputBeanID])) {
+				$retrievals[$iterationIndex][$inputBeanID] = array();
+			}
+			foreach($list as $listKey => $listBean) {
+				$retrievals[$iterationIndex][$inputBeanID][$listKey] = $listBean;
+			}
+		}
+	}
+	
+	/**
+	 * Gathers the IDs to preload and maps the ids to the original beans.
+	 * 
+	 * @param array $filteredBeans
+	 * @param string $field
+	 * @return array
+	 */
+	private function gatherIDsToPreloadAndMap($filteredBeans, $field) {
+		$ids = $map = array();
+		if (strpos($field, 'shared') !== 0) {
+			foreach($filteredBeans as $bean) { //gather ids to load the desired bean collections
+				if (strpos($field, 'own') === 0) { //based on bean->id for ownlist
+					$id = $bean->id; $ids[$id] = $id;
+				} elseif($id = $bean->{$field.'_id'}){ //based on bean_id for parent
+					$ids[$id] = $id; 
+					if (!isset($map[$id])) {
+						$map[$id] = array();
+					}
+					$map[$id][] = $bean;
+				}
+			}
+		}
+		return array($ids, $map);
+	}
+	
+	/**
+	 * Gathers the own list for a bean from a pool of child beans loaded by
+	 * the preloader.
+	 * 
+	 * @param RedBean_OODBBean $filteredBean
+	 * @param array            $children
+	 * @param string           $link
+	 * 
+	 * @return array
+	 */
+	private function gatherOwnBeansFromPool($filteredBean, $children, $link) {
+		$list = array();
+		foreach($children as $child) {
+			if ($child->$link == $filteredBean->id) {
+				$list[$child->id] = $child;
+			}
+		}
+		return $list;
+	}
+	
+	/**
+	 * Gathers the shared list for a bean from a pool of shared beans loaded
+	 * by the preloader.
+	 * 
+	 * @param RedBean_OODBBean $filteredBean
+	 * @param array            $sharedBeans
+	 * 
+	 * @return array
+	 */
+	private function gatherSharedBeansFromPool($filteredBean, $sharedBeans) {
+		$list = array();
+		foreach($sharedBeans as $sharedBean) {
+			if (in_array($filteredBean->id, $sharedBean->getMeta('sys.belongs-to'))) {
+				$list[] = $sharedBean;
+			}
+		}
+		return $list;
 	}
 	
 	/**
@@ -852,19 +1097,18 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param array $types types to load
 	 */
 	public function preload($beans, $typeList, $closure = null) {
-		if (!is_array($beans)) $beans = array($beans);
+		if (!is_array($beans)) {
+			$beans = array($beans);
+		}
 		$types = $this->extractTypesFromTypeList($typeList);
-		$oldFields = array(); $i = 0; $retrievals = array(); $oldField = '';
+		$oldFields = $retrievals = array();
+		$i = 0;
+		$oldField = '';
 		foreach($types as $key => $typeInfo) {
 			list($type,$sqlObj) = (is_array($typeInfo) ? $typeInfo : array($typeInfo, null));
 			list($sql, $params) = $sqlObj;
 			$map = $ids = $retrievals[$i] = array();
-			$field = (is_numeric($key)) ? $type : $key;//use an alias?
-			if (strpos($field, '*') !== false) { 
-				$oldFields[]= $oldField; 
-				$field = str_replace('*', implode('.', $oldFields), $field);
-			}
-			if (strpos($field, '&') !== false) $field = str_replace('&', implode('.', $oldFields), $field);
+			$field = $this->getPreloadField($key, $type, $oldField, $oldFields);
 			$filteredBeans = $beans;
 			$counterID = 0;
 			foreach($filteredBeans as $bean) {
@@ -879,18 +1123,11 @@ class RedBean_OODB extends RedBean_Observable {
 					if (is_array($bean->$nesting)) {
 						$nestedBeans = $bean->$nesting;
 						foreach($nestedBeans as $nestedBean) {
-							$currentInputBeanIDs = $nestedBean->getMeta('sys.input-bean-id'); 
-							if (!is_array($currentInputBeanIDs)) $currentInputBeanIDs = array();
-							foreach($addInputIDs as $addInputID) $currentInputBeanIDs[$addInputID] = $addInputID;
-							$nestedBean->setMeta('sys.input-bean-id', $currentInputBeanIDs);
+							$this->addInputBeanIDsToBean($nestedBean, $addInputIDs);
 						}
 						$filtered = array_merge($filtered, $nestedBeans);
 					} elseif (!is_null($bean->$nesting)) {
-						$nestedBean = $bean->$nesting;
-						$currentInputBeanIDs = $nestedBean->getMeta('sys.input-bean-id'); 
-						if (!is_array($currentInputBeanIDs)) $currentInputBeanIDs = array();
-						foreach($addInputIDs as $addInputID) $currentInputBeanIDs[$addInputID] = $addInputID;
-						$nestedBean->setMeta('sys.input-bean-id', $currentInputBeanIDs);	
+						$this->addInputBeanIDsToBean($bean->$nesting, $addInputIDs);
 						$filtered[] = $bean->$nesting;
 					}
 				}
@@ -898,82 +1135,43 @@ class RedBean_OODB extends RedBean_Observable {
 				$field = substr($field, $p+1);
 			}
 			$oldField = $field;
-			if (strpos($type, '.')) $type = $field;
-			if (strpos($field, 'shared') !== 0) {
-				foreach($filteredBeans as $bean) { //gather ids to load the desired bean collections
-					if (strpos($field, 'own') === 0) { //based on bean->id for ownlist
-						$id = $bean->id; $ids[$id] = $id;
-					} elseif($id = $bean->{$field.'_id'}){ //based on bean_id for parent
-						$ids[$id] = $id; 
-						if (!isset($map[$id])) $map[$id] = array();
-						$map[$id][] = $bean;
-					}
-				}
+			if (strpos($type, '.')) {
+				$type = $field;
 			}
+			if (count($filteredBeans) === 0) {
+				continue;
+			}
+			list($ids, $map) = $this->gatherIDsToPreloadAndMap($filteredBeans, $field);
 			if (strpos($field, 'shared') === 0) {
-				$bean = reset($filteredBeans);
-				$link = $bean->getMeta('type').'_id';
-				$keys = $this->assocManager->related($filteredBeans, $type, true);
-				$linkTable = $this->assocManager->getTable(array($type, $bean->getMeta('type')));
-				$linkBeans = $this->batch($linkTable, $keys);
-				$linked = $targetIDs = array();
-				$targetIDField = $type.'_id';
-				foreach($linkBeans as $linkBean) {
-					$linkID = $linkBean->$link;
-					if (!isset($linked[$linkID])) $linked[$linkID] = array();
-					$linked[$linkID][] = $linkBean;
-					$targetIDs[$linkBean->$targetIDField] = $linkBean->$targetIDField;
-				}
-				$sharedBeans = $this->find($type, array('id' => $targetIDs), $sql, $params, (!is_null($sqlObj)));
-				foreach($filteredBeans as $filteredBean) {
-					$list = array();
-					if (isset($linked[$filteredBean->id])) {
-						foreach($linked[$filteredBean->id] as $linkBean) {
-							foreach($sharedBeans as $sharedBean) {
-								if ($sharedBean->id == $linkBean->$targetIDField) $list[$sharedBean->id] = $sharedBean; 
-							}
-						}
-					}
+				if (!is_array($params)) $params = array();
+				$sharedBeans = $this->assocManager->relatedSimple($filteredBeans, $type, $sql, $params);
+				foreach($filteredBeans as $filteredBean) { //now let the filtered beans gather their beans
+					$list = $this->gatherSharedBeansFromPool($filteredBean, $sharedBeans);
 					$filteredBean->setProperty($field, $list);
-					$inputBeanIDs = $filteredBean->getMeta('sys.input-bean-id');
-					foreach($inputBeanIDs as $inputBeanID) {
-						if (!isset($retrievals[$i][$inputBeanID])) $retrievals[$i][$inputBeanID] = array();
-						foreach($list as $listKey => $listBean) $retrievals[$i][$inputBeanID][$listKey] = $listBean;
-					}
+					$this->fillParamArrayRetrievals($retrievals, $filteredBean, $list, $i);
 				}
 			} elseif (strpos($field, 'own') === 0) {//preload for own-list using find
+				$bean = reset($filteredBeans);
 				$link = $bean->getMeta('type').'_id';
 				$children = $this->find($type, array($link => $ids), $sql, $params, (!is_null($sqlObj)));
 				foreach($filteredBeans as $filteredBean) {
-					$list = array();
-					foreach($children as $child) if ($child->$link == $filteredBean->id) $list[$child->id] = $child;
+					$list = $this->gatherOwnBeansFromPool($filteredBean, $children, $link);
 					$filteredBean->setProperty($field, $list);
-					$inputBeanIDs = $filteredBean->getMeta('sys.input-bean-id');
-					foreach($inputBeanIDs as $inputBeanID) {
-						if (!isset($retrievals[$i][$inputBeanID])) $retrievals[$i][$inputBeanID] = array();
-						foreach($list as $listKey => $listBean) $retrievals[$i][$inputBeanID][$listKey] = $listBean;
-					}
+					$this->fillParamArrayRetrievals($retrievals, $filteredBean, $list, $i);
 				}
 			} else { //preload for parent objects using batch()
 				foreach($this->batch($type, $ids) as $parent) {
 					foreach($map[$parent->id] as $childBean) {
 						$childBean->setProperty($field, $parent);
 						$inputBeanIDs = $childBean->getMeta('sys.input-bean-id');
-						foreach($inputBeanIDs as $inputBeanID) $retrievals[$i][$inputBeanID] = $parent;
+						foreach($inputBeanIDs as $inputBeanID) {
+							$retrievals[$i][$inputBeanID] = $parent;
+						}
 					}
 				}
 			}
 			$i++;
 		}
-		if ($closure) {
-			$key = 0; 
-			foreach($beans as $bean) {
-				$params = array();
-				foreach($retrievals as $r) $params[] = (isset($r[$key])) ? $r[$key] : null; 
-				array_unshift($params, $bean);
-				call_user_func_array($closure, $params);
-				$key ++;
-			}
-		}
+		$this->invokePreloadEachFunction($closure, $beans, $retrievals);
 	}
 }

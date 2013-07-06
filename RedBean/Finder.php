@@ -68,7 +68,7 @@ class RedBean_Finder {
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $values values array of values to be bound to parameters in query
 	 *
-	 * @return array $arrays arrays
+	 * @return array
 	 */
 	public function findAndExport($type, $sql = null, $values = array()) {
 		$items = $this->find($type, $sql, $values);
@@ -87,7 +87,7 @@ class RedBean_Finder {
 	 * @param string $sql    sql    
 	 * @param array  $values values 
 	 *
-	 * @return RedBean_OODBBean $bean
+	 * @return RedBean_OODBBean
 	 */
 	public function findOne($type, $sql = null, $values = array()) {
 		$items = $this->find($type, $sql, $values);

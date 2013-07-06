@@ -35,7 +35,7 @@ class RedBean_SimpleModel {
 	 *
 	 * @param string $prop property
 	 *
-	 * @return mixed $propertyValue value
+	 * @return mixed
 	 */
 	public function __get($prop) {
 		return $this->bean->$prop;
@@ -65,7 +65,7 @@ class RedBean_SimpleModel {
 	/**
 	 * Box the bean using the current model.
 	 * 
-	 * @return RedBean_SimpleModel $box a bean in a box
+	 * @return RedBean_SimpleModel
 	 */
 	public function box() {
 		return $this;
@@ -74,7 +74,7 @@ class RedBean_SimpleModel {
 	/**
 	 * Unbox the bean from the model.
 	 * 
-	 * @return RedBean_OODBBean $bean bean 
+	 * @return RedBean_OODBBean 
 	 */
 	public function unbox(){
 		return $this->bean;

@@ -376,7 +376,19 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	public function relatedSimple($bean, $type, $sql = '', $values = array()) {
 		$sql = $this->writer->glueSQLCondition($sql);
 		$rows = $this->relatedRows($bean, $type, false, $sql, $values);
-		return $this->oodb->convertToBeans($type, $rows);
+		$links = array();
+		foreach($rows as $key => $row) {
+			if (!isset($links[$row['id']])) {
+				$links[$row['id']] = array();
+			} 
+			$links[$row['id']][] = $row['__linked_by'];
+			unset($rows[$key]['__linked_by']);
+		}
+		$beans = $this->oodb->convertToBeans($type, $rows);
+		foreach($beans as $bean) {
+			$bean->setMeta('sys.belongs-to',$links[$bean->id]);
+		}
+		return $beans;
 	}
 	
 	/**

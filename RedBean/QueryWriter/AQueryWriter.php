@@ -329,13 +329,21 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			if (!count($values)) continue;
 			$sql = $this->esc($column);
 			$sql .= ' '.($inverse ? ' NOT ':'').' IN ( ';
-			//If its safe to not use bindings please do... (fixes SQLite PDO issue limit 256 bindings)
-			$sql .= implode(',', array_fill(0, count($values), '?')).') ';
-			$sqlConditions[] = $sql;
-			if (!is_array($values)) $values = array($values);
-			foreach($values as $k => $v) {
-				$values[$k] = strval($v);
-				array_unshift($params, $v);
+			if (!is_array($values)) {
+				$values = array($values);
+			}
+			//if it's safe to skip bindings, do so...
+			if (preg_match('/^\d+$/', implode('', $values))) {
+				$sql .= implode(',', $values).' ) ';
+				//only numeric, cant do much harm.
+				$sqlConditions[] = $sql;
+			} else { 
+				$sql .= implode(',', array_fill(0, count($values), '?')).' ) ';
+				$sqlConditions[] = $sql;
+				foreach($values as $k => $v) {
+					$values[$k] = strval($v);
+					array_unshift($params, $v);
+				}
 			}
 		}
 		$sql = '';
@@ -400,10 +408,14 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			return $cached;
 		}
 		$inClause = implode(',', array_fill(0, count($linkIDs), '?'));
-		$selector = "{$destTable}.*";
 		if ($sourceType === $destType) {
 			$sql = "
-			SELECT {$selector} FROM {$linkTable}
+			SELECT 
+				{$destTable}.*,
+				COALESCE(
+				NULLIF({$linkTable}.{$sourceCol}, {$destTable}.id), 
+				NULLIF({$linkTable}.{$destCol}, {$destTable}.id)) AS __linked_by
+			FROM {$linkTable}
 			INNER JOIN {$destTable} ON 
 			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
 			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
@@ -412,7 +424,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$linkIDs = array_merge($linkIDs,$linkIDs);
 		} else {
 			$sql = "
-			SELECT {$selector} FROM {$linkTable}
+			SELECT 
+				{$destTable}.*,
+				{$linkTable}.{$sourceCol} AS __linked_by	
+			FROM {$linkTable}
 			INNER JOIN {$destTable} ON 
 			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) )
 			{$addSql}	
@@ -435,7 +450,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			return $cached;
 		}
 		$inClause = implode(',', array_fill(0, count($linkIDs), '?'));
-		$selector = "{$linkTable}.id"; 
+		$selector = "{$linkTable}.*"; 
 		if ($sourceType === $destType) {
 			$sql = "
 			SELECT {$selector} FROM {$linkTable}
