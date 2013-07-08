@@ -54,13 +54,6 @@ class RedBean_Finder {
 	}
 	
 	/**
-	 * @deprecated
-	 */
-	public function findAll($type, $sql = null, $values = array()) {
-		return $this->find($type, $sql, $values);
-	}
-	
-	/**
 	 * @see RedBean_Finder::find
 	 * The variation also exports the beans (i.e. it returns arrays).
 	 * 

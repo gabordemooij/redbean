@@ -33,6 +33,12 @@ class RedUNIT_Base_Update extends RedUNIT_Base {
 		
 		testpack('Test Update');
 		
+		try{
+			R::store(array());
+			fail();
+		} catch(RedBean_Exception_Security $e) {
+			pass();
+		}
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();

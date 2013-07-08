@@ -35,11 +35,8 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		asrt(count(R::taggedAll('coffee','sweet')),1);
 		asrt(count(R::taggedAll('coffee','sweet,strong')),1);
 		asrt(count(R::taggedAll('coffee','black,strong')),2);
+		asrt(count(R::taggedAll('coffee',array('black','strong'))),2);
 		asrt(count(R::taggedAll('coffee','salty')),0);
-		
-		
-
-		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
@@ -76,13 +73,14 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		R::addTags($blog,array("halloween"));
 		asrt(count(R::tag($blog)),3);
 		asrt(R::hasTag($blog,array("funny","commic","halloween"),true),false);
-		R::unTag($blog,array("funny"));
+		R::unTag($blog,"funny");
 		R::addTags($blog,"horror");
 		asrt(count(R::tag($blog)),3);
 		asrt(R::hasTag($blog,array("horror","commic","halloween"),true),false);
 		//no double tags
 		R::addTags($blog,"horror");
 		asrt(R::hasTag($blog,array("horror","commic","halloween"),true),false);
+		asrt(R::hasTag($blog,"horror,commic,halloween",true),false);
 		asrt(count(R::tag($blog)),3);
 		testpack("fetch tagged items");
 		R::nuke();
@@ -101,6 +99,8 @@ class RedUNIT_Base_Tags extends RedUNIT_Base {
 		$x = R::tagged("book","classic");
 		asrt(count($x),2);
 		$x = R::tagged("book","classic,horror");
+		asrt(count($x),3);
+		$x = R::tagged("book",array("classic","horror"));
 		asrt(count($x),3);
 		
 	}

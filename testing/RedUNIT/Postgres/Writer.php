@@ -69,13 +69,13 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 		asrt($writer->code($cols["c1"]),3);
 		//$id = $writer->insertRecord("testtable", array("c1"), array(array("lorem ipsum")));
 		$id = $writer->updateRecord("testtable", array(array("property"=>"c1","value"=>"lorem ipsum")));
-		$row = $writer->selectRecord("testtable", array("id"=>array($id)));
+		$row = $writer->queryRecord("testtable", array("id"=>array($id)));
 		asrt($row[0]["c1"],"lorem ipsum");
 		$writer->updateRecord("testtable", array(array("property"=>"c1","value"=>"ipsum lorem")), $id);
-		$row = $writer->selectRecord("testtable", array("id"=>array($id)));
+		$row = $writer->queryRecord("testtable", array("id"=>array($id)));
 		asrt($row[0]["c1"],"ipsum lorem");
-		$writer->selectRecord("testtable", array("id"=>array($id)),null,true);
-		$row = $writer->selectRecord("testtable", array("id"=>array($id)));
+		$writer->deleteRecord("testtable", array("id"=>array($id)));
+		$row = $writer->queryRecord("testtable", array("id"=>array($id)));
 		asrt(empty($row),true);
 		
 		//Zero issue (false should be stored as 0 not as '')

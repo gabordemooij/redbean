@@ -320,6 +320,15 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		asrt((int)R::count('bean'),2);
 		R::trashAll(R::batch('bean',$ids));
 		asrt((int)R::count('bean'),0);
+		
+		testpack('test assocManager check');
+		$rb = new RedBean_OODB(R::$writer);
+		try {
+			$rb->getAssociationManager();
+			fail();
+		} catch(RedBean_Exception_Security $e) {
+			pass();
+		}
 	}
 
 }

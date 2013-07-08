@@ -87,6 +87,18 @@ class RedUNIT_Plugin_Sync extends RedUNIT_Plugin {
 				asrt(count($columns),2);
 				asrt(isset($columns['color']),true);
 				asrt(isset($columns['length']),false);
+				try{
+					R::syncSchema('non-existant', $sourceKey);
+					fail();
+				} catch(RedBean_Exception_Security $e) {
+					pass();
+				}
+				try{
+					R::syncSchema($sourceKey, 'non-existant');
+					fail();
+				}catch(RedBean_Exception_Security $e) {
+					pass();
+				}
 				R::syncSchema($sourceKey,$key);
 				$tables = array_flip($toolbox->getWriter()->getTables());
 				asrt(isset($tables['monet']),true);

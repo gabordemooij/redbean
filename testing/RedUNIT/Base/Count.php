@@ -45,8 +45,10 @@ class RedUNIT_Base_Count extends RedUNIT_Base {
 		$page = R::dispense('page');
 		$page->name = 'bar';
 		R::store($page);
-		asrt(R::count('page',' name = ? ',array('foo')),1);
-		
+		asrt(R::count('page',' name = ? ',array('foo')), 1);
+		//now count something that does not exist, this should return 0. (just be polite)
+		asrt(R::count('teapot', ' name = ? ', array('flying')), 0);
+		asrt(R::count('teapot') , 0);
 	}
 
 }

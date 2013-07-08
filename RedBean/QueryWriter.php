@@ -134,10 +134,11 @@ interface RedBean_QueryWriter {
 	 * @param string  $addSQL     additional SQL snippet
 	 * @param array   $params     bindings for SQL snippet
 	 */
-	public function queryRecord($type, $conditions, $addSql = null, $params = array());
+	public function queryRecord($type, $conditions = array(), $addSql = null, $params = array());
 	
 	/**
-	 * Selects records from the database.
+	 * Counts the number of records in the database that match the
+	 * conditions and additional SQL.
 	 * 
 	 * @param string $type       name of the table you want to query
 	 * @param array  $conditions criteria ( $column => array( $values ) )
@@ -146,7 +147,7 @@ interface RedBean_QueryWriter {
 	 * 
 	 * @return integer
 	 */
-	public function queryRecordCount($type, $conditions, $addSql = null, $params = array());
+	public function queryRecordCount($type, $conditions = array(), $addSql = null, $params = array());
 	
 	/**
 	 * Returns the number of records linked through $linkType and satisfying the SQL in $addSQL/$params.
@@ -220,17 +221,7 @@ interface RedBean_QueryWriter {
 	 * @param string       $sql        additional SQL
 	 * @param array        $params     bindings
 	 */
-	public function deleteRecord($type, $conditions, $addSql = '', $params = array());
-	
-	/**
-	 * Selects records from the database using an 'NOT IN'-clause for conditions..
-	 * @note $addSql is always prefixed with ' WHERE ' or ' AND .'
-	 * 
-	 * @param string       $type       name of the table you want to query
-	 * @param array        $conditions criteria ( $column => array( $values ) )
-	 * @param string|array $allSql     additional SQL snippet, either a string or: array($SQL, $bindings)
-	 */
-	public function queryRecordInverse($type, $conditions, $addSql = null, $params = array());
+	public function deleteRecord($type, $conditions = array(), $addSql = '', $params = array());
 	
 	/**
 	 * This method will add a UNIQUE constraint index to a table on columns $columns.
@@ -267,15 +258,6 @@ interface RedBean_QueryWriter {
 	 */
 	public function wipe($type);
 	
-	/**
-	 * This method will count the number of beans of the given type.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param  string $type type of bean to count
-	 *
-	 * @return integer $numOfBeans number of beans found
-	 */
-	public function count($type);
 	
 	/**
 	 * Given two types this method will add a foreign key constraint.

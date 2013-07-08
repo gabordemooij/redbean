@@ -77,5 +77,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		//test findAll -- should not throw an exception
 		asrt(count(R::findAll('page'))>0,true);
 		asrt(count(R::findAll('page',' ORDER BY id '))>0,true);
+		$beans = R::findOrDispense("page");
+		asrt(count($beans), 6);
 	}
 }

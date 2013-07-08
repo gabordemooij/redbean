@@ -111,6 +111,18 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$author->ownDocument = array($d, $d2);
 		R::store($author);
 		
+		testpack('Test relatedCount with via()');
+		R::nuke();
+		$shop = R::dispense('shop');
+		$shop->ownRelation = R::dispense('relation',13);
+		foreach($shop->ownRelation as $relation) {
+			$relation->shop = $shop;
+			$relation->customer = R::dispense('customer');
+		}
+		R::store($shop);
+		$shop = $shop->fresh();
+		asrt($shop->via('relation')->countShared('customer'), 13);
+		
 		R::nuke();
 		$book = R::dispense('book');
 		$book->ownPage = R::dispense('page',10);
@@ -168,6 +180,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$pluto->name = 'P';
 		$donald->sharedFriend = array($mickey, $goofy);
 		$mickey->sharedFriend = array($pluto, $goofy);
+		$mickey->sharedBook = array(R::dispense('book'));
 		R::storeAll(array($mickey, $donald, $goofy, $pluto));
 		$donald = R::load('friend', $donald->id);
 		$mickey = R::load('friend', $mickey->id);
@@ -198,6 +211,23 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt((int)$donald->countShared('friend'), 2);
 		asrt((int)$mickey->countShared('friend'), 3);
 		asrt((int)$pluto->countShared('friend'), 1);
+		R::unassociate($donald, $mickey);
+		asrt((int)$donald->countShared('friend'), 1);
+		asrt(R::areRelated($donald, $mickey), false);
+		asrt(R::areRelated($mickey, $donald), false);
+		asrt(R::areRelated($mickey, $goofy), true);
+		asrt(R::areRelated($goofy, $mickey), true);
+		
+		R::getWriter()->setUseCache(true);
+		$mickeysFriends = R::$associationManager->related($mickey, 'friend', true);
+		asrt(count($mickeysFriends), 2);
+		$mickeysFriends = R::$associationManager->related($mickey, 'friend', true);
+		asrt(count($mickeysFriends), 2);
+		$plutosFriends = R::$associationManager->related($pluto, 'friend', true);
+		asrt(count($plutosFriends), 1);
+		$mickeysBooks = R::$associationManager->related($mickey, 'book', true);
+		asrt(count($mickeysBooks), 1);
+		R::getWriter()->setUseCache(false);
 		
 		testpack('Test list beautifications');
 		R::nuke();

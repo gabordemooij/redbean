@@ -120,7 +120,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base {
 		R::$writer->setUseCache(true); //with cache
 		$logger->clear();
 		$book = R::findOne('book');
-		R::$writer->selectRecord('garbage',array('id'=>array($garbage->id)),null,true);
+		R::$writer->queryRecord('garbage', array('id'=>array($garbage->id)));
 		$book = R::findOne('book');
 		asrt(count($logger->grep('SELECT *')),2); // now the same, auto flushed
 		

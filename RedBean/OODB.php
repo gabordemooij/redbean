@@ -817,7 +817,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	public function count($type, $addSQL = '', $params = array()) {
 		try {
-			return (int) $this->writer->count($type, $addSQL, $params);
+			return (int) $this->writer->queryRecordCount($type, array(), $addSQL, $params);
 		} catch(RedBean_Exception_SQL $e) {
 			if (!$this->writer->sqlStateIn($e->getSQLState(),array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) {
 				throw $e;
@@ -856,7 +856,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	public function getAssociationManager() {
 		if (!isset($this->assocManager)) {
-			throw new Exception('No association manager available.');
+			throw new RedBean_Exception_Security('No association manager available.');
 		}
 		return $this->assocManager;
 	}

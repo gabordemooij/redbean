@@ -271,7 +271,8 @@ class RedBean_Preloader {
 			} elseif (strpos($field, 'own') === 0) {//preload for own-list using find
 				$bean = reset($filteredBeans);
 				$link = $bean->getMeta('type').'_id';
-				$children = $this->oodb->find($type, array($link => $ids), $sql, $params, (!is_null($sqlObj)));
+				if (!is_array($params)) $params = array();
+				$children = $this->oodb->find($type, array($link => $ids), $sql, $params);
 				foreach($filteredBeans as $filteredBean) {
 					$list = $this->gatherOwnBeansFromPool($filteredBean, $children, $link);
 					$filteredBean->setProperty($field, $list);

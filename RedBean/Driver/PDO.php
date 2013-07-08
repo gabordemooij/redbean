@@ -93,8 +93,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * method will simply return directly. This method also turns on
 	 * UTF8 for the database and PDO-ERRMODE-EXCEPTION as well as
 	 * PDO-FETCH-ASSOC.
-	 *
-	 * @return void
 	 */
 	public function connect() {
 		if ($this->isConnected) return;
@@ -124,28 +122,28 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * Query Execution. This method binds parameters as NULL, INTEGER or STRING
 	 * and supports both named keys and question mark keys.
 	 *
-	 * @param  PDOStatement $s       PDO Statement instance
-	 * @param  array        $aValues values that need to get bound to the statement
+	 * @param  PDOStatement $statement PDO Statement instance
+	 * @param  array        $aValues   values that need to get bound to the statement
 	 *
 	 * @return void
 	 */
-	protected function bindParams($s, $aValues) {
+	protected function bindParams($statement, $aValues) {
 		foreach($aValues as $key => &$value) {
 			if (is_integer($key)) {
 				if (is_null($value)){
-					$s->bindValue($key+1, null, PDO::PARAM_NULL);
+					$statement->bindValue($key+1, null, PDO::PARAM_NULL);
 				} elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) && $value < 2147483648) {
-					$s->bindParam($key+1, $value, PDO::PARAM_INT);
+					$statement->bindParam($key+1, $value, PDO::PARAM_INT);
 				} else {
-					$s->bindParam($key+1, $value, PDO::PARAM_STR);
+					$statement->bindParam($key+1, $value, PDO::PARAM_STR);
 				}
 			} else {
 				if (is_null($value)){
-					$s->bindValue($key, null, PDO::PARAM_NULL);
+					$statement->bindValue($key, null, PDO::PARAM_NULL);
 				} elseif (!$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt($value) &&  $value < 2147483648) {
-					$s->bindParam($key, $value, PDO::PARAM_INT);
+					$statement->bindParam($key, $value, PDO::PARAM_INT);
 				} else {
-					$s->bindParam($key, $value, PDO::PARAM_STR);
+					$statement->bindParam($key, $value, PDO::PARAM_STR);
 				}
 			}
 		}
@@ -170,15 +168,15 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 		}
 		try {
 			if (strpos('pgsql', $this->dsn) === 0) {
-				$s = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
+				$statement = $this->pdo->prepare($sql, array(PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true));
 			} else {
-				$s = $this->pdo->prepare($sql);
+				$statement = $this->pdo->prepare($sql);
 			}
-			$this->bindParams($s, $aValues);
-			$s->execute();
-			$this->affected_rows = $s->rowCount();
-			if ($s->columnCount()) {
-		    	$this->rs = $s->fetchAll();
+			$this->bindParams($statement, $aValues);
+			$statement->execute();
+			$this->affected_rows = $statement->rowCount();
+			if ($statement->columnCount()) {
+		    	$this->rs = $statement->fetchAll();
 		    	if ($this->debug && $this->logger) $this->logger->log('resultset: '.count($this->rs).' rows');
 	    	} else {
 		    	$this->rs = array();
@@ -188,9 +186,9 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			//So we need a property to convey the SQL State code.
 			$err = $e->getMessage();
 			if ($this->debug && $this->logger) $this->logger->log('An error occurred: '.$err);
-			$x = new RedBean_Exception_SQL($err, 0);
-			$x->setSQLState($e->getCode());
-			throw $x;
+			$exception = new RedBean_Exception_SQL($err, 0);
+			$exception->setSQLState($e->getCode());
+			throw $exception;
 		}
 	}
 	

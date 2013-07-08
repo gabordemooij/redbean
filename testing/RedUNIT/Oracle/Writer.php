@@ -90,10 +90,10 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle {
 		$row = $writer->selectRecord("testtable", array("id"=>array($id)));
 		asrt($row[0]["c1"],"lorem ipsum");
 		$writer->updateRecord("testtable", array(array("property"=>"c1","value"=>"ipsum lorem")), $id);
-		$row = $writer->selectRecord("testtable", array("id"=>array($id)));
+		$row = $writer->queryRecord("testtable", array("id"=>array($id)));
 		asrt($row[0]["c1"],"ipsum lorem");
-		$writer->selectRecord("testtable", array("id"=>array($id)),null,true);
-		$row = $writer->selectRecord("testtable", array("id"=>array($id)));
+		$writer->deleteRecord("testtable", array("id"=>array($id)));
+		$row = $writer->queryRecord("testtable", array("id"=>array($id)));
 		asrt(empty($row),true);
 		//$pdo->setDebugMode(1);
 		$writer->addColumn("testtable", "c2", 2);

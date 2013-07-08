@@ -75,8 +75,8 @@ class RedBean_TagManager {
 	 */
 	public function hasTag($bean, $tags, $all = false) {
 		$foundtags = $this->tag($bean);
-		if (is_string($foundtags)) {
-			$foundtags = explode(',', $tags);
+		if (is_string($tags)) {
+			$tags = explode(',', $tags);
 		}
 		$same = array_intersect($tags, $foundtags);
 		if ($all) {

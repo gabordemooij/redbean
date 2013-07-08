@@ -409,21 +409,4 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		}
 		return reset($beans);
 	}
-	
-	/**
-	 * The opposite of related(). Returns all the beans that are not
-	 * associated with the bean provided.
-	 *
-	 * @param RedBean_OODBBean $bean   bean provided
-	 * @param string           $type   type of bean you are searching for
-	 * @param string           $sql    SQL for extra filtering
-	 * @param array            $values values to be inserted in SQL slots
-	 *
-	 * @return array
-	 */
-	public function unrelated(RedBean_OODBBean $bean, $type, $sql = null, $values = array()) {
-		$keys = $this->related($bean, $type);
-		$rows = $this->writer->queryRecordInverse($type, array('id' => $keys), $sql, $values);
-		return $this->oodb->convertToBeans($type, $rows);
-	}
 }
