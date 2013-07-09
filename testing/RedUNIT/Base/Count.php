@@ -49,6 +49,17 @@ class RedUNIT_Base_Count extends RedUNIT_Base {
 		//now count something that does not exist, this should return 0. (just be polite)
 		asrt(R::count('teapot', ' name = ? ', array('flying')), 0);
 		asrt(R::count('teapot') , 0);
+		global $currentDriver;
+		echo $currentDriver;
+		//some drivers don't support that many error codes.
+		if ($currentDriver === 'mysql' || $currentDriver === 'postgres') {
+			try {
+				R::count('teaport', ' for tea ');
+				fail();
+			} catch(RedBean_Exception_SQL $e) {
+				pass();
+			}
+		}
 	}
 
 }

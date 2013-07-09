@@ -157,6 +157,12 @@ class RedUNIT_Base_Update extends RedUNIT_Base {
 		$redbean->store($page);
 		$page = $redbean->load( "page", $id );
 		asrt($page->numasstring2,"00.123");
+		try {
+			$redbean->trash(array());
+			fail();
+		} catch (RedBean_Exception_Security $e) {
+			pass();
+		}
 		$redbean->trash( $page );
 		asrt( (int) $pdo->GetCell("SELECT count(*) FROM page"), 0 );
 		}

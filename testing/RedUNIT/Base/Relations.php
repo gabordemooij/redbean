@@ -100,9 +100,18 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$d2->sharedPage = array($p, $p2, $p3);
 		R::storeAll(array($d, $d2));
 		
+		try {
+			R::relatedCount(array(), 'page');
+			fail();
+		} catch(RedBean_Exception_Security $e) {
+			pass();
+		}
+		
+		asrt(R::relatedCount(R::dispense('page'), 'page'), 0);
 		asrt(R::relatedCount($d, 'page', ' WHERE page.id = ? ', array($p->id)), 1);
 		asrt(R::relatedCount($d, 'page'), 2);
 		asrt(R::relatedCount($d2, 'page'), 3);
+		asrt(R::relatedCount($d2, 'ghosts'), 0);
 		//now using bean methods..
 		asrt($d2->countShared('page'), 3);
 		asrt($d->countShared('page'), 2);
