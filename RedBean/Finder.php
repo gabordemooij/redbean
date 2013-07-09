@@ -173,9 +173,6 @@ class RedBean_Finder {
 				$listType = $this->toolbox->getWriter()->esc(substr($steps[$i],7));
 			}
 			$list = $bean->withCondition(" {$listType}.id = ? ",array($steps[$i + 1]))->$listName;
-			if (!is_array($list)) {
-				throw new RedBean_Exception_Security('Cannot access list.');
-			}
 			if (!isset($list[$steps[$i + 1]])) {
 				throw new RedBean_Exception_Security('Cannot access bean.');
 			}

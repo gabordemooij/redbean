@@ -79,5 +79,6 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		asrt(count(R::findAll('page',' ORDER BY id '))>0,true);
 		$beans = R::findOrDispense("page");
 		asrt(count($beans), 6);
+		asrt(is_null(R::findLast('nothing')), true);
 	}
 }

@@ -143,7 +143,20 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$newPage = R::findOne('page',' name = ? ',array('my new page'));
 		asrt((string)$resp['result']['id'], (string)$newPage->id);
 		asrt((string)$resp['result']['name'], (string)$newPage->name);
+		
+		$badPayLoad = array(
+			'type' => 'ad',
+			'bean' => 42
+		);
+		
+		$incompletePayLoad = array('type'=>'ad');
+		
 		//Send a PUT /site/1/page/2/shared-ad
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad', 'PUT', $badPayLoad);
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'Parameter \'bean\' must be object/array.');
+		asrt((string)$resp['error']['code'], '-32602');
+		
 		$payLoad = array(
 			'type' => 'ad',
 			'bean' => array(
@@ -155,7 +168,18 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$newAd = R::findOne('ad',' name = ? ',array('my new ad'));
 		asrt((string)$resp['result']['id'], (string)$newAd->id);
 		asrt((string)$resp['result']['name'], (string)$newAd->name);
+		
 		//Send a POST /site/1
+		$exception = null;
+		$resp = $can->handleREST($user, 'site/'.$site->id, 'POST', $incompletePayLoad);
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'Missing parameter \'bean\'.');
+		asrt((string)$resp['error']['code'], '-32602');
+		$resp = $can->handleREST($user, 'site/'.$site->id, 'POST', $badPayLoad);
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'Parameter \'bean\' must be object/array.');
+		asrt((string)$resp['error']['code'], '-32602');
+		
 		$payLoad = array(
 			'bean' => array(
 				'name' => 'The Original'
@@ -174,6 +198,16 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($newAd, null);
 		
 		//Send a MAIL /site/1/page/1
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id, 'mail', array());
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'No parameters.');
+		asrt((string)$resp['error']['code'], '-32600');
+		
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id, 'mail', array('param' => 123));
+		$resp = json_decode($resp, true);
+		asrt((string)$resp['error']['message'], 'Parameter \'param\' must be object/array.');
+		asrt((string)$resp['error']['code'], '-32602');
+		
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id, 'mail', array('param'=>array('me')));
 		$resp = json_decode($resp, true);
 		asrt((string)$resp['result'], 'mail has been sent to me');
@@ -247,6 +281,17 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(isset($rs["error"]),false);
 		$rs = json_decode( s("candybar:load",array( $oldid ) ),true );
 		asrt($rs["result"]["taste"],"salty");
+		$rs = json_decode( s("candybar:load",array() ),true );
+		asrt($rs["error"]["message"], "First param needs to be Bean ID");
+		asrt((string)$rs["error"]["code"], "-32602");
+		$rs = json_decode( s("candybar:export",array() ),true );
+		asrt($rs["error"]["message"], "First param needs to be Bean ID");
+		asrt((string)$rs["error"]["code"], "-32602");
+		$rs = json_decode( s("candybar:trash",array() ),true );
+		asrt($rs["error"]["message"], "First param needs to be Bean ID");
+		asrt((string)$rs["error"]["code"], "-32602");
+		
+		
 		$rs = json_decode( s("candybar:store",array( array("brand"=>"darkchoco","taste"=>"bitter") ) ), true );
 		$id2 = $rs["result"];
 		$rs = json_decode( s("candybar:load",array( $oldid ) ),true );
@@ -457,6 +502,29 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($rs["error"]["code"],-32601);
 		$rs = json_decode( s("stdClass:__toString",array("abc")), true );
 		asrt($rs["error"]["code"],-32601);
+		
+		$j = array(
+			"jsonrpc"=>"2.0",
+			'id' => '1'
+		);
+		$can = new RedBean_Plugin_BeanCan;
+		$request = json_encode($j);
+		$out = $can->handleJSONRequest( $request );
+		$rs = json_decode($out, true);
+		asrt((string)$rs["error"]["message"], 'No method');
+		asrt((string)$rs["error"]["code"], '-32600');
+		
+		$j = array(
+			"jsonrpc"=>"2.0",
+			'method' => 'method'
+		);
+		$can = new RedBean_Plugin_BeanCan;
+		$request = json_encode($j);
+		$out = $can->handleJSONRequest( $request );
+		$rs = json_decode($out, true);
+		asrt((string)$rs["error"]["message"], 'No ID');
+		asrt((string)$rs["error"]["code"], '-32600');
+		
 		
 		R::nuke();
 		$server = new RedBean_Plugin_BeanCan();

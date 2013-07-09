@@ -24,6 +24,15 @@ class RedUNIT_Plugin_Timeline extends RedUNIT_Plugin {
 	 */
 	public function run() {
 		R::nuke();
+		
+		//test for correct exception in case of non-existant file.
+		try {
+			$timeLine = new RedBean_Plugin_TimeLine('some-non-existant-file');
+			fail();
+		} catch(RedBean_Exception_Security $exception) {
+			pass();
+		}
+		
 		file_put_contents('/tmp/test_log.txt','');
 		R::log('/tmp/test_log.txt');
 		$bean = R::dispense('bean');
