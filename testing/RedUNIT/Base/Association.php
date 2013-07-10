@@ -326,6 +326,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		R::store($sheep3);
 		R::associate($sheep,$sheep2);
 		asrt(R::areRelated($sheep,$sheep2),true);
+		asrt(R::areRelated($sheep,$sheep2),true); //use cache?
 		asrt(R::areRelated($sheep,$sheep3),false);
 		$pig = R::dispense('pig');
 		asrt(R::areRelated($sheep,$pig),false);

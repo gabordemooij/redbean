@@ -79,7 +79,7 @@ class RedUNIT_Mysql_Foreignkeys extends RedUNIT_Mysql {
 		$cols = R::getColumns('invoice_project');
 		asrt($cols['project_id'],"tinyint(1) unsigned");
 		asrt($cols['invoice_id'],"tinyint(3) unsigned");
-		R::$writer->addConstraintForTypes($bean1->getMeta('type'),$bean2->getMeta('type'));
+		R::$writer->addConstraint($bean1,$bean2);
 		$cols = R::getColumns('invoice_project');
 		asrt($cols['project_id'],"int(11) unsigned");
 		asrt($cols['invoice_id'],"int(11) unsigned");

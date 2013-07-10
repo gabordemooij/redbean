@@ -30,12 +30,72 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 	 */
 	public function run() {
 		
+		global $currentDriver;
+		$adapter = new TroubleDapter(R::$toolbox->getDatabaseAdapter()->getDatabase());
+		$adapter->setSQLState('HY000');
+		$writer = new RedBean_QueryWriter_SQLiteT($adapter);
+		$redbean = new RedBean_OODB($writer);
+		$toolbox = new RedBean_ToolBox($redbean, $adapter, $writer);
+		
+		//we can only test this for a known driver...
+		if ($currentDriver === 'sqlite') {
+			try {
+				$redbean->find('bean');
+				pass();
+			}
+			catch(Exception $e) {
+				var_dump($e->getSQLState()); exit;
+				fail();
+
+			}
+		}
+		
+		$adapter->setSQLState(-999);
+		try {
+			$redbean->find('bean');
+			fail();
+		}
+		catch(Exception $e) {
+			pass();
+		}
+
+		$beanA = R::dispense('bean');
+		$beanB = R::dispense('bean');
+		R::storeAll(array($beanA, $beanB));
+		$associationManager = new RedBean_AssociationManager($toolbox);
+		$adapter->setSQLState('HY000');
+		
+		
+		//we can only test this for a known driver...
+		if ($currentDriver === 'sqlite') {
+			try {
+				$associationManager->areRelated($beanA, $beanB);
+				pass();
+			}
+			catch(Exception $e) {
+				fail();
+
+			}
+		}
+		
+		$adapter->getDatabase()->setDebugMode(1);
+		$adapter->setSQLState(-999);
+		try {
+			$associationManager->areRelated($beanA, $beanA);
+			fail();
+		}
+		catch(Exception $e) {
+			pass();
+		}
+
+		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo = $adapter->getDatabase();
-			
+		
+	
 		$page = $redbean->dispense("page");
 		try {
 			$adapter->exec("an invalid query");
@@ -87,3 +147,26 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 		
 	}
 }
+
+class TroubleDapter extends RedBean_Adapter_DBAdapter {
+	
+	private $sqlState;
+
+	public function setSQLState($sqlState) {
+		$this->sqlState = $sqlState;
+	}
+
+
+	public function get($sql, $values = array()) {
+		$exception = new RedBean_Exception_SQL('Just a trouble maker');
+		$exception->setSQLState($this->sqlState);
+		throw $exception;
+	}
+	
+	public function getRow($sql, $aValues = array()) {
+		$this->get($sql, $aValues);
+	}
+	
+}
+
+
