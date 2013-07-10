@@ -106,13 +106,14 @@ class RedBean_Facade {
 	 * @param string $dsn      Database connection string
 	 * @param string $username Username for database
 	 * @param string $password Password for database
+	 * @param bool        $frozen Whether this database is frozen or not
 	 *
 	 * @return void
 	 */
-	public static function setup( $dsn=NULL, $username=NULL, $password=NULL ) {
+	public static function setup( $dsn=NULL, $username=NULL, $password=NULL, $frozen=false ) {
 		if (function_exists('sys_get_temp_dir')) $tmp = sys_get_temp_dir(); else $tmp = 'tmp';
 		if (is_null($dsn)) $dsn = 'sqlite:/'.$tmp.'/red.db';
-		self::addDatabase('default',$dsn,$username,$password);
+		self::addDatabase('default',$dsn,$username,$password,$frozen);
 		self::selectDatabase('default');
 		return self::$toolbox;
 	}
@@ -1153,6 +1154,9 @@ class RedBean_Facade {
 	 * @param array $types types to load
 	 */
 	public static function preload($beans,$types) {
+		
+		if(!is_array($beans)) $beans = array($beans); 
+		
 		return self::$redbean->preload($beans,$types);
 	}
 	
