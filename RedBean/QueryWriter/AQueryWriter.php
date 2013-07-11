@@ -498,8 +498,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		if ($sourceTable === $destTable) {
 			$sql = "SELECT {$linkTable}.* FROM {$linkTable} 
 				WHERE ( {$sourceCol} = ? AND {$destCol} = ? ) OR 
-				 ( {$destCol} = ? AND {$sourceCol} = ? ) -- keep-cache
-				";
+				 ( {$destCol} = ? AND {$sourceCol} = ? ) -- keep-cache";
 			$row = $this->adapter->getRow($sql, array($sourceID, $destID, $sourceID, $destID));
 		} else {
 			$sql = "SELECT {$linkTable}.* FROM {$linkTable} 

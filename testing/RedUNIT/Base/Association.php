@@ -326,7 +326,14 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		R::store($sheep3);
 		R::associate($sheep,$sheep2);
 		asrt(R::areRelated($sheep,$sheep2),true);
+		R::exec('DELETE FROM sheep_sheep WHERE sheep2_id = ? -- keep-cache',array($sheep2->id));
+		asrt(R::areRelated($sheep,$sheep2),false); //use cache?
+		R::associate($sheep,$sheep2);
+		R::$writer->setUseCache(true);
+		asrt(R::areRelated($sheep,$sheep2),true);
+		R::exec('DELETE FROM sheep_sheep WHERE sheep2_id = ? -- keep-cache',array($sheep2->id));
 		asrt(R::areRelated($sheep,$sheep2),true); //use cache?
+		R::associate($sheep,$sheep2);
 		asrt(R::areRelated($sheep,$sheep3),false);
 		$pig = R::dispense('pig');
 		asrt(R::areRelated($sheep,$pig),false);
