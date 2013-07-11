@@ -78,7 +78,6 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 			}
 		}
 		
-		$adapter->getDatabase()->setDebugMode(1);
 		$adapter->setSQLState(-999);
 		try {
 			$associationManager->areRelated($beanA, $beanA);

@@ -96,6 +96,7 @@ require($dir.'DuplicationManager.php');
 
 require($dir.'Plugin.php');
 require($dir.'Plugin/BeanCan.php');
+require($dir.'Plugin/BeanCanResty.php');
 require($dir.'Plugin/Cooker.php');
 require($dir.'Plugin/Cache.php');
 

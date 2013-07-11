@@ -16,9 +16,6 @@
  */
 class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 
-	
-	
-	
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
@@ -45,75 +42,58 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$user->ownSite[] = $site;
 		R::store($user);
 
-		$can = new RedBean_Plugin_BeanCan;
+		$can = new RedBean_Plugin_BeanCanResty;
 		$can->setWhitelist('all');
 		$resp = $can->handleREST($user, '@!#?', 'GET');
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'URI contains invalid characters.');
-		asrt((string)$resp['error']['code'], '-32700');
+		asrt((string)$resp['error']['code'], '400');
 		$resp = $can->handleREST($user, 'blah', 'GET');
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'Invalid path: needs 1 more element.');
-		asrt((string)$resp['error']['code'], '-32600');
-		asrt((string)$resp['jsonrpc'], '2.0');
-		asrt((string)$resp['id'], '0');
+		asrt((string)$resp['error']['code'], '404');
+		asrt((string)$resp['red-resty'], '1.0');
 		$resp = $can->handleREST($user, '/blah', 'GET');
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'Cannot access list.');
-		asrt((string)$resp['error']['code'], '-32600');
-		asrt((string)$resp['jsonrpc'], '2.0');
-		asrt((string)$resp['id'], '0');
+		asrt((string)$resp['error']['code'], '404');
+		asrt((string)$resp['red-resty'], '1.0');
 		$resp = $can->handleREST($user, 'site/2', 'GET');
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'Cannot access bean.');
-		asrt((string)$resp['error']['code'], '-32600');
-		asrt((string)$resp['jsonrpc'], '2.0');
-		asrt((string)$resp['id'], '0');
+		asrt((string)$resp['error']['code'], '404');
+		asrt((string)$resp['red-resty'], '1.0');
 		$resp = $can->handleREST($user, 'blah/2', 'GET');
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'Cannot access bean.');
 		$resp = $can->handleREST($user, '', 'GET');
-		$resp = json_decode($resp, true);
-		asrt((string)$resp['jsonrpc'], '2.0');
+		asrt((string)$resp['red-resty'], '1.0');
 		asrt((string)$resp['result']['name'], 'me');
 		$resp = $can->handleREST($user, 'book', 'PUT', '');
-		$resp = json_decode($resp, true);
-		asrt((string)$resp['error']['code'], '-32700');
+		asrt((string)$resp['error']['code'], '400');
 		asrt((string)$resp['error']['message'], 'Payload needs to be array.');
 		
 		$resp = $can->handleREST($user, '', 'PUT',array());
-		$resp = json_decode($resp, true);
-		asrt((string)$resp['error']['code'], '-32602');
+		asrt((string)$resp['error']['code'], '400');
 		asrt((string)$resp['error']['message'], 'Missing list.');
 		$resp = $can->handleREST($user, 'shared-bo-ok', 'PUT',array());
-		$resp = json_decode($resp, true);
-		asrt((string)$resp['error']['code'], '-32700');
+		asrt((string)$resp['error']['code'], '400');
 		asrt((string)$resp['error']['message'], 'Invalid list.');
 		
 		$resp = $can->handleREST($user, 'book', 'PUT', array('type'=>'book'));
-		$resp = json_decode($resp, true);
-		asrt((string)$resp['error']['code'], '-32602');
+		asrt((string)$resp['error']['code'], '400');
 		asrt((string)$resp['error']['message'], 'Missing parameter \'bean\'.');
 		
 		//Send a GET /site/1 request to BeanCan Server 
 		$resp = $can->handleREST($user, 'site/'.$site->id , 'GET');
-		$resp = json_decode($resp, true);
-	 	asrt((string)$resp['result']['id'], (string)$site->id);
+		asrt((string)$resp['result']['id'], (string)$site->id);
 		asrt((string)$resp['result']['name'], (string)$site->name);
 		asrt((string)$resp['result']['user_id'], (string)$site->user_id);
 		$can->setWhitelist(array('page'=>array('POST')));
 		$resp = $can->handleREST($user, 'site/'.$site->id , 'GET');
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'],'This bean is not available. Set whitelist to "all" or add to whitelist.');
-		asrt((string)$resp['error']['code'], '-32600');
+		asrt((string)$resp['error']['code'], '403');
 		$can->setWhitelist(array('site'=>array('POST')));
 		$resp = $can->handleREST($user, 'site/'.$site->id , 'GET');
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'],'This bean is not available. Set whitelist to "all" or add to whitelist.');
-		asrt((string)$resp['error']['code'], '-32600');
+		asrt((string)$resp['error']['code'], '403');
 		$can->setWhitelist(array('site'=>array('GET')));
 		$resp = $can->handleREST($user, 'site/'.$site->id , 'GET');
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['result']['id'], (string)$site->id);
 		asrt((string)$resp['result']['name'], (string)$site->name);
 		asrt((string)$resp['result']['user_id'], (string)$site->user_id);
@@ -122,13 +102,11 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 
 		//Send a GET /site/1/page/1 request to BeanCan Server
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id , 'GET');
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['result']['id'], (string)$page->id);
 		asrt((string)$resp['result']['name'], (string)$page->name);
 		asrt((string)$resp['result']['site_id'], (string)$page->site_id);
 		//Send a GET /site/1/page/1/shared-ad/1
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/'.$ad->id, 'GET');
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['result']['id'], (string)$ad->id);
 		asrt((string)$resp['result']['name'], (string)$ad->name);
 		//Send a PUT /site/1/page
@@ -139,7 +117,6 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 			)
 		);
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page', 'PUT', $payLoad);
-		$resp = json_decode($resp, true);
 		$newPage = R::findOne('page',' name = ? ',array('my new page'));
 		asrt((string)$resp['result']['id'], (string)$newPage->id);
 		asrt((string)$resp['result']['name'], (string)$newPage->name);
@@ -153,9 +130,8 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		
 		//Send a PUT /site/1/page/2/shared-ad
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad', 'PUT', $badPayLoad);
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'Parameter \'bean\' must be object/array.');
-		asrt((string)$resp['error']['code'], '-32602');
+		asrt((string)$resp['error']['code'], '400');
 		
 		$payLoad = array(
 			'type' => 'ad',
@@ -164,7 +140,6 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 			)
 		);
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad', 'PUT', $payLoad);
-		$resp = json_decode($resp, true);
 		$newAd = R::findOne('ad',' name = ? ',array('my new ad'));
 		asrt((string)$resp['result']['id'], (string)$newAd->id);
 		asrt((string)$resp['result']['name'], (string)$newAd->name);
@@ -172,49 +147,54 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		//Send a POST /site/1
 		$exception = null;
 		$resp = $can->handleREST($user, 'site/'.$site->id, 'POST', $incompletePayLoad);
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'Missing parameter \'bean\'.');
-		asrt((string)$resp['error']['code'], '-32602');
+		asrt((string)$resp['error']['code'], '400');
 		$resp = $can->handleREST($user, 'site/'.$site->id, 'POST', $badPayLoad);
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'Parameter \'bean\' must be object/array.');
-		asrt((string)$resp['error']['code'], '-32602');
+		asrt((string)$resp['error']['code'], '400');
+		
+		$badPayLoad = array(
+			'type' => 'ad',
+			'bean' => array(array())
+		);
+		
+		$resp = $can->handleREST($user, 'site/'.$site->id, 'POST', $badPayLoad);
+		asrt((string)$resp['error']['message'], 'Object "bean" invalid.');
+		asrt((string)$resp['error']['code'], '400');
 		
 		$payLoad = array(
 			'bean' => array(
 				'name' => 'The Original'
 			)
 		);
+		
+		
+		
 		$resp = $can->handleREST($user, 'site/'.$site->id, 'POST', $payLoad);
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['result']['id'], (string)$site->id);
 		asrt((string)$resp['result']['name'], 'The Original');
 		
 		//Send a DELETE /site/1/page/2/shared-ad/2
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/'.$newAd->id, 'DELETE');
-		$resp = json_decode($resp, true);
 		$newAd = R::findOne('ad',' name = ? ',array('my new ad'));
 		asrt((string)$resp['result'], 'OK');
 		asrt($newAd, null);
 		
 		//Send a MAIL /site/1/page/1
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id, 'mail', array());
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'No parameters.');
-		asrt((string)$resp['error']['code'], '-32600');
+		asrt((string)$resp['error']['code'], '400');
 		
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id, 'mail', array('param' => 123));
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'Parameter \'param\' must be object/array.');
-		asrt((string)$resp['error']['code'], '-32602');
+		asrt((string)$resp['error']['code'], '400');
 		
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id, 'mail', array('param'=>array('me')));
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['result'], 'mail has been sent to me');
 		
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id, 'err', array('param'=>array('me')));
-		$resp = json_decode($resp, true);
 		asrt((string)$resp['error']['message'], 'Exception: 123');
+		asrt((string)$resp['error']['code'], '500');
 		
 		//test Access control
 		$setting = R::dispense('setting');
@@ -224,15 +204,12 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$option->name = 'secret';
 		R::store($user);
 		$resp = $can->handleREST($user, 'setting/'.$setting->id.'/option/'.$option->id, 'GET');
-		$resp = json_decode($resp, true);
 		asrt($resp['result']['name'], 'secret');
 		$user2 = R::load('user', R::store(R::dispense('user')));
 		$resp = $can->handleREST($user2, 'setting/'.$setting->id.'/option/'.$option->id, 'GET');
-		$resp = json_decode($resp, true);
 		asrt(isset($resp['error']),true);
 		Model_Setting::$closed = true;
 		$resp = $can->handleREST($user, 'setting/'.$setting->id.'/option/'.$option->id, 'GET');
-		$resp = json_decode($resp, true);
 		asrt(isset($resp['error']),true);
 		Model_Setting::$closed = false;
 		
