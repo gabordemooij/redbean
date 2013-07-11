@@ -511,6 +511,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(R::relatedOne($topic3,'book')->id,$a->id);
 		$t3 = R::load('topic',$topic3->id);
 		asrt(count($t3->sharedBook),2);
+		asrt(R::relatedOne($topic3, 'nothingness'), null);
 		//nuke an own-array, replace entire array at once without getting first
 		$page2->id=0;
 		$page2->title = 'yet another page 2';

@@ -111,11 +111,7 @@ class RedBean_Facade {
 	 * @return void
 	 */
 	public static function setup($dsn = null, $username = null, $password = null) {
-		if (function_exists('sys_get_temp_dir')) {
-			$tmp = sys_get_temp_dir(); 
-		} else {
-			$tmp = 'tmp';
-		}
+		$tmp = sys_get_temp_dir(); 
 		if (is_null($dsn)) {
 			$dsn = 'sqlite:/'.$tmp.'/red.db';
 		}

@@ -313,6 +313,13 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		asrt(is_array($bean->shared_item),false);
 		asrt(is_array($bean->{'own item'}),false);
 		asrt(is_array($bean->{'shared Item'}),false);
+		
+		try {
+			R::wipe('no-exist');
+			fail();
+		} catch(RedBean_Exception_Security $e) {
+			pass();
+		}
 	}
 	
 }
