@@ -672,7 +672,7 @@ class RedBean_OODB extends RedBean_Observable {
 		if (isset($this->stash[$this->nesting][$id])) {
 			$row = $this->stash[$this->nesting][$id];
 		} else {
-			try {
+			try {   
 				$rows = $this->writer->queryRecord($type, array('id' => array($id)));
 			} catch(RedBean_Exception_SQL $e ) {
 				if ($this->writer->sqlStateIn($e->getSQLState(),

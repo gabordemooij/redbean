@@ -31,6 +31,8 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 	public function run() {
 		
 		global $currentDriver;
+		
+		R::store(R::dispense('justabean'));
 		$adapter = new TroubleDapter(R::$toolbox->getDatabaseAdapter()->getDatabase());
 		$adapter->setSQLState('HY000');
 		$writer = new RedBean_QueryWriter_SQLiteT($adapter);
@@ -87,6 +89,12 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 			pass();
 		}
 
+		try {
+			$redbean->wipe('justabean');
+			fail();
+		} catch(Exception $e) {
+			pass();
+		}
 		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
@@ -102,6 +110,18 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 		}catch(RedBean_Exception_SQL $e ) {
 			pass();
 		}
+		
+		//special data type description should result in magic number 99 (specified)
+		if ($currentDriver == 'mysql') {
+			asrt($writer->code(RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE), 99);
+		}
+		if ($currentDriver == 'pgsql') {
+			asrt($writer->code(RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE), 99);
+		}
+		if ($currentDriver == 'CUBRID') {
+			asrt($writer->code(RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATE), 99);
+		}
+		
 		asrt( (int) $adapter->getCell("SELECT 123") ,123);
 		$page->aname = "my page";
 		$id = (int) $redbean->store($page);
@@ -163,6 +183,10 @@ class TroubleDapter extends RedBean_Adapter_DBAdapter {
 	}
 	
 	public function getRow($sql, $aValues = array()) {
+		$this->get($sql, $aValues);
+	}
+	
+	public function exec($sql, $aValues = array(), $noEvent = false) {
 		$this->get($sql, $aValues);
 	}
 	

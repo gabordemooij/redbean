@@ -43,12 +43,14 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres {
 		asrt(in_array("c1",array_keys($writer->getColumns("testtable"))),true);
 		foreach($writer->sqltype_typeno as $key=>$type) {
 			if ($type < 100) {
-				asrt($writer->code($key),$type);
+				asrt($writer->code($key, true),$type);
 			}
 			else {
 				asrt($writer->code($key),99);
 			}
 		}
+		asrt($writer->code(RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME), 99);
+		
 		asrt($writer->code("unknown"),99);
 		asrt($writer->scanType(false),3);
 		asrt($writer->scanType(NULL),0);

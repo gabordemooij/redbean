@@ -49,6 +49,15 @@ class RedUNIT_Base_Facade extends RedUNIT_Base {
 		asrt(($id>0),TRUE);
 		$book = R::load("book", (int)$id);
 		asrt($book->title,"a nice book");
+		asrt(R::load('book', 999)->title, null);
+		R::freeze(true);
+		try {
+			R::load('bookies', 999);
+			fail();
+		} catch(Exception $e) {
+			pass();
+		}
+		R::freeze(false);
 		$author = R::dispense("author");
 		$author->name = "me";
 		R::store($author);

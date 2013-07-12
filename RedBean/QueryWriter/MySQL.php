@@ -147,7 +147,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		if ($includeSpecials) {
 			return $r;
 		}
-		if ($r > self::C_DATATYPE_SPECIFIED) {
+		if ($r > RedBean_QueryWriter::C_DATATYPE_RANGE_SPECIAL) {
 			return self::C_DATATYPE_SPECIFIED;
 		}
 		return $r;

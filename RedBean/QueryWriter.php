@@ -29,7 +29,18 @@ interface RedBean_QueryWriter {
 	const C_SQLSTATE_NO_SUCH_TABLE = 1;
 	const C_SQLSTATE_NO_SUCH_COLUMN = 2;
 	const C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION = 3;
+
+	/**
+	 * Define data type regions
+	 *
+	 * 00 - 80: normal data types
+	 * 80 - 99: special data types, only scan/code if requested
+	 * 99     : specified by user, don't change 
+	 */
+	const C_DATATYPE_RANGE_SPECIAL = 80;	
+	const C_DATATYPE_RANGE_SPECIFIED = 99;
 	
+
 	/**
 	 * Returns the tables that are in the database.
 	 *
