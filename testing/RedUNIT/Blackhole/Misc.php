@@ -31,6 +31,15 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 	 */
 	public function run() {
 
+		testpack('Test debug mode with custom logger');
+		$pdoDriver = new RedBean_Driver_PDO(R::getDatabaseAdapter()->getDatabase()->getPDO());
+		$customLogger = new CustomLogger;
+		$pdoDriver->setDebugMode(true, $customLogger);
+		$pdoDriver->Execute('SELECT 123');
+		asrt(count($customLogger->getLogMessage()), 1);
+		$pdoDriver->setDebugMode(true, null);
+		asrt(($pdoDriver->getLogger() instanceof RedBean_Logger_Default), true);
+		
 		testpack('Test bean->getProperties method');
 		$bean = R::dispense('bean');
 		$bean->property = 'hello';
@@ -317,4 +326,18 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		
 	}
 	
+}
+
+
+class CustomLogger extends RedBean_Logger_Default {
+	
+	private $log;
+	
+	public function getLogMessage() {
+		return $this->log;
+	}
+	
+	public function log() {
+		$this->log = func_get_args();
+	}
 }

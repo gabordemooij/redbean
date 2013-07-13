@@ -23,6 +23,29 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 	 */
 	public function run() {
 
+		global $currentDriver;
+		
+		if ($currentDriver === 'mysql') {
+			testpack('Throw exception in case of issue with assoc constraint');
+			R::nuke();
+			$bunny = R::dispense('bunny');
+			$carrot = R::dispense('carrot');
+			$faultyWriter = new FaultyWriter(R::$toolbox->getDatabaseAdapter());
+			$faultyToolbox = new RedBean_ToolBox(R::$toolbox->getRedBean(), R::$toolbox->getDatabaseAdapter(), $faultyWriter);
+			$faultyAssociationManager = new RedBean_AssociationManager($faultyToolbox);
+			$faultyWriter->setSQLState('23000');
+			$faultyAssociationManager->associate($bunny, $carrot);
+			pass();
+			$faultyWriter->setSQLState('42S22');
+			R::nuke();
+			try {
+				$faultyAssociationManager->associate($bunny, $carrot);
+				fail();
+			} catch(RedBean_Exception_SQL $exception) {
+				pass();
+			}
+		}
+		
 		testpack('Test fast-track deletion');
 		R::nuke();
 		$ghost = R::dispense('ghost');
@@ -362,5 +385,20 @@ class Model_Ghost_Ghost extends RedBean_SimpleModel {
 	public static $deleted = false;
 	public function delete() {
 		self::$deleted = true;
+	}
+}
+
+class FaultyWriter extends RedBean_QueryWriter_MySQL {
+	
+	protected $sqlState;
+	
+	public function setSQLState($sqlState) {
+		$this->sqlState = $sqlState;
+	}
+	
+	public function addConstraintForTypes($sourceType, $destType) {
+		$exception = new RedBean_Exception_SQL;
+		$exception->setSQLState($this->sqlState);
+		throw $exception;
 	}
 }
