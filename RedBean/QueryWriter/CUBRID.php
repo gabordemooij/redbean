@@ -36,6 +36,87 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
   	protected $quoteCharacter = '`';
 	
 	/**
+	 * Obtains the keys of a table using the PDO schema function.
+	 * 
+	 * @param type $table
+	 * @return type 
+	 */
+	protected function getKeys($table, $table2 = null) {
+		$pdo = $this->adapter->getDatabase()->getPDO();
+		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS, $table);
+		if ($table2) {
+			$keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS, $table2));
+		}
+		return $keys;
+	}
+	/**
+	 * Add the constraints for a specific database driver: CUBRID
+	 *
+	 * @param string $table     table
+	 * @param string $table1    table1
+	 * @param string $table2    table2
+	 * @param string $property1 property1
+	 * @param string $property2 property2
+	 *
+	 * @return boolean
+	 */
+	protected function constrain($table, $table1, $table2, $property1, $property2) {
+		$writer = $this;
+		$adapter = $this->adapter;
+		$firstState = $this->buildFK($table, $table1, $property1, 'id', true);
+		$secondState = $this->buildFK($table, $table2, $property2, 'id', true);
+		return ($firstState && $secondState);
+	}
+	
+	/**
+	 * This method adds a foreign key from type and field to
+	 * target type and target field.
+	 * The foreign key is created without an action. On delete/update
+	 * no action will be triggered. The FK is only used to allow database
+	 * tools to generate pretty diagrams and to make it easy to add actions
+	 * later on.
+	 * This methods accepts a type and infers the corresponding table name.
+	 *
+	 *
+	 * @param  string $type	       type that will have a foreign key field
+	 * @param  string $targetType  points to this type
+	 * @param  string $field       field that contains the foreign key value
+	 * @param  string $targetField field where the fk points to
+	 *
+	 * @return void
+	 */
+	protected function buildFK($type, $targetType, $field, $targetField, $isDep = false) {
+		$table = $this->esc($type);
+		$tableNoQ = $this->esc($type, true);
+		$targetTable = $this->esc($targetType);
+		$targetTableNoQ = $this->esc($targetType, true);
+		$column = $this->esc($field);
+		$columnNoQ = $this->esc($field, true);
+		$targetColumn  = $this->esc($targetField);
+		$targetColumnNoQ  = $this->esc($targetField, true);
+		$keys = $this->getKeys($targetTableNoQ, $tableNoQ);
+		$needsToAddFK = true;
+		$needsToDropFK = false;
+		foreach($keys as $key) {
+			if ($key['FKTABLE_NAME'] == $tableNoQ && $key['FKCOLUMN_NAME'] == $columnNoQ) { 
+				//already has an FK
+				$needsToDropFK = true;
+				if ((($isDep && $key['DELETE_RULE'] == 0) || (!$isDep && $key['DELETE_RULE'] == 3))) {
+					return false;
+				}
+				break;
+			}
+		}	
+		if ($needsToDropFK) {
+			$sql = "ALTER TABLE $table DROP FOREIGN KEY {$key['FK_NAME']} ";
+			$this->adapter->exec($sql);
+		}
+		$casc = ($isDep ? 'CASCADE' : 'SET NULL');
+		$sql = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
+		$this->adapter->exec($sql);
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param RedBean_Adapter $adapter Database Adapter
@@ -198,26 +279,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	}
 	
 	/**
-	 * Add the constraints for a specific database driver: CUBRID
-	 * @todo Too many arguments; find a way to solve this in a neater way.
-	 *
-	 * @param string $table     table
-	 * @param string $table1    table1
-	 * @param string $table2    table2
-	 * @param string $property1 property1
-	 * @param string $property2 property2
-	 *
-	 * @return boolean
-	 */
-	protected function constrain($table, $table1, $table2, $property1, $property2) {
-		$writer = $this;
-		$adapter = $this->adapter;
-		$firstState = $this->buildFK($table, $table1, $property1, 'id', true);
-		$secondState = $this->buildFK($table, $table2, $property2, 'id', true);
-		return ($firstState && $secondState);
-	}
-	
-	/**
 	 * @see RedBean_QueryWriter::addIndex
 	 */
 	public function addIndex($type, $name, $column) {
@@ -237,55 +298,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function addFK($type, $targetType, $field, $targetField, $isDependent = false) {
 		return $this->buildFK($type, $targetType, $field, $targetField, $isDependent);
-	}
-	
-	/**
-	 * This method adds a foreign key from type and field to
-	 * target type and target field.
-	 * The foreign key is created without an action. On delete/update
-	 * no action will be triggered. The FK is only used to allow database
-	 * tools to generate pretty diagrams and to make it easy to add actions
-	 * later on.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 *
-	 * @param  string $type	       type that will have a foreign key field
-	 * @param  string $targetType  points to this type
-	 * @param  string $field       field that contains the foreign key value
-	 * @param  string $targetField field where the fk points to
-	 *
-	 * @return void
-	 */
-	protected function buildFK($type, $targetType, $field, $targetField, $isDep = false) {
-		$table = $this->esc($type);
-		$tableNoQ = $this->esc($type, true);
-		$targetTable = $this->esc($targetType);
-		$targetTableNoQ = $this->esc($targetType, true);
-		$column = $this->esc($field);
-		$columnNoQ = $this->esc($field, true);
-		$targetColumn  = $this->esc($targetField);
-		$targetColumnNoQ  = $this->esc($targetField, true);
-		$keys = $this->getKeys($targetTableNoQ, $tableNoQ);
-		$needsToAddFK = true;
-		$needsToDropFK = false;
-		foreach($keys as $key) {
-			if ($key['FKTABLE_NAME'] == $tableNoQ && $key['FKCOLUMN_NAME'] == $columnNoQ) { 
-				//already has an FK
-				$needsToDropFK = true;
-				if ((($isDep && $key['DELETE_RULE'] == 0) || (!$isDep && $key['DELETE_RULE'] == 3))) {
-					return false;
-				}
-				break;
-			}
-		}	
-		if ($needsToDropFK) {
-			$sql = "ALTER TABLE $table DROP FOREIGN KEY {$key['FK_NAME']} ";
-			$this->adapter->exec($sql);
-		}
-		$casc = ($isDep ? 'CASCADE' : 'SET NULL');
-		$sql = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
-		$this->adapter->exec($sql);
-	}
+	}	
 	
 	/**
 	 * @see RedBean_QueryWriter::wipeAll
@@ -297,21 +310,6 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			}
 			$this->adapter->exec("DROP TABLE \"$t\"");
 		}
-	}
-	
-	/**
-	 * Obtains the keys of a table using the PDO schema function.
-	 * 
-	 * @param type $table
-	 * @return type 
-	 */
-	protected function getKeys($table, $table2 = null) {
-		$pdo = $this->adapter->getDatabase()->getPDO();
-		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS, $table);
-		if ($table2) {
-			$keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS, $table2));
-		}
-		return $keys;
 	}
 	
 	/**

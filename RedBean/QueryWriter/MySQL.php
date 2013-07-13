@@ -41,6 +41,54 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
   	protected $quoteCharacter = '`';
 
 	/**
+	 * Add the constraints for a specific database driver: MySQL.
+	 * @todo Too many arguments; find a way to solve this in a neater way.
+	 *
+	 * @param string $table     table     table to add constrains to
+	 * @param string $table1    table1    first reference table
+	 * @param string $table2    table2    second reference table
+	 * @param string $property1 property1 first column
+	 * @param string $property2 property2 second column
+	 *
+	 * @return boolean $succes whether the constraint has been applied
+	 */
+	protected function constrain($table, $table1, $table2, $property1, $property2) {
+		try{
+			$db = $this->adapter->getCell('SELECT database()');
+			$fks =  $this->adapter->getCell("
+				SELECT count(*)
+				FROM information_schema.KEY_COLUMN_USAGE
+				WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND
+				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME IS NOT NULL
+					  ", array($db, $table));
+			//already foreign keys added in this association table
+			if ($fks>0) {
+				return false;
+			}
+			$columns = $this->getColumns($table);
+			if ($this->code($columns[$property1]) !== RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
+				$this->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
+			}
+			if ($this->code($columns[$property2]) !== RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
+				$this->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
+			}
+			$sql = "
+				ALTER TABLE ".$this->esc($table)."
+				ADD FOREIGN KEY($property1) references `$table1`(id) ON DELETE CASCADE;
+			";
+			$this->adapter->exec($sql);
+			$sql = "
+				ALTER TABLE ".$this->esc($table)."
+				ADD FOREIGN KEY($property2) references `$table2`(id) ON DELETE CASCADE
+			";
+			$this->adapter->exec($sql);
+			return true;
+		} catch(Exception $e) { 
+			return false; 
+		}
+	}
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param RedBean_Adapter $adapter Database Adapter
@@ -213,54 +261,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list); 
 	}
 
-	/**
-	 * Add the constraints for a specific database driver: MySQL.
-	 * @todo Too many arguments; find a way to solve this in a neater way.
-	 *
-	 * @param string $table     table     table to add constrains to
-	 * @param string $table1    table1    first reference table
-	 * @param string $table2    table2    second reference table
-	 * @param string $property1 property1 first column
-	 * @param string $property2 property2 second column
-	 *
-	 * @return boolean $succes whether the constraint has been applied
-	 */
-	protected function constrain($table, $table1, $table2, $property1, $property2) {
-		try{
-			$db = $this->adapter->getCell('SELECT database()');
-			$fks =  $this->adapter->getCell("
-				SELECT count(*)
-				FROM information_schema.KEY_COLUMN_USAGE
-				WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND
-				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME IS NOT NULL
-					  ", array($db, $table));
-			//already foreign keys added in this association table
-			if ($fks>0) {
-				return false;
-			}
-			$columns = $this->getColumns($table);
-			if ($this->code($columns[$property1]) !== RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
-				$this->widenColumn($table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
-			}
-			if ($this->code($columns[$property2]) !== RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32) {
-				$this->widenColumn($table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32);
-			}
-			$sql = "
-				ALTER TABLE ".$this->esc($table)."
-				ADD FOREIGN KEY($property1) references `$table1`(id) ON DELETE CASCADE;
-			";
-			$this->adapter->exec($sql);
-			$sql = "
-				ALTER TABLE ".$this->esc($table)."
-				ADD FOREIGN KEY($property2) references `$table2`(id) ON DELETE CASCADE
-			";
-			$this->adapter->exec($sql);
-			return true;
-		} catch(Exception $e) { 
-			return false; 
-		}
-	}
-
+	
 	/**
 	 * @see RedBean_QueryWriter::wipeAll
 	 */

@@ -43,16 +43,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	protected $defaultValue = 'DEFAULT';
 	
 	/**
-	* This method returns the datatype to be used for primary key IDS and
-	* foreign keys. Returns one if the data type constants.
-	*
-	* @return integer $const data type to be used for IDS.
-	*/
-	public function getTypeForID() {
-		return self::C_DATATYPE_INTEGER;
-	}
-	
-	/**
 	 * Returns the insert suffix SQL Snippet
 	 *
 	 * @param string $table table
@@ -63,6 +53,52 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		return 'RETURNING id ';
 	}
 	
+	/**
+	 * Add the constraints for a specific database driver: PostgreSQL.
+	 *
+	 * @param string $table     table to add fk constraints to
+	 * @param string $table1    first reference table
+	 * @param string $table2    second refernece table
+	 * @param string $property1 first reference column
+	 * @param string $property2 second reference column
+	 *
+	 * @return boolean
+	 */
+	protected function constrain($table, $table1, $table2, $property1, $property2) {
+		try{
+			$writer = $this;
+			$adapter = $this->adapter;
+			$fkCode = 'fk'.md5($table.$property1.$property2);
+			$sql = "SELECT c.oid, n.nspname, c.relname,
+				n2.nspname, c2.relname, cons.conname
+				FROM pg_class c
+				JOIN pg_namespace n ON n.oid = c.relnamespace
+				LEFT OUTER JOIN pg_constraint cons ON cons.conrelid = c.oid
+				LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
+				LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
+				WHERE c.relkind = 'r'
+					AND n.nspname IN ('public')
+					AND (cons.contype = 'f' OR cons.contype IS NULL)
+					AND (  cons.conname = '{$fkCode}a'	OR  cons.conname = '{$fkCode}b' )
+			";
+			$rows = $adapter->get($sql);
+			if (!count($rows)) {
+				$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
+					{$fkCode}a FOREIGN KEY ($property1)
+					REFERENCES \"$table1\" (id) ON DELETE CASCADE ";
+				$sql2 = "ALTER TABLE \"$table\" ADD CONSTRAINT
+					{$fkCode}b FOREIGN KEY ($property2)
+					REFERENCES \"$table2\" (id) ON DELETE CASCADE ";
+				$adapter->exec($sql1);
+				$adapter->exec($sql2);
+			}
+			return true;
+		}
+		catch(Exception $e){ 
+			return false; 
+		}
+	}
+
 	/**
 	 * Constructor
 	 * 
@@ -85,6 +121,16 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			$this->sqltype_typeno[trim(strtolower($v))] = $k;
 		}
 		$this->adapter = $adapter;
+	}
+	
+	/**
+	 * This method returns the datatype to be used for primary key IDS and
+	 * foreign keys. Returns one if the data type constants.
+	 *
+	 *  @return integer $const data type to be used for IDS.
+	 */
+	public function getTypeForID() {
+		return self::C_DATATYPE_INTEGER;
 	}
 	
 	/**
@@ -288,52 +334,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			}
 			return false;
 		} catch(Exception $e){ 
-			return false; 
-		}
-	}
-
-	/**
-	 * Add the constraints for a specific database driver: PostgreSQL.
-	 *
-	 * @param string $table     table to add fk constraints to
-	 * @param string $table1    first reference table
-	 * @param string $table2    second refernece table
-	 * @param string $property1 first reference column
-	 * @param string $property2 second reference column
-	 *
-	 * @return boolean
-	 */
-	protected function constrain($table, $table1, $table2, $property1, $property2) {
-		try{
-			$writer = $this;
-			$adapter = $this->adapter;
-			$fkCode = 'fk'.md5($table.$property1.$property2);
-			$sql = "SELECT c.oid, n.nspname, c.relname,
-				n2.nspname, c2.relname, cons.conname
-				FROM pg_class c
-				JOIN pg_namespace n ON n.oid = c.relnamespace
-				LEFT OUTER JOIN pg_constraint cons ON cons.conrelid = c.oid
-				LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
-				LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
-				WHERE c.relkind = 'r'
-					AND n.nspname IN ('public')
-					AND (cons.contype = 'f' OR cons.contype IS NULL)
-					AND (  cons.conname = '{$fkCode}a'	OR  cons.conname = '{$fkCode}b' )
-			";
-			$rows = $adapter->get($sql);
-			if (!count($rows)) {
-				$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
-					{$fkCode}a FOREIGN KEY ($property1)
-					REFERENCES \"$table1\" (id) ON DELETE CASCADE ";
-				$sql2 = "ALTER TABLE \"$table\" ADD CONSTRAINT
-					{$fkCode}b FOREIGN KEY ($property2)
-					REFERENCES \"$table2\" (id) ON DELETE CASCADE ";
-				$adapter->exec($sql1);
-				$adapter->exec($sql2);
-			}
-			return true;
-		}
-		catch(Exception $e){ 
 			return false; 
 		}
 	}

@@ -24,15 +24,6 @@ class RedBean_Preloader {
 	protected $oodb;
 	
 	/**
-	 * Constructor
-	 * @param RedBean_OODB $oodb
-	 */
-	public function __construct($oodb) {
-		$this->oodb = $oodb;
-		$this->assocManager = $oodb->getAssociationManager();
-	}
-	
-	/**
 	 * Extracts the type list for preloader.
 	 * 
 	 * @param array|string $typeList
@@ -205,6 +196,15 @@ class RedBean_Preloader {
 			}
 		}
 		return $list;
+	}
+	
+	/**
+	 * Constructor
+	 * @param RedBean_OODB $oodb
+	 */
+	public function __construct($oodb) {
+		$this->oodb = $oodb;
+		$this->assocManager = $oodb->getAssociationManager();
 	}
 	
 	/**

@@ -35,71 +35,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	const C_DATATYPE_SPECIFIED = 99;
 	
 	/**
-	 * Constructor
-	 * 
-	 * @param RedBean_Adapter $adapter Database Adapter
-	 */
-	public function __construct(RedBean_Adapter $adapter) {
-		$this->typeno_sqltype = array(
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER => 'INTEGER',
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC => 'NUMERIC',
-			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT => 'TEXT',
-		);
-		$this->sqltype_typeno = array();
-		foreach($this->typeno_sqltype as $k => $v)
-		$this->sqltype_typeno[$v] = $k;
-		$this->adapter = $adapter;
-	}
-	
-	/**
-	 * This method returns the datatype to be used for primary key IDS and
-	 * foreign keys. Returns one if the data type constants.
-	 *
-	 * @return integer $const data type to be used for IDS.
-	 */
-	public function getTypeForID() {
-		return self::C_DATATYPE_INTEGER;
-	}
-	
-	/**
-	 * @see RedBean_QueryWriter::scanType
-	 */
-	public function scanType($value, $flagSpecial = false) {
-		$this->svalue = $value;
-		if ($value === false) return self::C_DATATYPE_INTEGER;
-		if ($value === null) return self::C_DATATYPE_INTEGER;
-		if ($this->startsWithZeros($value)) return self::C_DATATYPE_TEXT;
-		if (is_numeric($value) && (intval($value) == $value) && $value<2147483648) return self::C_DATATYPE_INTEGER;
-		if ((is_numeric($value) && $value < 2147483648)
-				  || preg_match('/\d{4}\-\d\d\-\d\d/', $value)
-				  || preg_match('/\d{4}\-\d\d\-\d\d\s\d\d:\d\d:\d\d/', $value)
-		) {
-			return self::C_DATATYPE_NUMERIC;
-		}
-		return self::C_DATATYPE_TEXT;
-	}
-	
-	/**
-	 * @see RedBean_QueryWriter::addColumn
-	 */
-	public function addColumn($table, $column, $type) {
-		$column = $this->check($column);
-		$table = $this->check($table);
-		$type = $this->typeno_sqltype[$type];
-		$sql = "ALTER TABLE `$table` ADD `$column` $type ";
-		$this->adapter->exec($sql);
-	}
-	
-	/**
-	 * @see RedBean_QueryWriter::code
-	 */
-	public function code($typedescription, $includeSpecials = false) {
-		$r =  ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
-		if ($includeSpecials) return $r;
-		return $r;
-	}
-	
-	/**
 	 * Gets all information about a table (from a type).
 	 * 
 	 * Format:
@@ -168,44 +103,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$q[] = "PRAGMA foreign_keys = 1 ";
 		foreach($q as $sq) $this->adapter->exec($sq);
 	}
-
-	/**
-	 * @see RedBean_QueryWriter::widenColumn
-	 */
-	public function widenColumn($type, $column, $datatype) {
-		$t = $this->getTable($type);
-		$t['columns'][$column] = $this->typeno_sqltype[$datatype];
-		$this->putTable($t);
-	}
-
-	/**
-	 * @see RedBean_QueryWriter::getTables();
-	 */
-	public function getTables() {
-		return $this->adapter->getCol("SELECT name FROM sqlite_master
-			WHERE type='table' AND name!='sqlite_sequence';");
-	}
-
-	/**
-	 * @see RedBean_QueryWriter::createTable
-	 */
-	public function createTable($table) {
-		$table = $this->esc($table);
-		$sql = "CREATE TABLE $table ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ";
-		$this->adapter->exec($sql);
-	}
-
-	/**
-	 * @see RedBean_QueryWriter::getColumns
-	 */
-	public function getColumns($table) {
-		$table = $this->esc($table, true);
-		$columnsRaw = $this->adapter->get("PRAGMA table_info('$table')");
-		$columns = array();
-		foreach($columnsRaw as $r) $columns[$r['name']] = $r['type'];
-		return $columns;
-	}
-
+	
 	/**
 	 * Returns the indexes for type $type.
 	 * 
@@ -240,59 +138,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		}
 		return $keyInfoList;
 	}
-
-	/**
-	 * @see RedBean_QueryWriter::addUniqueIndex
-	 */
-	public function addUniqueIndex($type, $columns) {
-		$table = $this->esc($type, true);
-		$name = 'UQ_'.$table.implode('__', $columns);
-		$t = $this->getTable($type);
-		if (isset($t['indexes'][$name])) return;
-		$t['indexes'][$name] = array('name' => $name);
-		$this->putTable($t);
-	}
-
-	/**
-	 * @see RedBean_QueryWriter::sqlStateIn
-	 */
-	public function sqlStateIn($state, $list) {
-		$stateMap = array(
-			'HY000' => RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'23000' => RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
-		);
-		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list);
-	}
-
-	/**
-	 * @see RedBean_QueryWriter::addIndex
-	 */
-	public function addIndex($type, $name, $column) {
-		$table = $type;
-		$table = $this->esc($table);
-		$name = preg_replace('/\W/', '', $name);
-		$column = $this->esc($column, true);
-		foreach($this->adapter->get("PRAGMA INDEX_LIST($table) ") as $ind) if ($ind['name'] === $name) return;
-		$t = $this->getTable($type);
-		$t['indexes'][$name] = array('name' => $column);
-		return $this->putTable($t);
-	}
-
-	/**
-	 * @see RedBean_QueryWriter::wipe
-	 */
-	public function wipe($type) {
-		$table = $this->esc($type);
-		$this->adapter->exec("DELETE FROM $table");
-	}
-
-	/**
-	 * @see RedBean_QueryWriter::addFK
-	 */
-	public function addFK($type, $targetType, $field, $targetField, $isDep = false) {
-		return $this->buildFK($type, $targetType, $field, $targetField, $isDep);
-	}
-
+	
 	/**
 	 * Adds a foreign key to a type
 	 *
@@ -345,6 +191,160 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$firstState = $this->buildFK($table, $table1, $property1, 'id', true);
 		$secondState = $this->buildFK($table, $table2, $property2, 'id', true);
 		return ($firstState && $secondState);
+	}
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param RedBean_Adapter $adapter Database Adapter
+	 */
+	public function __construct(RedBean_Adapter $adapter) {
+		$this->typeno_sqltype = array(
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER => 'INTEGER',
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC => 'NUMERIC',
+			  RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT => 'TEXT',
+		);
+		$this->sqltype_typeno = array();
+		foreach($this->typeno_sqltype as $k => $v)
+		$this->sqltype_typeno[$v] = $k;
+		$this->adapter = $adapter;
+	}
+	
+	/**
+	 * This method returns the datatype to be used for primary key IDS and
+	 * foreign keys. Returns one if the data type constants.
+	 *
+	 * @return integer $const data type to be used for IDS.
+	 */
+	public function getTypeForID() {
+		return self::C_DATATYPE_INTEGER;
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::scanType
+	 */
+	public function scanType($value, $flagSpecial = false) {
+		$this->svalue = $value;
+		if ($value === false) return self::C_DATATYPE_INTEGER;
+		if ($value === null) return self::C_DATATYPE_INTEGER;
+		if ($this->startsWithZeros($value)) return self::C_DATATYPE_TEXT;
+		if (is_numeric($value) && (intval($value) == $value) && $value<2147483648) return self::C_DATATYPE_INTEGER;
+		if ((is_numeric($value) && $value < 2147483648)
+				  || preg_match('/\d{4}\-\d\d\-\d\d/', $value)
+				  || preg_match('/\d{4}\-\d\d\-\d\d\s\d\d:\d\d:\d\d/', $value)
+		) {
+			return self::C_DATATYPE_NUMERIC;
+		}
+		return self::C_DATATYPE_TEXT;
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::addColumn
+	 */
+	public function addColumn($table, $column, $type) {
+		$column = $this->check($column);
+		$table = $this->check($table);
+		$type = $this->typeno_sqltype[$type];
+		$sql = "ALTER TABLE `$table` ADD `$column` $type ";
+		$this->adapter->exec($sql);
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::code
+	 */
+	public function code($typedescription, $includeSpecials = false) {
+		$r =  ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : 99);
+		if ($includeSpecials) return $r;
+		return $r;
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::widenColumn
+	 */
+	public function widenColumn($type, $column, $datatype) {
+		$t = $this->getTable($type);
+		$t['columns'][$column] = $this->typeno_sqltype[$datatype];
+		$this->putTable($t);
+	}
+
+	/**
+	 * @see RedBean_QueryWriter::getTables();
+	 */
+	public function getTables() {
+		return $this->adapter->getCol("SELECT name FROM sqlite_master
+			WHERE type='table' AND name!='sqlite_sequence';");
+	}
+
+	/**
+	 * @see RedBean_QueryWriter::createTable
+	 */
+	public function createTable($table) {
+		$table = $this->esc($table);
+		$sql = "CREATE TABLE $table ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ";
+		$this->adapter->exec($sql);
+	}
+
+	/**
+	 * @see RedBean_QueryWriter::getColumns
+	 */
+	public function getColumns($table) {
+		$table = $this->esc($table, true);
+		$columnsRaw = $this->adapter->get("PRAGMA table_info('$table')");
+		$columns = array();
+		foreach($columnsRaw as $r) $columns[$r['name']] = $r['type'];
+		return $columns;
+	}
+
+	/**
+	 * @see RedBean_QueryWriter::addUniqueIndex
+	 */
+	public function addUniqueIndex($type, $columns) {
+		$table = $this->esc($type, true);
+		$name = 'UQ_'.$table.implode('__', $columns);
+		$t = $this->getTable($type);
+		if (isset($t['indexes'][$name])) return;
+		$t['indexes'][$name] = array('name' => $name);
+		$this->putTable($t);
+	}
+
+	/**
+	 * @see RedBean_QueryWriter::sqlStateIn
+	 */
+	public function sqlStateIn($state, $list) {
+		$stateMap = array(
+			'HY000' => RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			'23000' => RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+		);
+		return in_array((isset($stateMap[$state]) ? $stateMap[$state] : '0'), $list);
+	}
+
+	/**
+	 * @see RedBean_QueryWriter::addIndex
+	 */
+	public function addIndex($type, $name, $column) {
+		$table = $type;
+		$table = $this->esc($table);
+		$name = preg_replace('/\W/', '', $name);
+		$column = $this->esc($column, true);
+		foreach($this->adapter->get("PRAGMA INDEX_LIST($table) ") as $ind) if ($ind['name'] === $name) return;
+		$t = $this->getTable($type);
+		$t['indexes'][$name] = array('name' => $column);
+		return $this->putTable($t);
+	}
+
+	/**
+	 * @see RedBean_QueryWriter::wipe
+	 */
+	public function wipe($type) {
+		$table = $this->esc($type);
+		$this->adapter->exec("DELETE FROM $table");
+	}
+
+	/**
+	 * @see RedBean_QueryWriter::addFK
+	 */
+	public function addFK($type, $targetType, $field, $targetField, $isDep = false) {
+		return $this->buildFK($type, $targetType, $field, $targetField, $isDep);
 	}
 
 	/**

@@ -18,11 +18,6 @@
 abstract class RedBean_QueryWriter_AQueryWriter {
 	
 	/**
-	 * @var array
-	 */
-	public $typeno_sqltype = array();
-	
-	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
@@ -53,6 +48,130 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	protected static $renames = array();
 	
 	/**
+	 * @var array
+	 */
+	public $typeno_sqltype = array();
+	
+		/**
+	 * Returns a cache key for the cache values passed.
+	 * This method returns a fingerprint string to be used as a key to store
+	 * data in the writer cache.
+	 * 
+	 * @param array $keyValues
+	 * @return string
+	 */
+	private function getCacheKey($keyValues) {
+		return serialize($keyValues);
+	}
+	
+	/**
+	 * Returns the values associated with the provided cache tag and key.
+	 * 
+	 * @param string $cacheTag
+	 * @param string $key
+	 * 
+	 * @return mixed
+	 */
+	private function getCached($cacheTag, $key) {
+		$sql = $this->adapter->getSQL();
+		if (strpos($sql, '-- keep-cache') !== strlen($sql)-13) {
+			//If SQL has been taken place outside of this method then something else then
+			//a select query might have happened! (or instruct to keep cache)
+			$this->cache = array();
+		} else {
+			if (isset($this->cache[$cacheTag][$key])) {
+				return $this->cache[$cacheTag][$key];
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Stores data from the writer in the cache under a specific key and cache tag.
+	 * A cache tag is used to make sure the cache remains consistent. In most cases the cache tag
+	 * will be the bean type, this makes sure queries associated with a certain reference type will
+	 * never contain conflicting data.
+	 * You can only store one item under a cache tag. Why not use the cache tag as a key? Well
+	 * we need to make sure the cache contents fits the key (and key is based on the cache values).
+	 * Otherwise it would be possible to store two different result sets under the same key (the cache tag).
+	 * 
+	 * @param string $cacheTag cache tag (secondary key)
+	 * @param string $key      key
+	 * @param array  $values   content to be stored
+	 */
+	private function putResultInCache($cacheTag, $key, $values) {
+		$this->cache[$cacheTag] = array(
+			 $key => $values
+		);
+	}
+	
+	/**
+	 * Creates an SQL snippet from a list of conditions of format:
+	 * 
+	 * array(
+	 *    key => array( 
+	 *		   value1, value2, value3 ....
+	 *		)
+	 * )
+	 * @param array   $conditions
+	 * @param array   $params
+	 * @param string  $addSql
+	 * 
+	 * @return string
+	 */
+	private function makeSQLFromConditions($conditions, &$params, $addSql = '') {
+		$sqlConditions = array();
+		foreach($conditions as $column => $values) {
+			if (!count($values)) continue;
+			$sql = $this->esc($column);
+			$sql .= ' IN ( ';
+			if (!is_array($values)) {
+				$values = array($values);
+			}
+			//if it's safe to skip bindings, do so...
+			if (preg_match('/^\d+$/', implode('', $values))) {
+				$sql .= implode(',', $values).' ) ';
+				//only numeric, cant do much harm.
+				$sqlConditions[] = $sql;
+			} else { 
+				$sql .= implode(',', array_fill(0, count($values), '?')).' ) ';
+				$sqlConditions[] = $sql;
+				foreach($values as $k => $v) {
+					$values[$k] = strval($v);
+					array_unshift($params, $v);
+				}
+			}
+		}
+		$sql = '';
+		if (is_array($sqlConditions) && count($sqlConditions)>0) {
+			$sql = implode(' AND ', $sqlConditions);
+			$sql = " WHERE ( $sql ) ";
+			if ($addSql) $sql .= $addSql;
+		} elseif ($addSql) {
+			$sql = $addSql;
+		}
+		return $sql;
+	}
+	
+	/**
+	 * Returns the table names and column names for a relational query.
+	 *  
+	 * @param string $sourceType
+	 * @param string $destType
+	 * @param boolean $noQuote
+	 * 
+	 * @return array
+	 */
+	private function getRelationalTablesAndColumns($sourceType, $destType, $noQuote = false) {
+		$linkTable = $this->esc($this->getAssocTable(array($sourceType, $destType)), $noQuote);
+		$sourceCol = $this->esc($sourceType.'_id', $noQuote);
+		$destCol = ($sourceType === $destType) ? $this->esc($destType.'2_id', $noQuote) : $this->esc($destType.'_id', $noQuote);
+		$sourceTable = $this->esc($sourceType, $noQuote);
+		$destTable = $this->esc($destType, $noQuote);
+		return array($sourceTable, $destTable, $linkTable, $sourceCol, $destCol);
+	}
+	
+	/**
 	 * Returns the sql that should follow an insert statement.
 	 *
 	 * @param string $table name
@@ -62,6 +181,99 @@ abstract class RedBean_QueryWriter_AQueryWriter {
   	protected function getInsertSuffix ($table) {
     	return '';
   	}
+	
+	/**
+	 * Checks whether a value starts with zeros. In this case
+	 * the value should probably be stored using a text datatype instead of a
+	 * numerical type in order to preserve the zeros.
+	 * 
+	 * @param string $value value to be checked.
+	 */
+	protected function startsWithZeros($value) {
+		$value = strval($value);
+		if (strlen($value)>1 && strpos($value, '0') === 0 && strpos($value, '0.') !==0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Inserts a record into the database using a series of insert columns
+	 * and corresponding insertvalues. Returns the insert id.
+	 *
+	 * @param string $table			  table to perform query on
+	 * @param array  $insertcolumns columns to be inserted
+	 * @param array  $insertvalues  values to be inserted
+	 *
+	 * @return integer $insertid	  insert id from driver, new record id
+	 */
+	protected function insertRecord($type, $insertcolumns, $insertvalues) {
+		$default = $this->defaultValue;
+		$suffix = $this->getInsertSuffix($type);
+		$table = $this->esc($type);
+		if (count($insertvalues) > 0 && is_array($insertvalues[0]) && count($insertvalues[0]) > 0) {
+			foreach($insertcolumns as $k => $v) {
+				$insertcolumns[$k] = $this->esc($v);
+			}
+			$insertSQL = "INSERT INTO $table ( id, ".implode(',', $insertcolumns)." ) VALUES 
+			( $default, ". implode(',', array_fill(0, count($insertcolumns), ' ? '))." ) $suffix";
+			foreach($insertvalues as $i => $insertvalue) {
+				$ids[] = $this->adapter->getCell($insertSQL, $insertvalue, $i);
+			}
+			$result = count($ids) === 1 ? array_pop($ids) : $ids;
+		} else {
+			$result = $this->adapter->getCell("INSERT INTO $table (id) VALUES($default) $suffix");
+		}
+		if ($suffix) return $result;
+		$last_id = $this->adapter->getInsertID();
+		return $last_id;
+	}
+	
+	/**
+	 * Checks table name or column name.
+	 *
+	 * @param string $table table string
+	 *
+	 * @return string $table escaped string
+	 */
+	protected function check($struct) {
+		if (!preg_match('/^[a-zA-Z0-9_]+$/', $struct)) {
+		  throw new RedBean_Exception_Security('Identifier does not conform to RedBeanPHP security policies.');
+	    }
+		return $struct;
+	}
+	
+	/**
+	 * Checks whether a number can be treated like an int.
+	 *
+	 * @param  string $value string representation of a certain value
+	 *
+	 * @return boolean $value boolean result of analysis
+	 */
+	public static function canBeTreatedAsInt($value) {
+		return (boolean) (ctype_digit(strval($value)) && strval($value) === strval(intval($value)));
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::getAssocTableFormat
+	 */
+	public static function getAssocTableFormat($types) {
+		sort($types);
+		$assoc = (implode('_', $types));
+		return (isset(self::$renames[$assoc])) ? self::$renames[$assoc] : $assoc;
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::renameAssociation
+	 */
+	public static function renameAssociation($from, $to = null) {
+		if (is_array($from)) {
+			foreach($from as $key => $value) self::$renames[$key] = $value;
+			return;
+		}
+		self::$renames[$from] = $to;
+	}
 	
 	/**
 	 * Glues an SQL snippet to the beginning of a WHERE clause.
@@ -113,19 +325,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$this->check($dbStructure);
 		return ($dontQuote) ? $dbStructure : $this->quoteCharacter.$dbStructure.$this->quoteCharacter;
 	}
-	/**
-	 * Checks table name or column name.
-	 *
-	 * @param string $table table string
-	 *
-	 * @return string $table escaped string
-	 */
-	protected function check($struct) {
-		if (!preg_match('/^[a-zA-Z0-9_]+$/', $struct)) {
-		  throw new RedBean_Exception_Security('Identifier does not conform to RedBeanPHP security policies.');
-	    }
-		return $struct;
-	}
 	
 	/**
 	 * @see RedBean_QueryWriter::addColumn
@@ -167,37 +366,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$v[] = $id;
 		$this->adapter->exec($sql, $v);
 		return $id;
-	}
-	/**
-	 * Inserts a record into the database using a series of insert columns
-	 * and corresponding insertvalues. Returns the insert id.
-	 *
-	 * @param string $table			  table to perform query on
-	 * @param array  $insertcolumns columns to be inserted
-	 * @param array  $insertvalues  values to be inserted
-	 *
-	 * @return integer $insertid	  insert id from driver, new record id
-	 */
-	protected function insertRecord($type, $insertcolumns, $insertvalues) {
-		$default = $this->defaultValue;
-		$suffix = $this->getInsertSuffix($type);
-		$table = $this->esc($type);
-		if (count($insertvalues) > 0 && is_array($insertvalues[0]) && count($insertvalues[0]) > 0) {
-			foreach($insertcolumns as $k => $v) {
-				$insertcolumns[$k] = $this->esc($v);
-			}
-			$insertSQL = "INSERT INTO $table ( id, ".implode(',', $insertcolumns)." ) VALUES 
-			( $default, ". implode(',', array_fill(0, count($insertcolumns), ' ? '))." ) $suffix";
-			foreach($insertvalues as $i => $insertvalue) {
-				$ids[] = $this->adapter->getCell($insertSQL, $insertvalue, $i);
-			}
-			$result = count($ids) === 1 ? array_pop($ids) : $ids;
-		} else {
-			$result = $this->adapter->getCell("INSERT INTO $table (id) VALUES($default) $suffix");
-		}
-		if ($suffix) return $result;
-		$last_id = $this->adapter->getInsertID();
-		return $last_id;
 	}
 	
 	/**
@@ -367,125 +535,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 	
 	/**
-	 * Returns a cache key for the cache values passed.
-	 * This method returns a fingerprint string to be used as a key to store
-	 * data in the writer cache.
-	 * 
-	 * @param array $keyValues
-	 * @return string
-	 */
-	private function getCacheKey($keyValues) {
-		return serialize($keyValues);
-	}
-	
-	/**
-	 * Returns the values associated with the provided cache tag and key.
-	 * 
-	 * @param string $cacheTag
-	 * @param string $key
-	 * 
-	 * @return mixed
-	 */
-	private function getCached($cacheTag, $key) {
-		$sql = $this->adapter->getSQL();
-		if (strpos($sql, '-- keep-cache') !== strlen($sql)-13) {
-			//If SQL has been taken place outside of this method then something else then
-			//a select query might have happened! (or instruct to keep cache)
-			$this->cache = array();
-		} else {
-			if (isset($this->cache[$cacheTag][$key])) {
-				return $this->cache[$cacheTag][$key];
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * Stores data from the writer in the cache under a specific key and cache tag.
-	 * A cache tag is used to make sure the cache remains consistent. In most cases the cache tag
-	 * will be the bean type, this makes sure queries associated with a certain reference type will
-	 * never contain conflicting data.
-	 * You can only store one item under a cache tag. Why not use the cache tag as a key? Well
-	 * we need to make sure the cache contents fits the key (and key is based on the cache values).
-	 * Otherwise it would be possible to store two different result sets under the same key (the cache tag).
-	 * 
-	 * @param string $cacheTag cache tag (secondary key)
-	 * @param string $key      key
-	 * @param array  $values   content to be stored
-	 */
-	private function putResultInCache($cacheTag, $key, $values) {
-		$this->cache[$cacheTag] = array(
-			 $key => $values
-		);
-	}
-	
-	/**
-	 * Creates an SQL snippet from a list of conditions of format:
-	 * 
-	 * array(
-	 *    key => array( 
-	 *		   value1, value2, value3 ....
-	 *		)
-	 * )
-	 * @param array   $conditions
-	 * @param array   $params
-	 * @param string  $addSql
-	 * 
-	 * @return string
-	 */
-	private function makeSQLFromConditions($conditions, &$params, $addSql = '') {
-		$sqlConditions = array();
-		foreach($conditions as $column => $values) {
-			if (!count($values)) continue;
-			$sql = $this->esc($column);
-			$sql .= ' IN ( ';
-			if (!is_array($values)) {
-				$values = array($values);
-			}
-			//if it's safe to skip bindings, do so...
-			if (preg_match('/^\d+$/', implode('', $values))) {
-				$sql .= implode(',', $values).' ) ';
-				//only numeric, cant do much harm.
-				$sqlConditions[] = $sql;
-			} else { 
-				$sql .= implode(',', array_fill(0, count($values), '?')).' ) ';
-				$sqlConditions[] = $sql;
-				foreach($values as $k => $v) {
-					$values[$k] = strval($v);
-					array_unshift($params, $v);
-				}
-			}
-		}
-		$sql = '';
-		if (is_array($sqlConditions) && count($sqlConditions)>0) {
-			$sql = implode(' AND ', $sqlConditions);
-			$sql = " WHERE ( $sql ) ";
-			if ($addSql) $sql .= $addSql;
-		} elseif ($addSql) {
-			$sql = $addSql;
-		}
-		return $sql;
-	}
-	
-	/**
-	 * Returns the table names and column names for a relational query.
-	 *  
-	 * @param string $sourceType
-	 * @param string $destType
-	 * @param boolean $noQuote
-	 * 
-	 * @return array
-	 */
-	private function getRelationalTablesAndColumns($sourceType, $destType, $noQuote = false) {
-		$linkTable = $this->esc($this->getAssocTable(array($sourceType, $destType)), $noQuote);
-		$sourceCol = $this->esc($sourceType.'_id', $noQuote);
-		$destCol = ($sourceType === $destType) ? $this->esc($destType.'2_id', $noQuote) : $this->esc($destType.'_id', $noQuote);
-		$sourceTable = $this->esc($sourceType, $noQuote);
-		$destTable = $this->esc($destType, $noQuote);
-		return array($sourceTable, $destTable, $linkTable, $sourceCol, $destCol);
-	}
-	
-	/**
 	 * @see RedBean_QueryWriter::deleteRelations
 	 */
 	public function deleteRelations($sourceType, $destType, $sourceID) {
@@ -509,17 +558,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function wipe($type) {
 		$table = $this->esc($type);
 		$this->adapter->exec("TRUNCATE $table ");
-	}
-
-	/**
-	 * Checks whether a number can be treated like an int.
-	 *
-	 * @param  string $value string representation of a certain value
-	 *
-	 * @return boolean $value boolean result of analysis
-	 */
-	public static function canBeTreatedAsInt($value) {
-		return (boolean) (ctype_digit(strval($value)) && strval($value) === strval(intval($value)));
 	}
 
 	/**
@@ -562,30 +600,10 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 	
 	/**
-	 * @see RedBean_QueryWriter::renameAssociation
-	 */
-	public static function renameAssociation($from, $to = null) {
-		if (is_array($from)) {
-			foreach($from as $key => $value) self::$renames[$key] = $value;
-			return;
-		}
-		self::$renames[$from] = $to;
-	}
-	
-	/**
 	 * @see RedBean_QueryWriter::renameAssocTable
 	 */
 	public function renameAssocTable($from, $to = null) {
 		return self::renameAssociation($from, $to);
-	}
-	
-	/**
-	 * @see RedBean_QueryWriter::getAssocTableFormat
-	 */
-	public static function getAssocTableFormat($types) {
-		sort($types);
-		$assoc = (implode('_', $types));
-		return (isset(self::$renames[$assoc])) ? self::$renames[$assoc] : $assoc;
 	}
 	
 	/**
@@ -601,22 +619,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	public function addConstraintForTypes($sourceType, $destType) {
 		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType, true);
 		return $this->constrain($linkTable, $sourceTable, $destTable, $sourceCol, $destCol);
-	}
-	
-	/**
-	 * Checks whether a value starts with zeros. In this case
-	 * the value should probably be stored using a text datatype instead of a
-	 * numerical type in order to preserve the zeros.
-	 * 
-	 * @param string $value value to be checked.
-	 */
-	protected function startsWithZeros($value) {
-		$value = strval($value);
-		if (strlen($value)>1 && strpos($value, '0') === 0 && strpos($value, '0.') !==0) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 	
 	/**

@@ -19,6 +19,12 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 	protected $logs = array();
 	
 	/**
+	 * Singleton pattern
+	 * Constructor - private
+	 */
+	private function __construct(){}
+	
+	/**
 	 * Creates a new instance of the Query Logger and attaches
 	 * this logger to the adapter.
 	 *
@@ -32,12 +38,6 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin {
 		$adapter->addEventListener('sql_exec', $queryLog);
 		return $queryLog;
 	}
-	
-	/**
-	 * Singleton pattern
-	 * Constructor - private
-	 */
-	private function __construct(){}
 	
 	/**
 	 * Implementation of the onEvent() method for Observer interface.

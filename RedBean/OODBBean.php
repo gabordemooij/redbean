@@ -84,6 +84,82 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	private $via = NULL;
 	
+	/** Returns the alias for a type
+	 *
+	 * @param  $type aliased type
+	 *
+	 * @return string $type type
+	 */
+	private function getAlias($type) {
+		if ($this->fetchType) {
+			$type = $this->fetchType;
+			$this->fetchType = null;
+		}
+		return $type;
+	}
+	
+	/**
+	* Internal method.
+	* Obtains a shared list for a certain type.
+	*
+	* @param string $type the name of the list you want to retrieve.
+	*
+	* @return array
+	*/
+	private function getSharedList($type) {
+		$toolbox = $this->beanHelper->getToolbox();
+		$redbean = $toolbox->getRedBean();
+		$writer = $toolbox->getWriter();
+		if ($this->via) {
+			$oldName = $writer->getAssocTable(array($this->__info['type'],$type));
+			if ($oldName !== $this->via) {
+				//set the new renaming rule
+				$writer->renameAssocTable($oldName, $this->via);
+				$this->via = null;
+			} 
+		}
+		$type = $this->beau($type);
+		$types = array($this->__info['type'], $type);
+		$linkID = $this->properties['id'];
+		$assocManager = $redbean->getAssociationManager();
+		$beans = $assocManager->relatedSimple($this, $type, $this->withSql, $this->withParams);
+		$this->withSql = '';
+		$this->withParams = array();
+		return $beans;
+	}
+	
+	/**
+	* Internal method.
+	* Obtains the own list of a certain type.
+	*
+	* @param string $type name of the list you want to retrieve
+	*
+	* @return array
+	*/
+	private function getOwnList($type) {
+		$type = $this->beau($type);
+		if ($this->aliasName) {
+			$parentField = $this->aliasName;
+			$myFieldLink = $this->aliasName.'_id';
+			$this->__info['sys.alias.'.$type] = $this->aliasName;
+			$this->aliasName = null;
+		} else {
+			$myFieldLink = $this->__info['type'].'_id';
+			$parentField = $this->__info['type'];
+		}
+		$beans = array();
+		if ($this->getID()>0) {
+			$params = array_merge(array($this->getID()), $this->withParams);
+			$beans = $this->beanHelper->getToolbox()->getRedBean()->find($type, array(), " $myFieldLink = ? ".$this->withSql, $params);
+		}
+		$this->withSql = '';
+		$this->withParams = array();
+		foreach($beans as $beanFromList) {
+			$beanFromList->__info['sys.parentcache.'.$parentField] = $this;
+		}
+		return $beans;
+	}
+	
 	/**
 	 * By default own-lists and shared-lists no longer have IDs as keys (3.3+),
 	 * this is because exportAll also does not offer this feature and we want the
@@ -104,20 +180,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	public static function setFlagBeautifulColumnNames($flag) {
 		self::$flagUseBeautyCols = (boolean) $flag;
-	}
-	
-	/** Returns the alias for a type
-	 *
-	 * @param  $type aliased type
-	 *
-	 * @return string $type type
-	 */
-	private function getAlias($type) {
-		if ($this->fetchType) {
-			$type = $this->fetchType;
-			$this->fetchType = null;
-		}
-		return $type;
 	}
 	
 	/**
@@ -438,68 +500,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		}
 	}
 	
-	/**
-	* Internal method.
-	* Obtains a shared list for a certain type.
-	*
-	* @param string $type the name of the list you want to retrieve.
-	*
-	* @return array
-	*/
-	private function getSharedList($type) {
-		$toolbox = $this->beanHelper->getToolbox();
-		$redbean = $toolbox->getRedBean();
-		$writer = $toolbox->getWriter();
-		if ($this->via) {
-			$oldName = $writer->getAssocTable(array($this->__info['type'],$type));
-			if ($oldName !== $this->via) {
-				//set the new renaming rule
-				$writer->renameAssocTable($oldName, $this->via);
-				$this->via = null;
-			} 
-		}
-		$type = $this->beau($type);
-		$types = array($this->__info['type'], $type);
-		$linkID = $this->properties['id'];
-		$assocManager = $redbean->getAssociationManager();
-		$beans = $assocManager->relatedSimple($this, $type, $this->withSql, $this->withParams);
-		$this->withSql = '';
-		$this->withParams = array();
-		return $beans;
-	}
-	
-	/**
-	* Internal method.
-	* Obtains the own list of a certain type.
-	*
-	* @param string $type name of the list you want to retrieve
-	*
-	* @return array
-	*/
-	private function getOwnList($type) {
-		$type = $this->beau($type);
-		if ($this->aliasName) {
-			$parentField = $this->aliasName;
-			$myFieldLink = $this->aliasName.'_id';
-			$this->__info['sys.alias.'.$type] = $this->aliasName;
-			$this->aliasName = null;
-		} else {
-			$myFieldLink = $this->__info['type'].'_id';
-			$parentField = $this->__info['type'];
-		}
-		$beans = array();
-		if ($this->getID()>0) {
-			$params = array_merge(array($this->getID()), $this->withParams);
-			$beans = $this->beanHelper->getToolbox()->getRedBean()->find($type, array(), " $myFieldLink = ? ".$this->withSql, $params);
-		}
-		$this->withSql = '';
-		$this->withParams = array();
-		foreach($beans as $beanFromList) {
-			$beanFromList->__info['sys.parentcache.'.$parentField] = $this;
-		}
-		return $beans;
-	}
-
 	/**
 	 * Magic Getter. Gets the value for a specific property in the bean.
 	 * If the property does not exist this getter will make sure no error

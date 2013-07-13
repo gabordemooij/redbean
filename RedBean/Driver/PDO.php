@@ -60,73 +60,6 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	protected $flagUseStringOnlyBinding = false;
 	
 	/**
-	 * Constructor. You may either specify dsn, user and password or
-	 * just give an existing PDO connection.
-	 * Examples:
-	 *    $driver = new RedBean_Driver_PDO($dsn, $user, $password);
-	 *    $driver = new RedBean_Driver_PDO($existingConnection);
-	 *
-	 * @param string|PDO  $dsn	database connection string
-	 * @param string      $user optional, usename to sign in 
-	 * @param string      $pass optional, password for connection login
-	 *
-	 * @return void
-	 */
-	public function __construct($dsn, $user = null, $pass = null) {
-		if ($dsn instanceof PDO) {
-			$this->pdo = $dsn;
-			$this->isConnected = true;
-			$this->pdo->setAttribute(1002, 'SET NAMES utf8');
-			$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-			// make sure that the dsn at least contains the type
-			$this->dsn = $this->getDatabaseType();
-		} else {
-			$this->dsn = $dsn;
-			$this->connectInfo = array('pass' => $pass, 'user' => $user);
-		}
-	}
-	
-	/**
-	 * Whether to bind all parameters as strings.
-	 * 
-	 * @param boolean $yesNo pass TRUE to bind all parameters as strings.
-	 */
-	public function setUseStringOnlyBinding($yesNo) {
-		$this->flagUseStringOnlyBinding = (boolean) $yesNo;
-	}
-	
-	/**
-	 * Establishes a connection to the database using PHP PDO
-	 * functionality. If a connection has already been established this
-	 * method will simply return directly. This method also turns on
-	 * UTF8 for the database and PDO-ERRMODE-EXCEPTION as well as
-	 * PDO-FETCH-ASSOC.
-	 */
-	public function connect() {
-		if ($this->isConnected) return;
-		try {
-			$user = $this->connectInfo['user'];
-			$pass = $this->connectInfo['pass'];
-			$this->pdo = new PDO(
-					  $this->dsn,
-					  $user,
-					  $pass,
-					  array(1002 => 'SET NAMES utf8',
-								 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-								 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-					  )
-			);
-			$this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
-			$this->isConnected = true;
-		} catch(PDOException $e) {
-			$matches = array();
-			$dbname = (preg_match('/dbname=(\w+)/', $this->dsn, $matches)) ? $matches[1] : '?';
-			throw new PDOException('Could not connect to database ('.$dbname.').', $e->getCode());
-		}
-	}
-	
-	/**
 	 * Binds parameters. This method binds parameters to a PDOStatement for
 	 * Query Execution. This method binds parameters as NULL, INTEGER or STRING
 	 * and supports both named keys and question mark keys.
@@ -198,6 +131,73 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$exception = new RedBean_Exception_SQL($err, 0);
 			$exception->setSQLState($e->getCode());
 			throw $exception;
+		}
+	}
+	
+	/**
+	 * Constructor. You may either specify dsn, user and password or
+	 * just give an existing PDO connection.
+	 * Examples:
+	 *    $driver = new RedBean_Driver_PDO($dsn, $user, $password);
+	 *    $driver = new RedBean_Driver_PDO($existingConnection);
+	 *
+	 * @param string|PDO  $dsn	database connection string
+	 * @param string      $user optional, usename to sign in 
+	 * @param string      $pass optional, password for connection login
+	 *
+	 * @return void
+	 */
+	public function __construct($dsn, $user = null, $pass = null) {
+		if ($dsn instanceof PDO) {
+			$this->pdo = $dsn;
+			$this->isConnected = true;
+			$this->pdo->setAttribute(1002, 'SET NAMES utf8');
+			$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+			// make sure that the dsn at least contains the type
+			$this->dsn = $this->getDatabaseType();
+		} else {
+			$this->dsn = $dsn;
+			$this->connectInfo = array('pass' => $pass, 'user' => $user);
+		}
+	}
+	
+	/**
+	 * Whether to bind all parameters as strings.
+	 * 
+	 * @param boolean $yesNo pass TRUE to bind all parameters as strings.
+	 */
+	public function setUseStringOnlyBinding($yesNo) {
+		$this->flagUseStringOnlyBinding = (boolean) $yesNo;
+	}
+	
+	/**
+	 * Establishes a connection to the database using PHP PDO
+	 * functionality. If a connection has already been established this
+	 * method will simply return directly. This method also turns on
+	 * UTF8 for the database and PDO-ERRMODE-EXCEPTION as well as
+	 * PDO-FETCH-ASSOC.
+	 */
+	public function connect() {
+		if ($this->isConnected) return;
+		try {
+			$user = $this->connectInfo['user'];
+			$pass = $this->connectInfo['pass'];
+			$this->pdo = new PDO(
+					  $this->dsn,
+					  $user,
+					  $pass,
+					  array(1002 => 'SET NAMES utf8',
+								 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+								 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+					  )
+			);
+			$this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
+			$this->isConnected = true;
+		} catch(PDOException $e) {
+			$matches = array();
+			$dbname = (preg_match('/dbname=(\w+)/', $this->dsn, $matches)) ? $matches[1] : '?';
+			throw new PDOException('Could not connect to database ('.$dbname.').', $e->getCode());
 		}
 	}
 	

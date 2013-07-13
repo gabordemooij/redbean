@@ -122,22 +122,6 @@ interface RedBean_QueryWriter {
 	public function widenColumn($type, $column, $datatype);
 	
 	/**
-	 * This method should update (or insert a record), it takes
-	 * a table name, a list of update values ( $field => $value ) and an
-	 * primary key ID (optional). If no primary key ID is provided, an
-	 * INSERT will take place.
-	 * Returns the new ID.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param string  $type         name of the table to update
-	 * @param array   $updatevalues list of update values
-	 * @param integer $id			optional primary key ID value
-	 *
-	 * @return integer $id the primary key ID value of the new record
-	 */
-	public function updateRecord($type, $updatevalues, $id = null);
-	
-	/**
 	 * Selects records from the database.
 	 * 
 	 * @param string  $type       name of the table you want to query
@@ -217,14 +201,20 @@ interface RedBean_QueryWriter {
 	public function queryRecordCountRelated($sourceType, $targetType, $linkID, $addSQL = '', $params = array());
 	
 	/**
-	 * Deletes all links between $sourceType and $destType in an N-M relation.
-	 * 
-	 * @param string $sourceType
-	 * @param string $destType
-	 * @param string $sourceID
+	 * This method should update (or insert a record), it takes
+	 * a table name, a list of update values ( $field => $value ) and an
+	 * primary key ID (optional). If no primary key ID is provided, an
+	 * INSERT will take place.
+	 * Returns the new ID.
+	 * This methods accepts a type and infers the corresponding table name.
+	 *
+	 * @param string  $type         name of the table to update
+	 * @param array   $updatevalues list of update values
+	 * @param integer $id			optional primary key ID value
+	 *
+	 * @return integer $id the primary key ID value of the new record
 	 */
-	public function deleteRelations($sourceType, $destType, $sourceID);
-	
+	public function updateRecord($type, $updatevalues, $id = null);
 	
 	/**
 	 * Deletes records from the database.
@@ -236,6 +226,15 @@ interface RedBean_QueryWriter {
 	 * @param array        $params     bindings
 	 */
 	public function deleteRecord($type, $conditions = array(), $addSql = '', $params = array());
+	
+	/**
+	 * Deletes all links between $sourceType and $destType in an N-M relation.
+	 * 
+	 * @param string $sourceType
+	 * @param string $destType
+	 * @param string $sourceID
+	 */
+	public function deleteRelations($sourceType, $destType, $sourceID);
 	
 	/**
 	 * This method will add a UNIQUE constraint index to a table on columns $columns.

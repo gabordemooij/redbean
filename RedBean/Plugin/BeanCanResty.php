@@ -29,13 +29,6 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	private $whitelist;
 	
 	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->modelHelper = new RedBean_ModelHelper;
-	}
-	
-	/**
 	 * Writes a response object for the client (JSON encoded). Internal method.
 	 *
 	 * @param mixed   $result       result
@@ -57,6 +50,13 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 			);
 		}
 		return $response;
+	}
+	
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->modelHelper = new RedBean_ModelHelper;
 	}
 	
 	/**

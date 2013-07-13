@@ -29,18 +29,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	protected $writer;
 	
 	/**
-	 * Constructor
-	 *
-	 * @param RedBean_ToolBox $tools toolbox
-	 */
-	public function __construct(RedBean_ToolBox $tools) {
-		$this->oodb = $tools->getRedBean();
-		$this->adapter = $tools->getDatabaseAdapter();
-		$this->writer = $tools->getWriter();
-		$this->toolbox = $tools;
-	}
-	
-	/**
 	 * Handles Exceptions. Suppresses exceptions caused by missing structures.
 	 * 
 	 * @param Exception $e
@@ -58,42 +46,49 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	}
 	
 	/**
-	 * Creates a table name based on a types array.
-	 * Manages the get the correct name for the linking table for the
-	 * types provided.
-	 *
-	 * @todo find a nice way to decouple this class from QueryWriter?
+	 * Internal method.
+	 * Returns the many-to-many related rows of table $type for bean $bean using additional SQL in $sql and
+	 * $param bindings. If $getLinks is TRUE, link rows are returned instead.
 	 * 
-	 * @param array $types 2 types as strings
-	 *
-	 * @return string
+	 * @param RedBean_OODBBean $bean     reference bean
+	 * @param string           $type     target type
+	 * @param boolean          $getLinks TRUE returns rows from the link table
+	 * @param string           $sql      additional SQL snippet
+	 * @param array            $params   bindings
+	 * 
+	 * @return array
+	 * 
+	 * @throws RedBean_Exception_Security
+	 * @throws RedBean_Exception_SQL
 	 */
-	public function getTable($types) {
-		return $this->writer->getAssocTable($types);
-	}
-	
-	/**
-	 * Associates two beans with eachother using a many-to-many relation.
-	 *
-	 * @param RedBean_OODBBean $bean1 bean1
-	 * @param RedBean_OODBBean $bean2 bean2
-	 */
-	public function associate($beans1, $beans2) {
-		$results = array();
-		if (!is_array($beans1)) {
-			$beans1 = array($beans1);
+	private function relatedRows($bean, $type, $getLinks = false, $sql = '', $params = array()) {
+		if (!is_array($bean) && !($bean instanceof RedBean_OODBBean)) {
+			throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
 		}
-		if (!is_array($beans2)) {
-			$beans2 = array($beans2);
-		}
-		foreach($beans1 as $bean1) {
-			foreach($beans2 as $bean2) {
-				$table = $this->getTable(array($bean1->getMeta('type') , $bean2->getMeta('type')));
-				$bean = $this->oodb->dispense($table);
-				$results[] = $this->associateBeans($bean1, $bean2, $bean);
+		$ids = array();
+		if (is_array($bean)) {
+			$beans = $bean;
+			foreach($beans as $b) {
+				if (!($b instanceof RedBean_OODBBean)) {
+					throw new RedBean_Exception_Security('Expected RedBean_OODBBean in array but got:'.gettype($b));
+				}
+				$ids[] = $b->id;
 			}
+			$bean = reset($beans);
+		} else {
+			$ids[] = $bean->id;
 		}
-		return (count($results)>1) ? $results : reset($results);
+		$sourceType = $bean->getMeta('type');
+		try {		
+			if (!$getLinks) {
+				return $this->writer->queryRecordRelated($sourceType, $type, $ids, $sql, $params);
+			} else {
+				return $this->writer->queryRecordLinks($sourceType, $type, $ids, $sql, $params);
+			}
+		} catch(RedBean_Exception_SQL $e) {
+			$this->handleException($e);
+			return array();
+		}
 	}
 	
 	/**
@@ -147,49 +142,54 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	}
 	
 	/**
-	 * Internal method.
-	 * Returns the many-to-many related rows of table $type for bean $bean using additional SQL in $sql and
-	 * $param bindings. If $getLinks is TRUE, link rows are returned instead.
-	 * 
-	 * @param RedBean_OODBBean $bean     reference bean
-	 * @param string           $type     target type
-	 * @param boolean          $getLinks TRUE returns rows from the link table
-	 * @param string           $sql      additional SQL snippet
-	 * @param array            $params   bindings
-	 * 
-	 * @return array
-	 * 
-	 * @throws RedBean_Exception_Security
-	 * @throws RedBean_Exception_SQL
+	 * Constructor
+	 *
+	 * @param RedBean_ToolBox $tools toolbox
 	 */
-	private function relatedRows($bean, $type, $getLinks = false, $sql = '', $params = array()) {
-		if (!is_array($bean) && !($bean instanceof RedBean_OODBBean)) {
-			throw new RedBean_Exception_Security('Expected array or RedBean_OODBBean but got:'.gettype($bean));
+	public function __construct(RedBean_ToolBox $tools) {
+		$this->oodb = $tools->getRedBean();
+		$this->adapter = $tools->getDatabaseAdapter();
+		$this->writer = $tools->getWriter();
+		$this->toolbox = $tools;
+	}
+	
+	/**
+	 * Creates a table name based on a types array.
+	 * Manages the get the correct name for the linking table for the
+	 * types provided.
+	 *
+	 * @todo find a nice way to decouple this class from QueryWriter?
+	 * 
+	 * @param array $types 2 types as strings
+	 *
+	 * @return string
+	 */
+	public function getTable($types) {
+		return $this->writer->getAssocTable($types);
+	}
+	
+	/**
+	 * Associates two beans with eachother using a many-to-many relation.
+	 *
+	 * @param RedBean_OODBBean $bean1 bean1
+	 * @param RedBean_OODBBean $bean2 bean2
+	 */
+	public function associate($beans1, $beans2) {
+		$results = array();
+		if (!is_array($beans1)) {
+			$beans1 = array($beans1);
 		}
-		$ids = array();
-		if (is_array($bean)) {
-			$beans = $bean;
-			foreach($beans as $b) {
-				if (!($b instanceof RedBean_OODBBean)) {
-					throw new RedBean_Exception_Security('Expected RedBean_OODBBean in array but got:'.gettype($b));
-				}
-				$ids[] = $b->id;
+		if (!is_array($beans2)) {
+			$beans2 = array($beans2);
+		}
+		foreach($beans1 as $bean1) {
+			foreach($beans2 as $bean2) {
+				$table = $this->getTable(array($bean1->getMeta('type') , $bean2->getMeta('type')));
+				$bean = $this->oodb->dispense($table);
+				$results[] = $this->associateBeans($bean1, $bean2, $bean);
 			}
-			$bean = reset($beans);
-		} else {
-			$ids[] = $bean->id;
 		}
-		$sourceType = $bean->getMeta('type');
-		try {		
-			if (!$getLinks) {
-				return $this->writer->queryRecordRelated($sourceType, $type, $ids, $sql, $params);
-			} else {
-				return $this->writer->queryRecordLinks($sourceType, $type, $ids, $sql, $params);
-			}
-		} catch(RedBean_Exception_SQL $e) {
-			$this->handleException($e);
-			return array();
-		}
+		return (count($results)>1) ? $results : reset($results);
 	}
 	
 	/**

@@ -17,6 +17,26 @@
 class RedBean_Plugin_Sync implements RedBean_Plugin {
 	
 	/**
+	 * Performs a database schema sync. For use with facade.
+	 * Instead of toolboxes this method accepts simply string keys and is static.
+	 * 
+	 * @param string $database1 the source database
+	 * @param string $database2 the target database
+	 */
+	public static function syncSchema($database1, $database2) {
+		if (!isset(RedBean_Facade::$toolboxes[$database1])) {
+			throw new RedBean_Exception_Security('No database for this key: '.$database1);
+		}
+		if (!isset(RedBean_Facade::$toolboxes[$database2])) {
+			throw new RedBean_Exception_Security('No database for this key: '.$database2);
+		}
+		$db1 = RedBean_Facade::$toolboxes[$database1];
+		$db2 = RedBean_Facade::$toolboxes[$database2];
+		$sync = new self;
+		$sync->doSync($db1, $db2);
+	}
+	
+	/**
 	 * Captures the SQL required to adjust source database to match
 	 * schema of target database and feeds this sql code to the
 	 * adapter of the target database.
@@ -92,25 +112,5 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 				$targetWriter->addConstraintForTypes(R::dispense($types[0])->getMeta('type'), R::dispense($types[1])->getMeta('type'));
 			}
 		}
-	}
-	
-	/**
-	 * Performs a database schema sync. For use with facade.
-	 * Instead of toolboxes this method accepts simply string keys and is static.
-	 * 
-	 * @param string $database1 the source database
-	 * @param string $database2 the target database
-	 */
-	public static function syncSchema($database1, $database2) {
-		if (!isset(RedBean_Facade::$toolboxes[$database1])) {
-			throw new RedBean_Exception_Security('No database for this key: '.$database1);
-		}
-		if (!isset(RedBean_Facade::$toolboxes[$database2])) {
-			throw new RedBean_Exception_Security('No database for this key: '.$database2);
-		}
-		$db1 = RedBean_Facade::$toolboxes[$database1];
-		$db2 = RedBean_Facade::$toolboxes[$database2];
-		$sync = new self;
-		$sync->doSync($db1, $db2);
 	}
 }

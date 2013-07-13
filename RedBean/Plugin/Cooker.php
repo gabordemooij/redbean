@@ -38,6 +38,15 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	}
 	
 	/**
+	* Static version of setUseNullFlag.
+	*
+	* @param boolean $yesNo
+	*/
+	public static function setUseNullFlagSt($yesNo){
+		self::$useNULLForEmptyString = (boolean) $yesNo;
+	}
+	
+	/**
 	 * Sets the toolbox to be used by graph()
 	 *
 	 * @param RedBean_Toolbox $toolbox toolbox
@@ -140,15 +149,6 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	 * @param boolean $yesNo 
 	 */
 	public function setUseNullFlag($yesNo) {
-		self::$useNULLForEmptyString = (boolean) $yesNo;
-	}
-
-	/**
-	* Static version of setUseNullFlag.
-	*
-	* @param boolean $yesNo
-	*/
-	public static function setUseNullFlagSt($yesNo){
 		self::$useNULLForEmptyString = (boolean) $yesNo;
 	}
 }

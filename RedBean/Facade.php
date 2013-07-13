@@ -21,6 +21,11 @@
 class RedBean_Facade {
 	
 	/**
+	 * @var boolean
+	 */
+	private static $strictType = true;
+	
+	/**
 	 * @var array
 	 */
 	public static $toolboxes = array();
@@ -86,9 +91,37 @@ class RedBean_Facade {
 	public static $f;
 	
 	/**
-	 * @var boolean
+	 * Internal Query function, executes the desired query. Used by
+	 * all facade query functions. This keeps things DRY.
+	 *
+	 * @throws RedBean_Exception_SQL
+	 *
+	 * @param string $method desired query method (i.e. 'cell', 'col', 'exec' etc..)
+	 * @param string $sql    the sql you want to execute
+	 * @param array  $values array of values to be bound to query statement
+	 *
+	 * @return array
 	 */
-	private static $strictType = true;
+	private static function query($method, $sql, $values) {
+		if (!self::$redbean->isFrozen()) {
+			try {
+				$rs = RedBean_Facade::$adapter->$method($sql, $values);
+			} catch(RedBean_Exception_SQL $e) {
+				if(self::$writer->sqlStateIn($e->getSQLState(),
+				array(
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
+				)) {
+					return ($method === 'getCell') ? null : array();
+				} else {
+					throw $e;
+				}
+			}
+			return $rs;
+		} else {
+			return RedBean_Facade::$adapter->$method($sql, $values);
+		}
+	}
 	
 	/**
 	 * Get version
@@ -618,39 +651,6 @@ class RedBean_Facade {
 	 */
 	public static function getCol($sql, $values = array()) {
 		return self::query('getCol', $sql, $values);
-	}
-	
-	/**
-	 * Internal Query function, executes the desired query. Used by
-	 * all facade query functions. This keeps things DRY.
-	 *
-	 * @throws RedBean_Exception_SQL
-	 *
-	 * @param string $method desired query method (i.e. 'cell', 'col', 'exec' etc..)
-	 * @param string $sql    the sql you want to execute
-	 * @param array  $values array of values to be bound to query statement
-	 *
-	 * @return array
-	 */
-	private static function query($method, $sql, $values) {
-		if (!self::$redbean->isFrozen()) {
-			try {
-				$rs = RedBean_Facade::$adapter->$method($sql, $values);
-			} catch(RedBean_Exception_SQL $e) {
-				if(self::$writer->sqlStateIn($e->getSQLState(),
-				array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
-				)) {
-					return ($method === 'getCell') ? null : array();
-				} else {
-					throw $e;
-				}
-			}
-			return $rs;
-		} else {
-			return RedBean_Facade::$adapter->$method($sql, $values);
-		}
 	}
 	
 	/**
