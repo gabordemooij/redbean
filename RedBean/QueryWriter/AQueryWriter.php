@@ -204,7 +204,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @see RedBean_QueryWriter::queryRecord
 	 */
 	public function queryRecord($type, $conditions = array(), $addSql = null, $params = array()) {
-		
 		$addSql = $this->glueSQLCondition($addSql);
 		if ($this->flagUseCache) {
 			$key = $this->getCacheKey(array($conditions, $addSql, $params, 'select'));
@@ -221,6 +220,103 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		}
 		return $rows;
 	}
+	/**
+	 * @see RedBean_QueryWriter::queryRecordRelated
+	 */
+	public function queryRecordRelated($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
+		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
+		$key = $this->getCacheKey(array($sourceType, $destType, implode(',', $linkIDs), $addSql, $params));
+		if ($this->flagUseCache && $cached = $this->getCached($destType, $key)) {
+			return $cached;
+		}
+		$inClause = implode(',', array_fill(0, count($linkIDs), '?'));
+		if ($sourceType === $destType) {
+			$sql = "
+			SELECT 
+				{$destTable}.*,
+				COALESCE(
+				NULLIF({$linkTable}.{$sourceCol}, {$destTable}.id), 
+				NULLIF({$linkTable}.{$destCol}, {$destTable}.id)) AS __linked_by
+			FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
+			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
+			{$addSql}
+			-- keep-cache";
+			$linkIDs = array_merge($linkIDs,$linkIDs);
+		} else {
+			$sql = "
+			SELECT 
+				{$destTable}.*,
+				{$linkTable}.{$sourceCol} AS __linked_by	
+			FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) )
+			{$addSql}	
+			-- keep-cache";
+		}
+		$params = array_merge($linkIDs, $params);	
+		$rows = $this->adapter->get($sql, $params);
+		$this->putResultInCache($destType, $key, $rows);
+		return $rows;
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::queryRecordLinks
+	 */
+	public function queryRecordLinks($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
+		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
+		$key = $this->getCacheKey(array($sourceType, $destType, implode(',',$linkIDs), $addSql, $params));
+		if ($this->flagUseCache && $cached = $this->getCached($linkTable, $key)) {
+			return $cached;
+		}
+		$inClause = implode(',', array_fill(0, count($linkIDs), '?'));
+		$selector = "{$linkTable}.*"; 
+		if ($sourceType === $destType) {
+			$sql = "
+			SELECT {$selector} FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
+			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
+			{$addSql}
+			-- keep-cache";
+			$linkIDs = array_merge($linkIDs,$linkIDs);
+		} else {
+			$sql = "
+			SELECT {$selector} FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) )
+			{$addSql}	
+			-- keep-cache";
+		}
+		$params = array_merge($linkIDs, $params);	
+		$rows = $this->adapter->get($sql, $params);
+		$this->putResultInCache($linkTable, $key, $rows);
+		return $rows;
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::queryRecordLink
+	 */
+	public function queryRecordLink($sourceType, $destType, $sourceID, $destID) {
+		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
+		$key = $this->getCacheKey(array($sourceType, $destType, $sourceID, $destID));
+		if ($this->flagUseCache && $cached = $this->getCached($linkTable, $key)) {
+			return $cached;
+		}
+		if ($sourceTable === $destTable) {
+			$sql = "SELECT {$linkTable}.* FROM {$linkTable} 
+				WHERE ( {$sourceCol} = ? AND {$destCol} = ? ) OR 
+				 ( {$destCol} = ? AND {$sourceCol} = ? ) -- keep-cache";
+			$row = $this->adapter->getRow($sql, array($sourceID, $destID, $sourceID, $destID));
+		} else {
+			$sql = "SELECT {$linkTable}.* FROM {$linkTable} 
+				WHERE {$sourceCol} = ? AND {$destCol} = ? -- keep-cache";
+			$row = $this->adapter->getRow($sql, array($sourceID, $destID));	
+		}
+		$this->putResultInCache($linkTable, $key, $row);
+		return $row;
+	}
 	
 	/**
 	 * @see RedBean_QueryWriter::queryRecordCount
@@ -230,7 +326,33 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		$table = $this->esc($type);
 		$sql = $this->makeSQLFromConditions($conditions, $params, $addSql);
 		$sql = "SELECT COUNT(*) FROM {$table} {$sql} -- keep-cache";
-		return $this->adapter->getCell($sql, $params);
+		return (int) $this->adapter->getCell($sql, $params);
+	}
+	
+	/**
+	 * @see RedBean_QueryWriter::queryRecordCountRelated
+	 */
+	public function queryRecordCountRelated($sourceType, $destType, $linkID, $addSql = '', $params = array()) {
+		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
+		if ($sourceType === $destType) {
+			$sql = "
+			SELECT COUNT(*) FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? ) OR
+			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} = ? )
+			{$addSql}
+			-- keep-cache";
+			$params = array_merge(array($linkID, $linkID), $params);	
+		} else {
+			$sql = "
+			SELECT COUNT(*) FROM {$linkTable}
+			INNER JOIN {$destTable} ON 
+			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? )
+			{$addSql}	
+			-- keep-cache";
+			$params = array_merge(array($linkID), $params);	
+		}
+		return (int) $this->adapter->getCell($sql, $params);
 	}
 	
 	/**
@@ -345,111 +467,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 		return $sql;
 	}
 	
-	
-	
-	/**
-	 * @see RedBean_QueryWriter::queryRecordRelated
-	 */
-	public function queryRecordRelated($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
-		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
-		$key = $this->getCacheKey(array($sourceType, $destType, implode(',', $linkIDs), $addSql, $params));
-		if ($this->flagUseCache && $cached = $this->getCached($destType, $key)) {
-			return $cached;
-		}
-		$inClause = implode(',', array_fill(0, count($linkIDs), '?'));
-		if ($sourceType === $destType) {
-			$sql = "
-			SELECT 
-				{$destTable}.*,
-				COALESCE(
-				NULLIF({$linkTable}.{$sourceCol}, {$destTable}.id), 
-				NULLIF({$linkTable}.{$destCol}, {$destTable}.id)) AS __linked_by
-			FROM {$linkTable}
-			INNER JOIN {$destTable} ON 
-			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
-			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
-			{$addSql}
-			-- keep-cache";
-			$linkIDs = array_merge($linkIDs,$linkIDs);
-		} else {
-			$sql = "
-			SELECT 
-				{$destTable}.*,
-				{$linkTable}.{$sourceCol} AS __linked_by	
-			FROM {$linkTable}
-			INNER JOIN {$destTable} ON 
-			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) )
-			{$addSql}	
-			-- keep-cache";
-		}
-		$params = array_merge($linkIDs, $params);	
-		$rows = array();
-		$rows = $this->adapter->get($sql, $params);
-		$this->putResultInCache($destType, $key, $rows);
-		return $rows;
-	}
-	
-	/**
-	 * @see RedBean_QueryWriter::queryRecordLinks
-	 */
-	public function queryRecordLinks($sourceType, $destType, $linkIDs, $addSql = '', $params = array()) {
-		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
-		$key = $this->getCacheKey(array($sourceType, $destType, implode(',',$linkIDs), $addSql, $params));
-		if ($this->flagUseCache && $cached = $this->getCached($linkTable, $key)) {
-			return $cached;
-		}
-		$inClause = implode(',', array_fill(0, count($linkIDs), '?'));
-		$selector = "{$linkTable}.*"; 
-		if ($sourceType === $destType) {
-			$sql = "
-			SELECT {$selector} FROM {$linkTable}
-			INNER JOIN {$destTable} ON 
-			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
-			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
-			{$addSql}
-			-- keep-cache";
-			$linkIDs = array_merge($linkIDs,$linkIDs);
-		} else {
-			$sql = "
-			SELECT {$selector} FROM {$linkTable}
-			INNER JOIN {$destTable} ON 
-			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) )
-			{$addSql}	
-			-- keep-cache";
-		}
-		$params = array_merge($linkIDs, $params);	
-		$rows = array();
-		$rows = $this->adapter->get($sql, $params);
-		$this->putResultInCache($linkTable, $key, $rows);
-		return $rows;
-	}
-	
-	/**
-	 * @see RedBean_QueryWriter::queryRecordCountRelated
-	 */
-	public function queryRecordCountRelated($sourceType, $destType, $linkID, $addSql = '', $params = array()) {
-		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
-		if ($sourceType === $destType) {
-			$sql = "
-			SELECT COUNT(*) FROM {$linkTable}
-			INNER JOIN {$destTable} ON 
-			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? ) OR
-			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} = ? )
-			{$addSql}
-			-- keep-cache";
-			$params = array_merge(array($linkID, $linkID), $params);	
-		} else {
-			$sql = "
-			SELECT COUNT(*) FROM {$linkTable}
-			INNER JOIN {$destTable} ON 
-			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? )
-			{$addSql}	
-			-- keep-cache";
-			$params = array_merge(array($linkID), $params);	
-		}
-		return (int) $this->adapter->getCell($sql, $params);
-	}
-	
 	/**
 	 * Returns the table names and column names for a relational query.
 	 *  
@@ -485,30 +502,6 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$this->adapter->exec($sql, array($sourceID));
 		}
 	}
-	
-	/**
-	 * @see RedBean_QueryWriter::queryRecordLink
-	 */
-	public function queryRecordLink($sourceType, $destType, $sourceID, $destID) {
-		list($sourceTable, $destTable, $linkTable, $sourceCol, $destCol) = $this->getRelationalTablesAndColumns($sourceType, $destType);
-		$key = $this->getCacheKey(array($sourceType, $destType, $sourceID, $destID));
-		if ($this->flagUseCache && $cached = $this->getCached($linkTable, $key)) {
-			return $cached;
-		}
-		if ($sourceTable === $destTable) {
-			$sql = "SELECT {$linkTable}.* FROM {$linkTable} 
-				WHERE ( {$sourceCol} = ? AND {$destCol} = ? ) OR 
-				 ( {$destCol} = ? AND {$sourceCol} = ? ) -- keep-cache";
-			$row = $this->adapter->getRow($sql, array($sourceID, $destID, $sourceID, $destID));
-		} else {
-			$sql = "SELECT {$linkTable}.* FROM {$linkTable} 
-				WHERE {$sourceCol} = ? AND {$destCol} = ? -- keep-cache";
-			$row = $this->adapter->getRow($sql, array($sourceID, $destID));	
-		}
-		$this->putResultInCache($linkTable, $key, $row);
-		return $row;
-	}
-	
 	
 	/**
 	 * @see RedBean_QueryWriter::wipe

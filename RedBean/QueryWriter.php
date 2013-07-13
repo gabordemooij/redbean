@@ -144,35 +144,11 @@ interface RedBean_QueryWriter {
 	 * @param array   $conditions criteria ( $column => array( $values ) )
 	 * @param string  $addSQL     additional SQL snippet
 	 * @param array   $params     bindings for SQL snippet
+	 * 
+	 * @return array
 	 */
 	public function queryRecord($type, $conditions = array(), $addSql = null, $params = array());
-	
-	/**
-	 * Counts the number of records in the database that match the
-	 * conditions and additional SQL.
-	 * 
-	 * @param string $type       name of the table you want to query
-	 * @param array  $conditions criteria ( $column => array( $values ) )
-	 * @param string $addSQL     additional SQL snippet
-	 * @param array  $params     bindings for SQL snippet
-	 * 
-	 * @return integer
-	 */
-	public function queryRecordCount($type, $conditions = array(), $addSql = null, $params = array());
-	
-	/**
-	 * Returns the number of records linked through $linkType and satisfying the SQL in $addSQL/$params.
-	 *  
-	 * @param string $sourceType source type
-	 * @param string $targetType the thing you want to count
-	 * @param mixed  $linkID     the of the source type
-	 * @param string $addSQL     additional SQL snippet
-	 * @param array  $params     bindings for SQL snippet
-	 * 
-	 * @return integer
-	 */
-	public function queryRecordCountRelated($sourceType, $targetType, $linkID, $addSQL = '', $params = array());
-	
+
 	/**
 	 * Returns records through an intermediate type. This method is used to obtain records using a link table and
 	 * allows the SQL snippets to reference columns in the link table for additional filtering or ordering.
@@ -209,9 +185,36 @@ interface RedBean_QueryWriter {
 	 * @param string $sourceID
 	 * @param string $destID
 	 * 
-	 * @return array
+	 * @return array|null
 	 */
 	public function queryRecordLink($sourceType, $destType, $sourceID, $destID);
+	
+	
+	/**
+	 * Counts the number of records in the database that match the
+	 * conditions and additional SQL.
+	 * 
+	 * @param string $type       name of the table you want to query
+	 * @param array  $conditions criteria ( $column => array( $values ) )
+	 * @param string $addSQL     additional SQL snippet
+	 * @param array  $params     bindings for SQL snippet
+	 * 
+	 * @return integer
+	 */
+	public function queryRecordCount($type, $conditions = array(), $addSql = null, $params = array());
+	
+	/**
+	 * Returns the number of records linked through $linkType and satisfying the SQL in $addSQL/$params.
+	 *  
+	 * @param string $sourceType source type
+	 * @param string $targetType the thing you want to count
+	 * @param mixed  $linkID     the of the source type
+	 * @param string $addSQL     additional SQL snippet
+	 * @param array  $params     bindings for SQL snippet
+	 * 
+	 * @return integer
+	 */
+	public function queryRecordCountRelated($sourceType, $targetType, $linkID, $addSQL = '', $params = array());
 	
 	/**
 	 * Deletes all links between $sourceType and $destType in an N-M relation.
