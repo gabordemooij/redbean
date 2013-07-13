@@ -50,14 +50,14 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	protected $connectInfo = array();
 	
 	/**
-	 * @var bool
-	 */
-	public $flagUseStringOnlyBinding = false;
-	
-	/**
 	 * @var boolean
 	 */
 	protected $isConnected = false;
+	
+	/**
+	 * @var bool
+	 */
+	protected $flagUseStringOnlyBinding = false;
 	
 	/**
 	 * Constructor. You may either specify dsn, user and password or
@@ -85,6 +85,15 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			$this->dsn = $dsn;
 			$this->connectInfo = array('pass' => $pass, 'user' => $user);
 		}
+	}
+	
+	/**
+	 * Whether to bind all parameters as strings.
+	 * 
+	 * @param boolean $yesNo pass TRUE to bind all parameters as strings.
+	 */
+	public function setUseStringOnlyBinding($yesNo) {
+		$this->flagUseStringOnlyBinding = (boolean) $yesNo;
 	}
 	
 	/**
