@@ -94,6 +94,8 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	 * @param   boolean $filterEmpty whether you want to exclude empty beans
 	 *
 	 * @return	array
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public function graph($array, $filterEmpty = false) {
       	$beans = array();

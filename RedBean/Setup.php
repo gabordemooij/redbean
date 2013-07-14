@@ -16,9 +16,7 @@ class RedBean_Setup {
 	
 	/**
 	 * This method checks the DSN string.
-	 * 
-	 * @throws RedBean_Exception_NotImplemented
-	 * 
+	 *
 	 * @param string $dsn
 	 * 
 	 * @return boolean

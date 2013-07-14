@@ -22,6 +22,8 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 	 * 
 	 * @param string $database1 the source database
 	 * @param string $database2 the target database
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public static function syncSchema($database1, $database2) {
 		if (!isset(RedBean_Facade::$toolboxes[$database1])) {

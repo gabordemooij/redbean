@@ -342,15 +342,10 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 * @see RedBean_QueryWriter::wipeAll
 	 */
 	public function wipeAll() {
-      	$this->adapter->exec('SET CONSTRAINTS ALL DEFERRED');
-      	foreach($this->getTables() as $t) {
-      		$t = $this->esc($t);
-	 		try {
-	 			$this->adapter->exec("DROP TABLE IF EXISTS $t CASCADE ");
-	 		} catch(Exception $e) { }
-	 		try{
-	 			$this->adapter->exec("DROP TABLE IF EXISTS $t CASCADE ");
-	 		} catch(Exception $e) {  throw $e; }
+      $this->adapter->exec('SET CONSTRAINTS ALL DEFERRED');
+      foreach($this->getTables() as $t) {
+      	$t = $this->esc($t);
+	 		$this->adapter->exec("DROP TABLE IF EXISTS $t CASCADE ");
 		}
 		$this->adapter->exec('SET CONSTRAINTS ALL IMMEDIATE');
 	}

@@ -194,10 +194,10 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			);
 			$this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
 			$this->isConnected = true;
-		} catch(PDOException $e) {
+		} catch(PDOException $exception) {
 			$matches = array();
 			$dbname = (preg_match('/dbname=(\w+)/', $this->dsn, $matches)) ? $matches[1] : '?';
-			throw new PDOException('Could not connect to database ('.$dbname.').', $e->getCode());
+			throw new PDOException('Could not connect to database ('.$dbname.').', $exception->getCode());
 		}
 	}
 	

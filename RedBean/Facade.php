@@ -106,15 +106,15 @@ class RedBean_Facade {
 		if (!self::$redbean->isFrozen()) {
 			try {
 				$rs = RedBean_Facade::$adapter->$method($sql, $values);
-			} catch(RedBean_Exception_SQL $e) {
-				if(self::$writer->sqlStateIn($e->getSQLState(),
+			} catch(RedBean_Exception_SQL $exception) {
+				if(self::$writer->sqlStateIn($exception->getSQLState(),
 				array(
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
 				)) {
 					return ($method === 'getCell') ? null : array();
 				} else {
-					throw $e;
+					throw $exception;
 				}
 			}
 			return $rs;
@@ -180,10 +180,12 @@ class RedBean_Facade {
 	 * @param callable $callback Closure (or other callable) with the transaction logic
 	 * 
 	 * @return void
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public static function transaction($callback) {
 		if (!is_callable($callback)) {
-			throw new InvalidArgumentException('R::transaction needs a valid callback.');
+			throw new RedBean_Exception_Security('R::transaction needs a valid callback.');
 		}
 		static $depth = 0;
 		try {
@@ -196,12 +198,12 @@ class RedBean_Facade {
 			if ($depth == 0) {
 				self::commit();
 			}
-		} catch(Exception $e) {
+		} catch(Exception $exception) {
 			$depth--;
 			if ($depth == 0) {
 				self::rollback();
 			}
-			throw $e;
+			throw $exception;
 		}
 	}
 	
@@ -242,6 +244,8 @@ class RedBean_Facade {
 	 *
 	 * @param boolean $tf
 	 * @param RedBean_Logger $logger
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public static function debug($tf = true, $logger = NULL) {
 		if (!$logger) $logger = new RedBean_Logger_Default;
@@ -338,6 +342,8 @@ class RedBean_Facade {
 	 * @param integer $number number of beans to dispense
 	 * 
 	 * @return array
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public static function dispense($type, $num = 1) {
 		if (!preg_match('/^[a-z0-9]+$/', $type) && self::$strictType) {

@@ -27,7 +27,9 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 	 * Constructor.
 	 * Requires a path to an existing and writable file.
 	 * 
-	 * @param string $outputPath path to file to write schema changes to. 
+	 * @param string $outputPath path to file to write schema changes to
+	 * 
+	 * @throws RedBean_Exception_Security 
 	 */
 	public function __construct($outputPath) {
 		if (!file_exists($outputPath) || !is_writable($outputPath)) {

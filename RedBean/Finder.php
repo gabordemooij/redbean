@@ -46,10 +46,12 @@ class RedBean_Finder {
 	 * @param array  $values values array of values to be bound to parameters in query
 	 *
 	 * @return array
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public function find($type, $sql = null, $values = array()) {
 		if ($sql instanceof RedBean_SQLHelper) list($sql, $values) = $sql->getQuery();
-		if (!is_array($values)) throw new InvalidArgumentException('Expected array, ' . gettype($values) . ' given.');
+		if (!is_array($values)) throw new RedBean_Exception_Security('Expected array, ' . gettype($values) . ' given.');
 		return $this->redbean->find($type, array(), $sql, $values);
 	}
 	
@@ -151,7 +153,9 @@ class RedBean_Finder {
 	 * @param RedBean_OODBBean $bean
 	 * @param array            $steps  (an array representation of a REST path)
 	 * 
-	 * @return RedBean_OODBBean 
+	 * @return RedBean_OODBBean
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public function findByPath($bean, $steps) {
 		$n = count($steps);

@@ -236,6 +236,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param string $table table string
 	 *
 	 * @return string $table escaped string
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	protected function check($struct) {
 		if (!preg_match('/^[a-zA-Z0-9_]+$/', $struct)) {

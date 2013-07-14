@@ -31,7 +31,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	/**
 	 * Handles Exceptions. Suppresses exceptions caused by missing structures.
 	 * 
-	 * @param Exception $e
+	 * @param Exception $exception
+	 * 
 	 * @throws Exception
 	 */
 	private function handleException(Exception $e) {
@@ -131,11 +132,11 @@ class RedBean_AssociationManager extends RedBean_Observable {
 				}
 			}
 			$results[] = $id;
-		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),
+		} catch(RedBean_Exception_SQL $exception) {
+			if (!$this->writer->sqlStateIn($exception->getSQLState(),
 				array(RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION))
 			) {
-				throw $e;
+				throw $exception;
 			}
 		}
 		return $results;

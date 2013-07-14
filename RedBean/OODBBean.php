@@ -565,6 +565,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * 
 	 * @param string $property name of the propery you wish to assign a value to
 	 * @param  mixed $value    the value you want to assign
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public function __set($property, $value) {
 		$property = $this->beau($property);

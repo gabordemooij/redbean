@@ -62,16 +62,17 @@ class RedBean_OODB extends RedBean_Observable {
 	/**
 	 * Handles Exceptions. Suppresses exceptions caused by missing structures.
 	 * 
-	 * @param Exception $e
+	 * @param Exception $exception
+	 * 
 	 * @throws Exception
 	 */
-	private function handleException(Exception $e) {
-		if (!$this->writer->sqlStateIn($e->getSQLState(),
+	private function handleException(Exception $exception) {
+		if (!$this->writer->sqlStateIn($exception->getSQLState(),
 			array(
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN))
 		) {
-			throw $e;
+			throw $exception;
 		}
 	}
 	
@@ -103,7 +104,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param string $cast cast identifier
 	 * 
-	 * @return integer 
+	 * @return integer
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	private function getTypeFromCast($cast) {
 		if ($cast == 'string') {
@@ -113,7 +116,7 @@ class RedBean_OODB extends RedBean_Observable {
 		} elseif(isset($this->writer->sqltype_typeno[$cast])) {
 			$typeno = $this->writer->sqltype_typeno[$cast];
 		} else {
-			throw new RedBean_Exception('Invalid Cast');
+			throw new RedBean_Exception_Security('Invalid Cast');
 		}
 		return $typeno;
 	}
@@ -222,6 +225,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param RedBean_OODBBean $bean             the bean
 	 * @param array            $sharedAdditions  list with shared additions
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	private function processSharedAdditions($bean, $sharedAdditions) {
 		foreach($sharedAdditions as $addition) {
@@ -312,7 +317,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * in the dependent list.
 	 * 
 	 * @param RedBean_OODBBean $bean         bean
-	 * @param array            $ownAdditions list of addition beans in own-list 
+	 * @param array            $ownAdditions list of addition beans in own-list
+	 * 
+	 * @param RedBean_Exception_Security
 	 */
 	private function processAdditions($bean, $ownAdditions) {
 		$myFieldLink = $bean->getMeta('type').'_id';
@@ -471,10 +478,10 @@ class RedBean_OODB extends RedBean_Observable {
 	 * Checks whether a RedBean_OODBBean bean is valid.
 	 * If the type is not valid or the ID is not valid it will
 	 * throw an exception: RedBean_Exception_Security.
-	 * @throws RedBean_Exception_Security $exception
 	 * 
 	 * @param RedBean_OODBBean $bean the bean that needs to be checked
 	 * 
+	 * @throws RedBean_Exception_Security $exception
 	 */
 	public function check(RedBean_OODBBean $bean) {
 		//Is all meta information present?
@@ -520,14 +527,14 @@ class RedBean_OODB extends RedBean_Observable {
 	 * Note that you can use property names; the columns will be extracted using the
 	 * appropriate bean formatter.
 	 * 
-	 * @throws RedBean_Exception_SQL 
-	 * 
 	 * @param string  $type       type of beans you are looking for
 	 * @param array   $conditions list of conditions
 	 * @param string  $addSQL     SQL to be used in query
 	 * @param boolean $all        whether you prefer to use a WHERE clause or not (TRUE = not)
 	 * 
 	 * @return array
+	 * 
+	 * @throws RedBean_Exception_SQL
 	 */
 	public function find($type, $conditions = array(), $sql = null, $params = array()) {
 		//for backward compatibility, allow mismatch arguments:
@@ -568,11 +575,11 @@ class RedBean_OODB extends RedBean_Observable {
 	 * This function returns the primary key ID of the inserted
 	 * bean.
 	 *
-	 * @throws RedBean_Exception_Security $exception
-	 * 
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean to store
 	 *
 	 * @return integer
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public function store($bean) { 
 		if ($bean instanceof RedBean_SimpleModel) {
@@ -667,6 +674,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param integer $id   ID of the bean you want to load
 	 * 
 	 * @return RedBean_OODBBean
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public function load($type, $id) {
 		$bean = $this->dispense($type);
@@ -675,8 +684,8 @@ class RedBean_OODB extends RedBean_Observable {
 		} else {
 			try {   
 				$rows = $this->writer->queryRecord($type, array('id' => array($id)));
-			} catch(RedBean_Exception_SQL $e ) {
-				if ($this->writer->sqlStateIn($e->getSQLState(),
+			} catch(RedBean_Exception_SQL $exception) {
+				if ($this->writer->sqlStateIn($exception->getSQLState(),
 					array(
 						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE)
@@ -684,7 +693,7 @@ class RedBean_OODB extends RedBean_Observable {
 				) {
 					$rows = 0;
 					if ($this->isFrozen) {
-						throw $e; //only throw if frozen
+						throw $exception; //only throw if frozen
 					}
 				}
 			}
@@ -709,9 +718,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * This function will remove the specified RedBean_OODBBean
 	 * Bean Object from the database.
 	 * 
-	 * @throws RedBean_Exception_Security $exception
-	 * 
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean you want to remove from database
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public function trash($bean) {
 		if ($bean instanceof RedBean_SimpleModel) {
@@ -815,13 +824,15 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param array  $params parameters to bind to SQL
 	 *
 	 * @return integer
+	 * 
+	 * @throws RedBean_Exception_SQL
 	 */
 	public function count($type, $addSQL = '', $params = array()) {
 		try {
 			return (int) $this->writer->queryRecordCount($type, array(), $addSQL, $params);
-		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) {
-				throw $e;
+		} catch(RedBean_Exception_SQL $exception) {
+			if (!$this->writer->sqlStateIn($exception->getSQLState(),array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) {
+				throw $exception;
 			}
 		}
 		return 0;
@@ -833,14 +844,16 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param string $type type
 	 *
 	 * @return boolean
+	 * 
+	 * @throws RedBean_Exception_SQL
 	 */
 	public function wipe($type) {
 		try {
 			$this->writer->wipe($type);
 			return true;
-		} catch(RedBean_Exception_SQL $e) {
-			if (!$this->writer->sqlStateIn($e->getSQLState(),array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) {
-				throw $e;
+		} catch(RedBean_Exception_SQL $exception) {
+			if (!$this->writer->sqlStateIn($exception->getSQLState(),array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) {
+				throw $exception;
 			}
 			return false;
 		}
@@ -851,9 +864,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * A simple getter function to obtain a reference to the association manager used for
 	 * storage and more.
 	 *
-	 * @throws Exception
-
 	 * @return RedBean_AssociationManager
+	 * 
+	 * @throws RedBean_Exception_Security
 	 */
 	public function getAssociationManager() {
 		if (!isset($this->assocManager)) {

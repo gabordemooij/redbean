@@ -237,12 +237,12 @@ class RedBean_Driver_OCI implements RedBean_Driver {
 			} else {
 				$this->rs = array();
 			}
-		} catch (PDOException $e) {
+		} catch (PDOException $pdoException) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
-			$x = new RedBean_Exception_SQL($e->getMessage(), 0);
-			$x->setSQLState($e->getCode());
-			throw $x;
+			$transformedException = new RedBean_Exception_SQL($pdoException->getMessage(), 0);
+			$transformedException->setSQLState($pdoException->getCode());
+			throw $transformedException;
 		}
 	}
 	/**
