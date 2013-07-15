@@ -23,6 +23,36 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 	 */
 	public function run() {
 	
+		testpack('Test cleaning of lists (must not lead to artifacts)');
+		R::nuke();
+		list($book1, $book2) = R::dispense('book', 2);
+		list($page1, $page2, $page3, $page4) = R::dispense('page', 4);
+		list($author1, $author2) = R::dispense('author', 2);
+		$book1->title = 'a';
+		$book2->title = 'b';
+		$page1->thename = '1';
+		$page2->thename = '2';
+		$page3->thename = '3';
+		$page3->thename = '4';
+		$book1->ownPage = array($page1, $page2);
+		$book2->ownPage = array($page3, $page4);
+		$author1->sharedBook = array($book1, $book2);
+		$author2->sharedBook = array($book2);
+		R::storeAll(array($author1, $author2));
+		asrt(count($author1->sharedBook), 2);
+		asrt(count($author1->withCondition(' title = ? ',array('a'))->sharedBook), 1);
+		R::store($author1);
+		asrt(count($author1->sharedBook), 2);
+		asrt(count($author1->withCondition(' xtitle = ? ',array('a'))->sharedBook), 0);
+		R::store($author1);
+		asrt(count($author1->sharedBook), 2);
+		$book1 = R::load('book', $book1->id);
+		$book2 = $book2->fresh();
+		asrt(count($book1->ownPage), 2);
+		asrt(count($book1->with(' LIMIT 1 ')->ownPage), 1);
+		$book1 = $book1->fresh();
+		asrt(count($book1->ownPage), 2);
+		asrt(count($book1->withCondition(' thename = ? ', array('1'))->ownPage), 1);
 		
 		testpack('Test new shared relations with link conditions');
 		R::nuke();
