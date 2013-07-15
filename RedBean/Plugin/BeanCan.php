@@ -202,7 +202,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 				$id = (int) $resourceInfo[1];
 				return $this->resp(RedBean_Facade::load($type, $id)->export(), $id);
 			}
-		} catch(Exception $e) {
+		} catch(Exception $exception) {
 			return $this->resp(null, 0, -32099);
 		}
 	}

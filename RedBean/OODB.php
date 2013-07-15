@@ -126,15 +126,15 @@ class RedBean_OODB extends RedBean_Observable {
 	 * Then, the bean is stored if needed and finally the ID of the bean
 	 * will be returned.
 	 * 
-	 * @param RedBean_OODBBean|Model $v the bean or model
+	 * @param RedBean_OODBBean|Model $embeddedBean the bean or model
 	 * 
 	 * @return integer
 	 */
-	private function prepareEmbeddedBean($v) {
-		if (!$v->id || $v->getMeta('tainted')) {
-			$this->store($v);
+	private function prepareEmbeddedBean($embeddedBean) {
+		if (!$embeddedBean->id || $embeddedBean->getMeta('tainted')) {
+			$this->store($embeddedBean);
 		}
-		return $v->id;
+		return $embeddedBean->id;
 	}
 	
 	/**
@@ -161,51 +161,51 @@ class RedBean_OODB extends RedBean_Observable {
 				$columns = $this->writer->getColumns($table) ;
 			}
 			//does the table fit?
-			$insertvalues = array();
-			$insertcolumns = array();
-			$updatevalues = array();
-			foreach($bean as $p => $v) {
-				$origV = $v;
-				if ($p !== 'id') {
+			$insertValues = array();
+			$insertColumns = array();
+			$updateValues = array();
+			foreach($bean as $property => $value) {
+				$originalValue = $value;
+				if ($property !== 'id') {
 					if (!$this->isFrozen) {
 						//Not in the chill list?
 						if (!in_array($bean->getMeta('type'), $this->chillList)) {
 							//Does the user want to specify the type?
-							if ($bean->getMeta("cast.$p", -1) !== -1) {
-								$cast = $bean->getMeta("cast.$p");
+							if ($bean->getMeta("cast.$property", -1) !== -1) {
+								$cast = $bean->getMeta("cast.$property");
 								$typeno = $this->getTypeFromCast($cast);
 							} else {
 								$cast = false;		
 								//What kind of property are we dealing with?
-								$typeno = $this->writer->scanType($v, true);
+								$typeno = $this->writer->scanType($value, true);
 							}
 							//Is this property represented in the table?
-							if (isset($columns[$this->writer->esc($p, true)])) {
+							if (isset($columns[$this->writer->esc($property, true)])) {
 								//rescan
-								$v = $origV;
+								$value = $originalValue;
 								if (!$cast) {
-									$typeno = $this->writer->scanType($v, false);
+									$typeno = $this->writer->scanType($value, false);
 								}
 								//yes it is, does it still fit?
-								$sqlt = $this->writer->code($columns[$this->writer->esc($p, true)]);
+								$sqlt = $this->writer->code($columns[$this->writer->esc($property, true)]);
 								if ($typeno > $sqlt) {
 									//no, we have to widen the database column type
-									$this->writer->widenColumn($table, $p, $typeno);
+									$this->writer->widenColumn($table, $property, $typeno);
 									$bean->setMeta('buildreport.flags.widen', true);
 								}
 							} else {
 								//no it is not
-								$this->writer->addColumn($table, $p, $typeno);
+								$this->writer->addColumn($table, $property, $typeno);
 								$bean->setMeta('buildreport.flags.addcolumn', true);
 								//@todo: move build commands here... more practical
-								$this->processBuildCommands($table, $p, $bean);
+								$this->processBuildCommands($table, $property, $bean);
 							}
 						}
 					}
 					//Okay, now we are sure that the property value will fit
-					$insertvalues[] = $v;
-					$insertcolumns[] = $p;
-					$updatevalues[] = array('property' => $p, 'value' => $v);
+					$insertValues[] = $value;
+					$insertColumns[] = $property;
+					$updateValues[] = array('property' => $property, 'value' => $value);
 				}
 			}
 			if (!$this->isFrozen && ($uniques = $bean->getMeta('buildcommand.unique'))) {
@@ -213,8 +213,7 @@ class RedBean_OODB extends RedBean_Observable {
 					$this->writer->addUniqueIndex($table, $unique);
 				}
 			}
-			$rs = $this->writer->updateRecord($table, $updatevalues, $bean->id);
-			$bean->id = $rs;
+			$bean->id = $this->writer->updateRecord($table, $updateValues, $bean->id);
 			$bean->setMeta('tainted', false);
 		}
 	}
@@ -589,8 +588,8 @@ class RedBean_OODB extends RedBean_Observable {
 			throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
 		}
 		$processLists = false;
-		foreach($bean as $k => $v) {
-			if (is_array($v) || is_object($v)) { 
+		foreach($bean as $value) {
+			if (is_array($value) || is_object($value)) { 
 				$processLists = true; break; 
 			}
 		}
@@ -598,8 +597,8 @@ class RedBean_OODB extends RedBean_Observable {
 			return $bean->getID();
 		}
 		$this->signal('update', $bean );
-		foreach($bean as $k => $v) {
-			if (is_array($v) || is_object($v)) { 
+		foreach($bean as $value) {
+			if (is_array($value) || is_object($value)) { 
 				$processLists = true; break; 
 			}
 		}
@@ -609,27 +608,27 @@ class RedBean_OODB extends RedBean_Observable {
 			$ownAdditions = $ownTrashcan = $ownresidue = array();
 			$tmpCollectionStore = array();
 			$embeddedBeans = array();
-			foreach($bean as $p => $v) {
-				if ($v instanceof RedBean_SimpleModel) {
-					$v = $v->unbox();
+			foreach($bean as $property => $value) {
+				if ($value instanceof RedBean_SimpleModel) {
+					$value = $value->unbox();
 				} 
-				if ($v instanceof RedBean_OODBBean) {
-					$linkField = $p.'_id';
-					$bean->$linkField = $this->prepareEmbeddedBean($v);
+				if ($value instanceof RedBean_OODBBean) {
+					$linkField = $property.'_id';
+					$bean->$linkField = $this->prepareEmbeddedBean($value);
 					$bean->setMeta('cast.'.$linkField, 'id');
-					$embeddedBeans[$linkField] = $v;
-					$tmpCollectionStore[$p] = $bean->$p;
-					$bean->removeProperty($p);
+					$embeddedBeans[$linkField] = $value;
+					$tmpCollectionStore[$property] = $bean->$property;
+					$bean->removeProperty($property);
 				}
-				if (is_array($v)) {
-					$originals = $bean->getMeta('sys.shadow.'.$p);
+				if (is_array($value)) {
+					$originals = $bean->getMeta('sys.shadow.'.$property);
 					if (!$originals) $originals = array();
-					if (strpos($p, 'own') === 0) {
-						list($ownAdditions, $ownTrashcan, $ownresidue) = $this->processGroups($originals, $v, $ownAdditions, $ownTrashcan, $ownresidue);
-						$bean->removeProperty($p);
-					} elseif (strpos($p, 'shared') === 0) {
-						list($sharedAdditions, $sharedTrashcan, $sharedresidue) = $this->processGroups($originals, $v, $sharedAdditions, $sharedTrashcan, $sharedresidue);
-						$bean->removeProperty($p);
+					if (strpos($property, 'own') === 0) {
+						list($ownAdditions, $ownTrashcan, $ownresidue) = $this->processGroups($originals, $value, $ownAdditions, $ownTrashcan, $ownresidue);
+						$bean->removeProperty($property);
+					} elseif (strpos($property, 'shared') === 0) {
+						list($sharedAdditions, $sharedTrashcan, $sharedresidue) = $this->processGroups($originals, $value, $sharedAdditions, $sharedTrashcan, $sharedresidue);
+						$bean->removeProperty($property);
 					} else {}
 				}
 			}
@@ -637,7 +636,6 @@ class RedBean_OODB extends RedBean_Observable {
 		$this->storeBean($bean);
 		if ($processLists) {
 			$this->processEmbeddedBeans($bean, $embeddedBeans);
-			$myFieldLink = $bean->getMeta('type').'_id';
 			$this->processTrashcan($bean, $ownTrashcan);
 			$this->processAdditions($bean, $ownAdditions);
 			$this->processResidue($ownresidue);
@@ -703,8 +701,8 @@ class RedBean_OODB extends RedBean_Observable {
 			$row = array_pop($rows);
 		}
 		$bean->setMeta('sys.orig', $row);
-		foreach($row as $p => $v) {
-			$bean->$p = $v;
+		foreach($row as $columnName => $cellValue) {
+			$bean->$columnName = $cellValue;
 		}
 		$this->nesting ++;
 		$this->signal('open', $bean);
@@ -730,15 +728,15 @@ class RedBean_OODB extends RedBean_Observable {
 			throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
 		}
 		$this->signal('delete', $bean);
-		foreach($bean as $p => $v) {
-			if ($v instanceof RedBean_OODBBean) {
-				$bean->removeProperty($p);
+		foreach($bean as $property => $value) {
+			if ($value instanceof RedBean_OODBBean) {
+				$bean->removeProperty($property);
 			}
-			if (is_array($v)) {
-				if (strpos($p, 'own') === 0) {
-					$bean->removeProperty($p);
-				} elseif (strpos($p, 'shared') === 0) {
-					$bean->removeProperty($p);
+			if (is_array($value)) {
+				if (strpos($property, 'own') === 0) {
+					$bean->removeProperty($property);
+				} elseif (strpos($property, 'shared') === 0) {
+					$bean->removeProperty($property);
 				}
 			}
 		}
@@ -747,8 +745,8 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		try {
 			$this->writer->deleteRecord($bean->getMeta('type'),array('id' => array($bean->id)), null);
-		}catch(RedBean_Exception_SQL $e) {
-			$this->handleException($e);
+		}catch(RedBean_Exception_SQL $exception) {
+			$this->handleException($exception);
 		}
 		$bean->id = 0;
 		$this->signal('after_delete', $bean);
@@ -839,9 +837,9 @@ class RedBean_OODB extends RedBean_Observable {
 	}
 
 	/**
-	 * Trash all beans of a given type.
+	 * Trash all beans of a given type. Wipes an entire type of bean.
 	 *
-	 * @param string $type type
+	 * @param string $type type of bean you wish to delete all instances of
 	 *
 	 * @return boolean
 	 * 
@@ -883,8 +881,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_AssociationManager $assoc sets the association manager to be used
 	 * 
 	 */
-	public function setAssociationManager(RedBean_AssociationManager $assoc) {
-		$this->assocManager = $assoc;
+	public function setAssociationManager(RedBean_AssociationManager $assocManager) {
+		$this->assocManager = $assocManager;
 	}
 
 	/**
@@ -909,8 +907,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param array $dep 
 	 */
-	public function setDepList($dep) {
-		$this->dep = $dep;
+	public function setDepList($dependencyList) {
+		$this->dep = $dependencyList;
 	}
 	
 	/**

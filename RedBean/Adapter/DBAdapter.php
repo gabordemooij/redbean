@@ -46,48 +46,48 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * @see RedBean_Adapter::exec
 	 */
-	public function exec($sql, $aValues = array(), $noevent = false) {
+	public function exec($sql, $bindings = array(), $noevent = false) {
 		if (!$noevent) {
 			$this->sql = $sql;
 			$this->signal('sql_exec', $this);
 		}
-		return $this->db->Execute($sql, $aValues);
+		return $this->db->Execute($sql, $bindings);
 	}
 	
 	/**
 	 * @see RedBean_Adapter::get
 	 */
-	public function get($sql, $aValues = array()) {
+	public function get($sql, $bindings = array()) {
 		$this->sql = $sql;
 		$this->signal('sql_exec', $this);
-		return $this->db->GetAll($sql, $aValues);
+		return $this->db->GetAll($sql, $bindings);
 	}
 	
 	/**
 	 * @see RedBean_Adapter::getRow
 	 */
-	public function getRow($sql, $aValues = array()) {
+	public function getRow($sql, $bindings = array()) {
 		$this->sql = $sql;
 		$this->signal('sql_exec', $this);
-		return $this->db->GetRow($sql, $aValues);
+		return $this->db->GetRow($sql, $bindings);
 	}
 	
 	/**
 	 * @see RedBean_Adapter::getCol
 	 */
-	public function getCol($sql, $aValues = array()) {
+	public function getCol($sql, $bindings = array()) {
 		$this->sql = $sql;
 		$this->signal('sql_exec', $this);
-		return $this->db->GetCol($sql, $aValues);
+		return $this->db->GetCol($sql, $bindings);
 	}
 	
 	/**
 	 * @see RedBean_Adapter::getAssoc
 	 */
-	public function getAssoc($sql, $aValues = array()) {
+	public function getAssoc($sql, $bindings = array()) {
 		$this->sql = $sql;
 		$this->signal('sql_exec', $this);
-		$rows = $this->db->GetAll($sql, $aValues);
+		$rows = $this->db->GetAll($sql, $bindings);
 		$assoc = array();
 		if ($rows) {
 			foreach($rows as $row) {
@@ -109,12 +109,12 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * @see RedBean_Adapter::getCell
 	 */
-	public function getCell($sql, $aValues = array(), $noSignal = null) {
+	public function getCell($sql, $bindings = array(), $noSignal = null) {
 		$this->sql = $sql;
 		if (!$noSignal) {
 			$this->signal('sql_exec', $this);
 		}
-		$arr = $this->db->getCol($sql, $aValues);
+		$arr = $this->db->getCol($sql, $bindings);
 		if ($arr && is_array($arr) && isset($arr[0])) {
 			return ($arr[0]); 
 		} 

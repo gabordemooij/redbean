@@ -65,12 +65,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * and supports both named keys and question mark keys.
 	 *
 	 * @param  PDOStatement $statement PDO Statement instance
-	 * @param  array        $aValues   values that need to get bound to the statement
+	 * @param  array        $bindings   values that need to get bound to the statement
 	 *
 	 * @return void
 	 */
-	protected function bindParams($statement, $aValues) {
-		foreach($aValues as $key => &$value) {
+	protected function bindParams($statement, $bindings) {
+		foreach($bindings as $key => &$value) {
 			if (is_integer($key)) {
 				if (is_null($value)){
 					$statement->bindValue($key+1, null, PDO::PARAM_NULL);
@@ -101,12 +101,12 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * @throws RedBean_Exception_SQL 
 	 * 
 	 * @param string $sql     the SQL string to be send to database server
-	 * @param array  $aValues the values that need to get bound to the query slots
+	 * @param array  $bindings the values that need to get bound to the query slots
 	 */
-	protected function runQuery($sql, $aValues) {
+	protected function runQuery($sql, $bindings) {
 		$this->connect();
 		if ($this->debug && $this->logger) {
-			$this->logger->log($sql, $aValues);
+			$this->logger->log($sql, $bindings);
 		}
 		try {
 			if (strpos('pgsql', $this->dsn) === 0) {
@@ -114,7 +114,7 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 			} else {
 				$statement = $this->pdo->prepare($sql);
 			}
-			$this->bindParams($statement, $aValues);
+			$this->bindParams($statement, $bindings);
 			$statement->execute();
 			$this->affected_rows = $statement->rowCount();
 			if ($statement->columnCount()) {
@@ -204,16 +204,16 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * @see RedBean_Driver::GetAll
 	 */
-	public function GetAll($sql, $aValues = array()) {
-		$this->runQuery($sql, $aValues);
+	public function GetAll($sql, $bindings = array()) {
+		$this->runQuery($sql, $bindings);
 		return $this->rs;
 	}
 	
 	/**
 	 * @see RedBean_Driver::GetCol
 	 */
-	public function GetCol($sql, $aValues = array()) {
-		$rows = $this->GetAll($sql, $aValues);
+	public function GetCol($sql, $bindings = array()) {
+		$rows = $this->GetAll($sql, $bindings);
 		$cols = array();
 		if ($rows && is_array($rows) && count($rows)>0) {
 			foreach ($rows as $row) {
@@ -226,8 +226,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * @see RedBean_Driver::GetCell
 	 */
-	public function GetCell($sql, $aValues = array()) {
-		$arr = $this->GetAll($sql, $aValues);
+	public function GetCell($sql, $bindings = array()) {
+		$arr = $this->GetAll($sql, $bindings);
 		$row1 = array_shift($arr);
 		$col1 = array_shift($row1);
 		return $col1;
@@ -236,16 +236,16 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	/**
 	 * @see RedBean_Driver::GetRow
 	 */
-	public function GetRow($sql, $aValues = array()) {
-		$arr = $this->GetAll($sql, $aValues);
+	public function GetRow($sql, $bindings = array()) {
+		$arr = $this->GetAll($sql, $bindings);
 		return array_shift($arr);
 	}
 	
 	/**
 	 * @see RedBean_Driver::Excecute
 	 */
-	public function Execute($sql, $aValues = array()) {
-		$this->runQuery($sql, $aValues);
+	public function Execute($sql, $bindings = array()) {
+		$this->runQuery($sql, $bindings);
 		return $this->affected_rows;
 	}
 	
