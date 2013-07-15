@@ -529,23 +529,23 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param string  $type       type of beans you are looking for
 	 * @param array   $conditions list of conditions
 	 * @param string  $addSQL     SQL to be used in query
-	 * @param boolean $all        whether you prefer to use a WHERE clause or not (TRUE = not)
+	 * @param array   $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
 	 * 
 	 * @return array
 	 * 
 	 * @throws RedBean_Exception_SQL
 	 */
-	public function find($type, $conditions = array(), $sql = null, $params = array()) {
+	public function find($type, $conditions = array(), $sql = null, $bindings = array()) {
 		//for backward compatibility, allow mismatch arguments:
 		if (is_array($sql)) {
-			$params = $sql[1];
+			$bindings = $sql[1];
 			$sql = $sql[0];
 		}
 		try {
-			$beans = $this->convertToBeans($type, $this->writer->queryRecord($type, $conditions, $sql, $params));
+			$beans = $this->convertToBeans($type, $this->writer->queryRecord($type, $conditions, $sql, $bindings));
 			return $beans;
-		} catch(RedBean_Exception_SQL $e) {
-			$this->handleException($e);
+		} catch(RedBean_Exception_SQL $exception) {
+			$this->handleException($exception);
 		}
 		return array();
 	}
@@ -817,17 +817,17 @@ class RedBean_OODB extends RedBean_Observable {
 	/**
 	 * Returns the number of beans we have in DB of a given type.
 	 *
-	 * @param string $type   type of bean we are looking for
-	 * @param string $addSQL additional SQL snippet
-	 * @param array  $params parameters to bind to SQL
+	 * @param string $type     type of bean we are looking for
+	 * @param string $addSQL   additional SQL snippet
+	 * @param array  $bindings parameters to bind to SQL
 	 *
 	 * @return integer
 	 * 
 	 * @throws RedBean_Exception_SQL
 	 */
-	public function count($type, $addSQL = '', $params = array()) {
+	public function count($type, $addSQL = '', $bindings = array()) {
 		try {
-			return (int) $this->writer->queryRecordCount($type, array(), $addSQL, $params);
+			return (int) $this->writer->queryRecordCount($type, array(), $addSQL, $bindings);
 		} catch(RedBean_Exception_SQL $exception) {
 			if (!$this->writer->sqlStateIn($exception->getSQLState(),array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) {
 				throw $exception;

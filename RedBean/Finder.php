@@ -41,32 +41,32 @@ class RedBean_Finder {
 	 * array parameter; you can either use the question mark notation
 	 * or the slot-notation (:keyname).
 	 *
-	 * @param string $type   type   the type of bean you are looking for
-	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $values values array of values to be bound to parameters in query
+	 * @param string $type     type   the type of bean you are looking for
+	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 * 
 	 * @throws RedBean_Exception_Security
 	 */
-	public function find($type, $sql = null, $values = array()) {
-		if ($sql instanceof RedBean_SQLHelper) list($sql, $values) = $sql->getQuery();
-		if (!is_array($values)) throw new RedBean_Exception_Security('Expected array, ' . gettype($values) . ' given.');
-		return $this->redbean->find($type, array(), $sql, $values);
+	public function find($type, $sql = null, $bindings = array()) {
+		if ($sql instanceof RedBean_SQLHelper) list($sql, $bindings) = $sql->getQuery();
+		if (!is_array($bindings)) throw new RedBean_Exception_Security('Expected array, ' . gettype($bindings) . ' given.');
+		return $this->redbean->find($type, array(), $sql, $bindings);
 	}
 	
 	/**
 	 * @see RedBean_Finder::find
 	 * The variation also exports the beans (i.e. it returns arrays).
 	 * 
-	 * @param string $type   type   the type of bean you are looking for
-	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $values values array of values to be bound to parameters in query
+	 * @param string $type     type   the type of bean you are looking for
+	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
-	public function findAndExport($type, $sql = null, $values = array()) {
-		$items = $this->find($type, $sql, $values);
+	public function findAndExport($type, $sql = null, $bindings = array()) {
+		$items = $this->find($type, $sql, $bindings);
 		$arr = array();
 		foreach($items as $key => $item) {
 			$arr[$key] = $item->export();
@@ -78,14 +78,14 @@ class RedBean_Finder {
 	 * @see RedBean_Finder::find
 	 * This variation returns the first bean only.
 	 * 
-	 * @param string $type   type  
-	 * @param string $sql    sql    
-	 * @param array  $values values 
+	 * @param string $type     type  
+	 * @param string $sql      sql    
+	 * @param array  $bindings values 
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function findOne($type, $sql = null, $values = array()) {
-		$items = $this->find($type, $sql, $values);
+	public function findOne($type, $sql = null, $bindings = array()) {
+		$items = $this->find($type, $sql, $bindings);
 		$found = reset($items);
 		if (!$found) {
 			return null;
@@ -97,14 +97,14 @@ class RedBean_Finder {
 	 * @see RedBean_Finder::find
 	 * This variation returns the last bean only.
 	 * 
-	 * @param string $type   type   
-	 * @param string $sql    sql    
-	 * @param array  $values values 
+	 * @param string $type     type   
+	 * @param string $sql      sql    
+	 * @param array  $bindings values 
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function findLast($type, $sql = null, $values = array()) {
-		$items = $this->find($type, $sql, $values);
+	public function findLast($type, $sql = null, $bindings = array()) {
+		$items = $this->find($type, $sql, $bindings);
 		$found = end($items);
 		if (!$found) {
 			return null;
@@ -117,14 +117,14 @@ class RedBean_Finder {
 	 * Convience method. Tries to find beans of a certain type,
 	 * if no beans are found, it dispenses a bean of that type.
 	 *
-	 * @param  string $type   type
-	 * @param  string $sql    sql
-	 * @param  array  $values values
+	 * @param  string $type     type
+	 * @param  string $sql      sql
+	 * @param  array  $bindings values
 	 *
 	 * @return array
 	 */
-	public function findOrDispense($type, $sql = null, $values = array()) {
-		$foundBeans = $this->find($type, $sql, $values);
+	public function findOrDispense($type, $sql = null, $bindings = array()) {
+		$foundBeans = $this->find($type, $sql, $bindings);
 		if (count($foundBeans) == 0) {
 			return array($this->redbean->dispense($type)); 		
 		} else {

@@ -149,8 +149,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		}
 		$beans = array();
 		if ($this->getID()>0) {
-			$params = array_merge(array($this->getID()), $this->withParams);
-			$beans = $this->beanHelper->getToolbox()->getRedBean()->find($type, array(), " $myFieldLink = ? ".$this->withSql, $params);
+			$bindings = array_merge(array($this->getID()), $this->withParams);
+			$beans = $this->beanHelper->getToolbox()->getRedBean()->find($type, array(), " $myFieldLink = ? ".$this->withSql, $bindings);
 		}
 		$this->withSql = '';
 		$this->withParams = array();
@@ -391,17 +391,17 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * the additional SQL snippet will be merged into the final
 	 * query.
 	 * 
-	 * @param string|RedBean_SQLHelper $sql SQL to be added to retrieval query.
-	 * @param array                    $params array with parameters to bind to SQL snippet
+	 * @param string|RedBean_SQLHelper $sql      SQL to be added to retrieval query.
+	 * @param array                    $bindings array with parameters to bind to SQL snippet
 	 * 
 	 * @return RedBean_OODBBean $self
 	 */
-	public function with($sql, $params = array()) {
+	public function with($sql, $bindings = array()) {
 		if ($sql instanceof RedBean_SQLHelper) {
 			list($this->withSql, $this->withParams) = $sql->getQuery();
 		} else {
 			$this->withSql = $sql;
-			$this->withParams = $params;
+			$this->withParams = $bindings;
 		}
 		return $this;
 	}
@@ -416,17 +416,17 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * 
 	 * This will return in the own list only the pages having 'chapter == 3'. 
 	 * 
-	 * @param string|RedBean_SQLHelper $sql    SQL to be added to retrieval query (prefixed by AND)
-	 * @param array                    $params array with parameters to bind to SQL snippet
+	 * @param string|RedBean_SQLHelper $sql      SQL to be added to retrieval query (prefixed by AND)
+	 * @param array                    $bindings array with parameters to bind to SQL snippet
 	 * 
 	 * @return RedBean_OODBBean $self
 	 */
-	public function withCondition($sql, $params = array()) {
+	public function withCondition($sql, $bindings = array()) {
 		if ($sql instanceof RedBean_SQLHelper) {
-			list($sql, $params) = $sql->getQuery();
+			list($sql, $bindings) = $sql->getQuery();
 		} 
 		$this->withSql = ' AND '.$sql;
-		$this->withParams = $params;
+		$this->withParams = $bindings;
 		return $this;
 	}
 	
@@ -946,8 +946,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		}
 		$count = 0;
 		if ($this->getID()>0) {
-			$params = array_merge(array($this->getID()), $this->withParams);
-			$count = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount($type, array(), " $myFieldLink = ? ".$this->withSql, $params);
+			$bindings = array_merge(array($this->getID()), $this->withParams);
+			$count = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount($type, array(), " $myFieldLink = ? ".$this->withSql, $bindings);
 		}
 		$this->withSql = '';
 		$this->withParams = array();

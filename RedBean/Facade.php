@@ -98,14 +98,14 @@ class RedBean_Facade {
 	 *
 	 * @param string $method desired query method (i.e. 'cell', 'col', 'exec' etc..)
 	 * @param string $sql    the sql you want to execute
-	 * @param array  $values array of values to be bound to query statement
+	 * @param array  $bindings array of values to be bound to query statement
 	 *
 	 * @return array
 	 */
-	private static function query($method, $sql, $values) {
+	private static function query($method, $sql, $bindings) {
 		if (!self::$redbean->isFrozen()) {
 			try {
-				$rs = RedBean_Facade::$adapter->$method($sql, $values);
+				$rs = RedBean_Facade::$adapter->$method($sql, $bindings);
 			} catch(RedBean_Exception_SQL $exception) {
 				if(self::$writer->sqlStateIn($exception->getSQLState(),
 				array(
@@ -119,7 +119,7 @@ class RedBean_Facade {
 			}
 			return $rs;
 		} else {
-			return RedBean_Facade::$adapter->$method($sql, $values);
+			return RedBean_Facade::$adapter->$method($sql, $bindings);
 		}
 	}
 	
@@ -369,12 +369,12 @@ class RedBean_Facade {
 	 *
 	 * @param  string $type   type of bean you are looking for
 	 * @param  string $sql    SQL code for finding the bean
-	 * @param  array  $values parameters to bind to SQL
+	 * @param  array  $bindings parameters to bind to SQL
 	 *
 	 * @return array
 	 */
-	public static function findOrDispense($type, $sql = null, $values = array()) {
-		return self::$finder->findOrDispense($type, $sql, $values);
+	public static function findOrDispense($type, $sql = null, $bindings = array()) {
+		return self::$finder->findOrDispense($type, $sql, $bindings);
 	}
 	
 	/**
@@ -442,8 +442,8 @@ class RedBean_Facade {
 	 *
 	 * @return array
 	 */
-	public static function related($bean, $type, $sql = '', $values = array()) {
-		return self::$associationManager->relatedSimple($bean, $type, $sql, $values);
+	public static function related($bean, $type, $sql = '', $bindings = array()) {
+		return self::$associationManager->relatedSimple($bean, $type, $sql, $bindings);
 	}
 	
 	/**
@@ -452,10 +452,10 @@ class RedBean_Facade {
 	 * @param RedBean_OODBBean $bean
 	 * @param string           $type
 	 * @param string           $sql
-	 * @param array            $values
+	 * @param array            $bindings
 	 */
-	public static function relatedCount($bean, $type, $sql = null, $values = array()) {
-		return self::$associationManager->relatedCount($bean, $type, $sql, $values);
+	public static function relatedCount($bean, $type, $sql = null, $bindings = array()) {
+		return self::$associationManager->relatedCount($bean, $type, $sql, $bindings);
 	}
 	
 	/**
@@ -464,12 +464,12 @@ class RedBean_Facade {
 	* @param RedBean_OODBBean $bean bean provided
 	* @param string $type type of bean you are searching for
 	* @param string $sql SQL for extra filtering
-	* @param array $values values to be inserted in SQL slots
+	* @param array $bindings values to be inserted in SQL slots
 	*
 	* @return RedBean_OODBBean
 	*/
-	public static function relatedOne(RedBean_OODBBean $bean, $type, $sql = null, $values = array()) {
-		return self::$associationManager->relatedOne($bean, $type, $sql, $values);
+	public static function relatedOne(RedBean_OODBBean $bean, $type, $sql = null, $bindings = array()) {
+		return self::$associationManager->relatedOne($bean, $type, $sql, $bindings);
 	}
 	
 	/**
@@ -507,12 +507,12 @@ class RedBean_Facade {
 	 *
 	 * @param string $type   type   the type of bean you are looking for
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $values values array of values to be bound to parameters in query
+	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
-	public static function find($type, $sql = null, $values = array()) {
-		return self::$finder->find($type, $sql, $values);
+	public static function find($type, $sql = null, $bindings = array()) {
+		return self::$finder->find($type, $sql, $bindings);
 	}
 	
 	/**
@@ -526,12 +526,12 @@ class RedBean_Facade {
 	 * 
 	 * @param string $type   type   the type of bean you are looking for
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $values values array of values to be bound to parameters in query
+	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
-	public static function findAll($type, $sql = null, $values = array()) {
-		return self::$finder->find($type, $sql, $values);
+	public static function findAll($type, $sql = null, $bindings = array()) {
+		return self::$finder->find($type, $sql, $bindings);
 	}
 	
 	/**
@@ -540,12 +540,12 @@ class RedBean_Facade {
 	 * 
 	 * @param string $type   type   the type of bean you are looking for
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $values values array of values to be bound to parameters in query
+	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
-	public static function findAndExport($type, $sql = null, $values = array()) {
-		return self::$finder->findAndExport($type, $sql, $values);
+	public static function findAndExport($type, $sql = null, $bindings = array()) {
+		return self::$finder->findAndExport($type, $sql, $bindings);
 	}
 	
 	/**
@@ -554,12 +554,12 @@ class RedBean_Facade {
 	 * 
 	 * @param string $type   type   the type of bean you are looking for
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $values values array of values to be bound to parameters in query
+	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public static function findOne($type, $sql = null, $values = array()) {
-		return self::$finder->findOne($type, $sql, $values);
+	public static function findOne($type, $sql = null, $bindings = array()) {
+		return self::$finder->findOne($type, $sql, $bindings);
 	}
 	
 	/**
@@ -568,12 +568,12 @@ class RedBean_Facade {
 	 * 
 	 * @param string $type   type   the type of bean you are looking for
 	 * @param string $sql    sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $values values array of values to be bound to parameters in query
+	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public static function findLast($type, $sql = null, $values = array()) {
-		return self::$finder->findLast($type, $sql, $values);
+	public static function findLast($type, $sql = null, $bindings = array()) {
+		return self::$finder->findLast($type, $sql, $bindings);
 	}
 	
 	/**
@@ -598,65 +598,65 @@ class RedBean_Facade {
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql	 sql    SQL query to execute
-	 * @param array  $values values a list of values to be bound to query parameters
+	 * @param string $sql	   sql    SQL query to execute
+	 * @param array  $bindings values a list of values to be bound to query parameters
 	 *
 	 * @return integer
 	 */
-	public static function exec($sql, $values = array()) {
-		return self::query('exec', $sql, $values);
+	public static function exec($sql, $bindings = array()) {
+		return self::query('exec', $sql, $bindings);
 	}
 	
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql	 sql    SQL query to execute
-	 * @param array  $values values a list of values to be bound to query parameters
+	 * @param string $sql	   sql    SQL query to execute
+	 * @param array  $bindings values a list of values to be bound to query parameters
 	 *
 	 * @return array
 	 */
-	public static function getAll($sql, $values = array()) {
-		return self::query('get', $sql, $values);
+	public static function getAll($sql, $bindings = array()) {
+		return self::query('get', $sql, $bindings);
 	}
 	
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql	 sql    SQL query to execute
-	 * @param array  $values values a list of values to be bound to query parameters
+	 * @param string $sql	   sql    SQL query to execute
+	 * @param array  $bindings values a list of values to be bound to query parameters
 	 *
 	 * @return string
 	 */
-	public static function getCell($sql, $values = array()) {
-		return self::query('getCell', $sql, $values);
+	public static function getCell($sql, $bindings = array()) {
+		return self::query('getCell', $sql, $bindings);
 	}
 	
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql	 sql    SQL query to execute
-	 * @param array  $values values a list of values to be bound to query parameters
+	 * @param string $sql	   sql    SQL query to execute
+	 * @param array  $bindings values a list of values to be bound to query parameters
 	 *
 	 * @return array
 	 */
-	public static function getRow($sql, $values = array()) {
-		return self::query('getRow', $sql, $values);
+	public static function getRow($sql, $bindings = array()) {
+		return self::query('getRow', $sql, $bindings);
 	}
 	
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql	 sql    SQL query to execute
-	 * @param array  $values values a list of values to be bound to query parameters
+	 * @param string $sql	   sql    SQL query to execute
+	 * @param array  $bindings values a list of values to be bound to query parameters
 	 *
 	 * @return array
 	 */
-	public static function getCol($sql, $values = array()) {
-		return self::query('getCol', $sql, $values);
+	public static function getCol($sql, $bindings = array()) {
+		return self::query('getCol', $sql, $bindings);
 	}
 	
 	/**
@@ -668,13 +668,13 @@ class RedBean_Facade {
 	 * selected in the query, both key and value of the array will have the
 	 * value of this field for each row.
 	 *
-	 * @param string $sql	 sql    SQL query to execute
-	 * @param array  $values values a list of values to be bound to query parameters
+	 * @param string $sql	   sql    SQL query to execute
+	 * @param array  $bindings values a list of values to be bound to query parameters
 	 *
 	 * @return array
 	 */
-	public static function getAssoc($sql, $values = array()) {
-		return self::query('getAssoc', $sql, $values);
+	public static function getAssoc($sql, $bindings = array()) {
+		return self::query('getAssoc', $sql, $bindings);
 	}
 	
 	/**
@@ -850,12 +850,12 @@ class RedBean_Facade {
 	 *
 	 * @param string $beanType type of bean
 	 * @param string $addSQL   additional SQL snippet (for filtering, limiting)
-	 * @param array  $params   parameters to bind to SQL
+	 * @param array  $bindings parameters to bind to SQL
 	 *
 	 * @return integer
 	 */
-	public static function count($beanType, $addSQL = '', $params = array()) {
-		return RedBean_Facade::$redbean->count($beanType, $addSQL, $params);
+	public static function count($beanType, $addSQL = '', $bindings = array()) {
+		return RedBean_Facade::$redbean->count($beanType, $addSQL, $bindings);
 	}
 	
 	/**

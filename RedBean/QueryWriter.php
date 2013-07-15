@@ -127,11 +127,11 @@ interface RedBean_QueryWriter {
 	 * @param string  $type       name of the table you want to query
 	 * @param array   $conditions criteria ( $column => array( $values ) )
 	 * @param string  $addSQL     additional SQL snippet
-	 * @param array   $params     bindings for SQL snippet
+	 * @param array   $bindings   bindings for SQL snippet
 	 * 
 	 * @return array
 	 */
-	public function queryRecord($type, $conditions = array(), $addSql = null, $params = array());
+	public function queryRecord($type, $conditions = array(), $addSql = null, $bindings = array());
 
 	/**
 	 * Returns records through an intermediate type. This method is used to obtain records using a link table and
@@ -141,11 +141,11 @@ interface RedBean_QueryWriter {
 	 * @param string $destType   destination type, the target type you want to get beans of
 	 * @param mixed  $linkID     ID to use for the link table
 	 * @param string $addSql     Additional SQL snippet
-	 * @param array  $params     Bindings for SQL snippet
+	 * @param array  $bindings   Bindings for SQL snippet
 	 * 
 	 * @return array
 	 */
-	public function queryRecordRelated($sourceType, $destType, $linkID, $addSql = '', $params = array());
+	public function queryRecordRelated($sourceType, $destType, $linkID, $addSql = '', $bindings = array());
 	
 	/**
 	 * Returns linking records. This method is used to obtain records using a link table and
@@ -155,11 +155,11 @@ interface RedBean_QueryWriter {
 	 * @param string $destType   destination type, the target type you want to get beans of
 	 * @param mixed  $linkID     ID to use for the link table
 	 * @param string $addSql     Additional SQL snippet
-	 * @param array  $params     Bindings for SQL snippet
+	 * @param array  $bindings   Bindings for SQL snippet
 	 * 
 	 * @return array
 	 */
-	public function queryRecordLinks($sourceType, $destType, $linkIDs, $addSql = '', $params = array());
+	public function queryRecordLinks($sourceType, $destType, $linkIDs, $addSql = '', $bindings = array());
 	
 	/**
 	 * Returns the row that links $sourceType $sourcID to $destType $destID in an N-M relation.
@@ -181,24 +181,24 @@ interface RedBean_QueryWriter {
 	 * @param string $type       name of the table you want to query
 	 * @param array  $conditions criteria ( $column => array( $values ) )
 	 * @param string $addSQL     additional SQL snippet
-	 * @param array  $params     bindings for SQL snippet
+	 * @param array  $bindings   bindings for SQL snippet
 	 * 
 	 * @return integer
 	 */
-	public function queryRecordCount($type, $conditions = array(), $addSql = null, $params = array());
+	public function queryRecordCount($type, $conditions = array(), $addSql = null, $bindings = array());
 	
 	/**
-	 * Returns the number of records linked through $linkType and satisfying the SQL in $addSQL/$params.
+	 * Returns the number of records linked through $linkType and satisfying the SQL in $addSQL/$bindings.
 	 *  
 	 * @param string $sourceType source type
 	 * @param string $targetType the thing you want to count
 	 * @param mixed  $linkID     the of the source type
 	 * @param string $addSQL     additional SQL snippet
-	 * @param array  $params     bindings for SQL snippet
+	 * @param array  $bindings   bindings for SQL snippet
 	 * 
 	 * @return integer
 	 */
-	public function queryRecordCountRelated($sourceType, $targetType, $linkID, $addSQL = '', $params = array());
+	public function queryRecordCountRelated($sourceType, $targetType, $linkID, $addSQL = '', $bindings = array());
 	
 	/**
 	 * This method should update (or insert a record), it takes
@@ -210,7 +210,7 @@ interface RedBean_QueryWriter {
 	 *
 	 * @param string  $type         name of the table to update
 	 * @param array   $updatevalues list of update values
-	 * @param integer $id			optional primary key ID value
+	 * @param integer $id			  optional primary key ID value
 	 *
 	 * @return integer $id the primary key ID value of the new record
 	 */
@@ -223,9 +223,9 @@ interface RedBean_QueryWriter {
 	 * @param string       $type       name of the table you want to query
 	 * @param array        $conditions criteria ( $column => array( $values ) )
 	 * @param string       $sql        additional SQL
-	 * @param array        $params     bindings
+	 * @param array        $bindings   bindings
 	 */
-	public function deleteRecord($type, $conditions = array(), $addSql = '', $params = array());
+	public function deleteRecord($type, $conditions = array(), $addSql = '', $bindings = array());
 	
 	/**
 	 * Deletes all links between $sourceType and $destType in an N-M relation.

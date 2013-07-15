@@ -27,10 +27,10 @@ interface RedBean_Adapter {
 	 * infinite recursion when using observers.
 	 *
 	 * @param string  $sql     SQL
-	 * @param array   $aValues values
+	 * @param array   $bindings values
 	 * @param boolean $noevent no event firing
 	 */
-	public function exec($sql , $aValues = array(), $noevent = false);
+	public function exec($sql , $bindings = array(), $noevent = false);
 	
 	/**
 	 * Executes an SQL Query and returns a resultset.
@@ -39,9 +39,9 @@ interface RedBean_Adapter {
 	 * SQL query.
 	 *
 	 * @param string $sql     SQL
-	 * @param array  $aValues values
+	 * @param array  $bindings values
 	 */
-	public function get($sql, $aValues = array());
+	public function get($sql, $bindings = array());
 	
 	/**
 	 * Executes an SQL Query and returns a resultset.
@@ -50,11 +50,11 @@ interface RedBean_Adapter {
 	 * SQL query.
 	 *
 	 * @param string $sql	  SQL
-	 * @param array  $aValues values to bind
+	 * @param array  $bindings values to bind
 	 *
 	 * @return array
 	 */
-	public function getRow($sql, $aValues = array());
+	public function getRow($sql, $bindings = array());
 	
 	/**
 	 * Executes an SQL Query and returns a resultset.
@@ -63,11 +63,11 @@ interface RedBean_Adapter {
 	 * SQL query.
 	 *
 	 * @param string $sql	  SQL
-	 * @param array  $aValues values to bind
+	 * @param array  $bindings values to bind
 	 *
 	 * @return array
 	 */
-	public function getCol($sql, $aValues = array());
+	public function getCol($sql, $bindings = array());
 	
 	/**
 	 * Executes an SQL Query and returns a resultset.
@@ -76,11 +76,11 @@ interface RedBean_Adapter {
 	 * SQL query.
 	 *
 	 * @param string $sql     SQL
-	 * @param array  $aValues values to bind
+	 * @param array  $bindings values to bind
 	 *
 	 * @return string
 	 */
-	public function getCell($sql, $aValues = array());
+	public function getCell($sql, $bindings = array());
 	
 	/**
 	 * Executes the SQL query specified in $sql and takes
@@ -91,11 +91,11 @@ interface RedBean_Adapter {
 	 * SQL query.
 	 *
 	 * @param string $sql    SQL
-	 * @param array  $values values to bind
+	 * @param array  $bindings values to bind
 	 *
 	 * @return array
 	 */
-	public function getAssoc($sql, $values = array());
+	public function getAssoc($sql, $bindings = array());
 	
 	/**
 	 * Returns the latest insert ID.

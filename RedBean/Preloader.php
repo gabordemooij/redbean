@@ -100,10 +100,10 @@ class RedBean_Preloader {
 		if ($closure) {
 			$key = 0; 
 			foreach($beans as $bean) {
-				$params = array();
-				foreach($retrievals as $r) $params[] = (isset($r[$key])) ? $r[$key] : null; 
-				array_unshift($params, $bean);
-				call_user_func_array($closure, $params);
+				$bindings = array();
+				foreach($retrievals as $r) $bindings[] = (isset($r[$key])) ? $r[$key] : null; 
+				array_unshift($bindings, $bean);
+				call_user_func_array($closure, $bindings);
 				$key ++;
 			}
 		}
@@ -224,7 +224,7 @@ class RedBean_Preloader {
 		$oldField = '';
 		foreach($types as $key => $typeInfo) {
 			list($type,$sqlObj) = (is_array($typeInfo) ? $typeInfo : array($typeInfo, null));
-			list($sql, $params) = $sqlObj;
+			list($sql, $bindings) = $sqlObj;
 			$map = $ids = $retrievals[$i] = array();
 			$field = $this->getPreloadField($key, $type, $oldField, $oldFields);
 			$filteredBeans = $beans;
@@ -261,8 +261,8 @@ class RedBean_Preloader {
 			}
 			list($ids, $map) = $this->gatherIDsToPreloadAndMap($filteredBeans, $field);
 			if (strpos($field, 'shared') === 0) {
-				if (!is_array($params)) $params = array();
-				$sharedBeans = $this->assocManager->relatedSimple($filteredBeans, $type, $sql, $params);
+				if (!is_array($bindings)) $bindings = array();
+				$sharedBeans = $this->assocManager->relatedSimple($filteredBeans, $type, $sql, $bindings);
 				foreach($filteredBeans as $filteredBean) { //now let the filtered beans gather their beans
 					$list = $this->gatherSharedBeansFromPool($filteredBean, $sharedBeans);
 					$filteredBean->setProperty($field, $list);
@@ -271,8 +271,8 @@ class RedBean_Preloader {
 			} elseif (strpos($field, 'own') === 0) {//preload for own-list using find
 				$bean = reset($filteredBeans);
 				$link = $bean->getMeta('type').'_id';
-				if (!is_array($params)) $params = array();
-				$children = $this->oodb->find($type, array($link => $ids), $sql, $params);
+				if (!is_array($bindings)) $bindings = array();
+				$children = $this->oodb->find($type, array($link => $ids), $sql, $bindings);
 				foreach($filteredBeans as $filteredBean) {
 					$list = $this->gatherOwnBeansFromPool($filteredBean, $children, $link);
 					$filteredBean->setProperty($field, $list);
