@@ -840,7 +840,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 */
 	public function old($property) {
 		$old = $this->getMeta('sys.orig', array());
-		if (isset($old[$property])) {
+		if (array_key_exists($property, $old)) {
 			return $old[$property];
 		}
 	}
