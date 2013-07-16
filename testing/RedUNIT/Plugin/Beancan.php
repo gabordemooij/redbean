@@ -168,8 +168,6 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 			)
 		);
 		
-		
-		
 		$resp = $can->handleREST($user, 'site/'.$site->id, 'POST', $payLoad);
 		asrt((string)$resp['result']['id'], (string)$site->id);
 		asrt((string)$resp['result']['name'], 'The Original');
@@ -212,6 +210,33 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$resp = $can->handleREST($user, 'setting/'.$setting->id.'/option/'.$option->id, 'GET');
 		asrt(isset($resp['error']),true);
 		Model_Setting::$closed = false;
+		
+		//some other scenarios, not allowed to post nested sets.
+		$village = R::dispense('village');
+		$village->user = $user;
+		R::store($village);
+		asrt(count($village->ownBuilding), 0);
+		$resp = $can->handleREST($user, 'village/'.$village->id.'/building', 'PUT', array('bean' => array('name'=>'house')));
+		$village = $village->fresh();
+		asrt(count($village->ownBuilding), 1);
+		$resp = $can->handleREST($user, 'village/'.$village->id.'/building', 'PUT', array('bean' => array('name'=>'house', 'ownFurniture'=>array('chair'))));
+		asrt($resp['error']['message'], "Object 'bean' invalid.");
+		asrt(count($village->ownBuilding), 1);
+		
+		//test some combination with cache, needs more testing
+		R::nuke();
+		R::$writer->setUseCache(true);
+		$village = R::dispense('village');
+		$village->user = R::dispense('user');
+		R::store($village);
+		asrt(count($village->ownBuilding), 0);
+		$resp = $can->handleREST($user, 'village/'.$village->id.'/building', 'PUT', array('bean' => array('name'=>'house')));
+		$village = $village->fresh();
+		asrt(count($village->ownBuilding), 1);
+		$resp = $can->handleREST($user, 'village/'.$village->id.'/building', 'PUT', array('bean' => array('name'=>'house', 'ownFurniture'=>array('chair'))));
+		asrt($resp['error']['message'], "Object 'bean' invalid.");
+		asrt(count($village->ownBuilding), 1);
+		R::$writer->setUseCache(false);
 		
 		testpack("Test BeanCan Server 1 / create");
 		R::nuke();
