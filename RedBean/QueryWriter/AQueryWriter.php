@@ -61,7 +61,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return string
 	 */
 	private function getCacheKey($keyValues) {
-		return serialize($keyValues);
+		return json_encode($keyValues);
 	}
 	
 	/**
