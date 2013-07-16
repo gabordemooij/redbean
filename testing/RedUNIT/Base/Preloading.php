@@ -23,6 +23,57 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 	 */
 	public function run() {
 		
+		testpack('Is the shadow updated?');
+		R::nuke();
+		$book = R::dispense('book');
+		$book->ownPage = R::dispense('page', 3);
+		$firstPage = reset($book->ownPage);
+		R::store($book);
+		$book = $book->fresh();
+		R::preload(array($book), array('ownPage'=>'page'));
+		R::store($book);
+		$book = $book->fresh();
+		asrt(count($book->ownPage), 3); //dont we lose beans when saving?
+		
+		$book = $book->fresh();
+		R::preload(array($book), array('ownPage'=>'page'));
+		unset($book->ownPage[$firstPage->id]); //can we delete bean from list if bean has been preloaded ?
+		R::store($book);
+		$book = $book->fresh();
+		asrt(count($book->ownPage), 2);
+		
+		$book = $book->fresh();
+		R::preload(array($book), array('ownPage'=>'page'));
+		$book->ownPage[] = R::dispense('page'); //can we add a page?
+		R::store($book);
+		$book = $book->fresh();
+		asrt(count($book->ownPage), 3);
+		
+		R::nuke();
+		$book = R::dispense('book');
+		$book->sharedPage = R::dispense('page', 3);
+		$firstPage = reset($book->sharedPage);
+		R::store($book);
+		$book = $book->fresh();
+		R::preload(array($book), array('sharedPage'=>'page'));
+		R::store($book);
+		$book = $book->fresh();
+		asrt(count($book->sharedPage), 3); //dont we lose beans when saving?
+		
+		$book = $book->fresh();
+		R::preload(array($book), array('sharedPage'=>'page'));
+		unset($book->sharedPage[$firstPage->id]); //can we delete bean from list if bean has been preloaded ?
+		R::store($book);
+		$book = $book->fresh();
+		asrt(count($book->sharedPage), 2);
+		
+		$book = $book->fresh();
+		R::preload(array($book), array('sharedPage'=>'page'));
+		$book->sharedPage[] = R::dispense('page'); //can we add a page?
+		R::store($book);
+		$book = $book->fresh();
+		asrt(count($book->sharedPage), 3);
+		
 		//test without preload
 		R::nuke();
 		$books = R::dispense('book',3);

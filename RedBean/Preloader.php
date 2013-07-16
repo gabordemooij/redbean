@@ -265,7 +265,7 @@ class RedBean_Preloader {
 				$sharedBeans = $this->assocManager->relatedSimple($filteredBeans, $type, $sql, $bindings);
 				foreach($filteredBeans as $filteredBean) { //now let the filtered beans gather their beans
 					$list = $this->gatherSharedBeansFromPool($filteredBean, $sharedBeans);
-					$filteredBean->setProperty($field, $list);
+					$filteredBean->setProperty($field, $list, true, true);
 					$this->fillParamArrayRetrievals($retrievals, $filteredBean, $list, $i);
 				}
 			} elseif (strpos($field, 'own') === 0) {//preload for own-list using find
@@ -275,7 +275,7 @@ class RedBean_Preloader {
 				$children = $this->oodb->find($type, array($link => $ids), $sql, $bindings);
 				foreach($filteredBeans as $filteredBean) {
 					$list = $this->gatherOwnBeansFromPool($filteredBean, $children, $link);
-					$filteredBean->setProperty($field, $list);
+					$filteredBean->setProperty($field, $list, true, true);
 					$this->fillParamArrayRetrievals($retrievals, $filteredBean, $list, $i);
 				}
 			} else { //preload for parent objects using batch()

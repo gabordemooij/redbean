@@ -592,11 +592,19 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
 	 * Sets a property directly, for internal use only.
 	 * 
-	 * @param string $property property
-	 * @param mixed  $value    value
+	 * @param string  $property     property
+	 * @param mixed   $value        value
+	 * @param boolean $updateShadow whether you want to update the shadow
+	 * @param boolean $taint        whether you want to mark the bean as tainted
 	 */
-	public function setProperty($property, $value) {
+	public function setProperty($property, $value, $updateShadow = false, $taint = false) {
 		$this->properties[$property] = $value;
+		if ($updateShadow) {
+			$this->__info['sys.shadow.'.$property] = $value;
+		}
+		if ($taint) {
+			$this->__info['tainted'] = true;
+		}
 	}
 	
 	/**
