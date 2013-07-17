@@ -21,10 +21,10 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	/**
 	 * HTTP Error codes used by Resty BeanCan Server.
 	 */
-	const HTTP_BAD_REQUEST = 400;
-	const HTTP_FORBIDDEN_REQUEST = 403;
-	const HTTP_NOT_FOUND = 404;
-	const HTTP_INTERNAL_SERVER_ERROR = 500;
+	const C_HTTP_BAD_REQUEST = 400;
+	const C_HTTP_FORBIDDEN_REQUEST = 403;
+	const C_HTTP_NOT_FOUND = 404;
+	const C_HTTP_INTERNAL_SERVER_ERROR = 500;
 	
 	/**
 	 * @var RedBean_ModelHelper
@@ -93,14 +93,14 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	 */
 	protected function post(RedBean_OODBBean $bean, $payload) {
 		if (!isset($payload['bean'])) {
-			return $this->resp(null, self::HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.');
+			return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.');
 		}
 		if (!is_array($payload['bean'])) {
-			return $this->resp(null, self::HTTP_BAD_REQUEST, 'Parameter \'bean\' must be object/array.');
+			return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Parameter \'bean\' must be object/array.');
 		}
 		foreach($payload['bean'] as $key => $value) {
 			if (!is_string($key) || !is_string($value)) {
-				return $this->resp(null, self::HTTP_BAD_REQUEST, 'Object "bean" invalid.');
+				return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Object "bean" invalid.');
 			}
 		}
 		$bean->import($payload['bean']);
@@ -130,13 +130,13 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	 */
 	protected function put($bean, $type, $list, $payload) {
 		if (!isset($payload['bean'])) {
-			return $this->resp(null, self::HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.');
+			return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.');
 		}
 		if (!is_array($payload['bean'])) {
-			return $this->resp(null, self::HTTP_BAD_REQUEST, 'Parameter \'bean\' must be object/array.');
+			return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Parameter \'bean\' must be object/array.');
 		}
 		foreach($payload['bean'] as $key => $value) {
-			if (!is_string($key) || !is_string($value)) return $this->resp(null, self::HTTP_BAD_REQUEST, 'Object \'bean\' invalid.');
+			if (!is_string($key) || !is_string($value)) return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Object \'bean\' invalid.');
 		}
 		$newBean = RedBean_Facade::dispense($type);
 		$newBean->import($payload['bean']);
@@ -187,10 +187,10 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	 */
 	protected function custom(RedBean_OODBBean $bean, $method, $payload) {
 		if (!isset($payload['param'])) {
-			return $this->resp(null, self::HTTP_BAD_REQUEST, 'No parameters.'); 
+			return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'No parameters.'); 
 		}
 		if (!is_array($payload['param'])) {
-			return $this->resp(null, self::HTTP_BAD_REQUEST, 'Parameter \'param\' must be object/array.');
+			return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Parameter \'param\' must be object/array.');
 		}
 		$answer = call_user_func_array(array($bean, $method), $payload['param']);
 		return $this->resp($answer);
@@ -229,32 +229,32 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	public function handleREST($root, $uri, $method, $payload = array()) {
 		try {
 			if (!preg_match('|^[\w\-/]*$|', $uri)) {
-				return $this->resp(null, self::HTTP_BAD_REQUEST, 'URI contains invalid characters.');
+				return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'URI contains invalid characters.');
 			}
 			if (!is_array($payload)) {
-				return $this->resp(null, self::HTTP_BAD_REQUEST, 'Payload needs to be array.');
+				return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Payload needs to be array.');
 			}
 			$finder = new RedBean_Finder(RedBean_Facade::$toolbox);
 			$uri = ((strlen($uri))) ? explode('/', ($uri)) : array();
 			if ($method == 'PUT') {
 				if (count($uri)<1) {
-					 return $this->resp(null, self::HTTP_BAD_REQUEST, 'Missing list.');
+					 return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Missing list.');
 				}
 				$list = array_pop($uri); //grab the list
 				$type = (strpos($list, 'shared-')===0) ? substr($list, 7) : $list;
 				if (!preg_match('|^[\w]+$|', $type)) {
-					return $this->resp(null, self::HTTP_BAD_REQUEST, 'Invalid list.');
+					return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Invalid list.');
 				}
 			}
 			try {
 				$bean = $finder->findByPath($root, $uri);
 			} catch(Exception $e) {
-				return $this->resp(null, self::HTTP_NOT_FOUND, $e->getMessage());
+				return $this->resp(null, self::C_HTTP_NOT_FOUND, $e->getMessage());
 			}
 			$beanType = $bean->getMeta('type');
 			if (!($this->whitelist === 'all' 
 					  || (isset($this->whitelist[$beanType]) && in_array($method, $this->whitelist[$beanType])))) {
-				return $this->resp(null, self::HTTP_FORBIDDEN_REQUEST, 'This bean is not available. Set whitelist to "all" or add to whitelist.');
+				return $this->resp(null, self::C_HTTP_FORBIDDEN_REQUEST, 'This bean is not available. Set whitelist to "all" or add to whitelist.');
 			}
 			if ($method == 'GET') {
 				return $this->get($bean);
@@ -268,7 +268,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 				return $this->custom($bean, $method, $payload);
 			}
 		} catch(Exception $e) {
-			return $this->resp(null, self::HTTP_INTERNAL_SERVER_ERROR, 'Exception: '.$e->getCode());
+			return $this->resp(null, self::C_HTTP_INTERNAL_SERVER_ERROR, 'Exception: '.$e->getCode());
 		}
 	}
 }
