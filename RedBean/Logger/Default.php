@@ -19,6 +19,8 @@ class RedBean_Logger_Default implements RedBean_Logger {
    * This method will write the message value to STDOUT (screen).
    *
    * @param $message (optional)
+   * 
+   * @return void
    */
 	public function log() {
 		if (func_num_args() > 0) {

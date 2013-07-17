@@ -43,14 +43,16 @@
 	/**
 	* Toggles support for camelCased statements.
 	*
-	* @param boolean $yesNo
+	* @param boolean $yesNo TRUE to use camelcase mode
+	 * 
+	 * @return void
 	*/
 	public static function useCamelCase($yesNo) {
 		self::$flagUseCamelCase = (boolean) $yesNo;
 	}
 	
 	/**
-	 * Constructor
+	 * Constructor.
 	 * 
 	 * @param RedBean_DBAdapter $adapter database adapter for querying
 	 */
@@ -98,7 +100,7 @@
 	 * 
 	 * @param mixed $param parameter to be added
 	 * 
-	 * @return RedBean_SQLHelper $this chainable
+	 * @return RedBean_SQLHelper
 	 */
 	public function put($param) {
 		$this->params[] = $param;
@@ -157,7 +159,9 @@
 	/**
 	 * Nests another query builder query in the current query.
 	 * 
-	 * @param RedBean_SQLHelper $sqlHelper 
+	 * @param RedBean_SQLHelper 
+	 * 
+	 * @return RedBean_SQLHelper
 	 */
 	public function nest(RedBean_SQLHelper $sqlHelper) {
 		list($sql, $params) = $sqlHelper->getQuery();
@@ -168,6 +172,8 @@
 	
 	/**
 	 * Writes a '(' to the sql query.
+	 * 
+	 * @return RedBean_SQLHelper
 	 */
 	public function open() {
 		if ($this->capture) {
@@ -178,6 +184,8 @@
 	
 	/**
 	 * Writes a ')' to the sql query.
+	 * 
+	 * @return RedBean_SQLHelper
 	 */
 	public function close() {
 		if ($this->capture) {

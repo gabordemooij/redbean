@@ -33,6 +33,8 @@ class RedBean_DependencyInjector {
 	 * 
 	 * @param string $dependencyID name of the dependency (should match setter)
 	 * @param mixed  $dependency   the service to be injected
+	 * 
+	 * @return void
 	 */
 	public function addDependency($dependencyID, $dependency) {
 		$this->dependencies[$dependencyID] = $dependency;

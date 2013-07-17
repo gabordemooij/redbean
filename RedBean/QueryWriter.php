@@ -212,7 +212,7 @@ interface RedBean_QueryWriter {
 	 * @param array   $updatevalues list of update values
 	 * @param integer $id			  optional primary key ID value
 	 *
-	 * @return integer $id the primary key ID value of the new record
+	 * @return integer
 	 */
 	public function updateRecord($type, $updatevalues, $id = null);
 	
@@ -224,15 +224,19 @@ interface RedBean_QueryWriter {
 	 * @param array        $conditions criteria ( $column => array( $values ) )
 	 * @param string       $sql        additional SQL
 	 * @param array        $bindings   bindings
+	 * 
+	 * @return void
 	 */
 	public function deleteRecord($type, $conditions = array(), $addSql = '', $bindings = array());
 	
 	/**
 	 * Deletes all links between $sourceType and $destType in an N-M relation.
 	 * 
-	 * @param string $sourceType
-	 * @param string $destType
-	 * @param string $sourceID
+	 * @param string $sourceType source type
+	 * @param string $destType   destination type
+	 * @param string $sourceID   source ID
+	 * 
+	 * @return void
 	 */
 	public function deleteRelations($sourceType, $destType, $sourceID);
 	
@@ -257,7 +261,7 @@ interface RedBean_QueryWriter {
 	 * @param string $state sql state
 	 * @param array  $list  list
 	 *
-	 * @return boolean $isInList
+	 * @return boolean
 	 */
 	public function sqlStateIn($state, $list);
 	
@@ -275,8 +279,10 @@ interface RedBean_QueryWriter {
 	/**
 	 * Given two types this method will add a foreign key constraint.
 	 * 
-	 * @param string $sourceType
-	 * @param string $destType
+	 * @param string $sourceType source type
+	 * @param string $destType   destination type
+	 * 
+	 * @return void
 	 */
 	public function addConstraintForTypes($sourceType, $destType);
 	
@@ -327,7 +333,9 @@ interface RedBean_QueryWriter {
 	public function esc($databaseStructure, $dontQuote = false);
 	
 	/**
-	 * Removes all tables and views from the database. 
+	 * Removes all tables and views from the database.
+	 * 
+	 * @return void
 	 */
 	public function wipeAll();
 	
@@ -362,7 +370,7 @@ interface RedBean_QueryWriter {
 	 *
 	 * @param  array $types two types array($type1, $type2)
 	 *
-	 * @return string $linktable name of the link table
+	 * @return string
 	 */
 	public function getAssocTable($types);
 }

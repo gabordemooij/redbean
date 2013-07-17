@@ -144,6 +144,8 @@ class RedBean_DuplicationManager {
 	 * this might be beneficial for performance.
 	 * 
 	 * @param array $tables 
+	 * 
+	 * @return void
 	 */
 	public function setTables($tables) {
 		foreach($tables as $key => $value) {

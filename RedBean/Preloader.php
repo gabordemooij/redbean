@@ -56,6 +56,8 @@ class RedBean_Preloader {
 	 * Marks the input beans.
 	 * 
 	 * @param array $beans beans
+	 * 
+	 * @return void
 	 */
 	private function markBeans($filteredBeans) {
 		$this->counterID = 0;
@@ -72,6 +74,8 @@ class RedBean_Preloader {
 	 * 
 	 * @param array  $filteredBeans list of filtered beans
 	 * @param string $nesting       property (list or bean property)
+	 * 
+	 * @return void
 	 */
 	private function addBeansForNextStepInPath(&$filteredBeans, $nesting) {
 		$filtered = array();
@@ -120,6 +124,8 @@ class RedBean_Preloader {
 	 * 
 	 * @param RedBean_OODBBean $nestedBean
 	 * @param array $addInputIDs
+	 * 
+	 * @return void
 	 */
 	private function addInputBeanIDsToBean($nestedBean, $addInputIDs) {
 		$currentInputBeanIDs = $nestedBean->getMeta('sys.input-bean-id'); 
@@ -139,6 +145,8 @@ class RedBean_Preloader {
 	 * @param closure|string $closure    closure to invoke per bean
 	 * @param array          $beans      beans to iterate over
 	 * @param array          $retrievals retrievals to send as arguments to closure
+	 * 
+	 * @return void
 	 */
 	private function invokePreloadEachFunction($closure, $beans, $retrievals) {
 		if ($closure) {
@@ -165,6 +173,8 @@ class RedBean_Preloader {
 	 * @param RedBean_OODBBean $filteredBean   the bean we've retrieved lists for
 	 * @param array            $list				 the list we've retrieved for the bean	
 	 * @param integer          $iterationIndex the iteration index of the param array we're going to fill
+	 * 
+	 * @return void
 	 */
 	private function fillParamArrayRetrievals(&$retrievals, $filteredBean, $list, $iterationIndex) {
 		$inputBeanIDs = $filteredBean->getMeta('sys.input-bean-id');
@@ -181,8 +191,9 @@ class RedBean_Preloader {
 	/**
 	 * Gathers the IDs to preload and maps the ids to the original beans.
 	 * 
-	 * @param array $filteredBeans
-	 * @param string $field
+	 * @param array  $filteredBeans filtered beans
+	 * @param string $field         field name
+	 * 
 	 * @return array
 	 */
 	private function gatherIDsToPreloadAndMap($filteredBeans, $field) {
@@ -243,7 +254,8 @@ class RedBean_Preloader {
 	}
 	
 	/**
-	 * Constructor
+	 * Constructor.
+	 * 
 	 * @param RedBean_OODB $oodb
 	 */
 	public function __construct($oodb) {
@@ -257,6 +269,8 @@ class RedBean_Preloader {
 	 * 
 	 * @param array $beans beans
 	 * @param array $types types to load
+	 * 
+	 * @return array
 	 */
 	public function load($beans, $typeList, $closure = null) {
 		if (!is_array($beans)) {

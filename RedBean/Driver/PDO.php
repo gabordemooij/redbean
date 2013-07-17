@@ -102,6 +102,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * 
 	 * @param string $sql     the SQL string to be send to database server
 	 * @param array  $bindings the values that need to get bound to the query slots
+	 * 
+	 * @return void
 	 */
 	protected function runQuery($sql, $bindings) {
 		$this->connect();
@@ -177,6 +179,8 @@ class RedBean_Driver_PDO implements RedBean_Driver {
 	 * method will simply return directly. This method also turns on
 	 * UTF8 for the database and PDO-ERRMODE-EXCEPTION as well as
 	 * PDO-FETCH-ASSOC.
+	 * 
+	 * @return void
 	 */
 	public function connect() {
 		if ($this->isConnected) return;

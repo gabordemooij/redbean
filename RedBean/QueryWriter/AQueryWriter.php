@@ -98,6 +98,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param string $cacheTag cache tag (secondary key)
 	 * @param string $key      key
 	 * @param array  $values   content to be stored
+	 * 
+	 * @return void
 	 */
 	private function putResultInCache($cacheTag, $key, $values) {
 		$this->cache[$cacheTag] = array(
@@ -188,6 +190,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * numerical type in order to preserve the zeros.
 	 * 
 	 * @param string $value value to be checked.
+	 * 
+	 * @return boolean
 	 */
 	protected function startsWithZeros($value) {
 		$value = strval($value);
@@ -206,7 +210,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @param array  $insertcolumns columns to be inserted
 	 * @param array  $insertvalues  values to be inserted
 	 *
-	 * @return integer $insertid	  insert id from driver, new record id
+	 * @return integer
 	 */
 	protected function insertRecord($type, $insertcolumns, $insertvalues) {
 		$default = $this->defaultValue;
@@ -235,7 +239,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @param string $table table string
 	 *
-	 * @return string $table escaped string
+	 * @return string
 	 * 
 	 * @throws RedBean_Exception_Security
 	 */
@@ -251,7 +255,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @param  string $value string representation of a certain value
 	 *
-	 * @return boolean $value boolean result of analysis
+	 * @return boolean
 	 */
 	public static function canBeTreatedAsInt($value) {
 		return (boolean) (ctype_digit(strval($value)) && strval($value) === strval(intval($value)));
@@ -628,7 +632,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * If caching is turned on retrieval queries fired after eachother will
 	 * use a result row cache.
 	 * 
-	 * @param boolean $yesNo 
+	 * @param boolean 
 	 */
 	public function setUseCache($yesNo) {
 		$this->flushCache();
@@ -637,6 +641,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	
 	/**
 	 * Flushes the Query Writer Cache.
+	 * 
+	 * @return void
 	 */
 	public function flushCache() {
 		$this->cache = array();
@@ -672,6 +678,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * 
 	 * @param RedBean_Bean $bean1 bean
 	 * @param RedBean_Bean $bean2 bean
+	 * 
+	 * @return mixed
 	 */
 	public function addConstraint(RedBean_OODBBean $bean1, RedBean_OODBBean $bean2) { 
 		return $this->addConstraintForTypes($bean1->getMeta('type'), $bean2->getMeta('type')); 

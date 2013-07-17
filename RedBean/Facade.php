@@ -452,6 +452,8 @@ class RedBean_Facade {
 	 * @param string           $type
 	 * @param string           $sql
 	 * @param array            $bindings
+	 * 
+	 * @return integer
 	 */
 	public static function relatedCount($bean, $type, $sql = null, $bindings = array()) {
 		return self::$associationManager->relatedCount($bean, $type, $sql, $bindings);
@@ -713,7 +715,7 @@ class RedBean_Facade {
 	 * @param	boolean                $parents whether you want parent beans to be exported
 	 * @param   array                  $filters whitelist of types
 	 *
-	 * @return	array $array exported structure
+	 * @return	array
 	 */
 	public static function exportAll($beans, $parents = false, $filters = array()) {
 		return self::$duplicationManager->exportAll($beans, $parents, $filters);
@@ -724,6 +726,8 @@ class RedBean_Facade {
 	 * 
 	 * @param array  $beans    beans
 	 * @param string $property property
+	 * 
+	 * @return void
 	 */
 	public static function swap($beans, $property) {
 		return self::$associationManager->swap($beans, $property);
@@ -838,7 +842,9 @@ class RedBean_Facade {
 	/**
 	 * Wipes all beans of type $beanType.
 	 *
-	 * @param string $beanType type of bean you want to destroy entirely.
+	 * @param string $beanType type of bean you want to destroy entirely
+	 * 
+	 * @return void
 	 */
 	public static function wipe($beanType) {
 		return RedBean_Facade::$redbean->wipe($beanType);
@@ -955,6 +961,8 @@ class RedBean_Facade {
 	
 	/**
 	 * Nukes the entire database.
+	 * 
+	 * @return void
 	 */
 	public static function nuke() {
 		if (!self::$redbean->isFrozen()) {
@@ -987,6 +995,8 @@ class RedBean_Facade {
 	 * unset($paper->ownPage[$pageID]);
 	 * 
 	 * @param array $dep list of dependencies
+	 * 
+	 * @return void
 	 */
 	public static function dependencies($dep) {
 		self::$redbean->setDepList($dep);
@@ -1015,6 +1025,8 @@ class RedBean_Facade {
 	 * A loop saver.
 	 *
 	 * @param array $beans list of beans to be trashed
+	 * 
+	 * @return void
 	 */
 	public static function trashAll($beans) {
 		foreach($beans as $bean) {
@@ -1053,6 +1065,8 @@ class RedBean_Facade {
 	
 	/**
 	 * Closes the database connection.
+	 * 
+	 * @return void
 	 */
 	public static function close() {
 		if (isset(self::$adapter)) {
@@ -1092,7 +1106,9 @@ class RedBean_Facade {
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 * 
-	 * @param RedBean_Adapter $adapter 
+	 * @param RedBean_Adapter $adapter
+	 * 
+	 * @return void
 	 */
 	public static function setDatabaseAdapter(RedBean_Adapter $adapter) {
 		self::$adapter = $adapter;
@@ -1101,7 +1117,9 @@ class RedBean_Facade {
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @param RedBean_QueryWriter $writer 
+	 * @param RedBean_QueryWriter $writer
+	 * 
+	 * @return void
 	 */
 	public static function setWriter(RedBean_QueryWriter $writer) {
 		self::$writer = $writer;
@@ -1153,12 +1171,25 @@ class RedBean_Facade {
 	 * 
 	 * @param array $beans beans
 	 * @param array $types types to load
+	 * 
+	 * @return array
 	 */
 	public static function preload($beans, $types, $closure = null) {
 		return self::$redbean->preload($beans, $types, $closure);
 	}
 	
-	//Alias for Preload.
+	/**
+	 * Alias for preload.
+	 * Preloads certain properties for beans.
+	 * Understands aliases.
+	 * 
+	 * Usage: R::preload($books, array('coauthor'=>'author'));
+	 * 
+	 * @param array $beans beans
+	 * @param array $types types to load
+	 * 
+	 * @return array
+	 */
 	public static function each($beans, $types, $closure = null) { 
 		return self::preload($beans, $types, $closure); 
 	}
@@ -1167,7 +1198,9 @@ class RedBean_Facade {
 	 * Facade method for RedBean_QueryWriter_AQueryWriter::renameAssocation()
 	 * 
 	 * @param string|array $from
-	 * @param string $to 
+	 * @param string $to
+	 * 
+	 * @return void
 	 */
 	public static function renameAssociation($from, $to = null) { 
 		RedBean_QueryWriter_AQueryWriter::renameAssociation($from, $to); 

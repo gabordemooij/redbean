@@ -64,6 +64,8 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * for Fuse.
 	 *
 	 * @param string $modelFormatter
+	 * 
+	 * @return void
 	 */
 	public static function setModelFormatter($modelFormatter) {
 		self::$modelFormatter = $modelFormatter;
@@ -74,6 +76,8 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * container if possible.
 	 * 
 	 * @param string $modelClassName name of the model
+	 * 
+	 * @return void
 	 */
 	public static function factory($modelClassName) {
 		if (self::$dependencyInjector) {
@@ -86,6 +90,8 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * Sets the dependency injector to be used.
 	 * 
 	 * @param RedBean_DependencyInjector $di injecto to be used
+	 * 
+	 * @return void
 	 */
 	public static function setDependencyInjector(RedBean_DependencyInjector $di) {
 		self::$dependencyInjector = $di;
@@ -94,6 +100,8 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	/**
 	 * Stops the dependency injector from resolving dependencies. Removes the
 	 * reference to the dependency injector.
+	 * 
+	 * @return void
 	 */
 	public static function clearDependencyInjector() {
 		self::$dependencyInjector = null;
@@ -105,7 +113,9 @@ class RedBean_ModelHelper implements RedBean_Observer {
 	 * that belongs to the CRUD bean and this model will take over control from
 	 * there.
 	 * 
-	 * @param Observable $observable 
+	 * @param Observable $observable
+	 * 
+	 * @return void
 	 */
 	public function attachEventListeners(RedBean_Observable $observable) {
 		foreach(array('update', 'open', 'delete', 'after_delete', 'after_update', 'dispense') as $e) {

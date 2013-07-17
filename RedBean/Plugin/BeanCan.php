@@ -242,6 +242,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 */
 	public function setWhitelist($whitelist) {
 		$this->whitelist = $whitelist;
+		return $this;
 	}
 	
 	/**

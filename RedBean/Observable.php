@@ -44,6 +44,8 @@ abstract class RedBean_Observable {
 	 *
 	 * @param string $eventname eventname
 	 * @param mixed  $info      info
+	 * 
+	 * @return void
 	 */
 	public function signal($eventname, $info) {
 		if (!isset($this->observers[ $eventname ])) {

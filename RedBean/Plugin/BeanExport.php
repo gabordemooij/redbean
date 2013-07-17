@@ -45,6 +45,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	
 	/**
 	 * Constructor
+	 * 
 	 * @param RedBean_Toolbox $toolbox
 	 */
 	public function __construct(RedBean_Toolbox $toolbox) {
@@ -53,6 +54,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	
 	/**
 	 * Loads Schema
+	 * 
 	 * @return void
 	 */
 	public function loadSchema() {
@@ -138,6 +140,8 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	 * @param array   		  $beans      beans to export
 	 * @param boolean 		  $typeShield whether to use a type recursion shield
 	 * @param boolean|integer $depth      maximum number of iterations allowed (boolean FALSE to turn off)
+	 * 
+	 * @return array
 	 */
 	public function exportLimited($beans, $typeShield = true, $depth = false) {
 		$this->depth = 0;

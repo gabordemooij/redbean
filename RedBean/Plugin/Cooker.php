@@ -32,6 +32,8 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	 * manipulate beans and there is no model based ID validation.
 	 * 
 	 * @param boolean $yesNo 
+	 * 
+	 * @return void
 	 */
 	public static function enableBeanLoading($yesNo) {
 		self::$loadBeans = ($yesNo);
@@ -41,6 +43,8 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	* Static version of setUseNullFlag.
 	*
 	* @param boolean $yesNo
+	* 
+	* @return void
 	*/
 	public static function setUseNullFlagSt($yesNo){
 		self::$useNULLForEmptyString = (boolean) $yesNo;
@@ -148,7 +152,9 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	/**
 	 * Toggles the use-NULL flag.
 	 *  
-	 * @param boolean $yesNo 
+	 * @param boolean $yesNo
+	 * 
+	 * @return void
 	 */
 	public function setUseNullFlag($yesNo) {
 		self::$useNULLForEmptyString = (boolean) $yesNo;

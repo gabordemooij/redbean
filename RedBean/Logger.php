@@ -17,7 +17,11 @@
 interface RedBean_Logger {
 	
   /**
+   * Logs a message specified in first argument.
+   * 
    * @param string $message the message to log. (optional)
+   * 
+   * @return void
    */
   public function log();
 }

@@ -16,6 +16,8 @@ interface RedBean_Observer {
 	/**
 	 * @param string $eventname
 	 * @param RedBean_OODBBean mixed $info
+	 * 
+	 * @return void
 	 */
 	public function onEvent($eventname, $bean);
 }

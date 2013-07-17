@@ -166,7 +166,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * ORM to be more consistent. Also, exporting without keys makes it easier to
 	 * export lists to Javascript because unlike in PHP in JS arrays will fill up gaps.
 	 * 
-	 * @var boolean $yesNo 
+	 * @param boolean $yesNo
+	 * 
+	 * @return void
 	 */
 	public static function setFlagKeyedExport($flag) {
 		self::$flagKeyedExport = (boolean) $flag;
@@ -177,6 +179,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * converted; example: isForSale -> is_for_sale
 	 * 
 	 * @param boolean
+	 * 
+	 * @return void
 	 */
 	public static function setFlagBeautifulColumnNames($flag) {
 		self::$flagUseBeautyCols = (boolean) $flag;
@@ -201,7 +205,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * Returns an ArrayIterator so you can treat the bean like
 	 * an array with the properties container as its contents.
 	 *
-	 * @return ArrayIterator $arrayIt an array iterator instance with $properties
+	 * @return ArrayIterator
 	 */
 	public function getIterator() {
 		return new ArrayIterator($this->properties);
@@ -214,7 +218,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param string|array $selection selection of values
 	 * @param boolean      $notrim    if TRUE values will not be trimmed
 	 *
-	 * @return RedBean_OODBBean $this
+	 * @return RedBean_OODBBean
 	 */
 	public function import($arr, $selection = false, $notrim = false) {
 		if (is_string($selection)) {
@@ -240,7 +244,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	* 
 	* @param RedBean_OODBBean $sourceBean the source bean to take properties from
 	*
-	* @return RedBean_OODBBean $self
+	* @return RedBean_OODBBean
 	*/
 	public function importFrom(RedBean_OODBBean $sourceBean) {
 		$this->__info['tainted'] = true;
@@ -256,7 +260,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * 
 	 * @param RedBean_OODBBean $otherBean the bean whose properties you would like to copy
 	 * 
-	 * @return RedBean_OODBBean $self
+	 * @return RedBean_OODBBean
 	 */
 	public function inject(RedBean_OODBBean $otherBean) {
 		$myID = $this->id;
@@ -276,7 +280,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param boolean $onlyMe  set to TRUE if you want to export only this bean
 	 * @param array   $filters optional whitelist for export
 	 * 
-	 * @return array $arr
+	 * @return array
 	 */
 	public function export($meta = false, $parents = false, $onlyMe = false, $filters = array()) {
 		$arr = array();
@@ -318,7 +322,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * 
 	 * @param object $obj target object
 	 * 
-	 * @return array $arr
+	 * @return array
 	 */
 	public function exportToObj($object) {
 		foreach($this->properties as $key => $value) {
@@ -342,7 +346,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
 	 * Returns the ID of the bean no matter what the ID field is.
 	 *
-	 * @return string $id record Identifier for bean
+	 * @return string
 	 */
 	public function getID() {
 		return (string) $this->id;
@@ -394,7 +398,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param string|RedBean_SQLHelper $sql      SQL to be added to retrieval query.
 	 * @param array                    $bindings array with parameters to bind to SQL snippet
 	 * 
-	 * @return RedBean_OODBBean $self
+	 * @return RedBean_OODBBean
 	 */
 	public function with($sql, $bindings = array()) {
 		if ($sql instanceof RedBean_SQLHelper) {
@@ -419,7 +423,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param string|RedBean_SQLHelper $sql      SQL to be added to retrieval query (prefixed by AND)
 	 * @param array                    $bindings array with parameters to bind to SQL snippet
 	 * 
-	 * @return RedBean_OODBBean $self
+	 * @return RedBean_OODBBean
 	 */
 	public function withCondition($sql, $bindings = array()) {
 		if ($sql instanceof RedBean_SQLHelper) {
@@ -563,6 +567,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param string $property name of the propery you wish to assign a value to
 	 * @param  mixed $value    the value you want to assign
 	 * 
+	 * @return void
+	 * 
 	 * @throws RedBean_Exception_Security
 	 */
 	public function __set($property, $value) {
@@ -596,6 +602,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param mixed   $value        value
 	 * @param boolean $updateShadow whether you want to update the shadow
 	 * @param boolean $taint        whether you want to mark the bean as tainted
+	 * 
+	 * @return void
 	 */
 	public function setProperty($property, $value, $updateShadow = false, $taint = false) {
 		$this->properties[$property] = $value;
@@ -622,7 +630,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param string $path    path
 	 * @param mixed  $default default value
 	 * 
-	 * @return mixed $value
+	 * @return mixed
 	 */
 	public function getMeta($path, $default = NULL) {
 		return (isset($this->__info[$path])) ? $this->__info[$path] : $default;
@@ -636,9 +644,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * 
 	 * @param string $path  path
 	 * @param mixed  $value value
+	 * 
+	 * @return RedBean_OODBBean
 	 */
 	public function setMeta($path, $value) {
 		$this->__info[$path] = $value;
+		return $this;
 	}
 	
 	/**
@@ -661,7 +672,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @param string $method name of the method
 	 * @param array  $args   argument list
 	 * 
-	 * @return mixed $mixed
+	 * @return mixed
 	 */
 	public function __call($method, $args) {
 		if (!isset($this->__info['model'])) {
@@ -699,6 +710,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 *
 	 * @param  mixed $offset offset string
 	 * @param  mixed $value  value
+	 * 
+	 * @return void
 	 */
 	public function offsetSet($offset, $value) {
 		$this->__set($offset, $value);
@@ -710,7 +723,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 *
 	 * @param  mixed $offset property
 	 *
-	 * @return
+	 * @return boolean
 	 */
 	public function offsetExists($offset) {
 		return isset($this->properties[$offset]);
@@ -723,7 +736,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 *
 	 * @param  mixed $offset property
 	 *
-	 * @return
+	 * @return void
 	 */
 	public function offsetUnset($offset) {
 		unset($this->properties[$offset]);
@@ -763,7 +776,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	* @param string $column
 	*
 	* @return RedBean_OODBean
-	*
 	*/
 	public function poly($field) {
 		return $this->fetchAs($this->$field);
@@ -895,6 +907,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * 
 	 * @param string|RedBean_OODBBean $type          type of bean to dispense or the full bean
 	 * @param string|array            $qualification JSON string or array (optional)
+	 * 
+	 * @return RedBean_OODBBean
 	 */
 	public function link($typeOrBean, $qualification = array()) {
 		if (is_string($typeOrBean)) {
@@ -927,7 +941,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	/**
 	 * Registers a association renaming globally.
 	 * 
-	 * @param string $via 
+	 * @param string $via type you wish to use for shared lists
+	 * 
+	 * @return RedBean_OODBBean
 	 */
 	public function via($via) {
 		$this->via = $via;

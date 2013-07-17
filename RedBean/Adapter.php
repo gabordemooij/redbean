@@ -40,6 +40,8 @@ interface RedBean_Adapter {
 	 *
 	 * @param string $sql     SQL
 	 * @param array  $bindings values
+	 * 
+	 * @return array
 	 */
 	public function get($sql, $bindings = array());
 	
@@ -126,6 +128,8 @@ interface RedBean_Adapter {
 	 * This method is part of the RedBean Transaction Management
 	 * mechanisms.
 	 * Starts a transaction.
+	 * 
+	 * @return void
 	 */
 	public function startTransaction();
 	
@@ -133,6 +137,8 @@ interface RedBean_Adapter {
 	 * This method is part of the RedBean Transaction Management
 	 * mechanisms.
 	 * Commits the transaction.
+	 * 
+	 * @return void
 	 */
 	public function commit();
 	
@@ -140,11 +146,15 @@ interface RedBean_Adapter {
 	 * This method is part of the RedBean Transaction Management
 	 * mechanisms.
 	 * Rolls back the transaction.
+	 * 
+	 * @return void
 	 */
 	public function rollback();
 	
 	/**
 	 * Closes database connection.
+	 * 
+	 * @return void
 	 */
 	public function close();
 }

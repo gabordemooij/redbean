@@ -23,6 +23,8 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 	 * @param string $database1 the source database
 	 * @param string $database2 the target database
 	 * 
+	 * @return void
+	 * 
 	 * @throws RedBean_Exception_Security
 	 */
 	public static function syncSchema($database1, $database2) {
@@ -45,6 +47,8 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 	 *
 	 * @param RedBean_Toolbox $source toolbox of source database
 	 * @param RedBean_Toolbox $target toolbox of target database
+	 * 
+	 * @return void
 	 */
 	public function doSync(RedBean_Toolbox $source, RedBean_Toolbox $target) {
 		$sourceWriter = $source->getWriter();

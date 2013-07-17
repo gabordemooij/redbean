@@ -101,18 +101,21 @@ interface RedBean_Driver {
 	
 	/**
 	 * Starts a transaction.
+	 * 
 	 * @return void
 	 */
 	public function CommitTrans();
 	
 	/**
 	 * Commits a transaction.
+	 * 
 	 * @return void
 	 */
 	public function StartTrans();
 	
 	/**
 	 * Rolls back a transaction.
+	 * 
 	 * @return void
 	 */
 	public function FailTrans();

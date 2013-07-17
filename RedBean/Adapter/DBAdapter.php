@@ -13,19 +13,18 @@
 class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Adapter {
 	
 	/**
-	 * Database driver reference.
 	 * @var RedBean_Driver 
 	 */
 	private $db = null;
 	
 	/**
-	 * SQL query
 	 * @var string
 	 */
 	private $sql = '';
 	
 	/**
 	 * Constructor.
+	 * 
 	 * Creates an instance of the RedBean Adapter Class.
 	 * This class provides an interface for RedBean to work
 	 * with ADO compatible DB instances.

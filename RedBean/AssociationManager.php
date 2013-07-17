@@ -33,6 +33,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * 
 	 * @param Exception $exception
 	 * 
+	 * @return void
+	 * 
 	 * @throws Exception
 	 */
 	private function handleException(Exception $exception) {
@@ -174,6 +176,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 *
 	 * @param RedBean_OODBBean $bean1 bean1
 	 * @param RedBean_OODBBean $bean2 bean2
+	 * 
+	 * @return array
 	 */
 	public function associate($beans1, $beans2) {
 		$results = array();
@@ -264,6 +268,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean1 first bean
 	 * @param RedBean_OODBBean $bean2 second bean
 	 * @param boolean          $fast  If TRUE, removes the entries by query without FUSE
+	 * 
+	 * @return void
 	 */
 	public function unassociate($beans1, $beans2, $fast = null) {
 		if (!is_array($beans1)) {
@@ -400,7 +406,6 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	* @param string           $type     type of bean you are searching for
 	* @param string           $sql      SQL for extra filtering
 	* @param array            $bindings values to be inserted in SQL slots
-	*
 	*
 	* @return RedBean_OODBBean
 	*/

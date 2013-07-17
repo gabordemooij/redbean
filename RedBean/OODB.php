@@ -31,11 +31,10 @@ class RedBean_OODB extends RedBean_Observable {
 	/**
 	 * @var array
 	 */
-	protected $stash = NULL;
+	protected $stash = null;
 
 	/*
 	 * @var integer
-	 * Keeps track of the nesting level of the OODB object
 	 */
 	protected $nesting = 0;
 
@@ -50,7 +49,7 @@ class RedBean_OODB extends RedBean_Observable {
 	protected $isFrozen = false;
 	
 	/**
-	 * @var null|\RedBean_BeanHelperFacade
+	 * @var null|RedBean_BeanHelperFacade
 	 */
 	protected $beanhelper = null;
 	
@@ -62,7 +61,9 @@ class RedBean_OODB extends RedBean_Observable {
 	/**
 	 * Handles Exceptions. Suppresses exceptions caused by missing structures.
 	 * 
-	 * @param Exception $exception
+	 * @param Exception $exception exceotion
+	 * 
+	 * @return void
 	 * 
 	 * @throws Exception
 	 */
@@ -163,6 +164,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 *  
 	 * @param RedBean_OODBBean $bean  bean to update report of
 	 * @param string           $table table to check and create if not exists
+	 * 
+	 * @return void
 	 */
 	private function createTableIfNotExists(RedBean_OODBBean $bean, $table) {
 		//Does table exist? If not, create
@@ -178,7 +181,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * removed from the original bean the bean is passed to this method to be stored
 	 * in the database.
 	 * 
-	 * @param RedBean_OODBBean $bean the clean bean 
+	 * @param RedBean_OODBBean $bean the clean bean
+	 * 
+	 * @return void
 	 */
 	private function storeBean(RedBean_OODBBean $bean) {
 		if (!$this->isFrozen) {
@@ -251,6 +256,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean             the bean
 	 * @param array            $sharedAdditions  list with shared additions
 	 * 
+	 * @return void
+	 * 
 	 * @throws RedBean_Exception_Security
 	 */
 	private function processSharedAdditions($bean, $sharedAdditions) {
@@ -271,7 +278,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * the bean is stored once again, otherwise the bean will be left untouched.
 	 *  
 	 * @param RedBean_OODBBean $bean       the bean
-	 * @param array            $ownresidue list 
+	 * @param array            $ownresidue list
+	 * 
+	 * @return void
 	 */
 	private function processResidue($ownresidue) {
 		foreach($ownresidue as $residue) {
@@ -288,10 +297,12 @@ class RedBean_OODB extends RedBean_Observable {
 	 * (when checked with the shadow). This method
 	 * checks if the bean is also in the dependency list. If it is the bean will be removed.
 	 * If not, the connection between the bean and the owner bean will be broken by
-	 * setting the ID to NULL.
+	 * setting the ID to null.
 	 *  
 	 * @param RedBean_OODBBean $bean        the bean
-	 * @param array            $ownTrashcan list 
+	 * @param array            $ownTrashcan list
+	 * 
+	 * @return void
 	 */
 	private function processTrashcan($bean, $ownTrashcan) {
 		$myFieldLink = $bean->getMeta('type').'_id';
@@ -321,6 +332,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param RedBean_OODBBean $bean          bean
 	 * @param array            $embeddedBeans embedded beans
+	 * 
+	 * @return void
 	 */
 	private function processEmbeddedBeans($bean, $embeddedBeans) {
 		foreach($embeddedBeans as $linkField => $embeddedBean) {
@@ -344,7 +357,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param RedBean_OODBBean $bean         bean
 	 * @param array            $ownAdditions list of addition beans in own-list
 	 * 
-	 * @param RedBean_Exception_Security
+	 * @return void
+	 *
+	 * @throws RedBean_Exception_Security
 	 */
 	private function processAdditions($bean, $ownAdditions) {
 		$myFieldLink = $bean->getMeta('type').'_id';
@@ -399,7 +414,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @param  string           $table    name of the table to process build commands for
 	 * @param  string           $property name of the property to process build commands for
 	 * @param  RedBean_OODBBean $bean     bean that contains the build commands
-	 *
+	 * 
+	 * @return void
 	 */
 	protected function processBuildCommands($table, $property, RedBean_OODBBean $bean) {
 		if ($inx = ($bean->getMeta('buildcommand.indexes'))) {
@@ -412,7 +428,7 @@ class RedBean_OODB extends RedBean_Observable {
 	/**
 	 * Constructor, requires a query writer.
 	 *
-	 * @param RedBean_QueryWriter $writer
+	 * @param RedBean_QueryWriter $writer writer
 	 */
 	public function __construct(RedBean_QueryWriter $writer) {
 		if ($writer instanceof RedBean_QueryWriter) {
@@ -431,7 +447,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * Let's call this chilly mode, it's just like fluid mode except that
 	 * certain types (i.e. tables) aren't touched.
 	 * 
-	 * @param boolean|array $toggle
+	 * @param boolean|array $toggle TRUE if you want to use OODB instance in frozen mode
+	 * 
+	 * @return void
 	 */
 	public function freeze($toggle) {
 		if (is_array($toggle)) {
@@ -494,6 +512,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 *
 	 * @param RedBean_IBeanHelper $beanhelper helper
 	 *
+	 * @return void
 	 */
 	public function setBeanHelper(RedBean_BeanHelper $beanhelper) {
 		$this->beanhelper = $beanhelper;
@@ -505,6 +524,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * throw an exception: RedBean_Exception_Security.
 	 * 
 	 * @param RedBean_OODBBean $bean the bean that needs to be checked
+	 * 
+	 * @return void
 	 * 
 	 * @throws RedBean_Exception_Security $exception
 	 */
@@ -624,8 +645,7 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 		if ($processLists) {
-			//Define groups
-			$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array();
+			$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array(); //Define groups
 			$ownAdditions = $ownTrashcan = $ownresidue = $tmpCollectionStore = $embeddedBeans = array();
 			foreach($bean as $property => $value) {
 				if ($value instanceof RedBean_SimpleModel) {
@@ -648,7 +668,7 @@ class RedBean_OODB extends RedBean_Observable {
 					} elseif (strpos($property, 'shared') === 0) {
 						list($sharedAdditions, $sharedTrashcan, $sharedresidue) = $this->processGroups($originals, $value, $sharedAdditions, $sharedTrashcan, $sharedresidue);
 						$bean->removeProperty($property);
-					} else {}
+					} else { ; }
 				}
 			}
 		}
@@ -737,6 +757,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean you want to remove from database
 	 * 
+	 * @return void
+	 * 
 	 * @throws RedBean_Exception_Security
 	 */
 	public function trash($bean) {
@@ -806,7 +828,7 @@ class RedBean_OODB extends RedBean_Observable {
 		foreach($ids as $id) {
 			$collection[$id] = $this->load($type, $id);
 		}
-		$this->stash[$this->nesting] = NULL;
+		$this->stash[$this->nesting] = null;
 		return $collection;
 	}
 
@@ -829,7 +851,7 @@ class RedBean_OODB extends RedBean_Observable {
 			$this->stash[$this->nesting][$id] = $row;
 			$collection[$id] = $this->load($type, $id);
 		}
-		$this->stash[$this->nesting] = NULL;
+		$this->stash[$this->nesting] = null;
 		return $collection;
 	}
 	
@@ -869,7 +891,7 @@ class RedBean_OODB extends RedBean_Observable {
 			$this->writer->wipe($type);
 			return true;
 		} catch(RedBean_Exception_SQL $exception) {
-			if (!$this->writer->sqlStateIn($exception->getSQLState(),array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) {
+			if (!$this->writer->sqlStateIn($exception->getSQLState(), array(RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE))) {
 				throw $exception;
 			}
 			return false;
@@ -899,6 +921,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param RedBean_AssociationManager $assoc sets the association manager to be used
 	 * 
+	 * @return void
 	 */
 	public function setAssociationManager(RedBean_AssociationManager $assocManager) {
 		$this->assocManager = $assocManager;
@@ -924,7 +947,9 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 1. Adds a ON CASCADE DELETE 
 	 * 2. trashes the depending bean if the entry in the ownList is removed 
 	 * 
-	 * @param array $dep 
+	 * @param array $dep
+	 * 
+	 * @return void
 	 */
 	public function setDepList($dependencyList) {
 		$this->dep = $dependencyList;
@@ -951,6 +976,8 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @param array $beans beans
 	 * @param array $types types to load
+	 * 
+	 * @return array
 	 */
 	public function preload($beans, $typeList, $closure = null) {
 		$preloader = new RedBean_Preloader($this);

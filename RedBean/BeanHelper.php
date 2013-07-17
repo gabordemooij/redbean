@@ -18,6 +18,7 @@ interface RedBean_BeanHelper {
 	
 	/**
 	 * @abstract
+	 * 
 	 * @return RedBean_Toolbox $toolbox toolbox
 	 */
 	public function getToolbox();
@@ -27,6 +28,8 @@ interface RedBean_BeanHelper {
 	 * return the corresponding model.
 	 * 
 	 * @param RedBean_OODBBean $bean
+	 * 
+	 * @return string
 	 */
 	public function getModelForBean(RedBean_OODBBean $bean);	
 }

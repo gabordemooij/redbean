@@ -24,6 +24,8 @@ class RedBean_SimpleModel {
 	 * This method loads a bean in the model.
 	 *
 	 * @param RedBean_OODBBean $bean bean
+	 * 
+	 * @return void
 	 */
 	public function loadBean(RedBean_OODBBean $bean) {
 		$this->bean = $bean;
@@ -46,6 +48,8 @@ class RedBean_SimpleModel {
 	 *
 	 * @param string $prop  property
 	 * @param mixed  $value value
+	 * 
+	 * @return void
 	 */
 	public function __set($prop, $value) {
 		$this->bean->$prop = $value;
@@ -56,7 +60,7 @@ class RedBean_SimpleModel {
 	 *
 	 * @param  string $key key
 	 *
-	 * @return
+	 * @return boolean
 	 */
 	public function __isset($key) {
 		return (isset($this->bean->$key));
@@ -79,5 +83,4 @@ class RedBean_SimpleModel {
 	public function unbox(){
 		return $this->bean;
 	}
-	
 }

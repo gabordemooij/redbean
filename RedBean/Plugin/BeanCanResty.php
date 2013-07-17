@@ -213,6 +213,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	 */
 	public function setWhitelist($whitelist) {
 		$this->whitelist = $whitelist;
+		return $this;
 	}
 	
 	/**
