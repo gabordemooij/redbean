@@ -19,6 +19,16 @@
 class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	
 	/**
+	 * List of JSON RPC2 error code definitions.
+	 */
+	const C_JSONRPC2_PARSE_ERROR  = -32700;
+	const C_JSONRPC2_INVALID_REQUEST = -32600;
+	const C_JSONRPC2_METHOD_NOT_FOUND = -32601;
+	const C_JSONRPC2_INVALID_PARAMETERS = -32602;
+	const C_JSONRPC2_INTERNAL_ERROR = -32603;
+	const C_JSONRPC2_SPECIFIED_ERROR = -32099;
+	
+	/**
 	 * @var RedBean_ModelHelper
 	 */
 	private $modelHelper;
@@ -64,6 +74,165 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	}
 	
 	/**
+	 * Handles a JSON RPC 2 request to store a bean.
+	 * 
+	 * @param string $id       request ID, identification for request
+	 * @param string $beanType type of the bean you want to store
+	 * @param array  $data     data array
+	 * 
+	 * @return string
+	 */
+	private function store($id, $beanType, $data) {
+		if (!isset($data[0])) {
+			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean Object');
+		}
+		$data = $data[0];
+		if (!isset($data['id'])) {
+			$bean = RedBean_Facade::dispense($beanType); 
+		} else {
+			$bean = RedBean_Facade::load($beanType, $data['id']);
+		}
+		$bean->import($data);
+		$rid = RedBean_Facade::store($bean);
+		return $this->resp($rid, $id);
+	}
+	
+	/**
+	 * Handles a JSON RPC 2 request to load a bean.
+	 * 
+	 * @param string $id       request ID, identification for request
+	 * @param string $beanType type of the bean you want to store
+	 * @param array  $data     data array containing the ID of the bean to load
+	 * 
+	 * @return string
+	 */
+	private function load($id, $beanType, $data) {
+		if (!isset($data[0])) {
+			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean ID');
+		}
+		$bean = RedBean_Facade::load($beanType, $data[0]);
+		return $this->resp($bean->export(), $id);
+	}
+	
+	/**
+	 * Handles a JSON RPC 2 request to trash a bean.
+	 * 
+	 * @param string $id       request ID, identification for request
+	 * @param string $beanType type of the bean you want to delete
+	 * @param array  $data     data array
+	 * 
+	 * @return string
+	 */
+	private function trash($id, $beanType, $data) {
+		if (!isset($data[0])) {
+			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean ID');
+		}
+		$bean = RedBean_Facade::load($beanType, $data[0]);
+		RedBean_Facade::trash($bean);
+		return $this->resp('OK', $id);
+	}
+	
+	/**
+	 * Handles a JSON RPC 2 request to export a bean.
+	 * 
+	 * @param string $id       request ID, identification for request
+	 * @param string $beanType type of the bean you want to export
+	 * @param array  $data     data array
+	 * 
+	 * @return string
+	 */
+	private function export($id, $beanType, $data) {
+		if (!isset($data[0])) {
+			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean ID');
+		}
+		$bean = RedBean_Facade::load($beanType, $data[0]);
+		$array = RedBean_Facade::exportAll(array($bean), true);
+		return $this->resp($array, $id);
+	}
+	
+	/**
+	 * Handles a JSON RPC 2 request to perform a custom operation on a bean.
+	 * 
+	 * @param string $id       request ID, identification for request
+	 * @param string $beanType type of the bean you want to store
+	 * @param string $action   action you want to invoke on bean model
+	 * @param array  $data     data array
+	 * 
+	 * @return string
+	 */
+	private function custom($id, $beanType, $action, $data) {
+		$modelName = $this->modelHelper->getModelName($beanType);
+		if (!class_exists($modelName)) {
+			return $this->resp(null, $id, self::C_JSONRPC2_METHOD_NOT_FOUND, 'No such bean in the can!');
+		}
+		$beanModel = new $modelName;
+		if (!method_exists($beanModel, $action)) {
+			return $this->resp(null, $id, self::C_JSONRPC2_METHOD_NOT_FOUND, "Method not found in Bean: $beanType ");
+		}
+		return $this->resp(call_user_func_array(array($beanModel, $action), $data), $id);
+	}
+	
+	/**
+	 * Extracts bean type, action identifier, 
+	 * data array and method name from json array.
+	 * 
+	 * @param array $jsonArray JSON array containing the details
+	 * 
+	 * @return array
+	 */
+	private function getDataFromJSON($jsonArray) {
+		
+		$beanType = null;
+		$action = null;
+		
+		if (!isset($jsonArray['params'])) {
+			$data = array();
+		} else {
+			$data = $jsonArray['params'];
+		}
+		
+		//Check method signature
+		$method = explode(':', trim($jsonArray['method']));
+		
+		if (count($method) === 2) {
+			//Collect Bean and Action
+			$beanType = $method[0];
+			$action = $method[1];
+		}
+		
+		return array($beanType, $action, $data, $method);
+	}
+	
+	/**
+	 * Dispatches the JSON RPC request to one of the private methods.
+	 * 
+	 * @param string $id       identification of request
+	 * @param string $beanType type of the bean you wish to apply the action to
+	 * @param string $action   action to apply
+	 * @param array  $data     data array containing parameters or details
+	 * 
+	 * @return array
+	 */
+	private function dispatch($id, $beanType, $action, $data) {
+		try {
+			switch($action) {
+				case 'store':
+					return $this->store($id, $beanType, $data);
+				case 'load':
+					return $this->load($id, $beanType, $data);
+				case 'trash':
+					return $this->trash($id, $beanType, $data);
+				case 'export':
+					return $this->export($id, $beanType, $data);
+				default:
+					return $this->custom($id, $beanType, $action, $data);
+			}
+		} catch(Exception $exception) {
+			return $this->resp(null, $id, self::C_JSONRPC2_SPECIFIED_ERROR, $exception->getCode().'-'.$exception->getMessage());
+		}
+	}
+	
+	/**
 	 * Sets a whitelist with format: array('beantype'=>array('update','customMethod')) etc.
 	 * or simply string 'all' (for backward compatibility).
 	 * 
@@ -89,97 +258,40 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		//Decode JSON string
 		$jsonArray = json_decode($jsonString, true);
 		if (!$jsonArray) {
-			return $this->resp(null, null, -32700, 'Cannot Parse JSON');
+			return $this->resp(null, null, self::C_JSONRPC2_PARSE_ERROR, 'Cannot Parse JSON');
 		}
 		if (!isset($jsonArray['jsonrpc'])) {
-			return $this->resp(null, null, -32600, 'No RPC version');
+			return $this->resp(null, null, self::C_JSONRPC2_INVALID_REQUEST, 'No RPC version');
 		}
 		if (($jsonArray['jsonrpc'] != '2.0')) {
-			return $this->resp(null, null, -32600, 'Incompatible RPC Version');
+			return $this->resp(null, null, self::C_JSONRPC2_INVALID_REQUEST, 'Incompatible RPC Version');
 		}
 		//DO we have an ID to identify this request?
 		if (!isset($jsonArray['id'])) {
-			return $this->resp(null, null, -32600, 'No ID');
+			return $this->resp(null, null, self::C_JSONRPC2_INVALID_REQUEST, 'No ID');
 		}
 		//Fetch the request Identification String.
 		$id = $jsonArray['id'];
 		//Do we have a method?
 		if (!isset($jsonArray['method'])) {
-			return $this->resp(null, $id, -32600, 'No method');
+			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'No method');
 		}
 		//Do we have params?
-		if (!isset($jsonArray['params'])) {
-			$data = array();
-		} else {
-			$data = $jsonArray['params'];
-		}
-		//Check method signature
-		$method = explode(':', trim($jsonArray['method']));
+		list($beanType, $action, $data, $method) = $this->getDataFromJSON($jsonArray);
 		if (count($method) !== 2) {
-			return $this->resp(null, $id, -32600, 'Invalid method signature. Use: BEAN:ACTION');
+			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid method signature. Use: BEAN:ACTION');
 		}
-		//Collect Bean and Action
-		$beanType = $method[0];
-		$action = $method[1];
 		if (!($this->whitelist === 'all' || (isset($this->whitelist[$beanType]) && in_array($action,$this->whitelist[$beanType])))) {
-			return $this->resp(null, $id, -32600, 'This bean is not available. Set whitelist to "all" or add to whitelist.');
+			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'This bean is not available. Set whitelist to "all" or add to whitelist.');
 		}
 		//May not contain anything other than ALPHA NUMERIC chars and _
 		if (preg_match('/\W/', $beanType)) {
-			return $this->resp(null, $id, -32600, 'Invalid Bean Type String');
+			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid Bean Type String');
 		}
 		if (preg_match('/\W/', $action)) {
-			return $this->resp(null, $id, -32600, 'Invalid Action String');
+			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid Action String');
 		}
-		try {
-			switch($action) {
-				case 'store':
-					if (!isset($data[0])) {
-						return $this->resp(null, $id, -32602, 'First param needs to be Bean Object');
-					}
-					$data = $data[0];
-					if (!isset($data['id'])) {
-						$bean = RedBean_Facade::dispense($beanType); 
-					} else {
-						$bean = RedBean_Facade::load($beanType, $data['id']);
-					}
-					$bean->import($data);
-					$rid = RedBean_Facade::store($bean);
-					return $this->resp($rid, $id);
-				case 'load':
-					if (!isset($data[0])) {
-						return $this->resp(null, $id, -32602, 'First param needs to be Bean ID');
-					}
-					$bean = RedBean_Facade::load($beanType, $data[0]);
-					return $this->resp($bean->export(), $id);
-				case 'trash':
-					if (!isset($data[0])) {
-						return $this->resp(null, $id, -32602, 'First param needs to be Bean ID');
-					}
-					$bean = RedBean_Facade::load($beanType, $data[0]);
-					RedBean_Facade::trash($bean);
-					return $this->resp('OK', $id);
-				case 'export':
-					if (!isset($data[0])) {
-						return $this->resp(null, $id, -32602, 'First param needs to be Bean ID');
-					}
-					$bean = RedBean_Facade::load($beanType, $data[0]);
-					$array = RedBean_Facade::exportAll(array($bean), true);
-					return $this->resp($array, $id);
-				default:
-					$modelName = $this->modelHelper->getModelName($beanType);
-					if (!class_exists($modelName)) {
-						return $this->resp(null, $id, -32601, 'No such bean in the can!');
-					}
-					$beanModel = new $modelName;
-					if (!method_exists($beanModel, $action)) {
-						return $this->resp(null, $id, -32601, "Method not found in Bean: $beanType ");
-					}
-					return $this->resp(call_user_func_array(array($beanModel, $action), $data), $id);
-			}
-		} catch(Exception $exception) {
-			return $this->resp(null, $id, -32099, $exception->getCode().'-'.$exception->getMessage());
-		}
+		return $this->dispatch($id, $beanType, $action, $data);
 	}
 	
 	/**
@@ -192,7 +304,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 * @return string $json a JSON encoded response ready for sending to client
 	 */
 	public function handleRESTGetRequest($pathToResource) {
-		if (!is_string($pathToResource)) return $this->resp(null, 0, -32099, 'IR');
+		if (!is_string($pathToResource)) return $this->resp(null, 0, self::C_JSONRPC2_SPECIFIED_ERROR, 'IR');
 		$resourceInfo = explode('/', $pathToResource);
 		$type = $resourceInfo[0];
 		try {
@@ -203,7 +315,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 				return $this->resp(RedBean_Facade::load($type, $id)->export(), $id);
 			}
 		} catch(Exception $exception) {
-			return $this->resp(null, 0, -32099);
+			return $this->resp(null, 0, self::C_JSONRPC2_SPECIFIED_ERROR);
 		}
 	}
 }
