@@ -24,6 +24,11 @@ class RedBean_Preloader {
 	protected $oodb;
 	
 	/**
+	 * @var integer
+	 */
+	protected $counterID = 0;
+	
+	/**
 	 * Extracts the type list for preloader.
 	 * 
 	 * @param array|string $typeList
@@ -45,6 +50,45 @@ class RedBean_Preloader {
 			$types = $typeList;
 		}
 		return $types;
+	}
+	
+	/**
+	 * Marks the input beans.
+	 * 
+	 * @param array $beans beans
+	 */
+	private function markBeans($filteredBeans) {
+		$this->counterID = 0;
+		foreach($filteredBeans as $bean) {
+			$bean->setMeta('sys.input-bean-id', array($this->counterID => $this->counterID));
+			$this->counterID++;
+		}
+		return $filteredBeans;
+	}
+	
+	/**
+	 * Adds the beans from the next step in the path to the collection of filtered
+	 * beans.
+	 * 
+	 * @param array  $filteredBeans list of filtered beans
+	 * @param string $nesting       property (list or bean property)
+	 */
+	private function addBeansForNextStepInPath(&$filteredBeans, $nesting) {
+		$filtered = array();
+		foreach($filteredBeans as $bean) {
+			$addInputIDs = $bean->getMeta('sys.input-bean-id');
+			if (is_array($bean->$nesting)) {
+				$nestedBeans = $bean->$nesting;
+				foreach($nestedBeans as $nestedBean) {
+					$this->addInputBeanIDsToBean($nestedBean, $addInputIDs);
+				}
+				$filtered = array_merge($filtered, $nestedBeans);
+			} elseif (!is_null($bean->$nesting)) {
+				$this->addInputBeanIDsToBean($bean->$nesting, $addInputIDs);
+				$filtered[] = $bean->$nesting;
+			}
+		}
+		$filteredBeans = $filtered;
 	}
 	
 	/**
@@ -225,43 +269,24 @@ class RedBean_Preloader {
 		foreach($types as $key => $typeInfo) {
 			list($type,$sqlObj) = (is_array($typeInfo) ? $typeInfo : array($typeInfo, null));
 			list($sql, $bindings) = $sqlObj;
+			if (!is_array($bindings)) {
+					$bindings = array();
+			}
 			$map = $ids = $retrievals[$i] = array();
 			$field = $this->getPreloadField($key, $type, $oldField, $oldFields);
-			$filteredBeans = $beans;
-			$counterID = 0;
-			foreach($filteredBeans as $bean) {
-				$bean->setMeta('sys.input-bean-id', array($counterID => $counterID));
-				$counterID++;
-			}
+			$filteredBeans = $this->markBeans($beans);
 			while($p = strpos($field, '.')) { //filtering: find the right beans in the path
 				$nesting = substr($field, 0, $p);
-				$filtered = array();
-				foreach($filteredBeans as $bean) {
-					$addInputIDs = $bean->getMeta('sys.input-bean-id');
-					if (is_array($bean->$nesting)) {
-						$nestedBeans = $bean->$nesting;
-						foreach($nestedBeans as $nestedBean) {
-							$this->addInputBeanIDsToBean($nestedBean, $addInputIDs);
-						}
-						$filtered = array_merge($filtered, $nestedBeans);
-					} elseif (!is_null($bean->$nesting)) {
-						$this->addInputBeanIDsToBean($bean->$nesting, $addInputIDs);
-						$filtered[] = $bean->$nesting;
-					}
-				}
-				$filteredBeans = $filtered;
+				$this->addBeansForNextStepInPath($filteredBeans, $nesting);
 				$field = substr($field, $p+1);
 			}
 			$oldField = $field;
 			if (strpos($type, '.')) {
 				$type = $field;
 			}
-			if (count($filteredBeans) === 0) {
-				continue;
-			}
+			if (count($filteredBeans) === 0) continue;
 			list($ids, $map) = $this->gatherIDsToPreloadAndMap($filteredBeans, $field);
 			if (strpos($field, 'shared') === 0) {
-				if (!is_array($bindings)) $bindings = array();
 				$sharedBeans = $this->assocManager->relatedSimple($filteredBeans, $type, $sql, $bindings);
 				foreach($filteredBeans as $filteredBean) { //now let the filtered beans gather their beans
 					$list = $this->gatherSharedBeansFromPool($filteredBean, $sharedBeans);
@@ -271,7 +296,6 @@ class RedBean_Preloader {
 			} elseif (strpos($field, 'own') === 0) {//preload for own-list using find
 				$bean = reset($filteredBeans);
 				$link = $bean->getMeta('type').'_id';
-				if (!is_array($bindings)) $bindings = array();
 				$children = $this->oodb->find($type, array($link => $ids), $sql, $bindings);
 				foreach($filteredBeans as $filteredBean) {
 					$list = $this->gatherOwnBeansFromPool($filteredBean, $children, $link);

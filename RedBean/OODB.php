@@ -77,6 +77,26 @@ class RedBean_OODB extends RedBean_Observable {
 	}
 	
 	/**
+	 * Unboxes a bean from a FUSE model if needed and checks whether the bean is
+	 * an instance of RedBean_OODBBean.
+	 * 
+	 * @param RedBean_OODBBean $bean bean you wish to unbox
+	 * 
+	 * @return RedBean_OODBBean
+	 * 
+	 * @throws RedBean_Exception_Security
+	 */
+	private function unboxIfNeeded($bean) {
+		if ($bean instanceof RedBean_SimpleModel) {
+			$bean = $bean->unbox();
+		}
+		if (!($bean instanceof RedBean_OODBBean)) {
+			throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
+		}
+		return $bean;
+	}
+	
+	/**
 	 * Process groups. Internal function. Processes different kind of groups for
 	 * storage function. Given a list of original beans and a list of current beans,
 	 * this function calculates which beans remain in the list (residue), which
@@ -138,6 +158,21 @@ class RedBean_OODB extends RedBean_Observable {
 	}
 	
 	/**
+	 * Orders the Query Writer to create a table if it does not exist already and
+	 * adds a note in the build report about the creation.
+	 *  
+	 * @param RedBean_OODBBean $bean  bean to update report of
+	 * @param string           $table table to check and create if not exists
+	 */
+	private function createTableIfNotExists(RedBean_OODBBean $bean, $table) {
+		//Does table exist? If not, create
+		if (!$this->isFrozen && !$this->tableExists($this->writer->esc($table, true))) {
+			$this->writer->createTable($table);
+			$bean->setMeta('buildreport.flags.created', true);
+		}
+	} 
+	
+	/**
 	 * Stores a cleaned bean; i.e. only scalar values. This is the core of the store()
 	 * method. When all lists and embedded beans (parent objects) have been processed and
 	 * removed from the original bean the bean is passed to this method to be stored
@@ -152,20 +187,13 @@ class RedBean_OODB extends RedBean_Observable {
 		//what table does it want
 		$table = $bean->getMeta('type');
 		if ($bean->getMeta('tainted')) {
-			//Does table exist? If not, create
-			if (!$this->isFrozen && !$this->tableExists($this->writer->esc($table, true))) {
-				$this->writer->createTable($table);
-				$bean->setMeta('buildreport.flags.created', true);
-			}
+			$this->createTableIfNotExists($bean, $table);
 			if (!$this->isFrozen) {
 				$columns = $this->writer->getColumns($table) ;
 			}
 			//does the table fit?
-			$insertValues = array();
-			$insertColumns = array();
-			$updateValues = array();
+			$insertValues = $insertColumns = $updateValues = array();
 			foreach($bean as $property => $value) {
-				$originalValue = $value;
 				if ($property !== 'id') {
 					if (!$this->isFrozen) {
 						//Not in the chill list?
@@ -182,7 +210,6 @@ class RedBean_OODB extends RedBean_Observable {
 							//Is this property represented in the table?
 							if (isset($columns[$this->writer->esc($property, true)])) {
 								//rescan
-								$value = $originalValue;
 								if (!$cast) {
 									$typeno = $this->writer->scanType($value, false);
 								}
@@ -197,7 +224,6 @@ class RedBean_OODB extends RedBean_Observable {
 								//no it is not
 								$this->writer->addColumn($table, $property, $typeno);
 								$bean->setMeta('buildreport.flags.addcolumn', true);
-								//@todo: move build commands here... more practical
 								$this->processBuildCommands($table, $property, $bean);
 							}
 						}
@@ -581,12 +607,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * @throws RedBean_Exception_Security
 	 */
 	public function store($bean) { 
-		if ($bean instanceof RedBean_SimpleModel) {
-			$bean = $bean->unbox();
-		}
-		if (!($bean instanceof RedBean_OODBBean)) {
-			throw new RedBean_Exception_Security('OODB Store requires a bean, got: '.gettype($bean));
-		}
+		$bean = $this->unboxIfNeeded($bean);
 		$processLists = false;
 		foreach($bean as $value) {
 			if (is_array($value) || is_object($value)) { 
@@ -605,9 +626,7 @@ class RedBean_OODB extends RedBean_Observable {
 		if ($processLists) {
 			//Define groups
 			$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array();
-			$ownAdditions = $ownTrashcan = $ownresidue = array();
-			$tmpCollectionStore = array();
-			$embeddedBeans = array();
+			$ownAdditions = $ownTrashcan = $ownresidue = $tmpCollectionStore = $embeddedBeans = array();
 			foreach($bean as $property => $value) {
 				if ($value instanceof RedBean_SimpleModel) {
 					$value = $value->unbox();
@@ -704,9 +723,9 @@ class RedBean_OODB extends RedBean_Observable {
 		foreach($row as $columnName => $cellValue) {
 			$bean->$columnName = $cellValue;
 		}
-		$this->nesting ++;
+		$this->nesting++;
 		$this->signal('open', $bean);
-		$this->nesting --;
+		$this->nesting--;
 		$bean->setMeta('tainted', false);
 		return $bean;
 	}
@@ -745,7 +764,7 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		try {
 			$this->writer->deleteRecord($bean->getMeta('type'),array('id' => array($bean->id)), null);
-		}catch(RedBean_Exception_SQL $exception) {
+		} catch(RedBean_Exception_SQL $exception) {
 			$this->handleException($exception);
 		}
 		$bean->id = 0;
