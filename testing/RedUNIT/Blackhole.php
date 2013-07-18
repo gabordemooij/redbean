@@ -1,23 +1,24 @@
 <?php
 /**
- * RedUNIT_Blackhole
- * 
- * @file 			RedUNIT/Blackhole.php
- * @description		Parent class for all tests that don't need a database connection.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
+ * Blackhole tests.
  *
+ * @file    RedUNIT/Blackhole.php
+ * @desc    Tests that do not require a database or can just use the base SQLite driver.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-
 class RedUNIT_Blackhole extends RedUNIT {
 
+	/**
+	 * Returns the drivers this test suite applies to.
+	 * 
+	 * @return array
+	 */
 	public function getTargetDrivers() {
 		return array();
 	}
-
 }
