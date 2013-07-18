@@ -410,7 +410,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				{$destTable}.*,
 				COALESCE(
 				NULLIF({$linkTable}.{$sourceCol}, {$destTable}.id), 
-				NULLIF({$linkTable}.{$destCol}, {$destTable}.id)) AS __linked_by
+				NULLIF({$linkTable}.{$destCol}, {$destTable}.id)) AS linked_by
 			FROM {$linkTable}
 			INNER JOIN {$destTable} ON 
 			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
@@ -422,7 +422,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			$sql = "
 			SELECT 
 				{$destTable}.*,
-				{$linkTable}.{$sourceCol} AS __linked_by	
+				{$linkTable}.{$sourceCol} AS linked_by	
 			FROM {$linkTable}
 			INNER JOIN {$destTable} ON 
 			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) )

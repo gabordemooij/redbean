@@ -389,8 +389,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 			if (!isset($links[$row['id']])) {
 				$links[$row['id']] = array();
 			} 
-			$links[$row['id']][] = $row['__linked_by'];
-			unset($rows[$key]['__linked_by']);
+			$links[$row['id']][] = $row['linked_by'];
+			unset($rows[$key]['linked_by']);
 		}
 		$beans = $this->oodb->convertToBeans($type, $rows);
 		foreach($beans as $bean) {
