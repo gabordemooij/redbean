@@ -58,8 +58,9 @@ if (isset($ini['CUBRID'])) {
 }
 if (isset($ini['oracle'])){
     R::addDatabase('oracle',$ini['oracle']['dsn'],$ini['oracle']['user'],$ini['oracle']['pass'],false);
+    R::selectDatabase('oracle'); 
 }
-R::selectDatabase('sqlite');
+//R::selectDatabase('sqlite');
 
 //Function to activate a driver
 function activate_driver($d) {

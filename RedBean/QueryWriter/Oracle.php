@@ -504,14 +504,14 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	/**
 	 * @see RedBean_QueryWriter::queryRecord
 	 */
-	public function queryRecord($type, $conditions, $addSql = null, $all = false) { 
-		return parent::queryRecord($type, $this->filterConditions($conditions), $addSql, $all);
+	public function  queryRecord($type, $conditions = array(), $addSql = null, $bindings = array()) {
+		return parent::queryRecord($type, $this->filterConditions($conditions), $addSql, $bindings);
 	}
 	/**
 	 * @see RedBean_QueryWriter::deleteRecord
 	 */
-	public function deleteRecord($type, $conditions, $addSql = null) {
-		return parent::deleteRecord($type, $this->filterConditions($conditions), $addSql);
+	public function deleteRecord($type, $conditions = array(), $addSql = null, $bindings = array()) {
+		return parent::deleteRecord($type, $this->filterConditions($conditions), $addSql, $bindings);
 	}
 	/**
 	 * @see RedBean_QueryWriter::queryRecordInverse
