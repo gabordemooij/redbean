@@ -34,6 +34,9 @@ class RedBean_SimpleModel {
 	/**
 	 * Magic Getter to make the bean properties available from
 	 * the $this-scope.
+	 * 
+	 * @note this method returns a value, not a reference!
+	 * To obtain a reference unbox the bean first! 
 	 *
 	 * @param string $prop property
 	 *
@@ -44,7 +47,8 @@ class RedBean_SimpleModel {
 	}
 	
 	/**
-	 * Magic Setter
+	 * Magic Setter.
+	 * Sets the value directly as a bean property.
 	 *
 	 * @param string $prop  property
 	 * @param mixed  $value value
@@ -56,9 +60,10 @@ class RedBean_SimpleModel {
 	}
 	
 	/**
-	 * Isset implementation
+	 * Isset implementation.
+	 * Implements the isset function for array-like access.
 	 *
-	 * @param  string $key key
+	 * @param  string $key key to check
 	 *
 	 * @return boolean
 	 */
@@ -68,6 +73,12 @@ class RedBean_SimpleModel {
 	
 	/**
 	 * Box the bean using the current model.
+	 * This method wraps the current bean in this model.
+	 * This method can be reached using FUSE through a simple
+	 * OODBBean. The method returns a RedBeanPHP Simple Model.
+	 * This is useful if you would like to rely on PHP type hinting.
+	 * You can box your beans before passing them to functions or methods
+	 * with typed parameters.
 	 * 
 	 * @return RedBean_SimpleModel
 	 */
@@ -77,6 +88,7 @@ class RedBean_SimpleModel {
 	
 	/**
 	 * Unbox the bean from the model.
+	 * This method returns the bean inside the model.
 	 * 
 	 * @return RedBean_OODBBean 
 	 */

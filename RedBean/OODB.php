@@ -189,51 +189,40 @@ class RedBean_OODB extends RedBean_Observable {
 		if (!$this->isFrozen) {
 			$this->check($bean);
 		}
-		//what table does it want
 		$table = $bean->getMeta('type');
 		if ($bean->getMeta('tainted')) {
 			$this->createTableIfNotExists($bean, $table);
 			if (!$this->isFrozen) {
 				$columns = $this->writer->getColumns($table) ;
 			}
-			//does the table fit?
 			$insertValues = $insertColumns = $updateValues = array();
 			foreach($bean as $property => $value) {
 				if ($property !== 'id') {
 					if (!$this->isFrozen) {
-						//Not in the chill list?
 						if (!in_array($bean->getMeta('type'), $this->chillList)) {
-							//Does the user want to specify the type?
-							if ($bean->getMeta("cast.$property", -1) !== -1) {
+							if ($bean->getMeta("cast.$property", -1) !== -1) { //check for explicitly specified types
 								$cast = $bean->getMeta("cast.$property");
 								$typeno = $this->getTypeFromCast($cast);
 							} else {
 								$cast = false;		
-								//What kind of property are we dealing with?
 								$typeno = $this->writer->scanType($value, true);
 							}
-							//Is this property represented in the table?
-							if (isset($columns[$this->writer->esc($property, true)])) {
-								//rescan
-								if (!$cast) {
+							if (isset($columns[$this->writer->esc($property, true)])) { //Is this property represented in the table ?
+								if (!$cast) { //rescan without taking into account special types >80
 									$typeno = $this->writer->scanType($value, false);
 								}
-								//yes it is, does it still fit?
 								$sqlt = $this->writer->code($columns[$this->writer->esc($property, true)]);
-								if ($typeno > $sqlt) {
-									//no, we have to widen the database column type
+								if ($typeno > $sqlt) { //no, we have to widen the database column type
 									$this->writer->widenColumn($table, $property, $typeno);
 									$bean->setMeta('buildreport.flags.widen', true);
 								}
 							} else {
-								//no it is not
 								$this->writer->addColumn($table, $property, $typeno);
 								$bean->setMeta('buildreport.flags.addcolumn', true);
 								$this->processBuildCommands($table, $property, $bean);
 							}
 						}
 					}
-					//Okay, now we are sure that the property value will fit
 					$insertValues[] = $value;
 					$insertColumns[] = $property;
 					$updateValues[] = array('property' => $property, 'value' => $value);

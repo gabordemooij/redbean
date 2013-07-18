@@ -1,6 +1,8 @@
 <?php
 /**
- * RedBean Tag Manager
+ * RedBean Tag Manager.
+ * The tag manager offers an easy way to quickly implement basic tagging
+ * functionality.
  * 
  * @file    RedBean/TagManager.php
  * @desc    RedBean Tag Manager
@@ -32,7 +34,9 @@ class RedBean_TagManager {
 	protected $redbean;
 	
 	/**
-	 * Constructor
+	 * Constructor.
+	 * The tag manager offers an easy way to quickly implement basic tagging
+	 * functionality.
 	 *
 	 * @param RedBean_Toolbox $toolbox 
 	 */
@@ -143,7 +147,7 @@ class RedBean_TagManager {
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
 	 *
-	 * @param RedBean_OODBBean  $bean    bean
+	 * @param RedBean_OODBBean $bean    bean to add tags to
 	 * @param array				$tagList list of tags to add to bean
 	 *
 	 * @return void

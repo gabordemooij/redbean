@@ -1,15 +1,13 @@
 <?php
 /**
- * RedUNIT_CUBRID
- * 
- * @file 			RedUNIT/CUBRID.php
- * @description		Parent class for all CUBRID tests.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
+ * CUBRID tests.
  *
+ * @file    RedUNIT/CUBRID.php
+ * @desc    Base class for all test classes that aim to test the CUBRID database support.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */

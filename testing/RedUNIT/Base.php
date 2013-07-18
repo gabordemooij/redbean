@@ -1,15 +1,13 @@
 <?php
 /**
- * RedUNIT_Base
- * 
- * @file 			RedUNIT/Base.php
- * @description		Parent class for all tests that should be ran for all databases.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
+ * Base tests.
  *
+ * @file    RedUNIT/Base.php
+ * @desc    Base class for all drivers that support all database systems.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */

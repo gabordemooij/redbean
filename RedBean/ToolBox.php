@@ -1,6 +1,11 @@
 <?php
 /**
- * ToolBox
+ * ToolBox.
+ * The toolbox is an integral part of RedBeanPHP providing the basic
+ * architectural building blocks to manager objects, helpers and additional tools
+ * like plugins. A toolbox contains the three core components of RedBeanPHP:
+ * the adapter, the query writer and the core functionality of RedBeanPHP in
+ * OODB.
  * 
  * @file    RedBean/ToolBox.php
  * @desc    A RedBeanPHP-wide service locator
@@ -30,6 +35,11 @@ class RedBean_ToolBox {
 	
 	/**
 	 * Constructor.
+	 * The toolbox is an integral part of RedBeanPHP providing the basic
+	 * architectural building blocks to manager objects, helpers and additional tools
+	 * like plugins. A toolbox contains the three core components of RedBeanPHP:
+	 * the adapter, the query writer and the core functionality of RedBeanPHP in
+	 * OODB.
 	 *
 	 * @param RedBean_OODB              $oodb    Object Database
 	 * @param RedBean_Adapter_DBAdapter $adapter Adapter

@@ -2,12 +2,10 @@
 /**
  * RedUNIT_Base_Aliasing 
  * 
- * @file 			RedUNIT/Base/Aliasing.php
- * @description		Tests for nested beans with aliases, i.e. teacher alias for person etc.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
- *
+ * @file    RedUNIT/Base/Aliasing.php
+ * @desc    Tests for nested beans with aliases, i.e. teacher alias for person etc.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
@@ -81,7 +79,6 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base {
 		}
 		catch(RedBean_Exception_Security $e){ pass();}
 		catch(Exception $e){fail();}
-		
 		
 		try{
 			$book->ownPage[] = "a string"; R::store($book); fail();
@@ -165,7 +162,6 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base {
 		asrt($message->fetchAs('person')->sender->name,'Sheldon');
 		asrt($message->fetchAs('person')->recipient->name,'Penny');
 		
-		
 		R::nuke();
 		$project = R::dispense('project');
 		$project->name = 'Mutant Project';
@@ -231,4 +227,3 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base {
 		asrt(count($lines), 2);
 	}	
 }
-

@@ -6,6 +6,9 @@
  * @desc    Plugin to export beans to arrays recursively
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
+ * 
+ * @deprecated 
+ * Use the R::exportAll method instead.
  *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
@@ -176,8 +179,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		}
 		$type = $bean->getMeta('type');
 		$linkField = $type . '_id';
-		//get all ownProperties
-		foreach($this->tables as $table => $cols) {
+		foreach($this->tables as $table => $cols) { //get all ownProperties
 			if (strpos($table, '_') === false) {
 				if (in_array($linkField, array_keys($cols))) {
 					$field = 'own'.ucfirst($table);
@@ -185,8 +187,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 				}
 			}
 		}
-		//get all sharedProperties
-		foreach($this->tables as $table => $cols) {
+		foreach($this->tables as $table => $cols) { //get all sharedProperties
 			if (strpos($table, '_') !== false) {
 				$parts = explode('_', $table);
 				if (is_array($parts) && in_array($type, $parts)) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * Preloader
+ * Preloader.
  * 
  * @file    RedBean/Preloader.php
  * @desc    Used by OODB to facilitate preloading or eager loading
@@ -30,8 +30,10 @@ class RedBean_Preloader {
 	
 	/**
 	 * Extracts the type list for preloader.
+	 * Explodes a list of comma separated types and splits
+	 * the type definition in list -> type pairs if needed.
 	 * 
-	 * @param array|string $typeList
+	 * @param array|string $typeList list of types
 	 * 
 	 * @return array
 	 */
@@ -54,8 +56,10 @@ class RedBean_Preloader {
 	
 	/**
 	 * Marks the input beans.
+	 * This method is used to connect the current selection of beans to
+	 * input beans.
 	 * 
-	 * @param array $beans beans
+	 * @param array $beans beans to connect to input beans
 	 * 
 	 * @return void
 	 */
@@ -122,8 +126,8 @@ class RedBean_Preloader {
 	 * For Preloader: adds the IDs of your input beans to the nested beans, otherwise
 	 * we dont know how to pass them to the each-function later on.
 	 * 
-	 * @param RedBean_OODBBean $nestedBean
-	 * @param array $addInputIDs
+	 * @param RedBean_OODBBean $nestedBean  nested bean
+	 * @param array            $addInputIDs input ids
 	 * 
 	 * @return void
 	 */

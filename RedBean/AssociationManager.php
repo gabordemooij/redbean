@@ -344,9 +344,15 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	}
 	
 	/**
+	 * Swaps a property of two beans.
+	 * 
 	 * @deprecated
+	 * This method does not seem very useful.
+	 * 
 	 * @param array  $beans    beans
-	 * @param string $property property
+	 * @param string $property property to swap
+	 * 
+	 * @return void
 	 */
 	public function swap($beans, $property) {
 		$bean1 = array_shift($beans);

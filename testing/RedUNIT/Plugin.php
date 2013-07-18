@@ -1,15 +1,13 @@
 <?php
 /**
- * RedUNIT_Plugin
- * 
- * @file 			RedUNIT/Plugin.php
- * @description		Parent class for all tests that should be ran for all plugin tests.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
+ * Plugin tests.
  *
+ * @file    RedUNIT/Plugin.php
+ * @desc    Base class for all plugin tests.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
- * (c) G.J.G.T. (Gabor) de Mooij
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */

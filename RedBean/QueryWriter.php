@@ -123,6 +123,8 @@ interface RedBean_QueryWriter {
 	
 	/**
 	 * Selects records from the database.
+	 * This methods selects the records from the database that match the specified
+	 * type, conditions (optional) and additional SQL snippet (optional).
 	 * 
 	 * @param string  $type       name of the table you want to query
 	 * @param array   $conditions criteria ( $column => array( $values ) )
@@ -164,15 +166,14 @@ interface RedBean_QueryWriter {
 	/**
 	 * Returns the row that links $sourceType $sourcID to $destType $destID in an N-M relation.
 	 * 
-	 * @param string $sourceType
-	 * @param string $destType
-	 * @param string $sourceID
-	 * @param string $destID
+	 * @param string $sourceType source type, the first part of the link you're looking for
+	 * @param string $destType   destination type, the second part of the link you're looking for
+	 * @param string $sourceID   ID for the source
+	 * @param string $destID     ID for the destination
 	 * 
 	 * @return array|null
 	 */
 	public function queryRecordLink($sourceType, $destType, $sourceID, $destID);
-	
 	
 	/**
 	 * Counts the number of records in the database that match the

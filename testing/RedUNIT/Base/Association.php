@@ -2,12 +2,10 @@
 /**
  * RedUNIT_Base_Association 
  * 
- * @file 			RedUNIT/Base/Association.php
- * @description		Tests Association API (N:N associations)
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
- *
+ * @file    RedUNIT/Base/Association.php
+ * @desc    Tests Association API (N:N associations)
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
  *
  * (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
@@ -146,7 +144,6 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		asrt(($expected instanceof RedBean_Exception_SQL),true);
 		asrt(R::count('book'),1);
 		
-		
 		//Multiple Associations and Dissociations
 		R::nuke();
 		$wines = R::dispense('wine',3);
@@ -184,9 +181,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		asrt(count($wines[2]->sharedCheese),0);
 		asrt(count($wines[2]->sharedOlive),0);
 		
-		
 		R::nuke();
-		
 		try{
 			R::related(null,'book');
 		}catch(Exception $e){ 
@@ -288,9 +283,6 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		$user2 = $redbean->dispense("user");
 		$user2->name = "Second User";
 		
-		
-		
-		
 		set1toNAssoc($a,$user2, $page);
 		set1toNAssoc($a,$user, $page);
 		asrt(count($a->related($user2, "page" )),0);
@@ -313,7 +305,6 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		asrt(($page2->id>0),true);
 		$idpage = $page->id;
 		$idpage2 = $page2->id;
-		
 		
 		$page = $redbean->dispense("page");
 		$page->name = "test page";
@@ -369,11 +360,12 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 		$bar->id = 2;
 		asrt(R::areRelated($foo,$bar),false);
 		
-		
 	}	
-	
 }
 
+/**
+ * Mock class for testing purposes.
+ */
 class Model_Ghost_House extends RedBean_SimpleModel {
 	public static $deleted = false;
 	public function delete() {
@@ -381,6 +373,9 @@ class Model_Ghost_House extends RedBean_SimpleModel {
 	}
 }
 
+/**
+ * Mock class for testing purposes.
+ */
 class Model_Ghost_Ghost extends RedBean_SimpleModel {
 	public static $deleted = false;
 	public function delete() {
@@ -388,14 +383,30 @@ class Model_Ghost_Ghost extends RedBean_SimpleModel {
 	}
 }
 
+/**
+ * Mock class for testing purposes.
+ */
 class FaultyWriter extends RedBean_QueryWriter_MySQL {
 	
 	protected $sqlState;
 	
+	/**
+	 * Mock method.
+	 * 
+	 * @param string $sqlState sql state
+	 */
 	public function setSQLState($sqlState) {
 		$this->sqlState = $sqlState;
 	}
 	
+	/**
+	 * Mock method
+	 * 
+	 * @param string $sourceType destination type
+	 * @param string $destType   source type
+	 * 
+	 * @throws RedBean_Exception_SQL
+	 */
 	public function addConstraintForTypes($sourceType, $destType) {
 		$exception = new RedBean_Exception_SQL;
 		$exception->setSQLState($this->sqlState);

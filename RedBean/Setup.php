@@ -16,6 +16,9 @@ class RedBean_Setup {
 	
 	/**
 	 * This method checks the DSN string.
+	 * Checks the validity of the DSN string.
+	 * If the DSN contains an invalid database identifier this method
+	 * will trigger an error.
 	 *
 	 * @param string $dsn
 	 * 
