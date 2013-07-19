@@ -1,21 +1,14 @@
 <?php
 /**
  * RedUNIT_Plugin_Sync
- *  
- * @file 			RedUNIT/Plugin/Sync.php
- * @description		Tests sync functionality.
- *					This test pack is part of the RedBeanPHP ORM Plugin test suite.
- *					This class is part of the RedUNIT test suite for RedBeanPHP.
- *					This class tests whether we can sync() two schemas 
- *					and also tests whether we can sync between two different
- *					database systems, for instance PostgreSQL -> MySQL etc.
- *					All combinations are tested. 
- * @author			Gabor de Mooij
- * @license			BSD
+ * 
+ * @file    RedUNIT/Plugin/Sync.php
+ * @desc    Tests sync functionality.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license New BSD/GPLv2
  *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedUNIT_Plugin_Sync extends RedUNIT_Plugin {

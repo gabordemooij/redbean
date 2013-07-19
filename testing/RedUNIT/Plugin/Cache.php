@@ -2,15 +2,13 @@
 /**
  * RedUNIT_Plugin_Cache
  * 
- * @file 			RedUNIT/Plugin/Cache.php
- * @description		Tests caching plugin.
- * 					This test pack is part of the RedBeanPHP ORM Plugin test suite.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @file    RedUNIT/Plugin/Cache.php
+ * @desc    Tests caching plugin.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license New BSD/GPLv2
  *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedUNIT_Plugin_Cache extends RedUNIT_Plugin {

@@ -1,14 +1,14 @@
 <?php
 /**
- * RedUNIT_Base_Batch 
+ * RedUNIT_Base_Batch
  * 
- * @file 	RedUNIT/Base/Batch.php
+ * @file    RedUNIT/Base/Batch.php
  * @desc    Tests batch loading of beans, i.e. loading large collections of beans in optimized way.
- * @author	Gabor de Mooij and the RedBeanPHP Community
- * @license	BSD/GPLv2
- * 
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license New BSD/GPLv2
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedUNIT_Base_Batch extends RedUNIT_Base {

@@ -1,19 +1,14 @@
 <?php
-
 /**
  * RedUNIT_Base_Foreignkeys
+ * 
+ * @file    RedUNIT/Base/Foreignkeys.php
+ * @desc    Tests foreign key handling and dynamic foreign keys with
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license New BSD/GPLv2
  *
- * @file 			RedUNIT/Base/Foreignkeys.php
- * @description		Tests foreign key handling and dynamic foreign keys with
- * 					dependency list.
- *
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
- *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer {

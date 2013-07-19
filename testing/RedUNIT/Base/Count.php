@@ -1,16 +1,14 @@
 <?php
 /**
- * RedUNIT_Base_Count 
+ * RedUNIT_Base_Count
  * 
- * @file 			RedUNIT/Base/Count.php
- * @description		Tests for simple bean counting.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @file    RedUNIT/Base/Count.php
+ * @desc    Tests for simple bean counting.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license New BSD/GPLv2
  *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedUNIT_Base_Count extends RedUNIT_Base {

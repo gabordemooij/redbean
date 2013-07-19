@@ -1,16 +1,14 @@
 <?php
 /**
- * RedUNIT_Oracle_Database 
+ * RedUNIT_Oracle_Database
  * 
- * @file 			RedUNIT/Oracle/Database.php
- * @description		Tests basic database behaviors
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @file    RedUNIT/Oracle/Database.php
+ * @desc    Tests basic database behaviors
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license New BSD/GPLv2
  *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedUNIT_Oracle_Database extends RedUNIT_Oracle {

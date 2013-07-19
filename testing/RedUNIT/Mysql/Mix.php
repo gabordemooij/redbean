@@ -2,15 +2,13 @@
 /**
  * RedUNIT_Mysql_Mix
  * 
- * @file 			RedUNIT/Mysql/Mix.php
- * @description		Tests mixing SQL with PHP, SQLHelper class.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @file    RedUNIT/Mysql/Mix.php
+ * @desc    Tests mixing SQL with PHP, SQLHelper class.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license New BSD/GPLv2
  *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedUNIT_Mysql_Mix extends RedUNIT_Mysql {

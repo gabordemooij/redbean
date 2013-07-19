@@ -1,16 +1,14 @@
 <?php
 /**
- * RedUNIT_Base_Typechecking 
+ * RedUNIT_Base_Typechecking
  * 
- * @file 			RedUNIT/Base/Typechecking.php
- * @description		Tests basic bean validation rules; invalid bean handling.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @file    RedUNIT/Base/Typechecking.php
+ * @desc    Tests basic bean validation rules; invalid bean handling.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license New BSD/GPLv2
  *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedUNIT_Base_Typechecking extends RedUNIT_Base {

@@ -2,15 +2,13 @@
 /**
  * RedUNIT_Postgres_Views
  * 
- * @file 			RedUNIT/Postgres/Views.php
- * @description		Tests the creation of views.
- * 					This class is part of the RedUNIT test suite for RedBeanPHP.
- * @author			Gabor de Mooij
- * @license			BSD
+ * @file    RedUNIT/Postgres/Views.php
+ * @desc    Tests the creation of views.
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license New BSD/GPLv2
  *
- *
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedUNIT_Postgres_Views extends RedUNIT_Postgres {

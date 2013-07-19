@@ -1,14 +1,14 @@
 <?php
 /**
- * RedUNIT_Base_Aliasing 
+ * RedUNIT_Base_Aliasing
  * 
  * @file    RedUNIT/Base/Aliasing.php
  * @desc    Tests for nested beans with aliases, i.e. teacher alias for person etc.
  * @author  Gabor de Mooij and the RedBeanPHP Community
- * @license BSD/GPLv2
+ * @license New BSD/GPLv2
  *
- * (c) G.J.G.T. (Gabor) de Mooij
- * This source file is subject to the BSD/GPLv2 License that is bundled
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class RedUNIT_Base_Aliasing extends RedUNIT_Base {
