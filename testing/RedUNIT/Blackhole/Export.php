@@ -20,7 +20,7 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole {
 	 */
 	public function run() {
 		
-		
+		testpack('Test exportAll');
 		$redbean = R::$redbean;
 		$bean = new RedBean_OODBBean;
 		$bean->import(array("a"=>1,"b"=>2));
@@ -114,10 +114,5 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole {
 		$v = R::load('village',$id);
 		$a = R::exportAll($v);
 		asrt(count($a[0]['sharedArmy']),2);
-		
-	
-		
-		
 	}
-
 }

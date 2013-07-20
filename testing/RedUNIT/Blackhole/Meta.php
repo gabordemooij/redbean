@@ -19,6 +19,8 @@ class RedUNIT_Blackhole_Meta extends RedUNIT_Blackhole {
 	 * @return void
 	 */
 	public function run() {
+		
+		testpack('Test meta data');
 		$bean = new RedBean_OODBBean;
 		$bean->setMeta( "this.is.a.custom.metaproperty" , "yes" );
 		asrt($bean->getMeta("this.is.a.custom.metaproperty"),"yes");
@@ -39,7 +41,6 @@ class RedUNIT_Blackhole_Meta extends RedUNIT_Blackhole {
 		asrt($bean2->getMeta("meta.meta"),NULL);
 		$bean2->copyMetaFrom($bean);
 		asrt($bean2->getMeta("meta.meta"),"123");
-		
 		
 	}
 

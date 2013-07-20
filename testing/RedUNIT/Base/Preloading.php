@@ -320,7 +320,9 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 			$author->alias('coauthor')->ownBook = R::dispense('book',2);
 			foreach($author->alias('coauthor')->ownBook as $book) {
 				$book->ownPage = R::dispense('page',2);
-				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+				foreach($book->ownPage as $page) { 
+					$page->ownText = R::dispense('text',2);
+				}
 			}
 		}
 		R::storeAll($authors);
@@ -349,7 +351,9 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 			$author->ownBook = R::dispense('book',2);
 			foreach($author->ownBook as $book) {
 				$book->ownPage = R::dispense('page',2);
-				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+				foreach($book->ownPage as $page) {
+					$page->ownText = R::dispense('text',2);
+				}
 			}
 		}
 		R::storeAll($authors);
@@ -502,28 +506,34 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 			$author->ownBook = R::dispense('book',2);
 			foreach($author->ownBook as $book) {
 				$book->ownPage = R::dispense('page',2);
-				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+				foreach($book->ownPage as $page) {
+					$page->ownText = R::dispense('text',2);
+				}
 			}
 		}
 		R::storeAll($authors);
 		$texts = R::find('text');
 		$hasNuked = false;
-		R::preload($texts,'page,*.book,*.author',function($text,$page,$book,$author)use(&$hasNuked){
-			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
-			asrt($text->getMeta('type'),'text');
-			asrt($page->getMeta('type'),'page');
-			asrt($book->getMeta('type'),'book');
-			asrt($author->getMeta('type'),'author');
+		R::preload($texts,'page,*.book,*.author', function($text, $page, $book, $author) use (&$hasNuked) {
+			if (!$hasNuked) { 
+				R::nuke(); $hasNuked = true; 
+			}
+			asrt($text->getMeta('type'), 'text');
+			asrt($page->getMeta('type'), 'page');
+			asrt($book->getMeta('type'), 'book');
+			asrt($author->getMeta('type'), 'author');
 		});
 		
 		//test with closure and abbrevations and same-level abbr
 		R::nuke();
-		$authors = R::dispense('author',2);
+		$authors = R::dispense('author', 2);
 		foreach($authors as $author) { 
-			$author->ownBook = R::dispense('book',2);
+			$author->ownBook = R::dispense('book', 2);
 			foreach($author->ownBook as $book) {
-				$book->ownPage = R::dispense('page',2);
-				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
+				$book->ownPage = R::dispense('page', 2);
+				foreach($book->ownPage as $page) {
+					$page->ownText = R::dispense('text', 2);
+				}
 			}
 		}
 		foreach($authors as $author) {
@@ -534,15 +544,18 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::storeAll($authors);
 		$texts = R::find('text');
 		$hasNuked = false;
-		R::preload($texts,'page,*.book,*.author,&.shelf',function($text,$page,$book,$author,$shelf)use(&$hasNuked){
-			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
-			asrt($text->getMeta('type'),'text');
-			asrt($page->getMeta('type'),'page');
+		R::preload($texts,'page,*.book,*.author,&.shelf', function($text,$page,$book,$author,$shelf) use (&$hasNuked) {
+			if (!$hasNuked) { 
+				R::nuke(); 
+				$hasNuked = true; 
+			}
+			asrt($text->getMeta('type'), 'text');
+			asrt($page->getMeta('type'), 'page');
 			asrt(($page->id>0),true);
-			asrt($book->getMeta('type'),'book');
+			asrt($book->getMeta('type'), 'book');
 			asrt(($book->id>0),true);
-			asrt($author->getMeta('type'),'author');
-			asrt($shelf->getMeta('type'),'shelf');
+			asrt($author->getMeta('type'), 'author');
+			asrt($shelf->getMeta('type'), 'shelf');
 		});
 		
 		//test with closure, abbreviation and own-list
@@ -580,9 +593,12 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 			foreach($author->ownBook as $book) {
 				$book->ownPage = R::dispense('page',2);
 				$book->cover = R::dispense('cover',1);
-				foreach($book->ownPage as $page) $page->ownText = R::dispense('text',2);
-				foreach($book->ownPage as $page) $page->ownPicture = R::dispense('picture',3);
-		
+				foreach($book->ownPage as $page) {
+					$page->ownText = R::dispense('text',2);
+				}
+				foreach($book->ownPage as $page) {
+					$page->ownPicture = R::dispense('picture',3);
+				}
 			}
 		}
 		R::storeAll($authors);
@@ -749,8 +765,6 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		asrt(count($books[3]->ownPage),0);
 		asrt(count($books[3]->sharedAd),0);
 		
-		
-		
 		R::nuke();
 		R::$writer->setUseCache(false);
 		
@@ -813,10 +827,8 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 				asrt($first->getMeta('type'),'building');
 				$first = reset($x);
 				asrt($first->getMeta('type'),'book');
-				
-				
-			}
-			elseif ($counter === 1) {
+						
+			} elseif ($counter === 1) {
 				asrt($w->name,'w1');
 				asrt((string)$t->name,'1');
 				asrt(count($t->sharedArmy),2);
@@ -864,7 +876,6 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 				asrt($first->getMeta('type'),'building');
 			}
 			$counter++;
-	
 		});
 	}
 }

@@ -66,8 +66,6 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole {
 		list($coffee,$cocoa) = $geek->getObjects();
 		asrt(($coffee instanceof Dependency_Coffee),false);
 		asrt(($cocoa instanceof Dependency_Cocoa),false);
-		
-		
 	}
 }
 

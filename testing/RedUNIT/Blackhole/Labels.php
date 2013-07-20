@@ -21,6 +21,7 @@ class RedUNIT_Blackhole_Labels extends RedUNIT_Blackhole {
 	 */
 	public function run() {
 		
+		testpack('Test Labels');
 		$meals = R::dispenseLabels('meal',array('meat','fish','vegetarian'));
 		asrt(is_array($meals),true);
 		asrt(count($meals),3);
@@ -29,6 +30,5 @@ class RedUNIT_Blackhole_Labels extends RedUNIT_Blackhole {
 		}
 		$listOfMeals = implode(',',R::gatherLabels($meals));
 		asrt($listOfMeals,'fish,meat,vegetarian');
-		
 	}
 }

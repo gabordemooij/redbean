@@ -23,7 +23,6 @@ class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole {
 		asrt(($soup instanceof Model_Soup),true);
 		asrt('A bit too salty',$soup->taste());
 		asrt('tomato',$soup->flavour);
-		
 	}
 	
 	/**
@@ -41,7 +40,6 @@ class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole {
 	 * Testing Fusebox
 	 */
 	public function run() {
-		
 		$soup = R::dispense('soup');
 		$soup->flavour = 'tomato';
 		$this->giveMeSoup($soup->box());
@@ -49,10 +47,7 @@ class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole {
 		$this->giveMeBean($soup);
 		
 	}
-	
-	
 }
-
 
 /**
  * A model to box soup models :)

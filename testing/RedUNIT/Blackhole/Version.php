@@ -22,5 +22,4 @@ class RedUNIT_Blackhole_Version extends RedUNIT_Blackhole {
 		$version = R::getVersion();
 		asrt(is_string($version),true);
 	}
-	
 }

@@ -56,7 +56,6 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		list($sql, $params) = R::$f->begin()->camelCase()->getQuery();		
 		asrt(trim($sql), 'camelCase');
 		
-		
 		testpack('Test with- and withCondition with Query Builder');
 		R::nuke();
 		$book = R::dispense('book');
@@ -112,8 +111,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 					throw new Exception();
 				});
 			});
-		}
-		catch(Exception $e) {
+		} catch(Exception $e) {
 			pass();
 		}
 		asrt(R::count('bean'),0);
@@ -126,8 +124,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 					throw new Exception();
 				});
 			});
-		}
-		catch(Exception $e) {
+		} catch(Exception $e) {
 			pass();
 		}
 		asrt(R::count('bean'),0);
@@ -175,8 +172,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		try {
 			R::debug(true);
 			fail();
-		}
-		catch(RedBean_Exception_Security $e) {
+		} catch(RedBean_Exception_Security $e) {
 			pass();
 		}
 		R::$adapter = $old;
@@ -187,8 +183,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		try {
 			$candy = R::dispense('CandyBar');
 			fail();
-		}
-		catch(RedBean_Exception_Security $e){
+		} catch(RedBean_Exception_Security $e){
 			pass();
 		}
 		
@@ -258,8 +253,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		try{
 			(R::$toolboxes['default']->getDatabaseAdapter()->getDatabase()->connect());
 			fail();
-		}
-		catch(PDOException $e){
+		} catch(PDOException $e){
 			pass();
 			//make sure the message is non-descriptive - avoid revealing security details if user hasnt configured error reporting improperly.
 			asrt($e->getMessage(),'Could not connect to database (?).');
@@ -271,8 +265,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		try{
 			(R::$toolboxes['default']->getDatabaseAdapter()->getDatabase()->connect());
 			fail();
-		}
-		catch(PDOException $e){
+		} catch(PDOException $e){
 			pass();
 			//make sure the message is non-descriptive - avoid revealing security details if user hasnt configured error reporting improperly.
 			asrt($e->getMessage(),'Could not connect to database (mydatabase).');
@@ -320,13 +313,14 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole {
 		asrt(is_array($bean->shared_item),false);
 		asrt(is_array($bean->{'own item'}),false);
 		asrt(is_array($bean->{'shared Item'}),false);
-		
-		
 	}
 	
 }
 
-
+/**
+ * Custom Logger class.
+ * For testing purposes.
+ */
 class CustomLogger extends RedBean_Logger_Default {
 	
 	private $log;
