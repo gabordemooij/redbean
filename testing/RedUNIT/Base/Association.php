@@ -21,7 +21,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base {
 	 */
 	public function run() {
 
-		global $currentDriver;
+		$currentDriver = $this->currentlyActiveDriverID;
 		
 		if ($currentDriver === 'mysql') {
 			testpack('Throw exception in case of issue with assoc constraint');

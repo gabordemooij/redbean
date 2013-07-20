@@ -21,7 +21,56 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 	 */
 	public function run() {
 		
-		testpack('Is the shadow updated?');
+		testpack('Can we save in preload ?');
+		R::nuke();
+		$publisher = R::dispense('publisher');
+		list($book, $magazine) = R::dispense('book', 2);
+		$book->ownPage = R::dispense('page', 3);
+		$magazine->ownPage = R::dispense('page', 2);
+		$magazine->title = 'magazine';
+		$firstPage = reset($book->ownPage);
+		$secondPage = reset($magazine->ownPage);
+		$book->publisher = $publisher;
+		$magazine->publisher = $publisher;
+		R::storeAll(array($book, $magazine));
+		$firstPage = $firstPage->fresh();
+		$secondPage = $secondPage->fresh();
+		$pages = array($firstPage, $secondPage);
+		R::each($pages, 'book,*.publisher', function($page, $book, $publisher){
+			R::storeAll(array($page, $book, $publisher));
+		});
+		asrt(R::count('publisher'), 1);
+		asrt(R::count('book'), 2);
+		asrt(R::count('page'), 5);
+		
+		testpack('Can we re-preload ?');
+		
+		$books = $publishers = array();
+		R::each($pages, 'book,*.publisher', function($page, $book, $publisher) use(&$pages, &$books, &$publishers){
+			$books[] = $book;
+			$publishers[] = $publisher;
+		});
+		
+		asrt(count($books), 2);
+		
+		$foundMagazine = null;
+		foreach($books as $book) {
+			if ($book->title === 'magazine') {
+				$foundMagazine = $book;
+			}
+		}
+		
+		asrt(($foundMagazine instanceof RedBean_OODBBean), true);
+		asrt(count($foundMagazine->ownPage), 2);
+		
+		testpack('Does deleting still work after preloading ?');
+		$firstPageOfMag = reset($foundMagazine->ownPage);
+		$firstID = $firstPageOfMag->id;
+		unset($foundMagazine->ownPage[$firstID]);
+		R::store($foundMagazine);
+		asrt(count($foundMagazine->ownPage), 1);
+		
+		testpack('Is the shadow updated ?');
 		R::nuke();
 		$book = R::dispense('book');
 		$book->ownPage = R::dispense('page', 3);
@@ -105,8 +154,9 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::preload($books,array('author'));
 		R::nuke();
 		$i=0;
-		foreach($books as $book) asrt($book->author->name,strval(++$i));
-		
+		foreach($books as $book) {
+			asrt($book->author->name,strval(++$i));
+		}
 		
 		//test aliased preload
 		R::nuke();
@@ -125,7 +175,9 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::preload($books,array('coauthor'=>'author'));
 		R::nuke();
 		$i=0;
-		foreach($books as $book) asrt($book->fetchAs('author')->coauthor->name,strval(++$i));
+		foreach($books as $book) {
+			asrt($book->fetchAs('author')->coauthor->name,strval(++$i));
+		}
 		
 		//combined and multiple
 		R::nuke();
@@ -145,11 +197,21 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::preload($books,array('coauthor'=>'author','author','collection'));
 		R::nuke();
 		$i=0;
-		foreach($books as $book) asrt($book->author->name,strval(++$i));
+		
+		foreach($books as $book) {
+			asrt($book->author->name,strval(++$i));
+		}
+		
 		$i=0;
-		foreach($books as $book) asrt($book->fetchAs('author')->coauthor->name,strval(++$i));
+		
+		foreach($books as $book) {
+			asrt($book->fetchAs('author')->coauthor->name,strval(++$i));
+		}
+		
 		$i=0;
-		foreach($books as $book) asrt($book->collection->name,strval(++$i));
+		foreach($books as $book) {
+			asrt($book->collection->name,strval(++$i));
+		}
 		
 		//Crud
 		$books = R::dispense('book',3);
@@ -165,20 +227,39 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::storeAll($books);
 		$books = R::find('book');
 		R::preload($books,array('coauthor'=>'author','author','collection'));
+		
 		$i=0;
-		foreach($books as $book) $book->author->name .= 'nth';
+		foreach($books as $book) {
+			$book->author->name .= 'nth';
+		}
+		
 		$i=0;
-		foreach($books as $book) $book->fetchAs('author')->coauthor->name .= 'nth';
+		foreach($books as $book) {
+			$book->fetchAs('author')->coauthor->name .= 'nth';
+		}
+		
 		$i=0;
-		foreach($books as $book) $book->collection->name .= 'nth';
+		foreach($books as $book) {
+			$book->collection->name .= 'nth';
+		}
+		
 		R::storeAll($books);
 		$books = R::find('books');
+		
 		$i=0;
-		foreach($books as $book) asrt($book->author->name,strval(++$i).'nth');
+		foreach($books as $book) {
+			asrt($book->author->name,strval(++$i).'nth');
+		}
+		
 		$i=0;
-		foreach($books as $book) asrt($book->fetchAs('author')->coauthor->name,strval(++$i).'nth');
+		foreach($books as $book) {
+			asrt($book->fetchAs('author')->coauthor->name,strval(++$i).'nth');
+		}
+		
 		$i=0;
-		foreach($books as $book) asrt($book->collection->name,strval(++$i).'nth');
+		foreach($books as $book) {
+			asrt($book->collection->name,strval(++$i).'nth');
+		}
 		
 		//test with multiple same parents
 		R::nuke();
@@ -394,8 +475,6 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		$text = reset($texts);
 		asrt($text->page,null);
 		
-		
-		
 		//test with closure
 		R::nuke();
 		$books = R::dispense('book',3);
@@ -410,8 +489,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base {
 		R::storeAll($books);
 		$books = R::find('book');
 		$hasNuked = false;
-		R::preload($books,'author',function($book,$author){
-			global $hasNuked;
+		R::preload($books,'author',function($book,$author)use(&$hasNuked){
 			if (!$hasNuked) { R::nuke(); $hasNuked = true; }
 			asrt($book->getMeta('type'),'book');
 			asrt($author->getMeta('type'),'author');

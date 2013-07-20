@@ -20,10 +20,13 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin {
 	 * @return void
 	 */
 	public function run() {
+		
 		R::nuke();
 		RedBean_Plugin_Cooker::enableBeanLoading(true);
 		R::dependencies(array());
-		global $currentDriver;
+		
+		$currentDriver = $this->currentlyActiveDriverID;
+		
 		global $lifeCycle;
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
@@ -33,32 +36,28 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin {
 		try{
 			R::graph(array(array(array('a'=>'b'))));
 			fail();
-		}
-		catch(RedBean_Exception_Security $e){
+		} catch(RedBean_Exception_Security $e){
 			pass();
 		}
 		
 		try{
 			R::graph('ABC');
 			fail();
-		}
-		catch(RedBean_Exception_Security $e){
+		} catch(RedBean_Exception_Security $e){
 			pass();
 		}
 		
 		try{
 			R::graph(123);
 			fail();
-		}
-		catch(RedBean_Exception_Security $e){
+		} catch(RedBean_Exception_Security $e){
 			pass();
 		}
 		
 		try{
 			R::graph(array(new stdClass));
 			fail();
-		}
-		catch(RedBean_Exception_Security $e){
+		} catch(RedBean_Exception_Security $e){
 			pass();
 		}
 		
@@ -261,20 +260,9 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin {
 		$id = R::store($bandmember);
 		$bandmember = R::load('bandmember',$id);
 		R::trash($bandmember);
-		
-		
-		//echo "\n\n\n".$lifeCycle."\n";
-		
 		$expected = 'calleddispenseid0calledupdateid0nameFatzWallercalledafter_updateid5nameFatzWallercalleddispenseid0calledopen5calleddeleteid5band_idnullnameFatzWallercalledafter_deleteid0band_idnullnameFatzWaller';
-		
 		$lifeCycle = preg_replace("/\W/","",$lifeCycle);
-		//$expected = "\n\n".preg_replace("/\W/","",$expected)."\n\n";
-		
-		
 		asrt($lifeCycle,$expected);
-		
-	
-
 		
 		//Test whether a nested bean will be saved if tainted
 		R::nuke();
@@ -328,13 +316,13 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin {
 		$b2=R::load('building',$id);
 		asrt(count($b2->village->ownBuilding),2);
 		$buildings = $b2->village->ownBuilding;
+		
 		foreach($buildings as $b) {
 			if ($b->id!=$id) {
 				asrt(count($b->ownFurniture),1);
 			}
 		}
-	
-		
+
 		//save a form using graph and ignore empty beans
 		R::nuke();
 		$product = R::dispense('product');
@@ -464,14 +452,10 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin {
 		asrt(count($order->sharedCoupon),2);
 		asrt(end($order->ownProduct)->id,$productID);
 		
-		
 		//make sure zeros are preserved
 		$form = array('type'=>'laptop','price'=>0);
 		$product = R::graph($form);
 		asrt(isset($product->price),true);
 		asrt($product->price,0);
-				
 	}
-	
 }
-

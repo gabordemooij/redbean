@@ -63,7 +63,9 @@ class RedUNIT_Base_Misc extends RedUNIT_Base {
 		asrt($cal->when,'2000-01-01 00:00:00');
 		
 		testpack('Affected rows test');
-		global $currentDriver; 
+		
+		$currentDriver = $this->currentlyActiveDriverID;
+		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();

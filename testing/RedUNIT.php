@@ -14,6 +14,12 @@
  * with this source code in the file license.txt.
  */
 abstract class RedUNIT {
+	
+	/**
+	 * @var string 
+	 */
+	protected $currentlyActiveDriverID = 'unknown';
+	
 	/**
 	 * What drivers should be loaded for this test pack? 
 	 */
@@ -37,5 +43,12 @@ abstract class RedUNIT {
 	 * Do some cleanup (if necessary..)
 	 */
 	public function cleanUp() {
+	}
+	
+	/**
+	 * Sets the current driver.
+	 */
+	public function setCurrentDriver($driver) {
+		$this->currentlyActiveDriverID = $driver;
 	}
 }	

@@ -237,7 +237,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		
 		testpack("Test BeanCan Server 1 / create");
 		R::nuke();
-		$rs = ( s("candybar:store",array( array("brand"=>"funcandy","taste"=>"sweet") ) ) );
+		$rs = (fakeBeanCanServerRequest("candybar:store",array( array("brand"=>"funcandy","taste"=>"sweet") ) ) );
 		asrt(is_string($rs),true);
 		$rs = json_decode($rs,true);
 		asrt(is_array($rs),true);
@@ -252,7 +252,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(count($rs),3);
 		$oldid = $rs["result"];
 		testpack("Test retrieve");
-		$rs = json_decode( s("candybar:load",array( $oldid ) ),true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:load",array( $oldid ) ),true );
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -268,7 +268,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($rs["result"]["brand"],"funcandy");
 		asrt($rs["result"]["taste"],"sweet");
 		testpack("Test update");
-		$rs = json_decode( s("candybar:store",array( array( "id"=>$oldid, "taste"=>"salty" ) ),"42" ),true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:store",array( array( "id"=>$oldid, "taste"=>"salty" ) ),"42" ),true );
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -278,29 +278,29 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(($rs["id"]),"42");
 		asrt(isset($rs["result"]),true);
 		asrt(isset($rs["error"]),false);
-		$rs = json_decode( s("candybar:load",array( $oldid ) ),true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:load",array( $oldid ) ),true );
 		asrt($rs["result"]["taste"],"salty");
-		$rs = json_decode( s("candybar:load",array() ),true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:load",array() ),true );
 		asrt($rs["error"]["message"], "First param needs to be Bean ID");
 		asrt((string)$rs["error"]["code"], "-32602");
-		$rs = json_decode( s("candybar:export",array() ),true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:export",array() ),true );
 		asrt($rs["error"]["message"], "First param needs to be Bean ID");
 		asrt((string)$rs["error"]["code"], "-32602");
-		$rs = json_decode( s("candybar:trash",array() ),true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:trash",array() ),true );
 		asrt($rs["error"]["message"], "First param needs to be Bean ID");
 		asrt((string)$rs["error"]["code"], "-32602");
 		
 		
-		$rs = json_decode( s("candybar:store",array( array("brand"=>"darkchoco","taste"=>"bitter") ) ), true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:store",array( array("brand"=>"darkchoco","taste"=>"bitter") ) ), true );
 		$id2 = $rs["result"];
-		$rs = json_decode( s("candybar:load",array( $oldid ) ),true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:load",array( $oldid ) ),true );
 		asrt($rs["result"]["brand"],"funcandy");
 		asrt($rs["result"]["taste"],"salty");
-		$rs = json_decode( s("candybar:load",array( $id2 ) ),true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:load",array( $id2 ) ),true );
 		asrt($rs["result"]["brand"],"darkchoco");
 		asrt($rs["result"]["taste"],"bitter");
 		testpack("Test delete");
-		$rs = json_decode( s("candybar:trash",array( $oldid )), true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:trash",array( $oldid )), true );
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -311,15 +311,15 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(isset($rs["result"]),true);
 		asrt(isset($rs["error"]),false);
 		asrt($rs["result"],"OK");
-		$rs = json_decode( s("candybar:load",array( $oldid ) ),true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:load",array( $oldid ) ),true );
 		asrt(isset($rs["result"]),true);
 		asrt(isset($rs["error"]),false);
 		asrt($rs["result"]["id"],0);
-		$rs = json_decode( s("candybar:load",array( $id2 ) ),true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:load",array( $id2 ) ),true );
 		asrt($rs["result"]["brand"],"darkchoco");
 		asrt($rs["result"]["taste"],"bitter");
 		testpack("Test Custom Method");
-		$rs = json_decode( s("candybar:customMethod",array( "test" )), true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:customMethod",array( "test" )), true );
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -330,14 +330,14 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(isset($rs["result"]),true);
 		asrt(isset($rs["error"]),false);
 		asrt($rs["result"],"test!");
-		$rs = json_decode( s("candybar:customMethodWithException",array( "test" )), true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:customMethodWithException",array( "test" )), true );
 		asrt($rs["error"]["code"],-32099);
 		asrt($rs["error"]["message"],'0-Oops!');
 		
 		testpack("Test Whitelist");
 		$can = new RedBean_Plugin_BeanCan;
 		$can->setWhitelist('all');
-		$rs = json_decode( s("candybar:store",array( array("brand"=>"darkchoco","taste"=>"bitter") ), 1, ''), true);
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:store",array( array("brand"=>"darkchoco","taste"=>"bitter") ), 1, ''), true);
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -350,7 +350,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($rs["error"]["code"],-32600);
 		asrt($rs["error"]["message"], 'This bean is not available. Set whitelist to "all" or add to whitelist.');
 		$can = new RedBean_Plugin_BeanCan;
-		$rs = json_decode( s("candybar:store",array( array("brand"=>"darkchoco","taste"=>"bitter") ), 1, array('candybar'=>array('like'))), true);
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:store",array( array("brand"=>"darkchoco","taste"=>"bitter") ), 1, array('candybar'=>array('like'))), true);
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -363,7 +363,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($rs["error"]["code"],-32600);
 		asrt($rs["error"]["message"], 'This bean is not available. Set whitelist to "all" or add to whitelist.');
 		$can = new RedBean_Plugin_BeanCan;
-		$rs = json_decode( s("candybar:store",array( array("brand"=>"darkchoco","taste"=>"bitter") ), 1, array('candybar'=>array('store'))), true);
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:store",array( array("brand"=>"darkchoco","taste"=>"bitter") ), 1, array('candybar'=>array('store'))), true);
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -423,7 +423,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(isset($rs["error"]),true);
 		asrt(isset($rs["error"]["code"]),true);
 		asrt($rs["error"]["code"],-32600);
-		$rs = json_decode( s("wrong",array( "test" )), true );
+		$rs = json_decode(fakeBeanCanServerRequest("wrong",array( "test" )), true );
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -436,7 +436,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($rs["error"]["code"],-32600);
 		asrt($rs["error"]["message"],"Invalid method signature. Use: BEAN:ACTION");
 		
-		$rs = json_decode( s(".;':wrong",array( "test" )), true );
+		$rs = json_decode(fakeBeanCanServerRequest(".;':wrong",array( "test" )), true );
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -449,7 +449,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($rs["error"]["code"],-32600);
 		asrt($rs["error"]["message"],"Invalid Bean Type String");
 		
-		$rs = json_decode( s("wrong:.;'",array( "test" )), true );
+		$rs = json_decode(fakeBeanCanServerRequest("wrong:.;'",array( "test" )), true );
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -462,7 +462,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($rs["error"]["code"],-32600);
 		asrt($rs["error"]["message"],"Invalid Action String");
 		
-		$rs = json_decode( s("wrong:wrong",array( "test" )), true );
+		$rs = json_decode(fakeBeanCanServerRequest("wrong:wrong",array( "test" )), true );
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -474,7 +474,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(isset($rs["error"]),true);
 		asrt($rs["error"]["code"],-32601);
 		asrt($rs["error"]["message"],"No such bean in the can!");
-		$rs = json_decode( s("candybar:beHealthy",array( "test" )), true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:beHealthy",array( "test" )), true );
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -486,7 +486,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(isset($rs["error"]),true);
 		asrt($rs["error"]["code"],-32601);
 		asrt($rs["error"]["message"],"Method not found in Bean: candybar ");
-		$rs = json_decode( s("candybar:store"), true );
+		$rs = json_decode(fakeBeanCanServerRequest("candybar:store"), true );
 		asrt(is_array($rs),true);
 		asrt(empty($rs),false);
 		asrt(count($rs),3);
@@ -497,9 +497,9 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(isset($rs["result"]),false);
 		asrt(isset($rs["error"]),true);
 		asrt($rs["error"]["code"],-32602);
-		$rs = json_decode( s("pdo:connect",array("abc")), true );
+		$rs = json_decode(fakeBeanCanServerRequest("pdo:connect",array("abc")), true );
 		asrt($rs["error"]["code"],-32601);
-		$rs = json_decode( s("stdClass:__toString",array("abc")), true );
+		$rs = json_decode(fakeBeanCanServerRequest("stdClass:__toString",array("abc")), true );
 		asrt($rs["error"]["code"],-32601);
 		
 		$j = array(
@@ -567,7 +567,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$page->sharedAuthor[] = $author;
 		$id = R::store($briefcase);
 		
-		$rs = json_decode(s('briefcase:export',array($id)),true);
+		$rs = json_decode(fakeBeanCanServerRequest('briefcase:export',array($id)),true);
 		
 		asrt((int)$rs['result'][0]['id'],(int)$id);
 		asrt($rs['result'][0]['name'],'green');
@@ -575,7 +575,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt($rs['result'][0]['ownDocument'][1]['ownPage'][0]['content'],'Lorem Ipsum');
 		asrt($rs['result'][0]['ownDocument'][1]['ownPage'][0]['sharedAuthor'][0]['name'],'Someone');
 		
-		$rs = json_decode(s('document:export',array($documents[1]->id)),true);
+		$rs = json_decode(fakeBeanCanServerRequest('document:export',array($documents[1]->id)),true);
 		
 		asrt((int)$rs['result'][0]['id'],(int)$documents[1]->id);
 		asrt($rs['result'][0]['ownPage'][0]['content'],'Lorem Ipsum');

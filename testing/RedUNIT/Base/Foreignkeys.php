@@ -135,5 +135,4 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer 
 	public function onEvent($event,$info) {
 		$this->queries[] = $info->getSQL();
 	}
-	
 }

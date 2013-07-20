@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Selector
  * 
@@ -7,16 +6,22 @@
  * runned and to instrument the tests using phpcoverage tools.
  *  
  */
- 
 error_reporting(E_ALL);
 
 //Load configuration file
-if (file_exists('../config/test.ini')) $ini = parse_ini_file("../config/test.ini", true);
-elseif (file_exists('../config/test-travis.ini')) $ini = parse_ini_file("../config/test-travis.ini", true);
-else die('Cant find configuration file.');
+if (file_exists('../config/test.ini')) {
+	$ini = parse_ini_file("../config/test.ini", true);
+} elseif (file_exists('../config/test-travis.ini')) {
+	$ini = parse_ini_file("../config/test-travis.ini", true);
+} else {
+	die('Cant find configuration file.');
+}
 
-global $a;
+/**
+ * Define some globals.
+ */
 global $pdo;
+global $currentDriver;
 
 //Load basic functions and classes
 require_once('../helpers/functions.php');
@@ -31,9 +36,6 @@ require_once('../RedUNIT/Sqlite.php');
 require_once('../RedUNIT/CUBRID.php');
 require_once('../RedUNIT/Oracle.php');
 require_once('../RedUNIT/Plugin.php');
-
-
-
 
 //Configure the databases
 if (isset($ini['mysql'])) {
@@ -173,7 +175,6 @@ else {
 
 //Always include the last ones.
 $packList = array_merge($packList,$suffix);
-global $currentDriver;
 foreach($packList as $testPack) {
 	require_once($path.$testPack.'.php');
 	$testClassName = str_replace(' ','_',(str_replace('/',' ',$testPack)));
@@ -187,12 +188,12 @@ foreach($packList as $testPack) {
 			echo '('.$driver.'):';
 			activate_driver($driver);
 			$currentDriver = $driver;
+			$test->setCurrentDriver($driver);
 			$test->prepare();
 			$test->run();
 			$test->cleanUp();
 		}
-	}
-	else {
+	} else {
 		$test->prepare();
 		$test->run();
 		$test->cleanUp();

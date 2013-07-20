@@ -13,8 +13,6 @@
  */
 class RedUNIT_Base_Copy extends RedUNIT_Base {
 
-	
-
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
@@ -39,8 +37,6 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		$duplicate = R::exportAll($document);
 		asrt((int)$duplicate[0]['document_id'],$id);
 	
-		
-		
 		//test real world scenario: versioning
 		R::nuke();
 		$document = R::dispense('document');
@@ -92,7 +88,6 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		asrt(R::count('document'),3);
 		asrt(R::count('page'),3);
 		asrt(R::count('spaceship'),0);
-		
 		
 		//same, but now with intermediate save, counts must be same
 		R::freeze(true);
@@ -178,20 +173,16 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		$diner2 = R::dup($diner);
 		$id2 = R::store($diner2);
 		$diner2 = R::load('diner',$id2);
-		
-		
 		asrt(count($diner->ownEmployee),1);
 		asrt(count($diner2->ownEmployee),1);
 		asrt(count($diner->sharedGuest),3);
 		asrt(count($diner2->sharedGuest),3);
-		
 		$empl = reset($diner->ownEmployee);
 		asrt(count($empl->ownThought),2);
 		$empl = reset($diner2->ownEmployee);
 		asrt(count($empl->ownThought),2);
 		
 		//can we change something in the duplicate without changing the original?
-		
 		$empl->name = 'Marvin';
 		$thought =  R::dispense('thought');
 		$thought->content = 'depression';
@@ -201,7 +192,6 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		$guest->name = 'Arthur Dent';
 		$id2 = R::store($diner2);
 		$diner2 = R::load('diner',$id2);
-		
 		asrt(count($diner->ownEmployee),1);
 		asrt(count($diner2->ownEmployee),1);
 		asrt(count($diner->sharedGuest),3);
@@ -218,9 +208,5 @@ class RedUNIT_Base_Copy extends RedUNIT_Base {
 		asrt(R::count('guest_prop'),1);
 		$arthur = R::findOne('guest',' '.R::$writer->esc('name').' = ? ',array('Arthur Dent'));
 		asrt($arthur->name,'Arthur Dent');	
-				
 	}
-
 }
-
-

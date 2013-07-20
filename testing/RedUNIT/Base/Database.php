@@ -28,7 +28,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 	 */
 	public function run() {
 		
-		global $currentDriver;
+		$currentDriver = $this->currentlyActiveDriverID;
 		
 		R::store(R::dispense('justabean'));
 		$adapter = new TroubleDapter(R::$toolbox->getDatabaseAdapter()->getDatabase());
@@ -42,9 +42,8 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 			try {
 				$redbean->find('bean');
 				pass();
-			}
-			catch(Exception $e) {
-				var_dump($e->getSQLState()); exit;
+			} catch(Exception $e) {
+				var_dump($e->getSQLState());
 				fail();
 
 			}
@@ -54,8 +53,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 		try {
 			$redbean->find('bean');
 			fail();
-		}
-		catch(Exception $e) {
+		} catch(Exception $e) {
 			pass();
 		}
 

@@ -240,7 +240,7 @@ function setget($val) {
  * 
  * @return string $out Output JSON from BeanCan server. 
  */
-function s($data,$params=null,$id="1234", $whiteList = 'all') {
+function fakeBeanCanServerRequest($data,$params=null,$id="1234", $whiteList = 'all') {
 	$j = array(
 		"jsonrpc"=>"2.0",
 		"method"=>$data,

@@ -20,6 +20,7 @@ class RedUNIT_Base_Count extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
+		
 		testpack("Test count and wipe");
 		$page = R::dispense("page");
 		$page->name = "ABC";
@@ -47,8 +48,9 @@ class RedUNIT_Base_Count extends RedUNIT_Base {
 		//now count something that does not exist, this should return 0. (just be polite)
 		asrt(R::count('teapot', ' name = ? ', array('flying')), 0);
 		asrt(R::count('teapot') , 0);
-		global $currentDriver;
-		echo $currentDriver;
+		
+		$currentDriver = $this->currentlyActiveDriverID;
+		
 		//some drivers don't support that many error codes.
 		if ($currentDriver === 'mysql' || $currentDriver === 'postgres') {
 			try {
