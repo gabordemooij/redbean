@@ -4,7 +4,7 @@
  *
  * @file    RedBean/QueryWriter/AQueryWriter.php
  * @desc    Query Writer
- *	         Represents an abstract Database to RedBean
+ *          Represents an abstract Database to RedBean
  *          To write a driver for a different database for RedBean
  *          Contains a number of functions all implementors can
  *          inherit or override.
