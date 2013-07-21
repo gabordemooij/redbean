@@ -182,7 +182,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * @return string
 	 */
   	protected function getInsertSuffix ($table) {
-    	return '';
+		return '';
   	}
 	
 	/**
