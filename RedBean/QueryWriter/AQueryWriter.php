@@ -652,26 +652,26 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * @deprecated Use esc() instead.
 	 * 
-	 * @param string  $a column to be escaped
-	 * @param boolean $b omit quotes
+	 * @param string  $column   column to be escaped
+	 * @param boolean $noQuotes omit quotes
 	 * 
 	 * @return string
 	 */
-	public function safeColumn($a, $b = false) { 
-		return $this->esc($a, $b); 
+	public function safeColumn($column, $noQuotes = false) { 
+		return $this->esc($column, $noQuotes); 
 	}
 	
 	/**
 	 * @deprecated Use esc() instead.
 	 *
-	 * @param string  $a column to be escaped
-	 * @param boolean $b omit quotes
+	 * @param string  $table    table to be escaped
+	 * @param boolean $noQuotes omit quotes
 	 * 
 	 * @return string
 
 	 */
-	public function safeTable($a, $b = false) { 
-		return $this->esc($a, $b); 
+	public function safeTable($table, $noQuotes = false) { 
+		return $this->esc($table, $noQuotes); 
 	}
 	
 	/**
