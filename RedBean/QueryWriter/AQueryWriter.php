@@ -4,7 +4,7 @@
  *
  * @file    RedBean/QueryWriter/AQueryWriter.php
  * @desc    Query Writer
- *	         Represents an abstract Database to RedBean
+ *			   Represents an abstract Database to RedBean
  *          To write a driver for a different database for RedBean
  *          Contains a number of functions all implementors can
  *          inherit or override.
@@ -52,12 +52,13 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 */
 	public $typeno_sqltype = array();
 	
-		/**
+	/**
 	 * Returns a cache key for the cache values passed.
 	 * This method returns a fingerprint string to be used as a key to store
 	 * data in the writer cache.
 	 * 
-	 * @param array $keyValues
+	 * @param array $keyValues key-value to generate key for
+	 * 
 	 * @return string
 	 */
 	private function getCacheKey($keyValues) {
@@ -67,8 +68,8 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * Returns the values associated with the provided cache tag and key.
 	 * 
-	 * @param string $cacheTag
-	 * @param string $key
+	 * @param string $cacheTag cache tag to use for lookup
+	 * @param string $key      key to use for lookup
 	 * 
 	 * @return mixed
 	 */
@@ -115,9 +116,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *		   value1, value2, value3 ....
 	 *		)
 	 * )
-	 * @param array   $conditions
-	 * @param array   $bindings
-	 * @param string  $addSql
+	 * @param array   $conditions list of conditions
+	 * @param array   $bindings   parameter bindings for SQL snippet
+	 * @param string  $addSql     SQL snippet
 	 * 
 	 * @return string
 	 */
@@ -131,7 +132,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 				$values = array($values);
 			}
 			//if it's safe to skip bindings, do so...
-			if (preg_match('/^\d+$/', implode('', $values))) {
+			if (ctype_digit(implode('', $values))) {
 				$sql .= implode(',', $values).' ) ';
 				//only numeric, cant do much harm.
 				$sqlConditions[] = $sql;
@@ -145,7 +146,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 			}
 		}
 		$sql = '';
-		if (is_array($sqlConditions) && count($sqlConditions)>0) {
+		if (is_array($sqlConditions) && count($sqlConditions) > 0) {
 			$sql = implode(' AND ', $sqlConditions);
 			$sql = " WHERE ( $sql ) ";
 			if ($addSql) $sql .= $addSql;
@@ -158,9 +159,9 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	/**
 	 * Returns the table names and column names for a relational query.
 	 *  
-	 * @param string $sourceType
-	 * @param string $destType
-	 * @param boolean $noQuote
+	 * @param string  $sourceType type of the source bean
+	 * @param string  $destType   type of the bean you want to obtain using the relation
+	 * @param boolean $noQuote    TRUE if you want to omit quotes
 	 * 
 	 * @return array
 	 */
@@ -178,7 +179,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 *
 	 * @param string $table name
 	 *
-	 * @return string sql
+	 * @return string
 	 */
   	protected function getInsertSuffix ($table) {
     	return '';
@@ -206,7 +207,7 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	 * Inserts a record into the database using a series of insert columns
 	 * and corresponding insertvalues. Returns the insert id.
 	 *
-	 * @param string $table			  table to perform query on
+	 * @param string $table         table to perform query on
 	 * @param array  $insertcolumns columns to be inserted
 	 * @param array  $insertvalues  values to be inserted
 	 *
