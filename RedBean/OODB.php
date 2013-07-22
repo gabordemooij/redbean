@@ -378,6 +378,26 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 	}
+	
+	/**
+	 * Determines whether the bean has 'loaded lists' or
+	 * 'loaded embedded beans' that need to be processed
+	 * by the store() method.
+	 * 
+	 * @param RedBean_OODBBean $bean bean to be examined
+	 * 
+	 * @return boolean
+	 */
+	private function hasListsOrObjects(RedBean_OODBBean $bean) {
+		$processLists = false;
+		foreach($bean as $value) {
+			if (is_array($value) || is_object($value)) { 
+				$processLists = true; 
+				break; 
+			}
+		}
+		return $processLists;
+	}
 
 	/**
 	 * Checks whether reference type has been marked as dependent on target type.
@@ -590,13 +610,14 @@ class RedBean_OODB extends RedBean_Observable {
 	 * Checks whether the specified table already exists in the database.
 	 * Not part of the Object Database interface!
 	 * 
-	 * @param string $table table name (not type!)
+	 * @deprecated Use RedBean_QueryWriter_AQueryWriter::typeExists() instead.
+	 * 
+	 * @param string $table table name
 	 * 
 	 * @return boolean
 	 */
 	public function tableExists($table) {
-		$tables = $this->writer->getTables();
-		return in_array(($table), $tables);
+		return $this->writer->tableExists($table);
 	}
 
 	/**
@@ -618,21 +639,12 @@ class RedBean_OODB extends RedBean_Observable {
 	 */
 	public function store($bean) { 
 		$bean = $this->unboxIfNeeded($bean);
-		$processLists = false;
-		foreach($bean as $value) {
-			if (is_array($value) || is_object($value)) { 
-				$processLists = true; break; 
-			}
-		}
+		$processLists = $this->hasListsOrObjects($bean);
 		if (!$processLists && !$bean->getMeta('tainted')) {
-			return $bean->getID();
+			return $bean->getID(); //bail out!
 		}
 		$this->signal('update', $bean );
-		foreach($bean as $value) {
-			if (is_array($value) || is_object($value)) { 
-				$processLists = true; break; 
-			}
-		}
+		$processLists = $this->hasListsOrObjects($bean); //check again, might have changed by model!
 		if ($processLists) {
 			$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array(); //Define groups
 			$ownAdditions = $ownTrashcan = $ownresidue = $tmpCollectionStore = $embeddedBeans = array();
@@ -657,7 +669,7 @@ class RedBean_OODB extends RedBean_Observable {
 					} elseif (strpos($property, 'shared') === 0) {
 						list($sharedAdditions, $sharedTrashcan, $sharedresidue) = $this->processGroups($originals, $value, $sharedAdditions, $sharedTrashcan, $sharedresidue);
 						$bean->removeProperty($property);
-					} else { ; }
+					}
 				}
 			}
 		}

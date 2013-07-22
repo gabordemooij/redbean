@@ -283,6 +283,19 @@ abstract class RedBean_QueryWriter_AQueryWriter {
 	}
 	
 	/**
+	 * Checks whether the specified type (i.e. table) already exists in the database.
+	 * Not part of the Object Database interface!
+	 * 
+	 * @param string $table table name
+	 * 
+	 * @return boolean
+	 */
+	public function tableExists($table) {
+		$tables = $this->getTables();
+		return in_array($table, $tables);
+	}
+	
+	/**
 	 * Glues an SQL snippet to the beginning of a WHERE clause.
 	 * If the snippet begins with a condition glue (OR/AND) or a non-condition
 	 * keyword then no glue is required.
