@@ -143,9 +143,7 @@ class RedBean_OODB extends RedBean_Observable {
 	}
 
 	/**
-	 * Processes an embedded bean. First the bean gets unboxed if possible.
-	 * Then, the bean is stored if needed and finally the ID of the bean
-	 * will be returned.
+	 * Processes an embedded bean. 
 	 * 
 	 * @param RedBean_OODBBean|Model $embeddedBean the bean or model
 	 * 
@@ -173,7 +171,23 @@ class RedBean_OODB extends RedBean_Observable {
 			$this->writer->createTable($table);
 			$bean->setMeta('buildreport.flags.created', true);
 		}
-	} 
+	}
+	
+	/**
+	 * Adds the unique constraints described in the meta data.
+	 * 
+	 * @param RedBean_OODBBean $bean bean
+	 * 
+	 * @return void
+	 */
+	private function addUniqueConstraints(RedBean_OODBBean $bean) {
+		if ($uniques = $bean->getMeta('buildcommand.unique')) {
+			$table = $bean->getMeta('type');
+			foreach($uniques as $unique) {
+				$this->writer->addUniqueIndex($table, $unique);
+			}
+		}
+	}
 	
 	/**
 	 * Stores a cleaned bean; i.e. only scalar values. This is the core of the store()
@@ -192,49 +206,78 @@ class RedBean_OODB extends RedBean_Observable {
 		$table = $bean->getMeta('type');
 		if ($bean->getMeta('tainted')) {
 			$this->createTableIfNotExists($bean, $table);
+			$updateValues = $this->getUpdateValues($bean);
 			if (!$this->isFrozen) {
-				$columns = $this->writer->getColumns($table) ;
-			}
-			$insertValues = $insertColumns = $updateValues = array();
-			foreach($bean as $property => $value) {
-				if ($property !== 'id') {
-					if (!$this->isFrozen) {
-						if (!in_array($bean->getMeta('type'), $this->chillList)) {
-							if ($bean->getMeta("cast.$property", -1) !== -1) { //check for explicitly specified types
-								$cast = $bean->getMeta("cast.$property");
-								$typeno = $this->getTypeFromCast($cast);
-							} else {
-								$cast = false;		
-								$typeno = $this->writer->scanType($value, true);
-							}
-							if (isset($columns[$this->writer->esc($property, true)])) { //Is this property represented in the table ?
-								if (!$cast) { //rescan without taking into account special types >80
-									$typeno = $this->writer->scanType($value, false);
-								}
-								$sqlt = $this->writer->code($columns[$this->writer->esc($property, true)]);
-								if ($typeno > $sqlt) { //no, we have to widen the database column type
-									$this->writer->widenColumn($table, $property, $typeno);
-									$bean->setMeta('buildreport.flags.widen', true);
-								}
-							} else {
-								$this->writer->addColumn($table, $property, $typeno);
-								$bean->setMeta('buildreport.flags.addcolumn', true);
-								$this->processBuildCommands($table, $property, $bean);
-							}
-						}
-					}
-					$insertValues[] = $value;
-					$insertColumns[] = $property;
-					$updateValues[] = array('property' => $property, 'value' => $value);
-				}
-			}
-			if (!$this->isFrozen && ($uniques = $bean->getMeta('buildcommand.unique'))) {
-				foreach($uniques as $unique) {
-					$this->writer->addUniqueIndex($table, $unique);
-				}
+				$this->addUniqueConstraints($bean);
 			}
 			$bean->id = $this->writer->updateRecord($table, $updateValues, $bean->id);
 			$bean->setMeta('tainted', false);
+		}
+	}
+	
+	/**
+	 * Returns a structured array of update values using the following format:
+	 * array(
+	 *		property => $property,
+	 *		value => $value
+	 * );
+	 * 
+	 * @param RedBean_OODBBean $bean bean to extract update values from
+	 * 
+	 * @return array
+	 */
+	private function getUpdateValues(RedBean_OODBBean $bean) {
+		$updateValues = array();
+		foreach($bean as $property => $value) {
+			if (!$this->isFrozen && $property !== 'id') {
+					$this->moldTable($bean, $property, $value);
+			}
+			if ($property !== 'id') {
+				$updateValues[] = array('property' => $property, 'value' => $value);
+			}
+		}
+		return $updateValues;
+	}
+	
+	/**
+	 * Molds the table to fit the bean data.
+	 * Given a property and a value and the bean, this method will
+	 * adjust the table structure to fit the requirements of the property and value.
+	 * This may include adding a new column or widening an existing column to hold a larger
+	 * or different kind of value. This method employs the writer to adjust the table
+	 * structure in the database. Schema updates are recorded in meta properties of the bean.
+	 * 
+	 * @param RedBean_OODBBean $bean     bean to get cast data from and store meta in
+	 * @param string           $property property to store
+	 * @param mixed            $value    value to store
+	 * 
+	 * @return void
+	 */
+	private function moldTable(RedBean_OODBBean $bean, $property, $value) {
+		$table = $bean->getMeta('type');
+		$columns = $this->writer->getColumns($table) ;
+		if (!in_array($bean->getMeta('type'), $this->chillList)) {
+			if ($bean->getMeta("cast.$property", -1) !== -1) { //check for explicitly specified types
+				$cast = $bean->getMeta("cast.$property");
+				$typeno = $this->getTypeFromCast($cast);
+			} else {
+				$cast = false;		
+				$typeno = $this->writer->scanType($value, true);
+			}
+			if (isset($columns[$this->writer->esc($property, true)])) { //Is this property represented in the table ?
+				if (!$cast) { //rescan without taking into account special types >80
+					$typeno = $this->writer->scanType($value, false);
+				}
+				$sqlt = $this->writer->code($columns[$this->writer->esc($property, true)]);
+				if ($typeno > $sqlt) { //no, we have to widen the database column type
+					$this->writer->widenColumn($table, $property, $typeno);
+					$bean->setMeta('buildreport.flags.widen', true);
+				}
+			} else {
+				$this->writer->addColumn($table, $property, $typeno);
+				$bean->setMeta('buildreport.flags.addcolumn', true);
+				$this->processBuildCommands($table, $property, $bean);
+			}
 		}
 	}
 
@@ -313,7 +356,35 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 		}
 	}
+	
+	/**
+	 * Unassociates the list items in the trashcan.
+	 * 
+	 * @param RedBean_OODBBean $bean           bean
+	 * @param array            $sharedTrashcan list
+	 * 
+	 * @return void
+	 */
+	private function processSharedTrashcan($bean, $sharedTrashcan) {
+		foreach($sharedTrashcan as $trash) {
+			$this->assocManager->unassociate($trash, $bean);
+		}
+	}
 
+	/**
+	 * Stores all the beans in the residue group.
+	 * 
+	 * @param RedBean_OODBBean $bean          bean
+	 * @param array            $sharedresidue list
+	 * 
+	 * @return void
+	 */
+	private function processSharedResidue($bean, $sharedresidue) {
+		foreach($sharedresidue as $residue) {
+			$this->store($residue);
+		}
+	}
+	
 	/**
 	 * Processes embedded beans.
 	 * Each embedded bean will be indexed and foreign keys will
@@ -324,15 +395,13 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @return void
 	 */
-	private function processEmbeddedBeans($bean, $embeddedBeans) {
+	private function addForeignKeysForParentBeans($bean, $embeddedBeans) {
 		foreach($embeddedBeans as $linkField => $embeddedBean) {
-			if (!$this->isFrozen) {
-				$this->writer->addIndex($bean->getMeta('type'),
+			$this->writer->addIndex($bean->getMeta('type'),
 					'index_foreignkey_'.$bean->getMeta('type').'_'.$embeddedBean->getMeta('type'),
 					$linkField);
-				$isDep = $this->isDependentOn($bean->getMeta('type'), $embeddedBean->getMeta('type'));
-				$this->writer->addFK($bean->getMeta('type'), $embeddedBean->getMeta('type'), $linkField, 'id', $isDep);
-			}
+			$isDep = $this->isDependentOn($bean->getMeta('type'), $embeddedBean->getMeta('type'));
+			$this->writer->addFK($bean->getMeta('type'), $embeddedBean->getMeta('type'), $linkField, 'id', $isDep);
 		}	
 	}
 
@@ -646,8 +715,7 @@ class RedBean_OODB extends RedBean_Observable {
 		$this->signal('update', $bean );
 		$processLists = $this->hasListsOrObjects($bean); //check again, might have changed by model!
 		if ($processLists) {
-			$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = array(); //Define groups
-			$ownAdditions = $ownTrashcan = $ownresidue = $tmpCollectionStore = $embeddedBeans = array();
+			$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = $ownAdditions = $ownTrashcan = $ownresidue = $embeddedBeans = array(); //Define groups
 			foreach($bean as $property => $value) {
 				if ($value instanceof RedBean_SimpleModel) {
 					$value = $value->unbox();
@@ -657,12 +725,10 @@ class RedBean_OODB extends RedBean_Observable {
 					$bean->$linkField = $this->prepareEmbeddedBean($value);
 					$bean->setMeta('cast.'.$linkField, 'id');
 					$embeddedBeans[$linkField] = $value;
-					$tmpCollectionStore[$property] = $bean->$property;
 					$bean->removeProperty($property);
 				}
 				if (is_array($value)) {
-					$originals = $bean->getMeta('sys.shadow.'.$property);
-					if (!$originals) $originals = array();
+					$originals = $bean->getMeta('sys.shadow.'.$property, array());
 					if (strpos($property, 'own') === 0) {
 						list($ownAdditions, $ownTrashcan, $ownresidue) = $this->processGroups($originals, $value, $ownAdditions, $ownTrashcan, $ownresidue);
 						$bean->removeProperty($property);
@@ -675,17 +741,15 @@ class RedBean_OODB extends RedBean_Observable {
 		}
 		$this->storeBean($bean);
 		if ($processLists) {
-			$this->processEmbeddedBeans($bean, $embeddedBeans);
+			if (!$this->isFrozen) {
+				$this->addForeignKeysForParentBeans($bean, $embeddedBeans);
+			}
 			$this->processTrashcan($bean, $ownTrashcan);
 			$this->processAdditions($bean, $ownAdditions);
 			$this->processResidue($ownresidue);
-			foreach($sharedTrashcan as $trash) {
-				$this->assocManager->unassociate($trash, $bean);
-			}
+			$this->processSharedTrashcan($bean, $sharedTrashcan);
 			$this->processSharedAdditions($bean, $sharedAdditions);
-			foreach($sharedresidue as $residue) {
-				$this->store($residue);
-			}
+			$this->processSharedResidue($bean, $sharedresidue);
 		}
 		$this->signal('after_update', $bean);
 		return (int) $bean->id;

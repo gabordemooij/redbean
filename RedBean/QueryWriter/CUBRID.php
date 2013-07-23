@@ -4,8 +4,6 @@
  *
  * @file    RedBean/QueryWriter/CUBRID.php
  * @desc    Represents a CUBRID Database to RedBean
- *          To write a driver for a different database for RedBean
- *          you should only have to change this file.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *

@@ -1,5 +1,10 @@
 <?php
 /**
+ * @file    RedBean/ToolBox.php
+ * @desc    A RedBeanPHP-wide service locator
+ * @author	Gabor de Mooij and the RedBeanPHP community
+ * @license BSD/GPLv2
+ *
  * ToolBox.
  * The toolbox is an integral part of RedBeanPHP providing the basic
  * architectural building blocks to manager objects, helpers and additional tools
@@ -7,11 +12,6 @@
  * the adapter, the query writer and the core functionality of RedBeanPHP in
  * OODB.
  * 
- * @file    RedBean/ToolBox.php
- * @desc    A RedBeanPHP-wide service locator
- * @author	Gabor de Mooij and the RedBeanPHP community
- * @license BSD/GPLv2
- *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

@@ -6,6 +6,8 @@
  * @desc    Manages complex bean associations.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
+ * 
+ * @deprecated
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
