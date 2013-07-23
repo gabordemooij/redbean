@@ -106,9 +106,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	*
 	* @return array
 	*/
-	private function getSharedList($type) {
-		$toolbox = $this->beanHelper->getToolbox();
-		$redbean = $toolbox->getRedBean();
+	private function getSharedList($type, $redbean, $toolbox) {
 		$writer = $toolbox->getWriter();
 		if ($this->via) {
 			$oldName = $writer->getAssocTable(array($this->__info['type'],$type));
@@ -119,7 +117,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			} 
 		}
 		$type = $this->beau($type);
-		$types = array($this->__info['type'], $type);
 		$linkID = $this->properties['id'];
 		$assocManager = $redbean->getAssociationManager();
 		$beans = $assocManager->relatedSimple($this, $type, $this->withSql, $this->withParams);
@@ -136,21 +133,21 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	*
 	* @return array
 	*/
-	private function getOwnList($type) {
+	private function getOwnList($type, $redbean) {
 		$type = $this->beau($type);
 		if ($this->aliasName) {
 			$parentField = $this->aliasName;
-			$myFieldLink = $this->aliasName.'_id';
+			$myFieldLink = $parentField.'_id';
 			$this->__info['sys.alias.'.$type] = $this->aliasName;
 			$this->aliasName = null;
 		} else {
-			$myFieldLink = $this->__info['type'].'_id';
 			$parentField = $this->__info['type'];
+			$myFieldLink = $parentField.'_id';
 		}
 		$beans = array();
 		if ($this->getID()>0) {
 			$bindings = array_merge(array($this->getID()), $this->withParams);
-			$beans = $this->beanHelper->getToolbox()->getRedBean()->find($type, array(), " $myFieldLink = ? ".$this->withSql, $bindings);
+			$beans = $redbean->find($type, array(), " $myFieldLink = ? ".$this->withSql, $bindings);
 		}
 		$this->withSql = '';
 		$this->withParams = array();
@@ -494,6 +491,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 		if (strpos($property, 'own') !== 0 && strpos($property, 'shared') !== 0) {
 			if (isset($beautifulColumns[$property])) {
 				$propertyBeau = $beautifulColumns[$property];
+			} elseif (ctype_lower($property)) { 
+				return $property;
 			} else {
 				$propertyBeau = strtolower(preg_replace('/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $property));
 				$beautifulColumns[$property] = $propertyBeau;
@@ -527,7 +526,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 			$fieldLink = $property.'_id'; 
 			if (isset($this->$fieldLink) && $fieldLink !== $this->getMeta('sys.idfield')) {
 				$this->__info['tainted'] = true; 
-				$bean = $this->getMeta('sys.parentcache.'.$property);
+				$bean = isset($this->__info['sys.parentcache.'.$property]) ? $this->__info['sys.parentcache.'.$property] : null;
 				if (!$bean) { 
 					$type = $this->getAlias($property);
 					$bean = $redbean->load($type, $this->properties[$fieldLink]);
@@ -536,14 +535,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				return $this->properties[$property];
 			} elseif (strpos($property, 'own') === 0 && ctype_upper(substr($property, 3, 1))) {
 				$type = lcfirst(substr($property, 3));
-				$beans = $this->getOwnList($type);
+				$beans = $this->getOwnList($type, $redbean);
 				$this->properties[$property] = $beans;
 				$this->__info['sys.shadow.'.$property] = $beans;
 				$this->__info['tainted'] = true;
 				return $this->properties[$property];
 			} elseif (strpos($property, 'shared') === 0 && ctype_upper(substr($property, 6, 1))) {
 				$type = lcfirst(substr($property, 6));
-				$beans = $this->getSharedList($type);
+				$beans = $this->getSharedList($type, $redbean, $toolbox);
 				$this->properties[$property] = $beans;
 				$this->__info['sys.shadow.'.$property] = $beans;
 				$this->__info['tainted'] = true;
