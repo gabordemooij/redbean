@@ -184,6 +184,23 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	}
 	
 	/**
+	 * Does the work for OODB dispense, but without calling setMeta().
+	 * 
+	 * @param string             $type       type of the new bean
+	 * @param RedBean_BeanHelper $beanhelper bean helper to obtain a toolbox and a model
+	 * 
+	 * @return void
+	 */
+	public function initializeForDispense($type, RedBean_BeanHelper $beanhelper) {
+		$this->beanHelper = $beanhelper;
+		$this->__info['type'] = $type;
+		$this->__info['sys.id'] = 'id';
+		$this->__info['sys.orig'] = array('id' => 0);
+		$this->__info['tainted'] = true;
+		$this->properties['id'] = 0;
+	}
+	
+	/**
 	 * Sets the Bean Helper. Normally the Bean Helper is set by OODB.
 	 * Here you can change the Bean Helper. The Bean Helper is an object
 	 * providing access to a toolbox for the bean necessary to retrieve

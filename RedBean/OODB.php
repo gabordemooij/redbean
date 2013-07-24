@@ -569,15 +569,10 @@ class RedBean_OODB extends RedBean_Observable {
 		$beans = array();
 		for($i = 0; $i < $number; $i++){
 			$bean = new RedBean_OODBBean;
-			$bean->setBeanHelper($this->beanhelper);
-			$bean->setMeta('type', $type );
-			$bean->setMeta('sys.id', 'id');
-			$bean->id = 0;
+			$bean->initializeForDispense($type, $this->beanhelper);
 			if (!$this->isFrozen) {
 				$this->check($bean);
 			}
-			$bean->setMeta('tainted', true);
-			$bean->setMeta('sys.orig', array('id' => 0));
 			$this->signal('dispense', $bean );
 			$beans[] = $bean;
 		}
