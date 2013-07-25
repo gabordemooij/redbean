@@ -49,7 +49,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 		$response = array(
 			 'red-resty' => '1.0'
 		);
-		if ($result) {
+		if ($result !== null) {
 			$response['result'] = $result;
 		} else {
 			$response['error'] = array(
@@ -152,6 +152,35 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	}
 	
 	/**
+	 * Opens a list and returns the contents of the list.
+	 * 
+	 * @param RedBean_OODBBean $bean       owner of the list
+	 * @param string           $list       name of the list to open
+	 * @param string           $sqlSnippet additional SQL
+	 * @param array            $params     bindings
+	 * 
+	 * @return array
+	 */
+	protected function openList(RedBean_OODBBean $bean, $list, $sqlSnippet = null, $params = array()) {
+		$listOfBeans = array();
+		$listName = (strpos($list, 'shared-')===0) ? ('shared'.ucfirst(substr($list, 7))) : ('own'.ucfirst($list));
+		if ($sqlSnippet) {
+			if (preg_match('/^(ORDER|GROUP|HAVING|LIMIT|OFFSET|TOP)\s+/i', ltrim($sqlSnippet))) {
+				$beans = $bean->with($sqlSnippet, $params)->$listName;
+			} else {
+				$beans = $bean->withCondition($sqlSnippet, $params)->$listName;
+			}
+		} else {
+			$beans = $bean->$listName;
+		}
+		foreach($beans as $listBean) {
+			$listOfBeans[] = $listBean->export();
+		}
+		
+		return $this->resp($listOfBeans);
+	}
+	
+	/**
 	 * Handles a REST DELETE request.
 	 * Deletes the selected bean.
 	 * Returns an array formatted according to RedBeanPHP REST BeanCan
@@ -227,8 +256,9 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	 * 
 	 * @return string 
 	 */
-	public function handleREST($root, $uri, $method, $payload = array()) {
+	public function handleREST($root, $uri, $method, $payload = array(), $sqlSnippets = array()) {
 		try {
+			$listToOpen = $listTypeToOpen = null;
 			if (!preg_match('|^[\w\-/]*$|', $uri)) {
 				return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'URI contains invalid characters.');
 			}
@@ -238,7 +268,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 			$finder = new RedBean_Finder(RedBean_Facade::$toolbox);
 			$uri = ((strlen($uri))) ? explode('/', ($uri)) : array();
 			if ($method == 'PUT') {
-				if (count($uri)<1) {
+				if (count($uri) < 1) {
 					 return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Missing list.');
 				}
 				$list = array_pop($uri); //grab the list
@@ -247,18 +277,36 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 					return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Invalid list.');
 				}
 			}
+			$matches = array();
+			
+			if ($method === 'GET' && count($uri) > 2) {
+					$lastItemInURI = $uri[count($uri) - 1];
+					if ($lastItemInURI === 'list') {
+						array_pop($uri);
+						$listToOpen = array_pop($uri);
+						$listTypeToOpen = (strpos($listToOpen, 'shared-')===0) ? substr($listToOpen, 7) : $listToOpen;
+						list($sqlSnippet, $sqlBindings) = (isset($sqlSnippets[$listToOpen])) ? $sqlSnippets[$listToOpen] : array(null, array());
+					}
+			}
 			try {
 				$bean = $finder->findByPath($root, $uri);
 			} catch(Exception $e) {
 				return $this->resp(null, self::C_HTTP_NOT_FOUND, $e->getMessage());
 			}
 			$beanType = $bean->getMeta('type');
+			
 			if (!($this->whitelist === 'all' 
-					  || (isset($this->whitelist[$beanType]) && in_array($method, $this->whitelist[$beanType])))) {
+					  || ($listToOpen === null && isset($this->whitelist[$beanType]) && in_array($method, $this->whitelist[$beanType])
+					  || ($listToOpen !== null && isset($this->whitelist[$listTypeToOpen]) && in_array($method, $this->whitelist[$listTypeToOpen]))
+					  ))) {
 				return $this->resp(null, self::C_HTTP_FORBIDDEN_REQUEST, 'This bean is not available. Set whitelist to "all" or add to whitelist.');
 			}
 			if ($method == 'GET') {
-				return $this->get($bean);
+				if ($listToOpen === null) {
+					return $this->get($bean);
+				} else {
+					return $this->openList($bean, $listToOpen, $sqlSnippet, $sqlBindings);
+				}
 			} elseif ($method == 'DELETE') {
 				return $this->delete($bean);
 			} elseif ($method == 'POST') {

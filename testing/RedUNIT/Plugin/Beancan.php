@@ -38,9 +38,76 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$site->ownPage[] = $page;
 		$user->ownSite[] = $site;
 		R::store($user);
-
+		
 		$can = new RedBean_Plugin_BeanCanResty;
 		$can->setWhitelist('all');
+		
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/list', 'GET');
+		
+		asrt(count($resp['result']), 2);
+		
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/list', 'GET', array(), array('shared-ad'=>array(
+			 'LIMIT 1', array()
+		)));
+		
+		asrt(count($resp['result']), 1);
+	
+		$can->setWhitelist(array('ad'=> array('GET')));
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/list', 'GET', array(), array('shared-ad'=>array(
+			 'LIMIT 1', array()
+		)));
+		
+		asrt(count($resp['result']), 1);
+	
+		$can->setWhitelist(array('ad'=> array('GET')));
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/list', 'GET', array(), array('shared-ad'=>array(
+			 ' ORDER BY ad.id DESC ', array()
+		)));
+		
+		asrt(count($resp['result']), 2);
+		$entry1 = reset($resp['result']);
+		$entry2 = end($resp['result']);
+		asrt(($entry1['id'] > $entry2['id']), true);
+		
+		$can->setWhitelist(array('ad'=> array('GET')));
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/list', 'GET', array(), array('shared-ad'=>array(
+			 ' ORDER BY ad.id ASC ', array()
+		)));
+		
+		asrt(count($resp['result']), 2);
+		$entry1 = reset($resp['result']);
+		$entry2 = end($resp['result']);
+		asrt(($entry1['id'] < $entry2['id']), true);
+		
+		
+		$can->setWhitelist(array('page'=>array('GET')));
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/list', 'GET', array(), array('shared-ad'=>array(
+			 'LIMIT 1', array()
+		)));
+		
+		asrt(isset($resp['error']), true);
+	
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/list', 'GET', array(), array('shared-ad'=>array(
+			 ' id = ? ', array(0)
+		)));	
+		
+		asrt(count($resp['result']), 1);
+		
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/list', 'GET', array(), array('page'=>array(
+			 ' id = ? ', array($page->id)
+		)));	
+		
+		asrt(count($resp['result']), 1);
+		
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/list', 'GET', array(), array('page'=>array(
+			 ' id = ? ', array(0)
+		)));	
+		
+		asrt(count($resp['result']), 0);
+		
+		$can->setWhitelist('all');
+		
+		
 		$resp = $can->handleREST($user, '@!#?', 'GET');
 		asrt((string)$resp['error']['message'], 'URI contains invalid characters.');
 		asrt((string)$resp['error']['code'], '400');
@@ -106,6 +173,9 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/'.$ad->id, 'GET');
 		asrt((string)$resp['result']['id'], (string)$ad->id);
 		asrt((string)$resp['result']['name'], (string)$ad->name);
+		
+		
+		
 		//Send a PUT /site/1/page
 		$payLoad = array(
 			'type' => 'page',
