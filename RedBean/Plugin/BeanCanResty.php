@@ -286,6 +286,9 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 						$listToOpen = array_pop($uri);
 						$listTypeToOpen = (strpos($listToOpen, 'shared-')===0) ? substr($listToOpen, 7) : $listToOpen;
 						list($sqlSnippet, $sqlBindings) = (isset($sqlSnippets[$listToOpen])) ? $sqlSnippets[$listToOpen] : array(null, array());
+						if (!is_array($sqlBindings)) {
+							$sqlBindings = array();
+						}
 					}
 			}
 			try {

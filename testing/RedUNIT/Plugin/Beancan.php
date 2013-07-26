@@ -39,6 +39,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$user->ownSite[] = $site;
 		R::store($user);
 		
+		testpack('Test REST Lists');
 		$can = new RedBean_Plugin_BeanCanResty;
 		$can->setWhitelist('all');
 		
@@ -92,6 +93,13 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		)));	
 		
 		asrt(count($resp['result']), 1);
+		
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/list', 'GET', array(), array('shared-ad'=>array(
+			 ' id = ? ' //oops forgot array!
+		)));	
+		
+		asrt(count($resp['result']), 1);
+		
 		
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/list', 'GET', array(), array('page'=>array(
 			 ' id = ? ', array($page->id)
