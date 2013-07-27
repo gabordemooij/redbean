@@ -48,7 +48,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		asrt(count($resp['result']), 2);
 		
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/list', 'GET', array(), array('shared-ad'=>array(
-			 'LIMIT 1', array()
+			 'LIMIT 1'
 		)));
 		
 		asrt(count($resp['result']), 1);
