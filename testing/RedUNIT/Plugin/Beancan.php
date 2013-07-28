@@ -186,7 +186,6 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		
 		//Send a PUT /site/1/page
 		$payLoad = array(
-			'type' => 'page',
 			'bean' => array(
 				'name' => 'my new page'
 			)
@@ -195,6 +194,17 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		$newPage = R::findOne('page',' name = ? ',array('my new page'));
 		asrt((string)$resp['result']['id'], (string)$newPage->id);
 		asrt((string)$resp['result']['name'], (string)$newPage->name);
+		
+		$payload = array(
+			 'bean' => array(
+				  'does' => 'fly'
+			 )
+		);
+		
+		$resp = $can->handleREST($user, 'teapot', 'PUT', $payload);
+		$newTeapot = R::findOne('teapot');
+		asrt((string)$newTeapot->id, (string)$resp['result']['id']);
+		asrt((string)$newTeapot->does, 'fly');
 		
 		$badPayLoad = array(
 			'type' => 'ad',
