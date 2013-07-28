@@ -263,9 +263,12 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	 * @return void
 	 */
 	private function extractSQLSnippetsForGETList() {
-		list($this->sqlSnippet, $this->sqlBindings) = (isset($this->sqlSnippets[$this->list])) ? $this->sqlSnippets[$this->list] : array(null, array());
-		if (!is_array($this->sqlBindings)) {
-			$this->sqlBindings = array();
+		$sqlBundleItem = (isset($this->sqlSnippets[$this->list])) ? $this->sqlSnippets[$this->list] : array(null, array());
+		if (isset($sqlBundleItem[0])) {
+			$this->sqlSnippet = $sqlBundleItem[0];
+		}
+		if (isset($sqlBundleItem[1])) {
+			$this->sqlBindings = $sqlBundleItem[1];
 		}
 	}
 	
