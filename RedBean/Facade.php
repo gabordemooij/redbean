@@ -1153,6 +1153,7 @@ class RedBean_Facade {
 	public static function getWriter() {
 		return self::$writer;
 	}
+	
 	/**
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
@@ -1161,6 +1162,15 @@ class RedBean_Facade {
 	 */
 	public static function getRedBean() {
 		return self::$redbean;
+	}
+	
+	/**
+	 * Returns the toolbox currently used by the facade.
+	 * 
+	 * @return RedBean_ToolBox
+	 */
+	public static function getToolBox() {
+		return self::$toolbox;
 	}
 	
 	/**

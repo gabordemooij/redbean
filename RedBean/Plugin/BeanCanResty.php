@@ -27,9 +27,14 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	const C_HTTP_INTERNAL_SERVER_ERROR = 500;
 	
 	/**
-	 * @var RedBean_ModelHelper
+	 * @var RedBean_OODB
 	 */
-	private $modelHelper;
+	private $oodb;
+	
+	/**
+	 * @var RedBean_ToolBox
+	 */
+	private $toolbox;
 	
 	/**
 	 * @var array
@@ -152,8 +157,8 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 			}
 		}
 		$this->bean->import($this->payload['bean']);
-		RedBean_Facade::store($this->bean);
-		$this->bean = RedBean_Facade::load($this->bean->getMeta('type'), $this->bean->id);
+		$this->oodb->store($this->bean);
+		$this->bean = $this->oodb->load($this->bean->getMeta('type'), $this->bean->id);
 		return $this->resp($this->bean->export());
 	}
 	
@@ -181,7 +186,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 		foreach($this->payload['bean'] as $key => $value) {
 			if (!is_string($key) || !is_string($value)) return $this->resp(null, self::C_HTTP_BAD_REQUEST, 'Object \'bean\' invalid.');
 		}
-		$newBean = RedBean_Facade::dispense($this->type);
+		$newBean = $this->oodb->dispense($this->type);
 		$newBean->import($this->payload['bean']);
 		if (strpos($this->list, 'shared-') === false) {
 			$listName = 'own'.ucfirst($this->list);
@@ -189,8 +194,8 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 			$listName = 'shared'.ucfirst(substr($this->list,7));
 		}
 		array_push($this->bean->$listName, $newBean); 
-		RedBean_Facade::store($this->bean);
-		$newBean = RedBean_Facade::load($newBean->getMeta('type'), $newBean->id);
+		$this->oodb->store($this->bean);
+		$newBean = $this->oodb->load($newBean->getMeta('type'), $newBean->id);
 		return $this->resp($newBean->export());
 	}
 	
@@ -226,7 +231,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	 * @return array
 	 */
 	private function delete() {
-		RedBean_Facade::trash($this->bean);
+		$this->oodb->trash($this->bean);
 		return $this->resp('OK');
 	}
 	
@@ -312,7 +317,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 	 * @return void
 	 */
 	private function findBeanByURI() {
-		$finder = new RedBean_Finder(RedBean_Facade::$toolbox);
+		$finder = new RedBean_Finder($this->toolbox);
 		$this->bean = $finder->findByPath($this->root, $this->uri);
 		$this->beanType = $this->bean->getMeta('type');
 	}
@@ -415,9 +420,17 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin {
 
 	/**
 	 * Constructor.
+	 * 
+	 * @param RedBean_ToolBox $toolbox (optional)
 	 */
-	public function __construct() {
-		$this->modelHelper = new RedBean_ModelHelper;
+	public function __construct($toolbox = null) {
+		if ($toolbox instanceof RedBean_ToolBox) {
+			$this->toolbox = $toolbox;
+			$this->oodb = $toolbox->getRedBean();
+		} else {
+			$this->toolbox = RedBean_Facade::getToolBox();
+			$this->oodb = RedBean_Facade::getRedBean();
+		}
 	}
 	
 	/**

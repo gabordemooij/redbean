@@ -658,7 +658,9 @@ class RedBean_OODB extends RedBean_Observable {
 	public function find($type, $conditions = array(), $sql = null, $bindings = array()) {
 		//for backward compatibility, allow mismatch arguments:
 		if (is_array($sql)) {
-			$bindings = $sql[1];
+			if (isset($sql[1])) {
+				$bindings = $sql[1];
+			}
 			$sql = $sql[0];
 		}
 		try {

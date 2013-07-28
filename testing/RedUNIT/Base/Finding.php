@@ -47,6 +47,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		set1toNAssoc($a,$pageOne, $pageEvenMore);
 		asrt(count($redbean->find("page",array(), " name LIKE '%more%' ",array())),3);
 		asrt(count($redbean->find("page",array(), " name LIKE :str ",array(":str"=>'%more%'))),3);
+		asrt(count($redbean->find("page",array(), array(" name LIKE :str ",array(":str"=>'%more%')))),3);
 		asrt(count($redbean->find("page",array(), " name LIKE :str ",array(":str"=>'%mxore%'))),0);
 		asrt(count($redbean->find("page",array("id"=>array(2,3)))),2);
 		$bean = $redbean->dispense("wine");

@@ -40,12 +40,21 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin {
 		R::store($user);
 		
 		testpack('Test REST Lists');
+		
+		$can = new RedBean_Plugin_BeanCanResty(R::$toolbox);
+		$can->setWhitelist('all');
+		
+		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/list', 'GET');
+		
+		asrt(count($resp['result']), 2);
+		
 		$can = new RedBean_Plugin_BeanCanResty;
 		$can->setWhitelist('all');
 		
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/list', 'GET');
 		
 		asrt(count($resp['result']), 2);
+		
 		
 		$resp = $can->handleREST($user, 'site/'.$site->id.'/page/'.$page->id.'/shared-ad/list', 'GET', array(), array('shared-ad'=>array(
 			 'LIMIT 1'
