@@ -16,32 +16,32 @@ class RedBean_Preloader {
 	/**
 	 * @var RedBean_AssociationManager
 	 */
-	protected $assocManager;
+	private $assocManager;
 	
 	/**
 	 * @var RedBean_OODB 
 	 */
-	protected $oodb;
+	private $oodb;
 	
 	/**
 	 * @var integer
 	 */
-	protected $counterID = 0;
+	private $counterID = 0;
 	
 	/**
 	 * @var array
 	 */
-	protected $filteredBeans = array();
+	private $filteredBeans = array();
 	
 	/**
 	 * @var array 
 	 */
-	protected $retrievals = array();
+	private $retrievals = array();
 	
 	/**
 	 * @var integer 
 	 */
-	protected $iterationIndex = 0;
+	private $iterationIndex = 0;
 	
 	/**
 	 * Extracts the type list for preloader.
@@ -67,6 +67,23 @@ class RedBean_Preloader {
 			$types = $typeList;
 		}
 		return $types;
+	}
+	
+	
+	/**
+	 * Extracts perloading request for type from array.
+	 * 
+	 * @param array $typeInfo type info
+	 * 
+	 * @return array
+	 */
+	private function extractTypeInfo($typeInfo) {
+		list($type, $sqlObj) = (is_array($typeInfo) ? $typeInfo : array($typeInfo, null));
+		list($sql, $bindings) = $sqlObj;
+		if (!is_array($bindings)) {
+				$bindings = array();
+		}
+		return array($type, $sql, $bindings);
 	}
 	
 	/**
@@ -286,7 +303,7 @@ class RedBean_Preloader {
 	 * Initializes the filtered beans array, the retrievals array and
 	 * the iteration index.
 	 */
-	protected function init() {
+	private function init() {
 		$this->iterationIndex = 0;
 		$this->retrievals = array();
 		$this->filteredBeans = array();
@@ -302,7 +319,7 @@ class RedBean_Preloader {
 	 * 
 	 * @return void
 	 */
-	protected function preloadSharedBeans($type, $sql, $bindings, $field) {
+	private function preloadSharedBeans($type, $sql, $bindings, $field) {
 		$sharedBeans = $this->assocManager->relatedSimple($this->filteredBeans, $type, $sql, $bindings);
 		foreach($this->filteredBeans as $filteredBean) { //now let the filtered beans gather their beans
 			$list = $this->gatherSharedBeansFromPool($filteredBean, $sharedBeans);
@@ -322,7 +339,7 @@ class RedBean_Preloader {
 	 * 
 	 * @return void
 	 */
-	protected function preloadOwnBeans($type, $sql, $bindings, $field, $ids) {
+	private function preloadOwnBeans($type, $sql, $bindings, $field, $ids) {
 		$bean = reset($this->filteredBeans);
 		$link = $bean->getMeta('type').'_id';
 		$children = $this->oodb->find($type, array($link => $ids), $sql, $bindings);
@@ -343,7 +360,7 @@ class RedBean_Preloader {
 	 * 
 	 * @return void
 	 */
-	protected function preloadParentBeans($type, $field, $ids, $map) {
+	private function preloadParentBeans($type, $field, $ids, $map) {
 		foreach($this->oodb->batch($type, $ids) as $parent) {
 			foreach($map[$parent->id] as $childBean) {
 				$childBean->setProperty($field, $parent);
@@ -361,7 +378,7 @@ class RedBean_Preloader {
 	 * 
 	 * @return array
 	 */
-	protected function convertBeanToArrayIfNeeded($beanOrBeans) {
+	private function convertBeanToArrayIfNeeded($beanOrBeans) {
 		if (!is_array($beanOrBeans)) {
 			$beanOrBeans = array($beanOrBeans);
 		}
@@ -391,21 +408,15 @@ class RedBean_Preloader {
 		$beans = $this->convertBeanToArrayIfNeeded($beans);
 		$this->init();
 		$types = $this->extractTypesFromTypeList($typeList);
-		$oldFields = array();
-		$oldField = '';
+		$oldFields = array(); $oldField = '';
 		foreach($types as $key => $typeInfo) {
-			list($type,$sqlObj) = (is_array($typeInfo) ? $typeInfo : array($typeInfo, null));
-			list($sql, $bindings) = $sqlObj;
-			if (!is_array($bindings)) {
-					$bindings = array();
-			}
+			list($type, $sql, $bindings) = $this->extractTypeInfo($typeInfo);
 			$this->retrievals[$this->iterationIndex] = array();
 			$map = $ids = array();
 			$field = $this->getPreloadField($key, $type, $oldField, $oldFields);
 			$this->filteredBeans = $this->markBeans($beans);
 			while($p = strpos($field, '.')) { //filtering: find the right beans in the path
-				$nesting = substr($field, 0, $p);
-				$this->addBeansForNextStepInPath($nesting);
+				$this->addBeansForNextStepInPath(substr($field, 0, $p));
 				$field = substr($field, $p+1);
 			}
 			$oldField = $field;

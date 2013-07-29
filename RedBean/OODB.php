@@ -478,7 +478,7 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @return boolean 
 	 */
-	protected function isDependentOn($refType, $otherType) {
+	private function isDependentOn($refType, $otherType) {
 		return (boolean) (isset($this->dep[$refType]) && in_array($otherType, $this->dep[$refType]));
 	}
 	
@@ -495,12 +495,65 @@ class RedBean_OODB extends RedBean_Observable {
 	 * 
 	 * @return void
 	 */
-	protected function processBuildCommands($table, $property, RedBean_OODBBean $bean) {
+	private function processBuildCommands($table, $property, RedBean_OODBBean $bean) {
 		if ($inx = ($bean->getMeta('buildcommand.indexes'))) {
 			if (isset($inx[$property])) { 
 				$this->writer->addIndex($table, $inx[$property], $property);
 			}
 		}
+	}
+	
+	/**
+	 * Converts an embedded bean to an ID, removed the bean property and
+	 * stores the bean in the embedded beans array.
+	 * 
+	 * @param array            $embeddedBeans destination array for embedded bean
+	 * @param RedBean_OODBBean $bean          target bean
+	 * @param string           $property      property that contains the embedded bean
+	 * @param RedBean_OODBBean $value         embedded bean itself
+	 */
+	private function processEmbeddedBean(&$embeddedBeans, $bean, $property, RedBean_OODBBean $value) {
+		$linkField = $property.'_id';
+		$bean->$linkField = $this->prepareEmbeddedBean($value);
+		$bean->setMeta('cast.'.$linkField, 'id');
+		$embeddedBeans[$linkField] = $value;
+		$bean->removeProperty($property);
+	}
+	
+	/**
+	 * Stores a bean and its lists in one run.
+	 * 
+	 * @param RedBean_OODBBean $bean
+	 * 
+	 * @return void
+	 */
+	private function processLists(RedBean_OODBBean $bean) {
+		$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = $ownAdditions = $ownTrashcan = $ownresidue = $embeddedBeans = array(); //Define groups
+			foreach($bean as $property => $value) {
+				$value = ($value instanceof RedBean_SimpleModel) ? $value->unbox() : $value;
+				if ($value instanceof RedBean_OODBBean) {
+					$this->processEmbeddedBean($embeddedBeans, $bean, $property, $value);
+				} elseif (is_array($value)) {
+					$originals = $bean->getMeta('sys.shadow.'.$property, array());
+					if (strpos($property, 'own') === 0) {
+						list($ownAdditions, $ownTrashcan, $ownresidue) = $this->processGroups($originals, $value, $ownAdditions, $ownTrashcan, $ownresidue);
+						$bean->removeProperty($property);
+					} elseif (strpos($property, 'shared') === 0) {
+						list($sharedAdditions, $sharedTrashcan, $sharedresidue) = $this->processGroups($originals, $value, $sharedAdditions, $sharedTrashcan, $sharedresidue);
+						$bean->removeProperty($property);
+					}
+				}
+			}
+			$this->storeBean($bean);
+			if (!$this->isFrozen) {
+				$this->addForeignKeysForParentBeans($bean, $embeddedBeans);
+			}
+			$this->processTrashcan($bean, $ownTrashcan);
+			$this->processAdditions($bean, $ownAdditions);
+			$this->processResidue($ownresidue);
+			$this->processSharedTrashcan($bean, $sharedTrashcan);
+			$this->processSharedAdditions($bean, $sharedAdditions);
+			$this->processSharedResidue($bean, $sharedresidue);
 	}
 
 	/**
@@ -685,7 +738,7 @@ class RedBean_OODB extends RedBean_Observable {
 	public function tableExists($table) {
 		return $this->writer->tableExists($table);
 	}
-
+	
 	/**
 	 * Stores a bean in the database. This function takes a
 	 * RedBean_OODBBean Bean Object $bean and stores it
@@ -712,41 +765,9 @@ class RedBean_OODB extends RedBean_Observable {
 		$this->signal('update', $bean );
 		$processLists = $this->hasListsOrObjects($bean); //check again, might have changed by model!
 		if ($processLists) {
-			$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = $ownAdditions = $ownTrashcan = $ownresidue = $embeddedBeans = array(); //Define groups
-			foreach($bean as $property => $value) {
-				if ($value instanceof RedBean_SimpleModel) {
-					$value = $value->unbox();
-				} 
-				if ($value instanceof RedBean_OODBBean) {
-					$linkField = $property.'_id';
-					$bean->$linkField = $this->prepareEmbeddedBean($value);
-					$bean->setMeta('cast.'.$linkField, 'id');
-					$embeddedBeans[$linkField] = $value;
-					$bean->removeProperty($property);
-				}
-				if (is_array($value)) {
-					$originals = $bean->getMeta('sys.shadow.'.$property, array());
-					if (strpos($property, 'own') === 0) {
-						list($ownAdditions, $ownTrashcan, $ownresidue) = $this->processGroups($originals, $value, $ownAdditions, $ownTrashcan, $ownresidue);
-						$bean->removeProperty($property);
-					} elseif (strpos($property, 'shared') === 0) {
-						list($sharedAdditions, $sharedTrashcan, $sharedresidue) = $this->processGroups($originals, $value, $sharedAdditions, $sharedTrashcan, $sharedresidue);
-						$bean->removeProperty($property);
-					}
-				}
-			}
-		}
-		$this->storeBean($bean);
-		if ($processLists) {
-			if (!$this->isFrozen) {
-				$this->addForeignKeysForParentBeans($bean, $embeddedBeans);
-			}
-			$this->processTrashcan($bean, $ownTrashcan);
-			$this->processAdditions($bean, $ownAdditions);
-			$this->processResidue($ownresidue);
-			$this->processSharedTrashcan($bean, $sharedTrashcan);
-			$this->processSharedAdditions($bean, $sharedAdditions);
-			$this->processSharedResidue($bean, $sharedresidue);
+			$this->processLists($bean);
+		} else {
+			$this->storeBean($bean);
 		}
 		$this->signal('after_update', $bean);
 		return (int) $bean->id;
