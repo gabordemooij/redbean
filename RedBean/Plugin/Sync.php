@@ -17,6 +17,46 @@
 class RedBean_Plugin_Sync implements RedBean_Plugin {
 	
 	/**
+	 * @var RedBean_OODB
+	 */
+	private $oodb;
+	
+	/**
+	 * @var RedBean_QueryWriter
+	 */
+	private $sourceWriter;
+	
+	/**
+	 * @var RedBean_QueryWriter
+	 */
+	private $targetWriter;
+	
+	/**
+	 * @var array 
+	 */
+	private $sourceTables;
+	
+	/**
+	 * @var array
+	 */
+	private $targetTables;
+	
+	/**
+	 * @var array 
+	 */
+	private $missingTables;
+	
+	/**
+	 * @var array 
+	 */
+	private $translations;
+	
+	/**
+	 * @var integer
+	 */
+	private $defaultCode;
+	
+	/**
 	 * Performs a database schema sync. For use with facade.
 	 * Instead of toolboxes this method accepts simply string keys and is static.
 	 * 
@@ -41,6 +81,119 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 	}
 	
 	/**
+	 * Returns a translation map for the writer pair.
+	 * 
+	 * @return array
+	 */
+	private function getTranslations() {
+		$longText = str_repeat('lorem ipsum', 9000);
+		$testmap = array(
+			false, 1, 2.5, -10, 1000, 'abc', $longText, '2010-10-10', '2010-10-10 10:00:00', '10:00:00', 'POINT(1 2)'
+		);
+		$this->defaultCode = $this->targetWriter->scanType('string');
+		foreach ($testmap as $v) {
+			$code = $this->sourceWriter->scanType($v, true);
+			$translation = $this->targetWriter->scanType($v, true);
+			if (!isset($this->translations[$code])) {
+				$this->translations[$code] = $translation;
+			}
+			if ($translation > $this->translations[$code] && $translation < 50) {
+				$this->translations[$code] = $translation;
+			}
+		}
+		//Fix narrow translations SQLiteT stores date as double. (double != really double)
+		if (get_class($this->sourceWriter) === 'RedBean_QueryWriter_SQLiteT') {
+			$this->translations[1] = $this->defaultCode;  //use magic number in case writer not loaded.
+		}
+	}
+	
+	/**
+	 * Adds missing tables to target database.
+	 * 
+	 * @return void
+	 */
+	private function addMissingTables() {
+		foreach ($this->missingTables as $missingTable) {
+			$this->targetWriter->createTable($missingTable);
+		}
+	}
+	
+	/**
+	 * Synchronizes the tables and columns.
+	 * 
+	 * @return void
+	 */
+	private function syncTablesAndColumns() {
+		foreach ($this->sourceTables as $sourceTable) {
+			$sourceColumns = $this->sourceWriter->getColumns($sourceTable);
+			if (in_array($sourceTable, $this->missingTables)) {
+				$targetColumns = array();
+			} else {
+				$targetColumns = $this->targetWriter->getColumns($sourceTable);
+			}
+			unset($sourceColumns['id']);
+			foreach ($sourceColumns as $sourceColumn => $sourceType) {
+				if (substr($sourceColumn, -3) === '_id') {
+					$targetCode = $this->targetWriter->getTypeForID();
+				} else {
+					$sourceCode = $this->sourceWriter->code($sourceType, true);
+					$targetCode = (isset($this->translations[$sourceCode])) ? $this->translations[$sourceCode] : $this->defaultCode;
+				}
+				if (!isset($targetColumns[$sourceColumn])) {
+					$this->targetWriter->addColumn($sourceTable, $sourceColumn, $targetCode);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Synchronizes the foreign key and unique constraints.
+	 * 
+	 * @return void
+	 */
+	private function syncConstraints() {
+		foreach ($this->sourceTables as $sourceTable) {
+			$sourceColumns = $this->sourceWriter->getColumns($sourceTable);
+			//don't delete sourceType, sourceColumn needs to be the key!
+			foreach ($sourceColumns as $sourceColumn => $sourceType) {
+				if (substr($sourceColumn, -3) === '_id') {
+					$fkTargetType = substr($sourceColumn, 0, strlen($sourceColumn) - 3);
+					$fkType = $sourceTable;
+					$fkField = $sourceColumn;
+					$fkTargetField = 'id';
+					$this->targetWriter->addFK($fkType, $fkTargetType, $fkField, $fkTargetField);
+				}
+			}
+			//Is it a link table? -- Add Unique constraint and FK constraint
+			if (strpos($sourceTable, '_') !== false) {
+				$this->targetWriter->addUniqueIndex($sourceTable, array_keys($sourceColumns));
+				$types = explode('_', $sourceTable);
+				$this->targetWriter->addConstraintForTypes(
+						  $this->oodb->dispense($types[0])->getMeta('type'), 
+						  $this->oodb->dispense($types[1])->getMeta('type'));
+			}
+		}
+	}
+	
+	/**
+	 * Initializes the Sync plugin for usage.
+	 * 
+	 * @param RedBean_Toolbox $source toolbox of source database
+	 * @param RedBean_Toolbox $target toolbox of target database
+	 * 
+	 * @return void
+	 */
+	private function initialize(RedBean_Toolbox $source, RedBean_Toolbox $target) {
+		$this->oodb = $target->getRedBean();
+		$this->sourceWriter = $source->getWriter();
+		$this->targetWriter = $target->getWriter();
+		$this->sourceTables = $this->sourceWriter->getTables();
+		$this->targetTables = $this->targetWriter->getTables();
+		$this->missingTables = array_diff($this->sourceTables, $this->targetTables);
+		$this->translations = array();
+	}
+	
+	/**
 	 * Captures the SQL required to adjust source database to match
 	 * schema of target database and feeds this sql code to the
 	 * adapter of the target database.
@@ -51,72 +204,10 @@ class RedBean_Plugin_Sync implements RedBean_Plugin {
 	 * @return void
 	 */
 	public function doSync(RedBean_Toolbox $source, RedBean_Toolbox $target) {
-		$sourceWriter = $source->getWriter();
-		$targetWriter = $target->getWriter();
-		$longText = str_repeat('lorem ipsum', 9000);
-		$testmap = array(
-			false, 1, 2.5, -10, 1000, 'abc', $longText, '2010-10-10', '2010-10-10 10:00:00', '10:00:00', 'POINT(1 2)'
-		);
-		$translations = array();
-		$defaultCode = $targetWriter->scanType('string');
-		foreach ($testmap as $v) {
-			$code = $sourceWriter->scanType($v, true);
-			$translation = $targetWriter->scanType($v, true);
-			if (!isset($translations[$code])) {
-				$translations[$code] = $translation;
-			}
-			if ($translation > $translations[$code] && $translation < 50) {
-				$translations[$code] = $translation;
-			}
-		}
-		//Fix narrow translations SQLiteT stores date as double. (double != really double)
-		if (get_class($sourceWriter) === 'RedBean_QueryWriter_SQLiteT') {
-			$translations[1] = $defaultCode;  //use magic number in case writer not loaded.
-		}
-		$sourceTables = $sourceWriter->getTables();
-		$targetTables = $targetWriter->getTables();
-		$missingTables = array_diff($sourceTables, $targetTables);
-		foreach ($missingTables as $missingTable) {
-			$targetWriter->createTable($missingTable);
-		}
-		//First run, create tables and columns
-		foreach ($sourceTables as $sourceTable) {
-			$sourceColumns = $sourceWriter->getColumns($sourceTable);
-			if (in_array($sourceTable, $missingTables)) {
-				$targetColumns = array();
-			} else {
-				$targetColumns = $targetWriter->getColumns($sourceTable);
-			}
-			unset($sourceColumns['id']);
-			foreach ($sourceColumns as $sourceColumn => $sourceType) {
-				if (substr($sourceColumn, -3) === '_id') {
-					$targetCode = $targetWriter->getTypeForID();
-				} else {
-					$sourceCode = $sourceWriter->code($sourceType, true);
-					$targetCode = (isset($translations[$sourceCode])) ? $translations[$sourceCode] : $defaultCode;
-				}
-				if (!isset($targetColumns[$sourceColumn])) {
-					$targetWriter->addColumn($sourceTable, $sourceColumn, $targetCode);
-				}
-			}
-		}
-		foreach ($sourceTables as $sourceTable) {
-			$sourceColumns = $sourceWriter->getColumns($sourceTable);
-			foreach ($sourceColumns as $sourceColumn => $sourceType) {
-				if (substr($sourceColumn, -3) === '_id') {
-					$fkTargetType = substr($sourceColumn, 0, strlen($sourceColumn) - 3);
-					$fkType = $sourceTable;
-					$fkField = $sourceColumn;
-					$fkTargetField = 'id';
-					$targetWriter->addFK($fkType, $fkTargetType, $fkField, $fkTargetField);
-				}
-			}
-			//Is it a link table? -- Add Unique constraint and FK constraint
-			if (strpos($sourceTable, '_') !== false) {
-				$targetWriter->addUniqueIndex($sourceTable, array_keys($sourceColumns));
-				$types = explode('_', $sourceTable);
-				$targetWriter->addConstraintForTypes(R::dispense($types[0])->getMeta('type'), R::dispense($types[1])->getMeta('type'));
-			}
-		}
+		$this->initialize($source, $target);
+		$this->getTranslations();
+		$this->addMissingTables();
+		$this->syncTablesAndColumns();
+		$this->syncConstraints();
 	}
 }

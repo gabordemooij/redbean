@@ -63,6 +63,65 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	}
 	
 	/**
+	 * Loads bean, recurses if one of the property appears to be a list.
+	 * 
+	 * @param array   $array       data array to import as a bean
+	 * @param boolean $filterEmpty if TRUE empty STRING values are converted to NULL (default FALSE)
+	 * 
+	 * @return RedBean_OODBBean
+	 * 
+	 * @throws RedBean_Exception_Security
+	 */
+	private function loadBean(&$array, $filterEmpty) {
+		$type = $array['type'];
+		unset($array['type']);
+		if (isset($array['id'])) { //Do we need to load the bean?
+			if (self::$loadBeans) {
+				$bean = $this->redbean->load($type, (int) $array['id']);
+			} else {
+				throw new RedBean_Exception_Security('Attempt to load a bean in Cooker. Use enableBeanLoading to override but please read security notices first.');
+			}
+		} else {
+			$bean = $this->redbean->dispense($type);
+		}
+		foreach($array as $property => $value) {
+			if (is_array($value)) {
+				$bean->$property = $this->graph($value, $filterEmpty);
+			} else {
+				$bean->$property = ($value == '' && self::$useNULLForEmptyString) ? null : $value;
+			}
+		}
+		return $bean;
+	}
+	
+	/**
+	 * Loads a list. Recurses for every bean in the list.
+	 * 
+	 * @param array   $array       data array to import as a list
+	 * @param boolean $filterEmpty if TRUE empty lists will NOT be imported
+	 * 
+	 * @return array
+	 * 
+	 * @throws RedBean_Exception_Security
+	 */
+	private function loadList(&$array, $filterEmpty) {
+		foreach($array as $key => $value) {
+			$listBean = $this->graph($value, $filterEmpty);
+			if (!($listBean instanceof RedBean_OODBBean)) {
+				throw new RedBean_Exception_Security('Expected bean but got :'.gettype($listBean)); 
+			}
+			if ($listBean->isEmpty()) {  
+				if (!$filterEmpty) { 
+					$beans[$key] = $listBean;
+				}
+			} else { 
+				$beans[$key] = $listBean;
+			}
+		}
+		return $beans;
+	} 
+	
+	/**
 	 * Turns an array (post/request array) into a collection of beans.
 	 * Handy for turning forms into bean structures that can be stored with a
 	 * single call.
@@ -102,48 +161,11 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin {
 	 * @throws RedBean_Exception_Security
 	 */
 	public function graph($array, $filterEmpty = false) {
-      	$beans = array();
+      $beans = array();
 		if (is_array($array) && isset($array['type'])) {
-			$type = $array['type'];
-			unset($array['type']);
-			//Do we need to load the bean?
-			if (isset($array['id'])) {
-				if (self::$loadBeans) {
-					$id = (int) $array['id'];
-					$bean = $this->redbean->load($type, $id);
-				} else {
-					throw new RedBean_Exception_Security('Attempt to load a bean in Cooker. Use enableBeanLoading to override but please read security notices first.');
-				}
-			} else {
-				$bean = $this->redbean->dispense($type);
-			}
-			foreach($array as $property => $value) {
-				if (is_array($value)) {
-					$bean->$property = $this->graph($value, $filterEmpty);
-				} else {
-					if ($value == '' && self::$useNULLForEmptyString){
-						$bean->$property = null;
-               } else { 
-						$bean->$property = $value;
-					}
-				}
-			}
-			return $bean;
+			return $this->loadBean($array, $filterEmpty);
 		} elseif (is_array($array)) {
-			foreach($array as $key => $value) {
-				$listBean = $this->graph($value, $filterEmpty);
-				if (!($listBean instanceof RedBean_OODBBean)) {
-					throw new RedBean_Exception_Security('Expected bean but got :'.gettype($listBean)); 
-				}
-				if ($listBean->isEmpty()) {  
-					if (!$filterEmpty) { 
-						$beans[$key] = $listBean;
-					}
-				} else { 
-					$beans[$key] = $listBean;
-				}
-			}
-			return $beans;
+			return $this->loadList($array, $filterEmpty);
 		} else {
 			throw new RedBean_Exception_Security('Expected array but got :'.gettype($array)); 
 		}

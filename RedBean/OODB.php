@@ -822,15 +822,11 @@ class RedBean_OODB extends RedBean_Observable {
 			}
 			$row = array_pop($rows);
 		}
-		$bean->setMeta('sys.orig', $row);
-		foreach($row as $columnName => $cellValue) {
-			$bean->$columnName = $cellValue;
-		}
+		$bean->setMeta('sys.orig', $row)->import($row);
 		$this->nesting++;
 		$this->signal('open', $bean);
 		$this->nesting--;
-		$bean->setMeta('tainted', false);
-		return $bean;
+		return $bean->setMeta('tainted', false);
 	}
 
 	/**

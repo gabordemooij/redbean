@@ -420,9 +420,7 @@ class RedBean_Preloader {
 				$field = substr($field, $p+1);
 			}
 			$oldField = $field;
-			if (strpos($type, '.')) {
-				$type = $field;
-			}
+			$type = (strpos($type, '.') !== false) ? $field : $type;
 			if (count($this->filteredBeans) === 0) continue;
 			list($ids, $map) = $this->gatherIDsToPreloadAndMap($this->filteredBeans, $field);
 			if (strpos($field, 'shared') === 0) {
