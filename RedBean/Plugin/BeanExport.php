@@ -47,6 +47,74 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	protected $maxDepth = false;
 	
 	/**
+	 * Extracts the parent bean from the current bean and puts the
+	 * contents in the export array.
+	 * 
+	 * @param array            $export export array to store data in
+	 * @param RedBean_OODBBean $bean   bean to collect data from
+	 * @param string           $key    key for the current value
+	 * @param RedBean_OODBBean $value  the parent bean to extract
+	 * 
+	 * @return void
+	 */
+	private function extractParentBean(&$export, &$bean, $key, $value) {
+		if (strpos($key, '_id') !== false) {
+			$sub = str_replace('_id', '', $key);
+			$subBean = $bean->$sub;
+			if ($subBean) {
+				$export[$sub] = $this->export($subBean, false);
+			}
+		}
+	}
+	
+	/**
+	 * Extracts the own list from the current bean and puts the
+	 * contents in the export array.
+	 * 
+	 * @param array            $export export array to store data in
+	 * @param RedBean_OODBBean $bean   bean to collect data from
+	 * @param string           $table  table 
+	 * @param array            $cols   columns
+	 * 
+	 * @return void
+	 */
+	private function extractOwnList(&$export, &$bean, $table, $cols) {
+		$type = $bean->getMeta('type');
+		$linkField = $type . '_id';
+		if (strpos($table, '_') === false) {
+			if (in_array($linkField, array_keys($cols))) {
+				$field = 'own'.ucfirst($table);
+				$export[$field] = self::export($bean->$field, false);
+			}
+		}
+	}
+	
+	/**
+	 * Extracts the shared list from the current bean and puts the
+	 * contents in the export array.
+	 * 
+	 * @param array            $export export array to store data in
+	 * @param RedBean_OODBBean $bean   bean to collect data from
+	 * @param string           $table  table 
+	 * 
+	 * @return void
+	 */
+	private function extractSharedList(&$export, &$bean, $table) {
+		$type = $bean->getMeta('type');
+		if (strpos($table, '_') !== false) {
+			$parts = explode('_', $table);
+			if (is_array($parts) && in_array($type, $parts)) {
+				$other = $parts[0];
+				if ($other == $type) {
+					$other = $parts[1];
+				}
+				$field = 'shared'.ucfirst($other);
+				$export[$field] = self::export($bean->$field, false);
+			}
+		}
+	}
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param RedBean_Toolbox $toolbox
@@ -169,34 +237,13 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 		$this->recurCheck[$bid] = $bid;
 		$export = $bean->export();
 		foreach($export as $key => $value) {
-			if (strpos($key, '_id') !== false) {
-				$sub = str_replace('_id', '', $key);
-				$subBean = $bean->$sub;
-				if ($subBean) {
-					$export[$sub] = $this->export($subBean, false);
-				}
-			}
+			$this->extractParentBean($export, $bean, $key, $value);
 		}
-		$type = $bean->getMeta('type');
-		$linkField = $type . '_id';
 		foreach($this->tables as $table => $cols) { //get all ownProperties
-			if (strpos($table, '_') === false) {
-				if (in_array($linkField, array_keys($cols))) {
-					$field = 'own'.ucfirst($table);
-					$export[$field] = self::export($bean->$field, false);
-				}
-			}
+			$this->extractOwnList($export, $bean, $table, $cols);
 		}
 		foreach($this->tables as $table => $cols) { //get all sharedProperties
-			if (strpos($table, '_') !== false) {
-				$parts = explode('_', $table);
-				if (is_array($parts) && in_array($type, $parts)) {
-					$other = $parts[0];
-					if ($other == $type) $other = $parts[1];
-					$field = 'shared'.ucfirst($other);
-					$export[$field] = self::export($bean->$field, false);
-				}
-			}
+			$this->extractSharedList($export, $bean, $table);
 		}
 		return $export;
 	}
