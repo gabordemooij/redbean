@@ -49,6 +49,95 @@ class RedBean_DuplicationManager {
 	protected $cacheTables = false;
 	
 	/**
+	 * Copies the shared beans in a bean, i.e. all the sharedBean-lists.
+	 * 
+	 * @param RedBean_OODBBean $copy   target bean to copy lists to
+	 * @param string           $shared name of the shared list
+	 * @param array            $beans  array with shared beans to copy
+	 * 
+	 * @return void
+	 */
+	private function copySharedBeans($copy, $shared, $beans) {
+		$copy->$shared = array();
+		foreach($beans as $subBean) {
+			array_push($copy->$shared, $subBean);
+		}
+	}
+	
+	/**
+	 * Copies the own beans in a bean, i.e. all the ownBean-lists.
+	 * Each bean in the own-list belongs exclusively to its owner so 
+	 * we need to invoke the duplicate method again to duplicate each bean here.
+	 * 
+	 * @param RedBean_OODBBean $copy   target bean to copy lists to
+	 * @param string           $owned  name of the own list
+	 * @param array            $beans  array with shared beans to copy
+	 * @param array            $trail  array with former beans to detect recursion
+	 * @param boolean          $pid    TRUE means preserve IDs, for export only
+	 * 
+	 * @return void
+	 */
+	private function copyOwnBeans($copy, $owned, $beans, $trail, $pid) {
+		$copy->$owned = array();
+		foreach($beans as $subBean) {
+			array_push($copy->$owned, $this->duplicate($subBean, $trail, $pid));
+		}	
+	}
+	
+	/**
+	 * Creates a copy of bean $bean and copies all primitive properties (not lists)
+	 * and the parents beans to the newly created bean. Also sets the ID of the bean
+	 * to 0.
+	 * 
+	 * @param RedBean_OODBBean $bean bean to copy
+	 * 
+	 * @return RedBean_OODBBean
+	 */
+	private function createCopy($bean) {
+		$type = $bean->getMeta('type');
+		$copy = $this->redbean->dispense($type);
+		$copy->importFrom($bean);
+		$copy->id = 0;
+		return $copy;
+	}
+	
+	/**
+	 * Generates a key from the bean type and its ID and determines if the bean
+	 * occurs in the trail, if not the bean will be added to the trail.
+	 * Returns TRUE if the bean occurs in the trail and FALSE otherwise.
+	 * 
+	 * @param array            $trail list of former beans
+	 * @param RedBean_OODBBean $bean  currently selected bean
+	 * 
+	 * @return boolean
+	 */
+	private function inTrailOrAdd(&$trail, $bean) {
+		$type = $bean->getMeta('type');
+		$key = $type.$bean->getID();
+		if (isset($trail[$key])) {
+			return true;
+		}
+		$trail[$key] = $bean;
+		return false;
+	}
+	
+	/**
+	 * Given the type name of a bean this method returns the canonical names
+	 * of the own-list and the shared-list properties respectively.
+	 * Returns a list with two elements: name of the own-list, and name
+	 * of the shared list.
+	 * 
+	 * @param string $typeName bean type name
+	 * 
+	 * @return array
+	 */
+	private function getListNames($typeName) {
+		$owned = 'own'.ucfirst($typeName);
+		$shared = 'shared'.ucfirst($typeName);
+		return array($owned, $shared);
+	}
+	
+	/**
 	 * Determines whether the bean has an own list based on
 	 * schema inspection from realtime schema or cache.
 	 * 
@@ -85,45 +174,28 @@ class RedBean_DuplicationManager {
 	 */
 	protected function duplicate($bean, $trail = array(), $pid = false) {
 		$type = $bean->getMeta('type');
-		$key = $type.$bean->getID();
-		if (isset($trail[$key])) {
+		if ($this->inTrailOrAdd($trail, $bean)) {
 			return $bean;
 		}
-		$trail[$key] = $bean;
-		$copy = $this->redbean->dispense($type);
-		$copy->importFrom($bean);
-		$copy->id = 0;
-		$tables = $this->tables;
-		foreach($tables as $table) {
-			if (is_array($this->filters) && count($this->filters) && !in_array($table, $this->filters)) {
+		$copy = $this->createCopy($bean);
+		foreach($this->tables as $table) {
+			if ((is_array($this->filters) && count($this->filters) && !in_array($table, $this->filters)) || $table == $type) {
 				continue;
 			}
-			if ($table == $type) {
-				continue;
-			}
-			$owned = 'own'.ucfirst($table);
-			$shared = 'shared'.ucfirst($table);
+			list($owned, $shared) = $this->getListNames($table);
 			if ($this->hasSharedList($type, $table)) {
 				if ($beans = $bean->$shared) {
-					$copy->$shared = array();
-					foreach($beans as $subBean) {
-						array_push($copy->$shared, $subBean);
-					}
+					$this->copySharedBeans($copy, $shared, $beans);
 				}
 			} elseif ($this->hasOwnList($type, $table)) {
 				if ($beans = $bean->$owned) {
-					$copy->$owned = array();
-					foreach($beans as $subBean) {
-						array_push($copy->$owned, $this->duplicate($subBean, $trail, $pid));
-					}
+					$this->copyOwnBeans($copy, $owned, $beans, $trail, $pid);
 				}
 				$copy->setMeta('sys.shadow.'.$owned, null);
 			}
 			$copy->setMeta('sys.shadow.'.$shared, null);
 		}
-		if ($pid) {
-			$copy->id = $bean->id;
-		}
+		$copy->id = ($pid) ? $bean->id : $copy->id;
 		return $copy;
 	}
 	
