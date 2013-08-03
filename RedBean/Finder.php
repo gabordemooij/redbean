@@ -158,14 +158,14 @@ class RedBean_Finder {
 	 * @throws RedBean_Exception_Security
 	 */
 	public function findByPath($bean, $steps) {
-		$n = count($steps);
-		if (!$n) {
+		$numberOfSteps = count($steps);
+		if (!$numberOfSteps) {
 			return $bean;
 		}
-		if ($n % 2) {
+		if ($numberOfSteps % 2) {
 			throw new RedBean_Exception_Security('Invalid path: needs 1 more element.');
 		}
-		for($i = 0; $i < $n; $i += 2) {
+		for($i = 0; $i < $numberOfSteps; $i += 2) {
 			if (trim($steps[$i])==='') {
 				throw new RedBean_Exception_Security('Cannot access list.');
 			}

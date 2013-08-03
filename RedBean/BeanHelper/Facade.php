@@ -35,4 +35,12 @@ class RedBean_BeanHelper_Facade implements RedBean_BeanHelper {
 		$obj->loadBean($bean);
 		return $obj;
 	}
+	
+	/**
+	 * @see RedBean_BeanHelper::getExtractedToolbox
+	 */
+	public function getExtractedToolbox() {
+		$toolbox = $this->getToolbox();
+		return array($toolbox->getRedBean(), $toolbox->getDatabaseAdapter(), $toolbox->getWriter(), $toolbox);
+	}
 }

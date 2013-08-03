@@ -532,14 +532,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 	 * @return mixed
 	 */
 	public function &__get($property) {
-		if (!$this->flagSkipBeau) {
-			$property = $this->beau($property);	
-		}
+		$property = (!$this->flagSkipBeau) ? $this->beau($property) : $property;	
 		if ($this->beanHelper) {
-			$toolbox = $this->beanHelper->getToolbox();
-			$redbean = $toolbox->getRedBean();
+			list($redbean,,, $toolbox) = $this->beanHelper->getExtractedToolbox();
 		}
-		if (!isset($this->properties[$property]) || ($this->withSql !== '' && ((strpos($property, 'own') === 0) || (strpos($property, 'shared') === 0)))) { 
+		if (!isset($this->properties[$property]) 
+				|| ($this->withSql !== '' && ((strpos($property, 'own') === 0) 
+				|| (strpos($property, 'shared') === 0)))) { 
 			$fieldLink = $property.'_id'; 
 			if (isset($this->$fieldLink) && $fieldLink !== $this->getMeta('sys.idfield')) {
 				$this->__info['tainted'] = true; 
@@ -551,22 +550,19 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable {
 				$this->properties[$property] = $bean;
 				return $this->properties[$property];
 			} elseif (strpos($property, 'own') === 0 && ctype_upper(substr($property, 3, 1))) {
-				$type = lcfirst(substr($property, 3));
-				$beans = $this->getOwnList($type, $redbean);
+				$beans = $this->getOwnList(lcfirst(substr($property, 3)), $redbean);
 				$this->properties[$property] = $beans;
 				$this->__info['sys.shadow.'.$property] = $beans;
 				$this->__info['tainted'] = true;
 				return $this->properties[$property];
 			} elseif (strpos($property, 'shared') === 0 && ctype_upper(substr($property, 6, 1))) {
-				$type = lcfirst(substr($property, 6));
-				$beans = $this->getSharedList($type, $redbean, $toolbox);
+				$beans = $this->getSharedList(lcfirst(substr($property, 6)), $redbean, $toolbox);
 				$this->properties[$property] = $beans;
 				$this->__info['sys.shadow.'.$property] = $beans;
 				$this->__info['tainted'] = true;
 				return $this->properties[$property];
 			} else {
-				$null = null;
-				return $null;
+				$null = null; return $null;
 			}
 		} else {
 			return $this->properties[$property];

@@ -71,11 +71,11 @@ class RedBean_AssociationManager extends RedBean_Observable {
 		$ids = array();
 		if (is_array($bean)) {
 			$beans = $bean;
-			foreach($beans as $b) {
-				if (!($b instanceof RedBean_OODBBean)) {
-					throw new RedBean_Exception_Security('Expected RedBean_OODBBean in array but got:'.gettype($b));
+			foreach($beans as $singleBean) {
+				if (!($singleBean instanceof RedBean_OODBBean)) {
+					throw new RedBean_Exception_Security('Expected RedBean_OODBBean in array but got:'.gettype($singleBean));
 				}
-				$ids[] = $b->id;
+				$ids[] = $singleBean->id;
 			}
 			$bean = reset($beans);
 		} else {
@@ -272,12 +272,8 @@ class RedBean_AssociationManager extends RedBean_Observable {
 	 * @return void
 	 */
 	public function unassociate($beans1, $beans2, $fast = null) {
-		if (!is_array($beans1)) {
-			$beans1 = array($beans1);
-		}
-		if (!is_array($beans2)) {
-			$beans2 = array($beans2);
-		}
+		$beans1 = (!is_array($beans1)) ? array($beans1) : $beans1; 
+		$beans2 = (!is_array($beans2)) ? array($beans2) : $beans2; 
 		foreach($beans1 as $bean1) {
 			foreach($beans2 as $bean2) {
 				try {
@@ -286,8 +282,7 @@ class RedBean_AssociationManager extends RedBean_Observable {
 					$row = $this->writer->queryRecordLink($bean1->getMeta('type'), $bean2->getMeta('type'), $bean1->id, $bean2->id);
 					$linkType = $this->getTable(array($bean1->getMeta('type') , $bean2->getMeta('type')));
 					if ($fast) {
-						$this->writer->deleteRecord($linkType, array('id' => $row['id']));
-						return; 
+						return $this->writer->deleteRecord($linkType, array('id' => $row['id']));
 					}
 					$beans = $this->oodb->convertToBeans($linkType, array($row));
 					if (count($beans) > 0) {

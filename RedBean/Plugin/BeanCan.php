@@ -256,9 +256,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 	 * @return mixed $result result
 	 */
 	public function handleJSONRequest($jsonString) {
-		//Decode JSON string
-		$jsonArray = json_decode($jsonString, true);
-		if (!$jsonArray) {
+		if (!$jsonArray = json_decode($jsonString, true)) { //Decode JSON string
 			return $this->resp(null, null, self::C_JSONRPC2_PARSE_ERROR, 'Cannot Parse JSON');
 		}
 		if (!isset($jsonArray['jsonrpc'])) {
@@ -267,26 +265,21 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin {
 		if (($jsonArray['jsonrpc'] != '2.0')) {
 			return $this->resp(null, null, self::C_JSONRPC2_INVALID_REQUEST, 'Incompatible RPC Version');
 		}
-		//DO we have an ID to identify this request?
-		if (!isset($jsonArray['id'])) {
+		if (!isset($jsonArray['id'])) { //DO we have an ID to identify this request?
 			return $this->resp(null, null, self::C_JSONRPC2_INVALID_REQUEST, 'No ID');
 		}
-		//Fetch the request Identification String.
-		$id = $jsonArray['id'];
-		//Do we have a method?
-		if (!isset($jsonArray['method'])) {
+		$id = $jsonArray['id']; //Fetch the request Identification String.
+		if (!isset($jsonArray['method'])) { //Do we have a method?
 			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'No method');
 		}
-		//Do we have params?
-		list($beanType, $action, $data, $method) = $this->getDataFromJSON($jsonArray);
+		list($beanType, $action, $data, $method) = $this->getDataFromJSON($jsonArray); //Do we have params?
 		if (count($method) !== 2) {
 			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid method signature. Use: BEAN:ACTION');
 		}
 		if (!($this->whitelist === 'all' || (isset($this->whitelist[$beanType]) && in_array($action,$this->whitelist[$beanType])))) {
 			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'This bean is not available. Set whitelist to "all" or add to whitelist.');
 		}
-		//May not contain anything other than ALPHA NUMERIC chars and _
-		if (preg_match('/\W/', $beanType)) {
+		if (preg_match('/\W/', $beanType)) { //May not contain anything other than ALPHA NUMERIC chars and _
 			return $this->resp(null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid Bean Type String');
 		}
 		if (preg_match('/\W/', $action)) {

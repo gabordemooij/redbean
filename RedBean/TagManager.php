@@ -34,6 +34,24 @@ class RedBean_TagManager {
 	protected $redbean;
 	
 	/**
+	 * Checks if the argument is a comma separated string, in this case
+	 * it will split the string into words and return an array instead.
+	 * In case of an array the argument will be returned 'as is'.
+	 * 
+	 * @param array|string $tagList list of tags
+	 * 
+	 * @return array
+	 */
+	private function extractTagsIfNeeded($tagList) {
+		if ($tagList !== false && !is_array($tagList)) {
+			$tags = explode(',', (string) $tagList); 
+		} else {
+			$tags = $tagList;
+		}
+		return $tags;
+	}
+	
+	/**
 	 * Constructor.
 	 * The tag manager offers an easy way to quickly implement basic tagging
 	 * functionality.
@@ -79,9 +97,7 @@ class RedBean_TagManager {
 	 */
 	public function hasTag($bean, $tags, $all = false) {
 		$foundtags = $this->tag($bean);
-		if (is_string($tags)) {
-			$tags = explode(',', $tags);
-		}
+		$tags = $this->extractTagsIfNeeded($tags);
 		$same = array_intersect($tags, $foundtags);
 		if ($all) {
 			return (implode(',', $same) === implode(',', $tags));
@@ -99,11 +115,7 @@ class RedBean_TagManager {
 	 * @return void
 	 */
 	public function untag($bean, $tagList) {
-		if ($tagList !== false && !is_array($tagList)) {
-			$tags = explode(",", (string)$tagList); 
-		} else {
-			$tags = $tagList;
-		}
+		$tags = $this->extractTagsIfNeeded($tagList);
 		foreach($tags as $tag) {
 			if ($t = $this->findTagByTitle($tag)) {
 				$this->associationManager->unassociate($bean, $t);			
@@ -153,11 +165,7 @@ class RedBean_TagManager {
 	 * @return void
 	 */
 	public function addTags(RedBean_OODBBean $bean, $tagList) {
-		if ($tagList !== false && !is_array($tagList)) {
-			$tags = explode(",", (string)$tagList); 
-		} else { 
-			$tags = $tagList;
-		}
+		$tags = $this->extractTagsIfNeeded($tagList);
 		if ($tagList === false) {
 			return;
 		}
@@ -180,11 +188,7 @@ class RedBean_TagManager {
 	 * @return array
 	 */
 	public function tagged($beanType, $tagList) {
-		if ($tagList !== false && !is_array($tagList)) {
-			$tags = explode(",", (string) $tagList); 
-		} else {
-			$tags = $tagList;
-		}
+		$tags = $this->extractTagsIfNeeded($tagList);
 		$collection = array();
 		$tags = $this->redbean->find('tag', array('title' => $tags));
 		if (is_array($tags) && count($tags)>0) {
@@ -205,11 +209,7 @@ class RedBean_TagManager {
 	 * @return array
 	 */
 	public function taggedAll($beanType, $tagList) {
-		if ($tagList !== false && !is_array($tagList)) {
-			$tags = explode(",", (string)$tagList); 
-		} else {
-			$tags = $tagList;
-		}
+		$tags = $this->extractTagsIfNeeded($tagList);
 		$beans = array();
 		foreach($tags as $tag) {
 			$beans = $this->tagged($beanType, $tag);

@@ -57,7 +57,7 @@ class RedBean_DuplicationManager {
 	 * 
 	 * @return void
 	 */
-	private function copySharedBeans($copy, $shared, $beans) {
+	private function copySharedBeans(RedBean_OODBBean $copy, $shared, $beans) {
 		$copy->$shared = array();
 		foreach($beans as $subBean) {
 			array_push($copy->$shared, $subBean);
@@ -69,18 +69,18 @@ class RedBean_DuplicationManager {
 	 * Each bean in the own-list belongs exclusively to its owner so 
 	 * we need to invoke the duplicate method again to duplicate each bean here.
 	 * 
-	 * @param RedBean_OODBBean $copy   target bean to copy lists to
-	 * @param string           $owned  name of the own list
-	 * @param array            $beans  array with shared beans to copy
-	 * @param array            $trail  array with former beans to detect recursion
-	 * @param boolean          $pid    TRUE means preserve IDs, for export only
+	 * @param RedBean_OODBBean $copy        target bean to copy lists to
+	 * @param string           $owned       name of the own list
+	 * @param array            $beans       array with shared beans to copy
+	 * @param array            $trail       array with former beans to detect recursion
+	 * @param boolean          $preserveIDs TRUE means preserve IDs, for export only
 	 * 
 	 * @return void
 	 */
-	private function copyOwnBeans($copy, $owned, $beans, $trail, $pid) {
+	private function copyOwnBeans(RedBean_OODBBean $copy, $owned, $beans, $trail, $preserveIDs) {
 		$copy->$owned = array();
 		foreach($beans as $subBean) {
-			array_push($copy->$owned, $this->duplicate($subBean, $trail, $pid));
+			array_push($copy->$owned, $this->duplicate($subBean, $trail, $preserveIDs));
 		}	
 	}
 	
@@ -93,7 +93,7 @@ class RedBean_DuplicationManager {
 	 * 
 	 * @return RedBean_OODBBean
 	 */
-	private function createCopy($bean) {
+	private function createCopy(RedBean_OODBBean $bean) {
 		$type = $bean->getMeta('type');
 		$copy = $this->redbean->dispense($type);
 		$copy->importFrom($bean);
@@ -111,7 +111,7 @@ class RedBean_DuplicationManager {
 	 * 
 	 * @return boolean
 	 */
-	private function inTrailOrAdd(&$trail, $bean) {
+	private function inTrailOrAdd(&$trail, RedBean_OODBBean $bean) {
 		$type = $bean->getMeta('type');
 		$key = $type.$bean->getID();
 		if (isset($trail[$key])) {
@@ -166,13 +166,13 @@ class RedBean_DuplicationManager {
 	/**
 	 * @see RedBean_DuplicationManager::dup
 	 *
-	 * @param RedBean_OODBBean $bean  bean to be copied
-	 * @param array            $trail trail to prevent infinite loops
-	 * @param boolean          $pid   preserve IDs
+	 * @param RedBean_OODBBean $bean          bean to be copied
+	 * @param array            $trail         trail to prevent infinite loops
+	 * @param boolean          $preserveIDs   preserve IDs
 	 *
 	 * @return array
 	 */
-	protected function duplicate($bean, $trail = array(), $pid = false) {
+	protected function duplicate(RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false) {
 		$type = $bean->getMeta('type');
 		if ($this->inTrailOrAdd($trail, $bean)) {
 			return $bean;
@@ -189,19 +189,20 @@ class RedBean_DuplicationManager {
 				}
 			} elseif ($this->hasOwnList($type, $table)) {
 				if ($beans = $bean->$owned) {
-					$this->copyOwnBeans($copy, $owned, $beans, $trail, $pid);
+					$this->copyOwnBeans($copy, $owned, $beans, $trail, $preserveIDs);
 				}
 				$copy->setMeta('sys.shadow.'.$owned, null);
 			}
 			$copy->setMeta('sys.shadow.'.$shared, null);
 		}
-		$copy->id = ($pid) ? $bean->id : $copy->id;
+		$copy->id = ($preserveIDs) ? $bean->id : $copy->id;
 		return $copy;
 	}
 	
 	/**
 	 * Constructor,
 	 * creates a new instance of DupManager.
+	 * 
 	 * @param RedBean_Toolbox $toolbox 
 	 */
 	public function __construct(RedBean_Toolbox $toolbox) {
@@ -284,13 +285,13 @@ class RedBean_DuplicationManager {
 	 * duplicate() that does all the work. This method takes care of creating a clone
 	 * of the bean to avoid the bean getting tainted (triggering saving when storing it).
 	 * 
-	 * @param RedBean_OODBBean $bean  bean to be copied
-	 * @param array            $trail for internal usage, pass array()
-	 * @param boolean          $pid   for internal usage
+	 * @param RedBean_OODBBean $bean          bean to be copied
+	 * @param array            $trail         for internal usage, pass array()
+	 * @param boolean          $preserveIDs   for internal usage
 	 *
 	 * @return array
 	 */
-	public function dup($bean, $trail = array(), $pid = false) {
+	public function dup(RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false) {
 		if (!count($this->tables))  {
 			$this->tables = $this->toolbox->getWriter()->getTables();
 		}
@@ -300,7 +301,7 @@ class RedBean_DuplicationManager {
 			}
 		}
 		$beanCopy = clone($bean);
-		$rs = $this->duplicate($beanCopy, $trail, $pid);
+		$rs = $this->duplicate($beanCopy, $trail, $preserveIDs);
 		if (!$this->cacheTables) {
 			$this->tables = array();
 			$this->columns = array();
@@ -331,8 +332,8 @@ class RedBean_DuplicationManager {
 		}
 		foreach($beans as $bean) {
 			   $this->setFilters($filters);
-			   $f = $this->dup($bean, array(), true);
-			   $array[] = $f->export(false, $parents, false, $filters);
+			   $duplicate = $this->dup($bean, array(), true);
+			   $array[] = $duplicate->export(false, $parents, false, $filters);
 		}
 		return $array;
 	}

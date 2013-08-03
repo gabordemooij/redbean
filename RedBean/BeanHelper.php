@@ -17,11 +17,24 @@
 interface RedBean_BeanHelper {
 	
 	/**
-	 * @abstract
+	 * Returns a toolbox to empower the bean.
+	 * This allows beans to perform OODB operations by themselves,
+	 * as such the bean is a proxy for OODB. This allows beans to implement
+	 * their magic getters and setters and return lists.
 	 * 
 	 * @return RedBean_Toolbox $toolbox toolbox
 	 */
 	public function getToolbox();
+	
+	/**
+	 * Does approximately the same as getToolbox but also extracts the
+	 * toolbox for you.
+	 * This method returns a list with all toolbox items in Toolbox Constructor order:
+	 * OODB, adapter, writer and finally the toolbox itself!.
+	 * 
+	 * @return array
+	 */
+	public function getExtractedToolbox();
 	
 	/**
 	 * Given a certain bean this method will
