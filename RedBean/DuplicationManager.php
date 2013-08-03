@@ -1,7 +1,7 @@
 <?php
 /**
  * Duplication Manager
- * 
+ *
  * @file    RedBean/DuplicationManager.php
  * @desc    Creates deep copies of beans
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -11,158 +11,169 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_DuplicationManager {
-	
+class RedBean_DuplicationManager
+{
+
 	/**
 	 * @var RedBean_Toolbox
 	 */
 	protected $toolbox;
-	
+
 	/**
 	 * @var RedBean_AssociationManager
 	 */
 	protected $associationManager;
-	
+
 	/**
 	 * @var RedBean_OODB
 	 */
 	protected $redbean;
-	
+
 	/**
 	 * @var array
 	 */
 	protected $tables = array();
-	
+
 	/**
 	 * @var array
 	 */
 	protected $columns = array();
-	
+
 	/**
 	 * @var array
 	 */
 	protected $filters = array();
-	
+
 	/**
 	 * @var array
 	 */
 	protected $cacheTables = false;
-	
+
 	/**
 	 * Copies the shared beans in a bean, i.e. all the sharedBean-lists.
-	 * 
+	 *
 	 * @param RedBean_OODBBean $copy   target bean to copy lists to
 	 * @param string           $shared name of the shared list
 	 * @param array            $beans  array with shared beans to copy
-	 * 
+	 *
 	 * @return void
 	 */
-	private function copySharedBeans(RedBean_OODBBean $copy, $shared, $beans) {
+	private function copySharedBeans( RedBean_OODBBean $copy, $shared, $beans )
+	{
 		$copy->$shared = array();
-		foreach($beans as $subBean) {
-			array_push($copy->$shared, $subBean);
+		foreach ( $beans as $subBean ) {
+			array_push( $copy->$shared, $subBean );
 		}
 	}
-	
+
 	/**
 	 * Copies the own beans in a bean, i.e. all the ownBean-lists.
-	 * Each bean in the own-list belongs exclusively to its owner so 
+	 * Each bean in the own-list belongs exclusively to its owner so
 	 * we need to invoke the duplicate method again to duplicate each bean here.
-	 * 
+	 *
 	 * @param RedBean_OODBBean $copy        target bean to copy lists to
 	 * @param string           $owned       name of the own list
 	 * @param array            $beans       array with shared beans to copy
 	 * @param array            $trail       array with former beans to detect recursion
 	 * @param boolean          $preserveIDs TRUE means preserve IDs, for export only
-	 * 
+	 *
 	 * @return void
 	 */
-	private function copyOwnBeans(RedBean_OODBBean $copy, $owned, $beans, $trail, $preserveIDs) {
+	private function copyOwnBeans( RedBean_OODBBean $copy, $owned, $beans, $trail, $preserveIDs )
+	{
 		$copy->$owned = array();
-		foreach($beans as $subBean) {
-			array_push($copy->$owned, $this->duplicate($subBean, $trail, $preserveIDs));
-		}	
+		foreach ( $beans as $subBean ) {
+			array_push( $copy->$owned, $this->duplicate( $subBean, $trail, $preserveIDs ) );
+		}
 	}
-	
+
 	/**
 	 * Creates a copy of bean $bean and copies all primitive properties (not lists)
 	 * and the parents beans to the newly created bean. Also sets the ID of the bean
 	 * to 0.
-	 * 
+	 *
 	 * @param RedBean_OODBBean $bean bean to copy
-	 * 
+	 *
 	 * @return RedBean_OODBBean
 	 */
-	private function createCopy(RedBean_OODBBean $bean) {
-		$type = $bean->getMeta('type');
-		$copy = $this->redbean->dispense($type);
-		$copy->importFrom($bean);
+	private function createCopy( RedBean_OODBBean $bean )
+	{
+		$type = $bean->getMeta( 'type' );
+		$copy = $this->redbean->dispense( $type );
+		$copy->importFrom( $bean );
 		$copy->id = 0;
+
 		return $copy;
 	}
-	
+
 	/**
 	 * Generates a key from the bean type and its ID and determines if the bean
 	 * occurs in the trail, if not the bean will be added to the trail.
 	 * Returns TRUE if the bean occurs in the trail and FALSE otherwise.
-	 * 
+	 *
 	 * @param array            $trail list of former beans
 	 * @param RedBean_OODBBean $bean  currently selected bean
-	 * 
+	 *
 	 * @return boolean
 	 */
-	private function inTrailOrAdd(&$trail, RedBean_OODBBean $bean) {
-		$type = $bean->getMeta('type');
-		$key = $type.$bean->getID();
-		if (isset($trail[$key])) {
+	private function inTrailOrAdd( &$trail, RedBean_OODBBean $bean )
+	{
+		$type = $bean->getMeta( 'type' );
+		$key  = $type . $bean->getID();
+		if ( isset( $trail[$key] ) ) {
 			return true;
 		}
 		$trail[$key] = $bean;
+
 		return false;
 	}
-	
+
 	/**
 	 * Given the type name of a bean this method returns the canonical names
 	 * of the own-list and the shared-list properties respectively.
 	 * Returns a list with two elements: name of the own-list, and name
 	 * of the shared list.
-	 * 
+	 *
 	 * @param string $typeName bean type name
-	 * 
+	 *
 	 * @return array
 	 */
-	private function getListNames($typeName) {
-		$owned = 'own'.ucfirst($typeName);
-		$shared = 'shared'.ucfirst($typeName);
-		return array($owned, $shared);
+	private function getListNames( $typeName )
+	{
+		$owned  = 'own' . ucfirst( $typeName );
+		$shared = 'shared' . ucfirst( $typeName );
+
+		return array( $owned, $shared );
 	}
-	
+
 	/**
 	 * Determines whether the bean has an own list based on
 	 * schema inspection from realtime schema or cache.
-	 * 
+	 *
 	 * @param string $type   bean type
 	 * @param string $target type of list you want to detect
-	 * 
-	 * @return boolean 
+	 *
+	 * @return boolean
 	 */
-	protected function hasOwnList($type, $target) {
-		return (isset($this->columns[$target][$type.'_id']));
+	protected function hasOwnList( $type, $target )
+	{
+		return ( isset( $this->columns[$target][$type . '_id'] ) );
 	}
-	
+
 	/**
 	 * Determines whether the bea has a shared list based on
 	 * schema inspection from realtime schema or cache.
-	 * 
+	 *
 	 * @param string $type   bean type
 	 * @param string $target type of list you are looking for
-	 * 
-	 * @return boolean 
+	 *
+	 * @return boolean
 	 */
-	protected function hasSharedList($type, $target) {
-		return (in_array(RedBean_QueryWriter_AQueryWriter::getAssocTableFormat(array($type, $target)), $this->tables));
+	protected function hasSharedList( $type, $target )
+	{
+		return ( in_array( RedBean_QueryWriter_AQueryWriter::getAssocTableFormat( array( $type, $target ) ), $this->tables ) );
 	}
-	
+
 	/**
 	 * @see RedBean_DuplicationManager::dup
 	 *
@@ -172,100 +183,107 @@ class RedBean_DuplicationManager {
 	 *
 	 * @return array
 	 */
-	protected function duplicate(RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false) {
-		$type = $bean->getMeta('type');
-		if ($this->inTrailOrAdd($trail, $bean)) {
+	protected function duplicate( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false )
+	{
+		$type = $bean->getMeta( 'type' );
+		if ( $this->inTrailOrAdd( $trail, $bean ) ) {
 			return $bean;
 		}
-		$copy = $this->createCopy($bean);
-		foreach($this->tables as $table) {
-			if ((is_array($this->filters) && count($this->filters) && !in_array($table, $this->filters)) || $table == $type) {
+		$copy = $this->createCopy( $bean );
+		foreach ( $this->tables as $table ) {
+			if ( ( is_array( $this->filters ) && count( $this->filters ) && !in_array( $table, $this->filters ) ) || $table == $type ) {
 				continue;
 			}
-			list($owned, $shared) = $this->getListNames($table);
-			if ($this->hasSharedList($type, $table)) {
-				if ($beans = $bean->$shared) {
-					$this->copySharedBeans($copy, $shared, $beans);
+			list( $owned, $shared ) = $this->getListNames( $table );
+			if ( $this->hasSharedList( $type, $table ) ) {
+				if ( $beans = $bean->$shared ) {
+					$this->copySharedBeans( $copy, $shared, $beans );
 				}
-			} elseif ($this->hasOwnList($type, $table)) {
-				if ($beans = $bean->$owned) {
-					$this->copyOwnBeans($copy, $owned, $beans, $trail, $preserveIDs);
+			} elseif ( $this->hasOwnList( $type, $table ) ) {
+				if ( $beans = $bean->$owned ) {
+					$this->copyOwnBeans( $copy, $owned, $beans, $trail, $preserveIDs );
 				}
-				$copy->setMeta('sys.shadow.'.$owned, null);
+				$copy->setMeta( 'sys.shadow.' . $owned, null );
 			}
-			$copy->setMeta('sys.shadow.'.$shared, null);
+			$copy->setMeta( 'sys.shadow.' . $shared, null );
 		}
-		$copy->id = ($preserveIDs) ? $bean->id : $copy->id;
+		$copy->id = ( $preserveIDs ) ? $bean->id : $copy->id;
+
 		return $copy;
 	}
-	
+
 	/**
 	 * Constructor,
 	 * creates a new instance of DupManager.
-	 * 
-	 * @param RedBean_Toolbox $toolbox 
+	 *
+	 * @param RedBean_Toolbox $toolbox
 	 */
-	public function __construct(RedBean_Toolbox $toolbox) {
-		$this->toolbox = $toolbox;
-		$this->redbean = $toolbox->getRedBean();
+	public function __construct( RedBean_Toolbox $toolbox )
+	{
+		$this->toolbox            = $toolbox;
+		$this->redbean            = $toolbox->getRedBean();
 		$this->associationManager = $this->redbean->getAssociationManager();
 	}
-	
+
 	/**
 	 * For better performance you can pass the tables in an array to this method.
 	 * If the tables are available the duplication manager will not query them so
 	 * this might be beneficial for performance.
-	 * 
-	 * @param array $tables 
-	 * 
+	 *
+	 * @param array $tables
+	 *
 	 * @return void
 	 */
-	public function setTables($tables) {
-		foreach($tables as $key => $value) {
-			if (is_numeric($key)) {
+	public function setTables( $tables )
+	{
+		foreach ( $tables as $key => $value ) {
+			if ( is_numeric( $key ) ) {
 				$this->tables[] = $value;
 			} else {
-				$this->tables[] = $key;
+				$this->tables[]      = $key;
 				$this->columns[$key] = $value;
 			}
 		}
 		$this->cacheTables = true;
 	}
-	
+
 	/**
 	 * Returns a schema array for cache.
-	 * 
-	 * @return array 
+	 *
+	 * @return array
 	 */
-	public function getSchema() {
+	public function getSchema()
+	{
 		return $this->columns;
 	}
-	
+
 	/**
 	 * Indicates whether you want the duplication manager to cache the database schema.
 	 * If this flag is set to TRUE the duplication manager will query the database schema
 	 * only once. Otherwise the duplicationmanager will, by default, query the schema
 	 * every time a duplication action is performed (dup()).
-	 * 
-	 * @param boolean $yesNo 
+	 *
+	 * @param boolean $yesNo
 	 */
-	public function setCacheTables($yesNo) {
+	public function setCacheTables( $yesNo )
+	{
 		$this->cacheTables = $yesNo;
 	}
-	
+
 	/**
 	 * A filter array is an array with table names.
 	 * By setting a table filter you can make the duplication manager only take into account
 	 * certain bean types. Other bean types will be ignored when exporting or making a
 	 * deep copy. If no filters are set all types will be taking into account, this is
 	 * the default behavior.
-	 * 
-	 * @param array $filters 
+	 *
+	 * @param array $filters
 	 */
-	public function setFilters($filters) {
+	public function setFilters( $filters )
+	{
 		$this->filters = $filters;
 	}
-	
+
 	/**
 	 * Makes a copy of a bean. This method makes a deep copy
 	 * of the bean.The copy will have the following features.
@@ -284,33 +302,33 @@ class RedBean_DuplicationManager {
 	 * this function actually passes the arguments to a protected function called
 	 * duplicate() that does all the work. This method takes care of creating a clone
 	 * of the bean to avoid the bean getting tainted (triggering saving when storing it).
-	 * 
+	 *
 	 * @param RedBean_OODBBean $bean          bean to be copied
 	 * @param array            $trail         for internal usage, pass array()
 	 * @param boolean          $preserveIDs   for internal usage
 	 *
 	 * @return array
 	 */
-	public function dup(RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false) {
-		if (!count($this->tables))  {
+	public function dup( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false )
+	{
+		if ( !count( $this->tables ) ) {
 			$this->tables = $this->toolbox->getWriter()->getTables();
 		}
-		if (!count($this->columns)) {
-			foreach($this->tables as $table) {
-				$this->columns[$table] = $this->toolbox->getWriter()->getColumns($table);
+		if ( !count( $this->columns ) ) {
+			foreach ( $this->tables as $table ) {
+				$this->columns[$table] = $this->toolbox->getWriter()->getColumns( $table );
 			}
 		}
-		$beanCopy = clone($bean);
-		$rs = $this->duplicate($beanCopy, $trail, $preserveIDs);
-		if (!$this->cacheTables) {
-			$this->tables = array();
+		$beanCopy = clone( $bean );
+		$rs       = $this->duplicate( $beanCopy, $trail, $preserveIDs );
+		if ( !$this->cacheTables ) {
+			$this->tables  = array();
 			$this->columns = array();
 		}
+
 		return $rs;
 	}
-	
-	
-	
+
 	/**
 	 * Exports a collection of beans. Handy for XML/JSON exports with a
 	 * Javascript framework like Dojo or ExtJS.
@@ -319,22 +337,24 @@ class RedBean_DuplicationManager {
 	 * - all own bean lists (recursively)
 	 * - all shared beans (not THEIR own lists)
 	 *
-	 * @param	array|RedBean_OODBBean $beans   beans to be exported
-	 * @param   boolean				   $parents also export parents
-	 * @param   array                  $filters only these types (whitelist)
-	 * 
-	 * @return	array
+	 * @param    array|RedBean_OODBBean $beans   beans to be exported
+	 * @param   boolean                 $parents also export parents
+	 * @param   array                   $filters only these types (whitelist)
+	 *
+	 * @return    array
 	 */
-	public function exportAll($beans, $parents = false, $filters = array()) {
+	public function exportAll( $beans, $parents = false, $filters = array() )
+	{
 		$array = array();
-		if (!is_array($beans)) {
-			$beans = array($beans);
+		if ( !is_array( $beans ) ) {
+			$beans = array( $beans );
 		}
-		foreach($beans as $bean) {
-			   $this->setFilters($filters);
-			   $duplicate = $this->dup($bean, array(), true);
-			   $array[] = $duplicate->export(false, $parents, false, $filters);
+		foreach ( $beans as $bean ) {
+			$this->setFilters( $filters );
+			$duplicate = $this->dup( $bean, array(), true );
+			$array[]   = $duplicate->export( false, $parents, false, $filters );
 		}
+
 		return $array;
 	}
 }

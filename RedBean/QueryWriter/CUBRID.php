@@ -1,6 +1,6 @@
 <?php
 /**
- * RedBean CUBRID Writer 
+ * RedBean CUBRID Writer
  *
  * @file    RedBean/QueryWriter/CUBRID.php
  * @desc    Represents a CUBRID Database to RedBean
@@ -11,42 +11,47 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter {
-	
+class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter
+{
+
 	/**
 	 * Data types
 	 */
-	const C_DATATYPE_INTEGER = 0;
-	const C_DATATYPE_DOUBLE = 1;
-	const C_DATATYPE_STRING = 2;
-	const C_DATATYPE_SPECIAL_DATE = 80;
+	const C_DATATYPE_INTEGER          = 0;
+	const C_DATATYPE_DOUBLE           = 1;
+	const C_DATATYPE_STRING           = 2;
+	const C_DATATYPE_SPECIAL_DATE     = 80;
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
-	const C_DATATYPE_SPECIFIED = 99;
-	
+	const C_DATATYPE_SPECIFIED        = 99;
+
 	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
-	
+
 	/**
 	 * @var string
 	 */
-  	protected $quoteCharacter = '`';
-	
+	protected $quoteCharacter = '`';
+
 	/**
 	 * Obtains the keys of a table using the PDO schema function.
-	 * 
+	 *
 	 * @param type $table
-	 * @return type 
+	 *
+	 * @return type
 	 */
-	protected function getKeys($table, $table2 = null) {
-		$pdo = $this->adapter->getDatabase()->getPDO();
-		$keys = $pdo->cubrid_schema(PDO::CUBRID_SCH_EXPORTED_KEYS, $table);
-		if ($table2) {
-			$keys = array_merge($keys, $pdo->cubrid_schema(PDO::CUBRID_SCH_IMPORTED_KEYS, $table2));
+	protected function getKeys( $table, $table2 = null )
+	{
+		$pdo  = $this->adapter->getDatabase()->getPDO();
+		$keys = $pdo->cubrid_schema( PDO::CUBRID_SCH_EXPORTED_KEYS, $table );
+		if ( $table2 ) {
+			$keys = array_merge( $keys, $pdo->cubrid_schema( PDO::CUBRID_SCH_IMPORTED_KEYS, $table2 ) );
 		}
+
 		return $keys;
 	}
+
 	/**
 	 * Add the constraints for a specific database driver: CUBRID
 	 *
@@ -58,14 +63,16 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return boolean
 	 */
-	protected function constrain($table, $table1, $table2, $property1, $property2) {
-		$writer = $this;
-		$adapter = $this->adapter;
-		$firstState = $this->buildFK($table, $table1, $property1, 'id', true);
-		$secondState = $this->buildFK($table, $table2, $property2, 'id', true);
-		return ($firstState && $secondState);
+	protected function constrain( $table, $table1, $table2, $property1, $property2 )
+	{
+		$writer      = $this;
+		$adapter     = $this->adapter;
+		$firstState  = $this->buildFK( $table, $table1, $property1, 'id', true );
+		$secondState = $this->buildFK( $table, $table2, $property2, 'id', true );
+
+		return ( $firstState && $secondState );
 	}
-	
+
 	/**
 	 * This method adds a foreign key from type and field to
 	 * target type and target field.
@@ -76,244 +83,268 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 *
-	 * @param  string $type	       type that will have a foreign key field
-	 * @param  string $targetType  points to this type
-	 * @param  string $field       field that contains the foreign key value
-	 * @param  string $targetField field where the fk points to
+	 * @param  string $type           type that will have a foreign key field
+	 * @param  string $targetType     points to this type
+	 * @param  string $field          field that contains the foreign key value
+	 * @param  string $targetField    field where the fk points to
 	 *
 	 * @return void
 	 */
-	protected function buildFK($type, $targetType, $field, $targetField, $isDep = false) {
-		$table = $this->esc($type);
-		$tableNoQ = $this->esc($type, true);
-		$targetTable = $this->esc($targetType);
-		$targetTableNoQ = $this->esc($targetType, true);
-		$column = $this->esc($field);
-		$columnNoQ = $this->esc($field, true);
-		$targetColumn  = $this->esc($targetField);
-		$targetColumnNoQ  = $this->esc($targetField, true);
-		$keys = $this->getKeys($targetTableNoQ, $tableNoQ);
-		$needsToAddFK = true;
-		$needsToDropFK = false;
-		foreach($keys as $key) {
-			if ($key['FKTABLE_NAME'] == $tableNoQ && $key['FKCOLUMN_NAME'] == $columnNoQ) { 
+	protected function buildFK( $type, $targetType, $field, $targetField, $isDep = false )
+	{
+		$table           = $this->esc( $type );
+		$tableNoQ        = $this->esc( $type, true );
+		$targetTable     = $this->esc( $targetType );
+		$targetTableNoQ  = $this->esc( $targetType, true );
+		$column          = $this->esc( $field );
+		$columnNoQ       = $this->esc( $field, true );
+		$targetColumn    = $this->esc( $targetField );
+		$targetColumnNoQ = $this->esc( $targetField, true );
+		$keys            = $this->getKeys( $targetTableNoQ, $tableNoQ );
+		$needsToAddFK    = true;
+		$needsToDropFK   = false;
+		foreach ( $keys as $key ) {
+			if ( $key['FKTABLE_NAME'] == $tableNoQ && $key['FKCOLUMN_NAME'] == $columnNoQ ) {
 				//already has an FK
 				$needsToDropFK = true;
-				if ((($isDep && $key['DELETE_RULE'] == 0) || (!$isDep && $key['DELETE_RULE'] == 3))) {
+				if ( ( ( $isDep && $key['DELETE_RULE'] == 0 ) || ( !$isDep && $key['DELETE_RULE'] == 3 ) ) ) {
 					return false;
 				}
 				break;
 			}
-		}	
-		if ($needsToDropFK) {
-			$sql = "ALTER TABLE $table DROP FOREIGN KEY {$key['FK_NAME']} ";
-			$this->adapter->exec($sql);
 		}
-		$casc = ($isDep ? 'CASCADE' : 'SET NULL');
-		$sql = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
-		$this->adapter->exec($sql);
+		if ( $needsToDropFK ) {
+			$sql = "ALTER TABLE $table DROP FOREIGN KEY {$key['FK_NAME']} ";
+			$this->adapter->exec( $sql );
+		}
+		$casc = ( $isDep ? 'CASCADE' : 'SET NULL' );
+		$sql  = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
+		$this->adapter->exec( $sql );
 	}
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param RedBean_Adapter $adapter Database Adapter
 	 */
-	public function __construct(RedBean_Adapter $adapter) {
+	public function __construct( RedBean_Adapter $adapter )
+	{
 		$this->typeno_sqltype = array(
-			RedBean_QueryWriter_CUBRID::C_DATATYPE_INTEGER => ' INTEGER ',
-			RedBean_QueryWriter_CUBRID::C_DATATYPE_DOUBLE => ' DOUBLE ',
-			RedBean_QueryWriter_CUBRID::C_DATATYPE_STRING => ' STRING ',
-			RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATE => ' DATE ',
+			RedBean_QueryWriter_CUBRID::C_DATATYPE_INTEGER          => ' INTEGER ',
+			RedBean_QueryWriter_CUBRID::C_DATATYPE_DOUBLE           => ' DOUBLE ',
+			RedBean_QueryWriter_CUBRID::C_DATATYPE_STRING           => ' STRING ',
+			RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATE     => ' DATE ',
 			RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
 		);
 		$this->sqltype_typeno = array();
-		foreach($this->typeno_sqltype as $k => $v) {
-			$this->sqltype_typeno[trim(($v))] = $k;
+		foreach ( $this->typeno_sqltype as $k => $v ) {
+			$this->sqltype_typeno[trim( ( $v ) )] = $k;
 		}
 		$this->sqltype_typeno['STRING(1073741823)'] = self::C_DATATYPE_STRING;
-		$this->adapter = $adapter;
+		$this->adapter                              = $adapter;
 	}
-	
+
 	/**
 	 * This method returns the datatype to be used for primary key IDS and
 	 * foreign keys. Returns one if the data type constants.
 	 *
 	 * @return integer $const data type to be used for IDS.
 	 */
-	public function getTypeForID() {
+	public function getTypeForID()
+	{
 		return self::C_DATATYPE_INTEGER;
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::getTables
 	 */
-	public function getTables() { 
-		$rows = $this->adapter->getCol("SELECT class_name FROM db_class WHERE is_system_class = 'NO';");
+	public function getTables()
+	{
+		$rows = $this->adapter->getCol( "SELECT class_name FROM db_class WHERE is_system_class = 'NO';" );
+
 		return $rows;
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::createTable
 	 */
-	public function createTable($table) {
-		$rawTable = $this->esc($table, true);
-		$table = $this->esc($table);
-		$sql = 'CREATE TABLE '.$table.' ("id" integer AUTO_INCREMENT, CONSTRAINT "pk_'.$rawTable.'_id" PRIMARY KEY("id"))';
-		$this->adapter->exec($sql);
+	public function createTable( $table )
+	{
+		$rawTable = $this->esc( $table, true );
+		$table    = $this->esc( $table );
+		$sql      = 'CREATE TABLE ' . $table . ' ("id" integer AUTO_INCREMENT, CONSTRAINT "pk_' . $rawTable . '_id" PRIMARY KEY("id"))';
+		$this->adapter->exec( $sql );
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::getColumns
 	 */
-	public function getColumns($table) {
-		$columns = array();
-		$table = $this->esc($table);
-		$columnsRaw = $this->adapter->get("SHOW COLUMNS FROM $table");
-		foreach($columnsRaw as $r) {
+	public function getColumns( $table )
+	{
+		$columns    = array();
+		$table      = $this->esc( $table );
+		$columnsRaw = $this->adapter->get( "SHOW COLUMNS FROM $table" );
+		foreach ( $columnsRaw as $r ) {
 			$columns[$r['Field']] = $r['Type'];
 		}
+
 		return $columns;
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::scanType
 	 */
-	public function scanType($value, $flagSpecial = false) {
-		$this->svalue = $value;		
-		if (is_null($value)) {
+	public function scanType( $value, $flagSpecial = false )
+	{
+		$this->svalue = $value;
+		if ( is_null( $value ) ) {
 			return self::C_DATATYPE_INTEGER;
 		}
-		if ($flagSpecial) {
-			if (preg_match('/^\d{4}\-\d\d-\d\d$/', $value)) {
+		if ( $flagSpecial ) {
+			if ( preg_match( '/^\d{4}\-\d\d-\d\d$/', $value ) ) {
 				return self::C_DATATYPE_SPECIAL_DATE;
 			}
-			if (preg_match('/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d$/', $value)) {
+			if ( preg_match( '/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d$/', $value ) ) {
 				return self::C_DATATYPE_SPECIAL_DATETIME;
 			}
 		}
-		$value = strval($value);
-		if (!$this->startsWithZeros($value)) {
-			if (is_numeric($value) && (floor($value) == $value) && $value >= -2147483647  && $value <= 2147483647 ) {
+		$value = strval( $value );
+		if ( !$this->startsWithZeros( $value ) ) {
+			if ( is_numeric( $value ) && ( floor( $value ) == $value ) && $value >= -2147483647 && $value <= 2147483647 ) {
 				return self::C_DATATYPE_INTEGER;
 			}
-			if (is_numeric($value)) {
+			if ( is_numeric( $value ) ) {
 				return self::C_DATATYPE_DOUBLE;
 			}
 		}
+
 		return self::C_DATATYPE_STRING;
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::code
 	 */
-	public function code($typedescription, $includeSpecials = false) {
-		$r = ((isset($this->sqltype_typeno[$typedescription])) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED);
-		if ($includeSpecials) {
+	public function code( $typedescription, $includeSpecials = false )
+	{
+		$r = ( ( isset( $this->sqltype_typeno[$typedescription] ) ) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED );
+		if ( $includeSpecials ) {
 			return $r;
 		}
-		if ($r > RedBean_QueryWriter::C_DATATYPE_RANGE_SPECIAL) {
+		if ( $r > RedBean_QueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
 			return self::C_DATATYPE_SPECIFIED;
 		}
+
 		return $r;
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::addColumn
 	 */
-	public function addColumn($type, $column, $field) {
-		$table = $type;
-		$type = $field;
-		$table = $this->esc($table);
-		$column = $this->esc($column);
-		$type = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
-		$sql = "ALTER TABLE $table ADD COLUMN $column $type ";
-		$this->adapter->exec($sql);
+	public function addColumn( $type, $column, $field )
+	{
+		$table  = $type;
+		$type   = $field;
+		$table  = $this->esc( $table );
+		$column = $this->esc( $column );
+		$type   = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
+		$sql    = "ALTER TABLE $table ADD COLUMN $column $type ";
+		$this->adapter->exec( $sql );
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::widenColumn
 	 */
-	public function widenColumn($type, $column, $datatype) {
-		$table = $type;
-		$type = $datatype;
-		$table = $this->esc($table);
-		$column = $this->esc($column);
-		$newtype = array_key_exists($type, $this->typeno_sqltype) ? $this->typeno_sqltype[$type] : '';
+	public function widenColumn( $type, $column, $datatype )
+	{
+		$table           = $type;
+		$type            = $datatype;
+		$table           = $this->esc( $table );
+		$column          = $this->esc( $column );
+		$newtype         = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
-		$this->adapter->exec($changecolumnSQL);
+		$this->adapter->exec( $changecolumnSQL );
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::addUniqueIndex
 	 */
-	public function addUniqueIndex($table, $columns) {
-		$table = $this->esc($table);
-		sort($columns); //else we get multiple indexes due to order-effects
-		foreach($columns as $k => $v) {
-			$columns[$k] = $this->esc($v);
+	public function addUniqueIndex( $table, $columns )
+	{
+		$table = $this->esc( $table );
+		sort( $columns ); //else we get multiple indexes due to order-effects
+		foreach ( $columns as $k => $v ) {
+			$columns[$k] = $this->esc( $v );
 		}
-		$r = $this->adapter->get("SHOW INDEX FROM $table");
-		$name = 'UQ_'.sha1(implode(',', $columns));
-		if ($r) {
-			foreach($r as $i) { 
-				if (strtoupper($i['Key_name']) == strtoupper($name)) {
+		$r    = $this->adapter->get( "SHOW INDEX FROM $table" );
+		$name = 'UQ_' . sha1( implode( ',', $columns ) );
+		if ( $r ) {
+			foreach ( $r as $i ) {
+				if ( strtoupper( $i['Key_name'] ) == strtoupper( $name ) ) {
 					return;
 				}
 			}
 		}
-		$sql = "ALTER TABLE $table ADD CONSTRAINT UNIQUE $name (".implode(',', $columns).")";
-		$this->adapter->exec($sql);
+		$sql = "ALTER TABLE $table ADD CONSTRAINT UNIQUE $name (" . implode( ',', $columns ) . ")";
+		$this->adapter->exec( $sql );
 	}
+
 	/**
 	 * @see RedBean_QueryWriter::sqlStateIn
 	 */
-	public function sqlStateIn($state, $list) {
-		return ($state == 'HY000') ? (count(array_diff(array(
+	public function sqlStateIn( $state, $list )
+	{
+		return ( $state == 'HY000' ) ? ( count( array_diff( array(
 				RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
-				), $list)) !== 3) : false;
+			), $list ) ) !== 3 ) : false;
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::addIndex
 	 */
-	public function addIndex($type, $name, $column) {
-		$table = $type;
-		$table = $this->esc($table);
-		$name = preg_replace('/\W/', '', $name);
-		$column = $this->esc($column);
-		$index = $this->adapter->getRow("SELECT 1 as `exists` FROM db_index WHERE index_name = ? ", array($name));
-		if ($index && $index['exists']) {
-			return;   // positive number will return, 0 will continue.
+	public function addIndex( $type, $name, $column )
+	{
+		$table  = $type;
+		$table  = $this->esc( $table );
+		$name   = preg_replace( '/\W/', '', $name );
+		$column = $this->esc( $column );
+		$index  = $this->adapter->getRow( "SELECT 1 as `exists` FROM db_index WHERE index_name = ? ", array( $name ) );
+		if ( $index && $index['exists'] ) {
+			return; // positive number will return, 0 will continue.
 		}
-		try{ $this->adapter->exec("CREATE INDEX $name ON $table ($column) "); } catch(Exception $e){ }
+		try {
+			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
+		} catch ( Exception $e ) {
+		}
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::addFK
 	 */
-	public function addFK($type, $targetType, $field, $targetField, $isDependent = false) {
-		return $this->buildFK($type, $targetType, $field, $targetField, $isDependent);
-	}	
-	
+	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false )
+	{
+		return $this->buildFK( $type, $targetType, $field, $targetField, $isDependent );
+	}
+
 	/**
 	 * @see RedBean_QueryWriter::wipeAll
 	 */
-	public function wipeAll() {
-		foreach($this->getTables() as $t) {
-			foreach($this->getKeys($t) as $k) {
-				$this->adapter->exec("ALTER TABLE \"{$k['FKTABLE_NAME']}\" DROP FOREIGN KEY \"{$k['FK_NAME']}\"");
+	public function wipeAll()
+	{
+		foreach ( $this->getTables() as $t ) {
+			foreach ( $this->getKeys( $t ) as $k ) {
+				$this->adapter->exec( "ALTER TABLE \"{$k['FKTABLE_NAME']}\" DROP FOREIGN KEY \"{$k['FK_NAME']}\"" );
 			}
-			$this->adapter->exec("DROP TABLE \"$t\"");
+			$this->adapter->exec( "DROP TABLE \"$t\"" );
 		}
 	}
-	
+
 	/**
 	 * @see RedBean_QueryWriter::esc
 	 */
-	public function esc($dbStructure, $noQuotes = false) {
-		return parent::esc(strtolower($dbStructure), $noQuotes);
+	public function esc( $dbStructure, $noQuotes = false )
+	{
+		return parent::esc( strtolower( $dbStructure ), $noQuotes );
 	}
 }

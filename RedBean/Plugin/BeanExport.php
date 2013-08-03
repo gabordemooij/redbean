@@ -6,224 +6,237 @@
  * @desc    Plugin to export beans to arrays recursively
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
- * 
- * @deprecated 
- * Use the R::exportAll method instead.
+ *
+ * @deprecated
+ *          Use the R::exportAll method instead.
  *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Plugin_BeanExport implements RedBean_Plugin {
-	
+class RedBean_Plugin_BeanExport implements RedBean_Plugin
+{
+
 	/**
 	 * @var null|\RedBean_Toolbox
 	 */
 	protected $toolbox = null;
-	
+
 	/**
 	 * @var array
 	 */
 	protected $recurCheck = array();
-	
+
 	/**
 	 * @var array
 	 */
 	protected $recurTypeCheck = array();
-	
+
 	/**
 	 * @var boolean
 	 */
 	protected $typeShield = false;
-	
+
 	/**
 	 * @var integer
 	 */
 	protected $depth = 0;
-	
+
 	/**
 	 * @var integer
 	 */
 	protected $maxDepth = false;
-	
+
 	/**
 	 * Extracts the parent bean from the current bean and puts the
 	 * contents in the export array.
-	 * 
+	 *
 	 * @param array            $export export array to store data in
 	 * @param RedBean_OODBBean $bean   bean to collect data from
 	 * @param string           $key    key for the current value
 	 * @param RedBean_OODBBean $value  the parent bean to extract
-	 * 
+	 *
 	 * @return void
 	 */
-	private function extractParentBean(&$export, &$bean, $key, $value) {
-		if (strpos($key, '_id') !== false) {
-			$sub = str_replace('_id', '', $key);
+	private function extractParentBean( &$export, &$bean, $key, $value )
+	{
+		if ( strpos( $key, '_id' ) !== false ) {
+			$sub     = str_replace( '_id', '', $key );
 			$subBean = $bean->$sub;
-			if ($subBean) {
-				$export[$sub] = $this->export($subBean, false);
+			if ( $subBean ) {
+				$export[$sub] = $this->export( $subBean, false );
 			}
 		}
 	}
-	
+
 	/**
 	 * Extracts the own list from the current bean and puts the
 	 * contents in the export array.
-	 * 
+	 *
 	 * @param array            $export export array to store data in
 	 * @param RedBean_OODBBean $bean   bean to collect data from
-	 * @param string           $table  table 
+	 * @param string           $table  table
 	 * @param array            $cols   columns
-	 * 
+	 *
 	 * @return void
 	 */
-	private function extractOwnList(&$export, &$bean, $table, $cols) {
-		$type = $bean->getMeta('type');
+	private function extractOwnList( &$export, &$bean, $table, $cols )
+	{
+		$type      = $bean->getMeta( 'type' );
 		$linkField = $type . '_id';
-		if (strpos($table, '_') === false) {
-			if (in_array($linkField, array_keys($cols))) {
-				$field = 'own'.ucfirst($table);
-				$export[$field] = self::export($bean->$field, false);
+		if ( strpos( $table, '_' ) === false ) {
+			if ( in_array( $linkField, array_keys( $cols ) ) ) {
+				$field          = 'own' . ucfirst( $table );
+				$export[$field] = self::export( $bean->$field, false );
 			}
 		}
 	}
-	
+
 	/**
 	 * Extracts the shared list from the current bean and puts the
 	 * contents in the export array.
-	 * 
+	 *
 	 * @param array            $export export array to store data in
 	 * @param RedBean_OODBBean $bean   bean to collect data from
-	 * @param string           $table  table 
-	 * 
+	 * @param string           $table  table
+	 *
 	 * @return void
 	 */
-	private function extractSharedList(&$export, &$bean, $table) {
-		$type = $bean->getMeta('type');
-		if (strpos($table, '_') !== false) {
-			$parts = explode('_', $table);
-			if (is_array($parts) && in_array($type, $parts)) {
+	private function extractSharedList( &$export, &$bean, $table )
+	{
+		$type = $bean->getMeta( 'type' );
+		if ( strpos( $table, '_' ) !== false ) {
+			$parts = explode( '_', $table );
+			if ( is_array( $parts ) && in_array( $type, $parts ) ) {
 				$other = $parts[0];
-				if ($other == $type) {
+				if ( $other == $type ) {
 					$other = $parts[1];
 				}
-				$field = 'shared'.ucfirst($other);
-				$export[$field] = self::export($bean->$field, false);
+				$field          = 'shared' . ucfirst( $other );
+				$export[$field] = self::export( $bean->$field, false );
 			}
 		}
 	}
-	
+
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param RedBean_Toolbox $toolbox
 	 */
-	public function __construct(RedBean_Toolbox $toolbox) {
+	public function __construct( RedBean_Toolbox $toolbox )
+	{
 		$this->toolbox = $toolbox;
 	}
-	
+
 	/**
 	 * Loads Schema
-	 * 
+	 *
 	 * @return void
 	 */
-	public function loadSchema() {
-		$tables = array_flip($this->toolbox->getWriter()->getTables());
-		foreach($tables as $table => $columns) {
-			try{
-				$tables[$table] = $this->toolbox->getWriter()->getColumns($table);
-			}
-			catch(RedBean_Exception_SQL $e) {
+	public function loadSchema()
+	{
+		$tables = array_flip( $this->toolbox->getWriter()->getTables() );
+		foreach ( $tables as $table => $columns ) {
+			try {
+				$tables[$table] = $this->toolbox->getWriter()->getColumns( $table );
+			} catch ( RedBean_Exception_SQL $e ) {
 				$tables[$table] = array();
 			}
 		}
 		$this->tables = $tables;
 	}
-	
+
 	/**
 	 *Returs a serialized representation of the schema
 	 *
-	 *@return string $serialized serialized representation
+	 * @return string $serialized serialized representation
 	 */
-	public function getSchema() {
-		return serialize($this->tables);
+	public function getSchema()
+	{
+		return serialize( $this->tables );
 	}
-	
+
 	/**
 	 * Loads a schema from a string (containing serialized export of schema)
 	 *
 	 * @param string $schema
 	 */
-	public function loadSchemaFromString($schema) {
-		$this->tables = unserialize($schema);
+	public function loadSchemaFromString( $schema )
+	{
+		$this->tables = unserialize( $schema );
 	}
-	
+
 	/**
 	 * Exports a collection of beans
 	 *
-	 * @param	mixed $beans 	  Either array or RedBean_OODBBean
-	 * @param	bool  $resetRecur Whether we need to reset the recursion check array (first time only)
+	 * @param    mixed $beans      Either array or RedBean_OODBBean
+	 * @param    bool  $resetRecur Whether we need to reset the recursion check array (first time only)
 	 *
-	 * @return	array $export Exported beans
+	 * @return    array $export Exported beans
 	 */
-	public function export($beans, $resetRecur = true) {
-		if ($resetRecur) {
+	public function export( $beans, $resetRecur = true )
+	{
+		if ( $resetRecur ) {
 			$this->recurCheck = array();
 		}
-		if (!is_array($beans)) {
-			$beans = array($beans);
+		if ( !is_array( $beans ) ) {
+			$beans = array( $beans );
 		}
-		if ($this->maxDepth !== false) {
-			$this->depth ++;
-			if ($this->depth > $this->maxDepth) {
-				$this->depth--; 
+		if ( $this->maxDepth !== false ) {
+			$this->depth++;
+			if ( $this->depth > $this->maxDepth ) {
+				$this->depth--;
+
 				return array();
 			}
 		}
-		if ($this->typeShield === true) {
-			if (is_array($beans) && count($beans)>0) {
-				$firstBean = reset($beans);
-				$type = $firstBean->getMeta('type');
-				if (isset($this->recurTypeCheck[$type])){
-					if ($this->maxDepth !== false) {
+		if ( $this->typeShield === true ) {
+			if ( is_array( $beans ) && count( $beans ) > 0 ) {
+				$firstBean = reset( $beans );
+				$type      = $firstBean->getMeta( 'type' );
+				if ( isset( $this->recurTypeCheck[$type] ) ) {
+					if ( $this->maxDepth !== false ) {
 						$this->depth--;
 					}
+
 					return array();
 				}
-				$this->recurTypeCheck[ $type ] = true;
+				$this->recurTypeCheck[$type] = true;
 			}
 		}
 		$export = array();
-		foreach($beans as $bean) {
-			$export[$bean->getID()] = $this->exportBean($bean);
+		foreach ( $beans as $bean ) {
+			$export[$bean->getID()] = $this->exportBean( $bean );
 		}
-		if ($this->maxDepth !== false) {
+		if ( $this->maxDepth !== false ) {
 			$this->depth--;
 		}
+
 		return $export;
 	}
-	
+
 	/**
 	 * Exports beans, just like export() but with additional
 	 * parameters for limitation on recursion and depth.
-	 * 
-	 * @param array   		  $beans      beans to export
-	 * @param boolean 		  $typeShield whether to use a type recursion shield
+	 *
+	 * @param array           $beans      beans to export
+	 * @param boolean         $typeShield whether to use a type recursion shield
 	 * @param boolean|integer $depth      maximum number of iterations allowed (boolean FALSE to turn off)
-	 * 
+	 *
 	 * @return array
 	 */
-	public function exportLimited($beans, $typeShield = true, $depth = false) {
-		$this->depth = 0;
-		$this->maxDepth = $depth;
+	public function exportLimited( $beans, $typeShield = true, $depth = false )
+	{
+		$this->depth      = 0;
+		$this->maxDepth   = $depth;
 		$this->typeShield = $typeShield;
-		$export = $this->export($beans);
+		$export           = $this->export( $beans );
 		$this->typeShield = false;
-		$this->maxDepth = false;
+		$this->maxDepth   = false;
+
 		return $export;
 	}
-	
+
 	/**
 	 * Exports a single bean
 	 *
@@ -231,20 +244,22 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin {
 	 *
 	 * @return array|null $array Array export of bean
 	 */
-	public function exportBean(RedBean_OODBBean $bean) {
-		$bid = $bean->getMeta('type').'-'.$bean->getID();
-		if (isset($this->recurCheck[$bid])) return null;
+	public function exportBean( RedBean_OODBBean $bean )
+	{
+		$bid = $bean->getMeta( 'type' ) . '-' . $bean->getID();
+		if ( isset( $this->recurCheck[$bid] ) ) return null;
 		$this->recurCheck[$bid] = $bid;
-		$export = $bean->export();
-		foreach($export as $key => $value) {
-			$this->extractParentBean($export, $bean, $key, $value);
+		$export                 = $bean->export();
+		foreach ( $export as $key => $value ) {
+			$this->extractParentBean( $export, $bean, $key, $value );
 		}
-		foreach($this->tables as $table => $cols) { //get all ownProperties
-			$this->extractOwnList($export, $bean, $table, $cols);
+		foreach ( $this->tables as $table => $cols ) { //get all ownProperties
+			$this->extractOwnList( $export, $bean, $table, $cols );
 		}
-		foreach($this->tables as $table => $cols) { //get all sharedProperties
-			$this->extractSharedList($export, $bean, $table);
+		foreach ( $this->tables as $table => $cols ) { //get all sharedProperties
+			$this->extractSharedList( $export, $bean, $table );
 		}
+
 		return $export;
 	}
 }

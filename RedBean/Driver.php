@@ -2,10 +2,10 @@
 /**
  * Interface for database drivers
  *
- * @file    RedBean/Driver.php
- * @desc    Describes the API for database classes
- * @author  Gabor de Mooij and the RedBeanPHP Community
- * @license	BSD/GPLv2
+ * @file       RedBean/Driver.php
+ * @desc       Describes the API for database classes
+ * @author     Gabor de Mooij and the RedBeanPHP Community
+ * @license    BSD/GPLv2
  *
  * The Driver API conforms to the ADODB pseudo standard
  * for database drivers.
@@ -14,8 +14,9 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-interface RedBean_Driver {
-	
+interface RedBean_Driver
+{
+
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.
 	 *
@@ -23,8 +24,8 @@ interface RedBean_Driver {
 	 *
 	 * @return array
 	 */
-	public function GetAll($sql, $bindings = array());
-	
+	public function GetAll( $sql, $bindings = array() );
+
 	/**
 	 * Runs a query and fetches results as a column.
 	 *
@@ -32,8 +33,8 @@ interface RedBean_Driver {
 	 *
 	 * @return array
 	 */
-	public function GetCol($sql, $bindings = array());
-	
+	public function GetCol( $sql, $bindings = array() );
+
 	/**
 	 * Runs a query and returns results as a single cell.
 	 *
@@ -41,8 +42,8 @@ interface RedBean_Driver {
 	 *
 	 * @return mixed
 	 */
-	public function GetCell($sql, $bindings = array());
-	
+	public function GetCell( $sql, $bindings = array() );
+
 	/**
 	 * Runs a query and returns a flat array containing the values of
 	 * one row.
@@ -51,8 +52,8 @@ interface RedBean_Driver {
 	 *
 	 * @return array
 	 */
-	public function GetRow($sql, $bindings = array());
-	
+	public function GetRow( $sql, $bindings = array() );
+
 	/**
 	 * Executes SQL code and allows key-value binding.
 	 * This function allows you to provide an array with values to bind
@@ -63,13 +64,13 @@ interface RedBean_Driver {
 	 * array(":key"=>123) will bind the integer 123 to the key :key in the
 	 * SQL. This method has no return value.
 	 *
-	 * @param string $sql	  SQL Code to execute
+	 * @param string $sql      SQL Code to execute
 	 * @param array  $bindings Values to bind to SQL query
 	 *
 	 * @return void
 	 */
-	public function Execute($sql, $bindings = array());
-	
+	public function Execute( $sql, $bindings = array() );
+
 	/**
 	 * Returns the latest insert ID if driver does support this
 	 * feature.
@@ -77,7 +78,7 @@ interface RedBean_Driver {
 	 * @return integer
 	 */
 	public function GetInsertID();
-	
+
 	/**
 	 * Returns the number of rows affected by the most recent query
 	 * if the currently selected driver driver supports this feature.
@@ -85,7 +86,7 @@ interface RedBean_Driver {
 	 * @return integer
 	 */
 	public function Affected_Rows();
-	
+
 	/**
 	 * Toggles debug mode. In debug mode the driver will print all
 	 * SQL to the screen together with some information about the
@@ -97,25 +98,25 @@ interface RedBean_Driver {
 	 *
 	 * @return void
 	 */
-	public function setDebugMode($tf);
-	
+	public function setDebugMode( $tf );
+
 	/**
 	 * Starts a transaction.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function CommitTrans();
-	
+
 	/**
 	 * Commits a transaction.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function StartTrans();
-	
+
 	/**
 	 * Rolls back a transaction.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function FailTrans();
