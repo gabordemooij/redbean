@@ -162,7 +162,7 @@ class RedBean_DuplicationManager
 	 */
 	protected function hasOwnList( $type, $target )
 	{
-		return ( isset( $this->columns[$target][$type . '_id'] ) );
+		return isset( $this->columns[$target][$type . '_id'] );
 	}
 
 	/**
@@ -176,7 +176,7 @@ class RedBean_DuplicationManager
 	 */
 	protected function hasSharedList( $type, $target )
 	{
-		return ( in_array( RedBean_QueryWriter_AQueryWriter::getAssocTableFormat( array( $type, $target ) ), $this->tables ) );
+		return in_array( RedBean_QueryWriter_AQueryWriter::getAssocTableFormat( array( $type, $target ) ), $this->tables );
 	}
 
 	/**
@@ -190,9 +190,7 @@ class RedBean_DuplicationManager
 	 */
 	protected function duplicate( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false )
 	{
-		if ( $this->inTrailOrAdd( $trail, $bean ) ) {
-			return $bean;
-		}
+		if ( $this->inTrailOrAdd( $trail, $bean ) ) return $bean;
 
 		$type = $bean->getMeta( 'type' );
 
