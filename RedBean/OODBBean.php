@@ -341,23 +341,29 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			}
 		}
 
+		$hasFilters = is_array( $filters ) && count( $filters );
+
 		foreach ( $this as $key => $value ) {
 			if ( !$onlyMe && is_array( $value ) ) {
 				$vn = array();
+
 				foreach ( $value as $i => $b ) {
 					if ( is_numeric( $i ) && !self::$flagKeyedExport ) {
 						$vn[] = $b->export( $meta, false, false, $filters );
 					} else {
 						$vn[$i] = $b->export( $meta, false, false, $filters );
 					}
+
 					$value = $vn;
 				}
 			} elseif ( $value instanceof RedBean_OODBBean ) {
-				if ( is_array( $filters ) && count( $filters ) && !in_array( strtolower( $value->getMeta( 'type' ) ), $filters ) ) {
-					continue;
+				if ( $hasFilters ) {
+					if ( !in_array( strtolower( $value->getMeta( 'type' ) ), $filters ) ) continue;
 				}
+
 				$value = $value->export( $meta, $parents, false, $filters );
 			}
+
 			$arr[$key] = $value;
 		}
 
