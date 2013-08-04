@@ -593,60 +593,56 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function &__get( $property )
 	{
-		$property = ( !$this->flagSkipBeau ) ? $this->beau( $property ) : $property;
+		if ( !$this->flagSkipBeau ) $property = $this->beau( $property );
 
 		if ( $this->beanHelper ) {
 			list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 		}
 
-		$isOwn = strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) );
-
+		$isOwn    = strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) );
 		$isShared = strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) );
 
-		if (
-			isset( $this->properties[$property] )
-			&& (
-				( $this->withSql === '' )
-				|| ( !$isOwn && !$isShared )
-			)
-		) {
+		if ( isset( $this->properties[$property] ) && ( ( $this->withSql === '' ) || ( !$isOwn && !$isShared ) ) ) {
 			return $this->properties[$property];
 		}
 
 		$fieldLink = $property . '_id';
 		if ( isset( $this->$fieldLink ) && $fieldLink !== $this->getMeta( 'sys.idfield' ) ) {
 			$this->__info['tainted'] = true;
-			$bean                    = isset( $this->__info['sys.parentcache.' . $property] ) ? $this->__info['sys.parentcache.' . $property] : null;
+
+			$bean = null;
+			if ( isset( $this->__info["sys.parentcache.$property"] ) ) {
+				$bean = $this->__info["sys.parentcache.$property"];
+			}
+
 			if ( !$bean ) {
 				$type = $this->getAlias( $property );
 				$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 			}
+
 			$this->properties[$property] = $bean;
 
 			return $this->properties[$property];
 		}
 
-		if ( $isOwn ) {
-			$beans                                   = $this->getOwnList( lcfirst( substr( $property, 3 ) ), $redbean );
-			$this->properties[$property]             = $beans;
-			$this->__info['sys.shadow.' . $property] = $beans;
-			$this->__info['tainted']                 = true;
+		if ( $isOwn || $isShared ) {
+			if ( $isOwn ) {
+				$beans = $this->getOwnList( lcfirst( substr( $property, 3 ) ), $redbean );
+			} else {
+				$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
+			}
+
+			$this->properties[$property] = $beans;
+
+			$this->__info["sys.shadow.$property"] = $beans;
+			$this->__info['tainted']              = true;
 
 			return $this->properties[$property];
 		}
 
-		if ( $isShared ) {
-			$beans                                   = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
-			$this->properties[$property]             = $beans;
-			$this->__info['sys.shadow.' . $property] = $beans;
-			$this->__info['tainted']                 = true;
+		$null = null;
 
-			return $this->properties[$property];
-		} else {
-			$null = null;
-
-			return $null;
-		}
+		return $null;
 	}
 
 	/**
