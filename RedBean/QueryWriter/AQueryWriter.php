@@ -735,6 +735,7 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	{
 		$table           = $this->esc( $type );
 		$tableNoQ        = $this->esc( $type, true );
+
 		$targetTable     = $this->esc( $targetType );
 
 		$column          = $this->esc( $field );

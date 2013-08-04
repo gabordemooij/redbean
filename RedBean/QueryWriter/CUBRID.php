@@ -13,7 +13,6 @@
  */
 class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter
 {
-
 	/**
 	 * Data types
 	 */
@@ -37,14 +36,16 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	/**
 	 * Obtains the keys of a table using the PDO schema function.
 	 *
-	 * @param type $table
+	 * @param string $table
 	 *
-	 * @return type
+	 * @return array
 	 */
 	protected function getKeys( $table, $table2 = null )
 	{
 		$pdo  = $this->adapter->getDatabase()->getPDO();
+
 		$keys = $pdo->cubrid_schema( PDO::CUBRID_SCH_EXPORTED_KEYS, $table );
+
 		if ( $table2 ) {
 			$keys = array_merge( $keys, $pdo->cubrid_schema( PDO::CUBRID_SCH_IMPORTED_KEYS, $table2 ) );
 		}
@@ -94,31 +95,44 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	{
 		$table           = $this->esc( $type );
 		$tableNoQ        = $this->esc( $type, true );
+
 		$targetTable     = $this->esc( $targetType );
 		$targetTableNoQ  = $this->esc( $targetType, true );
+
 		$column          = $this->esc( $field );
 		$columnNoQ       = $this->esc( $field, true );
+
 		$targetColumn    = $this->esc( $targetField );
 		$targetColumnNoQ = $this->esc( $targetField, true );
+
 		$keys            = $this->getKeys( $targetTableNoQ, $tableNoQ );
+
 		$needsToAddFK    = true;
 		$needsToDropFK   = false;
+
 		foreach ( $keys as $key ) {
 			if ( $key['FKTABLE_NAME'] == $tableNoQ && $key['FKCOLUMN_NAME'] == $columnNoQ ) {
-				//already has an FK
+				// Already has an FK
 				$needsToDropFK = true;
-				if ( ( ( $isDep && $key['DELETE_RULE'] == 0 ) || ( !$isDep && $key['DELETE_RULE'] == 3 ) ) ) {
-					return false;
+
+				if ( ( $isDep && $key['DELETE_RULE'] == 0 ) || ( !$isDep && $key['DELETE_RULE'] == 3 ) ) {
+					return;
 				}
+
 				break;
 			}
 		}
+
 		if ( $needsToDropFK ) {
 			$sql = "ALTER TABLE $table DROP FOREIGN KEY {$key['FK_NAME']} ";
+
 			$this->adapter->exec( $sql );
 		}
+
 		$casc = ( $isDep ? 'CASCADE' : 'SET NULL' );
+
 		$sql  = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
+
 		$this->adapter->exec( $sql );
 	}
 
@@ -136,12 +150,16 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATE     => ' DATE ',
 			RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
 		);
+
 		$this->sqltype_typeno = array();
+
 		foreach ( $this->typeno_sqltype as $k => $v ) {
 			$this->sqltype_typeno[trim( ( $v ) )] = $k;
 		}
+
 		$this->sqltype_typeno['STRING(1073741823)'] = self::C_DATATYPE_STRING;
-		$this->adapter                              = $adapter;
+
+		$this->adapter = $adapter;
 	}
 
 	/**
@@ -170,9 +188,12 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function createTable( $table )
 	{
-		$rawTable = $this->esc( $table, true );
-		$table    = $this->esc( $table );
-		$sql      = 'CREATE TABLE ' . $table . ' ("id" integer AUTO_INCREMENT, CONSTRAINT "pk_' . $rawTable . '_id" PRIMARY KEY("id"))';
+		$sql  = 'CREATE TABLE '
+			. $this->esc( $table )
+			. ' ("id" integer AUTO_INCREMENT, CONSTRAINT "pk_'
+			. $this->esc( $table, true )
+			. '_id" PRIMARY KEY("id"))';
+
 		$this->adapter->exec( $sql );
 	}
 
@@ -181,9 +202,11 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function getColumns( $table )
 	{
-		$columns    = array();
-		$table      = $this->esc( $table );
+		$table = $this->esc( $table );
+
 		$columnsRaw = $this->adapter->get( "SHOW COLUMNS FROM $table" );
+
+		$columns = array();
 		foreach ( $columnsRaw as $r ) {
 			$columns[$r['Field']] = $r['Type'];
 		}
@@ -197,9 +220,11 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	public function scanType( $value, $flagSpecial = false )
 	{
 		$this->svalue = $value;
+
 		if ( is_null( $value ) ) {
 			return self::C_DATATYPE_INTEGER;
 		}
+
 		if ( $flagSpecial ) {
 			if ( preg_match( '/^\d{4}\-\d\d-\d\d$/', $value ) ) {
 				return self::C_DATATYPE_SPECIAL_DATE;
@@ -208,7 +233,9 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 				return self::C_DATATYPE_SPECIAL_DATETIME;
 			}
 		}
+
 		$value = strval( $value );
+
 		if ( !$this->startsWithZeros( $value ) ) {
 			if ( is_numeric( $value ) && ( floor( $value ) == $value ) && $value >= -2147483647 && $value <= 2147483647 ) {
 				return self::C_DATATYPE_INTEGER;
@@ -227,9 +254,11 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	public function code( $typedescription, $includeSpecials = false )
 	{
 		$r = ( ( isset( $this->sqltype_typeno[$typedescription] ) ) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED );
+
 		if ( $includeSpecials ) {
 			return $r;
 		}
+
 		if ( $r > RedBean_QueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
 			return self::C_DATATYPE_SPECIFIED;
 		}
@@ -244,11 +273,13 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	{
 		$table  = $type;
 		$type   = $field;
+
 		$table  = $this->esc( $table );
 		$column = $this->esc( $column );
+
 		$type   = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
-		$sql    = "ALTER TABLE $table ADD COLUMN $column $type ";
-		$this->adapter->exec( $sql );
+
+		$this->adapter->exec( "ALTER TABLE $table ADD COLUMN $column $type " );
 	}
 
 	/**
@@ -256,12 +287,16 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function widenColumn( $type, $column, $datatype )
 	{
-		$table           = $type;
-		$type            = $datatype;
-		$table           = $this->esc( $table );
-		$column          = $this->esc( $column );
-		$newtype         = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
+		$table   = $type;
+		$type    = $datatype;
+
+		$table   = $this->esc( $table );
+		$column  = $this->esc( $column );
+
+		$newtype = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
+
 		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
+
 		$this->adapter->exec( $changecolumnSQL );
 	}
 
@@ -271,12 +306,17 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	public function addUniqueIndex( $table, $columns )
 	{
 		$table = $this->esc( $table );
-		sort( $columns ); //else we get multiple indexes due to order-effects
+
+		sort( $columns ); // else we get multiple indexes due to order-effects
+
 		foreach ( $columns as $k => $v ) {
 			$columns[$k] = $this->esc( $v );
 		}
-		$r    = $this->adapter->get( "SHOW INDEX FROM $table" );
+
+		$r = $this->adapter->get( "SHOW INDEX FROM $table" );
+
 		$name = 'UQ_' . sha1( implode( ',', $columns ) );
+
 		if ( $r ) {
 			foreach ( $r as $i ) {
 				if ( strtoupper( $i['Key_name'] ) == strtoupper( $name ) ) {
@@ -284,7 +324,9 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 				}
 			}
 		}
+
 		$sql = "ALTER TABLE $table ADD CONSTRAINT UNIQUE $name (" . implode( ',', $columns ) . ")";
+
 		$this->adapter->exec( $sql );
 	}
 
@@ -307,12 +349,17 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	{
 		$table  = $type;
 		$table  = $this->esc( $table );
+
 		$name   = preg_replace( '/\W/', '', $name );
+
 		$column = $this->esc( $column );
+
 		$index  = $this->adapter->getRow( "SELECT 1 as `exists` FROM db_index WHERE index_name = ? ", array( $name ) );
+
 		if ( $index && $index['exists'] ) {
 			return; // positive number will return, 0 will continue.
 		}
+
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
 		} catch ( Exception $e ) {
@@ -336,6 +383,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 			foreach ( $this->getKeys( $t ) as $k ) {
 				$this->adapter->exec( "ALTER TABLE \"{$k['FKTABLE_NAME']}\" DROP FOREIGN KEY \"{$k['FK_NAME']}\"" );
 			}
+
 			$this->adapter->exec( "DROP TABLE \"$t\"" );
 		}
 	}
