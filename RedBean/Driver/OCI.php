@@ -20,7 +20,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 */
 	private $dsn;
 	/**
-	 * @var unknown_type
+	 * @var RedBean_Driver_OCI
 	 */
 	private static $instance;
 	/**
@@ -89,7 +89,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 * @param $pass
 	 * @param $dbname
 	 *
-	 * @return unknown_type
+	 * @return RedBean_Driver_OCI
 	 */
 	public static function getInstance( $dsn, $user, $pass )
 	{
@@ -118,8 +118,9 @@ class RedBean_Driver_OCI implements RedBean_Driver
 		if ( $dsn instanceof resource ) {
 			$this->connection  = $dsn;
 			$this->isConnected = true;
+
 			// make sure that the dsn at least contains the type
-			$this->dsn = $this->getDatabaseType();
+			$this->dsn         = $this->getDatabaseType();
 		} else {
 			$this->dsn         = substr( $dsn, 7 ); // remove 'oracle:'
 			$this->connectInfo = array( 'pass' => $pass, 'user' => $user );
@@ -215,13 +216,19 @@ class RedBean_Driver_OCI implements RedBean_Driver
 		$this->connection = oci_connect( $user, $pass, $this->dsn, 'utf8' );
 		if ( !$this->connection ) {
 			$e = oci_error();
+
 			print_r( $e );
+
 			$this->isConnected = false;
 		} else {
-			$s                 = oci_parse( $this->connection, "alter session set nls_date_format = '$this->nlsDateFormat'" );
-			$e                 = oci_execute( $s );
-			$s                 = oci_parse( $this->connection, "alter session set nls_timestamp_format = '$this->nlsTimeStampFormat'" );
-			$e                 = oci_execute( $s );
+			$s = oci_parse( $this->connection, "alter session set nls_date_format = '$this->nlsDateFormat'" );
+
+			oci_execute( $s );
+
+			$s = oci_parse( $this->connection, "alter session set nls_timestamp_format = '$this->nlsTimeStampFormat'" );
+
+			oci_execute( $s );
+
 			$this->isConnected = true;
 		}
 	}
@@ -242,35 +249,44 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	protected function runQuery( $sql, $aValues )
 	{
 		$this->connect();
+
 		if ( $this->debug && $this->logger ) {
 			$this->logger->log( $sql, $aValues );
 		}
-		try {
 
+		try {
 			$this->doBinding( $sql, $aValues );
 			$this->affected_rows = oci_num_rows( $this->statement );
+
 			if ( oci_num_fields( $this->statement ) ) {
 				$rows = array();
+
 				oci_fetch_all( $this->statement, $rows, 0, -1, OCI_FETCHSTATEMENT_BY_ROW );
+
 				// This rewrite all the php properties in lowercase
 				foreach ( $rows as $key => $row ) {
 					foreach ( $row as $field => $value ) {
 						unset( $rows[$key][$field] );
-						$new_key              = strtolower( $field );
+
+						$new_key = strtolower( $field );
+
 						$rows[$key][$new_key] = $value;
 					}
 				}
+
 				$this->rs = $rows;
+
 				if ( $this->debug && $this->logger )
 					$this->logger->log( 'resultset: ' . count( $this->rs ) . ' rows' );
 			} else {
 				$this->rs = array();
 			}
 		} catch ( PDOException $pdoException ) {
-			//Unfortunately the code field is supposed to be int by default (php)
-			//So we need a property to convey the SQL State code.
+			// Unfortunately the code field is supposed to be int by default (php)
+			// So we need a property to convey the SQL State code.
 			$transformedException = new RedBean_Exception_SQL( $pdoException->getMessage(), 0 );
 			$transformedException->setSQLState( $pdoException->getCode() );
+
 			throw $transformedException;
 		}
 	}
@@ -316,11 +332,12 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 *
 	 * @param  string $sql SQL Code to execute
 	 *
-	 * @return array    $results Resultset
+	 * @return array $results Resultset
 	 */
 	public function GetCol( $sql, $aValues = array() )
 	{
 		$rows = $this->GetAll( $sql, $aValues );
+
 		$cols = array();
 		if ( $rows && is_array( $rows ) && count( $rows ) > 0 ) {
 			foreach ( $rows as $row ) {
@@ -338,7 +355,8 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 */
 	public function GetCell( $sql, $aValues = array() )
 	{
-		$arr  = $this->GetAll( $sql, $aValues );
+		$arr = $this->GetAll( $sql, $aValues );
+
 		$row1 = array_shift( $arr );
 		$col1 = array_shift( $row1 );
 
@@ -365,7 +383,12 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	public function ErrorNo()
 	{
 		$error = oci_error( $this->statement );
-		if ( is_array( $error ) ) return $error['code']; else return null;
+
+		if ( is_array( $error ) ) {
+			return $error['code'];
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -376,7 +399,12 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	public function Errormsg()
 	{
 		$error = oci_error( $this->statement );
-		if ( is_array( $error ) ) return $error['message']; else return null;
+
+		if ( is_array( $error ) ) {
+			return $error['message'];
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -390,31 +418,37 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 */
 	private function doBinding( $sql, $aValues = array() )
 	{
-
 		foreach ( $aValues as $key => $value ) {
 			$sql = preg_replace( '/\?/', ' :SLOT' . $key . ' ', $sql, 1 );
 		}
 
 		//if we insert we fetch the inserted id
 		$isInsert = preg_match( '/^insert/i', $sql );
+
 		if ( $isInsert ) {
 			$sql .= ' RETURN ID INTO :ID';
 		}
+
 		$this->statement = oci_parse( $this->connection, $sql );
 
 		foreach ( $aValues as $key => $value ) {
 			if ( !is_int( $key ) ) {
-				$keyv             = str_replace( ':', '', $key );
+				$keyv = str_replace( ':', '', $key );
+
 				${'SLOT' . $keyv} = $value;
+
 				oci_bind_by_name( $this->statement, $key, ${'SLOT' . $keyv} );
 			} else {
 				${'SLOT' . $key} = $value;
+
 				oci_bind_by_name( $this->statement, ':SLOT' . $key, ${'SLOT' . $key} );
 			}
 		}
+
 		if ( $isInsert ) {
 			oci_bind_by_name( $this->statement, ':ID', $this->lastInsertedId, 20, SQLT_INT );
 		}
+
 		if ( $this->debug ) {
 			if ( !$this->autocommit ) {
 				$result = oci_execute( $this->statement, OCI_NO_AUTO_COMMIT ); // data not committed
@@ -428,9 +462,11 @@ class RedBean_Driver_OCI implements RedBean_Driver
 				$result = @oci_execute( $this->statement );
 			}
 		}
+
 		if ( !$result ) {
 			$error = oci_error( $this->statement );
-			$x     = new RedBean_Exception_SQL( $error['message'] . ':' . $error['sqltext'], 0 );
+
+			$x = new RedBean_Exception_SQL( $error['message'] . ':' . $error['sqltext'], 0 );
 			$x->setSQLState( $this->mergeErrors( $error['code'] ) );
 			throw $x;
 		}
@@ -449,7 +485,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	}
 
 	// This function is used to be compatible with the Redbean actual behaviour. Oracle makes a difference between the
-	// two errors belows, Redbean doesnt'
+	// two errors belows, Redbean doesn't
 	private function mergeErrors( $code )
 	{
 		if ( $code == self::OCI_UNIQUE_CONSTRAINT_VIOLATION )
@@ -578,10 +614,14 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	public function getDatabaseVersion()
 	{
 		$this->connect();
+
 		$output = array();
-		$s      = oci_parse( $this->connection, 'select * from v$version where banner like ' . "'Oracle%'" );
+
+		$s = oci_parse( $this->connection, 'select * from v$version where banner like ' . "'Oracle%'" );
+
 		oci_execute( $s );
-		$e = oci_fetch_all( $s, $output );
+
+		oci_fetch_all( $s, $output );
 
 		return $output['BANNER'][0];
 	}

@@ -14,7 +14,6 @@
  */
 class RedBean_Driver_PDO implements RedBean_Driver
 {
-
 	/**
 	 * @var string
 	 */
@@ -110,21 +109,30 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	protected function runQuery( $sql, $bindings )
 	{
 		$this->connect();
+
 		if ( $this->debug && $this->logger ) {
 			$this->logger->log( $sql, $bindings );
 		}
+
 		try {
 			if ( strpos( 'pgsql', $this->dsn ) === 0 ) {
 				$statement = $this->pdo->prepare( $sql, array( PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true ) );
 			} else {
 				$statement = $this->pdo->prepare( $sql );
 			}
+
 			$this->bindParams( $statement, $bindings );
+
 			$statement->execute();
+
 			$this->affectedRows = $statement->rowCount();
+
 			if ( $statement->columnCount() ) {
 				$this->resultArray = $statement->fetchAll();
-				if ( $this->debug && $this->logger ) $this->logger->log( 'resultset: ' . count( $this->resultArray ) . ' rows' );
+
+				if ( $this->debug && $this->logger ) {
+					$this->logger->log( 'resultset: ' . count( $this->resultArray ) . ' rows' );
+				}
 			} else {
 				$this->resultArray = array();
 			}
@@ -132,9 +140,12 @@ class RedBean_Driver_PDO implements RedBean_Driver
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
 			$err = $e->getMessage();
+
 			if ( $this->debug && $this->logger ) $this->logger->log( 'An error occurred: ' . $err );
+
 			$exception = new RedBean_Exception_SQL( $err, 0 );
 			$exception->setSQLState( $e->getCode() );
+
 			throw $exception;
 		}
 	}
@@ -154,15 +165,19 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	public function __construct( $dsn, $user = null, $pass = null )
 	{
 		if ( $dsn instanceof PDO ) {
-			$this->pdo         = $dsn;
+			$this->pdo = $dsn;
+
 			$this->isConnected = true;
+
 			$this->pdo->setAttribute( 1002, 'SET NAMES utf8' );
 			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			$this->pdo->setAttribute( PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC );
+
 			// make sure that the dsn at least contains the type
 			$this->dsn = $this->getDatabaseType();
 		} else {
-			$this->dsn         = $dsn;
+			$this->dsn = $dsn;
+
 			$this->connectInfo = array( 'pass' => $pass, 'user' => $user );
 		}
 	}
@@ -192,8 +207,9 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	{
 		if ( $this->isConnected ) return;
 		try {
-			$user      = $this->connectInfo['user'];
-			$pass      = $this->connectInfo['pass'];
+			$user = $this->connectInfo['user'];
+			$pass = $this->connectInfo['pass'];
+
 			$this->pdo = new PDO(
 				$this->dsn,
 				$user,
@@ -203,11 +219,15 @@ class RedBean_Driver_PDO implements RedBean_Driver
 					   PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 				)
 			);
+
 			$this->pdo->setAttribute( PDO::ATTR_STRINGIFY_FETCHES, true );
+
 			$this->isConnected = true;
 		} catch ( PDOException $exception ) {
 			$matches = array();
+
 			$dbname  = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
+
 			throw new PDOException( 'Could not connect to database (' . $dbname . ').', $exception->getCode() );
 		}
 	}
@@ -228,6 +248,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	public function GetCol( $sql, $bindings = array() )
 	{
 		$rows = $this->GetAll( $sql, $bindings );
+
 		$cols = array();
 		if ( $rows && is_array( $rows ) && count( $rows ) > 0 ) {
 			foreach ( $rows as $row ) {
@@ -243,7 +264,8 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 */
 	public function GetCell( $sql, $bindings = array() )
 	{
-		$arr  = $this->GetAll( $sql, $bindings );
+		$arr = $this->GetAll( $sql, $bindings );
+
 		$row1 = array_shift( $arr );
 		$col1 = array_shift( $row1 );
 
@@ -303,10 +325,13 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	public function setDebugMode( $tf, $logger = null )
 	{
 		$this->connect();
+
 		$this->debug = (bool) $tf;
+
 		if ( $this->debug and !$logger ) {
 			$logger = new RedBean_Logger_Default();
 		}
+
 		$this->setLogger( $logger );
 	}
 
@@ -338,6 +363,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	public function StartTrans()
 	{
 		$this->connect();
+
 		$this->pdo->beginTransaction();
 	}
 
@@ -347,6 +373,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	public function CommitTrans()
 	{
 		$this->connect();
+
 		$this->pdo->commit();
 	}
 
@@ -356,6 +383,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	public function FailTrans()
 	{
 		$this->connect();
+
 		$this->pdo->rollback();
 	}
 
@@ -415,8 +443,6 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 */
 	public function isConnected()
 	{
-		if ( !$this->isConnected && !$this->pdo ) return false;
-
-		return true;
+		return $this->isConnected && $this->pdo;
 	}
 }
