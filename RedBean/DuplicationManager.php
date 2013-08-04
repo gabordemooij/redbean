@@ -198,15 +198,10 @@ class RedBean_DuplicationManager
 
 		$copy = $this->createCopy( $bean );
 		foreach ( $this->tables as $table ) {
-			if (
-				(
-					is_array($this->filters)
-					&& count($this->filters)
-					&& !in_array($table, $this->filters)
-				)
-				|| $table == $type
-			) {
-				continue;
+			if ( $table == $type ) continue;
+
+			if ( !empty( $this->filters ) ) {
+				if ( !in_array( $table, $this->filters ) ) continue;
 			}
 
 			list( $owned, $shared ) = $this->getListNames( $table );
@@ -345,12 +340,14 @@ class RedBean_DuplicationManager
 			}
 		}
 
+		$rs = $this->duplicate( clone( $bean ), $trail, $preserveIDs );
+
 		if ( !$this->cacheTables ) {
 			$this->tables  = array();
 			$this->columns = array();
 		}
 
-		return $this->duplicate( clone( $bean ), $trail, $preserveIDs );
+		return $this->duplicate( $rs, $trail, $preserveIDs );
 	}
 
 	/**
