@@ -601,7 +601,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		if (
 			isset( $this->properties[$property] )
-			|| (
+			&& (
 				$this->withSql === ''
 				&& (
 					( strpos( $property, 'own' ) !== 0 )
