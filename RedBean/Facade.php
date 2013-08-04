@@ -391,7 +391,7 @@ class RedBean_Facade
 	 */
 	public static function setStrictTyping( $trueFalse )
 	{
-		self::$strictType = (boolean) $trueFalse;
+		self::$strictType = (bool) $trueFalse;
 	}
 
 	/**
@@ -968,13 +968,12 @@ class RedBean_Facade
 	 * Facade Convience method for adapter transaction system.
 	 * Begins a transaction.
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public static function begin()
 	{
-		if ( !self::$redbean->isFrozen() ) {
-			return false;
-		}
+		if ( !self::$redbean->isFrozen() ) return false;
+
 		self::$adapter->startTransaction();
 
 		return true;
@@ -984,13 +983,12 @@ class RedBean_Facade
 	 * Facade Convience method for adapter transaction system.
 	 * Commits a transaction.
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public static function commit()
 	{
-		if ( !self::$redbean->isFrozen() ) {
-			return false;
-		}
+		if ( !self::$redbean->isFrozen() ) return false;
+
 		self::$adapter->commit();
 
 		return true;
@@ -1000,13 +998,12 @@ class RedBean_Facade
 	 * Facade Convience method for adapter transaction system.
 	 * Rolls back a transaction.
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public static function rollback()
 	{
-		if ( !self::$redbean->isFrozen() ) {
-			return false;
-		}
+		if ( !self::$redbean->isFrozen() ) return false;
+
 		self::$adapter->rollback();
 
 		return true;
