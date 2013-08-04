@@ -51,12 +51,16 @@ class RedBean_Setup
 			$dsn = $db->getDatabaseType();
 		} else {
 			self::checkDSN( $dsn );
-			if ( strpos( $dsn, 'oracle' ) === 0 )
+
+			if ( strpos( $dsn, 'oracle' ) === 0 ) {
 				$db = new RedBean_Driver_OCI( $dsn, $username, $password );
-			else
+			} else {
 				$db = new RedBean_Driver_PDO( $dsn, $username, $password );
+			}
 		}
+
 		$adapter = new RedBean_Adapter_DBAdapter( $db );
+
 		if ( strpos( $dsn, 'pgsql' ) === 0 ) {
 			$writer = new RedBean_QueryWriter_PostgreSQL( $adapter );
 		} else if ( strpos( $dsn, 'sqlite' ) === 0 ) {
@@ -68,10 +72,13 @@ class RedBean_Setup
 		} else {
 			$writer = new RedBean_QueryWriter_MySQL( $adapter );
 		}
+
 		$redbean = new RedBean_OODB( $writer );
+
 		if ( $frozen ) {
 			$redbean->freeze( true );
 		}
+
 		$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
 
 		return $toolbox;

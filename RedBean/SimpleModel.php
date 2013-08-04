@@ -73,7 +73,7 @@ class RedBean_SimpleModel
 	 */
 	public function __isset( $key )
 	{
-		return ( isset( $this->bean->$key ) );
+		return isset( $this->bean->$key );
 	}
 
 	/**

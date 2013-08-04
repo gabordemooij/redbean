@@ -59,7 +59,7 @@ class RedBean_SQLHelper
 	 * Constructor.
 	 * Allows you to mix PHP and SQL as if they were one language.
 	 *
-	 * @param RedBean_DBAdapter $adapter database adapter for querying
+	 * @param RedBean_Adapter_DBAdapter $adapter database adapter for querying
 	 */
 	public function __construct( RedBean_Adapter $adapter )
 	{
@@ -90,12 +90,16 @@ class RedBean_SQLHelper
 	{
 		if ( self::$flagUseCamelCase ) {
 			static $funcCache = array();
+
 			if ( !isset( $funcCache[$funcName] ) ) {
 				$funcCache[$funcName] = strtolower( preg_replace( '/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $funcName ) );
 			}
+
 			$funcName = $funcCache[$funcName];
 		}
+
 		$funcName = str_replace( '_', ' ', $funcName );
+
 		if ( $this->capture ) {
 			$this->sql .= ' ' . $funcName . ' ' . implode( ',', $args );
 
@@ -151,7 +155,9 @@ class RedBean_SQLHelper
 	public function get( $what = '' )
 	{
 		$what = 'get' . ucfirst( $what );
+
 		$rs   = $this->adapter->$what( $this->sql, $this->params );
+
 		$this->clear();
 
 		return $rs;
@@ -167,6 +173,7 @@ class RedBean_SQLHelper
 		$this->sql     = '';
 		$this->params  = array();
 		$this->capture = false; //turn off capture mode (issue #142)
+
 		return $this;
 	}
 
@@ -216,7 +223,9 @@ class RedBean_SQLHelper
 	public function nest( RedBean_SQLHelper $sqlHelper )
 	{
 		list( $sql, $params ) = $sqlHelper->getQuery();
+
 		$this->sql .= $sql;
+
 		$this->params += $params;
 
 		return $this;
