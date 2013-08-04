@@ -599,32 +599,21 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 		}
 
+		$isOwn = strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) );
+
+		$isShared = strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) );
+
 		if (
 			isset( $this->properties[$property] )
 			&& (
-				$this->withSql === ''
-				|| (
-					( strpos( $property, 'own' ) !== 0 )
-					&& ( strpos( $property, 'shared' ) !== 0 )
-				)
+				( $this->withSql === '' )
+				|| ( !$isOwn && !$isShared )
 			)
 		) {
 			return $this->properties[$property];
 		}
 
-		/*if (
-			!isset($this->properties[$property])
-			|| (
-				$this->withSql !== ''
-				&& (
-					(strpos($property, 'own') === 0)
-					|| (strpos($property, 'shared') === 0)
-				)
-			)
-		) {
-		}*/
-
-			$fieldLink = $property . '_id';
+		$fieldLink = $property . '_id';
 		if ( isset( $this->$fieldLink ) && $fieldLink !== $this->getMeta( 'sys.idfield' ) ) {
 			$this->__info['tainted'] = true;
 			$bean                    = isset( $this->__info['sys.parentcache.' . $property] ) ? $this->__info['sys.parentcache.' . $property] : null;
@@ -635,14 +624,18 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$this->properties[$property] = $bean;
 
 			return $this->properties[$property];
-		} elseif ( strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) ) ) {
+		}
+
+		if ( $isOwn ) {
 			$beans                                   = $this->getOwnList( lcfirst( substr( $property, 3 ) ), $redbean );
 			$this->properties[$property]             = $beans;
 			$this->__info['sys.shadow.' . $property] = $beans;
 			$this->__info['tainted']                 = true;
 
 			return $this->properties[$property];
-		} elseif ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
+		}
+
+		if ( $isShared ) {
 			$beans                                   = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
 			$this->properties[$property]             = $beans;
 			$this->__info['sys.shadow.' . $property] = $beans;
