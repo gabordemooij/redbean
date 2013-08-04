@@ -84,7 +84,7 @@ class RedBean_ModelHelper implements RedBean_Observer
 	 *
 	 * @param string $modelClassName name of the model
 	 *
-	 * @return void
+	 * @return object
 	 */
 	public static function factory( $modelClassName )
 	{
