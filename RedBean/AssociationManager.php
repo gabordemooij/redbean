@@ -477,7 +477,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	{
 		$beans = $this->relatedSimple( $bean, $type, $sql, $bindings );
 
-		if ( !count( $beans ) || !is_array( $beans ) ) {
+		if ( empty( $beans ) ) {
 			return null;
 		}
 
