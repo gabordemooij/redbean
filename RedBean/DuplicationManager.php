@@ -300,6 +300,10 @@ class RedBean_DuplicationManager
 	 */
 	public function setFilters( $filters )
 	{
+		if ( !is_array( $filters ) ) {
+			$filters = array( $filters );
+		}
+
 		$this->filters = $filters;
 	}
 
