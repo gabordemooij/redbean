@@ -317,7 +317,7 @@ class RedBean_Facade
 	 */
 	public static function loadMulti( $types, $id )
 	{
-		if ( is_string( $types ) && strpos( $types, ',' ) !== false ) {
+		if ( is_string( $types ) ) {
 			$types = explode( ',', $types );
 		}
 
