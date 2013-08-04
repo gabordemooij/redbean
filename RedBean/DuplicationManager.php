@@ -198,10 +198,15 @@ class RedBean_DuplicationManager
 
 		$copy = $this->createCopy( $bean );
 		foreach ( $this->tables as $table ) {
-			if ( $table == $type ) continue;
-
-			if ( !empty( $this->filters ) ) {
-				if ( !in_array( $table, $this->filters ) ) continue;
+			if (
+				(
+					is_array($this->filters)
+					&& count($this->filters)
+					&& !in_array($table, $this->filters)
+				)
+				|| $table == $type
+			) {
+				continue;
 			}
 
 			list( $owned, $shared ) = $this->getListNames( $table );
