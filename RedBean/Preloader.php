@@ -55,18 +55,21 @@ class RedBean_Preloader
 	 */
 	private function extractTypesFromTypeList( $typeList )
 	{
-		if ( is_string( $typeList ) ) {
-			$typeList = explode( ',', $typeList );
-			foreach ( $typeList as $value ) {
-				if ( strpos( $value, '|' ) !== false ) {
-					list( $key, $newValue ) = explode( '|', $value );
-					$types[$key] = $newValue;
-				} else {
-					$types[] = $value;
-				}
+		if ( !is_string( $typeList ) ) {
+			return $typeList;
+		}
+
+		$typeList = explode( ',', $typeList );
+
+		$types = array();
+		foreach ( $typeList as $value ) {
+			if ( strpos( $value, '|' ) !== false ) {
+				list( $key, $newValue ) = explode( '|', $value );
+
+				$types[$key] = $newValue;
+			} else {
+				$types[] = $value;
 			}
-		} else {
-			$types = $typeList;
 		}
 
 		return $types;
