@@ -603,21 +603,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		$isOwn = strpos( $property, 'own' ) === 0;
 
-		$isRel = $isShared || $isOwn;
-
-		if (
-			isset( $this->properties[$property] )
-			&& ( ( $this->withSql === '' ) && !$isRel )
-		) {
+		if ( isset( $this->properties[$property] ) && ( $this->withSql === '' ) && !( $isShared || $isOwn ) ) {
 			return $this->properties[$property];
 		}
 
 		$fieldLink = $property . '_id';
 
-		if (
-			isset( $this->$fieldLink )
-			&& ( $fieldLink !== $this->getMeta( 'sys.idfield' ) )
-		) {
+		if ( isset( $this->$fieldLink ) && ( $fieldLink !== $this->getMeta( 'sys.idfield' ) ) ) {
 			$this->__info['tainted'] = true;
 
 			$cached = "sys.parentcache.$property";
@@ -638,19 +630,20 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			return $this->properties[$property];
 		}
 
-		if ( $isOwn && ctype_upper( substr( $property, 3, 1 ) ) ) {
-			$beans = $this->getOwnList( lcfirst( substr( $property, 3 ) ), $redbean );
-
-			$this->properties[$property]             = $beans;
-
-			$this->__info['sys.shadow.' . $property] = $beans;
-			$this->__info['tainted']                 = true;
-
-			return $this->properties[$property];
+		if ( $isOwn && !ctype_upper( substr( $property, 3, 1 ) ) ) {
+			$isOwn = false;
 		}
 
-		if ( $isShared && ctype_upper( substr( $property, 6, 1 ) ) ) {
-			$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
+		if ( $isShared && !ctype_upper( substr( $property, 6, 1 ) ) ) {
+			$isShared = false;
+		}
+
+		if ( $isShared || $isOwn ) {
+			if ( $isOwn ) {
+				$beans = $this->getOwnList( lcfirst( substr( $property, 3 ) ), $redbean );
+			} else {
+				$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
+			}
 
 			$this->properties[$property]             = $beans;
 
