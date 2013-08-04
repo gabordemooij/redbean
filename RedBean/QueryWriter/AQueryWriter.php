@@ -222,6 +222,7 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	protected function startsWithZeros( $value )
 	{
 		$value = strval( $value );
+
 		if ( strlen( $value ) > 1 && strpos( $value, '0' ) === 0 && strpos( $value, '0.' ) !== 0 ) {
 			return true;
 		} else {
@@ -244,20 +245,27 @@ abstract class RedBean_QueryWriter_AQueryWriter
 		$default = $this->defaultValue;
 		$suffix  = $this->getInsertSuffix( $type );
 		$table   = $this->esc( $type );
+
 		if ( count( $insertvalues ) > 0 && is_array( $insertvalues[0] ) && count( $insertvalues[0] ) > 0 ) {
 			foreach ( $insertcolumns as $k => $v ) {
 				$insertcolumns[$k] = $this->esc( $v );
 			}
+
 			$insertSQL = "INSERT INTO $table ( id, " . implode( ',', $insertcolumns ) . " ) VALUES
 			( $default, " . implode( ',', array_fill( 0, count( $insertcolumns ), ' ? ' ) ) . " ) $suffix";
+
+			$ids = array();
 			foreach ( $insertvalues as $i => $insertvalue ) {
 				$ids[] = $this->adapter->getCell( $insertSQL, $insertvalue, $i );
 			}
+
 			$result = count( $ids ) === 1 ? array_pop( $ids ) : $ids;
 		} else {
 			$result = $this->adapter->getCell( "INSERT INTO $table (id) VALUES($default) $suffix" );
 		}
+
 		if ( $suffix ) return $result;
+
 		$last_id = $this->adapter->getInsertID();
 
 		return $last_id;
@@ -290,7 +298,7 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	 */
 	public static function canBeTreatedAsInt( $value )
 	{
-		return (boolean) ( ctype_digit( strval( $value ) ) && strval( $value ) === strval( intval( $value ) ) );
+		return (bool) ( ctype_digit( strval( $value ) ) && strval( $value ) === strval( intval( $value ) ) );
 	}
 
 	/**
@@ -299,7 +307,8 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public static function getAssocTableFormat( $types )
 	{
 		sort( $types );
-		$assoc = ( implode( '_', $types ) );
+
+		$assoc = implode( '_', $types );
 
 		return ( isset( self::$renames[$assoc] ) ) ? self::$renames[$assoc] : $assoc;
 	}
@@ -314,6 +323,7 @@ abstract class RedBean_QueryWriter_AQueryWriter
 
 			return;
 		}
+
 		self::$renames[$from] = $to;
 	}
 
@@ -355,14 +365,19 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function glueSQLCondition( $sql, $replaceANDWithWhere = false )
 	{
 		static $snippetCache = array();
+
 		if ( trim( $sql ) === '' ) {
 			return $sql;
 		}
+
 		$key = $replaceANDWithWhere . '|' . $sql;
+
 		if ( isset( $snippetCache[$key] ) ) {
 			return $snippetCache[$key];
 		}
+
 		$lsql = ltrim( $sql );
+
 		if ( preg_match( '/^(AND|OR|WHERE|ORDER|GROUP|HAVING|LIMIT|OFFSET)\s+/i', $lsql ) ) {
 			if ( $replaceANDWithWhere && stripos( $lsql, 'AND' ) === 0 ) {
 				$snippetCache[$key] = ' WHERE ' . substr( $lsql, 3 );
@@ -388,7 +403,8 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	 */
 	public function setNewIDSQL( $sql )
 	{
-		$old                = $this->defaultValue;
+		$old = $this->defaultValue;
+
 		$this->defaultValue = $sql;
 
 		return $old;
@@ -413,9 +429,10 @@ abstract class RedBean_QueryWriter_AQueryWriter
 		$type   = $field;
 		$table  = $this->esc( $table );
 		$column = $this->esc( $column );
-		$type   = ( isset( $this->typeno_sqltype[$type] ) ) ? $this->typeno_sqltype[$type] : '';
-		$sql    = "ALTER TABLE $table ADD $column $type ";
-		$this->adapter->exec( $sql );
+
+		$type = ( isset( $this->typeno_sqltype[$type] ) ) ? $this->typeno_sqltype[$type] : '';
+
+		$this->adapter->exec( "ALTER TABLE $table ADD $column $type " );
 	}
 
 	/**
@@ -424,8 +441,10 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function updateRecord( $type, $updatevalues, $id = null )
 	{
 		$table = $type;
+
 		if ( !$id ) {
 			$insertcolumns = $insertvalues = array();
+
 			foreach ( $updatevalues as $pair ) {
 				$insertcolumns[] = $pair['property'];
 				$insertvalues[]  = $pair['value'];
@@ -433,18 +452,25 @@ abstract class RedBean_QueryWriter_AQueryWriter
 
 			return $this->insertRecord( $table, $insertcolumns, array( $insertvalues ) );
 		}
+
 		if ( $id && !count( $updatevalues ) ) {
 			return $id;
 		}
+
 		$table = $this->esc( $table );
 		$sql   = "UPDATE $table SET ";
-		$p     = $v = array();
+
+		$p = $v = array();
+
 		foreach ( $updatevalues as $uv ) {
 			$p[] = " {$this->esc( $uv["property"] )} = ? ";
 			$v[] = $uv['value'];
 		}
+
 		$sql .= implode( ',', $p ) . ' WHERE id = ? ';
+
 		$v[] = $id;
+
 		$this->adapter->exec( $sql, $v );
 
 		return $id;
@@ -456,16 +482,23 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function queryRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
 	{
 		$addSql = $this->glueSQLCondition( $addSql );
+
+		$key = null;
 		if ( $this->flagUseCache ) {
 			$key = $this->getCacheKey( array( $conditions, $addSql, $bindings, 'select' ) );
+
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
 			}
 		}
+
 		$table = $this->esc( $type );
+
 		$sql   = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
 		$sql   = "SELECT * FROM {$table} {$sql} -- keep-cache";
+
 		$rows  = $this->adapter->get( $sql, $bindings );
+
 		if ( $this->flagUseCache && $key ) {
 			$this->putResultInCache( $type, $key, $rows );
 		}
@@ -479,14 +512,19 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function queryRecordRelated( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() )
 	{
 		$addSql = $this->glueSQLCondition( $addSql, true );
+
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
+
 		$key = $this->getCacheKey( array( $sourceType, $destType, implode( ',', $linkIDs ), $addSql, $bindings ) );
+
 		if ( $this->flagUseCache && $cached = $this->getCached( $destType, $key ) ) {
 			return $cached;
 		}
+
 		$inClause = implode( ',', array_fill( 0, count( $linkIDs ), '?' ) );
+
 		if ( $sourceType === $destType ) {
-			$sql     = "
+			$sql = "
 			SELECT
 				{$destTable}.*,
 				COALESCE(
@@ -498,6 +536,7 @@ abstract class RedBean_QueryWriter_AQueryWriter
 			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
 			{$addSql}
 			-- keep-cache";
+
 			$linkIDs = array_merge( $linkIDs, $linkIDs );
 		} else {
 			$sql = "
@@ -510,8 +549,11 @@ abstract class RedBean_QueryWriter_AQueryWriter
 			{$addSql}
 			-- keep-cache";
 		}
+
 		$bindings = array_merge( $linkIDs, $bindings );
-		$rows     = $this->adapter->get( $sql, $bindings );
+
+		$rows = $this->adapter->get( $sql, $bindings );
+
 		$this->putResultInCache( $destType, $key, $rows );
 
 		return $rows;
@@ -523,21 +565,28 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function queryRecordLinks( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() )
 	{
 		$addSql = $this->glueSQLCondition( $addSql, true );
+
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
+
 		$key = $this->getCacheKey( array( $sourceType, $destType, implode( ',', $linkIDs ), $addSql, $bindings ) );
+
 		if ( $this->flagUseCache && $cached = $this->getCached( $linkTable, $key ) ) {
 			return $cached;
 		}
+
 		$inClause = implode( ',', array_fill( 0, count( $linkIDs ), '?' ) );
+
 		$selector = "{$linkTable}.*";
+
 		if ( $sourceType === $destType ) {
-			$sql     = "
+			$sql = "
 			SELECT {$selector} FROM {$linkTable}
 			INNER JOIN {$destTable} ON
 			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
 			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
 			{$addSql}
 			-- keep-cache";
+
 			$linkIDs = array_merge( $linkIDs, $linkIDs );
 		} else {
 			$sql = "
@@ -547,8 +596,11 @@ abstract class RedBean_QueryWriter_AQueryWriter
 			{$addSql}
 			-- keep-cache";
 		}
+
 		$bindings = array_merge( $linkIDs, $bindings );
-		$rows     = $this->adapter->get( $sql, $bindings );
+
+		$rows = $this->adapter->get( $sql, $bindings );
+
 		$this->putResultInCache( $linkTable, $key, $rows );
 
 		return $rows;
@@ -560,10 +612,13 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function queryRecordLink( $sourceType, $destType, $sourceID, $destID )
 	{
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
+
 		$key = $this->getCacheKey( array( $sourceType, $destType, $sourceID, $destID ) );
+
 		if ( $this->flagUseCache && $cached = $this->getCached( $linkTable, $key ) ) {
 			return $cached;
 		}
+
 		if ( $sourceTable === $destTable ) {
 			$sql = "SELECT {$linkTable}.* FROM {$linkTable}
 				WHERE ( {$sourceCol} = ? AND {$destCol} = ? ) OR
@@ -574,6 +629,7 @@ abstract class RedBean_QueryWriter_AQueryWriter
 				WHERE {$sourceCol} = ? AND {$destCol} = ? -- keep-cache";
 			$row = $this->adapter->getRow( $sql, array( $sourceID, $destID ) );
 		}
+
 		$this->putResultInCache( $linkTable, $key, $row );
 
 		return $row;
@@ -585,7 +641,9 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function queryRecordCount( $type, $conditions = array(), $addSql = null, $bindings = array() )
 	{
 		$addSql = $this->glueSQLCondition( $addSql );
+
 		$table  = $this->esc( $type );
+
 		$sql    = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
 		$sql    = "SELECT COUNT(*) FROM {$table} {$sql} -- keep-cache";
 
@@ -598,22 +656,25 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function queryRecordCountRelated( $sourceType, $destType, $linkID, $addSql = '', $bindings = array() )
 	{
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
+
 		if ( $sourceType === $destType ) {
-			$sql      = "
+			$sql = "
 			SELECT COUNT(*) FROM {$linkTable}
 			INNER JOIN {$destTable} ON
 			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? ) OR
 			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} = ? )
 			{$addSql}
 			-- keep-cache";
+
 			$bindings = array_merge( array( $linkID, $linkID ), $bindings );
 		} else {
-			$sql      = "
+			$sql = "
 			SELECT COUNT(*) FROM {$linkTable}
 			INNER JOIN {$destTable} ON
 			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} = ? )
 			{$addSql}
 			-- keep-cache";
+
 			$bindings = array_merge( array( $linkID ), $bindings );
 		}
 
@@ -626,9 +687,12 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function deleteRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
 	{
 		$addSql = $this->glueSQLCondition( $addSql );
+
 		$table  = $this->esc( $type );
+
 		$sql    = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
 		$sql    = "DELETE FROM {$table} {$sql}";
+
 		$this->adapter->exec( $sql, $bindings );
 	}
 
@@ -638,15 +702,18 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function deleteRelations( $sourceType, $destType, $sourceID )
 	{
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
+
 		if ( $sourceTable === $destTable ) {
 			$sql = "DELETE FROM {$linkTable}
 				WHERE ( {$sourceCol} = ? ) OR
 				( {$destCol} = ?  )
 			";
+
 			$this->adapter->exec( $sql, array( $sourceID, $sourceID ) );
 		} else {
 			$sql = "DELETE FROM {$linkTable}
 				WHERE {$sourceCol} = ? ";
+
 			$this->adapter->exec( $sql, array( $sourceID ) );
 		}
 	}
@@ -657,6 +724,7 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function wipe( $type )
 	{
 		$table = $this->esc( $type );
+
 		$this->adapter->exec( "TRUNCATE $table " );
 	}
 
@@ -668,37 +736,47 @@ abstract class RedBean_QueryWriter_AQueryWriter
 		$table           = $this->esc( $type );
 		$tableNoQ        = $this->esc( $type, true );
 		$targetTable     = $this->esc( $targetType );
+
 		$column          = $this->esc( $field );
 		$columnNoQ       = $this->esc( $field, true );
+
 		$targetColumn    = $this->esc( $targetField );
 		$targetColumnNoQ = $this->esc( $targetField, true );
-		$db              = $this->adapter->getCell( 'SELECT DATABASE()' );
-		$fkName          = 'fk_' . $tableNoQ . '_' . $columnNoQ . '_' . $targetColumnNoQ . ( $isDependent ? '_casc' : '' );
-		$cName           = 'cons_' . $fkName;
-		$cfks            = $this->adapter->getCell( "
+
+		$db = $this->adapter->getCell( 'SELECT DATABASE()' );
+
+		$fkName = 'fk_' . $tableNoQ . '_' . $columnNoQ . '_' . $targetColumnNoQ . ( $isDependent ? '_casc' : '' );
+		$cName  = 'cons_' . $fkName;
+
+		$cfks = $this->adapter->getCell( "
 			SELECT CONSTRAINT_NAME
 			FROM information_schema.KEY_COLUMN_USAGE
 			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME = '$tableNoQ'  AND COLUMN_NAME = '$columnNoQ' AND
 			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
 		" );
-		$flagAddKey      = false;
+
+		$flagAddKey = false;
+
 		try {
-			//No keys
+			// No keys
 			if ( !$cfks ) {
 				$flagAddKey = true; //go get a new key
 			}
-			//has fk, but different setting, --remove
+
+			// Has fk, but different setting, --remove
 			if ( $cfks && $cfks != $cName ) {
 				$this->adapter->exec( "ALTER TABLE $table DROP FOREIGN KEY $cfks " );
 				$flagAddKey = true; //go get a new key.
 			}
+
 			if ( $flagAddKey ) {
 				$this->adapter->exec( "ALTER TABLE  $table
 				ADD CONSTRAINT $cName FOREIGN KEY $fkName (  $column ) REFERENCES  $targetTable (
 				$targetColumn) ON DELETE " . ( $isDependent ? 'CASCADE' : 'SET NULL' ) . ' ON UPDATE SET NULL ;' );
 			}
 		} catch ( Exception $e ) {
-		} //Failure of fk-constraints is not a problem
+			// Failure of fk-constraints is not a problem
+		}
 	}
 
 	/**
@@ -737,7 +815,8 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	public function setUseCache( $yesNo )
 	{
 		$this->flushCache();
-		$this->flagUseCache = (boolean) $yesNo;
+
+		$this->flagUseCache = (bool) $yesNo;
 	}
 
 	/**
@@ -779,8 +858,8 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	/**
 	 * @deprecated Use addContraintForTypes instead.
 	 *
-	 * @param RedBean_Bean $bean1 bean
-	 * @param RedBean_Bean $bean2 bean
+	 * @param RedBean_OODBBean $bean1 bean
+	 * @param RedBean_OODBBean $bean2 bean
 	 *
 	 * @return mixed
 	 */
