@@ -112,6 +112,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	private function getSharedList( $type, $redbean, $toolbox )
 	{
 		$writer = $toolbox->getWriter();
+
 		if ( $this->via ) {
 			$oldName = $writer->getAssocTable( array( $this->__info['type'], $type ) );
 			if ( $oldName !== $this->via ) {
@@ -120,10 +121,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 				$this->via = null;
 			}
 		}
+
 		$type             = $this->beau( $type );
-		$linkID           = $this->properties['id'];
+
 		$assocManager     = $redbean->getAssociationManager();
+
 		$beans            = $assocManager->relatedSimple( $this, $type, $this->withSql, $this->withParams );
+
 		$this->withSql    = '';
 		$this->withParams = array();
 
