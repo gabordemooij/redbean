@@ -307,9 +307,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function inject( RedBean_OODBBean $otherBean )
 	{
-		$myID  = $this->id;
-		$array = $otherBean->export();
-		$this->import( $array );
+		$myID = $this->id;
+
+		$this->import( $otherBean->export() );
+
 		$this->id = $myID;
 
 		return $this;
