@@ -142,7 +142,8 @@ class RedBean_Finder
 	public function findOrDispense( $type, $sql = null, $bindings = array() )
 	{
 		$foundBeans = $this->find( $type, $sql, $bindings );
-		if ( count( $foundBeans ) == 0 ) {
+
+		if ( empty( $foundBeans ) ) {
 			return array( $this->redbean->dispense( $type ) );
 		} else {
 			return $foundBeans;
