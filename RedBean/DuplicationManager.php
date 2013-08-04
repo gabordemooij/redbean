@@ -186,7 +186,7 @@ class RedBean_DuplicationManager
 	 * @param array            $trail         trail to prevent infinite loops
 	 * @param boolean          $preserveIDs   preserve IDs
 	 *
-	 * @return array
+	 * @return RedBean_OODBBean
 	 */
 	protected function duplicate( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false )
 	{
@@ -327,7 +327,7 @@ class RedBean_DuplicationManager
 	 * @param array            $trail         for internal usage, pass array()
 	 * @param boolean          $preserveIDs   for internal usage
 	 *
-	 * @return array
+	 * @return RedBean_OODBBean
 	 */
 	public function dup( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false )
 	{
@@ -357,7 +357,7 @@ class RedBean_DuplicationManager
 	 * - all own bean lists (recursively)
 	 * - all shared beans (not THEIR own lists)
 	 *
-	 * @param    array|RedBean_OODBBean $beans   beans to be exported
+	 * @param   array|RedBean_OODBBean  $beans   beans to be exported
 	 * @param   boolean                 $parents also export parents
 	 * @param   array                   $filters only these types (whitelist)
 	 *
@@ -366,12 +366,16 @@ class RedBean_DuplicationManager
 	public function exportAll( $beans, $parents = false, $filters = array() )
 	{
 		$array = array();
+
 		if ( !is_array( $beans ) ) {
 			$beans = array( $beans );
 		}
+
 		foreach ( $beans as $bean ) {
 			$this->setFilters( $filters );
+
 			$duplicate = $this->dup( $bean, array(), true );
+
 			$array[]   = $duplicate->export( false, $parents, false, $filters );
 		}
 
