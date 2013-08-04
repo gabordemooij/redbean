@@ -564,20 +564,20 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		if ( !self::$flagUseBeautyCols ) return $property;
 
-		if ( strpos( $property, 'own' ) !== 0 && strpos( $property, 'shared' ) !== 0 ) {
-			if ( isset( $beautifulColumns[$property] ) ) {
-				$propertyBeau = $beautifulColumns[$property];
-			} elseif ( ctype_lower( $property ) ) {
-				return $property;
-			} else {
-				$propertyBeau                = strtolower( preg_replace( '/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $property ) );
-				$beautifulColumns[$property] = $propertyBeau;
-			}
+		if ( ctype_lower( $property ) ) return $property;
 
-			return $propertyBeau;
-		} else {
+		if (
+			strpos( $property, 'own' ) === 0
+			|| strpos( $property, 'shared' ) === 0
+		) {
 			return $property;
 		}
+
+		if ( !isset( $beautifulColumns[$property] ) ) {
+			$beautifulColumns[$property] = strtolower( preg_replace( '/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $property ) );
+		}
+
+		return $beautifulColumns[$property];
 	}
 
 	/**
