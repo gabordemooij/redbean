@@ -262,11 +262,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		if ( is_string( $selection ) ) {
 			$selection = explode( ',', $selection );
 		}
+
 		if ( !$notrim && is_array( $selection ) ) {
 			foreach ( $selection as $key => $selected ) {
 				$selection[$key] = trim( $selected );
 			}
 		}
+
 		foreach ( $arr as $key => $value ) {
 			if ( $key != '__info' ) {
 				if ( !$selection || ( $selection && in_array( $key, $selection ) ) ) {
@@ -288,8 +290,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function importFrom( RedBean_OODBBean $sourceBean )
 	{
 		$this->__info['tainted'] = true;
-		$array                   = $sourceBean->properties;
-		$this->properties        = $array;
+
+		$this->properties = $sourceBean->properties;
 
 		return $this;
 	}
