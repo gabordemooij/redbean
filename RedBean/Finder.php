@@ -120,12 +120,12 @@ class RedBean_Finder
 	public function findLast( $type, $sql = null, $bindings = array() )
 	{
 		$items = $this->find( $type, $sql, $bindings );
-		$found = end( $items );
-		if ( !$found ) {
+
+		if ( empty($items) ) {
 			return null;
 		}
 
-		return $found;
+		return end( $items );
 	}
 
 	/**
