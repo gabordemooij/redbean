@@ -18,7 +18,6 @@
  */
 class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 {
-
 	/**
 	 * HTTP Error codes used by Resty BeanCan Server.
 	 */

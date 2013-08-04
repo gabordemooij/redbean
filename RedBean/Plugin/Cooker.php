@@ -16,7 +16,6 @@
  */
 class RedBean_Plugin_Cooker implements RedBean_Plugin
 {
-
 	/**
 	 * @var boolean
 	 */
@@ -79,8 +78,10 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin
 	private function loadBean( &$array, $filterEmpty )
 	{
 		$type = $array['type'];
+
 		unset( $array['type'] );
-		if ( isset( $array['id'] ) ) { //Do we need to load the bean?
+
+		if ( isset( $array['id'] ) ) { // Do we need to load the bean?
 			if ( self::$loadBeans ) {
 				$bean = $this->redbean->load( $type, (int) $array['id'] );
 			} else {
@@ -89,6 +90,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin
 		} else {
 			$bean = $this->redbean->dispense( $type );
 		}
+
 		foreach ( $array as $property => $value ) {
 			if ( is_array( $value ) ) {
 				$bean->$property = $this->graph( $value, $filterEmpty );
@@ -112,11 +114,14 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin
 	 */
 	private function loadList( &$array, $filterEmpty )
 	{
+		$beans = array();
 		foreach ( $array as $key => $value ) {
 			$listBean = $this->graph( $value, $filterEmpty );
+
 			if ( !( $listBean instanceof RedBean_OODBBean ) ) {
 				throw new RedBean_Exception_Security( 'Expected bean but got :' . gettype( $listBean ) );
 			}
+
 			if ( $listBean->isEmpty() ) {
 				if ( !$filterEmpty ) {
 					$beans[$key] = $listBean;
@@ -170,7 +175,6 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin
 	 */
 	public function graph( $array, $filterEmpty = false )
 	{
-		$beans = array();
 		if ( is_array( $array ) && isset( $array['type'] ) ) {
 			return $this->loadBean( $array, $filterEmpty );
 		} elseif ( is_array( $array ) ) {
@@ -189,6 +193,6 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin
 	 */
 	public function setUseNullFlag( $yesNo )
 	{
-		self::$useNULLForEmptyString = (boolean) $yesNo;
+		self::$useNULLForEmptyString = (bool) $yesNo;
 	}
 }

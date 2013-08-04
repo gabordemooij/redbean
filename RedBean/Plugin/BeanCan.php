@@ -18,7 +18,6 @@
  */
 class RedBean_Plugin_BeanCan implements RedBean_Plugin
 {
-
 	/**
 	 * List of JSON RPC2 error code definitions.
 	 */

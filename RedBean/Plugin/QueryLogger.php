@@ -38,6 +38,7 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin
 	public static function getInstanceAndAttach( RedBean_Observable $adapter )
 	{
 		$queryLog = new RedBean_Plugin_QueryLogger;
+
 		$adapter->addEventListener( 'sql_exec', $queryLog );
 
 		return $queryLog;
@@ -48,8 +49,8 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin
 	 * If a query gets executed this method gets invoked because the
 	 * adapter will send a signal to the attached logger.
 	 *
-	 * @param  string            $eventName          ID of the event (name)
-	 * @param  RedBean_DBAdapter $adapter            adapter that sends the signal
+	 * @param  string                    $eventName ID of the event (name)
+	 * @param  RedBean_Adapter_DBAdapter $adapter   adapter that sends the signal
 	 *
 	 * @return void
 	 */

@@ -16,7 +16,6 @@
  */
 class RedBean_Plugin_Sync implements RedBean_Plugin
 {
-
 	/**
 	 * @var RedBean_OODB
 	 */
@@ -73,12 +72,16 @@ class RedBean_Plugin_Sync implements RedBean_Plugin
 		if ( !isset( RedBean_Facade::$toolboxes[$database1] ) ) {
 			throw new RedBean_Exception_Security( 'No database for this key: ' . $database1 );
 		}
+
 		if ( !isset( RedBean_Facade::$toolboxes[$database2] ) ) {
 			throw new RedBean_Exception_Security( 'No database for this key: ' . $database2 );
 		}
+
 		$db1  = RedBean_Facade::$toolboxes[$database1];
 		$db2  = RedBean_Facade::$toolboxes[$database2];
+
 		$sync = new self;
+
 		$sync->doSync( $db1, $db2 );
 	}
 
@@ -89,24 +92,33 @@ class RedBean_Plugin_Sync implements RedBean_Plugin
 	 */
 	private function getTranslations()
 	{
-		$longText          = str_repeat( 'lorem ipsum', 9000 );
-		$testmap           = array(
-			false, 1, 2.5, -10, 1000, 'abc', $longText, '2010-10-10', '2010-10-10 10:00:00', '10:00:00', 'POINT(1 2)'
+		$longText = str_repeat( 'lorem ipsum', 9000 );
+
+		$testmap = array(
+			false, 1, 2.5, -10,
+			1000, 'abc', $longText, '2010-10-10',
+			'2010-10-10 10:00:00', '10:00:00', 'POINT(1 2)'
 		);
+
 		$this->defaultCode = $this->targetWriter->scanType( 'string' );
+
 		foreach ( $testmap as $v ) {
 			$code        = $this->sourceWriter->scanType( $v, true );
 			$translation = $this->targetWriter->scanType( $v, true );
+
 			if ( !isset( $this->translations[$code] ) ) {
 				$this->translations[$code] = $translation;
 			}
+
 			if ( $translation > $this->translations[$code] && $translation < 50 ) {
 				$this->translations[$code] = $translation;
 			}
 		}
-		//Fix narrow translations SQLiteT stores date as double. (double != really double)
+
+		// Fix narrow translations SQLiteT stores date as double. (double != really double)
 		if ( get_class( $this->sourceWriter ) === 'RedBean_QueryWriter_SQLiteT' ) {
-			$this->translations[1] = $this->defaultCode; //use magic number in case writer not loaded.
+			// Use magic number in case writer not loaded.
+			$this->translations[1] = $this->defaultCode;
 		}
 	}
 
@@ -131,12 +143,14 @@ class RedBean_Plugin_Sync implements RedBean_Plugin
 	{
 		foreach ( $this->sourceTables as $sourceTable ) {
 			$sourceColumns = $this->sourceWriter->getColumns( $sourceTable );
-			if ( in_array( $sourceTable, $this->missingTables ) ) {
-				$targetColumns = array();
-			} else {
+
+			$targetColumns = array();
+			if ( !in_array( $sourceTable, $this->missingTables ) ) {
 				$targetColumns = $this->targetWriter->getColumns( $sourceTable );
 			}
+
 			unset( $sourceColumns['id'] );
+
 			foreach ( $sourceColumns as $sourceColumn => $sourceType ) {
 				if ( substr( $sourceColumn, -3 ) === '_id' ) {
 					$targetCode = $this->targetWriter->getTypeForID();
@@ -144,6 +158,7 @@ class RedBean_Plugin_Sync implements RedBean_Plugin
 					$sourceCode = $this->sourceWriter->code( $sourceType, true );
 					$targetCode = ( isset( $this->translations[$sourceCode] ) ) ? $this->translations[$sourceCode] : $this->defaultCode;
 				}
+
 				if ( !isset( $targetColumns[$sourceColumn] ) ) {
 					$this->targetWriter->addColumn( $sourceTable, $sourceColumn, $targetCode );
 				}
@@ -160,20 +175,24 @@ class RedBean_Plugin_Sync implements RedBean_Plugin
 	{
 		foreach ( $this->sourceTables as $sourceTable ) {
 			$sourceColumns = $this->sourceWriter->getColumns( $sourceTable );
-			//don't delete sourceType, sourceColumn needs to be the key!
+
+			// Don't delete sourceType, sourceColumn needs to be the key!
 			foreach ( $sourceColumns as $sourceColumn => $sourceType ) {
-				if ( substr( $sourceColumn, -3 ) === '_id' ) {
-					$fkTargetType  = substr( $sourceColumn, 0, strlen( $sourceColumn ) - 3 );
-					$fkType        = $sourceTable;
-					$fkField       = $sourceColumn;
-					$fkTargetField = 'id';
-					$this->targetWriter->addFK( $fkType, $fkTargetType, $fkField, $fkTargetField );
-				}
+				if ( substr( $sourceColumn, -3 ) !== '_id' ) continue;
+
+				$fkTargetType  = substr( $sourceColumn, 0, strlen( $sourceColumn ) - 3 );
+				$fkType        = $sourceTable;
+				$fkField       = $sourceColumn;
+				$fkTargetField = 'id';
+				$this->targetWriter->addFK( $fkType, $fkTargetType, $fkField, $fkTargetField );
 			}
-			//Is it a link table? -- Add Unique constraint and FK constraint
+
+			// Is it a link table? -- Add Unique constraint and FK constraint
 			if ( strpos( $sourceTable, '_' ) !== false ) {
 				$this->targetWriter->addUniqueIndex( $sourceTable, array_keys( $sourceColumns ) );
+
 				$types = explode( '_', $sourceTable );
+
 				$this->targetWriter->addConstraintForTypes(
 					$this->oodb->dispense( $types[0] )->getMeta( 'type' ),
 					$this->oodb->dispense( $types[1] )->getMeta( 'type' ) );
@@ -192,11 +211,14 @@ class RedBean_Plugin_Sync implements RedBean_Plugin
 	private function initialize( RedBean_Toolbox $source, RedBean_Toolbox $target )
 	{
 		$this->oodb          = $target->getRedBean();
+
 		$this->sourceWriter  = $source->getWriter();
 		$this->targetWriter  = $target->getWriter();
+
 		$this->sourceTables  = $this->sourceWriter->getTables();
 		$this->targetTables  = $this->targetWriter->getTables();
 		$this->missingTables = array_diff( $this->sourceTables, $this->targetTables );
+
 		$this->translations  = array();
 	}
 
@@ -213,8 +235,11 @@ class RedBean_Plugin_Sync implements RedBean_Plugin
 	public function doSync( RedBean_Toolbox $source, RedBean_Toolbox $target )
 	{
 		$this->initialize( $source, $target );
+
 		$this->getTranslations();
+
 		$this->addMissingTables();
+
 		$this->syncTablesAndColumns();
 		$this->syncConstraints();
 	}

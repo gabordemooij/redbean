@@ -16,7 +16,6 @@
  */
 class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedBean_Plugin
 {
-
 	/**
 	 * Path to file to write SQL and comments to.
 	 *
@@ -37,6 +36,7 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 		if ( !file_exists( $outputPath ) || !is_writable( $outputPath ) ) {
 			throw new RedBean_Exception_Security( 'Cannot write to file: ' . $outputPath );
 		}
+
 		$this->file = $outputPath;
 	}
 
@@ -55,16 +55,19 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 		if ( $eventName == 'sql_exec' ) {
 			$sql          = $adapter->getSQL();
 			$this->logs[] = $sql;
+
 			if ( strpos( $sql, 'ALTER' ) === 0 ) {
 				$write = "-- " . date( 'Y-m-d H:i' ) . " | Altering table. \n";
 				$write .= $sql;
 				$write .= "\n\n";
 			}
+
 			if ( strpos( $sql, 'CREATE' ) === 0 ) {
 				$write = "-- " . date( 'Y-m-d H:i' ) . " | Creating new table. \n";
 				$write .= $sql;
 				$write .= "\n\n";
 			}
+
 			if ( isset( $write ) ) {
 				file_put_contents( $this->file, $write, FILE_APPEND );
 			}
