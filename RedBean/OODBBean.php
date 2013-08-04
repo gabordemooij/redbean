@@ -384,7 +384,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function exportToObj( $object )
 	{
 		foreach ( $this->properties as $key => $value ) {
-			if ( !is_array( $value ) && !is_object( $value ) ) {
+			if ( is_scalar( $value ) ) {
 				$object->$key = $value;
 			}
 		}
