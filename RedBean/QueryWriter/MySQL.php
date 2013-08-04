@@ -119,9 +119,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
 			RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT    => ' POINT ',
 		);
+
 		$this->sqltype_typeno = array();
-		foreach ( $this->typeno_sqltype as $k => $v )
+
+		foreach ( $this->typeno_sqltype as $k => $v ) {
 			$this->sqltype_typeno[trim( strtolower( $v ) )] = $k;
+		}
+
 		$this->adapter = $adapter;
 	}
 
@@ -150,7 +154,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function createTable( $table )
 	{
 		$table = $this->esc( $table );
+
 		$sql   = "CREATE TABLE $table (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ";
+
 		$this->adapter->exec( $sql );
 	}
 
@@ -159,9 +165,11 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function getColumns( $table )
 	{
-		$table      = $this->esc( $table );
-		$columnsRaw = $this->adapter->get( "DESCRIBE $table" );
-		foreach ( $columnsRaw as $r ) $columns[$r['Field']] = $r['Type'];
+		$columnsRaw = $this->adapter->get( "DESCRIBE " . $this->esc( $table ) );
+
+		foreach ( $columnsRaw as $r ) {
+			$columns[$r['Field']] = $r['Type'];
+		}
 
 		return $columns;
 	}
@@ -172,7 +180,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function scanType( $value, $flagSpecial = false )
 	{
 		$this->svalue = $value;
+
 		if ( is_null( $value ) ) return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
+
 		if ( $flagSpecial ) {
 			if ( preg_match( '/^\d{4}\-\d\d-\d\d$/', $value ) ) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE;
@@ -181,25 +191,31 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME;
 			}
 		}
-		$value = strval( $value );
-		if ( !$this->startsWithZeros( $value ) ) {
 
+		$value = strval( $value );
+
+		if ( !$this->startsWithZeros( $value ) ) {
 			if ( $value === true || $value === false || $value === '1' || $value === '' ) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 			}
+
 			if ( is_numeric( $value ) && ( floor( $value ) == $value ) && $value >= 0 && $value <= 255 ) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT8;
 			}
+
 			if ( is_numeric( $value ) && ( floor( $value ) == $value ) && $value >= 0 && $value <= 4294967295 ) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32;
 			}
+
 			if ( is_numeric( $value ) ) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_DOUBLE;
 			}
 		}
+
 		if ( mb_strlen( $value, 'UTF-8' ) <= 255 ) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT8;
 		}
+
 		if ( mb_strlen( $value, 'UTF-8' ) <= 65535 ) {
 			return RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT16;
 		}
@@ -212,10 +228,16 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function code( $typedescription, $includeSpecials = false )
 	{
-		$r = ( ( isset( $this->sqltype_typeno[$typedescription] ) ) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED );
+		if ( isset( $this->sqltype_typeno[$typedescription] ) ) {
+			$r = $this->sqltype_typeno[$typedescription];
+		} else {
+			$r = self::C_DATATYPE_SPECIFIED;
+		}
+
 		if ( $includeSpecials ) {
 			return $r;
 		}
+
 		if ( $r > RedBean_QueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
 			return self::C_DATATYPE_SPECIFIED;
 		}
@@ -228,13 +250,15 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function widenColumn( $type, $column, $datatype )
 	{
-		$table           = $type;
-		$type            = $datatype;
-		$table           = $this->esc( $table );
-		$column          = $this->esc( $column );
-		$newtype         = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
-		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
-		$this->adapter->exec( $changecolumnSQL );
+		$table   = $type;
+		$type    = $datatype;
+
+		$table   = $this->esc( $table );
+		$column  = $this->esc( $column );
+
+		$newtype = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
+
+		$this->adapter->exec( "ALTER TABLE $table CHANGE $column $column $newtype " );
 	}
 
 	/**
@@ -243,12 +267,17 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function addUniqueIndex( $table, $columns )
 	{
 		$table = $this->esc( $table );
-		sort( $columns ); //else we get multiple indexes due to order-effects
+
+		sort( $columns ); // Else we get multiple indexes due to order-effects
+
 		foreach ( $columns as $k => $v ) {
 			$columns[$k] = $this->esc( $v );
 		}
+
 		$r    = $this->adapter->get( "SHOW INDEX FROM $table" );
+
 		$name = 'UQ_' . sha1( implode( ',', $columns ) );
+
 		if ( $r ) {
 			foreach ( $r as $i ) {
 				if ( $i['Key_name'] == $name ) {
@@ -256,8 +285,10 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 				}
 			}
 		}
+
 		$sql = "ALTER IGNORE TABLE $table
                 ADD UNIQUE INDEX $name (" . implode( ',', $columns ) . ")";
+
 		$this->adapter->exec( $sql );
 	}
 
@@ -268,9 +299,13 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	{
 		$table  = $type;
 		$table  = $this->esc( $table );
+
 		$name   = preg_replace( '/\W/', '', $name );
+
 		$column = $this->esc( $column );
+
 		foreach ( $this->adapter->get( "SHOW INDEX FROM $table " ) as $ind ) if ( $ind['Key_name'] === $name ) return;
+
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
 		} catch ( Exception $e ) {
@@ -297,16 +332,19 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	public function wipeAll()
 	{
 		$this->adapter->exec( 'SET FOREIGN_KEY_CHECKS = 0;' );
+
 		foreach ( $this->getTables() as $t ) {
 			try {
 				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
 			} catch ( Exception $e ) {
 			}
+
 			try {
 				$this->adapter->exec( "DROP VIEW IF EXISTS `$t`" );
 			} catch ( Exception $e ) {
 			}
 		}
+
 		$this->adapter->exec( 'SET FOREIGN_KEY_CHECKS = 1;' );
 	}
 }
