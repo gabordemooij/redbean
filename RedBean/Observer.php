@@ -1,7 +1,7 @@
 <?php
 /**
  * Observer
- * 
+ *
  * @file    RedBean/Observer.php
  * @desc    Part of the observer pattern in RedBean
  * @author  Gabor de Mooijand the RedBeanPHP community
@@ -11,13 +11,14 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-interface RedBean_Observer {
-	
+interface RedBean_Observer
+{
+
 	/**
 	 * @param string $eventname
-	 * @param RedBean_OODBBean mixed $info
-	 * 
+	 * @param        RedBean_OODBBean mixed $info
+	 *
 	 * @return void
 	 */
-	public function onEvent($eventname, $bean);
+	public function onEvent( $eventname, $bean );
 }

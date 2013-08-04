@@ -2,7 +2,7 @@
 /**
  * QueryWriter
  * Interface for QueryWriters
- * 
+ *
  * @file    RedBean/QueryWriter.php
  * @desc    Describes the API for a QueryWriter
  * @author  Gabor de Mooij and the RedBeanPHP community
@@ -21,13 +21,14 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-interface RedBean_QueryWriter {
-	
+interface RedBean_QueryWriter
+{
+
 	/**
 	 * Query Writer constants.
 	 */
-	const C_SQLSTATE_NO_SUCH_TABLE = 1;
-	const C_SQLSTATE_NO_SUCH_COLUMN = 2;
+	const C_SQLSTATE_NO_SUCH_TABLE                  = 1;
+	const C_SQLSTATE_NO_SUCH_COLUMN                 = 2;
 	const C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION = 3;
 
 	/**
@@ -35,11 +36,10 @@ interface RedBean_QueryWriter {
 	 *
 	 * 00 - 80: normal data types
 	 * 80 - 99: special data types, only scan/code if requested
-	 * 99     : specified by user, don't change 
+	 * 99     : specified by user, don't change
 	 */
-	const C_DATATYPE_RANGE_SPECIAL = 80;	
+	const C_DATATYPE_RANGE_SPECIAL   = 80;
 	const C_DATATYPE_RANGE_SPECIFIED = 99;
-	
 
 	/**
 	 * Returns the tables that are in the database.
@@ -47,7 +47,7 @@ interface RedBean_QueryWriter {
 	 * @return array
 	 */
 	public function getTables();
-	
+
 	/**
 	 * This method will create a table for the bean.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -56,8 +56,8 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return void
 	 */
-	public function createTable($type);
-	
+	public function createTable( $type );
+
 	/**
 	 * Returns an array containing all the columns of the specified type.
 	 * The format of the return array looks like this:
@@ -70,8 +70,8 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return array
 	 */
-	public function getColumns($type);
-	
+	public function getColumns( $type );
+
 	/**
 	 * Returns the Column Type Code (integer) that corresponds
 	 * to the given value type. This method is used to determine the minimum
@@ -81,8 +81,8 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return integer
 	 */
-	public function scanType($value, $alsoScanSpecialForTypes = false);
-	
+	public function scanType( $value, $alsoScanSpecialForTypes = false );
+
 	/**
 	 * This method will add a column to a table.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -93,8 +93,8 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return void
 	 */
-	public function addColumn($type, $column, $field);
-	
+	public function addColumn( $type, $column, $field );
+
 	/**
 	 * Returns the Type Code for a Column Description.
 	 * Given an SQL column description this method will return the corresponding
@@ -107,8 +107,8 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return integer
 	 */
-	public function code($typedescription, $includeSpecials = false);
-	
+	public function code( $typedescription, $includeSpecials = false );
+
 	/**
 	 * This method will widen the column to the specified data type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -119,88 +119,88 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return void
 	 */
-	public function widenColumn($type, $column, $datatype);
-	
+	public function widenColumn( $type, $column, $datatype );
+
 	/**
 	 * Selects records from the database.
 	 * This methods selects the records from the database that match the specified
 	 * type, conditions (optional) and additional SQL snippet (optional).
-	 * 
-	 * @param string  $type       name of the table you want to query
-	 * @param array   $conditions criteria ( $column => array( $values ) )
-	 * @param string  $addSQL     additional SQL snippet
-	 * @param array   $bindings   bindings for SQL snippet
-	 * 
-	 * @return array
-	 */
-	public function queryRecord($type, $conditions = array(), $addSql = null, $bindings = array());
-
-	/**
-	 * Returns records through an intermediate type. This method is used to obtain records using a link table and
-	 * allows the SQL snippets to reference columns in the link table for additional filtering or ordering.
-	 * 
-	 * @param string $sourceType source type, the reference type you want to use to fetch related items on the other side
-	 * @param string $destType   destination type, the target type you want to get beans of
-	 * @param mixed  $linkID     ID to use for the link table
-	 * @param string $addSql     Additional SQL snippet
-	 * @param array  $bindings   Bindings for SQL snippet
-	 * 
-	 * @return array
-	 */
-	public function queryRecordRelated($sourceType, $destType, $linkID, $addSql = '', $bindings = array());
-	
-	/**
-	 * Returns linking records. This method is used to obtain records using a link table and
-	 * allows the SQL snippets to reference columns in the link table for additional filtering or ordering.
-	 * 
-	 * @param string $sourceType source type, the reference type you want to use to fetch related items on the other side
-	 * @param string $destType   destination type, the target type you want to get beans of
-	 * @param mixed  $linkID     ID to use for the link table
-	 * @param string $addSql     Additional SQL snippet
-	 * @param array  $bindings   Bindings for SQL snippet
-	 * 
-	 * @return array
-	 */
-	public function queryRecordLinks($sourceType, $destType, $linkIDs, $addSql = '', $bindings = array());
-	
-	/**
-	 * Returns the row that links $sourceType $sourcID to $destType $destID in an N-M relation.
-	 * 
-	 * @param string $sourceType source type, the first part of the link you're looking for
-	 * @param string $destType   destination type, the second part of the link you're looking for
-	 * @param string $sourceID   ID for the source
-	 * @param string $destID     ID for the destination
-	 * 
-	 * @return array|null
-	 */
-	public function queryRecordLink($sourceType, $destType, $sourceID, $destID);
-	
-	/**
-	 * Counts the number of records in the database that match the
-	 * conditions and additional SQL.
-	 * 
+	 *
 	 * @param string $type       name of the table you want to query
 	 * @param array  $conditions criteria ( $column => array( $values ) )
 	 * @param string $addSQL     additional SQL snippet
 	 * @param array  $bindings   bindings for SQL snippet
-	 * 
+	 *
+	 * @return array
+	 */
+	public function queryRecord( $type, $conditions = array(), $addSql = null, $bindings = array() );
+
+	/**
+	 * Returns records through an intermediate type. This method is used to obtain records using a link table and
+	 * allows the SQL snippets to reference columns in the link table for additional filtering or ordering.
+	 *
+	 * @param string $sourceType source type, the reference type you want to use to fetch related items on the other side
+	 * @param string $destType   destination type, the target type you want to get beans of
+	 * @param mixed  $linkID     ID to use for the link table
+	 * @param string $addSql     Additional SQL snippet
+	 * @param array  $bindings   Bindings for SQL snippet
+	 *
+	 * @return array
+	 */
+	public function queryRecordRelated( $sourceType, $destType, $linkID, $addSql = '', $bindings = array() );
+
+	/**
+	 * Returns linking records. This method is used to obtain records using a link table and
+	 * allows the SQL snippets to reference columns in the link table for additional filtering or ordering.
+	 *
+	 * @param string $sourceType source type, the reference type you want to use to fetch related items on the other side
+	 * @param string $destType   destination type, the target type you want to get beans of
+	 * @param mixed  $linkID     ID to use for the link table
+	 * @param string $addSql     Additional SQL snippet
+	 * @param array  $bindings   Bindings for SQL snippet
+	 *
+	 * @return array
+	 */
+	public function queryRecordLinks( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() );
+
+	/**
+	 * Returns the row that links $sourceType $sourcID to $destType $destID in an N-M relation.
+	 *
+	 * @param string $sourceType source type, the first part of the link you're looking for
+	 * @param string $destType   destination type, the second part of the link you're looking for
+	 * @param string $sourceID   ID for the source
+	 * @param string $destID     ID for the destination
+	 *
+	 * @return array|null
+	 */
+	public function queryRecordLink( $sourceType, $destType, $sourceID, $destID );
+
+	/**
+	 * Counts the number of records in the database that match the
+	 * conditions and additional SQL.
+	 *
+	 * @param string $type       name of the table you want to query
+	 * @param array  $conditions criteria ( $column => array( $values ) )
+	 * @param string $addSQL     additional SQL snippet
+	 * @param array  $bindings   bindings for SQL snippet
+	 *
 	 * @return integer
 	 */
-	public function queryRecordCount($type, $conditions = array(), $addSql = null, $bindings = array());
-	
+	public function queryRecordCount( $type, $conditions = array(), $addSql = null, $bindings = array() );
+
 	/**
 	 * Returns the number of records linked through $linkType and satisfying the SQL in $addSQL/$bindings.
-	 *  
+	 *
 	 * @param string $sourceType source type
 	 * @param string $targetType the thing you want to count
 	 * @param mixed  $linkID     the of the source type
 	 * @param string $addSQL     additional SQL snippet
 	 * @param array  $bindings   bindings for SQL snippet
-	 * 
+	 *
 	 * @return integer
 	 */
-	public function queryRecordCountRelated($sourceType, $targetType, $linkID, $addSQL = '', $bindings = array());
-	
+	public function queryRecordCountRelated( $sourceType, $targetType, $linkID, $addSQL = '', $bindings = array() );
+
 	/**
 	 * This method should update (or insert a record), it takes
 	 * a table name, a list of update values ( $field => $value ) and an
@@ -209,38 +209,38 @@ interface RedBean_QueryWriter {
 	 * Returns the new ID.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string  $type         name of the table to update
-	 * @param array   $updatevalues list of update values
-	 * @param integer $id			  optional primary key ID value
+	 * @param string  $type            name of the table to update
+	 * @param array   $updatevalues    list of update values
+	 * @param integer $id              optional primary key ID value
 	 *
 	 * @return integer
 	 */
-	public function updateRecord($type, $updatevalues, $id = null);
-	
+	public function updateRecord( $type, $updatevalues, $id = null );
+
 	/**
 	 * Deletes records from the database.
 	 * @note $addSql is always prefixed with ' WHERE ' or ' AND .'
-	 * 
-	 * @param string       $type       name of the table you want to query
-	 * @param array        $conditions criteria ( $column => array( $values ) )
-	 * @param string       $sql        additional SQL
-	 * @param array        $bindings   bindings
-	 * 
+	 *
+	 * @param string $type       name of the table you want to query
+	 * @param array  $conditions criteria ( $column => array( $values ) )
+	 * @param string $sql        additional SQL
+	 * @param array  $bindings   bindings
+	 *
 	 * @return void
 	 */
-	public function deleteRecord($type, $conditions = array(), $addSql = '', $bindings = array());
-	
+	public function deleteRecord( $type, $conditions = array(), $addSql = '', $bindings = array() );
+
 	/**
 	 * Deletes all links between $sourceType and $destType in an N-M relation.
-	 * 
+	 *
 	 * @param string $sourceType source type
 	 * @param string $destType   destination type
 	 * @param string $sourceID   source ID
-	 * 
+	 *
 	 * @return void
 	 */
-	public function deleteRelations($sourceType, $destType, $sourceID);
-	
+	public function deleteRelations( $sourceType, $destType, $sourceID );
+
 	/**
 	 * This method will add a UNIQUE constraint index to a table on columns $columns.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -250,8 +250,8 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return void
 	 */
-	public function addUniqueIndex($type, $columns);
-	
+	public function addUniqueIndex( $type, $columns );
+
 	/**
 	 * This method will check whether the SQL state is in the list of specified states
 	 * and returns true if it does appear in this list or false if it
@@ -264,8 +264,8 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return boolean
 	 */
-	public function sqlStateIn($state, $list);
-	
+	public function sqlStateIn( $state, $list );
+
 	/**
 	 * This method will remove all beans of a certain type.
 	 * This methods accepts a type and infers the corresponding table name.
@@ -274,19 +274,18 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return void
 	 */
-	public function wipe($type);
-	
-	
+	public function wipe( $type );
+
 	/**
 	 * Given two types this method will add a foreign key constraint.
-	 * 
+	 *
 	 * @param string $sourceType source type
 	 * @param string $destType   destination type
-	 * 
+	 *
 	 * @return void
 	 */
-	public function addConstraintForTypes($sourceType, $destType);
-	
+	public function addConstraintForTypes( $sourceType, $destType );
+
 	/**
 	 * This method will add a foreign key from type and field to
 	 * target type and target field.
@@ -297,15 +296,15 @@ interface RedBean_QueryWriter {
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 *
-	 * @param  string $type	       type that will have a foreign key field
-	 * @param  string $targetType  points to this type
-	 * @param  string $field       field that contains the foreign key value
-	 * @param  string $targetField field where the fk points to
+	 * @param  string $type           type that will have a foreign key field
+	 * @param  string $targetType     points to this type
+	 * @param  string $field          field that contains the foreign key value
+	 * @param  string $targetField    field where the fk points to
 	 *
 	 * @return void
 	 */
-	public function addFK($type, $targetType, $field, $targetField);
-	
+	public function addFK( $type, $targetType, $field, $targetField );
+
 	/**
 	 * This method will add an index to a type and field with name
 	 * $name.
@@ -317,53 +316,53 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return void
 	 */
-	public function addIndex($type, $name, $column);
-	
+	public function addIndex( $type, $name, $column );
+
 	/**
 	 * Checks and filters a database structure element like a table of column
 	 * for safe use in a query. A database structure has to conform to the
 	 * RedBeanPHP DB security policy which basically means only alphanumeric
 	 * symbols are allowed. This security policy is more strict than conventional
 	 * SQL policies and does therefore not require database specific escaping rules.
-	 * 
+	 *
 	 * @param string  $databaseStructure name of the column/table to check
 	 * @param boolean $noQuotes          TRUE to NOT put backticks or quotes around the string
-	 * 
-	 * @return string 
+	 *
+	 * @return string
 	 */
-	public function esc($databaseStructure, $dontQuote = false);
-	
+	public function esc( $databaseStructure, $dontQuote = false );
+
 	/**
 	 * Removes all tables and views from the database.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function wipeAll();
-	
+
 	/**
 	 * Renames an association. For instance if you would like to refer to
 	 * album_song as: track you can specify this by calling this method like:
-	 * 
+	 *
 	 * renameAssociation('album_song','track')
-	 * 
+	 *
 	 * This allows:
-	 * 
-	 * $album->sharedSong 
-	 * 
+	 *
+	 * $album->sharedSong
+	 *
 	 * to add/retrieve beans from track instead of album_song.
 	 * Also works for exportAll().
-	 * 
+	 *
 	 * This method also accepts a single associative array as
 	 * its first argument.
-	 * 
+	 *
 	 * @param string|array $from
-	 * @param string $to (optional)
-	 * 
-	 * @return void 
+	 * @param string       $to (optional)
+	 *
+	 * @return void
 	 */
-	public function renameAssocTable($from, $to = null);
-	
-	/** 
+	public function renameAssocTable( $from, $to = null );
+
+	/**
 	 * Returns the format for link tables.
 	 * Given an array containing two type names this method returns the
 	 * name of the link table to be used to store and retrieve
@@ -373,5 +372,5 @@ interface RedBean_QueryWriter {
 	 *
 	 * @return string
 	 */
-	public function getAssocTable($types);
+	public function getAssocTable( $types );
 }

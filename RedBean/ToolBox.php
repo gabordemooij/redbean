@@ -1,9 +1,9 @@
 <?php
 /**
- * @file    RedBean/ToolBox.php
- * @desc    A RedBeanPHP-wide service locator
- * @author	Gabor de Mooij and the RedBeanPHP community
- * @license BSD/GPLv2
+ * @file      RedBean/ToolBox.php
+ * @desc      A RedBeanPHP-wide service locator
+ * @author    Gabor de Mooij and the RedBeanPHP community
+ * @license   BSD/GPLv2
  *
  * ToolBox.
  * The toolbox is an integral part of RedBeanPHP providing the basic
@@ -11,28 +11,29 @@
  * like plugins. A toolbox contains the three core components of RedBeanPHP:
  * the adapter, the query writer and the core functionality of RedBeanPHP in
  * OODB.
- * 
+ *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_ToolBox {
-	
+class RedBean_ToolBox
+{
+
 	/**
 	 * @var RedBean_OODB
 	 */
 	protected $oodb;
-	
+
 	/**
 	 * @var RedBean_QueryWriter
 	 */
 	protected $writer;
-	
+
 	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
 	protected $adapter;
-	
+
 	/**
 	 * Constructor.
 	 * The toolbox is an integral part of RedBeanPHP providing the basic
@@ -47,37 +48,42 @@ class RedBean_ToolBox {
 	 *
 	 * @return RedBean_ToolBox
 	 */
-	public function __construct(RedBean_OODB $oodb, RedBean_Adapter $adapter, RedBean_QueryWriter $writer) {
-		$this->oodb = $oodb;
+	public function __construct( RedBean_OODB $oodb, RedBean_Adapter $adapter, RedBean_QueryWriter $writer )
+	{
+		$this->oodb    = $oodb;
 		$this->adapter = $adapter;
-		$this->writer = $writer;
+		$this->writer  = $writer;
+
 		return $this;
 	}
-	
+
 	/**
 	 * Returns the query writer in this toolbox.
-	 * 
+	 *
 	 * @return RedBean_QueryWriter
 	 */
-	public function getWriter() {
+	public function getWriter()
+	{
 		return $this->writer;
 	}
-	
+
 	/**
 	 * Returns the OODB instance in this toolbox.
-	 * 
+	 *
 	 * @return RedBean_OODB
 	 */
-	public function getRedBean() {
+	public function getRedBean()
+	{
 		return $this->oodb;
 	}
-	
+
 	/**
 	 * Returns the database adapter in this toolbox.
-	 * 
+	 *
 	 * @return RedBean_Adapter_DBAdapter
 	 */
-	public function getDatabaseAdapter() {
+	public function getDatabaseAdapter()
+	{
 		return $this->adapter;
 	}
 }

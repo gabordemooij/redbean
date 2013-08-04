@@ -1,32 +1,34 @@
 <?php
 /**
  * Label Maker
- * 
- * @file    RedBean/LabelMaker.php
- * @desc    Makes so-called label beans
- * @author  Gabor de Mooij and the RedBeanPHP Community
- * @license	BSD/GPLv2
+ *
+ * @file       RedBean/LabelMaker.php
+ * @desc       Makes so-called label beans
+ * @author     Gabor de Mooij and the RedBeanPHP Community
+ * @license    BSD/GPLv2
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_LabelMaker {	
-	
+class RedBean_LabelMaker
+{
+
 	/**
-	 * @var RedBean_Toolbox 
+	 * @var RedBean_Toolbox
 	 */
 	protected $toolbox;
-	
+
 	/**
 	 * Constructor.
-	 * 
-	 * @param RedBean_ToolBox $toolbox 
+	 *
+	 * @param RedBean_ToolBox $toolbox
 	 */
-	public function __construct(RedBean_ToolBox $toolbox) {
+	public function __construct( RedBean_ToolBox $toolbox )
+	{
 		$this->toolbox = $toolbox;
 	}
-	
+
 	/**
 	 * A label is a bean with only an id, type and name property.
 	 * This function will dispense beans for all entries in the array. The
@@ -38,16 +40,18 @@ class RedBean_LabelMaker {
 	 *
 	 * @return array
 	 */
-	public function dispenseLabels($type, $labels) {
+	public function dispenseLabels( $type, $labels )
+	{
 		$labelBeans = array();
-		foreach($labels as $label) {
-			$labelBean = $this->toolbox->getRedBean()->dispense($type);
+		foreach ( $labels as $label ) {
+			$labelBean       = $this->toolbox->getRedBean()->dispense( $type );
 			$labelBean->name = $label;
-			$labelBeans[] = $labelBean;
+			$labelBeans[]    = $labelBean;
 		}
+
 		return $labelBeans;
 	}
-	
+
 	/**
 	 * Gathers labels from beans. This function loops through the beans,
 	 * collects the values of the name properties of each individual bean
@@ -58,12 +62,16 @@ class RedBean_LabelMaker {
 	 *
 	 * @return array
 	 */
-	public function gatherLabels($beans) {
+	public function gatherLabels( $beans )
+	{
 		$labels = array();
-		foreach($beans as $bean) {
+
+		foreach ( $beans as $bean ) {
 			$labels[] = $bean->name;
 		}
-		sort($labels);
+
+		sort( $labels );
+
 		return $labels;
 	}
 }

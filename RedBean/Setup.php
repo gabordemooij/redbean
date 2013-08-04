@@ -2,7 +2,7 @@
 /**
  * RedBean Setup
  * Helper class to quickly setup RedBean for you.
- * 
+ *
  * @file    RedBean/Setup.php
  * @desc    Helper class to quickly setup RedBean for you
  * @author  Gabor de Mooij and the RedBeanPHP community
@@ -12,8 +12,9 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Setup {
-	
+class RedBean_Setup
+{
+
 	/**
 	 * This method checks the DSN string.
 	 * Checks the validity of the DSN string.
@@ -21,16 +22,18 @@ class RedBean_Setup {
 	 * will trigger an error.
 	 *
 	 * @param string $dsn
-	 * 
+	 *
 	 * @return boolean
 	 */
-	private static function checkDSN($dsn) {
-		if (!preg_match('/^(mysql|sqlite|pgsql|cubrid|oracle):/', strtolower(trim($dsn)))) {
-			trigger_error('Unsupported DSN');
+	private static function checkDSN( $dsn )
+	{
+		if ( !preg_match( '/^(mysql|sqlite|pgsql|cubrid|oracle):/', strtolower( trim( $dsn ) ) ) ) {
+			trigger_error( 'Unsupported DSN' );
 		}
+
 		return true;
 	}
-	
+
 	/**
 	 * Initializes the database and prepares a toolbox.
 	 *
@@ -41,33 +44,43 @@ class RedBean_Setup {
 	 *
 	 * @return RedBean_ToolBox
 	 */
-	public static function kickstart($dsn, $username = null, $password = null, $frozen = false ) {
-		if ($dsn instanceof PDO) {
-			$db = new RedBean_Driver_PDO($dsn); $dsn = $db->getDatabaseType();
+	public static function kickstart( $dsn, $username = null, $password = null, $frozen = false )
+	{
+		if ( $dsn instanceof PDO ) {
+			$db  = new RedBean_Driver_PDO( $dsn );
+			$dsn = $db->getDatabaseType();
 		} else {
-			self::checkDSN($dsn);
-			if (strpos($dsn, 'oracle') === 0) 
-				$db = new RedBean_Driver_OCI($dsn, $username, $password);	
-			else
-				$db = new RedBean_Driver_PDO($dsn, $username, $password);			
+			self::checkDSN( $dsn );
+
+			if ( strpos( $dsn, 'oracle' ) === 0 ) {
+				$db = new RedBean_Driver_OCI( $dsn, $username, $password );
+			} else {
+				$db = new RedBean_Driver_PDO( $dsn, $username, $password );
+			}
 		}
-		$adapter = new RedBean_Adapter_DBAdapter($db);
-		if (strpos($dsn, 'pgsql') === 0) {
-			$writer = new RedBean_QueryWriter_PostgreSQL($adapter);
-		} else if (strpos($dsn, 'sqlite') === 0) {
-			$writer = new RedBean_QueryWriter_SQLiteT($adapter);
-		} else if (strpos($dsn, 'cubrid') === 0) {
-			$writer = new RedBean_QueryWriter_CUBRID($adapter);
-		} else if (strpos($dsn, 'oracle') === 0) {
-			$writer = new RedBean_QueryWriter_Oracle($adapter);
-		} else { 
-			$writer = new RedBean_QueryWriter_MySQL($adapter);
+
+		$adapter = new RedBean_Adapter_DBAdapter( $db );
+
+		if ( strpos( $dsn, 'pgsql' ) === 0 ) {
+			$writer = new RedBean_QueryWriter_PostgreSQL( $adapter );
+		} else if ( strpos( $dsn, 'sqlite' ) === 0 ) {
+			$writer = new RedBean_QueryWriter_SQLiteT( $adapter );
+		} else if ( strpos( $dsn, 'cubrid' ) === 0 ) {
+			$writer = new RedBean_QueryWriter_CUBRID( $adapter );
+		} else if ( strpos( $dsn, 'oracle' ) === 0 ) {
+			$writer = new RedBean_QueryWriter_Oracle( $adapter );
+		} else {
+			$writer = new RedBean_QueryWriter_MySQL( $adapter );
 		}
-		$redbean = new RedBean_OODB($writer);
-		if ($frozen) {
-			$redbean->freeze(true);
+
+		$redbean = new RedBean_OODB( $writer );
+
+		if ( $frozen ) {
+			$redbean->freeze( true );
 		}
-		$toolbox = new RedBean_ToolBox($redbean, $adapter, $writer);
+
+		$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
+
 		return $toolbox;
 	}
 }
