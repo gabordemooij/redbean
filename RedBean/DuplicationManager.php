@@ -199,11 +199,7 @@ class RedBean_DuplicationManager
 		$copy = $this->createCopy( $bean );
 		foreach ( $this->tables as $table ) {
 			if (
-				(
-					is_array( $this->filters )
-					&& count( $this->filters )
-					&& !in_array( $table, $this->filters )
-				)
+				( !empty( $this->filters ) && !in_array( $table, $this->filters ) )
 				|| $table == $type
 			) {
 				continue;
