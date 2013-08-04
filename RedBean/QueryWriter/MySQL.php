@@ -56,32 +56,42 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	{
 		try {
 			$db  = $this->adapter->getCell( 'SELECT database()' );
-			$fks = $this->adapter->getCell( "
-				SELECT count(*)
+
+			$fks = $this->adapter->getCell(
+				"SELECT count(*)
 				FROM information_schema.KEY_COLUMN_USAGE
 				WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND
-				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME IS NOT NULL
-					  ", array( $db, $table ) );
-			//already foreign keys added in this association table
+				CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME IS NOT NULL",
+				array( $db, $table )
+			);
+
+			// already foreign keys added in this association table
 			if ( $fks > 0 ) {
 				return false;
 			}
+
 			$columns = $this->getColumns( $table );
+
 			if ( $this->code( $columns[$property1] ) !== RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32 ) {
 				$this->widenColumn( $table, $property1, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32 );
 			}
+
 			if ( $this->code( $columns[$property2] ) !== RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32 ) {
 				$this->widenColumn( $table, $property2, RedBean_QueryWriter_MySQL::C_DATATYPE_UINT32 );
 			}
+
 			$sql = "
 				ALTER TABLE " . $this->esc( $table ) . "
 				ADD FOREIGN KEY($property1) references `$table1`(id) ON DELETE CASCADE;
 			";
+
 			$this->adapter->exec( $sql );
+
 			$sql = "
 				ALTER TABLE " . $this->esc( $table ) . "
 				ADD FOREIGN KEY($property2) references `$table2`(id) ON DELETE CASCADE
 			";
+
 			$this->adapter->exec( $sql );
 
 			return true;
