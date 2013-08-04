@@ -148,10 +148,10 @@ class RedBean_Facade
 	 */
 	public static function setup( $dsn = null, $username = null, $password = null, $frozen = false )
 	{
-		$tmp = sys_get_temp_dir();
 		if ( is_null( $dsn ) ) {
-			$dsn = 'sqlite:/' . $tmp . '/red.db';
+			$dsn = 'sqlite:/' . sys_get_temp_dir() . '/red.db';
 		}
+
 		self::addDatabase( 'default', $dsn, $username, $password, $frozen );
 		self::selectDatabase( 'default' );
 
@@ -193,7 +193,9 @@ class RedBean_Facade
 		if ( !is_callable( $callback ) ) {
 			throw new RedBean_Exception_Security( 'R::transaction needs a valid callback.' );
 		}
+
 		static $depth = 0;
+
 		try {
 			if ( $depth == 0 ) {
 				self::begin();
@@ -242,6 +244,7 @@ class RedBean_Facade
 		if ( self::$currentDB === $key ) {
 			return false;
 		}
+
 		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 		self::$currentDB = $key;
 
@@ -260,8 +263,14 @@ class RedBean_Facade
 	 */
 	public static function debug( $tf = true, $logger = null )
 	{
-		if ( !$logger ) $logger = new RedBean_Logger_Default;
-		if ( !isset( self::$adapter ) ) throw new RedBean_Exception_Security( 'Use R::setup() first.' );
+		if ( !$logger ) {
+			$logger = new RedBean_Logger_Default;
+		}
+
+		if ( !isset( self::$adapter ) ) {
+			throw new RedBean_Exception_Security( 'Use R::setup() first.' );
+		}
+
 		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
 	}
 
@@ -311,16 +320,16 @@ class RedBean_Facade
 		if ( is_string( $types ) && strpos( $types, ',' ) !== false ) {
 			$types = explode( ',', $types );
 		}
-		if ( is_array( $types ) ) {
-			$list = array();
-			foreach ( $types as $typeItem ) {
-				$list[] = self::$redbean->load( $typeItem, $id );
-			}
 
-			return $list;
+		if ( !is_array( $types ) ) {
+			return array();
 		}
 
-		return array();
+		foreach ( $types as $k => $typeItem ) {
+			$types[$k] = self::$redbean->load( $typeItem, $id );
+		}
+
+		return $types;
 	}
 
 	/**
