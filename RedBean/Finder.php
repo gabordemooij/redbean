@@ -53,8 +53,15 @@ class RedBean_Finder
 	 */
 	public function find( $type, $sql = null, $bindings = array() )
 	{
-		if ( $sql instanceof RedBean_SQLHelper ) list( $sql, $bindings ) = $sql->getQuery();
-		if ( !is_array( $bindings ) ) throw new RedBean_Exception_Security( 'Expected array, ' . gettype( $bindings ) . ' given.' );
+		if ( $sql instanceof RedBean_SQLHelper ) {
+			list( $sql, $bindings ) = $sql->getQuery();
+		}
+
+		if ( !is_array( $bindings ) ) {
+			throw new RedBean_Exception_Security(
+				'Expected array, ' . gettype( $bindings ) . ' given.'
+			);
+		}
 
 		return $this->redbean->find( $type, array(), $sql, $bindings );
 	}
@@ -71,9 +78,8 @@ class RedBean_Finder
 	 */
 	public function findAndExport( $type, $sql = null, $bindings = array() )
 	{
-		$items = $this->find( $type, $sql, $bindings );
-		$arr   = array();
-		foreach ( $items as $key => $item ) {
+		$arr = array();
+		foreach ( $this->find( $type, $sql, $bindings ) as $key => $item ) {
 			$arr[$key] = $item->export();
 		}
 
@@ -93,12 +99,12 @@ class RedBean_Finder
 	public function findOne( $type, $sql = null, $bindings = array() )
 	{
 		$items = $this->find( $type, $sql, $bindings );
-		$found = reset( $items );
-		if ( !$found ) {
+
+		if ( empty($items) ) {
 			return null;
 		}
 
-		return $found;
+		return reset( $items );
 	}
 
 	/**

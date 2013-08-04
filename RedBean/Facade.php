@@ -112,7 +112,7 @@ class RedBean_Facade
 					array(
 						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
-				)
+					)
 				) {
 					return ( $method === 'getCell' ) ? null : array();
 				} else {
