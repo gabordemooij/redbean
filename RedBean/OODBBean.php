@@ -594,21 +594,27 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function &__get( $property )
 	{
 		$property = ( !$this->flagSkipBeau ) ? $this->beau( $property ) : $property;
+
 		if ( $this->beanHelper ) {
 			list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 		}
-		if ( !isset( $this->properties[$property] )
+
+		if (
+			!isset( $this->properties[$property] )
 			|| ( $this->withSql !== '' && ( ( strpos( $property, 'own' ) === 0 )
-					|| ( strpos( $property, 'shared' ) === 0 ) ) )
+			|| ( strpos( $property, 'shared' ) === 0 ) ) )
 		) {
 			$fieldLink = $property . '_id';
+
 			if ( isset( $this->$fieldLink ) && $fieldLink !== $this->getMeta( 'sys.idfield' ) ) {
 				$this->__info['tainted'] = true;
 				$bean                    = isset( $this->__info['sys.parentcache.' . $property] ) ? $this->__info['sys.parentcache.' . $property] : null;
+
 				if ( !$bean ) {
 					$type = $this->getAlias( $property );
 					$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 				}
+
 				$this->properties[$property] = $bean;
 
 				return $this->properties[$property];
