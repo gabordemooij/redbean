@@ -1100,23 +1100,26 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function countOwn( $type )
 	{
 		$type = $this->beau( $type );
+
 		if ( $this->aliasName ) {
-			$parentField     = $this->aliasName;
 			$myFieldLink     = $this->aliasName . '_id';
+
 			$this->aliasName = null;
 		} else {
 			$myFieldLink = $this->__info['type'] . '_id';
-			$parentField = $this->__info['type'];
 		}
+
 		$count = 0;
+
 		if ( $this->getID() > 0 ) {
 			$bindings = array_merge( array( $this->getID() ), $this->withParams );
 			$count    = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " $myFieldLink = ? " . $this->withSql, $bindings );
 		}
+
 		$this->withSql    = '';
 		$this->withParams = array();
 
-		return (integer) $count;
+		return (int) $count;
 	}
 
 	/**
@@ -1132,19 +1135,24 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$toolbox = $this->beanHelper->getToolbox();
 		$redbean = $toolbox->getRedBean();
 		$writer  = $toolbox->getWriter();
+
 		if ( $this->via ) {
 			$oldName = $writer->getAssocTable( array( $this->__info['type'], $type ) );
+
 			if ( $oldName !== $this->via ) {
 				//set the new renaming rule
 				$writer->renameAssocTable( $oldName, $this->via );
 				$this->via = null;
 			}
 		}
+
 		$type  = $this->beau( $type );
 		$count = 0;
+
 		if ( $this->getID() > 0 ) {
 			$count = $redbean->getAssociationManager()->relatedCount( $this, $type, $this->withSql, $this->withParams, true );
 		}
+
 		$this->withSql    = '';
 		$this->withParams = array();
 
