@@ -112,6 +112,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private function resp( $result = null, $errorCode = '500', $errorMessage = 'Internal Error' )
 	{
 		$response = array( 'red-resty' => '1.0' );
+
 		if ( $result !== null ) {
 			$response['result'] = $result;
 		} else {
@@ -153,16 +154,21 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 		if ( !isset( $this->payload['bean'] ) ) {
 			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.' );
 		}
+
 		if ( !is_array( $this->payload['bean'] ) ) {
 			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Parameter \'bean\' must be object/array.' );
 		}
+
 		foreach ( $this->payload['bean'] as $key => $value ) {
 			if ( !is_string( $key ) || !is_string( $value ) ) {
 				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Object "bean" invalid.' );
 			}
 		}
+
 		$this->bean->import( $this->payload['bean'] );
+
 		$this->oodb->store( $this->bean );
+
 		$this->bean = $this->oodb->load( $this->bean->getMeta( 'type' ), $this->bean->id );
 
 		return $this->resp( $this->bean->export() );
@@ -187,21 +193,30 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 		if ( !isset( $this->payload['bean'] ) ) {
 			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.' );
 		}
+
 		if ( !is_array( $this->payload['bean'] ) ) {
 			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Parameter \'bean\' must be object/array.' );
 		}
+
 		foreach ( $this->payload['bean'] as $key => $value ) {
-			if ( !is_string( $key ) || !is_string( $value ) ) return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Object \'bean\' invalid.' );
+			if ( !is_string( $key ) || !is_string( $value ) ) {
+				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Object \'bean\' invalid.' );
+			}
 		}
+
 		$newBean = $this->oodb->dispense( $this->type );
 		$newBean->import( $this->payload['bean'] );
+
 		if ( strpos( $this->list, 'shared-' ) === false ) {
 			$listName = 'own' . ucfirst( $this->list );
 		} else {
 			$listName = 'shared' . ucfirst( substr( $this->list, 7 ) );
 		}
+
 		array_push( $this->bean->$listName, $newBean );
+
 		$this->oodb->store( $this->bean );
+
 		$newBean = $this->oodb->load( $newBean->getMeta( 'type' ), $newBean->id );
 
 		return $this->resp( $newBean->export() );
@@ -215,7 +230,9 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private function openList()
 	{
 		$listOfBeans = array();
-		$listName    = ( strpos( $this->list, 'shared-' ) === 0 ) ? ( 'shared' . ucfirst( substr( $this->list, 7 ) ) ) : ( 'own' . ucfirst( $this->list ) );
+
+		$listName = ( strpos( $this->list, 'shared-' ) === 0 ) ? ( 'shared' . ucfirst( substr( $this->list, 7 ) ) ) : ( 'own' . ucfirst( $this->list ) );
+
 		if ( $this->sqlSnippet ) {
 			if ( preg_match( '/^(ORDER|GROUP|HAVING|LIMIT|OFFSET|TOP)\s+/i', ltrim( $this->sqlSnippet ) ) ) {
 				$beans = $this->bean->with( $this->sqlSnippet, $this->sqlBindings )->$listName;
@@ -225,6 +242,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 		} else {
 			$beans = $this->bean->$listName;
 		}
+
 		foreach ( $beans as $listBean ) {
 			$listOfBeans[] = $listBean->export();
 		}
@@ -267,9 +285,11 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 		if ( !isset( $this->payload['param'] ) ) {
 			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'No parameters.' );
 		}
+
 		if ( !is_array( $this->payload['param'] ) ) {
 			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Parameter \'param\' must be object/array.' );
 		}
+
 		$answer = call_user_func_array( array( $this->bean, $this->method ), $this->payload['param'] );
 
 		return $this->resp( $answer );
@@ -284,9 +304,11 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private function extractSQLSnippetsForGETList()
 	{
 		$sqlBundleItem = ( isset( $this->sqlSnippets[$this->list] ) ) ? $this->sqlSnippets[$this->list] : array( null, array() );
+
 		if ( isset( $sqlBundleItem[0] ) ) {
 			$this->sqlSnippet = $sqlBundleItem[0];
 		}
+
 		if ( isset( $sqlBundleItem[1] ) ) {
 			$this->sqlBindings = $sqlBundleItem[1];
 		}
@@ -324,10 +346,19 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 */
 	private function isOnWhitelist()
 	{
-		return ( ( $this->whitelist === 'all'
-			|| ( $this->list === null && isset( $this->whitelist[$this->beanType] ) && in_array( $this->method, $this->whitelist[$this->beanType] )
-				|| ( $this->list !== null && isset( $this->whitelist[$this->type] ) && in_array( $this->method, $this->whitelist[$this->type] ) )
-			) ) );
+		return (
+			$this->whitelist === 'all'
+			|| (
+				$this->list === null
+				&& isset( $this->whitelist[$this->beanType] )
+				&& in_array( $this->method, $this->whitelist[$this->beanType] )
+				|| (
+					$this->list !== null
+					&& isset( $this->whitelist[$this->type] )
+					&& in_array( $this->method, $this->whitelist[$this->type] )
+				)
+			)
+		);
 	}
 
 	/**
@@ -337,7 +368,8 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 */
 	private function findBeanByURI()
 	{
-		$finder         = new RedBean_Finder( $this->toolbox );
+		$finder = new RedBean_Finder( $this->toolbox );
+
 		$this->bean     = $finder->findByPath( $this->root, $this->uri );
 		$this->beanType = $this->bean->getMeta( 'type' );
 	}
@@ -352,17 +384,19 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private function extractListInfo()
 	{
 		if ( $this->method == 'PUT' ) {
-			if ( count( $this->uri ) < 1 ) {
-				return false;
-			}
+			if ( count( $this->uri ) < 1 ) return false;
+
 			$this->list = array_pop( $this->uri ); //grab the list
 			$this->type = ( strpos( $this->list, 'shared-' ) === 0 ) ? substr( $this->list, 7 ) : $this->list;
 		} elseif ( $this->method === 'GET' && count( $this->uri ) > 2 ) {
 			$lastItemInURI = $this->uri[count( $this->uri ) - 1];
+
 			if ( $lastItemInURI === 'list' ) {
 				array_pop( $this->uri );
+
 				$this->list = array_pop( $this->uri );
 				$this->type = ( strpos( $this->list, 'shared-' ) === 0 ) ? substr( $this->list, 7 ) : $this->list;
+
 				$this->extractSQLSnippetsForGETList();
 			}
 		}
@@ -405,21 +439,27 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 			if ( $this->isURIValid() ) {
 				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'URI contains invalid characters.' );
 			}
+
 			if ( !is_array( $this->payload ) ) {
 				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Payload needs to be array.' );
 			}
+
 			$this->extractURI();
+
 			if ( $this->extractListInfo() === false ) {
 				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Missing list.' );
 			}
+
 			if ( !is_null( $this->type ) && !preg_match( '|^[\w]+$|', $this->type ) ) {
 				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Invalid list.' );
 			}
+
 			try {
 				$this->findBeanByURI();
 			} catch ( Exception $e ) {
 				return $this->resp( null, self::C_HTTP_NOT_FOUND, $e->getMessage() );
 			}
+
 			if ( !$this->isOnWhitelist() ) {
 				return $this->resp( null, self::C_HTTP_FORBIDDEN_REQUEST, 'This bean is not available. Set whitelist to "all" or add to whitelist.' );
 			}
@@ -489,11 +529,11 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 * per type, if a list gets accessed the SQL with the type-key of the list will be used to filter
 	 * or sort the results.
 	 *
-	 * @param RedBean_Bean $root        root bean for REST action
-	 * @param string       $uri         the URI of the RESTful operation
-	 * @param string       $method      the method you want to apply
-	 * @param array        $payload     payload (for POSTs)
-	 * @param array        $sqlSnippets a bundle of SQL snippets to use
+	 * @param RedBean_OODBBean $root        root bean for REST action
+	 * @param string           $uri         the URI of the RESTful operation
+	 * @param string           $method      the method you want to apply
+	 * @param array            $payload     payload (for POSTs)
+	 * @param array            $sqlSnippets a bundle of SQL snippets to use
 	 *
 	 * @return string
 	 */
@@ -504,7 +544,9 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 		$this->payload     = $payload;
 		$this->uri         = $uri;
 		$this->root        = $root;
+
 		$this->clearState();
+
 		$result = $this->handleRESTRequest();
 
 		return $result;
