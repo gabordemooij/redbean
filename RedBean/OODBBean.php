@@ -399,7 +399,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function __isset( $property )
 	{
-		return ( isset( $this->properties[$property] ) );
+		return isset( $this->properties[$property] );
 	}
 
 	/**
@@ -423,11 +423,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function __unset( $property )
 	{
 		$this->__get( $property );
+
 		$fieldLink = $property . '_id';
+
 		if ( isset( $this->$fieldLink ) ) {
 			//wanna unset a bean reference?
 			$this->$fieldLink = null;
 		}
+
 		if ( ( isset( $this->properties[$property] ) ) ) {
 			unset( $this->properties[$property] );
 		}
@@ -494,6 +497,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		if ( $sql instanceof RedBean_SQLHelper ) {
 			list( $sql, $bindings ) = $sql->getQuery();
 		}
+
 		$this->withSql    = ' AND ' . $sql;
 		$this->withParams = $bindings;
 
@@ -527,8 +531,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function alias( $aliasName )
 	{
-		$aliasName       = $this->beau( $aliasName );
-		$this->aliasName = $aliasName;
+		$this->aliasName = $this->beau( $aliasName );
 
 		return $this;
 	}
@@ -558,9 +561,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function beau( $property )
 	{
 		static $beautifulColumns = array();
-		if ( !self::$flagUseBeautyCols ) {
-			return $property;
-		}
+
+		if ( !self::$flagUseBeautyCols ) return $property;
+
 		if ( strpos( $property, 'own' ) !== 0 && strpos( $property, 'shared' ) !== 0 ) {
 			if ( isset( $beautifulColumns[$property] ) ) {
 				$propertyBeau = $beautifulColumns[$property];
