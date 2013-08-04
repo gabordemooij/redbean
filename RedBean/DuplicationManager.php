@@ -259,6 +259,7 @@ class RedBean_DuplicationManager
 				$this->columns[$key] = $value;
 			}
 		}
+
 		$this->cacheTables = true;
 	}
 
@@ -333,19 +334,19 @@ class RedBean_DuplicationManager
 		if ( !count( $this->tables ) ) {
 			$this->tables = $this->toolbox->getWriter()->getTables();
 		}
+
 		if ( !count( $this->columns ) ) {
 			foreach ( $this->tables as $table ) {
 				$this->columns[$table] = $this->toolbox->getWriter()->getColumns( $table );
 			}
 		}
-		$beanCopy = clone( $bean );
-		$rs       = $this->duplicate( $beanCopy, $trail, $preserveIDs );
+
 		if ( !$this->cacheTables ) {
 			$this->tables  = array();
 			$this->columns = array();
 		}
 
-		return $rs;
+		return $this->duplicate( clone( $bean ), $trail, $preserveIDs );
 	}
 
 	/**
