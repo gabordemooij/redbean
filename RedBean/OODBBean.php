@@ -606,9 +606,19 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		) {
 			$fieldLink = $property . '_id';
 
-			if ( isset( $this->$fieldLink ) && $fieldLink !== $this->getMeta( 'sys.idfield' ) ) {
+			if (
+				isset( $this->$fieldLink )
+				&& ( $fieldLink !== $this->getMeta( 'sys.idfield' ) )
+			) {
 				$this->__info['tainted'] = true;
-				$bean                    = isset( $this->__info['sys.parentcache.' . $property] ) ? $this->__info['sys.parentcache.' . $property] : null;
+
+				$cached = "sys.parentcache.$property";
+
+				if ( isset( $this->__info[$cached] ) ) {
+					$bean = $this->__info[$cached];
+				} else {
+					$bean = null;
+				}
 
 				if ( !$bean ) {
 					$type = $this->getAlias( $property );
@@ -618,16 +628,26 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 				$this->properties[$property] = $bean;
 
 				return $this->properties[$property];
-			} elseif ( strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) ) ) {
-				$beans                                   = $this->getOwnList( lcfirst( substr( $property, 3 ) ), $redbean );
+			} elseif (
+				strpos( $property, 'own' ) === 0
+				&& ctype_upper( substr( $property, 3, 1 ) )
+			) {
+				$beans = $this->getOwnList( lcfirst( substr( $property, 3 ) ), $redbean );
+
 				$this->properties[$property]             = $beans;
+
 				$this->__info['sys.shadow.' . $property] = $beans;
 				$this->__info['tainted']                 = true;
 
 				return $this->properties[$property];
-			} elseif ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
-				$beans                                   = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
+			} elseif (
+				strpos( $property, 'shared' ) === 0
+				&& ctype_upper( substr( $property, 6, 1 ) )
+			) {
+				$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
+
 				$this->properties[$property]             = $beans;
+
 				$this->__info['sys.shadow.' . $property] = $beans;
 				$this->__info['tainted']                 = true;
 
