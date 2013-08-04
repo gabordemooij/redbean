@@ -76,7 +76,7 @@ class RedBean_Preloader
 	}
 
 	/**
-	 * Extracts perloading request for type from array.
+	 * Extracts preloading request for type from array.
 	 *
 	 * @param array $typeInfo type info
 	 *
@@ -85,7 +85,9 @@ class RedBean_Preloader
 	private function extractTypeInfo( $typeInfo )
 	{
 		list( $type, $sqlObj ) = ( is_array( $typeInfo ) ? $typeInfo : array( $typeInfo, null ) );
+
 		list( $sql, $bindings ) = $sqlObj;
+
 		if ( !is_array( $bindings ) ) {
 			$bindings = array();
 		}
@@ -100,11 +102,12 @@ class RedBean_Preloader
 	 *
 	 * @param array $beans beans to connect to input beans
 	 *
-	 * @return void
+	 * @return array
 	 */
 	private function markBeans( $filteredBeans )
 	{
 		$this->counterID = 0;
+
 		foreach ( $filteredBeans as $bean ) {
 			$bean->setMeta( 'sys.input-bean-id', array( $this->counterID => $this->counterID ) );
 			$this->counterID++;
@@ -126,17 +129,21 @@ class RedBean_Preloader
 		$filtered = array();
 		foreach ( $this->filteredBeans as $bean ) {
 			$addInputIDs = $bean->getMeta( 'sys.input-bean-id' );
+
 			if ( is_array( $bean->$nesting ) ) {
 				$nestedBeans = $bean->$nesting;
+
 				foreach ( $nestedBeans as $nestedBean ) {
 					$this->addInputBeanIDsToBean( $nestedBean, $addInputIDs );
 				}
+
 				$filtered = array_merge( $filtered, $nestedBeans );
 			} elseif ( !is_null( $bean->$nesting ) ) {
 				$this->addInputBeanIDsToBean( $bean->$nesting, $addInputIDs );
 				$filtered[] = $bean->$nesting;
 			}
 		}
+
 		$this->filteredBeans = $filtered;
 	}
 
@@ -154,10 +161,12 @@ class RedBean_Preloader
 	private function getPreloadField( $key, $type, $oldField, &$oldFields )
 	{
 		$field = ( is_numeric( $key ) ) ? $type : $key; //use an alias?
+
 		if ( strpos( $field, '*' ) !== false ) {
 			$oldFields[] = $oldField;
 			$field       = str_replace( '*', implode( '.', $oldFields ), $field );
 		}
+
 		if ( strpos( $field, '&' ) !== false ) {
 			$field = str_replace( '&', implode( '.', $oldFields ), $field );
 		}
@@ -177,12 +186,15 @@ class RedBean_Preloader
 	private function addInputBeanIDsToBean( $nestedBean, $addInputIDs )
 	{
 		$currentInputBeanIDs = $nestedBean->getMeta( 'sys.input-bean-id' );
+
 		if ( !is_array( $currentInputBeanIDs ) ) {
 			$currentInputBeanIDs = array();
 		}
+
 		foreach ( $addInputIDs as $addInputID ) {
 			$currentInputBeanIDs[$addInputID] = $addInputID;
 		}
+
 		$nestedBean->setMeta( 'sys.input-bean-id', $currentInputBeanIDs );
 	}
 
@@ -200,11 +212,18 @@ class RedBean_Preloader
 	{
 		if ( $closure ) {
 			$key = 0;
+
 			foreach ( $beans as $bean ) {
 				$bindings = array();
-				foreach ( $retrievals as $r ) $bindings[] = ( isset( $r[$key] ) ) ? $r[$key] : null;
+
+				foreach ( $retrievals as $r ) {
+					$bindings[] = ( isset( $r[$key] ) ) ? $r[$key] : null;
+				}
+
 				array_unshift( $bindings, $bean );
+
 				call_user_func_array( $closure, $bindings );
+
 				$key++;
 			}
 		}
@@ -226,10 +245,12 @@ class RedBean_Preloader
 	private function fillParamArrayRetrievals( $filteredBean, $list )
 	{
 		$inputBeanIDs = $filteredBean->getMeta( 'sys.input-bean-id' );
+
 		foreach ( $inputBeanIDs as $inputBeanID ) {
 			if ( !isset( $this->retrievals[$this->iterationIndex][$inputBeanID] ) ) {
 				$this->retrievals[$this->iterationIndex][$inputBeanID] = array();
 			}
+
 			foreach ( $list as $listKey => $listBean ) {
 				$this->retrievals[$this->iterationIndex][$inputBeanID][$listKey] = $listBean;
 			}
@@ -260,16 +281,23 @@ class RedBean_Preloader
 	private function gatherIDsToPreloadAndMap( $filteredBeans, $field )
 	{
 		$ids = $map = array();
+
 		if ( strpos( $field, 'shared' ) !== 0 ) {
-			foreach ( $filteredBeans as $bean ) { //gather ids to load the desired bean collections
-				if ( strpos( $field, 'own' ) === 0 ) { //based on bean->id for ownlist
+			// Gather ids to load the desired bean collections
+			foreach ( $filteredBeans as $bean ) {
+
+				if ( strpos( $field, 'own' ) === 0 ) {
+					// Based on bean->id for ownlist
 					$id       = $bean->id;
 					$ids[$id] = $id;
-				} elseif ( $id = $bean->{$field . '_id'} ) { //based on bean_id for parent
+				} elseif ( $id = $bean->{$field . '_id'} ) {
+					// Based on bean_id for parent
 					$ids[$id] = $id;
+
 					if ( !isset( $map[$id] ) ) {
 						$map[$id] = array();
 					}
+
 					$map[$id][] = $bean;
 				}
 			}
@@ -346,9 +374,13 @@ class RedBean_Preloader
 	private function preloadSharedBeans( $type, $sql, $bindings, $field )
 	{
 		$sharedBeans = $this->assocManager->relatedSimple( $this->filteredBeans, $type, $sql, $bindings );
-		foreach ( $this->filteredBeans as $filteredBean ) { //now let the filtered beans gather their beans
+
+		// Let the filtered beans gather their beans
+		foreach ( $this->filteredBeans as $filteredBean ) {
 			$list = $this->gatherSharedBeansFromPool( $filteredBean, $sharedBeans );
+
 			$filteredBean->setProperty( $field, $list, true, true );
+
 			$this->fillParamArrayRetrievals( $filteredBean, $list );
 		}
 	}
@@ -366,12 +398,16 @@ class RedBean_Preloader
 	 */
 	private function preloadOwnBeans( $type, $sql, $bindings, $field, $ids )
 	{
-		$bean     = reset( $this->filteredBeans );
-		$link     = $bean->getMeta( 'type' ) . '_id';
+		$bean = reset( $this->filteredBeans );
+		$link = $bean->getMeta( 'type' ) . '_id';
+
 		$children = $this->oodb->find( $type, array( $link => $ids ), $sql, $bindings );
+
 		foreach ( $this->filteredBeans as $filteredBean ) {
 			$list = $this->gatherOwnBeansFromPool( $filteredBean, $children, $link );
+
 			$filteredBean->setProperty( $field, $list, true, true );
+
 			$this->fillParamArrayRetrievals( $filteredBean, $list );
 		}
 	}
@@ -391,7 +427,9 @@ class RedBean_Preloader
 		foreach ( $this->oodb->batch( $type, $ids ) as $parent ) {
 			foreach ( $map[$parent->id] as $childBean ) {
 				$childBean->setProperty( $field, $parent );
+
 				$inputBeanIDs = $childBean->getMeta( 'sys.input-bean-id' );
+
 				$this->fillParamArrayRetrievalsWithParent( $inputBeanIDs, $parent );
 			}
 		}
@@ -421,7 +459,8 @@ class RedBean_Preloader
 	 */
 	public function __construct( $oodb )
 	{
-		$this->oodb         = $oodb;
+		$this->oodb = $oodb;
+
 		$this->assocManager = $oodb->getAssociationManager();
 	}
 
@@ -437,33 +476,52 @@ class RedBean_Preloader
 	public function load( $beans, $typeList, $closure = null )
 	{
 		$beans = $this->convertBeanToArrayIfNeeded( $beans );
+
 		$this->init();
+
 		$types     = $this->extractTypesFromTypeList( $typeList );
+
 		$oldFields = array();
-		$oldField  = '';
+
+		$oldField = '';
+
 		foreach ( $types as $key => $typeInfo ) {
 			list( $type, $sql, $bindings ) = $this->extractTypeInfo( $typeInfo );
+
 			$this->retrievals[$this->iterationIndex] = array();
-			$map                                     = $ids = array();
-			$field                                   = $this->getPreloadField( $key, $type, $oldField, $oldFields );
-			$this->filteredBeans                     = $this->markBeans( $beans );
-			while ( $p = strpos( $field, '.' ) ) { //filtering: find the right beans in the path
+
+			$field = $this->getPreloadField( $key, $type, $oldField, $oldFields );
+
+			$this->filteredBeans = $this->markBeans( $beans );
+
+			// Filtering: find the right beans in the path
+			while ( $p = strpos( $field, '.' ) ) {
 				$this->addBeansForNextStepInPath( substr( $field, 0, $p ) );
+
 				$field = substr( $field, $p + 1 );
 			}
+
 			$oldField = $field;
-			$type     = ( strpos( $type, '.' ) !== false ) ? $field : $type;
+
+			$type = ( strpos( $type, '.' ) !== false ) ? $field : $type;
+
 			if ( count( $this->filteredBeans ) === 0 ) continue;
+
 			list( $ids, $map ) = $this->gatherIDsToPreloadAndMap( $this->filteredBeans, $field );
+
 			if ( strpos( $field, 'shared' ) === 0 ) {
 				$this->preloadSharedBeans( $type, $sql, $bindings, $field );
-			} elseif ( strpos( $field, 'own' ) === 0 ) { //preload for own-list using find
+			} elseif ( strpos( $field, 'own' ) === 0 ) {
+				// Preload for own-list using find
 				$this->preloadOwnBeans( $type, $sql, $bindings, $field, $ids );
-			} else { //preload for parent objects using batch()
+			} else {
+				// Preload for parent objects using batch()
 				$this->preloadParentBeans( $type, $field, $ids, $map );
 			}
+
 			$this->iterationIndex++;
 		}
+
 		$this->invokePreloadEachFunction( $closure, $beans, $this->retrievals );
 	}
 }
