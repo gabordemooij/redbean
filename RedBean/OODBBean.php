@@ -661,19 +661,27 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function __set( $property, $value )
 	{
-		$property           = $this->beau( $property );
+		$property = $this->beau( $property );
+
 		$this->flagSkipBeau = true;
+
 		$this->__get( $property );
+
 		$this->flagSkipBeau = false;
+
 		$this->setMeta( 'tainted', true );
-		$linkField = $property . '_id';
-		if ( isset( $this->properties[$linkField] ) && !( $value instanceof RedBean_OODBBean ) ) {
+
+		if (
+			isset( $this->properties[$property.'_id'] )
+			&& !( $value instanceof RedBean_OODBBean )
+		) {
 			if ( is_null( $value ) || $value === false ) {
 				return $this->__unset( $property );
 			} else {
 				throw new RedBean_Exception_Security( 'Cannot cast to bean.' );
 			}
 		}
+
 		if ( $value === false ) {
 			$value = '0';
 		} elseif ( $value === true ) {
@@ -681,6 +689,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		} elseif ( $value instanceof DateTime ) {
 			$value = $value->format( 'Y-m-d H:i:s' );
 		}
+
 		$this->properties[$property] = $value;
 	}
 
@@ -697,9 +706,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function setProperty( $property, $value, $updateShadow = false, $taint = false )
 	{
 		$this->properties[$property] = $value;
+
 		if ( $updateShadow ) {
 			$this->__info['sys.shadow.' . $property] = $value;
 		}
+
 		if ( $taint ) {
 			$this->__info['tainted'] = true;
 		}
@@ -773,9 +784,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	{
 		if ( !isset( $this->__info['model'] ) ) {
 			$model = $this->beanHelper->getModelForBean( $this );
+
 			if ( !$model ) {
 				return;
 			}
+
 			$this->__info['model'] = $model;
 		}
 		if ( !method_exists( $this->__info['model'], $method ) ) {
@@ -794,6 +807,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function __toString()
 	{
 		$string = $this->__call( '__toString', array() );
+
 		if ( $string === null ) {
 			return json_encode( $this->properties );
 		} else {
@@ -879,7 +893,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @param string $column
 	 *
-	 * @return RedBean_OODBean
+	 * @return RedBean_OODBBean
 	 */
 	public function poly( $field )
 	{
@@ -965,6 +979,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function old( $property )
 	{
 		$old = $this->getMeta( 'sys.orig', array() );
+
 		if ( array_key_exists( $property, $old ) ) {
 			return $old[$property];
 		}
@@ -1029,18 +1044,22 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	{
 		if ( is_string( $typeOrBean ) ) {
 			$bean = $this->beanHelper->getToolBox()->getRedBean()->dispense( $typeOrBean );
+
 			if ( is_string( $qualification ) ) {
 				$data = json_decode( $qualification, true );
 			} else {
 				$data = $qualification;
 			}
+
 			foreach ( $data as $key => $value ) {
 				$bean->$key = $value;
 			}
 		} else {
 			$bean = $typeOrBean;
 		}
+
 		$list = 'own' . ucfirst( $bean->getMeta( 'type' ) );
+
 		array_push( $this->$list, $bean );
 
 		return $bean;
