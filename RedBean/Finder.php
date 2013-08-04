@@ -186,9 +186,12 @@ class RedBean_Finder
 		}
 
 		for ( $i = 0; $i < $numberOfSteps; $i += 2 ) {
-			if ( trim( $steps[$i] ) === '' ) {
+			$steps[$i] = trim( $steps[$i] );
+
+			if ( $steps[$i] === '' ) {
 				throw new RedBean_Exception_Security( 'Cannot access list.' );
 			}
+
 			if ( strpos( $steps[$i], 'shared-' ) === false ) {
 				$listName = 'own' . ucfirst( $steps[$i] );
 				$listType = $this->toolbox->getWriter()->esc( $steps[$i] );
@@ -196,10 +199,13 @@ class RedBean_Finder
 				$listName = 'shared' . ucfirst( substr( $steps[$i], 7 ) );
 				$listType = $this->toolbox->getWriter()->esc( substr( $steps[$i], 7 ) );
 			}
+
 			$list = $bean->withCondition( " {$listType}.id = ? ", array( $steps[$i + 1] ) )->$listName;
+
 			if ( !isset( $list[$steps[$i + 1]] ) ) {
 				throw new RedBean_Exception_Security( 'Cannot access bean.' );
 			}
+
 			$bean = $list[$steps[$i + 1]];
 		}
 
