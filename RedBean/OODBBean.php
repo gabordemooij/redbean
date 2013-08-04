@@ -145,22 +145,29 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	private function getOwnList( $type, $redbean )
 	{
 		$type = $this->beau( $type );
+
 		if ( $this->aliasName ) {
-			$parentField                        = $this->aliasName;
-			$myFieldLink                        = $parentField . '_id';
+			$parentField = $this->aliasName;
+			$myFieldLink = $parentField . '_id';
+
 			$this->__info['sys.alias.' . $type] = $this->aliasName;
-			$this->aliasName                    = null;
+
+			$this->aliasName = null;
 		} else {
 			$parentField = $this->__info['type'];
 			$myFieldLink = $parentField . '_id';
 		}
+
 		$beans = array();
+
 		if ( $this->getID() > 0 ) {
 			$bindings = array_merge( array( $this->getID() ), $this->withParams );
 			$beans    = $redbean->find( $type, array(), " $myFieldLink = ? " . $this->withSql, $bindings );
 		}
+
 		$this->withSql    = '';
 		$this->withParams = array();
+
 		foreach ( $beans as $beanFromList ) {
 			$beanFromList->__info['sys.parentcache.' . $parentField] = $this;
 		}
