@@ -599,9 +599,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 		}
 
-		$isShared = (strpos($property, 'shared') === 0) && ctype_upper( substr( $property, 3, 1 ) );
+		$isShared = (strpos($property, 'shared') === 0) && ctype_upper( substr( $property, 6, 1 ) );
 
-		$isOwn = (strpos($property, 'own') === 0) && ctype_upper( substr( $property, 6, 1 ) );
+		$isOwn = (strpos($property, 'own') === 0) && ctype_upper( substr( $property, 3, 1 ) );
 
 		if ( isset( $this->properties[$property] ) && ( $this->withSql === '' ) && !( $isShared || $isOwn ) ) {
 			return $this->properties[$property];
@@ -614,10 +614,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 			$cached = "sys.parentcache.$property";
 
+			$bean = null;
 			if ( isset( $this->__info[$cached] ) ) {
 				$bean = $this->__info[$cached];
-			} else {
-				$bean = null;
 			}
 
 			if ( !$bean ) {
