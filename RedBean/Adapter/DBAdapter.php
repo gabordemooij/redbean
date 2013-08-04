@@ -100,22 +100,28 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	public function getAssoc( $sql, $bindings = array() )
 	{
 		$this->sql = $sql;
+
 		$this->signal( 'sql_exec', $this );
+
 		$rows  = $this->db->GetAll( $sql, $bindings );
+
 		$assoc = array();
-		if ( $rows ) {
-			foreach ( $rows as $row ) {
-				if ( is_array( $row ) && count( $row ) > 0 ) {
-					if ( count( $row ) > 1 ) {
-						$key   = array_shift( $row );
-						$value = array_shift( $row );
-					} elseif ( count( $row ) == 1 ) {
-						$key   = array_shift( $row );
-						$value = $key;
-					}
-					$assoc[$key] = $value;
-				}
+		if ( !$rows ) {
+			return $assoc;
+		}
+
+		foreach ( $rows as $row ) {
+			if ( empty( $row ) ) continue;
+
+			if ( count( $row ) > 1 ) {
+				$key   = array_shift( $row );
+				$value = array_shift( $row );
+			} elseif ( count( $row ) == 1 ) {
+				$key   = array_shift( $row );
+				$value = $key;
 			}
+
+			$assoc[$key] = $value;
 		}
 
 		return $assoc;
