@@ -599,9 +599,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 		}
 
-		$isShared = strpos( $property, 'shared' ) === 0;
+		$isShared = (strpos($property, 'shared') === 0) && ctype_upper( substr( $property, 3, 1 ) );
 
-		$isOwn = strpos( $property, 'own' ) === 0;
+		$isOwn = (strpos($property, 'own') === 0) && ctype_upper( substr( $property, 6, 1 ) );
 
 		if ( isset( $this->properties[$property] ) && ( $this->withSql === '' ) && !( $isShared || $isOwn ) ) {
 			return $this->properties[$property];
@@ -630,14 +630,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			return $this->properties[$property];
 		}
 
-		if ( $isOwn && !ctype_upper( substr( $property, 3, 1 ) ) ) {
-			$isOwn = false;
-		}
-
-		if ( $isShared && !ctype_upper( substr( $property, 6, 1 ) ) ) {
-			$isShared = false;
-		}
-
 		if ( $isShared || $isOwn ) {
 			if ( $isOwn ) {
 				$beans = $this->getOwnList( lcfirst( substr( $property, 3 ) ), $redbean );
@@ -645,7 +637,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 				$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
 			}
 
-			$this->properties[$property]             = $beans;
+			$this->properties[$property] = $beans;
 
 			$this->__info['sys.shadow.' . $property] = $beans;
 			$this->__info['tainted']                 = true;
