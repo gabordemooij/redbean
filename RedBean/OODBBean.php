@@ -331,14 +331,16 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function export( $meta = false, $parents = false, $onlyMe = false, $filters = array() )
 	{
 		$arr = array();
+
 		if ( $parents ) {
 			foreach ( $this as $key => $value ) {
-				if ( substr( $key, -3 ) == '_id' ) {
-					$prop = substr( $key, 0, strlen( $key ) - 3 );
-					$this->$prop;
-				}
+				if ( substr( $key, -3 ) != '_id' ) continue;
+
+				$prop = substr( $key, 0, strlen( $key ) - 3 );
+				$this->$prop;
 			}
 		}
+
 		foreach ( $this as $key => $value ) {
 			if ( !$onlyMe && is_array( $value ) ) {
 				$vn = array();
@@ -358,6 +360,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			}
 			$arr[$key] = $value;
 		}
+
 		if ( $meta ) {
 			$arr['__info'] = $this->__info;
 		}
