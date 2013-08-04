@@ -65,9 +65,11 @@ class RedBean_LabelMaker
 	public function gatherLabels( $beans )
 	{
 		$labels = array();
+
 		foreach ( $beans as $bean ) {
 			$labels[] = $bean->name;
 		}
+
 		sort( $labels );
 
 		return $labels;

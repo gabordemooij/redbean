@@ -33,11 +33,13 @@ abstract class RedBean_Observable
 		if ( !isset( $this->observers[$eventname] ) ) {
 			$this->observers[$eventname] = array();
 		}
+
 		foreach ( $this->observers[$eventname] as $o ) {
 			if ( $o == $observer ) {
 				return;
 			}
 		}
+
 		$this->observers[$eventname][] = $observer;
 	}
 
@@ -54,6 +56,7 @@ abstract class RedBean_Observable
 		if ( !isset( $this->observers[$eventname] ) ) {
 			$this->observers[$eventname] = array();
 		}
+
 		foreach ( $this->observers[$eventname] as $observer ) {
 			$observer->onEvent( $eventname, $info );
 		}
