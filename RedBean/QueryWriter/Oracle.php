@@ -21,30 +21,35 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @var RedBean_Adapter
 	 */
 	protected $adapter;
+
 	/**
 	 * character to escape keyword table/column names
 	 *
 	 * @var string
 	 */
 	protected $quoteCharacter = '"';
+
 	/**
 	 * Boolean Data type
 	 *
 	 * @var integer
 	 */
 	const C_DATATYPE_BOOL = 0;
+
 	/**
 	 * Unsigned 8BIT Integer
 	 *
 	 * @var integer
 	 */
 	const C_DATATYPE_UINT8 = 1;
+
 	/**
 	 * Unsigned 32BIT Integer
 	 *
 	 * @var integer
 	 */
 	const C_DATATYPE_UINT32 = 2;
+
 	/**
 	 * Double precision floating point number and
 	 * negative numbers.
@@ -52,6 +57,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @var integer
 	 */
 	const C_DATATYPE_DOUBLE = 3;
+
 	/**
 	 * Standard Text column (like varchar255)
 	 * At least 8BIT character support.
@@ -59,12 +65,14 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT8 = 4;
+
 	/**
 	 * Long text column (16BIT)
 	 *
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT16 = 5;
+
 	/**
 	 * 32BIT long textfield (number of characters can be as high as 32BIT) Data type
 	 * This is the biggest column that RedBean supports. If possible you may write
@@ -73,18 +81,21 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @var integer
 	 */
 	const C_DATATYPE_TEXT32 = 6;
+
 	/**
 	 * Special type date for storing date values: YYYY-MM-DD or YYYY-MM-DD HH:MM(:SS)
 	 *
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_DATE = 80;
+
 	/**
 	 * Special type date for storing date values: YYYY-MM-DD HH:MM:SS.FF
 	 *
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIAL_TIMESTAMP = 81;
+
 	/**
 	 * Specified. This means the developer or DBA
 	 * has altered the column to a different type not
@@ -94,6 +105,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @var integer
 	 */
 	const C_DATATYPE_SPECIFIED = 99;
+
 	/**
 	 * Spatial types
 	 *
@@ -139,9 +151,12 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT32            => 'CLOB',
 			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE      => 'DATE',
 			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP => 'TIMESTAMP(6)' );
+
 		$this->sqltype_typeno = array();
-		foreach ( $this->typeno_sqltype as $k => $v )
+
+		foreach ( $this->typeno_sqltype as $k => $v ) {
 			$this->sqltype_typeno[$v] = $k;
+		}
 	}
 
 	/**
@@ -157,21 +172,26 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	{
 		$tableNoQuote   = strtoupper( $this->esc( $table, true ) );
 		$tableWithQuote = strtoupper( $this->esc( $table ) );
+
 		sort( $columns ); //else we get multiple indexes due to order-effects
+
 		foreach ( $columns as $k => $v ) {
 			$columns[$k] = strtoupper( $this->esc( $v, true ) );
 		}
-		$r    = $this->adapter->get( "SELECT INDEX_NAME FROM USER_INDEXES WHERE TABLE_NAME='$tableNoQuote' AND UNIQUENESS='UNIQUE'" );
+
+		$r = $this->adapter->get( "SELECT INDEX_NAME FROM USER_INDEXES WHERE TABLE_NAME='$tableNoQuote' AND UNIQUENESS='UNIQUE'" );
+
 		$name = strtoupper( 'UQ_' . substr( sha1( implode( ',', $columns ) ), 0, 20 ) );
+
 		if ( $r ) {
 			foreach ( $r as $i ) {
-				if ( $i['index_name'] == $name ) {
-					return;
-				}
+				if ( $i['index_name'] == $name ) return;
 			}
 		}
+
 		$sql = "ALTER TABLE $tableWithQuote
                 ADD CONSTRAINT  $name UNIQUE (" . implode( ',', $columns ) . ")";
+
 		$this->adapter->exec( $sql );
 	}
 
@@ -192,32 +212,42 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	{
 		try {
 			$table     = strtoupper( $this->esc( $table ) );
+
 			$table1    = strtoupper( $this->esc( $table1 ) );
 			$table2    = strtoupper( $this->esc( $table2 ) );
+
 			$property1 = strtoupper( $this->esc( $property1 ) );
 			$property2 = strtoupper( $this->esc( $property2 ) );
+
 			$fks       = $this->adapter->getCell( "
 				SELECT COUNT(*)
 		        FROM ALL_CONS_COLUMNS A JOIN ALL_CONSTRAINTS C  ON A.CONSTRAINT_NAME = C.CONSTRAINT_NAME
 			    WHERE LOWER(C.TABLE_NAME) = ? AND C.CONSTRAINT_TYPE = 'R'
 					  ", array( $table ) );
-			//already foreign keys added in this association table
-			if ( $fks > 0 )
-				return false;
+
+			// Already foreign keys added in this association table
+			if ( $fks > 0 ) return false;
+
 			$columns = $this->getColumns( $table );
+
 			if ( $this->code( $columns[$property1] ) !== RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 ) {
 				$this->widenColumn( $table, $property1, RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 );
 			}
+
 			if ( $this->code( $columns[$property2] ) !== RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 ) {
 				$this->widenColumn( $table, $property2, edBean_QueryWriter_Oracle::C_DATATYPE_UINT32 );
 			}
+
 			$sql = "
 				ALTER TABLE " . $table . "
 				ADD FOREIGN KEY($property1) references $table1(id) ON DELETE CASCADE";
+
 			$this->adapter->exec( $sql );
+
 			$sql = "
 				ALTER TABLE " . $table . "
 				ADD FOREIGN KEY($property2) references $table2(id) ON DELETE CASCADE";
+
 			$this->adapter->exec( $sql );
 
 			return true;
@@ -266,8 +296,10 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	{
 		$table  = $type;
 		$table  = strtoupper( $this->esc( $table ) );
+
 		$name   = $this->limitOracleIdentifierLength( preg_replace( '/\W/', '', $name ) );
 		$column = strtoupper( $this->esc( $column ) );
+
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
 		} catch ( Exception $e ) {
@@ -290,19 +322,25 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		if ( strtolower( $table ) != $table ) {
 			throw new Exception( $table . ' is not lowercase. With ORACLE you MUST only use lowercase table in PHP, sorry!' );
 		}
+
 		$table_with_quotes         = strtoupper( $this->esc( $table ) );
 		$safe_table_without_quotes = strtoupper( $this->esc( $table, true ) );
-		$sql                       = "CREATE TABLE $table_with_quotes(
+
+		$sql = "CREATE TABLE $table_with_quotes(
                 ID NUMBER(11) NOT NULL,
                 CONSTRAINT " . $safe_table_without_quotes . "_PK PRIMARY KEY (ID)
                 )";
+
 		$this->adapter->exec( $sql );
+
 		$sql =
 			"CREATE SEQUENCE " . $safe_table_without_quotes . "_SEQ
             START WITH 1
             INCREMENT BY 1
             NOCACHE";
+
 		$this->adapter->exec( $sql );
+
 		$sql =
 			"CREATE OR REPLACE TRIGGER " . $safe_table_without_quotes . "_SEQ_TRI
             BEFORE INSERT ON $table_with_quotes
@@ -312,6 +350,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
             INTO   :NEW.ID
             FROM   DUAL;
             END " . $safe_table_without_quotes . "_SEQ_TRI;";
+
 		$this->adapter->exec( $sql );
 	}
 
@@ -329,9 +368,11 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	public function addColumn( $type, $column, $field )
 	{
 		$columnTested = preg_replace( '/^((own)|(shared))./', '', $column );
+
 		if ( strtolower( $columnTested ) != $columnTested ) {
 			throw new Exception( $column . ' is not lowercase. With ORACLE you MUST only use lowercase properties in PHP, sorry!' );
 		}
+
 		parent::addColumn( strtoupper( $type ), strtoupper( $column ), $field );
 	}
 
@@ -377,8 +418,10 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		$table      = $this->esc( $table, true );
 		$columnsRaw = $this->adapter->get( "SELECT LOWER(COLUMN_NAME) COLUMN_NAME, DATA_TYPE, DATA_LENGTH, DATA_PRECISION FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = UPPER('$table')" );
 
+		$columns = array();
 		foreach ( $columnsRaw as $r ) {
 			$field = $r['column_name'];
+
 			switch ( $r['data_type'] ) {
 				case 'NUMBER':
 					$columns[$field] = $r['data_type'] . '(' . ( (int) $r['data_precision'] ) . ',0)';
@@ -413,10 +456,10 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	public function code( $typedescription, $includeSpecials = false )
 	{
 		$r = ( ( isset( $this->sqltype_typeno[$typedescription] ) ) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED );
-		if ( $includeSpecials )
-			return $r;
-		if ( $r > self::C_DATATYPE_SPECIFIED )
-			return self::C_DATATYPE_SPECIFIED;
+
+		if ( $includeSpecials ) return $r;
+
+		if ( $r > self::C_DATATYPE_SPECIFIED ) return self::C_DATATYPE_SPECIFIED;
 
 		return $r;
 	}
@@ -433,16 +476,24 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function widenColumn( $type, $column, $datatype )
 	{
-		$table         = $type;
-		$type          = $datatype;
-		$table         = strtoupper( $this->esc( $table ) );
-		$column        = strtoupper( $this->esc( $column ) );
-		$newtype       = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
+		$table   = $type;
+		$type    = $datatype;
+
+		$table   = strtoupper( $this->esc( $table ) );
+		$column  = strtoupper( $this->esc( $column ) );
+
+		$newtype = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
+
 		$addTempColumn = "ALTER TABLE $table ADD (HOPEFULLYNOTEXIST $newtype)";
+
 		$this->adapter->exec( $addTempColumn );
+
 		$updateTempColumn = "UPDATE $table SET HOPEFULLYNOTEXIST = $column";
+
 		$this->adapter->exec( $updateTempColumn );
+
 		$this->adapter->exec( "ALTER TABLE $table DROP COLUMN $column" );
+
 		$this->adapter->exec( "ALTER TABLE $table RENAME COLUMN HOPEFULLYNOTEXIST TO $column" );
 	}
 
@@ -521,28 +572,36 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	{
 		$table           = strtoupper( $this->esc( $type ) );
 		$tableNoQ        = strtoupper( $this->esc( $type, true ) );
+
 		$targetTable     = strtoupper( $this->esc( $targetType ) );
+
 		$column          = strtoupper( $this->esc( $field ) );
 		$columnNoQ       = strtoupper( $this->esc( $field, true ) );
+
 		$targetColumn    = strtoupper( $this->esc( $targetField ) );
 		$targetColumnNoQ = strtoupper( $this->esc( $targetField, true ) );
+
 		$fkName          = 'FK_' . ( $isDependent ? 'C_' : '' ) . $tableNoQ . '_' . $columnNoQ . '_' . $targetColumnNoQ;
 		$fkName          = $this->limitOracleIdentifierLength( $fkName );
-		$cfks            = $this->adapter->getCell( "
+
+		$cfks = $this->adapter->getCell( "
 			SELECT A.CONSTRAINT_NAME
 		    FROM ALL_CONS_COLUMNS A JOIN ALL_CONSTRAINTS C  ON A.CONSTRAINT_NAME = C.CONSTRAINT_NAME
 			WHERE C.TABLE_NAME = '$tableNoQ' AND C.CONSTRAINT_TYPE = 'R'	AND COLUMN_NAME='$columnNoQ'" );
-		$flagAddKey      = false;
+
+		$flagAddKey = false;
 		try {
-			//No keys
+			// No keys
 			if ( !$cfks ) {
 				$flagAddKey = true; //go get a new key
 			}
-			//has fk, but different setting, --remove
+
+			// Has fk, but different setting, --remove
 			if ( $cfks && $cfks != $fkName ) {
 				$this->adapter->exec( "ALTER TABLE $table DROP CONSTRAINT $cfks " );
 				$flagAddKey = true; //go get a new key.
 			}
+
 			if ( $flagAddKey ) {
 				$sql = "ALTER TABLE  $table
 				ADD CONSTRAINT $fkName FOREIGN KEY (  $column ) REFERENCES  $targetTable (
@@ -551,7 +610,8 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 				$this->adapter->exec( $sql );
 			}
 		} catch ( Exception $e ) {
-		} //Failure of fk-constraints is not a problem
+			// Failure of fk-constraints is not a problem
+		}
 	}
 
 	/**
@@ -615,9 +675,11 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	public function scanType( $value, $flagSpecial = false )
 	{
 		$this->svalue = $value;
+
 		if ( is_null( $value ) ) {
 			return RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL;
 		}
+
 		if ( $flagSpecial ) {
 			if ( preg_match( '/^\d{4}\-\d\d-\d\d(\s\d\d:\d\d(:\d\d)?)?$/', $value ) ) {
 				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE;
@@ -626,24 +688,31 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP;
 			}
 		}
+
 		$value = strval( $value );
+
 		if ( !$this->startsWithZeros( $value ) ) {
 			if ( $value == '1' || $value == '' ) {
 				return RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL;
 			}
+
 			if ( is_numeric( $value ) && ( floor( $value ) == $value ) && $value >= 0 && $value <= 255 ) {
 				return RedBean_QueryWriter_Oracle::C_DATATYPE_UINT8;
 			}
+
 			if ( is_numeric( $value ) && ( floor( $value ) == $value ) && $value >= 0 && $value <= 4294967295 ) {
 				return RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32;
 			}
+
 			if ( is_numeric( $value ) ) {
 				return RedBean_QueryWriter_Oracle::C_DATATYPE_DOUBLE;
 			}
 		}
+
 		if ( strlen( $value ) <= 255 ) {
 			return RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT8;
 		}
+
 		if ( strlen( $value ) <= 2000 ) {
 			return RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT16;
 		}
@@ -661,10 +730,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function wipe( $type )
 	{
-		$table = $type;
-		$table = $this->esc( $table );
-		$sql   = "TRUNCATE TABLE $table ";
-		$this->adapter->exec( $sql );
+		$this->adapter->exec( "TRUNCATE TABLE " . $this->esc( $type ) );
 	}
 
 	/**
