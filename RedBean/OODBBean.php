@@ -599,10 +599,16 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 		}
 
+		$isShared = strpos( $property, 'shared' ) === 0;
+
+		$isOwn = strpos( $property, 'own' ) === 0;
+
 		if (
 			!isset( $this->properties[$property] )
-			|| ( $this->withSql !== '' && ( ( strpos( $property, 'own' ) === 0 )
-			|| ( strpos( $property, 'shared' ) === 0 ) ) )
+			|| (
+				( $this->withSql !== '' )
+				&& ( $isOwn || $isShared )
+			)
 		) {
 			$fieldLink = $property . '_id';
 
@@ -628,10 +634,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 				$this->properties[$property] = $bean;
 
 				return $this->properties[$property];
-			} elseif (
-				strpos( $property, 'own' ) === 0
-				&& ctype_upper( substr( $property, 3, 1 ) )
-			) {
+			}
+
+			if ( $isOwn && ctype_upper( substr( $property, 3, 1 ) ) ) {
 				$beans = $this->getOwnList( lcfirst( substr( $property, 3 ) ), $redbean );
 
 				$this->properties[$property]             = $beans;
@@ -640,10 +645,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 				$this->__info['tainted']                 = true;
 
 				return $this->properties[$property];
-			} elseif (
-				strpos( $property, 'shared' ) === 0
-				&& ctype_upper( substr( $property, 6, 1 ) )
-			) {
+			}
+
+			if ( $isShared && ctype_upper( substr( $property, 6, 1 ) ) ) {
 				$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
 
 				$this->properties[$property]             = $beans;
@@ -652,11 +656,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 				$this->__info['tainted']                 = true;
 
 				return $this->properties[$property];
-			} else {
-				$null = null;
-
-				return $null;
 			}
+
+			$null = null;
+
+			return $null;
 		} else {
 			return $this->properties[$property];
 		}
