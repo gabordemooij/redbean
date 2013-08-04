@@ -18,7 +18,6 @@
  */
 abstract class RedBean_QueryWriter_AQueryWriter
 {
-
 	/**
 	 * @var RedBean_Adapter_DBAdapter
 	 */
@@ -79,9 +78,10 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	private function getCached( $cacheTag, $key )
 	{
 		$sql = $this->adapter->getSQL();
+
 		if ( strpos( $sql, '-- keep-cache' ) !== strlen( $sql ) - 13 ) {
-			//If SQL has been taken place outside of this method then something else then
-			//a select query might have happened! (or instruct to keep cache)
+			// If SQL has been taken place outside of this method then something else then
+			// a select query might have happened! (or instruct to keep cache)
 			$this->cache = array();
 		} else {
 			if ( isset( $this->cache[$cacheTag][$key] ) ) {
@@ -134,29 +134,36 @@ abstract class RedBean_QueryWriter_AQueryWriter
 		$sqlConditions = array();
 		foreach ( $conditions as $column => $values ) {
 			if ( !count( $values ) ) continue;
+
 			$sql = $this->esc( $column );
 			$sql .= ' IN ( ';
-			if ( !is_array( $values ) ) {
-				$values = array( $values );
-			}
-			//if it's safe to skip bindings, do so...
+
+			if ( !is_array( $values ) ) $values = array( $values );
+
+			// If it's safe to skip bindings, do so...
 			if ( ctype_digit( implode( '', $values ) ) ) {
 				$sql .= implode( ',', $values ) . ' ) ';
-				//only numeric, cant do much harm.
+
+				// only numeric, cant do much harm
 				$sqlConditions[] = $sql;
 			} else {
 				$sql .= implode( ',', array_fill( 0, count( $values ), '?' ) ) . ' ) ';
+
 				$sqlConditions[] = $sql;
+
 				foreach ( $values as $k => $v ) {
 					$values[$k] = strval( $v );
+
 					array_unshift( $bindings, $v );
 				}
 			}
 		}
+
 		$sql = '';
 		if ( is_array( $sqlConditions ) && count( $sqlConditions ) > 0 ) {
 			$sql = implode( ' AND ', $sqlConditions );
 			$sql = " WHERE ( $sql ) ";
+
 			if ( $addSql ) $sql .= $addSql;
 		} elseif ( $addSql ) {
 			$sql = $addSql;
@@ -178,7 +185,13 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	{
 		$linkTable   = $this->esc( $this->getAssocTable( array( $sourceType, $destType ) ), $noQuote );
 		$sourceCol   = $this->esc( $sourceType . '_id', $noQuote );
-		$destCol     = ( $sourceType === $destType ) ? $this->esc( $destType . '2_id', $noQuote ) : $this->esc( $destType . '_id', $noQuote );
+
+		if ( $sourceType === $destType ) {
+			$destCol = $this->esc( $destType . '2_id', $noQuote );
+		} else {
+			$destCol = $this->esc( $destType . '_id', $noQuote );
+		}
+
 		$sourceTable = $this->esc( $sourceType, $noQuote );
 		$destTable   = $this->esc( $destType, $noQuote );
 
