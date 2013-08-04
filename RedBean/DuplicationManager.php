@@ -61,6 +61,7 @@ class RedBean_DuplicationManager
 	private function copySharedBeans( RedBean_OODBBean $copy, $shared, $beans )
 	{
 		$copy->$shared = array();
+
 		foreach ( $beans as $subBean ) {
 			array_push( $copy->$shared, $subBean );
 		}
@@ -99,7 +100,9 @@ class RedBean_DuplicationManager
 	private function createCopy( RedBean_OODBBean $bean )
 	{
 		$type = $bean->getMeta( 'type' );
+
 		$copy = $this->redbean->dispense( $type );
+
 		$copy->importFrom( $bean );
 		$copy->id = 0;
 
@@ -120,9 +123,11 @@ class RedBean_DuplicationManager
 	{
 		$type = $bean->getMeta( 'type' );
 		$key  = $type . $bean->getID();
+
 		if ( isset( $trail[$key] ) ) {
 			return true;
 		}
+
 		$trail[$key] = $bean;
 
 		return false;
@@ -185,16 +190,27 @@ class RedBean_DuplicationManager
 	 */
 	protected function duplicate( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false )
 	{
-		$type = $bean->getMeta( 'type' );
 		if ( $this->inTrailOrAdd( $trail, $bean ) ) {
 			return $bean;
 		}
+
+		$type = $bean->getMeta( 'type' );
+
 		$copy = $this->createCopy( $bean );
 		foreach ( $this->tables as $table ) {
-			if ( ( is_array( $this->filters ) && count( $this->filters ) && !in_array( $table, $this->filters ) ) || $table == $type ) {
+			if (
+				(
+					is_array( $this->filters )
+					&& count( $this->filters )
+					&& !in_array( $table, $this->filters )
+				)
+				|| $table == $type
+			) {
 				continue;
 			}
+
 			list( $owned, $shared ) = $this->getListNames( $table );
+
 			if ( $this->hasSharedList( $type, $table ) ) {
 				if ( $beans = $bean->$shared ) {
 					$this->copySharedBeans( $copy, $shared, $beans );
@@ -203,10 +219,13 @@ class RedBean_DuplicationManager
 				if ( $beans = $bean->$owned ) {
 					$this->copyOwnBeans( $copy, $owned, $beans, $trail, $preserveIDs );
 				}
+
 				$copy->setMeta( 'sys.shadow.' . $owned, null );
 			}
+
 			$copy->setMeta( 'sys.shadow.' . $shared, null );
 		}
+
 		$copy->id = ( $preserveIDs ) ? $bean->id : $copy->id;
 
 		return $copy;

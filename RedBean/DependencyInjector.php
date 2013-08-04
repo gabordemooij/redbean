@@ -54,9 +54,11 @@ class RedBean_DependencyInjector
 	public function getInstance( $modelClassName )
 	{
 		$object = new $modelClassName;
+
 		if ( $this->dependencies && is_array( $this->dependencies ) ) {
 			foreach ( $this->dependencies as $key => $dep ) {
 				$depSetter = 'set' . $key;
+
 				if ( method_exists( $object, $depSetter ) ) {
 					$object->$depSetter( $dep );
 				}
