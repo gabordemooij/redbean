@@ -318,7 +318,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 * @param string $sql      SQL Code to execute
 	 * @param array  $aValues  Values to bind to SQL query
 	 *
-	 * @return void
+	 * @return array Affected Rows
 	 */
 	public function Execute( $sql, $aValues = array() )
 	{

@@ -57,6 +57,11 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private $payload = array();
 
 	/**
+	 * @var string
+	 */
+	private $uri;
+
+	/**
 	 * Reference bean, the bean used to find other beans in a REST request.
 	 * All beans should be reachable given this root bean.
 	 *
@@ -70,6 +75,11 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 * @var string
 	 */
 	private $list;
+
+	/**
+	 * @var RedBean_OODBBean
+	 */
+	private $bean;
 
 	/**
 	 * Name of the type of the currently selected list.

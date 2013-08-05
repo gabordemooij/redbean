@@ -785,7 +785,7 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	 */
 	public function renameAssocTable( $from, $to = null )
 	{
-		return self::renameAssociation( $from, $to );
+		self::renameAssociation( $from, $to );
 	}
 
 	/**

@@ -45,8 +45,8 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 	 * If a query gets executed this method gets invoked because the
 	 * adapter will send a signal to the attached logger.
 	 *
-	 * @param  string            $eventName          ID of the event (name)
-	 * @param  RedBean_DBAdapter $adapter            adapter that sends the signal
+	 * @param  string                    $eventName          ID of the event (name)
+	 * @param  RedBean_Adapter_DBAdapter $adapter            adapter that sends the signal
 	 *
 	 * @return void
 	 */
