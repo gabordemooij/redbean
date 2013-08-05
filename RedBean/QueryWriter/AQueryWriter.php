@@ -718,7 +718,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	}
 	
 	/**
-	 * @see RedBean_QueryWriter::wideColumn
+	 * @see RedBean_QueryWriter::widenColumn
 	 */
 	public function widenColumn( $type, $column, $datatype )
 	{
