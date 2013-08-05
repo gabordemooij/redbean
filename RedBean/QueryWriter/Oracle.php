@@ -708,19 +708,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	}
 
 	/**
-	 * This method removes all beans of a certain type.
-	 * This methods accepts a type and infers the corresponding table name.
-	 *
-	 * @param  string $type bean type
-	 *
-	 * @return void
-	 */
-	public function wipe( $type )
-	{
-		$this->adapter->exec( "TRUNCATE TABLE " . $this->esc( $type ) );
-	}
-
-	/**
 	 * Drops all tables in database
 	 */
 	public function wipeAll()

@@ -408,7 +408,9 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	public function wipe( $type )
 	{
-		$this->adapter->exec( "DELETE FROM " . $this->esc( $type ) );
+		$table = $this->esc( $type );
+		
+		$this->adapter->exec( "DELETE FROM $table " );
 	}
 
 	/**

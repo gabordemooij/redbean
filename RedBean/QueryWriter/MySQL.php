@@ -247,24 +247,6 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::wideColumn
-	 */
-	public function widenColumn( $type, $column, $datatype )
-	{
-		if ( !isset($this->typeno_sqltype[$datatype]) ) return;
-
-		$table   = $type;
-		$type    = $datatype;
-
-		$table   = $this->esc( $table );
-		$column  = $this->esc( $column );
-
-		$newtype = $this->typeno_sqltype[$type];
-
-		$this->adapter->exec( "ALTER TABLE $table CHANGE $column $column $newtype " );
-	}
-
-	/**
 	 * @see RedBean_QueryWriter::addUniqueIndex
 	 */
 	public function addUniqueIndex( $table, $columns )

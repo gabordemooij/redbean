@@ -418,11 +418,4 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 		$this->adapter->exec( 'SET CONSTRAINTS ALL IMMEDIATE' );
 	}
 
-	/**
-	 * @see RedBean_QueryWriter::wipe
-	 */
-	public function wipe( $type )
-	{
-		$this->adapter->exec( "TRUNCATE " . $this->esc( $type ) . " CASCADE" );
-	}
 }
