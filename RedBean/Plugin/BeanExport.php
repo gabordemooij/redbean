@@ -47,6 +47,11 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 	protected $maxDepth = false;
 
 	/**
+	 * @var array
+	 */
+	protected $tables = array();
+
+	/**
 	 * Extracts the parent bean from the current bean and puts the
 	 * contents in the export array.
 	 *

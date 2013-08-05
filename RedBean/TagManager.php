@@ -149,7 +149,7 @@ class RedBean_TagManager
 	 * @param RedBean_OODBBean $bean    bean
 	 * @param mixed            $tagList tags
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public function tag( RedBean_OODBBean $bean, $tagList = null )
 	{
@@ -172,6 +172,8 @@ class RedBean_TagManager
 
 		$this->associationManager->clearRelations( $bean, 'tag' );
 		$this->addTags( $bean, $tagList );
+
+		return $tagList;
 	}
 
 	/**

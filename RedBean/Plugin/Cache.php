@@ -112,7 +112,7 @@ class RedBean_Plugin_Cache extends RedBean_OODB implements RedBean_Plugin
 			unset( $this->cache[$type][$id] );
 		}
 
-		return parent::trash( $bean );
+		parent::trash( $bean );
 	}
 
 	/**

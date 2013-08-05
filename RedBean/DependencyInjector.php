@@ -8,7 +8,7 @@
  * @license BSD/GPLv2
  *
  * A default dependency injector that can be subclassed to
- * suit your needs. This injetor can be used to inject helper objects into
+ * suit your needs. This injector can be used to inject helper objects into
  * FUSE(d) models.
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community

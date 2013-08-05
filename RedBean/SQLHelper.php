@@ -188,9 +188,9 @@ class RedBean_SQLHelper
 	{
 		if ( $this->capture ) {
 			$this->sql .= ' ' . $sql . ' ';
-
-			return $this;
 		}
+
+		return $this;
 	}
 
 	/**
@@ -240,9 +240,9 @@ class RedBean_SQLHelper
 	{
 		if ( $this->capture ) {
 			$this->sql .= ' ( ';
-
-			return $this;
 		}
+
+		return $this;
 	}
 
 	/**
@@ -254,9 +254,9 @@ class RedBean_SQLHelper
 	{
 		if ( $this->capture ) {
 			$this->sql .= ' ) ';
-
-			return $this;
 		}
+
+		return $this;
 	}
 
 	/**

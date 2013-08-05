@@ -87,7 +87,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 	/** Returns the alias for a type
 	 *
-	 * @param  $type aliased type
+	 * @param string $type type
 	 *
 	 * @return string $type type
 	 */
@@ -228,7 +228,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * nested beans (bean lists: ownBean, sharedBean) without the need to
 	 * rely on static calls to the facade (or make this class dep. on OODB).
 	 *
-	 * @param RedBean_IBeanHelper $helper
+	 * @param RedBean_BeanHelper $helper
 	 *
 	 * @return void
 	 */
@@ -652,7 +652,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * The tainted meta property indicates whether a bean has been modified and
 	 * can be used in various caching mechanisms.
 	 *
-	 * @param string $property name of the propery you wish to assign a value to
+	 * @param string $property name of the property you wish to assign a value to
 	 * @param  mixed $value    the value you want to assign
 	 *
 	 * @return void
@@ -675,7 +675,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			&& !( $value instanceof RedBean_OODBBean )
 		) {
 			if ( is_null( $value ) || $value === false ) {
-				return $this->__unset( $property );
+				$this->__unset( $property );
+
+				return;
 			} else {
 				throw new RedBean_Exception_Security( 'Cannot cast to bean.' );
 			}
@@ -722,7 +724,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * RedBean as well as other systems how to deal with the bean.
 	 * For instance: $bean->setMeta("buildcommand.unique", array(
 	 * array("column1", "column2", "column3") ) );
-	 * Will add a UNIQUE constaint for the bean on columns: column1, column2 and
+	 * Will add a UNIQUE constraint for the bean on columns: column1, column2 and
 	 * column 3.
 	 * To access a Meta property we use a dot separated notation.
 	 * If the property cannot be found this getter will return NULL instead.
@@ -785,7 +787,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$model = $this->beanHelper->getModelForBean( $this );
 
 			if ( !$model ) {
-				return;
+				return null;
 			}
 
 			$this->__info['model'] = $model;
@@ -911,7 +913,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
-	 * Checks wether a bean is empty or not.
+	 * Checks whether a bean is empty or not.
 	 * A bean is empty if it has no other properties than the id field OR
 	 * if all the other property are empty().
 	 *
@@ -982,6 +984,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		if ( array_key_exists( $property, $old ) ) {
 			return $old[$property];
 		}
+
+		return null;
 	}
 
 	/**

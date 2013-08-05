@@ -107,7 +107,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 *    $driver = new RedBean_Driver_OCI($dsn, $user, $password);
 	 *    $driver = new RedBean_Driver_OCI($existingConnection);
 	 *
-	 * @param string|resrouce $dsn     database connection string
+	 * @param string|resource $dsn     database connection string
 	 * @param string          $user    optional
 	 * @param string          $pass    optional
 	 *
@@ -115,7 +115,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 */
 	public function __construct( $dsn, $user = null, $pass = null )
 	{
-		if ( $dsn instanceof resource ) {
+		if ( is_resource($dsn) ) {
 			$this->connection  = $dsn;
 			$this->isConnected = true;
 
@@ -130,7 +130,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * @todo add Documentation
 	 *
-	 * @return type
+	 * @return string
 	 */
 	public function getNlsDateFormat()
 	{
@@ -140,7 +140,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * @todo add Documentation
 	 *
-	 * @return type
+	 * @return void
 	 */
 	public function setNlsDateFormat( $nlsDateFormat )
 	{
@@ -150,7 +150,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * @todo add Documentation
 	 *
-	 * @return type
+	 * @return string
 	 */
 	public function getNlsTimestampFormat()
 	{
@@ -160,7 +160,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * @todo add Documentation
 	 *
-	 * @return type
+	 * @return void
 	 */
 	public function setNlsTimestampFormat( $nlsTimestampFormat )
 	{
@@ -318,7 +318,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 * @param string $sql      SQL Code to execute
 	 * @param array  $aValues  Values to bind to SQL query
 	 *
-	 * @return void
+	 * @return array Affected Rows
 	 */
 	public function Execute( $sql, $aValues = array() )
 	{
@@ -414,6 +414,8 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 * @param string $sql      SQL Code to execute
 	 * @param array  $aValues  Values to bind to SQL query
 	 *
+	 * @throws RedBean_Exception_SQL
+	 *
 	 * @return void
 	 */
 	private function doBinding( $sql, $aValues = array() )
@@ -475,7 +477,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * Returns the underlying PHP OCI instance.
 	 *
-	 * @return OCI
+	 * @return resource
 	 */
 	public function getOCI()
 	{

@@ -71,7 +71,7 @@ interface RedBean_Driver
 	 * @param string $sql      SQL Code to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
-	 * @return void
+	 * @return array Affected Rows
 	 */
 	public function Execute( $sql, $bindings = array() );
 

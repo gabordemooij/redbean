@@ -50,7 +50,7 @@ class RedBean_OODB extends RedBean_Observable
 	protected $isFrozen = false;
 
 	/**
-	 * @var null|RedBean_BeanHelperFacade
+	 * @var RedBean_BeanHelper_Facade
 	 */
 	protected $beanhelper = null;
 
@@ -62,7 +62,7 @@ class RedBean_OODB extends RedBean_Observable
 	/**
 	 * Handles Exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param Exception $exception exceotion
+	 * @param Exception $exception exception
 	 *
 	 * @return void
 	 *
@@ -152,7 +152,7 @@ class RedBean_OODB extends RedBean_Observable
 	/**
 	 * Processes an embedded bean.
 	 *
-	 * @param RedBean_OODBBean|Model $embeddedBean the bean or model
+	 * @param RedBean_OODBBean|RedBean_SimpleModel $embeddedBean the bean or model
 	 *
 	 * @return integer
 	 */
@@ -668,7 +668,7 @@ class RedBean_OODB extends RedBean_Observable
 	 * Sets bean helper to be given to beans.
 	 * Bean helpers assist beans in getting a reference to a toolbox.
 	 *
-	 * @param RedBean_IBeanHelper $beanhelper helper
+	 * @param RedBean_BeanHelper $beanhelper helper
 	 *
 	 * @return void
 	 */
@@ -833,9 +833,10 @@ class RedBean_OODB extends RedBean_Observable
 	 * @param string  $type type of bean you want to load
 	 * @param integer $id   ID of the bean you want to load
 	 *
+	 * @throws RedBean_Exception_SQL
+	 *
 	 * @return RedBean_OODBBean
 	 *
-	 * @throws RedBean_Exception_Security
 	 */
 	public function load( $type, $id )
 	{
@@ -917,7 +918,7 @@ class RedBean_OODB extends RedBean_Observable
 
 	/**
 	 * Returns an array of beans. Pass a type and a series of ids and
-	 * this method will bring you the correspondig beans.
+	 * this method will bring you the corresponding beans.
 	 *
 	 * important note: Because this method loads beans using the load()
 	 * function (but faster) it will return empty beans with ID 0 for

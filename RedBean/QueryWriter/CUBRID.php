@@ -66,12 +66,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{
-		$writer      = $this;
-		$adapter     = $this->adapter;
-		$firstState  = $this->buildFK( $table, $table1, $property1, 'id', true );
-		$secondState = $this->buildFK( $table, $table2, $property2, 'id', true );
-
-		return ( $firstState && $secondState );
+		$this->buildFK( $table, $table1, $property1, 'id', true );
+		$this->buildFK( $table, $table2, $property2, 'id', true );
 	}
 
 	/**
@@ -103,11 +99,9 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$columnNoQ       = $this->esc( $field, true );
 
 		$targetColumn    = $this->esc( $targetField );
-		$targetColumnNoQ = $this->esc( $targetField, true );
 
 		$keys            = $this->getKeys( $targetTableNoQ, $tableNoQ );
 
-		$needsToAddFK    = true;
 		$needsToDropFK   = false;
 
 		foreach ( $keys as $key ) {
@@ -287,17 +281,17 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function widenColumn( $type, $column, $datatype )
 	{
+		if ( !isset($this->typeno_sqltype[$datatype]) ) return;
+
 		$table   = $type;
 		$type    = $datatype;
 
 		$table   = $this->esc( $table );
 		$column  = $this->esc( $column );
 
-		$newtype = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
+		$newtype = $this->typeno_sqltype[$type];
 
-		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
-
-		$this->adapter->exec( $changecolumnSQL );
+		$this->adapter->exec( "ALTER TABLE $table CHANGE $column $column $newtype " );
 	}
 
 	/**
@@ -371,7 +365,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false )
 	{
-		return $this->buildFK( $type, $targetType, $field, $targetField, $isDependent );
+		$this->buildFK( $type, $targetType, $field, $targetField, $isDependent );
 	}
 
 	/**

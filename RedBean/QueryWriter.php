@@ -310,9 +310,9 @@ interface RedBean_QueryWriter
 	 * $name.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param  $type   type to add index to
-	 * @param  $name   name of the new index
-	 * @param  $column field to index
+	 * @param string $type   type to add index to
+	 * @param string $name   name of the new index
+	 * @param string $column field to index
 	 *
 	 * @return void
 	 */
