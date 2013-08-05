@@ -68,8 +68,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{
 		try {
-			$writer  = $this;
-
 			$adapter = $this->adapter;
 
 			$fkCode  = 'fk' . md5( $table . $property1 . $property2 );

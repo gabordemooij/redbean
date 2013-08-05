@@ -99,11 +99,9 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$columnNoQ       = $this->esc( $field, true );
 
 		$targetColumn    = $this->esc( $targetField );
-		$targetColumnNoQ = $this->esc( $targetField, true );
 
 		$keys            = $this->getKeys( $targetTableNoQ, $tableNoQ );
 
-		$needsToAddFK    = true;
 		$needsToDropFK   = false;
 
 		foreach ( $keys as $key ) {

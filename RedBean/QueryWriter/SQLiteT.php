@@ -217,8 +217,6 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 */
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{
-		$writer      = $this;
-		$adapter     = $this->adapter;
 		$firstState  = $this->buildFK( $table, $table1, $property1, 'id', true );
 		$secondState = $this->buildFK( $table, $table2, $property2, 'id', true );
 
