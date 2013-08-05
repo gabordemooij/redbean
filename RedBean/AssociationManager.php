@@ -112,6 +112,8 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * @param RedBean_OODBBean $bean2 second bean
 	 * @param RedBean_OODBBean $bean  base bean
 	 *
+	 * @throws Exception|RedBean_Exception_SQL
+	 *
 	 * @return mixed
 	 */
 	protected function associateBeans( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean )
@@ -330,7 +332,9 @@ class RedBean_AssociationManager extends RedBean_Observable
 					$linkType = $this->getTable( array( $type1, $type2 ) );
 
 					if ( $fast ) {
-						return $this->writer->deleteRecord( $linkType, array( 'id' => $row['id'] ) );
+						$this->writer->deleteRecord( $linkType, array( 'id' => $row['id'] ) );
+
+						return;
 					}
 
 					$beans = $this->oodb->convertToBeans( $linkType, array( $row ) );

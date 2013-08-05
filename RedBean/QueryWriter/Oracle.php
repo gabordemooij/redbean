@@ -315,6 +315,8 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @param string $table type of bean you want to create a table for
 	 *
+	 * @throws Exception
+	 *
 	 * @return void
 	 */
 	public function createTable( $table )
@@ -362,8 +364,9 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @param string  $column name of the column
 	 * @param integer $field  data type for field
 	 *
-	 * @return void
+	 * @throws Exception
 	 *
+	 * @return void
 	 */
 	public function addColumn( $type, $column, $field )
 	{
@@ -635,7 +638,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function deleteRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
 	{
-		return parent::deleteRecord( $type, $this->filterConditions( $conditions ), $addSql, $bindings );
+		parent::deleteRecord( $type, $this->filterConditions( $conditions ), $addSql, $bindings );
 	}
 
 	/**

@@ -22,7 +22,7 @@ class RedBean_ModelHelper implements RedBean_Observer
 	private static $modelFormatter;
 
 	/**
-	 * @var type
+	 * @var RedBean_DependencyInjector
 	 */
 	private static $dependencyInjector;
 
@@ -124,7 +124,7 @@ class RedBean_ModelHelper implements RedBean_Observer
 	 * that belongs to the CRUD bean and this model will take over control from
 	 * there.
 	 *
-	 * @param Observable $observable
+	 * @param RedBean_Observable $observable
 	 *
 	 * @return void
 	 */

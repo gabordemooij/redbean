@@ -50,7 +50,7 @@ class RedBean_OODB extends RedBean_Observable
 	protected $isFrozen = false;
 
 	/**
-	 * @var null|RedBean_BeanHelperFacade
+	 * @var RedBean_BeanHelper_Facade
 	 */
 	protected $beanhelper = null;
 
@@ -668,7 +668,7 @@ class RedBean_OODB extends RedBean_Observable
 	 * Sets bean helper to be given to beans.
 	 * Bean helpers assist beans in getting a reference to a toolbox.
 	 *
-	 * @param RedBean_IBeanHelper $beanhelper helper
+	 * @param RedBean_BeanHelper $beanhelper helper
 	 *
 	 * @return void
 	 */
@@ -833,9 +833,10 @@ class RedBean_OODB extends RedBean_Observable
 	 * @param string  $type type of bean you want to load
 	 * @param integer $id   ID of the bean you want to load
 	 *
+	 * @throws RedBean_Exception_SQL
+	 *
 	 * @return RedBean_OODBBean
 	 *
-	 * @throws RedBean_Exception_Security
 	 */
 	public function load( $type, $id )
 	{

@@ -201,6 +201,8 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 * UTF8 for the database and PDO-ERRMODE-EXCEPTION as well as
 	 * PDO-FETCH-ASSOC.
 	 *
+	 * @throws PDOException
+	 *
 	 * @return void
 	 */
 	public function connect()

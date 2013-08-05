@@ -29,7 +29,7 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 	 * @param RedBean_OODBBean $bean2    the second bean you want to associate
 	 * @param RedBean_OODBBean $baseBean the link bean
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public function extAssociate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $baseBean )
 	{
@@ -56,7 +56,7 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 	 * @param RedBean_OODBBean $bean2 the second bean you want to associate
 	 * @param mixed            $extra one or more additional properties and values
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public function extAssociateSimple( $beans1, $beans2, $extra = null )
 	{

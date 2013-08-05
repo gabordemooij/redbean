@@ -46,7 +46,7 @@ class RedBean_Facade
 	public static $writer;
 
 	/**
-	 * @var RedBean_DBAdapter
+	 * @var RedBean_Adapter_DBAdapter
 	 */
 	public static $adapter;
 
@@ -56,7 +56,7 @@ class RedBean_Facade
 	public static $associationManager;
 
 	/**
-	 * @var RedBean_ExtAssociationManager
+	 * @var RedBean_AssociationManager_ExtAssociationManager
 	 */
 	public static $extAssocManager;
 
@@ -145,6 +145,8 @@ class RedBean_Facade
 	 * @param string  $username Username for database
 	 * @param string  $password Password for database
 	 * @param boolean $frozen   TRUE if you want to setup in frozen mode
+	 *
+	 * @return RedBean_ToolBox
 	 */
 	public static function setup( $dsn = null, $username = null, $password = null, $frozen = false )
 	{
@@ -184,9 +186,10 @@ class RedBean_Facade
 	 *
 	 * @param callable $callback Closure (or other callable) with the transaction logic
 	 *
+	 * @throws RedBean_Exception_Security
+	 *
 	 * @return void
 	 *
-	 * @throws RedBean_Exception_Security
 	 */
 	public static function transaction( $callback )
 	{
@@ -355,11 +358,11 @@ class RedBean_Facade
 	 *
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean to be deleted
 	 *
-	 * @return mixed
+	 * @return void
 	 */
 	public static function trash( $bean )
 	{
-		return self::$redbean->trash( $bean );
+		self::$redbean->trash( $bean );
 	}
 
 	/**
@@ -451,7 +454,7 @@ class RedBean_Facade
 	 */
 	public static function unassociate( $beans1, $beans2, $fast = false )
 	{
-		return self::$associationManager->unassociate( $beans1, $beans2, $fast );
+		self::$associationManager->unassociate( $beans1, $beans2, $fast );
 	}
 
 	/**
@@ -786,7 +789,7 @@ class RedBean_Facade
 	 */
 	public static function swap( $beans, $property )
 	{
-		return self::$associationManager->swap( $beans, $property );
+		self::$associationManager->swap( $beans, $property );
 	}
 
 	/**
@@ -835,7 +838,7 @@ class RedBean_Facade
 	 */
 	public static function untag( $bean, $tagList )
 	{
-		return self::$tagManager->untag( $bean, $tagList );
+		self::$tagManager->untag( $bean, $tagList );
 	}
 
 	/**
@@ -871,15 +874,15 @@ class RedBean_Facade
 	 */
 	public static function addTags( RedBean_OODBBean $bean, $tagList )
 	{
-		return self::$tagManager->addTags( $bean, $tagList );
+		self::$tagManager->addTags( $bean, $tagList );
 	}
 
 	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Returns all beans that have been tagged with one of the tags given.
 	 *
-	 * @param  $beanType type of bean you are looking for
-	 * @param  $tagList  list of tags to match
+	 * @param string $beanType type of bean you are looking for
+	 * @param array  $tagList  list of tags to match
 	 *
 	 * @return array
 	 */
@@ -892,8 +895,8 @@ class RedBean_Facade
 	 * Part of RedBeanPHP Tagging API.
 	 * Returns all beans that have been tagged with ALL of the tags given.
 	 *
-	 * @param  $beanType type of bean you are looking for
-	 * @param  $tagList  list of tags to match
+	 * @param string $beanType type of bean you are looking for
+	 * @param array  $tagList  list of tags to match
 	 *
 	 * @return array
 	 */
@@ -907,7 +910,7 @@ class RedBean_Facade
 	 *
 	 * @param string $beanType type of bean you want to destroy entirely
 	 *
-	 * @return void
+	 * @return boolean
 	 */
 	public static function wipe( $beanType )
 	{
@@ -940,19 +943,23 @@ class RedBean_Facade
 	public static function configureFacadeWithToolbox( RedBean_ToolBox $tb )
 	{
 		$oldTools                 = self::$toolbox;
+
 		self::$toolbox            = $tb;
+
 		self::$writer             = self::$toolbox->getWriter();
 		self::$adapter            = self::$toolbox->getDatabaseAdapter();
 		self::$redbean            = self::$toolbox->getRedBean();
 		self::$finder             = new RedBean_Finder( self::$toolbox );
+
 		self::$associationManager = new RedBean_AssociationManager( self::$toolbox );
 
 		self::$redbean->setAssociationManager( self::$associationManager );
 
-		self::$labelMaker      = new RedBean_LabelMaker( self::$toolbox );
-		self::$extAssocManager = new RedBean_AssociationManager_ExtAssociationManager( self::$toolbox );
+		self::$labelMaker         = new RedBean_LabelMaker( self::$toolbox );
+		self::$extAssocManager    = new RedBean_AssociationManager_ExtAssociationManager( self::$toolbox );
 
-		$helper                = new RedBean_ModelHelper();
+		$helper                   = new RedBean_ModelHelper();
+
 		$helper->attachEventListeners( self::$redbean );
 
 		self::$associationManager->addEventListener( 'delete', $helper );
@@ -1234,7 +1241,7 @@ class RedBean_Facade
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @return RedBean_DatabaseAdapter
+	 * @return RedBean_Adapter_DBAdapter
 	 */
 	public static function getDatabaseAdapter()
 	{
@@ -1256,7 +1263,7 @@ class RedBean_Facade
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @return RedBean_RedBean
+	 * @return RedBean_OODB
 	 */
 	public static function getRedBean()
 	{
