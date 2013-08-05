@@ -12,8 +12,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-abstract class RedBean_Observable
-{
+abstract class RedBean_Observable { //bracket must be here - otherwise coverage software does not understand.
 
 	/**
 	 * @var array

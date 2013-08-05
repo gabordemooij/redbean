@@ -671,8 +671,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		$this->setMeta( 'tainted', true );
 
-		if (
-			isset( $this->properties[$property.'_id'] )
+		if (isset( $this->properties[$property.'_id'] )
 			&& !( $value instanceof RedBean_OODBBean )
 		) {
 			if ( is_null( $value ) || $value === false ) {
