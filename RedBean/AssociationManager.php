@@ -427,7 +427,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * values for that SQL to filter your results after fetching the
 	 * related beans.
 	 *
-	 * Dont try to make use of subqueries, a subquery using IN() seems to
+	 * Don't try to make use of subqueries, a subquery using IN() seems to
 	 * be slower than two queries!
 	 *
 	 * Since 3.2, you can now also pass an array of beans instead just one

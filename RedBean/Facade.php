@@ -170,15 +170,15 @@ class RedBean_Facade
 	 * ex:
 	 *        $from = 1;
 	 *        $to = 2;
-	 *        $ammount = 300;
+	 *        $amount = 300;
 	 *
-	 *        R::transaction(function() use($from, $to, $ammount)
+	 *        R::transaction(function() use($from, $to, $amount)
 	 *        {
 	 *            $accountFrom = R::load('account', $from);
 	 *            $accountTo = R::load('account', $to);
 	 *
-	 *            $accountFrom->money -= $ammount;
-	 *            $accountTo->money += $ammount;
+	 *            $accountFrom->money -= $amount;
+	 *            $accountTo->money += $amount;
 	 *
 	 *            R::store($accountFrom);
 	 *            R::store($accountTo);
@@ -466,7 +466,7 @@ class RedBean_Facade
 	 * values for that SQL to filter your results after fetching the
 	 * related beans.
 	 *
-	 * Dont try to make use of subqueries, a subquery using IN() seems to
+	 * Don't try to make use of subqueries, a subquery using IN() seems to
 	 * be slower than two queries!
 	 *
 	 * Since 3.2, you can now also pass an array of beans instead just one
@@ -533,7 +533,7 @@ class RedBean_Facade
 	 * Breaks all many-to-many associations of a bean and a specified type.
 	 *
 	 * @param RedBean_OODBBean $bean bean you wish to clear many-to-many relations for
-	 * @param string           $type type of bean you wish to break associatons with
+	 * @param string           $type type of bean you wish to break associations with
 	 *
 	 * @return void
 	 */
@@ -627,7 +627,7 @@ class RedBean_Facade
 
 	/**
 	 * Returns an array of beans. Pass a type and a series of ids and
-	 * this method will bring you the correspondig beans.
+	 * this method will bring you the corresponding beans.
 	 *
 	 * important note: Because this method loads beans using the load()
 	 * function (but faster) it will return empty beans with ID 0 for
@@ -828,7 +828,7 @@ class RedBean_Facade
 
 	/**
 	 * Part of RedBeanPHP Tagging API.
-	 * Removes all sepcified tags from the bean. The tags specified in
+	 * Removes all specified tags from the bean. The tags specified in
 	 * the second parameter will no longer be associated with the bean.
 	 *
 	 * @param  RedBean_OODBBean $bean    tagged bean
@@ -1314,7 +1314,7 @@ class RedBean_Facade
 	}
 
 	/**
-	 * Facade method for RedBean_QueryWriter_AQueryWriter::renameAssocation()
+	 * Facade method for RedBean_QueryWriter_AQueryWriter::renameAssociation()
 	 *
 	 * @param string|array $from
 	 * @param string       $to

@@ -206,7 +206,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @param string $property1 property1
 	 * @param string $property2 property2
 	 *
-	 * @return boolean $succes whether the constraint has been applied
+	 * @return boolean $success whether the constraint has been applied
 	 */
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{

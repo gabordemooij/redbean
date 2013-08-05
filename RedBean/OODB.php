@@ -62,7 +62,7 @@ class RedBean_OODB extends RedBean_Observable
 	/**
 	 * Handles Exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param Exception $exception exceotion
+	 * @param Exception $exception exception
 	 *
 	 * @return void
 	 *
@@ -918,7 +918,7 @@ class RedBean_OODB extends RedBean_Observable
 
 	/**
 	 * Returns an array of beans. Pass a type and a series of ids and
-	 * this method will bring you the correspondig beans.
+	 * this method will bring you the corresponding beans.
 	 *
 	 * important note: Because this method loads beans using the load()
 	 * function (but faster) it will return empty beans with ID 0 for

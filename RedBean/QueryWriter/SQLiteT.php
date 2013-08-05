@@ -213,7 +213,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param string $property1 first reference column
 	 * @param string $property2 second reference column
 	 *
-	 * @return boolean $succes whether the constraint has been applied
+	 * @return boolean $success whether the constraint has been applied
 	 */
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{

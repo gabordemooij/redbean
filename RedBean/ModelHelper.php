@@ -98,7 +98,7 @@ class RedBean_ModelHelper implements RedBean_Observer
 	/**
 	 * Sets the dependency injector to be used.
 	 *
-	 * @param RedBean_DependencyInjector $di injecto to be used
+	 * @param RedBean_DependencyInjector $di injector to be used
 	 *
 	 * @return void
 	 */

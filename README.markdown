@@ -12,7 +12,7 @@ tools like mongoDB or couchDB and traditional relational database systems
 like MySQL. It offers the best of both worlds: SQL and no-SQL. You work
 with no-SQL if you interact with objects will you simply turn the switch
 and work with SQL if you want to do some typical database tasks like
-searching or quikly grabbing something out of the data store with
+searching or quickly grabbing something out of the data store with
 specially crafted SQL. RedBean also has excellent performance because it
 can freeze the database schema which means it no longer scans schemas.
 
@@ -44,7 +44,7 @@ Create `composer.json` in project root:
         	"gabordemooij/redbean": "dev-master"
     	}
 	}
-	
+
 
 Install via composer:
 
