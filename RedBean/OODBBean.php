@@ -676,7 +676,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			&& !( $value instanceof RedBean_OODBBean )
 		) {
 			if ( is_null( $value ) || $value === false ) {
-				return $this->__unset( $property );
+				$this->__unset( $property );
+
+				return;
 			} else {
 				throw new RedBean_Exception_Security( 'Cannot cast to bean.' );
 			}
@@ -786,7 +788,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$model = $this->beanHelper->getModelForBean( $this );
 
 			if ( !$model ) {
-				return;
+				return null;
 			}
 
 			$this->__info['model'] = $model;
@@ -983,6 +985,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		if ( array_key_exists( $property, $old ) ) {
 			return $old[$property];
 		}
+
+		return null;
 	}
 
 	/**
