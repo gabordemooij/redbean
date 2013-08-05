@@ -803,7 +803,7 @@ abstract class RedBean_QueryWriter_AQueryWriter
 	{
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType, true );
 
-		return $this->constrain( $linkTable, $sourceTable, $destTable, $sourceCol, $destCol );
+		$this->constrain( $linkTable, $sourceTable, $destTable, $sourceCol, $destCol );
 	}
 
 	/**

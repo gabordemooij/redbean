@@ -66,12 +66,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{
-		$writer      = $this;
-		$adapter     = $this->adapter;
-		$firstState  = $this->buildFK( $table, $table1, $property1, 'id', true );
-		$secondState = $this->buildFK( $table, $table2, $property2, 'id', true );
-
-		return ( $firstState && $secondState );
+		$this->buildFK( $table, $table1, $property1, 'id', true );
+		$this->buildFK( $table, $table2, $property2, 'id', true );
 	}
 
 	/**
@@ -371,7 +367,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false )
 	{
-		return $this->buildFK( $type, $targetType, $field, $targetField, $isDependent );
+		$this->buildFK( $type, $targetType, $field, $targetField, $isDependent );
 	}
 
 	/**

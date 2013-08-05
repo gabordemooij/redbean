@@ -235,7 +235,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			}
 
 			if ( $this->code( $columns[$property2] ) !== RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 ) {
-				$this->widenColumn( $table, $property2, edBean_QueryWriter_Oracle::C_DATATYPE_UINT32 );
+				$this->widenColumn( $table, $property2, RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 );
 			}
 
 			$sql = "

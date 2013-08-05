@@ -167,6 +167,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	{
 		$columnsRaw = $this->adapter->get( "DESCRIBE " . $this->esc( $table ) );
 
+		$columns = array();
 		foreach ( $columnsRaw as $r ) {
 			$columns[$r['Field']] = $r['Type'];
 		}
