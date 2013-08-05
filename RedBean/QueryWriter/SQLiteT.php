@@ -402,7 +402,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$t = $this->getTable( $type );
 		$t['indexes'][$name] = array( 'name' => $column );
 
-		return $this->putTable( $t );
+		$this->putTable( $t );
 	}
 
 	/**
