@@ -20,7 +20,8 @@ interface RedBean_Driver
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.
 	 *
-	 * @param  string $sql SQL to be executed
+	 * @param string $sql      SQL to be executed
+	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return array
 	 */
@@ -29,7 +30,8 @@ interface RedBean_Driver
 	/**
 	 * Runs a query and fetches results as a column.
 	 *
-	 * @param  string $sql SQL Code to execute
+	 * @param string $sql      SQL Code to execute
+	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return array
 	 */
@@ -38,7 +40,8 @@ interface RedBean_Driver
 	/**
 	 * Runs a query and returns results as a single cell.
 	 *
-	 * @param string $sql SQL to execute
+	 * @param string $sql      SQL to execute
+	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return mixed
 	 */
@@ -48,8 +51,9 @@ interface RedBean_Driver
 	 * Runs a query and returns a flat array containing the values of
 	 * one row.
 	 *
-	 * @param string $sql SQL to execute
-	 *
+	 * @param string $sql      SQL to execute
+	 * @param array  $bindings list of values to bind to SQL snippet
+	 * 
 	 * @return array
 	 */
 	public function GetRow( $sql, $bindings = array() );
@@ -65,7 +69,7 @@ interface RedBean_Driver
 	 * SQL. This method has no return value.
 	 *
 	 * @param string $sql      SQL Code to execute
-	 * @param array  $bindings Values to bind to SQL query
+	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return void
 	 */
