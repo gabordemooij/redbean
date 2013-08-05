@@ -30,6 +30,6 @@ foreach ( $tokens as $token ) {
 $newStr = removeEmptyLines( $newStr );
 
 $newStr = str_replace( "<" . "?php", "", $newStr );
-$newStr = "<" . "?php\n//Written by Gabor de Mooij and the RedBeanPHP Community, copyright 2009-2012\n//Licensed New BSD/GPLV2 - see license.txt\n" . $newStr;
+$newStr = "<" . "?php\n//Written by Gabor de Mooij and the RedBeanPHP Community, copyright 2009-2013\n//Licensed New BSD/GPLV2 - see license.txt\n" . $newStr;
 
 file_put_contents( 'rbnc.php', $newStr );
