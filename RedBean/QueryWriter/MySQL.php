@@ -250,13 +250,15 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	 */
 	public function widenColumn( $type, $column, $datatype )
 	{
+		if ( !isset($this->typeno_sqltype[$datatype]) ) return;
+
 		$table   = $type;
 		$type    = $datatype;
 
 		$table   = $this->esc( $table );
 		$column  = $this->esc( $column );
 
-		$newtype = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
+		$newtype = $this->typeno_sqltype[$type];
 
 		$this->adapter->exec( "ALTER TABLE $table CHANGE $column $column $newtype " );
 	}

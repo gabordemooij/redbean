@@ -287,17 +287,17 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function widenColumn( $type, $column, $datatype )
 	{
+		if ( !isset($this->typeno_sqltype[$datatype]) ) return;
+
 		$table   = $type;
 		$type    = $datatype;
 
 		$table   = $this->esc( $table );
 		$column  = $this->esc( $column );
 
-		$newtype = array_key_exists( $type, $this->typeno_sqltype ) ? $this->typeno_sqltype[$type] : '';
+		$newtype = $this->typeno_sqltype[$type];
 
-		$changecolumnSQL = "ALTER TABLE $table CHANGE $column $column $newtype ";
-
-		$this->adapter->exec( $changecolumnSQL );
+		$this->adapter->exec( "ALTER TABLE $table CHANGE $column $column $newtype " );
 	}
 
 	/**
