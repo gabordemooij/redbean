@@ -116,7 +116,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 			if ( count( $row ) > 1 ) {
 				$key   = array_shift( $row );
 				$value = array_shift( $row );
-			} elseif ( count( $row ) == 1 ) {
+			} else {
 				$key   = array_shift( $row );
 				$value = $key;
 			}
@@ -174,7 +174,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function startTransaction()
 	{
-		return $this->db->StartTrans();
+		$this->db->StartTrans();
 	}
 
 	/**
@@ -182,7 +182,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function commit()
 	{
-		return $this->db->CommitTrans();
+		$this->db->CommitTrans();
 	}
 
 	/**
@@ -190,7 +190,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 */
 	public function rollback()
 	{
-		return $this->db->FailTrans();
+		$this->db->FailTrans();
 	}
 
 	/**

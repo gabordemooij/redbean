@@ -27,6 +27,16 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin
 	private static $useNULLForEmptyString = false;
 
 	/**
+	 * @var RedBean_Toolbox
+	 */
+	private $toolbox;
+
+	/**
+	 * @var RedBean_OODB
+	 */
+	private $redbean;
+
+	/**
 	 * If you enable bean loading graph will load beans if there is an ID in the array.
 	 * This is very powerful but can also cause security issues if a user knows how to
 	 * manipulate beans and there is no model based ID validation.

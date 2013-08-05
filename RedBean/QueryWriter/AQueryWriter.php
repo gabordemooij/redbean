@@ -784,7 +784,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 */
 	public function renameAssocTable( $from, $to = null )
 	{
-		return self::renameAssociation( $from, $to );
+		self::renameAssociation( $from, $to );
 	}
 
 	/**
@@ -802,7 +802,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	{
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType, true );
 
-		return $this->constrain( $linkTable, $sourceTable, $destTable, $sourceCol, $destCol );
+		$this->constrain( $linkTable, $sourceTable, $destTable, $sourceCol, $destCol );
 	}
 
 	/**
@@ -861,10 +861,10 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 * @param RedBean_OODBBean $bean1 bean
 	 * @param RedBean_OODBBean $bean2 bean
 	 *
-	 * @return mixed
+	 * @return void
 	 */
 	public function addConstraint( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 )
 	{
-		return $this->addConstraintForTypes( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ) );
+		$this->addConstraintForTypes( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ) );
 	}
 }

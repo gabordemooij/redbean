@@ -206,7 +206,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @param string $property1 property1
 	 * @param string $property2 property2
 	 *
-	 * @return boolean $succes whether the constraint has been applied
+	 * @return boolean $success whether the constraint has been applied
 	 */
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{
@@ -235,7 +235,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			}
 
 			if ( $this->code( $columns[$property2] ) !== RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 ) {
-				$this->widenColumn( $table, $property2, edBean_QueryWriter_Oracle::C_DATATYPE_UINT32 );
+				$this->widenColumn( $table, $property2, RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 );
 			}
 
 			$sql = "
@@ -286,9 +286,9 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * $name.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param  $type   type to add index to
-	 * @param  $name   name of the new index
-	 * @param  $column field to index
+	 * @param string $type   type to add index to
+	 * @param string $name   name of the new index
+	 * @param string $column field to index
 	 *
 	 * @return void
 	 */
@@ -314,6 +314,8 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * the autoincrement feature.
 	 *
 	 * @param string $table type of bean you want to create a table for
+	 *
+	 * @throws Exception
 	 *
 	 * @return void
 	 */
@@ -362,8 +364,9 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @param string  $column name of the column
 	 * @param integer $field  data type for field
 	 *
-	 * @return void
+	 * @throws Exception
 	 *
+	 * @return void
 	 */
 	public function addColumn( $type, $column, $field )
 	{
@@ -627,7 +630,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function deleteRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
 	{
-		return parent::deleteRecord( $type, $this->filterConditions( $conditions ), $addSql, $bindings );
+		parent::deleteRecord( $type, $this->filterConditions( $conditions ), $addSql, $bindings );
 	}
 
 	/**

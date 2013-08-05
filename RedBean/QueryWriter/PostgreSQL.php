@@ -59,7 +59,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 *
 	 * @param string $table     table to add fk constraints to
 	 * @param string $table1    first reference table
-	 * @param string $table2    second refernece table
+	 * @param string $table2    second reference table
 	 * @param string $property1 first reference column
 	 * @param string $property2 second reference column
 	 *
@@ -68,8 +68,6 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{
 		try {
-			$writer  = $this;
-
 			$adapter = $this->adapter;
 
 			$fkCode  = 'fk' . md5( $table . $property1 . $property2 );

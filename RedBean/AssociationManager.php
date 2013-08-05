@@ -112,6 +112,8 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * @param RedBean_OODBBean $bean2 second bean
 	 * @param RedBean_OODBBean $bean  base bean
 	 *
+	 * @throws Exception|RedBean_Exception_SQL
+	 *
 	 * @return mixed
 	 */
 	protected function associateBeans( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean )
@@ -329,7 +331,9 @@ class RedBean_AssociationManager extends RedBean_Observable
 					$linkType = $this->getTable( array( $type1, $type2 ) );
 
 					if ( $fast ) {
-						return $this->writer->deleteRecord( $linkType, array( 'id' => $row['id'] ) );
+						$this->writer->deleteRecord( $linkType, array( 'id' => $row['id'] ) );
+
+						return;
 					}
 
 					$beans = $this->oodb->convertToBeans( $linkType, array( $row ) );
@@ -422,7 +426,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * values for that SQL to filter your results after fetching the
 	 * related beans.
 	 *
-	 * Dont try to make use of subqueries, a subquery using IN() seems to
+	 * Don't try to make use of subqueries, a subquery using IN() seems to
 	 * be slower than two queries!
 	 *
 	 * Since 3.2, you can now also pass an array of beans instead just one

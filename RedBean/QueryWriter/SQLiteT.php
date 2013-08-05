@@ -213,12 +213,10 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	 * @param string $property1 first reference column
 	 * @param string $property2 second reference column
 	 *
-	 * @return boolean $succes whether the constraint has been applied
+	 * @return boolean $success whether the constraint has been applied
 	 */
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{
-		$writer      = $this;
-		$adapter     = $this->adapter;
 		$firstState  = $this->buildFK( $table, $table1, $property1, 'id', true );
 		$secondState = $this->buildFK( $table, $table2, $property2, 'id', true );
 
@@ -402,7 +400,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		$t = $this->getTable( $type );
 		$t['indexes'][$name] = array( 'name' => $column );
 
-		return $this->putTable( $t );
+		$this->putTable( $t );
 	}
 
 	/**
