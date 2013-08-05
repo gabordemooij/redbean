@@ -79,5 +79,12 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		$beans = R::findOrDispense("page");
 		asrt(count($beans), 6);
 		asrt(is_null(R::findLast('nothing')), true);
+		
+		try {
+			R::find('bean', ' id > 0 ', 'invalid bindings argument');
+			fail();
+		} catch (RedBean_Exception_Security $exception) {
+			pass();
+		}
 	}
 }

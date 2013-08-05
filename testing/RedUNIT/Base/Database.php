@@ -141,6 +141,11 @@ class RedUNIT_Base_Database extends RedUNIT_Base {
 		$rooms[1]->number = 7;
 		R::store($rooms[0]);
 		R::store($rooms[1]);
+		
+		$rooms = R::getAssoc('SELECT * FROM room WHERE id < -999');
+		asrt(is_array($rooms), true);
+		asrt(count($rooms), 0);
+		
 		$rooms = R::getAssoc('SELECT '.R::$writer->esc('number').', kind FROM room ORDER BY kind ASC');
 		foreach($rooms as $key=>$room) {
 			asrt(($key===6 || $key===7),true);

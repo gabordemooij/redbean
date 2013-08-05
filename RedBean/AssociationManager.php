@@ -147,8 +147,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 			$id = $this->oodb->store( $bean );
 
 			//On creation, add constraints....
-			if (
-				!$this->oodb->isFrozen() &&
+			if ( !$this->oodb->isFrozen() &&
 				$bean->getMeta( 'buildreport.flags.created' )
 			) {
 				$bean->setMeta( 'buildreport.flags.created', 0 );
