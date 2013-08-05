@@ -87,7 +87,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 	/** Returns the alias for a type
 	 *
-	 * @param  $type aliased type
+	 * @param string $type type
 	 *
 	 * @return string $type type
 	 */
@@ -228,7 +228,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * nested beans (bean lists: ownBean, sharedBean) without the need to
 	 * rely on static calls to the facade (or make this class dep. on OODB).
 	 *
-	 * @param RedBean_IBeanHelper $helper
+	 * @param RedBean_BeanHelper $helper
 	 *
 	 * @return void
 	 */

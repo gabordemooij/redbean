@@ -152,7 +152,7 @@ class RedBean_OODB extends RedBean_Observable
 	/**
 	 * Processes an embedded bean.
 	 *
-	 * @param RedBean_OODBBean|Model $embeddedBean the bean or model
+	 * @param RedBean_OODBBean|RedBean_SimpleModel $embeddedBean the bean or model
 	 *
 	 * @return integer
 	 */

@@ -477,7 +477,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * Returns the underlying PHP OCI instance.
 	 *
-	 * @return OCI
+	 * @return resource
 	 */
 	public function getOCI()
 	{
