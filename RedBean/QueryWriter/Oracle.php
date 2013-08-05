@@ -615,14 +615,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	}
 
 	/**
-	 * @deprecated
-	 */
-	public function selectRecord( $type, $conditions, $addSql = null, $delete = null, $inverse = false, $all = false )
-	{
-		return parent::selectRecord( strtoupper( $type ), $this->filterConditions( $conditions ), $addSql, $delete, $inverse, $all );
-	}
-
-	/**
 	 * @see RedBean_QueryWriter::queryRecord
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
@@ -636,14 +628,6 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	public function deleteRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
 	{
 		return parent::deleteRecord( $type, $this->filterConditions( $conditions ), $addSql, $bindings );
-	}
-
-	/**
-	 * @see RedBean_QueryWriter::queryRecordInverse
-	 */
-	public function queryRecordInverse( $type, $conditions, $addSql = null )
-	{
-		return parent::queryRecordInverse( $type, $this->filterConditions( $conditions ), $addSql, $all );
 	}
 
 	/**
