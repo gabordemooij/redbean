@@ -115,7 +115,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 */
 	public function __construct( $dsn, $user = null, $pass = null )
 	{
-		if ( $dsn instanceof resource ) {
+		if ( is_resource($dsn) ) {
 			$this->connection  = $dsn;
 			$this->isConnected = true;
 
