@@ -1,7 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Relations
- * 
+ *
  * @file    RedUNIT/Base/Relations.php
  * @desc    Tests N:1 relations, nested beans.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -16,11 +16,11 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function run() {
-	
+
 		testpack('Test cleaning of lists (must not lead to artifacts)');
 		R::nuke();
 		list($book1, $book2) = R::dispense('book', 2);
@@ -51,7 +51,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$book1 = $book1->fresh();
 		asrt(count($book1->ownPage), 2);
 		asrt(count($book1->withCondition(' thename = ? ', array('1'))->ownPage), 1);
-		
+
 		testpack('Test new shared relations with link conditions');
 		R::nuke();
 		$w = R::$writer;
@@ -87,7 +87,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt($page->text, 'page2');
 		$page = array_shift($pages);
 		asrt($page->text, 'page1');
-		
+
 		testpack('Test new shared relations and cache');
 		R::exec('UPDATE page SET '.$w->esc('number').' = 1 '); //why does this not destroy cache in psql? ah: An error occurred: SQLSTATE[42703]: Undefined column: 7 ERROR:  column "page" of relation "page" does not exist
 		R::$writer->setUseCache(true);
@@ -107,7 +107,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$b1 = R::load('book', $b1->id);
 		$pages = $b1->withCondition(' book_page.'.$w->esc('order').' = 1 ')->sharedPage;
 		$page = reset($pages);
-		asrt((int)$page->number, 9); //yes! we get 9 instead of 8, why because the 
+		asrt((int)$page->number, 9); //yes! we get 9 instead of 8, why because the
 		//cache key has not changed, our last query was PAGE-BOOK-RELATION and now we ask for PAGE-BOOK-RELATION again.
 		//if we would have used just a load page query we would have gotten the new value (8).... let's test that!
 		R::exec(' UPDATE page SET '.$w->esc('number').' = 9');
@@ -119,7 +119,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$page = reset($pages);
 		asrt((int)$page->number, 8); //yes, keep-cache wont help, cache key changed!
 		R::$writer->setUseCache(false);
-		
+
 		testpack('Test relatedCount()');
 		R::nuke();
 		list($d, $d2) = R::dispense('document', 2);
@@ -127,14 +127,14 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$d->sharedPage = array($p, $p3);
 		$d2->sharedPage = array($p, $p2, $p3);
 		R::storeAll(array($d, $d2));
-		
+
 		try {
 			R::relatedCount(array(), 'page');
 			fail();
 		} catch(RedBean_Exception_Security $e) {
 			pass();
 		}
-		
+
 		asrt(R::relatedCount(R::dispense('page'), 'page'), 0);
 		asrt(R::relatedCount($d, 'page', ' WHERE page.id = ? ', array($p->id)), 1);
 		asrt(R::relatedCount($d, 'page'), 2);
@@ -147,7 +147,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$author = R::dispense('author');
 		$author->ownDocument = array($d, $d2);
 		R::store($author);
-		
+
 		testpack('Test relatedCount with via()');
 		R::nuke();
 		$shop = R::dispense('shop');
@@ -159,7 +159,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		R::store($shop);
 		$shop = $shop->fresh();
 		asrt($shop->via('relation')->countShared('customer'), 13);
-		
+
 		R::nuke();
 		$book = R::dispense('book');
 		$book->ownPage = R::dispense('page',10);
@@ -206,7 +206,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$p = R::dispense('patient')->setAttr('name', 'p1');
 		R::associate($d,$p);
 		asrt(in_array('consult', R::$writer->getTables()), true);
-		
+
 		testpack('Test fast-track linkBlock exceptions');
 		//Fast track link block code should not affect self-referential N-M relations.
 		R::nuke();
@@ -231,17 +231,17 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt($names, 'D,G,P');
 		$names = implode(',', R::gatherLabels($pluto->sharedFriend));
 		asrt($names, 'M');
-		
+
 		//now in combination with with() conditions...
 		$donald = R::load('friend', $donald->id);
 		$names = implode(',', R::gatherLabels($donald->withCondition(' name = ? ', array('M'))->sharedFriend));
 		asrt($names, 'M');
-		
+
 		//now in combination with with() conditions...
 		$donald = R::load('friend', $donald->id);
 		$names = implode(',', R::gatherLabels($donald->with(' ORDER BY name ')->sharedFriend));
 		asrt($names, 'G,M');
-		
+
 		//now counting
 		$goofy = R::load('friend', $goofy->id);
 		asrt((int)$goofy->countShared('friend'), 2);
@@ -254,7 +254,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(R::areRelated($mickey, $donald), false);
 		asrt(R::areRelated($mickey, $goofy), true);
 		asrt(R::areRelated($goofy, $mickey), true);
-		
+
 		R::getWriter()->setUseCache(true);
 		$mickeysFriends = R::$associationManager->related($mickey, 'friend', true);
 		asrt(count($mickeysFriends), 2);
@@ -265,7 +265,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$mickeysBooks = R::$associationManager->related($mickey, 'book', true);
 		asrt(count($mickeysBooks), 1);
 		R::getWriter()->setUseCache(false);
-		
+
 		testpack('Test list beautifications');
 		R::nuke();
 		$book = R::dispense('book');
@@ -286,7 +286,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$bean->sharedAclRole[] = $aclrole;
 		R::store($bean);
 		asrt(count($bean->sharedAclRole),1);
-		
+
 		testpack('Test list add/delete scenarios.');
 		R::nuke();
 		R::dependencies(array('page'=>array('book','paper')));
@@ -314,10 +314,10 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(R::count('page'),1);
 		$i->ownPage=array();
 		R::store($i);
-		asrt(R::count('page'),1);	
+		asrt(R::count('page'),1);
 		R::dependencies(array());
 		R::nuke();
-		
+
 		list($q1,$q2) = R::dispense('quote',2);
 		list($pic1,$pic2) = R::dispense('picture',2);
 		list($book,$book2,$book3) = R::dispense('book',4);
@@ -396,7 +396,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$p5 = $book->ownPage[5];
 		asrt($p5->title,'pagina5');
 		//other way around - single bean
-		asrt($p5->book->title,'abc'); 
+		asrt($p5->book->title,'abc');
 		asrt(R::load('page',5)->book->title,'abc');
 		asrt(R::load('page',3)->book->title,'abc');
 		//add the other way around - single bean
@@ -451,7 +451,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		R::store($b2);
 		$b2 = R::load('book',$book2->id);
 		asrt(count($b2->ownPage),1);
-	
+
 		//not allowed to re-use the field for something else
 		try { $page1->book = 1; fail(); } catch(RedBean_Exception_Security $e) { pass(); }
 		try { $page1->book = -2.1; fail(); } catch(RedBean_Exception_Security $e) { pass(); }
@@ -462,8 +462,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		try { $page1->book = 'just a string'; } catch(RedBean_Exception_Security $e) { pass(); }
 		try { $page1->book = array('a'=>1); fail(); } catch(RedBean_Exception_Security $e) { pass(); }
 		try { $page1->book = 0; fail(); } catch(RedBean_Exception_Security $e) { pass(); }
-		
-		
+
+
 		//test fk, not allowed to set to 0
 		$page1 = reset($b2->ownPage);
 		$page1->book_id = 0;
@@ -520,7 +520,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt((R::count('topic')),3);
 		unset($book->sharedTopic[1]);
 		$id = R::store($book);
-		
+
 		asrt((R::count('topic')),3);
 		asrt(count($book->sharedTopic),1);
 		asrt(count($book2->sharedTopic),0);
@@ -540,6 +540,11 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$t3 = R::load('topic',$topic3->id);
 		asrt(count($t3->sharedBook),2);
 		asrt(R::relatedOne($topic3, 'nothingness'), null);
+
+		// Testing relatedLast
+		$z = end($items);
+		asrt(R::relatedLast($topic3, 'book')->id, $z->id);
+
 		//nuke an own-array, replace entire array at once without getting first
 		$page2->id=0;
 		$page2->title = 'yet another page 2';
@@ -731,7 +736,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 			testids($book->ownPicture);
 			testids($book->sharedTopic);
 		}
-		
+
 		R::nuke();
 		$village = R::dispense('village');
 		$village->name = 'village';
@@ -746,7 +751,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		pass();
 		asrt(R::count('village'),1);
 		asrt(R::count('building'),0);
-		
+
 		//test N-M relations through intermediate beans
 		R::nuke();
 		list($mrA,$mrB,$mrC) = R::dispense('person',3);
@@ -783,7 +788,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt($developers,1);
 		asrt((int)R::count('participant'),5);
 		asrt((int)R::count('person'),3);
-		
+
 		//test emulation of sharedList through intermediate beans
 		R::nuke();
 		list($v1,$v2,$v3) = R::dispense('village',3);
@@ -807,7 +812,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		asrt(count($village1->sharedArmy),2);
 		asrt(count($village2->sharedArmy),1);
 		asrt(count($village3->sharedArmy),1);
-		
+
 		//test emulation via association renaming
 		R::nuke();
 		list($p1,$p2,$p3) = R::dispense('painting',3);
@@ -844,7 +849,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		$paintings = $m2->sharedPainting;
 		foreach($paintings as $painting) {
 			if ($painting->name === 'painting2') {
-				pass();	
+				pass();
 				$paintingX = $painting;
 			}
 		}

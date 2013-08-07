@@ -467,7 +467,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	}
 
 	/**
-	 * Returns only single associated bean.
+	 * Returns only a single associated bean.
 	 *
 	 * @param RedBean_OODBBean $bean     bean provided
 	 * @param string           $type     type of bean you are searching for
@@ -486,4 +486,26 @@ class RedBean_AssociationManager extends RedBean_Observable
 
 		return reset( $beans );
 	}
+
+	/**
+	 * Returns only the last, single associated bean.
+	 *
+	 * @param RedBean_OODBBean $bean     bean provided
+	 * @param string           $type     type of bean you are searching for
+	 * @param string           $sql      SQL for extra filtering
+	 * @param array            $bindings values to be inserted in SQL slots
+	 *
+	 * @return RedBean_OODBBean
+	 */
+	public function relatedLast( RedBean_OODBBean $bean, $type, $sql = null, $bindings = array() )
+	{
+		$beans = $this->relatedSimple( $bean, $type, $sql, $bindings );
+
+		if ( empty( $beans ) ) {
+			return null;
+		}
+
+		return end( $beans );
+	}
+
 }
