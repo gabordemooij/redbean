@@ -1,7 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Chill
- * 
+ *
  * @file    RedUNIT/Base/Chill.php
  * @desc    Tests chill list functionality, i.e. freezing a subset of all types.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -11,44 +11,44 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Chill extends RedUNIT_Base {
-	
+class RedUNIT_Base_Chill extends RedUNIT_Base
+{
+
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
-	 * 
+	 *
 	 * @return void
 	 */
-	public function run() {
-	
-		R::freeze(false);
+	public function run()
+	{
+
+		R::freeze( false );
 		R::nuke();
-		$bean = R::dispense('bean');
+		$bean       = R::dispense( 'bean' );
 		$bean->col1 = '1';
 		$bean->col2 = '2';
-		R::store($bean);
-		asrt( count(R::$writer->getColumns('bean')), 3);
+		R::store( $bean );
+		asrt( count( R::$writer->getColumns( 'bean' ) ), 3 );
 		$bean->col3 = '3';
-		R::store($bean);
-		asrt( count(R::$writer->getColumns('bean')), 4);
-		R::freeze( array('umbrella') );
+		R::store( $bean );
+		asrt( count( R::$writer->getColumns( 'bean' ) ), 4 );
+		R::freeze( array( 'umbrella' ) );
 		$bean->col4 = '4';
-		R::store($bean);
-		asrt( count(R::$writer->getColumns('bean')), 5);
-		R::freeze( array('bean') );
+		R::store( $bean );
+		asrt( count( R::$writer->getColumns( 'bean' ) ), 5 );
+		R::freeze( array( 'bean' ) );
 		$bean->col5 = '5';
-		try{ 
-			R::store($bean);
+		try {
+			R::store( $bean );
 			fail();
+		} catch ( Exception $e ) {
+			pass();
 		}
-		catch(Exception $e){ pass(); }
-		asrt( count(R::$writer->getColumns('bean')), 5);
+		asrt( count( R::$writer->getColumns( 'bean' ) ), 5 );
 		R::freeze( array() );
 		$bean->col5 = '5';
-		R::store($bean);
-		asrt( count(R::$writer->getColumns('bean')), 6);
-		
-		
+		R::store( $bean );
+		asrt( count( R::$writer->getColumns( 'bean' ) ), 6 );
 	}
-	
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * RedUNIT_Base_Typechecking
- * 
+ *
  * @file    RedUNIT/Base/Typechecking.php
  * @desc    Tests basic bean validation rules; invalid bean handling.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -11,68 +11,69 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Typechecking extends RedUNIT_Base {
+class RedUNIT_Base_Typechecking extends RedUNIT_Base
+{
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
-	 * 
+	 *
 	 * @return void
 	 */
-	public function run() {
- 		$redbean = R::$redbean;
-		 $bean = $redbean->dispense("page");
+	public function run()
+	{
+		$redbean = R::$redbean;
+		$bean    = $redbean->dispense( "page" );
 		//Set some illegal values in the bean; this should trugger Security exceptions.
 		//Arrays are not allowed.
-		$bean->name = array("1");
+		$bean->name = array( "1" );
 		try {
-			$redbean->store($bean);
+			$redbean->store( $bean );
 			fail();
-		}catch(RedBean_Exception_Security $e) {
+		} catch ( RedBean_Exception_Security $e ) {
 			pass();
 		}
 		try {
-			$redbean->check($bean);
+			$redbean->check( $bean );
 			fail();
-		}catch(RedBean_Exception_Security $e) {
+		} catch ( RedBean_Exception_Security $e ) {
 			pass();
 		}
 		$bean->name = new RedBean_OODBBean;
 		try {
-			$redbean->check($bean);
+			$redbean->check( $bean );
 			fail();
-		}catch(RedBean_Exception_Security $e) {
+		} catch ( RedBean_Exception_Security $e ) {
 			pass();
 		}
 		//Property names should be alphanumeric
-		$prop = ".";
+		$prop        = ".";
 		$bean->$prop = 1;
 		try {
-			$redbean->store($bean);
+			$redbean->store( $bean );
 			fail();
-		}catch(RedBean_Exception_Security $e) {
+		} catch ( RedBean_Exception_Security $e ) {
 			pass();
 		}
 		try {
-			$redbean->check($bean);
+			$redbean->check( $bean );
 			fail();
-		}catch(RedBean_Exception_Security $e) {
+		} catch ( RedBean_Exception_Security $e ) {
 			pass();
 		}
 		//Really...
-		$prop = "-";
+		$prop        = "-";
 		$bean->$prop = 1;
 		try {
-			$redbean->store($bean);
+			$redbean->store( $bean );
 			fail();
-		}catch(RedBean_Exception_Security $e) {
+		} catch ( RedBean_Exception_Security $e ) {
 			pass();
 		}
 		try {
-			$redbean->check($bean);
+			$redbean->check( $bean );
 			fail();
-		}catch(RedBean_Exception_Security $e) {
+		} catch ( RedBean_Exception_Security $e ) {
 			pass();
 		}
 	}
 }
- 

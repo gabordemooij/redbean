@@ -1,7 +1,7 @@
 <?php
 /**
  * RedUNIT_Postgres
- * 
+ *
  * @file    RedUNIT/Postgres.php
  * @desc    Base class for all PostgreSQL specific tests.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -11,12 +11,14 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Postgres extends RedUNIT {
+class RedUNIT_Postgres extends RedUNIT
+{
 
 	/*
-	 * What drivers should be loaded for this test pack? 
+	 * What drivers should be loaded for this test pack?
 	 */
-	public function getTargetDrivers() {
-		return array('pgsql');
+	public function getTargetDrivers()
+	{
+		return array( 'pgsql' );
 	}
 }
