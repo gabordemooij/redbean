@@ -155,7 +155,7 @@ class RedBean_DuplicationManager
 	 * Determines whether the bean has an own list based on
 	 * schema inspection from realtime schema or cache.
 	 *
-	 * @param string $type   bean type
+	 * @param string $type   bean type to get list for
 	 * @param string $target type of list you want to detect
 	 *
 	 * @return boolean
@@ -169,7 +169,7 @@ class RedBean_DuplicationManager
 	 * Determines whether the bea has a shared list based on
 	 * schema inspection from realtime schema or cache.
 	 *
-	 * @param string $type   bean type
+	 * @param string $type   bean type to get list for
 	 * @param string $target type of list you are looking for
 	 *
 	 * @return boolean
@@ -360,7 +360,7 @@ class RedBean_DuplicationManager
 	 * @param   boolean                 $parents also export parents
 	 * @param   array                   $filters only these types (whitelist)
 	 *
-	 * @return    array
+	 * @return array
 	 */
 	public function exportAll( $beans, $parents = false, $filters = array() )
 	{
