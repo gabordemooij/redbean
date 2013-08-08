@@ -500,7 +500,7 @@ class RedBean_Facade
 	}
 
 	/**
-	 * Returns only single associated bean.
+	 * Returns only a single associated bean.
 	 *
 	 * @param RedBean_OODBBean $bean     bean provided
 	 * @param string           $type     type of bean you are searching for
@@ -512,6 +512,21 @@ class RedBean_Facade
 	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql = null, $bindings = array() )
 	{
 		return self::$associationManager->relatedOne( $bean, $type, $sql, $bindings );
+	}
+
+	/**
+	 * Returns only the last, single associated bean.
+	 *
+	 * @param RedBean_OODBBean $bean     bean provided
+	 * @param string           $type     type of bean you are searching for
+	 * @param string           $sql      SQL for extra filtering
+	 * @param array            $bindings values to be inserted in SQL slots
+	 *
+	 * @return RedBean_OODBBean
+	 */
+	public static function relatedLast( RedBean_OODBBean $bean, $type, $sql = null, $bindings = array() )
+	{
+		return self::$associationManager->relatedLast( $bean, $type, $sql, $bindings );
 	}
 
 	/**
