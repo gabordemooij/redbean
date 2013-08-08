@@ -230,6 +230,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	 */
 	public function dummy1()
 	{
+		testpack( 'Testing Database Properties' );
+
 		$adapter = R::getDatabaseAdapter();
 
 		if ( method_exists( R::$adapter->getDatabase(), 'getPDO' ) ){
