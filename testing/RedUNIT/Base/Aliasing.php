@@ -15,17 +15,10 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 {
 
 	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
+	 * Associating two beans, then loading the associated bean
 	 */
-	public function run()
+	public function testAssociated()
 	{
-		/**
-		 * Associating two beans, then loading the associated bean
-		 */
-
 		$person       = R::dispense( 'person' );
 		$person->name = 'John';
 
@@ -63,12 +56,13 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 			fail();
 		}
 
-		R::nuke();
+	}
 
-		/**
-		 * Test for quick detect change
-		 */
-
+	/**
+	 * Test for quick detect change
+	 */
+	public function basic()
+	{
 		$book = R::dispense( 'book' );
 
 		if ( $book->prop ) {
@@ -118,13 +112,13 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 				fail();
 			}
 		}
+	}
 
-		R::nuke();
-
-		/**
-		 * Finding $person beans that have been aliased into various roles
-		 */
-
+	/**
+	 * Finding $person beans that have been aliased into various roles
+	 */
+	public function aliasedFinder()
+	{
 		$message          = R::dispense( 'message' );
 		$message->subject = 'Roommate agreement';
 
@@ -149,21 +143,18 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 
 		R::store( $message );
 
-		/**
-		 *
-		 */
-
 		$message = R::load( 'message', $id );
 
 		asrt( $message->fetchAs( 'person' )->sender->name, 'Sheldon' );
 		asrt( $message->fetchAs( 'person' )->recipient->name, 'Penny' );
 
-		R::nuke();
+	}
 
-		/**
-		 *
-		 */
-
+	/**
+	 *
+	 */
+	public function dummy1()
+	{
 		$project       = R::dispense( 'project' );
 		$project->name = 'Mutant Project';
 
@@ -180,13 +171,13 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 
 		asrt( $project->fetchAs( 'person' )->teacher->name, 'Charles Xavier' );
 		asrt( $project->fetchAs( 'person' )->student->name, 'Wolverine' );
+	}
 
-		R::nuke();
-
-		/**
-		 *
-		 */
-
+	/**
+	 *
+	 */
+	public function dummy2()
+	{
 		$farm    = R::dispense( 'building' );
 		$village = R::dispense( 'village' );
 
@@ -233,8 +224,10 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 		asrt( count( $village1->ownArmy ), 0 );
 		asrt( count( $village2->ownArmy ), 0 );
 
-		R::nuke();
+	}
 
+	public function dummy3()
+	{
 		/**
 		 * Ensure that aliased column aren't beautified
 		 */

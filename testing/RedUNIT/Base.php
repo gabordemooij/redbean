@@ -13,12 +13,36 @@
  */
 class RedUNIT_Base extends RedUNIT
 {
-
 	/**
 	 * What drivers should be loaded for this test pack?
 	 */
 	public function getTargetDrivers()
 	{
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID', 'oracle' );
+	}
+
+	/**
+	 * Begin testing.
+	 * This method runs the actual test pack.
+	 *
+	 * @return void
+	 */
+	public function run()
+	{
+		$class = new ReflectionClass( get_class($this) );
+
+		// Call all methods except run automatically
+		foreach ( $class->getMethods(ReflectionMethod::IS_PUBLIC) as $method ) {
+			// Skip methods inherited from parent class
+			if ( $method->class != $class->getName() ) continue;
+
+			if ( $method->name == 'run' ) continue;
+
+			$call = $method->name;
+
+			$this->$call();
+
+			R::nuke();
+		}
 	}
 }
