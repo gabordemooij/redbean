@@ -102,19 +102,20 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 			)
 			as $value
 		) {
-			foreach( array( 'own', 'shared' ) as $type ) {
-				try {
-					$t = $type.'Page';
-					$book->$t[] = $value;
+			try {
+				$book->ownPage[] = $value;
 
-					R::store( $book );
+				R::store( $book );
 
-					fail();
-				} catch ( RedBean_Exception_Security $e ) {
-					pass();
-				} catch ( Exception $e ) {
-					fail();
-				}
+				$book->sharedPage[] = $value;
+
+				R::store( $book );
+
+				fail();
+			} catch ( RedBean_Exception_Security $e ) {
+				pass();
+			} catch ( Exception $e ) {
+				fail();
 			}
 		}
 
