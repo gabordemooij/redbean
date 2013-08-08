@@ -159,6 +159,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 		$id = R::store( $painting );
 
+		testpack( 'Testing Plugin Cooker' );
+
 		$cooker = new RedBean_Plugin_Cooker();
 		$cooker->setToolbox( $toolbox );
 
@@ -170,6 +172,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 			pass();
 		}
 
+		testpack( 'Testing SQL Error Types' );
+
 		foreach ( $writer->typeno_sqltype as $code => $text ) {
 			asrt( is_integer( $code ), true );
 			asrt( is_string( $text ), true );
@@ -179,6 +183,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 			asrt( is_integer( $code ), true );
 			asrt( is_string( $text ), true );
 		}
+
+		testpack( 'Testing Nowhere Pt. 1 (pre-freeze)' );
 
 		R::exec( 'select * from nowhere' );
 		pass();
@@ -199,6 +205,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		pass();
 
 		R::freeze( true );
+
+		testpack( 'Testing Nowhere Pt. 2 (post-freeze)' );
 
 		foreach (
 			array(
