@@ -184,29 +184,21 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 			asrt( is_string( $text ), true );
 		}
 
-		testpack( 'Testing Nowhere Pt. 1 (pre-freeze)' );
+		testpack( 'Testing Nowhere Pt. 1 (unfrozen)' );
 
-		R::exec( 'select * from nowhere' );
-		pass();
+		foreach (
+			array(
+				'exec', 'getAll', 'getCell', 'getAssoc', 'getRow', 'getCol'
+			)
+			as $method ) {
 
-		R::getAll( 'select * from nowhere' );
-		pass();
+			R::$method( 'select * from nowhere' );
+			pass();
+		}
 
-		R::getAssoc( 'select * from nowhere' );
-		pass();
-
-		R::getCol( 'select * from nowhere' );
-		pass();
-
-		R::getCell( 'select * from nowhere' );
-		pass();
-
-		R::getRow( 'select * from nowhere' );
-		pass();
+		testpack( 'Testing Nowhere Pt. 2 (frozen)' );
 
 		R::freeze( true );
-
-		testpack( 'Testing Nowhere Pt. 2 (post-freeze)' );
 
 		foreach (
 			array(
@@ -223,6 +215,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 			}
 		}
 
+		R::freeze(false);
 	}
 
 	/**
@@ -247,15 +240,14 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	 */
 	public function dummy2()
 	{
-		testpack( 'Ordering? Dunno.' );
-
 		$track = R::dispense( 'track' );
 		$album = R::dispense( 'cd' );
 
 		$track->name     = 'a';
 		$track->ordernum = 1;
 
-		$track2           = R::dispense( 'track' );
+		$track2 = R::dispense( 'track' );
+
 		$track2->ordernum = 2;
 		$track2->name     = 'b';
 
