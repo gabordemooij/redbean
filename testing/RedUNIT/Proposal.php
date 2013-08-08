@@ -11,13 +11,18 @@ class RedUNIT_Proposal extends RedUNIT_Base
 	 */
 	public function run()
 	{
-		$methods = get_class_methods( $this );
+		$class = new ReflectionClass( get_class($this) );
 
 		// Call all methods except run automatically
-		foreach ( $methods as $method ) {
-			if ( $method == 'run' ) continue;
+		foreach ( $class->getMethods(ReflectionMethod::IS_PUBLIC) as $method ) {
+			// Skip methods inherited from parent class
+			if ( $method->class != $class->getName() ) continue;
 
-			$this->$method;
+			if ( $method->name == 'run' ) continue;
+
+			$call = $method->name;
+
+			$this->$call();
 
 			// Maybe each test automatically nukes the database afterwards?
 			// R::nuke();
@@ -30,22 +35,28 @@ class RedUNIT_Proposal extends RedUNIT_Base
 	 * the existing tests
 	 */
 
+	/**
+	 * Methods defined as non public can be used as utility functions
+	 * that aren't called in run()
+	 */
+	private function getThing( $type, $name )
+	{
+		$thing       = R::dispense( $type );
+		$thing->name = $name;
 
+		R::store( $thing );
+
+		return $thing;
+	}
 
 	/**
 	 * Associating two beans, then loading the associated bean
 	 */
 	public function testAssociateAndLoad()
 	{
-		$person       = R::dispense( 'person' );
-		$person->name = 'John';
+		$person = $this->getThing( 'person', 'John' );
 
-		R::store( $person );
-
-		$course       = R::dispense( 'course' );
-		$course->name = 'Math';
-
-		R::store( $course );
+		$course = $this->getThing( 'course', 'Math' );
 
 		$course->teacher = $person;
 
