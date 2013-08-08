@@ -247,6 +247,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	 */
 	public function dummy2()
 	{
+		testpack( 'Ordering? Dunno.' );
+
 		$track = R::dispense( 'track' );
 		$album = R::dispense( 'cd' );
 
