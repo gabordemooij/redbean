@@ -25,6 +25,7 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 		/**
 		 * Associating two beans, then loading the associated bean
 		 */
+
 		$person       = R::dispense( 'person' );
 		$person->name = 'John';
 
@@ -46,6 +47,7 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 		/**
 		 * Trying to load a property that has an invalid name
 		 */
+
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
 
@@ -61,12 +63,19 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 			fail();
 		}
 
-		//Test for quick detect change
 		R::nuke();
+
+		/**
+		 * Test for quick detect change
+		 */
+
 		$book = R::dispense( 'book' );
+
 		if ( $book->prop ) {
 		}
+
 		//echo $book;
+
 		asrt( isset( $book->prop ), false ); //not a very good test
 		asrt( in_array( 'prop', array_keys( $book->export() ) ), false ); //better...
 
@@ -84,151 +93,29 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 		/**
 		 * The following tests try to store various things that aren't
 		 * beans (which is expected) with the own* and shared* properties
-		 * which usually assign beans to other beans in a relationship
+		 * which only accept beans as assignments, so they're expected to fail
 		 */
 
-		// Cannot set a standard Object via own*
-		try {
-			$book->ownPage[] = new stdClass();
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
+		foreach (
+			array(
+				new stdClass(), "a string", 1928, true, null, array()
+			)
+			as $value
+		) {
+			foreach( array( 'own', 'shared' ) as $type ) {
+				try {
+					$t = $type.'Page';
+					$book->$t[] = $value;
 
-		// Cannot set a standard Object via shared*
-		try {
-			$book->sharedPage[] = new stdClass();
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
+					R::store( $book );
 
-		// Cannot set a string as own*
-		try {
-			$book->ownPage[] = "a string";
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
-
-		// Cannot set a string as shared*
-		try {
-			$book->sharedPage[] = "a string";
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
-
-		// Cannot set a number as own*
-		try {
-			$book->ownPage[] = 1928;
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
-
-		// Cannot set a number as shared*
-		try {
-			$book->sharedPage[] = 1928;
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
-
-		// Cannot set a boolean as own*
-		try {
-			$book->ownPage[] = true;
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
-
-		// Cannot set a boolean as shared*
-		try {
-			$book->sharedPage[] = false;
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
-
-		// Cannot set null as own*
-		try {
-			$book->ownPage[] = null;
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
-
-		// Cannot set null as shared*
-		try {
-			$book->sharedPage[] = null;
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
-
-		// Cannot set an array as own*
-		try {
-			$book->ownPage[] = array();
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
-		}
-
-		// Cannot set an array as shared*
-		try {
-			$book->sharedPage[] = array();
-			R::store( $book );
-			fail();
-		} catch ( RedBean_Exception_Security $e ) {
-			pass();
-		}
-		catch ( Exception $e ) {
-			fail();
+					fail();
+				} catch ( RedBean_Exception_Security $e ) {
+					pass();
+				} catch ( Exception $e ) {
+					fail();
+				}
+			}
 		}
 
 		R::nuke();
@@ -236,6 +123,7 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 		/**
 		 * Finding $person beans that have been aliased into various roles
 		 */
+
 		$message          = R::dispense( 'message' );
 		$message->subject = 'Roommate agreement';
 
@@ -260,12 +148,20 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 
 		R::store( $message );
 
+		/**
+		 *
+		 */
+
 		$message = R::load( 'message', $id );
 
 		asrt( $message->fetchAs( 'person' )->sender->name, 'Sheldon' );
 		asrt( $message->fetchAs( 'person' )->recipient->name, 'Penny' );
 
 		R::nuke();
+
+		/**
+		 *
+		 */
 
 		$project       = R::dispense( 'project' );
 		$project->name = 'Mutant Project';
@@ -285,6 +181,10 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 		asrt( $project->fetchAs( 'person' )->student->name, 'Wolverine' );
 
 		R::nuke();
+
+		/**
+		 *
+		 */
 
 		$farm    = R::dispense( 'building' );
 		$village = R::dispense( 'village' );
@@ -334,7 +234,10 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 
 		R::nuke();
 
-		//aliased column should be beautified
+		/**
+		 * Ensure that aliased column aren't beautified
+		 */
+
 		$points = R::dispense( 'point', 2 );
 		$line   = R::dispense( 'line' );
 
