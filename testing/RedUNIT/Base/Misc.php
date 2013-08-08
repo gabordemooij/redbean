@@ -255,6 +255,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		R::associate( $album, $track2 );
 
 		$tracks = R::related( $album, 'track' );
+
 		$track  = array_shift( $tracks );
 		$track2 = array_shift( $tracks );
 
