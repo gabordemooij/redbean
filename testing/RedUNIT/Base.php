@@ -38,6 +38,11 @@ class RedUNIT_Base extends RedUNIT
 
 			if ( $method->name == 'run' ) continue;
 
+			if ( $method->name == 'getTargetDrivers' ) continue;
+
+			$class = str_replace( $class->getParentClass()->getName(), '', $method->class );
+			testpack( "[".$method->class."->".$method->name."]");
+
 			$call = $method->name;
 
 			$this->$call();

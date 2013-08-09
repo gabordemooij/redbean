@@ -13,130 +13,228 @@
  */
 class RedUNIT_Base_Dup extends RedUNIT_Base
 {
-
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function testExportAllAndCache()
 	{
-
 		testpack( 'exportAll() and Cache' );
 
-		$can              = R::dispense( 'can' )->setAttr( 'size', 3 );
-		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
-		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
-		$id               = R::store( $can );
-		R::debug( true );
-		ob_start();
-		$can     = R::load( 'can', $id );
-		$cache   = array( 'coffee'  => array( 'color' => 'color', 'id' => 'id', 'can_id' => 'can_id' ), 'can' => array( 'size' => 'size', 'id' => 'id' ),
-						  'can_tag' => array( 'id' => 'id', 'can_id' => 'can_id', 'tag_id' => 'tag_id' ), 'tag' => array( 'id' => 'id', 'name' => 'name' ) );
-		$data    = R::exportAll( array( $can ), true );
-		$queries = ob_get_contents();
-		R::debug( false );
-		ob_end_clean();
-		$len1 = strlen( $queries );
+		$can = R::dispense( 'can' )->setAttr( 'size', 3 );
 
-		$can              = R::dispense( 'can' )->setAttr( 'size', 3 );
 		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
 		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
-		$id               = R::store( $can );
-		R::debug( true );
-		ob_start();
-		$can     = R::load( 'can', $id );
-		$cache   = array( 'coffee'  => array( 'color' => 'color', 'id' => 'id', 'can_id' => 'can_id' ), 'can' => array( 'size' => 'size', 'id' => 'id' ),
-						  'can_tag' => array( 'id' => 'id', 'can_id' => 'can_id', 'tag_id' => 'tag_id' ), 'tag' => array( 'id' => 'id', 'name' => 'name' ) );
-		$data    = R::exportAll( array( $can ), true );
-		$queries = ob_get_contents();
-		R::debug( false );
-		ob_end_clean();
-		$len2 = strlen( $queries );
-		asrt( ( $len1 ), ( $len2 ) );
 
-		$can              = R::dispense( 'can' )->setAttr( 'size', 3 );
-		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
-		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
-		$id               = R::store( $can );
+		$id = R::store( $can );
+
 		R::debug( true );
+
 		ob_start();
-		$can   = R::load( 'can', $id );
-		$cache = array( 'coffee'  => array( 'color' => 'color', 'id' => 'id', 'can_id' => 'can_id' ), 'can' => array( 'size' => 'size', 'id' => 'id' ),
-						'can_tag' => array( 'id' => 'id', 'can_id' => 'can_id', 'tag_id' => 'tag_id' ), 'tag' => array( 'id' => 'id', 'name' => 'name' ) );
-		R::$duplicationManager->setTables( $cache );
+
+		$can = R::load( 'can', $id );
+
+		$cache = $this->getCache();
+
 		$data = R::exportAll( array( $can ), true );
 
 		$queries = ob_get_contents();
+
 		R::debug( false );
 		ob_end_clean();
-		$len3 = strlen( $queries );
-		asrt( ( ( $len3 ) < ( $len2 ) ), true );
-		asrt( count( $data ), 1 );
-		asrt( $data[0]['ownCoffee'][0]['color'], 'black' );
-		R::$duplicationManager->setCacheTables( false );
+		$len1 = strlen( $queries );
 
-		testpack( 'Dup() and Cache' );
-		R::nuke();
 		$can              = R::dispense( 'can' )->setAttr( 'size', 3 );
 		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
 		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
-		$can              = R::load( 'can', R::store( $can ) );
-		$d                = new RedBean_DuplicationManager( R::$toolbox );
-		$d->setCacheTables( true );
+
+		$id = R::store( $can );
+
+		R::debug( true );
+
 		ob_start();
-		R::debug( 1 );
-		$x       = $d->dup( $can );
+
+		$can = R::load( 'can', $id );
+
+		$cache = $this->getCache();
+
+		$data = R::exportAll( array( $can ), true );
+
 		$queries = ob_get_contents();
-		R::debug( 0 );
+
+		R::debug( false );
+
 		ob_end_clean();
+
+		$len2 = strlen( $queries );
+
+		asrt( ( $len1 ), ( $len2 ) );
+
+		$can = R::dispense( 'can' )->setAttr( 'size', 3 );
+
+		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
+		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
+
+		$id = R::store( $can );
+
+		R::debug( true );
+
+		ob_start();
+
+		$can = R::load( 'can', $id );
+
+		$cache = $this->getCache();
+
+		R::$duplicationManager->setTables( $cache );
+
+		$data = R::exportAll( array( $can ), true );
+
+		$queries = ob_get_contents();
+
+		R::debug( false );
+
+		ob_end_clean();
+
+		$len3 = strlen( $queries );
+
+		asrt( ( ( $len3 ) < ( $len2 ) ), true );
+		asrt( count( $data ), 1 );
+		asrt( $data[0]['ownCoffee'][0]['color'], 'black' );
+
+		R::$duplicationManager->setCacheTables( false );
+	}
+
+	public function DupAndCache()
+	{
+		testpack( 'Dup() and Cache' );
+
+		$can = R::dispense( 'can' )->setAttr( 'size', 3 );
+
+		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
+		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
+
+		$can = R::load( 'can', R::store( $can ) );
+
+		$d = new RedBean_DuplicationManager( R::$toolbox );
+
+		$d->setCacheTables( true );
+
+		ob_start();
+
+		R::debug( 1 );
+
+		$x = $d->dup( $can );
+
+		$queries = ob_get_contents();
+
+		R::debug( 0 );
+
+		ob_end_clean();
+
 		$len1 = strlen( $queries );
+
 		asrt( ( $len1 > 40 ), true );
 		asrt( isset( $x->ownCoffee ), true );
 		asrt( count( $x->ownCoffee ), 1 );
 		asrt( isset( $x->sharedTag ), true );
 		asrt( count( $x->sharedTag ), 1 );
+
 		$cache = $d->getSchema();
 
 		R::nuke();
-		$can              = R::dispense( 'can' )->setAttr( 'size', 3 );
+
+		$can = R::dispense( 'can' )->setAttr( 'size', 3 );
+
 		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
 		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
-		$can              = R::load( 'can', R::store( $can ) );
-		$d                = new RedBean_DuplicationManager( R::$toolbox );
-		//$cache = '{"book":{"id":"INTEGER","title":"TEXT"},"bean":{"id":"INTEGER","prop":"INTEGER"},"pessoa":{"id":"INTEGER","nome":"TEXT","nome_meio":"TEXT","sobrenome":"TEXT","nascimento":"NUMERIC","reg_owner":"TEXT"},"documento":{"id":"INTEGER","nome_documento":"TEXT","numero_documento":"TEXT","reg_owner":"TEXT","ownPessoa_id":"INTEGER"},"can":{"id":"INTEGER","size":"INTEGER"},"coffee":{"id":"INTEGER","color":"TEXT","can_id":"INTEGER"},"tag":{"id":"INTEGER","name":"TEXT"},"can_tag":{"id":"INTEGER","tag_id":"INTEGER","can_id":"INTEGER"}}';
+
+		$can = R::load( 'can', R::store( $can ) );
+
+		$d = new RedBean_DuplicationManager( R::$toolbox );
+
+		/**
+		 * $cache = '{"book": {
+		 *  "id": "INTEGER",
+		 *  "title": "TEXT"
+		 * }, "bean": {
+		 *  "id": "INTEGER",
+		 *  "prop": "INTEGER"
+		 * }, "pessoa": {
+		 *  "id": "INTEGER",
+		 *  "nome": "TEXT",
+		 *  "nome_meio": "TEXT",
+		 *  "sobrenome": "TEXT",
+		 *  "nascimento": "NUMERIC",
+		 *  "reg_owner": "TEXT"
+		 * }, "documento": {
+		 *  "id": "INTEGER",
+		 *  "nome_documento": "TEXT",
+		 *  "numero_documento": "TEXT",
+		 *  "reg_owner": "TEXT",
+		 *  "ownPessoa_id": "INTEGER"
+		 * }, "can": {
+		 *  "id": "INTEGER",
+		 *  "size": "INTEGER"
+		 * }, "coffee": {
+		 *  "id": "INTEGER",
+		 *  "color": "TEXT",
+		 *  "can_id": "INTEGER"
+		 * }, "tag": {
+		 *  "id": "INTEGER",
+		 *  "name": "TEXT"
+		 * }, "can_tag": {
+		 *  "id": "INTEGER",
+		 *  "tag_id": "INTEGER",
+		 *  "can_id": "INTEGER"
+		 * }}'
+		 */
+
 		$d->setTables( $cache, 1 );
+
 		ob_start();
+
 		R::debug( 1 );
-		$x       = $d->dup( $can );
+
+		$x = $d->dup( $can );
+
 		$queries = ob_get_contents();
+
 		ob_end_clean();
+
 		R::debug( 0 );
+
 		$len2 = strlen( $queries );
+
 		asrt( isset( $x->ownCoffee ), true );
 		asrt( count( $x->ownCoffee ), 1 );
 		asrt( isset( $x->sharedTag ), true );
 		asrt( count( $x->sharedTag ), 1 );
 		asrt( json_encode( $cache ), json_encode( $d->getSchema() ) );
 		asrt( ( $len1 > $len2 ), true );
+	}
 
+	public function testDupAndExportNonTainting()
+	{
 		testpack( 'Dup() and Export() should not taint beans' );
-		R::nuke();
 
 		$p            = R::dispense( 'page' );
 		$b            = R::dispense( 'book' );
+
 		$b->ownPage[] = $p;
 		$b->title     = 'a';
+
 		$id           = R::store( $b );
+
 		$b            = R::load( 'book', $id );
+
 		asrt( ( !$b->getMeta( 'tainted' ) ), true );
+
 		R::exportAll( $b );
+
 		asrt( ( !$b->getMeta( 'tainted' ) ), true );
+
 		R::dup( $b );
+
 		asrt( ( !$b->getMeta( 'tainted' ) ), true );
 
 		testpack( 'Test issue with ownItems and stealing Ids.' );
+
 		R::nuke();
 		$bill                  = R::dispense( 'bill' );
 		$item                  = R::dispense( 'item' );
@@ -160,35 +258,49 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 		}
 
 		R::nuke();
-		$this->runOnce();
-		R::freeze( true );
-		$this->runOnce( false );
-		R::freeze( false );
 
+		$this->runOnce();
+
+		R::freeze( true );
+
+		$this->runOnce( false );
+
+		R::freeze( false );
+	}
+
+	public function ExportWithFilters()
+	{
 		testpack( 'Export with filters' );
-		R::nuke();
-		$book                       = R::dispense( 'book' );
-		$pages                      = R::dispense( 'page', 2 );
-		$texts                      = R::dispense( 'text', 2 );
-		$images                     = R::dispense( 'image', 2 );
-		$author                     = R::dispense( 'author' );
-		$pub                        = R::dispense( 'publisher' );
-		$bookmarks                  = R::dispense( 'bookmark', 2 );
-		$pages[0]->ownText          = array( $texts[0] );
-		$pages[0]->ownImage         = array( $images[0] );
-		$pages[1]->ownText          = array( $texts[1] );
-		$pages[1]->ownImage         = array( $images[1] );
+
+		$book      = R::dispense( 'book' );
+		$pages     = R::dispense( 'page', 2 );
+		$texts     = R::dispense( 'text', 2 );
+		$images    = R::dispense( 'image', 2 );
+		$author    = R::dispense( 'author' );
+		$pub       = R::dispense( 'publisher' );
+		$bookmarks = R::dispense( 'bookmark', 2 );
+
+		$pages[0]->ownText  = array( $texts[0] );
+		$pages[0]->ownImage = array( $images[0] );
+		$pages[1]->ownText  = array( $texts[1] );
+		$pages[1]->ownImage = array( $images[1] );
+
 		$pages[0]->sharedBookmark[] = $bookmarks[0];
 		$pages[1]->sharedBookmark[] = $bookmarks[1];
-		$bookmarks[0]->ownNote[]    = R::dispense( 'note' )->setAttr( 'text', 'a note' );
-		$bookmarks[1]->ownNote[]    = R::dispense( 'note' )->setAttr( 'text', 'a note' );
-		$book->ownPage              = $pages;
-		$book->author               = $author;
+
+		$bookmarks[0]->ownNote[] = R::dispense( 'note' )->setAttr( 'text', 'a note' );
+		$bookmarks[1]->ownNote[] = R::dispense( 'note' )->setAttr( 'text', 'a note' );
+
+		$book->ownPage = $pages;
+		$book->author  = $author;
 
 		$author->publisher = $pub;
 		$bookID            = R::store( $book );
+
 		R::$duplicationManager->setTables( R::$writer->getTables() );
+
 		$objects = ( R::exportAll( array( $book ), true, array() ) );
+
 		asrt( isset( $objects[0]['ownPage'] ), true );
 		asrt( count( $objects[0]['ownPage'] ), 2 );
 		asrt( isset( $objects[0]['author'] ), true );
@@ -196,7 +308,9 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 		asrt( count( $objects[0]['ownPage'][0]['ownText'] ), 1 );
 		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), true );
 		asrt( count( $objects[0]['ownPage'][0]['ownImage'] ), 1 );
+
 		$objects = ( R::exportAll( array( $book ), true, array( 'page', 'author', 'text', 'image' ) ) );
+
 		asrt( isset( $objects[0]['ownPage'] ), true );
 		asrt( count( $objects[0]['ownPage'] ), 2 );
 		asrt( isset( $objects[0]['author'] ), true );
@@ -204,50 +318,104 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 		asrt( count( $objects[0]['ownPage'][0]['ownText'] ), 1 );
 		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), true );
 		asrt( count( $objects[0]['ownPage'][0]['ownImage'] ), 1 );
+
 		$objects = ( R::exportAll( array( $book ), true, array( 'author' ) ) );
+
 		asrt( isset( $objects[0]['ownPage'] ), false );
 		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), false );
+
 		$objects = ( R::exportAll( array( $book ), true, array( 'page' ) ) );
+
 		asrt( isset( $objects[0]['author'] ), false );
 		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), false );
+
 		$objects = ( R::exportAll( array( $book ), true, array( 'page', 'text' ) ) );
+
 		asrt( isset( $objects[0]['author'] ), false );
 		asrt( isset( $objects[0]['ownPage'] ), true );
 		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), true );
 		asrt( count( $objects[0]['ownPage'][0]['ownText'] ), 1 );
 		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), false );
+
 		$objects = ( R::exportAll( array( $book ), true, array( 'none' ) ) );
+
 		asrt( isset( $objects[0]['author'] ), false );
 		asrt( isset( $objects[0]['ownPage'] ), false );
+
 		$texts = R::find( 'text' );
+
 		R::preload( $texts, 'page,*.book,*.author' );
+
 		$objects = ( R::exportAll( $texts, true ) );
+
 		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), true );
 		asrt( isset( $objects[0]['page']['sharedBookmark'] ), false );
+
 		$texts = R::find( 'text' );
+
 		R::preload( $texts, array( 'page', 'page.sharedBookmark' => 'bookmark' ) );
+
 		$objects = ( R::exportAll( $texts, true ) );
+
 		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), true );
 		asrt( isset( $objects[0]['page']['sharedBookmark'] ), true );
 		asrt( isset( $objects[0]['page']['sharedBookmark'][0]['ownNote'] ), false );
+
 		$texts = R::find( 'text' );
+
 		R::preload( $texts, array( 'page', 'page.sharedBookmark' => 'bookmark', 'page.sharedBookmark.ownNote' => 'note' ) );
+
 		$objects = ( R::exportAll( $texts, true ) );
+
 		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), true );
 		asrt( isset( $objects[0]['page']['sharedBookmark'] ), true );
 		asrt( isset( $objects[0]['page']['sharedBookmark'][0]['ownNote'] ), true );
+
 		R::$duplicationManager->setCacheTables( false );
+
 		testpack( 'Keyless export' );
+
 		$book = R::load( 'book', $bookID );
 		$book->ownPage;
+
 		$export = $book->export();
+
 		asrt( isset( $export['ownPage'][0] ), true );
+
 		RedBean_OODBBean::setFlagKeyedExport( true );
+
 		$export = $book->export();
+
 		asrt( isset( $export['ownPage'][1] ), true );
+
 		RedBean_OODBBean::setFlagKeyedExport( false );
+
 		$export = $book->export();
+
 		asrt( isset( $export['ownPage'][0] ), true );
+	}
+
+	private function getCache()
+	{
+		return array(
+			'coffee' => array(
+				'color' => 'color',
+				'id' => 'id',
+				'can_id' => 'can_id'
+			),
+			'can' => array(
+				'size' => 'size',
+				'id' => 'id'
+			),
+			'can_tag' => array(
+				'id' => 'id',
+				'can_id' => 'can_id',
+				'tag_id' => 'tag_id'
+			),
+			'tag' => array(
+				'id' => 'id',
+				'name' => 'name' )
+		);
 	}
 
 	/**
@@ -256,7 +424,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 	 * @param type $object
 	 * @param type $array
 	 */
-	public function compare( $object, $array )
+	private function compare( $object, $array )
 	{
 		foreach ( $object as $property => $value ) {
 			if ( is_array( $value ) ) {
@@ -283,7 +451,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 	/**
 	 * Run tests
 	 */
-	public function runOnce( $n = true )
+	private function runOnce( $n = true )
 	{
 
 		$books   = R::dispense( 'book', 10 );

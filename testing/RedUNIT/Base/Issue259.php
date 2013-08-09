@@ -13,28 +13,27 @@
  */
 class RedUNIT_Base_Issue259 extends RedUNIT_Base
 {
-
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function test()
 	{
 		testpack( 'Testing Issue #259 - Stash Cache breaks model delegation in open().' );
-		R::nuke();
 
-		$mother       = R::dispense( 'mother' );
+		$mother = R::dispense( 'mother' );
+
 		$mother->desc = 'I am mother';
+
 		R::store( $mother );
 
-		$child         = R::dispense( 'child' );
+		$child = R::dispense( 'child' );
+
 		$child->mother = $mother;
 		$child->desc   = 'I am child';
-		$id            = R::store( $child );
+
+		$id = R::store( $child );
+
 		R::findOne( 'child', ' id = ?', array( $id ) );
+
 		R::find( 'child', ' id = ? ', array( $id ) );
+
 		R::load( 'child', $id );
 	}
 }

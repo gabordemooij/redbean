@@ -13,7 +13,6 @@
  */
 class RedUNIT_Base_Issue90 extends RedUNIT_Base
 {
-
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
@@ -22,15 +21,24 @@ class RedUNIT_Base_Issue90 extends RedUNIT_Base
 	 */
 	public function run()
 	{
-		$s              = R::dispense( 'box' );
-		$s->name        = 'a';
-		$f              = R::dispense( 'bottle' );
+		$s = R::dispense( 'box' );
+
+		$s->name = 'a';
+
+		$f = R::dispense( 'bottle' );
+
 		$s->ownBottle[] = $f;
+
 		R::store( $s );
-		$s2       = R::dispense( 'box' );
+
+		$s2 = R::dispense( 'box' );
+
 		$s2->name = 'a';
+
 		R::store( $s2 );
+
 		R::trash( $s2 );
+
 		pass();
 	}
 }

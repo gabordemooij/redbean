@@ -13,40 +13,48 @@
  */
 class RedUNIT_Base_Boxing extends RedUNIT_Base
 {
-
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function testBoxing()
 	{
-
 		R::nuke();
+
 		$bean = R::dispense( 'boxedbean' )->box();
+
 		R::trash( $bean );
+
 		pass();
 
-		$bean                = R::dispense( 'boxedbean' );
+		$bean = R::dispense( 'boxedbean' );
+
 		$bean->sharedBoxbean = R::dispense( 'boxedbean' )->box();
+
 		R::store( $bean );
+
 		pass();
 
-		$bean               = R::dispense( 'boxedbean' );
+		$bean = R::dispense( 'boxedbean' );
+
 		$bean->ownBoxedbean = R::dispense( 'boxedbean' )->box();
+
 		R::store( $bean );
+
 		pass();
 
-		$bean        = R::dispense( 'boxedbean' );
+		$bean = R::dispense( 'boxedbean' );
+
 		$bean->other = R::dispense( 'boxedbean' )->box();
+
 		R::store( $bean );
+
 		pass();
 
-		$bean        = R::dispense( 'boxedbean' );
+		$bean = R::dispense( 'boxedbean' );
+
 		$bean->title = 'MyBean';
-		$box         = $bean->box();
+
+		$box = $bean->box();
+
 		asrt( ( $box instanceof Model_Boxedbean ), true );
+
 		R::store( $box );
 	}
 }
