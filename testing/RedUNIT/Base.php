@@ -31,7 +31,7 @@ class RedUNIT_Base extends RedUNIT
 	{
 		$class = new ReflectionClass( $this );
 
-		// Call all methods except run automatically
+				// Call all methods except run automatically
 		foreach ( $class->getMethods(ReflectionMethod::IS_PUBLIC) as $method ) {
 			// Skip methods inherited from parent class
 			if ( $method->class != $class->getName() ) continue;
@@ -40,8 +40,9 @@ class RedUNIT_Base extends RedUNIT
 
 			if ( $method->name == 'getTargetDrivers' ) continue;
 
-			$class = str_replace( $class->getParentClass()->getName(), '', $method->class );
-			testpack( "[".$method->class."->".$method->name."]");
+			$classname = str_replace( $class->getParentClass()->getName(), '', $method->class );
+
+			testpack( $classname."->".$method->name." [".$method->class."->".$method->name."]");
 
 			$call = $method->name;
 
