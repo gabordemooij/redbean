@@ -29,14 +29,12 @@ class RedUNIT_Base extends RedUNIT
 	 */
 	public function run()
 	{
-		$name = get_class($this);
-
-		$class = new ReflectionClass( $name );
+		$class = new ReflectionClass( $this );
 
 		// Call all methods except run automatically
 		foreach ( $class->getMethods(ReflectionMethod::IS_PUBLIC) as $method ) {
 			// Skip methods inherited from parent class
-			if ( $method->class != $name ) continue;
+			if ( $method->class != $class->getName() ) continue;
 
 			if ( $method->name == 'run' ) continue;
 
