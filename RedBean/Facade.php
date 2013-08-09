@@ -26,6 +26,11 @@ class RedBean_Facade
 	private static $strictType = true;
 
 	/**
+	 * @var integer
+	 */
+	private static $transactionDepth = 0;
+
+	/**
 	 * @var array
 	 */
 	public static $toolboxes = array();
@@ -197,23 +202,12 @@ class RedBean_Facade
 			throw new RedBean_Exception_Security( 'R::transaction needs a valid callback.' );
 		}
 
-		static $depth = 0;
-
 		try {
-			if ( $depth == 0 ) {
-				self::begin();
-			}
-			$depth++;
+			self::begin();
 			call_user_func( $callback ); //maintain 5.2 compatibility
-			$depth--;
-			if ( $depth == 0 ) {
-				self::commit();
-			}
+			self::commit();
 		} catch ( Exception $exception ) {
-			$depth--;
-			if ( $depth == 0 ) {
-				self::rollback();
-			}
+			self::rollback();
 			throw $exception;
 		}
 	}
@@ -988,15 +982,43 @@ class RedBean_Facade
 
 	/**
 	 * Facade Convience method for adapter transaction system.
+	 * Checks for opened transaction.
+	 *
+	 * @return boolean
+	 */
+	public static function isInTransaction()
+	{
+		return self::$transactionDepth > 0;
+	}
+
+	/**
+	 * Facade Convience method for adapter transaction system.
+	 * Checks for opened transaction.
+	 *
+	 * @return integer
+	 */
+	public static function getTransactionDepth()
+	{
+		return self::$transactionDepth;
+	}
+
+	/**
+	 * Facade Convience method for adapter transaction system.
 	 * Begins a transaction.
+	 *
+	 * @param  bool $skipDepthCheck disables nested transactions checking
 	 *
 	 * @return bool
 	 */
-	public static function begin()
+	public static function begin( $skipDepthCheck = false )
 	{
 		if ( !self::$redbean->isFrozen() ) return false;
 
-		self::$adapter->startTransaction();
+		if ( self::$transactionDepth == 0 or $skipDepthCheck ) {
+			self::$adapter->startTransaction();
+		}
+
+		++ self::$transactionDepth;
 
 		return true;
 	}
@@ -1005,13 +1027,19 @@ class RedBean_Facade
 	 * Facade Convience method for adapter transaction system.
 	 * Commits a transaction.
 	 *
+	 * @param  bool $skipDepthCheck disables nested transactions checking
+	 *
 	 * @return bool
 	 */
-	public static function commit()
+	public static function commit( $skipDepthCheck = false )
 	{
 		if ( !self::$redbean->isFrozen() ) return false;
 
-		self::$adapter->commit();
+		-- self::$transactionDepth;
+
+		if ( self::$transactionDepth == 0 or $skipDepthCheck ) {
+			self::$adapter->commit();
+		}
 
 		return true;
 	}
@@ -1020,13 +1048,19 @@ class RedBean_Facade
 	 * Facade Convience method for adapter transaction system.
 	 * Rolls back a transaction.
 	 *
+	 * @param  bool $skipDepthCheck disables nested transactions checking
+	 *
 	 * @return bool
 	 */
-	public static function rollback()
+	public static function rollback( $skipDepthCheck = false )
 	{
 		if ( !self::$redbean->isFrozen() ) return false;
 
-		self::$adapter->rollback();
+		-- self::$transactionDepth;
+
+		if ( self::$transactionDepth == 0 or $skipDepthCheck ) {
+			self::$adapter->rollback();
+		}
 
 		return true;
 	}
