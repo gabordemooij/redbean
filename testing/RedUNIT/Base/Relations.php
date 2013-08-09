@@ -544,6 +544,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base {
 		// Testing relatedLast
 		$z = end($items);
 		asrt(R::relatedLast($topic3, 'book')->id, $z->id);
+		asrt(R::relatedLast($topic3, 'manuscript'), null);
 
 		//nuke an own-array, replace entire array at once without getting first
 		$page2->id=0;
