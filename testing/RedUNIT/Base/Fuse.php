@@ -13,7 +13,7 @@
  */
 class RedUNIT_Base_Fuse extends RedUNIT_Base
 {
-	public function run()
+	public function unnamed0()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

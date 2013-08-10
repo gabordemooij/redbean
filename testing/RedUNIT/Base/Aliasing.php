@@ -153,7 +153,7 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 	/**
 	 *
 	 */
-	public function dummy1()
+	public function unnamed1()
 	{
 		$project       = R::dispense( 'project' );
 		$project->name = 'Mutant Project';
@@ -176,7 +176,7 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 	/**
 	 *
 	 */
-	public function dummy2()
+	public function unnamed2()
 	{
 		$farm    = R::dispense( 'building' );
 		$village = R::dispense( 'village' );
@@ -226,7 +226,7 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 
 	}
 
-	public function dummy3()
+	public function unnamed3()
 	{
 		/**
 		 * Ensure that aliased column aren't beautified

@@ -22,195 +22,345 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
 	}
 
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function unnamed0()
 	{
-
 		testpack( 'Testing WriteCache Query Writer Cache' );
-		R::nuke();
-		$logger          = RedBean_Plugin_QueryLogger::getInstanceAndAttach( R::$adapter );
-		$book            = R::dispense( 'book' )->setAttr( 'title', 'ABC' );
+
+		$logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach( R::$adapter );
+
+		$book = R::dispense( 'book' )->setAttr( 'title', 'ABC' );
+
 		$book->ownPage[] = R::dispense( 'page' );
-		$id              = R::store( $book );
 
-		//test load cache -- without
+		$id = R::store( $book );
+
+		// Test load cache -- without
 		$logger->clear();
+
 		$book = R::load( 'book', $id );
 		$book = R::load( 'book', $id );
+
 		asrt( count( $logger->grep( 'SELECT' ) ), 2 );
-		R::$writer->setUseCache( true ); //with cache
+
+		// With cache
+		R::$writer->setUseCache( true );
+
 		$logger->clear();
+
 		$book = R::load( 'book', $id );
 		$book = R::load( 'book', $id );
+
 		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
+
 		R::$writer->setUseCache( false );
 
-		//test find cache
+		// Test find cache
 		$logger->clear();
+
 		$book = R::find( 'book' );
 		$book = R::find( 'book' );
+
 		asrt( count( $logger->grep( 'SELECT' ) ), 2 );
-		R::$writer->setUseCache( true ); //with cache
+
+		// With cache
+		R::$writer->setUseCache( true );
+
 		$logger->clear();
+
 		$book = R::find( 'book' );
 		$book = R::find( 'book' );
+
 		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
+
 		R::$writer->setUseCache( false );
 
-		//test combinations
+		// Test combinations
 		$logger->clear();
+
 		$book = R::findOne( 'book', ' id = ? ', array( $id ) );
+
 		$book->ownPage;
+
 		R::batch( 'book', array( $id ) );
+
 		$book = R::findOne( 'book', ' id = ? ', array( $id ) );
+
 		$book->ownPage;
+
 		R::batch( 'book', array( $id ) );
+
 		asrt( count( $logger->grep( 'SELECT' ) ), 6 );
-		R::$writer->setUseCache( true ); //with cache
+
+		// With cache
+		R::$writer->setUseCache( true );
+
 		$logger->clear();
+
 		R::batch( 'book', array( $id ) );
+
 		$book = R::findOne( 'book', ' id = ? ', array( $id ) );
+
 		$book->ownPage;
+
 		$book = R::findOne( 'book', ' id = ? ', array( $id ) );
+
 		$book->ownPage;
+
 		asrt( count( $logger->grep( 'SELECT' ) ), 3 );
+
 		R::$writer->setUseCache( false );
 
-		//test auto flush
+		// Test auto flush
 		$logger->clear();
-		$book       = R::findOne( 'book' );
+
+		$book = R::findOne( 'book' );
+
 		$book->name = 'X';
+
 		R::store( $book );
+
 		$book = R::findOne( 'book' );
+
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
-		R::$writer->setUseCache( true ); //with cache
+
+		// With cache
+		R::$writer->setUseCache( true );
+
 		$logger->clear();
-		$book       = R::findOne( 'book' );
+
+		$book = R::findOne( 'book' );
+
 		$book->name = 'Y';
-		R::store( $book ); //will flush
+
+		// Will flush
+		R::store( $book );
+
 		$book = R::findOne( 'book' );
-		asrt( count( $logger->grep( 'SELECT *' ) ), 2 ); // now the same, auto flushed
+
+		// Now the same, auto flushed
+		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
+
 		R::$writer->setUseCache( false );
 
-		//test whether delete flushes as well (because uses selectRecord - might be a gotcha!)
+		// Test whether delete flushes as well (because uses selectRecord - might be a gotcha!)
 		R::store( R::dispense( 'garbage' ) );
+
 		$garbage = R::findOne( 'garbage' );
+
 		$logger->clear();
+
 		$book = R::findOne( 'book' );
+
 		R::trash( $garbage );
+
 		$book = R::findOne( 'book' );
+
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
 
 		R::store( R::dispense( 'garbage' ) );
+
 		$garbage = R::findOne( 'garbage' );
-		R::$writer->setUseCache( true ); //with cache
+
+		// With cache
+		R::$writer->setUseCache( true );
+
 		$logger->clear();
+
 		$book = R::findOne( 'book' );
+
 		R::trash( $garbage );
+
 		$book = R::findOne( 'book' );
-		asrt( count( $logger->grep( 'SELECT *' ) ), 2 ); // now the same, auto flushed
+
+		// Now the same, auto flushed
+		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
+
 		R::$writer->setUseCache( false );
 
 		R::store( R::dispense( 'garbage' ) );
+
 		$garbage = R::findOne( 'garbage' );
-		R::$writer->setUseCache( true ); //with cache
+
+		// With cache
+		R::$writer->setUseCache( true );
+
 		$logger->clear();
+
 		$book = R::findOne( 'book' );
+
 		R::$writer->queryRecord( 'garbage', array( 'id' => array( $garbage->id ) ) );
+
 		$book = R::findOne( 'book' );
-		asrt( count( $logger->grep( 'SELECT *' ) ), 2 ); // now the same, auto flushed
 
-		testpack( 'Testing possible regressions: Try to fool the cache' );
-		R::nuke();
-		$str         = 'SELECT * FROM ' . R::$writer->esc( 'bean', true ) . ' WHERE ( ' . R::$writer->esc( 'id', true ) . '  IN ( 1)  ) ';
-		$bean        = R::dispense( 'bean' );
-		$bean->title = 'abc';
-		$id          = R::store( $bean );
-		$bean        = R::load( 'bean', $id );
-		$bean->title = 'xxx';
-		R::store( $bean );
-		//fire exact same query so cache may think no other query has been fired
-		R::exec( $str );
-		$bean = R::load( 'bean', $id );
-		asrt( $bean->title, 'xxx' );
-		R::nuke();
-		$bean        = R::dispense( 'bean' );
-		$bean->title = 'abc';
-		$id          = R::store( $bean );
-		$bean        = R::load( 'bean', $id );
-		$bean->title = 'xxx';
-		R::store( $bean );
-		R::findOne( 'bean', ' title = ? ', array( '-- keep-cache' ) ); //causes flush even though it contains -- keep-cache (not at the end, not intended)
-		$bean = R::load( 'bean', $id );
-		asrt( $bean->title, 'xxx' );
-
-		R::nuke();
-		//now INSTRUCT the cache to not drop the cache
-		$str         = 'SELECT * FROM ' . R::$writer->esc( 'bean', true ) . ' -- keep-cache';
-		$bean        = R::dispense( 'bean' );
-		$bean->title = 'abc';
-		$id          = R::store( $bean );
-		$bean        = R::load( 'bean', $id );
-		$bean->title = 'xxx';
-		R::store( $bean );
-		R::exec( $str );
-		$bean = R::load( 'bean', $id );
-		asrt( $bean->title, 'abc' );
-
-		R::nuke();
-		//now INSTRUCT the cache to not drop the cache CASE 2
-		$str         = 'SELECT * FROM ' . R::$writer->esc( 'bean', true ) . ' -- keep-cache';
-		$bean        = R::dispense( 'bean' );
-		$bean->title = 'abc';
-		$id          = R::store( $bean );
-		$bean        = R::load( 'bean', $id );
-		$bean->title = 'xxx';
-		R::store( $bean );
-		R::findOne( 'bean', ' title = ? ', array( 'cache' ) );
-		$bean = R::load( 'bean', $id );
-		asrt( $bean->title, 'xxx' );
-
-		testpack( 'Testing possible confusion regression' );
-		R::nuke();
-		$bean        = R::dispense( 'bean' );
-		$bean->title = 'abc';
-		$id1         = R::store( $bean );
-		$bean        = R::dispense( 'bean' );
-		$bean->title = 'abc2';
-		$id2         = R::store( $bean );
-		$bean        = R::load( 'bean', $id1 );
-		asrt( $bean->title, 'abc' );
-		$bean = R::load( 'bean', $id2 );
-		asrt( $bean->title, 'abc2' );
-
-		testpack( 'Testing ghost beans' );
-		R::nuke();
-		$bean        = R::dispense( 'bean' );
-		$bean->title = 'abc';
-		$id1         = R::store( $bean );
-		R::trash( $bean );
-		$bean = R::load( 'bean', $id1 );
-		asrt( (int) $bean->id, 0 );
-
-		testpack( 'Test cache flush (explicit)' );
-		R::nuke();
-		$bean        = R::dispense( 'bean' );
-		$bean->title = 'abc';
-		$id1         = R::store( $bean );
-		$logger->clear();
-		$bean = R::load( 'bean', $id1 );
-		asrt( $bean->title, 'abc' );
-		asrt( count( $logger->grep( 'SELECT *' ) ), 1 );
-		$bean = R::load( 'bean', $id1 );
-		asrt( count( $logger->grep( 'SELECT *' ) ), 1 );
-		R::$writer->flushCache();
-		$bean = R::load( 'bean', $id1 );
+		// Now the same, auto flushed
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
+	}
+
+	public function testRegressions()
+	{
+		testpack( 'Testing possible regressions: Try to fool the cache' );
+
+		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', true ) . ' WHERE ( ' . R::$writer->esc( 'id', true ) . '  IN ( 1)  ) ';
+
+		$bean = R::dispense( 'bean' );
+
+		$bean->title = 'abc';
+
+		$id = R::store( $bean );
+
+		$bean = R::load( 'bean', $id );
+
+		$bean->title = 'xxx';
+
+		R::store( $bean );
+
+		// Fire exact same query so cache may think no other query has been fired
+		R::exec( $str );
+
+		$bean = R::load( 'bean', $id );
+
+		asrt( $bean->title, 'xxx' );
+	}
+
+	public function unnamed2()
+	{
+		$bean = R::dispense( 'bean' );
+
+		$bean->title = 'abc';
+
+		$id = R::store( $bean );
+
+		$bean = R::load( 'bean', $id );
+
+		$bean->title = 'xxx';
+
+		R::store( $bean );
+
+		// Causes flush even though it contains -- keep-cache (not at the end, not intended)
+		R::findOne( 'bean', ' title = ? ', array( '-- keep-cache' ) );
+
+		$bean = R::load( 'bean', $id );
+
+		asrt( $bean->title, 'xxx' );
+	}
+
+	public function testInstructNoDrop()
+	{
+		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', true ) . ' -- keep-cache';
+
+		$bean = R::dispense( 'bean' );
+
+		$bean->title = 'abc';
+
+		$id = R::store( $bean );
+
+		$bean = R::load( 'bean', $id );
+
+		$bean->title = 'xxx';
+
+		R::store( $bean );
+
+		R::exec( $str );
+
+		$bean = R::load( 'bean', $id );
+
+		asrt( $bean->title, 'abc' );
+
+		R::nuke();
+
+		// Now INSTRUCT the cache to not drop the cache CASE 2
+		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', true ) . ' -- keep-cache';
+
+		$bean = R::dispense( 'bean' );
+
+		$bean->title = 'abc';
+
+		$id = R::store( $bean );
+
+		$bean = R::load( 'bean', $id );
+
+		$bean->title = 'xxx';
+
+		R::store( $bean );
+
+		R::findOne( 'bean', ' title = ? ', array( 'cache' ) );
+
+		$bean = R::load( 'bean', $id );
+
+		asrt( $bean->title, 'xxx' );
+	}
+
+	public function testConfusionRegression()
+	{
+		testpack( 'Testing possible confusion regression' );
+
+		$bean = R::dispense( 'bean' );
+
+		$bean->title = 'abc';
+
+		$id1 = R::store( $bean );
+
+		$bean = R::dispense( 'bean' );
+
+		$bean->title = 'abc2';
+
+		$id2 = R::store( $bean );
+
+		$bean = R::load( 'bean', $id1 );
+
+		asrt( $bean->title, 'abc' );
+
+		$bean = R::load( 'bean', $id2 );
+
+		asrt( $bean->title, 'abc2' );
+	}
+
+	public function testGhostBeans()
+	{
+		testpack( 'Testing ghost beans' );
+
+		$bean = R::dispense( 'bean' );
+
+		$bean->title = 'abc';
+
+		$id1 = R::store( $bean );
+
+		R::trash( $bean );
+
+		$bean = R::load( 'bean', $id1 );
+
+		asrt( (int) $bean->id, 0 );
+	}
+
+	public function testExplicitCacheFlush()
+	{
+		testpack( 'Test cache flush (explicit)' );
+
+		$logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach( R::$adapter );
+
+		$bean = R::dispense( 'bean' );
+
+		$bean->title = 'abc';
+
+		$id1 = R::store( $bean );
+
+		$logger->clear();
+
+		$bean = R::load( 'bean', $id1 );
+
+		asrt( $bean->title, 'abc' );
+		asrt( count( $logger->grep( 'SELECT *' ) ), 1 );
+
+		$bean = R::load( 'bean', $id1 );
+
+		asrt( count( $logger->grep( 'SELECT *' ) ), 1 );
+
+		R::$writer->flushCache();
+
+		$bean = R::load( 'bean', $id1 );
+
+		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
+
 		R::$writer->flushCache();
 		R::$writer->setUseCache( false );
 	}

@@ -13,7 +13,7 @@
  */
 class RedUNIT_Base_Dispense extends RedUNIT_Base
 {
-	public function test()
+	public function unnamed0()
 	{
 		$redbean = R::$redbean;
 

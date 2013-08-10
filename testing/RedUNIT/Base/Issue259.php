@@ -13,7 +13,7 @@
  */
 class RedUNIT_Base_Issue259 extends RedUNIT_Base
 {
-	public function test()
+	public function unnamed0()
 	{
 		testpack( 'Testing Issue #259 - Stash Cache breaks model delegation in open().' );
 

@@ -13,19 +13,13 @@
  */
 class RedUNIT_Base_Typechecking extends RedUNIT_Base
 {
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function unnamed0()
 	{
 		$redbean = R::$redbean;
 
 		$bean    = $redbean->dispense( "page" );
 
-		// Set some illegal values in the bean; this should trugger Security exceptions.
+		// Set some illegal values in the bean; this should trigger Security exceptions.
 		// Arrays are not allowed.
 		$bean->name = array( "1" );
 
@@ -56,7 +50,6 @@ class RedUNIT_Base_Typechecking extends RedUNIT_Base
 		}
 
 		// Property names should be alphanumeric
-
 		$prop        = ".";
 
 		$bean->$prop = 1;
@@ -78,7 +71,6 @@ class RedUNIT_Base_Typechecking extends RedUNIT_Base
 		}
 
 		// Really...
-
 		$prop        = "-";
 
 		$bean->$prop = 1;

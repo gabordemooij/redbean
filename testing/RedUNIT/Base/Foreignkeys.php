@@ -13,7 +13,6 @@
  */
 class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 {
-
 	/**
 	 * To log the queries
 	 *
@@ -21,76 +20,125 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 	 */
 	private $queries = array();
 
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function testDependency()
 	{
-		//Unit test for dependency
-		R::nuke();
 		$can = $this->createBeanInCan();
-		asrt( 1, R::count( 'bean' ) );
-		R::trash( $can );
-		asrt( 1, R::count( 'bean' ) ); //bean stays.
-		R::nuke();
-		R::dependencies( array( 'bean' => array( 'can' ) ) );
-		$can = $this->createBeanInCan();
-		asrt( 1, R::count( 'bean' ) );
-		R::trash( $can );
-		asrt( 0, R::count( 'bean' ) ); //bean gone.
-		R::dependencies( array() );
-		$can = $this->createBeanInCan();
-		asrt( 1, R::count( 'bean' ) );
-		R::trash( $can );
-		asrt( 1, R::count( 'bean' ) ); //bean stays, constraint removed
 
-		R::nuke();
-		$can = $this->createCanForBean();
-		asrt( 1, R::count( 'bean' ) );
-		R::trash( $can );
-		asrt( 1, R::count( 'bean' ) );
-		R::nuke();
-		R::dependencies( array( 'bean' => array( 'can' ) ) );
-		$can = $this->createCanForBean();
-		asrt( 1, R::count( 'bean' ) );
-		R::trash( $can );
-		asrt( 0, R::count( 'bean' ) );
-		R::dependencies( array() );
-		$can = $this->createCanForBean();
-		asrt( 1, R::count( 'bean' ) );
-		R::trash( $can );
-		asrt( 1, R::count( 'bean' ) );
+		asrt( R::count( 'bean' ), 1 );
 
-		/**
-		 * Issue #171
-		 * The index name argument is not unique in processEmbeddedBean etc.
-		 */
-		R::nuke();
+		R::trash( $can );
+
+		// Bean stays
+		asrt( R::count( 'bean' ), 1 );
+	}
+
+	public function testDependency2()
+	{
+		R::dependencies( array( 'bean' => array( 'can' ) ) );
+
+		$can = $this->createBeanInCan();
+
+		asrt( R::count( 'bean' ), 1 );
+
+		R::trash( $can );
+
+		// Bean gone
+		asrt( R::count( 'bean' ), 0 );
+
+		R::dependencies( array() );
+
+		$can = $this->createBeanInCan();
+
+		asrt( R::count( 'bean' ), 1 );
+
+		R::trash( $can );
+
+		// Bean stays, constraint removed
+		asrt( R::count( 'bean' ), 1 );
+
+	}
+
+	public function unnamed0()
+	{
+		$can = $this->createCanForBean();
+
+		asrt( R::count( 'bean' ), 1 );
+
+		R::trash( $can );
+
+		asrt( R::count( 'bean' ), 1 );
+	}
+
+	public function unnamed1()
+	{
+		R::dependencies( array( 'bean' => array( 'can' ) ) );
+
+		$can = $this->createCanForBean();
+
+		asrt( R::count( 'bean' ), 1 );
+
+		R::trash( $can );
+
+		asrt( R::count( 'bean' ), 0 );
+
+		R::dependencies( array() );
+
+		$can = $this->createCanForBean();
+
+		asrt( R::count( 'bean' ), 1 );
+
+		R::trash( $can );
+
+		asrt( R::count( 'bean' ), 1 );
+	}
+
+	/**
+	 * Issue #171
+	 * The index name argument is not unique in processEmbeddedBean etc.
+	 */
+	public function testIssue171()
+	{
 		R::$adapter->addEventListener( 'sql_exec', $this );
-		$account            = R::dispense( 'account' );
-		$user               = R::dispense( 'user' );
-		$player             = R::dispense( 'player' );
+
+		$account = R::dispense( 'account' );
+		$user    = R::dispense( 'user' );
+		$player  = R::dispense( 'player' );
+
 		$account->ownUser[] = $user;
+
 		R::store( $account );
+
 		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_user_account' ) !== false, true );
-		$this->queries        = array();
-		$account->ownPlayer[] = $player;
-		R::store( $account );
-		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_player_accou' ) !== false, true );
-		R::nuke();
+
 		$this->queries = array();
-		$account       = R::dispense( 'account' );
-		$user          = R::dispense( 'user' );
-		$player        = R::dispense( 'player' );
+
+		$account->ownPlayer[] = $player;
+
+		R::store( $account );
+
+		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_player_accou' ) !== false, true );
+	}
+
+	public function unnamed2()
+	{
+		$this->queries = array();
+
+		$account = R::dispense( 'account' );
+		$user    = R::dispense( 'user' );
+		$player  = R::dispense( 'player' );
+
 		$user->account = $account;
+
 		R::store( $user );
+
 		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_user_account' ) !== false, true );
-		$this->queries   = array();
+
+		$this->queries = array();
+
 		$player->account = $account;
+
 		R::store( $player );
+
 		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_player_accou' ) !== false, true );
 	}
 
@@ -103,11 +151,14 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 	 */
 	private function createBeanInCan()
 	{
-		$can            = R::dispense( 'can' );
-		$bean           = R::dispense( 'bean' );
-		$can->name      = 'bakedbeans';
-		$bean->taste    = 'salty';
+		$can  = R::dispense( 'can' );
+		$bean = R::dispense( 'bean' );
+
+		$can->name   = 'bakedbeans';
+		$bean->taste = 'salty';
+
 		$can->ownBean[] = $bean;
+
 		R::store( $can );
 
 		return $can;
@@ -122,9 +173,11 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 	 */
 	private function createCanForBean()
 	{
-		$can       = R::dispense( 'can' );
-		$bean      = R::dispense( 'bean' );
+		$can  = R::dispense( 'can' );
+		$bean = R::dispense( 'bean' );
+
 		$bean->can = $can;
+
 		R::store( $bean );
 
 		return $can;

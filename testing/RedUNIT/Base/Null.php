@@ -13,14 +13,7 @@
  */
 class RedUNIT_Base_Null extends RedUNIT_Base
 {
-
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function test()
+	public function unnamed0()
 	{
 		// NULL can change bean
 		$bean      = R::dispense( 'bean' );
@@ -68,16 +61,17 @@ class RedUNIT_Base_Null extends RedUNIT_Base
 		R::store( $page );
 
 		pass();
-
 	}
 
+	/**
+	 * Here we test whether the column type is set correctly.
+	 * Normally if you store NULL, the smallest type (bool/set) will
+	 * be selected. However in case of a foreign key type INT should
+	 * be selected because fks columns require matching types.
+	 */
 	public function ColumnType()
 	{
-		/*
-		Here we test whether the column type is set correctly. Normally if you store NULL, the smallest
-		type (bool/set) will be selected. However in case of a foreign key type INT should be selected because
-		fks columns require matching types.
-		*/
+
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
 

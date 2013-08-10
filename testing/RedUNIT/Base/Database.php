@@ -13,7 +13,6 @@
  */
 class RedUNIT_Base_Database extends RedUNIT_Base
 {
-
 	/**
 	 * What drivers should be loaded for this test pack?
 	 */
@@ -22,7 +21,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
 	}
 
-	public function run()
+	public function unnamed0()
 	{
 		$currentDriver = $this->currentlyActiveDriverID;
 

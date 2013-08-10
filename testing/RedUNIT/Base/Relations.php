@@ -26,7 +26,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		testpack( 'Test cleaning of lists (must not lead to artifacts)' );
 	}
 
-	public function dummy1()
+	public function unnamed1()
 	{
 		list( $book1, $book2 ) = R::dispense( 'book', 2 );
 
@@ -77,7 +77,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		testpack( 'Test new shared relations with link conditions' );
 	}
 
-	public function dummy2()
+	public function unnamed2()
 	{
 		$w = R::$writer;
 
@@ -137,33 +137,44 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		testpack( 'Test new shared relations and cache' );
 
-		R::exec( 'UPDATE page SET ' . $w->esc( 'number' ) . ' = 1 ' ); //why does this not destroy cache in psql? ah: An error occurred: SQLSTATE[42703]: Undefined column: 7 ERROR:  column "page" of relation "page" does not exist
+		/**
+		 * why does this not destroy cache in psql?
+		 * ah: An error occurred: SQLSTATE[42703]: Undefined column: 7
+		 * ERROR:  column "page" of relation "page" does not exist
+		 */
+		R::exec( 'UPDATE page SET ' . $w->esc( 'number' ) . ' = 1 ' );
 
 		R::$writer->setUseCache( true );
 
 		$p1 = R::load( 'page', (int) $p1->id );
 
-		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 9 -- keep-cache' ); //someone else changes the records. Cache remains.
+		// Someone else changes the records. Cache remains.
+		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 9 -- keep-cache' );
 
 		$b1 = R::load( 'book', $b1->id );
 		$p1 = R::load( 'page', (int) $p1->id );
 
-		asrt( (int) $p1->number, 1 ); //yupz a stale cache, phantom read!
+		// Yupz a stale cache, phantom read!
+		asrt( (int) $p1->number, 1 );
 
 		$pages = $b1->withCondition( ' book_page.' . $w->esc( 'order' ) . ' = 1 ' )->sharedPage;
 
 		$page = reset( $pages );
 
-		asrt( (int) $page->number, 9 ); //inconsistent, sad but true, different query -> cache key is different
+		// Inconsistent, sad but true, different query -> cache key is different
+		asrt( (int) $page->number, 9 );
 
 		// However, cache must have been invalidated by this query
 		$p1 = R::load( 'page', (int) $p1->id );
 
-		asrt( (int) $page->number, 9 ); //yes! we're consistent again! -- as if the change just happened later!
+		// Yes! we're consistent again! -- as if the change just happened later!
+		asrt( (int) $page->number, 9 );
 
-		$b1->fresh()->withCondition( ' book_page.' . $w->esc( 'order' ) . ' = 1 ' )->sharedPage; //by doing this we keep getting 9 instead of 8
+		// By doing this we keep getting 9 instead of 8
+		$b1->fresh()->withCondition( ' book_page.' . $w->esc( 'order' ) . ' = 1 ' )->sharedPage;
 
-		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 8 -- keep-cache' ); //someone else is busy again...
+		// Someone else is busy again...
+		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 8 -- keep-cache' );
 
 		$b1 = R::load( 'book', $b1->id );
 
@@ -171,9 +182,13 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		$page = reset( $pages );
 
-		asrt( (int) $page->number, 9 ); //yes! we get 9 instead of 8, why because the
-		//cache key has not changed, our last query was PAGE-BOOK-RELATION and now we ask for PAGE-BOOK-RELATION again.
-		//if we would have used just a load page query we would have gotten the new value (8).... let's test that!
+		/**
+		 * yes! we get 9 instead of 8, why because the cache key has not changed,
+		 * our last query was PAGE-BOOK-RELATION and now we ask for
+		 * PAGE-BOOK-RELATION again. if we would have used just a load page
+		 * query we would have gotten the new value (8).... let's test that!
+		 */
+		asrt( (int) $page->number, 9 );
 
 		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 9' );
 
@@ -181,7 +196,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		asrt( (int) $page->number, 9 );
 
-		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 8 -- keep-cache' ); //someone else is busy again...
+		// Someone else is busy again...
+		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 8 -- keep-cache' );
 
 		$b1 = R::load( 'book', $b1->id );
 
@@ -189,14 +205,15 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		$page = reset( $pages );
 
-		asrt( (int) $page->number, 8 ); //yes, keep-cache wont help, cache key changed!
+		// Yes, keep-cache wont help, cache key changed!
+		asrt( (int) $page->number, 8 );
 
 		R::$writer->setUseCache( false );
 
 		testpack( 'Test relatedCount()' );
 	}
 
-	public function dummy3()
+	public function unnamed3()
 	{
 		list( $d, $d2 ) = R::dispense( 'document', 2 );
 
@@ -229,7 +246,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$author->ownDocument = array( $d, $d2 );
 
 		R::store( $author );
-
 	}
 
 	public function testRelatedCount()
@@ -245,10 +261,9 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		R::store( $shop );
 		$shop = $shop->fresh();
 		asrt( $shop->via( 'relation' )->countShared( 'customer' ), 13 );
-
 	}
 
-	public function dummy5()
+	public function unnamed5()
 	{
 		$book = R::dispense( 'book' );
 
@@ -319,7 +334,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( in_array( 'consult', R::$writer->getTables() ), true );
 	}
 
-	public function dummy7()
+	public function unnamed7()
 	{
 		asrt( in_array( 'consult', R::$writer->getTables() ), false );
 
@@ -334,16 +349,16 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 	/**
 	 * Fast track link block code should not affect self-referential N-M relations.
 	 */
-	public function dummy8()
+	public function unnamed8()
 	{
 		testpack( 'Test fast-track linkBlock exceptions' );
 
 		list( $donald, $mickey, $goofy, $pluto ) = R::dispense( 'friend', 4 );
 
-		$donald->name         = 'D';
-		$mickey->name         = 'M';
-		$goofy->name          = 'G';
-		$pluto->name          = 'P';
+		$donald->name = 'D';
+		$mickey->name = 'M';
+		$goofy->name  = 'G';
+		$pluto->name  = 'P';
 
 		$donald->sharedFriend = array( $mickey, $goofy );
 		$mickey->sharedFriend = array( $pluto, $goofy );
@@ -356,7 +371,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$goofy  = R::load( 'friend', $goofy->id );
 		$pluto  = R::load( 'friend', $pluto->id );
 
-		$names  = implode( ',', R::gatherLabels( $donald->sharedFriend ) );
+		$names = implode( ',', R::gatherLabels( $donald->sharedFriend ) );
 
 		asrt( $names, 'G,M' );
 
@@ -375,14 +390,14 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		// Now in combination with with() conditions...
 		$donald = R::load( 'friend', $donald->id );
 
-		$names  = implode( ',', R::gatherLabels( $donald->withCondition( ' name = ? ', array( 'M' ) )->sharedFriend ) );
+		$names = implode( ',', R::gatherLabels( $donald->withCondition( ' name = ? ', array( 'M' ) )->sharedFriend ) );
 
 		asrt( $names, 'M' );
 
 		// Now in combination with with() conditions...
 		$donald = R::load( 'friend', $donald->id );
 
-		$names  = implode( ',', R::gatherLabels( $donald->with( ' ORDER BY name ' )->sharedFriend ) );
+		$names = implode( ',', R::gatherLabels( $donald->with( ' ORDER BY name ' )->sharedFriend ) );
 
 		asrt( $names, 'G,M' );
 
@@ -397,6 +412,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		R::unassociate( $donald, $mickey );
 
 		asrt( (int) $donald->countShared( 'friend' ), 1 );
+
 		asrt( R::areRelated( $donald, $mickey ), false );
 		asrt( R::areRelated( $mickey, $donald ), false );
 		asrt( R::areRelated( $mickey, $goofy ), true );
@@ -421,30 +437,43 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( count( $mickeysBooks ), 1 );
 
 		R::getWriter()->setUseCache( false );
-
 	}
 
 	public function testListBeautifications()
 	{
 		testpack( 'Test list beautifications' );
 
-		$book               = R::dispense( 'book' );
-		$page               = R::dispense( 'page' )->setAttr( 'name', 'a' );
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' )->setAttr( 'name', 'a' );
+
 		$book->sharedPage[] = $page;
-		$id                 = R::store( $book );
-		$book               = R::load( 'book', $id );
-		$p                  = reset( $book->ownBookPage );
+
+		$id = R::store( $book );
+
+		$book = R::load( 'book', $id );
+
+		$p = reset( $book->ownBookPage );
+
 		asrt( $p->page->name, 'a' );
-		$bean                  = R::dispense( 'bean' );
+
+		$bean = R::dispense( 'bean' );
+
 		$bean->sharedAclRole[] = R::dispense( 'role' )->setAttr( 'name', 'x' );
+
 		R::store( $bean );
+
 		asrt( R::count( 'role' ), 1 );
 
-		$aclrole               = R::$redbean->dispense( 'acl_role' );
-		$aclrole->name         = 'role';
-		$bean                  = R::dispense( 'bean' );
+		$aclrole = R::$redbean->dispense( 'acl_role' );
+
+		$aclrole->name = 'role';
+
+		$bean = R::dispense( 'bean' );
+
 		$bean->sharedAclRole[] = $aclrole;
+
 		R::store( $bean );
+
 		asrt( count( $bean->sharedAclRole ), 1 );
 	}
 
@@ -454,34 +483,55 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		R::dependencies( array( 'page' => array( 'book', 'paper' ) ) );
 
-		$b            = R::dispense( 'book' );
-		$p            = R::dispense( 'page' );
-		$b->title     = 'a';
-		$p->name      = 'b';
+		$b = R::dispense( 'book' );
+		$p = R::dispense( 'page' );
+
+		$b->title = 'a';
+		$p->name  = 'b';
+
 		$b->ownPage[] = $p;
+
 		R::store( $b );
+
 		$b->ownPage = array();
+
 		R::store( $b );
+
 		asrt( R::count( 'page' ), 0 );
-		$p            = R::dispense( 'page' );
-		$z            = R::dispense( 'paper' );
+
+		$p = R::dispense( 'page' );
+		$z = R::dispense( 'paper' );
+
 		$z->ownPage[] = $p;
+
 		R::store( $z );
+
 		asrt( R::count( 'page' ), 1 );
+
 		$z->ownPage = array();
+
 		R::store( $z );
+
 		asrt( R::count( 'page' ), 0 );
-		$i            = R::dispense( 'magazine' );
+
+		$i = R::dispense( 'magazine' );
+
 		$i->ownPage[] = R::dispense( 'page' );
+
 		R::store( $i );
+
 		asrt( R::count( 'page' ), 1 );
+
 		$i->ownPage = array();
+
 		R::store( $i );
+
 		asrt( R::count( 'page' ), 1 );
+
 		R::dependencies( array() );
 	}
 
-	public function dummy11()
+	public function unnamed11()
 	{
 		list( $q1, $q2 ) = R::dispense( 'quote', 2 );
 
@@ -536,7 +586,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( count( $book->ownPage ), 2 );
 
 		// Performing a deletion
-
 		$book = R::load( 'book', $id );
 
 		unset( $book->ownPage[1] );
@@ -577,7 +626,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		unset( $book->ownPage[2] );
 
-		$book->ownPage['customkey'] = $page4; //and test custom key
+		// And test custom key
+		$book->ownPage['customkey'] = $page4;
 		$book->ownPage[3]->title    = "THIRD";
 
 		R::store( $book );
@@ -653,7 +703,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		asrt( count( $b2->ownPage ), 0 );
 
-		//Re-add the page
+		// Re-add the page
 		$b2->ownPage[] = $page1;
 
 		R::store( $b2 );
@@ -880,7 +930,9 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		asrt( ( $book3->cover instanceof RedBean_OODBBean ), true );
 		asrt( $justACover->title, 'cover1' );
-		asrt( isset( $book3->page ), false ); // no page property
+
+		// No page property
+		asrt( isset( $book3->page ), false );
 
 		// Test doubling and other side effects ... should not occur..
 		$book3->sharedTopic = array( $topic1, $topic2 );
@@ -928,7 +980,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		$book3->ownPage = array();
 
-		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 1 ); // no change until saved
+		// No change until saved
+		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 1 );
 
 		$book3 = R::load( 'book', R::store( $book3 ) );
 
@@ -937,7 +990,10 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		$book3 = R::load( 'book', $idb3 );
 
-		// Why do I need to do this ---> why does trash() not set id -> 0, because you unset() so trash is done on origin not bean
+		/**
+		 * Why do I need to do this ---> why does trash() not set id -> 0?
+		 * Because you unset() so trash is done on origin not bean
+		 */
 		$page1->id = 0;
 		$page2->id = 0;
 		$page3->id = 0;
@@ -949,6 +1005,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$book3 = R::load( 'book', R::store( $book3 ) );
 
 		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 3 );
+
 		asrt( count( $book3->ownPage ), 3 );
 
 		unset( $book3->ownPage[$page2->id] );
@@ -959,6 +1016,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$book3 = R::load( 'book', R::store( $book3 ) );
 
 		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 2 );
+
 		asrt( count( $book3->ownPage ), 2 );
 
 		// Delete and re-add
@@ -970,7 +1028,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		$book3 = R::load( 'book', R::store( $book3 ) );
 
-		asrt( count( $book3->ownPage ), 2 ); // exit;
+		asrt( count( $book3->ownPage ), 2 );
 
 		$book3 = R::load( 'book', $idb3 );
 
@@ -991,7 +1049,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		R::store( $book );
 
-		asrt( count( $logger->grep( 'UPDATE' ) ), 1 ); // no more than 1 update
+		// No more than 1 update
+		asrt( count( $logger->grep( 'UPDATE' ) ), 1 );
 
 		$book = R::load( 'book', 1 );
 
@@ -999,7 +1058,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		print_r( $book->sharedTopic, 1 );
 
-		asrt( count( $logger->grep( 'SELECT' ) ), 1 ); // no more than 1 select
+		// No more than 1 select
+		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
 
 		$logger->clear();
 
@@ -1020,7 +1080,9 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$book = R::load( 'book', 1 );
 
 		asrt( count( $book->sharedTopic ), 3 );
-		asrt( count( $logger->grep( "DELETE FROM" ) ), 0 ); // no deletes
+
+		// No deletes
+		asrt( count( $logger->grep( "DELETE FROM" ) ), 0 );
 
 		$book->sharedTopic['a'] = $topic3;
 
@@ -1031,7 +1093,9 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$book = R::load( 'book', 1 );
 
 		asrt( count( $book->sharedTopic ), 3 );
-		asrt( count( $logger->grep( "DELETE FROM" ) ), 0 ); // no deletes
+
+		// No deletes
+		asrt( count( $logger->grep( "DELETE FROM" ) ), 0 );
 
 		$book->ownPage = array();
 
@@ -1084,7 +1148,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		$i = R::store( $book3 );
 
-		// exit;
 		$book3 = R::load( 'book', $i );
 
 		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 2 );
@@ -1137,7 +1200,11 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		}
 
 		for ( $j = 0; $j < 10; $j++ ) {
-			for ( $x = 0; $x < rand( 1, 20 ); $x++ ) modgr( $book3, $quotes, $pictures, $topics ); // do several mutations
+			// Do several mutations
+			for ( $x = 0; $x < rand( 1, 20 ); $x++ ) {
+				modgr( $book3, $quotes, $pictures, $topics );
+			}
+
 			$qbefore = count( $book3->ownQuote );
 			$pbefore = count( $book3->ownPicture );
 			$tbefore = count( $book3->sharedTopic );
@@ -1162,7 +1229,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		}
 	}
 
-	public function dummy12()
+	public function unnamed12()
 	{
 		$village = R::dispense( 'village' );
 
@@ -1232,9 +1299,12 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$p = reset( $a->ownParticipant );
 
 		asrt( $p->person->getMeta( 'type' ), 'person' );
+
 		asrt( ( $p->person->id > 0 ), true );
+
 		asrt( $managers, 1 );
 		asrt( $developers, 1 );
+
 		asrt( (int) R::count( 'participant' ), 5 );
 		asrt( (int) R::count( 'person' ), 3 );
 	}
@@ -1291,7 +1361,9 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$m3->thename = 'c';
 
 		R::renameAssociation( 'museum_painting', 'exhibited' );
-		R::renameAssociation( array( 'museum_museum' => 'center' ) ); //also test array syntax
+
+		// Also test array syntax
+		R::renameAssociation( array( 'museum_museum' => 'center' ) );
 
 		$m1->link( 'center', array( 'name' => 'History Center' ) )->museum2            = $m2;
 		$m1->link( 'exhibited', '{"from":"2014-02-01","til":"2014-07-02"}' )->painting = $p3;

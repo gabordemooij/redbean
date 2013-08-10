@@ -221,7 +221,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	/**
 	 *
 	 */
-	public function dummy1()
+	public function unnamed1()
 	{
 		testpack( 'Testing Database Properties' );
 
@@ -238,7 +238,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	/**
 	 *
 	 */
-	public function dummy2()
+	public function unnamed2()
 	{
 		$track = R::dispense( 'track' );
 		$album = R::dispense( 'cd' );
@@ -382,7 +382,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	/**
 	 *
 	 */
-	public function dummy5()
+	public function unnamed5()
 	{
 		$coffee = R::dispense( 'coffee' );
 

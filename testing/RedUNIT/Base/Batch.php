@@ -20,7 +20,7 @@ class RedUNIT_Base_Batch extends RedUNIT_Base
 	 *
 	 * @return void
 	 */
-	public function run()
+	public function unnamed0()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

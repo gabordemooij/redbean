@@ -13,7 +13,6 @@
  */
 class RedUNIT_Base_Keywords extends RedUNIT_Base
 {
-
 	/**
 	 * What drivers should be loaded for this test pack?
 	 */
@@ -22,15 +21,8 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base
 		return array( 'mysql', 'pgsql', 'sqlite' ); // CUBRID excluded for now.
 	}
 
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function unnamed0()
 	{
-
 		$keywords = array(
 			'anokeyword', 'znokeyword', 'group', 'DROP',
 			'inner', 'JOIN', 'select', 'table',
