@@ -31,18 +31,17 @@ class RedUNIT_Base extends RedUNIT
 	{
 		$class = new ReflectionClass( $this );
 
-				// Call all methods except run automatically
+		$skip = array( 'run', 'getTargetDrivers', 'onEvent');
+		// Call all methods except run automatically
 		foreach ( $class->getMethods(ReflectionMethod::IS_PUBLIC) as $method ) {
 			// Skip methods inherited from parent class
 			if ( $method->class != $class->getName() ) continue;
 
-			if ( $method->name == 'run' ) continue;
-
-			if ( $method->name == 'getTargetDrivers' ) continue;
+			if ( in_array( $method->name, $skip ) ) continue;
 
 			$classname = str_replace( $class->getParentClass()->getName().'_', '', $method->class );
 
-			testpack( $classname."->".$method->name." [".$method->class."->".$method->name."]");
+			printtext( "\n\t" . $classname."->".$method->name." [".$method->class."->".$method->name."]" . " \n\t" );
 
 			$call = $method->name;
 
