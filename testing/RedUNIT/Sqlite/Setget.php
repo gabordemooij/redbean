@@ -13,7 +13,7 @@
  */
 class RedUNIT_Sqlite_Setget extends RedUNIT_Sqlite
 {
-	public function unnamed0()
+	public function run()
 	{
 		asrt( setget( "-1" ), "-1" );
 		asrt( setget( -1 ), "-1" );
