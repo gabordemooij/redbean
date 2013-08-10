@@ -13,24 +13,23 @@
  */
 class RedUNIT_Sqlite_Foreignkeys extends RedUNIT_Sqlite
 {
-
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function unnamed0()
 	{
 		$book  = R::dispense( 'book' );
 		$page  = R::dispense( 'page' );
 		$cover = R::dispense( 'cover' );
+
 		list( $g1, $g2 ) = R::dispense( 'genre', 2 );
+
 		$g1->name          = '1';
 		$g2->name          = '2';
+
 		$book->ownPage     = array( $page );
+
 		$book->cover       = $cover;
+
 		$book->sharedGenre = array( $g1, $g2 );
+
 		R::store( $book );
 
 		$fkbook  = R::getAll( 'pragma foreign_key_list(book)' );
@@ -47,6 +46,7 @@ class RedUNIT_Sqlite_Foreignkeys extends RedUNIT_Sqlite
 			asrt( $fkgenre[0]['to'], 'id' );
 			asrt( $fkgenre[0]['table'], 'book' );
 		}
+
 		if ( $fkgenre[0]['from'] == 'genre' ) {
 			asrt( $fkgenre[0]['to'], 'id' );
 			asrt( $fkgenre[0]['table'], 'genre' );

@@ -100,7 +100,9 @@ class RedUNIT_Postgres_Views extends RedUNIT_Postgres
 				asrt( $bl["name_of_musician"], "Goofy" );
 			}
 		}
+
 		//can we draw statistics?
+
 		$inHowManyBandsDoYouPlay = R::getAll( "select
 		name_of_musician ,count( distinct id ) as bands
 		from " . $p . "bandlist group by id_of_musician,name_of_musician order by name_of_musician asc
