@@ -20,34 +20,4 @@ class RedUNIT_Base extends RedUNIT
 	{
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID', 'oracle' );
 	}
-
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
-	{
-		$class = new ReflectionClass( $this );
-
-		$skip = array( 'run', 'getTargetDrivers', 'onEvent');
-		// Call all methods except run automatically
-		foreach ( $class->getMethods(ReflectionMethod::IS_PUBLIC) as $method ) {
-			// Skip methods inherited from parent class
-			if ( $method->class != $class->getName() ) continue;
-
-			if ( in_array( $method->name, $skip ) ) continue;
-
-			$classname = str_replace( $class->getParentClass()->getName().'_', '', $method->class );
-
-			printtext( "\n\t" . $classname."->".$method->name." [".$method->class."->".$method->name."]" . " \n\t" );
-
-			$call = $method->name;
-
-			$this->$call();
-
-			R::nuke();
-		}
-	}
 }
