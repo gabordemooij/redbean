@@ -14,23 +14,22 @@
 
 class RedUNIT_Blackhole_Labels extends RedUNIT_Blackhole
 {
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function testLabels()
 	{
-
 		testpack( 'Test Labels' );
+
 		$meals = R::dispenseLabels( 'meal', array( 'meat', 'fish', 'vegetarian' ) );
+
 		asrt( is_array( $meals ), true );
+
 		asrt( count( $meals ), 3 );
+
 		foreach ( $meals as $m ) {
 			asrt( ( $m instanceof RedBean_OODBBean ), true );
 		}
+
 		$listOfMeals = implode( ',', R::gatherLabels( $meals ) );
+
 		asrt( $listOfMeals, 'fish,meat,vegetarian' );
 	}
 }

@@ -14,16 +14,30 @@
 
 class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole
 {
+	public function basic()
+	{
+		$soup          = R::dispense( 'soup' );
+
+		$soup->flavour = 'tomato';
+
+		$this->giveMeSoup( $soup->box() );
+
+		$this->giveMeBean( $soup->box()->unbox() );
+
+		$this->giveMeBean( $soup );
+	}
 
 	/**
 	 * Test type hinting with boxed model
 	 *
 	 * @param Model_Soup $soup
 	 */
-	public function giveMeSoup( Model_Soup $soup )
+	private function giveMeSoup( Model_Soup $soup )
 	{
 		asrt( ( $soup instanceof Model_Soup ), true );
+
 		asrt( 'A bit too salty', $soup->taste() );
+
 		asrt( 'tomato', $soup->flavour );
 	}
 
@@ -32,23 +46,13 @@ class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole
 	 *
 	 * @param RedBean_OODBBean $bean
 	 */
-	public function giveMeBean( RedBean_OODBBean $bean )
+	private function giveMeBean( RedBean_OODBBean $bean )
 	{
 		asrt( ( $bean instanceof RedBean_OODBBean ), true );
-		asrt( 'A bit too salty', $bean->taste() );
-		asrt( 'tomato', $bean->flavour );
-	}
 
-	/**
-	 * Testing Fusebox
-	 */
-	public function run()
-	{
-		$soup          = R::dispense( 'soup' );
-		$soup->flavour = 'tomato';
-		$this->giveMeSoup( $soup->box() );
-		$this->giveMeBean( $soup->box()->unbox() );
-		$this->giveMeBean( $soup );
+		asrt( 'A bit too salty', $bean->taste() );
+
+		asrt( 'tomato', $bean->flavour );
 	}
 }
 

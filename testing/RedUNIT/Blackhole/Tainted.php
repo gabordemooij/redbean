@@ -13,49 +13,69 @@
  */
 class RedUNIT_Blackhole_Tainted extends RedUNIT_Blackhole
 {
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function unnamed0()
 	{
-
 		testpack( 'Original Tainted Tests' );
+
 		$redbean = R::$redbean;
-		$spoon   = $redbean->dispense( "spoon" );
+
+		$spoon = $redbean->dispense( "spoon" );
+
 		asrt( $spoon->getMeta( "tainted" ), true );
+
 		$spoon->dirty = "yes";
+
 		asrt( $spoon->getMeta( "tainted" ), true );
 
 		testpack( 'Tainted List test' );
-		$note            = R::dispense( 'note' );
-		$note->text      = 'abc';
+
+		$note = R::dispense( 'note' );
+
+		$note->text = 'abc';
+
 		$note->ownNote[] = R::dispense( 'note' )->setAttr( 'text', 'def' );
-		$id              = R::store( $note );
-		$note            = R::load( 'note', $id );
+
+		$id = R::store( $note );
+
+		$note = R::load( 'note', $id );
+
 		asrt( $note->isTainted(), false );
-		$note->text; //shouldnt affect tainted
+
+		// Shouldn't affect tainted
+		$note->text;
+
 		asrt( $note->isTainted(), false );
+
 		$note->ownNote;
+
 		asrt( $note->isTainted(), true );
 
 		testpack( 'Tainted Test Old Value' );
+
 		$text = $note->old( 'text' );
+
 		asrt( $text, 'abc' );
+
 		asrt( $note->hasChanged( 'text' ), false );
+
 		$note->text = 'xxx';
+
 		asrt( $note->hasChanged( 'text' ), true );
+
 		$text = $note->old( 'text' );
+
 		asrt( $text, 'abc' );
 
 		testpack( 'Tainted Non-exist' );
+
 		asrt( $note->hasChanged( 'text2' ), false );
 
 		testpack( 'Misc Tainted Tests' );
+
 		$bean = R::dispense( 'bean' );
+
 		$bean->hasChanged( 'prop' );
+
 		$bean->old( 'prop' );
 	}
 }
