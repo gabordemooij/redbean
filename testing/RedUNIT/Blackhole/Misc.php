@@ -26,7 +26,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 	{
 		testpack( 'Test debug mode with custom logger' );
 
-		$pdoDriver    = new RedBean_Driver_PDO( R::getDatabaseAdapter()->getDatabase()->getPDO() );
+		$pdoDriver = new RedBean_Driver_PDO( R::getDatabaseAdapter()->getDatabase()->getPDO() );
 
 		$customLogger = new CustomLogger;
 
@@ -41,11 +41,11 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		testpack( 'Test bean->getProperties method' );
 
-		$bean           = R::dispense( 'bean' );
+		$bean = R::dispense( 'bean' );
 
 		$bean->property = 'hello';
 
-		$props          = $bean->getProperties();
+		$props = $bean->getProperties();
 
 		asrt( isset( $props['property'] ), true );
 
@@ -70,27 +70,28 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		list( $sql, $params ) = R::$f->begin()->camelCase()->getQuery();
 
 		asrt( trim( $sql ), 'camelCase' );
+	}
 
-		R::nuke();
-
+	public function testWithWithConditionQueryBuilder()
+	{
 		testpack( 'Test with- and withCondition with Query Builder' );
 
-		$book            = R::dispense( 'book' );
-		$page            = R::dispense( 'page' );
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
 
-		$page->num       = 1;
-
-		$book->ownPage[] = $page;
-
-		$page            = R::dispense( 'page' );
-
-		$page->num       = 2;
+		$page->num = 1;
 
 		$book->ownPage[] = $page;
 
-		$id              = R::store( $book );
+		$page = R::dispense( 'page' );
 
-		$book            = R::load( 'book', $id );
+		$page->num = 2;
+
+		$book->ownPage[] = $page;
+
+		$id = R::store( $book );
+
+		$book = R::load( 'book', $id );
 
 		asrt( count( $book->ownPage ), 2 );
 
@@ -128,12 +129,13 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		asrt( R::commit(), true );
 
 		R::freeze( false );
+	}
 
-		R::nuke();
-
+	public function testTransactionInFacade()
+	{
 		testpack( 'Test transaction in facade' );
 
-		$bean       = R::dispense( 'bean' );
+		$bean = R::dispense( 'bean' );
 
 		$bean->name = 'a';
 
@@ -143,7 +145,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		R::freeze( true );
 
-		$bean       = R::dispense( 'bean' );
+		$bean = R::dispense( 'bean' );
 
 		$bean->name = 'a';
 
@@ -155,7 +157,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		asrt( R::count( 'bean' ), 0 );
 
-		$bean       = R::dispense( 'bean' );
+		$bean = R::dispense( 'bean' );
 
 		$bean->name = 'a';
 
@@ -172,7 +174,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		}
 		asrt( R::count( 'bean' ), 0 );
 
-		$bean       = R::dispense( 'bean' );
+		$bean = R::dispense( 'bean' );
 
 		$bean->name = 'a';
 
@@ -189,7 +191,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		asrt( R::count( 'bean' ), 0 );
 
-		$bean       = R::dispense( 'bean' );
+		$bean = R::dispense( 'bean' );
 
 		$bean->name = 'a';
 
@@ -228,7 +230,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 			'a1A2b'                    => 'a1a2b',
 		);
 
-		$bean  = R::dispense( 'bean' );
+		$bean = R::dispense( 'bean' );
 
 		foreach ( $names as $name => $becomes ) {
 			$bean->$name = 1;
@@ -238,7 +240,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		testpack( 'Test debugger check.' );
 
-		$old        = R::$adapter;
+		$old = R::$adapter;
 
 		R::$adapter = null;
 
@@ -270,9 +272,9 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		asrt( $s, 'candy!' );
 
-		$obj             = new stdClass;
+		$obj = new stdClass;
 
-		$bean            = R::dispense( 'bean' );
+		$bean = R::dispense( 'bean' );
 
 		$bean->property1 = 'property1';
 
@@ -320,7 +322,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		$band = R::dispense( 'band' );
 
-		$str  = strval( $band );
+		$str = strval( $band );
 
 		asrt( $str, 'bigband' );
 
@@ -333,9 +335,9 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		asrt( $band->checkProperty( 'property1' ), true );
 		asrt( $band->checkProperty( 'property2' ), false );
 
-		$band            = new Model_Band;
+		$band = new Model_Band;
 
-		$bean            = R::dispense( 'band' );
+		$bean = R::dispense( 'band' );
 
 		$bean->property3 = 123;
 
@@ -396,7 +398,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		testpack( 'Can we pass a PDO object to Setup?' );
 
-		$pdo     = new PDO( 'sqlite:test.db' );
+		$pdo = new PDO( 'sqlite:test.db' );
 
 		$toolbox = RedBean_Setup::kickstart( $pdo );
 
@@ -407,7 +409,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		testpack( 'Test array interface of beans' );
 
-		$bean        = R::dispense( 'bean' );
+		$bean = R::dispense( 'bean' );
 
 		$bean->hello = 'hi';
 		$bean->world = 'planet';
