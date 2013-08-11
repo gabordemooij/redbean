@@ -1419,4 +1419,20 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( $exhibition->from, '2014-07-03' );
 		asrt( $exhibition->til, '2014-10-02' );
 	}
+	
+	
+	public function testDontTryToStoreOtherThingsInSharedList() {
+
+		$book = R::dispense( 'book' );
+		$book->sharedPage[] = 'nonsense';
+		
+		try {
+			R::store( $book );
+			fail();
+		} catch( RedBean_Exception_Security $exception) {
+			pass();
+		}
+		
+	}
+	
 }

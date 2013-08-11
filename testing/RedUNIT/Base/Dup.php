@@ -319,7 +319,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), true );
 		asrt( count( $objects[0]['ownPage'][0]['ownImage'] ), 1 );
 
-		$objects = ( R::exportAll( array( $book ), true, array( 'author' ) ) );
+		$objects = ( R::exportAll( array( $book ), true, 'author' ) );
 
 		asrt( isset( $objects[0]['ownPage'] ), false );
 		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), false );
