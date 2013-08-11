@@ -889,6 +889,11 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( count( $t3->sharedBook ), 2 );
 		asrt( R::relatedOne( $topic3, 'nothingness' ), null );
 
+		 // Testing relatedLast
+		$z = end( $items );
+		asrt( R::relatedLast( $topic3, 'book')->id, $z->id );
+		asrt( R::relatedLast( $topic3, 'manuscript'), null );
+
 		// Nuke an own-array, replace entire array at once without getting first
 		$page2->id    = 0;
 		$page2->title = 'yet another page 2';
