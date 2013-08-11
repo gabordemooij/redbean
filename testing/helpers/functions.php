@@ -162,17 +162,17 @@ function testids( $array )
  */
 function modgr( $book3, $quotes, $pictures, $topics )
 {
-	$key     = array_rand( $quotes );
+	$key = array_rand( $quotes );
 
-	$quote   = $quotes[$key];
+	$quote = $quotes[$key];
 
-	$keyPic  = array_rand( $pictures );
+	$keyPic = array_rand( $pictures );
 
 	$picture = $pictures[$keyPic];
 
-	$keyTop  = array_rand( $topics );
+	$keyTop = array_rand( $topics );
 
-	$topic   = $topics[$keyTop];
+	$topic = $topics[$keyTop];
 
 	if ( rand( 0, 1 ) ) {
 		$f = 0;
