@@ -900,6 +900,86 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	{
 		return $this->fetchAs( $this->$field );
 	}
+	
+	
+	/**
+	 * Treats the bean like a node in a tree and searches for all
+	 * nested or parent beans.
+	 * 
+	 * To get all parent pages of a page:
+	 * 
+	 * $parentPages = $page->searchIn('page');
+	 * 
+	 * To get all child pages:
+	 * 
+	 * $pages = $parentPage->searchIn('ownPage');
+	 * 
+	 * When searching in lists you can use SQL snippets in withCondition():
+	 * 
+	 * $pages = $parentPage
+	 *     ->withCondition(' rank = ? ', array($rank))
+	 *     ->searchIn('ownPage');
+	 * 
+	 * Also works with alias() and fetchAs().
+	 * Note that shared lists are NOT supported.
+	 * Also you can't search parents recursively with SQL conditions.
+	 * 
+	 * @param string $property property/list to search
+	 * 
+	 * @return array
+	 */
+	public function searchIn($property) 
+	{
+		$oldFetchType = $this->fetchType;
+		$oldAliasName = $this->aliasName;
+		$oldWith      = $this->withSql;
+		$oldBindings  = $this->withParams;
+		$beanOrBeans  = $this->$property;
+
+		if ( $beanOrBeans instanceof RedBean_OODBBean ) {
+			$bean  = $beanOrBeans;
+			$key   = $bean->id;
+			$beans = array( $key => $bean );
+		} elseif ( is_null( $beanOrBeans ) ) {
+			$beans = array();
+		} else {
+			$beans = $beanOrBeans;
+		}
+
+		unset( $this->properties[$property] );
+		unset( $this->__info["sys.shadow.$property"] );
+
+		if ( $oldWith === '' ) {
+			$ufbeans = $beans;
+		} else {
+			$this->fetchType = $oldFetchType;
+			$this->aliasName = $oldAliasName;
+			$unfiltered      = $this->$property;
+
+			if ( $unfiltered instanceof RedBean_OODBBean ) {
+				$ufbean  = $unfiltered;
+				$key     = $bean->id;
+				$ufbeans = array( $key => $ufbean );
+			} elseif ( is_null( $unfiltered ) ) {
+				$ufbeans = array();
+			} else {
+				$ufbeans = $unfiltered;
+			}
+		}
+
+		foreach( $ufbeans as $bean ) {
+			$bean->fetchType  = $oldFetchType;
+			$bean->aliasName  = $oldAliasName;
+			$bean->withSql    = $oldWith;
+			$bean->withParams = $oldBindings;
+
+			$newBeans = $bean->searchIn( $property );
+
+			$beans = array_merge( $beans, $newBeans );
+		}
+		
+		return $beans;
+	}
 
 	/**
 	 * Implementation of Countable interface. Makes it possible to use

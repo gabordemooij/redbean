@@ -21,6 +21,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 	 * @return void
 	 */
 	public function run() {
+		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
@@ -86,5 +87,167 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		} catch (RedBean_Exception_Security $exception) {
 			pass();
 		}
+		
+		testpack( 'Test Tree Traversal' );
+		R::nuke();
+
+		$page = R::dispense( 'page', 10 );
+
+		//Setup the test data for this series of tests
+		$i = 0;
+		foreach( $page as $pageItem ) {
+			$pageItem->name = 'page' . $i;
+			$pageItem->number = $i;
+			$i++;
+			R::store( $pageItem );
+		}
+		$page[0]->ownPage  = array( $page[1], $page[2] );
+		$page[1]->ownPage  = array( $page[3], $page[4] );
+		$page[3]->ownPage  = array( $page[5] );
+		$page[5]->ownPage  = array( $page[7] );
+		$page[9]->document = $page[8];
+		R::store( $page[9] );
+		$id = R::store( $page[0] );
+
+		//Basics, load child nodes in tree
+		$referencePage = R::load( 'page', $id );
+		$found         = $referencePage->searchIn( 'ownPage' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+
+		asrt( $foundStr, 'page1page2page3page4page5page7' );
+
+		//A subset of a tree...
+		$referencePage = R::load( 'page', $page[3]->id );
+		$found         = $referencePage->searchIn( 'ownPage' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+
+		asrt( $foundStr, 'page5page7' );
+
+		//Now test with a condition
+		$referencePage = R::load( 'page', $page[1]->id );
+		$found         = $referencePage->withCondition(' page.number > 6 ')->searchIn( 'ownPage' );
+		
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+		
+		asrt($foundStr, 'page7');
+
+		//Ordering... works different, orders within a set!
+		$referencePage = R::load( 'page', $page[0]->id );
+		$found         = $referencePage->with(' ORDER BY page.number DESC ')->searchIn( 'ownPage' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		$foundStr = implode( '', $foundItems );
+
+		asrt($foundStr, 'page2page1page4page3page5page7');
+
+		//now with parents
+		$referencePage = R::load( 'page', $page[5]->id );
+		$found         = $referencePage->searchIn( 'page' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+
+		asrt( $foundStr, 'page0page1page3' );
+
+		//now with parents and aliases...
+		$otherPage           = R::dispense( 'page' );
+		$otherPage->document = $page[0];
+		$otherPage->name     = 'pagex';
+		$page[0]->document   = $page[6];
+		$page[6]->document   = $page[8];
+
+		R::store( $otherPage );
+
+		$referencePage = R::load( 'page', $otherPage->id );
+		$found = $referencePage->fetchAs( 'page' )
+				  ->searchIn( 'document' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+
+		asrt( $foundStr, 'page0page6page8' );
+
+		$referencePage = R::load( 'page', $page[8]->id );
+		$found         = $referencePage->alias( 'document' )
+				  ->withCondition( ' page.number > 5 ' )
+				  ->searchIn( 'ownPage' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+
+		asrt( $foundStr, 'page6page9' );
+
+		//store should not affect next search
+		R::store( $referencePage );
+
+		$referencePage = R::load( 'page', $page[8]->id );
+
+		$found = $referencePage->alias( 'document' )->searchIn( 'ownPage' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+
+		asrt( $foundStr, 'page0page6page9pagex' );
+
 	}
 }
