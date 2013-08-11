@@ -287,8 +287,6 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		R::debug( 1 );
 
 		flush();
-		ob_flush();
-		ob_clean();
 		ob_start();
 
 		R::exec( 'SELECT 123' );
@@ -305,8 +303,6 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		R::debug( 0 );
 
 		flush();
-		ob_flush();
-		ob_clean();
 		ob_start();
 
 		R::exec( 'SELECT 123' );
