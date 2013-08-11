@@ -13,7 +13,7 @@
  */
 class RedUNIT_Sqlite_Setget extends RedUNIT_Sqlite
 {
-	public function run()
+	public function testNumbers()
 	{
 		asrt( setget( "-1" ), "-1" );
 		asrt( setget( -1 ), "-1" );
@@ -38,24 +38,36 @@ class RedUNIT_Sqlite_Setget extends RedUNIT_Sqlite
 
 		asrt( setget( "199936710040730" ), "199936710040730" );
 		asrt( setget( "-199936710040730" ), "-199936710040730" );
+	}
 
+	public function testDates()
+	{
 		asrt( setget( "2010-10-11" ), "2010-10-11" );
 		asrt( setget( "2010-10-11 12:10" ), "2010-10-11 12:10" );
 		asrt( setget( "2010-10-11 12:10:11" ), "2010-10-11 12:10:11" );
 		asrt( setget( "x2010-10-11 12:10:11" ), "x2010-10-11 12:10:11" );
+	}
 
+	public function testStrings()
+	{
 		asrt( setget( "a" ), "a" );
 		asrt( setget( "." ), "." );
 		asrt( setget( "\"" ), "\"" );
 
 		asrt( setget( "just some text" ), "just some text" );
+	}
 
+	public function testBool()
+	{
 		asrt( setget( true ), "1" );
 		asrt( setget( false ), "0" );
 
 		asrt( setget( "true" ), "true" );
 		asrt( setget( "false" ), "false" );
+	}
 
+	public function testNull()
+	{
 		asrt( setget( "null" ), "null" );
 		asrt( setget( "NULL" ), "NULL" );
 

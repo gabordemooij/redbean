@@ -13,14 +13,7 @@
  */
 class RedUNIT_Postgres_Parambind extends RedUNIT_Postgres
 {
-
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function test()
+	public function unnamed0()
 	{
 		testpack( "param binding pgsql" );
 
