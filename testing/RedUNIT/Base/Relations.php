@@ -14,17 +14,7 @@
 class RedUNIT_Base_Relations extends RedUNIT_Base
 {
 
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
-	{
-		testpack( 'Test cleaning of lists (must not lead to artifacts)' );
-	}
-
+	
 	public function unnamed1()
 	{
 		list( $book1, $book2 ) = R::dispense( 'book', 2 );
@@ -259,15 +249,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		}
 		R::store( $shop );
 		$shop = $shop->fresh();
-		asrt($shop->via('relation')->countShared('customer'), 13);
-
-		R::nuke();
-		$book = R::dispense('book');
-		$book->ownPage = R::dispense('page',10);
-		$book2 = R::dispense('book');
-		$book2->ownPage = R::dispense('page', 4);
-		list($Bill, $James, $Andy) = R::dispense('person', 3);
-		$book->author = $Bill;
 
 		asrt( $shop->via( 'relation' )->countShared( 'customer' ), 13 );
 	}

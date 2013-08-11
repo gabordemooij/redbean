@@ -954,17 +954,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		} else {
 			$this->fetchType = $oldFetchType;
 			$this->aliasName = $oldAliasName;
-			$unfiltered      = $this->$property;
-
-			if ( $unfiltered instanceof RedBean_OODBBean ) {
-				$ufbean  = $unfiltered;
-				$key     = $bean->id;
-				$ufbeans = array( $key => $ufbean );
-			} elseif ( is_null( $unfiltered ) ) {
-				$ufbeans = array();
-			} else {
-				$ufbeans = $unfiltered;
-			}
+			$ufbeans         = $this->$property;
 		}
 
 		foreach( $ufbeans as $bean ) {
