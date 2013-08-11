@@ -1,7 +1,7 @@
 <?php
 /**
  * RedUNIT_Plugin_Timeline
- * 
+ *
  * @file    RedUNIT/Plugin/Timeline.php
  * @desc    Tests the Time Line feature for logging schema modifications.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -11,34 +11,37 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Plugin_Timeline extends RedUNIT_Plugin {
-
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 * 
-	 * @return void
-	 */
-	public function run() {
-		R::nuke();
-		
-		//test for correct exception in case of non-existant file.
+class RedUNIT_Plugin_Timeline extends RedUNIT_Plugin
+{
+	public function unnamed0()
+	{
+		// test for correct exception in case of non-existant file.
 		try {
-			$timeLine = new RedBean_Plugin_TimeLine('some-non-existant-file');
+			$timeLine = new RedBean_Plugin_TimeLine( 'some-non-existant-file' );
+
 			fail();
-		} catch(RedBean_Exception_Security $exception) {
+		} catch ( RedBean_Exception_Security $exception ) {
 			pass();
 		}
-		
-		file_put_contents('/tmp/test_log.txt','');
-		R::log('/tmp/test_log.txt');
-		$bean = R::dispense('bean');
+
+		file_put_contents( '/tmp/test_log.txt', '' );
+
+		R::log( '/tmp/test_log.txt' );
+
+		$bean = R::dispense( 'bean' );
+
 		$bean->name = true;
-		R::store($bean);
+
+		R::store( $bean );
+
 		$bean->name = 'test';
-		R::store($bean);
-		$log = file_get_contents('/tmp/test_log.txt');
-		asrt(strlen($log)>0,true);
+
+		R::store( $bean );
+
+		$log = file_get_contents( '/tmp/test_log.txt' );
+
+		asrt( strlen( $log ) > 0, true );
+
 		echo $log;
 	}
 }

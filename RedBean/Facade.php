@@ -372,7 +372,7 @@ class RedBean_Facade
 	 * @param string  $type   type
 	 * @param integer $number number of beans to dispense
 	 *
-	 * @return array
+	 * @return array|RedBean_OODBBean
 	 *
 	 * @throws RedBean_Exception_Security
 	 */
