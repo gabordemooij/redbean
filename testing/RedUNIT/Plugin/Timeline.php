@@ -13,34 +13,35 @@
  */
 class RedUNIT_Plugin_Timeline extends RedUNIT_Plugin
 {
-
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function run()
+	public function unnamed0()
 	{
-		R::nuke();
-
-		//test for correct exception in case of non-existant file.
+		// test for correct exception in case of non-existant file.
 		try {
 			$timeLine = new RedBean_Plugin_TimeLine( 'some-non-existant-file' );
+
 			fail();
 		} catch ( RedBean_Exception_Security $exception ) {
 			pass();
 		}
 
 		file_put_contents( '/tmp/test_log.txt', '' );
+
 		R::log( '/tmp/test_log.txt' );
-		$bean       = R::dispense( 'bean' );
+
+		$bean = R::dispense( 'bean' );
+
 		$bean->name = true;
+
 		R::store( $bean );
+
 		$bean->name = 'test';
+
 		R::store( $bean );
+
 		$log = file_get_contents( '/tmp/test_log.txt' );
+
 		asrt( strlen( $log ) > 0, true );
+
 		echo $log;
 	}
 }
