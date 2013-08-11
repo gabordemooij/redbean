@@ -70,11 +70,9 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		list( $sql, $params ) = R::$f->begin()->camelCase()->getQuery();
 
 		asrt( trim( $sql ), 'camelCase' );
-	}
 
+		R::nuke();
 
-	public function testWithWithConditionQueryBuilder()
-	{
 		testpack( 'Test with- and withCondition with Query Builder' );
 
 		$book            = R::dispense( 'book' );
@@ -130,11 +128,9 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		asrt( R::commit(), true );
 
 		R::freeze( false );
-	}
 
+		R::nuke();
 
-	public function testTransactionInFacade()
-	{
 		testpack( 'Test transaction in facade' );
 
 		$bean       = R::dispense( 'bean' );
