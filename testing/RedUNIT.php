@@ -60,7 +60,11 @@ abstract class RedUNIT
 
 			$this->$call();
 
-			R::nuke();
+			try {
+				R::nuke();
+			} catch( PDOException $e ) {
+				// Some tests use a broken database on purpose, so an exception is ok
+			}
 		}
 	}
 
