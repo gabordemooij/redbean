@@ -243,6 +243,68 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 
 		asrt( $foundStr, 'page0page6page8' );
 
+		//now with parents and condition
+		$referencePage = R::load( 'page', $otherPage->id );
+		$found = $referencePage->withCondition(' page.number > 6 ')
+				  ->fetchAs( 'page' )
+				  ->searchIn( 'document' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+
+		asrt( $foundStr, 'page8' );
+
+		//now with parents and condition (variation)
+		R::$writer->setUseCache(false);
+		$referencePage = R::load( 'page', $page[7]->id );
+		$found = $referencePage->withCondition(' ( page.number < 3 OR  page.number = 5 ) ')
+				  ->searchIn( 'page' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+		
+		asrt( $foundStr, 'page0page1page5' );
+
+		//try to cause a cache error... (parent cache)
+		$referencePage = R::load( 'page', $otherPage->id );
+		
+		$parentPage = $referencePage->fetchAs('page')->document;
+		$referencePages = $parentPage->alias('document')
+				  ->withCondition(' id = ?', array($otherPage->id))
+				  ->ownPage;
+		
+		$referencePage = reset($referencePages);
+
+		$found = $referencePage->withCondition(' page.number > 6 ')
+				  ->fetchAs( 'page' )
+				  ->searchIn( 'document' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+
+		asrt( $foundStr, 'page8' );
+
 		$referencePage = R::load( 'page', $page[8]->id );
 		$found         = $referencePage->alias( 'document' )
 				  ->withCondition( ' page.number > 5 ' )
@@ -279,5 +341,13 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 
 		asrt( $foundStr, 'page0page6page9pagex' );
 
+		//shared search not allowed
+		try {
+			$referencePage->searchIn('sharedPage');
+			fail();
+		} catch (RedBean_Exception_Security $exception) {
+			pass();
+		}
+		
 	}
 }

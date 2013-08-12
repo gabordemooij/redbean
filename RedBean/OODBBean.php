@@ -617,7 +617,20 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 			if ( !$bean ) {
 				$type = $this->getAlias( $property );
-				$bean = $redbean->load( $type, $this->properties[$fieldLink] );
+
+				if ( $this->withSql !== '' ) {
+
+					$beans = $redbean->find( 
+							  $type, 
+							  array( 'id' => array( $this->properties[$fieldLink] ) ),
+							  $this->withSql, $this->withParams );
+					
+					$bean             = ( empty( $beans ) ) ? null : reset( $beans );
+					$this->withSql    = '';
+					$this->withParams = '';
+				} else {
+					$bean = $redbean->load( $type, $this->properties[$fieldLink] );
+				}
 			}
 
 			$this->properties[$property] = $bean;
@@ -930,10 +943,17 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function searchIn($property) 
 	{
+		if ( strpos( $property, 'shared' ) === 0 ) {
+			throw new RedBean_Exception_Security( 'Cannot search a shared list recursively.' );
+		}
+
 		$oldFetchType = $this->fetchType;
 		$oldAliasName = $this->aliasName;
 		$oldWith      = $this->withSql;
 		$oldBindings  = $this->withParams;
+
+		unset( $this->__info["sys.parentcache.$property"] );
+
 		$beanOrBeans  = $this->$property;
 
 		if ( $beanOrBeans instanceof RedBean_OODBBean ) {
@@ -955,6 +975,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$this->fetchType = $oldFetchType;
 			$this->aliasName = $oldAliasName;
 			$ufbeans         = $this->$property;
+
+			if ( is_null( $ufbeans ) ) $ufbeans = array();
+			if ( $ufbeans instanceof RedBean_OODBBean ) $ufbeans = array( $ufbeans );
 		}
 
 		foreach( $ufbeans as $bean ) {
@@ -965,9 +988,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 			$newBeans = $bean->searchIn( $property );
 
-			$beans = array_merge( $beans, $newBeans );
+			$beans = array_replace( $beans, $newBeans );
 		}
-		
+
 		return $beans;
 	}
 
@@ -1230,5 +1253,19 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$this->withParams = array();
 
 		return (integer) $count;
+	}
+	
+	/**
+	 * Tests whether the database identities of two beans are equal.
+	 * 
+	 * @param RedBean_OODBBean $bean other bean
+	 * 
+	 * @return boolean
+	 */
+	public function equals(RedBean_OODBBean $bean) {
+		return (bool) (
+			   ( (string) $this->properties['id'] === (string) $bean->properties['id'] )
+			&& ( (string) $this->__info['type']   === (string) $bean->__info['type']   )
+		);
 	}
 }

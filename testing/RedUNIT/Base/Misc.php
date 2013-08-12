@@ -466,6 +466,37 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 			pass();
 		}
 	}
+	
+	/**
+	 * Test Bean identity equality.
+	 */
+	public function testBeanIdentityEquality() {
+		$beanA = R::dispense( 'bean' );
+		$beanB = R::dispense( 'bean' );
+		$beanA->id = 1;
+		$beanB->id = 1;
+		
+		asrt( $beanA->equals( $beanB ), true );
+		asrt( $beanB->equals( $beanA ), true );
+		asrt( $beanA->equals( $beanA ), true );
+		asrt( $beanB->equals( $beanB ), true );
+		
+		$beanB->id = 2;
+		
+		asrt( $beanA->equals( $beanB ), false );
+		asrt( $beanB->equals( $beanA ), false );
+		
+		$beanA->id = '2';
+		
+		asrt( $beanA->equals( $beanB ), true );
+		asrt( $beanB->equals( $beanA ), true );
+		
+		$beanB = R::dispense( 'carrot' );
+		$beanB->id = $beanA->id;
+		
+		asrt( $beanA->equals( $beanB ), false );
+		asrt( $beanB->equals( $beanA ), false );
+	}
 }
 
 
