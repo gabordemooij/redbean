@@ -935,7 +935,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * 
 	 * Also works with alias() and fetchAs().
 	 * Note that shared lists are NOT supported.
-	 * Also you can't search parents recursively with SQL conditions.
 	 * 
 	 * @param string $property property/list to search
 	 * 
