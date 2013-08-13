@@ -14,6 +14,35 @@
 class RedUNIT_Base_Aliasing extends RedUNIT_Base
 {
 
+	
+	public function testFetchTypeConfusionIssue291() 
+	{
+		list( $teacher, $student ) = R::dispense( 'person', 2 ) ;
+		$teacher->name = 'jimmy' ;
+		$student->name = 'jacko' ;
+		R::store( $teacher, $student ) ;
+
+		$client = R::dispense( 'client' ) ;
+		$client->firm = 'bean AG' ;
+		R::store( $client ) ;
+
+		$project = R::dispense( 'project' ) ;
+		$project->teacher = $teacher ;
+		$project->student = $student ;
+		$project->client = $client ;
+		R::store( $project ) ;
+
+		unset( $project->student ) ;
+		R::store( $project ) ;
+
+		$project = R::load( 'project', 1 ) ;
+		$teacher = $project->fetchAs( 'person' )->teacher ;
+		$student = $project->fetchAs( 'person' )->student ;
+		$client = $project->client ; // this will select from "person" instead of "client"
+		
+		asrt($client->firm, 'bean AG');
+	}
+	
 	public function testAliasSwitch() 
 	{
 		$student = R::dispense( 'person' );

@@ -613,7 +613,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		
 		$exists = isset( $this->properties[$property] );
 		
-		if ($exists && !$isOwn && !$isShared) return $this->properties[$property];
+		//if ($exists && !$isOwn && !$isShared) return $this->properties[$property];
 		
 		if ($exists && !$hasSQL && !$differentAlias) return $this->properties[$property];
 		
