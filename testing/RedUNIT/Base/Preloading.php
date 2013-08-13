@@ -481,7 +481,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		}
 
 		R::storeAll( $authors );
-
+		
 		$texts = R::find( 'text' );
 
 		R::preload( $texts, array( 'page', 'page.book', 'page.book.coauthor' => 'author' ) );

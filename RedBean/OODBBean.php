@@ -602,10 +602,21 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$isOwn    = strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) );
 		$isShared = strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) );
 
-		if ( isset( $this->properties[$property] ) && ( ( $this->withSql === '' ) || ( !$isOwn && !$isShared ) ) ) {
-			return $this->properties[$property];
-		}
-
+		if ($isOwn) $listName = lcfirst( substr( $property, 3 ) );
+		
+		$hasAlias = (!is_null($this->aliasName));
+		
+		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ? 
+				  ($this->__info['sys.alias.'.$listName] !== $this->aliasName) : false;
+		
+		$hasSQL = ($this->withSql !== '');
+		
+		$exists = isset( $this->properties[$property] );
+		
+		if ($exists && !$isOwn && !$isShared) return $this->properties[$property];
+		
+		if ($exists && !$hasSQL && !$differentAlias) return $this->properties[$property];
+		
 		$fieldLink = $property . '_id';
 		if ( isset( $this->$fieldLink ) && $fieldLink !== $this->getMeta( 'sys.idfield' ) ) {
 			$this->__info['tainted'] = true;
@@ -640,7 +651,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		if ( $isOwn || $isShared ) {
 			if ( $isOwn ) {
-				$beans = $this->getOwnList( lcfirst( substr( $property, 3 ) ), $redbean );
+				$beans = $this->getOwnList( $listName, $redbean );
 			} else {
 				$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
 			}

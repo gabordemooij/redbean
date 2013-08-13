@@ -14,6 +14,17 @@
 class RedUNIT_Base_Aliasing extends RedUNIT_Base
 {
 
+	public function testAliasSwitch() 
+	{
+		$student = R::dispense( 'person' );
+		$project = R::dispense( 'project' );
+		$project->student = $student;
+		R::store( $project );
+		$person = R::load( 'person', $student->id );
+		asrt( count( $person->alias( 'student' )->ownProject ), 1);
+		asrt( count( $person->alias( 'teacher' )->ownProject ), 0);
+	}
+	
 	/**
 	 * Associating two beans, then loading the associated bean
 	 */
