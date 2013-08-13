@@ -409,7 +409,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function getID()
 	{
-		return (string) $this->id;
+		return (string) $this->properties['id'];
 	}
 
 	/**
@@ -581,6 +581,16 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Clears state.
+	 */
+	private function clear() {
+		$this->withSql    = '';
+		$this->withParams = array();
+		$this->aliasName  = null;
+		$this->fetchType  = null;
+	}
+	
+	/**
 	 * Magic Getter. Gets the value for a specific property in the bean.
 	 * If the property does not exist this getter will make sure no error
 	 * occurs. This is because RedBean allows you to query (probe) for
@@ -613,9 +623,19 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		
 		$exists = isset( $this->properties[$property] );
 		
-		//if ($exists && !$isOwn && !$isShared) return $this->properties[$property];
+		if ($exists && !$isOwn && !$isShared) {
+			
+			$this->clear();
+			
+			return $this->properties[$property];
+		}
 		
-		if ($exists && !$hasSQL && !$differentAlias) return $this->properties[$property];
+		if ($exists && !$hasSQL && !$differentAlias) {
+			
+			$this->clear();
+			
+			return $this->properties[$property];
+		}
 		
 		$fieldLink = $property . '_id';
 		if ( isset( $this->$fieldLink ) && $fieldLink !== $this->getMeta( 'sys.idfield' ) ) {
@@ -645,7 +665,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			}
 
 			$this->properties[$property] = $bean;
-
+			
+			$this->clear();
+			
 			return $this->properties[$property];
 		}
 
@@ -661,9 +683,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$this->__info["sys.shadow.$property"] = $beans;
 			$this->__info['tainted']              = true;
 
+			$this->clear();
+			
 			return $this->properties[$property];
 		}
 
+		$this->clear();
+		
 		$null = null;
 
 		return $null;
