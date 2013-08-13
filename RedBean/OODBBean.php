@@ -307,7 +307,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function inject( RedBean_OODBBean $otherBean )
 	{
-		$myID = $this->id;
+		$myID = $this->properties['id'];
 
 		$this->import( $otherBean->export() );
 
@@ -994,7 +994,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		if ( $beanOrBeans instanceof RedBean_OODBBean ) {
 			$bean  = $beanOrBeans;
-			$key   = $bean->id;
+			$key   = $bean->properties['id'];
 			$beans = array( $key => $bean );
 		} elseif ( is_null( $beanOrBeans ) ) {
 			$beans = array();
@@ -1204,7 +1204,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function fresh()
 	{
-		return $this->beanHelper->getToolbox()->getRedBean()->load( $this->getMeta( 'type' ), $this->id );
+		return $this->beanHelper->getToolbox()->getRedBean()->load( $this->getMeta( 'type' ), $this->properties['id'] );
 	}
 
 	/**
