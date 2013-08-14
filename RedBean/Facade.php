@@ -1154,6 +1154,36 @@ class RedBean_Facade
 	{
 		return self::$labelMaker->dispenseLabels( $type, $labels );
 	}
+	
+	/**
+	 * Generates and returns an ENUM value. This is how RedBeanPHP handles ENUMs.
+	 * Either returns a (newly created) bean respresenting the desired ENUM
+	 * value or returns a list of all enums for the type.
+	 * 
+	 * To obtain (and add if necessary) an ENUM value:
+	 * 
+	 * $tea->flavour = R::enum( 'flavour:apple' );
+	 * 
+	 * Returns a bean of type 'flavour' with  name = apple.
+	 * This will add a bean with property name (set to APPLE) to the database
+	 * if it does not exist yet. 
+	 * 
+	 * To obtain all flavours:
+	 * 
+	 * R::enum('flavour');
+	 * 
+	 * To get a list of all flavour names:
+	 * 
+	 * R::gatherLabels( R::enum( 'flavour' ) );
+	 * 
+	 * @param string $enum either type or type-value
+	 * 
+	 * @return array|RedBean_OODBBean
+	 */
+	public static function enum( $enum ) 
+	{
+		return self::$labelMaker->enum( $enum );
+	}
 
 	/**
 	 * Gathers labels from beans. This function loops through the beans,

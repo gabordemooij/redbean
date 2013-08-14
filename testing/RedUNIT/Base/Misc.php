@@ -438,8 +438,63 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		asrt( $b, '[test] - ' );
 	}
 
+	public function testENUM() {
+		
+		testpack('test ENUM');
+		
+		$coffee = R::dispense( 'coffee' );
+		$coffee->taste = R::enum( 'flavour:mocca' );
+		
+		//did we create an enum?
+		asrt( implode( '', R::gatherLabels(R::enum('flavour'))), 'MOCCA' );
+		
+		R::store( $coffee );
+		
+		$coffee = $coffee->fresh();
+		
+		//test enum identity check - with alias
+		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), true );
+		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), false );
+		
+		//now we have two flavours
+		asrt( R::count('flavour'), 2 );
+		asrt( implode( ',', R::gatherLabels(R::enum('flavour'))), 'BANANA,MOCCA' );
+		
+		$coffee->flavour = R::enum( 'flavour:mocca' );
+		
+		R::store($coffee);
+		
+		//same results, can we have multiple flavours?
+		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), true );
+		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), false );
+		asrt( $coffee->flavour->equals( R::enum('flavour:mocca') ), true );
+		
+		//no additional mocca enum...
+		asrt( R::count('flavour'), 2 );
+		
+		$drink = R::dispense( 'drink' );
+		$drink->flavour = R::enum( 'flavour:choco' );
+		R::store( $drink );
+		
+		//now we have three!
+		asrt( R::count('flavour'), 3 );
+		
+		$drink = R::load( 'drink', $drink->id );
+		
+		asrt( $drink->flavour->equals( R::enum('flavour:mint') ), false );
+		asrt( $drink->flavour->equals( R::enum('flavour:choco') ), true );
+		
+		asrt( R::count('flavour'), 4 );
+		
+		//trash should not affect flavour!
+		R::trash( $drink );
+		
+		asrt( R::count('flavour'), 4 );
+	}
+	
+	
 	/**
-	 *
+	 * Test trashAll().
 	 */
 	public function testMultiDeleteUpdate()
 	{
