@@ -15,6 +15,47 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 {
 
 	/**
+	 * Make sure methods dont clear state of bean unintended.
+	 */
+	public function clearStateAdditionalTests() {
+		
+		list( $project1, $project2 ) = R::dispense( 'project', 2 );
+		list( $irene, $ilse ) = R::dispense('person', 2);
+		
+		$project1->developer = $ilse;
+		$project1->designer  = $irene;
+		
+		$ilse->name  = 'Ilse';
+		$irene->name = 'Irene';
+		
+		$project2->developer = $ilse;
+		
+		R::storeAll( array( $project1, $project2 ) );
+		
+		$ilse = R::load( 'person', $ilse->id );
+		
+		asrt( count( $ilse->alias( 'developer' )->ownProject ), 2);
+		
+		//cached - same list
+		asrt( count( $ilse->ownProject ), 2);
+		
+		asrt( count( $ilse->alias( 'designer' )->ownProject ), 0);
+		
+		//cached - same list
+		asrt( count( $ilse->ownProject ), 0);
+		
+		//now test state
+		asrt( count( $ilse->setAttr( 'a', 'b' )->alias( 'developer' )->ownProject ), 2);
+		
+		//now test state
+		$ilse = $ilse->fresh();
+		
+		//attr clears state...
+		asrt( count( $ilse->alias( 'developer' )->setAttr( 'a', 'b' )->ownProject ), 0);
+		
+	}
+	
+	/**
 	 * Can switch fetchAs().
 	 * Also checks shadow by storing.
 	 */
@@ -105,7 +146,9 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 		
 	}
 	
-	
+	/**
+	 * Issue 291. State not cleared.
+	 */
 	public function testFetchTypeConfusionIssue291() 
 	{
 		list( $teacher, $student ) = R::dispense( 'person', 2 ) ;
