@@ -15,7 +15,9 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 {
 
 	/**
-	 * Make sure methods dont clear state of bean unintended.
+	 * Describing how clearing state of bean works.
+	 * Every method returning somthing (except getID)
+	 * clears prefix-method-state (anything set by withCond,with,alias,fetchAs).
 	 */
 	public function clearStateAdditionalTests() {
 		
@@ -52,6 +54,12 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 		
 		//attr clears state...
 		asrt( count( $ilse->alias( 'developer' )->setAttr( 'a', 'b' )->ownProject ), 0);
+		
+		//but getID() does not!
+		$ilse = $ilse->fresh();
+		$ilse->alias('developer');
+		$ilse->getID();
+		asrt( count( $ilse->ownProject ), 2 );
 		
 	}
 	
