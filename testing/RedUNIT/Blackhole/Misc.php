@@ -96,7 +96,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		asrt( count( $book->ownPage ), 2 );
 
 		$book = R::load( 'book', $id );
-		R::debug();
+		
 		asrt( count( $book->withCondition( ' num >  1')->ownPage ), 1 );
 
 		$book = R::load( 'book', $id );

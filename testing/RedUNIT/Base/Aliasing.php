@@ -14,6 +14,97 @@
 class RedUNIT_Base_Aliasing extends RedUNIT_Base
 {
 
+	/**
+	 * Can switch fetchAs().
+	 * Also checks shadow by storing.
+	 */
+	public function canSwitchParentBean() 
+	{
+		
+		list( $project1, $project2 ) = R::dispense( 'project', 2 );
+		list( $irene, $ilse ) = R::dispense('person', 2);
+		
+		$project1->developer = $ilse;
+		$project1->designer  = $irene;
+		
+		$ilse->name  = 'Ilse';
+		$irene->name = 'Irene';
+		
+		$project2->developer = $ilse;
+		
+		R::storeAll( array( $project1, $project2 ) );
+		
+		$project1 = R::load( 'project', $project1->id );
+		
+		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );
+		asrt( $project1->fetchAs('person')->designer->name,  'Irene' );
+		
+		R::store( $project1 );
+		
+		$project1 = R::load( 'project', $project1->id );
+		
+		asrt( $project1->fetchAs('person')->designer->name,  'Irene' );
+		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );
+		
+		R::store( $project1 );
+		
+		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );
+		asrt( $project1->fetchAs('person')->designer->name,  'Irene' );
+		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );	
+	}
+	
+	/**
+	 * Switching aliases (->alias) should not change other list during
+	 * storage.
+	 */
+	public function testShadow() 
+	{
+		list( $project1, $project2 ) = R::dispense( 'project', 2 );
+		list( $irene, $ilse ) = R::dispense('person', 2);
+		
+		$project1->developer = $ilse;
+		$project1->designer  = $irene;
+		
+		$project2->developer = $ilse;
+		
+		R::storeAll( array( $project1, $project2 ) );
+		
+		$ilse  = R::load( 'person', $ilse->id );
+		$irene = R::load( 'person', $irene->id );
+		
+		asrt( count( $ilse->alias('developer')->ownProject ), 2 );
+		asrt( count( $ilse->alias('designer')->ownProject ), 0 );
+		
+		R::store( $ilse );
+		
+		$ilse  = R::load( 'person', $ilse->id );
+		$irene = R::load( 'person', $irene->id );
+		
+		asrt( count( $ilse->alias('designer')->ownProject ), 0 );
+		asrt( count( $ilse->alias('developer')->ownProject ), 2 );
+		
+		R::storeAll( array( $ilse, $irene) );
+		
+		$ilse  = R::load( 'person', $ilse->id );
+		$irene = R::load( 'person', $irene->id );
+		
+		asrt( count( $ilse->alias('designer')->ownProject ), 0 );
+		asrt( count( $ilse->alias('developer')->ownProject ), 2 );
+		asrt( count( $irene->alias('designer')->ownProject), 1 );
+		asrt( count( $irene->alias('developer')->ownProject), 0 );
+		
+		R::storeAll( array( $ilse, $irene) );
+		
+		$ilse  = R::load( 'person', $ilse->id );
+		$irene = R::load( 'person', $irene->id );
+		
+		asrt( count( $ilse->alias('designer')->ownProject ), 0 );
+		asrt( count( $ilse->alias('developer')->ownProject ), 2 );
+		asrt( count( $irene->alias('designer')->ownProject), 1 );
+		asrt( count( $irene->alias('developer')->ownProject), 0 );
+		
+	}
+	
 	
 	public function testFetchTypeConfusionIssue291() 
 	{
