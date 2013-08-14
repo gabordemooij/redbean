@@ -13,7 +13,12 @@
  */
 class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 {
-	public function unnamed0()
+	/**
+	 * Test graph() method.
+	 * 
+	 * @return void
+	 */
+	public function testGraph()
 	{
 		RedBean_Plugin_Cooker::enableBeanLoading( true );
 

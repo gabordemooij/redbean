@@ -13,7 +13,12 @@
  */
 class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 {
-	public function unnamed0()
+	/**
+	 * Test scanning and coding.
+	 * 
+	 * @return void
+	 */
+	public function testScanningAndCoding()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
@@ -110,6 +115,8 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 
 	/**
 	 * (false should be stored as 0 not as '')
+	 * 
+	 * @return void
 	 */
 	public function testZeroIssue()
 	{
@@ -146,7 +153,12 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		pass();
 	}
 
-	public function unnamed1()
+	/**
+	 * Various
+	 * 
+	 * @return void
+	 */
+	public function testIssue9and10()
 	{
 		$toolbox = R::$toolbox;
 		$redbean = $toolbox->getRedBean();
@@ -199,7 +211,12 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		asrt( (int) $adapter->getCell( "select count(*) from book_group" ), 1 ); //just 1 rec!
 	}
 
-	public function unnamed2()
+	/**
+	 * Various
+	 * 
+	 * @return void
+	 */
+	public function testVaria()
 	{
 		$toolbox = R::$toolbox;
 		$redbean = $toolbox->getRedBean();
@@ -234,6 +251,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		pass();
 	}
 
+	/**
+	 * Test special types.
+	 * 
+	 * @return void
+	 */
 	public function testTypes()
 	{
 		testpack( 'Special data types' );
@@ -259,6 +281,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		asrt( $cols['date'], 'text' );
 	}
 
+	/**
+	 * Test dates.
+	 * 
+	 * @return void
+	 */
 	public function testTypesDates()
 	{
 		$bean = R::dispense( 'bean' );
@@ -272,6 +299,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		asrt( $cols['date'], 'date' );
 	}
 
+	/**
+	 * Datetime.
+	 * 
+	 * @return void
+	 */
 	public function testTypesDateTimes()
 	{
 		$bean = R::dispense( 'bean' );
@@ -285,6 +317,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		asrt( $cols['date'], 'timestamp without time zone' );
 	}
 
+	/**
+	 * Test spatial data types.
+	 * 
+	 * @return void
+	 */
 	public function testTypesPoints()
 	{
 		$bean = R::dispense( 'bean' );
@@ -310,6 +347,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		asrt( $bean->point, '(92,12)' );
 	}
 
+	/**
+	 * Test points.
+	 * 
+	 * @return void
+	 */
 	public function testTypesDecPoints()
 	{
 		$bean = R::dispense( 'bean' );
@@ -335,6 +377,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		asrt( $bean->point, '(9.2,1.2)' );
 	}
 
+	/**
+	 * Test multi points.
+	 * 
+	 * @return void
+	 */
 	public function testTypesMultiDecPoints()
 	{
 		$bean = R::dispense( 'bean' );
@@ -360,6 +407,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		asrt( $bean->line, '[(1.2,1.4),(2.2,34)]' );
 	}
 
+	/**
+	 * More points...
+	 * 
+	 * @return void
+	 */
 	public function testTypesWeirdPoints()
 	{
 		$bean = R::dispense( 'bean' );
@@ -385,6 +437,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		asrt( $bean->circle, '<(9.2,1.2),7.9>' );
 	}
 
+	/**
+	 * Test money data type.
+	 * 
+	 * @return void
+	 */
 	public function testTypesMoney()
 	{
 		$bean = R::dispense( 'bean' );
@@ -410,6 +467,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		asrt( $bean->money, '$123.45' );
 	}
 
+	/**
+	 * Test negative money data type.
+	 * 
+	 * @return void
+	 */
 	public function testTypesNegativeMoney()
 	{
 		$bean = R::dispense( 'bean' );
@@ -435,6 +497,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		asrt( $bean->money, '-$123.45' );
 	}
 
+	/**
+	 * Test types of strings.
+	 * 
+	 * @return void
+	 */
 	public function testTypesStrings()
 	{
 		$bean = R::dispense( 'bean' );

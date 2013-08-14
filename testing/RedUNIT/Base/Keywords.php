@@ -15,13 +15,22 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base
 {
 	/**
 	 * What drivers should be loaded for this test pack?
+	 * 
+	 * CUBRID has inescapable keywords :/
+	 * 
+	 * @return array
 	 */
 	public function getTargetDrivers()
 	{
 		return array( 'mysql', 'pgsql', 'sqlite' ); // CUBRID excluded for now.
 	}
 
-	public function unnamed0()
+	/**
+	 * Test if RedBeanPHP can properly handle keywords.
+	 * 
+	 * @return void
+	 */
+	public function testKeywords()
 	{
 		$keywords = array(
 			'anokeyword', 'znokeyword', 'group', 'DROP',

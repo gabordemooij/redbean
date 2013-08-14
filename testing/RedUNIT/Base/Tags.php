@@ -13,6 +13,11 @@
  */
 class RedUNIT_Base_Tags extends RedUNIT_Base
 {
+	/**
+	 * Some basic tests.
+	 * 
+	 * @return void
+	 */
 	public function testTags()
 	{
 		list( $c, $d, $e, $f ) = R::dispense( 'coffee', 4 );
@@ -114,6 +119,11 @@ class RedUNIT_Base_Tags extends RedUNIT_Base
 		testpack( "fetch tagged items" );
 	}
 
+	/**
+	 * Fetching tagged items.
+	 * 
+	 * @return void
+	 */
 	public function fetchTaggedItems()
 	{
 		$b = R::dispense( "book" );

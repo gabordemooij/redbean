@@ -13,7 +13,12 @@
  */
 class RedUNIT_Base_Observers extends RedUNIT_Base
 {
-	public function unnamed0()
+	/**
+	 * Test RedBeanPHP observers.
+	 * 
+	 * @return void
+	 */
+	public function testObserverMechanism()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

@@ -18,6 +18,8 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 	 * Describing how clearing state of bean works.
 	 * Every method returning somthing (except getID)
 	 * clears prefix-method-state (anything set by withCond,with,alias,fetchAs).
+	 * 
+	 * @return void
 	 */
 	public function clearStateAdditionalTests() {
 		
@@ -66,6 +68,8 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 	/**
 	 * Can switch fetchAs().
 	 * Also checks shadow by storing.
+	 * 
+	 * @return void
 	 */
 	public function canSwitchParentBean() 
 	{
@@ -105,6 +109,8 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 	/**
 	 * Switching aliases (->alias) should not change other list during
 	 * storage.
+	 * 
+	 * @return void
 	 */
 	public function testShadow() 
 	{
@@ -156,6 +162,8 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 	
 	/**
 	 * Issue 291. State not cleared.
+	 * 
+	 * @return void
 	 */
 	public function testFetchTypeConfusionIssue291() 
 	{
@@ -185,6 +193,11 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 		asrt($client->firm, 'bean AG');
 	}
 	
+	/**
+	 * Test switching alias (also issue #291).
+	 * 
+	 * @return void
+	 */
 	public function testAliasSwitch() 
 	{
 		$student = R::dispense( 'person' );
@@ -198,6 +211,8 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 	
 	/**
 	 * Associating two beans, then loading the associated bean
+	 * 
+	 * @return void
 	 */
 	public function testAssociated()
 	{
@@ -241,7 +256,9 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 	}
 
 	/**
-	 * Test for quick detect change
+	 * Test for quick detect change.
+	 * 
+	 * @return void
 	 */
 	public function basic()
 	{
@@ -298,6 +315,8 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 
 	/**
 	 * Finding $person beans that have been aliased into various roles
+	 * 
+	 * @return void
 	 */
 	public function aliasedFinder()
 	{
@@ -333,9 +352,9 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 	}
 
 	/**
-	 *
+	 * Test Basic Fetch AS functionality.
 	 */
-	public function unnamed1()
+	public function testBasicFetchAs()
 	{
 		$project       = R::dispense( 'project' );
 		$project->name = 'Mutant Project';
@@ -356,9 +375,11 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 	}
 
 	/**
-	 *
+	 * Test Basic list variations.
+	 * 
+	 * @return void
 	 */
-	public function unnamed2()
+	public function testBasicListVariations()
 	{
 		$farm    = R::dispense( 'building' );
 		$village = R::dispense( 'village' );
@@ -408,7 +429,12 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 
 	}
 
-	public function unnamed3()
+	/**
+	 * Tests whether aliasing plays nice with beautification.
+	 * 
+	 * @return void
+	 */
+	public function testAliasWithBeautify()
 	{
 		/**
 		 * Ensure that aliased column aren't beautified

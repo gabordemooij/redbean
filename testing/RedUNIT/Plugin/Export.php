@@ -13,7 +13,13 @@
  */
 class RedUNIT_Plugin_Export extends RedUNIT_Plugin
 {
-	public function unnamed0()
+	
+	/**
+	 * Test export.
+	 * 
+	 * @return void
+	 */
+	public function testExport()
 	{
 		// Export with parents / embedded objects
 		$wines = R::dispense( 'wine', 3 );

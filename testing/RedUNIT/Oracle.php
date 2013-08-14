@@ -15,6 +15,8 @@ class RedUNIT_Oracle extends RedUNIT
 {
 	/*
 	 * What drivers should be loaded for this test pack?
+	 * 
+	 * @return array
 	 */
 	public function getTargetDrivers()
 	{

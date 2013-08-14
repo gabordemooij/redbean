@@ -13,6 +13,11 @@
  */
 class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 {
+	/**
+	 * Test Freeze.
+	 * 
+	 * @return void
+	 */
 	public function unnamed0()
 	{
 		$toolbox = R::$toolbox;

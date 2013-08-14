@@ -13,7 +13,12 @@
  */
 class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole
 {
-	public function run()
+	/**
+	 * ExportAll.
+	 * 
+	 * @return void
+	 */
+	public function testExportAll()
 	{
 		testpack( 'Test exportAll' );
 

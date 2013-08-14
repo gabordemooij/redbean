@@ -13,7 +13,12 @@
  */
 class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 {
-	public function unnamed0()
+	/**
+	 * Test scanning and coding.
+	 * 
+	 * @return void
+	 */
+	public function testScanningAndCoding()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
@@ -91,6 +96,8 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 
 	/**
 	 * (false should be stored as 0 not as '')
+	 * 
+	 * @return void
 	 */
 	public function testZeroIssue()
 	{
@@ -129,7 +136,12 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 		pass();
 	}
 
-	public function unnamed1()
+	/**
+	 * Various
+	 * 
+	 * @return void
+	 */
+	public function testVaria()
 	{
 		$toolbox = R::$toolbox;
 		$redbean = $toolbox->getRedBean();
@@ -180,7 +192,12 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 		asrt( (int) $adapter->getCell( "select count(*) from book_group" ), 1 ); //just 1 rec!
 	}
 
-	public function unnamed2()
+	/**
+	 * Test various.
+	 * 
+	 * @return void
+	 */
+	public function testVaria2()
 	{
 		$toolbox = R::$toolbox;
 		$redbean = $toolbox->getRedBean();
@@ -215,6 +232,11 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 		pass();
 	}
 
+	/**
+	 * Test special data types.
+	 * 
+	 * @return void
+	 */
 	public function testSpecialDataTypes()
 	{
 		testpack( 'Special data types' );

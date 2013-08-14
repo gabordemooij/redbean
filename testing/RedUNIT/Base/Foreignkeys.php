@@ -20,6 +20,11 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 	 */
 	private $queries = array();
 
+	/**
+	 * Test dependencies.
+	 * 
+	 * @return void
+	 */
 	public function testDependency()
 	{
 		$can = $this->createBeanInCan();
@@ -32,6 +37,11 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 		asrt( R::count( 'bean' ), 1 );
 	}
 
+	/**
+	 * Test dependencies (variation).
+	 * 
+	 * @return void
+	 */
 	public function testDependency2()
 	{
 		R::dependencies( array( 'bean' => array( 'can' ) ) );
@@ -58,7 +68,12 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 
 	}
 
-	public function unnamed0()
+	/**
+	 * Tests dependencies (variation).
+	 * 
+	 * @return void
+	 */
+	public function testDependency3()
 	{
 		$can = $this->createCanForBean();
 
@@ -69,7 +84,12 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 		asrt( R::count( 'bean' ), 1 );
 	}
 
-	public function unnamed1()
+	/**
+	 * Tests dependencies (variation).
+	 * 
+	 * @return void
+	 */
+	public function testDependency4()
 	{
 		R::dependencies( array( 'bean' => array( 'can' ) ) );
 
@@ -95,6 +115,8 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 	/**
 	 * Issue #171
 	 * The index name argument is not unique in processEmbeddedBean etc.
+	 * 
+	 * @return void
 	 */
 	public function testIssue171()
 	{

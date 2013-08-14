@@ -14,7 +14,12 @@
 
 class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole
 {
-	public function basic()
+	/**
+	 * Test boxing.
+	 * 
+	 * @return void
+	 */
+	public function testBasicBox()
 	{
 		$soup          = R::dispense( 'soup' );
 

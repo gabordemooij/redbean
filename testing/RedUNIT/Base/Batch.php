@@ -20,7 +20,7 @@ class RedUNIT_Base_Batch extends RedUNIT_Base
 	 *
 	 * @return void
 	 */
-	public function unnamed0()
+	public function testBatch()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
@@ -98,6 +98,11 @@ class RedUNIT_Base_Batch extends RedUNIT_Base
 		asrt( R::wipe( 'spaghettimonster' ), false );
 	}
 
+	/**
+	 * Test missing bean scenarios.
+	 * 
+	 * @return void
+	 */
 	public function testMissingBeans()
 	{
 		testpack( 'deal with missing beans' );

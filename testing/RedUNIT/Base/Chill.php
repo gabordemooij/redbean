@@ -13,6 +13,11 @@
  */
 class RedUNIT_Base_Chill extends RedUNIT_Base
 {
+	/**
+	 * Test Chill mode.
+	 * 
+	 * @return void
+	 */
 	public function testChill()
 	{
 		$bean = R::dispense( 'bean' );

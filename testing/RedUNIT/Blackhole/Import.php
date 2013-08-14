@@ -14,7 +14,12 @@
 
 class RedUNIT_Blackhole_Import extends RedUNIT_Blackhole
 {
-	public function run()
+	/**
+	 * Test import from and tainted.
+	 * 
+	 * @return void
+	 */
+	public function testImportFromAndTainted()
 	{
 		testpack( 'Test importFrom() and Tainted' );
 

@@ -13,7 +13,12 @@
  */
 class RedUNIT_Mysql_Double extends RedUNIT_Mysql
 {
-	public function unnamed0()
+	/**
+	 * Test storage of doubles.
+	 * 
+	 * @return void
+	 */
+	public function testDouble()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

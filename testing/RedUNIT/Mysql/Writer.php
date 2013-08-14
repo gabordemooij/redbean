@@ -13,7 +13,12 @@
  */
 class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 {
-	public function unnamed0()
+	/**
+	 * Test scanning and coding of values.
+	 * 
+	 * @return void
+	 */
+	public function testScanningAndCoding()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
@@ -123,8 +128,6 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		asrt( empty( $row ), true );
 
-		//$pdo->setDebugMode(1);
-
 		$writer->addColumn( "testtable", "c2", 2 );
 
 		try {
@@ -155,6 +158,8 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 	/**
 	 * (false should be stored as 0 not as '')
+	 * 
+	 * @return voids
 	 */
 	public function testZeroIssue()
 	{
@@ -405,6 +410,11 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		pass();
 	}
 
+	/**
+	 * Test special data types.
+	 * 
+	 * @return void
+	 */
 	public function testTypes()
 	{
 		testpack( 'Special data types' );
@@ -430,6 +440,11 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		asrt( $cols['date'], 'varchar(255)' );
 	}
 
+	/**
+	 * Test date types.
+	 * 
+	 * @return void
+	 */
 	public function testTypesDates()
 	{
 		$bean       = R::dispense( 'bean' );
@@ -443,6 +458,11 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		asrt( $cols['date'], 'date' );
 	}
 
+	/**
+	 * Date-time
+	 * 
+	 * @return void
+	 */
 	public function testTypesDateTimes()
 	{
 		$bean       = R::dispense( 'bean' );
@@ -503,6 +523,8 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 	/**
 	 * Stored and reloads spatial data to see if the
 	 * value is preserved correctly.
+	 * 
+	 * @return void
 	 */
 	protected function setGetSpatial( $data )
 	{

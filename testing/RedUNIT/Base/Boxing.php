@@ -13,6 +13,12 @@
  */
 class RedUNIT_Base_Boxing extends RedUNIT_Base
 {
+	
+	/**
+	 * Test boxing beans.
+	 * 
+	 * @return void
+	 */
 	public function testBoxing()
 	{
 		R::nuke();

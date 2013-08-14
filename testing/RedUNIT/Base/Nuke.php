@@ -13,6 +13,11 @@
  */
 class RedUNIT_Base_Nuke extends RedUNIT_Base
 {
+	/**
+	 * Nuclear test suite.
+	 * 
+	 * @return void
+	 */
 	public function testNuke()
 	{
 		$bean = R::dispense( 'bean' );

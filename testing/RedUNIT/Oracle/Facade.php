@@ -13,7 +13,12 @@
  */
 class RedUNIT_Oracle_Facade extends RedUNIT_Oracle
 {
-	public function unnamed0()
+	/**
+	 * Basic tests through Facade.
+	 * 
+	 * @return void
+	 */
+	public function testBasicThroughFacade()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

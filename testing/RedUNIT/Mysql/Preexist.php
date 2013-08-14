@@ -13,6 +13,11 @@
  */
 class RedUNIT_Mysql_Preexist extends RedUNIT_Mysql
 {
+	/**
+	 * Test integration with pre-existing schemas.
+	 * 
+	 * @return void
+	 */
 	public function unnamed0()
 	{
 		$toolbox     = R::$toolbox;

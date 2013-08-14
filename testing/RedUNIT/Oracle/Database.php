@@ -13,7 +13,12 @@
  */
 class RedUNIT_Oracle_Database extends RedUNIT_Oracle
 {
-	public function unnamed0()
+	/**
+	 * Various tests for OCI.
+	 * 
+	 * @return void
+	 */
+	public function testVaria()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

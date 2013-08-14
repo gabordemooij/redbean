@@ -19,7 +19,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 	 * 
 	 * @return void
 	 */
-	public function run() {
+	public function testFinding() {
 		
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

@@ -13,7 +13,13 @@
  */
 class RedUNIT_Base_Typechecking extends RedUNIT_Base
 {
-	public function unnamed0()
+	
+	/**
+	 * Test bean type checking.
+	 * 
+	 * @return void
+	 */
+	public function testBeanTypeChecking()
 	{
 		$redbean = R::$redbean;
 

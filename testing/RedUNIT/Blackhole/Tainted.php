@@ -13,7 +13,12 @@
  */
 class RedUNIT_Blackhole_Tainted extends RedUNIT_Blackhole
 {
-	public function unnamed0()
+	/**
+	 * Test tainted.
+	 * 
+	 * @return void
+	 */
+	public function testTainted()
 	{
 		testpack( 'Original Tainted Tests' );
 

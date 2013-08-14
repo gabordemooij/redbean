@@ -13,6 +13,11 @@
  */
 class RedUNIT_Base_Preloading extends RedUNIT_Base
 {
+	/**
+	 * Test Preload save.
+	 * 
+	 * @return void 
+	 */
 	public function testPreloadSave()
 	{
 		testpack( 'Can we save in preload ?' );
@@ -83,6 +88,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		asrt( count( $foundMagazine->ownPage ), 1 );
 	}
 
+	/**
+	 * Test shadow updates.
+	 * 
+	 * @return void
+	 */
 	public function testShadowUpdate()
 	{
 		testpack( 'Is the shadow updated ?' );
@@ -133,7 +143,12 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		asrt( count( $book->ownPage ), 3 );
 	}
 
-	public function unnamed2()
+	/**
+	 * Test list manipulation i.c.w preloading.
+	 * 
+	 * @return void
+	 */
+	public function testListManipulationAndPreloader()
 	{
 		$book = R::dispense( 'book' );
 
@@ -181,6 +196,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		asrt( count( $book->sharedPage ), 3 );
 	}
 
+	/**
+	 * Test no preloader.
+	 * 
+	 * @return void
+	 */
 	public function testNoPreload()
 	{
 		$books = R::dispense( 'book', 3 );
@@ -211,6 +231,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		}
 	}
 
+	/**
+	 * Test basic preloader.
+	 * 
+	 * @return void
+	 */
 	public function testPreload()
 	{
 		$books = R::dispense( 'book', 3 );
@@ -243,6 +268,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		}
 	}
 
+	/**
+	 * Test preloader and aliasing.
+	 * 
+	 * @return void
+	 */
 	public function testAliasedPreload()
 	{
 		$books = R::dispense( 'book', 3 );
@@ -275,6 +305,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		}
 	}
 
+	/**
+	 * Test various preloading combinations.
+	 * 
+	 * @return void
+	 */
 	public function testCombinedAndMultiple()
 	{
 		$books = R::dispense( 'book', 3 );
@@ -378,6 +413,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		}
 	}
 
+	/**
+	 * Test preloading with multiple items having the same parent.
+	 * 
+	 * @return void
+	 */
 	public function testMultipleSameParents()
 	{
 		$author = R::dispense( 'author' );
@@ -434,6 +474,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		asrt( (int) ( $text->page->id ), 0 );
 	}
 
+	/**
+	 * Test nested preloading.
+	 * 
+	 * @return void
+	 */
 	public function testNestedPreload()
 	{
 		$authors = R::dispense( 'author', 2 );
@@ -465,6 +510,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 	}
 
+	/**
+	 * Test nested preloading with aliasing.
+	 * 
+	 * @return void
+	 */
 	public function testNestedPreloadAlias()
 	{
 		$authors = R::dispense( 'author', 2 );
@@ -495,6 +545,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		asrt( ( $text->page->book->fetchAs( 'author' )->coauthor->id ) > 0, true );
 	}
 
+	/**
+	 * Test preloading own list with short notation.
+	 * 
+	 * @return void
+	 */
 	public function testPreloadOwnlistShort()
 	{
 		$tree = R::dispense( 'tree' );
@@ -512,6 +567,12 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		asrt( count( $tree->ownLeaf ), 3 );
 	}
 
+	/**
+	 * Test preloading own list.
+	 * (also short notation)
+	 * 
+	 * @return void
+	 */
 	public function testPreloadOwnlist()
 	{
 		$authors = R::dispense( 'author', 2 );
@@ -548,6 +609,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		asrt( count( $page->ownText ), 2 );
 	}
 
+	/**
+	 * test preloading of shared lists.
+	 * 
+	 * @return void
+	 */
 	public function testPreloadSharedLists()
 	{
 		list( $a1, $a2, $a3 ) = R::dispense( 'army', 3 );
@@ -721,6 +787,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		asrt( $text->page, null );
 	}
 
+	/**
+	 * Test preloading with closure (each). 
+	 *
+	 * @return void
+	 */
 	public function testClosure()
 	{
 		$books = R::dispense( 'book', 3 );
@@ -761,6 +832,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		);
 	}
 
+	/**
+	 * Test preloading with closure and abbreviations (*).
+	 * 
+	 * @return void
+	 */
 	public function testClosureAbbreviations()
 	{
 		$authors = R::dispense( 'author', 2 );
@@ -800,6 +876,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		);
 	}
 
+	/**
+	 * Test preloading with same-level abbreviations (&)
+	 * 
+	 * @return void
+	 */
 	public function testClosureAbbreviationsSameLevel()
 	{
 		$authors = R::dispense( 'author', 2 );
@@ -846,6 +927,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		);
 	}
 
+	/**
+	 * Test preloading with closure and abbr and own list.
+	 * 
+	 * @return void
+	 */
 	public function testClosureAbbreviationOwnlist()
 	{
 		$authors = R::dispense( 'author', 2 );
@@ -900,6 +986,11 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		);
 	}
 
+	/**
+	 * Test variations.
+	 * 
+	 * @return void
+	 */
 	public function testVariations()
 	{
 		$authors = R::dispense( 'author', 2 );
@@ -968,7 +1059,12 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		asrt( $i, 16 );
 	}
 
-	public function unnamed19()
+	/**
+	 * Test complex variations.
+	 * 
+	 * @return void
+	 */
+	public function testVariations2()
 	{
 		// Extra, test in combination with writer cache
 		R::$writer->setUseCache( true );
@@ -1228,7 +1324,12 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		);
 	}
 
-	public function unnamed20()
+	/**
+	 * Test preloading variations with caching.
+	 * 
+	 * @return void
+	 */
+	public function testPreloadingVariationsAndCache()
 	{
 		R::$writer->setUseCache( false );
 
@@ -1260,7 +1361,12 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 		asrt( count( $books[3]->sharedAd ), 0 );
 	}
 
-	public function unnamed21()
+	/**
+	 * Test variations and cache 2.
+	 * 
+	 * @return void
+	 */
+	public function testPreloadingVariationsAndCache2()
 	{
 		R::$writer->setUseCache( false );
 

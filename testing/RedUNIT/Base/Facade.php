@@ -23,7 +23,12 @@ class RedUNIT_Base_Facade extends RedUNIT_Base
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
 	}
 
-	public function unnamed0()
+	/**
+	 * Test common Facade usage scenarios.
+	 * 
+	 * @return void
+	 */
+	public function testCommonUsageFacade()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

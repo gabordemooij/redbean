@@ -14,8 +14,12 @@
 class RedUNIT_Base_Relations extends RedUNIT_Base
 {
 
-	
-	public function unnamed1()
+	/**
+	 * Test Relations and conditions.
+	 * 
+	 * @return void
+	 */
+	public function testRelationsAndConditions()
 	{
 		list( $book1, $book2 ) = R::dispense( 'book', 2 );
 
@@ -62,12 +66,17 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		asrt( count( $book1->ownPage ), 2 );
 		asrt( count( $book1->withCondition( ' thename = ? ', array( '1' ) )->ownPage ), 1 );
-
-		testpack( 'Test new shared relations with link conditions' );
 	}
 
-	public function unnamed2()
+	/**
+	 * Test filtering relations on links (using columns in the link table).
+	 * 
+	 * @return void
+	 */
+	public function testSharedLinkCond()
 	{
+		testpack( 'Test new shared relations with link conditions' );
+		
 		$w = R::$writer;
 
 		list( $b1, $b2 ) = R::dispense( 'book', 2 );
@@ -199,11 +208,16 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		R::$writer->setUseCache( false );
 
-		testpack( 'Test relatedCount()' );
 	}
 
-	public function unnamed3()
+	/**
+	 * Test related count
+	 */
+	public function testRelatedCount()
 	{
+
+		testpack('test relatedCount()');
+		
 		list( $d, $d2 ) = R::dispense( 'document', 2 );
 
 		list( $p, $p2, $p3 ) = R::dispense( 'page', 3 );
@@ -236,8 +250,13 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		R::store( $author );
 	}
-
-	public function testRelatedCount()
+	
+	/**
+	 * Test related count using via().
+	 * 
+	 * @return void
+	 */
+	public function testRelatedCountVia()
 	{
 		testpack( 'Test relatedCount with via()' );
 
@@ -253,7 +272,12 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( $shop->via( 'relation' )->countShared( 'customer' ), 13 );
 	}
 
-	public function unnamed5()
+	/**
+	 * Test counting and aliasing.
+	 * 
+	 * @return void
+	 */
+	public function testCountingAndAliasing()
 	{
 		$book = R::dispense( 'book' );
 
@@ -307,6 +331,11 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( $book2->withCondition( ' title = ? ', array( 'boe' ) )->countShared( 'book' ), 1 );
 	}
 
+	/**
+	 * Test via.
+	 * 
+	 * @return void
+	 */
 	public function testVia()
 	{
 		testpack( 'Test via()' );
@@ -324,7 +353,12 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( in_array( 'consult', R::$writer->getTables() ), true );
 	}
 
-	public function unnamed7()
+	/**
+	 * Test creation of link table.
+	 * 
+	 * @return void
+	 */
+	public function testCreationOfLinkTable()
 	{
 		asrt( in_array( 'consult', R::$writer->getTables() ), false );
 
@@ -338,8 +372,10 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 	/**
 	 * Fast track link block code should not affect self-referential N-M relations.
+	 * 
+	 * @return void
 	 */
-	public function unnamed8()
+	public function testFastTrackRelations()
 	{
 		testpack( 'Test fast-track linkBlock exceptions' );
 
@@ -429,6 +465,11 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		R::getWriter()->setUseCache( false );
 	}
 
+	/**
+	 * Test list beautifications.
+	 * 
+	 * @return void
+	 */
 	public function testListBeautifications()
 	{
 		testpack( 'Test list beautifications' );
@@ -466,6 +507,11 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( count( $bean->sharedAclRole ), 1 );
 	}
 
+	/**
+	 * Test list add and delete.
+	 * 
+	 * @return void
+	 */
 	public function testListAddDelete()
 	{
 		testpack( 'Test list add/delete scenarios.' );
@@ -520,7 +566,13 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		R::dependencies( array() );
 	}
 
-	public function unnamed11()
+	/**
+	 * Test basic and complex common usage scenarios for
+	 * relations and associations.
+	 * 
+	 * @return void
+	 */
+	public function testScenarios()
 	{
 		list( $q1, $q2 ) = R::dispense( 'quote', 2 );
 
@@ -1224,7 +1276,12 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		}
 	}
 
-	public function unnamed12()
+	/**
+	 * Test parent bean relations.
+	 * 
+	 * @return void
+	 */
+	public function testParentBean()
 	{
 		$village = R::dispense( 'village' );
 
@@ -1252,6 +1309,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 	/**
 	 * test N-M relations through intermediate beans
+	 * 
+	 * @return void
 	 */
 	public function testNMRelationsIntermediate()
 	{
@@ -1305,6 +1364,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 	/**
 	 * test emulation of sharedList through intermediate beans
+	 * 
+	 * @return void
 	 */
 	public function testSharedListIntermediate()
 	{
@@ -1340,6 +1401,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 	/**
 	 * test emulation via association renaming
+	 * 
+	 * @return void
 	 */
 	public function testAssociationRenaming()
 	{
@@ -1420,7 +1483,11 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( $exhibition->til, '2014-10-02' );
 	}
 	
-	
+	/**
+	 * Test don't try to store other things in shared list.
+	 * 
+	 * @return void
+	 */
 	public function testDontTryToStoreOtherThingsInSharedList() {
 
 		$book = R::dispense( 'book' );

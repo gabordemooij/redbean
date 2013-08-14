@@ -13,6 +13,11 @@
  */
 class RedUNIT_Base_Association extends RedUNIT_Base
 {
+	/**
+	 * MySQL specific tests.
+	 * 
+	 * @return void
+	 */
 	public function testMySQL()
 	{
 		if ( $this->currentlyActiveDriverID !== 'mysql' ) {
@@ -47,6 +52,12 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		}
 	}
 
+	/**
+	 * Test fast-track deletion, i.e. bypassing FUSE.
+	 * For link beans.
+	 * 
+	 * @return void
+	 */
 	public function testFastTrackDeletion()
 	{
 		testpack( 'Test fast-track deletion' );
@@ -71,6 +82,11 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( Model_Ghost_House::$deleted, false );
 	}
 
+	/**
+	 * Test self-referential associations.
+	 * 
+	 * @return void
+	 */
 	public function testCrossAssociation()
 	{
 		$ghost  = R::dispense( 'ghost' );
@@ -93,6 +109,11 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( Model_Ghost_Ghost::$deleted, false );
 	}
 
+	/**
+	 * Test limited support for polymorph associations.
+	 * 
+	 * @return void
+	 */
 	public function testPoly()
 	{
 		testpack( 'Testing poly' );
@@ -116,6 +137,11 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( $x->color, 'white' );
 	}
 
+	/**
+	 * Test limited support for 1-to-1 associations.
+	 * 
+	 * @return void
+	 */
 	public function testOneToOne()
 	{
 		testpack( 'Testing one-to-ones' );
@@ -159,6 +185,11 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( ( count( R::loadMulti( null, 1 ) ) === 0 ), true );
 	}
 
+	/**
+	 * Test single column bases unique constraints.
+	 * 
+	 * @return void
+	 */
 	public function testSingleColUniqueConstraint()
 	{
 		testpack( 'Testing unique constraint on single column' );
@@ -216,6 +247,11 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( R::count( 'book' ), 1 );
 	}
 
+	/**
+	 * Test multiple assiociation.
+	 * 
+	 * @return void
+	 */
 	public function testMultiAssociationDissociation()
 	{
 		$wines  = R::dispense( 'wine', 3 );
@@ -263,7 +299,12 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( count( $wines[2]->sharedOlive ), 0 );
 	}
 
-	public function unnamed6()
+	/**
+	 * Test some frequently used scenarios.
+	 * 
+	 * @return void
+	 */
+	public function testAssocVariations()
 	{
 		try {
 			R::related( null, 'book' );
@@ -292,6 +333,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		$books    = R::dispense( 'book', 5 );
 
 		$i        = 1;
+
 		foreach ( $books as $b ) {
 			$b->title = 'b' . ( $i++ );
 
@@ -339,7 +381,13 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( $found, 1 );
 	}
 
-	public function unnamed7()
+	/**
+	 * Test legacy methods, backward compatibility with removed
+	 * setAssoc function.
+	 * 
+	 * @return void
+	 */
+	public function testBackwardCompat()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
@@ -505,7 +553,12 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( $page->name, "test page" );
 	}
 
-	public function unnamed8()
+	/**
+	 * Test areRelated().
+	 * 
+	 * @return void
+	 */
+	public function testAreRelatedAndVariations()
 	{
 		$sheep = R::dispense( 'sheep' );
 

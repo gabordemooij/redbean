@@ -13,7 +13,13 @@
  */
 class RedUNIT_Base_Issue259 extends RedUNIT_Base
 {
-	public function unnamed0()
+	/**
+	 * Test to make sure stash cache works with recursively opening models
+	 * with FUSE.
+	 * 
+	 * @return void
+	 */
+	public function testIssue259()
 	{
 		testpack( 'Testing Issue #259 - Stash Cache breaks model delegation in open().' );
 
@@ -37,7 +43,9 @@ class RedUNIT_Base_Issue259 extends RedUNIT_Base
 		R::load( 'child', $id );
 	}
 }
-
+/**
+ * Mock Model.
+ */
 class Model_Mother extends RedBean_SimpleModel
 {
 	public function open()
@@ -47,7 +55,9 @@ class Model_Mother extends RedBean_SimpleModel
 		asrt( $this->bean->desc, 'I am mother' );
 	}
 }
-
+/**
+ * Mock Model.
+ */
 class Model_Child extends RedBean_SimpleModel
 {
 	public function open()

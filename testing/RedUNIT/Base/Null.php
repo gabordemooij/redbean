@@ -13,6 +13,12 @@
  */
 class RedUNIT_Base_Null extends RedUNIT_Base
 {
+	/**
+	 * Test NULL handling, setting a property to NULL must
+	 * cause a change.
+	 * 
+	 * @return void
+	 */
 	public function unnamed0()
 	{
 		// NULL can change bean
@@ -68,6 +74,8 @@ class RedUNIT_Base_Null extends RedUNIT_Base
 	 * Normally if you store NULL, the smallest type (bool/set) will
 	 * be selected. However in case of a foreign key type INT should
 	 * be selected because fks columns require matching types.
+	 * 
+	 * @return void
 	 */
 	public function ColumnType()
 	{
@@ -84,6 +92,11 @@ class RedUNIT_Base_Null extends RedUNIT_Base
 		asrt( $page->getMeta( 'cast.book_id' ), 'id' );
 	}
 
+	/**
+	 * Test meta column type.
+	 * 
+	 * @return void
+	 */
 	public function TypeColumn()
 	{
 		$book = R::dispense( 'book' );

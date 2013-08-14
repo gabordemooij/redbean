@@ -13,9 +13,10 @@
  */
 class RedUNIT_Postgres extends RedUNIT
 {
-
 	/*
 	 * What drivers should be loaded for this test pack?
+	 * 
+	 * @return array
 	 */
 	public function getTargetDrivers()
 	{

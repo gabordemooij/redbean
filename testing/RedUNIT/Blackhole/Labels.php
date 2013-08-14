@@ -14,6 +14,11 @@
 
 class RedUNIT_Blackhole_Labels extends RedUNIT_Blackhole
 {
+	/**
+	 * Test basic labels.
+	 * 
+	 * @return void
+	 */
 	public function testLabels()
 	{
 		testpack( 'Test Labels' );

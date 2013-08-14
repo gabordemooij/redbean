@@ -14,7 +14,12 @@
 class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 {
 
-	public function unnamed0()
+	/**
+	 * Test REST interface.
+	 * 
+	 * @return void
+	 */
+	public function testREST()
 	{
 		testpack( 'Test new Resty BeanCan' );
 

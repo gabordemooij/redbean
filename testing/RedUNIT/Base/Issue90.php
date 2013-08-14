@@ -13,7 +13,13 @@
  */
 class RedUNIT_Base_Issue90 extends RedUNIT_Base
 {
-	public function unnamed0()
+	/**
+	 * Test for issue90.
+	 * Checking 'own' relationship, makes it impossible to trash a bean.
+	 *
+	 * @return void
+	 */
+	public function testIssue90()
 	{
 		$s = R::dispense( 'box' );
 

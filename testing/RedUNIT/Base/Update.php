@@ -13,7 +13,15 @@
  */
 class RedUNIT_Base_Update extends RedUNIT_Base
 {
-	public function unnamed0()
+	
+	/**
+	 * All kinds of tests for basic CRUD.
+	 * 
+	 * Does the data survive?
+	 * 
+	 * @return void
+	 */
+	public function testUpdatingBeans()
 	{
 		testpack( 'Test basic support UUID/override ID default value' );
 

@@ -13,6 +13,11 @@
  */
 class RedUNIT_Base_Dup extends RedUNIT_Base
 {
+	/**
+	 * Test exportAll and caching.
+	 * 
+	 * @return void
+	 */
 	public function testExportAllAndCache()
 	{
 		testpack( 'exportAll() and Cache' );
@@ -100,6 +105,11 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 		R::$duplicationManager->setCacheTables( false );
 	}
 
+	/**
+	 * Test duplication and caching.
+	 * 
+	 * @return void
+	 */
 	public function DupAndCache()
 	{
 		testpack( 'Dup() and Cache' );
@@ -209,6 +219,11 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 		asrt( ( $len1 > $len2 ), true );
 	}
 
+	/**
+	 * Test duplication and tainting.
+	 * 
+	 * @return void
+	 */
 	public function testDupAndExportNonTainting()
 	{
 		testpack( 'Dup() and Export() should not taint beans' );
@@ -268,6 +283,11 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 		R::freeze( false );
 	}
 
+	/**
+	 * Test exporting with filters.
+	 * 
+	 * @return void
+	 */
 	public function ExportWithFilters()
 	{
 		testpack( 'Export with filters' );
@@ -396,6 +416,11 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 		asrt( isset( $export['ownPage'][0] ), true );
 	}
 
+	/**
+	 * Helper function getCache().
+	 * 
+	 * @return array
+	 */
 	private function getCache()
 	{
 		return array(

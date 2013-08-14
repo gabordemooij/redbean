@@ -13,6 +13,11 @@
  */
 class RedUNIT_Plugin_Timeline extends RedUNIT_Plugin
 {
+	/**
+	 * Test TimeLine plugin.
+	 * 
+	 * @return void
+	 */
 	public function unnamed0()
 	{
 		// test for correct exception in case of non-existant file.

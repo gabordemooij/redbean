@@ -14,7 +14,12 @@
 
 class RedUNIT_Oracle_Base extends RedUNIT_Oracle
 {
-	public function unnamed0()
+	/**
+	 * Various.
+	 * 
+	 * @return void
+	 */
+	public function testOCIVaria()
 	{
 		$village = R::dispense( 'village' );
 

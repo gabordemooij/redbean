@@ -13,7 +13,12 @@
  */
 class RedUNIT_Sqlite_Foreignkeys extends RedUNIT_Sqlite
 {
-	public function unnamed0()
+	/**
+	 * Test foreign keys with SQLite.
+	 * 
+	 * @return void
+	 */
+	public function testForeignKeysWithSQLite()
 	{
 		$book  = R::dispense( 'book' );
 		$page  = R::dispense( 'page' );

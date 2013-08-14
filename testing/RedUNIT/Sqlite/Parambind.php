@@ -13,7 +13,12 @@
  */
 class RedUNIT_Sqlite_Parambind extends RedUNIT_Sqlite
 {
-	public function unnamed0()
+	/**
+	 * Test parameter binding with SQLite.
+	 * 
+	 * @return void
+	 */
+	public function testParamBindWithSQLite()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

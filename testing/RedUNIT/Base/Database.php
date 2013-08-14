@@ -21,7 +21,12 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
 	}
 
-	public function unnamed0()
+	/**
+	 * Test the database driver and low level functions.
+	 * 
+	 * @return void
+	 */
+	public function testDriver()
 	{
 		$currentDriver = $this->currentlyActiveDriverID;
 
@@ -144,6 +149,11 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 		asrt( (int) $page->id, $id );
 	}
 
+	/**
+	 * Test selecting.
+	 * 
+	 * @return void
+	 */
 	public function testSelects()
 	{
 		$rooms = R::dispense( 'room', 2 );
@@ -183,6 +193,9 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 	}
 }
 
+/**
+ * Malfunctioning database adapter to test exceptions.
+ */
 class TroubleDapter extends RedBean_Adapter_DBAdapter
 {
 	private $sqlState;

@@ -24,7 +24,12 @@ class RedUNIT_Base_With extends RedUNIT_Base
 		return array( 'mysql' );
 	}
 
-	public function unnamed0()
+	/**
+	 * Test embedded SQL snippets using with and withCondition.
+	 * 
+	 * @return void
+	 */
+	public function testEmbeddedSQL()
 	{
 		list( $page1, $page2, $page3 ) = R::dispense( 'page', 3 );
 
@@ -64,7 +69,12 @@ class RedUNIT_Base_With extends RedUNIT_Base
 		asrt( $homepage->name, 'homepage' );
 	}
 
-	public function unnamed1()
+	/**
+	 * More variations...
+	 * 
+	 * @return void
+	 */
+	public function testEmbeddedSQLPart2()
 	{
 		list( $book1, $book2, $book3 ) = R::dispense( 'book', 3 );
 

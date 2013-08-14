@@ -13,7 +13,12 @@
  */
 class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 {
-	public function unnamed0()
+	/**
+	 * Test dependency injection with RedBeanPHP.
+	 * 
+	 * @return void
+	 */
+	public function testDependencyInjection()
 	{
 		// base scenario
 		$geek = R::dispense( 'geek' );

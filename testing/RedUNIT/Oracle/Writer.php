@@ -13,7 +13,12 @@
  */
 class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 {
-	public function unnamed0()
+	/**
+	 * Test scanning and coding.
+	 * 
+	 * @return void
+	 */
+	public function testScanningAndCoding()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
@@ -396,6 +401,11 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		pass();
 	}
 
+	/**
+	 * Test special data types.
+	 * 
+	 * @return void
+	 */
 	public function testTypes()
 	{
 		testpack( 'Special data types' );
@@ -421,6 +431,11 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		asrt( $cols['date'], 'NVARCHAR2(255)' );
 	}
 
+	/**
+	 * Test dates.
+	 * 
+	 * @return void
+	 */
 	public function testTypesDates()
 	{
 		$bean = R::dispense( 'bean' );
@@ -434,6 +449,11 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		asrt( $cols['date'], 'DATE' );
 	}
 
+	/**
+	 * Datetime.
+	 * 
+	 * @return void
+	 */
 	public function testTypesDateTimes()
 	{
 		$bean = R::dispense( 'bean' );
@@ -529,6 +549,12 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		asrt( R::getCell( 'SELECT AsText(location) FROM place LIMIT 1' ), $data );
 	}
 
+	/**
+	 * Internal.
+	 * 
+	 * @param mixed  $adapter adapter
+	 * @param string $table   table
+	 */
 	private function dropTableIfExists( $adapter, $table )
 	{
 		$adapter->exec( "BEGIN

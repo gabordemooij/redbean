@@ -13,7 +13,6 @@
  */
 class RedUNIT_Blackhole extends RedUNIT
 {
-
 	/**
 	 * Returns the drivers this test suite applies to.
 	 *

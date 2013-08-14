@@ -13,7 +13,12 @@
  */
 class RedUNIT_Sqlite_Rebuild extends RedUNIT_Sqlite
 {
-	public function unnamed0()
+	/**
+	 * Test SQLite table rebuilding.
+	 * 
+	 * @return void
+	 */
+	public function testRebuilder()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

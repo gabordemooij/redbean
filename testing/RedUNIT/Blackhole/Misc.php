@@ -22,6 +22,11 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		return array( 'sqlite' );
 	}
 
+	/**
+	 * Test debugging with custom logger.
+	 * 
+	 * @return void
+	 */
 	public function testDebugCustomLogger()
 	{
 		testpack( 'Test debug mode with custom logger' );
@@ -72,6 +77,11 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		asrt( trim( $sql ), 'camelCase' );
 	}
 
+	/**
+	 * Test with plus query builder.
+	 * 
+	 * @return void
+	 */
 	public function testWithWithConditionQueryBuilder()
 	{
 		testpack( 'Test with- and withCondition with Query Builder' );
@@ -131,6 +141,13 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		R::freeze( false );
 	}
 
+	/**
+	 * Test Facade transactions.
+	 * 
+	 * @return void
+	 * 
+	 * @throws Exception
+	 */
 	public function testTransactionInFacade()
 	{
 		testpack( 'Test transaction in facade' );

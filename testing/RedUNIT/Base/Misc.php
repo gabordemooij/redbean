@@ -13,6 +13,11 @@
  */
 class RedUNIT_Base_Misc extends RedUNIT_Base
 {
+	/**
+	 * Test limited support for UUIDs.
+	 * 
+	 * @return void
+	 */
 	public function testUUIDs()
 	{
 		testpack( 'Test basic support UUIDs' );
@@ -46,6 +51,11 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		asrt( R::$writer->safeTable( 'table', false ), R::$writer->esc( 'table', false ) );
 	}
 
+	/**
+	 * Test beautification of column names.
+	 * 
+	 * @return void
+	 */
 	public function testBeautifulColumnNames()
 	{
 		testpack( 'Beautiful column names' );
@@ -219,9 +229,11 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	}
 
 	/**
-	 *
+	 * Test reflectional functions of database.
+	 * 
+	 * @return void
 	 */
-	public function unnamed1()
+	public function testDatabaseProperties()
 	{
 		testpack( 'Testing Database Properties' );
 
@@ -236,9 +248,11 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	}
 
 	/**
-	 *
+	 * Misc Test relations...
+	 * 
+	 * @return void
 	 */
-	public function unnamed2()
+	public function testRelationsVariation()
 	{
 		$track = R::dispense( 'track' );
 		$album = R::dispense( 'cd' );
@@ -303,7 +317,9 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	}
 
 	/**
-	 *
+	 * Test Transactions.
+	 * 
+	 * @return void
 	 */
 	public function testTransactions()
 	{
@@ -339,7 +355,9 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	}
 
 	/**
-	 *
+	 * Test nested FUSE scenarios.
+	 * 
+	 * @return void
 	 */
 	public function testFUSEnested()
 	{
@@ -380,9 +398,12 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	}
 
 	/**
-	 *
+	 * Tests FUSE and lists, FUSE enforces no more than
+	 * 3 sugar cubes in coffee.
+	 * 
+	 * @return void
 	 */
-	public function unnamed5()
+	public function testCoffeeWithSugarAndFUSE()
 	{
 		$coffee = R::dispense( 'coffee' );
 
@@ -438,6 +459,11 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		asrt( $b, '[test] - ' );
 	}
 
+	/**
+	 * Test ENUM functionality offered by Label Maker.
+	 * 
+	 * @return void
+	 */
 	public function testENUM() {
 		
 		testpack('test ENUM');

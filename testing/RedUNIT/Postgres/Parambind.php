@@ -13,7 +13,12 @@
  */
 class RedUNIT_Postgres_Parambind extends RedUNIT_Postgres
 {
-	public function unnamed0()
+	/**
+	 * Test parameter binding.
+	 * 
+	 * @return void
+	 */
+	public function testParamBindingWithPostgres()
 	{
 		testpack( "param binding pgsql" );
 

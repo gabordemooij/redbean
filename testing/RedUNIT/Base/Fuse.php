@@ -13,7 +13,14 @@
  */
 class RedUNIT_Base_Fuse extends RedUNIT_Base
 {
-	public function unnamed0()
+	/**
+	 * Test FUSE and model formatting.
+	 * 
+	 * @todo move tagging tests to tag tester.
+	 * 
+	 * @return void
+	 */
+	public function testFUSE()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

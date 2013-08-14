@@ -13,7 +13,12 @@
  */
 class RedUNIT_Base_Dispense extends RedUNIT_Base
 {
-	public function unnamed0()
+	/**
+	 * Test dispense.
+	 * 
+	 * @return void
+	 */
+	public function testBasicsDispense()
 	{
 		$redbean = R::$redbean;
 

@@ -13,6 +13,11 @@
  */
 class RedUNIT_Blackhole_Meta extends RedUNIT_Blackhole
 {
+	/**
+	 * Test meta data methods.
+	 * 
+	 * @return void
+	 */
 	public function testMetaData()
 	{
 		testpack( 'Test meta data' );

@@ -13,6 +13,12 @@
  */
 class RedUNIT_Base_Close extends RedUNIT_Base
 {
+	
+	/**
+	 * Test closing database connection.
+	 * 
+	 * @return void
+	 */
 	public function testClose()
 	{
 		asrt( R::$adapter->getDatabase()->isConnected(), true );

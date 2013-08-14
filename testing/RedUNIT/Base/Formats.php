@@ -13,7 +13,14 @@
  */
 class RedUNIT_Base_Formats extends RedUNIT_Base
 {
-	public function unnamed0()
+	/**
+	 * Tests table formatting handling.
+	 * 
+	 * No longer in use?
+	 * 
+	 * @return void
+	 */
+	public function testTableFormattingHandling()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

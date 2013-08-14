@@ -13,7 +13,12 @@
  */
 class RedUNIT_Mysql_Foreignkeys extends RedUNIT_Mysql
 {
-	public function unnamed0()
+	/**
+	 * Basic FK tests.
+	 * 
+	 * @return void
+	 */
+	public function testFKS()
 	{
 		$book  = R::dispense( 'book' );
 		$page  = R::dispense( 'page' );
@@ -94,6 +99,11 @@ class RedUNIT_Mysql_Foreignkeys extends RedUNIT_Mysql
 		}
 	}
 
+	/**
+	 * Test widen for constraint.
+	 * 
+	 * @return void
+	 */
 	public function testWideningColumnForConstraint()
 	{
 		testpack( 'widening column for constraint' );

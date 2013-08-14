@@ -13,6 +13,11 @@
  */
 class RedUNIT_Base_Count extends RedUNIT_Base
 {
+	/**
+	 * Test count and wipe.
+	 * 
+	 * @return void
+	 */
 	public function testCountAndWipe()
 	{
 		testpack( "Test count and wipe" );

@@ -22,7 +22,12 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
 	}
 
-	public function unnamed0()
+	/**
+	 * Test effects of cache.
+	 * 
+	 * @return void
+	 */
+	public function testCachingEffects()
 	{
 		testpack( 'Testing WriteCache Query Writer Cache' );
 
@@ -196,6 +201,11 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
 	}
 
+	/**
+	 * Try to fool the cache :)
+	 * 
+	 * @return void
+	 */
 	public function testRegressions()
 	{
 		testpack( 'Testing possible regressions: Try to fool the cache' );
@@ -222,7 +232,12 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( $bean->title, 'xxx' );
 	}
 
-	public function unnamed2()
+	/**
+	 * Test keep-cache comment.
+	 * 
+	 * @return void
+	 */
+	public function testKeepCacheCommentInSQL()
 	{
 		$bean = R::dispense( 'bean' );
 
@@ -244,6 +259,12 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( $bean->title, 'xxx' );
 	}
 
+	/**
+	 * 
+	 * Same as above.. test keep cache.
+	 * 
+	 * @return void
+	 */
 	public function testInstructNoDrop()
 	{
 		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', true ) . ' -- keep-cache';
@@ -290,6 +311,11 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( $bean->title, 'xxx' );
 	}
 
+	/**
+	 * Can we confuse the cache?
+	 * 
+	 * @return void
+	 */
 	public function testConfusionRegression()
 	{
 		testpack( 'Testing possible confusion regression' );
@@ -315,6 +341,11 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( $bean->title, 'abc2' );
 	}
 
+	/**
+	 * Test Ghost beans....
+	 * 
+	 * @return void
+	 */
 	public function testGhostBeans()
 	{
 		testpack( 'Testing ghost beans' );
@@ -332,6 +363,11 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( (int) $bean->id, 0 );
 	}
 
+	/**
+	 * Test explicit flush.
+	 * 
+	 * @return void
+	 */
 	public function testExplicitCacheFlush()
 	{
 		testpack( 'Test cache flush (explicit)' );

@@ -13,7 +13,10 @@
  */
 class RedUNIT_Postgres_Foreignkeys extends RedUNIT_Postgres
 {
-	public function unnamed0()
+	/**
+	 * Test foreign keys with postgres.
+	 */
+	public function testForeignKeysWithPostgres()
 	{
 		testpack( 'Test Postgres Foreign keys' );
 

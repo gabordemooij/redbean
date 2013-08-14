@@ -14,7 +14,12 @@
 
 class RedUNIT_Base_Cross extends RedUNIT_Base
 {
-	public function unnamed0()
+	/**
+	 * Test self referential N-M relations (page_page).
+	 * 
+	 * @return void
+	 */
+	public function testSelfReferential()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
@@ -86,8 +91,6 @@ class RedUNIT_Base_Cross extends RedUNIT_Base
 		} catch ( RedBean_Exception_SQL $e ) {
 			fail();
 		}
-
-		//try{ $a->associate($page2,$page2); fail(); }catch(RedBean_Exception_SQL $e){ pass(); }
 
 		$pageOne = $redbean->dispense( "page" );
 

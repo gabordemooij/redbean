@@ -13,7 +13,12 @@
  */
 class RedUNIT_Blackhole_Version extends RedUNIT_Blackhole
 {
-	public function run()
+	/**
+	 * Test version info.
+	 * 
+	 * @return void
+	 */
+	public function testVersion()
 	{
 		$version = R::getVersion();
 

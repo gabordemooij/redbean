@@ -22,7 +22,12 @@ class RedUNIT_Plugin_Cache extends RedUNIT_Plugin
 		return array( 'sqlite' );
 	}
 
-	public function unnamed()
+	/**
+	 * Caching tests.
+	 * 
+	 * @return void
+	 */
+	public function testCache()
 	{
 		$t = R::$toolbox;
 

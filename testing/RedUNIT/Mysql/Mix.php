@@ -13,7 +13,13 @@
  */
 class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 {
-	public function unnamed0()
+	
+	/**
+	 * Test query building.
+	 * 
+	 * @return void
+	 */
+	public function testQueryBuilderMix()
 	{
 		$toolbox = R::$toolbox;
 

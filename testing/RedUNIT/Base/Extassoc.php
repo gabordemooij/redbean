@@ -13,7 +13,12 @@
  */
 class RedUNIT_Base_Extassoc extends RedUNIT_Base
 {
-	public function unnamed0()
+	/**
+	 * Test extended associations.
+	 * 
+	 * @return void
+	 */
+	public function testExtAssoc()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

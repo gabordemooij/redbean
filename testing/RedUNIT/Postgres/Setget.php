@@ -13,6 +13,11 @@
  */
 class RedUNIT_Postgres_Setget extends RedUNIT_Postgres
 {
+	/**
+	 * Test numbers.
+	 * 
+	 * @return void
+	 */
 	public function testNumbers()
 	{
 		asrt( setget( "-1" ), "-1" );
@@ -40,6 +45,11 @@ class RedUNIT_Postgres_Setget extends RedUNIT_Postgres
 		asrt( setget( "-199936710040730" ), "-199936710040730" );
 	}
 
+	/**
+	 * Test dates.
+	 * 
+	 * @return void
+	 */
 	public function testDates()
 	{
 		asrt( setget( "2010-10-11" ), "2010-10-11" );
@@ -51,6 +61,11 @@ class RedUNIT_Postgres_Setget extends RedUNIT_Postgres
 		asrt( setget( "x2010-10-11 12:10:11" ), "x2010-10-11 12:10:11" );
 	}
 
+	/**
+	 * Test strings.
+	 * 
+	 * @return void
+	 */
 	public function testStrings()
 	{
 		asrt( setget( "a" ), "a" );
@@ -62,6 +77,11 @@ class RedUNIT_Postgres_Setget extends RedUNIT_Postgres
 		asrt( setget( "just some text" ), "just some text" );
 	}
 
+	/**
+	 * Test booleans.
+	 * 
+	 * @return void
+	 */
 	public function testBool()
 	{
 		asrt( setget( true ), "1" );
@@ -71,6 +91,11 @@ class RedUNIT_Postgres_Setget extends RedUNIT_Postgres
 		asrt( setget( "false" ), "false" );
 	}
 
+	/**
+	 * Test NULL.
+	 * 
+	 * @return void
+	 */
 	public function testNull()
 	{
 		asrt( setget( "null" ), "null" );

@@ -13,7 +13,12 @@
  */
 class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 {
-	public function unnamed0()
+	/**
+	 * Test parameter binding with PDO.
+	 * 
+	 * @return void
+	 */
+	public function testPDOParameterBinding()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();
