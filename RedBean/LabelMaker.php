@@ -78,16 +78,13 @@ class RedBean_LabelMaker
 	/**
 	 * Returns a label or an array of labels for use as ENUMs.
 	 * 
-	 * @staticvar array $enums
-	 * 
 	 * @param string $enum ENUM specification for label
 	 * 
 	 * @return array|RedBean_OODBBean
 	 */
 	public function enum( $enum )
 	{
-		static $enums = array();
-		$oodb         = $this->toolbox->getRedBean();
+		$oodb = $this->toolbox->getRedBean();
 		
 		if ( strpos( $enum, ':' ) === false ) {
 			$type  = $enum;
@@ -97,15 +94,13 @@ class RedBean_LabelMaker
 			$value                = strtoupper( $value );
 		}
 		
-		if ( !isset( $enums[$type] ) ) {
-			$enums[$type] = $oodb->find( $type );
-		}
+		$values = $oodb->find( $type );
 		
 		if ( $value === false ) {
-			return $enums[$type];
+			return $values;
 		}
 		
-		foreach( $enums[$type] as $enumItem ) {
+		foreach( $values as $enumItem ) {
 				if ( $enumItem->name === $value ) return $enumItem;	
 		}
 		
@@ -113,8 +108,6 @@ class RedBean_LabelMaker
 		$newEnumItem  = reset( $newEnumItems );
 		
 		$oodb->store( $newEnumItem );
-		
-		if ( isset( $enums[$type] ) ) unset($enums[$type]);
 		
 		return $newEnumItem;
 	}
