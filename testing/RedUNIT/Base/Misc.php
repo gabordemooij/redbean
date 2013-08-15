@@ -467,7 +467,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	public function testENUMBasics() {
 		asrt( R::enum( 'gender:male' )->name, 'MALE' );
 		asrt( R::enum( 'country:South-Africa' )->name, 'SOUTH_AFRICA');
-		asrt( R::enum( 'test:T@E  S_t' )->name, 'T_E__S_T');
+		asrt( R::enum( 'tester:T@E  S_t' )->name, 'T_E__S_T');
 	}
 
 	/**
