@@ -18,7 +18,7 @@ class RedUNIT_Plugin_Sync extends RedUNIT_Plugin
 	 * 
 	 * @return void
 	 */
-	public function unnamed0()
+	public function testSync()
 	{
 		testpack( 'Test Schema Syncing. Setup...' );
 

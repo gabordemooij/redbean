@@ -18,7 +18,7 @@ class RedUNIT_Mysql_Preexist extends RedUNIT_Mysql
 	 * 
 	 * @return void
 	 */
-	public function unnamed0()
+	public function testPlaysNiceWithPreExitsingSchema()
 	{
 		$toolbox     = R::$toolbox;
 		$adapter     = $toolbox->getDatabaseAdapter();

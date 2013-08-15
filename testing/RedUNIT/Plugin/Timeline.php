@@ -18,7 +18,7 @@ class RedUNIT_Plugin_Timeline extends RedUNIT_Plugin
 	 * 
 	 * @return void
 	 */
-	public function unnamed0()
+	public function testTimeLineLogger()
 	{
 		// test for correct exception in case of non-existant file.
 		try {

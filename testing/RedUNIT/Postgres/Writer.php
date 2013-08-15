@@ -154,7 +154,10 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 	}
 
 	/**
-	 * Various
+	 * Various.
+	 * Tests whether writer correctly handles keyword 'group' and SQL state 23000 issue.
+	 * These tests remain here to make sure issues 9 and 10 never happen again.
+	 * However this bug will probably never re-appear due to changed architecture.
 	 * 
 	 * @return void
 	 */
@@ -212,7 +215,10 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 	}
 
 	/**
-	 * Various
+	 * Test various.
+	 * Test various somewhat uncommon trash/unassociate scenarios.
+	 * (i.e. unassociate unrelated beans, trash non-persistant beans etc).
+	 * Should be handled gracefully - no output checking.
 	 * 
 	 * @return void
 	 */

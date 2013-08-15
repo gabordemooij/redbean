@@ -14,11 +14,13 @@
 class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 {
 	/**
-	 * Test Freeze.
+	 * Tests freezing the database.
+	 * After freezing the database, schema modifications are no longer
+	 * allowed and referring to missing columns will now cause exceptions.
 	 * 
 	 * @return void
 	 */
-	public function unnamed0()
+	public function testFreezer()
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();

@@ -141,7 +141,13 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_player_accou' ) !== false, true );
 	}
 
-	public function unnamed2()
+	/**
+	 * Tests whether foreign keys are created correctly for certain
+	 * relations.
+	 * 
+	 * @return void
+	 */
+	public function testCreationOfForeignKeys()
 	{
 		$this->queries = array();
 

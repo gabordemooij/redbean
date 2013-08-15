@@ -16,6 +16,8 @@ class RedUNIT_Oracle_Base extends RedUNIT_Oracle
 {
 	/**
 	 * Various.
+	 * Various test for OCI. Some basic test cannot be performed because
+	 * practical issues (configuration testing VM image etc..).
 	 * 
 	 * @return void
 	 */

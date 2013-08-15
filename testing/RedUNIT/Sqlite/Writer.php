@@ -137,11 +137,14 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 	}
 
 	/**
-	 * Various
+	 * Various.
+	 * Tests whether writer correctly handles keyword 'group' and SQL state 23000 issue.
+	 * These tests remain here to make sure issues 9 and 10 never happen again.
+	 * However this bug will probably never re-appear due to changed architecture.
 	 * 
 	 * @return void
 	 */
-	public function testVaria()
+	public function testIssue9and10()
 	{
 		$toolbox = R::$toolbox;
 		$redbean = $toolbox->getRedBean();
@@ -194,6 +197,9 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 
 	/**
 	 * Test various.
+	 * Test various somewhat uncommon trash/unassociate scenarios.
+	 * (i.e. unassociate unrelated beans, trash non-persistant beans etc).
+	 * Should be handled gracefully - no output checking.
 	 * 
 	 * @return void
 	 */

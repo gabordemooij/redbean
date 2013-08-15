@@ -19,7 +19,7 @@ class RedUNIT_Base_Null extends RedUNIT_Base
 	 * 
 	 * @return void
 	 */
-	public function unnamed0()
+	public function testBasicNullHandling()
 	{
 		// NULL can change bean
 		$bean      = R::dispense( 'bean' );
