@@ -460,6 +460,17 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	}
 
 	/**
+	* ENUM Basic tests.
+	*
+	* @return void
+	*/
+	public function testENUMBasics() {
+		asrt( R::enum( 'gender:male' )->name, 'MALE' );
+		asrt( R::enum( 'country:South-Africa' )->name, 'SOUTH_AFRICA');
+		asrt( R::enum( 'test:T@E  S_t' )->name, 'T_E__S_T');
+	}
+
+	/**
 	 * Test ENUM functionality offered by Label Maker.
 	 * 
 	 * @return void
@@ -467,7 +478,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	public function testENUM() {
 		
 		testpack('test ENUM');
-		
+
 		$coffee = R::dispense( 'coffee' );
 		$coffee->taste = R::enum( 'flavour:mocca' );
 		

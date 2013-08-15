@@ -91,7 +91,7 @@ class RedBean_LabelMaker
 			$value = false;
 		} else {
 			list( $type, $value ) = explode( ':', $enum );
-			$value                = strtoupper( $value );
+			$value                = preg_replace( '/\W/', '_', strtoupper( trim( $value ) ) );
 		}
 		
 		$values = $oodb->find( $type );
