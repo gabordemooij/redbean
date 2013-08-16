@@ -35,12 +35,12 @@ class RedUNIT_Base_Close extends RedUNIT_Base
 		asrt( ( $id > 0 ), true );
 
 		// Test freeze via kickstart in setup
-		$toolbox = RedBean_Setup::kickstart( 'sqlite:/tmp/bla.txt', null, null, true );
+		$toolbox = RedBean_Setup::kickstart( 'sqlite:/tmp/bla.txt', null, null, "utf-8", true );
 
 		asrt( $toolbox->getRedBean()->isFrozen(), true );
 
 		// Test Oracle setup
-		$toolbox = RedBean_Setup::kickstart( 'oracle:test-value', 'test', 'test', false );
+		$toolbox = RedBean_Setup::kickstart( 'oracle:test-value', 'test', 'test', "utf-8", false );
 
 		asrt( ( $toolbox instanceof RedBean_ToolBox ), true );
 	}

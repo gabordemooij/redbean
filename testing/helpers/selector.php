@@ -41,7 +41,7 @@ require_once( '../RedUNIT/Plugin.php' );
 if ( isset( $ini['mysql'] ) ) {
 	$dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";
 
-	R::addDatabase( 'mysql', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], false );
+	R::addDatabase( 'mysql', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], "utf-8", false );
 
 	R::selectDatabase( 'mysql' );
 
@@ -51,17 +51,17 @@ if ( isset( $ini['mysql'] ) ) {
 if ( isset( $ini['pgsql'] ) ) {
 	$dsn = "pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
 
-	R::addDatabase( 'pgsql', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], false );
+	R::addDatabase( 'pgsql', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], "utf-8", false );
 }
 
 if ( isset( $ini['sqlite'] ) ) {
-	R::addDatabase( 'sqlite', 'sqlite:' . $ini['sqlite']['file'], null, null, false );
+	R::addDatabase( 'sqlite', 'sqlite:' . $ini['sqlite']['file'], null, null, "utf-8", false );
 }
 
 if ( isset( $ini['CUBRID'] ) ) {
 	$dsn = "cubrid:host={$ini['CUBRID']['host']};port=33000;dbname={$ini['CUBRID']['schema']}";
 
-	R::addDatabase( 'CUBRID', $dsn, $ini['CUBRID']['user'], $ini['CUBRID']['pass'], false );
+	R::addDatabase( 'CUBRID', $dsn, $ini['CUBRID']['user'], $ini['CUBRID']['pass'], "utf-8", false );
 
 	R::selectDatabase( 'CUBRID' );
 
@@ -69,7 +69,7 @@ if ( isset( $ini['CUBRID'] ) ) {
 }
 
 if ( isset( $ini['oracle'] ) ) {
-	R::addDatabase( 'oracle', $ini['oracle']['dsn'], $ini['oracle']['user'], $ini['oracle']['pass'], false );
+	R::addDatabase( 'oracle', $ini['oracle']['dsn'], $ini['oracle']['user'], $ini['oracle']['pass'], "utf-8", false );
 }
 
 R::selectDatabase( 'sqlite' );
