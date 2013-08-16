@@ -144,18 +144,18 @@ class RedBean_Facade
 	 * @param string  $dsn      Database connection string
 	 * @param string  $username Username for database
 	 * @param string  $password Password for database
-     * @param string  $encoding Encoding for connection, defaults to utf-8
 	 * @param boolean $frozen   TRUE if you want to setup in frozen mode
-	 *
+     * @param string  $encoding Encoding for connection, defaults to utf-8
+     *
 	 * @return RedBean_ToolBox
 	 */
-	public static function setup( $dsn = null, $username = null, $password = null, $encoding = "utf-8", $frozen = false )
+	public static function setup( $dsn = null, $username = null, $password = null, $frozen = false, $encoding = "utf-8" )
 	{
 		if ( is_null( $dsn ) ) {
 			$dsn = 'sqlite:/' . sys_get_temp_dir() . '/red.db';
 		}
 
-		self::addDatabase( 'default', $dsn, $username, $password, $encoding, $frozen );
+		self::addDatabase( 'default', $dsn, $username, $password, $frozen, $encoding );
 		self::selectDatabase( 'default' );
 
 		return self::$toolbox;
@@ -227,14 +227,14 @@ class RedBean_Facade
 	 * @param string      $dsn      DSN for the database
 	 * @param string      $user     User for connection
 	 * @param null|string $pass     Password for connection
-     * @param string      $encoding Encoding for connection, defaults to utf-8
 	 * @param bool        $frozen   Whether this database is frozen or not
-	 *
+     * @param string      $encoding Encoding for connection, defaults to utf-8
+     *
 	 * @return void
 	 */
-	public static function addDatabase( $key, $dsn, $user = null, $pass = null, $encoding = "utf-8", $frozen = false )
+	public static function addDatabase( $key, $dsn, $user = null, $pass = null, $frozen = false, $encoding = "utf-8" )
 	{
-		self::$toolboxes[$key] = RedBean_Setup::kickstart( $dsn, $user, $pass, $encoding, $frozen );
+		self::$toolboxes[$key] = RedBean_Setup::kickstart( $dsn, $user, $pass, $frozen, $encoding );
 	}
 
 	/**
