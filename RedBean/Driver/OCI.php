@@ -84,17 +84,18 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * Returns an instance of the OCI Driver.
 	 *
-	 * @param $dsn
-	 * @param $user
-	 * @param $pass
-	 * @param $dbname
+	 * @param  string   $dsn
+	 * @param  string   $user
+	 * @param  string   $pass
+	 * @param  string   $dbname
+     * @param  string   $encoding optional, connection encoding, defaults to utf-8
 	 *
 	 * @return RedBean_Driver_OCI
 	 */
-	public static function getInstance( $dsn, $user, $pass )
+	public static function getInstance( $dsn, $user, $pass, $encoding = "utf-8" )
 	{
 		if ( is_null( self::$instance ) ) {
-			self::$instance = new RedBean_Driver_OCI( $dsn, $user, $pass );
+			self::$instance = new RedBean_Driver_OCI( $dsn, $user, $pass, $encoding );
 		}
 
 		return self::$instance;
@@ -107,13 +108,14 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 *    $driver = new RedBean_Driver_OCI($dsn, $user, $password);
 	 *    $driver = new RedBean_Driver_OCI($existingConnection);
 	 *
-	 * @param string|resource $dsn     database connection string
-	 * @param string          $user    optional
-	 * @param string          $pass    optional
+	 * @param string|resource $dsn      database connection string
+	 * @param string          $user     optional
+	 * @param string          $pass     optional
+     * @param string          $encoding optional, connection encoding, defaults to utf-8
 	 *
 	 * @return void
 	 */
-	public function __construct( $dsn, $user = null, $pass = null )
+	public function __construct( $dsn, $user = null, $pass = null, $encoding = "utf-8" )
 	{
 		if ( is_resource($dsn) ) {
 			$this->connection  = $dsn;
@@ -123,7 +125,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 			$this->dsn         = $this->getDatabaseType();
 		} else {
 			$this->dsn         = substr( $dsn, 7 ); // remove 'oracle:'
-			$this->connectInfo = array( 'pass' => $pass, 'user' => $user );
+			$this->connectInfo = array( 'pass' => $pass, 'user' => $user, 'encoding' => $encoding );
 		}
 	}
 
@@ -212,8 +214,9 @@ class RedBean_Driver_OCI implements RedBean_Driver
 			return;
 		$user = $this->connectInfo['user'];
 		$pass = $this->connectInfo['pass'];
+        $encoding = $this->connectInfo['encoding'];
 
-		$this->connection = oci_connect( $user, $pass, $this->dsn, 'utf8' );
+		$this->connection = oci_connect( $user, $pass, $this->dsn, $encoding );
 		if ( !$this->connection ) {
 			$e = oci_error();
 

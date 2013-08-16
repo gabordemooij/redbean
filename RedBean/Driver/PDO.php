@@ -157,19 +157,20 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 *    $driver = new RedBean_Driver_PDO($dsn, $user, $password);
 	 *    $driver = new RedBean_Driver_PDO($existingConnection);
 	 *
-	 * @param string|PDO $dsn    database connection string
-	 * @param string     $user   optional, usename to sign in
-	 * @param string     $pass   optional, password for connection login
+     * @param string|PDO $dsn       database connection string
+     * @param string     $user      optional, usename to sign in
+     * @param string     $pass      optional, password for connection login
+     * @param string     $encoding  optional, encoding for connecntion, defaults to utf-8
 	 *
 	 */
-	public function __construct( $dsn, $user = null, $pass = null )
+    public function __construct( $dsn, $user = null, $pass = null, $encoding = "utf-8" )
 	{
 		if ( $dsn instanceof PDO ) {
 			$this->pdo = $dsn;
 
 			$this->isConnected = true;
 
-			$this->pdo->setAttribute( 1002, 'SET NAMES utf8' );
+			$this->pdo->setAttribute( 1002, 'SET NAMES ' . $encoding );
 			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			$this->pdo->setAttribute( PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC );
 
@@ -178,7 +179,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 		} else {
 			$this->dsn = $dsn;
 
-			$this->connectInfo = array( 'pass' => $pass, 'user' => $user );
+			$this->connectInfo = array( 'pass' => $pass, 'user' => $user, 'encoding' => $encoding );
 		}
 	}
 
@@ -211,12 +212,13 @@ class RedBean_Driver_PDO implements RedBean_Driver
 		try {
 			$user = $this->connectInfo['user'];
 			$pass = $this->connectInfo['pass'];
+			$encoding = $this->connectInfo['encoding'];
 
 			$this->pdo = new PDO(
 				$this->dsn,
 				$user,
 				$pass,
-				array( 1002                         => 'SET NAMES utf8',
+				array( 1002                         => 'SET NAMES ' . $encoding,
 					   PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
 					   PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 				)

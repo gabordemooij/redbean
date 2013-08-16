@@ -37,14 +37,15 @@ class RedBean_Setup
 	/**
 	 * Initializes the database and prepares a toolbox.
 	 *
-	 * @param  string|PDO $dsn      Database Connection String (or PDO instance)
-	 * @param  string     $username Username for database
-	 * @param  string     $password Password for database
-	 * @param  boolean    $frozen   Start in frozen mode?
+	 * @param  string|PDO $dsn          Database Connection String (or PDO instance)
+	 * @param  string     $username     Username for database
+	 * @param  string     $password     Password for database
+     * @param  string     $encoding     Encoding for connection, defaults to utf-8
+	 * @param  boolean    $frozen       Start in frozen mode?
 	 *
 	 * @return RedBean_ToolBox
 	 */
-	public static function kickstart( $dsn, $username = null, $password = null, $frozen = false )
+	public static function kickstart( $dsn, $username = null, $password = null, $frozen = false, $encoding = "utf-8" )
 	{
 		if ( $dsn instanceof PDO ) {
 			$db  = new RedBean_Driver_PDO( $dsn );
@@ -53,9 +54,9 @@ class RedBean_Setup
 			self::checkDSN( $dsn );
 
 			if ( strpos( $dsn, 'oracle' ) === 0 ) {
-				$db = new RedBean_Driver_OCI( $dsn, $username, $password );
+				$db = new RedBean_Driver_OCI( $dsn, $username, $password, $encoding );
 			} else {
-				$db = new RedBean_Driver_PDO( $dsn, $username, $password );
+				$db = new RedBean_Driver_PDO( $dsn, $username, $password, $encoding );
 			}
 		}
 
