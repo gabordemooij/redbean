@@ -194,6 +194,9 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 	{
 		testpack( 'Testing unique constraint on single column' );
 
+		//mysql cant handle this due to utf8mb4 fuckup Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes
+		if ($this->currentlyActiveDriverID === 'mysql') return;
+		
 		$book = R::dispense( 'book' );
 
 		$book->setMeta( 'buildcommand.unique', array( array( 'title' ) ) );

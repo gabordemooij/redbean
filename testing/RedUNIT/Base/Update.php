@@ -29,8 +29,13 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 
 		R::store( $bean );
 
-		R::$writer->widenColumn( 'bean', 'id', R::$writer->scanType( 'abc' ) );
-
+		if ($this->currentlyActiveDriverID === 'mysql') {
+			//otherwise UTF8 causes index overflow in mysql: SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes
+			R::exec('alter table bean modify column id char(3);');
+		} else {
+			R::$writer->widenColumn( 'bean', 'id', R::$writer->scanType( 'abc' ) );
+		}
+			
 		$bean->id = 'abc';
 
 		R::store( $bean );

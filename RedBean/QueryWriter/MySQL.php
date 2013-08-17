@@ -127,6 +127,8 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		}
 
 		$this->adapter = $adapter;
+
+		$this->encoding = $this->adapter->getDatabase()->getMysqlEncoding();
 	}
 
 	/**
@@ -155,7 +157,8 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	{
 		$table = $this->esc( $table );
 
-		$sql   = "CREATE TABLE $table (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ";
+		$encoding = $this->adapter->getDatabase()->getMysqlEncoding();
+		$sql   = "CREATE TABLE $table (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET={$encoding} COLLATE={$encoding}_unicode_ci ";
 
 		$this->adapter->exec( $sql );
 	}
