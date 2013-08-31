@@ -48,11 +48,9 @@
 		<item type="php">RedBean/Finder.php</item>
 		<item type="php">RedBean/Facade.php</item>
 		<item type="php">RedBean/Plugin.php</item>
-		<item type="php" flavour="extra">RedBean/Plugin/Sync.php</item>
 		<item type="php">RedBean/Plugin/BeanCan.php</item>
 		<item type="php">RedBean/Plugin/BeanCanResty.php</item>
 		<item type="php">RedBean/Plugin/QueryLogger.php</item>
-		<item type="php" flavour="extra">RedBean/Plugin/TimeLine.php</item>
 		<item type="php">RedBean/Plugin/Cooker.php</item>
 		<item type="php">RedBean/Plugin/Cache.php</item>
 		<item type="php">RedBean/DependencyInjector.php</item>

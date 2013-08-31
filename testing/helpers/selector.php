@@ -163,10 +163,8 @@ $suffix = array(
 $pluginPacks = array(
 	'Plugin/Export',
 	'Plugin/Graph',
-	'Plugin/Sync',
 	'Plugin/Beancan',
 	'Plugin/Cache',
-	'Plugin/Timeline',
 );
 
 // Default (mode == all)
