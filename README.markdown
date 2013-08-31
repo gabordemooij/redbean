@@ -25,11 +25,12 @@ Quick Example
 -------------
 
 How we store a book object with RedBean:
-
-	$book = R::dispense("book");
-	$book->author = "Santa Claus";
-	$book->title = "Secrets of Christmas";
-	$id = R::store( $book );
+```php
+$book = R::dispense("book");
+$book->author = "Santa Claus";
+$book->title = "Secrets of Christmas";
+$id = R::store( $book );
+```
 
 Yep, it's that simple.
 
@@ -38,23 +39,24 @@ Install with Composer
 You can use RedBeanPHP with [Composer](http://getcomposer.org/).
 
 Create `composer.json` in project root:
-
-	{
-    	"require": {
-        	"gabordemooij/redbean": "dev-master"
-    	}
-	}
-
+```json
+{
+  "require": {
+    "gabordemooij/redbean": "dev-master"
+  }
+}
+```
 
 Install via composer:
-
-	php composer.phar install
+```bash
+php composer.phar install
+```
 
 Autoloading:
-
-	require 'vendor/autoload.php';
-	use RedBean_Facade as R;
-
+```php
+require 'vendor/autoload.php';
+use RedBean_Facade as R;
+```
 
 More information
 ----------------
@@ -63,4 +65,3 @@ For more information about RedBeanPHP please consult
 the RedBeanPHP online manual at:
 
 http://www.redbeanphp.com/
-
