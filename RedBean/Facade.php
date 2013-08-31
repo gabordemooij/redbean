@@ -135,6 +135,52 @@ class RedBean_Facade
 	{
 		return '3.5';
 	}
+	
+	/**
+	 * Turns an array (post/request array) into a collection of beans.
+	 * Handy for turning forms into bean structures that can be stored with a
+	 * single call.
+	 *
+	 * Typical usage:
+	 *
+	 * $struct = R::graph($_POST);
+	 * R::store($struct);
+	 *
+	 * Example of a valid array:
+	 *
+	 *    $form = array(
+	 *        'type' => 'order',
+	 *        'ownProduct' => array(
+	 *            array('id' => 171, 'type' => 'product'),
+	 *        ),
+	 *        'ownCustomer' => array(
+	 *            array('type' => 'customer', 'name' => 'Bill')
+	 *        ),
+	 *        'sharedCoupon' => array(
+	 *            array('type' => 'coupon', 'name' => '123'),
+	 *            array('type' => 'coupon', 'id' => 3)
+	 *        )
+	 *    );
+	 *
+	 * Each entry in the array will become a property of the bean.
+	 * The array needs to have a type-field indicating the type of bean it is
+	 * going to be. The array can have nested arrays. A nested array has to be
+	 * named conform the bean-relation conventions, i.e. ownPage/sharedPage
+	 * each entry in the nested array represents another bean.
+	 *
+	 * @param array   $array       array to be turned into a bean collection
+	 * @param boolean $filterEmpty whether you want to exclude empty beans
+	 *
+	 * @return array
+	 *
+	 * @throws RedBean_Exception_Security
+	 */
+	public static function graph( $array, $filterEmpty = false ) 
+	{ 
+		$c = new RedBean_Plugin_Cooker;
+		$c->setToolbox( self::$toolbox );
+		return $c->graph( $array, $filterEmpty);
+	}
 
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using

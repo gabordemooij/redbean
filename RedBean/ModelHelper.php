@@ -57,7 +57,8 @@ class RedBean_ModelHelper implements RedBean_Observer
 		if ( self::$modelFormatter ) {
 			$modelID = self::$modelFormatter->formatModel( $model, $bean );
 		} else {
-			$modelID = 'Model_' . ucfirst( $model );
+			$prefix = ( defined('REDBEAN_MODEL_PREFIX') ) ? REDBEAN_MODEL_PREFIX : 'Model_';
+			$modelID = $prefix . ucfirst( $model );
 		}
 
 		self::$modelCache[$model] = $modelID;
