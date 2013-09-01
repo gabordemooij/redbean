@@ -76,9 +76,9 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 
 		asrt( $writer->scanType( "abc" ), 3 );
 
-		asrt( $writer->scanType( "2001-10-10", true ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->scanType( "2001-10-10", true ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00", true ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
+		asrt( $writer->scanType( "2001-10-10 10:00:00", true ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
 
 		asrt( $writer->scanType( "2001-10-10 10:00:00" ), 3 );
 
@@ -91,6 +91,22 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols["c1"] ), 3 );
+		
+		$writer->addColumn( "testtable", "special", RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE );
+		
+		$cols = $writer->getColumns( "testtable" );
+
+		asrt( $writer->code( $cols['special'], true ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE );
+		
+		asrt( $writer->code( $cols['special'], false ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIFIED );
+		
+		$writer->addColumn( "testtable", "special2", RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
+		
+		$cols = $writer->getColumns( "testtable" );
+
+		asrt( $writer->code( $cols['special2'], true ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
+		
+		asrt( $writer->code( $cols['special'], false ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIFIED );
 
 		//$id = $writer->insertRecord("testtable", array("c1"), array(array("lorem ipsum")));
 

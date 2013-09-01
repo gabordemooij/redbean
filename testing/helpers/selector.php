@@ -133,6 +133,7 @@ $allPacks = array(
 	'Base/With',
 	'Base/Misc',
 	'CUBRID/Setget',
+	'CUBRID/Writer',
 	'Oracle/Base',
 	'Oracle/Database',
 	'Oracle/Facade',

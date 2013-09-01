@@ -241,7 +241,9 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 
 		if ( $includeSpecials ) return $r;
 
-		if ( $r > self::C_DATATYPE_SPECIFIED ) return self::C_DATATYPE_SPECIFIED;
+		if ( $r >= RedBean_QueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
+			return self::C_DATATYPE_SPECIFIED;
+		}
 
 		return $r;
 	}

@@ -299,9 +299,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	public function code( $typedescription, $includeSpecials = false )
 	{
 		$r = ( ( isset( $this->sqltype_typeno[$typedescription] ) ) ? $this->sqltype_typeno[$typedescription] : 99 );
-
-		if ( $includeSpecials ) return $r;
-
+		
 		return $r;
 	}
 
