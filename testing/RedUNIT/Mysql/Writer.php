@@ -88,6 +88,22 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		$writer->widenColumn( "testtable", "c1", 2 );
 
+		$writer->addColumn( "testtable", "special", RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE );
+		
+		$cols = $writer->getColumns( "testtable" );
+
+		asrt( $writer->code( $cols['special'], true ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE );
+		
+		asrt( $writer->code( $cols['special'], false ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED );
+		
+		$writer->addColumn( "testtable", "special2", RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
+		
+		$cols = $writer->getColumns( "testtable" );
+
+		asrt( $writer->code( $cols['special2'], true ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
+		
+		asrt( $writer->code( $cols['special'], false ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED );
+		
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols["c1"] ), 2 );

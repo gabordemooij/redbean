@@ -242,7 +242,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 			return $r;
 		}
 
-		if ( $r > RedBean_QueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
+		if ( $r >= RedBean_QueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
 			return self::C_DATATYPE_SPECIFIED;
 		}
 
