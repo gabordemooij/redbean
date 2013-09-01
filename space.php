@@ -42,20 +42,6 @@ foreach ( $natObjects as $natObj ) {
 	$code = str_replace( "{" . $natObj, "{\\$natObj", $code );
 }
 
-$code .= "
-
-class RedBean_NSFormatter implements RedBean_IModelFormatter {
-     public function formatModel(\$model) {
-            return '\\\'.'Models'.'\\\'.\$model;
-     }
-}
-
-
- \$formatter = new RedBean_NSFormatter;
- RedBean_ModelHelper::setModelFormatter(\$formatter);
-
-";
-
 //save code
 file_put_contents( "rbn.php", $code );
 
