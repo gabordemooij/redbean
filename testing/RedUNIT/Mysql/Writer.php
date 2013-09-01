@@ -535,6 +535,27 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		asrt( $cols['title'], 'varchar(255)' );
 	}
+	
+	/**
+	 * Don't try to add foreign key constraints to 
+	 * link table if they are already there.
+	 * 
+	 * Actually this is pretty much dead code as this would normally never occur,
+	 * but we want 100% test coverage so we test this line anyway.
+	 */
+	public function testCheckConstraintAlreadyExists() 
+	{
+		R::nuke();
+		
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		
+		R::associate( $book, $page );
+		
+		$didAdd = R::$writer->addConstraintForTypes( 'book', 'page' );
+		
+		pass(); //can't really test this - just don't crash!
+	}
 
 	/**
 	 * Stored and reloads spatial data to see if the
