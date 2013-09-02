@@ -50,20 +50,26 @@ class RedBean_ModelHelper implements RedBean_Observer
 	 */
 	public static function getModelName( $model, $bean = null )
 	{
-		if ( isset( self::$modelCache[$model] ) ) {
+		
+		if ( self::$modelFormatter ) {
+			
+			self::$modelCache = array();
+			return self::$modelFormatter->formatModel( $model, $bean );
+		} else {
+			
+			if ( isset( self::$modelCache[$model] ) ) {
+				return self::$modelCache[$model];
+			}
+			
+			$prefix = ( defined('REDBEAN_MODEL_PREFIX') ) ? REDBEAN_MODEL_PREFIX : 'Model_';
+			$modelID = $prefix . ucfirst( $model );
+			
+			self::$modelCache[$model] = $modelID;
+
 			return self::$modelCache[$model];
 		}
 
-		if ( self::$modelFormatter ) {
-			$modelID = self::$modelFormatter->formatModel( $model, $bean );
-		} else {
-			$prefix = ( defined('REDBEAN_MODEL_PREFIX') ) ? REDBEAN_MODEL_PREFIX : 'Model_';
-			$modelID = $prefix . ucfirst( $model );
-		}
-
-		self::$modelCache[$model] = $modelID;
-
-		return self::$modelCache[$model];
+		
 	}
 
 	/**
