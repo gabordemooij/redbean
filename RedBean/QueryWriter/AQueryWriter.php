@@ -53,6 +53,48 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	public $typeno_sqltype = array();
 
 	/**
+	 * Generates a list of parameters (slots) for an SQL snippet.
+	 * This method calculates the correct number of slots to insert in the
+	 * SQL snippet and determines the correct type of slot. If the bindings
+	 * array contains named parameters this method will return named ones and
+	 * update the keys in the value list accordingly (that's why we use the &).
+	 * 
+	 * @param array &$valueList     list of values to generate slots for (gets modified if needed)
+	 * @param array $otherBindings  list of additional bindings
+	 * 
+	 * @return string
+	 */
+	protected function getParametersForInClause( &$valueList, $otherBindings ) 
+	{		
+		$numOfParams = count( $valueList );
+	
+		if ( is_array( $otherBindings ) && count( $otherBindings ) > 0 ) {
+		
+			reset( $otherBindings );
+			$key = key( $otherBindings );
+			
+			if ( !is_numeric($key) ) {
+				
+				$filler  = array();
+				$newList = array(); 
+				$counter = 0;
+				foreach( $valueList as $value ) {
+					$slot             = ':slot' . ( $counter++ );
+					$filler[]         = $slot; 
+					$newList[ $slot ] = $value;
+				}
+
+				//Change the keys!
+				$valueList = $newList; 
+				
+				return implode( ',', $filler );
+			} 
+		}
+		
+		return implode( ',', array_fill( 0, count( $valueList ), '?' ) );
+	}
+	
+	/**
 	 * Returns a cache key for the cache values passed.
 	 * This method returns a fingerprint string to be used as a key to store
 	 * data in the writer cache.
@@ -520,7 +562,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 			return $cached;
 		}
 
-		$inClause = implode( ',', array_fill( 0, count( $linkIDs ), '?' ) );
+		$inClause = $this->getParametersForInClause( $linkIDs, $bindings );
 
 		if ( $sourceType === $destType ) {
 			$sql = "
@@ -573,7 +615,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 			return $cached;
 		}
 
-		$inClause = implode( ',', array_fill( 0, count( $linkIDs ), '?' ) );
+		$inClause = $this->getParametersForInClause( $linkIDs, $bindings );
 
 		$selector = "{$linkTable}.*";
 

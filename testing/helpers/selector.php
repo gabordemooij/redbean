@@ -108,6 +108,7 @@ $allPacks = array(
 	'Base/Observers',
 	'Base/Database',
 	'Base/Foreignkeys',
+	'Base/Namedparams',
 	'Base/Copy',
 	'Base/Dup',
 	'Base/Update',
