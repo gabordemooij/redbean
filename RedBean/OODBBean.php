@@ -161,10 +161,23 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$beans = array();
 
 		if ( $this->getID() > 0 ) {
-			$bindings = array_merge( array( $this->getID() ), $this->withParams );
-			$beans    = $redbean->find( $type, array(), " $myFieldLink = ? " . $this->withSql, $bindings );
+			
+			$firstKey = null;
+			if ( count( $this->withParams ) > 0 ) {
+				reset( $this->withParams );
+				$firstKey = key( $this->withParams );
+			}
+			
+			if ( !is_numeric( $firstKey ) || $firstKey === null ) {
+					$bindings           = $this->withParams;
+					$bindings[':slot0'] = $this->getID();
+					$beans    = $redbean->find( $type, array(), " $myFieldLink = :slot0 " . $this->withSql, $bindings );
+			} else {
+					$bindings = array_merge( array( $this->getID() ), $this->withParams );
+					$beans    = $redbean->find( $type, array(), " $myFieldLink = ? " . $this->withSql, $bindings );
+			}
 		}
-
+		
 		$this->withSql    = '';
 		$this->withParams = array();
 

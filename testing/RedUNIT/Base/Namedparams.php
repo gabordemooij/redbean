@@ -69,5 +69,12 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 		$count = $book->withCondition( ' title = :title ', array( ':title' => 'page' ) )->countOwn( 'page' );
 		
 		asrt( $count, 1 );
+		
+		$book = $book->fresh();
+		
+		$pages = $book->withCondition( ' title = :title ', array( ':title' => 'page' ) )->ownPage;
+		
+		asrt( count( $pages ), 1 );
+		
 	}
 }
