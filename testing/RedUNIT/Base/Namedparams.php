@@ -42,5 +42,32 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 		$links = R::$associationManager->related( $page, 'book', true, ' title = :title ', array( ':title' => 'book' ) );
 
 		asrt( count( $links ), 1 );
+		
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->title = 'book';
+		$page->title = 'page';
+		$book->ownPage[] = $page;
+		R::store( $book );
+		
+		//should also not give error..
+		$count = $book->countOwn( 'page' );
+		
+		asrt( $count, 1 );
+		
+		$book = $book->fresh();
+		
+		//should also not give error..
+		$count = $book->withCondition( ' title = ? ', array( 'page' ) )->countOwn( 'page' );
+		
+		asrt( $count, 1 );
+		
+		$book = $book->fresh();
+		
+		//should also not give error..
+		$count = $book->withCondition( ' title = :title ', array( ':title' => 'page' ) )->countOwn( 'page' );
+		
+		asrt( $count, 1 );
 	}
 }

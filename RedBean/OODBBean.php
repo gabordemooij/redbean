@@ -1244,8 +1244,22 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$count = 0;
 
 		if ( $this->getID() > 0 ) {
-			$bindings = array_merge( array( $this->getID() ), $this->withParams );
-			$count    = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " $myFieldLink = ? " . $this->withSql, $bindings );
+			
+			$firstKey = null;
+			if ( count( $this->withParams ) > 0 ) {
+				reset( $this->withParams );
+				$firstKey = key( $this->withParams );
+			}
+			
+			if ( !is_numeric( $firstKey ) || $firstKey === null ) {
+					$bindings           = $this->withParams;
+					$bindings[':slot0'] = $this->getID(); 
+					$count              = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " $myFieldLink = :slot0 " . $this->withSql, $bindings );
+			} else {
+					$bindings = array_merge( array( $this->getID() ), $this->withParams );
+					$count    = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " $myFieldLink = ? " . $this->withSql, $bindings );
+			}
+			
 		}
 
 		$this->withSql    = '';
