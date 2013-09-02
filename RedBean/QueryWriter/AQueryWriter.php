@@ -59,12 +59,16 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 * array contains named parameters this method will return named ones and
 	 * update the keys in the value list accordingly (that's why we use the &).
 	 * 
-	 * @param array &$valueList     list of values to generate slots for (gets modified if needed)
-	 * @param array $otherBindings  list of additional bindings
+	 * If you pass an offset the bindings will be re-added to the value list.
+	 * Some databases cant handle duplicate parameter names in queries.
+	 * 
+	 * @param array   &$valueList     list of values to generate slots for (gets modified if needed)
+	 * @param array   $otherBindings  list of additional bindings
+	 * @param integer $offset         start counter at...
 	 * 
 	 * @return string
 	 */
-	protected function getParametersForInClause( &$valueList, $otherBindings ) 
+	protected function getParametersForInClause( &$valueList, $otherBindings, $offset = 0 ) 
 	{		
 		$numOfParams = count( $valueList );
 	
@@ -76,8 +80,8 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 			if ( !is_numeric($key) ) {
 				
 				$filler  = array();
-				$newList = array(); 
-				$counter = 0;
+				$newList = (!$offset) ? array() : $valueList; 
+				$counter = $offset;
 				foreach( $valueList as $value ) {
 					$slot             = ':slot' . ( $counter++ );
 					$filler[]         = $slot; 
@@ -565,6 +569,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 		$inClause = $this->getParametersForInClause( $linkIDs, $bindings );
 
 		if ( $sourceType === $destType ) {
+			$inClause2 = $this->getParametersForInClause( $linkIDs, $bindings, count( $bindings ) ); //for some databases
 			$sql = "
 			SELECT
 				{$destTable}.*,
@@ -574,7 +579,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 			FROM {$linkTable}
 			INNER JOIN {$destTable} ON
 			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
-			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
+			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause2) )
 			{$addSql}
 			-- keep-cache";
 
@@ -616,15 +621,17 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 		}
 
 		$inClause = $this->getParametersForInClause( $linkIDs, $bindings );
+		
 
 		$selector = "{$linkTable}.*";
 
 		if ( $sourceType === $destType ) {
+			$inClause2 = $this->getParametersForInClause( $linkIDs, $bindings, count( $bindings ) ); //for some databases
 			$sql = "
 			SELECT {$selector} FROM {$linkTable}
 			INNER JOIN {$destTable} ON
 			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
-			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause) )
+			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause2) )
 			{$addSql}
 			-- keep-cache";
 

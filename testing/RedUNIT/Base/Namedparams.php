@@ -23,6 +23,7 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 	{
 		testpack( 'Test whether we can use named parameters in SQL snippets.' );
 
+		R::nuke();
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
 		$book->title = 'book';
@@ -43,6 +44,14 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 
 		asrt( count( $links ), 1 );
 
+		$book2 = R::dispense( 'book' );
+		R::associate( $book, $book2 );
+		
+		//cross table, duplicate slots?
+		$books = R::related( $book2, 'book', ' title = :title ', array( ':title' => 'book' ) );
+		
+		asrt( count( $books ), 1 );
+		
 		R::nuke();
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
@@ -74,6 +83,15 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 
 		$pages = $book->withCondition( ' title = :title ', array( ':title' => 'page' ) )->ownPage;
 
+		asrt( count( $pages ), 1 );
+
+		//test with duplicate slots...
+		$page = reset( $pages );
+		$page2 = R::dispense( 'page' );
+		$page2->ownPage[] = $page;
+		R::store( $page2 );
+		$page2 = $page2->fresh();
+		$pages = $page2->withCondition( ' title = :title ', array( ':title' => 'page' ) )->ownPage;
 		asrt( count( $pages ), 1 );
 	}
 }
