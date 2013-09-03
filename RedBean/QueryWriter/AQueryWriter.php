@@ -174,6 +174,11 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 */
 	private function makeSQLFromConditions( $conditions, &$bindings, $addSql = '' )
 	{
+		reset( $bindings );
+		$firstKey       = key( $bindings );
+		$paramTypeIsNum = ( is_numeric( $firstKey ) );
+		$counter        = 0;
+
 		$sqlConditions = array();
 		foreach ( $conditions as $column => $values ) {
 			if ( !count( $values ) ) continue;
@@ -190,14 +195,29 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 				// only numeric, cant do much harm
 				$sqlConditions[] = $sql;
 			} else {
-				$sql .= implode( ',', array_fill( 0, count( $values ), '?' ) ) . ' ) ';
 
-				$sqlConditions[] = $sql;
+				if ( $paramTypeIsNum ) {
+					$sql .= implode( ',', array_fill( 0, count( $values ), '?' ) ) . ' ) ';
 
-				foreach ( $values as $k => $v ) {
-					$values[$k] = strval( $v );
+					array_unshift($sqlConditions, $sql);
 
-					array_unshift( $bindings, $v );
+					foreach ( $values as $k => $v ) {
+						$values[$k] = strval( $v );
+
+						array_unshift( $bindings, $v );
+					}
+				} else {
+
+					$slots = array();
+
+					foreach( $values as $k => $v ) {
+						$slot            = ':slot'.$counter++;
+						$slots[]         = $slot;
+						$bindings[$slot] = strval( $v );
+					}
+
+					$sql .= implode( ',', $slots ).' ) ';
+					$sqlConditions[] = $sql;
 				}
 			}
 		}
@@ -400,12 +420,13 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 *
 	 * @staticvar array $snippetCache
 	 *
-	 * @param string  $sql                 SQL Snippet
-	 * @param boolean $replaceANDWithWhere replaces first AND with WHERE if SQL begins with AND
+	 * @param string  $sql                  SQL Snippet
+	 * @param boolean $replaceANDWithWhere  replaces first AND with WHERE if SQL begins with AND
+	 * @param boolean $addANDInsteadOfWhere begins the snippet with AND if no other keyword has been found (thus probably condition)
 	 *
 	 * @return array|string
 	 */
-	public function glueSQLCondition( $sql, $replaceANDWithWhere = false )
+	public function glueSQLCondition( $sql, $replaceANDWithWhere = false, $addANDinsteadOfWhere = false )
 	{
 		static $snippetCache = array();
 
@@ -428,7 +449,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 				$snippetCache[$key] = $sql;
 			}
 		} else {
-			$snippetCache[$key] = ' WHERE ' . $sql;
+			$snippetCache[$key] = ( ( $addANDinsteadOfWhere ) ? ' AND ' : ' WHERE ') . $sql;
 		}
 
 		return $snippetCache[$key];
@@ -524,7 +545,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql );
+		$addSql = $this->glueSQLCondition( $addSql, false, ( count( $conditions ) > 0) );
 
 		$key = null;
 		if ( $this->flagUseCache ) {

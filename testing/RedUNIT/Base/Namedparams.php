@@ -56,6 +56,7 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
 		$book->title = 'book';
+		$book->comment = 'comment';
 		$page->title = 'page';
 		$book->ownPage[] = $page;
 		R::store( $book );
@@ -93,5 +94,30 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 		$page2 = $page2->fresh();
 		$pages = $page2->withCondition( ' title = :title ', array( ':title' => 'page' ) )->ownPage;
 		asrt( count( $pages ), 1 );
+
+		//test with find()
+		$books = R::$redbean->find( 'book', 
+				  array(
+						'title' => array('book')), 
+				  ' AND title = :title ', array(':title'=>'book'));
+
+		asrt( count( $books ), 1 );
+
+		$books = R::$redbean->find( 'book', 
+				  array(
+						'title'   => array('book', 'book2'), 
+						'comment' => array('comment', 'comment2')),
+				  ' AND title = :title ', array(':title'=>'book'));
+
+		asrt( count( $books ), 1 );
+
+		//just check numeric works as well...
+		$books = R::$redbean->find( 'book', 
+				  array(
+						'title'   => array('book', 'book2'), 
+						'comment' => array('comment', 'comment2')),
+				  ' AND title = ? ', array('book'));
+
+		asrt( count( $books ), 1 );
 	}
 }
