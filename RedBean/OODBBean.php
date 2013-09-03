@@ -1259,7 +1259,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		$count = 0;
 
-		if ( $this->getID() > 0 ) {
+		if ( $this->getID() !== 0 ) {
 
 			$firstKey = null;
 			if ( count( $this->withParams ) > 0 ) {
