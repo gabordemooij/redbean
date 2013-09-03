@@ -161,23 +161,26 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$beans = array();
 
 		if ( $this->getID() > 0 ) {
-			
+
 			$firstKey = null;
 			if ( count( $this->withParams ) > 0 ) {
 				reset( $this->withParams );
+
 				$firstKey = key( $this->withParams );
 			}
-			
+
 			if ( !is_numeric( $firstKey ) || $firstKey === null ) {
-					$bindings           = $this->withParams;
-					$bindings[':slot0'] = $this->getID();
-					$beans    = $redbean->find( $type, array(), " $myFieldLink = :slot0 " . $this->withSql, $bindings );
+				$bindings           = $this->withParams;
+				$bindings[':slot0'] = $this->getID();
+
+				$beans = $redbean->find( $type, array(), " $myFieldLink = :slot0 " . $this->withSql, $bindings );
 			} else {
-					$bindings = array_merge( array( $this->getID() ), $this->withParams );
-					$beans    = $redbean->find( $type, array(), " $myFieldLink = ? " . $this->withSql, $bindings );
+				$bindings = array_merge( array( $this->getID() ), $this->withParams );
+
+				$beans = $redbean->find( $type, array(), " $myFieldLink = ? " . $this->withSql, $bindings );
 			}
 		}
-		
+
 		$this->withSql    = '';
 		$this->withParams = array();
 
@@ -602,7 +605,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$this->aliasName  = null;
 		$this->fetchType  = null;
 	}
-	
+
 	/**
 	 * Magic Getter. Gets the value for a specific property in the bean.
 	 * If the property does not exist this getter will make sure no error
@@ -626,30 +629,30 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$isShared = strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) );
 
 		if ($isOwn) $listName = lcfirst( substr( $property, 3 ) );
-		
+
 		$hasAlias = (!is_null($this->aliasName));
-		
-		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ? 
+
+		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
 				  ($this->__info['sys.alias.'.$listName] !== $this->aliasName) : false;
-		
+
 		$hasSQL = ($this->withSql !== '');
-		
+
 		$exists = isset( $this->properties[$property] );
-		
+
 		if ($exists && !$isOwn && !$isShared) {
-			
+
 			$this->clear();
-			
+
 			return $this->properties[$property];
 		}
-		
+
 		if ($exists && !$hasSQL && !$differentAlias) {
-			
+
 			$this->clear();
-			
+
 			return $this->properties[$property];
 		}
-		
+
 		$fieldLink = $property . '_id';
 		if ( isset( $this->$fieldLink ) && $fieldLink !== $this->getMeta( 'sys.idfield' ) ) {
 			$this->__info['tainted'] = true;
@@ -664,11 +667,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 				if ( $this->withSql !== '' ) {
 
-					$beans = $redbean->find( 
-							  $type, 
+					$beans = $redbean->find(
+							  $type,
 							  array( 'id' => array( $this->properties[$fieldLink] ) ),
 							  $this->withSql, $this->withParams );
-					
+
 					$bean             = ( empty( $beans ) ) ? null : reset( $beans );
 					$this->withSql    = '';
 					$this->withParams = '';
@@ -678,9 +681,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			}
 
 			$this->properties[$property] = $bean;
-			
+
 			$this->clear();
-			
+
 			return $this->properties[$property];
 		}
 
@@ -697,12 +700,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$this->__info['tainted']              = true;
 
 			$this->clear();
-			
+
 			return $this->properties[$property];
 		}
 
 		$this->clear();
-		
+
 		$null = null;
 
 		return $null;
@@ -963,34 +966,34 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	{
 		return $this->fetchAs( $this->$field );
 	}
-	
-	
+
+
 	/**
 	 * Treats the bean like a node in a tree and searches for all
 	 * nested or parent beans.
-	 * 
+	 *
 	 * To get all parent pages of a page:
-	 * 
+	 *
 	 * $parentPages = $page->searchIn('page');
-	 * 
+	 *
 	 * To get all child pages:
-	 * 
+	 *
 	 * $pages = $parentPage->searchIn('ownPage');
-	 * 
+	 *
 	 * When searching in lists you can use SQL snippets in withCondition():
-	 * 
+	 *
 	 * $pages = $parentPage
 	 *     ->withCondition(' rank = ? ', array($rank))
 	 *     ->searchIn('ownPage');
-	 * 
+	 *
 	 * Also works with alias() and fetchAs().
 	 * Note that shared lists are NOT supported.
-	 * 
+	 *
 	 * @param string $property property/list to search
-	 * 
+	 *
 	 * @return array
 	 */
-	public function searchIn($property) 
+	public function searchIn($property)
 	{
 		if ( strpos( $property, 'shared' ) === 0 ) {
 			throw new RedBean_Exception_Security( 'Cannot search a shared list recursively.' );
@@ -1257,22 +1260,22 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$count = 0;
 
 		if ( $this->getID() > 0 ) {
-			
+
 			$firstKey = null;
 			if ( count( $this->withParams ) > 0 ) {
 				reset( $this->withParams );
 				$firstKey = key( $this->withParams );
 			}
-			
+
 			if ( !is_numeric( $firstKey ) || $firstKey === null ) {
 					$bindings           = $this->withParams;
-					$bindings[':slot0'] = $this->getID(); 
+					$bindings[':slot0'] = $this->getID();
 					$count              = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " $myFieldLink = :slot0 " . $this->withSql, $bindings );
 			} else {
 					$bindings = array_merge( array( $this->getID() ), $this->withParams );
 					$count    = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " $myFieldLink = ? " . $this->withSql, $bindings );
 			}
-			
+
 		}
 
 		$this->withSql    = '';
@@ -1317,12 +1320,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		return (integer) $count;
 	}
-	
+
 	/**
 	 * Tests whether the database identities of two beans are equal.
-	 * 
+	 *
 	 * @param RedBean_OODBBean $bean other bean
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public function equals(RedBean_OODBBean $bean) {
