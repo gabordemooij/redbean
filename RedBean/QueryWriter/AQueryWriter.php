@@ -420,13 +420,12 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 *
 	 * @staticvar array $snippetCache
 	 *
-	 * @param string  $sql                  SQL Snippet
-	 * @param boolean $replaceANDWithWhere  replaces first AND with WHERE if SQL begins with AND
-	 * @param boolean $addANDInsteadOfWhere begins the snippet with AND if no other keyword has been found (thus probably condition)
-	 *
+	 * @param string  $sql   SQL Snippet
+	 * @param integer $glue  how to glue
+	 * 
 	 * @return array|string
 	 */
-	public function glueSQLCondition( $sql, $replaceANDWithWhere = false, $addANDinsteadOfWhere = false )
+	public function glueSQLCondition( $sql, $glue = null )
 	{
 		static $snippetCache = array();
 
@@ -434,7 +433,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 			return $sql;
 		}
 
-		$key = $replaceANDWithWhere . '|' . $sql;
+		$key = $glue . '|' . $sql;
 
 		if ( isset( $snippetCache[$key] ) ) {
 			return $snippetCache[$key];
@@ -443,13 +442,13 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 		$lsql = ltrim( $sql );
 
 		if ( preg_match( '/^(AND|OR|WHERE|ORDER|GROUP|HAVING|LIMIT|OFFSET)\s+/i', $lsql ) ) {
-			if ( $replaceANDWithWhere && stripos( $lsql, 'AND' ) === 0 ) {
+			if ( $glue === RedBean_QueryWriter::C_GLUE_WHERE && stripos( $lsql, 'AND' ) === 0 ) {
 				$snippetCache[$key] = ' WHERE ' . substr( $lsql, 3 );
 			} else {
 				$snippetCache[$key] = $sql;
 			}
 		} else {
-			$snippetCache[$key] = ( ( $addANDinsteadOfWhere ) ? ' AND ' : ' WHERE ') . $sql;
+			$snippetCache[$key] = ( ( $glue === RedBean_QueryWriter::C_GLUE_AND ) ? ' AND ' : ' WHERE ') . $sql;
 		}
 
 		return $snippetCache[$key];
@@ -545,7 +544,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, false, ( count( $conditions ) > 0) );
+		$addSql = $this->glueSQLCondition( $addSql, ( count($conditions) > 0) ? RedBean_QueryWriter::C_GLUE_AND : null );
 
 		$key = null;
 		if ( $this->flagUseCache ) {
@@ -575,7 +574,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 */
 	public function queryRecordRelated( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, true );
+		$addSql = $this->glueSQLCondition( $addSql, RedBean_QueryWriter::C_GLUE_WHERE );
 
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 
@@ -629,7 +628,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 */
 	public function queryRecordLinks( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, true );
+		$addSql = $this->glueSQLCondition( $addSql, RedBean_QueryWriter::C_GLUE_WHERE );
 
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 

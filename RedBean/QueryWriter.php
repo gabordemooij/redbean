@@ -41,6 +41,20 @@ interface RedBean_QueryWriter
 	const C_DATATYPE_RANGE_SPECIAL   = 80;
 	const C_DATATYPE_RANGE_SPECIFIED = 99;
 
+	const C_GLUE_WHERE = 1;
+	const C_GLUE_AND   = 2;
+
+	/**
+	 * Glues an SQL snippet to append it to another snippet of
+	 * SQL.
+	 * 
+	 * @param string  SQL snippet to add some glue to
+	 * @param integer glue type
+	 * 
+	 * @return string
+	 */
+	public function glueSQLCondition( $sql, $glue = null );
+
 	/**
 	 * Returns the tables that are in the database.
 	 *

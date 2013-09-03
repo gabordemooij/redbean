@@ -119,5 +119,15 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 				  ' AND title = ? ', array('book'));
 
 		asrt( count( $books ), 1 );
+		
+		//just extra check to verify glue works
+		$books = R::$redbean->find( 'book', 
+				  array(
+						'title'   => array('book', 'book2'), 
+						'comment' => array('comment', 'comment2')),
+				  ' ORDER BY id ');
+
+		asrt( count( $books ), 1 );
+		
 	}
 }
