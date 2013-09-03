@@ -168,6 +168,7 @@ $pluginPacks = array(
 	'Plugin/Graph',
 	'Plugin/Beancan',
 	'Plugin/Cache',
+	'Plugin/Timeline'
 );
 
 // Default (mode == all)

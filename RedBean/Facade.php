@@ -181,6 +181,19 @@ class RedBean_Facade
 		$c->setToolbox( self::$toolbox );
 		return $c->graph( $array, $filterEmpty);
 	}
+	
+	/**
+	 * Logs queries beginning with CREATE or ALTER to file (TimeLine).
+	 * 
+	 * @param string $filename destination file
+	 * 
+	 * @return void
+	 */
+	public static function log($filename) 
+	{ 
+		$tl = new RedBean_Plugin_TimeLine($filename); 
+		self::$adapter->addEventListener('sql_exec', $tl);	
+	}
 
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
