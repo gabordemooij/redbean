@@ -45,15 +45,13 @@ class RedBean_ModelHelper implements RedBean_Observer
 	 */
 	public static function getModelName( $model, $bean = null )
 	{
-		
-		if ( self::$modelFormatter ) {
 
+		if ( self::$modelFormatter ) {
 			return self::$modelFormatter->formatModel( $model, $bean );
 		} else {
-
 			$prefix = ( defined('REDBEAN_MODEL_PREFIX') ) ? REDBEAN_MODEL_PREFIX : 'Model_';
 			$modelID = $prefix . ucfirst( $model );
-			
+
 			return $modelID;
 
 		}
