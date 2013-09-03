@@ -27,11 +27,6 @@ class RedBean_ModelHelper implements RedBean_Observer
 	private static $dependencyInjector;
 
 	/**
-	 * @var array
-	 */
-	private static $modelCache = array();
-
-	/**
 	 * @see RedBean_Observer::onEvent
 	 */
 	public function onEvent( $eventName, $bean )
@@ -53,20 +48,14 @@ class RedBean_ModelHelper implements RedBean_Observer
 		
 		if ( self::$modelFormatter ) {
 
-			self::$modelCache = array();
 			return self::$modelFormatter->formatModel( $model, $bean );
 		} else {
 
-			if ( isset( self::$modelCache[$model] ) ) {
-				return self::$modelCache[$model];
-			}
-
 			$prefix = ( defined('REDBEAN_MODEL_PREFIX') ) ? REDBEAN_MODEL_PREFIX : 'Model_';
 			$modelID = $prefix . ucfirst( $model );
-
-			self::$modelCache[$model] = $modelID;
 			
-			return self::$modelCache[$model];
+			return $modelID;
+
 		}
 	}
 
