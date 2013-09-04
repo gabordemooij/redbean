@@ -101,6 +101,7 @@ $allPacks = array(
 	'Blackhole/Meta',
 	'Blackhole/Import',
 	'Blackhole/Export',
+	'Blackhole/Glue',
 	'Base/Dispense',
 	'Base/Preloading',
 	'Base/Boxing',
