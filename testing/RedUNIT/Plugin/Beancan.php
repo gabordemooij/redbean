@@ -183,6 +183,22 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		asrt( count( $resp['result'] ), 1 );
 
+		//works also with names param?
+
+		$resp = $can->handleREST(
+			$user,
+			'site/' . $site->id . '/page/list',
+			'GET',
+			array(),
+			array(
+				'page' => array(
+					' id > :id ', array( ':id' => 0 )
+				)
+			)
+		);
+
+		asrt( count( $resp['result'] ), 1 );
+
 		$resp = $can->handleREST(
 			$user,
 			'site/' . $site->id . '/page/list',
