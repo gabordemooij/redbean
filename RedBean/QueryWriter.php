@@ -41,15 +41,42 @@ interface RedBean_QueryWriter
 	const C_DATATYPE_RANGE_SPECIAL   = 80;
 	const C_DATATYPE_RANGE_SPECIFIED = 99;
 
+	/**
+	 * Define GLUE types for use with glueSQLCondition methods.
+	 * Determines how to prefix a snippet of SQL before appending it
+	 * to other SQL (or integrating it, mixing it otherwise).
+	 * 
+	 * WHERE - glue as WHERE condition
+	 * AND   - glue as AND condition
+	 */
 	const C_GLUE_WHERE = 1;
 	const C_GLUE_AND   = 2;
 
 	/**
-	 * Glues an SQL snippet to append it to another snippet of
-	 * SQL.
+	 * Glues an SQL snippet to the beginning of a WHERE clause.
+	 * This ensures users don't have to add WHERE to their query snippets.
+	 *
+	 * The snippet gets prefixed with WHERE or AND 
+	 * if it starts with a condition.
 	 * 
-	 * @param string  SQL snippet to add some glue to
-	 * @param integer glue type
+	 * If the snippet does NOT start with a condition (or this function thinks so)
+	 * the snippet is returned as-is.
+	 * 
+	 * The GLUE type determines the prefix:
+	 * 
+	 * - NONE  prefixes with WHERE
+	 * - WHERE prefixes with WHERE and replaces AND if snippets starts with AND  
+	 * - AND   prefixes with AND
+	 * 
+	 * This method will never replace WHERE with AND since a snippet should never
+	 * begin with WHERE in the first place. OR is not supported.
+	 * 
+	 * Only a limited set of clauses will be recognized as non-conditions.
+	 * For instance beginning a snippet with complex statements like JOIN or UNION
+	 * will not work. This is too complex for use in a snippet.
+	 *
+	 * @param string  $sql   SQL Snippet
+	 * @param integer $glue  the GLUE type - how to glue (C_GLUE_WHERE or C_GLUE_AND)
 	 * 
 	 * @return string
 	 */

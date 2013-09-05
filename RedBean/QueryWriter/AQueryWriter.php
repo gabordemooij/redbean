@@ -406,24 +406,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	}
 
 	/**
-	 * Glues an SQL snippet to the beginning of a WHERE clause.
-	 * This ensures users don't have to add WHERE to their query snippets.
-	 *
-	 * If the snippet begins with something other than AND or OR, or a clause
-	 * then the SQL is prefixed with WHERE.
-	 *
-	 * If the snippet begins with a new clause, nothing happens, the sql can
-	 * be glued as-is.
-	 *
-	 * If the snippet begins with AND and $replaceANDWithWhere is TRUE
-	 * then replace the first AND with WHERE.
-	 *
-	 * @staticvar array $snippetCache
-	 *
-	 * @param string  $sql   SQL Snippet
-	 * @param integer $glue  how to glue
-	 * 
-	 * @return array|string
+	 * @see RedBean_QueryWriter::glueSQLCondition
 	 */
 	public function glueSQLCondition( $sql, $glue = null )
 	{
