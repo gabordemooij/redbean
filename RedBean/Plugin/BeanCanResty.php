@@ -397,7 +397,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 
 			$this->list = array_pop( $this->uri ); //grab the list
 			$this->type = ( strpos( $this->list, 'shared-' ) === 0 ) ? substr( $this->list, 7 ) : $this->list;
-		} elseif ( $this->method === 'GET' && count( $this->uri ) > 2 ) {
+		} elseif ( $this->method === 'GET' && count( $this->uri ) > 1 ) {
 			$lastItemInURI = $this->uri[count( $this->uri ) - 1];
 
 			if ( $lastItemInURI === 'list' ) {

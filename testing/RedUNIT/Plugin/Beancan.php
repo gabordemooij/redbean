@@ -59,6 +59,15 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$resp = $can->handleREST(
 			$user,
+			'site/list',
+			'GET'
+		);
+		
+		asrt( count( $resp['result'] ), 1 );
+
+		
+		$resp = $can->handleREST(
+			$user,
 			'site/' . $site->id . '/page/' . $page->id . '/shared-ad/list',
 			'GET'
 		);
