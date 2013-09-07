@@ -503,16 +503,6 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 			$user,
 			'site/' . $site->id . '/page/' . $page->id,
 			'mail',
-			array()
-		);
-
-		asrt( (string) $resp['error']['message'], 'No parameters.' );
-		asrt( (string) $resp['error']['code'], '400' );
-
-		$resp = $can->handleREST(
-			$user,
-			'site/' . $site->id . '/page/' . $page->id,
-			'mail',
 			array(
 				'param' => 123
 			)

@@ -292,7 +292,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private function custom()
 	{
 		if ( !isset( $this->payload['param'] ) ) {
-			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'No parameters.' );
+			$this->payload['param'] = array();
 		}
 
 		if ( !is_array( $this->payload['param'] ) ) {
@@ -300,7 +300,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 		}
 
 		$answer = call_user_func_array( array( $this->bean, $this->method ), $this->payload['param'] );
-
+		
 		return $this->resp( $answer );
 	}
 
