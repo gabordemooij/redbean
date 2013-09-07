@@ -503,6 +503,15 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 			$user,
 			'site/' . $site->id . '/page/' . $page->id,
 			'mail',
+			array()
+		);
+
+		asrt( (string) $resp['result'], 'mail has been sent to nobody' );
+		
+		$resp = $can->handleREST(
+			$user,
+			'site/' . $site->id . '/page/' . $page->id,
+			'mail',
 			array(
 				'param' => 123
 			)
@@ -1246,7 +1255,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 class Model_Page extends RedBean_SimpleModel
 {
-	public function mail( $who )
+	public function mail( $who = 'nobody' )
 	{
 		return 'mail has been sent to ' . $who;
 	}
