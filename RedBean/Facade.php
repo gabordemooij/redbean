@@ -1429,6 +1429,26 @@ class RedBean_Facade
 	{
 		RedBean_QueryWriter_AQueryWriter::renameAssociation( $from, $to );
 	}
+	
+	/**
+	 * Little helper method for Resty Bean Can server and others.
+	 * Takes an array of beans and exports each bean.
+	 * Unlike exportAll this method does not recurse into own lists
+	 * and shared lists, the beans are exported as-is, only loaded lists
+	 * are exported.
+	 * 
+	 * @param array $beans beans
+	 * 
+	 * @return array
+	 */
+	public static function beansToArray( $beans )
+	{
+		$list = array();
+		foreach( $beans as $bean ) {
+			$list[] = $bean->export();
+		}
+		return $list;
+	}
 }
 
 //Compatibility with PHP 5.2 and earlier

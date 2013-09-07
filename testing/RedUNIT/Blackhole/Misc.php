@@ -23,6 +23,26 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 	}
 
 	/**
+	 * Tests beansToArray().
+	 * 
+	 * @return void 
+	 */
+	public function testBeansToArray() 
+	{	
+		testpack('Test R::beansToArray method');
+	
+		$bean1 = R::dispense( 'bean' );
+		$bean1->name = 'hello';
+		$bean2 = R::dispense( 'bean' );
+		$bean2->name = 'world';
+
+		$beans = array( $bean1, $bean2 );
+		$array = R::beansToArray( $beans );
+		asrt( $array[0]['name'], 'hello' );
+		asrt( $array[1]['name'], 'world' );
+	}
+	
+	/**
 	 * Test debugging with custom logger.
 	 * 
 	 * @return void
