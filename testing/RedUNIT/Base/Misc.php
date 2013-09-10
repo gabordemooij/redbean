@@ -35,6 +35,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		asrt( count( $info ), 2 );
 		
 		$keys = array_keys( $info );
+		sort($keys);
 		asrt( strtolower( $keys[0] ), 'id' );
 		asrt( strtolower( $keys[1] ), 'title' );
 	}
