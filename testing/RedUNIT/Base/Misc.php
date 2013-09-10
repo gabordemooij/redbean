@@ -13,6 +13,32 @@
  */
 class RedUNIT_Base_Misc extends RedUNIT_Base
 {
+	
+	/**
+	* Tests the R::inspect() method on the Facade.
+	*
+	* @return void
+	*/	
+	public function testInspect() {
+	
+		testpack( 'Test R::inspect() ');
+
+		R::nuke();
+		
+		R::store( R::graph( array('type' => 'book', 'title' => 'book' ) ) );
+		
+		$info = R::inspect();	
+		asrt( count( $info ), 1 );
+		asrt( strtolower( $info[0] ), 'book' );
+		
+		$info = R::inspect( 'book' );
+		asrt( count( $info ), 2 );
+		
+		$keys = array_keys( $info );
+		asrt( strtolower( $keys[0] ), 'id' );
+		asrt( strtolower( $keys[1] ), 'title' );
+	}
+
 	/**
 	 * Test limited support for UUIDs.
 	 * 

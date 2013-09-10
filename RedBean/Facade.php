@@ -337,6 +337,22 @@ class RedBean_Facade
 	}
 
 	/**
+	* Inspects the database schema. If you pass the type of a bean this
+	* method will return the fields of its table in the database.
+	* The keys of this array will be the field names and the values will be
+	* the column types used to store their values.
+	* If no type is passed, this method returns a list of all tables in the database.
+	*
+	* @param string $type Type of bean (i.e. table) you want to inspect
+	*
+	* @return array
+	*/
+	public static function inspect( $type = null )
+	{
+		return ($type === null) ? self::$writer->getTables() : self::$writer->getColumns( $type );
+	}
+
+	/**
 	 * Stores a RedBean OODB Bean and returns the ID.
 	 *
 	 * @param  RedBean_OODBBean|RedBean_SimpleModel $bean bean
