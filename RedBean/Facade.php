@@ -354,18 +354,13 @@ class RedBean_Facade
 
 	/**
 	 * Stores a RedBean OODB Bean and returns the ID.
-	 * This method stores a bean into the database. It accepts a RedBean OODBBean instance,
-	 * a boxed bean (RedBean_SimpleModel) / model, or an array.
-	 * If passed an array, this method will simply call R::graph() first to turn it into
-	 * a bean.
 	 *
-	 * @param  RedBean_OODBBean|RedBean_SimpleModel|Array $bean bean or array.
+	 * @param  RedBean_OODBBean|RedBean_SimpleModel $bean bean
 	 *
 	 * @return mixed
 	 */
 	public static function store( $bean )
 	{
-		if ( is_array( $bean ) ) $bean = R::graph( $bean );	
 		return self::$redbean->store( $bean );
 	}
 

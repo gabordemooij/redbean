@@ -25,7 +25,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 		R::nuke();
 		
-		R::store( array('type' => 'book', 'title' => 'book' ) );
+		R::store( R::graph( array('type' => 'book', 'title' => 'book' ) ) );
 		
 		$info = R::inspect();	
 		asrt( count( $info ), 1 );
