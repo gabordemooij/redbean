@@ -41,36 +41,13 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	}
 
 	/**
-	 * Test limited support for UUIDs.
+	 * Test Backward compatibility writer ESC-method.
 	 * 
 	 * @return void
 	 */
-	public function testUUIDs()
+	public function testLegacyCode()
 	{
-		testpack( 'Test basic support UUIDs' );
-
-		$book = R::dispense( 'book' );
-
-		$book->name = 'abc';
-
-		$old = R::$writer->setNewIDSQL( '100' );
-
-		pass();
-
-		asrt( is_string( $old ), true );
-
-		R::store( $book );
-
-		$book = R::load( 'book', 100 );
-
-		asrt( $book->name, 'abc' );
-
-		R::$writer->setNewIDSQL( $old );
-
-		pass();
-
-		//test backward compatibility functions
-		testpack( 'Test backward compatability methods' );
+		testpack( 'Test Backward compatibility methods in writer.' );
 
 		asrt( R::$writer->safeColumn( 'column', true ), R::$writer->esc( 'column', true ) );
 		asrt( R::$writer->safeColumn( 'column', false ), R::$writer->esc( 'column', false ) );

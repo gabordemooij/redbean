@@ -438,25 +438,6 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	}
 
 	/**
-	 * Sets the ID SQL Snippet to use.
-	 * This can be used to use something different than NULL for the ID value,
-	 * for instance an UUID SQL function.
-	 * Returns the old value. So you can restore it later.
-	 *
-	 * @param string $sql pure SQL (don't use this for user input)
-	 *
-	 * @return string
-	 */
-	public function setNewIDSQL( $sql )
-	{
-		$old = $this->defaultValue;
-
-		$this->defaultValue = $sql;
-
-		return $old;
-	}
-
-	/**
 	 * @see RedBean_QueryWriter::esc
 	 */
 	public function esc( $dbStructure, $dontQuote = false )
