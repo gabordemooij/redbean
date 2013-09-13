@@ -195,6 +195,38 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		
 		asrt($foundStr, 'page7');
 
+		//Condition and slot
+		$referencePage = R::load( 'page', $page[1]->id );
+		$found         = $referencePage->withCondition(' page.number > ? ', array( 6 ) )->searchIn( 'ownPage' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+
+		asrt($foundStr, 'page7');
+
+		//Condition and named slot
+		$referencePage = R::load( 'page', $page[1]->id );
+		$found         = $referencePage->withCondition(' page.number > :num ', array( ':num' => 6 ) )->searchIn( 'ownPage' );
+
+		$foundStr      = '';
+		$foundItems = array();
+
+		foreach( $found as $foundBean ) {
+			$foundItems[] = $foundBean->name;
+		}
+
+		sort( $foundItems );
+		$foundStr = implode( '', $foundItems );
+
+		asrt($foundStr, 'page7');
+		
 		//Ordering... works different, orders within a set!
 		$referencePage = R::load( 'page', $page[0]->id );
 		$found         = $referencePage->with(' ORDER BY page.number DESC ')->searchIn( 'ownPage' );
@@ -272,7 +304,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		//now with parents and condition (variation)
 		R::$writer->setUseCache(false);
 		$referencePage = R::load( 'page', $page[7]->id );
-		$found = $referencePage->withCondition(' ( page.number < 3 OR  page.number = 5 ) ')
+		$found = $referencePage->withCondition(' ( page.number < ? OR  page.number = 5 ) ', array( 3 ) )
 				  ->searchIn( 'page' );
 
 		$foundStr      = '';
