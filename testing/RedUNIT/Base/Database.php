@@ -22,6 +22,35 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 	}
 
 	/**
+	 * Tests whether we can store an empty bean.
+	 * An empty bean has no properties, only ID. Normally we would
+	 * skip the ID field in an INSERT, this test forces the driver
+	 * to specify a value for the ID field. Different writers have to
+	 * use different values: Mysql uses NULL to insert a new auto-generated ID,
+	 * while Postgres has to use DEFAULT.
+	 */
+	public function testEmptyBean()
+	{
+		testpack( 'Test Empty Bean Storage.' );
+		R::nuke();
+		$bean = R::dispense( 'emptybean' );
+		$id = R::store( $bean );
+		asrt( ( $id > 0 ), true );
+		asrt( R::count( 'emptybean' ), 1 );
+		$bean = R::dispense( 'emptybean' );
+		$id = R::store( $bean );
+		asrt( ( $id > 0 ), true );
+		asrt( R::count( 'emptybean' ), 2 );
+		//also test in frozen mode
+		R::freeze( true );
+		$bean = R::dispense( 'emptybean' );
+		$id = R::store( $bean );
+		asrt( ( $id > 0 ), true );
+		asrt( R::count( 'emptybean' ), 3 );
+		R::freeze( false );
+	}
+	
+	/**
 	 * Test the database driver and low level functions.
 	 * 
 	 * @return void
