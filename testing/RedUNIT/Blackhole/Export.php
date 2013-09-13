@@ -32,19 +32,19 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole
 
 		$arr = $bean->export();
 
-		asrt( is_array( $arr ), true );
+		asrt( is_array( $arr ), TRUE );
 
-		asrt( isset( $arr["a"] ), true );
-		asrt( isset( $arr["b"] ), true );
+		asrt( isset( $arr["a"] ), TRUE );
+		asrt( isset( $arr["b"] ), TRUE );
 
 		asrt( $arr["a"], 1 );
 		asrt( $arr["b"], 2 );
 
-		asrt( isset( $arr["__info"] ), false );
+		asrt( isset( $arr["__info"] ), FALSE );
 
-		$arr = $bean->export( true );
+		$arr = $bean->export( TRUE );
 
-		asrt( isset( $arr["__info"] ), true );
+		asrt( isset( $arr["__info"] ), TRUE );
 
 		asrt( $arr["a"], 1 );
 		asrt( $arr["b"], 2 );
@@ -53,7 +53,7 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole
 
 		$exportBean->setMeta( "metaitem.bla", 1 );
 
-		$exportedBean = $exportBean->export( true );
+		$exportedBean = $exportBean->export( TRUE );
 
 		asrt( $exportedBean["__info"]["metaitem.bla"], 1 );
 		asrt( $exportedBean["__info"]["type"], "abean" );
@@ -63,42 +63,42 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole
 
 		$bean = R::dispense( 'bean' );
 
-		asrt( $bean->isEmpty(), true );
-		asrt( ( count( $bean ) > 0 ), true );
+		asrt( $bean->isEmpty(), TRUE );
+		asrt( ( count( $bean ) > 0 ), TRUE );
 
 		$bean->property = 1;
 
-		asrt( $bean->isEmpty(), false );
-		asrt( ( count( $bean ) > 0 ), true );
+		asrt( $bean->isEmpty(), FALSE );
+		asrt( ( count( $bean ) > 0 ), TRUE );
 
 		$bean->property = 0;
 
-		asrt( $bean->isEmpty(), true );
-		asrt( ( count( $bean ) > 0 ), true );
+		asrt( $bean->isEmpty(), TRUE );
+		asrt( ( count( $bean ) > 0 ), TRUE );
 
-		$bean->property = false;
+		$bean->property = FALSE;
 
-		asrt( $bean->isEmpty(), true );
-		asrt( ( count( $bean ) > 0 ), true );
+		asrt( $bean->isEmpty(), TRUE );
+		asrt( ( count( $bean ) > 0 ), TRUE );
 
-		$bean->property = null;
+		$bean->property = NULL;
 
-		asrt( $bean->isEmpty(), true );
-		asrt( ( count( $bean ) > 0 ), true );
+		asrt( $bean->isEmpty(), TRUE );
+		asrt( ( count( $bean ) > 0 ), TRUE );
 
 		unset( $bean->property );
 
-		asrt( $bean->isEmpty(), true );
-		asrt( ( count( $bean ) > 0 ), true );
+		asrt( $bean->isEmpty(), TRUE );
+		asrt( ( count( $bean ) > 0 ), TRUE );
 
 		// Export bug I found
-		$object = R::graph( json_decode( '{"type":"bandmember","name":"Duke","ownInstrument":[{"type":"instrument","name":"Piano"}]}', true ) );
+		$object = R::graph( json_decode( '{"type":"bandmember","name":"Duke","ownInstrument":[{"type":"instrument","name":"Piano"}]}', TRUE ) );
 
 		$a = R::exportAll( $object );
 
 		pass();
 
-		asrt( isset( $a[0] ), true );
+		asrt( isset( $a[0] ), TRUE );
 		asrt( (int) $a[0]['id'], 0 );
 
 		asrt( $a[0]['name'], 'Duke' );

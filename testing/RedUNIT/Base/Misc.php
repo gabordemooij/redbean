@@ -49,10 +49,10 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	{
 		testpack( 'Test Backward compatibility methods in writer.' );
 
-		asrt( R::$writer->safeColumn( 'column', true ), R::$writer->esc( 'column', true ) );
-		asrt( R::$writer->safeColumn( 'column', false ), R::$writer->esc( 'column', false ) );
-		asrt( R::$writer->safeTable( 'table', true ), R::$writer->esc( 'table', true ) );
-		asrt( R::$writer->safeTable( 'table', false ), R::$writer->esc( 'table', false ) );
+		asrt( R::$writer->safeColumn( 'column', TRUE ), R::$writer->esc( 'column', TRUE ) );
+		asrt( R::$writer->safeColumn( 'column', FALSE ), R::$writer->esc( 'column', FALSE ) );
+		asrt( R::$writer->safeTable( 'table', TRUE ), R::$writer->esc( 'table', TRUE ) );
+		asrt( R::$writer->safeTable( 'table', FALSE ), R::$writer->esc( 'table', FALSE ) );
 	}
 
 	/**
@@ -66,13 +66,13 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 		$town = R::dispense( 'town' );
 
-		$town->isCapital       = false;
-		$town->hasTrainStation = true;
+		$town->isCapital       = FALSE;
+		$town->hasTrainStation = TRUE;
 		$town->name            = 'BeautyVille';
 
 		$houses = R::dispense( 'house', 2 );
 
-		$houses[0]->isForSale = true;
+		$houses[0]->isForSale = TRUE;
 
 		$town->ownHouse = $houses;
 
@@ -80,9 +80,9 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 		$town = R::load( 'town', $town->id );
 
-		asrt( ( $town->isCapital == false ), true );
-		asrt( ( $town->hasTrainStation == true ), true );
-		asrt( ( $town->name == 'BeautyVille' ), true );
+		asrt( ( $town->isCapital == FALSE ), TRUE );
+		asrt( ( $town->hasTrainStation == TRUE ), TRUE );
+		asrt( ( $town->name == 'BeautyVille' ), TRUE );
 
 		testpack( 'Accept datetime objects.' );
 
@@ -116,17 +116,17 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 		R::$adapter->getDatabase()->setLogger( new RedBean_Logger_Default );
 
-		asrt( ( R::$adapter->getDatabase()->getLogger() instanceof RedBean_Logger ), true );
-		asrt( ( R::$adapter->getDatabase()->getLogger() instanceof RedBean_Logger_Default ), true );
+		asrt( ( R::$adapter->getDatabase()->getLogger() instanceof RedBean_Logger ), TRUE );
+		asrt( ( R::$adapter->getDatabase()->getLogger() instanceof RedBean_Logger_Default ), TRUE );
 
 		$bean = R::dispense( 'bean' );
 
 		$bean->property = 1;
 		$bean->unsetAll( array( 'property' ) );
 
-		asrt( $bean->property, null );
+		asrt( $bean->property, NULL );
 
-		asrt( ( $bean->setAttr( 'property', 2 ) instanceof RedBean_OODBBean ), true );
+		asrt( ( $bean->setAttr( 'property', 2 ) instanceof RedBean_OODBBean ), TRUE );
 		asrt( $bean->property, 2 );
 
 		asrt( preg_match( '/\d\d\d\d\-\d\d\-\d\d/', R::isoDate() ), 1 );
@@ -136,9 +136,9 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		$adapter = R::getDatabaseAdapter();
 		$writer  = R::getWriter();
 
-		asrt( ( $redbean instanceof RedBean_OODB ), true );
-		asrt( ( $adapter instanceof RedBean_Adapter ), true );
-		asrt( ( $writer instanceof RedBean_QueryWriter ), true );
+		asrt( ( $redbean instanceof RedBean_OODB ), TRUE );
+		asrt( ( $adapter instanceof RedBean_Adapter ), TRUE );
+		asrt( ( $writer instanceof RedBean_QueryWriter ), TRUE );
 
 		R::setRedBean( $redbean );
 		pass(); //cant really test this
@@ -189,13 +189,13 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		testpack( 'Testing SQL Error Types' );
 
 		foreach ( $writer->typeno_sqltype as $code => $text ) {
-			asrt( is_integer( $code ), true );
-			asrt( is_string( $text ), true );
+			asrt( is_integer( $code ), TRUE );
+			asrt( is_string( $text ), TRUE );
 		}
 
 		foreach ( $writer->sqltype_typeno as $text => $code ) {
-			asrt( is_integer( $code ), true );
-			asrt( is_string( $text ), true );
+			asrt( is_integer( $code ), TRUE );
+			asrt( is_string( $text ), TRUE );
 		}
 
 		testpack( 'Testing Nowhere Pt. 1 (unfrozen)' );
@@ -212,7 +212,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 		testpack( 'Testing Nowhere Pt. 2 (frozen)' );
 
-		R::freeze( true );
+		R::freeze( TRUE );
 
 		foreach (
 			array(
@@ -229,7 +229,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 			}
 		}
 
-		R::freeze(false);
+		R::freeze(FALSE);
 	}
 
 	/**
@@ -244,11 +244,11 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		$adapter = R::getDatabaseAdapter();
 
 		if ( method_exists( R::$adapter->getDatabase(), 'getPDO' ) ){
-			asrt( $adapter->getDatabase()->getPDO() instanceof PDO, true );
+			asrt( $adapter->getDatabase()->getPDO() instanceof PDO, TRUE );
 		}
 
-		asrt( strlen( $adapter->getDatabase()->getDatabaseVersion() ) > 0, true );
-		asrt( strlen( $adapter->getDatabase()->getDatabaseType() ) > 0, true );
+		asrt( strlen( $adapter->getDatabase()->getDatabaseVersion() ) > 0, TRUE );
+		asrt( strlen( $adapter->getDatabase()->getDatabaseType() ) > 0, TRUE );
 	}
 
 	/**
@@ -279,7 +279,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 		$ab = $track->name . $track2->name;
 
-		asrt( ( $ab == 'ab' || $ab == 'ba' ), true );
+		asrt( ( $ab == 'ab' || $ab == 'ba' ), TRUE );
 
 		$t  = R::dispense( 'person' );
 		$s  = R::dispense( 'person' );
@@ -304,8 +304,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		$s  = array_shift( $students );
 		$s2 = array_shift( $students );
 
-		asrt( ( $s->name == 'a' || $s2->name == 'a' ), true );
-		asrt( ( $s->name == 'b' || $s2->name == 'b' ), true );
+		asrt( ( $s->name == 'a' || $s2->name == 'a' ), TRUE );
+		asrt( ( $s->name == 'b' || $s2->name == 'b' ), TRUE );
 
 		// Empty classroom
 		R::clearRelations( $t, 'person' );
@@ -349,7 +349,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 		asrt( R::count( 'bean' ), 0 );
 
-		R::freeze( false );
+		R::freeze( FALSE );
 
 		testpack( 'genSlots' );
 
@@ -382,7 +382,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		$test->item          = $item;
 		$test->sharedSpoon[] = $spoon;
 
-		$test->isnowtainted = true;
+		$test->isnowtainted = TRUE;
 
 		$id   = R::store( $test );
 		$test = R::load( 'test', $id );
@@ -494,8 +494,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		$coffee = $coffee->fresh();
 		
 		//test enum identity check - with alias
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), true );
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), false );
+		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), TRUE );
+		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), FALSE );
 		
 		//now we have two flavours
 		asrt( R::count('flavour'), 2 );
@@ -506,9 +506,9 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		R::store($coffee);
 		
 		//same results, can we have multiple flavours?
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), true );
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), false );
-		asrt( $coffee->flavour->equals( R::enum('flavour:mocca') ), true );
+		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), TRUE );
+		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), FALSE );
+		asrt( $coffee->flavour->equals( R::enum('flavour:mocca') ), TRUE );
 		
 		//no additional mocca enum...
 		asrt( R::count('flavour'), 2 );
@@ -522,8 +522,8 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		
 		$drink = R::load( 'drink', $drink->id );
 		
-		asrt( $drink->flavour->equals( R::enum('flavour:mint') ), false );
-		asrt( $drink->flavour->equals( R::enum('flavour:choco') ), true );
+		asrt( $drink->flavour->equals( R::enum('flavour:mint') ), FALSE );
+		asrt( $drink->flavour->equals( R::enum('flavour:choco') ), TRUE );
 		
 		asrt( R::count('flavour'), 4 );
 		
@@ -572,26 +572,26 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		$beanA->id = 1;
 		$beanB->id = 1;
 		
-		asrt( $beanA->equals( $beanB ), true );
-		asrt( $beanB->equals( $beanA ), true );
-		asrt( $beanA->equals( $beanA ), true );
-		asrt( $beanB->equals( $beanB ), true );
+		asrt( $beanA->equals( $beanB ), TRUE );
+		asrt( $beanB->equals( $beanA ), TRUE );
+		asrt( $beanA->equals( $beanA ), TRUE );
+		asrt( $beanB->equals( $beanB ), TRUE );
 		
 		$beanB->id = 2;
 		
-		asrt( $beanA->equals( $beanB ), false );
-		asrt( $beanB->equals( $beanA ), false );
+		asrt( $beanA->equals( $beanB ), FALSE );
+		asrt( $beanB->equals( $beanA ), FALSE );
 		
 		$beanA->id = '2';
 		
-		asrt( $beanA->equals( $beanB ), true );
-		asrt( $beanB->equals( $beanA ), true );
+		asrt( $beanA->equals( $beanB ), TRUE );
+		asrt( $beanB->equals( $beanA ), TRUE );
 		
 		$beanB = R::dispense( 'carrot' );
 		$beanB->id = $beanA->id;
 		
-		asrt( $beanA->equals( $beanB ), false );
-		asrt( $beanB->equals( $beanA ), false );
+		asrt( $beanA->equals( $beanB ), FALSE );
+		asrt( $beanB->equals( $beanA ), FALSE );
 	}
 }
 

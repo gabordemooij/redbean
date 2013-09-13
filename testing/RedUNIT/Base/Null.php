@@ -29,17 +29,17 @@ class RedUNIT_Base_Null extends RedUNIT_Base
 
 		$bean = $bean->fresh();
 
-		asrt( $bean->hasChanged( 'bla' ), false );
+		asrt( $bean->hasChanged( 'bla' ), FALSE );
 
-		$bean->bla = null;
+		$bean->bla = NULL;
 
-		asrt( $bean->hasChanged( 'bla' ), true );
+		asrt( $bean->hasChanged( 'bla' ), TRUE );
 
 		// NULL test
 		$page = R::dispense( 'page' );
 		$book = R::dispense( 'book' );
 
-		$page->title = 'a null page';
+		$page->title = 'a NULL page';
 		$page->book  = $book;
 		$book->title = 'Why NUll is painful..';
 
@@ -62,7 +62,7 @@ class RedUNIT_Base_Null extends RedUNIT_Base
 		$page = R::load( 'page', $id );
 
 		$page->title   = 'another title';
-		$page->book_id = null;
+		$page->book_id = NULL;
 
 		R::store( $page );
 

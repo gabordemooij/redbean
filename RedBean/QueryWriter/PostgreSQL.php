@@ -100,9 +100,9 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 				$adapter->exec( $sql2 );
 			}
 
-			return true;
+			return TRUE;
 		} catch ( Exception $e ) {
-			return false;
+			return FALSE;
 		}
 	}
 
@@ -168,7 +168,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	public function getColumns( $table )
 	{
-		$table      = $this->esc( $table, true );
+		$table      = $this->esc( $table, TRUE );
 
 		$columnsRaw = $this->adapter->get( "SELECT column_name, data_type FROM information_schema.columns WHERE table_name='$table'" );
 
@@ -183,7 +183,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	/**
 	 * @see RedBean_QueryWriter::scanType
 	 */
-	public function scanType( $value, $flagSpecial = false )
+	public function scanType( $value, $flagSpecial = FALSE )
 	{
 		$this->svalue = $value;
 
@@ -219,7 +219,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 			return self::C_DATATYPE_TEXT;
 		}
 
-		if ( $value === null || ( $value instanceof RedBean_Driver_PDO_NULL ) || ( is_numeric( $value )
+		if ( $value === NULL || ( $value instanceof RedBean_Driver_PDO_NULL ) || ( is_numeric( $value )
 				&& floor( $value ) == $value
 				&& $value < 2147483648
 				&& $value > -2147483648 )
@@ -235,7 +235,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	/**
 	 * @see RedBean_QueryWriter::code
 	 */
-	public function code( $typedescription, $includeSpecials = false )
+	public function code( $typedescription, $includeSpecials = FALSE )
 	{
 		$r = ( isset( $this->sqltype_typeno[$typedescription] ) ) ? $this->sqltype_typeno[$typedescription] : 99;
 
@@ -269,7 +269,7 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	 */
 	public function addUniqueIndex( $table, $columns )
 	{
-		$table = $this->esc( $table, true );
+		$table = $this->esc( $table, TRUE );
 
 		sort( $columns ); //else we get multiple indexes due to order-effects
 
@@ -341,20 +341,20 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 	/**
 	 * @see RedBean_QueryWriter::addFK
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDep = false )
+	public function addFK( $type, $targetType, $field, $targetField, $isDep = FALSE )
 	{
 		try {
 			$table           = $this->esc( $type );
 			$column          = $this->esc( $field );
 
-			$tableNoQ        = $this->esc( $type, true );
-			$columnNoQ       = $this->esc( $field, true );
+			$tableNoQ        = $this->esc( $type, TRUE );
+			$columnNoQ       = $this->esc( $field, TRUE );
 
 			$targetTable     = $this->esc( $targetType );
-			$targetTableNoQ  = $this->esc( $targetType, true );
+			$targetTableNoQ  = $this->esc( $targetType, TRUE );
 
 			$targetColumn    = $this->esc( $targetField );
-			$targetColumnNoQ = $this->esc( $targetField, true );
+			$targetColumnNoQ = $this->esc( $targetField, TRUE );
 
 			$sql = "SELECT
 				tc.constraint_name, tc.table_name,
@@ -373,16 +373,16 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 
 			$row             = $this->adapter->getRow( $sql );
 
-			$flagAddKey      = false;
+			$flagAddKey      = FALSE;
 
-			if ( !$row ) $flagAddKey = true;
+			if ( !$row ) $flagAddKey = TRUE;
 
 			if ( $row ) {
 				if ( ( $row['delete_rule'] == 'SET NULL' && $isDep ) ||
 					( $row['delete_rule'] != 'SET NULL' && !$isDep )
 				) {
 					// Delete old key and order a new one
-					$flagAddKey = true;
+					$flagAddKey = TRUE;
 					$cName      = $row['constraint_name'];
 					$sql        = "ALTER TABLE $table DROP CONSTRAINT $cName ";
 					$this->adapter->exec( $sql );
@@ -395,12 +395,12 @@ class RedBean_QueryWriter_PostgreSQL extends RedBean_QueryWriter_AQueryWriter im
 					ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
 					$targetColumn) ON DELETE $delRule ON UPDATE SET NULL DEFERRABLE ;" );
 
-				return true;
+				return TRUE;
 			}
 
-			return false;
+			return FALSE;
 		} catch ( Exception $e ) {
-			return false;
+			return FALSE;
 		}
 	}
 

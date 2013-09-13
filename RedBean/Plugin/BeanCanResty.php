@@ -118,11 +118,11 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 *
 	 * @return array $response
 	 */
-	private function resp( $result = null, $errorCode = '500', $errorMessage = 'Internal Error' )
+	private function resp( $result = NULL, $errorCode = '500', $errorMessage = 'Internal Error' )
 	{
 		$response = array( 'red-resty' => '1.0' );
 
-		if ( $result !== null ) {
+		if ( $result !== NULL ) {
 			$response['result'] = $result;
 		} else {
 			$response['error'] = array( 'code' => $errorCode, 'message' => $errorMessage );
@@ -161,16 +161,16 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private function post()
 	{
 		if ( !isset( $this->payload['bean'] ) ) {
-			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.' );
+			return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.' );
 		}
 
 		if ( !is_array( $this->payload['bean'] ) ) {
-			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Parameter \'bean\' must be object/array.' );
+			return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Parameter \'bean\' must be object/array.' );
 		}
 
 		foreach ( $this->payload['bean'] as $key => $value ) {
 			if ( !is_string( $key ) || !is_string( $value ) ) {
-				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Object "bean" invalid.' );
+				return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Object "bean" invalid.' );
 			}
 		}
 
@@ -200,23 +200,23 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private function put()
 	{
 		if ( !isset( $this->payload['bean'] ) ) {
-			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.' );
+			return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.' );
 		}
 
 		if ( !is_array( $this->payload['bean'] ) ) {
-			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Parameter \'bean\' must be object/array.' );
+			return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Parameter \'bean\' must be object/array.' );
 		}
 
 		foreach ( $this->payload['bean'] as $key => $value ) {
 			if ( !is_string( $key ) || !is_string( $value ) ) {
-				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Object \'bean\' invalid.' );
+				return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Object \'bean\' invalid.' );
 			}
 		}
 
 		$newBean = $this->oodb->dispense( $this->type );
 		$newBean->import( $this->payload['bean'] );
 
-		if ( strpos( $this->list, 'shared-' ) === false ) {
+		if ( strpos( $this->list, 'shared-' ) === FALSE ) {
 			$listName = 'own' . ucfirst( $this->list );
 		} else {
 			$listName = 'shared' . ucfirst( substr( $this->list, 7 ) );
@@ -296,7 +296,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 		}
 
 		if ( !is_array( $this->payload['param'] ) ) {
-			return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Parameter \'param\' must be object/array.' );
+			return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Parameter \'param\' must be object/array.' );
 		}
 
 		$answer = call_user_func_array( array( $this->bean, $this->method ), $this->payload['param'] );
@@ -312,7 +312,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 */
 	private function extractSQLSnippetsForGETList()
 	{
-		$sqlBundleItem = ( isset( $this->sqlSnippets[$this->list] ) ) ? $this->sqlSnippets[$this->list] : array( null, array() );
+		$sqlBundleItem = ( isset( $this->sqlSnippets[$this->list] ) ) ? $this->sqlSnippets[$this->list] : array( NULL, array() );
 
 		if ( isset( $sqlBundleItem[0] ) ) {
 			$this->sqlSnippet = $sqlBundleItem[0];
@@ -332,7 +332,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private function dispatch()
 	{
 		if ( $this->method == 'GET' ) {
-			if ( $this->list === null ) {
+			if ( $this->list === NULL ) {
 				return $this->get();
 			}
 
@@ -393,7 +393,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private function extractListInfo()
 	{
 		if ( $this->method == 'PUT' ) {
-			if ( count( $this->uri ) < 1 ) return false;
+			if ( count( $this->uri ) < 1 ) return FALSE;
 
 			$this->list = array_pop( $this->uri ); //grab the list
 			$this->type = ( strpos( $this->list, 'shared-' ) === 0 ) ? substr( $this->list, 7 ) : $this->list;
@@ -410,7 +410,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 			}
 		}
 
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -421,10 +421,10 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	private function isURIValid()
 	{
 		if ( preg_match( '|^[\w\-/]*$|', $this->uri ) ) {
-			return false;
+			return FALSE;
 		}
 
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -446,36 +446,36 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	{
 		try {
 			if ( $this->isURIValid() ) {
-				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'URI contains invalid characters.' );
+				return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'URI contains invalid characters.' );
 			}
 
 			if ( !is_array( $this->payload ) ) {
-				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Payload needs to be array.' );
+				return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Payload needs to be array.' );
 			}
 
 			$this->extractURI();
 
-			if ( $this->extractListInfo() === false ) {
-				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Missing list.' );
+			if ( $this->extractListInfo() === FALSE ) {
+				return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Missing list.' );
 			}
 
 			if ( !is_null( $this->type ) && !preg_match( '|^[\w]+$|', $this->type ) ) {
-				return $this->resp( null, self::C_HTTP_BAD_REQUEST, 'Invalid list.' );
+				return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Invalid list.' );
 			}
 
 			try {
 				$this->findBeanByURI();
 			} catch ( Exception $e ) {
-				return $this->resp( null, self::C_HTTP_NOT_FOUND, $e->getMessage() );
+				return $this->resp( NULL, self::C_HTTP_NOT_FOUND, $e->getMessage() );
 			}
 
 			if ( !$this->isOnWhitelist() ) {
-				return $this->resp( null, self::C_HTTP_FORBIDDEN_REQUEST, 'This bean is not available. Set whitelist to "all" or add to whitelist.' );
+				return $this->resp( NULL, self::C_HTTP_FORBIDDEN_REQUEST, 'This bean is not available. Set whitelist to "all" or add to whitelist.' );
 			}
 
 			return $this->dispatch();
 		} catch ( Exception $e ) {
-			return $this->resp( null, self::C_HTTP_INTERNAL_SERVER_ERROR, 'Exception: ' . $e->getCode() );
+			return $this->resp( NULL, self::C_HTTP_INTERNAL_SERVER_ERROR, 'Exception: ' . $e->getCode() );
 		}
 	}
 
@@ -486,12 +486,12 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 */
 	private function clearState()
 	{
-		$this->list        = null;
-		$this->bean        = null;
-		$this->type        = null;
-		$this->beanType    = null;
+		$this->list        = NULL;
+		$this->bean        = NULL;
+		$this->type        = NULL;
+		$this->beanType    = NULL;
 		$this->sqlBindings = array();
-		$this->sqlSnippet  = null;
+		$this->sqlSnippet  = NULL;
 	}
 
 	/**
@@ -499,7 +499,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 *
 	 * @param RedBean_ToolBox $toolbox (optional)
 	 */
-	public function __construct( $toolbox = null )
+	public function __construct( $toolbox = NULL )
 	{
 		if ( $toolbox instanceof RedBean_ToolBox ) {
 			$this->toolbox = $toolbox;

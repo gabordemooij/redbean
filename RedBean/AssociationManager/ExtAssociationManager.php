@@ -58,10 +58,10 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 	 *
 	 * @return array
 	 */
-	public function extAssociateSimple( $beans1, $beans2, $extra = null )
+	public function extAssociateSimple( $beans1, $beans2, $extra = NULL )
 	{
 		if ( !is_array( $extra ) ) {
-			$info = json_decode( $extra, true );
+			$info = json_decode( $extra, TRUE );
 
 			if ( !$info ) $info = array( 'extra' => $extra );
 		} else {

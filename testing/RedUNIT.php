@@ -30,7 +30,7 @@ abstract class RedUNIT
 	 */
 	public function prepare()
 	{
-		R::freeze( false );
+		R::freeze( FALSE );
 
 		RedBean_ModelHelper::setModelFormatter( new DefaultModelFormatter );
 

@@ -25,9 +25,9 @@ class RedUNIT_Base_Observers extends RedUNIT_Base
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 
-		asrt( ( $adapter instanceof RedBean_Adapter_DBAdapter ), true );
-		asrt( ( $writer instanceof RedBean_QueryWriter ), true );
-		asrt( ( $redbean instanceof RedBean_OODB ), true );
+		asrt( ( $adapter instanceof RedBean_Adapter_DBAdapter ), TRUE );
+		asrt( ( $writer instanceof RedBean_QueryWriter ), TRUE );
+		asrt( ( $redbean instanceof RedBean_OODB ), TRUE );
 
 		$observable = new ObservableMock();
 		$observer   = new ObserverMock();

@@ -33,7 +33,7 @@ class RedBean_BeanHelper_Facade implements RedBean_BeanHelper
 		$modelName = RedBean_ModelHelper::getModelName( $bean->getMeta( 'type' ), $bean );
 
 		if ( !class_exists( $modelName ) ) {
-			return null;
+			return NULL;
 		}
 
 		$obj = RedBean_ModelHelper::factory( $modelName );

@@ -73,29 +73,29 @@ class RedUNIT_Base_Batch extends RedUNIT_Base
 
 		$a = $redbean->batch( 'book', 9919 );
 
-		asrt( is_array( $a ), true );
+		asrt( is_array( $a ), TRUE );
 		asrt( count( $a ), 0 );
 
 		$a = $redbean->batch( 'triangle', 1 );
 
-		asrt( is_array( $a ), true );
+		asrt( is_array( $a ), TRUE );
 		asrt( count( $a ), 0 );
 
-		R::freeze( true );
+		R::freeze( TRUE );
 
 		$a = $redbean->batch( 'book', 9919 );
 
-		asrt( is_array( $a ), true );
+		asrt( is_array( $a ), TRUE );
 		asrt( count( $a ), 0 );
 
 		$a = $redbean->batch( 'triangle', 1 );
 
-		asrt( is_array( $a ), true );
+		asrt( is_array( $a ), TRUE );
 		asrt( count( $a ), 0 );
 
-		R::freeze( false );
+		R::freeze( FALSE );
 
-		asrt( R::wipe( 'spaghettimonster' ), false );
+		asrt( R::wipe( 'spaghettimonster' ), FALSE );
 	}
 
 	/**

@@ -30,23 +30,23 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		$this->dropTableIfExists( $adapter, 'testtable' );
 
-		asrt( in_array( "testtable", $adapter->getCol( "SELECT  LOWER(table_name) FROM user_tables" ) ), false );
+		asrt( in_array( "testtable", $adapter->getCol( "SELECT  LOWER(table_name) FROM user_tables" ) ), FALSE );
 
 		$writer->createTable( "testtable" );
 
-		asrt( in_array( "testtable", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "testtable", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		asrt( count( array_diff( $writer->getTables(), $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ) ), 0 );
 		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 1 );
 
-		asrt( in_array( "id", array_keys( $writer->getColumns( "testtable" ) ) ), true );
-		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), false );
+		asrt( in_array( "id", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
+		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), FALSE );
 
 		$writer->addColumn( "testtable", "c1", 1 );
 
 		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 2 );
 
-		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), true );
+		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
 
 		foreach ( $writer->sqltype_typeno as $key => $type ) {
 			if ( $type < 100 ) {
@@ -58,8 +58,8 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		asrt( $writer->code( "unknown" ), 99 );
 
-		asrt( $writer->scanType( false ), 0 );
-		asrt( $writer->scanType( null ), 0 );
+		asrt( $writer->scanType( FALSE ), 0 );
+		asrt( $writer->scanType( NULL ), 0 );
 
 		asrt( $writer->scanType( 2 ), 1 );
 		asrt( $writer->scanType( 255 ), 1 );
@@ -73,11 +73,11 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		asrt( $writer->scanType( str_repeat( 'abcd', 100000 ) ), RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32 );
 
-		asrt( $writer->scanType( "2001-10-10", true ), RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->scanType( "2001-10-10", TRUE ), RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00", true ), RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00.99", true ), RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP );
+		asrt( $writer->scanType( "2001-10-10 10:00:00.99", TRUE ), RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP );
 
 		asrt( $writer->scanType( "2001-10-10" ), 4 );
 
@@ -85,7 +85,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		asrt( $writer->scanType( "2001-10-10 10:00:00.99" ), 4 );
 
-		//asrt($writer->scanType("POINT(1 2)",true),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT);
+		//asrt($writer->scanType("POINT(1 2)",TRUE),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT);
 		//asrt($writer->scanType("POINT(1 2)"),4);
 
 		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), 5 );
@@ -130,7 +130,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		$row = $writer->queryRecord( "testtable", array( "id" => array( $id ) ) );
 
-		asrt( empty( $row ), true );
+		asrt( empty( $row ), TRUE );
 
 		//$pdo->setDebugMode(1);
 
@@ -162,7 +162,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		//asrt($a[1]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 		//asrt($a[2]["Key_name"],"UQ_64b283449b9c396053fe1724b4c685a80fd1a54d");
 
-		//Zero issue (false should be stored as 0 not as '')
+		//Zero issue (FALSE should be stored as 0 not as '')
 
 		testpack( "Zero issue" );
 
@@ -170,7 +170,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		$bean = $redbean->dispense( "zero" );
 
-		$bean->zero  = false;
+		$bean->zero  = FALSE;
 		$bean->title = "bla";
 
 		$redbean->store( $bean );
@@ -181,18 +181,18 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		testpack( "Test RedBean Security - bean interface " );
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		$bean = $redbean->load( "page", "13; drop table hack" );
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		try {
 			$bean = $redbean->load( "page where 1; drop table hack", 1 );
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		$bean = $redbean->dispense( "page" );
 		$evil = "; drop table hack";
@@ -204,7 +204,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		unset( $bean->id );
 
@@ -215,7 +215,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		$bean->name = "'" . $evil;
 
@@ -224,7 +224,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		$bean->$evil = 1;
 
@@ -233,7 +233,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		unset( $bean->$evil );
 
@@ -245,7 +245,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		$bean->name = "'" . $evil;
 
@@ -254,7 +254,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		$bean->$evil = 1;
 
@@ -263,14 +263,14 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		try {
 			$redbean->trash( $bean );
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		try {
 			$redbean->find( "::", array(), "" );
@@ -287,7 +287,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		testpack( "Test ANSI92 issue in clearrelations" );
 

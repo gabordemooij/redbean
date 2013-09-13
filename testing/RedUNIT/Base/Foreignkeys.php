@@ -130,7 +130,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 
 		R::store( $account );
 
-		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_user_account' ) !== false, true );
+		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_user_account' ) !== FALSE, TRUE );
 
 		$this->queries = array();
 
@@ -138,7 +138,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 
 		R::store( $account );
 
-		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_player_accou' ) !== false, true );
+		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_player_accou' ) !== FALSE, TRUE );
 	}
 
 	/**
@@ -159,7 +159,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 
 		R::store( $user );
 
-		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_user_account' ) !== false, true );
+		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_user_account' ) !== FALSE, TRUE );
 
 		$this->queries = array();
 
@@ -167,7 +167,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 
 		R::store( $player );
 
-		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_player_accou' ) !== false, true );
+		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_player_accou' ) !== FALSE, TRUE );
 	}
 
 	/**

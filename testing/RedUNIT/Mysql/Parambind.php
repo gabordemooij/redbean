@@ -26,7 +26,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 
-		R::$adapter->getDatabase()->setUseStringOnlyBinding( true );
+		R::$adapter->getDatabase()->setUseStringOnlyBinding( TRUE );
 
 		try {
 			R::getAll( "select * from job limit ? ", array( 1 ) );
@@ -60,7 +60,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			pass();
 		}
 
-		R::$adapter->getDatabase()->setUseStringOnlyBinding( false );
+		R::$adapter->getDatabase()->setUseStringOnlyBinding( FALSE );
 
 		try {
 			R::getAll( "select * from job limit ? ", array( 1 ) );
@@ -100,11 +100,11 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 
 		$person = R::findOrDispense( "person", " job = ? ", array( "developer" ) );
 
-		asrt( ( count( $person ) > 0 ), true );
+		asrt( ( count( $person ) > 0 ), TRUE );
 
 		$person = R::findOrDispense( "person", " job = ? ", array( "musician" ) );
 
-		asrt( ( count( $person ) > 0 ), true );
+		asrt( ( count( $person ) > 0 ), TRUE );
 
 		$musician = array_pop( $person );
 
@@ -127,19 +127,19 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 
 		$pair = $adapter->getAssoc( "SELECT 'thekey','thevalue' " );
 
-		asrt( is_array( $pair ), true );
+		asrt( is_array( $pair ), TRUE );
 		asrt( count( $pair ), 1 );
 
-		asrt( isset( $pair["thekey"] ), true );
+		asrt( isset( $pair["thekey"] ), TRUE );
 
 		asrt( $pair["thekey"], "thevalue" );
 
 		testpack( 'Test whether we can properly bind and receive NULL values' );
 
-		asrt( $adapter->getCell( 'SELECT :nil ', array( ':nil' => 'null' ) ), 'null' );
-		asrt( $adapter->getCell( 'SELECT :nil ', array( ':nil' => null ) ), null );
+		asrt( $adapter->getCell( 'SELECT :nil ', array( ':nil' => 'NULL' ) ), 'NULL' );
+		asrt( $adapter->getCell( 'SELECT :nil ', array( ':nil' => NULL ) ), NULL );
 
-		asrt( $adapter->getCell( 'SELECT ? ', array( 'null' ) ), 'null' );
-		asrt( $adapter->getCell( 'SELECT ? ', array( null ) ), null );
+		asrt( $adapter->getCell( 'SELECT ? ', array( 'NULL' ) ), 'NULL' );
+		asrt( $adapter->getCell( 'SELECT ? ', array( NULL ) ), NULL );
 	}
 }

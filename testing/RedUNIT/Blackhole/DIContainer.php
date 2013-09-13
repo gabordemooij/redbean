@@ -25,8 +25,8 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 
 		list( $coffee, $cocoa ) = $geek->getObjects();
 
-		asrt( ( $coffee instanceof Dependency_Coffee ), false );
-		asrt( ( $cocoa instanceof Dependency_Cocoa ), false );
+		asrt( ( $coffee instanceof Dependency_Coffee ), FALSE );
+		asrt( ( $cocoa instanceof Dependency_Cocoa ), FALSE );
 
 		// Base scenario with empty container, don't fail
 		$di = new RedBean_DependencyInjector;
@@ -35,8 +35,8 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 
 		list( $coffee, $cocoa ) = $geek->getObjects();
 
-		asrt( ( $coffee instanceof Dependency_Coffee ), false );
-		asrt( ( $cocoa instanceof Dependency_Cocoa ), false );
+		asrt( ( $coffee instanceof Dependency_Coffee ), FALSE );
+		asrt( ( $cocoa instanceof Dependency_Cocoa ), FALSE );
 
 		// Succesfull scenario, one missing
 		$di = new RedBean_DependencyInjector;
@@ -49,8 +49,8 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 
 		list( $coffee, $cocoa ) = $geek->getObjects();
 
-		asrt( ( $coffee instanceof Dependency_Coffee ), true );
-		asrt( ( $cocoa instanceof Dependency_Cocoa ), false );
+		asrt( ( $coffee instanceof Dependency_Coffee ), TRUE );
+		asrt( ( $cocoa instanceof Dependency_Cocoa ), FALSE );
 
 		// Success scenario
 		$di = new RedBean_DependencyInjector;
@@ -64,8 +64,8 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 
 		list( $coffee, $cocoa ) = $geek->getObjects();
 
-		asrt( ( $coffee instanceof Dependency_Coffee ), true );
-		asrt( ( $cocoa instanceof Dependency_Cocoa ), true );
+		asrt( ( $coffee instanceof Dependency_Coffee ), TRUE );
+		asrt( ( $cocoa instanceof Dependency_Cocoa ), TRUE );
 
 		// Don't fail if not exists
 		$di->addDependency( 'NonExistantObject', new Dependency_Coffee );
@@ -75,8 +75,8 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 
 		list( $coffee, $cocoa ) = $geek->getObjects();
 
-		asrt( ( $coffee instanceof Dependency_Coffee ), true );
-		asrt( ( $cocoa instanceof Dependency_Cocoa ), true );
+		asrt( ( $coffee instanceof Dependency_Coffee ), TRUE );
+		asrt( ( $cocoa instanceof Dependency_Cocoa ), TRUE );
 
 		// Can we go back to base scenario?
 		RedBean_ModelHelper::clearDependencyInjector();
@@ -85,8 +85,8 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 
 		list( $coffee, $cocoa ) = $geek->getObjects();
 
-		asrt( ( $coffee instanceof Dependency_Coffee ), false );
-		asrt( ( $cocoa instanceof Dependency_Cocoa ), false );
+		asrt( ( $coffee instanceof Dependency_Coffee ), FALSE );
+		asrt( ( $cocoa instanceof Dependency_Cocoa ), FALSE );
 	}
 }
 

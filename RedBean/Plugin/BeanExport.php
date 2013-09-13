@@ -17,9 +17,9 @@
 class RedBean_Plugin_BeanExport implements RedBean_Plugin
 {
 	/**
-	 * @var null|\RedBean_Toolbox
+	 * @var NULL|\RedBean_Toolbox
 	 */
-	protected $toolbox = null;
+	protected $toolbox = NULL;
 
 	/**
 	 * @var array
@@ -34,7 +34,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 	/**
 	 * @var boolean
 	 */
-	protected $typeShield = false;
+	protected $typeShield = FALSE;
 
 	/**
 	 * @var integer
@@ -44,7 +44,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 	/**
 	 * @var integer
 	 */
-	protected $maxDepth = false;
+	protected $maxDepth = FALSE;
 
 	/**
 	 * @var array
@@ -64,14 +64,14 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 	 */
 	private function extractParentBean( &$export, &$bean, $key, $value )
 	{
-		if ( strpos( $key, '_id' ) === false ) return;
+		if ( strpos( $key, '_id' ) === FALSE ) return;
 
 		$sub = str_replace( '_id', '', $key );
 
 		$subBean = $bean->$sub;
 
 		if ( $subBean ) {
-			$export[$sub] = $this->export( $subBean, false );
+			$export[$sub] = $this->export( $subBean, FALSE );
 		}
 	}
 
@@ -88,7 +88,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 	 */
 	private function extractOwnList( &$export, &$bean, $table, $cols )
 	{
-		if ( strpos( $table, '_' ) !== false ) return;
+		if ( strpos( $table, '_' ) !== FALSE ) return;
 
 		$linkField = $bean->getMeta( 'type' ) . '_id';
 
@@ -96,7 +96,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 
 		$field = 'own' . ucfirst( $table );
 
-		$export[$field] = self::export( $bean->$field, false );
+		$export[$field] = self::export( $bean->$field, FALSE );
 	}
 
 	/**
@@ -111,7 +111,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 	 */
 	private function extractSharedList( &$export, &$bean, $table )
 	{
-		if ( strpos( $table, '_' ) === false ) return;
+		if ( strpos( $table, '_' ) === FALSE ) return;
 
 		$type = $bean->getMeta( 'type' );
 
@@ -129,7 +129,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 
 		$field  = 'shared' . ucfirst( $other );
 
-		$export[$field] = self::export( $bean->$field, false );
+		$export[$field] = self::export( $bean->$field, FALSE );
 	}
 
 	/**
@@ -190,13 +190,13 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 	 *
 	 * @return    array $export Exported beans
 	 */
-	public function export( $beans, $resetRecur = true )
+	public function export( $beans, $resetRecur = TRUE )
 	{
 		if ( $resetRecur ) $this->recurCheck = array();
 
 		if ( !is_array( $beans ) ) $beans = array( $beans );
 
-		if ( $this->maxDepth !== false ) {
+		if ( $this->maxDepth !== FALSE ) {
 			$this->depth++;
 			if ( $this->depth > $this->maxDepth ) {
 				$this->depth--;
@@ -205,21 +205,21 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 			}
 		}
 
-		if ( $this->typeShield === true ) {
+		if ( $this->typeShield === TRUE ) {
 			if ( is_array( $beans ) && count( $beans ) > 0 ) {
 				$firstBean = reset( $beans );
 
 				$type = $firstBean->getMeta( 'type' );
 
 				if ( isset( $this->recurTypeCheck[$type] ) ) {
-					if ( $this->maxDepth !== false ) {
+					if ( $this->maxDepth !== FALSE ) {
 						$this->depth--;
 					}
 
 					return array();
 				}
 
-				$this->recurTypeCheck[$type] = true;
+				$this->recurTypeCheck[$type] = TRUE;
 			}
 		}
 
@@ -228,7 +228,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 			$export[$bean->getID()] = $this->exportBean( $bean );
 		}
 
-		if ( $this->maxDepth !== false ) {
+		if ( $this->maxDepth !== FALSE ) {
 			$this->depth--;
 		}
 
@@ -245,7 +245,7 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 	 *
 	 * @return array
 	 */
-	public function exportLimited( $beans, $typeShield = true, $depth = false )
+	public function exportLimited( $beans, $typeShield = TRUE, $depth = FALSE )
 	{
 		$this->depth      = 0;
 		$this->maxDepth   = $depth;
@@ -253,8 +253,8 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 
 		$export           = $this->export( $beans );
 
-		$this->typeShield = false;
-		$this->maxDepth   = false;
+		$this->typeShield = FALSE;
+		$this->maxDepth   = FALSE;
 
 		return $export;
 	}
@@ -264,13 +264,13 @@ class RedBean_Plugin_BeanExport implements RedBean_Plugin
 	 *
 	 * @param RedBean_OODBBean $bean Bean to be exported
 	 *
-	 * @return array|null $array Array export of bean
+	 * @return array|NULL $array Array export of bean
 	 */
 	public function exportBean( RedBean_OODBBean $bean )
 	{
 		$bid = $bean->getMeta( 'type' ) . '-' . $bean->getID();
 
-		if ( isset( $this->recurCheck[$bid] ) ) return null;
+		if ( isset( $this->recurCheck[$bid] ) ) return NULL;
 
 		$this->recurCheck[$bid] = $bid;
 

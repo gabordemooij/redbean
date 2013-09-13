@@ -269,8 +269,8 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 
 		//echo $book;
 
-		asrt( isset( $book->prop ), false ); //not a very good test
-		asrt( in_array( 'prop', array_keys( $book->export() ) ), false ); //better...
+		asrt( isset( $book->prop ), FALSE ); //not a very good test
+		asrt( in_array( 'prop', array_keys( $book->export() ) ), FALSE ); //better...
 
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
@@ -280,8 +280,8 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 		$id   = R::store( $book );
 		$book = R::load( 'book', $id );
 
-		asrt( false, ( isset( $book->paper ) ) );
-		asrt( false, ( isset( $book->page ) ) );
+		asrt( FALSE, ( isset( $book->paper ) ) );
+		asrt( FALSE, ( isset( $book->page ) ) );
 
 		/**
 		 * The following tests try to store various things that aren't
@@ -291,7 +291,7 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 
 		foreach (
 			array(
-				new stdClass(), "a string", 1928, true, null, array()
+				new stdClass(), "a string", 1928, TRUE, NULL, array()
 			)
 			as $value
 		) {

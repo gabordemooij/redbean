@@ -20,7 +20,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @var boolean
 	 */
-	private static $flagUseBeautyCols = true;
+	private static $flagUseBeautyCols = TRUE;
 
 	/**
 	 * Setting: use IDs as keys when exporting. By default this has been turned off because exports
@@ -29,12 +29,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @var boolean
 	 */
-	private static $flagKeyedExport = false;
+	private static $flagKeyedExport = FALSE;
 
 	/**
 	 * @var boolean
 	 */
-	private $flagSkipBeau = false;
+	private $flagSkipBeau = FALSE;
 
 	/**
 	 * This is where the real properties of the bean live. They are stored and retrieved
@@ -58,12 +58,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @var RedBean_BeanHelper
 	 */
-	private $beanHelper = null;
+	private $beanHelper = NULL;
 
 	/**
 	 * @var null
 	 */
-	private $fetchType = null;
+	private $fetchType = NULL;
 
 	/**
 	 * @var string
@@ -78,12 +78,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	/**
 	 * @var string
 	 */
-	private $aliasName = null;
+	private $aliasName = NULL;
 
 	/**
 	 * @var string
 	 */
-	private $via = null;
+	private $via = NULL;
 
 	/** Returns the alias for a type
 	 *
@@ -95,7 +95,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	{
 		if ( $this->fetchType ) {
 			$type            = $this->fetchType;
-			$this->fetchType = null;
+			$this->fetchType = NULL;
 		}
 
 		return $type;
@@ -118,7 +118,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			if ( $oldName !== $this->via ) {
 				//set the new renaming rule
 				$writer->renameAssocTable( $oldName, $this->via );
-				$this->via = null;
+				$this->via = NULL;
 			}
 		}
 
@@ -152,7 +152,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 			$this->__info['sys.alias.' . $type] = $this->aliasName;
 
-			$this->aliasName = null;
+			$this->aliasName = NULL;
 		} else {
 			$parentField = $this->__info['type'];
 			$myFieldLink = $parentField . '_id';
@@ -162,14 +162,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		if ( $this->getID() > 0 ) {
 
-			$firstKey = null;
+			$firstKey = NULL;
 			if ( count( $this->withParams ) > 0 ) {
 				reset( $this->withParams );
 
 				$firstKey = key( $this->withParams );
 			}
 
-			if ( !is_numeric( $firstKey ) || $firstKey === null ) {
+			if ( !is_numeric( $firstKey ) || $firstKey === NULL ) {
 				$bindings           = $this->withParams;
 				$bindings[':slot0'] = $this->getID();
 
@@ -233,7 +233,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$this->__info['type']     = $type;
 		$this->__info['sys.id']   = 'id';
 		$this->__info['sys.orig'] = array( 'id' => 0 );
-		$this->__info['tainted']  = true;
+		$this->__info['tainted']  = TRUE;
 		$this->properties['id']   = 0;
 	}
 
@@ -273,7 +273,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function import( $arr, $selection = false, $notrim = false )
+	public function import( $arr, $selection = FALSE, $notrim = FALSE )
 	{
 		if ( is_string( $selection ) ) {
 			$selection = explode( ',', $selection );
@@ -305,7 +305,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function importFrom( RedBean_OODBBean $sourceBean )
 	{
-		$this->__info['tainted'] = true;
+		$this->__info['tainted'] = TRUE;
 
 		$this->properties = $sourceBean->properties;
 
@@ -344,7 +344,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @return array
 	 */
-	public function export( $meta = false, $parents = false, $onlyMe = false, $filters = array() )
+	public function export( $meta = FALSE, $parents = FALSE, $onlyMe = FALSE, $filters = array() )
 	{
 		$arr = array();
 
@@ -365,9 +365,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 				foreach ( $value as $i => $b ) {
 					if ( is_numeric( $i ) && !self::$flagKeyedExport ) {
-						$vn[] = $b->export( $meta, false, false, $filters );
+						$vn[] = $b->export( $meta, FALSE, FALSE, $filters );
 					} else {
-						$vn[$i] = $b->export( $meta, false, false, $filters );
+						$vn[$i] = $b->export( $meta, FALSE, FALSE, $filters );
 					}
 
 					$value = $vn;
@@ -377,7 +377,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 					if ( !in_array( strtolower( $value->getMeta( 'type' ) ), $filters ) ) continue;
 				}
 
-				$value = $value->export( $meta, $parents, false, $filters );
+				$value = $value->export( $meta, $parents, FALSE, $filters );
 			}
 
 			$arr[$key] = $value;
@@ -444,7 +444,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		if ( isset( $this->$fieldLink ) ) {
 			//wanna unset a bean reference?
-			$this->$fieldLink = null;
+			$this->$fieldLink = NULL;
 		}
 
 		if ( ( isset( $this->properties[$property] ) ) ) {
@@ -602,8 +602,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	private function clear() {
 		$this->withSql    = '';
 		$this->withParams = array();
-		$this->aliasName  = null;
-		$this->fetchType  = null;
+		$this->aliasName  = NULL;
+		$this->fetchType  = NULL;
 	}
 
 	/**
@@ -633,7 +633,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$hasAlias = (!is_null($this->aliasName));
 
 		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
-				  ($this->__info['sys.alias.'.$listName] !== $this->aliasName) : false;
+				  ($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
 
 		$hasSQL = ($this->withSql !== '');
 
@@ -655,9 +655,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		$fieldLink = $property . '_id';
 		if ( isset( $this->$fieldLink ) && $fieldLink !== $this->getMeta( 'sys.idfield' ) ) {
-			$this->__info['tainted'] = true;
+			$this->__info['tainted'] = TRUE;
 
-			$bean = null;
+			$bean = NULL;
 			if ( isset( $this->__info["sys.parentcache.$property"] ) ) {
 				$bean = $this->__info["sys.parentcache.$property"];
 			}
@@ -672,7 +672,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 							  array( 'id' => array( $this->properties[$fieldLink] ) ),
 							  $this->withSql, $this->withParams );
 
-					$bean             = ( empty( $beans ) ) ? null : reset( $beans );
+					$bean             = ( empty( $beans ) ) ? NULL : reset( $beans );
 					$this->withSql    = '';
 					$this->withParams = '';
 				} else {
@@ -697,7 +697,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$this->properties[$property] = $beans;
 
 			$this->__info["sys.shadow.$property"] = $beans;
-			$this->__info['tainted']              = true;
+			$this->__info['tainted']              = TRUE;
 
 			$this->clear();
 
@@ -706,9 +706,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		$this->clear();
 
-		$null = null;
+		$NULL = NULL;
 
-		return $null;
+		return $NULL;
 	}
 
 	/**
@@ -729,18 +729,18 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	{
 		$property = $this->beau( $property );
 
-		$this->flagSkipBeau = true;
+		$this->flagSkipBeau = TRUE;
 
 		$this->__get( $property );
 
-		$this->flagSkipBeau = false;
+		$this->flagSkipBeau = FALSE;
 
-		$this->setMeta( 'tainted', true );
+		$this->setMeta( 'tainted', TRUE );
 
 		if (isset( $this->properties[$property.'_id'] )
 			&& !( $value instanceof RedBean_OODBBean )
 		) {
-			if ( is_null( $value ) || $value === false ) {
+			if ( is_null( $value ) || $value === FALSE ) {
 				$this->__unset( $property );
 
 				return;
@@ -749,9 +749,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			}
 		}
 
-		if ( $value === false ) {
+		if ( $value === FALSE ) {
 			$value = '0';
-		} elseif ( $value === true ) {
+		} elseif ( $value === TRUE ) {
 			$value = '1';
 		} elseif ( $value instanceof DateTime ) {
 			$value = $value->format( 'Y-m-d H:i:s' );
@@ -770,7 +770,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @return void
 	 */
-	public function setProperty( $property, $value, $updateShadow = false, $taint = false )
+	public function setProperty( $property, $value, $updateShadow = FALSE, $taint = FALSE )
 	{
 		$this->properties[$property] = $value;
 
@@ -779,7 +779,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		}
 
 		if ( $taint ) {
-			$this->__info['tainted'] = true;
+			$this->__info['tainted'] = TRUE;
 		}
 	}
 
@@ -800,7 +800,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @return mixed
 	 */
-	public function getMeta( $path, $default = null )
+	public function getMeta( $path, $default = NULL )
 	{
 		return ( isset( $this->__info[$path] ) ) ? $this->__info[$path] : $default;
 	}
@@ -853,13 +853,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$model = $this->beanHelper->getModelForBean( $this );
 
 			if ( !$model ) {
-				return null;
+				return NULL;
 			}
 
 			$this->__info['model'] = $model;
 		}
 		if ( !method_exists( $this->__info['model'], $method ) ) {
-			return null;
+			return NULL;
 		}
 
 		return call_user_func_array( array( $this->__info['model'], $method ), $args );
@@ -875,7 +875,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	{
 		$string = $this->__call( '__toString', array() );
 
-		if ( $string === null ) {
+		if ( $string === NULL ) {
 			return json_encode( $this->properties );
 		} else {
 			return $string;
@@ -1066,13 +1066,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function isEmpty()
 	{
-		$empty = true;
+		$empty = TRUE;
 		foreach ( $this->properties as $key => $value ) {
 			if ( $key == 'id' ) {
 				continue;
 			}
 			if ( !empty( $value ) ) {
-				$empty = false;
+				$empty = FALSE;
 			}
 		}
 
@@ -1130,12 +1130,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			return $old[$property];
 		}
 
-		return null;
+		return NULL;
 	}
 
 	/**
 	 * Convenience method.
-	 * Returns true if the bean has been changed, or false otherwise.
+	 * Returns TRUE if the bean has been changed, or FALSE otherwise.
 	 * Same as $bean->getMeta('tainted');
 	 * Note that a bean becomes tainted as soon as you retrieve a list from
 	 * the bean. This is because the bean lists are arrays and the bean cannot
@@ -1160,7 +1160,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function hasChanged( $property )
 	{
 		return ( array_key_exists( $property, $this->properties ) ) ?
-			$this->old( $property ) != $this->properties[$property] : false;
+			$this->old( $property ) != $this->properties[$property] : FALSE;
 	}
 
 	/**
@@ -1194,7 +1194,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$bean = $this->beanHelper->getToolBox()->getRedBean()->dispense( $typeOrBean );
 
 			if ( is_string( $qualification ) ) {
-				$data = json_decode( $qualification, true );
+				$data = json_decode( $qualification, TRUE );
 			} else {
 				$data = $qualification;
 			}
@@ -1252,7 +1252,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		if ( $this->aliasName ) {
 			$myFieldLink     = $this->aliasName . '_id';
 
-			$this->aliasName = null;
+			$this->aliasName = NULL;
 		} else {
 			$myFieldLink = $this->__info['type'] . '_id';
 		}
@@ -1261,13 +1261,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		if ( $this->getID() !== 0 ) {
 
-			$firstKey = null;
+			$firstKey = NULL;
 			if ( count( $this->withParams ) > 0 ) {
 				reset( $this->withParams );
 				$firstKey = key( $this->withParams );
 			}
 
-			if ( !is_numeric( $firstKey ) || $firstKey === null ) {
+			if ( !is_numeric( $firstKey ) || $firstKey === NULL ) {
 					$bindings           = $this->withParams;
 					$bindings[':slot0'] = $this->getID();
 					$count              = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " $myFieldLink = :slot0 " . $this->withSql, $bindings );
@@ -1304,7 +1304,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			if ( $oldName !== $this->via ) {
 				//set the new renaming rule
 				$writer->renameAssocTable( $oldName, $this->via );
-				$this->via = null;
+				$this->via = NULL;
 			}
 		}
 
@@ -1312,7 +1312,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$count = 0;
 
 		if ( $this->getID() > 0 ) {
-			$count = $redbean->getAssociationManager()->relatedCount( $this, $type, $this->withSql, $this->withParams, true );
+			$count = $redbean->getAssociationManager()->relatedCount( $this, $type, $this->withSql, $this->withParams, TRUE );
 		}
 
 		$this->withSql    = '';

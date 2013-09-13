@@ -30,26 +30,26 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 
 		$adapter->exec( "DROP TABLE IF EXISTS testtable" );
 
-		asrt( in_array( "testtable", $writer->getTables() ), false );
+		asrt( in_array( "testtable", $writer->getTables() ), FALSE );
 
 		$writer->createTable( "testtable" );
 
-		asrt( in_array( "testtable", $writer->getTables() ), true );
+		asrt( in_array( "testtable", $writer->getTables() ), TRUE );
 
 		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 1 );
 
-		asrt( in_array( "id", array_keys( $writer->getColumns( "testtable" ) ) ), true );
-		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), false );
+		asrt( in_array( "id", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
+		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), FALSE );
 
 		$writer->addColumn( "testtable", "c1", 1 );
 
 		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 2 );
 
-		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), true );
+		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
 
 		foreach ( $writer->sqltype_typeno as $key => $type ) {
 			if ( $type < 100 ) {
-				asrt( $writer->code( $key, true ), $type );
+				asrt( $writer->code( $key, TRUE ), $type );
 			} else {
 				asrt( $writer->code( $key ), 99 );
 			}
@@ -59,9 +59,9 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 
 		asrt( $writer->code( "unknown" ), 99 );
 
-		asrt( $writer->scanType( false ), 3 );
+		asrt( $writer->scanType( FALSE ), 3 );
 
-		asrt( $writer->scanType( null ), 0 );
+		asrt( $writer->scanType( NULL ), 0 );
 
 		asrt( $writer->scanType( 2 ), 0 );
 
@@ -76,9 +76,9 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 
 		asrt( $writer->scanType( "abc" ), 3 );
 
-		asrt( $writer->scanType( "2001-10-10", true ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->scanType( "2001-10-10", TRUE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00", true ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
+		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
 
 		asrt( $writer->scanType( "2001-10-10 10:00:00" ), 3 );
 
@@ -96,17 +96,17 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols['special'], true ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->code( $cols['special'], TRUE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE );
 		
-		asrt( $writer->code( $cols['special'], false ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIFIED );
+		asrt( $writer->code( $cols['special'], FALSE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIFIED );
 		
 		$writer->addColumn( "testtable", "special2", RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
 		
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols['special2'], true ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
+		asrt( $writer->code( $cols['special2'], TRUE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
 		
-		asrt( $writer->code( $cols['special'], false ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIFIED );
+		asrt( $writer->code( $cols['special'], FALSE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIFIED );
 
 		//$id = $writer->insertRecord("testtable", array("c1"), array(array("lorem ipsum")));
 
@@ -126,11 +126,11 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 
 		$row = $writer->queryRecord( "testtable", array( "id" => array( $id ) ) );
 
-		asrt( empty( $row ), true );
+		asrt( empty( $row ), TRUE );
 	}
 
 	/**
-	 * (false should be stored as 0 not as '')
+	 * (FALSE should be stored as 0 not as '')
 	 * 
 	 * @return void
 	 */
@@ -143,7 +143,7 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 
 		$bean = $redbean->dispense( "zero" );
 
-		$bean->zero  = false;
+		$bean->zero  = FALSE;
 		$bean->title = "bla";
 
 		$redbean->store( $bean );

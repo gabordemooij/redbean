@@ -32,7 +32,7 @@ class RedBean_OODB extends RedBean_Observable
 	/**
 	 * @var array
 	 */
-	protected $stash = null;
+	protected $stash = NULL;
 
 	/*
 	 * @var integer
@@ -47,17 +47,17 @@ class RedBean_OODB extends RedBean_Observable
 	/**
 	 * @var boolean
 	 */
-	protected $isFrozen = false;
+	protected $isFrozen = FALSE;
 
 	/**
 	 * @var RedBean_BeanHelper_Facade
 	 */
-	protected $beanhelper = null;
+	protected $beanhelper = NULL;
 
 	/**
 	 * @var RedBean_AssociationManager
 	 */
-	protected $assocManager = null;
+	protected $assocManager = NULL;
 
 	/**
 	 * Handles Exceptions. Suppresses exceptions caused by missing structures.
@@ -177,9 +177,9 @@ class RedBean_OODB extends RedBean_Observable
 	private function createTableIfNotExists( RedBean_OODBBean $bean, $table )
 	{
 		//Does table exist? If not, create
-		if ( !$this->isFrozen && !$this->tableExists( $this->writer->esc( $table, true ) ) ) {
+		if ( !$this->isFrozen && !$this->tableExists( $this->writer->esc( $table, TRUE ) ) ) {
 			$this->writer->createTable( $table );
-			$bean->setMeta( 'buildreport.flags.created', true );
+			$bean->setMeta( 'buildreport.flags.created', TRUE );
 		}
 	}
 
@@ -223,7 +223,7 @@ class RedBean_OODB extends RedBean_Observable
 				$this->addUniqueConstraints( $bean );
 			}
 			$bean->id = $this->writer->updateRecord( $table, $updateValues, $bean->id );
-			$bean->setMeta( 'tainted', false );
+			$bean->setMeta( 'tainted', FALSE );
 		}
 	}
 
@@ -276,21 +276,21 @@ class RedBean_OODB extends RedBean_Observable
 				$cast   = $bean->getMeta( "cast.$property" );
 				$typeno = $this->getTypeFromCast( $cast );
 			} else {
-				$cast   = false;
-				$typeno = $this->writer->scanType( $value, true );
+				$cast   = FALSE;
+				$typeno = $this->writer->scanType( $value, TRUE );
 			}
-			if ( isset( $columns[$this->writer->esc( $property, true )] ) ) { //Is this property represented in the table ?
+			if ( isset( $columns[$this->writer->esc( $property, TRUE )] ) ) { //Is this property represented in the table ?
 				if ( !$cast ) { //rescan without taking into account special types >80
-					$typeno = $this->writer->scanType( $value, false );
+					$typeno = $this->writer->scanType( $value, FALSE );
 				}
-				$sqlt = $this->writer->code( $columns[$this->writer->esc( $property, true )] );
+				$sqlt = $this->writer->code( $columns[$this->writer->esc( $property, TRUE )] );
 				if ( $typeno > $sqlt ) { //no, we have to widen the database column type
 					$this->writer->widenColumn( $table, $property, $typeno );
-					$bean->setMeta( 'buildreport.flags.widen', true );
+					$bean->setMeta( 'buildreport.flags.widen', TRUE );
 				}
 			} else {
 				$this->writer->addColumn( $table, $property, $typeno );
-				$bean->setMeta( 'buildreport.flags.addcolumn', true );
+				$bean->setMeta( 'buildreport.flags.addcolumn', TRUE );
 				$this->processBuildCommands( $table, $property, $bean );
 			}
 		}
@@ -346,7 +346,7 @@ class RedBean_OODB extends RedBean_Observable
 	 * (when checked with the shadow). This method
 	 * checks if the bean is also in the dependency list. If it is the bean will be removed.
 	 * If not, the connection between the bean and the owner bean will be broken by
-	 * setting the ID to null.
+	 * setting the ID to NULL.
 	 *
 	 * @param RedBean_OODBBean $bean        the bean
 	 * @param array            $ownTrashcan list
@@ -369,7 +369,7 @@ class RedBean_OODB extends RedBean_Observable
 			if ( isset( $this->dep[$trash->getMeta( 'type' )] ) && in_array( $bean->getMeta( 'type' ), $this->dep[$trash->getMeta( 'type' )] ) ) {
 				$this->trash( $trash );
 			} else {
-				$trash->$myFieldLink = null;
+				$trash->$myFieldLink = NULL;
 				$this->store( $trash );
 			}
 		}
@@ -481,10 +481,10 @@ class RedBean_OODB extends RedBean_Observable
 	 */
 	private function hasListsOrObjects( RedBean_OODBBean $bean )
 	{
-		$processLists = false;
+		$processLists = FALSE;
 		foreach ( $bean as $value ) {
 			if ( is_array( $value ) || is_object( $value ) ) {
-				$processLists = true;
+				$processLists = TRUE;
 				break;
 			}
 		}
@@ -614,7 +614,7 @@ class RedBean_OODB extends RedBean_Observable
 	{
 		if ( is_array( $toggle ) ) {
 			$this->chillList = $toggle;
-			$this->isFrozen  = false;
+			$this->isFrozen  = FALSE;
 		} else {
 			$this->isFrozen = (boolean) $toggle;
 		}
@@ -742,7 +742,7 @@ class RedBean_OODB extends RedBean_Observable
 	 *
 	 * @throws RedBean_Exception_SQL
 	 */
-	public function find( $type, $conditions = array(), $sql = null, $bindings = array() )
+	public function find( $type, $conditions = array(), $sql = NULL, $bindings = array() )
 	{
 		//for backward compatibility, allow mismatch arguments:
 		if ( is_array( $sql ) ) {
@@ -869,7 +869,7 @@ class RedBean_OODB extends RedBean_Observable
 		$this->signal( 'open', $bean );
 		$this->nesting--;
 
-		return $bean->setMeta( 'tainted', false );
+		return $bean->setMeta( 'tainted', FALSE );
 	}
 
 	/**
@@ -908,7 +908,7 @@ class RedBean_OODB extends RedBean_Observable
 			$this->check( $bean );
 		}
 		try {
-			$this->writer->deleteRecord( $bean->getMeta( 'type' ), array( 'id' => array( $bean->id ) ), null );
+			$this->writer->deleteRecord( $bean->getMeta( 'type' ), array( 'id' => array( $bean->id ) ), NULL );
 		} catch ( RedBean_Exception_SQL $exception ) {
 			$this->handleException( $exception );
 		}
@@ -940,7 +940,7 @@ class RedBean_OODB extends RedBean_Observable
 			$rows = $this->writer->queryRecord( $type, array( 'id' => $ids ) );
 		} catch ( RedBean_Exception_SQL $e ) {
 			$this->handleException( $e );
-			$rows = false;
+			$rows = FALSE;
 		}
 		$this->stash[$this->nesting] = array();
 		if ( !$rows ) {
@@ -952,7 +952,7 @@ class RedBean_OODB extends RedBean_Observable
 		foreach ( $ids as $id ) {
 			$collection[$id] = $this->load( $type, $id );
 		}
-		$this->stash[$this->nesting] = null;
+		$this->stash[$this->nesting] = NULL;
 
 		return $collection;
 	}
@@ -977,7 +977,7 @@ class RedBean_OODB extends RedBean_Observable
 			$this->stash[$this->nesting][$id] = $row;
 			$collection[$id]                  = $this->load( $type, $id );
 		}
-		$this->stash[$this->nesting] = null;
+		$this->stash[$this->nesting] = NULL;
 
 		return $collection;
 	}
@@ -1020,13 +1020,13 @@ class RedBean_OODB extends RedBean_Observable
 		try {
 			$this->writer->wipe( $type );
 
-			return true;
+			return TRUE;
 		} catch ( RedBean_Exception_SQL $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE ) ) ) {
 				throw $exception;
 			}
 
-			return false;
+			return FALSE;
 		}
 	}
 
@@ -1115,7 +1115,7 @@ class RedBean_OODB extends RedBean_Observable
 	 *
 	 * @return array
 	 */
-	public function preload( $beans, $typeList, $closure = null )
+	public function preload( $beans, $typeList, $closure = NULL )
 	{
 		$preloader = new RedBean_Preloader( $this );
 

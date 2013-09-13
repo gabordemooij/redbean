@@ -31,7 +31,7 @@ class RedBean_Logger_Default implements RedBean_Logger
 
 		foreach ( func_get_args() as $argument ) {
 			if ( is_array( $argument ) ) {
-				echo print_r( $argument, true );
+				echo print_r( $argument, TRUE );
 			} else {
 				echo $argument;
 			}

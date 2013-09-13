@@ -142,7 +142,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		 */
 		R::exec( 'UPDATE page SET ' . $w->esc( 'number' ) . ' = 1 ' );
 
-		R::$writer->setUseCache( true );
+		R::$writer->setUseCache( TRUE );
 
 		$p1 = R::load( 'page', (int) $p1->id );
 
@@ -159,7 +159,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		$page = reset( $pages );
 
-		// Inconsistent, sad but true, different query -> cache key is different
+		// Inconsistent, sad but TRUE, different query -> cache key is different
 		asrt( (int) $page->number, 9 );
 
 		// However, cache must have been invalidated by this query
@@ -206,7 +206,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		// Yes, keep-cache wont help, cache key changed!
 		asrt( (int) $page->number, 8 );
 
-		R::$writer->setUseCache( false );
+		R::$writer->setUseCache( FALSE );
 
 	}
 
@@ -350,7 +350,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$d = R::load( 'doctor', $d->id );
 
 		asrt( count( $d->sharedPatient ), 1 );
-		asrt( in_array( 'consult', R::$writer->getTables() ), true );
+		asrt( in_array( 'consult', R::$writer->getTables() ), TRUE );
 	}
 
 	/**
@@ -360,14 +360,14 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 	 */
 	public function testCreationOfLinkTable()
 	{
-		asrt( in_array( 'consult', R::$writer->getTables() ), false );
+		asrt( in_array( 'consult', R::$writer->getTables() ), FALSE );
 
 		$d = R::dispense( 'doctor' )->setAttr( 'name', 'd1' );
 		$p = R::dispense( 'patient' )->setAttr( 'name', 'p1' );
 
 		R::associate( $d, $p );
 
-		asrt( in_array( 'consult', R::$writer->getTables() ), true );
+		asrt( in_array( 'consult', R::$writer->getTables() ), TRUE );
 	}
 
 	/**
@@ -439,30 +439,30 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		asrt( (int) $donald->countShared( 'friend' ), 1 );
 
-		asrt( R::areRelated( $donald, $mickey ), false );
-		asrt( R::areRelated( $mickey, $donald ), false );
-		asrt( R::areRelated( $mickey, $goofy ), true );
-		asrt( R::areRelated( $goofy, $mickey ), true );
+		asrt( R::areRelated( $donald, $mickey ), FALSE );
+		asrt( R::areRelated( $mickey, $donald ), FALSE );
+		asrt( R::areRelated( $mickey, $goofy ), TRUE );
+		asrt( R::areRelated( $goofy, $mickey ), TRUE );
 
-		R::getWriter()->setUseCache( true );
+		R::getWriter()->setUseCache( TRUE );
 
-		$mickeysFriends = R::$associationManager->related( $mickey, 'friend', true );
-
-		asrt( count( $mickeysFriends ), 2 );
-
-		$mickeysFriends = R::$associationManager->related( $mickey, 'friend', true );
+		$mickeysFriends = R::$associationManager->related( $mickey, 'friend', TRUE );
 
 		asrt( count( $mickeysFriends ), 2 );
 
-		$plutosFriends = R::$associationManager->related( $pluto, 'friend', true );
+		$mickeysFriends = R::$associationManager->related( $mickey, 'friend', TRUE );
+
+		asrt( count( $mickeysFriends ), 2 );
+
+		$plutosFriends = R::$associationManager->related( $pluto, 'friend', TRUE );
 
 		asrt( count( $plutosFriends ), 1 );
 
-		$mickeysBooks = R::$associationManager->related( $mickey, 'book', true );
+		$mickeysBooks = R::$associationManager->related( $mickey, 'book', TRUE );
 
 		asrt( count( $mickeysBooks ), 1 );
 
-		R::getWriter()->setUseCache( false );
+		R::getWriter()->setUseCache( FALSE );
 	}
 
 	/**
@@ -737,7 +737,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		// Different, less elegant way to remove
 		$page1 = reset( $b2->ownPage );
 
-		$page1->book_id = null;
+		$page1->book_id = NULL;
 
 		R::store( $page1 );
 
@@ -755,13 +755,13 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( count( $b2->ownPage ), 1 );
 
 		// Another less elegant way to remove
-		$page1->book = null;
+		$page1->book = NULL;
 
 		R::store( $page1 );
 
 		$cols = R::getColumns( 'page' );
 
-		asrt( isset( $cols['book'] ), false );
+		asrt( isset( $cols['book'] ), FALSE );
 
 		$b2 = R::load( 'book', $book2->id );
 
@@ -777,13 +777,13 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( count( $b2->ownPage ), 1 );
 
 		// Another less elegant... just plain ugly... way to remove
-		$page1->book = false;
+		$page1->book = FALSE;
 
 		R::store( $page1 );
 
 		$cols = R::getColumns( 'page' );
 
-		asrt( isset( $cols['book'] ), false );
+		asrt( isset( $cols['book'] ), FALSE );
 
 		$b2 = R::load( 'book', $book2->id );
 
@@ -802,7 +802,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		foreach (
 			array(
 				1, -2.1, array(),
-				true, 'null', new stdClass,
+				TRUE, 'NULL', new stdClass,
 				'just a string', array( 'a' => 1 ), 0
 			) as $value
 		) {
@@ -822,7 +822,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		// Even uglier way, but still needs to work
 		$page1 = reset( $b2->ownPage );
 
-		$page1->book_id = null;
+		$page1->book_id = NULL;
 
 		R::store( $b2 );
 
@@ -928,7 +928,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		// Get books for topic
 		asrt( count( R::related( $topic3, 'book' ) ), 2 );
-		asrt( ( R::relatedOne( $topic3, 'book' ) instanceof RedBean_OODBBean ), true );
+		asrt( ( R::relatedOne( $topic3, 'book' ) instanceof RedBean_OODBBean ), TRUE );
 
 		$items = R::related( $topic3, 'book' );
 
@@ -939,12 +939,12 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$t3 = R::load( 'topic', $topic3->id );
 
 		asrt( count( $t3->sharedBook ), 2 );
-		asrt( R::relatedOne( $topic3, 'nothingness' ), null );
+		asrt( R::relatedOne( $topic3, 'nothingness' ), NULL );
 
 		 // Testing relatedLast
 		$z = end( $items );
 		asrt( R::relatedLast( $topic3, 'book')->id, $z->id );
-		asrt( R::relatedLast( $topic3, 'manuscript'), null );
+		asrt( R::relatedLast( $topic3, 'manuscript'), NULL );
 
 		// Nuke an own-array, replace entire array at once without getting first
 		$page2->id    = 0;
@@ -975,11 +975,11 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		$justACover = $book3->fetchAs( 'page' )->cover;
 
-		asrt( ( $book3->cover instanceof RedBean_OODBBean ), true );
+		asrt( ( $book3->cover instanceof RedBean_OODBBean ), TRUE );
 		asrt( $justACover->title, 'cover1' );
 
 		// No page property
-		asrt( isset( $book3->page ), false );
+		asrt( isset( $book3->page ), FALSE );
 
 		// Test doubling and other side effects ... should not occur..
 		$book3->sharedTopic = array( $topic1, $topic2 );
@@ -1353,7 +1353,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		asrt( $p->person->getMeta( 'type' ), 'person' );
 
-		asrt( ( $p->person->id > 0 ), true );
+		asrt( ( $p->person->id > 0 ), TRUE );
 
 		asrt( $managers, 1 );
 		asrt( $developers, 1 );

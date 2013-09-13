@@ -55,14 +55,14 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		$customLogger = new CustomLogger;
 
-		$pdoDriver->setDebugMode( true, $customLogger );
+		$pdoDriver->setDebugMode( TRUE, $customLogger );
 
 		$pdoDriver->Execute( 'SELECT 123' );
 
 		asrt( count( $customLogger->getLogMessage() ), 1 );
 
-		$pdoDriver->setDebugMode( true, null );
-		asrt( ( $pdoDriver->getLogger() instanceof RedBean_Logger_Default ), true );
+		$pdoDriver->setDebugMode( TRUE, NULL );
+		asrt( ( $pdoDriver->getLogger() instanceof RedBean_Logger_Default ), TRUE );
 
 		testpack( 'Test bean->getProperties method' );
 
@@ -72,7 +72,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		$props = $bean->getProperties();
 
-		asrt( isset( $props['property'] ), true );
+		asrt( isset( $props['property'] ), TRUE );
 
 		asrt( $props['property'], 'hello' );
 
@@ -90,7 +90,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		asrt( trim( $sql ), 'join' );
 
-		RedBean_SQLHelper::useCamelCase( false );
+		RedBean_SQLHelper::useCamelCase( FALSE );
 
 		list( $sql, $params ) = R::$f->begin()->camelCase()->getQuery();
 
@@ -147,18 +147,18 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		testpack( 'Transaction suppr. in fluid mode' );
 
-		R::freeze( false );
+		R::freeze( FALSE );
 
-		asrt( R::begin(), false );
-		asrt( R::commit(), false );
-		asrt( R::rollback(), false );
+		asrt( R::begin(), FALSE );
+		asrt( R::commit(), FALSE );
+		asrt( R::rollback(), FALSE );
 
-		R::freeze( true );
+		R::freeze( TRUE );
 
-		asrt( R::begin(), true );
-		asrt( R::commit(), true );
+		asrt( R::begin(), TRUE );
+		asrt( R::commit(), TRUE );
 
-		R::freeze( false );
+		R::freeze( FALSE );
 	}
 
 	/**
@@ -180,7 +180,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		R::trash( $bean );
 
-		R::freeze( true );
+		R::freeze( TRUE );
 
 		$bean = R::dispense( 'bean' );
 
@@ -244,7 +244,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		asrt( R::count( 'bean' ), 1 );
 
-		R::freeze( false );
+		R::freeze( FALSE );
 
 		try {
 			R::transaction( 'nope' );
@@ -272,17 +272,17 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		foreach ( $names as $name => $becomes ) {
 			$bean->$name = 1;
 
-			asrt( isset( $bean->$becomes ), true );
+			asrt( isset( $bean->$becomes ), TRUE );
 		}
 
 		testpack( 'Test debugger check.' );
 
 		$old = R::$adapter;
 
-		R::$adapter = null;
+		R::$adapter = NULL;
 
 		try {
-			R::debug( true );
+			R::debug( TRUE );
 
 			fail();
 		} catch ( RedBean_Exception_Security $e ) {
@@ -291,7 +291,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		R::$adapter = $old;
 
-		R::debug( false );
+		R::debug( FALSE );
 
 		testpack( 'Misc Tests' );
 
@@ -333,7 +333,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		pass();
 
-		asrt( ( strpos( $out, 'SELECT 123' ) !== false ), true );
+		asrt( ( strpos( $out, 'SELECT 123' ) !== FALSE ), TRUE );
 
 		R::debug( 0 );
 
@@ -369,8 +369,8 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		asrt( $band->property1, 123 );
 
-		asrt( $band->checkProperty( 'property1' ), true );
-		asrt( $band->checkProperty( 'property2' ), false );
+		asrt( $band->checkProperty( 'property1' ), TRUE );
+		asrt( $band->checkProperty( 'property2' ), FALSE );
 
 		$band = new Model_Band;
 
@@ -386,8 +386,8 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		asrt( $band->property1, 123 );
 
-		asrt( $band->checkProperty( 'property1' ), true );
-		asrt( $band->checkProperty( 'property2' ), false );
+		asrt( $band->checkProperty( 'property1' ), TRUE );
+		asrt( $band->checkProperty( 'property2' ), FALSE );
 
 		asrt( $band->property3, 123 );
 		asrt( $band->property4, 345 );
@@ -398,7 +398,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		pass();
 
-		asrt( isset( R::$toolboxes['default'] ), true );
+		asrt( isset( R::$toolboxes['default'] ), TRUE );
 
 		try {
 			( R::$toolboxes['default']->getDatabaseAdapter()->getDatabase()->connect() );
@@ -418,7 +418,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		pass();
 
-		asrt( isset( R::$toolboxes['default'] ), true );
+		asrt( isset( R::$toolboxes['default'] ), TRUE );
 		try {
 			( R::$toolboxes['default']->getDatabaseAdapter()->getDatabase()->connect() );
 
@@ -439,10 +439,10 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		$toolbox = RedBean_Setup::kickstart( $pdo );
 
-		asrt( ( $toolbox instanceof RedBean_ToolBox ), true );
+		asrt( ( $toolbox instanceof RedBean_ToolBox ), TRUE );
 
-		asrt( ( $toolbox->getDatabaseAdapter() instanceof RedBean_Adapter ), true );
-		asrt( ( $toolbox->getDatabaseAdapter()->getDatabase()->getPDO() instanceof PDO ), true );
+		asrt( ( $toolbox->getDatabaseAdapter() instanceof RedBean_Adapter ), TRUE );
+		asrt( ( $toolbox->getDatabaseAdapter()->getDatabase()->getPDO() instanceof PDO ), TRUE );
 
 		testpack( 'Test array interface of beans' );
 
@@ -453,8 +453,8 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		asrt( $bean['hello'], 'hi' );
 
-		asrt( isset( $bean['hello'] ), true );
-		asrt( isset( $bean['bye'] ), false );
+		asrt( isset( $bean['hello'] ), TRUE );
+		asrt( isset( $bean['bye'] ), FALSE );
 
 		$bean['world'] = 'sphere';
 
@@ -495,19 +495,19 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		$bean = R::dispense( 'bean' );
 
 		// Must not be list, because first char after own is lowercase
-		asrt( is_array( $bean->owner ), false );
+		asrt( is_array( $bean->owner ), FALSE );
 
 		// Must not be list, because first char after shared is lowercase
-		asrt( is_array( $bean->shareditem ), false );
+		asrt( is_array( $bean->shareditem ), FALSE );
 
-		asrt( is_array( $bean->own ), false );
-		asrt( is_array( $bean->shared ), false );
+		asrt( is_array( $bean->own ), FALSE );
+		asrt( is_array( $bean->shared ), FALSE );
 
-		asrt( is_array( $bean->own_item ), false );
-		asrt( is_array( $bean->shared_item ), false );
+		asrt( is_array( $bean->own_item ), FALSE );
+		asrt( is_array( $bean->shared_item ), FALSE );
 
-		asrt( is_array( $bean->{'own item'} ), false );
-		asrt( is_array( $bean->{'shared Item'} ), false );
+		asrt( is_array( $bean->{'own item'} ), FALSE );
+		asrt( is_array( $bean->{'shared Item'} ), FALSE );
 	}
 }
 

@@ -41,9 +41,9 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base
 			'distinct', 'like'
 		);
 
-		R::setStrictTyping( false );
+		R::setStrictTyping( FALSE );
 
-		RedBean_OODBBean::setFlagBeautifulColumnNames( false );
+		RedBean_OODBBean::setFlagBeautifulColumnNames( FALSE );
 
 		foreach ( $keywords as $k ) {
 			R::nuke();
@@ -72,8 +72,8 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base
 			pass();
 		}
 
-		RedBean_OODBBean::setFlagBeautifulColumnNames( true );
+		RedBean_OODBBean::setFlagBeautifulColumnNames( TRUE );
 
-		R::setStrictTyping( true );
+		R::setStrictTyping( TRUE );
 	}
 }

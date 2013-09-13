@@ -31,12 +31,12 @@ class ObserverMock implements RedBean_Observer
 	/**
 	 * @var bool
 	 */
-	public $event = false;
+	public $event = FALSE;
 
 	/**
 	 * @var bool
 	 */
-	public $info = false;
+	public $info = FALSE;
 
 	/**
 	 * @param string $event

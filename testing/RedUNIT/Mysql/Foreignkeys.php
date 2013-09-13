@@ -76,9 +76,9 @@ class RedUNIT_Mysql_Foreignkeys extends RedUNIT_Mysql
 			}
 		]';
 
-		$j1 = json_decode( $j, true );
+		$j1 = json_decode( $j, TRUE );
 
-		$j2 = json_decode( $json, true );
+		$j2 = json_decode( $json, TRUE );
 
 		foreach ( $j1 as $jrow ) {
 			$s = json_encode( $jrow );
@@ -111,11 +111,11 @@ class RedUNIT_Mysql_Foreignkeys extends RedUNIT_Mysql
 		$bean1 = R::dispense( 'project' );
 		$bean2 = R::dispense( 'invoice' );
 
-		R::setStrictTyping( false );
+		R::setStrictTyping( FALSE );
 
 		$bean3 = R::dispense( 'invoice_project' );
 
-		R::setStrictTyping( true );
+		R::setStrictTyping( TRUE );
 
 		$bean3->project_id = 1;
 		$bean3->invoice_id = 2;

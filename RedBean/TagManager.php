@@ -45,7 +45,7 @@ class RedBean_TagManager
 	 */
 	private function extractTagsIfNeeded( $tagList )
 	{
-		if ( $tagList !== false && !is_array( $tagList ) ) {
+		if ( $tagList !== FALSE && !is_array( $tagList ) ) {
 			$tags = explode( ',', (string) $tagList );
 		} else {
 			$tags = $tagList;
@@ -86,7 +86,7 @@ class RedBean_TagManager
 			return $bean;
 		}
 
-		return null;
+		return NULL;
 	}
 
 	/**
@@ -104,7 +104,7 @@ class RedBean_TagManager
 	 *
 	 * @return boolean
 	 */
-	public function hasTag( $bean, $tags, $all = false )
+	public function hasTag( $bean, $tags, $all = FALSE )
 	{
 		$foundtags = $this->tag( $bean );
 
@@ -140,7 +140,7 @@ class RedBean_TagManager
 
 	/**
 	 * Tags a bean or returns tags associated with a bean.
-	 * If $tagList is null or omitted this method will return a
+	 * If $tagList is NULL or omitted this method will return a
 	 * comma separated list of tags associated with the bean provided.
 	 * If $tagList is a comma separated list (string) of tags all tags will
 	 * be associated with the bean.
@@ -151,7 +151,7 @@ class RedBean_TagManager
 	 *
 	 * @return array
 	 */
-	public function tag( RedBean_OODBBean $bean, $tagList = null )
+	public function tag( RedBean_OODBBean $bean, $tagList = NULL )
 	{
 		if ( is_null( $tagList ) ) {
 			$tags = array();
@@ -191,7 +191,7 @@ class RedBean_TagManager
 	{
 		$tags = $this->extractTagsIfNeeded( $tagList );
 
-		if ( $tagList === false ) {
+		if ( $tagList === FALSE ) {
 			return;
 		}
 

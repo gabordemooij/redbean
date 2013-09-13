@@ -56,7 +56,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 	 *
 	 * @return string $json
 	 */
-	private function resp( $result = null, $id = null, $errorCode = '-32603', $errorMessage = 'Internal Error' )
+	private function resp( $result = NULL, $id = NULL, $errorCode = '-32603', $errorMessage = 'Internal Error' )
 	{
 		$response = array( 'jsonrpc' => '2.0' );
 
@@ -86,7 +86,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 	private function store( $id, $beanType, $data )
 	{
 		if ( !isset( $data[0] ) ) {
-			return $this->resp( null, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean Object' );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean Object' );
 		}
 
 		$data = $data[0];
@@ -116,7 +116,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 	private function load( $id, $beanType, $data )
 	{
 		if ( !isset( $data[0] ) ) {
-			return $this->resp( null, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean ID' );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean ID' );
 		}
 
 		$bean = RedBean_Facade::load( $beanType, $data[0] );
@@ -136,7 +136,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 	private function trash( $id, $beanType, $data )
 	{
 		if ( !isset( $data[0] ) ) {
-			return $this->resp( null, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean ID' );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean ID' );
 		}
 
 		$bean = RedBean_Facade::load( $beanType, $data[0] );
@@ -158,12 +158,12 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 	private function export( $id, $beanType, $data )
 	{
 		if ( !isset( $data[0] ) ) {
-			return $this->resp( null, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean ID' );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_INVALID_PARAMETERS, 'First param needs to be Bean ID' );
 		}
 
 		$bean  = RedBean_Facade::load( $beanType, $data[0] );
 
-		$array = RedBean_Facade::exportAll( array( $bean ), true );
+		$array = RedBean_Facade::exportAll( array( $bean ), TRUE );
 
 		return $this->resp( $array, $id );
 	}
@@ -183,13 +183,13 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 		$modelName = $this->modelHelper->getModelName( $beanType );
 
 		if ( !class_exists( $modelName ) ) {
-			return $this->resp( null, $id, self::C_JSONRPC2_METHOD_NOT_FOUND, 'No such bean in the can!' );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_METHOD_NOT_FOUND, 'No such bean in the can!' );
 		}
 
 		$beanModel = new $modelName;
 
 		if ( !method_exists( $beanModel, $action ) ) {
-			return $this->resp( null, $id, self::C_JSONRPC2_METHOD_NOT_FOUND, "Method not found in Bean: $beanType " );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_METHOD_NOT_FOUND, "Method not found in Bean: $beanType " );
 		}
 
 		return $this->resp( call_user_func_array( array( $beanModel, $action ), $data ), $id );
@@ -205,8 +205,8 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 	 */
 	private function getDataFromJSON( $jsonArray )
 	{
-		$beanType = null;
-		$action   = null;
+		$beanType = NULL;
+		$action   = NULL;
 
 		if ( !isset( $jsonArray['params'] ) ) {
 			$data = array();
@@ -252,7 +252,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 					return $this->custom( $id, $beanType, $action, $data );
 			}
 		} catch ( Exception $exception ) {
-			return $this->resp( null, $id, self::C_JSONRPC2_SPECIFIED_ERROR, $exception->getCode() . '-' . $exception->getMessage() );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_SPECIFIED_ERROR, $exception->getCode() . '-' . $exception->getMessage() );
 		}
 	}
 
@@ -283,44 +283,44 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 	 */
 	public function handleJSONRequest( $jsonString )
 	{
-		if ( !$jsonArray = json_decode( $jsonString, true ) ) { //Decode JSON string
-			return $this->resp( null, null, self::C_JSONRPC2_PARSE_ERROR, 'Cannot Parse JSON' );
+		if ( !$jsonArray = json_decode( $jsonString, TRUE ) ) { //Decode JSON string
+			return $this->resp( NULL, NULL, self::C_JSONRPC2_PARSE_ERROR, 'Cannot Parse JSON' );
 		}
 
 		if ( !isset( $jsonArray['jsonrpc'] ) ) {
-			return $this->resp( null, null, self::C_JSONRPC2_INVALID_REQUEST, 'No RPC version' );
+			return $this->resp( NULL, NULL, self::C_JSONRPC2_INVALID_REQUEST, 'No RPC version' );
 		}
 
 		if ( ( $jsonArray['jsonrpc'] != '2.0' ) ) {
-			return $this->resp( null, null, self::C_JSONRPC2_INVALID_REQUEST, 'Incompatible RPC Version' );
+			return $this->resp( NULL, NULL, self::C_JSONRPC2_INVALID_REQUEST, 'Incompatible RPC Version' );
 		}
 
 		if ( !isset( $jsonArray['id'] ) ) { //DO we have an ID to identify this request?
-			return $this->resp( null, null, self::C_JSONRPC2_INVALID_REQUEST, 'No ID' );
+			return $this->resp( NULL, NULL, self::C_JSONRPC2_INVALID_REQUEST, 'No ID' );
 		}
 
 		$id = $jsonArray['id']; //Fetch the request Identification String.
 
 		if ( !isset( $jsonArray['method'] ) ) { //Do we have a method?
-			return $this->resp( null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'No method' );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_INVALID_REQUEST, 'No method' );
 		}
 
 		list( $beanType, $action, $data, $method ) = $this->getDataFromJSON( $jsonArray ); //Do we have params?
 
 		if ( count( $method ) !== 2 ) {
-			return $this->resp( null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid method signature. Use: BEAN:ACTION' );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid method signature. Use: BEAN:ACTION' );
 		}
 
 		if ( !( $this->whitelist === 'all' || ( isset( $this->whitelist[$beanType] ) && in_array( $action, $this->whitelist[$beanType] ) ) ) ) {
-			return $this->resp( null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'This bean is not available. Set whitelist to "all" or add to whitelist.' );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_INVALID_REQUEST, 'This bean is not available. Set whitelist to "all" or add to whitelist.' );
 		}
 
 		if ( preg_match( '/\W/', $beanType ) ) { //May not contain anything other than ALPHA NUMERIC chars and _
-			return $this->resp( null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid Bean Type String' );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid Bean Type String' );
 		}
 
 		if ( preg_match( '/\W/', $action ) ) {
-			return $this->resp( null, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid Action String' );
+			return $this->resp( NULL, $id, self::C_JSONRPC2_INVALID_REQUEST, 'Invalid Action String' );
 		}
 
 		return $this->dispatch( $id, $beanType, $action, $data );
@@ -338,7 +338,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 	public function handleRESTGetRequest( $pathToResource )
 	{
 		if ( !is_string( $pathToResource ) ) {
-			return $this->resp( null, 0, self::C_JSONRPC2_SPECIFIED_ERROR, 'IR' );
+			return $this->resp( NULL, 0, self::C_JSONRPC2_SPECIFIED_ERROR, 'IR' );
 		}
 
 		$resourceInfo = explode( '/', $pathToResource );
@@ -354,7 +354,7 @@ class RedBean_Plugin_BeanCan implements RedBean_Plugin
 				return $this->resp( RedBean_Facade::load( $type, $id )->export(), $id );
 			}
 		} catch ( Exception $exception ) {
-			return $this->resp( null, 0, self::C_JSONRPC2_SPECIFIED_ERROR );
+			return $this->resp( NULL, 0, self::C_JSONRPC2_SPECIFIED_ERROR );
 		}
 	}
 }

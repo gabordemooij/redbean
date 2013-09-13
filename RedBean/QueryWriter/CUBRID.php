@@ -40,7 +40,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return array
 	 */
-	protected function getKeys( $table, $table2 = null )
+	protected function getKeys( $table, $table2 = NULL )
 	{
 		$pdo  = $this->adapter->getDatabase()->getPDO();
 
@@ -66,8 +66,8 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{
-		$this->buildFK( $table, $table1, $property1, 'id', true );
-		$this->buildFK( $table, $table2, $property2, 'id', true );
+		$this->buildFK( $table, $table1, $property1, 'id', TRUE );
+		$this->buildFK( $table, $table2, $property2, 'id', TRUE );
 	}
 
 	/**
@@ -87,27 +87,27 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return void
 	 */
-	protected function buildFK( $type, $targetType, $field, $targetField, $isDep = false )
+	protected function buildFK( $type, $targetType, $field, $targetField, $isDep = FALSE )
 	{
 		$table           = $this->esc( $type );
-		$tableNoQ        = $this->esc( $type, true );
+		$tableNoQ        = $this->esc( $type, TRUE );
 
 		$targetTable     = $this->esc( $targetType );
-		$targetTableNoQ  = $this->esc( $targetType, true );
+		$targetTableNoQ  = $this->esc( $targetType, TRUE );
 
 		$column          = $this->esc( $field );
-		$columnNoQ       = $this->esc( $field, true );
+		$columnNoQ       = $this->esc( $field, TRUE );
 
 		$targetColumn    = $this->esc( $targetField );
 
 		$keys            = $this->getKeys( $targetTableNoQ, $tableNoQ );
 
-		$needsToDropFK   = false;
+		$needsToDropFK   = FALSE;
 
 		foreach ( $keys as $key ) {
 			if ( $key['FKTABLE_NAME'] == $tableNoQ && $key['FKCOLUMN_NAME'] == $columnNoQ ) {
 				// Already has an FK
-				$needsToDropFK = true;
+				$needsToDropFK = TRUE;
 
 				if ( ( $isDep && $key['DELETE_RULE'] == 0 ) || ( !$isDep && $key['DELETE_RULE'] == 3 ) ) {
 					return;
@@ -185,7 +185,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 		$sql  = 'CREATE TABLE '
 			. $this->esc( $table )
 			. ' ("id" integer AUTO_INCREMENT, CONSTRAINT "pk_'
-			. $this->esc( $table, true )
+			. $this->esc( $table, TRUE )
 			. '_id" PRIMARY KEY("id"))';
 
 		$this->adapter->exec( $sql );
@@ -211,7 +211,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	/**
 	 * @see RedBean_QueryWriter::scanType
 	 */
-	public function scanType( $value, $flagSpecial = false )
+	public function scanType( $value, $flagSpecial = FALSE )
 	{
 		$this->svalue = $value;
 
@@ -245,7 +245,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	/**
 	 * @see RedBean_QueryWriter::code
 	 */
-	public function code( $typedescription, $includeSpecials = false )
+	public function code( $typedescription, $includeSpecials = FALSE )
 	{
 		$r = ( ( isset( $this->sqltype_typeno[$typedescription] ) ) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED );
 
@@ -315,7 +315,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 				RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
-			), $list ) ) !== 3 ) : false;
+			), $list ) ) !== 3 ) : FALSE;
 	}
 
 	/**
@@ -345,7 +345,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	/**
 	 * @see RedBean_QueryWriter::addFK
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false )
+	public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
 	{
 		$this->buildFK( $type, $targetType, $field, $targetField, $isDependent );
 	}
@@ -367,7 +367,7 @@ class RedBean_QueryWriter_CUBRID extends RedBean_QueryWriter_AQueryWriter implem
 	/**
 	 * @see RedBean_QueryWriter::esc
 	 */
-	public function esc( $dbStructure, $noQuotes = false )
+	public function esc( $dbStructure, $noQuotes = FALSE )
 	{
 		return parent::esc( strtolower( $dbStructure ), $noQuotes );
 	}

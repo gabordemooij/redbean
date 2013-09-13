@@ -19,7 +19,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * @var RedBean_Driver
 	 */
-	private $db = null;
+	private $db = NULL;
 
 	/**
 	 * @var string
@@ -51,7 +51,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * @see RedBean_Adapter::exec
 	 */
-	public function exec( $sql, $bindings = array(), $noevent = false )
+	public function exec( $sql, $bindings = array(), $noevent = FALSE )
 	{
 		if ( !$noevent ) {
 			$this->sql = $sql;
@@ -130,7 +130,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	/**
 	 * @see RedBean_Adapter::getCell
 	 */
-	public function getCell( $sql, $bindings = array(), $noSignal = null )
+	public function getCell( $sql, $bindings = array(), $noSignal = NULL )
 	{
 		$this->sql = $sql;
 
@@ -142,7 +142,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 			return ( $arr[0] );
 		}
 
-		return null;
+		return NULL;
 	}
 
 	/**

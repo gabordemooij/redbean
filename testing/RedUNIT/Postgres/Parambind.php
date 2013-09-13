@@ -41,9 +41,9 @@ class RedUNIT_Postgres_Parambind extends RedUNIT_Postgres
 
 		$adapter = R::$adapter;
 
-		asrt( $adapter->getCell( 'SELECT TEXT( :nil ) ', array( ':nil' => 'null' ) ), 'null' );
-		asrt( $adapter->getCell( 'SELECT TEXT( :nil ) ', array( ':nil' => null ) ), null );
-		asrt( $adapter->getCell( 'SELECT TEXT( ? ) ', array( 'null' ) ), 'null' );
-		asrt( $adapter->getCell( 'SELECT TEXT( ? ) ', array( null ) ), null );
+		asrt( $adapter->getCell( 'SELECT TEXT( :nil ) ', array( ':nil' => 'NULL' ) ), 'NULL' );
+		asrt( $adapter->getCell( 'SELECT TEXT( :nil ) ', array( ':nil' => NULL ) ), NULL );
+		asrt( $adapter->getCell( 'SELECT TEXT( ? ) ', array( 'NULL' ) ), 'NULL' );
+		asrt( $adapter->getCell( 'SELECT TEXT( ? ) ', array( NULL ) ), NULL );
 	}
 }

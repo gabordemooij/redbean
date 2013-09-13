@@ -126,7 +126,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return string $column name
 	 */
-	public function esc( $c, $q = false )
+	public function esc( $c, $q = FALSE )
 	{
 		return parent::esc( ( !$q ) ? strtoupper( $c ) : $c, $q );
 	}
@@ -170,13 +170,13 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function addUniqueIndex( $table, $columns )
 	{
-		$tableNoQuote   = strtoupper( $this->esc( $table, true ) );
+		$tableNoQuote   = strtoupper( $this->esc( $table, TRUE ) );
 		$tableWithQuote = strtoupper( $this->esc( $table ) );
 
 		sort( $columns ); //else we get multiple indexes due to order-effects
 
 		foreach ( $columns as $k => $v ) {
-			$columns[$k] = strtoupper( $this->esc( $v, true ) );
+			$columns[$k] = strtoupper( $this->esc( $v, TRUE ) );
 		}
 
 		$r = $this->adapter->get( "SELECT INDEX_NAME FROM USER_INDEXES WHERE TABLE_NAME='$tableNoQuote' AND UNIQUENESS='UNIQUE'" );
@@ -226,7 +226,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 					  ", array( $table ) );
 
 			// Already foreign keys added in this association table
-			if ( $fks > 0 ) return false;
+			if ( $fks > 0 ) return FALSE;
 
 			$columns = $this->getColumns( $table );
 
@@ -250,9 +250,9 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 
 			$this->adapter->exec( $sql );
 
-			return true;
+			return TRUE;
 		} catch ( Exception $e ) {
-			return false;
+			return FALSE;
 		}
 	}
 
@@ -326,7 +326,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		}
 
 		$table_with_quotes         = strtoupper( $this->esc( $table ) );
-		$safe_table_without_quotes = strtoupper( $this->esc( $table, true ) );
+		$safe_table_without_quotes = strtoupper( $this->esc( $table, TRUE ) );
 
 		$sql = "CREATE TABLE $table_with_quotes(
                 ID NUMBER(11) NOT NULL,
@@ -418,7 +418,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 */
 	public function getColumns( $table )
 	{
-		$table      = $this->esc( $table, true );
+		$table      = $this->esc( $table, TRUE );
 		$columnsRaw = $this->adapter->get( "SELECT LOWER(COLUMN_NAME) COLUMN_NAME, DATA_TYPE, DATA_LENGTH, DATA_PRECISION FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = UPPER('$table')" );
 
 		$columns = array();
@@ -456,7 +456,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return integer $typecode code
 	 */
-	public function code( $typedescription, $includeSpecials = false )
+	public function code( $typedescription, $includeSpecials = FALSE )
 	{
 		$r = ( ( isset( $this->sqltype_typeno[$typedescription] ) ) ? $this->sqltype_typeno[$typedescription] : self::C_DATATYPE_SPECIFIED );
 
@@ -545,7 +545,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return integer $id the primary key ID value of the new record
 	 */
-	public function updateRecord( $type, $updatevalues, $id = null )
+	public function updateRecord( $type, $updatevalues, $id = NULL )
 	{
 		foreach ( $updatevalues as &$updatevalue ) {
 			$updatevalue['property'] = strtoupper( $updatevalue['property'] );
@@ -571,18 +571,18 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return void
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false )
+	public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
 	{
 		$table           = strtoupper( $this->esc( $type ) );
-		$tableNoQ        = strtoupper( $this->esc( $type, true ) );
+		$tableNoQ        = strtoupper( $this->esc( $type, TRUE ) );
 
 		$targetTable     = strtoupper( $this->esc( $targetType ) );
 
 		$column          = strtoupper( $this->esc( $field ) );
-		$columnNoQ       = strtoupper( $this->esc( $field, true ) );
+		$columnNoQ       = strtoupper( $this->esc( $field, TRUE ) );
 
 		$targetColumn    = strtoupper( $this->esc( $targetField ) );
-		$targetColumnNoQ = strtoupper( $this->esc( $targetField, true ) );
+		$targetColumnNoQ = strtoupper( $this->esc( $targetField, TRUE ) );
 
 		$fkName          = 'FK_' . ( $isDependent ? 'C_' : '' ) . $tableNoQ . '_' . $columnNoQ . '_' . $targetColumnNoQ;
 		$fkName          = $this->limitOracleIdentifierLength( $fkName );
@@ -592,17 +592,17 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		    FROM ALL_CONS_COLUMNS A JOIN ALL_CONSTRAINTS C  ON A.CONSTRAINT_NAME = C.CONSTRAINT_NAME
 			WHERE C.TABLE_NAME = '$tableNoQ' AND C.CONSTRAINT_TYPE = 'R'	AND COLUMN_NAME='$columnNoQ'" );
 
-		$flagAddKey = false;
+		$flagAddKey = FALSE;
 		try {
 			// No keys
 			if ( !$cfks ) {
-				$flagAddKey = true; //go get a new key
+				$flagAddKey = TRUE; //go get a new key
 			}
 
 			// Has fk, but different setting, --remove
 			if ( $cfks && $cfks != $fkName ) {
 				$this->adapter->exec( "ALTER TABLE $table DROP CONSTRAINT $cfks " );
-				$flagAddKey = true; //go get a new key.
+				$flagAddKey = TRUE; //go get a new key.
 			}
 
 			if ( $flagAddKey ) {
@@ -620,7 +620,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	/**
 	 * @see RedBean_QueryWriter::queryRecord
 	 */
-	public function queryRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
+	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
 		return parent::queryRecord( $type, $this->filterConditions( $conditions ), $addSql, $bindings );
 	}
@@ -628,7 +628,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	/**
 	 * @see RedBean_QueryWriter::deleteRecord
 	 */
-	public function deleteRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
+	public function deleteRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
 		parent::deleteRecord( $type, $this->filterConditions( $conditions ), $addSql, $bindings );
 	}
@@ -659,7 +659,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return integer $type type
 	 */
-	public function scanType( $value, $flagSpecial = false )
+	public function scanType( $value, $flagSpecial = FALSE )
 	{
 		$this->svalue = $value;
 

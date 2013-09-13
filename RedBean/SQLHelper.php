@@ -23,7 +23,7 @@ class RedBean_SQLHelper
 	/**
 	 * @var boolean
 	 */
-	protected $capture = false;
+	protected $capture = FALSE;
 
 	/**
 	 * @var string
@@ -33,7 +33,7 @@ class RedBean_SQLHelper
 	/**
 	 * @var boolean
 	 */
-	protected static $flagUseCamelCase = true;
+	protected static $flagUseCamelCase = TRUE;
 
 	/**
 	 * @var array
@@ -70,7 +70,7 @@ class RedBean_SQLHelper
 	 * Magic method to construct SQL query.
 	 * Accepts any kind of message and turns it into an SQL statement and
 	 * adds it to the query string.
-	 * If camelcase is set to true camelCase transitions will be turned into spaces.
+	 * If camelcase is set to TRUE camelCase transitions will be turned into spaces.
 	 * Underscores will be replaced with spaces as well.
 	 * Arguments will be imploded using a comma as glue character and are also added
 	 * to the query.
@@ -118,7 +118,7 @@ class RedBean_SQLHelper
 	 */
 	public function begin()
 	{
-		$this->capture = true;
+		$this->capture = TRUE;
 
 		return $this;
 	}
@@ -172,7 +172,7 @@ class RedBean_SQLHelper
 	{
 		$this->sql     = '';
 		$this->params  = array();
-		$this->capture = false; //turn off capture mode (issue #142)
+		$this->capture = FALSE; //turn off capture mode (issue #142)
 
 		return $this;
 	}

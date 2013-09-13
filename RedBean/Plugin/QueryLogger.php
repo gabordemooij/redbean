@@ -73,7 +73,7 @@ class RedBean_Plugin_QueryLogger implements RedBean_Observer, RedBean_Plugin
 	{
 		$found = array();
 		foreach ( $this->logs as $log ) {
-			if ( strpos( $log, $word ) !== false ) {
+			if ( strpos( $log, $word ) !== FALSE ) {
 				$found[] = $log;
 			}
 		}

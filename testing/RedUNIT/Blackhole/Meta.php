@@ -28,10 +28,10 @@ class RedUNIT_Blackhole_Meta extends RedUNIT_Blackhole
 
 		asrt( $bean->getMeta( "this.is.a.custom.metaproperty" ), "yes" );
 
-		asrt( $bean->getMeta( "nonexistant" ), null );
+		asrt( $bean->getMeta( "nonexistant" ), NULL );
 		asrt( $bean->getMeta( "nonexistant", "abc" ), "abc" );
 
-		asrt( $bean->getMeta( "nonexistant.nested" ), null );
+		asrt( $bean->getMeta( "nonexistant.nested" ), NULL );
 		asrt( $bean->getMeta( "nonexistant,nested", "abc" ), "abc" );
 
 		$bean->setMeta( "test.two", "second" );
@@ -51,7 +51,7 @@ class RedUNIT_Blackhole_Meta extends RedUNIT_Blackhole
 
 		$bean2 = new RedBean_OODBBean;
 
-		asrt( $bean2->getMeta( "meta.meta" ), null );
+		asrt( $bean2->getMeta( "meta.meta" ), NULL );
 
 		$bean2->copyMetaFrom( $bean );
 

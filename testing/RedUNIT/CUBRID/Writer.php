@@ -32,17 +32,17 @@ class RedUNIT_CUBRID_Writer extends RedUNIT_CUBRID
 		
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols['special'], true ), RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->code( $cols['special'], TRUE ), RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATE );
 		
-		asrt( $writer->code( $cols['special'], false ), RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIFIED );
+		asrt( $writer->code( $cols['special'], FALSE ), RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIFIED );
 		
 		$writer->addColumn( "testtable", "special2", RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATETIME );
 		
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols['special2'], true ), RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATETIME );
+		asrt( $writer->code( $cols['special2'], TRUE ), RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATETIME );
 		
-		asrt( $writer->code( $cols['special'], false ), RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIFIED );
+		asrt( $writer->code( $cols['special'], FALSE ), RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIFIED );
 		
 		
 	}

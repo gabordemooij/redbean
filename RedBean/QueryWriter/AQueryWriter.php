@@ -35,7 +35,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	/**
 	 * @var boolean
 	 */
-	protected $flagUseCache = false;
+	protected $flagUseCache = FALSE;
 
 	/**
 	 * @var array
@@ -132,7 +132,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 			}
 		}
 
-		return null;
+		return NULL;
 	}
 
 	/**
@@ -244,7 +244,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 *
 	 * @return array
 	 */
-	private function getRelationalTablesAndColumns( $sourceType, $destType, $noQuote = false )
+	private function getRelationalTablesAndColumns( $sourceType, $destType, $noQuote = FALSE )
 	{
 		$linkTable   = $this->esc( $this->getAssocTable( array( $sourceType, $destType ) ), $noQuote );
 		$sourceCol   = $this->esc( $sourceType . '_id', $noQuote );
@@ -287,9 +287,9 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 		$value = strval( $value );
 
 		if ( strlen( $value ) > 1 && strpos( $value, '0' ) === 0 && strpos( $value, '0.' ) !== 0 ) {
-			return true;
+			return TRUE;
 		} else {
-			return false;
+			return FALSE;
 		}
 	}
 
@@ -379,7 +379,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	/**
 	 * @see RedBean_QueryWriter::renameAssociation
 	 */
-	public static function renameAssociation( $from, $to = null )
+	public static function renameAssociation( $from, $to = NULL )
 	{
 		if ( is_array( $from ) ) {
 			foreach ( $from as $key => $value ) self::$renames[$key] = $value;
@@ -408,7 +408,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	/**
 	 * @see RedBean_QueryWriter::glueSQLCondition
 	 */
-	public function glueSQLCondition( $sql, $glue = null )
+	public function glueSQLCondition( $sql, $glue = NULL )
 	{
 		static $snippetCache = array();
 
@@ -440,7 +440,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	/**
 	 * @see RedBean_QueryWriter::esc
 	 */
-	public function esc( $dbStructure, $dontQuote = false )
+	public function esc( $dbStructure, $dontQuote = FALSE )
 	{
 		$this->check( $dbStructure );
 
@@ -465,7 +465,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	/**
 	 * @see RedBean_QueryWriter::updateRecord
 	 */
-	public function updateRecord( $type, $updatevalues, $id = null )
+	public function updateRecord( $type, $updatevalues, $id = NULL )
 	{
 		$table = $type;
 
@@ -506,11 +506,11 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	/**
 	 * @see RedBean_QueryWriter::queryRecord
 	 */
-	public function queryRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
+	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, ( count($conditions) > 0) ? RedBean_QueryWriter::C_GLUE_AND : null );
+		$addSql = $this->glueSQLCondition( $addSql, ( count($conditions) > 0) ? RedBean_QueryWriter::C_GLUE_AND : NULL );
 
-		$key = null;
+		$key = NULL;
 		if ( $this->flagUseCache ) {
 			$key = $this->getCacheKey( array( $conditions, $addSql, $bindings, 'select' ) );
 
@@ -667,7 +667,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	/**
 	 * @see RedBean_QueryWriter::queryRecordCount
 	 */
-	public function queryRecordCount( $type, $conditions = array(), $addSql = null, $bindings = array() )
+	public function queryRecordCount( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
 		$addSql = $this->glueSQLCondition( $addSql );
 
@@ -713,7 +713,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	/**
 	 * @see RedBean_QueryWriter::deleteRecord
 	 */
-	public function deleteRecord( $type, $conditions = array(), $addSql = null, $bindings = array() )
+	public function deleteRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
 		$addSql = $this->glueSQLCondition( $addSql );
 
@@ -778,18 +778,18 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	/**
 	 * @see RedBean_QueryWriter::addFK
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDependent = false )
+	public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
 	{
 		$table           = $this->esc( $type );
-		$tableNoQ        = $this->esc( $type, true );
+		$tableNoQ        = $this->esc( $type, TRUE );
 
 		$targetTable     = $this->esc( $targetType );
 
 		$column          = $this->esc( $field );
-		$columnNoQ       = $this->esc( $field, true );
+		$columnNoQ       = $this->esc( $field, TRUE );
 
 		$targetColumn    = $this->esc( $targetField );
-		$targetColumnNoQ = $this->esc( $targetField, true );
+		$targetColumnNoQ = $this->esc( $targetField, TRUE );
 
 		$db = $this->adapter->getCell( 'SELECT DATABASE()' );
 
@@ -803,18 +803,18 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
 		" );
 
-		$flagAddKey = false;
+		$flagAddKey = FALSE;
 
 		try {
 			// No keys
 			if ( !$cfks ) {
-				$flagAddKey = true; //go get a new key
+				$flagAddKey = TRUE; //go get a new key
 			}
 
 			// Has fk, but different setting, --remove
 			if ( $cfks && $cfks != $cName ) {
 				$this->adapter->exec( "ALTER TABLE $table DROP FOREIGN KEY $cfks " );
-				$flagAddKey = true; //go get a new key.
+				$flagAddKey = TRUE; //go get a new key.
 			}
 
 			if ( $flagAddKey ) {
@@ -830,7 +830,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	/**
 	 * @see RedBean_QueryWriter::renameAssocTable
 	 */
-	public function renameAssocTable( $from, $to = null )
+	public function renameAssocTable( $from, $to = NULL )
 	{
 		self::renameAssociation( $from, $to );
 	}
@@ -848,7 +848,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 */
 	public function addConstraintForTypes( $sourceType, $destType )
 	{
-		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType, true );
+		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType, TRUE );
 
 		$this->constrain( $linkTable, $sourceTable, $destTable, $sourceCol, $destCol );
 	}
@@ -885,7 +885,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 *
 	 * @return string
 	 */
-	public function safeColumn( $column, $noQuotes = false )
+	public function safeColumn( $column, $noQuotes = FALSE )
 	{
 		return $this->esc( $column, $noQuotes );
 	}
@@ -898,7 +898,7 @@ abstract class RedBean_QueryWriter_AQueryWriter { //bracket must be here - other
 	 *
 	 * @return string
 	 */
-	public function safeTable( $table, $noQuotes = false )
+	public function safeTable( $table, $noQuotes = FALSE )
 	{
 		return $this->esc( $table, $noQuotes );
 	}

@@ -64,14 +64,14 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 		asrt( count( $books ), 2 );
 
-		$foundMagazine = null;
+		$foundMagazine = NULL;
 		foreach ( $books as $book ) {
 			if ( $book->title === 'magazine' ) {
 				$foundMagazine = $book;
 			}
 		}
 
-		asrt( ( $foundMagazine instanceof RedBean_OODBBean ), true );
+		asrt( ( $foundMagazine instanceof RedBean_OODBBean ), TRUE );
 
 		asrt( count( $foundMagazine->ownPage ), 2 );
 
@@ -504,9 +504,9 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 		$text = reset( $texts );
 
-		asrt( ( $text->page->id ) > 0, true );
-		asrt( ( $text->page->book->id ) > 0, true );
-		asrt( ( $text->page->book->author->id ) > 0, true );
+		asrt( ( $text->page->id ) > 0, TRUE );
+		asrt( ( $text->page->book->id ) > 0, TRUE );
+		asrt( ( $text->page->book->author->id ) > 0, TRUE );
 
 	}
 
@@ -540,9 +540,9 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 		$text = reset( $texts );
 
-		asrt( ( $text->page->id ) > 0, true );
-		asrt( ( $text->page->book->id ) > 0, true );
-		asrt( ( $text->page->book->fetchAs( 'author' )->coauthor->id ) > 0, true );
+		asrt( ( $text->page->id ) > 0, TRUE );
+		asrt( ( $text->page->book->id ) > 0, TRUE );
+		asrt( ( $text->page->book->fetchAs( 'author' )->coauthor->id ) > 0, TRUE );
 	}
 
 	/**
@@ -784,7 +784,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 		$text = reset( $texts );
 
-		asrt( $text->page, null );
+		asrt( $text->page, NULL );
 	}
 
 	/**
@@ -814,7 +814,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 		$books = R::find( 'book' );
 
-		$hasNuked = false;
+		$hasNuked = FALSE;
 
 		R::preload(
 			$books,
@@ -823,7 +823,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 				if ( !$hasNuked ) {
 					R::nuke();
 
-					$hasNuked = true;
+					$hasNuked = TRUE;
 				}
 
 				asrt( $book->getMeta( 'type' ), 'book' );
@@ -856,7 +856,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 		$texts = R::find( 'text' );
 
-		$hasNuked = false;
+		$hasNuked = FALSE;
 
 		R::preload(
 			$texts,
@@ -865,7 +865,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 				if ( !$hasNuked ) {
 					R::nuke();
 
-					$hasNuked = true;
+					$hasNuked = TRUE;
 				}
 
 				asrt( $text->getMeta( 'type' ), 'text' );
@@ -906,7 +906,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 		$texts = R::find( 'text' );
 
-		$hasNuked = false;
+		$hasNuked = FALSE;
 
 		R::preload(
 			$texts,
@@ -914,13 +914,13 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 			function ( $text, $page, $book, $author, $shelf ) use ( &$hasNuked ) {
 				if ( !$hasNuked ) {
 					R::nuke();
-					$hasNuked = true;
+					$hasNuked = TRUE;
 				}
 				asrt( $text->getMeta( 'type' ), 'text' );
 				asrt( $page->getMeta( 'type' ), 'page' );
-				asrt( ( $page->id > 0 ), true );
+				asrt( ( $page->id > 0 ), TRUE );
 				asrt( $book->getMeta( 'type' ), 'book' );
-				asrt( ( $book->id > 0 ), true );
+				asrt( ( $book->id > 0 ), TRUE );
 				asrt( $author->getMeta( 'type' ), 'author' );
 				asrt( $shelf->getMeta( 'type' ), 'shelf' );
 			}
@@ -951,7 +951,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 		$pages    = R::find( 'page' );
 
-		$hasNuked = false;
+		$hasNuked = FALSE;
 
 		R::preload(
 			$pages,
@@ -960,22 +960,22 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 				if ( !$hasNuked ) {
 					R::nuke();
 
-					$hasNuked = true;
+					$hasNuked = TRUE;
 				}
 
 				asrt( $page->getMeta( 'type' ), 'page' );
 
-				asrt( ( $page->id > 0 ), true );
+				asrt( ( $page->id > 0 ), TRUE );
 
 				asrt( $book->getMeta( 'type' ), 'book' );
 
-				asrt( ( $book->id > 0 ), true );
+				asrt( ( $book->id > 0 ), TRUE );
 
 				asrt( $author->getMeta( 'type' ), 'author' );
 
-				asrt( ( $author->id > 0 ), true );
+				asrt( ( $author->id > 0 ), TRUE );
 
-				asrt( is_array( $texts ), true );
+				asrt( is_array( $texts ), TRUE );
 
 				asrt( count( $texts ), 2 );
 
@@ -1015,7 +1015,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 		$texts = R::find( 'text' );
 
-		$hasNuked = false;
+		$hasNuked = FALSE;
 
 		$i = 0;
 
@@ -1032,16 +1032,16 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 				if ( !$hasNuked ) {
 					R::nuke();
 
-					$hasNuked = true;
+					$hasNuked = TRUE;
 				}
 				$i++;
 				asrt( count( $x ), 3 );
 
-				asrt( ( $p->id > 0 ), true );
-				asrt( ( $c->id > 0 ), true );
-				asrt( ( $t->id > 0 ), true );
-				asrt( ( $b->id > 0 ), true );
-				asrt( ( $a->id > 0 ), true );
+				asrt( ( $p->id > 0 ), TRUE );
+				asrt( ( $c->id > 0 ), TRUE );
+				asrt( ( $t->id > 0 ), TRUE );
+				asrt( ( $b->id > 0 ), TRUE );
+				asrt( ( $a->id > 0 ), TRUE );
 
 				asrt( $t->getMeta( 'type' ), 'text' );
 				asrt( $p->getMeta( 'type' ), 'page' );
@@ -1067,7 +1067,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 	public function testVariations2()
 	{
 		// Extra, test in combination with writer cache
-		R::$writer->setUseCache( true );
+		R::$writer->setUseCache( TRUE );
 
 		$villages = R::dispense( 'village', 3 );
 
@@ -1154,7 +1154,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 			),
 			function ( $t, $a, $s, $b, $x, $w ) use ( &$counter ) {
 				if ( $counter === 0 ) {
-					asrt( $w, null );
+					asrt( $w, NULL );
 
 					asrt( (string) $t->name, '0' );
 
@@ -1271,7 +1271,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 
 					asrt( $first->getMeta( 'type' ), 'book' );
 				} elseif ( $counter === 2 ) {
-					asrt( $w, null );
+					asrt( $w, NULL );
 
 					asrt( (string) $t->name, '2' );
 
@@ -1331,7 +1331,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 	 */
 	public function testPreloadingVariationsAndCache()
 	{
-		R::$writer->setUseCache( false );
+		R::$writer->setUseCache( FALSE );
 
 		$books = R::dispense( 'book', 4 );
 
@@ -1368,7 +1368,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 	 */
 	public function testPreloadingVariationsAndCache2()
 	{
-		R::$writer->setUseCache( false );
+		R::$writer->setUseCache( FALSE );
 
 		$villages = R::dispense( 'village', 3 );
 
@@ -1449,7 +1449,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 			),
 			function ( $t, $a, $s, $b, $x, $w ) use ( &$counter ) {
 				if ( $counter === 0 ) {
-					asrt( $w, null );
+					asrt( $w, NULL );
 
 					asrt( (string) $t->name, '0' );
 
@@ -1562,7 +1562,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 					$first = reset( $x );
 					asrt( $first->getMeta( 'type' ), 'book' );
 				} elseif ( $counter === 2 ) {
-					asrt( $w, null );
+					asrt( $w, NULL );
 
 					asrt( (string) $t->name, '2' );
 

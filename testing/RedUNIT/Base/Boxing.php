@@ -59,7 +59,7 @@ class RedUNIT_Base_Boxing extends RedUNIT_Base
 
 		$box = $bean->box();
 
-		asrt( ( $box instanceof Model_Boxedbean ), true );
+		asrt( ( $box instanceof Model_Boxedbean ), TRUE );
 
 		R::store( $box );
 	}

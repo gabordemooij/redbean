@@ -136,7 +136,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$entry2 = end( $resp['result'] );
 
-		asrt( ( $entry1['id'] > $entry2['id'] ), true );
+		asrt( ( $entry1['id'] > $entry2['id'] ), TRUE );
 
 		$can->setWhitelist( array( 'ad' => array( 'GET' ) ) );
 
@@ -159,7 +159,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$entry2 = end( $resp['result'] );
 
-		asrt( ( $entry1['id'] < $entry2['id'] ), true );
+		asrt( ( $entry1['id'] < $entry2['id'] ), TRUE );
 
 		$can->setWhitelist( array( 'page' => array( 'GET' ) ) );
 
@@ -176,7 +176,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 			)
 		);
 
-		asrt( isset( $resp['error'] ), true );
+		asrt( isset( $resp['error'] ), TRUE );
 
 		$resp = $can->handleREST(
 			$user,
@@ -339,7 +339,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		asrt( (string) $resp['result']['name'], (string) $site->name );
 		asrt( (string) $resp['result']['user_id'], (string) $site->user_id );
 
-		asrt( !isset( $resp['error'] ), true );
+		asrt( !isset( $resp['error'] ), TRUE );
 
 		$can->setWhitelist( 'all' );
 
@@ -434,7 +434,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		asrt( (string) $resp['result']['name'], (string) $newAd->name );
 
 		// Send a POST /site/1
-		$exception = null;
+		$exception = NULL;
 
 		$resp = $can->handleREST(
 			$user, 'site/' . $site->id,
@@ -496,7 +496,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		$newAd = R::findOne( 'ad', ' name = ? ', array( 'my new ad' ) );
 
 		asrt( (string) $resp['result'], 'OK' );
-		asrt( $newAd, null );
+		asrt( $newAd, NULL );
 
 		// Send a MAIL /site/1/page/1
 		$resp = $can->handleREST(
@@ -570,9 +570,9 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 			'GET'
 		);
 
-		asrt( isset( $resp['error'] ), true );
+		asrt( isset( $resp['error'] ), TRUE );
 
-		Model_Setting::$closed = true;
+		Model_Setting::$closed = TRUE;
 
 		$resp = $can->handleREST(
 			$user,
@@ -580,9 +580,9 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 			'GET'
 		);
 
-		asrt( isset( $resp['error'] ), true );
+		asrt( isset( $resp['error'] ), TRUE );
 
-		Model_Setting::$closed = false;
+		Model_Setting::$closed = FALSE;
 
 		// Some other scenarios, not allowed to post nested sets.
 		$village = R::dispense( 'village' );
@@ -626,7 +626,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		R::nuke();
 
-		R::$writer->setUseCache( true );
+		R::$writer->setUseCache( TRUE );
 
 		$village = R::dispense( 'village' );
 
@@ -648,7 +648,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		asrt( count( $village->ownBuilding ), 1 );
 
-		R::$writer->setUseCache( false );
+		R::$writer->setUseCache( FALSE );
 
 		testpack( "Test BeanCan Server 1 / create" );
 
@@ -656,27 +656,27 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$rs = ( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "funcandy", "taste" => "sweet" ) ) ) );
 
-		asrt( is_string( $rs ), true );
+		asrt( is_string( $rs ), TRUE );
 
-		$rs = json_decode( $rs, true );
+		$rs = json_decode( $rs, TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "1234" );
 
-		asrt( isset( $rs["result"] ), true );
+		asrt( isset( $rs["result"] ), TRUE );
 
-		asrt( ( $rs["result"] > 0 ), true );
+		asrt( ( $rs["result"] > 0 ), TRUE );
 
-		asrt( isset( $rs["error"] ), false );
+		asrt( isset( $rs["error"] ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
@@ -684,26 +684,26 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		testpack( "Test retrieve" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $oldid ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $oldid ) ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "1234" );
 
-		asrt( isset( $rs["result"] ), true );
-		asrt( isset( $rs["error"] ), false );
+		asrt( isset( $rs["result"] ), TRUE );
+		asrt( isset( $rs["error"] ), FALSE );
 
-		asrt( is_array( $rs["result"] ), true );
+		asrt( is_array( $rs["result"] ), TRUE );
 
 		asrt( count( $rs["result"] ), 3 );
 
@@ -713,121 +713,121 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		testpack( "Test update" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "id" => $oldid, "taste" => "salty" ) ), "42" ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "id" => $oldid, "taste" => "salty" ) ), "42" ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "42" );
 
-		asrt( isset( $rs["result"] ), true );
-		asrt( isset( $rs["error"] ), false );
+		asrt( isset( $rs["result"] ), TRUE );
+		asrt( isset( $rs["error"] ), FALSE );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $oldid ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $oldid ) ), TRUE );
 
 		asrt( $rs["result"]["taste"], "salty" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array() ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array() ), TRUE );
 
 		asrt( $rs["error"]["message"], "First param needs to be Bean ID" );
 
 		asrt( (string) $rs["error"]["code"], "-32602" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:export", array() ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:export", array() ), TRUE );
 
 		asrt( $rs["error"]["message"], "First param needs to be Bean ID" );
 
 		asrt( (string) $rs["error"]["code"], "-32602" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:trash", array() ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:trash", array() ), TRUE );
 
 		asrt( $rs["error"]["message"], "First param needs to be Bean ID" );
 
 		asrt( (string) $rs["error"]["code"], "-32602" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "darkchoco", "taste" => "bitter" ) ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "darkchoco", "taste" => "bitter" ) ) ), TRUE );
 
 		$id2 = $rs["result"];
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $oldid ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $oldid ) ), TRUE );
 
 		asrt( $rs["result"]["brand"], "funcandy" );
 		asrt( $rs["result"]["taste"], "salty" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $id2 ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $id2 ) ), TRUE );
 
 		asrt( $rs["result"]["brand"], "darkchoco" );
 		asrt( $rs["result"]["taste"], "bitter" );
 
 		testpack( "Test delete" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:trash", array( $oldid ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:trash", array( $oldid ) ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "1234" );
 
-		asrt( isset( $rs["result"] ), true );
+		asrt( isset( $rs["result"] ), TRUE );
 
-		asrt( isset( $rs["error"] ), false );
+		asrt( isset( $rs["error"] ), FALSE );
 
 		asrt( $rs["result"], "OK" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $oldid ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $oldid ) ), TRUE );
 
-		asrt( isset( $rs["result"] ), true );
-		asrt( isset( $rs["error"] ), false );
+		asrt( isset( $rs["result"] ), TRUE );
+		asrt( isset( $rs["error"] ), FALSE );
 
 		asrt( $rs["result"]["id"], 0 );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $id2 ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:load", array( $id2 ) ), TRUE );
 
 		asrt( $rs["result"]["brand"], "darkchoco" );
 		asrt( $rs["result"]["taste"], "bitter" );
 
 		testpack( "Test Custom Method" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:customMethod", array( "test" ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:customMethod", array( "test" ) ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "1234" );
 
-		asrt( isset( $rs["result"] ), true );
-		asrt( isset( $rs["error"] ), false );
+		asrt( isset( $rs["result"] ), TRUE );
+		asrt( isset( $rs["error"] ), FALSE );
 
 		asrt( $rs["result"], "test!" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:customMethodWithException", array( "test" ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:customMethodWithException", array( "test" ) ), TRUE );
 
 		asrt( $rs["error"]["code"], -32099 );
 		asrt( $rs["error"]["message"], '0-Oops!' );
@@ -838,87 +838,87 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$can->setWhitelist( 'all' );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "darkchoco", "taste" => "bitter" ) ), 1, '' ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "darkchoco", "taste" => "bitter" ) ), 1, '' ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
 
-		asrt( isset( $rs["error"]["code"] ), true );
+		asrt( isset( $rs["error"]["code"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32600 );
 		asrt( $rs["error"]["message"], 'This bean is not available. Set whitelist to "all" or add to whitelist.' );
 
 		$can = new RedBean_Plugin_BeanCan;
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "darkchoco", "taste" => "bitter" ) ), 1, array( 'candybar' => array( 'like' ) ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "darkchoco", "taste" => "bitter" ) ), 1, array( 'candybar' => array( 'like' ) ) ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
 
-		asrt( isset( $rs["error"]["code"] ), true );
+		asrt( isset( $rs["error"]["code"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32600 );
 		asrt( $rs["error"]["message"], 'This bean is not available. Set whitelist to "all" or add to whitelist.' );
 
 		$can = new RedBean_Plugin_BeanCan;
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "darkchoco", "taste" => "bitter" ) ), 1, array( 'candybar' => array( 'store' ) ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "darkchoco", "taste" => "bitter" ) ), 1, array( 'candybar' => array( 'store' ) ) ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
-		asrt( isset( $rs["result"] ), true );
-		asrt( isset( $rs["error"] ), false );
+		asrt( isset( $rs["id"] ), TRUE );
+		asrt( isset( $rs["result"] ), TRUE );
+		asrt( isset( $rs["error"] ), FALSE );
 
 		testpack( "Test Negatives: parse error" );
 
-		$rs = json_decode( $can->handleJSONRequest( "crap" ), true );
+		$rs = json_decode( $can->handleJSONRequest( "crap" ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 2 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), false );
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
-		asrt( isset( $rs["error"]["code"] ), true );
+		asrt( isset( $rs["id"] ), FALSE );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
+		asrt( isset( $rs["error"]["code"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32700 );
 
@@ -928,206 +928,206 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$can->setWhitelist( 'all' );
 
-		$rs = json_decode( $can->handleJSONRequest( '{"aa":"bb"}' ), true );
+		$rs = json_decode( $can->handleJSONRequest( '{"aa":"bb"}' ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 2 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), false );
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
+		asrt( isset( $rs["id"] ), FALSE );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
 
-		asrt( isset( $rs["error"]["code"] ), true );
+		asrt( isset( $rs["error"]["code"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32600 );
 
 		$can->setWhitelist( 'all' );
 
-		$rs = json_decode( $can->handleJSONRequest( '{"jsonrpc":"9.1"}' ), true );
+		$rs = json_decode( $can->handleJSONRequest( '{"jsonrpc":"9.1"}' ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 2 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), false );
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
+		asrt( isset( $rs["id"] ), FALSE );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
 
-		asrt( isset( $rs["error"]["code"] ), true );
+		asrt( isset( $rs["error"]["code"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32600 );
 
 		$can->setWhitelist( 'all' );
 
-		$rs = json_decode( $can->handleJSONRequest( '{"id":9876,"jsonrpc":"9.1"}' ), true );
+		$rs = json_decode( $can->handleJSONRequest( '{"id":9876,"jsonrpc":"9.1"}' ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 2 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), false );
+		asrt( isset( $rs["id"] ), FALSE );
 
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
-		asrt( isset( $rs["error"]["code"] ), true );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
+		asrt( isset( $rs["error"]["code"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32600 );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "wrong", array( "test" ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "wrong", array( "test" ) ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "1234" );
 
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32600 );
 		asrt( $rs["error"]["message"], "Invalid method signature. Use: BEAN:ACTION" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( ".;':wrong", array( "test" ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( ".;':wrong", array( "test" ) ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "1234" );
 
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32600 );
 		asrt( $rs["error"]["message"], "Invalid Bean Type String" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "wrong:.;'", array( "test" ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "wrong:.;'", array( "test" ) ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "1234" );
 
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32600 );
 		asrt( $rs["error"]["message"], "Invalid Action String" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "wrong:wrong", array( "test" ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "wrong:wrong", array( "test" ) ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "1234" );
 
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32601 );
 		asrt( $rs["error"]["message"], "No such bean in the can!" );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:beHealthy", array( "test" ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:beHealthy", array( "test" ) ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "1234" );
 
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32601 );
 		asrt( $rs["error"]["message"], "Method not found in Bean: candybar " );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store" ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store" ), TRUE );
 
-		asrt( is_array( $rs ), true );
+		asrt( is_array( $rs ), TRUE );
 
-		asrt( empty( $rs ), false );
+		asrt( empty( $rs ), FALSE );
 
 		asrt( count( $rs ), 3 );
 
-		asrt( isset( $rs["jsonrpc"] ), true );
+		asrt( isset( $rs["jsonrpc"] ), TRUE );
 
 		asrt( $rs["jsonrpc"], "2.0" );
 
-		asrt( isset( $rs["id"] ), true );
+		asrt( isset( $rs["id"] ), TRUE );
 
 		asrt( ( $rs["id"] ), "1234" );
 
-		asrt( isset( $rs["result"] ), false );
-		asrt( isset( $rs["error"] ), true );
+		asrt( isset( $rs["result"] ), FALSE );
+		asrt( isset( $rs["error"] ), TRUE );
 
 		asrt( $rs["error"]["code"], -32602 );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "pdo:connect", array( "abc" ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "pdo:connect", array( "abc" ) ), TRUE );
 
 		asrt( $rs["error"]["code"], -32601 );
 
-		$rs = json_decode( fakeBeanCanServerRequest( "stdClass:__toString", array( "abc" ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( "stdClass:__toString", array( "abc" ) ), TRUE );
 
 		asrt( $rs["error"]["code"], -32601 );
 
@@ -1142,7 +1142,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$out = $can->handleJSONRequest( $request );
 
-		$rs = json_decode( $out, true );
+		$rs = json_decode( $out, TRUE );
 
 		asrt( (string) $rs["error"]["message"], 'No method' );
 		asrt( (string) $rs["error"]["code"], '-32600' );
@@ -1158,7 +1158,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$out = $can->handleJSONRequest( $request );
 
-		$rs = json_decode( $out, true );
+		$rs = json_decode( $out, TRUE );
 
 		asrt( (string) $rs["error"]["message"], 'No ID' );
 		asrt( (string) $rs["error"]["code"], '-32600' );
@@ -1182,19 +1182,19 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		asrt( json_decode( $server->handleRESTGetRequest( 'book/' . $id1 ) )->result->title, 'book 1' );
 		asrt( json_decode( $server->handleRESTGetRequest( 'book/' . $id2 ) )->result->title, 'book 2' );
 
-		$r = json_decode( $server->handleRESTGetRequest( 'book' ), true );
+		$r = json_decode( $server->handleRESTGetRequest( 'book' ), TRUE );
 
 		$a = $r['result'];
 
 		asrt( count( $a ), 2 );
 
-		$r = json_decode( $server->handleRESTGetRequest( '' ), true );
+		$r = json_decode( $server->handleRESTGetRequest( '' ), TRUE );
 
 		$a = $r['error']['message'];
 
 		asrt( $a, 'Internal Error' );
 
-		$r = json_decode( $server->handleRESTGetRequest( array() ), true );
+		$r = json_decode( $server->handleRESTGetRequest( array() ), TRUE );
 
 		$a = $r['error']['message'];
 
@@ -1222,7 +1222,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$id = R::store( $briefcase );
 
-		$rs = json_decode( fakeBeanCanServerRequest( 'briefcase:export', array( $id ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( 'briefcase:export', array( $id ) ), TRUE );
 
 		asrt( (int) $rs['result'][0]['id'], (int) $id );
 
@@ -1231,7 +1231,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		asrt( $rs['result'][0]['ownDocument'][1]['ownPage'][0]['content'], 'Lorem Ipsum' );
 		asrt( $rs['result'][0]['ownDocument'][1]['ownPage'][0]['sharedAuthor'][0]['name'], 'Someone' );
 
-		$rs = json_decode( fakeBeanCanServerRequest( 'document:export', array( $documents[1]->id ) ), true );
+		$rs = json_decode( fakeBeanCanServerRequest( 'document:export', array( $documents[1]->id ) ), TRUE );
 
 		asrt( (int) $rs['result'][0]['id'], (int) $documents[1]->id );
 
@@ -1245,9 +1245,9 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$can->setWhitelist( 'all' );
 
-		$rs = json_decode( $can->handleJSONRequest( '{"jsonrpc":"2.0","method":"foo:load","params":[' . $id . '],"id":0}' ), true );
+		$rs = json_decode( $can->handleJSONRequest( '{"jsonrpc":"2.0","method":"foo:load","params":[' . $id . '],"id":0}' ), TRUE );
 
-		asrt( isset( $rs['id'] ), true );
+		asrt( isset( $rs['id'] ), TRUE );
 
 		asrt( $rs['id'], 0 );
 	}
@@ -1268,7 +1268,7 @@ class Model_Page extends RedBean_SimpleModel
 
 class Model_Setting extends RedBean_SimpleModel
 {
-	public static $closed = false;
+	public static $closed = FALSE;
 
 	public function open()
 	{

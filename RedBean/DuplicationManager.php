@@ -47,7 +47,7 @@ class RedBean_DuplicationManager
 	/**
 	 * @var array
 	 */
-	protected $cacheTables = false;
+	protected $cacheTables = FALSE;
 
 	/**
 	 * Copies the shared beans in a bean, i.e. all the sharedBean-lists.
@@ -125,12 +125,12 @@ class RedBean_DuplicationManager
 		$key  = $type . $bean->getID();
 
 		if ( isset( $trail[$key] ) ) {
-			return true;
+			return TRUE;
 		}
 
 		$trail[$key] = $bean;
 
-		return false;
+		return FALSE;
 	}
 
 	/**
@@ -188,7 +188,7 @@ class RedBean_DuplicationManager
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	protected function duplicate( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false )
+	protected function duplicate( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = FALSE )
 	{
 		if ( $this->inTrailOrAdd( $trail, $bean ) ) return $bean;
 
@@ -213,10 +213,10 @@ class RedBean_DuplicationManager
 					$this->copyOwnBeans( $copy, $owned, $beans, $trail, $preserveIDs );
 				}
 
-				$copy->setMeta( 'sys.shadow.' . $owned, null );
+				$copy->setMeta( 'sys.shadow.' . $owned, NULL );
 			}
 
-			$copy->setMeta( 'sys.shadow.' . $shared, null );
+			$copy->setMeta( 'sys.shadow.' . $shared, NULL );
 		}
 
 		$copy->id = ( $preserveIDs ) ? $bean->id : $copy->id;
@@ -257,7 +257,7 @@ class RedBean_DuplicationManager
 			}
 		}
 
-		$this->cacheTables = true;
+		$this->cacheTables = TRUE;
 	}
 
 	/**
@@ -326,7 +326,7 @@ class RedBean_DuplicationManager
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function dup( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = false )
+	public function dup( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = FALSE )
 	{
 		if ( !count( $this->tables ) ) {
 			$this->tables = $this->toolbox->getWriter()->getTables();
@@ -362,7 +362,7 @@ class RedBean_DuplicationManager
 	 *
 	 * @return array
 	 */
-	public function exportAll( $beans, $parents = false, $filters = array() )
+	public function exportAll( $beans, $parents = FALSE, $filters = array() )
 	{
 		$array = array();
 
@@ -373,9 +373,9 @@ class RedBean_DuplicationManager
 		foreach ( $beans as $bean ) {
 			$this->setFilters( $filters );
 
-			$duplicate = $this->dup( $bean, array(), true );
+			$duplicate = $this->dup( $bean, array(), TRUE );
 
-			$array[]   = $duplicate->export( false, $parents, false, $filters );
+			$array[]   = $duplicate->export( FALSE, $parents, FALSE, $filters );
 		}
 
 		return $array;

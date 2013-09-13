@@ -21,28 +21,28 @@ class RedUNIT_Base_Close extends RedUNIT_Base
 	 */
 	public function testClose()
 	{
-		asrt( R::$adapter->getDatabase()->isConnected(), true );
+		asrt( R::$adapter->getDatabase()->isConnected(), TRUE );
 
 		R::close();
 
-		asrt( R::$adapter->getDatabase()->isConnected(), false );
+		asrt( R::$adapter->getDatabase()->isConnected(), FALSE );
 
 		// Can we create a database using empty setup?
 		R::setup();
 
 		$id = R::store( R::dispense( 'bean' ) );
 
-		asrt( ( $id > 0 ), true );
+		asrt( ( $id > 0 ), TRUE );
 
 		// Test freeze via kickstart in setup
-		$toolbox = RedBean_Setup::kickstart( 'sqlite:/tmp/bla.txt', null, null, true );
+		$toolbox = RedBean_Setup::kickstart( 'sqlite:/tmp/bla.txt', NULL, NULL, TRUE );
 
-		asrt( $toolbox->getRedBean()->isFrozen(), true );
+		asrt( $toolbox->getRedBean()->isFrozen(), TRUE );
 
 		// Test Oracle setup
-		$toolbox = RedBean_Setup::kickstart( 'oracle:test-value', 'test', 'test', false );
+		$toolbox = RedBean_Setup::kickstart( 'oracle:test-value', 'test', 'test', FALSE );
 
-		asrt( ( $toolbox instanceof RedBean_ToolBox ), true );
+		asrt( ( $toolbox instanceof RedBean_ToolBox ), TRUE );
 	}
 }
 

@@ -125,7 +125,7 @@ class RedUNIT_Base_Copy extends RedUNIT_Base
 		asrt( R::count( 'spaceship' ), 0 );
 
 		// same, but now with intermediate save, counts must be same
-		R::freeze( true );
+		R::freeze( TRUE );
 
 		$document = R::dispense( 'document' );
 		$page     = R::dispense( 'page' );
@@ -163,7 +163,7 @@ class RedUNIT_Base_Copy extends RedUNIT_Base
 		asrt( R::count( 'page' ), 6 );
 		asrt( R::count( 'spaceship' ), 0 );
 
-		R::freeze( false );
+		R::freeze( FALSE );
 	}
 
 	/**
@@ -204,7 +204,7 @@ class RedUNIT_Base_Copy extends RedUNIT_Base
 
 		$ids = array();
 
-		asrt( ( $d instanceof RedBean_OODBBean ), true );
+		asrt( ( $d instanceof RedBean_OODBBean ), TRUE );
 		asrt( count( $d->ownPage ), 1 );
 
 		foreach ( end( $d->ownPage )->ownParagraph as $p ) {

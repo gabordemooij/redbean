@@ -26,11 +26,11 @@ class RedUNIT_Blackhole_Tainted extends RedUNIT_Blackhole
 
 		$spoon = $redbean->dispense( "spoon" );
 
-		asrt( $spoon->getMeta( "tainted" ), true );
+		asrt( $spoon->getMeta( "tainted" ), TRUE );
 
 		$spoon->dirty = "yes";
 
-		asrt( $spoon->getMeta( "tainted" ), true );
+		asrt( $spoon->getMeta( "tainted" ), TRUE );
 
 		testpack( 'Tainted List test' );
 
@@ -44,16 +44,16 @@ class RedUNIT_Blackhole_Tainted extends RedUNIT_Blackhole
 
 		$note = R::load( 'note', $id );
 
-		asrt( $note->isTainted(), false );
+		asrt( $note->isTainted(), FALSE );
 
 		// Shouldn't affect tainted
 		$note->text;
 
-		asrt( $note->isTainted(), false );
+		asrt( $note->isTainted(), FALSE );
 
 		$note->ownNote;
 
-		asrt( $note->isTainted(), true );
+		asrt( $note->isTainted(), TRUE );
 
 		testpack( 'Tainted Test Old Value' );
 
@@ -61,11 +61,11 @@ class RedUNIT_Blackhole_Tainted extends RedUNIT_Blackhole
 
 		asrt( $text, 'abc' );
 
-		asrt( $note->hasChanged( 'text' ), false );
+		asrt( $note->hasChanged( 'text' ), FALSE );
 
 		$note->text = 'xxx';
 
-		asrt( $note->hasChanged( 'text' ), true );
+		asrt( $note->hasChanged( 'text' ), TRUE );
 
 		$text = $note->old( 'text' );
 
@@ -73,7 +73,7 @@ class RedUNIT_Blackhole_Tainted extends RedUNIT_Blackhole
 
 		testpack( 'Tainted Non-exist' );
 
-		asrt( $note->hasChanged( 'text2' ), false );
+		asrt( $note->hasChanged( 'text2' ), FALSE );
 
 		testpack( 'Misc Tainted Tests' );
 

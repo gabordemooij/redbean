@@ -28,20 +28,20 @@ class RedUNIT_Oracle_Facade extends RedUNIT_Oracle
 
 		$a = new RedBean_AssociationManager( $toolbox );
 
-		asrt( R::$redbean instanceof RedBean_OODB, true );
-		asrt( R::$toolbox instanceof RedBean_Toolbox, true );
-		asrt( R::$adapter instanceof RedBean_Adapter, true );
-		asrt( R::$writer instanceof RedBean_QueryWriter, true );
+		asrt( R::$redbean instanceof RedBean_OODB, TRUE );
+		asrt( R::$toolbox instanceof RedBean_Toolbox, TRUE );
+		asrt( R::$adapter instanceof RedBean_Adapter, TRUE );
+		asrt( R::$writer instanceof RedBean_QueryWriter, TRUE );
 
 		$book = R::dispense( "book" );
 
-		asrt( $book instanceof RedBean_OODBBean, true );
+		asrt( $book instanceof RedBean_OODBBean, TRUE );
 
 		$book->title = "a nice book";
 
 		$id = R::store( $book );
 
-		asrt( ( $id > 0 ), true );
+		asrt( ( $id > 0 ), TRUE );
 
 		$book = R::load( "book", (int) $id );
 
@@ -240,11 +240,11 @@ class RedUNIT_Oracle_Facade extends RedUNIT_Oracle
 
 		$track = array_pop( $tracks );
 
-		asrt( ( strpos( $track->title, "Night" ) === 0 ), true );
+		asrt( ( strpos( $track->title, "Night" ) === 0 ), TRUE );
 
 		$track = array_pop( $tracks );
 
-		asrt( ( strpos( $track->title, "Night" ) === 0 ), true );
+		asrt( ( strpos( $track->title, "Night" ) === 0 ), TRUE );
 
 		$track = R::dispense( "track" );
 

@@ -22,12 +22,12 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	/**
 	 * @var boolean
 	 */
-	protected $debug = false;
+	protected $debug = FALSE;
 
 	/**
 	 * @var RedBean_Logger
 	 */
-	protected $logger = null;
+	protected $logger = NULL;
 
 	/**
 	 * @var PDO
@@ -52,12 +52,12 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	/**
 	 * @var boolean
 	 */
-	protected $isConnected = false;
+	protected $isConnected = FALSE;
 
 	/**
 	 * @var bool
 	 */
-	protected $flagUseStringOnlyBinding = false;
+	protected $flagUseStringOnlyBinding = FALSE;
 	
 	/**
 	 * @var string 
@@ -79,7 +79,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 		foreach ( $bindings as $key => &$value ) {
 			if ( is_integer( $key ) ) {
 				if ( is_null( $value ) ) {
-					$statement->bindValue( $key + 1, null, PDO::PARAM_NULL );
+					$statement->bindValue( $key + 1, NULL, PDO::PARAM_NULL );
 				} elseif ( !$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt( $value ) && $value < 2147483648 ) {
 					$statement->bindParam( $key + 1, $value, PDO::PARAM_INT );
 				} else {
@@ -87,7 +87,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 				}
 			} else {
 				if ( is_null( $value ) ) {
-					$statement->bindValue( $key, null, PDO::PARAM_NULL );
+					$statement->bindValue( $key, NULL, PDO::PARAM_NULL );
 				} elseif ( !$this->flagUseStringOnlyBinding && RedBean_QueryWriter_AQueryWriter::canBeTreatedAsInt( $value ) && $value < 2147483648 ) {
 					$statement->bindParam( $key, $value, PDO::PARAM_INT );
 				} else {
@@ -121,7 +121,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 
 		try {
 			if ( strpos( 'pgsql', $this->dsn ) === 0 ) {
-				$statement = $this->pdo->prepare( $sql, array( PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true ) );
+				$statement = $this->pdo->prepare( $sql, array( PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => TRUE ) );
 			} else {
 				$statement = $this->pdo->prepare( $sql );
 			}
@@ -196,12 +196,12 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 * @param string     $pass   optional, password for connection login
 	 *
 	 */
-	public function __construct( $dsn, $user = null, $pass = null )
+	public function __construct( $dsn, $user = NULL, $pass = NULL )
 	{
 		if ( $dsn instanceof PDO ) {
 			$this->pdo = $dsn;
 
-			$this->isConnected = true;
+			$this->isConnected = TRUE;
 
 			$this->setEncoding();
 			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -256,9 +256,9 @@ class RedBean_Driver_PDO implements RedBean_Driver
 			);
 			
 			$this->setEncoding();
-			$this->pdo->setAttribute( PDO::ATTR_STRINGIFY_FETCHES, true );
+			$this->pdo->setAttribute( PDO::ATTR_STRINGIFY_FETCHES, TRUE );
 
-			$this->isConnected = true;
+			$this->isConnected = TRUE;
 		} catch ( PDOException $exception ) {
 			$matches = array();
 
@@ -358,7 +358,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 *
 	 * @return void
 	 */
-	public function setDebugMode( $tf, $logger = null )
+	public function setDebugMode( $tf, $logger = NULL )
 	{
 		$this->connect();
 
@@ -468,8 +468,8 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 */
 	public function close()
 	{
-		$this->pdo         = null;
-		$this->isConnected = false;
+		$this->pdo         = NULL;
+		$this->isConnected = FALSE;
 	}
 
 	/**

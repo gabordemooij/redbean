@@ -25,12 +25,12 @@ class RedUNIT_Blackhole_Labels extends RedUNIT_Blackhole
 
 		$meals = R::dispenseLabels( 'meal', array( 'meat', 'fish', 'vegetarian' ) );
 
-		asrt( is_array( $meals ), true );
+		asrt( is_array( $meals ), TRUE );
 
 		asrt( count( $meals ), 3 );
 
 		foreach ( $meals as $m ) {
-			asrt( ( $m instanceof RedBean_OODBBean ), true );
+			asrt( ( $m instanceof RedBean_OODBBean ), TRUE );
 		}
 
 		$listOfMeals = implode( ',', R::gatherLabels( $meals ) );

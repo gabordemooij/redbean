@@ -31,7 +31,7 @@ interface RedBean_Adapter
 	 * @param array   $bindings values
 	 * @param boolean $noevent  no event firing
 	 */
-	public function exec( $sql, $bindings = array(), $noevent = false );
+	public function exec( $sql, $bindings = array(), $noevent = FALSE );
 
 	/**
 	 * Executes an SQL Query and returns a resultset.

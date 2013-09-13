@@ -40,7 +40,7 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 		asrt( count( $books ), 1 );
 
 		//should not give error...
-		$links = R::$associationManager->related( $page, 'book', true, ' title = :title ', array( ':title' => 'book' ) );
+		$links = R::$associationManager->related( $page, 'book', TRUE, ' title = :title ', array( ':title' => 'book' ) );
 
 		asrt( count( $links ), 1 );
 

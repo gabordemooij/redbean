@@ -26,10 +26,10 @@ class RedUNIT_Base_Dispense extends RedUNIT_Base
 		$page = $redbean->dispense( "page" );
 
 		// Does it have a meta type?
-		asrt( ( (bool) $page->getMeta( "type" ) ), true );
+		asrt( ( (bool) $page->getMeta( "type" ) ), TRUE );
 
 		// Does it have an ID?
-		asrt( isset( $page->id ), true );
+		asrt( isset( $page->id ), TRUE );
 
 		// Type should be 'page'
 		asrt( ( $page->getMeta( "type" ) ), "page" );
@@ -57,7 +57,7 @@ class RedUNIT_Base_Dispense extends RedUNIT_Base
 		asrt( $bean["abc"], "def" );
 		asrt( $bean->abc, "def" );
 
-		asrt( isset( $bean["abd"] ), false );
-		asrt( isset( $bean["abc"] ), true );
+		asrt( isset( $bean["abd"] ), FALSE );
+		asrt( isset( $bean["abc"] ), TRUE );
 	}
 }

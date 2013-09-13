@@ -16,12 +16,12 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin
 	/**
 	 * @var boolean
 	 */
-	private static $loadBeans = false;
+	private static $loadBeans = FALSE;
 
 	/**
 	 * @var boolean
 	 */
-	private static $useNULLForEmptyString = false;
+	private static $useNULLForEmptyString = FALSE;
 
 	/**
 	 * @var RedBean_Toolbox
@@ -102,7 +102,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin
 			if ( is_array( $value ) ) {
 				$bean->$property = $this->graph( $value, $filterEmpty );
 			} else {
-				$bean->$property = ( $value == '' && self::$useNULLForEmptyString ) ? null : $value;
+				$bean->$property = ( $value == '' && self::$useNULLForEmptyString ) ? NULL : $value;
 			}
 		}
 
@@ -180,7 +180,7 @@ class RedBean_Plugin_Cooker implements RedBean_Plugin
 	 *
 	 * @throws RedBean_Exception_Security
 	 */
-	public function graph( $array, $filterEmpty = false )
+	public function graph( $array, $filterEmpty = FALSE )
 	{
 		if ( is_array( $array ) && isset( $array['type'] ) ) {
 			return $this->loadBean( $array, $filterEmpty );

@@ -67,19 +67,19 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		R::associate( $house, $ghost );
 
-		Model_Ghost_House::$deleted = false;
+		Model_Ghost_House::$deleted = FALSE;
 
 		R::unassociate( $house, $ghost );
 
 		// No fast-track, assoc bean got trashed
-		asrt( Model_Ghost_House::$deleted, true );
+		asrt( Model_Ghost_House::$deleted, TRUE );
 
-		Model_Ghost_House::$deleted = false;
+		Model_Ghost_House::$deleted = FALSE;
 
-		R::unassociate( $house, $ghost, true );
+		R::unassociate( $house, $ghost, TRUE );
 
 		// Fast-track, assoc bean got deleted right away
-		asrt( Model_Ghost_House::$deleted, false );
+		asrt( Model_Ghost_House::$deleted, FALSE );
 	}
 
 	/**
@@ -94,19 +94,19 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		R::associate( $ghost, $ghost2 );
 
-		Model_Ghost_Ghost::$deleted = false;
+		Model_Ghost_Ghost::$deleted = FALSE;
 
 		R::unassociate( $ghost, $ghost2 );
 
 		// No fast-track, assoc bean got trashed
-		asrt( Model_Ghost_Ghost::$deleted, true );
+		asrt( Model_Ghost_Ghost::$deleted, TRUE );
 
-		Model_Ghost_Ghost::$deleted = false;
+		Model_Ghost_Ghost::$deleted = FALSE;
 
-		R::unassociate( $ghost, $ghost2, true );
+		R::unassociate( $ghost, $ghost2, TRUE );
 
 		// Fast-track, assoc bean got deleted right away
-		asrt( Model_Ghost_Ghost::$deleted, false );
+		asrt( Model_Ghost_Ghost::$deleted, FALSE );
 	}
 
 	/**
@@ -180,9 +180,9 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( $a->name, $b->name );
 		asrt( $a->name, 'b' );
 
-		asrt( is_array( R::loadMulti( null, 1 ) ), true );
+		asrt( is_array( R::loadMulti( NULL, 1 ) ), TRUE );
 
-		asrt( ( count( R::loadMulti( null, 1 ) ) === 0 ), true );
+		asrt( ( count( R::loadMulti( NULL, 1 ) ) === 0 ), TRUE );
 	}
 
 	/**
@@ -210,7 +210,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		$book->title = 'bla';
 
-		$expected = null;
+		$expected = NULL;
 
 		try {
 			R::store( $book );
@@ -220,7 +220,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 			$expected = $e;
 		}
 
-		asrt( ( $expected instanceof RedBean_Exception_SQL ), true );
+		asrt( ( $expected instanceof RedBean_Exception_SQL ), TRUE );
 
 		asrt( R::count( 'book' ), 1 );
 
@@ -245,7 +245,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 			$expected = $e;
 		}
 
-		asrt( ( $expected instanceof RedBean_Exception_SQL ), true );
+		asrt( ( $expected instanceof RedBean_Exception_SQL ), TRUE );
 
 		asrt( R::count( 'book' ), 1 );
 	}
@@ -310,21 +310,21 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 	public function testAssocVariations()
 	{
 		try {
-			R::related( null, 'book' );
+			R::related( NULL, 'book' );
 		} catch ( Exception $e ) {
-			asrt( ( $e instanceof RedBean_Exception_Security ), true );
+			asrt( ( $e instanceof RedBean_Exception_Security ), TRUE );
 		}
 
 		try {
 			R::related( 100, 'book' );
 		} catch ( Exception $e ) {
-			asrt( ( $e instanceof RedBean_Exception_Security ), true );
+			asrt( ( $e instanceof RedBean_Exception_Security ), TRUE );
 		}
 
 		try {
 			R::related( array( 'fakeBean' ), 'book' );
 		} catch ( Exception $e ) {
-			asrt( ( $e instanceof RedBean_Exception_Security ), true );
+			asrt( ( $e instanceof RedBean_Exception_Security ), TRUE );
 		}
 
 		list( $r1, $r2, $r3 ) = R::dispense( 'reader', 3 );
@@ -446,22 +446,22 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		$pages = $redbean->batch( "page", $pageKeys );
 
-		$links = $redbean->batch( "page_user", $a->related( $user, "page", true ) );
+		$links = $redbean->batch( "page_user", $a->related( $user, "page", TRUE ) );
 
 		asrt( count( $links ), 2 );
 
 		// Confirm that the link beans are ok.
 		$link = array_pop( $links );
 
-		asrt( isset( $link->page_id ), true );
-		asrt( isset( $link->user_id ), true );
-		asrt( isset( $link->id ), true );
+		asrt( isset( $link->page_id ), TRUE );
+		asrt( isset( $link->user_id ), TRUE );
+		asrt( isset( $link->id ), TRUE );
 
 		$link = array_pop( $links );
 
-		asrt( isset( $link->page_id ), true );
-		asrt( isset( $link->user_id ), true );
-		asrt( isset( $link->id ), true );
+		asrt( isset( $link->page_id ), TRUE );
+		asrt( isset( $link->user_id ), TRUE );
+		asrt( isset( $link->id ), TRUE );
 
 		$a->unassociate( $page, $user );
 
@@ -491,11 +491,11 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		$apage = array_shift( $pages );
 
-		asrt( ( $apage->name == "John's page" || $apage->name == "John's second page" ), true );
+		asrt( ( $apage->name == "John's page" || $apage->name == "John's second page" ), TRUE );
 
 		$apage = array_shift( $pages );
 
-		asrt( ( $apage->name == "John's page" || $apage->name == "John's second page" ), true );
+		asrt( ( $apage->name == "John's page" || $apage->name == "John's second page" ), TRUE );
 
 		// Test save on the fly
 		$page  = $redbean->dispense( "page" );
@@ -506,8 +506,8 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		$a->associate( $page, $page2 );
 
-		asrt( ( $page->id > 0 ), true );
-		asrt( ( $page2->id > 0 ), true );
+		asrt( ( $page->id > 0 ), TRUE );
+		asrt( ( $page2->id > 0 ), TRUE );
 
 		$idpage  = $page->id;
 		$idpage2 = $page2->id;
@@ -579,35 +579,35 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		R::associate( $sheep, $sheep2 );
 
-		asrt( R::areRelated( $sheep, $sheep2 ), true );
+		asrt( R::areRelated( $sheep, $sheep2 ), TRUE );
 
 		R::exec( 'DELETE FROM sheep_sheep WHERE sheep2_id = ? -- keep-cache', array( $sheep2->id ) );
 
-		asrt( R::areRelated( $sheep, $sheep2 ), false ); // Use cache?
+		asrt( R::areRelated( $sheep, $sheep2 ), FALSE ); // Use cache?
 
 		R::associate( $sheep, $sheep2 );
 
-		R::$writer->setUseCache( true );
+		R::$writer->setUseCache( TRUE );
 
-		asrt( R::areRelated( $sheep, $sheep2 ), true );
+		asrt( R::areRelated( $sheep, $sheep2 ), TRUE );
 
 		R::exec( 'DELETE FROM sheep_sheep WHERE sheep2_id = ? -- keep-cache', array( $sheep2->id ) );
 
-		asrt( R::areRelated( $sheep, $sheep2 ), true ); // Use cache?
+		asrt( R::areRelated( $sheep, $sheep2 ), TRUE ); // Use cache?
 
 		R::associate( $sheep, $sheep2 );
 
-		asrt( R::areRelated( $sheep, $sheep3 ), false );
+		asrt( R::areRelated( $sheep, $sheep3 ), FALSE );
 
 		$pig = R::dispense( 'pig' );
 
-		asrt( R::areRelated( $sheep, $pig ), false );
+		asrt( R::areRelated( $sheep, $pig ), FALSE );
 
-		R::freeze( true );
+		R::freeze( TRUE );
 
-		asrt( R::areRelated( $sheep, $pig ), false );
+		asrt( R::areRelated( $sheep, $pig ), FALSE );
 
-		R::freeze( false );
+		R::freeze( FALSE );
 
 		$foo = R::dispense( 'foo' );
 		$bar = R::dispense( 'bar' );
@@ -615,7 +615,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		$foo->id = 1;
 		$bar->id = 2;
 
-		asrt( R::areRelated( $foo, $bar ), false );
+		asrt( R::areRelated( $foo, $bar ), FALSE );
 	}
 }
 
@@ -624,11 +624,11 @@ class RedUNIT_Base_Association extends RedUNIT_Base
  */
 class Model_Ghost_House extends RedBean_SimpleModel
 {
-	public static $deleted = false;
+	public static $deleted = FALSE;
 
 	public function delete()
 	{
-		self::$deleted = true;
+		self::$deleted = TRUE;
 	}
 }
 
@@ -637,11 +637,11 @@ class Model_Ghost_House extends RedBean_SimpleModel
  */
 class Model_Ghost_Ghost extends RedBean_SimpleModel
 {
-	public static $deleted = false;
+	public static $deleted = FALSE;
 
 	public function delete()
 	{
-		self::$deleted = true;
+		self::$deleted = TRUE;
 	}
 }
 

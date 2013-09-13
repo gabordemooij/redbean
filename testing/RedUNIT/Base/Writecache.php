@@ -48,7 +48,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( count( $logger->grep( 'SELECT' ) ), 2 );
 
 		// With cache
-		R::$writer->setUseCache( true );
+		R::$writer->setUseCache( TRUE );
 
 		$logger->clear();
 
@@ -57,7 +57,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 
 		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
 
-		R::$writer->setUseCache( false );
+		R::$writer->setUseCache( FALSE );
 
 		// Test find cache
 		$logger->clear();
@@ -68,7 +68,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( count( $logger->grep( 'SELECT' ) ), 2 );
 
 		// With cache
-		R::$writer->setUseCache( true );
+		R::$writer->setUseCache( TRUE );
 
 		$logger->clear();
 
@@ -77,7 +77,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 
 		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
 
-		R::$writer->setUseCache( false );
+		R::$writer->setUseCache( FALSE );
 
 		// Test combinations
 		$logger->clear();
@@ -97,7 +97,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( count( $logger->grep( 'SELECT' ) ), 6 );
 
 		// With cache
-		R::$writer->setUseCache( true );
+		R::$writer->setUseCache( TRUE );
 
 		$logger->clear();
 
@@ -113,7 +113,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 
 		asrt( count( $logger->grep( 'SELECT' ) ), 3 );
 
-		R::$writer->setUseCache( false );
+		R::$writer->setUseCache( FALSE );
 
 		// Test auto flush
 		$logger->clear();
@@ -129,7 +129,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
 
 		// With cache
-		R::$writer->setUseCache( true );
+		R::$writer->setUseCache( TRUE );
 
 		$logger->clear();
 
@@ -145,7 +145,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		// Now the same, auto flushed
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
 
-		R::$writer->setUseCache( false );
+		R::$writer->setUseCache( FALSE );
 
 		// Test whether delete flushes as well (because uses selectRecord - might be a gotcha!)
 		R::store( R::dispense( 'garbage' ) );
@@ -167,7 +167,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		$garbage = R::findOne( 'garbage' );
 
 		// With cache
-		R::$writer->setUseCache( true );
+		R::$writer->setUseCache( TRUE );
 
 		$logger->clear();
 
@@ -180,14 +180,14 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		// Now the same, auto flushed
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
 
-		R::$writer->setUseCache( false );
+		R::$writer->setUseCache( FALSE );
 
 		R::store( R::dispense( 'garbage' ) );
 
 		$garbage = R::findOne( 'garbage' );
 
 		// With cache
-		R::$writer->setUseCache( true );
+		R::$writer->setUseCache( TRUE );
 
 		$logger->clear();
 
@@ -210,7 +210,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 	{
 		testpack( 'Testing possible regressions: Try to fool the cache' );
 
-		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', true ) . ' WHERE ( ' . R::$writer->esc( 'id', true ) . '  IN ( 1)  ) ';
+		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', TRUE ) . ' WHERE ( ' . R::$writer->esc( 'id', TRUE ) . '  IN ( 1)  ) ';
 
 		$bean = R::dispense( 'bean' );
 
@@ -267,7 +267,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 	 */
 	public function testInstructNoDrop()
 	{
-		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', true ) . ' -- keep-cache';
+		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', TRUE ) . ' -- keep-cache';
 
 		$bean = R::dispense( 'bean' );
 
@@ -290,7 +290,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		R::nuke();
 
 		// Now INSTRUCT the cache to not drop the cache CASE 2
-		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', true ) . ' -- keep-cache';
+		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', TRUE ) . ' -- keep-cache';
 
 		$bean = R::dispense( 'bean' );
 
@@ -398,6 +398,6 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
 
 		R::$writer->flushCache();
-		R::$writer->setUseCache( false );
+		R::$writer->setUseCache( FALSE );
 	}
 }

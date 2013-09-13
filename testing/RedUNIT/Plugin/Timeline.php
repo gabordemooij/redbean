@@ -27,12 +27,12 @@ class RedUNIT_Plugin_Timeline extends RedUNIT_Plugin {
 		file_put_contents('/tmp/test_log.txt','');
 		R::log('/tmp/test_log.txt');
 		$bean = R::dispense('bean');
-		$bean->name = true;
+		$bean->name = TRUE;
 		R::store($bean);
 		$bean->name = 'test';
 		R::store($bean);
 		$log = file_get_contents('/tmp/test_log.txt');
-		asrt(strlen($log)>0,true);
+		asrt(strlen($log)>0,TRUE);
 		echo $log;
 	}
 }

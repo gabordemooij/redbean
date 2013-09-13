@@ -24,7 +24,7 @@ class RedUNIT_Postgres_Foreignkeys extends RedUNIT_Postgres
 
 		pass(); //survive without exception
 
-		asrt( $a, false ); //must return false
+		asrt( $a, FALSE ); //must return false
 
 		$book  = R::dispense( 'book' );
 		$page  = R::dispense( 'page' );
@@ -85,8 +85,8 @@ class RedUNIT_Postgres_Foreignkeys extends RedUNIT_Postgres
 		]';
 
 		$j  = json_encode( $fks );
-		$j1 = json_decode( $j, true );
-		$j2 = json_decode( $json, true );
+		$j1 = json_decode( $j, TRUE );
+		$j2 = json_decode( $json, TRUE );
 
 		foreach ( $j1 as $jrow ) {
 			$s = json_encode( $jrow );

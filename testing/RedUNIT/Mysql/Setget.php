@@ -88,11 +88,11 @@ class RedUNIT_Mysql_Setget extends RedUNIT_Mysql
 	 */
 	public function testBool()
 	{
-		asrt( setget( true ), "1" );
-		asrt( setget( false ), "0" );
+		asrt( setget( TRUE ), "1" );
+		asrt( setget( FALSE ), "0" );
 
-		asrt( setget( "true" ), "true" );
-		asrt( setget( "false" ), "false" );
+		asrt( setget( "TRUE" ), "TRUE" );
+		asrt( setget( "FALSE" ), "FALSE" );
 	}
 
 	/**
@@ -102,18 +102,18 @@ class RedUNIT_Mysql_Setget extends RedUNIT_Mysql
 	 */
 	public function testNull()
 	{
-		asrt( setget( "null" ), "null" );
+		asrt( setget( "NULL" ), "NULL" );
 		asrt( setget( "NULL" ), "NULL" );
 
 		asrt( setget( "0123", 1 ), "0123" );
 		asrt( setget( "0000123", 1 ), "0000123" );
 
-		asrt( setget( null ), null );
+		asrt( setget( NULL ), NULL );
 
-		asrt( ( setget( 0 ) == 0 ), true );
-		asrt( ( setget( 1 ) == 1 ), true );
+		asrt( ( setget( 0 ) == 0 ), TRUE );
+		asrt( ( setget( 1 ) == 1 ), TRUE );
 
-		asrt( ( setget( true ) == true ), true );
-		asrt( ( setget( false ) == false ), true );
+		asrt( ( setget( TRUE ) == TRUE ), TRUE );
+		asrt( ( setget( FALSE ) == FALSE ), TRUE );
 	}
 }

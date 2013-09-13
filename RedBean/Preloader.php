@@ -63,7 +63,7 @@ class RedBean_Preloader
 
 		$types = array();
 		foreach ( $typeList as $value ) {
-			if ( strpos( $value, '|' ) !== false ) {
+			if ( strpos( $value, '|' ) !== FALSE ) {
 				list( $key, $newValue ) = explode( '|', $value );
 
 				$types[$key] = $newValue;
@@ -84,7 +84,7 @@ class RedBean_Preloader
 	 */
 	private function extractTypeInfo( $typeInfo )
 	{
-		list( $type, $sqlObj ) = ( is_array( $typeInfo ) ? $typeInfo : array( $typeInfo, null ) );
+		list( $type, $sqlObj ) = ( is_array( $typeInfo ) ? $typeInfo : array( $typeInfo, NULL ) );
 
 		list( $sql, $bindings ) = $sqlObj;
 
@@ -162,12 +162,12 @@ class RedBean_Preloader
 	{
 		$field = ( is_numeric( $key ) ) ? $type : $key; //use an alias?
 
-		if ( strpos( $field, '*' ) !== false ) {
+		if ( strpos( $field, '*' ) !== FALSE ) {
 			$oldFields[] = $oldField;
 			$field       = str_replace( '*', implode( '.', $oldFields ), $field );
 		}
 
-		if ( strpos( $field, '&' ) !== false ) {
+		if ( strpos( $field, '&' ) !== FALSE ) {
 			$field = str_replace( '&', implode( '.', $oldFields ), $field );
 		}
 
@@ -217,7 +217,7 @@ class RedBean_Preloader
 				$bindings = array();
 
 				foreach ( $retrievals as $r ) {
-					$bindings[] = ( isset( $r[$key] ) ) ? $r[$key] : null;
+					$bindings[] = ( isset( $r[$key] ) ) ? $r[$key] : NULL;
 				}
 
 				array_unshift( $bindings, $bean );
@@ -379,7 +379,7 @@ class RedBean_Preloader
 		foreach ( $this->filteredBeans as $filteredBean ) {
 			$list = $this->gatherSharedBeansFromPool( $filteredBean, $sharedBeans );
 
-			$filteredBean->setProperty( $field, $list, true, true );
+			$filteredBean->setProperty( $field, $list, TRUE, TRUE );
 
 			$this->fillParamArrayRetrievals( $filteredBean, $list );
 		}
@@ -406,7 +406,7 @@ class RedBean_Preloader
 		foreach ( $this->filteredBeans as $filteredBean ) {
 			$list = $this->gatherOwnBeansFromPool( $filteredBean, $children, $link );
 
-			$filteredBean->setProperty( $field, $list, true, true );
+			$filteredBean->setProperty( $field, $list, TRUE, TRUE );
 
 			$this->fillParamArrayRetrievals( $filteredBean, $list );
 		}
@@ -473,7 +473,7 @@ class RedBean_Preloader
 	 *
 	 * @return array
 	 */
-	public function load( $beans, $typeList, $closure = null )
+	public function load( $beans, $typeList, $closure = NULL )
 	{
 		$beans = $this->convertBeanToArrayIfNeeded( $beans );
 
@@ -503,7 +503,7 @@ class RedBean_Preloader
 
 			$oldField = $field;
 
-			$type = ( strpos( $type, '.' ) !== false ) ? $field : $type;
+			$type = ( strpos( $type, '.' ) !== FALSE ) ? $field : $type;
 
 			if ( count( $this->filteredBeans ) === 0 ) continue;
 

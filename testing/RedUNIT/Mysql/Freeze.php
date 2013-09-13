@@ -56,7 +56,7 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 
 		$a->associate( $page, $page2 );
 
-		$redbean->freeze( true );
+		$redbean->freeze( TRUE );
 
 		$page = $redbean->dispense( "page" );
 
@@ -84,8 +84,8 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 			fail();
 		}
 
-		asrt( in_array( "name", array_keys( $writer->getColumns( "page" ) ) ), true );
-		asrt( in_array( "sections", array_keys( $writer->getColumns( "page" ) ) ), false );
+		asrt( in_array( "name", array_keys( $writer->getColumns( "page" ) ) ), TRUE );
+		asrt( in_array( "sections", array_keys( $writer->getColumns( "page" ) ) ), FALSE );
 
 		$newtype = $redbean->dispense( "newtype" );
 
@@ -130,11 +130,11 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 
 		$redbean->trash( $page );
 
-		$redbean->freeze( false );
+		$redbean->freeze( FALSE );
 
-		asrt( count( $logger->grep( "SELECT" ) ) > 0, true );
-		asrt( count( $logger->grep( "describe" ) ) < 1, true );
+		asrt( count( $logger->grep( "SELECT" ) ) > 0, TRUE );
+		asrt( count( $logger->grep( "describe" ) ) < 1, TRUE );
 
-		asrt( is_array( $logger->getLogs() ), true );
+		asrt( is_array( $logger->getLogs() ), TRUE );
 	}
 }

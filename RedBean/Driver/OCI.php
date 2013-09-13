@@ -26,11 +26,11 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * @var boolean
 	 */
-	private $debug = false;
+	private $debug = FALSE;
 	/**
 	 * @var RedBean_Logger
 	 */
-	protected $logger = null;
+	protected $logger = NULL;
 	/**
 	 * @var integer
 	 */
@@ -42,7 +42,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * @var boolean
 	 */
-	private $autocommit = true;
+	private $autocommit = TRUE;
 	/**
 	 * @var mixed
 	 */
@@ -60,7 +60,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 *
 	 * @var boolean
 	 */
-	protected $isConnected = false;
+	protected $isConnected = FALSE;
 	/**
 	 * OCI NLS date format.
 	 *
@@ -113,11 +113,11 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 *
 	 * @return void
 	 */
-	public function __construct( $dsn, $user = null, $pass = null )
+	public function __construct( $dsn, $user = NULL, $pass = NULL )
 	{
 		if ( is_resource($dsn) ) {
 			$this->connection  = $dsn;
-			$this->isConnected = true;
+			$this->isConnected = TRUE;
 
 			// make sure that the dsn at least contains the type
 			$this->dsn         = $this->getDatabaseType();
@@ -219,7 +219,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 
 			print_r( $e );
 
-			$this->isConnected = false;
+			$this->isConnected = FALSE;
 		} else {
 			$s = oci_parse( $this->connection, "alter session set nls_date_format = '$this->nlsDateFormat'" );
 
@@ -229,7 +229,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 
 			oci_execute( $s );
 
-			$this->isConnected = true;
+			$this->isConnected = TRUE;
 		}
 	}
 
@@ -387,7 +387,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 		if ( is_array( $error ) ) {
 			return $error['code'];
 		} else {
-			return null;
+			return NULL;
 		}
 	}
 
@@ -403,7 +403,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 		if ( is_array( $error ) ) {
 			return $error['message'];
 		} else {
-			return null;
+			return NULL;
 		}
 	}
 
@@ -535,7 +535,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 *
 	 * @return void
 	 */
-	public function setDebugMode( $tf, $logger = null )
+	public function setDebugMode( $tf, $logger = NULL )
 	{
 		$this->connect();
 		$this->debug = (bool) $tf;
@@ -550,7 +550,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 */
 	public function GetRaw()
 	{
-		return null;
+		return NULL;
 	}
 
 	/**
@@ -560,9 +560,9 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 */
 	public function isConnected()
 	{
-		if ( !$this->isConnected && !$this->connection ) return false;
+		if ( !$this->isConnected && !$this->connection ) return FALSE;
 
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -570,8 +570,8 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 */
 	public function close()
 	{
-		$this->connection  = null;
-		$this->isConnected = false;
+		$this->connection  = NULL;
+		$this->isConnected = FALSE;
 	}
 
 	/**
@@ -579,7 +579,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 */
 	public function StartTrans()
 	{
-		$this->autocommit = false;
+		$this->autocommit = FALSE;
 	}
 
 	/**

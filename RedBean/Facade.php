@@ -23,7 +23,7 @@ class RedBean_Facade
 	/**
 	 * @var boolean
 	 */
-	private static $strictType = true;
+	private static $strictType = TRUE;
 
 	/**
 	 * @var array
@@ -114,7 +114,7 @@ class RedBean_Facade
 						RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
 					)
 				) {
-					return ( $method === 'getCell' ) ? null : array();
+					return ( $method === 'getCell' ) ? NULL : array();
 				} else {
 					throw $exception;
 				}
@@ -175,7 +175,7 @@ class RedBean_Facade
 	 *
 	 * @throws RedBean_Exception_Security
 	 */
-	public static function graph( $array, $filterEmpty = false ) 
+	public static function graph( $array, $filterEmpty = FALSE ) 
 	{ 
 		$c = new RedBean_Plugin_Cooker;
 		$c->setToolbox( self::$toolbox );
@@ -207,7 +207,7 @@ class RedBean_Facade
 	 *
 	 * @return RedBean_ToolBox
 	 */
-	public static function setup( $dsn = null, $username = null, $password = null, $frozen = false )
+	public static function setup( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE )
 	{
 		if ( is_null( $dsn ) ) {
 			$dsn = 'sqlite:/' . sys_get_temp_dir() . '/red.db';
@@ -284,12 +284,12 @@ class RedBean_Facade
 	 * @param string      $key    ID for the database
 	 * @param string      $dsn    DSN for the database
 	 * @param string      $user   User for connection
-	 * @param null|string $pass   Password for connection
+	 * @param NULL|string $pass   Password for connection
 	 * @param bool        $frozen Whether this database is frozen or not
 	 *
 	 * @return void
 	 */
-	public static function addDatabase( $key, $dsn, $user = null, $pass = null, $frozen = false )
+	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE )
 	{
 		self::$toolboxes[$key] = RedBean_Setup::kickstart( $dsn, $user, $pass, $frozen );
 	}
@@ -304,13 +304,13 @@ class RedBean_Facade
 	public static function selectDatabase( $key )
 	{
 		if ( self::$currentDB === $key ) {
-			return false;
+			return FALSE;
 		}
 
 		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 		self::$currentDB = $key;
 
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -323,7 +323,7 @@ class RedBean_Facade
 	 *
 	 * @throws RedBean_Exception_Security
 	 */
-	public static function debug( $tf = true, $logger = null )
+	public static function debug( $tf = TRUE, $logger = NULL )
 	{
 		if ( !$logger ) {
 			$logger = new RedBean_Logger_Default;
@@ -347,9 +347,9 @@ class RedBean_Facade
 	*
 	* @return array
 	*/
-	public static function inspect( $type = null )
+	public static function inspect( $type = NULL )
 	{
-		return ($type === null) ? self::$writer->getTables() : self::$writer->getColumns( $type );
+		return ($type === NULL) ? self::$writer->getTables() : self::$writer->getColumns( $type );
 	}
 
 	/**
@@ -375,7 +375,7 @@ class RedBean_Facade
 	 *
 	 * @param boolean|array $trueFalse
 	 */
-	public static function freeze( $tf = true )
+	public static function freeze( $tf = TRUE )
 	{
 		self::$redbean->freeze( $tf );
 	}
@@ -462,7 +462,7 @@ class RedBean_Facade
 
 	/**
 	 * Toggles strict bean type names.
-	 * If set to true (default) this will forbid the use of underscores and
+	 * If set to TRUE (default) this will forbid the use of underscores and
 	 * uppercase characters in bean type strings (R::dispense).
 	 *
 	 * @param boolean
@@ -482,7 +482,7 @@ class RedBean_Facade
 	 *
 	 * @return array
 	 */
-	public static function findOrDispense( $type, $sql = null, $bindings = array() )
+	public static function findOrDispense( $type, $sql = NULL, $bindings = array() )
 	{
 		return self::$finder->findOrDispense( $type, $sql, $bindings );
 	}
@@ -506,7 +506,7 @@ class RedBean_Facade
 	 *
 	 * @return mixed
 	 */
-	public static function associate( $beans1, $beans2, $extra = null )
+	public static function associate( $beans1, $beans2, $extra = NULL )
 	{
 		if ( !$extra ) {
 			return self::$associationManager->associate( $beans1, $beans2 );
@@ -527,7 +527,7 @@ class RedBean_Facade
 	 *
 	 * @return mixed
 	 */
-	public static function unassociate( $beans1, $beans2, $fast = false )
+	public static function unassociate( $beans1, $beans2, $fast = FALSE )
 	{
 		self::$associationManager->unassociate( $beans1, $beans2, $fast );
 	}
@@ -569,7 +569,7 @@ class RedBean_Facade
 	 *
 	 * @return integer
 	 */
-	public static function relatedCount( $bean, $type, $sql = null, $bindings = array() )
+	public static function relatedCount( $bean, $type, $sql = NULL, $bindings = array() )
 	{
 		return self::$associationManager->relatedCount( $bean, $type, $sql, $bindings );
 	}
@@ -584,7 +584,7 @@ class RedBean_Facade
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql = null, $bindings = array() )
+	public static function relatedOne( RedBean_OODBBean $bean, $type, $sql = NULL, $bindings = array() )
 	{
 		return self::$associationManager->relatedOne( $bean, $type, $sql, $bindings );
 	}
@@ -599,7 +599,7 @@ class RedBean_Facade
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public static function relatedLast( RedBean_OODBBean $bean, $type, $sql = null, $bindings = array() )
+	public static function relatedLast( RedBean_OODBBean $bean, $type, $sql = NULL, $bindings = array() )
 	{
 		return self::$associationManager->relatedLast( $bean, $type, $sql, $bindings );
 	}
@@ -645,7 +645,7 @@ class RedBean_Facade
 	 *
 	 * @return array
 	 */
-	public static function find( $type, $sql = null, $bindings = array() )
+	public static function find( $type, $sql = NULL, $bindings = array() )
 	{
 		return self::$finder->find( $type, $sql, $bindings );
 	}
@@ -665,7 +665,7 @@ class RedBean_Facade
 	 *
 	 * @return array
 	 */
-	public static function findAll( $type, $sql = null, $bindings = array() )
+	public static function findAll( $type, $sql = NULL, $bindings = array() )
 	{
 		return self::$finder->find( $type, $sql, $bindings );
 	}
@@ -680,7 +680,7 @@ class RedBean_Facade
 	 *
 	 * @return array
 	 */
-	public static function findAndExport( $type, $sql = null, $bindings = array() )
+	public static function findAndExport( $type, $sql = NULL, $bindings = array() )
 	{
 		return self::$finder->findAndExport( $type, $sql, $bindings );
 	}
@@ -695,7 +695,7 @@ class RedBean_Facade
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public static function findOne( $type, $sql = null, $bindings = array() )
+	public static function findOne( $type, $sql = NULL, $bindings = array() )
 	{
 		return self::$finder->findOne( $type, $sql, $bindings );
 	}
@@ -710,7 +710,7 @@ class RedBean_Facade
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public static function findLast( $type, $sql = null, $bindings = array() )
+	public static function findLast( $type, $sql = NULL, $bindings = array() )
 	{
 		return self::$finder->findLast( $type, $sql, $bindings );
 	}
@@ -843,7 +843,7 @@ class RedBean_Facade
 	 *
 	 * @return array
 	 */
-	public static function dup( $bean, $trail = array(), $pid = false, $filters = array() )
+	public static function dup( $bean, $trail = array(), $pid = FALSE, $filters = array() )
 	{
 		self::$duplicationManager->setFilters( $filters );
 
@@ -864,7 +864,7 @@ class RedBean_Facade
 	 *
 	 * @return    array
 	 */
-	public static function exportAll( $beans, $parents = false, $filters = array() )
+	public static function exportAll( $beans, $parents = FALSE, $filters = array() )
 	{
 		return self::$duplicationManager->exportAll( $beans, $parents, $filters );
 	}
@@ -911,7 +911,7 @@ class RedBean_Facade
 	 *
 	 * @return boolean
 	 */
-	public static function hasTag( $bean, $tags, $all = false )
+	public static function hasTag( $bean, $tags, $all = FALSE )
 	{
 		return self::$tagManager->hasTag( $bean, $tags, $all );
 	}
@@ -934,7 +934,7 @@ class RedBean_Facade
 	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Tags a bean or returns tags associated with a bean.
-	 * If $tagList is null or omitted this method will return a
+	 * If $tagList is NULL or omitted this method will return a
 	 * comma separated list of tags associated with the bean provided.
 	 * If $tagList is a comma separated list (string) of tags all tags will
 	 * be associated with the bean.
@@ -945,7 +945,7 @@ class RedBean_Facade
 	 *
 	 * @return string
 	 */
-	public static function tag( RedBean_OODBBean $bean, $tagList = null )
+	public static function tag( RedBean_OODBBean $bean, $tagList = NULL )
 	{
 		return self::$tagManager->tag( $bean, $tagList );
 	}
@@ -1069,11 +1069,11 @@ class RedBean_Facade
 	 */
 	public static function begin()
 	{
-		if ( !self::$redbean->isFrozen() ) return false;
+		if ( !self::$redbean->isFrozen() ) return FALSE;
 
 		self::$adapter->startTransaction();
 
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -1084,11 +1084,11 @@ class RedBean_Facade
 	 */
 	public static function commit()
 	{
-		if ( !self::$redbean->isFrozen() ) return false;
+		if ( !self::$redbean->isFrozen() ) return FALSE;
 
 		self::$adapter->commit();
 
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -1099,11 +1099,11 @@ class RedBean_Facade
 	 */
 	public static function rollback()
 	{
-		if ( !self::$redbean->isFrozen() ) return false;
+		if ( !self::$redbean->isFrozen() ) return FALSE;
 
 		self::$adapter->rollback();
 
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -1295,7 +1295,7 @@ class RedBean_Facade
 	 *
 	 * @return string
 	 */
-	public static function isoDate( $time = null )
+	public static function isoDate( $time = NULL )
 	{
 		if ( !$time ) {
 			$time = time();
@@ -1313,7 +1313,7 @@ class RedBean_Facade
 	 *
 	 * @return string
 	 */
-	public static function isoDateTime( $time = null )
+	public static function isoDateTime( $time = NULL )
 	{
 		if ( !$time ) $time = time();
 
@@ -1411,7 +1411,7 @@ class RedBean_Facade
 	 *
 	 * @return array
 	 */
-	public static function preload( $beans, $types, $closure = null )
+	public static function preload( $beans, $types, $closure = NULL )
 	{
 		return self::$redbean->preload( $beans, $types, $closure );
 	}
@@ -1428,7 +1428,7 @@ class RedBean_Facade
 	 *
 	 * @return array
 	 */
-	public static function each( $beans, $types, $closure = null )
+	public static function each( $beans, $types, $closure = NULL )
 	{
 		return self::preload( $beans, $types, $closure );
 	}
@@ -1441,7 +1441,7 @@ class RedBean_Facade
 	 *
 	 * @return void
 	 */
-	public static function renameAssociation( $from, $to = null )
+	public static function renameAssociation( $from, $to = NULL )
 	{
 		RedBean_QueryWriter_AQueryWriter::renameAssociation( $from, $to );
 	}

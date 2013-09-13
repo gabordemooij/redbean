@@ -71,9 +71,9 @@ class RedUNIT_Base_Cross extends RedUNIT_Base
 
 		asrt( count( $ids ), 2 );
 
-		asrt( in_array( $page3->id, $ids ), true );
-		asrt( in_array( $page4->id, $ids ), true );
-		asrt( in_array( $page->id, $ids ), false );
+		asrt( in_array( $page3->id, $ids ), TRUE );
+		asrt( in_array( $page4->id, $ids ), TRUE );
+		asrt( in_array( $page->id, $ids ), FALSE );
 
 		asrt( count( $a->related( $page3, "page" ) ), 1 );
 		asrt( count( $a->related( $page4, "page" ) ), 1 );

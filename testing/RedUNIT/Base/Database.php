@@ -35,19 +35,19 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 		R::nuke();
 		$bean = R::dispense( 'emptybean' );
 		$id = R::store( $bean );
-		asrt( ( $id > 0 ), true );
+		asrt( ( $id > 0 ), TRUE );
 		asrt( R::count( 'emptybean' ), 1 );
 		$bean = R::dispense( 'emptybean' );
 		$id = R::store( $bean );
-		asrt( ( $id > 0 ), true );
+		asrt( ( $id > 0 ), TRUE );
 		asrt( R::count( 'emptybean' ), 2 );
 		//also test in frozen mode
-		R::freeze( true );
+		R::freeze( TRUE );
 		$bean = R::dispense( 'emptybean' );
 		$id = R::store( $bean );
-		asrt( ( $id > 0 ), true );
+		asrt( ( $id > 0 ), TRUE );
 		asrt( R::count( 'emptybean' ), 3 );
-		R::freeze( false );
+		R::freeze( FALSE );
 	}
 	
 	/**
@@ -172,8 +172,8 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 		$page = $redbean->load( "page", 1 );
 
 		asrt( $page->aname, "my page" );
-		asrt( ( (bool) $page->getMeta( "type" ) ), true );
-		asrt( isset( $page->id ), true );
+		asrt( ( (bool) $page->getMeta( "type" ) ), TRUE );
+		asrt( isset( $page->id ), TRUE );
 		asrt( ( $page->getMeta( "type" ) ), "page" );
 		asrt( (int) $page->id, $id );
 	}
@@ -196,29 +196,29 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 		R::store( $rooms[1] );
 
 		$rooms = R::getAssoc('SELECT * FROM room WHERE id < -999');
-		asrt(is_array($rooms), true);
+		asrt(is_array($rooms), TRUE);
 		asrt(count($rooms), 0);
 		
 		$rooms = R::getAssoc( 'SELECT ' . R::$writer->esc( 'number' ) . ', kind FROM room ORDER BY kind ASC' );
 
 		foreach ( $rooms as $key => $room ) {
-			asrt( ( $key === 6 || $key === 7 ), true );
-			asrt( ( $room == 'classic' || $room == 'suite' ), true );
+			asrt( ( $key === 6 || $key === 7 ), TRUE );
+			asrt( ( $room == 'classic' || $room == 'suite' ), TRUE );
 		}
 
 		$rooms = R::$adapter->getAssoc( 'SELECT kind FROM room' );
 		foreach ( $rooms as $key => $room ) {
-			asrt( ( $room == 'classic' || $room == 'suite' ), true );
+			asrt( ( $room == 'classic' || $room == 'suite' ), TRUE );
 			asrt( $room, $key );
 		}
 
 		$rooms = R::getAssoc( 'SELECT `number`, kind FROM rooms2 ORDER BY kind ASC' );
 
 		asrt( count( $rooms ), 0 );
-		asrt( is_array( $rooms ), true );
+		asrt( is_array( $rooms ), TRUE );
 
 		// GetCell should return NULL in case of exception
-		asrt( null, R::getCell( 'SELECT dream FROM fantasy' ) );
+		asrt( NULL, R::getCell( 'SELECT dream FROM fantasy' ) );
 	}
 }
 
@@ -246,7 +246,7 @@ class TroubleDapter extends RedBean_Adapter_DBAdapter
 		$this->get( $sql, $aValues );
 	}
 
-	public function exec( $sql, $aValues = array(), $noEvent = false )
+	public function exec( $sql, $aValues = array(), $noEvent = FALSE )
 	{
 		$this->get( $sql, $aValues );
 	}

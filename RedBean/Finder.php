@@ -51,7 +51,7 @@ class RedBean_Finder
 	 *
 	 * @throws RedBean_Exception_Security
 	 */
-	public function find( $type, $sql = null, $bindings = array() )
+	public function find( $type, $sql = NULL, $bindings = array() )
 	{
 		if ( $sql instanceof RedBean_SQLHelper ) {
 			list( $sql, $bindings ) = $sql->getQuery();
@@ -76,7 +76,7 @@ class RedBean_Finder
 	 *
 	 * @return array
 	 */
-	public function findAndExport( $type, $sql = null, $bindings = array() )
+	public function findAndExport( $type, $sql = NULL, $bindings = array() )
 	{
 		$arr = array();
 		foreach ( $this->find( $type, $sql, $bindings ) as $key => $item ) {
@@ -96,12 +96,12 @@ class RedBean_Finder
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function findOne( $type, $sql = null, $bindings = array() )
+	public function findOne( $type, $sql = NULL, $bindings = array() )
 	{
 		$items = $this->find( $type, $sql, $bindings );
 
 		if ( empty($items) ) {
-			return null;
+			return NULL;
 		}
 
 		return reset( $items );
@@ -117,12 +117,12 @@ class RedBean_Finder
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function findLast( $type, $sql = null, $bindings = array() )
+	public function findLast( $type, $sql = NULL, $bindings = array() )
 	{
 		$items = $this->find( $type, $sql, $bindings );
 
 		if ( empty($items) ) {
-			return null;
+			return NULL;
 		}
 
 		return end( $items );
@@ -139,7 +139,7 @@ class RedBean_Finder
 	 *
 	 * @return array
 	 */
-	public function findOrDispense( $type, $sql = null, $bindings = array() )
+	public function findOrDispense( $type, $sql = NULL, $bindings = array() )
 	{
 		$foundBeans = $this->find( $type, $sql, $bindings );
 
@@ -192,7 +192,7 @@ class RedBean_Finder
 				throw new RedBean_Exception_Security( 'Cannot access list.' );
 			}
 
-			if ( strpos( $steps[$i], 'shared-' ) === false ) {
+			if ( strpos( $steps[$i], 'shared-' ) === FALSE ) {
 				$listName = 'own' . ucfirst( $steps[$i] );
 				$listType = $this->toolbox->getWriter()->esc( $steps[$i] );
 			} else {

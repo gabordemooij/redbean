@@ -29,7 +29,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$id = R::store( $can );
 
-		R::debug( true );
+		R::debug( TRUE );
 
 		ob_start();
 
@@ -37,11 +37,11 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$cache = $this->getCache();
 
-		$data = R::exportAll( array( $can ), true );
+		$data = R::exportAll( array( $can ), TRUE );
 
 		$queries = ob_get_contents();
 
-		R::debug( false );
+		R::debug( FALSE );
 		ob_end_clean();
 		$len1 = strlen( $queries );
 
@@ -51,7 +51,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$id = R::store( $can );
 
-		R::debug( true );
+		R::debug( TRUE );
 
 		ob_start();
 
@@ -59,11 +59,11 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$cache = $this->getCache();
 
-		$data = R::exportAll( array( $can ), true );
+		$data = R::exportAll( array( $can ), TRUE );
 
 		$queries = ob_get_contents();
 
-		R::debug( false );
+		R::debug( FALSE );
 
 		ob_end_clean();
 
@@ -78,7 +78,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$id = R::store( $can );
 
-		R::debug( true );
+		R::debug( TRUE );
 
 		ob_start();
 
@@ -88,21 +88,21 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		R::$duplicationManager->setTables( $cache );
 
-		$data = R::exportAll( array( $can ), true );
+		$data = R::exportAll( array( $can ), TRUE );
 
 		$queries = ob_get_contents();
 
-		R::debug( false );
+		R::debug( FALSE );
 
 		ob_end_clean();
 
 		$len3 = strlen( $queries );
 
-		asrt( ( ( $len3 ) < ( $len2 ) ), true );
+		asrt( ( ( $len3 ) < ( $len2 ) ), TRUE );
 		asrt( count( $data ), 1 );
 		asrt( $data[0]['ownCoffee'][0]['color'], 'black' );
 
-		R::$duplicationManager->setCacheTables( false );
+		R::$duplicationManager->setCacheTables( FALSE );
 	}
 
 	/**
@@ -123,7 +123,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$d = new RedBean_DuplicationManager( R::$toolbox );
 
-		$d->setCacheTables( true );
+		$d->setCacheTables( TRUE );
 
 		ob_start();
 
@@ -139,10 +139,10 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$len1 = strlen( $queries );
 
-		asrt( ( $len1 > 40 ), true );
-		asrt( isset( $x->ownCoffee ), true );
+		asrt( ( $len1 > 40 ), TRUE );
+		asrt( isset( $x->ownCoffee ), TRUE );
 		asrt( count( $x->ownCoffee ), 1 );
-		asrt( isset( $x->sharedTag ), true );
+		asrt( isset( $x->sharedTag ), TRUE );
 		asrt( count( $x->sharedTag ), 1 );
 
 		$cache = $d->getSchema();
@@ -211,12 +211,12 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$len2 = strlen( $queries );
 
-		asrt( isset( $x->ownCoffee ), true );
+		asrt( isset( $x->ownCoffee ), TRUE );
 		asrt( count( $x->ownCoffee ), 1 );
-		asrt( isset( $x->sharedTag ), true );
+		asrt( isset( $x->sharedTag ), TRUE );
 		asrt( count( $x->sharedTag ), 1 );
 		asrt( json_encode( $cache ), json_encode( $d->getSchema() ) );
-		asrt( ( $len1 > $len2 ), true );
+		asrt( ( $len1 > $len2 ), TRUE );
 	}
 
 	/**
@@ -238,15 +238,15 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$b            = R::load( 'book', $id );
 
-		asrt( ( !$b->getMeta( 'tainted' ) ), true );
+		asrt( ( !$b->getMeta( 'tainted' ) ), TRUE );
 
 		R::exportAll( $b );
 
-		asrt( ( !$b->getMeta( 'tainted' ) ), true );
+		asrt( ( !$b->getMeta( 'tainted' ) ), TRUE );
 
 		R::dup( $b );
 
-		asrt( ( !$b->getMeta( 'tainted' ) ), true );
+		asrt( ( !$b->getMeta( 'tainted' ) ), TRUE );
 
 		testpack( 'Test issue with ownItems and stealing Ids.' );
 
@@ -269,18 +269,18 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 		$rows = ( R::getAll( 'select * from item' ) );
 
 		foreach ( $rows as $row ) {
-			asrt( ( $row['bill_id'] > 0 ), true );
+			asrt( ( $row['bill_id'] > 0 ), TRUE );
 		}
 
 		R::nuke();
 
 		$this->runOnce();
 
-		R::freeze( true );
+		R::freeze( TRUE );
 
-		$this->runOnce( false );
+		$this->runOnce( FALSE );
 
-		R::freeze( false );
+		R::freeze( FALSE );
 	}
 
 	/**
@@ -319,79 +319,79 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		R::$duplicationManager->setTables( R::$writer->getTables() );
 
-		$objects = ( R::exportAll( array( $book ), true, array() ) );
+		$objects = ( R::exportAll( array( $book ), TRUE, array() ) );
 
-		asrt( isset( $objects[0]['ownPage'] ), true );
+		asrt( isset( $objects[0]['ownPage'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'] ), 2 );
-		asrt( isset( $objects[0]['author'] ), true );
-		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), true );
+		asrt( isset( $objects[0]['author'] ), TRUE );
+		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'][0]['ownText'] ), 1 );
-		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), true );
+		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'][0]['ownImage'] ), 1 );
 
-		$objects = ( R::exportAll( array( $book ), true, array( 'page', 'author', 'text', 'image' ) ) );
+		$objects = ( R::exportAll( array( $book ), TRUE, array( 'page', 'author', 'text', 'image' ) ) );
 
-		asrt( isset( $objects[0]['ownPage'] ), true );
+		asrt( isset( $objects[0]['ownPage'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'] ), 2 );
-		asrt( isset( $objects[0]['author'] ), true );
-		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), true );
+		asrt( isset( $objects[0]['author'] ), TRUE );
+		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'][0]['ownText'] ), 1 );
-		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), true );
+		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'][0]['ownImage'] ), 1 );
 
-		$objects = ( R::exportAll( array( $book ), true, 'author' ) );
+		$objects = ( R::exportAll( array( $book ), TRUE, 'author' ) );
 
-		asrt( isset( $objects[0]['ownPage'] ), false );
-		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), false );
+		asrt( isset( $objects[0]['ownPage'] ), FALSE );
+		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), FALSE );
 
-		$objects = ( R::exportAll( array( $book ), true, array( 'page' ) ) );
+		$objects = ( R::exportAll( array( $book ), TRUE, array( 'page' ) ) );
 
-		asrt( isset( $objects[0]['author'] ), false );
-		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), false );
+		asrt( isset( $objects[0]['author'] ), FALSE );
+		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), FALSE );
 
-		$objects = ( R::exportAll( array( $book ), true, array( 'page', 'text' ) ) );
+		$objects = ( R::exportAll( array( $book ), TRUE, array( 'page', 'text' ) ) );
 
-		asrt( isset( $objects[0]['author'] ), false );
-		asrt( isset( $objects[0]['ownPage'] ), true );
-		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), true );
+		asrt( isset( $objects[0]['author'] ), FALSE );
+		asrt( isset( $objects[0]['ownPage'] ), TRUE );
+		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'][0]['ownText'] ), 1 );
-		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), false );
+		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), FALSE );
 
-		$objects = ( R::exportAll( array( $book ), true, array( 'none' ) ) );
+		$objects = ( R::exportAll( array( $book ), TRUE, array( 'none' ) ) );
 
-		asrt( isset( $objects[0]['author'] ), false );
-		asrt( isset( $objects[0]['ownPage'] ), false );
+		asrt( isset( $objects[0]['author'] ), FALSE );
+		asrt( isset( $objects[0]['ownPage'] ), FALSE );
 
 		$texts = R::find( 'text' );
 
 		R::preload( $texts, 'page,*.book,*.author' );
 
-		$objects = ( R::exportAll( $texts, true ) );
+		$objects = ( R::exportAll( $texts, TRUE ) );
 
-		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), true );
-		asrt( isset( $objects[0]['page']['sharedBookmark'] ), false );
+		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), TRUE );
+		asrt( isset( $objects[0]['page']['sharedBookmark'] ), FALSE );
 
 		$texts = R::find( 'text' );
 
 		R::preload( $texts, array( 'page', 'page.sharedBookmark' => 'bookmark' ) );
 
-		$objects = ( R::exportAll( $texts, true ) );
+		$objects = ( R::exportAll( $texts, TRUE ) );
 
-		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), true );
-		asrt( isset( $objects[0]['page']['sharedBookmark'] ), true );
-		asrt( isset( $objects[0]['page']['sharedBookmark'][0]['ownNote'] ), false );
+		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), TRUE );
+		asrt( isset( $objects[0]['page']['sharedBookmark'] ), TRUE );
+		asrt( isset( $objects[0]['page']['sharedBookmark'][0]['ownNote'] ), FALSE );
 
 		$texts = R::find( 'text' );
 
 		R::preload( $texts, array( 'page', 'page.sharedBookmark' => 'bookmark', 'page.sharedBookmark.ownNote' => 'note' ) );
 
-		$objects = ( R::exportAll( $texts, true ) );
+		$objects = ( R::exportAll( $texts, TRUE ) );
 
-		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), true );
-		asrt( isset( $objects[0]['page']['sharedBookmark'] ), true );
-		asrt( isset( $objects[0]['page']['sharedBookmark'][0]['ownNote'] ), true );
+		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), TRUE );
+		asrt( isset( $objects[0]['page']['sharedBookmark'] ), TRUE );
+		asrt( isset( $objects[0]['page']['sharedBookmark'][0]['ownNote'] ), TRUE );
 
-		R::$duplicationManager->setCacheTables( false );
+		R::$duplicationManager->setCacheTables( FALSE );
 
 		testpack( 'Keyless export' );
 
@@ -401,19 +401,19 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$export = $book->export();
 
-		asrt( isset( $export['ownPage'][0] ), true );
+		asrt( isset( $export['ownPage'][0] ), TRUE );
 
-		RedBean_OODBBean::setFlagKeyedExport( true );
-
-		$export = $book->export();
-
-		asrt( isset( $export['ownPage'][1] ), true );
-
-		RedBean_OODBBean::setFlagKeyedExport( false );
+		RedBean_OODBBean::setFlagKeyedExport( TRUE );
 
 		$export = $book->export();
 
-		asrt( isset( $export['ownPage'][0] ), true );
+		asrt( isset( $export['ownPage'][1] ), TRUE );
+
+		RedBean_OODBBean::setFlagKeyedExport( FALSE );
+
+		$export = $book->export();
+
+		asrt( isset( $export['ownPage'][0] ), TRUE );
 	}
 
 	/**
@@ -456,11 +456,11 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 			if ( is_array( $value ) ) {
 				foreach ( $value as $index => $nestedObject ) {
 					if ( $nestedObject->id ) {
-						$foundMatch = false;
+						$foundMatch = FALSE;
 						//order might be different
 						foreach ( $array[$property] as $k => $a ) {
 							if ( $a['id'] == $nestedObject->id ) {
-								$foundMatch = true;
+								$foundMatch = TRUE;
 								$index      = $k;
 							}
 						}
@@ -477,7 +477,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 	/**
 	 * Run tests
 	 */
-	private function runOnce( $n = true )
+	private function runOnce( $n = TRUE )
 	{
 
 		$books   = R::dispense( 'book', 10 );

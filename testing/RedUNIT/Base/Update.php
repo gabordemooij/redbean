@@ -62,11 +62,11 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 
 		$id = $redbean->store( $page );
 
-		asrt( $page->getMeta( 'tainted' ), false );
+		asrt( $page->getMeta( 'tainted' ), FALSE );
 
 		$page->setAttr( 'name', "new name" );
 
-		asrt( $page->getMeta( 'tainted' ), true );
+		asrt( $page->getMeta( 'tainted' ), TRUE );
 
 		$id = $redbean->store( $page );
 
@@ -75,29 +75,16 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 		asrt( $page->name, "new name" );
 
 		// Null should == NULL after saving
-		$page->rating = null;
+		$page->rating = NULL;
 
 		$newid = $redbean->store( $page );
 		$page  = $redbean->load( "page", $id );
 
 		asrt( $page->name, "new name" );
-		asrt( ( $page->rating === null ), true );
-		asrt( !$page->rating, true );
+		asrt( ( $page->rating === NULL ), TRUE );
+		asrt( !$page->rating, TRUE );
 
-		$page->rating = false;
-
-		$newid = $redbean->store( $page );
-
-		asrt( $newid, $id );
-
-		$page = $redbean->load( "page", $id );
-
-		asrt( $page->name, "new name" );
-		asrt( (bool) $page->rating, false );
-		asrt( ( $page->rating == false ), true );
-		asrt( !$page->rating, true );
-
-		$page->rating = true;
+		$page->rating = FALSE;
 
 		$newid = $redbean->store( $page );
 
@@ -106,18 +93,31 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 		$page = $redbean->load( "page", $id );
 
 		asrt( $page->name, "new name" );
-		asrt( (bool) $page->rating, true );
+		asrt( (bool) $page->rating, FALSE );
+		asrt( ( $page->rating == FALSE ), TRUE );
+		asrt( !$page->rating, TRUE );
 
-		asrt( ( $page->rating == true ), true );
-		asrt( ( $page->rating == true ), true );
+		$page->rating = TRUE;
 
-		$page->rating = null;
+		$newid = $redbean->store( $page );
+
+		asrt( $newid, $id );
+
+		$page = $redbean->load( "page", $id );
+
+		asrt( $page->name, "new name" );
+		asrt( (bool) $page->rating, TRUE );
+
+		asrt( ( $page->rating == TRUE ), TRUE );
+		asrt( ( $page->rating == TRUE ), TRUE );
+
+		$page->rating = NULL;
 
 		R::store( $page );
 
 		$page = R::load( 'page', $page->id );
 
-		asrt( $page->rating, null );
+		asrt( $page->rating, NULL );
 
 		$page->rating = "1";
 
@@ -150,10 +150,10 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 		$page = $redbean->load( "page", $id );
 
 		asrt( $page->name, "new name" );
-		asrt( !$page->rating, true );
+		asrt( !$page->rating, TRUE );
 
-		asrt( ( $page->rating == 0 ), true );
-		asrt( ( $page->rating == false ), true );
+		asrt( ( $page->rating == 0 ), TRUE );
+		asrt( ( $page->rating == FALSE ), TRUE );
 
 		$page->rating = 5;
 
@@ -197,7 +197,7 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 		$page = $redbean->load( "page", $id );
 
 		asrt( $page->name, "new name" );
-		asrt( ( $page->rating == 2.5 ), true );
+		asrt( ( $page->rating == 2.5 ), TRUE );
 
 		$page->rating = -3.3;
 
@@ -208,7 +208,7 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 		$page = $redbean->load( "page", $id );
 
 		asrt( $page->name, "new name" );
-		asrt( ( $page->rating == -3.3 ), true );
+		asrt( ( $page->rating == -3.3 ), TRUE );
 
 		$page->rating = "good";
 
@@ -251,7 +251,7 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 
 		$page = $redbean->load( "page", $id );
 
-		asrt( $page->numnotstring == 0.123, true );
+		asrt( $page->numnotstring == 0.123, TRUE );
 
 		$page->numasstring2 = "00.123";
 

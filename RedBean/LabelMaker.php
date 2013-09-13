@@ -86,9 +86,9 @@ class RedBean_LabelMaker
 	{
 		$oodb = $this->toolbox->getRedBean();
 		
-		if ( strpos( $enum, ':' ) === false ) {
+		if ( strpos( $enum, ':' ) === FALSE ) {
 			$type  = $enum;
-			$value = false;
+			$value = FALSE;
 		} else {
 			list( $type, $value ) = explode( ':', $enum );
 			$value                = preg_replace( '/\W+/', '_', strtoupper( trim( $value ) ) );
@@ -96,7 +96,7 @@ class RedBean_LabelMaker
 		
 		$values = $oodb->find( $type );
 		
-		if ( $value === false ) {
+		if ( $value === FALSE ) {
 			return $values;
 		}
 		

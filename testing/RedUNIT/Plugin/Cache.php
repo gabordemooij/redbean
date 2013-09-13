@@ -283,8 +283,8 @@ class RedUNIT_Plugin_Cache extends RedUNIT_Plugin
 
 		$bean = R::load( 'nocacheplease', 0 );
 
-		asrt( !isset( $bean->name ), true );
-		asrt( !( $bean->name == 'test' ), true );
+		asrt( !isset( $bean->name ), TRUE );
+		asrt( !( $bean->name == 'test' ), TRUE );
 
 		R::configureFacadeWithToolbox( $old );
 	}

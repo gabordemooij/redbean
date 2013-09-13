@@ -43,6 +43,6 @@ class RedUNIT_Base_Nuke extends RedUNIT_Base
 		// No effect
 		asrt( count( R::$writer->getTables() ), 1 );
 
-		R::freeze( false );
+		R::freeze( FALSE );
 	}
 }

@@ -65,7 +65,7 @@ class RedUNIT_Base_Tags extends RedUNIT_Base
 
 		$tagz = implode( ',', R::tag( $post ) );
 
-		asrt( ( $tagz == "smart,clever" || $tagz == "clever,smart" ), true );
+		asrt( ( $tagz == "smart,clever" || $tagz == "clever,smart" ), TRUE );
 
 		R::tag( $blog, array( "smart", "interesting" ) );
 
@@ -85,11 +85,11 @@ class RedUNIT_Base_Tags extends RedUNIT_Base
 
 		asrt( implode( ",", R::tag( $blog ) ), "lousy!" );
 
-		asrt( R::hasTag( $blog, array( "lousy!" ) ), true );
-		asrt( R::hasTag( $blog, array( "lousy!", "smart" ) ), true );
-		asrt( R::hasTag( $blog, array( "lousy!", "smart" ), true ), false );
+		asrt( R::hasTag( $blog, array( "lousy!" ) ), TRUE );
+		asrt( R::hasTag( $blog, array( "lousy!", "smart" ) ), TRUE );
+		asrt( R::hasTag( $blog, array( "lousy!", "smart" ), TRUE ), FALSE );
 
-		R::tag( $blog, false );
+		R::tag( $blog, FALSE );
 
 		asrt( count( R::tag( $blog ) ), 0 );
 
@@ -100,19 +100,19 @@ class RedUNIT_Base_Tags extends RedUNIT_Base
 		R::addTags( $blog, array( "halloween" ) );
 
 		asrt( count( R::tag( $blog ) ), 3 );
-		asrt( R::hasTag( $blog, array( "funny", "commic", "halloween" ), true ), false );
+		asrt( R::hasTag( $blog, array( "funny", "commic", "halloween" ), TRUE ), FALSE );
 
 		R::unTag( $blog, "funny" );
 		R::addTags( $blog, "horror" );
 
 		asrt( count( R::tag( $blog ) ), 3 );
-		asrt( R::hasTag( $blog, array( "horror", "commic", "halloween" ), true ), false );
+		asrt( R::hasTag( $blog, array( "horror", "commic", "halloween" ), TRUE ), FALSE );
 
 		//no double tags
 		R::addTags( $blog, "horror" );
 
-		asrt( R::hasTag( $blog, array( "horror", "commic", "halloween" ), true ), false );
-		asrt( R::hasTag( $blog, "horror,commic,halloween", true ), false );
+		asrt( R::hasTag( $blog, array( "horror", "commic", "halloween" ), TRUE ), FALSE );
+		asrt( R::hasTag( $blog, "horror,commic,halloween", TRUE ), FALSE );
 
 		asrt( count( R::tag( $blog ) ), 3 );
 

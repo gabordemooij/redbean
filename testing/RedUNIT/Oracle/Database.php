@@ -53,9 +53,9 @@ class RedUNIT_Oracle_Database extends RedUNIT_Oracle
 
 		asrt( $page->aname, "my page" );
 
-		asrt( ( (bool) $page->getMeta( "type" ) ), true );
+		asrt( ( (bool) $page->getMeta( "type" ) ), TRUE );
 
-		asrt( isset( $page->id ), true );
+		asrt( isset( $page->id ), TRUE );
 
 		asrt( ( $page->getMeta( "type" ) ), "page" );
 
@@ -76,14 +76,14 @@ class RedUNIT_Oracle_Database extends RedUNIT_Oracle
 
 		$rooms = R::getAssoc( 'SELECT ' . R::$writer->esc( 'number' ) . ', kind FROM room ORDER BY kind ASC' );
 		foreach ( $rooms as $key => $room ) {
-			asrt( ( $key === 6 || $key === 7 ), true );
+			asrt( ( $key === 6 || $key === 7 ), TRUE );
 
-			asrt( ( $room == 'classic' || $room == 'suite' ), true );
+			asrt( ( $room == 'classic' || $room == 'suite' ), TRUE );
 		}
 
 		$rooms = R::$adapter->getAssoc( 'SELECT kind FROM room' );
 		foreach ( $rooms as $key => $room ) {
-			asrt( ( $room == 'classic' || $room == 'suite' ), true );
+			asrt( ( $room == 'classic' || $room == 'suite' ), TRUE );
 
 			asrt( $room, $key );
 		}
@@ -92,7 +92,7 @@ class RedUNIT_Oracle_Database extends RedUNIT_Oracle
 
 		asrt( count( $rooms ), 0 );
 
-		asrt( is_array( $rooms ), true );
+		asrt( is_array( $rooms ), TRUE );
 
 		$date = R::dispense( 'mydate' );
 

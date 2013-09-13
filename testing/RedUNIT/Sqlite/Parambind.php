@@ -41,20 +41,20 @@ class RedUNIT_Sqlite_Parambind extends RedUNIT_Sqlite
 
 		$pair = $adapter->getAssoc( "SELECT 'thekey','thevalue' " );
 
-		asrt( is_array( $pair ), true );
+		asrt( is_array( $pair ), TRUE );
 
 		asrt( count( $pair ), 1 );
 
-		asrt( isset( $pair["thekey"] ), true );
+		asrt( isset( $pair["thekey"] ), TRUE );
 
 		asrt( $pair["thekey"], "thevalue" );
 
 		testpack( 'Test whether we can properly bind and receive NULL values' );
 
-		asrt( $adapter->getCell( 'SELECT :nil ', array( ':nil' => 'null' ) ), 'null' );
-		asrt( $adapter->getCell( 'SELECT :nil ', array( ':nil' => null ) ), null );
+		asrt( $adapter->getCell( 'SELECT :nil ', array( ':nil' => 'NULL' ) ), 'NULL' );
+		asrt( $adapter->getCell( 'SELECT :nil ', array( ':nil' => NULL ) ), NULL );
 
-		asrt( $adapter->getCell( 'SELECT ? ', array( 'null' ) ), 'null' );
-		asrt( $adapter->getCell( 'SELECT ? ', array( null ) ), null );
+		asrt( $adapter->getCell( 'SELECT ? ', array( 'NULL' ) ), 'NULL' );
+		asrt( $adapter->getCell( 'SELECT ? ', array( NULL ) ), NULL );
 	}
 }

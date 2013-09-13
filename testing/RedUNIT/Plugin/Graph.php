@@ -20,7 +20,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 	 */
 	public function testGraph()
 	{
-		RedBean_Plugin_Cooker::enableBeanLoading( true );
+		RedBean_Plugin_Cooker::enableBeanLoading( TRUE );
 
 		R::dependencies( array() );
 
@@ -216,7 +216,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 			]
 		}}';
 
-		$playList = json_decode( $json, true );
+		$playList = json_decode( $json, TRUE );
 
 		$playList = R::graph( $playList );
 
@@ -229,7 +229,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 		foreach ( $play->ownTrack as $track ) {
 			asrt( count( $track->sharedSong ), 1 );
 
-			asrt( ( $track->cover instanceof RedBean_OODBBean ), true );
+			asrt( ( $track->cover instanceof RedBean_OODBBean ), TRUE );
 		}
 
 		$json = '{"mysongs": {
@@ -269,7 +269,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 			]
 		}}';
 
-		$playList = json_decode( $json, true );
+		$playList = json_decode( $json, TRUE );
 
 		$cooker = new RedBean_Plugin_Cooker;
 
@@ -286,7 +286,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 		foreach ( $play->ownTrack as $track ) {
 			asrt( count( $track->sharedSong ), 1 );
 
-			asrt( ( $track->cover instanceof RedBean_OODBBean ), true );
+			asrt( ( $track->cover instanceof RedBean_OODBBean ), TRUE );
 		}
 
 		$track = reset( $play->ownTrack );
@@ -335,7 +335,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 			]
 		}}';
 
-		$playList = json_decode( $json, true );
+		$playList = json_decode( $json, TRUE );
 
 		$cooker = new RedBean_Plugin_Cooker;
 
@@ -352,7 +352,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 		foreach ( $play->ownTrack as $track ) {
 			asrt( count( $track->sharedSong ), 1 );
 
-			asrt( ( $track->cover instanceof RedBean_OODBBean ), true );
+			asrt( ( $track->cover instanceof RedBean_OODBBean ), TRUE );
 		}
 
 		$track = reset( $play->ownTrack );
@@ -418,12 +418,12 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 		asrt( $cane->cane->label, 'Cane No. 1' );
 		asrt( $cane->cane->cane->label, 'Cane No. 4' );
 		asrt( $cane->cane->cane->cane->label, 'Cane No. 7' );
-		asrt( $cane->cane->cane->cane->cane, null );
+		asrt( $cane->cane->cane->cane->cane, NULL );
 
 		// Test backward compatibility
-		asrt( $page->owner, null );
+		asrt( $page->owner, NULL );
 
-		RedBean_ModelHelper::setModelFormatter( null );
+		RedBean_ModelHelper::setModelFormatter( NULL );
 
 		$band      = R::dispense( 'band' );
 		$musicians = R::dispense( 'bandmember', 5 );
@@ -609,7 +609,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 			)
 		);
 
-		$order = R::graph( $form, true );
+		$order = R::graph( $form, TRUE );
 
 		asrt( $order->getMeta( 'type' ), 'order' );
 
@@ -638,7 +638,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 
 		$cooker = new RedBean_Plugin_Cooker;
 
-		$cooker->setUseNullFlag( true );
+		$cooker->setUseNullFlag( TRUE );
 
 		$form = array(
 			'type'  => 'person',
@@ -649,9 +649,9 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 		$bean = R::graph( $form );
 
 		asrt( $bean->name, 'Fred' );
-		asrt( $bean->phone, null );
+		asrt( $bean->phone, NULL );
 
-		RedBean_Plugin_Cooker::setUseNullFlagSt( false );
+		RedBean_Plugin_Cooker::setUseNullFlagSt( FALSE );
 
 		// Save a form using graph and ignore empty beans, wrong nesting
 		R::nuke();
@@ -678,7 +678,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 		);
 
 		try {
-			$order = R::graph( $form, true );
+			$order = R::graph( $form, TRUE );
 
 			fail();
 		} catch ( RedBean_Exception_Security $e ) {
@@ -715,9 +715,9 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 			)
 		);
 
-		RedBean_Plugin_Cooker::enableBeanLoading( false );
+		RedBean_Plugin_Cooker::enableBeanLoading( FALSE );
 
-		$exc = false;
+		$exc = FALSE;
 		try {
 			$order = R::graph( $form );
 
@@ -726,9 +726,9 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 			$exc = $e;
 		}
 
-		asrt( ( $exc instanceof RedBean_Exception_Security ), true );
+		asrt( ( $exc instanceof RedBean_Exception_Security ), TRUE );
 
-		RedBean_Plugin_Cooker::enableBeanLoading( true );
+		RedBean_Plugin_Cooker::enableBeanLoading( TRUE );
 
 		$order = R::graph( $form );
 
@@ -745,7 +745,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 
 		$product = R::graph( $form );
 
-		asrt( isset( $product->price ), true );
+		asrt( isset( $product->price ), TRUE );
 
 		asrt( $product->price, 0 );
 	}

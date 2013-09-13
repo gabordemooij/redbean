@@ -80,7 +80,7 @@ interface RedBean_QueryWriter
 	 * 
 	 * @return string
 	 */
-	public function glueSQLCondition( $sql, $glue = null );
+	public function glueSQLCondition( $sql, $glue = NULL );
 
 	/**
 	 * Returns the tables that are in the database.
@@ -122,7 +122,7 @@ interface RedBean_QueryWriter
 	 *
 	 * @return integer
 	 */
-	public function scanType( $value, $alsoScanSpecialForTypes = false );
+	public function scanType( $value, $alsoScanSpecialForTypes = FALSE );
 
 	/**
 	 * This method will add a column to a table.
@@ -148,7 +148,7 @@ interface RedBean_QueryWriter
 	 *
 	 * @return integer
 	 */
-	public function code( $typedescription, $includeSpecials = false );
+	public function code( $typedescription, $includeSpecials = FALSE );
 
 	/**
 	 * This method will widen the column to the specified data type.
@@ -174,7 +174,7 @@ interface RedBean_QueryWriter
 	 *
 	 * @return array
 	 */
-	public function queryRecord( $type, $conditions = array(), $addSql = null, $bindings = array() );
+	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() );
 
 	/**
 	 * Returns records through an intermediate type. This method is used to obtain records using a link table and
@@ -227,7 +227,7 @@ interface RedBean_QueryWriter
 	 *
 	 * @return integer
 	 */
-	public function queryRecordCount( $type, $conditions = array(), $addSql = null, $bindings = array() );
+	public function queryRecordCount( $type, $conditions = array(), $addSql = NULL, $bindings = array() );
 
 	/**
 	 * Returns the number of records linked through $linkType and satisfying the SQL in $addSQL/$bindings.
@@ -256,7 +256,7 @@ interface RedBean_QueryWriter
 	 *
 	 * @return integer
 	 */
-	public function updateRecord( $type, $updatevalues, $id = null );
+	public function updateRecord( $type, $updatevalues, $id = NULL );
 
 	/**
 	 * Deletes records from the database.
@@ -295,7 +295,7 @@ interface RedBean_QueryWriter
 
 	/**
 	 * This method will check whether the SQL state is in the list of specified states
-	 * and returns true if it does appear in this list or false if it
+	 * and returns TRUE if it does appear in this list or FALSE if it
 	 * does not. The purpose of this method is to translate the database specific state to
 	 * a one of the constants defined in this class and then check whether it is in the list
 	 * of standard states provided.
@@ -371,7 +371,7 @@ interface RedBean_QueryWriter
 	 *
 	 * @return string
 	 */
-	public function esc( $databaseStructure, $dontQuote = false );
+	public function esc( $databaseStructure, $dontQuote = FALSE );
 
 	/**
 	 * Removes all tables and views from the database.
@@ -401,7 +401,7 @@ interface RedBean_QueryWriter
 	 *
 	 * @return void
 	 */
-	public function renameAssocTable( $from, $to = null );
+	public function renameAssocTable( $from, $to = NULL );
 
 	/**
 	 * Returns the format for link tables.

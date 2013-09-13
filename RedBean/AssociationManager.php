@@ -66,7 +66,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * @throws RedBean_Exception_Security
 	 * @throws RedBean_Exception_SQL
 	 */
-	private function relatedRows( $bean, $type, $getLinks = false, $sql = '', $bindings = array() )
+	private function relatedRows( $bean, $type, $getLinks = FALSE, $sql = '', $bindings = array() )
 	{
 		if ( !is_array( $bean ) && !( $bean instanceof RedBean_OODBBean ) ) {
 			throw new RedBean_Exception_Security(
@@ -240,7 +240,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 *
 	 * @throws RedBean_Exception_Security
 	 */
-	public function relatedCount( $bean, $type, $sql = null, $bindings = array() )
+	public function relatedCount( $bean, $type, $sql = NULL, $bindings = array() )
 	{
 		if ( !( $bean instanceof RedBean_OODBBean ) ) {
 			throw new RedBean_Exception_Security(
@@ -286,7 +286,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 *
 	 * @return array
 	 */
-	public function related( $bean, $type, $getLinks = false, $sql = '', $bindings = array() )
+	public function related( $bean, $type, $getLinks = FALSE, $sql = '', $bindings = array() )
 	{
 		$sql  = $this->writer->glueSQLCondition( $sql );
 
@@ -313,7 +313,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 *
 	 * @return void
 	 */
-	public function unassociate( $beans1, $beans2, $fast = null )
+	public function unassociate( $beans1, $beans2, $fast = NULL )
 	{
 		$beans1 = ( !is_array( $beans1 ) ) ? array( $beans1 ) : $beans1;
 		$beans2 = ( !is_array( $beans2 ) ) ? array( $beans2 ) : $beans2;
@@ -391,7 +391,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 		} catch ( RedBean_Exception_SQL $exception ) {
 			$this->handleException( $exception );
 
-			return false;
+			return FALSE;
 		}
 	}
 
@@ -444,7 +444,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	{
 		$sql   = $this->writer->glueSQLCondition( $sql );
 
-		$rows  = $this->relatedRows( $bean, $type, false, $sql, $bindings );
+		$rows  = $this->relatedRows( $bean, $type, FALSE, $sql, $bindings );
 
 		$links = array();
 		foreach ( $rows as $key => $row ) {
@@ -476,12 +476,12 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function relatedOne( RedBean_OODBBean $bean, $type, $sql = null, $bindings = array() )
+	public function relatedOne( RedBean_OODBBean $bean, $type, $sql = NULL, $bindings = array() )
 	{
 		$beans = $this->relatedSimple( $bean, $type, $sql, $bindings );
 
 		if ( empty( $beans ) ) {
-			return null;
+			return NULL;
 		}
 
 		return reset( $beans );
@@ -497,12 +497,12 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function relatedLast( RedBean_OODBBean $bean, $type, $sql = null, $bindings = array() )
+	public function relatedLast( RedBean_OODBBean $bean, $type, $sql = NULL, $bindings = array() )
 	{
 		$beans = $this->relatedSimple( $bean, $type, $sql, $bindings );
 
 		if ( empty( $beans ) ) {
-			return null;
+			return NULL;
 		}
 
 		return end( $beans );

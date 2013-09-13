@@ -49,7 +49,7 @@ class RedUNIT_Base_Extassoc extends RedUNIT_Base
 		$ea->extAssociate( $ad, $webpage, $top );
 
 		$ads    = $redbean->batch( "ad", $ea->related( $webpage, "ad" ) );
-		$adsPos = $redbean->batch( "ad_webpage", $ea->related( $webpage, "ad", true ) );
+		$adsPos = $redbean->batch( "ad_webpage", $ea->related( $webpage, "ad", TRUE ) );
 
 		asrt( count( $ads ), 1 );
 		asrt( count( $adsPos ), 1 );
@@ -66,7 +66,7 @@ class RedUNIT_Base_Extassoc extends RedUNIT_Base
 
 		$ea->extAssociate( $ad2, $webpage, $bottom );
 
-		$ads = $redbean->batch( "ad", $ea->related( $webpage, "ad", true ) );
+		$ads = $redbean->batch( "ad", $ea->related( $webpage, "ad", TRUE ) );
 
 		asrt( count( $ads ), 2 );
 	}

@@ -43,7 +43,7 @@ class RedBean_ModelHelper implements RedBean_Observer
 	 *
 	 * @return string
 	 */
-	public static function getModelName( $model, $bean = null )
+	public static function getModelName( $model, $bean = NULL )
 	{
 		if ( self::$modelFormatter ) {
 			return self::$modelFormatter->formatModel( $model, $bean );
@@ -104,7 +104,7 @@ class RedBean_ModelHelper implements RedBean_Observer
 	 */
 	public static function clearDependencyInjector()
 	{
-		self::$dependencyInjector = null;
+		self::$dependencyInjector = NULL;
 	}
 
 	/**

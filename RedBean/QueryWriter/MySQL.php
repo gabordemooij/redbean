@@ -67,7 +67,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 
 			// already foreign keys added in this association table
 			if ( $fks > 0 ) {
-				return false;
+				return FALSE;
 			}
 
 			$columns = $this->getColumns( $table );
@@ -94,9 +94,9 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 
 			$this->adapter->exec( $sql );
 
-			return true;
+			return TRUE;
 		} catch ( Exception $e ) {
-			return false;
+			return FALSE;
 		}
 	}
 
@@ -181,7 +181,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	/**
 	 * @see RedBean_QueryWriter::scanType
 	 */
-	public function scanType( $value, $flagSpecial = false )
+	public function scanType( $value, $flagSpecial = FALSE )
 	{
 		$this->svalue = $value;
 
@@ -199,7 +199,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 		$value = strval( $value );
 
 		if ( !$this->startsWithZeros( $value ) ) {
-			if ( $value === true || $value === false || $value === '1' || $value === '' ) {
+			if ( $value === TRUE || $value === FALSE || $value === '1' || $value === '' ) {
 				return RedBean_QueryWriter_MySQL::C_DATATYPE_BOOL;
 			}
 
@@ -230,7 +230,7 @@ class RedBean_QueryWriter_MySQL extends RedBean_QueryWriter_AQueryWriter impleme
 	/**
 	 * @see RedBean_QueryWriter::code
 	 */
-	public function code( $typedescription, $includeSpecials = false )
+	public function code( $typedescription, $includeSpecials = FALSE )
 	{
 		if ( isset( $this->sqltype_typeno[$typedescription] ) ) {
 			$r = $this->sqltype_typeno[$typedescription];

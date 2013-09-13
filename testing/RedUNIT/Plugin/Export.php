@@ -46,36 +46,36 @@ class RedUNIT_Plugin_Export extends RedUNIT_Plugin
 		$wine = R::load( 'wine', $wines[1]->id );
 
 		$list1 = R::exportAll( array( $wine, $shelves[1] ) );
-		$list2 = R::exportAll( array( $wine, $shelves[1] ), true );
+		$list2 = R::exportAll( array( $wine, $shelves[1] ), TRUE );
 
 		asrt( $list1[0]['name'], 'Chardonnay' );
 
-		asrt( isset( $list1[0]['shelf'] ), false );
-		asrt( isset( $list1[0]['shelf_id'] ), true );
-		asrt( isset( $list1[0]['shelf']['cellar'] ), false );
+		asrt( isset( $list1[0]['shelf'] ), FALSE );
+		asrt( isset( $list1[0]['shelf_id'] ), TRUE );
+		asrt( isset( $list1[0]['shelf']['cellar'] ), FALSE );
 
 		asrt( $list2[0]['name'], 'Chardonnay' );
 
-		asrt( isset( $list2[0]['shelf'] ), true );
+		asrt( isset( $list2[0]['shelf'] ), TRUE );
 
 		asrt( intval( $list2[0]['shelf']['number'] ), 1 );
 
-		asrt( isset( $list2[0]['shelf']['ownWine'] ), false );
-		asrt( isset( $list2[0]['shelf']['cellar'] ), true );
-		asrt( isset( $list2[0]['shelf']['cellar']['name'] ), true );
-		asrt( isset( $list2[0]['shelf_id'] ), true );
+		asrt( isset( $list2[0]['shelf']['ownWine'] ), FALSE );
+		asrt( isset( $list2[0]['shelf']['cellar'] ), TRUE );
+		asrt( isset( $list2[0]['shelf']['cellar']['name'] ), TRUE );
+		asrt( isset( $list2[0]['shelf_id'] ), TRUE );
 
 		asrt( intval( $list1[1]['number'] ), 2 );
 
-		asrt( isset( $list1[1]['ownWine'] ), true );
-		asrt( isset( $list1[1]['cellar'] ), false );
-		asrt( isset( $list1[1]['cellar']['name'] ), false );
+		asrt( isset( $list1[1]['ownWine'] ), TRUE );
+		asrt( isset( $list1[1]['cellar'] ), FALSE );
+		asrt( isset( $list1[1]['cellar']['name'] ), FALSE );
 
 		asrt( intval( $list2[1]['number'] ), 2 );
 
-		asrt( isset( $list2[1]['ownWine'] ), true );
-		asrt( isset( $list2[1]['cellar'] ), true );
-		asrt( isset( $list2[1]['cellar']['name'] ), true );
+		asrt( isset( $list2[1]['ownWine'] ), TRUE );
+		asrt( isset( $list2[1]['cellar'] ), TRUE );
+		asrt( isset( $list2[1]['cellar']['name'] ), TRUE );
 
 		R::nuke();
 
@@ -124,18 +124,18 @@ class RedUNIT_Plugin_Export extends RedUNIT_Plugin
 
 		$data = reset( $data );
 
-		asrt( isset( $data['sharedPerson'] ), true );
+		asrt( isset( $data['sharedPerson'] ), TRUE );
 		asrt( count( $data['sharedPerson'] ), 10 );
 
 		$last = end( $data['sharedPerson'] );
 
-		asrt( ( $last['suitcase_id'] > 0 ), true );
+		asrt( ( $last['suitcase_id'] > 0 ), TRUE );
 
 		$data = R::exportAll( $him );
 
 		$data = reset( $data );
 
-		asrt( isset( $data['ownShoe'] ), true );
+		asrt( isset( $data['ownShoe'] ), TRUE );
 
 		asrt( count( $data['ownShoe'] ), 2 );
 		asrt( count( $data['sharedCity'] ), 1 );

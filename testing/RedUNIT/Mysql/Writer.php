@@ -30,29 +30,29 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		$adapter->exec( "DROP TABLE IF EXISTS testtable" );
 
-		asrt( in_array( "testtable", $adapter->getCol( "show tables" ) ), false );
+		asrt( in_array( "testtable", $adapter->getCol( "show tables" ) ), FALSE );
 
 		$writer->createTable( "testtable" );
 
-		asrt( in_array( "testtable", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "testtable", $adapter->getCol( "show tables" ) ), TRUE );
 
 		asrt( count( array_diff( $writer->getTables(), $adapter->getCol( "show tables" ) ) ), 0 );
 		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 1 );
 
-		asrt( in_array( "id", array_keys( $writer->getColumns( "testtable" ) ) ), true );
-		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), false );
+		asrt( in_array( "id", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
+		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), FALSE );
 
 		$writer->addColumn( "testtable", "c1", 1 );
 
 		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 2 );
 
-		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), true );
+		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
 
 		foreach ( $writer->sqltype_typeno as $key => $type ) {
 			if ( $type < 100 ) {
-				asrt( $writer->code( $key, true ), $type );
+				asrt( $writer->code( $key, TRUE ), $type );
 			} else {
-				asrt( $writer->code( $key, true ), 99 );
+				asrt( $writer->code( $key, TRUE ), 99 );
 			}
 		}
 
@@ -60,8 +60,8 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		asrt( $writer->code( "unknown" ), 99 );
 
-		asrt( $writer->scanType( false ), 0 );
-		asrt( $writer->scanType( null ), 0 );
+		asrt( $writer->scanType( FALSE ), 0 );
+		asrt( $writer->scanType( NULL ), 0 );
 
 		asrt( $writer->scanType( 2 ), 1 );
 		asrt( $writer->scanType( 255 ), 1 );
@@ -76,9 +76,9 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		asrt( $writer->scanType( str_repeat( 'abcd', 100000 ) ), RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32 );
 
-		asrt( $writer->scanType( "2001-10-10", true ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->scanType( "2001-10-10", TRUE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00", true ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
+		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
 
 		asrt( $writer->scanType( "2001-10-10" ), 4 );
 
@@ -92,17 +92,17 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols['special'], true ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->code( $cols['special'], TRUE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE );
 		
-		asrt( $writer->code( $cols['special'], false ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED );
+		asrt( $writer->code( $cols['special'], FALSE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED );
 		
 		$writer->addColumn( "testtable", "special2", RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
 		
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols['special2'], true ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
+		asrt( $writer->code( $cols['special2'], TRUE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
 		
-		asrt( $writer->code( $cols['special'], false ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED );
+		asrt( $writer->code( $cols['special'], FALSE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED );
 		
 		$cols = $writer->getColumns( "testtable" );
 
@@ -142,7 +142,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		$row = $writer->queryRecord( "testtable", array( "id" => array( $id ) ) );
 
-		asrt( empty( $row ), true );
+		asrt( empty( $row ), TRUE );
 
 		$writer->addColumn( "testtable", "c2", 2 );
 
@@ -173,7 +173,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 	}
 
 	/**
-	 * (false should be stored as 0 not as '')
+	 * (FALSE should be stored as 0 not as '')
 	 * 
 	 * @return voids
 	 */
@@ -191,7 +191,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		$bean        = $redbean->dispense( "zero" );
 
-		$bean->zero  = false;
+		$bean->zero  = FALSE;
 		$bean->title = "bla";
 
 		$redbean->store( $bean );
@@ -202,17 +202,17 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		testpack( "Test RedBean Security - bean interface " );
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		$bean = $redbean->load( "page", "13; drop table hack" );
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 		try {
 			$bean = $redbean->load( "page where 1; drop table hack", 1 );
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		$bean     = $redbean->dispense( "page" );
 
@@ -225,7 +225,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		unset( $bean->id );
 
@@ -236,7 +236,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		$bean->name = "'" . $evil;
 
@@ -245,7 +245,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		$bean->$evil = 1;
 
@@ -254,7 +254,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		unset( $bean->$evil );
 
@@ -266,7 +266,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		$bean->name = "'" . $evil;
 
@@ -275,7 +275,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		$bean->$evil = 1;
 
@@ -284,14 +284,14 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		try {
 			$redbean->trash( $bean );
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		try {
 			$redbean->find( "::", array(), "" );
@@ -308,7 +308,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		} catch ( Exception $e ) {
 		}
 
-		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), true );
+		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		testpack( "Test ANSI92 issue in clearrelations" );
 

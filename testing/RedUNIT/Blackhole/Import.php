@@ -29,11 +29,11 @@ class RedUNIT_Blackhole_Import extends RedUNIT_Blackhole
 
 		$bean->name = 'abc';
 
-		asrt( $bean->getMeta( 'tainted' ), true );
+		asrt( $bean->getMeta( 'tainted' ), TRUE );
 
 		R::store( $bean );
 
-		asrt( $bean->getMeta( 'tainted' ), false );
+		asrt( $bean->getMeta( 'tainted' ), FALSE );
 
 		$copy = R::dispense( 'bean' );
 
@@ -41,19 +41,19 @@ class RedUNIT_Blackhole_Import extends RedUNIT_Blackhole
 
 		$copy = R::load( 'bean', $copy->id );
 
-		asrt( $copy->getMeta( 'tainted' ), false );
+		asrt( $copy->getMeta( 'tainted' ), FALSE );
 
 		$copy->import( array( 'name' => 'xyz' ) );
 
-		asrt( $copy->getMeta( 'tainted' ), true );
+		asrt( $copy->getMeta( 'tainted' ), TRUE );
 
-		$copy->setMeta( 'tainted', false );
+		$copy->setMeta( 'tainted', FALSE );
 
-		asrt( $copy->getMeta( 'tainted' ), false );
+		asrt( $copy->getMeta( 'tainted' ), FALSE );
 
 		$copy->importFrom( $bean );
 
-		asrt( $copy->getMeta( 'tainted' ), true );
+		asrt( $copy->getMeta( 'tainted' ), TRUE );
 
 		testpack( 'Test basic import() feature.' );
 

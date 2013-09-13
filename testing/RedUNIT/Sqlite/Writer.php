@@ -28,22 +28,22 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 
 		$a = new RedBean_AssociationManager( $toolbox );
 
-		asrt( in_array( "testtable", $writer->getTables() ), false );
+		asrt( in_array( "testtable", $writer->getTables() ), FALSE );
 
 		$writer->createTable( "testtable" );
 
-		asrt( in_array( "testtable", $writer->getTables() ), true );
+		asrt( in_array( "testtable", $writer->getTables() ), TRUE );
 
 		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 1 );
 
-		asrt( in_array( "id", array_keys( $writer->getColumns( "testtable" ) ) ), true );
-		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), false );
+		asrt( in_array( "id", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
+		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), FALSE );
 
 		$writer->addColumn( "testtable", "c1", 1 );
 
 		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 2 );
 
-		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), true );
+		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
 
 		foreach ( $writer->sqltype_typeno as $key => $type ) {
 			asrt( $writer->code( $key ), $type );
@@ -51,8 +51,8 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 
 		asrt( $writer->code( "unknown" ), 99 );
 
-		asrt( $writer->scanType( false ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
-		asrt( $writer->scanType( null ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( FALSE ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( NULL ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
 
 		asrt( $writer->scanType( 2 ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
 		asrt( $writer->scanType( 255 ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
@@ -91,11 +91,11 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 
 		$row = $writer->queryRecord( "testtable", array( "id" => array( $id ) ) );
 
-		asrt( empty( $row ), true );
+		asrt( empty( $row ), TRUE );
 	}
 
 	/**
-	 * (false should be stored as 0 not as '')
+	 * (FALSE should be stored as 0 not as '')
 	 * 
 	 * @return void
 	 */
@@ -108,7 +108,7 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 
 		$bean = $redbean->dispense( "zero" );
 
-		$bean->zero  = false;
+		$bean->zero  = FALSE;
 		$bean->title = "bla";
 
 		$redbean->store( $bean );

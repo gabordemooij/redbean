@@ -97,19 +97,19 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 
 		$row = R::getRow( 'select * from page ' );
 
-		asrt( is_array( $row ), true );
+		asrt( is_array( $row ), TRUE );
 
-		asrt( isset( $row['name'] ), true );
+		asrt( isset( $row['name'] ), TRUE );
 
 		// Test findAll -- should not throw an exception
-		asrt( count( R::findAll( 'page' ) ) > 0, true );
-		asrt( count( R::findAll( 'page', ' ORDER BY id ' ) ) > 0, true );
+		asrt( count( R::findAll( 'page' ) ) > 0, TRUE );
+		asrt( count( R::findAll( 'page', ' ORDER BY id ' ) ) > 0, TRUE );
 
 		$beans = R::findOrDispense( "page" );
 
 		asrt( count( $beans ), 6 );
 
-		asrt( is_null( R::findLast( 'nothing' ) ), true );
+		asrt( is_null( R::findLast( 'nothing' ) ), TRUE );
 
 		try {
 			R::find( 'bean', ' id > 0 ', 'invalid bindings argument' );
@@ -302,7 +302,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		asrt( $foundStr, 'page8' );
 
 		//now with parents and condition (variation)
-		R::$writer->setUseCache(false);
+		R::$writer->setUseCache(FALSE);
 		$referencePage = R::load( 'page', $page[7]->id );
 		$found = $referencePage->withCondition(' ( page.number < ? OR  page.number = 5 ) ', array( 3 ) )
 				  ->searchIn( 'page' );

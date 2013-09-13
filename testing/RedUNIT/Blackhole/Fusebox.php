@@ -39,7 +39,7 @@ class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole
 	 */
 	private function giveMeSoup( Model_Soup $soup )
 	{
-		asrt( ( $soup instanceof Model_Soup ), true );
+		asrt( ( $soup instanceof Model_Soup ), TRUE );
 
 		asrt( 'A bit too salty', $soup->taste() );
 
@@ -53,7 +53,7 @@ class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole
 	 */
 	private function giveMeBean( RedBean_OODBBean $bean )
 	{
-		asrt( ( $bean instanceof RedBean_OODBBean ), true );
+		asrt( ( $bean instanceof RedBean_OODBBean ), TRUE );
 
 		asrt( 'A bit too salty', $bean->taste() );
 

@@ -29,9 +29,9 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 
 		$now = $mixer->now();
 
-		asrt( is_string( $now ), true );
+		asrt( is_string( $now ), TRUE );
 
-		asrt( ( strlen( $now ) > 5 ), true );
+		asrt( ( strlen( $now ) > 5 ), TRUE );
 
 		$bean = R::dispense( 'bean' );
 
@@ -43,11 +43,11 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 		$data = $mixer->begin()->select( '*' )->from( 'bean' )
 			->where( ' field1 = ? ' )->put( 'a' )->get();
 
-		asrt( is_array( $data ), true );
+		asrt( is_array( $data ), TRUE );
 
 		$row = array_pop( $data );
 
-		asrt( is_array( $row ), true );
+		asrt( is_array( $row ), TRUE );
 
 		asrt( $row['field1'], 'a' );
 		asrt( $row['field2'], 'b' );
@@ -55,7 +55,7 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 		$row = $mixer->begin()->select( 'field1', 'field2' )->from( 'bean' )
 			->where( ' 1 ' )->limit( '1' )->get( 'row' );
 
-		asrt( is_array( $row ), true );
+		asrt( is_array( $row ), TRUE );
 
 		asrt( $row['field1'], 'a' );
 		asrt( $row['field2'], 'b' );
@@ -73,10 +73,10 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 		// Now switch back to non-capture mode (issue #142)
 		$value = $mixer->now();
 
-		asrt( is_object( $value ), false );
-		asrt( is_scalar( $value ), true );
+		asrt( is_object( $value ), FALSE );
+		asrt( is_scalar( $value ), TRUE );
 
-		asrt( $value > 0, true );
+		asrt( $value > 0, TRUE );
 
 		$mixer->begin()->select_field1_from( 'bean' );
 
@@ -84,7 +84,7 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 
 		$value = $mixer->now();
 
-		asrt( is_scalar( $value ), true );
+		asrt( is_scalar( $value ), TRUE );
 
 		// Test open and close block commands
 		$bean = R::dispense( 'bean' );
@@ -100,7 +100,7 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 			->close()
 			->get( 'cell' );
 
-		asrt( ( $value == 2 ), true );
+		asrt( ( $value == 2 ), TRUE );
 
 		// Test nesting
 		$bean = R::dispense( 'bean' );
@@ -114,7 +114,7 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 			->nest( $mixer->getNew()->begin()->addSQL( ' ( 2 ) ' ) )
 			->get( 'cell' );
 
-		asrt( ( $value == 2 ), true );
+		asrt( ( $value == 2 ), TRUE );
 	}
 }
 
