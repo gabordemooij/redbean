@@ -117,7 +117,15 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		} catch ( RedBean_Exception_Security $exception ) {
 			pass();
 		}
-		
+	}
+
+	/**
+	 * Test tree traversal with searchIn().
+	 * 
+	 * @return void
+	 */
+	public function testTreeTraversal()
+	{
 		testpack( 'Test Tree Traversal' );
 		R::nuke();
 
@@ -347,6 +355,14 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 			fail();
 		} catch (RedBean_Exception_Security $exception) {
 			pass();
+		}
+		
+		//but shareditem should be allowed
+		try {
+			$referencePage->searchIn('sharedpage');
+			pass();
+		} catch (RedBean_Exception_Security $exception) {
+			fail();
 		}
 		
 	}
