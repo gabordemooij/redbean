@@ -995,7 +995,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function searchIn($property)
 	{
-		if ( preg_match( '/^shared[A-Z]/', $property ) ) {
+		if ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
 			throw new RedBean_Exception_Security( 'Cannot search a shared list recursively.' );
 		}
 
