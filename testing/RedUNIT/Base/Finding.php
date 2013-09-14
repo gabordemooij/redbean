@@ -144,8 +144,10 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		$page[3]->ownPage  = array( $page[5] );
 		$page[5]->ownPage  = array( $page[7] );
 		$page[9]->document = $page[8];
+		$page[9]->book = R::dispense('book');
 		R::store( $page[9] );
 		$id = R::store( $page[0] );
+		$book = $page[9]->book;
 
 		//Basics, load child nodes in tree
 		$referencePage = R::load( 'page', $id );
@@ -361,6 +363,16 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		$foundStr = implode( '', $foundItems );
 
 		asrt( $foundStr, 'page6page9' );
+		
+		//also test if with-condition has been cleared!
+		asrt( count( $book->fresh()->ownPage ) ,1 );
+
+		//also if you find nothing..
+		$found = $referencePage->withCondition( ' page.number = 999 ' )
+				  ->searchIn( 'ownPage' );
+
+		asrt( count( $found ) ,0 );
+		asrt( count( $book->ownPage ) ,1 );
 
 		//store should not affect next search
 		R::store( $referencePage );
