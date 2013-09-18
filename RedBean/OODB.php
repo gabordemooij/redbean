@@ -708,10 +708,13 @@ class RedBean_OODB extends RedBean_Observable
 			if (
 				is_array( $value )
 				|| ( is_object( $value ) )
-				|| strlen( $prop ) < 1
+			) {
+				throw new RedBean_Exception_Security( "Invalid Bean value: property $prop  " );
+			} else if (
+				strlen( $prop ) < 1
 				|| preg_match( $pattern, $prop )
 			) {
-				throw new RedBean_Exception_Security( "Invalid Bean: property $prop  " );
+				throw new RedBean_Exception_Security( "Invalid Bean property: property $prop  " );
 			}
 		}
 	}
