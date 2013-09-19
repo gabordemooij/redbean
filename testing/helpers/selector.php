@@ -128,6 +128,7 @@ $allPacks = array(
 	'Base/Null',
 	'Base/Issue90',
 	'Base/Issue259',
+	'Base/Issue303',
 	'Base/Nuke',
 	'Base/Keywords',
 	'Base/Count',
