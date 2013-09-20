@@ -32,6 +32,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	private static $flagKeyedExport = FALSE;
 
 	/**
+	 * Whether to skip beautification of columns or not.
+	 * 
 	 * @var boolean
 	 */
 	private $flagSkipBeau = FALSE;
@@ -220,7 +222,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
-	 * Does the work for OODB dispense, but without calling setMeta().
+	 * Initializes a bean. Used by OODB for dispensing beans.
+	 * It is not recommended to use this method to initialize beans. Instead
+	 * use the OODB object to dispense new beans. You can use this method
+	 * if you build your own bean dispensing mechanism.
 	 *
 	 * @param string             $type       type of the new bean
 	 * @param RedBean_BeanHelper $beanhelper bean helper to obtain a toolbox and a model
@@ -256,6 +261,12 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	/**
 	 * Returns an ArrayIterator so you can treat the bean like
 	 * an array with the properties container as its contents.
+	 * This method is meant for PHP and allows you to access beans as if
+	 * they were arrays, i.e. using array notation:
+	 * 
+	 * $bean[ $key ] = $value;
+	 * 
+	 * Note that not all PHP functions work with the array interface.
 	 *
 	 * @return ArrayIterator
 	 */
@@ -266,14 +277,19 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 	/**
 	 * Imports all values from an associative array $array. Chainable.
+	 * This method imports the values in the first argument as bean
+	 * propery and value pairs. Use the second parameter to provide a
+	 * selection. If a selection array is passed, only the entries
+	 * having keys mentioned in the selection array will be imported.
+	 * Set the third parameter to TRUE to preserve spaces in selection keys.
 	 *
 	 * @param array        $array     what you want to import
 	 * @param string|array $selection selection of values
-	 * @param boolean      $notrim    if TRUE values will not be trimmed
+	 * @param boolean      $notrim    if TRUE selection keys will NOT be trimmed
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function import( $arr, $selection = FALSE, $notrim = FALSE )
+	public function import( $array, $selection = FALSE, $notrim = FALSE )
 	{
 		if ( is_string( $selection ) ) {
 			$selection = explode( ',', $selection );
@@ -285,7 +301,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			}
 		}
 
-		foreach ( $arr as $key => $value ) {
+		foreach ( $array as $key => $value ) {
 			if ( $key != '__info' ) {
 				if ( !$selection || ( $selection && in_array( $key, $selection ) ) ) {
 					$this->$key = $value;
@@ -298,6 +314,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 	/**
 	 * Imports data from another bean. Chainable.
+	 * Copies the properties from the source bean to the internal
+	 * property list.
 	 *
 	 * @param RedBean_OODBBean $sourceBean the source bean to take properties from
 	 *
@@ -392,6 +410,8 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 	/**
 	 * Exports the bean to an object.
+	 * This method exports the bean data to the specified object.
+	 * Only scalar values will be exported by this method.
 	 *
 	 * @param object $obj target object
 	 *
@@ -554,6 +574,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 	/**
 	 * Returns properties of bean as an array.
+	 * This method returns the raw internal property list of the
+	 * bean. Only use this method for optimization purposes. Otherwise
+	 * use the export() method to export bean data to arrays.
 	 *
 	 * @return array
 	 */
@@ -598,6 +621,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 	/**
 	 * Clears state.
+	 * Internal method. Clears the state of the query modifiers of the bean.
+	 * Query modifiers are: with(), withCondition(), alias() and fetchAs().
+	 * 
+	 * @return void
 	 */
 	private function clear() {
 		$this->withSql    = '';
@@ -867,7 +894,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 	/**
 	 * Implementation of __toString Method
-	 * Routes call to Model.
+	 * Routes call to Model. If the model implements a __toString() method this
+	 * method will be called and the result will be returned. In case of an 
+	 * echo-statement this result will be printed. If the model does not
+	 * implement a __toString method, this method will return a JSON
+	 * representation of the current bean.
 	 *
 	 * @return string
 	 */
