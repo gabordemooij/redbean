@@ -781,7 +781,7 @@ class RedBean_OODB extends RedBean_Observable
 	}
 
 	/**
-	 * Stores a bean in the database. This function takes a
+	 * Stores a bean in the database. This method takes a
 	 * RedBean_OODBBean Bean Object $bean and stores it
 	 * in the database. If the database schema is not compatible
 	 * with this bean and RedBean runs in fluid mode the schema
@@ -986,7 +986,9 @@ class RedBean_OODB extends RedBean_Observable
 	}
 
 	/**
-	 * Returns the number of beans we have in DB of a given type.
+	 * Counts the number of beans of type $type.
+	 * This method accepts a second argument to modify the count-query.
+	 * A third argument can be used to provide bindings for the SQL snippet.
 	 *
 	 * @param string $type     type of bean we are looking for
 	 * @param string $addSQL   additional SQL snippet

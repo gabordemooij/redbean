@@ -192,6 +192,7 @@ class RedBean_Facade
 	
 	/**
 	 * Logs queries beginning with CREATE or ALTER to file (TimeLine).
+	 * Attaches a listener to the adapter to monitor for schema altering queries.
 	 * 
 	 * @param string $filename destination file
 	 * 
@@ -287,8 +288,17 @@ class RedBean_Facade
 
 	/**
 	 * Adds a database to the facade, afterwards you can select the database using
-	 * selectDatabase($key).
-	 *
+	 * selectDatabase($key), where $key is the name you assigned to this database.
+	 * 
+	 * Usage:
+	 * 
+	 * R::addDatabase( 'database-1', 'sqlite:/tmp/db1.txt' );
+	 * R::selectDatabase( 'database-1' ); //to select database again
+	 * 
+	 * This method allows you to dynamically add (and select) new databases
+	 * to the facade. Adding a database with the same key as an older database
+	 * will cause this entry to be overwritten.
+	 * 
 	 * @param string      $key    ID for the database
 	 * @param string      $dsn    DSN for the database
 	 * @param string      $user   User for connection
@@ -304,10 +314,17 @@ class RedBean_Facade
 
 	/**
 	 * Selects a different database for the Facade to work with.
+	 * If you use the R::setup() you don't need this method. This method is meant
+	 * for multiple database setups. This method selects the database identified by the
+	 * database ID ($key). Use addDatabase() to add a new database, which in turn
+	 * can be selected using selectDatabase(). If you use R::setup(), the resulting
+	 * database will be stored under key 'default', to switch (back) to this database
+	 * use R::selectDatabase( 'default' ). This method returns TRUE if the database has been
+	 * switched and FALSE otherwise (for instance if you already using the specified database).
 	 *
 	 * @param  string $key Key of the database to select
 	 *
-	 * @return int 1
+	 * @return boolean
 	 */
 	public static function selectDatabase( $key )
 	{
@@ -325,6 +342,8 @@ class RedBean_Facade
 	 * Toggles DEBUG mode.
 	 * In Debug mode all SQL that happens under the hood will
 	 * be printed to the screen or logged by provided logger.
+	 * If no database connection has been configured using R::setup() or
+	 * R::selectDatabase() this method will throw an exception.
 	 *
 	 * @param boolean        $tf
 	 * @param RedBean_Logger $logger
@@ -361,11 +380,21 @@ class RedBean_Facade
 	}
 
 	/**
-	 * Stores a RedBean OODB Bean and returns the ID.
+	 * Stores a bean in the database. This method takes a
+	 * RedBean_OODBBean Bean Object $bean and stores it
+	 * in the database. If the database schema is not compatible
+	 * with this bean and RedBean runs in fluid mode the schema
+	 * will be altered to store the bean correctly.
+	 * If the database schema is not compatible with this bean and
+	 * RedBean runs in frozen mode it will throw an exception.
+	 * This function returns the primary key ID of the inserted
+	 * bean.
 	 *
-	 * @param  RedBean_OODBBean|RedBean_SimpleModel $bean bean
+	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean to store
 	 *
-	 * @return mixed
+	 * @return integer
+	 *
+	 * @throws RedBean_Exception_Security
 	 */
 	public static function store( $bean )
 	{
@@ -419,15 +448,26 @@ class RedBean_Facade
 	}
 
 	/**
-	 * Loads the bean with the given type and id and returns it.
+	 * Loads a bean from the object database.
+	 * It searches for a RedBean_OODBBean Bean Object in the
+	 * database. It does not matter how this bean has been stored.
+	 * RedBean uses the primary key ID $id and the string $type
+	 * to find the bean. The $type specifies what kind of bean you
+	 * are looking for; this is the same type as used with the
+	 * dispense() function. If RedBean finds the bean it will return
+	 * the RedBean_OODB Bean object; if it cannot find the bean
+	 * RedBean will return a new bean of type $type and with
+	 * primary key ID 0. In the latter case it acts basically the
+	 * same as dispense().
 	 *
-	 * Usage:
-	 * $book = R::load('book', $id); -- loads a book bean
+	 * Important note:
+	 * If the bean cannot be found in the database a new bean of
+	 * the specified type will be generated and returned.
 	 *
-	 * Can also load one-to-one related beans:
+	 * @param string  $type type of bean you want to load
+	 * @param integer $id   ID of the bean you want to load
 	 *
-	 * @param string  $type type
-	 * @param integer $id   id of the bean you want to load
+	 * @throws RedBean_Exception_SQL
 	 *
 	 * @return RedBean_OODBBean
 	 */
@@ -437,11 +477,15 @@ class RedBean_Facade
 	}
 
 	/**
-	 * Deletes the specified bean.
+	 * Removes a bean from the database.
+	 * This function will remove the specified RedBean_OODBBean
+	 * Bean Object from the database.
 	 *
-	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean to be deleted
+	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean you want to remove from database
 	 *
 	 * @return void
+	 *
+	 * @throws RedBean_Exception_Security
 	 */
 	public static function trash( $bean )
 	{
@@ -680,7 +724,7 @@ class RedBean_Facade
 
 	/**
 	 * @see RedBean_Facade::find
-	 *      The variation also exports the beans (i.e. it returns arrays).
+	 * The variation also exports the beans (i.e. it returns arrays).
 	 *
 	 * @param string $type     type   the type of bean you are looking for
 	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
@@ -695,7 +739,7 @@ class RedBean_Facade
 
 	/**
 	 * @see RedBean_Facade::find
-	 *      This variation returns the first bean only.
+	 * This variation returns the first bean only.
 	 *
 	 * @param string $type     type   the type of bean you are looking for
 	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
@@ -710,7 +754,7 @@ class RedBean_Facade
 
 	/**
 	 * @see RedBean_Facade::find
-	 *      This variation returns the last bean only.
+	 * This variation returns the last bean only.
 	 *
 	 * @param string $type     type   the type of bean you are looking for
 	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
@@ -1016,17 +1060,21 @@ class RedBean_Facade
 	}
 
 	/**
-	 * Counts beans
+	 * Counts the number of beans of type $type.
+	 * This method accepts a second argument to modify the count-query.
+	 * A third argument can be used to provide bindings for the SQL snippet.
 	 *
-	 * @param string $beanType type of bean
-	 * @param string $addSQL   additional SQL snippet (for filtering, limiting)
+	 * @param string $type     type of bean we are looking for
+	 * @param string $addSQL   additional SQL snippet
 	 * @param array  $bindings parameters to bind to SQL
 	 *
 	 * @return integer
+	 *
+	 * @throws RedBean_Exception_SQL
 	 */
-	public static function count( $beanType, $addSQL = '', $bindings = array() )
+	public static function count( $type, $addSQL = '', $bindings = array() )
 	{
-		return RedBean_Facade::$redbean->count( $beanType, $addSQL, $bindings );
+		return RedBean_Facade::$redbean->count( $type, $addSQL, $bindings );
 	}
 
 	/**
