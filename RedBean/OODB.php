@@ -813,7 +813,7 @@ class RedBean_OODB extends RedBean_Observable
 		}
 		$this->signal( 'after_update', $bean );
 
-		return (int) $bean->id;
+		return $bean->id;
 	}
 
 	/**
