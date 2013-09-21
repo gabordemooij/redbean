@@ -389,10 +389,13 @@ class RedBean_Facade
 	 * RedBean runs in frozen mode it will throw an exception.
 	 * This function returns the primary key ID of the inserted
 	 * bean.
+	 * 
+	 * The return value is an integer if possible. If it is not possible to
+	 * represent the value as an integer a string will be returned.
 	 *
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean to store
 	 *
-	 * @return integer
+	 * @return integer|string
 	 *
 	 * @throws RedBean_Exception_Security
 	 */
