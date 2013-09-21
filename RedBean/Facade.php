@@ -21,6 +21,11 @@
 class RedBean_Facade
 {
 	/**
+	 * RedBeanPHP version constant.
+	 */
+	const C_REDBEANPHP_VERSION = '3.5';
+	
+	/**
 	 * @var boolean
 	 */
 	private static $strictType = TRUE;
@@ -127,13 +132,16 @@ class RedBean_Facade
 	}
 
 	/**
-	 * Get version
-	 *
+	 * Returns the RedBeanPHP version string.
+	 * The RedBeanPHP version string always has the same format "X.Y"
+	 * where X is the major version number and Y is the minor version number.
+	 * Point releases are not mentioned in the version string.
+	 * 
 	 * @return string
 	 */
 	public static function getVersion()
 	{
-		return '3.5';
+		return self::C_REDBEANPHP_VERSION;
 	}
 	
 	/**
