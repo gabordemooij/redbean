@@ -441,11 +441,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	/**
 	 * Returns the ID of the bean no matter what the ID field is.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function getID()
 	{
-		return (string) $this->properties['id'];
+		return ( isset( $this->properties['id'] ) ) ? (string) $this->properties['id'] : NULL;
 	}
 
 	/**
