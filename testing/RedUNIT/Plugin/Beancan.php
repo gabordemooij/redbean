@@ -290,22 +290,22 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		asrt( (string) $resp['result']['name'], 'me' );
 
-		$resp = $can->handleREST( $user, 'book', 'PUT', '' );
+		$resp = $can->handleREST( $user, 'book', 'POST', '' );
 
 		asrt( (string) $resp['error']['code'], '400' );
 		asrt( (string) $resp['error']['message'], 'Payload needs to be array.' );
 
-		$resp = $can->handleREST( $user, '', 'PUT', array() );
+		$resp = $can->handleREST( $user, '', 'POST', array() );
 
 		asrt( (string) $resp['error']['code'], '400' );
 		asrt( (string) $resp['error']['message'], 'Missing list.' );
 
-		$resp = $can->handleREST( $user, 'shared-bo-ok', 'PUT', array() );
+		$resp = $can->handleREST( $user, 'shared-bo-ok', 'POST', array() );
 
 		asrt( (string) $resp['error']['code'], '400' );
 		asrt( (string) $resp['error']['message'], 'Invalid list.' );
 
-		$resp = $can->handleREST( $user, 'book', 'PUT', array( 'type' => 'book' ) );
+		$resp = $can->handleREST( $user, 'book', 'POST', array( 'type' => 'book' ) );
 
 		asrt( (string) $resp['error']['code'], '400' );
 		asrt( (string) $resp['error']['message'], 'Missing parameter \'bean\'.' );
@@ -317,14 +317,14 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		asrt( (string) $resp['result']['name'], (string) $site->name );
 		asrt( (string) $resp['result']['user_id'], (string) $site->user_id );
 
-		$can->setWhitelist( array( 'page' => array( 'POST' ) ) );
+		$can->setWhitelist( array( 'page' => array( 'PUT' ) ) );
 
 		$resp = $can->handleREST( $user, 'site/' . $site->id, 'GET' );
 
 		asrt( (string) $resp['error']['message'], 'This bean is not available. Set whitelist to "all" or add to whitelist.' );
 		asrt( (string) $resp['error']['code'], '403' );
 
-		$can->setWhitelist( array( 'site' => array( 'POST' ) ) );
+		$can->setWhitelist( array( 'site' => array( 'PUT' ) ) );
 
 		$resp = $can->handleREST( $user, 'site/' . $site->id, 'GET' );
 
@@ -365,7 +365,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		asrt( (string) $resp['result']['id'], (string) $ad->id );
 		asrt( (string) $resp['result']['name'], (string) $ad->name );
 
-		// Send a PUT /site/1/page
+		// Send a POST /site/1/page
 		$payLoad = array(
 			'bean' => array(
 				'name' => 'my new page'
@@ -375,12 +375,12 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		$resp = $can->handleREST(
 			$user,
 			'site/' . $site->id . '/page',
-			'PUT',
+			'POST',
 			$payLoad
 		);
 
 		$newPage = R::findOne( 'page', ' name = ? ', array( 'my new page' ) );
-
+		
 		asrt( (string) $resp['result']['id'], (string) $newPage->id );
 		asrt( (string) $resp['result']['name'], (string) $newPage->name );
 
@@ -390,7 +390,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 			)
 		);
 
-		$resp = $can->handleREST( $user, 'teapot', 'PUT', $payload );
+		$resp = $can->handleREST( $user, 'teapot', 'POST', $payload );
 
 		$newTeapot = R::findOne( 'teapot' );
 
@@ -408,7 +408,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		$resp = $can->handleREST(
 			$user,
 			'site/' . $site->id . '/page/' . $page->id . '/shared-ad',
-			'PUT', $badPayLoad
+			'POST', $badPayLoad
 		);
 
 		asrt( (string) $resp['error']['message'], 'Parameter \'bean\' must be object/array.' );
@@ -424,7 +424,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		$resp = $can->handleREST(
 			$user,
 			'site/' . $site->id . '/page/' . $page->id . '/shared-ad',
-			'PUT',
+			'POST',
 			$payLoad
 		);
 
@@ -438,7 +438,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		$resp = $can->handleREST(
 			$user, 'site/' . $site->id,
-			'POST',
+			'PUT',
 			$incompletePayLoad
 		);
 
@@ -448,7 +448,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		$resp = $can->handleREST(
 			$user,
 			'site/' . $site->id,
-			'POST',
+			'PUT',
 			$badPayLoad
 		);
 
@@ -463,7 +463,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		$resp = $can->handleREST(
 			$user,
 			'site/' . $site->id,
-			'POST',
+			'PUT',
 			$badPayLoad
 		);
 
@@ -479,7 +479,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		$resp = $can->handleREST(
 			$user,
 			'site/' . $site->id,
-			'POST',
+			'PUT',
 			$payLoad
 		);
 
@@ -596,7 +596,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		$resp = $can->handleREST(
 			$user,
 			'village/' . $village->id . '/building',
-			'PUT',
+			'POST',
 			array(
 				'bean' => array( 'name' => 'house' )
 			)
@@ -609,7 +609,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		$resp = $can->handleREST(
 			$user,
 			'village/' . $village->id . '/building',
-			'PUT',
+			'POST',
 			array(
 				'bean' => array(
 					'name'         => 'house',
@@ -636,13 +636,13 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		asrt( count( $village->ownBuilding ), 0 );
 
-		$resp = $can->handleREST( $user, 'village/' . $village->id . '/building', 'PUT', array( 'bean' => array( 'name' => 'house' ) ) );
+		$resp = $can->handleREST( $user, 'village/' . $village->id . '/building', 'POST', array( 'bean' => array( 'name' => 'house' ) ) );
 
 		$village = $village->fresh();
 
 		asrt( count( $village->ownBuilding ), 1 );
 
-		$resp = $can->handleREST( $user, 'village/' . $village->id . '/building', 'PUT', array( 'bean' => array( 'name' => 'house', 'ownFurniture' => array( 'chair' ) ) ) );
+		$resp = $can->handleREST( $user, 'village/' . $village->id . '/building', 'POST', array( 'bean' => array( 'name' => 'house', 'ownFurniture' => array( 'chair' ) ) ) );
 
 		asrt( $resp['error']['message'], "Object 'bean' invalid." );
 

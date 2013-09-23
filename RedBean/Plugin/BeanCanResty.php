@@ -145,7 +145,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	}
 
 	/**
-	 * Handles a REST POST request.
+	 * Handles a REST PUT request.
 	 * Updates the bean described in the payload array in the database.
 	 * Returns an array formatted according to RedBeanPHP REST BeanCan
 	 * formatting specifications.
@@ -158,7 +158,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 *
 	 * @return array
 	 */
-	private function post()
+	private function put()
 	{
 		if ( !isset( $this->payload['bean'] ) ) {
 			return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.' );
@@ -184,7 +184,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	}
 
 	/**
-	 * Handles a REST PUT request.
+	 * Handles a REST POST request.
 	 * Stores the bean described in the payload array in the database.
 	 * Returns an array formatted according to RedBeanPHP REST BeanCan
 	 * formatting specifications.
@@ -197,7 +197,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 *
 	 * @return array
 	 */
-	private function put()
+	private function post()
 	{
 		if ( !isset( $this->payload['bean'] ) ) {
 			return $this->resp( NULL, self::C_HTTP_BAD_REQUEST, 'Missing parameter \'bean\'.' );
@@ -392,7 +392,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 */
 	private function extractListInfo()
 	{
-		if ( $this->method == 'PUT' ) {
+		if ( $this->method == 'POST' ) {
 			if ( count( $this->uri ) < 1 ) return FALSE;
 
 			$this->list = array_pop( $this->uri ); //grab the list
