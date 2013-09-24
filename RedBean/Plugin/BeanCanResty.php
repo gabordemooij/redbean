@@ -2,7 +2,7 @@
 /**
  * BeanCan Server.
  * A RESTy server for RedBeanPHP.
- *
+ * 
  * @file    RedBean/BeanCanResty.php
  * @desc    PHP Server Component for RedBean and Fuse.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -12,6 +12,18 @@
  * RedBean that can perfectly act as an ORM middleware solution or a backend
  * for an AJAX application.
  *
+ * The Resty BeanCan Server is a handy tool for REST-like
+ * middleware. Using the Resty BeanCan Server you can easily connect
+ * RedBeanPHP as a backend to a Javascript Application Front-end.
+ *
+ * Please note that the Resty BeanCan server does not
+ * aspire to implement a *perfect* RESTful protocol, not 
+ * even *perfect* HTTP/1.1 protocol. The BeanCan offers REST-like
+ * methods and HTTP-like response code. The actual handling of responses is
+ * up to you, the BeanCan won't send any output or headers. Instead the
+ * purpose of this class is to provide a practical tool for everyday
+ * business.
+ * 
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
@@ -111,6 +123,8 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 
 	/**
 	 * Writes a response object for the client (JSON encoded). Internal method.
+	 * Returns a pseudo HTTP/REST response. You can refine or alter this response
+	 * before sending it to the client.
 	 *
 	 * @param mixed   $result       result
 	 * @param integer $errorCode    error code from server
@@ -233,6 +247,9 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 
 	/**
 	 * Opens a list and returns the contents of the list.
+	 * By default a list is interpreted as the own-list of the current bean.
+	 * If the list begins with the prefix 'shared-' the shared list of the
+	 * bean will be opened instead. Internal method.
 	 *
 	 * @return array
 	 */
@@ -263,7 +280,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 * Handles a REST DELETE request.
 	 * Deletes the selected bean.
 	 * Returns an array formatted according to RedBeanPHP REST BeanCan
-	 * formatting specifications.
+	 * formatting specifications. Internal method.
 	 *
 	 * @return array
 	 */
@@ -279,7 +296,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 * Passes the arguments specified in 'param' to the method
 	 * specified as request method of the selected bean.
 	 * Returns an array formatted according to RedBeanPHP REST BeanCan
-	 * formatting specifications.
+	 * formatting specifications. Internal method.
 	 *
 	 * Payload array:
 	 *
@@ -372,6 +389,10 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 
 	/**
 	 * Finds a bean by its URI.
+	 * Returns the bean identified by the specified URI. 
+	 * 
+	 * For more details 
+	 * @see RedBean_Finder::findByPath
 	 *
 	 * @return void
 	 */
@@ -395,7 +416,7 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 		if ( $this->method == 'POST' ) {
 			if ( count( $this->uri ) < 1 ) return FALSE;
 
-			$this->list = array_pop( $this->uri ); //grab the list
+			$this->list = array_pop( $this->uri );
 			$this->type = ( strpos( $this->list, 'shared-' ) === 0 ) ? substr( $this->list, 7 ) : $this->list;
 		} elseif ( $this->method === 'GET' && count( $this->uri ) > 1 ) {
 			$lastItemInURI = $this->uri[count( $this->uri ) - 1];
@@ -496,6 +517,10 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 
 	/**
 	 * Constructor.
+	 * Creates a new instance of the Resty BeanCan Server.
+	 * If no toolbox is provided the Resty BeanCan Server object will
+	 * try to obtain the toolbox currently used by the RedBeanPHP facade.
+	 * If you use only the R-methods and not the advanced objects this should be fine.
 	 *
 	 * @param RedBean_ToolBox $toolbox (optional)
 	 */
@@ -511,9 +536,19 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	}
 
 	/**
-	 * Sets a whitelist with format: array('beantype'=>array('update','customMethod')) etc.
-	 * or simply string 'all' (for backward compatibility).
-	 *
+	 * The Resty BeanCan uses a white list to determine whether the current
+	 * request is allowed.
+	 * 
+	 * A whitelist has the following format: 
+	 * 
+	 * array( 'book' 
+	 *	            => array( 'POST', 'GET', 'publish'),
+	 *	       'page'
+	 *             => etc...
+	 * 
+	 * this will allow the methods 'POST', 'GET' and 'publish' for beans of type 'book'.
+	 * To allow all methods on all beans pass the string 'all'.
+	 * 
 	 * @param array|string $whitelist  a white list of beans and methods that should be accessible through the BeanCan Server.
 	 *
 	 * @return RedBean_Plugin_BeanCan
@@ -537,7 +572,11 @@ class RedBean_Plugin_BeanCanResty implements RedBean_Plugin
 	 * a list of SQL snippets (the SQL bundle). The SQL bundle contains additional SQL and bindings
 	 * per type, if a list gets accessed the SQL with the type-key of the list will be used to filter
 	 * or sort the results.
-	 *
+	 * 
+	 * Only method-bean combinations mentioned in the whitelist will be allowed.
+	 * Also note that handleREST accepts ALL kinds of methods. You can pass proper HTTP methods
+	 * or fabricated methods. The latter will just cause the methods to be invoked on the specified beans.
+	 * 
 	 * @param RedBean_OODBBean $root        root bean for REST action
 	 * @param string           $uri         the URI of the RESTful operation
 	 * @param string           $method      the method you want to apply
