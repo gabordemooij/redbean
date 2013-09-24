@@ -792,7 +792,9 @@ class RedBean_OODB extends RedBean_Observable
 	 * bean.
 	 * 
 	 * The return value is an integer if possible. If it is not possible to
-	 * represent the value as an integer a string will be returned.
+	 * represent the value as an integer a string will be returned. We use
+	 * explicit casts instead of functions to preserve performance 
+	 * (0.13 vs 0.28 for 10000 iterations on Core i3).
 	 *
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean to store
 	 *
@@ -816,11 +818,7 @@ class RedBean_OODB extends RedBean_Observable
 		}
 		$this->signal( 'after_update', $bean );
 
-		$intID    = intval( $bean->id );
-		$strID    = strval( $bean->id );
-		$intIDstr = strval( $intID );
-		
-		return ( $strID === $intIDstr ) ? $intID : $strID;
+		return ( (string) $bean->id === (string) (int) $bean->id ) ? (int) $bean->id : (string) $bean->id;
 	}
 
 	/**
