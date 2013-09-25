@@ -272,7 +272,7 @@ class RedBean_Facade
 				self::begin();
 			}
 			$depth++;
-			call_user_func( $callback ); //maintain 5.2 compatibility
+			$result = call_user_func( $callback ); //maintain 5.2 compatibility
 			$depth--;
 			if ( $depth == 0 ) {
 				self::commit();
@@ -284,6 +284,7 @@ class RedBean_Facade
 			}
 			throw $exception;
 		}
+		return $result;
 	}
 
 	/**

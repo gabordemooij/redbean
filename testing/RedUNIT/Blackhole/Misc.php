@@ -214,6 +214,33 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		$bean->name = 'a';
 
+		$id = R::transaction( function() use( &$bean ) {
+			return R::transaction( function() use( &$bean ) {
+				return R::store( $bean );
+			} );
+		} );
+		
+		asrt( (int) $id, (int) $bean->id );
+		
+		R::trash( $bean );
+		
+		$bean = R::dispense( 'bean' );
+
+		$bean->name = 'a';
+
+		$id = R::transaction( function() use( &$bean ) {
+			return R::store( $bean );
+		} );
+		
+		asrt( (int) $id, (int) $bean->id );
+
+		R::trash( $bean );
+		
+		$bean = R::dispense( 'bean' );
+
+		$bean->name = 'a';
+
+		
 		try {
 			R::transaction( function () use ( $bean ) {
 				R::store( $bean );
