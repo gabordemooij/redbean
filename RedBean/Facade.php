@@ -256,7 +256,7 @@ class RedBean_Facade
 	 *
 	 * @throws RedBean_Exception_Security
 	 *
-	 * @return void
+	 * @return mixed
 	 *
 	 */
 	public static function transaction( $callback )
