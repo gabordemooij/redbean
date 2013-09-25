@@ -266,7 +266,7 @@ class RedBean_Facade
 		}
 
 		static $depth = 0;
-
+		$result = null;
 		try {
 			if ( $depth == 0 ) {
 				self::begin();
