@@ -253,13 +253,14 @@ class RedBean_Facade
 	 *      });
 	 *
 	 * @param callable $callback Closure (or other callable) with the transaction logic
+	 * @param bool     $doCommit Whether commit or rollback should happen after successful execution
 	 *
 	 * @throws RedBean_Exception_Security
 	 *
 	 * @return void
 	 *
 	 */
-	public static function transaction( $callback )
+	public static function transaction( $callback, $doCommit = true )
 	{
 		if ( !is_callable( $callback ) ) {
 			throw new RedBean_Exception_Security( 'R::transaction needs a valid callback.' );
@@ -275,7 +276,11 @@ class RedBean_Facade
 			$result = call_user_func( $callback ); //maintain 5.2 compatibility
 			$depth--;
 			if ( $depth == 0 ) {
-				self::commit();
+				if ( $doCommit ) {
+					self::commit();
+				} else {
+					self::rollback();
+				}
 			}
 		} catch ( Exception $exception ) {
 			$depth--;
