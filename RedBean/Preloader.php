@@ -468,8 +468,36 @@ class RedBean_Preloader
 	 * Preloads certain properties for beans.
 	 * Understands aliases.
 	 *
-	 * @param array $beans beans
-	 * @param array $types types to load
+	 * Usage: 
+	 * 
+	 * R::preload($books, 'author');
+	 * 
+	 * - preloads all the authors of all books, 
+	 * saves you a query per for-each iteration
+	 * 
+	 * R::preload($books, array('coauthor'=>'author'));
+	 * 
+	 * - same but with alias
+	 * 
+	 * R::preload($texts,'page,page.book,page.book.author');
+    * 
+	 * - preloads all pages for the texts, the books and the authors
+	 * 
+	 * R::preload($texts,'page,*.book,*.author');
+	 * 
+	 * - same as above bit with short syntax (* means prefix with previous types)
+	 *
+	 * R::preload($p,'book,*.author,&.shelf');
+	 * 
+	 * - if author and shelf are on the same level use & instead of *.
+	 * 
+	 * The other way around is possible as well, to load child beans in own-lists or
+	 * shared-lists use:
+	 * 
+	 * R::preload($books,'ownPage|page,sharedGenre|genre');
+	 * 
+	 * @param array        $beans beans beans to use as a reference for preloading
+	 * @param array|string $types types to load, either string or array
 	 *
 	 * @return array
 	 */

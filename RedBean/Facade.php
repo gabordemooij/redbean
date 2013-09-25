@@ -603,10 +603,10 @@ class RedBean_Facade
 	 * Since 3.2, you can now also pass an array of beans instead just one
 	 * bean as the first parameter.
 	 *
-	 * @param RedBean_OODBBean|array $bean the bean you have
-	 * @param string                 $type the type of beans you want
-	 * @param string                 $sql  SQL snippet for extra filtering
-	 * @param array                  $val  values to be inserted in SQL slots
+	 * @param RedBean_OODBBean|array $bean     the bean you have, the reference bean
+	 * @param string                 $type     the type of beans you want to search for
+	 * @param string                 $sql      SQL snippet for extra filtering
+	 * @param array                  $bindings values to be inserted in SQL slots
 	 *
 	 * @return array
 	 */
@@ -617,11 +617,18 @@ class RedBean_Facade
 
 	/**
 	 * Counts the number of related beans in an N-M relation.
+	 * Counts the number of beans of type $type that are related to $bean,
+	 * using optional filtering SQL $sql with $bindings. This count will
+	 * only search for N-M associated beans (works like countShared).
+	 * The $bean->countShared() method is the preferred way to obtain this
+	 * number.  
 	 *
-	 * @param RedBean_OODBBean $bean
-	 * @param string           $type
-	 * @param string           $sql
-	 * @param array            $bindings
+	 * @warning not a preferred method, use $bean->countShared if possible.
+	 * 
+	 * @param RedBean_OODBBean $bean     the bean you have, the reference bean
+	 * @param string           $type     the type of bean you want to count
+	 * @param string           $sql      SQL snippet for extra filtering
+	 * @param array            $bindings values to be inserted in SQL slots
 	 *
 	 * @return integer
 	 */
@@ -632,8 +639,13 @@ class RedBean_Facade
 
 	/**
 	 * Returns only a single associated bean.
+	 * This works just like R::related but returns a single bean. Which bean will be
+	 * returned depends on the SQL snippet provided.
+	 * For more details refer to R::related.
+	 * 
+	 * @warning not a preferred method, use $bean->shared if possible.
 	 *
-	 * @param RedBean_OODBBean $bean     bean provided
+	 * @param RedBean_OODBBean $bean     the bean you have, the reference bean
 	 * @param string           $type     type of bean you are searching for
 	 * @param string           $sql      SQL for extra filtering
 	 * @param array            $bindings values to be inserted in SQL slots
@@ -646,7 +658,12 @@ class RedBean_Facade
 	}
 
 	/**
-	 * Returns only the last, single associated bean.
+	 * Returns only the last associated bean.
+	 * This works just like R::related but returns a single bean, the last one.
+	 * If the query result contains multiple beans, the last bean from this result set will be returned.
+	 * For more details refer to R::related.
+	 * 
+	 * @warning not a preferred method, use $bean->shared if possible.
 	 *
 	 * @param RedBean_OODBBean $bean     bean provided
 	 * @param string           $type     type of bean you are searching for
@@ -663,7 +680,11 @@ class RedBean_Facade
 	/**
 	 * Checks whether a pair of beans is related N-M. This function does not
 	 * check whether the beans are related in N:1 way.
-	 *
+	 * The name may be bit confusing because two beans can be related in
+	 * various ways. This method only checks for many-to-many relations, for other
+	 * relations please use $bean->ownX where X is the type of the bean you are
+	 * looking for.
+	 * 
 	 * @param RedBean_OODBBean $bean1 first bean
 	 * @param RedBean_OODBBean $bean2 second bean
 	 *
@@ -677,6 +698,9 @@ class RedBean_Facade
 	/**
 	 * Clears all associated beans.
 	 * Breaks all many-to-many associations of a bean and a specified type.
+	 * Only breaks N-M relations.
+	 * 
+	 * @warning not a preferred method, use $bean->shared = array() if possible.
 	 *
 	 * @param RedBean_OODBBean $bean bean you wish to clear many-to-many relations for
 	 * @param string           $type type of bean you wish to break associations with
@@ -927,9 +951,11 @@ class RedBean_Facade
 
 	/**
 	 * @deprecated
+	 * Given two beans and a property this method will
+	 * swap the values of the property in the beans.
 	 *
-	 * @param array  $beans    beans
-	 * @param string $property property
+	 * @param array  $beans    beans to swap property values of
+	 * @param string $property property whose value you want to swap
 	 *
 	 * @return void
 	 */
@@ -940,9 +966,13 @@ class RedBean_Facade
 
 	/**
 	 * Converts a series of rows to beans.
+	 * This method converts a series of rows to beans.
+	 * The type of the desired output beans can be specified in the
+	 * first parameter. The second parameter is meant for the database
+	 * result rows.
 	 *
-	 * @param string $type type
-	 * @param array  $rows must contain an array of arrays.
+	 * @param string $type type of beans to produce
+	 * @param array  $rows must contain an array of array
 	 *
 	 * @return array
 	 */
@@ -1195,6 +1225,10 @@ class RedBean_Facade
 
 	/**
 	 * Nukes the entire database.
+	 * This will remove all schema structures from the database.
+	 * Only works in fluid mode. Be careful with this method.
+	 * 
+	 * @warning dangerous method, will remove all tables, columns etc.
 	 *
 	 * @return void
 	 */
@@ -1467,10 +1501,36 @@ class RedBean_Facade
 	 * Preloads certain properties for beans.
 	 * Understands aliases.
 	 *
-	 * Usage: R::preload($books, array('coauthor'=>'author'));
+	 * Usage: 
+	 * 
+	 * R::preload($books, 'author');
+	 * 
+	 * - preloads all the authors of all books, 
+	 * saves you a query per for-each iteration
+	 * 
+	 * R::preload($books, array('coauthor'=>'author'));
+	 * 
+	 * - same but with alias
+	 * 
+	 * R::preload($texts,'page,page.book,page.book.author');
+    * 
+	 * - preloads all pages for the texts, the books and the authors
+	 * 
+	 * R::preload($texts,'page,*.book,*.author');
+	 * 
+	 * - same as above bit with short syntax (* means prefix with previous types)
 	 *
-	 * @param array $beans beans
-	 * @param array $types types to load
+	 * R::preload($p,'book,*.author,&.shelf');
+	 * 
+	 * - if author and shelf are on the same level use & instead of *.
+	 * 
+	 * The other way around is possible as well, to load child beans in own-lists or
+	 * shared-lists use:
+	 * 
+	 * R::preload($books,'ownPage|page,sharedGenre|genre');
+	 * 
+	 * @param array        $beans beans beans to use as a reference for preloading
+	 * @param array|string $types types to load, either string or array
 	 *
 	 * @return array
 	 */
@@ -1483,12 +1543,15 @@ class RedBean_Facade
 	 * Alias for preload.
 	 * Preloads certain properties for beans.
 	 * Understands aliases.
+	 * 
+	 * @see RedBean_Facade::preload
 	 *
 	 * Usage: R::preload($books, array('coauthor'=>'author'));
 	 *
-	 * @param array $beans beans
-	 * @param array $types types to load
-	 *
+	 * @param array        $beans   beans beans to use as a reference for preloading
+	 * @param array|string $types   types to load, either string or array
+	 * @param closure      $closure function to call
+	 * 
 	 * @return array
 	 */
 	public static function each( $beans, $types, $closure = NULL )
