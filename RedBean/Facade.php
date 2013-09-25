@@ -1452,6 +1452,9 @@ class RedBean_Facade
 
 	/**
 	 * Returns the toolbox currently used by the facade.
+	 * To set the toolbox use R::setup() or R::configureFacadeWithToolbox().
+	 * To create a toolbox use RedBean_Setup::kickstart(). Or create a manual
+	 * toolbox using the RedBean_Toolbox class.
 	 *
 	 * @return RedBean_ToolBox
 	 */
