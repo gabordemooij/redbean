@@ -59,6 +59,8 @@ class RedBean_ToolBox
 
 	/**
 	 * Returns the query writer in this toolbox.
+	 * The Query Writer is responsible for building the queries for a
+	 * specific database and executing them through the adapter.
 	 *
 	 * @return RedBean_QueryWriter
 	 */
@@ -69,6 +71,9 @@ class RedBean_ToolBox
 
 	/**
 	 * Returns the OODB instance in this toolbox.
+	 * OODB is responsible for creating, storing, retrieving and deleting 
+	 * single beans. Other components rely
+	 * on OODB for their basic functionality.
 	 *
 	 * @return RedBean_OODB
 	 */
@@ -79,7 +84,9 @@ class RedBean_ToolBox
 
 	/**
 	 * Returns the database adapter in this toolbox.
-	 *
+	 * The adapter is responsible for executing the query and binding the values.
+	 * The adapter also takes care of transaction handling.
+	 * 
 	 * @return RedBean_Adapter_DBAdapter
 	 */
 	public function getDatabaseAdapter()

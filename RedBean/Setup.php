@@ -36,6 +36,11 @@ class RedBean_Setup
 
 	/**
 	 * Initializes the database and prepares a toolbox.
+	 * The kickstart method assembles a toolbox based on your DSN and
+	 * credentials and returns it.
+	 * The toolbox contains all the necessary core components for
+	 * RedBeanPHP to start working with your database. Most RedBeanPHP
+	 * components are stand-alone and require a toolbox to work.
 	 *
 	 * @param  string|PDO $dsn      Database Connection String (or PDO instance)
 	 * @param  string     $username Username for database
