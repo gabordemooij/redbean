@@ -98,9 +98,12 @@ class RedBean_TagManager
 	 * If the third parameter is FALSE this
 	 * method will return TRUE if one of the tags matches, FALSE if none
 	 * match.
+	 * 
+	 * Tag list can be either an array with tag names or a comma separated list
+	 * of tag names.
 	 *
 	 * @param  RedBean_OODBBean $bean bean to check for tags
-	 * @param  array            $tags list of tags
+	 * @param  array|string     $tags list of tags
 	 * @param  boolean          $all  whether they must all match or just some
 	 *
 	 * @return boolean
@@ -122,9 +125,12 @@ class RedBean_TagManager
 	/**
 	 * Removes all sepcified tags from the bean. The tags specified in
 	 * the second parameter will no longer be associated with the bean.
+	 * 
+	 * Tag list can be either an array with tag names or a comma separated list
+	 * of tag names.
 	 *
 	 * @param  RedBean_OODBBean $bean    tagged bean
-	 * @param  array            $tagList list of tags (names)
+	 * @param  array|string     $tagList list of tags (names)
 	 *
 	 * @return void
 	 */
@@ -146,9 +152,12 @@ class RedBean_TagManager
 	 * If $tagList is a comma separated list (string) of tags all tags will
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
+	 * 
+	 * Tag list can be either an array with tag names or a comma separated list
+	 * of tag names.
 	 *
-	 * @param RedBean_OODBBean $bean    bean
-	 * @param mixed            $tagList tags
+	 * @param RedBean_OODBBean $bean    bean to be tagged
+	 * @param array|string     $tagList a list of tags
 	 *
 	 * @return array
 	 */
@@ -182,9 +191,12 @@ class RedBean_TagManager
 	 * If $tagList is a comma separated list of tags all tags will
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
+	 * 
+	 * Tag list can be either an array with tag names or a comma separated list
+	 * of tag names.
 	 *
 	 * @param RedBean_OODBBean $bean    bean to add tags to
-	 * @param array            $tagList list of tags to add to bean
+	 * @param array|string     $tagList list of tags to add to bean
 	 *
 	 * @return void
 	 */
@@ -209,10 +221,14 @@ class RedBean_TagManager
 	}
 
 	/**
-	 * Returns all beans that have been tagged with one of the tags given.
+	 * Returns all beans that have been tagged with one or more
+	 * of the specified tags.
+	 * 
+	 * Tag list can be either an array with tag names or a comma separated list
+	 * of tag names.
 	 *
-	 * @param string $beanType type of bean you are looking for
-	 * @param array  $tagList  list of tags to match
+	 * @param string       $beanType type of bean you are looking for
+	 * @param array|string $tagList  list of tags to match
 	 *
 	 * @return array
 	 */
@@ -237,9 +253,12 @@ class RedBean_TagManager
 
 	/**
 	 * Returns all beans that have been tagged with ALL of the tags given.
-	 *
-	 * @param string $beanType type of bean you are looking for
-	 * @param array  $tagList  list of tags to match
+	 * 
+	 * Tag list can be either an array with tag names or a comma separated list
+	 * of tag names.
+	 * 
+	 * @param string        $beanType type of bean you are looking for
+	 * @param array|string  $tagList  list of tags to match
 	 *
 	 * @return array
 	 */
