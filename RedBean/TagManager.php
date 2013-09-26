@@ -71,12 +71,13 @@ class RedBean_TagManager
 
 	/**
 	 * Finds a tag bean by it's title.
+	 * Internal method.
 	 *
 	 * @param string $title title
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function findTagByTitle( $title )
+	protected function findTagByTitle( $title )
 	{
 		$beans = $this->redbean->find( 'tag', array( 'title' => array( $title ) ) );
 
