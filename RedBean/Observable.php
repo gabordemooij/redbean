@@ -21,9 +21,13 @@ abstract class RedBean_Observable { //bracket must be here - otherwise coverage 
 
 	/**
 	 * Implementation of the Observer Pattern.
+	 * Adds an event listener to the observable object.
+	 * First argument should be the name of the event you wish to listen for.
+	 * Second argument should be the object that wants to be notified in case
+	 * the event occurs.
 	 *
-	 * @param string           $eventname event
-	 * @param RedBean_Observer $observer  observer
+	 * @param string           $eventname event identifier
+	 * @param RedBean_Observer $observer  observer instance
 	 *
 	 * @return void
 	 */
@@ -44,9 +48,12 @@ abstract class RedBean_Observable { //bracket must be here - otherwise coverage 
 
 	/**
 	 * Notifies listeners.
+	 * Sends the signal $eventname, the event identifier and a message object
+	 * to all observers that have been registered to receive notification for
+	 * this event. Part of the observer pattern implementation in RedBeanPHP.
 	 *
-	 * @param string $eventname eventname
-	 * @param mixed  $info      info
+	 * @param string $eventname event you want signal
+	 * @param mixed  $info      message object to send along
 	 *
 	 * @return void
 	 */
