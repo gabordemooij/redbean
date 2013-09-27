@@ -1,6 +1,8 @@
 <?php
 /**
  * Observer
+ * Interface for Observer object. Implementation of the
+ * observer pattern.
  *
  * @file    RedBean/Observer.php
  * @desc    Part of the observer pattern in RedBean
@@ -15,8 +17,13 @@ interface RedBean_Observer
 {
 
 	/**
-	 * @param string $eventname
-	 * @param        $bean
+	 * An observer object needs to be capable of receiving
+	 * notifications. Therefore the observer needs to implement the
+	 * onEvent method with two parameters, the event identifier specifying the
+	 * current event and a message object (in RedBeanPHP this can also be a bean).
+	 * 
+	 * @param string $eventname event identifier
+	 * @param mixed  $bean      a message sent along with the notification
 	 *
 	 * @return void
 	 */
