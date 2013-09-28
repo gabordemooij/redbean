@@ -94,6 +94,11 @@ class RedBean_Facade
 	 * @var RedBean_SQLHelper
 	 */
 	public static $f;
+	
+	/**
+	 * @var array
+	 */
+	public static $plugins = array();
 
 	/**
 	 * Internal Query function, executes the desired query. Used by
@@ -1650,6 +1655,42 @@ class RedBean_Facade
 			$list[] = $bean->export();
 		}
 		return $list;
+	}
+	
+	/**
+	 * Dynamically extends the facade with a plugin.
+	 * Using this method you can register your plugin with the facade and then
+	 * use the plugin by invoking the name specified plugin name as a method on
+	 * the facade.
+	 * 
+	 * Usage:
+	 * 
+	 * R::ext( 'makeTea', function() { ... }  );
+	 * 
+	 * Now you can use your makeTea plugin like this:
+	 * 
+	 * R::makeTea();
+	 * 
+	 * @param string   $pluginName name of the method to call the plugin
+	 * @param callable $callable   a PHP callable
+	 */
+	public static function ext( $pluginName, $callable )
+	{
+		self::$plugins[$pluginName] = $callable;
+	}
+
+	/**
+	 * Call static for use with dynamic plugins. This magic method will
+	 * intercept static calls and route them to the specified plugin.
+	 *  
+	 * @param string $pluginName name of the plugin
+	 * @param array  $params     list of arguments to pass to plugin method
+	 * 
+	 * @return mixed
+	 */
+	public static function __callStatic( $pluginName, $params )
+	{
+		return call_user_func_array( self::$plugins[$pluginName], $params );
 	}
 }
 
