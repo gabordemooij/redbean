@@ -115,4 +115,18 @@ class RedUNIT_Base_Batch extends RedUNIT_Base
 		asrt( (int) $bottles[$id + 1]->id, 0 );
 		asrt( (int) $bottles[$id + 2]->id, 0 );
 	}
+	
+	/**
+	 * Test batch alias loadAll.
+	 * 
+	 * @return void
+	 */
+	public function testBatchAliasLoadAll() 
+	{	
+		$ids = R::storeAll( R::dispense( 'page', 2 ) );
+		$pages = R::loadAll( 'page', $ids );
+		asrt( is_array( $pages ), true );
+		asrt( count( $pages ), 2 );
+		asrt( ( $pages[$ids[0]] instanceof RedBean_OODBBean ), true );
+	}
 }

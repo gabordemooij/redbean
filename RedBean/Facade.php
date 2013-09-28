@@ -855,6 +855,24 @@ class RedBean_Facade
 	{
 		return self::$redbean->batch( $type, $ids );
 	}
+	
+	/**
+	 * @see RedBean_Facade::batch
+	 * 
+	 * Alias for batch(). Batch method is older but since we added so-called *All
+	 * methods like storeAll, trashAll, dispenseAll and findAll it seemed logical to
+	 * improve the consistency of the Facade API and also add an alias for batch() called
+	 * loadAll.
+	 * 
+	 * @param string $type type of beans
+	 * @param array  $ids  ids to load
+	 *
+	 * @return array
+	 */
+	public static function loadAll( $type, $ids ) 
+	{
+		return self::$redbean->batch( $type, $ids );
+	}
 
 	/**
 	 * Convenience function to execute Queries directly.
