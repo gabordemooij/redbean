@@ -515,6 +515,48 @@ class RedBean_Facade
 
 		return self::$redbean->dispense( $type, $num );
 	}
+	
+	/**
+	 * Takes a comma separated list of bean types
+	 * and dispenses these beans. For each type in the list
+	 * you can specify the number of beans to be dispensed.
+	 * 
+	 * Usage:
+	 * 
+	 * list($book, $page, $text) = R::dispenseAll('book,page,text');
+	 * 
+	 * This will dispense a book, a page and a text. This way you can
+	 * quickly dispense beans of various types in just one line of code.
+	 * 
+	 * Usage:
+	 * 
+	 * list($book, $pages) = R::dispenseAll('book,page*100');
+	 * 
+	 * This returns an array with a book bean and then another array
+	 * containing 100 page beans.
+	 * 
+	 * @param string $order a description of the desired dispense order using the syntax above
+	 * 
+	 * @return array
+	 */
+	public static function dispenseAll( $order )
+	{
+
+		$list = array();
+
+		foreach( explode( ',', $order ) as $order ) {
+			if ( strpos( $order, '*' ) !== false ) {
+				list( $type, $amount ) = explode( '*', $order );
+			} else {
+				$type   = $order;
+				$amount = 1;
+			}
+
+			$list[] = self::dispense( $type, $amount );
+		}
+
+		return $list;
+	}
 
 	/**
 	 * Toggles strict bean type names.
