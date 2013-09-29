@@ -1676,6 +1676,9 @@ class RedBean_Facade
 	 */
 	public static function ext( $pluginName, $callable )
 	{
+		if ( !ctype_alnum( $pluginName ) ) {
+			throw new RedBean_Exception( 'Plugin name may only contain alphanumeric characters.' );
+		}
 		self::$plugins[$pluginName] = $callable;
 	}
 
@@ -1690,6 +1693,12 @@ class RedBean_Facade
 	 */
 	public static function __callStatic( $pluginName, $params )
 	{
+		if ( !ctype_alnum( $pluginName) ) {
+			throw new RedBean_Exception( 'Plugin name may only contain alphanumeric characters.' );
+		}
+		if ( !isset( self::$plugins[$pluginName] ) ) {
+			throw new RedBean_Exception( 'Plugin \''.$pluginName.'\' does not exist, add this plugin using: R::ext(\''.$pluginName.'\')' );
+		}
 		return call_user_func_array( self::$plugins[$pluginName], $params );
 	}
 }
