@@ -106,11 +106,13 @@ class RedBean_AssociationManager extends RedBean_Observable
 
 	/**
 	 * Associates a pair of beans. This method associates two beans, no matter
-	 * what types.Accepts a base bean that contains data for the linking record.
+	 * what types. Accepts a base bean that contains data for the linking record.
+	 * This method is used by associate. This method also accepts a base bean to be used
+	 * as the template for the link record in the database.
 	 *
 	 * @param RedBean_OODBBean $bean1 first bean
 	 * @param RedBean_OODBBean $bean2 second bean
-	 * @param RedBean_OODBBean $bean  base bean
+	 * @param RedBean_OODBBean $bean  base bean (association record)
 	 *
 	 * @throws Exception|RedBean_Exception_SQL
 	 *
@@ -199,10 +201,13 @@ class RedBean_AssociationManager extends RedBean_Observable
 	}
 
 	/**
-	 * Associates two beans with eachother using a many-to-many relation.
-	 *
-	 * @param RedBean_OODBBean $bean1 bean1
-	 * @param RedBean_OODBBean $bean2 bean2
+	 * Associates two beans in a many-to-many relation.
+	 * This method will associate two beans and store the connection between the
+	 * two in a link table. Instead of two single beans this method also accepts
+	 * two sets of beans. Returns the ID or the IDs of the linking beans.
+	 * 
+	 * @param RedBean_OODBBean|array $beans1 one or more beans to form the association
+	 * @param RedBean_OODBBean|array $beans2 one or more beans to form the association
 	 *
 	 * @return array
 	 */
@@ -230,6 +235,9 @@ class RedBean_AssociationManager extends RedBean_Observable
 
 	/**
 	 * Counts the number of related beans in an N-M relation.
+	 * This method returns the number of beans of type $type associated
+	 * with reference bean(s) $bean. The query can be tuned using an
+	 * SQL snippet for additional filtering.
 	 *
 	 * @param RedBean_OODBBean|array $bean     a bean object or an array of beans
 	 * @param string                 $type     type of bean you're interested in
@@ -397,6 +405,8 @@ class RedBean_AssociationManager extends RedBean_Observable
 
 	/**
 	 * Swaps a property of two beans.
+	 * Given two beans and a property this method swaps the value of the
+	 * property in the beans.
 	 *
 	 * @deprecated
 	 * This method does not seem very useful.
@@ -468,6 +478,11 @@ class RedBean_AssociationManager extends RedBean_Observable
 
 	/**
 	 * Returns only a single associated bean.
+	 * You can also pass some extra SQL and
+	 * values for that SQL to filter your results after fetching the
+	 * related beans.
+	 * 
+	 * @see RedBean_AssociationManager::relatedSimple.
 	 *
 	 * @param RedBean_OODBBean $bean     bean provided
 	 * @param string           $type     type of bean you are searching for
@@ -489,6 +504,11 @@ class RedBean_AssociationManager extends RedBean_Observable
 
 	/**
 	 * Returns only the last, single associated bean.
+	 * You can also pass some extra SQL and
+	 * values for that SQL to filter your results after fetching the
+	 * related beans.
+	 * 
+	 * @see RedBean_AssociationManager::relatedSimple.
 	 *
 	 * @param RedBean_OODBBean $bean     bean provided
 	 * @param string           $type     type of bean you are searching for
