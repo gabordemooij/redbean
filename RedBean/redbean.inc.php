@@ -96,6 +96,7 @@ require( $dir . 'Plugin/BeanCan.php' );
 require( $dir . 'Plugin/BeanCanResty.php' );
 require( $dir . 'Plugin/Cooker.php' );
 require( $dir . 'Plugin/Cache.php' );
+require( $dir . 'Plugin/QueryLogger.php');
 require( $dir . 'Plugin/TimeLine.php' );
 
 class R extends RedBean_Facade
