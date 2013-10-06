@@ -48,7 +48,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 		asrt( count( $logger->grep( 'SELECT' ) ), 2 );
 
 		// With cache
-		R::$writer->setUseCache( TRUE );
+		R::useWriterCache( TRUE );
 
 		$logger->clear();
 
@@ -57,7 +57,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 
 		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
 
-		R::$writer->setUseCache( FALSE );
+		R::useWriterCache( FALSE );
 
 		// Test find cache
 		$logger->clear();

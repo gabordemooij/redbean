@@ -1374,6 +1374,27 @@ class RedBean_Facade
 	}
 
 	/**
+	 * Toggles Writer Cache.
+	 * Turns the Writer Cache on or off. The Writer Cache is a simple
+	 * query based caching system that may improve performance without the need
+	 * for cache management. This caching system will cache non-modifying queries
+	 * that are marked with special SQL comments. As soon as a non-marked query
+	 * gets executed the cache will be flushed. Only non-modifying select queries
+	 * have been marked therefore this mechanism is a rather safe way of caching, requiring
+	 * no explicit flushes or reloads. Of course this does not apply if you intend to test
+	 * or simulate concurrent querying.
+	 * 
+	 * @param boolean $yesNo TRUE to enable cache, FALSE to disable cache
+	 * 
+	 * @return void
+	 */
+	public static function useWriterCache( $yesNo )
+	{
+		self::getWriter()->setUseCache( $yesNo );
+	}
+	
+
+	/**
 	 * A label is a bean with only an id, type and name property.
 	 * This function will dispense beans for all entries in the array. The
 	 * values of the array will be assigned to the name property of each
