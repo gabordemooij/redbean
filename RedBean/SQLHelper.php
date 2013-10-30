@@ -289,4 +289,19 @@ class RedBean_SQLHelper
 	{
 		return new self( $this->adapter );
 	}
+
+	/**
+	 * When cast to string, simply print the query and its bindings.
+	 * 
+	 * @return string
+	 */
+	public function __toString()
+	{
+		list( $query, $params ) = $this->getQuery();
+
+		return print_r( array(
+			 'query'  => $query,
+			 'params' => $params
+		), true );
+	}
 }

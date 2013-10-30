@@ -116,6 +116,26 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 
 		asrt( ( $value == 2 ), TRUE );
 	}
+
+	/**
+	 * Test the __toString method of the SQLHelper. 
+	 */
+	public function testToString()
+	{
+		$toolbox = R::$toolbox;
+		$adapter = $toolbox->getDatabaseAdapter();	
+		$sqlHelper = new RedBean_SQLHelper( $adapter );
+		$sqlHelper->begin()
+				  ->select( '*' )
+				  ->from( 'table' )
+				  ->where( 'name = ?' )
+				  ->put( 'name' );
+		$str = (string) $sqlHelper;
+		asrt( ( strpos( $str, 'query' ) !== false ), true );
+		asrt( ( strpos( $str, 'select * from table where name = ?' ) !== false ), true );
+		asrt( ( strpos( $str, '=> Array') !== false ), true );
+		asrt( ( strpos( $str, 'params') !== false ), true );
+	}
 }
 
 
