@@ -1,11 +1,10 @@
 <?php
-/**
- * Selector
- *
- * The role of the selector is to load (i.e. select) the tests that should be
- * run and to instrument the tests using phpcoverage tools.
- *
- */
+
+require 'RedBean/redbean.inc.php';
+
+//load core classes
+require "testing/RedUNIT.php";
+
 error_reporting( E_ALL );
 
 //Load configuration file
@@ -87,7 +86,7 @@ if ( $arguments > 2 ) {
 	$mode = $_SERVER['argv'][2];
 }
 
-$path = '../RedUNIT/';
+$path = 'testing/RedUNIT/';
 
 // Possible Selections
 $packList = array();
@@ -252,3 +251,8 @@ foreach ( $packList as $testPack ) {
 		$test->cleanUp();
 	}
 }
+
+
+
+
+
