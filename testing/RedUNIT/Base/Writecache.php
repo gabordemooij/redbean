@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\Plugin\QueryLogger as QueryLogger; 
 /**
  * RedUNIT_Base_Writecache
  *
@@ -31,7 +33,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 	{
 		testpack( 'Testing WriteCache Query Writer Cache' );
 
-		$logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach( R::$adapter );
+		$logger = QueryLogger::getInstanceAndAttach( R::$adapter );
 
 		$book = R::dispense( 'book' )->setAttr( 'title', 'ABC' );
 
@@ -372,7 +374,7 @@ class RedUNIT_Base_Writecache extends RedUNIT_Base
 	{
 		testpack( 'Test cache flush (explicit)' );
 
-		$logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach( R::$adapter );
+		$logger = QueryLogger::getInstanceAndAttach( R::$adapter );
 
 		$bean = R::dispense( 'bean' );
 

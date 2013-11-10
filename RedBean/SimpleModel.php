@@ -1,4 +1,6 @@
-<?php
+<?php 
+namespace RedBeanPHP; 
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * SimpleModel
  * Base Model For All RedBeanPHP Models using FUSE.
@@ -12,11 +14,11 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_SimpleModel
+class SimpleModel
 {
 
 	/**
-	 * @var RedBean_OODBBean
+	 * @var OODBBean
 	 */
 	protected $bean;
 
@@ -24,11 +26,11 @@ class RedBean_SimpleModel
 	 * Used by FUSE: the ModelHelper class to connect a bean to a model.
 	 * This method loads a bean in the model.
 	 *
-	 * @param RedBean_OODBBean $bean bean
+	 * @param OODBBean $bean bean
 	 *
 	 * @return void
 	 */
-	public function loadBean( RedBean_OODBBean $bean )
+	public function loadBean( OODBBean $bean )
 	{
 		$this->bean = $bean;
 	}
@@ -85,7 +87,7 @@ class RedBean_SimpleModel
 	 * You can box your beans before passing them to functions or methods
 	 * with typed parameters.
 	 *
-	 * @return RedBean_SimpleModel
+	 * @return SimpleModel
 	 */
 	public function box()
 	{
@@ -96,7 +98,7 @@ class RedBean_SimpleModel
 	 * Unbox the bean from the model.
 	 * This method returns the bean inside the model.
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function unbox()
 	{

@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\SimpleModel as SimpleModel; 
 /**
  * RedUNIT_Base_Boxing
  *
@@ -68,6 +70,6 @@ class RedUNIT_Base_Boxing extends RedUNIT_Base
 /**
  * Test Model.
  */
-class Model_Boxedbean extends RedBean_SimpleModel
+class Model_Boxedbean extends SimpleModel
 {
 }

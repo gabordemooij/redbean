@@ -1,4 +1,11 @@
-<?php
+<?php 
+
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\OODB as OODB;
+use \RedBeanPHP\ToolBox as ToolBox;
+use \RedBeanPHP\Adapter as Adapter;
+use \RedBeanPHP\QueryWriter as QueryWriter;
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Oracle_Facade
  *
@@ -26,16 +33,16 @@ class RedUNIT_Oracle_Facade extends RedUNIT_Oracle
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
-		asrt( R::$redbean instanceof RedBean_OODB, TRUE );
-		asrt( R::$toolbox instanceof RedBean_Toolbox, TRUE );
-		asrt( R::$adapter instanceof RedBean_Adapter, TRUE );
-		asrt( R::$writer instanceof RedBean_QueryWriter, TRUE );
+		asrt( R::$redbean instanceof OODB, TRUE );
+		asrt( R::$toolbox instanceof ToolBox, TRUE );
+		asrt( R::$adapter instanceof Adapter, TRUE );
+		asrt( R::$writer instanceof QueryWriter, TRUE );
 
 		$book = R::dispense( "book" );
 
-		asrt( $book instanceof RedBean_OODBBean, TRUE );
+		asrt( $book instanceof OODBBean, TRUE );
 
 		$book->title = "a nice book";
 

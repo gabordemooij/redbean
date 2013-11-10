@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\OODB as OODB;
+use \RedBeanPHP\RedException\Security as Security; 
 /**
  * RedUNIT_Base_Finding
  *
@@ -27,7 +31,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$page = $redbean->dispense( "page" );
 
@@ -77,7 +81,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 			$redbean->store( $bean );
 		}
 
-		$redbean->find( "wine", array( "id" => 5 ) ); //  Finder:where call RedBean_OODB::convertToBeans
+		$redbean->find( "wine", array( "id" => 5 ) ); //  Finder:where call OODB::convertToBeans
 
 		$bean2 = $redbean->load( "anotherbean", 5 );
 
@@ -114,7 +118,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		try {
 			R::find( 'bean', ' id > 0 ', 'invalid bindings argument' );
 			fail();
-		} catch ( RedBean_Exception_Security $exception ) {
+		} catch ( Security $exception ) {
 			pass();
 		}
 	}
@@ -397,7 +401,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		try {
 			$referencePage->searchIn('sharedPage');
 			fail();
-		} catch (RedBean_Exception_Security $exception) {
+		} catch (Security $exception) {
 			pass();
 		}
 		
@@ -405,7 +409,7 @@ class RedUNIT_Base_Finding extends RedUNIT_Base {
 		try {
 			$referencePage->searchIn('sharedpage');
 			pass();
-		} catch (RedBean_Exception_Security $exception) {
+		} catch (Security $exception) {
 			fail();
 		}
 		

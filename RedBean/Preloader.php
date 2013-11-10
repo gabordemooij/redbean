@@ -1,4 +1,8 @@
-<?php
+<?php 
+namespace RedBeanPHP; 
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\OODB as OODB;
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * Preloader.
  *
@@ -11,16 +15,16 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Preloader
+class Preloader
 {
 
 	/**
-	 * @var RedBean_AssociationManager
+	 * @var AssociationManager
 	 */
 	private $assocManager;
 
 	/**
-	 * @var RedBean_OODB
+	 * @var OODB
 	 */
 	private $oodb;
 
@@ -178,7 +182,7 @@ class RedBean_Preloader
 	 * For Preloader: adds the IDs of your input beans to the nested beans, otherwise
 	 * we dont know how to pass them to the each-function later on.
 	 *
-	 * @param RedBean_OODBBean $nestedBean  nested bean
+	 * @param OODBBean $nestedBean  nested bean
 	 * @param array            $addInputIDs input ids
 	 *
 	 * @return void
@@ -237,7 +241,7 @@ class RedBean_Preloader
 	 * callback function for ::each will receive the correct bean lists as
 	 * parameters for every iteration.
 	 *
-	 * @param RedBean_OODBBean $filteredBean         the bean we've retrieved lists for
+	 * @param OODBBean $filteredBean         the bean we've retrieved lists for
 	 * @param array            $list                 the list we've retrieved for the bean
 	 *
 	 * @return void
@@ -261,7 +265,7 @@ class RedBean_Preloader
 	 * Fills retrieval array with parent beans.
 	 *
 	 * @param array            $inputBeanIDs ids
-	 * @param RedBean_OODBBean $parent       parent bean
+	 * @param OODBBean $parent       parent bean
 	 */
 	private function fillParamArrayRetrievalsWithParent( $inputBeanIDs, $parent )
 	{
@@ -310,7 +314,7 @@ class RedBean_Preloader
 	 * Gathers the own list for a bean from a pool of child beans loaded by
 	 * the preloader.
 	 *
-	 * @param RedBean_OODBBean $filteredBean
+	 * @param OODBBean $filteredBean
 	 * @param array            $children
 	 * @param string           $link
 	 *
@@ -332,7 +336,7 @@ class RedBean_Preloader
 	 * Gathers the shared list for a bean from a pool of shared beans loaded
 	 * by the preloader.
 	 *
-	 * @param RedBean_OODBBean $filteredBean
+	 * @param OODBBean $filteredBean
 	 * @param array            $sharedBeans
 	 *
 	 * @return array
@@ -439,7 +443,7 @@ class RedBean_Preloader
 	 * Simple input correction function. Checks whether input is a single bean
 	 * and wraps it in an array if necessary.
 	 *
-	 * @param RedBean_OODBBean|array $beanOrBeans input
+	 * @param OODBBean|array $beanOrBeans input
 	 *
 	 * @return array
 	 */
@@ -455,7 +459,7 @@ class RedBean_Preloader
 	/**
 	 * Constructor.
 	 *
-	 * @param RedBean_OODB $oodb
+	 * @param OODB $oodb
 	 */
 	public function __construct( $oodb )
 	{

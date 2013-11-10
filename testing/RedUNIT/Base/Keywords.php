@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Base_Keywords
  *
@@ -43,7 +45,7 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base
 
 		R::setStrictTyping( FALSE );
 
-		RedBean_OODBBean::setFlagBeautifulColumnNames( FALSE );
+		OODBBean::setFlagBeautifulColumnNames( FALSE );
 
 		foreach ( $keywords as $k ) {
 			R::nuke();
@@ -72,7 +74,7 @@ class RedUNIT_Base_Keywords extends RedUNIT_Base
 			pass();
 		}
 
-		RedBean_OODBBean::setFlagBeautifulColumnNames( TRUE );
+		OODBBean::setFlagBeautifulColumnNames( TRUE );
 
 		R::setStrictTyping( TRUE );
 	}

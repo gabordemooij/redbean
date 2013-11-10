@@ -1,8 +1,12 @@
-<?php
+<?php 
+namespace RedBeanPHP; 
+use \RedBeanPHP\BeanHelper as BeanHelper;
+use \RedBeanPHP\SQLHelper as SQLHelper;
+use \RedBeanPHP\RedException\Security as Security; 
 /**
- * RedBean_OODBBean (Object Oriented DataBase Bean)
+ * OODBBean (Object Oriented DataBase Bean)
  *
- * @file    RedBean/RedBean_OODBBean.php
+ * @file    RedBean/OODBBean.php
  * @desc    The Bean class used for passing information
  * @author  Gabor de Mooij and the RedBeanPHP community
  * @license BSD/GPLv2
@@ -11,7 +15,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
+class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 {
 
 	/**
@@ -58,7 +62,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * rich functionality, otherwise you would have to do everything with R or
 	 * external objects.
 	 *
-	 * @var RedBean_BeanHelper
+	 * @var BeanHelper
 	 */
 	private $beanHelper = NULL;
 
@@ -228,11 +232,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * if you build your own bean dispensing mechanism.
 	 *
 	 * @param string             $type       type of the new bean
-	 * @param RedBean_BeanHelper $beanhelper bean helper to obtain a toolbox and a model
+	 * @param BeanHelper $beanhelper bean helper to obtain a toolbox and a model
 	 *
 	 * @return void
 	 */
-	public function initializeForDispense( $type, RedBean_BeanHelper $beanhelper )
+	public function initializeForDispense( $type, BeanHelper $beanhelper )
 	{
 		$this->beanHelper         = $beanhelper;
 		$this->__info['type']     = $type;
@@ -249,17 +253,17 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * nested beans (bean lists: ownBean, sharedBean) without the need to
 	 * rely on static calls to the facade (or make this class dep. on OODB).
 	 *
-	 * @param RedBean_BeanHelper $helper
+	 * @param BeanHelper $helper
 	 *
 	 * @return void
 	 */
-	public function setBeanHelper( RedBean_BeanHelper $helper )
+	public function setBeanHelper( BeanHelper $helper )
 	{
 		$this->beanHelper = $helper;
 	}
 
 	/**
-	 * Returns an ArrayIterator so you can treat the bean like
+	 * Returns an\ArrayIterator so you can treat the bean like
 	 * an array with the properties container as its contents.
 	 * This method is meant for PHP and allows you to access beans as if
 	 * they were arrays, i.e. using array notation:
@@ -268,11 +272,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * 
 	 * Note that not all PHP functions work with the array interface.
 	 *
-	 * @return ArrayIterator
+	 * @return\ArrayIterator
 	 */
 	public function getIterator()
 	{
-		return new ArrayIterator( $this->properties );
+		return new\ArrayIterator( $this->properties );
 	}
 
 	/**
@@ -287,7 +291,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * @param string|array $selection selection of values
 	 * @param boolean      $notrim    if TRUE selection keys will NOT be trimmed
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function import( $array, $selection = FALSE, $notrim = FALSE )
 	{
@@ -317,11 +321,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * Copies the properties from the source bean to the internal
 	 * property list.
 	 *
-	 * @param RedBean_OODBBean $sourceBean the source bean to take properties from
+	 * @param OODBBean $sourceBean the source bean to take properties from
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
-	public function importFrom( RedBean_OODBBean $sourceBean )
+	public function importFrom( OODBBean $sourceBean )
 	{
 		$this->__info['tainted'] = TRUE;
 
@@ -335,11 +339,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * Just like import() but keeps the original ID.
 	 * Chainable.
 	 *
-	 * @param RedBean_OODBBean $otherBean the bean whose properties you would like to copy
+	 * @param OODBBean $otherBean the bean whose properties you would like to copy
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
-	public function inject( RedBean_OODBBean $otherBean )
+	public function inject( OODBBean $otherBean )
 	{
 		$myID = $this->properties['id'];
 
@@ -390,7 +394,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 					$value = $vn;
 				}
-			} elseif ( $value instanceof RedBean_OODBBean ) {
+			} elseif ( $value instanceof OODBBean ) {
 				if ( $hasFilters ) {
 					if ( !in_array( strtolower( $value->getMeta( 'type' ) ), $filters ) ) continue;
 				}
@@ -496,14 +500,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * the additional SQL snippet will be merged into the final
 	 * query.
 	 *
-	 * @param string|RedBean_SQLHelper $sql      SQL to be added to retrieval query.
+	 * @param string|SQLHelper $sql      SQL to be added to retrieval query.
 	 * @param array                    $bindings array with parameters to bind to SQL snippet
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function with( $sql, $bindings = array() )
 	{
-		if ( $sql instanceof RedBean_SQLHelper ) {
+		if ( $sql instanceof SQLHelper ) {
 			list( $this->withSql, $this->withParams ) = $sql->getQuery();
 		} else {
 			$this->withSql    = $sql;
@@ -523,14 +527,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * This will return in the own list only the pages having 'chapter == 3'.
 	 *
-	 * @param string|RedBean_SQLHelper $sql      SQL to be added to retrieval query (prefixed by AND)
+	 * @param string|SQLHelper $sql      SQL to be added to retrieval query (prefixed by AND)
 	 * @param array                    $bindings array with parameters to bind to SQL snippet
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function withCondition( $sql, $bindings = array() )
 	{
-		if ( $sql instanceof RedBean_SQLHelper ) {
+		if ( $sql instanceof SQLHelper ) {
 			list( $sql, $bindings ) = $sql->getQuery();
 		}
 
@@ -563,7 +567,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @param string $aliasName the alias name to use
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function alias( $aliasName )
 	{
@@ -750,7 +754,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @return void
 	 *
-	 * @throws RedBean_Exception_Security
+	 * @throws Security
 	 */
 	public function __set( $property, $value )
 	{
@@ -765,14 +769,14 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 		$this->setMeta( 'tainted', TRUE );
 
 		if (isset( $this->properties[$property.'_id'] )
-			&& !( $value instanceof RedBean_OODBBean )
+			&& !( $value instanceof OODBBean )
 		) {
 			if ( is_null( $value ) || $value === FALSE ) {
 				$this->__unset( $property );
 
 				return;
 			} else {
-				throw new RedBean_Exception_Security( 'Cannot cast to bean.' );
+				throw new Security( 'Cannot cast to bean.' );
 			}
 		}
 
@@ -780,7 +784,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$value = '0';
 		} elseif ( $value === TRUE ) {
 			$value = '1';
-		} elseif ( $value instanceof DateTime ) {
+		} elseif ( $value instanceof\DateTime ) {
 			$value = $value->format( 'Y-m-d H:i:s' );
 		}
 
@@ -841,7 +845,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * @param string $path  path
 	 * @param mixed  $value value
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function setMeta( $path, $value )
 	{
@@ -855,11 +859,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * This is a convenience method to enable you to
 	 * exchange meta information easily.
 	 *
-	 * @param RedBean_OODBBean $bean
+	 * @param OODBBean $bean
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
-	public function copyMetaFrom( RedBean_OODBBean $bean )
+	public function copyMetaFrom( OODBBean $bean )
 	{
 		$this->__info = $bean->__info;
 
@@ -976,7 +980,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @param  string $type preferred fetch type
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function fetchAs( $type )
 	{
@@ -991,7 +995,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @param string $column
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function poly( $field )
 	{
@@ -1027,7 +1031,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	public function searchIn($property)
 	{
 		if ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
-			throw new RedBean_Exception_Security( 'Cannot search a shared list recursively.' );
+			throw new Security( 'Cannot search a shared list recursively.' );
 		}
 
 		$oldFetchType = $this->fetchType;
@@ -1039,7 +1043,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		$beanOrBeans  = $this->$property;
 
-		if ( $beanOrBeans instanceof RedBean_OODBBean ) {
+		if ( $beanOrBeans instanceof OODBBean ) {
 			$bean  = $beanOrBeans;
 			$key   = $bean->properties['id'];
 			$beans = array( $key => $bean );
@@ -1060,7 +1064,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 			$ufbeans         = $this->$property;
 
 			if ( is_null( $ufbeans ) ) $ufbeans = array();
-			if ( $ufbeans instanceof RedBean_OODBBean ) $ufbeans = array( $ufbeans );
+			if ( $ufbeans instanceof OODBBean ) $ufbeans = array( $ufbeans );
 		}
 
 		foreach( $ufbeans as $bean ) {
@@ -1078,7 +1082,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
-	 * Implementation of Countable interface. Makes it possible to use
+	 * Implementation of\Countable interface. Makes it possible to use
 	 * count() function on a bean.
 	 *
 	 * @return integer
@@ -1116,7 +1120,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * @param string $property the property of the bean
 	 * @param mixed  $value    the value you want to set
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function setAttr( $property, $value )
 	{
@@ -1131,7 +1135,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @param array $properties properties you want to unset.
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function unsetAll( $properties )
 	{
@@ -1214,10 +1218,10 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * example #1. After preparing the linking bean, the bean is returned thus
 	 * allowing the chained setter: ->song = $song.
 	 *
-	 * @param string|RedBean_OODBBean $type          type of bean to dispense or the full bean
+	 * @param string|OODBBean $type          type of bean to dispense or the full bean
 	 * @param string|array            $qualification JSON string or array (optional)
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function link( $typeOrBean, $qualification = array() )
 	{
@@ -1247,7 +1251,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	/**
 	 * Returns the same bean freshly loaded from the database.
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function fresh()
 	{
@@ -1259,7 +1263,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 *
 	 * @param string $via type you wish to use for shared lists
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function via( $via )
 	{
@@ -1355,11 +1359,11 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	/**
 	 * Tests whether the database identities of two beans are equal.
 	 *
-	 * @param RedBean_OODBBean $bean other bean
+	 * @param OODBBean $bean other bean
 	 *
 	 * @return boolean
 	 */
-	public function equals(RedBean_OODBBean $bean) {
+	public function equals(OODBBean $bean) {
 		return (bool) (
 			   ( (string) $this->properties['id'] === (string) $bean->properties['id'] )
 			&& ( (string) $this->__info['type']   === (string) $bean->__info['type']   )

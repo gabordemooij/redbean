@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException\Security as Security; 
 /**
  * RedUNIT_Base_Update
  *
@@ -47,7 +49,7 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 		try {
 			R::store( array() );
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
 		}
 
@@ -265,7 +267,7 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 			$redbean->trash( array() );
 
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
 		}
 

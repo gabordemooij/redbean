@@ -1,6 +1,8 @@
-<?php
+<?php 
+namespace RedBeanPHP\RedException; 
+use \RedBeanPHP\RedException\SQL as SQL; 
 /**
- * RedBean Exception OCI
+ * RedBean\Exception OCI
  *
  * @file    RedBean/Exception/OCI.php
  * @desc    Represents an OCI database exception, for use with Oracle driver.
@@ -11,7 +13,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Exception_OCI extends RedBean_Exception_SQL
+class OCI extends SQL
 {
 
 	/**
@@ -22,6 +24,6 @@ class RedBean_Exception_OCI extends RedBean_Exception_SQL
 	 */
 	public function __toString()
 	{
-		return '[RedBean_Exception_OCI]:' . $this->getMessage();
+		return '[OCI]:' . $this->getMessage();
 	}
 }

@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\SimpleModel as SimpleModel; 
 /**
  * RedUNIT_Base_Issue259
  *
@@ -46,7 +48,7 @@ class RedUNIT_Base_Issue259 extends RedUNIT_Base
 /**
  * Mock Model.
  */
-class Model_Mother extends RedBean_SimpleModel
+class Model_Mother extends SimpleModel
 {
 	public function open()
 	{
@@ -58,7 +60,7 @@ class Model_Mother extends RedBean_SimpleModel
 /**
  * Mock Model.
  */
-class Model_Child extends RedBean_SimpleModel
+class Model_Child extends SimpleModel
 {
 	public function open()
 	{

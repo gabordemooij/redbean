@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException\SQL as SQL; 
 /**
  * RedUNIT_Oracle_Database
  *
@@ -32,7 +34,7 @@ class RedUNIT_Oracle_Database extends RedUNIT_Oracle
 			$adapter->exec( "an invalid query" );
 
 			fail();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			pass();
 		}
 

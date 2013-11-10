@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+use \RedBeanPHP\Observer as Observer;
+use \RedBeanPHP\OODBBean as OODBBean;
+use \RedBeanPHP\Adapter as Adapter; 
 /**
  * RedUNIT_Base_Foreignkeys
  *
@@ -11,7 +15,7 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
+class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements Observer
 {
 	/**
 	 * To log the queries
@@ -175,7 +179,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 	 * Creates a bean in a can. The bean will get a reference
 	 * to the can and can be made dependent.
 	 *
-	 * @return RedBean_OODBBean $can
+	 * @return OODBBean $can
 	 */
 	private function createBeanInCan()
 	{
@@ -197,7 +201,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 	 * Creates a bean in a can beginning with the bean. The bean will get a reference
 	 * to the can and can be made dependent.
 	 *
-	 * @return RedBean_OODBBean $can
+	 * @return OODBBean $can
 	 */
 	private function createCanForBean()
 	{
@@ -215,7 +219,7 @@ class RedUNIT_Base_Foreignkeys extends RedUNIT_Base implements RedBean_Observer
 	 * Log queries
 	 *
 	 * @param string          $event
-	 * @param RedBean_Adapter $info
+	 * @param Adapter $info
 	 */
 	public function onEvent( $event, $info )
 	{

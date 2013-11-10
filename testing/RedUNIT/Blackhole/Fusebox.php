@@ -1,4 +1,7 @@
-<?php
+<?php 
+
+use \RedBeanPHP\OODBBean as OODBBean;
+use \RedBeanPHP\SimpleModel as SimpleModel; 
 /**
  * RedUNIT_Blackhole_Fusebox
  *
@@ -49,11 +52,11 @@ class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole
 	/**
 	 * Test unboxing
 	 *
-	 * @param RedBean_OODBBean $bean
+	 * @param OODBBean $bean
 	 */
-	private function giveMeBean( RedBean_OODBBean $bean )
+	private function giveMeBean( OODBBean $bean )
 	{
-		asrt( ( $bean instanceof RedBean_OODBBean ), TRUE );
+		asrt( ( $bean instanceof OODBBean ), TRUE );
 
 		asrt( 'A bit too salty', $bean->taste() );
 
@@ -64,7 +67,7 @@ class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole
 /**
  * A model to box soup models :)
  */
-class Model_Soup extends RedBean_SimpleModel
+class Model_Soup extends SimpleModel
 {
 
 	public function taste()

@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Base_Batch
  *
@@ -127,6 +129,6 @@ class RedUNIT_Base_Batch extends RedUNIT_Base
 		$pages = R::loadAll( 'page', $ids );
 		asrt( is_array( $pages ), true );
 		asrt( count( $pages ), 2 );
-		asrt( ( $pages[$ids[0]] instanceof RedBean_OODBBean ), true );
+		asrt( ( $pages[$ids[0]] instanceof OODBBean ), true );
 	}
 }

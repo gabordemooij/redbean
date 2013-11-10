@@ -1,9 +1,10 @@
-<?php
+<?php 
+ 
 /**
  * RedUNIT_Sqlite_Parambind
  *
  * @file    RedUNIT/Sqlite/Parambind.php
- * @desc    Tests PDO parameter binding.
+ * @desc    Tests\PDO parameter binding.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license New BSD/GPLv2
  *

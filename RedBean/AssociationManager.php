@@ -1,4 +1,13 @@
-<?php
+<?php 
+namespace RedBeanPHP; 
+use \RedBeanPHP\Observable as Observable;
+use \RedBeanPHP\OODB as OODB;
+use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
+use \RedBeanPHP\QueryWriter as QueryWriter;
+use \RedBeanPHP\OODBBean as OODBBean;
+use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\RedException\SQL as SQL;
+use \RedBeanPHP\ToolBox as ToolBox; 
 /**
  * Association Manager
  *
@@ -11,39 +20,39 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_AssociationManager extends RedBean_Observable
+class AssociationManager extends Observable
 {
 
 	/**
-	 * @var RedBean_OODB
+	 * @var OODB
 	 */
 	protected $oodb;
 
 	/**
-	 * @var RedBean_Adapter_DBAdapter
+	 * @var DBAdapter
 	 */
 	protected $adapter;
 
 	/**
-	 * @var RedBean_QueryWriter
+	 * @var QueryWriter
 	 */
 	protected $writer;
 
 	/**
-	 * Handles Exceptions. Suppresses exceptions caused by missing structures.
+	 * Handles\Exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param Exception $exception
+	 * @param\Exception $exception
 	 *
 	 * @return void
 	 *
-	 * @throws Exception
+	 * @throws\Exception
 	 */
-	private function handleException( Exception $exception )
+	private function handleException(\Exception $exception )
 	{
 		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN )
+				QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN )
 			)
 		) {
 			throw $exception;
@@ -55,7 +64,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * Returns the many-to-many related rows of table $type for bean $bean using additional SQL in $sql and
 	 * $bindings bindings. If $getLinks is TRUE, link rows are returned instead.
 	 *
-	 * @param RedBean_OODBBean $bean     reference bean
+	 * @param OODBBean $bean     reference bean
 	 * @param string           $type     target type
 	 * @param boolean          $getLinks TRUE returns rows from the link table
 	 * @param string           $sql      additional SQL snippet
@@ -63,14 +72,14 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 *
 	 * @return array
 	 *
-	 * @throws RedBean_Exception_Security
-	 * @throws RedBean_Exception_SQL
+	 * @throws Security
+	 * @throws SQL
 	 */
 	private function relatedRows( $bean, $type, $getLinks = FALSE, $sql = '', $bindings = array() )
 	{
-		if ( !is_array( $bean ) && !( $bean instanceof RedBean_OODBBean ) ) {
-			throw new RedBean_Exception_Security(
-				'Expected array or RedBean_OODBBean but got:' . gettype( $bean )
+		if ( !is_array( $bean ) && !( $bean instanceof OODBBean ) ) {
+			throw new Security(
+				'Expected array or OODBBean but got:' . gettype( $bean )
 			);
 		}
 
@@ -78,9 +87,9 @@ class RedBean_AssociationManager extends RedBean_Observable
 		if ( is_array( $bean ) ) {
 			$beans = $bean;
 			foreach ( $beans as $singleBean ) {
-				if ( !( $singleBean instanceof RedBean_OODBBean ) ) {
-					throw new RedBean_Exception_Security(
-						'Expected RedBean_OODBBean in array but got:' . gettype( $singleBean )
+				if ( !( $singleBean instanceof OODBBean ) ) {
+					throw new Security(
+						'Expected OODBBean in array but got:' . gettype( $singleBean )
 					);
 				}
 				$ids[] = $singleBean->id;
@@ -97,7 +106,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 			} else {
 				return $this->writer->queryRecordLinks( $sourceType, $type, $ids, $sql, $bindings );
 			}
-		} catch ( RedBean_Exception_SQL $exception ) {
+		} catch ( SQL $exception ) {
 			$this->handleException( $exception );
 
 			return array();
@@ -110,15 +119,15 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * This method is used by associate. This method also accepts a base bean to be used
 	 * as the template for the link record in the database.
 	 *
-	 * @param RedBean_OODBBean $bean1 first bean
-	 * @param RedBean_OODBBean $bean2 second bean
-	 * @param RedBean_OODBBean $bean  base bean (association record)
+	 * @param OODBBean $bean1 first bean
+	 * @param OODBBean $bean2 second bean
+	 * @param OODBBean $bean  base bean (association record)
 	 *
-	 * @throws Exception|RedBean_Exception_SQL
+	 * @throws\Exception|SQL
 	 *
 	 * @return mixed
 	 */
-	protected function associateBeans( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $bean )
+	protected function associateBeans( OODBBean $bean1, OODBBean $bean2, OODBBean $bean )
 	{
 
 		$property1 = $bean1->getMeta( 'type' ) . '_id';
@@ -160,9 +169,9 @@ class RedBean_AssociationManager extends RedBean_Observable
 				}
 			}
 			$results[] = $id;
-		} catch ( RedBean_Exception_SQL $exception ) {
+		} catch ( SQL $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
-				array( RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ) )
+				array( QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ) )
 			) {
 				throw $exception;
 			}
@@ -174,9 +183,9 @@ class RedBean_AssociationManager extends RedBean_Observable
 	/**
 	 * Constructor
 	 *
-	 * @param RedBean_ToolBox $tools toolbox
+	 * @param ToolBox $tools toolbox
 	 */
-	public function __construct( RedBean_ToolBox $tools )
+	public function __construct( ToolBox $tools )
 	{
 		$this->oodb    = $tools->getRedBean();
 		$this->adapter = $tools->getDatabaseAdapter();
@@ -206,8 +215,8 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * two in a link table. Instead of two single beans this method also accepts
 	 * two sets of beans. Returns the ID or the IDs of the linking beans.
 	 * 
-	 * @param RedBean_OODBBean|array $beans1 one or more beans to form the association
-	 * @param RedBean_OODBBean|array $beans2 one or more beans to form the association
+	 * @param OODBBean|array $beans1 one or more beans to form the association
+	 * @param OODBBean|array $beans2 one or more beans to form the association
 	 *
 	 * @return array
 	 */
@@ -239,20 +248,20 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * with reference bean(s) $bean. The query can be tuned using an
 	 * SQL snippet for additional filtering.
 	 *
-	 * @param RedBean_OODBBean|array $bean     a bean object or an array of beans
+	 * @param OODBBean|array $bean     a bean object or an array of beans
 	 * @param string                 $type     type of bean you're interested in
 	 * @param string                 $sql      SQL snippet (optional)
 	 * @param array                  $bindings bindings for your SQL string
 	 *
 	 * @return integer
 	 *
-	 * @throws RedBean_Exception_Security
+	 * @throws Security
 	 */
 	public function relatedCount( $bean, $type, $sql = NULL, $bindings = array() )
 	{
-		if ( !( $bean instanceof RedBean_OODBBean ) ) {
-			throw new RedBean_Exception_Security(
-				'Expected array or RedBean_OODBBean but got:' . gettype( $bean )
+		if ( !( $bean instanceof OODBBean ) ) {
+			throw new Security(
+				'Expected array or OODBBean but got:' . gettype( $bean )
 			);
 		}
 
@@ -264,7 +273,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 
 		try {
 			return $this->writer->queryRecordCountRelated( $beanType, $type, $bean->id, $sql, $bindings );
-		} catch ( RedBean_Exception_SQL $exception ) {
+		} catch ( SQL $exception ) {
 			$this->handleException( $exception );
 
 			return 0;
@@ -284,9 +293,9 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * Since 3.2, you can now also pass an array of beans instead just one
 	 * bean as the first parameter.
 	 *
-	 * @throws RedBean_Exception_SQL
+	 * @throws SQL
 	 *
-	 * @param RedBean_OODBBean|array $bean     reference bean
+	 * @param OODBBean|array $bean     reference bean
 	 * @param string                 $type     target type
 	 * @param boolean                $getLinks whether you are interested in the assoc records
 	 * @param string                 $sql      room for additional SQL
@@ -315,8 +324,8 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * set to boolean TRUE this method will remove the beans without their consent,
 	 * bypassing FUSE. This can be used to improve performance.
 	 *
-	 * @param RedBean_OODBBean $bean1 first bean
-	 * @param RedBean_OODBBean $bean2 second bean
+	 * @param OODBBean $bean1 first bean
+	 * @param OODBBean $bean2 second bean
 	 * @param boolean          $fast  If TRUE, removes the entries by query without FUSE
 	 *
 	 * @return void
@@ -350,7 +359,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 						$bean = reset( $beans );
 						$this->oodb->trash( $bean );
 					}
-				} catch ( RedBean_Exception_SQL $exception ) {
+				} catch ( SQL $exception ) {
 					$this->handleException( $exception );
 				}
 			}
@@ -364,17 +373,17 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * models about this. If you want to notify FUSE models about deletion use a foreach-loop
 	 * with unassociate() instead. (that might be slower though)
 	 *
-	 * @param RedBean_OODBBean $bean reference bean
+	 * @param OODBBean $bean reference bean
 	 * @param string           $type type of beans that need to be unassociated
 	 *
 	 * @return void
 	 */
-	public function clearRelations( RedBean_OODBBean $bean, $type )
+	public function clearRelations( OODBBean $bean, $type )
 	{
 		$this->oodb->store( $bean );
 		try {
 			$this->writer->deleteRelations( $bean->getMeta( 'type' ), $type, $bean->id );
-		} catch ( RedBean_Exception_SQL $exception ) {
+		} catch ( SQL $exception ) {
 			$this->handleException( $exception );
 		}
 	}
@@ -383,20 +392,20 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * Given two beans this function returns TRUE if they are associated using a
 	 * many-to-many association, FALSE otherwise.
 	 *
-	 * @throws RedBean_Exception_SQL
+	 * @throws SQL
 	 *
-	 * @param RedBean_OODBBean $bean1 bean
-	 * @param RedBean_OODBBean $bean2 bean
+	 * @param OODBBean $bean1 bean
+	 * @param OODBBean $bean2 bean
 	 *
 	 * @return boolean
 	 */
-	public function areRelated( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 )
+	public function areRelated( OODBBean $bean1, OODBBean $bean2 )
 	{
 		try {
 			$row = $this->writer->queryRecordLink( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ), $bean1->id, $bean2->id );
 
 			return (boolean) $row;
-		} catch ( RedBean_Exception_SQL $exception ) {
+		} catch ( SQL $exception ) {
 			$this->handleException( $exception );
 
 			return FALSE;
@@ -442,7 +451,7 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * Since 3.2, you can now also pass an array of beans instead just one
 	 * bean as the first parameter.
 	 *
-	 * @param RedBean_OODBBean|array $bean      the bean you have
+	 * @param OODBBean|array $bean      the bean you have
 	 * @param string                 $type      the type of beans you want
 	 * @param string                 $sql       SQL snippet for extra filtering
 	 * @param array                  $bindings  values to be inserted in SQL slots
@@ -482,16 +491,16 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * values for that SQL to filter your results after fetching the
 	 * related beans.
 	 * 
-	 * @see RedBean_AssociationManager::relatedSimple.
+	 * @see AssociationManager::relatedSimple.
 	 *
-	 * @param RedBean_OODBBean $bean     bean provided
+	 * @param OODBBean $bean     bean provided
 	 * @param string           $type     type of bean you are searching for
 	 * @param string           $sql      SQL for extra filtering
 	 * @param array            $bindings values to be inserted in SQL slots
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
-	public function relatedOne( RedBean_OODBBean $bean, $type, $sql = NULL, $bindings = array() )
+	public function relatedOne( OODBBean $bean, $type, $sql = NULL, $bindings = array() )
 	{
 		$beans = $this->relatedSimple( $bean, $type, $sql, $bindings );
 
@@ -508,16 +517,16 @@ class RedBean_AssociationManager extends RedBean_Observable
 	 * values for that SQL to filter your results after fetching the
 	 * related beans.
 	 * 
-	 * @see RedBean_AssociationManager::relatedSimple.
+	 * @see AssociationManager::relatedSimple.
 	 *
-	 * @param RedBean_OODBBean $bean     bean provided
+	 * @param OODBBean $bean     bean provided
 	 * @param string           $type     type of bean you are searching for
 	 * @param string           $sql      SQL for extra filtering
 	 * @param array            $bindings values to be inserted in SQL slots
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
-	public function relatedLast( RedBean_OODBBean $bean, $type, $sql = NULL, $bindings = array() )
+	public function relatedLast( OODBBean $bean, $type, $sql = NULL, $bindings = array() )
 	{
 		$beans = $this->relatedSimple( $bean, $type, $sql, $bindings );
 

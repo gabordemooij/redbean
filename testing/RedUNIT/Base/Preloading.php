@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Base_Preloading
  *
@@ -71,7 +73,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 			}
 		}
 
-		asrt( ( $foundMagazine instanceof RedBean_OODBBean ), TRUE );
+		asrt( ( $foundMagazine instanceof OODBBean ), TRUE );
 
 		asrt( count( $foundMagazine->ownPage ), 2 );
 

@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+use \RedBeanPHP\DependencyInjector as DependencyInjector;
+use \RedBeanPHP\ModelHelper as ModelHelper;
+use \RedBeanPHP\SimpleModel as SimpleModel; 
 /**
  * RedUNIT_Blackhole_DIContainer
  *
@@ -29,7 +33,7 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 		asrt( ( $cocoa instanceof Dependency_Cocoa ), FALSE );
 
 		// Base scenario with empty container, don't fail
-		$di = new RedBean_DependencyInjector;
+		$di = new DependencyInjector;
 
 		$geek = R::dispense( 'geek' );
 
@@ -39,11 +43,11 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 		asrt( ( $cocoa instanceof Dependency_Cocoa ), FALSE );
 
 		// Succesfull scenario, one missing
-		$di = new RedBean_DependencyInjector;
+		$di = new DependencyInjector;
 
 		$di->addDependency( 'Coffee', new Dependency_Coffee );
 
-		RedBean_ModelHelper::setDependencyInjector( $di );
+		ModelHelper::setDependencyInjector( $di );
 
 		$geek = R::dispense( 'geek' );
 
@@ -53,12 +57,12 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 		asrt( ( $cocoa instanceof Dependency_Cocoa ), FALSE );
 
 		// Success scenario
-		$di = new RedBean_DependencyInjector;
+		$di = new DependencyInjector;
 
 		$di->addDependency( 'Coffee', new Dependency_Coffee );
 		$di->addDependency( 'Cocoa', new Dependency_Cocoa );
 
-		RedBean_ModelHelper::setDependencyInjector( $di );
+		ModelHelper::setDependencyInjector( $di );
 
 		$geek = R::dispense( 'geek' );
 
@@ -79,7 +83,7 @@ class RedUNIT_Blackhole_DIContainer extends RedUNIT_Blackhole
 		asrt( ( $cocoa instanceof Dependency_Cocoa ), TRUE );
 
 		// Can we go back to base scenario?
-		RedBean_ModelHelper::clearDependencyInjector();
+		ModelHelper::clearDependencyInjector();
 
 		$geek = R::dispense( 'geek' );
 
@@ -107,7 +111,7 @@ class Dependency_Cocoa
 /*
  * Mock object needed for DI testing
  */
-class Model_Geek extends RedBean_SimpleModel
+class Model_Geek extends SimpleModel
 {
 	private $cocoa;
 	private $coffee;

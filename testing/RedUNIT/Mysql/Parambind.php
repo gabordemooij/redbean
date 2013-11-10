@@ -1,9 +1,11 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException\SQL as SQL; 
 /**
  * RedUNIT_Mysql_Parambind
  *
  * @file    RedUNIT/Mysql/Parambind.php
- * @desc    Tests PDO parameter binding.
+ * @desc    Tests\PDO parameter binding.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license New BSD/GPLv2
  *
@@ -14,7 +16,7 @@
 class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 {
 	/**
-	 * Test parameter binding with PDO.
+	 * Test parameter binding with\PDO.
 	 * 
 	 * @return void
 	 */
@@ -32,7 +34,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::getAll( "select * from job limit ? ", array( 1 ) );
 
 			fail();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			pass();
 		}
 
@@ -40,7 +42,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::getAll( "select * from job limit :l ", array( ":l" => 1 ) );
 
 			fail();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			pass();
 		}
 
@@ -48,7 +50,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::exec( "select * from job limit ? ", array( 1 ) );
 
 			fail();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			pass();
 		}
 
@@ -56,7 +58,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::exec( "select * from job limit :l ", array( ":l" => 1 ) );
 
 			fail();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			pass();
 		}
 
@@ -66,7 +68,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::getAll( "select * from job limit ? ", array( 1 ) );
 
 			pass();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			print_r( $e );
 
 			fail();
@@ -76,7 +78,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::getAll( "select * from job limit :l ", array( ":l" => 1 ) );
 
 			pass();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			fail();
 		}
 
@@ -84,7 +86,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::exec( "select * from job limit ? ", array( 1 ) );
 
 			pass();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			fail();
 		}
 
@@ -92,7 +94,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::exec( "select * from job limit :l ", array( ":l" => 1 ) );
 
 			pass();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			fail();
 		}
 
@@ -114,7 +116,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			$adapter->exec( "an invalid query" );
 
 			fail();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			pass();
 		}
 

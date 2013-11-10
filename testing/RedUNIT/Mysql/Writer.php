@@ -1,4 +1,9 @@
-<?php
+<?php 
+
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\QueryWriter\MySQL as MySQL;
+use \RedBeanPHP\RedException\SQL as SQL;
+use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_Mysql_Writer
  *
@@ -26,7 +31,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 
-		$a       = new RedBean_AssociationManager( $toolbox );
+		$a       = new AssociationManager( $toolbox );
 
 		$adapter->exec( "DROP TABLE IF EXISTS testtable" );
 
@@ -56,7 +61,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 			}
 		}
 
-		asrt( $writer->code( RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME ), 99 );
+		asrt( $writer->code( MySQL::C_DATATYPE_SPECIAL_DATETIME ), 99 );
 
 		asrt( $writer->code( "unknown" ), 99 );
 
@@ -74,11 +79,11 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		asrt( $writer->scanType( "abc" ), 4 );
 
-		asrt( $writer->scanType( str_repeat( 'abcd', 100000 ) ), RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32 );
+		asrt( $writer->scanType( str_repeat( 'abcd', 100000 ) ), MySQL::C_DATATYPE_TEXT32 );
 
-		asrt( $writer->scanType( "2001-10-10", TRUE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->scanType( "2001-10-10", TRUE ), MySQL::C_DATATYPE_SPECIAL_DATE );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
+		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), MySQL::C_DATATYPE_SPECIAL_DATETIME );
 
 		asrt( $writer->scanType( "2001-10-10" ), 4 );
 
@@ -88,21 +93,21 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		$writer->widenColumn( "testtable", "c1", 2 );
 
-		$writer->addColumn( "testtable", "special", RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE );
+		$writer->addColumn( "testtable", "special", MySQL::C_DATATYPE_SPECIAL_DATE );
 		
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols['special'], TRUE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->code( $cols['special'], TRUE ), MySQL::C_DATATYPE_SPECIAL_DATE );
 		
-		asrt( $writer->code( $cols['special'], FALSE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED );
+		asrt( $writer->code( $cols['special'], FALSE ), MySQL::C_DATATYPE_SPECIFIED );
 		
-		$writer->addColumn( "testtable", "special2", RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
+		$writer->addColumn( "testtable", "special2", MySQL::C_DATATYPE_SPECIAL_DATETIME );
 		
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols['special2'], TRUE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATETIME );
+		asrt( $writer->code( $cols['special2'], TRUE ), MySQL::C_DATATYPE_SPECIAL_DATETIME );
 		
-		asrt( $writer->code( $cols['special'], FALSE ), RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIFIED );
+		asrt( $writer->code( $cols['special'], FALSE ), MySQL::C_DATATYPE_SPECIFIED );
 		
 		$cols = $writer->getColumns( "testtable" );
 
@@ -150,7 +155,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 			$writer->addUniqueIndex( "testtable", array( "c1", "c2" ) );
 
 			fail(); //should fail, no content length blob
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			pass();
 		}
 
@@ -160,7 +165,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 			$writer->addUniqueIndex( "testtable", array( "c2", "c3" ) );
 
 			pass(); //should fail, no content length blob
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 
@@ -209,7 +214,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 		try {
 			$bean = $redbean->load( "page where 1; drop table hack", 1 );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -222,7 +227,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -233,7 +238,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -242,7 +247,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -251,7 +256,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -263,7 +268,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -272,7 +277,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -281,21 +286,21 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		try {
 			$redbean->trash( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		try {
 			$redbean->find( "::", array(), "" );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			pass();
 		}
 
@@ -305,7 +310,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$writer->createTable( "sometable` ( `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT , PRIMARY KEY ( `id` ) ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ; drop table hack; --" );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -319,7 +324,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		$redbean       = $toolbox->getRedBean();
 
-		$a             = new RedBean_AssociationManager( $toolbox );
+		$a             = new AssociationManager( $toolbox );
 
 		$book          = $redbean->dispense( "book" );
 		$author1       = $redbean->dispense( "author" );
@@ -343,7 +348,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		$redbean       = $toolbox->getRedBean();
 
-		$a             = new RedBean_AssociationManager( $toolbox );
+		$a             = new AssociationManager( $toolbox );
 
 		$book          = $redbean->dispense( "book" );
 		$author1       = $redbean->dispense( "author" );
@@ -374,7 +379,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 			$a->associate( $group, $book );
 
 			pass();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 
@@ -383,7 +388,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 			$a->associate( $group, $book );
 
 			pass();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 
@@ -396,7 +401,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		$redbean       = $toolbox->getRedBean();
 
-		$a             = new RedBean_AssociationManager( $toolbox );
+		$a             = new AssociationManager( $toolbox );
 
 		$book          = $redbean->dispense( "book" );
 		$author1       = $redbean->dispense( "author" );
@@ -503,9 +508,9 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 			R::store( $bean );
 
 			fail();
-		} catch ( RedBean_Exception $e ) {
+		} catch ( RedException $e ) {
 			pass();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			fail();
 		}
 

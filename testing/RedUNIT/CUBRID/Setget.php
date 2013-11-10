@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException\Security as Security; 
 /**
  * RedUNIT_CUBRID_Setget
  *
@@ -122,10 +124,10 @@ class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID
 			R::$writer->esc( '`aaa`' );
 
 			fail();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			pass();
 		}
 
-		asrt( ( $e instanceof RedBean_Exception_Security ), TRUE );
+		asrt( ( $e instanceof Security ), TRUE );
 	}
 }

@@ -1,4 +1,11 @@
-<?php
+<?php 
+
+use \RedBeanPHP\ToolBox as ToolBox;
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\RedException\SQL as SQL;
+use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\SimpleModel as SimpleModel;
+use \RedBeanPHP\QueryWriter\MySQL as MySQL; 
 /**
  * RedUNIT_Base_Association
  *
@@ -30,9 +37,9 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		$carrot = R::dispense( 'carrot' );
 
 		$faultyWriter  = new FaultyWriter( R::$toolbox->getDatabaseAdapter() );
-		$faultyToolbox = new RedBean_ToolBox( R::$toolbox->getRedBean(), R::$toolbox->getDatabaseAdapter(), $faultyWriter );
+		$faultyToolbox = new ToolBox( R::$toolbox->getRedBean(), R::$toolbox->getDatabaseAdapter(), $faultyWriter );
 
-		$faultyAssociationManager = new RedBean_AssociationManager( $faultyToolbox );
+		$faultyAssociationManager = new AssociationManager( $faultyToolbox );
 
 		$faultyWriter->setSQLState( '23000' );
 
@@ -47,7 +54,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		try {
 			$faultyAssociationManager->associate( $bunny, $carrot );
 			fail();
-		} catch ( RedBean_Exception_SQL $exception ) {
+		} catch ( SQL $exception ) {
 			pass();
 		}
 	}
@@ -216,11 +223,11 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 			R::store( $book );
 
 			fail();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			$expected = $e;
 		}
 
-		asrt( ( $expected instanceof RedBean_Exception_SQL ), TRUE );
+		asrt( ( $expected instanceof SQL ), TRUE );
 
 		asrt( R::count( 'book' ), 1 );
 
@@ -241,11 +248,11 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 			R::store( $book );
 
 			fail();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			$expected = $e;
 		}
 
-		asrt( ( $expected instanceof RedBean_Exception_SQL ), TRUE );
+		asrt( ( $expected instanceof SQL ), TRUE );
 
 		asrt( R::count( 'book' ), 1 );
 	}
@@ -311,20 +318,20 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 	{
 		try {
 			R::related( NULL, 'book' );
-		} catch ( Exception $e ) {
-			asrt( ( $e instanceof RedBean_Exception_Security ), TRUE );
+		} catch (\Exception $e ) {
+			asrt( ( $e instanceof Security ), TRUE );
 		}
 
 		try {
 			R::related( 100, 'book' );
-		} catch ( Exception $e ) {
-			asrt( ( $e instanceof RedBean_Exception_Security ), TRUE );
+		} catch (\Exception $e ) {
+			asrt( ( $e instanceof Security ), TRUE );
 		}
 
 		try {
 			R::related( array( 'fakeBean' ), 'book' );
-		} catch ( Exception $e ) {
-			asrt( ( $e instanceof RedBean_Exception_Security ), TRUE );
+		} catch (\Exception $e ) {
+			asrt( ( $e instanceof Security ), TRUE );
 		}
 
 		list( $r1, $r2, $r3 ) = R::dispense( 'reader', 3 );
@@ -403,13 +410,13 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		$testA = $rb->dispense( 'testA' );
 		$testB = $rb->dispense( 'testB' );
 
-		$a     = new RedBean_AssociationManager( $toolbox );
+		$a     = new AssociationManager( $toolbox );
 
 		try {
 			$a->related( $testA, "testB" );
 
 			pass();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			fail();
 		}
 
@@ -431,7 +438,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		$redbean->store( $page2 );
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$a->associate( $page, $user );
 
@@ -622,7 +629,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 /**
  * Mock class for testing purposes.
  */
-class Model_Ghost_House extends RedBean_SimpleModel
+class Model_Ghost_House extends SimpleModel
 {
 	public static $deleted = FALSE;
 
@@ -635,7 +642,7 @@ class Model_Ghost_House extends RedBean_SimpleModel
 /**
  * Mock class for testing purposes.
  */
-class Model_Ghost_Ghost extends RedBean_SimpleModel
+class Model_Ghost_Ghost extends SimpleModel
 {
 	public static $deleted = FALSE;
 
@@ -648,7 +655,7 @@ class Model_Ghost_Ghost extends RedBean_SimpleModel
 /**
  * Mock class for testing purposes.
  */
-class FaultyWriter extends RedBean_QueryWriter_MySQL
+class FaultyWriter extends MySQL
 {
 
 	protected $sqlState;
@@ -669,11 +676,11 @@ class FaultyWriter extends RedBean_QueryWriter_MySQL
 	 * @param string $sourceType destination type
 	 * @param string $destType   source type
 	 *
-	 * @throws RedBean_Exception_SQL
+	 * @throws SQL
 	 */
 	public function addConstraintForTypes( $sourceType, $destType )
 	{
-		$exception = new RedBean_Exception_SQL;
+		$exception = new SQL;
 		$exception->setSQLState( $this->sqlState );
 		throw $exception;
 	}

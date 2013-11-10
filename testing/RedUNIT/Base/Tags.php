@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_Base_Tags
  *
@@ -75,7 +77,7 @@ class RedUNIT_Base_Tags extends RedUNIT_Base
 			R::tag( $blog, array( "smart", "interesting", "lousy!" ) );
 
 			pass();
-		} catch ( RedBean_Exception $e ) {
+		} catch ( RedException $e ) {
 			fail();
 		}
 

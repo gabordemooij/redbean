@@ -1,4 +1,14 @@
-<?php
+<?php 
+
+use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
+use \RedBeanPHP\OODB as OODB;
+use \RedBeanPHP\ToolBox as ToolBox;
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\RedException\SQL as SQL;
+use \RedBeanPHP\QueryWriter\MySQL as MySQL;
+use \RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
+use \RedBeanPHP\QueryWriter\CUBRID as CUBRID;
+use \RedBeanPHP\Adapter\DBAdapter as DBAdapter; 
 /**
  * RedUNIT_Base_Database
  *
@@ -65,9 +75,9 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 
 		$adapter->setSQLState( 'HY000' );
 
-		$writer  = new RedBean_QueryWriter_SQLiteT( $adapter );
-		$redbean = new RedBean_OODB( $writer );
-		$toolbox = new RedBean_ToolBox( $redbean, $adapter, $writer );
+		$writer  = new SQLiteT( $adapter );
+		$redbean = new OODB( $writer );
+		$toolbox = new ToolBox( $redbean, $adapter, $writer );
 
 		// We can only test this for a known driver...
 		if ( $currentDriver === 'sqlite' ) {
@@ -75,7 +85,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 				$redbean->find( 'bean' );
 
 				pass();
-			} catch ( Exception $e ) {
+			} catch (\Exception $e ) {
 				var_dump( $e->getSQLState() );
 
 				fail();
@@ -88,7 +98,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 			$redbean->find( 'bean' );
 
 			fail();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			pass();
 		}
 
@@ -97,7 +107,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 
 		R::storeAll( array( $beanA, $beanB ) );
 
-		$associationManager = new RedBean_AssociationManager( $toolbox );
+		$associationManager = new AssociationManager( $toolbox );
 
 		$adapter->setSQLState( 'HY000' );
 
@@ -107,7 +117,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 				$associationManager->areRelated( $beanA, $beanB );
 
 				pass();
-			} catch ( Exception $e ) {
+			} catch (\Exception $e ) {
 				fail();
 			}
 		}
@@ -118,7 +128,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 			$associationManager->areRelated( $beanA, $beanA );
 
 			fail();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			pass();
 		}
 
@@ -126,7 +136,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 			$redbean->wipe( 'justabean' );
 
 			fail();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			pass();
 		}
 
@@ -141,21 +151,21 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 		try {
 			$adapter->exec( "an invalid query" );
 			fail();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			pass();
 		}
 
 		// Special data type description should result in magic number 99 (specified)
 		if ( $currentDriver == 'mysql' ) {
-			asrt( $writer->code( RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_DATE ), 99 );
+			asrt( $writer->code( MySQL::C_DATATYPE_SPECIAL_DATE ), 99 );
 		}
 
 		if ( $currentDriver == 'pgsql' ) {
-			asrt( $writer->code( RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE ), 99 );
+			asrt( $writer->code( PostgreSQL::C_DATATYPE_SPECIAL_DATE ), 99 );
 		}
 
 		if ( $currentDriver == 'CUBRID' ) {
-			asrt( $writer->code( RedBean_QueryWriter_CUBRID::C_DATATYPE_SPECIAL_DATE ), 99 );
+			asrt( $writer->code( CUBRID::C_DATATYPE_SPECIAL_DATE ), 99 );
 		}
 
 		asrt( (int) $adapter->getCell( "SELECT 123" ), 123 );
@@ -225,7 +235,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 /**
  * Malfunctioning database adapter to test exceptions.
  */
-class TroubleDapter extends RedBean_Adapter_DBAdapter
+class TroubleDapter extends DBAdapter
 {
 	private $sqlState;
 
@@ -236,7 +246,7 @@ class TroubleDapter extends RedBean_Adapter_DBAdapter
 
 	public function get( $sql, $values = array() )
 	{
-		$exception = new RedBean_Exception_SQL( 'Just a trouble maker' );
+		$exception = new SQL( 'Just a trouble maker' );
 		$exception->setSQLState( $this->sqlState );
 		throw $exception;
 	}

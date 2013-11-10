@@ -1,4 +1,7 @@
-<?php
+<?php 
+
+use \RedBeanPHP\Facade as Facade;
+use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_Blackhole_Plugins
  *
@@ -43,28 +46,28 @@ class RedUNIT_Blackhole_Plugins extends RedUNIT_Blackhole
 
 		asrt( R::singVersion(), ( R::getVersion().' lalala !' ) );
 		
-		//should also work with RedBean_Facade
-		asrt( RedBean_Facade::singVersion(), ( R::getVersion().' lalala !' ) );
+		//should also work with Facade
+		asrt( Facade::singVersion(), ( R::getVersion().' lalala !' ) );
 		
 		//test error handling
 		try {
 			R::ext( '---', function() {} );
 			fail();
-		} catch ( RedBean_Exception $e ) {
+		} catch ( RedException $e ) {
 			asrt( $e->getMessage(), 'Plugin name may only contain alphanumeric characters.' );
 		}
 		
 		try {
 			R::__callStatic( '---', function() {} );
 			fail();
-		} catch ( RedBean_Exception $e ) {
+		} catch ( RedException $e ) {
 			asrt( $e->getMessage(), 'Plugin name may only contain alphanumeric characters.' );
 		}
 		
 		try {
 			R::invalidMethod();
 			fail();
-		} catch ( RedBean_Exception $e ) {
+		} catch ( RedException $e ) {
 			asrt( $e->getMessage(), 'Plugin \'invalidMethod\' does not exist, add this plugin using: R::ext(\'invalidMethod\')' );
 		}
 	}

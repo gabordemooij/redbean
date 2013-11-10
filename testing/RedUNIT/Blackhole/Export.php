@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Blackhole_Export
  *
@@ -24,7 +26,7 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole
 
 		$redbean = R::$redbean;
 
-		$bean = new RedBean_OODBBean;
+		$bean = new OODBBean;
 
 		$bean->import( array( "a" => 1, "b" => 2 ) );
 

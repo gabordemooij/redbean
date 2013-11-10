@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\SQLHelper as SQLHelper; 
 /**
  * RedUNIT_Mysql_Mix
  *
@@ -25,7 +27,7 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 
 		$adapter = $toolbox->getDatabaseAdapter();
 
-		$mixer = new RedBean_SQLHelper( $adapter );
+		$mixer = new SQLHelper( $adapter );
 
 		$now = $mixer->now();
 
@@ -124,7 +126,7 @@ class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
 	{
 		$toolbox = R::$toolbox;
 		$adapter = $toolbox->getDatabaseAdapter();	
-		$sqlHelper = new RedBean_SQLHelper( $adapter );
+		$sqlHelper = new SQLHelper( $adapter );
 		$sqlHelper->begin()
 				  ->select( '*' )
 				  ->from( 'table' )

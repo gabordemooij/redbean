@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\RedException\SQL as SQL;
+use \RedBeanPHP\Plugin\QueryLogger as QueryLogger; 
 /**
  * RedUNIT_Mysql_Freeze
  *
@@ -28,7 +32,7 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$post = $redbean->dispense( 'post' );
 
@@ -68,7 +72,7 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 			$id = $redbean->store( $page );
 
 			fail();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			pass();
 		}
 
@@ -80,7 +84,7 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 			$id = $redbean->store( $post );
 
 			pass();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 
@@ -95,11 +99,11 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 			$id = $redbean->store( $newtype );
 
 			fail();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			pass();
 		}
 
-		$logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach( $adapter );
+		$logger = QueryLogger::getInstanceAndAttach( $adapter );
 
 		// Now log and make sure no 'describe SQL' happens
 		$page = $redbean->dispense( "page" );

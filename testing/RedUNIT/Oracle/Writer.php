@@ -1,4 +1,10 @@
-<?php
+<?php 
+
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\QueryWriter\MySQL as MySQL;
+use \RedBeanPHP\QueryWriter\Oracle as Oracle;
+use \RedBeanPHP\RedException\SQL as SQL;
+use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_Oracle_Writer
  *
@@ -26,7 +32,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$this->dropTableIfExists( $adapter, 'testtable' );
 
@@ -71,13 +77,13 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		asrt( $writer->scanType( "abc" ), 4 );
 
-		asrt( $writer->scanType( str_repeat( 'abcd', 100000 ) ), RedBean_QueryWriter_MySQL::C_DATATYPE_TEXT32 );
+		asrt( $writer->scanType( str_repeat( 'abcd', 100000 ) ), MySQL::C_DATATYPE_TEXT32 );
 
-		asrt( $writer->scanType( "2001-10-10", TRUE ), RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->scanType( "2001-10-10", TRUE ), Oracle::C_DATATYPE_SPECIAL_DATE );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), Oracle::C_DATATYPE_SPECIAL_DATE );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00.99", TRUE ), RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP );
+		asrt( $writer->scanType( "2001-10-10 10:00:00.99", TRUE ), Oracle::C_DATATYPE_SPECIAL_TIMESTAMP );
 
 		asrt( $writer->scanType( "2001-10-10" ), 4 );
 
@@ -85,7 +91,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		asrt( $writer->scanType( "2001-10-10 10:00:00.99" ), 4 );
 
-		//asrt($writer->scanType("POINT(1 2)",TRUE),RedBean_QueryWriter_MySQL::C_DATATYPE_SPECIAL_POINT);
+		//asrt($writer->scanType("POINT(1 2)",TRUE),MySQL::C_DATATYPE_SPECIAL_POINT);
 		//asrt($writer->scanType("POINT(1 2)"),4);
 
 		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), 5 );
@@ -141,7 +147,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 			echo 'to be fixed';
 			//fail(); //should fail, no content length blob
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			pass();
 		}
 
@@ -151,7 +157,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 			$writer->addUniqueIndex( "testtable", array( "c2", "c3" ) );
 
 			pass(); //should fail, no content length blob
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 
@@ -189,7 +195,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$bean = $redbean->load( "page where 1; drop table hack", 1 );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -201,7 +207,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -212,7 +218,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -221,7 +227,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -230,7 +236,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -242,7 +248,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -251,7 +257,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -260,21 +266,21 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		try {
 			$redbean->trash( $bean );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		try {
 			$redbean->find( "::", array(), "" );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			pass();
 		}
 
@@ -284,7 +290,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$writer->createTable( "sometable` ( `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT , PRIMARY KEY ( `id` ) ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ; drop table hack; --" );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -298,7 +304,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		$this->dropTableIfExists( $adapter, 'author' );
 
 		$redbean = $toolbox->getRedBean();
-		$a       = new RedBean_AssociationManager( $toolbox );
+		$a       = new AssociationManager( $toolbox );
 		$book    = $redbean->dispense( "book" );
 		$author1 = $redbean->dispense( "author" );
 		$author2 = $redbean->dispense( "author" );
@@ -320,7 +326,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		$this->dropTableIfExists( $adapter, 'author' );
 
 		$redbean = $toolbox->getRedBean();
-		$a       = new RedBean_AssociationManager( $toolbox );
+		$a       = new AssociationManager( $toolbox );
 		$book    = $redbean->dispense( "book" );
 		$author1 = $redbean->dispense( "author" );
 		$author2 = $redbean->dispense( "author" );
@@ -350,7 +356,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 			$a->associate( $group, $book );
 
 			pass();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 
@@ -359,7 +365,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 			$a->associate( $group, $book );
 
 			pass();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 
@@ -372,7 +378,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		$this->dropTableIfExists( $adapter, 'author' );
 
 		$redbean = $toolbox->getRedBean();
-		$a       = new RedBean_AssociationManager( $toolbox );
+		$a       = new AssociationManager( $toolbox );
 		$book    = $redbean->dispense( "book" );
 		$author1 = $redbean->dispense( "author" );
 		$author2 = $redbean->dispense( "author" );
@@ -499,10 +505,10 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 			R::store( $bean );
 
 			fail();
-		} catch ( RedBean_Exception $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
-		catch ( Exception $e ) {
+		catch (\Exception $e ) {
 			fail();
 		}
 
