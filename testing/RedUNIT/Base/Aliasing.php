@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException\Security as Security; 
 /**
  * RedUNIT_Base_Aliasing
  *
@@ -247,9 +249,9 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 			$book->wrongProperty[] = $page;
 			R::store( $book );
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			fail();
 		}
 
@@ -305,9 +307,9 @@ class RedUNIT_Base_Aliasing extends RedUNIT_Base
 				R::store( $book );
 
 				fail();
-			} catch ( RedBean_Exception_Security $e ) {
+			} catch ( Security $e ) {
 				pass();
-			} catch ( Exception $e ) {
+			} catch (\Exception $e ) {
 				fail();
 			}
 		}

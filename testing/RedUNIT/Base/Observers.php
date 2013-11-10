@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
+use \RedBeanPHP\QueryWriter as QueryWriter;
+use \RedBeanPHP\OODB as OODB; 
 /**
  * RedUNIT_Base_Observers
  *
@@ -25,9 +29,9 @@ class RedUNIT_Base_Observers extends RedUNIT_Base
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 
-		asrt( ( $adapter instanceof RedBean_Adapter_DBAdapter ), TRUE );
-		asrt( ( $writer instanceof RedBean_QueryWriter ), TRUE );
-		asrt( ( $redbean instanceof RedBean_OODB ), TRUE );
+		asrt( ( $adapter instanceof DBAdapter ), TRUE );
+		asrt( ( $writer instanceof QueryWriter ), TRUE );
+		asrt( ( $redbean instanceof OODB ), TRUE );
 
 		$observable = new ObservableMock();
 		$observer   = new ObserverMock();

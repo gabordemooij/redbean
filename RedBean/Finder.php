@@ -1,4 +1,10 @@
-<?php
+<?php 
+namespace RedBeanPHP; 
+use \RedBeanPHP\ToolBox as ToolBox;
+use \RedBeanPHP\OODB as OODB;
+use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\SQLHelper as SQLHelper;
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedBean Finder
  *
@@ -11,16 +17,16 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Finder
+class Finder
 {
 
 	/**
-	 * @var RedBean_ToolBox
+	 * @var ToolBox
 	 */
 	protected $toolbox;
 
 	/**
-	 * @var RedBean_OODB
+	 * @var OODB
 	 */
 	protected $redbean;
 
@@ -28,9 +34,9 @@ class RedBean_Finder
 	 * Constructor.
 	 * The Finder requires a toolbox.
 	 *
-	 * @param RedBean_ToolBox $toolbox
+	 * @param ToolBox $toolbox
 	 */
-	public function __construct( RedBean_ToolBox $toolbox )
+	public function __construct( ToolBox $toolbox )
 	{
 		$this->toolbox = $toolbox;
 		$this->redbean = $toolbox->getRedBean();
@@ -49,16 +55,16 @@ class RedBean_Finder
 	 *
 	 * @return array
 	 *
-	 * @throws RedBean_Exception_Security
+	 * @throws Security
 	 */
 	public function find( $type, $sql = NULL, $bindings = array() )
 	{
-		if ( $sql instanceof RedBean_SQLHelper ) {
+		if ( $sql instanceof SQLHelper ) {
 			list( $sql, $bindings ) = $sql->getQuery();
 		}
 
 		if ( !is_array( $bindings ) ) {
-			throw new RedBean_Exception_Security(
+			throw new Security(
 				'Expected array, ' . gettype( $bindings ) . ' given.'
 			);
 		}
@@ -67,7 +73,7 @@ class RedBean_Finder
 	}
 
 	/**
-	 * @see RedBean_Finder::find
+	 * @see Finder::find
 	 *      The variation also exports the beans (i.e. it returns arrays).
 	 *
 	 * @param string $type     type   the type of bean you are looking for
@@ -87,14 +93,14 @@ class RedBean_Finder
 	}
 
 	/**
-	 * @see RedBean_Finder::find
+	 * @see Finder::find
 	 *      This variation returns the first bean only.
 	 *
 	 * @param string $type     type   the type of bean you are looking for
 	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function findOne( $type, $sql = NULL, $bindings = array() )
 	{
@@ -108,14 +114,14 @@ class RedBean_Finder
 	}
 
 	/**
-	 * @see RedBean_Finder::find
+	 * @see Finder::find
 	 *      This variation returns the last bean only.
 	 *
 	 * @param string $type     the type of bean you are looking for
 	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
 	public function findLast( $type, $sql = NULL, $bindings = array() )
 	{
@@ -129,7 +135,7 @@ class RedBean_Finder
 	}
 
 	/**
-	 * @see RedBean_Finder::find
+	 * @see Finder::find
 	 *      Convience method. Tries to find beans of a certain type,
 	 *      if no beans are found, it dispenses a bean of that type.
 	 *
@@ -168,12 +174,12 @@ class RedBean_Finder
 	 * Note that this method will open all intermediate beans so you can
 	 * attach access control rules to each bean in the path.
 	 *
-	 * @param RedBean_OODBBean $bean
+	 * @param OODBBean $bean
 	 * @param array            $steps  (an array representation of a REST path)
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 *
-	 * @throws RedBean_Exception_Security
+	 * @throws Security
 	 */
 	public function findByPath( $bean, $steps )
 	{
@@ -182,14 +188,14 @@ class RedBean_Finder
 		if ( !$numberOfSteps ) return $bean;
 
 		if ( $numberOfSteps % 2 ) {
-			throw new RedBean_Exception_Security( 'Invalid path: needs 1 more element.' );
+			throw new Security( 'Invalid path: needs 1 more element.' );
 		}
 
 		for ( $i = 0; $i < $numberOfSteps; $i += 2 ) {
 			$steps[$i] = trim( $steps[$i] );
 
 			if ( $steps[$i] === '' ) {
-				throw new RedBean_Exception_Security( 'Cannot access list.' );
+				throw new Security( 'Cannot access list.' );
 			}
 
 			if ( strpos( $steps[$i], 'shared-' ) === FALSE ) {
@@ -203,7 +209,7 @@ class RedBean_Finder
 			$list = $bean->withCondition( " {$listType}.id = ? ", array( $steps[$i + 1] ) )->$listName;
 
 			if ( !isset( $list[$steps[$i + 1]] ) ) {
-				throw new RedBean_Exception_Security( 'Cannot access bean.' );
+				throw new Security( 'Cannot access bean.' );
 			}
 
 			$bean = $list[$steps[$i + 1]];

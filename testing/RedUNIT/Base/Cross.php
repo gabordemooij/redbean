@@ -1,4 +1,7 @@
-<?php
+<?php 
+
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\RedException\SQL as SQL; 
 /**
  * RedUNIT_Base_Cross
  *
@@ -26,7 +29,7 @@ class RedUNIT_Base_Cross extends RedUNIT_Base
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
-		$a       = new RedBean_AssociationManager( $toolbox );
+		$a       = new AssociationManager( $toolbox );
 
 		$page = $redbean->dispense( "page" );
 
@@ -88,7 +91,7 @@ class RedUNIT_Base_Cross extends RedUNIT_Base
 			$a->associate( $page2, $page2 );
 
 			pass();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 

@@ -1,4 +1,10 @@
-<?php
+<?php 
+
+use \RedBeanPHP\Setup as Setup;
+use \RedBeanPHP\ToolBox as ToolBox;
+use \RedBeanPHP\Driver\OCI as OCI;
+use \RedBeanPHP\QueryWriter\Oracle as Oracle;
+use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT; 
 /**
  * RedUNIT_Base_Close
  *
@@ -35,24 +41,24 @@ class RedUNIT_Base_Close extends RedUNIT_Base
 		asrt( ( $id > 0 ), TRUE );
 
 		// Test freeze via kickstart in setup
-		$toolbox = RedBean_Setup::kickstart( 'sqlite:/tmp/bla.txt', NULL, NULL, TRUE );
+		$toolbox = Setup::kickstart( 'sqlite:/tmp/bla.txt', NULL, NULL, TRUE );
 
 		asrt( $toolbox->getRedBean()->isFrozen(), TRUE );
 
 		// Test Oracle setup
-		$toolbox = RedBean_Setup::kickstart( 'oracle:test-value', 'test', 'test', FALSE );
+		$toolbox = Setup::kickstart( 'oracle:test-value', 'test', 'test', FALSE );
 
-		asrt( ( $toolbox instanceof RedBean_ToolBox ), TRUE );
+		asrt( ( $toolbox instanceof ToolBox ), TRUE );
 	}
 }
 
-if ( !class_exists( 'RedBean_Driver_OCI' ) ) {
-	class RedBean_Driver_OCI
+if ( !class_exists( 'OCI' ) ) {
+	class OCI
 	{
 	}
 }
-if ( !class_exists( 'RedBean_QueryWriter_Oracle' ) ) {
-	class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_SQLiteT
+if ( !class_exists( 'Oracle' ) ) {
+	class Oracle extends SQLiteT
 	{
 	}
 }

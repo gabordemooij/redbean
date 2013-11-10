@@ -1,9 +1,10 @@
-<?php
+<?php 
+ 
 /**
  * RedUNIT_Postgres_Parambind
  *
  * @file    RedUNIT/Postgres/Parambind.php
- * @desc    Tests PDO parameter binding for Postgres.
+ * @desc    Tests\PDO parameter binding for Postgres.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license New BSD/GPLv2
  *

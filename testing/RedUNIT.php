@@ -32,7 +32,7 @@ abstract class RedUNIT
 	{
 		R::freeze( FALSE );
 
-		RedBean_ModelHelper::setModelFormatter( new DefaultModelFormatter );
+		\RedBeanPHP\ModelHelper::setModelFormatter( new DefaultModelFormatter );
 
 		R::nuke();
 	}

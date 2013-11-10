@@ -1,4 +1,7 @@
-<?php
+<?php 
+
+use \RedBeanPHP\Plugin\Cache as Cache;
+use \RedBeanPHP\ToolBox as ToolBox; 
 /**
  * RedUNIT_Plugin_Cache
  *
@@ -31,9 +34,9 @@ class RedUNIT_Plugin_Cache extends RedUNIT_Plugin
 	{
 		$t = R::$toolbox;
 
-		$cachedOODB = new RedBean_Plugin_Cache( $t->getWriter() );
+		$cachedOODB = new Cache( $t->getWriter() );
 
-		$old = R::configureFacadeWithToolbox( new RedBean_Toolbox( $cachedOODB, $t->getDatabaseAdapter(), $t->getWriter() ) );
+		$old = R::configureFacadeWithToolbox( new ToolBox( $cachedOODB, $t->getDatabaseAdapter(), $t->getWriter() ) );
 
 		function hm() { return R::$redbean->getHits() . '-' . R::$redbean->getMisses(); }
 

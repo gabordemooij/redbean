@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Base_Copy
  *
@@ -204,7 +206,7 @@ class RedUNIT_Base_Copy extends RedUNIT_Base
 
 		$ids = array();
 
-		asrt( ( $d instanceof RedBean_OODBBean ), TRUE );
+		asrt( ( $d instanceof OODBBean ), TRUE );
 		asrt( count( $d->ownPage ), 1 );
 
 		foreach ( end( $d->ownPage )->ownParagraph as $p ) {

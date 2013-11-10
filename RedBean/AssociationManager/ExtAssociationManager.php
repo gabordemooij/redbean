@@ -1,4 +1,7 @@
-<?php
+<?php 
+namespace RedBeanPHP\AssociationManager; 
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * Extended Association Manager
  *
@@ -13,7 +16,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_AssociationManager_ExtAssociationManager extends RedBean_AssociationManager
+class ExtAssociationManager extends AssociationManager
 {
 
 	/**
@@ -25,13 +28,13 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 	 * This method has been deprecated, please use $bean->link instead to form
 	 * many-to-many associations with additional properties.
 	 *
-	 * @param RedBean_OODBBean $bean1    the first bean you want to associate
-	 * @param RedBean_OODBBean $bean2    the second bean you want to associate
-	 * @param RedBean_OODBBean $baseBean the link bean
+	 * @param OODBBean $bean1    the first bean you want to associate
+	 * @param OODBBean $bean2    the second bean you want to associate
+	 * @param OODBBean $baseBean the link bean
 	 *
 	 * @return array
 	 */
-	public function extAssociate( RedBean_OODBBean $bean1, RedBean_OODBBean $bean2, RedBean_OODBBean $baseBean )
+	public function extAssociate( OODBBean $bean1, OODBBean $bean2, OODBBean $baseBean )
 	{
 		$table = $this->getTable( array( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ) ) );
 
@@ -52,8 +55,8 @@ class RedBean_AssociationManager_ExtAssociationManager extends RedBean_Associati
 	 * This method has been deprecated, please use $bean->link instead to form
 	 * many-to-many associations with additional properties.
 	 *
-	 * @param RedBean_OODBBean $bean1 the first bean you want to associate
-	 * @param RedBean_OODBBean $bean2 the second bean you want to associate
+	 * @param OODBBean $bean1 the first bean you want to associate
+	 * @param OODBBean $bean2 the second bean you want to associate
 	 * @param mixed            $extra one or more additional properties and values
 	 *
 	 * @return array

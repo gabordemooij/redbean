@@ -1,4 +1,7 @@
-<?php
+<?php 
+namespace RedBeanPHP; 
+use \RedBeanPHP\ToolBox as ToolBox;
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * Bean Helper Interface
  *
@@ -14,7 +17,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-interface RedBean_BeanHelper
+interface BeanHelper
 {
 
 	/**
@@ -23,7 +26,7 @@ interface RedBean_BeanHelper
 	 * as such the bean is a proxy for OODB. This allows beans to implement
 	 * their magic getters and setters and return lists.
 	 *
-	 * @return RedBean_Toolbox $toolbox toolbox
+	 * @return ToolBox $toolbox toolbox
 	 */
 	public function getToolbox();
 
@@ -41,9 +44,9 @@ interface RedBean_BeanHelper
 	 * Given a certain bean this method will
 	 * return the corresponding model.
 	 *
-	 * @param RedBean_OODBBean $bean
+	 * @param OODBBean $bean
 	 *
 	 * @return string
 	 */
-	public function getModelForBean( RedBean_OODBBean $bean );
+	public function getModelForBean( OODBBean $bean );
 }

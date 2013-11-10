@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\AssociationManager as AssociationManager; 
 /**
  * RedUNIT_Mysql_Preexist
  *
@@ -26,7 +28,7 @@ class RedUNIT_Mysql_Preexist extends RedUNIT_Mysql
 		$redbean     = $toolbox->getRedBean();
 		$pdo         = $adapter->getDatabase();
 
-		$a           = new RedBean_AssociationManager( $toolbox );
+		$a           = new AssociationManager( $toolbox );
 
 		$page        = $redbean->dispense( "page" );
 

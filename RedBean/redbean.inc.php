@@ -99,10 +99,7 @@ require( $dir . 'Plugin/Cache.php' );
 require( $dir . 'Plugin/QueryLogger.php');
 require( $dir . 'Plugin/TimeLine.php' );
 
-class R extends RedBean_Facade
-{
-}
-
+class R extends \RedBeanPHP\Facade {};
 
 
 

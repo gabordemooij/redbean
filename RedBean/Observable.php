@@ -1,4 +1,6 @@
-<?php
+<?php 
+namespace RedBeanPHP; 
+use \RedBeanPHP\Observer as Observer; 
 /**
  * Observable
  * Base class for Observables
@@ -12,7 +14,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-abstract class RedBean_Observable { //bracket must be here - otherwise coverage software does not understand.
+abstract class Observable { //bracket must be here - otherwise coverage software does not understand.
 
 	/**
 	 * @var array
@@ -27,11 +29,11 @@ abstract class RedBean_Observable { //bracket must be here - otherwise coverage 
 	 * the event occurs.
 	 *
 	 * @param string           $eventname event identifier
-	 * @param RedBean_Observer $observer  observer instance
+	 * @param Observer $observer  observer instance
 	 *
 	 * @return void
 	 */
-	public function addEventListener( $eventname, RedBean_Observer $observer )
+	public function addEventListener( $eventname, Observer $observer )
 	{
 		if ( !isset( $this->observers[$eventname] ) ) {
 			$this->observers[$eventname] = array();

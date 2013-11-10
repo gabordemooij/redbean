@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
+use \RedBeanPHP\RedException\SQL as SQL; 
 /**
  * RedUNIT_Postgres_Writer
  *
@@ -26,7 +30,7 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$adapter->exec( "DROP TABLE IF EXISTS testtable" );
 
@@ -55,7 +59,7 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 			}
 		}
 
-		asrt( $writer->code( RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME ), 99 );
+		asrt( $writer->code( PostgreSQL::C_DATATYPE_SPECIAL_DATETIME ), 99 );
 
 		asrt( $writer->code( "unknown" ), 99 );
 
@@ -76,9 +80,9 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 
 		asrt( $writer->scanType( "abc" ), 3 );
 
-		asrt( $writer->scanType( "2001-10-10", TRUE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->scanType( "2001-10-10", TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATE );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
+		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
 
 		asrt( $writer->scanType( "2001-10-10 10:00:00" ), 3 );
 
@@ -92,21 +96,21 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 
 		asrt( $writer->code( $cols["c1"] ), 3 );
 		
-		$writer->addColumn( "testtable", "special", RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE );
+		$writer->addColumn( "testtable", "special", PostgreSQL::C_DATATYPE_SPECIAL_DATE );
 		
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols['special'], TRUE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATE );
+		asrt( $writer->code( $cols['special'], TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATE );
 		
-		asrt( $writer->code( $cols['special'], FALSE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIFIED );
+		asrt( $writer->code( $cols['special'], FALSE ), PostgreSQL::C_DATATYPE_SPECIFIED );
 		
-		$writer->addColumn( "testtable", "special2", RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
+		$writer->addColumn( "testtable", "special2", PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
 		
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols['special2'], TRUE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
+		asrt( $writer->code( $cols['special2'], TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
 		
-		asrt( $writer->code( $cols['special'], FALSE ), RedBean_QueryWriter_PostgreSQL::C_DATATYPE_SPECIFIED );
+		asrt( $writer->code( $cols['special'], FALSE ), PostgreSQL::C_DATATYPE_SPECIFIED );
 
 		//$id = $writer->insertRecord("testtable", array("c1"), array(array("lorem ipsum")));
 
@@ -152,7 +156,7 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 
 		testpack( "Test ANSI92 issue in clearrelations" );
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$book    = $redbean->dispense( "book" );
 		$author1 = $redbean->dispense( "author" );
@@ -183,7 +187,7 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		$redbean = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$book = $redbean->dispense( "book" );
 
@@ -214,7 +218,7 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 			$a->associate( $group, $book );
 
 			pass();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 
@@ -223,7 +227,7 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 			$a->associate( $group, $book );
 
 			pass();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 
@@ -243,7 +247,7 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		$toolbox = R::$toolbox;
 		$redbean = $toolbox->getRedBean();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$book    = $redbean->dispense( "book" );
 		$author1 = $redbean->dispense( "author" );

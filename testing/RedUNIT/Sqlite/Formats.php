@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\DefaultBeanFormatter as DefaultBeanFormatter; 
 /**
  * RedUNIT_Sqlite_Formats
  *
@@ -51,6 +53,6 @@ class RedUNIT_Sqlite_Formats extends RedUNIT_Sqlite
 
 		asrt( $cols['rating'], 'TEXT' );
 
-		R::$writer->setBeanFormatter( new RedBean_DefaultBeanFormatter );
+		R::$writer->setBeanFormatter( new DefaultBeanFormatter );
 	}
 }

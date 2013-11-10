@@ -1,4 +1,9 @@
-<?php
+<?php 
+namespace RedBeanPHP\QueryWriter; 
+use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use \RedBeanPHP\QueryWriter as QueryWriter;
+use \RedBeanPHP\Adapter as Adapter;
+use \RedBeanPHP\Driver\OCI as OCI; 
 /**
  * RedBean Oracle Driver
  *
@@ -13,12 +18,12 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter
+class Oracle extends AQueryWriter implements QueryWriter
 {
 	/**
 	 * Adapter
 	 *
-	 * @var RedBean_Adapter
+	 * @var Adapter
 	 */
 	protected $adapter;
 
@@ -138,19 +143,19 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @return string table name
 	 */
-	public function __construct( RedBean_Adapter $a )
+	public function __construct( Adapter $a )
 	{
 		$this->adapter        = $a;
 		$this->typeno_sqltype = array(
-			RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL              => 'NUMBER(1,0)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_UINT8             => 'NUMBER(3,0)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32            => 'NUMBER(11,0)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_DOUBLE            => 'FLOAT',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT8             => 'NVARCHAR2(255)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT16            => 'NVARCHAR2(2000)',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT32            => 'CLOB',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE      => 'DATE',
-			RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP => 'TIMESTAMP(6)' );
+			Oracle::C_DATATYPE_BOOL              => 'NUMBER(1,0)',
+			Oracle::C_DATATYPE_UINT8             => 'NUMBER(3,0)',
+			Oracle::C_DATATYPE_UINT32            => 'NUMBER(11,0)',
+			Oracle::C_DATATYPE_DOUBLE            => 'FLOAT',
+			Oracle::C_DATATYPE_TEXT8             => 'NVARCHAR2(255)',
+			Oracle::C_DATATYPE_TEXT16            => 'NVARCHAR2(2000)',
+			Oracle::C_DATATYPE_TEXT32            => 'CLOB',
+			Oracle::C_DATATYPE_SPECIAL_DATE      => 'DATE',
+			Oracle::C_DATATYPE_SPECIAL_TIMESTAMP => 'TIMESTAMP(6)' );
 
 		$this->sqltype_typeno = array();
 
@@ -230,12 +235,12 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 
 			$columns = $this->getColumns( $table );
 
-			if ( $this->code( $columns[$property1] ) !== RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 ) {
-				$this->widenColumn( $table, $property1, RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 );
+			if ( $this->code( $columns[$property1] ) !== Oracle::C_DATATYPE_UINT32 ) {
+				$this->widenColumn( $table, $property1, Oracle::C_DATATYPE_UINT32 );
 			}
 
-			if ( $this->code( $columns[$property2] ) !== RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 ) {
-				$this->widenColumn( $table, $property2, RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32 );
+			if ( $this->code( $columns[$property2] ) !== Oracle::C_DATATYPE_UINT32 ) {
+				$this->widenColumn( $table, $property2, Oracle::C_DATATYPE_UINT32 );
 			}
 
 			$sql = "
@@ -251,7 +256,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 			$this->adapter->exec( $sql );
 
 			return TRUE;
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			return FALSE;
 		}
 	}
@@ -302,7 +307,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 		}
 	}
 
@@ -315,14 +320,14 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 *
 	 * @param string $table type of bean you want to create a table for
 	 *
-	 * @throws Exception
+	 * @throws\Exception
 	 *
 	 * @return void
 	 */
 	public function createTable( $table )
 	{
 		if ( strtolower( $table ) != $table ) {
-			throw new Exception( $table . ' is not lowercase. With ORACLE you MUST only use lowercase table in PHP, sorry!' );
+			throw new\Exception( $table . ' is not lowercase. With ORACLE you MUST only use lowercase table in PHP, sorry!' );
 		}
 
 		$table_with_quotes         = strtoupper( $this->esc( $table ) );
@@ -364,7 +369,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	 * @param string  $column name of the column
 	 * @param integer $field  data type for field
 	 *
-	 * @throws Exception
+	 * @throws\Exception
 	 *
 	 * @return void
 	 */
@@ -373,7 +378,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		$columnTested = preg_replace( '/^((own)|(shared))./', '', $column );
 
 		if ( strtolower( $columnTested ) != $columnTested ) {
-			throw new Exception( $column . ' is not lowercase. With ORACLE you MUST only use lowercase properties in PHP, sorry!' );
+			throw new\Exception( $column . ' is not lowercase. With ORACLE you MUST only use lowercase properties in PHP, sorry!' );
 		}
 
 		parent::addColumn( strtoupper( $type ), strtoupper( $column ), $field );
@@ -511,9 +516,9 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	public function sqlStateIn( $state, $list )
 	{
 		$stateMap = array(
-			RedBean_Driver_OCI::OCI_NO_SUCH_TABLE                  => RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			RedBean_Driver_OCI::OCI_NO_SUCH_COLUMN                 => RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			RedBean_Driver_OCI::OCI_INTEGRITY_CONSTRAINT_VIOLATION => RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			OCI::OCI_NO_SUCH_TABLE                  => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			OCI::OCI_NO_SUCH_COLUMN                 => QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			OCI::OCI_INTEGRITY_CONSTRAINT_VIOLATION => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
@@ -612,13 +617,13 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 
 				$this->adapter->exec( $sql );
 			}
-		} catch ( Exception $e ) {
+		} catch (\Exception $e ) {
 			// Failure of fk-constraints is not a problem
 		}
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::queryRecord
+	 * @see QueryWriter::queryRecord
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
@@ -626,7 +631,7 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::deleteRecord
+	 * @see QueryWriter::deleteRecord
 	 */
 	public function deleteRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
@@ -664,15 +669,15 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		$this->svalue = $value;
 
 		if ( is_null( $value ) ) {
-			return RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL;
+			return Oracle::C_DATATYPE_BOOL;
 		}
 
 		if ( $flagSpecial ) {
 			if ( preg_match( '/^\d{4}\-\d\d-\d\d(\s\d\d:\d\d(:\d\d)?)?$/', $value ) ) {
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_DATE;
+				return Oracle::C_DATATYPE_SPECIAL_DATE;
 			}
 			if ( preg_match( '/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d.\d\d$/', $value ) ) {
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_SPECIAL_TIMESTAMP;
+				return Oracle::C_DATATYPE_SPECIAL_TIMESTAMP;
 			}
 		}
 
@@ -680,31 +685,31 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 
 		if ( !$this->startsWithZeros( $value ) ) {
 			if ( $value == '1' || $value == '' ) {
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_BOOL;
+				return Oracle::C_DATATYPE_BOOL;
 			}
 
 			if ( is_numeric( $value ) && ( floor( $value ) == $value ) && $value >= 0 && $value <= 255 ) {
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_UINT8;
+				return Oracle::C_DATATYPE_UINT8;
 			}
 
 			if ( is_numeric( $value ) && ( floor( $value ) == $value ) && $value >= 0 && $value <= 4294967295 ) {
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_UINT32;
+				return Oracle::C_DATATYPE_UINT32;
 			}
 
 			if ( is_numeric( $value ) ) {
-				return RedBean_QueryWriter_Oracle::C_DATATYPE_DOUBLE;
+				return Oracle::C_DATATYPE_DOUBLE;
 			}
 		}
 
 		if ( strlen( $value ) <= 255 ) {
-			return RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT8;
+			return Oracle::C_DATATYPE_TEXT8;
 		}
 
 		if ( strlen( $value ) <= 2000 ) {
-			return RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT16;
+			return Oracle::C_DATATYPE_TEXT16;
 		}
 
-		return RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT32;
+		return Oracle::C_DATATYPE_TEXT32;
 	}
 
 	/**

@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
+use \RedBeanPHP\RedException\SQL as SQL; 
 /**
  * RedUNIT_Sqlite_Writer
  *
@@ -26,7 +30,7 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		asrt( in_array( "testtable", $writer->getTables() ), FALSE );
 
@@ -51,23 +55,23 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 
 		asrt( $writer->code( "unknown" ), 99 );
 
-		asrt( $writer->scanType( FALSE ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
-		asrt( $writer->scanType( NULL ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( FALSE ), SQLiteT::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( NULL ), SQLiteT::C_DATATYPE_INTEGER );
 
-		asrt( $writer->scanType( 2 ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
-		asrt( $writer->scanType( 255 ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
-		asrt( $writer->scanType( 256 ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
-		asrt( $writer->scanType( -1 ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER );
-		asrt( $writer->scanType( 1.5 ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC );
+		asrt( $writer->scanType( 2 ), SQLiteT::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( 255 ), SQLiteT::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( 256 ), SQLiteT::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( -1 ), SQLiteT::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( 1.5 ), SQLiteT::C_DATATYPE_NUMERIC );
 
-		asrt( $writer->scanType( INF ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT );
+		asrt( $writer->scanType( INF ), SQLiteT::C_DATATYPE_TEXT );
 
-		asrt( $writer->scanType( "abc" ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT );
+		asrt( $writer->scanType( "abc" ), SQLiteT::C_DATATYPE_TEXT );
 
-		asrt( $writer->scanType( '2010-10-10' ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC );
-		asrt( $writer->scanType( '2010-10-10 10:00:00' ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC );
+		asrt( $writer->scanType( '2010-10-10' ), SQLiteT::C_DATATYPE_NUMERIC );
+		asrt( $writer->scanType( '2010-10-10 10:00:00' ), SQLiteT::C_DATATYPE_NUMERIC );
 
-		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT );
+		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), SQLiteT::C_DATATYPE_TEXT );
 
 		$writer->widenColumn( "testtable", "c1", 2 );
 
@@ -119,7 +123,7 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 
 		$redbean = $toolbox->getRedBean();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$book    = $redbean->dispense( "book" );
 		$author1 = $redbean->dispense( "author" );
@@ -150,7 +154,7 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 		$redbean = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$book    = $redbean->dispense( "book" );
 		$author1 = $redbean->dispense( "author" );
@@ -177,7 +181,7 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 			$a->associate( $group, $book );
 
 			pass();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			fail();
 		}
 
@@ -186,7 +190,7 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 			$a->associate( $group, $book );
 
 			pass();
-		} catch ( RedBean_Exception_SQL $e ) {
+		} catch ( SQL $e ) {
 			print_r( $e );
 
 			fail();
@@ -208,7 +212,7 @@ class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
 		$toolbox = R::$toolbox;
 		$redbean = $toolbox->getRedBean();
 
-		$a = new RedBean_AssociationManager( $toolbox );
+		$a = new AssociationManager( $toolbox );
 
 		$book    = $redbean->dispense( "book" );
 		$author1 = $redbean->dispense( "author" );

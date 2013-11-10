@@ -1,4 +1,9 @@
-<?php
+<?php 
+namespace RedBeanPHP\Plugin; 
+use \RedBeanPHP\Plugin\QueryLogger as QueryLogger;
+use \RedBeanPHP\Plugin as Plugin;
+use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\DBAdapter as DBAdapter; 
 /**
  * TimeLine 
  *
@@ -11,7 +16,7 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedBean_Plugin {
+class TimeLine extends QueryLogger implements Plugin {
 	/**
 	 * Path to file to write SQL and comments to.
 	 * 
@@ -26,7 +31,7 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 	 */
 	public function __construct($outputPath) {
 		if (!file_exists($outputPath) || !is_writable($outputPath)) 
-			throw new RedBean_Exception_Security('Cannot write to file: '.$outputPath);
+			throw new Security('Cannot write to file: '.$outputPath);
 		$this->file = $outputPath;
 	}
 	/**
@@ -35,7 +40,7 @@ class RedBean_Plugin_TimeLine extends RedBean_Plugin_QueryLogger implements RedB
 	 * adapter will send a signal to the attached logger.
 	 *
 	 * @param  string $eventName          ID of the event (name)
-	 * @param  RedBean_DBAdapter $adapter adapter that sends the signal
+	 * @param  DBAdapter $adapter adapter that sends the signal
 	 *
 	 * @return void
 	 */

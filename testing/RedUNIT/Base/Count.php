@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException\SQL as SQL; 
 /**
  * RedUNIT_Base_Count
  *
@@ -77,7 +79,7 @@ class RedUNIT_Base_Count extends RedUNIT_Base
 			try {
 				R::count( 'teaport', ' for tea ' );
 				fail();
-			} catch ( RedBean_Exception_SQL $e ) {
+			} catch ( SQL $e ) {
 				pass();
 			}
 		}

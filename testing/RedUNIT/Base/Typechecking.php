@@ -1,4 +1,7 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Base_Typechecking
  *
@@ -56,7 +59,7 @@ class RedUNIT_Base_Typechecking extends RedUNIT_Base
 		$bean->bool2    = true;
 		$bean->text     = 'abc';
 		$bean->null     = null;
-		$bean->datetime = new DateTime( 'NOW', new DateTimeZone( 'Europe/Amsterdam' ) );
+		$bean->datetime = new\DateTime( 'NOW', new\DateTimeZone( 'Europe/Amsterdam' ) );
 
 		$id = R::store( $bean );
 
@@ -102,7 +105,7 @@ class RedUNIT_Base_Typechecking extends RedUNIT_Base
 			$redbean->store( $bean );
 
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
 		}
 
@@ -110,17 +113,17 @@ class RedUNIT_Base_Typechecking extends RedUNIT_Base
 			$redbean->check( $bean );
 
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
 		}
 
-		$bean->name = new RedBean_OODBBean;
+		$bean->name = new OODBBean;
 
 		try {
 			$redbean->check( $bean );
 
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
 		}
 
@@ -133,7 +136,7 @@ class RedUNIT_Base_Typechecking extends RedUNIT_Base
 			$redbean->store( $bean );
 
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
 		}
 
@@ -141,7 +144,7 @@ class RedUNIT_Base_Typechecking extends RedUNIT_Base
 			$redbean->check( $bean );
 
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
 		}
 
@@ -154,7 +157,7 @@ class RedUNIT_Base_Typechecking extends RedUNIT_Base
 			$redbean->store( $bean );
 
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
 		}
 
@@ -162,7 +165,7 @@ class RedUNIT_Base_Typechecking extends RedUNIT_Base
 			$redbean->check( $bean );
 
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
 		}
 	}

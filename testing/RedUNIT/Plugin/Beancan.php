@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+use \RedBeanPHP\Plugin\BeanCanResty as BeanCanResty;
+use \RedBeanPHP\Plugin\BeanCan as BeanCan;
+use \RedBeanPHP\SimpleModel as SimpleModel; 
 /**
  * RedUNIT_Plugin_Beancan
  *
@@ -53,7 +57,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		testpack( 'Test REST Lists' );
 
-		$can = new RedBean_Plugin_BeanCanResty( R::$toolbox );
+		$can = new BeanCanResty( R::$toolbox );
 
 		$can->setWhitelist( 'all' );
 
@@ -74,7 +78,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		asrt( count( $resp['result'] ), 2 );
 
-		$can = new RedBean_Plugin_BeanCanResty;
+		$can = new BeanCanResty;
 
 		$can->setWhitelist( 'all' );
 
@@ -834,7 +838,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		testpack( "Test Whitelist" );
 
-		$can = new RedBean_Plugin_BeanCan;
+		$can = new BeanCan;
 
 		$can->setWhitelist( 'all' );
 
@@ -860,7 +864,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		asrt( $rs["error"]["code"], -32600 );
 		asrt( $rs["error"]["message"], 'This bean is not available. Set whitelist to "all" or add to whitelist.' );
 
-		$can = new RedBean_Plugin_BeanCan;
+		$can = new BeanCan;
 
 		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "darkchoco", "taste" => "bitter" ) ), 1, array( 'candybar' => array( 'like' ) ) ), TRUE );
 
@@ -883,7 +887,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		asrt( $rs["error"]["code"], -32600 );
 		asrt( $rs["error"]["message"], 'This bean is not available. Set whitelist to "all" or add to whitelist.' );
 
-		$can = new RedBean_Plugin_BeanCan;
+		$can = new BeanCan;
 
 		$rs = json_decode( fakeBeanCanServerRequest( "candybar:store", array( array( "brand" => "darkchoco", "taste" => "bitter" ) ), 1, array( 'candybar' => array( 'store' ) ) ), TRUE );
 
@@ -924,7 +928,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		testpack( "invalid request" );
 
-		$can = new RedBean_Plugin_BeanCan;
+		$can = new BeanCan;
 
 		$can->setWhitelist( 'all' );
 
@@ -1136,7 +1140,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 			'id'      => '1'
 		);
 
-		$can = new RedBean_Plugin_BeanCan;
+		$can = new BeanCan;
 
 		$request = json_encode( $j );
 
@@ -1152,7 +1156,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 			'method'  => 'method'
 		);
 
-		$can = new RedBean_Plugin_BeanCan;
+		$can = new BeanCan;
 
 		$request = json_encode( $j );
 
@@ -1165,7 +1169,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 		R::nuke();
 
-		$server = new RedBean_Plugin_BeanCan();
+		$server = new BeanCan();
 
 		$book = R::dispense( 'book' );
 
@@ -1253,7 +1257,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 	}
 }
 
-class Model_Page extends RedBean_SimpleModel
+class Model_Page extends SimpleModel
 {
 	public function mail( $who = 'nobody' )
 	{
@@ -1262,16 +1266,16 @@ class Model_Page extends RedBean_SimpleModel
 
 	public function err()
 	{
-		throw new Exception( 'fake error', 123 );
+		throw new\Exception( 'fake error', 123 );
 	}
 }
 
-class Model_Setting extends RedBean_SimpleModel
+class Model_Setting extends SimpleModel
 {
 	public static $closed = FALSE;
 
 	public function open()
 	{
-		if ( self::$closed ) throw new Exception( 'closed' );
+		if ( self::$closed ) throw new\Exception( 'closed' );
 	}
 }

@@ -1,4 +1,9 @@
-<?php
+<?php 
+namespace RedBeanPHP\QueryWriter; 
+use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use \RedBeanPHP\QueryWriter as QueryWriter;
+use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
+use \RedBeanPHP\Adapter as Adapter; 
 /**
  * RedBean SQLiteWriter with support for SQLite types
  *
@@ -11,10 +16,10 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter implements RedBean_QueryWriter
+class SQLiteT extends AQueryWriter implements QueryWriter
 {
 	/**
-	 * @var RedBean_Adapter_DBAdapter
+	 * @var DBAdapter
 	 */
 
 	protected $adapter;
@@ -226,14 +231,14 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	/**
 	 * Constructor
 	 *
-	 * @param RedBean_Adapter $adapter Database Adapter
+	 * @param Adapter $adapter Database Adapter
 	 */
-	public function __construct( RedBean_Adapter $adapter )
+	public function __construct( Adapter $adapter )
 	{
 		$this->typeno_sqltype = array(
-			RedBean_QueryWriter_SQLiteT::C_DATATYPE_INTEGER => 'INTEGER',
-			RedBean_QueryWriter_SQLiteT::C_DATATYPE_NUMERIC => 'NUMERIC',
-			RedBean_QueryWriter_SQLiteT::C_DATATYPE_TEXT    => 'TEXT',
+			SQLiteT::C_DATATYPE_INTEGER => 'INTEGER',
+			SQLiteT::C_DATATYPE_NUMERIC => 'NUMERIC',
+			SQLiteT::C_DATATYPE_TEXT    => 'TEXT',
 		);
 
 		$this->sqltype_typeno = array();
@@ -257,7 +262,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::scanType
+	 * @see QueryWriter::scanType
 	 */
 	public function scanType( $value, $flagSpecial = FALSE )
 	{
@@ -282,7 +287,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::addColumn
+	 * @see QueryWriter::addColumn
 	 */
 	public function addColumn( $table, $column, $type )
 	{
@@ -294,7 +299,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::code
+	 * @see QueryWriter::code
 	 */
 	public function code( $typedescription, $includeSpecials = FALSE )
 	{
@@ -304,7 +309,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::widenColumn
+	 * @see QueryWriter::widenColumn
 	 */
 	public function widenColumn( $type, $column, $datatype )
 	{
@@ -316,7 +321,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::getTables();
+	 * @see QueryWriter::getTables();
 	 */
 	public function getTables()
 	{
@@ -325,7 +330,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::createTable
+	 * @see QueryWriter::createTable
 	 */
 	public function createTable( $table )
 	{
@@ -337,7 +342,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::getColumns
+	 * @see QueryWriter::getColumns
 	 */
 	public function getColumns( $table )
 	{
@@ -352,7 +357,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::addUniqueIndex
+	 * @see QueryWriter::addUniqueIndex
 	 */
 	public function addUniqueIndex( $type, $columns )
 	{
@@ -368,20 +373,20 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::sqlStateIn
+	 * @see QueryWriter::sqlStateIn
 	 */
 	public function sqlStateIn( $state, $list )
 	{
 		$stateMap = array(
-			'HY000' => RedBean_QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'23000' => RedBean_QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'HY000' => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			'23000' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::addIndex
+	 * @see QueryWriter::addIndex
 	 */
 	public function addIndex( $type, $name, $column )
 	{
@@ -402,7 +407,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::wipe
+	 * @see QueryWriter::wipe
 	 */
 	public function wipe( $type )
 	{
@@ -412,7 +417,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::addFK
+	 * @see QueryWriter::addFK
 	 */
 	public function addFK( $type, $targetType, $field, $targetField, $isDep = FALSE )
 	{
@@ -420,7 +425,7 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::wipeAll
+	 * @see QueryWriter::wipeAll
 	 */
 	public function wipeAll()
 	{
@@ -429,12 +434,12 @@ class RedBean_QueryWriter_SQLiteT extends RedBean_QueryWriter_AQueryWriter imple
 		foreach ( $this->getTables() as $t ) {
 			try {
 				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
-			} catch ( Exception $e ) {
+			} catch (\Exception $e ) {
 			}
 
 			try {
 				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
-			} catch ( Exception $e ) {
+			} catch (\Exception $e ) {
 			}
 		}
 

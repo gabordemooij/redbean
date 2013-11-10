@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\AssociationManager\ExtAssociationManager as ExtAssociationManager; 
 /**
  * RedUNIT_Base_Extassoc
  *
@@ -44,7 +46,7 @@ class RedUNIT_Base_Extassoc extends RedUNIT_Base
 
 		$bottom->position = "bottom";
 
-		$ea = new RedBean_AssociationManager_ExtAssociationManager( $toolbox );
+		$ea = new ExtAssociationManager( $toolbox );
 
 		$ea->extAssociate( $ad, $webpage, $top );
 

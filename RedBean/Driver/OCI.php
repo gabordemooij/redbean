@@ -1,4 +1,9 @@
-<?php
+<?php 
+namespace RedBeanPHP\Driver; 
+use \RedBeanPHP\Driver as Driver;
+use \RedBeanPHP\Logger as Logger;
+use \RedBeanPHP\RedException\SQL as SQL;
+use \RedBeanPHP\Logger\RDefault as RDefault; 
 /**
  * OCI Driver
  *
@@ -13,14 +18,14 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Driver_OCI implements RedBean_Driver
+class OCI implements Driver
 {
 	/**
 	 * @var string
 	 */
 	private $dsn;
 	/**
-	 * @var RedBean_Driver_OCI
+	 * @var OCI
 	 */
 	private static $instance;
 	/**
@@ -28,7 +33,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 */
 	private $debug = FALSE;
 	/**
-	 * @var RedBean_Logger
+	 * @var Logger
 	 */
 	protected $logger = NULL;
 	/**
@@ -89,12 +94,12 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 * @param $pass
 	 * @param $dbname
 	 *
-	 * @return RedBean_Driver_OCI
+	 * @return OCI
 	 */
 	public static function getInstance( $dsn, $user, $pass )
 	{
 		if ( is_null( self::$instance ) ) {
-			self::$instance = new RedBean_Driver_OCI( $dsn, $user, $pass );
+			self::$instance = new OCI( $dsn, $user, $pass );
 		}
 
 		return self::$instance;
@@ -104,8 +109,8 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 * Constructor. You may either specify dsn, user and password or
 	 * just give an existing OCI connection.
 	 * Examples:
-	 *    $driver = new RedBean_Driver_OCI($dsn, $user, $password);
-	 *    $driver = new RedBean_Driver_OCI($existingConnection);
+	 *    $driver = new OCI($dsn, $user, $password);
+	 *    $driver = new OCI($existingConnection);
 	 *
 	 * @param string|resource $dsn     database connection string
 	 * @param string          $user    optional
@@ -168,19 +173,19 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	}
 
 	/**
-	 * Gets RedBean_Logger object.
+	 * Gets Logger object.
 	 *
-	 * @return RedBean_Logger
+	 * @return Logger
 	 */
-	public function setLogger( RedBean_Logger $logger )
+	public function setLogger( Logger $logger )
 	{
 		$this->logger = $logger;
 	}
 
 	/**
-	 * Gets RedBean_Logger object.
+	 * Gets Logger object.
 	 *
-	 * @return RedBean_Logger
+	 * @return Logger
 	 */
 	public function getLogger()
 	{
@@ -198,11 +203,11 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	}
 
 	/**
-	 * Establishes a connection to the database using PHP PDO
+	 * Establishes a connection to the database using PHP\PDO
 	 * functionality. If a connection has already been established this
 	 * method will simply return directly. This method also turns on
-	 * UTF8 for the database and PDO-ERRMODE-EXCEPTION as well as
-	 * PDO-FETCH-ASSOC.
+	 * UTF8 for the database and\PDO-ERRMODE-EXCEPTION as well as
+	 *\PDO-FETCH-ASSOC.
 	 *
 	 * @return void
 	 */
@@ -241,7 +246,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 * is stored in protected property $affected_rows. If the debug flag is set
 	 * this function will send debugging output to screen buffer.
 	 *
-	 * @throws RedBean_Exception_SQL
+	 * @throws SQL
 	 *
 	 * @param string $sql     the SQL string to be send to database server
 	 * @param array  $aValues the values that need to get bound to the query slots
@@ -281,10 +286,10 @@ class RedBean_Driver_OCI implements RedBean_Driver
 			} else {
 				$this->rs = array();
 			}
-		} catch ( PDOException $pdoException ) {
+		} catch (\PDOException $pdoException ) {
 			// Unfortunately the code field is supposed to be int by default (php)
 			// So we need a property to convey the SQL State code.
-			$transformedException = new RedBean_Exception_SQL( $pdoException->getMessage(), 0 );
+			$transformedException = new SQL( $pdoException->getMessage(), 0 );
 			$transformedException->setSQLState( $pdoException->getCode() );
 
 			throw $transformedException;
@@ -351,7 +356,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * (non-PHPdoc)
 	 *
-	 * @see RedBean/RedBean_Driver#GetCell()
+	 * @see RedBean/Driver#GetCell()
 	 */
 	public function GetCell( $sql, $aValues = array() )
 	{
@@ -366,7 +371,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * (non-PHPdoc)
 	 *
-	 * @see RedBean/RedBean_Driver#GetRow()
+	 * @see RedBean/Driver#GetRow()
 	 */
 	public function GetRow( $sql, $aValues = array() )
 	{
@@ -378,7 +383,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * (non-PHPdoc)
 	 *
-	 * @see RedBean/RedBean_Driver#ErrorNo()
+	 * @see RedBean/Driver#ErrorNo()
 	 */
 	public function ErrorNo()
 	{
@@ -394,7 +399,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	/**
 	 * (non-PHPdoc)
 	 *
-	 * @see RedBean/RedBean_Driver#Errormsg()
+	 * @see RedBean/Driver#Errormsg()
 	 */
 	public function Errormsg()
 	{
@@ -414,7 +419,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 * @param string $sql      SQL Code to execute
 	 * @param array  $aValues  Values to bind to SQL query
 	 *
-	 * @throws RedBean_Exception_SQL
+	 * @throws SQL
 	 *
 	 * @return void
 	 */
@@ -468,7 +473,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 		if ( !$result ) {
 			$error = oci_error( $this->statement );
 
-			$x = new RedBean_Exception_SQL( $error['message'] . ':' . $error['sqltext'], 0 );
+			$x = new SQL( $error['message'] . ':' . $error['sqltext'], 0 );
 			$x->setSQLState( $this->mergeErrors( $error['code'] ) );
 			throw $x;
 		}
@@ -509,7 +514,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 
 	/**
 	 * Returns the number of rows affected by the most recent query
-	 * if the currently selected PDO driver supports this feature.
+	 * if the currently selected\PDO driver supports this feature.
 	 *
 	 * @return integer $numOfRows number of rows affected
 	 */
@@ -527,11 +532,11 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 * passes on to the screen for inspection.
 	 * This method has no return value.
 	 *
-	 * Additionally you can inject RedBean_Logger implementation
+	 * Additionally you can inject Logger implementation
 	 * where you can define your own log() method
 	 *
 	 * @param boolean        $trueFalse turn on/off
-	 * @param RedBean_Logger $logger
+	 * @param Logger $logger
 	 *
 	 * @return void
 	 */
@@ -539,14 +544,14 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	{
 		$this->connect();
 		$this->debug = (bool) $tf;
-		if ( $this->debug and !$logger ) $logger = new RedBean_Logger_Default();
+		if ( $this->debug and !$logger ) $logger = new RDefault();
 		$this->setLogger( $logger );
 	}
 
 	/**
 	 * (non-PHPdoc)
 	 *
-	 * @see RedBean/RedBean_Driver#GetRaw()
+	 * @see RedBean/Driver#GetRaw()
 	 */
 	public function GetRaw()
 	{
@@ -554,7 +559,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	}
 
 	/**
-	 * Returns TRUE if the current PDO instance is connected.
+	 * Returns TRUE if the current\PDO instance is connected.
 	 *
 	 * @return boolean $yesNO
 	 */
@@ -566,7 +571,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	}
 
 	/**
-	 * Closes database connection by destructing PDO.
+	 * Closes database connection by destructing\PDO.
 	 */
 	public function close()
 	{

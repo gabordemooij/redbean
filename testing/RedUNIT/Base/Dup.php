@@ -1,4 +1,7 @@
-<?php
+<?php 
+
+use \RedBeanPHP\DuplicationManager as DuplicationManager;
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Base_Dup
  *
@@ -121,7 +124,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$can = R::load( 'can', R::store( $can ) );
 
-		$d = new RedBean_DuplicationManager( R::$toolbox );
+		$d = new DuplicationManager( R::$toolbox );
 
 		$d->setCacheTables( TRUE );
 
@@ -156,7 +159,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		$can = R::load( 'can', R::store( $can ) );
 
-		$d = new RedBean_DuplicationManager( R::$toolbox );
+		$d = new DuplicationManager( R::$toolbox );
 
 		/**
 		 * $cache = '{"book": {
@@ -403,13 +406,13 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 		asrt( isset( $export['ownPage'][0] ), TRUE );
 
-		RedBean_OODBBean::setFlagKeyedExport( TRUE );
+		OODBBean::setFlagKeyedExport( TRUE );
 
 		$export = $book->export();
 
 		asrt( isset( $export['ownPage'][1] ), TRUE );
 
-		RedBean_OODBBean::setFlagKeyedExport( FALSE );
+		OODBBean::setFlagKeyedExport( FALSE );
 
 		$export = $book->export();
 
@@ -464,7 +467,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 								$index      = $k;
 							}
 						}
-						if ( !$foundMatch ) throw new Exception( 'failed to find match for object ' . $nestedObject->id );
+						if ( !$foundMatch ) throw new\Exception( 'failed to find match for object ' . $nestedObject->id );
 					}
 					$this->compare( $nestedObject, $array[$property][$index] );
 				}

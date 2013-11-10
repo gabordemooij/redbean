@@ -1,4 +1,7 @@
-<?php
+<?php 
+
+use \RedBeanPHP\ModelHelper as ModelHelper;
+use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_Base_Fuse
  *
@@ -42,7 +45,7 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base
 
 		$a = R::getAll( "select * from blog " );
 
-		RedBean_ModelHelper::setModelFormatter( new mymodelformatter );
+		ModelHelper::setModelFormatter( new mymodelformatter );
 
 		$w = R::dispense( "weirdo" );
 
@@ -66,7 +69,7 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base
 			R::tag( $blog, array( "smart", "interesting", "lousy!" ) );
 
 			pass();
-		} catch ( RedBean_Exception $e ) {
+		} catch ( RedException $e ) {
 			fail();
 		}
 

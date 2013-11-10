@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException\Security as Security; 
 /**
  * RedUNIT_Base_Issue303
  *
@@ -26,21 +28,21 @@ class RedUNIT_Base_Issue303 extends RedUNIT_Base
 		try {
 			R::store( R::dispense( 'invalidbean' )->setAttr( 'invalid.property', 'value' ) );
 			fail();
-		} catch (RedBean_Exception_Security $e ) {
+		} catch (Security $e ) {
 			asrt( $e->getMessage(), 'Invalid Bean property: property invalid.property' );
 		}
 
 		try {
 			R::store( R::dispense( 'invalidbean' )->setAttr( 'property', array() ) );
 			fail();
-		} catch (RedBean_Exception_Security $e ) {
+		} catch (Security $e ) {
 			asrt( $e->getMessage(), 'Invalid Bean value: property property' );
 		}
 
 		try {
 			R::store( R::dispense( 'invalidbean' )->setAttr( 'property', new stdClass ) );
 			fail();
-		} catch (RedBean_Exception_Security $e ) {
+		} catch (Security $e ) {
 			asrt( $e->getMessage(), 'Invalid Bean value: property property' );
 		}
 	}

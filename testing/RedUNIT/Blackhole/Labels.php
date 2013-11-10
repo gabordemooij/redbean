@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Blackhole_Labels
  *
@@ -30,7 +32,7 @@ class RedUNIT_Blackhole_Labels extends RedUNIT_Blackhole
 		asrt( count( $meals ), 3 );
 
 		foreach ( $meals as $m ) {
-			asrt( ( $m instanceof RedBean_OODBBean ), TRUE );
+			asrt( ( $m instanceof OODBBean ), TRUE );
 		}
 
 		$listOfMeals = implode( ',', R::gatherLabels( $meals ) );

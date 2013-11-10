@@ -1,4 +1,10 @@
-<?php
+<?php 
+namespace RedBeanPHP; 
+use \RedBeanPHP\ToolBox as ToolBox;
+use \RedBeanPHP\AssociationManager as AssociationManager;
+use \RedBeanPHP\OODB as OODB;
+use \RedBeanPHP\OODBBean as OODBBean;
+use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter; 
 /**
  * Duplication Manager
  *
@@ -11,21 +17,21 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_DuplicationManager
+class DuplicationManager
 {
 
 	/**
-	 * @var RedBean_Toolbox
+	 * @var ToolBox
 	 */
 	protected $toolbox;
 
 	/**
-	 * @var RedBean_AssociationManager
+	 * @var AssociationManager
 	 */
 	protected $associationManager;
 
 	/**
-	 * @var RedBean_OODB
+	 * @var OODB
 	 */
 	protected $redbean;
 
@@ -52,13 +58,13 @@ class RedBean_DuplicationManager
 	/**
 	 * Copies the shared beans in a bean, i.e. all the sharedBean-lists.
 	 *
-	 * @param RedBean_OODBBean $copy   target bean to copy lists to
+	 * @param OODBBean $copy   target bean to copy lists to
 	 * @param string           $shared name of the shared list
 	 * @param array            $beans  array with shared beans to copy
 	 *
 	 * @return void
 	 */
-	private function copySharedBeans( RedBean_OODBBean $copy, $shared, $beans )
+	private function copySharedBeans( OODBBean $copy, $shared, $beans )
 	{
 		$copy->$shared = array();
 
@@ -72,7 +78,7 @@ class RedBean_DuplicationManager
 	 * Each bean in the own-list belongs exclusively to its owner so
 	 * we need to invoke the duplicate method again to duplicate each bean here.
 	 *
-	 * @param RedBean_OODBBean $copy        target bean to copy lists to
+	 * @param OODBBean $copy        target bean to copy lists to
 	 * @param string           $owned       name of the own list
 	 * @param array            $beans       array with shared beans to copy
 	 * @param array            $trail       array with former beans to detect recursion
@@ -80,7 +86,7 @@ class RedBean_DuplicationManager
 	 *
 	 * @return void
 	 */
-	private function copyOwnBeans( RedBean_OODBBean $copy, $owned, $beans, $trail, $preserveIDs )
+	private function copyOwnBeans( OODBBean $copy, $owned, $beans, $trail, $preserveIDs )
 	{
 		$copy->$owned = array();
 		foreach ( $beans as $subBean ) {
@@ -93,11 +99,11 @@ class RedBean_DuplicationManager
 	 * and the parents beans to the newly created bean. Also sets the ID of the bean
 	 * to 0.
 	 *
-	 * @param RedBean_OODBBean $bean bean to copy
+	 * @param OODBBean $bean bean to copy
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
-	private function createCopy( RedBean_OODBBean $bean )
+	private function createCopy( OODBBean $bean )
 	{
 		$type = $bean->getMeta( 'type' );
 
@@ -115,11 +121,11 @@ class RedBean_DuplicationManager
 	 * Returns TRUE if the bean occurs in the trail and FALSE otherwise.
 	 *
 	 * @param array            $trail list of former beans
-	 * @param RedBean_OODBBean $bean  currently selected bean
+	 * @param OODBBean $bean  currently selected bean
 	 *
 	 * @return boolean
 	 */
-	private function inTrailOrAdd( &$trail, RedBean_OODBBean $bean )
+	private function inTrailOrAdd( &$trail, OODBBean $bean )
 	{
 		$type = $bean->getMeta( 'type' );
 		$key  = $type . $bean->getID();
@@ -176,19 +182,19 @@ class RedBean_DuplicationManager
 	 */
 	protected function hasSharedList( $type, $target )
 	{
-		return in_array( RedBean_QueryWriter_AQueryWriter::getAssocTableFormat( array( $type, $target ) ), $this->tables );
+		return in_array( AQueryWriter::getAssocTableFormat( array( $type, $target ) ), $this->tables );
 	}
 
 	/**
-	 * @see RedBean_DuplicationManager::dup
+	 * @see DuplicationManager::dup
 	 *
-	 * @param RedBean_OODBBean $bean          bean to be copied
+	 * @param OODBBean $bean          bean to be copied
 	 * @param array            $trail         trail to prevent infinite loops
 	 * @param boolean          $preserveIDs   preserve IDs
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
-	protected function duplicate( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = FALSE )
+	protected function duplicate( OODBBean $bean, $trail = array(), $preserveIDs = FALSE )
 	{
 		if ( $this->inTrailOrAdd( $trail, $bean ) ) return $bean;
 
@@ -228,9 +234,9 @@ class RedBean_DuplicationManager
 	 * Constructor,
 	 * creates a new instance of DupManager.
 	 *
-	 * @param RedBean_Toolbox $toolbox
+	 * @param ToolBox $toolbox
 	 */
-	public function __construct( RedBean_Toolbox $toolbox )
+	public function __construct( ToolBox $toolbox )
 	{
 		$this->toolbox            = $toolbox;
 		$this->redbean            = $toolbox->getRedBean();
@@ -320,13 +326,13 @@ class RedBean_DuplicationManager
 	 * duplicate() that does all the work. This method takes care of creating a clone
 	 * of the bean to avoid the bean getting tainted (triggering saving when storing it).
 	 *
-	 * @param RedBean_OODBBean $bean          bean to be copied
+	 * @param OODBBean $bean          bean to be copied
 	 * @param array            $trail         for internal usage, pass array()
 	 * @param boolean          $preserveIDs   for internal usage
 	 *
-	 * @return RedBean_OODBBean
+	 * @return OODBBean
 	 */
-	public function dup( RedBean_OODBBean $bean, $trail = array(), $preserveIDs = FALSE )
+	public function dup( OODBBean $bean, $trail = array(), $preserveIDs = FALSE )
 	{
 		if ( !count( $this->tables ) ) {
 			$this->tables = $this->toolbox->getWriter()->getTables();
@@ -356,7 +362,7 @@ class RedBean_DuplicationManager
 	 * - all own bean lists (recursively)
 	 * - all shared beans (not THEIR own lists)
 	 *
-	 * @param   array|RedBean_OODBBean  $beans   beans to be exported
+	 * @param   array|OODBBean  $beans   beans to be exported
 	 * @param   boolean                 $parents also export parents
 	 * @param   array                   $filters only these types (whitelist)
 	 *

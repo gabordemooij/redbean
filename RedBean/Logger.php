@@ -1,4 +1,5 @@
-<?php
+<?php 
+namespace RedBeanPHP;  
 /**
  * RedBean Logging interface.
  * Provides a uniform and convenient logging
@@ -13,11 +14,11 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-interface RedBean_Logger
+interface Logger
 {
 
 	/**
-	 * A logger (for PDO or OCI driver) needs to implement the log method.
+	 * A logger (for\PDO or OCI driver) needs to implement the log method.
 	 * The log method will receive logging data. Note that the number of parameters is 0, this means
 	 * all parameters are optional and the number may vary. This way the logger can be used in a very
 	 * flexible way. Sometimes the logger is used to log a simple error message and in other

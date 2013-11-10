@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\Facade as Facade;
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Base_Dispense
  *
@@ -43,7 +47,7 @@ class RedUNIT_Base_Dispense extends RedUNIT_Base
 				$redbean->dispense( $value );
 
 				fail();
-			} catch ( RedBean_Exception_Security $e ) {
+			} catch ( Security $e ) {
 				pass();
 			}
 		}
@@ -69,17 +73,17 @@ class RedUNIT_Base_Dispense extends RedUNIT_Base
 	 */
 	public function testDispenseAll() 
 	{
-		list( $book, $page ) = RedBean_Facade::dispenseAll( 'book,page' );
-		asrt( ( $book instanceof RedBean_OODBBean ), true );
-		asrt( ( $page instanceof RedBean_OODBBean ), true );
+		list( $book, $page ) = Facade::dispenseAll( 'book,page' );
+		asrt( ( $book instanceof OODBBean ), true );
+		asrt( ( $page instanceof OODBBean ), true );
 		asrt( $book->getMeta( 'type' ), 'book');
 		asrt( $page->getMeta( 'type' ), 'page');
 
 		list( $book, $page, $texts, $mark ) = R::dispenseAll( 'book,page,text*2,mark' );		
-		asrt( ( $book instanceof RedBean_OODBBean ), true );
-		asrt( ( $page instanceof RedBean_OODBBean ), true );
+		asrt( ( $book instanceof OODBBean ), true );
+		asrt( ( $page instanceof OODBBean ), true );
 		asrt( is_array( $texts ), true );
-		asrt( ( $mark instanceof RedBean_OODBBean ), true );
+		asrt( ( $mark instanceof OODBBean ), true );
 		asrt( $book->getMeta( 'type'), 'book' );
 		asrt( $page->getMeta( 'type'), 'page' );
 		asrt( $mark->getMeta( 'type'), 'mark' );
@@ -88,7 +92,7 @@ class RedUNIT_Base_Dispense extends RedUNIT_Base
 
 		list( $eggs, $milk, $butter ) = R::dispenseAll( 'eggs*3,milk*1,butter*9' );
 		asrt( count( $eggs ), 3 );
-		asrt( ( $milk instanceof RedBean_OODBBean ), true );
+		asrt( ( $milk instanceof OODBBean ), true );
 		asrt( count( $butter ), 9 );
 
 		list( $beer ) = R::dispenseAll( 'beer*0' );

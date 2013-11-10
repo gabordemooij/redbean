@@ -1,4 +1,8 @@
-<?php
+<?php 
+
+use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\OODBBean as OODBBean;
+use \RedBeanPHP\Plugin\QueryLogger as QueryLogger; 
 /**
  * RedUNIT_Base_Relations
  *
@@ -230,7 +234,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		try {
 			R::relatedCount( array(), 'page' );
 			fail();
-		} catch ( RedBean_Exception_Security $e ) {
+		} catch ( Security $e ) {
 			pass();
 		}
 
@@ -809,7 +813,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 			try {
 				$page1->book = $value;
 				fail();
-			} catch ( RedBean_Exception_Security $e ) {
+			} catch ( Security $e ) {
 				pass();
 			}
 		}
@@ -928,7 +932,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		// Get books for topic
 		asrt( count( R::related( $topic3, 'book' ) ), 2 );
-		asrt( ( R::relatedOne( $topic3, 'book' ) instanceof RedBean_OODBBean ), TRUE );
+		asrt( ( R::relatedOne( $topic3, 'book' ) instanceof OODBBean ), TRUE );
 
 		$items = R::related( $topic3, 'book' );
 
@@ -975,7 +979,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 
 		$justACover = $book3->fetchAs( 'page' )->cover;
 
-		asrt( ( $book3->cover instanceof RedBean_OODBBean ), TRUE );
+		asrt( ( $book3->cover instanceof OODBBean ), TRUE );
 		asrt( $justACover->title, 'cover1' );
 
 		// No page property
@@ -1088,7 +1092,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( count( $book3->sharedTopic ), 1 );
 
 		// Test performance
-		$logger = RedBean_Plugin_QueryLogger::getInstanceAndAttach( R::$adapter );
+		$logger = QueryLogger::getInstanceAndAttach( R::$adapter );
 
 		$book = R::load( 'book', 1 );
 
@@ -1496,7 +1500,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		try {
 			R::store( $book );
 			fail();
-		} catch( RedBean_Exception_Security $exception) {
+		} catch( Security $exception) {
 			pass();
 		}
 		

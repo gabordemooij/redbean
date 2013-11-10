@@ -1,4 +1,8 @@
-<?php
+<?php 
+namespace RedBeanPHP\Adapter; 
+use \RedBeanPHP\Observable as Observable;
+use \RedBeanPHP\Adapter as Adapter;
+use \RedBeanPHP\Driver as Driver; 
 /**
  * DBAdapter (Database Adapter)
  *
@@ -13,11 +17,11 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Adapter
+class DBAdapter extends Observable implements Adapter
 {
 
 	/**
-	 * @var RedBean_Driver
+	 * @var Driver
 	 */
 	private $db = NULL;
 
@@ -33,7 +37,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	 * This class provides an interface for RedBean to work
 	 * with ADO compatible DB instances.
 	 *
-	 * @param RedBean_Driver $database ADO Compatible DB Instance
+	 * @param Driver $database ADO Compatible DB Instance
 	 */
 	public function __construct( $database )
 	{
@@ -41,7 +45,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::getSQL
+	 * @see Adapter::getSQL
 	 */
 	public function getSQL()
 	{
@@ -49,7 +53,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::exec
+	 * @see Adapter::exec
 	 */
 	public function exec( $sql, $bindings = array(), $noevent = FALSE )
 	{
@@ -62,7 +66,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::get
+	 * @see Adapter::get
 	 */
 	public function get( $sql, $bindings = array() )
 	{
@@ -73,7 +77,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::getRow
+	 * @see Adapter::getRow
 	 */
 	public function getRow( $sql, $bindings = array() )
 	{
@@ -84,7 +88,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::getCol
+	 * @see Adapter::getCol
 	 */
 	public function getCol( $sql, $bindings = array() )
 	{
@@ -95,7 +99,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::getAssoc
+	 * @see Adapter::getAssoc
 	 */
 	public function getAssoc( $sql, $bindings = array() )
 	{
@@ -128,7 +132,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::getCell
+	 * @see Adapter::getCell
 	 */
 	public function getCell( $sql, $bindings = array(), $noSignal = NULL )
 	{
@@ -146,7 +150,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::getInsertID
+	 * @see Adapter::getInsertID
 	 */
 	public function getInsertID()
 	{
@@ -154,7 +158,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::getAffectedRows
+	 * @see Adapter::getAffectedRows
 	 */
 	public function getAffectedRows()
 	{
@@ -162,7 +166,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::getDatabase
+	 * @see Adapter::getDatabase
 	 */
 	public function getDatabase()
 	{
@@ -170,7 +174,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::startTransaction
+	 * @see Adapter::startTransaction
 	 */
 	public function startTransaction()
 	{
@@ -178,7 +182,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::commit
+	 * @see Adapter::commit
 	 */
 	public function commit()
 	{
@@ -186,7 +190,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::rollback
+	 * @see Adapter::rollback
 	 */
 	public function rollback()
 	{
@@ -194,7 +198,7 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 	}
 
 	/**
-	 * @see RedBean_Adapter::close.
+	 * @see Adapter::close.
 	 */
 	public function close()
 	{

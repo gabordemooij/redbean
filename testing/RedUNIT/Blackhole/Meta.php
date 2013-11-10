@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Blackhole_Meta
  *
@@ -22,7 +24,7 @@ class RedUNIT_Blackhole_Meta extends RedUNIT_Blackhole
 	{
 		testpack( 'Test meta data' );
 
-		$bean = new RedBean_OODBBean;
+		$bean = new OODBBean;
 
 		$bean->setMeta( "this.is.a.custom.metaproperty", "yes" );
 
@@ -45,11 +47,11 @@ class RedUNIT_Blackhole_Meta extends RedUNIT_Blackhole
 		asrt( $bean->getMeta( "test.two" ), "second" );
 
 		// Copy Metadata
-		$bean = new RedBean_OODBBean;
+		$bean = new OODBBean;
 
 		$bean->setMeta( "meta.meta", "123" );
 
-		$bean2 = new RedBean_OODBBean;
+		$bean2 = new OODBBean;
 
 		asrt( $bean2->getMeta( "meta.meta" ), NULL );
 

@@ -1,4 +1,7 @@
-<?php
+<?php 
+namespace RedBeanPHP; 
+use \RedBeanPHP\ToolBox as ToolBox;
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * Label Maker
  *
@@ -11,20 +14,20 @@
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedBean_LabelMaker
+class LabelMaker
 {
 
 	/**
-	 * @var RedBean_Toolbox
+	 * @var ToolBox
 	 */
 	protected $toolbox;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param RedBean_ToolBox $toolbox
+	 * @param ToolBox $toolbox
 	 */
-	public function __construct( RedBean_ToolBox $toolbox )
+	public function __construct( ToolBox $toolbox )
 	{
 		$this->toolbox = $toolbox;
 	}
@@ -80,7 +83,7 @@ class RedBean_LabelMaker
 	 * 
 	 * @param string $enum ENUM specification for label
 	 * 
-	 * @return array|RedBean_OODBBean
+	 * @return array|OODBBean
 	 */
 	public function enum( $enum )
 	{

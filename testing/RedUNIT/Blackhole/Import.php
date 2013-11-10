@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Blackhole_Import
  *
@@ -57,7 +59,7 @@ class RedUNIT_Blackhole_Import extends RedUNIT_Blackhole
 
 		testpack( 'Test basic import() feature.' );
 
-		$bean = new RedBean_OODBBean;
+		$bean = new OODBBean;
 
 		$bean->import( array( "a" => 1, "b" => 2 ) );
 
