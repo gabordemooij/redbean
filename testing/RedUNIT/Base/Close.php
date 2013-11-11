@@ -45,21 +45,6 @@ class RedUNIT_Base_Close extends RedUNIT_Base
 
 		asrt( $toolbox->getRedBean()->isFrozen(), TRUE );
 
-		// Test Oracle setup
-		$toolbox = Setup::kickstart( 'oracle:test-value', 'test', 'test', FALSE );
-
-		asrt( ( $toolbox instanceof ToolBox ), TRUE );
-	}
-}
-
-if ( !class_exists( 'OCI' ) ) {
-	class OCI
-	{
-	}
-}
-if ( !class_exists( 'Oracle' ) ) {
-	class Oracle extends SQLiteT
-	{
 	}
 }
 

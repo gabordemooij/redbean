@@ -314,6 +314,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 	 */
 	public function testCombinedAndMultiple()
 	{
+		R::nuke();
 		$books = R::dispense( 'book', 3 );
 
 		$i = 0;
