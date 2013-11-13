@@ -14,8 +14,6 @@ spl_autoload_register(function($className)
 
 	 $path = 'phar://rb.phar/'.$fileName;
 	 
-	 echo ">>>>>>>>>>>LOAD: $path";
-	 
     if (file_exists($path)) {
 		 require $path;
 	 }

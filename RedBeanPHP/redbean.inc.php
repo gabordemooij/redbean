@@ -38,9 +38,9 @@ $dir = dirname( __FILE__ ) . '/';
 
 //Load Database drivers
 require( $dir . 'Logger.php' );
-require( $dir . 'Logger/Default.php' );
+require( $dir . 'Logger/RDefault.php' );
 require( $dir . 'Driver.php' );
-require( $dir . 'Driver/PDO.php' );
+require( $dir . 'Driver/RPDO.php' );
 
 //Load Infrastructure
 require( $dir . 'OODBBean.php' );
@@ -60,9 +60,9 @@ require( $dir . 'QueryWriter/PostgreSQL.php' );
 require( $dir . 'QueryWriter/CUBRID.php' );
 
 //Load required Exceptions
-require( $dir . 'Exception.php' );
-require( $dir . 'Exception/SQL.php' );
-require( $dir . 'Exception/Security.php' );
+require( $dir . 'RException.php' );
+require( $dir . 'RException/SQL.php' );
+require( $dir . 'RException/Security.php' );
 
 //Load Core functionality
 require( $dir . 'OODB.php' );
@@ -76,7 +76,7 @@ require( $dir . 'AssociationManager/ExtAssociationManager.php' );
 require( $dir . 'Setup.php' );
 
 require( $dir . 'BeanHelper.php' );
-require( $dir . 'BeanHelper/Facade.php' );
+require( $dir . 'BeanHelper/FacadeBeanHelper.php' );
 
 /* Developer Comfort */
 

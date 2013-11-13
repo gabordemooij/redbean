@@ -3,7 +3,7 @@
 echo "\n\nRunning without coverage....";
 
 // Same as main but without coverage
-require_once "../../RedBean/redbean.inc.php";
+require_once "../../RedBeanPHP/redbean.inc.php";
 
 require "../RedUNIT.php";
 require "../helpers/selector.php";
