@@ -18,3 +18,8 @@ spl_autoload_register(function($className)
 		 require $path;
 	 }
 });
+
+//Allow users to mount the plugin folder.
+if ( defined( 'REDBEANPHP_EXTRA' ) ) {
+    Phar::mount( 'RedBeanPHP/Extra', REDBEANPHP_EXTRA );
+} 
