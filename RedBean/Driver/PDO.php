@@ -58,11 +58,13 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 * @var bool
 	 */
 	protected $flagUseStringOnlyBinding = FALSE;
-	
+
 	/**
-	 * @var string 
+	 * @var string
 	 */
 	protected $mysqlEncoding = '';
+
+    protected $set_encoding = true;
 
 	/**
 	 * Binds parameters. This method binds parameters to a PDOStatement for
@@ -161,25 +163,27 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 * seem to have added it with version 5.5 under a different label: utf8mb4.
 	 * We try to select the best possible charset based on your version data.
 	 */
-	protected function setEncoding() 
-	{
-		$driver = $this->pdo->getAttribute( PDO::ATTR_DRIVER_NAME );
-		$version = floatval( $this->pdo->getAttribute( PDO::ATTR_SERVER_VERSION ) );
+    protected function setEncoding() {
+        $driver  = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $version = floatval($this->pdo->getAttribute(PDO::ATTR_SERVER_VERSION));
 
-		if ($driver === 'mysql') {
-			$encoding = ($version >= 5.5) ? 'utf8mb4' : 'utf8';
-			$this->pdo->setAttribute( PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '.$encoding ); //on every re-connect
-			$this->pdo->exec(' SET NAMES '. $encoding); //also for current connection
-			$this->mysqlEncoding = $encoding;
-		}
-	}
+        if ($driver === 'mysql') {
+
+            $encoding = ($version >= 5.5) ? 'utf8mb4' : 'utf8';
+
+            $this->pdo->setAttribute(PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '.$encoding); //on every re-connect
+            $this->pdo->exec(' SET NAMES '.$encoding); //also for current connection
+
+            $this->mysqlEncoding = $encoding;
+        }
+    }
 
 	/**
 	 * Returns the best possible encoding for MySQL based on version data.
-	 * 
+	 *
 	 * @return string
 	 */
-	public function getMysqlEncoding() 
+	public function getMysqlEncoding()
 	{
 		return $this->mysqlEncoding;
 	}
@@ -196,14 +200,19 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 * @param string     $pass   optional, password for connection login
 	 *
 	 */
-	public function __construct( $dsn, $user = NULL, $pass = NULL )
+	public function __construct( $dsn, $user = NULL, $pass = NULL, $set_encoding = true )
 	{
+
+        $this->set_encoding = $set_encoding;
+
 		if ( $dsn instanceof PDO ) {
 			$this->pdo = $dsn;
 
 			$this->isConnected = TRUE;
 
-			$this->setEncoding();
+            if ($this->set_encoding === true)
+                $this->setEncoding();
+
 			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			$this->pdo->setAttribute( PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC );
 
@@ -214,6 +223,8 @@ class RedBean_Driver_PDO implements RedBean_Driver
 
 			$this->connectInfo = array( 'pass' => $pass, 'user' => $user );
 		}
+
+
 	}
 
 	/**
@@ -246,16 +257,18 @@ class RedBean_Driver_PDO implements RedBean_Driver
 			$user = $this->connectInfo['user'];
 			$pass = $this->connectInfo['pass'];
 
-			$this->pdo = new PDO(
-				$this->dsn,
-				$user,
-				$pass,
-				array(PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-					   PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-				)
-			);
-			
-			$this->setEncoding();
+            $this->pdo = new PDO(
+                $this->dsn,
+                $user,
+                $pass,
+                array(PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                )
+            );
+
+            if ($this->set_encoding === true)
+			    $this->setEncoding();
+
 			$this->pdo->setAttribute( PDO::ATTR_STRINGIFY_FETCHES, TRUE );
 
 			$this->isConnected = TRUE;
