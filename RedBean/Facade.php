@@ -313,9 +313,9 @@ class RedBean_Facade
 	 *
 	 * @return void
 	 */
-	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE, $set_encoding = true )
+	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE, $autoSetEncoding = TRUE )
 	{
-		self::$toolboxes[$key] = RedBean_Setup::kickstart( $dsn, $user, $pass, $frozen, (bool) $set_encoding );
+		self::$toolboxes[$key] = RedBean_Setup::kickstart( $dsn, $user, $pass, $frozen, $autoSetEncoding );
 	}
 
 	/**

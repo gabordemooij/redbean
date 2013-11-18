@@ -64,7 +64,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 */
 	protected $mysqlEncoding = '';
 
-    protected $set_encoding = true;
+    protected $autoSetEncoding = TRUE;
 
 	/**
 	 * Binds parameters. This method binds parameters to a PDOStatement for
@@ -157,26 +157,28 @@ class RedBean_Driver_PDO implements RedBean_Driver
 		}
 	}
 
-	/**
-	 * Try to fix MySQL character encoding problems.
-	 * MySQL < 5.5 does not support proper 4 byte unicode but they
-	 * seem to have added it with version 5.5 under a different label: utf8mb4.
-	 * We try to select the best possible charset based on your version data.
-	 */
-    protected function setEncoding() {
-        $driver  = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-        $version = floatval($this->pdo->getAttribute(PDO::ATTR_SERVER_VERSION));
+    /**
+   	 * Try to fix MySQL character encoding problems.
+   	 * MySQL < 5.5 does not support proper 4 byte unicode but they
+   	 * seem to have added it with version 5.5 under a different label: utf8mb4.
+   	 * We try to select the best possible charset based on your version data.
+   	 */
+   	protected function setEncoding()
+   	{
+   		$driver = $this->pdo->getAttribute( PDO::ATTR_DRIVER_NAME );
+   		$version = floatval( $this->pdo->getAttribute( PDO::ATTR_SERVER_VERSION ) );
 
-        if ($driver === 'mysql') {
+   		if ($driver === 'mysql') {
+   			$encoding = ($version >= 5.5) ? 'utf8mb4' : 'utf8';
+   			$this->pdo->setAttribute( PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '.$encoding ); //on every re-connect
+   			$this->pdo->exec(' SET NAMES '. $encoding); //also for current connection
+   			$this->mysqlEncoding = $encoding;
+   		}
+   	}
 
-            $encoding = ($version >= 5.5) ? 'utf8mb4' : 'utf8';
 
-            $this->pdo->setAttribute(PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '.$encoding); //on every re-connect
-            $this->pdo->exec(' SET NAMES '.$encoding); //also for current connection
 
-            $this->mysqlEncoding = $encoding;
-        }
-    }
+
 
 	/**
 	 * Returns the best possible encoding for MySQL based on version data.
@@ -200,17 +202,17 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 * @param string     $pass   optional, password for connection login
 	 *
 	 */
-	public function __construct( $dsn, $user = NULL, $pass = NULL, $set_encoding = true )
+	public function __construct( $dsn, $user = NULL, $pass = NULL, $autoSetEncoding = TRUE )
 	{
 
-        $this->set_encoding = $set_encoding;
+        $this->autoSetEncoding = $autoSetEncoding;
 
 		if ( $dsn instanceof PDO ) {
 			$this->pdo = $dsn;
 
 			$this->isConnected = TRUE;
 
-            if ($this->set_encoding === true)
+            if ($this->autoSetEncoding !== FALSE)
                 $this->setEncoding();
 
 			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -250,36 +252,36 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 *
 	 * @return void
 	 */
-	public function connect()
-	{
-		if ( $this->isConnected ) return;
-		try {
-			$user = $this->connectInfo['user'];
-			$pass = $this->connectInfo['pass'];
+    public function connect()
+   	{
+   		if ( $this->isConnected ) return;
+   		try {
+   			$user = $this->connectInfo['user'];
+   			$pass = $this->connectInfo['pass'];
 
-            $this->pdo = new PDO(
-                $this->dsn,
-                $user,
-                $pass,
-                array(PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                )
-            );
+   			$this->pdo = new PDO(
+   				$this->dsn,
+   				$user,
+   				$pass,
+   				array(PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+   					   PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+   				)
+   			);
 
-            if ($this->set_encoding === true)
+            if ($this->autoSetEncoding !== FALSE)
 			    $this->setEncoding();
 
-			$this->pdo->setAttribute( PDO::ATTR_STRINGIFY_FETCHES, TRUE );
+   			$this->pdo->setAttribute( PDO::ATTR_STRINGIFY_FETCHES, TRUE );
 
-			$this->isConnected = TRUE;
-		} catch ( PDOException $exception ) {
-			$matches = array();
+   			$this->isConnected = TRUE;
+   		} catch ( PDOException $exception ) {
+   			$matches = array();
 
-			$dbname  = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
+   			$dbname  = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
 
-			throw new PDOException( 'Could not connect to database (' . $dbname . ').', $exception->getCode() );
-		}
-	}
+   			throw new PDOException( 'Could not connect to database (' . $dbname . ').', $exception->getCode() );
+   		}
+   	}
 
 	/**
 	 * @see RedBean_Driver::GetAll

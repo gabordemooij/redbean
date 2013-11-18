@@ -49,7 +49,7 @@ class RedBean_Setup
 	 *
 	 * @return RedBean_ToolBox
 	 */
-	public static function kickstart( $dsn, $username = NULL, $password = NULL, $frozen = FALSE, $set_encoding = true )
+	public static function kickstart( $dsn, $username = NULL, $password = NULL, $frozen = FALSE, $autoSetEncoding = TRUE )
 	{
 		if ( $dsn instanceof PDO ) {
 			$db  = new RedBean_Driver_PDO( $dsn );
@@ -60,7 +60,7 @@ class RedBean_Setup
 			if ( strpos( $dsn, 'oracle' ) === 0 ) {
 				$db = new RedBean_Driver_OCI( $dsn, $username, $password);
 			} else {
-				$db = new RedBean_Driver_PDO( $dsn, $username, $password, (bool) $set_encoding );
+				$db = new RedBean_Driver_PDO( $dsn, $username, $password, $autoSetEncoding );
 			}
 		}
 
