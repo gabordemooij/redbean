@@ -64,7 +64,10 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	 */
 	protected $mysqlEncoding = '';
 
-    protected $autoSetEncoding = TRUE;
+	/**
+	 * @var boolean
+	 */
+	protected $autoSetEncoding = TRUE;
 
 	/**
 	 * Binds parameters. This method binds parameters to a PDOStatement for
@@ -157,34 +160,30 @@ class RedBean_Driver_PDO implements RedBean_Driver
 		}
 	}
 
-    /**
-   	 * Try to fix MySQL character encoding problems.
-   	 * MySQL < 5.5 does not support proper 4 byte unicode but they
-   	 * seem to have added it with version 5.5 under a different label: utf8mb4.
-   	 * We try to select the best possible charset based on your version data.
-   	 */
-   	protected function setEncoding()
-   	{
-   		$driver = $this->pdo->getAttribute( PDO::ATTR_DRIVER_NAME );
-   		$version = floatval( $this->pdo->getAttribute( PDO::ATTR_SERVER_VERSION ) );
+	/**
+	* Try to fix MySQL character encoding problems.
+	* MySQL < 5.5 does not support proper 4 byte unicode but they
+	* seem to have added it with version 5.5 under a different label: utf8mb4.
+	* We try to select the best possible charset based on your version data.
+	*/
+	protected function setEncoding()
+	{
+		$driver = $this->pdo->getAttribute( PDO::ATTR_DRIVER_NAME );
+		$version = floatval( $this->pdo->getAttribute( PDO::ATTR_SERVER_VERSION ) );
 
-   		if ($driver === 'mysql') {
-   			$encoding = ($version >= 5.5) ? 'utf8mb4' : 'utf8';
-   			$this->pdo->setAttribute( PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '.$encoding ); //on every re-connect
-   			$this->pdo->exec(' SET NAMES '. $encoding); //also for current connection
-   			$this->mysqlEncoding = $encoding;
-   		}
-   	}
-
-
-
-
+		if ( $driver === 'mysql' ) {
+			$encoding = ($version >= 5.5) ? 'utf8mb4' : 'utf8';
+			$this->pdo->setAttribute( PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '.$encoding ); //on every re-connect
+			$this->pdo->exec(' SET NAMES '. $encoding); //also for current connection
+			$this->mysqlEncoding = $encoding;
+		}
+	}
 
 	/**
-	 * Returns the best possible encoding for MySQL based on version data.
-	 *
-	 * @return string
-	 */
+	* Returns the best possible encoding for MySQL based on version data.
+	*
+	* @return string
+	*/
 	public function getMysqlEncoding()
 	{
 		return $this->mysqlEncoding;
@@ -212,8 +211,9 @@ class RedBean_Driver_PDO implements RedBean_Driver
 
 			$this->isConnected = TRUE;
 
-            if ($this->autoSetEncoding !== FALSE)
-                $this->setEncoding();
+			if ( $this->autoSetEncoding !== FALSE ) {
+				$this->setEncoding();
+			}
 
 			$this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			$this->pdo->setAttribute( PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC );
