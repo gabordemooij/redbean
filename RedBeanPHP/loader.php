@@ -23,3 +23,8 @@ spl_autoload_register(function($className)
 if ( defined( 'REDBEANPHP_EXTRA' ) ) {
     Phar::mount( 'RedBeanPHP/Extra', REDBEANPHP_EXTRA );
 } 
+
+//make some classes available for backward compatibility
+class RedBean_SimpleModel extends \RedBeanPHP\SimpleModel {};
+class RedBean_DependencyInjector extends \RedBeanPHP\DependencyInjector{};
+
