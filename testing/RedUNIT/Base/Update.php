@@ -13,6 +13,79 @@
  */
 class RedUNIT_Base_Update extends RedUNIT_Base
 {
+	/**
+	 * Tests whether we can update or unset a parent bean
+	 * with an alias without having to use fetchAs and
+	 * without loading the aliased bean causing table-not-found
+	 * errors.
+	 */
+	public function testUpdatingParentBeansWithAliases()
+	{
+		testpack( 'Test updating parent beans with aliases' );
+		R::nuke();
+
+		$trans  = R::dispense( 'transaction' );
+		$seller = R::dispense( 'user' );
+		
+		$trans->seller = $seller;
+
+		$id = R::store( $trans );
+
+		R::freeze( true );
+
+		$trans = R::load( 'transaction', $id );
+
+		//should not try to load seller, should not require fetchAs().
+		try {
+			$trans->seller = R::dispense( 'user' );
+			pass();
+		} catch( Exception $e ) {
+			fail();
+		}
+	
+		$trans = R::load( 'transaction', $id );
+		
+		//same for unset...
+		try {
+			unset( $trans->seller );
+			pass();
+		} catch ( Exception $e ) {
+			fail();
+		}
+
+		R::freeze( false );
+
+		$account = R::dispense( 'user' );
+
+		asrt( count( $account->alias( 'seller' )->ownTransaction ), 0 );
+
+		$account->alias( 'seller' )->ownTransaction = R::dispense( 'transaction', 10 );
+		$account->alias( 'boo' ); //try to trick me...
+
+		$id = R::store( $account );
+		
+		R::freeze( true );
+		
+		$account = R::load( 'user', $id );
+		asrt( count( $account->alias( 'seller' )->ownTransaction ), 10 );
+		
+		//you cannot unset a list
+		unset( $account->alias( 'seller' )->ownTransaction );
+		$id = R::store( $account );
+		
+		$account = R::load( 'user', $id );
+		asrt( count( $account->alias( 'seller' )->ownTransaction ), 10 );
+	
+		
+		$account->alias( 'seller' )->ownTransaction = array();
+		
+		$id = R::store( $account );
+		$account = R::load( 'user', $id );
+		asrt(count($account->alias( 'seller' )->ownTransaction), 0 );
+		asrt(count($account->ownTransaction), 0 );
+		
+		R::freeze( false );
+	}
 	
 	/**
 	 * All kinds of tests for basic CRUD.
