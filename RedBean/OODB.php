@@ -798,7 +798,7 @@ class RedBean_OODB extends RedBean_Observable
 	 *
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean to store
 	 *
-	 * @return integer|string
+	 * @return integer|string|false The ID or false if the operation has been cancelled
 	 *
 	 * @throws RedBean_Exception_Security
 	 */
@@ -818,6 +818,8 @@ class RedBean_OODB extends RedBean_Observable
                             $this->storeBean( $bean );
                     }
                     $this->signal( 'after_update', $bean );
+                }else{
+                    return false;
                 }
 
 		return ( (string) $bean->id === (string) (int) $bean->id ) ? (int) $bean->id : (string) $bean->id;
@@ -889,7 +891,7 @@ class RedBean_OODB extends RedBean_Observable
 	 *
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean you want to remove from database
 	 *
-	 * @return boolean
+	 * @return boolean true if the operation has been completed, false if cancelled
 	 *
 	 * @throws RedBean_Exception_Security
 	 */
