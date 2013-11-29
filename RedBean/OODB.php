@@ -809,14 +809,16 @@ class RedBean_OODB extends RedBean_Observable
 		if ( !$processLists && !$bean->getMeta( 'tainted' ) ) {
 			return $bean->getID(); //bail out!
 		}
-		$this->signal( 'update', $bean );
-		$processLists = $this->hasListsOrObjects( $bean ); //check again, might have changed by model!
-		if ( $processLists ) {
-			$this->processLists( $bean );
-		} else {
-			$this->storeBean( $bean );
-		}
-		$this->signal( 'after_update', $bean );
+		$continue = $this->signal( 'update', $bean );
+                if($continue !== false){
+                    $processLists = $this->hasListsOrObjects( $bean ); //check again, might have changed by model!
+                    if ( $processLists ) {
+                            $this->processLists( $bean );
+                    } else {
+                            $this->storeBean( $bean );
+                    }
+                    $this->signal( 'after_update', $bean );
+                }
 
 		return ( (string) $bean->id === (string) (int) $bean->id ) ? (int) $bean->id : (string) $bean->id;
 	}
@@ -887,7 +889,7 @@ class RedBean_OODB extends RedBean_Observable
 	 *
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean you want to remove from database
 	 *
-	 * @return void
+	 * @return boolean
 	 *
 	 * @throws RedBean_Exception_Security
 	 */
@@ -899,29 +901,34 @@ class RedBean_OODB extends RedBean_Observable
 		if ( !( $bean instanceof RedBean_OODBBean ) ) {
 			throw new RedBean_Exception_Security( 'OODB Store requires a bean, got: ' . gettype( $bean ) );
 		}
-		$this->signal( 'delete', $bean );
-		foreach ( $bean as $property => $value ) {
-			if ( $value instanceof RedBean_OODBBean ) {
-				$bean->removeProperty( $property );
-			}
-			if ( is_array( $value ) ) {
-				if ( strpos( $property, 'own' ) === 0 ) {
-					$bean->removeProperty( $property );
-				} elseif ( strpos( $property, 'shared' ) === 0 ) {
-					$bean->removeProperty( $property );
-				}
-			}
-		}
-		if ( !$this->isFrozen ) {
-			$this->check( $bean );
-		}
-		try {
-			$this->writer->deleteRecord( $bean->getMeta( 'type' ), array( 'id' => array( $bean->id ) ), NULL );
-		} catch ( RedBean_Exception_SQL $exception ) {
-			$this->handleException( $exception );
-		}
-		$bean->id = 0;
-		$this->signal( 'after_delete', $bean );
+		$continue = $this->signal( 'delete', $bean );
+                if($continue !== false){
+                    foreach ( $bean as $property => $value ) {
+                            if ( $value instanceof RedBean_OODBBean ) {
+                                    $bean->removeProperty( $property );
+                            }
+                            if ( is_array( $value ) ) {
+                                    if ( strpos( $property, 'own' ) === 0 ) {
+                                            $bean->removeProperty( $property );
+                                    } elseif ( strpos( $property, 'shared' ) === 0 ) {
+                                            $bean->removeProperty( $property );
+                                    }
+                            }
+                    }
+                    if ( !$this->isFrozen ) {
+                            $this->check( $bean );
+                    }
+                    try {
+                            $this->writer->deleteRecord( $bean->getMeta( 'type' ), array( 'id' => array( $bean->id ) ), NULL );
+                    } catch ( RedBean_Exception_SQL $exception ) {
+                            $this->handleException( $exception );
+                    }
+                    $bean->id = 0;
+                    $this->signal( 'after_delete', $bean );
+                    return true;
+                }else{
+                    return false;
+                }
 	}
 
 	/**

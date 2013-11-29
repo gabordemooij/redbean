@@ -55,16 +55,20 @@ abstract class RedBean_Observable { //bracket must be here - otherwise coverage 
 	 * @param string $eventname event you want signal
 	 * @param mixed  $info      message object to send along
 	 *
-	 * @return void
+	 * @return boolean
 	 */
 	public function signal( $eventname, $info )
 	{
+                $continue = true;
 		if ( !isset( $this->observers[$eventname] ) ) {
 			$this->observers[$eventname] = array();
 		}
 
 		foreach ( $this->observers[$eventname] as $observer ) {
-			$observer->onEvent( $eventname, $info );
+                        if($observer->onEvent( $eventname, $info ) === false){
+                            $continue = false;
+                        }
 		}
+                return $continue;
 	}
 }
