@@ -29,7 +29,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 	{	
 		testpack( 'Test flexible method signature (issue #328).' );
 		
-		$old_error_handler = set_error_handler( function() {
+		$old_error_handler = set_error_handler( function($errno, $errstr, $errfile, $errline) {
 			fail();
 		} );
 		
