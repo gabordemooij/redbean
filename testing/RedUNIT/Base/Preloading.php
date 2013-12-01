@@ -29,10 +29,6 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 	{	
 		testpack( 'Test flexible method signature (issue #328).' );
 		
-		$old_error_handler = set_error_handler( function($errno, $errstr, $errfile, $errline) {
-			fail();
-		} );
-		
 		R::nuke();
 		
 		$beans = R::dispense( 'user', 2 );
