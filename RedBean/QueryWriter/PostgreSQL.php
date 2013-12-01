@@ -1,10 +1,10 @@
-<?php 
-namespace RedBeanPHP\QueryWriter; 
+<?php
+namespace RedBeanPHP\QueryWriter;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\Driver\RPDO\NULL as NULL; 
+use \RedBeanPHP\Driver\RPDO\NULL as NULL;
 /**
  * RedBean PostgreSQL Query Writer
  *
@@ -107,7 +107,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 			}
 
 			return TRUE;
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			return FALSE;
 		}
 	}
@@ -340,7 +340,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 	}
 
@@ -405,7 +405,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 			}
 
 			return FALSE;
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			return FALSE;
 		}
 	}

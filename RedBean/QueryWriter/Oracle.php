@@ -1,9 +1,9 @@
-<?php 
-namespace RedBeanPHP\QueryWriter; 
+<?php
+namespace RedBeanPHP\QueryWriter;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\Driver\OCI as OCI; 
+use \RedBeanPHP\Driver\OCI as OCI;
 /**
  * RedBean Oracle Driver
  *
@@ -256,7 +256,7 @@ class Oracle extends AQueryWriter implements QueryWriter
 			$this->adapter->exec( $sql );
 
 			return TRUE;
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			return FALSE;
 		}
 	}
@@ -307,7 +307,7 @@ class Oracle extends AQueryWriter implements QueryWriter
 
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 	}
 
@@ -320,14 +320,14 @@ class Oracle extends AQueryWriter implements QueryWriter
 	 *
 	 * @param string $table type of bean you want to create a table for
 	 *
-	 * @throws\Exception
+	 * @throws \Exception
 	 *
 	 * @return void
 	 */
 	public function createTable( $table )
 	{
 		if ( strtolower( $table ) != $table ) {
-			throw new\Exception( $table . ' is not lowercase. With ORACLE you MUST only use lowercase table in PHP, sorry!' );
+			throw new \Exception( $table . ' is not lowercase. With ORACLE you MUST only use lowercase table in PHP, sorry!' );
 		}
 
 		$table_with_quotes         = strtoupper( $this->esc( $table ) );
@@ -369,7 +369,7 @@ class Oracle extends AQueryWriter implements QueryWriter
 	 * @param string  $column name of the column
 	 * @param integer $field  data type for field
 	 *
-	 * @throws\Exception
+	 * @throws \Exception
 	 *
 	 * @return void
 	 */
@@ -378,7 +378,7 @@ class Oracle extends AQueryWriter implements QueryWriter
 		$columnTested = preg_replace( '/^((own)|(shared))./', '', $column );
 
 		if ( strtolower( $columnTested ) != $columnTested ) {
-			throw new\Exception( $column . ' is not lowercase. With ORACLE you MUST only use lowercase properties in PHP, sorry!' );
+			throw new \Exception( $column . ' is not lowercase. With ORACLE you MUST only use lowercase properties in PHP, sorry!' );
 		}
 
 		parent::addColumn( strtoupper( $type ), strtoupper( $column ), $field );
@@ -617,7 +617,7 @@ class Oracle extends AQueryWriter implements QueryWriter
 
 				$this->adapter->exec( $sql );
 			}
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			// Failure of fk-constraints is not a problem
 		}
 	}

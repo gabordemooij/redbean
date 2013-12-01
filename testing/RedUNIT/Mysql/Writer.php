@@ -1,9 +1,9 @@
-<?php 
+<?php
 
 use \RedBeanPHP\AssociationManager as AssociationManager;
 use \RedBeanPHP\QueryWriter\MySQL as MySQL;
 use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\RedException as RedException; 
+use \RedBeanPHP\RedException as RedException;
 /**
  * RedUNIT_Mysql_Writer
  *
@@ -20,7 +20,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 {
 	/**
 	 * Test scanning and coding of values.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testScanningAndCoding()
@@ -94,21 +94,21 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		$writer->widenColumn( "testtable", "c1", 2 );
 
 		$writer->addColumn( "testtable", "special", MySQL::C_DATATYPE_SPECIAL_DATE );
-		
+
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols['special'], TRUE ), MySQL::C_DATATYPE_SPECIAL_DATE );
-		
+
 		asrt( $writer->code( $cols['special'], FALSE ), MySQL::C_DATATYPE_SPECIFIED );
-		
+
 		$writer->addColumn( "testtable", "special2", MySQL::C_DATATYPE_SPECIAL_DATETIME );
-		
+
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols['special2'], TRUE ), MySQL::C_DATATYPE_SPECIAL_DATETIME );
-		
+
 		asrt( $writer->code( $cols['special'], FALSE ), MySQL::C_DATATYPE_SPECIFIED );
-		
+
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols["c1"] ), 2 );
@@ -179,7 +179,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 	/**
 	 * (FALSE should be stored as 0 not as '')
-	 * 
+	 *
 	 * @return voids
 	 */
 	public function testZeroIssue()
@@ -214,7 +214,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 		try {
 			$bean = $redbean->load( "page where 1; drop table hack", 1 );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -227,7 +227,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -238,7 +238,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -247,7 +247,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -256,7 +256,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -268,7 +268,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -277,7 +277,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -286,21 +286,21 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		try {
 			$redbean->trash( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
 
 		try {
 			$redbean->find( "::", array(), "" );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -310,7 +310,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		try {
 			$writer->createTable( "sometable` ( `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT , PRIMARY KEY ( `id` ) ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ; drop table hack; --" );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "show tables" ) ), TRUE );
@@ -433,7 +433,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 	/**
 	 * Test special data types.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypes()
@@ -463,7 +463,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 	/**
 	 * Test date types.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesDates()
@@ -481,7 +481,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 	/**
 	 * Date-time
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesDateTimes()
@@ -510,7 +510,7 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 			fail();
 		} catch ( RedException $e ) {
 			pass();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			fail();
 		}
 
@@ -540,32 +540,32 @@ class RedUNIT_Mysql_Writer extends RedUNIT_Mysql
 
 		asrt( $cols['title'], 'varchar(255)' );
 	}
-	
+
 	/**
-	 * Don't try to add foreign key constraints to 
+	 * Don't try to add foreign key constraints to
 	 * link table if they are already there.
-	 * 
+	 *
 	 * Actually this is pretty much dead code as this would normally never occur,
 	 * but we want 100% test coverage so we test this line anyway.
 	 */
-	public function testCheckConstraintAlreadyExists() 
+	public function testCheckConstraintAlreadyExists()
 	{
 		R::nuke();
-		
+
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
-		
+
 		R::associate( $book, $page );
-		
+
 		$didAdd = R::$writer->addConstraintForTypes( 'book', 'page' );
-		
+
 		pass(); //can't really test this - just don't crash!
 	}
 
 	/**
 	 * Stored and reloads spatial data to see if the
 	 * value is preserved correctly.
-	 * 
+	 *
 	 * @return void
 	 */
 	protected function setGetSpatial( $data )

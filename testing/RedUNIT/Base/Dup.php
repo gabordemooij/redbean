@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 use \RedBeanPHP\DuplicationManager as DuplicationManager;
-use \RedBeanPHP\OODBBean as OODBBean; 
+use \RedBeanPHP\OODBBean as OODBBean;
 /**
  * RedUNIT_Base_Dup
  *
@@ -18,7 +18,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 {
 	/**
 	 * Test exportAll and caching.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testExportAllAndCache()
@@ -110,7 +110,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 	/**
 	 * Test duplication and caching.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function DupAndCache()
@@ -224,7 +224,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 	/**
 	 * Test duplication and tainting.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDupAndExportNonTainting()
@@ -288,7 +288,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 	/**
 	 * Test exporting with filters.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function ExportWithFilters()
@@ -421,7 +421,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 
 	/**
 	 * Helper function getCache().
-	 * 
+	 *
 	 * @return array
 	 */
 	private function getCache()
@@ -467,7 +467,7 @@ class RedUNIT_Base_Dup extends RedUNIT_Base
 								$index      = $k;
 							}
 						}
-						if ( !$foundMatch ) throw new\Exception( 'failed to find match for object ' . $nestedObject->id );
+						if ( !$foundMatch ) throw new \Exception( 'failed to find match for object ' . $nestedObject->id );
 					}
 					$this->compare( $nestedObject, $array[$property][$index] );
 				}

@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-use \RedBeanPHP\RedException\SQL as SQL; 
+use \RedBeanPHP\RedException\SQL as SQL;
 /**
  * RedUNIT_Mysql_Parambind
  *
@@ -17,7 +17,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 {
 	/**
 	 * Test parameter binding with\PDO.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testPDOParameterBinding()
@@ -34,7 +34,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::getAll( "select * from job limit ? ", array( 1 ) );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -42,7 +42,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::getAll( "select * from job limit :l ", array( ":l" => 1 ) );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -50,7 +50,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::exec( "select * from job limit ? ", array( 1 ) );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -58,7 +58,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::exec( "select * from job limit :l ", array( ":l" => 1 ) );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -68,7 +68,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::getAll( "select * from job limit ? ", array( 1 ) );
 
 			pass();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			print_r( $e );
 
 			fail();
@@ -78,7 +78,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::getAll( "select * from job limit :l ", array( ":l" => 1 ) );
 
 			pass();
-		} catch (\Exception $e ) {
+		} catch  ( \Exception $e ) {
 			fail();
 		}
 
@@ -86,7 +86,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::exec( "select * from job limit ? ", array( 1 ) );
 
 			pass();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			fail();
 		}
 
@@ -94,7 +94,7 @@ class RedUNIT_Mysql_Parambind extends RedUNIT_Mysql
 			R::exec( "select * from job limit :l ", array( ":l" => 1 ) );
 
 			pass();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			fail();
 		}
 

@@ -1,5 +1,5 @@
-<?php 
-namespace RedBeanPHP; 
+<?php
+namespace RedBeanPHP;
 use \RedBeanPHP\Observable as Observable;
 use \RedBeanPHP\OODB as OODB;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
@@ -7,7 +7,7 @@ use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\ToolBox as ToolBox; 
+use \RedBeanPHP\ToolBox as ToolBox;
 /**
  * Association Manager
  *
@@ -39,15 +39,15 @@ class AssociationManager extends Observable
 	protected $writer;
 
 	/**
-	 * Handles\Exceptions. Suppresses exceptions caused by missing structures.
+	 * Handles \Exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param\Exception $exception
+	 * @param \Exception $exception
 	 *
 	 * @return void
 	 *
-	 * @throws\Exception
+	 * @throws \Exception
 	 */
-	private function handleException(\Exception $exception )
+	private function handleException( \Exception $exception )
 	{
 		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
@@ -123,7 +123,7 @@ class AssociationManager extends Observable
 	 * @param OODBBean $bean2 second bean
 	 * @param OODBBean $bean  base bean (association record)
 	 *
-	 * @throws\Exception|SQL
+	 * @throws \Exception|SQL
 	 *
 	 * @return mixed
 	 */
@@ -214,7 +214,7 @@ class AssociationManager extends Observable
 	 * This method will associate two beans and store the connection between the
 	 * two in a link table. Instead of two single beans this method also accepts
 	 * two sets of beans. Returns the ID or the IDs of the linking beans.
-	 * 
+	 *
 	 * @param OODBBean|array $beans1 one or more beans to form the association
 	 * @param OODBBean|array $beans2 one or more beans to form the association
 	 *
@@ -490,7 +490,7 @@ class AssociationManager extends Observable
 	 * You can also pass some extra SQL and
 	 * values for that SQL to filter your results after fetching the
 	 * related beans.
-	 * 
+	 *
 	 * @see AssociationManager::relatedSimple.
 	 *
 	 * @param OODBBean $bean     bean provided
@@ -516,7 +516,7 @@ class AssociationManager extends Observable
 	 * You can also pass some extra SQL and
 	 * values for that SQL to filter your results after fetching the
 	 * related beans.
-	 * 
+	 *
 	 * @see AssociationManager::relatedSimple.
 	 *
 	 * @param OODBBean $bean     bean provided

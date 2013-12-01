@@ -1,5 +1,5 @@
-<?php 
-namespace RedBeanPHP\RedException;  
+<?php
+namespace RedBeanPHP\RedException;
 /**
  * RedBean\Exception SQL
  *
@@ -12,7 +12,7 @@ namespace RedBeanPHP\RedException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class SQL extends\RuntimeException
+class SQL extends \RuntimeException
 {
 
 	/**

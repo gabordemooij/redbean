@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
 use \RedBeanPHP\OODB as OODB;
@@ -8,7 +8,7 @@ use \RedBeanPHP\RedException\SQL as SQL;
 use \RedBeanPHP\QueryWriter\MySQL as MySQL;
 use \RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
 use \RedBeanPHP\QueryWriter\CUBRID as CUBRID;
-use \RedBeanPHP\Adapter\DBAdapter as DBAdapter; 
+use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 /**
  * RedUNIT_Base_Database
  *
@@ -59,10 +59,10 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 		asrt( R::count( 'emptybean' ), 3 );
 		R::freeze( FALSE );
 	}
-	
+
 	/**
 	 * Test the database driver and low level functions.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDriver()
@@ -85,7 +85,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 				$redbean->find( 'bean' );
 
 				pass();
-			} catch (\Exception $e ) {
+			} catch ( \Exception $e ) {
 				var_dump( $e->getSQLState() );
 
 				fail();
@@ -98,7 +98,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 			$redbean->find( 'bean' );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -117,7 +117,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 				$associationManager->areRelated( $beanA, $beanB );
 
 				pass();
-			} catch (\Exception $e ) {
+			} catch ( \Exception $e ) {
 				fail();
 			}
 		}
@@ -128,7 +128,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 			$associationManager->areRelated( $beanA, $beanA );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -136,7 +136,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 			$redbean->wipe( 'justabean' );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -190,7 +190,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 
 	/**
 	 * Test selecting.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testSelects()
@@ -208,7 +208,7 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 		$rooms = R::getAssoc('SELECT * FROM room WHERE id < -999');
 		asrt(is_array($rooms), TRUE);
 		asrt(count($rooms), 0);
-		
+
 		$rooms = R::getAssoc( 'SELECT ' . R::$writer->esc( 'number' ) . ', kind FROM room ORDER BY kind ASC' );
 
 		foreach ( $rooms as $key => $room ) {

@@ -1,11 +1,11 @@
-<?php 
+<?php
 
 use \RedBeanPHP\ToolBox as ToolBox;
 use \RedBeanPHP\AssociationManager as AssociationManager;
 use \RedBeanPHP\RedException\SQL as SQL;
 use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\SimpleModel as SimpleModel;
-use \RedBeanPHP\QueryWriter\MySQL as MySQL; 
+use \RedBeanPHP\QueryWriter\MySQL as MySQL;
 /**
  * RedUNIT_Base_Association
  *
@@ -22,7 +22,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 {
 	/**
 	 * MySQL specific tests.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testMySQL()
@@ -62,7 +62,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 	/**
 	 * Test fast-track deletion, i.e. bypassing FUSE.
 	 * For link beans.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFastTrackDeletion()
@@ -91,7 +91,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 	/**
 	 * Test self-referential associations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCrossAssociation()
@@ -118,7 +118,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 	/**
 	 * Test limited support for polymorph associations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testPoly()
@@ -146,7 +146,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 	/**
 	 * Test limited support for 1-to-1 associations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testOneToOne()
@@ -194,7 +194,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 	/**
 	 * Test single column bases unique constraints.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testSingleColUniqueConstraint()
@@ -203,7 +203,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		//mysql cant handle this due to utf8mb4 fuckup Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes
 		if ($this->currentlyActiveDriverID === 'mysql') return;
-		
+
 		$book = R::dispense( 'book' );
 
 		$book->setMeta( 'buildcommand.unique', array( array( 'title' ) ) );
@@ -259,7 +259,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 	/**
 	 * Test multiple assiociation.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testMultiAssociationDissociation()
@@ -311,26 +311,26 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 	/**
 	 * Test some frequently used scenarios.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAssocVariations()
 	{
 		try {
 			R::related( NULL, 'book' );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			asrt( ( $e instanceof Security ), TRUE );
 		}
 
 		try {
 			R::related( 100, 'book' );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			asrt( ( $e instanceof Security ), TRUE );
 		}
 
 		try {
 			R::related( array( 'fakeBean' ), 'book' );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			asrt( ( $e instanceof Security ), TRUE );
 		}
 
@@ -394,7 +394,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 	/**
 	 * Test legacy methods, backward compatibility with removed
 	 * setAssoc function.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBackwardCompat()
@@ -416,7 +416,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 			$a->related( $testA, "testB" );
 
 			pass();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			fail();
 		}
 
@@ -565,7 +565,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 	/**
 	 * Test areRelated().
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAreRelatedAndVariations()

@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-use \RedBeanPHP\RedException\Security as Security; 
+use \RedBeanPHP\RedException\Security as Security;
 /**
  * RedUNIT_CUBRID_Setget
  *
@@ -17,7 +17,7 @@ class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID
 {
 	/**
 	 * Test numbers.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNumbers()
@@ -49,7 +49,7 @@ class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID
 
 	/**
 	 * Test dates.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDates()
@@ -65,7 +65,7 @@ class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID
 
 	/**
 	 * Test strings.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testStrings()
@@ -81,7 +81,7 @@ class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID
 
 	/**
 	 * Test booleans.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBool()
@@ -95,7 +95,7 @@ class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID
 
 	/**
 	 * Test NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNull()
@@ -124,7 +124,7 @@ class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID
 			R::$writer->esc( '`aaa`' );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 

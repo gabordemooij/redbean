@@ -1,16 +1,16 @@
-<?php 
-namespace RedBeanPHP\Driver; 
+<?php
+namespace RedBeanPHP\Driver;
 use \RedBeanPHP\Driver as Driver;
 use \RedBeanPHP\Logger as Logger;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Logger\RDefault as RDefault; 
+use \RedBeanPHP\Logger\RDefault as RDefault;
 /**
- *\PDO Driver
+ * \PDO Driver
  * This Driver implements the RedBean Driver API
  *
  * @file    RedBean/PDO.php
- * @desc   \PDO Driver
+ * @desc    \PDO Driver
  * @author  Gabor de Mooij and the RedBeanPHP Community, Desfrenes
  * @license BSD/GPLv2
  *
@@ -36,7 +36,7 @@ class RPDO implements Driver
 	protected $logger = NULL;
 
 	/**
-	 * @var\PDO
+	 * @var \PDO
 	 */
 	protected $pdo;
 
@@ -64,19 +64,24 @@ class RPDO implements Driver
 	 * @var bool
 	 */
 	protected $flagUseStringOnlyBinding = FALSE;
-	
+
 	/**
-	 * @var string 
+	 * @var string
 	 */
 	protected $mysqlEncoding = '';
 
 	/**
-	 * Binds parameters. This method binds parameters to a\PDOStatement for
+	 * @var boolean
+	 */
+	protected $autoSetEncoding = TRUE;
+
+	/**
+	 * Binds parameters. This method binds parameters to a \PDOStatement for
 	 * Query Execution. This method binds parameters as NULL, INTEGER or STRING
 	 * and supports both named keys and question mark keys.
 	 *
-	 * @param \PDOStatement $statement \PDO Statement instance
-	 * @param  array        $bindings   values that need to get bound to the statement
+	 * @param  \PDOStatement $statement  \PDO Statement instance
+	 * @param  array         $bindings   values that need to get bound to the statement
 	 *
 	 * @return void
 	 */
@@ -85,19 +90,19 @@ class RPDO implements Driver
 		foreach ( $bindings as $key => &$value ) {
 			if ( is_integer( $key ) ) {
 				if ( is_null( $value ) ) {
-					$statement->bindValue( $key + 1, NULL,\PDO::PARAM_NULL );
+					$statement->bindValue( $key + 1, NULL, \PDO::PARAM_NULL );
 				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && $value < 2147483648 ) {
-					$statement->bindParam( $key + 1, $value,\PDO::PARAM_INT );
+					$statement->bindParam( $key + 1, $value, \PDO::PARAM_INT );
 				} else {
-					$statement->bindParam( $key + 1, $value,\PDO::PARAM_STR );
+					$statement->bindParam( $key + 1, $value, \PDO::PARAM_STR );
 				}
 			} else {
 				if ( is_null( $value ) ) {
-					$statement->bindValue( $key, NULL,\PDO::PARAM_NULL );
+					$statement->bindValue( $key, NULL, \PDO::PARAM_NULL );
 				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && $value < 2147483648 ) {
-					$statement->bindParam( $key, $value,\PDO::PARAM_INT );
+					$statement->bindParam( $key, $value, \PDO::PARAM_INT );
 				} else {
-					$statement->bindParam( $key, $value,\PDO::PARAM_STR );
+					$statement->bindParam( $key, $value, \PDO::PARAM_STR );
 				}
 			}
 		}
@@ -127,7 +132,7 @@ class RPDO implements Driver
 
 		try {
 			if ( strpos( 'pgsql', $this->dsn ) === 0 ) {
-				$statement = $this->pdo->prepare( $sql, array(\PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => TRUE ) );
+				$statement = $this->pdo->prepare( $sql, array( \PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => TRUE ) );
 			} else {
 				$statement = $this->pdo->prepare( $sql );
 			}
@@ -147,7 +152,7 @@ class RPDO implements Driver
 			} else {
 				$this->resultArray = array();
 			}
-		} catch (\PDOException $e ) {
+		} catch ( \PDOException $e ) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
 			$err = $e->getMessage();
@@ -162,37 +167,37 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Try to fix MySQL character encoding problems.
-	 * MySQL < 5.5 does not support proper 4 byte unicode but they
-	 * seem to have added it with version 5.5 under a different label: utf8mb4.
-	 * We try to select the best possible charset based on your version data.
-	 */
-	protected function setEncoding() 
+	* Try to fix MySQL character encoding problems.
+	* MySQL < 5.5 does not support proper 4 byte unicode but they
+	* seem to have added it with version 5.5 under a different label: utf8mb4.
+	* We try to select the best possible charset based on your version data.
+	*/
+	protected function setEncoding()
 	{
-		$driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME );
-		$version = floatval( $this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION ) );
+		$driver = $this->pdo->getAttribute( \PDO::ATTR_DRIVER_NAME );
+		$version = floatval( $this->pdo->getAttribute( \PDO::ATTR_SERVER_VERSION ) );
 
-		if ($driver === 'mysql') {
+		if ( $driver === 'mysql' ) {
 			$encoding = ($version >= 5.5) ? 'utf8mb4' : 'utf8';
-			$this->pdo->setAttribute(\PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '.$encoding ); //on every re-connect
+			$this->pdo->setAttribute( \PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '.$encoding ); //on every re-connect
 			$this->pdo->exec(' SET NAMES '. $encoding); //also for current connection
 			$this->mysqlEncoding = $encoding;
 		}
 	}
 
 	/**
-	 * Returns the best possible encoding for MySQL based on version data.
-	 * 
-	 * @return string
-	 */
-	public function getMysqlEncoding() 
+	* Returns the best possible encoding for MySQL based on version data.
+	*
+	* @return string
+	*/
+	public function getMysqlEncoding()
 	{
 		return $this->mysqlEncoding;
 	}
 
 	/**
 	 * Constructor. You may either specify dsn, user and password or
-	 * just give an existing\PDO connection.
+	 * just give an existing \PDO connection.
 	 * Examples:
 	 *    $driver = new RPDO($dsn, $user, $password);
 	 *    $driver = new RPDO($existingConnection);
@@ -202,16 +207,21 @@ class RPDO implements Driver
 	 * @param string     $pass   optional, password for connection login
 	 *
 	 */
-	public function __construct( $dsn, $user = NULL, $pass = NULL )
+	public function __construct( $dsn, $user = NULL, $pass = NULL, $autoSetEncoding = TRUE )
 	{
-		if ( $dsn instanceof\PDO ) {
+		$this->autoSetEncoding = $autoSetEncoding;
+
+		if ( $dsn instanceof PDO ) {
 			$this->pdo = $dsn;
 
 			$this->isConnected = TRUE;
 
-			$this->setEncoding();
-			$this->pdo->setAttribute(\PDO::ATTR_ERRMODE,\PDO::ERRMODE_EXCEPTION );
-			$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE,\PDO::FETCH_ASSOC );
+			if ( $this->autoSetEncoding !== FALSE ) {
+				$this->setEncoding();
+			}
+
+			$this->pdo->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION );
+			$this->pdo->setAttribute( \PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC );
 
 			// make sure that the dsn at least contains the type
 			$this->dsn = $this->getDatabaseType();
@@ -235,42 +245,46 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Establishes a connection to the database using PHP\PDO
+	 * Establishes a connection to the database using PHP \PDO
 	 * functionality. If a connection has already been established this
 	 * method will simply return directly. This method also turns on
-	 * UTF8 for the database and\PDO-ERRMODE-EXCEPTION as well as
-	 *\PDO-FETCH-ASSOC.
+	 * UTF8 for the database and \PDO-ERRMODE-EXCEPTION as well as
+	 * \PDO-FETCH-ASSOC.
 	 *
-	 * @throws\PDOException
+	 * @throws \PDOException
 	 *
 	 * @return void
 	 */
 	public function connect()
 	{
 		if ( $this->isConnected ) return;
+
 		try {
 			$user = $this->connectInfo['user'];
 			$pass = $this->connectInfo['pass'];
 
-			$this->pdo = new\PDO(
+			$this->pdo = new \PDO(
 				$this->dsn,
 				$user,
 				$pass,
-				array(\PDO::ATTR_ERRMODE            =>\PDO::ERRMODE_EXCEPTION,
-					  \PDO::ATTR_DEFAULT_FETCH_MODE =>\PDO::FETCH_ASSOC,
+				array( \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
+					   \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
 				)
 			);
-			
-			$this->setEncoding();
-			$this->pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, TRUE );
+
+			if ( $this->autoSetEncoding !== FALSE ) {
+				$this->setEncoding();
+			}
+
+			$this->pdo->setAttribute( \PDO::ATTR_STRINGIFY_FETCHES, TRUE );
 
 			$this->isConnected = TRUE;
-		} catch (\PDOException $exception ) {
+		} catch ( \PDOException $exception ) {
 			$matches = array();
 
-			$dbname  = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
+			$dbname = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
 
-			throw new\PDOException( 'Could not connect to database (' . $dbname . ').', $exception->getCode() );
+			throw new \PDOException( 'Could not connect to database (' . $dbname . ').', $exception->getCode() );
 		}
 	}
 
@@ -430,9 +444,9 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Returns the name of database driver for\PDO.
-	 * Uses the\PDO attribute DRIVER NAME to obtain the name of the
-	 *\PDO driver.
+	 * Returns the name of database driver for \PDO.
+	 * Uses the \PDO attribute DRIVER NAME to obtain the name of the
+	 * \PDO driver.
 	 *
 	 * @return string
 	 */
@@ -440,7 +454,7 @@ class RPDO implements Driver
 	{
 		$this->connect();
 
-		return $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME );
+		return $this->pdo->getAttribute( \PDO::ATTR_DRIVER_NAME );
 	}
 
 	/**
@@ -452,13 +466,13 @@ class RPDO implements Driver
 	{
 		$this->connect();
 
-		return $this->pdo->getAttribute(\PDO::ATTR_CLIENT_VERSION );
+		return $this->pdo->getAttribute( \PDO::ATTR_CLIENT_VERSION );
 	}
 
 	/**
-	 * Returns the underlying PHP\PDO instance.
+	 * Returns the underlying PHP \PDO instance.
 	 *
-	 * @return\PDO
+	 * @return \PDO
 	 */
 	public function getPDO()
 	{
@@ -468,7 +482,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Closes database connection by destructing\PDO.
+	 * Closes database connection by destructing \PDO.
 	 *
 	 * @return void
 	 */
@@ -479,7 +493,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Returns TRUE if the current\PDO instance is connected.
+	 * Returns TRUE if the current \PDO instance is connected.
 	 *
 	 * @return boolean
 	 */

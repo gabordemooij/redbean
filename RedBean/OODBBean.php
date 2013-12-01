@@ -1,8 +1,8 @@
-<?php 
-namespace RedBeanPHP; 
+<?php
+namespace RedBeanPHP;
 use \RedBeanPHP\BeanHelper as BeanHelper;
 use \RedBeanPHP\SQLHelper as SQLHelper;
-use \RedBeanPHP\RedException\Security as Security; 
+use \RedBeanPHP\RedException\Security as Security;
 /**
  * OODBBean (Object Oriented DataBase Bean)
  *
@@ -15,7 +15,7 @@ use \RedBeanPHP\RedException\Security as Security;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
+class OODBBean implements \IteratorAggregate, \ArrayAccess, \Countable
 {
 
 	/**
@@ -37,7 +37,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 	/**
 	 * Whether to skip beautification of columns or not.
-	 * 
+	 *
 	 * @var boolean
 	 */
 	private $flagSkipBeau = FALSE;
@@ -90,6 +90,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * @var string
 	 */
 	private $via = NULL;
+
+	/**
+	 * @var boolean
+	 */
+	private $writeOnly = false;
 
 	/** Returns the alias for a type
 	 *
@@ -263,20 +268,20 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * Returns an\ArrayIterator so you can treat the bean like
+	 * Returns an \ArrayIterator so you can treat the bean like
 	 * an array with the properties container as its contents.
 	 * This method is meant for PHP and allows you to access beans as if
 	 * they were arrays, i.e. using array notation:
-	 * 
+	 *
 	 * $bean[ $key ] = $value;
-	 * 
+	 *
 	 * Note that not all PHP functions work with the array interface.
 	 *
-	 * @return\ArrayIterator
+	 * @return \ArrayIterator
 	 */
 	public function getIterator()
 	{
-		return new\ArrayIterator( $this->properties );
+		return new \ArrayIterator( $this->properties );
 	}
 
 	/**
@@ -462,7 +467,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function __unset( $property )
 	{
+		$this->writeOnly = true;
 		$this->__get( $property );
+		$this->writeOnly = false;
 
 		$fieldLink = $property . '_id';
 
@@ -627,7 +634,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Clears state.
 	 * Internal method. Clears the state of the query modifiers of the bean.
 	 * Query modifiers are: with(), withCondition(), alias() and fetchAs().
-	 * 
+	 *
 	 * @return void
 	 */
 	private function clear() {
@@ -693,7 +700,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 				$bean = $this->__info["sys.parentcache.$property"];
 			}
 
-			if ( !$bean ) {
+			if ( !$bean && !$this->writeOnly ) {
 				$type = $this->getAlias( $property );
 
 				if ( $this->withSql !== '' ) {
@@ -762,7 +769,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		$this->flagSkipBeau = TRUE;
 
+		$this->writeOnly = true;
 		$this->__get( $property );
+		$this->writeOnly = false;
 
 		$this->flagSkipBeau = FALSE;
 
@@ -784,7 +793,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$value = '0';
 		} elseif ( $value === TRUE ) {
 			$value = '1';
-		} elseif ( $value instanceof\DateTime ) {
+		} elseif ( $value instanceof \DateTime ) {
 			$value = $value->format( 'Y-m-d H:i:s' );
 		}
 
@@ -899,7 +908,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	/**
 	 * Implementation of __toString Method
 	 * Routes call to Model. If the model implements a __toString() method this
-	 * method will be called and the result will be returned. In case of an 
+	 * method will be called and the result will be returned. In case of an
 	 * echo-statement this result will be printed. If the model does not
 	 * implement a __toString method, this method will return a JSON
 	 * representation of the current bean.
@@ -1082,7 +1091,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * Implementation of\Countable interface. Makes it possible to use
+	 * Implementation of \Countable interface. Makes it possible to use
 	 * count() function on a bean.
 	 *
 	 * @return integer

@@ -1,9 +1,9 @@
-<?php 
-namespace RedBeanPHP\QueryWriter; 
+<?php
+namespace RedBeanPHP\QueryWriter;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\Adapter as Adapter; 
+use \RedBeanPHP\Adapter as Adapter;
 /**
  * RedBean CUBRID Writer
  *
@@ -39,7 +39,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	protected $quoteCharacter = '`';
 
 	/**
-	 * Obtains the keys of a table using the\PDO schema function.
+	 * Obtains the keys of a table using the \PDO schema function.
 	 *
 	 * @param string $table
 	 *
@@ -49,10 +49,10 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	{
 		$pdo  = $this->adapter->getDatabase()->getPDO();
 
-		$keys = $pdo->cubrid_schema(\PDO::CUBRID_SCH_EXPORTED_KEYS, $table );
+		$keys = $pdo->cubrid_schema( \PDO::CUBRID_SCH_EXPORTED_KEYS, $table );
 
 		if ( $table2 ) {
-			$keys = array_merge( $keys, $pdo->cubrid_schema(\PDO::CUBRID_SCH_IMPORTED_KEYS, $table2 ) );
+			$keys = array_merge( $keys, $pdo->cubrid_schema( \PDO::CUBRID_SCH_IMPORTED_KEYS, $table2 ) );
 		}
 
 		return $keys;
@@ -343,7 +343,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 	}
 

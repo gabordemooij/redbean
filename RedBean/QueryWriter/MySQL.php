@@ -1,9 +1,9 @@
-<?php 
-namespace RedBeanPHP\QueryWriter; 
+<?php
+namespace RedBeanPHP\QueryWriter;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\Adapter as Adapter; 
+use \RedBeanPHP\Adapter as Adapter;
 /**
  * RedBean MySQLWriter
  *
@@ -100,7 +100,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 			$this->adapter->exec( $sql );
 
 			return TRUE;
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			return FALSE;
 		}
 	}
@@ -301,7 +301,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 	}
 
@@ -329,12 +329,12 @@ class MySQL extends AQueryWriter implements QueryWriter
 		foreach ( $this->getTables() as $t ) {
 			try {
 				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
-			} catch (\Exception $e ) {
+			} catch ( \Exception $e ) {
 			}
 
 			try {
 				$this->adapter->exec( "DROP VIEW IF EXISTS `$t`" );
-			} catch (\Exception $e ) {
+			} catch ( \Exception $e ) {
 			}
 		}
 

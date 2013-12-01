@@ -1,10 +1,10 @@
-<?php 
+<?php
 
 use \RedBeanPHP\AssociationManager as AssociationManager;
 use \RedBeanPHP\QueryWriter\MySQL as MySQL;
 use \RedBeanPHP\QueryWriter\Oracle as Oracle;
 use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\RedException as RedException; 
+use \RedBeanPHP\RedException as RedException;
 /**
  * RedUNIT_Oracle_Writer
  *
@@ -21,7 +21,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 {
 	/**
 	 * Test scanning and coding.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testScanningAndCoding()
@@ -195,7 +195,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$bean = $redbean->load( "page where 1; drop table hack", 1 );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -207,7 +207,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -218,7 +218,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -227,7 +227,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -236,7 +236,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -248,7 +248,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -257,7 +257,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -266,21 +266,21 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$redbean->store( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		try {
 			$redbean->trash( $bean );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
 
 		try {
 			$redbean->find( "::", array(), "" );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -290,7 +290,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 		try {
 			$writer->createTable( "sometable` ( `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT , PRIMARY KEY ( `id` ) ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ; drop table hack; --" );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 
 		asrt( in_array( "hack", $adapter->getCol( "SELECT LOWER(table_name) FROM user_tables" ) ), TRUE );
@@ -409,7 +409,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 	/**
 	 * Test special data types.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypes()
@@ -439,7 +439,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 	/**
 	 * Test dates.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesDates()
@@ -457,7 +457,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 	/**
 	 * Datetime.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesDateTimes()
@@ -508,7 +508,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 		} catch ( RedException $e ) {
 			pass();
 		}
-		catch (\Exception $e ) {
+		catch ( \Exception $e ) {
 			fail();
 		}
 
@@ -557,7 +557,7 @@ class RedUNIT_Oracle_Writer extends RedUNIT_Oracle
 
 	/**
 	 * Internal.
-	 * 
+	 *
 	 * @param mixed  $adapter adapter
 	 * @param string $table   table
 	 */

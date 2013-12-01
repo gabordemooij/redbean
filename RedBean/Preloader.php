@@ -88,13 +88,17 @@ class Preloader
 	 */
 	private function extractTypeInfo( $typeInfo )
 	{
+		if ( is_array( $typeInfo ) && !isset( $typeInfo[1] ) ) {
+			$typeInfo[1] = NULL;
+		}
+		
 		list( $type, $sqlObj ) = ( is_array( $typeInfo ) ? $typeInfo : array( $typeInfo, NULL ) );
 
-		list( $sql, $bindings ) = $sqlObj;
-
-		if ( !is_array( $bindings ) ) {
-			$bindings = array();
+		if ( !isset($sqlObj[1]) ) {
+			$sqlObj[1] = array();
 		}
+		
+		list( $sql, $bindings ) = $sqlObj;
 
 		return array( $type, $sql, $bindings );
 	}

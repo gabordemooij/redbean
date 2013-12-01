@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use \RedBeanPHP\Logger\RDefault as RDefault;
 use \RedBeanPHP\Logger as Logger;
@@ -9,7 +9,7 @@ use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\Plugin\Cooker as Cooker;
 use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Driver\RPDO as RPDO; 
+use \RedBeanPHP\Driver\RPDO as RPDO;
 /**
  * RedUNIT_Base_Misc
  *
@@ -24,27 +24,27 @@ use \RedBeanPHP\Driver\RPDO as RPDO;
  */
 class RedUNIT_Base_Misc extends RedUNIT_Base
 {
-	
+
 	/**
 	* Tests the R::inspect() method on the Facade.
 	*
 	* @return void
-	*/	
+	*/
 	public function testInspect() {
-	
+
 		testpack( 'Test R::inspect() ');
 
 		R::nuke();
-		
+
 		R::store( R::graph( array('type' => 'book', 'title' => 'book' ) ) );
-		
-		$info = R::inspect();	
+
+		$info = R::inspect();
 		asrt( count( $info ), 1 );
 		asrt( strtolower( $info[0] ), 'book' );
-		
+
 		$info = R::inspect( 'book' );
 		asrt( count( $info ), 2 );
-		
+
 		$keys = array_keys( $info );
 		sort($keys);
 		asrt( strtolower( $keys[0] ), 'id' );
@@ -53,7 +53,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 	/**
 	 * Test Backward compatibility writer ESC-method.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testLegacyCode()
@@ -68,7 +68,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 	/**
 	 * Test beautification of column names.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBeautifulColumnNames()
@@ -99,7 +99,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 		$cal = R::dispense( 'calendar' );
 
-		$cal->when = new\DateTime( '2000-01-01', new\DateTimeZone( 'Pacific/Nauru' ) );
+		$cal->when = new \DateTime( '2000-01-01', new \DateTimeZone( 'Pacific/Nauru' ) );
 
 		asrt( $cal->when, '2000-01-01 00:00:00' );
 
@@ -245,7 +245,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 	/**
 	 * Test reflectional functions of database.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDatabaseProperties()
@@ -255,7 +255,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		$adapter = R::getDatabaseAdapter();
 
 		if ( method_exists( R::$adapter->getDatabase(), 'getPDO' ) ){
-			asrt( $adapter->getDatabase()->getPDO() instanceof\PDO, TRUE );
+			asrt( $adapter->getDatabase()->getPDO() instanceof \PDO, TRUE );
 		}
 
 		asrt( strlen( $adapter->getDatabase()->getDatabaseVersion() ) > 0, TRUE );
@@ -264,7 +264,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 	/**
 	 * Misc Test relations...
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testRelationsVariation()
@@ -333,7 +333,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 	/**
 	 * Test Transactions.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTransactions()
@@ -371,7 +371,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 	/**
 	 * Test nested FUSE scenarios.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFUSEnested()
@@ -415,7 +415,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 	/**
 	 * Tests FUSE and lists, FUSE enforces no more than
 	 * 3 sugar cubes in coffee.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCoffeeWithSugarAndFUSE()
@@ -487,64 +487,64 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 	/**
 	 * Test ENUM functionality offered by Label Maker.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testENUM() {
-		
+
 		testpack('test ENUM');
 
 		$coffee = R::dispense( 'coffee' );
 		$coffee->taste = R::enum( 'flavour:mocca' );
-		
+
 		//did we create an enum?
 		asrt( implode( '', R::gatherLabels(R::enum('flavour'))), 'MOCCA' );
-		
+
 		R::store( $coffee );
-		
+
 		$coffee = $coffee->fresh();
-		
+
 		//test enum identity check - with alias
 		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), TRUE );
 		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), FALSE );
-		
+
 		//now we have two flavours
 		asrt( R::count('flavour'), 2 );
 		asrt( implode( ',', R::gatherLabels(R::enum('flavour'))), 'BANANA,MOCCA' );
-		
+
 		$coffee->flavour = R::enum( 'flavour:mocca' );
-		
+
 		R::store($coffee);
-		
+
 		//same results, can we have multiple flavours?
 		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), TRUE );
 		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), FALSE );
 		asrt( $coffee->flavour->equals( R::enum('flavour:mocca') ), TRUE );
-		
+
 		//no additional mocca enum...
 		asrt( R::count('flavour'), 2 );
-		
+
 		$drink = R::dispense( 'drink' );
 		$drink->flavour = R::enum( 'flavour:choco' );
 		R::store( $drink );
-		
+
 		//now we have three!
 		asrt( R::count('flavour'), 3 );
-		
+
 		$drink = R::load( 'drink', $drink->id );
-		
+
 		asrt( $drink->flavour->equals( R::enum('flavour:mint') ), FALSE );
 		asrt( $drink->flavour->equals( R::enum('flavour:choco') ), TRUE );
-		
+
 		asrt( R::count('flavour'), 4 );
-		
+
 		//trash should not affect flavour!
 		R::trash( $drink );
-		
+
 		asrt( R::count('flavour'), 4 );
 	}
-	
-	
+
+
 	/**
 	 * Test trashAll().
 	 */
@@ -573,7 +573,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 			pass();
 		}
 	}
-	
+
 	/**
 	 * Test Bean identity equality.
 	 */
@@ -582,25 +582,25 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		$beanB = R::dispense( 'bean' );
 		$beanA->id = 1;
 		$beanB->id = 1;
-		
+
 		asrt( $beanA->equals( $beanB ), TRUE );
 		asrt( $beanB->equals( $beanA ), TRUE );
 		asrt( $beanA->equals( $beanA ), TRUE );
 		asrt( $beanB->equals( $beanB ), TRUE );
-		
+
 		$beanB->id = 2;
-		
+
 		asrt( $beanA->equals( $beanB ), FALSE );
 		asrt( $beanB->equals( $beanA ), FALSE );
-		
+
 		$beanA->id = '2';
-		
+
 		asrt( $beanA->equals( $beanB ), TRUE );
 		asrt( $beanB->equals( $beanA ), TRUE );
-		
+
 		$beanB = R::dispense( 'carrot' );
 		$beanB->id = $beanA->id;
-		
+
 		asrt( $beanA->equals( $beanB ), FALSE );
 		asrt( $beanB->equals( $beanA ), FALSE );
 	}

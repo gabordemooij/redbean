@@ -1,5 +1,5 @@
-<?php 
-namespace RedBeanPHP; 
+<?php
+namespace RedBeanPHP;
 use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\Observable as Observable;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
@@ -12,7 +12,7 @@ use \RedBeanPHP\OODBBeans as OODBBeans;
 use \RedBeanPHP\BeanHelper as BeanHelper;
 use \RedBeanPHP\RedException\SQL as SQL;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\Preloader as Preloader; 
+use \RedBeanPHP\Preloader as Preloader;
 /**
  * RedBean Object Oriented DataBase
  *
@@ -74,15 +74,15 @@ class OODB extends Observable
 	protected $assocManager = NULL;
 
 	/**
-	 * Handles\Exceptions. Suppresses exceptions caused by missing structures.
+	 * Handles \Exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param\Exception $exception exception
+	 * @param \Exception $exception exception
 	 *
 	 * @return void
 	 *
-	 * @throws\Exception
+	 * @throws \Exception
 	 */
-	private function handleException(\Exception $exception )
+	private function handleException( \Exception $exception )
 	{
 		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
@@ -804,10 +804,10 @@ class OODB extends Observable
 	 * RedBean runs in frozen mode it will throw an exception.
 	 * This function returns the primary key ID of the inserted
 	 * bean.
-	 * 
+	 *
 	 * The return value is an integer if possible. If it is not possible to
 	 * represent the value as an integer a string will be returned. We use
-	 * explicit casts instead of functions to preserve performance 
+	 * explicit casts instead of functions to preserve performance
 	 * (0.13 vs 0.28 for 10000 iterations on Core i3).
 	 *
 	 * @param OODBBean|SimpleModel $bean bean to store

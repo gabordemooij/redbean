@@ -1,9 +1,9 @@
-<?php 
-namespace RedBeanPHP\Driver; 
+<?php
+namespace RedBeanPHP\Driver;
 use \RedBeanPHP\Driver as Driver;
 use \RedBeanPHP\Logger as Logger;
 use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Logger\RDefault as RDefault; 
+use \RedBeanPHP\Logger\RDefault as RDefault;
 /**
  * OCI Driver
  *
@@ -203,11 +203,11 @@ class OCI implements Driver
 	}
 
 	/**
-	 * Establishes a connection to the database using PHP\PDO
+	 * Establishes a connection to the database using PHP \PDO
 	 * functionality. If a connection has already been established this
 	 * method will simply return directly. This method also turns on
-	 * UTF8 for the database and\PDO-ERRMODE-EXCEPTION as well as
-	 *\PDO-FETCH-ASSOC.
+	 * UTF8 for the database and \PDO-ERRMODE-EXCEPTION as well as
+	 * \PDO-FETCH-ASSOC.
 	 *
 	 * @return void
 	 */
@@ -286,7 +286,7 @@ class OCI implements Driver
 			} else {
 				$this->rs = array();
 			}
-		} catch (\PDOException $pdoException ) {
+		} catch ( \PDOException $pdoException ) {
 			// Unfortunately the code field is supposed to be int by default (php)
 			// So we need a property to convey the SQL State code.
 			$transformedException = new SQL( $pdoException->getMessage(), 0 );
@@ -514,7 +514,7 @@ class OCI implements Driver
 
 	/**
 	 * Returns the number of rows affected by the most recent query
-	 * if the currently selected\PDO driver supports this feature.
+	 * if the currently selected \PDO driver supports this feature.
 	 *
 	 * @return integer $numOfRows number of rows affected
 	 */
@@ -559,7 +559,7 @@ class OCI implements Driver
 	}
 
 	/**
-	 * Returns TRUE if the current\PDO instance is connected.
+	 * Returns TRUE if the current \PDO instance is connected.
 	 *
 	 * @return boolean $yesNO
 	 */
@@ -571,7 +571,7 @@ class OCI implements Driver
 	}
 
 	/**
-	 * Closes database connection by destructing\PDO.
+	 * Closes database connection by destructing \PDO.
 	 */
 	public function close()
 	{
