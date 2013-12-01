@@ -1,5 +1,5 @@
-<?php 
-namespace RedBeanPHP; 
+<?php
+namespace RedBeanPHP;
 use \RedBeanPHP\ToolBox as ToolBox;
 use \RedBeanPHP\Driver\RPDO as RPDO;
 use \RedBeanPHP\Driver\OCI as OCI;
@@ -9,7 +9,7 @@ use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
 use \RedBeanPHP\QueryWriter\CUBRID as CUBRID;
 use \RedBeanPHP\QueryWriter\Oracle as Oracle;
 use \RedBeanPHP\QueryWriter\MySQL as MySQL;
-use \RedBeanPHP\OODB as OODB; 
+use \RedBeanPHP\OODB as OODB;
 /**
  * RedBean Setup
  * Helper class to quickly setup RedBean for you.
@@ -53,25 +53,25 @@ class Setup
 	 * RedBeanPHP to start working with your database. Most RedBeanPHP
 	 * components are stand-alone and require a toolbox to work.
 	 *
-	 * @param  string|PDO $dsn      Database Connection String (or\PDO instance)
+	 * @param  string|PDO $dsn      Database Connection String (or \PDO instance)
 	 * @param  string     $username Username for database
 	 * @param  string     $password Password for database
 	 * @param  boolean    $frozen   Start in frozen mode?
 	 *
 	 * @return ToolBox
 	 */
-	public static function kickstart( $dsn, $username = NULL, $password = NULL, $frozen = FALSE )
+	public static function kickstart( $dsn, $username = NULL, $password = NULL, $frozen = FALSE, $autoSetEncoding = TRUE )
 	{
-		if ( $dsn instanceof\PDO ) {
+		if ( $dsn instanceof \PDO ) {
 			$db  = new RPDO( $dsn );
 			$dsn = $db->getDatabaseType();
 		} else {
 			self::checkDSN( $dsn );
 
 			if ( strpos( $dsn, 'oracle' ) === 0 ) {
-				$db = new OCI( $dsn, $username, $password );
+				$db = new OCI( $dsn, $username, $password);
 			} else {
-				$db = new RPDO( $dsn, $username, $password );
+				$db = new RPDO( $dsn, $username, $password, $autoSetEncoding );
 			}
 		}
 
