@@ -28,10 +28,11 @@ class RedBean_ModelHelper implements RedBean_Observer
 
 	/**
 	 * @see RedBean_Observer::onEvent
+         * @return mixed
 	 */
 	public function onEvent( $eventName, $bean )
 	{
-		$bean->$eventName();
+		return $bean->$eventName();
 	}
 
 	/**
