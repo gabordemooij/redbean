@@ -87,8 +87,12 @@ class RedBean_Preloader
 		if ( is_array( $typeInfo ) && !isset( $typeInfo[1] ) ) {
 			$typeInfo[1] = NULL;
 		}
-		
+
 		list( $type, $sqlObj ) = ( is_array( $typeInfo ) ? $typeInfo : array( $typeInfo, NULL ) );
+		
+		if ( !isset($sqlObj[0]) ) {
+			$sqlObj[0] = NULL;
+		}
 
 		if ( !isset($sqlObj[1]) ) {
 			$sqlObj[1] = array();
