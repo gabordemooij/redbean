@@ -1,9 +1,9 @@
-<?php 
-namespace RedBeanPHP\QueryWriter; 
+<?php
+namespace RedBeanPHP\QueryWriter;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\OODBBean as OODBBean; 
+use \RedBeanPHP\OODBBean as OODBBean;
 /**
  * RedBean Abstract Query Writer
  *
@@ -827,7 +827,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 				ADD CONSTRAINT $cName FOREIGN KEY $fkName (  $column ) REFERENCES  $targetTable (
 				$targetColumn) ON DELETE " . ( $isDependent ? 'CASCADE' : 'SET NULL' ) . ' ON UPDATE SET NULL ;' );
 			}
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			// Failure of fk-constraints is not a problem
 		}
 	}

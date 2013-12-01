@@ -1,8 +1,8 @@
-<?php 
-namespace RedBeanPHP\Plugin; 
+<?php
+namespace RedBeanPHP\Plugin;
 use \RedBeanPHP\Plugin as Plugin;
 use \RedBeanPHP\ModelHelper as ModelHelper;
-use \RedBeanPHP\Facade as Facade; 
+use \RedBeanPHP\Facade as Facade;
 /**
  * BeanCan Server.
  * A JSON-RPC/RESTy server for RedBeanPHP.
@@ -255,7 +255,7 @@ class BeanCan implements Plugin
 				default:
 					return $this->custom( $id, $beanType, $action, $data );
 			}
-		} catch (\Exception $exception ) {
+		} catch ( \Exception $exception ) {
 			return $this->resp( NULL, $id, self::C_JSONRPC2_SPECIFIED_ERROR, $exception->getCode() . '-' . $exception->getMessage() );
 		}
 	}
@@ -357,7 +357,7 @@ class BeanCan implements Plugin
 
 				return $this->resp( Facade::load( $type, $id )->export(), $id );
 			}
-		} catch (\Exception $exception ) {
+		} catch ( \Exception $exception ) {
 			return $this->resp( NULL, 0, self::C_JSONRPC2_SPECIFIED_ERROR );
 		}
 	}

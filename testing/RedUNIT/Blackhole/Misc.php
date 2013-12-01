@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\Driver\RPDO as RPDO;
@@ -8,7 +8,7 @@ use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\Setup as Setup;
 use \RedBeanPHP\ToolBox as ToolBox;
 use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper; 
+use \RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
 /**
  * RedUNIT_Blackhole_Misc
  *
@@ -34,10 +34,10 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 	/**
 	 * Tests whether getID never produces a notice.
-	 * 
+	 *
 	 * @return void
 	 */
-	public function testGetIDShouldNeverPrintNotice() 
+	public function testGetIDShouldNeverPrintNotice()
 	{
 		set_error_handler(function($err, $errStr){
 			die('>>>>FAIL :'.$err.' '.$errStr);
@@ -50,13 +50,13 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 	/**
 	 * Tests beansToArray().
-	 * 
-	 * @return void 
+	 *
+	 * @return void
 	 */
-	public function testBeansToArray() 
-	{	
+	public function testBeansToArray()
+	{
 		testpack('Test R::beansToArray method');
-	
+
 		$bean1 = R::dispense( 'bean' );
 		$bean1->name = 'hello';
 		$bean2 = R::dispense( 'bean' );
@@ -67,10 +67,10 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		asrt( $array[0]['name'], 'hello' );
 		asrt( $array[1]['name'], 'world' );
 	}
-	
+
 	/**
 	 * Test debugging with custom logger.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDebugCustomLogger()
@@ -125,7 +125,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 	/**
 	 * Test with plus query builder.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testWithWithConditionQueryBuilder()
@@ -152,7 +152,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		asrt( count( $book->ownPage ), 2 );
 
 		$book = R::load( 'book', $id );
-		
+
 		asrt( count( $book->withCondition( ' num >  1')->ownPage ), 1 );
 
 		$book = R::load( 'book', $id );
@@ -189,10 +189,10 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 	/**
 	 * Test Facade transactions.
-	 * 
+	 *
 	 * @return void
-	 * 
-	 * @throws\Exception
+	 *
+	 * @throws \Exception
 	 */
 	public function testTransactionInFacade()
 	{
@@ -229,11 +229,11 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 				return R::store( $bean );
 			} );
 		} );
-		
+
 		asrt( (int) $id, (int) $bean->id );
-		
+
 		R::trash( $bean );
-		
+
 		$bean = R::dispense( 'bean' );
 
 		$bean->name = 'a';
@@ -241,25 +241,25 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		$id = R::transaction( function() use( &$bean ) {
 			return R::store( $bean );
 		} );
-		
+
 		asrt( (int) $id, (int) $bean->id );
 
 		R::trash( $bean );
-		
+
 		$bean = R::dispense( 'bean' );
 
 		$bean->name = 'a';
 
-		
+
 		try {
 			R::transaction( function () use ( $bean ) {
 				R::store( $bean );
 
 				R::transaction( function () {
-					throw new\Exception();
+					throw new \Exception();
 				} );
 			} );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 		asrt( R::count( 'bean' ), 0 );
@@ -272,10 +272,10 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 			R::transaction( function () use ( $bean ) {
 				R::transaction( function () use ( $bean ) {
 					R::store( $bean );
-					throw new\Exception();
+					throw new \Exception();
 				} );
 			} );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -291,7 +291,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 					R::store( $bean );
 				} );
 			} );
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -303,7 +303,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 			R::transaction( 'nope' );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -457,7 +457,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 			( R::$toolboxes['default']->getDatabaseAdapter()->getDatabase()->connect() );
 
 			fail();
-		} catch (\PDOException $e ) {
+		} catch ( \PDOException $e ) {
 			pass();
 
 			/**
@@ -476,7 +476,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 			( R::$toolboxes['default']->getDatabaseAdapter()->getDatabase()->connect() );
 
 			fail();
-		} catch (\PDOException $e ) {
+		} catch ( \PDOException $e ) {
 			pass();
 
 			/**
@@ -486,16 +486,16 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 			asrt( $e->getMessage(), 'Could not connect to database (mydatabase).' );
 		}
 
-		testpack( 'Can we pass a\PDO object to Setup?' );
+		testpack( 'Can we pass a \PDO object to Setup?' );
 
-		$pdo = new\PDO( 'sqlite:test.db' );
+		$pdo = new \PDO( 'sqlite:test.db' );
 
 		$toolbox = Setup::kickstart( $pdo );
 
 		asrt( ( $toolbox instanceof ToolBox ), TRUE );
 
 		asrt( ( $toolbox->getDatabaseAdapter() instanceof Adapter ), TRUE );
-		asrt( ( $toolbox->getDatabaseAdapter()->getDatabase()->getPDO() instanceof\PDO ), TRUE );
+		asrt( ( $toolbox->getDatabaseAdapter()->getDatabase()->getPDO() instanceof \PDO ), TRUE );
 
 		testpack( 'Test array interface of beans' );
 

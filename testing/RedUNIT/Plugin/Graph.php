@@ -1,9 +1,9 @@
-<?php 
+<?php
 
 use \RedBeanPHP\Plugin\Cooker as Cooker;
 use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\ModelHelper as ModelHelper; 
+use \RedBeanPHP\ModelHelper as ModelHelper;
 /**
  * RedUNIT_Plugin_Graph
  *
@@ -20,7 +20,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 {
 	/**
 	 * Test graph() method.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testGraph()
@@ -439,7 +439,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 			R::store( $band );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -452,7 +452,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 			$id = R::store( $band );
 
 			pass();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			fail();
 		}
 
@@ -464,7 +464,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 			R::store( $band );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			pass();
 		}
 
@@ -727,7 +727,7 @@ class RedUNIT_Plugin_Graph extends RedUNIT_Plugin
 			$order = R::graph( $form );
 
 			fail();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			$exc = $e;
 		}
 

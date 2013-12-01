@@ -1,9 +1,9 @@
-<?php 
-namespace RedBeanPHP\QueryWriter; 
+<?php
+namespace RedBeanPHP\QueryWriter;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\Adapter as Adapter; 
+use \RedBeanPHP\Adapter as Adapter;
 /**
  * RedBean SQLiteWriter with support for SQLite types
  *
@@ -304,7 +304,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	public function code( $typedescription, $includeSpecials = FALSE )
 	{
 		$r = ( ( isset( $this->sqltype_typeno[$typedescription] ) ) ? $this->sqltype_typeno[$typedescription] : 99 );
-		
+
 		return $r;
 	}
 
@@ -412,7 +412,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	public function wipe( $type )
 	{
 		$table = $this->esc( $type );
-		
+
 		$this->adapter->exec( "DELETE FROM $table " );
 	}
 
@@ -434,12 +434,12 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		foreach ( $this->getTables() as $t ) {
 			try {
 				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
-			} catch (\Exception $e ) {
+			} catch ( \Exception $e ) {
 			}
 
 			try {
 				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
-			} catch (\Exception $e ) {
+			} catch ( \Exception $e ) {
 			}
 		}
 

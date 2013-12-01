@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 use \RedBeanPHP\Plugin\BeanCanResty as BeanCanResty;
 use \RedBeanPHP\Plugin\BeanCan as BeanCan;
-use \RedBeanPHP\SimpleModel as SimpleModel; 
+use \RedBeanPHP\SimpleModel as SimpleModel;
 /**
  * RedUNIT_Plugin_Beancan
  *
@@ -20,7 +20,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 
 	/**
 	 * Test REST interface.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testREST()
@@ -66,10 +66,10 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 			'site/list',
 			'GET'
 		);
-		
+
 		asrt( count( $resp['result'] ), 1 );
 
-		
+
 		$resp = $can->handleREST(
 			$user,
 			'site/' . $site->id . '/page/' . $page->id . '/shared-ad/list',
@@ -384,7 +384,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		);
 
 		$newPage = R::findOne( 'page', ' name = ? ', array( 'my new page' ) );
-		
+
 		asrt( (string) $resp['result']['id'], (string) $newPage->id );
 		asrt( (string) $resp['result']['name'], (string) $newPage->name );
 
@@ -511,7 +511,7 @@ class RedUNIT_Plugin_Beancan extends RedUNIT_Plugin
 		);
 
 		asrt( (string) $resp['result'], 'mail has been sent to nobody' );
-		
+
 		$resp = $can->handleREST(
 			$user,
 			'site/' . $site->id . '/page/' . $page->id,
@@ -1266,7 +1266,7 @@ class Model_Page extends SimpleModel
 
 	public function err()
 	{
-		throw new\Exception( 'fake error', 123 );
+		throw new \Exception( 'fake error', 123 );
 	}
 }
 
@@ -1276,6 +1276,6 @@ class Model_Setting extends SimpleModel
 
 	public function open()
 	{
-		if ( self::$closed ) throw new\Exception( 'closed' );
+		if ( self::$closed ) throw new \Exception( 'closed' );
 	}
 }

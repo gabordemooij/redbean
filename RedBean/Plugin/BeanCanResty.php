@@ -1,16 +1,16 @@
-<?php 
-namespace RedBeanPHP\Plugin; 
+<?php
+namespace RedBeanPHP\Plugin;
 use \RedBeanPHP\Plugin as Plugin;
 use \RedBeanPHP\OODB as OODB;
 use \RedBeanPHP\ToolBox as ToolBox;
 use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\Finder as Finder;
 use \RedBeanPHP\Facade as Facade;
-use \RedBeanPHP\Plugin\BeanCan as BeanCan; 
+use \RedBeanPHP\Plugin\BeanCan as BeanCan;
 /**
  * BeanCan Server.
  * A RESTy server for RedBeanPHP.
- * 
+ *
  * @file    RedBean/BeanCanResty.php
  * @desc    PHP Server Component for RedBean and Fuse.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -25,13 +25,13 @@ use \RedBeanPHP\Plugin\BeanCan as BeanCan;
  * RedBeanPHP as a backend to a Javascript Application Front-end.
  *
  * Please note that the Resty BeanCan server does not
- * aspire to implement a *perfect* RESTful protocol, not 
+ * aspire to implement a *perfect* RESTful protocol, not
  * even *perfect* HTTP/1.1 protocol. The BeanCan offers REST-like
  * methods and HTTP-like response code. The actual handling of responses is
  * up to you, the BeanCan won't send any output or headers. Instead the
  * purpose of this class is to provide a practical tool for everyday
  * business.
- * 
+ *
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
@@ -325,7 +325,7 @@ class BeanCanResty implements Plugin
 		}
 
 		$answer = call_user_func_array( array( $this->bean, $this->method ), $this->payload['param'] );
-		
+
 		return $this->resp( $answer );
 	}
 
@@ -397,9 +397,9 @@ class BeanCanResty implements Plugin
 
 	/**
 	 * Finds a bean by its URI.
-	 * Returns the bean identified by the specified URI. 
-	 * 
-	 * For more details 
+	 * Returns the bean identified by the specified URI.
+	 *
+	 * For more details
 	 * @see Finder::findByPath
 	 *
 	 * @return void
@@ -494,7 +494,7 @@ class BeanCanResty implements Plugin
 
 			try {
 				$this->findBeanByURI();
-			} catch (\Exception $e ) {
+			} catch ( \Exception $e ) {
 				return $this->resp( NULL, self::C_HTTP_NOT_FOUND, $e->getMessage() );
 			}
 
@@ -503,7 +503,7 @@ class BeanCanResty implements Plugin
 			}
 
 			return $this->dispatch();
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			return $this->resp( NULL, self::C_HTTP_INTERNAL_SERVER_ERROR, 'Exception: ' . $e->getCode() );
 		}
 	}
@@ -546,17 +546,17 @@ class BeanCanResty implements Plugin
 	/**
 	 * The Resty BeanCan uses a white list to determine whether the current
 	 * request is allowed.
-	 * 
-	 * A whitelist has the following format: 
-	 * 
-	 * array( 'book' 
+	 *
+	 * A whitelist has the following format:
+	 *
+	 * array( 'book'
 	 *	            => array( 'POST', 'GET', 'publish'),
 	 *	       'page'
 	 *             => etc...
-	 * 
+	 *
 	 * this will allow the methods 'POST', 'GET' and 'publish' for beans of type 'book'.
 	 * To allow all methods on all beans pass the string 'all'.
-	 * 
+	 *
 	 * @param array|string $whitelist  a white list of beans and methods that should be accessible through the BeanCan Server.
 	 *
 	 * @return BeanCan
@@ -580,11 +580,11 @@ class BeanCanResty implements Plugin
 	 * a list of SQL snippets (the SQL bundle). The SQL bundle contains additional SQL and bindings
 	 * per type, if a list gets accessed the SQL with the type-key of the list will be used to filter
 	 * or sort the results.
-	 * 
+	 *
 	 * Only method-bean combinations mentioned in the whitelist will be allowed.
 	 * Also note that handleREST accepts ALL kinds of methods. You can pass proper HTTP methods
 	 * or fabricated methods. The latter will just cause the methods to be invoked on the specified beans.
-	 * 
+	 *
 	 * @param OODBBean $root        root bean for REST action
 	 * @param string           $uri         the URI of the RESTful operation
 	 * @param string           $method      the method you want to apply

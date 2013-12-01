@@ -90,19 +90,19 @@ class RPDO implements Driver
 		foreach ( $bindings as $key => &$value ) {
 			if ( is_integer( $key ) ) {
 				if ( is_null( $value ) ) {
-					$statement->bindValue( $key + 1, NULL,\PDO::PARAM_NULL );
+					$statement->bindValue( $key + 1, NULL, \PDO::PARAM_NULL );
 				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && $value < 2147483648 ) {
-					$statement->bindParam( $key + 1, $value,\PDO::PARAM_INT );
+					$statement->bindParam( $key + 1, $value, \PDO::PARAM_INT );
 				} else {
-					$statement->bindParam( $key + 1, $value,\PDO::PARAM_STR );
+					$statement->bindParam( $key + 1, $value, \PDO::PARAM_STR );
 				}
 			} else {
 				if ( is_null( $value ) ) {
-					$statement->bindValue( $key, NULL,\PDO::PARAM_NULL );
+					$statement->bindValue( $key, NULL, \PDO::PARAM_NULL );
 				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && $value < 2147483648 ) {
-					$statement->bindParam( $key, $value,\PDO::PARAM_INT );
+					$statement->bindParam( $key, $value, \PDO::PARAM_INT );
 				} else {
-					$statement->bindParam( $key, $value,\PDO::PARAM_STR );
+					$statement->bindParam( $key, $value, \PDO::PARAM_STR );
 				}
 			}
 		}
@@ -245,11 +245,11 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Establishes a connection to the database using PHP\PDO
+	 * Establishes a connection to the database using PHP \PDO
 	 * functionality. If a connection has already been established this
 	 * method will simply return directly. This method also turns on
-	 * UTF8 for the database and\PDO-ERRMODE-EXCEPTION as well as
-	 *\PDO-FETCH-ASSOC.
+	 * UTF8 for the database and \PDO-ERRMODE-EXCEPTION as well as
+	 * \PDO-FETCH-ASSOC.
 	 *
 	 * @throws \PDOException
 	 *
@@ -444,9 +444,9 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Returns the name of database driver for\PDO.
-	 * Uses the\PDO attribute DRIVER NAME to obtain the name of the
-	 *\PDO driver.
+	 * Returns the name of database driver for \PDO.
+	 * Uses the \PDO attribute DRIVER NAME to obtain the name of the
+	 * \PDO driver.
 	 *
 	 * @return string
 	 */
