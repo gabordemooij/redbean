@@ -85,10 +85,10 @@ class RedBean_Preloader
 	private function extractTypeInfo( $typeInfo )
 	{
 		if ( is_array( $typeInfo ) && !isset( $typeInfo[1] ) ) {
-			$typeInfo[1] = NULL;
+			$typeInfo[1] = array( NULL, array() );
 		}
 		
-		list( $type, $sqlObj ) = ( is_array( $typeInfo ) ? $typeInfo : array( $typeInfo, NULL ) );
+		list( $type, $sqlObj ) = ( is_array( $typeInfo ) ? $typeInfo : array( $typeInfo, array( NULL, array() ) ) );
 
 		if ( !isset($sqlObj[1]) ) {
 			$sqlObj[1] = array();
