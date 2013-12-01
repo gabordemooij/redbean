@@ -15,6 +15,49 @@ use \RedBeanPHP\OODBBean as OODBBean;
  */
 class RedUNIT_Base_Preloading extends RedUNIT_Base
 {
+	
+	/**
+	 * Test for issue #328 (excerpt): 
+	 * Previously, if we wanted to use the array form without an SQL snippet, it will fail:
+	 *	R::preload($beans, array('manager' => array('people')));
+	 * It fixes the ability to have conditional snippets without bindings:
+	 *	R::preload($beans, array('ownManager' => array('manager', array("name = 'john'"))))
+	 * 
+	 * @return void
+	 */
+	public function testAPreloadWithMissingParams()
+	{	
+		testpack( 'Test flexible method signature (issue #328).' );
+		
+		$old_error_handler = set_error_handler( function() {
+			fail();
+		} );
+		
+		R::nuke();
+		
+		$beans = R::dispense( 'user', 2 );
+		foreach( $beans as $bean ) {
+			$bean->people = R::dispense( 'manager' );
+		}
+		
+		R::storeAll( $beans );
+		R::preload( $beans, array( 'manager' => array( 'people' ) ) );
+		R::nuke();
+		$beans = R::dispense( 'company', 2 );
+		foreach( $beans as $company ) {
+			$company->ownManager[] = R::dispense( 'manager' )->setAttr( 'name', 'John' );
+		}
+		$ids   = R::storeAll( $beans );
+		$beans = R::batch( 'company', $ids );
+		R::preload( $beans, array( 'ownManager' => array( 'manager', array( "name = 'John'" ) ) ) );
+		
+		$bean    = reset( $beans );
+		$manager = reset( $bean->ownManager );
+		asrt( $manager->name, 'John' );
+		
+		set_error_handler($old_error_handler);
+	}
+	
 	/**
 	 * Test Preload save.
 	 * 
