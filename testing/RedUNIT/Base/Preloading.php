@@ -356,7 +356,7 @@ class RedUNIT_Base_Preloading extends RedUNIT_Base
 	public function testAPreloadWithMissingParams()
 	{	
 		testpack( 'Test flexible method signature (issue #328).' );
-		
+
 		R::nuke();
 		
 		$beans = R::dispense( 'user', 2 );
