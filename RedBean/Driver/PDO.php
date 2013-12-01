@@ -250,20 +250,21 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	* @return void
 	*/
 	public function connect()
-   {
+	{
 		if ( $this->isConnected ) return;
-   	try {
-			$user = $this->connectInfo['user'];
-   		$pass = $this->connectInfo['pass'];
 
-   		$this->pdo = new PDO(
+		try {
+			$user = $this->connectInfo['user'];
+			$pass = $this->connectInfo['pass'];
+
+			$this->pdo = new PDO(
 				$this->dsn,
-   			$user,
-   			$pass,
-   			array(PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-   					PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-   			)
-   		);
+				$user,
+				$pass,
+				array( PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+					   PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+				)
+			);
 
 			if ( $this->autoSetEncoding !== FALSE ) {
 				$this->setEncoding();
@@ -272,13 +273,13 @@ class RedBean_Driver_PDO implements RedBean_Driver
 			$this->pdo->setAttribute( PDO::ATTR_STRINGIFY_FETCHES, TRUE );
 
 			$this->isConnected = TRUE;
-   	} catch ( PDOException $exception ) {
-   			$matches = array();
+		} catch ( PDOException $exception ) {
+			$matches = array();
 
-   			$dbname  = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
+			$dbname = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
 
-   			throw new PDOException( 'Could not connect to database (' . $dbname . ').', $exception->getCode() );
-   	}
+			throw new PDOException( 'Could not connect to database (' . $dbname . ').', $exception->getCode() );
+		}
 	}
 
 	/**
