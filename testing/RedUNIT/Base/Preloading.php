@@ -13,6 +13,374 @@
  */
 class RedUNIT_Base_Preloading extends RedUNIT_Base
 {
+	
+	/**
+	 * Test whether we can still preload in case we renamed an association.
+	 * This is a very theoretical test since the preloader simply relies
+	 * on the Association Manager in the end, so this should never cause
+	 * trouble, but why not have a test to ensure this anyway?
+	 * 
+	 * @return void
+	 */
+	public function testPreloadingWithVia()
+	{
+		testpack( 'Can we preload with via()?' );
+		
+		R::nuke();
+		R::renameAssociation( 'person_village', 'people' );
+		$village = R::dispense( 'village' );
+		$john = R::dispense( 'person' )->setAttr( 'name', 'John' );
+		$people = R::dispense( 'people' );
+		$people->village = $village;
+		$people->person = $john;
+		R::store( $people );
+		$village = $village->fresh();
+
+		R::preload( $village, 
+			array( 'sharedPerson' =>
+				array( 'person' ) 
+			)
+		);
+		R::nuke();
+		asrt( count( $village->sharedPerson ), 1 );
+	}
+	
+	/**
+	 * Tests wheter we can use aliased own-lists when preloading.
+	 * To load an aliased own-list use the slash (/) to indicate the alias.
+	 * 
+	 * Example: 
+	 * 
+	 * R::preload( $pete,
+	 *		array( 'ownBook/illustrator' => 
+	 *			array( 'book' )
+	 *		)
+	 * );
+	 * 
+	 * Preloads all books where $pete has been the illustrator.
+	 * This is the preload equivalent of:
+	 * 
+	 * $pete->alias( 'illustrator' )->ownBook;
+	 * 
+	 * Here we test the preload variant.
+	 */
+	public function testPreloadingAliasedOwnList()
+	{
+		testpack('Test whether we can use aliasing in preloading own-lists' );
+
+		list( $church, $castle ) = R::dispense( 'building', 2 );
+		$priest = R::dispense( 'person' );
+		$priest->myrole = 'priest';
+		$church->ownership = $priest;
+		$castle->ownership = $priest;
+		
+		R::store( $church );
+		R::store( $castle );
+		
+		$priest = $priest->fresh();
+
+		R::preload( $priest, array(
+			 'ownBuilding/ownership' => 'building',
+		) );
+
+		R::nuke();
+		asrt( count( $priest->ownBuilding ), 2 );
+
+		//Same as above but also with an SQL condition...
+
+		list( $church, $castle ) = R::dispense( 'building', 2 );
+		$priest = R::dispense( 'person' );
+		$priest->myrole = 'priest';
+		$church->ownership = $priest;
+		$castle->ownership = $priest;
+		
+		$castle->isMonument = 'yes';
+		R::store( $church );
+		R::store( $castle );
+		
+		$priest = $priest->fresh();
+
+		R::preload( $priest, array(
+			'ownBuilding/ownership' => 
+				array( 'building',
+					array( ' is_monument = ? ', 
+						array( 'yes' )
+					)
+				)
+			)
+		);
+
+		R::nuke();
+		asrt( count( $priest->ownBuilding ), 1 );
+	}
+
+	/**
+	 * Tests whether we can filter parent beans using SQL snippets when
+	 * preloading. Sometimes you want to be able to only load certain parents when
+	 * preloading. This is normally not an issue because a single bean can only have one
+	 * parent, but when using the preloading you are forced to load all parens and this may
+	 * not be the desired outcome. You might be interested in only a subset of parents.
+	 * This test checks if you can use SQL snippets to filter parents.
+	 * 
+	 * Also tests double filtering for parents, i.e. when filtering parents their parents
+	 * should not cause all previous parents to load.
+	 * 
+	 * @return void
+	 */
+	public function testParentPreloadWithSQL()
+	{
+		testpack( 'Test whether we can preload a parent with an SQL snippet.' );
+		
+		R::nuke();
+		list( $bookX, $bookY ) = R::dispense( 'book', 2 );
+
+		$bookX->title = 'x';
+		$bookY->title = 'y';
+
+		$pages = R::dispense( 'page', 5 );
+
+		foreach( $pages as $page ) {
+			$page->belongsto = 'x';
+		}
+
+		$bookX->ownPage = $pages;
+
+		$pages = R::dispense('page',5);
+
+		foreach( $pages as $page ) {
+			$page->belongsto = 'y';
+		}
+
+		$bookY->ownPage = $pages;
+
+		R::storeAll( array( $bookX, $bookY ) );
+
+		$pages = R::find( 'page' );
+		R::preload( $pages, array( 'book' => array( 'book', array( ' title = ? ', array( 'x' ) ) ) ) );
+		R::nuke();
+
+		foreach( $pages as $page ) {
+			if ( $page->belongsto === 'x' ) {
+				asrt( ($page->book->id > 0 ), true );
+				asrt( ($page->book->title ), 'x' );
+			} elseif( $page->belongsto === 'y' ) {
+				asrt(( $page->book->id === 0 ), true );
+				asrt( (string) $page->book_id, (string) $bookY->id );
+			} 
+		}
+
+		//Now we test double filtering and a combination of parent- and child
+		//preloading...
+
+		list( $author1, $author2 )             = R::dispense( 'author', 2 );
+		list( $bookA, $bookB, $bookC )         = R::dispense( 'book', 3 );
+		list( $page1, $page2, $page3, $page4 ) = R::dispense( 'page', 4 );
+
+		$author1->myname = 1;
+		$author2->myname = 2;
+
+		$bookA->writer = $author1;
+		$bookB->writer = $author2;
+		$bookC->writer = $author1;
+
+		$bookA->title = 'a';
+		$bookB->title = 'b';
+		$bookC->title = 'c';
+
+		$page1->book = $bookA;
+		$page2->book = $bookB;
+		$page3->book = $bookA;
+		$page4->book = $bookC;
+
+		$page1->num = 1;
+		$page2->num = 2;
+		$page3->num = 3;
+		$page4->num = 4;
+
+		$page1->ownText = R::dispense( 'text', 10 );
+		$page2->ownText = R::dispense( 'text', 10 );
+		$page3->ownText = R::dispense( 'text', 10 );
+		$page4->ownText = R::dispense( 'text', 10 );
+
+		$page1->sharedTag = R::dispense( 'tag', 2 );
+
+		R::storeAll( array( $page1, $page2, $page3, $page4 ) );
+
+		$pages = R::find('page');
+
+		R::preload($pages, array(
+			 'ownText'     => 'text', 
+			 'book'        => 
+				array( 'book', 
+					array( ' title = ?  OR title = ? ', 
+						 array( 'a', 'b' ) ) ),
+			 'sharedTag'   => 
+				array( 'tag',  
+					array( ' tag.id < 9999 ' ) 
+				),
+			 'book.writer' => 
+				array( 'author', 
+					array( ' myname = 2 ' ) 
+				) //this *SHOULD NOT* cause the other book to be loaded as well.
+		));
+		
+		R::nuke();
+		foreach( $pages as $page ) {
+			
+			asrt( count( $page->ownText ), 10 ); //have ALL texts been preloaded ?
+			if ( (string) $page->num === '1' ) asrt( count( $page->sharedTag ), 2 ); //All tags?
+			
+			$book = $page->book;
+			if ( (string) $page->num === '4' ) asrt( $book->title, NULL ); //not c
+			if ( (string) $page->num === '3' ) asrt( $book->title, 'a' );
+			if ( (string) $page->num === '2' ) asrt( $book->title, 'b' );
+			if ( (string) $page->num === '1' ) asrt( $book->title, 'a' );
+			if ( (string) $book->title === 'b') asrt( (string) $book->writer->myname, '2' ); 
+			if ( (string) $book->title === 'a') asrt( $book->writer->id, 0 ); 
+			if ( (string) $book->title === 'c') fail(); 
+		}
+		
+	}
+	
+	/**
+	 * Test double filtering own-lists and shared lists.
+	 * If we load own-lists of own-lists this should not cause list members previously
+	 * filtered out to get loaded anyway. Same holds for shared lists.
+	 * This is called double filtering and it's a real power feature on the edge of
+	 * the RedBeanPHP scope.
+	 * 
+	 * @return void
+	 */
+	public function testDoubleFilteringWithSQL()
+	{
+
+		$village = R::dispense( 'village' );
+		list( $redArmy, $greenArmy, $yellowArmy ) = R::dispense( 'army', 3 );
+		$redArmy->color = 'red';
+		$greenArmy->color = 'green';
+		$yellowArmy->color = 'yellow';
+		list( $redFlag, $greenFlag, $yellowFlag, $whiteFlag ) = R::dispense( 'flag', 4 );
+		$redFlag->color = 'red';
+		$greenFlag->color = 'green';
+		$yellowFlag->color = 'yellow';
+		$whiteFlag->color = 'white';
+		list( $church, $castle, $tavern ) = R::dispense( 'building', 3 );
+		$church->kind = 'church';
+		$castle->kind = 'castle';
+		$tavern->kind = 'tavern';
+		list( $monk, $knight, $bartender ) = R::dispense( 'person', 3 );
+		$monk->myrole = 'monk';
+		$knight->myrole = 'knight';
+		$bartender->myrole = 'bartender';
+		list( $tagIntersting, $tagNew ) = R::dispense( 'tag', 2 );
+		$tagIntersting->label = 'interesting';
+		$tagNew->label = 'new';
+
+		$yellowArmy->sharedTag[] = $tagIntersting;
+		$greenArmy->sharedTag[] = $tagIntersting;
+
+		$redArmy->ownFlag = array( $redFlag );
+		$greenArmy->ownFlag = array( $greenFlag, $whiteFlag );
+		$yellowArmy->ownFlag = array( $yellowFlag );
+
+		$monk->sharedTag[] = $tagNew;
+
+		$church->ownPerson[] = $monk;
+		$castle->ownPerson = array($knight, $monk);
+		$tavern->ownPerson[] = $bartender;
+
+		$village->sharedArmy = array($redArmy, $greenArmy, $yellowArmy);
+		$village->ownBuilding = array($castle, $church, $tavern);
+
+		R::store($village);
+		$village = $village->fresh();
+
+		R::preload($village, 
+			array(
+				'ownBuilding' => array( 'building', 
+					array(' kind = ? ', 
+						array( 'church' )
+					)
+				),
+				'*.ownPerson' => 
+					array( 'person', 
+						array(' myrole = ? ', 
+							array('monk' )
+						)
+					),
+				'sharedArmy'  => 
+					array( 'army', 
+						array(' color = ? ', 
+							 array('green')
+						)
+					),
+				'sharedArmy.ownFlag'   => 
+					array( 'flag', 
+						array( ' color = ? OR color = ? ', 
+							 array( 'green', 'white' )
+						)
+					),
+				'sharedArmy.sharedTag' => 
+					array( 'tag',  
+						array(' label = ? ', 
+							 array( 'interesting' )
+						)
+					),
+				)
+			);
+
+		R::nuke();
+
+		asrt( count($village->ownBuilding), 1 );
+		$building = reset($village->ownBuilding );
+		asrt( count($building->ownPerson), 1 );
+		$monk = reset($building->ownPerson );
+		asrt( $monk->myrole, 'monk' );
+		
+		asrt( count($village->sharedArmy ), 1 );
+		$army = reset( $village->sharedArmy );
+		asrt( $army->color, 'green' );
+		asrt( count($army->ownFlag ), 2 );
+		asrt( count($army->sharedTag ), 1 );
+	}
+	
+	/**
+	 * Test for issue #328 (excerpt): 
+	 * Previously, if we wanted to use the array form without an SQL snippet, it will fail:
+	 *	R::preload($beans, array('manager' => array('people')));
+	 * It fixes the ability to have conditional snippets without bindings:
+	 *	R::preload($beans, array('ownManager' => array('manager', array("name = 'john'"))))
+	 * 
+	 * @return void
+	 */
+	public function testAPreloadWithMissingParams()
+	{	
+		testpack( 'Test flexible method signature (issue #328).' );
+		
+		R::nuke();
+		
+		$beans = R::dispense( 'user', 2 );
+		foreach( $beans as $bean ) {
+			$bean->people = R::dispense( 'manager' );
+		}
+		
+		R::storeAll( $beans );
+		R::preload( $beans, array( 'manager' => array( 'people' ) ) );
+		R::nuke();
+		$beans = R::dispense( 'company', 2 );
+		foreach( $beans as $company ) {
+			$company->ownManager[] = R::dispense( 'manager' )->setAttr( 'name', 'John' );
+		}
+		$ids   = R::storeAll( $beans );
+		$beans = R::batch( 'company', $ids );
+		R::preload( $beans, array( 'ownManager' => array( 'manager', array( "name = 'John'" ) ) ) );
+		
+		$bean    = reset( $beans );
+		$manager = reset( $bean->ownManager );
+		asrt( $manager->name, 'John' );
+		
+	}
+	
 	/**
 	 * Test Preload save.
 	 * 
