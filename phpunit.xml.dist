@@ -4,7 +4,9 @@
 		 backupStaticAttributes="false"
 		 strict="true"
 		 colors="true"
-		 verbose="true">
+		 verbose="true"
+		 processIsolation="true"
+         stopOnFailure="false">
 	<testsuites>
 		<testsuite name="redbean">
 			<directory suffix="Test.php">tests</directory>
