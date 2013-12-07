@@ -138,7 +138,7 @@ class Preloader
 		foreach ( $this->filteredBeans as $bean ) {
 			$addInputIDs = $bean->getMeta( 'sys.input-bean-id' );
 
-			if ( is_array( $bean->$nesting ) ) {
+			if ( isset($bean->$nesting) && is_array( $bean->$nesting ) ) {
 				$nestedBeans = $bean->$nesting;
 
 				foreach ( $nestedBeans as $nestedBean ) {
@@ -146,7 +146,7 @@ class Preloader
 				}
 
 				$filtered = array_merge( $filtered, $nestedBeans );
-			} elseif ( !is_null( $bean->$nesting ) ) {
+			} elseif ( isset($bean->$nesting) && !is_null( $bean->$nesting ) ) {
 				$this->addInputBeanIDsToBean( $bean->$nesting, $addInputIDs );
 				$filtered[] = $bean->$nesting;
 			}
@@ -401,13 +401,14 @@ class Preloader
 	 * @param array  $bindings parameter bindings for SQL snippet
 	 * @param string $field    field to store preloaded beans in
 	 * @param array  $ids      list of ids to load
+	 * @param string $alias    alias for own list (optional)
 	 *
 	 * @return void
 	 */
-	private function preloadOwnBeans( $type, $sql, $bindings, $field, $ids )
+	private function preloadOwnBeans( $type, $sql, $bindings, $field, $ids, $alias = null )
 	{
 		$bean = reset( $this->filteredBeans );
-		$link = $bean->getMeta( 'type' ) . '_id';
+		$link = ( $alias === NULL ) ? $bean->getMeta( 'type' ) . '_id' : ( $alias.'_id' );
 
 		$children = $this->oodb->find( $type, array( $link => $ids ), $sql, $bindings );
 
@@ -427,12 +428,14 @@ class Preloader
 	 * @param string $field field to store parent in
 	 * @param array  $ids   list of ids to load
 	 * @param array  $map   mapping to use (children indexed by parent bean ids)
-	 *
+	 * @param string $sql   optional SQL snippet for additional filtering
+	 * @param array  $array optional bindings for SQL snippet
+	 * 
 	 * @return void
 	 */
-	private function preloadParentBeans( $type, $field, $ids, $map )
+	private function preloadParentBeans( $type, $field, $ids, $map, $sql = NULL, $bindings = array() )
 	{
-		foreach ( $this->oodb->batch( $type, $ids ) as $parent ) {
+		foreach ( $this->oodb->find( $type, array( 'id' => $ids ), $sql, $bindings ) as $parent ) {
 			foreach ( $map[$parent->id] as $childBean ) {
 				$childBean->setProperty( $field, $parent );
 
@@ -525,6 +528,11 @@ class Preloader
 			list( $type, $sql, $bindings ) = $this->extractTypeInfo( $typeInfo );
 
 			$this->retrievals[$this->iterationIndex] = array();
+			
+			$alias = NULL;
+			if ( strpos( $key, '/' ) !== false ) {
+				list( $key, $alias ) = explode( '/', $key );
+			}
 
 			$field = $this->getPreloadField( $key, $type, $oldField, $oldFields );
 
@@ -549,10 +557,10 @@ class Preloader
 				$this->preloadSharedBeans( $type, $sql, $bindings, $field );
 			} elseif ( strpos( $field, 'own' ) === 0 ) {
 				// Preload for own-list using find
-				$this->preloadOwnBeans( $type, $sql, $bindings, $field, $ids );
+				$this->preloadOwnBeans( $type, $sql, $bindings, $field, $ids, $alias );
 			} else {
 				// Preload for parent objects using batch()
-				$this->preloadParentBeans( $type, $field, $ids, $map );
+				$this->preloadParentBeans( $type, $field, $ids, $map, $sql, $bindings );
 			}
 
 			$this->iterationIndex++;
