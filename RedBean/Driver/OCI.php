@@ -374,6 +374,15 @@ class RedBean_Driver_OCI implements RedBean_Driver
 
 		return array_shift( $arr );
 	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * 
+	 * @see RedBean/Driver#getAssocRow()
+	 */
+	public function GetAssocRow($sql, $bindings = array()) {
+		throw new \RedBean_Exception_OCI('Not implemented.');
+	}
 
 	/**
 	 * (non-PHPdoc)

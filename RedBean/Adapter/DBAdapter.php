@@ -126,6 +126,17 @@ class RedBean_Adapter_DBAdapter extends RedBean_Observable implements RedBean_Ad
 
 		return $assoc;
 	}
+	
+	/**
+	 * @see Adapter::getAssocRow
+	 */
+	public function getAssocRow($sql, $bindings = array())
+	{
+		$this->sql = $sql;
+		$this->signal( 'sql_exec', $this );
+
+		return $this->db->GetAssocRow( $sql, $bindings );
+	}
 
 	/**
 	 * @see RedBean_Adapter::getCell
