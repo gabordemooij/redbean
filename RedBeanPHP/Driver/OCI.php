@@ -3,7 +3,8 @@ namespace RedBeanPHP\Driver;
 use \RedBeanPHP\Driver as Driver;
 use \RedBeanPHP\Logger as Logger;
 use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Logger\RDefault as RDefault; 
+use \RedBeanPHP\Logger\RDefault as RDefault;
+use \RedBeanPHP\RedException\OCI as OCIException;
 /**
  * OCI Driver
  *
@@ -386,7 +387,7 @@ class OCI implements Driver
 	 * @see RedBean/Driver#getAssocRow()
 	 */
 	public function GetAssocRow($sql, $bindings = array()) {
-		throw new \RedBean_Exception_OCI('Not implemented.');
+		throw new OCIException('Not implemented.');
 	}
 
 	/**
