@@ -118,7 +118,7 @@ class RPDO implements Driver
 	 *
 	 * @throws SQL
 	 */
-	protected function runQuery( $sql, $bindings )
+	protected function runQuery( $sql, $bindings, $options = array() )
 	{
 		$this->connect();
 
@@ -140,7 +140,10 @@ class RPDO implements Driver
 			$this->affectedRows = $statement->rowCount();
 
 			if ( $statement->columnCount() ) {
-				$this->resultArray = $statement->fetchAll();
+				
+				$fetchStyle = ( isset( $options['fetchStyle'] ) ) ? $options['fetchStyle'] : NULL;
+				
+				$this->resultArray = $statement->fetchAll( $fetchStyle );
 
 				if ( $this->debug && $this->logger ) {
 					$this->logger->log( 'resultset: ' . count( $this->resultArray ) . ' rows' );
@@ -284,7 +287,20 @@ class RPDO implements Driver
 
 		return $this->resultArray;
 	}
-
+	
+	/**
+	 * @see Driver::GetAssocRow
+	 */
+	public function GetAssocRow( $sql, $bindings = array() )
+	{
+		$this->runQuery( $sql, $bindings, array( 
+				'fetchStyle' => \PDO::FETCH_ASSOC 
+			) 
+		);
+		
+		return $this->resultArray;
+	}
+	
 	/**
 	 * @see Driver::GetCol
 	 */

@@ -992,6 +992,22 @@ class Facade
 	{
 		return self::query( 'getAssoc', $sql, $bindings );
 	}
+	
+	/**
+	 * Convenience function to execute Queries directly.
+	 * Executes SQL.
+	 * Results will be returned as an associative array indexed by the first
+	 * column in the select.
+	 * 
+	 * @param string $sql       sql    SQL query to execute
+	 * @param array  $bindings  values a list of values to be bound to query parameters
+	 *
+	 * @return array
+	 */
+	public static function getAssocRow( $sql, $bindings = array() )
+	{
+		return self::query( 'getAssocRow', $sql, $bindings );
+	}
 
 	/**
 	 * Makes a copy of a bean. This method makes a deep copy

@@ -130,6 +130,17 @@ class DBAdapter extends Observable implements Adapter
 
 		return $assoc;
 	}
+	
+	/**
+	 * @see Adapter::getAssocRow
+	 */
+	public function getAssocRow($sql, $bindings = array())
+	{
+		$this->sql = $sql;
+		$this->signal( 'sql_exec', $this );
+
+		return $this->db->GetAssocRow( $sql, $bindings );
+	}
 
 	/**
 	 * @see Adapter::getCell

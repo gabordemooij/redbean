@@ -30,7 +30,59 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 	{
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
 	}
+	
+	/**
+	 * Tests the various ways to fetch (select queries)
+	 * data using adapter methods in the facade.
+	 * Also tests the new R::getAssocRow() method, 
+	 * as requested in issue #324.
+	 */
+	public function testFetchTypes() 
+	{
+		R::nuke();
 
+		$page = R::dispense( 'page' );
+		$page->a = 'a';
+		$page->b = 'b';
+		R::store( $page );
+
+		$page = R::dispense( 'page' );
+		$page->a = 'c';
+		$page->b = 'd';
+		R::store( $page );
+
+		$expect = '[{"id":"1","a":"a","b":"b"},{"id":"2","a":"c","b":"d"}]';
+		asrt( json_encode( R::getAll( 'SELECT * FROM page' ) ), $expect );
+
+		$expect = '{"1":"a","2":"c"}';
+		asrt( json_encode( R::getAssoc( 'SELECT id, a FROM page' ) ), $expect );
+		asrt( json_encode( R::getAssoc( 'SELECT id, a, b FROM page' ) ), $expect );
+
+		$expect = '[{"id":"1","a":"a"},{"id":"2","a":"c"}]';
+		asrt( json_encode( R::getAssocRow( 'SELECT id, a FROM page' ) ), $expect );
+
+		$expect = '[{"id":"1","a":"a","b":"b"},{"id":"2","a":"c","b":"d"}]';
+		asrt( json_encode( R::getAssocRow( 'SELECT id, a, b FROM page' ) ), $expect );
+
+		$expect = '{"id":"1","a":"a","b":"b"}';
+		asrt( json_encode( R::getRow( 'SELECT * FROM page WHERE id = 1' ) ), $expect );
+
+		$expect = '"a"';
+		asrt( json_encode( R::getCell( 'SELECT a FROM page WHERE id = 1' ) ), $expect );
+
+		$expect = '"b"';
+		asrt( json_encode( R::getCell( 'SELECT b FROM page WHERE id = 1') ), $expect );
+
+		$expect = '"c"';
+		asrt( json_encode( R::getCell('SELECT a FROM page WHERE id = 2') ), $expect );
+
+		$expect = '["a","c"]';
+		asrt( json_encode( R::getCol( 'SELECT a FROM page' ) ), $expect );
+
+		$expect = '["b","d"]';
+		asrt( json_encode( R::getCol('SELECT b FROM page') ), $expect );
+	}
+	
 	/**
 	 * Tests whether we can store an empty bean.
 	 * An empty bean has no properties, only ID. Normally we would

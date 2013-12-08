@@ -100,6 +100,17 @@ interface Adapter
 	 * @return array
 	 */
 	public function getAssoc( $sql, $bindings = array() );
+	
+	/**
+	 * Executes the SQL query specified in $sql and indexes
+	 * the row by the first column.
+	 * 
+	 * @param string $sql      SQL
+	 * @param array  $bindings values to bind
+	 *
+	 * @return array
+	 */
+	public function getAssocRow( $sql, $bindings = array() );
 
 	/**
 	 * Returns the latest insert ID.
