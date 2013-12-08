@@ -1,3 +1,9 @@
+# Composer #
+############
+
+vendor/
+composer.lock
+
 # Compiled source #
 ###################
 *.com
