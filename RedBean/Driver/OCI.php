@@ -381,7 +381,7 @@ class RedBean_Driver_OCI implements RedBean_Driver
 	 * @see RedBean/Driver#getAssocRow()
 	 */
 	public function GetAssocRow($sql, $bindings = array()) {
-		throw new \RedBean_Exception_OCI('Not implemented.');
+		throw new RedBean_Exception_OCI('Not implemented.');
 	}
 
 	/**

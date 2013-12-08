@@ -300,7 +300,7 @@ class RedBean_Driver_PDO implements RedBean_Driver
 	public function GetAssocRow( $sql, $bindings = array() )
 	{
 		$this->runQuery( $sql, $bindings, array( 
-				'fetchStyle' => \PDO::FETCH_ASSOC 
+				'fetchStyle' => PDO::FETCH_ASSOC 
 			) 
 		);
 		
