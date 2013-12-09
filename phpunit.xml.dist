@@ -13,13 +13,28 @@
 		</testsuite>
 	</testsuites>
 
-	<logging>
-		<log type="coverage-html" target="build/coverage" title="money"
-			 charset="UTF-8" yui="true" highlight="true"
-			 lowUpperBound="35" highLowerBound="70"/>
-		<log type="coverage-clover" target="build/logs/clover.xml"/>
-		<log type="junit" target="build/logs/junit.xml" logIncompleteSkipped="false"/>
-	</logging>
+    <logging>
+        <log
+            type="tap"
+            target="build/logs/report.tap"
+        />
+        <log
+            type="junit"
+            target="build/logs/report.junit.xml"
+        />
+        <log
+            type="coverage-html"
+            target="build/logs/coverage"
+            charset="UTF-8"
+            yui="true"
+            highlight="true"
+        />
+        <log
+            type="coverage-text"
+            target="build/logs/coverage.txt"
+        />
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
 
 	<filter>
 		<whitelist addUncoveredFilesFromWhitelist="true">
