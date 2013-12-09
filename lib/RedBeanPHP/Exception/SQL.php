@@ -1,5 +1,5 @@
 <?php
-namespace RedBeanPHP\RedException;
+namespace RedBeanPHP\Exception;
 /**
  * RedBean\Exception SQL
  *

@@ -3,7 +3,7 @@ namespace RedBeanPHP\Driver;
 use \RedBeanPHP\Driver as Driver;
 use \RedBeanPHP\Logger as Logger;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\RedException\SQL as SQL;
+use \RedBeanPHP\Exception\SQL as SQL;
 use \RedBeanPHP\Logger\RDefault as RDefault;
 /**
  * \PDO Driver
