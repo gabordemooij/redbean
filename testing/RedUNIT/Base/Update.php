@@ -85,6 +85,67 @@ class RedUNIT_Base_Update extends RedUNIT_Base
 		asrt(count($account->ownTransaction), 0 );
 		
 		R::freeze( false );
+
+		//but also make sure we don't cause extra column issue #335
+
+		R::nuke();
+
+		$building = R::dispense('building');
+		$village  = R::dispense('village');
+		
+		$building->village = $village;
+
+		R::store($building);
+
+		$building = $building->fresh();
+		$building->village = NULL;
+
+		R::store($building);
+		
+		$building = $building->fresh();
+
+		$columns = R::inspect('building');
+		asrt( isset( $columns['village'] ), false );
+		asrt( isset( $building->village ), false );
+		
+		R::nuke();
+
+		$building = R::dispense('building');
+                $village  = R::dispense('village');
+
+                $building->village = $village;
+
+                R::store($building);
+        
+                $building = $building->fresh();
+                unset($building->village);
+
+                R::store($building);
+
+                $building = $building->fresh();
+
+                $columns = R::inspect('building');
+                asrt( isset( $columns['village'] ), false );
+                asrt( isset( $building->village ), false );
+
+		$building = R::dispense('building');
+                $village  = R::dispense('village');
+
+                $building->village = $village;
+
+                R::store($building);
+        
+                $building = $building->fresh();
+                $building->village = false;
+
+                R::store($building);
+
+                $building = $building->fresh();
+
+                $columns = R::inspect('building');
+                asrt( isset( $columns['village'] ), false );
+                asrt( isset( $building->village ), false );
+
 	}
 	
 	/**

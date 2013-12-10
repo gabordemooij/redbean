@@ -696,7 +696,13 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 				$bean = $this->__info["sys.parentcache.$property"];
 			}
 
-			if ( !$bean && !$this->writeOnly ) {
+			if ( $this->writeOnly ) {
+				$this->clear();
+				$NULL = null;
+				return $NULL;
+			}
+
+			if ( !$bean ) {
 				$type = $this->getAlias( $property );
 
 				if ( $this->withSql !== '' ) {
