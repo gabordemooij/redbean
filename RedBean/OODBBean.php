@@ -86,11 +86,6 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 * @var string
 	 */
 	private $via = NULL;
-	
-	/**
-	 * @var boolean
-	 */
-	private $writeOnly = false;
 
 	/** Returns the alias for a type
 	 *
@@ -696,7 +691,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 				$bean = $this->__info["sys.parentcache.$property"];
 			}
 
-			if ( !$bean && !$this->writeOnly ) {
+			if ( !$bean ) {
 				$type = $this->getAlias( $property );
 
 				if ( $this->withSql !== '' ) {
@@ -765,9 +760,7 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 
 		$this->flagSkipBeau = TRUE;
 
-		$this->writeOnly = true;
 		$this->__get( $property );
-		$this->writeOnly = false;
 
 		$this->flagSkipBeau = FALSE;
 
