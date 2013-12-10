@@ -463,7 +463,9 @@ class RedBean_OODBBean implements IteratorAggregate, ArrayAccess, Countable
 	 */
 	public function __unset( $property )
 	{
+		$this->writeOnly = true;
 		$this->__get( $property );
+		$this->writeOnly = false;
 
 		$fieldLink = $property . '_id';
 
