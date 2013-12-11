@@ -707,6 +707,18 @@ class RedBean_QueryWriter_Oracle extends RedBean_QueryWriter_AQueryWriter implem
 		return RedBean_QueryWriter_Oracle::C_DATATYPE_TEXT32;
 	}
 
+    /**
+     * Oracle TRUNCATE needs TABLE|CLUSTER clause
+     * 
+     * @link http://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_10006.htm
+     * @see RedBean_QueryWriter::wipe
+     */
+    public function wipe( $type )
+    {
+        $table = $this->esc( $type );
+        $this->adapter->exec( "TRUNCATE TABLE $table " );
+    }
+
 	/**
 	 * Drops all tables in database
 	 */
