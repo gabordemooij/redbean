@@ -27,4 +27,5 @@ if ( defined( 'REDBEANPHP_EXTRA' ) ) {
 //make some classes available for backward compatibility
 class RedBean_SimpleModel extends \RedBeanPHP\SimpleModel {};
 class RedBean_DependencyInjector extends \RedBeanPHP\DependencyInjector{};
+class R extends \RedBeanPHP\Facade{};
 
