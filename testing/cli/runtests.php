@@ -294,3 +294,5 @@ echo 'Code Coverage: '.PHP_EOL;
 echo 'Hits: '.$hits.PHP_EOL;
 echo 'Misses: '.$misses.PHP_EOL;
 echo 'Percentage: '.$perc.' %'.PHP_EOL;
+
+exit(0);
