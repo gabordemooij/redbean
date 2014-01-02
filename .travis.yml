@@ -8,9 +8,9 @@ before_script:
   - touch /tmp/oodb.db
   - mysql -e 'create database oodb;'
   - psql -c 'create database oodb;' -U postgres
-  - php replica.php
-  - cp rb.php testing/cli/testcontainer/rb.php  
+  - php replica2.php
+  - cp rb.phar testing/cli/testcontainer/rb.phar  
   - cd testing/cli
     
  
-script: ./startnc.sh all+plugins
+script: phpunit runtests.php
