@@ -13,4 +13,4 @@ before_script:
   - cd testing/cli
     
  
-script: phpunit runtests.php
+script: php runtests.php

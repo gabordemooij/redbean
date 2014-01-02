@@ -2,9 +2,9 @@
 
 chdir('..');
 
+xdebug_start_code_coverage(XDEBUG_CC_UNUSED);
 require 'testcontainer/rb.phar';
 
-use RedBeanPHP\Facade as R;
 
 //load core classes
 require "RedUNIT.php";
@@ -83,11 +83,12 @@ function activate_driver( $d )
 	R::selectDatabase( $d );
 }
 
+
 $arguments = $_SERVER['argc'];
 
 $mode = 'all';
-if ( $arguments > 2 ) {
-	$mode = $_SERVER['argv'][2];
+if ( $arguments > 1 ) {
+	$mode = $_SERVER['argv'][1];
 }
 
 $path = 'RedUNIT/';
@@ -256,5 +257,40 @@ foreach ( $packList as $testPack ) {
 	}
 }
 
+$report = xdebug_get_code_coverage();
+$misses = 0;
+$hits = 0;
 
+$covLines = array();
+foreach($report as $file => $lines) {
+	$pi = pathinfo($file);
+	
+	if (strpos($file,'phar')===false) continue;
 
+	$covLines[] = '***** File:'.$file.' ******';
+	
+	$fileData = file_get_contents($file);
+	$fileLines = explode("\n", $fileData);
+	$i = 1;
+	foreach($fileLines as $covLine) {
+		if (isset($lines[$i]) && $lines[$i]===1) {
+			$covLines[] = '[ OK      ] '.$covLine;
+			$hits ++;
+			
+		} else {
+			$covLines[] = '[ MISSED! ] '.$covLine;
+			$misses ++;
+		}
+		$i ++;
+	}
+}
+
+$covFile = implode("\n", $covLines);
+@file_put_contents('cli/coverage_log.txt', $covFile);
+
+$perc = ($hits/($hits+$misses)) * 100;
+
+echo 'Code Coverage: '.PHP_EOL;
+echo 'Hits: '.$hits.PHP_EOL;
+echo 'Misses: '.$misses.PHP_EOL;
+echo 'Percentage: '.$perc.' %'.PHP_EOL;
