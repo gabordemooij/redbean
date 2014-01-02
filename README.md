@@ -1,4 +1,0 @@
-RedBeanPHPKS
-============
-
-RedBeanPHP KickStart
