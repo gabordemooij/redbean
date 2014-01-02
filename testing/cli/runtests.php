@@ -2,7 +2,7 @@
 
 chdir('..');
 
-xdebug_start_code_coverage(XDEBUG_CC_UNUSED);
+xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
 require 'testcontainer/rb.phar';
 
 
@@ -273,13 +273,18 @@ foreach($report as $file => $lines) {
 	$fileLines = explode("\n", $fileData);
 	$i = 1;
 	foreach($fileLines as $covLine) {
-		if (isset($lines[$i]) && $lines[$i]===1) {
-			$covLines[] = '[ OK      ] '.$covLine;
-			$hits ++;
-			
+		if (isset($lines[$i])) {
+			if ($lines[$i]===1) {
+				$covLines[] = '[ OK      ] '.$covLine;
+				$hits ++;
+			} else if ($lines[$i] === -1){
+				$covLines[] = '[ MISSED! ] '.$covLine;
+				$misses ++;
+			} else {
+				$covLines[] = '[ -       ] '.$covLine;
+			}
 		} else {
-			$covLines[] = '[ MISSED! ] '.$covLine;
-			$misses ++;
+			$covLines[] = '[ -       ] '.$covLine;
 		}
 		$i ++;
 	}
