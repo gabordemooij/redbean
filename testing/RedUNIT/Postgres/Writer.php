@@ -487,6 +487,15 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		$bean = R::load( 'bean', $bean->id );
 
 		asrt( $bean->money, '$123.45' );
+		
+		$bean->money = '$123,455.01';
+		
+		R::store($bean);
+		
+		$bean = $bean->fresh();
+		
+		asrt( $bean->money, '$123,455.01' );
+		
 	}
 
 	/**
@@ -517,6 +526,42 @@ class RedUNIT_Postgres_Writer extends RedUNIT_Postgres
 		$bean = R::load( 'bean', $bean->id );
 
 		asrt( $bean->money, '-$123.45' );
+	}
+	
+	/**
+	 * Issue #340
+	 * Redbean is currently picking up bcrypt hashed passwords
+	 * (which look like this: $2y$12$85lAS....SnpDNVGPAC7w0G) 
+	 * as PostgreSQL money types. 
+	 * Then, once R::store is called on the bean, it chokes and throws the following error:
+	 * PHP Fatal error: Uncaught [22P02] - SQLSTATE[22P02]: Invalid text representation: 7 ERROR: 
+	 * invalid input syntax for type money: ....
+	 * 
+	 * @return void
+	 */
+	public function testTypesInvalidMoney()
+	{
+		$bean = R::dispense( 'bean' );
+
+		$bean->nomoney = '$2y$12$85lAS';
+
+		R::store( $bean );
+
+		$cols = R::getColumns( 'bean' );
+
+		asrt( $cols['nomoney'], 'text' );
+
+		$bean = R::load( 'bean', $bean->id );
+
+		asrt( $bean->nomoney, '$2y$12$85lAS' );
+
+		$bean->note = 'taint';
+
+		R::store( $bean );
+
+		$bean = R::load( 'bean', $bean->id );
+
+		asrt( $bean->nomoney, '$2y$12$85lAS' );
 	}
 
 	/**
