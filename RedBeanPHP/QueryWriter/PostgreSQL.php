@@ -214,7 +214,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 				return PostgreSQL::C_DATATYPE_SPECIAL_CIRCLE;
 			}
 
-			if ( preg_match( '/^\-?\$\d+/', $value ) ) {
+			if ( preg_match( '/^\-?\$[\d,\.]+$/', $value ) ) {
 				return PostgreSQL::C_DATATYPE_SPECIAL_MONEY;
 			}
 		}
