@@ -1,0 +1,16 @@
+language: php
+php:
+  - 5.3
+  - 5.4
+  - 5.5
+
+before_script:
+  - touch /tmp/oodb.db
+  - mysql -e 'create database oodb;'
+  - psql -c 'create database oodb;' -U postgres
+  - php replica.php
+  - cp rb.php testing/cli/testcontainer/rb.php  
+  - cd testing/cli
+    
+ 
+script: ./startnc.sh all+plugins
