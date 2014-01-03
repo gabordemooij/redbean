@@ -2,7 +2,7 @@ RedBeanPHP 4 KickStart
 ======================
 
 Current Build Status:
-[![Build Status](https://secure.travis-ci.org/gabordemooij/redbean.png)](http://travis-ci.org/gabordemooij/redbean)
+[![Build Status](https://secure.travis-ci.org/gabordemooij/RedBeanPHPKS.png)](http://travis-ci.org/gabordemooij/RedBeanPHPKS)
 
 RedBeanPHP 4 KS is an easy to use ORM tool that stores beans directly in the
 database and creates all tables and columns required on the fly.
