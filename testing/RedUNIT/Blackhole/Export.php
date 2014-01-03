@@ -94,9 +94,13 @@ class RedUNIT_Blackhole_Export extends RedUNIT_Blackhole
 		asrt( ( count( $bean ) > 0 ), TRUE );
 
 		// Export bug I found
-		$object = R::graph( json_decode( '{"type":"bandmember","name":"Duke","ownInstrument":[{"type":"instrument","name":"Piano"}]}', TRUE ) );
-
-		$a = R::exportAll( $object );
+		$bandmember = R::dispense( 'bandmember' );
+		$bandmember->name = 'Duke';
+		$instrument = R::dispense( 'instrument' );
+		$instrument->name = 'Piano';
+		$bandmember->ownInstrument[] = $instrument;
+		
+		$a = R::exportAll( $bandmember );
 
 		pass();
 

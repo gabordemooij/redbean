@@ -132,11 +132,6 @@ class RedUNIT_Base_Facade extends RedUNIT_Base
 		asrt( count( R::find( "book", " title LIKE ?", array( "third" ) ) ), 1 );
 		asrt( count( R::find( "book", " title LIKE ?", array( "%d%" ) ) ), 2 );
 
-		// Now with new SQL Helper argument
-		asrt( count( R::find( "book", R::$f->begin()->addSQL( 'title LIKE ? ' )->put( 'third' ) ) ), 1 );
-		asrt( count( R::find( "book", R::$f->begin()->addSQL( 'title LIKE ? ' )->put( '%d%' ) ) ), 2 );
-		asrt( count( R::find( "book", R::$f->begin()->addSQL( 'title' )->like( ' ? ' )->addSQL( ' ORDER BY id ' )->desc()->put( '%d%' ) ) ), 2 );
-
 		// Find without where clause
 		asrt( count( R::findAll( 'book', ' order by id' ) ), 3 );
 
@@ -284,14 +279,5 @@ class RedUNIT_Base_Facade extends RedUNIT_Base
 
 		$track->title = "test";
 
-		R::associate( $track, $cd, "this column should be named extra" );
-
-		asrt( R::getCell( "SELECT count(*) FROM cd_track WHERE extra = 'this column should be named extra' " ), "1" );
-
-		$composer = R::dispense( "performer" );
-
-		$composer->name = "Miles Davis";
-
-		R::store( $composer );
 	}
 }

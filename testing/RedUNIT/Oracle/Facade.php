@@ -110,11 +110,6 @@ class RedUNIT_Oracle_Facade extends RedUNIT_Oracle
 		asrt( count( R::find( "book", " title LIKE ?", array( "third" ) ) ), 1 );
 		asrt( count( R::find( "book", " title LIKE ?", array( "%d%" ) ) ), 2 );
 
-		// Now with new SQL Helper argument
-		asrt( count( R::find( "book", R::$f->begin()->addSQL( 'title LIKE ? ' )->put( 'third' ) ) ), 1 );
-		asrt( count( R::find( "book", R::$f->begin()->addSQL( 'title LIKE ? ' )->put( '%d%' ) ) ), 2 );
-		asrt( count( R::find( "book", R::$f->begin()->addSQL( 'title' )->like( ' ? ' )->addSQL( ' ORDER BY id ' )->desc()->put( '%d%' ) ) ), 2 );
-
 		//Find without where clause
 		asrt( count( R::findAll( 'book', ' order by id' ) ), 3 );
 

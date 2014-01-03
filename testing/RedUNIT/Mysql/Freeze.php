@@ -1,8 +1,7 @@
 <?php 
 
 use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Plugin\QueryLogger as QueryLogger; 
+use \RedBeanPHP\RedException\SQL as SQL; 
 /**
  * RedUNIT_Mysql_Freeze
  *
@@ -103,8 +102,8 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 			pass();
 		}
 
-		$logger = QueryLogger::getInstanceAndAttach( $adapter );
-
+		$logger = R::debug( true, 1 );
+		
 		// Now log and make sure no 'describe SQL' happens
 		$page = $redbean->dispense( "page" );
 
@@ -140,5 +139,7 @@ class RedUNIT_Mysql_Freeze extends RedUNIT_Mysql
 		asrt( count( $logger->grep( "describe" ) ) < 1, TRUE );
 
 		asrt( is_array( $logger->getLogs() ), TRUE );
+		
+		R::debug( false );
 	}
 }

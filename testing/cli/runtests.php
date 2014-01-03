@@ -35,8 +35,7 @@ require_once( 'RedUNIT/Mysql.php' );
 require_once( 'RedUNIT/Postgres.php' );
 require_once( 'RedUNIT/Sqlite.php' );
 require_once( 'RedUNIT/CUBRID.php' );
-require_once( 'RedUNIT/Oracle.php' );
-require_once( 'RedUNIT/Plugin.php' );
+
 
 //Configure the databases
 if ( isset( $ini['mysql'] ) ) {
@@ -140,16 +139,11 @@ $allPacks = array(
 	'Base/Misc',
 	'CUBRID/Setget',
 	'CUBRID/Writer',
-	'Oracle/Base',
-	'Oracle/Database',
-	'Oracle/Facade',
-	'Oracle/Writer',
 	'Mysql/Preexist',
 	'Mysql/Double',
 	'Mysql/Writer',
 	'Mysql/Freeze',
 	'Mysql/Setget',
-	'Mysql/Mix',
 	'Mysql/Foreignkeys',
 	'Mysql/Parambind',
 	'Mysql/Uuid',
@@ -172,23 +166,13 @@ $suffix = array(
 	'Base/Close'
 );
 
-$pluginPacks = array(
-	'Plugin/Export',
-	'Plugin/Graph',
-	'Plugin/Beancan',
-	'Plugin/Cache',
-	'Plugin/Timeline'
-);
+
 
 // Default (mode == all)
 if ( $mode == 'all' ) {
 	$packList = $allPacks;
-} elseif ( $mode == 'plugins' ) {
-	$packList = $pluginPacks;
-} elseif ( $mode == 'all+plugins' ) {
-	$packList = array_merge( $allPacks, $pluginPacks );
 } else {
-	foreach ( array_merge( $allPacks, $pluginPacks ) as $pack ) {
+	foreach ( $allPacks as $pack ) {
 		if ( strpos( $pack, $mode ) === 0 ) $packList[] = $pack;
 	}
 }

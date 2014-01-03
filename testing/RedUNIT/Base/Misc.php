@@ -36,7 +36,7 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 
 		R::nuke();
 		
-		R::store( R::graph( array('type' => 'book', 'title' => 'book' ) ) );
+		R::store( R::dispense('book')->setAttr('title', 'book') );
 		
 		$info = R::inspect();	
 		asrt( count( $info ), 1 );
@@ -183,19 +183,6 @@ class RedUNIT_Base_Misc extends RedUNIT_Base
 		$painting->name = 'Nighthawks';
 
 		$id = R::store( $painting );
-
-		testpack( 'Testing Plugin Cooker' );
-
-		$cooker = new Cooker();
-		$cooker->setToolbox( $toolbox );
-
-		try {
-			asrt( $cooker->graph( 'abc' ), 'abc' );
-
-			fail();
-		} catch ( Security $e ) {
-			pass();
-		}
 
 		testpack( 'Testing SQL Error Types' );
 

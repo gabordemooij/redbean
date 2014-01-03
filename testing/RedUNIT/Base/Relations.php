@@ -2,7 +2,6 @@
 
 use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\Plugin\QueryLogger as QueryLogger; 
 /**
  * RedUNIT_Base_Relations
  *
@@ -1092,8 +1091,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( count( $book3->sharedTopic ), 1 );
 
 		// Test performance
-		$logger = QueryLogger::getInstanceAndAttach( R::$adapter );
-
+		$logger = R::debug( true, 1 );
+		
 		$book = R::load( 'book', 1 );
 
 		$book->sharedTopic = array();

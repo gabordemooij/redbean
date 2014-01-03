@@ -5,16 +5,12 @@ use \RedBeanPHP\OODB as OODB;
 use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\AssociationManager\ExtAssociationManager as ExtAssociationManager;
 use \RedBeanPHP\TagManager as TagManager;
 use \RedBeanPHP\DuplicationManager as DuplicationManager;
 use \RedBeanPHP\LabelMaker as LabelMaker;
 use \RedBeanPHP\Finder as Finder;
-use \RedBeanPHP\SQLHelper as SQLHelper;
 use \RedBeanPHP\RedException\SQL as SQL;
 use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\Plugin\Cooker as Cooker;
-use \RedBeanPHP\Plugin\TimeLine as TimeLine;
 use \RedBeanPHP\Setup as Setup;
 use \RedBeanPHP\Logger as Logger;
 use \RedBeanPHP\Logger\RDefault as RDefault;
@@ -86,11 +82,6 @@ class Facade
 	public static $associationManager;
 
 	/**
-	 * @var ExtAssociationManager
-	 */
-	public static $extAssocManager;
-
-	/**
 	 * @var TagManager
 	 */
 	public static $tagManager;
@@ -115,10 +106,6 @@ class Facade
 	 */
 	public static $currentDB = '';
 
-	/**
-	 * @var SQLHelper
-	 */
-	public static $f;
 	
 	/**
 	 * @var array
@@ -174,66 +161,6 @@ class Facade
 		return self::C_REDBEANPHP_VERSION;
 	}
 	
-	/**
-	 * Turns an array (post/request array) into a collection of beans.
-	 * Handy for turning forms into bean structures that can be stored with a
-	 * single call.
-	 *
-	 * Typical usage:
-	 *
-	 * $struct = R::graph($_POST);
-	 * R::store($struct);
-	 *
-	 * Example of a valid array:
-	 *
-	 *    $form = array(
-	 *        'type' => 'order',
-	 *        'ownProduct' => array(
-	 *            array('id' => 171, 'type' => 'product'),
-	 *        ),
-	 *        'ownCustomer' => array(
-	 *            array('type' => 'customer', 'name' => 'Bill')
-	 *        ),
-	 *        'sharedCoupon' => array(
-	 *            array('type' => 'coupon', 'name' => '123'),
-	 *            array('type' => 'coupon', 'id' => 3)
-	 *        )
-	 *    );
-	 *
-	 * Each entry in the array will become a property of the bean.
-	 * The array needs to have a type-field indicating the type of bean it is
-	 * going to be. The array can have nested arrays. A nested array has to be
-	 * named conform the bean-relation conventions, i.e. ownPage/sharedPage
-	 * each entry in the nested array represents another bean.
-	 *
-	 * @param array   $array       array to be turned into a bean collection
-	 * @param boolean $filterEmpty whether you want to exclude empty beans
-	 *
-	 * @return array
-	 *
-	 * @throws Security
-	 */
-	public static function graph( $array, $filterEmpty = FALSE ) 
-	{ 
-		$c = new Cooker;
-		$c->setToolbox( self::$toolbox );
-		return $c->graph( $array, $filterEmpty);
-	}
-	
-	/**
-	 * Logs queries beginning with CREATE or ALTER to file (TimeLine).
-	 * Attaches a listener to the adapter to monitor for schema altering queries.
-	 * 
-	 * @param string $filename destination file
-	 * 
-	 * @return void
-	 */
-	public static function log($filename) 
-	{ 
-		$tl = new TimeLine($filename); 
-		self::$adapter->addEventListener('sql_exec', $tl);	
-	}
-
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
 	 * RedBean. The Setup() method can be called without any arguments, in this case it will
@@ -375,23 +302,26 @@ class Facade
 	 * be printed to the screen or logged by provided logger.
 	 * If no database connection has been configured using R::setup() or
 	 * R::selectDatabase() this method will throw an exception.
+	 * Returns the attached logger instance.
 	 *
-	 * @param boolean        $tf
-	 * @param Logger $logger
+	 * @param boolean $tf
+	 * @param integer $mode (0 = to STDOUT, 1 = to ARRAY)   
 	 *
 	 * @throws Security
+	 * 
+	 * @return Logger\RDefault
 	 */
-	public static function debug( $tf = TRUE, $logger = NULL )
+	public static function debug( $tf = TRUE, $mode = 0 )
 	{
-		if ( !$logger ) {
-			$logger = new RDefault;
-		}
-
+		$logger = new RDefault;
+		
 		if ( !isset( self::$adapter ) ) {
 			throw new Security( 'Use R::setup() first.' );
 		}
-
+		$logger->setMode($mode);
 		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
+		
+		return $logger;
 	}
 
 	/**
@@ -630,17 +560,12 @@ class Facade
 	 *
 	 * @param OODBBean $bean1            bean that will be part of the association
 	 * @param OODBBean $bean2            bean that will be part of the association
-	 * @param mixed            $extra            bean, scalar, array or JSON providing extra data.
 	 *
 	 * @return mixed
 	 */
-	public static function associate( $beans1, $beans2, $extra = NULL )
+	public static function associate( $beans1, $beans2 )
 	{
-		if ( !$extra ) {
-			return self::$associationManager->associate( $beans1, $beans2 );
-		} else {
-			return self::$extAssocManager->extAssociateSimple( $beans1, $beans2, $extra );
-		}
+		return self::$associationManager->associate( $beans1, $beans2 );
 	}
 
 	/**
@@ -1242,8 +1167,7 @@ class Facade
 		self::$redbean->setAssociationManager( self::$associationManager );
 
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
-		self::$extAssocManager    = new ExtAssociationManager( self::$toolbox );
-
+		
 		$helper                   = new ModelHelper();
 
 		$helper->attachEventListeners( self::$redbean );
@@ -1252,8 +1176,7 @@ class Facade
 
 		self::$duplicationManager = new DuplicationManager( self::$toolbox );
 		self::$tagManager         = new TagManager( self::$toolbox );
-		self::$f                  = new SQLHelper( self::$adapter );
-
+		
 		return $oldTools;
 	}
 
@@ -1326,7 +1249,7 @@ class Facade
 	 */
 	public static function genSlots( $array )
 	{
-		return self::$f->genSlots( $array );
+		return ( count( $array ) ) ? implode( ',', array_fill( 0, count( $array ), '?' ) ) : '';
 	}
 
 	/**
