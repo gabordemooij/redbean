@@ -1,13 +1,13 @@
-RedBean
-===========
+RedBeanPHP 4 KickStart
+======================
 
 Current Build Status:
 [![Build Status](https://secure.travis-ci.org/gabordemooij/redbean.png)](http://travis-ci.org/gabordemooij/redbean)
 
-RedBeanPHP is an easy to use ORM tool that stores beans directly in the
+RedBeanPHP 4 KS is an easy to use ORM tool that stores beans directly in the
 database and creates all tables and columns required on the fly.
 On the other hand it allows plain SQL to search the database. In fact
-RedBean is some sort of combination between document oriented database
+RedBeanPHP is some sort of combination between document oriented database
 tools like mongoDB or couchDB and traditional relational database systems
 like MySQL. It offers the best of both worlds: SQL and no-SQL. You work
 with no-SQL if you interact with objects will you simply turn the switch
@@ -16,15 +16,25 @@ searching or quickly grabbing something out of the data store with
 specially crafted SQL. RedBean also has excellent performance because it
 can freeze the database schema which means it no longer scans schemas.
 
+The KickStart Edition of RedBeanPHP is meant for RAD, prototyping and
+offers easy-to-use interfaces and a wonderful works-out-of-the-box
+experience.
+
+If you already know the power of RedBeanPHP and you would like to 
+use RedBeanPHP in a more complex project or integrate RedBeanPHP in an
+existing project you might find the RedBeanPHP 'Adaptive' Edition an
+interesting solution.
+
+
 Databases Supported
 -------------------
 
-RedBean supports MySQL (InnoDB), PostgreSQL, SQLite3, CUBRID and Oracle.
+RedBeanPHP supports MySQL/InnoDB, MariaDB/InnoDB, PostgreSQL, SQLite3 and CUBRID.
 
 Quick Example
 -------------
 
-How we store a book object with RedBean:
+How we store a book object with RedBeanPHP:
 ```php
 $book = R::dispense("book");
 $book->author = "Santa Claus";
@@ -34,29 +44,10 @@ $id = R::store( $book );
 
 Yep, it's that simple.
 
-Install with Composer
-------------------------
-You can use RedBeanPHP with [Composer](http://getcomposer.org/).
-
-Create `composer.json` in project root:
-```json
-{
-  "require": {
-    "gabordemooij/redbean": "dev-master"
-  }
-}
-```
-
-Install via composer:
-```bash
-php composer.phar install
-```
-
-Autoloading:
-```php
-require 'vendor/autoload.php';
-use RedBean_Facade as R;
-```
+This Github account is for development only.
+If you want to use RedBeanPHP 4 KickStart please visit the website and
+download the ALL-in-ONE PHAR file. This should work out-of-the-box
+with no configuration at all.
 
 More information
 ----------------
