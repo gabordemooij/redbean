@@ -1,13 +1,11 @@
 <?php
 
-chdir('..');
-
-xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
+chdir( '..' );
+xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
 require 'testcontainer/rb.phar';
 
-
 //load core classes
-require "RedUNIT.php";
+require 'RedUNIT.php';
 
 error_reporting( E_ALL );
 
@@ -262,22 +260,24 @@ $misses = 0;
 $hits = 0;
 
 $covLines = array();
-foreach($report as $file => $lines) {
-	$pi = pathinfo($file);
+foreach( $report as $file => $lines ) {
+	$pi = pathinfo( $file );
 	
-	if (strpos($file,'phar')===false) continue;
+	if ( strpos( $file, 'phar/' ) === false ) continue;
+	if ( strpos( $file, '.php' ) === false ) continue;
+	if ( strpos( $file, 'RedBeanPHP' ) === false ) continue;
 
 	$covLines[] = '***** File:'.$file.' ******';
 	
-	$fileData = file_get_contents($file);
-	$fileLines = explode("\n", $fileData);
+	$fileData = file_get_contents( $file );
+	$fileLines = explode( "\n", $fileData );
 	$i = 1;
-	foreach($fileLines as $covLine) {
-		if (isset($lines[$i])) {
-			if ($lines[$i]===1) {
+	foreach( $fileLines as $covLine ) {
+		if ( isset( $lines [$i] ) ) {
+			if ( $lines[$i] === 1 ) {
 				$covLines[] = '[ OK      ] '.$covLine;
 				$hits ++;
-			} else if ($lines[$i] === -1){
+			} else if ( $lines[$i] === -1 ){
 				$covLines[] = '[ MISSED! ] '.$covLine;
 				$misses ++;
 			} else {
@@ -289,15 +289,12 @@ foreach($report as $file => $lines) {
 		$i ++;
 	}
 }
-
-$covFile = implode("\n", $covLines);
-@file_put_contents('cli/coverage_log.txt', $covFile);
-
-$perc = ($hits/($hits+$misses)) * 100;
+$covFile = implode( "\n", $covLines );
+@file_put_contents( 'cli/coverage_log.txt', $covFile );
+$perc = ( $hits / ( $hits + $misses ) ) * 100;
 
 echo 'Code Coverage: '.PHP_EOL;
 echo 'Hits: '.$hits.PHP_EOL;
 echo 'Misses: '.$misses.PHP_EOL;
 echo 'Percentage: '.$perc.' %'.PHP_EOL;
-
-exit(0);
+exit( 0 );
