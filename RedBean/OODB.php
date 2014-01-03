@@ -648,7 +648,7 @@ class RedBean_OODB extends RedBean_Observable
 	 *
 	 * @return RedBean_OODBBean
 	 */
-	public function dispense( $type, $number = 1 )
+	public function dispense( $type, $number = 1, $signal = true )
 	{
 		$beans = array();
 		for ( $i = 0; $i < $number; $i++ ) {
@@ -657,7 +657,9 @@ class RedBean_OODB extends RedBean_Observable
 			if ( !$this->isFrozen ) {
 				$this->check( $bean );
 			}
-			$this->signal( 'dispense', $bean );
+			if ( $signal ) {
+				$this->signal( 'dispense', $bean );
+			}
 			$beans[] = $bean;
 		}
 
@@ -790,10 +792,10 @@ class RedBean_OODB extends RedBean_Observable
 	 * RedBean runs in frozen mode it will throw an exception.
 	 * This function returns the primary key ID of the inserted
 	 * bean.
-	 * 
+	 *
 	 * The return value is an integer if possible. If it is not possible to
 	 * represent the value as an integer a string will be returned. We use
-	 * explicit casts instead of functions to preserve performance 
+	 * explicit casts instead of functions to preserve performance
 	 * (0.13 vs 0.28 for 10000 iterations on Core i3).
 	 *
 	 * @param RedBean_OODBBean|RedBean_SimpleModel $bean bean to store
@@ -848,7 +850,7 @@ class RedBean_OODB extends RedBean_Observable
 	 */
 	public function load( $type, $id )
 	{
-		$bean = $this->dispense( $type );
+		$bean = $this->dispense( $type, 1, false );
 		if ( isset( $this->stash[$this->nesting][$id] ) ) {
 			$row = $this->stash[$this->nesting][$id];
 		} else {
