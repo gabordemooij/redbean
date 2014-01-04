@@ -19,7 +19,8 @@ use \RedBeanPHP\SimpleModel as SimpleModel;
 use \RedBeanPHP\ModelHelper as ModelHelper;
 use \RedBeanPHP\Adapter as Adapter;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\RedException as RedException; 
+use \RedBeanPHP\RedException as RedException;
+use \RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
 /**
  * RedBean Facade
  *
@@ -1171,6 +1172,8 @@ class Facade
 		$helper                   = new ModelHelper();
 
 		$helper->attachEventListeners( self::$redbean );
+		
+		self::$redbean->setBeanHelper( new FacadeBeanHelper );
 
 		self::$associationManager->addEventListener( 'delete', $helper );
 

@@ -608,7 +608,6 @@ class OODB extends Observable
 		if ( $writer instanceof QueryWriter ) {
 			$this->writer = $writer;
 		}
-		$this->beanhelper = new FacadeBeanHelper();
 	}
 
 	/**
