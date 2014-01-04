@@ -121,7 +121,6 @@ $allPacks = array(
 	'Base/Relations',
 	'Base/Association',
 	'Base/Aliasing',
-	'Base/Extassoc',
 	'Base/Cross',
 	'Base/Finding',
 	'Base/Facade',
