@@ -1,8 +1,11 @@
 <?php 
+
 namespace RedBeanPHP; 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\OODBBean as OODBBean; 
+
+use RedBeanPHP\AssociationManager;
+use RedBeanPHP\OODB;
+use RedBeanPHP\OODBBean;
+
 /**
  * Preloader.
  *

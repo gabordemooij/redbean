@@ -1,10 +1,13 @@
 <?php 
+
 namespace RedBeanPHP; 
-use \RedBeanPHP\Observer as Observer;
-use \RedBeanPHP\IModelFormatter as IModelFormatter;
-use \RedBeanPHP\DependencyInjector as DependencyInjector;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\Observable as Observable; 
+
+use RedBeanPHP\Observer;
+use RedBeanPHP\IModelFormatter;
+use RedBeanPHP\DependencyInjector;
+use RedBeanPHP\OODBBean;
+use RedBeanPHP\Observable; 
+
 /**
  * RedBean Model Helper
  *

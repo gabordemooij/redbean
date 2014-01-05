@@ -1,6 +1,9 @@
 <?php 
+
 namespace RedBeanPHP\RedException; 
-use \RedBeanPHP\RedException\SQL as SQL; 
+
+use RedBeanPHP\RedException\SQL;
+
 /**
  * RedBean\Exception OCI
  *

@@ -1,12 +1,15 @@
 <?php
+
 namespace RedBeanPHP\Plugin;
-use \RedBeanPHP\Plugin as Plugin;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\Finder as Finder;
-use \RedBeanPHP\Facade as Facade;
-use \RedBeanPHP\Plugin\BeanCan as BeanCan;
+
+use RedBeanPHP\Plugin;
+use RedBeanPHP\OODB;
+use RedBeanPHP\ToolBox;
+use RedBeanPHP\OODBBean;
+use RedBeanPHP\Finder;
+use RedBeanPHP\Facade;
+use RedBeanPHP\Plugin\BeanCan;
+
 /**
  * BeanCan Server.
  * A RESTy server for RedBeanPHP.
