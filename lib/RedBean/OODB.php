@@ -1,18 +1,20 @@
 <?php
+
 namespace RedBeanPHP;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\Observable as Observable;
-use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\SimpleModel as SimpleModel;
-use \RedBeanPHP\OODBBeans as OODBBeans;
-use \RedBeanPHP\BeanHelper as BeanHelper;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\Preloader as Preloader;
+
+use Exception;
+use RedBeanPHP\Adapter\DBAdapter;
+use RedBeanPHP\AssociationManager;
+use RedBeanPHP\BeanHelper;
+use RedBeanPHP\BeanHelper\FacadeBeanHelper;
+use RedBeanPHP\Observable;
+use RedBeanPHP\OODBBean;
+use RedBeanPHP\Preloader;
+use RedBeanPHP\QueryWriter;
+use RedBeanPHP\RedException\Security;
+use RedBeanPHP\RedException\SQL;
+use RedBeanPHP\SimpleModel;
+
 /**
  * RedBean Object Oriented DataBase
  *
@@ -76,13 +78,13 @@ class OODB extends Observable
 	/**
 	 * Handles \Exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param \Exception $exception exception
+	 * @param Exception $exception exception
 	 *
 	 * @return void
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	private function handleException( \Exception $exception )
+	private function handleException( Exception $exception )
 	{
 		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(

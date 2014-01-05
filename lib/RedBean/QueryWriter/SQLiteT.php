@@ -1,9 +1,11 @@
 <?php
+
 namespace RedBeanPHP\QueryWriter;
-use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\Adapter as Adapter;
+
+use RedBeanPHP\QueryWriter\AQueryWriter;
+use RedBeanPHP\QueryWriter;
+use RedBeanPHP\Adapter\DBAdapter;
+use RedBeanPHP\Adapter;
 /**
  * RedBean SQLiteWriter with support for SQLite types
  *

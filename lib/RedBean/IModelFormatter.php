@@ -1,5 +1,7 @@
 <?php 
+
 namespace RedBeanPHP;  
+
 /**
  * RedBean interface for Model Formatting - Part of FUSE
  *

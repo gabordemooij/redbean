@@ -1,9 +1,12 @@
 <?php 
+
 namespace RedBeanPHP\Plugin; 
-use \RedBeanPHP\Plugin as Plugin;
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\RedException\SQL as SQL; 
+
+use RedBeanPHP\Plugin;
+use RedBeanPHP\ToolBox;
+use RedBeanPHP\OODBBean;
+use RedBeanPHP\RedException\SQL; 
+
 /**
  * Recursive Bean Export
  *

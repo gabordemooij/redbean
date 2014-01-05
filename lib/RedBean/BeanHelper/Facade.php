@@ -1,9 +1,12 @@
 <?php 
+
 namespace RedBeanPHP\BeanHelper; 
-use \RedBeanPHP\BeanHelper as BeanHelper;
-use \RedBeanPHP\Facade as Facade;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\ModelHelper as ModelHelper; 
+
+use RedBeanPHP\BeanHelper;
+use RedBeanPHP\Facade;
+use RedBeanPHP\OODBBean;
+use RedBeanPHP\ModelHelper; 
+
 /**
  * Bean Helper.
  * The Bean helper helps beans to access access the toolbox and

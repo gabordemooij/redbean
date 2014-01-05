@@ -1,5 +1,7 @@
-<?php 
+<?php
+
 namespace RedBeanPHP;  
+
 /**
  * Interface for database drivers
  *
