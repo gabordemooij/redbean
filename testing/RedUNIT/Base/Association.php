@@ -72,18 +72,18 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		$ghost = R::dispense( 'ghost' );
 		$house = R::dispense( 'house' );
 
-		R::associate( $house, $ghost );
-
+		$house->sharedGhost[] = $ghost;
+		
 		Model_Ghost_House::$deleted = FALSE;
 
-		R::unassociate( $house, $ghost );
+		R::getRedBean()->getAssociationManager()->unassociate( $house, $ghost );
 
 		// No fast-track, assoc bean got trashed
 		asrt( Model_Ghost_House::$deleted, TRUE );
 
 		Model_Ghost_House::$deleted = FALSE;
 
-		R::unassociate( $house, $ghost, TRUE );
+		R::getRedBean()->getAssociationManager()->unassociate( $house, $ghost, TRUE );
 
 		// Fast-track, assoc bean got deleted right away
 		asrt( Model_Ghost_House::$deleted, FALSE );
@@ -99,18 +99,18 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		$ghost  = R::dispense( 'ghost' );
 		$ghost2 = R::dispense( 'ghost' );
 
-		R::associate( $ghost, $ghost2 );
+		R::getRedBean()->getAssociationManager()->associate( $ghost, $ghost2 );
 
 		Model_Ghost_Ghost::$deleted = FALSE;
 
-		R::unassociate( $ghost, $ghost2 );
+		R::getRedBean()->getAssociationManager()->unassociate( $ghost, $ghost2 );
 
 		// No fast-track, assoc bean got trashed
 		asrt( Model_Ghost_Ghost::$deleted, TRUE );
 
 		Model_Ghost_Ghost::$deleted = FALSE;
 
-		R::unassociate( $ghost, $ghost2, TRUE );
+		R::getRedBean()->getAssociationManager()->unassociate( $ghost, $ghost2, TRUE );
 
 		// Fast-track, assoc bean got deleted right away
 		asrt( Model_Ghost_Ghost::$deleted, FALSE );
@@ -268,7 +268,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		$cheese = R::dispense( 'cheese', 3 );
 		$olives = R::dispense( 'olive', 3 );
 
-		R::associate( $wines, array_merge( $cheese, $olives ) );
+		R::getRedBean()->getAssociationManager()->associate( $wines, array_merge( $cheese, $olives ) );
 
 		asrt( R::count( 'cheese' ), 3 );
 		asrt( R::count( 'olive' ), 3 );
@@ -281,7 +281,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( count( $wines[2]->sharedCheese ), 3 );
 		asrt( count( $wines[2]->sharedOlive ), 3 );
 
-		R::unassociate( $wines, $olives );
+		R::getRedBean()->getAssociationManager()->unassociate( $wines, $olives );
 
 		asrt( count( $wines[0]->sharedCheese ), 3 );
 		asrt( count( $wines[0]->sharedOlive ), 0 );
@@ -290,7 +290,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( count( $wines[2]->sharedCheese ), 3 );
 		asrt( count( $wines[2]->sharedOlive ), 0 );
 
-		R::unassociate( array( $wines[1] ), $cheese );
+		R::getRedBean()->getAssociationManager()->unassociate( array( $wines[1] ), $cheese );
 
 		asrt( count( $wines[0]->sharedCheese ), 3 );
 		asrt( count( $wines[0]->sharedOlive ), 0 );
@@ -299,7 +299,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( count( $wines[2]->sharedCheese ), 3 );
 		asrt( count( $wines[2]->sharedOlive ), 0 );
 
-		R::unassociate( array( $wines[2] ), $cheese );
+		R::getRedBean()->getAssociationManager()->unassociate( array( $wines[2] ), $cheese );
 
 		asrt( count( $wines[0]->sharedCheese ), 3 );
 		asrt( count( $wines[0]->sharedOlive ), 0 );
@@ -309,321 +309,6 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( count( $wines[2]->sharedOlive ), 0 );
 	}
 
-	/**
-	 * Test some frequently used scenarios.
-	 * 
-	 * @return void
-	 */
-	public function testAssocVariations()
-	{
-		try {
-			R::related( NULL, 'book' );
-		} catch (\Exception $e ) {
-			asrt( ( $e instanceof Security ), TRUE );
-		}
-
-		try {
-			R::related( 100, 'book' );
-		} catch (\Exception $e ) {
-			asrt( ( $e instanceof Security ), TRUE );
-		}
-
-		try {
-			R::related( array( 'fakeBean' ), 'book' );
-		} catch (\Exception $e ) {
-			asrt( ( $e instanceof Security ), TRUE );
-		}
-
-		list( $r1, $r2, $r3 ) = R::dispense( 'reader', 3 );
-
-		$r1->name = 'MrOdd';
-		$r2->name = 'MrEven';
-		$r3->name = 'MrAll';
-
-		$books    = R::dispense( 'book', 5 );
-
-		$i        = 1;
-
-		foreach ( $books as $b ) {
-			$b->title = 'b' . ( $i++ );
-
-			if ( $i % 2 ) {
-				R::associate( $b, $r2 );
-			} else {
-				R::associate( $b, $r1 );
-			}
-		}
-
-		$readersOdd = R::related( array( $books[0], $books[2], $books[4] ), 'reader' );
-
-		asrt( count( $readersOdd ), 1 );
-
-		$readerOdd = reset( $readersOdd );
-
-		asrt( $readerOdd->name, 'MrOdd' );
-
-		$readersEven = R::related( array( $books[1], $books[3] ), 'reader' );
-
-		asrt( count( $readersEven ), 1 );
-
-		$readerEven = reset( $readersEven );
-
-		asrt( $readerEven->name, 'MrEven' );
-
-		foreach ( $books as $b ) {
-			R::associate( $b, $r3 );
-		}
-
-		$readersOdd = R::related( array( $books[0], $books[2], $books[4] ), 'reader' );
-
-		asrt( count( $readersOdd ), 2 );
-
-		$readersEven = R::related( array( $books[1], $books[3] ), 'reader' );
-
-		asrt( count( $readersEven ), 2 );
-
-		$found = 0;
-
-		foreach ( $readersEven as $r ) {
-			if ( $r->name == 'MrAll' ) $found = 1;
-		}
-
-		asrt( $found, 1 );
-	}
-
-	/**
-	 * Test legacy methods, backward compatibility with removed
-	 * setAssoc function.
-	 * 
-	 * @return void
-	 */
-	public function testBackwardCompat()
-	{
-		$toolbox = R::$toolbox;
-		$adapter = $toolbox->getDatabaseAdapter();
-		$writer  = $toolbox->getWriter();
-		$redbean = $toolbox->getRedBean();
-		$pdo     = $adapter->getDatabase();
-
-		$rb    = $redbean;
-
-		$testA = $rb->dispense( 'testA' );
-		$testB = $rb->dispense( 'testB' );
-
-		$a     = new AssociationManager( $toolbox );
-
-		try {
-			$a->related( $testA, "testB" );
-
-			pass();
-		} catch (\Exception $e ) {
-			fail();
-		}
-
-		$user = $redbean->dispense( "user" );
-
-		$user->name = "John";
-
-		$redbean->store( $user );
-
-		$page = $redbean->dispense( "page" );
-
-		$page->name = "John's page";
-
-		$redbean->store( $page );
-
-		$page2 = $redbean->dispense( "page" );
-
-		$page2->name = "John's second page";
-
-		$redbean->store( $page2 );
-
-		$a = new AssociationManager( $toolbox );
-
-		$a->associate( $page, $user );
-
-		asrt( count( $a->related( $user, "page" ) ), 1 );
-
-		$a->associate( $user, $page2 );
-
-		asrt( count( $a->related( $user, "page" ) ), 2 );
-
-		// Can we fetch the assoc ids themselves?
-		$pageKeys = $a->related( $user, "page" );
-
-		$pages = $redbean->batch( "page", $pageKeys );
-
-		$links = $redbean->batch( "page_user", $a->related( $user, "page", TRUE ) );
-
-		asrt( count( $links ), 2 );
-
-		// Confirm that the link beans are ok.
-		$link = array_pop( $links );
-
-		asrt( isset( $link->page_id ), TRUE );
-		asrt( isset( $link->user_id ), TRUE );
-		asrt( isset( $link->id ), TRUE );
-
-		$link = array_pop( $links );
-
-		asrt( isset( $link->page_id ), TRUE );
-		asrt( isset( $link->user_id ), TRUE );
-		asrt( isset( $link->id ), TRUE );
-
-		$a->unassociate( $page, $user );
-
-		asrt( count( $a->related( $user, "page" ) ), 1 );
-
-		$a->clearRelations( $user, "page" );
-
-		asrt( count( $a->related( $user, "page" ) ), 0 );
-
-		$user2 = $redbean->dispense( "user" );
-
-		$user2->name = "Second User";
-
-		set1toNAssoc( $a, $user2, $page );
-		set1toNAssoc( $a, $user, $page );
-
-		asrt( count( $a->related( $user2, "page" ) ), 0 );
-		asrt( count( $a->related( $user, "page" ) ), 1 );
-
-		set1toNAssoc( $a, $user, $page2 );
-
-		asrt( count( $a->related( $user, "page" ) ), 2 );
-
-		$pages = ( $redbean->batch( "page", $a->related( $user, "page" ) ) );
-
-		asrt( count( $pages ), 2 );
-
-		$apage = array_shift( $pages );
-
-		asrt( ( $apage->name == "John's page" || $apage->name == "John's second page" ), TRUE );
-
-		$apage = array_shift( $pages );
-
-		asrt( ( $apage->name == "John's page" || $apage->name == "John's second page" ), TRUE );
-
-		// Test save on the fly
-		$page  = $redbean->dispense( "page" );
-		$page2 = $redbean->dispense( "page" );
-
-		$page->name  = "idless page 1";
-		$page2->name = "idless page 1";
-
-		$a->associate( $page, $page2 );
-
-		asrt( ( $page->id > 0 ), TRUE );
-		asrt( ( $page2->id > 0 ), TRUE );
-
-		$idpage  = $page->id;
-		$idpage2 = $page2->id;
-
-		$page = $redbean->dispense( "page" );
-
-		$page->name = "test page";
-
-		$id   = $redbean->store( $page );
-		$user = $redbean->dispense( "user" );
-
-		$a->unassociate( $user, $page );
-
-		pass(); // No error
-
-		$a->unassociate( $page, $user );
-
-		pass(); // No error
-
-		$a->clearRelations( $page, "user" );
-
-		pass(); // No error
-
-		$a->clearRelations( $user, "page" );
-
-		pass(); // No error
-
-		$a->associate( $user, $page );
-
-		pass();
-
-		asrt( count( $a->related( $user, "page" ) ), 1 );
-		asrt( count( $a->related( $page, "user" ) ), 1 );
-
-		$a->clearRelations( $user, "page" );
-
-		pass(); // No error
-
-		asrt( count( $a->related( $user, "page" ) ), 0 );
-		asrt( count( $a->related( $page, "user" ) ), 0 );
-
-		$page = $redbean->load( "page", $id );
-
-		pass();
-
-		asrt( $page->name, "test page" );
-	}
-
-	/**
-	 * Test areRelated().
-	 * 
-	 * @return void
-	 */
-	public function testAreRelatedAndVariations()
-	{
-		$sheep = R::dispense( 'sheep' );
-
-		$sheep->name = 'Shawn';
-
-		$sheep2 = R::dispense( 'sheep' );
-
-		$sheep2->name = 'Billy';
-
-		$sheep3 = R::dispense( 'sheep' );
-
-		$sheep3->name = 'Moo';
-
-		R::store( $sheep3 );
-
-		R::associate( $sheep, $sheep2 );
-
-		asrt( R::areRelated( $sheep, $sheep2 ), TRUE );
-
-		R::exec( 'DELETE FROM sheep_sheep WHERE sheep2_id = ? -- keep-cache', array( $sheep2->id ) );
-
-		asrt( R::areRelated( $sheep, $sheep2 ), FALSE ); // Use cache?
-
-		R::associate( $sheep, $sheep2 );
-
-		R::$writer->setUseCache( TRUE );
-
-		asrt( R::areRelated( $sheep, $sheep2 ), TRUE );
-
-		R::exec( 'DELETE FROM sheep_sheep WHERE sheep2_id = ? -- keep-cache', array( $sheep2->id ) );
-
-		asrt( R::areRelated( $sheep, $sheep2 ), TRUE ); // Use cache?
-
-		R::associate( $sheep, $sheep2 );
-
-		asrt( R::areRelated( $sheep, $sheep3 ), FALSE );
-
-		$pig = R::dispense( 'pig' );
-
-		asrt( R::areRelated( $sheep, $pig ), FALSE );
-
-		R::freeze( TRUE );
-
-		asrt( R::areRelated( $sheep, $pig ), FALSE );
-
-		R::freeze( FALSE );
-
-		$foo = R::dispense( 'foo' );
-		$bar = R::dispense( 'bar' );
-
-		$foo->id = 1;
-		$bar->id = 2;
-
-		asrt( R::areRelated( $foo, $bar ), FALSE );
-	}
 }
 
 /**

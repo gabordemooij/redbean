@@ -168,13 +168,8 @@ class TagManager
 	public function tag( OODBBean $bean, $tagList = NULL )
 	{
 		if ( is_null( $tagList ) ) {
-			$tags = array();
-			$keys = $this->associationManager->related( $bean, 'tag' );
-
-			if ( $keys ) {
-				$tags = $this->redbean->batch( 'tag', $keys );
-			}
-
+			
+			$tags = $bean->sharedTag;
 			$foundTags = array();
 
 			foreach ( $tags as $tag ) {
@@ -244,11 +239,11 @@ class TagManager
 
 		$tags       = $this->redbean->find( 'tag', array( 'title' => $tags ) );
 
+		$list       = 'shared'.ucfirst( $beanType );
+		
 		if ( is_array( $tags ) && count( $tags ) > 0 ) {
-			$collectionKeys = $this->associationManager->related( $tags, $beanType );
-
-			if ( $collectionKeys ) {
-				$collection = $this->redbean->batch( $beanType, $collectionKeys );
+			foreach($tags as $tag) {
+				$collection += $tag->$list;
 			}
 		}
 
@@ -273,7 +268,7 @@ class TagManager
 		$beans = array();
 		foreach ( $tags as $tag ) {
 			$beans = $this->tagged( $beanType, $tag );
-
+			
 			if ( isset( $oldBeans ) ) {
 				$beans = array_intersect_assoc( $beans, $oldBeans );
 			}

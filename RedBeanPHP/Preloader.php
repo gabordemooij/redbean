@@ -381,7 +381,7 @@ class Preloader
 	 */
 	private function preloadSharedBeans( $type, $sql, $bindings, $field )
 	{
-		$sharedBeans = $this->assocManager->relatedSimple( $this->filteredBeans, $type, $sql, $bindings );
+		$sharedBeans = $this->assocManager->related( $this->filteredBeans, $type, $sql, $bindings );
 
 		// Let the filtered beans gather their beans
 		foreach ( $this->filteredBeans as $filteredBean ) {

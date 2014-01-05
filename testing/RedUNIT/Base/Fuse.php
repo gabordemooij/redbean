@@ -41,8 +41,9 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base
 
 		$post->message = "hello";
 
-		R::associate( $blog, $post );
-
+		$blog->sharedPost[] = $post;
+		R::store($blog);
+		
 		$a = R::getAll( "select * from blog " );
 
 		ModelHelper::setModelFormatter( new mymodelformatter );

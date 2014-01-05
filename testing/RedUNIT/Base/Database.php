@@ -154,36 +154,6 @@ class RedUNIT_Base_Database extends RedUNIT_Base
 			pass();
 		}
 
-		$beanA = R::dispense( 'bean' );
-		$beanB = R::dispense( 'bean' );
-
-		R::storeAll( array( $beanA, $beanB ) );
-
-		$associationManager = new AssociationManager( $toolbox );
-
-		$adapter->setSQLState( 'HY000' );
-
-		// We can only test this for a known driver...
-		if ( $currentDriver === 'sqlite' ) {
-			try {
-				$associationManager->areRelated( $beanA, $beanB );
-
-				pass();
-			} catch (\Exception $e ) {
-				fail();
-			}
-		}
-
-		$adapter->setSQLState( -999 );
-
-		try {
-			$associationManager->areRelated( $beanA, $beanA );
-
-			fail();
-		} catch (\Exception $e ) {
-			pass();
-		}
-
 		try {
 			$redbean->wipe( 'justabean' );
 

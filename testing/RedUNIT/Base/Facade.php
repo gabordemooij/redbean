@@ -110,19 +110,11 @@ class RedUNIT_Base_Facade extends RedUNIT_Base
 
 		R::store( $book2 );
 
-		R::associate( $book, $book2 );
-
-		asrt( count( R::related( $book, "book" ) ), 1 );
-
 		$book3 = R::dispense( "book" );
 
 		$book3->title = "third";
 
 		R::store( $book3 );
-
-		R::associate( $book, $book3 );
-
-		asrt( count( R::related( $book, "book" ) ), 2 );
 
 		asrt( count( R::find( "book" ) ), 3 );
 		asrt( count( R::findAll( "book" ) ), 3 );
@@ -135,14 +127,8 @@ class RedUNIT_Base_Facade extends RedUNIT_Base
 		// Find without where clause
 		asrt( count( R::findAll( 'book', ' order by id' ) ), 3 );
 
-		R::unassociate( $book, $book2 );
-
-		asrt( count( R::related( $book, "book" ) ), 1 );
-
 		R::trash( $book3 );
 		R::trash( $book2 );
-
-		asrt( count( R::related( $book, "book" ) ), 0 );
 
 		asrt( count( R::getAll( "SELECT * FROM book " ) ), 1 );
 		asrt( count( R::getCol( "SELECT title FROM book " ) ), 1 );
@@ -161,123 +147,7 @@ class RedUNIT_Base_Facade extends RedUNIT_Base
 
 		$aid = R::store( $author );
 
-		R::associate( $book, $author );
-
 		$author = R::findOne( "author", " name = ? ", array( "Bobby" ) );
-
-		$books = R::related( $author, "book" );
-
-		$book = reset( $books );
-
-		testpack( "Test Swap function in R-facade" );
-
-		$book = R::dispense( "book" );
-
-		$book->title  = "firstbook";
-		$book->rating = 2;
-
-		$id1 = R::store( $book );
-
-		$book = R::dispense( "book" );
-
-		$book->title  = "secondbook";
-		$book->rating = 3;
-
-		$id2 = R::store( $book );
-
-		$book1 = R::load( "book", $id1 );
-		$book2 = R::load( "book", $id2 );
-
-		asrt( $book1->rating, '2' );
-		asrt( $book2->rating, '3' );
-
-		$books = R::batch( "book", array( $id1, $id2 ) );
-
-		R::swap( $books, "rating" );
-
-		$book1 = R::load( "book", $id1 );
-		$book2 = R::load( "book", $id2 );
-
-		asrt( $book1->rating, '3' );
-		asrt( $book2->rating, '2' );
-
-		testpack( "Test R::convertToBeans" );
-
-		$SQL = "SELECT '1' as id, a.name AS name, b.title AS title, '123' as rating FROM author AS a LEFT JOIN book as b ON b.id = ?  WHERE a.id = ? ";
-
-		$rows = R::$adapter->get( $SQL, array( $id2, $aid ) );
-
-		$beans = R::convertToBeans( "something", $rows );
-
-		$bean = reset( $beans );
-
-		asrt( $bean->getMeta( "type" ), "something" );
-
-		asrt( $bean->name, "Bobby" );
-		asrt( $bean->title, "secondbook" );
-		asrt( $bean->rating, "123" );
-
-		testpack( "Ext Assoc with facade and findRelated" );
-
-		//R::setup("sqlite:/Users/prive/blaataap.db");
-
-		R::exec( "DROP TABLE IF EXISTS performer" );
-		R::exec( "DROP TABLE IF EXISTS cd_track" );
-
-		R::exec( "DROP TABLE IF EXISTS track" );
-		R::exec( "DROP TABLE IF EXISTS cd" );
-
-		$cd = R::dispense( "cd" );
-
-		$cd->title = "Midnight Jazzfest";
-
-		R::store( $cd );
-
-		$track = R::dispense( "track" );
-
-		$track->title = "Night in Tunesia";
-
-		$track2 = R::dispense( "track" );
-
-		$track2->title = "Stompin at one o clock";
-
-		$track3 = R::dispense( "track" );
-
-		$track3->title = "Nightlife";
-
-		R::store( $track );
-		R::store( $track2 );
-		R::store( $track3 );
-
-		// Assoc ext with json
-		R::associate( $track, $cd, '{"order":1}' );
-
-		pass();
-
-		// Width array
-		R::associate( $track2, $cd, array( "order" => 2 ) );
-
-		pass();
-
-		R::associate( $track3, $cd, '{"order":3}' );
-
-		pass();
-
-		$tracks = R::related( $cd, "track", " title LIKE ? ", array( "Night%" ) );
-
-		asrt( count( $tracks ), 2 );
-
-		$track = array_pop( $tracks );
-
-		asrt( ( strpos( $track->title, "Night" ) === 0 ), TRUE );
-
-		$track = array_pop( $tracks );
-
-		asrt( ( strpos( $track->title, "Night" ) === 0 ), TRUE );
-
-		$track = R::dispense( "track" );
-
-		$track->title = "test";
 
 	}
 }

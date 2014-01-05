@@ -281,41 +281,6 @@ class AssociationManager extends Observable
 	}
 
 	/**
-	 * Returns all ids of beans of type $type that are related to $bean. If the
-	 * $getLinks parameter is set to boolean TRUE this method will return the ids
-	 * of the association beans instead. You can also add additional SQL. This SQL
-	 * will be appended to the original query string used by this method. Note that this
-	 * method will not return beans, just keys. For a more convenient method see the R-facade
-	 * method related(), that is in fact a wrapper for this method that offers a more
-	 * convenient solution. If you want to make use of this method, consider the
-	 * OODB batch() method to convert the ids to beans.
-	 *
-	 * Since 3.2, you can now also pass an array of beans instead just one
-	 * bean as the first parameter.
-	 *
-	 * @throws SQL
-	 *
-	 * @param OODBBean|array $bean     reference bean
-	 * @param string                 $type     target type
-	 * @param boolean                $getLinks whether you are interested in the assoc records
-	 * @param string                 $sql      room for additional SQL
-	 * @param array                  $bindings bindings for SQL snippet
-	 *
-	 * @return array
-	 */
-	public function related( $bean, $type, $getLinks = FALSE, $sql = '', $bindings = array() )
-	{
-		$sql  = $this->writer->glueSQLCondition( $sql );
-
-		$rows = $this->relatedRows( $bean, $type, $getLinks, $sql, $bindings );
-
-		$ids  = array();
-		foreach ( $rows as $row ) $ids[] = $row['id'];
-
-		return $ids;
-	}
-
-	/**
 	 * Breaks the association between two beans. This method unassociates two beans. If the
 	 * method succeeds the beans will no longer form an association. In the database
 	 * this means that the association record will be removed. This method uses the
@@ -389,54 +354,6 @@ class AssociationManager extends Observable
 	}
 
 	/**
-	 * Given two beans this function returns TRUE if they are associated using a
-	 * many-to-many association, FALSE otherwise.
-	 *
-	 * @throws SQL
-	 *
-	 * @param OODBBean $bean1 bean
-	 * @param OODBBean $bean2 bean
-	 *
-	 * @return boolean
-	 */
-	public function areRelated( OODBBean $bean1, OODBBean $bean2 )
-	{
-		try {
-			$row = $this->writer->queryRecordLink( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ), $bean1->id, $bean2->id );
-
-			return (boolean) $row;
-		} catch ( SQL $exception ) {
-			$this->handleException( $exception );
-
-			return FALSE;
-		}
-	}
-
-	/**
-	 * Swaps a property of two beans.
-	 * Given two beans and a property this method swaps the value of the
-	 * property in the beans.
-	 *
-	 * @deprecated
-	 * This method does not seem very useful.
-	 *
-	 * @param array  $beans    beans
-	 * @param string $property property to swap
-	 *
-	 * @return void
-	 */
-	public function swap( $beans, $property )
-	{
-		$bean1            = array_shift( $beans );
-		$bean2            = array_shift( $beans );
-		$tmp              = $bean1->$property;
-		$bean1->$property = $bean2->$property;
-		$bean2->$property = $tmp;
-		$this->oodb->store( $bean1 );
-		$this->oodb->store( $bean2 );
-	}
-
-	/**
 	 * Returns all the beans associated with $bean.
 	 * This method will return an array containing all the beans that have
 	 * been associated once with the associate() function and are still
@@ -459,7 +376,7 @@ class AssociationManager extends Observable
 	 *
 	 * @return array
 	 */
-	public function relatedSimple( $bean, $type, $sql = '', $bindings = array() )
+	public function related( $bean, $type, $sql = '', $bindings = array() )
 	{
 		$sql   = $this->writer->glueSQLCondition( $sql );
 
@@ -484,57 +401,4 @@ class AssociationManager extends Observable
 
 		return $beans;
 	}
-
-	/**
-	 * Returns only a single associated bean.
-	 * You can also pass some extra SQL and
-	 * values for that SQL to filter your results after fetching the
-	 * related beans.
-	 * 
-	 * @see AssociationManager::relatedSimple.
-	 *
-	 * @param OODBBean $bean     bean provided
-	 * @param string           $type     type of bean you are searching for
-	 * @param string           $sql      SQL for extra filtering
-	 * @param array            $bindings values to be inserted in SQL slots
-	 *
-	 * @return OODBBean
-	 */
-	public function relatedOne( OODBBean $bean, $type, $sql = NULL, $bindings = array() )
-	{
-		$beans = $this->relatedSimple( $bean, $type, $sql, $bindings );
-
-		if ( empty( $beans ) ) {
-			return NULL;
-		}
-
-		return reset( $beans );
-	}
-
-	/**
-	 * Returns only the last, single associated bean.
-	 * You can also pass some extra SQL and
-	 * values for that SQL to filter your results after fetching the
-	 * related beans.
-	 * 
-	 * @see AssociationManager::relatedSimple.
-	 *
-	 * @param OODBBean $bean     bean provided
-	 * @param string           $type     type of bean you are searching for
-	 * @param string           $sql      SQL for extra filtering
-	 * @param array            $bindings values to be inserted in SQL slots
-	 *
-	 * @return OODBBean
-	 */
-	public function relatedLast( OODBBean $bean, $type, $sql = NULL, $bindings = array() )
-	{
-		$beans = $this->relatedSimple( $bean, $type, $sql, $bindings );
-
-		if ( empty( $beans ) ) {
-			return NULL;
-		}
-
-		return end( $beans );
-	}
-
 }

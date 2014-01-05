@@ -137,7 +137,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		$assocManager     = $redbean->getAssociationManager();
 
-		$beans            = $assocManager->relatedSimple( $this, $type, $this->withSql, $this->withParams );
+		$beans            = $assocManager->related( $this, $type, $this->withSql, $this->withParams );
 
 		$this->withSql    = '';
 		$this->withParams = array();

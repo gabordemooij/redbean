@@ -28,10 +28,11 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
 		$book->title = 'book';
-		R::associate( $book, $page );
-
+		$book->sharedPage[] = $page;
+		R::store($book);
+		
 		//should not give error like: Uncaught [HY093] - SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
-		$books = R::related( $page, 'book', ' title = :title ', array( ':title' => 'book' ) );
+		$books = $page->withCondition(' title = :title ', array( ':title' => 'book' ) )->sharedBook;
 
 		asrt( count( $books ), 1 );
 
@@ -40,19 +41,6 @@ class RedUNIT_Base_Namedparams extends RedUNIT_Base
 
 		asrt( count( $books ), 1 );
 
-		//should not give error...
-		$links = R::$associationManager->related( $page, 'book', TRUE, ' title = :title ', array( ':title' => 'book' ) );
-
-		asrt( count( $links ), 1 );
-
-		$book2 = R::dispense( 'book' );
-		R::associate( $book, $book2 );
-		
-		//cross table, duplicate slots?
-		$books = R::related( $book2, 'book', ' title = :title ', array( ':title' => 'book' ) );
-		
-		asrt( count( $books ), 1 );
-		
 		R::nuke();
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );

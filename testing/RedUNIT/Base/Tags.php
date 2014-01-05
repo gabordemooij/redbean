@@ -28,8 +28,7 @@ class RedUNIT_Base_Tags extends RedUNIT_Base
 		R::tag( $d, 'black' );
 		R::tag( $e, 'strong,sweet' );
 		R::tag( $f, 'black,strong' );
-
-		//$x = array_intersect(R::tagged('coffee','sweet'),R::tagged('coffee','strong'));
+		
 		asrt( count( R::taggedAll( 'coffee', 'strong,sweet' ) ), 1 );
 
 		asrt( count( R::taggedAll( 'coffee', 'strong' ) ), 3 );

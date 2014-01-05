@@ -212,47 +212,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		R::$writer->setUseCache( FALSE );
 
 	}
-
-	/**
-	 * Test related count
-	 */
-	public function testRelatedCount()
-	{
-
-		testpack('test relatedCount()');
-		
-		list( $d, $d2 ) = R::dispense( 'document', 2 );
-
-		list( $p, $p2, $p3 ) = R::dispense( 'page', 3 );
-
-		$d->sharedPage  = array( $p, $p3 );
-		$d2->sharedPage = array( $p, $p2, $p3 );
-
-		R::storeAll( array( $d, $d2 ) );
-
-		try {
-			R::relatedCount( array(), 'page' );
-			fail();
-		} catch ( Security $e ) {
-			pass();
-		}
-
-		asrt( R::relatedCount( R::dispense( 'page' ), 'page' ), 0 );
-		asrt( R::relatedCount( $d, 'page', ' WHERE page.id = ? ', array( $p->id ) ), 1 );
-		asrt( R::relatedCount( $d, 'page' ), 2 );
-		asrt( R::relatedCount( $d2, 'page' ), 3 );
-		asrt( R::relatedCount( $d2, 'ghosts' ), 0 );
-
-		// Now using bean methods..
-		asrt( $d2->countShared( 'page' ), 3 );
-		asrt( $d->countShared( 'page' ), 2 );
-
-		// N-1 counts
-		$author              = R::dispense( 'author' );
-		$author->ownDocument = array( $d, $d2 );
-
-		R::store( $author );
-	}
 	
 	/**
 	 * Test related count using via().
@@ -368,7 +327,8 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		$d = R::dispense( 'doctor' )->setAttr( 'name', 'd1' );
 		$p = R::dispense( 'patient' )->setAttr( 'name', 'p1' );
 
-		R::associate( $d, $p );
+		$d->sharedPatient[] = $p;
+		R::store($d);
 
 		asrt( in_array( 'consult', R::$writer->getTables() ), TRUE );
 	}
@@ -437,35 +397,6 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( (int) $donald->countShared( 'friend' ), 2 );
 		asrt( (int) $mickey->countShared( 'friend' ), 3 );
 		asrt( (int) $pluto->countShared( 'friend' ), 1 );
-
-		R::unassociate( $donald, $mickey );
-
-		asrt( (int) $donald->countShared( 'friend' ), 1 );
-
-		asrt( R::areRelated( $donald, $mickey ), FALSE );
-		asrt( R::areRelated( $mickey, $donald ), FALSE );
-		asrt( R::areRelated( $mickey, $goofy ), TRUE );
-		asrt( R::areRelated( $goofy, $mickey ), TRUE );
-
-		R::getWriter()->setUseCache( TRUE );
-
-		$mickeysFriends = R::$associationManager->related( $mickey, 'friend', TRUE );
-
-		asrt( count( $mickeysFriends ), 2 );
-
-		$mickeysFriends = R::$associationManager->related( $mickey, 'friend', TRUE );
-
-		asrt( count( $mickeysFriends ), 2 );
-
-		$plutosFriends = R::$associationManager->related( $pluto, 'friend', TRUE );
-
-		asrt( count( $plutosFriends ), 1 );
-
-		$mickeysBooks = R::$associationManager->related( $mickey, 'book', TRUE );
-
-		asrt( count( $mickeysBooks ), 1 );
-
-		R::getWriter()->setUseCache( FALSE );
 	}
 
 	/**
@@ -930,24 +861,13 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		asrt( count( $book2->sharedTopic ), 1 );
 
 		// Get books for topic
-		asrt( count( R::related( $topic3, 'book' ) ), 2 );
-		asrt( ( R::relatedOne( $topic3, 'book' ) instanceof OODBBean ), TRUE );
+		asrt( $topic3->countShared('book'), 2 );
 
-		$items = R::related( $topic3, 'book' );
-
-		$a = reset( $items );
-
-		asrt( R::relatedOne( $topic3, 'book' )->id, $a->id );
 
 		$t3 = R::load( 'topic', $topic3->id );
 
 		asrt( count( $t3->sharedBook ), 2 );
-		asrt( R::relatedOne( $topic3, 'nothingness' ), NULL );
 
-		 // Testing relatedLast
-		$z = end( $items );
-		asrt( R::relatedLast( $topic3, 'book')->id, $z->id );
-		asrt( R::relatedLast( $topic3, 'manuscript'), NULL );
 
 		// Nuke an own-array, replace entire array at once without getting first
 		$page2->id    = 0;
