@@ -1,6 +1,9 @@
 <?php
+
 namespace RedBeanPHP\RedException;
-use \RedBeanPHP\RedException as RedException;
+
+use RedBeanPHP\RedException;
+
 /**
  * \Exception Security.
  * Part of the RedBean\Exceptions Mechanism.

@@ -1,9 +1,12 @@
 <?php 
+
 namespace RedBeanPHP\Plugin; 
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\Plugin as Plugin;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\OODBBean as OODBBean; 
+
+use RedBeanPHP\OODB;
+use RedBeanPHP\Plugin;
+use RedBeanPHP\QueryWriter;
+use RedBeanPHP\OODBBean; 
+
 /**
  * RedBeanPHP Cache Plugin
  *

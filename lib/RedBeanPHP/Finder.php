@@ -1,10 +1,13 @@
 <?php 
+
 namespace RedBeanPHP; 
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\SQLHelper as SQLHelper;
-use \RedBeanPHP\OODBBean as OODBBean; 
+
+use RedBeanPHP\ToolBox;
+use RedBeanPHP\OODB;
+use RedBeanPHP\RedException\Security;
+use RedBeanPHP\SQLHelper;
+use RedBeanPHP\OODBBean; 
+
 /**
  * RedBean Finder
  *

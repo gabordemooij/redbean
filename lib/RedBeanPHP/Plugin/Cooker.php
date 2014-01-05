@@ -1,10 +1,13 @@
 <?php 
+
 namespace RedBeanPHP\Plugin; 
-use \RedBeanPHP\Plugin as Plugin;
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\RedException\Security as Security; 
+
+use RedBeanPHP\Plugin;
+use RedBeanPHP\ToolBox;
+use RedBeanPHP\OODB;
+use RedBeanPHP\OODBBean;
+use RedBeanPHP\RedException\Security; 
+
 /**
  * RedBean Cooker
  *

@@ -1,29 +1,32 @@
 <?php
+
 namespace RedBeanPHP;
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\AssociationManager\ExtAssociationManager as ExtAssociationManager;
-use \RedBeanPHP\TagManager as TagManager;
-use \RedBeanPHP\DuplicationManager as DuplicationManager;
-use \RedBeanPHP\LabelMaker as LabelMaker;
-use \RedBeanPHP\Finder as Finder;
-use \RedBeanPHP\SQLHelper as SQLHelper;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\Plugin\Cooker as Cooker;
-use \RedBeanPHP\Plugin\TimeLine as TimeLine;
-use \RedBeanPHP\Setup as Setup;
-use \RedBeanPHP\Logger as Logger;
-use \RedBeanPHP\Logger\RDefault as RDefault;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\SimpleModel as SimpleModel;
-use \RedBeanPHP\ModelHelper as ModelHelper;
-use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\RedException as RedException;
+
+use RedBeanPHP\ToolBox;
+use RedBeanPHP\OODB;
+use RedBeanPHP\QueryWriter;
+use RedBeanPHP\Adapter\DBAdapter;
+use RedBeanPHP\AssociationManager;
+use RedBeanPHP\AssociationManager\ExtAssociationManager;
+use RedBeanPHP\TagManager;
+use RedBeanPHP\DuplicationManager;
+use RedBeanPHP\LabelMaker;
+use RedBeanPHP\Finder;
+use RedBeanPHP\SQLHelper;
+use RedBeanPHP\RedException\SQL;
+use RedBeanPHP\RedException\Security;
+use RedBeanPHP\Plugin\Cooker;
+use RedBeanPHP\Plugin\TimeLine;
+use RedBeanPHP\Setup;
+use RedBeanPHP\Logger;
+use RedBeanPHP\Logger\RDefault;
+use RedBeanPHP\OODBBean;
+use RedBeanPHP\SimpleModel;
+use RedBeanPHP\ModelHelper;
+use RedBeanPHP\Adapter;
+use RedBeanPHP\QueryWriter\AQueryWriter;
+use RedBeanPHP\RedException;
+
 /**
  * RedBean Facade
  *

@@ -100,8 +100,3 @@ require( $dir . 'Plugin/QueryLogger.php' );
 require( $dir . 'Plugin/TimeLine.php' );
 
 class R extends \RedBeanPHP\Facade {};
-
-
-
-
-

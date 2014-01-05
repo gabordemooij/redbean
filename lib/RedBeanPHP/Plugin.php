@@ -1,5 +1,7 @@
 <?php 
+
 namespace RedBeanPHP;  
+
 /**
  * RedBean Plugin
  *
@@ -15,5 +17,3 @@ namespace RedBeanPHP;
 interface Plugin
 {
 }
-
-;
