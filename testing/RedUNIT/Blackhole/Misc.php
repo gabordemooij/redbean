@@ -8,7 +8,7 @@ use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\Setup as Setup;
 use \RedBeanPHP\ToolBox as ToolBox;
 use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper; 
+use \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper; 
 /**
  * RedUNIT_Blackhole_Misc
  *
@@ -453,9 +453,9 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		asrt( count( R::dispense( 'countable' ) ), 1 );
 
 		// Otherwise untestable...
-		$bean->setBeanHelper( new FacadeBeanHelper() );
+		$bean->setBeanHelper( new SimpleFacadeBeanHelper() );
 
-		R::$redbean->setBeanHelper( new FacadeBeanHelper() );
+		R::$redbean->setBeanHelper( new SimpleFacadeBeanHelper() );
 
 		pass();
 

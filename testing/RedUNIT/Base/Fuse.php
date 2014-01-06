@@ -46,12 +46,6 @@ class RedUNIT_Base_Fuse extends RedUNIT_Base
 		
 		$a = R::getAll( "select * from blog " );
 
-		ModelHelper::setModelFormatter( new mymodelformatter );
-
-		$w = R::dispense( "weirdo" );
-
-		asrt( $w->blah(), "yes!" );
-
 		R::tag( $post, "lousy,smart" );
 
 		asrt( implode( ',', R::tag( $post ) ), "lousy,smart" );

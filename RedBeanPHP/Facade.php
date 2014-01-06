@@ -16,11 +16,11 @@ use \RedBeanPHP\Logger as Logger;
 use \RedBeanPHP\Logger\RDefault as RDefault;
 use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\SimpleModel as SimpleModel;
-use \RedBeanPHP\ModelHelper as ModelHelper;
+use \RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
 use \RedBeanPHP\Adapter as Adapter;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use \RedBeanPHP\RedException as RedException;
-use \RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
+use \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 /**
  * RedBean Facade
  *
@@ -990,11 +990,11 @@ class Facade
 
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
 		
-		$helper                   = new ModelHelper();
+		$helper                   = new SimpleModelHelper();
 
 		$helper->attachEventListeners( self::$redbean );
 		
-		self::$redbean->setBeanHelper( new FacadeBeanHelper );
+		self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
 
 		self::$associationManager->addEventListener( 'delete', $helper );
 

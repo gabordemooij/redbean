@@ -34,8 +34,6 @@ abstract class RedUNIT
 		
 		R::debug( FALSE );
 
-		\RedBeanPHP\ModelHelper::setModelFormatter( new DefaultModelFormatter );
-
 		R::nuke();
 	}
 

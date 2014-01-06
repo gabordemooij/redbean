@@ -51,54 +51,6 @@ class ObserverMock implements \RedBeanPHP\Observer
 
 /**
  * Shared helper class for tests.
- * A Basic Model Formatter for FUSE tests.
- */
-class mymodelformatter implements RedBeanPHP\IModelFormatter
-{
-	/**
-	 * @param string $model
-	 *
-	 * @return string
-	 */
-	public function formatModel( $model )
-	{
-		return "my_weird_" . $model . "_model";
-	}
-}
-
-/**
- * Shared helper class for tests.
- * Default Model Formatter to reset model formatting in FUSE tests.
- */
-class DefaultModelFormatter implements RedBeanPHP\IModelFormatter
-{
-	/**
-	 * @param string $model
-	 *
-	 * @return string
-	 */public function formatModel( $model )
-	{
-		return 'Model_' . ucfirst( $model );
-	}
-}
-
-/**
- * Shared helper class for tests.
- * A Basic Model Formatter for FUSE tests.
- */
-class my_weird_weirdo_model extends RedBeanPHP\SimpleModel
-{
-	/**
-	 * @return string
-	 */
-	public function blah()
-	{
-		return "yes!";
-	}
-}
-
-/**
- * Shared helper class for tests.
  * A test model to test FUSE functions.
  */
 class Model_Band extends RedBeanPHP\SimpleModel
