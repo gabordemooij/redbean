@@ -102,7 +102,7 @@ function ID( $table )
 /**
  * Emulates legacy function for use with older tests.
  */
-function set1toNAssoc( $a, \RedBean\OODBBean $bean1, \RedBeanPHP\OODBBean $bean2 )
+function set1toNAssoc( $a, \RedBeanPHP\OODBBean $bean1, \RedBeanPHP\OODBBean $bean2 )
 {
 	$type = $bean1->getMeta( "type" );
 
