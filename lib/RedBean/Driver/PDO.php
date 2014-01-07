@@ -260,7 +260,20 @@ class RPDO implements Driver
 	 */
 	public function connect()
 	{
-		if ( $this->isConnected ) return;
+		if (true === $this->isConnected) {
+            return;
+        }
+
+        if ($this->pdo instanceof \PDO) {
+            $this->isConnected = true;
+            return;
+        }
+        
+        if ($this->dsn instanceof \PDO) {
+            $this->pdo = $dsn;
+            $this->isConnected = true;
+            return;
+        }
 
 		try {
 			$user = $this->connectInfo['user'];
