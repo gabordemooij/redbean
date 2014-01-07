@@ -270,7 +270,7 @@ class RPDO implements Driver
         }
         
         if ($this->dsn instanceof \PDO) {
-            $this->pdo = $dsn;
+            $this->pdo = $this->dsn;
             $this->isConnected = true;
             return;
         }
