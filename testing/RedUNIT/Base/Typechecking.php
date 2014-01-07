@@ -1,7 +1,7 @@
 <?php
 
-use \ReadBean\RedException\Security as Security;
-use \ReadBean\OODBBean as OODBBean;
+use \RedBean\RedException\Security as Security;
+use \RedBean\OODBBean as OODBBean;
 /**
  * RedUNIT_Base_Typechecking
  *

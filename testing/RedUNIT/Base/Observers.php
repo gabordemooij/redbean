@@ -1,8 +1,8 @@
 <?php 
 
-use \ReadBean\Adapter\DBAdapter as DBAdapter;
-use \ReadBean\QueryWriter as QueryWriter;
-use \ReadBean\OODB as OODB; 
+use \RedBean\Adapter\DBAdapter as DBAdapter;
+use \RedBean\QueryWriter as QueryWriter;
+use \RedBean\OODB as OODB; 
 /**
  * RedUNIT_Base_Observers
  *

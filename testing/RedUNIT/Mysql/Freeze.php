@@ -1,8 +1,8 @@
 <?php 
 
-use \ReadBean\AssociationManager as AssociationManager;
-use \ReadBean\RedException\SQL as SQL;
-use \ReadBean\Plugin\QueryLogger as QueryLogger; 
+use \RedBean\AssociationManager as AssociationManager;
+use \RedBean\RedException\SQL as SQL;
+use \RedBean\Plugin\QueryLogger as QueryLogger; 
 /**
  * RedUNIT_Mysql_Freeze
  *

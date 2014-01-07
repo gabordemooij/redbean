@@ -1,12 +1,12 @@
 <?php
 
-namespace ReadBean\QueryWriter;
+namespace RedBean\QueryWriter;
 
-use ReadBean\QueryWriter\AQueryWriter;
-use ReadBean\QueryWriter;
-use ReadBean\Adapter\DBAdapter;
-use ReadBean\Adapter;
-use ReadBean\Driver\RPDO\NULL as NULL; // this is not pretty!!!
+use RedBean\QueryWriter\AQueryWriter;
+use RedBean\QueryWriter;
+use RedBean\Adapter\DBAdapter;
+use RedBean\Adapter;
+use RedBean\Driver\RPDO\NULL as NULL; // this is not pretty!!!
 
 /**
  * RedBean PostgreSQL Query Writer

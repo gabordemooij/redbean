@@ -1,31 +1,31 @@
 <?php
 
-namespace ReadBean;
+namespace RedBean;
 
-use ReadBean\ToolBox;
-use ReadBean\OODB;
-use ReadBean\QueryWriter;
-use ReadBean\Adapter\DBAdapter;
-use ReadBean\AssociationManager;
-use ReadBean\AssociationManager\ExtAssociationManager;
-use ReadBean\TagManager;
-use ReadBean\DuplicationManager;
-use ReadBean\LabelMaker;
-use ReadBean\Finder;
-use ReadBean\SQLHelper;
-use ReadBean\RedException\SQL;
-use ReadBean\RedException\Security;
-use ReadBean\Plugin\Cooker;
-use ReadBean\Plugin\TimeLine;
-use ReadBean\Setup;
-use ReadBean\Logger;
-use ReadBean\Logger\RDefault;
-use ReadBean\OODBBean;
-use ReadBean\SimpleModel;
-use ReadBean\ModelHelper;
-use ReadBean\Adapter;
-use ReadBean\QueryWriter\AQueryWriter;
-use ReadBean\RedException;
+use RedBean\ToolBox;
+use RedBean\OODB;
+use RedBean\QueryWriter;
+use RedBean\Adapter\DBAdapter;
+use RedBean\AssociationManager;
+use RedBean\AssociationManager\ExtAssociationManager;
+use RedBean\TagManager;
+use RedBean\DuplicationManager;
+use RedBean\LabelMaker;
+use RedBean\Finder;
+use RedBean\SQLHelper;
+use RedBean\RedException\SQL;
+use RedBean\RedException\Security;
+use RedBean\Plugin\Cooker;
+use RedBean\Plugin\TimeLine;
+use RedBean\Setup;
+use RedBean\Logger;
+use RedBean\Logger\RDefault;
+use RedBean\OODBBean;
+use RedBean\SimpleModel;
+use RedBean\ModelHelper;
+use RedBean\Adapter;
+use RedBean\QueryWriter\AQueryWriter;
+use RedBean\RedException;
 
 /**
  * RedBean Facade

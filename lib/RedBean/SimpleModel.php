@@ -1,8 +1,8 @@
 <?php 
 
-namespace ReadBean; 
+namespace RedBean; 
 
-use ReadBean\OODBBean;
+use RedBean\OODBBean;
 
 /**
  * SimpleModel

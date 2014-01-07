@@ -1,10 +1,10 @@
 <?php
 
-namespace ReadBean\Plugin;
+namespace RedBean\Plugin;
 
-use ReadBean\Plugin;
-use ReadBean\ModelHelper;
-use ReadBean\Facade;
+use RedBean\Plugin;
+use RedBean\ModelHelper;
+use RedBean\Facade;
 
 /**
  * BeanCan Server.

@@ -1,10 +1,10 @@
 <?php 
 
-namespace ReadBean; 
+namespace RedBean; 
 
-use ReadBean\ToolBox;
-use ReadBean\AssociationManager;
-use ReadBean\OODBBean; 
+use RedBean\ToolBox;
+use RedBean\AssociationManager;
+use RedBean\OODBBean; 
 
 /**
  * RedBean Tag Manager.

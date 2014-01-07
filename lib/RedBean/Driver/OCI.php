@@ -1,11 +1,11 @@
 <?php
 
-namespace ReadBean\Driver;
+namespace RedBean\Driver;
 
-use ReadBean\Driver;
-use ReadBean\Logger;
-use ReadBean\RedException\SQL;
-use ReadBean\Logger\RDefault;
+use RedBean\Driver;
+use RedBean\Logger;
+use RedBean\RedException\SQL;
+use RedBean\Logger\RDefault;
 
 /**
  * OCI Driver

@@ -1,8 +1,8 @@
 <?php 
 
-use \ReadBean\Observer as Observer;
-use \ReadBean\OODBBean as OODBBean;
-use \ReadBean\Adapter as Adapter; 
+use \RedBean\Observer as Observer;
+use \RedBean\OODBBean as OODBBean;
+use \RedBean\Adapter as Adapter; 
 /**
  * RedUNIT_Base_Foreignkeys
  *

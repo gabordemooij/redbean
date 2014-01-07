@@ -1,12 +1,12 @@
 <?php 
 
-namespace ReadBean; 
+namespace RedBean; 
 
-use ReadBean\Observer;
-use ReadBean\IModelFormatter;
-use ReadBean\DependencyInjector;
-use ReadBean\OODBBean;
-use ReadBean\Observable; 
+use RedBean\Observer;
+use RedBean\IModelFormatter;
+use RedBean\DependencyInjector;
+use RedBean\OODBBean;
+use RedBean\Observable; 
 
 /**
  * RedBean Model Helper

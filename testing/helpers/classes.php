@@ -10,7 +10,7 @@
  * Observable Mock
  * This is just for testing
  */
-class ObservableMock extends \ReadBean\Observable
+class ObservableMock extends \RedBean\Observable
 {
 	/**
 	 * @param $eventname
@@ -26,7 +26,7 @@ class ObservableMock extends \ReadBean\Observable
  * Observer Mock
  * This is just for testing
  */
-class ObserverMock implements \ReadBean\Observer
+class ObserverMock implements \RedBean\Observer
 {
 	/**
 	 * @var bool
@@ -53,7 +53,7 @@ class ObserverMock implements \ReadBean\Observer
  * Shared helper class for tests.
  * A Basic Model Formatter for FUSE tests.
  */
-class mymodelformatter implements ReadBean\IModelFormatter
+class mymodelformatter implements RedBean\IModelFormatter
 {
 	/**
 	 * @param string $model
@@ -70,7 +70,7 @@ class mymodelformatter implements ReadBean\IModelFormatter
  * Shared helper class for tests.
  * Default Model Formatter to reset model formatting in FUSE tests.
  */
-class DefaultModelFormatter implements ReadBean\IModelFormatter
+class DefaultModelFormatter implements RedBean\IModelFormatter
 {
 	/**
 	 * @param string $model
@@ -86,7 +86,7 @@ class DefaultModelFormatter implements ReadBean\IModelFormatter
  * Shared helper class for tests.
  * A Basic Model Formatter for FUSE tests.
  */
-class my_weird_weirdo_model extends ReadBean\SimpleModel
+class my_weird_weirdo_model extends RedBean\SimpleModel
 {
 	/**
 	 * @return string
@@ -101,7 +101,7 @@ class my_weird_weirdo_model extends ReadBean\SimpleModel
  * Shared helper class for tests.
  * A test model to test FUSE functions.
  */
-class Model_Band extends ReadBean\SimpleModel
+class Model_Band extends RedBean\SimpleModel
 {
 	public function after_update() { }
 
@@ -147,7 +147,7 @@ class Model_Band extends ReadBean\SimpleModel
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
-class Model_Box extends ReadBean\SimpleModel
+class Model_Box extends RedBean\SimpleModel
 {
 	public function delete() { $a = $this->bean->ownBottle; }
 }
@@ -156,7 +156,7 @@ class Model_Box extends ReadBean\SimpleModel
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
-class Model_CandyBar extends ReadBean\SimpleModel
+class Model_CandyBar extends RedBean\SimpleModel
 {
 	/**
 	 * @param $custom
@@ -189,7 +189,7 @@ class Model_CandyBar extends ReadBean\SimpleModel
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
-class Model_Cocoa extends ReadBean\SimpleModel
+class Model_Cocoa extends RedBean\SimpleModel
 {
 	public function update()
 	{
@@ -201,7 +201,7 @@ class Model_Cocoa extends ReadBean\SimpleModel
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
-class Model_Taste extends ReadBean\SimpleModel
+class Model_Taste extends RedBean\SimpleModel
 {
 	public function after_update()
 	{
@@ -213,7 +213,7 @@ class Model_Taste extends ReadBean\SimpleModel
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
-class Model_Coffee extends ReadBean\SimpleModel
+class Model_Coffee extends RedBean\SimpleModel
 {
 	public function update()
 	{
@@ -227,7 +227,7 @@ class Model_Coffee extends ReadBean\SimpleModel
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
-class Model_Test extends ReadBean\SimpleModel
+class Model_Test extends RedBean\SimpleModel
 {
 	public function update()
 	{
@@ -251,7 +251,7 @@ global $lifeCycle;
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
-class Model_Bandmember extends ReadBean\SimpleModel
+class Model_Bandmember extends RedBean\SimpleModel
 {
 	public function open()
 	{

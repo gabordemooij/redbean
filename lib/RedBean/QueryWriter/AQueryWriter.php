@@ -1,11 +1,11 @@
 <?php
 
-namespace ReadBean\QueryWriter;
+namespace RedBean\QueryWriter;
 
-use ReadBean\Adapter\DBAdapter;
-use ReadBean\RedException\Security;
-use ReadBean\QueryWriter;
-use ReadBean\OODBBean;
+use RedBean\Adapter\DBAdapter;
+use RedBean\RedException\Security;
+use RedBean\QueryWriter;
+use RedBean\OODBBean;
 
 /**
  * RedBean Abstract Query Writer

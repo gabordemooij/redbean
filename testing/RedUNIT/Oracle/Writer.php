@@ -1,10 +1,10 @@
 <?php
 
-use \ReadBean\AssociationManager as AssociationManager;
-use \ReadBean\QueryWriter\MySQL as MySQL;
-use \ReadBean\QueryWriter\Oracle as Oracle;
-use \ReadBean\RedException\SQL as SQL;
-use \ReadBean\RedException as RedException;
+use \RedBean\AssociationManager as AssociationManager;
+use \RedBean\QueryWriter\MySQL as MySQL;
+use \RedBean\QueryWriter\Oracle as Oracle;
+use \RedBean\RedException\SQL as SQL;
+use \RedBean\RedException as RedException;
 /**
  * RedUNIT_Oracle_Writer
  *

@@ -1,8 +1,8 @@
 <?php 
 
-use \ReadBean\DependencyInjector as DependencyInjector;
-use \ReadBean\ModelHelper as ModelHelper;
-use \ReadBean\SimpleModel as SimpleModel; 
+use \RedBean\DependencyInjector as DependencyInjector;
+use \RedBean\ModelHelper as ModelHelper;
+use \RedBean\SimpleModel as SimpleModel; 
 /**
  * RedUNIT_Blackhole_DIContainer
  *

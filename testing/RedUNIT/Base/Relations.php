@@ -1,8 +1,8 @@
 <?php 
 
-use \ReadBean\RedException\Security as Security;
-use \ReadBean\OODBBean as OODBBean;
-use \ReadBean\Plugin\QueryLogger as QueryLogger; 
+use \RedBean\RedException\Security as Security;
+use \RedBean\OODBBean as OODBBean;
+use \RedBean\Plugin\QueryLogger as QueryLogger; 
 /**
  * RedUNIT_Base_Relations
  *

@@ -1,6 +1,6 @@
 <?php 
 
-use \ReadBean\SimpleModel as SimpleModel; 
+use \RedBean\SimpleModel as SimpleModel; 
 /**
  * RedUNIT_Base_Boxing
  *

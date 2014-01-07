@@ -1,6 +1,6 @@
 <?php 
 
-use \ReadBean\AssociationManager\ExtAssociationManager as ExtAssociationManager; 
+use \RedBean\AssociationManager\ExtAssociationManager as ExtAssociationManager; 
 /**
  * RedUNIT_Base_Extassoc
  *

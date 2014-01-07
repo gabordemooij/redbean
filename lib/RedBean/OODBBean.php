@@ -1,15 +1,15 @@
 <?php
 
-namespace ReadBean;
+namespace RedBean;
 
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use DateTime;
 use IteratorAggregate;
-use ReadBean\BeanHelper;
-use ReadBean\RedException\Security;
-use ReadBean\SQLHelper;
+use RedBean\BeanHelper;
+use RedBean\RedException\Security;
+use RedBean\SQLHelper;
 
 /**
  * OODBBean (Object Oriented DataBase Bean)

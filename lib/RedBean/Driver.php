@@ -1,6 +1,6 @@
 <?php
 
-namespace ReadBean;  
+namespace RedBean;  
 
 /**
  * Interface for database drivers

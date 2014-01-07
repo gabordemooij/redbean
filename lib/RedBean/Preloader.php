@@ -1,10 +1,10 @@
 <?php 
 
-namespace ReadBean; 
+namespace RedBean; 
 
-use ReadBean\AssociationManager;
-use ReadBean\OODB;
-use ReadBean\OODBBean;
+use RedBean\AssociationManager;
+use RedBean\OODB;
+use RedBean\OODBBean;
 
 /**
  * Preloader.

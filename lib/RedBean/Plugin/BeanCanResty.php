@@ -1,14 +1,14 @@
 <?php
 
-namespace ReadBean\Plugin;
+namespace RedBean\Plugin;
 
-use ReadBean\Plugin;
-use ReadBean\OODB;
-use ReadBean\ToolBox;
-use ReadBean\OODBBean;
-use ReadBean\Finder;
-use ReadBean\Facade;
-use ReadBean\Plugin\BeanCan;
+use RedBean\Plugin;
+use RedBean\OODB;
+use RedBean\ToolBox;
+use RedBean\OODBBean;
+use RedBean\Finder;
+use RedBean\Facade;
+use RedBean\Plugin\BeanCan;
 
 /**
  * BeanCan Server.
