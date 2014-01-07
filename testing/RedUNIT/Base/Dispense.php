@@ -1,8 +1,8 @@
 <?php 
 
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\Facade as Facade;
-use \RedBeanPHP\OODBBean as OODBBean; 
+use \ReadBean\RedException\Security as Security;
+use \ReadBean\Facade as Facade;
+use \ReadBean\OODBBean as OODBBean; 
 /**
  * RedUNIT_Base_Dispense
  *

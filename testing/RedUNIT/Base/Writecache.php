@@ -1,6 +1,6 @@
 <?php 
 
-use \RedBeanPHP\Plugin\QueryLogger as QueryLogger; 
+use \ReadBean\Plugin\QueryLogger as QueryLogger; 
 /**
  * RedUNIT_Base_Writecache
  *

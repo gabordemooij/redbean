@@ -1,15 +1,15 @@
 <?php
 
-use \RedBeanPHP\Logger\RDefault as RDefault;
-use \RedBeanPHP\Logger as Logger;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\Plugin\Cooker as Cooker;
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Driver\RPDO as RPDO;
+use \ReadBean\Logger\RDefault as RDefault;
+use \ReadBean\Logger as Logger;
+use \ReadBean\OODBBean as OODBBean;
+use \ReadBean\OODB as OODB;
+use \ReadBean\Adapter as Adapter;
+use \ReadBean\QueryWriter as QueryWriter;
+use \ReadBean\Plugin\Cooker as Cooker;
+use \ReadBean\RedException\Security as Security;
+use \ReadBean\RedException\SQL as SQL;
+use \ReadBean\Driver\RPDO as RPDO;
 /**
  * RedUNIT_Base_Misc
  *

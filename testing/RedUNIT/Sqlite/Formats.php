@@ -1,6 +1,6 @@
 <?php 
 
-use \RedBeanPHP\DefaultBeanFormatter as DefaultBeanFormatter; 
+use \ReadBean\DefaultBeanFormatter as DefaultBeanFormatter; 
 /**
  * RedUNIT_Sqlite_Formats
  *

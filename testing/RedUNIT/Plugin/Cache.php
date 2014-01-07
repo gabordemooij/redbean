@@ -1,7 +1,7 @@
 <?php 
 
-use \RedBeanPHP\Plugin\Cache as Cache;
-use \RedBeanPHP\ToolBox as ToolBox; 
+use \ReadBean\Plugin\Cache as Cache;
+use \ReadBean\ToolBox as ToolBox; 
 /**
  * RedUNIT_Plugin_Cache
  *

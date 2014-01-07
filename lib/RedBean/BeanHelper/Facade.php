@@ -1,11 +1,11 @@
 <?php 
 
-namespace RedBeanPHP\BeanHelper; 
+namespace ReadBean\BeanHelper; 
 
-use RedBeanPHP\BeanHelper;
-use RedBeanPHP\Facade;
-use RedBeanPHP\OODBBean;
-use RedBeanPHP\ModelHelper; 
+use ReadBean\BeanHelper;
+use ReadBean\Facade;
+use ReadBean\OODBBean;
+use ReadBean\ModelHelper; 
 
 /**
  * Bean Helper.

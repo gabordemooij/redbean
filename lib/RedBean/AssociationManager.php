@@ -1,16 +1,16 @@
 <?php
 
-namespace RedBeanPHP;
+namespace ReadBean;
 
 use Exception;
-use RedBeanPHP\Adapter\DBAdapter;
-use RedBeanPHP\Observable;
-use RedBeanPHP\OODB;
-use RedBeanPHP\OODBBean;
-use RedBeanPHP\QueryWriter;
-use RedBeanPHP\RedException\Security;
-use RedBeanPHP\RedException\SQL;
-use RedBeanPHP\ToolBox;
+use ReadBean\Adapter\DBAdapter;
+use ReadBean\Observable;
+use ReadBean\OODB;
+use ReadBean\OODBBean;
+use ReadBean\QueryWriter;
+use ReadBean\RedException\Security;
+use ReadBean\RedException\SQL;
+use ReadBean\ToolBox;
 
 /**
  * Association Manager

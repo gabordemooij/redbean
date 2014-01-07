@@ -1,11 +1,11 @@
 <?php
 
-namespace RedBeanPHP\RedException;
+namespace ReadBean\RedException;
 
 use RuntimeException;
 
 /**
- * RedBean\Exception SQL
+ * ReadBean\Exception SQL
  *
  * @file       RedBean/Exception/SQL.php
  * @desc       Represents a generic database exception independent of the underlying driver.

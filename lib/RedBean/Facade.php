@@ -1,31 +1,31 @@
 <?php
 
-namespace RedBeanPHP;
+namespace ReadBean;
 
-use RedBeanPHP\ToolBox;
-use RedBeanPHP\OODB;
-use RedBeanPHP\QueryWriter;
-use RedBeanPHP\Adapter\DBAdapter;
-use RedBeanPHP\AssociationManager;
-use RedBeanPHP\AssociationManager\ExtAssociationManager;
-use RedBeanPHP\TagManager;
-use RedBeanPHP\DuplicationManager;
-use RedBeanPHP\LabelMaker;
-use RedBeanPHP\Finder;
-use RedBeanPHP\SQLHelper;
-use RedBeanPHP\RedException\SQL;
-use RedBeanPHP\RedException\Security;
-use RedBeanPHP\Plugin\Cooker;
-use RedBeanPHP\Plugin\TimeLine;
-use RedBeanPHP\Setup;
-use RedBeanPHP\Logger;
-use RedBeanPHP\Logger\RDefault;
-use RedBeanPHP\OODBBean;
-use RedBeanPHP\SimpleModel;
-use RedBeanPHP\ModelHelper;
-use RedBeanPHP\Adapter;
-use RedBeanPHP\QueryWriter\AQueryWriter;
-use RedBeanPHP\RedException;
+use ReadBean\ToolBox;
+use ReadBean\OODB;
+use ReadBean\QueryWriter;
+use ReadBean\Adapter\DBAdapter;
+use ReadBean\AssociationManager;
+use ReadBean\AssociationManager\ExtAssociationManager;
+use ReadBean\TagManager;
+use ReadBean\DuplicationManager;
+use ReadBean\LabelMaker;
+use ReadBean\Finder;
+use ReadBean\SQLHelper;
+use ReadBean\RedException\SQL;
+use ReadBean\RedException\Security;
+use ReadBean\Plugin\Cooker;
+use ReadBean\Plugin\TimeLine;
+use ReadBean\Setup;
+use ReadBean\Logger;
+use ReadBean\Logger\RDefault;
+use ReadBean\OODBBean;
+use ReadBean\SimpleModel;
+use ReadBean\ModelHelper;
+use ReadBean\Adapter;
+use ReadBean\QueryWriter\AQueryWriter;
+use ReadBean\RedException;
 
 /**
  * RedBean Facade

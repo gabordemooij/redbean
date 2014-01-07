@@ -1,11 +1,11 @@
 <?php
 
-namespace RedBeanPHP\QueryWriter;
+namespace ReadBean\QueryWriter;
 
-use RedBeanPHP\QueryWriter\AQueryWriter;
-use RedBeanPHP\QueryWriter;
-use RedBeanPHP\Adapter;
-use RedBeanPHP\Driver\OCI;
+use ReadBean\QueryWriter\AQueryWriter;
+use ReadBean\QueryWriter;
+use ReadBean\Adapter;
+use ReadBean\Driver\OCI;
 
 /**
  * RedBean Oracle Driver

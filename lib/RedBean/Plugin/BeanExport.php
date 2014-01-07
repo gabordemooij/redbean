@@ -1,11 +1,11 @@
 <?php 
 
-namespace RedBeanPHP\Plugin; 
+namespace ReadBean\Plugin; 
 
-use RedBeanPHP\Plugin;
-use RedBeanPHP\ToolBox;
-use RedBeanPHP\OODBBean;
-use RedBeanPHP\RedException\SQL; 
+use ReadBean\Plugin;
+use ReadBean\ToolBox;
+use ReadBean\OODBBean;
+use ReadBean\RedException\SQL; 
 
 /**
  * Recursive Bean Export

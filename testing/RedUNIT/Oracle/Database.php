@@ -1,6 +1,6 @@
 <?php 
 
-use \RedBeanPHP\RedException\SQL as SQL; 
+use \ReadBean\RedException\SQL as SQL; 
 /**
  * RedUNIT_Oracle_Database
  *

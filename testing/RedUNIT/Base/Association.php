@@ -1,11 +1,11 @@
 <?php
 
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\SimpleModel as SimpleModel;
-use \RedBeanPHP\QueryWriter\MySQL as MySQL;
+use \ReadBean\ToolBox as ToolBox;
+use \ReadBean\AssociationManager as AssociationManager;
+use \ReadBean\RedException\SQL as SQL;
+use \ReadBean\RedException\Security as Security;
+use \ReadBean\SimpleModel as SimpleModel;
+use \ReadBean\QueryWriter\MySQL as MySQL;
 /**
  * RedUNIT_Base_Association
  *

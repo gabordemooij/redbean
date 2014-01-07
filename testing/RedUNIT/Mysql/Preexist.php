@@ -1,6 +1,6 @@
 <?php 
 
-use \RedBeanPHP\AssociationManager as AssociationManager; 
+use \ReadBean\AssociationManager as AssociationManager; 
 /**
  * RedUNIT_Mysql_Preexist
  *

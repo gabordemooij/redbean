@@ -1,19 +1,19 @@
 <?php
 
-namespace RedBeanPHP;
+namespace ReadBean;
 
 use Exception;
-use RedBeanPHP\Adapter\DBAdapter;
-use RedBeanPHP\AssociationManager;
-use RedBeanPHP\BeanHelper;
-use RedBeanPHP\BeanHelper\FacadeBeanHelper;
-use RedBeanPHP\Observable;
-use RedBeanPHP\OODBBean;
-use RedBeanPHP\Preloader;
-use RedBeanPHP\QueryWriter;
-use RedBeanPHP\RedException\Security;
-use RedBeanPHP\RedException\SQL;
-use RedBeanPHP\SimpleModel;
+use ReadBean\Adapter\DBAdapter;
+use ReadBean\AssociationManager;
+use ReadBean\BeanHelper;
+use ReadBean\BeanHelper\FacadeBeanHelper;
+use ReadBean\Observable;
+use ReadBean\OODBBean;
+use ReadBean\Preloader;
+use ReadBean\QueryWriter;
+use ReadBean\RedException\Security;
+use ReadBean\RedException\SQL;
+use ReadBean\SimpleModel;
 
 /**
  * RedBean Object Oriented DataBase

@@ -1,7 +1,7 @@
 <?php 
 
-use \RedBeanPHP\Facade as Facade;
-use \RedBeanPHP\RedException as RedException; 
+use \ReadBean\Facade as Facade;
+use \ReadBean\RedException as RedException; 
 /**
  * RedUNIT_Blackhole_Plugins
  *

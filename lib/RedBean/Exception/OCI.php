@@ -1,8 +1,8 @@
 <?php 
 
-namespace RedBeanPHP\RedException; 
+namespace ReadBean\RedException; 
 
-use RedBeanPHP\RedException\SQL;
+use ReadBean\RedException\SQL;
 
 /**
  * RedBean\Exception OCI

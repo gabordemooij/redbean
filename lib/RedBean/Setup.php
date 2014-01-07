@@ -1,17 +1,17 @@
 <?php
 
-namespace RedBeanPHP;
+namespace ReadBean;
 
-use RedBeanPHP\ToolBox;
-use RedBeanPHP\Driver\RPDO;
-use RedBeanPHP\Driver\OCI;
-use RedBeanPHP\Adapter\DBAdapter;
-use RedBeanPHP\QueryWriter\PostgreSQL;
-use RedBeanPHP\QueryWriter\SQLiteT;
-use RedBeanPHP\QueryWriter\CUBRID;
-use RedBeanPHP\QueryWriter\Oracle;
-use RedBeanPHP\QueryWriter\MySQL;
-use RedBeanPHP\OODB;
+use ReadBean\ToolBox;
+use ReadBean\Driver\RPDO;
+use ReadBean\Driver\OCI;
+use ReadBean\Adapter\DBAdapter;
+use ReadBean\QueryWriter\PostgreSQL;
+use ReadBean\QueryWriter\SQLiteT;
+use ReadBean\QueryWriter\CUBRID;
+use ReadBean\QueryWriter\Oracle;
+use ReadBean\QueryWriter\MySQL;
+use ReadBean\OODB;
 
 /**
  * RedBean Setup

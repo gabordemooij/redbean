@@ -1,9 +1,9 @@
 <?php 
 
-namespace RedBeanPHP\AssociationManager; 
+namespace ReadBean\AssociationManager; 
 
-use RedBeanPHP\AssociationManager;
-use RedBeanPHP\OODBBean; 
+use ReadBean\AssociationManager;
+use ReadBean\OODBBean; 
 
 /**
  * Extended Association Manager

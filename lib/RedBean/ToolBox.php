@@ -1,11 +1,11 @@
 <?php 
 
-namespace RedBeanPHP; 
+namespace ReadBean; 
 
-use \RedBeanPHP\OODB;
-use \RedBeanPHP\QueryWriter;
-use \RedBeanPHP\Adapter\DBAdapter;
-use \RedBeanPHP\Adapter;
+use \ReadBean\OODB;
+use \ReadBean\QueryWriter;
+use \ReadBean\Adapter\DBAdapter;
+use \ReadBean\Adapter;
 
 /**
  * @file      RedBean/ToolBox.php

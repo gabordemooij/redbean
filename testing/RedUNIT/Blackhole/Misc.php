@@ -1,14 +1,14 @@
 <?php
 
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\Driver\RPDO as RPDO;
-use \RedBeanPHP\Logger\RDefault as RDefault;
-use \RedBeanPHP\SQLHelper as SQLHelper;
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\Setup as Setup;
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
+use \ReadBean\OODBBean as OODBBean;
+use \ReadBean\Driver\RPDO as RPDO;
+use \ReadBean\Logger\RDefault as RDefault;
+use \ReadBean\SQLHelper as SQLHelper;
+use \ReadBean\RedException\Security as Security;
+use \ReadBean\Setup as Setup;
+use \ReadBean\ToolBox as ToolBox;
+use \ReadBean\Adapter as Adapter;
+use \ReadBean\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
 /**
  * RedUNIT_Blackhole_Misc
  *

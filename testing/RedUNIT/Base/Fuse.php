@@ -1,7 +1,7 @@
 <?php 
 
-use \RedBeanPHP\ModelHelper as ModelHelper;
-use \RedBeanPHP\RedException as RedException; 
+use \ReadBean\ModelHelper as ModelHelper;
+use \ReadBean\RedException as RedException; 
 /**
  * RedUNIT_Base_Fuse
  *

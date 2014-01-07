@@ -1,8 +1,8 @@
 <?php 
 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
-use \RedBeanPHP\RedException\SQL as SQL; 
+use \ReadBean\AssociationManager as AssociationManager;
+use \ReadBean\QueryWriter\PostgreSQL as PostgreSQL;
+use \ReadBean\RedException\SQL as SQL; 
 /**
  * RedUNIT_Postgres_Writer
  *

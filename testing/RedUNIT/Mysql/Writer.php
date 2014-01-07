@@ -1,9 +1,9 @@
 <?php
 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\QueryWriter\MySQL as MySQL;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\RedException as RedException;
+use \ReadBean\AssociationManager as AssociationManager;
+use \ReadBean\QueryWriter\MySQL as MySQL;
+use \ReadBean\RedException\SQL as SQL;
+use \ReadBean\RedException as RedException;
 /**
  * RedUNIT_Mysql_Writer
  *

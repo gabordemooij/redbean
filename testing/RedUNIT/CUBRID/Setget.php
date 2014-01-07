@@ -1,6 +1,6 @@
 <?php
 
-use \RedBeanPHP\RedException\Security as Security;
+use \ReadBean\RedException\Security as Security;
 /**
  * RedUNIT_CUBRID_Setget
  *

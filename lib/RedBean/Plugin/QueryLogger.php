@@ -1,11 +1,11 @@
 <?php 
 
-namespace RedBeanPHP\Plugin; 
+namespace ReadBean\Plugin; 
 
-use RedBeanPHP\Observer;
-use RedBeanPHP\Plugin;
-use RedBeanPHP\Observable;
-use RedBeanPHP\Adapter\DBAdapter; 
+use ReadBean\Observer;
+use ReadBean\Plugin;
+use ReadBean\Observable;
+use ReadBean\Adapter\DBAdapter; 
 
 /**
  * Query Logger

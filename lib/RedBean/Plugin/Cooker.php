@@ -1,12 +1,12 @@
 <?php 
 
-namespace RedBeanPHP\Plugin; 
+namespace ReadBean\Plugin; 
 
-use RedBeanPHP\Plugin;
-use RedBeanPHP\ToolBox;
-use RedBeanPHP\OODB;
-use RedBeanPHP\OODBBean;
-use RedBeanPHP\RedException\Security; 
+use ReadBean\Plugin;
+use ReadBean\ToolBox;
+use ReadBean\OODB;
+use ReadBean\OODBBean;
+use ReadBean\RedException\Security; 
 
 /**
  * RedBean Cooker

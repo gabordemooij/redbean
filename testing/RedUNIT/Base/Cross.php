@@ -1,7 +1,7 @@
 <?php 
 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\RedException\SQL as SQL; 
+use \ReadBean\AssociationManager as AssociationManager;
+use \ReadBean\RedException\SQL as SQL; 
 /**
  * RedUNIT_Base_Cross
  *

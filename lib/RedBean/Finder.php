@@ -1,12 +1,12 @@
 <?php 
 
-namespace RedBeanPHP; 
+namespace ReadBean; 
 
-use RedBeanPHP\ToolBox;
-use RedBeanPHP\OODB;
-use RedBeanPHP\RedException\Security;
-use RedBeanPHP\SQLHelper;
-use RedBeanPHP\OODBBean; 
+use ReadBean\ToolBox;
+use ReadBean\OODB;
+use ReadBean\RedException\Security;
+use ReadBean\SQLHelper;
+use ReadBean\OODBBean; 
 
 /**
  * RedBean Finder

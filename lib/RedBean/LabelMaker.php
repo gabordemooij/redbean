@@ -1,9 +1,9 @@
 <?php 
 
-namespace RedBeanPHP; 
+namespace ReadBean; 
 
-use RedBeanPHP\ToolBox;
-use RedBeanPHP\OODBBean; 
+use ReadBean\ToolBox;
+use ReadBean\OODBBean; 
 
 /**
  * Label Maker

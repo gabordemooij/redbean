@@ -1,9 +1,9 @@
 <?php
 
-use \RedBeanPHP\Plugin\Cooker as Cooker;
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\ModelHelper as ModelHelper;
+use \ReadBean\Plugin\Cooker as Cooker;
+use \ReadBean\RedException\Security as Security;
+use \ReadBean\OODBBean as OODBBean;
+use \ReadBean\ModelHelper as ModelHelper;
 /**
  * RedUNIT_Plugin_Graph
  *

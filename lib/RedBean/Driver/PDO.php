@@ -1,12 +1,12 @@
 <?php
 
-namespace RedBeanPHP\Driver;
+namespace ReadBean\Driver;
 
-use RedBeanPHP\Driver;
-use RedBeanPHP\Logger;
-use RedBeanPHP\QueryWriter\AQueryWriter;
-use RedBeanPHP\RedException\SQL;
-use RedBeanPHP\Logger\RDefault;
+use ReadBean\Driver;
+use ReadBean\Logger;
+use ReadBean\QueryWriter\AQueryWriter;
+use ReadBean\RedException\SQL;
+use ReadBean\Logger\RDefault;
 
 /**
  * \PDO Driver

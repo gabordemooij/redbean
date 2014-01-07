@@ -1,11 +1,11 @@
 <?php 
 
-namespace RedBeanPHP\Plugin; 
+namespace ReadBean\Plugin; 
 
-use RedBeanPHP\Plugin\QueryLogger;
-use RedBeanPHP\Plugin;
-use RedBeanPHP\RedException\Security;
-use RedBeanPHP\DBAdapter; 
+use ReadBean\Plugin\QueryLogger;
+use ReadBean\Plugin;
+use ReadBean\RedException\Security;
+use ReadBean\DBAdapter; 
 
 /**
  * TimeLine 

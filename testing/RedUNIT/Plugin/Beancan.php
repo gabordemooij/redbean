@@ -1,8 +1,8 @@
 <?php
 
-use \RedBeanPHP\Plugin\BeanCanResty as BeanCanResty;
-use \RedBeanPHP\Plugin\BeanCan as BeanCan;
-use \RedBeanPHP\SimpleModel as SimpleModel;
+use \ReadBean\Plugin\BeanCanResty as BeanCanResty;
+use \ReadBean\Plugin\BeanCan as BeanCan;
+use \ReadBean\SimpleModel as SimpleModel;
 /**
  * RedUNIT_Plugin_Beancan
  *

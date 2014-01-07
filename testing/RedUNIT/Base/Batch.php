@@ -1,6 +1,6 @@
 <?php 
 
-use \RedBeanPHP\OODBBean as OODBBean; 
+use \ReadBean\OODBBean as OODBBean; 
 /**
  * RedUNIT_Base_Batch
  *
