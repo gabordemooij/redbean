@@ -1,7 +1,9 @@
 <?php 
-namespace RedBeanPHP; 
-use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\Adapter\DBAdapter as DBAdapter; 
+
+namespace RedBean; 
+
+use RedBean\Adapter;
+use RedBean\Adapter\DBAdapter; 
 /**
  * RedBean SQL Helper
  * Allows you to mix PHP and SQL as if they were one language.

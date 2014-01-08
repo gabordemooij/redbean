@@ -1,6 +1,6 @@
 <?php 
 
-use \RedBeanPHP\QueryWriter\CUBRID as CUBRID; 
+use \RedBean\QueryWriter\CUBRID as CUBRID; 
 /**
  * RedUNIT_CUBRID_Writer
  *

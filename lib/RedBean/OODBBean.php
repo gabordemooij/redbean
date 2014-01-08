@@ -1,8 +1,16 @@
 <?php
-namespace RedBeanPHP;
-use \RedBeanPHP\BeanHelper as BeanHelper;
-use \RedBeanPHP\SQLHelper as SQLHelper;
-use \RedBeanPHP\RedException\Security as Security;
+
+namespace RedBean;
+
+use ArrayAccess;
+use ArrayIterator;
+use Countable;
+use DateTime;
+use IteratorAggregate;
+use RedBean\BeanHelper;
+use RedBean\RedException\Security;
+use RedBean\SQLHelper;
+
 /**
  * OODBBean (Object Oriented DataBase Bean)
  *
@@ -15,7 +23,7 @@ use \RedBeanPHP\RedException\Security as Security;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class OODBBean implements \IteratorAggregate, \ArrayAccess, \Countable
+class OODBBean implements IteratorAggregate, ArrayAccess, Countable
 {
 
 	/**
@@ -277,11 +285,11 @@ class OODBBean implements \IteratorAggregate, \ArrayAccess, \Countable
 	 *
 	 * Note that not all PHP functions work with the array interface.
 	 *
-	 * @return \ArrayIterator
+	 * @return ArrayIterator
 	 */
 	public function getIterator()
 	{
-		return new \ArrayIterator( $this->properties );
+		return new ArrayIterator( $this->properties );
 	}
 
 	/**
@@ -793,7 +801,7 @@ class OODBBean implements \IteratorAggregate, \ArrayAccess, \Countable
 			$value = '0';
 		} elseif ( $value === TRUE ) {
 			$value = '1';
-		} elseif ( $value instanceof \DateTime ) {
+		} elseif ( $value instanceof DateTime ) {
 			$value = $value->format( 'Y-m-d H:i:s' );
 		}
 

@@ -1,6 +1,6 @@
 <?php 
 
-use \RedBeanPHP\SQLHelper as SQLHelper; 
+use \RedBean\SQLHelper as SQLHelper; 
 /**
  * RedUNIT_Mysql_Mix
  *

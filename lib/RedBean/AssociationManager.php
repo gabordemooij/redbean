@@ -1,13 +1,17 @@
 <?php
-namespace RedBeanPHP;
-use \RedBeanPHP\Observable as Observable;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\ToolBox as ToolBox;
+
+namespace RedBean;
+
+use Exception;
+use RedBean\Adapter\DBAdapter;
+use RedBean\Observable;
+use RedBean\OODB;
+use RedBean\OODBBean;
+use RedBean\QueryWriter;
+use RedBean\RedException\Security;
+use RedBean\RedException\SQL;
+use RedBean\ToolBox;
+
 /**
  * Association Manager
  *
@@ -41,13 +45,13 @@ class AssociationManager extends Observable
 	/**
 	 * Handles \Exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param \Exception $exception
+	 * @param Exception $exception
 	 *
 	 * @return void
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
-	private function handleException( \Exception $exception )
+	private function handleException( Exception $exception )
 	{
 		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(

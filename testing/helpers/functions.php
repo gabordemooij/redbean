@@ -102,7 +102,7 @@ function ID( $table )
 /**
  * Emulates legacy function for use with older tests.
  */
-function set1toNAssoc( $a, RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 )
+function set1toNAssoc( $a, \RedBean\OODBBean $bean1, \RedBean\OODBBean $bean2 )
 {
 	$type = $bean1->getMeta( "type" );
 
@@ -112,7 +112,7 @@ function set1toNAssoc( $a, RedBean_OODBBean $bean1, RedBean_OODBBean $bean2 )
 	if ( count( $a->related( $bean2, $type ) ) === 1 ) {
 		// return $this;
 	} else {
-		throw new RedBean_Exception_SQL( "Failed to enforce 1-N Relation for $type " );
+		throw new \RedBean\SQL( "Failed to enforce 1-N Relation for $type " );
 	}
 }
 
@@ -304,7 +304,7 @@ function fakeBeanCanServerRequest( $data, $params = NULL, $id = "1234", $whiteLi
 		"id"      => $id
 	);
 
-	$can = new RedBean_Plugin_BeanCan;
+	$can = new \RedBean\Plugin\BeanCan;
 
 	$request = json_encode( $j );
 

@@ -1,9 +1,12 @@
 <?php 
-namespace RedBeanPHP; 
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\Adapter as Adapter; 
+
+namespace RedBean; 
+
+use \RedBean\OODB;
+use \RedBean\QueryWriter;
+use \RedBean\Adapter\DBAdapter;
+use \RedBean\Adapter;
+
 /**
  * @file      RedBean/ToolBox.php
  * @desc      A RedBeanPHP-wide service locator

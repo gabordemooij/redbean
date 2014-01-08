@@ -1,10 +1,10 @@
 <?php 
 
-use \RedBeanPHP\Setup as Setup;
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\Driver\OCI as OCI;
-use \RedBeanPHP\QueryWriter\Oracle as Oracle;
-use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT; 
+use \RedBean\Setup as Setup;
+use \RedBean\ToolBox as ToolBox;
+use \RedBean\Driver\OCI as OCI;
+use \RedBean\QueryWriter\Oracle as Oracle;
+use \RedBean\QueryWriter\SQLiteT as SQLiteT; 
 /**
  * RedUNIT_Base_Close
  *

@@ -1,6 +1,6 @@
 <?php 
 
-use \RedBeanPHP\RedException as RedException; 
+use \RedBean\RedException as RedException; 
 /**
  * RedUNIT_Base_Tags
  *

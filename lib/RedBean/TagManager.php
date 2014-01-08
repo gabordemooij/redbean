@@ -1,8 +1,11 @@
 <?php 
-namespace RedBeanPHP; 
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\OODBBean as OODBBean; 
+
+namespace RedBean; 
+
+use RedBean\ToolBox;
+use RedBean\AssociationManager;
+use RedBean\OODBBean; 
+
 /**
  * RedBean Tag Manager.
  * The tag manager offers an easy way to quickly implement basic tagging

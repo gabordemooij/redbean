@@ -1,5 +1,7 @@
 <?php 
-namespace RedBeanPHP;  
+
+namespace RedBean;  
+
 /**
  * Observer
  * Interface for Observer object. Implementation of the

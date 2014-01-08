@@ -1,8 +1,11 @@
 <?php
-namespace RedBeanPHP\Plugin;
-use \RedBeanPHP\Plugin as Plugin;
-use \RedBeanPHP\ModelHelper as ModelHelper;
-use \RedBeanPHP\Facade as Facade;
+
+namespace RedBean\Plugin;
+
+use RedBean\Plugin;
+use RedBean\ModelHelper;
+use RedBean\Facade;
+
 /**
  * BeanCan Server.
  * A JSON-RPC/RESTy server for RedBeanPHP.

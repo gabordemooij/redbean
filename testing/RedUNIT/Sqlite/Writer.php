@@ -1,8 +1,8 @@
 <?php 
 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
-use \RedBeanPHP\RedException\SQL as SQL; 
+use \RedBean\AssociationManager as AssociationManager;
+use \RedBean\QueryWriter\SQLiteT as SQLiteT;
+use \RedBean\RedException\SQL as SQL; 
 /**
  * RedUNIT_Sqlite_Writer
  *

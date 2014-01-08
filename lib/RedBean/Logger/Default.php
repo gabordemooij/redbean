@@ -1,6 +1,9 @@
 <?php 
-namespace RedBeanPHP\Logger; 
-use \RedBeanPHP\Logger as Logger; 
+
+namespace RedBean\Logger; 
+
+use RedBean\Logger;
+
 /**
  * Logger. Provides a basic logging function for RedBeanPHP.
  *

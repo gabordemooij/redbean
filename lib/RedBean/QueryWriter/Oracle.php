@@ -1,9 +1,12 @@
 <?php
-namespace RedBeanPHP\QueryWriter;
-use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\Driver\OCI as OCI;
+
+namespace RedBean\QueryWriter;
+
+use RedBean\QueryWriter\AQueryWriter;
+use RedBean\QueryWriter;
+use RedBean\Adapter;
+use RedBean\Driver\OCI;
+
 /**
  * RedBean Oracle Driver
  *

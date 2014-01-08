@@ -1,10 +1,12 @@
-<?php 
-namespace RedBeanPHP; 
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter; 
+<?php
+
+namespace RedBean; 
+
+use RedBean\ToolBox;
+use RedBean\AssociationManager;
+use RedBean\OODB;
+use RedBean\OODBBean;
+use RedBean\QueryWriter\AQueryWriter; 
 /**
  * Duplication Manager
  *

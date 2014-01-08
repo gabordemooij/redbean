@@ -1,7 +1,7 @@
 <?php 
 
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\SimpleModel as SimpleModel; 
+use \RedBean\OODBBean as OODBBean;
+use \RedBean\SimpleModel as SimpleModel; 
 /**
  * RedUNIT_Blackhole_Fusebox
  *

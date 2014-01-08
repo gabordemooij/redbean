@@ -1,7 +1,7 @@
 <?php
 
-use \RedBeanPHP\DuplicationManager as DuplicationManager;
-use \RedBeanPHP\OODBBean as OODBBean;
+use \RedBean\DuplicationManager as DuplicationManager;
+use \RedBean\OODBBean as OODBBean;
 /**
  * RedUNIT_Base_Dup
  *

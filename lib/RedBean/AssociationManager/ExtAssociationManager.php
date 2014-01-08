@@ -1,7 +1,10 @@
 <?php 
-namespace RedBeanPHP\AssociationManager; 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\OODBBean as OODBBean; 
+
+namespace RedBean\AssociationManager; 
+
+use RedBean\AssociationManager;
+use RedBean\OODBBean; 
+
 /**
  * Extended Association Manager
  *

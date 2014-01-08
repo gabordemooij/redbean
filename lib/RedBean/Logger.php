@@ -1,5 +1,7 @@
 <?php
-namespace RedBeanPHP;
+
+namespace RedBean;
+
 /**
  * RedBean Logging interface.
  * Provides a uniform and convenient logging

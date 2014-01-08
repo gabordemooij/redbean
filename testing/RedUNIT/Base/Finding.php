@@ -1,8 +1,8 @@
 <?php 
 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\RedException\Security as Security; 
+use \RedBean\AssociationManager as AssociationManager;
+use \RedBean\OODB as OODB;
+use \RedBean\RedException\Security as Security; 
 /**
  * RedUNIT_Base_Finding
  *

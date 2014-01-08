@@ -72,7 +72,7 @@ function convert2namespaces($file, $skipClass = false) {
 		foreach($oldPackage as $part) {
 			$packageParts[] = filterNames($part, $oldPackage);
 		}
-		$package = '\\RedBeanPHP\\'.implode('\\', $packageParts);
+		$package = '\\RedBean\'.implode('\\', $packageParts);
 		
 		$oldClassNameParts = explode('_', $oldClassName);
 

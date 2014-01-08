@@ -1,9 +1,12 @@
 <?php 
-namespace RedBeanPHP\Plugin; 
-use \RedBeanPHP\Observer as Observer;
-use \RedBeanPHP\Plugin as Plugin;
-use \RedBeanPHP\Observable as Observable;
-use \RedBeanPHP\Adapter\DBAdapter as DBAdapter; 
+
+namespace RedBean\Plugin; 
+
+use RedBean\Observer;
+use RedBean\Plugin;
+use RedBean\Observable;
+use RedBean\Adapter\DBAdapter; 
+
 /**
  * Query Logger
  *

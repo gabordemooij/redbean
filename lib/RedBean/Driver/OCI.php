@@ -1,9 +1,12 @@
 <?php
-namespace RedBeanPHP\Driver;
-use \RedBeanPHP\Driver as Driver;
-use \RedBeanPHP\Logger as Logger;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Logger\RDefault as RDefault;
+
+namespace RedBean\Driver;
+
+use RedBean\Driver;
+use RedBean\Logger;
+use RedBean\RedException\SQL;
+use RedBean\Logger\RDefault;
+
 /**
  * OCI Driver
  *

@@ -1,10 +1,13 @@
 <?php
-namespace RedBeanPHP\Driver;
-use \RedBeanPHP\Driver as Driver;
-use \RedBeanPHP\Logger as Logger;
-use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Logger\RDefault as RDefault;
+
+namespace RedBean\Driver;
+
+use RedBean\Driver;
+use RedBean\Logger;
+use RedBean\QueryWriter\AQueryWriter;
+use RedBean\RedException\SQL;
+use RedBean\Logger\RDefault;
+
 /**
  * \PDO Driver
  * This Driver implements the RedBean Driver API
@@ -257,7 +260,9 @@ class RPDO implements Driver
 	 */
 	public function connect()
 	{
-		if ( $this->isConnected ) return;
+		if (true === $this->isConnected) {
+            return;
+        }
 
 		try {
 			$user = $this->connectInfo['user'];

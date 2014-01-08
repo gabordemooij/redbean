@@ -1,6 +1,6 @@
 <?php 
 
-use \RedBeanPHP\RedException\SQL as SQL; 
+use \RedBean\RedException\SQL as SQL; 
 /**
  * RedUNIT_Base_Count
  *

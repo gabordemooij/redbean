@@ -1,6 +1,6 @@
 <?php 
 
-use \RedBeanPHP\QueryWriter as QueryWriter; 
+use \RedBean\QueryWriter as QueryWriter; 
 /**
  * RedUNIT_Blackhole_Glue
  *
