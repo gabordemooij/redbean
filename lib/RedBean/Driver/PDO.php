@@ -264,17 +264,6 @@ class RPDO implements Driver
             return;
         }
 
-        if ($this->pdo instanceof \PDO) {
-            $this->isConnected = true;
-            return;
-        }
-        
-        if ($this->dsn instanceof \PDO) {
-            $this->pdo = $this->dsn;
-            $this->isConnected = true;
-            return;
-        }
-
 		try {
 			$user = $this->connectInfo['user'];
 			$pass = $this->connectInfo['pass'];
