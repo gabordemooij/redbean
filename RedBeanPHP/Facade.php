@@ -11,7 +11,6 @@ use \RedBeanPHP\LabelMaker as LabelMaker;
 use \RedBeanPHP\Finder as Finder;
 use \RedBeanPHP\RedException\SQL as SQL;
 use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\Setup as Setup;
 use \RedBeanPHP\Logger as Logger;
 use \RedBeanPHP\Logger\RDefault as RDefault;
 use \RedBeanPHP\OODBBean as OODBBean;
@@ -21,6 +20,11 @@ use \RedBeanPHP\Adapter as Adapter;
 use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use \RedBeanPHP\RedException as RedException;
 use \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
+use RedBeanPHP\Driver\RPDO as RPDO;
+use QueryWriter\MySQL as MySQL;
+use QueryWriter\SQLiteT as SQLiteT;
+use QueryWriter\PostgreSQL as PostgreSQL;
+use QueryWriter\CUBRID as CUBRID;
 /**
  * RedBean Facade
  *
@@ -268,7 +272,29 @@ class Facade
 	 */
 	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE )
 	{
-		self::$toolboxes[$key] = Setup::kickstart( $dsn, $user, $pass, $frozen );
+		if ( is_object($dsn) ) {
+			$db  = new RPDO( $dsn );
+			$dbType = $db->getDatabaseType();
+		} else {
+			$db = new RPDO( $dsn, $user, $pass, TRUE );
+			$dbType = substr( $dsn, 0, strpos( $dsn, ':' ) );
+		}
+
+		$adapter = new DBAdapter( $db );
+
+		$writers     = [ 'pgsql'  => 'PostgreSQL', 
+							  'sqlite' => 'SQLiteT', 
+							  'cubrid' => 'CUBRID', 
+							  'mysql'  => 'MySQL'];
+		
+		$wkey = trim( strtolower( $dbType ) );
+		if ( !isset( $writers[$wkey] ) ) trigger_error( 'Unsupported DSN: '.$wkey );
+		$writerClass = '\\RedBeanPHP\\QueryWriter\\'.$writers[$wkey];
+		$writer      = new $writerClass( $adapter ); 
+		$redbean     = new OODB( $writer );
+
+		$redbean->freeze( ( $frozen === TRUE ) );
+		self::$toolboxes[$key] = new ToolBox( $redbean, $adapter, $writer );
 	}
 
 	/**

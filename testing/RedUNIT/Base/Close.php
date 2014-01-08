@@ -1,9 +1,5 @@
 <?php 
-
-use \RedBeanPHP\Setup as Setup;
 use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\Driver\OCI as OCI;
-use \RedBeanPHP\QueryWriter\Oracle as Oracle;
 use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT; 
 /**
  * RedUNIT_Base_Close
@@ -41,10 +37,9 @@ class RedUNIT_Base_Close extends RedUNIT_Base
 		asrt( ( $id > 0 ), TRUE );
 
 		// Test freeze via kickstart in setup
-		$toolbox = Setup::kickstart( 'sqlite:/tmp/bla.txt', NULL, NULL, TRUE );
-
-		asrt( $toolbox->getRedBean()->isFrozen(), TRUE );
-
+		R::addDatabase( 'icy', 'sqlite:/tmp/bla.txt', NULL, NULL, TRUE );
+		R::selectDatabase( 'icy' );
+		asrt( R::getRedBean()->isFrozen(), TRUE );
 	}
 }
 
