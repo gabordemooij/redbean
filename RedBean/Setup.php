@@ -27,7 +27,7 @@ class RedBean_Setup
 	 */
 	private static function checkDSN( $dsn )
 	{
-		if ( !preg_match( '/^(mysql|sqlite|pgsql|cubrid|oracle):/', strtolower( trim( $dsn ) ) ) ) {
+		if ( !preg_match( '/^(mysql|sqlite|pgsql|cubrid|oracle|sqlsrv):/', strtolower( trim( $dsn ) ) ) ) {
 			trigger_error( 'Unsupported DSN' );
 		}
 
@@ -74,6 +74,8 @@ class RedBean_Setup
 			$writer = new RedBean_QueryWriter_CUBRID( $adapter );
 		} else if ( strpos( $dsn, 'oracle' ) === 0 ) {
 			$writer = new RedBean_QueryWriter_Oracle( $adapter );
+		} else if ( strpos( $dsn, 'sqlsrv' ) === 0 ) {
+			$writer = new RedBean_QueryWriter_SQLServer( $adapter );
 		} else {
 			$writer = new RedBean_QueryWriter_MySQL( $adapter );
 		}
