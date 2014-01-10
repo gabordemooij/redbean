@@ -26,7 +26,7 @@
 		<item type="php">RedBean/QueryWriter/PostgreSQL.php</item>
 		<item type="php">RedBean/QueryWriter/CUBRID.php</item>
 		<item type="php" flavour="oci">RedBean/QueryWriter/Oracle.php</item>
-		<item type="php" flavour="sqlsrv">RedBean/QueryWriter/SQLServer.php</item>
+		<item type="php">RedBean/QueryWriter/SQLServer.php</item>
 		<item type="php">RedBean/Exception.php</item>
 		<item type="php">RedBean/Exception/SQL.php</item>
 		<item type="php">RedBean/Exception/Security.php</item>
