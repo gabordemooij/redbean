@@ -1,6 +1,6 @@
 <?php 
-namespace RedUNIT\Postgres;
-use RedUNIT\Postgres as Postgres;
+namespace RedUNIT\Sqlite;
+use RedUNIT\Sqlite as Sqlite;
 use RedBeanPHP\Facade as R;
 
 use \RedBeanPHP\AssociationManager as AssociationManager;
