@@ -37,16 +37,15 @@ class Keywords extends Base
 	public function testKeywords()
 	{
 		$keywords = array(
-			'anokeyword', 'znokeyword', 'group', 'DROP',
-			'inner', 'JOIN', 'select', 'table',
-			'int', 'cascade', 'float', 'CALL',
+			'anokeyword', 'znokeyword', 'group', 'drop',
+			'inner', 'join', 'select', 'table',
+			'int', 'cascade', 'float', 'call',
 			'in', 'status', 'order', 'limit',
 			'having', 'else', 'if', 'while',
 			'distinct', 'like'
 		);
 
-		R::setStrictTyping( FALSE );
-
+		
 		OODBBean::setFlagBeautifulColumnNames( FALSE );
 
 		foreach ( $keywords as $k ) {
@@ -78,6 +77,5 @@ class Keywords extends Base
 
 		OODBBean::setFlagBeautifulColumnNames( TRUE );
 
-		R::setStrictTyping( TRUE );
 	}
 }

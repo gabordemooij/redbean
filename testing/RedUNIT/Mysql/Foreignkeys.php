@@ -115,11 +115,7 @@ class Foreignkeys extends Mysql
 		$bean1 = R::dispense( 'project' );
 		$bean2 = R::dispense( 'invoice' );
 
-		R::setStrictTyping( FALSE );
-
-		$bean3 = R::dispense( 'invoice_project' );
-
-		R::setStrictTyping( TRUE );
+		$bean3 = R::getRedBean()->dispense( 'invoice_project' );
 
 		$bean3->project_id = 1;
 		$bean3->invoice_id = 2;

@@ -52,11 +52,6 @@ class Facade
 	const C_REDBEANPHP_VERSION = '3.5';
 	
 	/**
-	 * @var boolean
-	 */
-	private static $strictType = TRUE;
-
-	/**
 	 * @var array
 	 */
 	public static $toolboxes = array();
@@ -496,7 +491,7 @@ class Facade
 	 */
 	public static function dispense( $type, $num = 1 )
 	{
-		if ( !preg_match( '/^[a-z0-9]+$/', $type ) && self::$strictType ) {
+		if ( !preg_match( '/^[a-z0-9]+$/', $type )) {
 			throw new Security( 'Invalid type: ' . $type );
 		}
 
@@ -543,18 +538,6 @@ class Facade
 		}
 
 		return $list;
-	}
-
-	/**
-	 * Toggles strict bean type names.
-	 * If set to TRUE (default) this will forbid the use of underscores and
-	 * uppercase characters in bean type strings (R::dispense).
-	 *
-	 * @param boolean
-	 */
-	public static function setStrictTyping( $trueFalse )
-	{
-		self::$strictType = (bool) $trueFalse;
 	}
 
 	/**
