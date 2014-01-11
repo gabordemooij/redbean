@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\Logger\RDefault as RDefault;
 use \RedBeanPHP\Logger as Logger;
 use \RedBeanPHP\OODBBean as OODBBean;
@@ -22,7 +24,7 @@ use \RedBeanPHP\Driver\RPDO as RPDO;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Misc extends RedUNIT_Base
+class Misc extends Base
 {
 	
 	/**

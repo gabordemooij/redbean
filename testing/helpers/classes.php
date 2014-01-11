@@ -247,3 +247,81 @@ class Model_Bandmember extends RedBeanPHP\SimpleModel
 		$lifeCycle .= "\n called after_delete() " . $this->bean;
 	}
 }
+
+/**
+ * A model to box soup models :)
+ */
+class Model_Soup extends \RedBeanPHP\SimpleModel
+{
+
+	public function taste()
+	{
+		return 'A bit too salty';
+	}
+}
+/**
+ * Test Model.
+ */
+class Model_Boxedbean extends \RedBeanPHP\SimpleModel
+{
+}
+
+/**
+ * Mock class for testing purposes.
+ */
+class Model_Ghost_House extends \RedBeanPHP\SimpleModel
+{
+	public static $deleted = FALSE;
+
+	public function delete()
+	{
+		self::$deleted = TRUE;
+	}
+}
+
+/**
+ * Mock class for testing purposes.
+ */
+class Model_Ghost_Ghost extends \RedBeanPHP\SimpleModel
+{
+	public static $deleted = FALSE;
+
+	public function delete()
+	{
+		self::$deleted = TRUE;
+	}
+}
+
+/**
+ * Mock class for testing purposes.
+ */
+class FaultyWriter extends \RedBeanPHP\QueryWriter\MySQL
+{
+
+	protected $sqlState;
+
+	/**
+	 * Mock method.
+	 *
+	 * @param string $sqlState sql state
+	 */
+	public function setSQLState( $sqlState )
+	{
+		$this->sqlState = $sqlState;
+	}
+
+	/**
+	 * Mock method
+	 *
+	 * @param string $sourceType destination type
+	 * @param string $destType   source type
+	 *
+	 * @throws SQL
+	 */
+	public function addConstraintForTypes( $sourceType, $destType )
+	{
+		$exception = new \RedBeanPHP\RedException\SQL;
+		$exception->setSQLState( $this->sqlState );
+		throw $exception;
+	}
+}

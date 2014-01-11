@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\SimpleModel as SimpleModel; 
 /**
  * RedUNIT_Base_Boxing
@@ -13,7 +15,7 @@ use \RedBeanPHP\SimpleModel as SimpleModel;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Boxing extends RedUNIT_Base
+class Boxing extends Base
 {
 	
 	/**
@@ -61,15 +63,10 @@ class RedUNIT_Base_Boxing extends RedUNIT_Base
 
 		$box = $bean->box();
 
-		asrt( ( $box instanceof Model_Boxedbean ), TRUE );
+		asrt( ( $box instanceof \Model_Boxedbean ), TRUE );
 
 		R::store( $box );
 	}
 }
 
-/**
- * Test Model.
- */
-class Model_Boxedbean extends SimpleModel
-{
-}
+

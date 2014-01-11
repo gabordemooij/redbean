@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\Facade as Facade;
 use \RedBeanPHP\OODBBean as OODBBean; 
@@ -15,7 +17,7 @@ use \RedBeanPHP\OODBBean as OODBBean;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Dispense extends RedUNIT_Base
+class Dispense extends Base
 {
 	/**
 	 * Test dispense.

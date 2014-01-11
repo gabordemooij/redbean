@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Blackhole;
+use RedUNIT\Blackhole as Blackhole;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Blackhole_Meta
@@ -13,7 +15,7 @@ use \RedBeanPHP\OODBBean as OODBBean;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Blackhole_Meta extends RedUNIT_Blackhole
+class Meta extends Blackhole
 {
 	/**
 	 * Test meta data methods.

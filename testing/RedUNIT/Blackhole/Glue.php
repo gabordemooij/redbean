@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Blackhole;
+use RedUNIT\Blackhole as Blackhole;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\QueryWriter as QueryWriter; 
 /**
  * RedUNIT_Blackhole_Glue
@@ -13,7 +15,7 @@ use \RedBeanPHP\QueryWriter as QueryWriter;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Blackhole_Glue extends RedUNIT_Blackhole
+class Glue extends Blackhole
 {
 	/**
 	 * Tests whether we can intelligently glue together SQL snippets.

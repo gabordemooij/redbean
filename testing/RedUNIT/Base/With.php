@@ -1,5 +1,7 @@
 <?php 
- 
+ namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 /**
  * RedUNIT_Base_With
  *
@@ -12,7 +14,7 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_With extends RedUNIT_Base
+class With extends Base
 {
 
 	/**

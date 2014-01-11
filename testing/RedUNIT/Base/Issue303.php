@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\RedException\Security as Security; 
 /**
  * RedUNIT_Base_Issue303
@@ -13,7 +15,7 @@ use \RedBeanPHP\RedException\Security as Security;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Issue303 extends RedUNIT_Base
+class Issue303 extends Base
 {
 	/**
 	 * Test whether we have two different exception messages for
@@ -40,7 +42,7 @@ class RedUNIT_Base_Issue303 extends RedUNIT_Base
 		}
 
 		try {
-			R::store( R::dispense( 'invalidbean' )->setAttr( 'property', new stdClass ) );
+			R::store( R::dispense( 'invalidbean' )->setAttr( 'property', new \stdClass ) );
 			fail();
 		} catch (Security $e ) {
 			asrt( $e->getMessage(), 'Invalid Bean value: property property' );

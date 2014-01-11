@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_Base_Tags
@@ -13,7 +15,7 @@ use \RedBeanPHP\RedException as RedException;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Tags extends RedUNIT_Base
+class Tags extends Base
 {
 	/**
 	 * Some basic tests.

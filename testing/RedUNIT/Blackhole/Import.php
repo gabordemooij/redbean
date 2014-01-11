@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Blackhole;
+use RedUNIT\Blackhole as Blackhole;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Blackhole_Import
@@ -14,7 +16,7 @@ use \RedBeanPHP\OODBBean as OODBBean;
  * with this source code in the file license.txt.
  */
 
-class RedUNIT_Blackhole_Import extends RedUNIT_Blackhole
+class Import extends Blackhole
 {
 	/**
 	 * Test import from and tainted.

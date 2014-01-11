@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
 use \RedBeanPHP\OODB as OODB;
 use \RedBeanPHP\ToolBox as ToolBox;
@@ -21,7 +23,7 @@ use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Database extends RedUNIT_Base
+class Database extends Base
 {
 	/**
 	 * What drivers should be loaded for this test pack?

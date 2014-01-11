@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\DuplicationManager as DuplicationManager;
 use \RedBeanPHP\OODBBean as OODBBean; 
 /**
@@ -14,7 +16,7 @@ use \RedBeanPHP\OODBBean as OODBBean;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Dup extends RedUNIT_Base
+class Dup extends Base
 {
 	/**
 	 * Test exportAll and caching.

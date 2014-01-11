@@ -1,5 +1,7 @@
 <?php 
  
+namespace RedUNIT;
+
 /**
  * RedUNIT_CUBRID
  *
@@ -12,7 +14,7 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_CUBRID extends RedUNIT
+class CUBRID extends RedUNIT
 {
 	/*
 	 * What drivers should be loaded for this test pack?

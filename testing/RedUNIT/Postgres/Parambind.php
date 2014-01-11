@@ -1,4 +1,7 @@
 <?php 
+namespace RedUNIT\Postgres;
+use RedUNIT\Postgres as Postgres;
+use RedBeanPHP\Facade as R;
  
 /**
  * RedUNIT_Postgres_Parambind
@@ -12,7 +15,7 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Postgres_Parambind extends RedUNIT_Postgres
+class Parambind extends Postgres
 {
 	/**
 	 * Test parameter binding.

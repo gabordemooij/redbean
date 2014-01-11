@@ -1,5 +1,8 @@
 <?php 
 
+namespace RedUNIT\Blackhole;
+use RedUNIT\Blackhole as Blackhole;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Blackhole_Labels
@@ -14,7 +17,7 @@ use \RedBeanPHP\OODBBean as OODBBean;
  * with this source code in the file license.txt.
  */
 
-class RedUNIT_Blackhole_Labels extends RedUNIT_Blackhole
+class Labels extends Blackhole
 {
 	/**
 	 * Test basic labels.

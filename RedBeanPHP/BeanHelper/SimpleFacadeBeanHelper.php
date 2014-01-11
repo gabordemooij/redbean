@@ -43,7 +43,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	public function getModelForBean( OODBBean $bean )
 	{
 		$model = $bean->getMeta('type');
-		$prefix = defined('REDBEAN_MODEL_PREFIX') ? REDBEAN_MODEL_PREFIX : 'Model_';
+		$prefix = defined('REDBEAN_MODEL_PREFIX') ? REDBEAN_MODEL_PREFIX : '\\Model_';
 		$modelName = $prefix . ucfirst( $model );
 		
 		if ( !class_exists( $modelName ) ) {

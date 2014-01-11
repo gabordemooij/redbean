@@ -1,5 +1,8 @@
 <?php 
- 
+namespace RedUNIT\Postgres;
+use RedUNIT\Postgres as Postgres;
+use RedBeanPHP\Facade as R;
+
 /**
  * RedUNIT_Sqlite_Rebuild
  *
@@ -12,7 +15,7 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Sqlite_Rebuild extends RedUNIT_Sqlite
+class Rebuild extends Sqlite
 {
 	/**
 	 * Test SQLite table rebuilding.

@@ -1,4 +1,7 @@
 <?php 
+namespace RedUNIT\Blackhole;
+use RedUNIT\Blackhole as Blackhole;
+use RedBeanPHP\Facade as R;
 
 use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\Driver\RPDO as RPDO;
@@ -22,7 +25,7 @@ use \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
  * with this source code in the file license.txt.
  */
 
-class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
+class Misc extends Blackhole
 {
 	/*
 	 * What drivers should be loaded for this test pack?
@@ -279,7 +282,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 
 		asrt( $s, 'candy!' );
 
-		$obj = new stdClass;
+		$obj = new \stdClass;
 
 		$bean = R::dispense( 'bean' );
 
@@ -342,7 +345,7 @@ class RedUNIT_Blackhole_Misc extends RedUNIT_Blackhole
 		asrt( $band->checkProperty( 'property1' ), TRUE );
 		asrt( $band->checkProperty( 'property2' ), FALSE );
 
-		$band = new Model_Band;
+		$band = new \Model_Band;
 
 		$bean = R::dispense( 'band' );
 

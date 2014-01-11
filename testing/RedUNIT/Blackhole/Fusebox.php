@@ -1,5 +1,8 @@
 <?php 
 
+namespace RedUNIT\Blackhole;
+use RedUNIT\Blackhole as Blackhole;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\SimpleModel as SimpleModel; 
 /**
@@ -15,7 +18,7 @@ use \RedBeanPHP\SimpleModel as SimpleModel;
  * with this source code in the file license.txt.
  */
 
-class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole
+class Fusebox extends Blackhole
 {
 	/**
 	 * Test boxing.
@@ -40,9 +43,9 @@ class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole
 	 *
 	 * @param Model_Soup $soup
 	 */
-	private function giveMeSoup( Model_Soup $soup )
+	private function giveMeSoup( \Model_Soup $soup )
 	{
-		asrt( ( $soup instanceof Model_Soup ), TRUE );
+		asrt( ( $soup instanceof \Model_Soup ), TRUE );
 
 		asrt( 'A bit too salty', $soup->taste() );
 
@@ -64,14 +67,4 @@ class RedUNIT_Blackhole_Fusebox extends RedUNIT_Blackhole
 	}
 }
 
-/**
- * A model to box soup models :)
- */
-class Model_Soup extends SimpleModel
-{
 
-	public function taste()
-	{
-		return 'A bit too salty';
-	}
-}

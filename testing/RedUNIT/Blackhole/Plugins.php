@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Blackhole;
+use RedUNIT\Blackhole as Blackhole;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\Facade as Facade;
 use \RedBeanPHP\RedException as RedException; 
 /**
@@ -14,7 +16,7 @@ use \RedBeanPHP\RedException as RedException;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Blackhole_Plugins extends RedUNIT_Blackhole
+class Plugins extends Blackhole
 {
 	/**
 	 * Test if we can dynamically extend the R-facade.

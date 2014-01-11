@@ -1,5 +1,9 @@
 <?php 
  
+namespace RedUNIT\Blackhole;
+use RedUNIT\Blackhole as Blackhole;
+use RedBeanPHP\Facade as R;
+
 /**
  * RedUNIT_Blackhole_Tainted
  *
@@ -12,7 +16,7 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Blackhole_Tainted extends RedUNIT_Blackhole
+class Tainted extends Blackhole
 {
 	/**
 	 * Test tainted.

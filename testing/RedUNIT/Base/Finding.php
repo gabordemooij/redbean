@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\AssociationManager as AssociationManager;
 use \RedBeanPHP\OODB as OODB;
 use \RedBeanPHP\RedException\Security as Security; 
@@ -15,7 +17,7 @@ use \RedBeanPHP\RedException\Security as Security;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Finding extends RedUNIT_Base {
+class Finding extends Base {
 	
 	/**
 	 * Begin testing.

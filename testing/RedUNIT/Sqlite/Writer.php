@@ -1,4 +1,7 @@
 <?php 
+namespace RedUNIT\Postgres;
+use RedUNIT\Postgres as Postgres;
+use RedBeanPHP\Facade as R;
 
 use \RedBeanPHP\AssociationManager as AssociationManager;
 use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
@@ -15,7 +18,7 @@ use \RedBeanPHP\RedException\SQL as SQL;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Sqlite_Writer extends RedUNIT_Sqlite
+class Writer extends Sqlite
 {
 	/**
 	 * Test scanning and coding.

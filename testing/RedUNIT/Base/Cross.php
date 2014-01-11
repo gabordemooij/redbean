@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\AssociationManager as AssociationManager;
 use \RedBeanPHP\RedException\SQL as SQL; 
 /**
@@ -15,7 +17,7 @@ use \RedBeanPHP\RedException\SQL as SQL;
  * with this source code in the file license.txt.
  */
 
-class RedUNIT_Base_Cross extends RedUNIT_Base
+class Cross extends Base
 {
 	/**
 	 * Test self referential N-M relations (page_page).

@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\SimpleModel as SimpleModel; 
 /**
  * RedUNIT_Base_Issue259
@@ -13,7 +15,7 @@ use \RedBeanPHP\SimpleModel as SimpleModel;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Issue259 extends RedUNIT_Base
+class Issue259 extends Base
 {
 	/**
 	 * Test to make sure stash cache works with recursively opening models

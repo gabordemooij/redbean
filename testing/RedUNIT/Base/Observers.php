@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\OODB as OODB; 
@@ -15,7 +17,7 @@ use \RedBeanPHP\OODB as OODB;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Observers extends RedUNIT_Base
+class Observers extends Base
 {
 	/**
 	 * Test RedBeanPHP observers.
@@ -33,8 +35,8 @@ class RedUNIT_Base_Observers extends RedUNIT_Base
 		asrt( ( $writer instanceof QueryWriter ), TRUE );
 		asrt( ( $redbean instanceof OODB ), TRUE );
 
-		$observable = new ObservableMock();
-		$observer   = new ObserverMock();
+		$observable = new \ObservableMock();
+		$observer   = new \ObserverMock();
 
 		$observable->addEventListener( "event1", $observer );
 		$observable->addEventListener( "event3", $observer );

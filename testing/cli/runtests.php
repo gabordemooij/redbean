@@ -180,9 +180,9 @@ $packList = array_merge( $packList, $suffix );
 foreach ( $packList as $testPack ) {
 	require_once( $path . $testPack . '.php' );
 
-	$testClassName = str_replace( ' ', '_', ( str_replace( '/', ' ', $testPack ) ) );
+	$testClassName = str_replace( ' ', '\\', ( str_replace( '/', ' ', $testPack ) ) );
 
-	$testClass     = 'RedUNIT_' . ucfirst( $testClassName );
+	$testClass     = '\\RedUNIT\\' . ucfirst( $testClassName );
 
 	$test          = new $testClass();
 

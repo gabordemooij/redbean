@@ -1,5 +1,7 @@
 <?php 
- 
+
+namespace RedUNIT; 
+
 /**
  * RedUNIT_Postgres
  *
@@ -12,7 +14,7 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Postgres extends RedUNIT
+class Postgres extends RedUNIT
 {
 	/*
 	 * What drivers should be loaded for this test pack?

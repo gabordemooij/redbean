@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\OODBBean as OODBBean;
 /**
@@ -14,7 +16,7 @@ use \RedBeanPHP\OODBBean as OODBBean;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Relations extends RedUNIT_Base
+class Relations extends Base
 {
 
 	/**
@@ -736,7 +738,7 @@ class RedUNIT_Base_Relations extends RedUNIT_Base
 		foreach (
 			array(
 				1, -2.1, array(),
-				TRUE, 'NULL', new stdClass,
+				TRUE, 'NULL', new \stdClass,
 				'just a string', array( 'a' => 1 ), 0
 			) as $value
 		) {

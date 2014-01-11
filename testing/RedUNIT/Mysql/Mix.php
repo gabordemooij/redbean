@@ -1,4 +1,7 @@
 <?php 
+namespace RedUNIT\Mysql;
+use RedUNIT\Mysql as Mysql;
+use RedBeanPHP\Facade as R;
 
 use \RedBeanPHP\SQLHelper as SQLHelper; 
 /**
@@ -13,7 +16,7 @@ use \RedBeanPHP\SQLHelper as SQLHelper;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Mysql_Mix extends RedUNIT_Mysql
+class Mix extends Mysql
 {
 	
 	/**

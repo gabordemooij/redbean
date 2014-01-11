@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Mysql;
+use RedUNIT\Mysql as Mysql;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\AssociationManager as AssociationManager; 
 /**
  * RedUNIT_Mysql_Preexist
@@ -13,7 +15,7 @@ use \RedBeanPHP\AssociationManager as AssociationManager;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Mysql_Preexist extends RedUNIT_Mysql
+class Preexist extends Mysql
 {
 	/**
 	 * Test integration with pre-existing schemas.

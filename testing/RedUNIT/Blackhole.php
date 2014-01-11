@@ -1,5 +1,7 @@
 <?php 
- 
+
+namespace RedUNIT; 
+
 /**
  * RedUNIT_Blackhole
  *
@@ -12,7 +14,7 @@
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Blackhole extends RedUNIT
+class Blackhole extends RedUNIT
 {
 	/**
 	 * Returns the drivers this test suite applies to.

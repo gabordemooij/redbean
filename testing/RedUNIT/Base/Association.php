@@ -1,5 +1,7 @@
 <?php 
-
+namespace RedUNIT\Base;
+use RedUNIT\Base as Base;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\ToolBox as ToolBox;
 use \RedBeanPHP\AssociationManager as AssociationManager;
 use \RedBeanPHP\RedException\SQL as SQL;
@@ -18,7 +20,7 @@ use \RedBeanPHP\QueryWriter\MySQL as MySQL;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_Base_Association extends RedUNIT_Base
+class Association extends Base
 {
 	/**
 	 * MySQL specific tests.
@@ -36,7 +38,7 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		$bunny  = R::dispense( 'bunny' );
 		$carrot = R::dispense( 'carrot' );
 
-		$faultyWriter  = new FaultyWriter( R::$toolbox->getDatabaseAdapter() );
+		$faultyWriter  = new \FaultyWriter( R::$toolbox->getDatabaseAdapter() );
 		$faultyToolbox = new ToolBox( R::$toolbox->getRedBean(), R::$toolbox->getDatabaseAdapter(), $faultyWriter );
 
 		$faultyAssociationManager = new AssociationManager( $faultyToolbox );
@@ -74,19 +76,19 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		$house->sharedGhost[] = $ghost;
 		
-		Model_Ghost_House::$deleted = FALSE;
+		\Model_Ghost_House::$deleted = FALSE;
 
 		R::getRedBean()->getAssociationManager()->unassociate( $house, $ghost );
 
 		// No fast-track, assoc bean got trashed
-		asrt( Model_Ghost_House::$deleted, TRUE );
+		asrt( \Model_Ghost_House::$deleted, TRUE );
 
-		Model_Ghost_House::$deleted = FALSE;
+		\Model_Ghost_House::$deleted = FALSE;
 
 		R::getRedBean()->getAssociationManager()->unassociate( $house, $ghost, TRUE );
 
 		// Fast-track, assoc bean got deleted right away
-		asrt( Model_Ghost_House::$deleted, FALSE );
+		asrt( \Model_Ghost_House::$deleted, FALSE );
 	}
 
 	/**
@@ -101,19 +103,19 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 
 		R::getRedBean()->getAssociationManager()->associate( $ghost, $ghost2 );
 
-		Model_Ghost_Ghost::$deleted = FALSE;
+		\Model_Ghost_Ghost::$deleted = FALSE;
 
 		R::getRedBean()->getAssociationManager()->unassociate( $ghost, $ghost2 );
 
 		// No fast-track, assoc bean got trashed
-		asrt( Model_Ghost_Ghost::$deleted, TRUE );
+		asrt( \Model_Ghost_Ghost::$deleted, TRUE );
 
-		Model_Ghost_Ghost::$deleted = FALSE;
+		\Model_Ghost_Ghost::$deleted = FALSE;
 
 		R::getRedBean()->getAssociationManager()->unassociate( $ghost, $ghost2, TRUE );
 
 		// Fast-track, assoc bean got deleted right away
-		asrt( Model_Ghost_Ghost::$deleted, FALSE );
+		asrt( \Model_Ghost_Ghost::$deleted, FALSE );
 	}
 
 	/**
@@ -307,66 +309,5 @@ class RedUNIT_Base_Association extends RedUNIT_Base
 		asrt( count( $wines[1]->sharedOlive ), 0 );
 		asrt( count( $wines[2]->sharedCheese ), 0 );
 		asrt( count( $wines[2]->sharedOlive ), 0 );
-	}
-
-}
-
-/**
- * Mock class for testing purposes.
- */
-class Model_Ghost_House extends SimpleModel
-{
-	public static $deleted = FALSE;
-
-	public function delete()
-	{
-		self::$deleted = TRUE;
-	}
-}
-
-/**
- * Mock class for testing purposes.
- */
-class Model_Ghost_Ghost extends SimpleModel
-{
-	public static $deleted = FALSE;
-
-	public function delete()
-	{
-		self::$deleted = TRUE;
-	}
-}
-
-/**
- * Mock class for testing purposes.
- */
-class FaultyWriter extends MySQL
-{
-
-	protected $sqlState;
-
-	/**
-	 * Mock method.
-	 *
-	 * @param string $sqlState sql state
-	 */
-	public function setSQLState( $sqlState )
-	{
-		$this->sqlState = $sqlState;
-	}
-
-	/**
-	 * Mock method
-	 *
-	 * @param string $sourceType destination type
-	 * @param string $destType   source type
-	 *
-	 * @throws SQL
-	 */
-	public function addConstraintForTypes( $sourceType, $destType )
-	{
-		$exception = new SQL;
-		$exception->setSQLState( $this->sqlState );
-		throw $exception;
 	}
 }

@@ -1,5 +1,6 @@
 <?php 
-
+namespace RedUNIT\CUBRID;
+use RedBeanPHP\Facade as R;
 use \RedBeanPHP\RedException\Security as Security; 
 /**
  * RedUNIT_CUBRID_Setget
@@ -13,7 +14,7 @@ use \RedBeanPHP\RedException\Security as Security;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedUNIT_CUBRID_Setget extends RedUNIT_CUBRID
+class Setget extends \RedUNIT\CUBRID
 {
 	/**
 	 * Test numbers.
