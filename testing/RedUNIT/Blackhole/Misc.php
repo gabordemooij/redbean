@@ -34,6 +34,22 @@ class Misc extends Blackhole
 	{
 		return array( 'sqlite' );
 	}
+	
+	/**
+	 * Adding a database twice no longer allowed, causes confusion
+	 * and possible damage.
+	 */
+	public function testAddingTwice()
+	{
+		testpack( 'Test adding DB twice.' );
+
+		try {
+			R::addDatabase( 'default', '' );
+			fail();
+		} catch ( RedBean_Exception_Security $ex ) {
+			pass();
+		}
+	}
 
 	/**
 	 * Tests whether getID never produces a notice.

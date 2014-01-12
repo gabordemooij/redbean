@@ -306,9 +306,8 @@ class Facade
 	 * R::selectDatabase( 'database-1' ); //to select database again
 	 * 
 	 * This method allows you to dynamically add (and select) new databases
-	 * to the facade. Adding a database with the same key as an older database
-	 * will cause this entry to be overwritten.
-	 * 
+	 * to the facade. Adding a database with the same key will cause an exception.
+	 *
 	 * @param string      $key    ID for the database
 	 * @param string      $dsn    DSN for the database
 	 * @param string      $user   User for connection
@@ -319,6 +318,10 @@ class Facade
 	 */
 	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE )
 	{
+		if ( isset( self::$toolboxes[$key] ) ) {
+			throw new RedBean_Exception_Security( 'A database has already be specified for this key.' );
+		}
+
 		if ( is_object($dsn) ) {
 			$db  = new RPDO( $dsn );
 			$dbType = $db->getDatabaseType();
