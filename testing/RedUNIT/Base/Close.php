@@ -31,18 +31,7 @@ class Close extends Base
 		R::close();
 
 		asrt( R::$adapter->getDatabase()->isConnected(), FALSE );
-
-		// Can we create a database using empty setup?
-		R::setup();
-
-		$id = R::store( R::dispense( 'bean' ) );
-
-		asrt( ( $id > 0 ), TRUE );
-
-		// Test freeze via kickstart in setup
-		R::addDatabase( 'icy', 'sqlite:/tmp/bla.txt', NULL, NULL, TRUE );
-		R::selectDatabase( 'icy' );
-		asrt( R::getRedBean()->isFrozen(), TRUE );
+		
 	}
 }
 

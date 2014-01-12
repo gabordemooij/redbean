@@ -44,9 +44,9 @@ class Misc extends Blackhole
 		testpack( 'Test adding DB twice.' );
 
 		try {
-			R::addDatabase( 'default', '' );
+			R::addDatabase( 'sqlite', '' );
 			fail();
-		} catch ( RedBean_Exception_Security $ex ) {
+		} catch ( Security $ex ) {
 			pass();
 		}
 	}
