@@ -19,23 +19,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 {
 
 	/**
-	 * Setting: use beautiful columns, i.e. turn camelcase column names into snake case column names
-	 * for database.
-	 *
-	 * @var boolean
-	 */
-	private static $flagUseBeautyCols = TRUE;
-
-	/**
-	 * Setting: use IDs as keys when exporting. By default this has been turned off because exports
-	 * to Javascript may cause problems due to Javascript Sparse Array implementation (i.e. causing large arrays
-	 * with lots of 'gaps').
-	 *
-	 * @var boolean
-	 */
-	private static $flagKeyedExport = FALSE;
-
-	/**
 	 * Whether to skip beautification of columns or not.
 	 * 
 	 * @var boolean
@@ -203,34 +186,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * By default own-lists and shared-lists no longer have IDs as keys (3.3+),
-	 * this is because exportAll also does not offer this feature and we want the
-	 * ORM to be more consistent. Also, exporting without keys makes it easier to
-	 * export lists to Javascript because unlike in PHP in JS arrays will fill up gaps.
-	 *
-	 * @param boolean $yesNo
-	 *
-	 * @return void
-	 */
-	public static function setFlagKeyedExport( $flag )
-	{
-		self::$flagKeyedExport = (boolean) $flag;
-	}
-
-	/**
-	 * Flag indicates whether column names with CamelCase are supported and automatically
-	 * converted; example: isForSale -> is_for_sale
-	 *
-	 * @param boolean
-	 *
-	 * @return void
-	 */
-	public static function setFlagBeautifulColumnNames( $flag )
-	{
-		self::$flagUseBeautyCols = (boolean) $flag;
-	}
-
-	/**
 	 * Initializes a bean. Used by OODB for dispensing beans.
 	 * It is not recommended to use this method to initialize beans. Instead
 	 * use the OODB object to dispense new beans. You can use this method
@@ -391,7 +346,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 				$vn = array();
 
 				foreach ( $value as $i => $b ) {
-					if ( is_numeric( $i ) && !self::$flagKeyedExport ) {
+					if ( is_numeric( $i ) ) {
 						$vn[] = $b->export( $meta, FALSE, FALSE, $filters );
 					} else {
 						$vn[$i] = $b->export( $meta, FALSE, FALSE, $filters );
@@ -611,8 +566,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	public function beau( $property )
 	{
 		static $beautifulColumns = array();
-
-		if ( !self::$flagUseBeautyCols ) return $property;
 
 		if ( ctype_lower( $property ) ) return $property;
 

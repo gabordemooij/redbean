@@ -408,17 +408,6 @@ class Dup extends Base
 
 		asrt( isset( $export['ownPage'][0] ), TRUE );
 
-		OODBBean::setFlagKeyedExport( TRUE );
-
-		$export = $book->export();
-
-		asrt( isset( $export['ownPage'][1] ), TRUE );
-
-		OODBBean::setFlagKeyedExport( FALSE );
-
-		$export = $book->export();
-
-		asrt( isset( $export['ownPage'][0] ), TRUE );
 	}
 
 	/**

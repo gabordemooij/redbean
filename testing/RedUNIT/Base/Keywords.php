@@ -46,8 +46,6 @@ class Keywords extends Base
 		);
 
 		
-		OODBBean::setFlagBeautifulColumnNames( FALSE );
-
 		foreach ( $keywords as $k ) {
 			R::nuke();
 
@@ -75,7 +73,6 @@ class Keywords extends Base
 			pass();
 		}
 
-		OODBBean::setFlagBeautifulColumnNames( TRUE );
 
 	}
 }
