@@ -118,57 +118,11 @@ class Finding extends Base {
 		asrt( is_null( R::findLast( 'nothing' ) ), TRUE );
 
 		try {
-			R::find( 'bean', ' id > ', 0, '', array('invalid bindings argument') );
+			R::find( 'bean', ' id > 0 ', 'invalid bindings argument' );
 			fail();
 		} catch ( Security $exception ) {
 			pass();
 		}
-	}
-	
-	public function testFindingWithSmartBinding()
-	{
-		testpack( 'Test finding (and querying) with smart bindings.' );
-		R::nuke();
-		$book = R::dispense( 'book' );
-		$book->rating = 3;
-		$book->title = 'my book';
-		$book->ownPage = R::dispense( 'page', 3 );
-		$id1 = R::store( $book );
-		$book = R::dispense( 'book' );
-		$book->rating = 2;
-		$book->title = 'book2';
-		$id2 = R::store( $book );
-		asrt( count( R::findAll( 'page', ' LIMIT ', 2 ) ), 2 );
-		asrt( count( R::findAll( 'page', ' LIMIT ', 3 ) ), 3 );
-		asrt( count( R::find( 'book', ' rating > ', 1, ' AND rating < ', 10 ) ), 2 );
-		asrt( count( R::find( 'book', ' rating > ', 2, ' AND rating < ', 10 ) ), 1 );
-		asrt( R::findOne( 'book', ' title = ', 'my book')->title, 'my book' );
-		asrt( count( R::getAll( 'SELECT id FROM book WHERE rating > ', 0 ) ), 2 );
-		asrt( count( R::getCol( 'SELECT id FROM book WHERE rating < ', 4 ) ), 2 );
-		asrt( R::getCell( 'SELECT title FROM book WHERE rating = ', 3 ), 'my book' ); 
-		asrt( count( R::getRow( 'SELECT title FROM book WHERE rating = ', 3 ) ), 1 );
-		asrt( count( R::getAssoc( 'SELECT id, title FROM book WHERE rating = ', 3 ) ), 1 );
-		asrt( count( R::getAssocRow( 'SELECT id, title FROM book WHERE rating = ', 3 ) ), 1 );
-
-		list( $sql, $bindings ) = R::getSQLAndBindings( array('Hello', 'World') );
-		asrt( implode(',' , $bindings ), 'World' );
-		asrt( trim( $sql ), 'Hello ?' );
-
-		list( $sql, $bindings ) = R::getSQLAndBindings( array('Hello', array( R::dispense('abc') ) ) );
-		asrt( implode(',' , $bindings ), '0' );
-		asrt( trim( $sql ), 'Hello ?' );
-
-		list( $sql, $bindings ) = R::getSQLAndBindings( array('Hello', R::dispense( 'abc', 2 ) ) );
-		asrt( implode(',' , $bindings ), '0,0' );
-		asrt( trim( $sql ), 'Hello ? , ?' );
-
-		list( $sql, $bindings ) = R::getSQLAndBindings( array('Hello', R::dispense( 'abc', 2 ), 'World' ) );
-		asrt( implode(',' , $bindings ), '0,0' );
-		asrt( trim( $sql ), 'Hello ? , ? World' );
-
-		list( $sql, $bindings ) = R::getSQLAndBindings( array('Hello', R::find( 'book' ), 'World', R::dispense( 'abc', 3 ) ) );
-		asrt( implode(',' , $bindings ), "$id1,$id2,0,0,0" );
-		asrt( trim( $sql ), 'Hello ? , ? World ? , ? , ?' );
 	}
 
 	/**

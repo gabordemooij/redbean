@@ -162,58 +162,6 @@ class Facade
 	}
 	
 	/**
-	 * Extracts SQL and bindings from variable-length argument array.
-	 * 
-	 * @param array   $sqlParts Array with SQL Parts (binding parts and string parts)
-	 * @param integer $offset   Offset to start (i.e. for type strings etc.)
-	 * 
-	 * @return array( $sql, $bindings )
-	 * 
-	 * @throws Security
-	 */
-	public static function getSQLAndBindings($sqlParts = array(), $offset = 0)
-	{
-		$sql      = '';
-		$bindings = array();
-		$sqlParts = array_slice( $sqlParts, $offset );
-		$i        = 0;
-
-		if ( count( $sqlParts) === 1 ) {
-			$onlyPart = reset( $sqlParts );
-			return array( $onlyPart, array() );
-		}
-
-		foreach( $sqlParts as $sqlPart ) {
-			$i ++;
-			if ( ( $i % 2 ) ) {
-					$sql .= $sqlPart;
-			} else {
-				if (is_scalar( $sqlPart ) ) {
-					$sql .= ' ? ';
-					$bindings[] = $sqlPart;
-				} elseif ( is_array( $sqlPart ) ) {
-					$slots = array();
-					foreach( $sqlPart as $bean ) {
-						if ( $bean instanceof OODBBean ) {
-							$slots[] = ' ? ';
-							$bindings[] = $bean->id;
-						} else {
-							if ( $i !== 2 ) {
-								throw new Security( 'Argument #' . ($i + $offset) . ' cannot be binding array. Use Bean array.' );
-							}
-							$bindings = $sqlPart; //regular binding array
-							break;
-						}
-					}
-					$sql .= implode( ',', $slots );
-				}
-			}
-		}
-
-		return array( $sql, $bindings );
-	}
-	
-	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
 	 * RedBean. The Setup() method can be called without any arguments, in this case it will
 	 * try to create a SQLite database in /tmp called red.db (this only works on UNIX-like systems).
@@ -623,9 +571,8 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function find( $type, $rest = NULL )
+	public static function find( $type, $sql = NULL, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args(), 1 );
 		return self::$finder->find( $type, $sql, $bindings );
 	}
 
@@ -644,9 +591,8 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function findAll( $type, $rest = NULL )
+	public static function findAll( $type, $sql = NULL, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args(), 1 );
 		return self::$finder->find( $type, $sql, $bindings );
 	}
 
@@ -660,9 +606,8 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function findAndExport( $type, $rest = NULL )
+	public static function findAndExport( $type, $sql = NULL, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args(), 1 );
 		return self::$finder->findAndExport( $type, $sql, $bindings );
 	}
 
@@ -676,9 +621,8 @@ class Facade
 	 *
 	 * @return OODBBean
 	 */
-	public static function findOne( $type, $rest = NULL )
+	public static function findOne( $type, $sql = NULL, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args(), 1 );
 		return self::$finder->findOne( $type, $sql, $bindings );
 	}
 
@@ -692,9 +636,8 @@ class Facade
 	 *
 	 * @return OODBBean
 	 */
-	public static function findLast( $type, $rest = NULL )
+	public static function findLast( $type, $sql = NULL, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args(), 1 );
 		return self::$finder->findLast( $type, $sql, $bindings );
 	}
 
@@ -739,13 +682,13 @@ class Facade
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $rest       sql    SQL query to execute
+	 * @param string $sql       sql    SQL query to execute
+	 * @param array  $bindings  values a list of values to be bound to query parameters
 	 *
 	 * @return integer
 	 */
-	public static function exec( $rest )
+	public static function exec( $sql, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args() );
 		return self::query( 'exec', $sql, $bindings );
 	}
 
@@ -758,9 +701,8 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function getAll( $rest )
+	public static function getAll( $sql, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args() );
 		return self::query( 'get', $sql, $bindings );
 	}
 
@@ -773,9 +715,8 @@ class Facade
 	 *
 	 * @return string
 	 */
-	public static function getCell( $rest )
+	public static function getCell( $sql, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args() );
 		return self::query( 'getCell', $sql, $bindings );
 	}
 
@@ -788,9 +729,8 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function getRow( $rest )
+	public static function getRow( $sql, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args() );
 		return self::query( 'getRow', $sql, $bindings );
 	}
 
@@ -803,9 +743,8 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function getCol( $rest )
+	public static function getCol( $sql, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args() );
 		return self::query( 'getCol', $sql, $bindings );
 	}
 
@@ -823,9 +762,8 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function getAssoc( $rest )
+	public static function getAssoc( $sql, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args() );
 		return self::query( 'getAssoc', $sql, $bindings );
 	}
 	
@@ -840,9 +778,8 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function getAssocRow( $rest )
+	public static function getAssocRow( $sql, $bindings = array() )
 	{
-		list( $sql, $bindings ) = self::getSQLAndBindings( func_get_args() );
 		return self::query( 'getAssocRow', $sql, $bindings );
 	}
 
