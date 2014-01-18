@@ -571,8 +571,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		if (
 			strpos( $property, 'own' ) === 0
+			|| strpos( $property, 'xown' ) === 0
 			|| strpos( $property, 'shared' ) === 0
 		) {
+			
+			$property = preg_replace( '/List$/', '', $property );
 			return $property;
 		}
 
@@ -616,11 +619,18 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 		}
 
+		$isEx = false;
+		if (strpos($property, 'xown') === 0) { 
+			$property = substr($property, 1);
+			$isEx = true;
+		}
+		
 		$isOwn    = strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) );
 		$isShared = strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) );
-
+		
 		if ($isOwn) $listName = lcfirst( substr( $property, 3 ) );
-
+		if ($isEx) $this->__info['sys.exclusive-'.$listName] = true;
+		
 		$hasAlias = (!is_null($this->aliasName));
 
 		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
@@ -725,13 +735,17 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	public function __set( $property, $value )
 	{
 		$property = $this->beau( $property );
-
+		
 		$this->flagSkipBeau = TRUE;
 
 		$this->writeOnly = true;
 		$this->__get( $property );
 		$this->writeOnly = false;
 
+		if (strpos($property, 'xown') === 0) {
+			$property = substr($property, 1);
+		}
+		
 		$this->flagSkipBeau = FALSE;
 
 		$this->setMeta( 'tainted', TRUE );

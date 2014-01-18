@@ -186,15 +186,11 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$consSQL = ( $constraint ? 'CASCADE' : 'SET NULL' );
 
 		$t       = $this->getTable( $type );
-
 		$label   = 'from_' . $field . '_to_table_' . $targetType . '_col_' . $targetField;
 
-		if ( isset( $t['keys'][$label] )
-			&& $t['keys'][$label]['table'] === $targetType
-			&& $t['keys'][$label]['from'] === $field
-			&& $t['keys'][$label]['to'] === $targetField
-			&& $t['keys'][$label]['on_delete'] === $consSQL
-		) return FALSE;
+		foreach($t['keys'] as $key) {
+			if ($key['from'] === $field) return FALSE;
+		}
 
 		$t['keys'][$label] = array(
 			'table'     => $targetType,

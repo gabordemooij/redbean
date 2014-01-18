@@ -38,11 +38,7 @@ class OODB extends Observable
 	 */
 	protected $chillList = array();
 
-	/**
-	 * @var array
-	 */
-	protected $dep = array();
-
+	
 	/**
 	 * @var array
 	 */
@@ -380,7 +376,7 @@ class OODB extends Observable
 			}
 		}
 		foreach ( $ownTrashcan as $trash ) {
-			if ( isset( $this->dep[$trash->getMeta( 'type' )] ) && in_array( $bean->getMeta( 'type' ), $this->dep[$trash->getMeta( 'type' )] ) ) {
+			if ( $trash->getMeta( 'sys.garbage' ) === true ) {
 				$this->trash( $trash );
 			} else {
 				$trash->$myFieldLink = NULL;
@@ -431,12 +427,12 @@ class OODB extends Observable
 	 */
 	private function addForeignKeysForParentBeans( $bean, $embeddedBeans )
 	{
+		
 		foreach ( $embeddedBeans as $linkField => $embeddedBean ) {
 			$this->writer->addIndex( $bean->getMeta( 'type' ),
 				'index_foreignkey_' . $bean->getMeta( 'type' ) . '_' . $embeddedBean->getMeta( 'type' ),
 				$linkField );
-			$isDep = $this->isDependentOn( $bean->getMeta( 'type' ), $embeddedBean->getMeta( 'type' ) );
-			$this->writer->addFK( $bean->getMeta( 'type' ), $embeddedBean->getMeta( 'type' ), $linkField, 'id', $isDep );
+			$this->writer->addFK( $bean->getMeta( 'type' ), $embeddedBean->getMeta( 'type' ), $linkField, 'id', FALSE );
 		}
 	}
 
@@ -475,8 +471,8 @@ class OODB extends Observable
 					$this->writer->addIndex( $addition->getMeta( 'type' ),
 						'index_foreignkey_' . $addition->getMeta( 'type' ) . '_' . $bean->getMeta( 'type' ),
 						$myFieldLink );
-					$isDep = $this->isDependentOn( $addition->getMeta( 'type' ), $bean->getMeta( 'type' ) );
-					$this->writer->addFK( $addition->getMeta( 'type' ), $bean->getMeta( 'type' ), $myFieldLink, 'id', $isDep );
+						$isDep = $bean->getMeta('sys.exclusive-'.$addition->getMeta('type'));
+						$this->writer->addFK( $addition->getMeta( 'type' ), $bean->getMeta( 'type' ), $myFieldLink, 'id', $isDep );
 				}
 			} else {
 				throw new Security( 'Array may only contain OODBBeans' );
@@ -504,21 +500,6 @@ class OODB extends Observable
 		}
 
 		return $processLists;
-	}
-
-	/**
-	 * Checks whether reference type has been marked as dependent on target type.
-	 * This is the result of setting reference type as a key in R::dependencies() and
-	 * putting target type in its array.
-	 *
-	 * @param string $refType   reference type
-	 * @param string $otherType other type / target type
-	 *
-	 * @return boolean
-	 */
-	private function isDependentOn( $refType, $otherType )
-	{
-		return (boolean) ( isset( $this->dep[$refType] ) && in_array( $otherType, $this->dep[$refType] ) );
 	}
 
 	/**
@@ -579,6 +560,12 @@ class OODB extends Observable
 				$originals = $bean->getMeta( 'sys.shadow.' . $property, array() );
 				if ( strpos( $property, 'own' ) === 0 ) {
 					list( $ownAdditions, $ownTrashcan, $ownresidue ) = $this->processGroups( $originals, $value, $ownAdditions, $ownTrashcan, $ownresidue );
+					$listName = lcfirst( substr( $property, 3 ) );
+					if ($bean->getMeta( 'sys.exclusive-'.  $listName ) ) {
+						foreach( $ownTrashcan as $trashBean ) {
+							$trashBean->setMeta( 'sys.garbage', true );
+						}
+					}
 					$bean->removeProperty( $property );
 				} elseif ( strpos( $property, 'shared' ) === 0 ) {
 					list( $sharedAdditions, $sharedTrashcan, $sharedresidue ) = $this->processGroups( $originals, $value, $sharedAdditions, $sharedTrashcan, $sharedresidue );
@@ -1083,35 +1070,6 @@ class OODB extends Observable
 	public function setAssociationManager( AssociationManager $assocManager )
 	{
 		$this->assocManager = $assocManager;
-	}
-
-	/**
-	 * Sets a dependency list. Dependencies can be used to make
-	 * certain beans depend on others. This causes dependent beans to get removed
-	 * once the bean they depend on has been removed as well.
-	 * A dependency takes the form:
-	 *
-	 * $me => depends on array( $bean1, $bean2 )
-	 *
-	 * For instance a to inform RedBeanPHP about the fact that a page
-	 * depends on a book:
-	 *
-	 * 'page' => array('book')
-	 *
-	 * A bean can depend on multiple other beans.
-	 *
-	 * A dependency does two things:
-	 *
-	 * 1. Adds a ON CASCADE DELETE
-	 * 2. trashes the depending bean if the entry in the ownList is removed
-	 *
-	 * @param array $dep
-	 *
-	 * @return void
-	 */
-	public function setDepList( $dependencyList )
-	{
-		$this->dep = $dependencyList;
 	}
 
 	/**

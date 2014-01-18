@@ -785,48 +785,31 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 */
 	public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
 	{
-		$table           = $this->esc( $type );
-		$tableNoQ        = $this->esc( $type, TRUE );
-
-		$targetTable     = $this->esc( $targetType );
-
-		$column          = $this->esc( $field );
-		$columnNoQ       = $this->esc( $field, TRUE );
-
-		$targetColumn    = $this->esc( $targetField );
-		$targetColumnNoQ = $this->esc( $targetField, TRUE );
-
+		
 		$db = $this->adapter->getCell( 'SELECT DATABASE()' );
-
-		$fkName = 'fk_' . $tableNoQ . '_' . $columnNoQ . '_' . $targetColumnNoQ . ( $isDependent ? '_casc' : '' );
-		$cName  = 'cons_' . $fkName;
-
-		$cfks = $this->adapter->getCell( "
+		
+		$cfks = $this->adapter->getCell('
 			SELECT CONSTRAINT_NAME
-			FROM information_schema.KEY_COLUMN_USAGE
-			WHERE TABLE_SCHEMA ='$db' AND TABLE_NAME = '$tableNoQ'  AND COLUMN_NAME = '$columnNoQ' AND
-			CONSTRAINT_NAME <>'PRIMARY' AND REFERENCED_TABLE_NAME is not null
-		" );
+				FROM information_schema.KEY_COLUMN_USAGE
+			WHERE 
+				TABLE_SCHEMA = ? 
+				AND TABLE_NAME = ? 
+				AND COLUMN_NAME = ? AND
+				CONSTRAINT_NAME != \'PRIMARY\'
+				AND REFERENCED_TABLE_NAME IS NOT NULL
+		', array($db, $type, $field));
 
-		$flagAddKey = FALSE;
-
-		try {
-			// No keys
-			if ( !$cfks ) {
-				$flagAddKey = TRUE; //go get a new key
-			}
-
-			// Has fk, but different setting, --remove
-			if ( $cfks && $cfks != $cName ) {
-				$this->adapter->exec( "ALTER TABLE $table DROP FOREIGN KEY $cfks " );
-				$flagAddKey = TRUE; //go get a new key.
-			}
-
-			if ( $flagAddKey ) {
-				$this->adapter->exec( "ALTER TABLE  $table
-				ADD CONSTRAINT $cName FOREIGN KEY $fkName (  $column ) REFERENCES  $targetTable (
-				$targetColumn) ON DELETE " . ( $isDependent ? 'CASCADE' : 'SET NULL' ) . ' ON UPDATE SET NULL ;' );
-			}
+		if ($cfks) return;
+		
+		try {		
+			$fkName = 'fk_'.($type.'_'.$field);
+			$cName = 'c_'.$fkName;
+			$this->adapter->exec( "
+				ALTER TABLE  {$this->esc($type)}
+				ADD CONSTRAINT $cName 
+				FOREIGN KEY $fkName ( {$this->esc($field)} ) REFERENCES {$this->esc($targetType)} (
+				{$this->esc($targetField)}) ON DELETE " . ( $isDependent ? 'CASCADE' : 'SET NULL' ) . ' ON UPDATE SET NULL ;');
+			
 		} catch (\Exception $e ) {
 			// Failure of fk-constraints is not a problem
 		}

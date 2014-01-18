@@ -30,18 +30,16 @@ class Rebuild extends Sqlite
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 
-		R::dependencies( array( 'page' => array( 'book' ) ) );
-
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
 
-		$book->ownPage[] = $page;
+		$book->xownPage[] = $page;
 
 		$id = R::store( $book );
 
 		$book = R::load( 'book', $id );
 
-		asrt( count( $book->ownPage ), 1 );
+		asrt( count( $book->xownPage ), 1 );
 
 		asrt( (int) R::getCell( 'SELECT COUNT(*) FROM page' ), 1 );
 
@@ -52,13 +50,13 @@ class Rebuild extends Sqlite
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
 
-		$book->ownPage[] = $page;
+		$book->xownPage[] = $page;
 
 		$id = R::store( $book );
 
 		$book = R::load( 'book', $id );
 
-		asrt( count( $book->ownPage ), 1 );
+		asrt( count( $book->xownPage ), 1 );
 
 		asrt( (int) R::getCell( 'SELECT COUNT(*) FROM page' ), 1 );
 

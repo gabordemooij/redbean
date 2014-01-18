@@ -349,62 +349,24 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	 */
 	public function addFK( $type, $targetType, $field, $targetField, $isDep = FALSE )
 	{
-		try {
-			$table           = $this->esc( $type );
-			$column          = $this->esc( $field );
-
-			$tableNoQ        = $this->esc( $type, TRUE );
-			$columnNoQ       = $this->esc( $field, TRUE );
-
-			$targetTable     = $this->esc( $targetType );
-			$targetTableNoQ  = $this->esc( $targetType, TRUE );
-
-			$targetColumn    = $this->esc( $targetField );
-			$targetColumnNoQ = $this->esc( $targetField, TRUE );
-
-			$sql = "SELECT
-				tc.constraint_name, tc.table_name,
-				kcu.column_name, ccu.table_name AS foreign_table_name,
-				ccu.column_name AS foreign_column_name,rc.delete_rule
-				FROM information_schema.table_constraints AS tc
-				JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
-				JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
-				JOIN information_schema.referential_constraints AS rc ON ccu.constraint_name = rc.constraint_name
-				WHERE constraint_type = 'FOREIGN KEY' AND tc.table_catalog=current_database()
-					AND tc.table_name = '$tableNoQ'
-					AND ccu.table_name = '$targetTableNoQ'
-					AND kcu.column_name = '$columnNoQ'
-					AND ccu.column_name = '$targetColumnNoQ'
-			";
-
-			$row             = $this->adapter->getRow( $sql );
-
-			$flagAddKey      = FALSE;
-
-			if ( !$row ) $flagAddKey = TRUE;
-
-			if ( $row ) {
-				if ( ( $row['delete_rule'] == 'SET NULL' && $isDep ) ||
-					( $row['delete_rule'] != 'SET NULL' && !$isDep )
-				) {
-					// Delete old key and order a new one
-					$flagAddKey = TRUE;
-					$cName      = $row['constraint_name'];
-					$sql        = "ALTER TABLE $table DROP CONSTRAINT $cName ";
-					$this->adapter->exec( $sql );
-				}
-			}
-			if ( $flagAddKey ) {
+		$db = $this->adapter->getCell( 'SELECT current_database()' );
+		$cfks = $this->adapter->getCell('
+			SELECT constraint_name
+				FROM information_schema.KEY_COLUMN_USAGE
+			WHERE 
+				table_catalog = ?
+				AND table_schema = \'public\' 
+				AND table_name = ? 
+				AND column_name = ?
+		', array($db, $type, $field));
+		
+		try{
+			if (!$cfks) {
 				$delRule = ( $isDep ? 'CASCADE' : 'SET NULL' );
-
-				$this->adapter->exec( "ALTER TABLE  $table
-					ADD FOREIGN KEY (  $column ) REFERENCES  $targetTable (
-					$targetColumn) ON DELETE $delRule ON UPDATE SET NULL DEFERRABLE ;" );
-
-				return TRUE;
+				$this->adapter->exec( "ALTER TABLE  {$this->esc($type)}
+					ADD FOREIGN KEY ( {$this->esc($field)} ) REFERENCES  {$this->esc($targetType)} (
+					{$this->esc($targetField)}) ON DELETE $delRule ON UPDATE SET NULL DEFERRABLE ;" );
 			}
-
-			return FALSE;
 		} catch (\Exception $e ) {
 			return FALSE;
 		}

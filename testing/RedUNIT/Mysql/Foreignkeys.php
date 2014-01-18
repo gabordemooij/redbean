@@ -71,16 +71,18 @@ class Foreignkeys extends Mysql
 			{
 				"parent": "cover",
 				"child": "book",
-				"constraint_name": "cons_fk_book_cover_id_id"
+				"constraint_name": "c_fk_book_cover_id"
 			},
 			{
 				"parent": "book",
 				"child": "page",
-				"constraint_name": "cons_fk_page_book_id_id"
+				"constraint_name": "c_fk_page_book_id"
 			}
 		]';
 
 		$j1 = json_decode( $j, TRUE );
+		
+		print_r($j1);
 
 		$j2 = json_decode( $json, TRUE );
 

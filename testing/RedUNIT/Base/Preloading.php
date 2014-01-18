@@ -134,7 +134,6 @@ class Preloading extends Base
 	public function testParentPreloadWithSQL()
 	{
 		testpack( 'Test whether we can preload a parent with an SQL snippet.' );
-		
 		R::nuke();
 		list( $bookX, $bookY ) = R::dispense( 'book', 2 );
 

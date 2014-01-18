@@ -1105,39 +1105,6 @@ class Facade
 	}
 
 	/**
-	 * Sets a list of dependencies.
-	 * A dependency list contains an entry for each dependent bean.
-	 * A dependent bean will be removed if the relation with one of the
-	 * dependencies gets broken.
-	 *
-	 * Example:
-	 *
-	 * array(
-	 *    'page' => array('book', 'magazine')
-	 * )
-	 *
-	 * A page will be removed if:
-	 *
-	 * unset($book->ownPage[$pageID]);
-	 *
-	 * or:
-	 *
-	 * unset($magazine->ownPage[$pageID]);
-	 *
-	 * but not if:
-	 *
-	 * unset($paper->ownPage[$pageID]);
-	 *
-	 * @param array $dep list of dependencies
-	 *
-	 * @return void
-	 */
-	public static function dependencies( $dep )
-	{
-		self::$redbean->setDepList( $dep );
-	}
-
-	/**
 	 * Short hand function to store a set of beans at once, IDs will be
 	 * returned as an array. For information please consult the R::store()
 	 * function.

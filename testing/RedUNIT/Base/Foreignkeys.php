@@ -33,7 +33,7 @@ class Foreignkeys extends Base implements Observer
 	 */
 	public function testDependency()
 	{
-		$can = $this->createBeanInCan();
+		$can = $this->createBeanInCan( FALSE );
 
 		asrt( R::count( 'bean' ), 1 );
 
@@ -50,9 +50,7 @@ class Foreignkeys extends Base implements Observer
 	 */
 	public function testDependency2()
 	{
-		R::dependencies( array( 'bean' => array( 'can' ) ) );
-
-		$can = $this->createBeanInCan();
+		$can = $this->createBeanInCan( TRUE );
 
 		asrt( R::count( 'bean' ), 1 );
 
@@ -61,9 +59,19 @@ class Foreignkeys extends Base implements Observer
 		// Bean gone
 		asrt( R::count( 'bean' ), 0 );
 
-		R::dependencies( array() );
+		$can = $this->createBeanInCan( FALSE );
 
-		$can = $this->createBeanInCan();
+		asrt( R::count( 'bean' ), 1 );
+
+		R::trash( $can );
+
+		// Bean stays, constraint removed
+		asrt( R::count( 'bean' ), 0 );
+
+		//need to recreate table to get rid of constraint!
+		R::nuke();
+
+		$can = $this->createBeanInCan( FALSE );
 
 		asrt( R::count( 'bean' ), 1 );
 
@@ -81,6 +89,8 @@ class Foreignkeys extends Base implements Observer
 	 */
 	public function testDependency3()
 	{
+		R::nuke();
+		
 		$can = $this->createCanForBean();
 
 		asrt( R::count( 'bean' ), 1 );
@@ -97,7 +107,27 @@ class Foreignkeys extends Base implements Observer
 	 */
 	public function testDependency4()
 	{
-		R::dependencies( array( 'bean' => array( 'can' ) ) );
+		R::nuke();
+		
+		$can = $this->createBeanInCan( TRUE );
+		
+		R::store( $can );
+		
+		R::trash( $can );
+		
+		$can = $this->createCanForBean();
+
+		asrt( R::count( 'bean' ), 1 );
+
+		R::trash( $can );
+
+		asrt( R::count( 'bean' ), 0 );
+		
+		$can = $this->createBeanInCan( TRUE );
+		
+		R::store( $can );
+		
+		R::trash( $can );
 
 		$can = $this->createCanForBean();
 
@@ -106,16 +136,6 @@ class Foreignkeys extends Base implements Observer
 		R::trash( $can );
 
 		asrt( R::count( 'bean' ), 0 );
-
-		R::dependencies( array() );
-
-		$can = $this->createCanForBean();
-
-		asrt( R::count( 'bean' ), 1 );
-
-		R::trash( $can );
-
-		asrt( R::count( 'bean' ), 1 );
 	}
 
 	/**
@@ -183,7 +203,7 @@ class Foreignkeys extends Base implements Observer
 	 *
 	 * @return OODBBean $can
 	 */
-	private function createBeanInCan()
+	private function createBeanInCan( $isExcl )
 	{
 		$can  = R::dispense( 'can' );
 		$bean = R::dispense( 'bean' );
@@ -191,7 +211,11 @@ class Foreignkeys extends Base implements Observer
 		$can->name   = 'bakedbeans';
 		$bean->taste = 'salty';
 
-		$can->ownBean[] = $bean;
+		if ($isExcl) {
+			$can->xownBean[] = $bean;
+		} else {
+			$can->ownBean[] = $bean;
+		}
 
 		R::store( $can );
 

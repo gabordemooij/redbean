@@ -112,26 +112,13 @@ class CUBRID extends AQueryWriter implements QueryWriter
 		foreach ( $keys as $key ) {
 			if ( $key['FKTABLE_NAME'] == $tableNoQ && $key['FKCOLUMN_NAME'] == $columnNoQ ) {
 				// Already has an FK
-				$needsToDropFK = TRUE;
-
-				if ( ( $isDep && $key['DELETE_RULE'] == 0 ) || ( !$isDep && $key['DELETE_RULE'] == 3 ) ) {
-					return;
-				}
-
-				break;
+				return FALSE;
 			}
 		}
 
-		if ( $needsToDropFK ) {
-			$sql = "ALTER TABLE $table DROP FOREIGN KEY {$key['FK_NAME']} ";
-
-			$this->adapter->exec( $sql );
-		}
 
 		$casc = ( $isDep ? 'CASCADE' : 'SET NULL' );
-
 		$sql  = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
-
 		$this->adapter->exec( $sql );
 	}
 

@@ -448,23 +448,22 @@ class Relations extends Base
 	 * 
 	 * @return void
 	 */
-	public function testListAddDelete()
+	public function test_ListAddDelete()
 	{
 		testpack( 'Test list add/delete scenarios.' );
 
-		R::dependencies( array( 'page' => array( 'book', 'paper' ) ) );
-
+		R::nuke();
 		$b = R::dispense( 'book' );
 		$p = R::dispense( 'page' );
 
 		$b->title = 'a';
 		$p->name  = 'b';
 
-		$b->ownPage[] = $p;
+		$b->xownPage[] = $p;
 
 		R::store( $b );
-
-		$b->ownPage = array();
+		
+		$b->xownPage = array();
 
 		R::store( $b );
 
@@ -473,13 +472,13 @@ class Relations extends Base
 		$p = R::dispense( 'page' );
 		$z = R::dispense( 'paper' );
 
-		$z->ownPage[] = $p;
+		$z->xownPage[] = $p;
 
 		R::store( $z );
 
 		asrt( R::count( 'page' ), 1 );
 
-		$z->ownPage = array();
+		$z->xownPage = array();
 
 		R::store( $z );
 
@@ -499,7 +498,6 @@ class Relations extends Base
 
 		asrt( R::count( 'page' ), 1 );
 
-		R::dependencies( array() );
 	}
 
 	/**
