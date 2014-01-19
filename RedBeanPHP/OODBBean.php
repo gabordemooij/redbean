@@ -636,7 +636,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
 				  ($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
 
-		$hasSQL = ($this->withSql !== '');
+		$hasSQL = ($this->withSql !== '' || $this->via !== NULL);
 
 		$exists = isset( $this->properties[$property] );
 
