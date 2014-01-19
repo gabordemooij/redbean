@@ -97,7 +97,7 @@ class RDefault implements Logger
 	public function setMode( $mode )
 	{
 		if ($mode !== 0 && $mode !== 1) {
-			throw new Security( 'Invalid mode selected for logger, use 1 or 0.' );
+			throw new RedException( 'Invalid mode selected for logger, use 1 or 0.' );
 		}
 		$this->mode = $mode;
 		return $this;

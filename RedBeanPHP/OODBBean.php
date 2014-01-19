@@ -758,7 +758,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 				return;
 			} else {
-				throw new Security( 'Cannot cast to bean.' );
+				throw new RedException( 'Cannot cast to bean.' );
 			}
 		}
 
@@ -1013,7 +1013,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	public function searchIn($property)
 	{
 		if ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
-			throw new Security( 'Cannot search a shared list recursively.' );
+			throw new RedException( 'Cannot search a shared list recursively.' );
 		}
 
 		$oldFetchType = $this->fetchType;

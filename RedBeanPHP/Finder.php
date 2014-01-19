@@ -64,7 +64,7 @@ class Finder
 		}
 
 		if ( !is_array( $bindings ) ) {
-			throw new Security(
+			throw new RedException(
 				'Expected array, ' . gettype( $bindings ) . ' given.'
 			);
 		}
@@ -188,14 +188,14 @@ class Finder
 		if ( !$numberOfSteps ) return $bean;
 
 		if ( $numberOfSteps % 2 ) {
-			throw new Security( 'Invalid path: needs 1 more element.' );
+			throw new RedException( 'Invalid path: needs 1 more element.' );
 		}
 
 		for ( $i = 0; $i < $numberOfSteps; $i += 2 ) {
 			$steps[$i] = trim( $steps[$i] );
 
 			if ( $steps[$i] === '' ) {
-				throw new Security( 'Cannot access list.' );
+				throw new RedException( 'Cannot access list.' );
 			}
 
 			if ( strpos( $steps[$i], 'shared-' ) === FALSE ) {

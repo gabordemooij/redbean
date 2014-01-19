@@ -216,7 +216,7 @@ class Facade
 	public static function transaction( $callback )
 	{
 		if ( !is_callable( $callback ) ) {
-			throw new Security( 'R::transaction needs a valid callback.' );
+			throw new RedException( 'R::transaction needs a valid callback.' );
 		}
 
 		static $depth = 0;
@@ -264,7 +264,7 @@ class Facade
 	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE )
 	{
 		if ( isset( self::$toolboxes[$key] ) ) {
-			throw new Security( 'A database has already be specified for this key.' );
+			throw new RedException( 'A database has already be specified for this key.' );
 		}
 
 		if ( is_object($dsn) ) {
@@ -338,7 +338,7 @@ class Facade
 		$logger = new RDefault;
 		
 		if ( !isset( self::$adapter ) ) {
-			throw new Security( 'Use R::setup() first.' );
+			throw new RedException( 'Use R::setup() first.' );
 		}
 		$logger->setMode($mode);
 		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
@@ -492,7 +492,7 @@ class Facade
 	public static function dispense( $type, $num = 1 )
 	{
 		if ( !preg_match( '/^[a-z0-9]+$/', $type )) {
-			throw new Security( 'Invalid type: ' . $type );
+			throw new RedException( 'Invalid type: ' . $type );
 		}
 
 		return self::$redbean->dispense( $type, $num );

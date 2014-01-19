@@ -105,7 +105,7 @@ class OODB extends Observable
 			$bean = $bean->unbox();
 		}
 		if ( !( $bean instanceof OODBBean ) ) {
-			throw new Security( 'OODB Store requires a bean, got: ' . gettype( $bean ) );
+			throw new RedException( 'OODB Store requires a bean, got: ' . gettype( $bean ) );
 		}
 
 		return $bean;
@@ -153,7 +153,7 @@ class OODB extends Observable
 		} elseif ( isset( $this->writer->sqltype_typeno[$cast] ) ) {
 			$typeno = $this->writer->sqltype_typeno[$cast];
 		} else {
-			throw new Security( 'Invalid Cast' );
+			throw new RedException( 'Invalid Cast' );
 		}
 
 		return $typeno;
@@ -323,7 +323,7 @@ class OODB extends Observable
 			if ( $addition instanceof OODBBean ) {
 				$this->assocManager->associate( $addition, $bean );
 			} else {
-				throw new Security( 'Array may only contain OODBBeans' );
+				throw new RedException( 'Array may only contain OODBBeans' );
 			}
 		}
 	}
@@ -475,7 +475,7 @@ class OODB extends Observable
 						$this->writer->addFK( $addition->getMeta( 'type' ), $bean->getMeta( 'type' ), $myFieldLink, 'id', $isDep );
 				}
 			} else {
-				throw new Security( 'Array may only contain OODBBeans' );
+				throw new RedException( 'Array may only contain OODBBeans' );
 			}
 		}
 	}
@@ -692,16 +692,16 @@ class OODB extends Observable
 	{
 		//Is all meta information present?
 		if ( !isset( $bean->id ) ) {
-			throw new Security( 'Bean has incomplete Meta Information id ' );
+			throw new RedException( 'Bean has incomplete Meta Information id ' );
 		}
 		if ( !( $bean->getMeta( 'type' ) ) ) {
-			throw new Security( 'Bean has incomplete Meta Information II' );
+			throw new RedException( 'Bean has incomplete Meta Information II' );
 		}
 		//Pattern of allowed characters
 		$pattern = '/[^a-z0-9_]/i';
 		//Does the type contain invalid characters?
 		if ( preg_match( $pattern, $bean->getMeta( 'type' ) ) ) {
-			throw new Security( 'Bean Type is invalid' );
+			throw new RedException( 'Bean Type is invalid' );
 		}
 		//Are the properties and values valid?
 		foreach ( $bean as $prop => $value ) {
@@ -709,12 +709,12 @@ class OODB extends Observable
 				is_array( $value )
 				|| ( is_object( $value ) )
 			) {
-				throw new Security( "Invalid Bean value: property $prop" );
+				throw new RedException( "Invalid Bean value: property $prop" );
 			} else if (
 				strlen( $prop ) < 1
 				|| preg_match( $pattern, $prop )
 			) {
-				throw new Security( "Invalid Bean property: property $prop" );
+				throw new RedException( "Invalid Bean property: property $prop" );
 			}
 		}
 	}
@@ -897,7 +897,7 @@ class OODB extends Observable
 			$bean = $bean->unbox();
 		}
 		if ( !( $bean instanceof OODBBean ) ) {
-			throw new Security( 'OODB Store requires a bean, got: ' . gettype( $bean ) );
+			throw new RedException( 'OODB Store requires a bean, got: ' . gettype( $bean ) );
 		}
 		$this->signal( 'delete', $bean );
 		foreach ( $bean as $property => $value ) {
@@ -1052,7 +1052,7 @@ class OODB extends Observable
 	public function getAssociationManager()
 	{
 		if ( !isset( $this->assocManager ) ) {
-			throw new Security( 'No association manager available.' );
+			throw new RedException( 'No association manager available.' );
 		}
 
 		return $this->assocManager;

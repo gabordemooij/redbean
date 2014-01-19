@@ -5,6 +5,7 @@ use \RedBeanPHP\OODB as OODB;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\OODBBean as OODBBean;
+use \RedBeanPHP\RedException as RedException;
 use \RedBeanPHP\RedException\Security as Security;
 use \RedBeanPHP\RedException\SQL as SQL;
 use \RedBeanPHP\ToolBox as ToolBox; 
@@ -78,7 +79,7 @@ class AssociationManager extends Observable
 	private function relatedRows( $bean, $type, $getLinks = FALSE, $sql = '', $bindings = array() )
 	{
 		if ( !is_array( $bean ) && !( $bean instanceof OODBBean ) ) {
-			throw new Security(
+			throw new RedException(
 				'Expected array or OODBBean but got:' . gettype( $bean )
 			);
 		}
@@ -88,7 +89,7 @@ class AssociationManager extends Observable
 			$beans = $bean;
 			foreach ( $beans as $singleBean ) {
 				if ( !( $singleBean instanceof OODBBean ) ) {
-					throw new Security(
+					throw new RedException(
 						'Expected OODBBean in array but got:' . gettype( $singleBean )
 					);
 				}
@@ -260,7 +261,7 @@ class AssociationManager extends Observable
 	public function relatedCount( $bean, $type, $sql = NULL, $bindings = array() )
 	{
 		if ( !( $bean instanceof OODBBean ) ) {
-			throw new Security(
+			throw new RedException(
 				'Expected array or OODBBean but got:' . gettype( $bean )
 			);
 		}
