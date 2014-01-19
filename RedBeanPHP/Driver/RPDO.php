@@ -208,7 +208,7 @@ class RPDO implements Driver
 	 */
 	public function __construct( $dsn, $user = NULL, $pass = NULL )
 	{
-		if ( $dsn instanceof\PDO || $dsn instanceof PDOCompatible) {
+		if ( is_object( $dsn ) ) {
 			$this->pdo = $dsn;
 
 			$this->isConnected = TRUE;
