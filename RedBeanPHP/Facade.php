@@ -54,63 +54,63 @@ class Facade
 	/**
 	 * @var array
 	 */
-	public static $toolboxes = array();
+	private static $toolboxes = array();
 
 	/**
 	 * @var ToolBox
 	 */
-	public static $toolbox;
+	private static $toolbox;
 
 	/**
 	 * @var OODB
 	 */
-	public static $redbean;
+	private static $redbean;
 
 	/**
 	 * @var QueryWriter
 	 */
-	public static $writer;
+	private static $writer;
 
 	/**
 	 * @var DBAdapter
 	 */
-	public static $adapter;
+	private static $adapter;
 
 	/**
 	 * @var AssociationManager
 	 */
-	public static $associationManager;
+	private static $associationManager;
 
 	/**
 	 * @var TagManager
 	 */
-	public static $tagManager;
+	private static $tagManager;
 
 	/**
 	 * @var DuplicationManager
 	 */
-	public static $duplicationManager;
+	private static $duplicationManager;
 
 	/**
 	 * @var LabelMaker
 	 */
-	public static $labelMaker;
+	private static $labelMaker;
 
 	/**
 	 * @var Finder
 	 */
-	public static $finder;
+	private static $finder;
 
 	/**
 	 * @var string
 	 */
-	public static $currentDB = '';
+	private static $currentDB = '';
 
 	
 	/**
 	 * @var array
 	 */
-	public static $plugins = array();
+	private static $plugins = array();
 
 	/**
 	 * Internal Query function, executes the desired query. Used by
