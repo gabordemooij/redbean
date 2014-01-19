@@ -21,10 +21,7 @@ use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use \RedBeanPHP\RedException as RedException;
 use \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 use RedBeanPHP\Driver\RPDO as RPDO;
-use QueryWriter\MySQL as MySQL;
-use QueryWriter\SQLiteT as SQLiteT;
-use QueryWriter\PostgreSQL as PostgreSQL;
-use QueryWriter\CUBRID as CUBRID;
+
 /**
  * RedBean Facade
  *
