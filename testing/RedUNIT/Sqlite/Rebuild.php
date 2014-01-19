@@ -24,7 +24,7 @@ class Rebuild extends Sqlite
 	 */
 	public function testRebuilder()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();

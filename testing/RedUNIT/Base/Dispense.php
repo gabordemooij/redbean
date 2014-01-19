@@ -2,7 +2,7 @@
 namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\RedException as RedException;
 use \RedBeanPHP\Facade as Facade;
 use \RedBeanPHP\OODBBean as OODBBean; 
 /**
@@ -26,7 +26,7 @@ class Dispense extends Base
 	 */
 	public function testBasicsDispense()
 	{
-		$redbean = R::$redbean;
+		$redbean = R::getRedBean();
 
 		// Can we dispense a bean?
 		$page = $redbean->dispense( "page" );
@@ -49,7 +49,7 @@ class Dispense extends Base
 				$redbean->dispense( $value );
 
 				fail();
-			} catch ( Security $e ) {
+			} catch (RedException $e ) {
 				pass();
 			}
 		}

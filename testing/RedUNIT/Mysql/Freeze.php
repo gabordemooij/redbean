@@ -28,7 +28,7 @@ class Freeze extends Mysql
 	 */
 	public function testFreezer()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();

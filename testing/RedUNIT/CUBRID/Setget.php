@@ -1,7 +1,7 @@
 <?php 
 namespace RedUNIT\CUBRID;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException\Security as Security; 
+use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_CUBRID_Setget
  *
@@ -116,19 +116,19 @@ class Setget extends \RedUNIT\CUBRID
 		asrt( ( setget( FALSE ) == FALSE ), TRUE );
 
 		// minor test sqltest
-		$a = R::$writer->sqlStateIn( '000', array() );
+		$a = R::getWriter()->sqlStateIn( '000', array() );
 
 		// Unknown state must return FALSE.
 		asrt( $a, FALSE );
 
 		try {
-			R::$writer->esc( '`aaa`' );
+			R::getWriter()->esc( '`aaa`' );
 
 			fail();
 		} catch (\Exception $e ) {
 			pass();
 		}
 
-		asrt( ( $e instanceof Security ), TRUE );
+		asrt( ( $e instanceof RedException ), TRUE );
 	}
 }

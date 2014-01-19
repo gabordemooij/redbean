@@ -24,7 +24,7 @@ class Double extends Mysql
 	 */
 	public function testDouble()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();

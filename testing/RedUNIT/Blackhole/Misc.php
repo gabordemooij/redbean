@@ -6,11 +6,7 @@ use RedBeanPHP\Facade as R;
 use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\Driver\RPDO as RPDO;
 use \RedBeanPHP\Logger\RDefault as RDefault;
-use \RedBeanPHP\SQLHelper as SQLHelper;
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\Setup as Setup;
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\Adapter as Adapter;
+use \RedBeanPHP\RedException as RedException;
 use \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper; 
 /**
  * RedUNIT_Blackhole_Misc
@@ -46,7 +42,7 @@ class Misc extends Blackhole
 		try {
 			R::addDatabase( 'sqlite', '' );
 			fail();
-		} catch ( Security $ex ) {
+		} catch ( RedException $ex ) {
 			pass();
 		}
 	}
@@ -264,31 +260,13 @@ class Misc extends Blackhole
 			asrt( isset( $bean->$becomes ), TRUE );
 		}
 
-		testpack( 'Test debugger check.' );
-
-		$old = R::$adapter;
-
-		R::$adapter = NULL;
-
-		try {
-			R::debug( TRUE );
-
-			fail();
-		} catch ( Security $e ) {
-			pass();
-		}
-
-		R::$adapter = $old;
-
-		R::debug( FALSE );
-
 		testpack( 'Misc Tests' );
 
 		try {
 			$candy = R::dispense( 'CandyBar' );
 
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 
@@ -430,7 +408,7 @@ class Misc extends Blackhole
 		// Otherwise untestable...
 		$bean->setBeanHelper( new SimpleFacadeBeanHelper() );
 
-		R::$redbean->setBeanHelper( new SimpleFacadeBeanHelper() );
+		R::getRedBean()->setBeanHelper( new SimpleFacadeBeanHelper() );
 
 		pass();
 

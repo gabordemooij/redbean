@@ -34,7 +34,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 */
 	public function getToolbox()
 	{
-		return Facade::$toolbox;
+		return Facade::getToolBox();
 	}
 
 	/**

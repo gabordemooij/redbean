@@ -91,7 +91,7 @@ class Dup extends Base
 
 		$cache = $this->getCache();
 
-		R::$duplicationManager->setTables( $cache );
+		R::getDuplicationManager()->setTables( $cache );
 
 		$data = R::exportAll( array( $can ), TRUE );
 
@@ -107,7 +107,7 @@ class Dup extends Base
 		asrt( count( $data ), 1 );
 		asrt( $data[0]['ownCoffee'][0]['color'], 'black' );
 
-		R::$duplicationManager->setCacheTables( FALSE );
+		R::getDuplicationManager()->setCacheTables( FALSE );
 	}
 
 	/**
@@ -126,7 +126,7 @@ class Dup extends Base
 
 		$can = R::load( 'can', R::store( $can ) );
 
-		$d = new DuplicationManager( R::$toolbox );
+		$d = new DuplicationManager( R::getToolBox() );
 
 		$d->setCacheTables( TRUE );
 
@@ -161,7 +161,7 @@ class Dup extends Base
 
 		$can = R::load( 'can', R::store( $can ) );
 
-		$d = new DuplicationManager( R::$toolbox );
+		$d = new DuplicationManager( R::getToolBox() );
 
 		/**
 		 * $cache = '{"book": {
@@ -322,7 +322,7 @@ class Dup extends Base
 		$author->publisher = $pub;
 		$bookID            = R::store( $book );
 
-		R::$duplicationManager->setTables( R::$writer->getTables() );
+		R::getDuplicationManager()->setTables( R::getWriter()->getTables() );
 
 		$objects = ( R::exportAll( array( $book ), TRUE, array() ) );
 
@@ -396,7 +396,7 @@ class Dup extends Base
 		asrt( isset( $objects[0]['page']['sharedBookmark'] ), TRUE );
 		asrt( isset( $objects[0]['page']['sharedBookmark'][0]['ownNote'] ), TRUE );
 
-		R::$duplicationManager->setCacheTables( FALSE );
+		R::getDuplicationManager()->setCacheTables( FALSE );
 
 		testpack( 'Keyless export' );
 

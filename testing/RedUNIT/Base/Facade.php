@@ -39,17 +39,17 @@ class Facade extends Base
 	 */
 	public function testCommonUsageFacade()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 		$a       = new AssociationManager( $toolbox );
 
-		asrt( R::$redbean instanceof OODB, TRUE );
-		asrt( R::$toolbox instanceof ToolBox, TRUE );
-		asrt( R::$adapter instanceof Adapter, TRUE );
-		asrt( R::$writer instanceof QueryWriter, TRUE );
+		asrt( R::getRedBean() instanceof OODB, TRUE );
+		asrt( R::getToolBox() instanceof ToolBox, TRUE );
+		asrt( R::getDatabaseAdapter() instanceof Adapter, TRUE );
+		asrt( R::getWriter() instanceof QueryWriter, TRUE );
 
 		$book = R::dispense( "book" );
 

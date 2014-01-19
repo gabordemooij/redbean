@@ -30,13 +30,13 @@ class Chill extends Base
 
 		R::store( $bean );
 
-		asrt( count( R::$writer->getColumns( 'bean' ) ), 3 );
+		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 3 );
 
 		$bean->col3 = '3';
 
 		R::store( $bean );
 
-		asrt( count( R::$writer->getColumns( 'bean' ) ), 4 );
+		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 4 );
 
 		R::freeze( array( 'umbrella' ) );
 
@@ -44,7 +44,7 @@ class Chill extends Base
 
 		R::store( $bean );
 
-		asrt( count( R::$writer->getColumns( 'bean' ) ), 5 );
+		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 5 );
 
 		R::freeze( array( 'bean' ) );
 
@@ -57,7 +57,7 @@ class Chill extends Base
 			pass();
 		}
 
-		asrt( count( R::$writer->getColumns( 'bean' ) ), 5 );
+		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 5 );
 
 		R::freeze( array() );
 
@@ -65,6 +65,6 @@ class Chill extends Base
 
 		R::store( $bean );
 
-		asrt( count( R::$writer->getColumns( 'bean' ) ), 6 );
+		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 6 );
 	}
 }

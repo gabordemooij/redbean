@@ -24,13 +24,13 @@ class Parambind extends Mysql
 	 */
 	public function testPDOParameterBinding()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 
-		R::$adapter->getDatabase()->setUseStringOnlyBinding( TRUE );
+		R::getDatabaseAdapter()->getDatabase()->setUseStringOnlyBinding( TRUE );
 
 		try {
 			R::getAll( "select * from job limit ? ", array( 1 ) );
@@ -64,7 +64,7 @@ class Parambind extends Mysql
 			pass();
 		}
 
-		R::$adapter->getDatabase()->setUseStringOnlyBinding( FALSE );
+		R::getDatabaseAdapter()->getDatabase()->setUseStringOnlyBinding( FALSE );
 
 		try {
 			R::getAll( "select * from job limit ? ", array( 1 ) );

@@ -24,7 +24,7 @@ class Preexist extends Mysql
 	 */
 	public function testPlaysNiceWithPreExitsingSchema()
 	{
-		$toolbox     = R::$toolbox;
+		$toolbox     = R::getToolBox();
 		$adapter     = $toolbox->getDatabaseAdapter();
 		$writer      = $toolbox->getWriter();
 		$redbean     = $toolbox->getRedBean();

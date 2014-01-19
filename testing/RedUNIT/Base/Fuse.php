@@ -27,7 +27,7 @@ class Fuse extends Base
 	 */
 	public function testFUSE()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 
 		$blog = R::dispense( 'blog' );

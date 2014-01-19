@@ -315,7 +315,7 @@ class Copy extends Base
 		asrt( R::count( 'guest' ), 3 );
 		asrt( R::count( 'guest_prop' ), 1 );
 
-		$arthur = R::findOne( 'guest', ' ' . R::$writer->esc( 'name' ) . ' = ? ', array( 'Arthur Dent' ) );
+		$arthur = R::findOne( 'guest', ' ' . R::getWriter()->esc( 'name' ) . ' = ? ', array( 'Arthur Dent' ) );
 
 		asrt( $arthur->name, 'Arthur Dent' );
 	}

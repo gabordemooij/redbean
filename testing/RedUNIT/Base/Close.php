@@ -26,11 +26,11 @@ class Close extends Base
 	 */
 	public function testClose()
 	{
-		asrt( R::$adapter->getDatabase()->isConnected(), TRUE );
+		asrt( R::getDatabaseAdapter()->getDatabase()->isConnected(), TRUE );
 
 		R::close();
 
-		asrt( R::$adapter->getDatabase()->isConnected(), FALSE );
+		asrt( R::getDatabaseAdapter()->getDatabase()->isConnected(), FALSE );
 		
 	}
 }

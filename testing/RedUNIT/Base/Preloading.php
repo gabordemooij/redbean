@@ -1439,7 +1439,7 @@ class Preloading extends Base
 	public function testVariations2()
 	{
 		// Extra, test in combination with writer cache
-		R::$writer->setUseCache( TRUE );
+		R::getWriter()->setUseCache( TRUE );
 
 		$villages = R::dispense( 'village', 3 );
 
@@ -1703,7 +1703,7 @@ class Preloading extends Base
 	 */
 	public function testPreloadingVariationsAndCache()
 	{
-		R::$writer->setUseCache( FALSE );
+		R::getWriter()->setUseCache( FALSE );
 
 		$books = R::dispense( 'book', 4 );
 
@@ -1740,7 +1740,7 @@ class Preloading extends Base
 	 */
 	public function testPreloadingVariationsAndCache2()
 	{
-		R::$writer->setUseCache( FALSE );
+		R::getWriter()->setUseCache( FALSE );
 
 		$villages = R::dispense( 'village', 3 );
 

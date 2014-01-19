@@ -5,9 +5,7 @@ use RedBeanPHP\Facade as R;
 use \RedBeanPHP\ToolBox as ToolBox;
 use \RedBeanPHP\AssociationManager as AssociationManager;
 use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\SimpleModel as SimpleModel;
-use \RedBeanPHP\QueryWriter\MySQL as MySQL; 
+
 /**
  * RedUNIT_Base_Association
  *
@@ -38,8 +36,8 @@ class Association extends Base
 		$bunny  = R::dispense( 'bunny' );
 		$carrot = R::dispense( 'carrot' );
 
-		$faultyWriter  = new \FaultyWriter( R::$toolbox->getDatabaseAdapter() );
-		$faultyToolbox = new ToolBox( R::$toolbox->getRedBean(), R::$toolbox->getDatabaseAdapter(), $faultyWriter );
+		$faultyWriter  = new \FaultyWriter( R::getToolBox()->getDatabaseAdapter() );
+		$faultyToolbox = new ToolBox( R::getToolBox()->getRedBean(), R::getToolBox()->getDatabaseAdapter(), $faultyWriter );
 
 		$faultyAssociationManager = new AssociationManager( $faultyToolbox );
 

@@ -4,7 +4,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use \RedBeanPHP\AssociationManager as AssociationManager;
 use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\RedException\Security as Security; 
+use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_Base_Finding
  *
@@ -27,7 +27,7 @@ class Finding extends Base {
 	 */
 	public function testFinding() {
 		
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
@@ -120,7 +120,7 @@ class Finding extends Base {
 		try {
 			R::find( 'bean', ' id > 0 ', 'invalid bindings argument' );
 			fail();
-		} catch ( Security $exception ) {
+		} catch ( RedException $exception ) {
 			pass();
 		}
 	}
@@ -310,7 +310,7 @@ class Finding extends Base {
 		asrt( $foundStr, 'page8' );
 
 		//now with parents and condition (variation)
-		R::$writer->setUseCache(FALSE);
+		R::getWriter()->setUseCache(FALSE);
 		$referencePage = R::load( 'page', $page[7]->id );
 		$found = $referencePage->withCondition(' ( page.number < ? OR  page.number = 5 ) ', array( 3 ) )
 				  ->searchIn( 'page' );
@@ -403,7 +403,7 @@ class Finding extends Base {
 		try {
 			$referencePage->searchIn('sharedPage');
 			fail();
-		} catch (Security $exception) {
+		} catch (RedException $exception) {
 			pass();
 		}
 		
@@ -411,7 +411,7 @@ class Finding extends Base {
 		try {
 			$referencePage->searchIn('sharedpage');
 			pass();
-		} catch (Security $exception) {
+		} catch (RedException $exception) {
 			fail();
 		}
 		

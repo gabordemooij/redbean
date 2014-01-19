@@ -2,7 +2,7 @@
 namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException\Security as Security; 
+use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_Base_Issue303
  *
@@ -30,21 +30,21 @@ class Issue303 extends Base
 		try {
 			R::store( R::dispense( 'invalidbean' )->setAttr( 'invalid.property', 'value' ) );
 			fail();
-		} catch (Security $e ) {
+		} catch (RedException $e ) {
 			asrt( $e->getMessage(), 'Invalid Bean property: property invalid.property' );
 		}
 
 		try {
 			R::store( R::dispense( 'invalidbean' )->setAttr( 'property', array() ) );
 			fail();
-		} catch (Security $e ) {
+		} catch (RedException $e ) {
 			asrt( $e->getMessage(), 'Invalid Bean value: property property' );
 		}
 
 		try {
 			R::store( R::dispense( 'invalidbean' )->setAttr( 'property', new \stdClass ) );
 			fail();
-		} catch (Security $e ) {
+		} catch (RedException $e ) {
 			asrt( $e->getMessage(), 'Invalid Bean value: property property' );
 		}
 	}

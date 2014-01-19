@@ -23,7 +23,7 @@ class Writer extends \RedUNIT\CUBRID
 	 */
 	public function testScanningAndCoding()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();

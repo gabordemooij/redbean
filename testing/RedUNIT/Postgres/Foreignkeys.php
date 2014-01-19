@@ -24,7 +24,7 @@ class Foreignkeys extends Postgres
 	{
 		testpack( 'Test Postgres Foreign keys' );
 
-		$a = R::$writer->addFK( 'a', 'b', 'c', 'd' ); //must fail
+		$a = R::getWriter()->addFK( 'a', 'b', 'c', 'd' ); //must fail
 
 		pass(); //survive without exception
 

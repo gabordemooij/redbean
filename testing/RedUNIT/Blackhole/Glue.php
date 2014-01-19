@@ -24,7 +24,7 @@ class Glue extends Blackhole
 	 */
 	public function testGlue()
 	{
-		$writer = R::$writer;
+		$writer = R::getWriter();
 		
 		//Can we add a condition without having to type 'WHERE' - usual suspects
 		asrt( $writer->glueSQLCondition(' name = ? '), ' WHERE  name = ? ' );

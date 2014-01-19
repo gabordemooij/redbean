@@ -27,7 +27,7 @@ class Writer extends Sqlite
 	 */
 	public function testScanningAndCoding()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
@@ -110,7 +110,7 @@ class Writer extends Sqlite
 	{
 		testpack( "Zero issue" );
 
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$redbean = $toolbox->getRedBean();
 
 		$bean = $redbean->dispense( "zero" );
@@ -153,7 +153,7 @@ class Writer extends Sqlite
 	 */
 	public function testIssue9and10()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$redbean = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
 
@@ -212,7 +212,7 @@ class Writer extends Sqlite
 	 */
 	public function testVaria2()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$redbean = $toolbox->getRedBean();
 
 		$a = new AssociationManager( $toolbox );

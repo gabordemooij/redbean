@@ -72,7 +72,7 @@ class Writecache extends Base
 		asrt( count( $logger->grep( 'SELECT' ) ), 2 );
 
 		// With cache
-		R::$writer->setUseCache( TRUE );
+		R::getWriter()->setUseCache( TRUE );
 
 		$logger->clear();
 
@@ -81,7 +81,7 @@ class Writecache extends Base
 
 		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
 
-		R::$writer->setUseCache( FALSE );
+		R::getWriter()->setUseCache( FALSE );
 
 		// Test combinations
 		$logger->clear();
@@ -101,7 +101,7 @@ class Writecache extends Base
 		asrt( count( $logger->grep( 'SELECT' ) ), 6 );
 
 		// With cache
-		R::$writer->setUseCache( TRUE );
+		R::getWriter()->setUseCache( TRUE );
 
 		$logger->clear();
 
@@ -117,7 +117,7 @@ class Writecache extends Base
 
 		asrt( count( $logger->grep( 'SELECT' ) ), 3 );
 
-		R::$writer->setUseCache( FALSE );
+		R::getWriter()->setUseCache( FALSE );
 
 		// Test auto flush
 		$logger->clear();
@@ -133,7 +133,7 @@ class Writecache extends Base
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
 
 		// With cache
-		R::$writer->setUseCache( TRUE );
+		R::getWriter()->setUseCache( TRUE );
 
 		$logger->clear();
 
@@ -149,7 +149,7 @@ class Writecache extends Base
 		// Now the same, auto flushed
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
 
-		R::$writer->setUseCache( FALSE );
+		R::getWriter()->setUseCache( FALSE );
 
 		// Test whether delete flushes as well (because uses selectRecord - might be a gotcha!)
 		R::store( R::dispense( 'garbage' ) );
@@ -171,7 +171,7 @@ class Writecache extends Base
 		$garbage = R::findOne( 'garbage' );
 
 		// With cache
-		R::$writer->setUseCache( TRUE );
+		R::getWriter()->setUseCache( TRUE );
 
 		$logger->clear();
 
@@ -184,20 +184,20 @@ class Writecache extends Base
 		// Now the same, auto flushed
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
 
-		R::$writer->setUseCache( FALSE );
+		R::getWriter()->setUseCache( FALSE );
 
 		R::store( R::dispense( 'garbage' ) );
 
 		$garbage = R::findOne( 'garbage' );
 
 		// With cache
-		R::$writer->setUseCache( TRUE );
+		R::getWriter()->setUseCache( TRUE );
 
 		$logger->clear();
 
 		$book = R::findOne( 'book' );
 
-		R::$writer->queryRecord( 'garbage', array( 'id' => array( $garbage->id ) ) );
+		R::getWriter()->queryRecord( 'garbage', array( 'id' => array( $garbage->id ) ) );
 
 		$book = R::findOne( 'book' );
 
@@ -214,7 +214,7 @@ class Writecache extends Base
 	{
 		testpack( 'Testing possible regressions: Try to fool the cache' );
 
-		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', TRUE ) . ' WHERE ( ' . R::$writer->esc( 'id', TRUE ) . '  IN ( 1)  ) ';
+		$str = 'SELECT * FROM ' . R::getWriter()->esc( 'bean', TRUE ) . ' WHERE ( ' . R::getWriter()->esc( 'id', TRUE ) . '  IN ( 1)  ) ';
 
 		$bean = R::dispense( 'bean' );
 
@@ -271,7 +271,7 @@ class Writecache extends Base
 	 */
 	public function testInstructNoDrop()
 	{
-		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', TRUE ) . ' -- keep-cache';
+		$str = 'SELECT * FROM ' . R::getWriter()->esc( 'bean', TRUE ) . ' -- keep-cache';
 
 		$bean = R::dispense( 'bean' );
 
@@ -294,7 +294,7 @@ class Writecache extends Base
 		R::nuke();
 
 		// Now INSTRUCT the cache to not drop the cache CASE 2
-		$str = 'SELECT * FROM ' . R::$writer->esc( 'bean', TRUE ) . ' -- keep-cache';
+		$str = 'SELECT * FROM ' . R::getWriter()->esc( 'bean', TRUE ) . ' -- keep-cache';
 
 		$bean = R::dispense( 'bean' );
 
@@ -396,13 +396,13 @@ class Writecache extends Base
 
 		asrt( count( $logger->grep( 'SELECT *' ) ), 1 );
 
-		R::$writer->flushCache();
+		R::getWriter()->flushCache();
 
 		$bean = R::load( 'bean', $id1 );
 
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
 
-		R::$writer->flushCache();
-		R::$writer->setUseCache( FALSE );
+		R::getWriter()->flushCache();
+		R::getWriter()->setUseCache( FALSE );
 	}
 }

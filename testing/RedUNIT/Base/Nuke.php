@@ -27,24 +27,24 @@ class Nuke extends Base
 
 		R::store( $bean );
 
-		asrt( count( R::$writer->getTables() ), 1 );
+		asrt( count( R::getWriter()->getTables() ), 1 );
 
 		R::nuke();
 
-		asrt( count( R::$writer->getTables() ), 0 );
+		asrt( count( R::getWriter()->getTables() ), 0 );
 
 		$bean = R::dispense( 'bean' );
 
 		R::store( $bean );
 
-		asrt( count( R::$writer->getTables() ), 1 );
+		asrt( count( R::getWriter()->getTables() ), 1 );
 
 		R::freeze();
 
 		R::nuke();
 
 		// No effect
-		asrt( count( R::$writer->getTables() ), 1 );
+		asrt( count( R::getWriter()->getTables() ), 1 );
 
 		R::freeze( FALSE );
 	}

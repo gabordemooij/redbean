@@ -125,7 +125,7 @@ class Database extends Base
 
 		R::store( R::dispense( 'justabean' ) );
 
-		$adapter = new TroubleDapter( R::$toolbox->getDatabaseAdapter()->getDatabase() );
+		$adapter = new TroubleDapter( R::getToolBox()->getDatabaseAdapter()->getDatabase() );
 
 		$adapter->setSQLState( 'HY000' );
 
@@ -164,7 +164,7 @@ class Database extends Base
 			pass();
 		}
 
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
@@ -233,14 +233,14 @@ class Database extends Base
 		asrt(is_array($rooms), TRUE);
 		asrt(count($rooms), 0);
 		
-		$rooms = R::getAssoc( 'SELECT ' . R::$writer->esc( 'number' ) . ', kind FROM room ORDER BY kind ASC' );
+		$rooms = R::getAssoc( 'SELECT ' . R::getWriter()->esc( 'number' ) . ', kind FROM room ORDER BY kind ASC' );
 
 		foreach ( $rooms as $key => $room ) {
 			asrt( ( $key === 6 || $key === 7 ), TRUE );
 			asrt( ( $room == 'classic' || $room == 'suite' ), TRUE );
 		}
 
-		$rooms = R::$adapter->getAssoc( 'SELECT kind FROM room' );
+		$rooms = R::getDatabaseAdapter()->getAssoc( 'SELECT kind FROM room' );
 		foreach ( $rooms as $key => $room ) {
 			asrt( ( $room == 'classic' || $room == 'suite' ), TRUE );
 			asrt( $room, $key );

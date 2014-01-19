@@ -26,7 +26,7 @@ class Export extends Blackhole
 	{
 		testpack( 'Test exportAll' );
 
-		$redbean = R::$redbean;
+		$redbean = R::getRedBean();
 
 		$bean = new OODBBean;
 

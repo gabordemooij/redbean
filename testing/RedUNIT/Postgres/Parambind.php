@@ -43,7 +43,7 @@ class Parambind extends Postgres
 
 		testpack( 'Test whether we can properly bind and receive NULL values' );
 
-		$adapter = R::$adapter;
+		$adapter = R::getDatabaseAdapter();
 
 		asrt( $adapter->getCell( 'SELECT TEXT( :nil ) ', array( ':nil' => 'NULL' ) ), 'NULL' );
 		asrt( $adapter->getCell( 'SELECT TEXT( :nil ) ', array( ':nil' => NULL ) ), NULL );

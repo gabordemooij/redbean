@@ -27,7 +27,7 @@ class Tainted extends Blackhole
 	{
 		testpack( 'Original Tainted Tests' );
 
-		$redbean = R::$redbean;
+		$redbean = R::getRedBean();
 
 		$spoon = $redbean->dispense( "spoon" );
 

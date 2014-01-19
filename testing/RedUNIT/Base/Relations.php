@@ -2,7 +2,7 @@
 namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\RedException as RedException;
 use \RedBeanPHP\OODBBean as OODBBean;
 /**
  * RedUNIT_Base_Relations
@@ -82,7 +82,7 @@ class Relations extends Base
 	{
 		testpack( 'Test new shared relations with link conditions' );
 		
-		$w = R::$writer;
+		$w = R::getWriter();
 
 		list( $b1, $b2 ) = R::dispense( 'book', 2 );
 
@@ -147,7 +147,7 @@ class Relations extends Base
 		 */
 		R::exec( 'UPDATE page SET ' . $w->esc( 'number' ) . ' = 1 ' );
 
-		R::$writer->setUseCache( TRUE );
+		R::getWriter()->setUseCache( TRUE );
 
 		$p1 = R::load( 'page', (int) $p1->id );
 
@@ -211,7 +211,7 @@ class Relations extends Base
 		// Yes, keep-cache wont help, cache key changed!
 		asrt( (int) $page->number, 8 );
 
-		R::$writer->setUseCache( FALSE );
+		R::getWriter()->setUseCache( FALSE );
 
 	}
 	
@@ -314,7 +314,29 @@ class Relations extends Base
 		$d = R::load( 'doctor', $d->id );
 
 		asrt( count( $d->sharedPatient ), 1 );
-		asrt( in_array( 'consult', R::$writer->getTables() ), TRUE );
+		asrt( in_array( 'consult', R::getWriter()->getTables() ), TRUE );
+	}
+	
+	public function testIssue348()
+	{
+		//issue #348 via() should reload shared list
+		
+		$product = R::dispense( 'product' );
+		$product->name = 'test';
+		$color = R::dispense( 'color' );
+		$color->name = 'cname';
+		$color->code = 'ccode';
+		R::store( $product );
+		R::store( $color );
+		$product->link( 'product_color', array(
+			 'stock' => 1,
+			 'position' => 0
+		) )->color = $color;
+		R::store( $product );
+		asrt( count( $product->sharedColor ), 0 );
+		asrt( count( $product->via( 'product_color' )->sharedColor ), 1 );
+		asrt( count( $product->sharedColor ), 1 );
+		R::renameAssociation( 'color_product', NULL );
 	}
 
 	/**
@@ -324,7 +346,7 @@ class Relations extends Base
 	 */
 	public function testCreationOfLinkTable()
 	{
-		asrt( in_array( 'consult', R::$writer->getTables() ), FALSE );
+		asrt( in_array( 'consult', R::getWriter()->getTables() ), FALSE );
 
 		$d = R::dispense( 'doctor' )->setAttr( 'name', 'd1' );
 		$p = R::dispense( 'patient' )->setAttr( 'name', 'p1' );
@@ -332,7 +354,7 @@ class Relations extends Base
 		$d->sharedPatient[] = $p;
 		R::store($d);
 
-		asrt( in_array( 'consult', R::$writer->getTables() ), TRUE );
+		asrt( in_array( 'consult', R::getWriter()->getTables() ), TRUE );
 	}
 
 	/**
@@ -430,7 +452,7 @@ class Relations extends Base
 
 		asrt( R::count( 'role' ), 1 );
 
-		$aclrole = R::$redbean->dispense( 'acl_role' );
+		$aclrole = R::getRedBean()->dispense( 'acl_role' );
 
 		$aclrole->name = 'role';
 
@@ -743,7 +765,7 @@ class Relations extends Base
 			try {
 				$page1->book = $value;
 				fail();
-			} catch ( Security $e ) {
+			} catch ( RedException $e ) {
 				pass();
 			}
 		}
@@ -1419,7 +1441,7 @@ class Relations extends Base
 		try {
 			R::store( $book );
 			fail();
-		} catch( Security $exception) {
+		} catch( RedException $exception) {
 			pass();
 		}
 		

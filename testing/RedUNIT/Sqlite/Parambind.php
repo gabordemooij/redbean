@@ -23,7 +23,7 @@ class Parambind extends Sqlite
 	 */
 	public function testParamBindWithSQLite()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();

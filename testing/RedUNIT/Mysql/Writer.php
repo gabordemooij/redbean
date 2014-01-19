@@ -27,7 +27,7 @@ class Writer extends \RedUNIT\Mysql
 	 */
 	public function testScanningAndCoding()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
@@ -188,7 +188,7 @@ class Writer extends \RedUNIT\Mysql
 	{
 		testpack( "Zero issue" );
 
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$redbean = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
@@ -555,7 +555,7 @@ class Writer extends \RedUNIT\Mysql
 
 		$place           = R::dispense( 'place' );
 
-		$place->location = $data; //R::$f->GeomFromText('"'.$data.'"');
+		$place->location = $data;
 
 		R::store( $place );
 

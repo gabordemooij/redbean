@@ -8,8 +8,7 @@ use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\OODB as OODB;
 use \RedBeanPHP\Adapter as Adapter;
 use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\Plugin\Cooker as Cooker;
-use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\RedException as RedException;
 use \RedBeanPHP\RedException\SQL as SQL;
 use \RedBeanPHP\Driver\RPDO as RPDO; 
 /**
@@ -62,10 +61,10 @@ class Misc extends Base
 	{
 		testpack( 'Test Backward compatibility methods in writer.' );
 
-		asrt( R::$writer->safeColumn( 'column', TRUE ), R::$writer->esc( 'column', TRUE ) );
-		asrt( R::$writer->safeColumn( 'column', FALSE ), R::$writer->esc( 'column', FALSE ) );
-		asrt( R::$writer->safeTable( 'table', TRUE ), R::$writer->esc( 'table', TRUE ) );
-		asrt( R::$writer->safeTable( 'table', FALSE ), R::$writer->esc( 'table', FALSE ) );
+		asrt( R::getWriter()->safeColumn( 'column', TRUE ), R::getWriter()->esc( 'column', TRUE ) );
+		asrt( R::getWriter()->safeColumn( 'column', FALSE ), R::getWriter()->esc( 'column', FALSE ) );
+		asrt( R::getWriter()->safeTable( 'table', TRUE ), R::getWriter()->esc( 'table', TRUE ) );
+		asrt( R::getWriter()->safeTable( 'table', FALSE ), R::getWriter()->esc( 'table', FALSE ) );
 	}
 
 	/**
@@ -109,7 +108,7 @@ class Misc extends Base
 
 		$currentDriver = $this->currentlyActiveDriverID;
 
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
@@ -127,10 +126,10 @@ class Misc extends Base
 
 		testpack( 'Testing Logger' );
 
-		R::$adapter->getDatabase()->setLogger( new RDefault );
+		R::getDatabaseAdapter()->getDatabase()->setLogger( new RDefault );
 
-		asrt( ( R::$adapter->getDatabase()->getLogger() instanceof Logger ), TRUE );
-		asrt( ( R::$adapter->getDatabase()->getLogger() instanceof RDefault ), TRUE );
+		asrt( ( R::getDatabaseAdapter()->getDatabase()->getLogger() instanceof Logger ), TRUE );
+		asrt( ( R::getDatabaseAdapter()->getDatabase()->getLogger() instanceof RDefault ), TRUE );
 
 		$bean = R::dispense( 'bean' );
 
@@ -175,7 +174,7 @@ class Misc extends Base
 		R::store( $u1 );
 		R::store( $u2 );
 
-		$list = R::getAssoc( 'select login,' . R::$writer->esc( 'name' ) . ' from ' . R::$writer->esc( 'user' ) . ' ' );
+		$list = R::getAssoc( 'select login,' . R::getWriter()->esc( 'name' ) . ' from ' . R::getWriter()->esc( 'user' ) . ' ' );
 
 		asrt( $list['e'], 'Eric' );
 		asrt( $list['g'], 'Gabor' );
@@ -243,7 +242,7 @@ class Misc extends Base
 
 		$adapter = R::getDatabaseAdapter();
 
-		if ( method_exists( R::$adapter->getDatabase(), 'getPDO' ) ){
+		if ( method_exists( R::getDatabaseAdapter()->getDatabase(), 'getPDO' ) ){
 			asrt( $adapter->getDatabase()->getPDO() instanceof\PDO, TRUE );
 		}
 
@@ -375,8 +374,8 @@ class Misc extends Base
 
 		R::store( $cocoa );
 
-		if ( method_exists( R::$adapter->getDatabase(), 'getPDO' ) ) {
-			$pdo    = R::$adapter->getDatabase()->getPDO();
+		if ( method_exists( R::getDatabaseAdapter()->getDatabase(), 'getPDO' ) ) {
+			$pdo    = R::getDatabaseAdapter()->getDatabase()->getPDO();
 			$driver = new RPDO( $pdo );
 
 			pass();
@@ -483,13 +482,13 @@ class Misc extends Base
 
 		testpack( 'test assocManager check' );
 
-		$rb = new OODB( R::$writer );
+		$rb = new OODB( R::getWriter() );
 
 		try {
 			$rb->getAssociationManager();
 
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 	}

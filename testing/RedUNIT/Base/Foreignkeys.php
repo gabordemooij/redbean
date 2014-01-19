@@ -146,7 +146,7 @@ class Foreignkeys extends Base implements Observer
 	 */
 	public function testIssue171()
 	{
-		R::$adapter->addEventListener( 'sql_exec', $this );
+		R::getDatabaseAdapter()->addEventListener( 'sql_exec', $this );
 
 		$account = R::dispense( 'account' );
 		$user    = R::dispense( 'user' );

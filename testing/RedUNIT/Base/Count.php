@@ -47,12 +47,12 @@ class Count extends Base
 		R::wipe( "page" );
 
 		asrt( R::count( "page" ), 0 );
-		asrt( R::$redbean->count( "page" ), 0 );
-		asrt( R::$redbean->count( "kazoo" ), 0 ); // non existing table
+		asrt( R::getRedBean()->count( "page" ), 0 );
+		asrt( R::getRedBean()->count( "kazoo" ), 0 ); // non existing table
 
 		R::freeze( TRUE );
 
-		asrt( R::$redbean->count( "kazoo" ), 0 ); // non existing table
+		asrt( R::getRedBean()->count( "kazoo" ), 0 ); // non existing table
 
 		R::freeze( FALSE );
 

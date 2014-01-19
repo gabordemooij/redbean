@@ -1,7 +1,7 @@
 <?php 
 namespace RedBeanPHP\QueryWriter; 
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\RedException as RedException;
 use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\OODBBean as OODBBean; 
 /**
@@ -50,7 +50,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	/**
 	 * @var array
 	 */
-	protected static $renames = array();
+	public static $renames = array();
 
 	/**
 	 * @var array

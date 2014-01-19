@@ -87,14 +87,14 @@ class Namedparams extends Base
 		asrt( count( $pages ), 1 );
 
 		//test with find()
-		$books = R::$redbean->find( 'book', 
+		$books = R::getRedBean()->find( 'book', 
 				  array(
 						'title' => array('book')), 
 				  ' AND title = :title ', array(':title'=>'book'));
 
 		asrt( count( $books ), 1 );
 
-		$books = R::$redbean->find( 'book', 
+		$books = R::getRedBean()->find( 'book', 
 				  array(
 						'title'   => array('book', 'book2'), 
 						'comment' => array('comment', 'comment2')),
@@ -103,7 +103,7 @@ class Namedparams extends Base
 		asrt( count( $books ), 1 );
 
 		//just check numeric works as well...
-		$books = R::$redbean->find( 'book', 
+		$books = R::getRedBean()->find( 'book', 
 				  array(
 						'title'   => array('book', 'book2'), 
 						'comment' => array('comment', 'comment2')),
@@ -112,7 +112,7 @@ class Namedparams extends Base
 		asrt( count( $books ), 1 );
 
 		//just extra check to verify glue works
-		$books = R::$redbean->find( 'book', 
+		$books = R::getRedBean()->find( 'book', 
 				  array(
 						'title'   => array('book', 'book2'), 
 						'comment' => array('comment', 'comment2')),

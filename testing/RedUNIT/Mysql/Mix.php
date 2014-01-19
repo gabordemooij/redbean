@@ -26,7 +26,7 @@ class Mix extends Mysql
 	 */
 	public function testQueryBuilderMix()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 
 		$adapter = $toolbox->getDatabaseAdapter();
 
@@ -127,7 +127,7 @@ class Mix extends Mysql
 	 */
 	public function testToString()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();	
 		$sqlHelper = new SQLHelper( $adapter );
 		$sqlHelper->begin()

@@ -2,7 +2,7 @@
 namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException\Security as Security; 
+use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_Base_Update
  *
@@ -171,7 +171,7 @@ class Update extends Base
 			//otherwise UTF8 causes index overflow in mysql: SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes
 			R::exec('alter table bean modify column id char(3);');
 		} else {
-			R::$writer->widenColumn( 'bean', 'id', R::$writer->scanType( 'abc' ) );
+			R::getWriter()->widenColumn( 'bean', 'id', R::getWriter()->scanType( 'abc' ) );
 		}
 			
 		$bean->id = 'abc';
@@ -185,11 +185,11 @@ class Update extends Base
 		try {
 			R::store( array() );
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
@@ -403,7 +403,7 @@ class Update extends Base
 			$redbean->trash( array() );
 
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 

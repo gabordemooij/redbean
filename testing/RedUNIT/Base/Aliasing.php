@@ -2,7 +2,7 @@
 namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException\Security as Security; 
+use \RedBeanPHP\RedException as RedException; 
 /**
  * RedUNIT_Base_Aliasing
  *
@@ -251,7 +251,7 @@ class Aliasing extends Base
 			$book->wrongProperty[] = $page;
 			R::store( $book );
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		} catch (\Exception $e ) {
 			fail();
@@ -309,7 +309,7 @@ class Aliasing extends Base
 				R::store( $book );
 
 				fail();
-			} catch ( Security $e ) {
+			} catch ( RedException $e ) {
 				pass();
 			} catch (\Exception $e ) {
 				fail();

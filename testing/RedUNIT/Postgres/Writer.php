@@ -27,7 +27,7 @@ class Writer extends Postgres
 	 */
 	public function testScanningAndCoding()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
@@ -145,7 +145,7 @@ class Writer extends Postgres
 	{
 		testpack( "Zero issue" );
 
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$redbean = $toolbox->getRedBean();
 
 		$bean = $redbean->dispense( "zero" );
@@ -186,7 +186,7 @@ class Writer extends Postgres
 	 */
 	public function testIssue9and10()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$redbean = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
 
@@ -247,7 +247,7 @@ class Writer extends Postgres
 	 */
 	public function testVaria()
 	{
-		$toolbox = R::$toolbox;
+		$toolbox = R::getToolBox();
 		$redbean = $toolbox->getRedBean();
 
 		$a = new AssociationManager( $toolbox );

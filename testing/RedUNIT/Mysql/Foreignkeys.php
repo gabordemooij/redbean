@@ -129,7 +129,7 @@ class Foreignkeys extends Mysql
 		asrt( $cols['project_id'], "tinyint(1) unsigned" );
 		asrt( $cols['invoice_id'], "tinyint(3) unsigned" );
 
-		R::$writer->addConstraint( $bean1, $bean2 );
+		R::getWriter()->addConstraint( $bean1, $bean2 );
 
 		$cols = R::getColumns( 'invoice_project' );
 

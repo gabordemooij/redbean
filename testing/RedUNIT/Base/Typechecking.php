@@ -2,7 +2,7 @@
 namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException\Security as Security;
+use \RedBeanPHP\RedException as RedException;
 use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedUNIT_Base_Typechecking
@@ -95,7 +95,7 @@ class Typechecking extends Base
 	 */
 	public function testBeanTypeChecking()
 	{
-		$redbean = R::$redbean;
+		$redbean = R::getRedBean();
 
 		$bean    = $redbean->dispense( "page" );
 
@@ -107,7 +107,7 @@ class Typechecking extends Base
 			$redbean->store( $bean );
 
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 
@@ -115,7 +115,7 @@ class Typechecking extends Base
 			$redbean->check( $bean );
 
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 
@@ -125,7 +125,7 @@ class Typechecking extends Base
 			$redbean->check( $bean );
 
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 
@@ -138,7 +138,7 @@ class Typechecking extends Base
 			$redbean->store( $bean );
 
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 
@@ -146,7 +146,7 @@ class Typechecking extends Base
 			$redbean->check( $bean );
 
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 
@@ -159,7 +159,7 @@ class Typechecking extends Base
 			$redbean->store( $bean );
 
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 
@@ -167,7 +167,7 @@ class Typechecking extends Base
 			$redbean->check( $bean );
 
 			fail();
-		} catch ( Security $e ) {
+		} catch ( RedException $e ) {
 			pass();
 		}
 	}

@@ -1311,6 +1311,16 @@ class Facade
 	{
 		return self::$adapter;
 	}
+	
+	/**
+	 * Returns the current duplication manager instance.
+	 * 
+	 * @return DuplicationManager
+	 */
+	public static function getDuplicationManager()
+	{	
+		return self::$duplicationManager;
+	}
 
 	/**
 	 * Optional accessor for neat code.
