@@ -37,10 +37,8 @@ class Relations extends Base
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( count( $book->ownPage ), 10 );
-		R::debug(1);
 		asrt( count( $book->withCondition(' pageno < 5 ')->ownPage ), 5 );
 		asrt( count( $book->ownPage ), 5 );
-		R::debug(0);
 		asrt( count( $book->all()->ownPage ), 10 );
 		asrt( count( $book->with(' LIMIT 3 ')->ownPage ), 3 );
 		asrt( count( $book->ownPage ), 3 );
