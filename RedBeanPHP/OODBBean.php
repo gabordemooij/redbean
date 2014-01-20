@@ -505,6 +505,17 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		return $this;
 	}
+	
+	/**
+	 * When prefix for a list, this causes the list to reload.
+	 * 
+	 * @return self
+	 */
+	public function all()
+	{
+		$this->withSql = '  ';
+		return $this;
+	}
 
 	/**
 	 * Prepares an own-list to use an alias. This is best explained using

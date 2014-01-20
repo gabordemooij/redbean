@@ -20,6 +20,38 @@ class Relations extends Base
 {
 
 	/**
+	 * Test whether ->all() reloads a list.
+	 * 
+	 * @return void
+	 */
+	public function testAllPrefix()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->ownPage = R::dispense( 'page', 10 );
+		$book->sharedTag = R::dispense( 'tag', 2 );
+		$i = 0;
+		foreach( $book->ownPage as $page ) {
+			$page->pageno = $i++;
+		}
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( count( $book->ownPage ), 10 );
+		R::debug(1);
+		asrt( count( $book->withCondition(' pageno < 5 ')->ownPage ), 5 );
+		asrt( count( $book->ownPage ), 5 );
+		R::debug(0);
+		asrt( count( $book->all()->ownPage ), 10 );
+		asrt( count( $book->with(' LIMIT 3 ')->ownPage ), 3 );
+		asrt( count( $book->ownPage ), 3 );
+		asrt( count( $book->all()->ownPage ), 10 );
+		asrt( count( $book->sharedTag ), 2 );
+		asrt( count( $book->with( ' LIMIT 1 ' )->sharedTag ), 1 );
+		asrt( count( $book->sharedTag ), 1 );
+		asrt( count( $book->all()->sharedTag ), 2 );
+	}
+	
+	/**
 	 * Test Relations and conditions.
 	 * 
 	 * @return void
