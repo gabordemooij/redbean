@@ -120,14 +120,5 @@ class Namedparams extends Base
 
 		asrt( count( $books ), 1 );
 		
-		//also check with preloader
-		$book = $book->fresh();
-		R::preload( $book,
-				array( 'ownPage' => 
-					array( 'page', 
-						array( ' title = :title ', 
-							array(':title'=>'page')))));
-
-		asrt( count($book->ownPage), 1 );
 	}
 }

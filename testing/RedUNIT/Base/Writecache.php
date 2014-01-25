@@ -33,6 +33,8 @@ class Writecache extends Base
 	public function testCachingEffects()
 	{
 		testpack( 'Testing WriteCache Query Writer Cache' );
+		
+		R::useWriterCache( FALSE );
 
 		R::debug( true, 1 );
 		$logger = R::getDatabaseAdapter()->getDatabase()->getLogger();

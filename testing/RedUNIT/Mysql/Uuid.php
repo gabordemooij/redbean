@@ -140,10 +140,5 @@ class Uuid extends Mysql
 		$page3 = R::findOne( 'page', ' title = ? ', array( 'page 1 of book 2' ) );
 		asrt( $page3->id, $page3ID );
 		asrt( $page3->book->id, $book2ID );
-
-		R::each($page2->fresh(), 'book', function( $page, $book ) use ( $page2ID, $book1ID ) {
-			asrt( $page->id, $page2ID );
-			asrt( $book->id, $book1ID );
-		});
 	}
 }

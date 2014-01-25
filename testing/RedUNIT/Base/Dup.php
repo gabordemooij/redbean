@@ -369,33 +369,6 @@ class Dup extends Base
 
 		$texts = R::find( 'text' );
 
-		R::preload( $texts, 'page,*.book,*.author' );
-
-		$objects = ( R::exportAll( $texts, TRUE ) );
-
-		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), TRUE );
-		asrt( isset( $objects[0]['page']['sharedBookmark'] ), FALSE );
-
-		$texts = R::find( 'text' );
-
-		R::preload( $texts, array( 'page', 'page.sharedBookmark' => 'bookmark' ) );
-
-		$objects = ( R::exportAll( $texts, TRUE ) );
-
-		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), TRUE );
-		asrt( isset( $objects[0]['page']['sharedBookmark'] ), TRUE );
-		asrt( isset( $objects[0]['page']['sharedBookmark'][0]['ownNote'] ), FALSE );
-
-		$texts = R::find( 'text' );
-
-		R::preload( $texts, array( 'page', 'page.sharedBookmark' => 'bookmark', 'page.sharedBookmark.ownNote' => 'note' ) );
-
-		$objects = ( R::exportAll( $texts, TRUE ) );
-
-		asrt( isset( $objects[0]['page']['book']['author']['publisher'] ), TRUE );
-		asrt( isset( $objects[0]['page']['sharedBookmark'] ), TRUE );
-		asrt( isset( $objects[0]['page']['sharedBookmark'][0]['ownNote'] ), TRUE );
-
 		R::getDuplicationManager()->setCacheTables( FALSE );
 
 		testpack( 'Keyless export' );
