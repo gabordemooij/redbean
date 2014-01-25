@@ -995,83 +995,41 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		return $this->fetchAs( $this->$field );
 	}
 
-
 	/**
-	 * Treats the bean like a node in a tree and searches for all
-	 * nested or parent beans.
-	 *
-	 * To get all parent pages of a page:
-	 *
-	 * $parentPages = $page->searchIn('page');
-	 *
-	 * To get all child pages:
-	 *
-	 * $pages = $parentPage->searchIn('ownPage');
-	 *
-	 * When searching in lists you can use SQL snippets in withCondition():
-	 *
-	 * $pages = $parentPage
-	 *     ->withCondition(' rank = ? ', array($rank))
-	 *     ->searchIn('ownPage');
-	 *
-	 * Also works with alias() and fetchAs().
-	 * Note that shared lists are NOT supported.
-	 *
-	 * @param string $property property/list to search
-	 *
-	 * @return array
+	 * Traverses a bean property with the specified function.
+	 * Recursively iterates through the property invoking the
+	 * function for each bean along the way passing the bean to it.
+	 * 
+	 * Can be used together with with, withCondition, alias and fetchAs.
+	 * 
+	 * @param string  $property property
+	 * @param closure $function function
+	 * 
+	 * @return OODBBean
 	 */
-	public function searchIn($property)
+	public function traverse( $property, $function )
 	{
-		if ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
-			throw new RedException( 'Cannot search a shared list recursively.' );
-		}
-
 		$oldFetchType = $this->fetchType;
 		$oldAliasName = $this->aliasName;
 		$oldWith      = $this->withSql;
 		$oldBindings  = $this->withParams;
+		
+		$beans = $this->$property;
+		if ( !is_array( $beans ) ) $beans = array( $beans );
 
-		unset( $this->__info["sys.parentcache.$property"] );
-
-		$beanOrBeans  = $this->$property;
-
-		if ( $beanOrBeans instanceof OODBBean ) {
-			$bean  = $beanOrBeans;
-			$key   = $bean->properties['id'];
-			$beans = array( $key => $bean );
-		} elseif ( is_null( $beanOrBeans ) ) {
-			$beans = array();
-		} else {
-			$beans = $beanOrBeans;
-		}
-
-		unset( $this->properties[$property] );
-		unset( $this->__info["sys.shadow.$property"] );
-
-		if ( $oldWith === '' ) {
-			$ufbeans = $beans;
-		} else {
-			$this->fetchType = $oldFetchType;
-			$this->aliasName = $oldAliasName;
-			$ufbeans         = $this->$property;
-
-			if ( is_null( $ufbeans ) ) $ufbeans = array();
-			if ( $ufbeans instanceof OODBBean ) $ufbeans = array( $ufbeans );
-		}
-
-		foreach( $ufbeans as $bean ) {
+		foreach( $beans as $bean ) {
+	
+			$function( $bean );
+			
 			$bean->fetchType  = $oldFetchType;
 			$bean->aliasName  = $oldAliasName;
 			$bean->withSql    = $oldWith;
 			$bean->withParams = $oldBindings;
-
-			$newBeans = $bean->searchIn( $property );
-
-			$beans = array_replace( $beans, $newBeans );
+			
+			$bean->traverse( $property, $function );
 		}
 
-		return $beans;
+		return $this;
 	}
 
 	/**
