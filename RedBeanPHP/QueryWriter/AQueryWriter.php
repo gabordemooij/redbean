@@ -40,7 +40,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	/**
 	 * @var boolean
 	 */
-	protected $flagUseCache = FALSE;
+	protected $flagUseCache = TRUE;
 
 	/**
 	 * @var array
