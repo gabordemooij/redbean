@@ -429,7 +429,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 
 		$lsql = ltrim( $sql );
 
-		if ( preg_match( '/^(AND|OR|WHERE|ORDER|GROUP|HAVING|LIMIT|OFFSET)\s+/i', $lsql ) ) {
+		if ( preg_match( '/^(INNER|LEFT|RIGHT|JOIN|AND|OR|WHERE|ORDER|GROUP|HAVING|LIMIT|OFFSET)\s+/i', $lsql ) ) {
 			if ( $glue === QueryWriter::C_GLUE_WHERE && stripos( $lsql, 'AND' ) === 0 ) {
 				$snippetCache[$key] = ' WHERE ' . substr( $lsql, 3 );
 			} else {
