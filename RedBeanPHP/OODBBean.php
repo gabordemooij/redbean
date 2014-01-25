@@ -373,24 +373,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * Exports the bean to an object.
-	 * This method exports the bean data to the specified object.
-	 * Only scalar values will be exported by this method.
-	 *
-	 * @param object $obj target object
-	 *
-	 * @return array
-	 */
-	public function exportToObj( $object )
-	{
-		foreach ( $this->properties as $key => $value ) {
-			if ( is_scalar( $value ) ) {
-				$object->$key = $value;
-			}
-		}
-	}
-
-	/**
 	 * Implements isset() function for use as an array.
 	 *
 	 * @param string $property name of the property you want to check

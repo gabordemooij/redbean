@@ -276,16 +276,6 @@ class Misc extends Blackhole
 
 		asrt( $s, 'candy!' );
 
-		$obj = new \stdClass;
-
-		$bean = R::dispense( 'bean' );
-
-		$bean->property1 = 'property1';
-
-		$bean->exportToObj( $obj );
-
-		asrt( $obj->property1, 'property1' );
-
 		R::debug( 1 );
 
 		flush();
