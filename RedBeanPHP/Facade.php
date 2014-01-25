@@ -1358,68 +1358,6 @@ class Facade
 	}
 
 	/**
-	 * Preloads certain properties for beans.
-	 * Understands aliases.
-	 *
-	 * Usage: 
-	 * 
-	 * R::preload($books, 'author');
-	 * 
-	 * - preloads all the authors of all books, 
-	 * saves you a query per for-each iteration
-	 * 
-	 * R::preload($books, array('coauthor'=>'author'));
-	 * 
-	 * - same but with alias
-	 * 
-	 * R::preload($texts,'page,page.book,page.book.author');
-    * 
-	 * - preloads all pages for the texts, the books and the authors
-	 * 
-	 * R::preload($texts,'page,*.book,*.author');
-	 * 
-	 * - same as above bit with short syntax (* means prefix with previous types)
-	 *
-	 * R::preload($p,'book,*.author,&.shelf');
-	 * 
-	 * - if author and shelf are on the same level use & instead of *.
-	 * 
-	 * The other way around is possible as well, to load child beans in own-lists or
-	 * shared-lists use:
-	 * 
-	 * R::preload($books,'ownPage|page,sharedGenre|genre');
-	 * 
-	 * @param array        $beans beans beans to use as a reference for preloading
-	 * @param array|string $types types to load, either string or array
-	 *
-	 * @return array
-	 */
-	public static function preload( $beans, $types, $closure = NULL )
-	{
-		return self::$redbean->preload( $beans, $types, $closure );
-	}
-
-	/**
-	 * Alias for preload.
-	 * Preloads certain properties for beans.
-	 * Understands aliases.
-	 * 
-	 * @see Facade::preload
-	 *
-	 * Usage: R::preload($books, array('coauthor'=>'author'));
-	 *
-	 * @param array        $beans   beans beans to use as a reference for preloading
-	 * @param array|string $types   types to load, either string or array
-	 * @param closure      $closure function to call
-	 * 
-	 * @return array
-	 */
-	public static function each( $beans, $types, $closure = NULL )
-	{
-		return self::preload( $beans, $types, $closure );
-	}
-
-	/**
 	 * Facade method for AQueryWriter::renameAssociation()
 	 *
 	 * @param string|array $from

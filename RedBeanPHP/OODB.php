@@ -1071,35 +1071,4 @@ class OODB extends Observable
 	{
 		$this->assocManager = $assocManager;
 	}
-
-	/**
-	 * Preloads certain properties for beans.
-	 * Understands aliases.
-	 *
-	 * Usage: $redbean->preload($books, array('coauthor'=>'author'));
-	 *
-	 * Usage for nested beans:
-	 *
-	 * $redbean->preload($texts, array('page', 'page.book', 'page.book.author'));
-	 *
-	 * preloads pages, books and authors.
-	 * You may also use a shortcut here:
-	 *
-	 * $redbean->preload($texts, array('page', '*.book', '*.author'));
-	 *
-	 * Can also load preload lists:
-	 *
-	 * $redbean->preload($books, array('ownPage'=>'page', '*.ownText'=>'text', 'sharedTag'=>'tag'));
-	 *
-	 * @param array $beans beans
-	 * @param array $types types to load
-	 *
-	 * @return array
-	 */
-	public function preload( $beans, $typeList, $closure = NULL )
-	{
-		$preloader = new Preloader( $this );
-
-		return $preloader->load( $beans, $typeList, $closure );
-	}
 }
