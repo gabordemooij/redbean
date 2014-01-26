@@ -1,6 +1,6 @@
 
 RedBeanPHP 
-Written by Gabor de Mooij (c) copyright 2009-2013
+Written by Gabor de Mooij
 
 RedBean is DUAL Licensed New BSD and GPLv2. You may choose the license that fits
 best for your project.
