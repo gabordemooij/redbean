@@ -23,7 +23,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 	 * Data types
 	 */
 	const C_DATATYPE_BOOL             = 0;
-	const C_DATATYPE_UINT8            = 1;
 	const C_DATATYPE_UINT32           = 2;
 	const C_DATATYPE_DOUBLE           = 3;
 	const C_DATATYPE_TEXT8            = 4;
@@ -114,7 +113,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 	{
 		$this->typeno_sqltype = array(
 			MySQL::C_DATATYPE_BOOL             => ' TINYINT(1) UNSIGNED ',
-			MySQL::C_DATATYPE_UINT8            => ' TINYINT(3) UNSIGNED ',
 			MySQL::C_DATATYPE_UINT32           => ' INT(11) UNSIGNED ',
 			MySQL::C_DATATYPE_DOUBLE           => ' DOUBLE ',
 			MySQL::C_DATATYPE_TEXT8            => ' VARCHAR(255) ',
@@ -206,10 +204,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 		if ( !$this->startsWithZeros( $value ) ) {
 			if ( $value === TRUE || $value === FALSE || $value === '1' || $value === '' ) {
 				return MySQL::C_DATATYPE_BOOL;
-			}
-
-			if ( is_numeric( $value ) && ( floor( $value ) == $value ) && $value >= 0 && $value <= 255 ) {
-				return MySQL::C_DATATYPE_UINT8;
 			}
 
 			if ( is_numeric( $value ) && ( floor( $value ) == $value ) && $value >= 0 && $value <= 4294967295 ) {

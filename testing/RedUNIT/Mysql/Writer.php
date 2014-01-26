@@ -49,7 +49,7 @@ class Writer extends \RedUNIT\Mysql
 		asrt( in_array( "id", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
 		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), FALSE );
 
-		$writer->addColumn( "testtable", "c1", 1 );
+		$writer->addColumn( "testtable", "c1", MySQL::C_DATATYPE_UINT32 );
 
 		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 2 );
 
@@ -70,8 +70,8 @@ class Writer extends \RedUNIT\Mysql
 		asrt( $writer->scanType( FALSE ), 0 );
 		asrt( $writer->scanType( NULL ), 0 );
 
-		asrt( $writer->scanType( 2 ), 1 );
-		asrt( $writer->scanType( 255 ), 1 );
+		asrt( $writer->scanType( 2 ), 2 );
+		asrt( $writer->scanType( 255 ), 2 ); //no more uint8
 		asrt( $writer->scanType( 256 ), 2 );
 
 		asrt( $writer->scanType( -1 ), 3 );
