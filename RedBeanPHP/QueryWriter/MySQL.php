@@ -202,7 +202,8 @@ class MySQL extends AQueryWriter implements QueryWriter
 		$value = strval( $value );
 
 		if ( !$this->startsWithZeros( $value ) ) {
-			if ( $value === TRUE || $value === FALSE || $value === '1' || $value === '' ) {
+			
+			if ( $value === TRUE || $value === FALSE || $value === '1' || $value === '' || $value === '0') {
 				return MySQL::C_DATATYPE_BOOL;
 			}
 

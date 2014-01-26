@@ -82,8 +82,6 @@ class Foreignkeys extends Mysql
 
 		$j1 = json_decode( $j, TRUE );
 		
-		print_r($j1);
-
 		$j2 = json_decode( $json, TRUE );
 
 		foreach ( $j1 as $jrow ) {
@@ -119,15 +117,15 @@ class Foreignkeys extends Mysql
 
 		$bean3 = R::getRedBean()->dispense( 'invoice_project' );
 
-		$bean3->project_id = 1;
-		$bean3->invoice_id = 2;
+		$bean3->project_id = false;
+		$bean3->invoice_id = true;
 
 		R::store( $bean3 );
 
 		$cols = R::getColumns( 'invoice_project' );
-
+		
 		asrt( $cols['project_id'], "tinyint(1) unsigned" );
-		asrt( $cols['invoice_id'], "tinyint(3) unsigned" );
+		asrt( $cols['invoice_id'], "tinyint(1) unsigned" );
 
 		R::getWriter()->addConstraint( $bean1, $bean2 );
 

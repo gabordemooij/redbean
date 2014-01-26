@@ -172,6 +172,10 @@ if ( $mode == 'all' ) {
 	foreach ( $allPacks as $pack ) {
 		if ( strpos( $pack, $mode ) === 0 ) $packList[] = $pack;
 	}
+	//Add plugin pack to list.
+	if (count($packList) === 0) {
+		$packList[] = $mode;
+	}
 }
 
 // Always include the last ones.
