@@ -183,6 +183,7 @@ $packList = array_merge( $packList, $suffix );
 foreach ( $packList as $testPack ) {
 	require_once( $path . $testPack . '.php' );
 
+	$testPack = str_replace( '../', '', $testPack );
 	$testClassName = str_replace( ' ', '\\', ( str_replace( '/', ' ', $testPack ) ) );
 
 	$testClass     = '\\RedUNIT\\' . ucfirst( $testClassName );
