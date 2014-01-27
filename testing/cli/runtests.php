@@ -134,6 +134,7 @@ $allPacks = array(
 	'Base/Chill',
 	'Base/With',
 	'Base/Misc',
+	'Base/Via',
 	'CUBRID/Setget',
 	'CUBRID/Writer',
 	'Mysql/Preexist',
