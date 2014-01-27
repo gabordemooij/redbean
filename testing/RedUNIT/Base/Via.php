@@ -43,13 +43,13 @@ class Via extends Base
 		$p2->employee = $e2;
 		$p2->arole = 'coder';
 
-		R::storeAll([$p1, $p2]);
+		R::storeAll(array( $p1, $p2 ));
 
 
 		$project = R::load('project', $x1->id);
 
 		$designers = $project
-				->withCondition(' participant.arole = ? ', ['designer'] )
+				->withCondition(' participant.arole = ? ', array( 'designer' ) )
 				->via( 'participant' )
 				->sharedEmployeeList;
 
@@ -59,7 +59,7 @@ class Via extends Base
 		
 		
 		$coders = $project
-				->withCondition(' participant.arole = ? ', ['coder'] )
+				->withCondition(' participant.arole = ? ', array( 'coder' ) )
 				->via( 'participant' )
 				->sharedEmployeeList;
 
