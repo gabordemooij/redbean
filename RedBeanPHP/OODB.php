@@ -1005,6 +1005,11 @@ class OODB extends Observable
 	 */
 	public function count( $type, $addSQL = '', $bindings = array() )
 	{
+		$type = strtolower( preg_replace( '/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $type ) );
+		if ( count( explode( '_', $type ) ) > 2 ) {
+			throw new RedException( 'Invalid type for count.' );
+		}
+		
 		try {
 			return (int) $this->writer->queryRecordCount( $type, array(), $addSQL, $bindings );
 		} catch ( SQL $exception ) {
