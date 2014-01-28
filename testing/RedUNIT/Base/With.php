@@ -26,6 +26,21 @@ class With extends Base
 	{
 		return array( 'mysql' );
 	}
+	
+	/**
+	 * Test all().
+	 * 
+	 * @return void
+	 */
+	public function testAll() 
+	{
+		$book = R::dispense( 'book' );
+		$book->ownPage = R::dispense( 'page', 10 );
+		R::store( $book );
+		asrt( count( $book->with( ' LIMIT 3 ' )->ownPage ), 3 );
+		asrt( count( $book->ownPage ), 3 );
+		asrt( count( $book->all()->ownPage ), 10 );
+	}
 
 	/**
 	 * Test embedded SQL snippets using with and withCondition.
