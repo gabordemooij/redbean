@@ -40,6 +40,10 @@ class With extends Base
 		asrt( count( $book->with( ' LIMIT 3 ' )->ownPage ), 3 );
 		asrt( count( $book->ownPage ), 3 );
 		asrt( count( $book->all()->ownPage ), 10 );
+		asrt( count( $book->ownPage ), 10 );
+		R::nuke();
+		asrt( count( $book->ownPage ), 10 );
+		asrt( count( $book->all()->ownPage ), 0 );
 	}
 
 	/**
