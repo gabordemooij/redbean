@@ -180,7 +180,7 @@ if ( $mode == 'all' ) {
 }
 
 // Always include the last ones.
-$packList = array_merge( $packList, $suffix );
+$packList = array_unique(array_merge( $packList, $suffix ));
 foreach ( $packList as $testPack ) {
 	require_once( $path . $testPack . '.php' );
 
@@ -192,7 +192,7 @@ foreach ( $packList as $testPack ) {
 	$test          = new $testClass();
 
 	$drivers       = $test->getTargetDrivers();
-
+	
 	$colorMap      = array( 
 		 'mysql'  => '0;31',
 		 'pgsql'  => '0;32',
@@ -227,7 +227,7 @@ foreach ( $packList as $testPack ) {
 			$test->prepare();
 			$test->run();
 			$test->cleanUp();
-		
+			
 			if ( isset ( $colorMap[$driver] ) ) {
 				echo "\033[0m";
 			}
