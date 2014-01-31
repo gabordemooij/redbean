@@ -322,7 +322,7 @@ class Aliasing extends Base
 	 * 
 	 * @return void
 	 */
-	public function aliasedFinder()
+	public function testAliasedFinder()
 	{
 		$message          = R::dispense( 'message' );
 		$message->subject = 'Roommate agreement';

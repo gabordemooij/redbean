@@ -593,54 +593,6 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
-	 * @see QueryWriter::queryRecordLinks
-	 */
-	public function queryRecordLinks( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() )
-	{
-		$addSql = $this->glueSQLCondition( $addSql, QueryWriter::C_GLUE_WHERE );
-
-		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
-
-		$key = $this->getCacheKey( array( $sourceType, $destType, implode( ',', $linkIDs ), $addSql, $bindings ) );
-
-		if ( $this->flagUseCache && $cached = $this->getCached( $linkTable, $key ) ) {
-			return $cached;
-		}
-
-		$inClause = $this->getParametersForInClause( $linkIDs, $bindings );
-
-		$selector = "{$linkTable}.*";
-
-		if ( $sourceType === $destType ) {
-			$inClause2 = $this->getParametersForInClause( $linkIDs, $bindings, count( $bindings ) ); //for some databases
-			$sql = "
-			SELECT {$selector} FROM {$linkTable}
-			INNER JOIN {$destTable} ON
-			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) ) OR
-			( {$destTable}.id = {$linkTable}.{$sourceCol} AND {$linkTable}.{$destCol} IN ($inClause2) )
-			{$addSql}
-			-- keep-cache";
-
-			$linkIDs = array_merge( $linkIDs, $linkIDs );
-		} else {
-			$sql = "
-			SELECT {$selector} FROM {$linkTable}
-			INNER JOIN {$destTable} ON
-			( {$destTable}.id = {$linkTable}.{$destCol} AND {$linkTable}.{$sourceCol} IN ($inClause) )
-			{$addSql}
-			-- keep-cache";
-		}
-
-		$bindings = array_merge( $linkIDs, $bindings );
-
-		$rows = $this->adapter->get( $sql, $bindings );
-
-		$this->putResultInCache( $linkTable, $key, $rows );
-
-		return $rows;
-	}
-
-	/**
 	 * @see QueryWriter::queryRecordLink
 	 */
 	public function queryRecordLink( $sourceType, $destType, $sourceID, $destID )

@@ -345,12 +345,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 				$vn = array();
 
 				foreach ( $value as $i => $b ) {
-					if ( is_numeric( $i ) ) {
-						$vn[] = $b->export( $meta, FALSE, FALSE, $filters );
-					} else {
-						$vn[$i] = $b->export( $meta, FALSE, FALSE, $filters );
-					}
-
+					$vn[] = $b->export( $meta, FALSE, FALSE, $filters );
 					$value = $vn;
 				}
 			} elseif ( $value instanceof OODBBean ) {
@@ -653,20 +648,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 			if ( !$bean ) {
 				$type = $this->getAlias( $property );
-
-				if ( $this->withSql !== '' ) {
-
-					$beans = $redbean->find(
-							  $type,
-							  array( 'id' => array( $this->properties[$fieldLink] ) ),
-							  $this->withSql, $this->withParams );
-
-					$bean             = ( empty( $beans ) ) ? NULL : reset( $beans );
-					$this->withSql    = '';
-					$this->withParams = '';
-				} else {
-					$bean = $redbean->load( $type, $this->properties[$fieldLink] );
-				}
+				$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 			}
 
 			$this->properties[$property] = $bean;

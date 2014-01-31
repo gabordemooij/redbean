@@ -192,20 +192,6 @@ interface QueryWriter
 	public function queryRecordRelated( $sourceType, $destType, $linkID, $addSql = '', $bindings = array() );
 
 	/**
-	 * Returns linking records. This method is used to obtain records using a link table and
-	 * allows the SQL snippets to reference columns in the link table for additional filtering or ordering.
-	 *
-	 * @param string $sourceType source type, the reference type you want to use to fetch related items on the other side
-	 * @param string $destType   destination type, the target type you want to get beans of
-	 * @param mixed  $linkID     ID to use for the link table
-	 * @param string $addSql     Additional SQL snippet
-	 * @param array  $bindings   Bindings for SQL snippet
-	 *
-	 * @return array
-	 */
-	public function queryRecordLinks( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() );
-
-	/**
 	 * Returns the row that links $sourceType $sourcID to $destType $destID in an N-M relation.
 	 *
 	 * @param string $sourceType source type, the first part of the link you're looking for

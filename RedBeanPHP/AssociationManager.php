@@ -78,38 +78,12 @@ class AssociationManager extends Observable
 	 */
 	private function relatedRows( $bean, $type, $getLinks = FALSE, $sql = '', $bindings = array() )
 	{
-		if ( !is_array( $bean ) && !( $bean instanceof OODBBean ) ) {
-			throw new RedException(
-				'Expected array or OODBBean but got:' . gettype( $bean )
-			);
-		}
-
-		$ids = array();
-		if ( is_array( $bean ) ) {
-			$beans = $bean;
-			foreach ( $beans as $singleBean ) {
-				if ( !( $singleBean instanceof OODBBean ) ) {
-					throw new RedException(
-						'Expected OODBBean in array but got:' . gettype( $singleBean )
-					);
-				}
-				$ids[] = $singleBean->id;
-			}
-			$bean = reset( $beans );
-		} else {
-			$ids[] = $bean->id;
-		}
-
+		$ids = array( $bean->id );
 		$sourceType = $bean->getMeta( 'type' );
 		try {
-			if ( !$getLinks ) {
-				return $this->writer->queryRecordRelated( $sourceType, $type, $ids, $sql, $bindings );
-			} else {
-				return $this->writer->queryRecordLinks( $sourceType, $type, $ids, $sql, $bindings );
-			}
+			return $this->writer->queryRecordRelated( $sourceType, $type, $ids, $sql, $bindings );
 		} catch ( SQL $exception ) {
 			$this->handleException( $exception );
-
 			return array();
 		}
 	}
