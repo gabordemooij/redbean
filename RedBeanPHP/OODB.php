@@ -1013,7 +1013,9 @@ class OODB extends Observable
 		try {
 			return (int) $this->writer->queryRecordCount( $type, array(), $addSQL, $bindings );
 		} catch ( SQL $exception ) {
-			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( QueryWriter::C_SQLSTATE_NO_SUCH_TABLE ) ) ) {
+			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( 
+				 QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+				 QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ) ) ) {
 				throw $exception;
 			}
 		}
