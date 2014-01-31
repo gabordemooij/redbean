@@ -30,6 +30,21 @@ class Misc extends Blackhole
 	{
 		return array( 'sqlite' );
 	}
+
+	/**
+	* Should not be able to pass invalid mode (must be 0 or 1).
+	*
+	*/
+	public function testInvalidDebugModeException()
+	{
+		try {
+			R::debug( TRUE, 6 );
+			fail();
+		} catch ( RedException $e ) {
+			pass();
+		}
+		R::debug( FALSE );
+	}
 	
 	/**
 	 * Adding a database twice no longer allowed, causes confusion

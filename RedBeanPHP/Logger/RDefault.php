@@ -2,6 +2,7 @@
 
 namespace RedBeanPHP\Logger; 
 use RedBeanPHP\Logger as Logger;
+use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\Security as Security;
 
 /**
