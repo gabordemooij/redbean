@@ -1,7 +1,6 @@
 <?php 
 namespace RedBeanPHP; 
 use \RedBeanPHP\BeanHelper as BeanHelper;
-use \RedBeanPHP\SQLHelper as SQLHelper;
 use \RedBeanPHP\RedException\Security as Security; 
 /**
  * OODBBean (Object Oriented DataBase Bean)
@@ -444,20 +443,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * the additional SQL snippet will be merged into the final
 	 * query.
 	 *
-	 * @param string|SQLHelper $sql      SQL to be added to retrieval query.
-	 * @param array                    $bindings array with parameters to bind to SQL snippet
+	 * @param string $sql SQL to be added to retrieval query.
+	 * @param array       $bindings array with parameters to bind to SQL snippet
 	 *
 	 * @return OODBBean
 	 */
 	public function with( $sql, $bindings = array() )
 	{
-		if ( $sql instanceof SQLHelper ) {
-			list( $this->withSql, $this->withParams ) = $sql->getQuery();
-		} else {
-			$this->withSql    = $sql;
-			$this->withParams = $bindings;
-		}
-
+		$this->withSql    = $sql;
+		$this->withParams = $bindings;
 		return $this;
 	}
 
@@ -471,20 +465,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * This will return in the own list only the pages having 'chapter == 3'.
 	 *
-	 * @param string|SQLHelper $sql      SQL to be added to retrieval query (prefixed by AND)
-	 * @param array                    $bindings array with parameters to bind to SQL snippet
+	 * @param string $sql      SQL to be added to retrieval query (prefixed by AND)
+	 * @param array  $bindings array with parameters to bind to SQL snippet
 	 *
 	 * @return OODBBean
 	 */
 	public function withCondition( $sql, $bindings = array() )
 	{
-		if ( $sql instanceof SQLHelper ) {
-			list( $sql, $bindings ) = $sql->getQuery();
-		}
-
 		$this->withSql    = ' AND ' . $sql;
 		$this->withParams = $bindings;
-
 		return $this;
 	}
 	

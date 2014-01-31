@@ -3,7 +3,6 @@ namespace RedBeanPHP;
 use \RedBeanPHP\ToolBox as ToolBox;
 use \RedBeanPHP\OODB as OODB;
 use \RedBeanPHP\RedException\Security as Security;
-use \RedBeanPHP\SQLHelper as SQLHelper;
 use \RedBeanPHP\OODBBean as OODBBean; 
 /**
  * RedBean Finder
@@ -59,10 +58,6 @@ class Finder
 	 */
 	public function find( $type, $sql = NULL, $bindings = array() )
 	{
-		if ( $sql instanceof SQLHelper ) {
-			list( $sql, $bindings ) = $sql->getQuery();
-		}
-
 		if ( !is_array( $bindings ) ) {
 			throw new RedException(
 				'Expected array, ' . gettype( $bindings ) . ' given.'
