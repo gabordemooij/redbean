@@ -133,6 +133,7 @@ $allPacks = array(
 	'Base/Count',
 	'Base/Chill',
 	'Base/With',
+	'Base/Traverse',
 	'Base/Misc',
 	'Base/Via',
 	'CUBRID/Setget',
