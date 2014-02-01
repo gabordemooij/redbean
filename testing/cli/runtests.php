@@ -88,6 +88,11 @@ if ( $arguments > 1 ) {
 	$mode = $_SERVER['argv'][1];
 }
 
+$classSpec = null;
+if ( $arguments > 2 ) {
+	$classSpec = $_SERVER['argv'][2];
+}
+
 $path = 'RedUNIT/';
 
 // Possible Selections
@@ -186,10 +191,14 @@ foreach ( $packList as $testPack ) {
 	require_once( $path . $testPack . '.php' );
 
 	$testPack = str_replace( '../', '', $testPack );
-	$testClassName = str_replace( ' ', '\\', ( str_replace( '/', ' ', $testPack ) ) );
-
-	$testClass     = '\\RedUNIT\\' . ucfirst( $testClassName );
-
+	
+	if ($classSpec) {
+		$testClass = $classSpec;
+	} else {
+		$testClassName = str_replace( ' ', '\\', ( str_replace( '/', ' ', $testPack ) ) );
+		$testClass     = '\\RedUNIT\\' . ucfirst( $testClassName );
+	}
+		
 	$test          = new $testClass();
 
 	$drivers       = $test->getTargetDrivers();
