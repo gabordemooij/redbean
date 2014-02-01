@@ -187,12 +187,14 @@ if ( $mode == 'all' ) {
 
 // Always include the last ones.
 $packList = array_unique(array_merge( $packList, $suffix ));
+$j = 0;
 foreach ( $packList as $testPack ) {
+	$j ++;
 	require_once( $path . $testPack . '.php' );
 
 	$testPack = str_replace( '../', '', $testPack );
 	
-	if ($classSpec) {
+	if ($j === 1 && $classSpec) {
 		$testClass = $classSpec;
 	} else {
 		$testClassName = str_replace( ' ', '\\', ( str_replace( '/', ' ', $testPack ) ) );
