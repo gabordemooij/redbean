@@ -277,19 +277,6 @@ class Misc extends Blackhole
 
 		testpack( 'Misc Tests' );
 
-		try {
-			$candy = R::dispense( 'CandyBar' );
-
-			fail();
-		} catch ( RedException $e ) {
-			pass();
-		}
-
-		$candy = R::dispense( 'candybar' );
-
-		$s = strval( $candy );
-
-		asrt( $s, 'candy!' );
 
 		R::debug( 1 );
 
