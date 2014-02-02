@@ -81,7 +81,7 @@ class Finder
 	{
 		$arr = array();
 		foreach ( $this->find( $type, $sql, $bindings ) as $key => $item ) {
-			$arr[$key] = $item->export();
+			$arr[] = $item->export();
 		}
 
 		return $arr;

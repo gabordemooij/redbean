@@ -155,4 +155,25 @@ class Finding extends Base {
 		$id = R::store( $page[0] );
 		$book = $page[9]->book;
 	}
+
+	/**
+	 * Test find and export.
+	 * 
+	 * @return void
+	 */
+	public function testFindAndExport()
+	{
+		R::nuke();
+		$pages = R::dispense( 'page', 3 );
+		$i = 1;
+		foreach( $pages as $page ) {
+			$page->pageNumber = $i++;
+		}
+		R::storeAll( $pages );
+		$pages = R::findAndExport( 'page' );
+		asrt( is_array( $pages ), TRUE );
+		asrt( isset( $pages[0] ), TRUE );
+		asrt( is_array( $pages[0] ), TRUE );
+		asrt( count( $pages ), 3 );
+	}
 }
