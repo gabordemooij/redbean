@@ -118,4 +118,25 @@ class Count extends Base
 			}
 		}
 	}
+	
+	public function testCountShared() {
+		
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->sharedPageList = R::dispense( 'page', 5 );
+		R::store( $book );
+		asrt( $book->countShared('page'), 5 );
+		asrt( $book->countShared('leaflet'), 0 );
+		asrt( R::dispense( 'book' )->countShared('page'), 0 );
+		$am = R::getRedBean()->getAssociationManager();
+		asrt( $am->relatedCount( R::dispense( 'book' ), 'page' ), 0);
+		try {
+			$am->relatedCount( 'not a bean', 'type' );
+			fail();
+		} catch( RedException $e ) {
+			pass();
+		}
+		
+	}
+	
 }
