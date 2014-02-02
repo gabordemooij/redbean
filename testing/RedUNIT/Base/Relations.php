@@ -500,7 +500,7 @@ class Relations extends Base
 	 * 
 	 * @return void
 	 */
-	public function test_ListAddDelete()
+	public function testListAddDelete()
 	{
 		testpack( 'Test list add/delete scenarios.' );
 
