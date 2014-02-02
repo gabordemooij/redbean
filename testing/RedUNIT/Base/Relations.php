@@ -1475,6 +1475,13 @@ class Relations extends Base
 			pass();
 		}
 		
+		$book->sharedPageList = R::dispense( 'page', 2 );
+		R::store( $book );
+		$book->sharedPageList;
+		R::trash( $book );
+		asrt( R::count('page'), 2 );
 	}
+	
+	
 	
 }

@@ -77,6 +77,43 @@ class Misc extends Blackhole
 		restore_error_handler();
 		pass();
 	}
+	
+	/**
+	 * Tests setProperty.
+	 * 
+	 * @return void
+	 */
+	public function testSetProperty()
+	{
+		$bean = R::dispense( 'bean' );
+		$bean->item = 2;
+		$bean->ownBean = R::dispense( 'bean', 2 );
+		R::store( $bean );
+		$bean = $bean->fresh();
+		$bean->ownBean;
+		
+		$bean->setProperty( 'ownBean', array(), FALSE, FALSE );
+		asrt( count( $bean->ownBean ), 0 );
+		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 2 );
+		asrt( $bean->isTainted(), TRUE );
+		
+		$bean->setProperty( 'ownBean', array(), TRUE, FALSE );
+		asrt( count( $bean->ownBean ), 0 );
+		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 0 );
+		asrt( $bean->isTainted(), TRUE );
+		
+		$bean = $bean->fresh();
+		$bean->setProperty( 'ownBean', array(), TRUE, FALSE );
+		asrt( count( $bean->ownBean ), 0 );
+		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 0 );
+		asrt( $bean->isTainted(), FALSE );
+		
+		$bean = $bean->fresh();
+		$bean->setProperty( 'ownBean', array(), TRUE, TRUE );
+		asrt( count( $bean->ownBean ), 0 );
+		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 0 );
+		asrt( $bean->isTainted(), TRUE );
+	}
 
 	/**
 	 * Tests beansToArray().
