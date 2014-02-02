@@ -461,6 +461,15 @@ class Misc extends Blackhole
 		asrt( is_array( $bean->{'own item'} ), FALSE );
 		asrt( is_array( $bean->{'shared Item'} ), FALSE );
 	}
+	
+	public function testConv2Beans()
+	{
+		$row1 = array('id' => 1, 'title'=>'test');
+		$row2 = array('id' => 2, 'title'=>'test2');
+		$beans = R::convertToBeans('page', array($row1, $row2));
+		asrt(count($beans), 2);
+		asrt($beans[2]->title, 'test2');
+	}
 }
 
 /**
