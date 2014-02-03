@@ -31,6 +31,8 @@ class Fuse extends Base
 		$bean = R::dispense('band')->box();
 		asrt( ( $bean instanceof \Model_Band ), TRUE );
 		asrt( ( $bean->getNote('injected') ), 'dependency' );
+
+		SimpleFacadeBeanHelper::setFactoryFunction( NULL );
 	}
 	
 	/**
