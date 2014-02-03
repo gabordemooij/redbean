@@ -205,6 +205,28 @@ class Writecache extends Base
 
 		// Now the same, auto flushed
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
+		
+		$page = R::dispense('page');
+		$book->sharedPage[] = $page;
+		
+		R::store( $book );
+		
+		$logger->clear();
+		$link = R::getWriter()->queryRecordLink( 'book', 'page', $book->id, $page->id );
+		
+		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
+		
+		$link = R::getWriter()->queryRecordLink( 'book', 'page', $book->id, $page->id );
+		
+		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
+		
+		R::getWriter()->setUseCache( FALSE );
+
+		$link = R::getWriter()->queryRecordLink( 'book', 'page', $book->id, $page->id );
+		
+		asrt( count( $logger->grep( 'SELECT' ) ), 2 );
+		
+		R::getWriter()->setUseCache( TRUE );
 	}
 
 	/**
