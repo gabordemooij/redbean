@@ -470,6 +470,35 @@ class Misc extends Blackhole
 		asrt(count($beans), 2);
 		asrt($beans[2]->title, 'test2');
 	}
+
+	/**
+	* Test the most important invalid bean combinations.
+	*
+	* @return void
+	*/
+	public function testInvalidType()
+	{
+		$invalid = array(
+			'book_page', //no link beans
+			'a_b_c', //no prefix
+			'a b', //no space
+			'bean@', //no invalid symbols
+			'bean#', //no invalid symbols
+			'bean$', //sometimes used in DB, not allowed
+			'__bean',//no prefixes
+			'.bean', //no object notation
+			'bean-item', //no dash
+			'beanOther'); //no camelcase (uppercase because of file system issues)
+
+		foreach( $invalid as $j ) {
+			try {
+				R::dispense( $j );
+				fail();	
+			} catch( RedException $e ) {
+				pass();
+			}
+		}
+	}
 }
 
 /**
