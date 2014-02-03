@@ -499,6 +499,25 @@ class Misc extends Blackhole
 			}
 		}
 	}
+
+	/**
+	* Test whether batch still works if no IDs have been passed.
+	* 
+	* @return void
+	*/
+	public function testBatch0()
+	{
+		$zero = R::batch( 'page', array() );
+		asrt( is_array( $zero ), TRUE );
+		asrt( count( $zero ), 0 );
+		$zero = R::batch( 'page', FALSE );
+		asrt( is_array( $zero ), TRUE );
+		asrt( count( $zero ), 0 );
+		$zero = R::batch( 'page', NULL);
+		asrt( is_array( $zero ), TRUE );
+		asrt( count( $zero ), 0 );
+	}
+
 }
 
 /**
