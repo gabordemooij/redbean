@@ -56,6 +56,8 @@ class ObserverMock implements \RedBeanPHP\Observer
 class Model_Band extends RedBeanPHP\SimpleModel
 {
 	public function after_update() { }
+	
+	private $notes = array();
 
 	/**
 	 * @throws Exception
@@ -92,6 +94,32 @@ class Model_Band extends RedBeanPHP\SimpleModel
 	public function checkProperty( $prop )
 	{
 		return isset( $this->$prop );
+	}
+	
+	/**
+	 * Sets a note.
+	 * 
+	 * @param string $note
+	 *
+	 * @param mixed $value
+	 *
+	 * @return void
+	 */
+	public function setNote( $note, $value )
+	{
+		$this->notes[ $note ] = $value;
+	}
+	
+	/**
+	 * Returns the value of a note.
+	 * 
+	 * @param string $note
+	 *
+	 * @return string
+	 */
+	public function getNote( $note )
+	{
+		return $this->notes[ $note ];
 	}
 }
 

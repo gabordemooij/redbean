@@ -75,7 +75,8 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 * @return SimpleModel
 	 */
 	public static function factory($modelClassName) {
-		return ( self::$factory ) ? $factory( $modelClassName ) : new $modelClassName();
+		$factory = self::$factory;
+		return ( $factory ) ? $factory( $modelClassName ) : new $modelClassName();
 	}
 	
 	/**

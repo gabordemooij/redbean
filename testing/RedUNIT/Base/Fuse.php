@@ -3,7 +3,9 @@ namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use \RedBeanPHP\ModelHelper as ModelHelper;
-use \RedBeanPHP\RedException as RedException; 
+use \RedBeanPHP\RedException as RedException;
+use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 /**
  * RedUNIT_Base_Fuse
  *
@@ -18,6 +20,19 @@ use \RedBeanPHP\RedException as RedException;
  */
 class Fuse extends Base
 {
+	public function testFactory()
+	{
+		SimpleFacadeBeanHelper::setFactoryFunction( function( $name ) {
+			$model = new $name();
+			$model->setNote( 'injected', 'dependency' );
+			return $model;
+		} );
+		
+		$bean = R::dispense('band')->box();
+		asrt( ( $bean instanceof \Model_Band ), TRUE );
+		asrt( ( $bean->getNote('injected') ), 'dependency' );
+	}
+	
 	/**
 	 * Test FUSE and model formatting.
 	 * 
