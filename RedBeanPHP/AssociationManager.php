@@ -50,7 +50,7 @@ class AssociationManager extends Observable
 	 */
 	private function handleException(\Exception $exception )
 	{
-		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
+		if ( $this->oodb->isFrozen() || !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
 				QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN )

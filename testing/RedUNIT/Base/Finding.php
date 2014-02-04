@@ -5,6 +5,7 @@ use RedBeanPHP\Facade as R;
 use \RedBeanPHP\AssociationManager as AssociationManager;
 use \RedBeanPHP\OODB as OODB;
 use \RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException\SQL as SQL;
 /**
  * RedUNIT_Base_Finding
  *
@@ -175,5 +176,78 @@ class Finding extends Base {
 		asrt( isset( $pages[0] ), TRUE );
 		asrt( is_array( $pages[0] ), TRUE );
 		asrt( count( $pages ), 3 );
+	}
+
+	/**
+	* Test error handling of SQL states.
+	* 
+	* @return void
+	*/
+	public function testFindError()
+	{
+		R::freeze( FALSE );
+
+		$page = R::dispense( 'page' );
+		$page->title = 'abc';
+		R::store( $page );
+
+		//Column does not exist, in fluid mode no error!
+		try {
+			R::find( 'page', ' xtitle = ? ', array( 'x' ) );
+			pass();
+		} catch ( SQL $e ) {
+			fail();
+		}
+
+		//Table does not exist, in fluid mode no error!
+		try {
+			R::find( 'pagex', ' title = ? ', array( 'x' ) );
+			pass();
+		} catch ( SQL $e ) {
+			fail();
+		}
+
+		//Syntax error, error in fluid mode if possible to infer from SQLSTATE (MySQL/Postgres)
+		try {
+			R::find( 'page', ' invalid SQL ' );
+			//In SQLite only get HY000 - not very descriptive so suppress more errors in fluid mode then.
+			if ( 
+			$this->currentlyActiveDriverID === 'sqlite' 
+			|| $this->currentlyActiveDriverID === 'CUBRID' ) {
+				pass();
+			} else {
+				fail();
+			}
+		} catch ( SQL $e ) {
+			pass();
+		}
+
+		//Frozen, always error...
+		R::freeze( TRUE );
+
+		//Column does not exist, in frozen mode error!
+		try {
+			R::find( 'page', ' xtitle = ? ', array( 'x' ) );
+			fail();
+		} catch ( SQL $e ) {
+			pass();
+		}
+
+		//Table does not exist, in frozen mode error!
+		try {
+			R::find( 'pagex', ' title = ? ', array( 'x' ) );
+			fail();
+		} catch ( SQL $e ) {
+			pass();
+		}
+
+		//Syntax error, in frozen mode error!
+		try {
+			R::find( 'page', ' invalid SQL ' );
+			fail();
+		} catch ( SQL $e ) {
+			pass();
+		}
+		R::freeze( FALSE );
 	}
 }

@@ -2,7 +2,8 @@
 namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\OODBBean as OODBBean; 
+use \RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\RedException\SQL as SQL;
 /**
  * RedUNIT_Base_Batch
  *
@@ -26,6 +27,7 @@ class Batch extends Base
 	 */
 	public function testBatch()
 	{
+		R::freeze( FALSE );
 		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
@@ -79,7 +81,6 @@ class Batch extends Base
 
 		asrt( is_array( $a ), TRUE );
 		asrt( count( $a ), 0 );
-
 		$a = $redbean->batch( 'triangle', 1 );
 
 		asrt( is_array( $a ), TRUE );
@@ -91,14 +92,13 @@ class Batch extends Base
 
 		asrt( is_array( $a ), TRUE );
 		asrt( count( $a ), 0 );
-
-		$a = $redbean->batch( 'triangle', 1 );
-
-		asrt( is_array( $a ), TRUE );
-		asrt( count( $a ), 0 );
-
+		try {
+			$a = $redbean->batch( 'triangle', 1 );
+			fail();
+		} catch(SQL $e) {
+			pass();
+		}
 		R::freeze( FALSE );
-
 		asrt( R::wipe( 'spaghettimonster' ), FALSE );
 	}
 
