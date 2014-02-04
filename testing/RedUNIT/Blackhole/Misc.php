@@ -2,7 +2,6 @@
 namespace RedUNIT\Blackhole;
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-
 use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\Driver\RPDO as RPDO;
 use \RedBeanPHP\Logger\RDefault as RDefault;
@@ -392,7 +391,8 @@ class Misc extends Blackhole
 
 		$pdo = new\PDO( 'sqlite:test.db' );
 
-		R::setup( $pdo );
+		R::addDatabase( 'pdo', $pdo );
+		R::selectDatabase( 'pdo' );
 
 		R::getCell('SELECT 123;');
 		
@@ -516,6 +516,41 @@ class Misc extends Blackhole
 		$zero = R::batch( 'page', NULL);
 		asrt( is_array( $zero ), TRUE );
 		asrt( count( $zero ), 0 );
+	}
+
+	/**
+	* Test whether connection failure does not reveal
+	* credentials.
+	* 
+	* @return void
+	*/
+	public function testConnect()
+	{
+		$driver = new RPDO( 'dsn:invalid', 'usr', 'psst' );
+		try {
+			$driver->connect();
+			fail();
+		}
+		catch( \PDOException $e ) {
+			asrt( strpos( $e->getMessage(), 'invalid' ), FALSE );
+			asrt( strpos( $e->getMessage(), 'usr' ), FALSE );
+			asrt( strpos( $e->getMessage(), 'psst' ), FALSE );
+		}
+	}
+
+	/**
+	* Test whether we can create an instant database using
+	* R::setup().
+	*
+	* Probably only works on *NIX systems.
+	*
+	* @return void
+	*/
+	public function testSetup()
+	{
+		$tmpDir = sys_get_temp_dir();
+		R::setup();
+		asrt( file_exists( $tmpDir . '/red.db' ), TRUE );
 	}
 
 }
