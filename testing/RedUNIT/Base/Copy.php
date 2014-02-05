@@ -31,13 +31,14 @@ class Copy extends Base
 		R::store( $document );
 
 		$duplicate = R::dup( $document );
-
-		R::store( $duplicate );
+		pass(); //if RB cant handle this is will crash (nesting level error from PHP).
+		
+		$id2 = R::store( $duplicate );
 
 		$duplicate = R::load( 'document', $id );
 
 		asrt( (int) $document->document_id, $id );
-		asrt( (int) $duplicate->document_id, $id );
+		asrt( (int) $duplicate->document_id, $id2 );
 
 		// Export variant
 		$duplicate = R::exportAll( $document );

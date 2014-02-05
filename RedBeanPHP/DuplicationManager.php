@@ -202,8 +202,7 @@ class DuplicationManager
 
 		$copy = $this->createCopy( $bean );
 		foreach ( $this->tables as $table ) {
-			if ( $table == $type ) continue;
-
+			
 			if ( !empty( $this->filters ) ) {
 				if ( !in_array( $table, $this->filters ) ) continue;
 			}
