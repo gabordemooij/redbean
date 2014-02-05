@@ -104,9 +104,10 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 				$adapter->exec( $sql1 );
 
 				$adapter->exec( $sql2 );
+				return TRUE;
 			}
 
-			return TRUE;
+			return FALSE;
 		} catch (\Exception $e ) {
 			return FALSE;
 		}

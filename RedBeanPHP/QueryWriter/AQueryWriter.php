@@ -790,7 +790,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	{
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType, TRUE );
 
-		$this->constrain( $linkTable, $sourceTable, $destTable, $sourceCol, $destCol );
+		return $this->constrain( $linkTable, $sourceTable, $destTable, $sourceCol, $destCol );
 	}
 
 	/**

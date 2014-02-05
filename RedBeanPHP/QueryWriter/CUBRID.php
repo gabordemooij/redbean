@@ -71,8 +71,10 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	 */
 	protected function constrain( $table, $table1, $table2, $property1, $property2 )
 	{
-		$this->buildFK( $table, $table1, $property1, 'id', TRUE );
-		$this->buildFK( $table, $table2, $property2, 'id', TRUE );
+		$firstState  = $this->buildFK( $table, $table1, $property1, 'id', TRUE );
+		$secondState = $this->buildFK( $table, $table2, $property2, 'id', TRUE );
+		
+		return ( $firstState && $secondState );
 	}
 
 	/**
@@ -120,6 +122,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 		$casc = ( $isDep ? 'CASCADE' : 'SET NULL' );
 		$sql  = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
 		$this->adapter->exec( $sql );
+		return TRUE;
 	}
 
 	/**

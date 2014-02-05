@@ -18,7 +18,20 @@ use \RedBeanPHP\OODBBean as OODBBean;
  */
 class Relations extends Base
 {
-
+	/**
+	 * Test whether we can't add more than one FK.
+	 */
+	public function testDuplicateFK()
+	{
+		R::nuke();
+		list( $book, $page ) = R::dispenseAll( 'book,page' );
+		$book->sharedPage[] = $page;
+		R::store( $page );
+		R::store( $book );
+		$added = R::getWriter()->addConstraintForTypes( 'page', 'book' );
+		asrt( $added, FALSE );
+	}
+	
 	/**
 	 * Test whether ->all() reloads a list.
 	 * 
