@@ -36,6 +36,7 @@ require_once( 'RedUNIT/Postgres.php' );
 require_once( 'RedUNIT/Sqlite.php' );
 require_once( 'RedUNIT/CUBRID.php' );
 
+require_once( 'RedUNIT/Pretest.php' );
 
 //Configure the databases
 if ( isset( $ini['mysql'] ) ) {
