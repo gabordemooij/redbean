@@ -67,7 +67,6 @@ class AssociationManager extends Observable
 	 *
 	 * @param OODBBean $bean     reference bean
 	 * @param string           $type     target type
-	 * @param boolean          $getLinks TRUE returns rows from the link table
 	 * @param string           $sql      additional SQL snippet
 	 * @param array            $bindings bindings
 	 *
@@ -76,7 +75,7 @@ class AssociationManager extends Observable
 	 * @throws Security
 	 * @throws SQL
 	 */
-	private function relatedRows( $bean, $type, $getLinks = FALSE, $sql = '', $bindings = array() )
+	private function relatedRows( $bean, $type, $sql = '', $bindings = array() )
 	{
 		$ids = array( $bean->id );
 		$sourceType = $bean->getMeta( 'type' );
@@ -355,7 +354,7 @@ class AssociationManager extends Observable
 	{
 		$sql   = $this->writer->glueSQLCondition( $sql );
 
-		$rows  = $this->relatedRows( $bean, $type, FALSE, $sql, $bindings );
+		$rows  = $this->relatedRows( $bean, $type, $sql, $bindings );
 
 		$links = array();
 		foreach ( $rows as $key => $row ) {

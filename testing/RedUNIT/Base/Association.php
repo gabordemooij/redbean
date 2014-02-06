@@ -308,4 +308,43 @@ class Association extends Base
 		asrt( count( $wines[2]->sharedCheese ), 0 );
 		asrt( count( $wines[2]->sharedOlive ), 0 );
 	}
+
+
+	public function testErrorHandling()
+	{
+		R::nuke();
+		list( $book, $page ) = R::dispenseAll( 'book,page' );
+		$book->sharedPage[] = $page;
+		R::store( $page );
+
+		$redbean = R::getRedBean();
+		$am = $redbean->getAssociationManager();
+		
+		//SQLite and CUBRID do not comply with ANSI SQLState codes.
+		$catchAll = ( $this->currentlyActiveDriverID == 'sqlite' || $this->currentlyActiveDriverID === 'CUBRID' );
+
+		try {
+			$am->related( $book, 'page', 'invalid SQL' );
+			if ($catchAll) pass(); else fail();
+		} catch ( SQL $e ) {
+			if ($catchAll) fail(); else pass();
+		}
+
+		try {
+			$am->related( $book, 'cover');
+			pass();
+		} catch ( SQL $e ) {
+			fail();
+		}
+		
+		try {
+			$am->related( R::dispense('cover'), 'book' );
+			pass();
+		} catch ( SQL $e ) {
+			fail();
+		}
+
+	
+	}
+
 }
