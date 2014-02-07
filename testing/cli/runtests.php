@@ -94,6 +94,11 @@ if ( $arguments > 2 ) {
 	$classSpec = $_SERVER['argv'][2];
 }
 
+$covFilter = null;
+if ( $arguments > 3 ) {
+	$covFilter = $_SERVER['argv'][3];
+}
+
 $path = 'RedUNIT/';
 
 // Possible Selections
@@ -263,9 +268,14 @@ $covLines = array();
 foreach( $report as $file => $lines ) {
 	$pi = pathinfo( $file );
 	
-	if ( strpos( $file, 'phar/' ) === false ) continue;
-	if ( strpos( $file, '.php' ) === false ) continue;
-	if ( strpos( $file, 'RedBeanPHP' ) === false ) continue;
+	if ( $covFilter !== null ) {
+		echo " $file -> $covFilter ";
+		if ( strpos( $file, $covFilter ) === false ) continue;
+	} else {
+		if ( strpos( $file, 'phar/' ) === false ) continue;
+		if ( strpos( $file, '.php' ) === false ) continue;
+		if ( strpos( $file, 'RedBeanPHP' ) === false ) continue;
+	}
 
 	$covLines[] = '***** File:'.$file.' ******';
 	
@@ -291,7 +301,12 @@ foreach( $report as $file => $lines ) {
 }
 $covFile = implode( "\n", $covLines );
 @file_put_contents( 'cli/coverage_log.txt', $covFile );
-$perc = ( $hits / ( $hits + $misses ) ) * 100;
+
+if ( $hits > 0 ) {
+	$perc = ( $hits / ( $hits + $misses ) ) * 100;
+} else {
+	$perc = 0;
+}
 
 echo 'Code Coverage: '.PHP_EOL;
 echo 'Hits: '.$hits.PHP_EOL;
