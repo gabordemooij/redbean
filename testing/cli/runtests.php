@@ -38,6 +38,8 @@ require_once( 'RedUNIT/CUBRID.php' );
 
 require_once( 'RedUNIT/Pretest.php' );
 
+@include 'cli/test_hook.php';
+
 //Configure the databases
 if ( isset( $ini['mysql'] ) ) {
 	$dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";

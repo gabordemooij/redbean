@@ -16,6 +16,24 @@ namespace RedUNIT;
  */
 class Base extends RedUNIT
 {
+	
+	/**
+	 * List of DB drivers
+	 * 
+	 * @var array
+	 */
+	protected static $driverList = array( 'mysql', 'pgsql', 'sqlite', 'CUBRID', 'oracle' );
+	
+	/**
+	 * Adds a driver to the list.
+	 * 
+	 * @param string $driverID
+	 */
+	public static function addToDriverList( $driverID )
+	{
+		self::$driverList[] = $driverID;
+	}
+	
 	/**
 	 * What drivers should be loaded for this test pack?
 	 * 
@@ -23,6 +41,6 @@ class Base extends RedUNIT
 	 */
 	public function getTargetDrivers()
 	{
-		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID', 'oracle' );
+		return self::$driverList;
 	}
 }
