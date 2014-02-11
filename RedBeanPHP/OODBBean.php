@@ -276,6 +276,21 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
+	* Fast way to import a row.
+	* Does not perform any checks.
+	*
+	* @param array $row a database row
+	*
+	* @return self
+	*/
+	public function importRow( $row )
+	{
+		$this->properties = $row;
+		$this->__info['sys.orig'] = $row;
+		return $this;
+	}
+
+	/**
 	 * Imports data from another bean. Chainable.
 	 * Copies the properties from the source bean to the internal
 	 * property list.
