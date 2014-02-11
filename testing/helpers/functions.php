@@ -1,6 +1,29 @@
 <?php
 
 /**
+ * Convenience function for test hook.
+ * If you added the proper Writer class, the facade should be able
+ * to automatically load it, i.e. \RedBeanPHP\QueryWriter\MyWriter
+ * 
+ * @global array $ini
+ * 
+ * @param string $name name of the connection (key)
+ * @param string $dsn  DSN to connect
+ * @param string $user username
+ * @param string $pass passwords
+ */
+function add_writer_to_tests( $name, $dsn, $user, $pass )
+{
+
+	global $ini;
+	
+	\RedUNIT\Base::addToDriverList( $name );
+	R::addDatabase( $name, $dsn, $user, $pass );
+
+	$ini[ $name ] = true;
+}
+
+/**
  * A simple print function that works
  * both for CLI and HTML.
  *
