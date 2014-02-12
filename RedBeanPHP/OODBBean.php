@@ -267,7 +267,25 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		foreach ( $array as $key => $value ) {
 			if ( $key != '__info' ) {
 				if ( !$selection || ( $selection && in_array( $key, $selection ) ) ) {
-					$this->$key = $value;
+					if ( is_array($value ) ) {
+						if ( isset( $value['_type'] ) ) {
+							$bean = $this->beanHelper->getToolbox()->getRedBean()->dispense( $value['_type'] );
+							unset( $value['_type'] );
+							$bean->import($value);
+							$this->$key = $bean;
+						} else {
+							$listBeans = array();
+							foreach( $value as $listKey => $listItem ) {
+								$bean = $this->beanHelper->getToolbox()->getRedBean()->dispense( $listItem['_type'] );
+								unset( $listItem['_type'] );
+								$bean->import($listItem);
+								$list = &$this->$key;
+								$list[ $listKey ] = $bean;
+							}
+						}
+					} else {
+						$this->$key = $value;
+					}
 				}
 			}
 		}

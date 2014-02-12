@@ -19,6 +19,103 @@ use \RedBeanPHP\OODBBean as OODBBean;
 class Import extends Blackhole
 {
 	/**
+	 * Test recursive imports (formely known as R::graph).
+	 * 
+	 * @return void
+	 */
+	public function testRecursiveImport()
+	{
+		$book = R::dispense(
+			array(
+				'_type'=>'book', 
+				'title'=>'The magic book',
+				'ownPageList' => array(
+					 array(
+						'_type' => 'page',
+						'content'  => 'magic potions',
+					 ),
+					 array(
+						'_type' => 'page',
+						'content'  => 'magic spells',  
+					 )
+				)
+			)
+		);
+		
+		$id = R::store( $book );
+		$book = R::load( 'book', $id );
+		asrt( $book->title, 'The magic book' );
+		$pages = $book->with(' ORDER BY content ASC ')->ownPageList;
+		asrt( count($pages), 2 );
+		$page1 = array_shift( $pages );
+		asrt( $page1->content, 'magic potions' );
+		$page2 = array_shift( $pages );
+		asrt( $page2->content, 'magic spells' );
+		
+		R::nuke();
+		
+		$book = R::dispense(
+			array(
+				'_type'=>'book', 
+				'title'=>'The magic book',
+				'author' => array(
+					 '_type' => 'author',
+					 'name'  => 'Dr. Evil'
+				),
+				'coAuthor' => array(
+					 '_type' => 'author',
+					 'name'  => 'Dr. Creepy'
+				),
+				'ownPageList' => array(
+					 array(
+						'_type' => 'page',
+						'content'  => 'magic potions',
+						'ownRecipe' => array(
+							 'a' => array('_type'=>'recipe', 'name'=>'Invisibility Salad'),
+							 'b' => array('_type'=>'recipe', 'name'=>'Soup of Madness'),
+							 'c' => array('_type'=>'recipe', 'name'=>'Love cake'),
+						)
+					 ),
+					 array(
+						'_type' => 'page',
+						'content'  => 'magic spells',  
+					 )
+				),
+				'sharedCategory' => array(
+					 array(
+						  '_type' => 'category',
+						  'label' => 'wizardry'
+					 ),
+				)
+			)
+		);
+		
+		$id = R::store( $book );
+		$book = R::load( 'book', $id );
+		asrt( $book->title, 'The magic book' );
+		$pages = $book->with(' ORDER BY content ASC ')->ownPageList;
+		asrt( count($pages), 2 );
+		$page1 = array_shift( $pages );
+		asrt( $page1->content, 'magic potions' );
+		$page2 = array_shift( $pages );
+		asrt( $page2->content, 'magic spells' );
+		$recipes = $page1->with(' ORDER BY name ASC ')->ownRecipeList;
+		asrt( count( $recipes ), 3 );
+		$recipe1 = array_shift( $recipes );
+		asrt( $recipe1->name, 'Invisibility Salad' );
+		$recipe2 = array_shift( $recipes );
+		asrt( $recipe2->name, 'Love cake' );
+		$recipe3 = array_shift( $recipes );
+		asrt( $recipe3->name, 'Soup of Madness' );
+		$categories = $book->sharedCategoryList;
+		asrt( count($categories), 1 );
+		$category = reset( $categories );
+		asrt( $category->label, 'wizardry' );
+		asrt( $book->author->name, 'Dr. Evil' );
+		asrt( $book->fetchAs('author')->coAuthor->name, 'Dr. Creepy' );
+	}
+	
+	/**
 	 * Test import from and tainted.
 	 * 
 	 * @return void

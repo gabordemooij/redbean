@@ -489,13 +489,27 @@ class Facade
 	 *
 	 * @throws Security
 	 */
-	public static function dispense( $type, $num = 1 )
+	public static function dispense( $typeOrBeanArray, $num = 1 )
 	{
+		if ( is_array($typeOrBeanArray) && isset( $typeOrBeanArray['_type'] ) ) {
+			$import = $typeOrBeanArray;
+			$type = $import['_type'];
+			unset( $import['_type'] );
+		} else {
+			$type = $typeOrBeanArray;
+		}
+		
 		if ( !preg_match( '/^[a-z0-9]+$/', $type )) {
 			throw new RedException( 'Invalid type: ' . $type );
 		}
 
-		return self::$redbean->dispense( $type, $num );
+		$bean = self::$redbean->dispense( $type, $num );
+		
+		if ( isset( $import ) ) {
+			$bean->import( $import );
+		}
+		
+		return $bean;
 	}
 	
 	/**
@@ -1414,7 +1428,36 @@ class Facade
 		}
 		self::$plugins[$pluginName] = $callable;
 	}
-
+	
+	/**
+	 * Preloader.
+	 * 
+	 * @param array   $beans   beans
+	 * @param string  $preload preload operation
+	 * @param closure $closure closure
+	 * 
+	 * @return void
+	 */
+	public static function preload( $beans, $preload, $closure = NULL )
+	{
+		$preloader = new Preloader( self::getToolBox() );
+		$preloader->load($beans, $preload, $closure);
+	}
+	
+	/**
+	 * Preloader. Alias for preload().
+	 * 
+	 * @param array   $beans   beans
+	 * @param string  $preload preload operation
+	 * @param closure $closure closure
+	 * 
+	 * @return void
+	 */
+	public static function each( $beans, $preload, $closure = NULL )
+	{
+		self::preload( $beans, $preload, $closure );
+	}
+	
 	/**
 	 * Call static for use with dynamic plugins. This magic method will
 	 * intercept static calls and route them to the specified plugin.
