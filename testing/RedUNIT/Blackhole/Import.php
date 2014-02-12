@@ -2,7 +2,9 @@
 namespace RedUNIT\Blackhole;
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\RedException as RedException;
+
 /**
  * RedUNIT_Blackhole_Import
  *
@@ -113,6 +115,20 @@ class Import extends Blackhole
 		asrt( $category->label, 'wizardry' );
 		asrt( $book->author->name, 'Dr. Evil' );
 		asrt( $book->fetchAs('author')->coAuthor->name, 'Dr. Creepy' );
+		
+		try {
+			R::dispense( array() );
+			fail();
+		} catch ( RedException $ex ) {
+			pass();
+		}
+
+		try {
+			R::dispense( array( 'property' => 'value' ) );
+			fail();
+		} catch ( RedException $ex ) {
+			pass();
+		}
 	}
 	
 	/**

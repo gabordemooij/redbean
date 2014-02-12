@@ -482,8 +482,8 @@ class Facade
 	 * Dispenses a new RedBean OODB Bean for use with
 	 * the rest of the methods.
 	 *
-	 * @param string  $type   type
-	 * @param integer $number number of beans to dispense
+	 * @param string|array  $typeOrBeanArray type or bean array to import
+	 * @param integer       $number          number of beans to dispense
 	 *
 	 * @return array|OODBBean
 	 *
@@ -491,7 +491,8 @@ class Facade
 	 */
 	public static function dispense( $typeOrBeanArray, $num = 1 )
 	{
-		if ( is_array($typeOrBeanArray) && isset( $typeOrBeanArray['_type'] ) ) {
+		if ( is_array($typeOrBeanArray) ) {
+			if ( !isset( $typeOrBeanArray['_type'] ) ) throw new RedException('Missing _type field.');
 			$import = $typeOrBeanArray;
 			$type = $import['_type'];
 			unset( $import['_type'] );
@@ -499,7 +500,7 @@ class Facade
 			$type = $typeOrBeanArray;
 		}
 		
-		if ( !preg_match( '/^[a-z0-9]+$/', $type )) {
+		if ( !preg_match( '/^[a-z0-9]+$/', $type ) ) {
 			throw new RedException( 'Invalid type: ' . $type );
 		}
 
