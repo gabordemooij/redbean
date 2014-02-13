@@ -993,14 +993,21 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * 
 	 * @return OODBBean
 	 */
-	public function traverse( $property, $function )
+	public function traverse( $property, $function, $maxDepth = NULL )
 	{
+		if ( !is_null( $maxDepth ) ) {
+			if ( !$maxDepth-- ) return $this;
+		}
+
 		$oldFetchType = $this->fetchType;
 		$oldAliasName = $this->aliasName;
 		$oldWith      = $this->withSql;
 		$oldBindings  = $this->withParams;
 		
 		$beans = $this->$property;
+		
+		if ( $beans === NULL ) return $this;
+		
 		if ( !is_array( $beans ) ) $beans = array( $beans );
 
 		foreach( $beans as $bean ) {
@@ -1011,8 +1018,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$bean->aliasName  = $oldAliasName;
 			$bean->withSql    = $oldWith;
 			$bean->withParams = $oldBindings;
-			
-			$bean->traverse( $property, $function );
+
+			$bean->traverse( $property, $function, $maxDepth );
 		}
 
 		return $this;
