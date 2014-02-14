@@ -36,7 +36,6 @@ require( $dir . 'ToolBox.php' );
 require( $dir . 'Finder.php' );
 
 //Load extended functionality
-require( $dir . 'Preloader.php' );
 require( $dir . 'AssociationManager.php' );
 require( $dir . 'BeanHelper.php' );
 require( $dir . 'BeanHelper/SimpleFacadeBeanHelper.php' );
