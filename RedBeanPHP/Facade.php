@@ -1431,35 +1431,6 @@ class Facade
 	}
 	
 	/**
-	 * Preloader.
-	 * 
-	 * @param array   $beans   beans
-	 * @param string  $preload preload operation
-	 * @param closure $closure closure
-	 * 
-	 * @return void
-	 */
-	public static function preload( $beans, $preload, $closure = NULL )
-	{
-		$preloader = new Preloader( self::getToolBox() );
-		$preloader->load($beans, $preload, $closure);
-	}
-	
-	/**
-	 * Preloader. Alias for preload().
-	 * 
-	 * @param array   $beans   beans
-	 * @param string  $preload preload operation
-	 * @param closure $closure closure
-	 * 
-	 * @return void
-	 */
-	public static function each( $beans, $preload, $closure = NULL )
-	{
-		self::preload( $beans, $preload, $closure );
-	}
-	
-	/**
 	 * Call static for use with dynamic plugins. This magic method will
 	 * intercept static calls and route them to the specified plugin.
 	 *  
