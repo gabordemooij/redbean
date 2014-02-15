@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace RedBeanPHP\RedException;
 use RedBeanPHP\RedException as RedException;
 

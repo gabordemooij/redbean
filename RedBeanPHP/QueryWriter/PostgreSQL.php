@@ -1,10 +1,11 @@
 <?php 
+
 namespace RedBeanPHP\QueryWriter; 
-use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\Driver\RPDO\NULL as NULL; 
+use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
+use RedBeanPHP\Adapter as Adapter;
+
 /**
  * RedBean PostgreSQL Query Writer
  *

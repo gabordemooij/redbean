@@ -1,8 +1,10 @@
-<?php 
+<?php
+
 namespace RedBeanPHP\Adapter; 
-use \RedBeanPHP\Observable as Observable;
-use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\Driver as Driver; 
+use RedBeanPHP\Observable as Observable;
+use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\Driver as Driver; 
+
 /**
  * DBAdapter (Database Adapter)
  *

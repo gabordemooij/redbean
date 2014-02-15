@@ -1,11 +1,13 @@
-<?php 
+<?php
+
 namespace RedBeanPHP\Driver; 
-use \RedBeanPHP\Driver as Driver;
-use \RedBeanPHP\Logger as Logger;
-use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Logger\RDefault as RDefault;
-use \RedBeanPHP\PDOCompatible as PDOCompatible;
+use RedBeanPHP\Driver as Driver;
+use RedBeanPHP\Logger as Logger;
+use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\Logger\RDefault as RDefault;
+use RedBeanPHP\PDOCompatible as PDOCompatible;
+
 /**
  *\PDO Driver
  * This Driver implements the RedBean Driver API

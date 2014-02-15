@@ -1,6 +1,8 @@
 <?php 
+
 namespace RedBeanPHP; 
-use \RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean; 
+
 /**
  * SimpleModel
  * Base Model For All RedBeanPHP Models using FUSE.

@@ -1,7 +1,9 @@
 <?php 
+
 namespace RedBeanPHP; 
-use \RedBeanPHP\BeanHelper as BeanHelper;
-use \RedBeanPHP\RedException\Security as Security; 
+use RedBeanPHP\BeanHelper as BeanHelper;
+use RedBeanPHP\RedException\Security as Security; 
+
 /**
  * OODBBean (Object Oriented DataBase Bean)
  *

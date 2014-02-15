@@ -1,5 +1,7 @@
 <?php 
+
 namespace RedBeanPHP;  
+
 /**
  * QueryWriter
  * Interface for QueryWriters

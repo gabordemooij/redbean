@@ -1,5 +1,7 @@
-<?php 
+<?php
+
 namespace RedBeanPHP;  
+
 /**
  * RedBean Plugin
  *

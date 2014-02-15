@@ -1,5 +1,7 @@
 <?php 
+
 namespace RedBeanPHP;  
+
 /**
  * Adapter Interface
  *
