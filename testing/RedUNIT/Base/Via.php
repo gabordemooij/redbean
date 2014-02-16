@@ -229,4 +229,28 @@ class Via extends Base
 		sort( $projectList );
 		asrt( implode( ',', $projectList ), 'x,y' );
 	}
+	
+	/**
+	 * Test effect of via on shared list removal of beans.
+	 * 
+	 * @return void
+	 */
+	public function testViaAndRemove()
+	{
+		R::nuke();
+		$project   = R::dispense( 'project' );
+		$employees = R::dispense( 'employee', 2);
+		$project->via( 'partcipant' )->sharedEmployeeList = $employees;
+		R::store( $project );
+
+		asrt( R::count('employee'), 2 );
+		asrt( R::count('participant'), 2 );
+
+		$project = $project->fresh();
+		$project->sharedEmployee = array();
+		R::store( $project );
+
+		asrt( R::count( 'employee' ), 2 );
+		asrt( R::count( 'participant' ), 0 );
+	}
 }
