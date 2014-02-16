@@ -997,10 +997,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function traverse( $property, $function, $maxDepth = NULL )
 	{
+		
+		if ( strpos( $property, 'shared' ) !== FALSE ) {
+			throw new RedException( 'Traverse only works with (x)own-lists.' );
+		}
+		
 		if ( !is_null( $maxDepth ) ) {
 			if ( !$maxDepth-- ) return $this;
 		}
-
+		
 		$oldFetchType = $this->fetchType;
 		$oldAliasName = $this->aliasName;
 		$oldWith      = $this->withSql;
@@ -1026,7 +1031,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		return $this;
 	}
-
+	
 	/**
 	 * Implementation of\Countable interface. Makes it possible to use
 	 * count() function on a bean.
