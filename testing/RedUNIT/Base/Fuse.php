@@ -20,6 +20,11 @@ use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
  */
 class Fuse extends Base
 {
+	/**
+	 * Tests the SimpleFacadeBeanHelper factory setter.
+	 *
+	 * @return void
+	 */
 	public function testFactory()
 	{
 		SimpleFacadeBeanHelper::setFactoryFunction( function( $name ) {
@@ -27,8 +32,9 @@ class Fuse extends Base
 			$model->setNote( 'injected', 'dependency' );
 			return $model;
 		} );
-		
-		$bean = R::dispense('band')->box();
+
+		$bean = R::dispense( 'band' )->box();
+
 		asrt( ( $bean instanceof \Model_Band ), TRUE );
 		asrt( ( $bean->getNote('injected') ), 'dependency' );
 
