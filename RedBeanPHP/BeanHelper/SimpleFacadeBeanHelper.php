@@ -26,11 +26,11 @@ class SimpleFacadeBeanHelper implements BeanHelper
 
 	/**
 	 * Factory function to create instance of Simple Model, if any.
-	 * 
+	 *
 	 * @var closure
 	 */
 	private static $factory = null;
-	
+
 	/**
 	 * @see BeanHelper::getToolbox
 	 */
@@ -44,8 +44,8 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 */
 	public function getModelForBean( OODBBean $bean )
 	{
-		$model = $bean->getMeta('type');
-		$prefix = defined('REDBEAN_MODEL_PREFIX') ? REDBEAN_MODEL_PREFIX : '\\Model_';
+		$model     = $bean->getMeta( 'type' );
+		$prefix    = defined( 'REDBEAN_MODEL_PREFIX' ) ? REDBEAN_MODEL_PREFIX : '\\Model_';
 		$modelName = $prefix . ucfirst( $model );
 		
 		if ( !class_exists( $modelName ) ) {
@@ -67,30 +67,32 @@ class SimpleFacadeBeanHelper implements BeanHelper
 
 		return array( $toolbox->getRedBean(), $toolbox->getDatabaseAdapter(), $toolbox->getWriter(), $toolbox );
 	}
-	
+
 	/**
 	 * Factory method using a customizable factory function to create
 	 * the instance of the Simple Model.
-	 * 
+	 *
 	 * @param string $modelClassName name of the class
-	 * 
+	 *
 	 * @return SimpleModel
 	 */
-	public static function factory($modelClassName) {
+	public static function factory( $modelClassName )
+	{
 		$factory = self::$factory;
 		return ( $factory ) ? $factory( $modelClassName ) : new $modelClassName();
 	}
-	
+
 	/**
 	 * Sets the factory function to create the model when using FUSE
 	 * to connect a bean to a model.
-	 * 
+	 *
 	 * @param closure $factory
-	 * 
+	 *
 	 * @return void
 	 */
-	public static function setFactoryFunction($factory) {
+	public static function setFactoryFunction( $factory ) 
+	{
 		self::$factory = $factory;
 	}
-	
+
 }
