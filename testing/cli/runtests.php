@@ -271,7 +271,6 @@ foreach( $report as $file => $lines ) {
 	$pi = pathinfo( $file );
 	
 	if ( $covFilter !== null ) {
-		echo " $file -> $covFilter ";
 		if ( strpos( $file, $covFilter ) === false ) continue;
 	} else {
 		if ( strpos( $file, 'phar/' ) === false ) continue;

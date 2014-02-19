@@ -1,11 +1,17 @@
 <?php 
+
 namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\ModelHelper as ModelHelper;
-use \RedBeanPHP\RedException as RedException;
+use RedBeanPHP\ModelHelper as ModelHelper;
+use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\OODB as OODB;
+use RedBeanPHP\ToolBox as ToolBox;
+use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\Adapter as Adapter;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
+
 /**
  * RedUNIT_Base_Fuse
  *
@@ -39,6 +45,23 @@ class Fuse extends Base
 		asrt( ( $bean->getNote('injected') ), 'dependency' );
 
 		SimpleFacadeBeanHelper::setFactoryFunction( NULL );
+	}
+	
+	/**
+	 * Test extraction of toolbox.
+	 *
+	 * @return void
+	 */
+	public function testGetExtractedToolBox()
+	{
+		$helper = new SimpleFacadeBeanHelper;
+
+		list( $redbean, $database, $writer, $toolbox ) = $helper->getExtractedToolbox();
+
+		asrt( ( $redbean  instanceof OODB        ), TRUE );
+		asrt( ( $database instanceof Adapter     ), TRUE );
+		asrt( ( $writer   instanceof QueryWriter ), TRUE );
+		asrt( ( $toolbox  instanceof ToolBox     ), TRUE );
 	}
 	
 	/**

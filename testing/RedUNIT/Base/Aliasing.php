@@ -1,8 +1,10 @@
 <?php 
+
 namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException as RedException; 
+
 /**
  * RedUNIT_Base_Aliasing
  *
@@ -17,7 +19,6 @@ use \RedBeanPHP\RedException as RedException;
  */
 class Aliasing extends Base
 {
-
 	/**
 	 * Describing how clearing state of bean works.
 	 * Every method returning somthing (except getID)
@@ -25,50 +26,49 @@ class Aliasing extends Base
 	 * 
 	 * @return void
 	 */
-	public function clearStateAdditionalTests() {
-		
+	public function clearStateAdditionalTests()
+	{	
 		list( $project1, $project2 ) = R::dispense( 'project', 2 );
 		list( $irene, $ilse ) = R::dispense('person', 2);
-		
+
 		$project1->developer = $ilse;
 		$project1->designer  = $irene;
-		
+
 		$ilse->name  = 'Ilse';
 		$irene->name = 'Irene';
-		
+
 		$project2->developer = $ilse;
-		
+
 		R::storeAll( array( $project1, $project2 ) );
-		
+
 		$ilse = R::load( 'person', $ilse->id );
-		
+
 		asrt( count( $ilse->alias( 'developer' )->ownProject ), 2);
-		
+
 		//cached - same list
 		asrt( count( $ilse->ownProject ), 2);
-		
+
 		asrt( count( $ilse->alias( 'designer' )->ownProject ), 0);
-		
+
 		//cached - same list
 		asrt( count( $ilse->ownProject ), 0);
-		
+
 		//now test state
 		asrt( count( $ilse->setAttr( 'a', 'b' )->alias( 'developer' )->ownProject ), 2);
-		
+
 		//now test state
 		$ilse = $ilse->fresh();
-		
+
 		//attr clears state...
 		asrt( count( $ilse->alias( 'developer' )->setAttr( 'a', 'b' )->ownProject ), 0);
-		
+
 		//but getID() does not!
 		$ilse = $ilse->fresh();
 		$ilse->alias('developer');
 		$ilse->getID();
-		asrt( count( $ilse->ownProject ), 2 );
-		
+		asrt( count( $ilse->ownProject ), 2 );		
 	}
-	
+
 	/**
 	 * Can switch fetchAs().
 	 * Also checks shadow by storing.
@@ -77,34 +77,34 @@ class Aliasing extends Base
 	 */
 	public function canSwitchParentBean() 
 	{
-		
+
 		list( $project1, $project2 ) = R::dispense( 'project', 2 );
 		list( $irene, $ilse ) = R::dispense('person', 2);
-		
+
 		$project1->developer = $ilse;
 		$project1->designer  = $irene;
-		
+
 		$ilse->name  = 'Ilse';
 		$irene->name = 'Irene';
-		
+
 		$project2->developer = $ilse;
-		
+
 		R::storeAll( array( $project1, $project2 ) );
-		
+
 		$project1 = R::load( 'project', $project1->id );
-		
+
 		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );
 		asrt( $project1->fetchAs('person')->designer->name,  'Irene' );
-		
+
 		R::store( $project1 );
-		
+
 		$project1 = R::load( 'project', $project1->id );
-		
+
 		asrt( $project1->fetchAs('person')->designer->name,  'Irene' );
 		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );
-		
+
 		R::store( $project1 );
-		
+
 		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );
 		asrt( $project1->fetchAs('person')->designer->name,  'Irene' );
 		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );	
@@ -120,53 +120,52 @@ class Aliasing extends Base
 	{
 		list( $project1, $project2 ) = R::dispense( 'project', 2 );
 		list( $irene, $ilse ) = R::dispense('person', 2);
-		
+
 		$project1->developer = $ilse;
 		$project1->designer  = $irene;
-		
+
 		$project2->developer = $ilse;
-		
+
 		R::storeAll( array( $project1, $project2 ) );
-		
+
 		$ilse  = R::load( 'person', $ilse->id );
 		$irene = R::load( 'person', $irene->id );
-		
+
 		asrt( count( $ilse->alias('developer')->ownProject ), 2 );
 		asrt( count( $ilse->alias('designer')->ownProject ), 0 );
-		
+
 		R::store( $ilse );
-		
+
 		$ilse  = R::load( 'person', $ilse->id );
 		$irene = R::load( 'person', $irene->id );
-		
+
 		asrt( count( $ilse->alias('designer')->ownProject ), 0 );
 		asrt( count( $ilse->alias('developer')->ownProject ), 2 );
-		
+
 		R::storeAll( array( $ilse, $irene) );
-		
+
 		$ilse  = R::load( 'person', $ilse->id );
 		$irene = R::load( 'person', $irene->id );
-		
+
 		asrt( count( $ilse->alias('designer')->ownProject ), 0 );
 		asrt( count( $ilse->alias('developer')->ownProject ), 2 );
 		asrt( count( $irene->alias('designer')->ownProject), 1 );
 		asrt( count( $irene->alias('developer')->ownProject), 0 );
-		
+
 		R::storeAll( array( $ilse, $irene) );
-		
+
 		$ilse  = R::load( 'person', $ilse->id );
 		$irene = R::load( 'person', $irene->id );
-		
+
 		asrt( count( $ilse->alias('designer')->ownProject ), 0 );
 		asrt( count( $ilse->alias('developer')->ownProject ), 2 );
 		asrt( count( $irene->alias('designer')->ownProject), 1 );
-		asrt( count( $irene->alias('developer')->ownProject), 0 );
-		
+		asrt( count( $irene->alias('developer')->ownProject), 0 );		
 	}
-	
+
 	/**
 	 * Issue 291. State not cleared.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFetchTypeConfusionIssue291() 
@@ -194,9 +193,9 @@ class Aliasing extends Base
 		$student = $project->fetchAs( 'person' )->student ;
 		$client = $project->client ; // this will select from "person" instead of "client"
 		
-		asrt($client->firm, 'bean AG');
+		asrt( $client->firm, 'bean AG' );
 	}
-	
+
 	/**
 	 * Test switching alias (also issue #291).
 	 * 
@@ -212,10 +211,10 @@ class Aliasing extends Base
 		asrt( count( $person->alias( 'student' )->ownProject ), 1);
 		asrt( count( $person->alias( 'teacher' )->ownProject ), 0);
 	}
-	
+
 	/**
 	 * Associating two beans, then loading the associated bean
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAssociated()
@@ -261,17 +260,12 @@ class Aliasing extends Base
 
 	/**
 	 * Test for quick detect change.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function basic()
 	{
 		$book = R::dispense( 'book' );
-
-		if ( $book->prop ) {
-		}
-
-		//echo $book;
 
 		asrt( isset( $book->prop ), FALSE ); //not a very good test
 		asrt( in_array( 'prop', array_keys( $book->export() ) ), FALSE ); //better...
@@ -319,7 +313,7 @@ class Aliasing extends Base
 
 	/**
 	 * Finding $person beans that have been aliased into various roles
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAliasedFinder()
