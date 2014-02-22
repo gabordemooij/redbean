@@ -280,4 +280,54 @@ class Writer extends Sqlite
 
 		asrt( $cols['date'], 'NUMERIC' );
 	}
+	
+	/**
+	 * Constrain test for SQLite Writer.
+	 * 
+	 * @return void
+	 */
+	public function testConstrain()
+	{
+		R::nuke();
+		
+		$sql = 'CREATE TABLE book ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ';
+		
+		R::exec( $sql );
+		
+		$sql = 'CREATE TABLE page ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ';
+		
+		R::exec( $sql );
+		
+		$sql = 'CREATE TABLE book_page ( 
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			book_id INTEGER,
+			page_id INTEGER
+		) ';
+		
+		R::exec( $sql );
+		
+		$sql = 'PRAGMA foreign_key_list("book_page")';
+		
+		$fkList = R::getAll( $sql );
+		
+		asrt( count( $fkList), 0 );
+		
+		$writer = R::getWriter();
+		
+		$writer->addConstraintForTypes( 'page', 'book' );
+		
+		$sql = 'PRAGMA foreign_key_list("book_page")';
+		
+		$fkList = R::getAll( $sql );
+		
+		asrt( count( $fkList), 2 );
+		
+		$writer->addConstraintForTypes( 'page', 'book' );
+		
+		$sql = 'PRAGMA foreign_key_list("book_page")';
+		
+		$fkList = R::getAll( $sql );
+		
+		asrt( count( $fkList), 2 );
+	}
 }
