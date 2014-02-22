@@ -483,14 +483,15 @@ class Facade
 	 * Dispenses a new RedBean OODB Bean for use with
 	 * the rest of the methods.
 	 *
-	 * @param string|array  $typeOrBeanArray type or bean array to import
-	 * @param integer       $number          number of beans to dispense
+	 * @param string|array $typeOrBeanArray   type or bean array to import
+	 * @param integer      $number            number of beans to dispense
+	 * @param boolean	     $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return array|OODBBean
 	 *
 	 * @throws Security
 	 */
-	public static function dispense( $typeOrBeanArray, $num = 1 )
+	public static function dispense( $typeOrBeanArray, $num = 1, $alwaysReturnArray = FALSE )
 	{
 		if ( is_array($typeOrBeanArray) ) {
 			if ( !isset( $typeOrBeanArray['_type'] ) ) throw new RedException('Missing _type field.');
@@ -505,13 +506,13 @@ class Facade
 			throw new RedException( 'Invalid type: ' . $type );
 		}
 
-		$bean = self::$redbean->dispense( $type, $num );
+		$beanOrBeans = self::$redbean->dispense( $type, $num, $alwaysReturnArray );
 		
 		if ( isset( $import ) ) {
-			$bean->import( $import );
+			$beanOrBeans->import( $import );
 		}
 		
-		return $bean;
+		return $beanOrBeans;
 	}
 	
 	/**
@@ -533,11 +534,12 @@ class Facade
 	 * This returns an array with a book bean and then another array
 	 * containing 100 page beans.
 	 * 
-	 * @param string $order a description of the desired dispense order using the syntax above
+	 * @param string  $order      a description of the desired dispense order using the syntax above
+	 * @param boolean $onlyArrays return only arrays even if amount < 2
 	 * 
 	 * @return array
 	 */
-	public static function dispenseAll( $order )
+	public static function dispenseAll( $order, $onlyArrays = FALSE )
 	{
 
 		$list = array();
@@ -550,7 +552,7 @@ class Facade
 				$amount = 1;
 			}
 
-			$list[] = self::dispense( $type, $amount );
+			$list[] = self::dispense( $type, $amount, $onlyArrays );
 		}
 
 		return $list;

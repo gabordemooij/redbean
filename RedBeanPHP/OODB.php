@@ -644,13 +644,19 @@ class OODB extends Observable
 	 * function applies the appropriate initialization /
 	 * configuration for you.
 	 *
-	 * @param string $type   type of bean you want to dispense
-	 * @param string $number number of beans you would like to get
+	 * @param string  $type              type of bean you want to dispense
+	 * @param string  $number            number of beans you would like to get
+	 * @param boolean $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return OODBBean
 	 */
-	public function dispense( $type, $number = 1 )
+	public function dispense( $type, $number = 1, $alwaysReturnArray = FALSE )
 	{
+		if ( $number < 1 ) {
+			if ( $alwaysReturnArray ) return array();
+			return NULL;
+		}
+		
 		$beans = array();
 		for ( $i = 0; $i < $number; $i++ ) {
 			$bean = new OODBBean;
@@ -662,7 +668,7 @@ class OODB extends Observable
 			$beans[] = $bean;
 		}
 
-		return ( count( $beans ) === 1 ) ? array_pop( $beans ) : $beans;
+		return ( count( $beans ) === 1 && !$alwaysReturnArray ) ? array_pop( $beans ) : $beans;
 	}
 
 	/**
