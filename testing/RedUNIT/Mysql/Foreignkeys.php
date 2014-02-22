@@ -141,7 +141,7 @@ class Foreignkeys extends Mysql
 	 * 
 	 * @return void
 	 */
-	public function test_Contrain()
+	public function testContrain()
 	{
 		R::nuke();
 		
