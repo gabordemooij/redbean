@@ -844,17 +844,4 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	{
 		return $this->esc( $table, $noQuotes );
 	}
-
-	/**
-	 * @deprecated Use addContraintForTypes instead.
-	 *
-	 * @param OODBBean $bean1 bean
-	 * @param OODBBean $bean2 bean
-	 *
-	 * @return void
-	 */
-	public function addConstraint( OODBBean $bean1, OODBBean $bean2 )
-	{
-		$this->addConstraintForTypes( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ) );
-	}
 }

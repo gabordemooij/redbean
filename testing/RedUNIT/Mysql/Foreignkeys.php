@@ -127,11 +127,83 @@ class Foreignkeys extends Mysql
 		asrt( $cols['project_id'], "tinyint(1) unsigned" );
 		asrt( $cols['invoice_id'], "tinyint(1) unsigned" );
 
-		R::getWriter()->addConstraint( $bean1, $bean2 );
+		R::getWriter()->addConstraintForTypes( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ) );
 
 		$cols = R::getColumns( 'invoice_project' );
 
 		asrt( $cols['project_id'], "int(11) unsigned" );
 		asrt( $cols['invoice_id'], "int(11) unsigned" );
+	}
+	
+	/**
+	 * Test adding of constraints directly by invoking
+	 * the writer method.
+	 * 
+	 * @return void
+	 */
+	public function test_Contrain()
+	{
+		R::nuke();
+		
+		$sql   = '
+			CREATE TABLE book (
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
+				PRIMARY KEY ( id )
+			) 
+			ENGINE = InnoDB
+		';
+		
+		R::exec( $sql );
+		
+		$sql   = '
+			CREATE TABLE page (
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
+				PRIMARY KEY ( id )
+			) 
+			ENGINE = InnoDB
+		';
+
+		R::exec( $sql );
+		
+		$sql   = '
+			CREATE TABLE book_page (
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT,
+				book_id INT( 11 ) UNSIGNED NOT NULL,
+				page_id INT( 11 ) UNSIGNED NOT NULL,
+				PRIMARY KEY ( id )
+			) 
+			ENGINE = InnoDB
+		';
+
+		R::exec( $sql );
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "book_page" AND DELETE_RULE = "CASCADE"');
+		
+		asrt( (int) $numOfFKS, 0 );
+		
+		$writer = R::getWriter();
+		
+		$writer->addConstraintForTypes( 'book', 'page' );
+		
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "book_page" AND DELETE_RULE = "CASCADE"');
+		
+		asrt( (int) $numOfFKS, 2 );
+		
+		$writer->addConstraintForTypes( 'book', 'page' );
+		
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "book_page" AND DELETE_RULE = "CASCADE"');
+		
+		asrt( (int) $numOfFKS, 2 );
 	}
 }

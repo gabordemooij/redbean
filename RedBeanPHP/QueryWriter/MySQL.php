@@ -48,8 +48,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * Add the constraints for a specific database driver: MySQL.
 	 *
-	 * @todo Too many arguments; find a way to solve this in a neater way.
-	 *
 	 * @param string $table     table     table to add constrains to
 	 * @param string $table1    table1    first reference table
 	 * @param string $table2    table2    second reference table
@@ -101,7 +99,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 			$this->adapter->exec( $sql );
 
 			return TRUE;
-		} catch (\Exception $e ) {
+		} catch ( \Exception $e ) {
 			return FALSE;
 		}
 	}
