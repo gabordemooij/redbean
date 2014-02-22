@@ -53,6 +53,7 @@ class SQL extends RedException
 	 */
 	public function __toString()
 	{
-		return '[' . $this->getSQLState() . '] - ' . $this->getMessage();
+		return '[' . $this->getSQLState() . '] - ' . $this->getMessage()."\n".
+				'trace: ' . $this->getTraceAsString();
 	}
 }
