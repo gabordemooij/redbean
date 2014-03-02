@@ -128,12 +128,8 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	private function getCached( $cacheTag, $key )
 	{
 		$sql = $this->adapter->getSQL();
-
-		if ( strpos( $sql, '-- keep-cache' ) !== strlen( $sql ) - 13 ) {
-			// If SQL has been taken place outside of this method then something else then
-			// a select query might have happened! (or instruct to keep cache)
-			$this->cache = array();
-		} else {
+		
+		if ($this->updateCache()) {
 			if ( isset( $this->cache[$cacheTag][$key] ) ) {
 				return $this->cache[$cacheTag][$key];
 			}
@@ -142,6 +138,27 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		return NULL;
 	}
 
+	/**
+	 * Checks if the previous query had a keep-cache tag.
+	 * If so, the cache will persist, otherwise the cache will be flushed.
+	 * 
+	 * Returns TRUE if the cache will remain and FALSE if a flush has
+	 * been performed.
+	 * 
+	 * @return boolean
+	 */
+	private function updateCache()
+	{
+		$sql = $this->adapter->getSQL();
+		if ( strpos( $sql, '-- keep-cache' ) !== strlen( $sql ) - 13 ) {
+			// If SQL has been taken place outside of this method then something else then
+			// a select query might have happened! (or instruct to keep cache)
+			$this->cache = array();
+			return FALSE;
+		}
+		return TRUE;
+	}
+	
 	/**
 	 * Stores data from the writer in the cache under a specific key and cache tag.
 	 * A cache tag is used to make sure the cache remains consistent. In most cases the cache tag
@@ -520,7 +537,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		$key = NULL;
 		if ( $this->flagUseCache ) {
 			$key = $this->getCacheKey( array( $conditions, $addSql, $bindings, 'select' ) );
-
+			
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
 			}
@@ -631,6 +648,8 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		$addSql = $this->glueSQLCondition( $addSql );
 
 		$table  = $this->esc( $type );
+		
+		$this->updateCache(); //check if cache chain has been broken
 
 		$sql    = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
 		$sql    = "SELECT COUNT(*) FROM {$table} {$sql} -- keep-cache";
@@ -644,6 +663,8 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	public function queryRecordCountRelated( $sourceType, $destType, $linkID, $addSql = '', $bindings = array() )
 	{
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
+
+		$this->updateCache(); //check if cache chain has been broken
 
 		if ( $sourceType === $destType ) {
 			$sql = "

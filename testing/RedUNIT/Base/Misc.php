@@ -390,7 +390,7 @@ class Misc extends Base
 
 		$b = strval( $a );
 
-		asrt( $b, '[test] - ' );
+		asrt( ( strpos( $b, '[test] - ' ) === 0 ), TRUE );
 	}
 
 	/**
