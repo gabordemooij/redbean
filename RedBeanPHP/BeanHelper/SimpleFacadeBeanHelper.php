@@ -46,12 +46,31 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	{
 		$model     = $bean->getMeta( 'type' );
 		$prefix    = defined( 'REDBEAN_MODEL_PREFIX' ) ? REDBEAN_MODEL_PREFIX : '\\Model_';
-		$modelName = $prefix . ucfirst( $model );
-		
-		if ( !class_exists( $modelName ) ) {
-			return NULL;
-		}
 
+		if ( strpos( $model, '_' ) !== FALSE ) {
+			$modelParts = explode( '_', $model );
+			$modelName = '';
+			foreach( $modelParts as $part ) {
+				$modelName .= ucfirst( $part );
+			}
+			$modelName = $prefix . $modelName;
+
+			if ( !class_exists( $modelName ) ) {
+				//second try
+				$modelName = $prefix . ucfirst( $model );
+				
+				if ( !class_exists( $modelName ) ) {
+					return NULL;
+				}
+			}
+
+		} else {
+
+			$modelName = $prefix . ucfirst( $model );
+			if ( !class_exists( $modelName ) ) {
+				return NULL;
+			}
+		}
 		$obj = self::factory( $modelName );
 		$obj->loadBean( $bean );
 

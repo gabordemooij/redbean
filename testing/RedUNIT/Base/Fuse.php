@@ -48,6 +48,27 @@ class Fuse extends Base
 	}
 	
 	/**
+	 * Make sure that beans of type book_page can be fused with
+	 * models like BookPage (beautified) as well as Book_Page (non-beautified).
+	 */
+	public function testBeutificationOfLinkModel()
+	{
+		$page = R::dispense( 'page' );
+		$widget = R::dispense( 'widget' );
+		$page->sharedWidgetList[] = $widget;
+		R::store( $page );
+		$testReport = \Model_PageWidget::getTestReport();
+		asrt( $testReport, 'didSave' );
+
+		$page = R::dispense( 'page' );
+		$gadget = R::dispense( 'gadget' );
+		$page->sharedGadgetList[] = $gadget;
+		R::store( $page );
+		$testReport = \Model_Gadget_Page::getTestReport();
+		asrt( $testReport, 'didSave' );
+	}
+	
+	/**
 	 * Test extraction of toolbox.
 	 *
 	 * @return void

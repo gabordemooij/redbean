@@ -320,3 +320,62 @@ class FaultyWriter extends \RedBeanPHP\QueryWriter\MySQL
 		throw $exception;
 	}
 }
+
+/**
+ * Mock class to test proper model name
+ * beautificattion for link table beans in FUSE.
+ */
+class Model_PageWidget extends RedBean_SimpleModel {
+	/**
+	 * @var string
+	 */
+	private static $test = '';
+
+	/**
+	 * Returns the test flag.
+	 * 
+	 * @return string
+	 */
+	public static function getTestReport()
+	{
+		return self::$test;
+	}
+
+	/**
+	 * Update method to set the flag.
+	 */
+	public function update()
+	{
+		self::$test = 'didSave';
+	}
+}
+
+
+/**
+ * Mock class to test proper model name
+ * beautificattion for link table beans in FUSE.
+ */
+class Model_Gadget_Page extends RedBean_SimpleModel {
+	/**
+	 * @var string
+	 */
+	private static $test = '';
+
+	/**
+	 * Returns the test flag.
+	 * 
+	 * @return string
+	 */
+	public static function getTestReport()
+	{
+		return self::$test;
+	}
+
+	/**
+	 * Update method to set the flag.
+	 */
+	public function update()
+	{
+		self::$test = 'didSave';
+	}
+}
