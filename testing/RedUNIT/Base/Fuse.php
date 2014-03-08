@@ -69,6 +69,20 @@ class Fuse extends Base
 	}
 	
 	/**
+	 * Only theoretical.
+	 * 
+	 * @return void
+	 */
+	public function testTheoreticalBeautifications()
+	{
+		$bean = R::dispense('bean');
+		$bean->setMeta('type', 'a_b_c');
+		R::store($bean);
+		$testReport = \Model_A_B_C::getTestReport();
+		asrt( $testReport, 'didSave' );
+	}
+	
+	/**
 	 * Test extraction of toolbox.
 	 *
 	 * @return void
