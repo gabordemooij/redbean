@@ -223,15 +223,16 @@ class OODB extends Observable
 	 */
 	private function storeBean( OODBBean $bean )
 	{
-		if ( !$this->isFrozen ) {
-			$this->check( $bean );
-		}
-		$table = $bean->getMeta( 'type' );
 		if ( $bean->getMeta( 'tainted' ) ) {
-			$this->createTableIfNotExists( $bean, $table );
-			$updateValues = $this->getUpdateValues( $bean );
 			if ( !$this->isFrozen ) {
+				$this->check( $bean );
+				$table = $bean->getMeta( 'type' );
+				$this->createTableIfNotExists( $bean, $table );
+				$updateValues = $this->getUpdateValues( $bean );			
 				$this->addUniqueConstraints( $bean );
+			} else {
+				$table = $bean->getMeta( 'type' );
+				$updateValues = $this->getUpdateValues( $bean );			
 			}
 			$bean->id = $this->writer->updateRecord( $table, $updateValues, $bean->id );
 			$bean->setMeta( 'tainted', FALSE );
