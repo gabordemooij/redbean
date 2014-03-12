@@ -428,12 +428,18 @@ class OODB extends Observable
 	 */
 	private function addForeignKeysForParentBeans( $bean, $embeddedBeans )
 	{
-		
+		$cachedIndex = array();
 		foreach ( $embeddedBeans as $linkField => $embeddedBean ) {
-			$this->writer->addIndex( $bean->getMeta( 'type' ),
-				'index_foreignkey_' . $bean->getMeta( 'type' ) . '_' . $embeddedBean->getMeta( 'type' ),
+			$beanType = $bean->getMeta( 'type' );
+			$embeddedType = $embeddedBean->getMeta( 'type' );
+			$key = $beanType.'|'.$embeddedType.'>'.$linkField;
+			if ( !isset( $cachedIndex[$key] ) ) {
+				$this->writer->addIndex( $bean->getMeta( 'type' ),
+				'index_foreignkey_' . $beanType . '_' . $embeddedType,
 				$linkField );
-			$this->writer->addFK( $bean->getMeta( 'type' ), $embeddedBean->getMeta( 'type' ), $linkField, 'id', FALSE );
+				$this->writer->addFK( $beanType, $embeddedType, $linkField, 'id', FALSE );
+				$cachedIndex[$key] = TRUE;
+			}	
 		}
 	}
 
