@@ -453,7 +453,8 @@ class OODB extends Observable
 	 */
 	private function processAdditions( $bean, $ownAdditions )
 	{
-		$myFieldLink = $bean->getMeta( 'type' ) . '_id';
+		$beanType = $bean->getMeta( 'type' );
+		$myFieldLink = $beanType . '_id';
 		if ( $bean && count( $ownAdditions ) > 0 ) {
 			$first = reset( $ownAdditions );
 			if ( $first instanceof OODBBean ) {
@@ -463,17 +464,23 @@ class OODB extends Observable
 				}
 			}
 		}
+		$cachedIndex = array();
 		foreach ( $ownAdditions as $addition ) {
 			if ( $addition instanceof OODBBean ) {
 				$addition->$myFieldLink = $bean->id;
 				$addition->setMeta( 'cast.' . $myFieldLink, 'id' );
 				$this->store( $addition );
 				if ( !$this->isFrozen ) {
-					$this->writer->addIndex( $addition->getMeta( 'type' ),
-						'index_foreignkey_' . $addition->getMeta( 'type' ) . '_' . $bean->getMeta( 'type' ),
+					$additionType = $addition->getMeta( 'type' );
+					$key = $additionType.'|'.$beanType.'>'.$myFieldLink;
+					if ( !isset( $cachedIndex[$key] ) ) {
+						$this->writer->addIndex( $additionType,
+						'index_foreignkey_' . $additionType . '_' . $beanType,
 						$myFieldLink );
-						$isDep = $bean->getMeta('sys.exclusive-'.$addition->getMeta('type'));
-						$this->writer->addFK( $addition->getMeta( 'type' ), $bean->getMeta( 'type' ), $myFieldLink, 'id', $isDep );
+						$isDep = $bean->getMeta( 'sys.exclusive-'.$additionType );
+						$this->writer->addFK( $additionType, $beanType, $myFieldLink, 'id', $isDep );
+						$cachedIndex[$key] = TRUE;
+					}
 				}
 			} else {
 				throw new RedException( 'Array may only contain OODBBeans' );
