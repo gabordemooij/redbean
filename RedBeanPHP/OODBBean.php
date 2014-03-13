@@ -78,6 +78,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	/**
 	 * @var boolean
 	 */
+	private $noLoad = FALSE;
+	
+	/**
+	 * @var boolean
+	 */
 	private $writeOnly = false;
 
 	/** Returns the alias for a type
@@ -517,6 +522,19 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->withSql = '  ';
 		return $this;
 	}
+	
+	/**
+	 * Tells the bean to only access the list but not load
+	 * its contents. Use this if you only want to add something to a list
+	 * and you have no interest in retrieving its contents from the database.
+	 *
+	 * @return self
+	 */
+	public function noLoad()
+	{
+		$this->noLoad = TRUE;
+		return $this;
+	}
 
 	/**
 	 * Prepares an own-list to use an alias. This is best explained using
@@ -601,7 +619,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	/**
 	 * Clears state.
 	 * Internal method. Clears the state of the query modifiers of the bean.
-	 * Query modifiers are: with(), withCondition(), alias() and fetchAs().
+	 * Query modifiers are: with(), withCondition(), alias(), fetchAs() and noLoad().
 	 * 
 	 * @return void
 	 */
@@ -610,6 +628,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->withParams = array();
 		$this->aliasName  = NULL;
 		$this->fetchType  = NULL;
+		$this->noLoad     = FALSE;
 	}
 
 	/**
@@ -694,10 +713,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		}
 
 		if ( $isOwn || $isShared ) {
-			if ( $isOwn ) {
-				$beans = $this->getOwnList( $listName, $redbean );
+			
+			if ( $this->noLoad ) {
+				$beans = array();
 			} else {
-				$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
+				if ( $isOwn ) {
+					$beans = $this->getOwnList( $listName, $redbean );
+				} else {
+					$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
+				}
 			}
 
 			$this->properties[$property] = $beans;

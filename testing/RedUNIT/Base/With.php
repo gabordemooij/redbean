@@ -28,6 +28,84 @@ class With extends Base
 	}
 	
 	/**
+	 * Tests no-load modifier for lists.
+	 * 
+	 * @return void
+	 */
+	public function testNoLoad()
+	{
+		$book = R::dispense( array(
+			 '_type' => 'book',
+			 'title' => 'Book of Lorem Ipsum',
+			 'ownPage' => array(
+				  array(
+						'_type' => 'page',
+						'content' => 'Lorem Ipsum',
+					)
+			 ),
+			 'sharedTag' => array(
+				  array(
+						'_type' => 'tag',
+						'label' => 'testing'
+				  )
+			 )
+		) );
+		
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( R::count( 'book' ), 1 );
+		asrt( count( $book->ownPage ), 1 );
+		
+		//now try with no-load
+		$book = $book->fresh();
+		asrt( count( $book->noLoad()->ownPage ),  0 );
+		asrt( count( $book->noLoad()->sharedTag ),  0 );
+		
+		//now try to add with no-load
+		$book = $book->fresh();
+		$book->noLoad()->xownPageList[] = R::dispense( 'page' );
+		$book->noLoad()->sharedTagList[] = R::dispense( 'tag' );
+		R::store( $book );
+		
+		$book = $book->fresh();
+		asrt( count( $book->ownPage ), 2 );
+		asrt( count( $book->sharedTagList ), 2 );
+		
+		//no-load overrides with and withCondition
+		$book = $book->fresh();
+		asrt( count( $book->with(' invalid sql ')->noLoad()->ownPage ),  0 );
+		asrt( count( $book->withCondition(' invalid sql ')->noLoad()->sharedTag ),  0 );
+		
+		//no-load overrides all and alias
+		$book = $book->fresh();
+		asrt( count( $book->all()->noLoad()->ownPage ),  0 );
+		asrt( count( $book->alias('nothing')->noLoad()->sharedTag ),  0 );
+		
+		//no-load gets cleared
+		$book = $book->fresh();
+		asrt( count( $book->ownPage ), 2 );
+		asrt( count( $book->sharedTagList ), 2 );
+
+		//We cant clear with no-load accidentally?
+		$book = $book->fresh();
+		$book->noLoad()->ownPage = array();
+		$book->noLoad()->sharedTagList = array();
+		R::store( $book );
+
+		asrt( count( $book->ownPage ), 2 );
+		asrt( count( $book->sharedTagList ), 2 );
+
+		//No-load does not have effect if list is already cached
+		$book = $book->fresh();
+		$book->ownPage;
+		$book->sharedTag;
+		asrt( count( $book->ownPage ), 2 );
+		asrt( count( $book->sharedTagList ), 2 );
+
+	}
+	
+	
+	/**
 	 * Test all().
 	 * 
 	 * @return void
