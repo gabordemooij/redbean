@@ -34,7 +34,7 @@ require_once( 'RedUNIT/Blackhole.php' );
 require_once( 'RedUNIT/Mysql.php' );
 require_once( 'RedUNIT/Postgres.php' );
 require_once( 'RedUNIT/Sqlite.php' );
-require_once( 'RedUNIT/CUBRID.php' );
+
 
 require_once( 'RedUNIT/Pretest.php' );
 
@@ -59,20 +59,6 @@ if ( isset( $ini['pgsql'] ) ) {
 
 if ( isset( $ini['sqlite'] ) ) {
 	R::addDatabase( 'sqlite', 'sqlite:' . $ini['sqlite']['file'], NULL, NULL, FALSE );
-}
-
-if ( isset( $ini['CUBRID'] ) ) {
-	$dsn = "cubrid:host={$ini['CUBRID']['host']};port=33000;dbname={$ini['CUBRID']['schema']}";
-
-	R::addDatabase( 'CUBRID', $dsn, $ini['CUBRID']['user'], $ini['CUBRID']['pass'], FALSE );
-
-	R::selectDatabase( 'CUBRID' );
-
-	R::exec( 'AUTOCOMMIT IS ON' );
-}
-
-if ( isset( $ini['oracle'] ) ) {
-	R::addDatabase( 'oracle', $ini['oracle']['dsn'], $ini['oracle']['user'], $ini['oracle']['pass'], FALSE );
 }
 
 R::selectDatabase( 'sqlite' );
@@ -149,8 +135,6 @@ $allPacks = array(
 	'Base/Traverse',
 	'Base/Misc',
 	'Base/Via',
-	'CUBRID/Setget',
-	'CUBRID/Writer',
 	'Mysql/Preexist',
 	'Mysql/Double',
 	'Mysql/Writer',
