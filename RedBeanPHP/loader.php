@@ -45,14 +45,16 @@ require( $dir . 'SimpleModel.php' );
 require( $dir . 'SimpleModelHelper.php' );
 require( $dir . 'TagManager.php' );
 require( $dir . 'LabelMaker.php' );
-require( $dir . 'Facade.php' );;
+require( $dir . 'Facade.php' );
 require( $dir . 'DuplicationManager.php' );
 require( $dir . 'Plugin.php' );
+require( $dir . 'Functions.php' );
 
 //Allow users to mount the plugin folder.
 if ( defined( 'REDBEANPHP_PLUGINS' ) ) {
     Phar::mount( 'RedBeanPHP/Plugin', REDBEANPHP_PLUGINS );
-} 
+}
+
 //make some classes available for backward compatibility
 class RedBean_SimpleModel extends \RedBeanPHP\SimpleModel {};
 class R extends \RedBeanPHP\Facade{};

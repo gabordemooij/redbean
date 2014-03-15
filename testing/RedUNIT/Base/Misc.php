@@ -10,7 +10,8 @@ use \RedBeanPHP\Adapter as Adapter;
 use \RedBeanPHP\QueryWriter as QueryWriter;
 use \RedBeanPHP\RedException as RedException;
 use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Driver\RPDO as RPDO; 
+use \RedBeanPHP\Driver\RPDO as RPDO;
+
 /**
  * RedUNIT_Base_Misc
  *
@@ -404,6 +405,54 @@ class Misc extends Base
 		asrt( R::enum( 'tester:T@E  S_t' )->name, 'T_E_S_T');
 	}
 
+	/**
+	 * Test ENUM in Queries and with short hand notation.
+	 * 
+	 * @return void
+	 */
+	public function testENUMInQuery()
+	{
+		testpack('Test ENUM in Query and test ENUM short notation');
+		
+		R::nuke();
+		
+		$coffee = R::dispense( 'coffee' );
+		$coffee->taste = R::enum( 'flavour:mocca' );
+		
+		R::store( $coffee );
+		
+		$coffee = R::dispense( 'coffee' );
+		$coffee->taste = R::enum( 'flavour:banana' );
+		
+		R::store( $coffee );
+		
+		$coffee = R::dispense( 'coffee' );
+		$coffee->taste = R::enum( 'flavour:banana' );
+		
+		R::store( $coffee );
+		
+		//now we have two flavours
+		asrt( R::count('flavour'), 2 );
+		
+		//use in query
+		asrt( R::count( 'coffee', ' taste_id = ? ', array( R::enum( 'flavour:mocca' )->id ) ), 1);
+		
+		//use in quer with short notation
+		asrt( R::count( 'coffee', ' taste_id = ? ', array( EID( 'flavour:mocca' ) ) ), 1);
+		
+		//use in query
+		asrt( R::count( 'coffee', ' taste_id = ? ', array( R::enum( 'flavour:banana' )->id ) ), 2);
+		
+		//use in quer with short notation
+		asrt( R::count( 'coffee', ' taste_id = ? ', array( EID( 'flavour:banana' ) ) ), 2);
+		
+		//use in query
+		asrt( R::count( 'coffee', ' taste_id = ? ', array( R::enum( 'flavour:strawberry' )->id ) ), 0);
+		
+		//use in quer with short notation
+		asrt( R::count( 'coffee', ' taste_id = ? ', array( EID( 'flavour:strawberry' ) ) ), 0);
+	}
+	
 	/**
 	 * Test ENUM functionality offered by Label Maker.
 	 * 
