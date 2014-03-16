@@ -191,6 +191,27 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		return $beans;
 	}
+	
+	/**
+	 * Sets a meta property for all beans. This is a quicker way to set
+	 * the meta properties for a collection of beans because this method
+	 * can directly access the property arrays of the beans.
+	 * This method returns the beans.
+	 * 
+	 * @param array  $beans    beans to set the meta property of
+	 * @param string $property property to set
+	 * @param mixed  $value    value
+	 * 
+	 * @return array
+	 */
+	public static function setMetaAll( $beans, $property, $value )
+	{
+		foreach( $beans as $bean ) {
+			$bean->__info[ $property ] = $value;
+		}
+		
+		return $beans;
+	}
 
 	/**
 	 * Initializes a bean. Used by OODB for dispensing beans.

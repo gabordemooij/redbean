@@ -9,7 +9,6 @@ use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\SimpleModel as SimpleModel;
-use RedBeanPHP\OODBBeans as OODBBeans;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
@@ -577,9 +576,7 @@ class OODB extends Observable
 					list( $ownAdditions, $ownTrashcan, $ownresidue ) = $this->processGroups( $originals, $value, $ownAdditions, $ownTrashcan, $ownresidue );
 					$listName = lcfirst( substr( $property, 3 ) );
 					if ($bean->getMeta( 'sys.exclusive-'.  $listName ) ) {
-						foreach( $ownTrashcan as $trashBean ) {
-							$trashBean->setMeta( 'sys.garbage', true );
-						}
+						OODBBean::setMetaAll( $ownTrashcan, 'sys.garbage', TRUE );
 					}
 					$bean->removeProperty( $property );
 				} elseif ( strpos( $property, 'shared' ) === 0 ) {
