@@ -6,7 +6,9 @@ use \RedBeanPHP\OODBBean as OODBBean;
 use \RedBeanPHP\Driver\RPDO as RPDO;
 use \RedBeanPHP\Logger\RDefault as RDefault;
 use \RedBeanPHP\RedException as RedException;
-use \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper; 
+use \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
+use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+
 /**
  * RedUNIT_Blackhole_Misc
  *
@@ -550,9 +552,25 @@ class Misc extends Blackhole
 	{
 		$tmpDir = sys_get_temp_dir();
 		R::setup();
-		//asrt( file_exists( $tmpDir . '/red.db' ), TRUE ); -- does not work on travis?
 	}
 
+	/**
+	 * Test camelCase to snake_case conversions.
+	 * 
+	 * @return void
+	 */
+	public function testCamel2Snake()
+	{
+		asrt( AQueryWriter::camelsSnake('bookPage'), 'book_page' );
+		asrt( AQueryWriter::camelsSnake('FTP'), 'ftp' );
+		asrt( AQueryWriter::camelsSnake('ACLRules'), 'acl_rules' );
+		asrt( AQueryWriter::camelsSnake('SSHConnectionProxy'), 'ssh_connection_proxy' );
+		asrt( AQueryWriter::camelsSnake('proxyServerFacade'), 'proxy_server_facade' );
+		asrt( AQueryWriter::camelsSnake('proxySSHClient'), 'proxy_ssh_client' );
+		asrt( AQueryWriter::camelsSnake('objectACL2Factory'), 'object_acl2_factory' );
+		asrt( AQueryWriter::camelsSnake('bookItems4Page'), 'book_items4_page' );
+		asrt( AQueryWriter::camelsSnake('book☀Items4Page'), 'book☀_items4_page' );
+	}
 }
 
 /**

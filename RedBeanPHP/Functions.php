@@ -20,10 +20,18 @@
  * 
  * R::find( 'paint', ' color_id = ? ', [ EID('color:yellow') ] );
  * 
+ * If a function called EID() already exists you'll have to write this
+ * wrapper yourself ;)
+ * 
  * @param string $enumName enum code as you would pass to R::enum()
  *
  * @return mixed
  */
-function EID($enumName) {
-	return \RedBeanPHP\Facade::enum($enumName)->id;
+if (!function_exists('EID')) {
+
+	function EID($enumName)
+	{
+		return \RedBeanPHP\Facade::enum( $enumName )->id;
+	}
+
 }

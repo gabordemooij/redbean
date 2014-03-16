@@ -1,6 +1,7 @@
 <?php 
 
-namespace RedBeanPHP; 
+namespace RedBeanPHP;
+use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException\Security as Security; 
 
@@ -610,7 +611,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		}
 
 		if ( !isset( $beautifulColumns[$property] ) ) {
-			$beautifulColumns[$property] = strtolower( preg_replace( '/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $property ) );
+			$beautifulColumns[$property] = AQueryWriter::camelsSnake( $property );
 		}
 
 		return $beautifulColumns[$property];
