@@ -27,7 +27,7 @@ use RedBeanPHP\Driver\RPDO as RPDO;
  * RedBean Facade
  *
  * Version Information
- * RedBean Version @version 3.5
+ * RedBean Version @version 4
  *
  * @file    RedBean/Facade.php
  * @desc    Convenience class for RedBeanPHP.
