@@ -38,6 +38,9 @@ require_once( 'RedUNIT/Sqlite.php' );
 
 require_once( 'RedUNIT/Pretest.php' );
 
+$extraTestsFromHook = array();
+$hookPath = '';
+
 @include 'cli/test_hook.php';
 
 //Configure the databases
@@ -178,11 +181,14 @@ if ( $mode == 'all' ) {
 }
 
 // Always include the last ones.
-$packList = array_unique(array_merge( $packList, $suffix ));
+$packList = array_unique(array_merge( $packList, $suffix, $extraTestsFromHook ));
 $j = 0;
 foreach ( $packList as $testPack ) {
 	$j ++;
-	require_once( $path . $testPack . '.php' );
+	
+	if (file_exists($path . $testPack . '.php')) require($path . $testPack . '.php');
+	if (file_exists($hookPath . $testPack . '.php')) require($hookPath . $testPack . '.php');
+	
 
 	$testPack = str_replace( '../', '', $testPack );
 	
