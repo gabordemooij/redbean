@@ -432,7 +432,7 @@ class OODB extends Observable
 		foreach ( $embeddedBeans as $linkField => $embeddedBean ) {
 			$beanType = $bean->getMeta( 'type' );
 			$embeddedType = $embeddedBean->getMeta( 'type' );
-			$key = $beanType.'|'.$embeddedType.'>'.$linkField;
+			$key = $beanType . '|' . $embeddedType . '>' . $linkField;
 			if ( !isset( $cachedIndex[$key] ) ) {
 				$this->writer->addIndex( $bean->getMeta( 'type' ),
 				'index_foreignkey_' . $beanType . '_' . $embeddedType,
@@ -478,7 +478,7 @@ class OODB extends Observable
 				$this->store( $addition );
 				if ( !$this->isFrozen ) {
 					$additionType = $addition->getMeta( 'type' );
-					$key = $additionType.'|'.$beanType.'>'.$myFieldLink;
+					$key = $additionType . '|' . $beanType . '>' . $myFieldLink;
 					if ( !isset( $cachedIndex[$key] ) ) {
 						$this->writer->addIndex( $additionType,
 						'index_foreignkey_' . $additionType . '_' . $beanType,
