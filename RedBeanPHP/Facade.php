@@ -104,7 +104,6 @@ class Facade
 	 */
 	private static $currentDB = '';
 
-	
 	/**
 	 * @var array
 	 */
