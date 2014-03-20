@@ -203,9 +203,9 @@ class RPDO implements Driver
 	 *    $driver = new RPDO($dsn, $user, $password);
 	 *    $driver = new RPDO($existingConnection);
 	 *
-	 * @param string|PDO $dsn    database connection string
-	 * @param string     $user   optional, usename to sign in
-	 * @param string     $pass   optional, password for connection login
+	 * @param string|object $dsn    database connection string
+	 * @param string        $user   optional, usename to sign in
+	 * @param string        $pass   optional, password for connection login
 	 *
 	 */
 	public function __construct( $dsn, $user = NULL, $pass = NULL )
