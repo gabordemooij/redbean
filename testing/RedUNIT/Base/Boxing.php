@@ -1,8 +1,11 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\SimpleModel as SimpleModel; 
+use RedBeanPHP\SimpleModel as SimpleModel; 
+
 /**
  * RedUNIT_Base_Boxing
  *

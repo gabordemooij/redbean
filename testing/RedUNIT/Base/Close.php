@@ -1,9 +1,12 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT; 
+use RedBeanPHP\ToolBox as ToolBox;
+use RedBeanPHP\QueryWriter\SQLiteT as SQLiteT; 
+
 /**
  * RedUNIT_Base_Close
  *

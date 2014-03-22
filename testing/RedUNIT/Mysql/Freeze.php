@@ -1,10 +1,12 @@
 <?php 
+
 namespace RedUNIT\Mysql;
+
 use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
+use RedBeanPHP\AssociationManager as AssociationManager;
+use RedBeanPHP\RedException\SQL as SQL; 
 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\RedException\SQL as SQL; 
 /**
  * RedUNIT_Mysql_Freeze
  *

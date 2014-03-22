@@ -1,9 +1,12 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\RedException\SQL as SQL;
+
 /**
  * RedUNIT_Base_Batch
  *

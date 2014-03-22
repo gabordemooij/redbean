@@ -1,7 +1,10 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R; 
+
 /**
  * RedUNIT_Base_Chill
  *

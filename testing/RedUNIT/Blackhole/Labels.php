@@ -1,9 +1,11 @@
 <?php 
 
 namespace RedUNIT\Blackhole;
+
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean; 
+
 /**
  * RedUNIT_Blackhole_Labels
  *

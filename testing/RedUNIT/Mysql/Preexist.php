@@ -1,8 +1,11 @@
 <?php 
+
 namespace RedUNIT\Mysql;
+
 use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\AssociationManager as AssociationManager; 
+use RedBeanPHP\AssociationManager as AssociationManager; 
+
 /**
  * RedUNIT_Mysql_Preexist
  *

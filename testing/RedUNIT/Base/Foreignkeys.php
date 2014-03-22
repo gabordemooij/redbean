@@ -1,10 +1,13 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\Observer as Observer;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\Adapter as Adapter; 
+use RedBeanPHP\Observer as Observer;
+use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\Adapter as Adapter; 
+
 /**
  * RedUNIT_Base_Foreignkeys
  *

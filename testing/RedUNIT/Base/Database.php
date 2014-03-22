@@ -1,16 +1,19 @@
-<?php 
+<?php
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\QueryWriter\MySQL as MySQL;
-use \RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
-use \RedBeanPHP\QueryWriter\CUBRID as CUBRID;
-use \RedBeanPHP\Adapter\DBAdapter as DBAdapter; 
+use RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
+use RedBeanPHP\OODB as OODB;
+use RedBeanPHP\ToolBox as ToolBox;
+use RedBeanPHP\AssociationManager as AssociationManager;
+use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\QueryWriter\MySQL as MySQL;
+use RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
+use RedBeanPHP\QueryWriter\CUBRID as CUBRID;
+use RedBeanPHP\Adapter\DBAdapter as DBAdapter; 
+
 /**
  * RedUNIT_Base_Database
  *

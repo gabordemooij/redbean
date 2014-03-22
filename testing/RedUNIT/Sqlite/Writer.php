@@ -1,11 +1,13 @@
 <?php 
+
 namespace RedUNIT\Sqlite;
+
 use RedUNIT\Sqlite as Sqlite;
 use RedBeanPHP\Facade as R;
+use RedBeanPHP\AssociationManager as AssociationManager;
+use RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
+use RedBeanPHP\RedException\SQL as SQL; 
 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
-use \RedBeanPHP\RedException\SQL as SQL; 
 /**
  * RedUNIT_Sqlite_Writer
  *

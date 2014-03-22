@@ -1,9 +1,12 @@
 <?php 
+
 namespace RedUNIT\Blackhole;
+
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\Facade as Facade;
-use \RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\Facade as Facade;
+use RedBeanPHP\RedException as RedException; 
+
 /**
  * RedUNIT_Blackhole_Plugins
  *

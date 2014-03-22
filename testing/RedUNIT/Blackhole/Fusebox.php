@@ -1,10 +1,12 @@
 <?php 
 
 namespace RedUNIT\Blackhole;
+
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\SimpleModel as SimpleModel; 
+use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\SimpleModel as SimpleModel; 
+
 /**
  * RedUNIT_Blackhole_Fusebox
  *

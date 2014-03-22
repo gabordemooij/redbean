@@ -1,11 +1,14 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\AssociationManager as AssociationManager;
+use RedBeanPHP\OODB as OODB;
+use RedBeanPHP\RedException as RedException; 
 use RedBeanPHP\RedException\SQL as SQL;
+
 /**
  * RedUNIT_Base_Finding
  *

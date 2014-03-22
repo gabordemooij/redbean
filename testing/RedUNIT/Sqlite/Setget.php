@@ -1,5 +1,7 @@
 <?php 
+
 namespace RedUNIT\Sqlite;
+
 use RedUNIT\Sqlite as Sqlite;
 use RedBeanPHP\Facade as R;
 

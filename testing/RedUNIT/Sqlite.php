@@ -16,7 +16,6 @@ namespace RedUNIT;
  */
 class Sqlite extends RedUNIT
 {
-
 	/*
 	 * What drivers should be loaded for this test pack?
 	 * 

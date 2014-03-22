@@ -1,9 +1,12 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\DuplicationManager as DuplicationManager;
-use \RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\DuplicationManager as DuplicationManager;
+use RedBeanPHP\OODBBean as OODBBean; 
+
 /**
  * RedUNIT_Base_Dup
  *

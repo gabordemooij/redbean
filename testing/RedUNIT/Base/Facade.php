@@ -1,13 +1,16 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\ToolBox as ToolBox;
-use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\AssociationManager as AssociationManager;
+use RedBeanPHP\OODB as OODB;
+use RedBeanPHP\ToolBox as ToolBox;
+use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\OODBBean as OODBBean; 
+
 /**
  * RedUNIT_Base_Facade
  *

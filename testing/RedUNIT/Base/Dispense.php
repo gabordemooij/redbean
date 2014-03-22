@@ -1,10 +1,13 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException as RedException;
-use \RedBeanPHP\Facade as Facade;
-use \RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\Facade as Facade;
+use RedBeanPHP\OODBBean as OODBBean; 
+
 /**
  * RedUNIT_Base_Dispense
  *

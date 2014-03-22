@@ -1,9 +1,11 @@
 <?php 
+
 namespace RedUNIT\Mysql;
+
 use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
+use RedBeanPHP\SQLHelper as SQLHelper; 
 
-use \RedBeanPHP\SQLHelper as SQLHelper; 
 /**
  * RedUNIT_Mysql_Mix
  *

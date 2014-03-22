@@ -1,11 +1,13 @@
 <?php 
-namespace RedUNIT\Mysql;
-use RedBeanPHP\Facade as R;
 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\QueryWriter\MySQL as MySQL;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\RedException as RedException; 
+namespace RedUNIT\Mysql;
+
+use RedBeanPHP\Facade as R;
+use RedBeanPHP\AssociationManager as AssociationManager;
+use RedBeanPHP\QueryWriter\MySQL as MySQL;
+use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\RedException as RedException; 
+
 /**
  * RedUNIT_Mysql_Writer
  *

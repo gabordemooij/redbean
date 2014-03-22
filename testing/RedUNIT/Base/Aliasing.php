@@ -1,6 +1,7 @@
 <?php 
 
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\RedException as RedException; 

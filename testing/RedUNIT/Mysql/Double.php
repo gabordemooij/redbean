@@ -1,5 +1,7 @@
 <?php 
- namespace RedUNIT\Mysql;
+
+namespace RedUNIT\Mysql;
+
 use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
 

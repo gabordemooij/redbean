@@ -1,11 +1,13 @@
-<?php 
+<?php
+
 namespace RedUNIT\Postgres;
+
 use RedUNIT\Postgres as Postgres;
 use RedBeanPHP\Facade as R;
+use RedBeanPHP\AssociationManager as AssociationManager;
+use RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
+use RedBeanPHP\RedException\SQL as SQL; 
 
-use \RedBeanPHP\AssociationManager as AssociationManager;
-use \RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
-use \RedBeanPHP\RedException\SQL as SQL; 
 /**
  * RedUNIT_Postgres_Writer
  *

@@ -1,8 +1,11 @@
 <?php 
+
 namespace RedUNIT\Blackhole;
+
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\QueryWriter as QueryWriter; 
+use RedBeanPHP\QueryWriter as QueryWriter; 
+
 /**
  * RedUNIT_Blackhole_Glue
  *

@@ -1,12 +1,14 @@
 <?php 
+
 namespace RedUNIT\Blackhole;
+
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\Driver\RPDO as RPDO;
-use \RedBeanPHP\Logger\RDefault as RDefault;
-use \RedBeanPHP\RedException as RedException;
-use \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
+use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\Driver\RPDO as RPDO;
+use RedBeanPHP\Logger\RDefault as RDefault;
+use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 /**

@@ -1,16 +1,18 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\Logger\RDefault as RDefault;
-use \RedBeanPHP\Logger as Logger;
-use \RedBeanPHP\OODBBean as OODBBean;
-use \RedBeanPHP\OODB as OODB;
-use \RedBeanPHP\Adapter as Adapter;
-use \RedBeanPHP\QueryWriter as QueryWriter;
-use \RedBeanPHP\RedException as RedException;
-use \RedBeanPHP\RedException\SQL as SQL;
-use \RedBeanPHP\Driver\RPDO as RPDO;
+use RedBeanPHP\Logger\RDefault as RDefault;
+use RedBeanPHP\Logger as Logger;
+use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\OODB as OODB;
+use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\Driver\RPDO as RPDO;
 
 /**
  * RedUNIT_Base_Misc

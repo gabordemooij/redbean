@@ -1,9 +1,11 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException as RedException;
-use \RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * Traverse Test

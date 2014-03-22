@@ -1,9 +1,11 @@
 <?php 
+
 namespace RedUNIT\Base;
+
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException as RedException; 
-use \RedBeanPHP\RedException\SQL as SQL; 
+use RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException\SQL as SQL; 
 
 /**
  * RedUNIT_Base_Count

@@ -1,5 +1,7 @@
 <?php 
+
 namespace RedUNIT\Postgres;
+
 use RedUNIT\Postgres as Postgres;
 use RedBeanPHP\Facade as R;
 
