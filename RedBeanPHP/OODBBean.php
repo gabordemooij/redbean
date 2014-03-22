@@ -437,6 +437,13 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function __isset( $property )
 	{
+		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
+			$property = substr($property, 1);
+			$property = preg_replace( '/List$/', '', $property );
+		} elseif ( strpos( $property, 'own' ) === 0 || strpos( $property, 'shared' ) ) {
+			$property = preg_replace( '/List$/', '', $property );
+		}
+		
 		return isset( $this->properties[$property] );
 	}
 
@@ -460,6 +467,13 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function __unset( $property )
 	{
+		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
+			$property = substr($property, 1);
+			$property = preg_replace( '/List$/', '', $property );
+		} elseif ( strpos( $property, 'own' ) === 0 || strpos( $property, 'shared' ) ) {
+			$property = preg_replace( '/List$/', '', $property );
+		}
+		
 		$this->writeOnly = true;
 		$this->__get( $property );
 		$this->writeOnly = false;
@@ -672,17 +686,22 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 		}
 
-		$isEx = false;
-		if (strpos($property, 'xown') === 0) { 
+		$isEx     = FALSE;
+		$isOwn    = FALSE;
+		$isShared = FALSE;
+		
+		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
 			$property = substr($property, 1);
-			$isEx = true;
-		}
-		
-		$isOwn    = strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) );
-		$isShared = strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) );
-		
-		if ($isOwn) $listName = lcfirst( substr( $property, 3 ) );
-		if ($isEx) $this->__info['sys.exclusive-'.$listName] = true;
+			$listName = lcfirst( substr( $property, 3 ) );
+			$isEx     = TRUE;
+			$isOwn    = TRUE;
+			$this->__info['sys.exclusive-'.$listName] = TRUE;
+		} elseif ( strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) ) )  {
+			$isOwn    = TRUE;
+			$listName = lcfirst( substr( $property, 3 ) );
+		} elseif ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
+			$isShared = TRUE;
+		}	
 		
 		$hasAlias = (!is_null($this->aliasName));
 
@@ -787,7 +806,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->__get( $property );
 		$this->writeOnly = false;
 
-		if (strpos($property, 'xown') === 0) {
+		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
 			$property = substr($property, 1);
 		}
 		

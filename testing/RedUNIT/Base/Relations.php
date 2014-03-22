@@ -1498,6 +1498,188 @@ class Relations extends Base
 		asrt( R::count('page'), 2 );
 	}
 	
+	/**
+	 * Test whether magic array interface functions like isset() and
+	 * unset work correctly with the x-own-list and the List-suffix.
+	 * 
+	 * @return void
+	 */
+	public function testWhetherIssetWorksWithXList()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		
+		asrt( isset( $book->xownPageList ), FALSE );
+		asrt( isset( $book->ownPageList ), FALSE );
+		asrt( isset( $book->xownPage ), FALSE );
+		asrt( isset( $book->ownPage ), FALSE );
+		
+		$book->xownPageList[] = $page;
+		
+		asrt( isset( $book->xownPageList ), TRUE );
+		asrt( isset( $book->ownPageList ), TRUE );
+		asrt( isset( $book->xownPage ), TRUE );
+		asrt( isset( $book->ownPage ), TRUE );
+		
+		//Array offset works different but is faster because it does not support the aliases
+		asrt( isset( $book['xownPageList'] ), FALSE );
+		asrt( isset( $book['ownPageList'] ), FALSE );
+		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['ownPage'] ), TRUE );
+		
+		R::store( $book );
+		$book = $book->fresh();
+		
+		asrt( isset( $book->xownPageList ), FALSE );
+		asrt( isset( $book->ownPageList ), FALSE );
+		asrt( isset( $book->xownPage ), FALSE );
+		asrt( isset( $book->ownPage ), FALSE );
+		
+		//Array offset works different but is faster because it does not support the aliases
+		asrt( isset( $book['xownPageList'] ), FALSE );
+		asrt( isset( $book['ownPageList'] ), FALSE );
+		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['ownPage'] ), FALSE );
+		
+		$book->xownPageList;
+		
+		asrt( isset( $book->xownPageList ), TRUE );
+		asrt( isset( $book->ownPageList ), TRUE );
+		asrt( isset( $book->xownPage ), TRUE );
+		asrt( isset( $book->ownPage ), TRUE );
+		
+		//Array offset works different but is faster because it does not support the aliases
+		asrt( isset( $book['xownPageList'] ), FALSE );
+		asrt( isset( $book['ownPageList'] ), FALSE );
+		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['ownPage'] ), TRUE );
+		$book = $book->fresh();
+		
+		asrt( isset( $book->xownPageList ), FALSE );
+		asrt( isset( $book->ownPageList ), FALSE );
+		asrt( isset( $book->xownPage ), FALSE );
+		asrt( isset( $book->ownPage ), FALSE );
+		
+		//Array offset works different but is faster because it does not support the aliases
+		asrt( isset( $book['xownPageList'] ), FALSE );
+		asrt( isset( $book['ownPageList'] ), FALSE );
+		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['ownPage'] ), FALSE );
+		
+		$book->noLoad()->xownPageList;
+		
+		asrt( isset( $book->xownPageList ), TRUE );
+		asrt( isset( $book->ownPageList ), TRUE );
+		
+		//but empty
+		asrt( count( $book->ownPageList ), 0 );
+		asrt( count( $book->xownPageList ), 0 );
+		asrt( count( $book->ownPage ), 0 );
+		asrt( count( $book->xownPage ), 0 );
+
+		$book->xownPageList[] = $page;
+		asrt( isset( $book->xownPageList ), TRUE );
+		asrt( isset( $book->ownPageList ), TRUE );
+		asrt( isset( $book->xownPage ), TRUE );
+		asrt( isset( $book->ownPage ), TRUE );
+		
+		//Array offset works different but is faster because it does not support the aliases
+		asrt( isset( $book['xownPageList'] ), FALSE );
+		asrt( isset( $book['ownPageList'] ), FALSE );
+		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['ownPage'] ), TRUE );
+		
+		unset( $book->xownPageList );
+
+		asrt( isset( $book->xownPageList ), FALSE );
+		asrt( isset( $book->ownPageList ), FALSE );
+		asrt( isset( $book->xownPage ), FALSE );
+		asrt( isset( $book->ownPage ), FALSE );
+		
+		//Array offset works different but is faster because it does not support the aliases
+		asrt( isset( $book['xownPageList'] ), FALSE );
+		asrt( isset( $book['ownPageList'] ), FALSE );
+		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['ownPage'] ), FALSE );
+		
+		$book->xownPageList[] = $page;
+		
+		asrt( isset( $book->xownPageList ), TRUE );
+		asrt( isset( $book->ownPageList ), TRUE );
+		asrt( isset( $book->xownPage ), TRUE );
+		asrt( isset( $book->ownPage ), TRUE );
+		
+		//Array offset works different but is faster because it does not support the aliases
+		asrt( isset( $book['xownPageList'] ), FALSE );
+		asrt( isset( $book['ownPageList'] ), FALSE );
+		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['ownPage'] ), TRUE );
+		
+		unset( $book->xownPage );
+		
+		asrt( isset( $book->xownPageList ), FALSE );
+		asrt( isset( $book->ownPageList ), FALSE );
+		asrt( isset( $book->xownPage ), FALSE );
+		asrt( isset( $book->ownPage ), FALSE );
+		
+		//Array offset works different but is faster because it does not support the aliases
+		asrt( isset( $book['xownPageList'] ), FALSE );
+		asrt( isset( $book['ownPageList'] ), FALSE );
+		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['ownPage'] ), FALSE );
+		
+		$book = $book->fresh();
+		asrt( isset( $book->xownPageList ), FALSE );
+		asrt( isset( $book->ownPageList ), FALSE );
+		asrt( isset( $book->xownPage ), FALSE );
+		asrt( isset( $book->ownPage ), FALSE );
+		
+		//Array offset works different but is faster because it does not support the aliases
+		asrt( isset( $book['xownPageList'] ), FALSE );
+		asrt( isset( $book['ownPageList'] ), FALSE );
+		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['ownPage'] ), FALSE );
+		
+		$book->ownPageList;
+		asrt( isset( $book->xownPageList ), TRUE );
+		asrt( isset( $book->ownPageList ), TRUE );
+		asrt( isset( $book->xownPage ), TRUE );
+		asrt( isset( $book->ownPage ), TRUE );
+		
+		//Array offset works different but is faster because it does not support the aliases
+		asrt( isset( $book['xownPageList'] ), FALSE );
+		asrt( isset( $book['ownPageList'] ), FALSE );
+		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['ownPage'] ), TRUE );
+	}
 	
-	
+	/**
+	 * Test whether you can still set items starting with 'xown' or
+	 * 'own' not followed by an uppercase character.
+	 * 
+	 * @return void
+	 */
+	public function testConfusionWithXOwnList()
+	{
+		$book = R::dispense( 'book' );
+		$book->xownitem = 1;
+		asrt( isset( $book->xownitem ), TRUE );
+		asrt( (int) $book->xownitem, 1 );
+		asrt( isset( $book->xownItem ), FALSE );
+		asrt( isset( $book->xownItemList ), FALSE );
+		$book->ownitem = 1;
+		asrt( isset( $book->ownitem ), TRUE );
+		asrt( (int) $book->ownitem, 1 );
+		asrt( isset( $book->ownItemList ), FALSE );
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( isset( $book->xownitem ), TRUE );
+		asrt( (int) $book->xownitem, 1 );
+		asrt( isset( $book->xownItem ), FALSE );
+		asrt( isset( $book->xownItemList ), FALSE );
+		asrt( isset( $book->ownitem ), TRUE );
+		asrt( (int) $book->ownitem, 1 );
+		asrt( isset( $book->ownItemList ), FALSE );
+	}
 }
