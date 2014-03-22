@@ -1686,4 +1686,34 @@ class Relations extends Base
 		asrt( (int) $book->ownitem, 1 );
 		asrt( isset( $book->ownItemList ), FALSE );
 	}
+	
+	/**
+	 * Test whether we can determine the mode of a list.
+	 * 
+	 * @return void
+	 */
+	public function testModeCheckerOfLists()
+	{
+		foreach( array( 'ownPage', 'xownPage', 'ownPageList', 'xownPageList' ) as $listName ) { 
+			$book = R::dispense( 'book' );
+			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
+			$book->ownPageList[] = R::dispense( 'page' );
+			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
+
+			$book = R::dispense( 'book' );
+			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
+			$book->xownPageList[] = R::dispense( 'page' );
+			asrt( $book->isListInExclusiveMode( $listName ), TRUE );
+
+			$book = R::dispense( 'book' );
+			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
+			$book->ownPage[] = R::dispense( 'page' );
+			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
+
+			$book = R::dispense( 'book' );
+			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
+			$book->xownPage[] = R::dispense( 'page' );
+			asrt( $book->isListInExclusiveMode( $listName ), TRUE );
+		}
+	}
 }

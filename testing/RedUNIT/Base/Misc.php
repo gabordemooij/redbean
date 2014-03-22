@@ -71,6 +71,22 @@ class Misc extends Base
 	}
 
 	/**
+	 * Test beautification and array functions.
+	 * 
+	 * @return void
+	 */
+	public function testBeauficationAndArrayFunctions()
+	{
+		$bean = R::dispense( 'bean' );
+		$bean->isReallyAwesome = TRUE;
+		asrt( isset( $bean->isReallyAwesome ), TRUE );
+		asrt( isset( $bean->is_really_awesome ), TRUE );
+		unset( $bean->is_really_awesome );
+		asrt( isset( $bean->isReallyAwesome ), FALSE );
+		asrt( isset( $bean->is_really_awesome ), FALSE );
+	}
+	
+	/**
 	 * Test beautification of column names.
 	 * 
 	 * @return void

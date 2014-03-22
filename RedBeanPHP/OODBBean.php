@@ -437,13 +437,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function __isset( $property )
 	{
+		$property = $this->beau( $property );
+
 		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
 			$property = substr($property, 1);
-			$property = preg_replace( '/List$/', '', $property );
-		} elseif ( strpos( $property, 'own' ) === 0 || strpos( $property, 'shared' ) ) {
-			$property = preg_replace( '/List$/', '', $property );
 		}
-		
+
 		return isset( $this->properties[$property] );
 	}
 
@@ -467,11 +466,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function __unset( $property )
 	{
+		$property = $this->beau( $property );
+		
 		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
 			$property = substr($property, 1);
-			$property = preg_replace( '/List$/', '', $property );
-		} elseif ( strpos( $property, 'own' ) === 0 || strpos( $property, 'shared' ) ) {
-			$property = preg_replace( '/List$/', '', $property );
 		}
 		
 		$this->writeOnly = true;
@@ -665,6 +663,28 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->aliasName  = NULL;
 		$this->fetchType  = NULL;
 		$this->noLoad     = FALSE;
+	}
+	
+	/**
+	 * Determines whether a list is opened in exclusive mode or not.
+	 * If a list has been opened in exclusive mode this method will return TRUE,
+	 * othwerwise it will return FALSE.
+	 * 
+	 * @param string $listName name of the list to check
+	 * 
+	 * @return boolean
+	 */
+	public function isListInExclusiveMode( $listName )
+	{
+		$listName = $this->beau( $listName );
+		
+		if ( strpos( $listName, 'xown' ) === 0 && ctype_upper( substr( $listName, 4, 1 ) ) ) { 
+			$listName = substr($listName, 1);
+		}
+		
+		$listName = lcfirst( substr( $listName, 3 ) );
+		
+		return ( isset( $this->__info['sys.exclusive-'.$listName] ) && $this->__info['sys.exclusive-'.$listName] );
 	}
 
 	/**
