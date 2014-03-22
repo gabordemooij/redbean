@@ -41,6 +41,12 @@ require_once( 'RedUNIT/Pretest.php' );
 $extraTestsFromHook = array();
 $hookPath = '';
 
+$colorMap = array( 
+		 'mysql'  => '0;31',
+		 'pgsql'  => '0;32',
+		 'sqlite' => '0;34',
+);
+
 @include 'cli/test_hook.php';
 
 //Configure the databases
@@ -175,7 +181,7 @@ if ( $mode == 'all' ) {
 		if ( strpos( $pack, $mode ) === 0 ) $packList[] = $pack;
 	}
 	//Add plugin pack to list.
-	if (count($packList) === 0) {
+	if ( count($packList) === 0 && count($extraTestsFromHook) === 0 ) {
 		$packList[] = $mode;
 	}
 }
@@ -186,10 +192,9 @@ $j = 0;
 foreach ( $packList as $testPack ) {
 	$j ++;
 	
-	if (file_exists($path . $testPack . '.php')) require($path . $testPack . '.php');
-	if (file_exists($hookPath . $testPack . '.php')) require($hookPath . $testPack . '.php');
+	if ( file_exists( $path . $testPack . '.php' ) ) require( $path . $testPack . '.php' );
+	elseif ( file_exists( $hookPath . $testPack . '.php') ) require( $hookPath . $testPack . '.php' );
 	
-
 	$testPack = str_replace( '../', '', $testPack );
 	
 	if ($j === 1 && $classSpec) {
@@ -203,14 +208,6 @@ foreach ( $packList as $testPack ) {
 
 	$drivers       = $test->getTargetDrivers();
 	
-	$colorMap      = array( 
-		 'mysql'  => '0;31',
-		 'pgsql'  => '0;32',
-		 'sqlite' => '0;34',
-		 'oracle' => '0;33',
-		 'CUBRID' => '0;35' 
-	);
-
 	maintestpack( str_replace( '_', ' ', get_class( $test ) ) );
 
 	if ( $drivers && is_array( $drivers ) ) {
