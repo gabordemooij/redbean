@@ -1502,6 +1502,10 @@ class Relations extends Base
 	 * Test whether magic array interface functions like isset() and
 	 * unset work correctly with the x-own-list and the List-suffix.
 	 * 
+	 * Array functions do not reveal x-own-lists and list-alias because
+	 * you dont want duplicate entries in foreach-loops.
+	 * Also offers a slight performance improvement for array access.
+	 * 
 	 * @return void
 	 */
 	public function testWhetherIssetWorksWithXList()

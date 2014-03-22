@@ -981,6 +981,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	/**
 	 * Implementation of Array Access Interface, you can access bean objects
 	 * like an array.
+	 * 
+	 * Array functions do not reveal x-own-lists and list-alias because
+	 * you dont want duplicate entries in foreach-loops.
+	 * Also offers a slight performance improvement for array access.
 	 *
 	 * @param  mixed $offset property
 	 *
@@ -995,6 +999,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Implementation of Array Access Interface, you can access bean objects
 	 * like an array.
 	 * Unsets a value from the array/bean.
+	 * 
+	 * Array functions do not reveal x-own-lists and list-alias because
+	 * you dont want duplicate entries in foreach-loops.
+	 * Also offers a slight performance improvement for array access.
 	 *
 	 * @param  mixed $offset property
 	 *
@@ -1009,6 +1017,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Implementation of Array Access Interface, you can access bean objects
 	 * like an array.
 	 * Returns value of a property.
+	 * 
+	 * Array functions do not reveal x-own-lists and list-alias because
+	 * you dont want duplicate entries in foreach-loops.
+	 * Also offers a slight performance improvement for array access.
 	 *
 	 * @param  mixed $offset property
 	 *
