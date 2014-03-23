@@ -57,20 +57,30 @@ $drivers       = $test->getTargetDrivers();
 foreach ( $drivers as $driver ) {
 			
 			if ( !isset( $ini[$driver] ) ) continue;
-			if ( !isset( $_SERVER['argv'][1])) die('Missing parameter.');
+			if ( !isset( $_SERVER['argv'][1])) die('Missing parameter. Usage: php runperf.php <testname>');
 			
 			$method = $_SERVER['argv'][1];
 			
-			echo "Performing test: $method with driver $driver ".PHP_EOL;
-			
-			$t1 = microtime( TRUE );
-			
-			$test->$method();
-			
-			$t2 = microtime( TRUE );
-			
-			$d = $t2 - $t1;
-			
-			echo "Time elapsed: $d ".PHP_EOL;
-			
+			if ($method === 'setup') {
+				
+				echo 'Setup...'.PHP_EOL;
+				
+				$test->$method();
+
+				echo 'READY'.PHP_EOL;
+				
+			} else {
+				
+				echo "Performing test: $method with driver $driver ".PHP_EOL;
+
+				$t1 = microtime( TRUE );
+
+				$test->$method();
+
+				$t2 = microtime( TRUE );
+
+				$d = $t2 - $t1;
+
+				echo "Time elapsed: $d ".PHP_EOL;
+			}
 }
