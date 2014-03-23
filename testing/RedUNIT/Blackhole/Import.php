@@ -218,4 +218,59 @@ class Import extends Blackhole
 		// Id should not be transferred
 		asrt( $cup->id, 0 );
 	}
+	
+	/**
+	 * Test import using array access functions
+	 * 
+	 * @return void
+	 */
+	public function testArrayAccess()
+	{
+		$book = R::dispense( 'book' );
+		$book->isAwesome = TRUE;
+		asrt( isset( $book->isAwesome ), TRUE );
+		$book = R::dispense( 'book' );
+		$book['isAwesome'] = TRUE;
+		asrt( isset( $book->isAwesome ), TRUE );
+		
+		$book = R::dispense( 'book' );
+		$book['xownPageList'] = R::dispense( 'page', 2 );
+		asrt( isset( $book->ownPage ), TRUE );
+		asrt( isset( $book->xownPage ), TRUE );
+		asrt( isset( $book->ownPageList ), TRUE );
+		asrt( isset( $book->xownPageList ), TRUE );
+		
+		$book = R::dispense( 'book' );
+		$book['ownPageList'] = R::dispense( 'page', 2 );
+		asrt( isset( $book->ownPage ), TRUE );
+		asrt( isset( $book->xownPage ), TRUE );
+		asrt( isset( $book->ownPageList ), TRUE );
+		asrt( isset( $book->xownPageList ), TRUE );
+		
+		$book = R::dispense( 'book' );
+		$book['xownPage'] = R::dispense( 'page', 2 );
+		asrt( isset( $book->ownPage ), TRUE );
+		asrt( isset( $book->xownPage ), TRUE );
+		asrt( isset( $book->ownPageList ), TRUE );
+		asrt( isset( $book->xownPageList ), TRUE );
+		
+		$book = R::dispense( 'book' );
+		$book['ownPage'] = R::dispense( 'page', 2 );
+		asrt( isset( $book->ownPage ), TRUE );
+		asrt( isset( $book->xownPage ), TRUE );
+		asrt( isset( $book->ownPageList ), TRUE );
+		asrt( isset( $book->xownPageList ), TRUE );
+		
+		$book = R::dispense( 'book' );
+		$book['sharedTag'] = R::dispense( 'tag', 2 );
+		asrt( isset( $book->sharedTag ), TRUE );
+		asrt( isset( $book->sharedTagList ), TRUE );
+		
+		$book = R::dispense( 'book' );
+		$book['sharedTagList'] = R::dispense( 'tag', 2 );
+		asrt( isset( $book->sharedTag ), TRUE );
+		asrt( isset( $book->sharedTagList ), TRUE );
+		
+	}
+	
 }

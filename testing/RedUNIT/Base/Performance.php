@@ -89,4 +89,38 @@ class Performance extends Base
 		R::trash( $book );
 		
 	}
+	
+	/**
+	 * CRUD performance Array Access.
+	 * 
+	 * @return void
+	 */
+	public function crudaa()
+	{
+		R::freeze( TRUE );
+		
+		$book = R::dispense( 'book' );
+		$book['title'] = 'Book';
+		$page = R::dispense('page');
+		$page['content'] = 'Content';
+		$page['title'] = 'data';
+		$page['sequence'] = 'data';
+		$page['order'] = 'data';
+		$page['columns'] = 'data';
+		$page['paragraphs'] = 'data';
+		$page['paragraphs1'] = 'data';
+		$page['paragraphs2'] = 'data';
+		$page['paragraphs3'] = 'data';
+		$page['paragraphs4'] = 'data';
+		$tag = R::dispense('tag');
+		$tag['label'] = 'Tag ';
+		$book->ownPage[] = $page;
+		$book->noLoad()->sharedTag[] = $tag;
+		R::store( $book );
+		$book = $book->fresh();
+		$book->ownPage;
+		$book->sharedTag;
+		R::trash( $book );
+		
+	}
 }
