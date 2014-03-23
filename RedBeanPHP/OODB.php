@@ -230,12 +230,21 @@ class OODB extends Observable
 				$this->createTableIfNotExists( $bean, $table );
 				$updateValues = $this->getUpdateValues( $bean );			
 				$this->addUniqueConstraints( $bean );
+				$bean->id = $this->writer->updateRecord( $table, $updateValues, $bean->id );
+				$bean->setMeta( 'tainted', FALSE );
 			} else {
-				$table = $bean->getMeta( 'type' );
-				$updateValues = $this->getUpdateValues( $bean );			
+				list( $properties, $table ) = $bean->getPropertiesAndType();
+				$id = $properties['id'];
+				unset($properties['id']);
+				$updateValues = array();
+				$k1 = 'property';
+				$k2 = 'value';
+				foreach( $properties as $key => $value ) {
+					$updateValues[] = array( $k1 => $key, $k2 => $value );
+				}
+				$bean->id = $this->writer->updateRecord( $table, $updateValues, $id );
+				$bean->setMeta( 'tainted', FALSE );
 			}
-			$bean->id = $this->writer->updateRecord( $table, $updateValues, $bean->id );
-			$bean->setMeta( 'tainted', FALSE );
 		}
 	}
 

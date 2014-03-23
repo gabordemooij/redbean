@@ -615,6 +615,21 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		return $this->properties;
 	}
+	
+	/**
+	 * Returns properties of bean as an array.
+	 * This method returns the raw internal property list of the
+	 * bean. Only use this method for optimization purposes. Otherwise
+	 * use the export() method to export bean data to arrays.
+	 * This method returns an array with the properties array and
+	 * the type (string).
+	 * 
+	 * @return array
+	 */
+	public function getPropertiesAndType()
+	{
+		return array( $this->properties, $this->__info['type'] );
+	}
 
 	/**
 	 * Turns a camelcase property name into an underscored property name.
@@ -1412,7 +1427,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * @return boolean
 	 */
-	public function equals(OODBBean $bean) {
+	public function equals(OODBBean $bean)
+	{
 		return (bool) (
 			   ( (string) $this->properties['id'] === (string) $bean->properties['id'] )
 			&& ( (string) $this->__info['type']   === (string) $bean->__info['type']   )

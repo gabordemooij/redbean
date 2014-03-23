@@ -57,7 +57,7 @@ $drivers       = $test->getTargetDrivers();
 foreach ( $drivers as $driver ) {
 			
 			if ( !isset( $ini[$driver] ) ) continue;
-			if ( !isset( $_SERVER['argv'][1])) die('Missing parameter. Usage: php runperf.php <testname>');
+			if ( !isset( $_SERVER['argv'][1])) die('Missing parameter. Usage: php runperf.php <testname> <TIMES> ');
 			
 			$method = $_SERVER['argv'][1];
 			
@@ -71,16 +71,30 @@ foreach ( $drivers as $driver ) {
 				
 			} else {
 				
+				$times = 100;
+				if (isset($_SERVER['argv'][2])) {
+					$times = (int) $_SERVER['argv'][2];
+				}
+						
 				echo "Performing test: $method with driver $driver ".PHP_EOL;
 
-				$t1 = microtime( TRUE );
+				for ($j=0; $j<$times; $j++) {
+					
+					$t1 = microtime( TRUE );
 
-				$test->$method();
+					$test->$method();
 
-				$t2 = microtime( TRUE );
+					$t2 = microtime( TRUE );
 
-				$d = $t2 - $t1;
-
-				echo "Time elapsed: $d ".PHP_EOL;
+					$d[] = ($t2 - $t1);
+					
+				}
+				
+				$s = array_sum($d);
+				$a = ($s / $times);
+				$mx = max($d);
+				$mn = min($d);
+				
+				echo PHP_EOL."AVG: $a, MAX: $mx, MIN: $mn, TOTAL: $s, TIMES: $times ".PHP_EOL;
 			}
 }

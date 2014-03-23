@@ -37,6 +37,15 @@ class Performance extends Base
 		$pages = R::dispense( 'page', 10 );
 		foreach( $pages as $page ) {
 			$page->content = 'lorem ipsum';
+			$page->title = 'data';
+			$page->sequence = 'data';
+			$page->order = 'data';
+			$page->columns = 'data';
+			$page->paragraphs = 'data';
+			$page->paragraphs1 = 'data';
+			$page->paragraphs2 = 'data';
+			$page->paragraphs3 = 'data';
+			$page->paragraphs4 = 'data';
 		}
 		$book->xownPageList = $pages;
 		$tags = R::dispense( 'tag', 6 );
@@ -56,20 +65,28 @@ class Performance extends Base
 	{
 		R::freeze( TRUE );
 		
-		for( $i = 0; $i < 100; $i++ ) {
-			$book = R::dispense( 'book' );
-			$book->title = 'Book '.$i;
-			$page = R::dispense('page');
-			$page->content = 'Content '.$i;
-			$tag = R::dispense('tag');
-			$tag->label = 'Tag '.$i;
-			$book->noLoad()->ownPage[] = $page;
-			$book->noLoad()->sharedTag[] = $tag;
-			R::store( $book );
-			$book = $book->fresh();
-			$book->ownPage;
-			$book->sharedTag;
-			R::trash( $book );
-		}
+		$book = R::dispense( 'book' );
+		$book->title = 'Book';
+		$page = R::dispense('page');
+		$page->content = 'Content';
+		$page->title = 'data';
+		$page->sequence = 'data';
+		$page->order = 'data';
+		$page->columns = 'data';
+		$page->paragraphs = 'data';
+		$page->paragraphs1 = 'data';
+		$page->paragraphs2 = 'data';
+		$page->paragraphs3 = 'data';
+		$page->paragraphs4 = 'data';
+		$tag = R::dispense('tag');
+		$tag->label = 'Tag ';
+		$book->noLoad()->ownPage[] = $page;
+		$book->noLoad()->sharedTag[] = $tag;
+		R::store( $book );
+		$book = $book->fresh();
+		$book->ownPage;
+		$book->sharedTag;
+		R::trash( $book );
+		
 	}
 }
