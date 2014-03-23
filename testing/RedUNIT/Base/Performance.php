@@ -29,7 +29,6 @@ class Performance extends Base
 	 */
 	public function setup()
 	{
-		echo 'Preparing database.'.PHP_EOL;
 		R::nuke();
 		
 		//Prepare structure
@@ -46,7 +45,6 @@ class Performance extends Base
 		}
 		$book->sharedTagList = $tags;
 		R::store( $book );
-		echo 'READY.'.PHP_EOL;
 	}
 	
 	/**
