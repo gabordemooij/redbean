@@ -1,9 +1,10 @@
 <?php 
 
-namespace RedBeanPHP; 
+namespace RedBeanPHP;
+
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\AssociationManager as AssociationManager;
-use RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * RedBean Tag Manager.

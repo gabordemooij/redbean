@@ -1,6 +1,7 @@
 <?php 
 
-namespace RedBeanPHP; 
+namespace RedBeanPHP;
+
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Observable as Observable;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;

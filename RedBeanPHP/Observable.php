@@ -1,7 +1,8 @@
 <?php 
 
-namespace RedBeanPHP; 
-use RedBeanPHP\Observer as Observer; 
+namespace RedBeanPHP;
+
+use RedBeanPHP\Observer as Observer;
 
 /**
  * Observable

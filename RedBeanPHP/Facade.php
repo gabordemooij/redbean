@@ -1,6 +1,7 @@
 <?php
 
-namespace RedBeanPHP; 
+namespace RedBeanPHP;
+
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\QueryWriter as QueryWriter;

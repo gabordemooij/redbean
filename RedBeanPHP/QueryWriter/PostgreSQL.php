@@ -1,6 +1,7 @@
 <?php 
 
-namespace RedBeanPHP\QueryWriter; 
+namespace RedBeanPHP\QueryWriter;
+
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;

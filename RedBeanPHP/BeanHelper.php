@@ -1,8 +1,9 @@
 <?php
 
-namespace RedBeanPHP; 
+namespace RedBeanPHP;
+
 use RedBeanPHP\ToolBox as ToolBox;
-use RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * Bean Helper Interface

@@ -1,6 +1,7 @@
 <?php
 
-namespace RedBeanPHP\Driver; 
+namespace RedBeanPHP\Driver;
+
 use RedBeanPHP\Driver as Driver;
 use RedBeanPHP\Logger as Logger;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;

@@ -1,9 +1,10 @@
 <?php 
 
 namespace RedBeanPHP;
+
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\BeanHelper as BeanHelper;
-use RedBeanPHP\RedException\Security as Security; 
+use RedBeanPHP\RedException\Security as Security;
 
 /**
  * OODBBean (Object Oriented DataBase Bean)
