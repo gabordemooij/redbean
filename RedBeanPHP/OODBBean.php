@@ -743,7 +743,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			return $this->properties[$property];
 		}
 		
-		$fieldLink      = $property . '_id';
+		$fieldLink = $property . '_id';
 		
 		//If not exists and no field link and no list, bail out.
 		if ( !$exists && !isset($this->$fieldLink) && (!$isOwn && !$isShared )) {
@@ -776,10 +776,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			
 		} elseif ( $isOwn || $isShared ) {
 			
-			if ( $isOwn ) {
-					$beans = $this->getOwnList( $listName, $redbean );
+			if ( $this->noLoad ) {
+				$beans = array();
+			} elseif ( $isOwn ) {
+				$beans = $this->getOwnList( $listName, $redbean );
 			} else {
-					$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
+				$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
 			}
 
 			$this->properties[$property] = $beans;
@@ -857,9 +859,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->clear();
 		$this->__info['tainted'] = TRUE;
 
-		if ( isset( $this->properties[$fieldLink] )
-			&& !( $value instanceof OODBBean )
-		) {
+		if ( isset( $this->properties[$fieldLink] ) && !( $value instanceof OODBBean ) ) {
 			if ( is_null( $value ) || $value === FALSE ) {
 				
 				unset( $this->properties[ $property ]);

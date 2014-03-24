@@ -725,8 +725,15 @@ class Relations extends Base
 
 		$b2 = R::load( 'book', $book2->id );
 
-		asrt( count( $b2->ownPage ), 0 );
+		asrt( count( $b2->ownPage ), 1 ); //does not work
+		$page1->book = NULL;
 
+		R::store( $page1 );
+
+		$b2 = R::load( 'book', $book2->id );
+
+		asrt( count( $b2->ownPage ), 0 ); //works
+		
 		// Re-add the page
 		$b2->ownPage[] = $page1;
 
