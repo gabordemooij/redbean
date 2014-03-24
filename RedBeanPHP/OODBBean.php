@@ -81,11 +81,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * @var boolean
 	 */
 	private $noLoad = FALSE;
-	
-	/**
-	 * @var boolean
-	 */
-	private $writeOnly = false;
 
 	/** Returns the alias for a type
 	 *
