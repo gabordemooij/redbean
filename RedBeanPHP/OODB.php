@@ -376,17 +376,13 @@ class OODB extends Observable
 	 */
 	private function processTrashcan( $bean, $ownTrashcan )
 	{
-		$myFieldLink = $bean->getMeta( 'type' ) . '_id';
-		if ( is_array( $ownTrashcan ) && count( $ownTrashcan ) > 0 ) {
-			$first = reset( $ownTrashcan );
-			if ( $first instanceof OODBBean ) {
-				$alias = $bean->getMeta( 'sys.alias.' . $first->getMeta( 'type' ) );
-				if ( $alias ) {
-					$myFieldLink = $alias . '_id';
-				}
-			}
-		}
+		
 		foreach ( $ownTrashcan as $trash ) {
+			
+			$myFieldLink = $bean->getMeta( 'type' ) . '_id';
+			$alias = $bean->getMeta( 'sys.alias.' . $trash->getMeta( 'type' ) );
+			if ( $alias ) $myFieldLink = $alias . '_id';
+			
 			if ( $trash->getMeta( 'sys.garbage' ) === true ) {
 				$this->trash( $trash );
 			} else {
@@ -470,19 +466,15 @@ class OODB extends Observable
 	private function processAdditions( $bean, $ownAdditions )
 	{
 		$beanType = $bean->getMeta( 'type' );
-		$myFieldLink = $beanType . '_id';
-		if ( $bean && count( $ownAdditions ) > 0 ) {
-			$first = reset( $ownAdditions );
-			if ( $first instanceof OODBBean ) {
-				$alias = $bean->getMeta( 'sys.alias.' . $first->getMeta( 'type' ) );
-				if ( $alias ) {
-					$myFieldLink = $alias . '_id';
-				}
-			}
-		}
+		
 		$cachedIndex = array();
 		foreach ( $ownAdditions as $addition ) {
 			if ( $addition instanceof OODBBean ) {
+				
+				$myFieldLink = $beanType . '_id';
+				$alias = $bean->getMeta( 'sys.alias.' . $addition->getMeta( 'type' ) );
+				if ( $alias ) $myFieldLink = $alias . '_id';
+		
 				$addition->$myFieldLink = $bean->id;
 				$addition->setMeta( 'cast.' . $myFieldLink, 'id' );
 				$this->store( $addition );
