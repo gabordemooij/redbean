@@ -1374,6 +1374,16 @@ class Facade
 	{
 		return self::$toolbox;
 	}
+	
+	public static function getExtractedToolbox()
+	{
+		return array(
+			self::$redbean,
+			self::$adapter,
+			self::$writer,
+			self::$toolbox
+		);
+	}
 
 	/**
 	 * Facade method for AQueryWriter::renameAssociation()

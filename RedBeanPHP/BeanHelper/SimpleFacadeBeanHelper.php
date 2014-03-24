@@ -83,9 +83,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 */
 	public function getExtractedToolbox()
 	{
-		$toolbox = $this->getToolbox();
-
-		return array( $toolbox->getRedBean(), $toolbox->getDatabaseAdapter(), $toolbox->getWriter(), $toolbox );
+		return Facade::getExtractedToolbox();
 	}
 
 	/**
