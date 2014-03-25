@@ -699,18 +699,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function &__get( $property )
 	{
-		$onlyLowerCase = FALSE;
 		$isEx          = FALSE;
 		$isOwn         = FALSE;
 		$isShared      = FALSE;
 		
 		if ( !ctype_lower( $property ) ) {
 			$property = $this->beau( $property );
-		} else {
-			$onlyLowerCase = TRUE;
-		}
-		
-		if ( !$onlyLowerCase ) {
 			if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
 				$property = substr($property, 1);
 				$listName = lcfirst( substr( $property, 3 ) );
@@ -725,20 +719,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			}
 		}
 		
-		$hasAlias       = (!is_null($this->aliasName));
-		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
-								($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
-		$hasSQL         = ($this->withSql !== '' || $this->via !== NULL);
+		$fieldLink      = $property . '_id';
 		$exists         = isset( $this->properties[$property] );
-
-		
-		//If exists and no list or exits and list not changed, bail out.
-		if ( $exists && ((!$isOwn && !$isShared ) ||  (!$hasSQL && !$differentAlias)) ) {
-			$this->clear();
-			return $this->properties[$property];
-		}
-		
-		$fieldLink = $property . '_id';
 		
 		//If not exists and no field link and no list, bail out.
 		if ( !$exists && !isset($this->$fieldLink) && (!$isOwn && !$isShared )) {
@@ -747,18 +729,26 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			return $NULL;
 		}
 		
-		list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
+		$hasAlias       = (!is_null($this->aliasName));
+		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
+								($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
+		$hasSQL         = ($this->withSql !== '' || $this->via !== NULL);
 		
+		//If exists and no list or exits and list not changed, bail out.
+		if ( $exists && ((!$isOwn && !$isShared ) ||  (!$hasSQL && !$differentAlias)) ) {
+			$this->clear();
+			return $this->properties[$property];
+		}
+		
+		
+		list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 		
 		if ( isset( $this->$fieldLink ) ) {
 			$this->__info['tainted'] = TRUE;
 
-			$bean = NULL;
 			if ( isset( $this->__info["sys.parentcache.$property"] ) ) {
 				$bean = $this->__info["sys.parentcache.$property"];
-			}
-
-			if ( !$bean ) {
+			} else {
 				$type = $this->getAlias( $property );
 				$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 			}
@@ -803,18 +793,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function __set( $property, $value )
 	{
-		$onlyLowerCase = FALSE;
 		$isEx          = FALSE;
 		$isOwn         = FALSE;
 		$isShared      = FALSE;
 		
 		if ( !ctype_lower( $property ) ) {
 			$property = $this->beau( $property );
-		} else {
-			$onlyLowerCase = TRUE;
-		}
-		
-		if ( !$onlyLowerCase ) {
 			if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
 				$property = substr($property, 1);
 				$listName = lcfirst( substr( $property, 3 ) );
@@ -838,8 +822,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		
 		if ( ($isOwn || $isShared) &&  (!$exists || $hasSQL || $differentAlias) ) {
 			
-			
-
 			if ( !$this->noLoad ) {
 				list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 				if ( $isOwn ) {

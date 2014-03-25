@@ -123,6 +123,7 @@ $allPacks = array(
 	'Base/Update',
 	'Base/Utf8',
 	'Base/Batch',
+	'Base/Bean',
 	'Base/Writecache',
 	'Base/Relations',
 	'Base/Association',

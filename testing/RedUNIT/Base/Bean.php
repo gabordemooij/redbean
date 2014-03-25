@@ -23,7 +23,7 @@ class Bean extends Base
 	 * 
 	 * @return void
 	 */
-	public function _createBook()
+	private function _createBook()
 	{
 		R::nuke();
 		$book = R::dispense( 'book' );
@@ -50,7 +50,6 @@ class Bean extends Base
 	public function testWhetherWeCanAddToLists()
 	{
 		
-		return;
 		$book = $this->_createBook();
 		$book->ownPage[] = R::dispense( 'page' );
 		R::store( $book );
@@ -573,5 +572,98 @@ class Bean extends Base
 		$book = $book->fresh();
 		asrt( isset($book->fetchAs('author')->coauthor), FALSE );
 		asrt( (boolean) ($book->fetchAs('author')->coauthor), FALSE );
-	}	
+	}
+	
+	/**
+	 * Tests the effects of unsetting on the shadow of a list.
+	 * 
+	 * @return void
+	 */
+	public function testUnsettingAListAndShadow()
+	{
+		$book = $this->_createBook();
+		//should work with ownPage and ownPageList as well...
+		unset( $book->ownPageList );
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( count( $book->ownPage ), 2 );
+		unset( $book->ownPage );
+		//shadow should be reloaded as well...
+		$book->with(' LIMIT 1 ')->ownPage;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( count( $book->ownPage ), 2 );
+		asrt( count( $book->getMeta('sys.shadow.ownPage') ), 2 );
+		unset( $book->ownPage );
+		asrt( count( $book->getMeta('sys.shadow.ownPage') ), 2 );
+		//no load must clear shadow as well...
+		$book->noLoad()->ownPage[] = R::dispense( 'page' );
+		asrt( count( $book->getMeta('sys.shadow.ownPage') ), 0 );
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( count( $book->ownPage ), 3 );
+	}
+	
+	/**
+	 * Test whether the tainted flag gets set correctly.
+	 * 
+	 * @return void
+	 */
+	public function testAccessingTainting()
+	{
+		$book = $this->_createBook();
+		asrt( $book->isTainted(), FALSE );
+		$book->ownPage;
+		asrt( $book->isTainted(), TRUE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->author;
+		asrt( $book->isTainted(), TRUE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->fetchAs('author')->coauthor;
+		asrt( $book->isTainted(), TRUE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->alias('magazine')->xownAdList;
+		asrt( $book->isTainted(), TRUE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->title = 'Hello';
+		asrt( $book->isTainted(), TRUE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->sharedTag;
+		asrt( $book->isTainted(), TRUE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->via('connection')->sharedUser;
+		asrt( $book->isTainted(), TRUE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->coauthor;
+		asrt( $book->isTainted(), TRUE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->ownFakeList;
+		asrt( $book->isTainted(), TRUE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->sharedFakeList;
+		asrt( $book->isTainted(), TRUE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->alias('fake')->ownFakeList;
+		asrt( $book->isTainted(), TRUE );
+		
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->title;
+		asrt( $book->isTainted(), FALSE );
+		$book = $book->fresh();
+		asrt( $book->isTainted(), FALSE );
+		$book->title = 1;
+		$book->setMeta( 'tainted', FALSE );
+		asrt( $book->isTainted(), FALSE );
+	}
 }
