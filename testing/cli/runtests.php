@@ -103,6 +103,7 @@ $packList = array();
 
 $allPacks = array(
 	'Blackhole/Version',
+	'Blackhole/Toolbox',
 	'Blackhole/Fusebox',
 	'Blackhole/Labels',
 	'Blackhole/Tainted',
