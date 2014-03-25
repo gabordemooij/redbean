@@ -595,13 +595,72 @@ class Bean extends Base
 		asrt( count( $book->ownPage ), 2 );
 		asrt( count( $book->getMeta('sys.shadow.ownPage') ), 2 );
 		unset( $book->ownPage );
-		asrt( count( $book->getMeta('sys.shadow.ownPage') ), 2 );
+		asrt( $book->getMeta('sys.shadow.ownPage'), NULL );
 		//no load must clear shadow as well...
 		$book->noLoad()->ownPage[] = R::dispense( 'page' );
 		asrt( count( $book->getMeta('sys.shadow.ownPage') ), 0 );
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( count( $book->ownPage ), 3 );
+		$lists = array( 'ownPage', 'ownPageList', 'xownPage', 'xownPageList', 'sharedPage', 'sharedPageList' );
+		foreach( $lists as $list ) {
+			$book = R::dispense( 'book' );
+			$book->$list;
+			$shadowKey = $list;
+			if ( strpos( $list, 'x' ) === 0) $shadowKey = substr( $shadowKey, 1 );
+			$shadowKey = preg_replace( '/List$/', '', $shadowKey );
+			asrt( is_array( $book->getMeta('sys.shadow.'.$shadowKey) ), TRUE );
+			unset( $book->$list );
+			asrt( $book->getMeta('sys.shadow.'.$shadowKey), NULL );
+			$book->$list; //reloading brings back shadow
+			asrt( is_array( $book->getMeta('sys.shadow.'.$shadowKey) ), TRUE );
+			$book->$list = array(); //keeps shadow (very important to compare deletions!)
+			asrt( is_array( $book->getMeta('sys.shadow.'.$shadowKey) ), TRUE );
+			R::store( $book ); //clears shadow
+			$book->alias('magazine')->$list; //reloading with alias also brings back shadow
+			unset( $book->$list );
+			asrt( $book->getMeta('sys.shadow.'.$shadowKey), NULL );
+			$book = $book->fresh(); //clears shadow, reload
+			asrt( $book->getMeta('sys.shadow.'.$shadowKey), NULL );
+			$book->noLoad()->$list; //reloading with noload also brings back shadow
+			asrt( is_array( $book->getMeta('sys.shadow.'.$shadowKey) ), TRUE );
+			asrt( count( $book->getMeta('sys.shadow.'.$shadowKey) ), 0 );
+			$book = $book->fresh(); //clears shadow, reload
+			asrt( $book->getMeta('sys.shadow.'.$shadowKey), NULL );
+			$book->all()->$list; //reloading with all also brings back shadow
+			asrt( is_array( $book->getMeta('sys.shadow.'.$shadowKey) ), TRUE );
+			$book = $book->fresh(); //clears shadow, reload
+			asrt( $book->getMeta('sys.shadow.'.$shadowKey), NULL );
+			$book->with(' LIMIT 1 ')->$list; //reloading with with- all also brings back shadow
+			asrt( is_array( $book->getMeta('sys.shadow.'.$shadowKey) ), TRUE );
+			$book = $book->fresh(); //clears shadow, reload
+			asrt( $book->getMeta('sys.shadow.'.$shadowKey), NULL );
+			$book->$list = array(); //keeps shadow (very important to compare deletions!)
+			asrt( is_array( $book->getMeta('sys.shadow.'.$shadowKey) ), TRUE );
+			$book = $book->fresh(); //clears shadow, reload
+			asrt( $book->getMeta('sys.shadow.'.$shadowKey), NULL );
+			$book->$list = array(); //keeps shadow (very important to compare deletions!)
+			asrt( is_array( $book->getMeta('sys.shadow.'.$shadowKey) ), TRUE );
+			R::trash( $book );
+			asrt( $book->getMeta('sys.shadow.'.$shadowKey), NULL );
+		}
+
+		//no shadow for parent bean
+		$book = $book->fresh();
+		$book->author = R::dispense( 'author' );
+		asrt( $book->getMeta('sys.shadow.author'), NULL );
+		R::store( $book );
+		$book = $book->fresh();
+		unset( $book->author ); //we can unset and it does not remove
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( is_object( $book->author ),TRUE );
+		//but we can also remove
+		$book->author = NULL;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->author, NULL );
+		
 	}
 	
 	/**

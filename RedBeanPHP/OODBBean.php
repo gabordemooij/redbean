@@ -474,20 +474,19 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		}
 
 		unset( $this->properties[$property] );
+		
+		$shadowKey = 'sys.shadow.'.$property;
+		if ( isset( $this->__info[ $shadowKey ] ) ) unset( $this->__info[$shadowKey] );
+		
+		//also clear modifiers
+		$this->withSql    = '';
+		$this->withParams = array();
+		$this->aliasName  = NULL;
+		$this->fetchType  = NULL;
+		$this->noLoad     = FALSE;
+		$this->all        = FALSE;
+		
 		return;
-	}
-
-	/**
-	 * Removes a property from the properties list without invoking
-	 * an __unset on the bean.
-	 *
-	 * @param  string $property property that needs to be unset
-	 *
-	 * @return void
-	 */
-	public function removeProperty( $property )
-	{
-		unset( $this->properties[$property] );
 	}
 
 	/**
@@ -959,7 +958,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		return ( isset( $this->__info[$path] ) ) ? $this->__info[$path] : $default;
 	}
-
+	
 	/**
 	 * Stores a value in the specified Meta information property. $value contains
 	 * the value you want to store in the Meta section of the bean and $path
@@ -1419,9 +1418,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		}
 
-		$this->withSql    = '';
-		$this->withParams = array();
-
+		$this->clearModifiers();
 		return (int) $count;
 	}
 
@@ -1456,9 +1453,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$count = $redbean->getAssociationManager()->relatedCount( $this, $type, $this->withSql, $this->withParams, TRUE );
 		}
 
-		$this->withSql    = '';
-		$this->withParams = array();
-
+		$this->clearModifiers();
 		return (integer) $count;
 	}
 

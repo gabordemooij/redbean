@@ -555,7 +555,7 @@ class OODB extends Observable
 		$bean->$linkField = $this->prepareEmbeddedBean( $value );
 		$bean->setMeta( 'cast.' . $linkField, 'id' );
 		$embeddedBeans[$linkField] = $value;
-		$bean->removeProperty( $property );
+		unset( $bean->$property );
 	}
 
 	/**
@@ -574,16 +574,17 @@ class OODB extends Observable
 				$this->processEmbeddedBean( $embeddedBeans, $bean, $property, $value );
 			} elseif ( is_array( $value ) ) {
 				$originals = $bean->getMeta( 'sys.shadow.' . $property, array() );
+				$bean->setMeta( 'sys.shadow.' . $property, NULL ); //clear shadow
 				if ( strpos( $property, 'own' ) === 0 ) {
 					list( $ownAdditions, $ownTrashcan, $ownresidue ) = $this->processGroups( $originals, $value, $ownAdditions, $ownTrashcan, $ownresidue );
 					$listName = lcfirst( substr( $property, 3 ) );
 					if ($bean->getMeta( 'sys.exclusive-'.  $listName ) ) {
 						OODBBean::setMetaAll( $ownTrashcan, 'sys.garbage', TRUE );
 					}
-					$bean->removeProperty( $property );
+					unset( $bean->$property );
 				} elseif ( strpos( $property, 'shared' ) === 0 ) {
 					list( $sharedAdditions, $sharedTrashcan, $sharedresidue ) = $this->processGroups( $originals, $value, $sharedAdditions, $sharedTrashcan, $sharedresidue );
-					$bean->removeProperty( $property );
+					unset( $bean->$property );
 				}
 			}
 		}
@@ -922,13 +923,13 @@ class OODB extends Observable
 		$this->signal( 'delete', $bean );
 		foreach ( $bean as $property => $value ) {
 			if ( $value instanceof OODBBean ) {
-				$bean->removeProperty( $property );
+				unset( $bean->$property );
 			}
 			if ( is_array( $value ) ) {
 				if ( strpos( $property, 'own' ) === 0 ) {
-					$bean->removeProperty( $property );
+					unset( $bean->$property );
 				} elseif ( strpos( $property, 'shared' ) === 0 ) {
-					$bean->removeProperty( $property );
+					unset( $bean->$property );
 				}
 			}
 		}

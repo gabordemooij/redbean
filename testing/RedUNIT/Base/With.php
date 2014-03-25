@@ -664,5 +664,49 @@ class With extends Base
 				}
 			}
 		}
+		
+		$book = R::dispense( 'book' );
+		$book->ownPage = R::dispense( 'page', 2 );
+		$book->sharedPage = R::dispense( 'page', 2 );
+		R::store( $book );
+		$book = R::dispense( 'book' );
+		$book->alias('magazine')->ownPage = R::dispense( 'page', 2 );
+		R::store( $book );
+		
+		//test modifier with countOwn and countShared methods
+		foreach( $modifiers as $modifier => $flag ) {
+			$book = R::dispense( 'book' );
+			if ($modifier === 'withCondition') $book->$modifier( ' 1 ' );
+			elseif ($modifier === 'with') $book->$modifier( ' LIMIT 1 ' );
+			elseif ($modifier === 'alias') $book->$modifier('magazine');
+			else $book->$modifier('something');
+			$flags = $book->getModFlags();
+			$expect = $flag;
+			asrt( $flags, $expect );
+			$book->countOwn('page');
+			$flags = $book->getModFlags();
+			asrt( $flags, '' );
+			if ($modifier === 'withCondition') $book->$modifier( ' 1 ' );
+			elseif ($modifier === 'with') $book->$modifier( ' LIMIT 1 ' );
+			elseif ($modifier === 'alias') $book->$modifier('magazine');
+			else $book->$modifier('something');
+			$flags = $book->getModFlags();
+			$expect = $flag;
+			asrt( $flags, $expect );
+			$book->countShared('page');
+			$flags = $book->getModFlags();
+			asrt( $flags, '' );
+			if ($modifier === 'withCondition') $book->$modifier( ' 1 ' );
+			elseif ($modifier === 'with') $book->$modifier( ' LIMIT 1 ' );
+			elseif ($modifier === 'alias') $book->$modifier('magazine');
+			else $book->$modifier('something');
+			$flags = $book->getModFlags();
+			$expect = $flag;
+			asrt( $flags, $expect );
+			unset( $book->author );
+			$flags = $book->getModFlags();
+			asrt( $flags, '' );
+		}
+		
 	}
 }
