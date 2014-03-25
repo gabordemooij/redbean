@@ -81,6 +81,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * @var boolean
 	 */
 	private $noLoad = FALSE;
+	
+	/**
+	 * @var boolean
+	 */
+	private $all = FALSE;
 
 	/** Returns the alias for a type
 	 *
@@ -537,7 +542,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function all()
 	{
-		$this->withSql = '  ';
+		$this->all = TRUE;
 		return $this;
 	}
 	
@@ -650,18 +655,36 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * Clears state.
-	 * Internal method. Clears the state of the query modifiers of the bean.
-	 * Query modifiers are: with(), withCondition(), alias(), fetchAs() and noLoad().
+	 * Returns current status of modification flags.
 	 * 
-	 * @return void
+	 * @return string
 	 */
-	private function clear() {
+	public function getModFlags()
+	{
+		$modFlags = '';
+		if ($this->aliasName !== NULL) $modFlags .= 'a';
+		if ($this->fetchType !== NULL) $modFlags .= 'f';
+		if ($this->noLoad === TRUE) $modFlags .= 'n';
+		if ($this->all === TRUE) $modFlags .= 'r';
+		if ($this->withSql !== '') $modFlags .= 'w';
+		
+		return $modFlags;
+	}
+	
+	/**
+	 * Clears all modifiers.
+	 * 
+	 * @return self
+	 */
+	public function clearModifiers()
+	{
 		$this->withSql    = '';
 		$this->withParams = array();
 		$this->aliasName  = NULL;
 		$this->fetchType  = NULL;
 		$this->noLoad     = FALSE;
+		$this->all        = FALSE;
+		return $this;
 	}
 	
 	/**
@@ -724,7 +747,14 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		
 		//If not exists and no field link and no list, bail out.
 		if ( !$exists && !isset($this->$fieldLink) && (!$isOwn && !$isShared )) {
-			$this->clear();
+
+			$this->withSql    = '';
+			$this->withParams = array();
+			$this->aliasName  = NULL;
+			$this->fetchType  = NULL;
+			$this->noLoad     = FALSE;
+			$this->all        = FALSE;
+
 			$NULL = NULL;
 			return $NULL;
 		}
@@ -733,10 +763,18 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
 								($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
 		$hasSQL         = ($this->withSql !== '' || $this->via !== NULL);
+		$hasAll         = (boolean) ($this->all);
 		
 		//If exists and no list or exits and list not changed, bail out.
-		if ( $exists && ((!$isOwn && !$isShared ) ||  (!$hasSQL && !$differentAlias)) ) {
-			$this->clear();
+		if ( $exists && ((!$isOwn && !$isShared ) ||  (!$hasSQL && !$differentAlias && !$hasAll)) ) {
+			
+			$this->withSql    = '';
+			$this->withParams = array();
+			$this->aliasName  = NULL;
+			$this->fetchType  = NULL;
+			$this->noLoad     = FALSE;
+			$this->all        = FALSE;
+		
 			return $this->properties[$property];
 		}
 		
@@ -755,7 +793,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 			$this->properties[$property] = $bean;
 
-			$this->clear();
+			$this->withSql    = '';
+			$this->withParams = array();
+			$this->aliasName  = NULL;
+			$this->fetchType  = NULL;
+			$this->noLoad     = FALSE;
+			$this->all        = FALSE;
 
 			return $this->properties[$property];
 			
@@ -772,7 +815,14 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$this->properties[$property] = $beans;
 			$this->__info["sys.shadow.$property"] = $beans;
 			$this->__info['tainted']              = TRUE;
-			$this->clear();
+
+			$this->withSql    = '';
+			$this->withParams = array();
+			$this->aliasName  = NULL;
+			$this->fetchType  = NULL;
+			$this->noLoad     = FALSE;
+			$this->all        = FALSE;
+
 			return $this->properties[$property];
 		}
 	}
@@ -833,7 +883,13 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			}
 		}
 		
-		$this->clear();
+		$this->withSql    = '';
+		$this->withParams = array();
+		$this->aliasName  = NULL;
+		$this->fetchType  = NULL;
+		$this->noLoad     = FALSE;
+		$this->all        = FALSE;
+
 		$this->__info['tainted'] = TRUE;
 
 		if ( isset( $this->properties[$fieldLink] ) && !( $value instanceof OODBBean ) ) {
