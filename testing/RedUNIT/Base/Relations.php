@@ -1533,10 +1533,10 @@ class Relations extends Base
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPage ), TRUE );
 		
-		//Array offset works different but is faster because it does not support the aliases
-		asrt( isset( $book['xownPageList'] ), FALSE );
-		asrt( isset( $book['ownPageList'] ), FALSE );
-		asrt( isset( $book['xownPage'] ), FALSE );
+		//Test array access
+		asrt( isset( $book['xownPageList'] ), TRUE );
+		asrt( isset( $book['ownPageList'] ), TRUE );
+		asrt( isset( $book['xownPage'] ), TRUE );
 		asrt( isset( $book['ownPage'] ), TRUE );
 		
 		R::store( $book );
@@ -1547,7 +1547,6 @@ class Relations extends Base
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
 		
-		//Array offset works different but is faster because it does not support the aliases
 		asrt( isset( $book['xownPageList'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
@@ -1560,11 +1559,11 @@ class Relations extends Base
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPage ), TRUE );
 		
-		//Array offset works different but is faster because it does not support the aliases
-		asrt( isset( $book['xownPageList'] ), FALSE );
-		asrt( isset( $book['ownPageList'] ), FALSE );
-		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['xownPageList'] ), TRUE );
+		asrt( isset( $book['ownPageList'] ), TRUE );
+		asrt( isset( $book['xownPage'] ), TRUE );
 		asrt( isset( $book['ownPage'] ), TRUE );
+
 		$book = $book->fresh();
 		
 		asrt( isset( $book->xownPageList ), FALSE );
@@ -1572,7 +1571,6 @@ class Relations extends Base
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
 		
-		//Array offset works different but is faster because it does not support the aliases
 		asrt( isset( $book['xownPageList'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
@@ -1595,10 +1593,9 @@ class Relations extends Base
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPage ), TRUE );
 		
-		//Array offset works different but is faster because it does not support the aliases
-		asrt( isset( $book['xownPageList'] ), FALSE );
-		asrt( isset( $book['ownPageList'] ), FALSE );
-		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['xownPageList'] ), TRUE );
+		asrt( isset( $book['ownPageList'] ), TRUE );
+		asrt( isset( $book['xownPage'] ), TRUE );
 		asrt( isset( $book['ownPage'] ), TRUE );
 		
 		unset( $book->xownPageList );
@@ -1608,7 +1605,6 @@ class Relations extends Base
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
 		
-		//Array offset works different but is faster because it does not support the aliases
 		asrt( isset( $book['xownPageList'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
@@ -1621,10 +1617,9 @@ class Relations extends Base
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPage ), TRUE );
 		
-		//Array offset works different but is faster because it does not support the aliases
-		asrt( isset( $book['xownPageList'] ), FALSE );
-		asrt( isset( $book['ownPageList'] ), FALSE );
-		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['xownPageList'] ), TRUE );
+		asrt( isset( $book['ownPageList'] ), TRUE );
+		asrt( isset( $book['xownPage'] ), TRUE );
 		asrt( isset( $book['ownPage'] ), TRUE );
 		
 		unset( $book->xownPage );
@@ -1634,7 +1629,6 @@ class Relations extends Base
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
 		
-		//Array offset works different but is faster because it does not support the aliases
 		asrt( isset( $book['xownPageList'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
@@ -1646,7 +1640,6 @@ class Relations extends Base
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
 		
-		//Array offset works different but is faster because it does not support the aliases
 		asrt( isset( $book['xownPageList'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
@@ -1658,10 +1651,9 @@ class Relations extends Base
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPage ), TRUE );
 		
-		//Array offset works different but is faster because it does not support the aliases
-		asrt( isset( $book['xownPageList'] ), FALSE );
-		asrt( isset( $book['ownPageList'] ), FALSE );
-		asrt( isset( $book['xownPage'] ), FALSE );
+		asrt( isset( $book['xownPageList'] ), TRUE );
+		asrt( isset( $book['ownPageList'] ), TRUE );
+		asrt( isset( $book['xownPage'] ), TRUE );
 		asrt( isset( $book['ownPage'] ), TRUE );
 	}
 	

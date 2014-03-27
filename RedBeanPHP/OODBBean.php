@@ -443,7 +443,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
 			$property = substr($property, 1);
 		}
-
 		return isset( $this->properties[$property] );
 	}
 
@@ -1069,7 +1068,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function offsetExists( $offset )
 	{
-		return isset( $this->properties[$offset] );
+		return $this->__isset( $offset );
 	}
 
 	/**
@@ -1087,7 +1086,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function offsetUnset( $offset )
 	{
-		unset( $this->properties[$offset] );
+		$this->__unset( $offset );
 	}
 
 	/**
@@ -1103,7 +1102,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * @return mixed
 	 */
-	public function offsetGet( $offset )
+	public function &offsetGet( $offset )
 	{
 		return $this->__get( $offset );
 	}
