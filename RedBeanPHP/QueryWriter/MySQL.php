@@ -87,14 +87,14 @@ class MySQL extends AQueryWriter implements QueryWriter
 
 			$sql = "
 				ALTER TABLE " . $this->esc( $table ) . "
-				ADD FOREIGN KEY($property1) references `$table1`(id) ON DELETE CASCADE;
+				ADD FOREIGN KEY($property1) references `$table1`(id) ON DELETE CASCADE ON UPDATE CASCADE;
 			";
 
 			$this->adapter->exec( $sql );
 
 			$sql = "
 				ALTER TABLE " . $this->esc( $table ) . "
-				ADD FOREIGN KEY($property2) references `$table2`(id) ON DELETE CASCADE
+				ADD FOREIGN KEY($property2) references `$table2`(id) ON DELETE CASCADE ON UPDATE CASCADE
 			";
 
 			$this->adapter->exec( $sql );
@@ -298,6 +298,41 @@ class MySQL extends AQueryWriter implements QueryWriter
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
 		} catch (\Exception $e ) {
+		}
+	}
+	
+	/**
+	 * @see QueryWriter::addFK
+	 */
+	public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
+	{
+		
+		$db = $this->adapter->getCell( 'SELECT DATABASE()' );
+		
+		$cfks = $this->adapter->getCell('
+			SELECT CONSTRAINT_NAME
+				FROM information_schema.KEY_COLUMN_USAGE
+			WHERE 
+				TABLE_SCHEMA = ? 
+				AND TABLE_NAME = ? 
+				AND COLUMN_NAME = ? AND
+				CONSTRAINT_NAME != \'PRIMARY\'
+				AND REFERENCED_TABLE_NAME IS NOT NULL
+		', array($db, $type, $field));
+
+		if ($cfks) return;
+		
+		try {		
+			$fkName = 'fk_'.($type.'_'.$field);
+			$cName = 'c_'.$fkName;
+			$this->adapter->exec( "
+				ALTER TABLE  {$this->esc($type)}
+				ADD CONSTRAINT $cName 
+				FOREIGN KEY $fkName ( {$this->esc($field)} ) REFERENCES {$this->esc($targetType)} (
+				{$this->esc($targetField)}) ON DELETE " . ( $isDependent ? 'CASCADE' : 'SET NULL' ) . ' ON UPDATE '.( $isDependent ? 'CASCADE' : 'SET NULL' ).';');
+			
+		} catch (\Exception $e ) {
+			// Failure of fk-constraints is not a problem
 		}
 	}
 

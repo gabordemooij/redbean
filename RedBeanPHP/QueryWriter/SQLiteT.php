@@ -199,7 +199,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 			'table'     => $targetType,
 			'from'      => $field,
 			'to'        => $targetField,
-			'on_update' => 'SET NULL',
+			'on_update' => $consSQL,
 			'on_delete' => $consSQL
 		);
 

@@ -67,4 +67,115 @@ class Foreignkeys extends Sqlite
 		asrt( $fkbook[0]['to'], 'id' );
 		asrt( $fkbook[0]['table'], 'cover' );
 	}
+	
+	/**
+	 * Constrain test for SQLite Writer.
+	 * 
+	 * @return void
+	 */
+	public function testConstrain()
+	{
+		R::nuke();
+		
+		$sql = 'CREATE TABLE book ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ';
+		
+		R::exec( $sql );
+		
+		$sql = 'CREATE TABLE page ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ';
+		
+		R::exec( $sql );
+		
+		$sql = 'CREATE TABLE book_page ( 
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			book_id INTEGER,
+			page_id INTEGER
+		) ';
+		
+		R::exec( $sql );
+		
+		$sql = 'PRAGMA foreign_key_list("book_page")';
+		
+		$fkList = R::getAll( $sql );
+		
+		asrt( count( $fkList), 0 );
+		
+		$writer = R::getWriter();
+		
+		$writer->addConstraintForTypes( 'page', 'book' );
+		
+		$sql = 'PRAGMA foreign_key_list("book_page")';
+		
+		$fkList = R::getAll( $sql );
+		
+		asrt( count( $fkList), 2 );
+		
+		$writer->addConstraintForTypes( 'page', 'book' );
+		
+		$sql = 'PRAGMA foreign_key_list("book_page")';
+		
+		$fkList = R::getAll( $sql );
+		
+		asrt( count( $fkList), 2 );
+	}
+	
+	/**
+	 * Test adding foreign keys.
+	 * 
+	 * @return void
+	 */
+	public function testAddingForeignKeys()
+	{
+		R::nuke();
+		
+		$sql = 'CREATE TABLE book ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ';
+		
+		R::exec( $sql );
+		
+		$sql = 'CREATE TABLE page ( id INTEGER PRIMARY KEY AUTOINCREMENT, book_id INTEGER ) ';
+		
+		R::exec( $sql );
+		
+		asrt( count( R::getAll(' PRAGMA foreign_key_list("page") ') ), 0 );
+		
+		$writer = R::getWriter();
+		
+		$writer->addFK('page', 'book', 'book_id', 'id', TRUE);
+		
+		asrt( count( R::getAll(' PRAGMA foreign_key_list("page") ') ), 1 );
+		
+		$writer->addFK('page', 'book', 'book_id', 'id', TRUE);
+		
+		asrt( count( R::getAll(' PRAGMA foreign_key_list("page") ') ), 1 );
+		
+		$writer->addFK('page', 'book', 'book_id', 'id', FALSE);
+		
+		asrt( count( R::getAll(' PRAGMA foreign_key_list("page") ') ), 1 );
+		
+		R::nuke();
+		
+		$sql = 'CREATE TABLE book ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ';
+		
+		R::exec( $sql );
+		
+		$sql = 'CREATE TABLE page ( id INTEGER PRIMARY KEY AUTOINCREMENT, book_id INTEGER ) ';
+		
+		R::exec( $sql );
+		
+		asrt( count( R::getAll(' PRAGMA foreign_key_list("page") ') ), 0 );
+		
+		$writer = R::getWriter();
+		
+		$writer->addFK('page', 'book', 'book_id', 'id', FALSE);
+		
+		asrt( count( R::getAll(' PRAGMA foreign_key_list("page") ') ), 1 );
+		
+		$writer->addFK('page', 'book', 'book_id', 'id', TRUE);
+		
+		asrt( count( R::getAll(' PRAGMA foreign_key_list("page") ') ), 1 );
+		
+		$writer->addFK('page', 'book', 'book_id', 'id', FALSE);
+		
+		asrt( count( R::getAll(' PRAGMA foreign_key_list("page") ') ), 1 );
+		
+	}
 }

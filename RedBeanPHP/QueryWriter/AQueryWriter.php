@@ -770,41 +770,6 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
-	 * @see QueryWriter::addFK
-	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
-	{
-		
-		$db = $this->adapter->getCell( 'SELECT DATABASE()' );
-		
-		$cfks = $this->adapter->getCell('
-			SELECT CONSTRAINT_NAME
-				FROM information_schema.KEY_COLUMN_USAGE
-			WHERE 
-				TABLE_SCHEMA = ? 
-				AND TABLE_NAME = ? 
-				AND COLUMN_NAME = ? AND
-				CONSTRAINT_NAME != \'PRIMARY\'
-				AND REFERENCED_TABLE_NAME IS NOT NULL
-		', array($db, $type, $field));
-
-		if ($cfks) return;
-		
-		try {		
-			$fkName = 'fk_'.($type.'_'.$field);
-			$cName = 'c_'.$fkName;
-			$this->adapter->exec( "
-				ALTER TABLE  {$this->esc($type)}
-				ADD CONSTRAINT $cName 
-				FOREIGN KEY $fkName ( {$this->esc($field)} ) REFERENCES {$this->esc($targetType)} (
-				{$this->esc($targetField)}) ON DELETE " . ( $isDependent ? 'CASCADE' : 'SET NULL' ) . ' ON UPDATE SET NULL ;');
-			
-		} catch (\Exception $e ) {
-			// Failure of fk-constraints is not a problem
-		}
-	}
-
-	/**
 	 * @see QueryWriter::renameAssocTable
 	 */
 	public function renameAssocTable( $from, $to = NULL )

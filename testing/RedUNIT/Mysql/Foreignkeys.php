@@ -208,4 +208,130 @@ class Foreignkeys extends Mysql
 		
 		asrt( (int) $numOfFKS, 2 );
 	}
+	
+	/**
+	 * Test adding foreign keys.
+	 * 
+	 * @return void
+	 */
+	public function testAddingForeignKey()
+	{
+		R::nuke();
+		
+		$sql   = '
+			CREATE TABLE book (
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
+				PRIMARY KEY ( id )
+			) 
+			ENGINE = InnoDB
+		';
+		
+		R::exec( $sql );
+		
+		$sql   = '
+			CREATE TABLE page (
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
+				book_id INT( 11 ) UNSIGNED NOT NULL,
+				PRIMARY KEY ( id )
+			) 
+			ENGINE = InnoDB
+		';
+
+		R::exec( $sql );
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "page" AND DELETE_RULE = "CASCADE"');
+		
+		asrt( (int) $numOfFKS, 0 );
+		
+		$writer = R::getWriter();
+		
+		//Can we add a foreign key with cascade?
+		$writer->addFK('page', 'book', 'book_id', 'id', TRUE);
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "page" AND DELETE_RULE = "CASCADE"');
+		
+		asrt( (int) $numOfFKS, 1 );
+		
+		//dont add it twice
+		$writer->addFK('page', 'book', 'book_id', 'id', TRUE);
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "page" AND DELETE_RULE = "CASCADE"');
+		
+		asrt( (int) $numOfFKS, 1 );
+		
+		//even if different
+		$writer->addFK('page', 'book', 'book_id', 'id', FALSE);
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "page" ');
+		
+		asrt( (int) $numOfFKS, 1 );
+		
+		//Now add non-dep key
+		R::nuke();
+		
+		
+		$sql   = '
+			CREATE TABLE book (
+				id INT( 11 ) UNSIGNED NULL AUTO_INCREMENT, 
+				PRIMARY KEY ( id )
+			) 
+			ENGINE = InnoDB
+		';
+		
+		R::exec( $sql );
+		
+		$sql   = '
+			CREATE TABLE page (
+				id INT( 11 ) UNSIGNED AUTO_INCREMENT, 
+				book_id INT( 11 ) UNSIGNED NULL,
+				PRIMARY KEY ( id )
+			) 
+			ENGINE = InnoDB
+		';
+
+		R::exec( $sql );
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "page" AND DELETE_RULE = "CASCADE"');
+		
+		asrt( (int) $numOfFKS, 0 );
+		
+		//even if different
+		$writer->addFK('page', 'book', 'book_id', 'id', FALSE);
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "page" AND DELETE_RULE = "CASCADE"');
+		
+		asrt( (int) $numOfFKS, 0 );
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "page" AND DELETE_RULE = "SET NULL"');
+		
+		asrt( (int) $numOfFKS, 1 );
+		
+		$writer->addFK('page', 'book', 'book_id', 'id', TRUE);
+		
+		$numOfFKS = R::getCell('
+			SELECT COUNT(*) 
+			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+			WHERE TABLE_NAME = "page" ');
+	}
 }

@@ -198,7 +198,7 @@ class Foreignkeys extends Base implements Observer
 
 		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_player_accou' ) !== FALSE, TRUE );
 	}
-
+	
 	/**
 	 * Test helper method.
 	 * Creates a bean in a can. The bean will get a reference

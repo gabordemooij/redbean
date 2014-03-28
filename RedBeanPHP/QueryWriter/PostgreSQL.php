@@ -97,11 +97,11 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 			if ( !count( $rows ) ) {
 				$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
 					{$fkCode}a FOREIGN KEY ($property1)
-					REFERENCES \"$table1\" (id) ON DELETE CASCADE ";
+					REFERENCES \"$table1\" (id) ON DELETE CASCADE ON UPDATE CASCADE ";
 
 				$sql2 = "ALTER TABLE \"$table\" ADD CONSTRAINT
 					{$fkCode}b FOREIGN KEY ($property2)
-					REFERENCES \"$table2\" (id) ON DELETE CASCADE ";
+					REFERENCES \"$table2\" (id) ON DELETE CASCADE ON UPDATE CASCADE ";
 
 				$adapter->exec( $sql1 );
 
@@ -368,7 +368,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 				$delRule = ( $isDep ? 'CASCADE' : 'SET NULL' );
 				$this->adapter->exec( "ALTER TABLE  {$this->esc($type)}
 					ADD FOREIGN KEY ( {$this->esc($field)} ) REFERENCES  {$this->esc($targetType)} (
-					{$this->esc($targetField)}) ON DELETE $delRule ON UPDATE SET NULL DEFERRABLE ;" );
+					{$this->esc($targetField)}) ON DELETE $delRule ON UPDATE $delRule DEFERRABLE ;" );
 			}
 		} catch (\Exception $e ) {
 			return FALSE;
