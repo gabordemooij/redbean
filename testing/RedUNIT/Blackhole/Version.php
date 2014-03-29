@@ -30,4 +30,16 @@ class Version extends Blackhole
 
 		asrt( is_string( $version ), TRUE );
 	}
+	
+	/**
+	 * Test whether basic tools are available for use.
+	 * 
+	 * @return void
+	 */
+	public function testTools()
+	{
+		asrt( class_exists( '\\RedBean_SimpleModel' ), TRUE );
+		asrt( class_exists( '\\R' ), TRUE );
+		asrt( function_exists( 'EID' ), TRUE );
+	}
 }
