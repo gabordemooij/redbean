@@ -275,9 +275,13 @@ class MySQL extends AQueryWriter implements QueryWriter
 			}
 		}
 
-		$sql = "ALTER IGNORE TABLE $table
-                ADD UNIQUE INDEX $name (" . implode( ',', $columns ) . ")";
-
+		try {
+			$sql = "ALTER TABLE $table
+						 ADD UNIQUE INDEX $name (" . implode( ',', $columns ) . ")";
+		} catch ( \Exception $e ) {
+			//do nothing, dont use alter table ignore, this will delete duplicate records in 3-ways!
+		}
+			
 		$this->adapter->exec( $sql );
 	}
 

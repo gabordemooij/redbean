@@ -113,6 +113,7 @@ $allPacks = array(
 	'Blackhole/Glue',
 	'Blackhole/Plugins',
 	'Base/Dispense',
+	'Base/Threeway',
 	'Base/Arrays',
 	'Base/Boxing',
 	'Base/Typechecking',

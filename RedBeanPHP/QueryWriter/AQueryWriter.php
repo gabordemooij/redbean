@@ -61,6 +61,16 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	public $typeno_sqltype = array();
 
 	/**
+	 * Clears renames.
+	 * 
+	 * @return void
+	 */
+	public static function clearRenames()
+	{
+		self::$renames = array();
+	}
+	
+	/**
 	 * Generates a list of parameters (slots) for an SQL snippet.
 	 * This method calculates the correct number of slots to insert in the
 	 * SQL snippet and determines the correct type of slot. If the bindings
@@ -506,7 +516,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	public function updateRecord( $type, $updatevalues, $id = NULL )
 	{
 		$table = $type;
-
+		
 		if ( !$id ) {
 			$insertcolumns = $insertvalues = array();
 
@@ -515,7 +525,8 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 				$insertvalues[]  = $pair['value'];
 			}
 
-			return $this->insertRecord( $table, $insertcolumns, array( $insertvalues ) );
+			//Otherwise psql returns string while MySQL/SQLite return numeric causing problems with additions (array_diff)
+			return (string) $this->insertRecord( $table, $insertcolumns, array( $insertvalues ) );
 		}
 
 		if ( $id && !count( $updatevalues ) ) {

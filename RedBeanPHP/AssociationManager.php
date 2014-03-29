@@ -106,7 +106,6 @@ class AssociationManager extends Observable
 	 */
 	protected function associateBeans( OODBBean $bean1, OODBBean $bean2, OODBBean $bean )
 	{
-
 		$property1 = $bean1->getMeta( 'type' ) . '_id';
 		$property2 = $bean2->getMeta( 'type' ) . '_id';
 
@@ -114,8 +113,21 @@ class AssociationManager extends Observable
 			$property2 = $bean2->getMeta( 'type' ) . '2_id';
 		}
 		
-		//add a build command for Unique Indexes
-		$bean->setMeta( 'buildcommand.unique', array( array( $property1, $property2 ) ) );
+		//Dont mess with other tables, only add the unique constraint if:
+		//1. the table exists (otherwise we cant inspect it)
+		//2. the table only contains N-M fields: ID, N-ID, M-ID.
+		$unique = array( $property1, $property2 );
+		$type = $bean->getMeta( 'type' );
+		$tables = $this->writer->getTables();
+		if ( in_array( $type, $tables ) ) {
+			$columns = ( $this->writer->getColumns( $type ) );
+			if ( count( $columns ) === 3 
+				&& isset( $columns[ 'id' ] )
+				&& isset( $columns[ $property1 ] ) 
+				&& isset( $columns[ $property2 ] ) ) {
+				$bean->setMeta( 'buildcommand.unique', array( $unique ) );
+			}
+		}
 
 		//add a build command for Single Column Index (to improve performance in case unqiue cant be used)
 		$indexName1 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property1;
