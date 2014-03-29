@@ -306,4 +306,69 @@ class Foreignkeys extends Postgres
 		asrt( (int) $numFKS, 1 );
 		
 	}
+	
+	/**
+	 * Test whether we can manually create indexes.
+	 * 
+	 * @return void
+	 */
+	public function testAddingIndex()
+	{
+		R::nuke();
+		
+		$sql = 'CREATE TABLE song (
+			id SERIAL PRIMARY KEY,
+			album_id INTEGER,
+			category VARCHAR(255)
+		)';
+		
+		R::exec( $sql );
+		
+		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
+		
+		asrt( count( $indexes ), 1 );
+		
+		$writer = R::getWriter();
+		
+		$writer->addIndex( 'song', 'index1', 'album_id' );
+		
+		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
+		
+		asrt( count( $indexes ), 2 );
+		
+		//Cant add the same index twice
+		$writer->addIndex( 'song', 'index1', 'album_id' );
+		
+		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
+		
+		asrt( count( $indexes ), 2 );
+		
+		$writer->addIndex( 'song', 'index2', 'category' );
+		
+		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
+		
+		asrt( count( $indexes ), 3 );
+		
+		//Dont fail, just dont
+		try {
+			$writer->addIndex( 'song', 'index3', 'nonexistant' );
+			pass();
+		} catch( \Exception $e ) {
+			fail();
+		}
+			
+		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
+		asrt( count( $indexes ), 3 );
+		
+		try {
+			$writer->addIndex( 'nonexistant', 'index4', 'nonexistant' );
+			pass();
+		} catch( \Exception $e ) {
+			fail();
+		}
+			
+		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
+		asrt( count( $indexes ), 3 );
+		
+	}
 }

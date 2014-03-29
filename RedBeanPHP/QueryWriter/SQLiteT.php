@@ -395,14 +395,19 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$name   = preg_replace( '/\W/', '', $name );
 		$column = $this->esc( $column, TRUE );
 
-		foreach ( $this->adapter->get( "PRAGMA INDEX_LIST($table) " ) as $ind ) {
-			if ( $ind['name'] === $name ) return;
+		try {
+			
+			foreach ( $this->adapter->get( "PRAGMA INDEX_LIST($table) " ) as $ind ) {
+				if ( $ind['name'] === $name ) return;
+			}
+
+			$t = $this->getTable( $type );
+			$t['indexes'][$name] = array( 'name' => $column );
+
+			$this->putTable( $t );
+		} catch( \Exception $exception ) {
+			//do nothing
 		}
-
-		$t = $this->getTable( $type );
-		$t['indexes'][$name] = array( 'name' => $column );
-
-		$this->putTable( $t );
 	}
 
 	/**

@@ -334,4 +334,83 @@ class Foreignkeys extends Mysql
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "page" ');
 	}
+	
+	/**
+	 * Test whether we can manually create indexes.
+	 * 
+	 * @return void
+	 */
+	public function testAddingIndex()
+	{
+		R::nuke();
+		
+		$sql   = '
+			CREATE TABLE song (
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
+				album_id INT( 11 ) UNSIGNED NOT NULL,
+				category VARCHAR( 255 ),
+				PRIMARY KEY ( id )
+			) 
+			ENGINE = InnoDB
+		';
+
+		R::exec( $sql );
+		
+		$sql = 'SHOW INDEX FROM song';
+		
+		$indexes = R::getAll( $sql );
+		
+		asrt( count( $indexes ), 1 );
+		asrt( $indexes[0]['Table'], 'song' );
+		asrt( $indexes[0]['Key_name'], 'PRIMARY' );
+		
+		$writer = R::getWriter();
+		
+		$writer->addIndex('song', 'index1', 'album_id');
+		
+		
+		$indexes = R::getAll( 'SHOW INDEX FROM song' );
+		
+		asrt( count( $indexes ), 2 );
+		asrt( $indexes[0]['Table'], 'song' );
+		asrt( $indexes[0]['Key_name'], 'PRIMARY' );
+		asrt( $indexes[1]['Table'], 'song' );
+		asrt( $indexes[1]['Key_name'], 'index1' );
+		
+		//Cant add the same index twice
+		$writer->addIndex('song', 'index2', 'category');
+		
+		$indexes = R::getAll( 'SHOW INDEX FROM song' );
+		
+		asrt( count( $indexes ), 3 );
+		
+		
+		//Dont fail, just dont
+		try {
+			$writer->addIndex('song', 'index3', 'nonexistant');
+			pass();
+		} catch( \Exception $e ) {
+			fail();
+		}
+		
+		asrt( count( $indexes ), 3 );
+		
+		try {
+			$writer->addIndex('nonexistant', 'index4', 'nonexistant');
+			pass();
+		} catch( \Exception $e ) {
+			fail();
+		}
+		
+		asrt( count( $indexes ), 3 );
+		
+		try {
+			$writer->addIndex('nonexistant', '', 'nonexistant');
+			pass();
+		} catch( \Exception $e ) {
+			fail();
+		}
+		
+		asrt( count( $indexes ), 3 );
+	}
 }

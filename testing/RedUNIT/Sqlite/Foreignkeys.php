@@ -178,4 +178,66 @@ class Foreignkeys extends Sqlite
 		asrt( count( R::getAll(' PRAGMA foreign_key_list("page") ') ), 1 );
 		
 	}
+	
+	/**
+	 * Test whether we can manually create indexes.
+	 * 
+	 * @return void
+	 */
+	public function testAddingIndex()
+	{
+		R::nuke();
+		
+		$sql = 'CREATE TABLE song ( 
+			id INTEGER PRIMARY KEY AUTOINCREMENT, 
+			album_id INTEGER,
+			category TEXT
+		) ';
+		
+		R::exec( $sql );
+		
+		$writer = R::getWriter();
+		
+		$indexes = R::getAll('PRAGMA index_list("song") ');
+		
+		asrt( count( $indexes ), 0 );
+		
+		$writer->addIndex( 'song', 'index1', 'album_id' );
+		
+		$indexes = R::getAll('PRAGMA index_list("song") ');
+		
+		asrt( count( $indexes ), 1 );
+		
+		$writer->addIndex( 'song', 'index1', 'album_id' );
+		
+		$indexes = R::getAll('PRAGMA index_list("song") ');
+		
+		asrt( count( $indexes ), 1 );
+		
+		$writer->addIndex( 'song', 'index2', 'category' );
+		
+		$indexes = R::getAll('PRAGMA index_list("song") ');
+		
+		asrt( count( $indexes ), 2 );
+		
+		try {
+			$writer->addIndex( 'song', 'index1', 'nonexistant' );
+			pass();
+		} catch ( \Exception $ex ) {
+			fail();
+		}
+		
+		$indexes = R::getAll('PRAGMA index_list("song") ');
+		asrt( count( $indexes ), 2 );
+		
+		try {
+			$writer->addIndex( 'nonexistant', 'index1', 'nonexistant' );
+			pass();
+		} catch ( \Exception $ex ) {
+			fail();
+		}
+		
+		$indexes = R::getAll('PRAGMA index_list("song") ');
+		asrt( count( $indexes ), 2 );
+	}
 }

@@ -113,7 +113,7 @@ class AssociationManager extends Observable
 		if ( $property1 == $property2 ) {
 			$property2 = $bean2->getMeta( 'type' ) . '2_id';
 		}
-
+		
 		//add a build command for Unique Indexes
 		$bean->setMeta( 'buildcommand.unique', array( array( $property1, $property2 ) ) );
 

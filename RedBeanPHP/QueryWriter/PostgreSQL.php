@@ -344,6 +344,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
 		} catch (\Exception $e ) {
+			//do nothing
 		}
 	}
 

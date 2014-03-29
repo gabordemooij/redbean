@@ -293,9 +293,8 @@ class MySQL extends AQueryWriter implements QueryWriter
 
 		$column = $this->esc( $column );
 
-		foreach ( $this->adapter->get( "SHOW INDEX FROM $table " ) as $ind ) if ( $ind['Key_name'] === $name ) return;
-
 		try {
+			foreach ( $this->adapter->get( "SHOW INDEX FROM $table " ) as $ind ) if ( $ind['Key_name'] === $name ) return;
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
 		} catch (\Exception $e ) {
 		}
