@@ -64,4 +64,36 @@ class Meta extends Blackhole
 
 		asrt( $bean2->getMeta( "meta.meta" ), "123" );
 	}
+	
+	/**
+	 * Meta properties should not be saved.
+	 * 
+	 * @return void
+	 */
+	public function testMetaPersist()
+	{
+		$bean = R::dispense( 'bean' );
+		$bean->property = 'test';
+		$bean->setMeta( 'meta', 'hello' );
+		R::store( $bean );
+		asrt( $bean->getMeta( 'meta' ), 'hello' );
+		$bean = $bean->fresh();
+		asrt( $bean->getMeta( 'meta' ), NULL );
+	}
+	
+	/**
+	 * You cant access meta data using the array accessors.
+	 * 
+	 * @return void
+	 */
+	public function testNoArrayMetaAccess()
+	{
+		$bean = R::dispense( 'bean' );
+		$bean->setMeta( 'greet', 'hello' );
+		asrt( isset( $bean['greet'] ), FALSE );
+		asrt( isset( $bean['__info']['greet'] ), FALSE );
+		asrt( isset( $bean['__info'] ), FALSE );
+		asrt( isset( $bean['meta'] ), FALSE );
+		asrt( count( $bean ), 1 );
+	}
 }
