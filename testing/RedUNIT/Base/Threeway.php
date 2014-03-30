@@ -21,6 +21,12 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
  */
 class Threeway extends Base
 {
+	/**
+	 * Test whether we can use threeway tables without being
+	 * bothered by unique constraints.
+	 * 
+	 * @return void
+	 */
 	public function testUniqueConstraintOnThreeways()
 	{
 		AQueryWriter::clearRenames();
@@ -75,5 +81,63 @@ class Threeway extends Base
 		//Can we add a duplicate role now?
 		asrt( R::count( 'participant' ), 2 );
 		
+	}
+	
+	/**
+	 * Test whether a duplicate bean in the list isnt saved.
+	 * This was an issue with Postgres while testing the threeway tables.
+	 * Postgres returned the ID as a string while other drivers returned
+	 * a numeric value causing different outcome in array_diff when
+	 * calculating the shared additions.
+	 * 
+	 * @return void
+	 */
+	public function testIssueWithDriverReturnID()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->sharedPageList[] = $page;
+		R::store( $book );
+		asrt( R::count( 'page' ), 1 );
+		$book = $book->fresh();
+		$book->sharedPageList[] = $page;
+		R::store( $book );
+		
+		//don't save the duplicate bean!
+		asrt( R::count( 'page' ), 1 );
+		
+		$book = $book->fresh();
+		$page->item = 2; //even if we change a property ?
+		$book->sharedPageList[] = $page;
+		R::store( $book );
+		
+		foreach( $book->sharedPageList as $listItem) {
+			asrt( is_string( $listItem->id ), TRUE );
+		}
+		
+		//same test but for own-list
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->ownPageList[] = $page;
+		R::store( $book );
+		asrt( R::count( 'page' ), 1 );
+		$book = $book->fresh();
+		$book->ownPageList[] = $page;
+		R::store( $book );
+		//don't save the duplicate bean!
+		asrt( R::count( 'page' ), 1 );
+		
+		$book = $book->fresh();
+		$book->ownPageList[] = $page;
+		$page->item = 3;
+		R::store( $book );
+		//don't save the duplicate bean!
+		asrt( R::count( 'page' ), 1 );
+		
+		foreach( $book->ownPageList as $listItem) {
+			asrt( is_string( $listItem->id ), TRUE );
+		}	
 	}
 }
