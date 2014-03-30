@@ -800,29 +800,28 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 			return $this->properties[$property];
 			
-		} elseif ( $isOwn || $isShared ) {
-			
-			if ( $this->noLoad ) {
-				$beans = array();
-			} elseif ( $isOwn ) {
-				$beans = $this->getOwnList( $listName, $redbean );
-			} else {
-				$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
-			}
-
-			$this->properties[$property] = $beans;
-			$this->__info["sys.shadow.$property"] = $beans;
-			$this->__info['tainted']              = TRUE;
-
-			$this->withSql    = '';
-			$this->withParams = array();
-			$this->aliasName  = NULL;
-			$this->fetchType  = NULL;
-			$this->noLoad     = FALSE;
-			$this->all        = FALSE;
-
-			return $this->properties[$property];
 		}
+		//Implicit: elseif ( $isOwn || $isShared ) {
+		if ( $this->noLoad ) {
+			$beans = array();
+		} elseif ( $isOwn ) {
+			$beans = $this->getOwnList( $listName, $redbean );
+		} else {
+			$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
+		}
+
+		$this->properties[$property] = $beans;
+		$this->__info["sys.shadow.$property"] = $beans;
+		$this->__info['tainted']              = TRUE;
+
+		$this->withSql    = '';
+		$this->withParams = array();
+		$this->aliasName  = NULL;
+		$this->fetchType  = NULL;
+		$this->noLoad     = FALSE;
+		$this->all        = FALSE;
+
+		return $this->properties[$property];
 	}
 
 	/**
