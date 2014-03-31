@@ -70,4 +70,80 @@ class Chill extends Base
 
 		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 6 );
 	}
+	
+	/**
+	 * Test whether we cannot add unique constraints on chilled tables,
+	 * otherwise you cannot avoid this from happening when adding beans to the
+	 * shared list :) -- this is almost a theoretical issue however we want it
+	 * to work according to specifications!
+	 * 
+	 * @return void
+	 */
+	public function testDontAddUniqueConstraintForChilledBeanTypes()
+	{
+		R::nuke();
+		$person = R::dispense( 'person' );
+		$role = R::dispense( 'role' );
+		$person->sharedRole[] = $role;
+		R::store( $person );
+		$person->sharedRole[] = R::dispense( 'role' );
+		R::store( $person );
+		$bean = R::getRedBean()->dispense('person_role');
+		$bean->personId = $person->id;
+		$bean->roleId = $role->id;
+		try {
+			R::store( $bean );
+			fail();
+		} catch(\Exception $e) {
+			pass();
+		}
+		asrt(R::count('person_role'), 2);
+		
+		
+		R::nuke();
+		$person = R::dispense( 'person' );
+		$role = R::dispense( 'role' );
+		$person->sharedRole[] = $role;
+		R::store( $person );
+		R::freeze(array('person_role'));
+		$person->sharedRole[] = R::dispense( 'role' );
+		R::store( $person );
+		$bean = R::getRedBean()->dispense('person_role');
+		$bean->personId = $person->id;
+		$bean->roleId = $role->id;
+		try {
+			R::store( $bean );
+			pass();
+		} catch(\Exception $e) {
+			fail();
+		}
+		asrt(R::count('person_role'), 3);
+		R::freeze( array() ); //set freeze to FALSE and clear CHILL LIST!
+	}
+	
+	/**
+	 * Test whether we can set and reset the chill list and check the contents
+	 * of the chill list.
+	 * 
+	 * @return void
+	 */
+	public function testChillTest()
+	{
+		R::freeze( array( 'beer' ) );
+		$oodb = R::getRedBean();
+		asrt( $oodb->isChilled( 'beer' ), TRUE );
+		asrt( $oodb->isChilled( 'wine' ), FALSE );
+		R::freeze( FALSE );
+		$oodb = R::getRedBean();
+		asrt( $oodb->isChilled( 'beer' ), TRUE );
+		asrt( $oodb->isChilled( 'wine' ), FALSE );
+		R::freeze( TRUE );
+		$oodb = R::getRedBean();
+		asrt( $oodb->isChilled( 'beer' ), TRUE );
+		asrt( $oodb->isChilled( 'wine' ), FALSE );
+		R::freeze( array() );
+		$oodb = R::getRedBean();
+		asrt( $oodb->isChilled( 'beer' ), FALSE );
+		asrt( $oodb->isChilled( 'wine' ), FALSE );
+	}
 }

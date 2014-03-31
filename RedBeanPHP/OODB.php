@@ -206,7 +206,7 @@ class OODB extends Observable
 		if ( $uniques = $bean->getMeta( 'buildcommand.unique' ) ) {
 			$table = $bean->getMeta( 'type' );
 			foreach ( $uniques as $unique ) {
-				$this->writer->addUniqueIndex( $table, $unique );
+				if ( !$this->isChilled($table) ) $this->writer->addUniqueIndex( $table, $unique );
 			}
 		}
 	}
@@ -647,6 +647,22 @@ class OODB extends Observable
 	public function isFrozen()
 	{
 		return (bool) $this->isFrozen;
+	}
+	
+	/**
+	 * Determines whether a type is in the chill list.
+	 * If a type is 'chilled' it's frozen, so its schema cannot be
+	 * changed anymore. However other bean types may still be modified.
+	 * This method is a convenience method for other objects to check if
+	 * the schema of a certain type is locked for modification.
+	 *  
+	 * @param string $type the type you wish to check
+	 * 
+	 * @return boolean
+	 */
+	public function isChilled( $type )
+	{
+		return (boolean) ( in_array( $type, $this->chillList ) );
 	}
 
 	/**

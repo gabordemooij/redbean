@@ -119,7 +119,7 @@ class AssociationManager extends Observable
 		$unique = array( $property1, $property2 );
 		$type = $bean->getMeta( 'type' );
 		$tables = $this->writer->getTables();
-		if ( in_array( $type, $tables ) ) {
+		if ( in_array( $type, $tables ) && !$this->oodb->isChilled( $type ) ) {
 			$columns = ( $this->writer->getColumns( $type ) );
 			if ( count( $columns ) === 3 
 				&& isset( $columns[ 'id' ] )
