@@ -1,4 +1,7 @@
 <?php
+
+use RedBeanPHP\OODBBean as OODBBean;
+
 /**
  * Do not include this file, but let your IDE scan it automatically. 
  */
