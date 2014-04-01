@@ -5,7 +5,7 @@ Written by Gabor de Mooij
 RedBean is DUAL Licensed New BSD and GPLv2. You may choose the license that fits
 best for your project.
 
-New BSD/GPLv2 License
+New BSD License
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-RedBeanPHP is Written by Gabor de Mooij (G.J.G.T de Mooij) Copyright (c) 2013.
+RedBeanPHP is Written by Gabor de Mooij (G.J.G.T de Mooij) Copyright (c) 2014.
 
 
 GPLv2 LICENSE
