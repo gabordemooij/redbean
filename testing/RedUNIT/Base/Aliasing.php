@@ -21,6 +21,29 @@ use RedBeanPHP\RedException as RedException;
 class Aliasing extends Base
 {
 	/**
+	 * Test for aliasing issue for LTS version.
+	 * 
+	 * @return void
+	 */
+	public function testIssueAliasingForLTSVersion() {
+		$person = R::dispense('person');
+		$pro = R::dispense('project');
+		$c = R::dispense('course');
+		$person->name = 'x';
+		$person->alias('teacher')->ownProject[] = $pro;
+		$person->alias('student')->ownCourse[] = $c;
+		R::store($person);
+		asrt($c->fresh()->fetchAs('person')->student->name, 'x');
+		asrt($pro->fresh()->fetchAs('person')->teacher->name, 'x');
+		$person = $person->fresh();
+		$person->alias('teacher')->ownProject = array();
+		$person->alias('student')->ownCourse = array();
+		R::store($person);
+		asrt($c->fresh()->fetchAs('person')->student, NULL);
+		asrt($pro->fresh()->fetchAs('person')->teacher, NULL);
+	}
+
+	/**
 	 * Describing how clearing state of bean works.
 	 * Every method returning somthing (except getID)
 	 * clears prefix-method-state (anything set by withCond,with,alias,fetchAs).
