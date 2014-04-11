@@ -387,6 +387,16 @@ class Facade
 	{
 		return self::$redbean->store( $bean );
 	}
+	
+	/**
+	 * Returns the latest insert ID.
+	 *
+	 * @return integer
+	 */
+	public static function getInsertID()
+	{
+		return self::$adapter->getInsertID();
+	}
 
 	/**
 	 * Toggles fluid or frozen mode. In fluid mode the database
