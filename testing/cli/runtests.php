@@ -41,7 +41,7 @@ require_once( 'RedUNIT/Pretest.php' );
 $extraTestsFromHook = array();
 $hookPath = '';
 
-$colorMap = array( 
+$colorMap = array(
 		 'mysql'  => '0;31',
 		 'pgsql'  => '0;32',
 		 'sqlite' => '0;34',
@@ -135,6 +135,7 @@ $allPacks = array(
 	'Base/Cross',
 	'Base/Finding',
 	'Base/Facade',
+	'Base/Frozen',
 	'Base/Fuse',
 	'Base/Tags',
 	'Base/Null',
@@ -195,23 +196,23 @@ $packList = array_unique(array_merge( $packList, $suffix, $extraTestsFromHook ))
 $j = 0;
 foreach ( $packList as $testPack ) {
 	$j ++;
-	
+
 	if ( file_exists( $path . $testPack . '.php' ) ) require( $path . $testPack . '.php' );
 	elseif ( file_exists( $hookPath . $testPack . '.php') ) require( $hookPath . $testPack . '.php' );
-	
+
 	$testPack = str_replace( '../', '', $testPack );
-	
+
 	if ($j === 1 && $classSpec) {
 		$testClass = $classSpec;
 	} else {
 		$testClassName = str_replace( ' ', '\\', ( str_replace( '/', ' ', $testPack ) ) );
 		$testClass     = '\\RedUNIT\\' . ucfirst( $testClassName );
 	}
-		
+
 	$test          = new $testClass();
 
 	$drivers       = $test->getTargetDrivers();
-	
+
 	maintestpack( str_replace( '_', ' ', get_class( $test ) ) );
 
 	if ( $drivers && is_array( $drivers ) ) {
@@ -219,7 +220,7 @@ foreach ( $packList as $testPack ) {
 			if ( !isset( $ini[$driver] ) ) continue;
 
 			echo PHP_EOL;
-			
+
 			echo '===== DRIVER : (' . $driver . ') =====';
 
 			echo PHP_EOL;
@@ -238,7 +239,7 @@ foreach ( $packList as $testPack ) {
 			$test->prepare();
 			$test->run();
 			$test->cleanUp();
-			
+
 			if ( isset ( $colorMap[$driver] ) ) {
 				echo "\033[0m";
 			}
@@ -260,7 +261,7 @@ $hits = 0;
 $covLines = array();
 foreach( $report as $file => $lines ) {
 	$pi = pathinfo( $file );
-	
+
 	if ( $covFilter !== null ) {
 		if ( strpos( $file, $covFilter ) === false ) continue;
 	} else {
@@ -270,7 +271,7 @@ foreach( $report as $file => $lines ) {
 	}
 
 	$covLines[] = '***** File:'.$file.' ******';
-	
+
 	$fileData = file_get_contents( $file );
 	$fileLines = explode( "\n", $fileData );
 	$i = 1;

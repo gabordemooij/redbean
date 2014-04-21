@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -34,10 +34,10 @@ class Relations extends Base
 		$added = R::getWriter()->addConstraintForTypes( 'page', 'book' );
 		asrt( $added, FALSE );
 	}
-	
+
 	/**
 	 * Test whether ->all() reloads a list.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAllPrefix()
@@ -64,10 +64,10 @@ class Relations extends Base
 		asrt( count( $book->sharedTag ), 1 );
 		asrt( count( $book->all()->sharedTag ), 2 );
 	}
-	
+
 	/**
 	 * Test Relations and conditions.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testRelationsAndConditions()
@@ -121,13 +121,13 @@ class Relations extends Base
 
 	/**
 	 * Test filtering relations on links (using columns in the link table).
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testSharedLinkCond()
 	{
 		testpack( 'Test new shared relations with link conditions' );
-		
+
 		$w = R::getWriter();
 
 		list( $b1, $b2 ) = R::dispense( 'book', 2 );
@@ -260,10 +260,10 @@ class Relations extends Base
 		R::getWriter()->setUseCache( FALSE );
 
 	}
-	
+
 	/**
 	 * Test related count using via().
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testRelatedCountVia()
@@ -284,7 +284,7 @@ class Relations extends Base
 
 	/**
 	 * Test counting and aliasing.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCountingAndAliasing()
@@ -343,7 +343,7 @@ class Relations extends Base
 
 	/**
 	 * Test via.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testVia()
@@ -362,11 +362,11 @@ class Relations extends Base
 		asrt( count( $d->sharedPatient ), 1 );
 		asrt( in_array( 'consult', R::getWriter()->getTables() ), TRUE );
 	}
-	
+
 	public function testIssue348()
 	{
 		//issue #348 via() should reload shared list
-		
+
 		$product = R::dispense( 'product' );
 		$product->name = 'test';
 		$color = R::dispense( 'color' );
@@ -387,7 +387,7 @@ class Relations extends Base
 
 	/**
 	 * Test creation of link table.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCreationOfLinkTable()
@@ -405,7 +405,7 @@ class Relations extends Base
 
 	/**
 	 * Fast track link block code should not affect self-referential N-M relations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFastTrackRelations()
@@ -471,7 +471,7 @@ class Relations extends Base
 
 	/**
 	 * Test list beautifications.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testListBeautifications()
@@ -513,7 +513,7 @@ class Relations extends Base
 
 	/**
 	 * Test list add and delete.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testListAddDelete()
@@ -530,7 +530,7 @@ class Relations extends Base
 		$b->xownPage[] = $p;
 
 		R::store( $b );
-		
+
 		$b->xownPage = array();
 
 		R::store( $b );
@@ -571,7 +571,7 @@ class Relations extends Base
 	/**
 	 * Test basic and complex common usage scenarios for
 	 * relations and associations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testScenarios()
@@ -733,7 +733,7 @@ class Relations extends Base
 		$b2 = R::load( 'book', $book2->id );
 
 		asrt( count( $b2->ownPage ), 0 ); //works
-		
+
 		// Re-add the page
 		$b2->ownPage[] = $page1;
 
@@ -1087,7 +1087,7 @@ class Relations extends Base
 
 		// Test performance
 		$logger = R::debug( true, 1 );
-		
+
 		$book = R::load( 'book', 1 );
 
 		$book->sharedTopic = array();
@@ -1276,7 +1276,7 @@ class Relations extends Base
 
 	/**
 	 * Test parent bean relations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testParentBean()
@@ -1307,7 +1307,7 @@ class Relations extends Base
 
 	/**
 	 * test N-M relations through intermediate beans
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNMRelationsIntermediate()
@@ -1362,7 +1362,7 @@ class Relations extends Base
 
 	/**
 	 * test emulation of sharedList through intermediate beans
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testSharedListIntermediate()
@@ -1399,7 +1399,7 @@ class Relations extends Base
 
 	/**
 	 * test emulation via association renaming
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAssociationRenaming()
@@ -1480,39 +1480,39 @@ class Relations extends Base
 		asrt( $exhibition->from, '2014-07-03' );
 		asrt( $exhibition->til, '2014-10-02' );
 	}
-	
+
 	/**
 	 * Test don't try to store other things in shared list.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDontTryToStoreOtherThingsInSharedList() {
 
 		$book = R::dispense( 'book' );
 		$book->sharedPage[] = 'nonsense';
-		
+
 		try {
 			R::store( $book );
 			fail();
 		} catch( RedException $exception) {
 			pass();
 		}
-		
+
 		$book->sharedPageList = R::dispense( 'page', 2 );
 		R::store( $book );
 		$book->sharedPageList;
 		R::trash( $book );
 		asrt( R::count('page'), 2 );
 	}
-	
+
 	/**
 	 * Test whether magic array interface functions like isset() and
 	 * unset work correctly with the x-own-list and the List-suffix.
-	 * 
+	 *
 	 * Array functions do not reveal x-own-lists and list-alias because
 	 * you dont want duplicate entries in foreach-loops.
 	 * Also offers a slight performance improvement for array access.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testWhetherIssetWorksWithXList()
@@ -1520,67 +1520,67 @@ class Relations extends Base
 		R::nuke();
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
-		
+
 		asrt( isset( $book->xownPageList ), FALSE );
 		asrt( isset( $book->ownPageList ), FALSE );
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
-		
+
 		$book->xownPageList[] = $page;
-		
+
 		asrt( isset( $book->xownPageList ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPage ), TRUE );
-		
+
 		//Test array access
 		asrt( isset( $book['xownPageList'] ), TRUE );
 		asrt( isset( $book['ownPageList'] ), TRUE );
 		asrt( isset( $book['xownPage'] ), TRUE );
 		asrt( isset( $book['ownPage'] ), TRUE );
-		
+
 		R::store( $book );
 		$book = $book->fresh();
-		
+
 		asrt( isset( $book->xownPageList ), FALSE );
 		asrt( isset( $book->ownPageList ), FALSE );
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
-		
+
 		asrt( isset( $book['xownPageList'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
 		asrt( isset( $book['ownPage'] ), FALSE );
-		
+
 		$book->xownPageList;
-		
+
 		asrt( isset( $book->xownPageList ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPage ), TRUE );
-		
+
 		asrt( isset( $book['xownPageList'] ), TRUE );
 		asrt( isset( $book['ownPageList'] ), TRUE );
 		asrt( isset( $book['xownPage'] ), TRUE );
 		asrt( isset( $book['ownPage'] ), TRUE );
 
 		$book = $book->fresh();
-		
+
 		asrt( isset( $book->xownPageList ), FALSE );
 		asrt( isset( $book->ownPageList ), FALSE );
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
-		
+
 		asrt( isset( $book['xownPageList'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
 		asrt( isset( $book['ownPage'] ), FALSE );
-		
+
 		$book->noLoad()->xownPageList;
-		
+
 		asrt( isset( $book->xownPageList ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
-		
+
 		//but empty
 		asrt( count( $book->ownPageList ), 0 );
 		asrt( count( $book->xownPageList ), 0 );
@@ -1592,75 +1592,75 @@ class Relations extends Base
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPage ), TRUE );
-		
+
 		asrt( isset( $book['xownPageList'] ), TRUE );
 		asrt( isset( $book['ownPageList'] ), TRUE );
 		asrt( isset( $book['xownPage'] ), TRUE );
 		asrt( isset( $book['ownPage'] ), TRUE );
-		
+
 		unset( $book->xownPageList );
 
 		asrt( isset( $book->xownPageList ), FALSE );
 		asrt( isset( $book->ownPageList ), FALSE );
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
-		
+
 		asrt( isset( $book['xownPageList'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
 		asrt( isset( $book['ownPage'] ), FALSE );
-		
+
 		$book->xownPageList[] = $page;
-		
+
 		asrt( isset( $book->xownPageList ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPage ), TRUE );
-		
+
 		asrt( isset( $book['xownPageList'] ), TRUE );
 		asrt( isset( $book['ownPageList'] ), TRUE );
 		asrt( isset( $book['xownPage'] ), TRUE );
 		asrt( isset( $book['ownPage'] ), TRUE );
-		
+
 		unset( $book->xownPage );
-		
+
 		asrt( isset( $book->xownPageList ), FALSE );
 		asrt( isset( $book->ownPageList ), FALSE );
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
-		
+
 		asrt( isset( $book['xownPageList'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
 		asrt( isset( $book['ownPage'] ), FALSE );
-		
+
 		$book = $book->fresh();
 		asrt( isset( $book->xownPageList ), FALSE );
 		asrt( isset( $book->ownPageList ), FALSE );
 		asrt( isset( $book->xownPage ), FALSE );
 		asrt( isset( $book->ownPage ), FALSE );
-		
+
 		asrt( isset( $book['xownPageList'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
 		asrt( isset( $book['ownPage'] ), FALSE );
-		
+
 		$book->ownPageList;
 		asrt( isset( $book->xownPageList ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPage ), TRUE );
-		
+
 		asrt( isset( $book['xownPageList'] ), TRUE );
 		asrt( isset( $book['ownPageList'] ), TRUE );
 		asrt( isset( $book['xownPage'] ), TRUE );
 		asrt( isset( $book['ownPage'] ), TRUE );
 	}
-	
+
 	/**
 	 * Test whether you can still set items starting with 'xown' or
 	 * 'own' not followed by an uppercase character.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testConfusionWithXOwnList()
@@ -1685,15 +1685,15 @@ class Relations extends Base
 		asrt( (int) $book->ownitem, 1 );
 		asrt( isset( $book->ownItemList ), FALSE );
 	}
-	
+
 	/**
 	 * Test whether we can determine the mode of a list.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testModeCheckerOfLists()
 	{
-		foreach( array( 'ownPage', 'xownPage', 'ownPageList', 'xownPageList' ) as $listName ) { 
+		foreach( array( 'ownPage', 'xownPage', 'ownPageList', 'xownPageList' ) as $listName ) {
 			$book = R::dispense( 'book' );
 			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
 			$book->ownPageList[] = R::dispense( 'page' );

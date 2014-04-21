@@ -29,6 +29,11 @@ require( $dir . 'QueryWriter/PostgreSQL.php' );
 require( $dir . 'RedException.php' );
 require( $dir . 'RedException/SQL.php' );
 
+//Load Repository Classes
+require( $dir . 'Repository.php' );
+require( $dir . 'Repository/Fluid.php' );
+require( $dir . 'Repository/Frozen.php' );
+
 //Load Core functionality
 require( $dir . 'OODB.php' );
 require( $dir . 'ToolBox.php' );
