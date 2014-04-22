@@ -143,9 +143,9 @@ class Relations extends Base
 		$p3->text   = 'page3';
 
 		$b1->link( 'book_page', array( 'order' => 1 ) )->page = $p1;
-		$b1->link( 'book_page', array( 'order' => 2 ) )->page = $p2;
+		$b1->link( 'bookPage', array( 'order' => 2 ) )->page = $p2;
 		$b2->link( 'book_page', array( 'order' => 1 ) )->page = $p3;
-		$b2->link( 'book_page', array( 'order' => 2 ) )->page = $p2;
+		$b2->link( 'bookPage', array( 'order' => 2 ) )->page = $p2;
 		$b2->link( 'book_page', array( 'order' => 3 ) )->page = $p1;
 
 		R::storeAll( array( $b1, $b2 ) );
@@ -374,7 +374,7 @@ class Relations extends Base
 		$color->code = 'ccode';
 		R::store( $product );
 		R::store( $color );
-		$product->link( 'product_color', array(
+		$product->link( 'productColor', array(
 			 'stock' => 1,
 			 'position' => 0
 		) )->color = $color;

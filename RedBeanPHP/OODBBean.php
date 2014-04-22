@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP;
 
@@ -23,7 +23,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 	/**
 	 * Whether to skip beautification of columns or not.
-	 * 
+	 *
 	 * @var boolean
 	 */
 	private $flagSkipBeau = FALSE;
@@ -76,12 +76,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * @var string
 	 */
 	private $via = NULL;
-	
+
 	/**
 	 * @var boolean
 	 */
 	private $noLoad = FALSE;
-	
+
 	/**
 	 * @var boolean
 	 */
@@ -192,17 +192,17 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		return $beans;
 	}
-	
+
 	/**
 	 * Sets a meta property for all beans. This is a quicker way to set
 	 * the meta properties for a collection of beans because this method
 	 * can directly access the property arrays of the beans.
 	 * This method returns the beans.
-	 * 
+	 *
 	 * @param array  $beans    beans to set the meta property of
 	 * @param string $property property to set
 	 * @param mixed  $value    value
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function setMetaAll( $beans, $property, $value )
@@ -210,7 +210,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		foreach( $beans as $bean ) {
 			$bean->__info[ $property ] = $value;
 		}
-		
+
 		return $beans;
 	}
 
@@ -256,9 +256,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * an array with the properties container as its contents.
 	 * This method is meant for PHP and allows you to access beans as if
 	 * they were arrays, i.e. using array notation:
-	 * 
+	 *
 	 * $bean[ $key ] = $value;
-	 * 
+	 *
 	 * Note that not all PHP functions work with the array interface.
 	 *
 	 * @return\ArrayIterator
@@ -440,7 +440,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		$property = $this->beau( $property );
 
-		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
+		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) {
 			$property = substr($property, 1);
 		}
 		return isset( $this->properties[$property] );
@@ -468,15 +468,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		$property = $this->beau( $property );
 
-		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
+		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) {
 			$property = substr($property, 1);
 		}
 
 		unset( $this->properties[$property] );
-		
+
 		$shadowKey = 'sys.shadow.'.$property;
 		if ( isset( $this->__info[ $shadowKey ] ) ) unset( $this->__info[$shadowKey] );
-		
+
 		//also clear modifiers
 		$this->withSql    = '';
 		$this->withParams = array();
@@ -484,7 +484,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->fetchType  = NULL;
 		$this->noLoad     = FALSE;
 		$this->all        = FALSE;
-		
+
 		return;
 	}
 
@@ -532,10 +532,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->withParams = $bindings;
 		return $this;
 	}
-	
+
 	/**
 	 * When prefix for a list, this causes the list to reload.
-	 * 
+	 *
 	 * @return self
 	 */
 	public function all()
@@ -543,7 +543,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->all = TRUE;
 		return $this;
 	}
-	
+
 	/**
 	 * Tells the bean to only access the list but not load
 	 * its contents. Use this if you only want to add something to a list
@@ -601,7 +601,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		return $this->properties;
 	}
-	
+
 	/**
 	 * Returns properties of bean as an array.
 	 * This method returns the raw internal property list of the
@@ -609,7 +609,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * use the export() method to export bean data to arrays.
 	 * This method returns an array with the properties array and
 	 * the type (string).
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getPropertiesAndType()
@@ -640,7 +640,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			|| strpos( $property, 'xown' ) === 0
 			|| strpos( $property, 'shared' ) === 0
 		) {
-			
+
 			$property = preg_replace( '/List$/', '', $property );
 			return $property;
 		}
@@ -654,7 +654,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 	/**
 	 * Returns current status of modification flags.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getModFlags()
@@ -665,13 +665,13 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		if ($this->noLoad === TRUE) $modFlags .= 'n';
 		if ($this->all === TRUE) $modFlags .= 'r';
 		if ($this->withSql !== '') $modFlags .= 'w';
-		
+
 		return $modFlags;
 	}
-	
+
 	/**
 	 * Clears all modifiers.
-	 * 
+	 *
 	 * @return self
 	 */
 	public function clearModifiers()
@@ -684,26 +684,26 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->all        = FALSE;
 		return $this;
 	}
-	
+
 	/**
 	 * Determines whether a list is opened in exclusive mode or not.
 	 * If a list has been opened in exclusive mode this method will return TRUE,
 	 * othwerwise it will return FALSE.
-	 * 
+	 *
 	 * @param string $listName name of the list to check
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public function isListInExclusiveMode( $listName )
 	{
 		$listName = $this->beau( $listName );
-		
-		if ( strpos( $listName, 'xown' ) === 0 && ctype_upper( substr( $listName, 4, 1 ) ) ) { 
+
+		if ( strpos( $listName, 'xown' ) === 0 && ctype_upper( substr( $listName, 4, 1 ) ) ) {
 			$listName = substr($listName, 1);
 		}
-		
+
 		$listName = lcfirst( substr( $listName, 3 ) );
-		
+
 		return ( isset( $this->__info['sys.exclusive-'.$listName] ) && $this->__info['sys.exclusive-'.$listName] );
 	}
 
@@ -723,10 +723,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$isEx          = FALSE;
 		$isOwn         = FALSE;
 		$isShared      = FALSE;
-		
+
 		if ( !ctype_lower( $property ) ) {
 			$property = $this->beau( $property );
-			if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
+			if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) {
 				$property = substr($property, 1);
 				$listName = lcfirst( substr( $property, 3 ) );
 				$isEx     = TRUE;
@@ -739,10 +739,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 				$isShared = TRUE;
 			}
 		}
-		
+
 		$fieldLink      = $property . '_id';
 		$exists         = isset( $this->properties[$property] );
-		
+
 		//If not exists and no field link and no list, bail out.
 		if ( !$exists && !isset($this->$fieldLink) && (!$isOwn && !$isShared )) {
 
@@ -756,29 +756,29 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$NULL = NULL;
 			return $NULL;
 		}
-		
+
 		$hasAlias       = (!is_null($this->aliasName));
 		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
 								($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
 		$hasSQL         = ($this->withSql !== '' || $this->via !== NULL);
 		$hasAll         = (boolean) ($this->all);
-		
+
 		//If exists and no list or exits and list not changed, bail out.
 		if ( $exists && ((!$isOwn && !$isShared ) ||  (!$hasSQL && !$differentAlias && !$hasAll)) ) {
-			
+
 			$this->withSql    = '';
 			$this->withParams = array();
 			$this->aliasName  = NULL;
 			$this->fetchType  = NULL;
 			$this->noLoad     = FALSE;
 			$this->all        = FALSE;
-		
+
 			return $this->properties[$property];
 		}
-		
-		
+
+
 		list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
-		
+
 		if ( isset( $this->$fieldLink ) ) {
 			$this->__info['tainted'] = TRUE;
 
@@ -799,7 +799,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$this->all        = FALSE;
 
 			return $this->properties[$property];
-			
+
 		}
 		//Implicit: elseif ( $isOwn || $isShared ) {
 		if ( $this->noLoad ) {
@@ -843,10 +843,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$isEx          = FALSE;
 		$isOwn         = FALSE;
 		$isShared      = FALSE;
-		
+
 		if ( !ctype_lower( $property ) ) {
 			$property = $this->beau( $property );
-			if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) { 
+			if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) {
 				$property = substr($property, 1);
 				$listName = lcfirst( substr( $property, 3 ) );
 				$isEx     = TRUE;
@@ -859,16 +859,16 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 				$isShared = TRUE;
 			}
 		}
-	
+
 		$hasAlias       = (!is_null($this->aliasName));
 		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
 								($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
 		$hasSQL         = ($this->withSql !== '' || $this->via !== NULL);
 		$exists         = isset( $this->properties[$property] );
 		$fieldLink      = $property . '_id';
-		
+
 		if ( ($isOwn || $isShared) &&  (!$exists || $hasSQL || $differentAlias) ) {
-			
+
 			if ( !$this->noLoad ) {
 				list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 				if ( $isOwn ) {
@@ -879,7 +879,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 				$this->__info["sys.shadow.$property"] = $beans;
 			}
 		}
-		
+
 		$this->withSql    = '';
 		$this->withParams = array();
 		$this->aliasName  = NULL;
@@ -891,10 +891,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		if ( isset( $this->properties[$fieldLink] ) && !( $value instanceof OODBBean ) ) {
 			if ( is_null( $value ) || $value === FALSE ) {
-				
+
 				unset( $this->properties[ $property ]);
 				$this->properties[ $fieldLink ] = NULL;
-				
+
 				return;
 			} else {
 				throw new RedException( 'Cannot cast to bean.' );
@@ -956,7 +956,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		return ( isset( $this->__info[$path] ) ) ? $this->__info[$path] : $default;
 	}
-	
+
 	/**
 	 * Stores a value in the specified Meta information property. $value contains
 	 * the value you want to store in the Meta section of the bean and $path
@@ -1020,7 +1020,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	/**
 	 * Implementation of __toString Method
 	 * Routes call to Model. If the model implements a __toString() method this
-	 * method will be called and the result will be returned. In case of an 
+	 * method will be called and the result will be returned. In case of an
 	 * echo-statement this result will be printed. If the model does not
 	 * implement a __toString method, this method will return a JSON
 	 * representation of the current bean.
@@ -1056,7 +1056,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	/**
 	 * Implementation of Array Access Interface, you can access bean objects
 	 * like an array.
-	 * 
+	 *
 	 * Array functions do not reveal x-own-lists and list-alias because
 	 * you dont want duplicate entries in foreach-loops.
 	 * Also offers a slight performance improvement for array access.
@@ -1074,7 +1074,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Implementation of Array Access Interface, you can access bean objects
 	 * like an array.
 	 * Unsets a value from the array/bean.
-	 * 
+	 *
 	 * Array functions do not reveal x-own-lists and list-alias because
 	 * you dont want duplicate entries in foreach-loops.
 	 * Also offers a slight performance improvement for array access.
@@ -1092,7 +1092,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Implementation of Array Access Interface, you can access bean objects
 	 * like an array.
 	 * Returns value of a property.
-	 * 
+	 *
 	 * Array functions do not reveal x-own-lists and list-alias because
 	 * you dont want duplicate entries in foreach-loops.
 	 * Also offers a slight performance improvement for array access.
@@ -1139,40 +1139,40 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Traverses a bean property with the specified function.
 	 * Recursively iterates through the property invoking the
 	 * function for each bean along the way passing the bean to it.
-	 * 
+	 *
 	 * Can be used together with with, withCondition, alias and fetchAs.
-	 * 
+	 *
 	 * @param string  $property property
 	 * @param closure $function function
-	 * 
+	 *
 	 * @return OODBBean
 	 */
 	public function traverse( $property, $function, $maxDepth = NULL )
 	{
-		
+
 		if ( strpos( $property, 'shared' ) !== FALSE ) {
 			throw new RedException( 'Traverse only works with (x)own-lists.' );
 		}
-		
+
 		if ( !is_null( $maxDepth ) ) {
 			if ( !$maxDepth-- ) return $this;
 		}
-		
+
 		$oldFetchType = $this->fetchType;
 		$oldAliasName = $this->aliasName;
 		$oldWith      = $this->withSql;
 		$oldBindings  = $this->withParams;
-		
+
 		$beans = $this->$property;
-		
+
 		if ( $beans === NULL ) return $this;
-		
+
 		if ( !is_array( $beans ) ) $beans = array( $beans );
 
 		foreach( $beans as $bean ) {
-	
+
 			$function( $bean );
-			
+
 			$bean->fetchType  = $oldFetchType;
 			$bean->aliasName  = $oldAliasName;
 			$bean->withSql    = $oldWith;
@@ -1183,7 +1183,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		return $this;
 	}
-	
+
 	/**
 	 * Implementation of\Countable interface. Makes it possible to use
 	 * count() function on a bean.
@@ -1329,6 +1329,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	public function link( $typeOrBean, $qualification = array() )
 	{
 		if ( is_string( $typeOrBean ) ) {
+
+			$typeOrBean = AQueryWriter::camelsSnake( $typeOrBean );
+
 			$bean = $this->beanHelper->getToolBox()->getRedBean()->dispense( $typeOrBean );
 
 			if ( is_string( $qualification ) ) {
