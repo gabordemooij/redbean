@@ -1373,7 +1373,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function via( $via )
 	{
-		$this->via = $via;
+		$this->via = AQueryWriter::camelsSnake( $via );
 
 		return $this;
 	}
