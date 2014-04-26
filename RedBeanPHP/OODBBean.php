@@ -1459,6 +1459,56 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
+	 * Iterates through the specified own-list and
+	 * fetches all properties (with their type) and
+	 * returns the references.
+	 * Use this method to quickly load indirectly related
+	 * beans in an own-list. Whenever you cannot use a
+	 * shared-list this method offers the same convenience
+	 * by aggregating the parent beans of all children in
+	 * the specified own-list.
+	 *
+	 * Example:
+	 *
+	 * $quest->aggr( 'xownQuestTarget', 'target', 'quest' );
+	 *
+	 * Loads (in batch) and returns references to all
+	 * quest beans residing in the $questTarget->target properties
+	 * of each element in the xownQuestTargetList.
+	 *
+	 * @param string $list     the list you wish to process
+	 * @param string $property the property to load
+	 * @param string $type     the type of bean residing in this property (optional)
+	 *
+	 * @return array
+	 */
+	public function &aggr( $list, $property, $type = NULL )
+	{
+		$ids = array();
+
+		if ( is_null( $type ) ) $type = $property;
+
+		foreach( $this->$list as $bean ) {
+			$field = $property . '_id';
+			$ids[] = $bean->$field;
+			$beanIndex[$bean->$field] = $bean;
+		}
+
+		$beans = $this->beanHelper->getToolBox()->getRedBean()->batch( $type, $ids );
+
+		//now preload the beans as well
+		foreach( $beans as $bean ) {
+			$beanIndex[$bean->id]->setProperty( $property, $bean );
+		}
+
+		foreach( $beanIndex as $indexedBean ) {
+			$references[] = $indexedBean->$property;
+		}
+
+		return $references;
+	}
+
+	/**
 	 * Tests whether the database identities of two beans are equal.
 	 *
 	 * @param OODBBean $bean other bean
