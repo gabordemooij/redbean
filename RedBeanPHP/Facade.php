@@ -502,7 +502,7 @@ class Facade
 			$type = $typeOrBeanArray;
 		}
 		
-		if ( !preg_match( '/^[a-z0-9_]+$/', $type ) ) {
+		if ( !preg_match( '/^[a-z0-9]+$/', $type ) ) {
 			throw new RedException( 'Invalid type: ' . $type );
 		}
 
