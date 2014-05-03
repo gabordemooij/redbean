@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -107,7 +107,7 @@ class Batch extends Base
 
 	/**
 	 * Test missing bean scenarios.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testMissingBeans()
@@ -122,14 +122,14 @@ class Batch extends Base
 		asrt( (int) $bottles[$id + 1]->id, 0 );
 		asrt( (int) $bottles[$id + 2]->id, 0 );
 	}
-	
+
 	/**
 	 * Test batch alias loadAll.
-	 * 
+	 *
 	 * @return void
 	 */
-	public function testBatchAliasLoadAll() 
-	{	
+	public function testBatchAliasLoadAll()
+	{
 		$ids = R::storeAll( R::dispense( 'page', 2 ) );
 		$pages = R::loadAll( 'page', $ids );
 		asrt( is_array( $pages ), true );

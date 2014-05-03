@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -28,27 +28,27 @@ use RedBeanPHP\Driver\RPDO as RPDO;
  */
 class Misc extends Base
 {
-	
+
 	/**
 	* Tests the R::inspect() method on the Facade.
 	*
 	* @return void
-	*/	
+	*/
 	public function testInspect() {
-	
+
 		testpack( 'Test R::inspect() ');
 
 		R::nuke();
-		
+
 		R::store( R::dispense('book')->setAttr('title', 'book') );
-		
-		$info = R::inspect();	
+
+		$info = R::inspect();
 		asrt( count( $info ), 1 );
 		asrt( strtolower( $info[0] ), 'book' );
-		
+
 		$info = R::inspect( 'book' );
 		asrt( count( $info ), 2 );
-		
+
 		$keys = array_keys( $info );
 		sort($keys);
 		asrt( strtolower( $keys[0] ), 'id' );
@@ -56,8 +56,62 @@ class Misc extends Base
 	}
 
 	/**
+	 * Test whether we can use the tableExist() method in OODB
+	 * instances directly to help us determine
+	 * the existance of a table.
+	 *
+	 * @return void
+	 */
+	public function testTableExist()
+	{
+		R::nuke();
+		R::store( R::dispense( 'book' ) );
+		R::freeze( FALSE );
+		asrt( R::getRedBean()->tableExists( 'book' ), TRUE );
+		asrt( R::getRedBean()->tableExists( 'book2' ), FALSE );
+		R::freeze( TRUE );
+		asrt( R::getRedBean()->tableExists( 'book' ), TRUE );
+		asrt( R::getRedBean()->tableExists( 'book2' ), FALSE );
+		R::freeze( FALSE );
+	}
+
+	/**
+	 * Normally the check() method is always called indirectly when
+	 * dealing with beans. This test ensures we can call check()
+	 * directly. Even though frozen repositories do not rely on
+	 * bean checking to improve performance the method should still
+	 * offer the same functionality when called directly.
+	 *
+	 * @return void
+	 */
+	public function testCheckDirectly()
+	{
+		$bean = new OODBBean;
+		$bean->id = 0;
+		$bean->setMeta( 'type', 'book' );
+		R::getRedBean()->check( $bean );
+		$bean->setMeta( 'type', '.' );
+		try {
+			R::getRedBean()->check( $bean );
+			fail();
+		} catch ( \Exception $e ) {
+			pass();
+		}
+		//check should remain the same even if frozen repo is used, method is public after all!
+		//we dont want to break the API!
+		R::freeze( TRUE );
+		try {
+			R::getRedBean()->check( $bean );
+			fail();
+		} catch ( \Exception $e ) {
+			pass();
+		}
+		R::freeze( FALSE );
+	}
+
+	/**
 	 * Test Backward compatibility writer ESC-method.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testLegacyCode()
@@ -72,7 +126,7 @@ class Misc extends Base
 
 	/**
 	 * Test beautification and array functions.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBeauficationAndArrayFunctions()
@@ -85,10 +139,10 @@ class Misc extends Base
 		asrt( isset( $bean->isReallyAwesome ), FALSE );
 		asrt( isset( $bean->is_really_awesome ), FALSE );
 	}
-	
+
 	/**
 	 * Test beautification of column names.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBeautifulColumnNames()
@@ -252,7 +306,7 @@ class Misc extends Base
 
 	/**
 	 * Test reflectional functions of database.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDatabaseProperties()
@@ -271,7 +325,7 @@ class Misc extends Base
 
 	/**
 	 * Test Transactions.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTransactions()
@@ -309,7 +363,7 @@ class Misc extends Base
 
 	/**
 	 * Test nested FUSE scenarios.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFUSEnested()
@@ -353,7 +407,7 @@ class Misc extends Base
 	/**
 	 * Tests FUSE and lists, FUSE enforces no more than
 	 * 3 sugar cubes in coffee.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCoffeeWithSugarAndFUSE()
@@ -425,112 +479,112 @@ class Misc extends Base
 
 	/**
 	 * Test ENUM in Queries and with short hand notation.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testENUMInQuery()
 	{
 		testpack('Test ENUM in Query and test ENUM short notation');
-		
+
 		R::nuke();
-		
+
 		$coffee = R::dispense( 'coffee' );
 		$coffee->taste = R::enum( 'flavour:mocca' );
-		
+
 		R::store( $coffee );
-		
+
 		$coffee = R::dispense( 'coffee' );
 		$coffee->taste = R::enum( 'flavour:banana' );
-		
+
 		R::store( $coffee );
-		
+
 		$coffee = R::dispense( 'coffee' );
 		$coffee->taste = R::enum( 'flavour:banana' );
-		
+
 		R::store( $coffee );
-		
+
 		//now we have two flavours
 		asrt( R::count('flavour'), 2 );
-		
+
 		//use in query
 		asrt( R::count( 'coffee', ' taste_id = ? ', array( R::enum( 'flavour:mocca' )->id ) ), 1);
-		
+
 		//use in quer with short notation
 		asrt( R::count( 'coffee', ' taste_id = ? ', array( EID( 'flavour:mocca' ) ) ), 1);
-		
+
 		//use in query
 		asrt( R::count( 'coffee', ' taste_id = ? ', array( R::enum( 'flavour:banana' )->id ) ), 2);
-		
+
 		//use in quer with short notation
 		asrt( R::count( 'coffee', ' taste_id = ? ', array( EID( 'flavour:banana' ) ) ), 2);
-		
+
 		//use in query
 		asrt( R::count( 'coffee', ' taste_id = ? ', array( R::enum( 'flavour:strawberry' )->id ) ), 0);
-		
+
 		//use in quer with short notation
 		asrt( R::count( 'coffee', ' taste_id = ? ', array( EID( 'flavour:strawberry' ) ) ), 0);
 	}
-	
+
 	/**
 	 * Test ENUM functionality offered by Label Maker.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testENUM() {
-		
+
 		testpack('test ENUM');
 
 		$coffee = R::dispense( 'coffee' );
 		$coffee->taste = R::enum( 'flavour:mocca' );
-		
+
 		//did we create an enum?
 		asrt( implode( '', R::gatherLabels(R::enum('flavour'))), 'MOCCA' );
-		
+
 		R::store( $coffee );
-		
+
 		$coffee = $coffee->fresh();
-		
+
 		//test enum identity check - with alias
 		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), TRUE );
 		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), FALSE );
-		
+
 		//now we have two flavours
 		asrt( R::count('flavour'), 2 );
 		asrt( implode( ',', R::gatherLabels(R::enum('flavour'))), 'BANANA,MOCCA' );
-		
+
 		$coffee->flavour = R::enum( 'flavour:mocca' );
-		
+
 		R::store($coffee);
-		
+
 		//same results, can we have multiple flavours?
 		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), TRUE );
 		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), FALSE );
 		asrt( $coffee->flavour->equals( R::enum('flavour:mocca') ), TRUE );
-		
+
 		//no additional mocca enum...
 		asrt( R::count('flavour'), 2 );
-		
+
 		$drink = R::dispense( 'drink' );
 		$drink->flavour = R::enum( 'flavour:choco' );
 		R::store( $drink );
-		
+
 		//now we have three!
 		asrt( R::count('flavour'), 3 );
-		
+
 		$drink = R::load( 'drink', $drink->id );
-		
+
 		asrt( $drink->flavour->equals( R::enum('flavour:mint') ), FALSE );
 		asrt( $drink->flavour->equals( R::enum('flavour:choco') ), TRUE );
-		
+
 		asrt( R::count('flavour'), 4 );
-		
+
 		//trash should not affect flavour!
 		R::trash( $drink );
-		
+
 		asrt( R::count('flavour'), 4 );
 	}
-	
-	
+
+
 	/**
 	 * Test trashAll().
 	 */
@@ -559,7 +613,7 @@ class Misc extends Base
 			pass();
 		}
 	}
-	
+
 	/**
 	 * Test Bean identity equality.
 	 */
@@ -568,25 +622,25 @@ class Misc extends Base
 		$beanB = R::dispense( 'bean' );
 		$beanA->id = 1;
 		$beanB->id = 1;
-		
+
 		asrt( $beanA->equals( $beanB ), TRUE );
 		asrt( $beanB->equals( $beanA ), TRUE );
 		asrt( $beanA->equals( $beanA ), TRUE );
 		asrt( $beanB->equals( $beanB ), TRUE );
-		
+
 		$beanB->id = 2;
-		
+
 		asrt( $beanA->equals( $beanB ), FALSE );
 		asrt( $beanB->equals( $beanA ), FALSE );
-		
+
 		$beanA->id = '2';
-		
+
 		asrt( $beanA->equals( $beanB ), TRUE );
 		asrt( $beanB->equals( $beanA ), TRUE );
-		
+
 		$beanB = R::dispense( 'carrot' );
 		$beanB->id = $beanA->id;
-		
+
 		asrt( $beanA->equals( $beanB ), FALSE );
 		asrt( $beanB->equals( $beanA ), FALSE );
 	}

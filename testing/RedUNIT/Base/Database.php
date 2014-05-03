@@ -12,7 +12,7 @@ use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\QueryWriter\MySQL as MySQL;
 use RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
 use RedBeanPHP\QueryWriter\CUBRID as CUBRID;
-use RedBeanPHP\Adapter\DBAdapter as DBAdapter; 
+use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 
 /**
  * RedUNIT_Base_Database
@@ -35,14 +35,37 @@ class Database extends Base
 	{
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
 	}
-	
+
+	/**
+	 * Test setting direct PDO.
+	 * Not much to test actually.
+	 *
+	 * @return void
+	 */
+	public function testDirectPDO()
+	{
+		$pdo = R::getDatabaseAdapter()->getDatabase()->getPDO();
+		R::getDatabaseAdapter()->getDatabase()->setPDO( $pdo );
+		pass();
+	}
+
+	/**
+	 * Test for testConnection() method.
+	 *
+	 * @return void
+	 */
+	public function testConnectionTester()
+	{
+		asrt( R::testConnection(), TRUE );
+	}
+
 	/**
 	 * Tests the various ways to fetch (select queries)
 	 * data using adapter methods in the facade.
-	 * Also tests the new R::getAssocRow() method, 
+	 * Also tests the new R::getAssocRow() method,
 	 * as requested in issue #324.
 	 */
-	public function testFetchTypes() 
+	public function testFetchTypes()
 	{
 		R::nuke();
 
@@ -87,7 +110,7 @@ class Database extends Base
 		$expect = '["b","d"]';
 		asrt( json_encode( R::getCol('SELECT b FROM page') ), $expect );
 	}
-	
+
 	/**
 	 * Tests whether we can store an empty bean.
 	 * An empty bean has no properties, only ID. Normally we would
@@ -116,10 +139,10 @@ class Database extends Base
 		asrt( R::count( 'emptybean' ), 3 );
 		R::freeze( FALSE );
 	}
-	
+
 	/**
 	 * Test the database driver and low level functions.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDriver()
@@ -217,7 +240,7 @@ class Database extends Base
 
 	/**
 	 * Test selecting.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testSelects()
@@ -235,7 +258,7 @@ class Database extends Base
 		$rooms = R::getAssoc('SELECT * FROM room WHERE id < -999');
 		asrt(is_array($rooms), TRUE);
 		asrt(count($rooms), 0);
-		
+
 		$rooms = R::getAssoc( 'SELECT ' . R::getWriter()->esc( 'number' ) . ', kind FROM room ORDER BY kind ASC' );
 
 		foreach ( $rooms as $key => $room ) {

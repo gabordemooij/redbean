@@ -62,14 +62,14 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 
 	/**
 	 * Clears renames.
-	 * 
+	 *
 	 * @return void
 	 */
 	public static function clearRenames()
 	{
 		self::$renames = array();
 	}
-	
+
 	/**
 	 * Generates a list of parameters (slots) for an SQL snippet.
 	 * This method calculates the correct number of slots to insert in the
@@ -139,7 +139,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	private function getCached( $cacheTag, $key )
 	{
 		$sql = $this->adapter->getSQL();
-		
+
 		if ($this->updateCache()) {
 			if ( isset( $this->cache[$cacheTag][$key] ) ) {
 				return $this->cache[$cacheTag][$key];
@@ -152,10 +152,10 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	/**
 	 * Checks if the previous query had a keep-cache tag.
 	 * If so, the cache will persist, otherwise the cache will be flushed.
-	 * 
+	 *
 	 * Returns TRUE if the cache will remain and FALSE if a flush has
 	 * been performed.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	private function updateCache()
@@ -169,7 +169,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		}
 		return TRUE;
 	}
-	
+
 	/**
 	 * Stores data from the writer in the cache under a specific key and cache tag.
 	 * A cache tag is used to make sure the cache remains consistent. In most cases the cache tag
@@ -424,13 +424,13 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 
 		self::$renames[$from] = $to;
 	}
-	
+
 	/**
 	 * Globally available service method for RedBeanPHP.
 	 * Converts a camel cased string to a snake cased string.
-	 * 
+	 *
 	 * @param string $camel a camelCased string
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function camelsSnake( $camel )
@@ -516,7 +516,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	public function updateRecord( $type, $updatevalues, $id = NULL )
 	{
 		$table = $type;
-		
+
 		if ( !$id ) {
 			$insertcolumns = $insertvalues = array();
 
@@ -562,7 +562,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		$key = NULL;
 		if ( $this->flagUseCache ) {
 			$key = $this->getCacheKey( array( $conditions, $addSql, $bindings, 'select' ) );
-			
+
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
 			}
@@ -673,7 +673,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		$addSql = $this->glueSQLCondition( $addSql );
 
 		$table  = $this->esc( $type );
-		
+
 		$this->updateCache(); //check if cache chain has been broken
 
 		$sql    = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
