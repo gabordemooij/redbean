@@ -112,6 +112,7 @@ $allPacks = array(
 	'Blackhole/Export',
 	'Blackhole/Glue',
 	'Blackhole/Plugins',
+	'Blackhole/Debug',
 	'Base/Dispense',
 	'Base/Threeway',
 	'Base/Chill',

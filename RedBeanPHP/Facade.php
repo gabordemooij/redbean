@@ -15,6 +15,7 @@ use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\Logger as Logger;
 use RedBeanPHP\Logger\RDefault as RDefault;
+use RedBeanPHP\Logger\RDefault\Debug as Debug;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\SimpleModel as SimpleModel;
 use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
@@ -49,7 +50,7 @@ class Facade
 	 * RedBeanPHP version constant.
 	 */
 	const C_REDBEANPHP_VERSION = '4.0';
-	
+
 	/**
 	 * @var array
 	 */
@@ -151,14 +152,14 @@ class Facade
 	 * The RedBeanPHP version string always has the same format "X.Y"
 	 * where X is the major version number and Y is the minor version number.
 	 * Point releases are not mentioned in the version string.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getVersion()
 	{
 		return self::C_REDBEANPHP_VERSION;
 	}
-	
+
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
 	 * RedBean. The Setup() method can be called without any arguments, in this case it will
@@ -245,12 +246,12 @@ class Facade
 	/**
 	 * Adds a database to the facade, afterwards you can select the database using
 	 * selectDatabase($key), where $key is the name you assigned to this database.
-	 * 
+	 *
 	 * Usage:
-	 * 
+	 *
 	 * R::addDatabase( 'database-1', 'sqlite:/tmp/db1.txt' );
 	 * R::selectDatabase( 'database-1' ); //to select database again
-	 * 
+	 *
 	 * This method allows you to dynamically add (and select) new databases
 	 * to the facade. Adding a database with the same key will cause an exception.
 	 *
@@ -278,15 +279,15 @@ class Facade
 
 		$adapter = new DBAdapter( $db );
 
-		$writers     = array('pgsql'  => 'PostgreSQL', 
-									'sqlite' => 'SQLiteT', 
-									'cubrid' => 'CUBRID', 
+		$writers     = array('pgsql'  => 'PostgreSQL',
+									'sqlite' => 'SQLiteT',
+									'cubrid' => 'CUBRID',
 									'mysql'  => 'MySQL');
-		
+
 		$wkey = trim( strtolower( $dbType ) );
 		if ( !isset( $writers[$wkey] ) ) trigger_error( 'Unsupported DSN: '.$wkey );
 		$writerClass = '\\RedBeanPHP\\QueryWriter\\'.$writers[$wkey];
-		$writer      = new $writerClass( $adapter ); 
+		$writer      = new $writerClass( $adapter );
 		$redbean     = new OODB( $writer );
 
 		$redbean->freeze( ( $frozen === TRUE ) );
@@ -328,22 +329,27 @@ class Facade
 	 * Returns the attached logger instance.
 	 *
 	 * @param boolean $tf
-	 * @param integer $mode (0 = to STDOUT, 1 = to ARRAY)   
+	 * @param integer $mode (0 = to STDOUT, 1 = to ARRAY)
 	 *
 	 * @throws Security
-	 * 
+	 *
 	 * @return Logger\RDefault
 	 */
 	public static function debug( $tf = TRUE, $mode = 0 )
 	{
-		$logger = new RDefault;
-		
+		if ($mode > 1) {
+			$mode -= 2;
+			$logger = new Debug;
+		} else {
+			$logger = new RDefault;
+		}
+
 		if ( !isset( self::$adapter ) ) {
 			throw new RedException( 'Use R::setup() first.' );
 		}
 		$logger->setMode($mode);
 		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
-		
+
 		return $logger;
 	}
 
@@ -373,7 +379,7 @@ class Facade
 	 * RedBean runs in frozen mode it will throw an exception.
 	 * This function returns the primary key ID of the inserted
 	 * bean.
-	 * 
+	 *
 	 * The return value is an integer if possible. If it is not possible to
 	 * represent the value as an integer a string will be returned.
 	 *
@@ -501,42 +507,42 @@ class Facade
 		} else {
 			$type = $typeOrBeanArray;
 		}
-		
+
 		if ( !preg_match( '/^[a-z0-9]+$/', $type ) ) {
 			throw new RedException( 'Invalid type: ' . $type );
 		}
 
 		$beanOrBeans = self::$redbean->dispense( $type, $num, $alwaysReturnArray );
-		
+
 		if ( isset( $import ) ) {
 			$beanOrBeans->import( $import );
 		}
-		
+
 		return $beanOrBeans;
 	}
-	
+
 	/**
 	 * Takes a comma separated list of bean types
 	 * and dispenses these beans. For each type in the list
 	 * you can specify the number of beans to be dispensed.
-	 * 
+	 *
 	 * Usage:
-	 * 
+	 *
 	 * list($book, $page, $text) = R::dispenseAll('book,page,text');
-	 * 
+	 *
 	 * This will dispense a book, a page and a text. This way you can
 	 * quickly dispense beans of various types in just one line of code.
-	 * 
+	 *
 	 * Usage:
-	 * 
+	 *
 	 * list($book, $pages) = R::dispenseAll('book,page*100');
-	 * 
+	 *
 	 * This returns an array with a book bean and then another array
 	 * containing 100 page beans.
-	 * 
+	 *
 	 * @param string  $order      a description of the desired dispense order using the syntax above
 	 * @param boolean $onlyArrays return only arrays even if amount < 2
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function dispenseAll( $order, $onlyArrays = FALSE )
@@ -674,21 +680,21 @@ class Facade
 	{
 		return self::$redbean->batch( $type, $ids );
 	}
-	
+
 	/**
 	 * @see Facade::batch
-	 * 
+	 *
 	 * Alias for batch(). Batch method is older but since we added so-called *All
 	 * methods like storeAll, trashAll, dispenseAll and findAll it seemed logical to
 	 * improve the consistency of the Facade API and also add an alias for batch() called
 	 * loadAll.
-	 * 
+	 *
 	 * @param string $type type of beans
 	 * @param array  $ids  ids to load
 	 *
 	 * @return array
 	 */
-	public static function loadAll( $type, $ids ) 
+	public static function loadAll( $type, $ids )
 	{
 		return self::$redbean->batch( $type, $ids );
 	}
@@ -781,13 +787,13 @@ class Facade
 	{
 		return self::query( 'getAssoc', $sql, $bindings );
 	}
-	
+
 	/**
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 * Results will be returned as an associative array indexed by the first
 	 * column in the select.
-	 * 
+	 *
 	 * @param string $sql       sql    SQL query to execute
 	 * @param array  $bindings  values a list of values to be bound to query parameters
 	 *
@@ -1016,18 +1022,18 @@ class Facade
 		self::$redbean->setAssociationManager( self::$associationManager );
 
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
-		
+
 		$helper                   = new SimpleModelHelper();
 
 		$helper->attachEventListeners( self::$redbean );
-		
+
 		self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
 
 		self::$associationManager->addEventListener( 'delete', $helper );
 
 		self::$duplicationManager = new DuplicationManager( self::$toolbox );
 		self::$tagManager         = new TagManager( self::$toolbox );
-		
+
 		return $oldTools;
 	}
 
@@ -1107,7 +1113,7 @@ class Facade
 	 * Nukes the entire database.
 	 * This will remove all schema structures from the database.
 	 * Only works in fluid mode. Be careful with this method.
-	 * 
+	 *
 	 * @warning dangerous method, will remove all tables, columns etc.
 	 *
 	 * @return void
@@ -1165,16 +1171,16 @@ class Facade
 	 * have been marked therefore this mechanism is a rather safe way of caching, requiring
 	 * no explicit flushes or reloads. Of course this does not apply if you intend to test
 	 * or simulate concurrent querying.
-	 * 
+	 *
 	 * @param boolean $yesNo TRUE to enable cache, FALSE to disable cache
-	 * 
+	 *
 	 * @return void
 	 */
 	public static function useWriterCache( $yesNo )
 	{
 		self::getWriter()->setUseCache( $yesNo );
 	}
-	
+
 
 	/**
 	 * A label is a bean with only an id, type and name property.
@@ -1191,33 +1197,33 @@ class Facade
 	{
 		return self::$labelMaker->dispenseLabels( $type, $labels );
 	}
-	
+
 	/**
 	 * Generates and returns an ENUM value. This is how RedBeanPHP handles ENUMs.
 	 * Either returns a (newly created) bean respresenting the desired ENUM
 	 * value or returns a list of all enums for the type.
-	 * 
+	 *
 	 * To obtain (and add if necessary) an ENUM value:
-	 * 
+	 *
 	 * $tea->flavour = R::enum( 'flavour:apple' );
-	 * 
+	 *
 	 * Returns a bean of type 'flavour' with  name = apple.
 	 * This will add a bean with property name (set to APPLE) to the database
-	 * if it does not exist yet. 
-	 * 
+	 * if it does not exist yet.
+	 *
 	 * To obtain all flavours:
-	 * 
+	 *
 	 * R::enum('flavour');
-	 * 
+	 *
 	 * To get a list of all flavour names:
-	 * 
+	 *
 	 * R::gatherLabels( R::enum( 'flavour' ) );
-	 * 
+	 *
 	 * @param string $enum either type or type-value
-	 * 
+	 *
 	 * @return array|OODBBean
 	 */
-	public static function enum( $enum ) 
+	public static function enum( $enum )
 	{
 		return self::$labelMaker->enum( $enum );
 	}
@@ -1329,14 +1335,14 @@ class Facade
 	{
 		return self::$adapter;
 	}
-	
+
 	/**
 	 * Returns the current duplication manager instance.
-	 * 
+	 *
 	 * @return DuplicationManager
 	 */
 	public static function getDuplicationManager()
-	{	
+	{
 		return self::$duplicationManager;
 	}
 
@@ -1374,7 +1380,7 @@ class Facade
 	{
 		return self::$toolbox;
 	}
-	
+
 	public static function getExtractedToolbox()
 	{
 		return array(
@@ -1397,16 +1403,16 @@ class Facade
 	{
 		AQueryWriter::renameAssociation( $from, $to );
 	}
-	
+
 	/**
 	 * Little helper method for Resty Bean Can server and others.
 	 * Takes an array of beans and exports each bean.
 	 * Unlike exportAll this method does not recurse into own lists
 	 * and shared lists, the beans are exported as-is, only loaded lists
 	 * are exported.
-	 * 
+	 *
 	 * @param array $beans beans
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function beansToArray( $beans )
@@ -1417,21 +1423,21 @@ class Facade
 		}
 		return $list;
 	}
-	
+
 	/**
 	 * Dynamically extends the facade with a plugin.
 	 * Using this method you can register your plugin with the facade and then
 	 * use the plugin by invoking the name specified plugin name as a method on
 	 * the facade.
-	 * 
+	 *
 	 * Usage:
-	 * 
+	 *
 	 * R::ext( 'makeTea', function() { ... }  );
-	 * 
+	 *
 	 * Now you can use your makeTea plugin like this:
-	 * 
+	 *
 	 * R::makeTea();
-	 * 
+	 *
 	 * @param string   $pluginName name of the method to call the plugin
 	 * @param callable $callable   a PHP callable
 	 */
@@ -1442,14 +1448,14 @@ class Facade
 		}
 		self::$plugins[$pluginName] = $callable;
 	}
-	
+
 	/**
 	 * Call static for use with dynamic plugins. This magic method will
 	 * intercept static calls and route them to the specified plugin.
-	 *  
+	 *
 	 * @param string $pluginName name of the plugin
 	 * @param array  $params     list of arguments to pass to plugin method
-	 * 
+	 *
 	 * @return mixed
 	 */
 	public static function __callStatic( $pluginName, $params )

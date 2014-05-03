@@ -6,6 +6,7 @@ $dir = 'phar://rb.phar/RedBeanPHP/';
 //Load Database drivers
 require( $dir . 'Logger.php' );
 require( $dir . 'Logger/RDefault.php' );
+require( $dir . 'Logger/RDefault/Debug.php' );
 require( $dir . 'Driver.php' );
 require( $dir . 'Driver/RPDO.php' );
 
