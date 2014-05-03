@@ -6,6 +6,7 @@ $dir = 'phar://rb.phar/RedBeanPHP/';
 //Load Database drivers
 require( $dir . 'Logger.php' );
 require( $dir . 'Logger/RDefault.php' );
+require( $dir . 'Logger/RDefault/Debug.php' );
 require( $dir . 'Driver.php' );
 require( $dir . 'Driver/RPDO.php' );
 
@@ -28,6 +29,11 @@ require( $dir . 'QueryWriter/PostgreSQL.php' );
 //Load required Exceptions
 require( $dir . 'RedException.php' );
 require( $dir . 'RedException/SQL.php' );
+
+//Load Repository Classes
+require( $dir . 'Repository.php' );
+require( $dir . 'Repository/Fluid.php' );
+require( $dir . 'Repository/Frozen.php' );
 
 //Load Core functionality
 require( $dir . 'OODB.php' );

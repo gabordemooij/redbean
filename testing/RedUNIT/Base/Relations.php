@@ -21,6 +21,27 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Relations extends Base
 {
+
+	/**
+	 * Tests whether via() applies camelcase-to-snakecase
+	 * conversion. Although most of the time you do not need
+	 * this since via() is meant to remap typical link tables
+	 * to bean - but alas.
+	 *
+	 * @return void
+	 */
+	public function testCamelCasingVia()
+	{
+		R::nuke();
+		$book = R::dispense('book');
+		$book->sharedPage[] = R::dispense('page');
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( count( $book->via('bookPage')->sharedPage ), 1 );
+		$book = $book->fresh();
+		asrt( count( $book->via('book_page')->sharedPage ), 1 );
+	}
+
 	/**
 	 * Test whether we can't add more than one FK.
 	 */

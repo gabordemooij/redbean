@@ -87,22 +87,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	private $all = FALSE;
 
-	/** Returns the alias for a type
-	 *
-	 * @param string $type type
-	 *
-	 * @return string $type type
-	 */
-	private function getAlias( $type )
-	{
-		if ( $this->fetchType ) {
-			$type            = $this->fetchType;
-			$this->fetchType = NULL;
-		}
-
-		return $type;
-	}
-
 	/**
 	 * Internal method.
 	 * Obtains a shared list for a certain type.
@@ -785,7 +769,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			if ( isset( $this->__info["sys.parentcache.$property"] ) ) {
 				$bean = $this->__info["sys.parentcache.$property"];
 			} else {
-				$type = $this->getAlias( $property );
+				if ( $this->fetchType ) {
+					$type            = $this->fetchType;
+					$this->fetchType = NULL;
+				} else {
+					$type = $property;
+				}
 				$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 			}
 
@@ -1373,7 +1362,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function via( $via )
 	{
-		$this->via = $via;
+		$this->via = AQueryWriter::camelsSnake( $via );
 
 		return $this;
 	}
@@ -1456,6 +1445,56 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		$this->clearModifiers();
 		return (integer) $count;
+	}
+
+	/**
+	 * Iterates through the specified own-list and
+	 * fetches all properties (with their type) and
+	 * returns the references.
+	 * Use this method to quickly load indirectly related
+	 * beans in an own-list. Whenever you cannot use a
+	 * shared-list this method offers the same convenience
+	 * by aggregating the parent beans of all children in
+	 * the specified own-list.
+	 *
+	 * Example:
+	 *
+	 * $quest->aggr( 'xownQuestTarget', 'target', 'quest' );
+	 *
+	 * Loads (in batch) and returns references to all
+	 * quest beans residing in the $questTarget->target properties
+	 * of each element in the xownQuestTargetList.
+	 *
+	 * @param string $list     the list you wish to process
+	 * @param string $property the property to load
+	 * @param string $type     the type of bean residing in this property (optional)
+	 *
+	 * @return array
+	 */
+	public function &aggr( $list, $property, $type = NULL )
+	{
+		$ids = array();
+
+		if ( is_null( $type ) ) $type = $property;
+
+		foreach( $this->$list as $bean ) {
+			$field = $property . '_id';
+			$ids[] = $bean->$field;
+			$beanIndex[$bean->$field] = $bean;
+		}
+
+		$beans = $this->beanHelper->getToolBox()->getRedBean()->batch( $type, $ids );
+
+		//now preload the beans as well
+		foreach( $beans as $bean ) {
+			$beanIndex[$bean->id]->setProperty( $property, $bean );
+		}
+
+		foreach( $beanIndex as $indexedBean ) {
+			$references[] = $indexedBean->$property;
+		}
+
+		return $references;
 	}
 
 	/**

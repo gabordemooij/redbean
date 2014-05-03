@@ -2,7 +2,7 @@
 
 /**
  * Pretests
- * 
+ *
  * These tests will run before the configuration takes place
  * in the unit test suite (mostly error handling tests).
  *
@@ -25,3 +25,8 @@ try {
 	pass();
 }
 
+asrt( R::testConnection(), FALSE);
+
+R::addDatabase( 'broken', 'mysql:host=nowhere', 'defunct', 'void' );
+R::selectDatabase( 'broken' );
+asrt( R::testConnection(), FALSE);
