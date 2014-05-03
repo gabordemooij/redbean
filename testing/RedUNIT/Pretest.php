@@ -24,3 +24,8 @@ try {
 } catch( Exception $e ) {
 	pass();
 }
+
+asrt( R::testConnection(), FALSE);
+
+R::setup( 'mysql:host=nowhere', 'defunct', 'void' );
+asrt( R::testConnection(), FALSE);

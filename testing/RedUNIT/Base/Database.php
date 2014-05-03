@@ -50,6 +50,16 @@ class Database extends Base
 	}
 
 	/**
+	 * Test for testConnection() method.
+	 *
+	 * @return void
+	 */
+	public function testConnectionTester()
+	{
+		asrt( R::testConnection(), TRUE );
+	}
+
+	/**
 	 * Tests the various ways to fetch (select queries)
 	 * data using adapter methods in the facade.
 	 * Also tests the new R::getAssocRow() method,

@@ -169,8 +169,12 @@ class Facade
 	 */
 	public static function testConnection()
 	{
+		if ( !isset( self::$adapter ) ) return FALSE;
+
 		$database = self::$adapter->getDatabase();
-		$database->connect();
+		try {
+			@$database->connect();
+		} catch ( \Exception $e ) {}
 		return $database->isConnected();
 	}
 
@@ -1466,8 +1470,6 @@ class Facade
 			}
 			return $array;
 		}
-
-
 
 		return $array;
 	}
