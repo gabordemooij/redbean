@@ -1439,6 +1439,40 @@ class Facade
 	}
 
 	/**
+	 * Simple but effective debug function.
+	 * Given a one or more beans this method will
+	 * return an array containing first part of the string
+	 * representation of each item in the array.
+	 *
+	 * @return array
+	 *
+	 */
+	public static function dump( $data )
+	{
+		$array = array();
+
+		if ( $data instanceof OODBBean ) {
+			$str = strval( $data );
+			if (strlen($str) > 35) {
+				$array[] = substr( $str, 0, 35 ).'... ';
+			} else {
+				$array[] = $str;
+			}
+		}
+
+		if ( is_array( $data ) ) {
+			foreach( $data as $key => $item ) {
+				$array[$key] = self::dump( $item );
+			}
+			return $array;
+		}
+
+
+
+		return $array;
+	}
+
+	/**
 	 * Dynamically extends the facade with a plugin.
 	 * Using this method you can register your plugin with the facade and then
 	 * use the plugin by invoking the name specified plugin name as a method on

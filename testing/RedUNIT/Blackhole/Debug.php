@@ -49,6 +49,20 @@ class Debug extends Blackhole
 	}
 
 	/**
+	 * Test dump().
+	 *
+	 * @return void
+	 */
+	public function testDump()
+	{
+		$beans = R::dispense( 'bean', 2 );
+		$beans[0]->name = 'hello';
+		$beans[1]->name = 'world';
+		$array = R::dump($beans);
+		asrt( is_array( $array ), TRUE );
+	}
+
+	/**
 	 * Performs tests for debugger.
 	 *
 	 * @return void
