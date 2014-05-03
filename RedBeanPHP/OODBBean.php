@@ -87,22 +87,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	private $all = FALSE;
 
-	/** Returns the alias for a type
-	 *
-	 * @param string $type type
-	 *
-	 * @return string $type type
-	 */
-	private function getAlias( $type )
-	{
-		if ( $this->fetchType ) {
-			$type            = $this->fetchType;
-			$this->fetchType = NULL;
-		}
-
-		return $type;
-	}
-
 	/**
 	 * Internal method.
 	 * Obtains a shared list for a certain type.
@@ -785,7 +769,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			if ( isset( $this->__info["sys.parentcache.$property"] ) ) {
 				$bean = $this->__info["sys.parentcache.$property"];
 			} else {
-				$type = $this->getAlias( $property );
+				if ( $this->fetchType ) {
+					$type            = $this->fetchType;
+					$this->fetchType = NULL;
+				} else {
+					$type = $property;
+				}
 				$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 			}
 
