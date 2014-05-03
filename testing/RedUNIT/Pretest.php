@@ -2,7 +2,7 @@
 
 /**
  * Pretests
- * 
+ *
  * These tests will run before the configuration takes place
  * in the unit test suite (mostly error handling tests).
  *
@@ -24,4 +24,3 @@ try {
 } catch( Exception $e ) {
 	pass();
 }
-
