@@ -27,5 +27,6 @@ try {
 
 asrt( R::testConnection(), FALSE);
 
-R::setup( 'mysql:host=nowhere', 'defunct', 'void' );
+R::addDatabase( 'broken', 'mysql:host=nowhere', 'defunct', 'void' );
+R::selectDatabase( 'broken' );
 asrt( R::testConnection(), FALSE);
