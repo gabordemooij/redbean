@@ -68,9 +68,9 @@ class RPDO implements Driver
 	 * @var bool
 	 */
 	protected $flagUseStringOnlyBinding = FALSE;
-	
+
 	/**
-	 * @var string 
+	 * @var string
 	 */
 	protected $mysqlEncoding = '';
 
@@ -143,9 +143,9 @@ class RPDO implements Driver
 			$this->affectedRows = $statement->rowCount();
 
 			if ( $statement->columnCount() ) {
-				
+
 				$fetchStyle = ( isset( $options['fetchStyle'] ) ) ? $options['fetchStyle'] : NULL;
-				
+
 				$this->resultArray = $statement->fetchAll( $fetchStyle );
 
 				if ( $this->debug && $this->logger ) {
@@ -174,7 +174,7 @@ class RPDO implements Driver
 	 * seem to have added it with version 5.5 under a different label: utf8mb4.
 	 * We try to select the best possible charset based on your version data.
 	 */
-	protected function setEncoding() 
+	protected function setEncoding()
 	{
 		$driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME );
 		$version = floatval( $this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION ) );
@@ -189,10 +189,10 @@ class RPDO implements Driver
 
 	/**
 	 * Returns the best possible encoding for MySQL based on version data.
-	 * 
+	 *
 	 * @return string
 	 */
-	public function getMysqlEncoding() 
+	public function getMysqlEncoding()
 	{
 		return $this->mysqlEncoding;
 	}
@@ -267,7 +267,7 @@ class RPDO implements Driver
 					  \PDO::ATTR_DEFAULT_FETCH_MODE =>\PDO::FETCH_ASSOC,
 				)
 			);
-			
+
 			$this->setEncoding();
 			$this->pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, TRUE );
 
@@ -282,6 +282,21 @@ class RPDO implements Driver
 	}
 
 	/**
+	 * Directly sets PDO instance into driver.
+	 * This method might improve performance, however since the driver does
+	 * not configure this instance terrible things may happen... only use
+	 * this method if you are an expert on RedBeanPHP, PDO and UTF8 connections and
+	 * you know your database server VERY WELL.
+	 *
+	 * @param PDO $pdo PDO instance
+	 *
+	 * @return void
+	 */
+	public function setPDO( \PDO $pdo ) {
+		$this->pdo = $pdo;
+	}
+
+	/**
 	 * @see Driver::GetAll
 	 */
 	public function GetAll( $sql, $bindings = array() )
@@ -290,20 +305,20 @@ class RPDO implements Driver
 
 		return $this->resultArray;
 	}
-	
+
 	/**
 	 * @see Driver::GetAssocRow
 	 */
 	public function GetAssocRow( $sql, $bindings = array() )
 	{
-		$this->runQuery( $sql, $bindings, array( 
-				'fetchStyle' => \PDO::FETCH_ASSOC 
-			) 
+		$this->runQuery( $sql, $bindings, array(
+				'fetchStyle' => \PDO::FETCH_ASSOC
+			)
 		);
-		
+
 		return $this->resultArray;
 	}
-	
+
 	/**
 	 * @see Driver::GetCol
 	 */
