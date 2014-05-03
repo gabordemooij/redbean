@@ -161,6 +161,20 @@ class Facade
 	}
 
 	/**
+	 * Tests the connection.
+	 * Returns TRUE if connection has been established and
+	 * FALSE otherwise.
+	 *
+	 * @return boolean
+	 */
+	public static function testConnection()
+	{
+		$database = self::$adapter->getDatabase();
+		$database->connect();
+		return $database->isConnected();
+	}
+
+	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
 	 * RedBean. The Setup() method can be called without any arguments, in this case it will
 	 * try to create a SQLite database in /tmp called red.db (this only works on UNIX-like systems).
