@@ -6,6 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
@@ -270,6 +271,26 @@ class Cross extends Base
 		}
 		foreach( $texts as $text ) {
 			asrt( $text->content, 'CHANGED', TRUE );
+		}
+	 }
+
+	 /**
+	  * The aggr method can only be used with own-list.
+	  *
+	  * @return void
+	  */
+	 public function testErrorHandlingAggr()
+	 {
+		$wrongLists = array( 'not-an-own-list', 'OWNlist', 'Ownpage', 'ownbook', 'own book', '!', 'sharedBook' );
+		foreach( $wrongLists as $wrongList ) {
+			$bean = R::dispense( 'bean' );
+			try {
+				$bean->aggr( $wrongList, 'field' );
+				fail();
+			} catch ( \Exception $exception ) {
+				pass();
+				asrt( ( $exception instanceof RedException ), TRUE );
+			}
 		}
 	 }
 }

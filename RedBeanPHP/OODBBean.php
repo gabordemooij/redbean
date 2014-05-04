@@ -5,6 +5,8 @@ namespace RedBeanPHP;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException\Security as Security;
+use RedBeanPHP\RedException as RedException;
+
 
 /**
  * OODBBean (Object Oriented DataBase Bean)
@@ -1474,6 +1476,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	public function &aggr( $list, $property, $type = NULL )
 	{
 		$ids = array();
+
+		if ( strlen( $list ) < 4 ) throw new RedException('Invalid own-list.');
+		if ( strpos( $list, 'own') !== 0 ) throw new RedException('Only own-lists can be aggregated.');
+		if ( !ctype_upper( substr( $list, 3, 1 ) ) ) throw new RedException('Invalid own-list.');
 
 		if ( is_null( $type ) ) $type = $property;
 
