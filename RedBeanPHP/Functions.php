@@ -15,14 +15,14 @@
 
 /**
  * Convenience function for ENUM short syntax in queries.
- * 
+ *
  * Usage:
- * 
+ *
  * R::find( 'paint', ' color_id = ? ', [ EID('color:yellow') ] );
- * 
+ *
  * If a function called EID() already exists you'll have to write this
  * wrapper yourself ;)
- * 
+ *
  * @param string $enumName enum code as you would pass to R::enum()
  *
  * @return mixed
@@ -34,4 +34,20 @@ if (!function_exists('EID')) {
 		return \RedBeanPHP\Facade::enum( $enumName )->id;
 	}
 
+}
+
+/**
+ * Prints the result of R::dump() to the screen using
+ * print_r.
+ *
+ * @param mixed $data data to dump
+ *
+ * @return void
+ */
+if ( !function_exists( 'dump' ) ) {
+
+	function dmp( $list )
+	{
+		print_r( \RedBeanPHP\Facade::dump( $list ) );
+	}
 }
