@@ -1399,6 +1399,21 @@ class Facade
 		return self::$toolbox;
 	}
 
+	/**
+	 * Mostly for internal use, but might be handy
+	 * for some users.
+	 * This returns all the components of the currently
+	 * selected toolbox.
+	 *
+	 * Returns the components in the following order:
+	 *
+	 * 0 - OODB instance (getRedBean())
+	 * 1 - Database Adapter
+	 * 2 - Query Writer
+	 * 3 - Toolbox itself
+	 *
+	 * @return array
+	 */
 	public static function getExtractedToolbox()
 	{
 		return array(
