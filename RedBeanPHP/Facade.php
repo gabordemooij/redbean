@@ -1471,8 +1471,6 @@ class Facade
 			}
 			return $array;
 		}
-
-		return $array;
 	}
 
 	/**
