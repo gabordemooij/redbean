@@ -1458,10 +1458,11 @@ class Facade
 		if ( $data instanceof OODBBean ) {
 			$str = strval( $data );
 			if (strlen($str) > 35) {
-				$array[] = substr( $str, 0, 35 ).'... ';
+				$beanStr = substr( $str, 0, 35 ).'... ';
 			} else {
-				$array[] = $str;
+				$beanStr = $str;
 			}
+			return $beanStr;
 		}
 
 		if ( is_array( $data ) ) {

@@ -60,6 +60,13 @@ class Debug extends Blackhole
 		$beans[1]->name = 'world';
 		$array = R::dump($beans);
 		asrt( is_array( $array ), TRUE );
+		foreach( $array as $item ) {
+			asrt( is_string( $item ), TRUE );
+		}
+		$beans[1]->name = 'world, and a very long string that should be shortened';
+		$array = R::dump($beans);
+		asrt( is_array( $array ), TRUE );
+		asrt( strpos( $array[1], '...' ), 35 );
 	}
 
 	/**
