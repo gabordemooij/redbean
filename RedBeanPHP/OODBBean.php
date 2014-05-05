@@ -6,7 +6,7 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\RedException as RedException;
-
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * OODBBean (Object Oriented DataBase Bean)
@@ -1475,7 +1475,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function &aggr( $list, $property, $type = NULL )
 	{
-		$ids = array();
+		$ids = $beanIndex = $references = array();
 
 		if ( strlen( $list ) < 4 ) throw new RedException('Invalid own-list.');
 		if ( strpos( $list, 'own') !== 0 ) throw new RedException('Only own-lists can be aggregated.');
@@ -1485,8 +1485,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		foreach( $this->$list as $bean ) {
 			$field = $property . '_id';
-			$ids[] = $bean->$field;
-			$beanIndex[$bean->$field] = $bean;
+			if ( isset( $bean->$field)  ) {
+				$ids[] = $bean->$field;
+				$beanIndex[$bean->$field] = $bean;
+			}
 		}
 
 		$beans = $this->beanHelper->getToolBox()->getRedBean()->batch( $type, $ids );

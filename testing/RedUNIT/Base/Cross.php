@@ -25,6 +25,50 @@ use RedBeanPHP\OODBBean as OODBBean;
 
 class Cross extends Base
 {
+
+	/**
+	 * Test how well aggr handles fields with no
+	 * values.
+	 *
+	 * @return void
+	 */
+	public function testAggrNullHandling()
+	{
+		R::nuke();
+		$book  = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$page->name = 'Page 3';
+		$book->xownPageList[] = $page;
+		R::store( $book );
+		$book  = $book->fresh();
+		$texts = $book->aggr( 'ownPageList', 'text' );
+		pass();
+		asrt( count( $texts ), 0 );
+		asrt( is_array( $texts ), TRUE );
+		R::nuke();
+		$book  = R::dispense( 'book' );
+		$page1 = R::dispense( 'page' );
+		$page1->name = 'Page 1';
+		$text1 = R::dispense('text');
+		$text1->content = 'Text 1';
+		$page1->text = $text1;
+		$book->xownPageList[] = $page1;
+		$page2 = R::dispense( 'page' );
+		$page2->name = 'Page 2';
+		$text2 = R::dispense( 'text' );
+		$text2->content = 'Text 2';
+		$page2->text = $text2;
+		$book->xownPageList[] = $page2;
+		$page3 = R::dispense( 'page' );
+		$page3->name = 'Page 3';
+		$book->xownPageList[] = $page3;
+		R::store( $book );
+		$book  = $book->fresh();
+		$texts = $book->aggr( 'ownPageList', 'text' );
+		pass();
+		asrt( count( $texts ), 2 );
+	}
+
 	/**
 	 * Test many different scenarios with self referential
 	 * many-to-many relations.
