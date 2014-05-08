@@ -80,6 +80,17 @@ class OODB extends Observable
 	protected $repository = NULL;
 
 	/**
+	 * @var FrozenRepo
+	 */
+	protected $frozenRepository = NULL;
+
+	/**
+	 * @var FluidRepo
+	 */
+	protected $fluidRepository = NULL;
+
+
+	/**
 	 * Unboxes a bean from a FUSE model if needed and checks whether the bean is
 	 * an instance of OODBBean.
 	 *
@@ -138,9 +149,18 @@ class OODB extends Observable
 		}
 
 		if ( $this->isFrozen ) {
-			$this->repository = new FrozenRepo( $this, $this->writer );
+			if ( !$this->frozenRepository ) {
+				$this->frozenRepository = new FrozenRepo( $this, $this->writer );
+			}
+
+			$this->repository = $this->frozenRepository;
+
 		} else {
-			$this->repository = new FluidRepo( $this, $this->writer );
+			if ( !$this->fluidRepository ) {
+				$this->fluidRepository = new FluidRepo( $this, $this->writer );
+			}
+
+			$this->repository = $this->fluidRepository;
 		}
 
 	}
@@ -458,5 +478,16 @@ class OODB extends Observable
 	public function setAssociationManager( AssociationManager $assocManager )
 	{
 		$this->assocManager = $assocManager;
+	}
+
+	/**
+	 * Returns the currently used repository instance.
+	 * For testing purposes only.
+	 *
+	 * @return Repository
+	 */
+	public function getCurrentRepository()
+	{
+		return $this->repository;
 	}
 }
