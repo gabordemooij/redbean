@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Mysql;
 
@@ -6,7 +6,7 @@ use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Mysql_Bigint
+ * Bigint
  *
  * @file    RedUNIT/Mysql/Bigint.php
  * @desc    Tests support for BIGINT primary keys.
@@ -21,53 +21,53 @@ class Bigint extends Mysql
 {
 	/**
 	 * Test BIG INT primary key support.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBigIntSupport()
 	{
 		R::nuke();
-		
+
 		$createPageTableSQL = '
-			CREATE TABLE 
-			`page` 
+			CREATE TABLE
+			`page`
 			(
-				id BIGINT(20) UNSIGNED NOT NULL, 
+				id BIGINT(20) UNSIGNED NOT NULL,
 				book_id BIGINT(20) UNSIGNED NOT NULL,
 				magazine_id BIGINT(20) UNSIGNED NOT NULL,
 				title VARCHAR(255),
 				PRIMARY KEY ( id )
-			) 
-			ENGINE = InnoDB DEFAULT 
-			CHARSET=utf8mb4 
-			COLLATE=utf8mb4_unicode_ci 
+			)
+			ENGINE = InnoDB DEFAULT
+			CHARSET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci
 			AUTO_INCREMENT = 1223372036854775808';
 
 		$createBookTableSQL = '
-			CREATE TABLE 
-			`book` 
+			CREATE TABLE
+			`book`
 			(
-				id BIGINT(20) UNSIGNED NOT NULL, 
+				id BIGINT(20) UNSIGNED NOT NULL,
 				title VARCHAR(255),
 				PRIMARY KEY ( id )
-			) 
-			ENGINE = InnoDB DEFAULT 
-			CHARSET=utf8mb4 
-			COLLATE=utf8mb4_unicode_ci 
+			)
+			ENGINE = InnoDB DEFAULT
+			CHARSET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci
 			AUTO_INCREMENT = 2223372036854775808';
 
 		$createPagePageTableSQL = '
-			CREATE TABLE 
-			`page_page` 
+			CREATE TABLE
+			`page_page`
 			(
-				id BIGINT(20) UNSIGNED NOT NULL, 
+				id BIGINT(20) UNSIGNED NOT NULL,
 				page_id BIGINT(20) UNSIGNED NOT NULL,
 				page2_id BIGINT(20) UNSIGNED NOT NULL,
 				PRIMARY KEY ( id )
-			) 
-			ENGINE = InnoDB DEFAULT 
-			CHARSET=utf8mb4 
-			COLLATE=utf8mb4_unicode_ci 
+			)
+			ENGINE = InnoDB DEFAULT
+			CHARSET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci
 			AUTO_INCREMENT = 3223372036854775808';
 
 		R::exec( $createBookTableSQL );
@@ -82,7 +82,7 @@ class Bigint extends Mysql
 		$page2ID     = '1223372036854775809';
 		$page3ID     = '1223372036854775890';
 		$pagePage1ID = '3223372036854775808';
-				
+
 		$insertBook1SQL = "
 			INSERT INTO book (id, title) VALUES( '$book1ID', 'book 1' );
 		";
@@ -147,4 +147,3 @@ class Bigint extends Mysql
 
 	}
 }
-		

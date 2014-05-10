@@ -1,9 +1,9 @@
-<?php 
+<?php
 
-namespace RedUNIT; 
+namespace RedUNIT;
 
 /**
- * RedUNIT_Blackhole
+ * Blackhole
  *
  * @file    RedUNIT/Blackhole.php
  * @desc    Tests that do not require a database or can just use the base SQLite driver.

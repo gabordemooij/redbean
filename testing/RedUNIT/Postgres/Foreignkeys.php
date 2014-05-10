@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Postgres;
 
@@ -6,7 +6,7 @@ use RedUNIT\Postgres as Postgres;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Postgres_Foreignkeys
+ * Foreignkeys
  *
  * @file    RedUNIT/Postgres/Foreignkeys.php
  * @desc    Tests the creation of foreign keys.
@@ -111,244 +111,244 @@ class Foreignkeys extends Postgres
 			if ( !$found ) fail();
 		}
 	}
-	
+
 	/**
 	 * Test constraint function directly in Writer.
-	 * 
+	 *
 	 * @return void
 	 */
-	public function testConstraint() 
+	public function testConstraint()
 	{
 		R::nuke();
-		
+
 		$database = R::getCell('SELECT current_database()');
-		
+
 		$sql = 'CREATE TABLE book (id SERIAL PRIMARY KEY)';
-		
+
 		R::exec( $sql );
-		
+
 		$sql = 'CREATE TABLE page (id SERIAL PRIMARY KEY)';
-		
+
 		R::exec( $sql );
-		
+
 		$sql = 'CREATE TABLE book_page (
 			id SERIAL PRIMARY KEY,
 			book_id INTEGER,
 			page_id INTEGER
 		)';
-		
+
 		R::exec( $sql );
-		
+
 		$writer = R::getWriter();
-		
+
 		$sql = "
-			SELECT 
-				COUNT(*) 
-			FROM information_schema.key_column_usage AS k 
-			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name 
+			SELECT
+				COUNT(*)
+			FROM information_schema.key_column_usage AS k
+			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name
 			WHERE k.table_catalog = '$database'
-				AND k.table_schema = 'public' 
-				AND k.table_name = 'book_page' 
+				AND k.table_schema = 'public'
+				AND k.table_name = 'book_page'
 				AND c.constraint_type = 'FOREIGN KEY'";
-		
+
 		$numFKS = R::getCell( $sql );
-		
+
 		asrt( (int) $numFKS, 0 );
-		
+
 		$writer->addConstraintForTypes( 'book', 'page' );
-		
+
 		$numFKS = R::getCell( $sql );
-		
+
 		asrt( (int) $numFKS, 2 );
-		
+
 		$writer->addConstraintForTypes( 'book', 'page' );
-		
+
 		$numFKS = R::getCell( $sql );
-		
+
 		asrt( (int) $numFKS, 2 );
 	}
-	
+
 	/**
 	 * Test adding foreign keys.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAddingForeignKey()
 	{
 		R::nuke();
-		
+
 		$database = R::getCell('SELECT current_database()');
-		
+
 		$sql = 'CREATE TABLE book (
 			id SERIAL PRIMARY KEY
 		)';
-		
+
 		R::exec( $sql );
-		
+
 		$sql = 'CREATE TABLE page (
 			id SERIAL PRIMARY KEY,
 			book_id INTEGER
 		)';
-		
+
 		R::exec( $sql );
-		
+
 		$writer = R::getWriter();
-		
+
 		$sql = "
-			SELECT 
-				COUNT(*) 
-			FROM information_schema.key_column_usage AS k 
-			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name 
+			SELECT
+				COUNT(*)
+			FROM information_schema.key_column_usage AS k
+			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name
 			WHERE k.table_catalog = '$database'
-				AND k.table_schema = 'public' 
-				AND k.table_name = 'page' 
+				AND k.table_schema = 'public'
+				AND k.table_name = 'page'
 				AND c.constraint_type = 'FOREIGN KEY'";
-		
+
 		$numFKS = R::getCell( $sql );
-		
+
 		asrt( (int) $numFKS, 0 );
-		
+
 		$writer->addFK('page', 'page', 'book_id', 'id', TRUE);
-		
+
 		$sql = "
-			SELECT 
-				COUNT(*) 
-			FROM information_schema.key_column_usage AS k 
-			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name 
+			SELECT
+				COUNT(*)
+			FROM information_schema.key_column_usage AS k
+			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name
 			WHERE k.table_catalog = '$database'
-				AND k.table_schema = 'public' 
-				AND k.table_name = 'page' 
+				AND k.table_schema = 'public'
+				AND k.table_name = 'page'
 				AND c.constraint_type = 'FOREIGN KEY'";
-		
+
 		$numFKS = R::getCell( $sql );
-		
+
 		asrt( (int) $numFKS, 1 );
-		
+
 		//dont add twice
 		$writer->addFK('page', 'page', 'book_id', 'id', TRUE);
-		
+
 		$sql = "
-			SELECT 
-				COUNT(*) 
-			FROM information_schema.key_column_usage AS k 
-			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name 
+			SELECT
+				COUNT(*)
+			FROM information_schema.key_column_usage AS k
+			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name
 			WHERE k.table_catalog = '$database'
-				AND k.table_schema = 'public' 
-				AND k.table_name = 'page' 
+				AND k.table_schema = 'public'
+				AND k.table_name = 'page'
 				AND c.constraint_type = 'FOREIGN KEY'";
-		
+
 		$numFKS = R::getCell( $sql );
-		
+
 		asrt( (int) $numFKS, 1 );
-		
+
 		//even if it is different
 		$writer->addFK('page', 'page', 'book_id', 'id', FALSE);
-		
+
 		$sql = "
-			SELECT 
-				COUNT(*) 
-			FROM information_schema.key_column_usage AS k 
-			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name 
+			SELECT
+				COUNT(*)
+			FROM information_schema.key_column_usage AS k
+			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name
 			WHERE k.table_catalog = '$database'
-				AND k.table_schema = 'public' 
-				AND k.table_name = 'page' 
+				AND k.table_schema = 'public'
+				AND k.table_name = 'page'
 				AND c.constraint_type = 'FOREIGN KEY'";
-		
+
 		$numFKS = R::getCell( $sql );
-		
+
 		asrt( (int) $numFKS, 1 );
-		
+
 		R::nuke();
-		
+
 		$sql = 'CREATE TABLE book (
 			id SERIAL PRIMARY KEY
 		)';
-		
+
 		R::exec( $sql );
-		
+
 		$sql = 'CREATE TABLE page (
 			id SERIAL PRIMARY KEY,
 			book_id INTEGER
 		)';
-		
+
 		R::exec( $sql );
-		
+
 		$writer = R::getWriter();
-		
+
 		$sql = "
-			SELECT 
-				COUNT(*) 
-			FROM information_schema.key_column_usage AS k 
-			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name 
+			SELECT
+				COUNT(*)
+			FROM information_schema.key_column_usage AS k
+			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name
 			WHERE k.table_catalog = '$database'
-				AND k.table_schema = 'public' 
-				AND k.table_name = 'page' 
+				AND k.table_schema = 'public'
+				AND k.table_name = 'page'
 				AND c.constraint_type = 'FOREIGN KEY'";
-		
+
 		$numFKS = R::getCell( $sql );
-		
+
 		asrt( (int) $numFKS, 0 );
-		
+
 		$writer->addFK('page', 'page', 'book_id', 'id', FALSE);
-		
+
 		$sql = "
-			SELECT 
-				COUNT(*) 
-			FROM information_schema.key_column_usage AS k 
-			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name 
+			SELECT
+				COUNT(*)
+			FROM information_schema.key_column_usage AS k
+			LEFT JOIN information_schema.table_constraints AS c ON c.constraint_name = k.constraint_name
 			WHERE k.table_catalog = '$database'
-				AND k.table_schema = 'public' 
-				AND k.table_name = 'page' 
+				AND k.table_schema = 'public'
+				AND k.table_name = 'page'
 				AND c.constraint_type = 'FOREIGN KEY'";
-		
+
 		$numFKS = R::getCell( $sql );
-		
+
 		asrt( (int) $numFKS, 1 );
-		
+
 	}
-	
+
 	/**
 	 * Test whether we can manually create indexes.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAddingIndex()
 	{
 		R::nuke();
-		
+
 		$sql = 'CREATE TABLE song (
 			id SERIAL PRIMARY KEY,
 			album_id INTEGER,
 			category VARCHAR(255)
 		)';
-		
+
 		R::exec( $sql );
-		
+
 		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
-		
+
 		asrt( count( $indexes ), 1 );
-		
+
 		$writer = R::getWriter();
-		
+
 		$writer->addIndex( 'song', 'index1', 'album_id' );
-		
+
 		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
-		
+
 		asrt( count( $indexes ), 2 );
-		
+
 		//Cant add the same index twice
 		$writer->addIndex( 'song', 'index1', 'album_id' );
-		
+
 		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
-		
+
 		asrt( count( $indexes ), 2 );
-		
+
 		$writer->addIndex( 'song', 'index2', 'category' );
-		
+
 		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
-		
+
 		asrt( count( $indexes ), 3 );
-		
+
 		//Dont fail, just dont
 		try {
 			$writer->addIndex( 'song', 'index3', 'nonexistant' );
@@ -356,19 +356,19 @@ class Foreignkeys extends Postgres
 		} catch( \Exception $e ) {
 			fail();
 		}
-			
+
 		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
 		asrt( count( $indexes ), 3 );
-		
+
 		try {
 			$writer->addIndex( 'nonexistant', 'index4', 'nonexistant' );
 			pass();
 		} catch( \Exception $e ) {
 			fail();
 		}
-			
+
 		$indexes = R::getAll( " SELECT * FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'song' ");
 		asrt( count( $indexes ), 3 );
-		
+
 	}
 }

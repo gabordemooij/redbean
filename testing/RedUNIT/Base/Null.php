@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -6,7 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Base_Null
+ * Null
  *
  * @file    RedUNIT/Base/Null.php
  * @desc    Tests handling of NULL values.
@@ -22,7 +22,7 @@ class Null extends Base
 	/**
 	 * Test NULL handling, setting a property to NULL must
 	 * cause a change.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBasicNullHandling()
@@ -80,7 +80,7 @@ class Null extends Base
 	 * Normally if you store NULL, the smallest type (bool/set) will
 	 * be selected. However in case of a foreign key type INT should
 	 * be selected because fks columns require matching types.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function ColumnType()
@@ -100,7 +100,7 @@ class Null extends Base
 
 	/**
 	 * Test meta column type.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function TypeColumn()

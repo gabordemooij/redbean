@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\SimpleModel as SimpleModel; 
+use RedBeanPHP\SimpleModel as SimpleModel;
 
 /**
- * RedUNIT_Base_Boxing
+ * Boxing
  *
  * @file    RedUNIT/Base/Boxing.php
  * @desc    Tests bean boxing and unboxing functionality.
@@ -20,10 +20,10 @@ use RedBeanPHP\SimpleModel as SimpleModel;
  */
 class Boxing extends Base
 {
-	
+
 	/**
 	 * Test boxing beans.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBoxing()

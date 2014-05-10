@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Mysql;
 
 use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\SQLHelper as SQLHelper; 
+use RedBeanPHP\SQLHelper as SQLHelper;
 
 /**
- * RedUNIT_Mysql_Mix
+ * Mix
  *
  * @file    RedUNIT/Mysql/Mix.php
  * @desc    Tests mixing SQL with PHP, SQLHelper class.
@@ -20,10 +20,10 @@ use RedBeanPHP\SQLHelper as SQLHelper;
  */
 class Mix extends Mysql
 {
-	
+
 	/**
 	 * Test query building.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testQueryBuilderMix()
@@ -125,12 +125,12 @@ class Mix extends Mysql
 	}
 
 	/**
-	 * Test the __toString method of the SQLHelper. 
+	 * Test the __toString method of the SQLHelper.
 	 */
 	public function testToString()
 	{
 		$toolbox = R::getToolBox();
-		$adapter = $toolbox->getDatabaseAdapter();	
+		$adapter = $toolbox->getDatabaseAdapter();
 		$sqlHelper = new SQLHelper( $adapter );
 		$sqlHelper->begin()
 				  ->select( '*' )

@@ -1,14 +1,14 @@
-<?php 
+<?php
 
 namespace RedUNIT\Blackhole;
 
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\SimpleModel as SimpleModel; 
+use RedBeanPHP\SimpleModel as SimpleModel;
 
 /**
- * RedUNIT_Blackhole_Fusebox
+ * Fusebox
  *
  * @file    RedUNIT/Blackhole/Fusebox.php
  * @desc    Tests Boxing/Unboxing of beans.
@@ -24,7 +24,7 @@ class Fusebox extends Blackhole
 {
 	/**
 	 * Test boxing.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBasicBox()

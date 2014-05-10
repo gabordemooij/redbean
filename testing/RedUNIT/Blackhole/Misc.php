@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Blackhole;
 
@@ -12,7 +12,7 @@ use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 /**
- * RedUNIT_Blackhole_Misc
+ * Misc
  *
  * @file    RedUNIT/Blackhole/Misc.php
  * @desc    Tests various features that do not rely on a database connection.
@@ -48,7 +48,7 @@ class Misc extends Blackhole
 		}
 		R::debug( FALSE );
 	}
-	
+
 	/**
 	 * Adding a database twice no longer allowed, causes confusion
 	 * and possible damage.
@@ -67,10 +67,10 @@ class Misc extends Blackhole
 
 	/**
 	 * Tests whether getID never produces a notice.
-	 * 
+	 *
 	 * @return void
 	 */
-	public function testGetIDShouldNeverPrintNotice() 
+	public function testGetIDShouldNeverPrintNotice()
 	{
 		set_error_handler(function($err, $errStr){
 			die('>>>>FAIL :'.$err.' '.$errStr);
@@ -80,10 +80,10 @@ class Misc extends Blackhole
 		restore_error_handler();
 		pass();
 	}
-	
+
 	/**
 	 * Tests setProperty.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testSetProperty()
@@ -94,23 +94,23 @@ class Misc extends Blackhole
 		R::store( $bean );
 		$bean = $bean->fresh();
 		$bean->ownBean;
-		
+
 		$bean->setProperty( 'ownBean', array(), FALSE, FALSE );
 		asrt( count( $bean->ownBean ), 0 );
 		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 2 );
 		asrt( $bean->isTainted(), TRUE );
-		
+
 		$bean->setProperty( 'ownBean', array(), TRUE, FALSE );
 		asrt( count( $bean->ownBean ), 0 );
 		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 0 );
 		asrt( $bean->isTainted(), TRUE );
-		
+
 		$bean = $bean->fresh();
 		$bean->setProperty( 'ownBean', array(), TRUE, FALSE );
 		asrt( count( $bean->ownBean ), 0 );
 		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 0 );
 		asrt( $bean->isTainted(), FALSE );
-		
+
 		$bean = $bean->fresh();
 		$bean->setProperty( 'ownBean', array(), TRUE, TRUE );
 		asrt( count( $bean->ownBean ), 0 );
@@ -120,13 +120,13 @@ class Misc extends Blackhole
 
 	/**
 	 * Tests beansToArray().
-	 * 
-	 * @return void 
+	 *
+	 * @return void
 	 */
-	public function testBeansToArray() 
-	{	
+	public function testBeansToArray()
+	{
 		testpack('Test R::beansToArray method');
-	
+
 		$bean1 = R::dispense( 'bean' );
 		$bean1->name = 'hello';
 		$bean2 = R::dispense( 'bean' );
@@ -137,10 +137,10 @@ class Misc extends Blackhole
 		asrt( $array[0]['name'], 'hello' );
 		asrt( $array[1]['name'], 'world' );
 	}
-	
+
 	/**
 	 * Test debugging with custom logger.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDebugCustomLogger()
@@ -176,9 +176,9 @@ class Misc extends Blackhole
 
 	/**
 	 * Test Facade transactions.
-	 * 
+	 *
 	 * @return void
-	 * 
+	 *
 	 * @throws\Exception
 	 */
 	public function testTransactionInFacade()
@@ -216,11 +216,11 @@ class Misc extends Blackhole
 				return R::store( $bean );
 			} );
 		} );
-		
+
 		asrt( (int) $id, (int) $bean->id );
-		
+
 		R::trash( $bean );
-		
+
 		$bean = R::dispense( 'bean' );
 
 		$bean->name = 'a';
@@ -228,16 +228,16 @@ class Misc extends Blackhole
 		$id = R::transaction( function() use( &$bean ) {
 			return R::store( $bean );
 		} );
-		
+
 		asrt( (int) $id, (int) $bean->id );
 
 		R::trash( $bean );
-		
+
 		$bean = R::dispense( 'bean' );
 
 		$bean->name = 'a';
 
-		
+
 		try {
 			R::transaction( function () use ( $bean ) {
 				R::store( $bean );
@@ -399,7 +399,7 @@ class Misc extends Blackhole
 		R::selectDatabase( 'pdo' );
 
 		R::getCell('SELECT 123;');
-		
+
 		testpack( 'Test array interface of beans' );
 
 		$bean = R::dispense( 'bean' );
@@ -465,7 +465,7 @@ class Misc extends Blackhole
 		asrt( is_array( $bean->{'own item'} ), FALSE );
 		asrt( is_array( $bean->{'shared Item'} ), FALSE );
 	}
-	
+
 	public function testConv2Beans()
 	{
 		$row1 = array('id' => 1, 'title'=>'test');
@@ -497,7 +497,7 @@ class Misc extends Blackhole
 		foreach( $invalid as $j ) {
 			try {
 				R::dispense( $j );
-				fail();	
+				fail();
 			} catch( RedException $e ) {
 				pass();
 			}
@@ -506,7 +506,7 @@ class Misc extends Blackhole
 
 	/**
 	* Test whether batch still works if no IDs have been passed.
-	* 
+	*
 	* @return void
 	*/
 	public function testBatch0()
@@ -525,7 +525,7 @@ class Misc extends Blackhole
 	/**
 	* Test whether connection failure does not reveal
 	* credentials.
-	* 
+	*
 	* @return void
 	*/
 	public function testConnect()
@@ -558,7 +558,7 @@ class Misc extends Blackhole
 
 	/**
 	 * Test camelCase to snake_case conversions.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCamel2Snake()

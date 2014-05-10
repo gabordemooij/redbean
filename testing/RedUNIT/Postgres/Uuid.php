@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Postgres;
 
@@ -6,7 +6,7 @@ use RedUNIT\Postgres as Postgres;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Postgres_Uuid
+ * Uuid
  *
  * @file    RedUNIT/Postgres/Uuid.php
  * @desc    Tests read support for UUID tables.
@@ -21,37 +21,37 @@ class Uuid extends Postgres
 {
 	/**
 	 * Test Read-support.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testUUIDReadSupport()
 	{
-		
+
 		R::nuke();
-		
+
 		$createPageTableSQL = '
-			CREATE TABLE 
+			CREATE TABLE
 			page
 			(
-				id UUID PRIMARY KEY, 
+				id UUID PRIMARY KEY,
 				book_id UUID,
 				magazine_id UUID,
 				title VARCHAR(255)
 			)';
 
 		$createBookTableSQL = '
-			CREATE TABLE 
+			CREATE TABLE
 			book
 			(
-				id UUID PRIMARY KEY, 
+				id UUID PRIMARY KEY,
 				title VARCHAR(255)
 			)';
 
 		$createPagePageTableSQL = '
-			CREATE TABLE 
-			page_page 
+			CREATE TABLE
+			page_page
 			(
-				id UUID PRIMARY KEY, 
+				id UUID PRIMARY KEY,
 				page_id UUID,
 				page2_id UUID
 			)';
@@ -68,7 +68,7 @@ class Uuid extends Postgres
 		$page2ID     = '6ccd780c-baba-1026-9564-0040f4311e24';
 		$page3ID     = '6ccd780c-baba-1026-9564-0040f4311e25';
 		$pagePage1ID = '6ccd780c-baba-1026-9564-0040f4311e26';
-				
+
 		$insertBook1SQL = "
 			INSERT INTO book (id, title) VALUES( '$book1ID', 'book 1' );
 		";

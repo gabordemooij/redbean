@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Mysql;
 
@@ -6,7 +6,7 @@ use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Mysql_Double
+ * Double
  *
  * @file    RedUNIT/Mysql/Double.php
  * @desc    Tests handling of double precision values.
@@ -21,7 +21,7 @@ class Double extends Mysql
 {
 	/**
 	 * Test storage of doubles.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDouble()

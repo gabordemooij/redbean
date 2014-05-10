@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -9,7 +9,7 @@ use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\RedException\SQL as SQL;
 
 /**
- * RedUNIT_Base_Association
+ * Association
  *
  * @file    RedUNIT/Base/Association.php
  * @desc    Tests Association API (N:N associations)
@@ -24,7 +24,7 @@ class Association extends Base
 {
 	/**
 	 * MySQL specific tests.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testMySQL()
@@ -64,7 +64,7 @@ class Association extends Base
 	/**
 	 * Test fast-track deletion, i.e. bypassing FUSE.
 	 * For link beans.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFastTrackDeletion()
@@ -75,7 +75,7 @@ class Association extends Base
 		$house = R::dispense( 'house' );
 
 		$house->sharedGhost[] = $ghost;
-		
+
 		\Model_Ghost_House::$deleted = FALSE;
 
 		R::getRedBean()->getAssociationManager()->unassociate( $house, $ghost );
@@ -93,7 +93,7 @@ class Association extends Base
 
 	/**
 	 * Test self-referential associations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCrossAssociation()
@@ -120,7 +120,7 @@ class Association extends Base
 
 	/**
 	 * Test limited support for polymorph associations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testPoly()
@@ -148,7 +148,7 @@ class Association extends Base
 
 	/**
 	 * Test limited support for 1-to-1 associations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testOneToOne()
@@ -196,7 +196,7 @@ class Association extends Base
 
 	/**
 	 * Test single column bases unique constraints.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testSingleColUniqueConstraint()
@@ -205,7 +205,7 @@ class Association extends Base
 
 		//mysql cant handle this due to utf8mb4 fuckup Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes
 		if ($this->currentlyActiveDriverID === 'mysql') return;
-		
+
 		$book = R::dispense( 'book' );
 
 		$book->setMeta( 'buildcommand.unique', array( array( 'title' ) ) );
@@ -261,7 +261,7 @@ class Association extends Base
 
 	/**
 	 * Test multiple assiociation.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testMultiAssociationDissociation()
@@ -321,7 +321,7 @@ class Association extends Base
 
 		$redbean = R::getRedBean();
 		$am = $redbean->getAssociationManager();
-		
+
 		//SQLite and CUBRID do not comply with ANSI SQLState codes.
 		$catchAll = ( $this->currentlyActiveDriverID == 'sqlite' || $this->currentlyActiveDriverID === 'CUBRID' );
 
@@ -338,7 +338,7 @@ class Association extends Base
 		} catch ( SQL $e ) {
 			fail();
 		}
-		
+
 		try {
 			$am->related( R::dispense('cover'), 'book' );
 			pass();
@@ -346,7 +346,7 @@ class Association extends Base
 			fail();
 		}
 
-	
+
 	}
 
 }

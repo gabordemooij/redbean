@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -14,7 +14,7 @@ use RedBeanPHP\Adapter as Adapter;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 
 /**
- * RedUNIT_Base_Fuse
+ * Fuse
  *
  * @file    RedUNIT/Base/Fuse.php
  * @desc    Tests Fuse feature; coupling beans to models.
@@ -47,7 +47,7 @@ class Fuse extends Base
 
 		SimpleFacadeBeanHelper::setFactoryFunction( NULL );
 	}
-	
+
 	/**
 	 * Make sure that beans of type book_page can be fused with
 	 * models like BookPage (beautified) as well as Book_Page (non-beautified).
@@ -68,10 +68,10 @@ class Fuse extends Base
 		$testReport = \Model_Gadget_Page::getTestReport();
 		asrt( $testReport, 'didSave' );
 	}
-	
+
 	/**
 	 * Only theoretical.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTheoreticalBeautifications()
@@ -82,7 +82,7 @@ class Fuse extends Base
 		$testReport = \Model_A_B_C::getTestReport();
 		asrt( $testReport, 'didSave' );
 	}
-	
+
 	/**
 	 * Test extraction of toolbox.
 	 *
@@ -99,12 +99,12 @@ class Fuse extends Base
 		asrt( ( $writer   instanceof QueryWriter ), TRUE );
 		asrt( ( $toolbox  instanceof ToolBox     ), TRUE );
 	}
-	
+
 	/**
 	 * Test FUSE and model formatting.
-	 * 
+	 *
 	 * @todo move tagging tests to tag tester.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFUSE()
@@ -127,7 +127,7 @@ class Fuse extends Base
 
 		$blog->sharedPost[] = $post;
 		R::store($blog);
-		
+
 		$a = R::getAll( "select * from blog " );
 
 		R::tag( $post, "lousy,smart" );

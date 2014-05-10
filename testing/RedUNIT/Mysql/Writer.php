@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Mysql;
 
@@ -6,10 +6,10 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\QueryWriter\MySQL as MySQL;
 use RedBeanPHP\RedException\SQL as SQL;
-use RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException as RedException;
 
 /**
- * RedUNIT_Mysql_Writer
+ * Writer
  *
  * @file    RedUNIT/Mysql/Writer.php
  * @desc    A collection of database specific writer functions.
@@ -24,7 +24,7 @@ class Writer extends \RedUNIT\Mysql
 {
 	/**
 	 * Test scanning and coding of values.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testScanningAndCoding()
@@ -98,21 +98,21 @@ class Writer extends \RedUNIT\Mysql
 		$writer->widenColumn( "testtable", "c1", 2 );
 
 		$writer->addColumn( "testtable", "special", MySQL::C_DATATYPE_SPECIAL_DATE );
-		
+
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols['special'], TRUE ), MySQL::C_DATATYPE_SPECIAL_DATE );
-		
+
 		asrt( $writer->code( $cols['special'], FALSE ), MySQL::C_DATATYPE_SPECIFIED );
-		
+
 		$writer->addColumn( "testtable", "special2", MySQL::C_DATATYPE_SPECIAL_DATETIME );
-		
+
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols['special2'], TRUE ), MySQL::C_DATATYPE_SPECIAL_DATETIME );
-		
+
 		asrt( $writer->code( $cols['special'], FALSE ), MySQL::C_DATATYPE_SPECIFIED );
-		
+
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols["c1"] ), 2 );
@@ -183,7 +183,7 @@ class Writer extends \RedUNIT\Mysql
 
 	/**
 	 * (FALSE should be stored as 0 not as '')
-	 * 
+	 *
 	 * @return voids
 	 */
 	public function testZeroIssue()
@@ -437,7 +437,7 @@ class Writer extends \RedUNIT\Mysql
 
 	/**
 	 * Test special data types.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypes()
@@ -467,7 +467,7 @@ class Writer extends \RedUNIT\Mysql
 
 	/**
 	 * Test date types.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesDates()
@@ -485,7 +485,7 @@ class Writer extends \RedUNIT\Mysql
 
 	/**
 	 * Date-time
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesDateTimes()
@@ -544,11 +544,11 @@ class Writer extends \RedUNIT\Mysql
 
 		asrt( $cols['title'], 'varchar(255)' );
 	}
-	
+
 	/**
 	 * Stored and reloads spatial data to see if the
 	 * value is preserved correctly.
-	 * 
+	 *
 	 * @return void
 	 */
 	protected function setGetSpatial( $data )

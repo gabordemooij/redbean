@@ -1,12 +1,12 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
-use RedBeanPHP\Facade as R; 
+use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Base_Issue90
+ * Issue90
  *
  * @file    RedUNIT/Base/Issue90.php
  * @desc    Issue #90 - cannot trash bean with ownproperty if checked in model.

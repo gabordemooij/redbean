@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -6,10 +6,10 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\OODB as OODB; 
+use RedBeanPHP\OODB as OODB;
 
 /**
- * RedUNIT_Base_Observers
+ * Observers
  *
  * @file    RedUNIT/Base/Observers.php
  * @desc    Tests the observer pattern in RedBeanPHP.
@@ -24,7 +24,7 @@ class Observers extends Base
 {
 	/**
 	 * Test RedBeanPHP observers.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testObserverMechanism()

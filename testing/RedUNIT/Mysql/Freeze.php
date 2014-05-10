@@ -1,14 +1,14 @@
-<?php 
+<?php
 
 namespace RedUNIT\Mysql;
 
 use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
-use RedBeanPHP\RedException\SQL as SQL; 
+use RedBeanPHP\RedException\SQL as SQL;
 
 /**
- * RedUNIT_Mysql_Freeze
+ * Freeze
  *
  * @file    RedUNIT/Mysql/Freeze.php
  * @desc    Tests freezing of databases for production environments.
@@ -25,7 +25,7 @@ class Freeze extends Mysql
 	 * Tests freezing the database.
 	 * After freezing the database, schema modifications are no longer
 	 * allowed and referring to missing columns will now cause exceptions.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFreezer()
@@ -108,7 +108,7 @@ class Freeze extends Mysql
 		}
 
 		$logger = R::debug( true, 1 );
-		
+
 		// Now log and make sure no 'describe SQL' happens
 		$page = $redbean->dispense( "page" );
 
@@ -144,7 +144,7 @@ class Freeze extends Mysql
 		asrt( count( $logger->grep( "describe" ) ) < 1, TRUE );
 
 		asrt( is_array( $logger->getLogs() ), TRUE );
-		
+
 		R::debug( false );
 	}
 }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -6,10 +6,10 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\Facade as Facade;
-use RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedUNIT_Base_Dispense
+ * Dispense
  *
  * @file    RedUNIT/Base/Dispense.php
  * @desc    Tests bean dispensing functionality.
@@ -24,7 +24,7 @@ class Dispense extends Base
 {
 	/**
 	 * Test dispense.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBasicsDispense()
@@ -69,14 +69,14 @@ class Dispense extends Base
 		asrt( isset( $bean["abd"] ), FALSE );
 		asrt( isset( $bean["abc"] ), TRUE );
 	}
-	
-	
+
+
 	/**
 	 * Tests the facade-only dispenseAll method.
-	 * 
+	 *
 	 * @return void
 	 */
-	public function testDispenseAll() 
+	public function testDispenseAll()
 	{
 		list( $book, $page ) = Facade::dispenseAll( 'book,page' );
 		asrt( ( $book instanceof OODBBean ), TRUE );
@@ -84,7 +84,7 @@ class Dispense extends Base
 		asrt( $book->getMeta( 'type' ), 'book');
 		asrt( $page->getMeta( 'type' ), 'page');
 
-		list( $book, $page, $texts, $mark ) = R::dispenseAll( 'book,page,text*2,mark' );		
+		list( $book, $page, $texts, $mark ) = R::dispenseAll( 'book,page,text*2,mark' );
 		asrt( ( $book instanceof OODBBean ), TRUE );
 		asrt( ( $page instanceof OODBBean ), TRUE );
 		asrt( is_array( $texts ), TRUE );
@@ -99,25 +99,25 @@ class Dispense extends Base
 		asrt( count( $eggs ), 3 );
 		asrt( ( $milk instanceof OODBBean ), TRUE );
 		asrt( count( $butter ), 9 );
-		
+
 		list( $eggs, $milk, $butter ) = R::dispenseAll( 'eggs*3,milk*1,butter*9', TRUE );
 		asrt( count( $eggs ), 3 );
 		asrt( count( $milk ), 1 );
 		asrt( count( $eggs ), 3 );
-		
+
 		list( $beer ) = R::dispenseAll( 'beer*0', TRUE );
 		asrt( is_array( $beer ), TRUE );
 		asrt( count( $beer ), 0 );
-		
+
 		list( $beer ) = R::dispenseAll( 'beer*0', FALSE );
 		asrt( is_array( $beer ), FALSE );
 		asrt( is_null( $beer ), TRUE );
 		asrt( count( $beer ), 0 );
 	}
-	
+
 	/**
 	 * Tests different return values of dispense().
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDispenseArray()
@@ -135,7 +135,7 @@ class Dispense extends Base
 		asrt( is_array( $array ), TRUE );
 		$array = R::dispense( 'book', 2, TRUE );
 		asrt( is_array( $array ), TRUE );
-		
+
 		$array = $oodb->dispense( 'book', 0, FALSE );
 		asrt( is_array( $array ), FALSE );
 		asrt( is_null( $array ), TRUE );
@@ -150,7 +150,7 @@ class Dispense extends Base
 		asrt( is_array( $array ), FALSE );
 		$array = R::dispense( 'book', 2, FALSE );
 		asrt( is_array( $array ), TRUE );
-		
+
 		$array = $oodb->dispense( 'book', 0 );
 		asrt( is_array( $array ), FALSE );
 		asrt( is_null( $array ), TRUE );

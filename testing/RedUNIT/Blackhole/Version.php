@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Blackhole;
 
@@ -6,7 +6,7 @@ use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Blackhole_Version
+ * Version
  *
  * @file    RedUNIT/Blackhole/Version.php
  * @desc    Tests identification features.
@@ -21,7 +21,7 @@ class Version extends Blackhole
 {
 	/**
 	 * Test version info.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testVersion()
@@ -30,10 +30,10 @@ class Version extends Blackhole
 
 		asrt( is_string( $version ), TRUE );
 	}
-	
+
 	/**
 	 * Test whether basic tools are available for use.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTools()

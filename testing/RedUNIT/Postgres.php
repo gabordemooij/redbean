@@ -1,9 +1,9 @@
-<?php 
+<?php
 
-namespace RedUNIT; 
+namespace RedUNIT;
 
 /**
- * RedUNIT_Postgres
+ * Postgres
  *
  * @file    RedUNIT/Postgres.php
  * @desc    Base class for all PostgreSQL specific tests.
@@ -18,7 +18,7 @@ class Postgres extends RedUNIT
 {
 	/*
 	 * What drivers should be loaded for this test pack?
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getTargetDrivers()

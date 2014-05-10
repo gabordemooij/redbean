@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Sqlite;
 
@@ -6,7 +6,7 @@ use RedUNIT\Sqlite as Sqlite;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Sqlite_Parambind
+ * Parambind
  *
  * @file    RedUNIT/Sqlite/Parambind.php
  * @desc    Tests\PDO parameter binding.
@@ -21,7 +21,7 @@ class Parambind extends Sqlite
 {
 	/**
 	 * Test parameter binding with SQLite.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testParamBindWithSQLite()

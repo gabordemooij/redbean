@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -6,7 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Base_Namedparams
+ * Namedparams
  *
  * @file    RedUNIT/Base/Namedparams.php
  * @desc    Test whether you can use named parameters in SQL snippets.
@@ -22,7 +22,7 @@ class Namedparams extends Base
 	/**
 	 * Test usage of named parameters in SQL snippets.
 	 * Issue #299 on Github.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNamedParamsInSnippets()
@@ -35,7 +35,7 @@ class Namedparams extends Base
 		$book->title = 'book';
 		$book->sharedPage[] = $page;
 		R::store($book);
-		
+
 		//should not give error like: Uncaught [HY093] - SQLSTATE[HY093]: Invalid parameter number: mixed named and positional parameters
 		$books = $page->withCondition(' title = :title ', array( ':title' => 'book' ) )->sharedBook;
 
@@ -64,7 +64,7 @@ class Namedparams extends Base
 
 		//should also not give error..
 		$count = $book->withCondition( ' title = ? ', array( 'page' ) )->countOwn( 'page' );
-		
+
 		asrt( $count, 1 );
 
 		$book = $book->fresh();
@@ -90,38 +90,38 @@ class Namedparams extends Base
 		asrt( count( $pages ), 1 );
 
 		//test with find()
-		$books = R::getRedBean()->find( 'book', 
+		$books = R::getRedBean()->find( 'book',
 				  array(
-						'title' => array('book')), 
+						'title' => array('book')),
 				  ' AND title = :title ', array(':title'=>'book'));
 
 		asrt( count( $books ), 1 );
 
-		$books = R::getRedBean()->find( 'book', 
+		$books = R::getRedBean()->find( 'book',
 				  array(
-						'title'   => array('book', 'book2'), 
+						'title'   => array('book', 'book2'),
 						'comment' => array('comment', 'comment2')),
 				  ' AND title = :title ', array(':title'=>'book'));
 
 		asrt( count( $books ), 1 );
 
 		//just check numeric works as well...
-		$books = R::getRedBean()->find( 'book', 
+		$books = R::getRedBean()->find( 'book',
 				  array(
-						'title'   => array('book', 'book2'), 
+						'title'   => array('book', 'book2'),
 						'comment' => array('comment', 'comment2')),
 				  ' AND title = ? ', array('book'));
 
 		asrt( count( $books ), 1 );
 
 		//just extra check to verify glue works
-		$books = R::getRedBean()->find( 'book', 
+		$books = R::getRedBean()->find( 'book',
 				  array(
-						'title'   => array('book', 'book2'), 
+						'title'   => array('book', 'book2'),
 						'comment' => array('comment', 'comment2')),
 				  ' ORDER BY id ');
 
 		asrt( count( $books ), 1 );
-		
+
 	}
 }

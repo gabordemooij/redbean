@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -6,11 +6,11 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\OODB as OODB;
-use RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
 
 /**
- * RedUNIT_Base_Finding
+ * Finding
  *
  * @file    RedUNIT/Base/Finding.php
  * @desc    Tests finding beans.
@@ -22,15 +22,15 @@ use RedBeanPHP\RedException\SQL as SQL;
  * with this source code in the file license.txt.
  */
 class Finding extends Base {
-	
+
 	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFinding() {
-		
+
 		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
@@ -131,7 +131,7 @@ class Finding extends Base {
 
 	/**
 	 * Test tree traversal with searchIn().
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTreeTraversal()
@@ -162,7 +162,7 @@ class Finding extends Base {
 
 	/**
 	 * Test find and export.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFindAndExport()
@@ -183,7 +183,7 @@ class Finding extends Base {
 
 	/**
 	* Test error handling of SQL states.
-	* 
+	*
 	* @return void
 	*/
 	public function testFindError()
@@ -214,8 +214,8 @@ class Finding extends Base {
 		try {
 			R::find( 'page', ' invalid SQL ' );
 			//In SQLite only get HY000 - not very descriptive so suppress more errors in fluid mode then.
-			if ( 
-			$this->currentlyActiveDriverID === 'sqlite' 
+			if (
+			$this->currentlyActiveDriverID === 'sqlite'
 			|| $this->currentlyActiveDriverID === 'CUBRID' ) {
 				pass();
 			} else {

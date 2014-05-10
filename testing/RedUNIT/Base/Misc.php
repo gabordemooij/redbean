@@ -15,7 +15,7 @@ use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\Driver\RPDO as RPDO;
 
 /**
- * RedUNIT_Base_Misc
+ * Misc
  *
  * @file    RedUNIT/Base/Misc.php
  * @desc    Various tests.

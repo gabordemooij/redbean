@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException as RedException;
 
 /**
- * RedUNIT_Base_Update
+ * Update
  *
  * @file    RedUNIT/Base/Update.php
  * @desc    Tests basic storage features through OODB class.
@@ -33,7 +33,7 @@ class Update extends Base
 
 		$trans  = R::dispense( 'transaction' );
 		$seller = R::dispense( 'user' );
-		
+
 		$trans->seller = $seller;
 
 		$id = R::store( $trans );
@@ -49,9 +49,9 @@ class Update extends Base
 		} catch( Exception $e ) {
 			fail();
 		}
-	
+
 		$trans = R::load( 'transaction', $id );
-		
+
 		//same for unset...
 		try {
 			unset( $trans->seller );
@@ -70,27 +70,27 @@ class Update extends Base
 		$account->alias( 'boo' ); //try to trick me...
 
 		$id = R::store( $account );
-		
+
 		R::freeze( true );
-		
+
 		$account = R::load( 'user', $id );
 		asrt( count( $account->alias( 'seller' )->ownTransaction ), 10 );
-		
+
 		//you cannot unset a list
 		unset( $account->alias( 'seller' )->ownTransaction );
 		$id = R::store( $account );
-		
+
 		$account = R::load( 'user', $id );
 		asrt( count( $account->alias( 'seller' )->ownTransaction ), 10 );
-	
-		
+
+
 		$account->alias( 'seller' )->ownTransaction = array();
-		
+
 		$id = R::store( $account );
 		$account = R::load( 'user', $id );
 		asrt(count($account->alias( 'seller' )->ownTransaction), 0 );
 		asrt(count($account->ownTransaction), 0 );
-		
+
 		R::freeze( false );
 
 		//but also make sure we don't cause extra column issue #335
@@ -99,7 +99,7 @@ class Update extends Base
 
 		$building = R::dispense('building');
 		$village  = R::dispense('village');
-		
+
 		$building->village = $village;
 
 		R::store($building);
@@ -108,13 +108,13 @@ class Update extends Base
 		$building->village = NULL;
 
 		R::store($building);
-		
+
 		$building = $building->fresh();
 
 		$columns = R::inspect('building');
 		asrt( isset( $columns['village'] ), false );
 		asrt( isset( $building->village ), false );
-		
+
 		R::nuke();
 
 		$building = R::dispense('building');
@@ -123,7 +123,7 @@ class Update extends Base
                 $building->village = $village;
 
                 R::store($building);
-        
+
                 $building = $building->fresh();
                 unset($building->village);
 
@@ -141,7 +141,7 @@ class Update extends Base
                 $building->village = $village;
 
                 R::store($building);
-        
+
                 $building = $building->fresh();
                 $building->village = false;
 
@@ -154,12 +154,12 @@ class Update extends Base
                 asrt( isset( $building->village ), false );
 
 	}
-	
+
 	/**
 	 * All kinds of tests for basic CRUD.
-	 * 
+	 *
 	 * Does the data survive?
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testUpdatingBeans()
@@ -176,7 +176,7 @@ class Update extends Base
 		} else {
 			R::getWriter()->widenColumn( 'bean', 'id', R::getWriter()->scanType( 'abc' ) );
 		}
-			
+
 		$bean->id = 'abc';
 
 		R::store( $bean );

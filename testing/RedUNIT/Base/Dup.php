@@ -8,7 +8,7 @@ use RedBeanPHP\DuplicationManager as DuplicationManager;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedUNIT_Base_Dup
+ * Dup
  *
  * @file    RedUNIT/Base/Dup.php
  * @desc    Intensive test for dup()

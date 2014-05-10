@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Mysql;
 
@@ -6,7 +6,7 @@ use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Mysql_Setget
+ * Setget
  *
  * @file    RedUNIT/Mysql/Setget.php
  * @desc    Tests whether values are stored correctly.
@@ -21,7 +21,7 @@ class Setget extends Mysql
 {
 	/**
 	 * Test numbers.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNumbers()
@@ -57,7 +57,7 @@ class Setget extends Mysql
 
 	/**
 	 * Test dates.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDates()
@@ -73,7 +73,7 @@ class Setget extends Mysql
 
 	/**
 	 * Test strings.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testStrings()
@@ -89,7 +89,7 @@ class Setget extends Mysql
 
 	/**
 	 * Test booleans.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBool()
@@ -103,7 +103,7 @@ class Setget extends Mysql
 
 	/**
 	 * Test NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNull()

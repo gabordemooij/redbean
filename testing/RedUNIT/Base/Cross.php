@@ -10,11 +10,12 @@ use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * Cross tables, self referential many-to-many relations
- * and aggregation techniques.
+ * Cross
  *
  * @file    RedUNIT/Base/Cross.php
  * @desc    Tests associations within the same table (i.e. page_page2 alike)
+ *  		Cross tables, self referential many-to-many relations
+ * 			and aggregation techniques
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license New BSD/GPLv2
  *

@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Blackhole;
 
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedUNIT_Blackhole_Export
+ * Export
  *
  * @file    RedUNIT/Blackhole/Export.php
  * @desc    Tests basic bean exporting features.
@@ -22,7 +22,7 @@ class Export extends Blackhole
 {
 	/**
 	 * ExportAll.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testExportAll()
@@ -104,7 +104,7 @@ class Export extends Blackhole
 		$instrument = R::dispense( 'instrument' );
 		$instrument->name = 'Piano';
 		$bandmember->ownInstrument[] = $instrument;
-		
+
 		$a = R::exportAll( $bandmember );
 
 		pass();

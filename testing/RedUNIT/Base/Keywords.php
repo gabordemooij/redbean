@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedUNIT_Base_Keywords
+ * Keywords
  *
  * @file    RedUNIT/Base/Keywords.php
  * @desc    Tests for possible keyword clashes.
@@ -22,9 +22,9 @@ class Keywords extends Base
 {
 	/**
 	 * What drivers should be loaded for this test pack?
-	 * 
+	 *
 	 * CUBRID has inescapable keywords :/
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getTargetDrivers()
@@ -34,7 +34,7 @@ class Keywords extends Base
 
 	/**
 	 * Test if RedBeanPHP can properly handle keywords.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testKeywords()
@@ -48,7 +48,7 @@ class Keywords extends Base
 			'distinct', 'like'
 		);
 
-		
+
 		foreach ( $keywords as $k ) {
 			R::nuke();
 

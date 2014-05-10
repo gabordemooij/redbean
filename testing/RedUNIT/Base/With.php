@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -6,7 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Base_With
+ * With
  *
  * @file    RedUNIT/Base/With.php
  * @desc    Tests query modification of own-lists with prefix-with
@@ -29,10 +29,10 @@ class With extends Base
 	{
 		return array( 'mysql' );
 	}
-	
+
 	/**
 	 * Tests no-load modifier for lists.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNoLoad()
@@ -53,37 +53,37 @@ class With extends Base
 				  )
 			 )
 		) );
-		
+
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( R::count( 'book' ), 1 );
 		asrt( count( $book->ownPage ), 1 );
-		
+
 		//now try with no-load
 		$book = $book->fresh();
 		asrt( count( $book->noLoad()->ownPage ),  0 );
 		asrt( count( $book->noLoad()->sharedTag ),  0 );
-		
+
 		//now try to add with no-load
 		$book = $book->fresh();
 		$book->noLoad()->xownPageList[] = R::dispense( 'page' );
 		$book->noLoad()->sharedTagList[] = R::dispense( 'tag' );
 		R::store( $book );
-		
+
 		$book = $book->fresh();
 		asrt( count( $book->ownPage ), 2 );
 		asrt( count( $book->sharedTagList ), 2 );
-		
+
 		//no-load overrides with and withCondition
 		$book = $book->fresh();
 		asrt( count( $book->with(' invalid sql ')->noLoad()->ownPage ),  0 );
 		asrt( count( $book->withCondition(' invalid sql ')->noLoad()->sharedTag ),  0 );
-		
+
 		//no-load overrides all and alias
 		$book = $book->fresh();
 		asrt( count( $book->all()->noLoad()->ownPage ),  0 );
 		asrt( count( $book->alias('nothing')->noLoad()->sharedTag ),  0 );
-		
+
 		//no-load gets cleared
 		$book = $book->fresh();
 		asrt( count( $book->ownPage ), 2 );
@@ -106,14 +106,14 @@ class With extends Base
 		asrt( count( $book->sharedTagList ), 2 );
 
 	}
-	
-	
+
+
 	/**
 	 * Test all().
-	 * 
+	 *
 	 * @return void
 	 */
-	public function testAll() 
+	public function testAll()
 	{
 		$book = R::dispense( 'book' );
 		$book->ownPage = R::dispense( 'page', 10 );
@@ -129,7 +129,7 @@ class With extends Base
 
 	/**
 	 * Test embedded SQL snippets using with and withCondition.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testEmbeddedSQL()
@@ -174,7 +174,7 @@ class With extends Base
 
 	/**
 	 * More variations...
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testEmbeddedSQLPart2()
@@ -395,14 +395,14 @@ class With extends Base
 		asrt( count( $team1->alias( 'team1' )->ownGame ), 0 );
 		asrt( count( $team1->ownBook ), 1 );
 	}
-	
+
 	/**
 	 * Test when to reload and when to NOT reload beans.
 	 * Use UNSET to reload a parent bean. Use UNSET or
 	 * a modifier (with, withCondition, all) to reload a list.
 	 * Use noLoad() to obtain an empty list - does not reload
 	 * but sets an empty array.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testWhenToReload()
@@ -416,7 +416,7 @@ class With extends Base
 		$firstPage = reset( $book->ownPage );
 		$id = $firstPage->id;
 		$book->ownPage[ $id ]->title = 'a';
-		
+
 		//Do not reload an own list after manipulations
 		asrt( $book->ownPage[ $id ]->title, 'a' ); //dont reload!
 		$book->ownPage[] = R::dispense( 'page' ); //dont reload!
@@ -465,8 +465,8 @@ class With extends Base
 		asrt( count( $book->ownPageList ), 3 );
 		$book->ownPage[] = R::dispense( 'page' );
 		asrt( count( $book->ownPageList ), 4 );
-		
-		
+
+
 		//Do not reload an own list if told to not reload using noLoad()
 		$book->noLoad()->with(' LIMIT 1 ')->ownPage; //dont reload!
 		asrt( count( $book->xownPage ), 0); //dont reload!
@@ -476,7 +476,7 @@ class With extends Base
 		asrt( count( $book->xownPage ), 0); //dont reload!
 		$book->noLoad()->withCondition('')->ownPage; //dont reload!
 		asrt( count( $book->xownPage ), 0); //dont reload!
-		
+
 		//even if modifiers proceed noLoad()
 		$book->with(' LIMIT 1 ')->noLoad()->ownPage; //dont reload!
 		asrt( count( $book->xownPage ), 0); //dont reload!
@@ -486,7 +486,7 @@ class With extends Base
 		asrt( count( $book->xownPage ), 0); //dont reload!
 		$book->withCondition('')->noLoad()->ownPage; //dont reload!
 		asrt( count( $book->xownPage ), 0); //dont reload!
-		
+
 		//even in combinations
 		$book->all()->with(' LIMIT 1 ')->noLoad()->ownPage; //dont reload!
 		asrt( count( $book->xownPage ), 0); //dont reload!
@@ -496,7 +496,7 @@ class With extends Base
 		asrt( count( $book->xownPage ), 0); //dont reload!
 		$book->alias('magazine')->withCondition('')->noLoad()->ownPage; //dont reload!
 		asrt( count( $book->xownPage ), 0); //dont reload!
-		
+
 		//now test shared list
 		$book->sharedTag = R::dispense( 'tag', 16 );
 		asrt( count( $book->sharedTag ), 16 );
@@ -528,8 +528,8 @@ class With extends Base
 		asrt( count( $book->sharedTag ), 0 );
 		$book->sharedTag = R::dispense( 'tag', 16 );
 		asrt( count( $book->sharedTag ), 16 );
-		
-		
+
+
 		//Do not reload a sharedTag list if told to not reload using noLoad()
 		$book->noLoad()->with(' LIMIT 1 ')->sharedTag; //dont reload!
 		asrt( count( $book->sharedTag ), 0); //dont reload!
@@ -539,7 +539,7 @@ class With extends Base
 		asrt( count( $book->sharedTag ), 0); //dont reload!
 		$book->noLoad()->withCondition('')->sharedTag; //dont reload!
 		asrt( count( $book->sharedTag ), 0); //dont reload!
-		
+
 		//even if modifiers proceed noLoad()
 		$book->with(' LIMIT 1 ')->noLoad()->sharedTag; //dont reload!
 		asrt( count( $book->sharedTag ), 0); //dont reload!
@@ -549,7 +549,7 @@ class With extends Base
 		asrt( count( $book->sharedTag ), 0); //dont reload!
 		$book->withCondition('')->noLoad()->ownPage; //dont reload!
 		asrt( count( $book->sharedTag ), 0); //dont reload!
-		
+
 		//even in combinations
 		$book->all()->with(' LIMIT 1 ')->noLoad()->sharedTag; //dont reload!
 		asrt( count( $book->sharedTag ), 0); //dont reload!
@@ -559,7 +559,7 @@ class With extends Base
 		asrt( count( $book->sharedTag ), 0); //dont reload!
 		$book->alias('magazine')->withCondition('')->noLoad()->sharedTag; //dont reload!
 		asrt( count( $book->sharedTag ), 0); //dont reload!
-		
+
 		//test do not reload parent bean
 		$book->author->name = 'me';
 		asrt( $book->author->name, 'me' );
@@ -585,11 +585,11 @@ class With extends Base
 		$book->author->name = 'me';
 		asrt( $book->author->name, 'me' );
 	}
-	
+
 	/**
 	 * Tests whether modifiers are cleared after reading or
 	 * writing a bean property.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testClearanceOfModFlags()
@@ -624,7 +624,7 @@ class With extends Base
 		$book->author = R::dispense( 'author' );
 		asrt( $book->getModFlags(), '' );
 		$book->title = 'title';
-		
+
 		//Test whether appropriate flags are set and whether they are cleared after
 		//accessing a property.
 		$modifiers = array('with'=>'w', 'withCondition'=>'w', 'alias'=>'a', 'fetchAs'=>'f', 'all'=>'r', 'noLoad'=>'n');
@@ -664,7 +664,7 @@ class With extends Base
 				}
 			}
 		}
-		
+
 		$book = R::dispense( 'book' );
 		$book->ownPage = R::dispense( 'page', 2 );
 		$book->sharedPage = R::dispense( 'page', 2 );
@@ -672,7 +672,7 @@ class With extends Base
 		$book = R::dispense( 'book' );
 		$book->alias('magazine')->ownPage = R::dispense( 'page', 2 );
 		R::store( $book );
-		
+
 		//test modifier with countOwn and countShared methods
 		foreach( $modifiers as $modifier => $flag ) {
 			$book = R::dispense( 'book' );
@@ -707,6 +707,6 @@ class With extends Base
 			$flags = $book->getModFlags();
 			asrt( $flags, '' );
 		}
-		
+
 	}
 }

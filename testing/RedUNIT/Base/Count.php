@@ -1,14 +1,14 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException; 
-use RedBeanPHP\RedException\SQL as SQL; 
+use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\RedException\SQL as SQL;
 
 /**
- * RedUNIT_Base_Count
+ * Count
  *
  * @file    RedUNIT/Base/Count.php
  * @desc    Tests for simple bean counting.
@@ -24,7 +24,7 @@ class Count extends Base
 	/**
 	 * Tests type check and conversion in
 	 * OODB for count().
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCountType()
@@ -34,14 +34,14 @@ class Count extends Base
 		$book->sharedPage = R::dispense( 'page', 10 );
 		R::store( $book );
 		asrt( R::count('bookPage'), 10 );
-		
+
 		try {
 			R::count( 'WrongTypeName' );
 			fail();
 		} catch ( RedException $ex ) {
 			pass();
 		}
-		
+
 		try {
 			R::count( 'wrong_type_name' );
 			fail();
@@ -49,11 +49,11 @@ class Count extends Base
 			pass();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Test count and wipe.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCountAndWipe()
@@ -120,9 +120,9 @@ class Count extends Base
 			}
 		}
 	}
-	
+
 	public function testCountShared() {
-		
+
 		R::nuke();
 		$book = R::dispense( 'book' );
 		$book->sharedPageList = R::dispense( 'page', 5 );
@@ -138,7 +138,7 @@ class Count extends Base
 		} catch( RedException $e ) {
 			pass();
 		}
-		
+
 	}
-	
+
 }

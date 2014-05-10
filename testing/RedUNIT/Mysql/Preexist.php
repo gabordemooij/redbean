@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Mysql;
 
 use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\AssociationManager as AssociationManager; 
+use RedBeanPHP\AssociationManager as AssociationManager;
 
 /**
- * RedUNIT_Mysql_Preexist
+ * Preexist
  *
  * @file    RedUNIT/Mysql/Preexist.php
  * @desc    Tests integration with pre-existing schemas.
@@ -22,7 +22,7 @@ class Preexist extends Mysql
 {
 	/**
 	 * Test integration with pre-existing schemas.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testPlaysNiceWithPreExitsingSchema()

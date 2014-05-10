@@ -5,7 +5,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 
 /**
- * Bean tests, tests various combinations of list manipulations.
+ * Bean
  *
  * @file    RedUNIT/Base/Bean.php
  * @desc    Tests list manipulations of bean.
@@ -20,7 +20,7 @@ class Bean extends Base
 {
 	/**
 	 * Setup
-	 * 
+	 *
 	 * @return void
 	 */
 	private function _createBook()
@@ -41,15 +41,15 @@ class Bean extends Base
 		R::store( $book );
 		return $book->fresh();
 	}
-	
+
 	/*
 	 * Can we add a bean to a list?
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testWhetherWeCanAddToLists()
 	{
-		
+
 		$book = $this->_createBook();
 		$book->ownPage[] = R::dispense( 'page' );
 		R::store( $book );
@@ -66,7 +66,7 @@ class Bean extends Base
 		$book->xownPageList[] = R::dispense('page');
 		R::store( $book );
 		asrt( R::count('page'), 3 );
-		
+
 		$ads = R::dispense('ad', 3 );
 		$book = $this->_createBook();
 		$book->alias('magazine')->ownAd = $ads;
@@ -95,7 +95,7 @@ class Bean extends Base
 		R::store( $book );
 		asrt( R::count('ad'), 3 );
 		asrt( R::count('page'), 3 );
-		
+
 		$book = $this->_createBook();
 		$book->sharedTag[] = R::dispense('tag');
 		R::store( $book );
@@ -105,11 +105,11 @@ class Bean extends Base
 		R::store( $book );
 		asrt( R::count('tag'), 3 );
 	}
-	
+
 	/**
 	 * Can we delete a bean in a list by its ID?
 	 * Only the UNSET() variant should work.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDeleteByIDs()
@@ -130,7 +130,7 @@ class Bean extends Base
 		try { R::store( $book ); fail(); }catch(\Exception $e) { pass(); }
 		$book = $book->fresh();
 		asrt( count( $book->ownPage ), 0 );
-		
+
 		$book = $this->_createBook();
 		$firstAd = reset( $book->alias('magazine')->ownAd );
 		$book->alias('magazine')->ownAd[ $firstAd->id ] = NULL;
@@ -147,12 +147,12 @@ class Bean extends Base
 		try { R::store( $book ); fail(); }catch(\Exception $e) { pass(); }
 		$book = $book->fresh();
 		asrt( count( $book->alias('magazine')->ownAd ), 1 );
-		
+
 	}
-	
+
 	/**
 	 * You CAN delete an own-list by assiging an empty array.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDeleteOwnListWithEmptyArray()
@@ -165,10 +165,10 @@ class Bean extends Base
 		asrt( isset($book->ownPage), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->ownPage ), 0 );
 	}
-	
+
 	/**
 	 * You cannot delete an own-list by assigning NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteOwnListWithNULL()
@@ -181,10 +181,10 @@ class Bean extends Base
 		asrt( isset($book->ownPage), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->ownPage ), 2 );
 	}
-	
+
 	/**
 	 * You cannot delete an own-list by assigning FALSE.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteOwnListWithFalse()
@@ -197,7 +197,7 @@ class Bean extends Base
 		asrt( isset($book->ownPage), TRUE ); //not loaded yet, lazy loading
 		asrt( $book->ownPage, '0' );
 	}
-	
+
 	/**
 	 * You cannot delete an own-list by unsetting it.
 	 */
@@ -211,10 +211,10 @@ class Bean extends Base
 		asrt( isset($book->ownPage), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->ownPage ), 2 );
 	}
-	
+
 	/**
 	 * You CAN delete an aliased own-list by assiging an empty array.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDeleteAliasedOwnListWithEmptyArray()
@@ -230,10 +230,10 @@ class Bean extends Base
 		asrt( count( $book->alias('magazine')->ownPage ), 0 ); //also test possible confusion
 		asrt( count( $book->all()->ownPageList ), 3 );
 	}
-	
+
 	/**
 	 * You cannot delete an aliased own-list by assigning NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteAliasedOwnListWithNULL()
@@ -246,10 +246,10 @@ class Bean extends Base
 		asrt( isset($book->alias('magazine')->ownAd), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->alias('magazine')->ownAd ), 3 );
 	}
-	
+
 	/**
 	 * You cannot delete an aliased own-list by assigning FALSE.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteAliasedOwnListWithFalse()
@@ -262,10 +262,10 @@ class Bean extends Base
 		asrt( isset($book->alias('magazine')->ownAd), TRUE ); //not loaded yet, lazy loading
 		asrt( $book->alias('magazine')->ownAd, '0' );
 	}
-	
+
 	/**
 	 * You cannot delete an aliased own-list by unsetting it.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteAliasedOwnListWithUnset()
@@ -278,10 +278,10 @@ class Bean extends Base
 		asrt( isset($book->alias('magazine')->ownAd), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->alias('magazine')->ownAd ), 3 );
 	}
-	
+
 	/**
 	 * You CAN delete an x-own-list by assiging an empty array.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDeleteXOwnListWithEmptyArray()
@@ -294,10 +294,10 @@ class Bean extends Base
 		asrt( isset($book->xownPage), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->xownPage ), 0 );
 	}
-	
+
 	/**
 	 * You cannot delete an x-own-list by assigning NULL.
-	 * 
+	 *
 	 * @return  void
 	 */
 	public function testCANTDeleteXOwnListWithNULL()
@@ -310,10 +310,10 @@ class Bean extends Base
 		asrt( isset($book->xownPage), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->xownPage ), 2 );
 	}
-	
+
 	/**
 	 * You cannot delete an x-own-list by assigning FALSE.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteXOwnListWithFalse()
@@ -326,10 +326,10 @@ class Bean extends Base
 		asrt( isset($book->xownPage), TRUE ); //not loaded yet, lazy loading
 		asrt( $book->xownPage, '0' );
 	}
-	
+
 	/**
 	 * You cannot delete an x-own-list by unsetting it.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteXOwnListWithUnset()
@@ -342,10 +342,10 @@ class Bean extends Base
 		asrt( isset($book->xownPage), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->xownPage ), 2 );
 	}
-	
+
 	/**
 	 * You CAN delete a shared-list by assiging an empty array.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDeleteSharedListWithEmptyArray()
@@ -358,10 +358,10 @@ class Bean extends Base
 		asrt( isset($book->sharedTag), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->sharedTag ), 0 );
 	}
-	
+
 	/**
 	 * You cannot delete a shared list by assigning NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteSharedListWithNULL()
@@ -374,10 +374,10 @@ class Bean extends Base
 		asrt( isset($book->sharedTag), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->sharedTag ), 2 );
 	}
-	
+
 	/**
 	 * You cannot delete a shared-list by assigning FALSE.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteSharedListWithFalse()
@@ -390,10 +390,10 @@ class Bean extends Base
 		asrt( isset($book->sharedTag), TRUE ); //not loaded yet, lazy loading
 		asrt( $book->sharedTag, '0' );
 	}
-	
+
 	/**
 	 * You cannot delete a shared-list by unsetting it.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteSharedWithUnset()
@@ -406,10 +406,10 @@ class Bean extends Base
 		asrt( isset($book->sharedTag), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->sharedTag ), 2 );
 	}
-	
+
 	/**
 	 * You CAN delete a shared-list by assiging an empty array.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDeleteViaSharedListWithEmptyArray()
@@ -422,10 +422,10 @@ class Bean extends Base
 		asrt( isset($book->via('connection')->sharedUser), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->via('connection')->sharedUser ), 0 );
 	}
-	
+
 	/**
 	 * You cannot delete a shared-list by assigning NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteViaSharedListWithNULL()
@@ -438,10 +438,10 @@ class Bean extends Base
 		asrt( isset($book->via('connection')->sharedUser), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->via('connection')->sharedUser ), 1 );
 	}
-	
+
 	/**
 	 * You cannot delete a shared list by assigning FALSE.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteViaSharedListWithFalse()
@@ -453,12 +453,12 @@ class Bean extends Base
 		R::store( $book );
 		asrt( isset($book->via('connection')->sharedUser), TRUE ); //not loaded yet, lazy loading
 		asrt( count( $book->via('connection')->sharedUser ), 1 ); //when loaded has 1
-		
+
 	}
-	
+
 	/**
 	 * You cannot delete a shared-list by unsetting it.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCANTDeleteViaSharedWithUnset()
@@ -471,10 +471,10 @@ class Bean extends Base
 		asrt( isset($book->via('connection')->sharedUser), FALSE ); //not loaded yet, lazy loading
 		asrt( count( $book->via('connection')->sharedUser ), 1 );
 	}
-	
+
 	/**
 	 * You cannot delete a parent bean by unsetting it.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testYouCANTDeleteParentBeanWithUnset()
@@ -488,10 +488,10 @@ class Bean extends Base
 		asrt( isset($book->author), FALSE );
 		asrt( (boolean) ($book->author), TRUE );
 	}
-	
+
 	/**
 	 * You cannot delete a parent bean by setting it to NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testYouCANDeleteParentBeanWithNULL()
@@ -505,10 +505,10 @@ class Bean extends Base
 		asrt( isset($book->author), FALSE );
 		asrt( (boolean) ($book->author), FALSE );
 	}
-	
+
 	/**
 	 * You CAN delete a parent bean by setting it to FALSE.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testYouCANDeleteParentBeanWithFALSE()
@@ -522,10 +522,10 @@ class Bean extends Base
 		asrt( isset($book->author), FALSE );
 		asrt( (boolean) ($book->author), FALSE );
 	}
-	
+
 	/**
 	 * You cannot delete an aliased parent bean by unsetting it.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testYouCANTDeleteAliasedParentBeanWithUnset()
@@ -539,10 +539,10 @@ class Bean extends Base
 		asrt( isset($book->fetchAs('author')->coauthor), FALSE );
 		asrt( (boolean) ($book->fetchAs('author')->coauthor), TRUE );
 	}
-	
+
 	/**
 	 * You CAN delete an aliased parent bean by setting it to NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testYouCANDeleteAliasedParentBeanWithNULL()
@@ -556,10 +556,10 @@ class Bean extends Base
 		asrt( isset($book->fetchAs('author')->coauthor), FALSE );
 		asrt( (boolean) ($book->fetchAs('author')->coauthor), FALSE );
 	}
-	
+
 	/**
 	 * You cannot delete an aliased parent bean by setting it to FALSE.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testYouCANDeleteAliasedParentBeanWithFALSE()
@@ -573,10 +573,10 @@ class Bean extends Base
 		asrt( isset($book->fetchAs('author')->coauthor), FALSE );
 		asrt( (boolean) ($book->fetchAs('author')->coauthor), FALSE );
 	}
-	
+
 	/**
 	 * Tests the effects of unsetting on the shadow of a list.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testUnsettingAListAndShadow()
@@ -660,12 +660,12 @@ class Bean extends Base
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( $book->author, NULL );
-		
+
 	}
-	
+
 	/**
 	 * Test whether the tainted flag gets set correctly.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAccessingTainting()
@@ -714,7 +714,7 @@ class Bean extends Base
 		asrt( $book->isTainted(), FALSE );
 		$book->alias('fake')->ownFakeList;
 		asrt( $book->isTainted(), TRUE );
-		
+
 		$book = $book->fresh();
 		asrt( $book->isTainted(), FALSE );
 		$book->title;

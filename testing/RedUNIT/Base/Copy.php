@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedUNIT_Base_Copy
+ * Copy
  *
  * @file    RedUNIT/Base/Copy.php
  * @desc    Tests whether we can make a deep copy of a bean.
@@ -35,7 +35,7 @@ class Copy extends Base
 
 		$duplicate = R::dup( $document );
 		pass(); //if RB cant handle this is will crash (nesting level error from PHP).
-		
+
 		$id2 = R::store( $duplicate );
 
 		$duplicate = R::load( 'document', $id );

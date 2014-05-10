@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Sqlite;
 
@@ -6,7 +6,7 @@ use RedUNIT\Sqlite as Sqlite;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Sqlite_Setget
+ * Setget
  *
  * @file    RedUNIT/Sqlite/Setget.php
  * @desc    Tests whether values are stored correctly.
@@ -21,7 +21,7 @@ class Setget extends Sqlite
 {
 	/**
 	 * Test numbers.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNumbers()
@@ -53,7 +53,7 @@ class Setget extends Sqlite
 
 	/**
 	 * Test dates.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDates()
@@ -66,7 +66,7 @@ class Setget extends Sqlite
 
 	/**
 	 * Test strings.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testStrings()
@@ -80,7 +80,7 @@ class Setget extends Sqlite
 
 	/**
 	 * Test booleans.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBool()
@@ -94,7 +94,7 @@ class Setget extends Sqlite
 
 	/**
 	 * Test NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNull()

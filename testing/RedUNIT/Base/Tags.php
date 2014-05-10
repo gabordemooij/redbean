@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException as RedException;
 
 /**
- * RedUNIT_Base_Tags
+ * Tags
  *
  * @file    RedUNIT/Base/Tags.php
  * @desc    Tests the tagging of beans.
@@ -22,7 +22,7 @@ class Tags extends Base
 {
 	/**
 	 * Some basic tests.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTags()
@@ -33,7 +33,7 @@ class Tags extends Base
 		R::tag( $d, 'black' );
 		R::tag( $e, 'strong,sweet' );
 		R::tag( $f, 'black,strong' );
-		
+
 		asrt( count( R::taggedAll( 'coffee', 'strong,sweet' ) ), 1 );
 
 		asrt( count( R::taggedAll( 'coffee', 'strong' ) ), 3 );
@@ -127,7 +127,7 @@ class Tags extends Base
 
 	/**
 	 * Fetching tagged items.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function fetchTaggedItems()

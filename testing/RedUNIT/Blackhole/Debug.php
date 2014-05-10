@@ -8,7 +8,7 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Logger\RDefault\Debug as Debugger;
 
 /**
- * RedUNIT\Blackhole\Debug
+ * Debug
  *
  * @file    RedUNIT/Blackhole/Debug.php
  * @desc    Tests Debugger II.

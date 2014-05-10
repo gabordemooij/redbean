@@ -1,12 +1,12 @@
-<?php 
+<?php
 
 namespace RedUNIT\Postgres;
 
 use RedUNIT\Postgres as Postgres;
 use RedBeanPHP\Facade as R;
- 
+
 /**
- * RedUNIT_Postgres_Parambind
+ * Parambind
  *
  * @file    RedUNIT/Postgres/Parambind.php
  * @desc    Tests\PDO parameter binding for Postgres.
@@ -21,7 +21,7 @@ class Parambind extends Postgres
 {
 	/**
 	 * Test parameter binding.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testParamBindingWithPostgres()

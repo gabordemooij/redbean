@@ -8,6 +8,8 @@ use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
+ * Frozen
+ *
  * Frozen mode tests
  * When I split the repositories in frozen and fluid I discovered some missed
  * code-paths in the tests.

@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Blackhole;
 
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedUNIT_Blackhole_Meta
+ * Meta
  *
  * @file    RedUNIT/Blackhole/Meta.php
  * @desc    Tests meta data features on OODBBean class.
@@ -22,7 +22,7 @@ class Meta extends Blackhole
 {
 	/**
 	 * Test meta data methods.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testMetaData()
@@ -64,10 +64,10 @@ class Meta extends Blackhole
 
 		asrt( $bean2->getMeta( "meta.meta" ), "123" );
 	}
-	
+
 	/**
 	 * Meta properties should not be saved.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testMetaPersist()
@@ -80,10 +80,10 @@ class Meta extends Blackhole
 		$bean = $bean->fresh();
 		asrt( $bean->getMeta( 'meta' ), NULL );
 	}
-	
+
 	/**
 	 * You cant access meta data using the array accessors.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNoArrayMetaAccess()

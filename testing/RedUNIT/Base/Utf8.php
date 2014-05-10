@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -6,7 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Base_Utf8
+ * Utf8
  *
  * @file    RedUNIT/Base/UTF8.php
  * @desc    Tests handling of NULL values.
@@ -21,7 +21,7 @@ class Utf8 extends Base
 {
 	/**
 	 * Test UTF8 handling.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testUTF8()
@@ -33,7 +33,7 @@ class Utf8 extends Base
 		R::store( $bean );
 		$bean = R::load( 'bean', $bean->id );
 		asrt( $bean->bla, $str );
-		
+
 		pass();
 	}
 }

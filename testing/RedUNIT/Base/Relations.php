@@ -8,7 +8,7 @@ use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedUNIT_Base_Relations
+ * Relations
  *
  * @file    RedUNIT/Base/Relations.php
  * @desc    Tests N:1 relations, nested beans.

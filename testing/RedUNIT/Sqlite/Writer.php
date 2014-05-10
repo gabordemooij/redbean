@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Sqlite;
 
@@ -6,10 +6,10 @@ use RedUNIT\Sqlite as Sqlite;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
-use RedBeanPHP\RedException\SQL as SQL; 
+use RedBeanPHP\RedException\SQL as SQL;
 
 /**
- * RedUNIT_Sqlite_Writer
+ * Writer
  *
  * @file    RedUNIT/Sqlite/Writer.php
  * @desc    Tests writer specific functions.
@@ -24,7 +24,7 @@ class Writer extends Sqlite
 {
 	/**
 	 * Test scanning and coding.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testScanningAndCoding()
@@ -105,7 +105,7 @@ class Writer extends Sqlite
 
 	/**
 	 * (FALSE should be stored as 0 not as '')
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testZeroIssue()
@@ -150,7 +150,7 @@ class Writer extends Sqlite
 	 * Tests whether writer correctly handles keyword 'group' and SQL state 23000 issue.
 	 * These tests remain here to make sure issues 9 and 10 never happen again.
 	 * However this bug will probably never re-appear due to changed architecture.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testIssue9and10()
@@ -209,7 +209,7 @@ class Writer extends Sqlite
 	 * Test various somewhat uncommon trash/unassociate scenarios.
 	 * (i.e. unassociate unrelated beans, trash non-persistant beans etc).
 	 * Should be handled gracefully - no output checking.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testVaria2()
@@ -249,7 +249,7 @@ class Writer extends Sqlite
 
 	/**
 	 * Test special data types.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testSpecialDataTypes()

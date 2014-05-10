@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Postgres;
 
@@ -6,7 +6,7 @@ use RedUNIT\Postgres as Postgres;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Postgres_Bigint
+ * Bigint
  *
  * @file    RedUNIT/Postgres/Bigint.php
  * @desc    Tests support for BIGINT primary keys.
@@ -21,36 +21,36 @@ class Bigint extends Postgres
 {
 	/**
 	 * Test BIG INT primary key support.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBigIntSupport()
 	{
 		R::nuke();
-		
+
 		$createPageTableSQL = '
-			CREATE TABLE 
-			page 
+			CREATE TABLE
+			page
 			(
-				id BIGSERIAL PRIMARY KEY, 
+				id BIGSERIAL PRIMARY KEY,
 				book_id BIGSERIAL,
 				magazine_id BIGSERIAL,
 				title VARCHAR(255)
 			)';
 
 		$createBookTableSQL = '
-			CREATE TABLE 
-			book 
+			CREATE TABLE
+			book
 			(
 				id BIGSERIAL PRIMARY KEY,
 				title VARCHAR(255)
 			)';
 
 		$createPagePageTableSQL = '
-			CREATE TABLE 
+			CREATE TABLE
 			page_page
 			(
-				id BIGSERIAL PRIMARY KEY, 
+				id BIGSERIAL PRIMARY KEY,
 				page_id BIGSERIAL,
 				page2_id BIGSERIAL
 			) ';
@@ -67,7 +67,7 @@ class Bigint extends Postgres
 		$page2ID     = '1223372036854775809';
 		$page3ID     = '1223372036854775890';
 		$pagePage1ID = '3223372036854775808';
-		
+
 		R::exec("ALTER SEQUENCE book_id_seq RESTART WITH $book1ID");
 		R::exec("ALTER SEQUENCE page_id_seq RESTART WITH $page1ID");
 		R::exec("ALTER SEQUENCE page_page_id_seq RESTART WITH $pagePage1ID");

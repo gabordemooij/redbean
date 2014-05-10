@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Mysql;
 
 use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException\SQL as SQL; 
+use RedBeanPHP\RedException\SQL as SQL;
 
 /**
- * RedUNIT_Mysql_Parambind
+ * Parambind
  *
  * @file    RedUNIT/Mysql/Parambind.php
  * @desc    Tests\PDO parameter binding.
@@ -22,7 +22,7 @@ class Parambind extends Mysql
 {
 	/**
 	 * Test parameter binding with\PDO.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testPDOParameterBinding()

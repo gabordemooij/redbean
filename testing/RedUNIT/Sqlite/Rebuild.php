@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Sqlite;
 
@@ -6,7 +6,7 @@ use RedUNIT\Sqlite as Sqlite;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Sqlite_Rebuild
+ * Rebuild
  *
  * @file    RedUNIT/Sqlite/Rebuild.php
  * @desc    Test rebuilding of tables for SQLite
@@ -21,7 +21,7 @@ class Rebuild extends Sqlite
 {
 	/**
 	 * Test SQLite table rebuilding.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testRebuilder()

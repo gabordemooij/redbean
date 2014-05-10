@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException as RedException;
 
 /**
- * RedUNIT_Base_Aliasing
+ * Aliasing
  *
  * @file    RedUNIT/Base/Aliasing.php
  * @desc    Tests for nested beans with aliases, i.e. teacher alias for person etc.
@@ -22,7 +22,7 @@ class Aliasing extends Base
 {
 	/**
 	 * Test for aliasing issue for LTS version.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testIssueAliasingForLTSVersion() {
@@ -47,11 +47,11 @@ class Aliasing extends Base
 	 * Describing how clearing state of bean works.
 	 * Every method returning somthing (except getID)
 	 * clears prefix-method-state (anything set by withCond,with,alias,fetchAs).
-	 * 
+	 *
 	 * @return void
 	 */
 	public function clearStateAdditionalTests()
-	{	
+	{
 		list( $project1, $project2 ) = R::dispense( 'project', 2 );
 		list( $irene, $ilse ) = R::dispense('person', 2);
 
@@ -90,16 +90,16 @@ class Aliasing extends Base
 		$ilse = $ilse->fresh();
 		$ilse->alias('developer');
 		$ilse->getID();
-		asrt( count( $ilse->ownProject ), 2 );		
+		asrt( count( $ilse->ownProject ), 2 );
 	}
 
 	/**
 	 * Can switch fetchAs().
 	 * Also checks shadow by storing.
-	 * 
+	 *
 	 * @return void
 	 */
-	public function canSwitchParentBean() 
+	public function canSwitchParentBean()
 	{
 
 		list( $project1, $project2 ) = R::dispense( 'project', 2 );
@@ -131,16 +131,16 @@ class Aliasing extends Base
 
 		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );
 		asrt( $project1->fetchAs('person')->designer->name,  'Irene' );
-		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );	
+		asrt( $project1->fetchAs('person')->developer->name, 'Ilse' );
 	}
-	
+
 	/**
 	 * Switching aliases (->alias) should not change other list during
 	 * storage.
-	 * 
+	 *
 	 * @return void
 	 */
-	public function testShadow() 
+	public function testShadow()
 	{
 		list( $project1, $project2 ) = R::dispense( 'project', 2 );
 		list( $irene, $ilse ) = R::dispense('person', 2);
@@ -184,7 +184,7 @@ class Aliasing extends Base
 		asrt( count( $ilse->alias('designer')->ownProject ), 0 );
 		asrt( count( $ilse->alias('developer')->ownProject ), 2 );
 		asrt( count( $irene->alias('designer')->ownProject), 1 );
-		asrt( count( $irene->alias('developer')->ownProject), 0 );		
+		asrt( count( $irene->alias('developer')->ownProject), 0 );
 	}
 
 	/**
@@ -192,7 +192,7 @@ class Aliasing extends Base
 	 *
 	 * @return void
 	 */
-	public function testFetchTypeConfusionIssue291() 
+	public function testFetchTypeConfusionIssue291()
 	{
 		list( $teacher, $student ) = R::dispense( 'person', 2 ) ;
 		$teacher->name = 'jimmy' ;
@@ -216,16 +216,16 @@ class Aliasing extends Base
 		$teacher = $project->fetchAs( 'person' )->teacher ;
 		$student = $project->fetchAs( 'person' )->student ;
 		$client = $project->client ; // this will select from "person" instead of "client"
-		
+
 		asrt( $client->firm, 'bean AG' );
 	}
 
 	/**
 	 * Test switching alias (also issue #291).
-	 * 
+	 *
 	 * @return void
 	 */
-	public function testAliasSwitch() 
+	public function testAliasSwitch()
 	{
 		$student = R::dispense( 'person' );
 		$project = R::dispense( 'project' );
@@ -398,7 +398,7 @@ class Aliasing extends Base
 
 	/**
 	 * Test Basic list variations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBasicListVariations()
@@ -453,7 +453,7 @@ class Aliasing extends Base
 
 	/**
 	 * Tests whether aliasing plays nice with beautification.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAliasWithBeautify()

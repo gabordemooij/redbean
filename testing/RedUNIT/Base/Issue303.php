@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException as RedException;
 
 /**
- * RedUNIT_Base_Issue303
+ * Issue303
  *
  * @file    RedUNIT/Base/Issue303.php
  * @desc    Issue #303 - Split bean property exception.
@@ -23,7 +23,7 @@ class Issue303 extends Base
 	/**
 	 * Test whether we have two different exception messages for
 	 * properties and values.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testIssue303()

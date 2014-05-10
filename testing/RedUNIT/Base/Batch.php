@@ -8,7 +8,7 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\RedException\SQL as SQL;
 
 /**
- * RedUNIT_Base_Batch
+ * Batch
  *
  * @file    RedUNIT/Base/Batch.php
  * @desc    Tests batch loading of beans, i.e. loading large collections of beans in optimized way.

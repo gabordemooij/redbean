@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Blackhole;
 
@@ -8,7 +8,7 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\RedException as RedException;
 
 /**
- * RedUNIT_Blackhole_Import
+ * Import
  *
  * @file    RedUNIT/Blackhole/Import.php
  * @desc    Tests basic bean importing features.
@@ -24,14 +24,14 @@ class Import extends Blackhole
 {
 	/**
 	 * Test recursive imports (formely known as R::graph).
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testRecursiveImport()
 	{
 		$book = R::dispense(
 			array(
-				'_type'=>'book', 
+				'_type'=>'book',
 				'title'=>'The magic book',
 				'ownPageList' => array(
 					 array(
@@ -40,12 +40,12 @@ class Import extends Blackhole
 					 ),
 					 array(
 						'_type' => 'page',
-						'content'  => 'magic spells',  
+						'content'  => 'magic spells',
 					 )
 				)
 			)
 		);
-		
+
 		$id = R::store( $book );
 		$book = R::load( 'book', $id );
 		asrt( $book->title, 'The magic book' );
@@ -55,12 +55,12 @@ class Import extends Blackhole
 		asrt( $page1->content, 'magic potions' );
 		$page2 = array_shift( $pages );
 		asrt( $page2->content, 'magic spells' );
-		
+
 		R::nuke();
-		
+
 		$book = R::dispense(
 			array(
-				'_type'=>'book', 
+				'_type'=>'book',
 				'title'=>'The magic book',
 				'author' => array(
 					 '_type' => 'author',
@@ -82,7 +82,7 @@ class Import extends Blackhole
 					 ),
 					 array(
 						'_type' => 'page',
-						'content'  => 'magic spells',  
+						'content'  => 'magic spells',
 					 )
 				),
 				'sharedCategory' => array(
@@ -93,7 +93,7 @@ class Import extends Blackhole
 				)
 			)
 		);
-		
+
 		$id = R::store( $book );
 		$book = R::load( 'book', $id );
 		asrt( $book->title, 'The magic book' );
@@ -117,7 +117,7 @@ class Import extends Blackhole
 		asrt( $category->label, 'wizardry' );
 		asrt( $book->author->name, 'Dr. Evil' );
 		asrt( $book->fetchAs('author')->coAuthor->name, 'Dr. Creepy' );
-		
+
 		try {
 			R::dispense( array() );
 			fail();
@@ -132,10 +132,10 @@ class Import extends Blackhole
 			pass();
 		}
 	}
-	
+
 	/**
 	 * Test import from and tainted.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testImportFromAndTainted()
@@ -218,10 +218,10 @@ class Import extends Blackhole
 		// Id should not be transferred
 		asrt( $cup->id, 0 );
 	}
-	
+
 	/**
 	 * Test import using array access functions
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testArrayAccess()
@@ -232,45 +232,45 @@ class Import extends Blackhole
 		$book = R::dispense( 'book' );
 		$book['isAwesome'] = TRUE;
 		asrt( isset( $book->isAwesome ), TRUE );
-		
+
 		$book = R::dispense( 'book' );
 		$book['xownPageList'] = R::dispense( 'page', 2 );
 		asrt( isset( $book->ownPage ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPageList ), TRUE );
-		
+
 		$book = R::dispense( 'book' );
 		$book['ownPageList'] = R::dispense( 'page', 2 );
 		asrt( isset( $book->ownPage ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPageList ), TRUE );
-		
+
 		$book = R::dispense( 'book' );
 		$book['xownPage'] = R::dispense( 'page', 2 );
 		asrt( isset( $book->ownPage ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPageList ), TRUE );
-		
+
 		$book = R::dispense( 'book' );
 		$book['ownPage'] = R::dispense( 'page', 2 );
 		asrt( isset( $book->ownPage ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPageList ), TRUE );
-		
+
 		$book = R::dispense( 'book' );
 		$book['sharedTag'] = R::dispense( 'tag', 2 );
 		asrt( isset( $book->sharedTag ), TRUE );
 		asrt( isset( $book->sharedTagList ), TRUE );
-		
+
 		$book = R::dispense( 'book' );
 		$book['sharedTagList'] = R::dispense( 'tag', 2 );
 		asrt( isset( $book->sharedTag ), TRUE );
 		asrt( isset( $book->sharedTagList ), TRUE );
-		
+
 	}
-	
+
 }

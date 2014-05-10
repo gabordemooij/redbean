@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Postgres;
 
@@ -6,7 +6,7 @@ use RedUNIT\Postgres as Postgres;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Postgres_Setget
+ * Setget
  *
  * @file    RedUNIT/Postgres/Setget.php
  * @desc    Tests whether values are correctly stored.
@@ -21,7 +21,7 @@ class Setget extends Postgres
 {
 	/**
 	 * Test numbers.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNumbers()
@@ -53,7 +53,7 @@ class Setget extends Postgres
 
 	/**
 	 * Test dates.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDates()
@@ -69,7 +69,7 @@ class Setget extends Postgres
 
 	/**
 	 * Test strings.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testStrings()
@@ -85,7 +85,7 @@ class Setget extends Postgres
 
 	/**
 	 * Test booleans.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBool()
@@ -99,7 +99,7 @@ class Setget extends Postgres
 
 	/**
 	 * Test NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNull()

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Mysql;
 
@@ -6,7 +6,7 @@ use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Mysql_Uuid
+ * Uuid
  *
  * @file    RedUNIT/Mysql/Uuid.php
  * @desc    Tests read support for UUID tables.
@@ -21,51 +21,51 @@ class Uuid extends Mysql
 {
 	/**
 	 * Test Read-support.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testUUIDReadSupport()
 	{
-		
+
 		R::nuke();
-		
+
 		$createPageTableSQL = '
-			CREATE TABLE 
-			`page` 
+			CREATE TABLE
+			`page`
 			(
-				id CHAR( 40 ), 
+				id CHAR( 40 ),
 				book_id CHAR( 40 ),
 				magazine_id CHAR( 40 ),
 				title VARCHAR(255),
 				PRIMARY KEY ( id )
-			) 
-			ENGINE = InnoDB DEFAULT 
-			CHARSET=utf8mb4 
+			)
+			ENGINE = InnoDB DEFAULT
+			CHARSET=utf8mb4
 			COLLATE=utf8mb4_unicode_ci ';
 
 		$createBookTableSQL = '
-			CREATE TABLE 
-			`book` 
+			CREATE TABLE
+			`book`
 			(
-				id CHAR( 40 ), 
+				id CHAR( 40 ),
 				title VARCHAR(255),
 				PRIMARY KEY ( id )
-			) 
-			ENGINE = InnoDB DEFAULT 
-			CHARSET=utf8mb4 
+			)
+			ENGINE = InnoDB DEFAULT
+			CHARSET=utf8mb4
 			COLLATE=utf8mb4_unicode_ci ';
 
 		$createPagePageTableSQL = '
-			CREATE TABLE 
-			`page_page` 
+			CREATE TABLE
+			`page_page`
 			(
-				id CHAR( 40 ), 
+				id CHAR( 40 ),
 				page_id CHAR( 40 ),
 				page2_id CHAR( 40 ),
 				PRIMARY KEY ( id )
-			) 
-			ENGINE = InnoDB DEFAULT 
-			CHARSET=utf8mb4 
+			)
+			ENGINE = InnoDB DEFAULT
+			CHARSET=utf8mb4
 			COLLATE=utf8mb4_unicode_ci ';
 
 		R::exec( $createBookTableSQL );
@@ -80,7 +80,7 @@ class Uuid extends Mysql
 		$page2ID     = '6ccd780c-baba-1026-9564-0040f4311e24';
 		$page3ID     = '6ccd780c-baba-1026-9564-0040f4311e25';
 		$pagePage1ID = '6ccd780c-baba-1026-9564-0040f4311e26';
-				
+
 		$insertBook1SQL = "
 			INSERT INTO book (id, title) VALUES( '$book1ID', 'book 1' );
 		";

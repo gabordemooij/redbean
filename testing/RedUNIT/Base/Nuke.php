@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -6,7 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Base_Nuke
+ * Nuke
  *
  * @file    RedUNIT/Base/Nuke.php
  * @desc    Test the nuke() function.
@@ -21,7 +21,7 @@ class Nuke extends Base
 {
 	/**
 	 * Nuclear test suite.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNuke()

@@ -1,14 +1,14 @@
-<?php 
+<?php
 
 namespace RedUNIT\Blackhole;
 
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\Facade as Facade;
-use RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException as RedException;
 
 /**
- * RedUNIT_Blackhole_Plugins
+ * Plugins
  *
  * @file    RedUNIT/Blackhole/Plugins.php
  * @desc    Tests extending R facade dynamically.
@@ -23,13 +23,13 @@ class Plugins extends Blackhole
 {
 	/**
 	 * Test if we can dynamically extend the R-facade.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDynamicPlugins()
 	{
 		testpack('Test dynamic plugins');
-		
+
 		//basic behaviour
 		R::ext( 'makeTea', function() {
 			return 'sorry cant do that!';
@@ -50,10 +50,10 @@ class Plugins extends Blackhole
 		} );
 
 		asrt( R::singVersion(), ( R::getVersion().' lalala !' ) );
-		
+
 		//should also work with Facade
 		asrt( Facade::singVersion(), ( R::getVersion().' lalala !' ) );
-		
+
 		//test error handling
 		try {
 			R::ext( '---', function() {} );
@@ -61,14 +61,14 @@ class Plugins extends Blackhole
 		} catch ( RedException $e ) {
 			asrt( $e->getMessage(), 'Plugin name may only contain alphanumeric characters.' );
 		}
-		
+
 		try {
 			R::__callStatic( '---', function() {} );
 			fail();
 		} catch ( RedException $e ) {
 			asrt( $e->getMessage(), 'Plugin name may only contain alphanumeric characters.' );
 		}
-		
+
 		try {
 			R::invalidMethod();
 			fail();

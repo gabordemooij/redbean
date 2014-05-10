@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 namespace RedUNIT\Blackhole;
 
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedUNIT_Blackhole_Labels
+ * Labels
  *
  * @file    RedUNIT/Blackhole/Labels.php
  * @desc    Tests Facade Label functions.
@@ -23,7 +23,7 @@ class Labels extends Blackhole
 {
 	/**
 	 * Test basic labels.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testLabels()

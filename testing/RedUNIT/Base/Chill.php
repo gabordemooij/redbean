@@ -1,12 +1,12 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
-use RedBeanPHP\Facade as R; 
+use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Base_Chill
+ * Chill
  *
  * @file    RedUNIT/Base/Chill.php
  * @desc    Tests chill list functionality, i.e. freezing a subset of all types.
@@ -21,7 +21,7 @@ class Chill extends Base
 {
 	/**
 	 * Test Chill mode.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testChill()
@@ -70,13 +70,13 @@ class Chill extends Base
 
 		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 6 );
 	}
-	
+
 	/**
 	 * Test whether we cannot add unique constraints on chilled tables,
 	 * otherwise you cannot avoid this from happening when adding beans to the
 	 * shared list :) -- this is almost a theoretical issue however we want it
 	 * to work according to specifications!
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDontAddUniqueConstraintForChilledBeanTypes()
@@ -98,8 +98,8 @@ class Chill extends Base
 			pass();
 		}
 		asrt(R::count('person_role'), 2);
-		
-		
+
+
 		R::nuke();
 		$person = R::dispense( 'person' );
 		$role = R::dispense( 'role' );
@@ -120,11 +120,11 @@ class Chill extends Base
 		asrt(R::count('person_role'), 3);
 		R::freeze( array() ); //set freeze to FALSE and clear CHILL LIST!
 	}
-	
+
 	/**
 	 * Test whether we can set and reset the chill list and check the contents
 	 * of the chill list.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testChillTest()

@@ -1,9 +1,9 @@
-<?php 
- 
-namespace RedUNIT; 
+<?php
+
+namespace RedUNIT;
 
 /**
- * RedUNIT_Sqlite
+ * Sqlite
  *
  * @file    RedUNIT/Sqlite.php
  * @desc    Base class for all SQLite specific tests.
@@ -18,7 +18,7 @@ class Sqlite extends RedUNIT
 {
 	/*
 	 * What drivers should be loaded for this test pack?
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getTargetDrivers()

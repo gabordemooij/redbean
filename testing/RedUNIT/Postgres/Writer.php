@@ -6,10 +6,10 @@ use RedUNIT\Postgres as Postgres;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
-use RedBeanPHP\RedException\SQL as SQL; 
+use RedBeanPHP\RedException\SQL as SQL;
 
 /**
- * RedUNIT_Postgres_Writer
+ * Writer
  *
  * @file    RedUNIT/Postgres/Writer.php
  * @desc    A collection of writer specific tests.
@@ -24,7 +24,7 @@ class Writer extends Postgres
 {
 	/**
 	 * Test scanning and coding.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testScanningAndCoding()
@@ -100,21 +100,21 @@ class Writer extends Postgres
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols["c1"] ), 3 );
-		
+
 		$writer->addColumn( "testtable", "special", PostgreSQL::C_DATATYPE_SPECIAL_DATE );
-		
+
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols['special'], TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATE );
-		
+
 		asrt( $writer->code( $cols['special'], FALSE ), PostgreSQL::C_DATATYPE_SPECIFIED );
-		
+
 		$writer->addColumn( "testtable", "special2", PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
-		
+
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols['special2'], TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
-		
+
 		asrt( $writer->code( $cols['special'], FALSE ), PostgreSQL::C_DATATYPE_SPECIFIED );
 
 		//$id = $writer->insertRecord("testtable", array("c1"), array(array("lorem ipsum")));
@@ -140,7 +140,7 @@ class Writer extends Postgres
 
 	/**
 	 * (FALSE should be stored as 0 not as '')
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testZeroIssue()
@@ -183,7 +183,7 @@ class Writer extends Postgres
 	 * Tests whether writer correctly handles keyword 'group' and SQL state 23000 issue.
 	 * These tests remain here to make sure issues 9 and 10 never happen again.
 	 * However this bug will probably never re-appear due to changed architecture.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testIssue9and10()
@@ -244,7 +244,7 @@ class Writer extends Postgres
 	 * Test various somewhat uncommon trash/unassociate scenarios.
 	 * (i.e. unassociate unrelated beans, trash non-persistant beans etc).
 	 * Should be handled gracefully - no output checking.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testVaria()
@@ -284,7 +284,7 @@ class Writer extends Postgres
 
 	/**
 	 * Test special types.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypes()
@@ -314,7 +314,7 @@ class Writer extends Postgres
 
 	/**
 	 * Test dates.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesDates()
@@ -332,7 +332,7 @@ class Writer extends Postgres
 
 	/**
 	 * Datetime.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesDateTimes()
@@ -350,7 +350,7 @@ class Writer extends Postgres
 
 	/**
 	 * Test spatial data types.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesPoints()
@@ -380,7 +380,7 @@ class Writer extends Postgres
 
 	/**
 	 * Test points.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesDecPoints()
@@ -410,7 +410,7 @@ class Writer extends Postgres
 
 	/**
 	 * Test multi points.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesMultiDecPoints()
@@ -440,7 +440,7 @@ class Writer extends Postgres
 
 	/**
 	 * More points...
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesWeirdPoints()
@@ -470,7 +470,7 @@ class Writer extends Postgres
 
 	/**
 	 * Test money data type.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesMoney()
@@ -496,20 +496,20 @@ class Writer extends Postgres
 		$bean = R::load( 'bean', $bean->id );
 
 		asrt( $bean->money, '$123.45' );
-		
+
 		$bean->money = '$123,455.01';
-		
+
 		R::store($bean);
-		
+
 		$bean = $bean->fresh();
-		
+
 		asrt( $bean->money, '$123,455.01' );
-		
+
 	}
 
 	/**
 	 * Test negative money data type.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesNegativeMoney()
@@ -536,16 +536,16 @@ class Writer extends Postgres
 
 		asrt( $bean->money, '-$123.45' );
 	}
-	
+
 	/**
 	 * Issue #340
 	 * Redbean is currently picking up bcrypt hashed passwords
-	 * (which look like this: $2y$12$85lAS....SnpDNVGPAC7w0G) 
-	 * as PostgreSQL money types. 
+	 * (which look like this: $2y$12$85lAS....SnpDNVGPAC7w0G)
+	 * as PostgreSQL money types.
 	 * Then, once R::store is called on the bean, it chokes and throws the following error:
-	 * PHP Fatal error: Uncaught [22P02] - SQLSTATE[22P02]: Invalid text representation: 7 ERROR: 
+	 * PHP Fatal error: Uncaught [22P02] - SQLSTATE[22P02]: Invalid text representation: 7 ERROR:
 	 * invalid input syntax for type money: ....
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesInvalidMoney()
@@ -575,7 +575,7 @@ class Writer extends Postgres
 
 	/**
 	 * Test types of strings.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTypesStrings()

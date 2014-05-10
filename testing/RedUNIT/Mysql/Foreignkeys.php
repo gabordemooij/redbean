@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Mysql;
 
@@ -6,7 +6,7 @@ use RedUNIT\Mysql as Mysql;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Mysql_Foreignkeys
+ * Foreignkeys
  *
  * @file    RedUNIT/Mysql/Foreignkeys.php
  * @desc    Tests creation of foreign keys.
@@ -21,7 +21,7 @@ class Foreignkeys extends Mysql
 {
 	/**
 	 * Basic FK tests.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFKS()
@@ -83,7 +83,7 @@ class Foreignkeys extends Mysql
 		]';
 
 		$j1 = json_decode( $j, TRUE );
-		
+
 		$j2 = json_decode( $json, TRUE );
 
 		foreach ( $j1 as $jrow ) {
@@ -107,7 +107,7 @@ class Foreignkeys extends Mysql
 
 	/**
 	 * Test widen for constraint.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testWideningColumnForConstraint()
@@ -125,7 +125,7 @@ class Foreignkeys extends Mysql
 		R::store( $bean3 );
 
 		$cols = R::getColumns( 'invoice_project' );
-		
+
 		asrt( $cols['project_id'], "tinyint(1) unsigned" );
 		asrt( $cols['invoice_id'], "tinyint(1) unsigned" );
 
@@ -136,255 +136,255 @@ class Foreignkeys extends Mysql
 		asrt( $cols['project_id'], "int(11) unsigned" );
 		asrt( $cols['invoice_id'], "int(11) unsigned" );
 	}
-	
+
 	/**
 	 * Test adding of constraints directly by invoking
 	 * the writer method.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testContrain()
 	{
 		R::nuke();
-		
+
 		$sql   = '
 			CREATE TABLE book (
-				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				PRIMARY KEY ( id )
-			) 
-			ENGINE = InnoDB
-		';
-		
-		R::exec( $sql );
-		
-		$sql   = '
-			CREATE TABLE page (
-				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
-				PRIMARY KEY ( id )
-			) 
+			)
 			ENGINE = InnoDB
 		';
 
 		R::exec( $sql );
-		
+
+		$sql   = '
+			CREATE TABLE page (
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT,
+				PRIMARY KEY ( id )
+			)
+			ENGINE = InnoDB
+		';
+
+		R::exec( $sql );
+
 		$sql   = '
 			CREATE TABLE book_page (
 				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				book_id INT( 11 ) UNSIGNED NOT NULL,
 				page_id INT( 11 ) UNSIGNED NOT NULL,
 				PRIMARY KEY ( id )
-			) 
+			)
 			ENGINE = InnoDB
 		';
 
 		R::exec( $sql );
-		
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "book_page" AND DELETE_RULE = "CASCADE"');
-		
+
 		asrt( (int) $numOfFKS, 0 );
-		
+
 		$writer = R::getWriter();
-		
+
 		$writer->addConstraintForTypes( 'book', 'page' );
-		
-		
+
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "book_page" AND DELETE_RULE = "CASCADE"');
-		
+
 		asrt( (int) $numOfFKS, 2 );
-		
+
 		$writer->addConstraintForTypes( 'book', 'page' );
-		
-		
+
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "book_page" AND DELETE_RULE = "CASCADE"');
-		
+
 		asrt( (int) $numOfFKS, 2 );
 	}
-	
+
 	/**
 	 * Test adding foreign keys.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAddingForeignKey()
 	{
 		R::nuke();
-		
+
 		$sql   = '
 			CREATE TABLE book (
-				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				PRIMARY KEY ( id )
-			) 
+			)
 			ENGINE = InnoDB
 		';
-		
+
 		R::exec( $sql );
-		
+
 		$sql   = '
 			CREATE TABLE page (
-				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				book_id INT( 11 ) UNSIGNED NOT NULL,
 				PRIMARY KEY ( id )
-			) 
+			)
 			ENGINE = InnoDB
 		';
 
 		R::exec( $sql );
-		
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "page" AND DELETE_RULE = "CASCADE"');
-		
+
 		asrt( (int) $numOfFKS, 0 );
-		
+
 		$writer = R::getWriter();
-		
+
 		//Can we add a foreign key with cascade?
 		$writer->addFK('page', 'book', 'book_id', 'id', TRUE);
-		
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "page" AND DELETE_RULE = "CASCADE"');
-		
+
 		asrt( (int) $numOfFKS, 1 );
-		
+
 		//dont add it twice
 		$writer->addFK('page', 'book', 'book_id', 'id', TRUE);
-		
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "page" AND DELETE_RULE = "CASCADE"');
-		
+
 		asrt( (int) $numOfFKS, 1 );
-		
+
 		//even if different
 		$writer->addFK('page', 'book', 'book_id', 'id', FALSE);
-		
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "page" ');
-		
+
 		asrt( (int) $numOfFKS, 1 );
-		
+
 		//Now add non-dep key
 		R::nuke();
-		
-		
+
+
 		$sql   = '
 			CREATE TABLE book (
-				id INT( 11 ) UNSIGNED NULL AUTO_INCREMENT, 
+				id INT( 11 ) UNSIGNED NULL AUTO_INCREMENT,
 				PRIMARY KEY ( id )
-			) 
-			ENGINE = InnoDB
-		';
-		
-		R::exec( $sql );
-		
-		$sql   = '
-			CREATE TABLE page (
-				id INT( 11 ) UNSIGNED AUTO_INCREMENT, 
-				book_id INT( 11 ) UNSIGNED NULL,
-				PRIMARY KEY ( id )
-			) 
+			)
 			ENGINE = InnoDB
 		';
 
 		R::exec( $sql );
-		
+
+		$sql   = '
+			CREATE TABLE page (
+				id INT( 11 ) UNSIGNED AUTO_INCREMENT,
+				book_id INT( 11 ) UNSIGNED NULL,
+				PRIMARY KEY ( id )
+			)
+			ENGINE = InnoDB
+		';
+
+		R::exec( $sql );
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "page" AND DELETE_RULE = "CASCADE"');
-		
+
 		asrt( (int) $numOfFKS, 0 );
-		
+
 		//even if different
 		$writer->addFK('page', 'book', 'book_id', 'id', FALSE);
-		
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "page" AND DELETE_RULE = "CASCADE"');
-		
+
 		asrt( (int) $numOfFKS, 0 );
-		
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "page" AND DELETE_RULE = "SET NULL"');
-		
+
 		asrt( (int) $numOfFKS, 1 );
-		
+
 		$writer->addFK('page', 'book', 'book_id', 'id', TRUE);
-		
+
 		$numOfFKS = R::getCell('
-			SELECT COUNT(*) 
+			SELECT COUNT(*)
 			FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 			WHERE TABLE_NAME = "page" ');
 	}
-	
+
 	/**
 	 * Test whether we can manually create indexes.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testAddingIndex()
 	{
 		R::nuke();
-		
+
 		$sql   = '
 			CREATE TABLE song (
-				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, 
+				id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				album_id INT( 11 ) UNSIGNED NOT NULL,
 				category VARCHAR( 255 ),
 				PRIMARY KEY ( id )
-			) 
+			)
 			ENGINE = InnoDB
 		';
 
 		R::exec( $sql );
-		
+
 		$sql = 'SHOW INDEX FROM song';
-		
+
 		$indexes = R::getAll( $sql );
-		
+
 		asrt( count( $indexes ), 1 );
 		asrt( $indexes[0]['Table'], 'song' );
 		asrt( $indexes[0]['Key_name'], 'PRIMARY' );
-		
+
 		$writer = R::getWriter();
-		
+
 		$writer->addIndex('song', 'index1', 'album_id');
-		
-		
+
+
 		$indexes = R::getAll( 'SHOW INDEX FROM song' );
-		
+
 		asrt( count( $indexes ), 2 );
 		asrt( $indexes[0]['Table'], 'song' );
 		asrt( $indexes[0]['Key_name'], 'PRIMARY' );
 		asrt( $indexes[1]['Table'], 'song' );
 		asrt( $indexes[1]['Key_name'], 'index1' );
-		
+
 		//Cant add the same index twice
 		$writer->addIndex('song', 'index2', 'category');
-		
+
 		$indexes = R::getAll( 'SHOW INDEX FROM song' );
-		
+
 		asrt( count( $indexes ), 3 );
-		
-		
+
+
 		//Dont fail, just dont
 		try {
 			$writer->addIndex('song', 'index3', 'nonexistant');
@@ -392,25 +392,25 @@ class Foreignkeys extends Mysql
 		} catch( \Exception $e ) {
 			fail();
 		}
-		
+
 		asrt( count( $indexes ), 3 );
-		
+
 		try {
 			$writer->addIndex('nonexistant', 'index4', 'nonexistant');
 			pass();
 		} catch( \Exception $e ) {
 			fail();
 		}
-		
+
 		asrt( count( $indexes ), 3 );
-		
+
 		try {
 			$writer->addIndex('nonexistant', '', 'nonexistant');
 			pass();
 		} catch( \Exception $e ) {
 			fail();
 		}
-		
+
 		asrt( count( $indexes ), 3 );
 	}
 }

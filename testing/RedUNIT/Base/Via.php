@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -9,7 +9,7 @@ use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\RedException\SQL as SQL;
 
 /**
- * RedUNIT_Base_Via
+ * Via
  *
  * @file    RedUNIT/Base/Via.php
  * @desc    Tests Association API (N:N associations)
@@ -24,7 +24,7 @@ class Via extends Base
 {
 	/**
 	 * Via specific tests.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testViaAndSQL()
@@ -58,8 +58,8 @@ class Via extends Base
 		$anna = reset( $designers );
 		asrt(count($designers), 1);
 		asrt($anna->name, 'Anna');
-		
-		
+
+
 		$coders = $project
 				->withCondition(' participant.arole = ? ', array( 'coder' ) )
 				->via( 'participant' )
@@ -69,10 +69,10 @@ class Via extends Base
 		asrt(count($coders), 1);
 		asrt($john->name, 'John');
 	}
-	
+
 	/**
 	 * Test Via and Link together.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testViaAndLink()
@@ -231,10 +231,10 @@ class Via extends Base
 		sort( $projectList );
 		asrt( implode( ',', $projectList ), 'x,y' );
 	}
-	
+
 	/**
 	 * Test effect of via on shared list removal of beans.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testViaAndRemove()

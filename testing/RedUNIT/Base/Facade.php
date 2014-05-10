@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -9,10 +9,10 @@ use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\Adapter as Adapter;
 use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedUNIT_Base_Facade
+ * Facade
  *
  * @file    RedUNIT/Base/Facade.php
  * @desc    Tests basic functions through facade.
@@ -37,7 +37,7 @@ class Facade extends Base
 
 	/**
 	 * Test common Facade usage scenarios.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCommonUsageFacade()

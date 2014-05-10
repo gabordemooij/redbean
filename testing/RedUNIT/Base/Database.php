@@ -15,7 +15,7 @@ use RedBeanPHP\QueryWriter\CUBRID as CUBRID;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 
 /**
- * RedUNIT_Base_Database
+ * Database
  *
  * @file    RedUNIT/Base/Database.php
  * @desc    Tests basic database behaviors

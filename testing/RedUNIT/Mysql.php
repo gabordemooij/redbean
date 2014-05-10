@@ -1,9 +1,9 @@
-<?php 
+<?php
 
-namespace RedUNIT; 
+namespace RedUNIT;
 
 /**
- * RedUNIT_Mysql
+ * Mysql
  *
  * @file    RedUNIT/Mysql.php
  * @desc    Base class for all tests that test support for MySQL/MariaDB database.
@@ -18,7 +18,7 @@ class Mysql extends RedUNIT
 {
 	/*
 	 * What drivers should be loaded for this test pack?
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getTargetDrivers()

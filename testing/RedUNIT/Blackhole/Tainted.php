@@ -1,12 +1,12 @@
-<?php 
- 
+<?php
+
 namespace RedUNIT\Blackhole;
 
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Blackhole_Tainted
+ * Tainted
  *
  * @file    RedUNIT/Blackhole/Tainted.php
  * @desc    Tests tainted flag for OODBBean objects.
@@ -21,7 +21,7 @@ class Tainted extends Blackhole
 {
 	/**
 	 * Test tainted.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testTainted()

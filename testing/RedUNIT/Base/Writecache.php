@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -6,7 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 
 /**
- * RedUNIT_Base_Writecache
+ * Writecache
  *
  * @file    RedUNIT/Base/Writecache.php
  * @desc    Tests the Query Writer cache implemented in the
@@ -30,13 +30,13 @@ class Writecache extends Base
 
 	/**
 	 * Test effects of cache.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCachingEffects()
 	{
 		testpack( 'Testing WriteCache Query Writer Cache' );
-		
+
 		R::useWriterCache( FALSE );
 
 		R::debug( true, 1 );
@@ -208,33 +208,33 @@ class Writecache extends Base
 
 		// Now the same, auto flushed
 		asrt( count( $logger->grep( 'SELECT *' ) ), 2 );
-		
+
 		$page = R::dispense('page');
 		$book->sharedPage[] = $page;
-		
+
 		R::store( $book );
-		
+
 		$logger->clear();
 		$link = R::getWriter()->queryRecordLink( 'book', 'page', $book->id, $page->id );
-		
+
 		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
-		
+
 		$link = R::getWriter()->queryRecordLink( 'book', 'page', $book->id, $page->id );
-		
+
 		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
-		
+
 		R::getWriter()->setUseCache( FALSE );
 
 		$link = R::getWriter()->queryRecordLink( 'book', 'page', $book->id, $page->id );
-		
+
 		asrt( count( $logger->grep( 'SELECT' ) ), 2 );
-		
+
 		R::getWriter()->setUseCache( TRUE );
 	}
 
 	/**
 	 * Try to fool the cache :)
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testRegressions()
@@ -265,7 +265,7 @@ class Writecache extends Base
 
 	/**
 	 * Test keep-cache comment.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testKeepCacheCommentInSQL()
@@ -291,9 +291,9 @@ class Writecache extends Base
 	}
 
 	/**
-	 * 
+	 *
 	 * Same as above.. test keep cache.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testInstructNoDrop()
@@ -344,7 +344,7 @@ class Writecache extends Base
 
 	/**
 	 * Can we confuse the cache?
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testConfusionRegression()
@@ -374,7 +374,7 @@ class Writecache extends Base
 
 	/**
 	 * Test Ghost beans....
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testGhostBeans()
@@ -396,7 +396,7 @@ class Writecache extends Base
 
 	/**
 	 * Test explicit flush.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testExplicitCacheFlush()
@@ -405,7 +405,7 @@ class Writecache extends Base
 
 		R::debug( true, 1 );
 		$logger = R::getDatabaseAdapter()->getDatabase()->getLogger();
-		
+
 		$bean = R::dispense( 'bean' );
 
 		$bean->title = 'abc';

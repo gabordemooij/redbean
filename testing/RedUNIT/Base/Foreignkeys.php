@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
@@ -6,10 +6,10 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\Observer as Observer;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\Adapter as Adapter; 
+use RedBeanPHP\Adapter as Adapter;
 
 /**
- * RedUNIT_Base_Foreignkeys
+ * Foreignkeys
  *
  * @file    RedUNIT/Base/Foreignkeys.php
  * @desc    Tests foreign key handling and dynamic foreign keys with
@@ -31,7 +31,7 @@ class Foreignkeys extends Base implements Observer
 
 	/**
 	 * Test dependencies.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDependency()
@@ -48,7 +48,7 @@ class Foreignkeys extends Base implements Observer
 
 	/**
 	 * Test dependencies (variation).
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDependency2()
@@ -87,13 +87,13 @@ class Foreignkeys extends Base implements Observer
 
 	/**
 	 * Tests dependencies (variation).
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDependency3()
 	{
 		R::nuke();
-		
+
 		$can = $this->createCanForBean();
 
 		asrt( R::count( 'bean' ), 1 );
@@ -105,19 +105,19 @@ class Foreignkeys extends Base implements Observer
 
 	/**
 	 * Tests dependencies (variation).
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDependency4()
 	{
 		R::nuke();
-		
+
 		$can = $this->createBeanInCan( TRUE );
-		
+
 		R::store( $can );
-		
+
 		R::trash( $can );
-		
+
 		$can = $this->createCanForBean();
 
 		asrt( R::count( 'bean' ), 1 );
@@ -125,11 +125,11 @@ class Foreignkeys extends Base implements Observer
 		R::trash( $can );
 
 		asrt( R::count( 'bean' ), 0 );
-		
+
 		$can = $this->createBeanInCan( TRUE );
-		
+
 		R::store( $can );
-		
+
 		R::trash( $can );
 
 		$can = $this->createCanForBean();
@@ -144,7 +144,7 @@ class Foreignkeys extends Base implements Observer
 	/**
 	 * Issue #171
 	 * The index name argument is not unique in processEmbeddedBean etc.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testIssue171()
@@ -173,7 +173,7 @@ class Foreignkeys extends Base implements Observer
 	/**
 	 * Tests whether foreign keys are created correctly for certain
 	 * relations.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testCreationOfForeignKeys()
@@ -198,7 +198,7 @@ class Foreignkeys extends Base implements Observer
 
 		asrt( strpos( implode( ',', $this->queries ), 'index_foreignkey_player_accou' ) !== FALSE, TRUE );
 	}
-	
+
 	/**
 	 * Test helper method.
 	 * Creates a bean in a can. The bean will get a reference
