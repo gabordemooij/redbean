@@ -1,11 +1,11 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\DuplicationManager as DuplicationManager;
-use RedBeanPHP\OODBBean as OODBBean; 
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * RedUNIT_Base_Dup
@@ -21,9 +21,145 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Dup extends Base
 {
+
+	/**
+	 * Test whether we can duplicate part of a tree
+	 * without infinite loops.
+	 *
+	 * @return void
+	 */
+	public function testDupPortionOfATree()
+	{
+		R::nuke();
+		$article = R::dispense( 'article' );
+		$article->name = 'article 1';
+		list( $article2, $article3 ) = R::dispense( 'article', 2 );
+		$article2->name = 'article 2';
+		$article3->name = 'article 3';
+		list( $article4, $article5 ) = R::dispense( 'article' , 2);
+		$article4->name = 'article 4';
+		$article5->name = 'article 5';
+		list( $article6, $article7 ) = R::dispense( 'article' , 2);
+		$article6->name = 'article 6';
+		$article7->name = 'article 7';
+		$article3->xownArticleList[] = $article7;
+		$article4->xownArticleList[] = $article6;
+		$article2->xownArticleList = array( $article5, $article4 );
+		$article->xownArticleList = array( $article2, $article3 );
+		R::store( $article );
+		asrt( R::count( 'article' ), 7 );
+		$article2 = $article2->fresh();
+		$dupArticle2 = R::dup( $article2 );
+		$dupArticle2->name = 'article 2b';
+		$dupBeans = $dupArticle2->xownArticleList;
+		foreach( $dupBeans as $dupBean ) {
+			$list[] = $dupBean->name;
+		}
+		sort( $list );
+		$listStr = implode( ',', $list );
+		asrt( $listStr, 'article 4,article 5' );
+		foreach( $dupBeans as $dupBean ) {
+			if ( $dupBean->name === 'article 4' ) {
+				$dup4 = $dupBean;
+			}
+		}
+		asrt( isset( $dup4 ), TRUE );
+		$dupBeans = $dup4->xownArticleList;
+		foreach( $dupBeans as $dupBean ) {
+			asrt( $dupBean->name, 'article 6' );
+		}
+
+		//so we have extracted part of the tree, can we store it?
+		$id = R::store( $dupArticle2 );
+		asrt( ( $id > 0 ), TRUE );
+		asrt( R::count( 'article' ), 11 );
+
+		$originalArticle = $article->fresh();
+		asrt( $originalArticle->name, 'article 1' );
+
+		$subArticles = $originalArticle->xownArticleList;
+		$list = array();
+		foreach( $subArticles as $subArticle ) {
+			$list[] = $subArticle->name;
+		}
+		sort( $list );
+		$listStr = implode( ',', $list );
+		asrt( $listStr, 'article 2,article 2b,article 3' );
+
+		foreach( $subArticles as $subArticle ) {
+			if ( $subArticle->name === 'article 2' ) {
+				$sub2 = $subArticle;
+			}
+			if ( $subArticle->name === 'article 3' ) {
+				$sub3 = $subArticle;
+			}
+		}
+
+		$subArticles = $sub2->xownArticleList;
+		$list = array();
+		foreach( $subArticles as $subArticle ) {
+			$list[] = $subArticle->name;
+		}
+		sort( $list );
+		$listStr = implode( ',', $list );
+		asrt( $listStr, 'article 4,article 5' );
+
+		$subArticles = $sub3->xownArticleList;
+		$list = array();
+		foreach( $subArticles as $subArticle ) {
+			$list[] = $subArticle->name;
+		}
+		sort( $list );
+		$listStr = implode( ',', $list );
+		asrt( $listStr, 'article 7' );
+
+		$subArticles = $sub2->xownArticleList;
+		foreach( $subArticles as $subArticle ) {
+			if ( $subArticle->name === 'article 4' ) {
+				$sub4 = $subArticle;
+			}
+			if ( $subArticle->name === 'article 5' ) {
+				$sub5 = $subArticle;
+			}
+		}
+
+		asrt( count( $sub4->xownArticleList ), 1 );
+		$subBeans = $sub4->xownArticleList;
+		$subBean = reset( $subBeans );
+		asrt( $subBean->name, 'article 6');
+
+		asrt( count( $sub5->xownArticleList ), 0 );
+
+		$dupArticle2 = $dupArticle2->fresh();
+		$subArticles = $dupArticle2->xownArticleList;
+		$list = array();
+		foreach( $subArticles as $subArticle ) {
+			$list[] = $subArticle->name;
+		}
+		sort( $list );
+		$listStr = implode( ',', $list );
+		asrt( $listStr, 'article 4,article 5' );
+
+		foreach( $subArticles as $subArticle ) {
+			if ( $subArticle->name === 'article 4' ) {
+				$sub4 = $subArticle;
+			}
+			if ( $subArticle->name === 'article 5' ) {
+				$sub5 = $subArticle;
+			}
+		}
+
+		asrt( count( $sub4->xownArticleList ), 1 );
+		$subBeans = $sub4->xownArticleList;
+		$subBean = reset( $subBeans );
+		asrt( $subBean->name, 'article 6');
+
+		asrt( count( $sub5->xownArticleList ), 0 );
+	}
+
 	/**
 	 * Test exportAll and caching.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testExportAllAndCache()
@@ -115,7 +251,7 @@ class Dup extends Base
 
 	/**
 	 * Test duplication and caching.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function DupAndCache()
@@ -229,7 +365,7 @@ class Dup extends Base
 
 	/**
 	 * Test duplication and tainting.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDupAndExportNonTainting()
@@ -293,7 +429,7 @@ class Dup extends Base
 
 	/**
 	 * Test exporting with filters.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function ExportWithFilters()
@@ -388,7 +524,7 @@ class Dup extends Base
 
 	/**
 	 * Helper function getCache().
-	 * 
+	 *
 	 * @return array
 	 */
 	private function getCache()
