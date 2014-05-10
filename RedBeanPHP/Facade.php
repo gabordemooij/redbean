@@ -1463,6 +1463,8 @@ class Facade
 	 * return an array containing first part of the string
 	 * representation of each item in the array.
 	 *
+	 * @param OODBBean|array $data either a bean or an array of beans
+	 *
 	 * @return array
 	 *
 	 */
