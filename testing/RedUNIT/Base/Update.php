@@ -21,6 +21,39 @@ use RedBeanPHP\RedException as RedException;
 class Update extends Base
 {
 	/**
+	 * Test unsetting properties.
+	 *
+	 * @return void
+	 */
+	public function testUnsetUpdate()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->name = 'x';
+		$book->price = 40;
+		R::store( $book );
+		$book = $book->fresh();
+		$book->name = 'y';
+		unset( $book->name );
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->name, 'x' );
+		asrt( (int) $book->price, 40 );
+		$book->price = 30;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->name, 'x' );
+		asrt( (int) $book->price, 30 );
+		$book->price = 20;
+		unset( $book->price );
+		$book->name = 'y';
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->name, 'y' );
+		asrt( (int) $book->price, 30 );
+	}
+
+	/**
 	 * Tests whether we can update or unset a parent bean
 	 * with an alias without having to use fetchAs and
 	 * without loading the aliased bean causing table-not-found
