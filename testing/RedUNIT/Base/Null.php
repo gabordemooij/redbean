@@ -19,6 +19,74 @@ use RedBeanPHP\Facade as R;
  */
 class Null extends Base
 {
+
+	/**
+	 * Tests whether we can NULLify a parent bean
+	 * page->book if the parent (book) is already
+	 * NULL. (isset vs array_key_exists bug).
+	 *
+	 * @return void
+	 */
+	public function testUnsetParent()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->title = 'My Book';
+		$page = R::dispense( 'page' );
+		$page->text = 'Lorem Ipsum';
+		$book->ownPage[] = $page;
+		R::store( $book );
+		$page = $page->fresh();
+		R::freeze( TRUE );
+		asrt( (int) $page->book->id, (int) $book->id );
+		unset( $page->book );
+		R::store( $page );
+		$page = $page->fresh();
+		asrt( (int) $page->book->id, (int) $book->id );
+		$page->book = NULL;
+		R::store( $page );
+		$page = $page->fresh();
+		asrt( $page->book, NULL );
+		asrt( $page->book_id, NULL );
+		asrt( $page->bookID, NULL );
+		asrt( $page->bookId, NULL );
+		$page = R::dispense( 'page' );
+		$page->text = 'Another Page';
+		$page->book = NULL;
+		try {
+			R::store( $page );
+			fail();
+		} catch( \Exception $exception ) {
+			pass();
+		}
+		unset($page->book);
+		R::store($page);
+		$page = $page->fresh();
+		$page->book = NULL; //this must set field id to NULL not ADD column!
+		try {
+			R::store($page);
+			pass();
+		} catch( \Exception $exception ) {
+			fail();
+		}
+		$page = $page->fresh();
+		$page->book = NULL;
+		R::store( $page );
+		$page = $page->fresh();
+		asrt( is_null( $page->book_id ), TRUE );
+		$page->book = $book;
+		R::store( $page );
+		$page = $page->fresh();
+		asrt( (int) $page->book->id, (int) $book->id );
+		$page->book = NULL;
+		R::store( $page );
+		asrt( is_null( $page->book_id ), TRUE );
+		asrt( is_null( $page->book ), TRUE );
+		R::freeze( FALSE );
+	}
+
+
+
 	/**
 	 * Test NULL handling, setting a property to NULL must
 	 * cause a change.
