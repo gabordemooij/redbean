@@ -880,7 +880,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		$this->__info['tainted'] = TRUE;
 
-		if ( isset( $this->properties[$fieldLink] ) && !( $value instanceof OODBBean ) ) {
+		if ( array_key_exists( $fieldLink, $this->properties ) && !( $value instanceof OODBBean ) ) {
 			if ( is_null( $value ) || $value === FALSE ) {
 
 				unset( $this->properties[ $property ]);
@@ -1519,4 +1519,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			&& ( (string) $this->__info['type']   === (string) $bean->__info['type']   )
 		);
 	}
+
+
 }
