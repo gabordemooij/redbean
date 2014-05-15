@@ -23,6 +23,41 @@ class Dup extends Base
 {
 
 	/**
+	 * Test export camelCase.
+	 *
+	 * @return void
+	 */
+	public function testExportCamelCase()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->isCheap = true;
+		$book->hasISBNCode = false;
+		$page = R::dispense('page');
+		$page->isWrittenWell = true;
+		$page->containsInterestingText = true;
+		$book->ownPageList[] = $page;
+		R::store( $book );
+		$book = $book->fresh();
+		$export = R::exportAll( $book );
+		asrt( isset( $export[0]['id'] ), true );
+		asrt( isset( $export[0]['is_cheap'] ), true );
+		asrt( isset( $export[0]['has_isbn_code'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['id'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['is_written_well'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['contains_interesting_text'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['book_id'] ), true );
+		$export = R::exportAll( $book, false, array(), true );
+		asrt( isset( $export[0]['id'] ), true );
+		asrt( isset( $export[0]['isCheap'] ), true );
+		asrt( isset( $export[0]['hasIsbnCode'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['id'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['isWrittenWell'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['containsInterestingText'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['bookId'] ), true );
+	}
+
+	/**
 	 * Test whether we can duplicate part of a tree
 	 * without infinite loops.
 	 *

@@ -59,6 +59,25 @@ class DuplicationManager
 	protected $cacheTables = FALSE;
 
 	/**
+	 * Recursively turns the keys of an array into
+	 * camelCase.
+	 *
+	 * @param $array array to camelize
+	 *
+	 * @return array
+	 */
+	public function camelfy( $array ) {
+		$newArray = array();
+		foreach( $array as $key => $element ) {
+			$newKey = preg_replace_callback( '/_(\w)/', function( &$matches ){
+				return strtoupper( $matches[1] );
+			}, $key);
+			$newArray[$newKey] = ( is_array($element) ) ? $this->camelfy( $element ) : $element;
+		}
+		return $newArray;
+	}
+
+	/**
 	 * Copies the shared beans in a bean, i.e. all the sharedBean-lists.
 	 *
 	 * @param OODBBean $copy   target bean to copy lists to
@@ -205,7 +224,7 @@ class DuplicationManager
 
 		$copy = $this->createCopy( $bean );
 		foreach ( $this->tables as $table ) {
-			
+
 			if ( !empty( $this->filters ) ) {
 				if ( !in_array( $table, $this->filters ) ) continue;
 			}
@@ -370,7 +389,7 @@ class DuplicationManager
 	 *
 	 * @return array
 	 */
-	public function exportAll( $beans, $parents = FALSE, $filters = array() )
+	public function exportAll( $beans, $parents = FALSE, $filters = array(), $camelfy = false)
 	{
 		$array = array();
 
@@ -385,6 +404,8 @@ class DuplicationManager
 
 			$array[]   = $duplicate->export( FALSE, $parents, FALSE, $filters );
 		}
+
+		if ($camelfy) $array = $this->camelfy( $array );
 
 		return $array;
 	}

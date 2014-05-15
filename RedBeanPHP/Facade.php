@@ -863,9 +863,9 @@ class Facade
 	 *
 	 * @return    array
 	 */
-	public static function exportAll( $beans, $parents = FALSE, $filters = array() )
+	public static function exportAll( $beans, $parents = FALSE, $filters = array(), $camelfy = false )
 	{
-		return self::$duplicationManager->exportAll( $beans, $parents, $filters );
+		return self::$duplicationManager->exportAll( $beans, $parents, $filters, $camelfy );
 	}
 
 	/**
