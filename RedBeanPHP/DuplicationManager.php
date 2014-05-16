@@ -62,17 +62,23 @@ class DuplicationManager
 	 * Recursively turns the keys of an array into
 	 * camelCase.
 	 *
-	 * @param $array array to camelize
+	 * @param array   $array       array to camelize
+	 * @param boolean $dolphinMode whether you want the exception for IDs.
 	 *
 	 * @return array
 	 */
-	public function camelfy( $array ) {
+	public function camelfy( $array, $dolphinMode = false ) {
 		$newArray = array();
 		foreach( $array as $key => $element ) {
 			$newKey = preg_replace_callback( '/_(\w)/', function( &$matches ){
 				return strtoupper( $matches[1] );
 			}, $key);
-			$newArray[$newKey] = ( is_array($element) ) ? $this->camelfy( $element ) : $element;
+
+			if ( $dolphinMode ) {
+				$newKey = preg_replace( '/(\w)Id$/', '$1ID', $newKey );
+			}
+
+			$newArray[$newKey] = ( is_array($element) ) ? $this->camelfy( $element, $dolphinMode ) : $element;
 		}
 		return $newArray;
 	}
@@ -383,13 +389,14 @@ class DuplicationManager
 	 * - all own bean lists (recursively)
 	 * - all shared beans (not THEIR own lists)
 	 *
-	 * @param   array|OODBBean  $beans   beans to be exported
-	 * @param   boolean                 $parents also export parents
-	 * @param   array                   $filters only these types (whitelist)
+	 * @param array|OODBBean $beans     beans to be exported
+	 * @param boolean        $parents   also export parents
+	 * @param array          $filters   only these types (whitelist)
+	 * @param string         $caseStyle case style identifier
 	 *
 	 * @return array
 	 */
-	public function exportAll( $beans, $parents = FALSE, $filters = array(), $camelfy = false)
+	public function exportAll( $beans, $parents = FALSE, $filters = array(), $caseStyle = 'snake')
 	{
 		$array = array();
 
@@ -405,7 +412,8 @@ class DuplicationManager
 			$array[]   = $duplicate->export( FALSE, $parents, FALSE, $filters );
 		}
 
-		if ($camelfy) $array = $this->camelfy( $array );
+		if ( $caseStyle === 'camel' ) $array = $this->camelfy( $array );
+		if ( $caseStyle === 'dolphin' ) $array = $this->camelfy( $array, true );
 
 		return $array;
 	}

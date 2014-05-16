@@ -112,6 +112,11 @@ class Facade
 	private static $plugins = array();
 
 	/**
+	 * @var string
+	 */
+	private static $exportCaseStyle = 'default';
+
+	/**
 	 * Internal Query function, executes the desired query. Used by
 	 * all facade query functions. This keeps things DRY.
 	 *
@@ -845,7 +850,6 @@ class Facade
 	public static function dup( $bean, $trail = array(), $pid = FALSE, $filters = array() )
 	{
 		self::$duplicationManager->setFilters( $filters );
-
 		return self::$duplicationManager->dup( $bean, $trail, $pid );
 	}
 
@@ -858,14 +862,38 @@ class Facade
 	 * - all shared beans (not THEIR own lists)
 	 *
 	 * @param    array|OODBBean $beans   beans to be exported
-	 * @param    boolean                $parents whether you want parent beans to be exported
-	 * @param   array                   $filters whitelist of types
+	 * @param    boolean        $parents whether you want parent beans to be exported
+	 * @param    array          $filters whitelist of types
 	 *
 	 * @return    array
 	 */
-	public static function exportAll( $beans, $parents = FALSE, $filters = array(), $camelfy = false )
+	public static function exportAll( $beans, $parents = FALSE, $filters = array())
 	{
-		return self::$duplicationManager->exportAll( $beans, $parents, $filters, $camelfy );
+		return self::$duplicationManager->exportAll( $beans, $parents, $filters, self::$exportCaseStyle );
+	}
+
+	/**
+	 * Selects case style for export.
+	 * This will determine the case style for the keys of exported beans (see exportAll).
+	 * The following options are accepted:
+	 *
+	 * 'default' RedBeanPHP by default enforces Snake Case (i.e. book_id is_valid )
+	 * 'camel'   Camel Case   (i.e. bookId isValid   )
+	 * 'dolphin' Dolphin Case (i.e. bookID isValid   ) Like CamelCase but ID is written all uppercase
+	 *
+	 * @warning RedBeanPHP transforms camelCase to snake_case using a slightly different
+	 * algorithm, it also converts isACL to is_acl (not is_a_c_l) and bookID to book_id.
+	 * Due to information loss this cannot be corrected. However if you might try
+	 * DolphinCase for IDs it takes into account the exception concerning IDs.
+	 *
+	 * @param string $caseStyle case style identifier
+	 *
+	 * @return void
+	 */
+	public static function useExportCase( $caseStyle = 'default' )
+	{
+		if ( !in_array( $caseStyle, array( 'default', 'camel', 'dolphin' ) ) ) throw new RedException( 'Invalid case selected.' );
+		self::$exportCaseStyle = $caseStyle;
 	}
 
 	/**

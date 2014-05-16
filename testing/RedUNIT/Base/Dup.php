@@ -6,6 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\DuplicationManager as DuplicationManager;
 use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\RedException as RedException;
 
 /**
  * Dup
@@ -40,6 +41,7 @@ class Dup extends Base
 		R::store( $book );
 		$book = $book->fresh();
 		$export = R::exportAll( $book );
+
 		asrt( isset( $export[0]['id'] ), true );
 		asrt( isset( $export[0]['is_cheap'] ), true );
 		asrt( isset( $export[0]['has_isbn_code'] ), true );
@@ -47,7 +49,9 @@ class Dup extends Base
 		asrt( isset( $export[0]['ownPage']['0']['is_written_well'] ), true );
 		asrt( isset( $export[0]['ownPage']['0']['contains_interesting_text'] ), true );
 		asrt( isset( $export[0]['ownPage']['0']['book_id'] ), true );
-		$export = R::exportAll( $book, false, array(), true );
+
+		R::useExportCase( 'camel' );
+		$export = R::exportAll( $book );
 		asrt( isset( $export[0]['id'] ), true );
 		asrt( isset( $export[0]['isCheap'] ), true );
 		asrt( isset( $export[0]['hasIsbnCode'] ), true );
@@ -55,6 +59,33 @@ class Dup extends Base
 		asrt( isset( $export[0]['ownPage']['0']['isWrittenWell'] ), true );
 		asrt( isset( $export[0]['ownPage']['0']['containsInterestingText'] ), true );
 		asrt( isset( $export[0]['ownPage']['0']['bookId'] ), true );
+
+		R::useExportCase( 'dolphin' );
+		$export = R::exportAll( $book );
+		asrt( isset( $export[0]['id'] ), true );
+		asrt( isset( $export[0]['isCheap'] ), true );
+		asrt( isset( $export[0]['hasIsbnCode'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['id'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['isWrittenWell'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['containsInterestingText'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['bookID'] ), true );
+
+		R::useExportCase( 'default' );
+		$export = R::exportAll( $book );
+		asrt( isset( $export[0]['id'] ), true );
+		asrt( isset( $export[0]['is_cheap'] ), true );
+		asrt( isset( $export[0]['has_isbn_code'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['id'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['is_written_well'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['contains_interesting_text'] ), true );
+		asrt( isset( $export[0]['ownPage']['0']['book_id'] ), true );
+
+		try {
+			R::useExportCase( 'invalid' );
+			fail();
+		} catch ( RedException $exception ) {
+			pass();
+		}
 	}
 
 	/**
