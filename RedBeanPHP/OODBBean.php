@@ -1481,6 +1481,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function &aggr( $list, $property, $type = NULL )
 	{
+		$this->via = NULL;
 		$ids = $beanIndex = $references = array();
 
 		if ( strlen( $list ) < 4 ) throw new RedException('Invalid own-list.');
