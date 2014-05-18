@@ -106,8 +106,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			if ( $oldName !== $this->via ) {
 				//set the new renaming rule
 				$writer->renameAssocTable( $oldName, $this->via );
-				$this->via = NULL;
 			}
+			$this->via = NULL;
 		}
 
 		$type             = $this->beau( $type );
@@ -470,6 +470,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->fetchType  = NULL;
 		$this->noLoad     = FALSE;
 		$this->all        = FALSE;
+		$this->via        = NULL;
 
 		return;
 	}
@@ -668,6 +669,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->fetchType  = NULL;
 		$this->noLoad     = FALSE;
 		$this->all        = FALSE;
+		$this->via        = NULL;
 		return $this;
 	}
 
@@ -738,6 +740,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$this->fetchType  = NULL;
 			$this->noLoad     = FALSE;
 			$this->all        = FALSE;
+			$this->via        = NULL;
 
 			$NULL = NULL;
 			return $NULL;
@@ -758,7 +761,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$this->fetchType  = NULL;
 			$this->noLoad     = FALSE;
 			$this->all        = FALSE;
-
+			$this->via        = NULL;
 			return $this->properties[$property];
 		}
 
@@ -788,6 +791,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$this->fetchType  = NULL;
 			$this->noLoad     = FALSE;
 			$this->all        = FALSE;
+			$this->via        = NULL;
 
 			return $this->properties[$property];
 
@@ -811,6 +815,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->fetchType  = NULL;
 		$this->noLoad     = FALSE;
 		$this->all        = FALSE;
+		$this->via        = NULL;
 
 		return $this->properties[$property];
 	}
@@ -877,6 +882,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->fetchType  = NULL;
 		$this->noLoad     = FALSE;
 		$this->all        = FALSE;
+		$this->via        = NULL;
 
 		$this->__info['tainted'] = TRUE;
 
@@ -1140,7 +1146,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function traverse( $property, $function, $maxDepth = NULL )
 	{
-
+		$this->via = NULL;
 		if ( strpos( $property, 'shared' ) !== FALSE ) {
 			throw new RedException( 'Traverse only works with (x)own-lists.' );
 		}

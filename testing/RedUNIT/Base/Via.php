@@ -7,6 +7,7 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 /**
  * Via
@@ -22,6 +23,147 @@ use RedBeanPHP\RedException\SQL as SQL;
  */
 class Via extends Base
 {
+	/**
+	 * Tests fix for issue #378.
+	 * Via property does not get cleared properly.
+	 *
+	 * @return void
+	 */
+	public function testIssue378()
+	{
+		R::nuke();
+		$mediaBean = R::dispense('media');
+		$fooPerson = R::dispense('person');
+		$mediaBean->sharedPersonList[] = $fooPerson;
+		R::store($mediaBean);
+		asrt( count( $mediaBean->sharedPersonList ), 1 );
+
+		$person = R::findOne('person');
+		$person->via('relation')->sharedMarriageList[] = R::dispense('marriage');
+		//this second one caused the via property to not get cleared
+		$person->via('relation')->sharedMarriageList;
+
+		asrt( count( $person->sharedMediaList ), 1 );
+
+		//also found this scenario, non-existing property
+		$book = R::dispense('book');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('garbage')->nothing;
+		asrt( count( $book->sharedPageList ), 1 );
+
+		//yet another
+		$book = R::dispense('magazine');
+		$book->ownAdList[] = R::dispense('ad');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('garbage')->ownAdList;
+		asrt( count( $book->sharedPageList ), 1 );
+
+		$book = R::dispense('folder');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('garbage')->sharedItemList[] = R::dispense('item');
+		asrt( count( $book->sharedPageList ), 1 );
+
+		$book = R::dispense('folder2');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('garbage')->sharedItemList[] = R::dispense('item');
+		$book->via('garbage')->sharedItemList[] = R::dispense('item');
+		asrt( count( $book->sharedPageList ), 1 );
+
+		$book = R::dispense('folder3');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('garbage')->item = R::dispense('item');
+		asrt( count( $book->sharedPageList ), 1 );
+
+		$book = R::dispense('folder3');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('garbage')->item = 'test';
+		asrt( count( $book->sharedPageList ), 1 );
+
+
+		//yet another
+		$book = R::dispense('leaflet');
+		$book->title = 'leaflet';
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('garbage')->title;
+		asrt( count( $book->sharedPageList ), 1 );
+
+		//yet another
+		$book = R::dispense('paper');
+		$book->author = R::dispense('author');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('garbage')->author;
+		asrt( count( $book->sharedPageList ), 1 );
+
+		$book = R::dispense('paper2');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('garbage')->author;
+		asrt( count( $book->sharedPageList ), 1 );
+
+		//yet another one
+		$book = R::dispense('archive');
+		$book->sharedItem[] = R::dispense('item');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		unset( $book->via('garbage')->sharedItem );
+		asrt( count( $book->sharedPageList ), 1 );
+
+		//theoretic cases
+		$book = R::dispense('guide');
+		$book->sharedItem[] = R::dispense('item');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('relation')->countShared('item');
+		$book->via('relation')->countShared('item');
+		asrt( count( $book->sharedPageList ), 1 );
+
+		$book = R::dispense('catalogue');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('relation')->countShared('item');
+		$book->via('relation')->countShared('item');
+		asrt( count( $book->sharedPageList ), 1 );
+
+		$book = R::dispense('tabloid');
+		$book->ownItemList[] = R::dispense('item');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('relation')->countOwn('item');
+		$book->via('relation')->countOwn('item');
+		asrt( count( $book->sharedPageList ), 1 );
+
+		$book = R::dispense('booklet');
+		$book->ownItemList[] = R::dispense('item');
+		$book->sharedPage[] = R::dispense('page');
+		R::store($book);
+		$book = $book->fresh();
+		$book->via('relation')->countOwn('item');
+		$book->via('relation')->countOwn('item');
+		asrt( count( $book->sharedPageList ), 1 );
+		AQueryWriter::clearRenames();
+	}
+
 	/**
 	 * Via specific tests.
 	 *
