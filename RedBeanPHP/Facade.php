@@ -842,8 +842,9 @@ class Facade
 	 * This function does a reflectional database query so it may be slow.
 	 *
 	 * @param OODBBean $bean  bean to be copied
-	 * @param array            $trail for internal usage, pass array()
-	 * @param boolean          $pid   for internal usage
+	 * @param array    $trail for internal usage, pass array()
+	 * @param boolean  $pid   for internal usage
+	 * @param array	   $white white list filter with bean types to duplicate
 	 *
 	 * @return array
 	 */
