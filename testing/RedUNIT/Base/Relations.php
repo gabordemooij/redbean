@@ -21,6 +21,25 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Relations extends Base
 {
+	/**
+	 * Test whether untainted parent bean dont
+	 * get saved.
+	 *
+	 * @return void
+	 */
+	public function testDontSaveParentIfNotTainted()
+	{
+		R::nuke();
+		$author = R::dispense( 'author' );
+		R::store( $author );
+		$book = R::dispense( 'book' );
+		$book->author = $author;
+		$book->author->name = 'x';
+		$book->author->setMeta( 'tainted', false );
+		R::store( $book );
+		$author = $author->fresh();
+		asrt( isset( $author->name ), false );
+	}
 
 	/**
 	 * Tests whether via() applies camelcase-to-snakecase
