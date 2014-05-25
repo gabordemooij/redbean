@@ -2,7 +2,7 @@
 
 chdir( '..' );
 xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
-require 'testcontainer/rb.phar';
+require 'testcontainer/rb.php';
 
 //load core classes
 require 'RedUNIT.php';
@@ -266,14 +266,17 @@ $hits = 0;
 
 $covLines = array();
 foreach( $report as $file => $lines ) {
+
 	$pi = pathinfo( $file );
 
 	if ( $covFilter !== null ) {
 		if ( strpos( $file, $covFilter ) === false ) continue;
 	} else {
-		if ( strpos( $file, 'phar/' ) === false ) continue;
-		if ( strpos( $file, '.php' ) === false ) continue;
-		if ( strpos( $file, 'RedBeanPHP' ) === false ) continue;
+		if ( strpos( $file, '/rb.php' ) === false) {
+			if ( strpos( $file, 'phar/' ) === false ) continue;
+			if ( strpos( $file, '.php' ) === false ) continue;
+			if ( strpos( $file, 'RedBeanPHP' ) === false ) continue;
+		}
 	}
 
 	$covLines[] = '***** File:'.$file.' ******';

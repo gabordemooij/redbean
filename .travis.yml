@@ -9,8 +9,8 @@ before_script:
   - touch /tmp/oodb.db
   - mysql -e 'create database oodb;'
   - psql -c 'create database oodb;' -U postgres
-  - php replica2.php
-  - cp rb.phar testing/cli/testcontainer/rb.phar  
+  - php replica3.php
+  - cp rb.phar testing/cli/testcontainer/rb.php  
   - cd testing/cli
     
  
