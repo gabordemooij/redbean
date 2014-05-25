@@ -29,7 +29,7 @@ use RedBeanPHP\Driver\RPDO as RPDO;
  * RedBean Facade
  *
  * Version Information
- * RedBean Version @version 4
+ * RedBean Version @version 4.1
  *
  * @file    RedBean/Facade.php
  * @desc    Convenience class for RedBeanPHP.
@@ -49,7 +49,7 @@ class Facade
 	/**
 	 * RedBeanPHP version constant.
 	 */
-	const C_REDBEANPHP_VERSION = '4.0';
+	const C_REDBEANPHP_VERSION = '4.1';
 
 	/**
 	 * @var array
