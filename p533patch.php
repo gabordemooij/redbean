@@ -4,7 +4,7 @@ echo "Running Patch P533...";
 echo PHP_EOL;
 
 $code = file_get_contents('rb.php');
-$code = str_replace('&__offsetGet', '__offsetGet', $code);
+$code = str_replace('&offsetGet', 'offsetGet', $code);
 
 $bytes = file_put_contents('rb-p533.php', $code);
 
