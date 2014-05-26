@@ -264,9 +264,11 @@ foreach( $report as $file => $lines ) {
 	if ( $covFilter !== null ) {
 		if ( strpos( $file, $covFilter ) === false ) continue;
 	} else {
-		if ( strpos( $file, 'phar/' ) === false ) continue;
-		if ( strpos( $file, '.php' ) === false ) continue;
-		if ( strpos( $file, 'RedBeanPHP' ) === false ) continue;
+		if ( strpos( $file, '/rb.php') === false) {
+			if ( strpos( $file, 'phar/' ) === false ) continue;
+			if ( strpos( $file, '.php' ) === false ) continue;
+			if ( strpos( $file, 'RedBeanPHP' ) === false ) continue;
+		}
 	}
 
 	$covLines[] = '***** File:'.$file.' ******';
