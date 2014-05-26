@@ -57,5 +57,7 @@ if ( defined( 'REDBEANPHP_PLUGINS' ) ) {
 
 //make some classes available for backward compatibility
 class RedBean_SimpleModel extends \RedBeanPHP\SimpleModel {};
-class R extends \RedBeanPHP\Facade{};
 
+if (!class_exists('R')) {
+	class R extends \RedBeanPHP\Facade{};
+}
