@@ -9,7 +9,7 @@ before_script:
   - touch /tmp/oodb.db
   - mysql -e 'create database oodb;'
   - psql -c 'create database oodb;' -U postgres
-  - php replica3.php
+  - php replica2.php
   - cp rb.php testing/cli/testcontainer/rb.php  
   - cd testing/cli
     
