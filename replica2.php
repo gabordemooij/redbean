@@ -46,7 +46,6 @@ define('DIR', 'RedBeanPHP/');
 
 addFile( DIR . 'Logger.php' );
 addFile( DIR . 'Logger/RDefault.php' );
-addFile( DIR . 'Logger/RDefault/Debug.php' );
 addFile( DIR . 'Driver.php' );
 addFile( DIR . 'Driver/RPDO.php' );
 addFile( DIR . 'OODBBean.php' );
