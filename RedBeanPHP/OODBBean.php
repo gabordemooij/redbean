@@ -22,14 +22,6 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 {
-
-	/**
-	 * Whether to skip beautification of columns or not.
-	 *
-	 * @var boolean
-	 */
-	private $flagSkipBeau = FALSE;
-
 	/**
 	 * This is where the real properties of the bean live. They are stored and retrieved
 	 * by the magic getter and setter (__get and __set).
