@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 echo "Welcome to Replica 2 Build Script for RedBeanPHP\n";
@@ -22,11 +23,11 @@ echo "Done.\n";
 
 echo "Creating PHAR archive... ";
 $phar = new Phar("rb.phar", 0, "rb.phar");
-$phar->buildFromDirectory('./build');
+$phar->buildFromDirectory('./build', '/^((?!loader\.php).)*$/');
 echo "Done.\n";
 
 echo "Adding stub... ";
-$phar->setStub($phar->createDefaultStub("loader.php"));
+$phar->setStub(file_get_contents(__DIR__ . '/build/loader.php') . "__HALT_COMPILER();\n");
 echo "Done.\n";
 
 echo "Your PHAR file has been generated.\n";
