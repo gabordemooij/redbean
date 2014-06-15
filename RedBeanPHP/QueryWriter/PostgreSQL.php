@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP\QueryWriter;
 
@@ -33,6 +33,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	const C_DATATYPE_SPECIAL_LSEG     = 91;
 	const C_DATATYPE_SPECIAL_CIRCLE   = 92;
 	const C_DATATYPE_SPECIAL_MONEY    = 93;
+	const C_DATATYPE_SPECIAL_POLYGON  = 94;
 	const C_DATATYPE_SPECIFIED        = 99;
 
 	/**
@@ -132,6 +133,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 			self::C_DATATYPE_SPECIAL_LSEG     => ' lseg ',
 			self::C_DATATYPE_SPECIAL_CIRCLE   => ' circle ',
 			self::C_DATATYPE_SPECIAL_MONEY    => ' money ',
+			self::C_DATATYPE_SPECIAL_POLYGON  => ' polygon ',
 		);
 
 		$this->sqltype_typeno = array();
@@ -215,6 +217,10 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 
 			if ( preg_match( '/^\<\([\d\.]+,[\d\.]+\),[\d\.]+\>$/', $value ) ) {
 				return PostgreSQL::C_DATATYPE_SPECIAL_CIRCLE;
+			}
+
+			if ( preg_match( '/^\((\([\d\.]+,[\d\.]+\),?)+\)$/', $value ) ) {
+				return PostgreSQL::C_DATATYPE_SPECIAL_POLYGON;
 			}
 
 			if ( preg_match( '/^\-?\$[\d,\.]+$/', $value ) ) {
@@ -357,13 +363,13 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 		$cfks = $this->adapter->getCell('
 			SELECT constraint_name
 				FROM information_schema.KEY_COLUMN_USAGE
-			WHERE 
+			WHERE
 				table_catalog = ?
-				AND table_schema = \'public\' 
-				AND table_name = ? 
+				AND table_schema = \'public\'
+				AND table_name = ?
 				AND column_name = ?
 		', array($db, $type, $field));
-		
+
 		try{
 			if (!$cfks) {
 				$delRule = ( $isDep ? 'CASCADE' : 'SET NULL' );

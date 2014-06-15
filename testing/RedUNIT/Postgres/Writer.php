@@ -409,6 +409,37 @@ class Writer extends Postgres
 	}
 
 	/**
+	 * Test polygons.
+	 *
+	 * @return void
+	 */
+	public function testPolygons()
+	{
+		$bean = R::dispense( 'bean' );
+		$bean->polygon = '((0,0),(1,1),(2,0))';
+		R::store( $bean );
+		$cols = R::getColumns( 'bean' );
+		asrt( $cols['polygon'], 'polygon' );
+		$bean = R::load( 'bean', $bean->id );
+		asrt( $bean->polygon, '((0,0),(1,1),(2,0))' );
+		$bean->note = 'taint';
+		R::store( $bean );
+		$bean = R::load( 'bean', $bean->id );
+		asrt( $bean->polygon, '((0,0),(1,1),(2,0))' );
+		$bean = R::dispense( 'bean' );
+		$bean->polygon = '((0,0),(1.2,1),(2,0.3))';
+		R::store( $bean );
+		$cols = R::getColumns( 'bean' );
+		asrt( $cols['polygon'], 'polygon' );
+		$bean = R::load( 'bean', $bean->id );
+		asrt( $bean->polygon, '((0,0),(1.2,1),(2,0.3))' );
+		$bean->note = 'taint';
+		R::store( $bean );
+		$bean = R::load( 'bean', $bean->id );
+		asrt( $bean->polygon, '((0,0),(1.2,1),(2,0.3))' );
+	}
+
+	/**
 	 * Test multi points.
 	 *
 	 * @return void
