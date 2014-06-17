@@ -40,6 +40,15 @@ class Writer extends \RedUNIT\Mysql
 		asrt( $columns['point'], 'point' );
 		$location = $location->fresh();
 		asrt( $location->point, 'POINT(14 6)' );
+		R::nuke();
+		$location = R::dispense( 'location' );
+		$location->point = 'LINESTRING(0 0,1 1,2 2)';
+		R::store($location);
+		$columns = R::inspect( 'location' );
+		asrt( $columns['point'], 'linestring' );
+		$location = $location->fresh();
+		asrt( $location->point, 'LINESTRING(0 0,1 1,2 2)' );
+		R::nuke();
 	}
 
 	/**

@@ -34,6 +34,9 @@ class MySQL extends AQueryWriter implements QueryWriter
 	const C_DATATYPE_SPECIAL_DATE     = 80;
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
 	const C_DATATYPE_SPECIAL_POINT    = 90;
+	const C_DATATYPE_SPECIAL_LINESTRING = 91;
+	const C_DATATYPE_SPECIAL_POLYGON    = 92;
+
 	const C_DATATYPE_SPECIFIED        = 99;
 
 	/**
@@ -122,6 +125,8 @@ class MySQL extends AQueryWriter implements QueryWriter
 			MySQL::C_DATATYPE_SPECIAL_DATE     => ' DATE ',
 			MySQL::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
 			MySQL::C_DATATYPE_SPECIAL_POINT    => ' POINT ',
+			MySQL::C_DATATYPE_SPECIAL_LINESTRING => ' LINESTRING ',
+			MySQL::C_DATATYPE_SPECIAL_POLYGON => ' POLYGON ',
 		);
 
 		$this->sqltype_typeno = array();
@@ -198,8 +203,14 @@ class MySQL extends AQueryWriter implements QueryWriter
 			if ( preg_match( '/^\d{4}\-\d\d-\d\d\s\d\d:\d\d:\d\d$/', $value ) ) {
 				return MySQL::C_DATATYPE_SPECIAL_DATETIME;
 			}
-			if ( preg_match( '/^POINT\([\d\.]+\s[\d\.]+\)$/', $value ) ) {
+			if ( preg_match( '/^POINT\(/', $value ) ) {
 				return MySQL::C_DATATYPE_SPECIAL_POINT;
+			}
+			if ( preg_match( '/^LINESTRING\(/', $value ) ) {
+				return MySQL::C_DATATYPE_SPECIAL_LINESTRING;
+			}
+			if ( preg_match( '/^POLYGON\(/', $value ) ) {
+				return MySQL::C_DATATYPE_SPECIAL_POLYGON;
 			}
 		}
 
