@@ -105,8 +105,8 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	protected function getSQLFilterSnippet( $type )
 	{
 		$sqlFilters = array();
-		if ( isset( self::$sqlFilters['r'][$type] ) ) {
-			foreach( self::$sqlFilters['r'][$type] as $property => $sqlFilter ) {
+		if ( isset( self::$sqlFilters[QueryWriter::C_SQLFILTER_READ][$type] ) ) {
+			foreach( self::$sqlFilters[QueryWriter::C_SQLFILTER_READ][$type] as $property => $sqlFilter ) {
 				$sqlFilters[] = $sqlFilter.' AS '.$property.' ';
 			}
 		}
