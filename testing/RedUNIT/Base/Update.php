@@ -5,6 +5,8 @@ namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 /**
  * Update
@@ -20,6 +22,64 @@ use RedBeanPHP\RedException as RedException;
  */
 class Update extends Base
 {
+	/**
+	 * Test whether we can use SQL filters and
+	 * whether they are being applied properly for
+	 * different types of SELECT queries in the QueryWriter.
+	 */
+	public function testSQLFilters()
+	{
+		R::nuke();
+		AQueryWriter::setSQLFilters(array(
+			QueryWriter::C_SQLFILTER_READ => array(
+				'book' => array( 'title' => ' LOWER(book.title) '),
+			),
+			QueryWriter::C_SQLFILTER_WRITE => array(
+				'book' => array( 'title' => ' UPPER(?) '),
+			),
+		));
+
+		$book = R::dispense( 'book' );
+		$book->title = 'story';
+		R::store( $book );
+		asrt( R::getCell( 'SELECT title FROM book WHERE id = ?', array( $book->id ) ), 'STORY' );
+		$book = $book->fresh();
+		asrt( $book->title, 'story' );
+		$library = R::dispense( 'library' );
+		$library->sharedBookList[] = $book;
+		R::store( $library );
+		$library = $library->fresh();
+		$books = $library->sharedBookList;
+		$book = reset( $books );
+		asrt( $book->title, 'story' );
+		$otherBook = R::dispense('book');
+		$otherBook->sharedBook[] = $book;
+		R::store( $otherBook );
+		$otherBook = $otherBook->fresh();
+		$books = $otherBook->sharedBookList;
+		$book = reset( $books );
+		asrt( $book->title, 'story' );
+		$links = $book->ownBookBookList;
+		$link = reset( $links );
+		$link->shelf = 'x13';
+		AQueryWriter::setSQLFilters(array(
+			QueryWriter::C_SQLFILTER_READ => array(
+				'book' => array( 'title' => ' LOWER(book.title) '),
+				'book_book' => array( 'shelf' => ' LOWER(book_book.shelf) '),
+			),
+			QueryWriter::C_SQLFILTER_WRITE => array(
+				'book' => array( 'title' => ' UPPER(?) '),
+				'book_book' => array( 'shelf' => ' UPPER(?) ')
+			),
+		));
+		R::store( $link );
+		asrt( R::getCell( 'SELECT shelf FROM book_book WHERE id = ?', array( $link->id ) ), 'X13' );
+		$otherBook = $otherBook->fresh();
+		unset($book->sharedBookList[$otherBook->id]);
+		R::store( $book );
+		AQueryWriter::setSQLFilters(array());
+	}
+
 	/**
 	 * Test unsetting properties.
 	 *
@@ -448,3 +508,4 @@ class Update extends Base
 		asrt( (int) $pdo->GetCell( "SELECT count(*) FROM page" ), 0 );
 	}
 }
+

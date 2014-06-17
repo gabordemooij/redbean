@@ -56,7 +56,7 @@ class ObserverMock implements \RedBeanPHP\Observer
 class Model_Band extends RedBeanPHP\SimpleModel
 {
 	public function after_update() { }
-	
+
 	private $notes = array();
 
 	/**
@@ -95,10 +95,10 @@ class Model_Band extends RedBeanPHP\SimpleModel
 	{
 		return isset( $this->$prop );
 	}
-	
+
 	/**
 	 * Sets a note.
-	 * 
+	 *
 	 * @param string $note
 	 *
 	 * @param mixed $value
@@ -109,10 +109,10 @@ class Model_Band extends RedBeanPHP\SimpleModel
 	{
 		$this->notes[ $note ] = $value;
 	}
-	
+
 	/**
 	 * Returns the value of a note.
-	 * 
+	 *
 	 * @param string $note
 	 *
 	 * @return string
@@ -333,7 +333,7 @@ class Model_PageWidget extends RedBean_SimpleModel {
 
 	/**
 	 * Returns the test flag.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getTestReport()
@@ -363,7 +363,7 @@ class Model_Gadget_Page extends RedBean_SimpleModel {
 
 	/**
 	 * Returns the test flag.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getTestReport()
@@ -392,7 +392,7 @@ class Model_A_B_C extends RedBean_SimpleModel {
 
 	/**
 	 * Returns the test flag.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getTestReport()
@@ -406,5 +406,11 @@ class Model_A_B_C extends RedBean_SimpleModel {
 	public function update()
 	{
 		self::$test = 'didSave';
+	}
+}
+
+class Model_BookBook extends \RedBean_SimpleModel {
+	public function delete() {
+		asrt($this->bean->shelf, 'x13');
 	}
 }

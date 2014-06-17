@@ -26,6 +26,11 @@ namespace RedBeanPHP;
  */
 interface QueryWriter
 {
+	/**
+	 * SQL filter constants
+	 */
+	const C_SQLFILTER_READ = 'r';
+	const C_SQLFILTER_WRITE = 'w';
 
 	/**
 	 * Query Writer constants.

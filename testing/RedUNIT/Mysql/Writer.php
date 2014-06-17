@@ -4,7 +4,9 @@ namespace RedUNIT\Mysql;
 
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
+use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\QueryWriter\MySQL as MySQL;
+use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\RedException as RedException;
 
@@ -22,6 +24,24 @@ use RedBeanPHP\RedException as RedException;
  */
 class Writer extends \RedUNIT\Mysql
 {
+
+	/**
+	 * Test Facade bind function method.
+	 */
+	public function testFunctionFilters()
+	{
+		R::nuke();
+		R::bindFunc('read', 'location.point', 'asText');
+		R::bindFunc('write', 'location.point', 'GeomFromText');
+		$location = R::dispense( 'location' );
+		$location->point = 'POINT(14 6)';
+		R::store($location);
+		$columns = R::inspect( 'location' );
+		asrt( $columns['point'], 'point' );
+		$location = $location->fresh();
+		asrt( $location->point, 'POINT(14 6)' );
+	}
+
 	/**
 	 * Test scanning and coding of values.
 	 *
