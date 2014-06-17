@@ -27,7 +27,10 @@ $phar->buildFromDirectory('./build', '/^((?!loader\.php).)*$/');
 echo "Done.\n";
 
 echo "Adding stub... ";
-$phar->setStub(file_get_contents(__DIR__ . '/build/loader.php') . "__HALT_COMPILER();\n");
+$stub = "<"."?php Phar::mapPhar();\n";
+$stub .= str_replace('<'.'?php','',file_get_contents('build/loader.php'));
+$stub .= "__HALT_COMPILER();\n";
+$phar->setStub($stub);
 echo "Done.\n";
 
 echo "Your PHAR file has been generated.\n";
