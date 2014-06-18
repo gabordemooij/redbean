@@ -629,7 +629,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		$table = $this->esc( $type );
 
 		$sqlFilterStr = '';
-		if (count(self::$sqlFilters)) {
+		if ( count( self::$sqlFilters ) ) {
 			$sqlFilterStr = $this->getSQLFilterSnippet( $type );
 		}
 

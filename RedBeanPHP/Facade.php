@@ -1545,11 +1545,16 @@ class Facade
 			self::$sqlFilters[$mode][$type] = array();
 		}
 
-		if ($mode === QueryWriter::C_SQLFILTER_WRITE) {
-			self::$sqlFilters[$mode][$type][$property] = $function.'(?)';
+		if ( is_null( $function ) ) {
+			unset( self::$sqlFilters[$mode][$type][$property] );
 		} else {
-			self::$sqlFilters[$mode][$type][$property] = $function."($field)";
+			if ($mode === QueryWriter::C_SQLFILTER_WRITE) {
+				self::$sqlFilters[$mode][$type][$property] = $function.'(?)';
+			} else {
+				self::$sqlFilters[$mode][$type][$property] = $function."($field)";
+			}
 		}
+
 		AQueryWriter::setSQLFilters(self::$sqlFilters);
 	}
 

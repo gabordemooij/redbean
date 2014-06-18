@@ -46,6 +46,8 @@ class Writer extends \RedUNIT\Mysql
 		R::store($location);
 		$columns = R::inspect( 'location' );
 		asrt( $columns['point'], 'linestring' );
+		$location->bustcache = 2;
+		R::store($location);
 		$location = $location->fresh();
 		asrt( $location->point, 'LINESTRING(0 0,1 1,2 2)' );
 		R::nuke();
@@ -54,8 +56,15 @@ class Writer extends \RedUNIT\Mysql
 		R::store($location);
 		$columns = R::inspect( 'location' );
 		asrt( $columns['point'], 'polygon' );
+		$location->bustcache = 4;
+		R::store($location);
 		$location = $location->fresh();
 		asrt( $location->point, 'POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))' );
+		R::bindFunc( 'read', 'location.point', null );
+		$location->bustcache = 1;
+		R::store($location);
+		$location = $location->fresh();
+		asrt( ( $location->point === 'POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))' ), FALSE );
 	}
 
 	/**
