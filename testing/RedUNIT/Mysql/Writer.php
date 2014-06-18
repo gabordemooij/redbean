@@ -27,12 +27,13 @@ class Writer extends \RedUNIT\Mysql
 
 	/**
 	 * Test Facade bind function method.
+	 * Test for MySQL WKT spatial format.
 	 */
 	public function testFunctionFilters()
 	{
 		R::nuke();
-		R::bindFunc('read', 'location.point', 'asText');
-		R::bindFunc('write', 'location.point', 'GeomFromText');
+		R::bindFunc( 'read', 'location.point', 'asText' );
+		R::bindFunc( 'write', 'location.point', 'GeomFromText' );
 		$location = R::dispense( 'location' );
 		$location->point = 'POINT(14 6)';
 		R::store($location);
@@ -60,11 +61,13 @@ class Writer extends \RedUNIT\Mysql
 		R::store($location);
 		$location = $location->fresh();
 		asrt( $location->point, 'POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))' );
-		R::bindFunc( 'read', 'location.point', null );
+		R::bindFunc( 'read', 'location.point', NULL );
 		$location->bustcache = 1;
 		R::store($location);
 		$location = $location->fresh();
 		asrt( ( $location->point === 'POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))' ), FALSE );
+		$filters = AQueryWriter::getSQLFilters();
+		asrt( is_array( $filters ), TRUE );
 	}
 
 	/**
