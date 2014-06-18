@@ -77,6 +77,30 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 
 	/**
 	 * Sets SQL filters.
+	 * This is a lowlevel method to set the SQL filter array.
+	 * The format of this array is:
+	 *
+	 * array(
+	 * 		'<MODE, i.e. 'r' for read, 'w' for write>' => array(
+	 * 			'<TABLE NAME>' => array(
+	 * 				'<COLUMN NAME>' => '<SQL>'
+	 * 			)
+	 * 		)
+	 * )
+	 *
+	 * Example:
+	 *
+	 * array(
+	 * QueryWriter::C_SQLFILTER_READ => array(
+	 * 	'book' => array(
+	 * 		'title' => ' LOWER(book.title) '
+	 * 	)
+	 * )
+	 *
+	 * Note that you can use constants instead of magical chars
+	 * as keys for the uppermost array.
+	 * This is a lowlevel method. For a more friendly method
+	 * please take a look at the facade: R::bindFunc().
 	 *
 	 * @param array
 	 */
@@ -87,6 +111,9 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 
 	/**
 	 * Returns current SQL Filters.
+	 * This method returns the raw SQL filter array.
+	 * This is a lowlevel method. For a more friendly method
+	 * please take a look at the facade: R::bindFunc().
 	 *
 	 * @return array
 	 */
