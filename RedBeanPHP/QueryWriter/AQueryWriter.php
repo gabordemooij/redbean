@@ -58,12 +58,16 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	/**
 	 * @var array
 	 */
-	public static $sqlFilters = array();
+	private static $sqlFilters = array();
+
+	private static $flagSQLFilterSafeMode = false;
 
 	/**
 	 * @var array
 	 */
 	public $typeno_sqltype = array();
+
+
 
 	/**
 	 * Clears renames.
@@ -104,8 +108,9 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 *
 	 * @param array
 	 */
-	public static function setSQLFilters( $sqlFilters )
+	public static function setSQLFilters( $sqlFilters, $safeMode = false )
 	{
+		self::$flagSQLFilterSafeMode = (boolean) $safeMode;
 		self::$sqlFilters = $sqlFilters;
 	}
 
@@ -131,10 +136,17 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 */
 	protected function getSQLFilterSnippet( $type )
 	{
+		$existingCols = array();
+		if (self::$flagSQLFilterSafeMode) {
+			$existingCols = $this->getColumns( $type );
+		}
+
 		$sqlFilters = array();
 		if ( isset( self::$sqlFilters[QueryWriter::C_SQLFILTER_READ][$type] ) ) {
 			foreach( self::$sqlFilters[QueryWriter::C_SQLFILTER_READ][$type] as $property => $sqlFilter ) {
-				$sqlFilters[] = $sqlFilter.' AS '.$property.' ';
+				if ( !self::$flagSQLFilterSafeMode || isset( $existingCols[$property] ) ) {
+					$sqlFilters[] = $sqlFilter.' AS '.$property.' ';
+				}
 			}
 		}
 		$sqlFilterStr = ( count($sqlFilters) ) ? ( ','.implode( ',', $sqlFilters ) ) : '';

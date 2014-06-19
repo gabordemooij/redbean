@@ -37,6 +37,10 @@ use RedBeanPHP\Repository\Frozen as FrozenRepo;
  */
 class OODB extends Observable
 {
+	/**
+	 * @var array
+	 */
+	private static $sqlFilters = array();
 
 	/**
 	 * @var array
@@ -88,7 +92,6 @@ class OODB extends Observable
 	 * @var FluidRepo
 	 */
 	protected $fluidRepository = NULL;
-
 
 	/**
 	 * Unboxes a bean from a FUSE model if needed and checks whether the bean is
@@ -161,6 +164,10 @@ class OODB extends Observable
 			}
 
 			$this->repository = $this->fluidRepository;
+		}
+
+		if ( count( self::$sqlFilters ) ) {
+			AQueryWriter::setSQLFilters( self::$sqlFilters, ( !$this->isFrozen ) );
 		}
 
 	}
@@ -489,5 +496,37 @@ class OODB extends Observable
 	public function getCurrentRepository()
 	{
 		return $this->repository;
+	}
+
+	/**
+	 * Binds an SQL function to a column.
+	 * This method can be used to setup a decode/encode scheme or
+	 * perform UUID insertion. This method is especially useful for handling
+	 * MySQL spatial columns, because they need to be processed first using
+	 * the asText/GeomFromText functions.
+	 *
+	 * @param string $mode (read or write)
+	 * @param string $field
+	 * @param string $function
+	 */
+	public function bindFunc( $mode, $field, $function )
+	{
+		list( $type, $property ) = explode( '.', $field );
+		$mode = ($mode === 'write') ? QueryWriter::C_SQLFILTER_WRITE : QueryWriter::C_SQLFILTER_READ;
+
+		if ( !isset( self::$sqlFilters[$mode] ) ) self::$sqlFilters[$mode] = array();
+		if ( !isset( self::$sqlFilters[$mode][$type] ) ) self::$sqlFilters[$mode][$type] = array();
+
+		if ( is_null( $function ) ) {
+			unset( self::$sqlFilters[$mode][$type][$property] );
+		} else {
+			if ($mode === QueryWriter::C_SQLFILTER_WRITE) {
+				self::$sqlFilters[$mode][$type][$property] = $function.'(?)';
+			} else {
+				self::$sqlFilters[$mode][$type][$property] = $function."($field)";
+			}
+		}
+
+		AQueryWriter::setSQLFilters( self::$sqlFilters, ( !$this->isFrozen ) );
 	}
 }

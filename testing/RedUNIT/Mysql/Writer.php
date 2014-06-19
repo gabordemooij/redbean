@@ -34,6 +34,21 @@ class Writer extends \RedUNIT\Mysql
 		R::nuke();
 		R::bindFunc( 'read', 'location.point', 'asText' );
 		R::bindFunc( 'write', 'location.point', 'GeomFromText' );
+		R::store(R::dispense('location'));
+		R::freeze( true );
+		try {
+			R::find('location');
+			fail();
+		} catch( SQL $exception ) {
+			pass();
+		}
+		R::freeze( false );
+		try {
+			R::find('location');
+			pass();
+		} catch( SQL $exception ) {
+			fail();
+		}
 		$location = R::dispense( 'location' );
 		$location->point = 'POINT(14 6)';
 		R::store($location);

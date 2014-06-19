@@ -117,11 +117,6 @@ class Facade
 	private static $exportCaseStyle = 'default';
 
 	/**
-	 * @var array
-	 */
-	private static $sqlFilters = array();
-
-	/**
 	 * Internal Query function, executes the desired query. Used by
 	 * all facade query functions. This keeps things DRY.
 	 *
@@ -1545,24 +1540,7 @@ class Facade
 	 *
 	 */
 	public static function bindFunc( $mode, $field, $function ) {
-
-		list( $type, $property ) = explode( '.', $field );
-		$mode = ($mode === 'write') ? QueryWriter::C_SQLFILTER_WRITE : QueryWriter::C_SQLFILTER_READ;
-
-		if ( !isset( self::$sqlFilters[$mode] ) ) self::$sqlFilters[$mode] = array();
-		if ( !isset( self::$sqlFilters[$mode][$type] ) ) self::$sqlFilters[$mode][$type] = array();
-
-		if ( is_null( $function ) ) {
-			unset( self::$sqlFilters[$mode][$type][$property] );
-		} else {
-			if ($mode === QueryWriter::C_SQLFILTER_WRITE) {
-				self::$sqlFilters[$mode][$type][$property] = $function.'(?)';
-			} else {
-				self::$sqlFilters[$mode][$type][$property] = $function."($field)";
-			}
-		}
-
-		AQueryWriter::setSQLFilters(self::$sqlFilters);
+		self::$redbean->bindFunc( $mode, $field, $function );
 	}
 
 	/**
