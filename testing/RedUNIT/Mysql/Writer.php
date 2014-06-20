@@ -83,6 +83,28 @@ class Writer extends \RedUNIT\Mysql
 		asrt( ( $location->point === 'POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))' ), FALSE );
 		$filters = AQueryWriter::getSQLFilters();
 		asrt( is_array( $filters ), TRUE );
+		asrt( count( $filters ), 2 );
+		asrt( isset( $filters[ QueryWriter::C_SQLFILTER_READ] ), TRUE );
+		asrt( isset( $filters[ QueryWriter::C_SQLFILTER_WRITE] ), TRUE );
+		R::bindFunc( 'read', 'place.point', 'asText' );
+		R::bindFunc( 'write', 'place.point', 'GeomFromText' );
+		R::bindFunc( 'read', 'place.line', 'asText' );
+		R::bindFunc( 'write', 'place.line', 'GeomFromText' );
+		R::nuke();
+		$place = R::dispense( 'place' );
+		$place->point = 'POINT(13.2 666.6)';
+		$place->line = 'LINESTRING(9.2 0,3 1.33)';
+		R::store( $place );
+		$columns = R::inspect( 'place' );
+		asrt( $columns['point'], 'point' );
+		asrt( $columns['line'], 'linestring' );
+		$place = R::findOne('place');
+		asrt( $place->point, 'POINT(13.2 666.6)' );
+		asrt( $place->line, 'LINESTRING(9.2 0,3 1.33)' );
+		R::bindFunc( 'read', 'place.point', NULL );
+		R::bindFunc( 'write', 'place.point', NULL );
+		R::bindFunc( 'read', 'place.line', NULL );
+		R::bindFunc( 'write', 'place.line', NULL );
 	}
 
 	/**
