@@ -70,8 +70,6 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 */
 	public $typeno_sqltype = array();
 
-
-
 	/**
 	 * Clears renames.
 	 *
