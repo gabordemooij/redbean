@@ -60,6 +60,9 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 */
 	private static $sqlFilters = array();
 
+	/**
+	 * @var boolean
+	 */
 	private static $flagSQLFilterSafeMode = false;
 
 	/**
