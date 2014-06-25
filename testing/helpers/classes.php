@@ -414,3 +414,81 @@ class Model_BookBook extends \RedBean_SimpleModel {
 		asrt($this->bean->shelf, 'x13');
 	}
 }
+
+/*
+class UUIDWriterMySQL extends \RedBeanPHP\QueryWriter\MySQL {
+	//Because MySQL does not allow insert NULL primary key even if trigger.
+	protected $defaultValue = '@uuid';
+	public function updateRecord($table, $updateValues, $id = NULL)
+	{
+		//if you want less queries, you can put this one here in a trigger.
+		$flagNeedsReturnID = (!$id);
+		if ($flagNeedsReturnID) R::exec('SET @uuid = uuid() ');
+		$id = parent::updateRecord( $table, $updateValues, $id );
+		if ( $flagNeedsReturnID ) $id = R::getCell('SELECT @uuid');
+		return $id;
+	}
+}*/
+
+class UUIDWriterMySQL extends \RedBeanPHP\QueryWriter\MySQL {
+
+	protected $defaultValue = '@uuid';
+	const C_DATATYPE_SPECIAL_UUID  = 97;
+
+	public function __construct( \RedBeanPHP\Adapter $adapter )
+	{
+		parent::__construct( $adapter );
+		$this->addDataType( self::C_DATATYPE_SPECIAL_UUID, 'char(36)'  );
+	}
+
+	public function createTable( $table )
+	{
+		$table = $this->esc( $table );
+		$sql   = "
+			CREATE TABLE {$table} (
+			id char(36) NOT NULL,
+			PRIMARY KEY ( id ))
+			ENGINE = InnoDB DEFAULT
+			CHARSET=utf8mb4
+			COLLATE=utf8mb4_unicode_ci ";
+		$this->adapter->exec( $sql );
+	}
+
+	public function updateRecord($table, $updateValues, $id = NULL)
+	{
+		$flagNeedsReturnID = (!$id);
+		if ($flagNeedsReturnID) R::exec('SET @uuid = uuid() ');
+		$id = parent::updateRecord( $table, $updateValues, $id );
+		if ( $flagNeedsReturnID ) $id = R::getCell('SELECT @uuid');
+		return $id;
+	}
+
+	public function getTypeForID()
+	{
+		return self::C_DATATYPE_SPECIAL_UUID;
+	}
+}
+
+class UUIDWriterPostgres extends \RedBeanPHP\QueryWriter\PostgreSQL {
+
+	protected $defaultValue = 'uuid_generate_v4()';
+	const C_DATATYPE_SPECIAL_UUID  = 97;
+
+	public function __construct( \RedBeanPHP\Adapter $adapter )
+	{
+		parent::__construct( $adapter );
+		$this->addDataType( self::C_DATATYPE_SPECIAL_UUID, 'uuid'  );
+	}
+
+	public function createTable( $table )
+	{
+		$table = $this->esc( $table );
+		$this->adapter->exec( " CREATE TABLE $table (id uuid PRIMARY KEY); " );
+	}
+
+	public function getTypeForID()
+	{
+		return self::C_DATATYPE_SPECIAL_UUID;
+	}
+}
+

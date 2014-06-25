@@ -80,12 +80,14 @@ class MySQL extends AQueryWriter implements QueryWriter
 
 			$columns = $this->getColumns( $table );
 
-			if ( $this->code( $columns[$property1] ) !== MySQL::C_DATATYPE_UINT32 ) {
-				$this->widenColumn( $table, $property1, MySQL::C_DATATYPE_UINT32 );
+			$idType = $this->getTypeForID();
+
+			if ( $this->code( $columns[$property1] ) !==  $idType ) {
+				$this->widenColumn( $table, $property1, $idType );
 			}
 
-			if ( $this->code( $columns[$property2] ) !== MySQL::C_DATATYPE_UINT32 ) {
-				$this->widenColumn( $table, $property2, MySQL::C_DATATYPE_UINT32 );
+			if ( $this->code( $columns[$property2] ) !== $idType ) {
+				$this->widenColumn( $table, $property2, $idType );
 			}
 
 			$sql = "
