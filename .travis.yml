@@ -7,6 +7,7 @@ php:
 before_script:
   - touch /tmp/oodb.db
   - mysql -e 'create database oodb;'
+  - psql template1 -c 'CREATE EXTENSION "uuid-ossp";' -U postgres
   - psql -c 'create database oodb;' -U postgres
   - php replica2.php
   - cp rb.php testing/cli/testcontainer/rb.php  

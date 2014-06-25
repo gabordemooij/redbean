@@ -297,6 +297,23 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
+	 * Adds a data type to the list of data types.
+	 * Use this method to add a new column type definition to the writer.
+	 * Used for UUID support.
+	 *
+	 * @param integer $dataTypeID    magic number constant assigned to this data type
+	 * @param string  $SQLDefinition SQL column definition (i.e. INT(11))
+	 *
+	 * @return self
+	 */
+	protected function addDataType( $dataTypeID, $SQLDefinition )
+	{
+		$this->typeno_sqltype[ $dataTypeID ] = $SQLDefinition;
+		$this->sqltype_typeno[ $SQLDefinition ] = $dataTypeID;
+		return $this;
+	}
+
+	/**
 	 * Returns the sql that should follow an insert statement.
 	 *
 	 * @param string $table name

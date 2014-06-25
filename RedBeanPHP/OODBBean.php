@@ -113,6 +113,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	private function getSharedList( $type, $redbean, $toolbox )
 	{
+
 		$writer = $toolbox->getWriter();
 
 		if ( $this->via ) {
@@ -124,11 +125,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$this->via = NULL;
 		}
 
-		$type             = $this->beau( $type );
-
-		$assocManager     = $redbean->getAssociationManager();
-
-		$beans            = $assocManager->related( $this, $type, $this->withSql, $this->withParams );
+		$beans = array();
+		if ($this->getID()) {
+			$type             = $this->beau( $type );
+			$assocManager     = $redbean->getAssociationManager();
+			$beans            = $assocManager->related( $this, $type, $this->withSql, $this->withParams );
+		}
 
 		$this->withSql    = '';
 		$this->withParams = array();
@@ -162,7 +164,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		$beans = array();
 
-		if ( $this->getID() > 0 ) {
+		if ( $this->getID() ) {
 
 			$firstKey = NULL;
 			if ( count( $this->withParams ) > 0 ) {
@@ -1406,7 +1408,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		$count = 0;
 
-		if ( $this->getID() !== 0 ) {
+		if ( $this->getID() ) {
 
 			$firstKey = NULL;
 			if ( count( $this->withParams ) > 0 ) {
@@ -1456,7 +1458,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$type  = $this->beau( $type );
 		$count = 0;
 
-		if ( $this->getID() > 0 ) {
+		if ( $this->getID() ) {
 			$count = $redbean->getAssociationManager()->relatedCount( $this, $type, $this->withSql, $this->withParams, TRUE );
 		}
 
