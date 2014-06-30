@@ -4,13 +4,14 @@ php:
   - 5.4
   - 5.5
   - 5.6
+  - hhvm
 
 before_script:
   - touch /tmp/oodb.db
   - mysql -e 'create database oodb;'
   - psql template1 -c 'CREATE EXTENSION "uuid-ossp";' -U postgres
   - psql -c 'create database oodb;' -U postgres
-  - php replica2.php
+  - php replica2.php onlyphp
   - cp rb.php testing/cli/testcontainer/rb.php  
   - cd testing/cli
     

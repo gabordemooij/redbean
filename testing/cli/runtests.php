@@ -1,7 +1,11 @@
 <?php
 
 chdir( '..' );
-xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
+
+
+$xdebugSupported = (function_exists('xdebug_start_code_coverage'));
+
+if ($xdebugSupported) xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
 require 'testcontainer/rb.php';
 
 //load core classes
@@ -258,6 +262,12 @@ foreach ( $packList as $testPack ) {
 		$test->run();
 		$test->cleanUp();
 	}
+}
+
+
+if (!$xdebugSupported) {
+	echo 'Done. No report - XDEBUG not installed.';
+	exit(0);
 }
 
 $report = xdebug_get_code_coverage();
