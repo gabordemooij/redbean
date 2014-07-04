@@ -1,0 +1,8 @@
+
+Test notes
+==========
+
+* PostgreSQL tests perform a text-to-money cast test, make sure lc_monetary is set to en_US
+in your postgres.conf
+* PostgreSQL tests need the ossp extension, to enable this, install the postgres-contrib package and run SQL: CREATE EXTENSION "uuid-ossp";
+* XDebug is NOT required but recommended
