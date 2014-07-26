@@ -25,12 +25,6 @@ use RedBeanPHP\OODBBean as OODBBean;
  * with this source code in the file license.txt.
  */
 abstract class AQueryWriter { //bracket must be here - otherwise coverage software does not understand.
-	
-	/**
-	 * @var boolean
-	 */
-	protected $wideField = false;
-	
 	/**
 	 * @var DBAdapter
 	 */
@@ -697,7 +691,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		}
 
 		$sql   = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
-		$sql   = "SELECT {$table}.* {$sqlFilterStr} FROM {$table} {$sql} -- keep-cache";
+		$sql   = "SELECT * {$sqlFilterStr} FROM {$table} {$sql} -- keep-cache";
 
 		$rows  = $this->adapter->get( $sql, $bindings );
 
