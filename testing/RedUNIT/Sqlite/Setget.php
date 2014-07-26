@@ -44,7 +44,9 @@ class Setget extends Sqlite
 		asrt( setget( -2147483647 ), "-2147483647" );
 		asrt( setget( "-2147483647" ), "-2147483647" );
 
-		asrt( setget( "2147483648" ), "2147483648" );
+		if (PHP_MAJOR_VERSION === 5 && PHP_MINOR_VERSION > 3) {
+			asrt( setget( "2147483648" ), "2147483648" );
+		}
 		asrt( setget( "-2147483648" ), "-2147483648" );
 
 		asrt( setget( "199936710040730" ), "199936710040730" );
