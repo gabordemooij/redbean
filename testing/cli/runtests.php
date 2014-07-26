@@ -149,6 +149,7 @@ $allPacks = array(
 	'Base/Fuse',
 	'Base/Tags',
 	'Base/Null',
+	'Base/Largenum',
 	'Base/Issue90',
 	'Base/Issue259',
 	'Base/Issue303',
