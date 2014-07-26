@@ -90,7 +90,7 @@ class RPDO implements Driver
 			if ( is_integer( $key ) ) {
 				if ( is_null( $value ) ) {
 					$statement->bindValue( $key + 1, NULL,\PDO::PARAM_NULL );
-				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && $value < 2147483648 ) {
+				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && $value <= PHP_INT_MAX ) {
 					$statement->bindParam( $key + 1, $value,\PDO::PARAM_INT );
 				} else {
 					$statement->bindParam( $key + 1, $value,\PDO::PARAM_STR );
@@ -98,7 +98,7 @@ class RPDO implements Driver
 			} else {
 				if ( is_null( $value ) ) {
 					$statement->bindValue( $key, NULL,\PDO::PARAM_NULL );
-				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && $value < 2147483648 ) {
+				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && $value <= PHP_INT_MAX ) {
 					$statement->bindParam( $key, $value,\PDO::PARAM_INT );
 				} else {
 					$statement->bindParam( $key, $value,\PDO::PARAM_STR );
