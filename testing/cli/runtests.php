@@ -69,10 +69,13 @@ if ( isset( $ini['mysql'] ) ) {
 	R::exec( ' SET GLOBAL sql_mode="" ' );
 }
 
-if ( isset( $ini['pgsql'] ) ) {
-	$dsn = "pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
+//HHVM on Travis does not yet support PostgreSQL.
+if (!defined('HHVM_VERSION')) {
+	if ( isset( $ini['pgsql'] ) ) {
+		$dsn = "pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
 
-	R::addDatabase( 'pgsql', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
+		R::addDatabase( 'pgsql', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
+	}
 }
 
 if ( isset( $ini['sqlite'] ) ) {
