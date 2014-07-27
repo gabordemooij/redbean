@@ -70,10 +70,11 @@ if ( isset( $ini['mysql'] ) ) {
 }
 
 //HHVM on Travis does not yet support PostgreSQL.
-if (!defined('HHVM_VERSION')) {
+if ( defined( 'HHVM_VERSION' ) ) {
+	unset( $ini['psql'] );
+} else {
 	if ( isset( $ini['pgsql'] ) ) {
 		$dsn = "pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
-
 		R::addDatabase( 'pgsql', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
 	}
 }
