@@ -206,7 +206,10 @@ class Joins extends Base
 		R::setNarrowFieldMode( TRUE );
 		OODBBean::setIgnoreJoinFeature( TRUE );
 		$author = $author->fresh();
-		$books = $author->withCondition(' @joined.info.title != ? ', array('y3') )->xownBookList;
+		$books = array();
+		try {
+			$books = $author->withCondition(' @joined.info.title != ? ', array('y3') )->xownBookList;
+		}catch(\Exception $e){}
 		asrt( is_array( $books ), TRUE );
 		asrt( count( $books ), 0 );
 		OODBBean::setIgnoreJoinFeature( FALSE );
