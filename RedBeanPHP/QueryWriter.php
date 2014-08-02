@@ -61,6 +61,18 @@ interface QueryWriter
 	const C_GLUE_AND   = 2;
 
 	/**
+	 * Writes an SQL Snippet for a JOIN, returns the
+	 * SQL snippet string.
+	 *
+	 * @param string $type       source type
+	 * @param string $targetType target type (type to join)
+	 * @param string $leftRight  type of join (possible: 'LEFT', 'RIGHT' or 'INNER').
+	 *
+	 * @return string $joinSQLSnippet
+	 */
+	public function writeJoin( $type, $targetType, $joinType );
+
+	/**
 	 * Glues an SQL snippet to the beginning of a WHERE clause.
 	 * This ensures users don't have to add WHERE to their query snippets.
 	 *

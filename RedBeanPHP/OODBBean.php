@@ -23,6 +23,11 @@ use RedBeanPHP\OODBBean as OODBBean;
 class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 {
 	/**
+	 * @var boolean
+	 */
+	private static $ignoreJoinFeature = false;
+
+	/**
 	 * This is where the real properties of the bean live. They are stored and retrieved
 	 * by the magic getter and setter (__get and __set).
 	 *
@@ -82,6 +87,64 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	private $all = FALSE;
 
 	/**
+	 * Disables the JOIN-feature.
+	 * Gives a slight performance improvement.
+	 * Use this method only if you want to squeeze every cycle out
+	 * of RedBeanPHP. You can also use this feature if for some reason
+	 * the JOIN feature causes a problem with regular SQL snippets -
+	 * but this is very, very unlikely.
+	 *
+	 * @param boolean $toggle TRUE = disable JOIN detection in with clauses.
+	 *
+	 * @return void
+	 */
+	public static function setIgnoreJoinFeature( $toggle )
+	{
+		self::$ignoreJoinFeature = (boolean) $toggle;
+	}
+
+	/**
+	 * Parses the join in the with-snippet.
+	 * For instance:
+	 *
+	 * $author
+	 * 	->withCondition(' joined.detail.title LIKE ? ')
+	 *  ->ownBookList;
+	 *
+	 * will automatically join 'detail' on book to
+	 * access the title field.
+	 *
+	 * @note this feature requires Narrow Field Mode and Join Feature
+	 * to be both activated (default).
+	 *
+	 * @param string $type the source type for the join
+	 *
+	 * @return string $joinSql
+	 */
+	private function parseJoin( $type )
+	{
+		$joinSql = '';
+		$joins = array();
+		if ( strpos($this->withSql, 'joined.' ) !== FALSE ) {
+			$writer   = $this->beanHelper->getToolBox()->getWriter();
+			$oldParts = $parts = explode( 'joined.', $this->withSql );
+			array_shift( $parts );
+			foreach($parts as $part) {
+				$explosion = explode( '.', $part );
+				$joinInfo  = array_shift( $explosion );
+				//Dont join more than once..
+				if ( !isset( $joins[$joinInfo] ) ) {
+					$joins[ $joinInfo ] = true;
+					$joinSql  .= $writer->writeJoin( $type, $joinInfo, 'LEFT' );
+				}
+			}
+			$this->withSql = implode( '', $oldParts );
+			$joinSql      .= ' WHERE ';
+		}
+		return $joinSql;
+	}
+
+	/**
 	 * Internal method.
 	 * Obtains a shared list for a certain type.
 	 *
@@ -120,7 +183,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Internal method.
 	 * Obtains the own list of a certain type.
 	 *
-	 * @param string $type name of the list you want to retrieve
+	 * @param string      $type   name of the list you want to retrieve
+	 * @param OODB        $oodb   The RB OODB object database instance
 	 *
 	 * @return array
 	 */
@@ -151,15 +215,18 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 				$firstKey = key( $this->withParams );
 			}
 
+			$joinSql = '';
+			if ( !self::$ignoreJoinFeature ) $joinSql = $this->parseJoin( $type );
+
 			if ( !is_numeric( $firstKey ) || $firstKey === NULL ) {
 				$bindings           = $this->withParams;
 				$bindings[':slot0'] = $this->getID();
 
-				$beans = $redbean->find( $type, array(), " $myFieldLink = :slot0 " . $this->withSql, $bindings );
+				$beans = $redbean->find( $type, array(), " {$joinSql} $myFieldLink = :slot0 " . $this->withSql, $bindings );
 			} else {
 				$bindings = array_merge( array( $this->getID() ), $this->withParams );
 
-				$beans = $redbean->find( $type, array(), " $myFieldLink = ? " . $this->withSql, $bindings );
+				$beans = $redbean->find( $type, array(), " {$joinSql} $myFieldLink = ? " . $this->withSql, $bindings );
 			}
 		}
 

@@ -161,6 +161,7 @@ $allPacks = array(
 	'Base/Keywords',
 	'Base/Count',
 	'Base/With',
+	'Base/Joins',
 	'Base/Traverse',
 	'Base/Misc',
 	'Base/Via',

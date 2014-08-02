@@ -37,6 +37,7 @@ class Writecache extends Base
 	{
 		testpack( 'Testing WriteCache Query Writer Cache' );
 
+		R::setNarrowFieldMode( FALSE );
 		R::useWriterCache( FALSE );
 
 		R::debug( true, 1 );
@@ -230,6 +231,7 @@ class Writecache extends Base
 		asrt( count( $logger->grep( 'SELECT' ) ), 2 );
 
 		R::getWriter()->setUseCache( TRUE );
+		R::setNarrowFieldMode( TRUE );
 	}
 
 	/**
@@ -403,6 +405,7 @@ class Writecache extends Base
 	{
 		testpack( 'Test cache flush (explicit)' );
 
+		R::setNarrowFieldMode( FALSE );
 		R::debug( true, 1 );
 		$logger = R::getDatabaseAdapter()->getDatabase()->getLogger();
 
@@ -431,5 +434,6 @@ class Writecache extends Base
 
 		R::getWriter()->flushCache();
 		R::getWriter()->setUseCache( FALSE );
+		R::setNarrowFieldMode( TRUE );
 	}
 }

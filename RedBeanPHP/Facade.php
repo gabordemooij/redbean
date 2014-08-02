@@ -208,6 +208,19 @@ class Facade
 	}
 
 	/**
+	 * Toggles Narrow Field Mode.
+	 * See documentation in QueryWriter.
+	 *
+	 * @param boolean $mode TRUE = Narrow Field Mode
+	 *
+	 * @return void
+	 */
+	public static function setNarrowFieldMode( $mode )
+	{
+		AQueryWriter::setNarrowFieldMode( $mode );
+	}
+
+	/**
 	 * Starts a transaction within a closure (or other valid callback).
 	 * If an\Exception is thrown inside, the operation is automatically rolled back.
 	 * If no\Exception happens, it commits automatically.

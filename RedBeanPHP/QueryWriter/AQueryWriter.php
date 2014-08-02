@@ -66,6 +66,11 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	private static $flagSQLFilterSafeMode = false;
 
 	/**
+	 * @var boolean
+	 */
+	private static $flagNarrowFieldMode = true;
+
+	/**
 	 * @var array
 	 */
 	public $typeno_sqltype = array();
@@ -78,6 +83,31 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	public static function clearRenames()
 	{
 		self::$renames = array();
+	}
+
+	/**
+	 * Toggles 'Narrow Field Mode'.
+	 * In Narrow Field mode the queryRecord method will
+	 * narrow its selection field to
+	 *
+	 * SELECT {table}.*
+	 *
+	 * instead of
+	 *
+	 * SELECT *
+	 *
+	 * This is a better way of querying because it allows
+	 * more flexibility (for instance joins). However if you need
+	 * the wide selector for backward compatibility; use this method
+	 * to turn OFF Narrow Field Mode by passing FALSE.
+	 *
+	 * @param boolean $narrowField TRUE = Narrow Field FALSE = Wide Field
+	 *
+	 * @return void
+	 */
+	public static function setNarrowFieldMode( $narrowField )
+	{
+		self::$flagNarrowFieldMode = (boolean) $narrowField;
 	}
 
 	/**
@@ -668,6 +698,20 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
+	 * @see QueryWriter::writeJoin
+	 */
+	public function writeJoin( $type, $targetType, $leftRight = 'LEFT' )
+	{
+		if ( $leftRight !== 'LEFT' && $leftRight !== 'RIGHT' && $leftRight !== 'INNER' )
+			throw new RedException( 'Invalid JOIN.' );
+
+		$table = $this->esc( $type );
+		$targetTable = $this->esc( $targetType );
+		$field = $this->esc( $targetType, TRUE );
+		return " {$leftRight} JOIN {$targetTable} ON {$targetTable}.id = {$table}.{$field}_id ";
+	}
+
+	/**
 	 * @see QueryWriter::queryRecord
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
@@ -691,7 +735,9 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		}
 
 		$sql   = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
-		$sql   = "SELECT * {$sqlFilterStr} FROM {$table} {$sql} -- keep-cache";
+
+		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
+		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} -- keep-cache";
 
 		$rows  = $this->adapter->get( $sql, $bindings );
 
