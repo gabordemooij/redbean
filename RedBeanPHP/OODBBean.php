@@ -108,7 +108,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * For instance:
 	 *
 	 * $author
-	 * 	->withCondition(' joined.detail.title LIKE ? ')
+	 * 	->withCondition(' @joined.detail.title LIKE ? ')
 	 *  ->ownBookList;
 	 *
 	 * will automatically join 'detail' on book to
@@ -125,9 +125,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		$joinSql = '';
 		$joins = array();
-		if ( strpos($this->withSql, 'joined.' ) !== FALSE ) {
+		if ( strpos($this->withSql, '@joined.' ) !== FALSE ) {
 			$writer   = $this->beanHelper->getToolBox()->getWriter();
-			$oldParts = $parts = explode( 'joined.', $this->withSql );
+			$oldParts = $parts = explode( '@joined.', $this->withSql );
 			array_shift( $parts );
 			foreach($parts as $part) {
 				$explosion = explode( '.', $part );
