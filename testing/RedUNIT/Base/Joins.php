@@ -53,7 +53,7 @@ class Joins extends Base
 		$v3->label = 'v3 to Arabia';
 		$v4->label = 'v4 to Belgium';
 
-		R::storeAll([$v1,$v2,$v3,$v4]);
+		R::storeAll( array($v1,$v2,$v3,$v4) );
 
 
 		$visits = $p1->ownVisit;
