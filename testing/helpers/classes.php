@@ -415,21 +415,9 @@ class Model_BookBook extends \RedBean_SimpleModel {
 	}
 }
 
-/*
-class UUIDWriterMySQL extends \RedBeanPHP\QueryWriter\MySQL {
-	//Because MySQL does not allow insert NULL primary key even if trigger.
-	protected $defaultValue = '@uuid';
-	public function updateRecord($table, $updateValues, $id = NULL)
-	{
-		//if you want less queries, you can put this one here in a trigger.
-		$flagNeedsReturnID = (!$id);
-		if ($flagNeedsReturnID) R::exec('SET @uuid = uuid() ');
-		$id = parent::updateRecord( $table, $updateValues, $id );
-		if ( $flagNeedsReturnID ) $id = R::getCell('SELECT @uuid');
-		return $id;
-	}
-}*/
-
+/**
+ * UUID QueryWriter for MySQL for testing purposes.
+ */
 class UUIDWriterMySQL extends \RedBeanPHP\QueryWriter\MySQL {
 
 	protected $defaultValue = '@uuid';
@@ -469,6 +457,9 @@ class UUIDWriterMySQL extends \RedBeanPHP\QueryWriter\MySQL {
 	}
 }
 
+/**
+ * UUID QueryWriter for PostgreSQL for testing purposes.
+ */
 class UUIDWriterPostgres extends \RedBeanPHP\QueryWriter\PostgreSQL {
 
 	protected $defaultValue = 'uuid_generate_v4()';
@@ -491,4 +482,3 @@ class UUIDWriterPostgres extends \RedBeanPHP\QueryWriter\PostgreSQL {
 		return self::C_DATATYPE_SPECIAL_UUID;
 	}
 }
-
