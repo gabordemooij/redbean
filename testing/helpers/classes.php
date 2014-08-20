@@ -138,10 +138,7 @@ class Model_Box extends RedBeanPHP\SimpleModel
  */
 class Model_Cocoa extends RedBeanPHP\SimpleModel
 {
-	public function update()
-	{
-		//print_r($this->sharedTaste);
-	}
+	public function update(){}
 }
 
 /**
