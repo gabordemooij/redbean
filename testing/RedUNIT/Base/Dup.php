@@ -22,6 +22,25 @@ use RedBeanPHP\RedException as RedException;
  */
 class Dup extends Base
 {
+	/**
+	 * Tests whether the original ID is stored
+	 * in meta data (quite handy for ID mappings).
+	 */
+	public function testKeepOldID()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->xownPageList[] = R::dispense( 'page' );
+		R::store( $book );
+		$bookID = $book->id;
+		$page = reset( $book->xownPageList );
+		$pageID = $page->id;
+		$book = $book->fresh();
+		$copy = R::dup( $book );
+		asrt( $copy->getMeta( 'sys.dup-from-id' ), $bookID );
+		$copyPage = reset( $copy->xownPageList );
+		asrt( $copyPage->getMeta( 'sys.dup-from-id' ), $pageID );
+	}
 
 	/**
 	 * Test export camelCase.
