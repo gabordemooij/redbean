@@ -173,7 +173,12 @@ class Frozen extends Repository
 	{
 		$beans = array();
 		for ( $i = 0; $i < $number; $i++ ) {
-			$bean = new OODBBean;
+			if ( $this->externalDispenser ) {
+				$func = $this->externalDispenser;
+				$bean = $func( $type );
+			} else {
+				$bean = new OODBBean;
+			}
 			$bean->initializeForDispense( $type, $this->oodb->getBeanHelper() );
 			$this->oodb->signal( 'dispense', $bean );
 			$beans[] = $bean;

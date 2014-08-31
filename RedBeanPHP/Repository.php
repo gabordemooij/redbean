@@ -51,6 +51,11 @@ abstract class Repository
 	protected $writer;
 
 	/**
+	 * @var external dispenser
+	 */
+	protected $externalDispenser;
+
+	/**
 	 * Process groups. Internal function. Processes different kind of groups for
 	 * storage function. Given a list of original beans and a list of current beans,
 	 * this function calculates which beans remain in the list (residue), which
@@ -549,5 +554,17 @@ abstract class Repository
 		}
 	}
 
-
+	/**
+	 * Sets an external dispenser function to dispense
+	 * specific beans.
+	 *
+	 * @param closure $function function that returns an empty bean.
+	 *
+	 * @return self
+	 */
+	public function setExternalDispenser( $function )
+	{
+		$this->externalDispenser = $function;
+		return $this;
+	}
 }
