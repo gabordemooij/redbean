@@ -55,11 +55,11 @@ class SimpleFacadeBeanHelper implements BeanHelper
 			foreach( $modelParts as $part ) {
 				$modelName .= ucfirst( $part );
 			}
-			$modelName = $prefix . $modelName;
+			$modelName = $prefix . $modelName . $suffix;
 
 			if ( !class_exists( $modelName ) ) {
 				//second try
-				$modelName = $prefix . ucfirst( $model );
+				$modelName = $prefix . ucfirst( $model ) . $suffix;
 				
 				if ( !class_exists( $modelName ) ) {
 					return NULL;
