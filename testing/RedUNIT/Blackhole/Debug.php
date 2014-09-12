@@ -71,6 +71,16 @@ class Debug extends Blackhole
 		//just to get 100% test cov, we dont need to test this
 		dmp( $beans );
 		pass();
+
+		//test wrong input
+		asrt( is_array( R::dump( NULL ) ), TRUE );
+		asrt( count( R::dump( NULL ) ), 0 );
+		asrt( is_array( R::dump( '' ) ), TRUE );
+		asrt( count( R::dump( '' ) ), 0 );
+		asrt( is_array( R::dump( 1 ) ), TRUE );
+		asrt( count( R::dump( 1 ) ), 0 );
+		asrt( is_array( R::dump( TRUE ) ), TRUE );
+		asrt( count( R::dump( FALSE ) ), 0 );
 	}
 
 	/**

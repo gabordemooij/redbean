@@ -1562,8 +1562,9 @@ class Facade
 			foreach( $data as $key => $item ) {
 				$array[$key] = self::dump( $item );
 			}
-			return $array;
 		}
+
+		return $array;
 	}
 
 	/**
