@@ -36,7 +36,7 @@ class Dup extends Base
 		$page = reset( $book->xownPageList );
 		$pageID = $page->id;
 		$book = $book->fresh();
-		$copy = R::dup( $book );
+		$copy = R::duplicate( $book );
 		asrt( $copy->getMeta( 'sys.dup-from-id' ), $bookID );
 		$copyPage = reset( $copy->xownPageList );
 		asrt( $copyPage->getMeta( 'sys.dup-from-id' ), $pageID );
@@ -134,7 +134,7 @@ class Dup extends Base
 		R::store( $article );
 		asrt( R::count( 'article' ), 7 );
 		$article2 = $article2->fresh();
-		$dupArticle2 = R::dup( $article2 );
+		$dupArticle2 = R::duplicate( $article2 );
 		$dupArticle2->name = 'article 2b';
 		$dupBeans = $dupArticle2->xownArticleList;
 		foreach( $dupBeans as $dupBean ) {
