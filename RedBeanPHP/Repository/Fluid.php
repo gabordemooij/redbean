@@ -361,9 +361,10 @@ class Fluid extends Repository
 	 */
 	public function dispense( $type, $number = 1, $alwaysReturnArray = FALSE )
 	{
+		$OODBBEAN = defined( 'REDBEAN_OODBBEAN_CLASS' ) ? REDBEAN_OODBBEAN_CLASS : '\RedBeanPHP\OODBBean';
 		$beans = array();
 		for ( $i = 0; $i < $number; $i++ ) {
-			$bean = new OODBBean;
+			$bean = new $OODBBEAN;
 			$bean->initializeForDispense( $type, $this->oodb->getBeanHelper() );
 			$this->check( $bean );
 			$this->oodb->signal( 'dispense', $bean );

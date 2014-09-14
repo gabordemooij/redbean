@@ -479,3 +479,26 @@ class UUIDWriterPostgres extends \RedBeanPHP\QueryWriter\PostgreSQL {
 		return self::C_DATATYPE_SPECIAL_UUID;
 	}
 }
+
+class DiagnosticBean extends \RedBeanPHP\OODBBean {
+
+	/**
+	 * Returns current status of modification flags.
+	 *
+	 * @return string
+	 */
+	public function getModFlags()
+	{
+		$modFlags = '';
+		if ($this->aliasName !== NULL) $modFlags .= 'a';
+		if ($this->fetchType !== NULL) $modFlags .= 'f';
+		if ($this->noLoad === TRUE) $modFlags .= 'n';
+		if ($this->all === TRUE) $modFlags .= 'r';
+		if ($this->withSql !== '') $modFlags .= 'w';
+
+		return $modFlags;
+	}
+
+}
+
+define('REDBEAN_OODBBEAN_CLASS', '\DiagnosticBean');

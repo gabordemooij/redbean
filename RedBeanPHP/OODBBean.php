@@ -33,14 +33,14 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * @var array $properties
 	 */
-	private $properties = array();
+	protected $properties = array();
 
 	/**
 	 * Here we keep the meta data of a bean.
 	 *
 	 * @var array
 	 */
-	private $__info = array();
+	protected $__info = array();
 
 	/**
 	 * The BeanHelper allows the bean to access the toolbox objects to implement
@@ -49,42 +49,42 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * @var BeanHelper
 	 */
-	private $beanHelper = NULL;
+	protected $beanHelper = NULL;
 
 	/**
 	 * @var null
 	 */
-	private $fetchType = NULL;
+	protected $fetchType = NULL;
 
 	/**
 	 * @var string
 	 */
-	private $withSql = '';
+	protected $withSql = '';
 
 	/**
 	 * @var array
 	 */
-	private $withParams = array();
+	protected $withParams = array();
 
 	/**
 	 * @var string
 	 */
-	private $aliasName = NULL;
+	protected $aliasName = NULL;
 
 	/**
 	 * @var string
 	 */
-	private $via = NULL;
+	protected $via = NULL;
 
 	/**
 	 * @var boolean
 	 */
-	private $noLoad = FALSE;
+	protected $noLoad = FALSE;
 
 	/**
 	 * @var boolean
 	 */
-	private $all = FALSE;
+	protected $all = FALSE;
 
 	/**
 	 * Disables the JOIN-feature.
@@ -700,22 +700,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		return $beautifulColumns[$property];
 	}
 
-	/**
-	 * Returns current status of modification flags.
-	 *
-	 * @return string
-	 */
-	public function getModFlags()
-	{
-		$modFlags = '';
-		if ($this->aliasName !== NULL) $modFlags .= 'a';
-		if ($this->fetchType !== NULL) $modFlags .= 'f';
-		if ($this->noLoad === TRUE) $modFlags .= 'n';
-		if ($this->all === TRUE) $modFlags .= 'r';
-		if ($this->withSql !== '') $modFlags .= 'w';
-
-		return $modFlags;
-	}
+	
 
 	/**
 	 * Clears all modifiers.
