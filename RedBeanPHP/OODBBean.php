@@ -23,11 +23,6 @@ use RedBeanPHP\OODBBean as OODBBean;
 class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 {
 	/**
-	 * @var boolean
-	 */
-	private static $ignoreJoinFeature = false;
-
-	/**
 	 * This is where the real properties of the bean live. They are stored and retrieved
 	 * by the magic getter and setter (__get and __set).
 	 *
@@ -85,23 +80,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * @var boolean
 	 */
 	protected $all = FALSE;
-
-	/**
-	 * Disables the JOIN-feature.
-	 * Gives a slight performance improvement.
-	 * Use this method only if you want to squeeze every cycle out
-	 * of RedBeanPHP. You can also use this feature if for some reason
-	 * the JOIN feature causes a problem with regular SQL snippets -
-	 * but this is very, very unlikely.
-	 *
-	 * @param boolean $toggle TRUE = disable JOIN detection in with clauses.
-	 *
-	 * @return void
-	 */
-	public static function setIgnoreJoinFeature( $toggle )
-	{
-		self::$ignoreJoinFeature = (boolean) $toggle;
-	}
 
 	/**
 	 * Parses the join in the with-snippet.
@@ -215,8 +193,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 				$firstKey = key( $this->withParams );
 			}
 
-			$joinSql = '';
-			if ( !self::$ignoreJoinFeature ) $joinSql = $this->parseJoin( $type );
+			$joinSql = $this->parseJoin( $type );
 
 			if ( !is_numeric( $firstKey ) || $firstKey === NULL ) {
 				$bindings           = $this->withParams;
