@@ -479,21 +479,3 @@ class UUIDWriterPostgres extends \RedBeanPHP\QueryWriter\PostgreSQL {
 		return self::C_DATATYPE_SPECIAL_UUID;
 	}
 }
-
-/**
- * Test class for custom dispensers.
- */
-class CustomBean extends \RedBeanPHP\OODBBean {
-
-	/**
-	 * Test method for custom bean.
-	 * Returns a sha1 hash of the bean.
-	 *
-	 * @return string
-	 */
-	public function quickHash()
-	{
-		return sha1( $this->__toString() );
-	}
-
-}

@@ -363,12 +363,7 @@ class Fluid extends Repository
 	{
 		$beans = array();
 		for ( $i = 0; $i < $number; $i++ ) {
-			if ( $this->externalDispenser ) {
-				$func = $this->externalDispenser;
-				$bean = $func( $type );
-			} else {
-				$bean = new OODBBean;
-			}
+			$bean = new OODBBean;
 			$bean->initializeForDispense( $type, $this->oodb->getBeanHelper() );
 			$this->check( $bean );
 			$this->oodb->signal( 'dispense', $bean );
