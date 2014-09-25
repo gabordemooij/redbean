@@ -225,16 +225,24 @@ class TagManager
 	/**
 	 * Returns all beans that have been tagged with one or more
 	 * of the specified tags.
-	 * 
+	 *
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
+	 * Note that additional SQL snippets will be applied PER TAG.
+	 * This means LIMIT 2 on 2 tags might yield 4 results.
+	 * You can use the LIMIT clause to prevent memory issues with large
+	 * collections but you cannot create a reliable pagination system
+	 * without further logic if using more than one tag.
+	 *
 	 * @param string       $beanType type of bean you are looking for
 	 * @param array|string $tagList  list of tags to match
+	 * @param string       $sql      additional SQL
+	 * @param array        $bindings bindings
 	 *
 	 * @return array
 	 */
-	public function tagged( $beanType, $tagList )
+	public function tagged( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
 		$tags       = $this->extractTagsIfNeeded( $tagList );
 
@@ -246,7 +254,7 @@ class TagManager
 		
 		if ( is_array( $tags ) && count( $tags ) > 0 ) {
 			foreach($tags as $tag) {
-				$collection += $tag->$list;
+				$collection += $tag->with( $sql, $bindings )->$list;
 			}
 		}
 

@@ -21,6 +21,29 @@ use RedBeanPHP\RedException as RedException;
 class Tags extends Base
 {
 	/**
+	 * Tests tags with SQL.
+	 *
+	 * @return void
+	 */
+	public function testTagsWithSQL()
+	{
+		R::nuke();
+		list( $m1, $m2, $m3 ) = R::dispense( 'movie', 3 );
+		$m1->title = 'Frankenstein';
+		$m2->title = 'Fall of the House Usher';
+		$m3->title = 'Sleepy Hollow';
+		R::tag($m1, 'horror,gothic');
+		R::tag($m2, 'horror,gothic,short');
+		R::tag($m3, 'horror,legend');
+		asrt( count( R::tagged( 'movie', 'horror' ) ), 3);
+		asrt( count( R::tagged( 'movie', 'horror', ' LIMIT 2' ) ), 2);
+		asrt( count( R::tagged( 'movie', 'horror', ' LIMIT ?', array( 2 ) ) ), 2);
+		asrt( count( R::tagged( 'movie', 'horror', ' ORDER BY title DESC LIMIT ?', array( 2 ) ) ), 2);
+		//you can limit with multiple tags, but the SQL will be applied per tag...
+		asrt( count( R::tagged( 'movie', 'horror,gothic', ' ORDER BY title DESC LIMIT ?', array( 1 ) ) ), 2);
+	}
+
+	/**
 	 * Some basic tests.
 	 *
 	 * @return void
