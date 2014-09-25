@@ -18,6 +18,253 @@ use RedBeanPHP\Facade as R;
  */
 class Bean extends Base
 {
+
+	/**
+	 * Only fire update query if the bean really contains different
+	 * values. But make sure beans several 'parents' away still get
+	 * saved.
+	 *
+	 * @return void
+	 */
+	public function testBeanTainting()
+	{
+		$logger = R::getDatabaseAdapter()->getDatabase()->getLogger();
+		list( $i, $k, $c, $s ) = R::dispenseAll( 'invoice,customer,city,state' );
+		$i->customer = $k;
+		$i->status = 0;
+		$k->city = $c;
+		$c->state = $s;
+		$s->name = 'x';
+		R::store( $i );
+		$i = $i->fresh();
+		asrt( $i->customer->city->state->name, 'x' );
+		$i->status = 1;
+		R::freeze( true );
+		$logger = R::debug( 1, 1 );
+		//do we properly skip unmodified but tainted parent beans?
+		R::store( $i );
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 1 );
+		//does cascade update still work?
+		$i = $i->fresh();
+		$i->customer->city->state->name = 'y';
+		R::store( $i );
+		$i = $i->fresh();
+		asrt( $i->customer->city->state->name, 'y' );
+		$i = $i->fresh();
+		$differentCity = R::dispense( 'city' );
+		R::store( $differentCity );
+		$i->customer->city = $differentCity;
+		R::store( $i );
+		$i = $i->fresh();
+		asrt( ( $i->customer->city->id != $c->id ), TRUE );
+		asrt( is_null( $i->customer->city->state ), TRUE );
+		$i->customer->city = NULL;
+		R::store( $i );
+		$i = $i->fresh();
+		asrt( is_null( $i->customer->city ), TRUE );
+		$i->customer = $k;
+		$i->status = 0;
+		$k->city = $c;
+		$c->state = $s;
+		$s->name = 'x';
+		R::store( $i );
+		R::freeze( FALSE );
+		$i = $i->fresh();
+		//can we still change remote parent?
+		$i->customer->city->name = 'q';
+		$logger->clear();
+		R::store($i);
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 1 );
+		$i = $i->fresh();
+		asrt( $i->customer->city->name, 'q' );
+		//do we properly skip unmodified but tainted parent beans?
+		$i->status = 3;
+		$logger->clear();
+		R::store( $i );
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 1 );
+	}
+
+	/**
+	 * Test whether the number of update queries
+	 * executed is limited to the ones that are absolutely
+	 * necessary to sync the database.
+	 *
+	 * @return void
+	 */
+	public function testUpdateQueries()
+	{
+		$book = R::dispense( 'book' );
+		$book->title = 'Eye of Wight';
+		$book->xownPageList = R::dispense( 'page', 10 );
+		$book->sharedCategoryList = R::dispense( 'category', 2 );
+		$n = 1;
+		foreach( $book->xownPageList as $page ) {
+			$page->number = $n++;
+		}
+		$book->sharedCategory[0]->name = 'adventure';
+		$book->sharedCategory[1]->name = 'puzzle';
+		$book->author = R::dispense( 'author' );
+		$book->author->name = 'John';
+		$book->map = R::dispense( 'map' );
+		$book->map->name = 'Wight';
+		$book->map->xownLocationList = R::dispense( 'location', 3 );
+		R::store( $book );
+		$logger = R::debug( 1, 1);
+		$book = $book->fresh();
+		asrt( $book->getMeta('tainted'), FALSE );
+		asrt( $book->getMeta('changed'), FALSE );
+		$book->author;
+		asrt( $book->getMeta('tainted'), TRUE );
+		asrt( $book->getMeta('changed'), FALSE );
+		$logger->clear();
+		R::store( $book );
+		//read only, no updates
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 0 );
+		$book->title = 'Spirit of the Stones';
+		R::store( $book );
+		//changed title, 1 update
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 1 );
+		$logger->clear();
+		$book = $book->fresh();
+		$book->xownPageList;
+		asrt( $book->getMeta('tainted'), TRUE );
+		asrt( $book->getMeta('changed'), FALSE );
+		R::store( $book );
+		//access only, no update
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 0 );
+		$logger->clear();
+		$book = $book->fresh();
+		$book->sharedCategoryList;
+		asrt( $book->getMeta('tainted'), TRUE );
+		asrt( $book->getMeta('changed'), FALSE );
+		R::store( $book );
+		//access only, no update
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 0 );
+		$logger->clear();
+		$book = $book->fresh();
+		unset($book->xownPageList[5]);
+		asrt( $book->getMeta('tainted'), TRUE );
+		asrt( $book->getMeta('changed'), FALSE );
+		R::store( $book );
+		//remove only, no update, just 1 delete
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 0 );
+		$numberOfUpdateQueries = $logger->grep( 'DELETE' );
+		asrt( count( $numberOfUpdateQueries ), 1 );
+		$book = $book->fresh();
+		asrt( count( $book->xownPageList ), 9 );
+		$logger->clear();
+		$book = $book->fresh();
+		$book->xownPageList[] = R::dispense('page');
+		asrt( $book->getMeta('tainted'), TRUE );
+		asrt( $book->getMeta('changed'), FALSE );
+		R::store( $book );
+		//no update, 1 insert, just adding
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 0 );
+		$numberOfUpdateQueries = $logger->grep( 'INSERT' );
+		asrt( count( $numberOfUpdateQueries ), 1 );
+		$book = $book->fresh();
+		asrt( count( $book->xownPageList ), 10 );
+		$logger->clear();
+		$book = $book->fresh();
+		$book->map->xownLocationList[1]->name = 'Horshoe Bay';
+		asrt( $book->getMeta('tainted'), TRUE );
+		asrt( $book->getMeta('changed'), FALSE );
+		asrt( $book->map->getMeta('tainted'), TRUE );
+		asrt( $book->map->getMeta('changed'), FALSE );
+		asrt( $book->map->xownLocationList[1]->getMeta('tainted'), TRUE );
+		asrt( $book->map->xownLocationList[1]->getMeta('changed'), TRUE );
+		R::store( $book );
+		//1 update for child of parent, no other updates
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 1 );
+		$book = $book->fresh();
+		asrt( $book->map->xownLocationList[1]->name, 'Horshoe Bay' );
+		$logger->clear();
+		R::store( $book );
+		//just access, no updates
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 0 );
+		$logger->clear();
+		$book = $book->fresh();
+		$book->ownPageList[2]->number = 99;
+		R::store( $book );
+		//1 update, do not update rest of pages or book itself
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 1 );
+		$book = $book->fresh();
+		$book->author->name = 'Worsley';
+		$logger->clear();
+		R::store( $book );
+		//1 update for parent
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 1 );
+		$author = R::dispense('author');
+		$author->name = 'J.W.';
+		R::store( $author );
+		$book = $book->fresh();
+		$book->author = $author;
+		$author->name = 'JW';
+		$logger->clear();
+		R::store( $book );
+		//2 updates, one for author, one for link field: author_id needs update.
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 2 );
+		$author->country = R::dispense( 'country' )->setAttr( 'name', 'England' );
+		R::store( $author );
+		$book = $book->fresh();
+		$book->author->country->name = 'Wight';
+		$logger->clear();
+		R::store( $book );
+		//1 update, country only, dont update for intermediate parents: book -> author -> ...
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 1 );
+	}
+
+	/**
+	 * Tests effects of importFrom and setProperty.
+	 *
+	 * @return void
+	 */
+	public function testImportFromAndSetProp()
+	{
+		$bean = R::dispense( 'bean' );
+		asrt( $bean->getMeta( 'tainted' ), TRUE );
+		asrt( $bean->getMeta( 'changed' ), TRUE );
+		$bean->setMeta( 'tainted', FALSE );
+		$bean->setMeta( 'changed', FALSE );
+		asrt( $bean->getMeta( 'tainted' ), FALSE );
+		asrt( $bean->getMeta( 'changed' ), FALSE );
+		$bean->importFrom( R::dispense( 'bean' ) );
+		asrt( $bean->getMeta( 'tainted' ), TRUE );
+		asrt( $bean->getMeta( 'changed' ), TRUE );
+		$bean->setMeta( 'tainted', FALSE );
+		$bean->setMeta( 'changed', FALSE );
+		asrt( $bean->getMeta( 'tainted' ), FALSE );
+		asrt( $bean->getMeta( 'changed' ), FALSE );
+		$bean->setProperty( 'id', 0, TRUE, TRUE );
+		asrt( $bean->getMeta( 'tainted' ), TRUE );
+		asrt( $bean->getMeta( 'changed' ), TRUE );
+		$bean->setMeta( 'tainted', FALSE );
+		$bean->setMeta( 'changed', FALSE );
+		asrt( $bean->getMeta( 'tainted' ), FALSE );
+		asrt( $bean->getMeta( 'changed' ), FALSE );
+		$bean->setProperty( 'id', 0, TRUE, FALSE );
+		asrt( $bean->getMeta( 'tainted' ), FALSE );
+		asrt( $bean->getMeta( 'changed' ), FALSE );
+		$bean->name = 'x';
+		asrt( $bean->getMeta( 'tainted' ), TRUE );
+		asrt( $bean->getMeta( 'changed' ), TRUE );
+	}
+
 	/**
 	 * Setup
 	 *

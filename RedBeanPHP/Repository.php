@@ -230,7 +230,8 @@ abstract class Repository
 	protected function processEmbeddedBean( &$embeddedBeans, $bean, $property, OODBBean $value )
 	{
 		$linkField        = $property . '_id';
-		$bean->$linkField = $this->prepareEmbeddedBean( $value );
+		$id = $this->prepareEmbeddedBean( $value );
+		if ($bean->$linkField != $id) $bean->$linkField = $id;
 		$bean->setMeta( 'cast.' . $linkField, 'id' );
 		$embeddedBeans[$linkField] = $value;
 		unset( $bean->$property );

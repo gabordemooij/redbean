@@ -246,15 +246,16 @@ class Fluid extends Repository
 	 */
 	protected function storeBean( OODBBean $bean )
 	{
-		if ( $bean->getMeta( 'tainted' ) ) {
+		if ( $bean->getMeta( 'changed' ) ) {
 			$this->check( $bean );
 			$table = $bean->getMeta( 'type' );
 			$this->createTableIfNotExists( $bean, $table );
 			$updateValues = $this->getUpdateValues( $bean );
 			$this->addUniqueConstraints( $bean );
 			$bean->id = $this->writer->updateRecord( $table, $updateValues, $bean->id );
-			$bean->setMeta( 'tainted', FALSE );
+			$bean->setMeta( 'changed', FALSE );
 		}
+		$bean->setMeta( 'tainted', FALSE );
 	}
 
 	/**

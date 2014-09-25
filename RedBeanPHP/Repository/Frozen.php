@@ -62,7 +62,7 @@ class Frozen extends Repository
 	 */
 	protected function storeBean( OODBBean $bean )
 	{
-		if ( $bean->getMeta( 'tainted' ) ) {
+		if ( $bean->getMeta( 'changed' ) ) {
 
 			list( $properties, $table ) = $bean->getPropertiesAndType();
 			$id = $properties['id'];
@@ -74,9 +74,9 @@ class Frozen extends Repository
 				$updateValues[] = array( $k1 => $key, $k2 => $value );
 			}
 			$bean->id = $this->writer->updateRecord( $table, $updateValues, $id );
-			$bean->setMeta( 'tainted', FALSE );
-
+			$bean->setMeta( 'changed', FALSE );
 		}
+		$bean->setMeta( 'tainted', FALSE );
 	}
 
 	/**

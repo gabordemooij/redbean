@@ -256,6 +256,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->__info['sys.id']   = 'id';
 		$this->__info['sys.orig'] = array( 'id' => 0 );
 		$this->__info['tainted']  = TRUE;
+		$this->__info['changed']  = TRUE;
 		$this->properties['id']   = 0;
 	}
 
@@ -359,6 +360,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		$this->properties = $row;
 		$this->__info['sys.orig'] = $row;
+		$this->__info['changed'] = FALSE;
 		return $this;
 	}
 
@@ -374,7 +376,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	public function importFrom( OODBBean $sourceBean )
 	{
 		$this->__info['tainted'] = TRUE;
-
+		$this->__info['changed'] = TRUE;
 		$this->properties = $sourceBean->properties;
 
 		return $this;
@@ -908,6 +910,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$this->via        = NULL;
 
 		$this->__info['tainted'] = TRUE;
+		$this->__info['changed'] = TRUE;
 
 		if ( array_key_exists( $fieldLink, $this->properties ) && !( $value instanceof OODBBean ) ) {
 			if ( is_null( $value ) || $value === FALSE ) {
@@ -952,6 +955,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		if ( $taint ) {
 			$this->__info['tainted'] = TRUE;
+			$this->__info['changed'] = TRUE;
 		}
 	}
 
