@@ -113,27 +113,29 @@ class AssociationManager extends Observable
 			$property2 = $bean2->getMeta( 'type' ) . '2_id';
 		}
 		
-		//Dont mess with other tables, only add the unique constraint if:
-		//1. the table exists (otherwise we cant inspect it)
-		//2. the table only contains N-M fields: ID, N-ID, M-ID.
-		$unique = array( $property1, $property2 );
-		$type = $bean->getMeta( 'type' );
-		$tables = $this->writer->getTables();
-		if ( in_array( $type, $tables ) && !$this->oodb->isChilled( $type ) ) {
-			$columns = ( $this->writer->getColumns( $type ) );
-			if ( count( $columns ) === 3 
-				&& isset( $columns[ 'id' ] )
-				&& isset( $columns[ $property1 ] ) 
-				&& isset( $columns[ $property2 ] ) ) {
-				$bean->setMeta( 'buildcommand.unique', array( $unique ) );
+		if ( !$this->oodb->isFrozen() ) {
+			//Dont mess with other tables, only add the unique constraint if:
+			//1. the table exists (otherwise we cant inspect it)
+			//2. the table only contains N-M fields: ID, N-ID, M-ID.
+			$unique = array( $property1, $property2 );
+			$type = $bean->getMeta( 'type' );
+			$tables = $this->writer->getTables();
+			if ( in_array( $type, $tables ) && !$this->oodb->isChilled( $type ) ) {
+				$columns = ( $this->writer->getColumns( $type ) );
+				if ( count( $columns ) === 3 
+					&& isset( $columns[ 'id' ] )
+					&& isset( $columns[ $property1 ] ) 
+					&& isset( $columns[ $property2 ] ) ) {
+					$bean->setMeta( 'buildcommand.unique', array( $unique ) );
+				}
 			}
+
+			//add a build command for Single Column Index (to improve performance in case unqiue cant be used)
+			$indexName1 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property1;
+			$indexName2 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property2;
+
+			$bean->setMeta( 'buildcommand.indexes', array( $property1 => $indexName1, $property2 => $indexName2 ) );
 		}
-
-		//add a build command for Single Column Index (to improve performance in case unqiue cant be used)
-		$indexName1 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property1;
-		$indexName2 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property2;
-
-		$bean->setMeta( 'buildcommand.indexes', array( $property1 => $indexName1, $property2 => $indexName2 ) );
 
 		$this->oodb->store( $bean1 );
 		$this->oodb->store( $bean2 );
