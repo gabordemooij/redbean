@@ -102,6 +102,8 @@ class Finder
 	 */
 	public function findOne( $type, $sql = NULL, $bindings = array() )
 	{
+		$sql = $this->toolbox->getWriter()->glueLimitOne( $sql );
+		
 		$items = $this->find( $type, $sql, $bindings );
 
 		if ( empty($items) ) {

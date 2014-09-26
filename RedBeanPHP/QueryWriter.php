@@ -103,6 +103,16 @@ interface QueryWriter
 	public function glueSQLCondition( $sql, $glue = NULL );
 
 	/**
+	 * Determines if there is a LIMIT 1 clause in the SQL.
+	 * If not, it will add a LIMIT 1. (used for findOne).
+	 *
+	 * @param string $sql query to scan and adjust
+	 *
+	 * @return string
+	 */
+	public function glueLimitOne( $sql );
+
+	/**
 	 * Returns the tables that are in the database.
 	 *
 	 * @return array

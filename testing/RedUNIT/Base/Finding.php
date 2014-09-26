@@ -24,6 +24,37 @@ use RedBeanPHP\RedException\SQL as SQL;
 class Finding extends Base {
 
 	/**
+	 * Test whether findOne gets a LIMIT 1
+	 * clause.
+	 * 
+	 * @return void
+	 */
+	public function testFindOneLimitOne()
+	{
+		R::nuke();
+		list( $book1, $book2 ) = R::dispense( 'book', 2 );
+		$book1->title = 'a';
+		$book2->title = 'b';
+		R::storeAll( array( $book1, $book2 ) );
+		$logger = R::debug( 1, 1 );
+		$logger->clear();
+		$found = R::findOne( 'book' );
+		asrt( count( $logger->grep('LIMIT 1') ), 1 );
+		asrt( ( $found instanceof \RedBeanPHP\OODBBean ), TRUE );
+		$logger->clear();
+		$found = R::findOne( 'book', ' title = ? ', array( 'a' ) );
+		asrt( count( $logger->grep('LIMIT 1') ), 1 );
+		asrt( ( $found instanceof \RedBeanPHP\OODBBean ), TRUE );
+		$logger->clear();
+		$found = R::findOne( 'book', ' title = ? LIMIT 1', array( 'b' ) );
+		asrt( count( $logger->grep('LIMIT 1') ), 1 );
+		asrt( ( $found instanceof \RedBeanPHP\OODBBean ), TRUE );
+		$found = R::findOne( 'book', ' title = ? LIMIT 2', array( 'b' ) );
+		asrt( count( $logger->grep('LIMIT 2') ), 1 );
+		asrt( ( $found instanceof \RedBeanPHP\OODBBean ), TRUE );
+	}
+
+	/**
 	 * Begin testing.
 	 * This method runs the actual test pack.
 	 *

@@ -625,6 +625,14 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
+	 * @see QueryWriter::glueLimitOne
+	 */
+	 public function glueLimitOne( $sql = '')
+	 {
+		 return ( strpos( $sql, 'LIMIT' ) === FALSE ) ? ( $sql . ' LIMIT 1 ' ) : $sql;
+	 }
+
+	/**
 	 * @see QueryWriter::esc
 	 */
 	public function esc( $dbStructure, $dontQuote = FALSE )
