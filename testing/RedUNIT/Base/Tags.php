@@ -39,8 +39,37 @@ class Tags extends Base
 		asrt( count( R::tagged( 'movie', 'horror', ' LIMIT 2' ) ), 2);
 		asrt( count( R::tagged( 'movie', 'horror', ' LIMIT ?', array( 2 ) ) ), 2);
 		asrt( count( R::tagged( 'movie', 'horror', ' ORDER BY title DESC LIMIT ?', array( 2 ) ) ), 2);
-		//you can limit with multiple tags, but the SQL will be applied per tag...
-		asrt( count( R::tagged( 'movie', 'horror,gothic', ' ORDER BY title DESC LIMIT ?', array( 1 ) ) ), 2);
+		asrt( count( R::tagged( 'movie', 'horror,gothic', ' ORDER BY title DESC LIMIT ?', array( 1 ) ) ), 1);
+		asrt( count( R::tagged( 'movie', 'horror,gothic') ), 3 );
+		asrt( count( R::taggedAll( 'movie', 'horror,gothic') ), 2 );
+		asrt( count( R::tagged( 'movie', 'horror,gothic', ' LIMIT ? ', array( 2 ) ) ), 2 );
+		asrt( count( R::taggedAll( 'movie', 'horror,gothic', ' LIMIT ? ', array( 2 ) ) ), 2 );
+		asrt( count( R::tagged( 'movie', 'horror,gothic', ' LIMIT ? ', array( 1 ) ) ), 1 );
+		asrt( count( R::taggedAll( 'movie', 'horror,gothic', ' LIMIT ? ', array( 1 ) ) ), 1 );
+		asrt( count( R::tagged( 'movie', 'horror,legend', ' LIMIT ? ', array( 1 ) ) ), 1 );
+		asrt( count( R::taggedAll( 'movie', 'horror,legend', ' LIMIT ? ', array( 1 ) ) ), 1 );
+		asrt( count( R::tagged( 'movie', 'gothic,legend', ' LIMIT ? ', array( 1 ) ) ), 1 );
+		asrt( count( R::taggedAll( 'movie', 'gothic,legend', ' LIMIT ? ', array( 1 ) ) ), 0 );
+		asrt( count( R::tagged( 'movie', 'romance', ' LIMIT ? ', array( 1 ) ) ), 0 );
+		asrt( count( R::taggedAll( 'movie', 'romance', ' LIMIT ? ', array( 1 ) ) ), 0 );
+		asrt( count( R::tagged( 'movie', 'romance,xmas', ' LIMIT ? ', array( 1 ) ) ), 0 );
+		asrt( count( R::taggedAll( 'movie', 'romance,xmas', ' LIMIT ? ', array( 1 ) ) ), 0 );
+		asrt( count( R::tagged( 'movie', 'gothic,short', ' LIMIT ? ', array( 4 ) ) ), 2 );
+		asrt( count( R::taggedAll( 'movie', 'gothic,short', ' LIMIT ? ', array( 4 ) ) ), 1 );
+		asrt( count( R::tagged( 'movie', 'gothic,short', ' LIMIT 4 ' ) ), 2 );
+		asrt( count( R::taggedAll( 'movie', 'gothic,short', ' LIMIT 4 ' ) ), 1 );
+		asrt( count( R::tagged( 'movie', 'gothic,short', ' ORDER BY id DESC LIMIT 4 ' ) ), 2 );
+		asrt( count( R::taggedAll( 'movie', 'gothic,short', ' ORDER BY id DESC LIMIT 4 ' ) ), 1 );
+		asrt( count( R::tagged( 'movie', 'short', ' LIMIT ? ', array( 4 ) ) ), 1 );
+		asrt( count( R::taggedAll( 'movie', 'short', ' LIMIT ? ', array( 4 ) ) ), 1 );
+		asrt( count( R::tagged( 'movie', '', ' LIMIT ? ', array( 4 ) ) ), 0 );
+		asrt( count( R::taggedAll( 'movie', '', ' LIMIT ? ', array( 4 ) ) ), 0 );
+		asrt( count( R::tagged( 'movie', '', ' LIMIT 4 ' ) ), 0 );
+		asrt( count( R::taggedAll( 'movie', '', ' LIMIT 4 ' ) ), 0 );
+		asrt( count( R::tagged( 'movie', '', '' ) ), 0 );
+		asrt( count( R::taggedAll( 'movie', '', '' ) ), 0 );
+		asrt( count( R::tagged( 'movie', '' ) ), 0 );
+		asrt( count( R::taggedAll( 'movie', '' ) ), 0 );
 	}
 
 	/**
@@ -56,7 +85,6 @@ class Tags extends Base
 		R::tag( $d, 'black' );
 		R::tag( $e, 'strong,sweet' );
 		R::tag( $f, 'black,strong' );
-
 		asrt( count( R::taggedAll( 'coffee', 'strong,sweet' ) ), 1 );
 
 		asrt( count( R::taggedAll( 'coffee', 'strong' ) ), 3 );

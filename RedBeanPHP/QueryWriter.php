@@ -259,6 +259,23 @@ interface QueryWriter
 	public function queryRecordCountRelated( $sourceType, $targetType, $linkID, $addSQL = '', $bindings = array() );
 
 	/**
+	 * Returns all rows of specified type that have been tagged with one of the
+	 * strings in the specified tag list array.
+	 *
+	 * Note that the additional SQL snippet can only be used for pagination,
+	 * the SQL snippet will be appended to the end of the query.
+	 *
+	 * @param string  $type     the bean type you want to query
+	 * @param array   $tagList  an array of strings, each string containing a tag title
+	 * @param boolean $all      if TRUE only return records that have been associated with ALL the tags in the list
+	 * @param string  $addSql   addition SQL snippet, for pagination
+	 * @param array   $bindings parameter bindings for additional SQL snippet
+	 *
+	 * @return array
+	 */
+	public function queryTagged( $type, $tagList, $all = FALSE, $addSql = '', $bindings = array() );
+
+	/**
 	 * This method should update (or insert a record), it takes
 	 * a table name, a list of update values ( $field => $value ) and an
 	 * primary key ID (optional). If no primary key ID is provided, an

@@ -229,15 +229,9 @@ class TagManager
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
-	 * Note that additional SQL snippets will be applied PER TAG.
-	 * This means LIMIT 2 on 2 tags might yield 4 results.
-	 * You can use the LIMIT clause to prevent memory issues with large
-	 * collections but you cannot create a reliable pagination system
-	 * without further logic if using more than one tag.
-	 *
 	 * @param string       $beanType type of bean you are looking for
 	 * @param array|string $tagList  list of tags to match
-	 * @param string       $sql      additional SQL
+	 * @param string       $sql      additional SQL (use only for pagination)
 	 * @param array        $bindings bindings
 	 *
 	 * @return array
@@ -245,48 +239,27 @@ class TagManager
 	public function tagged( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
 		$tags       = $this->extractTagsIfNeeded( $tagList );
+		$records    = $this->toolbox->getWriter()->queryTagged( $beanType, $tags, FALSE, $sql, $bindings );
 
-		$collection = array();
-
-		$tags       = $this->redbean->find( 'tag', array( 'title' => $tags ) );
-
-		$list       = 'shared'.ucfirst( $beanType );
-		
-		if ( is_array( $tags ) && count( $tags ) > 0 ) {
-			foreach($tags as $tag) {
-				$collection += $tag->with( $sql, $bindings )->$list;
-			}
-		}
-
-		return $collection;
+		return $this->redbean->convertToBeans( $beanType, $records );
 	}
 
 	/**
 	 * Returns all beans that have been tagged with ALL of the tags given.
-	 * 
+	 *
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
-	 * 
+	 *
 	 * @param string        $beanType type of bean you are looking for
 	 * @param array|string  $tagList  list of tags to match
 	 *
 	 * @return array
 	 */
-	public function taggedAll( $beanType, $tagList )
+	public function taggedAll( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
 		$tags  = $this->extractTagsIfNeeded( $tagList );
+		$records    = $this->toolbox->getWriter()->queryTagged( $beanType, $tags, TRUE, $sql, $bindings );
 
-		$beans = array();
-		foreach ( $tags as $tag ) {
-			$beans = $this->tagged( $beanType, $tag );
-			
-			if ( isset( $oldBeans ) ) {
-				$beans = array_intersect_assoc( $beans, $oldBeans );
-			}
-
-			$oldBeans = $beans;
-		}
-
-		return $beans;
+		return $this->redbean->convertToBeans( $beanType, $records );
 	}
 }

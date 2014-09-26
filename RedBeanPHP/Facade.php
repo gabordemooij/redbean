@@ -1055,12 +1055,14 @@ class Facade
 	 *
 	 * @param string $beanType type of bean you are looking for
 	 * @param array  $tagList  list of tags to match
+	 * @param string $sql      additional SQL
+	 * @param array  $bindings bindings
 	 *
 	 * @return array
 	 */
-	public static function taggedAll( $beanType, $tagList )
+	public static function taggedAll( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
-		return self::$tagManager->taggedAll( $beanType, $tagList );
+		return self::$tagManager->taggedAll( $beanType, $tagList, $sql, $bindings );
 	}
 
 	/**

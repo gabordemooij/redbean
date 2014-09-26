@@ -851,6 +851,33 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
+	 * @see QueryWriter::queryTagged
+	 */
+	public function queryTagged( $type, $tagList, $all = FALSE, $addSql = '', $bindings = array() )
+	{
+		$assocType = $this->getAssocTable( array( $type, 'tag' ) );
+		$assocTable = $this->esc( $assocType );
+		$assocField = $type . '_id';
+		$table = $this->esc( $type );
+		$slots = implode( ',', array_fill( 0, count( $tagList ), '?' ) );
+		$score = ( $all ) ? count( $tagList ) : 1;
+
+		$sql = "
+			SELECT {$table}.*, count({$table}.id) FROM {$table}
+			INNER JOIN {$assocTable} ON {$assocField} = {$table}.id
+			INNER JOIN tag ON {$assocTable}.tag_id = tag.id
+			WHERE tag.title IN ({$slots})
+			GROUP BY {$table}.id
+			HAVING count({$table}.id) >= ?
+			{$addSql}
+		";
+
+		$bindings = array_merge( $tagList, array( $score ), $bindings );
+		$rows = $this->adapter->get( $sql, $bindings );
+		return $rows;
+	}
+
+	/**
 	 * @see QueryWriter::queryRecordCount
 	 */
 	public function queryRecordCount( $type, $conditions = array(), $addSql = NULL, $bindings = array() )

@@ -26,7 +26,7 @@ class Finding extends Base {
 	/**
 	 * Test whether findOne gets a LIMIT 1
 	 * clause.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testFindOneLimitOne()
