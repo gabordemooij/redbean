@@ -1127,8 +1127,6 @@ class Facade
 
 		self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
 
-		self::$associationManager->addEventListener( 'delete', $helper );
-
 		self::$duplicationManager = new DuplicationManager( self::$toolbox );
 		self::$tagManager         = new TagManager( self::$toolbox );
 
