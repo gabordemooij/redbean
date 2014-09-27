@@ -111,8 +111,12 @@ class Bean extends Base
 		$book->map = R::dispense( 'map' );
 		$book->map->name = 'Wight';
 		$book->map->xownLocationList = R::dispense( 'location', 3 );
+		asrt( $book->getMeta('tainted'), TRUE );
+		asrt( $book->getMeta('changed'), TRUE );
 		R::store( $book );
-		$logger = R::debug( 1, 1);
+		asrt( $book->getMeta('tainted'), FALSE );
+		asrt( $book->getMeta('changed'), FALSE );
+		$logger = R::debug( 1, 1 );
 		$book = $book->fresh();
 		asrt( $book->getMeta('tainted'), FALSE );
 		asrt( $book->getMeta('changed'), FALSE );
@@ -129,6 +133,11 @@ class Bean extends Base
 		//changed title, 1 update
 		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
 		asrt( count( $numberOfUpdateQueries ), 1 );
+		$logger->clear();
+		//store again, no changes, no updates
+		R::store( $book );
+		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
+		asrt( count( $numberOfUpdateQueries ), 0 );
 		$logger->clear();
 		$book = $book->fresh();
 		$book->xownPageList;
@@ -961,7 +970,6 @@ class Bean extends Base
 		asrt( $book->isTainted(), FALSE );
 		$book->alias('fake')->ownFakeList;
 		asrt( $book->isTainted(), TRUE );
-
 		$book = $book->fresh();
 		asrt( $book->isTainted(), FALSE );
 		$book->title;

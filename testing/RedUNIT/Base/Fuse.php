@@ -28,6 +28,102 @@ use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 class Fuse extends Base
 {
 	/**
+	 * Test FUSE hooks (i.e. open, update, update_after etc..)
+	 *
+	 * @return void
+	 */
+	public function testHooks()
+	{
+		R::nuke();
+		$probe = R::dispense( 'probe' );
+		$probe->name = 'test';
+		asrt( $probe->getLogActionCount(), 1 );
+		asrt( $probe->getLogActionCount( 'dispense' ), 1 );
+		asrt( $probe->getLogActionCount( 'open' ), 0 );
+		asrt( $probe->getLogActionCount( 'update' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_update' ), 0 );
+		asrt( $probe->getLogActionCount( 'delete' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_delete' ), 0 );
+		asrt( ( $probe->getDataFromLog( 0, 'bean' ) === $probe ), TRUE );
+		R::store( $probe );
+		asrt( $probe->getLogActionCount(), 3 );
+		asrt( $probe->getLogActionCount( 'dispense' ), 1 );
+		asrt( $probe->getLogActionCount( 'open' ), 0 );
+		asrt( $probe->getLogActionCount( 'update' ), 1 );
+		asrt( $probe->getLogActionCount( 'after_update' ), 1 );
+		asrt( $probe->getLogActionCount( 'delete' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_delete' ), 0 );
+		asrt( ( $probe->getDataFromLog( 2, 'bean' ) === $probe ), TRUE );
+		$probe = R::load( 'probe', $probe->id );
+		asrt( $probe->getLogActionCount(), 2 );
+		asrt( $probe->getLogActionCount( 'dispense' ), 1 );
+		asrt( $probe->getLogActionCount( 'open' ), 1 );
+		asrt( $probe->getLogActionCount( 'update' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_update' ), 0 );
+		asrt( $probe->getLogActionCount( 'delete' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_delete' ), 0 );
+		asrt( ( $probe->getDataFromLog( 0, 'bean' ) === $probe ), TRUE );
+		asrt( ( $probe->getDataFromLog( 1, 'id' ) === $probe->id ), TRUE );
+		$probe->clearLog();
+		R::trash( $probe );
+		asrt( $probe->getLogActionCount(), 2 );
+		asrt( $probe->getLogActionCount( 'dispense' ), 0 );
+		asrt( $probe->getLogActionCount( 'open' ), 0 );
+		asrt( $probe->getLogActionCount( 'update' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_update' ), 0 );
+		asrt( $probe->getLogActionCount( 'delete' ), 1 );
+		asrt( $probe->getLogActionCount( 'after_delete' ), 1 );
+		asrt( ( $probe->getDataFromLog( 0, 'bean' ) === $probe ), TRUE );
+		asrt( ( $probe->getDataFromLog( 1, 'bean' ) === $probe ), TRUE );
+		//less 'normal scenarios'
+		$probe = R::dispense( 'probe' );
+		$probe->name = 'test';
+		asrt( $probe->getLogActionCount(), 1 );
+		asrt( $probe->getLogActionCount( 'dispense' ), 1 );
+		asrt( $probe->getLogActionCount( 'open' ), 0 );
+		asrt( $probe->getLogActionCount( 'update' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_update' ), 0 );
+		asrt( $probe->getLogActionCount( 'delete' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_delete' ), 0 );
+		asrt( ( $probe->getDataFromLog( 0, 'bean' ) === $probe ), TRUE );
+		R::store( $probe );
+		asrt( $probe->getLogActionCount(), 3 );
+		asrt( $probe->getLogActionCount( 'dispense' ), 1 );
+		asrt( $probe->getLogActionCount( 'open' ), 0 );
+		asrt( $probe->getLogActionCount( 'update' ), 1 );
+		asrt( $probe->getLogActionCount( 'after_update' ), 1 );
+		asrt( $probe->getLogActionCount( 'delete' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_delete' ), 0 );
+		asrt( ( $probe->getDataFromLog( 2, 'bean' ) === $probe ), TRUE );
+		asrt( $probe->getMeta( 'tainted' ), FALSE );
+		asrt( $probe->getMeta( 'changed' ), FALSE );
+		R::store( $probe ); //not tainted, no FUSE save!
+		asrt( $probe->getLogActionCount(), 3 );
+		asrt( $probe->getLogActionCount( 'dispense' ), 1 );
+		asrt( $probe->getLogActionCount( 'open' ), 0 );
+		asrt( $probe->getLogActionCount( 'update' ), 1 );
+		asrt( $probe->getLogActionCount( 'after_update' ), 1 );
+		asrt( $probe->getLogActionCount( 'delete' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_delete' ), 0 );
+		asrt( ( $probe->getDataFromLog( 2, 'bean' ) === $probe ), TRUE );
+		$probe->xownProbeList[] = R::dispense( 'probe' );
+		//tainted, not changed, triggers FUSE
+		asrt( $probe->getMeta( 'tainted' ), TRUE );
+		asrt( $probe->getMeta( 'changed' ), FALSE );
+		R::store( $probe );
+		asrt( $probe->getMeta( 'tainted' ), FALSE );
+		asrt( $probe->getMeta( 'changed' ), FALSE );
+		asrt( $probe->getLogActionCount(), 5 );
+		asrt( $probe->getLogActionCount( 'dispense' ), 1 );
+		asrt( $probe->getLogActionCount( 'open' ), 0 );
+		asrt( $probe->getLogActionCount( 'update' ), 2 );
+		asrt( $probe->getLogActionCount( 'after_update' ), 2 );
+		asrt( $probe->getLogActionCount( 'delete' ), 0 );
+		asrt( $probe->getLogActionCount( 'after_delete' ), 0 );
+		asrt( ( $probe->getDataFromLog( 2, 'bean' ) === $probe ), TRUE );
+	}
+	
+	/**
 	 * Tests the SimpleFacadeBeanHelper factory setter.
 	 *
 	 * @return void

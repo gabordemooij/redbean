@@ -501,4 +501,100 @@ class DiagnosticBean extends \RedBeanPHP\OODBBean {
 
 }
 
+class DiagnosticModel extends \RedBeanPHP\SimpleModel
+{
+	
+	private $logs = array();
+	
+	public function open()
+	{
+		$this->logs[] = array(
+			'action' => 'open',
+			'data'   => array(
+				'id' => $this->id
+			)
+		);
+	}
+
+	public function dispense()
+	{
+		$this->logs[] = array(
+			'action' => 'dispense',
+			'data'   => array(
+				'bean' => $this->bean
+			)
+		);
+	}
+
+	public function update()
+	{
+		$this->logs[] = array(
+			'action' => 'update',
+			'data'   => array(
+				'bean' => $this->bean
+			)
+		);
+	}
+
+	public function after_update()
+	{
+		$this->logs[] = array(
+			'action' => 'after_update',
+			'data'   => array(
+				'bean' => $this->bean
+			)
+		);
+	}
+
+	public function delete()
+	{
+		$this->logs[] = array(
+			'action' => 'delete',
+			'data'   => array(
+				'bean' => $this->bean
+			)
+		);
+	}
+
+	public function after_delete()
+	{
+		$this->logs[] = array(
+			'action' => 'after_delete',
+			'data'   => array(
+				'bean' => $this->bean
+			)
+		);
+	}
+	
+	public function getLogs()
+	{
+		return $this->logs;
+	}
+	
+	public function getLogActionCount( $action = NULL )
+	{
+		if ( is_null( $action ) ) return count( $this->logs );
+		$counter = 0;
+		foreach( $this->logs as $log ) {
+			if ( $log['action'] == $action ) $counter ++;
+		}
+		return $counter;
+	}
+	
+	public function clearLog()
+	{
+		return $this->logs = array();
+	}
+	
+	public function getDataFromLog( $logIndex = 0, $property )
+	{
+		return $this->logs[$logIndex]['data'][$property];
+	}
+	
+	
+}
+
+class Model_Probe extends DiagnosticModel {};
+
+
 define('REDBEAN_OODBBEAN_CLASS', '\DiagnosticBean');
