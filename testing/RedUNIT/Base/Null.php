@@ -85,7 +85,49 @@ class Null extends Base
 		R::freeze( FALSE );
 	}
 
-
+	/**
+	 * Test nullifying aliased parent.
+	 *
+	 * @return void
+	 */
+	public function testUnsetAliasedParent()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$author = R::dispense( 'author' );
+		$book->coauthor = $author;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( is_null( $book->fetchAs('author')->coauthor ), FALSE );
+		unset( $book->coauthor );
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( is_null( $book->fetchAs('author')->coauthor ), FALSE );
+		$book->coauthor = NULL;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( is_null( $book->fetchAs('author')->coauthor ), TRUE );
+		R::trash( $book );
+		R::trash( $author );
+		R::freeze( TRUE );
+		$book = R::dispense( 'book' );
+		$author = R::dispense( 'author' );
+		$book->coauthor = $author;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( is_null( $book->fetchAs('author')->coauthor ), FALSE );
+		unset( $book->coauthor );
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( is_null( $book->fetchAs('author')->coauthor ), FALSE );
+		$book->coauthor = NULL;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( is_null( $book->fetchAs('author')->coauthor ), TRUE );
+		R::trash( $book );
+		R::trash( $author );
+		R::freeze( FALSE );
+	}
 
 	/**
 	 * Test NULL handling, setting a property to NULL must
