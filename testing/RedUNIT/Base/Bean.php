@@ -20,6 +20,26 @@ class Bean extends Base
 {
 
 	/**
+	 * Other tests...
+	 */
+	public function testMisc()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->ownPage[] = R::dispense( 'page' );
+		R::store( $book );
+		R::nuke();
+		R::store( $book );
+		asrt( R::count( 'book' ), 0 );
+		$book->ownPage;
+		R::store( $book );
+		asrt( R::count( 'book' ), 0 );
+		$book->title = 'x';
+		R::store( $book );
+		asrt( R::count( 'book' ), 0 );
+	}
+
+	/**
 	 * Only fire update query if the bean really contains different
 	 * values. But make sure beans several 'parents' away still get
 	 * saved.
