@@ -37,6 +37,11 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	const C_DATATYPE_SPECIFIED        = 99;
 
 	/**
+	 * @var schema
+	 */
+	protected $schema = "'public'";
+
+	/**
 	 * @var DBAdapter
 	 */
 	protected $adapter;
@@ -89,7 +94,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 				LEFT OUTER JOIN pg_class c2 ON cons.confrelid = c2.oid
 				LEFT OUTER JOIN pg_namespace n2 ON n2.oid = c2.relnamespace
 				WHERE c.relkind = 'r'
-					AND n.nspname IN ('public')
+					AND n.nspname IN ({$this->schema})
 					AND (cons.contype = 'f' OR cons.contype IS NULL)
 					AND (  cons.conname = '{$fkCode}a'	OR  cons.conname = '{$fkCode}b' )
 			";
@@ -157,11 +162,26 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	}
 
 	/**
+	 * Sets a (different) schema.
+	 *
+	 * @param array $schemas array of schemas
+	 *
+	 * @return self
+	 */
+	public function setSchemas( $schemas )
+	{
+		$list = array();
+		foreach( $schemas as $schema ) $list[] = "'{$schema}'";
+		$this->schema = implode( ',', $list );
+		return $this;
+	}
+
+	/**
 	 * @see QueryWriter::getTables
 	 */
 	public function getTables()
 	{
-		return $this->adapter->getCol( "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'" );
+		return $this->adapter->getCol( "SELECT table_name FROM information_schema.tables WHERE table_schema IN ({$this->schema})" );
 	}
 
 	/**
@@ -360,15 +380,15 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	public function addFK( $type, $targetType, $field, $targetField, $isDep = FALSE )
 	{
 		$db = $this->adapter->getCell( 'SELECT current_database()' );
-		$cfks = $this->adapter->getCell('
+		$cfks = $this->adapter->getCell("
 			SELECT constraint_name
 				FROM information_schema.KEY_COLUMN_USAGE
 			WHERE
 				table_catalog = ?
-				AND table_schema = \'public\'
+				AND table_schema IN ({$this->schema})
 				AND table_name = ?
 				AND column_name = ?
-		', array($db, $type, $field));
+		", array($db, $type, $field));
 
 		try{
 			if (!$cfks) {
