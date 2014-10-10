@@ -275,7 +275,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		
 		if ( is_numeric( $value ) && ( intval( $value ) == $value ) && $value < 2147483648 && $value > -2147483648 ) return self::C_DATATYPE_INTEGER;
 
-		if ( ( is_numeric( $value ) && $value < 2147483648 )
+		if ( ( is_numeric( $value ) && $value < 2147483648 && $value > -2147483648)
 			|| preg_match( '/\d{4}\-\d\d\-\d\d/', $value )
 			|| preg_match( '/\d{4}\-\d\d\-\d\d\s\d\d:\d\d:\d\d/', $value )
 		) {

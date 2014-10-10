@@ -69,6 +69,12 @@ class Writer extends Sqlite
 		asrt( $writer->scanType( -1 ), SQLiteT::C_DATATYPE_INTEGER );
 		asrt( $writer->scanType( 1.5 ), SQLiteT::C_DATATYPE_NUMERIC );
 
+		asrt( $writer->scanType( 2147483648 - 1 ), SQLiteT::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( 2147483648 ), SQLiteT::C_DATATYPE_TEXT );
+
+		asrt( $writer->scanType( -2147483648 + 1), SQLiteT::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( -2147483648 ), SQLiteT::C_DATATYPE_TEXT );
+
 		asrt( $writer->scanType( INF ), SQLiteT::C_DATATYPE_TEXT );
 
 		asrt( $writer->scanType( "abc" ), SQLiteT::C_DATATYPE_TEXT );
