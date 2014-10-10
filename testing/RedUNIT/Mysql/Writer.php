@@ -155,6 +155,8 @@ class Writer extends \RedUNIT\Mysql
 		asrt( $writer->code( "unknown" ), 99 );
 
 		asrt( $writer->scanType( FALSE ), 0 );
+		asrt( $writer->scanType( TRUE ), 0 );
+		
 		asrt( $writer->scanType( NULL ), 0 );
 
 		asrt( $writer->scanType( 2 ), 2 );
