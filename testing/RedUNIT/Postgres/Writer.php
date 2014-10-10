@@ -82,7 +82,7 @@ class Writer extends Postgres
 
 		asrt( $writer->scanType( 1.5 ), 1 );
 
-		asrt( $writer->scanType( INF ), 1 );
+		asrt( $writer->scanType( INF ), 3 );
 
 		asrt( $writer->scanType( "abc" ), 3 );
 

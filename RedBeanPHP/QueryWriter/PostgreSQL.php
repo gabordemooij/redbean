@@ -198,6 +198,8 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	{
 		$this->svalue = $value;
 
+		if ( $value === INF ) return self::C_DATATYPE_TEXT;
+
 		if ( $flagSpecial && $value ) {
 			if ( preg_match( '/^\d{4}\-\d\d-\d\d$/', $value ) ) {
 				return PostgreSQL::C_DATATYPE_SPECIAL_DATE;

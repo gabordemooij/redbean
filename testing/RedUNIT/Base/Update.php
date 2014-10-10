@@ -517,5 +517,27 @@ class Update extends Base
 		$bean = $bean->fresh();
 		asrt( ( $bean->str === '' ), TRUE);
 	}
+
+	/**
+	 * Test handling of infinity values.
+	 *
+	 * @return void
+	 */
+	public function testStoringInf()
+	{
+		R::nuke();
+		$bean = R::dispense( 'bean' );
+		$bean->inf = INF;
+		R::store( $bean );
+		$bean = $bean->fresh();
+		asrt( ( $bean->inf === 'INF' ), TRUE );
+		asrt( ( $bean->inf == 'INF' ), TRUE );
+		$bean->modifyme = 'yes';
+		R::store( $bean );
+		$bean = $bean->fresh();
+		asrt( ( $bean->inf === 'INF' ), TRUE );
+		asrt( ( $bean->inf == 'INF' ), TRUE );
+		$bean->modifyme = 'yes';
+	}
 }
 

@@ -268,6 +268,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$this->svalue = $value;
 
 		if ( $value === NULL ) return self::C_DATATYPE_INTEGER;
+		if ( $value === INF ) return self::C_DATATYPE_TEXT;
 
 		if ( $this->startsWithZeros( $value ) ) return self::C_DATATYPE_TEXT;
 
