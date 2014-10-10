@@ -507,5 +507,15 @@ class Update extends Base
 
 		asrt( (int) $pdo->GetCell( "SELECT count(*) FROM page" ), 0 );
 	}
+	
+	public function testEmptyStringShouldNotBeStoredAsInteger()
+	{
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->str = '';
+		R::store($bean);
+		$bean = $bean->fresh();
+		asrt( ( $bean->str === '' ), TRUE);
+	}
 }
 

@@ -68,7 +68,8 @@ class Writer extends Postgres
 
 		asrt( $writer->code( "unknown" ), 99 );
 
-		asrt( $writer->scanType( FALSE ), 3 );
+		asrt( $writer->scanType( FALSE ), 0 );
+		asrt( $writer->scanType( TRUE ), 0 );
 
 		asrt( $writer->scanType( NULL ), 0 );
 

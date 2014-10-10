@@ -228,13 +228,9 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 			}
 		}
 
-		$sz = ( $this->startsWithZeros( $value ) );
+		if ( $this->startsWithZeros( $value ) ) return self::C_DATATYPE_TEXT; 
 
-		if ( $sz ) {
-			return self::C_DATATYPE_TEXT;
-		}
-
-		if ( $value === NULL || ( $value instanceof NULL ) || ( is_numeric( $value )
+		if ( $value === FALSE || $value === TRUE || $value === NULL || ( $value instanceof NULL ) || ( is_numeric( $value )
 				&& floor( $value ) == $value
 				&& $value < 2147483648
 				&& $value > -2147483648 )

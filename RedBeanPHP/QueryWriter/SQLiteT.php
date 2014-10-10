@@ -267,13 +267,13 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	{
 		$this->svalue = $value;
 
-		if ( $value === FALSE ) return self::C_DATATYPE_INTEGER;
-
 		if ( $value === NULL ) return self::C_DATATYPE_INTEGER;
 
 		if ( $this->startsWithZeros( $value ) ) return self::C_DATATYPE_TEXT;
 
-		if ( is_numeric( $value ) && ( intval( $value ) == $value ) && $value < 2147483648 ) return self::C_DATATYPE_INTEGER;
+		if ( $value === TRUE || $value === FALSE )  return self::C_DATATYPE_INTEGER;
+		
+		if ( is_numeric( $value ) && ( intval( $value ) == $value ) && $value < 2147483648 && $value > -2147483648 ) return self::C_DATATYPE_INTEGER;
 
 		if ( ( is_numeric( $value ) && $value < 2147483648 )
 			|| preg_match( '/\d{4}\-\d\d\-\d\d/', $value )

@@ -164,7 +164,7 @@ class Writer extends \RedUNIT\Mysql
 		asrt( $writer->scanType( -1 ), 3 );
 		asrt( $writer->scanType( 1.5 ), 3 );
 
-		asrt( $writer->scanType( INF ), 4 );
+		//asrt( $writer->scanType( INF ), 4 ); @todo what type should INF get???
 
 		asrt( $writer->scanType( "abc" ), 4 );
 
