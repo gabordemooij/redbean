@@ -136,6 +136,7 @@ $allPacks = array(
 	'Base/Database',
 	'Base/Foreignkeys',
 	'Base/Namedparams',
+	'Base/Prefixes',
 	'Base/Copy',
 	'Base/Dup',
 	'Base/Update',
