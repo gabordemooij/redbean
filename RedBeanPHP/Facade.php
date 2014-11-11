@@ -320,7 +320,7 @@ class Facade
                     'sqlite' => 'SQLiteT',
                     'cubrid' => 'CUBRID',
                     'mysql'  => 'MySQL',
-                    'sqlsrv' => 'SqlServer',
+                    'sqlsrv' => 'SQLServer',
                   );
 
 		$wkey = trim( strtolower( $dbType ) );
