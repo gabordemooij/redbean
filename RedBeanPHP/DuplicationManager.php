@@ -372,7 +372,7 @@ class DuplicationManager
 			}
 		}
 
-		$rs = $this->duplicate( clone( $bean ), $trail, $preserveIDs );
+		$rs = $this->duplicate( ( clone $bean ), $trail, $preserveIDs );
 
 		if ( !$this->cacheTables ) {
 			$this->tables  = array();
