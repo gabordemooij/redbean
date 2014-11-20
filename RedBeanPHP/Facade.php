@@ -54,12 +54,12 @@ class Facade
 	/**
 	 * @var array
 	 */
-	private static $toolboxes = array();
+	public static $toolboxes = array();
 
 	/**
 	 * @var ToolBox
 	 */
-	private static $toolbox;
+	public static $toolbox;
 
 	/**
 	 * @var OODB
@@ -104,7 +104,7 @@ class Facade
 	/**
 	 * @var string
 	 */
-	private static $currentDB = '';
+	public static $currentDB = '';
 
 	/**
 	 * @var array
