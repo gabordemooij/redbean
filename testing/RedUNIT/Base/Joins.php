@@ -21,6 +21,34 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Joins extends Base
 {
+
+	/**
+	 * Tests joins with ownCount().
+	 */
+	public function testJoinsInCount()
+	{
+		R::nuke();
+		$author = R::dispense( 'author' );
+		$book = R::dispense( 'book' );
+		$info = R::dispense( 'info' );
+		$info->title = 'x';
+		$author->xownBookList[] = $book;
+		$book->info = $info;
+		$book = R::dispense( 'book' );
+		$info = R::dispense( 'info' );
+		$info->title = 'y';
+		$author->xownBookList[] = $book;
+		$book->info = $info;
+		R::store( $author );
+		$author = $author->fresh();
+		$books = $author->withCondition(' @joined.info.title != ? ', array('x'))->countOwn('book');
+		asrt($books, 1);
+		$books = $author->withCondition(' @joined.info.title != ? ', array('y'))->countOwn('book');
+		asrt($books, 1);
+		$books = $author->withCondition(' @joined.info.title IN (?,?) ', array('x','y'))->countOwn('book');
+		asrt($books, 2);
+	}
+
 	/**
 	 * Test Joins.
 	 *
