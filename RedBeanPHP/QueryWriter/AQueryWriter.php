@@ -289,9 +289,12 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 * A cache tag is used to make sure the cache remains consistent. In most cases the cache tag
 	 * will be the bean type, this makes sure queries associated with a certain reference type will
 	 * never contain conflicting data.
-	 * You can only store one item under a cache tag. Why not use the cache tag as a key? Well
+	 * Why not use the cache tag as a key? Well
 	 * we need to make sure the cache contents fits the key (and key is based on the cache values).
 	 * Otherwise it would be possible to store two different result sets under the same key (the cache tag).
+	 *
+	 * In previous versions you could only store one key-entry, I have changed this to
+	 * improve caching efficiency (issue #400).
 	 *
 	 * @param string $cacheTag cache tag (secondary key)
 	 * @param string $key      key
@@ -301,9 +304,8 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 */
 	private function putResultInCache( $cacheTag, $key, $values )
 	{
-		$this->cache[$cacheTag] = array(
-			$key => $values
-		);
+		if (!isset($this->cache[$cacheTag])) $this->cache[$cacheTag] = array();
+		$this->cache[$cacheTag][$key] = $values;
 	}
 
 	/**

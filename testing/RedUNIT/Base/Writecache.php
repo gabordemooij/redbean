@@ -29,6 +29,61 @@ class Writecache extends Base
 	}
 
 	/**
+	 * When using fetchAs(), Query Cache does not recognize objects
+	 * that have been previously fetched, see issue #400.
+	 */
+	public function testCachingAndFetchAs()
+	{
+		testpack( 'Testing whether you can cache multiple records of the same type' );
+		R::debug( true, 1 );
+		$logger = R::getDatabaseAdapter()->getDatabase()->getLogger();
+		R::nuke();
+		$coauthor1 = R::dispense( 'author' );
+		$coauthor1->name = 'John';
+		$book = R::dispense( 'book' );
+		$book->title = 'a Funny Tale';
+		$book->coauthor = $coauthor1;
+		$id = R::store( $book );
+		$coauthor = R::dispense( 'author' );
+		$coauthor->name = 'Pete';
+		$book = R::dispense( 'book' );
+		$book->title = 'a Funny Tale 2';
+		$book->coauthor = $coauthor;
+		$id = R::store( $book );
+		$book = R::dispense( 'book' );
+		$book->title = 'a Funny Tale 3';
+		$book->coauthor = $coauthor1;
+		$id = R::store( $book );
+		$books = R::find( 'book' );
+		$logger->clear();
+		$authors = array();
+		$authorsByName = array();
+		foreach($books as $book) {
+			$coAuthor = $book->with( ' ORDER BY title ASC ' )
+				->fetchAs( 'author' )->coauthor;
+			$authors[] = $coAuthor->name;
+			$authorsByName[ $coAuthor->name ] = $coAuthor;
+		}
+		asrt( count( $logger->grep( 'SELECT' ) ), 2 ); //must be 2! 3 if cache does not work!
+		asrt( count( $authors ), 3 );
+		asrt( isset( $authorsByName[ 'John' ] ), TRUE );
+		asrt( isset( $authorsByName[ 'Pete' ] ), TRUE );
+		$logger->clear();
+		$authors = array();
+		$authorsByName = array();
+		foreach($books as $book) {
+			$coAuthor = $book->with( ' ORDER BY title DESC ' )
+				->fetchAs( 'author' )->coauthor;
+			$authors[] = $coAuthor->name;
+			$authorsByName[ $coAuthor->name ] = $coAuthor;
+		}
+		asrt( count( $logger->grep( 'SELECT' ) ), 0 ); //must be 0!
+		asrt( count( $authors ), 3 );
+		asrt( isset( $authorsByName[ 'John' ] ), TRUE );
+		asrt( isset( $authorsByName[ 'Pete' ] ), TRUE );
+	}
+
+	/**
 	 * Test effects of cache.
 	 *
 	 * @return void
