@@ -24,3 +24,4 @@ Thumbs.db
 /rb.phar
 /rb.php
 build/
+vendor

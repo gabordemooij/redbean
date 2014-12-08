@@ -1,0 +1,25 @@
+{
+    "name": "gabordemooij/redbean",
+    "type": "library",
+    "description": "RedBeanPHP is an easy-to-use, on-the-fly ORM for PHP.",
+    "keywords": ["MySQL", "InnoDB", "MariaDB", "PostgreSQL", "SQLite3", "CUBRID"],
+    "license": "MIT",
+    "homepage": "https://github.com/gabordemooij/redbean",
+    "authors": [
+        {
+          "name": "Gabor de Mooij",
+          "email": "gabordemooij@gmail.com",
+          "homepage": "http://www.redbeanphp.com",
+          "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "RedBeanPHP\\": "RedBeanPHP"
+        }
+    },
+    "minimum-stability": "stable"
+}
