@@ -22,200 +22,203 @@ use RedBeanPHP\Driver as Driver;
  */
 class DBAdapter extends Observable implements Adapter
 {
+    /**
+     * @var Driver
+     */
+    private $db = null;
 
-	/**
-	 * @var Driver
-	 */
-	private $db = NULL;
+    /**
+     * @var string
+     */
+    private $sql = '';
 
-	/**
-	 * @var string
-	 */
-	private $sql = '';
+    /**
+     * Constructor.
+     *
+     * Creates an instance of the RedBean Adapter Class.
+     * This class provides an interface for RedBean to work
+     * with ADO compatible DB instances.
+     *
+     * @param Driver $database ADO Compatible DB Instance
+     */
+    public function __construct($database)
+    {
+        $this->db = $database;
+    }
 
-	/**
-	 * Constructor.
-	 *
-	 * Creates an instance of the RedBean Adapter Class.
-	 * This class provides an interface for RedBean to work
-	 * with ADO compatible DB instances.
-	 *
-	 * @param Driver $database ADO Compatible DB Instance
-	 */
-	public function __construct( $database )
-	{
-		$this->db = $database;
-	}
+    /**
+     * @see Adapter::getSQL
+     */
+    public function getSQL()
+    {
+        return $this->sql;
+    }
 
-	/**
-	 * @see Adapter::getSQL
-	 */
-	public function getSQL()
-	{
-		return $this->sql;
-	}
+    /**
+     * @see Adapter::exec
+     */
+    public function exec($sql, $bindings = array(), $noevent = false)
+    {
+        if (!$noevent) {
+            $this->sql = $sql;
+            $this->signal('sql_exec', $this);
+        }
 
-	/**
-	 * @see Adapter::exec
-	 */
-	public function exec( $sql, $bindings = array(), $noevent = FALSE )
-	{
-		if ( !$noevent ) {
-			$this->sql = $sql;
-			$this->signal( 'sql_exec', $this );
-		}
+        return $this->db->Execute($sql, $bindings);
+    }
 
-		return $this->db->Execute( $sql, $bindings );
-	}
+    /**
+     * @see Adapter::get
+     */
+    public function get($sql, $bindings = array())
+    {
+        $this->sql = $sql;
+        $this->signal('sql_exec', $this);
 
-	/**
-	 * @see Adapter::get
-	 */
-	public function get( $sql, $bindings = array() )
-	{
-		$this->sql = $sql;
-		$this->signal( 'sql_exec', $this );
+        return $this->db->GetAll($sql, $bindings);
+    }
 
-		return $this->db->GetAll( $sql, $bindings );
-	}
+    /**
+     * @see Adapter::getRow
+     */
+    public function getRow($sql, $bindings = array())
+    {
+        $this->sql = $sql;
+        $this->signal('sql_exec', $this);
 
-	/**
-	 * @see Adapter::getRow
-	 */
-	public function getRow( $sql, $bindings = array() )
-	{
-		$this->sql = $sql;
-		$this->signal( 'sql_exec', $this );
+        return $this->db->GetRow($sql, $bindings);
+    }
 
-		return $this->db->GetRow( $sql, $bindings );
-	}
+    /**
+     * @see Adapter::getCol
+     */
+    public function getCol($sql, $bindings = array())
+    {
+        $this->sql = $sql;
+        $this->signal('sql_exec', $this);
 
-	/**
-	 * @see Adapter::getCol
-	 */
-	public function getCol( $sql, $bindings = array() )
-	{
-		$this->sql = $sql;
-		$this->signal( 'sql_exec', $this );
+        return $this->db->GetCol($sql, $bindings);
+    }
 
-		return $this->db->GetCol( $sql, $bindings );
-	}
+    /**
+     * @see Adapter::getAssoc
+     */
+    public function getAssoc($sql, $bindings = array())
+    {
+        $this->sql = $sql;
 
-	/**
-	 * @see Adapter::getAssoc
-	 */
-	public function getAssoc( $sql, $bindings = array() )
-	{
-		$this->sql = $sql;
+        $this->signal('sql_exec', $this);
 
-		$this->signal( 'sql_exec', $this );
+        $rows  = $this->db->GetAll($sql, $bindings);
 
-		$rows  = $this->db->GetAll( $sql, $bindings );
+        $assoc = array();
+        if (!$rows) {
+            return $assoc;
+        }
 
-		$assoc = array();
-		if ( !$rows ) {
-			return $assoc;
-		}
+        foreach ($rows as $row) {
+            if (empty($row)) {
+                continue;
+            }
 
-		foreach ( $rows as $row ) {
-			if ( empty( $row ) ) continue;
+            if (count($row) > 1) {
+                $key   = array_shift($row);
+                $value = array_shift($row);
+            } else {
+                $key   = array_shift($row);
+                $value = $key;
+            }
 
-			if ( count( $row ) > 1 ) {
-				$key   = array_shift( $row );
-				$value = array_shift( $row );
-			} else {
-				$key   = array_shift( $row );
-				$value = $key;
-			}
+            $assoc[$key] = $value;
+        }
 
-			$assoc[$key] = $value;
-		}
+        return $assoc;
+    }
 
-		return $assoc;
-	}
-	
-	/**
-	 * @see Adapter::getAssocRow
-	 */
-	public function getAssocRow($sql, $bindings = array())
-	{
-		$this->sql = $sql;
-		$this->signal( 'sql_exec', $this );
+    /**
+     * @see Adapter::getAssocRow
+     */
+    public function getAssocRow($sql, $bindings = array())
+    {
+        $this->sql = $sql;
+        $this->signal('sql_exec', $this);
 
-		return $this->db->GetAssocRow( $sql, $bindings );
-	}
+        return $this->db->GetAssocRow($sql, $bindings);
+    }
 
-	/**
-	 * @see Adapter::getCell
-	 */
-	public function getCell( $sql, $bindings = array(), $noSignal = NULL )
-	{
-		$this->sql = $sql;
+    /**
+     * @see Adapter::getCell
+     */
+    public function getCell($sql, $bindings = array(), $noSignal = null)
+    {
+        $this->sql = $sql;
 
-		if ( !$noSignal ) $this->signal( 'sql_exec', $this );
+        if (!$noSignal) {
+            $this->signal('sql_exec', $this);
+        }
 
-		$arr = $this->db->getCol( $sql, $bindings );
+        $arr = $this->db->getCol($sql, $bindings);
 
-		if ( $arr && is_array( $arr ) && isset( $arr[0] ) ) {
-			return ( $arr[0] );
-		}
+        if ($arr && is_array($arr) && isset($arr[0])) {
+            return ($arr[0]);
+        }
 
-		return NULL;
-	}
+        return NULL;
+    }
 
-	/**
-	 * @see Adapter::getInsertID
-	 */
-	public function getInsertID()
-	{
-		return $this->db->getInsertID();
-	}
+    /**
+     * @see Adapter::getInsertID
+     */
+    public function getInsertID()
+    {
+        return $this->db->getInsertID();
+    }
 
-	/**
-	 * @see Adapter::getAffectedRows
-	 */
-	public function getAffectedRows()
-	{
-		return $this->db->Affected_Rows();
-	}
+    /**
+     * @see Adapter::getAffectedRows
+     */
+    public function getAffectedRows()
+    {
+        return $this->db->Affected_Rows();
+    }
 
-	/**
-	 * @see Adapter::getDatabase
-	 */
-	public function getDatabase()
-	{
-		return $this->db;
-	}
+    /**
+     * @see Adapter::getDatabase
+     */
+    public function getDatabase()
+    {
+        return $this->db;
+    }
 
-	/**
-	 * @see Adapter::startTransaction
-	 */
-	public function startTransaction()
-	{
-		$this->db->StartTrans();
-	}
+    /**
+     * @see Adapter::startTransaction
+     */
+    public function startTransaction()
+    {
+        $this->db->StartTrans();
+    }
 
-	/**
-	 * @see Adapter::commit
-	 */
-	public function commit()
-	{
-		$this->db->CommitTrans();
-	}
+    /**
+     * @see Adapter::commit
+     */
+    public function commit()
+    {
+        $this->db->CommitTrans();
+    }
 
-	/**
-	 * @see Adapter::rollback
-	 */
-	public function rollback()
-	{
-		$this->db->FailTrans();
-	}
+    /**
+     * @see Adapter::rollback
+     */
+    public function rollback()
+    {
+        $this->db->FailTrans();
+    }
 
-	/**
-	 * @see Adapter::close.
-	 */
-	public function close()
-	{
-		$this->db->close();
-	}
+    /**
+     * @see Adapter::close.
+     */
+    public function close()
+    {
+        $this->db->close();
+    }
 }

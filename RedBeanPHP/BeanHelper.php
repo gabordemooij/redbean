@@ -2,8 +2,6 @@
 
 namespace RedBeanPHP;
 
-use RedBeanPHP\ToolBox as ToolBox;
-use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * Bean Helper Interface
@@ -22,34 +20,33 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 interface BeanHelper
 {
+    /**
+     * Returns a toolbox to empower the bean.
+     * This allows beans to perform OODB operations by themselves,
+     * as such the bean is a proxy for OODB. This allows beans to implement
+     * their magic getters and setters and return lists.
+     *
+     * @return ToolBox $toolbox toolbox
+     */
+    public function getToolbox();
 
-	/**
-	 * Returns a toolbox to empower the bean.
-	 * This allows beans to perform OODB operations by themselves,
-	 * as such the bean is a proxy for OODB. This allows beans to implement
-	 * their magic getters and setters and return lists.
-	 *
-	 * @return ToolBox $toolbox toolbox
-	 */
-	public function getToolbox();
+    /**
+     * Does approximately the same as getToolbox but also extracts the
+     * toolbox for you.
+     * This method returns a list with all toolbox items in Toolbox Constructor order:
+     * OODB, adapter, writer and finally the toolbox itself!.
+     *
+     * @return array
+     */
+    public function getExtractedToolbox();
 
-	/**
-	 * Does approximately the same as getToolbox but also extracts the
-	 * toolbox for you.
-	 * This method returns a list with all toolbox items in Toolbox Constructor order:
-	 * OODB, adapter, writer and finally the toolbox itself!.
-	 *
-	 * @return array
-	 */
-	public function getExtractedToolbox();
-
-	/**
-	 * Given a certain bean this method will
-	 * return the corresponding model.
-	 *
-	 * @param OODBBean $bean
-	 *
-	 * @return string
-	 */
-	public function getModelForBean( OODBBean $bean );
+    /**
+     * Given a certain bean this method will
+     * return the corresponding model.
+     *
+     * @param OODBBean $bean
+     *
+     * @return string
+     */
+    public function getModelForBean(OODBBean $bean);
 }

@@ -1,10 +1,7 @@
-<?php 
+<?php
 
 namespace RedBeanPHP;
 
-use RedBeanPHP\Observer as Observer;
-use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\Observable as Observable;
 
 /**
  * RedBean Model Helper
@@ -22,29 +19,28 @@ use RedBeanPHP\Observable as Observable;
  */
 class SimpleModelHelper implements Observer
 {
+    /**
+     * @see Observer::onEvent
+     */
+    public function onEvent($eventName, $bean)
+    {
+        $bean->$eventName();
+    }
 
-	/**
-	 * @see Observer::onEvent
-	 */
-	public function onEvent( $eventName, $bean )
-	{
-		$bean->$eventName();
-	}
-
-	/**
-	 * Attaches the FUSE event listeners. Now the Model Helper will listen for
-	 * CRUD events. If a CRUD event occurs it will send a signal to the model
-	 * that belongs to the CRUD bean and this model will take over control from
-	 * there.
-	 *
-	 * @param Observable $observable
-	 *
-	 * @return void
-	 */
-	public function attachEventListeners( Observable $observable )
-	{
-		foreach ( array( 'update', 'open', 'delete', 'after_delete', 'after_update', 'dispense' ) as $e ) {
-			$observable->addEventListener( $e, $this );
-		}
-	}
+    /**
+     * Attaches the FUSE event listeners. Now the Model Helper will listen for
+     * CRUD events. If a CRUD event occurs it will send a signal to the model
+     * that belongs to the CRUD bean and this model will take over control from
+     * there.
+     *
+     * @param Observable $observable
+     *
+     * @return void
+     */
+    public function attachEventListeners(Observable $observable)
+    {
+        foreach (array( 'update', 'open', 'delete', 'after_delete', 'after_update', 'dispense' ) as $e) {
+            $observable->addEventListener($e, $this);
+        }
+    }
 }

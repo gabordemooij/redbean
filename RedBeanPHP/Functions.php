@@ -28,12 +28,10 @@
  * @return mixed
  */
 if (!function_exists('EID')) {
-
-	function EID($enumName)
-	{
-		return \RedBeanPHP\Facade::enum( $enumName )->id;
-	}
-
+    function EID($enumName)
+    {
+        return \RedBeanPHP\Facade::enum($enumName)->id;
+    }
 }
 
 /**
@@ -44,10 +42,9 @@ if (!function_exists('EID')) {
  *
  * @return void
  */
-if ( !function_exists( 'dump' ) ) {
-
-	function dmp( $list )
-	{
-		print_r( \RedBeanPHP\Facade::dump( $list ) );
-	}
+if (!function_exists('dump')) {
+    function dmp($list)
+    {
+        print_r(\RedBeanPHP\Facade::dump($list));
+    }
 }

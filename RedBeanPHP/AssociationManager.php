@@ -2,15 +2,9 @@
 
 namespace RedBeanPHP;
 
-use RedBeanPHP\Observable as Observable;
-use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\RedException\SQL as SQL;
-use RedBeanPHP\ToolBox as ToolBox;
 
 /**
  * Association Manager
@@ -26,370 +20,370 @@ use RedBeanPHP\ToolBox as ToolBox;
  */
 class AssociationManager extends Observable
 {
+    /**
+     * @var OODB
+     */
+    protected $oodb;
 
-	/**
-	 * @var OODB
-	 */
-	protected $oodb;
+    /**
+     * @var DBAdapter
+     */
+    protected $adapter;
 
-	/**
-	 * @var DBAdapter
-	 */
-	protected $adapter;
+    /**
+     * @var QueryWriter
+     */
+    protected $writer;
 
-	/**
-	 * @var QueryWriter
-	 */
-	protected $writer;
+    /**
+     * Handles\Exceptions. Suppresses exceptions caused by missing structures.
+     *
+     * @param\Exception $exception
+     *
+     * @return void
+     *
+     * @throws\Exception
+     */
+    private function handleException(\Exception $exception)
+    {
+        if ($this->oodb->isFrozen() || !$this->writer->sqlStateIn($exception->getSQLState(),
+            array(
+                QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+                QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN, )
+            )
+        ) {
+            throw $exception;
+        }
+    }
 
-	/**
-	 * Handles\Exceptions. Suppresses exceptions caused by missing structures.
-	 *
-	 * @param\Exception $exception
-	 *
-	 * @return void
-	 *
-	 * @throws\Exception
-	 */
-	private function handleException(\Exception $exception )
-	{
-		if ( $this->oodb->isFrozen() || !$this->writer->sqlStateIn( $exception->getSQLState(),
-			array(
-				QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN )
-			)
-		) {
-			throw $exception;
-		}
-	}
+    /**
+     * Internal method.
+     * Returns the many-to-many related rows of table $type for bean $bean using additional SQL in $sql and
+     * $bindings bindings. If $getLinks is TRUE, link rows are returned instead.
+     *
+     * @param OODBBean $bean     reference bean
+     * @param string   $type     target type
+     * @param string   $sql      additional SQL snippet
+     * @param array    $bindings bindings
+     *
+     * @return array
+     *
+     * @throws Security
+     * @throws SQL
+     */
+    private function relatedRows($bean, $type, $sql = '', $bindings = array())
+    {
+        $ids = array( $bean->id );
+        $sourceType = $bean->getMeta('type');
+        try {
+            return $this->writer->queryRecordRelated($sourceType, $type, $ids, $sql, $bindings);
+        } catch (SQL $exception) {
+            $this->handleException($exception);
 
-	/**
-	 * Internal method.
-	 * Returns the many-to-many related rows of table $type for bean $bean using additional SQL in $sql and
-	 * $bindings bindings. If $getLinks is TRUE, link rows are returned instead.
-	 *
-	 * @param OODBBean $bean     reference bean
-	 * @param string           $type     target type
-	 * @param string           $sql      additional SQL snippet
-	 * @param array            $bindings bindings
-	 *
-	 * @return array
-	 *
-	 * @throws Security
-	 * @throws SQL
-	 */
-	private function relatedRows( $bean, $type, $sql = '', $bindings = array() )
-	{
-		$ids = array( $bean->id );
-		$sourceType = $bean->getMeta( 'type' );
-		try {
-			return $this->writer->queryRecordRelated( $sourceType, $type, $ids, $sql, $bindings );
-		} catch ( SQL $exception ) {
-			$this->handleException( $exception );
-			return array();
-		}
-	}
+            return array();
+        }
+    }
 
-	/**
-	 * Associates a pair of beans. This method associates two beans, no matter
-	 * what types. Accepts a base bean that contains data for the linking record.
-	 * This method is used by associate. This method also accepts a base bean to be used
-	 * as the template for the link record in the database.
-	 *
-	 * @param OODBBean $bean1 first bean
-	 * @param OODBBean $bean2 second bean
-	 * @param OODBBean $bean  base bean (association record)
-	 *
-	 * @throws\Exception|SQL
-	 *
-	 * @return mixed
-	 */
-	protected function associateBeans( OODBBean $bean1, OODBBean $bean2, OODBBean $bean )
-	{
-		$property1 = $bean1->getMeta( 'type' ) . '_id';
-		$property2 = $bean2->getMeta( 'type' ) . '_id';
+    /**
+     * Associates a pair of beans. This method associates two beans, no matter
+     * what types. Accepts a base bean that contains data for the linking record.
+     * This method is used by associate. This method also accepts a base bean to be used
+     * as the template for the link record in the database.
+     *
+     * @param OODBBean $bean1 first bean
+     * @param OODBBean $bean2 second bean
+     * @param OODBBean $bean  base bean (association record)
+     *
+     * @throws\Exception|SQL
+     *
+     * @return mixed
+     */
+    protected function associateBeans(OODBBean $bean1, OODBBean $bean2, OODBBean $bean)
+    {
+        $property1 = $bean1->getMeta('type').'_id';
+        $property2 = $bean2->getMeta('type').'_id';
 
-		if ( $property1 == $property2 ) {
-			$property2 = $bean2->getMeta( 'type' ) . '2_id';
-		}
-		
-		if ( !$this->oodb->isFrozen() ) {
-			//Dont mess with other tables, only add the unique constraint if:
-			//1. the table exists (otherwise we cant inspect it)
-			//2. the table only contains N-M fields: ID, N-ID, M-ID.
-			$unique = array( $property1, $property2 );
-			$type = $bean->getMeta( 'type' );
-			$tables = $this->writer->getTables();
-			if ( in_array( $type, $tables ) && !$this->oodb->isChilled( $type ) ) {
-				$columns = ( $this->writer->getColumns( $type ) );
-				if ( count( $columns ) === 3 
-					&& isset( $columns[ 'id' ] )
-					&& isset( $columns[ $property1 ] ) 
-					&& isset( $columns[ $property2 ] ) ) {
-					$bean->setMeta( 'buildcommand.unique', array( $unique ) );
-				}
-			}
+        if ($property1 == $property2) {
+            $property2 = $bean2->getMeta('type').'2_id';
+        }
 
-			//add a build command for Single Column Index (to improve performance in case unqiue cant be used)
-			$indexName1 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property1;
-			$indexName2 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property2;
+        if (!$this->oodb->isFrozen()) {
+            //Dont mess with other tables, only add the unique constraint if:
+            //1. the table exists (otherwise we cant inspect it)
+            //2. the table only contains N-M fields: ID, N-ID, M-ID.
+            $unique = array( $property1, $property2 );
+            $type = $bean->getMeta('type');
+            $tables = $this->writer->getTables();
+            if (in_array($type, $tables) && !$this->oodb->isChilled($type)) {
+                $columns = ($this->writer->getColumns($type));
+                if (count($columns) === 3
+                    && isset($columns[ 'id' ])
+                    && isset($columns[ $property1 ])
+                    && isset($columns[ $property2 ])) {
+                    $bean->setMeta('buildcommand.unique', array( $unique ));
+                }
+            }
 
-			$bean->setMeta( 'buildcommand.indexes', array( $property1 => $indexName1, $property2 => $indexName2 ) );
-		}
+            //add a build command for Single Column Index (to improve performance in case unqiue cant be used)
+            $indexName1 = 'index_for_'.$bean->getMeta('type').'_'.$property1;
+            $indexName2 = 'index_for_'.$bean->getMeta('type').'_'.$property2;
 
-		$this->oodb->store( $bean1 );
-		$this->oodb->store( $bean2 );
+            $bean->setMeta('buildcommand.indexes', array( $property1 => $indexName1, $property2 => $indexName2 ));
+        }
 
-		$bean->setMeta( "cast.$property1", "id" );
-		$bean->setMeta( "cast.$property2", "id" );
+        $this->oodb->store($bean1);
+        $this->oodb->store($bean2);
 
-		$bean->$property1 = $bean1->id;
-		$bean->$property2 = $bean2->id;
+        $bean->setMeta("cast.$property1", "id");
+        $bean->setMeta("cast.$property2", "id");
 
-		$results   = array();
-		try {
-			$id = $this->oodb->store( $bean );
+        $bean->$property1 = $bean1->id;
+        $bean->$property2 = $bean2->id;
 
-			//On creation, add constraints....
-			if ( !$this->oodb->isFrozen() &&
-				$bean->getMeta( 'buildreport.flags.created' )
-			) {
-				$bean->setMeta( 'buildreport.flags.created', 0 );
-				if ( !$this->oodb->isFrozen() ) {
-					$this->writer->addConstraintForTypes( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ) );
-				}
-			}
-			$results[] = $id;
-		} catch ( SQL $exception ) {
-			if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
-				array( QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ) )
-			) {
-				throw $exception;
-			}
-		}
+        $results   = array();
+        try {
+            $id = $this->oodb->store($bean);
 
-		return $results;
-	}
+            //On creation, add constraints....
+            if (!$this->oodb->isFrozen() &&
+                $bean->getMeta('buildreport.flags.created')
+            ) {
+                $bean->setMeta('buildreport.flags.created', 0);
+                if (!$this->oodb->isFrozen()) {
+                    $this->writer->addConstraintForTypes($bean1->getMeta('type'), $bean2->getMeta('type'));
+                }
+            }
+            $results[] = $id;
+        } catch (SQL $exception) {
+            if (!$this->writer->sqlStateIn($exception->getSQLState(),
+                array( QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ))
+            ) {
+                throw $exception;
+            }
+        }
 
-	/**
-	 * Constructor
-	 *
-	 * @param ToolBox $tools toolbox
-	 */
-	public function __construct( ToolBox $tools )
-	{
-		$this->oodb    = $tools->getRedBean();
-		$this->adapter = $tools->getDatabaseAdapter();
-		$this->writer  = $tools->getWriter();
-		$this->toolbox = $tools;
-	}
+        return $results;
+    }
 
-	/**
-	 * Creates a table name based on a types array.
-	 * Manages the get the correct name for the linking table for the
-	 * types provided.
-	 *
-	 * @todo find a nice way to decouple this class from QueryWriter?
-	 *
-	 * @param array $types 2 types as strings
-	 *
-	 * @return string
-	 */
-	public function getTable( $types )
-	{
-		return $this->writer->getAssocTable( $types );
-	}
+    /**
+     * Constructor
+     *
+     * @param ToolBox $tools toolbox
+     */
+    public function __construct(ToolBox $tools)
+    {
+        $this->oodb    = $tools->getRedBean();
+        $this->adapter = $tools->getDatabaseAdapter();
+        $this->writer  = $tools->getWriter();
+        $this->toolbox = $tools;
+    }
 
-	/**
-	 * Associates two beans in a many-to-many relation.
-	 * This method will associate two beans and store the connection between the
-	 * two in a link table. Instead of two single beans this method also accepts
-	 * two sets of beans. Returns the ID or the IDs of the linking beans.
-	 * 
-	 * @param OODBBean|array $beans1 one or more beans to form the association
-	 * @param OODBBean|array $beans2 one or more beans to form the association
-	 *
-	 * @return array
-	 */
-	public function associate( $beans1, $beans2 )
-	{
-		if ( !is_array( $beans1 ) ) {
-			$beans1 = array( $beans1 );
-		}
+    /**
+     * Creates a table name based on a types array.
+     * Manages the get the correct name for the linking table for the
+     * types provided.
+     *
+     * @todo find a nice way to decouple this class from QueryWriter?
+     *
+     * @param array $types 2 types as strings
+     *
+     * @return string
+     */
+    public function getTable($types)
+    {
+        return $this->writer->getAssocTable($types);
+    }
 
-		if ( !is_array( $beans2 ) ) {
-			$beans2 = array( $beans2 );
-		}
+    /**
+     * Associates two beans in a many-to-many relation.
+     * This method will associate two beans and store the connection between the
+     * two in a link table. Instead of two single beans this method also accepts
+     * two sets of beans. Returns the ID or the IDs of the linking beans.
+     *
+     * @param OODBBean|array $beans1 one or more beans to form the association
+     * @param OODBBean|array $beans2 one or more beans to form the association
+     *
+     * @return array
+     */
+    public function associate($beans1, $beans2)
+    {
+        if (!is_array($beans1)) {
+            $beans1 = array( $beans1 );
+        }
 
-		$results = array();
-		foreach ( $beans1 as $bean1 ) {
-			foreach ( $beans2 as $bean2 ) {
-				$table     = $this->getTable( array( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ) ) );
-				$bean      = $this->oodb->dispense( $table );
-				$results[] = $this->associateBeans( $bean1, $bean2, $bean );
-			}
-		}
+        if (!is_array($beans2)) {
+            $beans2 = array( $beans2 );
+        }
 
-		return ( count( $results ) > 1 ) ? $results : reset( $results );
-	}
+        $results = array();
+        foreach ($beans1 as $bean1) {
+            foreach ($beans2 as $bean2) {
+                $table     = $this->getTable(array( $bean1->getMeta('type'), $bean2->getMeta('type') ));
+                $bean      = $this->oodb->dispense($table);
+                $results[] = $this->associateBeans($bean1, $bean2, $bean);
+            }
+        }
 
-	/**
-	 * Counts the number of related beans in an N-M relation.
-	 * This method returns the number of beans of type $type associated
-	 * with reference bean(s) $bean. The query can be tuned using an
-	 * SQL snippet for additional filtering.
-	 *
-	 * @param OODBBean|array $bean     a bean object or an array of beans
-	 * @param string                 $type     type of bean you're interested in
-	 * @param string                 $sql      SQL snippet (optional)
-	 * @param array                  $bindings bindings for your SQL string
-	 *
-	 * @return integer
-	 *
-	 * @throws Security
-	 */
-	public function relatedCount( $bean, $type, $sql = NULL, $bindings = array() )
-	{
-		if ( !( $bean instanceof OODBBean ) ) {
-			throw new RedException(
-				'Expected array or OODBBean but got:' . gettype( $bean )
-			);
-		}
+        return (count($results) > 1) ? $results : reset($results);
+    }
 
-		if ( !$bean->id ) {
-			return 0;
-		}
+    /**
+     * Counts the number of related beans in an N-M relation.
+     * This method returns the number of beans of type $type associated
+     * with reference bean(s) $bean. The query can be tuned using an
+     * SQL snippet for additional filtering.
+     *
+     * @param OODBBean|array $bean     a bean object or an array of beans
+     * @param string         $type     type of bean you're interested in
+     * @param string         $sql      SQL snippet (optional)
+     * @param array          $bindings bindings for your SQL string
+     *
+     * @return integer
+     *
+     * @throws Security
+     */
+    public function relatedCount($bean, $type, $sql = null, $bindings = array())
+    {
+        if (!($bean instanceof OODBBean)) {
+            throw new RedException(
+                'Expected array or OODBBean but got:'.gettype($bean)
+            );
+        }
 
-		$beanType = $bean->getMeta( 'type' );
+        if (!$bean->id) {
+            return 0;
+        }
 
-		try {
-			return $this->writer->queryRecordCountRelated( $beanType, $type, $bean->id, $sql, $bindings );
-		} catch ( SQL $exception ) {
-			$this->handleException( $exception );
+        $beanType = $bean->getMeta('type');
 
-			return 0;
-		}
-	}
+        try {
+            return $this->writer->queryRecordCountRelated($beanType, $type, $bean->id, $sql, $bindings);
+        } catch (SQL $exception) {
+            $this->handleException($exception);
 
-	/**
-	 * Breaks the association between two beans. This method unassociates two beans. If the
-	 * method succeeds the beans will no longer form an association. In the database
-	 * this means that the association record will be removed. This method uses the
-	 * OODB trash() method to remove the association links, thus giving FUSE models the
-	 * opportunity to hook-in additional business logic. If the $fast parameter is
-	 * set to boolean TRUE this method will remove the beans without their consent,
-	 * bypassing FUSE. This can be used to improve performance.
-	 *
-	 * @param OODBBean $bean1 first bean
-	 * @param OODBBean $bean2 second bean
-	 * @param boolean          $fast  If TRUE, removes the entries by query without FUSE
-	 *
-	 * @return void
-	 */
-	public function unassociate( $beans1, $beans2, $fast = NULL )
-	{
-		$beans1 = ( !is_array( $beans1 ) ) ? array( $beans1 ) : $beans1;
-		$beans2 = ( !is_array( $beans2 ) ) ? array( $beans2 ) : $beans2;
+            return 0;
+        }
+    }
 
-		foreach ( $beans1 as $bean1 ) {
-			foreach ( $beans2 as $bean2 ) {
-				try {
-					$this->oodb->store( $bean1 );
-					$this->oodb->store( $bean2 );
+    /**
+     * Breaks the association between two beans. This method unassociates two beans. If the
+     * method succeeds the beans will no longer form an association. In the database
+     * this means that the association record will be removed. This method uses the
+     * OODB trash() method to remove the association links, thus giving FUSE models the
+     * opportunity to hook-in additional business logic. If the $fast parameter is
+     * set to boolean TRUE this method will remove the beans without their consent,
+     * bypassing FUSE. This can be used to improve performance.
+     *
+     * @param OODBBean $bean1 first bean
+     * @param OODBBean $bean2 second bean
+     * @param boolean  $fast  If TRUE, removes the entries by query without FUSE
+     *
+     * @return void
+     */
+    public function unassociate($beans1, $beans2, $fast = null)
+    {
+        $beans1 = (!is_array($beans1)) ? array( $beans1 ) : $beans1;
+        $beans2 = (!is_array($beans2)) ? array( $beans2 ) : $beans2;
 
-					$type1 = $bean1->getMeta( 'type' );
-					$type2 = $bean2->getMeta( 'type' );
+        foreach ($beans1 as $bean1) {
+            foreach ($beans2 as $bean2) {
+                try {
+                    $this->oodb->store($bean1);
+                    $this->oodb->store($bean2);
 
-					$row      = $this->writer->queryRecordLink( $type1, $type2, $bean1->id, $bean2->id );
-					$linkType = $this->getTable( array( $type1, $type2 ) );
+                    $type1 = $bean1->getMeta('type');
+                    $type2 = $bean2->getMeta('type');
 
-					if ( $fast ) {
-						$this->writer->deleteRecord( $linkType, array( 'id' => $row['id'] ) );
+                    $row      = $this->writer->queryRecordLink($type1, $type2, $bean1->id, $bean2->id);
+                    $linkType = $this->getTable(array( $type1, $type2 ));
 
-						return;
-					}
+                    if ($fast) {
+                        $this->writer->deleteRecord($linkType, array( 'id' => $row['id'] ));
 
-					$beans = $this->oodb->convertToBeans( $linkType, array( $row ) );
+                        return;
+                    }
 
-					if ( count( $beans ) > 0 ) {
-						$bean = reset( $beans );
-						$this->oodb->trash( $bean );
-					}
-				} catch ( SQL $exception ) {
-					$this->handleException( $exception );
-				}
-			}
-		}
-	}
+                    $beans = $this->oodb->convertToBeans($linkType, array( $row ));
 
-	/**
-	 * Removes all relations for a bean. This method breaks every connection between
-	 * a certain bean $bean and every other bean of type $type. Warning: this method
-	 * is really fast because it uses a direct SQL query however it does not inform the
-	 * models about this. If you want to notify FUSE models about deletion use a foreach-loop
-	 * with unassociate() instead. (that might be slower though)
-	 *
-	 * @param OODBBean $bean reference bean
-	 * @param string           $type type of beans that need to be unassociated
-	 *
-	 * @return void
-	 */
-	public function clearRelations( OODBBean $bean, $type )
-	{
-		$this->oodb->store( $bean );
-		try {
-			$this->writer->deleteRelations( $bean->getMeta( 'type' ), $type, $bean->id );
-		} catch ( SQL $exception ) {
-			$this->handleException( $exception );
-		}
-	}
+                    if (count($beans) > 0) {
+                        $bean = reset($beans);
+                        $this->oodb->trash($bean);
+                    }
+                } catch (SQL $exception) {
+                    $this->handleException($exception);
+                }
+            }
+        }
+    }
 
-	/**
-	 * Returns all the beans associated with $bean.
-	 * This method will return an array containing all the beans that have
-	 * been associated once with the associate() function and are still
-	 * associated with the bean specified. The type parameter indicates the
-	 * type of beans you are looking for. You can also pass some extra SQL and
-	 * values for that SQL to filter your results after fetching the
-	 * related beans.
-	 *
-	 * Don't try to make use of subqueries, a subquery using IN() seems to
-	 * be slower than two queries!
-	 *
-	 * Since 3.2, you can now also pass an array of beans instead just one
-	 * bean as the first parameter.
-	 *
-	 * @param OODBBean|array $bean      the bean you have
-	 * @param string                 $type      the type of beans you want
-	 * @param string                 $sql       SQL snippet for extra filtering
-	 * @param array                  $bindings  values to be inserted in SQL slots
-	 * @param boolean                $glue      whether the SQL should be prefixed with WHERE
-	 *
-	 * @return array
-	 */
-	public function related( $bean, $type, $sql = '', $bindings = array() )
-	{
-		$sql   = $this->writer->glueSQLCondition( $sql );
+    /**
+     * Removes all relations for a bean. This method breaks every connection between
+     * a certain bean $bean and every other bean of type $type. Warning: this method
+     * is really fast because it uses a direct SQL query however it does not inform the
+     * models about this. If you want to notify FUSE models about deletion use a foreach-loop
+     * with unassociate() instead. (that might be slower though)
+     *
+     * @param OODBBean $bean reference bean
+     * @param string   $type type of beans that need to be unassociated
+     *
+     * @return void
+     */
+    public function clearRelations(OODBBean $bean, $type)
+    {
+        $this->oodb->store($bean);
+        try {
+            $this->writer->deleteRelations($bean->getMeta('type'), $type, $bean->id);
+        } catch (SQL $exception) {
+            $this->handleException($exception);
+        }
+    }
 
-		$rows  = $this->relatedRows( $bean, $type, $sql, $bindings );
+    /**
+     * Returns all the beans associated with $bean.
+     * This method will return an array containing all the beans that have
+     * been associated once with the associate() function and are still
+     * associated with the bean specified. The type parameter indicates the
+     * type of beans you are looking for. You can also pass some extra SQL and
+     * values for that SQL to filter your results after fetching the
+     * related beans.
+     *
+     * Don't try to make use of subqueries, a subquery using IN() seems to
+     * be slower than two queries!
+     *
+     * Since 3.2, you can now also pass an array of beans instead just one
+     * bean as the first parameter.
+     *
+     * @param OODBBean|array $bean     the bean you have
+     * @param string         $type     the type of beans you want
+     * @param string         $sql      SQL snippet for extra filtering
+     * @param array          $bindings values to be inserted in SQL slots
+     * @param boolean        $glue     whether the SQL should be prefixed with WHERE
+     *
+     * @return array
+     */
+    public function related($bean, $type, $sql = '', $bindings = array())
+    {
+        $sql   = $this->writer->glueSQLCondition($sql);
 
-		$links = array();
-		foreach ( $rows as $key => $row ) {
-			if ( !isset( $links[$row['id']] ) ) {
-				$links[$row['id']] = array();
-			}
+        $rows  = $this->relatedRows($bean, $type, $sql, $bindings);
 
-			$links[$row['id']][] = $row['linked_by'];
+        $links = array();
+        foreach ($rows as $key => $row) {
+            if (!isset($links[$row['id']])) {
+                $links[$row['id']] = array();
+            }
 
-			unset( $rows[$key]['linked_by'] );
-		}
+            $links[$row['id']][] = $row['linked_by'];
 
-		$beans = $this->oodb->convertToBeans( $type, $rows );
+            unset($rows[$key]['linked_by']);
+        }
 
-		foreach ( $beans as $bean ) {
-			$bean->setMeta( 'sys.belongs-to', $links[$bean->id] );
-		}
+        $beans = $this->oodb->convertToBeans($type, $rows);
 
-		return $beans;
-	}
+        foreach ($beans as $bean) {
+            $bean->setMeta('sys.belongs-to', $links[$bean->id]);
+        }
+
+        return $beans;
+    }
 }

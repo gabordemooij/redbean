@@ -18,43 +18,42 @@ use RedBeanPHP\RedException as RedException;
  */
 class SQL extends RedException
 {
+    /**
+     * @var string
+     */
+    private $sqlState;
 
-	/**
-	 * @var string
-	 */
-	private $sqlState;
+    /**
+     * Returns an ANSI-92 compliant SQL state.
+     *
+     * @return string $state ANSI state code
+     */
+    public function getSQLState()
+    {
+        return $this->sqlState;
+    }
 
-	/**
-	 * Returns an ANSI-92 compliant SQL state.
-	 *
-	 * @return string $state ANSI state code
-	 */
-	public function getSQLState()
-	{
-		return $this->sqlState;
-	}
+    /**
+     * @todo parse state to verify valid ANSI92!
+     *       Stores ANSI-92 compliant SQL state.
+     *
+     * @param string $sqlState code
+     *
+     * @return void
+     */
+    public function setSQLState($sqlState)
+    {
+        $this->sqlState = $sqlState;
+    }
 
-	/**
-	 * @todo parse state to verify valid ANSI92!
-	 *       Stores ANSI-92 compliant SQL state.
-	 *
-	 * @param string $sqlState code
-	 *
-	 * @return void
-	 */
-	public function setSQLState( $sqlState )
-	{
-		$this->sqlState = $sqlState;
-	}
-
-	/**
-	 * To String prints both code and SQL state.
-	 *
-	 * @return string $message prints this exception instance as a string
-	 */
-	public function __toString()
-	{
-		return '[' . $this->getSQLState() . '] - ' . $this->getMessage()."\n".
-				'trace: ' . $this->getTraceAsString();
-	}
+    /**
+     * To String prints both code and SQL state.
+     *
+     * @return string $message prints this exception instance as a string
+     */
+    public function __toString()
+    {
+        return '['.$this->getSQLState().'] - '.$this->getMessage()."\n".
+                'trace: '.$this->getTraceAsString();
+    }
 }

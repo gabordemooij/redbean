@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP;
 
@@ -18,17 +18,16 @@ namespace RedBeanPHP;
  */
 interface Observer
 {
-
-	/**
-	 * An observer object needs to be capable of receiving
-	 * notifications. Therefore the observer needs to implement the
-	 * onEvent method with two parameters, the event identifier specifying the
-	 * current event and a message object (in RedBeanPHP this can also be a bean).
-	 * 
-	 * @param string $eventname event identifier
-	 * @param mixed  $bean      a message sent along with the notification
-	 *
-	 * @return void
-	 */
-	public function onEvent( $eventname, $bean );
+    /**
+     * An observer object needs to be capable of receiving
+     * notifications. Therefore the observer needs to implement the
+     * onEvent method with two parameters, the event identifier specifying the
+     * current event and a message object (in RedBeanPHP this can also be a bean).
+     *
+     * @param string $eventname event identifier
+     * @param mixed  $bean      a message sent along with the notification
+     *
+     * @return void
+     */
+    public function onEvent($eventname, $bean);
 }

@@ -5,7 +5,6 @@ namespace RedBeanPHP\BeanHelper;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\Facade as Facade;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
 
 /**
  * Bean Helper.
@@ -24,93 +23,90 @@ use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
  */
 class SimpleFacadeBeanHelper implements BeanHelper
 {
+    /**
+     * Factory function to create instance of Simple Model, if any.
+     *
+     * @var closure
+     */
+    private static $factory = null;
 
-	/**
-	 * Factory function to create instance of Simple Model, if any.
-	 *
-	 * @var closure
-	 */
-	private static $factory = null;
+    /**
+     * @see BeanHelper::getToolbox
+     */
+    public function getToolbox()
+    {
+        return Facade::getToolBox();
+    }
 
-	/**
-	 * @see BeanHelper::getToolbox
-	 */
-	public function getToolbox()
-	{
-		return Facade::getToolBox();
-	}
+    /**
+     * @see BeanHelper::getModelForBean
+     */
+    public function getModelForBean(OODBBean $bean)
+    {
+        $model     = $bean->getMeta('type');
+        $prefix    = defined('REDBEAN_MODEL_PREFIX') ? REDBEAN_MODEL_PREFIX : '\\Model_';
 
-	/**
-	 * @see BeanHelper::getModelForBean
-	 */
-	public function getModelForBean( OODBBean $bean )
-	{
-		$model     = $bean->getMeta( 'type' );
-		$prefix    = defined( 'REDBEAN_MODEL_PREFIX' ) ? REDBEAN_MODEL_PREFIX : '\\Model_';
+        if (strpos($model, '_') !== FALSE) {
+            $modelParts = explode('_', $model);
+            $modelName = '';
+            foreach ($modelParts as $part) {
+                $modelName .= ucfirst($part);
+            }
+            $modelName = $prefix.$modelName;
 
-		if ( strpos( $model, '_' ) !== FALSE ) {
-			$modelParts = explode( '_', $model );
-			$modelName = '';
-			foreach( $modelParts as $part ) {
-				$modelName .= ucfirst( $part );
-			}
-			$modelName = $prefix . $modelName;
+            if (!class_exists($modelName)) {
+                //second try
+                $modelName = $prefix.ucfirst($model);
 
-			if ( !class_exists( $modelName ) ) {
-				//second try
-				$modelName = $prefix . ucfirst( $model );
-				
-				if ( !class_exists( $modelName ) ) {
-					return NULL;
-				}
-			}
+                if (!class_exists($modelName)) {
+                    return NULL;
+                }
+            }
+        } else {
+            $modelName = $prefix.ucfirst($model);
+            if (!class_exists($modelName)) {
+                return NULL;
+            }
+        }
+        $obj = self::factory($modelName);
+        $obj->loadBean($bean);
 
-		} else {
+        return $obj;
+    }
 
-			$modelName = $prefix . ucfirst( $model );
-			if ( !class_exists( $modelName ) ) {
-				return NULL;
-			}
-		}
-		$obj = self::factory( $modelName );
-		$obj->loadBean( $bean );
+    /**
+     * @see BeanHelper::getExtractedToolbox
+     */
+    public function getExtractedToolbox()
+    {
+        return Facade::getExtractedToolbox();
+    }
 
-		return $obj;
-	}
+    /**
+     * Factory method using a customizable factory function to create
+     * the instance of the Simple Model.
+     *
+     * @param string $modelClassName name of the class
+     *
+     * @return SimpleModel
+     */
+    public static function factory($modelClassName)
+    {
+        $factory = self::$factory;
 
-	/**
-	 * @see BeanHelper::getExtractedToolbox
-	 */
-	public function getExtractedToolbox()
-	{
-		return Facade::getExtractedToolbox();
-	}
+        return ($factory) ? $factory($modelClassName) : new $modelClassName();
+    }
 
-	/**
-	 * Factory method using a customizable factory function to create
-	 * the instance of the Simple Model.
-	 *
-	 * @param string $modelClassName name of the class
-	 *
-	 * @return SimpleModel
-	 */
-	public static function factory( $modelClassName )
-	{
-		$factory = self::$factory;
-		return ( $factory ) ? $factory( $modelClassName ) : new $modelClassName();
-	}
-
-	/**
-	 * Sets the factory function to create the model when using FUSE
-	 * to connect a bean to a model.
-	 *
-	 * @param closure $factory
-	 *
-	 * @return void
-	 */
-	public static function setFactoryFunction( $factory ) 
-	{
-		self::$factory = $factory;
-	}
-
+    /**
+     * Sets the factory function to create the model when using FUSE
+     * to connect a bean to a model.
+     *
+     * @param closure $factory
+     *
+     * @return void
+     */
+    public static function setFactoryFunction($factory)
+    {
+        self::$factory = $factory;
+    }
 }
