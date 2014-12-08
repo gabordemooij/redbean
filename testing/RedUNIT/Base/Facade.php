@@ -25,134 +25,132 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Facade extends Base
 {
+    /**
+     * What drivers should be loaded for this test pack?
+     * This pack contains some SQL incomp. with OCI
+     */
+    public function getTargetDrivers()
+    {
+        return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
+    }
 
-	/**
-	 * What drivers should be loaded for this test pack?
-	 * This pack contains some SQL incomp. with OCI
-	 */
-	public function getTargetDrivers()
-	{
-		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
-	}
+    /**
+     * Test common Facade usage scenarios.
+     *
+     * @return void
+     */
+    public function testCommonUsageFacade()
+    {
+        $toolbox = R::getToolBox();
+        $adapter = $toolbox->getDatabaseAdapter();
+        $writer  = $toolbox->getWriter();
+        $redbean = $toolbox->getRedBean();
+        $pdo     = $adapter->getDatabase();
+        $a       = new AssociationManager($toolbox);
 
-	/**
-	 * Test common Facade usage scenarios.
-	 *
-	 * @return void
-	 */
-	public function testCommonUsageFacade()
-	{
-		$toolbox = R::getToolBox();
-		$adapter = $toolbox->getDatabaseAdapter();
-		$writer  = $toolbox->getWriter();
-		$redbean = $toolbox->getRedBean();
-		$pdo     = $adapter->getDatabase();
-		$a       = new AssociationManager( $toolbox );
+        asrt(R::getRedBean() instanceof OODB, true);
+        asrt(R::getToolBox() instanceof ToolBox, true);
+        asrt(R::getDatabaseAdapter() instanceof Adapter, true);
+        asrt(R::getWriter() instanceof QueryWriter, true);
 
-		asrt( R::getRedBean() instanceof OODB, TRUE );
-		asrt( R::getToolBox() instanceof ToolBox, TRUE );
-		asrt( R::getDatabaseAdapter() instanceof Adapter, TRUE );
-		asrt( R::getWriter() instanceof QueryWriter, TRUE );
+        $book = R::dispense("book");
 
-		$book = R::dispense( "book" );
+        asrt($book instanceof OODBBean, true);
 
-		asrt( $book instanceof OODBBean, TRUE );
+        $book->title = "a nice book";
 
-		$book->title = "a nice book";
+        $id = R::store($book);
 
-		$id = R::store( $book );
+        asrt(($id > 0), true);
 
-		asrt( ( $id > 0 ), TRUE );
+        $book = R::load("book", (int) $id);
 
-		$book = R::load( "book", (int) $id );
+        asrt($book->title, "a nice book");
 
-		asrt( $book->title, "a nice book" );
+        asrt(R::load('book', 999)->title, null);
 
-		asrt( R::load( 'book', 999 )->title, NULL );
+        R::freeze(true);
 
-		R::freeze( TRUE );
+        try {
+            R::load('bookies', 999);
 
-		try {
-			R::load( 'bookies', 999 );
+            fail();
+        } catch (\Exception $e) {
+            pass();
+        }
 
-			fail();
-		} catch (\Exception $e ) {
-			pass();
-		}
+        R::freeze(false);
 
-		R::freeze( FALSE );
+        $author = R::dispense("author");
 
-		$author = R::dispense( "author" );
+        $author->name = "me";
 
-		$author->name = "me";
+        R::store($author);
 
-		R::store( $author );
+        $book9   = R::dispense("book");
+        $author9 = R::dispense("author");
 
-		$book9   = R::dispense( "book" );
-		$author9 = R::dispense( "author" );
+        $author9->name = "mr Nine";
 
-		$author9->name = "mr Nine";
+        $a9 = R::store($author9);
 
-		$a9 = R::store( $author9 );
+        $book9->author_id = $a9;
 
-		$book9->author_id = $a9;
+        $bk9 = R::store($book9);
 
-		$bk9 = R::store( $book9 );
+        $book9  = R::load("book", $bk9);
+        $author = R::load("author", $book9->author_id);
 
-		$book9  = R::load( "book", $bk9 );
-		$author = R::load( "author", $book9->author_id );
+        asrt($author->name, "mr Nine");
 
-		asrt( $author->name, "mr Nine" );
+        R::trash($author);
+        R::trash($book9);
 
-		R::trash( $author );
-		R::trash( $book9 );
+        pass();
 
-		pass();
+        $book2 = R::dispense("book");
 
-		$book2 = R::dispense( "book" );
+        $book2->title = "second";
 
-		$book2->title = "second";
+        R::store($book2);
 
-		R::store( $book2 );
+        $book3 = R::dispense("book");
 
-		$book3 = R::dispense( "book" );
+        $book3->title = "third";
 
-		$book3->title = "third";
+        R::store($book3);
 
-		R::store( $book3 );
+        asrt(count(R::find("book")), 3);
+        asrt(count(R::findAll("book")), 3);
+        asrt(count(R::findAll("book", " LIMIT 2")), 2);
 
-		asrt( count( R::find( "book" ) ), 3 );
-		asrt( count( R::findAll( "book" ) ), 3 );
-		asrt( count( R::findAll( "book", " LIMIT 2" ) ), 2 );
+        asrt(count(R::find("book", " id=id ")), 3);
+        asrt(count(R::find("book", " title LIKE ?", array( "third" ))), 1);
+        asrt(count(R::find("book", " title LIKE ?", array( "%d%" ))), 2);
 
-		asrt( count( R::find( "book", " id=id " ) ), 3 );
-		asrt( count( R::find( "book", " title LIKE ?", array( "third" ) ) ), 1 );
-		asrt( count( R::find( "book", " title LIKE ?", array( "%d%" ) ) ), 2 );
+        // Find without where clause
+        asrt(count(R::findAll('book', ' order by id')), 3);
 
-		// Find without where clause
-		asrt( count( R::findAll( 'book', ' order by id' ) ), 3 );
+        R::trash($book3);
+        R::trash($book2);
 
-		R::trash( $book3 );
-		R::trash( $book2 );
+        asrt(count(R::getAll("SELECT * FROM book ")), 1);
+        asrt(count(R::getCol("SELECT title FROM book ")), 1);
 
-		asrt( count( R::getAll( "SELECT * FROM book " ) ), 1 );
-		asrt( count( R::getCol( "SELECT title FROM book " ) ), 1 );
+        asrt((int) R::getCell("SELECT 123 "), 123);
 
-		asrt( (int) R::getCell( "SELECT 123 " ), 123 );
+        $book = R::dispense("book");
 
-		$book = R::dispense( "book" );
+        $book->title = "not so original title";
 
-		$book->title = "not so original title";
+        $author = R::dispense("author");
 
-		$author = R::dispense( "author" );
+        $author->name = "Bobby";
 
-		$author->name = "Bobby";
+        R::store($book);
 
-		R::store( $book );
+        $aid = R::store($author);
 
-		$aid = R::store( $author );
-
-		$author = R::findOne( "author", " name = ? ", array( "Bobby" ) );
-
-	}
+        $author = R::findOne("author", " name = ? ", array( "Bobby" ));
+    }
 }

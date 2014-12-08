@@ -20,55 +20,55 @@ use RedBeanPHP\AssociationManager as AssociationManager;
  */
 class Preexist extends Mysql
 {
-	/**
-	 * Test integration with pre-existing schemas.
-	 *
-	 * @return void
-	 */
-	public function testPlaysNiceWithPreExitsingSchema()
-	{
-		$toolbox     = R::getToolBox();
-		$adapter     = $toolbox->getDatabaseAdapter();
-		$writer      = $toolbox->getWriter();
-		$redbean     = $toolbox->getRedBean();
-		$pdo         = $adapter->getDatabase();
+    /**
+     * Test integration with pre-existing schemas.
+     *
+     * @return void
+     */
+    public function testPlaysNiceWithPreExitsingSchema()
+    {
+        $toolbox     = R::getToolBox();
+        $adapter     = $toolbox->getDatabaseAdapter();
+        $writer      = $toolbox->getWriter();
+        $redbean     = $toolbox->getRedBean();
+        $pdo         = $adapter->getDatabase();
 
-		$a           = new AssociationManager( $toolbox );
+        $a           = new AssociationManager($toolbox);
 
-		$page        = $redbean->dispense( "page" );
+        $page        = $redbean->dispense("page");
 
-		$page->name  = "John's page";
+        $page->name  = "John's page";
 
-		$idpage      = $redbean->store( $page );
+        $idpage      = $redbean->store($page);
 
-		$page2       = $redbean->dispense( "page" );
+        $page2       = $redbean->dispense("page");
 
-		$page2->name = "John's second page";
+        $page2->name = "John's second page";
 
-		$idpage2     = $redbean->store( $page2 );
+        $idpage2     = $redbean->store($page2);
 
-		$a->associate( $page, $page2 );
+        $a->associate($page, $page2);
 
-		$adapter->exec( "ALTER TABLE " . $writer->esc( 'page' ) . "
-		CHANGE " . $writer->esc( 'name' ) . " " . $writer->esc( 'name' ) . "
-		VARCHAR( 254 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL " );
+        $adapter->exec("ALTER TABLE ".$writer->esc('page')."
+		CHANGE ".$writer->esc('name')." ".$writer->esc('name')."
+		VARCHAR( 254 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL ");
 
-		$page       = $redbean->dispense( "page" );
+        $page       = $redbean->dispense("page");
 
-		$page->name = "Just Another Page In a Table";
+        $page->name = "Just Another Page In a Table";
 
-		$cols       = $writer->getColumns( "page" );
+        $cols       = $writer->getColumns("page");
 
-		asrt( $cols["name"], "varchar(254)" );
+        asrt($cols["name"], "varchar(254)");
 
-		//$pdo->SethMode(1);
+        //$pdo->SethMode(1);
 
-		$redbean->store( $page );
+        $redbean->store($page);
 
-		pass(); // No crash?
+        pass(); // No crash?
 
-		$cols = $writer->getColumns( "page" );
+        $cols = $writer->getColumns("page");
 
-		asrt( $cols["name"], "varchar(254)" ); //must still be same
-	}
+        asrt($cols["name"], "varchar(254)"); //must still be same
+    }
 }

@@ -4,8 +4,6 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\ToolBox as ToolBox;
-use RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
 
 /**
  * Close
@@ -21,21 +19,17 @@ use RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
  */
 class Close extends Base
 {
+    /**
+     * Test closing database connection.
+     *
+     * @return void
+     */
+    public function testClose()
+    {
+        asrt(R::getDatabaseAdapter()->getDatabase()->isConnected(), true);
 
-	/**
-	 * Test closing database connection.
-	 *
-	 * @return void
-	 */
-	public function testClose()
-	{
-		asrt( R::getDatabaseAdapter()->getDatabase()->isConnected(), TRUE );
+        R::close();
 
-		R::close();
-
-		asrt( R::getDatabaseAdapter()->getDatabase()->isConnected(), FALSE );
-
-	}
+        asrt(R::getDatabaseAdapter()->getDatabase()->isConnected(), false);
+    }
 }
-
-

@@ -21,124 +21,121 @@ use RedBeanPHP\RedException\SQL as SQL;
  */
 class Count extends Base
 {
-	/**
-	 * Tests type check and conversion in
-	 * OODB for count().
-	 *
-	 * @return void
-	 */
-	public function testCountType()
-	{
-		R::nuke();
-		$book = R::dispense( 'book' );
-		$book->sharedPage = R::dispense( 'page', 10 );
-		R::store( $book );
-		asrt( R::count('bookPage'), 10 );
+    /**
+     * Tests type check and conversion in
+     * OODB for count().
+     *
+     * @return void
+     */
+    public function testCountType()
+    {
+        R::nuke();
+        $book = R::dispense('book');
+        $book->sharedPage = R::dispense('page', 10);
+        R::store($book);
+        asrt(R::count('bookPage'), 10);
 
-		try {
-			R::count( 'WrongTypeName' );
-			fail();
-		} catch ( RedException $ex ) {
-			pass();
-		}
+        try {
+            R::count('WrongTypeName');
+            fail();
+        } catch (RedException $ex) {
+            pass();
+        }
 
-		try {
-			R::count( 'wrong_type_name' );
-			fail();
-		} catch ( RedException $ex ) {
-			pass();
-		}
-	}
+        try {
+            R::count('wrong_type_name');
+            fail();
+        } catch (RedException $ex) {
+            pass();
+        }
+    }
 
+    /**
+     * Test count and wipe.
+     *
+     * @return void
+     */
+    public function testCountAndWipe()
+    {
+        testpack("Test count and wipe");
 
-	/**
-	 * Test count and wipe.
-	 *
-	 * @return void
-	 */
-	public function testCountAndWipe()
-	{
-		testpack( "Test count and wipe" );
+        $page = R::dispense("page");
 
-		$page = R::dispense( "page" );
+        $page->name = "ABC";
 
-		$page->name = "ABC";
+        R::store($page);
 
-		R::store( $page );
+        $n1 = R::count("page");
 
-		$n1 = R::count( "page" );
+        $page = R::dispense("page");
 
-		$page = R::dispense( "page" );
+        $page->name = "DEF";
 
-		$page->name = "DEF";
+        R::store($page);
 
-		R::store( $page );
+        $n2 = R::count("page");
 
-		$n2 = R::count( "page" );
+        asrt($n1 + 1, $n2);
 
-		asrt( $n1 + 1, $n2 );
+        R::wipe("page");
 
-		R::wipe( "page" );
+        asrt(R::count("page"), 0);
+        asrt(R::getRedBean()->count("page"), 0);
+        asrt(R::getRedBean()->count("kazoo"), 0); // non existing table
 
-		asrt( R::count( "page" ), 0 );
-		asrt( R::getRedBean()->count( "page" ), 0 );
-		asrt( R::getRedBean()->count( "kazoo" ), 0 ); // non existing table
+        R::freeze(true);
 
-		R::freeze( TRUE );
+        asrt(R::getRedBean()->count("kazoo"), 0); // non existing table
 
-		asrt( R::getRedBean()->count( "kazoo" ), 0 ); // non existing table
+        R::freeze(false);
 
-		R::freeze( FALSE );
+        $page = R::dispense('page');
 
-		$page = R::dispense( 'page' );
+        $page->name = 'foo';
 
-		$page->name = 'foo';
+        R::store($page);
 
-		R::store( $page );
+        $page = R::dispense('page');
 
-		$page = R::dispense( 'page' );
+        $page->name = 'bar';
 
-		$page->name = 'bar';
+        R::store($page);
 
-		R::store( $page );
+        asrt(R::count('page', ' name = ? ', array( 'foo' )), 1);
 
-		asrt( R::count( 'page', ' name = ? ', array( 'foo' ) ), 1 );
+        // Now count something that does not exist, this should return 0. (just be polite)
+        asrt(R::count('teapot', ' name = ? ', array( 'flying' )), 0);
+        asrt(R::count('teapot'), 0);
 
-		// Now count something that does not exist, this should return 0. (just be polite)
-		asrt( R::count( 'teapot', ' name = ? ', array( 'flying' ) ), 0 );
-		asrt( R::count( 'teapot' ), 0 );
+        $currentDriver = $this->currentlyActiveDriverID;
 
-		$currentDriver = $this->currentlyActiveDriverID;
+        // Some drivers don't support that many error codes.
+        if ($currentDriver === 'mysql' || $currentDriver === 'postgres') {
+            try {
+                R::count('teaport', ' for tea ');
+                fail();
+            } catch (SQL $e) {
+                pass();
+            }
+        }
+    }
 
-		// Some drivers don't support that many error codes.
-		if ( $currentDriver === 'mysql' || $currentDriver === 'postgres' ) {
-			try {
-				R::count( 'teaport', ' for tea ' );
-				fail();
-			} catch ( SQL $e ) {
-				pass();
-			}
-		}
-	}
-
-	public function testCountShared() {
-
-		R::nuke();
-		$book = R::dispense( 'book' );
-		$book->sharedPageList = R::dispense( 'page', 5 );
-		R::store( $book );
-		asrt( $book->countShared('page'), 5 );
-		asrt( $book->countShared('leaflet'), 0 );
-		asrt( R::dispense( 'book' )->countShared('page'), 0 );
-		$am = R::getRedBean()->getAssociationManager();
-		asrt( $am->relatedCount( R::dispense( 'book' ), 'page' ), 0);
-		try {
-			$am->relatedCount( 'not a bean', 'type' );
-			fail();
-		} catch( RedException $e ) {
-			pass();
-		}
-
-	}
-
+    public function testCountShared()
+    {
+        R::nuke();
+        $book = R::dispense('book');
+        $book->sharedPageList = R::dispense('page', 5);
+        R::store($book);
+        asrt($book->countShared('page'), 5);
+        asrt($book->countShared('leaflet'), 0);
+        asrt(R::dispense('book')->countShared('page'), 0);
+        $am = R::getRedBean()->getAssociationManager();
+        asrt($am->relatedCount(R::dispense('book'), 'page'), 0);
+        try {
+            $am->relatedCount('not a bean', 'type');
+            fail();
+        } catch (RedException $e) {
+            pass();
+        }
+    }
 }

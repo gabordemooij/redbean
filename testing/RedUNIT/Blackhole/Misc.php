@@ -26,553 +26,549 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 class Misc extends Blackhole
 {
-	/*
-	 * What drivers should be loaded for this test pack?
-	 */
-	public function getTargetDrivers()
-	{
-		return array( 'sqlite' );
-	}
-
-	/**
-	* Should not be able to pass invalid mode (must be 0 or 1).
-	*
-	*/
-	public function testInvalidDebugModeException()
-	{
-		try {
-			R::debug( TRUE, 6 );
-			fail();
-		} catch ( RedException $e ) {
-			pass();
-		}
-		R::debug( FALSE );
-	}
-
-	/**
-	 * Adding a database twice no longer allowed, causes confusion
-	 * and possible damage.
-	 */
-	public function testAddingTwice()
-	{
-		testpack( 'Test adding DB twice.' );
-
-		try {
-			R::addDatabase( 'sqlite', '' );
-			fail();
-		} catch ( RedException $ex ) {
-			pass();
-		}
-	}
-
-	/**
-	 * Tests whether getID never produces a notice.
-	 *
-	 * @return void
-	 */
-	public function testGetIDShouldNeverPrintNotice()
-	{
-		set_error_handler(function($err, $errStr){
-			die('>>>>FAIL :'.$err.' '.$errStr);
-		});
-		$bean = new OODBBean;
-		$bean->getID();
-		restore_error_handler();
-		pass();
-	}
-
-	/**
-	 * Tests setProperty.
-	 *
-	 * @return void
-	 */
-	public function testSetProperty()
-	{
-		$bean = R::dispense( 'bean' );
-		$bean->item = 2;
-		$bean->ownBean = R::dispense( 'bean', 2 );
-		R::store( $bean );
-		$bean = $bean->fresh();
-		$bean->ownBean;
-
-		$bean->setProperty( 'ownBean', array(), FALSE, FALSE );
-		asrt( count( $bean->ownBean ), 0 );
-		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 2 );
-		asrt( $bean->isTainted(), TRUE );
-
-		$bean->setProperty( 'ownBean', array(), TRUE, FALSE );
-		asrt( count( $bean->ownBean ), 0 );
-		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 0 );
-		asrt( $bean->isTainted(), TRUE );
-
-		$bean = $bean->fresh();
-		$bean->setProperty( 'ownBean', array(), TRUE, FALSE );
-		asrt( count( $bean->ownBean ), 0 );
-		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 0 );
-		asrt( $bean->isTainted(), FALSE );
-
-		$bean = $bean->fresh();
-		$bean->setProperty( 'ownBean', array(), TRUE, TRUE );
-		asrt( count( $bean->ownBean ), 0 );
-		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 0 );
-		asrt( $bean->isTainted(), TRUE );
-	}
-
-	/**
-	 * Tests beansToArray().
-	 *
-	 * @return void
-	 */
-	public function testBeansToArray()
-	{
-		testpack('Test R::beansToArray method');
-
-		$bean1 = R::dispense( 'bean' );
-		$bean1->name = 'hello';
-		$bean2 = R::dispense( 'bean' );
-		$bean2->name = 'world';
+    /*
+     * What drivers should be loaded for this test pack?
+     */
+    public function getTargetDrivers()
+    {
+        return array( 'sqlite' );
+    }
+
+    /**
+    * Should not be able to pass invalid mode (must be 0 or 1).
+    *
+    */
+    public function testInvalidDebugModeException()
+    {
+        try {
+            R::debug(true, 6);
+            fail();
+        } catch (RedException $e) {
+            pass();
+        }
+        R::debug(false);
+    }
+
+    /**
+     * Adding a database twice no longer allowed, causes confusion
+     * and possible damage.
+     */
+    public function testAddingTwice()
+    {
+        testpack('Test adding DB twice.');
+
+        try {
+            R::addDatabase('sqlite', '');
+            fail();
+        } catch (RedException $ex) {
+            pass();
+        }
+    }
+
+    /**
+     * Tests whether getID never produces a notice.
+     *
+     * @return void
+     */
+    public function testGetIDShouldNeverPrintNotice()
+    {
+        set_error_handler(function ($err, $errStr) {
+            die('>>>>FAIL :'.$err.' '.$errStr);
+        });
+        $bean = new OODBBean();
+        $bean->getID();
+        restore_error_handler();
+        pass();
+    }
+
+    /**
+     * Tests setProperty.
+     *
+     * @return void
+     */
+    public function testSetProperty()
+    {
+        $bean = R::dispense('bean');
+        $bean->item = 2;
+        $bean->ownBean = R::dispense('bean', 2);
+        R::store($bean);
+        $bean = $bean->fresh();
+        $bean->ownBean;
+
+        $bean->setProperty('ownBean', array(), false, false);
+        asrt(count($bean->ownBean), 0);
+        asrt(count($bean->getMeta('sys.shadow.ownBean')), 2);
+        asrt($bean->isTainted(), true);
+
+        $bean->setProperty('ownBean', array(), true, false);
+        asrt(count($bean->ownBean), 0);
+        asrt(count($bean->getMeta('sys.shadow.ownBean')), 0);
+        asrt($bean->isTainted(), true);
+
+        $bean = $bean->fresh();
+        $bean->setProperty('ownBean', array(), true, false);
+        asrt(count($bean->ownBean), 0);
+        asrt(count($bean->getMeta('sys.shadow.ownBean')), 0);
+        asrt($bean->isTainted(), false);
+
+        $bean = $bean->fresh();
+        $bean->setProperty('ownBean', array(), true, true);
+        asrt(count($bean->ownBean), 0);
+        asrt(count($bean->getMeta('sys.shadow.ownBean')), 0);
+        asrt($bean->isTainted(), true);
+    }
+
+    /**
+     * Tests beansToArray().
+     *
+     * @return void
+     */
+    public function testBeansToArray()
+    {
+        testpack('Test R::beansToArray method');
+
+        $bean1 = R::dispense('bean');
+        $bean1->name = 'hello';
+        $bean2 = R::dispense('bean');
+        $bean2->name = 'world';
 
-		$beans = array( $bean1, $bean2 );
-		$array = R::beansToArray( $beans );
-		asrt( $array[0]['name'], 'hello' );
-		asrt( $array[1]['name'], 'world' );
-	}
+        $beans = array( $bean1, $bean2 );
+        $array = R::beansToArray($beans);
+        asrt($array[0]['name'], 'hello');
+        asrt($array[1]['name'], 'world');
+    }
 
-	/**
-	 * Test debugging with custom logger.
-	 *
-	 * @return void
-	 */
-	public function testDebugCustomLogger()
-	{
-		testpack( 'Test debug mode with custom logger' );
+    /**
+     * Test debugging with custom logger.
+     *
+     * @return void
+     */
+    public function testDebugCustomLogger()
+    {
+        testpack('Test debug mode with custom logger');
 
-		$pdoDriver = new RPDO( R::getDatabaseAdapter()->getDatabase()->getPDO() );
+        $pdoDriver = new RPDO(R::getDatabaseAdapter()->getDatabase()->getPDO());
 
-		$customLogger = new CustomLogger;
+        $customLogger = new CustomLogger();
 
-		$pdoDriver->setDebugMode( TRUE, $customLogger );
+        $pdoDriver->setDebugMode(true, $customLogger);
 
-		$pdoDriver->Execute( 'SELECT 123' );
+        $pdoDriver->Execute('SELECT 123');
 
-		asrt( count( $customLogger->getLogMessage() ), 1 );
+        asrt(count($customLogger->getLogMessage()), 1);
 
-		$pdoDriver->setDebugMode( TRUE, NULL );
-		asrt( ( $pdoDriver->getLogger() instanceof RDefault ), TRUE );
+        $pdoDriver->setDebugMode(true, null);
+        asrt(($pdoDriver->getLogger() instanceof RDefault), true);
 
-		testpack( 'Test bean->getProperties method' );
+        testpack('Test bean->getProperties method');
 
-		$bean = R::dispense( 'bean' );
+        $bean = R::dispense('bean');
 
-		$bean->property = 'hello';
+        $bean->property = 'hello';
 
-		$props = $bean->getProperties();
+        $props = $bean->getProperties();
 
-		asrt( isset( $props['property'] ), TRUE );
+        asrt(isset($props['property']), true);
 
-		asrt( $props['property'], 'hello' );
+        asrt($props['property'], 'hello');
+    }
 
-	}
+    /**
+     * Test Facade transactions.
+     *
+     * @return void
+     *
+     * @throws\Exception
+     */
+    public function testTransactionInFacade()
+    {
+        testpack('Test transaction in facade');
 
-	/**
-	 * Test Facade transactions.
-	 *
-	 * @return void
-	 *
-	 * @throws\Exception
-	 */
-	public function testTransactionInFacade()
-	{
-		testpack( 'Test transaction in facade' );
+        $bean = R::dispense('bean');
 
-		$bean = R::dispense( 'bean' );
+        $bean->name = 'a';
 
-		$bean->name = 'a';
+        R::store($bean);
 
-		R::store( $bean );
+        R::trash($bean);
 
-		R::trash( $bean );
+        R::freeze(true);
 
-		R::freeze( TRUE );
+        $bean = R::dispense('bean');
 
-		$bean = R::dispense( 'bean' );
+        $bean->name = 'a';
 
-		$bean->name = 'a';
+        R::store($bean);
 
-		R::store( $bean );
+        asrt(R::count('bean'), 1);
 
-		asrt( R::count( 'bean' ), 1 );
+        R::trash($bean);
 
-		R::trash( $bean );
+        asrt(R::count('bean'), 0);
 
-		asrt( R::count( 'bean' ), 0 );
+        $bean = R::dispense('bean');
 
-		$bean = R::dispense( 'bean' );
+        $bean->name = 'a';
 
-		$bean->name = 'a';
+        $id = R::transaction(function () use (&$bean) {
+            return R::transaction(function () use (&$bean) {
+                return R::store($bean);
+            });
+        });
 
-		$id = R::transaction( function() use( &$bean ) {
-			return R::transaction( function() use( &$bean ) {
-				return R::store( $bean );
-			} );
-		} );
+        asrt((int) $id, (int) $bean->id);
 
-		asrt( (int) $id, (int) $bean->id );
+        R::trash($bean);
 
-		R::trash( $bean );
+        $bean = R::dispense('bean');
 
-		$bean = R::dispense( 'bean' );
+        $bean->name = 'a';
 
-		$bean->name = 'a';
+        $id = R::transaction(function () use (&$bean) {
+            return R::store($bean);
+        });
 
-		$id = R::transaction( function() use( &$bean ) {
-			return R::store( $bean );
-		} );
+        asrt((int) $id, (int) $bean->id);
 
-		asrt( (int) $id, (int) $bean->id );
+        R::trash($bean);
 
-		R::trash( $bean );
+        $bean = R::dispense('bean');
 
-		$bean = R::dispense( 'bean' );
+        $bean->name = 'a';
 
-		$bean->name = 'a';
+        try {
+            R::transaction(function () use ($bean) {
+                R::store($bean);
 
+                R::transaction(function () {
+                    throw new\Exception();
+                });
+            });
+        } catch (\Exception $e) {
+            pass();
+        }
+        asrt(R::count('bean'), 0);
 
-		try {
-			R::transaction( function () use ( $bean ) {
-				R::store( $bean );
+        $bean = R::dispense('bean');
 
-				R::transaction( function () {
-					throw new\Exception();
-				} );
-			} );
-		} catch (\Exception $e ) {
-			pass();
-		}
-		asrt( R::count( 'bean' ), 0 );
+        $bean->name = 'a';
 
-		$bean = R::dispense( 'bean' );
+        try {
+            R::transaction(function () use ($bean) {
+                R::transaction(function () use ($bean) {
+                    R::store($bean);
+                    throw new\Exception();
+                });
+            });
+        } catch (\Exception $e) {
+            pass();
+        }
 
-		$bean->name = 'a';
+        asrt(R::count('bean'), 0);
 
-		try {
-			R::transaction( function () use ( $bean ) {
-				R::transaction( function () use ( $bean ) {
-					R::store( $bean );
-					throw new\Exception();
-				} );
-			} );
-		} catch (\Exception $e ) {
-			pass();
-		}
+        $bean = R::dispense('bean');
 
-		asrt( R::count( 'bean' ), 0 );
+        $bean->name = 'a';
 
-		$bean = R::dispense( 'bean' );
+        try {
+            R::transaction(function () use ($bean) {
+                R::transaction(function () use ($bean) {
+                    R::store($bean);
+                });
+            });
+        } catch (\Exception $e) {
+            pass();
+        }
 
-		$bean->name = 'a';
+        asrt(R::count('bean'), 1);
 
-		try {
-			R::transaction( function () use ( $bean ) {
-				R::transaction( function () use ( $bean ) {
-					R::store( $bean );
-				} );
-			} );
-		} catch (\Exception $e ) {
-			pass();
-		}
+        R::freeze(false);
 
-		asrt( R::count( 'bean' ), 1 );
+        try {
+            R::transaction('nope');
 
-		R::freeze( FALSE );
+            fail();
+        } catch (\Exception $e) {
+            pass();
+        }
 
-		try {
-			R::transaction( 'nope' );
+        testpack('Test Camelcase 2 underscore');
 
-			fail();
-		} catch (\Exception $e ) {
-			pass();
-		}
+        $names = array(
+            'oneACLRoute'              => 'one_acl_route',
+            'ALLUPPERCASE'             => 'alluppercase',
+            'clientServerArchitecture' => 'client_server_architecture',
+            'camelCase'                => 'camel_case',
+            'peer2peer'                => 'peer2peer',
+            'fromUs4You'               => 'from_us4_you',
+            'lowercase'                => 'lowercase',
+            'a1A2b'                    => 'a1a2b',
+        );
 
-		testpack( 'Test Camelcase 2 underscore' );
+        $bean = R::dispense('bean');
 
-		$names = array(
-			'oneACLRoute'              => 'one_acl_route',
-			'ALLUPPERCASE'             => 'alluppercase',
-			'clientServerArchitecture' => 'client_server_architecture',
-			'camelCase'                => 'camel_case',
-			'peer2peer'                => 'peer2peer',
-			'fromUs4You'               => 'from_us4_you',
-			'lowercase'                => 'lowercase',
-			'a1A2b'                    => 'a1a2b',
-		);
+        foreach ($names as $name => $becomes) {
+            $bean->$name = 1;
 
-		$bean = R::dispense( 'bean' );
+            asrt(isset($bean->$becomes), true);
+        }
 
-		foreach ( $names as $name => $becomes ) {
-			$bean->$name = 1;
+        testpack('Misc Tests');
 
-			asrt( isset( $bean->$becomes ), TRUE );
-		}
+        R::debug(1);
 
-		testpack( 'Misc Tests' );
+        flush();
+        ob_start();
 
+        R::exec('SELECT 123');
 
-		R::debug( 1 );
+        $out = ob_get_contents();
 
-		flush();
-		ob_start();
+        ob_end_clean();
+        flush();
 
-		R::exec( 'SELECT 123' );
+        pass();
 
-		$out = ob_get_contents();
+        asrt((strpos($out, 'SELECT 123') !== FALSE), true);
 
-		ob_end_clean();
-		flush();
+        R::debug(0);
 
-		pass();
+        flush();
+        ob_start();
 
-		asrt( ( strpos( $out, 'SELECT 123' ) !== FALSE ), TRUE );
+        R::exec('SELECT 123');
 
-		R::debug( 0 );
+        $out = ob_get_contents();
+        ob_end_clean();
 
-		flush();
-		ob_start();
+        flush();
 
-		R::exec( 'SELECT 123' );
+        pass();
 
-		$out = ob_get_contents();
-		ob_end_clean();
+        asrt($out, '');
 
-		flush();
+        R::debug(0);
 
-		pass();
+        pass();
 
-		asrt( $out, '' );
+        testpack('test to string override');
 
-		R::debug( 0 );
+        $band = R::dispense('band');
 
-		pass();
+        $str = strval($band);
 
-		testpack( 'test to string override' );
+        asrt($str, 'bigband');
 
-		$band = R::dispense( 'band' );
+        testpack('test whether we can use isset/set in model');
 
-		$str = strval( $band );
+        $band->setProperty('property1', 123);
 
-		asrt( $str, 'bigband' );
+        asrt($band->property1, 123);
 
-		testpack( 'test whether we can use isset/set in model' );
+        asrt($band->checkProperty('property1'), true);
+        asrt($band->checkProperty('property2'), false);
 
-		$band->setProperty( 'property1', 123 );
+        $band = new \Model_Band();
 
-		asrt( $band->property1, 123 );
+        $bean = R::dispense('band');
 
-		asrt( $band->checkProperty( 'property1' ), TRUE );
-		asrt( $band->checkProperty( 'property2' ), FALSE );
+        $bean->property3 = 123;
 
-		$band = new \Model_Band;
+        $band->loadBean($bean);
 
-		$bean = R::dispense( 'band' );
+        $bean->property4 = 345;
 
-		$bean->property3 = 123;
+        $band->setProperty('property1', 123);
 
-		$band->loadBean( $bean );
+        asrt($band->property1, 123);
 
-		$bean->property4 = 345;
+        asrt($band->checkProperty('property1'), true);
+        asrt($band->checkProperty('property2'), false);
 
-		$band->setProperty( 'property1', 123 );
+        asrt($band->property3, 123);
+        asrt($band->property4, 345);
 
-		asrt( $band->property1, 123 );
+        testpack('Can we pass a\PDO object to Setup?');
 
-		asrt( $band->checkProperty( 'property1' ), TRUE );
-		asrt( $band->checkProperty( 'property2' ), FALSE );
+        $pdo = new\PDO('sqlite:test.db');
 
-		asrt( $band->property3, 123 );
-		asrt( $band->property4, 345 );
+        R::addDatabase('pdo', $pdo);
+        R::selectDatabase('pdo');
 
-		testpack( 'Can we pass a\PDO object to Setup?' );
+        R::getCell('SELECT 123;');
 
-		$pdo = new\PDO( 'sqlite:test.db' );
+        testpack('Test array interface of beans');
 
-		R::addDatabase( 'pdo', $pdo );
-		R::selectDatabase( 'pdo' );
+        $bean = R::dispense('bean');
 
-		R::getCell('SELECT 123;');
+        $bean->hello = 'hi';
+        $bean->world = 'planet';
 
-		testpack( 'Test array interface of beans' );
+        asrt($bean['hello'], 'hi');
 
-		$bean = R::dispense( 'bean' );
+        asrt(isset($bean['hello']), true);
+        asrt(isset($bean['bye']), false);
 
-		$bean->hello = 'hi';
-		$bean->world = 'planet';
+        $bean['world'] = 'sphere';
 
-		asrt( $bean['hello'], 'hi' );
+        asrt($bean->world, 'sphere');
 
-		asrt( isset( $bean['hello'] ), TRUE );
-		asrt( isset( $bean['bye'] ), FALSE );
+        foreach ($bean as $key => $el) {
+            if ($el == 'sphere' || $el == 'hi' || $el == 0) {
+                pass();
+            } else {
+                fail();
+            }
 
-		$bean['world'] = 'sphere';
+            if ($key == 'hello' || $key == 'world' || $key == 'id') {
+                pass();
+            } else {
+                fail();
+            }
+        }
 
-		asrt( $bean->world, 'sphere' );
+        asrt(count($bean), 3);
 
-		foreach ( $bean as $key => $el ) {
-			if ( $el == 'sphere' || $el == 'hi' || $el == 0 ) {
-				pass();
-			} else {
-				fail();
-			}
+        unset($bean['hello']);
 
-			if ( $key == 'hello' || $key == 'world' || $key == 'id' ) {
-				pass();
-			} else {
-				fail();
-			}
-		}
+        asrt(count($bean), 2);
 
-		asrt( count( $bean ), 3 );
+        asrt(count(R::dispense('countable')), 1);
 
-		unset( $bean['hello'] );
+        // Otherwise untestable...
+        $bean->setBeanHelper(new SimpleFacadeBeanHelper());
 
-		asrt( count( $bean ), 2 );
+        R::getRedBean()->setBeanHelper(new SimpleFacadeBeanHelper());
 
-		asrt( count( R::dispense( 'countable' ) ), 1 );
+        pass();
 
-		// Otherwise untestable...
-		$bean->setBeanHelper( new SimpleFacadeBeanHelper() );
+        // Test whether properties like owner and shareditem are still possible
+        testpack('Test Bean Interface for Lists');
 
-		R::getRedBean()->setBeanHelper( new SimpleFacadeBeanHelper() );
+        $bean = R::dispense('bean');
 
-		pass();
+        // Must not be list, because first char after own is lowercase
+        asrt(is_array($bean->owner), false);
 
-		// Test whether properties like owner and shareditem are still possible
-		testpack( 'Test Bean Interface for Lists' );
+        // Must not be list, because first char after shared is lowercase
+        asrt(is_array($bean->shareditem), false);
 
-		$bean = R::dispense( 'bean' );
+        asrt(is_array($bean->own), false);
+        asrt(is_array($bean->shared), false);
 
-		// Must not be list, because first char after own is lowercase
-		asrt( is_array( $bean->owner ), FALSE );
+        asrt(is_array($bean->own_item), false);
+        asrt(is_array($bean->shared_item), false);
 
-		// Must not be list, because first char after shared is lowercase
-		asrt( is_array( $bean->shareditem ), FALSE );
+        asrt(is_array($bean->{'own item'}), false);
+        asrt(is_array($bean->{'shared Item'}), false);
+    }
 
-		asrt( is_array( $bean->own ), FALSE );
-		asrt( is_array( $bean->shared ), FALSE );
+    public function testConv2Beans()
+    {
+        $row1 = array('id' => 1, 'title' => 'test');
+        $row2 = array('id' => 2, 'title' => 'test2');
+        $beans = R::convertToBeans('page', array($row1, $row2));
+        asrt(count($beans), 2);
+        asrt($beans[2]->title, 'test2');
+    }
 
-		asrt( is_array( $bean->own_item ), FALSE );
-		asrt( is_array( $bean->shared_item ), FALSE );
+    /**
+    * Test the most important invalid bean combinations.
+    *
+    * @return void
+    */
+    public function testInvalidType()
+    {
+        $invalid = array(
+            'book_page', //no link beans
+            'a_b_c', //no prefix
+            'a b', //no space
+            'bean@', //no invalid symbols
+            'bean#', //no invalid symbols
+            'bean$', //sometimes used in DB, not allowed
+            '__bean',//no prefixes
+            '.bean', //no object notation
+            'bean-item', //no dash
+            'beanOther', ); //no camelcase (uppercase because of file system issues)
 
-		asrt( is_array( $bean->{'own item'} ), FALSE );
-		asrt( is_array( $bean->{'shared Item'} ), FALSE );
-	}
+        foreach ($invalid as $j) {
+            try {
+                R::dispense($j);
+                fail();
+            } catch (RedException $e) {
+                pass();
+            }
+        }
+    }
 
-	public function testConv2Beans()
-	{
-		$row1 = array('id' => 1, 'title'=>'test');
-		$row2 = array('id' => 2, 'title'=>'test2');
-		$beans = R::convertToBeans('page', array($row1, $row2));
-		asrt(count($beans), 2);
-		asrt($beans[2]->title, 'test2');
-	}
+    /**
+    * Test whether batch still works if no IDs have been passed.
+    *
+    * @return void
+    */
+    public function testBatch0()
+    {
+        $zero = R::batch('page', array());
+        asrt(is_array($zero), true);
+        asrt(count($zero), 0);
+        $zero = R::batch('page', false);
+        asrt(is_array($zero), true);
+        asrt(count($zero), 0);
+        $zero = R::batch('page', null);
+        asrt(is_array($zero), true);
+        asrt(count($zero), 0);
+    }
 
-	/**
-	* Test the most important invalid bean combinations.
-	*
-	* @return void
-	*/
-	public function testInvalidType()
-	{
-		$invalid = array(
-			'book_page', //no link beans
-			'a_b_c', //no prefix
-			'a b', //no space
-			'bean@', //no invalid symbols
-			'bean#', //no invalid symbols
-			'bean$', //sometimes used in DB, not allowed
-			'__bean',//no prefixes
-			'.bean', //no object notation
-			'bean-item', //no dash
-			'beanOther'); //no camelcase (uppercase because of file system issues)
+    /**
+    * Test whether connection failure does not reveal
+    * credentials.
+    *
+    * @return void
+    */
+    public function testConnect()
+    {
+        $driver = new RPDO('dsn:invalid', 'usr', 'psst');
+        try {
+            $driver->connect();
+            fail();
+        } catch (\PDOException $e) {
+            asrt(strpos($e->getMessage(), 'invalid'), false);
+            asrt(strpos($e->getMessage(), 'usr'), false);
+            asrt(strpos($e->getMessage(), 'psst'), false);
+        }
+    }
 
-		foreach( $invalid as $j ) {
-			try {
-				R::dispense( $j );
-				fail();
-			} catch( RedException $e ) {
-				pass();
-			}
-		}
-	}
+    /**
+    * Test whether we can create an instant database using
+    * R::setup().
+    *
+    * Probably only works on *NIX systems.
+    *
+    * @return void
+    */
+    public function testSetup()
+    {
+        $tmpDir = sys_get_temp_dir();
+        R::setup();
+    }
 
-	/**
-	* Test whether batch still works if no IDs have been passed.
-	*
-	* @return void
-	*/
-	public function testBatch0()
-	{
-		$zero = R::batch( 'page', array() );
-		asrt( is_array( $zero ), TRUE );
-		asrt( count( $zero ), 0 );
-		$zero = R::batch( 'page', FALSE );
-		asrt( is_array( $zero ), TRUE );
-		asrt( count( $zero ), 0 );
-		$zero = R::batch( 'page', NULL);
-		asrt( is_array( $zero ), TRUE );
-		asrt( count( $zero ), 0 );
-	}
-
-	/**
-	* Test whether connection failure does not reveal
-	* credentials.
-	*
-	* @return void
-	*/
-	public function testConnect()
-	{
-		$driver = new RPDO( 'dsn:invalid', 'usr', 'psst' );
-		try {
-			$driver->connect();
-			fail();
-		}
-		catch( \PDOException $e ) {
-			asrt( strpos( $e->getMessage(), 'invalid' ), FALSE );
-			asrt( strpos( $e->getMessage(), 'usr' ), FALSE );
-			asrt( strpos( $e->getMessage(), 'psst' ), FALSE );
-		}
-	}
-
-	/**
-	* Test whether we can create an instant database using
-	* R::setup().
-	*
-	* Probably only works on *NIX systems.
-	*
-	* @return void
-	*/
-	public function testSetup()
-	{
-		$tmpDir = sys_get_temp_dir();
-		R::setup();
-	}
-
-	/**
-	 * Test camelCase to snake_case conversions.
-	 *
-	 * @return void
-	 */
-	public function testCamel2Snake()
-	{
-		asrt( AQueryWriter::camelsSnake('bookPage'), 'book_page' );
-		asrt( AQueryWriter::camelsSnake('FTP'), 'ftp' );
-		asrt( AQueryWriter::camelsSnake('ACLRules'), 'acl_rules' );
-		asrt( AQueryWriter::camelsSnake('SSHConnectionProxy'), 'ssh_connection_proxy' );
-		asrt( AQueryWriter::camelsSnake('proxyServerFacade'), 'proxy_server_facade' );
-		asrt( AQueryWriter::camelsSnake('proxySSHClient'), 'proxy_ssh_client' );
-		asrt( AQueryWriter::camelsSnake('objectACL2Factory'), 'object_acl2_factory' );
-		asrt( AQueryWriter::camelsSnake('bookItems4Page'), 'book_items4_page' );
-		asrt( AQueryWriter::camelsSnake('book☀Items4Page'), 'book☀_items4_page' );
-	}
+    /**
+     * Test camelCase to snake_case conversions.
+     *
+     * @return void
+     */
+    public function testCamel2Snake()
+    {
+        asrt(AQueryWriter::camelsSnake('bookPage'), 'book_page');
+        asrt(AQueryWriter::camelsSnake('FTP'), 'ftp');
+        asrt(AQueryWriter::camelsSnake('ACLRules'), 'acl_rules');
+        asrt(AQueryWriter::camelsSnake('SSHConnectionProxy'), 'ssh_connection_proxy');
+        asrt(AQueryWriter::camelsSnake('proxyServerFacade'), 'proxy_server_facade');
+        asrt(AQueryWriter::camelsSnake('proxySSHClient'), 'proxy_ssh_client');
+        asrt(AQueryWriter::camelsSnake('objectACL2Factory'), 'object_acl2_factory');
+        asrt(AQueryWriter::camelsSnake('bookItems4Page'), 'book_items4_page');
+        asrt(AQueryWriter::camelsSnake('book☀Items4Page'), 'book☀_items4_page');
+    }
 }
 
 /**
@@ -581,16 +577,15 @@ class Misc extends Blackhole
  */
 class CustomLogger extends RDefault
 {
+    private $log;
 
-	private $log;
+    public function getLogMessage()
+    {
+        return $this->log;
+    }
 
-	public function getLogMessage()
-	{
-		return $this->log;
-	}
-
-	public function log()
-	{
-		$this->log = func_get_args();
-	}
+    public function log()
+    {
+        $this->log = func_get_args();
+    }
 }

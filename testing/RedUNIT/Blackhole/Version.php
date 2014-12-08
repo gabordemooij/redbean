@@ -19,27 +19,27 @@ use RedBeanPHP\Facade as R;
  */
 class Version extends Blackhole
 {
-	/**
-	 * Test version info.
-	 *
-	 * @return void
-	 */
-	public function testVersion()
-	{
-		$version = R::getVersion();
+    /**
+     * Test version info.
+     *
+     * @return void
+     */
+    public function testVersion()
+    {
+        $version = R::getVersion();
 
-		asrt( is_string( $version ), TRUE );
-	}
+        asrt(is_string($version), true);
+    }
 
-	/**
-	 * Test whether basic tools are available for use.
-	 *
-	 * @return void
-	 */
-	public function testTools()
-	{
-		asrt( class_exists( '\\RedBean_SimpleModel' ), TRUE );
-		asrt( class_exists( '\\R' ), TRUE );
-		asrt( function_exists( 'EID' ), TRUE );
-	}
+    /**
+     * Test whether basic tools are available for use.
+     *
+     * @return void
+     */
+    public function testTools()
+    {
+        asrt(class_exists('\\RedBean_SimpleModel'), true);
+        asrt(class_exists('\\R'), true);
+        asrt(function_exists('EID'), true);
+    }
 }

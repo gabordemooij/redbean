@@ -19,21 +19,21 @@ use RedBeanPHP\Facade as R;
  */
 class Utf8 extends Base
 {
-	/**
-	 * Test UTF8 handling.
-	 *
-	 * @return void
-	 */
-	public function testUTF8()
-	{
-		$str = '𠜎ὃ𠻗𠻹𠻺𠼭𠼮𠽌𠾴𠾼𠿪𡁜';
-		$bean      = R::dispense( 'bean' );
-		$bean->bla = $str;
+    /**
+     * Test UTF8 handling.
+     *
+     * @return void
+     */
+    public function testUTF8()
+    {
+        $str = '𠜎ὃ𠻗𠻹𠻺𠼭𠼮𠽌𠾴𠾼𠿪𡁜';
+        $bean      = R::dispense('bean');
+        $bean->bla = $str;
 
-		R::store( $bean );
-		$bean = R::load( 'bean', $bean->id );
-		asrt( $bean->bla, $str );
+        R::store($bean);
+        $bean = R::load('bean', $bean->id);
+        asrt($bean->bla, $str);
 
-		pass();
-	}
+        pass();
+    }
 }

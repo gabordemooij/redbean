@@ -21,267 +21,267 @@ use RedBeanPHP\RedException\SQL as SQL;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class Finding extends Base {
+class Finding extends Base
+{
+    /**
+     * Test whether findOne gets a LIMIT 1
+     * clause.
+     *
+     * @return void
+     */
+    public function testFindOneLimitOne()
+    {
+        R::nuke();
+        list($book1, $book2) = R::dispense('book', 2);
+        $book1->title = 'a';
+        $book2->title = 'b';
+        R::storeAll(array( $book1, $book2 ));
+        $logger = R::debug(1, 1);
+        $logger->clear();
+        $found = R::findOne('book');
+        asrt(count($logger->grep('LIMIT 1')), 1);
+        asrt(($found instanceof \RedBeanPHP\OODBBean), true);
+        $logger->clear();
+        $found = R::findOne('book', ' title = ? ', array( 'a' ));
+        asrt(count($logger->grep('LIMIT 1')), 1);
+        asrt(($found instanceof \RedBeanPHP\OODBBean), true);
+        $logger->clear();
+        $found = R::findOne('book', ' title = ? LIMIT 1', array( 'b' ));
+        asrt(count($logger->grep('LIMIT 1')), 1);
+        asrt(($found instanceof \RedBeanPHP\OODBBean), true);
+        $found = R::findOne('book', ' title = ? LIMIT 2', array( 'b' ));
+        asrt(count($logger->grep('LIMIT 2')), 1);
+        asrt(($found instanceof \RedBeanPHP\OODBBean), true);
+    }
 
-	/**
-	 * Test whether findOne gets a LIMIT 1
-	 * clause.
-	 *
-	 * @return void
-	 */
-	public function testFindOneLimitOne()
-	{
-		R::nuke();
-		list( $book1, $book2 ) = R::dispense( 'book', 2 );
-		$book1->title = 'a';
-		$book2->title = 'b';
-		R::storeAll( array( $book1, $book2 ) );
-		$logger = R::debug( 1, 1 );
-		$logger->clear();
-		$found = R::findOne( 'book' );
-		asrt( count( $logger->grep('LIMIT 1') ), 1 );
-		asrt( ( $found instanceof \RedBeanPHP\OODBBean ), TRUE );
-		$logger->clear();
-		$found = R::findOne( 'book', ' title = ? ', array( 'a' ) );
-		asrt( count( $logger->grep('LIMIT 1') ), 1 );
-		asrt( ( $found instanceof \RedBeanPHP\OODBBean ), TRUE );
-		$logger->clear();
-		$found = R::findOne( 'book', ' title = ? LIMIT 1', array( 'b' ) );
-		asrt( count( $logger->grep('LIMIT 1') ), 1 );
-		asrt( ( $found instanceof \RedBeanPHP\OODBBean ), TRUE );
-		$found = R::findOne( 'book', ' title = ? LIMIT 2', array( 'b' ) );
-		asrt( count( $logger->grep('LIMIT 2') ), 1 );
-		asrt( ( $found instanceof \RedBeanPHP\OODBBean ), TRUE );
-	}
+    /**
+     * Begin testing.
+     * This method runs the actual test pack.
+     *
+     * @return void
+     */
+    public function testFinding()
+    {
+        $toolbox = R::getToolBox();
+        $adapter = $toolbox->getDatabaseAdapter();
+        $writer  = $toolbox->getWriter();
+        $redbean = $toolbox->getRedBean();
+        $pdo     = $adapter->getDatabase();
 
-	/**
-	 * Begin testing.
-	 * This method runs the actual test pack.
-	 *
-	 * @return void
-	 */
-	public function testFinding() {
+        $a = new AssociationManager($toolbox);
 
-		$toolbox = R::getToolBox();
-		$adapter = $toolbox->getDatabaseAdapter();
-		$writer  = $toolbox->getWriter();
-		$redbean = $toolbox->getRedBean();
-		$pdo     = $adapter->getDatabase();
+        $page = $redbean->dispense("page");
 
-		$a = new AssociationManager( $toolbox );
+        $page->name = "John's page";
 
-		$page = $redbean->dispense( "page" );
+        $idpage = $redbean->store($page);
 
-		$page->name = "John's page";
+        $page2 = $redbean->dispense("page");
 
-		$idpage = $redbean->store( $page );
+        $page2->name = "John's second page";
 
-		$page2 = $redbean->dispense( "page" );
+        $idpage2 = $redbean->store($page2);
 
-		$page2->name = "John's second page";
+        $a->associate($page, $page2);
 
-		$idpage2 = $redbean->store( $page2 );
+        $pageOne = $redbean->dispense("page");
 
-		$a->associate( $page, $page2 );
+        $pageOne->name = "one";
 
-		$pageOne = $redbean->dispense( "page" );
+        $pageMore = $redbean->dispense("page");
 
-		$pageOne->name = "one";
+        $pageMore->name = "more";
 
-		$pageMore = $redbean->dispense( "page" );
+        $pageEvenMore = $redbean->dispense("page");
 
-		$pageMore->name = "more";
+        $pageEvenMore->name = "evenmore";
 
-		$pageEvenMore = $redbean->dispense( "page" );
+        $pageOther = $redbean->dispense("page");
 
-		$pageEvenMore->name = "evenmore";
+        $pageOther->name = "othermore";
 
-		$pageOther = $redbean->dispense( "page" );
+        set1toNAssoc($a, $pageOther, $pageMore);
+        set1toNAssoc($a, $pageOne, $pageMore);
+        set1toNAssoc($a, $pageOne, $pageEvenMore);
 
-		$pageOther->name = "othermore";
+        asrt(count($redbean->find("page", array(), " name LIKE '%more%' ", array())), 3);
+        asrt(count($redbean->find("page", array(), " name LIKE :str ", array( ":str" => '%more%' ))), 3);
+        asrt(count($redbean->find("page", array(), array( " name LIKE :str ", array( ":str" => '%more%' ) ))), 3);
+        asrt(count($redbean->find("page", array(), " name LIKE :str ", array( ":str" => '%mxore%' ))), 0);
+        asrt(count($redbean->find("page", array( "id" => array( 2, 3 ) ))), 2);
 
-		set1toNAssoc( $a, $pageOther, $pageMore );
-		set1toNAssoc( $a, $pageOne, $pageMore );
-		set1toNAssoc( $a, $pageOne, $pageEvenMore );
+        $bean = $redbean->dispense("wine");
 
-		asrt( count( $redbean->find( "page", array(), " name LIKE '%more%' ", array() ) ), 3 );
-		asrt( count( $redbean->find( "page", array(), " name LIKE :str ", array( ":str" => '%more%' ) ) ), 3 );
-		asrt( count( $redbean->find( "page", array(), array( " name LIKE :str ", array( ":str" => '%more%' ) ) ) ), 3 );
-		asrt( count( $redbean->find( "page", array(), " name LIKE :str ", array( ":str" => '%mxore%' ) ) ), 0 );
-		asrt( count( $redbean->find( "page", array( "id" => array( 2, 3 ) ) ) ), 2 );
+        $bean->name = "bla";
 
-		$bean = $redbean->dispense( "wine" );
+        for ($i = 0; $i < 10; $i++) {
+            $redbean->store($bean);
+        }
 
-		$bean->name = "bla";
+        $redbean->find("wine", array( "id" => 5 )); //  Finder:where call OODB::convertToBeans
 
-		for ( $i = 0; $i < 10; $i++ ) {
-			$redbean->store( $bean );
-		}
+        $bean2 = $redbean->load("anotherbean", 5);
 
-		$redbean->find( "wine", array( "id" => 5 ) ); //  Finder:where call OODB::convertToBeans
+        asrt($bean2->id, 0);
 
-		$bean2 = $redbean->load( "anotherbean", 5 );
+        $keys = $adapter->getCol("SELECT id FROM page WHERE ".$writer->esc('name')." LIKE '%John%'");
 
-		asrt( $bean2->id, 0 );
+        asrt(count($keys), 2);
 
-		$keys = $adapter->getCol( "SELECT id FROM page WHERE " . $writer->esc( 'name' ) . " LIKE '%John%'" );
+        $pages = $redbean->batch("page", $keys);
 
-		asrt( count( $keys ), 2 );
+        asrt(count($pages), 2);
 
-		$pages = $redbean->batch( "page", $keys );
+        $p = R::findLast('page');
 
-		asrt( count( $pages ), 2 );
+        pass();
 
-		$p = R::findLast( 'page' );
+        $row = R::getRow('select * from page ');
 
-		pass();
+        asrt(is_array($row), true);
 
-		$row = R::getRow( 'select * from page ' );
+        asrt(isset($row['name']), true);
 
-		asrt( is_array( $row ), TRUE );
+        // Test findAll -- should not throw an exception
+        asrt(count(R::findAll('page')) > 0, true);
+        asrt(count(R::findAll('page', ' ORDER BY id ')) > 0, true);
 
-		asrt( isset( $row['name'] ), TRUE );
+        $beans = R::findOrDispense("page");
 
-		// Test findAll -- should not throw an exception
-		asrt( count( R::findAll( 'page' ) ) > 0, TRUE );
-		asrt( count( R::findAll( 'page', ' ORDER BY id ' ) ) > 0, TRUE );
+        asrt(count($beans), 6);
 
-		$beans = R::findOrDispense( "page" );
+        asrt(is_null(R::findLast('nothing')), true);
 
-		asrt( count( $beans ), 6 );
+        try {
+            R::find('bean', ' id > 0 ', 'invalid bindings argument');
+            fail();
+        } catch (RedException $exception) {
+            pass();
+        }
+    }
 
-		asrt( is_null( R::findLast( 'nothing' ) ), TRUE );
+    /**
+     * Test tree traversal with searchIn().
+     *
+     * @return void
+     */
+    public function testTreeTraversal()
+    {
+        testpack('Test Tree Traversal');
+        R::nuke();
 
-		try {
-			R::find( 'bean', ' id > 0 ', 'invalid bindings argument' );
-			fail();
-		} catch ( RedException $exception ) {
-			pass();
-		}
-	}
+        $page = R::dispense('page', 10);
 
-	/**
-	 * Test tree traversal with searchIn().
-	 *
-	 * @return void
-	 */
-	public function testTreeTraversal()
-	{
-		testpack( 'Test Tree Traversal' );
-		R::nuke();
+        //Setup the test data for this series of tests
+        $i = 0;
+        foreach ($page as $pageItem) {
+            $pageItem->name = 'page'.$i;
+            $pageItem->number = $i;
+            $i++;
+            R::store($pageItem);
+        }
+        $page[0]->ownPage  = array( $page[1], $page[2] );
+        $page[1]->ownPage  = array( $page[3], $page[4] );
+        $page[3]->ownPage  = array( $page[5] );
+        $page[5]->ownPage  = array( $page[7] );
+        $page[9]->document = $page[8];
+        $page[9]->book = R::dispense('book');
+        R::store($page[9]);
+        $id = R::store($page[0]);
+        $book = $page[9]->book;
+    }
 
-		$page = R::dispense( 'page', 10 );
+    /**
+     * Test find and export.
+     *
+     * @return void
+     */
+    public function testFindAndExport()
+    {
+        R::nuke();
+        $pages = R::dispense('page', 3);
+        $i = 1;
+        foreach ($pages as $page) {
+            $page->pageNumber = $i++;
+        }
+        R::storeAll($pages);
+        $pages = R::findAndExport('page');
+        asrt(is_array($pages), true);
+        asrt(isset($pages[0]), true);
+        asrt(is_array($pages[0]), true);
+        asrt(count($pages), 3);
+    }
 
-		//Setup the test data for this series of tests
-		$i = 0;
-		foreach( $page as $pageItem ) {
-			$pageItem->name = 'page' . $i;
-			$pageItem->number = $i;
-			$i++;
-			R::store( $pageItem );
-		}
-		$page[0]->ownPage  = array( $page[1], $page[2] );
-		$page[1]->ownPage  = array( $page[3], $page[4] );
-		$page[3]->ownPage  = array( $page[5] );
-		$page[5]->ownPage  = array( $page[7] );
-		$page[9]->document = $page[8];
-		$page[9]->book = R::dispense('book');
-		R::store( $page[9] );
-		$id = R::store( $page[0] );
-		$book = $page[9]->book;
-	}
+    /**
+    * Test error handling of SQL states.
+    *
+    * @return void
+    */
+    public function testFindError()
+    {
+        R::freeze(false);
 
-	/**
-	 * Test find and export.
-	 *
-	 * @return void
-	 */
-	public function testFindAndExport()
-	{
-		R::nuke();
-		$pages = R::dispense( 'page', 3 );
-		$i = 1;
-		foreach( $pages as $page ) {
-			$page->pageNumber = $i++;
-		}
-		R::storeAll( $pages );
-		$pages = R::findAndExport( 'page' );
-		asrt( is_array( $pages ), TRUE );
-		asrt( isset( $pages[0] ), TRUE );
-		asrt( is_array( $pages[0] ), TRUE );
-		asrt( count( $pages ), 3 );
-	}
+        $page = R::dispense('page');
+        $page->title = 'abc';
+        R::store($page);
 
-	/**
-	* Test error handling of SQL states.
-	*
-	* @return void
-	*/
-	public function testFindError()
-	{
-		R::freeze( FALSE );
+        //Column does not exist, in fluid mode no error!
+        try {
+            R::find('page', ' xtitle = ? ', array( 'x' ));
+            pass();
+        } catch (SQL $e) {
+            fail();
+        }
 
-		$page = R::dispense( 'page' );
-		$page->title = 'abc';
-		R::store( $page );
+        //Table does not exist, in fluid mode no error!
+        try {
+            R::find('pagex', ' title = ? ', array( 'x' ));
+            pass();
+        } catch (SQL $e) {
+            fail();
+        }
 
-		//Column does not exist, in fluid mode no error!
-		try {
-			R::find( 'page', ' xtitle = ? ', array( 'x' ) );
-			pass();
-		} catch ( SQL $e ) {
-			fail();
-		}
+        //Syntax error, error in fluid mode if possible to infer from SQLSTATE (MySQL/Postgres)
+        try {
+            R::find('page', ' invalid SQL ');
+            //In SQLite only get HY000 - not very descriptive so suppress more errors in fluid mode then.
+            if (
+            $this->currentlyActiveDriverID === 'sqlite'
+            || $this->currentlyActiveDriverID === 'CUBRID') {
+                pass();
+            } else {
+                fail();
+            }
+        } catch (SQL $e) {
+            pass();
+        }
 
-		//Table does not exist, in fluid mode no error!
-		try {
-			R::find( 'pagex', ' title = ? ', array( 'x' ) );
-			pass();
-		} catch ( SQL $e ) {
-			fail();
-		}
+        //Frozen, always error...
+        R::freeze(true);
 
-		//Syntax error, error in fluid mode if possible to infer from SQLSTATE (MySQL/Postgres)
-		try {
-			R::find( 'page', ' invalid SQL ' );
-			//In SQLite only get HY000 - not very descriptive so suppress more errors in fluid mode then.
-			if (
-			$this->currentlyActiveDriverID === 'sqlite'
-			|| $this->currentlyActiveDriverID === 'CUBRID' ) {
-				pass();
-			} else {
-				fail();
-			}
-		} catch ( SQL $e ) {
-			pass();
-		}
+        //Column does not exist, in frozen mode error!
+        try {
+            R::find('page', ' xtitle = ? ', array( 'x' ));
+            fail();
+        } catch (SQL $e) {
+            pass();
+        }
 
-		//Frozen, always error...
-		R::freeze( TRUE );
+        //Table does not exist, in frozen mode error!
+        try {
+            R::find('pagex', ' title = ? ', array( 'x' ));
+            fail();
+        } catch (SQL $e) {
+            pass();
+        }
 
-		//Column does not exist, in frozen mode error!
-		try {
-			R::find( 'page', ' xtitle = ? ', array( 'x' ) );
-			fail();
-		} catch ( SQL $e ) {
-			pass();
-		}
-
-		//Table does not exist, in frozen mode error!
-		try {
-			R::find( 'pagex', ' title = ? ', array( 'x' ) );
-			fail();
-		} catch ( SQL $e ) {
-			pass();
-		}
-
-		//Syntax error, in frozen mode error!
-		try {
-			R::find( 'page', ' invalid SQL ' );
-			fail();
-		} catch ( SQL $e ) {
-			pass();
-		}
-		R::freeze( FALSE );
-	}
+        //Syntax error, in frozen mode error!
+        try {
+            R::find('page', ' invalid SQL ');
+            fail();
+        } catch (SQL $e) {
+            pass();
+        }
+        R::freeze(false);
+    }
 }

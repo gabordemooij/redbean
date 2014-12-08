@@ -28,623 +28,618 @@ use RedBeanPHP\Driver\RPDO as RPDO;
  */
 class Misc extends Base
 {
+    /**
+    * Tests the R::inspect() method on the Facade.
+    *
+    * @return void
+    */
+    public function testInspect()
+    {
+        testpack('Test R::inspect() ');
+
+        R::nuke();
+
+        R::store(R::dispense('book')->setAttr('title', 'book'));
+
+        $info = R::inspect();
+        asrt(count($info), 1);
+        asrt(strtolower($info[0]), 'book');
+
+        $info = R::inspect('book');
+        asrt(count($info), 2);
+
+        $keys = array_keys($info);
+        sort($keys);
+        asrt(strtolower($keys[0]), 'id');
+        asrt(strtolower($keys[1]), 'title');
+    }
+
+    /**
+     * Test whether we can use the tableExist() method in OODB
+     * instances directly to help us determine
+     * the existance of a table.
+     *
+     * @return void
+     */
+    public function testTableExist()
+    {
+        R::nuke();
+        R::store(R::dispense('book'));
+        R::freeze(false);
+        asrt(R::getRedBean()->tableExists('book'), true);
+        asrt(R::getRedBean()->tableExists('book2'), false);
+        R::freeze(true);
+        asrt(R::getRedBean()->tableExists('book'), true);
+        asrt(R::getRedBean()->tableExists('book2'), false);
+        R::freeze(false);
+    }
+
+    /**
+     * Normally the check() method is always called indirectly when
+     * dealing with beans. This test ensures we can call check()
+     * directly. Even though frozen repositories do not rely on
+     * bean checking to improve performance the method should still
+     * offer the same functionality when called directly.
+     *
+     * @return void
+     */
+    public function testCheckDirectly()
+    {
+        $bean = new OODBBean();
+        $bean->id = 0;
+        $bean->setMeta('type', 'book');
+        R::getRedBean()->check($bean);
+        $bean->setMeta('type', '.');
+        try {
+            R::getRedBean()->check($bean);
+            fail();
+        } catch (\Exception $e) {
+            pass();
+        }
+        //check should remain the same even if frozen repo is used, method is public after all!
+        //we dont want to break the API!
+        R::freeze(true);
+        try {
+            R::getRedBean()->check($bean);
+            fail();
+        } catch (\Exception $e) {
+            pass();
+        }
+        R::freeze(false);
+    }
+
+    /**
+     * Test Backward compatibility writer ESC-method.
+     *
+     * @return void
+     */
+    public function testLegacyCode()
+    {
+        testpack('Test Backward compatibility methods in writer.');
+
+        asrt(R::getWriter()->safeColumn('column', true), R::getWriter()->esc('column', true));
+        asrt(R::getWriter()->safeColumn('column', false), R::getWriter()->esc('column', false));
+        asrt(R::getWriter()->safeTable('table', true), R::getWriter()->esc('table', true));
+        asrt(R::getWriter()->safeTable('table', false), R::getWriter()->esc('table', false));
+    }
+
+    /**
+     * Test beautification and array functions.
+     *
+     * @return void
+     */
+    public function testBeauficationAndArrayFunctions()
+    {
+        $bean = R::dispense('bean');
+        $bean->isReallyAwesome = true;
+        asrt(isset($bean->isReallyAwesome), true);
+        asrt(isset($bean->is_really_awesome), true);
+        unset($bean->is_really_awesome);
+        asrt(isset($bean->isReallyAwesome), false);
+        asrt(isset($bean->is_really_awesome), false);
+    }
 
-	/**
-	* Tests the R::inspect() method on the Facade.
-	*
-	* @return void
-	*/
-	public function testInspect() {
-
-		testpack( 'Test R::inspect() ');
-
-		R::nuke();
-
-		R::store( R::dispense('book')->setAttr('title', 'book') );
-
-		$info = R::inspect();
-		asrt( count( $info ), 1 );
-		asrt( strtolower( $info[0] ), 'book' );
-
-		$info = R::inspect( 'book' );
-		asrt( count( $info ), 2 );
-
-		$keys = array_keys( $info );
-		sort($keys);
-		asrt( strtolower( $keys[0] ), 'id' );
-		asrt( strtolower( $keys[1] ), 'title' );
-	}
-
-	/**
-	 * Test whether we can use the tableExist() method in OODB
-	 * instances directly to help us determine
-	 * the existance of a table.
-	 *
-	 * @return void
-	 */
-	public function testTableExist()
-	{
-		R::nuke();
-		R::store( R::dispense( 'book' ) );
-		R::freeze( FALSE );
-		asrt( R::getRedBean()->tableExists( 'book' ), TRUE );
-		asrt( R::getRedBean()->tableExists( 'book2' ), FALSE );
-		R::freeze( TRUE );
-		asrt( R::getRedBean()->tableExists( 'book' ), TRUE );
-		asrt( R::getRedBean()->tableExists( 'book2' ), FALSE );
-		R::freeze( FALSE );
-	}
-
-	/**
-	 * Normally the check() method is always called indirectly when
-	 * dealing with beans. This test ensures we can call check()
-	 * directly. Even though frozen repositories do not rely on
-	 * bean checking to improve performance the method should still
-	 * offer the same functionality when called directly.
-	 *
-	 * @return void
-	 */
-	public function testCheckDirectly()
-	{
-		$bean = new OODBBean;
-		$bean->id = 0;
-		$bean->setMeta( 'type', 'book' );
-		R::getRedBean()->check( $bean );
-		$bean->setMeta( 'type', '.' );
-		try {
-			R::getRedBean()->check( $bean );
-			fail();
-		} catch ( \Exception $e ) {
-			pass();
-		}
-		//check should remain the same even if frozen repo is used, method is public after all!
-		//we dont want to break the API!
-		R::freeze( TRUE );
-		try {
-			R::getRedBean()->check( $bean );
-			fail();
-		} catch ( \Exception $e ) {
-			pass();
-		}
-		R::freeze( FALSE );
-	}
-
-	/**
-	 * Test Backward compatibility writer ESC-method.
-	 *
-	 * @return void
-	 */
-	public function testLegacyCode()
-	{
-		testpack( 'Test Backward compatibility methods in writer.' );
-
-		asrt( R::getWriter()->safeColumn( 'column', TRUE ), R::getWriter()->esc( 'column', TRUE ) );
-		asrt( R::getWriter()->safeColumn( 'column', FALSE ), R::getWriter()->esc( 'column', FALSE ) );
-		asrt( R::getWriter()->safeTable( 'table', TRUE ), R::getWriter()->esc( 'table', TRUE ) );
-		asrt( R::getWriter()->safeTable( 'table', FALSE ), R::getWriter()->esc( 'table', FALSE ) );
-	}
-
-	/**
-	 * Test beautification and array functions.
-	 *
-	 * @return void
-	 */
-	public function testBeauficationAndArrayFunctions()
-	{
-		$bean = R::dispense( 'bean' );
-		$bean->isReallyAwesome = TRUE;
-		asrt( isset( $bean->isReallyAwesome ), TRUE );
-		asrt( isset( $bean->is_really_awesome ), TRUE );
-		unset( $bean->is_really_awesome );
-		asrt( isset( $bean->isReallyAwesome ), FALSE );
-		asrt( isset( $bean->is_really_awesome ), FALSE );
-	}
+    /**
+     * Test beautification of column names.
+     *
+     * @return void
+     */
+    public function testBeautifulColumnNames()
+    {
+        testpack('Beautiful column names');
 
-	/**
-	 * Test beautification of column names.
-	 *
-	 * @return void
-	 */
-	public function testBeautifulColumnNames()
-	{
-		testpack( 'Beautiful column names' );
+        $town = R::dispense('town');
 
-		$town = R::dispense( 'town' );
+        $town->isCapital       = false;
+        $town->hasTrainStation = true;
+        $town->name            = 'BeautyVille';
 
-		$town->isCapital       = FALSE;
-		$town->hasTrainStation = TRUE;
-		$town->name            = 'BeautyVille';
+        $houses = R::dispense('house', 2);
 
-		$houses = R::dispense( 'house', 2 );
+        $houses[0]->isForSale = true;
 
-		$houses[0]->isForSale = TRUE;
+        $town->ownHouse = $houses;
 
-		$town->ownHouse = $houses;
+        R::store($town);
 
-		R::store( $town );
+        $town = R::load('town', $town->id);
 
-		$town = R::load( 'town', $town->id );
+        asrt(($town->isCapital == FALSE), true);
+        asrt(($town->hasTrainStation == TRUE), true);
+        asrt(($town->name == 'BeautyVille'), true);
 
-		asrt( ( $town->isCapital == FALSE ), TRUE );
-		asrt( ( $town->hasTrainStation == TRUE ), TRUE );
-		asrt( ( $town->name == 'BeautyVille' ), TRUE );
+        testpack('Accept datetime objects.');
 
-		testpack( 'Accept datetime objects.' );
+        $cal = R::dispense('calendar');
 
-		$cal = R::dispense( 'calendar' );
+        $cal->when = new\DateTime('2000-01-01', new\DateTimeZone('Pacific/Nauru'));
 
-		$cal->when = new\DateTime( '2000-01-01', new\DateTimeZone( 'Pacific/Nauru' ) );
+        asrt($cal->when, '2000-01-01 00:00:00');
 
-		asrt( $cal->when, '2000-01-01 00:00:00' );
+        testpack('Affected rows test');
 
-		testpack( 'Affected rows test' );
+        $currentDriver = $this->currentlyActiveDriverID;
 
-		$currentDriver = $this->currentlyActiveDriverID;
+        $toolbox = R::getToolBox();
+        $adapter = $toolbox->getDatabaseAdapter();
+        $writer  = $toolbox->getWriter();
+        $redbean = $toolbox->getRedBean();
+        $pdo     = $adapter->getDatabase();
 
-		$toolbox = R::getToolBox();
-		$adapter = $toolbox->getDatabaseAdapter();
-		$writer  = $toolbox->getWriter();
-		$redbean = $toolbox->getRedBean();
-		$pdo     = $adapter->getDatabase();
+        $bean = $redbean->dispense('bean');
 
-		$bean = $redbean->dispense( 'bean' );
+        $bean->prop = 3; //make test run with strict mode as well
 
-		$bean->prop = 3; //make test run with strict mode as well
+        $redbean->store($bean);
 
-		$redbean->store( $bean );
+        $adapter->exec('UPDATE bean SET prop = 2');
 
-		$adapter->exec( 'UPDATE bean SET prop = 2' );
+        asrt($adapter->getAffectedRows(), 1);
 
-		asrt( $adapter->getAffectedRows(), 1 );
+        testpack('Testing Logger');
 
-		testpack( 'Testing Logger' );
+        R::getDatabaseAdapter()->getDatabase()->setLogger(new RDefault());
 
-		R::getDatabaseAdapter()->getDatabase()->setLogger( new RDefault );
+        asrt((R::getDatabaseAdapter()->getDatabase()->getLogger() instanceof Logger), true);
+        asrt((R::getDatabaseAdapter()->getDatabase()->getLogger() instanceof RDefault), true);
 
-		asrt( ( R::getDatabaseAdapter()->getDatabase()->getLogger() instanceof Logger ), TRUE );
-		asrt( ( R::getDatabaseAdapter()->getDatabase()->getLogger() instanceof RDefault ), TRUE );
+        $bean = R::dispense('bean');
 
-		$bean = R::dispense( 'bean' );
+        $bean->property = 1;
+        $bean->unsetAll(array( 'property' ));
 
-		$bean->property = 1;
-		$bean->unsetAll( array( 'property' ) );
+        asrt($bean->property, null);
 
-		asrt( $bean->property, NULL );
+        asrt(($bean->setAttr('property', 2) instanceof OODBBean), true);
+        asrt($bean->property, 2);
 
-		asrt( ( $bean->setAttr( 'property', 2 ) instanceof OODBBean ), TRUE );
-		asrt( $bean->property, 2 );
+        asrt(preg_match('/\d\d\d\d\-\d\d\-\d\d/', R::isoDate()), 1);
+        asrt(preg_match('/\d\d\d\d\-\d\d\-\d\d\s\d\d:\d\d:\d\d/', R::isoDateTime()), 1);
 
-		asrt( preg_match( '/\d\d\d\d\-\d\d\-\d\d/', R::isoDate() ), 1 );
-		asrt( preg_match( '/\d\d\d\d\-\d\d\-\d\d\s\d\d:\d\d:\d\d/', R::isoDateTime() ), 1 );
+        $redbean = R::getRedBean();
+        $adapter = R::getDatabaseAdapter();
+        $writer  = R::getWriter();
 
-		$redbean = R::getRedBean();
-		$adapter = R::getDatabaseAdapter();
-		$writer  = R::getWriter();
+        asrt(($redbean instanceof OODB), true);
+        asrt(($adapter instanceof Adapter), true);
+        asrt(($writer instanceof QueryWriter), true);
 
-		asrt( ( $redbean instanceof OODB ), TRUE );
-		asrt( ( $adapter instanceof Adapter ), TRUE );
-		asrt( ( $writer instanceof QueryWriter ), TRUE );
+        R::setRedBean($redbean);
+        pass(); //cant really test this
 
-		R::setRedBean( $redbean );
-		pass(); //cant really test this
+        R::setDatabaseAdapter($adapter);
+        pass(); //cant really test this
 
-		R::setDatabaseAdapter( $adapter );
-		pass(); //cant really test this
+        R::setWriter($writer);
+        pass(); //cant really test this
 
-		R::setWriter( $writer );
-		pass(); //cant really test this
+        $u1 = R::dispense('user');
 
-		$u1 = R::dispense( 'user' );
+        $u1->name  = 'Gabor';
+        $u1->login = 'g';
 
-		$u1->name  = 'Gabor';
-		$u1->login = 'g';
+        $u2 = R::dispense('user');
 
-		$u2 = R::dispense( 'user' );
+        $u2->name  = 'Eric';
+        $u2->login = 'e';
 
-		$u2->name  = 'Eric';
-		$u2->login = 'e';
+        R::store($u1);
+        R::store($u2);
 
-		R::store( $u1 );
-		R::store( $u2 );
+        $list = R::getAssoc('select login,'.R::getWriter()->esc('name').' from '.R::getWriter()->esc('user').' ');
 
-		$list = R::getAssoc( 'select login,' . R::getWriter()->esc( 'name' ) . ' from ' . R::getWriter()->esc( 'user' ) . ' ' );
+        asrt($list['e'], 'Eric');
+        asrt($list['g'], 'Gabor');
 
-		asrt( $list['e'], 'Eric' );
-		asrt( $list['g'], 'Gabor' );
+        $painting = R::dispense('painting');
 
-		$painting = R::dispense( 'painting' );
+        $painting->name = 'Nighthawks';
 
-		$painting->name = 'Nighthawks';
+        $id = R::store($painting);
 
-		$id = R::store( $painting );
+        testpack('Testing SQL Error Types');
 
-		testpack( 'Testing SQL Error Types' );
+        foreach ($writer->typeno_sqltype as $code => $text) {
+            asrt(is_integer($code), true);
+            asrt(is_string($text), true);
+        }
 
-		foreach ( $writer->typeno_sqltype as $code => $text ) {
-			asrt( is_integer( $code ), TRUE );
-			asrt( is_string( $text ), TRUE );
-		}
+        foreach ($writer->sqltype_typeno as $text => $code) {
+            asrt(is_integer($code), true);
+            asrt(is_string($text), true);
+        }
 
-		foreach ( $writer->sqltype_typeno as $text => $code ) {
-			asrt( is_integer( $code ), TRUE );
-			asrt( is_string( $text ), TRUE );
-		}
+        testpack('Testing Nowhere Pt. 1 (unfrozen)');
 
-		testpack( 'Testing Nowhere Pt. 1 (unfrozen)' );
+        foreach (
+            array(
+                'exec', 'getAll', 'getCell', 'getAssoc', 'getRow', 'getCol',
+            )
+            as $method) {
+            R::$method('select * from nowhere');
+            pass();
+        }
 
-		foreach (
-			array(
-				'exec', 'getAll', 'getCell', 'getAssoc', 'getRow', 'getCol'
-			)
-			as $method ) {
+        testpack('Testing Nowhere Pt. 2 (frozen)');
 
-			R::$method( 'select * from nowhere' );
-			pass();
-		}
+        R::freeze(true);
 
-		testpack( 'Testing Nowhere Pt. 2 (frozen)' );
+        foreach (
+            array(
+                'exec', 'getAll', 'getCell', 'getAssoc', 'getRow', 'getCol',
+            )
+            as $method) {
+            try {
+                R::$method('select * from nowhere');
 
-		R::freeze( TRUE );
+                fail();
+            } catch (SQL $e) {
+                pass();
+            }
+        }
 
-		foreach (
-			array(
-				'exec', 'getAll', 'getCell', 'getAssoc', 'getRow', 'getCol'
-			)
-			as $method ) {
+        R::freeze(false);
+    }
 
-			try {
-				R::$method( 'select * from nowhere' );
+    /**
+     * Test reflectional functions of database.
+     *
+     * @return void
+     */
+    public function testDatabaseProperties()
+    {
+        testpack('Testing Database Properties');
 
-				fail();
-			} catch ( SQL $e ) {
-				pass();
-			}
-		}
+        $adapter = R::getDatabaseAdapter();
 
-		R::freeze(FALSE);
-	}
+        if (method_exists(R::getDatabaseAdapter()->getDatabase(), 'getPDO')) {
+            asrt($adapter->getDatabase()->getPDO() instanceof\PDO, true);
+        }
 
-	/**
-	 * Test reflectional functions of database.
-	 *
-	 * @return void
-	 */
-	public function testDatabaseProperties()
-	{
-		testpack( 'Testing Database Properties' );
+        asrt(strlen($adapter->getDatabase()->getDatabaseVersion()) > 0, true);
+        asrt(strlen($adapter->getDatabase()->getDatabaseType()) > 0, true);
+    }
 
-		$adapter = R::getDatabaseAdapter();
+    /**
+     * Test Transactions.
+     *
+     * @return void
+     */
+    public function testTransactions()
+    {
+        testpack('transactions');
 
-		if ( method_exists( R::getDatabaseAdapter()->getDatabase(), 'getPDO' ) ){
-			asrt( $adapter->getDatabase()->getPDO() instanceof\PDO, TRUE );
-		}
+        R::begin();
 
-		asrt( strlen( $adapter->getDatabase()->getDatabaseVersion() ) > 0, TRUE );
-		asrt( strlen( $adapter->getDatabase()->getDatabaseType() ) > 0, TRUE );
-	}
+        $bean = R::dispense('bean');
 
-	/**
-	 * Test Transactions.
-	 *
-	 * @return void
-	 */
-	public function testTransactions()
-	{
-		testpack( 'transactions' );
+        R::store($bean);
+        R::commit();
 
-		R::begin();
+        asrt(R::count('bean'), 1);
 
-		$bean = R::dispense( 'bean' );
+        R::wipe('bean');
+        R::freeze(1);
+        R::begin();
 
-		R::store( $bean );
-		R::commit();
+        $bean = R::dispense('bean');
 
-		asrt( R::count( 'bean' ), 1 );
+        R::store($bean);
+        R::rollback();
 
-		R::wipe( 'bean' );
-		R::freeze( 1 );
-		R::begin();
+        asrt(R::count('bean'), 0);
 
-		$bean = R::dispense( 'bean' );
+        R::freeze(false);
 
-		R::store( $bean );
-		R::rollback();
+        testpack('genSlots');
 
-		asrt( R::count( 'bean' ), 0 );
+        asrt(R::genSlots(array( 'a', 'b' )), '?,?');
+        asrt(R::genSlots(array( 'a' )), '?');
+        asrt(R::genSlots(array()), '');
+    }
 
-		R::freeze( FALSE );
+    /**
+     * Test nested FUSE scenarios.
+     *
+     * @return void
+     */
+    public function testFUSEnested()
+    {
+        testpack('FUSE models cant touch nested beans in update() - issue 106');
 
-		testpack( 'genSlots' );
+        $spoon       = R::dispense('spoon');
+        $spoon->name = 'spoon for test bean';
 
-		asrt( R::genSlots( array( 'a', 'b' ) ), '?,?' );
-		asrt( R::genSlots( array( 'a' ) ), '?' );
-		asrt( R::genSlots( array() ), '' );
-	}
+        $deep        = R::dispense('deep');
+        $deep->name  = 'deepbean';
 
-	/**
-	 * Test nested FUSE scenarios.
-	 *
-	 * @return void
-	 */
-	public function testFUSEnested()
-	{
-		testpack( 'FUSE models cant touch nested beans in update() - issue 106' );
+        $item        = R::dispense('item');
+        $item->val   = 'Test';
+        $item->deep  = $deep;
 
-		$spoon       = R::dispense( 'spoon' );
-		$spoon->name = 'spoon for test bean';
+        $test = R::dispense('test');
 
-		$deep        = R::dispense( 'deep' );
-		$deep->name  = 'deepbean';
+        $test->item          = $item;
+        $test->sharedSpoon[] = $spoon;
 
-		$item        = R::dispense( 'item' );
-		$item->val   = 'Test';
-		$item->deep  = $deep;
+        $test->isnowtainted = true;
 
-		$test = R::dispense( 'test' );
+        $id   = R::store($test);
+        $test = R::load('test', $id);
 
-		$test->item          = $item;
-		$test->sharedSpoon[] = $spoon;
+        asrt($test->item->val, 'Test2');
 
-		$test->isnowtainted = TRUE;
+        $can   = reset($test->ownCan);
+        $spoon = reset($test->sharedSpoon);
 
-		$id   = R::store( $test );
-		$test = R::load( 'test', $id );
+        asrt($can->name, 'can for bean');
+        asrt($spoon->name, 'S2');
+        asrt($test->item->deep->name, '123');
+        asrt(count($test->ownCan), 1);
+        asrt(count($test->sharedSpoon), 1);
+        asrt(count($test->sharedPeas), 10);
+        asrt(count($test->ownChip), 9);
+    }
 
-		asrt( $test->item->val, 'Test2' );
+    /**
+     * Tests FUSE and lists, FUSE enforces no more than
+     * 3 sugar cubes in coffee.
+     *
+     * @return void
+     */
+    public function testCoffeeWithSugarAndFUSE()
+    {
+        $coffee = R::dispense('coffee');
 
-		$can   = reset( $test->ownCan );
-		$spoon = reset( $test->sharedSpoon );
+        $coffee->size     = 'XL';
+        $coffee->ownSugar = R::dispense('sugar', 5);
 
-		asrt( $can->name, 'can for bean' );
-		asrt( $spoon->name, 'S2' );
-		asrt( $test->item->deep->name, '123' );
-		asrt( count( $test->ownCan ), 1 );
-		asrt( count( $test->sharedSpoon ), 1 );
-		asrt( count( $test->sharedPeas ), 10 );
-		asrt( count( $test->ownChip ), 9 );
-	}
+        $id = R::store($coffee);
 
-	/**
-	 * Tests FUSE and lists, FUSE enforces no more than
-	 * 3 sugar cubes in coffee.
-	 *
-	 * @return void
-	 */
-	public function testCoffeeWithSugarAndFUSE()
-	{
-		$coffee = R::dispense( 'coffee' );
+        $coffee = R::load('coffee', $id);
 
-		$coffee->size     = 'XL';
-		$coffee->ownSugar = R::dispense( 'sugar', 5 );
+        asrt(count($coffee->ownSugar), 3);
 
-		$id = R::store( $coffee );
+        $coffee->ownSugar = R::dispense('sugar', 2);
 
-		$coffee = R::load( 'coffee', $id );
+        $id     = R::store($coffee);
+        $coffee = R::load('coffee', $id);
 
-		asrt( count( $coffee->ownSugar ), 3 );
+        asrt(count($coffee->ownSugar), 2);
 
-		$coffee->ownSugar = R::dispense( 'sugar', 2 );
+        $cocoa = R::dispense('cocoa');
 
-		$id     = R::store( $coffee );
-		$coffee = R::load( 'coffee', $id );
+        $cocoa->name = 'Fair Cocoa';
 
-		asrt( count( $coffee->ownSugar ), 2 );
+        list($taste1, $taste2) = R::dispense('taste', 2);
 
-		$cocoa = R::dispense( 'cocoa' );
+        $taste1->name = 'sweet';
+        $taste2->name = 'bitter';
 
-		$cocoa->name = 'Fair Cocoa';
+        $cocoa->ownTaste = array( $taste1, $taste2 );
 
-		list( $taste1, $taste2 ) = R::dispense( 'taste', 2 );
+        R::store($cocoa);
 
-		$taste1->name = 'sweet';
-		$taste2->name = 'bitter';
+        $cocoa->name = 'Koko';
 
-		$cocoa->ownTaste = array( $taste1, $taste2 );
+        R::store($cocoa);
 
-		R::store( $cocoa );
+        if (method_exists(R::getDatabaseAdapter()->getDatabase(), 'getPDO')) {
+            $pdo    = R::getDatabaseAdapter()->getDatabase()->getPDO();
+            $driver = new RPDO($pdo);
 
-		$cocoa->name = 'Koko';
+            pass();
 
-		R::store( $cocoa );
+            asrt($pdo->getAttribute(\PDO::ATTR_ERRMODE), \PDO::ERRMODE_EXCEPTION);
+            asrt($pdo->getAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE), \PDO::FETCH_ASSOC);
+            asrt(strval($driver->GetCell('select 123')), '123');
+        }
 
-		if ( method_exists( R::getDatabaseAdapter()->getDatabase(), 'getPDO' ) ) {
-			$pdo    = R::getDatabaseAdapter()->getDatabase()->getPDO();
-			$driver = new RPDO( $pdo );
+        $a = new SQL();
+        $a->setSqlState('test');
 
-			pass();
+        $b = strval($a);
 
-			asrt( $pdo->getAttribute(\PDO::ATTR_ERRMODE ),\PDO::ERRMODE_EXCEPTION );
-			asrt( $pdo->getAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE ),\PDO::FETCH_ASSOC );
-			asrt( strval( $driver->GetCell( 'select 123' ) ), '123' );
-		}
+        asrt((strpos($b, '[test] - ') === 0), true);
+    }
 
-		$a = new SQL;
-		$a->setSqlState( 'test' );
+    /**
+    * ENUM Basic tests.
+    *
+    * @return void
+    */
+    public function testENUMBasics()
+    {
+        asrt(R::enum('gender:male')->name, 'MALE');
+        asrt(R::enum('country:South-Africa')->name, 'SOUTH_AFRICA');
+        asrt(R::enum('tester:T@E  S_t')->name, 'T_E_S_T');
+    }
 
-		$b = strval( $a );
+    /**
+     * Test ENUM in Queries and with short hand notation.
+     *
+     * @return void
+     */
+    public function testENUMInQuery()
+    {
+        testpack('Test ENUM in Query and test ENUM short notation');
 
-		asrt( ( strpos( $b, '[test] - ' ) === 0 ), TRUE );
-	}
+        R::nuke();
 
-	/**
-	* ENUM Basic tests.
-	*
-	* @return void
-	*/
-	public function testENUMBasics() {
-		asrt( R::enum( 'gender:male' )->name, 'MALE' );
-		asrt( R::enum( 'country:South-Africa' )->name, 'SOUTH_AFRICA');
-		asrt( R::enum( 'tester:T@E  S_t' )->name, 'T_E_S_T');
-	}
+        $coffee = R::dispense('coffee');
+        $coffee->taste = R::enum('flavour:mocca');
 
-	/**
-	 * Test ENUM in Queries and with short hand notation.
-	 *
-	 * @return void
-	 */
-	public function testENUMInQuery()
-	{
-		testpack('Test ENUM in Query and test ENUM short notation');
+        R::store($coffee);
 
-		R::nuke();
+        $coffee = R::dispense('coffee');
+        $coffee->taste = R::enum('flavour:banana');
 
-		$coffee = R::dispense( 'coffee' );
-		$coffee->taste = R::enum( 'flavour:mocca' );
+        R::store($coffee);
 
-		R::store( $coffee );
+        $coffee = R::dispense('coffee');
+        $coffee->taste = R::enum('flavour:banana');
 
-		$coffee = R::dispense( 'coffee' );
-		$coffee->taste = R::enum( 'flavour:banana' );
+        R::store($coffee);
 
-		R::store( $coffee );
+        //now we have two flavours
+        asrt(R::count('flavour'), 2);
 
-		$coffee = R::dispense( 'coffee' );
-		$coffee->taste = R::enum( 'flavour:banana' );
+        //use in query
+        asrt(R::count('coffee', ' taste_id = ? ', array( R::enum('flavour:mocca')->id )), 1);
 
-		R::store( $coffee );
+        //use in quer with short notation
+        asrt(R::count('coffee', ' taste_id = ? ', array( EID('flavour:mocca') )), 1);
 
-		//now we have two flavours
-		asrt( R::count('flavour'), 2 );
+        //use in query
+        asrt(R::count('coffee', ' taste_id = ? ', array( R::enum('flavour:banana')->id )), 2);
 
-		//use in query
-		asrt( R::count( 'coffee', ' taste_id = ? ', array( R::enum( 'flavour:mocca' )->id ) ), 1);
+        //use in quer with short notation
+        asrt(R::count('coffee', ' taste_id = ? ', array( EID('flavour:banana') )), 2);
 
-		//use in quer with short notation
-		asrt( R::count( 'coffee', ' taste_id = ? ', array( EID( 'flavour:mocca' ) ) ), 1);
+        //use in query
+        asrt(R::count('coffee', ' taste_id = ? ', array( R::enum('flavour:strawberry')->id )), 0);
 
-		//use in query
-		asrt( R::count( 'coffee', ' taste_id = ? ', array( R::enum( 'flavour:banana' )->id ) ), 2);
+        //use in quer with short notation
+        asrt(R::count('coffee', ' taste_id = ? ', array( EID('flavour:strawberry') )), 0);
+    }
 
-		//use in quer with short notation
-		asrt( R::count( 'coffee', ' taste_id = ? ', array( EID( 'flavour:banana' ) ) ), 2);
+    /**
+     * Test ENUM functionality offered by Label Maker.
+     *
+     * @return void
+     */
+    public function testENUM()
+    {
+        testpack('test ENUM');
 
-		//use in query
-		asrt( R::count( 'coffee', ' taste_id = ? ', array( R::enum( 'flavour:strawberry' )->id ) ), 0);
+        $coffee = R::dispense('coffee');
+        $coffee->taste = R::enum('flavour:mocca');
 
-		//use in quer with short notation
-		asrt( R::count( 'coffee', ' taste_id = ? ', array( EID( 'flavour:strawberry' ) ) ), 0);
-	}
+        //did we create an enum?
+        asrt(implode('', R::gatherLabels(R::enum('flavour'))), 'MOCCA');
 
-	/**
-	 * Test ENUM functionality offered by Label Maker.
-	 *
-	 * @return void
-	 */
-	public function testENUM() {
+        R::store($coffee);
 
-		testpack('test ENUM');
+        $coffee = $coffee->fresh();
 
-		$coffee = R::dispense( 'coffee' );
-		$coffee->taste = R::enum( 'flavour:mocca' );
+        //test enum identity check - with alias
+        asrt($coffee->fetchAs('flavour')->taste->equals(R::enum('flavour:mocca')), true);
+        asrt($coffee->fetchAs('flavour')->taste->equals(R::enum('flavour:banana')), false);
 
-		//did we create an enum?
-		asrt( implode( '', R::gatherLabels(R::enum('flavour'))), 'MOCCA' );
+        //now we have two flavours
+        asrt(R::count('flavour'), 2);
+        asrt(implode(',', R::gatherLabels(R::enum('flavour'))), 'BANANA,MOCCA');
 
-		R::store( $coffee );
+        $coffee->flavour = R::enum('flavour:mocca');
 
-		$coffee = $coffee->fresh();
+        R::store($coffee);
 
-		//test enum identity check - with alias
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), TRUE );
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), FALSE );
+        //same results, can we have multiple flavours?
+        asrt($coffee->fetchAs('flavour')->taste->equals(R::enum('flavour:mocca')), true);
+        asrt($coffee->fetchAs('flavour')->taste->equals(R::enum('flavour:banana')), false);
+        asrt($coffee->flavour->equals(R::enum('flavour:mocca')), true);
 
-		//now we have two flavours
-		asrt( R::count('flavour'), 2 );
-		asrt( implode( ',', R::gatherLabels(R::enum('flavour'))), 'BANANA,MOCCA' );
+        //no additional mocca enum...
+        asrt(R::count('flavour'), 2);
 
-		$coffee->flavour = R::enum( 'flavour:mocca' );
+        $drink = R::dispense('drink');
+        $drink->flavour = R::enum('flavour:choco');
+        R::store($drink);
 
-		R::store($coffee);
+        //now we have three!
+        asrt(R::count('flavour'), 3);
 
-		//same results, can we have multiple flavours?
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), TRUE );
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), FALSE );
-		asrt( $coffee->flavour->equals( R::enum('flavour:mocca') ), TRUE );
+        $drink = R::load('drink', $drink->id);
 
-		//no additional mocca enum...
-		asrt( R::count('flavour'), 2 );
+        asrt($drink->flavour->equals(R::enum('flavour:mint')), false);
+        asrt($drink->flavour->equals(R::enum('flavour:choco')), true);
 
-		$drink = R::dispense( 'drink' );
-		$drink->flavour = R::enum( 'flavour:choco' );
-		R::store( $drink );
+        asrt(R::count('flavour'), 4);
 
-		//now we have three!
-		asrt( R::count('flavour'), 3 );
+        //trash should not affect flavour!
+        R::trash($drink);
 
-		$drink = R::load( 'drink', $drink->id );
+        asrt(R::count('flavour'), 4);
+    }
 
-		asrt( $drink->flavour->equals( R::enum('flavour:mint') ), FALSE );
-		asrt( $drink->flavour->equals( R::enum('flavour:choco') ), TRUE );
+    /**
+     * Test trashAll().
+     */
+    public function testMultiDeleteUpdate()
+    {
+        testpack('test multi delete and multi update');
 
-		asrt( R::count('flavour'), 4 );
+        $beans = R::dispenseLabels('bean', array( 'a', 'b' ));
+        $ids   = R::storeAll($beans);
 
-		//trash should not affect flavour!
-		R::trash( $drink );
+        asrt((int) R::count('bean'), 2);
 
-		asrt( R::count('flavour'), 4 );
-	}
+        R::trashAll(R::batch('bean', $ids));
 
+        asrt((int) R::count('bean'), 0);
 
-	/**
-	 * Test trashAll().
-	 */
-	public function testMultiDeleteUpdate()
-	{
-		testpack( 'test multi delete and multi update' );
+        testpack('test assocManager check');
 
-		$beans = R::dispenseLabels( 'bean', array( 'a', 'b' ) );
-		$ids   = R::storeAll( $beans );
+        $rb = new OODB(R::getWriter());
 
-		asrt( (int) R::count( 'bean' ), 2 );
+        try {
+            $rb->getAssociationManager();
 
-		R::trashAll( R::batch( 'bean', $ids ) );
+            fail();
+        } catch (RedException $e) {
+            pass();
+        }
+    }
 
-		asrt( (int) R::count( 'bean' ), 0 );
+    /**
+     * Test Bean identity equality.
+     */
+    public function testBeanIdentityEquality()
+    {
+        $beanA = R::dispense('bean');
+        $beanB = R::dispense('bean');
+        $beanA->id = 1;
+        $beanB->id = 1;
 
-		testpack( 'test assocManager check' );
+        asrt($beanA->equals($beanB), true);
+        asrt($beanB->equals($beanA), true);
+        asrt($beanA->equals($beanA), true);
+        asrt($beanB->equals($beanB), true);
 
-		$rb = new OODB( R::getWriter() );
+        $beanB->id = 2;
 
-		try {
-			$rb->getAssociationManager();
+        asrt($beanA->equals($beanB), false);
+        asrt($beanB->equals($beanA), false);
 
-			fail();
-		} catch ( RedException $e ) {
-			pass();
-		}
-	}
+        $beanA->id = '2';
 
-	/**
-	 * Test Bean identity equality.
-	 */
-	public function testBeanIdentityEquality() {
-		$beanA = R::dispense( 'bean' );
-		$beanB = R::dispense( 'bean' );
-		$beanA->id = 1;
-		$beanB->id = 1;
+        asrt($beanA->equals($beanB), true);
+        asrt($beanB->equals($beanA), true);
 
-		asrt( $beanA->equals( $beanB ), TRUE );
-		asrt( $beanB->equals( $beanA ), TRUE );
-		asrt( $beanA->equals( $beanA ), TRUE );
-		asrt( $beanB->equals( $beanB ), TRUE );
+        $beanB = R::dispense('carrot');
+        $beanB->id = $beanA->id;
 
-		$beanB->id = 2;
-
-		asrt( $beanA->equals( $beanB ), FALSE );
-		asrt( $beanB->equals( $beanA ), FALSE );
-
-		$beanA->id = '2';
-
-		asrt( $beanA->equals( $beanB ), TRUE );
-		asrt( $beanB->equals( $beanA ), TRUE );
-
-		$beanB = R::dispense( 'carrot' );
-		$beanB->id = $beanA->id;
-
-		asrt( $beanA->equals( $beanB ), FALSE );
-		asrt( $beanB->equals( $beanA ), FALSE );
-	}
+        asrt($beanA->equals($beanB), false);
+        asrt($beanB->equals($beanA), false);
+    }
 }
-
-
-

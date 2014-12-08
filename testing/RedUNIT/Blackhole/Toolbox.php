@@ -14,7 +14,6 @@ use RedBeanPHP\Repository as Repository;
 use RedBeanPHP\Repository\Fluid as FluidRepo;
 use RedBeanPHP\Repository\Frozen as FrozenRepo;
 
-
 /**
  * Toolbox
  *
@@ -27,89 +26,89 @@ use RedBeanPHP\Repository\Frozen as FrozenRepo;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class Toolbox extends Blackhole {
+class Toolbox extends Blackhole
+{
+    /**
+     * Test whether we can obtain a toolbox properly.
+     *
+     * @return void
+     */
+    public function testCanWeObtainToolbox()
+    {
+        $toolbox = R::getToolBox();
+        asrt(($toolbox instanceof TB), true);
+        $extractedToolbox = R::getExtractedToolbox();
+        asrt(is_array($extractedToolbox), true);
+        asrt(count($extractedToolbox), 4);
+        asrt(($extractedToolbox[0] instanceof OODB), true);
+        asrt(($extractedToolbox[1] instanceof Adapter), true);
+        asrt(($extractedToolbox[2] instanceof QueryWriter), true);
+        asrt(($extractedToolbox[3] instanceof TB), true);
 
-	/**
-	 * Test whether we can obtain a toolbox properly.
-	 *
-	 * @return void
-	 */
-	public function testCanWeObtainToolbox()
-	{
-		$toolbox = R::getToolBox();
-		asrt( ( $toolbox instanceof TB), TRUE );
-		$extractedToolbox = R::getExtractedToolbox();
-		asrt( is_array( $extractedToolbox ), TRUE );
-		asrt( count( $extractedToolbox ), 4 );
-		asrt( ( $extractedToolbox[0] instanceof OODB ), TRUE );
-		asrt( ( $extractedToolbox[1] instanceof Adapter ), TRUE );
-		asrt( ( $extractedToolbox[2] instanceof QueryWriter ), TRUE );
-		asrt( ( $extractedToolbox[3] instanceof TB ), TRUE );
+        $beanHelper = new SimpleFacadeBeanHelper();
+        $toolbox2 = $beanHelper->getToolbox();
+        asrt(($toolbox2 instanceof TB), true);
+        asrt($toolbox, $toolbox2);
+        $extractedToolbox = $beanHelper->getExtractedToolbox();
+        asrt(is_array($extractedToolbox), true);
+        asrt(count($extractedToolbox), 4);
+        asrt(($extractedToolbox[0] instanceof OODB), true);
+        asrt(($extractedToolbox[1] instanceof Adapter), true);
+        asrt(($extractedToolbox[2] instanceof QueryWriter), true);
+        asrt(($extractedToolbox[3] instanceof TB), true);
+    }
 
-		$beanHelper = new SimpleFacadeBeanHelper;
-		$toolbox2 = $beanHelper->getToolbox();
-		asrt( ( $toolbox2 instanceof TB), TRUE );
-		asrt( $toolbox, $toolbox2 );
-		$extractedToolbox = $beanHelper->getExtractedToolbox();
-		asrt( is_array( $extractedToolbox ), TRUE );
-		asrt( count( $extractedToolbox ), 4 );
-		asrt( ( $extractedToolbox[0] instanceof OODB ), TRUE );
-		asrt( ( $extractedToolbox[1] instanceof Adapter ), TRUE );
-		asrt( ( $extractedToolbox[2] instanceof QueryWriter ), TRUE );
-		asrt( ( $extractedToolbox[3] instanceof TB ), TRUE );
-	}
+    /**
+     * Does the toolbox contain the necessary tools ?
+     *
+     * @return void
+     */
+    public function testDoesToolboxContainTheTools()
+    {
+        $toolbox = R::getToolBox();
+        asrt(($toolbox->getDatabaseAdapter() instanceof Adapter), true);
+        asrt(($toolbox->getRedBean() instanceof OODB), true);
+        asrt(($toolbox->getWriter() instanceof QueryWriter), true);
+    }
 
-	/**
-	 * Does the toolbox contain the necessary tools ?
-	 *
-	 * @return void
-	 */
-	public function testDoesToolboxContainTheTools()
-	{
-		$toolbox = R::getToolBox();
-		asrt( ( $toolbox->getDatabaseAdapter() instanceof Adapter ), TRUE );
-		asrt( ( $toolbox->getRedBean() instanceof OODB ), TRUE );
-		asrt( ( $toolbox->getWriter() instanceof QueryWriter ), TRUE );
-	}
-
-	/**
-	 * Tests whether freeze() switches the repository object
-	 * as it is supposed to do.
-	 *
-	 * @return void
-	 */
-	public function testRepoSwitching()
-	{
-		asrt( class_exists( 'RedBeanPHP\Repository' ), TRUE );
-		asrt( class_exists( 'RedBeanPHP\Repository\Fluid' ), TRUE );
-		asrt( class_exists( 'RedBeanPHP\Repository\Frozen' ), TRUE );
-		R::freeze( FALSE );
-		$redbean = R::getRedBean();
-		$repo = $redbean->getCurrentRepository();
-		asrt( is_object( $repo ), TRUE );
-		asrt( ( $repo instanceof Repository ), TRUE );
-		asrt( ( $repo instanceof FluidRepo ), TRUE );
-		R::freeze( TRUE );
-		$fluid = $repo;
-		$repo = $redbean->getCurrentRepository();
-		asrt( is_object( $repo ), TRUE );
-		asrt( ( $repo instanceof Repository ), TRUE );
-		asrt( ( $repo instanceof FrozenRepo ), TRUE );
-		$frozen = $repo;
-		R::freeze( FALSE );
-		$redbean = R::getRedBean();
-		$repo = $redbean->getCurrentRepository();
-		asrt( is_object( $repo ), TRUE );
-		asrt( ( $repo instanceof Repository ), TRUE );
-		asrt( ( $repo instanceof FluidRepo ), TRUE );
-		asrt( $repo, $fluid );
-		R::freeze( TRUE );
-		$fluid = $repo;
-		$repo = $redbean->getCurrentRepository();
-		asrt( is_object( $repo ), TRUE );
-		asrt( ( $repo instanceof Repository ), TRUE );
-		asrt( ( $repo instanceof FrozenRepo ), TRUE );
-		asrt( $repo, $frozen );
-		R::freeze( FALSE );
-	}
+    /**
+     * Tests whether freeze() switches the repository object
+     * as it is supposed to do.
+     *
+     * @return void
+     */
+    public function testRepoSwitching()
+    {
+        asrt(class_exists('RedBeanPHP\Repository'), true);
+        asrt(class_exists('RedBeanPHP\Repository\Fluid'), true);
+        asrt(class_exists('RedBeanPHP\Repository\Frozen'), true);
+        R::freeze(false);
+        $redbean = R::getRedBean();
+        $repo = $redbean->getCurrentRepository();
+        asrt(is_object($repo), true);
+        asrt(($repo instanceof Repository), true);
+        asrt(($repo instanceof FluidRepo), true);
+        R::freeze(true);
+        $fluid = $repo;
+        $repo = $redbean->getCurrentRepository();
+        asrt(is_object($repo), true);
+        asrt(($repo instanceof Repository), true);
+        asrt(($repo instanceof FrozenRepo), true);
+        $frozen = $repo;
+        R::freeze(false);
+        $redbean = R::getRedBean();
+        $repo = $redbean->getCurrentRepository();
+        asrt(is_object($repo), true);
+        asrt(($repo instanceof Repository), true);
+        asrt(($repo instanceof FluidRepo), true);
+        asrt($repo, $fluid);
+        R::freeze(true);
+        $fluid = $repo;
+        $repo = $redbean->getCurrentRepository();
+        asrt(is_object($repo), true);
+        asrt(($repo instanceof Repository), true);
+        asrt(($repo instanceof FrozenRepo), true);
+        asrt($repo, $frozen);
+        R::freeze(false);
+    }
 }
