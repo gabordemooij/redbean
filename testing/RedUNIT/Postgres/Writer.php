@@ -22,648 +22,647 @@ use RedBeanPHP\RedException\SQL as SQL;
  */
 class Writer extends Postgres
 {
-	/**
-	 * Test scanning and coding.
-	 *
-	 * @return void
-	 */
-	public function testScanningAndCoding()
-	{
-		$toolbox = R::getToolBox();
-		$adapter = $toolbox->getDatabaseAdapter();
-		$writer  = $toolbox->getWriter();
-		$redbean = $toolbox->getRedBean();
-		$pdo     = $adapter->getDatabase();
+    /**
+     * Test scanning and coding.
+     *
+     * @return void
+     */
+    public function testScanningAndCoding()
+    {
+        $toolbox = R::getToolBox();
+        $adapter = $toolbox->getDatabaseAdapter();
+        $writer  = $toolbox->getWriter();
+        $redbean = $toolbox->getRedBean();
+        $pdo     = $adapter->getDatabase();
 
-		$a = new AssociationManager( $toolbox );
+        $a = new AssociationManager($toolbox);
 
-		$adapter->exec( "DROP TABLE IF EXISTS testtable" );
+        $adapter->exec("DROP TABLE IF EXISTS testtable");
 
-		asrt( in_array( "testtable", $writer->getTables() ), FALSE );
+        asrt(in_array("testtable", $writer->getTables()), false);
 
-		$writer->createTable( "testtable" );
+        $writer->createTable("testtable");
 
-		asrt( in_array( "testtable", $writer->getTables() ), TRUE );
+        asrt(in_array("testtable", $writer->getTables()), true);
 
-		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 1 );
+        asrt(count(array_keys($writer->getColumns("testtable"))), 1);
 
-		asrt( in_array( "id", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
-		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), FALSE );
+        asrt(in_array("id", array_keys($writer->getColumns("testtable"))), true);
+        asrt(in_array("c1", array_keys($writer->getColumns("testtable"))), false);
 
-		$writer->addColumn( "testtable", "c1", 1 );
+        $writer->addColumn("testtable", "c1", 1);
 
-		asrt( count( array_keys( $writer->getColumns( "testtable" ) ) ), 2 );
+        asrt(count(array_keys($writer->getColumns("testtable"))), 2);
 
-		asrt( in_array( "c1", array_keys( $writer->getColumns( "testtable" ) ) ), TRUE );
+        asrt(in_array("c1", array_keys($writer->getColumns("testtable"))), true);
 
-		foreach ( $writer->sqltype_typeno as $key => $type ) {
-			if ( $type < 100 ) {
-				asrt( $writer->code( $key, TRUE ), $type );
-			} else {
-				asrt( $writer->code( $key ), 99 );
-			}
-		}
+        foreach ($writer->sqltype_typeno as $key => $type) {
+            if ($type < 100) {
+                asrt($writer->code($key, true), $type);
+            } else {
+                asrt($writer->code($key), 99);
+            }
+        }
 
-		asrt( $writer->code( PostgreSQL::C_DATATYPE_SPECIAL_DATETIME ), 99 );
+        asrt($writer->code(PostgreSQL::C_DATATYPE_SPECIAL_DATETIME), 99);
 
-		asrt( $writer->code( "unknown" ), 99 );
+        asrt($writer->code("unknown"), 99);
 
-		asrt( $writer->scanType( FALSE ), 0 );
-		asrt( $writer->scanType( TRUE ), 0 );
+        asrt($writer->scanType(false), 0);
+        asrt($writer->scanType(true), 0);
 
-		asrt( $writer->scanType( NULL ), 0 );
+        asrt($writer->scanType(null), 0);
 
-		asrt( $writer->scanType( 2 ), 0 );
+        asrt($writer->scanType(2), 0);
 
-		asrt( $writer->scanType( 255 ), 0 );
-		asrt( $writer->scanType( 256 ), 0 );
+        asrt($writer->scanType(255), 0);
+        asrt($writer->scanType(256), 0);
 
-		asrt( $writer->scanType( -1 ), 0 );
+        asrt($writer->scanType(-1), 0);
 
-		asrt( $writer->scanType( 1.5 ), 1 );
+        asrt($writer->scanType(1.5), 1);
 
-		asrt( $writer->scanType( INF ), 3 );
+        asrt($writer->scanType(INF), 3);
 
-		asrt( $writer->scanType( "abc" ), 3 );
+        asrt($writer->scanType("abc"), 3);
 
-		asrt( $writer->scanType( "2001-10-10", TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATE );
+        asrt($writer->scanType("2001-10-10", true), PostgreSQL::C_DATATYPE_SPECIAL_DATE);
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
+        asrt($writer->scanType("2001-10-10 10:00:00", true), PostgreSQL::C_DATATYPE_SPECIAL_DATETIME);
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00" ), 3 );
+        asrt($writer->scanType("2001-10-10 10:00:00"), 3);
 
-		asrt( $writer->scanType( "2001-10-10" ), 3 );
+        asrt($writer->scanType("2001-10-10"), 3);
 
-		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), 3 );
+        asrt($writer->scanType(str_repeat("lorem ipsum", 100)), 3);
 
-		$writer->widenColumn( "testtable", "c1", 3 );
+        $writer->widenColumn("testtable", "c1", 3);
 
-		$cols = $writer->getColumns( "testtable" );
+        $cols = $writer->getColumns("testtable");
 
-		asrt( $writer->code( $cols["c1"] ), 3 );
+        asrt($writer->code($cols["c1"]), 3);
 
-		$writer->addColumn( "testtable", "special", PostgreSQL::C_DATATYPE_SPECIAL_DATE );
+        $writer->addColumn("testtable", "special", PostgreSQL::C_DATATYPE_SPECIAL_DATE);
 
-		$cols = $writer->getColumns( "testtable" );
+        $cols = $writer->getColumns("testtable");
 
-		asrt( $writer->code( $cols['special'], TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATE );
+        asrt($writer->code($cols['special'], true), PostgreSQL::C_DATATYPE_SPECIAL_DATE);
 
-		asrt( $writer->code( $cols['special'], FALSE ), PostgreSQL::C_DATATYPE_SPECIFIED );
+        asrt($writer->code($cols['special'], false), PostgreSQL::C_DATATYPE_SPECIFIED);
 
-		$writer->addColumn( "testtable", "special2", PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
+        $writer->addColumn("testtable", "special2", PostgreSQL::C_DATATYPE_SPECIAL_DATETIME);
 
-		$cols = $writer->getColumns( "testtable" );
+        $cols = $writer->getColumns("testtable");
 
-		asrt( $writer->code( $cols['special2'], TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
+        asrt($writer->code($cols['special2'], true), PostgreSQL::C_DATATYPE_SPECIAL_DATETIME);
 
-		asrt( $writer->code( $cols['special'], FALSE ), PostgreSQL::C_DATATYPE_SPECIFIED );
+        asrt($writer->code($cols['special'], false), PostgreSQL::C_DATATYPE_SPECIFIED);
 
-		//$id = $writer->insertRecord("testtable", array("c1"), array(array("lorem ipsum")));
+        //$id = $writer->insertRecord("testtable", array("c1"), array(array("lorem ipsum")));
 
-		$id = $writer->updateRecord( "testtable", array( array( "property" => "c1", "value" => "lorem ipsum" ) ) );
+        $id = $writer->updateRecord("testtable", array( array( "property" => "c1", "value" => "lorem ipsum" ) ));
 
-		$row = $writer->queryRecord( "testtable", array( "id" => array( $id ) ) );
+        $row = $writer->queryRecord("testtable", array( "id" => array( $id ) ));
 
-		asrt( $row[0]["c1"], "lorem ipsum" );
+        asrt($row[0]["c1"], "lorem ipsum");
 
-		$writer->updateRecord( "testtable", array( array( "property" => "c1", "value" => "ipsum lorem" ) ), $id );
+        $writer->updateRecord("testtable", array( array( "property" => "c1", "value" => "ipsum lorem" ) ), $id);
 
-		$row = $writer->queryRecord( "testtable", array( "id" => array( $id ) ) );
+        $row = $writer->queryRecord("testtable", array( "id" => array( $id ) ));
 
-		asrt( $row[0]["c1"], "ipsum lorem" );
+        asrt($row[0]["c1"], "ipsum lorem");
 
-		$writer->deleteRecord( "testtable", array( "id" => array( $id ) ) );
+        $writer->deleteRecord("testtable", array( "id" => array( $id ) ));
 
-		$row = $writer->queryRecord( "testtable", array( "id" => array( $id ) ) );
+        $row = $writer->queryRecord("testtable", array( "id" => array( $id ) ));
 
-		asrt( empty( $row ), TRUE );
-	}
+        asrt(empty($row), true);
+    }
 
-	/**
-	 * (FALSE should be stored as 0 not as '')
-	 *
-	 * @return void
-	 */
-	public function testZeroIssue()
-	{
-		testpack( "Zero issue" );
+    /**
+     * (FALSE should be stored as 0 not as '')
+     *
+     * @return void
+     */
+    public function testZeroIssue()
+    {
+        testpack("Zero issue");
 
-		$toolbox = R::getToolBox();
-		$redbean = $toolbox->getRedBean();
+        $toolbox = R::getToolBox();
+        $redbean = $toolbox->getRedBean();
 
-		$bean = $redbean->dispense( "zero" );
+        $bean = $redbean->dispense("zero");
 
-		$bean->zero  = FALSE;
-		$bean->title = "bla";
+        $bean->zero  = false;
+        $bean->title = "bla";
 
-		$redbean->store( $bean );
+        $redbean->store($bean);
 
-		asrt( count( $redbean->find( "zero", array(), " zero = 0 " ) ), 1 );
+        asrt(count($redbean->find("zero", array(), " zero = 0 ")), 1);
 
-		testpack( "Test ANSI92 issue in clearrelations" );
+        testpack("Test ANSI92 issue in clearrelations");
 
-		$a = new AssociationManager( $toolbox );
+        $a = new AssociationManager($toolbox);
 
-		$book    = $redbean->dispense( "book" );
-		$author1 = $redbean->dispense( "author" );
-		$author2 = $redbean->dispense( "author" );
+        $book    = $redbean->dispense("book");
+        $author1 = $redbean->dispense("author");
+        $author2 = $redbean->dispense("author");
 
-		$book->title = "My First Post";
+        $book->title = "My First Post";
 
-		$author1->name = "Derek";
-		$author2->name = "Whoever";
+        $author1->name = "Derek";
+        $author2->name = "Whoever";
 
-		set1toNAssoc( $a, $book, $author1 );
-		set1toNAssoc( $a, $book, $author2 );
+        set1toNAssoc($a, $book, $author1);
+        set1toNAssoc($a, $book, $author2);
 
-		pass();
-	}
+        pass();
+    }
 
-	/**
-	 * Various.
-	 * Tests whether writer correctly handles keyword 'group' and SQL state 23000 issue.
-	 * These tests remain here to make sure issues 9 and 10 never happen again.
-	 * However this bug will probably never re-appear due to changed architecture.
-	 *
-	 * @return void
-	 */
-	public function testIssue9and10()
-	{
-		$toolbox = R::getToolBox();
-		$redbean = $toolbox->getRedBean();
-		$adapter = $toolbox->getDatabaseAdapter();
+    /**
+     * Various.
+     * Tests whether writer correctly handles keyword 'group' and SQL state 23000 issue.
+     * These tests remain here to make sure issues 9 and 10 never happen again.
+     * However this bug will probably never re-appear due to changed architecture.
+     *
+     * @return void
+     */
+    public function testIssue9and10()
+    {
+        $toolbox = R::getToolBox();
+        $redbean = $toolbox->getRedBean();
+        $adapter = $toolbox->getDatabaseAdapter();
 
-		$a = new AssociationManager( $toolbox );
+        $a = new AssociationManager($toolbox);
 
-		$book = $redbean->dispense( "book" );
+        $book = $redbean->dispense("book");
 
-		$author1 = $redbean->dispense( "author" );
-		$author2 = $redbean->dispense( "author" );
+        $author1 = $redbean->dispense("author");
+        $author2 = $redbean->dispense("author");
 
-		$book->title = "My First Post";
+        $book->title = "My First Post";
 
-		$author1->name = "Derek";
-		$author2->name = "Whoever";
+        $author1->name = "Derek";
+        $author2->name = "Whoever";
 
-		$a->associate( $book, $author1 );
-		$a->associate( $book, $author2 );
+        $a->associate($book, $author1);
+        $a->associate($book, $author2);
 
-		pass();
+        pass();
 
-		testpack( "Test Association Issue Group keyword (Issues 9 and 10)" );
+        testpack("Test Association Issue Group keyword (Issues 9 and 10)");
 
-		R::nuke();
+        R::nuke();
 
-		$group = $redbean->dispense( "group" );
+        $group = $redbean->dispense("group");
 
-		$group->name = "mygroup";
+        $group->name = "mygroup";
 
-		$redbean->store( $group );
+        $redbean->store($group);
 
-		try {
-			$a->associate( $group, $book );
+        try {
+            $a->associate($group, $book);
 
-			pass();
-		} catch ( SQL $e ) {
-			fail();
-		}
+            pass();
+        } catch (SQL $e) {
+            fail();
+        }
 
-		// Test issue SQL error 23000
-		try {
-			$a->associate( $group, $book );
+        // Test issue SQL error 23000
+        try {
+            $a->associate($group, $book);
 
-			pass();
-		} catch ( SQL $e ) {
-			fail();
-		}
+            pass();
+        } catch (SQL $e) {
+            fail();
+        }
 
-		asrt( (int) $adapter->getCell( "select count(*) from book_group" ), 1 ); //just 1 rec!
-	}
+        asrt((int) $adapter->getCell("select count(*) from book_group"), 1); //just 1 rec!
+    }
 
-	/**
-	 * Test various.
-	 * Test various somewhat uncommon trash/unassociate scenarios.
-	 * (i.e. unassociate unrelated beans, trash non-persistant beans etc).
-	 * Should be handled gracefully - no output checking.
-	 *
-	 * @return void
-	 */
-	public function testVaria()
-	{
-		$toolbox = R::getToolBox();
-		$redbean = $toolbox->getRedBean();
+    /**
+     * Test various.
+     * Test various somewhat uncommon trash/unassociate scenarios.
+     * (i.e. unassociate unrelated beans, trash non-persistant beans etc).
+     * Should be handled gracefully - no output checking.
+     *
+     * @return void
+     */
+    public function testVaria()
+    {
+        $toolbox = R::getToolBox();
+        $redbean = $toolbox->getRedBean();
 
-		$a = new AssociationManager( $toolbox );
+        $a = new AssociationManager($toolbox);
 
-		$book    = $redbean->dispense( "book" );
-		$author1 = $redbean->dispense( "author" );
-		$author2 = $redbean->dispense( "author" );
+        $book    = $redbean->dispense("book");
+        $author1 = $redbean->dispense("author");
+        $author2 = $redbean->dispense("author");
 
-		$book->title = "My First Post";
+        $book->title = "My First Post";
 
-		$author1->name = "Derek";
-		$author2->name = "Whoever";
+        $author1->name = "Derek";
+        $author2->name = "Whoever";
 
-		$a->unassociate( $book, $author1 );
-		$a->unassociate( $book, $author2 );
+        $a->unassociate($book, $author1);
+        $a->unassociate($book, $author2);
 
-		pass();
+        pass();
 
-		$redbean->trash( $redbean->dispense( "bla" ) );
+        $redbean->trash($redbean->dispense("bla"));
 
-		pass();
+        pass();
 
-		$bean = $redbean->dispense( "bla" );
+        $bean = $redbean->dispense("bla");
 
-		$bean->name = 1;
-		$bean->id   = 2;
+        $bean->name = 1;
+        $bean->id   = 2;
 
-		$redbean->trash( $bean );
+        $redbean->trash($bean);
 
-		pass();
-	}
+        pass();
+    }
 
-	/**
-	 * Test special types.
-	 *
-	 * @return void
-	 */
-	public function testTypes()
-	{
-		testpack( 'Special data types' );
+    /**
+     * Test special types.
+     *
+     * @return void
+     */
+    public function testTypes()
+    {
+        testpack('Special data types');
 
-		$bean = R::dispense( 'bean' );
+        $bean = R::dispense('bean');
 
-		$bean->date = 'someday';
+        $bean->date = 'someday';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$cols = R::getColumns( 'bean' );
+        $cols = R::getColumns('bean');
 
-		asrt( $cols['date'], 'text' );
+        asrt($cols['date'], 'text');
 
-		$bean = R::dispense( 'bean' );
+        $bean = R::dispense('bean');
 
-		$bean->date = '2011-10-10';
+        $bean->date = '2011-10-10';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$cols = R::getColumns( 'bean' );
+        $cols = R::getColumns('bean');
 
-		asrt( $cols['date'], 'text' );
-	}
+        asrt($cols['date'], 'text');
+    }
 
-	/**
-	 * Test dates.
-	 *
-	 * @return void
-	 */
-	public function testTypesDates()
-	{
-		$bean = R::dispense( 'bean' );
+    /**
+     * Test dates.
+     *
+     * @return void
+     */
+    public function testTypesDates()
+    {
+        $bean = R::dispense('bean');
 
-		$bean->date = '2011-10-10';
+        $bean->date = '2011-10-10';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$cols = R::getColumns( 'bean' );
+        $cols = R::getColumns('bean');
 
-		asrt( $cols['date'], 'date' );
-	}
+        asrt($cols['date'], 'date');
+    }
 
-	/**
-	 * Datetime.
-	 *
-	 * @return void
-	 */
-	public function testTypesDateTimes()
-	{
-		$bean = R::dispense( 'bean' );
+    /**
+     * Datetime.
+     *
+     * @return void
+     */
+    public function testTypesDateTimes()
+    {
+        $bean = R::dispense('bean');
 
-		$bean->date = '2011-10-10 10:00:00';
+        $bean->date = '2011-10-10 10:00:00';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$cols = R::getColumns( 'bean' );
+        $cols = R::getColumns('bean');
 
-		asrt( $cols['date'], 'timestamp without time zone' );
-	}
+        asrt($cols['date'], 'timestamp without time zone');
+    }
 
-	/**
-	 * Test spatial data types.
-	 *
-	 * @return void
-	 */
-	public function testTypesPoints()
-	{
-		$bean = R::dispense( 'bean' );
+    /**
+     * Test spatial data types.
+     *
+     * @return void
+     */
+    public function testTypesPoints()
+    {
+        $bean = R::dispense('bean');
 
-		$bean->point = '(92,12)';
+        $bean->point = '(92,12)';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$cols = R::getColumns( 'bean' );
+        $cols = R::getColumns('bean');
 
-		asrt( $cols['point'], 'point' );
+        asrt($cols['point'], 'point');
 
-		$bean = R::load( 'bean', $bean->id );
+        $bean = R::load('bean', $bean->id);
 
-		asrt( $bean->point, '(92,12)' );
+        asrt($bean->point, '(92,12)');
 
-		$bean->note = 'taint';
+        $bean->note = 'taint';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$bean = R::load( 'bean', $bean->id );
+        $bean = R::load('bean', $bean->id);
 
-		asrt( $bean->point, '(92,12)' );
-	}
+        asrt($bean->point, '(92,12)');
+    }
 
-	/**
-	 * Test points.
-	 *
-	 * @return void
-	 */
-	public function testTypesDecPoints()
-	{
-		$bean = R::dispense( 'bean' );
+    /**
+     * Test points.
+     *
+     * @return void
+     */
+    public function testTypesDecPoints()
+    {
+        $bean = R::dispense('bean');
 
-		$bean->point = '(9.2,1.2)';
+        $bean->point = '(9.2,1.2)';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$cols = R::getColumns( 'bean' );
+        $cols = R::getColumns('bean');
 
-		asrt( $cols['point'], 'point' );
+        asrt($cols['point'], 'point');
 
-		$bean = R::load( 'bean', $bean->id );
+        $bean = R::load('bean', $bean->id);
 
-		asrt( $bean->point, '(9.2,1.2)' );
+        asrt($bean->point, '(9.2,1.2)');
 
-		$bean->note = 'taint';
+        $bean->note = 'taint';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$bean = R::load( 'bean', $bean->id );
+        $bean = R::load('bean', $bean->id);
 
-		asrt( $bean->point, '(9.2,1.2)' );
-	}
+        asrt($bean->point, '(9.2,1.2)');
+    }
 
-	/**
-	 * Test polygons.
-	 *
-	 * @return void
-	 */
-	public function testPolygons()
-	{
-		$bean = R::dispense( 'bean' );
-		$bean->polygon = '((0,0),(1,1),(2,0))';
-		R::store( $bean );
-		$cols = R::getColumns( 'bean' );
-		asrt( $cols['polygon'], 'polygon' );
-		$bean = R::load( 'bean', $bean->id );
-		asrt( $bean->polygon, '((0,0),(1,1),(2,0))' );
-		$bean->note = 'taint';
-		R::store( $bean );
-		$bean = R::load( 'bean', $bean->id );
-		asrt( $bean->polygon, '((0,0),(1,1),(2,0))' );
-		$bean = R::dispense( 'bean' );
-		$bean->polygon = '((0,0),(1.2,1),(2,0.3))';
-		R::store( $bean );
-		$cols = R::getColumns( 'bean' );
-		asrt( $cols['polygon'], 'polygon' );
-		$bean = R::load( 'bean', $bean->id );
-		asrt( $bean->polygon, '((0,0),(1.2,1),(2,0.3))' );
-		$bean->note = 'taint';
-		R::store( $bean );
-		$bean = R::load( 'bean', $bean->id );
-		asrt( $bean->polygon, '((0,0),(1.2,1),(2,0.3))' );
-	}
+    /**
+     * Test polygons.
+     *
+     * @return void
+     */
+    public function testPolygons()
+    {
+        $bean = R::dispense('bean');
+        $bean->polygon = '((0,0),(1,1),(2,0))';
+        R::store($bean);
+        $cols = R::getColumns('bean');
+        asrt($cols['polygon'], 'polygon');
+        $bean = R::load('bean', $bean->id);
+        asrt($bean->polygon, '((0,0),(1,1),(2,0))');
+        $bean->note = 'taint';
+        R::store($bean);
+        $bean = R::load('bean', $bean->id);
+        asrt($bean->polygon, '((0,0),(1,1),(2,0))');
+        $bean = R::dispense('bean');
+        $bean->polygon = '((0,0),(1.2,1),(2,0.3))';
+        R::store($bean);
+        $cols = R::getColumns('bean');
+        asrt($cols['polygon'], 'polygon');
+        $bean = R::load('bean', $bean->id);
+        asrt($bean->polygon, '((0,0),(1.2,1),(2,0.3))');
+        $bean->note = 'taint';
+        R::store($bean);
+        $bean = R::load('bean', $bean->id);
+        asrt($bean->polygon, '((0,0),(1.2,1),(2,0.3))');
+    }
 
-	/**
-	 * Test multi points.
-	 *
-	 * @return void
-	 */
-	public function testTypesMultiDecPoints()
-	{
-		$bean = R::dispense( 'bean' );
+    /**
+     * Test multi points.
+     *
+     * @return void
+     */
+    public function testTypesMultiDecPoints()
+    {
+        $bean = R::dispense('bean');
 
-		$bean->line = '[(1.2,1.4),(2.2,34)]';
+        $bean->line = '[(1.2,1.4),(2.2,34)]';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$cols = R::getColumns( 'bean' );
+        $cols = R::getColumns('bean');
 
-		asrt( $cols['line'], 'lseg' );
+        asrt($cols['line'], 'lseg');
 
-		$bean = R::load( 'bean', $bean->id );
+        $bean = R::load('bean', $bean->id);
 
-		asrt( $bean->line, '[(1.2,1.4),(2.2,34)]' );
+        asrt($bean->line, '[(1.2,1.4),(2.2,34)]');
 
-		$bean->note = 'taint';
+        $bean->note = 'taint';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$bean = R::load( 'bean', $bean->id );
+        $bean = R::load('bean', $bean->id);
 
-		asrt( $bean->line, '[(1.2,1.4),(2.2,34)]' );
-	}
+        asrt($bean->line, '[(1.2,1.4),(2.2,34)]');
+    }
 
-	/**
-	 * More points...
-	 *
-	 * @return void
-	 */
-	public function testTypesWeirdPoints()
-	{
-		$bean = R::dispense( 'bean' );
+    /**
+     * More points...
+     *
+     * @return void
+     */
+    public function testTypesWeirdPoints()
+    {
+        $bean = R::dispense('bean');
 
-		$bean->circle = '<(9.2,1.2),7.9>';
+        $bean->circle = '<(9.2,1.2),7.9>';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$cols = R::getColumns( 'bean' );
+        $cols = R::getColumns('bean');
 
-		asrt( $cols['circle'], 'circle' );
+        asrt($cols['circle'], 'circle');
 
-		$bean = R::load( 'bean', $bean->id );
+        $bean = R::load('bean', $bean->id);
 
-		asrt( $bean->circle, '<(9.2,1.2),7.9>' );
+        asrt($bean->circle, '<(9.2,1.2),7.9>');
 
-		$bean->note = 'taint';
+        $bean->note = 'taint';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$bean = R::load( 'bean', $bean->id );
+        $bean = R::load('bean', $bean->id);
 
-		asrt( $bean->circle, '<(9.2,1.2),7.9>' );
-	}
+        asrt($bean->circle, '<(9.2,1.2),7.9>');
+    }
 
-	/**
-	 * Test money data type.
-	 *
-	 * @return void
-	 */
-	public function testTypesMoney()
-	{
-		$bean = R::dispense( 'bean' );
+    /**
+     * Test money data type.
+     *
+     * @return void
+     */
+    public function testTypesMoney()
+    {
+        $bean = R::dispense('bean');
 
-		$bean->money = '$123.45';
+        $bean->money = '$123.45';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$cols = R::getColumns( 'bean' );
+        $cols = R::getColumns('bean');
 
-		asrt( $cols['money'], 'money' );
+        asrt($cols['money'], 'money');
 
-		$bean = R::load( 'bean', $bean->id );
+        $bean = R::load('bean', $bean->id);
 
-		asrt( $bean->money, '$123.45' );
+        asrt($bean->money, '$123.45');
 
-		$bean->note = 'taint';
+        $bean->note = 'taint';
 
-		R::store( $bean );
+        R::store($bean);
 
-		$bean = R::load( 'bean', $bean->id );
+        $bean = R::load('bean', $bean->id);
 
-		asrt( $bean->money, '$123.45' );
+        asrt($bean->money, '$123.45');
 
-		$bean->money = '$123,455.01';
+        $bean->money = '$123,455.01';
 
-		R::store($bean);
+        R::store($bean);
 
-		$bean = $bean->fresh();
+        $bean = $bean->fresh();
 
-		asrt( $bean->money, '$123,455.01' );
+        asrt($bean->money, '$123,455.01');
+    }
 
-	}
+    /**
+     * Test negative money data type.
+     *
+     * @return void
+     */
+    public function testTypesNegativeMoney()
+    {
+        $bean = R::dispense('bean');
 
-	/**
-	 * Test negative money data type.
-	 *
-	 * @return void
-	 */
-	public function testTypesNegativeMoney()
-	{
-		$bean = R::dispense( 'bean' );
+        $bean->money = '-$123.45';
 
-		$bean->money = '-$123.45';
+        R::store($bean);
 
-		R::store( $bean );
+        $cols = R::getColumns('bean');
 
-		$cols = R::getColumns( 'bean' );
+        asrt($cols['money'], 'money');
 
-		asrt( $cols['money'], 'money' );
+        $bean = R::load('bean', $bean->id);
 
-		$bean = R::load( 'bean', $bean->id );
+        asrt($bean->money, '-$123.45');
 
-		asrt( $bean->money, '-$123.45' );
+        $bean->note = 'taint';
 
-		$bean->note = 'taint';
+        R::store($bean);
 
-		R::store( $bean );
+        $bean = R::load('bean', $bean->id);
 
-		$bean = R::load( 'bean', $bean->id );
+        asrt($bean->money, '-$123.45');
+    }
 
-		asrt( $bean->money, '-$123.45' );
-	}
+    /**
+     * Issue #340
+     * Redbean is currently picking up bcrypt hashed passwords
+     * (which look like this: $2y$12$85lAS....SnpDNVGPAC7w0G)
+     * as PostgreSQL money types.
+     * Then, once R::store is called on the bean, it chokes and throws the following error:
+     * PHP Fatal error: Uncaught [22P02] - SQLSTATE[22P02]: Invalid text representation: 7 ERROR:
+     * invalid input syntax for type money: ....
+     *
+     * @return void
+     */
+    public function testTypesInvalidMoney()
+    {
+        $bean = R::dispense('bean');
 
-	/**
-	 * Issue #340
-	 * Redbean is currently picking up bcrypt hashed passwords
-	 * (which look like this: $2y$12$85lAS....SnpDNVGPAC7w0G)
-	 * as PostgreSQL money types.
-	 * Then, once R::store is called on the bean, it chokes and throws the following error:
-	 * PHP Fatal error: Uncaught [22P02] - SQLSTATE[22P02]: Invalid text representation: 7 ERROR:
-	 * invalid input syntax for type money: ....
-	 *
-	 * @return void
-	 */
-	public function testTypesInvalidMoney()
-	{
-		$bean = R::dispense( 'bean' );
+        $bean->nomoney = '$2y$12$85lAS';
 
-		$bean->nomoney = '$2y$12$85lAS';
+        R::store($bean);
 
-		R::store( $bean );
+        $cols = R::getColumns('bean');
 
-		$cols = R::getColumns( 'bean' );
+        asrt($cols['nomoney'], 'text');
 
-		asrt( $cols['nomoney'], 'text' );
+        $bean = R::load('bean', $bean->id);
 
-		$bean = R::load( 'bean', $bean->id );
+        asrt($bean->nomoney, '$2y$12$85lAS');
 
-		asrt( $bean->nomoney, '$2y$12$85lAS' );
+        $bean->note = 'taint';
 
-		$bean->note = 'taint';
+        R::store($bean);
 
-		R::store( $bean );
+        $bean = R::load('bean', $bean->id);
 
-		$bean = R::load( 'bean', $bean->id );
+        asrt($bean->nomoney, '$2y$12$85lAS');
+    }
 
-		asrt( $bean->nomoney, '$2y$12$85lAS' );
-	}
+    /**
+     * Test types of strings.
+     *
+     * @return void
+     */
+    public function testTypesStrings()
+    {
+        $bean = R::dispense('bean');
 
-	/**
-	 * Test types of strings.
-	 *
-	 * @return void
-	 */
-	public function testTypesStrings()
-	{
-		$bean = R::dispense( 'bean' );
+        $bean->data = 'abcdefghijk';
 
-		$bean->data = 'abcdefghijk';
+        R::store($bean);
 
-		R::store( $bean );
+        $cols = R::getColumns('bean');
 
-		$cols = R::getColumns( 'bean' );
+        asrt($cols['data'], 'text');
 
-		asrt( $cols['data'], 'text' );
+        $bean = R::load('bean', $bean->id);
 
-		$bean = R::load( 'bean', $bean->id );
+        asrt($bean->data, 'abcdefghijk');
 
-		asrt( $bean->data, 'abcdefghijk' );
+        $bean->data = '(1,2)';
 
-		$bean->data = '(1,2)';
+        R::store($bean);
 
-		R::store( $bean );
+        $cols = R::getColumns('bean');
 
-		$cols = R::getColumns( 'bean' );
+        asrt($cols['data'], 'text');
 
-		asrt( $cols['data'], 'text' );
+        $bean->data = '[(1.2,1.4),(2.2,34)]';
 
-		$bean->data = '[(1.2,1.4),(2.2,34)]';
+        R::store($bean);
 
-		R::store( $bean );
+        $cols = R::getColumns('bean');
 
-		$cols = R::getColumns( 'bean' );
+        asrt($cols['data'], 'text');
 
-		asrt( $cols['data'], 'text' );
+        $bean->data = '<(9.2,1.2),7.9>';
 
-		$bean->data = '<(9.2,1.2),7.9>';
+        R::store($bean);
 
-		R::store( $bean );
+        $cols = R::getColumns('bean');
 
-		$cols = R::getColumns( 'bean' );
+        asrt($cols['data'], 'text');
 
-		asrt( $cols['data'], 'text' );
+        $bean->data = '$25';
 
-		$bean->data = '$25';
+        R::store($bean);
 
-		R::store( $bean );
+        $cols = R::getColumns('bean');
 
-		$cols = R::getColumns( 'bean' );
+        asrt($cols['data'], 'text');
 
-		asrt( $cols['data'], 'text' );
+        $bean->data = '2012-10-10 10:00:00';
 
-		$bean->data = '2012-10-10 10:00:00';
+        R::store($bean);
 
-		R::store( $bean );
+        $cols = R::getColumns('bean');
 
-		$cols = R::getColumns( 'bean' );
-
-		asrt( $cols['data'], 'text' );
-	}
+        asrt($cols['data'], 'text');
+    }
 }

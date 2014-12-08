@@ -22,41 +22,41 @@ use RedBeanPHP\OODB as OODB;
  */
 class Observers extends Base
 {
-	/**
-	 * Test RedBeanPHP observers.
-	 *
-	 * @return void
-	 */
-	public function testObserverMechanism()
-	{
-		$toolbox = R::getToolBox();
-		$adapter = $toolbox->getDatabaseAdapter();
-		$writer  = $toolbox->getWriter();
-		$redbean = $toolbox->getRedBean();
+    /**
+     * Test RedBeanPHP observers.
+     *
+     * @return void
+     */
+    public function testObserverMechanism()
+    {
+        $toolbox = R::getToolBox();
+        $adapter = $toolbox->getDatabaseAdapter();
+        $writer  = $toolbox->getWriter();
+        $redbean = $toolbox->getRedBean();
 
-		asrt( ( $adapter instanceof DBAdapter ), TRUE );
-		asrt( ( $writer instanceof QueryWriter ), TRUE );
-		asrt( ( $redbean instanceof OODB ), TRUE );
+        asrt(($adapter instanceof DBAdapter), true);
+        asrt(($writer instanceof QueryWriter), true);
+        asrt(($redbean instanceof OODB), true);
 
-		$observable = new \ObservableMock();
-		$observer   = new \ObserverMock();
+        $observable = new \ObservableMock();
+        $observer   = new \ObserverMock();
 
-		$observable->addEventListener( "event1", $observer );
-		$observable->addEventListener( "event3", $observer );
+        $observable->addEventListener("event1", $observer);
+        $observable->addEventListener("event3", $observer);
 
-		$observable->test( "event1", "testsignal1" );
+        $observable->test("event1", "testsignal1");
 
-		asrt( $observer->event, "event1" );
-		asrt( $observer->info, "testsignal1" );
+        asrt($observer->event, "event1");
+        asrt($observer->info, "testsignal1");
 
-		$observable->test( "event2", "testsignal2" );
+        $observable->test("event2", "testsignal2");
 
-		asrt( $observer->event, "event1" );
-		asrt( $observer->info, "testsignal1" );
+        asrt($observer->event, "event1");
+        asrt($observer->info, "testsignal1");
 
-		$observable->test( "event3", "testsignal3" );
+        $observable->test("event3", "testsignal3");
 
-		asrt( $observer->event, "event3" );
-		asrt( $observer->info, "testsignal3" );
-	}
+        asrt($observer->event, "event3");
+        asrt($observer->info, "testsignal3");
+    }
 }

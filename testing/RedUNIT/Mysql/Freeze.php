@@ -21,130 +21,130 @@ use RedBeanPHP\RedException\SQL as SQL;
  */
 class Freeze extends Mysql
 {
-	/**
-	 * Tests freezing the database.
-	 * After freezing the database, schema modifications are no longer
-	 * allowed and referring to missing columns will now cause exceptions.
-	 *
-	 * @return void
-	 */
-	public function testFreezer()
-	{
-		$toolbox = R::getToolBox();
-		$adapter = $toolbox->getDatabaseAdapter();
-		$writer  = $toolbox->getWriter();
-		$redbean = $toolbox->getRedBean();
-		$pdo     = $adapter->getDatabase();
+    /**
+     * Tests freezing the database.
+     * After freezing the database, schema modifications are no longer
+     * allowed and referring to missing columns will now cause exceptions.
+     *
+     * @return void
+     */
+    public function testFreezer()
+    {
+        $toolbox = R::getToolBox();
+        $adapter = $toolbox->getDatabaseAdapter();
+        $writer  = $toolbox->getWriter();
+        $redbean = $toolbox->getRedBean();
+        $pdo     = $adapter->getDatabase();
 
-		$a = new AssociationManager( $toolbox );
+        $a = new AssociationManager($toolbox);
 
-		$post = $redbean->dispense( 'post' );
+        $post = $redbean->dispense('post');
 
-		$post->title = 'title';
+        $post->title = 'title';
 
-		$redbean->store( $post );
+        $redbean->store($post);
 
-		$page = $redbean->dispense( 'page' );
+        $page = $redbean->dispense('page');
 
-		$page->name = 'title';
+        $page->name = 'title';
 
-		$redbean->store( $page );
+        $redbean->store($page);
 
-		$page = $redbean->dispense( "page" );
+        $page = $redbean->dispense("page");
 
-		$page->name = "John's page";
+        $page->name = "John's page";
 
-		$idpage = $redbean->store( $page );
+        $idpage = $redbean->store($page);
 
-		$page2 = $redbean->dispense( "page" );
+        $page2 = $redbean->dispense("page");
 
-		$page2->name = "John's second page";
+        $page2->name = "John's second page";
 
-		$idpage2 = $redbean->store( $page2 );
+        $idpage2 = $redbean->store($page2);
 
-		$a->associate( $page, $page2 );
+        $a->associate($page, $page2);
 
-		$redbean->freeze( TRUE );
+        $redbean->freeze(true);
 
-		$page = $redbean->dispense( "page" );
+        $page = $redbean->dispense("page");
 
-		$page->sections = 10;
+        $page->sections = 10;
 
-		$page->name = "half a page";
+        $page->name = "half a page";
 
-		try {
-			$id = $redbean->store( $page );
+        try {
+            $id = $redbean->store($page);
 
-			fail();
-		} catch ( SQL $e ) {
-			pass();
-		}
+            fail();
+        } catch (SQL $e) {
+            pass();
+        }
 
-		$post = $redbean->dispense( "post" );
+        $post = $redbean->dispense("post");
 
-		$post->title = "existing table";
+        $post->title = "existing table";
 
-		try {
-			$id = $redbean->store( $post );
+        try {
+            $id = $redbean->store($post);
 
-			pass();
-		} catch ( SQL $e ) {
-			fail();
-		}
+            pass();
+        } catch (SQL $e) {
+            fail();
+        }
 
-		asrt( in_array( "name", array_keys( $writer->getColumns( "page" ) ) ), TRUE );
-		asrt( in_array( "sections", array_keys( $writer->getColumns( "page" ) ) ), FALSE );
+        asrt(in_array("name", array_keys($writer->getColumns("page"))), true);
+        asrt(in_array("sections", array_keys($writer->getColumns("page"))), false);
 
-		$newtype = $redbean->dispense( "newtype" );
+        $newtype = $redbean->dispense("newtype");
 
-		$newtype->property = 1;
+        $newtype->property = 1;
 
-		try {
-			$id = $redbean->store( $newtype );
+        try {
+            $id = $redbean->store($newtype);
 
-			fail();
-		} catch ( SQL $e ) {
-			pass();
-		}
+            fail();
+        } catch (SQL $e) {
+            pass();
+        }
 
-		$logger = R::debug( true, 1 );
+        $logger = R::debug(true, 1);
 
-		// Now log and make sure no 'describe SQL' happens
-		$page = $redbean->dispense( "page" );
+        // Now log and make sure no 'describe SQL' happens
+        $page = $redbean->dispense("page");
 
-		$page->name = "just another page that has been frozen...";
+        $page->name = "just another page that has been frozen...";
 
-		$id = $redbean->store( $page );
+        $id = $redbean->store($page);
 
-		$page = $redbean->load( "page", $id );
+        $page = $redbean->load("page", $id);
 
-		$page->name = "just a frozen page...";
+        $page->name = "just a frozen page...";
 
-		$redbean->store( $page );
+        $redbean->store($page);
 
-		$page2 = $redbean->dispense( "page" );
+        $page2 = $redbean->dispense("page");
 
-		$page2->name = "an associated frozen page";
+        $page2->name = "an associated frozen page";
 
-		$a->associate( $page, $page2 );
+        $a->associate($page, $page2);
 
-		$a->related( $page, "page" );
+        $a->related($page, "page");
 
-		$a->unassociate( $page, $page2 );
+        $a->unassociate($page, $page2);
 
-		$a->clearRelations( $page, "page" );
+        $a->clearRelations($page, "page");
 
-		$items = $redbean->find( "page", array(), array( "1" ) );
+        $items = $redbean->find("page", array(), array( "1" ));
 
-		$redbean->trash( $page );
+        $redbean->trash($page);
 
-		$redbean->freeze( FALSE );
+        $redbean->freeze(false);
 
-		asrt( count( $logger->grep( "SELECT" ) ) > 0, TRUE );
-		asrt( count( $logger->grep( "describe" ) ) < 1, TRUE );
+        asrt(count($logger->grep("SELECT")) > 0, true);
+        asrt(count($logger->grep("describe")) < 1, true);
 
-		asrt( is_array( $logger->getLogs() ), TRUE );
+        asrt(is_array($logger->getLogs()), true);
 
-		R::debug( false );
-	}
+        R::debug(false);
+    }
 }

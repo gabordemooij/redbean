@@ -21,1738 +21,1733 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Relations extends Base
 {
-	/**
-	 * Test whether untainted parent bean dont
-	 * get saved.
-	 *
-	 * @return void
-	 */
-	public function testDontSaveParentIfNotTainted()
-	{
-		R::nuke();
-		$author = R::dispense( 'author' );
-		R::store( $author );
-		$book = R::dispense( 'book' );
-		$book->author = $author;
-		$book->author->name = 'x';
-		$book->author->setMeta( 'tainted', false );
-		R::store( $book );
-		$author = $author->fresh();
-		asrt( isset( $author->name ), false );
-	}
-
-	/**
-	 * Tests whether via() applies camelcase-to-snakecase
-	 * conversion. Although most of the time you do not need
-	 * this since via() is meant to remap typical link tables
-	 * to bean - but alas.
-	 *
-	 * @return void
-	 */
-	public function testCamelCasingVia()
-	{
-		R::nuke();
-		$book = R::dispense('book');
-		$book->sharedPage[] = R::dispense('page');
-		R::store( $book );
-		$book = $book->fresh();
-		asrt( count( $book->via('bookPage')->sharedPage ), 1 );
-		$book = $book->fresh();
-		asrt( count( $book->via('book_page')->sharedPage ), 1 );
-	}
-
-	/**
-	 * Test whether we can't add more than one FK.
-	 */
-	public function testDuplicateFK()
-	{
-		R::nuke();
-		list( $book, $page ) = R::dispenseAll( 'book,page' );
-		$book->sharedPage[] = $page;
-		R::store( $page );
-		R::store( $book );
-		$added = R::getWriter()->addConstraintForTypes( 'page', 'book' );
-		asrt( $added, FALSE );
-	}
-
-	/**
-	 * Test whether ->all() reloads a list.
-	 *
-	 * @return void
-	 */
-	public function testAllPrefix()
-	{
-		R::nuke();
-		$book = R::dispense( 'book' );
-		$book->ownPage = R::dispense( 'page', 10 );
-		$book->sharedTag = R::dispense( 'tag', 2 );
-		$i = 0;
-		foreach( $book->ownPage as $page ) {
-			$page->pageno = $i++;
-		}
-		R::store( $book );
-		$book = $book->fresh();
-		asrt( count( $book->ownPage ), 10 );
-		asrt( count( $book->withCondition(' pageno < 5 ')->ownPage ), 5 );
-		asrt( count( $book->ownPage ), 5 );
-		asrt( count( $book->all()->ownPage ), 10 );
-		asrt( count( $book->with(' LIMIT 3 ')->ownPage ), 3 );
-		asrt( count( $book->ownPage ), 3 );
-		asrt( count( $book->all()->ownPage ), 10 );
-		asrt( count( $book->sharedTag ), 2 );
-		asrt( count( $book->with( ' LIMIT 1 ' )->sharedTag ), 1 );
-		asrt( count( $book->sharedTag ), 1 );
-		asrt( count( $book->all()->sharedTag ), 2 );
-	}
-
-	/**
-	 * Test Relations and conditions.
-	 *
-	 * @return void
-	 */
-	public function testRelationsAndConditions()
-	{
-		list( $book1, $book2 ) = R::dispense( 'book', 2 );
-
-		list( $page1, $page2, $page3, $page4 ) = R::dispense( 'page', 4 );
-
-		list( $author1, $author2 ) = R::dispense( 'author', 2 );
-
-		$book1->title = 'a';
-		$book2->title = 'b';
-
-		$page1->thename = '1';
-		$page2->thename = '2';
-		$page3->thename = '3';
-		$page3->thename = '4';
+    /**
+     * Test whether untainted parent bean dont
+     * get saved.
+     *
+     * @return void
+     */
+    public function testDontSaveParentIfNotTainted()
+    {
+        R::nuke();
+        $author = R::dispense('author');
+        R::store($author);
+        $book = R::dispense('book');
+        $book->author = $author;
+        $book->author->name = 'x';
+        $book->author->setMeta('tainted', false);
+        R::store($book);
+        $author = $author->fresh();
+        asrt(isset($author->name), false);
+    }
+
+    /**
+     * Tests whether via() applies camelcase-to-snakecase
+     * conversion. Although most of the time you do not need
+     * this since via() is meant to remap typical link tables
+     * to bean - but alas.
+     *
+     * @return void
+     */
+    public function testCamelCasingVia()
+    {
+        R::nuke();
+        $book = R::dispense('book');
+        $book->sharedPage[] = R::dispense('page');
+        R::store($book);
+        $book = $book->fresh();
+        asrt(count($book->via('bookPage')->sharedPage), 1);
+        $book = $book->fresh();
+        asrt(count($book->via('book_page')->sharedPage), 1);
+    }
+
+    /**
+     * Test whether we can't add more than one FK.
+     */
+    public function testDuplicateFK()
+    {
+        R::nuke();
+        list($book, $page) = R::dispenseAll('book,page');
+        $book->sharedPage[] = $page;
+        R::store($page);
+        R::store($book);
+        $added = R::getWriter()->addConstraintForTypes('page', 'book');
+        asrt($added, false);
+    }
+
+    /**
+     * Test whether ->all() reloads a list.
+     *
+     * @return void
+     */
+    public function testAllPrefix()
+    {
+        R::nuke();
+        $book = R::dispense('book');
+        $book->ownPage = R::dispense('page', 10);
+        $book->sharedTag = R::dispense('tag', 2);
+        $i = 0;
+        foreach ($book->ownPage as $page) {
+            $page->pageno = $i++;
+        }
+        R::store($book);
+        $book = $book->fresh();
+        asrt(count($book->ownPage), 10);
+        asrt(count($book->withCondition(' pageno < 5 ')->ownPage), 5);
+        asrt(count($book->ownPage), 5);
+        asrt(count($book->all()->ownPage), 10);
+        asrt(count($book->with(' LIMIT 3 ')->ownPage), 3);
+        asrt(count($book->ownPage), 3);
+        asrt(count($book->all()->ownPage), 10);
+        asrt(count($book->sharedTag), 2);
+        asrt(count($book->with(' LIMIT 1 ')->sharedTag), 1);
+        asrt(count($book->sharedTag), 1);
+        asrt(count($book->all()->sharedTag), 2);
+    }
+
+    /**
+     * Test Relations and conditions.
+     *
+     * @return void
+     */
+    public function testRelationsAndConditions()
+    {
+        list($book1, $book2) = R::dispense('book', 2);
+
+        list($page1, $page2, $page3, $page4) = R::dispense('page', 4);
+
+        list($author1, $author2) = R::dispense('author', 2);
+
+        $book1->title = 'a';
+        $book2->title = 'b';
+
+        $page1->thename = '1';
+        $page2->thename = '2';
+        $page3->thename = '3';
+        $page3->thename = '4';
 
-		$book1->ownPage = array( $page1, $page2 );
-		$book2->ownPage = array( $page3, $page4 );
+        $book1->ownPage = array( $page1, $page2 );
+        $book2->ownPage = array( $page3, $page4 );
 
-		$author1->sharedBook = array( $book1, $book2 );
-		$author2->sharedBook = array( $book2 );
+        $author1->sharedBook = array( $book1, $book2 );
+        $author2->sharedBook = array( $book2 );
 
-		R::storeAll( array( $author1, $author2 ) );
+        R::storeAll(array( $author1, $author2 ));
 
-		asrt( count( $author1->sharedBook ), 2 );
-		asrt( count( $author1->withCondition( ' title = ? ', array( 'a' ) )->sharedBook ), 1 );
+        asrt(count($author1->sharedBook), 2);
+        asrt(count($author1->withCondition(' title = ? ', array( 'a' ))->sharedBook), 1);
 
-		R::store( $author1 );
+        R::store($author1);
 
-		asrt( count( $author1->sharedBook ), 2 );
-		asrt( count( $author1->withCondition( ' xtitle = ? ', array( 'a' ) )->sharedBook ), 0 );
+        asrt(count($author1->sharedBook), 2);
+        asrt(count($author1->withCondition(' xtitle = ? ', array( 'a' ))->sharedBook), 0);
 
-		R::store( $author1 );
+        R::store($author1);
 
-		asrt( count( $author1->sharedBook ), 2 );
+        asrt(count($author1->sharedBook), 2);
 
-		$book1 = R::load( 'book', $book1->id );
+        $book1 = R::load('book', $book1->id);
 
-		$book2 = $book2->fresh();
+        $book2 = $book2->fresh();
 
-		asrt( count( $book1->ownPage ), 2 );
-		asrt( count( $book1->with( ' LIMIT 1 ' )->ownPage ), 1 );
+        asrt(count($book1->ownPage), 2);
+        asrt(count($book1->with(' LIMIT 1 ')->ownPage), 1);
 
-		$book1 = $book1->fresh();
+        $book1 = $book1->fresh();
 
-		asrt( count( $book1->ownPage ), 2 );
-		asrt( count( $book1->withCondition( ' thename = ? ', array( '1' ) )->ownPage ), 1 );
-	}
+        asrt(count($book1->ownPage), 2);
+        asrt(count($book1->withCondition(' thename = ? ', array( '1' ))->ownPage), 1);
+    }
 
-	/**
-	 * Test filtering relations on links (using columns in the link table).
-	 *
-	 * @return void
-	 */
-	public function testSharedLinkCond()
-	{
-		testpack( 'Test new shared relations with link conditions' );
+    /**
+     * Test filtering relations on links (using columns in the link table).
+     *
+     * @return void
+     */
+    public function testSharedLinkCond()
+    {
+        testpack('Test new shared relations with link conditions');
 
-		$w = R::getWriter();
+        $w = R::getWriter();
 
-		list( $b1, $b2 ) = R::dispense( 'book', 2 );
+        list($b1, $b2) = R::dispense('book', 2);
 
-		$b1->name = 'book1';
-		$b2->name = 'book2';
+        $b1->name = 'book1';
+        $b2->name = 'book2';
 
-		list( $p1, $p2, $p3 ) = R::dispense( 'page', 3 );
+        list($p1, $p2, $p3) = R::dispense('page', 3);
 
-		$p1->text   = 'page1';
-		$p1->number = 3;
-		$p2->text   = 'page2';
-		$p3->text   = 'page3';
+        $p1->text   = 'page1';
+        $p1->number = 3;
+        $p2->text   = 'page2';
+        $p3->text   = 'page3';
 
-		$b1->link( 'book_page', array( 'order' => 1 ) )->page = $p1;
-		$b1->link( 'bookPage', array( 'order' => 2 ) )->page = $p2;
-		$b2->link( 'book_page', array( 'order' => 1 ) )->page = $p3;
-		$b2->link( 'bookPage', array( 'order' => 2 ) )->page = $p2;
-		$b2->link( 'book_page', array( 'order' => 3 ) )->page = $p1;
+        $b1->link('book_page', array( 'order' => 1 ))->page = $p1;
+        $b1->link('bookPage', array( 'order' => 2 ))->page = $p2;
+        $b2->link('book_page', array( 'order' => 1 ))->page = $p3;
+        $b2->link('bookPage', array( 'order' => 2 ))->page = $p2;
+        $b2->link('book_page', array( 'order' => 3 ))->page = $p1;
 
-		R::storeAll( array( $b1, $b2 ) );
+        R::storeAll(array( $b1, $b2 ));
 
-		$b1 = R::load( 'book', $b1->id );
-		$b2 = R::load( 'book', $b2->id );
+        $b1 = R::load('book', $b1->id);
+        $b2 = R::load('book', $b2->id);
 
-		$pages = $b1->withCondition( ' book_page.' . $w->esc( 'order' ) . ' = 2 ' )->sharedPage;
+        $pages = $b1->withCondition(' book_page.'.$w->esc('order').' = 2 ')->sharedPage;
 
-		$page = reset( $pages );
+        $page = reset($pages);
 
-		asrt( $page->text, 'page2' );
+        asrt($page->text, 'page2');
 
-		$pages = $b2->withCondition( ' ' . $w->esc( 'order' ) . ' = 3 ' )->sharedPage;
+        $pages = $b2->withCondition(' '.$w->esc('order').' = 3 ')->sharedPage;
 
-		$page = reset( $pages );
+        $page = reset($pages);
 
-		asrt( $page->text, 'page1' );
+        asrt($page->text, 'page1');
 
-		$b1 = R::load( 'book', $b1->id );
-		$b2 = R::load( 'book', $b2->id );
+        $b1 = R::load('book', $b1->id);
+        $b2 = R::load('book', $b2->id);
 
-		$pages = $b1->withCondition( ' book_page.' . $w->esc( 'order' ) . ' < 3  AND page.number = 3' )->sharedPage;
+        $pages = $b1->withCondition(' book_page.'.$w->esc('order').' < 3  AND page.number = 3')->sharedPage;
 
-		$page = reset( $pages );
+        $page = reset($pages);
 
-		asrt( $page->text, 'page1' );
+        asrt($page->text, 'page1');
 
-		$pages = $b2->withCondition( ' ' . $w->esc( 'order' ) . ' > 1  ORDER BY book_page.' . $w->esc( 'order' ) . ' ASC ' )->sharedPage;
+        $pages = $b2->withCondition(' '.$w->esc('order').' > 1  ORDER BY book_page.'.$w->esc('order').' ASC ')->sharedPage;
 
-		$page = array_shift( $pages );
+        $page = array_shift($pages);
 
-		asrt( $page->text, 'page2' );
+        asrt($page->text, 'page2');
 
-		$page = array_shift( $pages );
+        $page = array_shift($pages);
 
-		asrt( $page->text, 'page1' );
+        asrt($page->text, 'page1');
 
-		testpack( 'Test new shared relations and cache' );
+        testpack('Test new shared relations and cache');
 
-		/**
-		 * why does this not destroy cache in psql?
-		 * ah: An error occurred: SQLSTATE[42703]: Undefined column: 7
-		 * ERROR:  column "page" of relation "page" does not exist
-		 */
-		R::exec( 'UPDATE page SET ' . $w->esc( 'number' ) . ' = 1 ' );
+        /**
+         * why does this not destroy cache in psql?
+         * ah: An error occurred: SQLSTATE[42703]: Undefined column: 7
+         * ERROR:  column "page" of relation "page" does not exist
+         */
+        R::exec('UPDATE page SET '.$w->esc('number').' = 1 ');
 
-		R::getWriter()->setUseCache( TRUE );
+        R::getWriter()->setUseCache(true);
 
-		$p1 = R::load( 'page', (int) $p1->id );
+        $p1 = R::load('page', (int) $p1->id);
 
-		// Someone else changes the records. Cache remains.
-		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 9 -- keep-cache' );
+        // Someone else changes the records. Cache remains.
+        R::exec(' UPDATE page SET '.$w->esc('number').' = 9 -- keep-cache');
 
-		$b1 = R::load( 'book', $b1->id );
-		$p1 = R::load( 'page', (int) $p1->id );
+        $b1 = R::load('book', $b1->id);
+        $p1 = R::load('page', (int) $p1->id);
 
-		// Yupz a stale cache, phantom read!
-		asrt( (int) $p1->number, 1 );
+        // Yupz a stale cache, phantom read!
+        asrt((int) $p1->number, 1);
 
-		$pages = $b1->withCondition( ' book_page.' . $w->esc( 'order' ) . ' = 1 ' )->sharedPage;
+        $pages = $b1->withCondition(' book_page.'.$w->esc('order').' = 1 ')->sharedPage;
 
-		$page = reset( $pages );
+        $page = reset($pages);
 
-		// Inconsistent, sad but TRUE, different query -> cache key is different
-		asrt( (int) $page->number, 9 );
+        // Inconsistent, sad but TRUE, different query -> cache key is different
+        asrt((int) $page->number, 9);
 
-		// However, cache must have been invalidated by this query
-		$p1 = R::load( 'page', (int) $p1->id );
+        // However, cache must have been invalidated by this query
+        $p1 = R::load('page', (int) $p1->id);
 
-		// Yes! we're consistent again! -- as if the change just happened later!
-		asrt( (int) $page->number, 9 );
+        // Yes! we're consistent again! -- as if the change just happened later!
+        asrt((int) $page->number, 9);
 
-		// By doing this we keep getting 9 instead of 8
-		$b1->fresh()->withCondition( ' book_page.' . $w->esc( 'order' ) . ' = 1 ' )->sharedPage;
+        // By doing this we keep getting 9 instead of 8
+        $b1->fresh()->withCondition(' book_page.'.$w->esc('order').' = 1 ')->sharedPage;
 
-		// Someone else is busy again...
-		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 8 -- keep-cache' );
+        // Someone else is busy again...
+        R::exec(' UPDATE page SET '.$w->esc('number').' = 8 -- keep-cache');
 
-		$b1 = R::load( 'book', $b1->id );
+        $b1 = R::load('book', $b1->id);
 
-		$pages = $b1->withCondition( ' book_page.' . $w->esc( 'order' ) . ' = 1 ' )->sharedPage;
+        $pages = $b1->withCondition(' book_page.'.$w->esc('order').' = 1 ')->sharedPage;
 
-		$page = reset( $pages );
+        $page = reset($pages);
 
-		/**
-		 * yes! we get 9 instead of 8, why because the cache key has not changed,
-		 * our last query was PAGE-BOOK-RELATION and now we ask for
-		 * PAGE-BOOK-RELATION again. if we would have used just a load page
-		 * query we would have gotten the new value (8).... let's test that!
-		 */
-		asrt( (int) $page->number, 9 );
+        /**
+         * yes! we get 9 instead of 8, why because the cache key has not changed,
+         * our last query was PAGE-BOOK-RELATION and now we ask for
+         * PAGE-BOOK-RELATION again. if we would have used just a load page
+         * query we would have gotten the new value (8).... let's test that!
+         */
+        asrt((int) $page->number, 9);
 
-		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 9' );
+        R::exec(' UPDATE page SET '.$w->esc('number').' = 9');
 
-		$p1 = R::load( 'page', (int) $p1->id );
+        $p1 = R::load('page', (int) $p1->id);
 
-		asrt( (int) $page->number, 9 );
+        asrt((int) $page->number, 9);
 
-		// Someone else is busy again...
-		R::exec( ' UPDATE page SET ' . $w->esc( 'number' ) . ' = 8 -- keep-cache' );
+        // Someone else is busy again...
+        R::exec(' UPDATE page SET '.$w->esc('number').' = 8 -- keep-cache');
 
-		$b1 = R::load( 'book', $b1->id );
+        $b1 = R::load('book', $b1->id);
 
-		$pages = $b1->withCondition( ' book_page.' . $w->esc( 'order' ) . ' = 1 ' )->sharedPage;
+        $pages = $b1->withCondition(' book_page.'.$w->esc('order').' = 1 ')->sharedPage;
 
-		$page = reset( $pages );
+        $page = reset($pages);
 
-		// Yes, keep-cache wont help, cache key changed!
-		asrt( (int) $page->number, 8 );
+        // Yes, keep-cache wont help, cache key changed!
+        asrt((int) $page->number, 8);
 
-		R::getWriter()->setUseCache( FALSE );
+        R::getWriter()->setUseCache(false);
+    }
 
-	}
+    /**
+     * Test related count using via().
+     *
+     * @return void
+     */
+    public function testRelatedCountVia()
+    {
+        testpack('Test relatedCount with via()');
 
-	/**
-	 * Test related count using via().
-	 *
-	 * @return void
-	 */
-	public function testRelatedCountVia()
-	{
-		testpack( 'Test relatedCount with via()' );
+        $shop              = R::dispense('shop');
+        $shop->ownRelation = R::dispense('relation', 13);
+        foreach ($shop->ownRelation as $relation) {
+            $relation->shop     = $shop;
+            $relation->customer = R::dispense('customer');
+        }
+        R::store($shop);
+        $shop = $shop->fresh();
 
-		$shop              = R::dispense( 'shop' );
-		$shop->ownRelation = R::dispense( 'relation', 13 );
-		foreach ( $shop->ownRelation as $relation ) {
-			$relation->shop     = $shop;
-			$relation->customer = R::dispense( 'customer' );
-		}
-		R::store( $shop );
-		$shop = $shop->fresh();
+        asrt($shop->via('relation')->countShared('customer'), 13);
+    }
 
-		asrt( $shop->via( 'relation' )->countShared( 'customer' ), 13 );
-	}
+    /**
+     * Test counting and aliasing.
+     *
+     * @return void
+     */
+    public function testCountingAndAliasing()
+    {
+        $book = R::dispense('book');
 
-	/**
-	 * Test counting and aliasing.
-	 *
-	 * @return void
-	 */
-	public function testCountingAndAliasing()
-	{
-		$book = R::dispense( 'book' );
+        $book->ownPage = R::dispense('page', 10);
 
-		$book->ownPage = R::dispense( 'page', 10 );
+        $book2 = R::dispense('book');
 
-		$book2 = R::dispense( 'book' );
+        $book2->ownPage = R::dispense('page', 4);
 
-		$book2->ownPage = R::dispense( 'page', 4 );
+        list($Bill, $James, $Andy) = R::dispense('person', 3);
 
-		list( $Bill, $James, $Andy ) = R::dispense( 'person', 3 );
+        $book->author   = $Bill;
+        $book->coAuthor = $James;
 
-		$book->author   = $Bill;
-		$book->coAuthor = $James;
+        $book2->author   = $Bill;
+        $book2->coAuthor = $Andy;
 
-		$book2->author   = $Bill;
-		$book2->coAuthor = $Andy;
+        $book->price  = 25;
+        $book2->price = 50;
 
-		$book->price  = 25;
-		$book2->price = 50;
+        $notes = R::dispense('note', 10);
 
-		$notes = R::dispense( 'note', 10 );
+        $book->sharedNote  = array( $notes[0], $notes[1], $notes[2] );
+        $book2->sharedNote = array( $notes[3], $notes[4], $notes[1], $notes[0] );
 
-		$book->sharedNote  = array( $notes[0], $notes[1], $notes[2] );
-		$book2->sharedNote = array( $notes[3], $notes[4], $notes[1], $notes[0] );
+        $books = R::dispense('book', 5);
 
-		$books = R::dispense( 'book', 5 );
+        $books[2]->title = 'boe';
 
-		$books[2]->title = 'boe';
+        $book->sharedBook = array( $books[0], $books[1] );
 
-		$book->sharedBook = array( $books[0], $books[1] );
+        $book2->sharedBook = array( $books[0], $books[2], $books[4] );
 
-		$book2->sharedBook = array( $books[0], $books[2], $books[4] );
+        R::storeAll(array( $book, $book2 ));
 
-		R::storeAll( array( $book, $book2 ) );
+        asrt($book->countOwn('page'), 10);
+        asrt($book->withCondition(' id < 5 ')->countOwn('page'), 4);
 
-		asrt( $book->countOwn( 'page' ), 10 );
-		asrt( $book->withCondition( ' id < 5 ' )->countOwn( 'page' ), 4 );
+        asrt($Bill->alias('author')->countOwn('book'), 2);
+        asrt($Andy->alias('coAuthor')->countOwn('book'), 1);
+        asrt($James->alias('coAuthor')->countOwn('book'), 1);
+        asrt($Bill->alias('author')->countOwn('book'), 2);
 
-		asrt( $Bill->alias( 'author' )->countOwn( 'book' ), 2 );
-		asrt( $Andy->alias( 'coAuthor' )->countOwn( 'book' ), 1 );
-		asrt( $James->alias( 'coAuthor' )->countOwn( 'book' ), 1 );
-		asrt( $Bill->alias( 'author' )->countOwn( 'book' ), 2 );
+        asrt($book->countShared('note'), 3);
 
-		asrt( $book->countShared( 'note' ), 3 );
+        asrt($book2->countShared('note'), 4);
+        asrt($book2->countShared('book'), 3);
 
-		asrt( $book2->countShared( 'note' ), 4 );
-		asrt( $book2->countShared( 'book' ), 3 );
+        $book2 = $book2->fresh();
 
-		$book2 = $book2->fresh();
+        asrt($book2->withCondition(' title = ? ', array( 'boe' ))->countShared('book'), 1);
+    }
 
-		asrt( $book2->withCondition( ' title = ? ', array( 'boe' ) )->countShared( 'book' ), 1 );
-	}
+    /**
+     * Test via.
+     *
+     * @return void
+     */
+    public function testVia()
+    {
+        testpack('Test via()');
 
-	/**
-	 * Test via.
-	 *
-	 * @return void
-	 */
-	public function testVia()
-	{
-		testpack( 'Test via()' );
+        $d = R::dispense('doctor')->setAttr('name', 'd1');
+        $p = R::dispense('patient')->setAttr('name', 'p1');
 
-		$d = R::dispense( 'doctor' )->setAttr( 'name', 'd1' );
-		$p = R::dispense( 'patient' )->setAttr( 'name', 'p1' );
+        $d->via('consult')->sharedPatient[] = $p;
 
-		$d->via( 'consult' )->sharedPatient[] = $p;
+        R::store($d);
 
-		R::store( $d );
+        $d = R::load('doctor', $d->id);
 
-		$d = R::load( 'doctor', $d->id );
+        asrt(count($d->sharedPatient), 1);
+        asrt(in_array('consult', R::getWriter()->getTables()), true);
+    }
 
-		asrt( count( $d->sharedPatient ), 1 );
-		asrt( in_array( 'consult', R::getWriter()->getTables() ), TRUE );
-	}
+    public function testIssue348()
+    {
+        //issue #348 via() should reload shared list
 
-	public function testIssue348()
-	{
-		//issue #348 via() should reload shared list
+        $product = R::dispense('product');
+        $product->name = 'test';
+        $color = R::dispense('color');
+        $color->name = 'cname';
+        $color->code = 'ccode';
+        R::store($product);
+        R::store($color);
+        $product->link('productColor', array(
+             'stock' => 1,
+             'position' => 0,
+        ))->color = $color;
+        R::store($product);
+        asrt(count($product->sharedColor), 0);
+        asrt(count($product->via('product_color')->sharedColor), 1);
+        asrt(count($product->sharedColor), 1);
+        R::renameAssociation('color_product', null);
+    }
 
-		$product = R::dispense( 'product' );
-		$product->name = 'test';
-		$color = R::dispense( 'color' );
-		$color->name = 'cname';
-		$color->code = 'ccode';
-		R::store( $product );
-		R::store( $color );
-		$product->link( 'productColor', array(
-			 'stock' => 1,
-			 'position' => 0
-		) )->color = $color;
-		R::store( $product );
-		asrt( count( $product->sharedColor ), 0 );
-		asrt( count( $product->via( 'product_color' )->sharedColor ), 1 );
-		asrt( count( $product->sharedColor ), 1 );
-		R::renameAssociation( 'color_product', NULL );
-	}
+    /**
+     * Test creation of link table.
+     *
+     * @return void
+     */
+    public function testCreationOfLinkTable()
+    {
+        asrt(in_array('consult', R::getWriter()->getTables()), false);
 
-	/**
-	 * Test creation of link table.
-	 *
-	 * @return void
-	 */
-	public function testCreationOfLinkTable()
-	{
-		asrt( in_array( 'consult', R::getWriter()->getTables() ), FALSE );
+        $d = R::dispense('doctor')->setAttr('name', 'd1');
+        $p = R::dispense('patient')->setAttr('name', 'p1');
 
-		$d = R::dispense( 'doctor' )->setAttr( 'name', 'd1' );
-		$p = R::dispense( 'patient' )->setAttr( 'name', 'p1' );
+        $d->sharedPatient[] = $p;
+        R::store($d);
 
-		$d->sharedPatient[] = $p;
-		R::store($d);
+        asrt(in_array('consult', R::getWriter()->getTables()), true);
+    }
 
-		asrt( in_array( 'consult', R::getWriter()->getTables() ), TRUE );
-	}
+    /**
+     * Fast track link block code should not affect self-referential N-M relations.
+     *
+     * @return void
+     */
+    public function testFastTrackRelations()
+    {
+        testpack('Test fast-track linkBlock exceptions');
 
-	/**
-	 * Fast track link block code should not affect self-referential N-M relations.
-	 *
-	 * @return void
-	 */
-	public function testFastTrackRelations()
-	{
-		testpack( 'Test fast-track linkBlock exceptions' );
+        list($donald, $mickey, $goofy, $pluto) = R::dispense('friend', 4);
 
-		list( $donald, $mickey, $goofy, $pluto ) = R::dispense( 'friend', 4 );
+        $donald->name = 'D';
+        $mickey->name = 'M';
+        $goofy->name  = 'G';
+        $pluto->name  = 'P';
 
-		$donald->name = 'D';
-		$mickey->name = 'M';
-		$goofy->name  = 'G';
-		$pluto->name  = 'P';
+        $donald->sharedFriend = array( $mickey, $goofy );
+        $mickey->sharedFriend = array( $pluto, $goofy );
+        $mickey->sharedBook   = array( R::dispense('book') );
 
-		$donald->sharedFriend = array( $mickey, $goofy );
-		$mickey->sharedFriend = array( $pluto, $goofy );
-		$mickey->sharedBook   = array( R::dispense( 'book' ) );
+        R::storeAll(array( $mickey, $donald, $goofy, $pluto ));
 
-		R::storeAll( array( $mickey, $donald, $goofy, $pluto ) );
+        $donald = R::load('friend', $donald->id);
+        $mickey = R::load('friend', $mickey->id);
+        $goofy  = R::load('friend', $goofy->id);
+        $pluto  = R::load('friend', $pluto->id);
 
-		$donald = R::load( 'friend', $donald->id );
-		$mickey = R::load( 'friend', $mickey->id );
-		$goofy  = R::load( 'friend', $goofy->id );
-		$pluto  = R::load( 'friend', $pluto->id );
+        $names = implode(',', R::gatherLabels($donald->sharedFriend));
 
-		$names = implode( ',', R::gatherLabels( $donald->sharedFriend ) );
+        asrt($names, 'G,M');
 
-		asrt( $names, 'G,M' );
+        $names = implode(',', R::gatherLabels($goofy->sharedFriend));
 
-		$names = implode( ',', R::gatherLabels( $goofy->sharedFriend ) );
+        asrt($names, 'D,M');
 
-		asrt( $names, 'D,M' );
+        $names = implode(',', R::gatherLabels($mickey->sharedFriend));
 
-		$names = implode( ',', R::gatherLabels( $mickey->sharedFriend ) );
+        asrt($names, 'D,G,P');
 
-		asrt( $names, 'D,G,P' );
+        $names = implode(',', R::gatherLabels($pluto->sharedFriend));
 
-		$names = implode( ',', R::gatherLabels( $pluto->sharedFriend ) );
+        asrt($names, 'M');
 
-		asrt( $names, 'M' );
+        // Now in combination with with() conditions...
+        $donald = R::load('friend', $donald->id);
 
-		// Now in combination with with() conditions...
-		$donald = R::load( 'friend', $donald->id );
+        $names = implode(',', R::gatherLabels($donald->withCondition(' name = ? ', array( 'M' ))->sharedFriend));
 
-		$names = implode( ',', R::gatherLabels( $donald->withCondition( ' name = ? ', array( 'M' ) )->sharedFriend ) );
+        asrt($names, 'M');
 
-		asrt( $names, 'M' );
+        // Now in combination with with() conditions...
+        $donald = R::load('friend', $donald->id);
 
-		// Now in combination with with() conditions...
-		$donald = R::load( 'friend', $donald->id );
+        $names = implode(',', R::gatherLabels($donald->with(' ORDER BY name ')->sharedFriend));
 
-		$names = implode( ',', R::gatherLabels( $donald->with( ' ORDER BY name ' )->sharedFriend ) );
+        asrt($names, 'G,M');
 
-		asrt( $names, 'G,M' );
+        // Now counting
+        $goofy = R::load('friend', $goofy->id);
 
-		// Now counting
-		$goofy = R::load( 'friend', $goofy->id );
+        asrt((int) $goofy->countShared('friend'), 2);
+        asrt((int) $donald->countShared('friend'), 2);
+        asrt((int) $mickey->countShared('friend'), 3);
+        asrt((int) $pluto->countShared('friend'), 1);
+    }
 
-		asrt( (int) $goofy->countShared( 'friend' ), 2 );
-		asrt( (int) $donald->countShared( 'friend' ), 2 );
-		asrt( (int) $mickey->countShared( 'friend' ), 3 );
-		asrt( (int) $pluto->countShared( 'friend' ), 1 );
-	}
+    /**
+     * Test list beautifications.
+     *
+     * @return void
+     */
+    public function testListBeautifications()
+    {
+        testpack('Test list beautifications');
 
-	/**
-	 * Test list beautifications.
-	 *
-	 * @return void
-	 */
-	public function testListBeautifications()
-	{
-		testpack( 'Test list beautifications' );
+        $book = R::dispense('book');
+        $page = R::dispense('page')->setAttr('name', 'a');
+        $book->sharedPage[] = $page;
 
-		$book = R::dispense( 'book' );
-		$page = R::dispense( 'page' )->setAttr( 'name', 'a' );
-		$book->sharedPage[] = $page;
+        $id = R::store($book);
 
-		$id = R::store( $book );
+        $book = R::load('book', $id);
 
-		$book = R::load( 'book', $id );
+        $p = reset($book->ownBookPage);
 
-		$p = reset( $book->ownBookPage );
+        asrt($p->page->name, 'a');
 
-		asrt( $p->page->name, 'a' );
+        $bean = R::dispense('bean');
 
-		$bean = R::dispense( 'bean' );
+        $bean->sharedAclRole[] = R::dispense('role')->setAttr('name', 'x');
 
-		$bean->sharedAclRole[] = R::dispense( 'role' )->setAttr( 'name', 'x' );
+        R::store($bean);
 
-		R::store( $bean );
+        asrt(R::count('role'), 1);
 
-		asrt( R::count( 'role' ), 1 );
+        $aclrole = R::getRedBean()->dispense('acl_role');
 
-		$aclrole = R::getRedBean()->dispense( 'acl_role' );
+        $aclrole->name = 'role';
 
-		$aclrole->name = 'role';
+        $bean = R::dispense('bean');
 
-		$bean = R::dispense( 'bean' );
+        $bean->sharedAclRole[] = $aclrole;
 
-		$bean->sharedAclRole[] = $aclrole;
+        R::store($bean);
 
-		R::store( $bean );
+        asrt(count($bean->sharedAclRole), 1);
+    }
 
-		asrt( count( $bean->sharedAclRole ), 1 );
-	}
+    /**
+     * Test list add and delete.
+     *
+     * @return void
+     */
+    public function testListAddDelete()
+    {
+        testpack('Test list add/delete scenarios.');
 
-	/**
-	 * Test list add and delete.
-	 *
-	 * @return void
-	 */
-	public function testListAddDelete()
-	{
-		testpack( 'Test list add/delete scenarios.' );
+        R::nuke();
+        $b = R::dispense('book');
+        $p = R::dispense('page');
 
-		R::nuke();
-		$b = R::dispense( 'book' );
-		$p = R::dispense( 'page' );
+        $b->title = 'a';
+        $p->name  = 'b';
 
-		$b->title = 'a';
-		$p->name  = 'b';
+        $b->xownPage[] = $p;
 
-		$b->xownPage[] = $p;
+        R::store($b);
 
-		R::store( $b );
+        $b->xownPage = array();
 
-		$b->xownPage = array();
+        R::store($b);
 
-		R::store( $b );
+        asrt(R::count('page'), 0);
 
-		asrt( R::count( 'page' ), 0 );
+        $p = R::dispense('page');
+        $z = R::dispense('paper');
 
-		$p = R::dispense( 'page' );
-		$z = R::dispense( 'paper' );
+        $z->xownPage[] = $p;
 
-		$z->xownPage[] = $p;
+        R::store($z);
 
-		R::store( $z );
+        asrt(R::count('page'), 1);
 
-		asrt( R::count( 'page' ), 1 );
+        $z->xownPage = array();
 
-		$z->xownPage = array();
+        R::store($z);
 
-		R::store( $z );
+        asrt(R::count('page'), 0);
 
-		asrt( R::count( 'page' ), 0 );
+        $i = R::dispense('magazine');
 
-		$i = R::dispense( 'magazine' );
+        $i->ownPage[] = R::dispense('page');
 
-		$i->ownPage[] = R::dispense( 'page' );
+        R::store($i);
 
-		R::store( $i );
+        asrt(R::count('page'), 1);
 
-		asrt( R::count( 'page' ), 1 );
+        $i->ownPage = array();
 
-		$i->ownPage = array();
+        R::store($i);
 
-		R::store( $i );
+        asrt(R::count('page'), 1);
+    }
 
-		asrt( R::count( 'page' ), 1 );
+    /**
+     * Test basic and complex common usage scenarios for
+     * relations and associations.
+     *
+     * @return void
+     */
+    public function testScenarios()
+    {
+        list($q1, $q2) = R::dispense('quote', 2);
 
-	}
+        list($pic1, $pic2) = R::dispense('picture', 2);
 
-	/**
-	 * Test basic and complex common usage scenarios for
-	 * relations and associations.
-	 *
-	 * @return void
-	 */
-	public function testScenarios()
-	{
-		list( $q1, $q2 ) = R::dispense( 'quote', 2 );
+        list($book, $book2, $book3) = R::dispense('book', 4);
 
-		list( $pic1, $pic2 ) = R::dispense( 'picture', 2 );
+        list($topic1, $topic2, $topic3, $topic4, $topic5) = R::dispense('topic', 5);
 
-		list( $book, $book2, $book3 ) = R::dispense( 'book', 4 );
+        list($page1, $page2, $page3, $page4, $page5, $page6, $page7) = R::dispense('page', 7);
 
-		list( $topic1, $topic2, $topic3, $topic4, $topic5 ) = R::dispense( 'topic', 5 );
+        $q1->text = 'lorem';
+        $q2->text = 'ipsum';
 
-		list( $page1, $page2, $page3, $page4, $page5, $page6, $page7 ) = R::dispense( 'page', 7 );
+        $book->title  = 'abc';
+        $book2->title = 'def';
+        $book3->title = 'ghi';
 
-		$q1->text = 'lorem';
-		$q2->text = 'ipsum';
+        $page1->title = 'pagina1';
+        $page2->title = 'pagina2';
+        $page3->title = 'pagina3';
+        $page4->title = 'pagina4';
+        $page5->title = 'pagina5';
+        $page6->title = 'cover1';
+        $page7->title = 'cover2';
 
-		$book->title  = 'abc';
-		$book2->title = 'def';
-		$book3->title = 'ghi';
+        $topic1->name = 'holiday';
+        $topic2->name = 'cooking';
+        $topic3->name = 'gardening';
+        $topic4->name = 'computing';
+        $topic5->name = 'christmas';
 
-		$page1->title = 'pagina1';
-		$page2->title = 'pagina2';
-		$page3->title = 'pagina3';
-		$page4->title = 'pagina4';
-		$page5->title = 'pagina5';
-		$page6->title = 'cover1';
-		$page7->title = 'cover2';
+        // Add one page to the book
+        $book->ownPage[] = $page1;
 
-		$topic1->name = 'holiday';
-		$topic2->name = 'cooking';
-		$topic3->name = 'gardening';
-		$topic4->name = 'computing';
-		$topic5->name = 'christmas';
+        $id = R::store($book);
 
-		// Add one page to the book
-		$book->ownPage[] = $page1;
+        asrt(count($book->ownPage), 1);
+        asrt(reset($book->ownPage)->getMeta('type'), 'page');
 
-		$id = R::store( $book );
+        $book = R::load('book', $id);
 
-		asrt( count( $book->ownPage ), 1 );
-		asrt( reset( $book->ownPage )->getMeta( 'type' ), 'page' );
+        asrt(count($book->ownPage), 1);
+        asrt(reset($book->ownPage)->getMeta('type'), 'page');
 
-		$book = R::load( 'book', $id );
+        // Performing an own addition
+        $book->ownPage[] = $page2;
 
-		asrt( count( $book->ownPage ), 1 );
-		asrt( reset( $book->ownPage )->getMeta( 'type' ), 'page' );
+        $id   = R::store($book);
+        $book = R::load('book', $id);
 
-		// Performing an own addition
-		$book->ownPage[] = $page2;
+        asrt(count($book->ownPage), 2);
 
-		$id   = R::store( $book );
-		$book = R::load( 'book', $id );
+        // Performing a deletion
+        $book = R::load('book', $id);
 
-		asrt( count( $book->ownPage ), 2 );
+        unset($book->ownPage[1]);
 
-		// Performing a deletion
-		$book = R::load( 'book', $id );
+        $id = R::store($book);
 
-		unset( $book->ownPage[1] );
+        $book = R::load('book', $id);
 
-		$id = R::store( $book );
+        asrt(count($book->ownPage), 1);
+        asrt(reset($book->ownPage)->getMeta('type'), 'page');
+        asrt(R::count('page'), 2); //still exists
+        asrt(reset($book->ownPage)->id, '2');
 
-		$book = R::load( 'book', $id );
+        // Doing a change in one of the owned items
+        $book->ownPage[2]->title = 'page II';
 
-		asrt( count( $book->ownPage ), 1 );
-		asrt( reset( $book->ownPage )->getMeta( 'type' ), 'page' );
-		asrt( R::count( 'page' ), 2 ); //still exists
-		asrt( reset( $book->ownPage )->id, '2' );
+        $id   = R::store($book);
+        $book = R::load('book', $id);
 
-		// Doing a change in one of the owned items
-		$book->ownPage[2]->title = 'page II';
+        asrt(reset($book->ownPage)->title, 'page II');
 
-		$id   = R::store( $book );
-		$book = R::load( 'book', $id );
+        // Change by reference now... don't copy!
+        $refToPage2 = $book->ownPage[2];
 
-		asrt( reset( $book->ownPage )->title, 'page II' );
+        $refToPage2->title = 'page II b';
 
-		// Change by reference now... don't copy!
-		$refToPage2 = $book->ownPage[2];
+        $id   = R::store($book);
+        $book = R::load('book', $id);
 
-		$refToPage2->title = 'page II b';
+        asrt(reset($book->ownPage)->title, 'page II b');
 
-		$id   = R::store( $book );
-		$book = R::load( 'book', $id );
+        // Doing all actions combined
+        $book->ownPage[] = $page3;
 
-		asrt( reset( $book->ownPage )->title, 'page II b' );
+        R::store($book);
 
-		// Doing all actions combined
-		$book->ownPage[] = $page3;
+        $book = R::load('book', $id);
 
-		R::store( $book );
+        unset($book->ownPage[2]);
 
-		$book = R::load( 'book', $id );
+        // And test custom key
+        $book->ownPage['customkey'] = $page4;
+        $book->ownPage[3]->title    = "THIRD";
 
-		unset( $book->ownPage[2] );
+        R::store($book);
 
-		// And test custom key
-		$book->ownPage['customkey'] = $page4;
-		$book->ownPage[3]->title    = "THIRD";
+        $book = R::load('book', $id);
 
-		R::store( $book );
+        asrt(count($book->ownPage), 2);
 
-		$book = R::load( 'book', $id );
+        $p4 = $book->ownPage[4];
+        $p3 = $book->ownPage[3];
 
-		asrt( count( $book->ownPage ), 2 );
+        asrt($p4->title, 'pagina4');
+        asrt($p3->title, 'THIRD');
 
-		$p4 = $book->ownPage[4];
-		$p3 = $book->ownPage[3];
+        // Test replacing an element
+        $book = R::load('book', $id);
 
-		asrt( $p4->title, 'pagina4' );
-		asrt( $p3->title, 'THIRD' );
+        $book->ownPage[4] = $page5;
 
-		// Test replacing an element
-		$book = R::load( 'book', $id );
+        R::store($book);
 
-		$book->ownPage[4] = $page5;
+        $book = R::load('book', $id);
 
-		R::store( $book );
+        asrt(count($book->ownPage), 2);
 
-		$book = R::load( 'book', $id );
+        $p5 = $book->ownPage[5];
 
-		asrt( count( $book->ownPage ), 2 );
+        asrt($p5->title, 'pagina5');
 
-		$p5 = $book->ownPage[5];
+        // Other way around - single bean
+        asrt($p5->book->title, 'abc');
+        asrt(R::load('page', 5)->book->title, 'abc');
+        asrt(R::load('page', 3)->book->title, 'abc');
 
-		asrt( $p5->title, 'pagina5' );
+        // Add the other way around - single bean
+        $page1->id   = 0;
 
-		// Other way around - single bean
-		asrt( $p5->book->title, 'abc' );
-		asrt( R::load( 'page', 5 )->book->title, 'abc' );
-		asrt( R::load( 'page', 3 )->book->title, 'abc' );
+        $page1->book = $book2;
 
-		// Add the other way around - single bean
-		$page1->id   = 0;
+        $page1 = R::load('page', R::store($page1));
 
-		$page1->book = $book2;
+        asrt($page1->book->title, 'def');
 
-		$page1 = R::load( 'page', R::store( $page1 ) );
+        $b2 = R::load('book', $id);
 
-		asrt( $page1->book->title, 'def' );
+        asrt(count($b2->ownPage), 2);
 
-		$b2 = R::load( 'book', $id );
+        // Remove the other way around - single bean
+        unset($page1->book);
 
-		asrt( count( $b2->ownPage ), 2 );
+        R::store($page1);
 
-		// Remove the other way around - single bean
-		unset( $page1->book );
+        $b2 = R::load('book', $book2->id);
 
-		R::store( $page1 );
+        asrt(count($b2->ownPage), 1); //does not work
+        $page1->book = null;
 
-		$b2 = R::load( 'book', $book2->id );
+        R::store($page1);
 
-		asrt( count( $b2->ownPage ), 1 ); //does not work
-		$page1->book = NULL;
+        $b2 = R::load('book', $book2->id);
 
-		R::store( $page1 );
+        asrt(count($b2->ownPage), 0); //works
 
-		$b2 = R::load( 'book', $book2->id );
+        // Re-add the page
+        $b2->ownPage[] = $page1;
 
-		asrt( count( $b2->ownPage ), 0 ); //works
+        R::store($b2);
 
-		// Re-add the page
-		$b2->ownPage[] = $page1;
+        $b2 = R::load('book', $book2->id);
 
-		R::store( $b2 );
+        asrt(count($b2->ownPage), 1);
 
-		$b2 = R::load( 'book', $book2->id );
+        // Different, less elegant way to remove
+        $page1 = reset($b2->ownPage);
 
-		asrt( count( $b2->ownPage ), 1 );
+        $page1->book_id = null;
 
-		// Different, less elegant way to remove
-		$page1 = reset( $b2->ownPage );
+        R::store($page1);
 
-		$page1->book_id = NULL;
+        $b2 = R::load('book', $book2->id);
 
-		R::store( $page1 );
+        asrt(count($b2->ownPage), 0);
 
-		$b2 = R::load( 'book', $book2->id );
+        // Re-add the page
+        $b2->ownPage[] = $page1;
 
-		asrt( count( $b2->ownPage ), 0 );
+        R::store($b2);
 
-		// Re-add the page
-		$b2->ownPage[] = $page1;
+        $b2 = R::load('book', $book2->id);
 
-		R::store( $b2 );
+        asrt(count($b2->ownPage), 1);
 
-		$b2 = R::load( 'book', $book2->id );
+        // Another less elegant way to remove
+        $page1->book = null;
 
-		asrt( count( $b2->ownPage ), 1 );
+        R::store($page1);
 
-		// Another less elegant way to remove
-		$page1->book = NULL;
+        $cols = R::getColumns('page');
 
-		R::store( $page1 );
+        asrt(isset($cols['book']), false);
 
-		$cols = R::getColumns( 'page' );
+        $b2 = R::load('book', $book2->id);
 
-		asrt( isset( $cols['book'] ), FALSE );
+        asrt(count($b2->ownPage), 0);
 
-		$b2 = R::load( 'book', $book2->id );
+        // Re-add the page
+        $b2->ownPage[] = $page1;
 
-		asrt( count( $b2->ownPage ), 0 );
+        R::store($b2);
 
-		// Re-add the page
-		$b2->ownPage[] = $page1;
+        $b2 = R::load('book', $book2->id);
 
-		R::store( $b2 );
+        asrt(count($b2->ownPage), 1);
 
-		$b2 = R::load( 'book', $book2->id );
+        // Another less elegant... just plain ugly... way to remove
+        $page1->book = false;
 
-		asrt( count( $b2->ownPage ), 1 );
+        R::store($page1);
 
-		// Another less elegant... just plain ugly... way to remove
-		$page1->book = FALSE;
+        $cols = R::getColumns('page');
 
-		R::store( $page1 );
+        asrt(isset($cols['book']), false);
 
-		$cols = R::getColumns( 'page' );
+        $b2 = R::load('book', $book2->id);
 
-		asrt( isset( $cols['book'] ), FALSE );
+        asrt(count($b2->ownPage), 0);
 
-		$b2 = R::load( 'book', $book2->id );
+        // Re-add the page
+        $b2->ownPage[] = $page1;
 
-		asrt( count( $b2->ownPage ), 0 );
+        R::store($b2);
 
-		// Re-add the page
-		$b2->ownPage[] = $page1;
+        $b2 = R::load('book', $book2->id);
 
-		R::store( $b2 );
+        asrt(count($b2->ownPage), 1);
 
-		$b2 = R::load( 'book', $book2->id );
+        // You are not allowed to re-use the field for something else
+        foreach (
+            array(
+                1, -2.1, array(),
+                true, 'NULL', new \stdClass(),
+                'just a string', array( 'a' => 1 ), 0,
+            ) as $value
+        ) {
+            try {
+                $page1->book = $value;
+                fail();
+            } catch (RedException $e) {
+                pass();
+            }
+        }
 
-		asrt( count( $b2->ownPage ), 1 );
+        // Test fk, not allowed to set to 0
+        $page1 = reset($b2->ownPage);
 
-		// You are not allowed to re-use the field for something else
-		foreach (
-			array(
-				1, -2.1, array(),
-				TRUE, 'NULL', new \stdClass,
-				'just a string', array( 'a' => 1 ), 0
-			) as $value
-		) {
-			try {
-				$page1->book = $value;
-				fail();
-			} catch ( RedException $e ) {
-				pass();
-			}
-		}
+        $page1->book_id = 0;
 
-		// Test fk, not allowed to set to 0
-		$page1 = reset( $b2->ownPage );
+        // Even uglier way, but still needs to work
+        $page1 = reset($b2->ownPage);
 
-		$page1->book_id = 0;
+        $page1->book_id = null;
 
-		// Even uglier way, but still needs to work
-		$page1 = reset( $b2->ownPage );
+        R::store($b2);
 
-		$page1->book_id = NULL;
+        $b2 = R::load('book', $book2->id);
 
-		R::store( $b2 );
+        asrt(count($b2->ownPage), 0);
 
-		$b2 = R::load( 'book', $book2->id );
+        // Test shared items
+        $book = R::load('book', $id);
 
-		asrt( count( $b2->ownPage ), 0 );
+        $book->sharedTopic[] = $topic1;
 
-		// Test shared items
-		$book = R::load( 'book', $id );
+        $id = R::store($book);
 
-		$book->sharedTopic[] = $topic1;
+        // Add an item
+        asrt(count($book->sharedTopic), 1);
+        asrt(reset($book->sharedTopic)->name, 'holiday');
 
-		$id = R::store( $book );
+        $book = R::load('book', $id);
 
-		// Add an item
-		asrt( count( $book->sharedTopic ), 1 );
-		asrt( reset( $book->sharedTopic )->name, 'holiday' );
+        asrt(count($book->sharedTopic), 1);
+        asrt(reset($book->sharedTopic)->name, 'holiday');
 
-		$book = R::load( 'book', $id );
+        // Add another item
+        $book->sharedTopic[] = $topic2;
 
-		asrt( count( $book->sharedTopic ), 1 );
-		asrt( reset( $book->sharedTopic )->name, 'holiday' );
+        $id   = R::store($book);
+        $tidx = R::store(R::dispense('topic'));
 
-		// Add another item
-		$book->sharedTopic[] = $topic2;
+        $book = R::load('book', $id);
 
-		$id   = R::store( $book );
-		$tidx = R::store( R::dispense( 'topic' ) );
+        asrt(count($book->sharedTopic), 2);
 
-		$book = R::load( 'book', $id );
+        $t1 = $book->sharedTopic[1];
+        $t2 = $book->sharedTopic[2];
 
-		asrt( count( $book->sharedTopic ), 2 );
+        asrt($t1->name, 'holiday');
+        asrt($t2->name, 'cooking');
 
-		$t1 = $book->sharedTopic[1];
-		$t2 = $book->sharedTopic[2];
+        // Remove an item
+        unset($book->sharedTopic[2]);
 
-		asrt( $t1->name, 'holiday' );
-		asrt( $t2->name, 'cooking' );
+        asrt(count($book->sharedTopic), 1);
 
-		// Remove an item
-		unset( $book->sharedTopic[2] );
+        $id = R::store($book);
 
-		asrt( count( $book->sharedTopic ), 1 );
+        $book = R::load('book', $id);
 
-		$id = R::store( $book );
+        asrt(count($book->sharedTopic), 1);
+        asrt(reset($book->sharedTopic)->name, 'holiday');
 
-		$book = R::load( 'book', $id );
+        // Add and change
+        $book->sharedTopic[]        = $topic3;
+        $book->sharedTopic[1]->name = 'tropics';
 
-		asrt( count( $book->sharedTopic ), 1 );
-		asrt( reset( $book->sharedTopic )->name, 'holiday' );
+        $id = R::store($book);
 
-		// Add and change
-		$book->sharedTopic[]        = $topic3;
-		$book->sharedTopic[1]->name = 'tropics';
+        $book = R::load('book', $id);
 
-		$id = R::store( $book );
+        asrt(count($book->sharedTopic), 2);
+        asrt($book->sharedTopic[1]->name, 'tropics');
 
-		$book = R::load( 'book', $id );
+        testids($book->sharedTopic);
 
-		asrt( count( $book->sharedTopic ), 2 );
-		asrt( $book->sharedTopic[1]->name, 'tropics' );
+        R::trash(R::load('topic', $tidx));
 
-		testids( $book->sharedTopic );
+        $id = R::store($book);
 
-		R::trash( R::load( 'topic', $tidx ) );
+        $book = R::load('book', $id);
 
-		$id = R::store( $book );
+        // Delete without save
+        unset($book->sharedTopic[1]);
 
-		$book = R::load( 'book', $id );
+        $book = R::load('book', $id);
 
-		// Delete without save
-		unset( $book->sharedTopic[1] );
+        asrt(count($book->sharedTopic), 2);
 
-		$book = R::load( 'book', $id );
+        $book = R::load('book', $id);
 
-		asrt( count( $book->sharedTopic ), 2 );
+        // Delete without init
+        asrt((R::count('topic')), 3);
 
-		$book = R::load( 'book', $id );
+        unset($book->sharedTopic[1]);
 
-		// Delete without init
-		asrt( ( R::count( 'topic' ) ), 3 );
+        $id = R::store($book);
 
-		unset( $book->sharedTopic[1] );
+        asrt((R::count('topic')), 3);
+        asrt(count($book->sharedTopic), 1);
+        asrt(count($book2->sharedTopic), 0);
 
-		$id = R::store( $book );
+        // Add same topic to other book
+        $book2->sharedTopic[] = $topic3;
 
-		asrt( ( R::count( 'topic' ) ), 3 );
-		asrt( count( $book->sharedTopic ), 1 );
-		asrt( count( $book2->sharedTopic ), 0 );
+        asrt(count($book2->sharedTopic), 1);
 
-		// Add same topic to other book
-		$book2->sharedTopic[] = $topic3;
+        $id2 = R::store($book2);
 
-		asrt( count( $book2->sharedTopic ), 1 );
+        asrt(count($book2->sharedTopic), 1);
 
-		$id2 = R::store( $book2 );
+        $book2 = R::load('book', $id2);
 
-		asrt( count( $book2->sharedTopic ), 1 );
+        asrt(count($book2->sharedTopic), 1);
 
-		$book2 = R::load( 'book', $id2 );
+        // Get books for topic
+        asrt($topic3->countShared('book'), 2);
 
-		asrt( count( $book2->sharedTopic ), 1 );
+        $t3 = R::load('topic', $topic3->id);
 
-		// Get books for topic
-		asrt( $topic3->countShared('book'), 2 );
+        asrt(count($t3->sharedBook), 2);
 
+        // Nuke an own-array, replace entire array at once without getting first
+        $page2->id    = 0;
+        $page2->title = 'yet another page 2';
+        $page4->id    = 0;
+        $page4->title = 'yet another page 4';
 
-		$t3 = R::load( 'topic', $topic3->id );
+        $book = R::load('book', $id);
 
-		asrt( count( $t3->sharedBook ), 2 );
+        $book->ownPage = array( $page2, $page4 );
 
+        R::store($book);
 
-		// Nuke an own-array, replace entire array at once without getting first
-		$page2->id    = 0;
-		$page2->title = 'yet another page 2';
-		$page4->id    = 0;
-		$page4->title = 'yet another page 4';
+        $book = R::load('book', $id);
 
-		$book = R::load( 'book', $id );
+        asrt(count($book->ownPage), 2);
+        asrt(reset($book->ownPage)->title, 'yet another page 2');
+        asrt(end($book->ownPage)->title, 'yet another page 4');
 
-		$book->ownPage = array( $page2, $page4 );
+        testids($book->ownPage);
 
-		R::store( $book );
+        // Test with alias format
+        $book3->cover = $page6;
 
-		$book = R::load( 'book', $id );
+        $idb3 = R::store($book3);
 
-		asrt( count( $book->ownPage ), 2 );
-		asrt( reset( $book->ownPage )->title, 'yet another page 2' );
-		asrt( end( $book->ownPage )->title, 'yet another page 4' );
+        $book3 = R::load('book', $idb3);
 
-		testids( $book->ownPage );
+        $justACover = $book3->fetchAs('page')->cover;
 
-		// Test with alias format
-		$book3->cover = $page6;
+        asrt(($book3->cover instanceof OODBBean), true);
+        asrt($justACover->title, 'cover1');
 
-		$idb3 = R::store( $book3 );
+        // No page property
+        asrt(isset($book3->page), false);
 
-		$book3 = R::load( 'book', $idb3 );
+        // Test doubling and other side effects ... should not occur..
+        $book3->sharedTopic = array( $topic1, $topic2 );
 
-		$justACover = $book3->fetchAs( 'page' )->cover;
+        $book3 = R::load('book', R::store($book3));
 
-		asrt( ( $book3->cover instanceof OODBBean ), TRUE );
-		asrt( $justACover->title, 'cover1' );
+        $book3->sharedTopic = array();
 
-		// No page property
-		asrt( isset( $book3->page ), FALSE );
+        $book3 = R::load('book', R::store($book3));
 
-		// Test doubling and other side effects ... should not occur..
-		$book3->sharedTopic = array( $topic1, $topic2 );
+        asrt(count($book3->sharedTopic), 0);
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        $book3->sharedTopic[] = $topic1;
 
-		$book3->sharedTopic = array();
+        $book3 = R::load('book', R::store($book3));
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        // Added only one, not more?
+        asrt(count($book3->sharedTopic), 1);
+        asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")), 1);
 
-		asrt( count( $book3->sharedTopic ), 0 );
+        // Add the same
+        $book3->sharedTopic[] = $topic1;
 
-		$book3->sharedTopic[] = $topic1;
+        $book3 = R::load('book', R::store($book3));
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        asrt(count($book3->sharedTopic), 1);
+        asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")), 1);
 
-		// Added only one, not more?
-		asrt( count( $book3->sharedTopic ), 1 );
-		asrt( intval( R::getCell( "select count(*) from book_topic where book_id = $idb3" ) ), 1 );
+        $book3->sharedTopic['differentkey'] = $topic1;
 
-		// Add the same
-		$book3->sharedTopic[] = $topic1;
+        $book3 = R::load('book', R::store($book3));
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        asrt(count($book3->sharedTopic), 1);
+        asrt(intval(R::getCell("select count(*) from book_topic where book_id = $idb3")), 1);
 
-		asrt( count( $book3->sharedTopic ), 1 );
-		asrt( intval( R::getCell( "select count(*) from book_topic where book_id = $idb3" ) ), 1 );
+        // Ugly assign, auto array generation
+        $book3->ownPage[] = $page1;
 
-		$book3->sharedTopic['differentkey'] = $topic1;
+        $book3 = R::load('book', R::store($book3));
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        asrt(count($book3->ownPage), 1);
+        asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")), 1);
 
-		asrt( count( $book3->sharedTopic ), 1 );
-		asrt( intval( R::getCell( "select count(*) from book_topic where book_id = $idb3" ) ), 1 );
+        $book3 = R::load('book', $idb3);
 
-		// Ugly assign, auto array generation
-		$book3->ownPage[] = $page1;
+        $book3->ownPage = array();
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        // No change until saved
+        asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")), 1);
 
-		asrt( count( $book3->ownPage ), 1 );
-		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 1 );
+        $book3 = R::load('book', R::store($book3));
 
-		$book3 = R::load( 'book', $idb3 );
+        asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")), 0);
+        asrt(count($book3->ownPage), 0);
 
-		$book3->ownPage = array();
+        $book3 = R::load('book', $idb3);
 
-		// No change until saved
-		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 1 );
+        /**
+         * Why do I need to do this ---> why does trash() not set id -> 0?
+         * Because you unset() so trash is done on origin not bean
+         */
+        $page1->id = 0;
+        $page2->id = 0;
+        $page3->id = 0;
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        $book3->ownPage[] = $page1;
+        $book3->ownPage[] = $page2;
+        $book3->ownPage[] = $page3;
 
-		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 0 );
-		asrt( count( $book3->ownPage ), 0 );
+        $book3 = R::load('book', R::store($book3));
 
-		$book3 = R::load( 'book', $idb3 );
+        asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")), 3);
 
-		/**
-		 * Why do I need to do this ---> why does trash() not set id -> 0?
-		 * Because you unset() so trash is done on origin not bean
-		 */
-		$page1->id = 0;
-		$page2->id = 0;
-		$page3->id = 0;
+        asrt(count($book3->ownPage), 3);
 
-		$book3->ownPage[] = $page1;
-		$book3->ownPage[] = $page2;
-		$book3->ownPage[] = $page3;
+        unset($book3->ownPage[$page2->id]);
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        $book3->ownPage[]                  = $page3;
+        $book3->ownPage['try_to_trick_ya'] = $page3;
 
-		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 3 );
+        $book3 = R::load('book', R::store($book3));
 
-		asrt( count( $book3->ownPage ), 3 );
+        asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")), 2);
 
-		unset( $book3->ownPage[$page2->id] );
+        asrt(count($book3->ownPage), 2);
 
-		$book3->ownPage[]                  = $page3;
-		$book3->ownPage['try_to_trick_ya'] = $page3;
+        // Delete and re-add
+        $book3 = R::load('book', $idb3);
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        unset($book3->ownPage[10]);
 
-		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 2 );
+        $book3->ownPage[] = $page1;
 
-		asrt( count( $book3->ownPage ), 2 );
+        $book3 = R::load('book', R::store($book3));
 
-		// Delete and re-add
-		$book3 = R::load( 'book', $idb3 );
+        asrt(count($book3->ownPage), 2);
 
-		unset( $book3->ownPage[10] );
+        $book3 = R::load('book', $idb3);
 
-		$book3->ownPage[] = $page1;
+        unset($book3->sharedTopic[1]);
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        $book3->sharedTopic[] = $topic1;
 
-		asrt( count( $book3->ownPage ), 2 );
+        $book3 = R::load('book', R::store($book3));
 
-		$book3 = R::load( 'book', $idb3 );
+        asrt(count($book3->sharedTopic), 1);
 
-		unset( $book3->sharedTopic[1] );
+        // Test performance
+        $logger = R::debug(true, 1);
 
-		$book3->sharedTopic[] = $topic1;
+        $book = R::load('book', 1);
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        $book->sharedTopic = array();
 
-		asrt( count( $book3->sharedTopic ), 1 );
+        R::store($book);
 
-		// Test performance
-		$logger = R::debug( true, 1 );
+        // No more than 1 update
+        asrt(count($logger->grep('UPDATE')), 1);
 
-		$book = R::load( 'book', 1 );
+        $book = R::load('book', 1);
 
-		$book->sharedTopic = array();
+        $logger->clear();
 
-		R::store( $book );
+        print_r($book->sharedTopic, 1);
 
-		// No more than 1 update
-		asrt( count( $logger->grep( 'UPDATE' ) ), 1 );
+        // No more than 1 select
+        asrt(count($logger->grep('SELECT')), 1);
 
-		$book = R::load( 'book', 1 );
+        $logger->clear();
 
-		$logger->clear();
+        $book->sharedTopic[] = $topic1;
+        $book->sharedTopic[] = $topic2;
 
-		print_r( $book->sharedTopic, 1 );
+        asrt(count($logger->grep('SELECT')), 0);
 
-		// No more than 1 select
-		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
+        R::store($book);
 
-		$logger->clear();
+        $book->sharedTopic[] = $topic3;
 
-		$book->sharedTopic[] = $topic1;
-		$book->sharedTopic[] = $topic2;
+        // Now do NOT clear all and then add one, just add the one
+        $logger->clear();
 
-		asrt( count( $logger->grep( 'SELECT' ) ), 0 );
+        R::store($book);
 
-		R::store( $book );
+        $book = R::load('book', 1);
 
-		$book->sharedTopic[] = $topic3;
+        asrt(count($book->sharedTopic), 3);
 
-		// Now do NOT clear all and then add one, just add the one
-		$logger->clear();
+        // No deletes
+        asrt(count($logger->grep("DELETE FROM")), 0);
 
-		R::store( $book );
+        $book->sharedTopic['a'] = $topic3;
 
-		$book = R::load( 'book', 1 );
+        unset($book->sharedTopic['a']);
 
-		asrt( count( $book->sharedTopic ), 3 );
+        R::store($book);
 
-		// No deletes
-		asrt( count( $logger->grep( "DELETE FROM" ) ), 0 );
+        $book = R::load('book', 1);
 
-		$book->sharedTopic['a'] = $topic3;
+        asrt(count($book->sharedTopic), 3);
 
-		unset( $book->sharedTopic['a'] );
+        // No deletes
+        asrt(count($logger->grep("DELETE FROM")), 0);
 
-		R::store( $book );
+        $book->ownPage = array();
 
-		$book = R::load( 'book', 1 );
+        R::store($book);
 
-		asrt( count( $book->sharedTopic ), 3 );
+        asrt(count($book->ownPage), 0);
 
-		// No deletes
-		asrt( count( $logger->grep( "DELETE FROM" ) ), 0 );
+        $book->ownPage[]    = $page1;
+        $book->ownPage['a'] = $page2;
 
-		$book->ownPage = array();
+        asrt(count($book->ownPage), 2);
 
-		R::store( $book );
+        R::store($book);
 
-		asrt( count( $book->ownPage ), 0 );
+        unset($book->ownPage['a']);
 
-		$book->ownPage[]    = $page1;
-		$book->ownPage['a'] = $page2;
+        asrt(count($book->ownPage), 2);
 
-		asrt( count( $book->ownPage ), 2 );
+        unset($book->ownPage[11]);
 
-		R::store( $book );
+        R::store($book);
 
-		unset( $book->ownPage['a'] );
+        $book = R::load('book', 1);
 
-		asrt( count( $book->ownPage ), 2 );
+        asrt(count($book->ownPage), 1);
 
-		unset( $book->ownPage[11] );
+        $aPage = $book->ownPage[10];
 
-		R::store( $book );
+        unset($book->ownPage[10]);
 
-		$book = R::load( 'book', 1 );
+        $aPage->title .= ' changed ';
 
-		asrt( count( $book->ownPage ), 1 );
+        $book->ownPage['anotherPage'] = $aPage;
 
-		$aPage = $book->ownPage[10];
+        $logger->clear();
 
-		unset( $book->ownPage[10] );
+        R::store($book);
 
-		$aPage->title .= ' changed ';
+        // if ($db=="mysql") asrt(count($logger->grep("SELECT")),0);
+        $book = R::load('book', 1);
 
-		$book->ownPage['anotherPage'] = $aPage;
+        asrt(count($book->ownPage), 1);
 
-		$logger->clear();
+        $ap = reset($book->ownPage);
 
-		R::store( $book );
+        asrt($ap->title, "pagina1 changed ");
 
-		// if ($db=="mysql") asrt(count($logger->grep("SELECT")),0);
-		$book = R::load( 'book', 1 );
+        // Fix udiff instead of diff
+        $book3->ownPage = array( $page3, $page1 );
 
-		asrt( count( $book->ownPage ), 1 );
+        $i = R::store($book3);
 
-		$ap = reset( $book->ownPage );
+        $book3 = R::load('book', $i);
 
-		asrt( $ap->title, "pagina1 changed " );
+        asrt(intval(R::getCell("select count(*) from page where book_id = $idb3 ")), 2);
+        asrt(count($book3->ownPage), 2);
 
-		// Fix udiff instead of diff
-		$book3->ownPage = array( $page3, $page1 );
+        $pic1->name = 'aaa';
+        $pic2->name = 'bbb';
 
-		$i = R::store( $book3 );
+        R::store($pic1);
+        R::store($q1);
 
-		$book3 = R::load( 'book', $i );
+        $book3->ownPicture[] = $pic1;
+        $book3->ownQuote[]   = $q1;
 
-		asrt( intval( R::getCell( "select count(*) from page where book_id = $idb3 " ) ), 2 );
-		asrt( count( $book3->ownPage ), 2 );
+        $book3 = R::load('book', R::store($book3));
 
-		$pic1->name = 'aaa';
-		$pic2->name = 'bbb';
+        // two own-arrays -->forgot array_merge
+        asrt(count($book3->ownPicture), 1);
+        asrt(count($book3->ownQuote), 1);
+        asrt(count($book3->ownPage), 2);
 
-		R::store( $pic1 );
-		R::store( $q1 );
+        $book3 = R::load('book', R::store($book3));
 
-		$book3->ownPicture[] = $pic1;
-		$book3->ownQuote[]   = $q1;
+        unset($book3->ownPicture[1]);
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        $book3 = R::load('book', R::store($book3));
 
-		// two own-arrays -->forgot array_merge
-		asrt( count( $book3->ownPicture ), 1 );
-		asrt( count( $book3->ownQuote ), 1 );
-		asrt( count( $book3->ownPage ), 2 );
+        asrt(count($book3->ownPicture), 0);
+        asrt(count($book3->ownQuote), 1);
+        asrt(count($book3->ownPage), 2);
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        $book3 = R::load('book', R::store($book3));
 
-		unset( $book3->ownPicture[1] );
+        $NOTE = 0;
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        $quotes = R::dispense('quote', 10);
 
-		asrt( count( $book3->ownPicture ), 0 );
-		asrt( count( $book3->ownQuote ), 1 );
-		asrt( count( $book3->ownPage ), 2 );
+        foreach ($quotes as &$justSomeQuote) {
+            $justSomeQuote->note = 'note'.(++$NOTE);
+        }
 
-		$book3 = R::load( 'book', R::store( $book3 ) );
+        $pictures = R::dispense('picture', 10);
+        foreach ($pictures as &$justSomePic) {
+            $justSomePic->note = 'note'.(++$NOTE);
+        }
 
-		$NOTE = 0;
+        $topics = R::dispense('topic', 10);
+        foreach ($topics as &$justSomeTopic) {
+            $justSomeTopic->note = 'note'.(++$NOTE);
+        }
 
-		$quotes = R::dispense( 'quote', 10 );
+        for ($j = 0; $j < 10; $j++) {
+            // Do several mutations
+            for ($x = 0; $x < rand(1, 20); $x++) {
+                modgr($book3, $quotes, $pictures, $topics);
+            }
 
-		foreach ( $quotes as &$justSomeQuote ) {
-			$justSomeQuote->note = 'note' . ( ++$NOTE );
-		}
+            $qbefore = count($book3->ownQuote);
+            $pbefore = count($book3->ownPicture);
+            $tbefore = count($book3->sharedTopic);
 
-		$pictures = R::dispense( 'picture', 10 );
-		foreach ( $pictures as &$justSomePic ) {
-			$justSomePic->note = 'note' . ( ++$NOTE );
-		}
+            $qjson = json_encode($book->ownQuote);
+            $pjson = json_encode($book->ownPicture);
+            $tjson = json_encode($book->sharedTopic);
 
-		$topics = R::dispense( 'topic', 10 );
-		foreach ( $topics as &$justSomeTopic ) {
-			$justSomeTopic->note = 'note' . ( ++$NOTE );
-		}
+            $book3 = R::load('book', R::store($book3));
 
-		for ( $j = 0; $j < 10; $j++ ) {
-			// Do several mutations
-			for ( $x = 0; $x < rand( 1, 20 ); $x++ ) {
-				modgr( $book3, $quotes, $pictures, $topics );
-			}
+            asrt(count($book3->ownQuote), $qbefore);
+            asrt(count($book3->ownPicture), $pbefore);
+            asrt(count($book3->sharedTopic), $tbefore);
 
-			$qbefore = count( $book3->ownQuote );
-			$pbefore = count( $book3->ownPicture );
-			$tbefore = count( $book3->sharedTopic );
+            asrt(json_encode($book->ownQuote), $qjson);
+            asrt(json_encode($book->ownPicture), $pjson);
+            asrt(json_encode($book->sharedTopic), $tjson);
 
-			$qjson = json_encode( $book->ownQuote );
-			$pjson = json_encode( $book->ownPicture );
-			$tjson = json_encode( $book->sharedTopic );
+            testids($book->ownQuote);
+            testids($book->ownPicture);
+            testids($book->sharedTopic);
+        }
+    }
 
-			$book3 = R::load( 'book', R::store( $book3 ) );
+    /**
+     * Test parent bean relations.
+     *
+     * @return void
+     */
+    public function testParentBean()
+    {
+        $village = R::dispense('village');
 
-			asrt( count( $book3->ownQuote ), $qbefore );
-			asrt( count( $book3->ownPicture ), $pbefore );
-			asrt( count( $book3->sharedTopic ), $tbefore );
+        $village->name = 'village';
 
-			asrt( json_encode( $book->ownQuote ), $qjson );
-			asrt( json_encode( $book->ownPicture ), $pjson );
-			asrt( json_encode( $book->sharedTopic ), $tjson );
+        $home = R::dispense('building');
 
-			testids( $book->ownQuote );
-			testids( $book->ownPicture );
-			testids( $book->sharedTopic );
-		}
-	}
+        $home->village = $village;
 
-	/**
-	 * Test parent bean relations.
-	 *
-	 * @return void
-	 */
-	public function testParentBean()
-	{
-		$village = R::dispense( 'village' );
+        $id = R::store($home);
 
-		$village->name = 'village';
+        $home = R::load('building', $id);
 
-		$home = R::dispense( 'building' );
+        asrt($home->village->name, 'village');
+        asrt(R::count('village'), 1);
+        asrt(R::count('building'), 1);
 
-		$home->village = $village;
+        R::trash($home);
 
-		$id = R::store( $home );
+        pass();
 
-		$home = R::load( 'building', $id );
+        asrt(R::count('village'), 1);
+        asrt(R::count('building'), 0);
+    }
 
-		asrt( $home->village->name, 'village' );
-		asrt( R::count( 'village' ), 1 );
-		asrt( R::count( 'building' ), 1 );
+    /**
+     * test N-M relations through intermediate beans
+     *
+     * @return void
+     */
+    public function testNMRelationsIntermediate()
+    {
+        list($mrA, $mrB, $mrC) = R::dispense('person', 3);
+        list($projA, $projB, $projC) = R::dispense('project', 3);
 
-		R::trash( $home );
+        $projA->title = 'A';
+        $projB->title = 'B';
+        $projC->title = 'C';
 
-		pass();
+        $participant = R::dispense('participant');
 
-		asrt( R::count( 'village' ), 1 );
-		asrt( R::count( 'building' ), 0 );
-	}
+        $projA->link('participant', array( 'role' => 'manager' ))->person                  = $mrA;
+        $projA->link($participant->setAttr('role', 'developer'))->person                 = $mrB;
+        $projB->link(R::dispense('participant')->setAttr('role', 'developer'))->person = $mrB;
+        $projB->link('participant', '{"role":"helpdesk"}')->person                         = $mrC;
+        $projC->link('participant', '{"role":"sales"}')->person                            = $mrC;
 
-	/**
-	 * test N-M relations through intermediate beans
-	 *
-	 * @return void
-	 */
-	public function testNMRelationsIntermediate()
-	{
-		list( $mrA, $mrB, $mrC ) = R::dispense( 'person', 3 );
-		list( $projA, $projB, $projC ) = R::dispense( 'project', 3 );
+        R::storeAll(array( $projA, $projB, $projC ));
 
-		$projA->title = 'A';
-		$projB->title = 'B';
-		$projC->title = 'C';
+        $a = R::findOne('project', ' title = ? ', array( 'A' ));
+        $b = R::findOne('project', ' title = ? ', array( 'B' ));
+        $c = R::findOne('project', ' title = ? ', array( 'C' ));
 
-		$participant = R::dispense( 'participant' );
+        asrt(count($a->ownParticipant), 2);
+        asrt(count($b->ownParticipant), 2);
+        asrt(count($c->ownParticipant), 1);
 
-		$projA->link( 'participant', array( 'role' => 'manager' ) )->person                  = $mrA;
-		$projA->link( $participant->setAttr( 'role', 'developer' ) )->person                 = $mrB;
-		$projB->link( R::dispense( 'participant' )->setAttr( 'role', 'developer' ) )->person = $mrB;
-		$projB->link( 'participant', '{"role":"helpdesk"}' )->person                         = $mrC;
-		$projC->link( 'participant', '{"role":"sales"}' )->person                            = $mrC;
+        $managers = $developers = 0;
 
-		R::storeAll( array( $projA, $projB, $projC ) );
+        foreach ($a->ownParticipant as $p) {
+            if ($p->role === 'manager') {
+                $managers++;
+            }
+            if ($p->role === 'developer') {
+                $developers++;
+            }
+        }
+        $p = reset($a->ownParticipant);
 
-		$a = R::findOne( 'project', ' title = ? ', array( 'A' ) );
-		$b = R::findOne( 'project', ' title = ? ', array( 'B' ) );
-		$c = R::findOne( 'project', ' title = ? ', array( 'C' ) );
+        asrt($p->person->getMeta('type'), 'person');
 
-		asrt( count( $a->ownParticipant ), 2 );
-		asrt( count( $b->ownParticipant ), 2 );
-		asrt( count( $c->ownParticipant ), 1 );
+        asrt(($p->person->id > 0), true);
 
-		$managers = $developers = 0;
+        asrt($managers, 1);
+        asrt($developers, 1);
 
-		foreach ( $a->ownParticipant as $p ) {
-			if ( $p->role === 'manager' ) {
-				$managers++;
-			}
-			if ( $p->role === 'developer' ) {
-				$developers++;
-			}
-		}
-		$p = reset( $a->ownParticipant );
+        asrt((int) R::count('participant'), 5);
+        asrt((int) R::count('person'), 3);
+    }
 
-		asrt( $p->person->getMeta( 'type' ), 'person' );
+    /**
+     * test emulation of sharedList through intermediate beans
+     *
+     * @return void
+     */
+    public function testSharedListIntermediate()
+    {
+        list($v1, $v2, $v3) = R::dispense('village', 3);
+        list($a1, $a2, $a3) = R::dispense('army', 3);
 
-		asrt( ( $p->person->id > 0 ), TRUE );
+        $a1->name = 'one';
+        $a2->name = 'two';
+        $a3->name = 'three';
 
-		asrt( $managers, 1 );
-		asrt( $developers, 1 );
+        $v1->name = 'Ville 1';
+        $v2->name = 'Ville 2';
+        $v3->name = 'Ville 3';
 
-		asrt( (int) R::count( 'participant' ), 5 );
-		asrt( (int) R::count( 'person' ), 3 );
-	}
+        $v1->link('armyVillage')->army    = $a3;
+        $v2->link('army_village')->army    = $a2;
+        $v3->link('armyVillage')->army    = $a1;
+        $a2->link('army_village')->village = $v1;
 
-	/**
-	 * test emulation of sharedList through intermediate beans
-	 *
-	 * @return void
-	 */
-	public function testSharedListIntermediate()
-	{
-		list( $v1, $v2, $v3 ) = R::dispense( 'village', 3 );
-		list( $a1, $a2, $a3 ) = R::dispense( 'army', 3 );
+        $id1 = R::store($v1);
+        $id2 = R::store($v2);
+        $id3 = R::store($v3);
 
-		$a1->name = 'one';
-		$a2->name = 'two';
-		$a3->name = 'three';
+        $village1 = R::load('village', $id1);
+        $village2 = R::load('village', $id2);
+        $village3 = R::load('village', $id3);
 
-		$v1->name = 'Ville 1';
-		$v2->name = 'Ville 2';
-		$v3->name = 'Ville 3';
+        asrt(count($village1->sharedArmy), 2);
+        asrt(count($village2->sharedArmy), 1);
+        asrt(count($village3->sharedArmy), 1);
+    }
 
+    /**
+     * test emulation via association renaming
+     *
+     * @return void
+     */
+    public function testAssociationRenaming()
+    {
+        list($p1, $p2, $p3) = R::dispense('painting', 3);
 
-		$v1->link( 'armyVillage' )->army    = $a3;
-		$v2->link( 'army_village' )->army    = $a2;
-		$v3->link( 'armyVillage' )->army    = $a1;
-		$a2->link( 'army_village' )->village = $v1;
+        list($m1, $m2, $m3) = R::dispense('museum', 3);
 
-		$id1 = R::store( $v1 );
-		$id2 = R::store( $v2 );
-		$id3 = R::store( $v3 );
+        $p1->name = 'painting1';
+        $p2->name = 'painting2';
+        $p3->name = 'painting3';
 
-		$village1 = R::load( 'village', $id1 );
-		$village2 = R::load( 'village', $id2 );
-		$village3 = R::load( 'village', $id3 );
+        $m1->thename = 'a';
+        $m2->thename = 'b';
+        $m3->thename = 'c';
 
-		asrt( count( $village1->sharedArmy ), 2 );
-		asrt( count( $village2->sharedArmy ), 1 );
-		asrt( count( $village3->sharedArmy ), 1 );
-	}
+        R::renameAssociation('museum_painting', 'exhibited');
 
-	/**
-	 * test emulation via association renaming
-	 *
-	 * @return void
-	 */
-	public function testAssociationRenaming()
-	{
-		list( $p1, $p2, $p3 ) = R::dispense( 'painting', 3 );
+        // Also test array syntax
+        R::renameAssociation(array( 'museum_museum' => 'center' ));
 
-		list( $m1, $m2, $m3 ) = R::dispense( 'museum', 3 );
+        $m1->link('center', array( 'name' => 'History Center' ))->museum2            = $m2;
+        $m1->link('exhibited', '{"from":"2014-02-01","til":"2014-07-02"}')->painting = $p3;
+        $m2->link('exhibited', '{"from":"2014-07-03","til":"2014-10-02"}')->painting = $p3;
+        $m3->link('exhibited', '{"from":"2014-02-01","til":"2014-07-02"}')->painting = $p1;
+        $m2->link('exhibited', '{"from":"2014-02-01","til":"2014-07-02"}')->painting = $p2;
 
-		$p1->name = 'painting1';
-		$p2->name = 'painting2';
-		$p3->name = 'painting3';
+        R::storeAll(array( $m1, $m2, $m3 ));
 
-		$m1->thename = 'a';
-		$m2->thename = 'b';
-		$m3->thename = 'c';
+        list($m1, $m2, $m3) = array_values(R::findAll('museum', ' ORDER BY thename ASC'));
 
-		R::renameAssociation( 'museum_painting', 'exhibited' );
+        asrt(count($m1->sharedMuseum), 1);
+        asrt(count($m1->sharedPainting), 1);
+        asrt(count($m2->sharedPainting), 2);
+        asrt(count($m3->sharedPainting), 1);
 
-		// Also test array syntax
-		R::renameAssociation( array( 'museum_museum' => 'center' ) );
+        $p3 = reset($m1->sharedPainting);
 
-		$m1->link( 'center', array( 'name' => 'History Center' ) )->museum2            = $m2;
-		$m1->link( 'exhibited', '{"from":"2014-02-01","til":"2014-07-02"}' )->painting = $p3;
-		$m2->link( 'exhibited', '{"from":"2014-07-03","til":"2014-10-02"}' )->painting = $p3;
-		$m3->link( 'exhibited', '{"from":"2014-02-01","til":"2014-07-02"}' )->painting = $p1;
-		$m2->link( 'exhibited', '{"from":"2014-02-01","til":"2014-07-02"}' )->painting = $p2;
+        asrt(count($p3->ownExhibited), 2);
+        asrt(count($m2->ownExhibited), 2);
 
-		R::storeAll( array( $m1, $m2, $m3 ) );
+        R::storeAll(array( $m1, $m2, $m3 ));
 
-		list( $m1, $m2, $m3 ) = array_values( R::findAll( 'museum', ' ORDER BY thename ASC' ) );
+        list($m1, $m2, $m3) = array_values(R::findAll('museum', ' ORDER BY thename ASC'));
 
-		asrt( count( $m1->sharedMuseum ), 1 );
-		asrt( count( $m1->sharedPainting ), 1 );
-		asrt( count( $m2->sharedPainting ), 2 );
-		asrt( count( $m3->sharedPainting ), 1 );
+        asrt(count($m1->sharedPainting), 1);
+        asrt(count($m2->sharedPainting), 2);
+        asrt(count($m3->sharedPainting), 1);
 
-		$p3 = reset( $m1->sharedPainting );
+        $p3 = reset($m1->sharedPainting);
 
-		asrt( count( $p3->ownExhibited ), 2 );
-		asrt( count( $m2->ownExhibited ), 2 );
+        asrt(count($p3->ownExhibited), 2);
 
-		R::storeAll( array( $m1, $m2, $m3 ) );
+        $paintings = $m2->sharedPainting;
 
-		list( $m1, $m2, $m3 ) = array_values( R::findAll( 'museum', ' ORDER BY thename ASC' ) );
+        foreach ($paintings as $painting) {
+            if ($painting->name === 'painting2') {
+                pass();
+                $paintingX = $painting;
+            }
+        }
 
-		asrt( count( $m1->sharedPainting ), 1 );
-		asrt( count( $m2->sharedPainting ), 2 );
-		asrt( count( $m3->sharedPainting ), 1 );
+        unset($m2->sharedPainting[$paintingX->id]);
 
-		$p3 = reset( $m1->sharedPainting );
+        R::store($m2);
 
-		asrt( count( $p3->ownExhibited ), 2 );
+        $m2 = R::load('museum', $m2->id);
 
-		$paintings = $m2->sharedPainting;
+        asrt(count($m2->sharedPainting), 1);
 
-		foreach ( $paintings as $painting ) {
-			if ( $painting->name === 'painting2' ) {
-				pass();
-				$paintingX = $painting;
-			}
-		}
+        $left = reset($m2->sharedPainting);
 
-		unset( $m2->sharedPainting[$paintingX->id] );
+        asrt($left->name, 'painting3');
+        asrt(count($m2->ownExhibited), 1);
 
-		R::store( $m2 );
+        $exhibition = reset($m2->ownExhibited);
 
-		$m2 = R::load( 'museum', $m2->id );
+        asrt($exhibition->from, '2014-07-03');
+        asrt($exhibition->til, '2014-10-02');
+    }
 
-		asrt( count( $m2->sharedPainting ), 1 );
+    /**
+     * Test don't try to store other things in shared list.
+     *
+     * @return void
+     */
+    public function testDontTryToStoreOtherThingsInSharedList()
+    {
+        $book = R::dispense('book');
+        $book->sharedPage[] = 'nonsense';
 
-		$left = reset( $m2->sharedPainting );
+        try {
+            R::store($book);
+            fail();
+        } catch (RedException $exception) {
+            pass();
+        }
 
-		asrt( $left->name, 'painting3' );
-		asrt( count( $m2->ownExhibited ), 1 );
+        $book->sharedPageList = R::dispense('page', 2);
+        R::store($book);
+        $book->sharedPageList;
+        R::trash($book);
+        asrt(R::count('page'), 2);
+    }
 
-		$exhibition = reset( $m2->ownExhibited );
+    /**
+     * Test whether magic array interface functions like isset() and
+     * unset work correctly with the x-own-list and the List-suffix.
+     *
+     * Array functions do not reveal x-own-lists and list-alias because
+     * you dont want duplicate entries in foreach-loops.
+     * Also offers a slight performance improvement for array access.
+     *
+     * @return void
+     */
+    public function testWhetherIssetWorksWithXList()
+    {
+        R::nuke();
+        $book = R::dispense('book');
+        $page = R::dispense('page');
 
-		asrt( $exhibition->from, '2014-07-03' );
-		asrt( $exhibition->til, '2014-10-02' );
-	}
+        asrt(isset($book->xownPageList), false);
+        asrt(isset($book->ownPageList), false);
+        asrt(isset($book->xownPage), false);
+        asrt(isset($book->ownPage), false);
 
-	/**
-	 * Test don't try to store other things in shared list.
-	 *
-	 * @return void
-	 */
-	public function testDontTryToStoreOtherThingsInSharedList() {
+        $book->xownPageList[] = $page;
 
-		$book = R::dispense( 'book' );
-		$book->sharedPage[] = 'nonsense';
+        asrt(isset($book->xownPageList), true);
+        asrt(isset($book->ownPageList), true);
+        asrt(isset($book->xownPage), true);
+        asrt(isset($book->ownPage), true);
 
-		try {
-			R::store( $book );
-			fail();
-		} catch( RedException $exception) {
-			pass();
-		}
+        //Test array access
+        asrt(isset($book['xownPageList']), true);
+        asrt(isset($book['ownPageList']), true);
+        asrt(isset($book['xownPage']), true);
+        asrt(isset($book['ownPage']), true);
 
-		$book->sharedPageList = R::dispense( 'page', 2 );
-		R::store( $book );
-		$book->sharedPageList;
-		R::trash( $book );
-		asrt( R::count('page'), 2 );
-	}
+        R::store($book);
+        $book = $book->fresh();
 
-	/**
-	 * Test whether magic array interface functions like isset() and
-	 * unset work correctly with the x-own-list and the List-suffix.
-	 *
-	 * Array functions do not reveal x-own-lists and list-alias because
-	 * you dont want duplicate entries in foreach-loops.
-	 * Also offers a slight performance improvement for array access.
-	 *
-	 * @return void
-	 */
-	public function testWhetherIssetWorksWithXList()
-	{
-		R::nuke();
-		$book = R::dispense( 'book' );
-		$page = R::dispense( 'page' );
+        asrt(isset($book->xownPageList), false);
+        asrt(isset($book->ownPageList), false);
+        asrt(isset($book->xownPage), false);
+        asrt(isset($book->ownPage), false);
 
-		asrt( isset( $book->xownPageList ), FALSE );
-		asrt( isset( $book->ownPageList ), FALSE );
-		asrt( isset( $book->xownPage ), FALSE );
-		asrt( isset( $book->ownPage ), FALSE );
+        asrt(isset($book['xownPageList']), false);
+        asrt(isset($book['ownPageList']), false);
+        asrt(isset($book['xownPage']), false);
+        asrt(isset($book['ownPage']), false);
 
-		$book->xownPageList[] = $page;
+        $book->xownPageList;
 
-		asrt( isset( $book->xownPageList ), TRUE );
-		asrt( isset( $book->ownPageList ), TRUE );
-		asrt( isset( $book->xownPage ), TRUE );
-		asrt( isset( $book->ownPage ), TRUE );
+        asrt(isset($book->xownPageList), true);
+        asrt(isset($book->ownPageList), true);
+        asrt(isset($book->xownPage), true);
+        asrt(isset($book->ownPage), true);
 
-		//Test array access
-		asrt( isset( $book['xownPageList'] ), TRUE );
-		asrt( isset( $book['ownPageList'] ), TRUE );
-		asrt( isset( $book['xownPage'] ), TRUE );
-		asrt( isset( $book['ownPage'] ), TRUE );
+        asrt(isset($book['xownPageList']), true);
+        asrt(isset($book['ownPageList']), true);
+        asrt(isset($book['xownPage']), true);
+        asrt(isset($book['ownPage']), true);
 
-		R::store( $book );
-		$book = $book->fresh();
+        $book = $book->fresh();
 
-		asrt( isset( $book->xownPageList ), FALSE );
-		asrt( isset( $book->ownPageList ), FALSE );
-		asrt( isset( $book->xownPage ), FALSE );
-		asrt( isset( $book->ownPage ), FALSE );
+        asrt(isset($book->xownPageList), false);
+        asrt(isset($book->ownPageList), false);
+        asrt(isset($book->xownPage), false);
+        asrt(isset($book->ownPage), false);
 
-		asrt( isset( $book['xownPageList'] ), FALSE );
-		asrt( isset( $book['ownPageList'] ), FALSE );
-		asrt( isset( $book['xownPage'] ), FALSE );
-		asrt( isset( $book['ownPage'] ), FALSE );
+        asrt(isset($book['xownPageList']), false);
+        asrt(isset($book['ownPageList']), false);
+        asrt(isset($book['xownPage']), false);
+        asrt(isset($book['ownPage']), false);
 
-		$book->xownPageList;
+        $book->noLoad()->xownPageList;
 
-		asrt( isset( $book->xownPageList ), TRUE );
-		asrt( isset( $book->ownPageList ), TRUE );
-		asrt( isset( $book->xownPage ), TRUE );
-		asrt( isset( $book->ownPage ), TRUE );
+        asrt(isset($book->xownPageList), true);
+        asrt(isset($book->ownPageList), true);
 
-		asrt( isset( $book['xownPageList'] ), TRUE );
-		asrt( isset( $book['ownPageList'] ), TRUE );
-		asrt( isset( $book['xownPage'] ), TRUE );
-		asrt( isset( $book['ownPage'] ), TRUE );
+        //but empty
+        asrt(count($book->ownPageList), 0);
+        asrt(count($book->xownPageList), 0);
+        asrt(count($book->ownPage), 0);
+        asrt(count($book->xownPage), 0);
 
-		$book = $book->fresh();
+        $book->xownPageList[] = $page;
+        asrt(isset($book->xownPageList), true);
+        asrt(isset($book->ownPageList), true);
+        asrt(isset($book->xownPage), true);
+        asrt(isset($book->ownPage), true);
 
-		asrt( isset( $book->xownPageList ), FALSE );
-		asrt( isset( $book->ownPageList ), FALSE );
-		asrt( isset( $book->xownPage ), FALSE );
-		asrt( isset( $book->ownPage ), FALSE );
+        asrt(isset($book['xownPageList']), true);
+        asrt(isset($book['ownPageList']), true);
+        asrt(isset($book['xownPage']), true);
+        asrt(isset($book['ownPage']), true);
 
-		asrt( isset( $book['xownPageList'] ), FALSE );
-		asrt( isset( $book['ownPageList'] ), FALSE );
-		asrt( isset( $book['xownPage'] ), FALSE );
-		asrt( isset( $book['ownPage'] ), FALSE );
+        unset($book->xownPageList);
 
-		$book->noLoad()->xownPageList;
+        asrt(isset($book->xownPageList), false);
+        asrt(isset($book->ownPageList), false);
+        asrt(isset($book->xownPage), false);
+        asrt(isset($book->ownPage), false);
 
-		asrt( isset( $book->xownPageList ), TRUE );
-		asrt( isset( $book->ownPageList ), TRUE );
+        asrt(isset($book['xownPageList']), false);
+        asrt(isset($book['ownPageList']), false);
+        asrt(isset($book['xownPage']), false);
+        asrt(isset($book['ownPage']), false);
 
-		//but empty
-		asrt( count( $book->ownPageList ), 0 );
-		asrt( count( $book->xownPageList ), 0 );
-		asrt( count( $book->ownPage ), 0 );
-		asrt( count( $book->xownPage ), 0 );
+        $book->xownPageList[] = $page;
 
-		$book->xownPageList[] = $page;
-		asrt( isset( $book->xownPageList ), TRUE );
-		asrt( isset( $book->ownPageList ), TRUE );
-		asrt( isset( $book->xownPage ), TRUE );
-		asrt( isset( $book->ownPage ), TRUE );
+        asrt(isset($book->xownPageList), true);
+        asrt(isset($book->ownPageList), true);
+        asrt(isset($book->xownPage), true);
+        asrt(isset($book->ownPage), true);
 
-		asrt( isset( $book['xownPageList'] ), TRUE );
-		asrt( isset( $book['ownPageList'] ), TRUE );
-		asrt( isset( $book['xownPage'] ), TRUE );
-		asrt( isset( $book['ownPage'] ), TRUE );
+        asrt(isset($book['xownPageList']), true);
+        asrt(isset($book['ownPageList']), true);
+        asrt(isset($book['xownPage']), true);
+        asrt(isset($book['ownPage']), true);
 
-		unset( $book->xownPageList );
+        unset($book->xownPage);
 
-		asrt( isset( $book->xownPageList ), FALSE );
-		asrt( isset( $book->ownPageList ), FALSE );
-		asrt( isset( $book->xownPage ), FALSE );
-		asrt( isset( $book->ownPage ), FALSE );
+        asrt(isset($book->xownPageList), false);
+        asrt(isset($book->ownPageList), false);
+        asrt(isset($book->xownPage), false);
+        asrt(isset($book->ownPage), false);
 
-		asrt( isset( $book['xownPageList'] ), FALSE );
-		asrt( isset( $book['ownPageList'] ), FALSE );
-		asrt( isset( $book['xownPage'] ), FALSE );
-		asrt( isset( $book['ownPage'] ), FALSE );
+        asrt(isset($book['xownPageList']), false);
+        asrt(isset($book['ownPageList']), false);
+        asrt(isset($book['xownPage']), false);
+        asrt(isset($book['ownPage']), false);
 
-		$book->xownPageList[] = $page;
+        $book = $book->fresh();
+        asrt(isset($book->xownPageList), false);
+        asrt(isset($book->ownPageList), false);
+        asrt(isset($book->xownPage), false);
+        asrt(isset($book->ownPage), false);
 
-		asrt( isset( $book->xownPageList ), TRUE );
-		asrt( isset( $book->ownPageList ), TRUE );
-		asrt( isset( $book->xownPage ), TRUE );
-		asrt( isset( $book->ownPage ), TRUE );
+        asrt(isset($book['xownPageList']), false);
+        asrt(isset($book['ownPageList']), false);
+        asrt(isset($book['xownPage']), false);
+        asrt(isset($book['ownPage']), false);
 
-		asrt( isset( $book['xownPageList'] ), TRUE );
-		asrt( isset( $book['ownPageList'] ), TRUE );
-		asrt( isset( $book['xownPage'] ), TRUE );
-		asrt( isset( $book['ownPage'] ), TRUE );
+        $book->ownPageList;
+        asrt(isset($book->xownPageList), true);
+        asrt(isset($book->ownPageList), true);
+        asrt(isset($book->xownPage), true);
+        asrt(isset($book->ownPage), true);
 
-		unset( $book->xownPage );
+        asrt(isset($book['xownPageList']), true);
+        asrt(isset($book['ownPageList']), true);
+        asrt(isset($book['xownPage']), true);
+        asrt(isset($book['ownPage']), true);
+    }
 
-		asrt( isset( $book->xownPageList ), FALSE );
-		asrt( isset( $book->ownPageList ), FALSE );
-		asrt( isset( $book->xownPage ), FALSE );
-		asrt( isset( $book->ownPage ), FALSE );
+    /**
+     * Test whether you can still set items starting with 'xown' or
+     * 'own' not followed by an uppercase character.
+     *
+     * @return void
+     */
+    public function testConfusionWithXOwnList()
+    {
+        $book = R::dispense('book');
+        $book->xownitem = 1;
+        asrt(isset($book->xownitem), true);
+        asrt((int) $book->xownitem, 1);
+        asrt(isset($book->xownItem), false);
+        asrt(isset($book->xownItemList), false);
+        $book->ownitem = 1;
+        asrt(isset($book->ownitem), true);
+        asrt((int) $book->ownitem, 1);
+        asrt(isset($book->ownItemList), false);
+        R::store($book);
+        $book = $book->fresh();
+        asrt(isset($book->xownitem), true);
+        asrt((int) $book->xownitem, 1);
+        asrt(isset($book->xownItem), false);
+        asrt(isset($book->xownItemList), false);
+        asrt(isset($book->ownitem), true);
+        asrt((int) $book->ownitem, 1);
+        asrt(isset($book->ownItemList), false);
+    }
 
-		asrt( isset( $book['xownPageList'] ), FALSE );
-		asrt( isset( $book['ownPageList'] ), FALSE );
-		asrt( isset( $book['xownPage'] ), FALSE );
-		asrt( isset( $book['ownPage'] ), FALSE );
+    /**
+     * Test whether we can determine the mode of a list.
+     *
+     * @return void
+     */
+    public function testModeCheckerOfLists()
+    {
+        foreach (array( 'ownPage', 'xownPage', 'ownPageList', 'xownPageList' ) as $listName) {
+            $book = R::dispense('book');
+            asrt($book->isListInExclusiveMode($listName), false);
+            $book->ownPageList[] = R::dispense('page');
+            asrt($book->isListInExclusiveMode($listName), false);
 
-		$book = $book->fresh();
-		asrt( isset( $book->xownPageList ), FALSE );
-		asrt( isset( $book->ownPageList ), FALSE );
-		asrt( isset( $book->xownPage ), FALSE );
-		asrt( isset( $book->ownPage ), FALSE );
+            $book = R::dispense('book');
+            asrt($book->isListInExclusiveMode($listName), false);
+            $book->xownPageList[] = R::dispense('page');
+            asrt($book->isListInExclusiveMode($listName), true);
 
-		asrt( isset( $book['xownPageList'] ), FALSE );
-		asrt( isset( $book['ownPageList'] ), FALSE );
-		asrt( isset( $book['xownPage'] ), FALSE );
-		asrt( isset( $book['ownPage'] ), FALSE );
+            $book = R::dispense('book');
+            asrt($book->isListInExclusiveMode($listName), false);
+            $book->ownPage[] = R::dispense('page');
+            asrt($book->isListInExclusiveMode($listName), false);
 
-		$book->ownPageList;
-		asrt( isset( $book->xownPageList ), TRUE );
-		asrt( isset( $book->ownPageList ), TRUE );
-		asrt( isset( $book->xownPage ), TRUE );
-		asrt( isset( $book->ownPage ), TRUE );
-
-		asrt( isset( $book['xownPageList'] ), TRUE );
-		asrt( isset( $book['ownPageList'] ), TRUE );
-		asrt( isset( $book['xownPage'] ), TRUE );
-		asrt( isset( $book['ownPage'] ), TRUE );
-	}
-
-	/**
-	 * Test whether you can still set items starting with 'xown' or
-	 * 'own' not followed by an uppercase character.
-	 *
-	 * @return void
-	 */
-	public function testConfusionWithXOwnList()
-	{
-		$book = R::dispense( 'book' );
-		$book->xownitem = 1;
-		asrt( isset( $book->xownitem ), TRUE );
-		asrt( (int) $book->xownitem, 1 );
-		asrt( isset( $book->xownItem ), FALSE );
-		asrt( isset( $book->xownItemList ), FALSE );
-		$book->ownitem = 1;
-		asrt( isset( $book->ownitem ), TRUE );
-		asrt( (int) $book->ownitem, 1 );
-		asrt( isset( $book->ownItemList ), FALSE );
-		R::store( $book );
-		$book = $book->fresh();
-		asrt( isset( $book->xownitem ), TRUE );
-		asrt( (int) $book->xownitem, 1 );
-		asrt( isset( $book->xownItem ), FALSE );
-		asrt( isset( $book->xownItemList ), FALSE );
-		asrt( isset( $book->ownitem ), TRUE );
-		asrt( (int) $book->ownitem, 1 );
-		asrt( isset( $book->ownItemList ), FALSE );
-	}
-
-	/**
-	 * Test whether we can determine the mode of a list.
-	 *
-	 * @return void
-	 */
-	public function testModeCheckerOfLists()
-	{
-		foreach( array( 'ownPage', 'xownPage', 'ownPageList', 'xownPageList' ) as $listName ) {
-			$book = R::dispense( 'book' );
-			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
-			$book->ownPageList[] = R::dispense( 'page' );
-			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
-
-			$book = R::dispense( 'book' );
-			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
-			$book->xownPageList[] = R::dispense( 'page' );
-			asrt( $book->isListInExclusiveMode( $listName ), TRUE );
-
-			$book = R::dispense( 'book' );
-			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
-			$book->ownPage[] = R::dispense( 'page' );
-			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
-
-			$book = R::dispense( 'book' );
-			asrt( $book->isListInExclusiveMode( $listName ), FALSE );
-			$book->xownPage[] = R::dispense( 'page' );
-			asrt( $book->isListInExclusiveMode( $listName ), TRUE );
-		}
-	}
+            $book = R::dispense('book');
+            asrt($book->isListInExclusiveMode($listName), false);
+            $book->xownPage[] = R::dispense('page');
+            asrt($book->isListInExclusiveMode($listName), true);
+        }
+    }
 }

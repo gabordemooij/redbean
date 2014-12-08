@@ -16,13 +16,13 @@ namespace RedUNIT;
  */
 class Postgres extends RedUNIT
 {
-	/*
-	 * What drivers should be loaded for this test pack?
-	 *
-	 * @return array
-	 */
-	public function getTargetDrivers()
-	{
-		return array( 'pgsql' );
-	}
+    /*
+     * What drivers should be loaded for this test pack?
+     *
+     * @return array
+     */
+    public function getTargetDrivers()
+    {
+        return array( 'pgsql' );
+    }
 }

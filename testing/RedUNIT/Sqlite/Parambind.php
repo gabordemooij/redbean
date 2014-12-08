@@ -19,48 +19,48 @@ use RedBeanPHP\Facade as R;
  */
 class Parambind extends Sqlite
 {
-	/**
-	 * Test parameter binding with SQLite.
-	 *
-	 * @return void
-	 */
-	public function testParamBindWithSQLite()
-	{
-		$toolbox = R::getToolBox();
-		$adapter = $toolbox->getDatabaseAdapter();
-		$writer  = $toolbox->getWriter();
-		$redbean = $toolbox->getRedBean();
-		$pdo     = $adapter->getDatabase();
+    /**
+     * Test parameter binding with SQLite.
+     *
+     * @return void
+     */
+    public function testParamBindWithSQLite()
+    {
+        $toolbox = R::getToolBox();
+        $adapter = $toolbox->getDatabaseAdapter();
+        $writer  = $toolbox->getWriter();
+        $redbean = $toolbox->getRedBean();
+        $pdo     = $adapter->getDatabase();
 
-		asrt( (int) $adapter->getCell( "SELECT 123" ), 123 );
-		asrt( (int) $adapter->getCell( "SELECT ?", array( "987" ) ), 987 );
-		asrt( (int) $adapter->getCell( "SELECT ?+?", array( "987", "2" ) ), 989 );
+        asrt((int) $adapter->getCell("SELECT 123"), 123);
+        asrt((int) $adapter->getCell("SELECT ?", array( "987" )), 987);
+        asrt((int) $adapter->getCell("SELECT ?+?", array( "987", "2" )), 989);
 
-		asrt( (int) $adapter->getCell(
-			"SELECT :numberOne+:numberTwo",
-			array(
-				":numberOne" => 42,
-				":numberTwo" => 50 )
-			),
-			92
-		);
+        asrt((int) $adapter->getCell(
+            "SELECT :numberOne+:numberTwo",
+            array(
+                ":numberOne" => 42,
+                ":numberTwo" => 50, )
+            ),
+            92
+        );
 
-		$pair = $adapter->getAssoc( "SELECT 'thekey','thevalue' " );
+        $pair = $adapter->getAssoc("SELECT 'thekey','thevalue' ");
 
-		asrt( is_array( $pair ), TRUE );
+        asrt(is_array($pair), true);
 
-		asrt( count( $pair ), 1 );
+        asrt(count($pair), 1);
 
-		asrt( isset( $pair["thekey"] ), TRUE );
+        asrt(isset($pair["thekey"]), true);
 
-		asrt( $pair["thekey"], "thevalue" );
+        asrt($pair["thekey"], "thevalue");
 
-		testpack( 'Test whether we can properly bind and receive NULL values' );
+        testpack('Test whether we can properly bind and receive NULL values');
 
-		asrt( $adapter->getCell( 'SELECT :nil ', array( ':nil' => 'NULL' ) ), 'NULL' );
-		asrt( $adapter->getCell( 'SELECT :nil ', array( ':nil' => NULL ) ), NULL );
+        asrt($adapter->getCell('SELECT :nil ', array( ':nil' => 'NULL' )), 'NULL');
+        asrt($adapter->getCell('SELECT :nil ', array( ':nil' => NULL )), null);
 
-		asrt( $adapter->getCell( 'SELECT ? ', array( 'NULL' ) ), 'NULL' );
-		asrt( $adapter->getCell( 'SELECT ? ', array( NULL ) ), NULL );
-	}
+        asrt($adapter->getCell('SELECT ? ', array( 'NULL' )), 'NULL');
+        asrt($adapter->getCell('SELECT ? ', array( null )), null);
+    }
 }

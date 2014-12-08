@@ -21,27 +21,27 @@ use RedBeanPHP\OODBBean as OODBBean;
 
 class Labels extends Blackhole
 {
-	/**
-	 * Test basic labels.
-	 *
-	 * @return void
-	 */
-	public function testLabels()
-	{
-		testpack( 'Test Labels' );
+    /**
+     * Test basic labels.
+     *
+     * @return void
+     */
+    public function testLabels()
+    {
+        testpack('Test Labels');
 
-		$meals = R::dispenseLabels( 'meal', array( 'meat', 'fish', 'vegetarian' ) );
+        $meals = R::dispenseLabels('meal', array( 'meat', 'fish', 'vegetarian' ));
 
-		asrt( is_array( $meals ), TRUE );
+        asrt(is_array($meals), true);
 
-		asrt( count( $meals ), 3 );
+        asrt(count($meals), 3);
 
-		foreach ( $meals as $m ) {
-			asrt( ( $m instanceof OODBBean ), TRUE );
-		}
+        foreach ($meals as $m) {
+            asrt(($m instanceof OODBBean), true);
+        }
 
-		$listOfMeals = implode( ',', R::gatherLabels( $meals ) );
+        $listOfMeals = implode(',', R::gatherLabels($meals));
 
-		asrt( $listOfMeals, 'fish,meat,vegetarian' );
-	}
+        asrt($listOfMeals, 'fish,meat,vegetarian');
+    }
 }

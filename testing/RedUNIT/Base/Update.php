@@ -22,522 +22,519 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
  */
 class Update extends Base
 {
-	/**
-	 * Test whether we can use SQL filters and
-	 * whether they are being applied properly for
-	 * different types of SELECT queries in the QueryWriter.
-	 */
-	public function testSQLFilters()
-	{
-		R::nuke();
-		AQueryWriter::setSQLFilters(array(
-			QueryWriter::C_SQLFILTER_READ => array(
-				'book' => array( 'title' => ' LOWER(book.title) '),
-			),
-			QueryWriter::C_SQLFILTER_WRITE => array(
-				'book' => array( 'title' => ' UPPER(?) '),
-			),
-		));
-
-		$book = R::dispense( 'book' );
-		$book->title = 'story';
-		R::store( $book );
-		asrt( R::getCell( 'SELECT title FROM book WHERE id = ?', array( $book->id ) ), 'STORY' );
-		$book = $book->fresh();
-		asrt( $book->title, 'story' );
-		$library = R::dispense( 'library' );
-		$library->sharedBookList[] = $book;
-		R::store( $library );
-		$library = $library->fresh();
-		$books = $library->sharedBookList;
-		$book = reset( $books );
-		asrt( $book->title, 'story' );
-		$otherBook = R::dispense('book');
-		$otherBook->sharedBook[] = $book;
-		R::store( $otherBook );
-		$otherBook = $otherBook->fresh();
-		$books = $otherBook->sharedBookList;
-		$book = reset( $books );
-		asrt( $book->title, 'story' );
-		$links = $book->ownBookBookList;
-		$link = reset( $links );
-		$link->shelf = 'x13';
-		AQueryWriter::setSQLFilters(array(
-			QueryWriter::C_SQLFILTER_READ => array(
-				'book' => array( 'title' => ' LOWER(book.title) '),
-				'book_book' => array( 'shelf' => ' LOWER(book_book.shelf) '),
-			),
-			QueryWriter::C_SQLFILTER_WRITE => array(
-				'book' => array( 'title' => ' UPPER(?) '),
-				'book_book' => array( 'shelf' => ' UPPER(?) ')
-			),
-		));
-		R::store( $link );
-		asrt( R::getCell( 'SELECT shelf FROM book_book WHERE id = ?', array( $link->id ) ), 'X13' );
-		$otherBook = $otherBook->fresh();
-		unset($book->sharedBookList[$otherBook->id]);
-		R::store( $book );
-		AQueryWriter::setSQLFilters(array());
-	}
-
-	/**
-	 * Test unsetting properties.
-	 *
-	 * @return void
-	 */
-	public function testUnsetUpdate()
-	{
-		R::nuke();
-		$book = R::dispense( 'book' );
-		$book->name = 'x';
-		$book->price = 40;
-		R::store( $book );
-		$book = $book->fresh();
-		$book->name = 'y';
-		unset( $book->name );
-		R::store( $book );
-		$book = $book->fresh();
-		asrt( $book->name, 'x' );
-		asrt( (int) $book->price, 40 );
-		$book->price = 30;
-		R::store( $book );
-		$book = $book->fresh();
-		asrt( $book->name, 'x' );
-		asrt( (int) $book->price, 30 );
-		$book->price = 20;
-		unset( $book->price );
-		$book->name = 'y';
-		R::store( $book );
-		$book = $book->fresh();
-		asrt( $book->name, 'y' );
-		asrt( (int) $book->price, 30 );
-	}
-
-	/**
-	 * Tests whether we can update or unset a parent bean
-	 * with an alias without having to use fetchAs and
-	 * without loading the aliased bean causing table-not-found
-	 * errors.
-	 */
-	public function testUpdatingParentBeansWithAliases()
-	{
-		testpack( 'Test updating parent beans with aliases' );
-		R::nuke();
+    /**
+     * Test whether we can use SQL filters and
+     * whether they are being applied properly for
+     * different types of SELECT queries in the QueryWriter.
+     */
+    public function testSQLFilters()
+    {
+        R::nuke();
+        AQueryWriter::setSQLFilters(array(
+            QueryWriter::C_SQLFILTER_READ => array(
+                'book' => array( 'title' => ' LOWER(book.title) '),
+            ),
+            QueryWriter::C_SQLFILTER_WRITE => array(
+                'book' => array( 'title' => ' UPPER(?) '),
+            ),
+        ));
+
+        $book = R::dispense('book');
+        $book->title = 'story';
+        R::store($book);
+        asrt(R::getCell('SELECT title FROM book WHERE id = ?', array( $book->id )), 'STORY');
+        $book = $book->fresh();
+        asrt($book->title, 'story');
+        $library = R::dispense('library');
+        $library->sharedBookList[] = $book;
+        R::store($library);
+        $library = $library->fresh();
+        $books = $library->sharedBookList;
+        $book = reset($books);
+        asrt($book->title, 'story');
+        $otherBook = R::dispense('book');
+        $otherBook->sharedBook[] = $book;
+        R::store($otherBook);
+        $otherBook = $otherBook->fresh();
+        $books = $otherBook->sharedBookList;
+        $book = reset($books);
+        asrt($book->title, 'story');
+        $links = $book->ownBookBookList;
+        $link = reset($links);
+        $link->shelf = 'x13';
+        AQueryWriter::setSQLFilters(array(
+            QueryWriter::C_SQLFILTER_READ => array(
+                'book' => array( 'title' => ' LOWER(book.title) '),
+                'book_book' => array( 'shelf' => ' LOWER(book_book.shelf) '),
+            ),
+            QueryWriter::C_SQLFILTER_WRITE => array(
+                'book' => array( 'title' => ' UPPER(?) '),
+                'book_book' => array( 'shelf' => ' UPPER(?) '),
+            ),
+        ));
+        R::store($link);
+        asrt(R::getCell('SELECT shelf FROM book_book WHERE id = ?', array( $link->id )), 'X13');
+        $otherBook = $otherBook->fresh();
+        unset($book->sharedBookList[$otherBook->id]);
+        R::store($book);
+        AQueryWriter::setSQLFilters(array());
+    }
+
+    /**
+     * Test unsetting properties.
+     *
+     * @return void
+     */
+    public function testUnsetUpdate()
+    {
+        R::nuke();
+        $book = R::dispense('book');
+        $book->name = 'x';
+        $book->price = 40;
+        R::store($book);
+        $book = $book->fresh();
+        $book->name = 'y';
+        unset($book->name);
+        R::store($book);
+        $book = $book->fresh();
+        asrt($book->name, 'x');
+        asrt((int) $book->price, 40);
+        $book->price = 30;
+        R::store($book);
+        $book = $book->fresh();
+        asrt($book->name, 'x');
+        asrt((int) $book->price, 30);
+        $book->price = 20;
+        unset($book->price);
+        $book->name = 'y';
+        R::store($book);
+        $book = $book->fresh();
+        asrt($book->name, 'y');
+        asrt((int) $book->price, 30);
+    }
+
+    /**
+     * Tests whether we can update or unset a parent bean
+     * with an alias without having to use fetchAs and
+     * without loading the aliased bean causing table-not-found
+     * errors.
+     */
+    public function testUpdatingParentBeansWithAliases()
+    {
+        testpack('Test updating parent beans with aliases');
+        R::nuke();
 
-		$trans  = R::dispense( 'transaction' );
-		$seller = R::dispense( 'user' );
+        $trans  = R::dispense('transaction');
+        $seller = R::dispense('user');
 
-		$trans->seller = $seller;
+        $trans->seller = $seller;
 
-		$id = R::store( $trans );
+        $id = R::store($trans);
 
-		R::freeze( true );
+        R::freeze(true);
 
-		$trans = R::load( 'transaction', $id );
+        $trans = R::load('transaction', $id);
 
-		//should not try to load seller, should not require fetchAs().
-		try {
-			$trans->seller = R::dispense( 'user' );
-			pass();
-		} catch( Exception $e ) {
-			fail();
-		}
+        //should not try to load seller, should not require fetchAs().
+        try {
+            $trans->seller = R::dispense('user');
+            pass();
+        } catch (Exception $e) {
+            fail();
+        }
 
-		$trans = R::load( 'transaction', $id );
+        $trans = R::load('transaction', $id);
 
-		//same for unset...
-		try {
-			unset( $trans->seller );
-			pass();
-		} catch ( Exception $e ) {
-			fail();
-		}
+        //same for unset...
+        try {
+            unset($trans->seller);
+            pass();
+        } catch (Exception $e) {
+            fail();
+        }
 
-		R::freeze( false );
+        R::freeze(false);
 
-		$account = R::dispense( 'user' );
+        $account = R::dispense('user');
 
-		asrt( count( $account->alias( 'seller' )->ownTransaction ), 0 );
+        asrt(count($account->alias('seller')->ownTransaction), 0);
 
-		$account->alias( 'seller' )->ownTransaction = R::dispense( 'transaction', 10 );
-		$account->alias( 'boo' ); //try to trick me...
+        $account->alias('seller')->ownTransaction = R::dispense('transaction', 10);
+        $account->alias('boo'); //try to trick me...
 
-		$id = R::store( $account );
+        $id = R::store($account);
 
-		R::freeze( true );
+        R::freeze(true);
 
-		$account = R::load( 'user', $id );
-		asrt( count( $account->alias( 'seller' )->ownTransaction ), 10 );
+        $account = R::load('user', $id);
+        asrt(count($account->alias('seller')->ownTransaction), 10);
 
-		//you cannot unset a list
-		unset( $account->alias( 'seller' )->ownTransaction );
-		$id = R::store( $account );
+        //you cannot unset a list
+        unset($account->alias('seller')->ownTransaction);
+        $id = R::store($account);
 
-		$account = R::load( 'user', $id );
-		asrt( count( $account->alias( 'seller' )->ownTransaction ), 10 );
+        $account = R::load('user', $id);
+        asrt(count($account->alias('seller')->ownTransaction), 10);
 
+        $account->alias('seller')->ownTransaction = array();
 
-		$account->alias( 'seller' )->ownTransaction = array();
+        $id = R::store($account);
+        $account = R::load('user', $id);
+        asrt(count($account->alias('seller')->ownTransaction), 0);
+        asrt(count($account->ownTransaction), 0);
 
-		$id = R::store( $account );
-		$account = R::load( 'user', $id );
-		asrt(count($account->alias( 'seller' )->ownTransaction), 0 );
-		asrt(count($account->ownTransaction), 0 );
+        R::freeze(false);
 
-		R::freeze( false );
+        //but also make sure we don't cause extra column issue #335
 
-		//but also make sure we don't cause extra column issue #335
+        R::nuke();
 
-		R::nuke();
+        $building = R::dispense('building');
+        $village  = R::dispense('village');
 
-		$building = R::dispense('building');
-		$village  = R::dispense('village');
+        $building->village = $village;
 
-		$building->village = $village;
+        R::store($building);
 
-		R::store($building);
+        $building = $building->fresh();
+        $building->village = null;
 
-		$building = $building->fresh();
-		$building->village = NULL;
+        R::store($building);
 
-		R::store($building);
+        $building = $building->fresh();
 
-		$building = $building->fresh();
+        $columns = R::inspect('building');
+        asrt(isset($columns['village']), false);
+        asrt(isset($building->village), false);
 
-		$columns = R::inspect('building');
-		asrt( isset( $columns['village'] ), false );
-		asrt( isset( $building->village ), false );
+        R::nuke();
 
-		R::nuke();
+        $building = R::dispense('building');
+        $village  = R::dispense('village');
 
-		$building = R::dispense('building');
-                $village  = R::dispense('village');
+        $building->village = $village;
 
-                $building->village = $village;
+        R::store($building);
 
-                R::store($building);
+        $building = $building->fresh();
+        unset($building->village);
 
-                $building = $building->fresh();
-                unset($building->village);
+        R::store($building);
 
-                R::store($building);
+        $building = $building->fresh();
 
-                $building = $building->fresh();
+        $columns = R::inspect('building');
+        asrt(isset($columns['village']), false);
+        asrt(isset($building->village), false);
 
-                $columns = R::inspect('building');
-                asrt( isset( $columns['village'] ), false );
-                asrt( isset( $building->village ), false );
+        $building = R::dispense('building');
+        $village  = R::dispense('village');
 
-		$building = R::dispense('building');
-                $village  = R::dispense('village');
+        $building->village = $village;
 
-                $building->village = $village;
+        R::store($building);
 
-                R::store($building);
+        $building = $building->fresh();
+        $building->village = false;
 
-                $building = $building->fresh();
-                $building->village = false;
+        R::store($building);
 
-                R::store($building);
+        $building = $building->fresh();
 
-                $building = $building->fresh();
+        $columns = R::inspect('building');
+        asrt(isset($columns['village']), false);
+        asrt(isset($building->village), false);
+    }
 
-                $columns = R::inspect('building');
-                asrt( isset( $columns['village'] ), false );
-                asrt( isset( $building->village ), false );
+    /**
+     * All kinds of tests for basic CRUD.
+     *
+     * Does the data survive?
+     *
+     * @return void
+     */
+    public function testUpdatingBeans()
+    {
+        testpack('Test basic support UUID/override ID default value');
 
-	}
+        $bean = R::dispense('bean');
 
-	/**
-	 * All kinds of tests for basic CRUD.
-	 *
-	 * Does the data survive?
-	 *
-	 * @return void
-	 */
-	public function testUpdatingBeans()
-	{
-		testpack( 'Test basic support UUID/override ID default value' );
+        R::store($bean);
 
-		$bean = R::dispense( 'bean' );
+        if ($this->currentlyActiveDriverID === 'mysql') {
+            //otherwise UTF8 causes index overflow in mysql: SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes
+            R::exec('alter table bean modify column id char(3);');
+        } else {
+            R::getWriter()->widenColumn('bean', 'id', R::getWriter()->scanType('abc'));
+        }
 
-		R::store( $bean );
+        $bean->id = 'abc';
 
-		if ($this->currentlyActiveDriverID === 'mysql') {
-			//otherwise UTF8 causes index overflow in mysql: SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too long; max key length is 767 bytes
-			R::exec('alter table bean modify column id char(3);');
-		} else {
-			R::getWriter()->widenColumn( 'bean', 'id', R::getWriter()->scanType( 'abc' ) );
-		}
+        R::store($bean);
 
-		$bean->id = 'abc';
+        asrt($bean->id, 'abc');
 
-		R::store( $bean );
+        testpack('Test Update');
 
-		asrt( $bean->id, 'abc' );
+        try {
+            R::store(array());
+            fail();
+        } catch (RedException $e) {
+            pass();
+        }
 
-		testpack( 'Test Update' );
+        $toolbox = R::getToolBox();
+        $adapter = $toolbox->getDatabaseAdapter();
+        $writer  = $toolbox->getWriter();
+        $redbean = $toolbox->getRedBean();
+        $pdo     = $adapter->getDatabase();
+        $page    = $redbean->dispense("page");
 
-		try {
-			R::store( array() );
-			fail();
-		} catch ( RedException $e ) {
-			pass();
-		}
+        $page->name = "old name";
 
-		$toolbox = R::getToolBox();
-		$adapter = $toolbox->getDatabaseAdapter();
-		$writer  = $toolbox->getWriter();
-		$redbean = $toolbox->getRedBean();
-		$pdo     = $adapter->getDatabase();
-		$page    = $redbean->dispense( "page" );
+        $id = $redbean->store($page);
 
-		$page->name = "old name";
+        asrt($page->getMeta('tainted'), false);
 
-		$id = $redbean->store( $page );
+        $page->setAttr('name', "new name");
 
-		asrt( $page->getMeta( 'tainted' ), FALSE );
+        asrt($page->getMeta('tainted'), true);
 
-		$page->setAttr( 'name', "new name" );
+        $id = $redbean->store($page);
 
-		asrt( $page->getMeta( 'tainted' ), TRUE );
+        $page = $redbean->load("page", $id);
 
-		$id = $redbean->store( $page );
+        asrt($page->name, "new name");
 
-		$page = $redbean->load( "page", $id );
+        // Null should == NULL after saving
+        $page->rating = null;
 
-		asrt( $page->name, "new name" );
+        $newid = $redbean->store($page);
+        $page  = $redbean->load("page", $id);
 
-		// Null should == NULL after saving
-		$page->rating = NULL;
+        asrt($page->name, "new name");
+        asrt(($page->rating === NULL), true);
+        asrt(!$page->rating, true);
 
-		$newid = $redbean->store( $page );
-		$page  = $redbean->load( "page", $id );
+        $page->rating = false;
 
-		asrt( $page->name, "new name" );
-		asrt( ( $page->rating === NULL ), TRUE );
-		asrt( !$page->rating, TRUE );
+        $newid = $redbean->store($page);
 
-		$page->rating = FALSE;
+        asrt($newid, $id);
 
-		$newid = $redbean->store( $page );
+        $page = $redbean->load("page", $id);
 
-		asrt( $newid, $id );
+        asrt($page->name, "new name");
+        asrt((bool) $page->rating, false);
+        asrt(($page->rating == FALSE), true);
+        asrt(!$page->rating, true);
 
-		$page = $redbean->load( "page", $id );
+        $page->rating = true;
 
-		asrt( $page->name, "new name" );
-		asrt( (bool) $page->rating, FALSE );
-		asrt( ( $page->rating == FALSE ), TRUE );
-		asrt( !$page->rating, TRUE );
+        $newid = $redbean->store($page);
 
-		$page->rating = TRUE;
+        asrt($newid, $id);
 
-		$newid = $redbean->store( $page );
+        $page = $redbean->load("page", $id);
 
-		asrt( $newid, $id );
+        asrt($page->name, "new name");
+        asrt((bool) $page->rating, true);
 
-		$page = $redbean->load( "page", $id );
+        asrt(($page->rating == TRUE), true);
+        asrt(($page->rating == TRUE), true);
 
-		asrt( $page->name, "new name" );
-		asrt( (bool) $page->rating, TRUE );
+        $page->rating = null;
 
-		asrt( ( $page->rating == TRUE ), TRUE );
-		asrt( ( $page->rating == TRUE ), TRUE );
+        R::store($page);
 
-		$page->rating = NULL;
+        $page = R::load('page', $page->id);
 
-		R::store( $page );
+        asrt($page->rating, null);
 
-		$page = R::load( 'page', $page->id );
+        $page->rating = "1";
 
-		asrt( $page->rating, NULL );
+        $newid = $redbean->store($page);
 
-		$page->rating = "1";
+        asrt($newid, $id);
 
-		$newid = $redbean->store( $page );
+        $page = $redbean->load("page", $id);
 
-		asrt( $newid, $id );
+        asrt($page->name, "new name");
+        asrt($page->rating, "1");
 
-		$page = $redbean->load( "page", $id );
+        $page->rating = "0";
 
-		asrt( $page->name, "new name" );
-		asrt( $page->rating, "1" );
+        $newid = $redbean->store($page);
 
-		$page->rating = "0";
+        asrt($page->rating, "0");
 
-		$newid = $redbean->store( $page );
+        $page->rating = 0;
 
-		asrt( $page->rating, "0" );
+        $newid = $redbean->store($page);
 
-		$page->rating = 0;
+        asrt($page->rating, 0);
 
-		$newid = $redbean->store( $page );
+        $page->rating = "0";
 
-		asrt( $page->rating, 0 );
+        $newid = $redbean->store($page);
 
-		$page->rating = "0";
+        asrt($newid, $id);
+        $page = $redbean->load("page", $id);
 
-		$newid = $redbean->store( $page );
+        asrt($page->name, "new name");
+        asrt(!$page->rating, true);
 
-		asrt( $newid, $id );
-		$page = $redbean->load( "page", $id );
+        asrt(($page->rating == 0), true);
+        asrt(($page->rating == FALSE), true);
 
-		asrt( $page->name, "new name" );
-		asrt( !$page->rating, TRUE );
+        $page->rating = 5;
 
-		asrt( ( $page->rating == 0 ), TRUE );
-		asrt( ( $page->rating == FALSE ), TRUE );
+        $newid = $redbean->store($page);
 
-		$page->rating = 5;
+        asrt($newid, $id);
 
-		$newid = $redbean->store( $page );
+        $page = $redbean->load("page", $id);
 
-		asrt( $newid, $id );
+        asrt($page->name, "new name");
+        asrt(strval($page->rating), "5");
 
-		$page = $redbean->load( "page", $id );
+        $page->rating = 300;
 
-		asrt( $page->name, "new name" );
-		asrt( strval( $page->rating ), "5" );
+        $newid = $redbean->store($page);
 
-		$page->rating = 300;
+        asrt($newid, $id);
 
-		$newid = $redbean->store( $page );
+        $page = $redbean->load("page", $id);
 
-		asrt( $newid, $id );
+        asrt($page->name, "new name");
+        asrt(strval($page->rating), "300");
 
-		$page = $redbean->load( "page", $id );
+        $page->rating = -2;
 
-		asrt( $page->name, "new name" );
-		asrt( strval( $page->rating ), "300" );
+        $newid = $redbean->store($page);
 
-		$page->rating = -2;
+        asrt($newid, $id);
 
-		$newid = $redbean->store( $page );
+        $page = $redbean->load("page", $id);
 
-		asrt( $newid, $id );
+        asrt($page->name, "new name");
+        asrt(strval($page->rating), "-2");
 
-		$page = $redbean->load( "page", $id );
+        $page->rating = 2.5;
 
-		asrt( $page->name, "new name" );
-		asrt( strval( $page->rating ), "-2" );
+        $newid = $redbean->store($page);
 
-		$page->rating = 2.5;
+        asrt($newid, $id);
 
-		$newid = $redbean->store( $page );
+        $page = $redbean->load("page", $id);
 
-		asrt( $newid, $id );
+        asrt($page->name, "new name");
+        asrt(($page->rating == 2.5), true);
 
-		$page = $redbean->load( "page", $id );
+        $page->rating = -3.3;
 
-		asrt( $page->name, "new name" );
-		asrt( ( $page->rating == 2.5 ), TRUE );
+        $newid = $redbean->store($page);
 
-		$page->rating = -3.3;
+        asrt($newid, $id);
 
-		$newid = $redbean->store( $page );
+        $page = $redbean->load("page", $id);
 
-		asrt( $newid, $id );
+        asrt($page->name, "new name");
+        asrt(($page->rating == -3.3), true);
 
-		$page = $redbean->load( "page", $id );
+        $page->rating = "good";
 
-		asrt( $page->name, "new name" );
-		asrt( ( $page->rating == -3.3 ), TRUE );
+        $newid = $redbean->store($page);
 
-		$page->rating = "good";
+        asrt($newid, $id);
 
-		$newid = $redbean->store( $page );
+        $page = $redbean->load("page", $id);
 
-		asrt( $newid, $id );
+        asrt($page->name, "new name");
+        asrt($page->rating, "good");
 
-		$page = $redbean->load( "page", $id );
+        $longtext = str_repeat('great! because..', 100);
 
-		asrt( $page->name, "new name" );
-		asrt( $page->rating, "good" );
+        $page->rating = $longtext;
 
-		$longtext = str_repeat( 'great! because..', 100 );
+        $newid = $redbean->store($page);
 
-		$page->rating = $longtext;
+        asrt($newid, $id);
 
-		$newid = $redbean->store( $page );
+        $page = $redbean->load("page", $id);
 
-		asrt( $newid, $id );
+        asrt($page->name, "new name");
+        asrt($page->rating, $longtext);
 
-		$page = $redbean->load( "page", $id );
+        // Test leading zeros
+        $numAsString = "0001";
 
-		asrt( $page->name, "new name" );
-		asrt( $page->rating, $longtext );
+        $page->numasstring = $numAsString;
 
-		// Test leading zeros
-		$numAsString = "0001";
+        $redbean->store($page);
 
-		$page->numasstring = $numAsString;
+        $page = $redbean->load("page", $id);
 
-		$redbean->store( $page );
+        asrt($page->numasstring, "0001");
 
-		$page = $redbean->load( "page", $id );
+        $page->numnotstring = "0.123";
 
-		asrt( $page->numasstring, "0001" );
+        $redbean->store($page);
 
-		$page->numnotstring = "0.123";
+        $page = $redbean->load("page", $id);
 
-		$redbean->store( $page );
+        asrt($page->numnotstring == 0.123, true);
 
-		$page = $redbean->load( "page", $id );
+        $page->numasstring2 = "00.123";
 
-		asrt( $page->numnotstring == 0.123, TRUE );
+        $redbean->store($page);
 
-		$page->numasstring2 = "00.123";
+        $page = $redbean->load("page", $id);
 
-		$redbean->store( $page );
+        asrt($page->numasstring2, "00.123");
 
-		$page = $redbean->load( "page", $id );
+        try {
+            $redbean->trash(array());
 
-		asrt( $page->numasstring2, "00.123" );
+            fail();
+        } catch (RedException $e) {
+            pass();
+        }
 
-		try {
-			$redbean->trash( array() );
+        $redbean->trash($page);
 
-			fail();
-		} catch ( RedException $e ) {
-			pass();
-		}
+        asrt((int) $pdo->GetCell("SELECT count(*) FROM page"), 0);
+    }
 
-		$redbean->trash( $page );
+    public function testEmptyStringShouldNotBeStoredAsInteger()
+    {
+        R::nuke();
+        $bean = R::dispense('bean');
+        $bean->str = '';
+        R::store($bean);
+        $bean = $bean->fresh();
+        asrt(($bean->str === ''), true);
+    }
 
-		asrt( (int) $pdo->GetCell( "SELECT count(*) FROM page" ), 0 );
-	}
-	
-	public function testEmptyStringShouldNotBeStoredAsInteger()
-	{
-		R::nuke();
-		$bean = R::dispense('bean');
-		$bean->str = '';
-		R::store($bean);
-		$bean = $bean->fresh();
-		asrt( ( $bean->str === '' ), TRUE);
-	}
-
-	/**
-	 * Test handling of infinity values.
-	 *
-	 * @return void
-	 */
-	public function testStoringInf()
-	{
-		R::nuke();
-		$bean = R::dispense( 'bean' );
-		$bean->inf = INF;
-		R::store( $bean );
-		$bean = $bean->fresh();
-		asrt( ( $bean->inf === 'INF' ), TRUE );
-		asrt( ( $bean->inf == 'INF' ), TRUE );
-		$bean->modifyme = 'yes';
-		R::store( $bean );
-		$bean = $bean->fresh();
-		asrt( ( $bean->inf === 'INF' ), TRUE );
-		asrt( ( $bean->inf == 'INF' ), TRUE );
-		$bean->modifyme = 'yes';
-	}
+    /**
+     * Test handling of infinity values.
+     *
+     * @return void
+     */
+    public function testStoringInf()
+    {
+        R::nuke();
+        $bean = R::dispense('bean');
+        $bean->inf = INF;
+        R::store($bean);
+        $bean = $bean->fresh();
+        asrt(($bean->inf === 'INF'), true);
+        asrt(($bean->inf == 'INF'), true);
+        $bean->modifyme = 'yes';
+        R::store($bean);
+        $bean = $bean->fresh();
+        asrt(($bean->inf === 'INF'), true);
+        asrt(($bean->inf == 'INF'), true);
+        $bean->modifyme = 'yes';
+    }
 }
-

@@ -19,36 +19,36 @@ use RedBeanPHP\Facade as R;
  */
 class Nuke extends Base
 {
-	/**
-	 * Nuclear test suite.
-	 *
-	 * @return void
-	 */
-	public function testNuke()
-	{
-		$bean = R::dispense( 'bean' );
+    /**
+     * Nuclear test suite.
+     *
+     * @return void
+     */
+    public function testNuke()
+    {
+        $bean = R::dispense('bean');
 
-		R::store( $bean );
+        R::store($bean);
 
-		asrt( count( R::getWriter()->getTables() ), 1 );
+        asrt(count(R::getWriter()->getTables()), 1);
 
-		R::nuke();
+        R::nuke();
 
-		asrt( count( R::getWriter()->getTables() ), 0 );
+        asrt(count(R::getWriter()->getTables()), 0);
 
-		$bean = R::dispense( 'bean' );
+        $bean = R::dispense('bean');
 
-		R::store( $bean );
+        R::store($bean);
 
-		asrt( count( R::getWriter()->getTables() ), 1 );
+        asrt(count(R::getWriter()->getTables()), 1);
 
-		R::freeze();
+        R::freeze();
 
-		R::nuke();
+        R::nuke();
 
-		// No effect
-		asrt( count( R::getWriter()->getTables() ), 1 );
+        // No effect
+        asrt(count(R::getWriter()->getTables()), 1);
 
-		R::freeze( FALSE );
-	}
+        R::freeze(false);
+    }
 }

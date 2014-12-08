@@ -1,6 +1,7 @@
 <?php
 
 namespace RedUNIT;
+
 use RedBeanPHP\Facade as R;
 
 /**
@@ -19,71 +20,75 @@ use RedBeanPHP\Facade as R;
  */
 abstract class RedUNIT
 {
-	/**
-	 * @var string
-	 */
-	protected $currentlyActiveDriverID = 'unknown';
+    /**
+     * @var string
+     */
+    protected $currentlyActiveDriverID = 'unknown';
 
-	/**
-	 * What drivers should be loaded for this test pack?
-	 */
-	abstract public function getTargetDrivers();
+    /**
+     * What drivers should be loaded for this test pack?
+     */
+    abstract public function getTargetDrivers();
 
-	/**
-	 * Prepare test pack (mostly: nuke the entire database)
-	 */
-	public function prepare()
-	{
-		R::freeze( FALSE );
-		
-		R::debug( FALSE );
+    /**
+     * Prepare test pack (mostly: nuke the entire database)
+     */
+    public function prepare()
+    {
+        R::freeze(false);
 
-		R::nuke();
-	}
+        R::debug(false);
 
-	/**
-	 * Run the actual test
-	 */
-	public function run()
-	{
-		$class = new \ReflectionClass( $this );
+        R::nuke();
+    }
 
-		$skip = array( 'run', 'getTargetDrivers', 'onEvent');
-		// Call all methods except run automatically
-		foreach ( $class->getMethods( \ReflectionMethod::IS_PUBLIC ) as $method ) {
-			// Skip methods inherited from parent class
-			if ( $method->class != $class->getName() ) continue;
+    /**
+     * Run the actual test
+     */
+    public function run()
+    {
+        $class = new \ReflectionClass($this);
 
-			if ( in_array( $method->name, $skip ) ) continue;
+        $skip = array( 'run', 'getTargetDrivers', 'onEvent');
+        // Call all methods except run automatically
+        foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            // Skip methods inherited from parent class
+            if ($method->class != $class->getName()) {
+                continue;
+            }
 
-			$classname = str_replace( $class->getParentClass()->getName().'_', '', $method->class );
+            if (in_array($method->name, $skip)) {
+                continue;
+            }
 
-			printtext( "\n\t" . $classname."->".$method->name." [".$method->class."->".$method->name."]" . " \n\t" );
+            $classname = str_replace($class->getParentClass()->getName().'_', '', $method->class);
 
-			$call = $method->name;
+            printtext("\n\t".$classname."->".$method->name." [".$method->class."->".$method->name."]"." \n\t");
 
-			$this->$call();
+            $call = $method->name;
 
-			try {
-				R::nuke();
-			} catch( \PDOException $e ) {
-				// Some tests use a broken database on purpose, so an exception is ok
-			}
-		}
-	}
+            $this->$call();
 
-	/**
-	 * Do some cleanup (if necessary..)
-	 */
-	public function cleanUp()
-	{
-	}
+            try {
+                R::nuke();
+            } catch (\PDOException $e) {
+                // Some tests use a broken database on purpose, so an exception is ok
+            }
+        }
+    }
 
-	/**
-	 * Sets the current driver.
-	 */
-	public function setCurrentDriver( $driver )
-	{
-		$this->currentlyActiveDriverID = $driver;
-	}
+    /**
+     * Do some cleanup (if necessary..)
+     */
+    public function cleanUp()
+    {
+    }
+
+    /**
+     * Sets the current driver.
+     */
+    public function setCurrentDriver($driver)
+    {
+        $this->currentlyActiveDriverID = $driver;
+    }
 }

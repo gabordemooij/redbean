@@ -19,74 +19,74 @@ use RedBeanPHP\Facade as R;
  */
 class Tainted extends Blackhole
 {
-	/**
-	 * Test tainted.
-	 *
-	 * @return void
-	 */
-	public function testTainted()
-	{
-		testpack( 'Original Tainted Tests' );
+    /**
+     * Test tainted.
+     *
+     * @return void
+     */
+    public function testTainted()
+    {
+        testpack('Original Tainted Tests');
 
-		$redbean = R::getRedBean();
+        $redbean = R::getRedBean();
 
-		$spoon = $redbean->dispense( "spoon" );
+        $spoon = $redbean->dispense("spoon");
 
-		asrt( $spoon->getMeta( "tainted" ), TRUE );
+        asrt($spoon->getMeta("tainted"), true);
 
-		$spoon->dirty = "yes";
+        $spoon->dirty = "yes";
 
-		asrt( $spoon->getMeta( "tainted" ), TRUE );
+        asrt($spoon->getMeta("tainted"), true);
 
-		testpack( 'Tainted List test' );
+        testpack('Tainted List test');
 
-		$note = R::dispense( 'note' );
+        $note = R::dispense('note');
 
-		$note->text = 'abc';
+        $note->text = 'abc';
 
-		$note->ownNote[] = R::dispense( 'note' )->setAttr( 'text', 'def' );
+        $note->ownNote[] = R::dispense('note')->setAttr('text', 'def');
 
-		$id = R::store( $note );
+        $id = R::store($note);
 
-		$note = R::load( 'note', $id );
+        $note = R::load('note', $id);
 
-		asrt( $note->isTainted(), FALSE );
+        asrt($note->isTainted(), false);
 
-		// Shouldn't affect tainted
-		$note->text;
+        // Shouldn't affect tainted
+        $note->text;
 
-		asrt( $note->isTainted(), FALSE );
+        asrt($note->isTainted(), false);
 
-		$note->ownNote;
+        $note->ownNote;
 
-		asrt( $note->isTainted(), TRUE );
+        asrt($note->isTainted(), true);
 
-		testpack( 'Tainted Test Old Value' );
+        testpack('Tainted Test Old Value');
 
-		$text = $note->old( 'text' );
+        $text = $note->old('text');
 
-		asrt( $text, 'abc' );
+        asrt($text, 'abc');
 
-		asrt( $note->hasChanged( 'text' ), FALSE );
+        asrt($note->hasChanged('text'), false);
 
-		$note->text = 'xxx';
+        $note->text = 'xxx';
 
-		asrt( $note->hasChanged( 'text' ), TRUE );
+        asrt($note->hasChanged('text'), true);
 
-		$text = $note->old( 'text' );
+        $text = $note->old('text');
 
-		asrt( $text, 'abc' );
+        asrt($text, 'abc');
 
-		testpack( 'Tainted Non-exist' );
+        testpack('Tainted Non-exist');
 
-		asrt( $note->hasChanged( 'text2' ), FALSE );
+        asrt($note->hasChanged('text2'), false);
 
-		testpack( 'Misc Tainted Tests' );
+        testpack('Misc Tainted Tests');
 
-		$bean = R::dispense( 'bean' );
+        $bean = R::dispense('bean');
 
-		$bean->hasChanged( 'prop' );
+        $bean->hasChanged('prop');
 
-		$bean->old( 'prop' );
-	}
+        $bean->old('prop');
+    }
 }

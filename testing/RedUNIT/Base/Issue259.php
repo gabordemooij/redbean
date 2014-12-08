@@ -20,56 +20,56 @@ use RedBeanPHP\SimpleModel as SimpleModel;
  */
 class Issue259 extends Base
 {
-	/**
-	 * Test to make sure stash cache works with recursively opening models
-	 * with FUSE.
-	 *
-	 * @return void
-	 */
-	public function testIssue259()
-	{
-		testpack( 'Testing Issue #259 - Stash Cache breaks model delegation in open().' );
+    /**
+     * Test to make sure stash cache works with recursively opening models
+     * with FUSE.
+     *
+     * @return void
+     */
+    public function testIssue259()
+    {
+        testpack('Testing Issue #259 - Stash Cache breaks model delegation in open().');
 
-		$mother = R::dispense( 'mother' );
+        $mother = R::dispense('mother');
 
-		$mother->desc = 'I am mother';
+        $mother->desc = 'I am mother';
 
-		R::store( $mother );
+        R::store($mother);
 
-		$child = R::dispense( 'child' );
+        $child = R::dispense('child');
 
-		$child->mother = $mother;
-		$child->desc   = 'I am child';
+        $child->mother = $mother;
+        $child->desc   = 'I am child';
 
-		$id = R::store( $child );
+        $id = R::store($child);
 
-		R::findOne( 'child', ' id = ?', array( $id ) );
+        R::findOne('child', ' id = ?', array( $id ));
 
-		R::find( 'child', ' id = ? ', array( $id ) );
+        R::find('child', ' id = ? ', array( $id ));
 
-		R::load( 'child', $id );
-	}
+        R::load('child', $id);
+    }
 }
 /**
  * Mock Model.
  */
 class Model_Mother extends SimpleModel
 {
-	public function open()
-	{
-		$bean = $this->bean;
-		// $this & $bean are both referencing child incorrectly!
-		asrt( $this->bean->desc, 'I am mother' );
-	}
+    public function open()
+    {
+        $bean = $this->bean;
+        // $this & $bean are both referencing child incorrectly!
+        asrt($this->bean->desc, 'I am mother');
+    }
 }
 /**
  * Mock Model.
  */
 class Model_Child extends SimpleModel
 {
-	public function open()
-	{
-		$this->bean->mother;
-		asrt( $this->bean->desc, 'I am child' );
-	}
+    public function open()
+    {
+        $this->bean->mother;
+        asrt($this->bean->desc, 'I am child');
+    }
 }

@@ -20,178 +20,178 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Export extends Blackhole
 {
-	/**
-	 * ExportAll.
-	 *
-	 * @return void
-	 */
-	public function testExportAll()
-	{
-		testpack( 'Test exportAll' );
+    /**
+     * ExportAll.
+     *
+     * @return void
+     */
+    public function testExportAll()
+    {
+        testpack('Test exportAll');
 
-		$redbean = R::getRedBean();
+        $redbean = R::getRedBean();
 
-		$bean = new OODBBean;
+        $bean = new OODBBean();
 
-		$bean->import( array( "a" => 1, "b" => 2 ) );
+        $bean->import(array( "a" => 1, "b" => 2 ));
 
-		$bean->setMeta( "justametaproperty", "hellothere" );
+        $bean->setMeta("justametaproperty", "hellothere");
 
-		$arr = $bean->export();
+        $arr = $bean->export();
 
-		asrt( is_array( $arr ), TRUE );
+        asrt(is_array($arr), true);
 
-		asrt( isset( $arr["a"] ), TRUE );
-		asrt( isset( $arr["b"] ), TRUE );
+        asrt(isset($arr["a"]), true);
+        asrt(isset($arr["b"]), true);
 
-		asrt( $arr["a"], 1 );
-		asrt( $arr["b"], 2 );
+        asrt($arr["a"], 1);
+        asrt($arr["b"], 2);
 
-		asrt( isset( $arr["__info"] ), FALSE );
+        asrt(isset($arr["__info"]), false);
 
-		$arr = $bean->export( TRUE );
+        $arr = $bean->export(true);
 
-		asrt( isset( $arr["__info"] ), TRUE );
+        asrt(isset($arr["__info"]), true);
 
-		asrt( $arr["a"], 1 );
-		asrt( $arr["b"], 2 );
+        asrt($arr["a"], 1);
+        asrt($arr["b"], 2);
 
-		$exportBean = $redbean->dispense( "abean" );
+        $exportBean = $redbean->dispense("abean");
 
-		$exportBean->setMeta( "metaitem.bla", 1 );
+        $exportBean->setMeta("metaitem.bla", 1);
 
-		$exportedBean = $exportBean->export( TRUE );
+        $exportedBean = $exportBean->export(true);
 
-		asrt( $exportedBean["__info"]["metaitem.bla"], 1 );
-		asrt( $exportedBean["__info"]["type"], "abean" );
+        asrt($exportedBean["__info"]["metaitem.bla"], 1);
+        asrt($exportedBean["__info"]["type"], "abean");
 
-		// Can we determine whether a bean is empty?
-		testpack( 'test $bean->isEmpty() function' );
+        // Can we determine whether a bean is empty?
+        testpack('test $bean->isEmpty() function');
 
-		$bean = R::dispense( 'bean' );
+        $bean = R::dispense('bean');
 
-		asrt( $bean->isEmpty(), TRUE );
-		asrt( ( count( $bean ) > 0 ), TRUE );
+        asrt($bean->isEmpty(), true);
+        asrt((count($bean) > 0), true);
 
-		$bean->property = 1;
+        $bean->property = 1;
 
-		asrt( $bean->isEmpty(), FALSE );
-		asrt( ( count( $bean ) > 0 ), TRUE );
+        asrt($bean->isEmpty(), false);
+        asrt((count($bean) > 0), true);
 
-		$bean->property = 0;
+        $bean->property = 0;
 
-		asrt( $bean->isEmpty(), TRUE );
-		asrt( ( count( $bean ) > 0 ), TRUE );
+        asrt($bean->isEmpty(), true);
+        asrt((count($bean) > 0), true);
 
-		$bean->property = FALSE;
+        $bean->property = false;
 
-		asrt( $bean->isEmpty(), TRUE );
-		asrt( ( count( $bean ) > 0 ), TRUE );
+        asrt($bean->isEmpty(), true);
+        asrt((count($bean) > 0), true);
 
-		$bean->property = NULL;
+        $bean->property = null;
 
-		asrt( $bean->isEmpty(), TRUE );
-		asrt( ( count( $bean ) > 0 ), TRUE );
+        asrt($bean->isEmpty(), true);
+        asrt((count($bean) > 0), true);
 
-		unset( $bean->property );
+        unset($bean->property);
 
-		asrt( $bean->isEmpty(), TRUE );
-		asrt( ( count( $bean ) > 0 ), TRUE );
+        asrt($bean->isEmpty(), true);
+        asrt((count($bean) > 0), true);
 
-		// Export bug I found
-		$bandmember = R::dispense( 'bandmember' );
-		$bandmember->name = 'Duke';
-		$instrument = R::dispense( 'instrument' );
-		$instrument->name = 'Piano';
-		$bandmember->ownInstrument[] = $instrument;
+        // Export bug I found
+        $bandmember = R::dispense('bandmember');
+        $bandmember->name = 'Duke';
+        $instrument = R::dispense('instrument');
+        $instrument->name = 'Piano';
+        $bandmember->ownInstrument[] = $instrument;
 
-		$a = R::exportAll( $bandmember );
+        $a = R::exportAll($bandmember);
 
-		pass();
+        pass();
 
-		asrt( isset( $a[0] ), TRUE );
-		asrt( (int) $a[0]['id'], 0 );
+        asrt(isset($a[0]), true);
+        asrt((int) $a[0]['id'], 0);
 
-		asrt( $a[0]['name'], 'Duke' );
+        asrt($a[0]['name'], 'Duke');
 
-		asrt( $a[0]['ownInstrument'][0]['name'], 'Piano' );
+        asrt($a[0]['ownInstrument'][0]['name'], 'Piano');
 
-		R::nuke();
+        R::nuke();
 
-		$v = R::dispense( 'village' );
-		$b = R::dispense( 'building' );
+        $v = R::dispense('village');
+        $b = R::dispense('building');
 
-		$v->name = 'a';
-		$b->name = 'b';
+        $v->name = 'a';
+        $b->name = 'b';
 
-		$v->ownBuilding[] = $b;
+        $v->ownBuilding[] = $b;
 
-		$id = R::store( $v );
+        $id = R::store($v);
 
-		$a = R::exportAll( $v );
+        $a = R::exportAll($v);
 
-		asrt( $a[0]['name'], 'a' );
-		asrt( $a[0]['ownBuilding'][0]['name'], 'b' );
+        asrt($a[0]['name'], 'a');
+        asrt($a[0]['ownBuilding'][0]['name'], 'b');
 
-		$v = R::load( 'village', $id );
+        $v = R::load('village', $id);
 
-		$b2 = R::dispense( 'building' );
+        $b2 = R::dispense('building');
 
-		$b2->name = 'c';
+        $b2->name = 'c';
 
-		$v->ownBuilding[] = $b2;
+        $v->ownBuilding[] = $b2;
 
-		$a = R::exportAll( $v );
+        $a = R::exportAll($v);
 
-		asrt( $a[0]['name'], 'a' );
-		asrt( $a[0]['ownBuilding'][0]['name'], 'b' );
+        asrt($a[0]['name'], 'a');
+        asrt($a[0]['ownBuilding'][0]['name'], 'b');
 
-		asrt( count( $a[0]['ownBuilding'] ), 2 );
+        asrt(count($a[0]['ownBuilding']), 2);
 
-		list( $r1, $r2 ) = R::dispense( 'army', 2 );
+        list($r1, $r2) = R::dispense('army', 2);
 
-		$r1->name = '1';
-		$r2->name = '2';
+        $r1->name = '1';
+        $r2->name = '2';
 
-		$v->sharedArmy[] = $r2;
+        $v->sharedArmy[] = $r2;
 
-		$a = R::exportAll( $v );
+        $a = R::exportAll($v);
 
-		asrt( count( $a[0]['sharedArmy'] ), 1 );
+        asrt(count($a[0]['sharedArmy']), 1);
 
-		R::store( $v );
+        R::store($v);
 
-		$v = R::load( 'village', $id );
+        $v = R::load('village', $id);
 
-		$a = R::exportAll( $v );
+        $a = R::exportAll($v);
 
-		asrt( count( $a[0]['sharedArmy'] ), 1 );
+        asrt(count($a[0]['sharedArmy']), 1);
 
-		asrt( $a[0]['name'], 'a' );
-		asrt( $a[0]['ownBuilding'][0]['name'], 'b' );
+        asrt($a[0]['name'], 'a');
+        asrt($a[0]['ownBuilding'][0]['name'], 'b');
 
-		asrt( count( $a[0]['ownBuilding'] ), 2 );
+        asrt(count($a[0]['ownBuilding']), 2);
 
-		$v->sharedArmy[] = $r1;
+        $v->sharedArmy[] = $r1;
 
-		$a = R::exportAll( $v );
+        $a = R::exportAll($v);
 
-		asrt( count( $a[0]['sharedArmy'] ), 2 );
+        asrt(count($a[0]['sharedArmy']), 2);
 
-		$v = R::load( 'village', $id );
+        $v = R::load('village', $id);
 
-		$a = R::exportAll( $v );
+        $a = R::exportAll($v);
 
-		asrt( count( $a[0]['sharedArmy'] ), 1 );
+        asrt(count($a[0]['sharedArmy']), 1);
 
-		$v->sharedArmy[] = $r1;
+        $v->sharedArmy[] = $r1;
 
-		R::store( $v );
+        R::store($v);
 
-		$v = R::load( 'village', $id );
+        $v = R::load('village', $id);
 
-		$a = R::exportAll( $v );
+        $a = R::exportAll($v);
 
-		asrt( count( $a[0]['sharedArmy'] ), 2 );
-	}
+        asrt(count($a[0]['sharedArmy']), 2);
+    }
 }

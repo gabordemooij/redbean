@@ -4,7 +4,6 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
@@ -27,89 +26,89 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Frozen extends Base
 {
-	/**
-	 * Tests the handling of trashed beans in frozen mode.
-	 * Are the lists unset etc?
-	 *
-	 * @return void
-	 */
-	public function testTrash()
-	{
-		R::nuke();
-		$book = R::dispense( 'book' );
-		$book->xownPageList[] = R::dispense( 'page' );
-		$book->sharedTagList[] = R::dispense( 'tag' );
-		R::store( $book );
-		$book = $book->fresh();
-		R::freeze( TRUE );
+    /**
+     * Tests the handling of trashed beans in frozen mode.
+     * Are the lists unset etc?
+     *
+     * @return void
+     */
+    public function testTrash()
+    {
+        R::nuke();
+        $book = R::dispense('book');
+        $book->xownPageList[] = R::dispense('page');
+        $book->sharedTagList[] = R::dispense('tag');
+        R::store($book);
+        $book = $book->fresh();
+        R::freeze(true);
 
-		$book->xownPageList = array();
+        $book->xownPageList = array();
 
-		R::store( $book );
-		$book = $book->fresh();
+        R::store($book);
+        $book = $book->fresh();
 
-		asrt( R::count('page'), 0 );
+        asrt(R::count('page'), 0);
 
-		$book->xownPageList[] = R::dispense( 'page' );
+        $book->xownPageList[] = R::dispense('page');
 
-		R::store( $book );
-		$book = $book->fresh();
+        R::store($book);
+        $book = $book->fresh();
 
-		asrt( R::count('page'), 1 );
+        asrt(R::count('page'), 1);
 
-		$book->xownPageList;
-		$book->sharedTagList;
-		R::trash( $book );
+        $book->xownPageList;
+        $book->sharedTagList;
+        R::trash($book);
 
-		asrt( R::count('book'), 0 );
-		asrt( R::count('page'), 0 );
-		asrt( R::count('tag'), 1 );
-		asrt( R::count('book_tag'), 0 );
+        asrt(R::count('book'), 0);
+        asrt(R::count('page'), 0);
+        asrt(R::count('tag'), 1);
+        asrt(R::count('book_tag'), 0);
 
-		R::freeze( FALSE );
-	}
+        R::freeze(false);
+    }
 
-	/**
-	 * Tests whether invalid list checks are
-	 * operational in frozen mode.
-	 *
-	 * @return void
-	 */
-	public function testInvalidList()
-	{
-		R::nuke();
-		$book = R::dispense( 'book' );
-		$book->xownPageList[] = R::dispense( 'page' );
-		$book->sharedTagList[] = R::dispense( 'tag' );
-		R::store( $book );
-		R::freeze( TRUE );
+    /**
+     * Tests whether invalid list checks are
+     * operational in frozen mode.
+     *
+     * @return void
+     */
+    public function testInvalidList()
+    {
+        R::nuke();
+        $book = R::dispense('book');
+        $book->xownPageList[] = R::dispense('page');
+        $book->sharedTagList[] = R::dispense('tag');
+        R::store($book);
+        R::freeze(true);
 
-		$book = R::dispense( 'book' );
-		$book->xownPageList[] = 'nonsense';
-		try {
-			R::store( $book );
-			fail();
-		} catch( \Exception $e ) {
-			pass();
-		}
+        $book = R::dispense('book');
+        $book->xownPageList[] = 'nonsense';
+        try {
+            R::store($book);
+            fail();
+        } catch (\Exception $e) {
+            pass();
+        }
 
-		R::freeze( FALSE );
-	}
+        R::freeze(false);
+    }
 
-	/**
-	 * Tests whether loading non-existant beans
-	 * returns the same results in frozen mode.
-	 *
-	 * @return
-	 */
-	public function testLoadNonExistant()
-	{
-		R::nuke();
-		R::store( R::dispense( 'bean' ) );
-		R::freeze( TRUE );
-		$bean = R::load( 'bean', 123 );
-		R::freeze( FALSE );
-		asrt( ( $bean instanceof OODBBean ), TRUE );
-		asrt( $bean->id, 0 );
-	}
+    /**
+     * Tests whether loading non-existant beans
+     * returns the same results in frozen mode.
+     *
+     * @return
+     */
+    public function testLoadNonExistant()
+    {
+        R::nuke();
+        R::store(R::dispense('bean'));
+        R::freeze(true);
+        $bean = R::load('bean', 123);
+        R::freeze(false);
+        asrt(($bean instanceof OODBBean), true);
+        asrt($bean->id, 0);
+    }
 }

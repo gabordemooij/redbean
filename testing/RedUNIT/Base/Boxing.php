@@ -4,7 +4,6 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\SimpleModel as SimpleModel;
 
 /**
  * Boxing
@@ -20,56 +19,53 @@ use RedBeanPHP\SimpleModel as SimpleModel;
  */
 class Boxing extends Base
 {
+    /**
+     * Test boxing beans.
+     *
+     * @return void
+     */
+    public function testBoxing()
+    {
+        R::nuke();
 
-	/**
-	 * Test boxing beans.
-	 *
-	 * @return void
-	 */
-	public function testBoxing()
-	{
-		R::nuke();
+        $bean = R::dispense('boxedbean')->box();
 
-		$bean = R::dispense( 'boxedbean' )->box();
+        R::trash($bean);
 
-		R::trash( $bean );
+        pass();
 
-		pass();
+        $bean = R::dispense('boxedbean');
 
-		$bean = R::dispense( 'boxedbean' );
+        $bean->sharedBoxbean = R::dispense('boxedbean')->box();
 
-		$bean->sharedBoxbean = R::dispense( 'boxedbean' )->box();
+        R::store($bean);
 
-		R::store( $bean );
+        pass();
 
-		pass();
+        $bean = R::dispense('boxedbean');
 
-		$bean = R::dispense( 'boxedbean' );
+        $bean->ownBoxedbean = R::dispense('boxedbean')->box();
 
-		$bean->ownBoxedbean = R::dispense( 'boxedbean' )->box();
+        R::store($bean);
 
-		R::store( $bean );
+        pass();
 
-		pass();
+        $bean = R::dispense('boxedbean');
 
-		$bean = R::dispense( 'boxedbean' );
+        $bean->other = R::dispense('boxedbean')->box();
 
-		$bean->other = R::dispense( 'boxedbean' )->box();
+        R::store($bean);
 
-		R::store( $bean );
+        pass();
 
-		pass();
+        $bean = R::dispense('boxedbean');
 
-		$bean = R::dispense( 'boxedbean' );
+        $bean->title = 'MyBean';
 
-		$bean->title = 'MyBean';
+        $box = $bean->box();
 
-		$box = $bean->box();
+        asrt(($box instanceof \Model_Boxedbean), true);
 
-		asrt( ( $box instanceof \Model_Boxedbean ), TRUE );
-
-		R::store( $box );
-	}
+        R::store($box);
+    }
 }
-
-

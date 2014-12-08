@@ -3,7 +3,6 @@
 namespace RedUNIT\Mysql;
 
 use RedUNIT\Mysql as Mysql;
-use RedBeanPHP\Facade as R;
 
 /**
  * Setget
@@ -19,107 +18,107 @@ use RedBeanPHP\Facade as R;
  */
 class Setget extends Mysql
 {
-	/**
-	 * Test numbers.
-	 *
-	 * @return void
-	 */
-	public function testNumbers()
-	{
-		asrt( setget( "-1" ), "-1" );
-		asrt( setget( -1 ), "-1" );
+    /**
+     * Test numbers.
+     *
+     * @return void
+     */
+    public function testNumbers()
+    {
+        asrt(setget("-1"), "-1");
+        asrt(setget(-1), "-1");
 
-		asrt( setget( "-0.25" ), "-0.25" );
-		asrt( setget( -0.25 ), "-0.25" );
+        asrt(setget("-0.25"), "-0.25");
+        asrt(setget(-0.25), "-0.25");
 
-		asrt( setget( "0.12345678" ), "0.12345678" );
-		asrt( setget( 0.12345678 ), "0.12345678" );
+        asrt(setget("0.12345678"), "0.12345678");
+        asrt(setget(0.12345678), "0.12345678");
 
-		asrt( setget( "-0.12345678" ), "-0.12345678" );
-		asrt( setget( -0.12345678 ), "-0.12345678" );
+        asrt(setget("-0.12345678"), "-0.12345678");
+        asrt(setget(-0.12345678), "-0.12345678");
 
-		asrt( setget( "2147483647" ), "2147483647" );
-		asrt( setget( 2147483647 ), "2147483647" );
+        asrt(setget("2147483647"), "2147483647");
+        asrt(setget(2147483647), "2147483647");
 
-		asrt( setget( -2147483647 ), "-2147483647" );
-		asrt( setget( "-2147483647" ), "-2147483647" );
+        asrt(setget(-2147483647), "-2147483647");
+        asrt(setget("-2147483647"), "-2147483647");
 
-		asrt( setget( "2147483648" ), "2147483648" );
-		asrt( setget( "-2147483648" ), "-2147483648" );
+        asrt(setget("2147483648"), "2147483648");
+        asrt(setget("-2147483648"), "-2147483648");
 
-		asrt( setget( "199936710040730" ), "199936710040730" );
-		asrt( setget( "-199936710040730" ), "-199936710040730" );
+        asrt(setget("199936710040730"), "199936710040730");
+        asrt(setget("-199936710040730"), "-199936710040730");
 
-		//Architecture dependent... only test this if you are sure what arch
-		//asrt(setget("2147483647123456"),"2.14748364712346e+15");
-		//asrt(setget(2147483647123456),"2.14748364712e+15");
-	}
+        //Architecture dependent... only test this if you are sure what arch
+        //asrt(setget("2147483647123456"),"2.14748364712346e+15");
+        //asrt(setget(2147483647123456),"2.14748364712e+15");
+    }
 
-	/**
-	 * Test dates.
-	 *
-	 * @return void
-	 */
-	public function testDates()
-	{
-		asrt( setget( "2010-10-11" ), "2010-10-11" );
+    /**
+     * Test dates.
+     *
+     * @return void
+     */
+    public function testDates()
+    {
+        asrt(setget("2010-10-11"), "2010-10-11");
 
-		asrt( setget( "2010-10-11 12:10" ), "2010-10-11 12:10" );
+        asrt(setget("2010-10-11 12:10"), "2010-10-11 12:10");
 
-		asrt( setget( "2010-10-11 12:10:11" ), "2010-10-11 12:10:11" );
+        asrt(setget("2010-10-11 12:10:11"), "2010-10-11 12:10:11");
 
-		asrt( setget( "x2010-10-11 12:10:11" ), "x2010-10-11 12:10:11" );
-	}
+        asrt(setget("x2010-10-11 12:10:11"), "x2010-10-11 12:10:11");
+    }
 
-	/**
-	 * Test strings.
-	 *
-	 * @return void
-	 */
-	public function testStrings()
-	{
-		asrt( setget( "a" ), "a" );
+    /**
+     * Test strings.
+     *
+     * @return void
+     */
+    public function testStrings()
+    {
+        asrt(setget("a"), "a");
 
-		asrt( setget( "." ), "." );
+        asrt(setget("."), ".");
 
-		asrt( setget( "\"" ), "\"" );
+        asrt(setget("\""), "\"");
 
-		asrt( setget( "just some text" ), "just some text" );
-	}
+        asrt(setget("just some text"), "just some text");
+    }
 
-	/**
-	 * Test booleans.
-	 *
-	 * @return void
-	 */
-	public function testBool()
-	{
-		asrt( setget( TRUE ), "1" );
-		asrt( setget( FALSE ), "0" );
+    /**
+     * Test booleans.
+     *
+     * @return void
+     */
+    public function testBool()
+    {
+        asrt(setget(true), "1");
+        asrt(setget(false), "0");
 
-		asrt( setget( "TRUE" ), "TRUE" );
-		asrt( setget( "FALSE" ), "FALSE" );
-	}
+        asrt(setget("TRUE"), "TRUE");
+        asrt(setget("FALSE"), "FALSE");
+    }
 
-	/**
-	 * Test NULL.
-	 *
-	 * @return void
-	 */
-	public function testNull()
-	{
-		asrt( setget( "NULL" ), "NULL" );
-		asrt( setget( "NULL" ), "NULL" );
+    /**
+     * Test NULL.
+     *
+     * @return void
+     */
+    public function testNull()
+    {
+        asrt(setget("NULL"), "NULL");
+        asrt(setget("NULL"), "NULL");
 
-		asrt( setget( "0123", 1 ), "0123" );
-		asrt( setget( "0000123", 1 ), "0000123" );
+        asrt(setget("0123", 1), "0123");
+        asrt(setget("0000123", 1), "0000123");
 
-		asrt( setget( NULL ), NULL );
+        asrt(setget(null), null);
 
-		asrt( ( setget( 0 ) == 0 ), TRUE );
-		asrt( ( setget( 1 ) == 1 ), TRUE );
+        asrt((setget(0) == 0), true);
+        asrt((setget(1) == 1), true);
 
-		asrt( ( setget( TRUE ) == TRUE ), TRUE );
-		asrt( ( setget( FALSE ) == FALSE ), TRUE );
-	}
+        asrt((setget(true) == TRUE), true);
+        asrt((setget(false) == FALSE), true);
+    }
 }

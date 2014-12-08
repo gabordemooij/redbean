@@ -16,13 +16,13 @@ namespace RedUNIT;
  */
 class Blackhole extends RedUNIT
 {
-	/**
-	 * Returns the drivers this test suite applies to.
-	 *
-	 * @return array
-	 */
-	public function getTargetDrivers()
-	{
-		return array();
-	}
+    /**
+     * Returns the drivers this test suite applies to.
+     *
+     * @return array
+     */
+    public function getTargetDrivers()
+    {
+        return array();
+    }
 }
