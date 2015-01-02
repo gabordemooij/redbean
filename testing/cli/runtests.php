@@ -175,6 +175,7 @@ $allPacks = array(
 	'Mysql/Parambind',
 	'Mysql/Uuid',
 	'Mysql/Bigint',
+	'Mysql/Issue411',
 	'Postgres/Setget',
 	'Postgres/Foreignkeys',
 	'Postgres/Parambind',

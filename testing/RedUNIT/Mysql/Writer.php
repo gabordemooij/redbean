@@ -156,7 +156,7 @@ class Writer extends \RedUNIT\Mysql
 
 		asrt( $writer->scanType( FALSE ), 0 );
 		asrt( $writer->scanType( TRUE ), 0 );
-		asrt( $writer->scanType( INF ), 4 );
+		asrt( $writer->scanType( INF ), 5 );
 		
 		asrt( $writer->scanType( NULL ), 0 );
 
@@ -181,7 +181,7 @@ class Writer extends \RedUNIT\Mysql
 
 		asrt( $writer->scanType( "2001-10-10 10:00:00" ), 4 );
 
-		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), 5 );
+		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), 6 );
 
 		$writer->widenColumn( "testtable", "c1", 2 );
 
@@ -540,7 +540,7 @@ class Writer extends \RedUNIT\Mysql
 
 		$cols = R::getColumns( 'bean' );
 
-		asrt( $cols['date'], 'varchar(255)' );
+		asrt( $cols['date'], 'varchar(191)' );
 
 		$bean       = R::dispense( 'bean' );
 
@@ -550,7 +550,7 @@ class Writer extends \RedUNIT\Mysql
 
 		$cols = R::getColumns( 'bean' );
 
-		asrt( $cols['date'], 'varchar(255)' );
+		asrt( $cols['date'], 'varchar(191)' );
 	}
 
 	/**
@@ -630,7 +630,7 @@ class Writer extends \RedUNIT\Mysql
 
 		$cols = R::getColumns( 'bean' );
 
-		asrt( $cols['title'], 'varchar(255)' );
+		asrt( $cols['title'], 'varchar(191)' );
 	}
 
 	/**
