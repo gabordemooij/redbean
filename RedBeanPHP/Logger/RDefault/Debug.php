@@ -36,6 +36,11 @@ class Debug extends RDefault implements Logger
 	 */
 	private function writeQuery( $newSql, $newBindings )
 	{
+		//avoid str_replace collisions: slot1 and slot10 (issue 407).
+		uksort( $newBindings, function( $a, $b ) {
+			return ( strlen( $b ) - strlen( $a ) );
+		} );
+
 		$newStr = $newSql;
 		foreach( $newBindings as $slot => $value ) {
 			if ( strpos( $slot, ':' ) === 0 ) {
