@@ -412,6 +412,17 @@ class Model_BookBook extends \RedBean_SimpleModel {
 	}
 }
 
+class Model_Feed extends \RedbeanPHP\SimpleModel {
+    public function update() {
+        $this->bean->post = json_encode($this->bean->post);
+    }
+
+    public function open() {
+        $this->bean->post = json_decode($this->bean->post, true);
+    }
+}
+
+
 /**
  * UUID QueryWriter for MySQL for testing purposes.
  */
