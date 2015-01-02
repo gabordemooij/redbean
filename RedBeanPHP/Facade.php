@@ -112,6 +112,11 @@ class Facade
 	private static $plugins = array();
 
 	/**
+	 * Not in use (backward compatibility SQLHelper)
+	 */
+	public static $f;
+
+	/**
 	 * @var string
 	 */
 	private static $exportCaseStyle = 'default';
