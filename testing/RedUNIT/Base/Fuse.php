@@ -284,4 +284,123 @@ class Fuse extends Base
 		asrt( R::hasTag( $blog, array( "horror", "commic", "halloween" ), TRUE ), FALSE );
 		asrt( count( R::tag( $blog ) ), 3 );
 	}
+
+	/**
+	 * Test error handling options FUSE.
+	 */
+	public function testModelErrorHandling()
+	{
+		$test = R::dispense( 'feed' );
+		$test->nonExistantMethod();
+		pass();
+		$old = R::setErrorHandlingFUSE( OODBBean::C_ERR_LOG );
+		asrt( is_array( $old ), TRUE );
+		asrt( count( $old ), 2 );
+		asrt( $old[0], FALSE );
+		asrt( $old[1], NULL);
+		$test->nonExistantMethod(); //we cant really test this... :(
+		pass();
+				
+		$old = R::setErrorHandlingFUSE( OODBBean::C_ERR_NOTICE );
+		asrt( is_array( $old ), TRUE );
+		asrt( count( $old ), 2 );
+		asrt( $old[0], OODBBean::C_ERR_LOG );
+		asrt( $old[1], NULL);
+		set_error_handler(function($error, $str) {
+			asrt( $str, 'FUSE: method does not exist in model: nonExistantMethod' );
+		}, E_USER_NOTICE);
+		$test->nonExistantMethod();
+		restore_error_handler();
+		
+		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_WARN );
+		asrt( is_array( $old ), TRUE );
+		asrt( count( $old ), 2 );
+		asrt( $old[0], OODBBean::C_ERR_NOTICE );
+		asrt( $old[1], NULL);
+		set_error_handler(function($error, $str) {
+			asrt( $str, 'FUSE: method does not exist in model: nonExistantMethod' );
+		}, E_USER_WARNING);
+		$test->nonExistantMethod();
+		restore_error_handler();
+		
+		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_FATAL );
+		asrt( is_array( $old ), TRUE );
+		asrt( count( $old ), 2 );
+		asrt( $old[0], OODBBean::C_ERR_WARN );
+		asrt( $old[1], NULL);
+		set_error_handler(function($error, $str) {
+			asrt( $str, 'FUSE: method does not exist in model: nonExistantMethod' );
+		}, E_USER_ERROR);
+		$test->nonExistantMethod();
+		restore_error_handler();
+
+		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_EXCEPTION );
+		asrt( is_array( $old ), TRUE );
+		asrt( count( $old ), 2 );
+		asrt( $old[0], OODBBean::C_ERR_FATAL );
+		asrt( $old[1], NULL);
+		try {
+			$test->nonExistantMethod();
+			fail();
+		} catch (\Exception $e) {
+			pass();
+		}
+
+		global $test_bean;
+		$test_bean = $test;
+		global $has_executed_error_func_fuse;
+		$has_executed_error_func_fuse = FALSE;
+		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_FUNC, function( $info ){
+			global $has_executed_error_func_fuse;
+			global $test_bean;
+			$has_executed_error_func_fuse = TRUE;
+			asrt( is_array( $info ), TRUE );
+			asrt( $info['method'], 'nonExistantMethod' );
+			asrt( json_encode( $info['bean']->export() ), json_encode( $test_bean->export() ) );
+			asrt( $info['message'], 'FUSE: method does not exist in model: nonExistantMethod' );
+		} );
+		asrt( is_array( $old ), TRUE );
+		asrt( count( $old ), 2 );
+		asrt( $old[0], OODBBean::C_ERR_EXCEPTION );
+		asrt( $old[1], NULL);
+		$test->nonExistantMethod();
+		asrt( $has_executed_error_func_fuse, TRUE );
+
+		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_IGNORE );
+		asrt( is_array( $old ), TRUE );
+		asrt( count( $old ), 2 );
+		asrt( $old[0], OODBBean::C_ERR_FUNC );
+		asrt( is_callable( $old[1] ), TRUE );
+
+		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_IGNORE );
+		asrt( is_array( $old ), TRUE );
+		asrt( count( $old ), 2 );
+		asrt( $old[0], OODBBean::C_ERR_IGNORE );
+		asrt( $old[1], NULL);
+
+		try {
+			OODBBean::setErrorHandlingFUSE( 900 );
+			fail();
+		} catch (\Exception $e) {
+			pass();
+			asrt( $e->getMessage(), 'Invalid error mode selected' );
+		}
+
+		try {
+			OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_FUNC, 'hello' );
+			fail();
+		} catch (\Exception $e) {
+			pass();
+			asrt( $e->getMessage(), 'Invalid error handler' );
+		}
+
+		OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_EXCEPTION );
+		//make sure ignore FUSE events
+		$test = R::dispense('feed');
+		R::store( $test );
+		$test = $test->fresh();
+		R::trash( $test );
+		pass();
+		OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_IGNORE );
+	}
 }

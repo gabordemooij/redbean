@@ -23,6 +23,78 @@ use RedBeanPHP\OODBBean as OODBBean;
 class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 {
 	/**
+	 * @var boolean
+	 */
+	protected static $errorHandlingFUSE = FALSE;
+
+	/**
+	 * @var callable|NULL
+	 */
+	protected static $errorHandler = NULL;
+
+	/**
+	 * FUSE error modes.
+	 */
+	const C_ERR_IGNORE    = FALSE;
+	const C_ERR_LOG       = 1;
+	const C_ERR_NOTICE    = 2;
+	const C_ERR_WARN      = 3;
+	const C_ERR_EXCEPTION = 4;
+	const C_ERR_FUNC      = 5;
+	const C_ERR_FATAL     = 6;
+
+	/**
+	 * Sets the error mode for FUSE.
+	 * What to do if a FUSE model method does not exist?
+	 * You can set the following options:
+	 *
+	 * OODBBean::C_ERR_IGNORE (default), ignores the call, returns NULL
+	 * OODBBean::C_ERR_LOG, logs the incident using error_log
+	 * OODBBean::C_ERR_NOTICE, triggers a E_USER_NOTICE
+	 * OODBBean::C_ERR_WARN, triggers a E_USER_WARNING
+	 * OODBBean::C_ERR_EXCEPTION, throws an exception
+	 * OODBBean::C_ERR_FUNC, allows you to specify a custom handler (function)
+	 * OODBBean::C_ERR_FATAL, triggers a E_USER_ERROR
+	 *
+	 * Custom handler method signature: handler( array (
+	 * 	'message' => string
+	 * 	'bean' => OODBBean
+	 * 	'method' => string
+	 * ) )
+	 *
+	 * This method returns the old mode and handler as an array.
+	 *
+	 * @param integer       $mode mode
+	 * @param callable|NULL $func custom handler
+	 *
+	 * @return array
+	 */
+	public static function setErrorHandlingFUSE($mode, $func = NULL) {
+		if (
+			   $mode !== self::C_ERR_IGNORE
+			&& $mode !== self::C_ERR_LOG
+			&& $mode !== self::C_ERR_NOTICE
+			&& $mode !== self::C_ERR_WARN
+			&& $mode !== self::C_ERR_EXCEPTION
+			&& $mode !== self::C_ERR_FUNC
+			&& $mode !== self::C_ERR_FATAL
+		) throw new \Exception( 'Invalid error mode selected' );
+
+		if ( $mode === self::C_ERR_FUNC && !is_callable( $func ) ) {
+			throw new \Exception( 'Invalid error handler' );
+		}
+
+		$old = array( self::$errorHandlingFUSE, self::$errorHandler );
+		self::$errorHandlingFUSE = $mode;
+		if ( is_callable( $func ) ) {
+			self::$errorHandler = $func;
+		} else {
+			self::$errorHandler = NULL;
+		}
+		return $old;
+	}
+	
+	/**
 	 * This is where the real properties of the bean live. They are stored and retrieved
 	 * by the magic getter and setter (__get and __set).
 	 *
@@ -1036,6 +1108,39 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$this->__info['model'] = $model;
 		}
 		if ( !method_exists( $this->__info['model'], $method ) ) {
+
+			if ( self::$errorHandlingFUSE === FALSE ) {
+				return NULL;
+			}
+
+			if ( in_array( $method, array( 'update', 'open', 'delete', 'after_delete', 'after_update', 'dispense' ), TRUE ) ) {
+				return NULL;
+			}
+
+			$message = "FUSE: method does not exist in model: $method";
+			if ( self::$errorHandlingFUSE === self::C_ERR_LOG ) {
+				error_log( $message );
+				return NULL;
+			} elseif ( self::$errorHandlingFUSE === self::C_ERR_NOTICE ) {
+				trigger_error( $message, E_USER_NOTICE );
+				return NULL;
+			} elseif ( self::$errorHandlingFUSE === self::C_ERR_WARN ) {
+				trigger_error( $message, E_USER_WARNING );
+				return NULL;
+			} elseif ( self::$errorHandlingFUSE === self::C_ERR_EXCEPTION ) {
+				throw new \Exception( $message );
+			} elseif ( self::$errorHandlingFUSE === self::C_ERR_FUNC ) {
+				if ( is_callable( self::$errorHandler ) ) {
+					$func = self::$errorHandler;
+					return $func(array(
+						'message' => $message,
+						'method' => $method,
+						'args' => $args,
+						'bean' => $this
+					));
+				}
+			}
+			trigger_error( $message, E_USER_ERROR );
 			return NULL;
 		}
 
