@@ -38,8 +38,8 @@ class Tags extends Base
 		asrt( count( R::tagged( 'movie', 'horror' ) ), 3);
 		asrt( count( R::tagged( 'movie', 'horror', ' LIMIT 2' ) ), 2);
 		asrt( count( R::tagged( 'movie', 'horror', ' LIMIT ?', array( 2 ) ) ), 2);
-		asrt( count( R::tagged( 'movie', 'horror', ' ORDER BY title DESC LIMIT ?', array( 2 ) ) ), 2);
-		asrt( count( R::tagged( 'movie', 'horror,gothic', ' ORDER BY title DESC LIMIT ?', array( 1 ) ) ), 1);
+		asrt( count( R::tagged( 'movie', 'horror', ' ORDER BY movie.title DESC LIMIT ?', array( 2 ) ) ), 2);
+		asrt( count( R::tagged( 'movie', 'horror,gothic', ' ORDER BY movie.title DESC LIMIT ?', array( 1 ) ) ), 1);
 		asrt( count( R::tagged( 'movie', 'horror,gothic') ), 3 );
 		asrt( count( R::taggedAll( 'movie', 'horror,gothic') ), 2 );
 		asrt( count( R::tagged( 'movie', 'horror,gothic', ' LIMIT ? ', array( 2 ) ) ), 2 );
@@ -58,8 +58,8 @@ class Tags extends Base
 		asrt( count( R::taggedAll( 'movie', 'gothic,short', ' LIMIT ? ', array( 4 ) ) ), 1 );
 		asrt( count( R::tagged( 'movie', 'gothic,short', ' LIMIT 4 ' ) ), 2 );
 		asrt( count( R::taggedAll( 'movie', 'gothic,short', ' LIMIT 4 ' ) ), 1 );
-		asrt( count( R::tagged( 'movie', 'gothic,short', ' ORDER BY id DESC LIMIT 4 ' ) ), 2 );
-		asrt( count( R::taggedAll( 'movie', 'gothic,short', ' ORDER BY id DESC LIMIT 4 ' ) ), 1 );
+		asrt( count( R::tagged( 'movie', 'gothic,short', ' ORDER BY movie.id DESC LIMIT 4 ' ) ), 2 );
+		asrt( count( R::taggedAll( 'movie', 'gothic,short', ' ORDER BY movie.id DESC LIMIT 4 ' ) ), 1 );
 		asrt( count( R::tagged( 'movie', 'short', ' LIMIT ? ', array( 4 ) ) ), 1 );
 		asrt( count( R::taggedAll( 'movie', 'short', ' LIMIT ? ', array( 4 ) ) ), 1 );
 		asrt( count( R::tagged( 'movie', '', ' LIMIT ? ', array( 4 ) ) ), 0 );
