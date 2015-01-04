@@ -472,7 +472,7 @@ class Aliasing extends Base
 
 		$line2 = R::dispense( 'line' );
 
-		$line2->pointA = $line->pointA;
+		$line2->pointA = $line->fetchAs('point')->pointA;
 		$line2->pointB = R::dispense( 'point' );
 
 		R::store( $line2 );
