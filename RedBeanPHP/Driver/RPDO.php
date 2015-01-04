@@ -236,6 +236,8 @@ class RPDO implements Driver
 		//PHP 5.3 PDO SQLite has a bug with large numbers:
 		if ( strpos( $this->dsn, 'sqlite' ) === 0 && PHP_MAJOR_VERSION === 5 && PHP_MINOR_VERSION === 3) {
 			$this->max = 2147483647; //otherwise you get -2147483648 ?! demonstrated in build #603 on Travis.
+		} elseif ( strpos( $this->dsn, 'cubrid' ) === 0 ) {
+			$this->max = 2147483647; //bindParam in pdo_cubrid also fails...
 		} else {
 			$this->max = PHP_INT_MAX; //the normal value of course (makes it possible to use large numbers in LIMIT clause)
 		}
@@ -274,14 +276,14 @@ class RPDO implements Driver
 			$this->pdo = new\PDO(
 				$this->dsn,
 				$user,
-				$pass,
-				array(\PDO::ATTR_ERRMODE            =>\PDO::ERRMODE_EXCEPTION,
-					  \PDO::ATTR_DEFAULT_FETCH_MODE =>\PDO::FETCH_ASSOC,
-				)
+				$pass
 			);
 
 			$this->setEncoding();
 			$this->pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, TRUE );
+			//cant pass these as argument to constructor, CUBRID driver does not understand...
+			$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+			$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE,\PDO::FETCH_ASSOC);
 
 			$this->isConnected = TRUE;
 		} catch (\PDOException $exception ) {
