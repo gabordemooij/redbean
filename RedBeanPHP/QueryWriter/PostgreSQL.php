@@ -64,6 +64,35 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	}
 
 	/**
+	 * Internal method, returns a map of foreign key constraints for
+	 * the current database (and schema) and the specified table
+	 * and field.
+	 *
+	 * @param string $table  table name
+	 * @param string $field field name
+	 *
+	 * @return array
+	 */
+	protected function getKeys($type, $field)
+	{
+		return $this->adapter->get('
+			SELECT 
+			information_schema.key_column_usage.constraint_name,
+			information_schema.key_column_usage.table_name as sourcetable,
+			information_schema.key_column_usage.column_name as sourcecolumn,
+			information_schema.constraint_table_usage.table_name as targettable
+				FROM information_schema.key_column_usage
+			INNER JOIN information_schema.constraint_table_usage
+				ON information_schema.key_column_usage.constraint_name = information_schema.constraint_table_usage.constraint_name
+			WHERE
+				information_schema.key_column_usage.table_catalog = current_database()
+				AND information_schema.key_column_usage.table_schema = ANY( current_schemas( FALSE ) )
+				AND information_schema.key_column_usage.table_name = ?
+				AND information_schema.key_column_usage.column_name = ?
+		', array($type, $field));
+	}
+
+	/**
 	 * Add the constraints for a specific database driver: PostgreSQL.
 	 *
 	 * @param string $table     table to add fk constraints to
@@ -78,7 +107,6 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	{
 		try {
 			$adapter = $this->adapter;
-
 			$fkCode  = 'fk' . md5( $table . $property1 . $property2 );
 
 			$sql = "SELECT c.oid, n.nspname, c.relname,
@@ -355,24 +383,22 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::addFK
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDep = FALSE )
+	public function addFK( $table, $targetTable, $field, $targetField, $isDep = FALSE )
 	{
 		$db = $this->adapter->getCell( 'SELECT current_database()' );
-		$cfks = $this->adapter->getCell('
-			SELECT constraint_name
-				FROM information_schema.KEY_COLUMN_USAGE
-			WHERE
-				table_catalog = ?
-				AND table_schema = ANY( current_schemas( FALSE ) )
-				AND table_name = ?
-				AND column_name = ?
-		', array($db, $type, $field));
-
+		
+		$table = $this->esc( $table, TRUE );
+		$field = $this->esc( $field, TRUE );
+		$targetTable = $this->esc( $targetTable, TRUE );
+		$targetField = $this->esc( $targetField, TRUE );
+		
+		$cfks = $this->getKeys( $table, $field );
+		
 		try{
-			if (!$cfks) {
+			if ( !count( $cfks ) ) {
 				$delRule = ( $isDep ? 'CASCADE' : 'SET NULL' );
-				$this->adapter->exec( "ALTER TABLE  {$this->esc($type)}
-					ADD FOREIGN KEY ( {$this->esc($field)} ) REFERENCES  {$this->esc($targetType)} (
+				$this->adapter->exec( "ALTER TABLE  {$this->esc($table)}
+					ADD FOREIGN KEY ( {$this->esc($field)} ) REFERENCES  {$this->esc($targetTable)} (
 					{$this->esc($targetField)}) ON DELETE $delRule ON UPDATE $delRule DEFERRABLE ;" );
 			}
 		} catch (\Exception $e ) {
@@ -394,6 +420,23 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 		}
 
 		$this->adapter->exec( 'SET CONSTRAINTS ALL IMMEDIATE' );
+	}
+
+	/**
+	 * @see QueryWriter::inferFetchType
+	 */
+	public function inferFetchType( $type, $property )
+	{
+		$type = $this->esc( $type, TRUE );
+		$field = $this->esc( $property, TRUE ) . '_id';
+		$keys = $this->getKeys($type, $field);
+		foreach( $keys as $key ) {
+			if ( 
+				$key['sourcetable'] === $type
+				&& $key['sourcecolumn'] === $field
+			) return $key['targettable'];
+		}
+		return NULL;
 	}
 
 }

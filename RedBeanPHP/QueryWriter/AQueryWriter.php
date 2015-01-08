@@ -1069,4 +1069,15 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	{
 		return $this->esc( $table, $noQuotes );
 	}
+	
+	/**
+	 * @see QueryWriter::inferFetchType
+	 * 
+	 * Default implementation, makes sure it does not affect
+	 * any QueryWriters not overriding this method.
+	 */
+	public function inferFetchType( $type, $property )
+	{
+		return NULL;
+	}
 }

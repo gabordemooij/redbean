@@ -319,6 +319,12 @@ class FaultyWriter extends \RedBeanPHP\QueryWriter\MySQL
 }
 
 /**
+ * Mock class to test default implementations in AQueryWriter.
+ */
+class NullWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
+}
+
+/**
  * Mock class to test proper model name
  * beautificattion for link table beans in FUSE.
  */

@@ -112,6 +112,36 @@ class MySQL extends AQueryWriter implements QueryWriter
 	}
 
 	/**
+	 * Internal method, returns a map of foreign key constraints for
+	 * the current database (and schema) and the specified table
+	 * and field.
+	 *
+	 * @param string $table  table name
+	 * @param string $field field name
+	 *
+	 * @return array
+	 */
+	protected function getKeys($table, $field)
+	{
+		$cfks = $this->adapter->get('
+			SELECT 
+				CONSTRAINT_NAME,
+				REFERENCED_TABLE_NAME,
+				TABLE_NAME,
+				COLUMN_NAME
+				FROM information_schema.KEY_COLUMN_USAGE
+			WHERE
+				TABLE_SCHEMA IN ( SELECT DATABASE() )
+				AND TABLE_NAME = ?
+				AND COLUMN_NAME = ? AND
+				CONSTRAINT_NAME != \'PRIMARY\'
+				AND REFERENCED_TABLE_NAME IS NOT NULL
+		', array($table, $field));
+		
+		return $cfks;
+	}
+
+	/**
 	 * Constructor
 	 *
 	 * @param Adapter $adapter Database Adapter
@@ -331,20 +361,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	 */
 	public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
 	{
-
-		$db = $this->adapter->getCell( 'SELECT DATABASE()' );
-
-		$cfks = $this->adapter->getCell('
-			SELECT CONSTRAINT_NAME
-				FROM information_schema.KEY_COLUMN_USAGE
-			WHERE
-				TABLE_SCHEMA = ?
-				AND TABLE_NAME = ?
-				AND COLUMN_NAME = ? AND
-				CONSTRAINT_NAME != \'PRIMARY\'
-				AND REFERENCED_TABLE_NAME IS NOT NULL
-		', array($db, $type, $field));
-
+		$cfks = $this->getKeys($type, $field);
 		if ($cfks) return;
 
 		try {
@@ -395,5 +412,22 @@ class MySQL extends AQueryWriter implements QueryWriter
 		}
 
 		$this->adapter->exec( 'SET FOREIGN_KEY_CHECKS = 1;' );
+	}
+
+	 /**
+	 * @see QueryWriter::inferFetchType
+	 */
+	public function inferFetchType( $type, $property )
+	{
+		$type = $this->esc( $type, TRUE );
+		$field = $this->esc( $property, TRUE ) . '_id';
+		$keys = $this->getKeys($type, $field);
+		foreach( $keys as $key ) {
+			if ( 
+				$key['TABLE_NAME'] === $type
+				&& $key['COLUMN_NAME'] === $field
+			) return $key['REFERENCED_TABLE_NAME'];
+		}
+		return NULL;
 	}
 }

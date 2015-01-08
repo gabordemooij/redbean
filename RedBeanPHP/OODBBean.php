@@ -876,7 +876,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 					$type            = $this->fetchType;
 					$this->fetchType = NULL;
 				} else {
-					$type = $property;
+					$type = $this->beanHelper->getToolbox()->getWriter()->inferFetchType( $this->__info['type'], $property );
+					if ( is_null( $type ) ) $type = $property;
 				}
 				$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 			}
