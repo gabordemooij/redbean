@@ -472,7 +472,7 @@ interface QueryWriter
 	 *
 	 * @return array|NULL
 	 */
-	public function getForeignKeyForTableColumn( $table, $column )
+	public function getForeignKeyForTableColumn( $table, $column );
 
 	/**
 	 * Returns the foreign key map (FKM) for a table.

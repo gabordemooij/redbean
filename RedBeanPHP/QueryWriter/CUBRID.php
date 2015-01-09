@@ -102,17 +102,16 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	 *
 	 * @return void
 	 */
-	protected function buildFK( $type, $targetType, $field, $targetField, $isDep = FALSE )
+	protected function buildFK( $type, $targetType, $property, $targetProperty, $isDep = FALSE )
 	{
-		if ( !is_null( $this->getForeignKeyForTableColumn( $type, $field ) ) ) return FALSE;
 		$table           = $this->esc( $type );
 		$tableNoQ        = $this->esc( $type, TRUE );
 		$targetTable     = $this->esc( $targetType );
 		$targetTableNoQ  = $this->esc( $targetType, TRUE );
-		$column          = $this->esc( $field );
-		$columnNoQ       = $this->esc( $field, TRUE );
-		$targetColumn    = $this->esc( $targetField );
-		$keys            = $this->getKeyMapForTable( $tableNoQ );
+		$column          = $this->esc( $property );
+		$columnNoQ       = $this->esc( $property, TRUE );
+		$targetColumn    = $this->esc( $targetProperty );
+		if ( !is_null( $this->getForeignKeyForTableColumn( $tableNoQ, $columnNoQ ) ) ) return FALSE;
 		$needsToDropFK   = FALSE;
 		$casc = ( $isDep ? 'CASCADE' : 'SET NULL' );
 		$sql  = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
@@ -335,9 +334,9 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::addFK
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
+	public function addFK( $type, $targetType, $property, $targetProperty, $isDependent = FALSE )
 	{
-		$this->buildFK( $type, $targetType, $field, $targetField, $isDependent );
+		return $this->buildFK( $type, $targetType, $property, $targetProperty, $isDependent );
 	}
 
 	/**

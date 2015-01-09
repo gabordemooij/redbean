@@ -186,27 +186,24 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	 * @note: cant put this in try-catch because that can hide the fact
 	 *      that database has been damaged.
 	 */
-	protected function buildFK( $type, $targetType, $field, $targetField, $constraint = FALSE )
+	protected function buildFK( $type, $targetType, $property, $targetProperty, $constraint = FALSE )
 	{
+		$table           = $this->esc( $type, TRUE );
+		$targetTable     = $this->esc( $targetType, TRUE );
+		$column          = $this->esc( $property, TRUE );
+		$targetColumn    = $this->esc( $targetProperty, TRUE );
+		if ( !is_null( $this->getForeignKeyForTableColumn( $table, $column ) ) ) return FALSE;
+		$t = $this->getTable( $table );
 		$consSQL = ( $constraint ? 'CASCADE' : 'SET NULL' );
-
-		$t       = $this->getTable( $type );
-		$label   = 'from_' . $field . '_to_table_' . $targetType . '_col_' . $targetField;
-
-		foreach($t['keys'] as $key) {
-			if ($key['from'] === $field) return FALSE;
-		}
-
+		$label   = 'from_' . $column . '_to_table_' . $targetTable . '_col_' . $targetColumn;
 		$t['keys'][$label] = array(
-			'table'     => $targetType,
-			'from'      => $field,
-			'to'        => $targetField,
+			'table'     => $targetTable,
+			'from'      => $column,
+			'to'        => $targetColumn,
 			'on_update' => $consSQL,
 			'on_delete' => $consSQL
 		);
-
 		$this->putTable( $t );
-
 		return TRUE;
 	}
 
@@ -425,9 +422,9 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::addFK
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDep = FALSE )
+	public function addFK( $type, $targetType, $property, $targetProperty, $isDep = FALSE )
 	{
-		return $this->buildFK( $type, $targetType, $field, $targetField, $isDep );
+		return $this->buildFK( $type, $targetType, $property, $targetProperty, $isDep );
 	}
 
 	/**

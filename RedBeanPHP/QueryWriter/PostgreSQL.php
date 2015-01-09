@@ -386,22 +386,20 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::addFK
 	 */
-	public function addFK( $table, $targetTable, $field, $targetField, $isDep = FALSE )
+	public function addFK( $type, $targetType, $property, $targetProperty, $isDep = FALSE )
 	{
-		$db = $this->adapter->getCell( 'SELECT current_database()' );
-		$table = $this->esc( $table, TRUE );
-		$field = $this->esc( $field, TRUE );
-		$targetTable = $this->esc( $targetTable, TRUE );
-		$targetField = $this->esc( $targetField, TRUE );
-		$foreignKeys = $this->getKeyMapForTable( $table );
-		foreach( $foreignKeys as $foreignKey ) {
-			if ( $foreignKey['from'] === $field ) return FALSE; //return, field has already fk
-		}
+		$table = $this->esc( $type );
+		$targetTable = $this->esc( $targetType );
+		$field = $this->esc( $property );
+		$targetField = $this->esc( $targetProperty );
+		$tableNoQ = $this->esc( $type, TRUE );
+		$fieldNoQ = $this->esc( $property, TRUE );
+		if ( !is_null( $this->getForeignKeyForTableColumn( $tableNoQ, $fieldNoQ ) ) ) return FALSE;
 		try{
 			$delRule = ( $isDep ? 'CASCADE' : 'SET NULL' );
-			$this->adapter->exec( "ALTER TABLE  {$this->esc($table)}
-				ADD FOREIGN KEY ( {$this->esc($field)} ) REFERENCES  {$this->esc($targetTable)} (
-				{$this->esc($targetField)}) ON DELETE $delRule ON UPDATE $delRule DEFERRABLE ;" );
+			$this->adapter->exec( "ALTER TABLE {$table}
+				ADD FOREIGN KEY ( {$field} ) REFERENCES  {$targetTable}
+				({$targetField}) ON DELETE {$delRule} ON UPDATE {$delRule} DEFERRABLE ;" );
 			return TRUE;
 		} catch (\Exception $e ) {
 			return FALSE;

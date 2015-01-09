@@ -540,7 +540,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 */
 	protected function check( $struct )
 	{
-		if ( !preg_match( '/^[a-zA-Z0-9_]+$/', $struct ) ) {
+		if ( !is_string( $struct ) || !preg_match( '/^[a-zA-Z0-9_]+$/', $struct ) ) {
 			throw new RedException( 'Identifier does not conform to RedBeanPHP security policies.' );
 		}
 

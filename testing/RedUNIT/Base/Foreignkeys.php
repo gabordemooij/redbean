@@ -52,7 +52,7 @@ class Foreignkeys extends Base implements Observer
 	 * @return void
 	 */
 	public function testDependency2()
-	{
+	{ 
 		$can = $this->createBeanInCan( TRUE );
 
 		asrt( R::count( 'bean' ), 1 );

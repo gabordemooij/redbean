@@ -349,21 +349,26 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::addFK
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
+	public function addFK( $type, $targetType, $property, $targetProperty, $isDependent = FALSE )
 	{
-		$cfks = $this->getKeyMapForTable( $type );
-		foreach( $cfks as $cfk ) {
-			if ( $cfk['from'] === $field ) return; //already has a key this field..
-		}
+		$table = $this->esc( $type );
+		$targetTable = $this->esc( $targetType );
+		$targetTableNoQ = $this->esc( $targetType, TRUE );
+		$field = $this->esc( $property );
+		$fieldNoQ = $this->esc( $property, TRUE );
+		$targetField = $this->esc( $targetProperty );
+		$targetFieldNoQ = $this->esc( $targetProperty, TRUE );
+		$tableNoQ = $this->esc( $type, TRUE );
+		$fieldNoQ = $this->esc( $property, TRUE );
+		if ( !is_null( $this->getForeignKeyForTableColumn( $tableNoQ, $fieldNoQ ) ) ) return FALSE;
+		$fkName = 'fk_'.($tableNoQ.'_'.$fieldNoQ);
+		$cName = 'c_'.$fkName;
 		try {
-			$fkName = 'fk_'.($type.'_'.$field);
-			$cName = 'c_'.$fkName;
 			$this->adapter->exec( "
-				ALTER TABLE  {$this->esc($type)}
+				ALTER TABLE {$table}
 				ADD CONSTRAINT $cName
-				FOREIGN KEY $fkName ( {$this->esc($field)} ) REFERENCES {$this->esc($targetType)} (
-				{$this->esc($targetField)}) ON DELETE " . ( $isDependent ? 'CASCADE' : 'SET NULL' ) . ' ON UPDATE '.( $isDependent ? 'CASCADE' : 'SET NULL' ).';');
-
+				FOREIGN KEY $fkName ( {$fieldNoQ} ) REFERENCES {$targetTableNoQ}
+				({$targetFieldNoQ}) ON DELETE " . ( $isDependent ? 'CASCADE' : 'SET NULL' ) . ' ON UPDATE '.( $isDependent ? 'CASCADE' : 'SET NULL' ).';');
 		} catch (\Exception $e ) {
 			// Failure of fk-constraints is not a problem
 		}
