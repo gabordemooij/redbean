@@ -151,28 +151,6 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::getKeyMapForTable
-	 */
-	public function getKeyMapForTable( $type )
-	{
-		$table = $this->esc( $type, TRUE );
-		$keys  = $this->adapter->get( "PRAGMA foreign_key_list('$table')" );
-		$keyInfoList = array();
-		foreach ( $keys as $k ) {
-			$label = $this->makeFKLabel( $k['from'], $k['table'], $k['to'] );
-			$keyInfoList[$label] = array(
-				'name'          => $label,
-				'from'          => $k['from'],
-				'table'         => $k['table'],
-				'to'            => $k['to'],
-				'on_update'     => $k['on_update'],
-				'on_delete'     => $k['on_delete']
-			);
-		}
-		return $keyInfoList;
-	}
-
-	/**
 	 * Adds a foreign key to a type
 	 *
 	 * @param  string  $type        type you want to modify table of
@@ -359,14 +337,11 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	 */
 	public function addUniqueIndex( $type, $columns )
 	{
+		$tableNoQ = $this->esc( $type, TRUE );
+		if ( $this->areColumnsInUniqueIndex( $tableNoQ, $columns ) ) return FALSE;
 		$name  = 'UQ_' . $this->esc( $type, TRUE ) . implode( '__', $columns );
-
 		$t     = $this->getTable( $type );
-
-		if ( isset( $t['indexes'][$name] ) ) return;
-
 		$t['indexes'][$name] = array( 'name' => $name );
-
 		$this->putTable( $t );
 	}
 
@@ -447,5 +422,47 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		}
 
 		$this->adapter->exec( 'PRAGMA foreign_keys = 1 ' );
+	}
+
+	/**
+	 * @see QueryWriter::getKeyMapForTable
+	 */
+	public function getKeyMapForTable( $type )
+	{
+		$table = $this->esc( $type, TRUE );
+		$keys  = $this->adapter->get( "PRAGMA foreign_key_list('$table')" );
+		$keyInfoList = array();
+		foreach ( $keys as $k ) {
+			$label = $this->makeFKLabel( $k['from'], $k['table'], $k['to'] );
+			$keyInfoList[$label] = array(
+				'name'          => $label,
+				'from'          => $k['from'],
+				'table'         => $k['table'],
+				'to'            => $k['to'],
+				'on_update'     => $k['on_update'],
+				'on_delete'     => $k['on_delete']
+			);
+		}
+		return $keyInfoList;
+	}
+
+	/**
+	 * @see QueryWriter::getUniquesForTable
+	 */
+	public function getUniquesForTable( $table )
+	{
+		$uniques = array();
+		$table = $this->esc( $table, TRUE );
+		$indexes = $this->adapter->get( "PRAGMA index_list({$table})" );
+		foreach( $indexes as $index ) {
+			if ( $index['unique'] == 1 ) {
+				$info = $this->adapter->get( "PRAGMA index_info({$index['name']})" );
+				if ( !isset( $uniques[$index['name']] ) ) $uniques[$index['name']] = array();
+				foreach( $info as $piece ) {
+					$uniques[$index['name']][] = $piece['name'];
+				}
+			}
+		}
+		return $uniques;
 	}
 }

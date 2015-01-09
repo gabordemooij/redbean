@@ -41,32 +41,6 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	protected $quoteCharacter = '`';
 
 	/**
-	 * @see QueryWriter::getKeyMapForTable
-	 */
-	public function getKeyMapForTable( $table  )
-	{
-		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$table}`");
-		if (!isset($sqlCode[0])) return array();
-		$matches = array();
-		preg_match_all( '/CONSTRAINT\s+\[([\w_]+)\]\s+FOREIGN\s+KEY\s+\(\[([\w_]+)\]\)\s+REFERENCES\s+\[([\w_]+)\]/', $sqlCode[0]['CREATE TABLE'], $matches );
-		$list = array();
-		if (!isset($matches[0])) return $list;
-		$max = count($matches[0]);
-		for($i = 0; $i < $max; $i++) {
-			$label = $this->makeFKLabel( $matches[2][$i], $matches[3][$i], 'id' );
-			$list[ $label ] = array(
-				'name' => $matches[1][$i],
-				'from' => $matches[2][$i],
-				'table' => $matches[3][$i],
-				'to' => 'id',
-				'on_update' => '?',
-				'on_delete' => '?'
-			);
-		}
-		return $list;
-	}
-
-	/**
 	 * Add the constraints for a specific database driver: CUBRID
 	 *
 	 * @param string $table     table
@@ -270,28 +244,13 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	 */
 	public function addUniqueIndex( $table, $columns )
 	{
+		$tableNoQ = $this->esc( $table, TRUE );
+		if ( $this->areColumnsInUniqueIndex( $table, $columns ) ) return FALSE;
+		foreach( $columns as $key => $column ) $columns[$key] = $this->esc( $column );
 		$table = $this->esc( $table );
-
 		sort( $columns ); // else we get multiple indexes due to order-effects
-
-		foreach ( $columns as $k => $v ) {
-			$columns[$k] = $this->esc( $v );
-		}
-
-		$r = $this->adapter->get( "SHOW INDEX FROM $table" );
-
 		$name = 'UQ_' . sha1( implode( ',', $columns ) );
-
-		if ( $r ) {
-			foreach ( $r as $i ) {
-				if ( strtoupper( $i['Key_name'] ) == strtoupper( $name ) ) {
-					return;
-				}
-			}
-		}
-
 		$sql = "ALTER TABLE $table ADD CONSTRAINT UNIQUE $name (" . implode( ',', $columns ) . ")";
-
 		$this->adapter->exec( $sql );
 	}
 
@@ -377,5 +336,53 @@ class CUBRID extends AQueryWriter implements QueryWriter
 			) return $key['table'];
 		}
 		return NULL;
+	}
+
+	/**
+	 * @see QueryWriter::getKeyMapForTable
+	 */
+	public function getKeyMapForTable( $table  )
+	{
+		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$table}`");
+		if (!isset($sqlCode[0])) return array();
+		$matches = array();
+		preg_match_all( '/CONSTRAINT\s+\[([\w_]+)\]\s+FOREIGN\s+KEY\s+\(\[([\w_]+)\]\)\s+REFERENCES\s+\[([\w_]+)\]/', $sqlCode[0]['CREATE TABLE'], $matches );
+		$list = array();
+		if (!isset($matches[0])) return $list;
+		$max = count($matches[0]);
+		for($i = 0; $i < $max; $i++) {
+			$label = $this->makeFKLabel( $matches[2][$i], $matches[3][$i], 'id' );
+			$list[ $label ] = array(
+				'name' => $matches[1][$i],
+				'from' => $matches[2][$i],
+				'table' => $matches[3][$i],
+				'to' => 'id',
+				'on_update' => '?',
+				'on_delete' => '?'
+			);
+		}
+		return $list;
+	}
+
+	/**
+	 * @see QueryWriter::getUniquesForTable
+	 */
+	public function getUniquesForTable( $table )
+	{
+		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$table}`");
+		if (!isset($sqlCode[0])) return array();
+		$matches = array();
+		preg_match_all('/CONSTRAINT\s+\[([\w_]+)\]\s+UNIQUE\s+KEY\s+\(([^\)]+)\)/', $sqlCode[0]['CREATE TABLE'], $matches);
+		$list = array();
+		if (!isset($matches[0])) return $list;
+		$max = count($matches[0]);
+		for($i = 0; $i < $max; $i++) {
+			$columns = explode(',', $matches[2][$i]);
+			foreach( $columns as $key => $column ) {
+				$columns[$key] = trim( $column, '[] ');
+			}
+			$list[ $matches[1][$i] ] = $columns;
+		}
+		return $list;
 	}
 }

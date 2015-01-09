@@ -256,15 +256,13 @@ class Writer extends \RedUNIT\Mysql
 		try {
 			$writer->addUniqueIndex( "testtable", array( "c2", "c3" ) );
 
-			pass(); //should fail, no content length blob
+			pass();
 		} catch ( SQL $e ) {
 			fail();
 		}
 
 		$a = $adapter->get( "show index from testtable" );
-
 		asrt( count( $a ), 3 );
-
 		asrt( $a[1]["Key_name"], "UQ_64b283449b9c396053fe1724b4c685a80fd1a54d" );
 		asrt( $a[2]["Key_name"], "UQ_64b283449b9c396053fe1724b4c685a80fd1a54d" );
 	}

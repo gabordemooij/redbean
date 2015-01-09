@@ -90,48 +90,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::getKeyMapForTable
-	 */
-	public function getKeyMapForTable( $type )
-	{
-		$table = $this->esc( $type, TRUE );
-		$keys = $this->adapter->get('
-			SELECT 
-				information_schema.key_column_usage.constraint_name AS `name`,
-				information_schema.key_column_usage.referenced_table_name AS `table`,
-				information_schema.key_column_usage.column_name AS `from`,
-				information_schema.key_column_usage.referenced_column_name AS `to`,
-				information_schema.referential_constraints.update_rule AS `on_update`,
-				information_schema.referential_constraints.delete_rule AS `on_delete`
-				FROM information_schema.key_column_usage
-				INNER JOIN information_schema.referential_constraints
-					ON (
-						information_schema.referential_constraints.constraint_name = information_schema.key_column_usage.constraint_name
-						AND information_schema.referential_constraints.constraint_schema = information_schema.key_column_usage.constraint_schema
-						AND information_schema.referential_constraints.constraint_catalog = information_schema.key_column_usage.constraint_catalog
-					)
-			WHERE
-				information_schema.key_column_usage.table_schema IN ( SELECT DATABASE() )
-				AND information_schema.key_column_usage.table_name = ?
-				AND information_schema.key_column_usage.constraint_name != \'PRIMARY\'
-				AND information_schema.key_column_usage.referenced_table_name IS NOT NULL
-		', array($table));
-		$keyInfoList = array();
-		foreach ( $keys as $k ) {
-			$label = $this->makeFKLabel( $k['from'], $k['table'], $k['to'] );
-			$keyInfoList[$label] = array(
-				'name'          => $k['name'],
-				'from'          => $k['from'],
-				'table'         => $k['table'],
-				'to'            => $k['to'],
-				'on_update'     => $k['on_update'],
-				'on_delete'     => $k['on_delete']
-			);
-		}
-		return $keyInfoList;
-	}
-
-	/**
 	 * Constructor
 	 *
 	 * @param Adapter $adapter Database Adapter
@@ -297,33 +255,18 @@ class MySQL extends AQueryWriter implements QueryWriter
 	 */
 	public function addUniqueIndex( $table, $columns )
 	{
+		$tableNoQ = $this->esc( $table, TRUE );
+		if ( $this->areColumnsInUniqueIndex( $tableNoQ, $columns ) ) return FALSE;
+		foreach( $columns as $key => $column ) $columns[$key] = $this->esc( $column );
 		$table = $this->esc( $table );
-
 		sort( $columns ); // Else we get multiple indexes due to order-effects
-
-		foreach ( $columns as $k => $v ) {
-			$columns[$k] = $this->esc( $v );
-		}
-
-		$r    = $this->adapter->get( "SHOW INDEX FROM $table" );
-
 		$name = 'UQ_' . sha1( implode( ',', $columns ) );
-
-		if ( $r ) {
-			foreach ( $r as $i ) {
-				if ( $i['Key_name'] == $name ) {
-					return;
-				}
-			}
-		}
-
 		try {
 			$sql = "ALTER TABLE $table
 						 ADD UNIQUE INDEX $name (" . implode( ',', $columns ) . ")";
 		} catch ( \Exception $e ) {
 			//do nothing, dont use alter table ignore, this will delete duplicate records in 3-ways!
 		}
-
 		$this->adapter->exec( $sql );
 	}
 
@@ -408,5 +351,78 @@ class MySQL extends AQueryWriter implements QueryWriter
 		}
 
 		$this->adapter->exec( 'SET FOREIGN_KEY_CHECKS = 1;' );
+	}
+
+	/**
+	 * @see QueryWriter::getKeyMapForTable
+	 */
+	public function getKeyMapForTable( $type )
+	{
+		$table = $this->esc( $type, TRUE );
+		$keys = $this->adapter->get('
+			SELECT
+				information_schema.key_column_usage.constraint_name AS `name`,
+				information_schema.key_column_usage.referenced_table_name AS `table`,
+				information_schema.key_column_usage.column_name AS `from`,
+				information_schema.key_column_usage.referenced_column_name AS `to`,
+				information_schema.referential_constraints.update_rule AS `on_update`,
+				information_schema.referential_constraints.delete_rule AS `on_delete`
+				FROM information_schema.key_column_usage
+				INNER JOIN information_schema.referential_constraints
+					ON (
+						information_schema.referential_constraints.constraint_name = information_schema.key_column_usage.constraint_name
+						AND information_schema.referential_constraints.constraint_schema = information_schema.key_column_usage.constraint_schema
+						AND information_schema.referential_constraints.constraint_catalog = information_schema.key_column_usage.constraint_catalog
+					)
+			WHERE
+				information_schema.key_column_usage.table_schema IN ( SELECT DATABASE() )
+				AND information_schema.key_column_usage.table_name = ?
+				AND information_schema.key_column_usage.constraint_name != \'PRIMARY\'
+				AND information_schema.key_column_usage.referenced_table_name IS NOT NULL
+		', array($table));
+		$keyInfoList = array();
+		foreach ( $keys as $k ) {
+			$label = $this->makeFKLabel( $k['from'], $k['table'], $k['to'] );
+			$keyInfoList[$label] = array(
+				'name'          => $k['name'],
+				'from'          => $k['from'],
+				'table'         => $k['table'],
+				'to'            => $k['to'],
+				'on_update'     => $k['on_update'],
+				'on_delete'     => $k['on_delete']
+			);
+		}
+		return $keyInfoList;
+	}
+
+	/**
+	 * @see QueryWriter::getUniquesForTable
+	 */
+	public function getUniquesForTable( $type )
+	{
+		$table = $this->esc( $type, TRUE );
+		$columns = $this->adapter->get('
+			SELECT
+				information_schema.key_column_usage.constraint_name,
+				information_schema.key_column_usage.column_name
+			FROM
+				information_schema.table_constraints
+			INNER JOIN information_schema.key_column_usage
+				ON (
+					information_schema.table_constraints.constraint_name = information_schema.key_column_usage.constraint_name
+					AND information_schema.table_constraints.constraint_schema = information_schema.key_column_usage.constraint_schema
+					AND information_schema.table_constraints.constraint_catalog = information_schema.key_column_usage.constraint_catalog
+				)
+			WHERE
+				information_schema.table_constraints.table_schema IN (SELECT DATABASE())
+				AND information_schema.table_constraints.table_name = ?
+				AND information_schema.table_constraints.constraint_type = \'UNIQUE\'
+		', array( $table ) );
+		$uniques = array();
+		foreach( $columns as $column ) {
+			if ( !isset( $uniques[ $column['constraint_name'] ] ) ) $uniques[ $column['constraint_name'] ] = array();
+			$uniques[ $column['constraint_name'] ][] = $column['column_name'];
+		}
+		return $uniques;
 	}
 }

@@ -488,12 +488,6 @@ interface QueryWriter
 	 *    'on_delete' => <delete rule: 'SET NULL','CASCADE' or 'RESTRICT'>
 	 * )
 	 *
-	 * @note that 'to' is *ALWAYS* 'id', however in THIS particular driver
-	 * the map is also used to rebuild tables, because SQLite does not
-	 * offer ALTER TABLE support, so here 'to' might also reflect custom
-	 * key definitions. The value/functionality of 'to' therefore differs
-	 * per driver.
-	 *
 	 * @note the keys in the result array are FKDLs, i.e. descriptive unique
 	 * keys per source table. Also see: AQueryWriter::makeFKLabel for details.
 	 *
@@ -502,4 +496,14 @@ interface QueryWriter
 	 * @return array
 	 */
 	 public function getKeyMapForTable( $table );
+
+	 /**
+	  * Returns an array, listing all column groups (as sub-arrays)
+	  * that have a unique constraint.
+	  *
+	  * @param string $table table name
+	  *
+	  * @return array
+	  */
+	 public function getUniquesForTable( $table );
 }
