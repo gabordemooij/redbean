@@ -461,5 +461,45 @@ interface QueryWriter
 	 *
 	 * @return string|NULL
 	 */
-	 public function inferFetchType( $type, $property );
+	public function inferFetchType( $type, $property );
+
+	/**
+	 * Given a table and a column name this method
+	 * returns the foreign key map section associated with this pair.
+	 *
+	 * @param string $table  name of the table
+	 * @param string $column name of the column
+	 *
+	 * @return array|NULL
+	 */
+	public function getForeignKeyForTableColumn( $table, $column )
+
+	/**
+	 * Returns the foreign key map (FKM) for a table.
+	 * A foreign key map describes the foreign keys in a table.
+	 * A FKM always has the same structure:
+	 *
+	 * array(
+	 * 	'name'      => <name of the foreign key>
+	 *    'from'      => <name of the column on the source table>
+	 *    'table'     => <name of the target table>
+	 *    'to'        => <name of the target column> (most of the time 'id')
+	 *    'on_update' => <update rule: 'SET NULL','CASCADE' or 'RESTRICT'>
+	 *    'on_delete' => <delete rule: 'SET NULL','CASCADE' or 'RESTRICT'>
+	 * )
+	 *
+	 * @note that 'to' is *ALWAYS* 'id', however in THIS particular driver
+	 * the map is also used to rebuild tables, because SQLite does not
+	 * offer ALTER TABLE support, so here 'to' might also reflect custom
+	 * key definitions. The value/functionality of 'to' therefore differs
+	 * per driver.
+	 *
+	 * @note the keys in the result array are FKDLs, i.e. descriptive unique
+	 * keys per source table. Also see: AQueryWriter::makeFKLabel for details.
+	 *
+	 * @param string $type the bean type you wish to obtain a key map of
+	 *
+	 * @return array
+	 */
+	 public function getKeyMapForTable( $table );
 }

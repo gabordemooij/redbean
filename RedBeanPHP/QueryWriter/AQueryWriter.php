@@ -159,6 +159,25 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
+	 * This method makes a key for a foreign key description array.
+	 * This key is a readable string unique for every source table.
+	 * This uniform key is called the FKDL Foreign Key Description Label.
+	 * Note that the source table is not part of the FKDL because
+	 * this key is supposed to be 'per source table'. If you wish to
+	 * include a source table, prefix the key with 'on_table_<SOURCE>_'.
+	 *
+	 * @param string $from  the column of the key in the source table
+	 * @param string $table the table where the key points to
+	 * @param string $to    the target column of the foreign key (mostly just 'id')
+	 *
+	 * @return string
+	 */
+	protected function makeFKLabel($from, $table, $to)
+	{
+		return "from_{$from}_to_table_{$table}_col_{$to}";
+	}
+
+	/**
 	 * Returns an SQL Filter snippet for reading.
 	 *
 	 * @param string $type type of bean
@@ -1069,15 +1088,41 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	{
 		return $this->esc( $table, $noQuotes );
 	}
-	
+
+	/**
+	 * @see QueryWriter::getKeyMapForTable
+	 */
+	public function getKeyMapForTable( $type )
+	{
+		return array();
+	}
+
 	/**
 	 * @see QueryWriter::inferFetchType
-	 * 
-	 * Default implementation, makes sure it does not affect
-	 * any QueryWriters not overriding this method.
 	 */
 	public function inferFetchType( $type, $property )
 	{
+		$type = $this->esc( $type, TRUE );
+		$field = $this->esc( $property, TRUE ) . '_id';
+		$keys = $this->getKeyMapForTable( $type );
+		foreach( $keys as $key ) {
+			if (
+				$key['from'] === $field
+			) return $key['table'];
+		}
+		return NULL;
+	}
+
+	/**
+	 * @see QueryWriter::getForeignKeyForTableColumn
+	 */
+	public function getForeignKeyForTableColumn( $table, $column )
+	{
+		$column = $this->esc( $column, TRUE );
+		$map = $this->getKeyMapForTable( $table );
+		foreach( $map as $key ) {
+			if ( $key['from'] === $column ) return $key;
+		}
 		return NULL;
 	}
 }

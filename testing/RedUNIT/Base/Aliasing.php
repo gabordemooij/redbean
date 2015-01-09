@@ -22,6 +22,38 @@ use RedBeanPHP\OODBBean as OODBBean;
 class Aliasing extends Base
 {
 	/**
+	 * Tests the keyMap functions in the writers.
+	 *
+	 * @return void
+	 */
+	public function testKeyMapFunctions()
+	{
+		R::nuke();
+		list( $project, $teacher, $student ) = R::dispenseAll( 'project,person,person' );
+		$teacher->name = 'teacher';
+		$student->name = 'student';
+		$project->teacher = $teacher;
+		$project->student = $student;
+		R::store( $project );
+		$writer = R::getWriter();
+		$map = $writer->getKeyMapForTable( 'project' );
+		asrt( count( $map ), 2 );
+		asrt( isset( $map[ 'from_teacher_id_to_table_person_col_id' ] ), TRUE );
+		asrt( isset( $map[ 'from_student_id_to_table_person_col_id' ] ), TRUE );
+		asrt( $map['from_teacher_id_to_table_person_col_id']['from'], 'teacher_id' );
+		asrt( $map['from_student_id_to_table_person_col_id']['from'], 'student_id' );
+		asrt( $map['from_teacher_id_to_table_person_col_id']['to'], 'id' );
+		asrt( $map['from_student_id_to_table_person_col_id']['to'], 'id' );
+		asrt( $map['from_teacher_id_to_table_person_col_id']['table'], 'person' );
+		asrt( $map['from_student_id_to_table_person_col_id']['table'], 'person' );
+		//these can differ per driver...
+		asrt( isset( $map[ 'from_teacher_id_to_table_person_col_id' ]['on_update'] ), TRUE );
+		asrt( isset( $map[ 'from_student_id_to_table_person_col_id' ]['on_delete'] ), TRUE );
+		asrt( isset( $map[ 'from_teacher_id_to_table_person_col_id' ]['name'] ), TRUE );
+		asrt( isset( $map[ 'from_student_id_to_table_person_col_id' ]['name'] ), TRUE );
+	}
+
+	/**
 	 * Tests automatic resolvement of parent beans
 	 * without fetchAs() using inferFetchType (foreign keys).
 	 *
@@ -64,6 +96,15 @@ class Aliasing extends Base
 		//Also test the default implementation...
 		$nullWriter = new \NullWriter( R::getDatabaseAdapter() );
 		asrt( is_null( $nullWriter->inferFetchType( 'test', 'test' ) ), TRUE );
+		//Realteacher should take precedence over fetchAs-teacher, name conventions first!
+		//also: ensure we do not use autoresolv for anything except when truly necessary! (performance)
+		$realTeacher = R::dispense( 'teacher' );
+		$realTeacher->name = 'real';
+		R::store( $realTeacher );
+		//ID must be same
+		asrt( $realTeacher->id, $teacher->id );
+		$project = $project->fresh();
+		asrt( $project->teacher->name, 'real' );
 	}
 
 	/**

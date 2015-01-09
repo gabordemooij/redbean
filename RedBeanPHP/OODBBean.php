@@ -876,10 +876,17 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 					$type            = $this->fetchType;
 					$this->fetchType = NULL;
 				} else {
-					$type = $this->beanHelper->getToolbox()->getWriter()->inferFetchType( $this->__info['type'], $property );
-					if ( is_null( $type ) ) $type = $property;
+					$type = $property;
 				}
-				$bean = $redbean->load( $type, $this->properties[$fieldLink] );
+				$bean = NULL;
+				if ( !is_null( $this->properties[$fieldLink] ) ) {
+					$bean = $redbean->load( $type, $this->properties[$fieldLink] );
+					//If the IDs dont match, we failed to load, so try autoresolv in that case...
+					if ( $bean->id !== $this->properties[$fieldLink] ) {
+						$type = $this->beanHelper->getToolbox()->getWriter()->inferFetchType( $this->__info['type'], $property );
+						if ( !is_null( $type) ) $bean = $redbean->load( $type, $this->properties[$fieldLink] );
+					}
+				}
 			}
 
 			$this->properties[$property] = $bean;

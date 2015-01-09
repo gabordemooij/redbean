@@ -151,25 +151,27 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * Returns the keys for type $type.
-	 *
-	 * @param string $type
-	 *
-	 * @return array $keysInfo keys information
+	 * @see QueryWriter::getKeyMapForTable
 	 */
-	protected function getKeyMapForTable( $type )
+	public function getKeyMapForTable( $type )
 	{
 		$table = $this->esc( $type, TRUE );
 		$keys  = $this->adapter->get( "PRAGMA foreign_key_list('$table')" );
-
 		$keyInfoList = array();
 		foreach ( $keys as $k ) {
-			$keyInfoList['from_' . $k['from'] . '_to_table_' . $k['table'] . '_col_' . $k['to']] = $k;
+			$label = $this->makeFKLabel( $k['from'], $k['table'], $k['to'] );
+			$keyInfoList[$label] = array(
+				'name'          => $label,
+				'from'          => $k['from'],
+				'table'         => $k['table'],
+				'to'            => $k['to'],
+				'on_update'     => $k['on_update'],
+				'on_delete'     => $k['on_delete']
+			);
 		}
-
 		return $keyInfoList;
 	}
-	
+
 	/**
 	 * Adds a foreign key to a type
 	 *
@@ -223,7 +225,6 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	{
 		$firstState  = $this->buildFK( $table, $table1, $property1, 'id', TRUE );
 		$secondState = $this->buildFK( $table, $table2, $property2, 'id', TRUE );
-
 		return ( $firstState && $secondState );
 	}
 
@@ -449,21 +450,5 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		}
 
 		$this->adapter->exec( 'PRAGMA foreign_keys = 1 ' );
-	}
-
-	/**
-	 * @see QueryWriter::inferFetchType
-	 */
-	public function inferFetchType( $type, $property )
-	{
-		$type = $this->esc( $type, TRUE );
-		$field = $this->esc( $property, TRUE ) . '_id';
-		$keys = $this->getKeyMapForTable( $type );
-		foreach( $keys as $key ) {
-			if ( 
-				$key['from'] === $field
-			) return $key['table'];
-		}
-		return NULL;
 	}
 }
