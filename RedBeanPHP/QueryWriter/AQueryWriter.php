@@ -159,95 +159,6 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
-	 * This method makes a key for a foreign key description array.
-	 * This key is a readable string unique for every source table.
-	 * This uniform key is called the FKDL Foreign Key Description Label.
-	 * Note that the source table is not part of the FKDL because
-	 * this key is supposed to be 'per source table'. If you wish to
-	 * include a source table, prefix the key with 'on_table_<SOURCE>_'.
-	 *
-	 * @param string $from  the column of the key in the source table
-	 * @param string $table the table where the key points to
-	 * @param string $to    the target column of the foreign key (mostly just 'id')
-	 *
-	 * @return string
-	 */
-	protected function makeFKLabel($from, $table, $to)
-	{
-		return "from_{$from}_to_table_{$table}_col_{$to}";
-	}
-
-	/**
-	 * Returns an SQL Filter snippet for reading.
-	 *
-	 * @param string $type type of bean
-	 *
-	 * @return string
-	 */
-	protected function getSQLFilterSnippet( $type )
-	{
-		$existingCols = array();
-		if (self::$flagSQLFilterSafeMode) {
-			$existingCols = $this->getColumns( $type );
-		}
-
-		$sqlFilters = array();
-		if ( isset( self::$sqlFilters[QueryWriter::C_SQLFILTER_READ][$type] ) ) {
-			foreach( self::$sqlFilters[QueryWriter::C_SQLFILTER_READ][$type] as $property => $sqlFilter ) {
-				if ( !self::$flagSQLFilterSafeMode || isset( $existingCols[$property] ) ) {
-					$sqlFilters[] = $sqlFilter.' AS '.$property.' ';
-				}
-			}
-		}
-		$sqlFilterStr = ( count($sqlFilters) ) ? ( ','.implode( ',', $sqlFilters ) ) : '';
-		return $sqlFilterStr;
-	}
-
-	/**
-	 * Generates a list of parameters (slots) for an SQL snippet.
-	 * This method calculates the correct number of slots to insert in the
-	 * SQL snippet and determines the correct type of slot. If the bindings
-	 * array contains named parameters this method will return named ones and
-	 * update the keys in the value list accordingly (that's why we use the &).
-	 *
-	 * If you pass an offset the bindings will be re-added to the value list.
-	 * Some databases cant handle duplicate parameter names in queries.
-	 *
-	 * @param array   &$valueList     list of values to generate slots for (gets modified if needed)
-	 * @param array   $otherBindings  list of additional bindings
-	 * @param integer $offset         start counter at...
-	 *
-	 * @return string
-	 */
-	protected function getParametersForInClause( &$valueList, $otherBindings, $offset = 0 )
-	{
-		if ( is_array( $otherBindings ) && count( $otherBindings ) > 0 ) {
-			reset( $otherBindings );
-
-			$key = key( $otherBindings );
-
-			if ( !is_numeric($key) ) {
-				$filler  = array();
-				$newList = (!$offset) ? array() : $valueList;
-				$counter = $offset;
-
-				foreach( $valueList as $value ) {
-					$slot           = ':slot' . ( $counter++ );
-					$filler[]       = $slot;
-					$newList[$slot] = $value;
-				}
-
-				// Change the keys!
-				$valueList = $newList;
-
-				return implode( ',', $filler );
-			}
-		}
-
-		return implode( ',', array_fill( 0, count( $valueList ), '?' ) );
-	}
-
-	/**
 	 * Returns a cache key for the cache values passed.
 	 * This method returns a fingerprint string to be used as a key to store
 	 * data in the writer cache.
@@ -429,6 +340,155 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		$destTable   = $this->esc( $destType, $noQuote );
 
 		return array( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol );
+	}
+
+	/**
+	 * Given a table and a column name this method
+	 * returns the foreign key map section associated with this pair.
+	 *
+	 * @param string $table    name of the table
+	 * @param string $property name of the property
+	 *
+	 * @return array|NULL
+	 */
+	protected function getForeignKeyForTableColumn( $table, $column )
+	{
+		$column = $this->esc( $column, TRUE );
+
+		$map = $this->getKeyMapForTable( $table );
+
+		foreach( $map as $key ) {
+			if ( $key['from'] === $column ) return $key;
+		}
+		return NULL;
+	}
+
+	/**
+	 * Returns the foreign key map (FKM) for a table.
+	 * A foreign key map describes the foreign keys in a table.
+	 * A FKM always has the same structure:
+	 *
+	 * array(
+	 * 	'name'      => <name of the foreign key>
+	 *    'from'      => <name of the column on the source table>
+	 *    'table'     => <name of the target table>
+	 *    'to'        => <name of the target column> (most of the time 'id')
+	 *    'on_update' => <update rule: 'SET NULL','CASCADE' or 'RESTRICT'>
+	 *    'on_delete' => <delete rule: 'SET NULL','CASCADE' or 'RESTRICT'>
+	 * )
+	 *
+	 * @note the keys in the result array are FKDLs, i.e. descriptive unique
+	 * keys per source table. Also see: AQueryWriter::makeFKLabel for details.
+	 *
+	 * @param string $type the bean type you wish to obtain a key map of
+	 *
+	 * @return array
+	 */
+	protected function getKeyMapForTable( $type )
+	{
+		return array();
+	}
+
+	/**
+	 * Returns an array, listing all column groups (as sub-arrays)
+	 * that have a unique constraint.
+	 *
+	 * @param string $type type name
+	 *
+	 * @return array
+	 */
+	protected function getUniquesForTable( $table )
+	{
+		return array();
+	}
+
+	/**
+	 * This method makes a key for a foreign key description array.
+	 * This key is a readable string unique for every source table.
+	 * This uniform key is called the FKDL Foreign Key Description Label.
+	 * Note that the source table is not part of the FKDL because
+	 * this key is supposed to be 'per source table'. If you wish to
+	 * include a source table, prefix the key with 'on_table_<SOURCE>_'.
+	 *
+	 * @param string $from  the column of the key in the source table
+	 * @param string $table the table where the key points to
+	 * @param string $to    the target column of the foreign key (mostly just 'id')
+	 *
+	 * @return string
+	 */
+	protected function makeFKLabel($from, $table, $to)
+	{
+		return "from_{$from}_to_table_{$table}_col_{$to}";
+	}
+
+	/**
+	 * Returns an SQL Filter snippet for reading.
+	 *
+	 * @param string $type type of bean
+	 *
+	 * @return string
+	 */
+	protected function getSQLFilterSnippet( $type )
+	{
+		$existingCols = array();
+		if (self::$flagSQLFilterSafeMode) {
+			$existingCols = $this->getColumns( $type );
+		}
+
+		$sqlFilters = array();
+		if ( isset( self::$sqlFilters[QueryWriter::C_SQLFILTER_READ][$type] ) ) {
+			foreach( self::$sqlFilters[QueryWriter::C_SQLFILTER_READ][$type] as $property => $sqlFilter ) {
+				if ( !self::$flagSQLFilterSafeMode || isset( $existingCols[$property] ) ) {
+					$sqlFilters[] = $sqlFilter.' AS '.$property.' ';
+				}
+			}
+		}
+		$sqlFilterStr = ( count($sqlFilters) ) ? ( ','.implode( ',', $sqlFilters ) ) : '';
+		return $sqlFilterStr;
+	}
+
+	/**
+	 * Generates a list of parameters (slots) for an SQL snippet.
+	 * This method calculates the correct number of slots to insert in the
+	 * SQL snippet and determines the correct type of slot. If the bindings
+	 * array contains named parameters this method will return named ones and
+	 * update the keys in the value list accordingly (that's why we use the &).
+	 *
+	 * If you pass an offset the bindings will be re-added to the value list.
+	 * Some databases cant handle duplicate parameter names in queries.
+	 *
+	 * @param array   &$valueList     list of values to generate slots for (gets modified if needed)
+	 * @param array   $otherBindings  list of additional bindings
+	 * @param integer $offset         start counter at...
+	 *
+	 * @return string
+	 */
+	protected function getParametersForInClause( &$valueList, $otherBindings, $offset = 0 )
+	{
+		if ( is_array( $otherBindings ) && count( $otherBindings ) > 0 ) {
+			reset( $otherBindings );
+
+			$key = key( $otherBindings );
+
+			if ( !is_numeric($key) ) {
+				$filler  = array();
+				$newList = (!$offset) ? array() : $valueList;
+				$counter = $offset;
+
+				foreach( $valueList as $value ) {
+					$slot           = ':slot' . ( $counter++ );
+					$filler[]       = $slot;
+					$newList[$slot] = $value;
+				}
+
+				// Change the keys!
+				$valueList = $newList;
+
+				return implode( ',', $filler );
+			}
+		}
+
+		return implode( ',', array_fill( 0, count( $valueList ), '?' ) );
 	}
 
 	/**
@@ -1112,14 +1172,6 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
-	 * @see QueryWriter::getKeyMapForTable
-	 */
-	public function getKeyMapForTable( $type )
-	{
-		return array();
-	}
-
-	/**
 	 * @see QueryWriter::inferFetchType
 	 */
 	public function inferFetchType( $type, $property )
@@ -1134,28 +1186,5 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 			) return $key['table'];
 		}
 		return NULL;
-	}
-
-	/**
-	 * @see QueryWriter::getForeignKeyForTableColumn
-	 */
-	public function getForeignKeyForTableColumn( $table, $column )
-	{
-		$column = $this->esc( $column, TRUE );
-
-		$map = $this->getKeyMapForTable( $table );
-
-		foreach( $map as $key ) {
-			if ( $key['from'] === $column ) return $key;
-		}
-		return NULL;
-	}
-
-	/**
-	 * @see QueryWriter::getUniquesForTable
-	 */
-	public function getUniquesForTable( $table )
-	{
-		return array();
 	}
 }

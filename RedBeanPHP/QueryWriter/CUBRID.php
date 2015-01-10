@@ -94,6 +94,54 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	}
 
 	/**
+	 * @see AQueryWriter::getKeyMapForTable
+	 */
+	public function getKeyMapForTable( $table  )
+	{
+		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$table}`");
+		if (!isset($sqlCode[0])) return array();
+		$matches = array();
+		preg_match_all( '/CONSTRAINT\s+\[([\w_]+)\]\s+FOREIGN\s+KEY\s+\(\[([\w_]+)\]\)\s+REFERENCES\s+\[([\w_]+)\]/', $sqlCode[0]['CREATE TABLE'], $matches );
+		$list = array();
+		if (!isset($matches[0])) return $list;
+		$max = count($matches[0]);
+		for($i = 0; $i < $max; $i++) {
+			$label = $this->makeFKLabel( $matches[2][$i], $matches[3][$i], 'id' );
+			$list[ $label ] = array(
+				'name' => $matches[1][$i],
+				'from' => $matches[2][$i],
+				'table' => $matches[3][$i],
+				'to' => 'id',
+				'on_update' => '?',
+				'on_delete' => '?'
+			);
+		}
+		return $list;
+	}
+
+	/**
+	 * @see AQueryWriter::getUniquesForTable
+	 */
+	public function getUniquesForTable( $table )
+	{
+		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$table}`");
+		if (!isset($sqlCode[0])) return array();
+		$matches = array();
+		preg_match_all('/CONSTRAINT\s+\[([\w_]+)\]\s+UNIQUE\s+KEY\s+\(([^\)]+)\)/', $sqlCode[0]['CREATE TABLE'], $matches);
+		$list = array();
+		if (!isset($matches[0])) return $list;
+		$max = count($matches[0]);
+		for($i = 0; $i < $max; $i++) {
+			$columns = explode(',', $matches[2][$i]);
+			foreach( $columns as $key => $column ) {
+				$columns[$key] = trim( $column, '[] ');
+			}
+			$list[ $matches[1][$i] ] = $columns;
+		}
+		return $list;
+	}
+
+	/**
 	 * Constructor
 	 *
 	 * @param Adapter $adapter Database Adapter
@@ -338,53 +386,5 @@ class CUBRID extends AQueryWriter implements QueryWriter
 			) return $key['table'];
 		}
 		return NULL;
-	}
-
-	/**
-	 * @see QueryWriter::getKeyMapForTable
-	 */
-	public function getKeyMapForTable( $table  )
-	{
-		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$table}`");
-		if (!isset($sqlCode[0])) return array();
-		$matches = array();
-		preg_match_all( '/CONSTRAINT\s+\[([\w_]+)\]\s+FOREIGN\s+KEY\s+\(\[([\w_]+)\]\)\s+REFERENCES\s+\[([\w_]+)\]/', $sqlCode[0]['CREATE TABLE'], $matches );
-		$list = array();
-		if (!isset($matches[0])) return $list;
-		$max = count($matches[0]);
-		for($i = 0; $i < $max; $i++) {
-			$label = $this->makeFKLabel( $matches[2][$i], $matches[3][$i], 'id' );
-			$list[ $label ] = array(
-				'name' => $matches[1][$i],
-				'from' => $matches[2][$i],
-				'table' => $matches[3][$i],
-				'to' => 'id',
-				'on_update' => '?',
-				'on_delete' => '?'
-			);
-		}
-		return $list;
-	}
-
-	/**
-	 * @see QueryWriter::getUniquesForTable
-	 */
-	public function getUniquesForTable( $table )
-	{
-		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$table}`");
-		if (!isset($sqlCode[0])) return array();
-		$matches = array();
-		preg_match_all('/CONSTRAINT\s+\[([\w_]+)\]\s+UNIQUE\s+KEY\s+\(([^\)]+)\)/', $sqlCode[0]['CREATE TABLE'], $matches);
-		$list = array();
-		if (!isset($matches[0])) return $list;
-		$max = count($matches[0]);
-		for($i = 0; $i < $max; $i++) {
-			$columns = explode(',', $matches[2][$i]);
-			foreach( $columns as $key => $column ) {
-				$columns[$key] = trim( $column, '[] ');
-			}
-			$list[ $matches[1][$i] ] = $columns;
-		}
-		return $list;
 	}
 }
