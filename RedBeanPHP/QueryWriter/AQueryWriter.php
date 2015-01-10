@@ -548,6 +548,28 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
+	 * Determines whether the specified columns are part
+	 * of a unique index in the specified table.
+	 *
+	 * @param string $table   table
+	 * @param array  $columns a list of columns
+	 *
+	 * @return boolean
+	 */
+	protected function areColumnsInUniqueIndex( $table, $columns )
+	{
+		sort( $columns );
+		$columnFootprint = implode( ',', $columns );
+		$uniques = $this->getUniquesForTable( $table );
+		foreach( $uniques as $unique ) {
+				sort( $unique );
+				$uniqueFootprint = implode( ',', $unique );
+				if ( $uniqueFootprint === $columnFootprint ) return TRUE;
+		}
+		return FALSE;
+	}
+
+	/**
 	 * Checks whether a number can be treated like an int.
 	 *
 	 * @param  string $value string representation of a certain value
@@ -1105,6 +1127,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		$type = $this->esc( $type, TRUE );
 		$field = $this->esc( $property, TRUE ) . '_id';
 		$keys = $this->getKeyMapForTable( $type );
+
 		foreach( $keys as $key ) {
 			if (
 				$key['from'] === $field
@@ -1119,7 +1142,9 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	public function getForeignKeyForTableColumn( $table, $column )
 	{
 		$column = $this->esc( $column, TRUE );
+
 		$map = $this->getKeyMapForTable( $table );
+
 		foreach( $map as $key ) {
 			if ( $key['from'] === $column ) return $key;
 		}
@@ -1132,27 +1157,5 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	public function getUniquesForTable( $table )
 	{
 		return array();
-	}
-
-	/**
-	 * Determines whether the specified columns are part
-	 * of a unique index in the specified table.
-	 *
-	 * @param string $table   table
-	 * @param array  $columns a list of columns
-	 *
-	 * @return boolean
-	 */
-	public function areColumnsInUniqueIndex( $table, $columns )
-	{
-		sort( $columns );
-		$columnFootprint = implode( ',', $columns );
-		$uniques = $this->getUniquesForTable( $table );
-		foreach( $uniques as $unique ) {
-				sort( $unique );
-				$uniqueFootprint = implode( ',', $unique );
-				if ( $uniqueFootprint === $columnFootprint ) return TRUE;
-		}
-		return FALSE;
 	}
 }

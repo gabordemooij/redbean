@@ -370,28 +370,28 @@ interface QueryWriter
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
 	 *
-	 * @param  string $type        type that will have a foreign key field
-	 * @param  string $targetType  points to this type
-	 * @param  string $field       field that contains the foreign key value
-	 * @param  string $targetField field where the fk points to
-	 * @param  string $isDep       whether target is dependent and should cascade on update/delete
+	 * @param  string $type           type that will have a foreign key field
+	 * @param  string $targetType     points to this type
+	 * @param  string $property       field that contains the foreign key value
+	 * @param  string $targetProperty field where the fk points to
+	 * @param  string $isDep          whether target is dependent and should cascade on update/delete
 	 *
 	 * @return void
 	 */
-	public function addFK( $type, $targetType, $field, $targetField, $isDep = false );
+	public function addFK( $type, $targetType, $property, $targetProperty, $isDep = false );
 
 	/**
 	 * This method will add an index to a type and field with name
 	 * $name.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string $type   type to add index to
-	 * @param string $name   name of the new index
-	 * @param string $column field to index
+	 * @param string $type     type to add index to
+	 * @param string $name     name of the new index
+	 * @param string $property field to index
 	 *
 	 * @return void
 	 */
-	public function addIndex( $type, $name, $column );
+	public function addIndex( $type, $name, $property );
 
 	/**
 	 * Checks and filters a database structure element like a table of column
@@ -467,12 +467,12 @@ interface QueryWriter
 	 * Given a table and a column name this method
 	 * returns the foreign key map section associated with this pair.
 	 *
-	 * @param string $table  name of the table
-	 * @param string $column name of the column
+	 * @param string $table    name of the table
+	 * @param string $property name of the property
 	 *
 	 * @return array|NULL
 	 */
-	public function getForeignKeyForTableColumn( $table, $column );
+	public function getForeignKeyForTableColumn( $type, $property );
 
 	/**
 	 * Returns the foreign key map (FKM) for a table.
@@ -495,15 +495,15 @@ interface QueryWriter
 	 *
 	 * @return array
 	 */
-	 public function getKeyMapForTable( $table );
+	 public function getKeyMapForTable( $type );
 
 	 /**
 	  * Returns an array, listing all column groups (as sub-arrays)
 	  * that have a unique constraint.
 	  *
-	  * @param string $table table name
+	  * @param string $type type name
 	  *
 	  * @return array
 	  */
-	 public function getUniquesForTable( $table );
+	 public function getUniquesForTable( $type );
 }
