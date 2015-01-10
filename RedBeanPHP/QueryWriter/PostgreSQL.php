@@ -64,37 +64,6 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * Add the constraints for a specific database driver: PostgreSQL.
-	 *
-	 * @param string $table     table to add fk constraints to
-	 * @param string $table1    first reference table
-	 * @param string $table2    second reference table
-	 * @param string $property1 first reference column
-	 * @param string $property2 second reference column
-	 *
-	 * @return boolean
-	 */
-	protected function constrain( $table, $table1, $table2, $property1, $property2 )
-	{
-		if ( !is_null( $this->getForeignKeyForTableColumn( $table, $property1 ) ) ) return FALSE;
-		$adapter = $this->adapter;
-		$fkCode  = 'fk' . md5( $table . $property1 . $property2 );
-		$sql1 = "ALTER TABLE \"$table\" ADD CONSTRAINT
-			{$fkCode}a FOREIGN KEY ($property1)
-			REFERENCES \"$table1\" (id) ON DELETE CASCADE ON UPDATE CASCADE ";
-		$sql2 = "ALTER TABLE \"$table\" ADD CONSTRAINT
-			{$fkCode}b FOREIGN KEY ($property2)
-			REFERENCES \"$table2\" (id) ON DELETE CASCADE ON UPDATE CASCADE ";
-		try {
-			$adapter->exec( $sql1 );
-			$adapter->exec( $sql2 );
-			return TRUE;
-		} catch (\Exception $e ) {
-			return FALSE;
-		}
-	}
-
-	/**
 	 * @see AQueryWriter::getKeyMapForTable
 	 */
 	public function getKeyMapForTable( $type )

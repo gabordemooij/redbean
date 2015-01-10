@@ -41,25 +41,6 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	protected $quoteCharacter = '`';
 
 	/**
-	 * Add the constraints for a specific database driver: CUBRID
-	 *
-	 * @param string $table     table
-	 * @param string $table1    table1
-	 * @param string $table2    table2
-	 * @param string $property1 property1
-	 * @param string $property2 property2
-	 *
-	 * @return boolean
-	 */
-	protected function constrain( $table, $table1, $table2, $property1, $property2 )
-	{
-		if ( !is_null( $this->getForeignKeyForTableColumn( $table, $property1 ) ) ) return FALSE;
-		$firstState  = $this->buildFK( $table, $table1, $property1, 'id', TRUE );
-		$secondState = $this->buildFK( $table, $table2, $property2, 'id', TRUE );
-		return ( $firstState && $secondState );
-	}
-
-	/**
 	 * This method adds a foreign key from type and field to
 	 * target type and target field.
 	 * The foreign key is created without an action. On delete/update

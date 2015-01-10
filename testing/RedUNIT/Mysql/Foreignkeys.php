@@ -63,12 +63,12 @@ class Foreignkeys extends Mysql
 			{
 				"parent": "genre",
 				"child": "book_genre",
-				"constraint_name": "book_genre_ibfk_1"
+				"constraint_name": "c_fk_book_genre_genre_id"
 			},
 			{
 				"parent": "book",
 				"child": "book_genre",
-				"constraint_name": "book_genre_ibfk_2"
+				"constraint_name": "c_fk_book_genre_book_id"
 			},
 			{
 				"parent": "cover",
@@ -92,12 +92,14 @@ class Foreignkeys extends Mysql
 			$found = 0;
 
 			foreach ( $j2 as $k => $j2row ) {
+
 				if ( json_encode( $j2row ) === $s ) {
 					pass();
 
 					unset( $j2[$k] );
 
 					$found = 1;
+					break;
 				}
 			}
 

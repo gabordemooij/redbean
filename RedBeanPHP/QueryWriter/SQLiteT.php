@@ -186,24 +186,6 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * Add the constraints for a specific database driver: SQLite.
-	 *
-	 * @param string $table     table to add fk constrains to
-	 * @param string $table1    first reference table
-	 * @param string $table2    second reference table
-	 * @param string $property1 first reference column
-	 * @param string $property2 second reference column
-	 *
-	 * @return boolean $success whether the constraint has been applied
-	 */
-	protected function constrain( $table, $table1, $table2, $property1, $property2 )
-	{
-		$firstState  = $this->buildFK( $table, $table1, $property1, 'id', TRUE );
-		$secondState = $this->buildFK( $table, $table2, $property2, 'id', TRUE );
-		return ( $firstState && $secondState );
-	}
-
-	/**
 	 * @see AQueryWriter::getKeyMapForTable
 	 */
 	public function getKeyMapForTable( $type )

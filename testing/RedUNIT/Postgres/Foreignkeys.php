@@ -75,14 +75,14 @@ class Foreignkeys extends Postgres
 				"foreign_column_name": "id"
 			},
 			{
-				"constraint_name": "fk65c02fc3a418eb08d0c7b3e8440204f3a",
+				"constraint_name": "book_genre_genre_id_fkey",
 				"table_name": "book_genre",
 				"column_name": "genre_id",
 				"foreign_table_name": "genre",
 				"foreign_column_name": "id"
 			},
 			{
-				"constraint_name": "fk65c02fc3a418eb08d0c7b3e8440204f3b",
+				"constraint_name": "book_genre_book_id_fkey",
 				"table_name": "book_genre",
 				"column_name": "book_id",
 				"foreign_table_name": "book",
