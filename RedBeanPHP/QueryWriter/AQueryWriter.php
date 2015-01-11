@@ -343,28 +343,28 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
-	 * Given a table and a column name this method
+	 * Given a type and a property name this method
 	 * returns the foreign key map section associated with this pair.
 	 *
-	 * @param string $table    name of the table
+	 * @param string $type     name of the type
 	 * @param string $property name of the property
 	 *
 	 * @return array|NULL
 	 */
-	protected function getForeignKeyForTableColumn( $table, $column )
+	protected function getForeignKeyForTypeProperty( $type, $property )
 	{
-		$column = $this->esc( $column, TRUE );
+		$property = $this->esc( $property, TRUE );
 
-		$map = $this->getKeyMapForTable( $table );
+		$map = $this->getKeyMapForType( $type );
 
 		foreach( $map as $key ) {
-			if ( $key['from'] === $column ) return $key;
+			if ( $key['from'] === $property ) return $key;
 		}
 		return NULL;
 	}
 
 	/**
-	 * Returns the foreign key map (FKM) for a table.
+	 * Returns the foreign key map (FKM) for a type.
 	 * A foreign key map describes the foreign keys in a table.
 	 * A FKM always has the same structure:
 	 *
@@ -384,7 +384,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 *
 	 * @return array
 	 */
-	protected function getKeyMapForTable( $type )
+	protected function getKeyMapForType( $type )
 	{
 		return array();
 	}
@@ -397,7 +397,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 *
 	 * @return array
 	 */
-	protected function getUniquesForTable( $table )
+	protected function getUniquesForType( $type )
 	{
 		return array();
 	}
@@ -411,14 +411,14 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 * include a source table, prefix the key with 'on_table_<SOURCE>_'.
 	 *
 	 * @param string $from  the column of the key in the source table
-	 * @param string $table the table where the key points to
+	 * @param string $type  the type (table) where the key points to
 	 * @param string $to    the target column of the foreign key (mostly just 'id')
 	 *
 	 * @return string
 	 */
-	protected function makeFKLabel($from, $table, $to)
+	protected function makeFKLabel($from, $type, $to)
 	{
-		return "from_{$from}_to_table_{$table}_col_{$to}";
+		return "from_{$from}_to_table_{$type}_col_{$to}";
 	}
 
 	/**
@@ -611,20 +611,20 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	 * Determines whether the specified columns are part
 	 * of a unique index in the specified table.
 	 *
-	 * @param string $table   table
-	 * @param array  $columns a list of columns
+	 * @param string $type       table
+	 * @param array  $properties a list of columns
 	 *
 	 * @return boolean
 	 */
-	protected function areColumnsInUniqueIndex( $table, $columns )
+	protected function areColumnsInUniqueIndex( $type, $properties )
 	{
-		sort( $columns );
-		$columnFootprint = implode( ',', $columns );
-		$uniques = $this->getUniquesForTable( $table );
+		sort( $properties );
+		$propertyFootprint = implode( ',', $properties );
+		$uniques = $this->getUniquesForType( $type );
 		foreach( $uniques as $unique ) {
 				sort( $unique );
 				$uniqueFootprint = implode( ',', $unique );
-				if ( $uniqueFootprint === $columnFootprint ) return TRUE;
+				if ( $uniqueFootprint === $propertyFootprint ) return TRUE;
 		}
 		return FALSE;
 	}
@@ -1209,7 +1209,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	{
 		$type = $this->esc( $type, TRUE );
 		$field = $this->esc( $property, TRUE ) . '_id';
-		$keys = $this->getKeyMapForTable( $type );
+		$keys = $this->getKeyMapForType( $type );
 
 		foreach( $keys as $key ) {
 			if (

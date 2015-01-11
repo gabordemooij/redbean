@@ -36,7 +36,7 @@ class Aliasing extends Base
 		$project->student = $student;
 		R::store( $project );
 		$writer = R::getWriter();
-		$map = \ProxyWriter::callMethod( $writer, 'getKeyMapForTable', 'project' );
+		$map = \ProxyWriter::callMethod( $writer, 'getKeyMapForType', 'project' );
 		asrt( count( $map ), 2 );
 		asrt( isset( $map[ 'from_teacher_id_to_table_person_col_id' ] ), TRUE );
 		asrt( isset( $map[ 'from_student_id_to_table_person_col_id' ] ), TRUE );

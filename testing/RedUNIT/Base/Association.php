@@ -40,7 +40,7 @@ class Association extends Base
 		$book = $book->fresh();
 		$book->sharedCategory[] = $cat;
 		R::store($book);
-		$uniques = \ProxyWriter::callMethod( R::getWriter(), 'getUniquesForTable', 'book_category' );
+		$uniques = \ProxyWriter::callMethod( R::getWriter(), 'getUniquesForType', 'book_category' );
 		asrt( count( $uniques ), 1 );
 		$uniqueSet = reset( $uniques );
 		asrt( count( $uniqueSet ), 2 );
@@ -48,7 +48,7 @@ class Association extends Base
 		asrt( $uniqueSet[0], 'book_id' );
 		asrt( $uniqueSet[1], 'category_id' );
 		$nullWriter = new \NullWriter( R::getDatabaseAdapter() );
-		asrt( count( \ProxyWriter::callMethod( $nullWriter, 'getUniquesForTable', 'book_category' ) ), 0 );
+		asrt( count( \ProxyWriter::callMethod( $nullWriter, 'getUniquesForType', 'book_category' ) ), 0 );
 	}
 
 	/**

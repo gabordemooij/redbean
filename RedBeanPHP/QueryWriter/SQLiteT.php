@@ -60,7 +60,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$tableName = $this->esc( $type, TRUE );
 		$columns   = $this->getColumns( $type );
 		$indexes   = $this->getIndexes( $type );
-		$keys      = $this->getKeyMapForTable( $type );
+		$keys      = $this->getKeyMapForType( $type );
 
 		$table = array(
 			'columns' => $columns,
@@ -170,7 +170,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$targetTable     = $this->esc( $targetType, TRUE );
 		$column          = $this->esc( $property, TRUE );
 		$targetColumn    = $this->esc( $targetProperty, TRUE );
-		if ( !is_null( $this->getForeignKeyForTableColumn( $table, $column ) ) ) return FALSE;
+		if ( !is_null( $this->getForeignKeyForTypeProperty( $table, $column ) ) ) return FALSE;
 		$t = $this->getTable( $table );
 		$consSQL = ( $constraint ? 'CASCADE' : 'SET NULL' );
 		$label   = 'from_' . $column . '_to_table_' . $targetTable . '_col_' . $targetColumn;
@@ -186,9 +186,9 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see AQueryWriter::getKeyMapForTable
+	 * @see AQueryWriter::getKeyMapForType
 	 */
-	public function getKeyMapForTable( $type )
+	public function getKeyMapForType( $type )
 	{
 		$table = $this->esc( $type, TRUE );
 		$keys  = $this->adapter->get( "PRAGMA foreign_key_list('$table')" );
@@ -208,12 +208,12 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see AQueryWriter::getUniquesForTable
+	 * @see AQueryWriter::getUniquesForType
 	 */
-	public function getUniquesForTable( $table )
+	public function getUniquesForType( $type )
 	{
 		$uniques = array();
-		$table = $this->esc( $table, TRUE );
+		$table = $this->esc( $type, TRUE );
 		$indexes = $this->adapter->get( "PRAGMA index_list({$table})" );
 		foreach( $indexes as $index ) {
 			if ( $index['unique'] == 1 ) {

@@ -51,9 +51,9 @@ class MySQL extends AQueryWriter implements QueryWriter
 	protected $quoteCharacter = '`';
 
 	/**
-	 * @see AQueryWriter::getKeyMapForTable
+	 * @see AQueryWriter::getKeyMapForType
 	 */
-	protected function getKeyMapForTable( $type )
+	protected function getKeyMapForType( $type )
 	{
 		$table = $this->esc( $type, TRUE );
 		$keys = $this->adapter->get('
@@ -93,9 +93,9 @@ class MySQL extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see AQueryWriter::getUniquesForTable
+	 * @see AQueryWriter::getUniquesForType
 	 */
-	protected function getUniquesForTable( $type )
+	protected function getUniquesForType( $type )
 	{
 		$table = $this->esc( $type, TRUE );
 		$columns = $this->adapter->get('
@@ -308,14 +308,14 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::addIndex
 	 */
-	public function addIndex( $type, $name, $column )
+	public function addIndex( $type, $name, $property )
 	{
 		$table  = $type;
 		$table  = $this->esc( $table );
 
 		$name   = preg_replace( '/\W/', '', $name );
 
-		$column = $this->esc( $column );
+		$column = $this->esc( $property );
 
 		try {
 			foreach ( $this->adapter->get( "SHOW INDEX FROM $table " ) as $ind ) if ( $ind['Key_name'] === $name ) return;
@@ -338,7 +338,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 		$targetFieldNoQ = $this->esc( $targetProperty, TRUE );
 		$tableNoQ = $this->esc( $type, TRUE );
 		$fieldNoQ = $this->esc( $property, TRUE );
-		if ( !is_null( $this->getForeignKeyForTableColumn( $tableNoQ, $fieldNoQ ) ) ) return FALSE;
+		if ( !is_null( $this->getForeignKeyForTypeProperty( $tableNoQ, $fieldNoQ ) ) ) return FALSE;
 
 		//Widen the column if it's incapable of representing a foreign key (at least INT).
 		$columns = $this->getColumns( $tableNoQ );

@@ -11,14 +11,16 @@ namespace RedBeanPHP;
  * @author  Gabor de Mooij and the RedBeanPHP community
  * @license BSD/GPLv2
  *
- * Notes:
- * - Whenever you see a parameter called $table or $type you should always
- * be aware of the fact that this argument contains a Bean Type string, not the
- * actual table name. These raw type names are passed to safeTable() to obtain the
- * actual name of the database table. Don't let the names confuse you $type/$table
- * refers to Bean Type, not physical database table names!
- * - This is the interface for FLUID database drivers. Drivers intended to support
- * just FROZEN mode should implement the IceWriter instead.
+ *	Terminology:
+ *
+ * - beautified property (a camelCased property, has to be converted first)
+ * - beautified type (a camelCased type, has to be converted first)
+ * - type (a bean type, corresponds directly to a table)
+ * - property (a bean property, corresponds directly to a column)
+ * - table (a checked and quoted type, ready for use in a query)
+ * - column (a checked and quoted property, ready for use in query)
+ * - tableNoQ (same as type, but in context of a database operation)
+ * - columnNoQ (same as property, but in context of a database operation)
  *
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
@@ -439,12 +441,12 @@ interface QueryWriter
 	 * This method also accepts a single associative array as
 	 * its first argument.
 	 *
-	 * @param string|array $from
-	 * @param string       $to (optional)
+	 * @param string|array $fromType
+	 * @param string       $toType (optional)
 	 *
 	 * @return void
 	 */
-	public function renameAssocTable( $from, $to = NULL );
+	public function renameAssocTable( $fromType, $toType = NULL );
 
 	/**
 	 * Returns the format for link tables.
