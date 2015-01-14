@@ -30,6 +30,48 @@ class Foreignkeys extends Base implements Observer
 	private $queries = array();
 
 	/**
+	 * Tests index information methods.
+	 *
+	 * @return void
+	 */
+	public function testIndexInfo()
+	{
+		global $currentDriver;
+		R::nuke();
+		$writer = R::getWriter();
+		$book = R::dispense( 'book' );
+		$book->ownPageList[] = R::dispense( 'page' );
+		R::store( $book );
+		$map = \ProxyWriter::callMethod( $writer, 'getIndexListForType', 'page' );
+		asrt( is_array( $map ), TRUE );
+		asrt( ( count( $map ) > 0 ), TRUE );
+		foreach( $map as $columns ) {
+			foreach( $columns as $column ) {
+				asrt( in_array( $column, array( 'id', 'book_id' ) ), TRUE );
+			}
+		}
+		$book->sharedCategory[] = R::dispense( 'category' );
+		R::store( $book );
+		$book->sharedCategory[] = R::dispense( 'category' );
+		R::store( $book );
+		$book->link('book_category', array( 'note' => 'test' ) )->category = R::dispense( 'category' );
+		R::store( $book );
+		$map = \ProxyWriter::callMethod( $writer, 'getIndexListForType', 'book_category' );
+		foreach( $map as $columns ) {
+			foreach( $columns as $column ) {
+				asrt( in_array( $column, array( 'id', 'book_id', 'category_id' ) ), TRUE );
+			}
+		}
+		asrt( \ProxyWriter::callMethod( $writer, 'isIndexed', 'book_category', 'book_id' ), TRUE );
+		asrt( \ProxyWriter::callMethod( $writer, 'isIndexed', 'book_category', 'category_id' ), TRUE );
+		asrt( \ProxyWriter::callMethod( $writer, 'isIndexed', 'book_category', 'strange_id' ), FALSE );
+		$columns = R::inspect( 'book_category' );
+		asrt( isset( $columns['note'] ), TRUE );
+		asrt( \ProxyWriter::callMethod( $writer, 'isIndexed', 'book_category', 'note' ), FALSE );
+		asrt( \ProxyWriter::callMethod( $writer, 'isIndexed', 'page', 'book_id' ), TRUE );
+	}
+
+	/**
 	 * Test dependencies.
 	 *
 	 * @return void

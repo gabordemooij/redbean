@@ -327,6 +327,11 @@ interface QueryWriter
 	public function deleteRelations( $sourceType, $destType, $sourceID );
 
 	/**
+	 * @see QueryWriter::addUniqueConstaint
+	 */
+	public function addUniqueIndex( $type, $columns );
+
+	/**
 	 * This method will add a UNIQUE constraint index to a table on columns $columns.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
@@ -335,7 +340,7 @@ interface QueryWriter
 	 *
 	 * @return void
 	 */
-	public function addUniqueIndex( $type, $columns );
+	public function addUniqueConstraint( $type, $columns );
 
 	/**
 	 * This method will check whether the SQL state is in the list of specified states

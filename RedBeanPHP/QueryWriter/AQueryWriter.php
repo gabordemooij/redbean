@@ -355,7 +355,11 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	{
 		$property = $this->esc( $property, TRUE );
 
-		$map = $this->getKeyMapForType( $type );
+		try {
+			$map = $this->getKeyMapForType( $type );
+		} catch ( \Exception $e ) {
+			return NULL;
+		}
 
 		foreach( $map as $key ) {
 			if ( $key['from'] === $property ) return $key;
@@ -400,6 +404,53 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	protected function getUniquesForType( $type )
 	{
 		return array();
+	}
+
+	/**
+	 * Returns a list of indexes for the specified type.
+	 * The list contains all index names (as keys) and their
+	 * columns (values, arrays).
+	 *
+	 * @param string $type type name
+	 *
+	 * @return array
+	 */
+	protected function getIndexListForType( $type )
+	{
+		return array();
+	}
+
+	/**
+	 * Determines whether a property of a type
+	 * is used in an index.
+	 *
+	 * Because databases have varying implementations of
+	 * unique constraints, this method only returns TRUE
+	 * if there is an index solely for this property, indexes
+	 * having multiple properties including the specified one
+	 * will be disgarded because they may not be actually used.
+	 *
+	 * For instance, in MySQL a unique constraint is implemented by
+	 * an index, but the second column in that index cannot be used
+	 * by a query using that column.
+	 *
+	 * This will probably generate some redundant indexes that need
+	 * to be reviewed. There is not much to do about that :/
+	 *
+	 * @param string $type     type name
+	 * @param string $property property name
+	 *
+	 * @return boolean
+	 */
+	protected function isIndexed( $type, $property )
+	{
+		$columnNoQ = $this->esc( $property, TRUE );
+		$indexList = $this->getIndexListForType( $type );
+
+		foreach( $indexList as $index ) {
+			if (count($index) === 1 && $index[0]===$columnNoQ) return TRUE;
+		}
+		return FALSE;
 	}
 
 	/**
@@ -1217,5 +1268,13 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 			) return $key['table'];
 		}
 		return NULL;
+	}
+
+	/**
+	 * @see QueryWriter::addUniqueConstraint
+	 */
+	public function addUniqueIndex( $type, $properties )
+	{
+		return $this->addUniqueConstraint( $type, $properties );
 	}
 }

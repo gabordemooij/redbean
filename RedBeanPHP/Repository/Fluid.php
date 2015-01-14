@@ -113,7 +113,7 @@ class Fluid extends Repository
 		if ( $uniques = $bean->getMeta( 'buildcommand.unique' ) ) {
 			$table = $bean->getMeta( 'type' );
 			foreach ( $uniques as $unique ) {
-				if ( !$this->oodb->isChilled( $table ) ) $this->writer->addUniqueIndex( $table, $unique );
+				if ( !$this->oodb->isChilled( $table ) ) $this->writer->addUniqueConstraint( $table, $unique );
 			}
 		}
 	}

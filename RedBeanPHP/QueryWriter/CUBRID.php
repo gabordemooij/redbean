@@ -77,7 +77,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	/**
 	 * @see AQueryWriter::getKeyMapForType
 	 */
-	public function getKeyMapForType( $type  )
+	protected function getKeyMapForType( $type  )
 	{
 		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$type}`");
 		if (!isset($sqlCode[0])) return array();
@@ -103,7 +103,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	/**
 	 * @see AQueryWriter::getUniquesForType
 	 */
-	public function getUniquesForType( $type )
+	protected function getUniquesForType( $type )
 	{
 		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$type}`");
 		if (!isset($sqlCode[0])) return array();
@@ -120,6 +120,23 @@ class CUBRID extends AQueryWriter implements QueryWriter
 			$list[ $matches[1][$i] ] = $columns;
 		}
 		return $list;
+	}
+
+	/**
+	 * @see AQueryWriter::getIndexListForType
+	 */
+	protected function getIndexListForType( $type )
+	{
+		$tableNoQ = $this->esc( $type, TRUE );
+		$indexList = $this->adapter->get( "SHOW INDEX FROM `{$type}`" );
+		$indexItems = array();
+		foreach( $indexList as $indexInfo ) {
+			if ( !isset($indexItems[$indexInfo['Key_name']] ) ) {
+				$indexItems[$indexInfo['Key_name']] = array();
+			}
+			$indexItems[$indexInfo['Key_name']][] = $indexInfo['Column_name'];
+		}
+		return $indexItems;
 	}
 
 	/**
@@ -271,7 +288,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::addUniqueIndex
 	 */
-	public function addUniqueIndex( $type, $properties )
+	public function addUniqueConstraint( $type, $properties )
 	{
 		$tableNoQ = $this->esc( $type, TRUE );
 		$columns = array();
@@ -302,22 +319,20 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	 */
 	public function addIndex( $type, $name, $column )
 	{
-		$table  = $type;
-		$table  = $this->esc( $table );
-
-		$name   = preg_replace( '/\W/', '', $name );
-
-		$column = $this->esc( $column );
-
-		$index  = $this->adapter->getRow( "SELECT 1 as `exists` FROM db_index WHERE index_name = ? ", array( $name ) );
-
-		if ( $index && $index['exists'] ) {
-			return; // positive number will return, 0 will continue.
+		try {
+			if ( $this->isIndexed( $type, $column ) ) return FALSE;
+		} catch ( \Exception $e ) {
+			return FALSE;
 		}
 
 		try {
+			$table  = $this->esc( $type );
+			$name   = preg_replace( '/\W/', '', $name );
+			$column = $this->esc( $column );
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
+			return TRUE;
 		} catch (\Exception $e ) {
+			return FALSE;
 		}
 	}
 

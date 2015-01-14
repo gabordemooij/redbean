@@ -124,6 +124,23 @@ class MySQL extends AQueryWriter implements QueryWriter
 	}
 
 	/**
+	 * @see AQueryWriter::getIndexListForType
+	 */
+	protected function getIndexListForType( $type )
+	{
+		$tableNoQ = $this->esc( $type, TRUE );
+		$indexList = $this->adapter->get("SHOW INDEX FROM `{$type}`");
+		$indexItems = array();
+		foreach( $indexList as $indexInfo ) {
+			if (!isset($indexItems[$indexInfo['Key_name']])) {
+				$indexItems[$indexInfo['Key_name']] = array();
+			}
+			$indexItems[$indexInfo['Key_name']][] = $indexInfo['Column_name'];
+		}
+		return $indexItems;
+	}
+
+	/**
 	 * Constructor
 	 *
 	 * @param Adapter $adapter Database Adapter
@@ -287,7 +304,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::addUniqueIndex
 	 */
-	public function addUniqueIndex( $type, $properties )
+	public function addUniqueConstraint( $type, $properties )
 	{
 		$tableNoQ = $this->esc( $type, TRUE );
 		if ( $this->areColumnsInUniqueIndex( $tableNoQ, $properties ) ) return FALSE;
@@ -310,17 +327,20 @@ class MySQL extends AQueryWriter implements QueryWriter
 	 */
 	public function addIndex( $type, $name, $property )
 	{
-		$table  = $type;
-		$table  = $this->esc( $table );
-
-		$name   = preg_replace( '/\W/', '', $name );
-
-		$column = $this->esc( $property );
+		try {
+			if ( $this->isIndexed( $type, $property ) ) return FALSE;
+		} catch ( \Exception $e ) {
+			return FALSE;
+		}
 
 		try {
-			foreach ( $this->adapter->get( "SHOW INDEX FROM $table " ) as $ind ) if ( $ind['Key_name'] === $name ) return;
+			$table  = $this->esc( $type );
+			$name   = preg_replace( '/\W/', '', $name );
+			$column = $this->esc( $property );
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
-		} catch (\Exception $e ) {
+			return TRUE;
+		} catch ( \Exception $e ) {
+			return FALSE;
 		}
 	}
 
