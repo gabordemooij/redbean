@@ -80,45 +80,6 @@ class Fluid extends Repository
 	}
 
 	/**
-	 * Processes all column based build commands.
-	 * A build command is an additional instruction for the Query Writer. It is processed only when
-	 * a column gets created. The build command is often used to instruct the writer to write some
-	 * extra SQL to create indexes or constraints. Build commands are stored in meta data of the bean.
-	 * They are only for internal use, try to refrain from using them in your code directly.
-	 *
-	 * @param  string           $table    name of the table to process build commands for
-	 * @param  string           $property name of the property to process build commands for
-	 * @param  OODBBean $bean     bean that contains the build commands
-	 *
-	 * @return void
-	 */
-	private function processBuildCommands( $table, $property, OODBBean $bean )
-	{
-		if ( $inx = ( $bean->getMeta( 'buildcommand.indexes' ) ) ) {
-			if ( isset( $inx[$property] ) ) {
-				$this->writer->addIndex( $table, $inx[$property], $property );
-			}
-		}
-	}
-
-	/**
-	 * Adds the unique constraints described in the meta data.
-	 *
-	 * @param OODBBean $bean bean
-	 *
-	 * @return void
-	 */
-	private function addUniqueConstraints( OODBBean $bean )
-	{
-		if ( $uniques = $bean->getMeta( 'buildcommand.unique' ) ) {
-			$table = $bean->getMeta( 'type' );
-			foreach ( $uniques as $unique ) {
-				if ( !$this->oodb->isChilled( $table ) ) $this->writer->addUniqueConstraint( $table, $unique );
-			}
-		}
-	}
-
-	/**
 	 * Molds the table to fit the bean data.
 	 * Given a property and a value and the bean, this method will
 	 * adjust the table structure to fit the requirements of the property and value.
@@ -156,7 +117,6 @@ class Fluid extends Repository
 			} else {
 				$this->writer->addColumn( $table, $property, $typeno );
 				$bean->setMeta( 'buildreport.flags.addcolumn', TRUE );
-				$this->processBuildCommands( $table, $property, $bean );
 			}
 		}
 	}
@@ -251,7 +211,6 @@ class Fluid extends Repository
 			$table = $bean->getMeta( 'type' );
 			$this->createTableIfNotExists( $bean, $table );
 			$updateValues = $this->getUpdateValues( $bean );
-			$this->addUniqueConstraints( $bean );
 			$bean->id = $this->writer->updateRecord( $table, $updateValues, $bean->id );
 			$bean->setMeta( 'changed', FALSE );
 		}
