@@ -106,6 +106,7 @@ class AssociationManager extends Observable
 	 */
 	protected function associateBeans( OODBBean $bean1, OODBBean $bean2, OODBBean $bean )
 	{
+		$type      = $bean->getMeta( 'type' );
 		$property1 = $bean1->getMeta( 'type' ) . '_id';
 		$property2 = $bean2->getMeta( 'type' ) . '_id';
 
@@ -126,15 +127,15 @@ class AssociationManager extends Observable
 					&& isset( $columns[ 'id' ] )
 					&& isset( $columns[ $property1 ] ) 
 					&& isset( $columns[ $property2 ] ) ) {
-					$bean->setMeta( 'buildcommand.unique', array( $unique ) );
+					$this->writer->addUniqueConstraint( $type, $unique );
 				}
 			}
 
 			//add a build command for Single Column Index (to improve performance in case unqiue cant be used)
 			$indexName1 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property1;
 			$indexName2 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property2;
-
-			$bean->setMeta( 'buildcommand.indexes', array( $property1 => $indexName1, $property2 => $indexName2 ) );
+			$this->writer->addIndex( $type, $indexName1, $property1 );
+			$this->writer->addIndex( $type, $indexName2, $property2 );
 		}
 
 		$this->oodb->store( $bean1 );
