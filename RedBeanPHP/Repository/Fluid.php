@@ -97,6 +97,7 @@ class Fluid extends Repository
 	{
 		$table   = $bean->getMeta( 'type' );
 		$columns = $this->writer->getColumns( $table );
+		$columnNoQ = $this->writer->esc( $property, TRUE );
 		if ( !$this->oodb->isChilled( $bean->getMeta( 'type' ) ) ) {
 			if ( $bean->getMeta( "cast.$property", -1 ) !== -1 ) { //check for explicitly specified types
 				$cast   = $bean->getMeta( "cast.$property" );
@@ -117,6 +118,11 @@ class Fluid extends Repository
 			} else {
 				$this->writer->addColumn( $table, $property, $typeno );
 				$bean->setMeta( 'buildreport.flags.addcolumn', TRUE );
+			}
+			if (strrpos($columnNoQ, '_id')===(strlen($columnNoQ)-3)) {
+				$destinationColumnNoQ = substr($columnNoQ, 0, strlen($columnNoQ)-3);
+				$indexName = "index_foreignkey_{$table}_{$destinationColumnNoQ}";
+				$this->writer->addIndex($table, $indexName, $columnNoQ);
 			}
 		}
 	}
@@ -139,9 +145,6 @@ class Fluid extends Repository
 			$embeddedType = $embeddedBean->getMeta( 'type' );
 			$key = $beanType . '|' . $embeddedType . '>' . $linkField;
 			if ( !isset( $cachedIndex[$key] ) ) {
-				$this->writer->addIndex( $bean->getMeta( 'type' ),
-				'index_foreignkey_' . $beanType . '_' . $embeddedType,
-				$linkField );
 				$this->writer->addFK( $beanType, $embeddedType, $linkField, 'id', FALSE );
 				$cachedIndex[$key] = TRUE;
 			}
@@ -180,9 +183,6 @@ class Fluid extends Repository
 				$additionType = $addition->getMeta( 'type' );
 				$key = $additionType . '|' . $beanType . '>' . $myFieldLink;
 				if ( !isset( $cachedIndex[$key] ) ) {
-					$this->writer->addIndex( $additionType,
-					'index_foreignkey_' . $additionType . '_' . $beanType,
-					$myFieldLink );
 					$isDep = $bean->getMeta( 'sys.exclusive-'.$additionType );
 					$this->writer->addFK( $additionType, $beanType, $myFieldLink, 'id', $isDep );
 					$cachedIndex[$key] = TRUE;

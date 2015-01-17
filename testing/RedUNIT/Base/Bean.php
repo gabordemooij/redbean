@@ -96,7 +96,13 @@ class Bean extends Base
 		$logger->clear();
 		R::store($i);
 		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
-		asrt( count( $numberOfUpdateQueries ), 1 );
+		//print_r($logger->getLogs());
+		global $currentDriver;
+		if ($currentDriver === 'sqlite') {
+			asrt( count( $numberOfUpdateQueries ), 2 );
+		} else {
+			asrt( count( $numberOfUpdateQueries ), 1 );
+		}
 		$i = $i->fresh();
 		asrt( $i->customer->city->name, 'q' );
 		//do we properly skip unmodified but tainted parent beans?
@@ -104,9 +110,13 @@ class Bean extends Base
 		$logger->clear();
 		R::store( $i );
 		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
-		asrt( count( $numberOfUpdateQueries ), 1 );
+		if ($currentDriver === 'sqlite') {
+			asrt( count( $numberOfUpdateQueries ), 2 );
+		} else {
+			asrt( count( $numberOfUpdateQueries ), 1 );
+		}
 	}
-
+	//public function getTargetDrivers(){ return array('sqlite'); }
 	/**
 	 * Test whether the number of update queries
 	 * executed is limited to the ones that are absolutely
@@ -152,7 +162,12 @@ class Bean extends Base
 		R::store( $book );
 		//changed title, 1 update
 		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
-		asrt( count( $numberOfUpdateQueries ), 1 );
+		global $currentDriver;
+		if ($currentDriver === 'sqlite') {
+			asrt( count( $numberOfUpdateQueries ), 3 );
+		} else {
+			asrt( count( $numberOfUpdateQueries ), 1 );
+		}
 		$logger->clear();
 		//store again, no changes, no updates
 		R::store( $book );
@@ -197,9 +212,17 @@ class Bean extends Base
 		R::store( $book );
 		//no update, 1 insert, just adding
 		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
-		asrt( count( $numberOfUpdateQueries ), 0 );
+		if ($currentDriver === 'sqlite') {
+			asrt( count( $numberOfUpdateQueries ), 1 );
+		} else {
+			asrt( count( $numberOfUpdateQueries ), 0 );
+		}
 		$numberOfUpdateQueries = $logger->grep( 'INSERT' );
-		asrt( count( $numberOfUpdateQueries ), 1 );
+		if ($currentDriver === 'sqlite') {
+			asrt( count( $numberOfUpdateQueries ), 3 );
+		} else {
+			asrt( count( $numberOfUpdateQueries ), 1 );
+		}
 		$book = $book->fresh();
 		asrt( count( $book->xownPageList ), 10 );
 		$logger->clear();
@@ -214,7 +237,11 @@ class Bean extends Base
 		R::store( $book );
 		//1 update for child of parent, no other updates
 		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
-		asrt( count( $numberOfUpdateQueries ), 1 );
+		if ($currentDriver === 'sqlite') {
+			asrt( count( $numberOfUpdateQueries ), 2 );
+		} else {
+			asrt( count( $numberOfUpdateQueries ), 1 );
+		}
 		$book = $book->fresh();
 		asrt( $book->map->xownLocationList[1]->name, 'Horshoe Bay' );
 		$logger->clear();
@@ -228,7 +255,11 @@ class Bean extends Base
 		R::store( $book );
 		//1 update, do not update rest of pages or book itself
 		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
-		asrt( count( $numberOfUpdateQueries ), 1 );
+		if ($currentDriver === 'sqlite') {
+			asrt( count( $numberOfUpdateQueries ), 2 );
+		} else {
+			asrt( count( $numberOfUpdateQueries ), 1 );
+		}
 		$book = $book->fresh();
 		$book->author->name = 'Worsley';
 		$logger->clear();
@@ -246,7 +277,11 @@ class Bean extends Base
 		R::store( $book );
 		//2 updates, one for author, one for link field: author_id needs update.
 		$numberOfUpdateQueries = $logger->grep( 'UPDATE' );
-		asrt( count( $numberOfUpdateQueries ), 2 );
+		if ($currentDriver === 'sqlite') {
+			asrt( count( $numberOfUpdateQueries ), 4 );
+		} else {
+			asrt( count( $numberOfUpdateQueries ), 2 );
+		}
 		$author->country = R::dispense( 'country' )->setAttr( 'name', 'England' );
 		R::store( $author );
 		$book = $book->fresh();

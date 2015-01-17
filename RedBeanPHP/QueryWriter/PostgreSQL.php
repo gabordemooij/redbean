@@ -117,79 +117,6 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see AQueryWriter::getUniquesForType
-	 */
-	protected function getUniquesForType( $type )
-	{
-		$table = $this->esc( $type, TRUE );
-		$columns = $this->adapter->get('
-			SELECT
-				information_schema.key_column_usage.constraint_name,
-				information_schema.key_column_usage.column_name
-			FROM
-				information_schema.table_constraints
-			INNER JOIN information_schema.key_column_usage
-				ON (
-					information_schema.table_constraints.constraint_name = information_schema.key_column_usage.constraint_name
-					AND information_schema.table_constraints.constraint_schema = information_schema.key_column_usage.constraint_schema
-					AND information_schema.table_constraints.constraint_catalog = information_schema.key_column_usage.constraint_catalog
-				)
-			WHERE
-				information_schema.table_constraints.table_catalog = current_database()
-				AND information_schema.key_column_usage.table_schema = ANY( current_schemas( FALSE ) )
-				AND information_schema.table_constraints.table_name = ?
-				AND information_schema.table_constraints.constraint_type = \'UNIQUE\'
-		', array( $table ) );
-		$uniques = array();
-		foreach( $columns as $column ) {
-			if ( !isset( $uniques[ $column['constraint_name'] ] ) ) $uniques[ $column['constraint_name'] ] = array();
-			$uniques[ $column['constraint_name'] ][] = $column['column_name'];
-		}
-		return $uniques;
-	}
-
-	/**
-	 * @see AQueryWriter::getIndexListForType
-	 */
-	protected function getIndexListForType( $type )
-	{
-		$tableNoQ = $this->esc( $type, TRUE );
-		$indexes = $this->adapter->get("
-			SELECT relname, indkey
-				FROM pg_class, pg_index
-			WHERE pg_class.oid = pg_index.indexrelid
-				AND pg_class.oid IN (
-					SELECT indexrelid
-						FROM pg_index, pg_class
-					WHERE pg_class.relname = '{$tableNoQ}'
-						AND pg_class.oid = pg_index.indrelid
-						AND indisunique != 't'
-						AND indisprimary != 't')");
-
-		$indexList = array();
-
-		foreach($indexes as $index) {
-			if (!isset($indexList[$index['relname']])) {
-				$indexList[$index['relname']] = array();
-			}
-			$keys = implode(',', explode(' ', $index['indkey']));
-			$info = $this->adapter->getCell("
-				SELECT pg_attribute.attname
-				FROM pg_index
-				LEFT JOIN pg_class
-					ON pg_index.indrelid  = pg_class.oid
-				LEFT JOIN pg_attribute
-					ON pg_attribute.attrelid = pg_class.oid
-					AND pg_attribute.attnum = ANY( indkey )
-				WHERE pg_class.relname = '{$tableNoQ}'
-					AND pg_attribute.attnum IN ({$keys})
-			");
-			$indexList[$index['relname']][] = $info;
-		}
-		return $indexList;
-	}
-
-	/**
 	 * Constructor
 	 *
 	 * @param Adapter $adapter Database Adapter
@@ -356,7 +283,6 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	public function addUniqueConstraint( $type, $properties )
 	{
 		$tableNoQ = $this->esc( $type, TRUE );
-		if ( $this->areColumnsInUniqueIndex( $tableNoQ, $properties ) ) return FALSE;
 		$columns = array();
 		foreach( $properties as $key => $column ) $columns[$key] = $this->esc( $column );
 		$table = $this->esc( $type );
@@ -386,12 +312,6 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	 */
 	public function addIndex( $type, $name, $property )
 	{
-		try {
-			if ( $this->isIndexed( $type, $property ) ) return FALSE;
-		} catch ( \Exception $e ) {
-			return FALSE;
-		}
-
 		$table  = $this->esc( $type );
 		$name   = preg_replace( '/\W/', '', $name );
 		$column = $this->esc( $property );

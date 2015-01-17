@@ -93,54 +93,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see AQueryWriter::getUniquesForType
-	 */
-	protected function getUniquesForType( $type )
-	{
-		$table = $this->esc( $type, TRUE );
-		$columns = $this->adapter->get('
-			SELECT
-				information_schema.key_column_usage.constraint_name,
-				information_schema.key_column_usage.column_name
-			FROM
-				information_schema.table_constraints
-			INNER JOIN information_schema.key_column_usage
-				ON (
-					information_schema.table_constraints.constraint_name = information_schema.key_column_usage.constraint_name
-					AND information_schema.table_constraints.constraint_schema = information_schema.key_column_usage.constraint_schema
-					AND information_schema.table_constraints.constraint_catalog = information_schema.key_column_usage.constraint_catalog
-				)
-			WHERE
-				information_schema.table_constraints.table_schema IN (SELECT DATABASE())
-				AND information_schema.table_constraints.table_name = ?
-				AND information_schema.table_constraints.constraint_type = \'UNIQUE\'
-		', array( $table ) );
-		$uniques = array();
-		foreach( $columns as $column ) {
-			if ( !isset( $uniques[ $column['constraint_name'] ] ) ) $uniques[ $column['constraint_name'] ] = array();
-			$uniques[ $column['constraint_name'] ][] = $column['column_name'];
-		}
-		return $uniques;
-	}
-
-	/**
-	 * @see AQueryWriter::getIndexListForType
-	 */
-	protected function getIndexListForType( $type )
-	{
-		$tableNoQ = $this->esc( $type, TRUE );
-		$indexList = $this->adapter->get("SHOW INDEX FROM `{$type}`");
-		$indexItems = array();
-		foreach( $indexList as $indexInfo ) {
-			if (!isset($indexItems[$indexInfo['Key_name']])) {
-				$indexItems[$indexInfo['Key_name']] = array();
-			}
-			$indexItems[$indexInfo['Key_name']][] = $indexInfo['Column_name'];
-		}
-		return $indexItems;
-	}
-
-	/**
 	 * Constructor
 	 *
 	 * @param Adapter $adapter Database Adapter
@@ -307,7 +259,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 	public function addUniqueConstraint( $type, $properties )
 	{
 		$tableNoQ = $this->esc( $type, TRUE );
-		if ( $this->areColumnsInUniqueIndex( $tableNoQ, $properties ) ) return FALSE;
 		$columns = array();
 		foreach( $properties as $key => $column ) $columns[$key] = $this->esc( $column );
 		$table = $this->esc( $type );
@@ -327,12 +278,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 	 */
 	public function addIndex( $type, $name, $property )
 	{
-		try {
-			if ( $this->isIndexed( $type, $property ) ) return FALSE;
-		} catch ( \Exception $e ) {
-			return FALSE;
-		}
-
 		try {
 			$table  = $this->esc( $type );
 			$name   = preg_replace( '/\W/', '', $name );

@@ -1135,7 +1135,12 @@ class Relations extends Base
 		R::store( $book );
 
 		// No more than 1 update
-		asrt( count( $logger->grep( 'UPDATE' ) ), 1 );
+		global $currentDriver;
+		if ($currentDriver === 'sqlite') {
+			asrt( count( $logger->grep( 'UPDATE' ) ), 2 );
+		} else {
+			asrt( count( $logger->grep( 'UPDATE' ) ), 1 );
+		}
 
 		$book = R::load( 'book', 1 );
 

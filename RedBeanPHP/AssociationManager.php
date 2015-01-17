@@ -135,12 +135,6 @@ class AssociationManager extends Observable
 				$type = $bean->getMeta( 'type' );
 				$unique = array( $property1, $property2 );
 				$this->writer->addUniqueConstraint( $type, $unique );
-
-				$indexName1 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property1;
-				$indexName2 = 'index_for_' . $bean->getMeta( 'type' ) . '_' . $property2;
-				$this->writer->addIndex( $type, $indexName1, $property1 );
-				$this->writer->addIndex( $type, $indexName2, $property2 );
-
 				$this->writer->addConstraintForTypes( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ) );
 			}
 			$results[] = $id;

@@ -394,66 +394,6 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
-	 * Returns an array, listing all column groups (as sub-arrays)
-	 * that have a unique constraint.
-	 *
-	 * @param string $type type name
-	 *
-	 * @return array
-	 */
-	protected function getUniquesForType( $type )
-	{
-		return array();
-	}
-
-	/**
-	 * Returns a list of indexes for the specified type.
-	 * The list contains all index names (as keys) and their
-	 * columns (values, arrays).
-	 *
-	 * @param string $type type name
-	 *
-	 * @return array
-	 */
-	protected function getIndexListForType( $type )
-	{
-		return array();
-	}
-
-	/**
-	 * Determines whether a property of a type
-	 * is used in an index.
-	 *
-	 * Because databases have varying implementations of
-	 * unique constraints, this method only returns TRUE
-	 * if there is an index solely for this property, indexes
-	 * having multiple properties including the specified one
-	 * will be disgarded because they may not be actually used.
-	 *
-	 * For instance, in MySQL a unique constraint is implemented by
-	 * an index, but the second column in that index cannot be used
-	 * by a query using that column.
-	 *
-	 * This will probably generate some redundant indexes that need
-	 * to be reviewed. There is not much to do about that :/
-	 *
-	 * @param string $type     type name
-	 * @param string $property property name
-	 *
-	 * @return boolean
-	 */
-	protected function isIndexed( $type, $property )
-	{
-		$columnNoQ = $this->esc( $property, TRUE );
-		$indexList = $this->getIndexListForType( $type );
-
-		foreach( $indexList as $index ) {
-			if (count($index) === 1 && $index[0]===$columnNoQ) return TRUE;
-		}
-		return FALSE;
-	}
-
-	/**
 	 * This method makes a key for a foreign key description array.
 	 * This key is a readable string unique for every source table.
 	 * This uniform key is called the FKDL Foreign Key Description Label.
@@ -656,28 +596,6 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 		}
 
 		return $struct;
-	}
-
-	/**
-	 * Determines whether the specified columns are part
-	 * of a unique index in the specified table.
-	 *
-	 * @param string $type       table
-	 * @param array  $properties a list of columns
-	 *
-	 * @return boolean
-	 */
-	protected function areColumnsInUniqueIndex( $type, $properties )
-	{
-		sort( $properties );
-		$propertyFootprint = implode( ',', $properties );
-		$uniques = $this->getUniquesForType( $type );
-		foreach( $uniques as $unique ) {
-				sort( $unique );
-				$uniqueFootprint = implode( ',', $unique );
-				if ( $uniqueFootprint === $propertyFootprint ) return TRUE;
-		}
-		return FALSE;
 	}
 
 	/**

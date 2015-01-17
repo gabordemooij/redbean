@@ -23,35 +23,6 @@ use RedBeanPHP\RedException\SQL as SQL;
 class Association extends Base
 {
 	/**
-	 * Tests whether we can apply unique
-	 * constraints and obtain unique info
-	 * about a table.
-	 *
-	 * @return void
-	 */
-	public function testUniques()
-	{
-		R::nuke();
-		$book = R::dispense('book');
-		$cat = R::dispense('category');
-		$book->sharedCategory[] = $cat;
-		R::store($book);
-		$cat = R::dispense('category');
-		$book = $book->fresh();
-		$book->sharedCategory[] = $cat;
-		R::store($book);
-		$uniques = \ProxyWriter::callMethod( R::getWriter(), 'getUniquesForType', 'book_category' );
-		asrt( count( $uniques ), 1 );
-		$uniqueSet = reset( $uniques );
-		asrt( count( $uniqueSet ), 2 );
-		sort( $uniqueSet );
-		asrt( $uniqueSet[0], 'book_id' );
-		asrt( $uniqueSet[1], 'category_id' );
-		$nullWriter = new \NullWriter( R::getDatabaseAdapter() );
-		asrt( count( \ProxyWriter::callMethod( $nullWriter, 'getUniquesForType', 'book_category' ) ), 0 );
-	}
-
-	/**
 	 * MySQL specific tests.
 	 *
 	 * @return void
