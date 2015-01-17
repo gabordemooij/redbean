@@ -120,7 +120,10 @@ class DBAdapter extends Observable implements Adapter
 		foreach ( $rows as $row ) {
 			if ( empty( $row ) ) continue;
 
-			if ( count( $row ) > 1 ) {
+			if ( count( $row ) > 2 ) {
+            $key   = array_shift( $row );
+            $value = $row;
+        } elseif ( count( $row ) > 1 ) {
 				$key   = array_shift( $row );
 				$value = array_shift( $row );
 			} else {
