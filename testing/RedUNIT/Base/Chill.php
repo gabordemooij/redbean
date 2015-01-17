@@ -101,10 +101,12 @@ class Chill extends Base
 
 
 		R::nuke();
+		$link = R::getRedBean()->dispense('person_role');
 		$person = R::dispense( 'person' );
 		$role = R::dispense( 'role' );
-		$person->sharedRole[] = $role;
-		R::store( $person );
+		$link->person = $person;
+		$link->role = $role;
+		R::store( $link );
 		R::freeze(array('person_role'));
 		$person->sharedRole[] = R::dispense( 'role' );
 		R::store( $person );
