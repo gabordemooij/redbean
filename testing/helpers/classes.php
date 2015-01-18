@@ -325,21 +325,6 @@ class NullWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
 }
 
 /**
- * Enables access to protected methods.
- */
-class ProxyWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
-
-	/**
-	 * Calls a method on the inner writer.
-	 */
-	public static function callMethod( $writer, $method, $argument1 = NULL, $argument2 = NULL, $argument3 = NULL, $argument4 = NULL )
-	{
-		return $writer->$method( $argument1, $argument2, $argument3, $argument4 );
-	}
-
-}
-
-/**
  * Mock class to test proper model name
  * beautificattion for link table beans in FUSE.
  */
