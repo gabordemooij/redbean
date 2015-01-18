@@ -170,6 +170,10 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$targetTable     = $this->esc( $targetType, TRUE );
 		$column          = $this->esc( $property, TRUE );
 		$targetColumn    = $this->esc( $targetProperty, TRUE );
+
+		$tables = $this->getTables();
+		if ( !in_array( $targetTable, $tables ) ) return FALSE;
+
 		if ( !is_null( $this->getForeignKeyForTypeProperty( $table, $column ) ) ) return FALSE;
 		$t = $this->getTable( $table );
 		$consSQL = ( $constraint ? 'CASCADE' : 'SET NULL' );

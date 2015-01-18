@@ -367,16 +367,6 @@ interface QueryWriter
 	public function wipe( $type );
 
 	/**
-	 * Given two types this method will add a foreign key constraint.
-	 *
-	 * @param string $sourceType source type
-	 * @param string $destType   destination type
-	 *
-	 * @return void
-	 */
-	public function addConstraintForTypes( $sourceType, $destType );
-
-	/**
 	 * This method will add a foreign key from type and field to
 	 * target type and target field.
 	 * The foreign key is created without an action. On delete/update

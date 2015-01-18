@@ -310,7 +310,7 @@ class FaultyWriter extends \RedBeanPHP\QueryWriter\MySQL
 	 *
 	 * @throws SQL
 	 */
-	public function addConstraintForTypes( $sourceType, $destType )
+	public function addUniqueConstraint( $sourceType, $destType )
 	{
 		$exception = new \RedBeanPHP\RedException\SQL;
 		$exception->setSQLState( $this->sqlState );

@@ -70,7 +70,11 @@ class CUBRID extends AQueryWriter implements QueryWriter
 		$needsToDropFK   = FALSE;
 		$casc = ( $isDep ? 'CASCADE' : 'SET NULL' );
 		$sql  = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
-		$this->adapter->exec( $sql );
+		try {
+			$this->adapter->exec( $sql );
+		} catch( \Exception $e ) {
+			return FALSE;
+		}
 		return TRUE;
 	}
 

@@ -95,6 +95,7 @@ class Fluid extends Repository
 	 */
 	private function moldTable( OODBBean $bean, $property, $value )
 	{
+		$doFKStuff = FALSE;
 		$table   = $bean->getMeta( 'type' );
 		$columns = $this->writer->getColumns( $table );
 		$columnNoQ = $this->writer->esc( $property, TRUE );
@@ -114,39 +115,28 @@ class Fluid extends Repository
 				if ( $typeno > $sqlt ) { //no, we have to widen the database column type
 					$this->writer->widenColumn( $table, $property, $typeno );
 					$bean->setMeta( 'buildreport.flags.widen', TRUE );
+					$doFKStuff = TRUE;
 				}
 			} else {
 				$this->writer->addColumn( $table, $property, $typeno );
 				$bean->setMeta( 'buildreport.flags.addcolumn', TRUE );
+				$doFKStuff = TRUE;
 			}
-			if (strrpos($columnNoQ, '_id')===(strlen($columnNoQ)-3)) {
-				$destinationColumnNoQ = substr($columnNoQ, 0, strlen($columnNoQ)-3);
-				$indexName = "index_foreignkey_{$table}_{$destinationColumnNoQ}";
-				$this->writer->addIndex($table, $indexName, $columnNoQ);
-			}
-		}
-	}
-
-	/**
-	 * Processes embedded beans.
-	 * Each embedded bean will be indexed and foreign keys will
-	 * be created if the bean is in the dependency list.
-	 *
-	 * @param OODBBean $bean          bean
-	 * @param array            $embeddedBeans embedded beans
-	 *
-	 * @return void
-	 */
-	private function addForeignKeysForParentBeans( $bean, $embeddedBeans )
-	{
-		$cachedIndex = array();
-		foreach ( $embeddedBeans as $linkField => $embeddedBean ) {
-			$beanType = $bean->getMeta( 'type' );
-			$embeddedType = $embeddedBean->getMeta( 'type' );
-			$key = $beanType . '|' . $embeddedType . '>' . $linkField;
-			if ( !isset( $cachedIndex[$key] ) ) {
-				$this->writer->addFK( $beanType, $embeddedType, $linkField, 'id', FALSE );
-				$cachedIndex[$key] = TRUE;
+			if ($doFKStuff) {
+				if (strrpos($columnNoQ, '_id')===(strlen($columnNoQ)-3)) {
+					$destinationColumnNoQ = substr($columnNoQ, 0, strlen($columnNoQ)-3);
+					$indexName = "index_foreignkey_{$table}_{$destinationColumnNoQ}";
+					$this->writer->addIndex($table, $indexName, $columnNoQ);
+					$typeof = $bean->getMeta("sys.typeof.{$destinationColumnNoQ}", $destinationColumnNoQ);
+					$isLink = $bean->getMeta( 'sys.is_link', FALSE );
+					//Make FK CASCADING if part of exclusive list (dependson=typeof) or if link bean
+					$isDep = ( $bean->getMeta( 'sys.dependson' ) === $typeof || is_array( $isLink ) );
+					$result = $this->writer->addFK( $table, $typeof, $columnNoQ, 'id', $isDep );
+					//If this is a link bean and all unique columns have been added already, then apply unique constraint
+					if ( is_array( $isLink ) && !count( array_diff( $isLink, array_keys( $this->writer->getColumns( $table ) ) ) ) ) {
+						 $this->writer->addUniqueConstraint( $table, $bean->getMeta('sys.is_link') );
+					}
+				}
 			}
 		}
 	}
@@ -169,7 +159,6 @@ class Fluid extends Repository
 	{
 		$beanType = $bean->getMeta( 'type' );
 
-		$cachedIndex = array();
 		foreach ( $ownAdditions as $addition ) {
 			if ( $addition instanceof OODBBean ) {
 
@@ -179,15 +168,14 @@ class Fluid extends Repository
 
 				$addition->$myFieldLink = $bean->id;
 				$addition->setMeta( 'cast.' . $myFieldLink, 'id' );
-				$this->store( $addition );
-				$additionType = $addition->getMeta( 'type' );
-				$key = $additionType . '|' . $beanType . '>' . $myFieldLink;
-				if ( !isset( $cachedIndex[$key] ) ) {
-					$isDep = $bean->getMeta( 'sys.exclusive-'.$additionType );
-					$this->writer->addFK( $additionType, $beanType, $myFieldLink, 'id', $isDep );
-					$cachedIndex[$key] = TRUE;
+
+				if ($alias) {
+					$addition->setMeta( "sys.typeof.{$alias}", $beanType );
+				} else {
+					$addition->setMeta( "sys.typeof.{$beanType}", $beanType );
 				}
 
+				$this->store( $addition );
 			} else {
 				throw new RedException( 'Array may only contain OODBBeans' );
 			}
@@ -277,6 +265,7 @@ class Fluid extends Repository
 			$value = ( $value instanceof SimpleModel ) ? $value->unbox() : $value;
 			if ( $value instanceof OODBBean ) {
 				$this->processEmbeddedBean( $embeddedBeans, $bean, $property, $value );
+				$bean->setMeta("sys.typeof.{$property}", $value->getMeta('type'));
 			} elseif ( is_array( $value ) ) {
 				$originals = $bean->getMeta( 'sys.shadow.' . $property, array() );
 				$bean->setMeta( 'sys.shadow.' . $property, NULL ); //clear shadow
@@ -285,6 +274,7 @@ class Fluid extends Repository
 					$listName = lcfirst( substr( $property, 3 ) );
 					if ($bean->getMeta( 'sys.exclusive-'.  $listName ) ) {
 						OODBBean::setMetaAll( $ownTrashcan, 'sys.garbage', TRUE );
+						OODBBean::setMetaAll( $ownAdditions, 'sys.dependson', $bean->getMeta( 'type' ) );
 					}
 					unset( $bean->$property );
 				} elseif ( strpos( $property, 'shared' ) === 0 ) {
@@ -294,7 +284,6 @@ class Fluid extends Repository
 			}
 		}
 		$this->storeBean( $bean );
-		$this->addForeignKeysForParentBeans( $bean, $embeddedBeans );
 		$this->processTrashcan( $bean, $ownTrashcan );
 		$this->processAdditions( $bean, $ownAdditions );
 		$this->processResidue( $ownresidue );
@@ -302,7 +291,6 @@ class Fluid extends Repository
 		$this->processSharedAdditions( $bean, $sharedAdditions );
 		$this->processSharedResidue( $bean, $sharedresidue );
 	}
-
 
 	/**
 	 * Dispenses a new bean (a OODBBean Bean Object)

@@ -1135,12 +1135,7 @@ class Relations extends Base
 		R::store( $book );
 
 		// No more than 1 update
-		global $currentDriver;
-		if ($currentDriver === 'sqlite') {
-			asrt( count( $logger->grep( 'UPDATE' ) ), 2 );
-		} else {
-			asrt( count( $logger->grep( 'UPDATE' ) ), 1 );
-		}
+		asrt( count( $logger->grep( 'UPDATE' ) ), 1 );
 
 		$book = R::load( 'book', 1 );
 
@@ -1150,7 +1145,6 @@ class Relations extends Base
 
 		// No more than 1 select
 		asrt( count( $logger->grep( 'SELECT' ) ), 1 );
-
 		$logger->clear();
 
 		$book->sharedTopic[] = $topic1;

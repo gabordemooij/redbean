@@ -119,24 +119,15 @@ class AssociationManager extends Observable
 
 		$bean->setMeta( "cast.$property1", "id" );
 		$bean->setMeta( "cast.$property2", "id" );
+		$bean->setMeta( 'sys.is_link', array( $property1, $property2 ) );
 
 		$bean->$property1 = $bean1->id;
 		$bean->$property2 = $bean2->id;
 
 		$results   = array();
+
 		try {
 			$id = $this->oodb->store( $bean );
-
-			//On creation, add constraints....
-			if ( !$this->oodb->isFrozen() &&
-				$bean->getMeta( 'buildreport.flags.created' )
-			) {
-				$bean->setMeta( 'buildreport.flags.created', 0 );
-				$type = $bean->getMeta( 'type' );
-				$unique = array( $property1, $property2 );
-				$this->writer->addUniqueConstraint( $type, $unique );
-				$this->writer->addConstraintForTypes( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ) );
-			}
 			$results[] = $id;
 		} catch ( SQL $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(),

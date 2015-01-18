@@ -128,13 +128,6 @@ class Foreignkeys extends Mysql
 
 		$cols = R::getColumns( 'invoice_project' );
 
-		asrt( $cols['project_id'], "tinyint(1) unsigned" );
-		asrt( $cols['invoice_id'], "tinyint(1) unsigned" );
-
-		R::getWriter()->addConstraintForTypes( $bean1->getMeta( 'type' ), $bean2->getMeta( 'type' ) );
-
-		$cols = R::getColumns( 'invoice_project' );
-
 		asrt( $cols['project_id'], "int(11) unsigned" );
 		asrt( $cols['invoice_id'], "int(11) unsigned" );
 	}

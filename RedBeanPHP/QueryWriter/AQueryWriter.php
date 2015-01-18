@@ -599,38 +599,6 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
-	 * Creates a pair of foreign keys so that the specified link table
-	 * gets 'cleaned up' if one of the components of the link gets removed.
-	 * This is a basic implementation that should be enough for most
-	 * QueryWriters, however it's available as a seprate method
-	 * to override in case needed.
-	 *
-	 * This method should only be applied to standard link tables containing
-	 * no more than 3 columns. The AssociationManager should check this.
-	 * Multi-column link tables will not have these constraints because they
-	 * may contain additional information and applying this constraint on such
-	 * tables might cause loss of data.
-	 *
-	 * This method returns TRUE if the constraint has been applied and
-	 * FALSE otherwise (maybe the constraint was already there, the query failed, or
-	 * the functionality is not available for the current writer).
-	 *
-	 * @param string $linkType       the link type (table) to apply the foreign key constraints to
-	 * @param string $firstType      the first type to associate with the link
-	 * @param string $secondType     the second type to associate with the link
-	 * @param string $firstProperty  the property (id field) referring to the first table
-	 * @param string $secondProperty the property (id field) referring to the second table
-	 *
-	 * @return boolean
-	 */
-	protected function constrain( $linkType, $firstType, $secondType, $firstProperty, $secondProperty )
-	{
-		$state1 = $this->addFK( $linkType, $firstType, $firstProperty, 'id', TRUE );
-		$state2 = $this->addFK( $linkType, $secondType, $secondProperty, 'id', TRUE );
-		return ( $state1 && $state2 );
-	}
-
-	/**
 	 * Checks whether a number can be treated like an int.
 	 *
 	 * @param  string $value string representation of a certain value
@@ -680,6 +648,28 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	{
 		return strtolower( preg_replace( '/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $camel ) );
 	}
+
+	/**
+	* Given two types this method will add a foreign key constraint.
+	* Note that this method is no longer part of the official
+	* QueryWriter interface. It's not even used anymore at all, just in tests.
+	* It remains here for backward compatibility.
+	*
+	* @deprecated
+	*
+	* @param string $sourceType source type
+	* @param string $destType   destination type
+	*
+	* @return void
+	*/
+	public function addConstraintForTypes( $sourceType, $targetType )
+	{
+		list( ,,$linkType, $sourceProperty, $targetProperty ) = $this->getRelationalTablesAndColumns( $sourceType, $targetType, TRUE );
+		$state1 = $this->addFK( $linkType, $sourceType, $sourceProperty, 'id', TRUE );
+		$state2 = $this->addFK( $linkType, $targetType, $targetProperty, 'id', TRUE );
+		return ( $state1 && $state2 );
+	}
+
 
 	/**
 	 * Checks whether the specified type (i.e. table) already exists in the database.
@@ -1109,16 +1099,6 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	public function getAssocTable( $types )
 	{
 		return self::getAssocTableFormat( $types );
-	}
-
-	/**
-	 * @see QueryWriter::addConstraintForTypes
-	 */
-	public function addConstraintForTypes( $sourceType, $targetType )
-	{
-		list( ,,$linkType, $sourceProperty, $targetProperty ) = $this->getRelationalTablesAndColumns( $sourceType, $targetType, TRUE );
-
-		return $this->constrain( $linkType, $sourceType, $targetType, $sourceProperty, $targetProperty );
 	}
 
 	/**

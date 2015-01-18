@@ -5,6 +5,7 @@ namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\ToolBox as ToolBox;
+use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\RedException\SQL as SQL;
 
@@ -39,7 +40,9 @@ class Association extends Base
 		$carrot = R::dispense( 'carrot' );
 
 		$faultyWriter  = new \FaultyWriter( R::getToolBox()->getDatabaseAdapter() );
-		$faultyToolbox = new ToolBox( R::getToolBox()->getRedBean(), R::getToolBox()->getDatabaseAdapter(), $faultyWriter );
+		$faultyOODB = new OODB( $faultyWriter );
+		$faultyOODB->setBeanHelper( R::getRedBean()->getBeanHelper() );
+		$faultyToolbox = new ToolBox( $faultyOODB, R::getToolBox()->getDatabaseAdapter(), $faultyWriter );
 
 		$faultyAssociationManager = new AssociationManager( $faultyToolbox );
 
