@@ -24,10 +24,9 @@ try {
 } catch( Exception $e ) {
 	pass();
 }
-/*
+
 asrt( R::testConnection(), FALSE);
 
 R::addDatabase( 'broken', 'mysql:host=nowhere', 'defunct', 'void' );
 R::selectDatabase( 'broken' );
 asrt( R::testConnection(), FALSE );
-*/
