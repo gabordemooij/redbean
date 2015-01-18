@@ -116,7 +116,7 @@ class Bean extends Base
 			asrt( count( $numberOfUpdateQueries ), 1 );
 		}
 	}
-	//public function getTargetDrivers(){ return array('sqlite'); }
+
 	/**
 	 * Test whether the number of update queries
 	 * executed is limited to the ones that are absolutely
