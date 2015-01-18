@@ -362,3 +362,40 @@ function candy_canes()
 
 	return $canes;
 }
+
+/**
+ * Returns an array containing the index names of all
+ * indexes on the specified table name.
+ *
+ * @param $tableNoQ table name without quotes or backticks
+ *
+ * @return array
+ */
+function getIndexes( $tableNoQ )
+{
+	$writer = R::getWriter();
+
+	if ( ( $writer instanceof \RedBeanPHP\QueryWriter\MySQL ) || ( $writer instanceof \RedBeanPHP\QueryWriter\CUBRID ) ) {
+		$indexes = array();
+		$list = R::getAll( "SHOW INDEX FROM `{$tableNoQ}`" );
+		foreach( $list as $listItem ) {
+			$indexes[] = $listItem['Key_name'];
+		}
+		return $indexes;
+	}
+
+	if ( ( $writer instanceof \RedBeanPHP\QueryWriter\SQLiteT ) ) {
+		$indexes = array();
+		$list = R::getAll( " pragma index_list(`{$tableNoQ}`) " );
+		foreach( $list as $listItem ) {
+			$indexes[] = $listItem['name'];
+		}
+		return $indexes;
+	}
+
+	if ( ( $writer instanceof \RedBeanPHP\QueryWriter\PostgreSQL ) ) {
+		return R::getCol( " SELECT indexname FROM pg_indexes WHERE tablename = '{$tableNoQ}' AND schemaname = 'public' " );
+	}
+
+	return array();
+}
