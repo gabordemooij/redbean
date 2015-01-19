@@ -368,7 +368,7 @@ abstract class Repository
 		$this->oodb->signal( 'update', $bean );
 		$processLists = $this->hasListsOrObjects( $bean ); //check again, might have changed by model!
 		if ( $processLists ) {
-			$this->processLists( $bean );
+			$this->storeBeanWithLists( $bean );
 		} else {
 			$this->storeBean( $bean );
 		}

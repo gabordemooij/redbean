@@ -200,37 +200,21 @@ class Fluid extends Repository
 			$this->check( $bean );
 			$table = $bean->getMeta( 'type' );
 			$this->createTableIfNotExists( $bean, $table );
-			$updateValues = $this->getUpdateValues( $bean );
+
+			$updateValues = array();
+			foreach ( $bean as $property => $value ) {
+				if ( $property !== 'id' ) {
+					$this->modifySchema( $bean, $property, $value );
+				}
+				if ( $property !== 'id' ) {
+					$updateValues[] = array( 'property' => $property, 'value' => $value );
+				}
+			}
+
 			$bean->id = $this->writer->updateRecord( $table, $updateValues, $bean->id );
 			$bean->setMeta( 'changed', FALSE );
 		}
 		$bean->setMeta( 'tainted', FALSE );
-	}
-
-	/**
-	 * Returns a structured array of update values using the following format:
-	 * array(
-	 *        property => $property,
-	 *        value => $value
-	 * );
-	 *
-	 * @param OODBBean $bean bean to extract update values from
-	 *
-	 * @return array
-	 */
-	protected function getUpdateValues( OODBBean $bean )
-	{
-		$updateValues = array();
-		foreach ( $bean as $property => $value ) {
-			if ( $property !== 'id' ) {
-				$this->modifySchema( $bean, $property, $value );
-			}
-			if ( $property !== 'id' ) {
-				$updateValues[] = array( 'property' => $property, 'value' => $value );
-			}
-		}
-
-		return $updateValues;
 	}
 
 	/**
@@ -260,7 +244,7 @@ class Fluid extends Repository
 	 *
 	 * @return void
 	 */
-	protected function processLists( OODBBean $bean )
+	protected function storeBeanWithLists( OODBBean $bean )
 	{
 		$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = $ownAdditions = $ownTrashcan = $ownresidue = $embeddedBeans = array(); //Define groups
 		foreach ( $bean as $property => $value ) {
