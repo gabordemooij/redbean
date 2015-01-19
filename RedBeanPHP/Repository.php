@@ -51,6 +51,47 @@ abstract class Repository
 	protected $writer;
 
 	/**
+	 * Stores a bean and its lists in one run.
+	 *
+	 * @param OODBBean $bean
+	 *
+	 * @return void
+	 */
+	protected function storeBeanWithLists( OODBBean $bean )
+	{
+		$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = $ownAdditions = $ownTrashcan = $ownresidue = $embeddedBeans = array(); //Define groups
+		foreach ( $bean as $property => $value ) {
+			$value = ( $value instanceof SimpleModel ) ? $value->unbox() : $value;
+			if ( $value instanceof OODBBean ) {
+				$this->processEmbeddedBean( $embeddedBeans, $bean, $property, $value );
+				$bean->setMeta("sys.typeof.{$property}", $value->getMeta('type'));
+			} elseif ( is_array( $value ) ) {
+				$originals = $bean->getMeta( 'sys.shadow.' . $property, array() );
+				$bean->setMeta( 'sys.shadow.' . $property, NULL ); //clear shadow
+				if ( strpos( $property, 'own' ) === 0 ) {
+					list( $ownAdditions, $ownTrashcan, $ownresidue ) = $this->processGroups( $originals, $value, $ownAdditions, $ownTrashcan, $ownresidue );
+					$listName = lcfirst( substr( $property, 3 ) );
+					if ($bean->getMeta( 'sys.exclusive-'.  $listName ) ) {
+						OODBBean::setMetaAll( $ownTrashcan, 'sys.garbage', TRUE );
+						OODBBean::setMetaAll( $ownAdditions, 'sys.dependson', $bean->getMeta( 'type' ) );
+					}
+					unset( $bean->$property );
+				} elseif ( strpos( $property, 'shared' ) === 0 ) {
+					list( $sharedAdditions, $sharedTrashcan, $sharedresidue ) = $this->processGroups( $originals, $value, $sharedAdditions, $sharedTrashcan, $sharedresidue );
+					unset( $bean->$property );
+				}
+			}
+		}
+		$this->storeBean( $bean );
+		$this->processTrashcan( $bean, $ownTrashcan );
+		$this->processAdditions( $bean, $ownAdditions );
+		$this->processResidue( $ownresidue );
+		$this->processSharedTrashcan( $bean, $sharedTrashcan );
+		$this->processSharedAdditions( $bean, $sharedAdditions );
+		$this->processSharedResidue( $bean, $sharedresidue );
+	}
+
+	/**
 	 * Process groups. Internal function. Processes different kind of groups for
 	 * storage function. Given a list of original beans and a list of current beans,
 	 * this function calculates which beans remain in the list (residue), which
