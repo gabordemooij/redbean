@@ -324,6 +324,14 @@ class FaultyWriter extends \RedBeanPHP\QueryWriter\MySQL
 class NullWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
 }
 
+class ProxyWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
+
+	public static function callMethod( $object, $method, $arg1, $arg2, $arg3 ) {
+		return $object->$method( $arg1, $arg2, $arg3 );
+	}
+
+}
+
 /**
  * Mock class to test proper model name
  * beautificattion for link table beans in FUSE.
