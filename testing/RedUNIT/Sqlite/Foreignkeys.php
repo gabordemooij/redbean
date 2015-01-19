@@ -101,7 +101,8 @@ class Foreignkeys extends Sqlite
 
 		$writer = R::getWriter();
 
-		$writer->addConstraintForTypes( 'page', 'book' );
+		$writer->addFK( 'book_page', 'book', 'book_id', 'id', TRUE );
+		$writer->addFK( 'book_page', 'page', 'page_id', 'id', TRUE );
 
 		$sql = 'PRAGMA foreign_key_list("book_page")';
 
@@ -109,7 +110,8 @@ class Foreignkeys extends Sqlite
 
 		asrt( count( $fkList), 2 );
 
-		$writer->addConstraintForTypes( 'page', 'book' );
+		$writer->addFK( 'book_page', 'book', 'book_id', 'id', TRUE );
+		$writer->addFK( 'book_page', 'page', 'page_id', 'id', TRUE );
 
 		$sql = 'PRAGMA foreign_key_list("book_page")';
 

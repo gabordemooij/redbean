@@ -71,7 +71,10 @@ class Relations extends Base
 		$book->sharedPage[] = $page;
 		R::store( $page );
 		R::store( $book );
-		$added = R::getWriter()->addConstraintForTypes( 'page', 'book' );
+		$writer = R::getWriter();
+		$added1 = $writer->addFK( 'book_page', 'book', 'book_id', 'id', TRUE );
+		$added2 = $writer->addFK( 'book_page', 'page', 'page_id', 'id', TRUE );
+		$added = ( $added1 && $added2 );
 		asrt( $added, FALSE );
 	}
 

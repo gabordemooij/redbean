@@ -183,8 +183,8 @@ class Foreignkeys extends Mysql
 
 		$writer = R::getWriter();
 
-		$writer->addConstraintForTypes( 'book', 'page' );
-
+		$writer->addFK( 'book_page', 'book', 'book_id', 'id', TRUE );
+		$writer->addFK( 'book_page', 'page', 'page_id', 'id', TRUE );
 
 		$numOfFKS = R::getCell('
 			SELECT COUNT(*)
@@ -193,8 +193,8 @@ class Foreignkeys extends Mysql
 
 		asrt( (int) $numOfFKS, 2 );
 
-		$writer->addConstraintForTypes( 'book', 'page' );
-
+		$writer->addFK( 'book_page', 'book', 'book_id', 'id', TRUE );
+		$writer->addFK( 'book_page', 'page', 'page_id', 'id', TRUE );
 
 		$numOfFKS = R::getCell('
 			SELECT COUNT(*)

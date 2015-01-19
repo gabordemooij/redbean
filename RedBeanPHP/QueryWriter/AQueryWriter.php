@@ -650,28 +650,6 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
-	* Given two types this method will add a foreign key constraint.
-	* Note that this method is no longer part of the official
-	* QueryWriter interface. It's not even used anymore at all, just in tests.
-	* It remains here for backward compatibility.
-	*
-	* @deprecated
-	*
-	* @param string $sourceType source type
-	* @param string $destType   destination type
-	*
-	* @return void
-	*/
-	public function addConstraintForTypes( $sourceType, $targetType )
-	{
-		list( ,,$linkType, $sourceProperty, $targetProperty ) = $this->getRelationalTablesAndColumns( $sourceType, $targetType, TRUE );
-		$state1 = $this->addFK( $linkType, $sourceType, $sourceProperty, 'id', TRUE );
-		$state2 = $this->addFK( $linkType, $targetType, $targetProperty, 'id', TRUE );
-		return ( $state1 && $state2 );
-	}
-
-
-	/**
 	 * Checks whether the specified type (i.e. table) already exists in the database.
 	 * Not part of the Object Database interface!
 	 *
