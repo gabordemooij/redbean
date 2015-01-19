@@ -155,14 +155,14 @@ class Foreignkeys extends Postgres
 
 		asrt( (int) $numFKS, 0 );
 
-		$writer->addConstraintForTypes( 'book', 'page' );
-
+		$writer->addFK( 'book_page', 'book', 'book_id', 'id', TRUE );
+		$writer->addFK( 'book_page', 'page', 'page_id', 'id', TRUE );
 		$numFKS = R::getCell( $sql );
 
 		asrt( (int) $numFKS, 2 );
 
-		$writer->addConstraintForTypes( 'book', 'page' );
-
+		$writer->addFK( 'book_page', 'book', 'book_id', 'id', TRUE );
+		$writer->addFK( 'book_page', 'page', 'page_id', 'id', TRUE );
 		$numFKS = R::getCell( $sql );
 
 		asrt( (int) $numFKS, 2 );
