@@ -86,7 +86,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$type}`");
 		if (!isset($sqlCode[0])) return array();
 		$matches = array();
-		preg_match_all( '/CONSTRAINT\s+\[([\w_]+)\]\s+FOREIGN\s+KEY\s+\(\[([\w_]+)\]\)\s+REFERENCES\s+\[([\w_]+)\]/', $sqlCode[0]['CREATE TABLE'], $matches );
+		preg_match_all( '/CONSTRAINT\s+\[([\w_]+)\]\s+FOREIGN\s+KEY\s+\(\[([\w_]+)\]\)\s+REFERENCES\s+\[([\w_]+)\](\s+ON\s+DELETE\s+(CASCADE|SET\sNULL|RESTRICT|NO\sACTION)\s+ON\s+UPDATE\s+(SET\sNULL|RESTRICT|NO\sACTION))?/', $sqlCode[0]['CREATE TABLE'], $matches );
 		$list = array();
 		if (!isset($matches[0])) return $list;
 		$max = count($matches[0]);
@@ -97,8 +97,8 @@ class CUBRID extends AQueryWriter implements QueryWriter
 				'from' => $matches[2][$i],
 				'table' => $matches[3][$i],
 				'to' => 'id',
-				'on_update' => '?',
-				'on_delete' => '?'
+				'on_update' => $matches[6][$i],
+				'on_delete' => $matches[5][$i]
 			);
 		}
 		return $list;
