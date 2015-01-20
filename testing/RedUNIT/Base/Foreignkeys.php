@@ -30,6 +30,71 @@ class Foreignkeys extends Base implements Observer
 	private $queries = array();
 
 	/**
+	 * Tests foreign keys but checks using ProxyWriter.
+	 *
+	 * @return void
+	 */
+	public function testFKInspect()
+	{
+		$writer = R::getWriter();
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->xownPage[] = $page;
+		R::store( $book );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'page', 'book_id' );
+		asrt( is_array( $keys ), TRUE );
+		asrt( $keys['on_delete'], 'CASCADE' );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'page', 'id' );
+		asrt( is_null( $keys ), TRUE );
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->ownPage[] = $page;
+		R::store( $book );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'page', 'book_id' );
+		asrt( is_array( $keys ), TRUE );
+		asrt( $keys['on_delete'], 'SET NULL' );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'page', 'id' );
+		asrt( is_null( $keys ), TRUE );
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->alias('magazine')->xownPage[] = $page;
+		R::store( $book );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'page', 'magazine_id' );
+		asrt( is_array( $keys ), TRUE );
+		asrt( $keys['on_delete'], 'CASCADE' );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'page', 'book_id' );
+		asrt( is_null( $keys ), TRUE );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'page', 'id' );
+		asrt( is_null( $keys ), TRUE );
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->cover= $page;
+		R::store( $book );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'book', 'cover_id' );
+		asrt( is_array( $keys ), TRUE );
+		asrt( $keys['on_delete'], 'SET NULL' );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'book', 'page_id' );
+		asrt( is_null( $keys ), TRUE );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'book', 'id' );
+		asrt( is_null( $keys ), TRUE );
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$category = R::dispense( 'category' );
+		$book->sharedTag[] = $category;
+		R::store( $book );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'book_category', 'book_id' );
+		asrt( is_array( $keys ), TRUE );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'book_category', 'category_id' );
+		asrt( is_array( $keys ), TRUE );
+		$keys = \ProxyWriter::callMethod( $writer, 'getForeignKeyForTypeProperty', 'book_category', 'id' );
+		asrt( is_null( $keys ), TRUE );
+	}
+
+	/**
 	 * Test dependencies.
 	 *
 	 * @return void
