@@ -326,7 +326,7 @@ class NullWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
 
 class ProxyWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
 
-	public static function callMethod( $object, $method, $arg1, $arg2, $arg3 ) {
+	public static function callMethod( $object, $method, $arg1 = NULL, $arg2 = NULL, $arg3 = NULL ) {
 		return $object->$method( $arg1, $arg2, $arg3 );
 	}
 
