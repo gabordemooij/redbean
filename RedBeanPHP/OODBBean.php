@@ -304,7 +304,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	public static function setMetaAll( $beans, $property, $value )
 	{
 		foreach( $beans as $bean ) {
-			$bean->__info[ $property ] = $value;
+			if ( $bean instanceof OODBBean ) $bean->__info[ $property ] = $value;
 		}
 
 		return $beans;
