@@ -66,12 +66,11 @@ abstract class Repository
 				$this->processEmbeddedBean( $embeddedBeans, $bean, $property, $value );
 				$bean->setMeta("sys.typeof.{$property}", $value->getMeta('type'));
 			} elseif ( is_array( $value ) ) {
-				$originals = $bean->getMeta( 'sys.shadow.' . $property, array() );
-				$bean->setMeta( 'sys.shadow.' . $property, NULL ); //clear shadow
+				$originals = $bean->moveMeta( 'sys.shadow.' . $property, array() );
 				if ( strpos( $property, 'own' ) === 0 ) {
 					list( $ownAdditions, $ownTrashcan, $ownresidue ) = $this->processGroups( $originals, $value, $ownAdditions, $ownTrashcan, $ownresidue );
 					$listName = lcfirst( substr( $property, 3 ) );
-					if ($bean->getMeta( 'sys.exclusive-'.  $listName ) ) {
+					if ($bean->moveMeta( 'sys.exclusive-'.  $listName ) ) {
 						OODBBean::setMetaAll( $ownTrashcan, 'sys.garbage', TRUE );
 						OODBBean::setMetaAll( $ownAdditions, 'sys.dependson', $bean->getMeta( 'type' ) );
 					}
@@ -590,6 +589,4 @@ abstract class Repository
 			return FALSE;
 		}
 	}
-
-
 }

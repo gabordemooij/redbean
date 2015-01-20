@@ -1063,6 +1063,23 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
+	 * Gets and unsets a meta property.
+	 *
+	 * @param string $path    path
+	 * @param mixed  $default default value
+	 *
+	 * @return mixed
+	 */
+	public function moveMeta( $path, $value = NULL )
+	{
+		if ( isset( $this->__info[$path] ) ) {
+			$value = $this->__info[ $path ];
+			unset( $this->__info[ $path ] );
+		}
+		return $value;
+	}
+
+	/**
 	 * Stores a value in the specified Meta information property. $value contains
 	 * the value you want to store in the Meta section of the bean and $path
 	 * specifies the dot separated path to the property. For instance "my.meta.property".
