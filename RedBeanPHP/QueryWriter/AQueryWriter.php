@@ -6,6 +6,7 @@ use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
  * RedBean Abstract Query Writer
@@ -357,7 +358,7 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 
 		try {
 			$map = $this->getKeyMapForType( $type );
-		} catch ( \Exception $e ) {
+		} catch ( SQLException $e ) {
 			return NULL;
 		}
 

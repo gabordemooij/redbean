@@ -11,7 +11,7 @@ use RedBeanPHP\TagManager as TagManager;
 use RedBeanPHP\DuplicationManager as DuplicationManager;
 use RedBeanPHP\LabelMaker as LabelMaker;
 use RedBeanPHP\Finder as Finder;
-use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\RedException\SQL as SQLException;
 use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\Logger as Logger;
 use RedBeanPHP\Logger\RDefault as RDefault;
@@ -138,7 +138,7 @@ class Facade
 		if ( !self::$redbean->isFrozen() ) {
 			try {
 				$rs = Facade::$adapter->$method( $sql, $bindings );
-			} catch ( SQL $exception ) {
+			} catch ( SQLException $exception ) {
 				if ( self::$writer->sqlStateIn( $exception->getSQLState(),
 					array(
 						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
@@ -1628,8 +1628,21 @@ class Facade
 	 * @param string $function
 	 *
 	 */
-	public static function bindFunc( $mode, $field, $function ) {
+	public static function bindFunc( $mode, $field, $function )
+	{
 		self::$redbean->bindFunc( $mode, $field, $function );
+	}
+
+	/**
+	 * Sets global aliases.
+	 *
+	 * @param array $list
+	 *
+	 * @return void
+	 */
+	public static function aliases( $list )
+	{
+		OODBBean::aliases( $list );
 	}
 
 	/**

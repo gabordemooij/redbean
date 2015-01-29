@@ -6,6 +6,7 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
  * RedBean SQLiteWriter with support for SQLite types
@@ -349,7 +350,12 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$name  = 'UQ_' . $this->esc( $type, TRUE ) . implode( '__', $properties );
 		$t     = $this->getTable( $type );
 		$t['indexes'][$name] = array( 'name' => $name );
-		$this->putTable( $t );
+		try {
+			$this->putTable( $t );
+		} catch( SQLException $e ) {
+			return FALSE;
+		}
+		return TRUE;
 	}
 
 	/**
@@ -382,7 +388,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 			$t['indexes'][$name] = array( 'name' => $column );
 			$this->putTable( $t );
 			return TRUE;
-		} catch( \Exception $exception ) {
+		} catch( SQLException $exception ) {
 			return FALSE;
 		}
 	}
@@ -415,12 +421,12 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		foreach ( $this->getTables() as $t ) {
 			try {
 				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
-			} catch (\Exception $e ) {
+			} catch ( SQLException $e ) {
 			}
 
 			try {
 				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
-			} catch (\Exception $e ) {
+			} catch ( SQLException $e ) {
 			}
 		}
 

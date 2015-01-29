@@ -5,6 +5,7 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\Adapter as Adapter; 
+use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
  * RedBean CUBRID Writer
@@ -72,7 +73,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 		$sql  = "ALTER TABLE $table ADD CONSTRAINT FOREIGN KEY($column) REFERENCES $targetTable($targetColumn) ON DELETE $casc ";
 		try {
 			$this->adapter->exec( $sql );
-		} catch( \Exception $e ) {
+		} catch( SQLException $e ) {
 			return FALSE;
 		}
 		return TRUE;
@@ -262,7 +263,12 @@ class CUBRID extends AQueryWriter implements QueryWriter
 		sort( $columns ); // else we get multiple indexes due to order-effects
 		$name = 'UQ_' . sha1( implode( ',', $columns ) );
 		$sql = "ALTER TABLE $table ADD CONSTRAINT UNIQUE $name (" . implode( ',', $columns ) . ")";
-		$this->adapter->exec( $sql );
+		try {
+			$this->adapter->exec( $sql );
+		} catch( SQLException $e ) {
+			return FALSE;
+		}
+		return TRUE;
 	}
 
 	/**
@@ -288,7 +294,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 			$column = $this->esc( $column );
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
 			return TRUE;
-		} catch (\Exception $e ) {
+		} catch ( SQLException $e ) {
 			return FALSE;
 		}
 	}

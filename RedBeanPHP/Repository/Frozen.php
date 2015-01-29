@@ -11,7 +11,7 @@ use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\SimpleModel as SimpleModel;
 use RedBeanPHP\BeanHelper as BeanHelper;
-use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\RedException\SQL as SQLException;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\Repository as Repository;
 
@@ -177,7 +177,7 @@ class Frozen extends Repository
 		} else {
 			try {
 				$rows = $this->writer->queryRecord( $type, array( 'id' => array( $id ) ) );
-			} catch ( SQL $exception ) {
+			} catch ( SQLException $exception ) {
 				if ( $this->writer->sqlStateIn( $exception->getSQLState(),
 					array(
 						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
@@ -185,7 +185,6 @@ class Frozen extends Repository
 				)
 				) {
 					throw $exception; //only throw if frozen
-
 				}
 			}
 			if ( empty( $rows ) ) {

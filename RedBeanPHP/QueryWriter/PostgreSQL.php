@@ -6,6 +6,7 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
  * RedBean PostgreSQL Query Writer
@@ -290,7 +291,12 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 		$name = "UQ_" . sha1( $table . implode( ',', $columns ) );
 		$sql = "ALTER TABLE {$table}
                 ADD CONSTRAINT $name UNIQUE (" . implode( ',', $columns ) . ")";
-		$this->adapter->exec( $sql );
+		try {
+			$this->adapter->exec( $sql );
+		} catch( SQLException $e ) {
+			return FALSE;
+		}
+		return TRUE;
 	}
 
 	/**
@@ -319,7 +325,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 		try {
 			$this->adapter->exec( "CREATE INDEX {$name} ON $table ({$column}) " );
 			return TRUE;
-		} catch (\Exception $e ) {
+		} catch ( SQLException $e ) {
 			return FALSE;
 		}
 	}
@@ -342,7 +348,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 				ADD FOREIGN KEY ( {$field} ) REFERENCES  {$targetTable}
 				({$targetField}) ON DELETE {$delRule} ON UPDATE {$delRule} DEFERRABLE ;" );
 			return TRUE;
-		} catch (\Exception $e ) {
+		} catch ( SQLException $e ) {
 			return FALSE;
 		}
 	}

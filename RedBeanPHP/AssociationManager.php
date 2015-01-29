@@ -9,7 +9,7 @@ use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\Security as Security;
-use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\RedException\SQL as SQLException;
 use RedBeanPHP\ToolBox as ToolBox;
 
 /**
@@ -84,7 +84,7 @@ class AssociationManager extends Observable
 		$sourceType = $bean->getMeta( 'type' );
 		try {
 			return $this->writer->queryRecordRelated( $sourceType, $type, $ids, $sql, $bindings );
-		} catch ( SQL $exception ) {
+		} catch ( SQLException $exception ) {
 			$this->handleException( $exception );
 			return array();
 		}
@@ -129,7 +129,7 @@ class AssociationManager extends Observable
 		try {
 			$id = $this->oodb->store( $bean );
 			$results[] = $id;
-		} catch ( SQL $exception ) {
+		} catch ( SQLException $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 				array( QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ) )
 			) {
@@ -233,7 +233,7 @@ class AssociationManager extends Observable
 
 		try {
 			return $this->writer->queryRecordCountRelated( $beanType, $type, $bean->id, $sql, $bindings );
-		} catch ( SQL $exception ) {
+		} catch ( SQLException $exception ) {
 			$this->handleException( $exception );
 
 			return 0;
@@ -284,7 +284,7 @@ class AssociationManager extends Observable
 						$bean = reset( $beans );
 						$this->oodb->trash( $bean );
 					}
-				} catch ( SQL $exception ) {
+				} catch ( SQLException $exception ) {
 					$this->handleException( $exception );
 				}
 			}
@@ -308,7 +308,7 @@ class AssociationManager extends Observable
 		$this->oodb->store( $bean );
 		try {
 			$this->writer->deleteRelations( $bean->getMeta( 'type' ), $type, $bean->id );
-		} catch ( SQL $exception ) {
+		} catch ( SQLException $exception ) {
 			$this->handleException( $exception );
 		}
 	}

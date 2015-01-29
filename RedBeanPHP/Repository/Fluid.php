@@ -11,7 +11,7 @@ use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\SimpleModel as SimpleModel;
 use RedBeanPHP\BeanHelper as BeanHelper;
-use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\RedException\SQL as SQLException;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\Repository as Repository;
 
@@ -136,8 +136,8 @@ class Fluid extends Repository
 					$result = $this->writer->addFK( $table, $typeof, $columnNoQ, 'id', $isDep );
 					//If this is a link bean and all unique columns have been added already, then apply unique constraint
 					if ( is_array( $isLink ) && !count( array_diff( $isLink, array_keys( $this->writer->getColumns( $table ) ) ) ) ) {
-						 $this->writer->addUniqueConstraint( $table, $bean->moveMeta('sys.is_link') );
-						 $bean->setMeta("sys.typeof.{$destinationColumnNoQ}", NULL);
+						$this->writer->addUniqueConstraint( $table, $bean->moveMeta('sys.is_link') );
+						$bean->setMeta("sys.typeof.{$destinationColumnNoQ}", NULL);
 					}
 				}
 			}
@@ -301,7 +301,7 @@ class Fluid extends Repository
 		} else {
 			try {
 				$rows = $this->writer->queryRecord( $type, array( 'id' => array( $id ) ) );
-			} catch ( SQL $exception ) {
+			} catch ( SQLException $exception ) {
 				if ( $this->writer->sqlStateIn( $exception->getSQLState(),
 					array(
 						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
