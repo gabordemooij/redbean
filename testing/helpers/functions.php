@@ -399,3 +399,117 @@ function getIndexes( $tableNoQ )
 
 	return array();
 }
+
+
+function are_cols_in_unique( $type, $properties )
+{
+	sort( $properties );
+	$propertyFootprint = implode( ',', $properties );
+	$uniques = get_uniques_for_type( $type );
+	foreach( $uniques as $unique ) {
+		sort( $unique );
+		$uniqueFootprint = implode( ',', $unique );
+		if ( $uniqueFootprint === $propertyFootprint ) return TRUE;
+	}
+	return FALSE;
+}
+
+
+function get_uniques_for_type( $type )
+{
+	$list = array();
+	$writer = R::getWriter();
+	$adapter = R::getDatabaseAdapter();
+	global $currentDriver;
+	switch( $currentDriver ) {
+		case 'mysql':
+			$table = $writer->esc( $type, TRUE );
+			$columns = $adapter->get('
+				SELECT
+				information_schema.key_column_usage.constraint_name,
+				information_schema.key_column_usage.column_name
+				FROM
+				information_schema.table_constraints
+				INNER JOIN information_schema.key_column_usage
+				ON (
+				information_schema.table_constraints.constraint_name = information_schema.key_column_usage.constraint_name
+				AND information_schema.table_constraints.constraint_schema = information_schema.key_column_usage.constraint_schema
+				AND information_schema.table_constraints.constraint_catalog = information_schema.key_column_usage.constraint_catalog
+				)
+				WHERE
+				information_schema.table_constraints.table_schema IN (SELECT DATABASE())
+				AND information_schema.table_constraints.table_name = ?
+				AND information_schema.table_constraints.constraint_type = \'UNIQUE\'
+			', array( $table ) );
+			$uniques = array();
+			foreach( $columns as $column ) {
+				if ( !isset( $uniques[ $column['constraint_name'] ] ) ) $uniques[ $column['constraint_name'] ] = array();
+				$uniques[ $column['constraint_name'] ][] = $column['column_name'];
+			}
+			$list = $uniques;
+		break;
+		case 'pgsql':
+			$table = $writer->esc( $type, TRUE );
+			$columns = $adapter->get('
+				SELECT
+				information_schema.key_column_usage.constraint_name,
+				information_schema.key_column_usage.column_name
+				FROM
+				information_schema.table_constraints
+				INNER JOIN information_schema.key_column_usage
+				ON (
+				information_schema.table_constraints.constraint_name = information_schema.key_column_usage.constraint_name
+				AND information_schema.table_constraints.constraint_schema = information_schema.key_column_usage.constraint_schema
+				AND information_schema.table_constraints.constraint_catalog = information_schema.key_column_usage.constraint_catalog
+				)
+				WHERE
+				information_schema.table_constraints.table_catalog = current_database()
+				AND information_schema.key_column_usage.table_schema = ANY( current_schemas( FALSE ) )
+				AND information_schema.table_constraints.table_name = ?
+				AND information_schema.table_constraints.constraint_type = \'UNIQUE\'
+				', array( $table ) );
+			$uniques = array();
+			foreach( $columns as $column ) {
+				if ( !isset( $uniques[ $column['constraint_name'] ] ) ) $uniques[ $column['constraint_name'] ] = array();
+				$uniques[ $column['constraint_name'] ][] = $column['column_name'];
+			}
+			$list= $uniques;
+		break;
+		case 'sqlite':
+			$uniques = array();
+			$table = $writer->esc( $type, TRUE );
+			$indexes = $adapter->get( "PRAGMA index_list({$table})" );
+			foreach( $indexes as $index ) {
+				if ( $index['unique'] == 1 ) {
+					$info = $adapter->get( "PRAGMA index_info({$index['name']})" );
+					if ( !isset( $uniques[$index['name']] ) ) $uniques[$index['name']] = array();
+					foreach( $info as $piece ) {
+						$uniques[$index['name']][] = $piece['name'];
+					}
+				}
+			}
+			$list = $uniques;
+		break;
+		case 'CUBRID':
+			try {
+				$sqlCode = $adapter->get("SHOW CREATE TABLE `{$type}`");
+			} catch ( \Exception $e ) {
+				$sqlCode = '';
+			}
+			if (!isset($sqlCode[0])) return array();
+			$matches = array();
+			preg_match_all('/CONSTRAINT\s+\[([\w_]+)\]\s+UNIQUE\s+KEY\s+\(([^\)]+)\)/', $sqlCode[0]['CREATE TABLE'], $matches);
+			$list = array();
+			if (!isset($matches[0])) return $list;
+			$max = count($matches[0]);
+			for($i = 0; $i < $max; $i++) {
+				$columns = explode(',', $matches[2][$i]);
+				foreach( $columns as $key => $column ) {
+					$columns[$key] = trim( $column, '[] ');
+				}
+				$list[ $matches[1][$i] ] = $columns;
+			}
+		break;
+	}
+	return $list;
+}

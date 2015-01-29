@@ -242,29 +242,6 @@ class Writer extends \RedUNIT\Mysql
 		asrt( empty( $row ), TRUE );
 
 		$writer->addColumn( "testtable", "c2", 2 );
-
-		try {
-			$writer->addUniqueIndex( "testtable", array( "c1", "c2" ) );
-
-			fail(); //should fail, no content length blob
-		} catch ( SQL $e ) {
-			pass();
-		}
-
-		$writer->addColumn( "testtable", "c3", 2 );
-
-		try {
-			$writer->addUniqueIndex( "testtable", array( "c2", "c3" ) );
-
-			pass();
-		} catch ( SQL $e ) {
-			fail();
-		}
-
-		$a = $adapter->get( "show index from testtable" );
-		asrt( count( $a ), 3 );
-		asrt( $a[1]["Key_name"], "UQ_64b283449b9c396053fe1724b4c685a80fd1a54d" );
-		asrt( $a[2]["Key_name"], "UQ_64b283449b9c396053fe1724b4c685a80fd1a54d" );
 	}
 
 	/**

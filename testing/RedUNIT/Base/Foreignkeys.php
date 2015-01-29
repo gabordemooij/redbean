@@ -7,6 +7,8 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\Observer as Observer;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+
 
 /**
  * Foreignkeys
@@ -28,6 +30,96 @@ class Foreignkeys extends Base implements Observer
 	 * @var array
 	 */
 	private $queries = array();
+
+	/**
+	 * Test whether aliases are not used if not necessary:
+	 * when using fetchAs() or R::aliases().
+	 *
+	 * @return void
+	 */
+	public function testAutoResolvAvoid()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->cover = $page;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
+		$book->cover;
+		asrt( $book->getMeta('sys.autoresolved.cover'), 'page' );
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->cover = $page;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
+		$book->fetchAs('page')->cover;
+		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
+		R::nuke();
+		R::aliases( array( 'cover' => 'page' ) );
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->cover = $page;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
+		$book->cover;
+		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
+		R::aliases( array() );
+	}
+
+	/**
+	 * Test whether unique constraints are properly created using
+	 * reflection.
+	 *
+	 * @return void
+	 */
+	public function testUniqueInspect()
+	{
+		$writer = R::getWriter();
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$category = R::dispense( 'category' );
+		$book->sharedCategory[] = $category;
+		R::store( $book );
+		asrt( count( get_uniques_for_type('book_category') ), 1 );
+		asrt( are_cols_in_unique( 'book_category', array( 'book_id', 'category_id' ) ), TRUE );
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$category = R::dispense( 'category' );
+		$book->via( 'library' )->sharedCategory[] = $category;
+		R::store( $book );
+		asrt( count( get_uniques_for_type('book_category') ), 0 );
+		asrt( are_cols_in_unique( 'book_category', array( 'book_id', 'category_id' ) ), FALSE );
+		asrt( count( get_uniques_for_type('library') ), 1 );
+		asrt( are_cols_in_unique( 'library', array( 'book_id', 'category_id' ) ), TRUE );
+		AQueryWriter::clearRenames();
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$category = R::dispense( 'category' );
+		$book->sharedCategory[] = $category;
+		R::store( $book );
+		asrt( count( get_uniques_for_type('book_category') ), 1 );
+		asrt( are_cols_in_unique( 'book_category', array( 'book_id', 'category_id' ) ), TRUE );
+		asrt( count( get_uniques_for_type('library') ), 0 );
+		asrt( are_cols_in_unique( 'library', array( 'book_id', 'category_id' ) ), FALSE );
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book2 = R::dispense( 'book' );
+		$book->sharedBook[] = $book2;
+		R::store( $book );
+		asrt( count( get_uniques_for_type('book_book') ), 1 );
+		asrt( are_cols_in_unique( 'book_book', array( 'book_id', 'book2_id' ) ), TRUE );
+		try {
+			$result = R::getWriter()->addUniqueConstraint( 'nonexistant', array( 'a', 'b' ) );
+		} catch( \Exception $e ) {
+			print_r( $e ); exit;
+		}
+		pass(); //dont crash!
+		asrt( $result, FALSE );
+	}
 
 	/**
 	 * Tests foreign keys but checks using ProxyWriter.
