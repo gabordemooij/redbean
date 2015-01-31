@@ -8,6 +8,7 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\Logger\RDefault as RDefault;
 use RedBeanPHP\PDOCompatible as PDOCompatible;
+use RedBeanPHP\Cursor\PDOCursor as PDOCursor;
 
 /**
  *\PDO Driver
@@ -150,6 +151,11 @@ class RPDO implements Driver
 			if ( $statement->columnCount() ) {
 
 				$fetchStyle = ( isset( $options['fetchStyle'] ) ) ? $options['fetchStyle'] : NULL;
+
+				if ( isset( $options['noFetch'] ) && $options['noFetch'] ) {
+					$this->resultArray = array();
+					return $statement;
+				}
 
 				$this->resultArray = $statement->fetchAll( $fetchStyle );
 
@@ -391,6 +397,16 @@ class RPDO implements Driver
 		$this->connect();
 
 		return (int) $this->pdo->lastInsertId();
+	}
+
+	/**
+	 * @see Driver::GetCursor
+	 */
+	public function GetCursor( $sql, $bindings = array() )
+	{
+		$statement = $this->runQuery( $sql, $bindings, array( 'noFetch' => TRUE ) );
+		$cursor = new PDOCursor( $statement, \PDO::FETCH_ASSOC );
+		return $cursor;
 	}
 
 	/**

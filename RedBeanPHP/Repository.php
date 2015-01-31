@@ -13,6 +13,8 @@ use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException\SQL as SQLException;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\OODB as OODB;
+use RedBeanPHP\Cursor as Cursor;
+use RedBeanPHP\Cursor\NullCursor as NullCursor;
 
 /**
  * Abstract Repository
@@ -374,6 +376,26 @@ abstract class Repository
 		}
 
 		return array();
+	}
+
+	/**
+	 * Finds a BeanCollection.
+	 *
+	 * @param string $type     type of beans you are looking for
+	 * @param string $sql      SQL to be used in query
+	 * @param array  $bindings whether you prefer to use a WHERE clause or not (TRUE = not)
+	 *
+	 * @return BeanCollection
+	 */
+	public function findCollection( $type, $sql, $bindings = array() )
+	{
+		try {
+			$cursor = $this->writer->queryRecordWithCursor( $type, $sql, $bindings );
+			return new BeanCollection( $type, $this, $cursor );
+		} catch ( SQLException $exception ) {
+			$this->handleException( $exception );
+		}
+		return new BeanCollection( $type, $this, new NullCursor );
 	}
 
 	/**

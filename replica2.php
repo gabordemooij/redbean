@@ -67,6 +67,10 @@ if ($mode !== 'onlyphar') {
 	addFile( DIR . 'Observer.php' );
 	addFile( DIR . 'Adapter.php' );
 	addFile( DIR . 'Adapter/DBAdapter.php' );
+	addFile( DIR . 'Cursor.php');
+	addFile( DIR . 'Cursor/PDOCursor.php');
+	addFile( DIR . 'Cursor/NullCursor.php');
+	addFile( DIR . 'BeanCollection.php' );
 	addFile( DIR . 'QueryWriter.php' );
 	addFile( DIR . 'QueryWriter/AQueryWriter.php' );
 	addFile( DIR . 'QueryWriter/MySQL.php' );

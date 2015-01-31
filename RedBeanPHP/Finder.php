@@ -155,4 +155,18 @@ class Finder
 			return $foundBeans;
 		}
 	}
+
+	/**
+	 * Finds a BeanCollection using the repository.
+	 *
+	 * @param  string $type     the type of bean you are looking for
+	 * @param  string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param  array  $bindings values array of values to be bound to parameters in query
+	 *
+	 * @return BeanCollection
+	 */
+	public function findCollection( $type, $sql, $bindings = array() )
+	{
+		return $this->redbean->findCollection( $type, $sql, $bindings );
+	}
 }

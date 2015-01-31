@@ -299,6 +299,22 @@ class OODB extends Observable
 	}
 
 	/**
+	 * Same as find() but returns a BeanCollection.
+	 *
+	 * @param string $type       type of beans you are looking for
+	 * @param string $addSQL     SQL to be used in query
+	 * @param array  $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
+	 *
+	 * @return array
+	 *
+	 * @throws SQL
+	 */
+	public function findCollection(  $type, $sql = NULL, $bindings = array() )
+	{
+		return $this->repository->findCollection( $type, $sql, $bindings );
+	}
+
+	/**
 	 * Checks whether the specified table already exists in the database.
 	 * Not part of the Object Database interface!
 	 *

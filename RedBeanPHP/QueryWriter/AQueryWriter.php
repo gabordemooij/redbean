@@ -831,6 +831,17 @@ abstract class AQueryWriter { //bracket must be here - otherwise coverage softwa
 	}
 
 	/**
+	 * @see QueryWriter::queryRecordWithCursor
+	 */
+	public function queryRecordWithCursor( $type, $addSql = NULL, $bindings = array() )
+	{
+		$sql = $this->glueSQLCondition( $addSql, NULL );
+		$table = $this->esc( $type );
+		$sql   = "SELECT {$table}.* FROM {$table} {$sql}";
+		return $this->adapter->getCursor( $sql, $bindings );
+	}
+
+	/**
 	 * @see QueryWriter::queryRecordRelated
 	 */
 	public function queryRecordRelated( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() )
