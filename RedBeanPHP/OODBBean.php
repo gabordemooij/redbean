@@ -1468,7 +1468,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Returns TRUE if the value of a certain property of the bean has been changed and
 	 * FALSE otherwise.
 	 *
-	 * @param string $property name of the property you want the change-status of
+	 * Note that this method will return TRUE if applied to a loaded list.
+	 * Also note that this method keeps track of the bean's history regardless whether
+	 * it has been stored or not. Storing a bean does not undo it's history,
+	 * to clean the history of a bean use: clearHistory().
+	 *
+	 * @param string  $property  name of the property you want the change-status of
 	 *
 	 * @return boolean
 	 */
@@ -1476,6 +1481,38 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		return ( array_key_exists( $property, $this->properties ) ) ?
 			$this->old( $property ) != $this->properties[$property] : FALSE;
+	}
+
+	/**
+	 * Returns TRUE if the specified list exists, has been loaded and has been changed:
+	 * beans have been added or deleted. This method will not tell you anything about
+	 * the state of the beans in the list.
+	 *
+	 * @param string $property name of the list to check
+	 *
+	 * @return boolean
+	 */
+	public function hasListChanged( $property )
+	{
+		if ( !array_key_exists( $property, $this->properties ) ) return FALSE;
+		$diffAdded = array_diff_assoc( $this->properties[$property], $this->__info['sys.shadow.'.$property] );
+		if ( count( $diffAdded ) ) return TRUE;
+		$diffMissing = array_diff_assoc( $this->__info['sys.shadow.'.$property], $this->properties[$property] );
+		if ( count( $diffMissing ) ) return TRUE;
+		return FALSE;
+	}
+
+	/**
+	 * Clears (syncs) the history of the bean.
+	 * Resets all shadow values of the bean to their current value.
+	 *
+	 * @return self
+	 */
+	public function clearHistory()
+	{
+		$this->__info['sys.orig'] = array();
+		foreach( $this->properties as $key => $value ) $this->__info['sys.orig'][$key] = $value;
+		return $this;
 	}
 
 	/**

@@ -20,6 +20,72 @@ use RedBeanPHP\Facade as R;
 class Tainted extends Blackhole
 {
 	/**
+	 * Test whether we can detect a change using hasChanged().
+	 *
+	 * @return void
+	 */
+	public function testHasChangedList()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		asrt( $book->hasListChanged( 'ownPage' ), FALSE );
+		$book->ownPage[] = $page;
+		asrt( $book->hasListChanged( 'ownPage' ), TRUE );
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->hasListChanged( 'ownPage' ), FALSE );
+		$page = R::dispense( 'page' );
+		$book->ownPageList[] = $page;
+		asrt( $book->hasListChanged( 'ownPage' ), TRUE );
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->hasListChanged( 'ownPage' ), FALSE );
+		asrt( count( $book->ownPageList ), 2 );
+		array_pop( $book->ownPageList );
+		asrt( count( $book->ownPageList ), 1 );
+		asrt( $book->hasListChanged( 'ownPage' ), TRUE );
+		array_pop( $book->ownPageList );
+		asrt( count( $book->ownPageList ), 0 );
+		asrt( $book->hasListChanged( 'ownPage' ), TRUE );
+		$book = $book->fresh();
+		asrt( $book->hasListChanged( 'ownPage' ), FALSE );
+		asrt( count( $book->ownPageList ), 2 );
+		$otherPage = R::dispense( 'page' );
+		array_pop( $book->ownPageList );
+		$book->ownPageList[] = $otherPage;
+		asrt( count( $book->ownPageList ), 2 );
+		asrt( $book->hasListChanged( 'ownPage' ), TRUE );
+		$book = $book->fresh();
+		$firstPage = reset( $book->ownPageList );
+		$firstPage->content = 'abc';
+		asrt( $book->hasListChanged( 'ownPage' ), FALSE );
+		$book = $book->fresh();
+		asrt( $book->hasListChanged( 'ownPage' ), FALSE );
+		$lastPage = end( $book->ownPageList );
+		$lastPage->ownText[] = R::dispense( 'text' );
+		asrt( $book->hasListChanged( 'ownPage' ), FALSE );
+	}
+
+	/**
+	 * Tests whether we can clear the history of a bean.
+	 *
+	 * @return void
+	 */
+	public function testClearHist()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		asrt( $book->hasChanged( 'title' ), FALSE );
+		$book->title = 'book';
+		asrt( $book->hasChanged( 'title' ), TRUE );
+		R::store( $book );
+		asrt( $book->hasChanged( 'title' ), TRUE );
+		$book->clearHistory();
+		asrt( $book->hasChanged( 'title' ), FALSE );
+	}
+
+	/**
 	 * Test tainted.
 	 *
 	 * @return void
