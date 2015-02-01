@@ -1511,7 +1511,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	public function clearHistory()
 	{
 		$this->__info['sys.orig'] = array();
-		foreach( $this->properties as $key => $value ) $this->__info['sys.orig'][$key] = $value;
+		foreach( $this->properties as $key => $value ) {
+			if ( is_scalar($value) ) $this->__info['sys.orig'][$key] = $value;
+		}
 		return $this;
 	}
 
