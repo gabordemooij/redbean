@@ -157,13 +157,7 @@ class DBAdapter extends Observable implements Adapter
 
 		if ( !$noSignal ) $this->signal( 'sql_exec', $this );
 
-		$arr = $this->db->getCol( $sql, $bindings );
-
-		if ( $arr && is_array( $arr ) && isset( $arr[0] ) ) {
-			return ( $arr[0] );
-		}
-
-		return NULL;
+		return $this->db->GetOne( $sql, $bindings );
 	}
 
 	/**
