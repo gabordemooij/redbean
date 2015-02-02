@@ -118,15 +118,16 @@ class OODB extends Observable
 	/**
 	 * Constructor, requires a query writer.
 	 *
-	 * @param QueryWriter $writer writer
+	 * @param QueryWriter   $writer writer
+	 * @param array|boolean $frozen mode of operation: TRUE (frozen), FALSE (default, fluid) or ARRAY (chilled)
 	 */
-	public function __construct( QueryWriter $writer )
+	public function __construct( QueryWriter $writer, $frozen = FALSE )
 	{
 		if ( $writer instanceof QueryWriter ) {
 			$this->writer = $writer;
 		}
 
-		$this->freeze( FALSE );
+		$this->freeze( $frozen );
 	}
 
 	/**

@@ -332,9 +332,8 @@ class Facade
 		if ( !isset( $writers[$wkey] ) ) trigger_error( 'Unsupported DSN: '.$wkey );
 		$writerClass = '\\RedBeanPHP\\QueryWriter\\'.$writers[$wkey];
 		$writer      = new $writerClass( $adapter );
-		$redbean     = new OODB( $writer );
+		$redbean     = new OODB( $writer, $frozen );
 
-		$redbean->freeze( ( $frozen === TRUE ) );
 		self::$toolboxes[$key] = new ToolBox( $redbean, $adapter, $writer );
 	}
 
