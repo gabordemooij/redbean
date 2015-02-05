@@ -169,4 +169,51 @@ class Finder
 	{
 		return $this->redbean->findCollection( $type, $sql, $bindings );
 	}
+
+	/**
+	 * Finds or creates a bean.
+	 * Tries to find a bean with certain properties specified in the second
+	 * parameter ($like). If the bean is found, it will be returned.
+	 * If multiple beans are found, only the first will be returned.
+	 * If no beans match the criteria, a new bean will be dispensed,
+	 * the criteria will be imported as properties and this new bean
+	 * will be stored and returned.
+	 *
+	 * Format of criteria set: property => value
+	 * The criteria set also supports OR-conditions: property => array( value1, orValue2 )
+	 *
+	 * @param string $type type of bean to search for
+	 * @param array  $like criteria set describing bean to search for
+	 *
+	 * @return OODBBean
+	 */
+	public function findOrCreate( $type, $like = array() )
+	{
+			$beans = $this->findLike( $type, $like );
+			if ( count( $beans ) ) {
+				$bean = reset( $beans );
+				return $bean;
+			}
+
+			$bean = $this->redbean->dispense( $type );
+			$bean->import( $like );
+			$this->redbean->store( $bean );
+			return $bean;
+	}
+
+	/**
+	 * Finds beans by its type and a certain criteria set.
+	 *
+	 * Format of criteria set: property => value
+	 * The criteria set also supports OR-conditions: property => array( value1, orValue2 )
+	 *
+	 * @param string $type type of bean to search for
+	 * @param array  $like criteria set describing the bean to search for
+	 *
+	 * @return array
+	 */
+	public function findLike( $type, $like = array() )
+	{
+		return $this->redbean->find( $type, $like );
+	}
 }

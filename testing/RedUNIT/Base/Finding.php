@@ -6,6 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\OODB as OODB;
+use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
 
@@ -22,6 +23,61 @@ use RedBeanPHP\RedException\SQL as SQL;
  * with this source code in the file license.txt.
  */
 class Finding extends Base {
+	/**
+	 * Tests the findOrCreate method.
+	 *
+	 * @return void
+	 */
+	public function testFindOrCreate()
+	{
+		R::nuke();
+		$book = R::findOrCreate( 'book', array( 'title' => 'my book', 'price' => 50 ) );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		$id = $book->id;
+		$book = R::findOrCreate( 'book', array( 'title' => 'my book', 'price' => 50 ) );
+		asrt( $book->id, $id );
+		asrt( $book->title, 'my book' );
+		asrt( (int) $book->price, 50 );
+	}
+
+	/**
+	 * Tests the findLike method.
+	 *
+	 * @return void
+	 */
+	public function testFindLike()
+	{
+		R::nuke();
+		$book = R::dispense( array(
+			'_type' => 'book',
+			'title' => 'my book',
+			'price' => 80
+		) );
+		R::store( $book );
+		$book = R::dispense( array(
+			'_type' => 'book',
+			'title' => 'other book',
+			'price' => 80
+		) );
+		R::store( $book );
+		$books = R::findLike( 'book', array( 'price' => 80 ) );
+		asrt( count( $books ), 2 );
+		foreach( $books as $book ) {
+			asrt( $book->getMeta( 'type' ), 'book' );
+		}
+		$books = R::findLike( 'book' );
+		asrt( count( $books ), 2 );
+		$books = R::findLike( 'book', array( 'title' => 'my book' ) );
+		asrt( count( $books ), 1 );
+		$books = R::findLike( 'book', array( 'title' => array( 'my book', 'other book' ) ) );
+		asrt( count( $books ), 2 );
+		$books = R::findLike( 'book', array( 'title' => 'strange book') );
+		asrt( is_array( $books ), TRUE );
+		asrt( count( $books ), 0 );
+		$books = R::findLike( 'magazine' );
+		asrt( is_array( $books ), TRUE );
+		asrt( count( $books ), 0 );
+	}
 
 	/**
 	 * Test whether findOne gets a LIMIT 1

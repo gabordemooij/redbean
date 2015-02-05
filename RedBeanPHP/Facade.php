@@ -1660,6 +1660,38 @@ class Facade
 	}
 
 	/**
+	 * Tries to find a bean matching a certain type and
+	 * criteria set. If no beans are found a new bean
+	 * will be created, the criteria will be imported into this
+	 * bean and the bean will be stored and returned.
+	 * If multiple beans match the criteria only the first one
+	 * will be returned.
+	 *
+	 * @param string $type type of bean to search for
+	 * @param array  $like criteria set describing the bean to search for
+	 *
+	 * @return OODBBean
+	 */
+	public static function findOrCreate( $type, $like = array() )
+	{
+		return self::$finder->findOrCreate( $type, $like );
+	}
+
+	/**
+	 * Tries to find beans matching the specified type and
+	 * criteria set.
+	 *
+	 * @param string $type type of bean to search for
+	 * @param array  $like criteria set describing the bean to search for
+	 *
+	 * @return array
+	 */
+	public static function findLike( $type, $like = array() )
+	{
+		return self::$finder->findLike( $type, $like );
+	}
+
+	/**
 	 * Dynamically extends the facade with a plugin.
 	 * Using this method you can register your plugin with the facade and then
 	 * use the plugin by invoking the name specified plugin name as a method on
