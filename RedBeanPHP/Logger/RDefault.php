@@ -22,6 +22,11 @@ use RedBeanPHP\RedException\Security as Security;
  */
 class RDefault implements Logger
 {
+	/**
+	 * Logger modes
+	 */
+	const C_LOGGER_ECHO  = 0;
+	const C_LOGGER_ARRAY = 1;
 
 	/**
 	 * @var integer
@@ -49,20 +54,20 @@ class RDefault implements Logger
 		foreach ( func_get_args() as $argument ) {
 			if ( is_array( $argument ) ) {
 				$log = print_r( $argument, TRUE );
-				if ( $this->mode === 0 ) {
+				if ( $this->mode === self::C_LOGGER_ECHO ) {
 					echo $log;
 				} else {
 					$this->logs[] = $log;
 				}
 			} else {
-				if ( $this->mode === 0 ) {
+				if ( $this->mode === self::C_LOGGER_ECHO ) {
 					echo $argument;
 				} else {
 					$this->logs[] = $argument;
 				}
 			}
 
-			if ($this->mode === 0) echo "<br>\n";
+			if ( $this->mode === self::C_LOGGER_ECHO ) echo "<br>\n";
 		}
 	}
 	
@@ -98,7 +103,7 @@ class RDefault implements Logger
 	 */
 	public function setMode( $mode )
 	{
-		if ($mode !== 0 && $mode !== 1) {
+		if ($mode !== self::C_LOGGER_ARRAY && $mode !== self::C_LOGGER_ECHO ) {
 			throw new RedException( 'Invalid mode selected for logger, use 1 or 0.' );
 		}
 		$this->mode = $mode;

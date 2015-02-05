@@ -38,7 +38,7 @@ class RPDO implements Driver
 	/**
 	 * @var boolean
 	 */
-	protected $debug = FALSE;
+	protected $loggingEnabled = FALSE;
 
 	/**
 	 * @var Logger
@@ -131,7 +131,7 @@ class RPDO implements Driver
 	{
 		$this->connect();
 
-		if ( $this->debug && $this->logger ) {
+		if ( $this->loggingEnabled && $this->logger ) {
 			$this->logger->log( $sql, $bindings );
 		}
 
@@ -159,7 +159,7 @@ class RPDO implements Driver
 
 				$this->resultArray = $statement->fetchAll( $fetchStyle );
 
-				if ( $this->debug && $this->logger ) {
+				if ( $this->loggingEnabled && $this->logger ) {
 					$this->logger->log( 'resultset: ' . count( $this->resultArray ) . ' rows' );
 				}
 			} else {
@@ -170,7 +170,7 @@ class RPDO implements Driver
 			//So we need a property to convey the SQL State code.
 			$err = $e->getMessage();
 
-			if ( $this->debug && $this->logger ) $this->logger->log( 'An error occurred: ' . $err );
+			if ( $this->loggingEnabled && $this->logger ) $this->logger->log( 'An error occurred: ' . $err );
 
 			$exception = new SQL( $err, 0 );
 			$exception->setSQLState( $e->getCode() );
@@ -450,9 +450,9 @@ class RPDO implements Driver
 	{
 		$this->connect();
 
-		$this->debug = (bool) $tf;
+		$this->loggingEnabled = (bool) $tf;
 
-		if ( $this->debug and !$logger ) {
+		if ( $this->loggingEnabled and !$logger ) {
 			$logger = new RDefault();
 		}
 
@@ -568,5 +568,17 @@ class RPDO implements Driver
 	public function isConnected()
 	{
 		return $this->isConnected && $this->pdo;
+	}
+
+	/**
+	 * Toggles logging, enables or disables logging.
+	 *
+	 * @param boolean $enable TRUE to enable logging
+	 *
+	 * @return self
+	 */
+	public function setEnableLogging( $enable )
+	{
+		$this->loggingEnabled = (boolean) $enable;
 	}
 }

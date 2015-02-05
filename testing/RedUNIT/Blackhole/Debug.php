@@ -37,6 +37,7 @@ class Debug extends Blackhole
 	{
 		$debugger = new Debugger;
 		$debugger->setMode(1);
+		$debugger->setParamStringLength( 20 );
 		if (!is_null($bindings)) {
 			$debugger->log($query, $bindings);
 		} else {

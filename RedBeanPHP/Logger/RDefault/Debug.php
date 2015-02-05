@@ -24,6 +24,10 @@ use RedBeanPHP\RedException\Security as Security;
  */
 class Debug extends RDefault implements Logger
 {
+	/**
+	 * @var integer
+	 */
+	private $strLen = 40;
 
 	/**
 	 * Writes a query for logging with all bindings / params filled
@@ -63,8 +67,8 @@ class Debug extends RDefault implements Logger
 		if ( is_null( $value ) ) $value = 'NULL';
 
 		$value = strval( $value );
-		if ( strlen( $value ) > 20 ) {
-			$value = substr( $value, 0, 20 ).'... ';
+		if ( strlen( $value ) > ( $this->strLen ) ) {
+			$value = substr( $value, 0, ( $this->strLen ) ).'... ';
 		}
 
 		if ( !is_numeric( $value ) && $value !== 'NULL') {
@@ -164,5 +168,20 @@ class Debug extends RDefault implements Logger
 		$newBindings = $this->normalizeBindings( $bindings );
 		$newStr = $this->writeQuery( $newSql, $newBindings );
 		$this->output( $newStr );
+	}
+
+	/**
+	 * Sets the max string length for the parameter output in
+	 * SQL queries. Set this value to a reasonable number to
+	 * keep you SQL queries readable.
+	 *
+	 * @param integer $len string length
+	 *
+	 * @return self
+	 */
+	public function setParamStringLength( $len = 20 )
+	{
+		$this->strLen = max(0, $len);
+		return $this;
 	}
 }
