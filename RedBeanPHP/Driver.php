@@ -148,4 +148,18 @@ interface Driver
 	 * @return void
 	 */
 	public function FailTrans();
+
+	/**
+	 * Resets the internal Query Counter.
+	 *
+	 * @return self
+	 */
+	public function resetCounter();
+
+	/**
+	 * Returns the number of SQL queries processed.
+	 *
+	 * @return integer
+	 */
+	public function getQueryCount();
 }

@@ -1733,16 +1733,23 @@ class Facade
 	}
 
 	/**
-	 * Returns the number of SQL queries executed.
-	 * You need to use startLogging() for this method to
-	 * work. This method just counts the log entries written
-	 * after the invocation of startLogging().
+	 * Resets the Query counter.
+	 *
+	 * @return integer
+	 */
+	public static function resetQueryCount()
+	{
+		self::$adapter->getDatabase()->resetCounter();
+	}
+
+	/**
+	 * Returns the number of SQL queries processed.
 	 *
 	 * @return integer
 	 */
 	public static function getQueryCount()
 	{
-		return count( self::getLogs() );
+		return self::$adapter->getDatabase()->getQueryCount();
 	}
 
 	/**
