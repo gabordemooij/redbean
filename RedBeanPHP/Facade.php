@@ -402,6 +402,14 @@ class Facade
 	}
 
 	/**
+	 * Turns on the fancy debugger.
+	 */
+	public static function fancyDebug( $toggle )
+	{
+		self::debug( $toggle, 2 );
+	}
+
+	/**
 	* Inspects the database schema. If you pass the type of a bean this
 	* method will return the fields of its table in the database.
 	* The keys of this array will be the field names and the values will be

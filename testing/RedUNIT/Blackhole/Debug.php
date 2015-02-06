@@ -36,7 +36,7 @@ class Debug extends Blackhole
 	private function testDebug($query, $bindings = NULL, $expected)
 	{
 		$debugger = new Debugger;
-		$debugger->setMode(1);
+		$debugger->setMode( 1 );
 		$debugger->setParamStringLength( 20 );
 		if (!is_null($bindings)) {
 			$debugger->log($query, $bindings);
@@ -137,5 +137,14 @@ class Debug extends Blackhole
 		'a','b','c','d','e','f','g','h','i','j','k'
 		),"'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k'");
 		$this->testDebug(':a :aaa :ab', array(':a'=>1,':aaa'=>2,':ab'=>3),'1 2 3');
+	}
+
+	/**
+	 * Test facade fancyDebug function
+	 */
+	public function testDebug2InFacade()
+	{
+		R::fancyDebug( TRUE );
+		pass();
 	}
 }
