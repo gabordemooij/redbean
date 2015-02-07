@@ -1177,15 +1177,13 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			} elseif ( self::$errorHandlingFUSE === self::C_ERR_EXCEPTION ) {
 				throw new \Exception( $message );
 			} elseif ( self::$errorHandlingFUSE === self::C_ERR_FUNC ) {
-				if ( is_callable( self::$errorHandler ) ) {
-					$func = self::$errorHandler;
-					return $func(array(
-						'message' => $message,
-						'method' => $method,
-						'args' => $args,
-						'bean' => $this
-					));
-				}
+				$func = self::$errorHandler;
+				return $func(array(
+					'message' => $message,
+					'method' => $method,
+					'args' => $args,
+					'bean' => $this
+				));
 			}
 			trigger_error( $message, E_USER_ERROR );
 			return NULL;
