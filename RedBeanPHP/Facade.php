@@ -530,15 +530,19 @@ class Facade
 	 * This function will remove the specified OODBBean
 	 * Bean Object from the database.
 	 *
-	 * @param OODBBean|SimpleModel $bean bean you want to remove from database
+	 * This facade method also accepts a type-id combination,
+	 * in the latter case this method will attempt to load the specified bean
+	 * and THEN trash it.
+	 *
+	 * @param string|OODBBean|SimpleModel $bean bean you want to remove from database
+	 * @param integer $id (optional)
 	 *
 	 * @return void
-	 *
-	 * @throws Security
 	 */
-	public static function trash( $bean )
+	public static function trash( $beanOrType, $id = NULL )
 	{
-		self::$redbean->trash( $bean );
+		if ( is_string( $beanOrType ) ) return self::trash( self::load( $beanOrType, $id ) );
+		return self::$redbean->trash( $beanOrType );
 	}
 
 	/**

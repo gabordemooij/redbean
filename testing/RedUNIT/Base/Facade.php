@@ -36,6 +36,21 @@ class Facade extends Base
 	}
 
 	/**
+	 * Tests quick trash method: R::trash( type, id ).
+	 *
+	 * @return void
+	 */
+	public function testQuickTrash()
+	{
+		R::nuke();
+		$bean = R::dispense( 'bean' );
+		$id = R::store( $bean );
+		asrt( R::count( 'bean' ), 1 );
+		R::trash( 'bean', $id );
+		asrt( R::count( 'bean' ), 0 );
+	}
+
+	/**
 	 * Test common Facade usage scenarios.
 	 *
 	 * @return void
