@@ -212,7 +212,7 @@ class Association extends Base
 		$book->extra = 2;
 
 		$id = R::store( $book );
-		R::getWriter()->addUniqueConstraint( 'book', array( 'title' ) );
+		R::getWriter()->addUniqueIndex( 'book', array( 'title' ) );
 
 		$book = R::dispense( 'book' );
 
