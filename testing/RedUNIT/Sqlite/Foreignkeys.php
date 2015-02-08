@@ -20,6 +20,27 @@ use RedBeanPHP\Facade as R;
 class Foreignkeys extends Sqlite
 {
 	/**
+	 * addIndex should not trigger exception...
+	 *
+	 * @return void
+	 */
+	public function testIndexException()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->title = 'a';
+		R::store( $book );
+		try {
+			R::getWriter()->addIndex( 'book' , '\'', 'title' );
+			pass();
+		} catch( \Exception $e ) {
+			fail();
+		}
+		R::getWriter()->addIndex( 'book' , '\'', 'title' );
+		pass();
+	}
+
+	/**
 	 * Test foreign keys with SQLite.
 	 *
 	 * @return void
