@@ -57,9 +57,9 @@ if ( !function_exists( 'dump' ) ) {
  */
 if ( !function_exists( 'genslots' ) ) {
 
-	function genslots( $slots, $tpl )
+	function genslots( $slots, $tpl = NULL )
 	{
-		print_r( \RedBeanPHP\Facade::genSlots( $slots, $tpl ) );
+		return \RedBeanPHP\Facade::genSlots( $slots, $tpl );
 	}
 }
 
@@ -70,6 +70,6 @@ if ( !function_exists( 'array_flatten' ) ) {
 
 	function array_flatten( $array )
 	{
-		print_r( \RedBeanPHP\Facade::flat( $list ) );
+		return \RedBeanPHP\Facade::flat( $array );
 	}
 }
