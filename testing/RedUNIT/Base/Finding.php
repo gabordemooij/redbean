@@ -41,11 +41,45 @@ class Finding extends Base {
 	}
 
 	/**
+	 * Test forming IN-clause using genSlots and flat.
+	 *
+	 * @return void
+	 */
+	public function testINClause()
+	{
+		list( $flowers, $shop ) = R::dispenseAll( 'flower*4,shop' );
+		$flowers[0]->color = 'red';
+		$flowers[1]->color = 'yellow';
+		$flowers[2]->color = 'blue';
+		$flowers[3]->color = 'purple';
+		$flowers[0]->price = 10;
+		$flowers[1]->price = 15;
+		$flowers[2]->price = 20;
+		$flowers[3]->price = 25;
+		$shop->xownFlowerList = $flowers;
+		R::store( $shop );
+		$colors = array( 'red', 'yellow' );
+		$result = $this->getColors( R::find( 'flower', ' color IN ('.R::genSlots( $colors ).' ) AND price < ?' , R::flat( array( $colors, 100 ) ) ) );
+		asrt( $result, 'red,yellow' );
+		$colors = array( 'red', 'yellow' );
+		$result = $this->getColors( R::find( 'flower', ' color IN ('.R::genSlots( $colors ).' ) AND price < ?' , R::flat( array( $colors, 10 ) ) ) );
+		asrt( $result, '' );
+		$colors = array( 'red', 'yellow' );
+		$result = $this->getColors( R::find( 'flower', ' color IN ('.R::genSlots( $colors ).' ) AND price < ?' , R::flat( array( $colors, 15 ) ) ) );
+		asrt( $result, 'red' );
+		asrt( json_encode( R::flat( array( 'a', 'b', 'c' ) ) ), '["a","b","c"]' );
+		asrt( json_encode( R::flat( array( 'a', array( 'b' ), 'c' ) ) ), '["a","b","c"]' );
+		asrt( json_encode( R::flat( array( 'a', array( 'b', array( 'c' ) ) ) ) ), '["a","b","c"]' );
+		asrt( json_encode( R::flat( array( array( 'a', array( 'b', array( array( 'c' ) ) ) ) ) ) ), '["a","b","c"]' );
+		asrt( json_encode( R::flat( array( 'a', 'b', 'c', array() ) ) ), '["a","b","c"]' );
+	}
+
+	/**
 	 * Test findLike.
 	 *
 	 * @return void
 	 */
-	public function testFindLike()
+	public function testFindLike2()
 	{
 		list( $flowers, $shop ) = R::dispenseAll( 'flower*4,shop' );
 		$flowers[0]->color = 'red';
