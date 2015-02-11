@@ -51,3 +51,25 @@ if ( !function_exists( 'dump' ) ) {
 		print_r( \RedBeanPHP\Facade::dump( $list ) );
 	}
 }
+
+/**
+ * Function alias for R::genSlots().
+ */
+if ( !function_exists( 'genslots' ) ) {
+
+	function genslots( $slots )
+	{
+		print_r( \RedBeanPHP\Facade::genSlots( $slots ) );
+	}
+}
+
+/**
+ * Function alias for R::flat().
+ */
+if ( !function_exists( 'array_flatten' ) ) {
+
+	function array_flatten( $array )
+	{
+		print_r( \RedBeanPHP\Facade::flat( $list ) );
+	}
+}
