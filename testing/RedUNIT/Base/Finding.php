@@ -74,8 +74,17 @@ class Finding extends Base {
 		asrt( json_encode( R::flat( array( 'a', 'b', 'c', array() ) ) ), '["a","b","c"]' );
 		asrt( genslots( array( 1, 2 ) ), '?,?' );
 		asrt( json_encode( array_flatten( array( array( 'a', array( 'b', array( array( 'c' ) ) ) ) ) ) ), '["a","b","c"]' );
-		asrt( genslots( array( 1, 2 ), ' IN (%s) AND ' ), ' IN (?,?)' );
+		asrt( genslots( array( 1, 2 ), 'IN (%s) AND' ), 'IN (?,?) AND' );
 		asrt( genslots( array(), ' IN (%s) AND ' ), '' );
+		$colors = array( 'blue', 'purple', 'red' );
+		$flowers = R::find( 'flower', genslots( $colors, ' color IN (%s) AND ' ).' price > ? ', array_flatten( array( $colors, 11 ) ) );
+		asrt( $this->getColors( $flowers ), 'blue,purple' );
+		$flowers = R::find( 'flower', genslots( array(), ' color IN (%s) AND ' ).' price > ? ', array_flatten( array( array(), 11 ) ) );
+		asrt( $this->getColors( $flowers ), 'blue,purple,yellow' );
+		$flowers = R::find( 'flower', ' id > 0 AND '.genslots( $colors, ' color IN (%s) AND ' ).' price > ? ', array_flatten( array( $colors, 11 ) ) );
+		asrt( $this->getColors( $flowers ), 'blue,purple' );
+		$flowers = R::find( 'flower', ' id > 0 AND '.genslots( array(), ' color IN (%s) AND ' ).' price > ? ', array_flatten( array( array(), 11 ) ) );
+		asrt( $this->getColors( $flowers ), 'blue,purple,yellow' );
 	}
 
 	/**
