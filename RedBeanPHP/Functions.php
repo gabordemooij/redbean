@@ -57,9 +57,9 @@ if ( !function_exists( 'dump' ) ) {
  */
 if ( !function_exists( 'genslots' ) ) {
 
-	function genslots( $slots )
+	function genslots( $slots, $tpl )
 	{
-		print_r( \RedBeanPHP\Facade::genSlots( $slots ) );
+		print_r( \RedBeanPHP\Facade::genSlots( $slots, $tpl ) );
 	}
 }
 

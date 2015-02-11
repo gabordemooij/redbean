@@ -1239,9 +1239,10 @@ class Facade
 	 *
 	 * @return string
 	 */
-	public static function genSlots( $array )
+	public static function genSlots( $array, $template = NULL )
 	{
-		return ( count( $array ) ) ? implode( ',', array_fill( 0, count( $array ), '?' ) ) : '';
+		$str = ( count( $array ) ) ? implode( ',', array_fill( 0, count( $array ), '?' ) ) : '';
+		return ( ( is_null( $template ) || !count( $array ) ) ? $str : sprintf( $template, $str ) );
 	}
 
 	/**
