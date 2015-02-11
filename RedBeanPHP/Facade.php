@@ -1235,7 +1235,7 @@ class Facade
 	/**
 	 * Generates question mark slots for an array of values.
 	 *
-	 * @param array $array
+	 * @param array  $array    array to generate question mark slots for
 	 *
 	 * @return string
 	 */
@@ -1698,14 +1698,18 @@ class Facade
 	 * Tries to find beans matching the specified type and
 	 * criteria set.
 	 *
+	 * If the optional additional SQL snippet is a condition, it will
+	 * be glued to the rest of the query using the AND operator.
+	 *
 	 * @param string $type type of bean to search for
-	 * @param array  $like criteria set describing the bean to search for
+	 * @param array  $like optional criteria set describing the bean to search for
+	 * @param string $sql  optional additional SQL for sorting
 	 *
 	 * @return array
 	 */
-	public static function findLike( $type, $like = array() )
+	public static function findLike( $type, $like = array(), $sql = '' )
 	{
-		return self::$finder->findLike( $type, $like );
+		return self::$finder->findLike( $type, $like, $sql );
 	}
 
 	/**

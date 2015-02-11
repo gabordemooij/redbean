@@ -207,13 +207,23 @@ class Finder
 	 * Format of criteria set: property => value
 	 * The criteria set also supports OR-conditions: property => array( value1, orValue2 )
 	 *
-	 * @param string $type type of bean to search for
-	 * @param array  $like criteria set describing the bean to search for
+	 * If the additional SQL is a condition, this condition will be glued to the rest
+	 * of the query using an AND operator.
+	 *
+	 * @param string $type       type of bean to search for
+	 * @param array  $conditions criteria set describing the bean to search for
+	 * @param string $sql        additional SQL (for sorting)
 	 *
 	 * @return array
 	 */
-	public function findLike( $type, $like = array() )
+	public function findLike( $type, $conditions = array(), $sql = '' )
 	{
-		return $this->redbean->find( $type, $like );
+		if ( count( $conditions ) > 0 ) {
+			foreach( $conditions as $key => $condition ) {
+				if ( !count( $condition ) ) unset( $conditions[$key] );
+			}
+		}
+
+		return $this->redbean->find( $type, $conditions, $sql );
 	}
 }

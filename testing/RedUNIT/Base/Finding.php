@@ -23,6 +23,52 @@ use RedBeanPHP\RedException\SQL as SQL;
  * with this source code in the file license.txt.
  */
 class Finding extends Base {
+
+	/**
+	 * Helper for testing findLike.
+	 *
+	 * @param array   $flowers beans
+	 * @param boolean $noSort  sorting?
+	 *
+	 * @return string
+	 */
+	private function getColors( $flowers, $noSort = FALSE )
+	{
+		$colors = array();
+		foreach( $flowers as $flower ) $colors[] = $flower->color;
+		if ( !$noSort) sort( $colors );
+		return implode( ',', $colors );
+	}
+
+	/**
+	 * Test findLike.
+	 *
+	 * @return void
+	 */
+	public function testFindLike()
+	{
+		list( $flowers, $shop ) = R::dispenseAll( 'flower*4,shop' );
+		$flowers[0]->color = 'red';
+		$flowers[1]->color = 'yellow';
+		$flowers[2]->color = 'blue';
+		$flowers[3]->color = 'purple';
+		$flowers[0]->price = 10;
+		$flowers[1]->price = 15;
+		$flowers[2]->price = 20;
+		$flowers[3]->price = 25;
+		$shop->xownFlowerList = $flowers;
+		R::store( $shop );
+		asrt( $this->getColors( R::findLike( 'flower', array( 'color' => array( 'red', 'yellow' )  ), ' price < 20' ) ), 'red,yellow' );
+		asrt( $this->getColors( R::findLike( 'flower', array( 'color' => array()  ), '' ) ), 'blue,purple,red,yellow' );
+		asrt( $this->getColors( R::findLike( 'flower', array( 'color' => array()  ) ) ), 'blue,purple,red,yellow' );
+		asrt( $this->getColors( R::findLike( 'flower', array( 'color' => array('blue')  ), ' OR price = 25' ) ), 'blue,purple' );
+		asrt( $this->getColors( R::findLike( 'flower', array( 'color' => array()  ), ' price < 25' ) ), 'blue,red,yellow' );
+		asrt( $this->getColors( R::findLike( 'flower', array( 'color' => array()  ), ' price < 20' ) ), 'red,yellow' );
+		asrt( $this->getColors( R::findLike( 'flower', array( 'color' => array()  ), ' ORDER BY color DESC' ), TRUE ), 'yellow,red,purple,blue' );
+		asrt( $this->getColors( R::findLike( 'flower', array( 'color' => array()  ), ' ORDER BY color LIMIT 1' ) ), 'blue' );
+		asrt( $this->getColors( R::findLike( 'flower', array( 'color' => array( 'yellow', 'blue' )  ), ' ORDER BY color ASC  LIMIT 1' ) ), 'blue' );
+	}
+
 	/**
 	 * Tests the findOrCreate method.
 	 *
