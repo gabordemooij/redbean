@@ -1245,6 +1245,22 @@ class Facade
 	}
 
 	/**
+	 * Flattens a multi dimensional bindings array for use with genSlots().
+	 *
+	 * @param array $array array to flatten
+	 *
+	 * @return array
+	 */
+	public static function flat( $array, $result = array() )
+	{
+		foreach( $array as $value ) {
+			if ( is_array( $value ) ) $result = self::flat( $value, $result );
+			else $result[] = $value;
+		}
+		return $result;
+	}
+
+	/**
 	 * Nukes the entire database.
 	 * This will remove all schema structures from the database.
 	 * Only works in fluid mode. Be careful with this method.
