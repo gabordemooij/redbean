@@ -74,7 +74,7 @@ abstract class Repository
 					$listName = lcfirst( substr( $property, 3 ) );
 					if ($bean->moveMeta( 'sys.exclusive-'.  $listName ) ) {
 						OODBBean::setMetaAll( $ownTrashcan, 'sys.garbage', TRUE );
-						OODBBean::setMetaAll( $ownAdditions, 'sys.dependson', $bean->getMeta( 'type' ) );
+						OODBBean::setMetaAll( $ownAdditions, 'sys.buildcommand.fkdependson', $bean->getMeta( 'type' ) );
 					}
 					unset( $bean->$property );
 				} elseif ( strpos( $property, 'shared' ) === 0 ) {

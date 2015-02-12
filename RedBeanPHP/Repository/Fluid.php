@@ -132,7 +132,7 @@ class Fluid extends Repository
 					$typeof = $bean->getMeta("sys.typeof.{$destinationColumnNoQ}", $destinationColumnNoQ);
 					$isLink = $bean->getMeta( 'sys.buildcommand.unique', FALSE );
 					//Make FK CASCADING if part of exclusive list (dependson=typeof) or if link bean
-					$isDep = ( $bean->moveMeta( 'sys.dependson' ) === $typeof || is_array( $isLink ) );
+					$isDep = ( $bean->moveMeta( 'sys.buildcommand.fkdependson' ) === $typeof || is_array( $isLink ) );
 					$result = $this->writer->addFK( $table, $typeof, $columnNoQ, 'id', $isDep );
 					//If this is a link bean and all unique columns have been added already, then apply unique constraint
 					if ( is_array( $isLink ) && !count( array_diff( $isLink, array_keys( $this->writer->getColumns( $table ) ) ) ) ) {
