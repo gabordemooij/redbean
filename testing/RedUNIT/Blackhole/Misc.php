@@ -35,6 +35,24 @@ class Misc extends Blackhole
 	}
 
 	/**
+	 * Tests max parameter binding.
+	 *
+	 * @return void
+	 */
+	public function testIntegerBindingMax()
+	{
+		$driver = new RPDO( 'test-sqlite-53', 'user', 'pass' );
+		$max = $driver->getIntegerBindingMax();
+		asrt( $max, 2147483647 );
+		$driver = new RPDO( 'cubrid', 'user', 'pass' );
+		$max = $driver->getIntegerBindingMax();
+		asrt( $max, 2147483647 );
+		$driver = new RPDO( 'other', 'user', 'pass' );
+		$max = $driver->getIntegerBindingMax();
+		asrt( $max, PHP_INT_MAX );
+	}
+
+	/**
 	* Should not be able to pass invalid mode (must be 0 or 1).
 	*
 	*/

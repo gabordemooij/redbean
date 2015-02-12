@@ -246,7 +246,7 @@ class RPDO implements Driver
 		}
 		
 		//PHP 5.3 PDO SQLite has a bug with large numbers:
-		if ( strpos( $this->dsn, 'sqlite' ) === 0 && PHP_MAJOR_VERSION === 5 && PHP_MINOR_VERSION === 3) {
+		if ( ( strpos( $this->dsn, 'sqlite' ) === 0 && PHP_MAJOR_VERSION === 5 && PHP_MINOR_VERSION === 3 ) || $this->dsn === 'test-sqlite-53' ) {
 			$this->max = 2147483647; //otherwise you get -2147483648 ?! demonstrated in build #603 on Travis.
 		} elseif ( strpos( $this->dsn, 'cubrid' ) === 0 ) {
 			$this->max = 2147483647; //bindParam in pdo_cubrid also fails...
@@ -607,5 +607,19 @@ class RPDO implements Driver
 	public function getQueryCount()
 	{
 		return $this->queryCounter;
+	}
+
+	/**
+	 * Returns the maximum value treated as integer parameter
+	 * binding.
+	 *
+	 * This method is mainly for testing purposes but it can help
+	 * you solve some issues relating to integer bindings.
+	 *
+	 * @return integer
+	 */
+	public function getIntegerBindingMax()
+	{
+		return $this->max;
 	}
 }
