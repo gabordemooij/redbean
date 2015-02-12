@@ -119,7 +119,7 @@ class AssociationManager extends Observable
 
 		$bean->setMeta( "cast.$property1", "id" );
 		$bean->setMeta( "cast.$property2", "id" );
-		$bean->setMeta( 'sys.is_link', array( $property1, $property2 ) );
+		$bean->setMeta( 'sys.buildcommand.unique', array( $property1, $property2 ) );
 
 		$bean->$property1 = $bean1->id;
 		$bean->$property2 = $bean2->id;
