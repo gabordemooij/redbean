@@ -5,7 +5,7 @@ namespace RedBeanPHP;
 /**
  * RedBean\Exception Base
  *
- * @file    RedBean/Exception.php
+ * @file    RedBeanPHP/Exception.php
  * @desc    Represents the base class for RedBean\Exceptions
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

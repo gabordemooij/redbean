@@ -11,7 +11,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
 /**
  * RedBean SQLiteWriter with support for SQLite types
  *
- * @file    RedBean/QueryWriter/SQLiteT.php
+ * @file    RedBeanPHP/QueryWriter/SQLiteT.php
  * @desc    Represents a SQLite Database to RedBean
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

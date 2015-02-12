@@ -8,7 +8,7 @@ use RedBeanPHP\OODBBean as OODBBean;
  * SimpleModel
  * Base Model For All RedBeanPHP Models using FUSE.
  *
- * @file       RedBean/SimpleModel.php
+ * @file       RedBeanPHP/SimpleModel.php
  * @desc       Part of FUSE
  * @author     Gabor de Mooij and the RedBeanPHP Team
  * @license    BSD/GPLv2

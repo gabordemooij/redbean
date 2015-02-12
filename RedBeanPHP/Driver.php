@@ -5,7 +5,7 @@ namespace RedBeanPHP;
 /**
  * Interface for database drivers
  *
- * @file       RedBean/Driver.php
+ * @file       RedBeanPHP/Driver.php
  * @desc       Describes the API for database classes
  * @author     Gabor de Mooij and the RedBeanPHP Community
  * @license    BSD/GPLv2

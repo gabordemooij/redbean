@@ -18,8 +18,8 @@ use RedBeanPHP\Repository as Repository;
 /**
  * Frozen Repository
  *
- * @file    RedBean/Repository/Frozen.php
- * @desc    RedBean Object Database
+ * @file    RedBeanPHP/Repository/Frozen.php
+ * @desc    RedBeanPHP Object Database
  * @author  Gabor de Mooij and the RedBeanPHP community
  * @license BSD/GPLv2
  *

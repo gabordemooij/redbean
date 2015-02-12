@@ -10,7 +10,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
 /**
  * RedBean CUBRID Writer
  *
- * @file    RedBean/QueryWriter/CUBRID.php
+ * @file    RedBeanPHP/QueryWriter/CUBRID.php
  * @desc    Represents a CUBRID Database to RedBean
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

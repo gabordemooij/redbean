@@ -13,7 +13,7 @@ use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
  * FUSE models. This Bean Helper makes use of the facade to obtain a
  * reference to the toolbox.
  *
- * @file    RedBean/BeanHelperFacade.php
+ * @file    RedBeanPHP/BeanHelperFacade.php
  * @desc    Finds the toolbox for the bean.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

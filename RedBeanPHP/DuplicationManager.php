@@ -11,7 +11,7 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 /**
  * Duplication Manager
  *
- * @file    RedBean/DuplicationManager.php
+ * @file    RedBeanPHP/DuplicationManager.php
  * @desc    Creates deep copies of beans
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

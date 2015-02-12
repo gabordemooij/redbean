@@ -7,7 +7,7 @@ namespace RedBeanPHP;
  * Interface for Observer object. Implementation of the
  * observer pattern.
  *
- * @file    RedBean/Observer.php
+ * @file    RedBeanPHP/Observer.php
  * @desc    Part of the observer pattern in RedBean
  * @author  Gabor de Mooijand the RedBeanPHP community
  * @license BSD/GPLv2

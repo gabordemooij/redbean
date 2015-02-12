@@ -9,7 +9,7 @@ use RedBeanPHP\RedException\Security as Security;
 /**
  * Logger. Provides a basic logging function for RedBeanPHP.
  *
- * @file    RedBean/Logger.php
+ * @file    RedBeanPHP/Logger.php
  * @desc    Logger
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

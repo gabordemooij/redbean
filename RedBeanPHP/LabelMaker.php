@@ -8,7 +8,7 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Label Maker
  *
- * @file       RedBean/LabelMaker.php
+ * @file       RedBeanPHP/LabelMaker.php
  * @desc       Makes so-called label beans
  * @author     Gabor de Mooij and the RedBeanPHP Community
  * @license    BSD/GPLv2

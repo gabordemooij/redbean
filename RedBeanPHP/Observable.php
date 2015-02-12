@@ -8,7 +8,7 @@ use RedBeanPHP\Observer as Observer;
  * Observable
  * Base class for Observables
  *
- * @file            RedBean/Observable.php
+ * @file            RedBeanPHP/Observable.php
  * @description     Part of the observer pattern in RedBean
  * @author          Gabor de Mooij and the RedBeanPHP community
  * @license         BSD/GPLv2

@@ -9,7 +9,7 @@ use RedBeanPHP\Driver as Driver;
 /**
  * DBAdapter (Database Adapter)
  *
- * @file    RedBean/Adapter/DBAdapter.php
+ * @file    RedBeanPHP/Adapter/DBAdapter.php
  * @desc    An adapter class to connect various database systems to RedBean
  * @author  Gabor de Mooij and the RedBeanPHP Community.
  * @license BSD/GPLv2

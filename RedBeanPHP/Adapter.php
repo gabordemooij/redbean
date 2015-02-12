@@ -5,7 +5,7 @@ namespace RedBeanPHP;
 /**
  * Adapter Interface
  *
- * @file    RedBean/Adapter.php
+ * @file    RedBeanPHP/Adapter.php
  * @desc    Describes the API for a RedBean Database Adapter.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
@@ -16,7 +16,6 @@ namespace RedBeanPHP;
  */
 interface Adapter
 {
-
 	/**
 	 * Returns the latest SQL statement
 	 *

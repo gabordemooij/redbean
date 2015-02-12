@@ -8,7 +8,7 @@ use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\Adapter as Adapter;
 
 /**
- * @file      RedBean/ToolBox.php
+ * @file      RedBeanPHP/ToolBox.php
  * @desc      A RedBeanPHP-wide service locator
  * @author    Gabor de Mooij and the RedBeanPHP community
  * @license   BSD/GPLv2

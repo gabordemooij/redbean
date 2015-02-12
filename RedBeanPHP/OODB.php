@@ -21,7 +21,7 @@ use RedBeanPHP\Repository\Frozen as FrozenRepo;
 /**
  * RedBean Object Oriented DataBase
  *
- * @file    RedBean/OODB.php
+ * @file    RedBeanPHP/OODB.php
  * @desc    RedBean Object Database
  * @author  Gabor de Mooij and the RedBeanPHP community
  * @license BSD/GPLv2

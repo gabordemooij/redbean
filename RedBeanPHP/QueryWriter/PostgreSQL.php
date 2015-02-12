@@ -11,7 +11,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
 /**
  * RedBean PostgreSQL Query Writer
  *
- * @file    RedBean/QueryWriter/PostgreSQL.php
+ * @file    RedBeanPHP/QueryWriter/PostgreSQL.php
  * @desc    QueryWriter for the PostgreSQL database system.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

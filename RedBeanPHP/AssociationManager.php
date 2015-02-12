@@ -15,7 +15,7 @@ use RedBeanPHP\ToolBox as ToolBox;
 /**
  * Association Manager
  *
- * @file    RedBean/AssociationManager.php
+ * @file    RedBeanPHP/AssociationManager.php
  * @desc    Manages simple bean associations.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

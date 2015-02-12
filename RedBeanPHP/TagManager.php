@@ -7,12 +7,12 @@ use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedBean Tag Manager.
+ * RedBeanPHP Tag Manager.
  * The tag manager offers an easy way to quickly implement basic tagging
  * functionality.
  *
- * @file       RedBean/TagManager.php
- * @desc       RedBean Tag Manager
+ * @file       RedBeanPHP/TagManager.php
+ * @desc       RedBeanPHP Tag Manager
  * @author     Gabor de Mooij and the RedBeanPHP community
  * @license    BSD/GPLv2
  *

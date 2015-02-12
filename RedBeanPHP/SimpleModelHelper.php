@@ -9,7 +9,7 @@ use RedBeanPHP\Observable as Observable;
 /**
  * RedBean Model Helper
  *
- * @file    RedBean/ModelHelper.php
+ * @file    RedBeanPHP/ModelHelper.php
  * @desc    Connects beans to models, in essence
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

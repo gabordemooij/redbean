@@ -18,8 +18,8 @@ use RedBeanPHP\Repository as Repository;
 /**
  * Fluid Repository
  *
- * @file    RedBean/Repository/Fluid.php
- * @desc    RedBean Object Database
+ * @file    RedBeanPHP/Repository/Fluid.php
+ * @desc    RedBeanPHP Object Database
  * @author  Gabor de Mooij and the RedBeanPHP community
  * @license BSD/GPLv2
  *

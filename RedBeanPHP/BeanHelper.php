@@ -8,7 +8,7 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Bean Helper Interface
  *
- * @file    RedBean/IBeanHelper.php
+ * @file    RedBeanPHP/IBeanHelper.php
  * @desc    Interface for Bean Helper.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
