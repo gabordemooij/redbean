@@ -316,6 +316,18 @@ class FaultyWriter extends \RedBeanPHP\QueryWriter\MySQL
 		$exception->setSQLState( $this->sqlState );
 		throw $exception;
 	}
+
+	/**
+	 * Mock method.
+	 * Generates an exception when trying to invoke
+	 * getKeyMapForType via getForeignKeyForTypeProperty.
+	 *
+	 * @return void
+	 */
+	protected function getKeyMapForType()
+	{
+		throw new \RedBeanPHP\RedException\SQL;
+	}
 }
 
 /**

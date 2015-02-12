@@ -128,6 +128,14 @@ class Foreignkeys extends Base implements Observer
 	 */
 	public function testFKInspect()
 	{
+		$faultyWriter = new \FaultyWriter( R::getDatabaseAdapter() );
+		try {
+			$null = \ProxyWriter::callMethod( $faultyWriter, 'getForeignKeyForTypeProperty', 'test', 'test' );
+			pass();
+		} catch( \Exception $e ) {
+			fail();
+		}
+		asrt( is_null( $null ), TRUE );
 		$writer = R::getWriter();
 		R::nuke();
 		$book = R::dispense( 'book' );
