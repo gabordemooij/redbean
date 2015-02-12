@@ -560,7 +560,14 @@ class Facade
 	public static function dispense( $typeOrBeanArray, $num = 1, $alwaysReturnArray = FALSE )
 	{
 		if ( is_array($typeOrBeanArray) ) {
-			if ( !isset( $typeOrBeanArray['_type'] ) ) throw new RedException('Missing _type field.');
+
+			if ( !isset( $typeOrBeanArray['_type'] ) ) {
+				$list = array();
+				foreach( $typeOrBeanArray as $beanArray ) if ( !( is_array( $beanArray ) && isset( $beanArray['_type'] ) ) ) throw new RedException( 'Invalid Array Bean' );
+				foreach( $typeOrBeanArray as $beanArray ) $list[] = self::dispense( $beanArray );
+				return $list;
+			}
+
 			$import = $typeOrBeanArray;
 			$type = $import['_type'];
 			unset( $import['_type'] );

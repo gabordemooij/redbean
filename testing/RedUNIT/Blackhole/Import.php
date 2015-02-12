@@ -23,6 +23,27 @@ use RedBeanPHP\RedException as RedException;
 class Import extends Blackhole
 {
 	/**
+	 * Test multi array dispense import.
+	 *
+	 * @return void
+	 */
+	public function testMultiRecurImport()
+	{
+		$books = R::dispense( array(
+			array( '_type' => 'book', 'title' => 'book one' ),
+			array( '_type' => 'book', 'title' => 'book two' ),
+		) );
+		asrt( is_array( $books ), TRUE );
+		asrt( count( $books ), 2 );
+		$book = reset( $books );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		asrt( $book->title, 'book one' );
+		$book = next( $books );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		asrt( $book->title, 'book two' );
+	}
+
+	/**
 	 * Test recursive imports (formely known as R::graph).
 	 *
 	 * @return void
@@ -119,7 +140,23 @@ class Import extends Blackhole
 		asrt( $book->fetchAs('author')->coAuthor->name, 'Dr. Creepy' );
 
 		try {
-			R::dispense( array() );
+			$list = R::dispense( array() );
+			pass();
+			asrt( is_array( $list ), TRUE );
+			asrt( count( $list ), 0 );
+		} catch ( RedException $ex ) {
+			pass();
+		}
+
+		try {
+			R::dispense( array( array() ) );
+			fail();
+		} catch ( RedException $ex ) {
+			pass();
+		}
+
+		try {
+			R::dispense( array( 'a' ) );
 			fail();
 		} catch ( RedException $ex ) {
 			pass();
