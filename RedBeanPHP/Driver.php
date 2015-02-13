@@ -19,7 +19,6 @@ namespace RedBeanPHP;
  */
 interface Driver
 {
-
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.
 	 *

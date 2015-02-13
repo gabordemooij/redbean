@@ -22,7 +22,6 @@ use RedBeanPHP\RedException\SQL as SQLException;
  */
 class MySQL extends AQueryWriter implements QueryWriter
 {
-
 	/**
 	 * Data types
 	 */

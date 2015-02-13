@@ -16,7 +16,8 @@ use RedBeanPHP\Cursor as Cursor;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class NullCursor implements Cursor {
+class NullCursor implements Cursor
+{
 	/**
 	 * @see Cursor::getNextItem
 	 */

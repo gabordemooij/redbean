@@ -26,7 +26,6 @@ use RedBeanPHP\ToolBox as ToolBox;
  */
 class AssociationManager extends Observable
 {
-
 	/**
 	 * @var OODB
 	 */

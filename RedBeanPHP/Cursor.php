@@ -14,7 +14,8 @@ namespace RedBeanPHP;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-interface Cursor {
+interface Cursor
+{
 	/**
 	 * Retrieves the next row from the result set.
 	 *

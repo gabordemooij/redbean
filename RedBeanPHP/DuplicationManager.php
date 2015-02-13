@@ -22,7 +22,6 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
  */
 class DuplicationManager
 {
-
 	/**
 	 * @var ToolBox
 	 */

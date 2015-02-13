@@ -24,7 +24,6 @@ use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
  */
 class SimpleFacadeBeanHelper implements BeanHelper
 {
-
 	/**
 	 * Factory function to create instance of Simple Model, if any.
 	 *
@@ -112,5 +111,4 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	{
 		self::$factory = $factory;
 	}
-
 }

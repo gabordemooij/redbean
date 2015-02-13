@@ -22,7 +22,6 @@ use RedBeanPHP\Driver as Driver;
  */
 class DBAdapter extends Observable implements Adapter
 {
-
 	/**
 	 * @var Driver
 	 */

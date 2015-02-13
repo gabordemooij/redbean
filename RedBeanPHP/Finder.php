@@ -21,7 +21,6 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Finder
 {
-
 	/**
 	 * @var ToolBox
 	 */

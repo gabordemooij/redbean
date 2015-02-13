@@ -18,7 +18,6 @@ use RedBeanPHP\RedException as RedException;
  */
 class SQL extends RedException
 {
-
 	/**
 	 * @var string
 	 */

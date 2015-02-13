@@ -25,7 +25,8 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-abstract class AQueryWriter { //bracket must be here - otherwise coverage software does not understand.
+abstract class AQueryWriter
+{ 
 	/**
 	 * @var DBAdapter
 	 */

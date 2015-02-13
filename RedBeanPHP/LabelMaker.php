@@ -19,7 +19,6 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class LabelMaker
 {
-
 	/**
 	 * @var ToolBox
 	 */

@@ -28,7 +28,8 @@ use RedBeanPHP\Repository as Repository;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class BeanCollection {
+class BeanCollection
+{
 	/**
 	 * @var Cursor
 	 */

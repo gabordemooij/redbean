@@ -36,7 +36,6 @@ use RedBeanPHP\Repository as Repository;
  */
 class Fluid extends Repository
 {
-
 	/**
 	 * Figures out the desired type given the cast string ID.
 	 *
