@@ -9,38 +9,30 @@ if ($_SERVER['argc']>1) $mode = $_SERVER['argv'][1];
 	echo "-------------------------------------------\n";
 
 	if ($mode !== 'onlyphp') {
-
-	echo "Cleaning up... ";
-	@exec('rm rb.phar; rm -Rf build');
-	echo "Done.\n";
-
-	echo "Trying to create a directory called build to build the PHAR... ";
-	@mkdir('build');
-	echo "Done.\n";
-
-	echo "Trying to copy RedBeanPHP to build/RedBeanPHP... ";
-	@exec('cp -R RedBeanPHP build/RedBeanPHP');
-	echo "Done.\n";
-
-	echo "Moving loader to build folder... ";
-	@exec('mv build/RedBeanPHP/loader.php build/');
-	echo "Done.\n";
-
-	echo "Creating PHAR archive... ";
-	$phar = new Phar("rb.phar", 0, "rb.phar");
-	$phar->buildFromDirectory('./build', '/^((?!loader\.php).)*$/');
-	echo "Done.\n";
-
-	echo "Adding stub... ";
-	$stub = "<"."?php Phar::mapPhar();\n";
-	$stub .= str_replace('<'.'?php','',file_get_contents('build/loader.php'));
-	$stub .= "__HALT_COMPILER();\n";
-	$phar->setStub($stub);
-	echo "Done.\n";
-
-	echo "Your PHAR file has been generated.\n";
-
-}
+		echo "Cleaning up... ";
+		@exec('rm rb.phar; rm -Rf build');
+		echo "Done.\n";
+		echo "Trying to create a directory called build to build the PHAR... ";
+		@mkdir('build');
+		echo "Done.\n";
+		echo "Trying to copy RedBeanPHP to build/RedBeanPHP... ";
+		@exec('cp -R RedBeanPHP build/RedBeanPHP');
+		echo "Done.\n";
+		echo "Moving loader to build folder... ";
+		@exec('mv build/RedBeanPHP/loader.php build/');
+		echo "Done.\n";
+		echo "Creating PHAR archive... ";
+		$phar = new Phar("rb.phar", 0, "rb.phar");
+		$phar->buildFromDirectory('./build', '/^((?!loader\.php).)*$/');
+		echo "Done.\n";
+		echo "Adding stub... ";
+		$stub = "<"."?php Phar::mapPhar();\n";
+		$stub .= str_replace('<'.'?php','',file_get_contents('build/loader.php'));
+		$stub .= "__HALT_COMPILER();\n";
+		$phar->setStub($stub);
+		echo "Done.\n";
+		echo "Your PHAR file has been generated.\n";
+	}
 
 if ($mode !== 'onlyphar') {
 
