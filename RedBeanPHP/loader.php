@@ -18,6 +18,10 @@ require( REDBEANPHP_MAIN_DIR . 'Observer.php' );
 //Load Database Adapters
 require( REDBEANPHP_MAIN_DIR . 'Adapter.php' );
 require( REDBEANPHP_MAIN_DIR . 'Adapter/DBAdapter.php' );
+require( REDBEANPHP_MAIN_DIR . 'Cursor.php');
+require( REDBEANPHP_MAIN_DIR . 'Cursor/PDOCursor.php');
+require( REDBEANPHP_MAIN_DIR . 'Cursor/NullCursor.php');
+require( REDBEANPHP_MAIN_DIR . 'BeanCollection.php' );
 
 //Load SQL drivers
 require( REDBEANPHP_MAIN_DIR . 'QueryWriter.php' );
@@ -46,7 +50,6 @@ require( REDBEANPHP_MAIN_DIR . 'BeanHelper.php' );
 require( REDBEANPHP_MAIN_DIR . 'BeanHelper/SimpleFacadeBeanHelper.php' );
 
 /* Developer Comfort */
-
 require( REDBEANPHP_MAIN_DIR . 'SimpleModel.php' );
 require( REDBEANPHP_MAIN_DIR . 'SimpleModelHelper.php' );
 require( REDBEANPHP_MAIN_DIR . 'TagManager.php' );
