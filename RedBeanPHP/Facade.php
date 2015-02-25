@@ -1804,6 +1804,22 @@ class Facade
 	}
 
 	/**
+	 * Alias for setAutoResolve() method on OODBBean.
+	 * Enables or disables auto-resolving fetch types.
+	 * Auto-resolving aliased parent beans is convenient but can
+	 * be slower and can create infinite recursion if you
+	 * used aliases to break cyclic relations in your domain.
+	 *
+	 * @param boolean $automatic TRUE to enable automatic resolving aliased parents
+	 *
+	 * @return void
+	 */
+	public static function setAutoResolve( $automatic = TRUE )
+	{
+		OODBBean::setAutoResolve( (boolean) $automatic );
+	}
+
+	/**
 	 * Dynamically extends the facade with a plugin.
 	 * Using this method you can register your plugin with the facade and then
 	 * use the plugin by invoking the name specified plugin name as a method on

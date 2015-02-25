@@ -38,6 +38,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	protected static $aliases = array();
 
 	/**
+	 * @var boolean
+	 */
+	protected static $autoResolve = FALSE;
+
+	/**
 	 * FUSE error modes.
 	 */
 	const C_ERR_IGNORE    = FALSE;
@@ -109,6 +114,21 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	public static function aliases( $list )
 	{
 		self::$aliases = $list;
+	}
+
+	/**
+	 * Enables or disables auto-resolving fetch types.
+	 * Auto-resolving aliased parent beans is convenient but can
+	 * be slower and can create infinite recursion if you
+	 * used aliases to break cyclic relations in your domain.
+	 *
+	 * @param boolean $automatic TRUE to enable automatic resolving aliased parents
+	 *
+	 * @return void
+	 */
+	public static function setAutoResolve( $automatic = TRUE )
+	{
+		self::$autoResolve = (boolean) $automatic;
 	}
 
 	/**
@@ -901,7 +921,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 				if ( !is_null( $this->properties[$fieldLink] ) ) {
 					$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 					//If the IDs dont match, we failed to load, so try autoresolv in that case...
-					if ( $bean->id !== $this->properties[$fieldLink] ) {
+					if ( $bean->id !== $this->properties[$fieldLink] && self::$autoResolve ) {
 						$type = $this->beanHelper->getToolbox()->getWriter()->inferFetchType( $this->__info['type'], $property );
 						if ( !is_null( $type) ) {
 							$bean = $redbean->load( $type, $this->properties[$fieldLink] );

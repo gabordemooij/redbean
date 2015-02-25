@@ -39,6 +39,7 @@ class Foreignkeys extends Base implements Observer
 	 */
 	public function testAutoResolvAvoid()
 	{
+		R::setAutoResolve( TRUE );
 		R::nuke();
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
@@ -68,6 +69,17 @@ class Foreignkeys extends Base implements Observer
 		$book->cover;
 		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
 		R::aliases( array() );
+		R::nuke();
+		R::setAutoResolve( FALSE );
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->cover = $page;
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
+		$book->cover;
+		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
+		R::setAutoResolve( TRUE );
 	}
 
 	/**
