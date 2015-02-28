@@ -10,12 +10,10 @@ use RedBeanPHP\RedException\Security as Security;
  * Logger. Provides a basic logging function for RedBeanPHP.
  *
  * @file    RedBeanPHP/Logger.php
- * @desc    Logger
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *
- * Provides a basic logging function for RedBeanPHP.
- *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

@@ -9,18 +9,17 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
- * RedBean Abstract Query Writer
- *
- * @file    RedBeanPHP/QueryWriter/AQueryWriter.php
- * @desc    Query Writer (abstract class)
- * @author  Gabor de Mooij and the RedBeanPHP Community
- * @license BSD/GPLv2
- *
+ * RedBeanPHP Abstract Query Writer.
  * Represents an abstract Database to RedBean
  * To write a driver for a different database for RedBean
  * Contains a number of functions all implementors can
  * inherit or override.
  *
+ * @file    RedBeanPHP/QueryWriter/AQueryWriter.php
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
+ *
+ * @copyright
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

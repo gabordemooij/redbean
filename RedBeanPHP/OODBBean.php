@@ -9,13 +9,18 @@ use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * OODBBean (Object Oriented DataBase Bean)
+ * OODBBean (Object Oriented DataBase Bean).
+ * 
+ * to exchange information with the database. A bean represents
+ * a single table row and offers generic services for interaction
+ * with databases systems as well as some meta-data.
  *
  * @file    RedBeanPHP/OODBBean.php
- * @desc    The Bean class used for passing information
  * @author  Gabor de Mooij and the RedBeanPHP community
  * @license BSD/GPLv2
- *
+ * @desc    OODBBean represents a bean. RedBeanPHP uses beans
+ * 
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
@@ -788,8 +793,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		return $beautifulColumns[$property];
 	}
-
-	
 
 	/**
 	 * Clears all modifiers.
@@ -1765,6 +1768,4 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			&& ( (string) $this->__info['type']   === (string) $bean->__info['type']   )
 		);
 	}
-
-
 }

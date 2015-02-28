@@ -8,24 +8,24 @@ use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * RedBeanPHP Tag Manager.
+ *
  * The tag manager offers an easy way to quickly implement basic tagging
  * functionality.
- *
- * @file       RedBeanPHP/TagManager.php
- * @desc       RedBeanPHP Tag Manager
- * @author     Gabor de Mooij and the RedBeanPHP community
- * @license    BSD/GPLv2
  *
  * Provides methods to tag beans and perform tag-based searches in the
  * bean database.
  *
+ * @file       RedBeanPHP/TagManager.php
+ * @author     Gabor de Mooij and the RedBeanPHP community
+ * @license    BSD/GPLv2
+ *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 class TagManager
 {
-
 	/**
 	 * @var ToolBox
 	 */

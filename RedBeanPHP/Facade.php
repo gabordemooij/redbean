@@ -30,16 +30,16 @@ use RedBeanPHP\Driver\RPDO as RPDO;
  *
  * Version Information
  * RedBean Version @version 4.2
- *
- * @file    RedBeanPHP/Facade.php
- * @desc    Convenience class for RedBeanPHP.
- * @author  Gabor de Mooij and the RedBeanPHP Community
- * @license BSD/GPLv2
- *
+ * 
  * This class hides the object landscape of
  * RedBeanPHP behind a single letter class providing
  * almost all functionality with simple static calls.
  *
+ * @file    RedBeanPHP/Facade.php
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
+ *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

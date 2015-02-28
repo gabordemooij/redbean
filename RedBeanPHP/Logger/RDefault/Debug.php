@@ -10,14 +10,13 @@ use RedBeanPHP\RedException\Security as Security;
 /**
  * Debug logger.
  * A special logger for debugging purposes.
+ * Provides debugging logging functions for RedBeanPHP.
  *
  * @file    RedBeanPHP/Logger/RDefault/Debug.php
- * @desc    Debug Logger
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *
- * Provides a debugging logging functions for RedBeanPHP.
- *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

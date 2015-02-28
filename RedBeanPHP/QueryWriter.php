@@ -4,14 +4,10 @@ namespace RedBeanPHP;
 
 /**
  * QueryWriter
- * Interface for QueryWriters
+ * Interface for QueryWriters.
+ * Describes the API for a QueryWriter.
  *
- * @file    RedBeanPHP/QueryWriter.php
- * @desc    Describes the API for a QueryWriter
- * @author  Gabor de Mooij and the RedBeanPHP community
- * @license BSD/GPLv2
- *
- *	Terminology:
+ * Terminology:
  *
  * - beautified property (a camelCased property, has to be converted first)
  * - beautified type (a camelCased type, has to be converted first)
@@ -22,6 +18,11 @@ namespace RedBeanPHP;
  * - tableNoQ (same as type, but in context of a database operation)
  * - columnNoQ (same as property, but in context of a database operation)
  *
+ * @file    RedBeanPHP/QueryWriter.php
+ * @author  Gabor de Mooij and the RedBeanPHP community
+ * @license BSD/GPLv2
+ *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

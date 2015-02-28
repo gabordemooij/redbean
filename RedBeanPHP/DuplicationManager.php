@@ -9,13 +9,14 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 /**
- * Duplication Manager
+ * Duplication Manager.
+ * Creates deep copies of beans.
  *
  * @file    RedBeanPHP/DuplicationManager.php
- * @desc    Creates deep copies of beans
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

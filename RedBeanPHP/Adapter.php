@@ -3,13 +3,16 @@
 namespace RedBeanPHP;
 
 /**
- * Adapter Interface
+ * Adapter Interface.
+ * Describes the API for a RedBeanPHP Database Adapter.
+ * This interface defines the API contract for
+ * a RedBeanPHP Database Adapter.  
  *
  * @file    RedBeanPHP/Adapter.php
- * @desc    Describes the API for a RedBean Database Adapter.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *
+ * @copyright
  * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

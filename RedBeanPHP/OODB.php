@@ -17,20 +17,19 @@ use RedBeanPHP\Repository as Repository;
 use RedBeanPHP\Repository\Fluid as FluidRepo;
 use RedBeanPHP\Repository\Frozen as FrozenRepo;
 
-
 /**
- * RedBean Object Oriented DataBase
- *
- * @file    RedBeanPHP/OODB.php
- * @desc    RedBean Object Database
- * @author  Gabor de Mooij and the RedBeanPHP community
- * @license BSD/GPLv2
- *
+ * RedBean Object Oriented DataBase.
+ * 
  * The RedBean OODB Class is the main class of RedBeanPHP.
  * It takes OODBBean objects and stores them to and loads them from the
  * database as well as providing other CRUD functions. This class acts as a
  * object database.
  *
+ * @file    RedBeanPHP/OODB.php
+ * @author  Gabor de Mooij and the RedBeanPHP community
+ * @license BSD/GPLv2
+ *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

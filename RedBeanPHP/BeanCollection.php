@@ -6,12 +6,7 @@ use RedBeanPHP\Cursor as Cursor;
 use RedBeanPHP\Repository as Repository;
 
 /**
- * BeanCollection
- *
- * @file    RedBeanPHP/BeanCollection.php
- * @desc    Represents a collection of beans
- * @author  Gabor de Mooij and the RedBeanPHP community
- * @license BSD/GPLv2
+ * BeanCollection.
  *
  * The BeanCollection represents a collection of beans and
  * makes it possible to use database cursors. The BeanCollection
@@ -24,6 +19,11 @@ use RedBeanPHP\Repository as Repository;
  * option. Keep in mind that ID-marking (querying a start ID) is a decent
  * alternative though.
  *
+ * @file    RedBeanPHP/BeanCollection.php
+ * @author  Gabor de Mooij and the RedBeanPHP community
+ * @license BSD/GPLv2
+ *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

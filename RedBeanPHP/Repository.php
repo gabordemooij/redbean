@@ -17,12 +17,7 @@ use RedBeanPHP\Cursor as Cursor;
 use RedBeanPHP\Cursor\NullCursor as NullCursor;
 
 /**
- * Abstract Repository
- *
- * @file    RedBeanPHP/Repository.php
- * @desc    RedBean Object Database
- * @author  Gabor de Mooij and the RedBeanPHP community
- * @license BSD/GPLv2
+ * Abstract Repository.
  *
  * OODB manages two repositories, a fluid one that
  * adjust the database schema on-the-fly to accomodate for
@@ -31,6 +26,11 @@ use RedBeanPHP\Cursor\NullCursor as NullCursor;
  * allows you to swap the repository instances using the freeze()
  * method.
  *
+ * @file    RedBeanPHP/Repository.php
+ * @author  Gabor de Mooij and the RedBeanPHP community
+ * @license BSD/GPLv2
+ * 
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

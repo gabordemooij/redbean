@@ -12,14 +12,16 @@ use RedBeanPHP\Cursor\PDOCursor as PDOCursor;
 
 /**
  * PDO Driver
- * This Driver implements the RedBean Driver API
+ * This Driver implements the RedBean Driver API.
+ * for RedBeanPHP. This is the standard / default database driver
+ * for RedBeanPHP.
  *
  * @file    RedBeanPHP/PDO.php
- * @desc    RPDO Driver
  * @author  Gabor de Mooij and the RedBeanPHP Community, Desfrenes
  * @license BSD/GPLv2
  *
- * (c) copyright Desfrenes & Gabor de Mooij and the RedBeanPHP community
+ * @copyright
+ * copyright (c) Desfrenes & Gabor de Mooij and the RedBeanPHP community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */

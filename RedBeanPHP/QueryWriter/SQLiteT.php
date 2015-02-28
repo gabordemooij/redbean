@@ -9,13 +9,15 @@ use RedBeanPHP\Adapter as Adapter;
 use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
- * RedBean SQLiteWriter with support for SQLite types
+ * RedBeanPHP SQLiteWriter with support for SQLite types
+ * This is a QueryWriter class for RedBeanPHP.
+ * This QueryWriter provides support for the SQLite database platform.
  *
  * @file    RedBeanPHP/QueryWriter/SQLiteT.php
- * @desc    Represents a SQLite Database to RedBean
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *
+ * @copyright
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

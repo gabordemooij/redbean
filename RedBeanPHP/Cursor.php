@@ -3,13 +3,14 @@
 namespace RedBeanPHP;
 
 /**
- * Database Cursor Interface
+ * Database Cursor Interface.
+ * Represents a simple database cursor.
  *
  * @file    RedBeanPHP/Cursor.php
- * @desc    Represents a simple database cursor.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

@@ -9,13 +9,18 @@ use RedBeanPHP\Driver as Driver;
 /**
  * DBAdapter (Database Adapter)
  *
+ * An adapter class to connect various database systems to RedBean
+ * Database Adapter Class. The task of the database adapter class is to
+ * communicate with the database driver. You can use all sorts of database
+ * drivers with RedBeanPHP. The default database drivers that ships with
+ * the RedBeanPHP library is the RPDO driver ( which uses the PHP Data Objects
+ * Architecture aka PDO ).
+ *
  * @file    RedBeanPHP/Adapter/DBAdapter.php
- * @desc    An adapter class to connect various database systems to RedBean
  * @author  Gabor de Mooij and the RedBeanPHP Community.
  * @license BSD/GPLv2
  *
- * Database Adapter Class.
- *
+ * @copyright
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

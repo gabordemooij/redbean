@@ -7,15 +7,16 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Observable as Observable;
 
 /**
- * RedBean Model Helper
+ * RedBean Model Helper.
+ *
+ * Connects beans to models.
+ * This is the core of so-called FUSE.
  *
  * @file    RedBeanPHP/ModelHelper.php
- * @desc    Connects beans to models, in essence
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *
- * This is the core of so-called FUSE.
- *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

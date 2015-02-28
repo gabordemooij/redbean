@@ -9,15 +9,16 @@ use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
 
 /**
  * Bean Helper.
+ *
  * The Bean helper helps beans to access access the toolbox and
  * FUSE models. This Bean Helper makes use of the facade to obtain a
  * reference to the toolbox.
  *
  * @file    RedBeanPHP/BeanHelperFacade.php
- * @desc    Finds the toolbox for the bean.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *
+ * @copyright
  * (c) copyright G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

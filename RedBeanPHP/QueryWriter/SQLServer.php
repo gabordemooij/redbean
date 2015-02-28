@@ -8,13 +8,20 @@ use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use \RedBeanPHP\Adapter as Adapter;
 
 /**
- * RedBean SQLServerWriter
+ * RedBeanPHP SQLServerWriter
  *
  * @file    RedBeanPHP/QueryWriter/SQLServer.php
- * @desc    Represents a SQLServer Database to RedBean
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
+ * @desc    3rd party / community plugin for SQL Server Support
  *
+ * This is a 3rd party QueryWriter for MS SQL Server databases.
+ * This plugin Query Writer is experimental, be careful.
+ * This plugin has *not been tested* by RedUNIT test suite and is
+ * not considered an official part of RedBeanPHP. This plugin resides
+ * in the RedBeanPHP repository for convenience only.
+ *
+ * @copyright
  * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

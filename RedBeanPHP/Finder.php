@@ -8,13 +8,14 @@ use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * RedBeanPHP Finder
+ * RedBeanPHP Finder.
+ * Helper class to harmonize APIs.
  *
  * @file    RedBeanPHP/Finder.php
- * @desc    Helper class to harmonize APIs.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.

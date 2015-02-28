@@ -6,23 +6,22 @@ use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
- * Bean Helper Interface
- *
- * @file    RedBeanPHP/IBeanHelper.php
- * @desc    Interface for Bean Helper.
- * @author  Gabor de Mooij and the RedBeanPHP Community
- * @license BSD/GPLv2
- *
+ * Bean Helper Interface.
+ * 
  * Interface for Bean Helper.
  * A little bolt that glues the whole machinery together.
  *
+ * @file    RedBeanPHP/IBeanHelper.php
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license BSD/GPLv2
+ *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
 interface BeanHelper
 {
-
 	/**
 	 * Returns a toolbox to empower the bean.
 	 * This allows beans to perform OODB operations by themselves,

@@ -16,13 +16,7 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\Repository as Repository;
 
 /**
- * Frozen Repository
- *
- * @file    RedBeanPHP/Repository/Frozen.php
- * @desc    RedBeanPHP Object Database
- * @author  Gabor de Mooij and the RedBeanPHP community
- * @license BSD/GPLv2
- *
+ * Frozen Repository.
  * OODB manages two repositories, a fluid one that
  * adjust the database schema on-the-fly to accomodate for
  * new bean types (tables) and new properties (columns) and
@@ -30,6 +24,11 @@ use RedBeanPHP\Repository as Repository;
  * allows you to swap the repository instances using the freeze()
  * method.
  *
+ * @file    RedBeanPHP/Repository/Frozen.php
+ * @author  Gabor de Mooij and the RedBeanPHP community
+ * @license BSD/GPLv2
+ *
+ * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
