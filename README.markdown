@@ -1,8 +1,6 @@
 RedBeanPHP 4
 ============
 
-Current Build Status:
-
 ![Build Status](https://travis-ci.org/gabordemooij/redbean.svg?branch=master)
 
 RedBeanPHP is an easy to use ORM tool for PHP.
