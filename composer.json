@@ -1,0 +1,27 @@
+{
+  "name": "simirimia/RedBeanPHP",
+  "description": "composer-enabled fork of RedBeanPHP ORM",
+  "keywords": ["orm"],
+  "homepage": "https://github.com/simirimia/redbean",
+  "license": "New BSD / GPLv2",
+  "authors": [
+    {
+      "name": "Gabor de Mooji",
+      "email": "gabor@redbeanphp.com",
+      "homepage": "http://redbeanphp.com"
+    },
+    {
+      "name": "Verena Ruff",
+      "email": "simirimia@triosolutions.at",
+      "homepage": "https://github.com/simirimia"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "RedBeanPHP\\" : "RedBeanPHP"
+    }
+  }
+}
