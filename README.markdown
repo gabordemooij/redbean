@@ -9,7 +9,7 @@ RedBeanPHP is an easy to use ORM tool for PHP.
 
 * Automatically creates tables and columns as you go
 * No configuration, just fire and forget
-~~* No complicated package tools, no autoloaders, just ONE file~~ 
+* ~~No complicated package tools, no autoloaders, just ONE file~~ 
 This fork uses composer as package tool, comes in multiple files and provides support for the composer autloader. So just
 add this package as a dependency to your composer.json file, include the composer autoload.php file and you are ready to go.
 
@@ -19,11 +19,11 @@ Quick Example
 
 How we store a book object with RedBeanPHP:
 ```php
-~~$book = R::dispense("book");~~
+/* original: $book = R::dispense("book"); */
 $book = \ReadBeanPHP\R::dispense("book");
 $book->author = "Santa Claus";
 $book->title = "Secrets of Christmas";
-~~$id = R::store( $book );~~
+/* original: $id = R::store( $book ); */
 $id = \ReadBeanPHP\R::store( $book );
 ```
 
