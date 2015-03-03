@@ -31,10 +31,9 @@ Yep, it's that simple. Still simple, I think, even if you have to add the ReadBe
 Or just 
 ```php
 use \ReadBeanPHP\R;
-$book = \ReadBeanPHP\R::dispense("book");
+$book = R::dispense("book");
 $book->author = "Santa Claus";
 $book->title = "Secrets of Christmas";
-$id = \ReadBeanPHP\R::store( $book );
 $id = R::store( $book );
 ```
 
