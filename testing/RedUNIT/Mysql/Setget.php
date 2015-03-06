@@ -20,6 +20,19 @@ use RedBeanPHP\Facade as R;
 class Setget extends Mysql
 {
 	/**
+	 * Tests R::getInsertID convenience method.
+	 *
+	 * @return void
+	 */
+	public function testGetInsertID()
+	{
+		R::nuke();
+		$id = R::store( R::dispense( 'book' ) );
+		$id2 = R::getInsertID();
+		asrt( $id, $id2 );
+	}
+
+	/**
 	 * Test numbers.
 	 *
 	 * @return void

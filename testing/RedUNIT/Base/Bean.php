@@ -18,7 +18,42 @@ use RedBeanPHP\Facade as R;
  */
 class Bean extends Base
 {
-
+	/**
+	 * Test beautification conflicts...
+	 * Issue #418
+	 *
+	 * @return void
+	 */
+	public function testBeau()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->ownerId = 2;
+		$book->ownerCritic = 'a';
+		$book->sharedbyReader = 'b';
+		$id = R::store( $book );
+		$columns = R::inspect( 'book' );
+		asrt( isset( $columns['owner_id'] ), TRUE );
+		asrt( isset( $columns['owner_critic'] ), TRUE );
+		asrt( isset( $columns['sharedby_reader'] ), TRUE );
+		asrt( isset( $columns['ownerId'] ), FALSE );
+		asrt( isset( $columns['ownerCritic'] ), FALSE );
+		asrt( isset( $columns['sharedbyReader'] ), FALSE );
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->xownerId = 2;
+		$book->xownerCritic = 'a';
+		$book->sharedbyReader = 'b';
+		$id = R::store( $book );
+		$columns = R::inspect( 'book' );
+		asrt( isset( $columns['xowner_id'] ), TRUE );
+		asrt( isset( $columns['xowner_critic'] ), TRUE );
+		asrt( isset( $columns['sharedby_reader'] ), TRUE );
+		asrt( isset( $columns['xownerId'] ), FALSE );
+		asrt( isset( $columns['xownerCritic'] ), FALSE );
+		asrt( isset( $columns['sharedbyReader'] ), FALSE );
+	}
+	
 	/**
 	 * Other tests...
 	 */

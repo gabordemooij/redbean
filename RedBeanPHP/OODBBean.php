@@ -778,9 +778,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		if ( ctype_lower( $property ) ) return $property;
 
 		if (
-			strpos( $property, 'own' ) === 0
-			|| strpos( $property, 'xown' ) === 0
-			|| strpos( $property, 'shared' ) === 0
+			( strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) ) )
+			|| ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) )
+			|| ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) )
 		) {
 
 			$property = preg_replace( '/List$/', '', $property );

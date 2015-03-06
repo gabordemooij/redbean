@@ -887,6 +887,17 @@ class Facade
 	}
 
 	/**
+	 * Returns the insert ID for databases that support/require this
+	 * functionality. Alias for R::getAdapter()->getInsertID().
+	 *
+	 * @return mixed
+	 */
+	public static function getInsertID()
+	{
+		return self::$adapter->getInsertID();
+	}
+
+	/**
 	 * Makes a copy of a bean. This method makes a deep copy
 	 * of the bean.The copy will have the following features.
 	 * - All beans in own-lists will be duplicated as well
