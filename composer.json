@@ -3,7 +3,7 @@
   "description": "composer-enabled fork of RedBeanPHP ORM",
   "keywords": ["orm"],
   "homepage": "https://github.com/simirimia/redbean",
-  "license": "New BSD / GPLv2",
+  "license": "New BSD and GPLv2",
   "authors": [
     {
       "name": "Gabor de Mooji",
