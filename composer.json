@@ -1,5 +1,5 @@
 {
-  "name": "simirimia/RedBeanPHP",
+  "name": "simirimia/redbean",
   "description": "composer-enabled fork of RedBeanPHP ORM",
   "keywords": ["orm"],
   "homepage": "https://github.com/simirimia/redbean",
