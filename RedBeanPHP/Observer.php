@@ -23,7 +23,7 @@ interface Observer
 	/**
 	 * An observer object needs to be capable of receiving
 	 * notifications. Therefore the observer needs to implement the
-	 * onEvent method with two parameters, the event identifier specifying the
+	 * onEvent method with two parameters: the event identifier specifying the
 	 * current event and a message object (in RedBeanPHP this can also be a bean).
 	 * 
 	 * @param string $eventname event identifier
