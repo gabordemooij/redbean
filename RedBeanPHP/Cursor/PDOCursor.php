@@ -7,6 +7,7 @@ use RedBeanPHP\Cursor as Cursor;
 /**
  * PDO Database Cursor
  * Implementation of PDO Database Cursor.
+ * Used by the BeanCollection to fetch one bean at a time.
  *
  * @file    RedBeanPHP/Cursor/PDOCursor.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -20,7 +21,7 @@ use RedBeanPHP\Cursor as Cursor;
 class PDOCursor implements Cursor
 {
 	/**
-	 * @var \PDOStatement
+	 * @var PDOStatement
 	 */
 	protected $res;
 
@@ -32,7 +33,7 @@ class PDOCursor implements Cursor
 	/**
 	 * Constructor, creates a new instance of a PDO Database Cursor.
 	 *
-	 * @param \PDOStatement $res        the PDO statement
+	 * @param PDOStatement  $res        the PDO statement
 	 * @param string        $fetchStyle fetch style constant to use
 	 *
 	 * @return void

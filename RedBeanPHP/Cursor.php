@@ -5,6 +5,7 @@ namespace RedBeanPHP;
 /**
  * Database Cursor Interface.
  * Represents a simple database cursor.
+ * Cursors make it possible to create lightweight BeanCollections.
  *
  * @file    RedBeanPHP/Cursor.php
  * @author  Gabor de Mooij and the RedBeanPHP Community

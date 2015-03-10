@@ -7,6 +7,7 @@ use RedBeanPHP\Cursor as Cursor;
 /**
  * NULL Database Cursor
  * Implementation of the NULL Cursor.
+ * Used for an empty BeanCollection.
  *
  * @file    RedBeanPHP/Cursor/NULLCursor.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
