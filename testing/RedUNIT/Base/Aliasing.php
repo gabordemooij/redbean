@@ -368,7 +368,7 @@ class Aliasing extends Base
 
 		foreach (
 			array(
-				new \stdClass(), "a string", 1928, TRUE, NULL, array()
+				"a string", 1928, TRUE, NULL, array()
 			)
 			as $value
 		) {
