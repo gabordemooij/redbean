@@ -24,7 +24,3 @@ Thumbs.db
 /rb.phar
 /rb.php
 build/
-.idea
-
-# local tools for source code management #
-sync_upstream.sh
