@@ -39,9 +39,10 @@ class RDefault implements Logger
 	/**
 	 * Default logger method logging to STDOUT.
 	 * This is the default/reference implementation of a logger.
-	 * This method will write the message value to STDOUT (screen).
+	 * This method will write the message value to STDOUT (screen) unless
+	 * you have changed the mode of operation to C_LOGGER_ARRAY.
 	 *
-	 * @param $message (optional)
+	 * @param $message (optional) message to log (might also be data or output)
 	 *
 	 * @return void
 	 */
@@ -70,7 +71,8 @@ class RDefault implements Logger
 	}
 	
 	/**
-	 * Returns the logs array.
+	 * Returns the internal log array.
+	 * The internal log array is where all log messages are stored.
 	 * 
 	 * @return array
 	 */
@@ -80,7 +82,8 @@ class RDefault implements Logger
 	}
 	
 	/**
-	 * Empties the logs array.
+	 * Clears the internal log array, removing all
+	 * previously stored entries.
 	 * 
 	 * @return self
 	 */
@@ -92,17 +95,19 @@ class RDefault implements Logger
 	
 	/**
 	 * Selects a logging mode.
-	 * Mode 0 means echoing all statements, while mode 1
-	 * means populating the logs array.
+	 * There are several options available.
 	 * 
-	 * @param integer $mode mode
+	 * C_LOGGER_ARRAY - log silently, stores entries in internal log array only
+	 * C_LOGGER_ECHO  - also forward log messages directly to STDOUT
+	 *  
+	 * @param integer $mode mode of operation for logging object
 	 * 
 	 * @return self
 	 */
 	public function setMode( $mode )
 	{
 		if ($mode !== self::C_LOGGER_ARRAY && $mode !== self::C_LOGGER_ECHO ) {
-			throw new RedException( 'Invalid mode selected for logger, use 1 or 0.' );
+			throw new RedException( 'Invalid mode selected for logger, use C_LOGGER_ARRAY or C_LOGGER_ECHO.' );
 		}
 		$this->mode = $mode;
 		return $this;
@@ -111,16 +116,18 @@ class RDefault implements Logger
 	/**
 	 * Searches for all log entries in internal log array
 	 * for $needle and returns those entries.
-	 * 
-	 * @param string $needle needle
-	 * 
+	 * This method will return an array containing all matches for your
+	 * search query.
+	 *
+	 * @param string $needle phrase to look for in internal log array
+	 *
 	 * @return array
 	 */
 	public function grep( $needle )
 	{
 		$found = array();
 		foreach( $this->logs as $logEntry ) {
-			if (strpos( $logEntry, $needle ) !== false) $found[] = $logEntry;
+			if ( strpos( $logEntry, $needle ) !== FALSE ) $found[] = $logEntry;
 		}
 		return $found;
 	}
