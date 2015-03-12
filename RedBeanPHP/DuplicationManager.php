@@ -87,8 +87,8 @@ class DuplicationManager
 	 * Copies the shared beans in a bean, i.e. all the sharedBean-lists.
 	 *
 	 * @param OODBBean $copy   target bean to copy lists to
-	 * @param string           $shared name of the shared list
-	 * @param array            $beans  array with shared beans to copy
+	 * @param string   $shared name of the shared list
+	 * @param array    $beans  array with shared beans to copy
 	 *
 	 * @return void
 	 */
@@ -107,10 +107,10 @@ class DuplicationManager
 	 * we need to invoke the duplicate method again to duplicate each bean here.
 	 *
 	 * @param OODBBean $copy        target bean to copy lists to
-	 * @param string           $owned       name of the own list
-	 * @param array            $beans       array with shared beans to copy
-	 * @param array            $trail       array with former beans to detect recursion
-	 * @param boolean          $preserveIDs TRUE means preserve IDs, for export only
+	 * @param string   $owned       name of the own list
+	 * @param array    $beans       array with shared beans to copy
+	 * @param array    $trail       array with former beans to detect recursion
+	 * @param boolean  $preserveIDs TRUE means preserve IDs, for export only
 	 *
 	 * @return void
 	 */
@@ -149,7 +149,7 @@ class DuplicationManager
 	 * occurs in the trail, if not the bean will be added to the trail.
 	 * Returns TRUE if the bean occurs in the trail and FALSE otherwise.
 	 *
-	 * @param array            $trail list of former beans
+	 * @param array    $trail list of former beans
 	 * @param OODBBean $bean  currently selected bean
 	 *
 	 * @return boolean
@@ -217,9 +217,9 @@ class DuplicationManager
 	/**
 	 * @see DuplicationManager::dup
 	 *
-	 * @param OODBBean $bean          bean to be copied
-	 * @param array            $trail         trail to prevent infinite loops
-	 * @param boolean          $preserveIDs   preserve IDs
+	 * @param OODBBean $bean        bean to be copied
+	 * @param array    $trail       trail to prevent infinite loops
+	 * @param boolean  $preserveIDs preserve IDs
 	 *
 	 * @return OODBBean
 	 */
@@ -276,7 +276,15 @@ class DuplicationManager
 	 * If the tables are available the duplication manager will not query them so
 	 * this might be beneficial for performance.
 	 *
-	 * @param array $tables
+	 * This method allows two array formats:
+	 *
+	 * array( TABLE1, TABLE2 ... )
+	 *
+	 * or
+	 *
+	 * array( TABLE1 => array( COLUMN1, COLUMN2 ... ) ... )
+	 *
+	 * @param array $tables a table cache array
 	 *
 	 * @return void
 	 */
@@ -296,6 +304,8 @@ class DuplicationManager
 
 	/**
 	 * Returns a schema array for cache.
+	 * You can use the return value of this method as a cache,
+	 * store it in RAM or on disk and pass it to setTables later.
 	 *
 	 * @return array
 	 */
@@ -310,7 +320,7 @@ class DuplicationManager
 	 * only once. Otherwise the duplicationmanager will, by default, query the schema
 	 * every time a duplication action is performed (dup()).
 	 *
-	 * @param boolean $yesNo
+	 * @param boolean $yesNo TRUE to use caching, FALSE otherwise
 	 */
 	public function setCacheTables( $yesNo )
 	{
@@ -324,7 +334,7 @@ class DuplicationManager
 	 * deep copy. If no filters are set all types will be taking into account, this is
 	 * the default behavior.
 	 *
-	 * @param array $filters
+	 * @param array $filters list of tables to be filtered
 	 */
 	public function setFilters( $filters )
 	{
@@ -354,9 +364,9 @@ class DuplicationManager
 	 * duplicate() that does all the work. This method takes care of creating a clone
 	 * of the bean to avoid the bean getting tainted (triggering saving when storing it).
 	 *
-	 * @param OODBBean $bean          bean to be copied
-	 * @param array            $trail         for internal usage, pass array()
-	 * @param boolean          $preserveIDs   for internal usage
+	 * @param OODBBean $bean        bean to be copied
+	 * @param array    $trail       for internal usage, pass array()
+	 * @param boolean  $preserveIDs for internal usage
 	 *
 	 * @return OODBBean
 	 */
