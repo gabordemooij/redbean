@@ -36,11 +36,11 @@ class Misc extends Base
 	*/
 	public function testInspect() {
 
-		testpack( 'Test R::inspect() ');
+		testpack( 'Test R::inspect() ' );
 
 		R::nuke();
 
-		R::store( R::dispense('book')->setAttr('title', 'book') );
+		R::store( R::dispense( 'book' )->setAttr( 'title', 'book' ) );
 
 		$info = R::inspect();
 		asrt( count( $info ), 1 );
@@ -301,7 +301,7 @@ class Misc extends Base
 			}
 		}
 
-		R::freeze(FALSE);
+		R::freeze( FALSE );
 	}
 
 	/**
@@ -316,7 +316,7 @@ class Misc extends Base
 		$adapter = R::getDatabaseAdapter();
 
 		if ( method_exists( R::getDatabaseAdapter()->getDatabase(), 'getPDO' ) ){
-			asrt( $adapter->getDatabase()->getPDO() instanceof\PDO, TRUE );
+			asrt( $adapter->getDatabase()->getPDO() instanceof \PDO, TRUE );
 		}
 
 		asrt( strlen( $adapter->getDatabase()->getDatabaseVersion() ) > 0, TRUE );
@@ -473,8 +473,8 @@ class Misc extends Base
 	*/
 	public function testENUMBasics() {
 		asrt( R::enum( 'gender:male' )->name, 'MALE' );
-		asrt( R::enum( 'country:South-Africa' )->name, 'SOUTH_AFRICA');
-		asrt( R::enum( 'tester:T@E  S_t' )->name, 'T_E_S_T');
+		asrt( R::enum( 'country:South-Africa' )->name, 'SOUTH_AFRICA' );
+		asrt( R::enum( 'tester:T@E  S_t' )->name, 'T_E_S_T' );
 	}
 
 	/**
@@ -538,31 +538,31 @@ class Misc extends Base
 		$coffee->taste = R::enum( 'flavour:mocca' );
 
 		//did we create an enum?
-		asrt( implode( '', R::gatherLabels(R::enum('flavour'))), 'MOCCA' );
+		asrt( implode( '', R::gatherLabels( R::enum( 'flavour' ) ) ), 'MOCCA' );
 
 		R::store( $coffee );
 
 		$coffee = $coffee->fresh();
 
 		//test enum identity check - with alias
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), TRUE );
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), FALSE );
+		asrt( $coffee->fetchAs( 'flavour' )->taste->equals( R::enum('flavour:mocca') ), TRUE );
+		asrt( $coffee->fetchAs( 'flavour' )->taste->equals( R::enum('flavour:banana') ), FALSE );
 
 		//now we have two flavours
-		asrt( R::count('flavour'), 2 );
-		asrt( implode( ',', R::gatherLabels(R::enum('flavour'))), 'BANANA,MOCCA' );
+		asrt( R::count( 'flavour' ), 2 );
+		asrt( implode( ',', R::gatherLabels( R::enum( 'flavour') ) ), 'BANANA,MOCCA' );
 
 		$coffee->flavour = R::enum( 'flavour:mocca' );
 
 		R::store($coffee);
 
 		//same results, can we have multiple flavours?
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:mocca') ), TRUE );
-		asrt( $coffee->fetchAs('flavour')->taste->equals( R::enum('flavour:banana') ), FALSE );
-		asrt( $coffee->flavour->equals( R::enum('flavour:mocca') ), TRUE );
+		asrt( $coffee->fetchAs( 'flavour' )->taste->equals( R::enum( 'flavour:mocca' ) ), TRUE );
+		asrt( $coffee->fetchAs( 'flavour' )->taste->equals( R::enum( 'flavour:banana' ) ), FALSE );
+		asrt( $coffee->flavour->equals( R::enum( 'flavour:mocca' ) ), TRUE );
 
 		//no additional mocca enum...
-		asrt( R::count('flavour'), 2 );
+		asrt( R::count( 'flavour' ), 2 );
 
 		$drink = R::dispense( 'drink' );
 		$drink->flavour = R::enum( 'flavour:choco' );
@@ -576,12 +576,12 @@ class Misc extends Base
 		asrt( $drink->flavour->equals( R::enum('flavour:mint') ), FALSE );
 		asrt( $drink->flavour->equals( R::enum('flavour:choco') ), TRUE );
 
-		asrt( R::count('flavour'), 4 );
+		asrt( R::count( 'flavour' ), 4 );
 
 		//trash should not affect flavour!
 		R::trash( $drink );
 
-		asrt( R::count('flavour'), 4 );
+		asrt( R::count( 'flavour' ), 4 );
 	}
 
 
@@ -645,6 +645,3 @@ class Misc extends Base
 		asrt( $beanB->equals( $beanA ), FALSE );
 	}
 }
-
-
-
