@@ -8,6 +8,10 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Label Maker.
  * Makes so-called label beans.
+ * A label is a bean with only an id, type and name property.
+ * Labels can be used to create simple entities like categories, tags or enums.
+ * This service class provides convenience methods to deal with this kind of
+ * beans.
  *
  * @file       RedBeanPHP/LabelMaker.php
  * @author     Gabor de Mooij and the RedBeanPHP Community
@@ -41,6 +45,8 @@ class LabelMaker
 	 * values of the array will be assigned to the name property of each
 	 * individual bean.
 	 *
+	 * $people = R::dispenseLabels( 'person', [ 'Santa', 'Claus' ] );
+	 *
 	 * @param string $type   type of beans you would like to have
 	 * @param array  $labels list of labels, names for each bean
 	 *
@@ -60,11 +66,19 @@ class LabelMaker
 
 	/**
 	 * Gathers labels from beans. This function loops through the beans,
-	 * collects the values of the name properties of each individual bean
+	 * collects the value of the name property for each individual bean
 	 * and stores the names in a new array. The array then gets sorted using the
 	 * default sort function of PHP (sort).
 	 *
-	 * @param array $beans list of beans to loop
+	 * Usage:
+	 *
+	 * $o1->name = 'hamburger';
+	 * $o2->name = 'pizza';
+	 * implode( ',', R::gatherLabels( [ $o1, $o2 ] ) ); //hamburger,pizza
+	 *
+	 * Note that the return value is an array of strings, not beans.
+	 *
+	 * @param array $beans list of beans to loop through
 	 *
 	 * @return array
 	 */
@@ -82,8 +96,29 @@ class LabelMaker
 	}
 	
 	/**
-	 * Returns a label or an array of labels for use as ENUMs.
-	 * 
+	 * Fetches an ENUM from the database and creates it if necessary.
+	 * An ENUM has the following format:
+	 *
+	 * ENUM:VALUE
+	 *
+	 * If you pass 'ENUM' only, this method will return an array of its
+	 * values:
+	 *
+	 * implode( ',', R::gatherLabels( R::enum( 'flavour' ) ) ) //'BANANA,MOCCA'
+	 *
+	 * If you pass 'ENUM:VALUE' this method will return the specified enum bean
+	 * and create it in the database if it does not exist yet:
+	 *
+	 * $bananaFlavour = R::enum( 'flavour:banana' );
+	 * $bananaFlavour->name;
+	 *
+	 * So you can use this method to set an ENUM value in a bean:
+	 *
+	 * $shake->flavour = R::enum( 'flavour:banana' );
+	 *
+	 * the property flavour now contains the enum bean, a parent bean.
+	 * In the database, flavour_id will point to the flavour record with name 'banana'.
+	 *
 	 * @param string $enum ENUM specification for label
 	 * 
 	 * @return array|OODBBean
