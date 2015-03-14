@@ -32,6 +32,9 @@ class Setget extends Sqlite
 		asrt( setget( "-0.25" ), "-0.25" );
 		asrt( setget( -0.25 ), "-0.25" );
 
+		asrt( setget( "1.0" ), "1" );
+		asrt( setget( 1.0 ), "1" );
+
 		asrt( setget( "0.12345678" ), "0.12345678" );
 		asrt( setget( 0.12345678 ), "0.12345678" );
 

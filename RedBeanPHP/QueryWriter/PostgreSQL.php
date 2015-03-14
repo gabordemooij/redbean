@@ -233,10 +233,12 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 			}
 		}
 
-		if ( $this->startsWithZeros( $value ) ) return self::C_DATATYPE_TEXT; 
+		if ( is_float( $value ) ) return self::C_DATATYPE_DOUBLE;
 
-		if ( $value === FALSE || $value === TRUE || $value === NULL || ( $value instanceof NULL ) || ( is_numeric( $value )
-				&& floor( $value ) == $value
+		if ( $this->startsWithZeros( $value ) ) return self::C_DATATYPE_TEXT;
+		
+		if ( $value === FALSE || $value === TRUE || $value === NULL || ( is_numeric( $value )
+				&& AQueryWriter::canBeTreatedAsInt( $value )
 				&& $value < 2147483648
 				&& $value > -2147483648 )
 		) {

@@ -26,6 +26,9 @@ class Setget extends \RedUNIT\CUBRID
 		asrt( setget( "-1" ), "-1" );
 		asrt( setget( -1 ), "-1" );
 
+		asrt( setget( "1.0" ), "1" );
+		asrt( setget( 1.0 ), "1" );
+
 		asrt( setget( "-0.25" ), "-0.2500000000000000" );
 		asrt( setget( -0.25 ), "-0.2500000000000000" );
 

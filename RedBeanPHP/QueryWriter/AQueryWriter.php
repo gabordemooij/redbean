@@ -608,7 +608,7 @@ abstract class AQueryWriter
 	 */
 	public static function canBeTreatedAsInt( $value )
 	{
-		return (bool) ( ctype_digit( strval( $value ) ) && strval( $value ) === strval( intval( $value ) ) );
+		return (bool) ( strval( $value ) === strval( intval( $value ) ) );
 	}
 
 	/**

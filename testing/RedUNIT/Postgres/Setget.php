@@ -29,6 +29,9 @@ class Setget extends Postgres
 		asrt( setget( "-1" ), "-1" );
 		asrt( setget( -1 ), "-1" );
 
+		asrt( setget( "1.0" ), "1" );
+		asrt( setget( 1.0 ), "1" );
+
 		asrt( setget( "-0.25" ), "-0.25" );
 		asrt( setget( -0.25 ), "-0.25" );
 
