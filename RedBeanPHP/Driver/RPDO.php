@@ -252,7 +252,6 @@ class RPDO implements Driver
 			$this->max = 2147483647; //otherwise you get -2147483648 ?! demonstrated in build #603 on Travis.
 		} elseif ( strpos( $this->dsn, 'cubrid' ) === 0 ) {
 			$this->max = 2147483647; //bindParam in pdo_cubrid also fails...
-			$this->flagUseStringOnlyBinding = TRUE;
 		} else {
 			$this->max = PHP_INT_MAX; //the normal value of course (makes it possible to use large numbers in LIMIT clause)
 		}
