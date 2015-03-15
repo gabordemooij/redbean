@@ -48,7 +48,7 @@ class RPDO implements Driver
 	protected $logger = NULL;
 
 	/**
-	 * @var\PDO
+	 * @var PDO
 	 */
 	protected $pdo;
 
@@ -88,12 +88,12 @@ class RPDO implements Driver
 	protected $mysqlEncoding = '';
 
 	/**
-	 * Binds parameters. This method binds parameters to a\PDOStatement for
+	 * Binds parameters. This method binds parameters to a PDOStatement for
 	 * Query Execution. This method binds parameters as NULL, INTEGER or STRING
 	 * and supports both named keys and question mark keys.
 	 *
-	 * @param \PDOStatement $statement \PDO Statement instance
-	 * @param  array        $bindings   values that need to get bound to the statement
+	 * @param PDOStatement $statement PDO Statement instance
+	 * @param array        $bindings  values that need to get bound to the statement
 	 *
 	 * @return void
 	 */
@@ -218,7 +218,8 @@ class RPDO implements Driver
 
 	/**
 	 * Constructor. You may either specify dsn, user and password or
-	 * just give an existing\PDO connection.
+	 * just give an existing PDO connection.
+	 *
 	 * Examples:
 	 *    $driver = new RPDO($dsn, $user, $password);
 	 *    $driver = new RPDO($existingConnection);
@@ -273,8 +274,8 @@ class RPDO implements Driver
 	 * Establishes a connection to the database using PHP\PDO
 	 * functionality. If a connection has already been established this
 	 * method will simply return directly. This method also turns on
-	 * UTF8 for the database and\PDO-ERRMODE-EXCEPTION as well as
-	 *\PDO-FETCH-ASSOC.
+	 * UTF8 for the database and PDO-ERRMODE-EXCEPTION as well as
+	 * PDO-FETCH-ASSOC.
 	 *
 	 * @throws\PDOException
 	 *
@@ -449,8 +450,8 @@ class RPDO implements Driver
 	 * SQL to the screen together with some information about the
 	 * results.
 	 *
-	 * @param boolean        $trueFalse turn on/off
-	 * @param Logger $logger    logger instance
+	 * @param boolean $trueFalse turn on/off
+	 * @param Logger  $logger    logger instance
 	 *
 	 * @return void
 	 */
@@ -472,6 +473,8 @@ class RPDO implements Driver
 	 * Sets the logger instance you wish to use.
 	 *
 	 * @param Logger $logger the logger instance to be used for logging
+	 *
+	 * @return void
 	 */
 	public function setLogger( Logger $logger )
 	{
@@ -520,9 +523,9 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Returns the name of database driver for\PDO.
-	 * Uses the\PDO attribute DRIVER NAME to obtain the name of the
-	 *\PDO driver.
+	 * Returns the name of database driver for PDO.
+	 * Uses the PDO attribute DRIVER NAME to obtain the name of the
+	 * PDO driver.
 	 *
 	 * @return string
 	 */
@@ -546,9 +549,9 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Returns the underlying PHP\PDO instance.
+	 * Returns the underlying PHP PDO instance.
 	 *
-	 * @return\PDO
+	 * @return PDO
 	 */
 	public function getPDO()
 	{
