@@ -29,6 +29,44 @@ class Writecache extends Base
 	}
 
 	/**
+	 * Test whether cache size remains constant (per type).
+	 * Avoiding potential memory leaks. (Issue #424).
+	 *
+	 * @return void
+	 */
+	public function testCacheSize()
+	{
+		R::nuke();
+		R::useWriterCache( TRUE );
+		$writer = R::getWriter();
+		$bean = R::dispense( 'bean' );
+		$bean->prop = 1;
+		R::store( $bean );
+		$writer->flushCache();
+		$count = $writer->flushCache();
+		asrt( $count, 0 );
+		R::find( 'bean', ' prop < ? ', array( 1 ) );
+		$count = $writer->flushCache();
+		asrt( $count, 2 );
+		R::find( 'bean', ' prop < ? ', array( 2 ) );
+		$count = $writer->flushCache();
+		asrt( $count, 5 );
+		R::find( 'bean', ' prop < ? ', array( 2 ) );
+		$count = $writer->flushCache();
+		asrt( $count, 5 );
+		for( $i = 0; $i < 40; $i ++ ) {
+			R::find( 'bean', ' prop < ? ', array( $i ) );
+		}
+		$count = $writer->flushCache();
+		asrt( $count, 85 );
+		for( $i = 0; $i < 120; $i ++ ) {
+			R::find( 'bean', ' prop < ? ', array( $i ) );
+		}
+		$count = $writer->flushCache();
+		asrt( $count, 85 );
+	}
+
+	/**
 	 * When using fetchAs(), Query Cache does not recognize objects
 	 * that have been previously fetched, see issue #400.
 	 */

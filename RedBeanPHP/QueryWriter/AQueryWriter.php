@@ -235,7 +235,12 @@ abstract class AQueryWriter
 	 */
 	private function putResultInCache( $cacheTag, $key, $values )
 	{
-		if (!isset($this->cache[$cacheTag])) $this->cache[$cacheTag] = array();
+		if ( isset( $this->cache[$cacheTag] ) ) {
+			if ( count( $this->cache[$cacheTag] ) > 20 ) array_shift( $this->cache[$cacheTag] );
+		} else {
+			$this->cache[$cacheTag] = array();
+		}
+
 		$this->cache[$cacheTag][$key] = $values;
 	}
 
@@ -1107,12 +1112,16 @@ abstract class AQueryWriter
 
 	/**
 	 * Flushes the Query Writer Cache.
+	 * Clears the internal query cache array and returns its overall
+	 * size.
 	 *
-	 * @return void
+	 * @return integer
 	 */
 	public function flushCache()
 	{
+		$count = count( $this->cache, COUNT_RECURSIVE );
 		$this->cache = array();
+		return $count;
 	}
 
 	/**
