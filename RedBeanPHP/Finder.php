@@ -208,7 +208,13 @@ class Finder
 	 * The criteria set also supports OR-conditions: property => array( value1, orValue2 )
 	 *
 	 * If the additional SQL is a condition, this condition will be glued to the rest
-	 * of the query using an AND operator.
+	 * of the query using an AND operator. Note that this is as far as this method
+	 * can go, there is no way to glue additional SQL using an OR-condition.
+	 * This method provides access to an underlying mechanism in the RedBeanPHP architecture
+	 * to find beans using criteria sets. However, please do not use this method
+	 * for complex queries, use plain SQL instead ( the regular find method ) as it is
+	 * more suitable for the job. This method is
+	 * meant for basic search-by-example operations.
 	 *
 	 * @param string $type       type of bean to search for
 	 * @param array  $conditions criteria set describing the bean to search for
