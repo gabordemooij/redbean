@@ -462,7 +462,8 @@ interface QueryWriter
 	 * Returns the format for link tables.
 	 * Given an array containing two type names this method returns the
 	 * name of the link table to be used to store and retrieve
-	 * association records.
+	 * association records. For instance, given two types: person and
+	 * project, the corresponding link table might be: 'person_project'.
 	 *
 	 * @param  array $types two types array($type1, $type2)
 	 *
