@@ -25,7 +25,27 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * with this source code in the file license.txt.
  */
 abstract class AQueryWriter
-{ 
+{
+	/**
+	 * @var array
+	 */
+	private static $sqlFilters = array();
+
+	/**
+	 * @var boolean
+	 */
+	private static $flagSQLFilterSafeMode = false;
+
+	/**
+	 * @var boolean
+	 */
+	private static $flagNarrowFieldMode = true;
+
+	/**
+	 * @var array
+	 */
+	public static $renames = array();
+
 	/**
 	 * @var DBAdapter
 	 */
@@ -59,27 +79,58 @@ abstract class AQueryWriter
 	/**
 	 * @var array
 	 */
-	public static $renames = array();
-
-	/**
-	 * @var array
-	 */
-	private static $sqlFilters = array();
-
-	/**
-	 * @var boolean
-	 */
-	private static $flagSQLFilterSafeMode = false;
-
-	/**
-	 * @var boolean
-	 */
-	private static $flagNarrowFieldMode = true;
-
-	/**
-	 * @var array
-	 */
 	public $typeno_sqltype = array();
+
+	/**
+	 * Checks whether a number can be treated like an int.
+	 *
+	 * @param  string $value string representation of a certain value
+	 *
+	 * @return boolean
+	 */
+	public static function canBeTreatedAsInt( $value )
+	{
+		return (bool) ( strval( $value ) === strval( intval( $value ) ) );
+	}
+
+	/**
+	 * @see QueryWriter::getAssocTableFormat
+	 */
+	public static function getAssocTableFormat( $types )
+	{
+		sort( $types );
+
+		$assoc = implode( '_', $types );
+
+		return ( isset( self::$renames[$assoc] ) ) ? self::$renames[$assoc] : $assoc;
+	}
+
+	/**
+	 * @see QueryWriter::renameAssociation
+	 */
+	public static function renameAssociation( $from, $to = NULL )
+	{
+		if ( is_array( $from ) ) {
+			foreach ( $from as $key => $value ) self::$renames[$key] = $value;
+
+			return;
+		}
+
+		self::$renames[$from] = $to;
+	}
+
+	/**
+	 * Globally available service method for RedBeanPHP.
+	 * Converts a camel cased string to a snake cased string.
+	 *
+	 * @param string $camel a camelCased string
+	 *
+	 * @return string
+	 */
+	public static function camelsSnake( $camel )
+	{
+		return strtolower( preg_replace( '/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $camel ) );
+	}
 
 	/**
 	 * Clears renames.
@@ -607,57 +658,6 @@ abstract class AQueryWriter
 		}
 
 		return $struct;
-	}
-
-	/**
-	 * Checks whether a number can be treated like an int.
-	 *
-	 * @param  string $value string representation of a certain value
-	 *
-	 * @return boolean
-	 */
-	public static function canBeTreatedAsInt( $value )
-	{
-		return (bool) ( strval( $value ) === strval( intval( $value ) ) );
-	}
-
-	/**
-	 * @see QueryWriter::getAssocTableFormat
-	 */
-	public static function getAssocTableFormat( $types )
-	{
-		sort( $types );
-
-		$assoc = implode( '_', $types );
-
-		return ( isset( self::$renames[$assoc] ) ) ? self::$renames[$assoc] : $assoc;
-	}
-
-	/**
-	 * @see QueryWriter::renameAssociation
-	 */
-	public static function renameAssociation( $from, $to = NULL )
-	{
-		if ( is_array( $from ) ) {
-			foreach ( $from as $key => $value ) self::$renames[$key] = $value;
-
-			return;
-		}
-
-		self::$renames[$from] = $to;
-	}
-
-	/**
-	 * Globally available service method for RedBeanPHP.
-	 * Converts a camel cased string to a snake cased string.
-	 *
-	 * @param string $camel a camelCased string
-	 *
-	 * @return string
-	 */
-	public static function camelsSnake( $camel )
-	{
-		return strtolower( preg_replace( '/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $camel ) );
 	}
 
 	/**
