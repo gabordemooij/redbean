@@ -267,7 +267,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	private function getSharedList( $type, $redbean, $toolbox )
 	{
-
 		$writer = $toolbox->getWriter();
 
 		if ( $this->via ) {
@@ -396,11 +395,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * This method is meant for PHP and allows you to access beans as if
 	 * they were arrays, i.e. using array notation:
 	 *
-	 * $bean[ $key ] = $value;
+	 * $bean[$key] = $value;
 	 *
 	 * Note that not all PHP functions work with the array interface.
 	 *
-	 * @return\ArrayIterator
+	 * @return \ArrayIterator
 	 */
 	public function getIterator()
 	{
@@ -598,10 +597,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * Unsets a property. This method will load the property first using
-	 * __get.
-	 *
-	 * @param  string $property property
+	 * Unsets a property of a bean.
+	 * Magic method, gets called implicitly when performing the unset() operation
+	 * on a bean property.
+	 * 
+	 * @param  string $property property to unset
 	 *
 	 * @return void
 	 */
@@ -676,7 +676,14 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * When prefix for a list, this causes the list to reload.
+	 * Tells the bean to (re)load the following list without any
+	 * conditions. If you have an ownList or sharedList with a
+	 * condition you can use this method to reload the entire list.
+	 *
+	 * Usage:
+	 *
+	 * $bean->with( ' LIMIT 3 ' )->ownPage; //Just 3
+	 * $bean->all()->ownPage; //Reload all pages
 	 *
 	 * @return self
 	 */
@@ -761,6 +768,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 	/**
 	 * Turns a camelcase property name into an underscored property name.
+	 *
 	 * Examples:
 	 *    oneACLRoute -> one_acl_route
 	 *    camelCase -> camel_case
@@ -935,14 +943,13 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			}
 
 			$this->properties[$property] = $bean;
-
-			$this->withSql    = '';
-			$this->withParams = array();
-			$this->aliasName  = NULL;
-			$this->fetchType  = NULL;
-			$this->noLoad     = FALSE;
-			$this->all        = FALSE;
-			$this->via        = NULL;
+			$this->withSql               = '';
+			$this->withParams            = array();
+			$this->aliasName             = NULL;
+			$this->fetchType             = NULL;
+			$this->noLoad                = FALSE;
+			$this->all                   = FALSE;
+			$this->via                   = NULL;
 
 			return $this->properties[$property];
 
@@ -956,7 +963,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
 		}
 
-		$this->properties[$property] = $beans;
+		$this->properties[$property]          = $beans;
 		$this->__info["sys.shadow.$property"] = $beans;
 		$this->__info['tainted']              = TRUE;
 
@@ -1087,15 +1094,17 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 	/**
 	 * Returns the value of a meta property. A meta property
-	 * contains extra information about the bean object that will not
-	 * get stored in the database. Meta information is used to instruct
-	 * RedBean as well as other systems how to deal with the bean.
-	 * For instance: $bean->setMeta("buildcommand.unique", array(
-	 * array("column1", "column2", "column3") ) );
-	 * Will add a UNIQUE constraint for the bean on columns: column1, column2 and
-	 * column 3.
-	 * To access a Meta property we use a dot separated notation.
+	 * contains additional information about the bean object that will not
+	 * be stored in the database. Meta information is used to instruct
+	 * RedBeanPHP as well as other systems how to deal with the bean.
 	 * If the property cannot be found this getter will return NULL instead.
+	 *
+	 * Example:
+	 *
+	 * $bean->setMeta( 'flush-cache', TRUE );
+	 *
+	 * RedBeanPHP also stores meta data in beans, this meta data uses
+	 * keys prefixed with 'sys.' (system).
 	 *
 	 * @param string $path    path
 	 * @param mixed  $default default value
@@ -1109,6 +1118,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 	/**
 	 * Gets and unsets a meta property.
+	 * Moves a meta property out of the bean.
+	 * This is a short-cut method that can be used instead
+	 * of combining a get/unset.
 	 *
 	 * @param string $path    path
 	 * @param mixed  $default default value
@@ -1125,13 +1137,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * Stores a value in the specified Meta information property. $value contains
-	 * the value you want to store in the Meta section of the bean and $path
-	 * specifies the dot separated path to the property. For instance "my.meta.property".
-	 * If "my" and "meta" do not exist they will be created automatically.
+	 * Stores a value in the specified Meta information property.
+	 * The first argument should be the key to store the value under,
+	 * the second argument should be the value. It is common to use
+	 * a path-like notation for meta data in RedBeanPHP like:
+	 * 'my.meta.data', however the dots are purely for readability, the
+	 * meta data methods do not store nested structures or hierarchies.
 	 *
-	 * @param string $path  path
-	 * @param mixed  $value value
+	 * @param string $path  path / key to store value under
+	 * @param mixed  $value value to store in bean (not in database) as meta data
 	 *
 	 * @return OODBBean
 	 */
