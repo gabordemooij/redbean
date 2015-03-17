@@ -62,21 +62,6 @@ class TagManager
 	}
 
 	/**
-	 * Constructor.
-	 * The tag manager offers an easy way to quickly implement basic tagging
-	 * functionality.
-	 *
-	 * @param ToolBox $toolbox
-	 */
-	public function __construct( ToolBox $toolbox )
-	{
-		$this->toolbox = $toolbox;
-		$this->redbean = $toolbox->getRedBean();
-
-		$this->associationManager = $this->redbean->getAssociationManager();
-	}
-
-	/**
 	 * Finds a tag bean by it's title.
 	 * Internal method.
 	 *
@@ -95,6 +80,21 @@ class TagManager
 		}
 
 		return NULL;
+	}
+
+	/**
+	 * Constructor.
+	 * The tag manager offers an easy way to quickly implement basic tagging
+	 * functionality.
+	 *
+	 * @param ToolBox $toolbox
+	 */
+	public function __construct( ToolBox $toolbox )
+	{
+		$this->toolbox = $toolbox;
+		$this->redbean = $toolbox->getRedBean();
+
+		$this->associationManager = $this->redbean->getAssociationManager();
 	}
 
 	/**

@@ -28,6 +28,17 @@ use RedBeanPHP\OODBBean as OODBBean;
 class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 {
 	/**
+	 * FUSE error modes.
+	 */
+	const C_ERR_IGNORE    = FALSE;
+	const C_ERR_LOG       = 1;
+	const C_ERR_NOTICE    = 2;
+	const C_ERR_WARN      = 3;
+	const C_ERR_EXCEPTION = 4;
+	const C_ERR_FUNC      = 5;
+	const C_ERR_FATAL     = 6;
+
+	/**
 	 * @var boolean
 	 */
 	protected static $errorHandlingFUSE = FALSE;
@@ -46,17 +57,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * @var boolean
 	 */
 	protected static $autoResolve = FALSE;
-
-	/**
-	 * FUSE error modes.
-	 */
-	const C_ERR_IGNORE    = FALSE;
-	const C_ERR_LOG       = 1;
-	const C_ERR_NOTICE    = 2;
-	const C_ERR_WARN      = 3;
-	const C_ERR_EXCEPTION = 4;
-	const C_ERR_FUNC      = 5;
-	const C_ERR_FATAL     = 6;
 
 	/**
 	 * Sets the error mode for FUSE.
@@ -196,6 +196,27 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	protected $all = FALSE;
 
 	/**
+	 * Sets a meta property for all beans. This is a quicker way to set
+	 * the meta properties for a collection of beans because this method
+	 * can directly access the property arrays of the beans.
+	 * This method returns the beans.
+	 *
+	 * @param array  $beans    beans to set the meta property of
+	 * @param string $property property to set
+	 * @param mixed  $value    value
+	 *
+	 * @return array
+	 */
+	public static function setMetaAll( $beans, $property, $value )
+	{
+		foreach( $beans as $bean ) {
+			if ( $bean instanceof OODBBean ) $bean->__info[ $property ] = $value;
+		}
+
+		return $beans;
+	}
+
+	/**
 	 * Parses the join in the with-snippet.
 	 * For instance:
 	 *
@@ -326,27 +347,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 
 		foreach ( $beans as $beanFromList ) {
 			$beanFromList->__info['sys.parentcache.' . $parentField] = $this;
-		}
-
-		return $beans;
-	}
-
-	/**
-	 * Sets a meta property for all beans. This is a quicker way to set
-	 * the meta properties for a collection of beans because this method
-	 * can directly access the property arrays of the beans.
-	 * This method returns the beans.
-	 *
-	 * @param array  $beans    beans to set the meta property of
-	 * @param string $property property to set
-	 * @param mixed  $value    value
-	 *
-	 * @return array
-	 */
-	public static function setMetaAll( $beans, $property, $value )
-	{
-		foreach( $beans as $bean ) {
-			if ( $bean instanceof OODBBean ) $bean->__info[ $property ] = $value;
 		}
 
 		return $beans;

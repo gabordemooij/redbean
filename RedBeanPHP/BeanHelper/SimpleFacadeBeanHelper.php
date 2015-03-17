@@ -33,6 +33,33 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	private static $factory = null;
 
 	/**
+	 * Factory method using a customizable factory function to create
+	 * the instance of the Simple Model.
+	 *
+	 * @param string $modelClassName name of the class
+	 *
+	 * @return SimpleModel
+	 */
+	public static function factory( $modelClassName )
+	{
+		$factory = self::$factory;
+		return ( $factory ) ? $factory( $modelClassName ) : new $modelClassName();
+	}
+
+	/**
+	 * Sets the factory function to create the model when using FUSE
+	 * to connect a bean to a model.
+	 *
+	 * @param closure $factory
+	 *
+	 * @return void
+	 */
+	public static function setFactoryFunction( $factory ) 
+	{
+		self::$factory = $factory;
+	}
+
+	/**
 	 * @see BeanHelper::getToolbox
 	 */
 	public function getToolbox()
@@ -84,32 +111,5 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	public function getExtractedToolbox()
 	{
 		return Facade::getExtractedToolbox();
-	}
-
-	/**
-	 * Factory method using a customizable factory function to create
-	 * the instance of the Simple Model.
-	 *
-	 * @param string $modelClassName name of the class
-	 *
-	 * @return SimpleModel
-	 */
-	public static function factory( $modelClassName )
-	{
-		$factory = self::$factory;
-		return ( $factory ) ? $factory( $modelClassName ) : new $modelClassName();
-	}
-
-	/**
-	 * Sets the factory function to create the model when using FUSE
-	 * to connect a bean to a model.
-	 *
-	 * @param closure $factory
-	 *
-	 * @return void
-	 */
-	public static function setFactoryFunction( $factory ) 
-	{
-		self::$factory = $factory;
 	}
 }

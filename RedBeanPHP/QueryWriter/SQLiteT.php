@@ -25,23 +25,22 @@ use RedBeanPHP\RedException\SQL as SQLException;
 class SQLiteT extends AQueryWriter implements QueryWriter
 {
 	/**
-	 * @var DBAdapter
-	 */
-
-	protected $adapter;
-
-	/**
-	 * @var string
-	 */
-	protected $quoteCharacter = '`';
-
-	/**
 	 * Data types
 	 */
 	const C_DATATYPE_INTEGER   = 0;
 	const C_DATATYPE_NUMERIC   = 1;
 	const C_DATATYPE_TEXT      = 2;
 	const C_DATATYPE_SPECIFIED = 99;
+
+	/**
+	 * @var DBAdapter
+	 */
+	protected $adapter;
+
+	/**
+	 * @var string
+	 */
+	protected $quoteCharacter = '`';
 
 	/**
 	 * Gets all information about a table (from a type).
@@ -434,5 +433,4 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 
 		$this->adapter->exec( 'PRAGMA foreign_keys = 1 ' );
 	}
-
 }

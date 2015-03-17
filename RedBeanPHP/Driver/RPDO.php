@@ -207,16 +207,6 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Returns the best possible encoding for MySQL based on version data.
-	 *
-	 * @return string
-	 */
-	public function getMysqlEncoding()
-	{
-		return $this->mysqlEncoding;
-	}
-
-	/**
 	 * Constructor. You may either specify dsn, user and password or
 	 * just give an existing PDO connection.
 	 *
@@ -256,6 +246,16 @@ class RPDO implements Driver
 		} else {
 			$this->max = PHP_INT_MAX; //the normal value of course (makes it possible to use large numbers in LIMIT clause)
 		}
+	}
+
+	/**
+	 * Returns the best possible encoding for MySQL based on version data.
+	 *
+	 * @return string
+	 */
+	public function getMysqlEncoding()
+	{
+		return $this->mysqlEncoding;
 	}
 
 	/**
