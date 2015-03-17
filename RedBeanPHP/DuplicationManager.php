@@ -59,31 +59,6 @@ class DuplicationManager
 	protected $cacheTables = FALSE;
 
 	/**
-	 * Recursively turns the keys of an array into
-	 * camelCase.
-	 *
-	 * @param array   $array       array to camelize
-	 * @param boolean $dolphinMode whether you want the exception for IDs.
-	 *
-	 * @return array
-	 */
-	public function camelfy( $array, $dolphinMode = false ) {
-		$newArray = array();
-		foreach( $array as $key => $element ) {
-			$newKey = preg_replace_callback( '/_(\w)/', function( &$matches ){
-				return strtoupper( $matches[1] );
-			}, $key);
-
-			if ( $dolphinMode ) {
-				$newKey = preg_replace( '/(\w)Id$/', '$1ID', $newKey );
-			}
-
-			$newArray[$newKey] = ( is_array($element) ) ? $this->camelfy( $element, $dolphinMode ) : $element;
-		}
-		return $newArray;
-	}
-
-	/**
 	 * Copies the shared beans in a bean, i.e. all the sharedBean-lists.
 	 *
 	 * @param OODBBean $copy   target bean to copy lists to
@@ -269,6 +244,31 @@ class DuplicationManager
 		$this->toolbox            = $toolbox;
 		$this->redbean            = $toolbox->getRedBean();
 		$this->associationManager = $this->redbean->getAssociationManager();
+	}
+
+	/**
+	 * Recursively turns the keys of an array into
+	 * camelCase.
+	 *
+	 * @param array   $array       array to camelize
+	 * @param boolean $dolphinMode whether you want the exception for IDs.
+	 *
+	 * @return array
+	 */
+	public function camelfy( $array, $dolphinMode = false ) {
+		$newArray = array();
+		foreach( $array as $key => $element ) {
+			$newKey = preg_replace_callback( '/_(\w)/', function( &$matches ){
+				return strtoupper( $matches[1] );
+			}, $key);
+
+			if ( $dolphinMode ) {
+				$newKey = preg_replace( '/(\w)Id$/', '$1ID', $newKey );
+			}
+
+			$newArray[$newKey] = ( is_array($element) ) ? $this->camelfy( $element, $dolphinMode ) : $element;
+		}
+		return $newArray;
 	}
 
 	/**
