@@ -52,6 +52,11 @@ abstract class AQueryWriter
 	protected $cache = array();
 
 	/**
+	 * @var integer
+	 */
+	protected $maxCacheSizePerType = 20;
+
+	/**
 	 * @var array
 	 */
 	public static $renames = array();
@@ -236,7 +241,7 @@ abstract class AQueryWriter
 	private function putResultInCache( $cacheTag, $key, $values )
 	{
 		if ( isset( $this->cache[$cacheTag] ) ) {
-			if ( count( $this->cache[$cacheTag] ) > 20 ) array_shift( $this->cache[$cacheTag] );
+			if ( count( $this->cache[$cacheTag] ) > $this->maxCacheSizePerType ) array_shift( $this->cache[$cacheTag] );
 		} else {
 			$this->cache[$cacheTag] = array();
 		}
@@ -1117,8 +1122,11 @@ abstract class AQueryWriter
 	 *
 	 * @return integer
 	 */
-	public function flushCache()
+	public function flushCache( $newMaxCacheSizePerType = NULL )
 	{
+		if ( !is_null( $newMaxCacheSizePerType ) && $newMaxCacheSizePerType > 0 ) {
+			$this->maxCacheSizePerType = $newMaxCacheSizePerType;
+		}
 		$count = count( $this->cache, COUNT_RECURSIVE );
 		$this->cache = array();
 		return $count;

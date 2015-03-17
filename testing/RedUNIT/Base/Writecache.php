@@ -42,7 +42,7 @@ class Writecache extends Base
 		$bean = R::dispense( 'bean' );
 		$bean->prop = 1;
 		R::store( $bean );
-		$writer->flushCache();
+		$writer->flushCache( 20 );
 		$count = $writer->flushCache();
 		asrt( $count, 0 );
 		R::find( 'bean', ' prop < ? ', array( 1 ) );
@@ -62,8 +62,13 @@ class Writecache extends Base
 		for( $i = 0; $i < 120; $i ++ ) {
 			R::find( 'bean', ' prop < ? ', array( $i ) );
 		}
-		$count = $writer->flushCache();
+		$count = $writer->flushCache( 1 );
 		asrt( $count, 85 );
+		for( $i = 0; $i < 20; $i ++ ) {
+			R::find( 'bean', ' prop < ? ', array( $i ) );
+		}
+		$count = $writer->flushCache( 20 );
+		asrt( $count, 9 );
 	}
 
 	/**
