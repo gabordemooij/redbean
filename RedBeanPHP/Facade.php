@@ -52,11 +52,6 @@ class Facade
 	const C_REDBEANPHP_VERSION = '4.2';
 
 	/**
-	 * @var array
-	 */
-	public static $toolboxes = array();
-
-	/**
 	 * @var ToolBox
 	 */
 	public static $toolbox;
@@ -102,11 +97,6 @@ class Facade
 	private static $finder;
 
 	/**
-	 * @var string
-	 */
-	public static $currentDB = '';
-
-	/**
 	 * @var Logger
 	 */
 	private static $logger;
@@ -117,6 +107,11 @@ class Facade
 	private static $plugins = array();
 
 	/**
+	 * @var string
+	 */
+	private static $exportCaseStyle = 'default';
+	
+	/**
 	 * Not in use (backward compatibility SQLHelper)
 	 */
 	public static $f;
@@ -124,7 +119,12 @@ class Facade
 	/**
 	 * @var string
 	 */
-	private static $exportCaseStyle = 'default';
+	public static $currentDB = '';
+
+	/**
+	 * @var array
+	 */
+	public static $toolboxes = array();
 
 	/**
 	 * Internal Query function, executes the desired query. Used by
