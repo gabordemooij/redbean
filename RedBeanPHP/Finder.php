@@ -158,6 +158,9 @@ class Finder
 
 	/**
 	 * Finds a BeanCollection using the repository.
+	 * A bean collection can be used to retrieve one bean at a time using
+	 * cursors - this is useful for processing large datasets. A bean collection
+	 * will not load all beans into memory all at once, just one at a time.
 	 *
 	 * @param  string $type     the type of bean you are looking for
 	 * @param  string $sql      SQL query to find the desired bean, starting right after WHERE clause
