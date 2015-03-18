@@ -71,8 +71,9 @@ class Finder
 	}
 
 	/**
-	 * @see Finder::find
-	 *      The variation also exports the beans (i.e. it returns arrays).
+	 * Like find() but also exports the beans as an array.
+	 *
+	 * @see Finder::findAndExport
 	 *
 	 * @param string $type     type   the type of bean you are looking for
 	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
@@ -91,8 +92,10 @@ class Finder
 	}
 
 	/**
+	 * Like find() but returns just one bean instead of an array of beans.
+	 * This method will return only the first bean of the array.
+	 *
 	 * @see Finder::find
-	 *      This variation returns the first bean only.
 	 *
 	 * @param string $type     type   the type of bean you are looking for
 	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
@@ -114,8 +117,10 @@ class Finder
 	}
 
 	/**
+	 * Like find() but returns the last bean of the result array.
+	 * Opposite of Finder::findLast().
+	 *
 	 * @see Finder::find
-	 *      This variation returns the last bean only.
 	 *
 	 * @param string $type     the type of bean you are looking for
 	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
@@ -135,9 +140,10 @@ class Finder
 	}
 
 	/**
+	 * Tries to find beans of a certain type,
+	 * if no beans are found, it dispenses a bean of that type.
+	 *
 	 * @see Finder::find
-	 *      Convience method. Tries to find beans of a certain type,
-	 *      if no beans are found, it dispenses a bean of that type.
 	 *
 	 * @param  string $type     the type of bean you are looking for
 	 * @param  string $sql      SQL query to find the desired bean, starting right after WHERE clause
