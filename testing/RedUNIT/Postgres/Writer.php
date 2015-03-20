@@ -60,47 +60,47 @@ class Writer extends Postgres
 			if ( $type < 100 ) {
 				asrt( $writer->code( $key, TRUE ), $type );
 			} else {
-				asrt( $writer->code( $key ), 99 );
+				asrt( $writer->code( $key ), PostgreSQL::C_DATATYPE_SPECIFIED );
 			}
 		}
 
-		asrt( $writer->code( PostgreSQL::C_DATATYPE_SPECIAL_DATETIME ), 99 );
+		asrt( $writer->code( PostgreSQL::C_DATATYPE_SPECIAL_DATETIME ), PostgreSQL::C_DATATYPE_SPECIFIED );
 
-		asrt( $writer->code( "unknown" ), 99 );
+		asrt( $writer->code( "unknown" ), PostgreSQL::C_DATATYPE_SPECIFIED );
 
-		asrt( $writer->scanType( FALSE ), 0 );
-		asrt( $writer->scanType( TRUE ), 0 );
+		asrt( $writer->scanType( FALSE ), PostgreSQL::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( TRUE ), PostgreSQL::C_DATATYPE_INTEGER );
 
-		asrt( $writer->scanType( NULL ), 0 );
+		asrt( $writer->scanType( NULL ), PostgreSQL::C_DATATYPE_INTEGER );
 
-		asrt( $writer->scanType( 2 ), 0 );
+		asrt( $writer->scanType( 2 ), PostgreSQL::C_DATATYPE_INTEGER );
 
-		asrt( $writer->scanType( 255 ), 0 );
-		asrt( $writer->scanType( 256 ), 0 );
+		asrt( $writer->scanType( 255 ), PostgreSQL::C_DATATYPE_INTEGER );
+		asrt( $writer->scanType( 256 ), PostgreSQL::C_DATATYPE_INTEGER );
 
-		asrt( $writer->scanType( -1 ), 0 );
+		asrt( $writer->scanType( -1 ), PostgreSQL::C_DATATYPE_INTEGER );
 
-		asrt( $writer->scanType( 1.5 ), 1 );
+		asrt( $writer->scanType( 1.5 ), PostgreSQL::C_DATATYPE_DOUBLE );
 
-		asrt( $writer->scanType( INF ), 3 );
+		asrt( $writer->scanType( INF ), PostgreSQL::C_DATATYPE_TEXT );
 
-		asrt( $writer->scanType( "abc" ), 3 );
+		asrt( $writer->scanType( "abc" ), PostgreSQL::C_DATATYPE_TEXT );
 
 		asrt( $writer->scanType( "2001-10-10", TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATE );
 
 		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00" ), 3 );
+		asrt( $writer->scanType( "2001-10-10 10:00:00" ), PostgreSQL::C_DATATYPE_TEXT );
 
-		asrt( $writer->scanType( "2001-10-10" ), 3 );
+		asrt( $writer->scanType( "2001-10-10" ), PostgreSQL::C_DATATYPE_TEXT );
 
-		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), 3 );
+		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), PostgreSQL::C_DATATYPE_TEXT );
 
-		$writer->widenColumn( "testtable", "c1", 3 );
+		$writer->widenColumn( "testtable", "c1", PostgreSQL::C_DATATYPE_TEXT );
 
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols["c1"] ), 3 );
+		asrt( $writer->code( $cols["c1"] ), PostgreSQL::C_DATATYPE_TEXT );
 
 		$writer->addColumn( "testtable", "special", PostgreSQL::C_DATATYPE_SPECIAL_DATE );
 
