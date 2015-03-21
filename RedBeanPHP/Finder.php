@@ -341,7 +341,7 @@ class Finder
 						$wannaBean[$property] = $value;
 					}
 				}
-				$wannaBeans[$type][] = $wannaBean;
+				$wannaBeans[$type][$wannaBean['id']] = $wannaBean;
 			}
 		}
 
