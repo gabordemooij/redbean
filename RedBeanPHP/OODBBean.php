@@ -1547,7 +1547,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		$this->__info['sys.orig'] = array();
 		foreach( $this->properties as $key => $value ) {
-			if ( is_scalar($value) ) $this->__info['sys.orig'][$key] = $value;
+			if ( is_scalar($value) ) {
+				$this->__info['sys.orig'][$key] = $value;
+			} else {
+				$this->__info['sys.shadow.'.$key] = $value;
+			}
 		}
 		return $this;
 	}

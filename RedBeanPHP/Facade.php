@@ -745,6 +745,25 @@ class Facade
 	}
 
 	/**
+	 * Finds multiple types of beans at once and offers additional
+	 * remapping functionality. This is a very powerful yet complex function.
+	 * For details see Finder::findMulti().
+	 *
+	 * @see Finder::findMulti()
+	 *
+	 * @param array|string $types      a list of bean types to find
+	 * @param string       $sql        SQL query
+	 * @param array        $bindings   SQL bindings
+	 * @param array        $remappings An array of remapping arrays containing closures
+	 *
+	 * @return array
+	 */
+	public static function findMulti( $types, $sql, $bindings = array(), $remappings = array() )
+	{
+		return self::$finder->findMulti( $types, $sql, $bindings, $remappings );
+	}
+
+	/**
 	 * Returns an array of beans. Pass a type and a series of ids and
 	 * this method will bring you the corresponding beans.
 	 *

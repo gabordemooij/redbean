@@ -241,4 +241,128 @@ class Finder
 
 		return $this->redbean->find( $type, $conditions, $sql );
 	}
+
+	/**
+	 * Returns a hashmap with bean arrays keyed by type using an SQL
+	 * query as its resource. Given an SQL query like 'SELECT movie.*, review.* FROM movie... JOIN review'
+	 * this method will return movie and review beans.
+	 *
+	 * Example:
+	 *
+	 * $stuff = $finder->findMulti('movie,review', '
+	 *          SELECT movie.*, review.* FROM movie
+	 *          LEFT JOIN review ON review.movie_id = movie.id');
+	 *
+	 * After this operation, $stuff will contain an entry 'movie' containing all
+	 * movies and an entry named 'review' containing all reviews (all beans).
+	 * You can also pass bindings.
+	 *
+	 * If you want to re-map your beans, so you can use $movie->ownReviewList without
+	 * having RedBeanPHP executing an SQL query you can use the fourth parameter to
+	 * define a selection of remapping closures.
+	 *
+	 * The remapping argument (optional) should contain an array of arrays.
+	 * Each array in the remapping array should contain the following entries:
+	 *
+	 * array(
+	 * 	'a'       => TYPE A
+	 *    'b'       => TYPE B
+	 *    'matcher' => MATCHING FUNCTION ACCEPTING A, B and ALL BEANS
+	 *    'do'      => OPERATION FUNCTION ACCEPTING A, B, ALL BEANS, ALL REMAPPINGS
+	 * )
+	 *
+	 * Using this mechanism you can build your own 'preloader' with tiny function
+	 * snippets (and those can be re-used and shared online of course).
+	 *
+	 * Example:
+	 *
+	 * array(
+	 * 	'a'       => 'movie'     //define A as movie
+	 *    'b'       => 'review'    //define B as review
+	 *    'matcher' => function( $a, $b ) {
+	 *       return ( $b->movie_id == $a->id );  //Perform action if review.movie_id equals movie.id
+	 *    }
+	 *    'do'      => function( $a, $b ) {
+	 *       $a->noLoad()->ownReviewList[] = $b; //Add the review to the movie
+	 *       $a->clearHistory();                 //optional, act 'as if these beans have been loaded through ownReviewList'.
+	 *    }
+	 * )
+	 *
+	 * The Query Template parameter is optional as well but can be used to
+	 * set a different SQL template (sprintf-style) for processing the original query.
+	 *
+	 * @note the SQL query provided IS NOT THE ONE used internally by this function,
+	 * this function will pre-process the query to get all the data required to find the beans.
+	 *
+	 * @note if you use the 'book.*' notation make SURE you're
+	 * selector starts with a SPACE. ' book.*' NOT ',book.*'. This is because
+	 * it's actually an SQL-like template SLOT, not real SQL.
+	 *
+	 * @param string|array $types         a list of types (either array or comma separated string)
+	 * @param string       $sql           an SQL query that provides beans for all the specified types
+	 * @param array        $bindings      optional, bindings for SQL query
+	 * @param array        $remappings    optional, an array of remapping arrays
+	 * @param string       $queryTemplate optional, query template
+	 *
+	 * @return array
+	 */
+	public function findMulti( $types, $sql, $bindings = array(), $remappings = array(), $queryTemplate = ' %s.%s AS %s__%s' )
+	{
+		if ( !is_array( $types ) ) $types = explode( ',', $types );
+		$writer = $this->toolbox->getWriter();
+		$adapter = $this->toolbox->getDatabaseAdapter();
+
+		//Repair the query, replace book.* with book.id AS book_id etc..
+		foreach( $types as $type ) {
+			$pattern = " {$type}.*";
+			if ( strpos( $sql, $pattern ) !== FALSE ) {
+				$newSelectorArray = array();
+				$columns = $writer->getColumns( $type );
+				foreach( $columns as $column => $definition ) {
+					$newSelectorArray[] = sprintf( $queryTemplate, $type, $column, $type, $column );
+				}
+				$newSelector = implode( ',', $newSelectorArray );
+				$sql = str_replace( $pattern, $newSelector, $sql );
+			}
+		}
+
+		//Gather the bean data from the query results using the prefix
+		$rows = $adapter->get( $sql, $bindings );
+		$wannaBeans = array();
+		foreach( $types as $type ) {
+			$wannaBeans[$type] = array();
+			$prefix            = "{$type}__";
+			foreach( $rows as $rowkey=>$row ) {
+				$wannaBean = array();
+				foreach( $row as $cell => $value ) {
+					if ( strpos( $cell, $prefix ) === 0 ) {
+						$property = substr( $cell, strlen( $prefix ) );
+						unset( $rows[$rowkey][$cell] );
+						$wannaBean[$property] = $value;
+					}
+				}
+				$wannaBeans[$type][] = $wannaBean;
+			}
+		}
+
+		//Turn the rows into beans
+		$beans = array();
+		foreach( $wannaBeans as $type => $wannabees ) {
+			$beans[$type] = $this->redbean->convertToBeans( $type, $wannabees );
+		}
+
+		//Apply additional re-mappings
+		foreach($remappings as $remapping) {
+			$a       = $remapping['a'];
+			$b       = $remapping['b'];
+			$matcher = $remapping['matcher'];
+			$do      = $remapping['do'];
+			foreach( $beans[$a] as $bean ) {
+				foreach( $beans[$b] as $putBean ) {
+					if ( $matcher( $bean, $putBean, $beans ) ) $do( $bean, $putBean, $beans, $remapping );
+				}
+			}
+		}
+		return $beans;
+	}
 }

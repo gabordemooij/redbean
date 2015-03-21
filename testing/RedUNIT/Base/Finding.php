@@ -41,6 +41,217 @@ class Finding extends Base {
 	}
 
 	/**
+	 * Inserts data for findMulti-tests.
+	 *
+	 * @return void
+	 */
+	private function insertBookData()
+	{
+		list( $books, $pages, $texts, $categories ) = R::dispenseAll( 'book*5,page*25,text*60,category*3' );
+		$texts[0]->content = 'C is a beautiful language.';
+		$texts[1]->content = 'But also a bit dangerous.';
+		$texts[2]->content = 'You need to know what you are doing.';
+		$texts[3]->content = 'Javascript is very flexible.';
+		$texts[4]->content = 'It can be anything you want...';
+		$texts[5]->content = 'But it can lead to chaos.';
+		$texts[6]->content = 'CSS was meant for documents';
+		$texts[7]->content = 'Now we use it for applications...';
+		$texts[8]->content = 'PHP is an easy language to learn,';
+		$texts[9]->content = 'Maybe a bit too easy...';
+		$texts[10]->content = 'SQL is much more powerful than you think.';
+		$pages[0]->ownTextList = array( $texts[0], $texts[1] );
+		$pages[1]->ownTextList = array( $texts[2] );
+		$pages[2]->ownTextList = array( $texts[3] );
+		$pages[3]->ownTextList = array( $texts[4] );
+		$pages[4]->ownTextList = array( $texts[5] );
+		$pages[5]->ownTextList = array( $texts[6], $texts[7] );
+		$pages[6]->ownTextList = array( $texts[8] );
+		$pages[7]->ownTextList = array( $texts[9] );
+		$pages[8]->ownTextList = array( $texts[10] );
+		$books[0]->ownPageList = array( $pages[0], $pages[1] );
+		$books[1]->ownPageList = array( $pages[2], $pages[3], $pages[4] );
+		$books[2]->ownPageList = array( $pages[5] );
+		$books[3]->ownPageList = array( $pages[6], $pages[7] );
+		$books[4]->ownPageList = array( $pages[8] );
+		$books[0]->title = 'Diehard C';
+		$books[1]->title = 'Adventures in JavaScript';
+		$books[2]->title = 'CSS ala Picasso';
+		$books[3]->title = 'PHP Tips and Tricks';
+		$books[4]->title = 'Secrets of SQL';
+		$categories[0]->name = 'Programming';
+		$categories[1]->name = 'Design';
+		$categories[2]->name = 'Web Development';
+		$books[0]->sharedCategoryList = array( $categories[0] );
+		$books[1]->sharedCategoryList = array( $categories[0], $categories[2] );
+		$books[2]->sharedCategoryList = array( $categories[0], $categories[2], $categories[1] );
+		$books[3]->sharedCategoryList = array( $categories[0], $categories[2] );
+		$books[4]->sharedCategoryList = array( $categories[0], $categories[2] );
+		R::storeAll( $books );
+	}
+
+	/**
+	 * Test findMulti(). Basic version.
+	 *
+	 * @return void
+	 */
+	public function testFindMulti()
+	{
+		$book = R::dispense( 'book' );
+		$book->title = 'My Book';
+		$book->ownPageList = R::dispense('page', 3);
+		$no = 1;
+		foreach( $book->ownPageList as $page ) {
+			$page->num = $no++;
+		}
+		R::store( $book );
+		$collection = R::findMulti('book,page', '
+			SELECT book.*, page.* FROM book
+			LEFT JOIN page ON page.book_id = book.id
+		');
+		asrt( count( $collection ), 2 );
+		asrt( isset( $collection['book'] ), TRUE );
+		asrt( isset( $collection['page'] ), TRUE );
+		asrt( count( $collection['book'] ), 1 );
+		asrt( count( $collection['page'] ), 3 );
+		foreach( $collection['book'] as $bean ) asrt( ( $bean instanceof OODBBean ), TRUE );
+		foreach( $collection['page'] as $bean ) asrt( ( $bean instanceof OODBBean ), TRUE );
+		$book = reset( $collection['book'] );
+		asrt( $book->title, 'My Book' );
+		$no = 1;
+		foreach( $collection['page'] as $page ) asrt( (int) $page->num, $no++ );
+		R::nuke();
+		$book->noLoad()->ownPageList = $collection['page'];
+		asrt( count( $book->ownPageList ), 3 );
+	}
+
+	/**
+	 * Tests the complex use case for findMulti().
+	 *
+	 * @return void
+	 */
+	public function testMultiAdvanced()
+	{
+		$this->insertBookData();
+		$collection = R::findMulti( 'book,page,text,category', '
+			SELECT book.*, page.*, text.*, category.*
+			FROM book
+			LEFT JOIN page ON page.book_id = book.id
+			LEFT JOIN text ON text.page_id = page.id
+			LEFT JOIN book_category ON book_category.book_id = book.id
+			LEFT JOIN category ON book_category.category_id = category.id
+		' );
+		asrt( count( $collection ), 4 );
+		asrt( isset( $collection['book'] ), TRUE );
+		asrt( isset( $collection['page'] ), TRUE );
+		asrt( isset( $collection['text'] ), TRUE );
+		asrt( isset( $collection['category'] ), TRUE );
+		asrt( count( $collection['book'] ), 5 );
+		asrt( count( $collection['page'] ), 9 );
+		asrt( count( $collection['text'] ), 11 );
+		asrt( count( $collection['category'] ), 3 );
+		foreach( $collection['book'] as $bean ) asrt( ( $bean instanceof OODBBean ), TRUE );
+		foreach( $collection['page'] as $bean ) asrt( ( $bean instanceof OODBBean ), TRUE );
+		foreach( $collection['text'] as $bean ) asrt( ( $bean instanceof OODBBean ), TRUE );
+		foreach( $collection['category'] as $bean ) asrt( ( $bean instanceof OODBBean ), TRUE );
+		foreach( $collection['book']  as $book ) $titles[] = $book->title;
+		asrt( in_array( 'Diehard C', $titles ), TRUE );
+		asrt( in_array( 'Adventures in JavaScript', $titles ), TRUE );
+		asrt( in_array( 'CSS ala Picasso', $titles ), TRUE );
+		asrt( in_array( 'PHP Tips and Tricks', $titles ), TRUE );
+		asrt( in_array( 'Secrets of SQL', $titles ), TRUE );
+		$collection = R::findMulti( 'book,page,text,category,book_category', '
+			SELECT book.*, page.*, text.*, category.*, book_category.*
+			FROM book
+			LEFT JOIN page ON page.book_id = book.id
+			LEFT JOIN text ON text.page_id = page.id
+			LEFT JOIN book_category ON book_category.book_id = book.id
+			LEFT JOIN category ON book_category.category_id = category.id
+			WHERE category_id > ?
+			ORDER BY book.title ASC
+		', array( 0 ), array(
+				array(
+					'b'=>'page',
+					'a'=>'text',
+					'do' => function( $a, $b ) {
+						$b->noLoad()->ownTextList[] = $a;
+						$b->clearHistory();
+					},
+					'matcher' => function( $a, $b ){ return ($a->page_id == $b->id);  }
+					),
+				array(
+					'b'=>'book',
+					'a'=>'page',
+					'do' => function( $a, $b ) {
+						$b->noLoad()->ownPageList[] = $a;
+						$b->clearHistory();
+					},
+					'matcher' => function( $a, $b ){ return ($a->book_id == $b->id);  }
+					),
+				array(
+					'b' => 'category',
+					'a' => 'book',
+					'do'  => function($a, $b) {
+						$a->noLoad()->sharedCategoryList[] = $b;
+						$a->clearHistory();
+					},
+					'matcher' => function( $a, $b, $beans ) {
+							foreach( $beans['book_category'] as $bean ) {
+								if ($bean->book_id == $a->id && $bean->category_id == $b->id) return TRUE;
+							}
+							return FALSE;
+					}
+				),
+			)
+		);
+		$books = $collection['book'];
+		$book = reset( $books );
+		asrt( $book->title, 'Adventures in JavaScript' );
+		R::nuke();
+		asrt( count( $book->ownPageList ), 3 );
+		$page = reset( $book->ownPageList );
+		asrt( count( $page->ownTextList ), 1 );
+		asrt( count( $book->sharedCategoryList ), 2);
+		$categories = array();
+		foreach( $book->sharedCategoryList as $category ) {
+			$categories[] = $category->name;
+		}
+		sort( $categories );
+		asrt( implode( ',', $categories ), 'Programming,Web Development' );
+		$book = next( $books );
+		asrt( $book->title, 'CSS ala Picasso' );
+		asrt( count( $book->ownPage ), 1 );
+		$page = reset( $book->ownPage );
+		asrt( count( $page->ownTextList ), 2 );
+		$texts = array();
+		foreach( $page->ownTextList as $text ) $texts[] = $text->content;
+		asrt( in_array( 'Now we use it for applications...', $texts ), TRUE );
+		$categories = array();
+		foreach( $book->sharedCategoryList as $category ) {
+			$categories[] = $category->name;
+		}
+		sort( $categories );
+		asrt( implode( ',', $categories ), 'Design,Programming,Web Development' );
+		$book = next( $books );
+		asrt( $book->title, 'Diehard C' );
+		asrt( count( $book->ownPageList ), 2 );
+		$page = reset( $book->ownPageList );
+		asrt( count( $page->ownTextList ), 2 );
+		$page = next( $book->ownPageList );
+		asrt( count( $page->ownTextList ), 1 );
+		$categories = array();
+		foreach( $book->sharedCategoryList as $category ) {
+			$categories[] = $category->name;
+		}
+		sort( $categories );
+		asrt( implode( ',', $categories ), 'Programming' );
+		//should have no effect, nothing should have changed
+		R::storeAll($books);
+		asrt( R::count('book'), 0 );
+		asrt( R::count('page'), 0 );
+		asrt( R::count('text'), 0 );
+	}
+
+	/**
 	 * Test forming IN-clause using genSlots and flat.
 	 *
 	 * @return void
