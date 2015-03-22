@@ -90,6 +90,69 @@ class Finding extends Base {
 	}
 
 	/**
+	 * Test findMulti() with manual crafted fields.
+	 *
+	 * @return void
+	 */
+	public function testFindMultiDIY()
+	{
+		R::nuke();
+		$movie = R::dispense( 'movie' );
+		$review = R::dispense( 'review' );
+		$movie->ownReviewList[] = $review;
+		$review->stars = 5;
+		$movie->title = 'Gambit';
+		R::store( $movie );
+		$stuff = R::findMulti( 'movie,review', 'SELECT
+			movie.id AS movie__id,
+			movie.title AS movie__title,
+			review.id AS review__id,
+			review.stars AS review__stars,
+			review.movie_id AS review__movie_id
+			FROM movie
+			LEFT JOIN review ON review.movie_id = movie.id
+		' );
+		asrt( count( $stuff ), 2 );
+		asrt( isset( $stuff['movie'] ), TRUE );
+		asrt( isset( $stuff['review'] ), TRUE );
+		asrt( is_array( $stuff['movie'] ), TRUE );
+		asrt( is_array( $stuff['review'] ), TRUE );
+		asrt( count( $stuff['movie'] ), 1 );
+		asrt( count( $stuff['review'] ), 1 );
+		$movie = reset( $stuff['movie'] );
+		asrt( $movie->title, 'Gambit' );
+		$review = reset( $stuff['review'] );
+		asrt( (int) $review->stars, 5 );
+		R::nuke();
+		$movie = R::dispense( 'movie' );
+		$review = R::dispense( 'review' );
+		$movie->ownReviewList[] = $review;
+		$review->stars = 5;
+		$movie->title = 'Gambit';
+		R::store( $movie );
+		$stuff = R::findMulti( array( 'movie', 'review' ), 'SELECT
+			movie.id AS movie__id,
+			movie.title AS movie__title,
+			review.id AS review__id,
+			review.stars AS review__stars,
+			review.movie_id AS review__movie_id
+			FROM movie
+			LEFT JOIN review ON review.movie_id = movie.id
+		' );
+		asrt( count( $stuff ), 2 );
+		asrt( isset( $stuff['movie'] ), TRUE );
+		asrt( isset( $stuff['review'] ), TRUE );
+		asrt( is_array( $stuff['movie'] ), TRUE );
+		asrt( is_array( $stuff['review'] ), TRUE );
+		asrt( count( $stuff['movie'] ), 1 );
+		asrt( count( $stuff['review'] ), 1 );
+		$movie = reset( $stuff['movie'] );
+		asrt( $movie->title, 'Gambit' );
+		$review = reset( $stuff['review'] );
+		asrt( (int) $review->stars, 5 );
+	}
+
+	/**
 	 * Test findMulti(). Basic version.
 	 *
 	 * @return void
