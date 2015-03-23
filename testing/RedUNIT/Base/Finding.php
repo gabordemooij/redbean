@@ -90,6 +90,65 @@ class Finding extends Base {
 	}
 
 	/**
+	 * Test findMuli with self-made arrays.
+	 *
+	 * @return void
+	 */
+	public function testFindMultiDirectArray()
+	{
+		R::nuke();
+		$collection = R::findMulti( 'shop,product', array(
+			array( 'shop__id' => 1, 'product__id' => 1, 'product__name' => 'vase', 'product__shop_id' => 1 ),
+			array( 'shop__id' => 1, 'product__id' => 2, 'product__name' => 'candle', 'product__shop_id' => 1 ),
+			array( 'shop__id' => 1, 'product__id' => 3, 'product__name' => 'plate', 'product__shop_id' => 1 ),
+		) );
+		asrt( is_array( $collection ), TRUE );
+		asrt( isset( $collection['shop'] ), TRUE );
+		asrt( isset( $collection['product'] ), TRUE );
+		asrt( (int) $collection['shop'][1]->id, 1 );
+		asrt( (int) $collection['product'][1]->id, 1 );
+		asrt( (int) $collection['product'][2]->id, 2 );
+		asrt( (int) $collection['product'][3]->id, 3 );
+		asrt( (int) $collection['product'][1]->shopID, 1 );
+		asrt( (int) $collection['product'][2]->shopID, 1 );
+		asrt( (int) $collection['product'][3]->shopID, 1 );
+		asrt( $collection['product'][1]->name, 'vase' );
+		asrt( $collection['product'][2]->name, 'candle' );
+		asrt( $collection['product'][3]->name, 'plate' );
+		$collection = R::findMulti( 'shop,product', array(
+			array( 'shop__id' => 1, 'product__id' => 1, 'product__name' => 'vase', 'product__shop_id' => 1 ),
+			array( 'shop__id' => 1, 'product__id' => 2, 'product__name' => 'candle', 'product__shop_id' => 1 ),
+			array( 'shop__id' => 1, 'product__id' => 3, 'product__name' => 'plate', 'product__shop_id' => 1 ),
+		), array(), array(
+			array(
+				'a' => 'shop',
+				'b' => 'product',
+				'matcher' => function( $a, $b ) { return ( $b->shopID == $a->id ); },
+				'do'      => function( $a, $b ) { return $a->noLoad()->ownProductList[] = $b; }
+			)
+		) );
+		asrt( is_array( $collection ), TRUE );
+		asrt( isset( $collection['shop'] ), TRUE );
+		asrt( isset( $collection['product'] ), TRUE );
+		asrt( (int) $collection['shop'][1]->id, 1 );
+		asrt( (int) $collection['product'][1]->id, 1 );
+		asrt( (int) $collection['product'][2]->id, 2 );
+		asrt( (int) $collection['product'][3]->id, 3 );
+		asrt( (int) $collection['product'][1]->shopID, 1 );
+		asrt( (int) $collection['product'][2]->shopID, 1 );
+		asrt( (int) $collection['product'][3]->shopID, 1 );
+		asrt( $collection['product'][1]->name, 'vase' );
+		asrt( $collection['product'][2]->name, 'candle' );
+		asrt( $collection['product'][3]->name, 'plate' );
+		asrt( isset( $collection['shop'][1]->ownProductList ), TRUE );
+		asrt( is_array( $collection['shop'][1]->ownProductList ), TRUE );
+		asrt( count( $collection['shop'][1]->ownProductList ), 3 );
+		asrt( $collection['shop'][1]->ownProductList[0]->name, 'vase' );
+		asrt( $collection['shop'][1]->ownProductList[1]->name, 'candle' );
+		asrt( $collection['shop'][1]->ownProductList[2]->name, 'plate' );
+	}
+
+	/**
 	 * Test findMulti() with manual crafted fields.
 	 *
 	 * @return void

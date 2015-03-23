@@ -752,7 +752,7 @@ class Facade
 	 * @see Finder::findMulti()
 	 *
 	 * @param array|string $types      a list of bean types to find
-	 * @param string       $sql        SQL query
+	 * @param string|array $sqlOrArr   SQL query string or result set array
 	 * @param array        $bindings   SQL bindings
 	 * @param array        $remappings An array of remapping arrays containing closures
 	 *

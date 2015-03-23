@@ -301,8 +301,10 @@ class Finder
 	 * selector starts with a SPACE. ' book.*' NOT ',book.*'. This is because
 	 * it's actually an SQL-like template SLOT, not real SQL.
 	 *
+	 * @note instead of an SQL query you can pass a result array as well.
+	 *
 	 * @param string|array $types         a list of types (either array or comma separated string)
-	 * @param string       $sql           an SQL query that provides beans for all the specified types
+	 * @param string|array $sqlOrArr      an SQL query or an array of prefetched records
 	 * @param array        $bindings      optional, bindings for SQL query
 	 * @param array        $remappings    optional, an array of remapping arrays
 	 * @param string       $queryTemplate optional, query template
@@ -312,25 +314,30 @@ class Finder
 	public function findMulti( $types, $sql, $bindings = array(), $remappings = array(), $queryTemplate = ' %s.%s AS %s__%s' )
 	{
 		if ( !is_array( $types ) ) $types = explode( ',', $types );
-		$writer = $this->toolbox->getWriter();
-		$adapter = $this->toolbox->getDatabaseAdapter();
+		if ( !is_array( $sql ) ) {
+			$writer = $this->toolbox->getWriter();
+			$adapter = $this->toolbox->getDatabaseAdapter();
 
-		//Repair the query, replace book.* with book.id AS book_id etc..
-		foreach( $types as $type ) {
-			$pattern = " {$type}.*";
-			if ( strpos( $sql, $pattern ) !== FALSE ) {
-				$newSelectorArray = array();
-				$columns = $writer->getColumns( $type );
-				foreach( $columns as $column => $definition ) {
-					$newSelectorArray[] = sprintf( $queryTemplate, $type, $column, $type, $column );
+			//Repair the query, replace book.* with book.id AS book_id etc..
+			foreach( $types as $type ) {
+				$pattern = " {$type}.*";
+				if ( strpos( $sql, $pattern ) !== FALSE ) {
+					$newSelectorArray = array();
+					$columns = $writer->getColumns( $type );
+					foreach( $columns as $column => $definition ) {
+						$newSelectorArray[] = sprintf( $queryTemplate, $type, $column, $type, $column );
+					}
+					$newSelector = implode( ',', $newSelectorArray );
+					$sql = str_replace( $pattern, $newSelector, $sql );
 				}
-				$newSelector = implode( ',', $newSelectorArray );
-				$sql = str_replace( $pattern, $newSelector, $sql );
 			}
+
+			$rows = $adapter->get( $sql, $bindings );
+		} else {
+			$rows = $sql;
 		}
 
 		//Gather the bean data from the query results using the prefix
-		$rows = $adapter->get( $sql, $bindings );
 		$wannaBeans = array();
 		foreach( $types as $type ) {
 			$wannaBeans[$type] = array();
