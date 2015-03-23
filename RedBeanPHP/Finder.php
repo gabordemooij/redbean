@@ -9,7 +9,10 @@ use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * RedBeanPHP Finder.
- * Helper class to harmonize APIs.
+ * Service class to find beans. For the most part this class
+ * offers user friendly utility methods for interacting with the
+ * OODB::find() method, which is rather complex. This class can be
+ * used to find beans using plain old SQL queries.
  *
  * @file    RedBeanPHP/Finder.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
