@@ -324,16 +324,16 @@ class Finding extends Base {
 	{
 		$book = R::dispense( 'book' );
 		$book->title = 'My Book';
-		$book->ownPageList = R::dispense('page', 3);
+		$book->ownPageList = R::dispense( 'page', 3 );
 		$no = 1;
 		foreach( $book->ownPageList as $page ) {
 			$page->num = $no++;
 		}
 		R::store( $book );
-		$collection = R::findMulti('book,page', '
+		$collection = R::findMulti( 'book,page', '
 			SELECT book.*, page.* FROM book
 			LEFT JOIN page ON page.book_id = book.id
-		');
+		' );
 		asrt( count( $collection ), 2 );
 		asrt( isset( $collection['book'] ), TRUE );
 		asrt( isset( $collection['page'] ), TRUE );
@@ -421,10 +421,10 @@ class Finding extends Base {
 						$a->clearHistory();
 					},
 					'matcher' => function( $a, $b, $beans ) {
-							foreach( $beans['book_category'] as $bean ) {
-								if ($bean->book_id == $a->id && $bean->category_id == $b->id) return TRUE;
-							}
-							return FALSE;
+						foreach( $beans['book_category'] as $bean ) {
+							if ( $bean->book_id == $a->id && $bean->category_id == $b->id ) return TRUE;
+						}
+						return FALSE;
 					}
 				),
 			)
@@ -646,98 +646,60 @@ class Finding extends Base {
 	 *
 	 * @return void
 	 */
-	public function testFinding() {
-
+	public function testFinding()
+	{
 		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
-
 		$a = new AssociationManager( $toolbox );
-
 		$page = $redbean->dispense( "page" );
-
 		$page->name = "John's page";
-
 		$idpage = $redbean->store( $page );
-
 		$page2 = $redbean->dispense( "page" );
-
 		$page2->name = "John's second page";
-
 		$idpage2 = $redbean->store( $page2 );
-
 		$a->associate( $page, $page2 );
-
 		$pageOne = $redbean->dispense( "page" );
-
 		$pageOne->name = "one";
-
 		$pageMore = $redbean->dispense( "page" );
-
 		$pageMore->name = "more";
-
 		$pageEvenMore = $redbean->dispense( "page" );
-
 		$pageEvenMore->name = "evenmore";
-
 		$pageOther = $redbean->dispense( "page" );
-
 		$pageOther->name = "othermore";
-
 		set1toNAssoc( $a, $pageOther, $pageMore );
 		set1toNAssoc( $a, $pageOne, $pageMore );
 		set1toNAssoc( $a, $pageOne, $pageEvenMore );
-
 		asrt( count( $redbean->find( "page", array(), " name LIKE '%more%' ", array() ) ), 3 );
 		asrt( count( $redbean->find( "page", array(), " name LIKE :str ", array( ":str" => '%more%' ) ) ), 3 );
 		asrt( count( $redbean->find( "page", array(), array( " name LIKE :str ", array( ":str" => '%more%' ) ) ) ), 3 );
 		asrt( count( $redbean->find( "page", array(), " name LIKE :str ", array( ":str" => '%mxore%' ) ) ), 0 );
 		asrt( count( $redbean->find( "page", array( "id" => array( 2, 3 ) ) ) ), 2 );
-
 		$bean = $redbean->dispense( "wine" );
-
 		$bean->name = "bla";
-
 		for ( $i = 0; $i < 10; $i++ ) {
 			$redbean->store( $bean );
 		}
-
 		$redbean->find( "wine", array( "id" => 5 ) ); //  Finder:where call OODB::convertToBeans
-
 		$bean2 = $redbean->load( "anotherbean", 5 );
-
 		asrt( $bean2->id, 0 );
-
 		$keys = $adapter->getCol( "SELECT id FROM page WHERE " . $writer->esc( 'name' ) . " LIKE '%John%'" );
-
 		asrt( count( $keys ), 2 );
-
 		$pages = $redbean->batch( "page", $keys );
-
 		asrt( count( $pages ), 2 );
-
 		$p = R::findLast( 'page' );
-
 		pass();
-
 		$row = R::getRow( 'select * from page ' );
-
 		asrt( is_array( $row ), TRUE );
-
 		asrt( isset( $row['name'] ), TRUE );
-
 		// Test findAll -- should not throw an exception
 		asrt( count( R::findAll( 'page' ) ) > 0, TRUE );
 		asrt( count( R::findAll( 'page', ' ORDER BY id ' ) ) > 0, TRUE );
-
 		$beans = R::findOrDispense( "page" );
-
 		asrt( count( $beans ), 6 );
-
 		asrt( is_null( R::findLast( 'nothing' ) ), TRUE );
-
 		try {
 			R::find( 'bean', ' id > 0 ', 'invalid bindings argument' );
 			fail();
@@ -755,9 +717,7 @@ class Finding extends Base {
 	{
 		testpack( 'Test Tree Traversal' );
 		R::nuke();
-
 		$page = R::dispense( 'page', 10 );
-
 		//Setup the test data for this series of tests
 		$i = 0;
 		foreach( $page as $pageItem ) {
@@ -806,11 +766,9 @@ class Finding extends Base {
 	public function testFindError()
 	{
 		R::freeze( FALSE );
-
 		$page = R::dispense( 'page' );
 		$page->title = 'abc';
 		R::store( $page );
-
 		//Column does not exist, in fluid mode no error!
 		try {
 			R::find( 'page', ' xtitle = ? ', array( 'x' ) );
@@ -818,7 +776,6 @@ class Finding extends Base {
 		} catch ( SQL $e ) {
 			fail();
 		}
-
 		//Table does not exist, in fluid mode no error!
 		try {
 			R::find( 'pagex', ' title = ? ', array( 'x' ) );
@@ -826,7 +783,6 @@ class Finding extends Base {
 		} catch ( SQL $e ) {
 			fail();
 		}
-
 		//Syntax error, error in fluid mode if possible to infer from SQLSTATE (MySQL/Postgres)
 		try {
 			R::find( 'page', ' invalid SQL ' );
@@ -841,10 +797,8 @@ class Finding extends Base {
 		} catch ( SQL $e ) {
 			pass();
 		}
-
 		//Frozen, always error...
 		R::freeze( TRUE );
-
 		//Column does not exist, in frozen mode error!
 		try {
 			R::find( 'page', ' xtitle = ? ', array( 'x' ) );
@@ -852,7 +806,6 @@ class Finding extends Base {
 		} catch ( SQL $e ) {
 			pass();
 		}
-
 		//Table does not exist, in frozen mode error!
 		try {
 			R::find( 'pagex', ' title = ? ', array( 'x' ) );
@@ -860,7 +813,6 @@ class Finding extends Base {
 		} catch ( SQL $e ) {
 			pass();
 		}
-
 		//Syntax error, in frozen mode error!
 		try {
 			R::find( 'page', ' invalid SQL ' );
