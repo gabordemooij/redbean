@@ -13,6 +13,9 @@ use RedBeanPHP\RedException\SQL as SQL;
 /**
  * Finding
  *
+ * Tests whether we can find beans by passing SQL queries to the
+ * Facade or the Finder Service Class.
+ *
  * @file    RedUNIT/Base/Finding.php
  * @desc    Tests finding beans.
  * @author  Gabor de Mooij and the RedBeanPHP Community
