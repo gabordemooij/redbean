@@ -90,6 +90,86 @@ class Finding extends Base {
 	}
 
 	/**
+	 * A custom record-to-bean mapping function for findMulti test.
+	 *
+	 * @param string $parentName name of the parent bean
+	 * @param string $childName  name of the child bean
+	 *
+	 * @return array
+	 */
+	private function map($parentName,$childName) {
+		return array(
+			'a' => $parentName,
+			'b' => $childName,
+			'matcher' => function( $parent, $child ) use ( $parentName ) {
+				$property = "{$parentName}ID";
+				return ( $child->$property == $parent->id );
+			},
+			'do' => function( $parent, $child ) use ( $childName ) {
+				$list = 'own'.ucfirst( $childName ).'List';
+				$parent->noLoad()->{$list}[] = $child;
+			}
+		);
+	}
+
+	/**
+	 * You can build your own mapping functions to remap records to bean.
+	 * Just like the preloader once did. However now you can define the
+	 * mapping yourself using closures. This test verifies that such a
+	 * function would actually work.
+	 *
+	 * This method also tests whether empty records (resulting from LEFT JOINS for
+	 * instance) do not produce unnecessary, empty beans.
+	 *
+	 * @return void
+	 */
+	public function testFindMultiExtFunc()
+	{
+		R::nuke();
+		$shop = R::dispense( 'shop' );
+		$shop2 = R::dispense( 'shop' );
+		$products = R::dispense( 'product', 3 );
+		$price = R::dispense( 'price' );
+		$price->tag = 5;
+		$products[0]->name = 'vase';
+		$products[1]->name = 'candle';
+		$products[2]->name = 'plate';
+		$products[1]->ownPriceList[] = $price;
+		$shop->ownProduct[] = $products[0];
+		$shop->ownProduct[] = $products[1];
+		$shop2->ownProduct[] = $products[2];
+		R::storeAll( array( $shop, $shop2 ) );
+		$collection = R::findMulti( 'shop,product,price', '
+			SELECT shop.*, product.*, price.* FROM shop
+			LEFT JOIN product ON product.shop_id = shop.id
+			LEFT JOIN price ON price.product_id = product.id
+		', array(), array(
+			'0' => $this->map( 'shop', 'product' ),
+			'1' => $this->map( 'product', 'price' ),
+		));
+		asrt( is_array( $collection ), TRUE );
+		asrt( count( $collection ), 3 );
+		asrt( count( $collection['shop'] ), 2 );
+		asrt( count( $collection['product'] ), 3 );
+		asrt( count( $collection['price'] ), 1 );
+		$shop = reset( $collection['shop'] );
+		asrt( count( $shop->ownProductList ), 2 );
+		$shop2 = next( $collection['shop'] );
+		asrt( count( $shop2->ownProductList ), 1 );
+		$candle = NULL;
+		foreach( $shop->ownProduct as $product ) {
+				if ( $product->name == 'candle' ) {
+					$candle = $product;
+				}
+		}
+		asrt( is_null( $candle ), FALSE );
+		asrt( count( $candle->ownPrice ), 1 );
+		asrt( $candle->name, 'candle' );
+		$price = reset( $candle->ownPrice );
+		asrt( (int) $price->tag, 5 );
+	}
+
+	/**
 	 * Test findMuli with self-made arrays.
 	 *
 	 * @return void
@@ -115,10 +195,31 @@ class Finding extends Base {
 		asrt( $collection['product'][1]->name, 'vase' );
 		asrt( $collection['product'][2]->name, 'candle' );
 		asrt( $collection['product'][3]->name, 'plate' );
+		R::nuke();
+		$shop = R::dispense('shop');
+		$shop2 = R::dispense('shop');
+		$products = R::dispense('product', 3);
+		$price = R::dispense('price');
+		$price->tag = 5;
+		$products[0]->name = 'vase';
+		$products[1]->name = 'candle';
+		$products[2]->name = 'plate';
+		$products[1]->ownPriceList[] = $price;
+		$shop->ownProduct = $products;
+		R::store($shop);
+		$collection = R::findMulti('shop,product,price', '
+			SELECT shop.*, product.*, price.* FROM shop
+			LEFT JOIN product ON product.shop_id = shop.id
+			LEFT JOIN price ON price.product_id = product.id
+		', array(), array(
+			'0' => $this->map('shop', 'product'),
+			'1' => $this->map('product', 'price'),
+		));
 		$collection = R::findMulti( 'shop,product', array(
 			array( 'shop__id' => 1, 'product__id' => 1, 'product__name' => 'vase', 'product__shop_id' => 1 ),
 			array( 'shop__id' => 1, 'product__id' => 2, 'product__name' => 'candle', 'product__shop_id' => 1 ),
 			array( 'shop__id' => 1, 'product__id' => 3, 'product__name' => 'plate', 'product__shop_id' => 1 ),
+			array( 'shop__id' => 1, 'product__id' => 2, 'product__name' => 'candle', 'product__shop_id' => 1)
 		), array(), array(
 			array(
 				'a' => 'shop',
