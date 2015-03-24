@@ -116,6 +116,22 @@ class Finding extends Base {
 	}
 
 	/**
+	 * FindMulti should not throw errors in case of
+	 * a record-type mismatch.
+	 *
+	 * @return void
+	 */
+	public function testFindMultiErrorHandling()
+	{
+		R::findMulti('a,b', array());
+		pass();
+		R::findMulti('book', array(
+				array( 'book__title' => 'The missing ID.' )
+		));
+		pass();
+	}
+
+	/**
 	 * You can build your own mapping functions to remap records to bean.
 	 * Just like the preloader once did. However now you can define the
 	 * mapping yourself using closures. This test verifies that such a

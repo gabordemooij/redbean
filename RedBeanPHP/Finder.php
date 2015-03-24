@@ -351,6 +351,7 @@ class Finder
 						$wannaBean[$property] = $value;
 					}
 				}
+				if ( !isset( $wannaBean['id'] ) ) continue;
 				if ( is_null( $wannaBean['id'] ) ) continue;
 				$wannaBeans[$type][$wannaBean['id']] = $wannaBean;
 			}
