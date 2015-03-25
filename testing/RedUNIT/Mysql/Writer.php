@@ -146,30 +146,28 @@ class Writer extends \RedUNIT\Mysql
 			if ( $type < 100 ) {
 				asrt( $writer->code( $key, TRUE ), $type );
 			} else {
-				asrt( $writer->code( $key, TRUE ), 99 );
+				asrt( $writer->code( $key, TRUE ), MySQL::C_DATATYPE_SPECIFIED );
 			}
 		}
 
-		asrt( $writer->code( MySQL::C_DATATYPE_SPECIAL_DATETIME ), 99 );
+		asrt( $writer->code( MySQL::C_DATATYPE_SPECIAL_DATETIME ), MySQL::C_DATATYPE_SPECIFIED );
 
-		asrt( $writer->code( "unknown" ), 99 );
+		asrt( $writer->code( "unknown" ), MySQL::C_DATATYPE_SPECIFIED );
 
-		asrt( $writer->scanType( FALSE ), 0 );
-		asrt( $writer->scanType( TRUE ), 0 );
-		asrt( $writer->scanType( INF ), 5 );
+		asrt( $writer->scanType( FALSE ), MySQL::C_DATATYPE_BOOL );
+		asrt( $writer->scanType( TRUE ), MySQL::C_DATATYPE_BOOL );
+		asrt( $writer->scanType( INF ), MySQL::C_DATATYPE_TEXT7 );
 		
-		asrt( $writer->scanType( NULL ), 0 );
+		asrt( $writer->scanType( NULL ), MySQL::C_DATATYPE_BOOL );
 
-		asrt( $writer->scanType( 2 ), 2 );
-		asrt( $writer->scanType( 255 ), 2 ); //no more uint8
-		asrt( $writer->scanType( 256 ), 2 );
+		asrt( $writer->scanType( 2 ), MySQL::C_DATATYPE_UINT32 );
+		asrt( $writer->scanType( 255 ), MySQL::C_DATATYPE_UINT32 ); //no more uint8
+		asrt( $writer->scanType( 256 ), MySQL::C_DATATYPE_UINT32 );
 
-		asrt( $writer->scanType( -1 ), 3 );
-		asrt( $writer->scanType( 1.5 ), 3 );
+		asrt( $writer->scanType( -1 ), MySQL::C_DATATYPE_DOUBLE );
+		asrt( $writer->scanType( 1.5 ), MySQL::C_DATATYPE_DOUBLE );
 
-		//asrt( $writer->scanType( INF ), 4 ); @todo what type should INF get???
-
-		asrt( $writer->scanType( "abc" ), 4 );
+		asrt( $writer->scanType( "abc" ), MySQL::C_DATATYPE_TEXT7 );
 
 		asrt( $writer->scanType( str_repeat( 'abcd', 100000 ) ), MySQL::C_DATATYPE_TEXT32 );
 
@@ -177,13 +175,13 @@ class Writer extends \RedUNIT\Mysql
 
 		asrt( $writer->scanType( "2001-10-10 10:00:00", TRUE ), MySQL::C_DATATYPE_SPECIAL_DATETIME );
 
-		asrt( $writer->scanType( "2001-10-10" ), 4 );
+		asrt( $writer->scanType( "2001-10-10" ), MySQL::C_DATATYPE_TEXT7 );
 
-		asrt( $writer->scanType( "2001-10-10 10:00:00" ), 4 );
+		asrt( $writer->scanType( "2001-10-10 10:00:00" ), MySQL::C_DATATYPE_TEXT7 );
 
-		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), 6 );
+		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), MySQL::C_DATATYPE_TEXT16 );
 
-		$writer->widenColumn( "testtable", "c1", 2 );
+		$writer->widenColumn( "testtable", "c1", MySQL::C_DATATYPE_UINT32 );
 
 		$writer->addColumn( "testtable", "special", MySQL::C_DATATYPE_SPECIAL_DATE );
 
@@ -203,25 +201,25 @@ class Writer extends \RedUNIT\Mysql
 
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols["c1"] ), 2 );
+		asrt( $writer->code( $cols["c1"] ), MySQL::C_DATATYPE_UINT32 );
 
-		$writer->widenColumn( "testtable", "c1", 3 );
-
-		$cols = $writer->getColumns( "testtable" );
-
-		asrt( $writer->code( $cols["c1"] ), 3 );
-
-		$writer->widenColumn( "testtable", "c1", 4 );
+		$writer->widenColumn( "testtable", "c1", MySQL::C_DATATYPE_DOUBLE );
 
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols["c1"] ), 4 );
+		asrt( $writer->code( $cols["c1"] ), MySQL::C_DATATYPE_DOUBLE );
 
-		$writer->widenColumn( "testtable", "c1", 5 );
+		$writer->widenColumn( "testtable", "c1", MySQL::C_DATATYPE_TEXT7 );
 
 		$cols = $writer->getColumns( "testtable" );
 
-		asrt( $writer->code( $cols["c1"] ), 5 );
+		asrt( $writer->code( $cols["c1"] ), MySQL::C_DATATYPE_TEXT7 );
+
+		$writer->widenColumn( "testtable", "c1", MySQL::C_DATATYPE_TEXT8 );
+
+		$cols = $writer->getColumns( "testtable" );
+
+		asrt( $writer->code( $cols["c1"] ), MySQL::C_DATATYPE_TEXT8 );
 
 		$id  = $writer->updateRecord( "testtable", array( array( "property" => "c1", "value" => "lorem ipsum" ) ) );
 
@@ -241,7 +239,7 @@ class Writer extends \RedUNIT\Mysql
 
 		asrt( empty( $row ), TRUE );
 
-		$writer->addColumn( "testtable", "c2", 2 );
+		$writer->addColumn( "testtable", "c2", MySQL::C_DATATYPE_UINT32 );
 	}
 
 	/**
