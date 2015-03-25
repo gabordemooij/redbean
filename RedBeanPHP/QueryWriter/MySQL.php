@@ -182,7 +182,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 		$this->svalue = $value;
 
 		if ( is_null( $value ) ) return MySQL::C_DATATYPE_BOOL;
-		if ( $value === INF ) return MySQL::C_DATATYPE_TEXT8;
+		if ( $value === INF ) return MySQL::C_DATATYPE_TEXT7;
 
 		if ( $flagSpecial ) {
 			if ( preg_match( '/^\d{4}\-\d\d-\d\d$/', $value ) ) {
