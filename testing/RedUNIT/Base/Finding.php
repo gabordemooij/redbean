@@ -123,11 +123,24 @@ class Finding extends Base {
 	 */
 	public function testFindMultiErrorHandling()
 	{
-		R::findMulti('a,b', array());
+		$result = R::findMulti('a,b', array());
+		asrt( is_array( $result ), TRUE );
+		asrt( count( $result ), 2 );
+		asrt( isset( $result['a'] ), TRUE );
+		asrt( isset( $result['b'] ), TRUE );
+		asrt( is_array( $result['a'] ), TRUE );
+		asrt( is_array( $result['b'] ), TRUE );
+		asrt( count( $result['a'] ), 0 );
+		asrt( count( $result['b'] ), 0 );
 		pass();
-		R::findMulti('book', array(
+		$result = R::findMulti( 'book', array(
 				array( 'book__title' => 'The missing ID.' )
-		));
+		) );
+		asrt( is_array( $result ), TRUE );
+		asrt( count( $result ), 1 );
+		asrt( isset( $result['book'] ), TRUE );
+		asrt( is_array( $result['book'] ), TRUE );
+		asrt( count( $result['book'] ), 0 );
 		pass();
 	}
 
