@@ -4,6 +4,7 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * Null
@@ -19,6 +20,58 @@ use RedBeanPHP\Facade as R;
  */
 class Null extends Base
 {
+
+	/**
+	 * Test Null bindings.
+	 */
+	public function testBindings()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->content = NULL;
+		//can we store a NULL?
+		asrt( is_null( $book->content ), TRUE );
+		R::store( $book );
+		//did we really store the NULL value ?
+		$book = R::findOne( 'book', ' content IS NULL ' );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		//still NULL, not empty STRING ?
+		asrt( is_null( $book->content ), TRUE );
+		$book->pages = 100;
+		R::store( $book );
+		//did we save it once again as NULL?
+		$book = R::findOne( 'book', ' content IS NULL ' );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		asrt( is_null( $book->content ), TRUE );
+		asrt( gettype( $book->pages ), 'string' );
+		$otherBook = R::dispense( 'book' );
+		$otherBook->pages = 99;
+		//also if the column is VARCHAR-like?
+		$otherBook->content = 'blah blah';
+		R::store( $otherBook );
+		$book = R::findOne( 'book', ' content IS NULL ' );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		asrt( is_null( $book->content ), TRUE );
+		asrt( intval( $book->pages ), 100 );
+		//can we query not NULL as well?
+		$book = R::findOne( 'book', ' content IS NOT NULL ' );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		asrt( is_null( $book->content ), FALSE );
+		asrt( intval( $book->pages ), 99 );
+		asrt( $book->content, 'blah blah' );
+		//Can we bind NULL directly?
+		$book->isGood = FALSE;
+		//Is NULL the default? And... no confusion with boolean FALSE?
+		R::store( $book );
+		$book = R::findOne( 'book', ' is_good IS NULL' );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		asrt( is_null( $book->content ), TRUE );
+		asrt( intval( $book->pages ), 100 );
+		$book = R::findOne( 'book', ' is_good = ?', array( 0 ) );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		asrt( is_null( $book->content ), FALSE );
+		asrt( intval( $book->pages ), 99 );
+	}
 
 	/**
 	 * Tests whether we can NULLify a parent bean
