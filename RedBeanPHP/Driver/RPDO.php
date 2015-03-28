@@ -102,19 +102,19 @@ class RPDO implements Driver
 		foreach ( $bindings as $key => &$value ) {
 			if ( is_integer( $key ) ) {
 				if ( is_null( $value ) ) {
-					$statement->bindValue( $key + 1, NULL,\PDO::PARAM_NULL );
+					$statement->bindValue( $key + 1, NULL, \PDO::PARAM_NULL );
 				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && abs( $value ) <= $this->max ) {
-					$statement->bindParam( $key + 1, $value,\PDO::PARAM_INT );
+					$statement->bindParam( $key + 1, $value, \PDO::PARAM_INT );
 				} else {
-					$statement->bindParam( $key + 1, $value,\PDO::PARAM_STR );
+					$statement->bindParam( $key + 1, $value, \PDO::PARAM_STR );
 				}
 			} else {
 				if ( is_null( $value ) ) {
-					$statement->bindValue( $key, NULL,\PDO::PARAM_NULL );
+					$statement->bindValue( $key, NULL, \PDO::PARAM_NULL );
 				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && abs( $value ) <= $this->max ) {
-					$statement->bindParam( $key, $value,\PDO::PARAM_INT );
+					$statement->bindParam( $key, $value, \PDO::PARAM_INT );
 				} else {
-					$statement->bindParam( $key, $value,\PDO::PARAM_STR );
+					$statement->bindParam( $key, $value, \PDO::PARAM_STR );
 				}
 			}
 		}
