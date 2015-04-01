@@ -41,6 +41,7 @@ class Misc extends Blackhole
 	 */
 	public function testIntegerBindingMax()
 	{
+		if ( defined( 'HHVM_VERSION' ) ) return; //not for hhvm...
 		$driver = new RPDO( 'test-sqlite-53', 'user', 'pass' );
 		$max = $driver->getIntegerBindingMax();
 		asrt( $max, 2147483647 );
