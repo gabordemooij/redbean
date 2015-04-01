@@ -221,7 +221,7 @@ class RPDO implements Driver
 		}
 
 		//PHP 5.3 PDO SQLite has a bug with large numbers:
-		if ( ( strpos( $this->dsn, 'sqlite' ) === 0 && PHP_MAJOR_VERSION === 5 && PHP_MINOR_VERSION === 3 ) || $this->dsn === 'test-sqlite-53' ) {
+		if ( ( strpos( $this->dsn, 'sqlite' ) === 0 && PHP_MAJOR_VERSION === 5 && PHP_MINOR_VERSION === 3 ) ||  defined('HHVM_VERSION') || $this->dsn === 'test-sqlite-53' ) {
 			$this->max = 2147483647; //otherwise you get -2147483648 ?! demonstrated in build #603 on Travis.
 		} elseif ( strpos( $this->dsn, 'cubrid' ) === 0 ) {
 			$this->max = 2147483647; //bindParam in pdo_cubrid also fails...
