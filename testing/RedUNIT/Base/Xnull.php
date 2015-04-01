@@ -9,7 +9,7 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Null
  *
- * @file    RedUNIT/Base/Null.php
+ * @file    RedUNIT/Base/Xnull.php
  * @desc    Tests handling of NULL values.
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license New BSD/GPLv2
@@ -18,7 +18,7 @@ use RedBeanPHP\OODBBean as OODBBean;
  * This source file is subject to the New BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class Null extends Base
+class Xnull extends Base
 {
 
 	/**
