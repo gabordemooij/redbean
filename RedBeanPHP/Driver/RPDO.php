@@ -242,6 +242,8 @@ class RPDO implements Driver
 
 	/**
 	 * Whether to bind all parameters as strings.
+	 * If set to TRUE this will cause all integers to be bound as STRINGS.
+	 * This will NOT affect NULL values.
 	 *
 	 * @param boolean $yesNo pass TRUE to bind all parameters as strings.
 	 *
