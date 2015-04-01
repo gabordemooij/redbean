@@ -6,6 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
 use RedBeanPHP\OODB as OODB;
+use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\RedException\SQL as SQL;
@@ -34,6 +35,49 @@ class Database extends Base
 	public function getTargetDrivers()
 	{
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
+	}
+
+	/**
+	 * Can we use colons in SQL?
+	 *
+	 * @return void
+	 */
+	public function testColonsInSQL()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->title = 'About :';
+		R::store( $book );
+		pass();
+		$book = R::findOne( 'book', ' title LIKE :this ', array(
+			':this' => 'About :'
+		) );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		//without the colon?
+		$book = R::findOne( 'book', ' title LIKE :this ', array(
+			'this' => 'About :'
+		) );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		$book = R::findOne( 'book', ' title LIKE :this ', array(
+			':this' => '%:%'
+		) );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		$book = R::findOne( 'book', ' title LIKE :this OR title LIKE :that', array(
+			'this' => '%:%', ':that' => 'That'
+		) );
+		asrt( ( $book instanceof OODBBean ), TRUE );
+		$records = R::getAll('SELECT * FROM book WHERE title LIKE :this', array( ':this' => 'About :' ) );
+		asrt( count( $records ), 1 );
+		$records = R::getAll('SELECT * FROM book WHERE title LIKE :this', array( 'this' => 'About :' ) );
+		asrt( count( $records ), 1 );
+		$records = R::getAll('SELECT * FROM book WHERE title LIKE :this OR title LIKE :that', array( ':this' => 'About :', ':that' => 'That' ) );
+		asrt( count( $records ), 1 );
+		$records = R::getRow('SELECT * FROM book WHERE title LIKE :this', array( ':this' => 'About :' ) );
+		asrt( count( $records ), 2 );
+		$records = R::getRow('SELECT * FROM book WHERE title LIKE :this', array( 'this' => 'About :' ) );
+		asrt( count( $records ), 2 );
+		$records = R::getRow('SELECT * FROM book WHERE title LIKE :this OR title LIKE :that', array( ':this' => 'About :', ':that' => 'That' ) );
+		asrt( count( $records ), 2 );
 	}
 
 	/**
