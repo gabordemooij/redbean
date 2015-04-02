@@ -5,6 +5,7 @@ namespace RedBeanPHP\Driver;
 use RedBeanPHP\Driver as Driver;
 use RedBeanPHP\Logger as Logger;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\Logger\RDefault as RDefault;
 use RedBeanPHP\PDOCompatible as PDOCompatible;
@@ -252,6 +253,26 @@ class RPDO implements Driver
 	public function setUseStringOnlyBinding( $yesNo )
 	{
 		$this->flagUseStringOnlyBinding = (boolean) $yesNo;
+	}
+
+	/**
+	 * Sets the maximum value to be bound as integer, normally
+	 * this value equals PHP's MAX INT constant, however sometimes
+	 * PDO driver bindings cannot bind large integers as integers.
+	 * This method allows you to manually set the max integer binding
+	 * value to manage portability/compatibility issues among different
+	 * PHP builds. This method will return the old value.
+	 *
+	 * @param integer $max maximum value for integer bindings
+	 *
+	 * @return integer
+	 */
+	public function setMaxIntBind( $max )
+	{
+		if ( !is_integer( $max ) ) throw new RedException( 'Parameter has to be integer.' );
+		$oldMax = $this->max;
+		$this->max = $max;
+		return $oldMax;
 	}
 
 	/**

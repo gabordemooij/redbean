@@ -9,6 +9,7 @@ use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\AssociationManager as AssociationManager;
+use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\QueryWriter\MySQL as MySQL;
 use RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;
@@ -35,6 +36,38 @@ class Database extends Base
 	public function getTargetDrivers()
 	{
 		return array( 'mysql', 'pgsql', 'sqlite', 'CUBRID' );
+	}
+
+	/**
+	 * Test setter maximum integer bindings.
+	 *
+	 * @return void
+	 */
+	public function testSetMaxBind()
+	{
+		$driver = R::getDatabaseAdapter()->getDatabase();
+		$old = $driver->setMaxIntBind( 10 );
+		//use SQLite to confirm...
+		if ( $this->currentlyActiveDriverID === 'sqlite' ) {
+			$type = R::getCell( 'SELECT typeof( ? ) ', array( 11 ) );
+			asrt( $type, 'text' );
+			$type = R::getCell( 'SELECT typeof( ? ) ', array( 10 ) );
+			asrt( $type, 'integer' );
+			$type = R::getCell( 'SELECT typeof( ? ) ', array( 9 ) );
+			asrt( $type, 'integer' );
+		}
+		$new = $driver->setMaxIntBind( $old );
+		asrt( $new, 10 );
+		try {
+			$driver->setMaxIntBind( '10' );
+			fail();
+		} catch( RedException $e ) {
+			pass();
+		}
+		$new = $driver->setMaxIntBind( $old );
+		asrt( $new, $old );
+		$new = $driver->setMaxIntBind( $old );
+		asrt( $new, $old );
 	}
 
 	/**
