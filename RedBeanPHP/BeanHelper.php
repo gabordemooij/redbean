@@ -48,7 +48,7 @@ interface BeanHelper
 	 *
 	 * @param OODBBean $bean
 	 *
-	 * @return string
+	 * @return object
 	 */
 	public function getModelForBean( OODBBean $bean );
 }
