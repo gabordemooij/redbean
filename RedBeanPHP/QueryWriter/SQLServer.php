@@ -464,4 +464,13 @@ class SQLServer extends AQueryWriter implements QueryWriter
 
         $this->adapter->exec( "ALTER TABLE [$table] ADD [$column] $type " );
     }
+	
+	/**
+	 * @see QueryWriter::addUniqueIndex
+	 */
+	public function addUniqueConstraint( $type, $properties )
+	{
+		throw new \Exception("Not yet implemented");
+		return FALSE;
+	}
 }
