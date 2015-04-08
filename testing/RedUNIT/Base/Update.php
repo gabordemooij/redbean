@@ -4,9 +4,9 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\RedException\Base as RedException;
+use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 
 /**
  * Update
@@ -30,11 +30,11 @@ class Update extends Base
 	public function testSQLFilters()
 	{
 		R::nuke();
-		AQueryWriter::setSQLFilters(array(
-			QueryWriter::C_SQLFILTER_READ => array(
+		QueryWriter::setSQLFilters(array(
+			IQueryWriter::C_SQLFILTER_READ => array(
 				'book' => array( 'title' => ' LOWER(book.title) '),
 			),
-			QueryWriter::C_SQLFILTER_WRITE => array(
+			IQueryWriter::C_SQLFILTER_WRITE => array(
 				'book' => array( 'title' => ' UPPER(?) '),
 			),
 		));
@@ -62,12 +62,12 @@ class Update extends Base
 		$links = $book->ownBookBookList;
 		$link = reset( $links );
 		$link->shelf = 'x13';
-		AQueryWriter::setSQLFilters(array(
-			QueryWriter::C_SQLFILTER_READ => array(
+		QueryWriter::setSQLFilters(array(
+			IQueryWriter::C_SQLFILTER_READ => array(
 				'book' => array( 'title' => ' LOWER(book.title) '),
 				'book_book' => array( 'shelf' => ' LOWER(book_book.shelf) '),
 			),
-			QueryWriter::C_SQLFILTER_WRITE => array(
+			IQueryWriter::C_SQLFILTER_WRITE => array(
 				'book' => array( 'title' => ' UPPER(?) '),
 				'book_book' => array( 'shelf' => ' UPPER(?) ')
 			),
@@ -77,7 +77,7 @@ class Update extends Base
 		$otherBook = $otherBook->fresh();
 		unset($book->sharedBookList[$otherBook->id]);
 		R::store( $book );
-		AQueryWriter::setSQLFilters(array());
+		QueryWriter::setSQLFilters(array());
 	}
 
 	/**
@@ -139,7 +139,7 @@ class Update extends Base
 		try {
 			$trans->seller = R::dispense( 'user' );
 			pass();
-		} catch( Exception $e ) {
+		} catch( \Exception $e ) {
 			fail();
 		}
 
@@ -149,7 +149,7 @@ class Update extends Base
 		try {
 			unset( $trans->seller );
 			pass();
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			fail();
 		}
 

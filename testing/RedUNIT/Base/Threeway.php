@@ -4,8 +4,8 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\RedException\Base as RedException;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 
 /**
  * Threeway
@@ -29,7 +29,7 @@ class Threeway extends Base
 	 */
 	public function testUniqueConstraintOnThreeways()
 	{
-		AQueryWriter::clearRenames();
+		QueryWriter::clearRenames();
 
 		R::nuke();
 
@@ -80,7 +80,7 @@ class Threeway extends Base
 
 		//Can we add a duplicate role now?
 		asrt( R::count( 'participant' ), 2 );
-		AQueryWriter::clearRenames();
+		QueryWriter::clearRenames();
 	}
 
 	/**
@@ -94,7 +94,7 @@ class Threeway extends Base
 	 */
 	public function testIssueWithDriverReturnID()
 	{
-		AQueryWriter::clearRenames();
+		QueryWriter::clearRenames();
 		R::nuke();
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
@@ -140,6 +140,6 @@ class Threeway extends Base
 		foreach( $book->ownPageList as $listItem) {
 			asrt( is_string( $listItem->id ), TRUE );
 		}
-		AQueryWriter::clearRenames();
+		QueryWriter::clearRenames();
 	}
 }

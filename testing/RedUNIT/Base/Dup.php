@@ -6,7 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\DuplicationManager as DuplicationManager;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\RedException\Base as RedException;
 
 /**
  * Dup

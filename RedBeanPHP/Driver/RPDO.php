@@ -2,13 +2,12 @@
 
 namespace RedBeanPHP\Driver;
 
-use RedBeanPHP\Driver as Driver;
-use RedBeanPHP\Logger as Logger;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\IDriver as IDriver;
+use RedBeanPHP\ILogger as ILogger;
+use RedBeanPHP\QueryWriter\Base as BaseQueryWriter;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\Logger\RDefault as RDefault;
-use RedBeanPHP\PDOCompatible as PDOCompatible;
 use RedBeanPHP\Cursor\PDOCursor as PDOCursor;
 
 /**
@@ -26,7 +25,7 @@ use RedBeanPHP\Cursor\PDOCursor as PDOCursor;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RPDO implements Driver
+class RPDO implements IDriver
 {
 	/**
 	 * @var integer
@@ -44,12 +43,12 @@ class RPDO implements Driver
 	protected $loggingEnabled = FALSE;
 
 	/**
-	 * @var Logger
+	 * @var ILogger
 	 */
 	protected $logger = NULL;
 
 	/**
-	 * @var PDO
+	 * @var \PDO
 	 */
 	protected $pdo;
 
@@ -93,7 +92,7 @@ class RPDO implements Driver
 	 * Query Execution. This method binds parameters as NULL, INTEGER or STRING
 	 * and supports both named keys and question mark keys.
 	 *
-	 * @param PDOStatement $statement PDO Statement instance
+	 * @param \PDOStatement $statement PDO Statement instance
 	 * @param array        $bindings  values that need to get bound to the statement
 	 *
 	 * @return void
@@ -104,7 +103,7 @@ class RPDO implements Driver
 			if ( is_integer( $key ) ) {
 				if ( is_null( $value ) ) {
 					$statement->bindValue( $key + 1, NULL, \PDO::PARAM_NULL );
-				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && abs( $value ) <= $this->max ) {
+				} elseif ( !$this->flagUseStringOnlyBinding && BaseQueryWriter::canBeTreatedAsInt( $value ) && abs( $value ) <= $this->max ) {
 					$statement->bindParam( $key + 1, $value, \PDO::PARAM_INT );
 				} else {
 					$statement->bindParam( $key + 1, $value, \PDO::PARAM_STR );
@@ -112,7 +111,7 @@ class RPDO implements Driver
 			} else {
 				if ( is_null( $value ) ) {
 					$statement->bindValue( $key, NULL, \PDO::PARAM_NULL );
-				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && abs( $value ) <= $this->max ) {
+				} elseif ( !$this->flagUseStringOnlyBinding && BaseQueryWriter::canBeTreatedAsInt( $value ) && abs( $value ) <= $this->max ) {
 					$statement->bindParam( $key, $value, \PDO::PARAM_INT );
 				} else {
 					$statement->bindParam( $key, $value, \PDO::PARAM_STR );
@@ -130,8 +129,9 @@ class RPDO implements Driver
 	 *
 	 * @param string $sql      the SQL string to be send to database server
 	 * @param array  $bindings the values that need to get bound to the query slots
+	 * @param array $options
 	 *
-	 * @return void
+	 * @return $statement
 	 *
 	 * @throws SQL
 	 */
@@ -173,6 +173,8 @@ class RPDO implements Driver
 			$exception->setSQLState( $e->getCode() );
 			throw $exception;
 		}
+
+		return null;
 	}
 
 	/**
@@ -265,6 +267,8 @@ class RPDO implements Driver
 	 *
 	 * @param integer $max maximum value for integer bindings
 	 *
+	 * @throws RedException
+	 *
 	 * @return integer
 	 */
 	public function setMaxIntBind( $max )
@@ -317,7 +321,7 @@ class RPDO implements Driver
 	 * this method if you are an expert on RedBeanPHP, PDO and UTF8 connections and
 	 * you know your database server VERY WELL.
 	 *
-	 * @param PDO $pdo PDO instance
+	 * @param \PDO $pdo PDO instance
 	 *
 	 * @return void
 	 */
@@ -326,7 +330,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::GetAll
+	 * @see IDriver::GetAll
 	 */
 	public function GetAll( $sql, $bindings = array() )
 	{
@@ -335,7 +339,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::GetAssocRow
+	 * @see IDriver::GetAssocRow
 	 */
 	public function GetAssocRow( $sql, $bindings = array() )
 	{
@@ -347,7 +351,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::GetCol
+	 * @see IDriver::GetCol
 	 */
 	public function GetCol( $sql, $bindings = array() )
 	{
@@ -363,7 +367,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::GetOne
+	 * @see IDriver::GetOne
 	 */
 	public function GetOne( $sql, $bindings = array() )
 	{
@@ -393,7 +397,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::GetRow
+	 * @see IDriver::GetRow
 	 */
 	public function GetRow( $sql, $bindings = array() )
 	{
@@ -402,7 +406,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::Excecute
+	 * @see IDriver::Excecute
 	 */
 	public function Execute( $sql, $bindings = array() )
 	{
@@ -411,7 +415,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::GetInsertID
+	 * @see IDriver::GetInsertID
 	 */
 	public function GetInsertID()
 	{
@@ -421,7 +425,8 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::GetCursor
+	 * @see IDriver::GetCursor
+	 * @returns PDOCursor
 	 */
 	public function GetCursor( $sql, $bindings = array() )
 	{
@@ -431,7 +436,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::Affected_Rows
+	 * @see IDriver::Affected_Rows
 	 */
 	public function Affected_Rows()
 	{
@@ -444,8 +449,8 @@ class RPDO implements Driver
 	 * SQL to the screen together with some information about the
 	 * results.
 	 *
-	 * @param boolean $trueFalse turn on/off
-	 * @param Logger  $logger    logger instance
+	 * @param boolean $tf   turn on/off
+	 * @param ILogger  $logger    logger instance
 	 *
 	 * @return void
 	 */
@@ -463,11 +468,11 @@ class RPDO implements Driver
 	 * Injects Logger object.
 	 * Sets the logger instance you wish to use.
 	 *
-	 * @param Logger $logger the logger instance to be used for logging
+	 * @param ILogger $logger the logger instance to be used for logging
 	 *
 	 * @return void
 	 */
-	public function setLogger( Logger $logger )
+	public function setLogger( ILogger $logger )
 	{
 		$this->logger = $logger;
 	}
@@ -476,7 +481,7 @@ class RPDO implements Driver
 	 * Gets Logger object.
 	 * Returns the currently active Logger instance.
 	 *
-	 * @return Logger
+	 * @return ILogger
 	 */
 	public function getLogger()
 	{
@@ -484,7 +489,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::StartTrans
+	 * @see IDriver::StartTrans
 	 */
 	public function StartTrans()
 	{
@@ -493,7 +498,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::CommitTrans
+	 * @see IDriver::CommitTrans
 	 */
 	public function CommitTrans()
 	{
@@ -502,7 +507,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::FailTrans
+	 * @see IDriver::FailTrans
 	 */
 	public function FailTrans()
 	{
@@ -538,7 +543,7 @@ class RPDO implements Driver
 	/**
 	 * Returns the underlying PHP PDO instance.
 	 *
-	 * @return PDO
+	 * @return \PDO
 	 */
 	public function getPDO()
 	{

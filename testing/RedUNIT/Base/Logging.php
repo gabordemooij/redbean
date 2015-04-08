@@ -4,7 +4,7 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\Logger as Logger;
+use RedBeanPHP\ILogger as ILogger;
 use RedBeanPHP\Logger\RDefault as RDefault; 
 
 /**
@@ -34,7 +34,7 @@ class Logging extends Base
 		$logs = R::getLogs();
 		$count = count( $logs );
 		asrt( ( count( $logs ) > 0 ), TRUE );
-		asrt( ( R::getLogger() instanceof Logger ), TRUE );
+		asrt( ( R::getLogger() instanceof ILogger ), TRUE );
 		R::stopLogging();
 		R::store( R::dispense( 'book' ) );
 		$logs = R::getLogs();

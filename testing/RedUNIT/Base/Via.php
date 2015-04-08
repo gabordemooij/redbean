@@ -7,7 +7,7 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\RedException\SQL as SQL;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 
 /**
  * Via
@@ -161,7 +161,7 @@ class Via extends Base
 		$book->via('relation')->countOwn('item');
 		$book->via('relation')->countOwn('item');
 		asrt( count( $book->sharedPageList ), 1 );
-		AQueryWriter::clearRenames();
+		QueryWriter::clearRenames();
 	}
 
 	/**

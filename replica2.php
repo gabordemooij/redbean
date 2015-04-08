@@ -49,35 +49,35 @@ if ($mode !== 'onlyphar') {
 
 	define('DIR', 'RedBeanPHP/');
 
-	addFile( DIR . 'Logger.php' );
+	addFile( DIR . 'ILogger.php' );
 	addFile( DIR . 'Logger/RDefault.php' );
 	addFile( DIR . 'Logger/RDefault/Debug.php' );
-	addFile( DIR . 'Driver.php' );
+	addFile( DIR . 'IDriver.php' );
 	addFile( DIR . 'Driver/RPDO.php' );
 	addFile( DIR . 'OODBBean.php' );
 	addFile( DIR . 'Observable.php' );
 	addFile( DIR . 'Observer.php' );
-	addFile( DIR . 'Adapter.php' );
+	addFile( DIR . 'IAdapter.php' );
 	addFile( DIR . 'Adapter/DBAdapter.php' );
-	addFile( DIR . 'Cursor.php');
+	addFile( DIR . 'ICursor.php');
 	addFile( DIR . 'Cursor/PDOCursor.php');
 	addFile( DIR . 'Cursor/NullCursor.php');
 	addFile( DIR . 'BeanCollection.php' );
-	addFile( DIR . 'QueryWriter.php' );
-	addFile( DIR . 'QueryWriter/AQueryWriter.php' );
+	addFile( DIR . 'IQueryWriter.php' );
+	addFile( DIR . 'QueryWriter/Base.php' );
 	addFile( DIR . 'QueryWriter/MySQL.php' );
 	addFile( DIR . 'QueryWriter/SQLiteT.php' );
 	addFile( DIR . 'QueryWriter/PostgreSQL.php' );
-	addFile( DIR . 'RedException.php' );
+	addFile( DIR . 'RedException/Base.php' );
 	addFile( DIR . 'RedException/SQL.php' );
-	addFile( DIR . 'Repository.php' );
+	addFile( DIR . 'Repository/Base.php' );
 	addFile( DIR . 'Repository/Fluid.php' );
 	addFile( DIR . 'Repository/Frozen.php' );
 	addFile( DIR . 'OODB.php' );
 	addFile( DIR . 'ToolBox.php' );
 	addFile( DIR . 'Finder.php' );
 	addFile( DIR . 'AssociationManager.php' );
-	addFile( DIR . 'BeanHelper.php' );
+	addFile( DIR . 'IBeanHelper.php' );
 	addFile( DIR . 'BeanHelper/SimpleFacadeBeanHelper.php' );
 	addFile( DIR . 'SimpleModel.php' );
 	addFile( DIR . 'SimpleModelHelper.php' );
@@ -85,7 +85,7 @@ if ($mode !== 'onlyphar') {
 	addFile( DIR . 'LabelMaker.php' );
 	addFile( DIR . 'Facade.php' );
 	addFile( DIR . 'DuplicationManager.php' );
-	addFile( DIR . 'Plugin.php' );
+	addFile( DIR . 'IPlugin.php' );
 
 	$func = file_get_contents(DIR . 'Functions.php');
 

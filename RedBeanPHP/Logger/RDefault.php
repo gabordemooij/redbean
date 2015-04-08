@@ -2,9 +2,8 @@
 
 namespace RedBeanPHP\Logger;
 
-use RedBeanPHP\Logger as Logger;
-use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\RedException\Security as Security;
+use RedBeanPHP\ILogger as ILogger;
+use RedBeanPHP\RedException\Base as RedException;
 
 /**
  * Logger. Provides a basic logging function for RedBeanPHP.
@@ -18,7 +17,7 @@ use RedBeanPHP\RedException\Security as Security;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RDefault implements Logger
+class RDefault implements ILogger
 {
 	/**
 	 * Logger modes
@@ -101,7 +100,9 @@ class RDefault implements Logger
 	 * C_LOGGER_ECHO  - also forward log messages directly to STDOUT
 	 *  
 	 * @param integer $mode mode of operation for logging object
-	 * 
+	 *
+	 * @throws RedException
+	 *
 	 * @return self
 	 */
 	public function setMode( $mode )

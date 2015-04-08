@@ -2,10 +2,10 @@
 
 namespace RedBeanPHP\BeanHelper;
 
-use RedBeanPHP\BeanHelper as BeanHelper;
+use RedBeanPHP\SimpleModel;
+use RedBeanPHP\IBeanHelper as IBeanHelper;
 use RedBeanPHP\Facade as Facade;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
 
 /**
  * Bean Helper.
@@ -23,12 +23,12 @@ use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class SimpleFacadeBeanHelper implements BeanHelper
+class SimpleFacadeBeanHelper implements IBeanHelper
 {
 	/**
 	 * Factory function to create instance of Simple Model, if any.
 	 *
-	 * @var closure
+	 * @var \Closure
 	 */
 	private static $factory = null;
 
@@ -50,7 +50,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 * Sets the factory function to create the model when using FUSE
 	 * to connect a bean to a model.
 	 *
-	 * @param closure $factory
+	 * @param \Closure $factory
 	 *
 	 * @return void
 	 */
@@ -60,7 +60,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	}
 
 	/**
-	 * @see BeanHelper::getToolbox
+	 * @see IBeanHelper::getToolbox
 	 */
 	public function getToolbox()
 	{
@@ -68,7 +68,9 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	}
 
 	/**
-	 * @see BeanHelper::getModelForBean
+	 * @see IBeanHelper::getModelForBean
+	 * @param OODBBean $bean;
+	 * @return self::factory()
 	 */
 	public function getModelForBean( OODBBean $bean )
 	{
@@ -106,7 +108,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	}
 
 	/**
-	 * @see BeanHelper::getExtractedToolbox
+	 * @see IBeanHelper::getExtractedToolbox
 	 */
 	public function getExtractedToolbox()
 	{

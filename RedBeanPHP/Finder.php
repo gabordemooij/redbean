@@ -4,7 +4,7 @@ namespace RedBeanPHP;
 
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\OODB as OODB;
-use RedBeanPHP\RedException\Security as Security;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
@@ -60,7 +60,7 @@ class Finder
 	 *
 	 * @return array
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	public function find( $type, $sql = NULL, $bindings = array() )
 	{

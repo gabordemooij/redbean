@@ -331,13 +331,19 @@ class FaultyWriter extends \RedBeanPHP\QueryWriter\MySQL
 }
 
 /**
- * Mock class to test default implementations in AQueryWriter.
+ * Mock class to test default implementations in QueryWriter\Base.
  */
-class NullWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
+class NullWriter extends \RedBeanPHP\QueryWriter\Base {
+	public function getColumns( $type ) {}
+	public function getTables() {}
+	public function addUniqueConstraint( $type, $properties ) {}
+
 }
 
-class ProxyWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
-
+class ProxyWriter extends \RedBeanPHP\QueryWriter\Base {
+	public function getColumns( $type ) {}
+	public function getTables() {}
+	public function addUniqueConstraint( $type, $properties ) {}
 	public static function callMethod( $object, $method, $arg1 = NULL, $arg2 = NULL, $arg3 = NULL ) {
 		return $object->$method( $arg1, $arg2, $arg3 );
 	}
@@ -457,7 +463,7 @@ class UUIDWriterMySQL extends \RedBeanPHP\QueryWriter\MySQL {
 	protected $defaultValue = '@uuid';
 	const C_DATATYPE_SPECIAL_UUID  = 97;
 
-	public function __construct( \RedBeanPHP\Adapter $adapter )
+	public function __construct( \RedBeanPHP\IAdapter $adapter )
 	{
 		parent::__construct( $adapter );
 		$this->addDataType( self::C_DATATYPE_SPECIAL_UUID, 'char(36)'  );
@@ -499,7 +505,7 @@ class UUIDWriterPostgres extends \RedBeanPHP\QueryWriter\PostgreSQL {
 	protected $defaultValue = 'uuid_generate_v4()';
 	const C_DATATYPE_SPECIAL_UUID  = 97;
 
-	public function __construct( \RedBeanPHP\Adapter $adapter )
+	public function __construct( \RedBeanPHP\IAdapter $adapter )
 	{
 		parent::__construct( $adapter );
 		$this->addDataType( self::C_DATATYPE_SPECIAL_UUID, 'uuid'  );

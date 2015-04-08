@@ -2,10 +2,9 @@
 
 namespace RedBeanPHP\QueryWriter;
 
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\IQueryWriter as IQueryWriter;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\IAdapter as IAdapter;
 use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
@@ -22,7 +21,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class MySQL extends AQueryWriter implements QueryWriter
+class MySQL extends Base implements IQueryWriter
 {
 	/**
 	 * Data types
@@ -53,7 +52,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	protected $quoteCharacter = '`';
 
 	/**
-	 * @see AQueryWriter::getKeyMapForType
+	 * @see QueryWriter::getKeyMapForType
 	 */
 	protected function getKeyMapForType( $type )
 	{
@@ -97,9 +96,9 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * Constructor
 	 *
-	 * @param Adapter $adapter Database Adapter
+	 * @param IAdapter $adapter Database Adapter
 	 */
-	public function __construct( Adapter $adapter )
+	public function __construct( IAdapter $adapter )
 	{
 		$this->typeno_sqltype = array(
 			MySQL::C_DATATYPE_BOOL             => ' TINYINT(1) UNSIGNED ',
@@ -250,7 +249,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 			return $r;
 		}
 
-		if ( $r >= QueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
+		if ( $r >= IQueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
 			return self::C_DATATYPE_SPECIFIED;
 		}
 
@@ -337,9 +336,9 @@ class MySQL extends AQueryWriter implements QueryWriter
 	public function sqlStateIn( $state, $list )
 	{
 		$stateMap = array(
-			'42S02' => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'42S22' => QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			'23000' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'42S02' => IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			'42S22' => IQueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			'23000' => IQueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
