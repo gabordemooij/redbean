@@ -6,8 +6,8 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\Observer as Observer;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\Adapter as Adapter;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\IAdapter as IAdapter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 
 
 /**
@@ -107,7 +107,7 @@ class Foreignkeys extends Base implements Observer
 		asrt( are_cols_in_unique( 'book_category', array( 'book_id', 'category_id' ) ), FALSE );
 		asrt( count( get_uniques_for_type('library') ), 1 );
 		asrt( are_cols_in_unique( 'library', array( 'book_id', 'category_id' ) ), TRUE );
-		AQueryWriter::clearRenames();
+		QueryWriter::clearRenames();
 		R::nuke();
 		$book = R::dispense( 'book' );
 		$category = R::dispense( 'category' );
@@ -425,7 +425,7 @@ class Foreignkeys extends Base implements Observer
 	 * Log queries
 	 *
 	 * @param string          $event
-	 * @param Adapter $info
+	 * @param IAdapter $info
 	 */
 	public function onEvent( $event, $info )
 	{

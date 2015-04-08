@@ -6,7 +6,7 @@ use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 
 /**
  * Duplication Manager.
@@ -186,7 +186,7 @@ class DuplicationManager
 	 */
 	protected function hasSharedList( $type, $target )
 	{
-		return in_array( AQueryWriter::getAssocTableFormat( array( $type, $target ) ), $this->tables );
+		return in_array( QueryWriter::getAssocTableFormat( array( $type, $target ) ), $this->tables );
 	}
 
 	/**

@@ -9,7 +9,7 @@ use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\AssociationManager as AssociationManager;
-use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\QueryWriter\MySQL as MySQL;
 use RedBeanPHP\QueryWriter\PostgreSQL as PostgreSQL;

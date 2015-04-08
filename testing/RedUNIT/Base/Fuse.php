@@ -5,12 +5,12 @@ namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\ModelHelper as ModelHelper;
-use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\ToolBox as ToolBox;
-use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\IAdapter as IAdapter;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 
 /**
@@ -191,8 +191,8 @@ class Fuse extends Base
 		list( $redbean, $database, $writer, $toolbox ) = $helper->getExtractedToolbox();
 
 		asrt( ( $redbean  instanceof OODB        ), TRUE );
-		asrt( ( $database instanceof Adapter     ), TRUE );
-		asrt( ( $writer   instanceof QueryWriter ), TRUE );
+		asrt( ( $database instanceof IAdapter     ), TRUE );
+		asrt( ( $writer   instanceof IQueryWriter ), TRUE );
 		asrt( ( $toolbox  instanceof ToolBox     ), TRUE );
 	}
 

@@ -3,8 +3,8 @@
 namespace RedBeanPHP\Adapter;
 
 use RedBeanPHP\Observable as Observable;
-use RedBeanPHP\Adapter as Adapter;
-use RedBeanPHP\Driver as Driver;
+use RedBeanPHP\IAdapter as IAdapter;
+use RedBeanPHP\IDriver as IDriver;
 
 /**
  * DBAdapter (Database Adapter)
@@ -25,10 +25,10 @@ use RedBeanPHP\Driver as Driver;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class DBAdapter extends Observable implements Adapter
+class DBAdapter extends Observable implements IAdapter
 {
 	/**
-	 * @var Driver
+	 * @var IDriver
 	 */
 	private $db = NULL;
 
@@ -44,7 +44,7 @@ class DBAdapter extends Observable implements Adapter
 	 * This class provides an interface for RedBean to work
 	 * with ADO compatible DB instances.
 	 *
-	 * @param Driver $database ADO Compatible DB Instance
+	 * @param IDriver $database ADO Compatible DB Instance
 	 */
 	public function __construct( $database )
 	{
@@ -52,7 +52,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::getSQL
+	 * @see IAdapter::getSQL
 	 */
 	public function getSQL()
 	{
@@ -60,7 +60,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::exec
+	 * @see IAdapter::exec
 	 */
 	public function exec( $sql, $bindings = array(), $noevent = FALSE )
 	{
@@ -73,7 +73,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::get
+	 * @see IAdapter::get
 	 */
 	public function get( $sql, $bindings = array() )
 	{
@@ -84,7 +84,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::getRow
+	 * @see IAdapter::getRow
 	 */
 	public function getRow( $sql, $bindings = array() )
 	{
@@ -95,7 +95,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::getCol
+	 * @see IAdapter::getCol
 	 */
 	public function getCol( $sql, $bindings = array() )
 	{
@@ -106,7 +106,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::getAssoc
+	 * @see IAdapter::getAssoc
 	 */
 	public function getAssoc( $sql, $bindings = array() )
 	{
@@ -142,7 +142,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 	
 	/**
-	 * @see Adapter::getAssocRow
+	 * @see IAdapter::getAssocRow
 	 */
 	public function getAssocRow($sql, $bindings = array())
 	{
@@ -153,7 +153,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::getCell
+	 * @see IAdapter::getCell
 	 */
 	public function getCell( $sql, $bindings = array(), $noSignal = NULL )
 	{
@@ -165,7 +165,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::getCursor
+	 * @see IAdapter::getCursor
 	 */
 	public function getCursor( $sql, $bindings = array() )
 	{
@@ -173,7 +173,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::getInsertID
+	 * @see IAdapter::getInsertID
 	 */
 	public function getInsertID()
 	{
@@ -181,7 +181,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::getAffectedRows
+	 * @see IAdapter::getAffectedRows
 	 */
 	public function getAffectedRows()
 	{
@@ -189,7 +189,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::getDatabase
+	 * @see IAdapter::getDatabase
 	 */
 	public function getDatabase()
 	{
@@ -197,7 +197,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::startTransaction
+	 * @see IAdapter::startTransaction
 	 */
 	public function startTransaction()
 	{
@@ -205,7 +205,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::commit
+	 * @see IAdapter::commit
 	 */
 	public function commit()
 	{
@@ -213,7 +213,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::rollback
+	 * @see IAdapter::rollback
 	 */
 	public function rollback()
 	{
@@ -221,7 +221,7 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
-	 * @see Adapter::close.
+	 * @see IAdapter::close.
 	 */
 	public function close()
 	{

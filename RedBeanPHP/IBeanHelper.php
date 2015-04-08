@@ -2,9 +2,6 @@
 
 namespace RedBeanPHP;
 
-use RedBeanPHP\ToolBox as ToolBox;
-use RedBeanPHP\OODBBean as OODBBean;
-
 /**
  * Bean Helper Interface.
  * 
@@ -20,7 +17,7 @@ use RedBeanPHP\OODBBean as OODBBean;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-interface BeanHelper
+interface IBeanHelper
 {
 	/**
 	 * Returns a toolbox to empower the bean.

@@ -6,7 +6,7 @@ chdir( '..' );
 $xdebugSupported = (function_exists('xdebug_start_code_coverage'));
 
 if ($xdebugSupported) xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
-require 'testcontainer/rb.php';
+require '../RedBeanPHP/loader.php';
 
 //load core classes
 require 'RedUNIT.php';

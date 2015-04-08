@@ -7,9 +7,9 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Driver\RPDO as RPDO;
 use RedBeanPHP\Logger\RDefault as RDefault;
-use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 
 /**
  * Misc
@@ -582,15 +582,15 @@ class Misc extends Blackhole
 	 */
 	public function testCamel2Snake()
 	{
-		asrt( AQueryWriter::camelsSnake('bookPage'), 'book_page' );
-		asrt( AQueryWriter::camelsSnake('FTP'), 'ftp' );
-		asrt( AQueryWriter::camelsSnake('ACLRules'), 'acl_rules' );
-		asrt( AQueryWriter::camelsSnake('SSHConnectionProxy'), 'ssh_connection_proxy' );
-		asrt( AQueryWriter::camelsSnake('proxyServerFacade'), 'proxy_server_facade' );
-		asrt( AQueryWriter::camelsSnake('proxySSHClient'), 'proxy_ssh_client' );
-		asrt( AQueryWriter::camelsSnake('objectACL2Factory'), 'object_acl2_factory' );
-		asrt( AQueryWriter::camelsSnake('bookItems4Page'), 'book_items4_page' );
-		asrt( AQueryWriter::camelsSnake('book☀Items4Page'), 'book☀_items4_page' );
+		asrt( QueryWriter::camelsSnake('bookPage'), 'book_page' );
+		asrt( QueryWriter::camelsSnake('FTP'), 'ftp' );
+		asrt( QueryWriter::camelsSnake('ACLRules'), 'acl_rules' );
+		asrt( QueryWriter::camelsSnake('SSHConnectionProxy'), 'ssh_connection_proxy' );
+		asrt( QueryWriter::camelsSnake('proxyServerFacade'), 'proxy_server_facade' );
+		asrt( QueryWriter::camelsSnake('proxySSHClient'), 'proxy_ssh_client' );
+		asrt( QueryWriter::camelsSnake('objectACL2Factory'), 'object_acl2_factory' );
+		asrt( QueryWriter::camelsSnake('bookItems4Page'), 'book_items4_page' );
+		asrt( QueryWriter::camelsSnake('book☀Items4Page'), 'book☀_items4_page' );
 	}
 }
 
