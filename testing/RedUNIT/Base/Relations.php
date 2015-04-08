@@ -4,7 +4,7 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
@@ -861,7 +861,7 @@ class Relations extends Base
 			try {
 				$page1->book = $value;
 				fail();
-			} catch ( RedException $e ) {
+			} catch ( \Exception $e ) {
 				pass();
 			}
 		}

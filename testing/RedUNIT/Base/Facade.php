@@ -7,8 +7,8 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\ToolBox as ToolBox;
-use RedBeanPHP\Adapter as Adapter;
-use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\IAdapter as IAdapter;
+use RedBeanPHP\IQueryWriter as IQueryWriter;
 use RedBeanPHP\OODBBean as OODBBean;
 
 /**
@@ -66,8 +66,8 @@ class Facade extends Base
 
 		asrt( R::getRedBean() instanceof OODB, TRUE );
 		asrt( R::getToolBox() instanceof ToolBox, TRUE );
-		asrt( R::getDatabaseAdapter() instanceof Adapter, TRUE );
-		asrt( R::getWriter() instanceof QueryWriter, TRUE );
+		asrt( R::getDatabaseAdapter() instanceof IAdapter, TRUE );
+		asrt( R::getWriter() instanceof IQueryWriter, TRUE );
 
 		$book = R::dispense( "book" );
 

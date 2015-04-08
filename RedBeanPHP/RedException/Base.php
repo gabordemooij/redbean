@@ -1,6 +1,6 @@
 <?php 
 
-namespace RedBeanPHP;
+namespace RedBeanPHP\RedException;
 
 /**
  * RedBean\Exception Base.
@@ -15,6 +15,6 @@ namespace RedBeanPHP;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RedException extends \Exception
+class Base extends \Exception
 {
 }

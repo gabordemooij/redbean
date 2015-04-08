@@ -5,7 +5,7 @@ namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 
 R::ext('xdispense', function($type){
 	return R::getRedBean()->dispense($type);
@@ -236,7 +236,7 @@ class Prefixes extends Base
 		asrt( isset( $tables[ 'tbl_author_friend' ] ), TRUE );
 		asrt( isset( $tables[ 'tbl_author_tbl_friend' ] ), FALSE );
 		asrt( count( $author->{FRIENDLIST} ), 1 );
-		AQueryWriter::clearRenames();
+		QueryWriter::clearRenames();
 	}
 
 	/**

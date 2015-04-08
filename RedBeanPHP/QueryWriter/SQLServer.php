@@ -2,10 +2,9 @@
 
 namespace RedBeanPHP\QueryWriter;
 
-use \RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use \RedBeanPHP\QueryWriter as QueryWriter;
+use \RedBeanPHP\IQueryWriter as IQueryWriter;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\Adapter as Adapter;
+use \RedBeanPHP\IAdapter as IAdapter;
 
 /**
  * RedBeanPHP SQLServerWriter
@@ -26,7 +25,7 @@ use \RedBeanPHP\Adapter as Adapter;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class SQLServer extends AQueryWriter implements QueryWriter
+class SQLServer extends Base implements IQueryWriter
 {
 
 	/**
@@ -45,7 +44,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
 	const C_DATATYPE_SPECIFIED        = 99;
 
 	/**
-	 * @var RedBean_Adapter_DBAdapter
+	 * @var DBAdapter
 	 */
 	protected $adapter;
 
@@ -130,7 +129,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
 			$this->adapter->exec( $sql );
 
 			return TRUE;
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			return FALSE;
 		}
 	}
@@ -138,9 +137,9 @@ class SQLServer extends AQueryWriter implements QueryWriter
 	/**
 	 * Constructor
 	 *
-	 * @param RedBean_Adapter $adapter Database Adapter
+	 * @param IAdapter $adapter Database Adapter
 	 */
-	public function __construct( Adapter $adapter )
+	public function __construct( IAdapter $adapter )
 	{
 		$this->typeno_sqltype = array(
 			self::C_DATATYPE_BOOL             => ' TINYINT ',
@@ -178,7 +177,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::getTables
+	 * @see IQueryWriter::getTables
 	 */
 	public function getTables()
 	{
@@ -187,9 +186,9 @@ class SQLServer extends AQueryWriter implements QueryWriter
 
     /**
      * Inserts a record into the database using a series of insert columns
-     * and corresponding insertvalues. Returns the insert id.
+     * and corresponding insert values. Returns the insert id.
      *
-     * @param string $table         table to perform query on
+     * @param string $type type to perform query on
      * @param array  $insertcolumns columns to be inserted
      * @param array  $insertvalues  values to be inserted
      *
@@ -224,7 +223,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
     }
 
 	/**
-	 * @see RedBean_QueryWriter::createTable
+	 * @see IQueryWriter::createTable
 	 */
 	public function createTable( $table )
 	{
@@ -236,7 +235,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::getColumns
+	 * @see IQueryWriter::getColumns
 	 */
 	public function getColumns( $table )
 	{
@@ -251,7 +250,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::scanType
+	 * @see IQueryWriter::scanType
 	 */
 	public function scanType( $value, $flagSpecial = FALSE )
 	{
@@ -300,7 +299,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::code
+	 * @see IQueryWriter::code
 	 */
 	public function code( $typedescription, $includeSpecials = FALSE )
 	{
@@ -314,7 +313,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
 			return $r;
 		}
 
-		if ( $r >= QueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
+		if ( $r >= IQueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
 			return self::C_DATATYPE_SPECIFIED;
 		}
 
@@ -322,7 +321,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::addUniqueIndex
+	 * @see IQueryWriter::addUniqueIndex
 	 */
 	public function addUniqueIndex( $table, $columns )
 	{
@@ -353,7 +352,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::addIndex
+	 * @see IQueryWriter::addIndex
 	 */
 	public function addIndex( $type, $name, $column )
 	{
@@ -368,39 +367,39 @@ class SQLServer extends AQueryWriter implements QueryWriter
 
 		try {
 			$this->adapter->exec( "CREATE INDEX $name ON $table ($column) " );
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 		}
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::sqlStateIn
+	 * @see IQueryWriter::sqlStateIn
 	 */
 	public function sqlStateIn( $state, $list )
 	{
 		$stateMap = array(
-			'42S02' => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'42S22' => QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			'23000' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'42S02' => IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+			'42S22' => IQueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+			'23000' => IQueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
 	}
 
 	/**
-	 * @see RedBean_QueryWriter::wipeAll
+	 * @see IQueryWriter::wipeAll
 	 */
 	public function wipeAll()
 	{
 		foreach ( $this->getTables() as $t ) {
 			try {
 				$this->adapter->exec( "EXEC sp_msforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT all'; IF OBJECT_ID('[$t]', 'U') IS NOT NULL DROP TABLE [$t]; EXEC sp_msforeachtable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all';" );
-			} catch ( Exception $e ) {
+			} catch ( \Exception $e ) {
 			}
 		}
 	}
 
     /**
-     * @see RedBean_QueryWriter::addFK
+     * @see IQueryWriter::addFK
      */
     public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
     {
@@ -451,7 +450,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
     }
 
     /**
-     * @see RedBean_QueryWriter::addColumn
+     * @see IQueryWriter::addColumn
      */
     public function addColumn( $type, $column, $field )
     {
@@ -466,7 +465,7 @@ class SQLServer extends AQueryWriter implements QueryWriter
     }
 	
 	/**
-	 * @see QueryWriter::addUniqueIndex
+	 * @see IQueryWriter::addUniqueIndex
 	 */
 	public function addUniqueConstraint( $type, $properties )
 	{

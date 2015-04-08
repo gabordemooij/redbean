@@ -2,7 +2,7 @@
 
 namespace RedBeanPHP\Cursor;
 
-use RedBeanPHP\Cursor as Cursor;
+use RedBeanPHP\ICursor as ICursor;
 
 /**
  * PDO Database Cursor
@@ -18,10 +18,10 @@ use RedBeanPHP\Cursor as Cursor;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class PDOCursor implements Cursor
+class PDOCursor implements ICursor
 {
 	/**
-	 * @var PDOStatement
+	 * @var \PDOStatement
 	 */
 	protected $res;
 
@@ -33,10 +33,9 @@ class PDOCursor implements Cursor
 	/**
 	 * Constructor, creates a new instance of a PDO Database Cursor.
 	 *
-	 * @param PDOStatement  $res        the PDO statement
+	 * @param \PDOStatement  $res        the PDO statement
 	 * @param string        $fetchStyle fetch style constant to use
 	 *
-	 * @return void
 	 */
 	public function __construct( \PDOStatement $res, $fetchStyle )
 	{
@@ -45,7 +44,7 @@ class PDOCursor implements Cursor
 	}
 
 	/**
-	 * @see Cursor::getNextItem
+	 * @see ICursor::getNextItem
 	 */
 	public function getNextItem()
 	{
@@ -53,7 +52,7 @@ class PDOCursor implements Cursor
 	}
 
 	/**
-	 * @see Cursor::close
+	 * @see ICursor::close
 	 */
 	public function close()
 	{

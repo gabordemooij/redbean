@@ -1,17 +1,17 @@
 <?php
 
-namespace RedBeanPHP;
+namespace RedBeanPHP\Repository;
 
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\Observable as Observable;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
-use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\RedException\Security as Security;
+use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\SimpleModel as SimpleModel;
 use RedBeanPHP\BeanHelper as BeanHelper;
+use RedBeanPHP\BeanCollection as BeanCollection;
 use RedBeanPHP\RedException\SQL as SQLException;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\Cursor as Cursor;
 use RedBeanPHP\Cursor\NullCursor as NullCursor;
@@ -35,7 +35,7 @@ use RedBeanPHP\Cursor\NullCursor as NullCursor;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-abstract class Repository
+abstract class Base
 {
 	/**
 	 * @var array
@@ -141,7 +141,7 @@ abstract class Repository
 	 *
 	 * @return void
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	protected function processSharedAdditions( $bean, $sharedAdditions )
 	{
@@ -161,7 +161,6 @@ abstract class Repository
 	 * checks if there have been any modification to this bean, in that case
 	 * the bean is stored once again, otherwise the bean will be left untouched.
 	 *
-	 * @param OODBBean $bean       the bean
 	 * @param array            $ownresidue list
 	 *
 	 * @return void
@@ -174,6 +173,8 @@ abstract class Repository
 			}
 		}
 	}
+
+	protected abstract function storeBean( OODBBean $bean );
 
 	/**
 	 * Processes a list of beans from a bean. A bean may contain lists. This
@@ -207,8 +208,10 @@ abstract class Repository
 		}
 	}
 
+	protected abstract function processAdditions( $bean, $ownAdditions );
+
 	/**
-	 * Unassociates the list items in the trashcan.
+	 * Dissociates the list items in the trashcan.
 	 *
 	 * @param OODBBean $bean           bean
 	 * @param array            $sharedTrashcan list
@@ -283,9 +286,9 @@ abstract class Repository
 	/**
 	 * Constructor, requires a query writer.
 	 *
-	 * @param QueryWriter $writer writer
+	 * @param IQueryWriter $writer writer
 	 */
-	public function __construct( OODB $oodb, QueryWriter $writer )
+	public function __construct( OODB $oodb, IQueryWriter $writer )
 	{
 		$this->writer = $writer;
 		$this->oodb = $oodb;
@@ -300,7 +303,7 @@ abstract class Repository
 	 *
 	 * @return void
 	 *
-	 * @throws Security $exception
+	 * @throws RedException $exception
 	 */
 	public function check( OODBBean $bean )
 	{
@@ -352,7 +355,7 @@ abstract class Repository
 	 *
 	 * @param string $type       type of beans you are looking for
 	 * @param array  $conditions list of conditions
-	 * @param string $addSQL     SQL to be used in query
+	 * @param string $sql     SQL to be used in query
 	 * @param array  $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
 	 *
 	 * @return array
@@ -517,7 +520,7 @@ abstract class Repository
 	 */
 	public function count( $type, $addSQL = '', $bindings = array() )
 	{
-		$type = AQueryWriter::camelsSnake( $type );
+		$type = QueryWriter::camelsSnake( $type );
 		if ( count( explode( '_', $type ) ) > 2 ) {
 			throw new RedException( 'Invalid type for count.' );
 		}
@@ -526,8 +529,8 @@ abstract class Repository
 			return (int) $this->writer->queryRecordCount( $type, array(), $addSQL, $bindings );
 		} catch ( SQLException $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array(
-				 QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				 QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ) ) ) {
+				 IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
+				 IQueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ) ) ) {
 				throw $exception;
 			}
 		}
@@ -574,7 +577,7 @@ abstract class Repository
 	 * Checks whether the specified table already exists in the database.
 	 * Not part of the Object Database interface!
 	 *
-	 * @deprecated Use AQueryWriter::typeExists() instead.
+	 * @deprecated Use QueryWriter\Base::typeExists() instead.
 	 *
 	 * @param string $table table name
 	 *
@@ -601,7 +604,7 @@ abstract class Repository
 
 			return TRUE;
 		} catch ( SQLException $exception ) {
-			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( QueryWriter::C_SQLSTATE_NO_SUCH_TABLE ) ) ) {
+			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE ) ) ) {
 				throw $exception;
 			}
 

@@ -1,13 +1,13 @@
 <?php
 
 //Set the directory path
-define('REDBEANPHP_MAIN_DIR', 'phar://rb.phar/RedBeanPHP/');
+define('REDBEANPHP_MAIN_DIR', dirname(__FILE__) . '/');
 
 //Load Database drivers
-require( REDBEANPHP_MAIN_DIR . 'Logger.php' );
+require( REDBEANPHP_MAIN_DIR . 'ILogger.php' );
 require( REDBEANPHP_MAIN_DIR . 'Logger/RDefault.php' );
 require( REDBEANPHP_MAIN_DIR . 'Logger/RDefault/Debug.php' );
-require( REDBEANPHP_MAIN_DIR . 'Driver.php' );
+require( REDBEANPHP_MAIN_DIR . 'IDriver.php' );
 require( REDBEANPHP_MAIN_DIR . 'Driver/RPDO.php' );
 
 //Load Infrastructure
@@ -16,26 +16,26 @@ require( REDBEANPHP_MAIN_DIR . 'Observable.php' );
 require( REDBEANPHP_MAIN_DIR . 'Observer.php' );
 
 //Load Database Adapters
-require( REDBEANPHP_MAIN_DIR . 'Adapter.php' );
+require( REDBEANPHP_MAIN_DIR . 'IAdapter.php' );
 require( REDBEANPHP_MAIN_DIR . 'Adapter/DBAdapter.php' );
-require( REDBEANPHP_MAIN_DIR . 'Cursor.php');
+require( REDBEANPHP_MAIN_DIR . 'ICursor.php');
 require( REDBEANPHP_MAIN_DIR . 'Cursor/PDOCursor.php');
 require( REDBEANPHP_MAIN_DIR . 'Cursor/NullCursor.php');
 require( REDBEANPHP_MAIN_DIR . 'BeanCollection.php' );
 
 //Load SQL drivers
-require( REDBEANPHP_MAIN_DIR . 'QueryWriter.php' );
-require( REDBEANPHP_MAIN_DIR . 'QueryWriter/AQueryWriter.php' );
+require( REDBEANPHP_MAIN_DIR . 'IQueryWriter.php' );
+require( REDBEANPHP_MAIN_DIR . 'QueryWriter/Base.php' );
 require( REDBEANPHP_MAIN_DIR . 'QueryWriter/MySQL.php' );
 require( REDBEANPHP_MAIN_DIR . 'QueryWriter/SQLiteT.php' );
 require( REDBEANPHP_MAIN_DIR . 'QueryWriter/PostgreSQL.php' );
 
 //Load required Exceptions
-require( REDBEANPHP_MAIN_DIR . 'RedException.php' );
+require( REDBEANPHP_MAIN_DIR . 'RedException/Base.php' );
 require( REDBEANPHP_MAIN_DIR . 'RedException/SQL.php' );
 
 //Load Repository Classes
-require( REDBEANPHP_MAIN_DIR . 'Repository.php' );
+require( REDBEANPHP_MAIN_DIR . 'Repository/Base.php' );
 require( REDBEANPHP_MAIN_DIR . 'Repository/Fluid.php' );
 require( REDBEANPHP_MAIN_DIR . 'Repository/Frozen.php' );
 
@@ -46,7 +46,7 @@ require( REDBEANPHP_MAIN_DIR . 'Finder.php' );
 
 //Load extended functionality
 require( REDBEANPHP_MAIN_DIR . 'AssociationManager.php' );
-require( REDBEANPHP_MAIN_DIR . 'BeanHelper.php' );
+require( REDBEANPHP_MAIN_DIR . 'IBeanHelper.php' );
 require( REDBEANPHP_MAIN_DIR . 'BeanHelper/SimpleFacadeBeanHelper.php' );
 
 /* Developer Comfort */
@@ -56,7 +56,7 @@ require( REDBEANPHP_MAIN_DIR . 'TagManager.php' );
 require( REDBEANPHP_MAIN_DIR . 'LabelMaker.php' );
 require( REDBEANPHP_MAIN_DIR . 'Facade.php' );
 require( REDBEANPHP_MAIN_DIR . 'DuplicationManager.php' );
-require( REDBEANPHP_MAIN_DIR . 'Plugin.php' );
+require( REDBEANPHP_MAIN_DIR . 'IPlugin.php' );
 require( REDBEANPHP_MAIN_DIR . 'Functions.php' );
 
 //Allow users to mount the plugin folder.

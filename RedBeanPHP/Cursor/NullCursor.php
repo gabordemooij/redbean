@@ -2,7 +2,7 @@
 
 namespace RedBeanPHP\Cursor;
 
-use RedBeanPHP\Cursor as Cursor;
+use RedBeanPHP\ICursor as ICursor;
 
 /**
  * NULL Database Cursor
@@ -18,10 +18,10 @@ use RedBeanPHP\Cursor as Cursor;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class NullCursor implements Cursor
+class NullCursor implements ICursor
 {
 	/**
-	 * @see Cursor::getNextItem
+	 * @see ICursor::getNextItem
 	 */
 	public function getNextItem()
 	{
@@ -29,7 +29,7 @@ class NullCursor implements Cursor
 	}
 
 	/**
-	 * @see Cursor::close
+	 * @see ICursor::close
 	 */
 	public function close()
 	{

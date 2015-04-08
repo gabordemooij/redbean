@@ -2,8 +2,7 @@
 
 namespace RedBeanPHP;
 
-use RedBeanPHP\Cursor as Cursor;
-use RedBeanPHP\Repository as Repository;
+use RedBeanPHP\Repository\Base as Repository;
 
 /**
  * BeanCollection.
@@ -31,12 +30,12 @@ use RedBeanPHP\Repository as Repository;
 class BeanCollection
 {
 	/**
-	 * @var Cursor
+	 * @var ICursor
 	 */
 	protected $cursor = NULL;
 
 	/**
-	 * @var Repository
+	 * @var Repository\*
 	 */
 	protected $repository = NULL;
 
@@ -50,11 +49,10 @@ class BeanCollection
 	 * 
 	 * @param string     $type       type of beans in this collection
 	 * @param Repository $repository repository to use to generate bean objects
-	 * @param Cursor     $cursor     cursor object to use
+	 * @param ICursor     $cursor     cursor object to use
 	 *
-	 * @return void
 	 */
-	public function __construct( $type, Repository $repository, Cursor $cursor )
+	public function __construct( $type, Repository $repository, ICursor $cursor )
 	{
 		$this->type = $type;
 		$this->cursor = $cursor;

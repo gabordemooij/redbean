@@ -4,7 +4,7 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\Facade as Facade;
 use RedBeanPHP\OODBBean as OODBBean;
 
@@ -61,6 +61,8 @@ class Dispense extends Base
 
 		$bean["property"] = 123;
 		$bean["abc"]      = "def";
+
+		print_r($bean["property"]);
 
 		asrt( $bean["property"], 123 );
 		asrt( $bean["abc"], "def" );
