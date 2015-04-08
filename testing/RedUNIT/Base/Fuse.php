@@ -28,6 +28,42 @@ use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 class Fuse extends Base
 {
 	/**
+	 * Test whether we can override the getModelForBean() method
+	 * of the BeanHelper and use a custom BeanHelper to attach a model
+	 * based on type.
+	 *
+	 * @return void
+	 */
+	public function testCustomBeanHelper()
+	{
+		$customBeanHelper = new \SoupBeanHelper( R::getToolbox() );
+		$oldBeanHelper = R::getRedBean()->getBeanHelper();
+		asrt( ( $oldBeanHelper instanceof SimpleFacadeBeanHelper ), TRUE );
+		R::getRedBean()->setBeanHelper( $customBeanHelper );
+		$meal = R::dispense( 'meal' );
+		asrt( ( $meal->box() instanceof \Model_Soup ), TRUE );
+		$cake = R::dispense( 'cake' );
+		asrt( is_null( $cake->box() ), TRUE );
+		$bean = R::dispense( 'coffee' );
+		asrt( ( $bean->box() instanceof \Model_Coffee ), TRUE );
+		$meal->setFlavour( 'tomato' );
+		asrt( $meal->getFlavour(), 'tomato' );
+		$meal->rating = 5;
+		R::store( $meal );
+		asrt( $meal->getFlavour(), 'tomato' );
+		$meal = $meal->unbox();
+		asrt( $meal->getFlavour(), 'tomato' );
+		$meal = R::findOne( 'meal' );
+		asrt( ( $meal->box() instanceof \Model_Soup ), TRUE );
+		asrt( $meal->getFlavour(), '' );
+		$meal->setFlavour( 'tomato' );
+		asrt( $meal->getFlavour(), 'tomato' );
+		$meal = $meal->unbox();
+		asrt( $meal->getFlavour(), 'tomato' );
+		R::getRedBean()->setBeanHelper( $oldBeanHelper );
+	}
+
+	/**
 	 * Test FUSE hooks (i.e. open, update, update_after etc..)
 	 *
 	 * @return void

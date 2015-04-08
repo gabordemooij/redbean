@@ -245,12 +245,48 @@ class Model_Bandmember extends RedBeanPHP\SimpleModel
  */
 class Model_Soup extends \RedBeanPHP\SimpleModel
 {
+	private $flavour = '';
 
 	public function taste()
 	{
 		return 'A bit too salty';
 	}
+
+	public function setFlavour( $flavour )
+	{
+		$this->flavour = $flavour;
+	}
+
+	public function getFlavour()
+	{
+		return $this->flavour;
+	}
 }
+
+/**
+ * A custom BeanHelper to test custom FUSE operations.
+ */
+class SoupBeanHelper extends \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper
+{
+	/**
+	 * Returns a model for a bean based on its type.
+	 *
+	 * @param OODBBean $bean
+	 *
+	 * @return object
+	 */
+	public function getModelForBean( \RedBeanPHP\OODBBean $bean )
+	{
+			if ( $bean->getMeta( 'type' ) === 'meal' ) {
+				$model = new Model_Soup;
+				$model->loadBean( $bean );
+				return $model;
+			} else {
+				return parent::getModelForBean( $bean );
+			}
+	}
+}
+
 /**
  * Test Model.
  */
