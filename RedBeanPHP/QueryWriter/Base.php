@@ -4,7 +4,7 @@ namespace RedBeanPHP\QueryWriter;
 
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\RedException\Base as RedException;
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
@@ -95,7 +95,7 @@ abstract class Base
 	}
 
 	/**
-	 * @see IQueryWriter::getAssocTableFormat
+	 * @see QueryWriterInterface::getAssocTableFormat
 	 */
 	public static function getAssocTableFormat( $types )
 	{
@@ -107,7 +107,7 @@ abstract class Base
 	}
 
 	/**
-	 * @see IQueryWriter::renameAssociation
+	 * @see QueryWriterInterface::renameAssociation
 	 */
 	public static function renameAssociation( $from, $to = NULL )
 	{
@@ -491,8 +491,8 @@ abstract class Base
 		}
 
 		$sqlFilters = array();
-		if ( isset( self::$sqlFilters[IQueryWriter::C_SQLFILTER_READ][$type] ) ) {
-			foreach( self::$sqlFilters[IQueryWriter::C_SQLFILTER_READ][$type] as $property => $sqlFilter ) {
+		if ( isset( self::$sqlFilters[QueryWriterInterface::C_SQLFILTER_READ][$type] ) ) {
+			foreach( self::$sqlFilters[QueryWriterInterface::C_SQLFILTER_READ][$type] as $property => $sqlFilter ) {
 				if ( !self::$flagSQLFilterSafeMode || isset( $existingCols[$property] ) ) {
 					$sqlFilters[] = $sqlFilter.' AS '.$property.' ';
 				}
@@ -701,13 +701,13 @@ abstract class Base
 		$lsql = ltrim( $sql );
 
 		if ( preg_match( '/^(INNER|LEFT|RIGHT|JOIN|AND|OR|WHERE|ORDER|GROUP|HAVING|LIMIT|OFFSET)\s+/i', $lsql ) ) {
-			if ( $glue === IQueryWriter::C_GLUE_WHERE && stripos( $lsql, 'AND' ) === 0 ) {
+			if ( $glue === QueryWriterInterface::C_GLUE_WHERE && stripos( $lsql, 'AND' ) === 0 ) {
 				$snippetCache[$key] = ' WHERE ' . substr( $lsql, 3 );
 			} else {
 				$snippetCache[$key] = $sql;
 			}
 		} else {
-			$snippetCache[$key] = ( ( $glue === IQueryWriter::C_GLUE_AND ) ? ' AND ' : ' WHERE ') . $sql;
+			$snippetCache[$key] = ( ( $glue === QueryWriterInterface::C_GLUE_AND ) ? ' AND ' : ' WHERE ') . $sql;
 		}
 
 		return $snippetCache[$key];
@@ -813,7 +813,7 @@ abstract class Base
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, ( count($conditions) > 0) ? IQueryWriter::C_GLUE_AND : NULL );
+		$addSql = $this->glueSQLCondition( $addSql, ( count($conditions) > 0) ? QueryWriterInterface::C_GLUE_AND : NULL );
 
 		$key = NULL;
 		if ( $this->flagUseCache ) {
@@ -862,7 +862,7 @@ abstract class Base
 	 */
 	public function queryRecordRelated( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, IQueryWriter::C_GLUE_WHERE );
+		$addSql = $this->glueSQLCondition( $addSql, QueryWriterInterface::C_GLUE_WHERE );
 
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 

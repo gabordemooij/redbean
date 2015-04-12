@@ -112,12 +112,12 @@ class OODB extends Observable
 	/**
 	 * Constructor, requires a query writer.
 	 *
-	 * @param IQueryWriter   $writer writer
+	 * @param QueryWriterInterface   $writer writer
 	 * @param array|boolean $frozen mode of operation: TRUE (frozen), FALSE (default, fluid) or ARRAY (chilled)
 	 */
-	public function __construct( IQueryWriter $writer, $frozen = FALSE )
+	public function __construct( QueryWriterInterface $writer, $frozen = FALSE )
 	{
-		if ( $writer instanceof IQueryWriter ) {
+		if ( $writer instanceof QueryWriterInterface ) {
 			$this->writer = $writer;
 		}
 
@@ -523,7 +523,7 @@ class OODB extends Observable
 	public function bindFunc( $mode, $field, $function )
 	{
 		list( $type, $property ) = explode( '.', $field );
-		$mode = ($mode === 'write') ? IQueryWriter::C_SQLFILTER_WRITE : IQueryWriter::C_SQLFILTER_READ;
+		$mode = ($mode === 'write') ? QueryWriterInterface::C_SQLFILTER_WRITE : QueryWriterInterface::C_SQLFILTER_READ;
 
 		if ( !isset( self::$sqlFilters[$mode] ) ) self::$sqlFilters[$mode] = array();
 		if ( !isset( self::$sqlFilters[$mode][$type] ) ) self::$sqlFilters[$mode][$type] = array();
@@ -531,7 +531,7 @@ class OODB extends Observable
 		if ( is_null( $function ) ) {
 			unset( self::$sqlFilters[$mode][$type][$property] );
 		} else {
-			if ($mode === IQueryWriter::C_SQLFILTER_WRITE) {
+			if ($mode === QueryWriterInterface::C_SQLFILTER_WRITE) {
 				self::$sqlFilters[$mode][$type][$property] = $function.'(?)';
 			} else {
 				self::$sqlFilters[$mode][$type][$property] = $function."($field)";

@@ -2,9 +2,9 @@
 
 namespace RedBeanPHP\QueryWriter;
 
-use \RedBeanPHP\IQueryWriter as IQueryWriter;
+use \RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use \RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use \RedBeanPHP\IAdapter as IAdapter;
+use \RedBeanPHP\AdaptorInterface as AdaptorInterface;
 
 /**
  * RedBeanPHP SQLServerWriter
@@ -25,7 +25,7 @@ use \RedBeanPHP\IAdapter as IAdapter;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class SQLServer extends Base implements IQueryWriter
+class SQLServer extends Base implements QueryWriterInterface
 {
 
 	/**
@@ -137,9 +137,9 @@ class SQLServer extends Base implements IQueryWriter
 	/**
 	 * Constructor
 	 *
-	 * @param IAdapter $adapter Database Adapter
+	 * @param AdaptorInterface $adapter Database Adapter
 	 */
-	public function __construct( IAdapter $adapter )
+	public function __construct( AdaptorInterface $adapter )
 	{
 		$this->typeno_sqltype = array(
 			self::C_DATATYPE_BOOL             => ' TINYINT ',
@@ -177,7 +177,7 @@ class SQLServer extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::getTables
+	 * @see QueryWriterInterface::getTables
 	 */
 	public function getTables()
 	{
@@ -223,7 +223,7 @@ class SQLServer extends Base implements IQueryWriter
     }
 
 	/**
-	 * @see IQueryWriter::createTable
+	 * @see QueryWriterInterface::createTable
 	 */
 	public function createTable( $table )
 	{
@@ -235,7 +235,7 @@ class SQLServer extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::getColumns
+	 * @see QueryWriterInterface::getColumns
 	 */
 	public function getColumns( $table )
 	{
@@ -250,7 +250,7 @@ class SQLServer extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::scanType
+	 * @see QueryWriterInterface::scanType
 	 */
 	public function scanType( $value, $flagSpecial = FALSE )
 	{
@@ -299,7 +299,7 @@ class SQLServer extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::code
+	 * @see QueryWriterInterface::code
 	 */
 	public function code( $typedescription, $includeSpecials = FALSE )
 	{
@@ -313,7 +313,7 @@ class SQLServer extends Base implements IQueryWriter
 			return $r;
 		}
 
-		if ( $r >= IQueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
+		if ( $r >= QueryWriterInterface::C_DATATYPE_RANGE_SPECIAL ) {
 			return self::C_DATATYPE_SPECIFIED;
 		}
 
@@ -321,7 +321,7 @@ class SQLServer extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::addUniqueIndex
+	 * @see QueryWriterInterface::addUniqueIndex
 	 */
 	public function addUniqueIndex( $table, $columns )
 	{
@@ -352,7 +352,7 @@ class SQLServer extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::addIndex
+	 * @see QueryWriterInterface::addIndex
 	 */
 	public function addIndex( $type, $name, $column )
 	{
@@ -372,21 +372,21 @@ class SQLServer extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::sqlStateIn
+	 * @see QueryWriterInterface::sqlStateIn
 	 */
 	public function sqlStateIn( $state, $list )
 	{
 		$stateMap = array(
-			'42S02' => IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'42S22' => IQueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			'23000' => IQueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'42S02' => QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE,
+			'42S22' => QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN,
+			'23000' => QueryWriterInterface::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
 	}
 
 	/**
-	 * @see IQueryWriter::wipeAll
+	 * @see QueryWriterInterface::wipeAll
 	 */
 	public function wipeAll()
 	{
@@ -399,7 +399,7 @@ class SQLServer extends Base implements IQueryWriter
 	}
 
     /**
-     * @see IQueryWriter::addFK
+     * @see QueryWriterInterface::addFK
      */
     public function addFK( $type, $targetType, $field, $targetField, $isDependent = FALSE )
     {
@@ -450,7 +450,7 @@ class SQLServer extends Base implements IQueryWriter
     }
 
     /**
-     * @see IQueryWriter::addColumn
+     * @see QueryWriterInterface::addColumn
      */
     public function addColumn( $type, $column, $field )
     {
@@ -465,7 +465,7 @@ class SQLServer extends Base implements IQueryWriter
     }
 	
 	/**
-	 * @see IQueryWriter::addUniqueIndex
+	 * @see QueryWriterInterface::addUniqueIndex
 	 */
 	public function addUniqueConstraint( $type, $properties )
 	{

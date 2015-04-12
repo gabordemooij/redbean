@@ -2,8 +2,8 @@
 
 namespace RedBeanPHP\Driver;
 
-use RedBeanPHP\IDriver as IDriver;
-use RedBeanPHP\ILogger as ILogger;
+use RedBeanPHP\DriverInterface as DriverInterface;
+use RedBeanPHP\LoggerInterface as LoggerInterface;
 use RedBeanPHP\QueryWriter\Base as BaseQueryWriter;
 use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
@@ -25,7 +25,7 @@ use RedBeanPHP\Cursor\PDOCursor as PDOCursor;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RPDO implements IDriver
+class RPDO implements DriverInterface
 {
 	/**
 	 * @var integer
@@ -43,7 +43,7 @@ class RPDO implements IDriver
 	protected $loggingEnabled = FALSE;
 
 	/**
-	 * @var ILogger
+	 * @var LoggerInterface
 	 */
 	protected $logger = NULL;
 
@@ -330,7 +330,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::GetAll
+	 * @see DriverInterface::GetAll
 	 */
 	public function GetAll( $sql, $bindings = array() )
 	{
@@ -339,7 +339,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::GetAssocRow
+	 * @see DriverInterface::GetAssocRow
 	 */
 	public function GetAssocRow( $sql, $bindings = array() )
 	{
@@ -351,7 +351,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::GetCol
+	 * @see DriverInterface::GetCol
 	 */
 	public function GetCol( $sql, $bindings = array() )
 	{
@@ -367,7 +367,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::GetOne
+	 * @see DriverInterface::GetOne
 	 */
 	public function GetOne( $sql, $bindings = array() )
 	{
@@ -397,7 +397,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::GetRow
+	 * @see DriverInterface::GetRow
 	 */
 	public function GetRow( $sql, $bindings = array() )
 	{
@@ -406,7 +406,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::Excecute
+	 * @see DriverInterface::Excecute
 	 */
 	public function Execute( $sql, $bindings = array() )
 	{
@@ -415,7 +415,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::GetInsertID
+	 * @see DriverInterface::GetInsertID
 	 */
 	public function GetInsertID()
 	{
@@ -425,7 +425,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::GetCursor
+	 * @see DriverInterface::GetCursor
 	 * @returns PDOCursor
 	 */
 	public function GetCursor( $sql, $bindings = array() )
@@ -436,7 +436,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::Affected_Rows
+	 * @see DriverInterface::Affected_Rows
 	 */
 	public function Affected_Rows()
 	{
@@ -450,7 +450,7 @@ class RPDO implements IDriver
 	 * results.
 	 *
 	 * @param boolean $tf   turn on/off
-	 * @param ILogger  $logger    logger instance
+	 * @param LoggerInterface  $logger    logger instance
 	 *
 	 * @return void
 	 */
@@ -468,11 +468,11 @@ class RPDO implements IDriver
 	 * Injects Logger object.
 	 * Sets the logger instance you wish to use.
 	 *
-	 * @param ILogger $logger the logger instance to be used for logging
+	 * @param LoggerInterface $logger the logger instance to be used for logging
 	 *
 	 * @return void
 	 */
-	public function setLogger( ILogger $logger )
+	public function setLogger( LoggerInterface $logger )
 	{
 		$this->logger = $logger;
 	}
@@ -481,7 +481,7 @@ class RPDO implements IDriver
 	 * Gets Logger object.
 	 * Returns the currently active Logger instance.
 	 *
-	 * @return ILogger
+	 * @return LoggerInterface
 	 */
 	public function getLogger()
 	{
@@ -489,7 +489,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::StartTrans
+	 * @see DriverInterface::StartTrans
 	 */
 	public function StartTrans()
 	{
@@ -498,7 +498,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::CommitTrans
+	 * @see DriverInterface::CommitTrans
 	 */
 	public function CommitTrans()
 	{
@@ -507,7 +507,7 @@ class RPDO implements IDriver
 	}
 
 	/**
-	 * @see IDriver::FailTrans
+	 * @see DriverInterface::FailTrans
 	 */
 	public function FailTrans()
 	{

@@ -3,8 +3,8 @@
 namespace RedBeanPHP\Adapter;
 
 use RedBeanPHP\Observable as Observable;
-use RedBeanPHP\IAdapter as IAdapter;
-use RedBeanPHP\IDriver as IDriver;
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
+use RedBeanPHP\DriverInterface as DriverInterface;
 
 /**
  * DBAdapter (Database Adapter)
@@ -25,10 +25,10 @@ use RedBeanPHP\IDriver as IDriver;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class DBAdapter extends Observable implements IAdapter
+class DBAdapter extends Observable implements AdaptorInterface
 {
 	/**
-	 * @var IDriver
+	 * @var DriverInterface
 	 */
 	private $db = NULL;
 
@@ -44,7 +44,7 @@ class DBAdapter extends Observable implements IAdapter
 	 * This class provides an interface for RedBean to work
 	 * with ADO compatible DB instances.
 	 *
-	 * @param IDriver $database ADO Compatible DB Instance
+	 * @param DriverInterface $database ADO Compatible DB Instance
 	 */
 	public function __construct( $database )
 	{
@@ -52,7 +52,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::getSQL
+	 * @see AdaptorInterface::getSQL
 	 */
 	public function getSQL()
 	{
@@ -60,7 +60,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::exec
+	 * @see AdaptorInterface::exec
 	 */
 	public function exec( $sql, $bindings = array(), $noevent = FALSE )
 	{
@@ -73,7 +73,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::get
+	 * @see AdaptorInterface::get
 	 */
 	public function get( $sql, $bindings = array() )
 	{
@@ -84,7 +84,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::getRow
+	 * @see AdaptorInterface::getRow
 	 */
 	public function getRow( $sql, $bindings = array() )
 	{
@@ -95,7 +95,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::getCol
+	 * @see AdaptorInterface::getCol
 	 */
 	public function getCol( $sql, $bindings = array() )
 	{
@@ -106,7 +106,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::getAssoc
+	 * @see AdaptorInterface::getAssoc
 	 */
 	public function getAssoc( $sql, $bindings = array() )
 	{
@@ -142,7 +142,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 	
 	/**
-	 * @see IAdapter::getAssocRow
+	 * @see AdaptorInterface::getAssocRow
 	 */
 	public function getAssocRow($sql, $bindings = array())
 	{
@@ -153,7 +153,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::getCell
+	 * @see AdaptorInterface::getCell
 	 */
 	public function getCell( $sql, $bindings = array(), $noSignal = NULL )
 	{
@@ -165,7 +165,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::getCursor
+	 * @see AdaptorInterface::getCursor
 	 */
 	public function getCursor( $sql, $bindings = array() )
 	{
@@ -173,7 +173,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::getInsertID
+	 * @see AdaptorInterface::getInsertID
 	 */
 	public function getInsertID()
 	{
@@ -181,7 +181,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::getAffectedRows
+	 * @see AdaptorInterface::getAffectedRows
 	 */
 	public function getAffectedRows()
 	{
@@ -189,7 +189,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::getDatabase
+	 * @see AdaptorInterface::getDatabase
 	 */
 	public function getDatabase()
 	{
@@ -197,7 +197,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::startTransaction
+	 * @see AdaptorInterface::startTransaction
 	 */
 	public function startTransaction()
 	{
@@ -205,7 +205,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::commit
+	 * @see AdaptorInterface::commit
 	 */
 	public function commit()
 	{
@@ -213,7 +213,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::rollback
+	 * @see AdaptorInterface::rollback
 	 */
 	public function rollback()
 	{
@@ -221,7 +221,7 @@ class DBAdapter extends Observable implements IAdapter
 	}
 
 	/**
-	 * @see IAdapter::close.
+	 * @see AdaptorInterface::close.
 	 */
 	public function close()
 	{

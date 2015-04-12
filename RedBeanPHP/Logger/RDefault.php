@@ -2,7 +2,7 @@
 
 namespace RedBeanPHP\Logger;
 
-use RedBeanPHP\ILogger as ILogger;
+use RedBeanPHP\LoggerInterface as LoggerInterface;
 use RedBeanPHP\RedException\Base as RedException;
 
 /**
@@ -17,7 +17,7 @@ use RedBeanPHP\RedException\Base as RedException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class RDefault implements ILogger
+class RDefault implements LoggerInterface
 {
 	/**
 	 * Logger modes

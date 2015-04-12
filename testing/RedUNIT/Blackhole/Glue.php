@@ -4,7 +4,7 @@ namespace RedUNIT\Blackhole;
 
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 
 /**
  * Glue
@@ -43,13 +43,13 @@ class Glue extends Blackhole
 		asrt( $writer->glueSQLCondition(' HAVING x = ? '), ' HAVING x = ? ' );
 
 		//can we replace WHERE with AND ?
-		asrt( $writer->glueSQLCondition(' AND name = ? ', IQueryWriter::C_GLUE_WHERE ), ' WHERE  name = ? ' );
+		asrt( $writer->glueSQLCondition(' AND name = ? ', QueryWriterInterface::C_GLUE_WHERE ), ' WHERE  name = ? ' );
 
 		//can we glue with AND instead of WHERE ?
-		asrt( $writer->glueSQLCondition(' value1 > ? OR value < ? ', IQueryWriter::C_GLUE_AND ), ' AND  value1 > ? OR value < ? ' );
+		asrt( $writer->glueSQLCondition(' value1 > ? OR value < ? ', QueryWriterInterface::C_GLUE_AND ), ' AND  value1 > ? OR value < ? ' );
 
 		//non-cases
-		asrt( $writer->glueSQLCondition(' GROUP BY grp ', IQueryWriter::C_GLUE_WHERE ), ' GROUP BY grp ' );
-		asrt( $writer->glueSQLCondition(' GROUP BY grp ', IQueryWriter::C_GLUE_AND ), ' GROUP BY grp ' );
+		asrt( $writer->glueSQLCondition(' GROUP BY grp ', QueryWriterInterface::C_GLUE_WHERE ), ' GROUP BY grp ' );
+		asrt( $writer->glueSQLCondition(' GROUP BY grp ', QueryWriterInterface::C_GLUE_AND ), ' GROUP BY grp ' );
 	}
 }

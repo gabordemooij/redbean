@@ -3,7 +3,7 @@
 namespace RedBeanPHP\BeanHelper;
 
 use RedBeanPHP\SimpleModel;
-use RedBeanPHP\IBeanHelper as IBeanHelper;
+use RedBeanPHP\BeanHelperInterface as BeanHelperInterface;
 use RedBeanPHP\Facade as Facade;
 use RedBeanPHP\OODBBean as OODBBean;
 
@@ -23,7 +23,7 @@ use RedBeanPHP\OODBBean as OODBBean;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class SimpleFacadeBeanHelper implements IBeanHelper
+class SimpleFacadeBeanHelper implements BeanHelperInterface
 {
 	/**
 	 * Factory function to create instance of Simple Model, if any.
@@ -60,7 +60,7 @@ class SimpleFacadeBeanHelper implements IBeanHelper
 	}
 
 	/**
-	 * @see IBeanHelper::getToolbox
+	 * @see BeanHelperInterface::getToolbox
 	 */
 	public function getToolbox()
 	{
@@ -68,7 +68,7 @@ class SimpleFacadeBeanHelper implements IBeanHelper
 	}
 
 	/**
-	 * @see IBeanHelper::getModelForBean
+	 * @see BeanHelperInterface::getModelForBean
 	 * @param OODBBean $bean;
 	 * @return self::factory()
 	 */
@@ -108,7 +108,7 @@ class SimpleFacadeBeanHelper implements IBeanHelper
 	}
 
 	/**
-	 * @see IBeanHelper::getExtractedToolbox
+	 * @see BeanHelperInterface::getExtractedToolbox
 	 */
 	public function getExtractedToolbox()
 	{

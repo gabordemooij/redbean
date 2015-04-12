@@ -6,7 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\Observer as Observer;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\IAdapter as IAdapter;
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
 use RedBeanPHP\QueryWriter\Base as QueryWriter;
 
 
@@ -425,7 +425,7 @@ class Foreignkeys extends Base implements Observer
 	 * Log queries
 	 *
 	 * @param string          $event
-	 * @param IAdapter $info
+	 * @param AdaptorInterface $info
 	 */
 	public function onEvent( $event, $info )
 	{

@@ -5,7 +5,7 @@ namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\OODB as OODB;
 
 /**
@@ -35,7 +35,7 @@ class Observers extends Base
 		$redbean = $toolbox->getRedBean();
 
 		asrt( ( $adapter instanceof DBAdapter ), TRUE );
-		asrt( ( $writer instanceof IQueryWriter ), TRUE );
+		asrt( ( $writer instanceof QueryWriterInterface ), TRUE );
 		asrt( ( $redbean instanceof OODB ), TRUE );
 
 		$observable = new \ObservableMock();

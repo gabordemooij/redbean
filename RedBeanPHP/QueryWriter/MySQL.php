@@ -2,9 +2,9 @@
 
 namespace RedBeanPHP\QueryWriter;
 
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\IAdapter as IAdapter;
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
 use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
@@ -21,7 +21,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class MySQL extends Base implements IQueryWriter
+class MySQL extends Base implements QueryWriterInterface
 {
 	/**
 	 * Data types
@@ -96,9 +96,9 @@ class MySQL extends Base implements IQueryWriter
 	/**
 	 * Constructor
 	 *
-	 * @param IAdapter $adapter Database Adapter
+	 * @param AdaptorInterface $adapter Database Adapter
 	 */
-	public function __construct( IAdapter $adapter )
+	public function __construct( AdaptorInterface $adapter )
 	{
 		$this->typeno_sqltype = array(
 			MySQL::C_DATATYPE_BOOL             => ' TINYINT(1) UNSIGNED ',
@@ -249,7 +249,7 @@ class MySQL extends Base implements IQueryWriter
 			return $r;
 		}
 
-		if ( $r >= IQueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
+		if ( $r >= QueryWriterInterface::C_DATATYPE_RANGE_SPECIAL ) {
 			return self::C_DATATYPE_SPECIFIED;
 		}
 
@@ -336,9 +336,9 @@ class MySQL extends Base implements IQueryWriter
 	public function sqlStateIn( $state, $list )
 	{
 		$stateMap = array(
-			'42S02' => IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'42S22' => IQueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			'23000' => IQueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'42S02' => QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE,
+			'42S22' => QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN,
+			'23000' => QueryWriterInterface::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );

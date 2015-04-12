@@ -4,7 +4,7 @@ namespace RedBeanPHP;
 
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\OODB as OODB;
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\TagManager as TagManager;
@@ -13,13 +13,13 @@ use RedBeanPHP\LabelMaker as LabelMaker;
 use RedBeanPHP\Finder as Finder;
 use RedBeanPHP\RedException\SQL as SQLException;
 use RedBeanPHP\RedException\Base as RedException;
-use RedBeanPHP\ILogger as ILogger;
+use RedBeanPHP\LoggerInterface as LoggerInterface;
 use RedBeanPHP\Logger\RDefault as RDefault;
 use RedBeanPHP\Logger\RDefault\Debug as Debug;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\SimpleModel as SimpleModel;
 use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
-use RedBeanPHP\IAdapter as IAdapter;
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
 use RedBeanPHP\QueryWriter\Base as QueryWriter;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 use RedBeanPHP\Driver\RPDO as RPDO;
@@ -61,7 +61,7 @@ class Facade
 	private static $redbean;
 
 	/**
-	 * @var IQueryWriter
+	 * @var QueryWriterInterface
 	 */
 	private static $writer;
 
@@ -96,7 +96,7 @@ class Facade
 	private static $finder;
 
 	/**
-	 * @var ILogger
+	 * @var LoggerInterface
 	 */
 	private static $logger;
 
@@ -145,8 +145,8 @@ class Facade
 			} catch ( SQLException $exception ) {
 				if ( self::$writer->sqlStateIn( $exception->getSQLState(),
 					array(
-						IQueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-						IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
+						QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN,
+						QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE )
 					)
 				) {
 					return ( $method === 'getCell' ) ? NULL : array();
@@ -1484,11 +1484,11 @@ class Facade
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @param IAdapter $adapter
+	 * @param AdaptorInterface $adapter
 	 *
 	 * @return void
 	 */
-	public static function setDatabaseAdapter( IAdapter $adapter )
+	public static function setDatabaseAdapter( AdaptorInterface $adapter )
 	{
 		self::$adapter = $adapter;
 	}
@@ -1829,7 +1829,7 @@ class Facade
 	 * Returns the current logger instance being used by the
 	 * database object.
 	 *
-	 * @return ILogger
+	 * @return LoggerInterface
 	 */
 	public static function getLogger()
 	{

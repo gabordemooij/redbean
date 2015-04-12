@@ -4,7 +4,7 @@ namespace RedUNIT\Mysql;
 
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\QueryWriter\MySQL as MySQL;
 use RedBeanPHP\QueryWriter\Base as QueryWriter;
 use RedBeanPHP\RedException\SQL as SQL;
@@ -84,8 +84,8 @@ class Writer extends \RedUNIT\Mysql
 		$filters = QueryWriter::getSQLFilters();
 		asrt( is_array( $filters ), TRUE );
 		asrt( count( $filters ), 2 );
-		asrt( isset( $filters[ IQueryWriter::C_SQLFILTER_READ] ), TRUE );
-		asrt( isset( $filters[ IQueryWriter::C_SQLFILTER_WRITE] ), TRUE );
+		asrt( isset( $filters[ QueryWriterInterface::C_SQLFILTER_READ] ), TRUE );
+		asrt( isset( $filters[ QueryWriterInterface::C_SQLFILTER_WRITE] ), TRUE );
 		R::bindFunc( 'read', 'place.point', 'asText' );
 		R::bindFunc( 'write', 'place.point', 'GeomFromText' );
 		R::bindFunc( 'read', 'place.line', 'asText' );

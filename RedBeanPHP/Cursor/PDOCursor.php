@@ -2,7 +2,7 @@
 
 namespace RedBeanPHP\Cursor;
 
-use RedBeanPHP\ICursor as ICursor;
+use RedBeanPHP\CursorInterface as CursorInterface;
 
 /**
  * PDO Database Cursor
@@ -18,7 +18,7 @@ use RedBeanPHP\ICursor as ICursor;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class PDOCursor implements ICursor
+class PDOCursor implements CursorInterface
 {
 	/**
 	 * @var \PDOStatement
@@ -44,7 +44,7 @@ class PDOCursor implements ICursor
 	}
 
 	/**
-	 * @see ICursor::getNextItem
+	 * @see CursorInterface::getNextItem
 	 */
 	public function getNextItem()
 	{
@@ -52,7 +52,7 @@ class PDOCursor implements ICursor
 	}
 
 	/**
-	 * @see ICursor::close
+	 * @see CursorInterface::close
 	 */
 	public function close()
 	{

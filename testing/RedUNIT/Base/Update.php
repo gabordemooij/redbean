@@ -5,7 +5,7 @@ namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\RedException\Base as RedException;
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\QueryWriter\Base as QueryWriter;
 
 /**
@@ -31,10 +31,10 @@ class Update extends Base
 	{
 		R::nuke();
 		QueryWriter::setSQLFilters(array(
-			IQueryWriter::C_SQLFILTER_READ => array(
+			QueryWriterInterface::C_SQLFILTER_READ => array(
 				'book' => array( 'title' => ' LOWER(book.title) '),
 			),
-			IQueryWriter::C_SQLFILTER_WRITE => array(
+			QueryWriterInterface::C_SQLFILTER_WRITE => array(
 				'book' => array( 'title' => ' UPPER(?) '),
 			),
 		));
@@ -63,11 +63,11 @@ class Update extends Base
 		$link = reset( $links );
 		$link->shelf = 'x13';
 		QueryWriter::setSQLFilters(array(
-			IQueryWriter::C_SQLFILTER_READ => array(
+			QueryWriterInterface::C_SQLFILTER_READ => array(
 				'book' => array( 'title' => ' LOWER(book.title) '),
 				'book_book' => array( 'shelf' => ' LOWER(book_book.shelf) '),
 			),
-			IQueryWriter::C_SQLFILTER_WRITE => array(
+			QueryWriterInterface::C_SQLFILTER_WRITE => array(
 				'book' => array( 'title' => ' UPPER(?) '),
 				'book_book' => array( 'shelf' => ' UPPER(?) ')
 			),

@@ -2,9 +2,9 @@
 
 namespace RedBeanPHP\QueryWriter;
 
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\IAdapter as IAdapter;
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
 use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
@@ -21,7 +21,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class SQLiteT extends Base implements IQueryWriter
+class SQLiteT extends Base implements QueryWriterInterface
 {
 	/**
 	 * Data types
@@ -215,9 +215,9 @@ class SQLiteT extends Base implements IQueryWriter
 	/**
 	 * Constructor
 	 *
-	 * @param IAdapter $adapter Database Adapter
+	 * @param AdaptorInterface $adapter Database Adapter
 	 */
-	public function __construct( IAdapter $adapter )
+	public function __construct( AdaptorInterface $adapter )
 	{
 		$this->typeno_sqltype = array(
 			SQLiteT::C_DATATYPE_INTEGER => 'INTEGER',
@@ -246,7 +246,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::scanType
+	 * @see QueryWriterInterface::scanType
 	 */
 	public function scanType( $value, $flagSpecial = FALSE )
 	{
@@ -272,7 +272,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::addColumn
+	 * @see QueryWriterInterface::addColumn
 	 */
 	public function addColumn( $table, $column, $type )
 	{
@@ -284,7 +284,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::code
+	 * @see QueryWriterInterface::code
 	 */
 	public function code( $typedescription, $includeSpecials = FALSE )
 	{
@@ -294,7 +294,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::widenColumn
+	 * @see QueryWriterInterface::widenColumn
 	 */
 	public function widenColumn( $type, $column, $datatype )
 	{
@@ -306,7 +306,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::getTables();
+	 * @see QueryWriterInterface::getTables();
 	 */
 	public function getTables()
 	{
@@ -315,7 +315,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::createTable
+	 * @see QueryWriterInterface::createTable
 	 */
 	public function createTable( $table )
 	{
@@ -327,7 +327,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::getColumns
+	 * @see QueryWriterInterface::getColumns
 	 */
 	public function getColumns( $table )
 	{
@@ -342,7 +342,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::addUniqueIndex
+	 * @see QueryWriterInterface::addUniqueIndex
 	 */
 	public function addUniqueConstraint( $type, $properties )
 	{
@@ -359,20 +359,20 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::sqlStateIn
+	 * @see QueryWriterInterface::sqlStateIn
 	 */
 	public function sqlStateIn( $state, $list )
 	{
 		$stateMap = array(
-			'HY000' => IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'23000' => IQueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'HY000' => QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE,
+			'23000' => QueryWriterInterface::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
 	}
 
 	/**
-	 * @see IQueryWriter::addIndex
+	 * @see QueryWriterInterface::addIndex
 	 */
 	public function addIndex( $type, $name, $column )
 	{
@@ -394,7 +394,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::wipe
+	 * @see QueryWriterInterface::wipe
 	 */
 	public function wipe( $type )
 	{
@@ -404,7 +404,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::addFK
+	 * @see QueryWriterInterface::addFK
 	 */
 	public function addFK( $type, $targetType, $property, $targetProperty, $isDep = FALSE )
 	{
@@ -412,7 +412,7 @@ class SQLiteT extends Base implements IQueryWriter
 	}
 
 	/**
-	 * @see IQueryWriter::wipeAll
+	 * @see QueryWriterInterface::wipeAll
 	 */
 	public function wipeAll()
 	{

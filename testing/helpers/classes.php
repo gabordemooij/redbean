@@ -463,7 +463,7 @@ class UUIDWriterMySQL extends \RedBeanPHP\QueryWriter\MySQL {
 	protected $defaultValue = '@uuid';
 	const C_DATATYPE_SPECIAL_UUID  = 97;
 
-	public function __construct( \RedBeanPHP\IAdapter $adapter )
+	public function __construct( \RedBeanPHP\AdaptorInterface $adapter )
 	{
 		parent::__construct( $adapter );
 		$this->addDataType( self::C_DATATYPE_SPECIAL_UUID, 'char(36)'  );
@@ -505,7 +505,7 @@ class UUIDWriterPostgres extends \RedBeanPHP\QueryWriter\PostgreSQL {
 	protected $defaultValue = 'uuid_generate_v4()';
 	const C_DATATYPE_SPECIAL_UUID  = 97;
 
-	public function __construct( \RedBeanPHP\IAdapter $adapter )
+	public function __construct( \RedBeanPHP\AdaptorInterface $adapter )
 	{
 		parent::__construct( $adapter );
 		$this->addDataType( self::C_DATATYPE_SPECIAL_UUID, 'uuid'  );

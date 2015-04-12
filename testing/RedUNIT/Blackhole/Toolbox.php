@@ -5,8 +5,8 @@ namespace RedUNIT\Blackhole;
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\ToolBox as TB;
-use RedBeanPHP\IQueryWriter as IQueryWriter;
-use RedBeanPHP\IAdapter as IAdapter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
@@ -42,8 +42,8 @@ class Toolbox extends Blackhole {
 		asrt( is_array( $extractedToolbox ), TRUE );
 		asrt( count( $extractedToolbox ), 4 );
 		asrt( ( $extractedToolbox[0] instanceof OODB ), TRUE );
-		asrt( ( $extractedToolbox[1] instanceof IAdapter ), TRUE );
-		asrt( ( $extractedToolbox[2] instanceof IQueryWriter ), TRUE );
+		asrt( ( $extractedToolbox[1] instanceof AdaptorInterface ), TRUE );
+		asrt( ( $extractedToolbox[2] instanceof QueryWriterInterface ), TRUE );
 		asrt( ( $extractedToolbox[3] instanceof TB ), TRUE );
 
 		$beanHelper = new SimpleFacadeBeanHelper;
@@ -54,8 +54,8 @@ class Toolbox extends Blackhole {
 		asrt( is_array( $extractedToolbox ), TRUE );
 		asrt( count( $extractedToolbox ), 4 );
 		asrt( ( $extractedToolbox[0] instanceof OODB ), TRUE );
-		asrt( ( $extractedToolbox[1] instanceof IAdapter ), TRUE );
-		asrt( ( $extractedToolbox[2] instanceof IQueryWriter ), TRUE );
+		asrt( ( $extractedToolbox[1] instanceof AdaptorInterface ), TRUE );
+		asrt( ( $extractedToolbox[2] instanceof QueryWriterInterface ), TRUE );
 		asrt( ( $extractedToolbox[3] instanceof TB ), TRUE );
 	}
 
@@ -67,9 +67,9 @@ class Toolbox extends Blackhole {
 	public function testDoesToolboxContainTheTools()
 	{
 		$toolbox = R::getToolBox();
-		asrt( ( $toolbox->getDatabaseAdapter() instanceof IAdapter ), TRUE );
+		asrt( ( $toolbox->getDatabaseAdapter() instanceof AdaptorInterface ), TRUE );
 		asrt( ( $toolbox->getRedBean() instanceof OODB ), TRUE );
-		asrt( ( $toolbox->getWriter() instanceof IQueryWriter ), TRUE );
+		asrt( ( $toolbox->getWriter() instanceof QueryWriterInterface ), TRUE );
 	}
 
 	/**

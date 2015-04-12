@@ -6,7 +6,7 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Observable as Observable;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as FacadeSimpleBeanHelper;
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\SimpleModel as SimpleModel;
 use RedBeanPHP\BeanHelper as BeanHelper;
@@ -228,8 +228,8 @@ class Fluid extends Repository\Base
 	{
 		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
-				IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				IQueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ) )
+				QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE,
+				QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN ) )
 		) {
 			throw $exception;
 		}
@@ -301,8 +301,8 @@ class Fluid extends Repository\Base
 			} catch ( SQLException $exception ) {
 				if ( $this->writer->sqlStateIn( $exception->getSQLState(),
 					array(
-						IQueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-						IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
+						QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN,
+						QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE )
 				)
 				) {
 					$rows = 0;

@@ -29,12 +29,12 @@ class ToolBox
 	protected $oodb;
 
 	/**
-	 * @var IQueryWriter
+	 * @var QueryWriterInterface
 	 */
 	protected $writer;
 
 	/**
-	 * @var IAdapter
+	 * @var AdaptorInterface
 	 */
 	protected $adapter;
 
@@ -47,12 +47,12 @@ class ToolBox
 	 * OODB.
 	 *
 	 * @param OODB              $oodb    Object Database
-	 * @param IAdapter $adapter Adapter
-	 * @param IQueryWriter       $writer  Writer
+	 * @param AdaptorInterface $adapter Adapter
+	 * @param QueryWriterInterface       $writer  Writer
 	 *
 	 * @return ToolBox
 	 */
-	public function __construct( OODB $oodb, IAdapter $adapter, IQueryWriter $writer )
+	public function __construct( OODB $oodb, AdaptorInterface $adapter, QueryWriterInterface $writer )
 	{
 		$this->oodb    = $oodb;
 		$this->adapter = $adapter;
@@ -66,7 +66,7 @@ class ToolBox
 	 * The Query Writer is responsible for building the queries for a
 	 * specific database and executing them through the adapter.
 	 *
-	 * @return IQueryWriter
+	 * @return QueryWriterInterface
 	 */
 	public function getWriter()
 	{
@@ -91,7 +91,7 @@ class ToolBox
 	 * The adapter is responsible for executing the query and binding the values.
 	 * The adapter also takes care of transaction handling.
 	 * 
-	 * @return IAdapter
+	 * @return AdaptorInterface
 	 */
 	public function getDatabaseAdapter()
 	{

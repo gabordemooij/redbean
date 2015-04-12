@@ -5,7 +5,7 @@ namespace RedBeanPHP\Repository;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\QueryWriter\Base as QueryWriter;
 use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\SimpleModel as SimpleModel;
@@ -286,9 +286,9 @@ abstract class Base
 	/**
 	 * Constructor, requires a query writer.
 	 *
-	 * @param IQueryWriter $writer writer
+	 * @param QueryWriterInterface $writer writer
 	 */
-	public function __construct( OODB $oodb, IQueryWriter $writer )
+	public function __construct( OODB $oodb, QueryWriterInterface $writer )
 	{
 		$this->writer = $writer;
 		$this->oodb = $oodb;
@@ -529,8 +529,8 @@ abstract class Base
 			return (int) $this->writer->queryRecordCount( $type, array(), $addSQL, $bindings );
 		} catch ( SQLException $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array(
-				 IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				 IQueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ) ) ) {
+				 QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE,
+				 QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN ) ) ) {
 				throw $exception;
 			}
 		}
@@ -604,7 +604,7 @@ abstract class Base
 
 			return TRUE;
 		} catch ( SQLException $exception ) {
-			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( IQueryWriter::C_SQLSTATE_NO_SUCH_TABLE ) ) ) {
+			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE ) ) ) {
 				throw $exception;
 			}
 

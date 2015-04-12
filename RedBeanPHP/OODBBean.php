@@ -3,7 +3,7 @@
 namespace RedBeanPHP;
 
 use RedBeanPHP\QueryWriter\Base as QueryWriter;
-use RedBeanPHP\IBeanHelper as IBeanHelper;
+use RedBeanPHP\BeanHelperInterface as BeanHelperInterface;
 use RedBeanPHP\RedException\Base as RedException;
 
 /**
@@ -156,7 +156,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * rich functionality, otherwise you would have to do everything with R or
 	 * external objects.
 	 *
-	 * @var IBeanHelper
+	 * @var BeanHelperInterface
 	 */
 	protected $beanHelper = NULL;
 
@@ -358,11 +358,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * if you build your own bean dispensing mechanism.
 	 *
 	 * @param string             $type       type of the new bean
-	 * @param IBeanHelper $beanhelper bean helper to obtain a toolbox and a model
+	 * @param BeanHelperInterface $beanhelper bean helper to obtain a toolbox and a model
 	 *
 	 * @return void
 	 */
-	public function initializeForDispense( $type, IBeanHelper $beanhelper )
+	public function initializeForDispense( $type, BeanHelperInterface $beanhelper )
 	{
 		$this->beanHelper         = $beanhelper;
 		$this->__info['type']     = $type;
@@ -380,11 +380,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * nested beans (bean lists: ownBean, sharedBean) without the need to
 	 * rely on static calls to the facade (or make this class dep. on OODB).
 	 *
-	 * @param IBeanHelper $helper
+	 * @param BeanHelperInterface $helper
 	 *
 	 * @return void
 	 */
-	public function setBeanHelper( IBeanHelper $helper )
+	public function setBeanHelper( BeanHelperInterface $helper )
 	{
 		$this->beanHelper = $helper;
 	}

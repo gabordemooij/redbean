@@ -5,11 +5,11 @@ namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\Logger\RDefault as RDefault;
-use RedBeanPHP\ILogger as ILogger;
+use RedBeanPHP\LoggerInterface as LoggerInterface;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\OODB as OODB;
-use RedBeanPHP\IAdapter as IAdapter;
-use RedBeanPHP\IQueryWriter as IQueryWriter;
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\Driver\RPDO as RPDO;
@@ -201,7 +201,7 @@ class Misc extends Base
 
 		R::getDatabaseAdapter()->getDatabase()->setLogger( new RDefault );
 
-		asrt( ( R::getDatabaseAdapter()->getDatabase()->getLogger() instanceof ILogger ), TRUE );
+		asrt( ( R::getDatabaseAdapter()->getDatabase()->getLogger() instanceof LoggerInterface ), TRUE );
 		asrt( ( R::getDatabaseAdapter()->getDatabase()->getLogger() instanceof RDefault ), TRUE );
 
 		$bean = R::dispense( 'bean' );
@@ -222,8 +222,8 @@ class Misc extends Base
 		$writer  = R::getWriter();
 
 		asrt( ( $redbean instanceof OODB ), TRUE );
-		asrt( ( $adapter instanceof IAdapter ), TRUE );
-		asrt( ( $writer instanceof IQueryWriter ), TRUE );
+		asrt( ( $adapter instanceof AdaptorInterface ), TRUE );
+		asrt( ( $writer instanceof QueryWriterInterface ), TRUE );
 
 		R::setRedBean( $redbean );
 		pass(); //cant really test this
