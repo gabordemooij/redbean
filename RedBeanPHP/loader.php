@@ -16,7 +16,7 @@ require( REDBEANPHP_MAIN_DIR . 'Observable.php' );
 require( REDBEANPHP_MAIN_DIR . 'Observer.php' );
 
 //Load Database Adapters
-require( REDBEANPHP_MAIN_DIR . 'AdaptorInterface.php' );
+require( REDBEANPHP_MAIN_DIR . 'AdapterInterface.php' );
 require( REDBEANPHP_MAIN_DIR . 'Adapter/DBAdapter.php' );
 require( REDBEANPHP_MAIN_DIR . 'CursorInterface.php');
 require( REDBEANPHP_MAIN_DIR . 'Cursor/PDOCursor.php');
