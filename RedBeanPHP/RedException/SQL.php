@@ -2,8 +2,6 @@
 
 namespace RedBeanPHP\RedException;
 
-use RedBeanPHP\RedException as RedException;
-
 /**
  * SQL Exception.
  * Represents a generic database exception independent of the underlying driver.
@@ -17,7 +15,7 @@ use RedBeanPHP\RedException as RedException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class SQL extends RedException
+class SQL extends Base
 {
 	/**
 	 * @var string

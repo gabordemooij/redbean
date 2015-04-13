@@ -3,9 +3,8 @@
 namespace RedBeanPHP\QueryWriter;
 
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\RedException\Base as RedException;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
@@ -15,7 +14,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * Contains a number of functions all implementors can
  * inherit or override.
  *
- * @file    RedBeanPHP/QueryWriter/AQueryWriter.php
+ * @file    RedBeanPHP/QueryWriter/QueryWriter.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *
@@ -24,7 +23,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-abstract class AQueryWriter
+abstract class Base
 {
 	/**
 	 * @var array
@@ -81,6 +80,8 @@ abstract class AQueryWriter
 	 */
 	public $typeno_sqltype = array();
 
+	public $tableArchive = array();
+
 	/**
 	 * Checks whether a number can be treated like an int.
 	 *
@@ -94,7 +95,7 @@ abstract class AQueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::getAssocTableFormat
+	 * @see QueryWriterInterface::getAssocTableFormat
 	 */
 	public static function getAssocTableFormat( $types )
 	{
@@ -106,7 +107,7 @@ abstract class AQueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::renameAssociation
+	 * @see QueryWriterInterface::renameAssociation
 	 */
 	public static function renameAssociation( $from, $to = NULL )
 	{
@@ -191,10 +192,11 @@ abstract class AQueryWriter
 	 *
 	 * Note that you can use constants instead of magical chars
 	 * as keys for the uppermost array.
-	 * This is a lowlevel method. For a more friendly method
+	 * This is a low level method. For a more friendly method
 	 * please take a look at the facade: R::bindFunc().
 	 *
 	 * @param array
+	 * @param boolean
 	 */
 	public static function setSQLFilters( $sqlFilters, $safeMode = false )
 	{
@@ -205,7 +207,7 @@ abstract class AQueryWriter
 	/**
 	 * Returns current SQL Filters.
 	 * This method returns the raw SQL filter array.
-	 * This is a lowlevel method. For a more friendly method
+	 * This is a low level method. For a more friendly method
 	 * please take a look at the facade: R::bindFunc().
 	 *
 	 * @return array
@@ -489,8 +491,8 @@ abstract class AQueryWriter
 		}
 
 		$sqlFilters = array();
-		if ( isset( self::$sqlFilters[QueryWriter::C_SQLFILTER_READ][$type] ) ) {
-			foreach( self::$sqlFilters[QueryWriter::C_SQLFILTER_READ][$type] as $property => $sqlFilter ) {
+		if ( isset( self::$sqlFilters[QueryWriterInterface::C_SQLFILTER_READ][$type] ) ) {
+			foreach( self::$sqlFilters[QueryWriterInterface::C_SQLFILTER_READ][$type] as $property => $sqlFilter ) {
 				if ( !self::$flagSQLFilterSafeMode || isset( $existingCols[$property] ) ) {
 					$sqlFilters[] = $sqlFilter.' AS '.$property.' ';
 				}
@@ -499,6 +501,8 @@ abstract class AQueryWriter
 		$sqlFilterStr = ( count($sqlFilters) ) ? ( ','.implode( ',', $sqlFilters ) ) : '';
 		return $sqlFilterStr;
 	}
+
+	public abstract function getColumns( $type );
 
 	/**
 	 * Generates a list of parameters (slots) for an SQL snippet.
@@ -645,11 +649,11 @@ abstract class AQueryWriter
 	/**
 	 * Checks table name or column name.
 	 *
-	 * @param string $table table string
+	 * @param string $struct table string
 	 *
 	 * @return string
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	protected function check( $struct )
 	{
@@ -659,6 +663,8 @@ abstract class AQueryWriter
 
 		return $struct;
 	}
+
+	public abstract function getTables();
 
 	/**
 	 * Checks whether the specified type (i.e. table) already exists in the database.
@@ -695,13 +701,13 @@ abstract class AQueryWriter
 		$lsql = ltrim( $sql );
 
 		if ( preg_match( '/^(INNER|LEFT|RIGHT|JOIN|AND|OR|WHERE|ORDER|GROUP|HAVING|LIMIT|OFFSET)\s+/i', $lsql ) ) {
-			if ( $glue === QueryWriter::C_GLUE_WHERE && stripos( $lsql, 'AND' ) === 0 ) {
+			if ( $glue === QueryWriterInterface::C_GLUE_WHERE && stripos( $lsql, 'AND' ) === 0 ) {
 				$snippetCache[$key] = ' WHERE ' . substr( $lsql, 3 );
 			} else {
 				$snippetCache[$key] = $sql;
 			}
 		} else {
-			$snippetCache[$key] = ( ( $glue === QueryWriter::C_GLUE_AND ) ? ' AND ' : ' WHERE ') . $sql;
+			$snippetCache[$key] = ( ( $glue === QueryWriterInterface::C_GLUE_AND ) ? ' AND ' : ' WHERE ') . $sql;
 		}
 
 		return $snippetCache[$key];
@@ -807,7 +813,7 @@ abstract class AQueryWriter
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, ( count($conditions) > 0) ? QueryWriter::C_GLUE_AND : NULL );
+		$addSql = $this->glueSQLCondition( $addSql, ( count($conditions) > 0) ? QueryWriterInterface::C_GLUE_AND : NULL );
 
 		$key = NULL;
 		if ( $this->flagUseCache ) {
@@ -856,7 +862,7 @@ abstract class AQueryWriter
 	 */
 	public function queryRecordRelated( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, QueryWriter::C_GLUE_WHERE );
+		$addSql = $this->glueSQLCondition( $addSql, QueryWriterInterface::C_GLUE_WHERE );
 
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 
@@ -1174,6 +1180,8 @@ abstract class AQueryWriter
 		}
 		return NULL;
 	}
+
+	public abstract function addUniqueConstraint( $type, $properties );
 
 	/**
 	 * @see QueryWriter::addUniqueConstraint

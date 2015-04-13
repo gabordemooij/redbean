@@ -16,7 +16,7 @@ namespace RedBeanPHP;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-interface Driver
+interface DriverInterface
 {
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.

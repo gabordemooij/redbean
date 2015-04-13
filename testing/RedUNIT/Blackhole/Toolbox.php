@@ -5,12 +5,12 @@ namespace RedUNIT\Blackhole;
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\ToolBox as TB;
-use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
-use RedBeanPHP\Repository as Repository;
+use RedBeanPHP\Repository\Base as Repository;
 use RedBeanPHP\Repository\Fluid as FluidRepo;
 use RedBeanPHP\Repository\Frozen as FrozenRepo;
 
@@ -42,8 +42,8 @@ class Toolbox extends Blackhole {
 		asrt( is_array( $extractedToolbox ), TRUE );
 		asrt( count( $extractedToolbox ), 4 );
 		asrt( ( $extractedToolbox[0] instanceof OODB ), TRUE );
-		asrt( ( $extractedToolbox[1] instanceof Adapter ), TRUE );
-		asrt( ( $extractedToolbox[2] instanceof QueryWriter ), TRUE );
+		asrt( ( $extractedToolbox[1] instanceof AdaptorInterface ), TRUE );
+		asrt( ( $extractedToolbox[2] instanceof QueryWriterInterface ), TRUE );
 		asrt( ( $extractedToolbox[3] instanceof TB ), TRUE );
 
 		$beanHelper = new SimpleFacadeBeanHelper;
@@ -54,8 +54,8 @@ class Toolbox extends Blackhole {
 		asrt( is_array( $extractedToolbox ), TRUE );
 		asrt( count( $extractedToolbox ), 4 );
 		asrt( ( $extractedToolbox[0] instanceof OODB ), TRUE );
-		asrt( ( $extractedToolbox[1] instanceof Adapter ), TRUE );
-		asrt( ( $extractedToolbox[2] instanceof QueryWriter ), TRUE );
+		asrt( ( $extractedToolbox[1] instanceof AdaptorInterface ), TRUE );
+		asrt( ( $extractedToolbox[2] instanceof QueryWriterInterface ), TRUE );
 		asrt( ( $extractedToolbox[3] instanceof TB ), TRUE );
 	}
 
@@ -67,9 +67,9 @@ class Toolbox extends Blackhole {
 	public function testDoesToolboxContainTheTools()
 	{
 		$toolbox = R::getToolBox();
-		asrt( ( $toolbox->getDatabaseAdapter() instanceof Adapter ), TRUE );
+		asrt( ( $toolbox->getDatabaseAdapter() instanceof AdaptorInterface ), TRUE );
 		asrt( ( $toolbox->getRedBean() instanceof OODB ), TRUE );
-		asrt( ( $toolbox->getWriter() instanceof QueryWriter ), TRUE );
+		asrt( ( $toolbox->getWriter() instanceof QueryWriterInterface ), TRUE );
 	}
 
 	/**
@@ -80,7 +80,7 @@ class Toolbox extends Blackhole {
 	 */
 	public function testRepoSwitching()
 	{
-		asrt( class_exists( 'RedBeanPHP\Repository' ), TRUE );
+		asrt( class_exists( 'RedBeanPHP\Repository\Base' ), TRUE );
 		asrt( class_exists( 'RedBeanPHP\Repository\Fluid' ), TRUE );
 		asrt( class_exists( 'RedBeanPHP\Repository\Frozen' ), TRUE );
 		R::freeze( FALSE );

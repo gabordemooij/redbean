@@ -6,13 +6,12 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Observable as Observable;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
-use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\RedException\Security as Security;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\SimpleModel as SimpleModel;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException\SQL as SQLException;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 use RedBeanPHP\Repository as Repository;
 
 /**
@@ -33,7 +32,7 @@ use RedBeanPHP\Repository as Repository;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class Frozen extends Repository
+class Frozen extends Repository\Base
 {
 	/**
 	 * Handles\Exceptions. Suppresses exceptions caused by missing structures.
@@ -90,7 +89,7 @@ class Frozen extends Repository
 	 *
 	 * @return void
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	protected function processAdditions( $bean, $ownAdditions )
 	{
@@ -124,7 +123,7 @@ class Frozen extends Repository
 	 * configuration for you.
 	 *
 	 * @param string  $type              type of bean you want to dispense
-	 * @param string  $number            number of beans you would like to get
+	 * @param number  $number            number of beans you would like to get
 	 * @param boolean $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return OODBBean
@@ -163,7 +162,7 @@ class Frozen extends Repository
 	 * @param string  $type type of bean you want to load
 	 * @param integer $id   ID of the bean you want to load
 	 *
-	 * @throws SQL
+	 * @throws RedException
 	 *
 	 * @return OODBBean
 	 *
@@ -179,8 +178,8 @@ class Frozen extends Repository
 			} catch ( SQLException $exception ) {
 				if ( $this->writer->sqlStateIn( $exception->getSQLState(),
 					array(
-						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-						QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
+						QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN,
+						QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE )
 				)
 				) {
 					throw $exception; //only throw if frozen

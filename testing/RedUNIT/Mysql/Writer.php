@@ -4,11 +4,11 @@ namespace RedUNIT\Mysql;
 
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
-use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\QueryWriter\MySQL as MySQL;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 use RedBeanPHP\RedException\SQL as SQL;
-use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\RedException\Base as RedException;
 
 /**
  * Writer
@@ -81,11 +81,11 @@ class Writer extends \RedUNIT\Mysql
 		R::store($location);
 		$location = $location->fresh();
 		asrt( ( $location->point === 'POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7,5 5))' ), FALSE );
-		$filters = AQueryWriter::getSQLFilters();
+		$filters = QueryWriter::getSQLFilters();
 		asrt( is_array( $filters ), TRUE );
 		asrt( count( $filters ), 2 );
-		asrt( isset( $filters[ QueryWriter::C_SQLFILTER_READ] ), TRUE );
-		asrt( isset( $filters[ QueryWriter::C_SQLFILTER_WRITE] ), TRUE );
+		asrt( isset( $filters[ QueryWriterInterface::C_SQLFILTER_READ] ), TRUE );
+		asrt( isset( $filters[ QueryWriterInterface::C_SQLFILTER_WRITE] ), TRUE );
 		R::bindFunc( 'read', 'place.point', 'asText' );
 		R::bindFunc( 'write', 'place.point', 'GeomFromText' );
 		R::bindFunc( 'read', 'place.line', 'asText' );

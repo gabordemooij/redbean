@@ -5,10 +5,9 @@ namespace RedBeanPHP;
 use RedBeanPHP\Observable as Observable;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\RedException\Security as Security;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\RedException\SQL as SQLException;
 use RedBeanPHP\ToolBox as ToolBox;
 
@@ -38,7 +37,7 @@ class AssociationManager extends Observable
 	protected $adapter;
 
 	/**
-	 * @var QueryWriter
+	 * @var QueryWriterInterface
 	 */
 	protected $writer;
 
@@ -55,8 +54,8 @@ class AssociationManager extends Observable
 	{
 		if ( $this->oodb->isFrozen() || !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
-				QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN )
+				QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE,
+				QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN )
 			)
 		) {
 			throw $exception;
@@ -131,7 +130,7 @@ class AssociationManager extends Observable
 			$results[] = $id;
 		} catch ( SQLException $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
-				array( QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ) )
+				array( QueryWriterInterface::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ) )
 			) {
 				throw $exception;
 			}
@@ -215,7 +214,7 @@ class AssociationManager extends Observable
 	 *
 	 * @return integer
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	public function relatedCount( $bean, $type, $sql = NULL, $bindings = array() )
 	{

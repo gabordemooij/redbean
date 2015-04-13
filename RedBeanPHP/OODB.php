@@ -2,17 +2,12 @@
 
 namespace RedBeanPHP;
 
-use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\Observable as Observable;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
-use RedBeanPHP\AssociationManager as AssociationManager;
-use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\RedException\Security as Security;
-use RedBeanPHP\SimpleModel as SimpleModel;
+use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException\SQL as SQL;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 use RedBeanPHP\Repository as Repository;
 use RedBeanPHP\Repository\Fluid as FluidRepo;
 use RedBeanPHP\Repository\Frozen as FrozenRepo;
@@ -68,7 +63,7 @@ class OODB extends Observable
 	protected $isFrozen = FALSE;
 
 	/**
-	 * @var FacadeBeanHelper
+	 * @var SimpleFacadeBeanHelper
 	 */
 	protected $beanhelper = NULL;
 
@@ -78,7 +73,7 @@ class OODB extends Observable
 	protected $assocManager = NULL;
 
 	/**
-	 * @var Repository
+	 * @var Repository\*
 	 */
 	protected $repository = NULL;
 
@@ -100,7 +95,7 @@ class OODB extends Observable
 	 *
 	 * @return OODBBean
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	protected function unboxIfNeeded( $bean )
 	{
@@ -117,12 +112,12 @@ class OODB extends Observable
 	/**
 	 * Constructor, requires a query writer.
 	 *
-	 * @param QueryWriter   $writer writer
+	 * @param QueryWriterInterface   $writer writer
 	 * @param array|boolean $frozen mode of operation: TRUE (frozen), FALSE (default, fluid) or ARRAY (chilled)
 	 */
-	public function __construct( QueryWriter $writer, $frozen = FALSE )
+	public function __construct( QueryWriterInterface $writer, $frozen = FALSE )
 	{
-		if ( $writer instanceof QueryWriter ) {
+		if ( $writer instanceof QueryWriterInterface ) {
 			$this->writer = $writer;
 		}
 
@@ -167,7 +162,7 @@ class OODB extends Observable
 		}
 
 		if ( count( self::$sqlFilters ) ) {
-			AQueryWriter::setSQLFilters( self::$sqlFilters, ( !$this->isFrozen ) );
+			QueryWriter::setSQLFilters( self::$sqlFilters, ( !$this->isFrozen ) );
 		}
 
 	}
@@ -212,7 +207,7 @@ class OODB extends Observable
 	 * configuration for you.
 	 *
 	 * @param string  $type              type of bean you want to dispense
-	 * @param string  $number            number of beans you would like to get
+	 * @param number  $number            number of beans you would like to get
 	 * @param boolean $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return OODBBean
@@ -231,11 +226,11 @@ class OODB extends Observable
 	 * Sets bean helper to be given to beans.
 	 * Bean helpers assist beans in getting a reference to a toolbox.
 	 *
-	 * @param BeanHelper $beanhelper helper
+	 * @param SimpleFacadeBeanHelper $beanhelper helper
 	 *
 	 * @return void
 	 */
-	public function setBeanHelper( BeanHelper $beanhelper )
+	public function setBeanHelper( SimpleFacadeBeanHelper $beanhelper )
 	{
 		$this->beanhelper = $beanhelper;
 	}
@@ -244,7 +239,7 @@ class OODB extends Observable
 	 * Returns the current bean helper.
 	 * Bean helpers assist beans in getting a reference to a toolbox.
 	 *
-	 * @return BeanHelper
+	 * @return SimpleFacadeBeanHelper
 	 */
 	public function getBeanHelper()
 	{
@@ -260,7 +255,7 @@ class OODB extends Observable
 	 *
 	 * @return void
 	 *
-	 * @throws Security $exception
+	 * @throws RedException $exception
 	 */
 	public function check( OODBBean $bean )
 	{
@@ -286,7 +281,7 @@ class OODB extends Observable
 	 *
 	 * @param string $type       type of beans you are looking for
 	 * @param array  $conditions list of conditions
-	 * @param string $addSQL     SQL to be used in query
+	 * @param string $sql     SQL to be used in query
 	 * @param array  $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
 	 *
 	 * @return array
@@ -302,7 +297,7 @@ class OODB extends Observable
 	 * Same as find() but returns a BeanCollection.
 	 *
 	 * @param string $type       type of beans you are looking for
-	 * @param string $addSQL     SQL to be used in query
+	 * @param string $sql     SQL to be used in query
 	 * @param array  $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
 	 *
 	 * @return array
@@ -318,7 +313,7 @@ class OODB extends Observable
 	 * Checks whether the specified table already exists in the database.
 	 * Not part of the Object Database interface!
 	 *
-	 * @deprecated Use AQueryWriter::typeExists() instead.
+	 * @deprecated Use QueryWriter\Base::typeExists() instead.
 	 *
 	 * @param string $table table name
 	 *
@@ -349,7 +344,7 @@ class OODB extends Observable
 	 *
 	 * @return integer|string
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	public function store( $bean )
 	{
@@ -396,7 +391,7 @@ class OODB extends Observable
 	 *
 	 * @return void
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	public function trash( $bean )
 	{
@@ -478,7 +473,7 @@ class OODB extends Observable
 	 *
 	 * @return AssociationManager
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	public function getAssociationManager()
 	{
@@ -494,7 +489,7 @@ class OODB extends Observable
 	 * A simple setter function to set the association manager to be used for storage and
 	 * more.
 	 *
-	 * @param AssociationManager $assoc sets the association manager to be used
+	 * @param AssociationManager $assocManager sets the association manager to be used
 	 *
 	 * @return void
 	 */
@@ -507,7 +502,7 @@ class OODB extends Observable
 	 * Returns the currently used repository instance.
 	 * For testing purposes only.
 	 *
-	 * @return Repository
+	 * @return Repository\*
 	 */
 	public function getCurrentRepository()
 	{
@@ -528,7 +523,7 @@ class OODB extends Observable
 	public function bindFunc( $mode, $field, $function )
 	{
 		list( $type, $property ) = explode( '.', $field );
-		$mode = ($mode === 'write') ? QueryWriter::C_SQLFILTER_WRITE : QueryWriter::C_SQLFILTER_READ;
+		$mode = ($mode === 'write') ? QueryWriterInterface::C_SQLFILTER_WRITE : QueryWriterInterface::C_SQLFILTER_READ;
 
 		if ( !isset( self::$sqlFilters[$mode] ) ) self::$sqlFilters[$mode] = array();
 		if ( !isset( self::$sqlFilters[$mode][$type] ) ) self::$sqlFilters[$mode][$type] = array();
@@ -536,13 +531,13 @@ class OODB extends Observable
 		if ( is_null( $function ) ) {
 			unset( self::$sqlFilters[$mode][$type][$property] );
 		} else {
-			if ($mode === QueryWriter::C_SQLFILTER_WRITE) {
+			if ($mode === QueryWriterInterface::C_SQLFILTER_WRITE) {
 				self::$sqlFilters[$mode][$type][$property] = $function.'(?)';
 			} else {
 				self::$sqlFilters[$mode][$type][$property] = $function."($field)";
 			}
 		}
 
-		AQueryWriter::setSQLFilters( self::$sqlFilters, ( !$this->isFrozen ) );
+		QueryWriter::setSQLFilters( self::$sqlFilters, ( !$this->isFrozen ) );
 	}
 }

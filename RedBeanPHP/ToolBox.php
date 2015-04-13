@@ -2,11 +2,6 @@
 
 namespace RedBeanPHP;
 
-use RedBeanPHP\OODB as OODB;
-use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\Adapter as Adapter;
-
 /**
  * ToolBox.
  *
@@ -34,12 +29,12 @@ class ToolBox
 	protected $oodb;
 
 	/**
-	 * @var QueryWriter
+	 * @var QueryWriterInterface
 	 */
 	protected $writer;
 
 	/**
-	 * @var DBAdapter
+	 * @var AdaptorInterface
 	 */
 	protected $adapter;
 
@@ -52,12 +47,12 @@ class ToolBox
 	 * OODB.
 	 *
 	 * @param OODB              $oodb    Object Database
-	 * @param DBAdapter $adapter Adapter
-	 * @param QueryWriter       $writer  Writer
+	 * @param AdaptorInterface $adapter Adapter
+	 * @param QueryWriterInterface       $writer  Writer
 	 *
 	 * @return ToolBox
 	 */
-	public function __construct( OODB $oodb, Adapter $adapter, QueryWriter $writer )
+	public function __construct( OODB $oodb, AdaptorInterface $adapter, QueryWriterInterface $writer )
 	{
 		$this->oodb    = $oodb;
 		$this->adapter = $adapter;
@@ -71,7 +66,7 @@ class ToolBox
 	 * The Query Writer is responsible for building the queries for a
 	 * specific database and executing them through the adapter.
 	 *
-	 * @return QueryWriter
+	 * @return QueryWriterInterface
 	 */
 	public function getWriter()
 	{
@@ -96,7 +91,7 @@ class ToolBox
 	 * The adapter is responsible for executing the query and binding the values.
 	 * The adapter also takes care of transaction handling.
 	 * 
-	 * @return DBAdapter
+	 * @return AdaptorInterface
 	 */
 	public function getDatabaseAdapter()
 	{

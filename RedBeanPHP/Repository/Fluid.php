@@ -5,14 +5,13 @@ namespace RedBeanPHP\Repository;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Observable as Observable;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
-use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\RedException\Security as Security;
+use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as FacadeSimpleBeanHelper;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\SimpleModel as SimpleModel;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException\SQL as SQLException;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 use RedBeanPHP\Repository as Repository;
 
 /**
@@ -33,7 +32,7 @@ use RedBeanPHP\Repository as Repository;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class Fluid extends Repository
+class Fluid extends Repository\Base
 {
 	/**
 	 * Figures out the desired type given the cast string ID.
@@ -229,8 +228,8 @@ class Fluid extends Repository
 	{
 		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
-				QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ) )
+				QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE,
+				QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN ) )
 		) {
 			throw $exception;
 		}
@@ -302,8 +301,8 @@ class Fluid extends Repository
 			} catch ( SQLException $exception ) {
 				if ( $this->writer->sqlStateIn( $exception->getSQLState(),
 					array(
-						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-						QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
+						QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN,
+						QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE )
 				)
 				) {
 					$rows = 0;

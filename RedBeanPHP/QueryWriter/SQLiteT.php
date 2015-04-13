@@ -2,10 +2,9 @@
 
 namespace RedBeanPHP\QueryWriter;
 
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
 use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
@@ -22,7 +21,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class SQLiteT extends AQueryWriter implements QueryWriter
+class SQLiteT extends Base implements QueryWriterInterface
 {
 	/**
 	 * Data types
@@ -157,9 +156,9 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	 *
 	 * @param  string  $type        type you want to modify table of
 	 * @param  string  $targetType  target type
-	 * @param  string  $field       field of the type that needs to get the fk
-	 * @param  string  $targetField field where the fk needs to point to
-	 * @param  integer $buildopt    0 = NO ACTION, 1 = ON DELETE CASCADE
+	 * @param  string  $property       field of the type that needs to get the fk
+	 * @param  string  $targetProperty field where the fk needs to point to
+	 * @param  boolean $constraint    0 = NO ACTION, 1 = ON DELETE CASCADE
 	 *
 	 * @return boolean $didIt
 	 *
@@ -192,7 +191,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see AQueryWriter::getKeyMapForType
+	 * @see Base::getKeyMapForType
 	 */
 	protected function getKeyMapForType( $type )
 	{
@@ -216,9 +215,9 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	/**
 	 * Constructor
 	 *
-	 * @param Adapter $adapter Database Adapter
+	 * @param AdaptorInterface $adapter Database Adapter
 	 */
-	public function __construct( Adapter $adapter )
+	public function __construct( AdaptorInterface $adapter )
 	{
 		$this->typeno_sqltype = array(
 			SQLiteT::C_DATATYPE_INTEGER => 'INTEGER',
@@ -236,7 +235,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * This method returns the datatype to be used for primary key IDS and
+	 * This method returns the data type to be used for primary key IDS and
 	 * foreign keys. Returns one if the data type constants.
 	 *
 	 * @return integer $const data type to be used for IDS.
@@ -247,7 +246,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::scanType
+	 * @see QueryWriterInterface::scanType
 	 */
 	public function scanType( $value, $flagSpecial = FALSE )
 	{
@@ -273,7 +272,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::addColumn
+	 * @see QueryWriterInterface::addColumn
 	 */
 	public function addColumn( $table, $column, $type )
 	{
@@ -285,7 +284,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::code
+	 * @see QueryWriterInterface::code
 	 */
 	public function code( $typedescription, $includeSpecials = FALSE )
 	{
@@ -295,7 +294,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::widenColumn
+	 * @see QueryWriterInterface::widenColumn
 	 */
 	public function widenColumn( $type, $column, $datatype )
 	{
@@ -307,7 +306,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::getTables();
+	 * @see QueryWriterInterface::getTables();
 	 */
 	public function getTables()
 	{
@@ -316,7 +315,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::createTable
+	 * @see QueryWriterInterface::createTable
 	 */
 	public function createTable( $table )
 	{
@@ -328,7 +327,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::getColumns
+	 * @see QueryWriterInterface::getColumns
 	 */
 	public function getColumns( $table )
 	{
@@ -343,7 +342,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::addUniqueIndex
+	 * @see QueryWriterInterface::addUniqueIndex
 	 */
 	public function addUniqueConstraint( $type, $properties )
 	{
@@ -360,20 +359,20 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::sqlStateIn
+	 * @see QueryWriterInterface::sqlStateIn
 	 */
 	public function sqlStateIn( $state, $list )
 	{
 		$stateMap = array(
-			'HY000' => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-			'23000' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'HY000' => QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE,
+			'23000' => QueryWriterInterface::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
 
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
 	}
 
 	/**
-	 * @see QueryWriter::addIndex
+	 * @see QueryWriterInterface::addIndex
 	 */
 	public function addIndex( $type, $name, $column )
 	{
@@ -395,7 +394,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::wipe
+	 * @see QueryWriterInterface::wipe
 	 */
 	public function wipe( $type )
 	{
@@ -405,7 +404,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::addFK
+	 * @see QueryWriterInterface::addFK
 	 */
 	public function addFK( $type, $targetType, $property, $targetProperty, $isDep = FALSE )
 	{
@@ -413,7 +412,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::wipeAll
+	 * @see QueryWriterInterface::wipeAll
 	 */
 	public function wipeAll()
 	{

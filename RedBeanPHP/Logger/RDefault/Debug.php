@@ -2,10 +2,8 @@
 
 namespace RedBeanPHP\Logger\RDefault;
 
-use RedBeanPHP\Logger as Logger;
+use RedBeanPHP\LoggerInterface as LoggerInterface;
 use RedBeanPHP\Logger\RDefault as RDefault;
-use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\RedException\Security as Security;
 
 /**
  * Debug logger.
@@ -21,7 +19,7 @@ use RedBeanPHP\RedException\Security as Security;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class Debug extends RDefault implements Logger
+class Debug extends RDefault implements LoggerInterface
 {
 	/**
 	 * @var integer
@@ -33,7 +31,7 @@ class Debug extends RDefault implements Logger
 	 * in.
 	 *
 	 * @param string $newSql   the query
-	 * @param array  $bindings the bindings to process (key-value pairs)
+	 * @param array  $newBindings the bindings to process (key-value pairs)
 	 *
 	 * @return string
 	 */
@@ -160,7 +158,8 @@ class Debug extends RDefault implements Logger
 		}
 
 		if ( !is_array( $bindings ) ) {
-			return $this->output( $sql );
+			$this->output( $sql );
+			return;
 		}
 
 		$newSql = $this->normalizeSlots( $sql );

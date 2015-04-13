@@ -7,7 +7,7 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\RedException\Base as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
 
 /**

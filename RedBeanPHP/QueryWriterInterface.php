@@ -27,7 +27,7 @@ namespace RedBeanPHP;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-interface QueryWriter
+interface QueryWriterInterface
 {
 	/**
 	 * SQL filter constants
@@ -67,7 +67,7 @@ interface QueryWriter
 	 * Writes an SQL Snippet for a JOIN, returns the
 	 * SQL snippet string.
 	 *
-	 * @note A default implementation is available in AQueryWriter
+	 * @note A default implementation is available in QueryWriter
 	 * unless a database uses very different SQL this should suffice.
 	 *
 	 * @param string $type       source type
@@ -101,7 +101,7 @@ interface QueryWriter
 	 * For instance beginning a snippet with complex statements like JOIN or UNION
 	 * will not work. This is too complex for use in a snippet.
 	 *
-	 * @note A default implementation is available in AQueryWriter
+	 * @note A default implementation is available in QueryWriter
 	 * unless a database uses very different SQL this should suffice.
 	 *
 	 * @param string  $sql   SQL Snippet
@@ -115,7 +115,7 @@ interface QueryWriter
 	 * Determines if there is a LIMIT 1 clause in the SQL.
 	 * If not, it will add a LIMIT 1. (used for findOne).
 	 *
-	 * @note A default implementation is available in AQueryWriter
+	 * @note A default implementation is available in QueryWriter
 	 * unless a database uses very different SQL this should suffice.
 	 *
 	 * @param string $sql query to scan and adjust
@@ -479,7 +479,7 @@ interface QueryWriter
 	 * If no fetchType can be inferred, this method will return NULL.
 	 *
 	 * @note QueryWriters do not have to implement this method,
-	 * it's optional. A default version is available in AQueryWriter.
+	 * it's optional. A default version is available in QueryWriter.
 	 *
 	 * @param $type     the source type to fetch a target type for
 	 * @param $property the property to fetch the type of

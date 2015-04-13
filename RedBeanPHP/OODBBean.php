@@ -2,11 +2,9 @@
 
 namespace RedBeanPHP;
 
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use RedBeanPHP\BeanHelper as BeanHelper;
-use RedBeanPHP\RedException\Security as Security;
-use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
+use RedBeanPHP\BeanHelperInterface as BeanHelperInterface;
+use RedBeanPHP\RedException\Base as RedException;
 
 /**
  * OODBBean (Object Oriented DataBase Bean).
@@ -82,6 +80,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * @param integer       $mode mode
 	 * @param callable|NULL $func custom handler
 	 *
+	 * @throws \Exception
+	 *
 	 * @return array
 	 */
 	public static function setErrorHandlingFUSE($mode, $func = NULL) {
@@ -156,7 +156,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * rich functionality, otherwise you would have to do everything with R or
 	 * external objects.
 	 *
-	 * @var BeanHelper
+	 * @var BeanHelperInterface
 	 */
 	protected $beanHelper = NULL;
 
@@ -358,11 +358,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * if you build your own bean dispensing mechanism.
 	 *
 	 * @param string             $type       type of the new bean
-	 * @param BeanHelper $beanhelper bean helper to obtain a toolbox and a model
+	 * @param BeanHelperInterface $beanhelper bean helper to obtain a toolbox and a model
 	 *
 	 * @return void
 	 */
-	public function initializeForDispense( $type, BeanHelper $beanhelper )
+	public function initializeForDispense( $type, BeanHelperInterface $beanhelper )
 	{
 		$this->beanHelper         = $beanhelper;
 		$this->__info['type']     = $type;
@@ -380,11 +380,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * nested beans (bean lists: ownBean, sharedBean) without the need to
 	 * rely on static calls to the facade (or make this class dep. on OODB).
 	 *
-	 * @param BeanHelper $helper
+	 * @param BeanHelperInterface $helper
 	 *
 	 * @return void
 	 */
-	public function setBeanHelper( BeanHelper $helper )
+	public function setBeanHelper( BeanHelperInterface $helper )
 	{
 		$this->beanHelper = $helper;
 	}
@@ -796,7 +796,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		}
 
 		if ( !isset( $beautifulColumns[$property] ) ) {
-			$beautifulColumns[$property] = AQueryWriter::camelsSnake( $property );
+			$beautifulColumns[$property] = QueryWriter::camelsSnake( $property );
 		}
 
 		return $beautifulColumns[$property];
@@ -990,7 +990,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * @return void
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	public function __set( $property, $value )
 	{
@@ -1178,6 +1178,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * @param string $method name of the method
 	 * @param array  $args   argument list
 	 *
+	 * @throws \Exception
+	 *
 	 * @return mixed
 	 */
 	public function __call( $method, $args )
@@ -1338,7 +1340,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * For polymorphic bean relations.
 	 * Same as fetchAs but uses a column instead of a direct value.
 	 *
-	 * @param string $column
+	 * @param string $field
 	 *
 	 * @return OODBBean
 	 */
@@ -1355,7 +1357,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Can be used together with with, withCondition, alias and fetchAs.
 	 *
 	 * @param string  $property property
-	 * @param closure $function function
+	 * @param \Closure $function function
+	 * @param number|null $maxDepth
+	 *
+	 * @throws RedException
 	 *
 	 * @return OODBBean
 	 */
@@ -1585,7 +1590,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		if ( is_string( $typeOrBean ) ) {
 
-			$typeOrBean = AQueryWriter::camelsSnake( $typeOrBean );
+			$typeOrBean = QueryWriter::camelsSnake( $typeOrBean );
 
 			$bean = $this->beanHelper->getToolBox()->getRedBean()->dispense( $typeOrBean );
 
@@ -1628,7 +1633,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 */
 	public function via( $via )
 	{
-		$this->via = AQueryWriter::camelsSnake( $via );
+		$this->via = QueryWriter::camelsSnake( $via );
 
 		return $this;
 	}
@@ -1736,6 +1741,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * @param string $list     the list you wish to process
 	 * @param string $property the property to load
 	 * @param string $type     the type of bean residing in this property (optional)
+	 *
+	 * @throws RedException
 	 *
 	 * @return array
 	 */

@@ -4,7 +4,7 @@ namespace RedBeanPHP;
 
 use RedBeanPHP\ToolBox as ToolBox;
 use RedBeanPHP\OODB as OODB;
-use RedBeanPHP\QueryWriter as QueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\TagManager as TagManager;
@@ -12,16 +12,15 @@ use RedBeanPHP\DuplicationManager as DuplicationManager;
 use RedBeanPHP\LabelMaker as LabelMaker;
 use RedBeanPHP\Finder as Finder;
 use RedBeanPHP\RedException\SQL as SQLException;
-use RedBeanPHP\RedException\Security as Security;
-use RedBeanPHP\Logger as Logger;
+use RedBeanPHP\RedException\Base as RedException;
+use RedBeanPHP\LoggerInterface as LoggerInterface;
 use RedBeanPHP\Logger\RDefault as RDefault;
 use RedBeanPHP\Logger\RDefault\Debug as Debug;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\SimpleModel as SimpleModel;
 use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
-use RedBeanPHP\Adapter as Adapter;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
+use RedBeanPHP\QueryWriter\Base as QueryWriter;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 use RedBeanPHP\Driver\RPDO as RPDO;
 
@@ -62,7 +61,7 @@ class Facade
 	private static $redbean;
 
 	/**
-	 * @var QueryWriter
+	 * @var QueryWriterInterface
 	 */
 	private static $writer;
 
@@ -97,7 +96,7 @@ class Facade
 	private static $finder;
 
 	/**
-	 * @var Logger
+	 * @var LoggerInterface
 	 */
 	private static $logger;
 
@@ -130,7 +129,7 @@ class Facade
 	 * Internal Query function, executes the desired query. Used by
 	 * all facade query functions. This keeps things DRY.
 	 *
-	 * @throws SQL
+	 * @throws SQLException
 	 *
 	 * @param string $method   desired query method (i.e. 'cell', 'col', 'exec' etc..)
 	 * @param string $sql      the sql you want to execute
@@ -146,8 +145,8 @@ class Facade
 			} catch ( SQLException $exception ) {
 				if ( self::$writer->sqlStateIn( $exception->getSQLState(),
 					array(
-						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-						QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
+						QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN,
+						QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE )
 					)
 				) {
 					return ( $method === 'getCell' ) ? NULL : array();
@@ -227,7 +226,7 @@ class Facade
 	 */
 	public static function setNarrowFieldMode( $mode )
 	{
-		AQueryWriter::setNarrowFieldMode( $mode );
+		QueryWriter::setNarrowFieldMode( $mode );
 	}
 
 	/**
@@ -256,7 +255,7 @@ class Facade
 	 *
 	 * @param callable $callback Closure (or other callable) with the transaction logic
 	 *
-	 * @throws Security
+	 * @throws mixed
 	 *
 	 * @return mixed
 	 *
@@ -306,6 +305,8 @@ class Facade
 	 * @param string      $user   User for connection
 	 * @param NULL|string $pass   Password for connection
 	 * @param bool        $frozen Whether this database is frozen or not
+	 *
+	 * @throws RedException
 	 *
 	 * @return void
 	 */
@@ -379,7 +380,7 @@ class Facade
 	 * @param boolean $tf
 	 * @param integer $mode (0 = to STDOUT, 1 = to ARRAY)
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 *
 	 * @return Logger\RDefault
 	 */
@@ -443,7 +444,7 @@ class Facade
 	 *
 	 * @return integer|string
 	 *
-	 * @throws Security
+	 * @throws \Exception
 	 */
 	public static function store( $bean )
 	{
@@ -459,7 +460,7 @@ class Facade
 	 * Let's call this chilly mode, it's just like fluid mode except that
 	 * certain types (i.e. tables) aren't touched.
 	 *
-	 * @param boolean|array $trueFalse
+	 * @param boolean|array $tf
 	 */
 	public static function freeze( $tf = TRUE )
 	{
@@ -516,7 +517,7 @@ class Facade
 	 * @param string  $type type of bean you want to load
 	 * @param integer $id   ID of the bean you want to load
 	 *
-	 * @throws SQL
+	 * @throws SQLException
 	 *
 	 * @return OODBBean
 	 */
@@ -550,12 +551,12 @@ class Facade
 	 * the rest of the methods.
 	 *
 	 * @param string|array $typeOrBeanArray   type or bean array to import
-	 * @param integer      $number            number of beans to dispense
+	 * @param integer      $num            number of beans to dispense
 	 * @param boolean	     $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return array|OODBBean
 	 *
-	 * @throws Security
+	 * @throws RedException
 	 */
 	public static function dispense( $typeOrBeanArray, $num = 1, $alwaysReturnArray = FALSE )
 	{
@@ -632,7 +633,7 @@ class Facade
 	}
 
 	/**
-	 * Convience method. Tries to find beans of a certain type,
+	 * Convenience method. Tries to find beans of a certain type,
 	 * if no beans are found, it dispenses a bean of that type.
 	 *
 	 * @param  string $type     type of bean you are looking for
@@ -752,7 +753,7 @@ class Facade
 	 * @see Finder::findMulti()
 	 *
 	 * @param array|string $types      a list of bean types to find
-	 * @param string|array $sqlOrArr   SQL query string or result set array
+	 * @param string|array $sql   SQL query string or result set array
 	 * @param array        $bindings   SQL bindings
 	 * @param array        $remappings An array of remapping arrays containing closures
 	 *
@@ -938,7 +939,7 @@ class Facade
 	 * @param OODBBean $bean  bean to be copied
 	 * @param array    $trail for internal usage, pass array()
 	 * @param boolean  $pid   for internal usage
-	 * @param array	   $white white list filter with bean types to duplicate
+	 * @param array	   $filters white list filter with bean types to duplicate
 	 *
 	 * @return array
 	 */
@@ -968,7 +969,7 @@ class Facade
 	 * This is a simplified version of the deprecated R::dup() function.
 	 *
 	 * @param OODBBean $bean  bean to be copied
-	 * @param array	   $white white list filter with bean types to duplicate
+	 * @param array	   $filters white list filter with bean types to duplicate
 	 *
 	 * @return array
 	 */
@@ -1011,6 +1012,8 @@ class Facade
 	 * DolphinCase for IDs it takes into account the exception concerning IDs.
 	 *
 	 * @param string $caseStyle case style identifier
+	 *
+	 * @throws RedException
 	 *
 	 * @return void
 	 */
@@ -1164,7 +1167,7 @@ class Facade
 	 *
 	 * @return integer
 	 *
-	 * @throws SQL
+	 * @throws SQLException
 	 */
 	public static function count( $type, $addSQL = '', $bindings = array() )
 	{
@@ -1210,7 +1213,7 @@ class Facade
 	}
 
 	/**
-	 * Facade Convience method for adapter transaction system.
+	 * Facade Convenience method for adapter transaction system.
 	 * Begins a transaction.
 	 *
 	 * @return bool
@@ -1225,7 +1228,7 @@ class Facade
 	}
 
 	/**
-	 * Facade Convience method for adapter transaction system.
+	 * Facade Convenience method for adapter transaction system.
 	 * Commits a transaction.
 	 *
 	 * @return bool
@@ -1240,7 +1243,7 @@ class Facade
 	}
 
 	/**
-	 * Facade Convience method for adapter transaction system.
+	 * Facade Convenience method for adapter transaction system.
 	 * Rolls back a transaction.
 	 *
 	 * @return bool
@@ -1389,7 +1392,7 @@ class Facade
 
 	/**
 	 * Generates and returns an ENUM value. This is how RedBeanPHP handles ENUMs.
-	 * Either returns a (newly created) bean respresenting the desired ENUM
+	 * Either returns a (newly created) bean representing the desired ENUM
 	 * value or returns a list of all enums for the type.
 	 *
 	 * To obtain (and add if necessary) an ENUM value:
@@ -1481,11 +1484,11 @@ class Facade
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @param Adapter $adapter
+	 * @param AdaptorInterface $adapter
 	 *
 	 * @return void
 	 */
-	public static function setDatabaseAdapter( Adapter $adapter )
+	public static function setDatabaseAdapter( AdaptorInterface $adapter )
 	{
 		self::$adapter = $adapter;
 	}
@@ -1596,7 +1599,7 @@ class Facade
 	}
 
 	/**
-	 * Facade method for AQueryWriter::renameAssociation()
+	 * Facade method for QueryWriter::renameAssociation()
 	 *
 	 * @param string|array $from
 	 * @param string       $to
@@ -1605,7 +1608,7 @@ class Facade
 	 */
 	public static function renameAssociation( $from, $to = NULL )
 	{
-		AQueryWriter::renameAssociation( $from, $to );
+		QueryWriter::renameAssociation( $from, $to );
 	}
 
 	/**
@@ -1826,7 +1829,7 @@ class Facade
 	 * Returns the current logger instance being used by the
 	 * database object.
 	 *
-	 * @return Logger
+	 * @return LoggerInterface
 	 */
 	public static function getLogger()
 	{
@@ -1863,6 +1866,8 @@ class Facade
 	 *
 	 * R::makeTea();
 	 *
+	 * @throws RedException
+	 *
 	 * @param string   $pluginName name of the method to call the plugin
 	 * @param callable $callable   a PHP callable
 	 */
@@ -1880,6 +1885,8 @@ class Facade
 	 *
 	 * @param string $pluginName name of the plugin
 	 * @param array  $params     list of arguments to pass to plugin method
+	 *
+	 * @throws RedException
 	 *
 	 * @return mixed
 	 */

@@ -1,10 +1,9 @@
 <?php
 
-namespace RedBeanPHP\QueryWriter; 
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
-use RedBeanPHP\QueryWriter as QueryWriter;
+namespace RedBeanPHP\QueryWriter;
+use RedBeanPHP\QueryWriterInterface as QueryWriterInterface;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\Adapter as Adapter; 
+use RedBeanPHP\AdaptorInterface as AdaptorInterface;
 use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
@@ -21,7 +20,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class CUBRID extends AQueryWriter implements QueryWriter
+class CUBRID extends Base implements QueryWriterInterface
 {
 	/**
 	 * Data types
@@ -82,7 +81,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see AQueryWriter::getKeyMapForType
+	 * @see QueryWriter::getKeyMapForType
 	 */
 	protected function getKeyMapForType( $type  )
 	{
@@ -110,9 +109,9 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	/**
 	 * Constructor
 	 *
-	 * @param Adapter $adapter Database Adapter
+	 * @param AdaptorInterface $adapter Database Adapter
 	 */
-	public function __construct( Adapter $adapter )
+	public function __construct( AdaptorInterface $adapter )
 	{
 		$this->typeno_sqltype = array(
 			CUBRID::C_DATATYPE_INTEGER          => ' INTEGER ',
@@ -230,7 +229,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 			return $r;
 		}
 
-		if ( $r >= QueryWriter::C_DATATYPE_RANGE_SPECIAL ) {
+		if ( $r >= QueryWriterInterface::C_DATATYPE_RANGE_SPECIAL ) {
 			return self::C_DATATYPE_SPECIFIED;
 		}
 
@@ -279,9 +278,9 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	public function sqlStateIn( $state, $list )
 	{
 		return ( $state == 'HY000' ) ? ( count( array_diff( array(
-				QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,
-				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-				QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
+				QueryWriterInterface::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,
+				QueryWriterInterface::C_SQLSTATE_NO_SUCH_COLUMN,
+				QueryWriterInterface::C_SQLSTATE_NO_SUCH_TABLE
 			), $list ) ) !== 3 ) : FALSE;
 	}
 
