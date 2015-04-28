@@ -9,7 +9,6 @@ RedBeanPHP is an easy to use ORM tool for PHP.
 * No configuration, just fire and forget
 * No complicated package tools, no autoloaders, just ONE file
 
-
 Quick Example
 -------------
 
