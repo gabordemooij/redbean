@@ -35,10 +35,10 @@ class SQL extends RedException
 	}
 
 	/**
-	 * @todo parse state to verify valid ANSI92!
-	 *       Stores ANSI-92 compliant SQL state.
+	 * Returns the raw SQL STATE, possibly compliant with
+	 * ANSI SQL error codes - but this depends on database driver.
 	 *
-	 * @param string $sqlState code
+	 * @param string $sqlState SQL state error code
 	 *
 	 * @return void
 	 */

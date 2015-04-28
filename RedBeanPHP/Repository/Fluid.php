@@ -307,7 +307,6 @@ class Fluid extends Repository
 				)
 				) {
 					$rows = 0;
-
 				}
 			}
 			if ( empty( $rows ) ) {
