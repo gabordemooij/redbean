@@ -303,9 +303,9 @@ class Facade
 	 *
 	 * @param string      $key    ID for the database
 	 * @param string      $dsn    DSN for the database
-	 * @param string      $user   User for connection
-	 * @param NULL|string $pass   Password for connection
-	 * @param bool        $frozen Whether this database is frozen or not
+	 * @param string      $user   user for connection
+	 * @param NULL|string $pass   password for connection
+	 * @param bool        $frozen whether this database is frozen or not
 	 *
 	 * @return void
 	 */
@@ -376,12 +376,12 @@ class Facade
 	 * R::selectDatabase() this method will throw an exception.
 	 * Returns the attached logger instance.
 	 *
-	 * @param boolean $tf
+	 * @param boolean $tf   debug mode (true or false)
 	 * @param integer $mode (0 = to STDOUT, 1 = to ARRAY)
 	 *
 	 * @throws Security
 	 *
-	 * @return Logger\RDefault
+	 * @return RDefault
 	 */
 	public static function debug( $tf = TRUE, $mode = 0 )
 	{
@@ -403,6 +403,14 @@ class Facade
 
 	/**
 	 * Turns on the fancy debugger.
+	 * In 'fancy' mode the debugger will output queries with bound
+	 * parameters inside the SQL itself. This method has been added to
+	 * offer a convenient way to activate the fancy debugger system
+	 * in one call.
+	 *
+	 * @param boolean $toggle TRUE to activate debugger and select 'fancy' mode
+	 *
+	 * @return void
 	 */
 	public static function fancyDebug( $toggle )
 	{
@@ -1048,8 +1056,8 @@ class Facade
 	 * match.
 	 *
 	 * @param  OODBBean $bean bean to check for tags
-	 * @param  array            $tags list of tags
-	 * @param  boolean          $all  whether they must all match or just some
+	 * @param  array    $tags list of tags
+	 * @param  boolean  $all  whether they must all match or just some
 	 *
 	 * @return boolean
 	 */
@@ -1064,7 +1072,7 @@ class Facade
 	 * the second parameter will no longer be associated with the bean.
 	 *
 	 * @param  OODBBean $bean    tagged bean
-	 * @param  array            $tagList list of tags (names)
+	 * @param  array    $tagList list of tags (names)
 	 *
 	 * @return void
 	 */
@@ -1083,7 +1091,7 @@ class Facade
 	 * You may also pass an array instead of a string.
 	 *
 	 * @param OODBBean $bean    bean
-	 * @param mixed            $tagList tags
+	 * @param mixed    $tagList tags
 	 *
 	 * @return string
 	 */
@@ -1100,7 +1108,7 @@ class Facade
 	 * You may also pass an array instead of a string.
 	 *
 	 * @param OODBBean $bean    bean
-	 * @param array            $tagList list of tags to add to bean
+	 * @param array    $tagList list of tags to add to bean
 	 *
 	 * @return void
 	 */
@@ -1260,7 +1268,7 @@ class Facade
 	 * Note that this method only works in fluid mode because it might be
 	 * quite heavy on production servers!
 	 *
-	 * @param  string $table   name of the table (not type) you want to get columns of
+	 * @param  string $table name of the table (not type) you want to get columns of
 	 *
 	 * @return array
 	 */
@@ -1272,7 +1280,7 @@ class Facade
 	/**
 	 * Generates question mark slots for an array of values.
 	 *
-	 * @param array  $array    array to generate question mark slots for
+	 * @param array  $array array to generate question mark slots for
 	 *
 	 * @return string
 	 */
