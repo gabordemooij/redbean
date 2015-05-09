@@ -68,10 +68,10 @@ class AssociationManager extends Observable
 	 * Returns the many-to-many related rows of table $type for bean $bean using additional SQL in $sql and
 	 * $bindings bindings. If $getLinks is TRUE, link rows are returned instead.
 	 *
-	 * @param OODBBean $bean     reference bean
-	 * @param string           $type     target type
-	 * @param string           $sql      additional SQL snippet
-	 * @param array            $bindings bindings
+	 * @param OODBBean $bean     reference bean instance
+	 * @param string   $type     target bean type
+	 * @param string   $sql      additional SQL snippet
+	 * @param array    $bindings bindings for query
 	 *
 	 * @return array
 	 *
@@ -339,25 +339,17 @@ class AssociationManager extends Observable
 	public function related( $bean, $type, $sql = '', $bindings = array() )
 	{
 		$sql   = $this->writer->glueSQLCondition( $sql );
-
 		$rows  = $this->relatedRows( $bean, $type, $sql, $bindings );
-
 		$links = array();
+
 		foreach ( $rows as $key => $row ) {
-			if ( !isset( $links[$row['id']] ) ) {
-				$links[$row['id']] = array();
-			}
-
+			if ( !isset( $links[$row['id']] ) ) $links[$row['id']] = array();
 			$links[$row['id']][] = $row['linked_by'];
-
 			unset( $rows[$key]['linked_by'] );
 		}
 
 		$beans = $this->oodb->convertToBeans( $type, $rows );
-
-		foreach ( $beans as $bean ) {
-			$bean->setMeta( 'sys.belongs-to', $links[$bean->id] );
-		}
+		foreach ( $beans as $bean ) $bean->setMeta( 'sys.belongs-to', $links[$bean->id] );
 
 		return $beans;
 	}
