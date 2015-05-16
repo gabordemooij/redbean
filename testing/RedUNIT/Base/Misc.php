@@ -28,6 +28,37 @@ use RedBeanPHP\Driver\RPDO as RPDO;
  */
 class Misc extends Base
 {
+	/**
+	 * Test whether we can set the 'auto clear'
+	 * option in OODB.
+	 *
+	 * @return void
+	 */
+	public function testAutoClearHistory()
+	{
+		testpack( 'Auto clear history' );
+		$book = R::dispense( 'book' );
+		$book->pages = 100;
+		$book->title = 'book';
+		R::store( $book );
+		$book = R::findOne( 'book' );
+		asrt( $book->hasChanged( 'title' ), FALSE );
+		$book->title = 'yes';
+		R::store( $book );
+		asrt( $book->hasChanged( 'title' ), TRUE );
+		OODB::autoClearHistoryAfterStore( TRUE );
+		$book = R::findOne( 'book' );
+		asrt( $book->hasChanged( 'title' ), FALSE );
+		$book->title = 'yes2';
+		R::store( $book );
+		asrt( $book->hasChanged( 'title' ), FALSE );
+		OODB::autoClearHistoryAfterStore( FALSE );
+		$book = R::findOne( 'book' );
+		asrt( $book->hasChanged( 'title' ), FALSE );
+		$book->title = 'yes';
+		R::store( $book );
+		asrt( $book->hasChanged( 'title' ), TRUE );
+	}
 
 	/**
 	* Tests the R::inspect() method on the Facade.
