@@ -9,6 +9,22 @@ RedBeanPHP is an easy to use ORM tool for PHP.
 * No configuration, just fire and forget
 * No complicated package tools, no autoloaders, just ONE file
 
+Installation via Composer
+-------------------------
+
+Just open your composer.json file and add the package name ```(e.g. "gabordemooij/redbean": "dev-master")``` in your require list.
+
+```json
+{
+    "require": {
+        "gabordemooij/redbean": "dev-master"
+    }
+}
+```
+
+If you not using composer then [try it.](http://redbeanphp.com/install)
+
+
 Quick Example
 -------------
 
