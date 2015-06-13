@@ -712,7 +712,7 @@ abstract class AQueryWriter
 	 */
 	public function glueLimitOne( $sql = '')
 	{
-		return ( strpos( $sql, 'LIMIT' ) === FALSE ) ? ( $sql . ' LIMIT 1 ' ) : $sql;
+		return ( strpos( strtoupper( $sql ), 'LIMIT' ) === FALSE ) ? ( $sql . ' LIMIT 1 ' ) : $sql;
 	}
 
 	/**
