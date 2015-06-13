@@ -184,7 +184,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	{
 		$table      = $this->esc( $table, TRUE );
 
-		$columnsRaw = $this->adapter->get( "SELECT column_name, data_type FROM information_schema.columns WHERE table_name='$table'" );
+		$columnsRaw = $this->adapter->get( "SELECT column_name, data_type FROM information_schema.columns WHERE table_name='$table' AND table_schema = ANY( current_schemas( FALSE ) )" );
 
 		$columns = array();
 		foreach ( $columnsRaw as $r ) {
