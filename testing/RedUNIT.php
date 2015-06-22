@@ -20,6 +20,11 @@ use RedBeanPHP\Facade as R;
 abstract class RedUNIT
 {
 	/**
+	 * @var integer
+	 */
+	protected $round;
+	
+	/**
 	 * @var string
 	 */
 	protected $currentlyActiveDriverID = 'unknown';
@@ -85,5 +90,35 @@ abstract class RedUNIT
 	public function setCurrentDriver( $driver )
 	{
 		$this->currentlyActiveDriverID = $driver;
+	}
+	
+	/**
+	 * Sets the round number.
+	 * 
+	 * @param integer $roundNumber round
+	 */
+	public function setRound( $roundNumber )
+	{
+		$this->round = (int) $roundNumber;
+	}
+	
+	/**
+	 * Returns the current round number
+	 * 
+	 * @return integer
+	 */
+	public function getRound()
+	{
+		return $this->round;
+	}
+	
+	/**
+	 * Returns TRUE if the current round is the first round.
+	 * 
+	 * @return boolean
+	 */
+	public function isFirstRound()
+	{
+		return ( $this->round === 0 );
 	}
 }

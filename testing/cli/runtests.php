@@ -230,6 +230,9 @@ foreach ( $packList as $testPack ) {
 	$drivers       = $test->getTargetDrivers();
 
 	maintestpack( str_replace( '_', ' ', get_class( $test ) ) );
+	
+	$round = 0;
+	$test->setRound( $round );
 
 	if ( $drivers && is_array( $drivers ) ) {
 		foreach ( $drivers as $driver ) {
@@ -261,6 +264,7 @@ foreach ( $packList as $testPack ) {
 			}
 
 			echo PHP_EOL;
+			$test->setRound( ++$round );
 
 		}
 	} else {
