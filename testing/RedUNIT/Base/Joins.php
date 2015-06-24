@@ -6,7 +6,6 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\OODBBean as OODBBean;
 
-
 /**
  * Joins
  *
@@ -106,10 +105,10 @@ class Joins extends Base
 
 	/**
 	 * Helper for the next test.
-	 * 
+	 *
 	 * @param array  $books      the books we are going to check
 	 * @param string $numberList the numbers that are expected
-	 * 
+	 *
 	 * @return void
 	 */
 	private function checkBookNumbers( $books, $numberList )
@@ -190,7 +189,7 @@ class Joins extends Base
 		$books = $author->with(' ORDER BY @joined.category.title DESC, @joined.info.title ASC' )->ownBookList;
 		$this->checkBookNumbers( $books, '3,2,0,1' );
 		$books = $author->with(' ORDER BY @joined.category.title DESC, @joined.info.title ASC LIMIT 2' )->ownBookList;
-		$this->checkBookNumbers( $books, '3,2' );		
+		$this->checkBookNumbers( $books, '3,2' );
 	}
 
 	/**

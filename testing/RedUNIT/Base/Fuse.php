@@ -158,7 +158,7 @@ class Fuse extends Base
 		asrt( $probe->getLogActionCount( 'after_delete' ), 0 );
 		asrt( ( $probe->getDataFromLog( 2, 'bean' ) === $probe ), TRUE );
 	}
-	
+
 	/**
 	 * Tests the SimpleFacadeBeanHelper factory setter.
 	 *
@@ -336,7 +336,7 @@ class Fuse extends Base
 		asrt( $old[1], NULL);
 		$test->nonExistantMethod(); //we cant really test this... :(
 		pass();
-				
+
 		$old = R::setErrorHandlingFUSE( OODBBean::C_ERR_NOTICE );
 		asrt( is_array( $old ), TRUE );
 		asrt( count( $old ), 2 );
@@ -347,7 +347,7 @@ class Fuse extends Base
 		}, E_USER_NOTICE);
 		$test->nonExistantMethod();
 		restore_error_handler();
-		
+
 		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_WARN );
 		asrt( is_array( $old ), TRUE );
 		asrt( count( $old ), 2 );
@@ -358,7 +358,7 @@ class Fuse extends Base
 		}, E_USER_WARNING);
 		$test->nonExistantMethod();
 		restore_error_handler();
-		
+
 		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_FATAL );
 		asrt( is_array( $old ), TRUE );
 		asrt( count( $old ), 2 );

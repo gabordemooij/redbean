@@ -157,7 +157,7 @@ class Writer extends \RedUNIT\Mysql
 		asrt( $writer->scanType( FALSE ), MySQL::C_DATATYPE_BOOL );
 		asrt( $writer->scanType( TRUE ), MySQL::C_DATATYPE_BOOL );
 		asrt( $writer->scanType( INF ), MySQL::C_DATATYPE_TEXT7 );
-		
+
 		asrt( $writer->scanType( NULL ), MySQL::C_DATATYPE_BOOL );
 
 		asrt( $writer->scanType( 2 ), MySQL::C_DATATYPE_UINT32 );

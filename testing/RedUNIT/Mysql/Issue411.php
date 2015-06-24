@@ -55,6 +55,3 @@ class Issue411 extends Mysql
 	}
 }
 
-
-
-

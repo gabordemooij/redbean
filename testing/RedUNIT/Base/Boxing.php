@@ -72,4 +72,3 @@ class Boxing extends Base
 	}
 }
 
-

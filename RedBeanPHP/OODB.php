@@ -19,7 +19,7 @@ use RedBeanPHP\Repository\Frozen as FrozenRepo;
 
 /**
  * RedBean Object Oriented DataBase.
- * 
+ *
  * The RedBean OODB Class is the main class of RedBeanPHP.
  * It takes OODBBean objects and stores them to and loads them from the
  * database as well as providing other CRUD functions. This class acts as a
@@ -45,7 +45,6 @@ class OODB extends Observable
 	 * @var array
 	 */
 	protected $chillList = array();
-
 
 	/**
 	 * @var array

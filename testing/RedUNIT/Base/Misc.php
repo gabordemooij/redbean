@@ -615,7 +615,6 @@ class Misc extends Base
 		asrt( R::count( 'flavour' ), 4 );
 	}
 
-
 	/**
 	 * Test trashAll().
 	 */

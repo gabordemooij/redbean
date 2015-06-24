@@ -1,7 +1,7 @@
-<?php 
+<?php
 namespace RedUNIT\CUBRID;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\RedException as RedException; 
+use \RedBeanPHP\RedException as RedException;
 /**
  * RedUNIT_CUBRID_Setget
  *
@@ -18,7 +18,7 @@ class Setget extends \RedUNIT\CUBRID
 {
 	/**
 	 * Test numbers.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNumbers()
@@ -43,7 +43,7 @@ class Setget extends \RedUNIT\CUBRID
 
 		asrt( setget( -2147483647 ), "-2147483647" );
 		asrt( setget( "-2147483647" ), "-2147483647" );
-		
+
 		asrt( setget( "2147483648" ), "2147483648.0000000000000000" );
 		asrt( setget( "-2147483648" ), "-2147483648.0000000000000000" );
 
@@ -53,7 +53,7 @@ class Setget extends \RedUNIT\CUBRID
 
 	/**
 	 * Test dates.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testDates()
@@ -69,7 +69,7 @@ class Setget extends \RedUNIT\CUBRID
 
 	/**
 	 * Test strings.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testStrings()
@@ -85,7 +85,7 @@ class Setget extends \RedUNIT\CUBRID
 
 	/**
 	 * Test booleans.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testBool()
@@ -99,7 +99,7 @@ class Setget extends \RedUNIT\CUBRID
 
 	/**
 	 * Test NULL.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testNull()

@@ -69,4 +69,3 @@ class Fusebox extends Blackhole
 	}
 }
 
-

@@ -94,7 +94,7 @@ class LabelMaker
 
 		return $labels;
 	}
-	
+
 	/**
 	 * Fetches an ENUM from the database and creates it if necessary.
 	 * An ENUM has the following format:
@@ -120,13 +120,13 @@ class LabelMaker
 	 * In the database, flavour_id will point to the flavour record with name 'banana'.
 	 *
 	 * @param string $enum ENUM specification for label
-	 * 
+	 *
 	 * @return array|OODBBean
 	 */
 	public function enum( $enum )
 	{
 		$oodb = $this->toolbox->getRedBean();
-		
+
 		if ( strpos( $enum, ':' ) === FALSE ) {
 			$type  = $enum;
 			$value = FALSE;
@@ -134,22 +134,22 @@ class LabelMaker
 			list( $type, $value ) = explode( ':', $enum );
 			$value                = preg_replace( '/\W+/', '_', strtoupper( trim( $value ) ) );
 		}
-		
+
 		$values = $oodb->find( $type );
-		
+
 		if ( $value === FALSE ) {
 			return $values;
 		}
-		
+
 		foreach( $values as $enumItem ) {
-				if ( $enumItem->name === $value ) return $enumItem;	
+				if ( $enumItem->name === $value ) return $enumItem;
 		}
-		
+
 		$newEnumItems = $this->dispenseLabels( $type, array( $value ) );
 		$newEnumItem  = reset( $newEnumItems );
-		
+
 		$oodb->store( $newEnumItem );
-		
+
 		return $newEnumItem;
 	}
 }

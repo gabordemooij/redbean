@@ -30,7 +30,7 @@ use RedBeanPHP\Driver\RPDO as RPDO;
  *
  * Version Information
  * RedBean Version @version 4.2
- * 
+ *
  * This class hides the object landscape of
  * RedBeanPHP behind a single letter class providing
  * almost all functionality with simple static calls.
@@ -110,7 +110,7 @@ class Facade
 	 * @var string
 	 */
 	private static $exportCaseStyle = 'default';
-	
+
 	/**
 	 * Not in use (backward compatibility SQLHelper)
 	 */
@@ -1378,7 +1378,6 @@ class Facade
 		self::getWriter()->setUseCache( $yesNo );
 	}
 
-
 	/**
 	 * A label is a bean with only an id, type and name property.
 	 * This function will dispense beans for all entries in the array. The
@@ -1635,7 +1634,7 @@ class Facade
 		}
 		return $list;
 	}
-	
+
 	/**
 	 * Sets the error mode for FUSE.
 	 * What to do if a FUSE model method does not exist?
@@ -1648,7 +1647,7 @@ class Facade
 	 * OODBBean::C_ERR_EXCEPTION, throws an exception
 	 * OODBBean::C_ERR_FUNC, allows you to specify a custom handler (function)
 	 * OODBBean::C_ERR_FATAL, triggers a E_USER_ERROR
-	 * 
+	 *
 	 * Custom handler method signature: handler( array (
 	 * 	'message' => string
 	 * 	'bean' => OODBBean
@@ -1659,7 +1658,7 @@ class Facade
 	 *
 	 * @param integer       $mode mode
 	 * @param callable|NULL $func custom handler
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function setErrorHandlingFUSE( $mode, $func = NULL )

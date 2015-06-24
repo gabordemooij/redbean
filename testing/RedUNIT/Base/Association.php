@@ -310,7 +310,6 @@ class Association extends Base
 		asrt( count( $wines[2]->sharedOlive ), 0 );
 	}
 
-
 	public function testErrorHandling()
 	{
 		R::nuke();
@@ -344,7 +343,6 @@ class Association extends Base
 		} catch ( SQL $e ) {
 			fail();
 		}
-
 
 	}
 

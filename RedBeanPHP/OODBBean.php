@@ -10,7 +10,7 @@ use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * OODBBean (Object Oriented DataBase Bean).
- * 
+ *
  * to exchange information with the database. A bean represents
  * a single table row and offers generic services for interaction
  * with databases systems as well as some meta-data.
@@ -19,7 +19,7 @@ use RedBeanPHP\OODBBean as OODBBean;
  * @author  Gabor de Mooij and the RedBeanPHP community
  * @license BSD/GPLv2
  * @desc    OODBBean represents a bean. RedBeanPHP uses beans
- * 
+ *
  * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
@@ -600,7 +600,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Unsets a property of a bean.
 	 * Magic method, gets called implicitly when performing the unset() operation
 	 * on a bean property.
-	 * 
+	 *
 	 * @param  string $property property to unset
 	 *
 	 * @return void
@@ -910,7 +910,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			$this->via        = NULL;
 			return $this->properties[$property];
 		}
-
 
 		list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 

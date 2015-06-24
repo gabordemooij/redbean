@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP;
 
@@ -25,7 +25,7 @@ interface Observer
 	 * notifications. Therefore the observer needs to implement the
 	 * onEvent method with two parameters: the event identifier specifying the
 	 * current event and a message object (in RedBeanPHP this can also be a bean).
-	 * 
+	 *
 	 * @param string $eventname event identifier
 	 * @param mixed  $bean      a message sent along with the notification
 	 *

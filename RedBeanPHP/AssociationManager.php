@@ -174,7 +174,7 @@ class AssociationManager extends Observable
 	 * This method will associate two beans and store the connection between the
 	 * two in a link table. Instead of two single beans this method also accepts
 	 * two sets of beans. Returns the ID or the IDs of the linking beans.
-	 * 
+	 *
 	 * @param OODBBean|array $beans1 one or more beans to form the association
 	 * @param OODBBean|array $beans2 one or more beans to form the association
 	 *

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP\Logger;
 
@@ -69,22 +69,22 @@ class RDefault implements Logger
 			if ( $this->mode === self::C_LOGGER_ECHO ) echo "<br>\n";
 		}
 	}
-	
+
 	/**
 	 * Returns the internal log array.
 	 * The internal log array is where all log messages are stored.
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getLogs()
 	{
 		return $this->logs;
 	}
-	
+
 	/**
 	 * Clears the internal log array, removing all
 	 * previously stored entries.
-	 * 
+	 *
 	 * @return self
 	 */
 	public function clear()
@@ -92,16 +92,16 @@ class RDefault implements Logger
 		$this->logs = array();
 		return $this;
 	}
-	
+
 	/**
 	 * Selects a logging mode.
 	 * There are several options available.
-	 * 
+	 *
 	 * C_LOGGER_ARRAY - log silently, stores entries in internal log array only
 	 * C_LOGGER_ECHO  - also forward log messages directly to STDOUT
-	 *  
+	 *
 	 * @param integer $mode mode of operation for logging object
-	 * 
+	 *
 	 * @return self
 	 */
 	public function setMode( $mode )
@@ -112,7 +112,7 @@ class RDefault implements Logger
 		$this->mode = $mode;
 		return $this;
 	}
-	
+
 	/**
 	 * Searches for all log entries in internal log array
 	 * for $needle and returns those entries.

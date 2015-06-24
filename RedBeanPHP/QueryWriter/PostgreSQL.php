@@ -236,7 +236,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 		if ( is_float( $value ) ) return self::C_DATATYPE_DOUBLE;
 
 		if ( $this->startsWithZeros( $value ) ) return self::C_DATATYPE_TEXT;
-		
+
 		if ( $value === FALSE || $value === TRUE || $value === NULL || ( is_numeric( $value )
 				&& AQueryWriter::canBeTreatedAsInt( $value )
 				&& $value < 2147483648

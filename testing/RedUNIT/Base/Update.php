@@ -176,7 +176,6 @@ class Update extends Base
 		$account = R::load( 'user', $id );
 		asrt( count( $account->alias( 'seller' )->ownTransaction ), 10 );
 
-
 		$account->alias( 'seller' )->ownTransaction = array();
 
 		$id = R::store( $account );
@@ -507,7 +506,7 @@ class Update extends Base
 
 		asrt( (int) $pdo->GetCell( "SELECT count(*) FROM page" ), 0 );
 	}
-	
+
 	public function testEmptyStringShouldNotBeStoredAsInteger()
 	{
 		R::nuke();

@@ -50,7 +50,6 @@ class Count extends Base
 		}
 	}
 
-
 	/**
 	 * Test count and wipe.
 	 *

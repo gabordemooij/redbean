@@ -9,7 +9,6 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Adapter as Adapter;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
-
 /**
  * Foreignkeys
  *
@@ -229,7 +228,7 @@ class Foreignkeys extends Base implements Observer
 	 * @return void
 	 */
 	public function testDependency2()
-	{ 
+	{
 		$can = $this->createBeanInCan( TRUE );
 
 		asrt( R::count( 'bean' ), 1 );

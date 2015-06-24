@@ -149,7 +149,6 @@ class Traverse extends Base
 
 		asrt( implode( ',', $path ), 'e,f,h' );
 
-
 		$path = array();
 		$pageA->traverse( 'ownPageList', function( $page ) use ( &$path ) {
 			$path[] = $page->title;
@@ -225,7 +224,6 @@ class Traverse extends Base
 			$cats[] = $cat->gname;
 		} );
 		asrt( implode( ',', $cats ), 'SF,Fantasy' );
-
 
 		$catList = array();
 		$fantasy->alias( 'genre' )

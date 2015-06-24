@@ -54,7 +54,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 *
 	 * @return void
 	 */
-	public static function setFactoryFunction( $factory ) 
+	public static function setFactoryFunction( $factory )
 	{
 		self::$factory = $factory;
 	}
@@ -86,7 +86,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 			if ( !class_exists( $modelName ) ) {
 				//second try
 				$modelName = $prefix . ucfirst( $model );
-				
+
 				if ( !class_exists( $modelName ) ) {
 					return NULL;
 				}

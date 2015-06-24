@@ -22,7 +22,7 @@ class Largenum extends Base
 	/**
 	 * Test for issue #386.
 	 * Can we use large numbers in LIMIT ?
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testLargeNum()

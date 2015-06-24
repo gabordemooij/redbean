@@ -832,7 +832,6 @@ abstract class AQueryWriter
 
 		$rows  = $this->adapter->get( $sql, $bindings );
 
-
 		if ( $this->flagUseCache && $key ) {
 			$this->putResultInCache( $type, $key, $rows );
 		}

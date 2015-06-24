@@ -1,16 +1,16 @@
-<?php 
+<?php
 
 namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
-use RedBeanPHP\RedException as RedException; 
+use RedBeanPHP\RedException as RedException;
 
 /**
  * Performance
  *
  * This performance test is used with runperf and xdebug profiler.
- * 
+ *
  * @file    RedUNIT/Base/Performance.php
  * @desc    Performance testing.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -24,13 +24,13 @@ class Performance extends Base
 {
 	/**
 	 * Setup
-	 * 
+	 *
 	 * @return void
 	 */
 	public function setup()
 	{
 		R::nuke();
-		
+
 		//Prepare structure
 		$book = R::dispense( 'book' );
 		$book->title = 'book';
@@ -55,16 +55,16 @@ class Performance extends Base
 		$book->sharedTagList = $tags;
 		R::store( $book );
 	}
-	
+
 	/**
 	 * CRUD performance.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function crud()
 	{
 		R::freeze( TRUE );
-		
+
 		$book = R::dispense( 'book' );
 		$book->title = 'Book';
 		$page = R::dispense('page');
@@ -87,18 +87,18 @@ class Performance extends Base
 		$book->ownPage;
 		$book->sharedTag;
 		R::trash( $book );
-		
+
 	}
-	
+
 	/**
 	 * CRUD performance Array Access.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function crudaa()
 	{
 		R::freeze( TRUE );
-		
+
 		$book = R::dispense( 'book' );
 		$book['title'] = 'Book';
 		$page = R::dispense('page');
@@ -121,6 +121,6 @@ class Performance extends Base
 		$book->ownPage;
 		$book->sharedTag;
 		R::trash( $book );
-		
+
 	}
 }

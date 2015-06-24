@@ -29,7 +29,7 @@ use RedBeanPHP\Cursor\NullCursor as NullCursor;
  * @file    RedBeanPHP/Repository.php
  * @author  Gabor de Mooij and the RedBeanPHP community
  * @license BSD/GPLv2
- * 
+ *
  * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community
  * This source file is subject to the BSD/GPLv2 License that is bundled
@@ -259,7 +259,6 @@ abstract class Repository
 		return $processLists;
 	}
 
-
 	/**
 	 * Converts an embedded bean to an ID, removed the bean property and
 	 * stores the bean in the embedded beans array.
@@ -278,7 +277,6 @@ abstract class Repository
 		$embeddedBeans[$linkField] = $value;
 		unset( $bean->$property );
 	}
-
 
 	/**
 	 * Constructor, requires a query writer.

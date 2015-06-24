@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP;
 
@@ -105,7 +105,7 @@ class TagManager
 	 * If the third parameter is FALSE this
 	 * method will return TRUE if one of the tags matches, FALSE if none
 	 * match.
-	 * 
+	 *
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
@@ -132,7 +132,7 @@ class TagManager
 	/**
 	 * Removes all sepcified tags from the bean. The tags specified in
 	 * the second parameter will no longer be associated with the bean.
-	 * 
+	 *
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
@@ -159,7 +159,7 @@ class TagManager
 	 * If $tagList is a comma separated list (string) of tags all tags will
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
-	 * 
+	 *
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
@@ -171,7 +171,7 @@ class TagManager
 	public function tag( OODBBean $bean, $tagList = NULL )
 	{
 		if ( is_null( $tagList ) ) {
-			
+
 			$tags = $bean->sharedTag;
 			$foundTags = array();
 
@@ -193,7 +193,7 @@ class TagManager
 	 * If $tagList is a comma separated list of tags all tags will
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
-	 * 
+	 *
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *

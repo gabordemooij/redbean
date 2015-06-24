@@ -9,7 +9,6 @@ require 'RedUNIT.php';
 require 'RedUNIT/Base.php';
 require 'RedUNIT/Base/Performance.php';
 
-
 error_reporting( E_ALL );
 
 //Load configuration file
@@ -18,7 +17,6 @@ if ( file_exists( 'config/test.ini' ) ) {
 } else {
 	die( 'Cant find configuration file.' );
 }
-
 
 //Configure the databases
 if ( isset( $ini['mysql'] ) ) {
@@ -52,34 +50,32 @@ $test = new \RedUNIT\Base\Performance();
 
 $drivers       = $test->getTargetDrivers();
 
-
-
 foreach ( $drivers as $driver ) {
-			
+
 			if ( !isset( $ini[$driver] ) ) continue;
 			if ( !isset( $_SERVER['argv'][1])) die('Missing parameter. Usage: php runperf.php <testname> <TIMES> ');
-			
+
 			$method = $_SERVER['argv'][1];
-			
+
 			if ($method === 'setup') {
-				
+
 				echo 'Setup...'.PHP_EOL;
-				
+
 				$test->$method();
 
 				echo 'READY'.PHP_EOL;
-				
+
 			} else {
-				
+
 				$times = 100;
 				if (isset($_SERVER['argv'][2])) {
 					$times = (int) $_SERVER['argv'][2];
 				}
-						
+
 				echo "Performing test: $method with driver $driver ".PHP_EOL;
 
 				for ($j=0; $j<$times; $j++) {
-					
+
 					$t1 = microtime( TRUE );
 
 					$test->$method();
@@ -87,14 +83,14 @@ foreach ( $drivers as $driver ) {
 					$t2 = microtime( TRUE );
 
 					$d[] = ($t2 - $t1);
-					
+
 				}
-				
+
 				$s = array_sum($d);
 				$a = ($s / $times);
 				$mx = max($d);
 				$mn = min($d);
-				
+
 				echo PHP_EOL."AVG: $a, MAX: $mx, MIN: $mn, TOTAL: $s, TIMES: $times ".PHP_EOL;
 			}
 }

@@ -38,4 +38,3 @@ class Close extends Base
 	}
 }
 
-

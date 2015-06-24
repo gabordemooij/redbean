@@ -7,7 +7,7 @@ use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * Bean Helper Interface.
- * 
+ *
  * Interface for Bean Helper.
  * A little bolt that glues the whole machinery together.
  *

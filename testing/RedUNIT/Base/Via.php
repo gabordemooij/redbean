@@ -91,7 +91,6 @@ class Via extends Base
 		$book->via('garbage')->item = 'test';
 		asrt( count( $book->sharedPageList ), 1 );
 
-
 		//yet another
 		$book = R::dispense('leaflet');
 		$book->title = 'leaflet';
@@ -189,7 +188,6 @@ class Via extends Base
 
 		R::storeAll(array( $p1, $p2 ));
 
-
 		$project = R::load('project', $x1->id);
 
 		$designers = $project
@@ -200,7 +198,6 @@ class Via extends Base
 		$anna = reset( $designers );
 		asrt(count($designers), 1);
 		asrt($anna->name, 'Anna');
-
 
 		$coders = $project
 				->withCondition(' participant.arole = ? ', array( 'coder' ) )

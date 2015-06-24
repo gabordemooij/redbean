@@ -107,7 +107,6 @@ class With extends Base
 
 	}
 
-
 	/**
 	 * Test all().
 	 *
@@ -466,7 +465,6 @@ class With extends Base
 		$book->ownPage[] = R::dispense( 'page' );
 		asrt( count( $book->ownPageList ), 4 );
 
-
 		//Do not reload an own list if told to not reload using noLoad()
 		$book->noLoad()->with(' LIMIT 1 ')->ownPage; //dont reload!
 		asrt( count( $book->xownPage ), 0); //dont reload!
@@ -528,7 +526,6 @@ class With extends Base
 		asrt( count( $book->sharedTag ), 0 );
 		$book->sharedTag = R::dispense( 'tag', 16 );
 		asrt( count( $book->sharedTag ), 16 );
-
 
 		//Do not reload a sharedTag list if told to not reload using noLoad()
 		$book->noLoad()->with(' LIMIT 1 ')->sharedTag; //dont reload!

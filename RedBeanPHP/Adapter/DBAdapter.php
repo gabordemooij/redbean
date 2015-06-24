@@ -140,7 +140,7 @@ class DBAdapter extends Observable implements Adapter
 
 		return $assoc;
 	}
-	
+
 	/**
 	 * @see Adapter::getAssocRow
 	 */

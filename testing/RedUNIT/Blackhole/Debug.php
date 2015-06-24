@@ -118,7 +118,6 @@ class Debug extends Blackhole
 		$this->testDebug(':a,?', array(':a'=>20, 30), '20,30');
 		$this->testDebug(':a,?', array(30, ':a'=>20), '20,30');
 
-
 		$this->testDebug('?,?', array('test',20), '\'test\',20');
 		$this->testDebug('?', array( NULL ), 'NULL');
 		$this->testDebug('title = ?', array( NULL ), 'title = NULL');
@@ -129,7 +128,7 @@ class Debug extends Blackhole
 		$this->testDebug('?,?', array('hello'), '\'hello\',:slot1');
 
 		$this->testDebug('hello ?', 'world', 'hello ?');
-		
+
 		$this->testDebug(':slot0 :slot1 :slot2 :slot3 :slot4 :slot5 :slot6 :slot7 :slot8 :slot9 :slot10', array(
 		'a','b','c','d','e','f','g','h','i','j','k'
 		),"'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k'");

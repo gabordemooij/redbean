@@ -2,7 +2,6 @@
 
 chdir( '..' );
 
-
 $xdebugSupported = (function_exists('xdebug_start_code_coverage'));
 
 if ($xdebugSupported) xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
@@ -26,7 +25,6 @@ echo '*** RedUNIT ***'.PHP_EOL;
 echo 'Welcome to RedUNIT Unit testing framework for RedBeanPHP.'.PHP_EOL;
 echo PHP_EOL;
 
-
 /**
  * Define some globals.
  */
@@ -43,7 +41,6 @@ require_once( 'RedUNIT/Blackhole.php' );
 require_once( 'RedUNIT/Mysql.php' );
 require_once( 'RedUNIT/Postgres.php' );
 require_once( 'RedUNIT/Sqlite.php' );
-
 
 require_once( 'RedUNIT/Pretest.php' );
 
@@ -90,7 +87,6 @@ function activate_driver( $d )
 {
 	R::selectDatabase( $d );
 }
-
 
 $arguments = $_SERVER['argc'];
 
@@ -198,8 +194,6 @@ $suffix = array(
 	'Base/Close'
 );
 
-
-
 // Default (mode == all)
 if ( $mode == 'all' ) {
 	$packList = $allPacks;
@@ -275,7 +269,6 @@ foreach ( $packList as $testPack ) {
 		$test->cleanUp();
 	}
 }
-
 
 if (!$xdebugSupported) {
 	echo 'Done. No report - XDEBUG not installed.';

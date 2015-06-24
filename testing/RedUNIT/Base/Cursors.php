@@ -61,7 +61,7 @@ class Cursors extends Base
 			if ( $i > 5 ) break;
 		}
 		$key = array_rand( $list );
-		$content = $list[ $key ];		
+		$content = $list[ $key ];
 		$collection = R::findCollection( 'page', ' content = ? ', array( $content ) );
 		$bean = $collection->next();
 		asrt( $bean->content, $content );

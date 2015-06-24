@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP;
 
@@ -6,7 +6,7 @@ namespace RedBeanPHP;
  * Adapter Interface.
  * Describes the API for a RedBeanPHP Database Adapter.
  * This interface defines the API contract for
- * a RedBeanPHP Database Adapter.  
+ * a RedBeanPHP Database Adapter.
  *
  * @file    RedBeanPHP/Adapter.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -104,11 +104,11 @@ interface Adapter
 	 * @return array
 	 */
 	public function getAssoc( $sql, $bindings = array() );
-	
+
 	/**
 	 * Executes the SQL query specified in $sql and indexes
 	 * the row by the first column.
-	 * 
+	 *
 	 * @param string $sql      SQL
 	 * @param array  $bindings values to bind
 	 *

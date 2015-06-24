@@ -70,7 +70,6 @@ class Dispense extends Base
 		asrt( isset( $bean["abc"] ), TRUE );
 	}
 
-
 	/**
 	 * Tests the facade-only dispenseAll method.
 	 *

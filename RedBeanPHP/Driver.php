@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP;
 
@@ -47,7 +47,7 @@ interface Driver
 	 * @return mixed
 	 */
 	public function GetOne( $sql, $bindings = array() );
-	
+
 	/**
 	 * Runs a query and returns results as an associative array
 	 * indexed by the first column.
@@ -58,14 +58,14 @@ interface Driver
 	 * @return mixed
 	 */
 	public function GetAssocRow( $sql, $bindings = array() );
-	
+
 	/**
 	 * Runs a query and returns a flat array containing the values of
 	 * one row.
 	 *
 	 * @param string $sql      SQL to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
-	 * 
+	 *
 	 * @return array
 	 */
 	public function GetRow( $sql, $bindings = array() );

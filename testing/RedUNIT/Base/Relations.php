@@ -981,11 +981,9 @@ class Relations extends Base
 		// Get books for topic
 		asrt( $topic3->countShared('book'), 2 );
 
-
 		$t3 = R::load( 'topic', $topic3->id );
 
 		asrt( count( $t3->sharedBook ), 2 );
-
 
 		// Nuke an own-array, replace entire array at once without getting first
 		$page2->id    = 0;
@@ -1419,7 +1417,6 @@ class Relations extends Base
 		$v1->name = 'Ville 1';
 		$v2->name = 'Ville 2';
 		$v3->name = 'Ville 3';
-
 
 		$v1->link( 'armyVillage' )->army    = $a3;
 		$v2->link( 'army_village' )->army    = $a2;

@@ -161,7 +161,7 @@ class Database extends Base
 
 		$expect = '{"1":"a","2":"c"}';
 		asrt( json_encode( R::getAssoc( 'SELECT id, a FROM page' ) ), $expect );
-		
+
 		$expect = '{"1":{"a":"a","b":"b"},"2":{"a":"c","b":"d"}}';
 		asrt( json_encode( R::getAssoc( 'SELECT id, a, b FROM page' ) ), $expect );
 
@@ -390,5 +390,4 @@ class TroubleDapter extends DBAdapter
 		$this->get( $sql, $aValues );
 	}
 }
-
 

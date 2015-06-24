@@ -99,7 +99,6 @@ class Chill extends Base
 		}
 		asrt(R::count('person_role'), 2);
 
-
 		R::nuke();
 		$link = R::getRedBean()->dispense('person_role');
 		$person = R::dispense( 'person' );

@@ -4,9 +4,9 @@
  * Convenience function for test hook.
  * If you added the proper Writer class, the facade should be able
  * to automatically load it, i.e. \RedBeanPHP\QueryWriter\MyWriter
- * 
+ *
  * @global array $ini
- * 
+ *
  * @param string $name name of the connection (key)
  * @param string $dsn  DSN to connect
  * @param string $user username
@@ -16,7 +16,7 @@ function add_writer_to_tests( $name, $dsn, $user, $pass )
 {
 
 	global $ini;
-	
+
 	\RedUNIT\Base::addToDriverList( $name );
 	R::addDatabase( $name, $dsn, $user, $pass );
 
@@ -400,7 +400,6 @@ function getIndexes( $tableNoQ )
 	return array();
 }
 
-
 function are_cols_in_unique( $type, $properties )
 {
 	sort( $properties );
@@ -413,7 +412,6 @@ function are_cols_in_unique( $type, $properties )
 	}
 	return FALSE;
 }
-
 
 function get_uniques_for_type( $type )
 {

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP\QueryWriter;
 
@@ -259,7 +259,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		if ( $this->startsWithZeros( $value ) ) return self::C_DATATYPE_TEXT;
 
 		if ( $value === TRUE || $value === FALSE )  return self::C_DATATYPE_INTEGER;
-		
+
 		if ( is_numeric( $value ) && ( intval( $value ) == $value ) && $value < 2147483648 && $value > -2147483648 ) return self::C_DATATYPE_INTEGER;
 
 		if ( ( is_numeric( $value ) && $value < 2147483648 && $value > -2147483648)
@@ -290,7 +290,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	public function code( $typedescription, $includeSpecials = FALSE )
 	{
 		$r = ( ( isset( $this->sqltype_typeno[$typedescription] ) ) ? $this->sqltype_typeno[$typedescription] : 99 );
-		
+
 		return $r;
 	}
 
@@ -400,7 +400,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	public function wipe( $type )
 	{
 		$table = $this->esc( $type );
-		
+
 		$this->adapter->exec( "DELETE FROM $table " );
 	}
 

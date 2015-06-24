@@ -37,7 +37,7 @@ class Prefixes extends Base
 	 * Test prerequisites.
 	 */
 	public function testPrerequisites()
-	{	
+	{
 		R::nuke();
 		$bean = R::xdispense( 'type_with_underscore' );
 		asrt( ( $bean instanceof OODBBean ), TRUE );

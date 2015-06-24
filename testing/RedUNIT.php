@@ -35,7 +35,7 @@ abstract class RedUNIT
 	public function prepare()
 	{
 		R::freeze( FALSE );
-		
+
 		R::debug( FALSE );
 
 		R::nuke();

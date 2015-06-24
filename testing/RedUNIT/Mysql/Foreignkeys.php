@@ -276,7 +276,6 @@ class Foreignkeys extends Mysql
 		//Now add non-dep key
 		R::nuke();
 
-
 		$sql   = '
 			CREATE TABLE book (
 				id INT( 11 ) UNSIGNED NULL AUTO_INCREMENT,
@@ -363,7 +362,6 @@ class Foreignkeys extends Mysql
 
 		$writer->addIndex('song', 'index1', 'album_id');
 
-
 		$indexes = R::getAll( 'SHOW INDEX FROM song' );
 
 		asrt( count( $indexes ), 2 );
@@ -378,7 +376,6 @@ class Foreignkeys extends Mysql
 		$indexes = R::getAll( 'SHOW INDEX FROM song' );
 
 		asrt( count( $indexes ), 3 );
-
 
 		//Dont fail, just dont
 		try {

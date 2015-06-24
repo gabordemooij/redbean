@@ -1,10 +1,10 @@
 <?php
 
-namespace RedBeanPHP\QueryWriter; 
+namespace RedBeanPHP\QueryWriter;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\Adapter as Adapter; 
+use RedBeanPHP\Adapter as Adapter;
 use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
@@ -340,9 +340,9 @@ class CUBRID extends AQueryWriter implements QueryWriter
 		$table = $this->esc( $type, TRUE );
 		$field = $this->esc( $property, TRUE ) . '_id';
 		$keys = $this->getKeyMapForType( $table );
-		
+
 		foreach( $keys as $key ) {
-			if ( 
+			if (
 				$key['from'] === $field
 			) return $key['table'];
 		}

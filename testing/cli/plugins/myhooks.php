@@ -8,7 +8,7 @@ require('../RedBeanPHP/QueryWriter/CUBRID.php');
 //Define extra test packages from the hook
 $extraTestsFromHook = array(
 	'CUBRID/Setget',
-	'CUBRID/Writer' 
+	'CUBRID/Writer'
 );
 
 //Create a connection for this database

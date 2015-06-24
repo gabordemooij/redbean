@@ -256,7 +256,6 @@ class Misc extends Blackhole
 
 		$bean->name = 'a';
 
-
 		try {
 			R::transaction( function () use ( $bean ) {
 				R::store( $bean );
@@ -335,7 +334,6 @@ class Misc extends Blackhole
 		}
 
 		testpack( 'Misc Tests' );
-
 
 		R::debug( 1 );
 

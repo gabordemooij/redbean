@@ -53,7 +53,7 @@ class Bean extends Base
 		asrt( isset( $columns['xownerCritic'] ), FALSE );
 		asrt( isset( $columns['sharedbyReader'] ), FALSE );
 	}
-	
+
 	/**
 	 * Other tests...
 	 */

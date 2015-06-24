@@ -1,7 +1,7 @@
-<?php 
+<?php
 namespace RedUNIT\CUBRID;
 use RedBeanPHP\Facade as R;
-use \RedBeanPHP\QueryWriter\CUBRID as CUBRID; 
+use \RedBeanPHP\QueryWriter\CUBRID as CUBRID;
 /**
  * RedUNIT_CUBRID_Writer
  *
@@ -18,7 +18,7 @@ class Writer extends \RedUNIT\CUBRID
 {
 	/**
 	 * Test scanning and coding of values.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function testScanningAndCoding()
@@ -28,26 +28,26 @@ class Writer extends \RedUNIT\CUBRID
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
-		
+
 		$writer->createTable( "testtable" );
 
 		$writer->addColumn( "testtable", "special", CUBRID::C_DATATYPE_SPECIAL_DATE );
-		
+
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols['special'], TRUE ), CUBRID::C_DATATYPE_SPECIAL_DATE );
-		
+
 		asrt( $writer->code( $cols['special'], FALSE ), CUBRID::C_DATATYPE_SPECIFIED );
-		
+
 		$writer->addColumn( "testtable", "special2", CUBRID::C_DATATYPE_SPECIAL_DATETIME );
-		
+
 		$cols = $writer->getColumns( "testtable" );
 
 		asrt( $writer->code( $cols['special2'], TRUE ), CUBRID::C_DATATYPE_SPECIAL_DATETIME );
-		
+
 		asrt( $writer->code( $cols['special'], FALSE ), CUBRID::C_DATATYPE_SPECIFIED );
-		
+
 		
 	}
-	
+
 }

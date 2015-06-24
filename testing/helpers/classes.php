@@ -409,7 +409,6 @@ class Model_PageWidget extends RedBean_SimpleModel {
 	}
 }
 
-
 /**
  * Mock class to test proper model name
  * beautificattion for link table beans in FUSE.
@@ -483,7 +482,6 @@ class Model_Feed extends \RedbeanPHP\SimpleModel {
         $this->bean->post = json_decode($this->bean->post, true);
     }
 }
-
 
 /**
  * UUID QueryWriter for MySQL for testing purposes.
@@ -576,9 +574,9 @@ class DiagnosticBean extends \RedBeanPHP\OODBBean {
 
 class DiagnosticModel extends \RedBeanPHP\SimpleModel
 {
-	
+
 	private $logs = array();
-	
+
 	public function open()
 	{
 		$this->logs[] = array(
@@ -638,12 +636,12 @@ class DiagnosticModel extends \RedBeanPHP\SimpleModel
 			)
 		);
 	}
-	
+
 	public function getLogs()
 	{
 		return $this->logs;
 	}
-	
+
 	public function getLogActionCount( $action = NULL )
 	{
 		if ( is_null( $action ) ) return count( $this->logs );
@@ -653,21 +651,20 @@ class DiagnosticModel extends \RedBeanPHP\SimpleModel
 		}
 		return $counter;
 	}
-	
+
 	public function clearLog()
 	{
 		return $this->logs = array();
 	}
-	
+
 	public function getDataFromLog( $logIndex = 0, $property )
 	{
 		return $this->logs[$logIndex]['data'][$property];
 	}
-	
+
 	
 }
 
 class Model_Probe extends DiagnosticModel {};
-
 
 define('REDBEAN_OODBBEAN_CLASS', '\DiagnosticBean');

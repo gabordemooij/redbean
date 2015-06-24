@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP;
 
@@ -19,7 +19,7 @@ use RedBeanPHP\Adapter as Adapter;
  * @file      RedBeanPHP/ToolBox.php
  * @author    Gabor de Mooij and the RedBeanPHP community
  * @license   BSD/GPLv2
- * 
+ *
  * @copyright
  * copyright (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
  * This source file is subject to the BSD/GPLv2 License that is bundled
@@ -80,7 +80,7 @@ class ToolBox
 
 	/**
 	 * Returns the OODB instance in this toolbox.
-	 * OODB is responsible for creating, storing, retrieving and deleting 
+	 * OODB is responsible for creating, storing, retrieving and deleting
 	 * single beans. Other components rely
 	 * on OODB for their basic functionality.
 	 *
@@ -95,7 +95,7 @@ class ToolBox
 	 * Returns the database adapter in this toolbox.
 	 * The adapter is responsible for executing the query and binding the values.
 	 * The adapter also takes care of transaction handling.
-	 * 
+	 *
 	 * @return DBAdapter
 	 */
 	public function getDatabaseAdapter()

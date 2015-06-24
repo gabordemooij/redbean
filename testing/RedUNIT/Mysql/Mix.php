@@ -145,6 +145,3 @@ class Mix extends Mysql
 	}
 }
 
-
-
-

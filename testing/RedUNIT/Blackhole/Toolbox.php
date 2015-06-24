@@ -14,7 +14,6 @@ use RedBeanPHP\Repository as Repository;
 use RedBeanPHP\Repository\Fluid as FluidRepo;
 use RedBeanPHP\Repository\Frozen as FrozenRepo;
 
-
 /**
  * Toolbox
  *

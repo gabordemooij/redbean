@@ -48,7 +48,6 @@ class Keywords extends Base
 			'distinct', 'like'
 		);
 
-
 		foreach ( $keywords as $k ) {
 			R::nuke();
 
@@ -75,7 +74,6 @@ class Keywords extends Base
 
 			pass();
 		}
-
 
 	}
 }

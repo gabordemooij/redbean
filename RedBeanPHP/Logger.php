@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace RedBeanPHP;
 
@@ -27,7 +27,7 @@ interface Logger
 	 * situations sql and bindings are passed.
 	 * The log method should be able to accept all kinds of parameters and data by using
 	 * functions like func_num_args/func_get_args.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function log();

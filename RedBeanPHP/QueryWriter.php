@@ -474,7 +474,7 @@ interface QueryWriter
 	/**
 	 * Given a bean type and a property, this method
 	 * tries to infer the fetch type using the foreign key
-	 * definitions in the database. 
+	 * definitions in the database.
 	 * For instance: project, student -> person.
 	 * If no fetchType can be inferred, this method will return NULL.
 	 *

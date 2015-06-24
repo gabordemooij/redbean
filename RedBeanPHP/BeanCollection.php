@@ -44,10 +44,10 @@ class BeanCollection
 	 * @var string
 	 */
 	protected $type = NULL;
-	
+
 	/**
 	 * Constructor, creates a new instance of the BeanCollection.
-	 * 
+	 *
 	 * @param string     $type       type of beans in this collection
 	 * @param Repository $repository repository to use to generate bean objects
 	 * @param Cursor     $cursor     cursor object to use

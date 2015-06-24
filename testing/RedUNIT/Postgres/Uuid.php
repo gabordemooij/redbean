@@ -171,7 +171,6 @@ class Uuid extends Postgres
 		$id = R::store( $mansion );
 		//exit;
 
-
 		asrt( is_string( $id ), TRUE );
 		asrt( strlen( $id ), 36 );
 		$haunted = R::load( 'mansion', $id );
