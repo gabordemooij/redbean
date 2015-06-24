@@ -41,8 +41,6 @@ class Fluid extends Repository
 	 * @param string $cast cast identifier
 	 *
 	 * @return integer
-	 *
-	 * @throws Security
 	 */
 	private function getTypeFromCast( $cast )
 	{
@@ -153,8 +151,6 @@ class Fluid extends Repository
 	 * @param array            $ownAdditions list of addition beans in own-list
 	 *
 	 * @return void
-	 *
-	 * @throws Security
 	 */
 	protected function processAdditions( $bean, $ownAdditions )
 	{
@@ -217,13 +213,11 @@ class Fluid extends Repository
 	}
 
 	/**
-	 * Handles\Exceptions. Suppresses exceptions caused by missing structures.
+	 * Handles exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param\Exception $exception exception
+	 * @param Exception $exception exception
 	 *
 	 * @return void
-	 *
-	 * @throws\Exception
 	 */
 	protected function handleException( \Exception $exception )
 	{
@@ -286,10 +280,7 @@ class Fluid extends Repository
 	 * @param string  $type type of bean you want to load
 	 * @param integer $id   ID of the bean you want to load
 	 *
-	 * @throws SQL
-	 *
 	 * @return OODBBean
-	 *
 	 */
 	public function load( $type, $id )
 	{

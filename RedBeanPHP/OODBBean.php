@@ -988,8 +988,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * @param  mixed $value    the value you want to assign
 	 *
 	 * @return void
-	 *
-	 * @throws Security
 	 */
 	public function __set( $property, $value )
 	{

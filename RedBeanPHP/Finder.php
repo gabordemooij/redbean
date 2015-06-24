@@ -59,8 +59,6 @@ class Finder
 	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
-	 *
-	 * @throws Security
 	 */
 	public function find( $type, $sql = NULL, $bindings = array() )
 	{

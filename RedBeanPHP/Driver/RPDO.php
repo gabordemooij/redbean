@@ -132,8 +132,6 @@ class RPDO implements Driver
 	 * @param array  $bindings the values that need to get bound to the query slots
 	 *
 	 * @return void
-	 *
-	 * @throws SQL
 	 */
 	protected function runQuery( $sql, $bindings, $options = array() )
 	{
@@ -285,8 +283,6 @@ class RPDO implements Driver
 	 * method will simply return directly. This method also turns on
 	 * UTF8 for the database and PDO-ERRMODE-EXCEPTION as well as
 	 * PDO-FETCH-ASSOC.
-	 *
-	 * @throws\PDOException
 	 *
 	 * @return void
 	 */

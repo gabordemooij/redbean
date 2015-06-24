@@ -648,8 +648,6 @@ abstract class AQueryWriter
 	 * @param string $table table string
 	 *
 	 * @return string
-	 *
-	 * @throws Security
 	 */
 	protected function check( $struct )
 	{

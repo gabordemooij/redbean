@@ -43,13 +43,11 @@ class AssociationManager extends Observable
 	protected $writer;
 
 	/**
-	 * Handles\Exceptions. Suppresses exceptions caused by missing structures.
+	 * Handles exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param\Exception $exception
+	 * @param Exception $exception
 	 *
 	 * @return void
-	 *
-	 * @throws\Exception
 	 */
 	private function handleException(\Exception $exception )
 	{
@@ -74,9 +72,6 @@ class AssociationManager extends Observable
 	 * @param array    $bindings bindings for query
 	 *
 	 * @return array
-	 *
-	 * @throws Security
-	 * @throws SQL
 	 */
 	private function relatedRows( $bean, $type, $sql = '', $bindings = array() )
 	{
@@ -99,8 +94,6 @@ class AssociationManager extends Observable
 	 * @param OODBBean $bean1 first bean
 	 * @param OODBBean $bean2 second bean
 	 * @param OODBBean $bean  base bean (association record)
-	 *
-	 * @throws\Exception|SQL
 	 *
 	 * @return mixed
 	 */
@@ -214,8 +207,6 @@ class AssociationManager extends Observable
 	 * @param array                  $bindings bindings for your SQL string
 	 *
 	 * @return integer
-	 *
-	 * @throws Security
 	 */
 	public function relatedCount( $bean, $type, $sql = NULL, $bindings = array() )
 	{

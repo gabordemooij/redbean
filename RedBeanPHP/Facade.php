@@ -130,8 +130,6 @@ class Facade
 	 * Internal Query function, executes the desired query. Used by
 	 * all facade query functions. This keeps things DRY.
 	 *
-	 * @throws SQL
-	 *
 	 * @param string $method   desired query method (i.e. 'cell', 'col', 'exec' etc..)
 	 * @param string $sql      the sql you want to execute
 	 * @param array  $bindings array of values to be bound to query statement
@@ -256,10 +254,7 @@ class Facade
 	 *
 	 * @param callable $callback Closure (or other callable) with the transaction logic
 	 *
-	 * @throws Security
-	 *
 	 * @return mixed
-	 *
 	 */
 	public static function transaction( $callback )
 	{
@@ -379,8 +374,6 @@ class Facade
 	 * @param boolean $tf   debug mode (true or false)
 	 * @param integer $mode (0 = to STDOUT, 1 = to ARRAY)
 	 *
-	 * @throws Security
-	 *
 	 * @return RDefault
 	 */
 	public static function debug( $tf = TRUE, $mode = 0 )
@@ -450,8 +443,6 @@ class Facade
 	 * @param OODBBean|SimpleModel $bean bean to store
 	 *
 	 * @return integer|string
-	 *
-	 * @throws Security
 	 */
 	public static function store( $bean )
 	{
@@ -524,8 +515,6 @@ class Facade
 	 * @param string  $type type of bean you want to load
 	 * @param integer $id   ID of the bean you want to load
 	 *
-	 * @throws SQL
-	 *
 	 * @return OODBBean
 	 */
 	public static function load( $type, $id )
@@ -562,8 +551,6 @@ class Facade
 	 * @param boolean	     $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return array|OODBBean
-	 *
-	 * @throws Security
 	 */
 	public static function dispense( $typeOrBeanArray, $num = 1, $alwaysReturnArray = FALSE )
 	{
@@ -1171,8 +1158,6 @@ class Facade
 	 * @param array  $bindings parameters to bind to SQL
 	 *
 	 * @return integer
-	 *
-	 * @throws SQL
 	 */
 	public static function count( $type, $addSQL = '', $bindings = array() )
 	{

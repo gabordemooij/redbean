@@ -140,8 +140,6 @@ abstract class Repository
 	 * @param array            $sharedAdditions  list with shared additions
 	 *
 	 * @return void
-	 *
-	 * @throws Security
 	 */
 	protected function processSharedAdditions( $bean, $sharedAdditions )
 	{
@@ -297,8 +295,6 @@ abstract class Repository
 	 * @param OODBBean $bean the bean that needs to be checked
 	 *
 	 * @return void
-	 *
-	 * @throws Security $exception
 	 */
 	public function check( OODBBean $bean )
 	{
@@ -510,8 +506,6 @@ abstract class Repository
 	 * @param array  $bindings parameters to bind to SQL
 	 *
 	 * @return integer
-	 *
-	 * @throws SQLException
 	 */
 	public function count( $type, $addSQL = '', $bindings = array() )
 	{
@@ -541,8 +535,6 @@ abstract class Repository
 	 * @param OODBBean|SimpleModel $bean bean you want to remove from database
 	 *
 	 * @return void
-	 *
-	 * @throws SQLException
 	 */
 	public function trash( $bean )
 	{
@@ -589,8 +581,6 @@ abstract class Repository
 	 * @param string $type type of bean you wish to delete all instances of
 	 *
 	 * @return boolean
-	 *
-	 * @throws SQLException
 	 */
 	public function wipe( $type )
 	{

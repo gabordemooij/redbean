@@ -116,8 +116,6 @@ class OODB extends Observable
 	 * @param OODBBean $bean bean you wish to unbox
 	 *
 	 * @return OODBBean
-	 *
-	 * @throws Security
 	 */
 	protected function unboxIfNeeded( $bean )
 	{
@@ -276,8 +274,6 @@ class OODB extends Observable
 	 * @param OODBBean $bean the bean that needs to be checked
 	 *
 	 * @return void
-	 *
-	 * @throws Security $exception
 	 */
 	public function check( OODBBean $bean )
 	{
@@ -307,8 +303,6 @@ class OODB extends Observable
 	 * @param array  $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
 	 *
 	 * @return array
-	 *
-	 * @throws SQL
 	 */
 	public function find( $type, $conditions = array(), $sql = NULL, $bindings = array() )
 	{
@@ -323,8 +317,6 @@ class OODB extends Observable
 	 * @param array  $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
 	 *
 	 * @return array
-	 *
-	 * @throws SQL
 	 */
 	public function findCollection(  $type, $sql = NULL, $bindings = array() )
 	{
@@ -365,8 +357,6 @@ class OODB extends Observable
 	 * @param OODBBean|SimpleModel $bean bean to store
 	 *
 	 * @return integer|string
-	 *
-	 * @throws Security
 	 */
 	public function store( $bean )
 	{
@@ -398,10 +388,7 @@ class OODB extends Observable
 	 * @param string  $type type of bean you want to load
 	 * @param integer $id   ID of the bean you want to load
 	 *
-	 * @throws SQL
-	 *
 	 * @return OODBBean
-	 *
 	 */
 	public function load( $type, $id )
 	{
@@ -416,8 +403,6 @@ class OODB extends Observable
 	 * @param OODBBean|SimpleModel $bean bean you want to remove from database
 	 *
 	 * @return void
-	 *
-	 * @throws Security
 	 */
 	public function trash( $bean )
 	{
@@ -470,8 +455,6 @@ class OODB extends Observable
 	 * @param array  $bindings parameters to bind to SQL
 	 *
 	 * @return integer
-	 *
-	 * @throws SQL
 	 */
 	public function count( $type, $addSQL = '', $bindings = array() )
 	{
@@ -484,8 +467,6 @@ class OODB extends Observable
 	 * @param string $type type of bean you wish to delete all instances of
 	 *
 	 * @return boolean
-	 *
-	 * @throws SQL
 	 */
 	public function wipe( $type )
 	{
@@ -498,8 +479,6 @@ class OODB extends Observable
 	 * storage and more.
 	 *
 	 * @return AssociationManager
-	 *
-	 * @throws Security
 	 */
 	public function getAssociationManager()
 	{
