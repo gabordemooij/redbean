@@ -662,7 +662,6 @@ class DiagnosticModel extends \RedBeanPHP\SimpleModel
 		return $this->logs[$logIndex]['data'][$property];
 	}
 
-	
 }
 
 class Model_Probe extends DiagnosticModel {};

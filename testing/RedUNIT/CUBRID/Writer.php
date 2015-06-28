@@ -47,7 +47,6 @@ class Writer extends \RedUNIT\CUBRID
 
 		asrt( $writer->code( $cols['special'], FALSE ), CUBRID::C_DATATYPE_SPECIFIED );
 
-		
 	}
 
 }

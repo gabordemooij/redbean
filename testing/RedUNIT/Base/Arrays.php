@@ -264,7 +264,6 @@ class Arrays extends Base
 		asrt( isset( $book['sharedTagList'] ), TRUE );
 		asrt( isset( $book['sharedTag'] ), TRUE );
 
-		
 		$book['sharedTag'][] = R::dispense( 'tag' );
 		R::store( $book );
 

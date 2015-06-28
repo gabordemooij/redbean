@@ -268,7 +268,7 @@ abstract class Repository
 	 */
 	protected function processEmbeddedBean( &$embeddedBeans, $bean, $property, OODBBean $value )
 	{
-		$linkField        = $property . '_id';
+		$linkField = $property . '_id';
 		$id = $this->prepareEmbeddedBean( $value );
 		if ($bean->$linkField != $id) $bean->$linkField = $id;
 		$bean->setMeta( 'cast.' . $linkField, 'id' );
@@ -278,8 +278,9 @@ abstract class Repository
 
 	/**
 	 * Constructor, requires a query writer.
+	 * Creates a new instance of the bean respository class.
 	 *
-	 * @param QueryWriter $writer writer
+	 * @param QueryWriter $writer the Query Writer to use for this repository
 	 */
 	public function __construct( OODB $oodb, QueryWriter $writer )
 	{
