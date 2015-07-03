@@ -59,6 +59,65 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	protected static $autoResolve = FALSE;
 
 	/**
+	 * This is where the real properties of the bean live. They are stored and retrieved
+	 * by the magic getter and setter (__get and __set).
+	 *
+	 * @var array $properties
+	 */
+	protected $properties = array();
+
+	/**
+	 * Here we keep the meta data of a bean.
+	 *
+	 * @var array
+	 */
+	protected $__info = array();
+
+	/**
+	 * The BeanHelper allows the bean to access the toolbox objects to implement
+	 * rich functionality, otherwise you would have to do everything with R or
+	 * external objects.
+	 *
+	 * @var BeanHelper
+	 */
+	protected $beanHelper = NULL;
+
+	/**
+	 * @var null
+	 */
+	protected $fetchType = NULL;
+
+	/**
+	 * @var string
+	 */
+	protected $withSql = '';
+
+	/**
+	 * @var array
+	 */
+	protected $withParams = array();
+
+	/**
+	 * @var string
+	 */
+	protected $aliasName = NULL;
+
+	/**
+	 * @var string
+	 */
+	protected $via = NULL;
+
+	/**
+	 * @var boolean
+	 */
+	protected $noLoad = FALSE;
+
+	/**
+	 * @var boolean
+	 */
+	protected $all = FALSE;
+
+	/**
 	 * Sets the error mode for FUSE.
 	 * What to do if a FUSE model method does not exist?
 	 * You can set the following options:
@@ -135,65 +194,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	{
 		self::$autoResolve = (boolean) $automatic;
 	}
-
-	/**
-	 * This is where the real properties of the bean live. They are stored and retrieved
-	 * by the magic getter and setter (__get and __set).
-	 *
-	 * @var array $properties
-	 */
-	protected $properties = array();
-
-	/**
-	 * Here we keep the meta data of a bean.
-	 *
-	 * @var array
-	 */
-	protected $__info = array();
-
-	/**
-	 * The BeanHelper allows the bean to access the toolbox objects to implement
-	 * rich functionality, otherwise you would have to do everything with R or
-	 * external objects.
-	 *
-	 * @var BeanHelper
-	 */
-	protected $beanHelper = NULL;
-
-	/**
-	 * @var null
-	 */
-	protected $fetchType = NULL;
-
-	/**
-	 * @var string
-	 */
-	protected $withSql = '';
-
-	/**
-	 * @var array
-	 */
-	protected $withParams = array();
-
-	/**
-	 * @var string
-	 */
-	protected $aliasName = NULL;
-
-	/**
-	 * @var string
-	 */
-	protected $via = NULL;
-
-	/**
-	 * @var boolean
-	 */
-	protected $noLoad = FALSE;
-
-	/**
-	 * @var boolean
-	 */
-	protected $all = FALSE;
 
 	/**
 	 * Sets a meta property for all beans. This is a quicker way to set
