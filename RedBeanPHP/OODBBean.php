@@ -138,7 +138,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * This method returns the old mode and handler as an array.
 	 *
-	 * @param integer       $mode mode
+	 * @param integer       $mode error handling mode
 	 * @param callable|NULL $func custom handler
 	 *
 	 * @return array
@@ -169,9 +169,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * Sets aliases.
+	 * Sets global aliases.
 	 *
-	 * @param array $list
+	 * @param array $list list of global aliases to use
 	 *
 	 * @return void
 	 */
@@ -232,7 +232,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * @param string $type the source type for the join
 	 *
-	 * @return string $joinSql
+	 * @return string
 	 */
 	private function parseJoin( $type )
 	{
@@ -357,7 +357,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * use the OODB object to dispense new beans. You can use this method
 	 * if you build your own bean dispensing mechanism.
 	 *
-	 * @param string             $type       type of the new bean
+	 * @param string     $type       type of the new bean
 	 * @param BeanHelper $beanhelper bean helper to obtain a toolbox and a model
 	 *
 	 * @return void
@@ -380,7 +380,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * nested beans (bean lists: ownBean, sharedBean) without the need to
 	 * rely on static calls to the facade (or make this class dep. on OODB).
 	 *
-	 * @param BeanHelper $helper
+	 * @param BeanHelper $helper helper to use for this bean
 	 *
 	 * @return void
 	 */
@@ -399,11 +399,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Note that not all PHP functions work with the array interface.
 	 *
-	 * @return \ArrayIterator
+	 * @return ArrayIterator
 	 */
 	public function getIterator()
 	{
-		return new\ArrayIterator( $this->properties );
+		return new \ArrayIterator( $this->properties );
 	}
 
 	/**
@@ -641,8 +641,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * the additional SQL snippet will be merged into the final
 	 * query.
 	 *
-	 * @param string $sql SQL to be added to retrieval query.
-	 * @param array       $bindings array with parameters to bind to SQL snippet
+	 * @param string $sql      SQL to be added to retrieval query.
+	 * @param array  $bindings array with parameters to bind to SQL snippet
 	 *
 	 * @return OODBBean
 	 */
@@ -775,7 +775,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Also caches the result to improve performance.
 	 *
-	 * @param string $property
+	 * @param string $property property to un-beautify
 	 *
 	 * @return string
 	 */
@@ -1103,7 +1103,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * RedBeanPHP also stores meta data in beans, this meta data uses
 	 * keys prefixed with 'sys.' (system).
 	 *
-	 * @param string $path    path
+	 * @param string $path    path to property in meta data
 	 * @param mixed  $default default value
 	 *
 	 * @return mixed
@@ -1119,7 +1119,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * This is a short-cut method that can be used instead
 	 * of combining a get/unset.
 	 *
-	 * @param string $path    path
+	 * @param string $path    path to property in meta data
 	 * @param mixed  $default default value
 	 *
 	 * @return mixed
@@ -1158,7 +1158,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * This is a convenience method to enable you to
 	 * exchange meta information easily.
 	 *
-	 * @param OODBBean $bean
+	 * @param OODBBean $bean bean to copy meta data of
 	 *
 	 * @return OODBBean
 	 */
@@ -1335,7 +1335,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * For polymorphic bean relations.
 	 * Same as fetchAs but uses a column instead of a direct value.
 	 *
-	 * @param string $column
+	 * @param string $field field name to use for mapping
 	 *
 	 * @return OODBBean
 	 */
@@ -1353,6 +1353,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * @param string  $property property
 	 * @param closure $function function
+	 * @param integer $maxDepth maximum depth for traversal
 	 *
 	 * @return OODBBean
 	 */
@@ -1394,7 +1395,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * Implementation of\Countable interface. Makes it possible to use
+	 * Implementation of Countable interface. Makes it possible to use
 	 * count() function on a bean.
 	 *
 	 * @return integer
@@ -1505,7 +1506,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * it has been stored or not. Storing a bean does not undo it's history,
 	 * to clean the history of a bean use: clearHistory().
 	 *
-	 * @param string  $property  name of the property you want the change-status of
+	 * @param string  $property name of the property you want the change-status of
 	 *
 	 * @return boolean
 	 */
@@ -1574,7 +1575,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * allowing the chained setter: ->song = $song.
 	 *
 	 * @param string|OODBBean $type          type of bean to dispense or the full bean
-	 * @param string|array            $qualification JSON string or array (optional)
+	 * @param string|array    $qualification JSON string or array (optional)
 	 *
 	 * @return OODBBean
 	 */

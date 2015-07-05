@@ -32,7 +32,7 @@ class SimpleModel
 	 * Used by FUSE: the ModelHelper class to connect a bean to a model.
 	 * This method loads a bean in the model.
 	 *
-	 * @param OODBBean $bean bean
+	 * @param OODBBean $bean bean to load
 	 *
 	 * @return void
 	 */
@@ -48,7 +48,7 @@ class SimpleModel
 	 * @note this method returns a value, not a reference!
 	 *       To obtain a reference unbox the bean first!
 	 *
-	 * @param string $prop property
+	 * @param string $prop property to get
 	 *
 	 * @return mixed
 	 */
@@ -61,8 +61,8 @@ class SimpleModel
 	 * Magic Setter.
 	 * Sets the value directly as a bean property.
 	 *
-	 * @param string $prop  property
-	 * @param mixed  $value value
+	 * @param string $prop  property to set value of
+	 * @param mixed  $value value to set
 	 *
 	 * @return void
 	 */

@@ -471,10 +471,10 @@ class Facade
 	 * for loading a one-to-one relation.
 	 *
 	 * Usage:
-	 * list($author, $bio) = R::load('author, bio', $id);
+	 * list( $author, $bio ) = R::load( 'author, bio', $id );
 	 *
-	 * @param string|array $types
-	 * @param mixed        $id
+	 * @param string|array $types the set of types to load at once
+	 * @param mixed        $id    the common ID
 	 *
 	 * @return OODBBean
 	 */
@@ -532,7 +532,7 @@ class Facade
 	 * and THEN trash it.
 	 *
 	 * @param string|OODBBean|SimpleModel $bean bean you want to remove from database
-	 * @param integer $id (optional)
+	 * @param integer                     $id   ID if the bean to trash (optional, type-id variant only)
 	 *
 	 * @return void
 	 */
@@ -648,9 +648,9 @@ class Facade
 	 * array parameter; you can either use the question mark notation
 	 * or the slot-notation (:keyname).
 	 *
-	 * @param string $type     type   the type of bean you are looking for
-	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string $type     the type of bean you are looking for
+	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
@@ -668,9 +668,9 @@ class Facade
 	 *
 	 * Your SQL does not have to start with a valid WHERE-clause condition.
 	 *
-	 * @param string $type     type   the type of bean you are looking for
-	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string $type     the type of bean you are looking for
+	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
@@ -683,9 +683,9 @@ class Facade
 	 * @see Facade::find
 	 * The variation also exports the beans (i.e. it returns arrays).
 	 *
-	 * @param string $type     type   the type of bean you are looking for
-	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string $type     the type of bean you are looking for
+	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
@@ -698,9 +698,9 @@ class Facade
 	 * @see Facade::find
 	 * This variation returns the first bean only.
 	 *
-	 * @param string $type     type   the type of bean you are looking for
-	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string $type     the type of bean you are looking for
+	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings array of values to be bound to parameters in query
 	 *
 	 * @return OODBBean
 	 */
@@ -713,9 +713,9 @@ class Facade
 	 * @see Facade::find
 	 * This variation returns the last bean only.
 	 *
-	 * @param string $type     type   the type of bean you are looking for
-	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string $type     the type of bean you are looking for
+	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings array of values to be bound to parameters in query
 	 *
 	 * @return OODBBean
 	 */
@@ -728,9 +728,9 @@ class Facade
 	 * Finds a bean collection.
 	 * Use this for large datasets.
 	 *
-	 * @param string $type     type   the type of bean you are looking for
-	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string $type     the type of bean you are looking for
+	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings array of values to be bound to parameters in query
 	 *
 	 * @return BeanCollection
 	 */
@@ -749,7 +749,7 @@ class Facade
 	 * @param array|string $types      a list of bean types to find
 	 * @param string|array $sqlOrArr   SQL query string or result set array
 	 * @param array        $bindings   SQL bindings
-	 * @param array        $remappings An array of remapping arrays containing closures
+	 * @param array        $remappings an array of remapping arrays containing closures
 	 *
 	 * @return array
 	 */
@@ -799,8 +799,8 @@ class Facade
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql       sql    SQL query to execute
-	 * @param array  $bindings  values a list of values to be bound to query parameters
+	 * @param string $sql       SQL query to execute
+	 * @param array  $bindings  a list of values to be bound to query parameters
 	 *
 	 * @return integer
 	 */
@@ -813,8 +813,8 @@ class Facade
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql       sql    SQL query to execute
-	 * @param array  $bindings  values a list of values to be bound to query parameters
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
 	 * @return array
 	 */
@@ -827,8 +827,8 @@ class Facade
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql       sql    SQL query to execute
-	 * @param array  $bindings  values a list of values to be bound to query parameters
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
 	 * @return string
 	 */
@@ -841,8 +841,8 @@ class Facade
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql       sql    SQL query to execute
-	 * @param array  $bindings  values a list of values to be bound to query parameters
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
 	 * @return array
 	 */
@@ -855,8 +855,8 @@ class Facade
 	 * Convenience function to execute Queries directly.
 	 * Executes SQL.
 	 *
-	 * @param string $sql       sql    SQL query to execute
-	 * @param array  $bindings  values a list of values to be bound to query parameters
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
 	 * @return array
 	 */
@@ -874,8 +874,8 @@ class Facade
 	 * selected in the query, both key and value of the array will have the
 	 * value of this field for each row.
 	 *
-	 * @param string $sql       sql    SQL query to execute
-	 * @param array  $bindings  values a list of values to be bound to query parameters
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
 	 * @return array
 	 */
@@ -890,8 +890,8 @@ class Facade
 	 * Results will be returned as an associative array indexed by the first
 	 * column in the select.
 	 *
-	 * @param string $sql       sql    SQL query to execute
-	 * @param array  $bindings  values a list of values to be bound to query parameters
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
 	 * @return array
 	 */
@@ -933,7 +933,7 @@ class Facade
 	 * @param OODBBean $bean  bean to be copied
 	 * @param array    $trail for internal usage, pass array()
 	 * @param boolean  $pid   for internal usage
-	 * @param array	   $white white list filter with bean types to duplicate
+	 * @param array	 $white white list filter with bean types to duplicate
 	 *
 	 * @return array
 	 */
@@ -963,7 +963,7 @@ class Facade
 	 * This is a simplified version of the deprecated R::dup() function.
 	 *
 	 * @param OODBBean $bean  bean to be copied
-	 * @param array	   $white white list filter with bean types to duplicate
+	 * @param array	 $white white list filter with bean types to duplicate
 	 *
 	 * @return array
 	 */
@@ -1077,8 +1077,8 @@ class Facade
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
 	 *
-	 * @param OODBBean $bean    bean
-	 * @param mixed    $tagList tags
+	 * @param OODBBean $bean    bean to tag
+	 * @param mixed    $tagList tags to attach to the specified bean
 	 *
 	 * @return string
 	 */
@@ -1094,7 +1094,7 @@ class Facade
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
 	 *
-	 * @param OODBBean $bean    bean
+	 * @param OODBBean $bean    bean to tag
 	 * @param array    $tagList list of tags to add to bean
 	 *
 	 * @return void
@@ -1110,8 +1110,8 @@ class Facade
 	 *
 	 * @param string $beanType type of bean you are looking for
 	 * @param array  $tagList  list of tags to match
-	 * @param string $sql      additional SQL
-	 * @param array  $bindings bindings
+	 * @param string $sql      additional SQL query snippet
+	 * @param array  $bindings a list of values to bind to the query parameters
 	 *
 	 * @return array
 	 */
@@ -1126,8 +1126,8 @@ class Facade
 	 *
 	 * @param string $beanType type of bean you are looking for
 	 * @param array  $tagList  list of tags to match
-	 * @param string $sql      additional SQL
-	 * @param array  $bindings bindings
+	 * @param string $sql      additional SQL query snippet
+	 * @param array  $bindings a list of values to bind to the query parameters
 	 *
 	 * @return array
 	 */
@@ -1169,7 +1169,7 @@ class Facade
 	 * Adapter and you want it on-the-fly? Use this method to hot-swap your facade with a new
 	 * toolbox.
 	 *
-	 * @param ToolBox $tb toolbox
+	 * @param ToolBox $tb toolbox to configure facade with
 	 *
 	 * @return ToolBox
 	 */
@@ -1473,7 +1473,7 @@ class Facade
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @param Adapter $adapter
+	 * @param Adapter $adapter Database Adapter for facade to use
 	 *
 	 * @return void
 	 */
@@ -1486,7 +1486,7 @@ class Facade
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @param QueryWriter $writer
+	 * @param QueryWriter $writer Query Writer instance for facade to use
 	 *
 	 * @return void
 	 */
@@ -1499,7 +1499,7 @@ class Facade
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @param OODB $redbean
+	 * @param OODB $redbean Object Database for facade to use
 	 */
 	public static function setRedBean( OODB $redbean )
 	{
@@ -1641,8 +1641,8 @@ class Facade
 	 *
 	 * This method returns the old mode and handler as an array.
 	 *
-	 * @param integer       $mode mode
-	 * @param callable|NULL $func custom handler
+	 * @param integer       $mode mode, determines how to handle errors
+	 * @param callable|NULL $func custom handler (if applicable)
 	 *
 	 * @return array
 	 */
@@ -1700,9 +1700,9 @@ class Facade
 	 * Passing NULL as the function will reset (clear) the function
 	 * for this column/mode.
 	 *
-	 * @param string $mode (read or write)
-	 * @param string $field
-	 * @param string $function
+	 * @param string $mode     mode for function: i.e. read or write
+	 * @param string $field    field (table.column) to bind function to
+	 * @param string $function SQL function to bind to specified column
 	 *
 	 */
 	public static function bindFunc( $mode, $field, $function )
@@ -1713,7 +1713,7 @@ class Facade
 	/**
 	 * Sets global aliases.
 	 *
-	 * @param array $list
+	 * @param array $list list of global aliases
 	 *
 	 * @return void
 	 */

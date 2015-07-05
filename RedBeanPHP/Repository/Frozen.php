@@ -38,7 +38,7 @@ class Frozen extends Repository
 	/**
 	 * Handles exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param Exception $exception exception
+	 * @param Exception $exception exception to handle
 	 *
 	 * @return void
 	 */
@@ -83,8 +83,13 @@ class Frozen extends Repository
 	 * adds a foreign key. Also adds a constraint in case the type is
 	 * in the dependent list.
 	 *
-	 * @param OODBBean $bean         bean
-	 * @param array            $ownAdditions list of addition beans in own-list
+	 * Note that this method raises a custom exception if the bean
+	 * is not an instance of OODBBean. Therefore it does not use
+	 * a type hint. This allows the user to take action in case
+	 * invalid objects are passed in the list.
+	 *
+	 * @param OODBBean $bean         bean to process
+	 * @param array    $ownAdditions list of addition beans in own-list
 	 *
 	 * @return void
 	 */

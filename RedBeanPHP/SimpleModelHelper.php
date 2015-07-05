@@ -38,7 +38,7 @@ class SimpleModelHelper implements Observer
 	 * that belongs to the CRUD bean and this model will take over control from
 	 * there.
 	 *
-	 * @param Observable $observable
+	 * @param Observable $observable object to observe
 	 *
 	 * @return void
 	 */

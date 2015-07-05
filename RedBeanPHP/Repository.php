@@ -55,7 +55,7 @@ abstract class Repository
 	/**
 	 * Stores a bean and its lists in one run.
 	 *
-	 * @param OODBBean $bean
+	 * @param OODBBean $bean bean to process
 	 *
 	 * @return void
 	 */
@@ -159,8 +159,8 @@ abstract class Repository
 	 * checks if there have been any modification to this bean, in that case
 	 * the bean is stored once again, otherwise the bean will be left untouched.
 	 *
-	 * @param OODBBean $bean       the bean
-	 * @param array            $ownresidue list
+	 * @param OODBBean $bean       bean tor process
+	 * @param array    $ownresidue list to process
 	 *
 	 * @return void
 	 */
@@ -182,14 +182,13 @@ abstract class Repository
 	 * If not, the connection between the bean and the owner bean will be broken by
 	 * setting the ID to NULL.
 	 *
-	 * @param OODBBean $bean        the bean
-	 * @param array            $ownTrashcan list
+	 * @param OODBBean $bean bean   to process
+	 * @param array    $ownTrashcan list to process
 	 *
 	 * @return void
 	 */
 	protected function processTrashcan( $bean, $ownTrashcan )
 	{
-
 		foreach ( $ownTrashcan as $trash ) {
 
 			$myFieldLink = $bean->getMeta( 'type' ) . '_id';
@@ -208,8 +207,8 @@ abstract class Repository
 	/**
 	 * Unassociates the list items in the trashcan.
 	 *
-	 * @param OODBBean $bean           bean
-	 * @param array            $sharedTrashcan list
+	 * @param OODBBean $bean           bean to process
+	 * @param array    $sharedTrashcan list to process
 	 *
 	 * @return void
 	 */
@@ -223,8 +222,8 @@ abstract class Repository
 	/**
 	 * Stores all the beans in the residue group.
 	 *
-	 * @param OODBBean $bean          bean
-	 * @param array            $sharedresidue list
+	 * @param OODBBean $bean          bean to process
+	 * @param array    $sharedresidue list to process
 	 *
 	 * @return void
 	 */
@@ -261,10 +260,12 @@ abstract class Repository
 	 * Converts an embedded bean to an ID, removed the bean property and
 	 * stores the bean in the embedded beans array.
 	 *
-	 * @param array            $embeddedBeans destination array for embedded bean
-	 * @param OODBBean $bean          target bean
-	 * @param string           $property      property that contains the embedded bean
+	 * @param array    $embeddedBeans destination array for embedded bean
+	 * @param OODBBean $bean          target bean to process
+	 * @param string   $property      property that contains the embedded bean
 	 * @param OODBBean $value         embedded bean itself
+	 *
+	 * @return void
 	 */
 	protected function processEmbeddedBean( &$embeddedBeans, $bean, $property, OODBBean $value )
 	{
@@ -281,6 +282,8 @@ abstract class Repository
 	 * Creates a new instance of the bean respository class.
 	 *
 	 * @param QueryWriter $writer the Query Writer to use for this repository
+	 *
+	 * @return void
 	 */
 	public function __construct( OODB $oodb, QueryWriter $writer )
 	{

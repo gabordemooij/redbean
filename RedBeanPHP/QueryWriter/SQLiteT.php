@@ -131,11 +131,11 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * Returns the indexes for type $type.
+	 * Returns the an array describing the indexes for type $type.
 	 *
-	 * @param string $type
+	 * @param string $type type to describe indexes of
 	 *
-	 * @return array $indexInfo index information
+	 * @return array $indexInfo
 	 */
 	protected function getIndexes( $type )
 	{

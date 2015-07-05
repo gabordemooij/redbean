@@ -52,11 +52,10 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	 * later on.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 *
-	 * @param  string $type           type that will have a foreign key field
-	 * @param  string $targetType     points to this type
-	 * @param  string $field          field that contains the foreign key value
-	 * @param  string $targetField    field where the fk points to
+	 * @param  string $type        type that will have a foreign key field
+	 * @param  string $targetType  points to this type
+	 * @param  string $field       field that contains the foreign key value
+	 * @param  string $targetField field where the fk points to
 	 *
 	 * @return void
 	 */

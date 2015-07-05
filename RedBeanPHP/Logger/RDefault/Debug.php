@@ -57,7 +57,7 @@ class Debug extends RDefault implements Logger
 	 * Fills in a value of a binding and truncates the
 	 * resulting string if necessary.
 	 *
-	 * @param mixed $value
+	 * @param mixed $value bound value
 	 *
 	 * @return string
 	 */

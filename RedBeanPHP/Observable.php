@@ -31,7 +31,7 @@ abstract class Observable { //bracket must be here - otherwise coverage software
 	 * Second argument should be the object that wants to be notified in case
 	 * the event occurs.
 	 *
-	 * @param string           $eventname event identifier
+	 * @param string   $eventname event identifier
 	 * @param Observer $observer  observer instance
 	 *
 	 * @return void

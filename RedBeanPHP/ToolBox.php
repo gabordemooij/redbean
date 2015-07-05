@@ -51,11 +51,9 @@ class ToolBox
 	 * the adapter, the query writer and the core functionality of RedBeanPHP in
 	 * OODB.
 	 *
-	 * @param OODB              $oodb    Object Database
-	 * @param DBAdapter $adapter Adapter
-	 * @param QueryWriter       $writer  Writer
-	 *
-	 * @return ToolBox
+	 * @param OODB        $oodb    Object Database, OODB
+	 * @param DBAdapter   $adapter Database Adapter
+	 * @param QueryWriter $writer  Query Writer
 	 */
 	public function __construct( OODB $oodb, Adapter $adapter, QueryWriter $writer )
 	{

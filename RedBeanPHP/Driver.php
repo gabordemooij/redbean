@@ -21,7 +21,7 @@ interface Driver
 	/**
 	 * Runs a query and fetches results as a multi dimensional array.
 	 *
-	 * @param string $sql      SQL to be executed
+	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return array
@@ -31,7 +31,7 @@ interface Driver
 	/**
 	 * Runs a query and fetches results as a column.
 	 *
-	 * @param string $sql      SQL Code to execute
+	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return array
@@ -41,7 +41,7 @@ interface Driver
 	/**
 	 * Runs a query and returns results as a single cell.
 	 *
-	 * @param string $sql      SQL to execute
+	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return mixed
@@ -52,7 +52,7 @@ interface Driver
 	 * Runs a query and returns results as an associative array
 	 * indexed by the first column.
 	 *
-	 * @param string $sql      SQL to execute
+	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return mixed
@@ -63,7 +63,7 @@ interface Driver
 	 * Runs a query and returns a flat array containing the values of
 	 * one row.
 	 *
-	 * @param string $sql      SQL to execute
+	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return array
@@ -80,7 +80,7 @@ interface Driver
 	 * array(":key"=>123) will bind the integer 123 to the key :key in the
 	 * SQL. This method has no return value.
 	 *
-	 * @param string $sql      SQL Code to execute
+	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return array Affected Rows
@@ -106,8 +106,8 @@ interface Driver
 	/**
 	 * Returns a cursor-like object from the database.
 	 *
-	 * @param string $sql      SQL code to execute
-	 * @param array  $bindings Bindings
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
 	 * @return mixed
 	 */
@@ -120,7 +120,7 @@ interface Driver
 	 * passes on to the screen for inspection.
 	 * This method has no return value.
 	 *
-	 * @param boolean $trueFalse turn on/off
+	 * @param boolean $trueFalse TRUE = debug mode ON
 	 *
 	 * @return void
 	 */

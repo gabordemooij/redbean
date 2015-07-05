@@ -32,7 +32,7 @@ interface QueryWriter
 	/**
 	 * SQL filter constants
 	 */
-	const C_SQLFILTER_READ = 'r';
+	const C_SQLFILTER_READ  = 'r';
 	const C_SQLFILTER_WRITE = 'w';
 
 	/**
@@ -104,8 +104,8 @@ interface QueryWriter
 	 * @note A default implementation is available in AQueryWriter
 	 * unless a database uses very different SQL this should suffice.
 	 *
-	 * @param string  $sql   SQL Snippet
-	 * @param integer $glue  the GLUE type - how to glue (C_GLUE_WHERE or C_GLUE_AND)
+	 * @param string  $sql  SQL Snippet
+	 * @param integer $glue the GLUE type - how to glue (C_GLUE_WHERE or C_GLUE_AND)
 	 *
 	 * @return string
 	 */
@@ -196,9 +196,9 @@ interface QueryWriter
 	 * This method will widen the column to the specified data type.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string  $type       type / table that needs to be adjusted
-	 * @param string  $column     column that needs to be altered
-	 * @param integer $datatype   target data type
+	 * @param string  $type     type / table that needs to be adjusted
+	 * @param string  $column   column that needs to be altered
+	 * @param integer $datatype target data type
 	 *
 	 * @return void
 	 */
@@ -309,9 +309,9 @@ interface QueryWriter
 	 * Returns the new ID.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string  $type            name of the table to update
-	 * @param array   $updatevalues    list of update values
-	 * @param integer $id              optional primary key ID value
+	 * @param string  $type         name of the table to update
+	 * @param array   $updatevalues list of update values
+	 * @param integer $id           optional primary key ID value
 	 *
 	 * @return integer
 	 */
@@ -350,7 +350,7 @@ interface QueryWriter
 	 * This method will add a UNIQUE constraint index to a table on columns $columns.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string $type               type
+	 * @param string $type               target bean type
 	 * @param array  $columnsPartOfIndex columns to include in index
 	 *
 	 * @return void
@@ -364,8 +364,8 @@ interface QueryWriter
 	 * a one of the constants defined in this class and then check whether it is in the list
 	 * of standard states provided.
 	 *
-	 * @param string $state sql state
-	 * @param array  $list  list
+	 * @param string $state SQL state to consider
+	 * @param array  $list  list of standardized SQL state constants to check against
 	 *
 	 * @return boolean
 	 */
@@ -451,8 +451,8 @@ interface QueryWriter
 	 * This method also accepts a single associative array as
 	 * its first argument.
 	 *
-	 * @param string|array $fromType
-	 * @param string       $toType (optional)
+	 * @param string|array $fromType original type name, or array
+	 * @param string       $toType   new type name (only if 1st argument is string)
 	 *
 	 * @return void
 	 */

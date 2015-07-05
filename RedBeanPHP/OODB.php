@@ -300,7 +300,7 @@ class OODB extends Observable
 	 * @param string $type       type of beans you are looking for
 	 * @param array  $conditions list of conditions
 	 * @param string $addSQL     SQL to be used in query
-	 * @param array  $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
+	 * @param array  $bindings   a list of values to bind to query parameters
 	 *
 	 * @return array
 	 */
@@ -312,9 +312,9 @@ class OODB extends Observable
 	/**
 	 * Same as find() but returns a BeanCollection.
 	 *
-	 * @param string $type       type of beans you are looking for
-	 * @param string $addSQL     SQL to be used in query
-	 * @param array  $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
+	 * @param string $type     type of beans you are looking for
+	 * @param string $addSQL   SQL to be used in query
+	 * @param array  $bindings a list of values to bind to query parameters
 	 *
 	 * @return array
 	 */
@@ -521,9 +521,9 @@ class OODB extends Observable
 	 * MySQL spatial columns, because they need to be processed first using
 	 * the asText/GeomFromText functions.
 	 *
-	 * @param string $mode (read or write)
-	 * @param string $field
-	 * @param string $function
+	 * @param string $mode     mode to set function for, i.e. read or write
+	 * @param string $field    field (table.column) to bind SQL function to
+	 * @param string $function SQL function to bind to field
 	 */
 	public function bindFunc( $mode, $field, $function )
 	{

@@ -45,7 +45,7 @@ class AssociationManager extends Observable
 	/**
 	 * Handles exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param Exception $exception
+	 * @param Exception $exception exception to handle
 	 *
 	 * @return void
 	 */
@@ -202,9 +202,9 @@ class AssociationManager extends Observable
 	 * SQL snippet for additional filtering.
 	 *
 	 * @param OODBBean|array $bean     a bean object or an array of beans
-	 * @param string                 $type     type of bean you're interested in
-	 * @param string                 $sql      SQL snippet (optional)
-	 * @param array                  $bindings bindings for your SQL string
+	 * @param string         $type     type of bean you're interested in
+	 * @param string         $sql      SQL snippet (optional)
+	 * @param array          $bindings bindings for your SQL string
 	 *
 	 * @return integer
 	 */
@@ -240,9 +240,9 @@ class AssociationManager extends Observable
 	 * set to boolean TRUE this method will remove the beans without their consent,
 	 * bypassing FUSE. This can be used to improve performance.
 	 *
-	 * @param OODBBean $bean1 first bean
-	 * @param OODBBean $bean2 second bean
-	 * @param boolean          $fast  If TRUE, removes the entries by query without FUSE
+	 * @param OODBBean $bean1 first bean in target association
+	 * @param OODBBean $bean2 second bean in target association
+	 * @param boolean  $fast  if TRUE, removes the entries by query without FUSE
 	 *
 	 * @return void
 	 */
@@ -290,7 +290,7 @@ class AssociationManager extends Observable
 	 * with unassociate() instead. (that might be slower though)
 	 *
 	 * @param OODBBean $bean reference bean
-	 * @param string           $type type of beans that need to be unassociated
+	 * @param string   $type type of beans that need to be unassociated
 	 *
 	 * @return void
 	 */
@@ -319,11 +319,10 @@ class AssociationManager extends Observable
 	 * Since 3.2, you can now also pass an array of beans instead just one
 	 * bean as the first parameter.
 	 *
-	 * @param OODBBean|array $bean      the bean you have
-	 * @param string                 $type      the type of beans you want
-	 * @param string                 $sql       SQL snippet for extra filtering
-	 * @param array                  $bindings  values to be inserted in SQL slots
-	 * @param boolean                $glue      whether the SQL should be prefixed with WHERE
+	 * @param OODBBean|array $bean the bean you have
+	 * @param string         $type      the type of beans you want
+	 * @param string         $sql       SQL snippet for extra filtering
+	 * @param array          $bindings  values to be inserted in SQL slots
 	 *
 	 * @return array
 	 */

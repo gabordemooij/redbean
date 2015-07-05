@@ -123,7 +123,7 @@ abstract class AQueryWriter
 	 * Globally available service method for RedBeanPHP.
 	 * Converts a camel cased string to a snake cased string.
 	 *
-	 * @param string $camel a camelCased string
+	 * @param string $camel camelCased string to converty to snake case
 	 *
 	 * @return string
 	 */
@@ -284,7 +284,7 @@ abstract class AQueryWriter
 	 * improve caching efficiency (issue #400).
 	 *
 	 * @param string $cacheTag cache tag (secondary key)
-	 * @param string $key      key
+	 * @param string $key      key to store values under
 	 * @param array  $values   content to be stored
 	 *
 	 * @return void
@@ -311,7 +311,7 @@ abstract class AQueryWriter
 	 *
 	 * @param array  $conditions list of conditions
 	 * @param array  $bindings   parameter bindings for SQL snippet
-	 * @param string $addSql     SQL snippet
+	 * @param string $addSql     additional SQL snippet to append to result
 	 *
 	 * @return string
 	 */
@@ -510,9 +510,9 @@ abstract class AQueryWriter
 	 * If you pass an offset the bindings will be re-added to the value list.
 	 * Some databases cant handle duplicate parameter names in queries.
 	 *
-	 * @param array   &$valueList     list of values to generate slots for (gets modified if needed)
-	 * @param array   $otherBindings  list of additional bindings
-	 * @param integer $offset         start counter at...
+	 * @param array   &$valueList    list of values to generate slots for (gets modified if needed)
+	 * @param array   $otherBindings list of additional bindings
+	 * @param integer $offset        start counter at...
 	 *
 	 * @return string
 	 */

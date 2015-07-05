@@ -65,7 +65,7 @@ class TagManager
 	 * Finds a tag bean by it's title.
 	 * Internal method.
 	 *
-	 * @param string $title title
+	 * @param string $title title to search for
 	 *
 	 * @return OODBBean
 	 */
@@ -87,7 +87,7 @@ class TagManager
 	 * The tag manager offers an easy way to quickly implement basic tagging
 	 * functionality.
 	 *
-	 * @param ToolBox $toolbox
+	 * @param ToolBox $toolbox toolbox object
 	 */
 	public function __construct( ToolBox $toolbox )
 	{
@@ -109,9 +109,9 @@ class TagManager
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
-	 * @param  OODBBean $bean bean to check for tags
-	 * @param  array|string     $tags list of tags
-	 * @param  boolean          $all  whether they must all match or just some
+	 * @param  OODBBean     $bean bean to check for tags
+	 * @param  array|string $tags list of tags
+	 * @param  boolean      $all  whether they must all match or just some
 	 *
 	 * @return boolean
 	 */
@@ -136,8 +136,8 @@ class TagManager
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
-	 * @param  OODBBean $bean    tagged bean
-	 * @param  array|string     $tagList list of tags (names)
+	 * @param  OODBBean     $bean    tagged bean
+	 * @param  array|string $tagList list of tags (names)
 	 *
 	 * @return void
 	 */
@@ -163,8 +163,8 @@ class TagManager
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
-	 * @param OODBBean $bean    bean to be tagged
-	 * @param array|string     $tagList a list of tags
+	 * @param OODBBean     $bean    bean to be tagged
+	 * @param array|string $tagList a list of tags
 	 *
 	 * @return array
 	 */
@@ -197,8 +197,8 @@ class TagManager
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
-	 * @param OODBBean $bean    bean to add tags to
-	 * @param array|string     $tagList list of tags to add to bean
+	 * @param OODBBean     $bean    bean to add tags to
+	 * @param array|string $tagList list of tags to add to bean
 	 *
 	 * @return void
 	 */
