@@ -354,7 +354,6 @@ abstract class Repository
 	 * @param array  $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
 	 *
 	 * @return array
-	 *
 	 */
 	public function find( $type, $conditions = array(), $sql = NULL, $bindings = array() )
 	{

@@ -524,6 +524,8 @@ class OODB extends Observable
 	 * @param string $mode     mode to set function for, i.e. read or write
 	 * @param string $field    field (table.column) to bind SQL function to
 	 * @param string $function SQL function to bind to field
+	 *
+	 * @return void
 	 */
 	public function bindFunc( $mode, $field, $function )
 	{

@@ -194,7 +194,9 @@ abstract class AQueryWriter
 	 * This is a lowlevel method. For a more friendly method
 	 * please take a look at the facade: R::bindFunc().
 	 *
-	 * @param array
+	 * @param array list of filters to set
+	 *
+	 * @return void
 	 */
 	public static function setSQLFilters( $sqlFilters, $safeMode = false )
 	{
@@ -1104,6 +1106,8 @@ abstract class AQueryWriter
 	 * use a result row cache.
 	 *
 	 * @param boolean
+	 *
+	 * @return void
 	 */
 	public function setUseCache( $yesNo )
 	{

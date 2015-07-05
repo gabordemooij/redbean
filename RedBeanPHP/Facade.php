@@ -984,7 +984,7 @@ class Facade
 	 * @param    boolean        $parents whether you want parent beans to be exported
 	 * @param    array          $filters whitelist of types
 	 *
-	 * @return    array
+	 * @return array
 	 */
 	public static function exportAll( $beans, $parents = FALSE, $filters = array())
 	{
@@ -1660,7 +1660,6 @@ class Facade
 	 * @param OODBBean|array $data either a bean or an array of beans
 	 *
 	 * @return array
-	 *
 	 */
 	public static function dump( $data )
 	{
@@ -1704,6 +1703,7 @@ class Facade
 	 * @param string $field    field (table.column) to bind function to
 	 * @param string $function SQL function to bind to specified column
 	 *
+	 * @return void
 	 */
 	public static function bindFunc( $mode, $field, $function )
 	{
@@ -1857,6 +1857,8 @@ class Facade
 	 *
 	 * @param string   $pluginName name of the method to call the plugin
 	 * @param callable $callable   a PHP callable
+	 *
+	 * @return void
 	 */
 	public static function ext( $pluginName, $callable )
 	{

@@ -530,7 +530,7 @@ class RPDO implements Driver
 	/**
 	 * Returns the version number of the database.
 	 *
-	 * @return mixed $version version number of the database
+	 * @return mixed
 	 */
 	public function getDatabaseVersion()
 	{

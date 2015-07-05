@@ -27,7 +27,7 @@ class SQL extends RedException
 	/**
 	 * Returns an ANSI-92 compliant SQL state.
 	 *
-	 * @return string $state ANSI state code
+	 * @return string
 	 */
 	public function getSQLState()
 	{
@@ -50,7 +50,7 @@ class SQL extends RedException
 	/**
 	 * To String prints both code and SQL state.
 	 *
-	 * @return string $message prints this exception instance as a string
+	 * @return string
 	 */
 	public function __toString()
 	{

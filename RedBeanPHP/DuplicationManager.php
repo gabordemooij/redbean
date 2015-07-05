@@ -335,6 +335,8 @@ class DuplicationManager
 	 * the default behavior.
 	 *
 	 * @param array $filters list of tables to be filtered
+	 *
+	 * @return void
 	 */
 	public function setFilters( $filters )
 	{

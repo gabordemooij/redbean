@@ -55,7 +55,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	 *
 	 * @param string $type type you want to get info of
 	 *
-	 * @return array $info
+	 * @return array
 	 */
 	protected function getTable( $type )
 	{
@@ -83,6 +83,8 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	 * then store it with putTable()...
 	 *
 	 * @param array $tableMap information array
+	 *
+	 * @return void
 	 */
 	protected function putTable( $tableMap )
 	{
@@ -135,7 +137,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	 *
 	 * @param string $type type to describe indexes of
 	 *
-	 * @return array $indexInfo
+	 * @return array
 	 */
 	protected function getIndexes( $type )
 	{
@@ -153,7 +155,9 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * Adds a foreign key to a type
+	 * Adds a foreign key to a type.
+	 * Note: cant put this in try-catch because that can hide the fact
+	 * that database has been damaged.
 	 *
 	 * @param  string  $type        type you want to modify table of
 	 * @param  string  $targetType  target type
@@ -161,10 +165,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	 * @param  string  $targetField field where the fk needs to point to
 	 * @param  integer $buildopt    0 = NO ACTION, 1 = ON DELETE CASCADE
 	 *
-	 * @return boolean $didIt
-	 *
-	 * @note: cant put this in try-catch because that can hide the fact
-	 *      that database has been damaged.
+	 * @return boolean
 	 */
 	protected function buildFK( $type, $targetType, $property, $targetProperty, $constraint = FALSE )
 	{

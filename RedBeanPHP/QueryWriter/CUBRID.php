@@ -136,7 +136,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	 * This method returns the datatype to be used for primary key IDS and
 	 * foreign keys. Returns one if the data type constants.
 	 *
-	 * @return integer $const data type to be used for IDS.
+	 * @return integer
 	 */
 	public function getTypeForID()
 	{
