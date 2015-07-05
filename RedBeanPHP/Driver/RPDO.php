@@ -166,7 +166,7 @@ class RPDO implements Driver
 			} else {
 				$this->resultArray = array();
 			}
-		} catch (\PDOException $e ) {
+		} catch ( \PDOException $e ) {
 			//Unfortunately the code field is supposed to be int by default (php)
 			//So we need a property to convey the SQL State code.
 			$err = $e->getMessage();
@@ -182,11 +182,13 @@ class RPDO implements Driver
 	 * MySQL < 5.5 does not support proper 4 byte unicode but they
 	 * seem to have added it with version 5.5 under a different label: utf8mb4.
 	 * We try to select the best possible charset based on your version data.
+	 *
+	 * @return void
 	 */
 	protected function setEncoding()
 	{
-		$driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME );
-		$version = floatval( $this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION ) );
+		$driver = $this->pdo->getAttribute( \PDO::ATTR_DRIVER_NAME );
+		$version = floatval( $this->pdo->getAttribute( \PDO::ATTR_SERVER_VERSION ) );
 		if ($driver === 'mysql') {
 			$encoding = ($version >= 5.5) ? 'utf8mb4' : 'utf8';
 			$this->pdo->setAttribute(\PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '.$encoding ); //on every re-connect
@@ -207,6 +209,7 @@ class RPDO implements Driver
 	 * @param string        $user optional, usename to sign in
 	 * @param string        $pass optional, password for connection login
 	 *
+	 * @return void
 	 */
 	public function __construct( $dsn, $user = NULL, $pass = NULL )
 	{
@@ -214,8 +217,8 @@ class RPDO implements Driver
 			$this->pdo = $dsn;
 			$this->isConnected = TRUE;
 			$this->setEncoding();
-			$this->pdo->setAttribute(\PDO::ATTR_ERRMODE,\PDO::ERRMODE_EXCEPTION );
-			$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE,\PDO::FETCH_ASSOC );
+			$this->pdo->setAttribute( \PDO::ATTR_ERRMODE,\PDO::ERRMODE_EXCEPTION );
+			$this->pdo->setAttribute( \PDO::ATTR_DEFAULT_FETCH_MODE,\PDO::FETCH_ASSOC );
 			// make sure that the dsn at least contains the type
 			$this->dsn = $this->getDatabaseType();
 		} else {
@@ -547,7 +550,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Closes database connection by destructing\PDO.
+	 * Closes database connection by destructing PDO.
 	 *
 	 * @return void
 	 */

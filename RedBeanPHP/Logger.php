@@ -20,7 +20,7 @@ interface Logger
 {
 
 	/**
-	 * A logger (for\PDO or OCI driver) needs to implement the log method.
+	 * A logger (for PDO or OCI driver) needs to implement the log method.
 	 * The log method will receive logging data. Note that the number of parameters is 0, this means
 	 * all parameters are optional and the number may vary. This way the logger can be used in a very
 	 * flexible way. Sometimes the logger is used to log a simple error message and in other
