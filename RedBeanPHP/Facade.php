@@ -230,8 +230,8 @@ class Facade
 
 	/**
 	 * Starts a transaction within a closure (or other valid callback).
-	 * If an\Exception is thrown inside, the operation is automatically rolled back.
-	 * If no\Exception happens, it commits automatically.
+	 * If an Exception is thrown inside, the operation is automatically rolled back.
+	 * If no Exception happens, it commits automatically.
 	 * It also supports (simulated) nested transactions (that is useful when
 	 * you have many methods that needs transactions but are unaware of
 	 * each other).
@@ -274,7 +274,7 @@ class Facade
 			if ( $depth == 0 ) {
 				self::commit();
 			}
-		} catch (\Exception $exception ) {
+		} catch ( \Exception $exception ) {
 			$depth--;
 			if ( $depth == 0 ) {
 				self::rollback();
