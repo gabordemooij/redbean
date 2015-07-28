@@ -13,6 +13,7 @@ use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 use RedBeanPHP\Repository as Repository;
 use RedBeanPHP\Repository\Fluid as FluidRepo;
 use RedBeanPHP\Repository\Frozen as FrozenRepo;
+use RedBeanPHP\RedException as RedException;
 
 /**
  * Toolbox
@@ -27,6 +28,22 @@ use RedBeanPHP\Repository\Frozen as FrozenRepo;
  * with this source code in the file license.txt.
  */
 class Toolbox extends Blackhole {
+
+	/**
+	 * Github issue #458, selectDatabase causes PHP notice undefined index
+	 * if database key not found.
+	 *
+	 * @return void
+	 */
+	public function testInvalidDB()
+	{
+		try {
+			R::selectDatabase( 'idontexist' );
+			fail();
+		} catch ( RedException $exception ) {
+			pass();
+		}
+	}
 
 	/**
 	 * Test whether we can obtain a toolbox properly.

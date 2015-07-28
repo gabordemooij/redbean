@@ -357,6 +357,10 @@ class Facade
 			return FALSE;
 		}
 
+		if ( !isset( self::$toolboxes[$key] ) ) {
+			throw new RedException( 'Database not found in registry. Add database using R::addDatabase().' );
+		}
+
 		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 		self::$currentDB = $key;
 
