@@ -66,7 +66,7 @@ class RDefault implements Logger
 				}
 			}
 
-			if ( $this->mode === self::C_LOGGER_ECHO ) echo "<br>\n";
+			if ( $this->mode === self::C_LOGGER_ECHO ) echo "<br>" . PHP_EOL;
 		}
 	}
 
