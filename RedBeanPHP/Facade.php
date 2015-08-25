@@ -29,7 +29,7 @@ use RedBeanPHP\Driver\RPDO as RPDO;
  * RedBean Facade
  *
  * Version Information
- * RedBean Version @version 4.2
+ * RedBean Version @version 4.3
  *
  * This class hides the object landscape of
  * RedBeanPHP behind a single letter class providing
@@ -49,7 +49,7 @@ class Facade
 	/**
 	 * RedBeanPHP version constant.
 	 */
-	const C_REDBEANPHP_VERSION = '4.2';
+	const C_REDBEANPHP_VERSION = '4.3';
 
 	/**
 	 * @var ToolBox
