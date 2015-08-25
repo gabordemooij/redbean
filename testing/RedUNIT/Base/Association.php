@@ -170,6 +170,14 @@ class Association extends Base
 
 		R::storeAll( array( $author, $bio ) );
 
+		$x = $author->one( 'bio' );
+		$y = $bio->one('author');
+
+		asrt( $x->name, $bio->name );
+		asrt( $y->name, $author->name );
+		asrt( $x->id, $bio->id );
+		asrt( $y->id, $author->id );
+
 		$id2 = $author->id;
 
 		list( $a, $b ) = R::loadMulti( 'author,bio', $id1 );

@@ -1627,6 +1627,19 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
+	 * Returns a bean of the given type with the same ID of as
+	 * the current one. This only happens in a one-to-one relation.
+	 * This is as far as support for 1-1 goes in RedBeanPHP. This
+	 * method will only return a reference to the bean, changing it
+	 * and storing the bean will not update the related one-bean.
+	 *
+	 * @return OODBBean
+	 */
+	public function one( $type ) {
+		return $this->beanHelper->getToolBox()->getRedBean()->load( $type, $this->id );
+	}
+
+	/**
 	 * Returns the same bean freshly loaded from the database.
 	 *
 	 * @return OODBBean
