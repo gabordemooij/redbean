@@ -122,20 +122,22 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * What to do if a FUSE model method does not exist?
 	 * You can set the following options:
 	 *
-	 * OODBBean::C_ERR_IGNORE (default), ignores the call, returns NULL
-	 * OODBBean::C_ERR_LOG, logs the incident using error_log
-	 * OODBBean::C_ERR_NOTICE, triggers a E_USER_NOTICE
-	 * OODBBean::C_ERR_WARN, triggers a E_USER_WARNING
-	 * OODBBean::C_ERR_EXCEPTION, throws an exception
-	 * OODBBean::C_ERR_FUNC, allows you to specify a custom handler (function)
-	 * OODBBean::C_ERR_FATAL, triggers a E_USER_ERROR
+	 * * OODBBean::C_ERR_IGNORE (default), ignores the call, returns NULL
+	 * * OODBBean::C_ERR_LOG, logs the incident using error_log
+	 * * OODBBean::C_ERR_NOTICE, triggers a E_USER_NOTICE
+	 * * OODBBean::C_ERR_WARN, triggers a E_USER_WARNING
+	 * * OODBBean::C_ERR_EXCEPTION, throws an exception
+	 * * OODBBean::C_ERR_FUNC, allows you to specify a custom handler (function)
+	 * * OODBBean::C_ERR_FATAL, triggers a E_USER_ERROR
 	 *
+	 * <code>
 	 * Custom handler method signature: handler( array (
 	 * 	'message' => string
 	 * 	'bean' => OODBBean
 	 * 	'method' => string
 	 * ) )
 	 *
+	 * </code>
 	 * This method returns the old mode and handler as an array.
 	 *
 	 * @param integer       $mode error handling mode
