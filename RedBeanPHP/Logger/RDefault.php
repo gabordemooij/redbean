@@ -97,8 +97,8 @@ class RDefault implements Logger
 	 * Selects a logging mode.
 	 * There are several options available.
 	 *
-	 * C_LOGGER_ARRAY - log silently, stores entries in internal log array only
-	 * C_LOGGER_ECHO  - also forward log messages directly to STDOUT
+	 * * C_LOGGER_ARRAY - log silently, stores entries in internal log array only
+	 * * C_LOGGER_ECHO  - also forward log messages directly to STDOUT
 	 *
 	 * @param integer $mode mode of operation for logging object
 	 *

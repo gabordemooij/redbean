@@ -235,22 +235,24 @@ class Facade
 	 * It also supports (simulated) nested transactions (that is useful when
 	 * you have many methods that needs transactions but are unaware of
 	 * each other).
-	 * ex:
-	 *        $from = 1;
-	 *        $to = 2;
-	 *        $amount = 300;
 	 *
-	 *        R::transaction(function() use($from, $to, $amount)
-	 *        {
-	 *            $accountFrom = R::load('account', $from);
-	 *            $accountTo = R::load('account', $to);
+	 * Example:
 	 *
-	 *            $accountFrom->money -= $amount;
-	 *            $accountTo->money += $amount;
+	 * <code>
+	 * $from = 1;
+	 * $to = 2;
+	 * $amount = 300;
 	 *
-	 *            R::store($accountFrom);
-	 *            R::store($accountTo);
-	 *      });
+	 * R::transaction(function() use($from, $to, $amount)
+	 * {
+	 *   $accountFrom = R::load('account', $from);
+	 *   $accountTo = R::load('account', $to);
+	 *   $accountFrom->money -= $amount;
+	 *   $accountTo->money += $amount;
+	 *   R::store($accountFrom);
+	 *   R::store($accountTo);
+	 * });
+	 * </code>
 	 *
 	 * @param callable $callback Closure (or other callable) with the transaction logic
 	 *
@@ -290,8 +292,10 @@ class Facade
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * R::addDatabase( 'database-1', 'sqlite:/tmp/db1.txt' );
 	 * R::selectDatabase( 'database-1' ); //to select database again
+	 * </code>
 	 *
 	 * This method allows you to dynamically add (and select) new databases
 	 * to the facade. Adding a database with the same key will cause an exception.
@@ -552,7 +556,7 @@ class Facade
 	 *
 	 * @param string|array $typeOrBeanArray   type or bean array to import
 	 * @param integer      $number            number of beans to dispense
-	 * @param boolean	     $alwaysReturnArray if TRUE always returns the result as an array
+	 * @param boolean	   $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return array|OODBBean
 	 */
@@ -594,14 +598,18 @@ class Facade
 	 *
 	 * Usage:
 	 *
-	 * list($book, $page, $text) = R::dispenseAll('book,page,text');
+	 * <code>
+	 * list( $book, $page, $text ) = R::dispenseAll( 'book,page,text' );
+	 * </code>
 	 *
 	 * This will dispense a book, a page and a text. This way you can
 	 * quickly dispense beans of various types in just one line of code.
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * list($book, $pages) = R::dispenseAll('book,page*100');
+	 * </code>
 	 *
 	 * This returns an array with a book bean and then another array
 	 * containing 100 page beans.
@@ -951,9 +959,9 @@ class Facade
 	 * Makes a deep copy of a bean. This method makes a deep copy
 	 * of the bean.The copy will have the following:
 	 *
-	 * - All beans in own-lists will be duplicated as well
-	 * - All references to shared beans will be copied but not the shared beans themselves
-	 * - All references to parent objects (_id fields) will be copied but not the parents themselves
+	 * * All beans in own-lists will be duplicated as well
+	 * * All references to shared beans will be copied but not the shared beans themselves
+	 * * All references to parent objects (_id fields) will be copied but not the parents themselves
 	 *
 	 * In most cases this is the desired scenario for copying beans.
 	 * This function uses a trail-array to prevent infinite recursion, if a recursive bean is found
@@ -980,9 +988,10 @@ class Facade
 	 * Exports a collection of beans. Handy for XML/JSON exports with a
 	 * Javascript framework like Dojo or ExtJS.
 	 * What will be exported:
-	 * - contents of the bean
-	 * - all own bean lists (recursively)
-	 * - all shared beans (not THEIR own lists)
+	 *
+	 * * contents of the bean
+	 * * all own bean lists (recursively)
+	 * * all shared beans (not THEIR own lists)
 	 *
 	 * @param    array|OODBBean $beans   beans to be exported
 	 * @param    boolean        $parents whether you want parent beans to be exported
@@ -1000,9 +1009,9 @@ class Facade
 	 * This will determine the case style for the keys of exported beans (see exportAll).
 	 * The following options are accepted:
 	 *
-	 * 'default' RedBeanPHP by default enforces Snake Case (i.e. book_id is_valid )
-	 * 'camel'   Camel Case   (i.e. bookId isValid   )
-	 * 'dolphin' Dolphin Case (i.e. bookID isValid   ) Like CamelCase but ID is written all uppercase
+	 * * 'default' RedBeanPHP by default enforces Snake Case (i.e. book_id is_valid )
+	 * * 'camel'   Camel Case   (i.e. bookId isValid   )
+	 * * 'dolphin' Dolphin Case (i.e. bookID isValid   ) Like CamelCase but ID is written all uppercase
 	 *
 	 * @warning RedBeanPHP transforms camelCase to snake_case using a slightly different
 	 * algorithm, it also converts isACL to is_acl (not is_a_c_l) and bookID to book_id.
@@ -1390,7 +1399,9 @@ class Facade
 	 *
 	 * To obtain (and add if necessary) an ENUM value:
 	 *
+	 * <code>
 	 * $tea->flavour = R::enum( 'flavour:apple' );
+	 * </code>
 	 *
 	 * Returns a bean of type 'flavour' with  name = apple.
 	 * This will add a bean with property name (set to APPLE) to the database
@@ -1398,11 +1409,15 @@ class Facade
 	 *
 	 * To obtain all flavours:
 	 *
+	 * <code>
 	 * R::enum('flavour');
+	 * </code>
 	 *
 	 * To get a list of all flavour names:
 	 *
+	 * <code>
 	 * R::gatherLabels( R::enum( 'flavour' ) );
+	 * </code>
 	 *
 	 * @param string $enum either type or type-value
 	 *
@@ -1574,10 +1589,10 @@ class Facade
 	 *
 	 * Returns the components in the following order:
 	 *
-	 * 0 - OODB instance (getRedBean())
-	 * 1 - Database Adapter
-	 * 2 - Query Writer
-	 * 3 - Toolbox itself
+	 * # OODB instance (getRedBean())
+	 * # Database Adapter
+	 * # Query Writer
+	 * # Toolbox itself
 	 *
 	 * @return array
 	 */
@@ -1629,19 +1644,21 @@ class Facade
 	 * What to do if a FUSE model method does not exist?
 	 * You can set the following options:
 	 *
-	 * OODBBean::C_ERR_IGNORE (default), ignores the call, returns NULL
-	 * OODBBean::C_ERR_LOG, logs the incident using error_log
-	 * OODBBean::C_ERR_NOTICE, triggers a E_USER_NOTICE
-	 * OODBBean::C_ERR_WARN, triggers a E_USER_WARNING
-	 * OODBBean::C_ERR_EXCEPTION, throws an exception
-	 * OODBBean::C_ERR_FUNC, allows you to specify a custom handler (function)
-	 * OODBBean::C_ERR_FATAL, triggers a E_USER_ERROR
+	 * * OODBBean::C_ERR_IGNORE (default), ignores the call, returns NULL
+	 * * OODBBean::C_ERR_LOG, logs the incident using error_log
+	 * * OODBBean::C_ERR_NOTICE, triggers a E_USER_NOTICE
+	 * * OODBBean::C_ERR_WARN, triggers a E_USER_WARNING
+	 * * OODBBean::C_ERR_EXCEPTION, throws an exception
+	 * * OODBBean::C_ERR_FUNC, allows you to specify a custom handler (function)
+	 * * OODBBean::C_ERR_FATAL, triggers a E_USER_ERROR
 	 *
+	 * <code>
 	 * Custom handler method signature: handler( array (
 	 * 	'message' => string
 	 * 	'bean' => OODBBean
 	 * 	'method' => string
 	 * ) )
+	 * </code>
 	 *
 	 * This method returns the old mode and handler as an array.
 	 *
@@ -1697,8 +1714,10 @@ class Facade
 	 *
 	 * Example:
 	 *
+	 * <code>
 	 * R::bindFunc( 'read', 'location.point', 'asText' );
 	 * R::bindFunc( 'write', 'location.point', 'GeomFromText' );
+	 * </code>
 	 *
 	 * Passing NULL as the function will reset (clear) the function
 	 * for this column/mode.
@@ -1853,11 +1872,15 @@ class Facade
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * R::ext( 'makeTea', function() { ... }  );
+	 * </code>
 	 *
 	 * Now you can use your makeTea plugin like this:
 	 *
+	 * <code>
 	 * R::makeTea();
+	 * </code>
 	 *
 	 * @param string   $pluginName name of the method to call the plugin
 	 * @param callable $callable   a PHP callable

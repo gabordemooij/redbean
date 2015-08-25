@@ -286,10 +286,12 @@ class OODB extends Observable
 	 *
 	 * Conditions need to take form:
 	 *
+	 * <code>
 	 * array(
 	 *    'PROPERTY' => array( POSSIBLE VALUES... 'John', 'Steve' )
 	 *    'PROPERTY' => array( POSSIBLE VALUES... )
 	 * );
+	 * </code>
 	 *
 	 * All conditions are glued together using the AND-operator, while all value lists
 	 * are glued using IN-operators thus acting as OR-conditions.

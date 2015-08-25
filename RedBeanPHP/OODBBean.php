@@ -136,8 +136,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * 	'bean' => OODBBean
 	 * 	'method' => string
 	 * ) )
-	 *
 	 * </code>
+	 *
 	 * This method returns the old mode and handler as an array.
 	 *
 	 * @param integer       $mode error handling mode
@@ -392,7 +392,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * Returns an\ArrayIterator so you can treat the bean like
+	 * Returns an ArrayIterator so you can treat the bean like
 	 * an array with the properties container as its contents.
 	 * This method is meant for PHP and allows you to access beans as if
 	 * they were arrays, i.e. using array notation:
@@ -638,7 +638,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * issue the following command: $book->ownPage
 	 * However, to order these pages by number use:
 	 *
+	 * <code>
 	 * $book->with(' ORDER BY `number` ASC ')->ownPage
+	 * </code>
 	 *
 	 * the additional SQL snippet will be merged into the final
 	 * query.
@@ -684,8 +686,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * $bean->with( ' LIMIT 3 ' )->ownPage; //Just 3
 	 * $bean->all()->ownPage; //Reload all pages
+	 * </code>
 	 *
 	 * @return self
 	 */
@@ -715,16 +719,22 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * case, so to the project has a teacher_id pointing to a person, and a student_id
 	 * also pointing to a person. Given a project, we obtain the teacher like this:
 	 *
+	 * <code>
 	 * $project->fetchAs('person')->teacher;
+	 * </code>
 	 *
 	 * Now, if we want all projects of a teacher we cant say:
 	 *
+	 * <code>
 	 * $teacher->ownProject
+	 * </code>
 	 *
 	 * because the $teacher is a bean of type 'person' and no project has been
 	 * assigned to a person. Instead we use the alias() method like this:
 	 *
+	 * <code>
 	 * $teacher->alias('teacher')->ownProject
+	 * </code>
 	 *
 	 * now we get the projects associated with the person bean aliased as
 	 * a teacher.
@@ -772,8 +782,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Turns a camelcase property name into an underscored property name.
 	 *
 	 * Examples:
-	 *    oneACLRoute -> one_acl_route
-	 *    camelCase -> camel_case
+	 *
+	 * * oneACLRoute -> one_acl_route
+	 * * camelCase -> camel_case
 	 *
 	 * Also caches the result to improve performance.
 	 *
@@ -1100,7 +1111,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Example:
 	 *
+	 * <code>
 	 * $bean->setMeta( 'flush-cache', TRUE );
+	 * </code>
 	 *
 	 * RedBeanPHP also stores meta data in beans, this meta data uses
 	 * keys prefixed with 'sys.' (system).
@@ -1564,11 +1577,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * $album->link('track', array('number'=>1))->song = $song;
+	 * </code>
 	 *
 	 * or:
 	 *
+	 * <code>
 	 * $album->link($trackBean)->song = $song;
+	 * </code>
 	 *
 	 * What this method does is adding the link bean to the own-list, in this case
 	 * ownTrack. If the first argument is a string and the second is an array or
@@ -1727,7 +1744,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Example:
 	 *
+	 * <code>
 	 * $quest->aggr( 'xownQuestTarget', 'target', 'quest' );
+	 * </code>
 	 *
 	 * Loads (in batch) and returns references to all
 	 * quest beans residing in the $questTarget->target properties

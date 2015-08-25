@@ -250,8 +250,8 @@ class TagManager
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
-	 * @param string        $beanType type of bean you are looking for
-	 * @param array|string  $tagList  list of tags to match
+	 * @param string       $beanType type of bean you are looking for
+	 * @param array|string $tagList  list of tags to match
 	 *
 	 * @return array
 	 */

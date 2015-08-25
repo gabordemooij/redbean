@@ -172,6 +172,7 @@ abstract class AQueryWriter
 	 * This is a lowlevel method to set the SQL filter array.
 	 * The format of this array is:
 	 *
+	 * <code>
 	 * array(
 	 * 		'<MODE, i.e. 'r' for read, 'w' for write>' => array(
 	 * 			'<TABLE NAME>' => array(
@@ -179,15 +180,18 @@ abstract class AQueryWriter
 	 * 			)
 	 * 		)
 	 * )
+	 * </code>
 	 *
 	 * Example:
 	 *
+	 * <code>
 	 * array(
-	 * QueryWriter::C_SQLFILTER_READ => array(
+	 *   QueryWriter::C_SQLFILTER_READ => array(
 	 * 	'book' => array(
 	 * 		'title' => ' LOWER(book.title) '
 	 * 	)
 	 * )
+	 * </code>
 	 *
 	 * Note that you can use constants instead of magical chars
 	 * as keys for the uppermost array.
@@ -305,11 +309,13 @@ abstract class AQueryWriter
 	/**
 	 * Creates an SQL snippet from a list of conditions of format:
 	 *
+	 * <code>
 	 * array(
 	 *    key => array(
 	 *           value1, value2, value3 ....
 	 *        )
 	 * )
+	 * </code>
 	 *
 	 * @param array  $conditions list of conditions
 	 * @param array  $bindings   parameter bindings for SQL snippet
@@ -436,6 +442,7 @@ abstract class AQueryWriter
 	 * A foreign key map describes the foreign keys in a table.
 	 * A FKM always has the same structure:
 	 *
+	 * <code>
 	 * array(
 	 * 	'name'      => <name of the foreign key>
 	 *    'from'      => <name of the column on the source table>
@@ -444,6 +451,7 @@ abstract class AQueryWriter
 	 *    'on_update' => <update rule: 'SET NULL','CASCADE' or 'RESTRICT'>
 	 *    'on_delete' => <delete rule: 'SET NULL','CASCADE' or 'RESTRICT'>
 	 * )
+	 * </code>
 	 *
 	 * @note the keys in the result array are FKDLs, i.e. descriptive unique
 	 * keys per source table. Also see: AQueryWriter::makeFKLabel for details.

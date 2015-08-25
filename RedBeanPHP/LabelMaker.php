@@ -45,7 +45,9 @@ class LabelMaker
 	 * values of the array will be assigned to the name property of each
 	 * individual bean.
 	 *
+	 * <code>
 	 * $people = R::dispenseLabels( 'person', [ 'Santa', 'Claus' ] );
+	 * </code>
 	 *
 	 * @param string $type   type of beans you would like to have
 	 * @param array  $labels list of labels, names for each bean
@@ -72,9 +74,11 @@ class LabelMaker
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * $o1->name = 'hamburger';
 	 * $o2->name = 'pizza';
 	 * implode( ',', R::gatherLabels( [ $o1, $o2 ] ) ); //hamburger,pizza
+	 * </code>
 	 *
 	 * Note that the return value is an array of strings, not beans.
 	 *
@@ -99,22 +103,30 @@ class LabelMaker
 	 * Fetches an ENUM from the database and creates it if necessary.
 	 * An ENUM has the following format:
 	 *
+	 * <code>
 	 * ENUM:VALUE
+	 * </code>
 	 *
 	 * If you pass 'ENUM' only, this method will return an array of its
 	 * values:
 	 *
+	 * <code>
 	 * implode( ',', R::gatherLabels( R::enum( 'flavour' ) ) ) //'BANANA,MOCCA'
+	 * </code>
 	 *
 	 * If you pass 'ENUM:VALUE' this method will return the specified enum bean
 	 * and create it in the database if it does not exist yet:
 	 *
+	 * <code>
 	 * $bananaFlavour = R::enum( 'flavour:banana' );
 	 * $bananaFlavour->name;
+	 * </code>
 	 *
 	 * So you can use this method to set an ENUM value in a bean:
 	 *
+	 * <code>
 	 * $shake->flavour = R::enum( 'flavour:banana' );
+	 * </code>
 	 *
 	 * the property flavour now contains the enum bean, a parent bean.
 	 * In the database, flavour_id will point to the flavour record with name 'banana'.

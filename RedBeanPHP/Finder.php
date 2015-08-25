@@ -250,9 +250,11 @@ class Finder
 	 *
 	 * Example:
 	 *
+	 * <code>
 	 * $stuff = $finder->findMulti('movie,review', '
 	 *          SELECT movie.*, review.* FROM movie
 	 *          LEFT JOIN review ON review.movie_id = movie.id');
+	 * </code>
 	 *
 	 * After this operation, $stuff will contain an entry 'movie' containing all
 	 * movies and an entry named 'review' containing all reviews (all beans).
@@ -265,18 +267,21 @@ class Finder
 	 * The remapping argument (optional) should contain an array of arrays.
 	 * Each array in the remapping array should contain the following entries:
 	 *
+	 * <code>
 	 * array(
 	 * 	'a'       => TYPE A
 	 *    'b'       => TYPE B
 	 *    'matcher' => MATCHING FUNCTION ACCEPTING A, B and ALL BEANS
 	 *    'do'      => OPERATION FUNCTION ACCEPTING A, B, ALL BEANS, ALL REMAPPINGS
 	 * )
+	 * </code>
 	 *
 	 * Using this mechanism you can build your own 'preloader' with tiny function
 	 * snippets (and those can be re-used and shared online of course).
 	 *
 	 * Example:
 	 *
+	 * <code>
 	 * array(
 	 * 	'a'       => 'movie'     //define A as movie
 	 *    'b'       => 'review'    //define B as review
@@ -288,6 +293,7 @@ class Finder
 	 *       $a->clearHistory();                 //optional, act 'as if these beans have been loaded through ownReviewList'.
 	 *    }
 	 * )
+	 * </code>
 	 *
 	 * The Query Template parameter is optional as well but can be used to
 	 * set a different SQL template (sprintf-style) for processing the original query.
