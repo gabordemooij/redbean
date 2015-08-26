@@ -470,7 +470,7 @@ class Facade
 	 */
 	public static function loadMulti( $types, $id )
 	{
-		return MultiLoader::load( self::$oodb, $types, $id );
+		return MultiLoader::load( self::$redbean, $types, $id );
 	}
 
 	/**
