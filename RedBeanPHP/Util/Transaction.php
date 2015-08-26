@@ -5,6 +5,7 @@ namespace RedBeanPHP\Util;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\Adapter as Adapter;
 
 /**
  * Transaction Helper
@@ -54,11 +55,12 @@ class Transaction
 	 * });
 	 * </code>
 	 *
+	 * @param Adapter  $adapter  Database Adapter providing transaction mechanisms.
 	 * @param callable $callback Closure (or other callable) with the transaction logic
 	 *
 	 * @return mixed
 	 */
-	public static function transaction( $callback )
+	public static function transaction( Adapter $adapter, $callback )
 	{
 		if ( !is_callable( $callback ) ) {
 			throw new RedException( 'R::transaction needs a valid callback.' );
@@ -68,18 +70,18 @@ class Transaction
 		$result = null;
 		try {
 			if ( $depth == 0 ) {
-				self::begin();
+				$adapter->begin();
 			}
 			$depth++;
 			$result = call_user_func( $callback ); //maintain 5.2 compatibility
 			$depth--;
 			if ( $depth == 0 ) {
-				self::commit();
+				$adapter->commit();
 			}
 		} catch ( \Exception $exception ) {
 			$depth--;
 			if ( $depth == 0 ) {
-				self::rollback();
+				$adapter->rollback();
 			}
 			throw $exception;
 		}

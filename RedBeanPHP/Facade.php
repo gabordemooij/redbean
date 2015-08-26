@@ -265,7 +265,7 @@ class Facade
 	 */
 	public static function transaction( $callback )
 	{
-		return Transaction::transaction( $callback );
+		return Transaction::transaction( self::$adapter, $callback );
 	}
 
 	/**
