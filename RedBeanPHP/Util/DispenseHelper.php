@@ -45,7 +45,7 @@ class DispenseHelper
 						throw new RedException( 'Invalid Array Bean' );
 					}
 				}
-				foreach( $typeOrBeanArray as $beanArray ) $list[] = self::dispense( $beanArray );
+				foreach( $typeOrBeanArray as $beanArray ) $list[] = self::dispense( $oodb, $beanArray );
 				return $list;
 			}
 
