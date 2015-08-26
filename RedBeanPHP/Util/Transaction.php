@@ -70,7 +70,7 @@ class Transaction
 		$result = null;
 		try {
 			if ( $depth == 0 ) {
-				$adapter->begin();
+				$adapter->startTransaction();
 			}
 			$depth++;
 			$result = call_user_func( $callback ); //maintain 5.2 compatibility
