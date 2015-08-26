@@ -37,7 +37,7 @@ class MultiLoader
 	 *
 	 * @return OODBBean
 	 */
-	public static function loadMulti( OODB $oodb, $types, $id )
+	public static function load( OODB $oodb, $types, $id )
 	{
 		if ( is_string( $types ) ) {
 			$types = explode( ',', $types );
