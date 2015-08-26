@@ -59,6 +59,13 @@ require( REDBEANPHP_MAIN_DIR . 'DuplicationManager.php' );
 require( REDBEANPHP_MAIN_DIR . 'Plugin.php' );
 require( REDBEANPHP_MAIN_DIR . 'Functions.php' );
 
+/* Facade Utilities */
+require( REDBEANPHP_MAIN_DIR . 'Util/ArrayTool.php' );
+require( REDBEANPHP_MAIN_DIR . 'Util/DispenseHelper.php' );
+require( REDBEANPHP_MAIN_DIR . 'Util/Dump.php' );
+require( REDBEANPHP_MAIN_DIR . 'Util/MultiLoader.php' );
+require( REDBEANPHP_MAIN_DIR . 'Util/Transaction.php' );
+
 //Allow users to mount the plugin folder.
 if ( defined( 'REDBEANPHP_PLUGINS' ) ) {
     Phar::mount( 'RedBeanPHP/Plugin', REDBEANPHP_PLUGINS );

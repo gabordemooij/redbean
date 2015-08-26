@@ -24,6 +24,11 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 use RedBeanPHP\Driver\RPDO as RPDO;
+use RedBeanPHP\Util\MultiLoader as MultiLoader;
+use RedBeanPHP\Util\Transaction as Transaction;
+use RedBeanPHP\Util\Dump as Dump;
+use RedBeanPHP\Util\DispenseHelper as DispenseHelper;
+use RedBeanPHP\Util\ArrayTool as ArrayTool;
 
 /**
  * RedBean Facade
@@ -229,7 +234,7 @@ class Facade
 	}
 
 	/**
-	 * Starts a transaction within a closure (or other valid callback).
+	 * Wraps a transaction around a closure or string callback.
 	 * If an Exception is thrown inside, the operation is automatically rolled back.
 	 * If no Exception happens, it commits automatically.
 	 * It also supports (simulated) nested transactions (that is useful when
@@ -260,30 +265,7 @@ class Facade
 	 */
 	public static function transaction( $callback )
 	{
-		if ( !is_callable( $callback ) ) {
-			throw new RedException( 'R::transaction needs a valid callback.' );
-		}
-
-		static $depth = 0;
-		$result = null;
-		try {
-			if ( $depth == 0 ) {
-				self::begin();
-			}
-			$depth++;
-			$result = call_user_func( $callback ); //maintain 5.2 compatibility
-			$depth--;
-			if ( $depth == 0 ) {
-				self::commit();
-			}
-		} catch ( \Exception $exception ) {
-			$depth--;
-			if ( $depth == 0 ) {
-				self::rollback();
-			}
-			throw $exception;
-		}
-		return $result;
+		return Transaction::transaction( $callback );
 	}
 
 	/**
@@ -479,7 +461,7 @@ class Facade
 	 * for loading a one-to-one relation.
 	 *
 	 * Usage:
-	 * list( $author, $bio ) = R::load( 'author, bio', $id );
+	 * list( $author, $bio ) = R::loadMulti( 'author, bio', $id );
 	 *
 	 * @param string|array $types the set of types to load at once
 	 * @param mixed        $id    the common ID
@@ -488,19 +470,7 @@ class Facade
 	 */
 	public static function loadMulti( $types, $id )
 	{
-		if ( is_string( $types ) ) {
-			$types = explode( ',', $types );
-		}
-
-		if ( !is_array( $types ) ) {
-			return array();
-		}
-
-		foreach ( $types as $k => $typeItem ) {
-			$types[$k] = self::$redbean->load( $typeItem, $id );
-		}
-
-		return $types;
+		return MultiLoader::load( self::$oodb, $types, $id );
 	}
 
 	/**
@@ -562,33 +532,7 @@ class Facade
 	 */
 	public static function dispense( $typeOrBeanArray, $num = 1, $alwaysReturnArray = FALSE )
 	{
-		if ( is_array($typeOrBeanArray) ) {
-
-			if ( !isset( $typeOrBeanArray['_type'] ) ) {
-				$list = array();
-				foreach( $typeOrBeanArray as $beanArray ) if ( !( is_array( $beanArray ) && isset( $beanArray['_type'] ) ) ) throw new RedException( 'Invalid Array Bean' );
-				foreach( $typeOrBeanArray as $beanArray ) $list[] = self::dispense( $beanArray );
-				return $list;
-			}
-
-			$import = $typeOrBeanArray;
-			$type = $import['_type'];
-			unset( $import['_type'] );
-		} else {
-			$type = $typeOrBeanArray;
-		}
-
-		if ( !preg_match( '/^[a-z0-9]+$/', $type ) ) {
-			throw new RedException( 'Invalid type: ' . $type );
-		}
-
-		$beanOrBeans = self::$redbean->dispense( $type, $num, $alwaysReturnArray );
-
-		if ( isset( $import ) ) {
-			$beanOrBeans->import( $import );
-		}
-
-		return $beanOrBeans;
+		return DispenseHelper::dispense( self::$redbean, $typeOrBeanArray, $num, $alwaysReturnArray );
 	}
 
 	/**
@@ -621,21 +565,7 @@ class Facade
 	 */
 	public static function dispenseAll( $order, $onlyArrays = FALSE )
 	{
-
-		$list = array();
-
-		foreach( explode( ',', $order ) as $order ) {
-			if ( strpos( $order, '*' ) !== false ) {
-				list( $type, $amount ) = explode( '*', $order );
-			} else {
-				$type   = $order;
-				$amount = 1;
-			}
-
-			$list[] = self::dispense( $type, $amount, $onlyArrays );
-		}
-
-		return $list;
+		DispenseHelper::dispenseAll( self::$redbean, $order, $onlyArrays );
 	}
 
 	/**
@@ -1284,8 +1214,7 @@ class Facade
 	 */
 	public static function genSlots( $array, $template = NULL )
 	{
-		$str = count( $array ) ? implode( ',', array_fill( 0, count( $array ), '?' ) ) : '';
-		return ( is_null( $template ) ||  $str === '' ) ? $str : sprintf( $template, $str );
+		return ArrayTool::genSlots( $array, $template );
 	}
 
 	/**
@@ -1297,11 +1226,7 @@ class Facade
 	 */
 	public static function flat( $array, $result = array() )
 	{
-		foreach( $array as $value ) {
-			if ( is_array( $value ) ) $result = self::flat( $value, $result );
-			else $result[] = $value;
-		}
-		return $result;
+		return ArrayTool::flat( $array, $result );
 	}
 
 	/**
@@ -1684,25 +1609,7 @@ class Facade
 	 */
 	public static function dump( $data )
 	{
-		$array = array();
-
-		if ( $data instanceof OODBBean ) {
-			$str = strval( $data );
-			if (strlen($str) > 35) {
-				$beanStr = substr( $str, 0, 35 ).'... ';
-			} else {
-				$beanStr = $str;
-			}
-			return $beanStr;
-		}
-
-		if ( is_array( $data ) ) {
-			foreach( $data as $key => $item ) {
-				$array[$key] = self::dump( $item );
-			}
-		}
-
-		return $array;
+		return Dump::dump( $data );
 	}
 
 	/**
