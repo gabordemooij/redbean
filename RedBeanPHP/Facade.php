@@ -565,7 +565,7 @@ class Facade
 	 */
 	public static function dispenseAll( $order, $onlyArrays = FALSE )
 	{
-		DispenseHelper::dispenseAll( self::$redbean, $order, $onlyArrays );
+		return DispenseHelper::dispenseAll( self::$redbean, $order, $onlyArrays );
 	}
 
 	/**

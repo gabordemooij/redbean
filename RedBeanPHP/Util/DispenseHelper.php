@@ -104,7 +104,7 @@ class DispenseHelper
 		$list = array();
 
 		foreach( explode( ',', $order ) as $order ) {
-			if ( strpos( $order, '*' ) !== false ) {
+			if ( strpos( $order, '*' ) !== FALSE ) {
 				list( $type, $amount ) = explode( '*', $order );
 			} else {
 				$type   = $order;
