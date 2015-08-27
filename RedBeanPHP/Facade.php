@@ -305,13 +305,13 @@ class Facade
 
 		$adapter = new DBAdapter( $db );
 
-		$writers     = array(
-                    'pgsql'  => 'PostgreSQL',
-                    'sqlite' => 'SQLiteT',
-                    'cubrid' => 'CUBRID',
-                    'mysql'  => 'MySQL',
-                    'sqlsrv' => 'SQLServer',
-                  );
+		$writers = array(
+			'pgsql'  => 'PostgreSQL',
+			'sqlite' => 'SQLiteT',
+			'cubrid' => 'CUBRID',
+			'mysql'  => 'MySQL',
+			'sqlsrv' => 'SQLServer',
+		);
 
 		$wkey = trim( strtolower( $dbType ) );
 		if ( !isset( $writers[$wkey] ) ) trigger_error( 'Unsupported DSN: '.$wkey );
@@ -1118,29 +1118,19 @@ class Facade
 	public static function configureFacadeWithToolbox( ToolBox $tb )
 	{
 		$oldTools                 = self::$toolbox;
-
 		self::$toolbox            = $tb;
-
 		self::$writer             = self::$toolbox->getWriter();
 		self::$adapter            = self::$toolbox->getDatabaseAdapter();
 		self::$redbean            = self::$toolbox->getRedBean();
 		self::$finder             = new Finder( self::$toolbox );
-
 		self::$associationManager = new AssociationManager( self::$toolbox );
-
 		self::$redbean->setAssociationManager( self::$associationManager );
-
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
-
 		$helper                   = new SimpleModelHelper();
-
 		$helper->attachEventListeners( self::$redbean );
-
 		self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
-
 		self::$duplicationManager = new DuplicationManager( self::$toolbox );
 		self::$tagManager         = new TagManager( self::$toolbox );
-
 		return $oldTools;
 	}
 
@@ -1153,9 +1143,7 @@ class Facade
 	public static function begin()
 	{
 		if ( !self::$redbean->isFrozen() ) return FALSE;
-
 		self::$adapter->startTransaction();
-
 		return TRUE;
 	}
 
@@ -1168,9 +1156,7 @@ class Facade
 	public static function commit()
 	{
 		if ( !self::$redbean->isFrozen() ) return FALSE;
-
 		self::$adapter->commit();
-
 		return TRUE;
 	}
 
@@ -1183,9 +1169,7 @@ class Facade
 	public static function rollback()
 	{
 		if ( !self::$redbean->isFrozen() ) return FALSE;
-
 		self::$adapter->rollback();
-
 		return TRUE;
 	}
 
@@ -1260,7 +1244,6 @@ class Facade
 		foreach ( $beans as $bean ) {
 			$ids[] = self::store( $bean );
 		}
-
 		return $ids;
 	}
 
@@ -1408,7 +1391,6 @@ class Facade
 	public static function isoDateTime( $time = NULL )
 	{
 		if ( !$time ) $time = time();
-
 		return @date( 'Y-m-d H:i:s', $time );
 	}
 
@@ -1522,12 +1504,7 @@ class Facade
 	 */
 	public static function getExtractedToolbox()
 	{
-		return array(
-			self::$redbean,
-			self::$adapter,
-			self::$writer,
-			self::$toolbox
-		);
+		return array( self::$redbean, self::$adapter, self::$writer, self::$toolbox );
 	}
 
 	/**
@@ -1557,9 +1534,7 @@ class Facade
 	public static function beansToArray( $beans )
 	{
 		$list = array();
-		foreach( $beans as $bean ) {
-			$list[] = $bean->export();
-		}
+		foreach( $beans as $bean ) $list[] = $bean->export();
 		return $list;
 	}
 
