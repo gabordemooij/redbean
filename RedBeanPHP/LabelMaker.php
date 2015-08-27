@@ -147,6 +147,21 @@ class LabelMaker
 			$value                = preg_replace( '/\W+/', '_', strtoupper( trim( $value ) ) );
 		}
 
+		/**
+		 * We use simply find here, we could use inspect() in fluid mode etc,
+		 * but this would be useless. At first sight it looks clean, you could even
+		 * bake this into find(), however, find not only has to deal with the primary
+		 * search type, people can also include references in the SQL part, so avoiding
+		 * find failures does not matter, this is still the quickest way making use
+		 * of existing functionality.
+		 *
+		 * @note There seems to be a bug in XDebug v2.3.2 causing suppressed
+		 * exceptions like these to surface anyway, to prevent this use:
+		 *
+		 * "xdebug.default_enable = 0"
+		 *
+		 *  Also see Github Issue #464
+		 */
 		$values = $oodb->find( $type );
 
 		if ( $value === FALSE ) {
