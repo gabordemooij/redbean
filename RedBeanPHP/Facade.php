@@ -12,7 +12,6 @@ use RedBeanPHP\DuplicationManager as DuplicationManager;
 use RedBeanPHP\LabelMaker as LabelMaker;
 use RedBeanPHP\Finder as Finder;
 use RedBeanPHP\RedException\SQL as SQLException;
-use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\Logger as Logger;
 use RedBeanPHP\Logger\RDefault as RDefault;
 use RedBeanPHP\Logger\RDefault\Debug as Debug;
