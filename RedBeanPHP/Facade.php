@@ -314,7 +314,10 @@ class Facade
 		);
 
 		$wkey = trim( strtolower( $dbType ) );
-		if ( !isset( $writers[$wkey] ) ) trigger_error( 'Unsupported DSN: '.$wkey );
+		if ( !isset( $writers[$wkey] ) ) {
+			$wkey = preg_replace( '/\W/', '' , $wkey );
+			throw new RedException( 'Unsupported database ('.$wkey.').' );
+		}
 		$writerClass = '\\RedBeanPHP\\QueryWriter\\'.$writers[$wkey];
 		$writer      = new $writerClass( $adapter );
 		$redbean     = new OODB( $writer, $frozen );
