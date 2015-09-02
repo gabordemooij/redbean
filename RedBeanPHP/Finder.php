@@ -73,8 +73,12 @@ class Finder
 
 	/**
 	 * Like find() but also exports the beans as an array.
+	 * This method will perform a find-operation. For every bean
+	 * in the result collection this method will call the export() method.
+	 * This method returns an array containing the array representations
+	 * of every bean in the result set.
 	 *
-	 * @see Finder::findAndExport
+	 * @see Finder::find
 	 *
 	 * @param string $type     type   the type of bean you are looking for
 	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
@@ -95,6 +99,7 @@ class Finder
 	/**
 	 * Like find() but returns just one bean instead of an array of beans.
 	 * This method will return only the first bean of the array.
+	 * If no beans are found, this method will return NULL.
 	 *
 	 * @see Finder::find
 	 *
@@ -120,6 +125,7 @@ class Finder
 	/**
 	 * Like find() but returns the last bean of the result array.
 	 * Opposite of Finder::findLast().
+	 * If no beans are found, this method will return NULL.
 	 *
 	 * @see Finder::find
 	 *
