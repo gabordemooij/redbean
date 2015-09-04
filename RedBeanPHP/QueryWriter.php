@@ -90,9 +90,9 @@ interface QueryWriter
 	 *
 	 * The GLUE type determines the prefix:
 	 *
-	 * - NONE  prefixes with WHERE
-	 * - WHERE prefixes with WHERE and replaces AND if snippets starts with AND
-	 * - AND   prefixes with AND
+	 * * NONE  prefixes with WHERE
+	 * * WHERE prefixes with WHERE and replaces AND if snippets starts with AND
+	 * * AND   prefixes with AND
 	 *
 	 * This method will never replace WHERE with AND since a snippet should never
 	 * begin with WHERE in the first place. OR is not supported.
@@ -439,11 +439,15 @@ interface QueryWriter
 	 * Renames an association. For instance if you would like to refer to
 	 * album_song as: track you can specify this by calling this method like:
 	 *
+	 * <code>
 	 * renameAssociation('album_song','track')
+	 * </code>
 	 *
 	 * This allows:
 	 *
+	 * <code>
 	 * $album->sharedSong
+	 * </code>
 	 *
 	 * to add/retrieve beans from track instead of album_song.
 	 * Also works for exportAll().

@@ -13,12 +13,17 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 use RedBeanPHP\Driver\RPDO as RPDO;
+use RedBeanPHP\Util\MultiLoader as MultiLoader;
+use RedBeanPHP\Util\Transaction as Transaction;
+use RedBeanPHP\Util\Dump as Dump;
+use RedBeanPHP\Util\DispenseHelper as DispenseHelper;
+use RedBeanPHP\Util\ArrayTool as ArrayTool;
 
 /**
  * RedBean Facade
  *
  * Version Information
- * RedBean Version @version 4.2
+ * RedBean Version @version 4.3
  *
  * This class hides the object landscape of
  * RedBeanPHP behind a single letter class providing
@@ -38,7 +43,7 @@ class Facade
 	/**
 	 * RedBeanPHP version constant.
 	 */
-	const C_REDBEANPHP_VERSION = '4.2';
+	const C_REDBEANPHP_VERSION = '4.3';
 
 	/**
 	 * @var ToolBox
@@ -218,28 +223,30 @@ class Facade
 	}
 
 	/**
-	 * Starts a transaction within a closure (or other valid callback).
+	 * Wraps a transaction around a closure or string callback.
 	 * If an Exception is thrown inside, the operation is automatically rolled back.
 	 * If no Exception happens, it commits automatically.
 	 * It also supports (simulated) nested transactions (that is useful when
 	 * you have many methods that needs transactions but are unaware of
 	 * each other).
-	 * ex:
-	 *        $from = 1;
-	 *        $to = 2;
-	 *        $amount = 300;
 	 *
-	 *        R::transaction(function() use($from, $to, $amount)
-	 *        {
-	 *            $accountFrom = R::load('account', $from);
-	 *            $accountTo = R::load('account', $to);
+	 * Example:
 	 *
-	 *            $accountFrom->money -= $amount;
-	 *            $accountTo->money += $amount;
+	 * <code>
+	 * $from = 1;
+	 * $to = 2;
+	 * $amount = 300;
 	 *
-	 *            R::store($accountFrom);
-	 *            R::store($accountTo);
-	 *      });
+	 * R::transaction(function() use($from, $to, $amount)
+	 * {
+	 *   $accountFrom = R::load('account', $from);
+	 *   $accountTo = R::load('account', $to);
+	 *   $accountFrom->money -= $amount;
+	 *   $accountTo->money += $amount;
+	 *   R::store($accountFrom);
+	 *   R::store($accountTo);
+	 * });
+	 * </code>
 	 *
 	 * @param callable $callback Closure (or other callable) with the transaction logic
 	 *
@@ -247,30 +254,7 @@ class Facade
 	 */
 	public static function transaction( $callback )
 	{
-		if ( !is_callable( $callback ) ) {
-			throw new RedException( 'R::transaction needs a valid callback.' );
-		}
-
-		static $depth = 0;
-		$result = null;
-		try {
-			if ( $depth == 0 ) {
-				self::begin();
-			}
-			$depth++;
-			$result = call_user_func( $callback ); //maintain 5.2 compatibility
-			$depth--;
-			if ( $depth == 0 ) {
-				self::commit();
-			}
-		} catch ( \Exception $exception ) {
-			$depth--;
-			if ( $depth == 0 ) {
-				self::rollback();
-			}
-			throw $exception;
-		}
-		return $result;
+		return Transaction::transaction( self::$adapter, $callback );
 	}
 
 	/**
@@ -279,8 +263,10 @@ class Facade
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * R::addDatabase( 'database-1', 'sqlite:/tmp/db1.txt' );
 	 * R::selectDatabase( 'database-1' ); //to select database again
+	 * </code>
 	 *
 	 * This method allows you to dynamically add (and select) new databases
 	 * to the facade. Adding a database with the same key will cause an exception.
@@ -309,16 +295,19 @@ class Facade
 
 		$adapter = new DBAdapter( $db );
 
-		$writers     = array(
-                    'pgsql'  => 'PostgreSQL',
-                    'sqlite' => 'SQLiteT',
-                    'cubrid' => 'CUBRID',
-                    'mysql'  => 'MySQL',
-                    'sqlsrv' => 'SQLServer',
-                  );
+		$writers = array(
+			'pgsql'  => 'PostgreSQL',
+			'sqlite' => 'SQLiteT',
+			'cubrid' => 'CUBRID',
+			'mysql'  => 'MySQL',
+			'sqlsrv' => 'SQLServer',
+		);
 
 		$wkey = trim( strtolower( $dbType ) );
-		if ( !isset( $writers[$wkey] ) ) trigger_error( 'Unsupported DSN: '.$wkey );
+		if ( !isset( $writers[$wkey] ) ) {
+			$wkey = preg_replace( '/\W/', '' , $wkey );
+			throw new RedException( 'Unsupported database ('.$wkey.').' );
+		}
 		$writerClass = '\\RedBeanPHP\\QueryWriter\\'.$writers[$wkey];
 		$writer      = new $writerClass( $adapter );
 		$redbean     = new OODB( $writer, $frozen );
@@ -464,7 +453,7 @@ class Facade
 	 * for loading a one-to-one relation.
 	 *
 	 * Usage:
-	 * list( $author, $bio ) = R::load( 'author, bio', $id );
+	 * list( $author, $bio ) = R::loadMulti( 'author, bio', $id );
 	 *
 	 * @param string|array $types the set of types to load at once
 	 * @param mixed        $id    the common ID
@@ -473,19 +462,7 @@ class Facade
 	 */
 	public static function loadMulti( $types, $id )
 	{
-		if ( is_string( $types ) ) {
-			$types = explode( ',', $types );
-		}
-
-		if ( !is_array( $types ) ) {
-			return array();
-		}
-
-		foreach ( $types as $k => $typeItem ) {
-			$types[$k] = self::$redbean->load( $typeItem, $id );
-		}
-
-		return $types;
+		return MultiLoader::load( self::$redbean, $types, $id );
 	}
 
 	/**
@@ -541,39 +518,13 @@ class Facade
 	 *
 	 * @param string|array $typeOrBeanArray   type or bean array to import
 	 * @param integer      $number            number of beans to dispense
-	 * @param boolean	     $alwaysReturnArray if TRUE always returns the result as an array
+	 * @param boolean	   $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return array|OODBBean
 	 */
 	public static function dispense( $typeOrBeanArray, $num = 1, $alwaysReturnArray = FALSE )
 	{
-		if ( is_array($typeOrBeanArray) ) {
-
-			if ( !isset( $typeOrBeanArray['_type'] ) ) {
-				$list = array();
-				foreach( $typeOrBeanArray as $beanArray ) if ( !( is_array( $beanArray ) && isset( $beanArray['_type'] ) ) ) throw new RedException( 'Invalid Array Bean' );
-				foreach( $typeOrBeanArray as $beanArray ) $list[] = self::dispense( $beanArray );
-				return $list;
-			}
-
-			$import = $typeOrBeanArray;
-			$type = $import['_type'];
-			unset( $import['_type'] );
-		} else {
-			$type = $typeOrBeanArray;
-		}
-
-		if ( !preg_match( '/^[a-z0-9]+$/', $type ) ) {
-			throw new RedException( 'Invalid type: ' . $type );
-		}
-
-		$beanOrBeans = self::$redbean->dispense( $type, $num, $alwaysReturnArray );
-
-		if ( isset( $import ) ) {
-			$beanOrBeans->import( $import );
-		}
-
-		return $beanOrBeans;
+		return DispenseHelper::dispense( self::$redbean, $typeOrBeanArray, $num, $alwaysReturnArray );
 	}
 
 	/**
@@ -583,14 +534,18 @@ class Facade
 	 *
 	 * Usage:
 	 *
-	 * list($book, $page, $text) = R::dispenseAll('book,page,text');
+	 * <code>
+	 * list( $book, $page, $text ) = R::dispenseAll( 'book,page,text' );
+	 * </code>
 	 *
 	 * This will dispense a book, a page and a text. This way you can
 	 * quickly dispense beans of various types in just one line of code.
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * list($book, $pages) = R::dispenseAll('book,page*100');
+	 * </code>
 	 *
 	 * This returns an array with a book bean and then another array
 	 * containing 100 page beans.
@@ -602,21 +557,7 @@ class Facade
 	 */
 	public static function dispenseAll( $order, $onlyArrays = FALSE )
 	{
-
-		$list = array();
-
-		foreach( explode( ',', $order ) as $order ) {
-			if ( strpos( $order, '*' ) !== false ) {
-				list( $type, $amount ) = explode( '*', $order );
-			} else {
-				$type   = $order;
-				$amount = 1;
-			}
-
-			$list[] = self::dispense( $type, $amount, $onlyArrays );
-		}
-
-		return $list;
+		return DispenseHelper::dispenseAll( self::$redbean, $order, $onlyArrays );
 	}
 
 	/**
@@ -940,9 +881,9 @@ class Facade
 	 * Makes a deep copy of a bean. This method makes a deep copy
 	 * of the bean.The copy will have the following:
 	 *
-	 * - All beans in own-lists will be duplicated as well
-	 * - All references to shared beans will be copied but not the shared beans themselves
-	 * - All references to parent objects (_id fields) will be copied but not the parents themselves
+	 * * All beans in own-lists will be duplicated as well
+	 * * All references to shared beans will be copied but not the shared beans themselves
+	 * * All references to parent objects (_id fields) will be copied but not the parents themselves
 	 *
 	 * In most cases this is the desired scenario for copying beans.
 	 * This function uses a trail-array to prevent infinite recursion, if a recursive bean is found
@@ -969,9 +910,10 @@ class Facade
 	 * Exports a collection of beans. Handy for XML/JSON exports with a
 	 * Javascript framework like Dojo or ExtJS.
 	 * What will be exported:
-	 * - contents of the bean
-	 * - all own bean lists (recursively)
-	 * - all shared beans (not THEIR own lists)
+	 *
+	 * * contents of the bean
+	 * * all own bean lists (recursively)
+	 * * all shared beans (not THEIR own lists)
 	 *
 	 * @param    array|OODBBean $beans   beans to be exported
 	 * @param    boolean        $parents whether you want parent beans to be exported
@@ -989,9 +931,9 @@ class Facade
 	 * This will determine the case style for the keys of exported beans (see exportAll).
 	 * The following options are accepted:
 	 *
-	 * 'default' RedBeanPHP by default enforces Snake Case (i.e. book_id is_valid )
-	 * 'camel'   Camel Case   (i.e. bookId isValid   )
-	 * 'dolphin' Dolphin Case (i.e. bookID isValid   ) Like CamelCase but ID is written all uppercase
+	 * * 'default' RedBeanPHP by default enforces Snake Case (i.e. book_id is_valid )
+	 * * 'camel'   Camel Case   (i.e. bookId isValid   )
+	 * * 'dolphin' Dolphin Case (i.e. bookID isValid   ) Like CamelCase but ID is written all uppercase
 	 *
 	 * @warning RedBeanPHP transforms camelCase to snake_case using a slightly different
 	 * algorithm, it also converts isACL to is_acl (not is_a_c_l) and bookID to book_id.
@@ -1169,29 +1111,19 @@ class Facade
 	public static function configureFacadeWithToolbox( ToolBox $tb )
 	{
 		$oldTools                 = self::$toolbox;
-
 		self::$toolbox            = $tb;
-
 		self::$writer             = self::$toolbox->getWriter();
 		self::$adapter            = self::$toolbox->getDatabaseAdapter();
 		self::$redbean            = self::$toolbox->getRedBean();
 		self::$finder             = new Finder( self::$toolbox );
-
 		self::$associationManager = new AssociationManager( self::$toolbox );
-
 		self::$redbean->setAssociationManager( self::$associationManager );
-
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
-
 		$helper                   = new SimpleModelHelper();
-
 		$helper->attachEventListeners( self::$redbean );
-
 		self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
-
 		self::$duplicationManager = new DuplicationManager( self::$toolbox );
 		self::$tagManager         = new TagManager( self::$toolbox );
-
 		return $oldTools;
 	}
 
@@ -1204,9 +1136,7 @@ class Facade
 	public static function begin()
 	{
 		if ( !self::$redbean->isFrozen() ) return FALSE;
-
 		self::$adapter->startTransaction();
-
 		return TRUE;
 	}
 
@@ -1219,9 +1149,7 @@ class Facade
 	public static function commit()
 	{
 		if ( !self::$redbean->isFrozen() ) return FALSE;
-
 		self::$adapter->commit();
-
 		return TRUE;
 	}
 
@@ -1234,9 +1162,7 @@ class Facade
 	public static function rollback()
 	{
 		if ( !self::$redbean->isFrozen() ) return FALSE;
-
 		self::$adapter->rollback();
-
 		return TRUE;
 	}
 
@@ -1264,8 +1190,7 @@ class Facade
 	 */
 	public static function genSlots( $array, $template = NULL )
 	{
-		$str = count( $array ) ? implode( ',', array_fill( 0, count( $array ), '?' ) ) : '';
-		return ( is_null( $template ) ||  $str === '' ) ? $str : sprintf( $template, $str );
+		return ArrayTool::genSlots( $array, $template );
 	}
 
 	/**
@@ -1277,11 +1202,7 @@ class Facade
 	 */
 	public static function flat( $array, $result = array() )
 	{
-		foreach( $array as $value ) {
-			if ( is_array( $value ) ) $result = self::flat( $value, $result );
-			else $result[] = $value;
-		}
-		return $result;
+		return ArrayTool::flat( $array, $result );
 	}
 
 	/**
@@ -1316,7 +1237,6 @@ class Facade
 		foreach ( $beans as $bean ) {
 			$ids[] = self::store( $bean );
 		}
-
 		return $ids;
 	}
 
@@ -1379,7 +1299,9 @@ class Facade
 	 *
 	 * To obtain (and add if necessary) an ENUM value:
 	 *
+	 * <code>
 	 * $tea->flavour = R::enum( 'flavour:apple' );
+	 * </code>
 	 *
 	 * Returns a bean of type 'flavour' with  name = apple.
 	 * This will add a bean with property name (set to APPLE) to the database
@@ -1387,11 +1309,15 @@ class Facade
 	 *
 	 * To obtain all flavours:
 	 *
+	 * <code>
 	 * R::enum('flavour');
+	 * </code>
 	 *
 	 * To get a list of all flavour names:
 	 *
+	 * <code>
 	 * R::gatherLabels( R::enum( 'flavour' ) );
+	 * </code>
 	 *
 	 * @param string $enum either type or type-value
 	 *
@@ -1458,7 +1384,6 @@ class Facade
 	public static function isoDateTime( $time = NULL )
 	{
 		if ( !$time ) $time = time();
-
 		return @date( 'Y-m-d H:i:s', $time );
 	}
 
@@ -1563,21 +1488,16 @@ class Facade
 	 *
 	 * Returns the components in the following order:
 	 *
-	 * 0 - OODB instance (getRedBean())
-	 * 1 - Database Adapter
-	 * 2 - Query Writer
-	 * 3 - Toolbox itself
+	 * # OODB instance (getRedBean())
+	 * # Database Adapter
+	 * # Query Writer
+	 * # Toolbox itself
 	 *
 	 * @return array
 	 */
 	public static function getExtractedToolbox()
 	{
-		return array(
-			self::$redbean,
-			self::$adapter,
-			self::$writer,
-			self::$toolbox
-		);
+		return array( self::$redbean, self::$adapter, self::$writer, self::$toolbox );
 	}
 
 	/**
@@ -1607,9 +1527,7 @@ class Facade
 	public static function beansToArray( $beans )
 	{
 		$list = array();
-		foreach( $beans as $bean ) {
-			$list[] = $bean->export();
-		}
+		foreach( $beans as $bean ) $list[] = $bean->export();
 		return $list;
 	}
 
@@ -1618,19 +1536,21 @@ class Facade
 	 * What to do if a FUSE model method does not exist?
 	 * You can set the following options:
 	 *
-	 * OODBBean::C_ERR_IGNORE (default), ignores the call, returns NULL
-	 * OODBBean::C_ERR_LOG, logs the incident using error_log
-	 * OODBBean::C_ERR_NOTICE, triggers a E_USER_NOTICE
-	 * OODBBean::C_ERR_WARN, triggers a E_USER_WARNING
-	 * OODBBean::C_ERR_EXCEPTION, throws an exception
-	 * OODBBean::C_ERR_FUNC, allows you to specify a custom handler (function)
-	 * OODBBean::C_ERR_FATAL, triggers a E_USER_ERROR
+	 * * OODBBean::C_ERR_IGNORE (default), ignores the call, returns NULL
+	 * * OODBBean::C_ERR_LOG, logs the incident using error_log
+	 * * OODBBean::C_ERR_NOTICE, triggers a E_USER_NOTICE
+	 * * OODBBean::C_ERR_WARN, triggers a E_USER_WARNING
+	 * * OODBBean::C_ERR_EXCEPTION, throws an exception
+	 * * OODBBean::C_ERR_FUNC, allows you to specify a custom handler (function)
+	 * * OODBBean::C_ERR_FATAL, triggers a E_USER_ERROR
 	 *
+	 * <code>
 	 * Custom handler method signature: handler( array (
 	 * 	'message' => string
 	 * 	'bean' => OODBBean
 	 * 	'method' => string
 	 * ) )
+	 * </code>
 	 *
 	 * This method returns the old mode and handler as an array.
 	 *
@@ -1656,25 +1576,7 @@ class Facade
 	 */
 	public static function dump( $data )
 	{
-		$array = array();
-
-		if ( $data instanceof OODBBean ) {
-			$str = strval( $data );
-			if (strlen($str) > 35) {
-				$beanStr = substr( $str, 0, 35 ).'... ';
-			} else {
-				$beanStr = $str;
-			}
-			return $beanStr;
-		}
-
-		if ( is_array( $data ) ) {
-			foreach( $data as $key => $item ) {
-				$array[$key] = self::dump( $item );
-			}
-		}
-
-		return $array;
+		return Dump::dump( $data );
 	}
 
 	/**
@@ -1686,8 +1588,10 @@ class Facade
 	 *
 	 * Example:
 	 *
+	 * <code>
 	 * R::bindFunc( 'read', 'location.point', 'asText' );
 	 * R::bindFunc( 'write', 'location.point', 'GeomFromText' );
+	 * </code>
 	 *
 	 * Passing NULL as the function will reset (clear) the function
 	 * for this column/mode.
@@ -1842,11 +1746,15 @@ class Facade
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * R::ext( 'makeTea', function() { ... }  );
+	 * </code>
 	 *
 	 * Now you can use your makeTea plugin like this:
 	 *
+	 * <code>
 	 * R::makeTea();
+	 * </code>
 	 *
 	 * @param string   $pluginName name of the method to call the plugin
 	 * @param callable $callable   a PHP callable

@@ -120,19 +120,21 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * What to do if a FUSE model method does not exist?
 	 * You can set the following options:
 	 *
-	 * OODBBean::C_ERR_IGNORE (default), ignores the call, returns NULL
-	 * OODBBean::C_ERR_LOG, logs the incident using error_log
-	 * OODBBean::C_ERR_NOTICE, triggers a E_USER_NOTICE
-	 * OODBBean::C_ERR_WARN, triggers a E_USER_WARNING
-	 * OODBBean::C_ERR_EXCEPTION, throws an exception
-	 * OODBBean::C_ERR_FUNC, allows you to specify a custom handler (function)
-	 * OODBBean::C_ERR_FATAL, triggers a E_USER_ERROR
+	 * * OODBBean::C_ERR_IGNORE (default), ignores the call, returns NULL
+	 * * OODBBean::C_ERR_LOG, logs the incident using error_log
+	 * * OODBBean::C_ERR_NOTICE, triggers a E_USER_NOTICE
+	 * * OODBBean::C_ERR_WARN, triggers a E_USER_WARNING
+	 * * OODBBean::C_ERR_EXCEPTION, throws an exception
+	 * * OODBBean::C_ERR_FUNC, allows you to specify a custom handler (function)
+	 * * OODBBean::C_ERR_FATAL, triggers a E_USER_ERROR
 	 *
+	 * <code>
 	 * Custom handler method signature: handler( array (
 	 * 	'message' => string
 	 * 	'bean' => OODBBean
 	 * 	'method' => string
 	 * ) )
+	 * </code>
 	 *
 	 * This method returns the old mode and handler as an array.
 	 *
@@ -388,7 +390,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	}
 
 	/**
-	 * Returns an\ArrayIterator so you can treat the bean like
+	 * Returns an ArrayIterator so you can treat the bean like
 	 * an array with the properties container as its contents.
 	 * This method is meant for PHP and allows you to access beans as if
 	 * they were arrays, i.e. using array notation:
@@ -634,7 +636,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * issue the following command: $book->ownPage
 	 * However, to order these pages by number use:
 	 *
+	 * <code>
 	 * $book->with(' ORDER BY `number` ASC ')->ownPage
+	 * </code>
 	 *
 	 * the additional SQL snippet will be merged into the final
 	 * query.
@@ -680,8 +684,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * $bean->with( ' LIMIT 3 ' )->ownPage; //Just 3
 	 * $bean->all()->ownPage; //Reload all pages
+	 * </code>
 	 *
 	 * @return self
 	 */
@@ -711,16 +717,22 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * case, so to the project has a teacher_id pointing to a person, and a student_id
 	 * also pointing to a person. Given a project, we obtain the teacher like this:
 	 *
+	 * <code>
 	 * $project->fetchAs('person')->teacher;
+	 * </code>
 	 *
 	 * Now, if we want all projects of a teacher we cant say:
 	 *
+	 * <code>
 	 * $teacher->ownProject
+	 * </code>
 	 *
 	 * because the $teacher is a bean of type 'person' and no project has been
 	 * assigned to a person. Instead we use the alias() method like this:
 	 *
+	 * <code>
 	 * $teacher->alias('teacher')->ownProject
+	 * </code>
 	 *
 	 * now we get the projects associated with the person bean aliased as
 	 * a teacher.
@@ -768,8 +780,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 * Turns a camelcase property name into an underscored property name.
 	 *
 	 * Examples:
-	 *    oneACLRoute -> one_acl_route
-	 *    camelCase -> camel_case
+	 *
+	 * * oneACLRoute -> one_acl_route
+	 * * camelCase -> camel_case
 	 *
 	 * Also caches the result to improve performance.
 	 *
@@ -1096,7 +1109,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Example:
 	 *
+	 * <code>
 	 * $bean->setMeta( 'flush-cache', TRUE );
+	 * </code>
 	 *
 	 * RedBeanPHP also stores meta data in beans, this meta data uses
 	 * keys prefixed with 'sys.' (system).
@@ -1561,11 +1576,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * $album->link('track', array('number'=>1))->song = $song;
+	 * </code>
 	 *
 	 * or:
 	 *
+	 * <code>
 	 * $album->link($trackBean)->song = $song;
+	 * </code>
 	 *
 	 * What this method does is adding the link bean to the own-list, in this case
 	 * ownTrack. If the first argument is a string and the second is an array or
@@ -1604,6 +1623,19 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		array_push( $this->$list, $bean );
 
 		return $bean;
+	}
+
+	/**
+	 * Returns a bean of the given type with the same ID of as
+	 * the current one. This only happens in a one-to-one relation.
+	 * This is as far as support for 1-1 goes in RedBeanPHP. This
+	 * method will only return a reference to the bean, changing it
+	 * and storing the bean will not update the related one-bean.
+	 *
+	 * @return OODBBean
+	 */
+	public function one( $type ) {
+		return $this->beanHelper->getToolBox()->getRedBean()->load( $type, $this->id );
 	}
 
 	/**
@@ -1724,7 +1756,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Example:
 	 *
+	 * <code>
 	 * $quest->aggr( 'xownQuestTarget', 'target', 'quest' );
+	 * </code>
 	 *
 	 * Loads (in batch) and returns references to all
 	 * quest beans residing in the $questTarget->target properties

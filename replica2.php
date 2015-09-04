@@ -85,6 +85,11 @@ if ($mode !== 'onlyphar') {
 	addFile( DIR . 'LabelMaker.php' );
 	addFile( DIR . 'Facade.php' );
 	addFile( DIR . 'DuplicationManager.php' );
+	addFile( DIR . 'Util/ArrayTool.php' );
+	addFile( DIR . 'Util/DispenseHelper.php' );
+	addFile( DIR . 'Util/Dump.php' );
+	addFile( DIR . 'Util/MultiLoader.php' );
+	addFile( DIR . 'Util/Transaction.php' );
 	addFile( DIR . 'Plugin.php' );
 
 	$func = file_get_contents(DIR . 'Functions.php');

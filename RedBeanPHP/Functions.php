@@ -19,7 +19,9 @@
  *
  * Usage:
  *
+ * <code>
  * R::find( 'paint', ' color_id = ? ', [ EID('color:yellow') ] );
+ * </code>
  *
  * If a function called EID() already exists you'll have to write this
  * wrapper yourself ;)

@@ -18,7 +18,6 @@ namespace RedBeanPHP;
  */
 interface Logger
 {
-
 	/**
 	 * A logger (for PDO or OCI driver) needs to implement the log method.
 	 * The log method will receive logging data. Note that the number of parameters is 0, this means
