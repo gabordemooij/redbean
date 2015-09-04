@@ -357,6 +357,7 @@ class Facade
 	 * @param integer $mode (0 = to STDOUT, 1 = to ARRAY)
 	 *
 	 * @return RDefault
+	 * @throws RedException
 	 */
 	public static function debug( $tf = TRUE, $mode = 0 )
 	{
@@ -371,7 +372,7 @@ class Facade
 			throw new RedException( 'Use R::setup() first.' );
 		}
 		$logger->setMode($mode);
-		self::$adapter->getDatabase()->setDebugMode( $tf );
+		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
 
 		return $logger;
 	}

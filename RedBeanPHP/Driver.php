@@ -120,11 +120,12 @@ interface Driver
 	 * passes on to the screen for inspection.
 	 * This method has no return value.
 	 *
-	 * @param boolean $trueFalse TRUE = debug mode ON
+	 * @param boolean $tf TRUE = debug mode ON
+	 * @param Logger $customLogger
 	 *
 	 * @return void
 	 */
-	public function setDebugMode( $tf );
+	public function setDebugMode( $tf, $customLogger );
 
 	/**
 	 * Starts a transaction.
