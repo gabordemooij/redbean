@@ -424,7 +424,7 @@ class Dup extends Base
 		 * }}'
 		 */
 
-		$d->setTables( $cache, 1 );
+		$d->setTables( $cache );
 
 		ob_start();
 

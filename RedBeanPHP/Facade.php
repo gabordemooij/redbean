@@ -2,23 +2,12 @@
 
 namespace RedBeanPHP;
 
-use RedBeanPHP\ToolBox as ToolBox;
-use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\AssociationManager as AssociationManager;
-use RedBeanPHP\TagManager as TagManager;
-use RedBeanPHP\DuplicationManager as DuplicationManager;
-use RedBeanPHP\LabelMaker as LabelMaker;
-use RedBeanPHP\Finder as Finder;
 use RedBeanPHP\RedException\SQL as SQLException;
-use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\Logger as Logger;
 use RedBeanPHP\Logger\RDefault as RDefault;
 use RedBeanPHP\Logger\RDefault\Debug as Debug;
-use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\SimpleModel as SimpleModel;
-use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
 use RedBeanPHP\Adapter as Adapter;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\RedException as RedException;
@@ -393,7 +382,7 @@ class Facade
 			throw new RedException( 'Use R::setup() first.' );
 		}
 		$logger->setMode($mode);
-		self::$adapter->getDatabase()->setDebugMode( $tf, $logger );
+		self::$adapter->getDatabase()->setDebugMode( $tf );
 
 		return $logger;
 	}

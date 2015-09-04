@@ -461,7 +461,7 @@ class Cross extends Base
 			$text->content = 'CHANGED';
 		}
 		foreach( $texts as $text ) {
-			asrt( $text->content, 'CHANGED', TRUE );
+			asrt( $text->content, 'CHANGED' );
 		}
 	 }
 
@@ -504,7 +504,7 @@ class Cross extends Base
 			$text->content = 'CHANGED';
 		}
 		foreach( $texts as $text ) {
-			asrt( $text->content, 'CHANGED', TRUE );
+			asrt( $text->content, 'CHANGED' );
 		}
 	 }
 

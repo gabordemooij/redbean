@@ -3,16 +3,10 @@
 namespace RedBeanPHP\Repository;
 
 use RedBeanPHP\OODBBean as OODBBean;
-use RedBeanPHP\Observable as Observable;
-use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\BeanHelper\FacadeBeanHelper as FacadeBeanHelper;
 use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\RedException\Security as Security;
-use RedBeanPHP\SimpleModel as SimpleModel;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException\SQL as SQLException;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\Repository as Repository;
 
 /**
@@ -38,9 +32,10 @@ class Frozen extends Repository
 	/**
 	 * Handles exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param Exception $exception exception to handle
+	 * @param \Exception $exception exception to handle
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	protected function handleException( \Exception $exception )
 	{
@@ -92,6 +87,7 @@ class Frozen extends Repository
 	 * @param array    $ownAdditions list of addition beans in own-list
 	 *
 	 * @return void
+	 * @throws RedException
 	 */
 	protected function processAdditions( $bean, $ownAdditions )
 	{
@@ -125,7 +121,7 @@ class Frozen extends Repository
 	 * configuration for you.
 	 *
 	 * @param string  $type              type of bean you want to dispense
-	 * @param string  $number            number of beans you would like to get
+	 * @param int  $number            number of beans you would like to get
 	 * @param boolean $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return OODBBean
@@ -135,6 +131,7 @@ class Frozen extends Repository
 		$OODBBEAN = defined( 'REDBEAN_OODBBEAN_CLASS' ) ? REDBEAN_OODBBEAN_CLASS : '\RedBeanPHP\OODBBean';
 		$beans = array();
 		for ( $i = 0; $i < $number; $i++ ) {
+			/** @var \RedBeanPHP\OODBBean $bean */
 			$bean = new $OODBBEAN;
 			$bean->initializeForDispense( $type, $this->oodb->getBeanHelper() );
 			$this->oodb->signal( 'dispense', $bean );
@@ -165,6 +162,7 @@ class Frozen extends Repository
 	 * @param integer $id   ID of the bean you want to load
 	 *
 	 * @return OODBBean
+	 * @throws SQLException
 	 */
 	public function load( $type, $id )
 	{

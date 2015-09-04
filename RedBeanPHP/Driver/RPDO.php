@@ -130,8 +130,10 @@ class RPDO implements Driver
 	 *
 	 * @param string $sql      the SQL string to be send to database server
 	 * @param array  $bindings the values that need to get bound to the query slots
+	 * @param array  $options
 	 *
-	 * @return void
+	 * @return mixed
+	 * @throws SQL
 	 */
 	protected function runQuery( $sql, $bindings, $options = array() )
 	{

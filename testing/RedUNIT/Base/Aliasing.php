@@ -252,7 +252,8 @@ class Aliasing extends Base
 		list( $teacher, $student ) = R::dispense( 'person', 2 ) ;
 		$teacher->name = 'jimmy' ;
 		$student->name = 'jacko' ;
-		R::store( $teacher, $student ) ;
+		R::store( $teacher ) ;
+		R::store( $student ) ;
 
 		$client = R::dispense( 'client' ) ;
 		$client->firm = 'bean AG' ;

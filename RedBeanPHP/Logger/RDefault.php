@@ -4,7 +4,6 @@ namespace RedBeanPHP\Logger;
 
 use RedBeanPHP\Logger as Logger;
 use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\RedException\Security as Security;
 
 /**
  * Logger. Provides a basic logging function for RedBeanPHP.

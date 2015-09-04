@@ -2,15 +2,10 @@
 
 namespace RedBeanPHP;
 
-use RedBeanPHP\Observable as Observable;
-use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\RedException\SQL as SQLException;
-use RedBeanPHP\ToolBox as ToolBox;
 
 /**
  * Association Manager.

@@ -28,6 +28,7 @@ interface Logger
 	 * The log method should be able to accept all kinds of parameters and data by using
 	 * functions like func_num_args/func_get_args.
 	 *
+	 * @param string $message, ...
 	 * @return void
 	 */
 	public function log();

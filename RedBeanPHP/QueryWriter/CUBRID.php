@@ -54,10 +54,11 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	 *
 	 * @param  string $type        type that will have a foreign key field
 	 * @param  string $targetType  points to this type
-	 * @param  string $field       field that contains the foreign key value
-	 * @param  string $targetField field where the fk points to
+	 * @param  string $property       field that contains the foreign key value
+	 * @param  string $targetProperty field where the fk points to
+	 * @param  bool $isDep
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	protected function buildFK( $type, $targetType, $property, $targetProperty, $isDep = FALSE )
 	{

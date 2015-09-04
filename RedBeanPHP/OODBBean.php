@@ -4,9 +4,7 @@ namespace RedBeanPHP;
 
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\BeanHelper as BeanHelper;
-use RedBeanPHP\RedException\Security as Security;
 use RedBeanPHP\RedException as RedException;
-use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * OODBBean (Object Oriented DataBase Bean).
@@ -1351,11 +1349,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 	 *
 	 * Can be used together with with, withCondition, alias and fetchAs.
 	 *
-	 * @param string  $property property
-	 * @param closure $function function
+	 * @param string $property property
+	 * @param callable $function function
 	 * @param integer $maxDepth maximum depth for traversal
 	 *
 	 * @return OODBBean
+	 * @throws RedException
 	 */
 	public function traverse( $property, $function, $maxDepth = NULL )
 	{
@@ -1380,7 +1379,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		if ( !is_array( $beans ) ) $beans = array( $beans );
 
 		foreach( $beans as $bean ) {
-
+			/** @var OODBBean $bean */
 			$function( $bean );
 
 			$bean->fetchType  = $oldFetchType;
@@ -1706,7 +1705,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$count = 0;
 
 		if ( $this->getID() ) {
-			$count = $redbean->getAssociationManager()->relatedCount( $this, $type, $this->withSql, $this->withParams, TRUE );
+			$count = $redbean->getAssociationManager()->relatedCount( $this, $type, $this->withSql, $this->withParams );
 		}
 
 		$this->clearModifiers();

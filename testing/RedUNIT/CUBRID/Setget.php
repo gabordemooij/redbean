@@ -107,8 +107,8 @@ class Setget extends \RedUNIT\CUBRID
 		asrt( setget( "NULL" ), "NULL" );
 		asrt( setget( "NULL" ), "NULL" );
 
-		asrt( setget( "0123", 1 ), "0123" );
-		asrt( setget( "0000123", 1 ), "0000123" );
+		asrt( setget( "0123" ), "0123" );
+		asrt( setget( "0000123" ), "0000123" );
 
 		asrt( setget( NULL ), NULL );
 

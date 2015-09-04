@@ -296,6 +296,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 
 	/**
 	 * @see QueryWriter::addFK
+	 * @return bool
 	 */
 	public function addFK( $type, $targetType, $property, $targetProperty, $isDependent = FALSE )
 	{
@@ -328,6 +329,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 		} catch ( SQLException $e ) {
 			// Failure of fk-constraints is not a problem
 		}
+		return true;
 	}
 
 	/**
