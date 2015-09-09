@@ -39,6 +39,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	const C_DATATYPE_SPECIAL_POINT    = 90;
 	const C_DATATYPE_SPECIAL_LINESTRING = 91;
 	const C_DATATYPE_SPECIAL_POLYGON    = 92;
+	const C_DATATYPE_SPECIAL_MONEY    = 93;
 
 	const C_DATATYPE_SPECIFIED        = 99;
 
@@ -113,6 +114,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 			MySQL::C_DATATYPE_SPECIAL_POINT    => ' POINT ',
 			MySQL::C_DATATYPE_SPECIAL_LINESTRING => ' LINESTRING ',
 			MySQL::C_DATATYPE_SPECIAL_POLYGON => ' POLYGON ',
+			MySQL::C_DATATYPE_SPECIAL_MONEY    => ' DECIMAL(10,2) '
 		);
 
 		$this->sqltype_typeno = array();
@@ -184,6 +186,9 @@ class MySQL extends AQueryWriter implements QueryWriter
 		if ( $value === INF ) return MySQL::C_DATATYPE_TEXT7;
 
 		if ( $flagSpecial ) {
+			if ( preg_match( '/^\d+\.\d{2}$/', $value ) ) {
+				return MySQL::C_DATATYPE_SPECIAL_MONEY;
+			}
 			if ( preg_match( '/^\d{4}\-\d\d-\d\d$/', $value ) ) {
 				return MySQL::C_DATATYPE_SPECIAL_DATE;
 			}
