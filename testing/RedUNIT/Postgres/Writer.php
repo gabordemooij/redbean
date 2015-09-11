@@ -501,6 +501,36 @@ class Writer extends Postgres
 	}
 
 	/**
+	 * Test money types.
+	 *
+	 * @return void
+	 */
+	public function testTypesMon()
+	{
+		$bean       = R::dispense( 'bean' );
+
+		$bean->amount = '22.99';
+
+		R::store( $bean );
+
+		$cols = R::getColumns( 'bean' );
+
+		asrt( $cols['amount'], 'numeric' );
+
+		R::nuke();
+
+		$bean       = R::dispense( 'bean' );
+
+		$bean->amount = '-22.99';
+
+		R::store( $bean );
+
+		$cols = R::getColumns( 'bean' );
+
+		asrt( $cols['amount'], 'numeric' );
+	}
+
+	/**
 	 * Test money data type.
 	 *
 	 * @return void
