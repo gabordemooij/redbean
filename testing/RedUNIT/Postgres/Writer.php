@@ -515,7 +515,19 @@ class Writer extends Postgres
 
 		$cols = R::getColumns( 'bean' );
 
-		asrt( $cols['amount'], 'numeric(10,2)' );
+		asrt( $cols['amount'], 'numeric' );
+
+		R::nuke();
+
+		$bean       = R::dispense( 'bean' );
+
+		$bean->amount = '-22.99';
+
+		R::store( $bean );
+
+		$cols = R::getColumns( 'bean' );
+
+		asrt( $cols['amount'], 'numeric' );
 	}
 
 	/**

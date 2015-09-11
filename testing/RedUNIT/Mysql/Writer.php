@@ -564,6 +564,18 @@ class Writer extends \RedUNIT\Mysql
 		$cols = R::getColumns( 'bean' );
 
 		asrt( $cols['amount'], 'decimal(10,2)' );
+
+		R::nuke();
+
+		$bean       = R::dispense( 'bean' );
+
+		$bean->amount = '-22.99';
+
+		R::store( $bean );
+
+		$cols = R::getColumns( 'bean' );
+
+		asrt( $cols['amount'], 'decimal(10,2)' );
 	}
 
 
