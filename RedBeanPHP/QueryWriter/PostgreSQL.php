@@ -137,7 +137,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 			self::C_DATATYPE_SPECIAL_LSEG     => ' lseg ',
 			self::C_DATATYPE_SPECIAL_CIRCLE   => ' circle ',
 			self::C_DATATYPE_SPECIAL_MONEY    => ' money ',
-			self::C_DATATYPE_SPECIAL_MONEY2   => ' numeric(10,2) '
+			self::C_DATATYPE_SPECIAL_MONEY2   => ' numeric(10,2) ',
 			self::C_DATATYPE_SPECIAL_POLYGON  => ' polygon ',
 		);
 
