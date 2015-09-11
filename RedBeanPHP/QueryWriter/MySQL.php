@@ -186,7 +186,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 		if ( $value === INF ) return MySQL::C_DATATYPE_TEXT7;
 
 		if ( $flagSpecial ) {
-			if ( preg_match( '/^\d+\.\d{2}$/', $value ) ) {
+			if ( preg_match( '/^-?\d+\.\d{2}$/', $value ) ) {
 				return MySQL::C_DATATYPE_SPECIAL_MONEY;
 			}
 			if ( preg_match( '/^\d{4}\-\d\d-\d\d$/', $value ) ) {
