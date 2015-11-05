@@ -372,8 +372,8 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 
 		foreach ( $this->getTables() as $t ) {
 			$t = $this->esc( $t );
-
-			$this->adapter->exec( "DROP TABLE IF EXISTS $t CASCADE " );
+			//Some plugins (PostGIS have unremovable tables/views), avoid exceptions.
+			try { $this->adapter->exec( "DROP TABLE IF EXISTS $t CASCADE " ); }catch( \Exception $e ) {}
 		}
 
 		$this->adapter->exec( 'SET CONSTRAINTS ALL IMMEDIATE' );
