@@ -19,6 +19,24 @@ use RedBeanPHP\Facade as R;
  */
 class Foreignkeys extends Mysql
 {
+
+	/**
+	* Test whether we can use foreign keys with keywords.
+	*
+	* @return void
+	*/
+	public function testKWConflicts()
+	{
+		R::nuke();
+		$metrics = R::dispense( 'metrics' );
+		$constraint = R::dispense( 'constraint' );
+		$constraint->xownMetrics[] = $metrics;
+		R::store( $constraint );
+		asrt( 1, R::count( 'metrics' ) );
+		R::trash($constraint);
+		asrt( 0, R::count( 'metrics') );
+	}
+
 	/**
 	 * Basic FK tests.
 	 *
