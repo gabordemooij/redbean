@@ -330,7 +330,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 				ALTER TABLE {$table}
 				ADD CONSTRAINT $cName
 				FOREIGN KEY $fkName ( `{$fieldNoQ}` ) REFERENCES `{$targetTableNoQ}`
-				({$targetFieldNoQ}) ON DELETE " . ( $isDependent ? 'CASCADE' : 'SET NULL' ) . ' ON UPDATE '.( $isDependent ? 'CASCADE' : 'SET NULL' ).';');
+				(`{$targetFieldNoQ}`) ON DELETE " . ( $isDependent ? 'CASCADE' : 'SET NULL' ) . ' ON UPDATE '.( $isDependent ? 'CASCADE' : 'SET NULL' ).';');
 		} catch ( SQLException $e ) {
 			// Failure of fk-constraints is not a problem
 		}

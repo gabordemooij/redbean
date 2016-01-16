@@ -64,7 +64,7 @@ interface BeanHelper
 	 *   if (!isset($bean->pages)) return NULL; //will ask again
 	 *   if ($bean->pages <= 10) return new Booklet;
 	 *   return new Book;
-	 *	}
+	 *	 }
 	 * }
 	 *
 	 * $h = new FlexBeanHelper;
