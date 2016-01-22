@@ -23,7 +23,7 @@ use RedBeanPHP\RedException as RedException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
+class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable, \JsonSerializable
 {
 	/**
 	 * FUSE error modes.
@@ -1816,5 +1816,16 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			   ( (string) $this->properties['id'] === (string) $bean->properties['id'] )
 			&& ( (string) $this->__info['type']   === (string) $bean->__info['type']   )
 		);
+	}
+
+
+	/**
+	 * Implement jsonSerializable interface, to let redbean work with json_encode.
+	 *
+	 * @see  http://php.net/manual/en/class.jsonserializable.php
+	 * @return array 
+	 */
+	function jsonSerialize() {
+		return $this->export();
 	}
 }
