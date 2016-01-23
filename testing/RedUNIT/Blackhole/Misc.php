@@ -48,7 +48,7 @@ class Misc extends Blackhole
 		$room->number = 237;
 		$hotel->ownRoomList[] = $room;
 		$shine = (string) $hotel;
-		asrt( $shine, '{"id":0,"name":"Overlook","ownRoom":[{}]}' ); //basic JSON
+		asrt( $shine, '{"id":0,"name":"Overlook"}' ); //basic JSON
 		$shine = json_encode( $hotel->jsonSerialize() ); //As of PHP 5.4 json_encode() will call jsonSerializable
 		asrt( $shine, '{"id":0,"name":"Overlook","ownRoom":[{"id":0,"number":237}]}' ); //should get full JSON
 	}

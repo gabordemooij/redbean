@@ -1267,8 +1267,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			foreach($this->properties as $property => $value) {
 				if (is_scalar($value)) {
 					$list[$property] = $value;
-				} else {
-					$list[$property] = array( new \StdClass ); /* emulate old-style JSON string */
 				}
 			}
 			return json_encode( $list );
