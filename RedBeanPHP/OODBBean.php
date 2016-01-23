@@ -6,6 +6,13 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException as RedException;
 
+/* PHP 5.3 compatibility */
+if (!interface_exists('Jsonable')) {
+		/* We extend JsonSerializable to avoid namespace conflicts,
+		can't define interface with special namespace in PHP */
+		interface Jsonable extends \JsonSerializable {};
+}
+
 /**
  * OODBBean (Object Oriented DataBase Bean).
  *
@@ -23,7 +30,7 @@ use RedBeanPHP\RedException as RedException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
+class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 {
 	/**
 	 * FUSE error modes.
@@ -1254,7 +1261,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 		$string = $this->__call( '__toString', array() );
 
 		if ( $string === NULL ) {
-			return json_encode( $this->properties );
+			$list = array();
+			foreach($this->properties as $property => $value) {
+				if (is_scalar($value)) {
+					$list[$property] = $value;
+				} else {
+					$list[$property] = array( new \StdClass ); /* emulate old-style JSON string */
+				}
+			}
+			return json_encode( $list );
 		} else {
 			return $string;
 		}
@@ -1816,5 +1831,19 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable
 			   ( (string) $this->properties['id'] === (string) $bean->properties['id'] )
 			&& ( (string) $this->__info['type']   === (string) $bean->__info['type']   )
 		);
+	}
+
+	/**
+	 * Magic method jsonSerialize, implementation for the \JsonSerializable interface,
+	 * this method gets called by json_encode and facilitates a better JSON representation
+	 * of the bean. Exports the bean on JSON serialization, for the JSON fans.
+	 *
+	 * @see  http://php.net/manual/en/class.jsonserializable.php
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return $this->export();
 	}
 }

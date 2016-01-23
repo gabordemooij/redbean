@@ -35,6 +35,25 @@ class Misc extends Blackhole
 	}
 
 	/**
+	 * Test whether we can use the JSONSerializable interface and
+	 * whether old-style JSON is still the same (backwards compatibility).
+	 *
+	 * @return void
+	 */
+	public function testJSONSerialize()
+	{
+		$hotel = R::dispense( 'hotel' );
+		$hotel->name = 'Overlook';
+		$room = R::dispense( 'room' );
+		$room->number = 237;
+		$hotel->ownRoomList[] = $room;
+		$shine = (string) $hotel;
+		asrt( $shine, '{"id":0,"name":"Overlook","ownRoom":[{}]}' ); //basic JSON
+		$shine = json_encode( $hotel->jsonSerialize() ); //As of PHP 5.4 json_encode() will call jsonSerializable
+		asrt( $shine, '{"id":0,"name":"Overlook","ownRoom":[{"id":0,"number":237}]}' ); //should get full JSON
+	}
+
+	/**
 	 * Tests max parameter binding.
 	 *
 	 * @return void
