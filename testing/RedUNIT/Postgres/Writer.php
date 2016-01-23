@@ -96,6 +96,10 @@ class Writer extends Postgres
 
 		asrt( $writer->scanType( str_repeat( "lorem ipsum", 100 ) ), PostgreSQL::C_DATATYPE_TEXT );
 
+		asrt( $writer->scanType( json_encode( array( 1, 2 ) ), TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_JSON );
+
+		asrt( $writer->scanType( json_encode( array( 'hello' => 'json', 'hello' => array( 'objects' ) ) ), TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_JSON );
+
 		$writer->widenColumn( "testtable", "c1", PostgreSQL::C_DATATYPE_TEXT );
 
 		$cols = $writer->getColumns( "testtable" );
@@ -117,6 +121,12 @@ class Writer extends Postgres
 		asrt( $writer->code( $cols['special2'], TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_DATETIME );
 
 		asrt( $writer->code( $cols['special'], FALSE ), PostgreSQL::C_DATATYPE_SPECIFIED );
+
+		$writer->addColumn( "testtable", "special3", PostgreSQL::C_DATATYPE_SPECIAL_JSON );
+
+		$cols = $writer->getColumns( "testtable" );
+
+		asrt( $writer->code( $cols['special3'], TRUE ), PostgreSQL::C_DATATYPE_SPECIAL_JSON );
 
 		//$id = $writer->insertRecord("testtable", array("c1"), array(array("lorem ipsum")));
 
