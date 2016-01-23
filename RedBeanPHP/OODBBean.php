@@ -7,10 +7,12 @@ use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException as RedException;
 
 /* PHP 5.3 compatibility */
-if (!interface_exists('Jsonable')) {
+if (interface_exists('\JsonSerializable')) {
 		/* We extend JsonSerializable to avoid namespace conflicts,
 		can't define interface with special namespace in PHP */
 		interface Jsonable extends \JsonSerializable {};
+} else {
+	interface Jsonable {};
 }
 
 /**
