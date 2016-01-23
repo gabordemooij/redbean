@@ -28,7 +28,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	/**
 	 * Factory function to create instance of Simple Model, if any.
 	 *
-	 * @var closure
+	 * @var \Closure
 	 */
 	private static $factory = null;
 
@@ -50,7 +50,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 * Sets the factory function to create the model when using FUSE
 	 * to connect a bean to a model.
 	 *
-	 * @param closure $factory factory function
+	 * @param \Closure $factory factory function
 	 *
 	 * @return void
 	 */
