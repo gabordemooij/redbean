@@ -38,7 +38,6 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	const C_DATATYPE_SPECIAL_MONEY    = 93;
 	const C_DATATYPE_SPECIAL_POLYGON  = 94;
 	const C_DATATYPE_SPECIAL_MONEY2   = 95; //Numbers only money, i.e. fixed point numeric
-	const C_DATATYPE_SPECIAL_JSON     = 96;
 	const C_DATATYPE_SPECIFIED        = 99;
 
 	/**
@@ -140,7 +139,6 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 			self::C_DATATYPE_SPECIAL_MONEY    => ' money ',
 			self::C_DATATYPE_SPECIAL_MONEY2   => ' numeric(10,2) ',
 			self::C_DATATYPE_SPECIAL_POLYGON  => ' polygon ',
-			self::C_DATATYPE_SPECIAL_JSON     => ' json ',
 		);
 
 		$this->sqltype_typeno = array();
@@ -238,10 +236,6 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 
 			if ( preg_match( '/^-?\d+\.\d{2}$/', $value ) ) {
 				return PostgreSQL::C_DATATYPE_SPECIAL_MONEY2;
-			}
-
-			if ( is_array( @json_decode( $value, TRUE ) ) ) {
-				return PostgreSQL::C_DATATYPE_SPECIAL_JSON;
 			}
 		}
 

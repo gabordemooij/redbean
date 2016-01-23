@@ -20,24 +20,6 @@ use RedBeanPHP\Facade as R;
 class Setget extends Postgres
 {
 	/**
-	 * Test support for Postgres JSON columns.
-	 */
-	public function testJSON()
-	{
-		asrt( setget( json_encode( array( 'can' => 'store json?' ) ) ), json_encode( array( 'can' => 'store json?' ) ) );
-		R::nuke();
-		$bean = R::dispense( 'blob' );
-		$bean->content = json_encode( array( 'hello' => 'world' ) );
-		R::store( $bean );
-		$columns = R::inspect( 'blob' );
-		asrt( $columns['content'], 'json' );
-		$bean = R::load( 'blob', $bean->id );
-		asrt( $bean->content, json_encode( array( 'hello' => 'world' ) ) );
-		$data = R::getCell( 'SELECT json_extract_path(content, \'hello\') FROM blob LIMIT 1' );
-		asrt( $data, '"world"' );
-	}
-
-	/**
 	 * Test numbers.
 	 *
 	 * @return void
