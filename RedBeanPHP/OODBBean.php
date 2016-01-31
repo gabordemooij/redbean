@@ -229,9 +229,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Parses the join in the with-snippet.
 	 * For instance:
 	 *
+	 * <code>
 	 * $author
 	 * 	->withCondition(' @joined.detail.title LIKE ? ')
 	 *  ->ownBookList;
+	 * </code>
 	 *
 	 * will automatically join 'detail' on book to
 	 * access the title field.
