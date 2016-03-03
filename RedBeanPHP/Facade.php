@@ -348,18 +348,35 @@ class Facade
 	/**
 	 * Toggles DEBUG mode.
 	 * In Debug mode all SQL that happens under the hood will
-	 * be printed to the screen or logged by provided logger.
+	 * be printed to the screen and/or logged.
 	 * If no database connection has been configured using R::setup() or
 	 * R::selectDatabase() this method will throw an exception.
-	 * Returns the attached logger instance.
 	 *
-	 * @param boolean $tf   debug mode (true or false)
-	 * @param integer $mode (0 = to STDOUT, 1 = to ARRAY)
+	 * There are 2 debug styles:
+	 *
+	 * Classic: separate parameter bindings, explicit and complete but less readable
+	 * Fancy:   interpersed bindings, truncates large strings, highlighted schema changes
+	 *
+	 * Fancy style is more readable but sometimes incomplete.
+	 *
+	 * The first parameter turns debugging ON or OFF.
+	 * The second parameter indicates the mode of operation:
+	 *
+	 * 0 Log and write to STDOUT classic style
+	 * 1 Log only, class style
+	 * 2 Log and write to STDOUT fancy style (default)
+	 * 3 Log only, fancy style
+	 *
+	 * This function always returns the logger instance created to generate the
+	 * debug messages.
+	 *
+	 * @param boolean $tf   debug mode (TRUE or FALSE)
+	 * @param integer $mode mode of operation
 	 *
 	 * @return RDefault
 	 * @throws RedException
 	 */
-	public static function debug( $tf = TRUE, $mode = 0 )
+	public static function debug( $tf = TRUE, $mode = 2 )
 	{
 		if ($mode > 1) {
 			$mode -= 2;
