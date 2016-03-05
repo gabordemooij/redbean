@@ -99,7 +99,7 @@ class Debug extends RDefault implements Logger
 			|| strpos( $str, 'DROP' ) === 0) {
 				$highlight = TRUE;
 			}
-			if (PHP_SAPI !== 'cli') {
+			if (PHP_SAPI === 'cli') {
 				if ($highlight) echo "\e[91m";
 				echo $str, PHP_EOL;
 				echo "\e[39m";
