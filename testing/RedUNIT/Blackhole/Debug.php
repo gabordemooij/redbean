@@ -45,6 +45,8 @@ class Debug extends Blackhole
 		}
 		$logs = $debugger->getLogs();
 		$log = reset($logs);
+		$log = str_replace( '\e[32m', '', $log );
+		$log = str_replace( '\e[39m', '', $log );
 		asrt($log, $expected);
 		$debugger->clear();
 	}
