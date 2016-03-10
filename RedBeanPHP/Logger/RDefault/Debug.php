@@ -131,7 +131,11 @@ class Debug extends RDefault implements Logger
 			$slot  = ':slot'.$i;
 			$begin = substr( $newSql, 0, $pos );
 			$end   = substr( $newSql, $pos+1 );
-			$newSql = $begin . $slot . $end;
+			if (PHP_SAPI === 'cli') {
+				$newSql = "{$begin}\e[32m{$slot}\e[39m{$end}";
+			} else {
+				$newSql = "{$begin}<b style=\"color:green\">$slot</b>{$end}";
+			}
 			$i++;
 		}
 		return $newSql;
