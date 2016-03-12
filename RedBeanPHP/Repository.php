@@ -480,9 +480,7 @@ abstract class Repository
 	 * data from raw result rows to the meta store of the bean. This is
 	 * useful for bundling additional information with custom queries.
 	 * Values of every column whos name starts with $mask will be
-	 * transferred to the meta section of the bean and prefixed with
-	 * 'data.'. So given a mask 'extra_' the value of the column 'extra_avg'
-	 * will be retrievable using getMeta( 'data.avg' );
+	 * transferred to the meta section of the bean under key 'data.bundle'.
 	 *
 	 * @param string $type type of beans you would like to have
 	 * @param array  $rows rows from the database result
@@ -493,7 +491,7 @@ abstract class Repository
 	public function convertToBeans( $type, $rows, $mask = NULL )
 	{
 		$masklen = 0;
-		if ( !is_null( $mask ) ) $masklen = mb_strlen( $mask );
+		if ( $mask !== NULL ) $masklen = mb_strlen( $mask );
 
 		$collection                  = array();
 		$this->stash[$this->nesting] = array();
@@ -512,10 +510,8 @@ abstract class Repository
 			$this->stash[$this->nesting][$id] = $row;
 			$collection[$id]                  = $this->load( $type, $id );
 
-			if ( !is_null( $mask ) && count( $meta ) > 0 ) {
-				foreach( $meta as $key => $value ) {
-					$collection[$id]->setMeta( 'data.'. substr( $key, $masklen ), $value );
-				}
+			if ( $mask !== NULL && count( $meta ) > 0 ) {
+				$collection[$id]->setMeta( 'data.bundle', $meta );
 			}
 		}
 		$this->stash[$this->nesting] = NULL;

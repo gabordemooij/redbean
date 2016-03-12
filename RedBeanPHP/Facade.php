@@ -986,13 +986,14 @@ class Facade
 	 * 
 	 * As of version 4.3.2 you can specify a meta-mask.
 	 * Data from columns with names starting with the value specified in the mask
-	 * will be transferred to the meta section of a bean (under data.*).
+	 * will be transferred to the meta section of a bean (under data.bundle).
 	 * 
 	 * <code>
 	 * $rows = R::getAll( 'SELECT FROM... COUNT(*) AS extra_count ...' );
 	 * $beans = R::convertToBeans( $rows );
 	 * $bean = reset( $beans );
-	 * $extra_count = $bean->getMeta('data.count');
+	 * $data = $bean->getMeta( 'data.bundle' );
+	 * $extra_count = $data['extra_count'];
 	 * </code>
 	 *
 	 * @param string $type type of beans to produce

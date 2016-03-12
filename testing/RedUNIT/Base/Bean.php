@@ -45,8 +45,9 @@ class Bean extends Base
 		asrt( isset( $bean->author ), TRUE );
 		asrt( isset( $bean->meta_count ), FALSE );
 		asrt( isset( $bean->meta_extra ), FALSE );
-		asrt( intval( $bean->getMeta('data.count') ), 2);
-		asrt( intval( $bean->getMeta('data.extra') ), 1234);
+		$data = $bean->getMeta( 'data.bundle' );
+		asrt( intval( $data['meta_count'] ), 2);
+		asrt( intval( $data['meta_extra'] ), 1234);
 		//now with multiple beans
 		$book = R::dispense( array(
 			'_type'  => 'book',
@@ -71,7 +72,8 @@ class Bean extends Base
 				asrt( isset( $book->author ), TRUE );
 				asrt( isset( $book->meta_count ), FALSE );
 				asrt( isset( $book->meta_extra ), FALSE );
-				asrt( intval( $book->getMeta('data.pages') ), 2);
+				$data = $book->getMeta( 'data.bundle' );
+				asrt( intval( $data['meta_pages'] ), 2);
 			}
 			if ( $book->title == 'Bean Adventures' ) {
 				$found++;
@@ -79,7 +81,8 @@ class Bean extends Base
 				asrt( isset( $book->author ), TRUE );
 				asrt( isset( $book->meta_pages ), FALSE );
 				asrt( isset( $book->meta_extra ), FALSE );
-				asrt( intval( $book->getMeta('data.pages') ), 3);
+				$data = $book->getMeta( 'data.bundle' );
+				asrt( intval( $data['meta_pages'] ), 3);
 			}
 		}
 		asrt( $found, 2 );
