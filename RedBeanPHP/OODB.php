@@ -432,12 +432,13 @@ class OODB extends Observable
 	 *
 	 * @param string $type type of beans you would like to have
 	 * @param array  $rows rows from the database result
+	 * @param string $mask mask to apply for meta data
 	 *
 	 * @return array
 	 */
-	public function convertToBeans( $type, $rows )
+	public function convertToBeans( $type, $rows, $mask = NULL )
 	{
-		return $this->repository->convertToBeans( $type, $rows );
+		return $this->repository->convertToBeans( $type, $rows, $mask );
 	}
 
 	/**

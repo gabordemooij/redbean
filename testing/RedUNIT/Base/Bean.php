@@ -19,6 +19,73 @@ use RedBeanPHP\Facade as R;
 class Bean extends Base
 {
 	/**
+	 * Tests whether we can send results of a query to meta data
+	 * when converting to bean.
+	 */
+	public function testImportMeta()
+	{
+		R::nuke();
+		$book = R::dispense( array(
+			'_type'  => 'book',
+			'title'  => 'Bean Recipes',
+			'author' => 'Meastro de la Bean'
+		) );
+		$pages = R::dispenseAll( 'page*2' );
+		$book->ownPageList = reset( $pages );
+		R::store( $book );
+		$data = R::getRow('SELECT book.*,
+								  COUNT(page.id) AS meta_count,
+								  1234 AS meta_extra
+						   FROM book
+						   LEFT JOIN page ON page.book_id = book.id
+						   GROUP BY book.id
+						   ');
+		$bean = R::convertToBean( 'book', $data, 'meta_' );
+		asrt( isset( $bean->title ), TRUE );
+		asrt( isset( $bean->author ), TRUE );
+		asrt( isset( $bean->meta_count ), FALSE );
+		asrt( isset( $bean->meta_extra ), FALSE );
+		asrt( intval( $bean->getMeta('data.count') ), 2);
+		asrt( intval( $bean->getMeta('data.extra') ), 1234);
+		//now with multiple beans
+		$book = R::dispense( array(
+			'_type'  => 'book',
+			'title'  => 'Bean Adventures',
+			'author' => 'Mr Adventure'
+		) );
+		$pages = R::dispenseAll( 'page*3' );
+		$book->ownPageList = reset( $pages );
+		R::store( $book );
+		$data = R::getAll('SELECT book.*,
+								  COUNT(page.id) AS meta_pages			  
+						   FROM book
+						   LEFT JOIN page ON page.book_id = book.id
+						   GROUP BY book.id
+						   ');
+		$books = R::convertToBeans( 'book', $data, 'meta_' );
+		$found = 0;
+		foreach( $books as $book ) {
+			if ( $book->title == 'Bean Recipes' ) {
+				$found++;
+				asrt( isset( $book->title ), TRUE );
+				asrt( isset( $book->author ), TRUE );
+				asrt( isset( $book->meta_count ), FALSE );
+				asrt( isset( $book->meta_extra ), FALSE );
+				asrt( intval( $book->getMeta('data.pages') ), 2);
+			}
+			if ( $book->title == 'Bean Adventures' ) {
+				$found++;
+				asrt( isset( $book->title ), TRUE );
+				asrt( isset( $book->author ), TRUE );
+				asrt( isset( $book->meta_pages ), FALSE );
+				asrt( isset( $book->meta_extra ), FALSE );
+				asrt( intval( $book->getMeta('data.pages') ), 3);
+			}
+		}
+		asrt( $found, 2 );
+	}
+
+	/**
 	 * Test beautification conflicts...
 	 * Issue #418
 	 *

@@ -976,15 +976,33 @@ class Facade
 	 * The type of the desired output beans can be specified in the
 	 * first parameter. The second parameter is meant for the database
 	 * result rows.
+	 * 
+	 * Usage:
+	 * 
+	 * <code>
+	 * $rows = R::getAll( 'SELECT * FROM ...' )
+	 * $beans = R::convertToBeans( $rows );
+	 * </code>
+	 * 
+	 * As of version 4.3.2 you can specify a meta-mask.
+	 * Data from columns with names starting with the value specified in the mask
+	 * will be transferred to the meta section of a bean (under data.*).
+	 * 
+	 * <code>
+	 * $rows = R::getAll( 'SELECT FROM... COUNT(*) AS extra_count ...' );
+	 * $beans = R::convertToBeans( $rows );
+	 * $bean = reset( $beans );
+	 * $extra_count = $bean->getMeta('data.count');
+	 * </code>
 	 *
 	 * @param string $type type of beans to produce
 	 * @param array  $rows must contain an array of array
 	 *
 	 * @return array
 	 */
-	public static function convertToBeans( $type, $rows )
+	public static function convertToBeans( $type, $rows, $metamask = NULL )
 	{
-		return self::$redbean->convertToBeans( $type, $rows );
+		return self::$redbean->convertToBeans( $type, $rows, $metamask );
 	}
 
 	/**
@@ -996,9 +1014,11 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function convertToBean( $type, $rows )
+	public static function convertToBean( $type, $row, $metamask = NULL )
 	{
-		return self::$redbean->convertToBeans( $type, array( $rows ) );
+		$beans = self::$redbean->convertToBeans( $type, array( $row ), $metamask );
+		$bean  = reset( $beans );
+		return $bean;
 	}
 
 	/**
