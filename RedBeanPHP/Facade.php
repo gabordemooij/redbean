@@ -395,6 +395,8 @@ class Facade
 	}
 
 	/**
+	 * @deprecated, now the default.
+	 *
 	 * Turns on the fancy debugger.
 	 * In 'fancy' mode the debugger will output queries with bound
 	 * parameters inside the SQL itself. This method has been added to
@@ -405,7 +407,7 @@ class Facade
 	 *
 	 * @return void
 	 */
-	public static function fancyDebug( $toggle )
+	public static function fancyDebug( $toggle = TRUE )
 	{
 		self::debug( $toggle, 2 );
 	}
