@@ -986,6 +986,20 @@ class Facade
 	}
 
 	/**
+	 * Just like converToBeans, but for one bean.
+	 * @see convertToBeans for more details.
+	 *
+	 * @param string $type type of beans to produce
+	 * @param array  $row  one row from the database
+	 *
+	 * @return array
+	 */
+	public static function convertToBean( $type, $rows )
+	{
+		return self::$redbean->convertToBeans( $type, array( $rows ) );
+	}
+
+	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Tests whether a bean has been associated with one ore more
 	 * of the listed tags. If the third parameter is TRUE this method
