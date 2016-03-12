@@ -1470,6 +1470,30 @@ class Facade
 	}
 
 	/**
+	 * In case you use PDO (which is recommended and the default but not mandatory, hence
+	 * the database adapter), you can use this method to obtain the PDO object directly.
+	 * This is a convenience method, it will do the same as:
+	 *
+	 * <code>
+	 * R::getDatabaseAdapter()->getDatabase()->getPDO();
+	 * </code>
+	 *
+	 * If the PDO object could not be found, for whatever reason, this method
+	 * will return NULL instead.
+	 *
+	 * @return NULL|PDO
+	 */
+	public static function getPDO()
+	{
+		$databaseAdapter = self::getDatabaseAdapter();
+		if ( is_null( $databaseAdapter ) ) return NULL;
+		$database = $databaseAdapter->getDatabase();
+		if ( is_null( $database ) ) return NULL;
+		if ( !method_exists( $database, 'getPDO' ) ) return NULL;
+		return $database->getPDO();
+	}
+
+	/**
 	 * Returns the current duplication manager instance.
 	 *
 	 * @return DuplicationManager
