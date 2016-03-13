@@ -510,7 +510,7 @@ abstract class Repository
 			$this->stash[$this->nesting][$id] = $row;
 			$collection[$id]                  = $this->load( $type, $id );
 
-			if ( $mask !== NULL && count( $meta ) > 0 ) {
+			if ( $mask !== NULL ) {
 				$collection[$id]->setMeta( 'data.bundle', $meta );
 			}
 		}
