@@ -362,9 +362,9 @@ class Facade
 	 * The first parameter turns debugging ON or OFF.
 	 * The second parameter indicates the mode of operation:
 	 *
-	 * 0 Log and write to STDOUT classic style
+	 * 0 Log and write to STDOUT classic style (default)
 	 * 1 Log only, class style
-	 * 2 Log and write to STDOUT fancy style (default)
+	 * 2 Log and write to STDOUT fancy style
 	 * 3 Log only, fancy style
 	 *
 	 * This function always returns the logger instance created to generate the
@@ -376,7 +376,7 @@ class Facade
 	 * @return RDefault
 	 * @throws RedException
 	 */
-	public static function debug( $tf = TRUE, $mode = 2 )
+	public static function debug( $tf = TRUE, $mode = 0 )
 	{
 		if ($mode > 1) {
 			$mode -= 2;
@@ -395,8 +395,6 @@ class Facade
 	}
 
 	/**
-	 * @deprecated, now the default.
-	 *
 	 * Turns on the fancy debugger.
 	 * In 'fancy' mode the debugger will output queries with bound
 	 * parameters inside the SQL itself. This method has been added to
@@ -538,7 +536,7 @@ class Facade
 	 *
 	 * @param string|array $typeOrBeanArray   type or bean array to import
 	 * @param integer      $number            number of beans to dispense
-	 * @param boolean	   $alwaysReturnArray if TRUE always returns the result as an array
+	 * @param boolean      $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return array|OODBBean
 	 */
@@ -887,7 +885,7 @@ class Facade
 	 * @param OODBBean $bean  bean to be copied
 	 * @param array    $trail for internal usage, pass array()
 	 * @param boolean  $pid   for internal usage
-	 * @param array	 $white white list filter with bean types to duplicate
+	 * @param array    $white white list filter with bean types to duplicate
 	 *
 	 * @return array
 	 */
@@ -917,7 +915,7 @@ class Facade
 	 * This is a simplified version of the deprecated R::dup() function.
 	 *
 	 * @param OODBBean $bean  bean to be copied
-	 * @param array	 $white white list filter with bean types to duplicate
+	 * @param array    $white white list filter with bean types to duplicate
 	 *
 	 * @return array
 	 */
@@ -976,18 +974,18 @@ class Facade
 	 * The type of the desired output beans can be specified in the
 	 * first parameter. The second parameter is meant for the database
 	 * result rows.
-	 * 
+	 *
 	 * Usage:
-	 * 
+	 *
 	 * <code>
 	 * $rows = R::getAll( 'SELECT * FROM ...' )
 	 * $beans = R::convertToBeans( $rows );
 	 * </code>
-	 * 
+	 *
 	 * As of version 4.3.2 you can specify a meta-mask.
 	 * Data from columns with names starting with the value specified in the mask
 	 * will be transferred to the meta section of a bean (under data.bundle).
-	 * 
+	 *
 	 * <code>
 	 * $rows = R::getAll( 'SELECT FROM... COUNT(*) AS extra_count ...' );
 	 * $beans = R::convertToBeans( $rows );

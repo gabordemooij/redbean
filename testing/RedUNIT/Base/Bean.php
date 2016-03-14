@@ -58,7 +58,7 @@ class Bean extends Base
 		$book->ownPageList = reset( $pages );
 		R::store( $book );
 		$data = R::getAll('SELECT book.*,
-								  COUNT(page.id) AS meta_pages			  
+								  COUNT(page.id) AS meta_pages
 						   FROM book
 						   LEFT JOIN page ON page.book_id = book.id
 						   GROUP BY book.id
