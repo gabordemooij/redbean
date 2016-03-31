@@ -282,7 +282,7 @@ class Facade
 	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE )
 	{
 		if ( isset( self::$toolboxes[$key] ) ) {
-			throw new RedException( 'A database has already be specified for this key.' );
+			throw new RedException( 'A database has already been specified for this key.' );
 		}
 
 		if ( is_object($dsn) ) {
