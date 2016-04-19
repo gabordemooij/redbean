@@ -316,6 +316,20 @@ class Facade
 	}
 
 	/**
+	 * Determines whether a database identified with the specified key has
+	 * already been added to the facade. This function will return TRUE
+	 * if the database indicated by the key is available and FALSE otherwise.
+	 *
+	 * @param string $key the key/name of the database to check for
+	 *
+	 * @return boolean
+	 */
+	public static function hasDatabase( $key )
+	{
+		return ( isset( self::$toolboxes[$key] ) );
+	}
+
+	/**
 	 * Selects a different database for the Facade to work with.
 	 * If you use the R::setup() you don't need this method. This method is meant
 	 * for multiple database setups. This method selects the database identified by the
