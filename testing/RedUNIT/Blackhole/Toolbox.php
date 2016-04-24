@@ -30,6 +30,18 @@ use RedBeanPHP\RedException as RedException;
 class Toolbox extends Blackhole {
 
 	/**
+	 * Tests the hasDatabase() method.
+	 *
+	 * @return void
+	 */
+	public function testDatabaseCheck()
+	{
+		R::addDatabase( 'key1', 'mysql:dsn1', 'user1', 'password1', TRUE );
+		asrt( R::hasDatabase( 'key1' ), TRUE );
+		asrt( R::hasDatabase( 'key2' ), FALSE );
+	}
+
+	/**
 	 * Github issue #458, selectDatabase causes PHP notice undefined index
 	 * if database key not found.
 	 *
