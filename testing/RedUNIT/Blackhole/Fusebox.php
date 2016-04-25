@@ -29,14 +29,10 @@ class Fusebox extends Blackhole
 	 */
 	public function testBasicBox()
 	{
-		$soup          = R::dispense( 'soup' );
-
+		$soup = R::dispense( 'soup' );
 		$soup->flavour = 'tomato';
-
 		$this->giveMeSoup( $soup->box() );
-
 		$this->giveMeBean( $soup->box()->unbox() );
-
 		$this->giveMeBean( $soup );
 	}
 
@@ -48,9 +44,7 @@ class Fusebox extends Blackhole
 	private function giveMeSoup( \Model_Soup $soup )
 	{
 		asrt( ( $soup instanceof \Model_Soup ), TRUE );
-
 		asrt( 'A bit too salty', $soup->taste() );
-
 		asrt( 'tomato', $soup->flavour );
 	}
 
@@ -62,10 +56,7 @@ class Fusebox extends Blackhole
 	private function giveMeBean( OODBBean $bean )
 	{
 		asrt( ( $bean instanceof OODBBean ), TRUE );
-
 		asrt( 'A bit too salty', $bean->taste() );
-
 		asrt( 'tomato', $bean->flavour );
 	}
 }
-

@@ -108,18 +108,15 @@ class Debug extends Blackhole
 		$this->testDebug('title = ? OR title = ?', array('a very long title that should be shortened', 'another long title that should be shortened'), 'title = \'a very long title th... \' OR title = \'another long title t... \'');
 		$this->testDebug('title = ? OR ?', array('a very long title that should be shortened', NULL), 'title = \'a very long title th... \' OR NULL');
 		$this->testDebug('?,?', array('hello'), '\'hello\',:slot1');
-
 		$this->testDebug('title = :first OR title = :second', array(':first'=>'book1', ':second'=>'book2'), 'title = \'book1\' OR title = \'book2\'');
 		$this->testDebug('title = :first OR price = :second', array(':first'=>'book1', ':second'=>20), 'title = \'book1\' OR price = 20');
 		$this->testDebug('number IN (:one,:two)', array(':one'=>8, ':two'=>900), 'number IN (8,900)');
 		$this->testDebug('number IN (:one,:two)', array(':one'=>8, ':two'=>900, ':three'=>999), 'number IN (8,900)');
 		$this->testDebug('number IN (:one,:two)', array(':three'=>999, ':one'=>8, ':two'=>900), 'number IN (8,900)');
 		$this->testDebug('number IN (:one,:two)', array(':one'=>8, ':three'=>999, ':two'=>900), 'number IN (8,900)');
-
 		$this->testDebug(':a', array(':a'=>20), '20');
 		$this->testDebug(':a,?', array(':a'=>20, 30), '20,30');
 		$this->testDebug(':a,?', array(30, ':a'=>20), '20,30');
-
 		$this->testDebug('?,?', array('test',20), '\'test\',20');
 		$this->testDebug('?', array( NULL ), 'NULL');
 		$this->testDebug('title = ?', array( NULL ), 'title = NULL');
@@ -128,9 +125,7 @@ class Debug extends Blackhole
 		$this->testDebug('title = ? OR title = ?', array('a very long title that should be shortened', 'another long title that should be shortened'), 'title = \'a very long title th... \' OR title = \'another long title t... \'');
 		$this->testDebug('title = ? OR ?', array('a very long title that should be shortened', NULL), 'title = \'a very long title th... \' OR NULL');
 		$this->testDebug('?,?', array('hello'), '\'hello\',:slot1');
-
 		$this->testDebug('hello ?', 'world', 'hello ?');
-
 		$this->testDebug(':slot0 :slot1 :slot2 :slot3 :slot4 :slot5 :slot6 :slot7 :slot8 :slot9 :slot10', array(
 		'a','b','c','d','e','f','g','h','i','j','k'
 		),"'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k'");
