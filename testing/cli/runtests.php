@@ -1,7 +1,6 @@
 <?php
 
 chdir( '..' );
-
 $xdebugSupported = (function_exists('xdebug_start_code_coverage'));
 
 if ($xdebugSupported) xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
@@ -9,7 +8,6 @@ require 'testcontainer/rb.php';
 
 //load core classes
 require 'RedUNIT.php';
-
 error_reporting( E_ALL );
 
 //Load configuration file
@@ -211,61 +209,42 @@ if ( $mode == 'all' ) {
 $packList = array_unique(array_merge( $packList, $suffix, $extraTestsFromHook ));
 $j = 0;
 foreach ( $packList as $testPack ) {
-	$j ++;
-
+	$j++;
 	if ( file_exists( $path . $testPack . '.php' ) ) require( $path . $testPack . '.php' );
 	elseif ( file_exists( $hookPath . $testPack . '.php') ) require( $hookPath . $testPack . '.php' );
-
 	$testPack = str_replace( '../', '', $testPack );
-
 	if ($j === 1 && $classSpec) {
 		$testClass = $classSpec;
 	} else {
 		$testClassName = str_replace( ' ', '\\', ( str_replace( '/', ' ', $testPack ) ) );
 		$testClass     = '\\RedUNIT\\' . ucfirst( $testClassName );
 	}
-
 	$test          = new $testClass();
-
 	$drivers       = $test->getTargetDrivers();
-
 	maintestpack( str_replace( '_', ' ', get_class( $test ) ) );
-
 	$round = 0;
 	$test->setRound( $round );
-
 	if ( $drivers && is_array( $drivers ) ) {
 		foreach ( $drivers as $driver ) {
 			if ( !isset( $ini[$driver] ) ) continue;
-
 			echo PHP_EOL;
-
 			echo '===== DRIVER : (' . $driver . ') =====';
-
 			echo PHP_EOL;
 			echo PHP_EOL;
-
 			if ( isset( $colorMap[$driver] ) ) {
 				echo "\033[{$colorMap[$driver]}m";
 			}
-
 			activate_driver( $driver );
-
 			$currentDriver = $driver;
-
 			$test->setCurrentDriver( $driver );
-
 			$test->prepare();
 			$test->run();
 			$test->cleanUp();
-
 			if ( isset ( $colorMap[$driver] ) ) {
 				echo "\033[0m";
 			}
-
 			echo PHP_EOL;
 			$test->setRound( ++$round );
-
 		}
 	} else {
 		$test->prepare();
@@ -297,9 +276,7 @@ foreach( $report as $file => $lines ) {
 			if ( strpos( $file, 'RedBeanPHP' ) === false ) continue;
 		}
 	}
-
 	$covLines[] = '***** File:'.$file.' ******';
-
 	$fileData = file_get_contents( $file );
 	$fileLines = explode( "\n", $fileData );
 	$i = 1;
@@ -322,13 +299,11 @@ foreach( $report as $file => $lines ) {
 }
 $covFile = implode( "\n", $covLines );
 @file_put_contents( 'cli/coverage_log.txt', $covFile );
-
 if ( $hits > 0 ) {
 	$perc = ( $hits / ( $hits + $misses ) ) * 100;
 } else {
 	$perc = 0;
 }
-
 echo 'Code Coverage: '.PHP_EOL;
 echo 'Hits: '.$hits.PHP_EOL;
 echo 'Misses: '.$misses.PHP_EOL;
