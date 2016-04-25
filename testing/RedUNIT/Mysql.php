@@ -5,6 +5,9 @@ namespace RedUNIT;
 /**
  * Mysql
  *
+ * The Mysql class is the parent class of all MySQL and MariaDB
+ * specific test classes.
+ *
  * @file    RedUNIT/Mysql.php
  * @desc    Base class for all tests that test support for MySQL/MariaDB database.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -16,8 +19,12 @@ namespace RedUNIT;
  */
 class Mysql extends RedUNIT
 {
-	/*
-	 * What drivers should be loaded for this test pack?
+	/**
+	 * Returns a list of drivers for which this driver supports
+	 * 'test rounds'. This class only supports
+	 * the MySQL/MariaDB driver.
+	 *
+	 * @see RedUNIT::getTargetDrivers() for details.
 	 *
 	 * @return array
 	 */

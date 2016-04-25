@@ -5,6 +5,9 @@ namespace RedUNIT;
 /**
  * Sqlite
  *
+ * The Sqlite class is the parent class of all SQLite3 specific test
+ * classes.
+ *
  * @file    RedUNIT/Sqlite.php
  * @desc    Base class for all SQLite specific tests.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -16,8 +19,11 @@ namespace RedUNIT;
  */
 class Sqlite extends RedUNIT
 {
-	/*
-	 * What drivers should be loaded for this test pack?
+	/**
+	 * Returns a list of drivers for which this driver supports
+	 * 'test rounds'. This class only supports the SQLite3 driver.
+	 *
+	 * @see RedUNIT::getTargetDrivers() for details.
 	 *
 	 * @return array
 	 */

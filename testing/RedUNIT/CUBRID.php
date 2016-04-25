@@ -3,7 +3,9 @@
 namespace RedUNIT;
 
 /**
- * RedUNIT_CUBRID
+ * CUBRID
+ *
+ * The CUBRID class is the parent class for all CUBRID specific tests.
  *
  * @file    RedUNIT/CUBRID.php
  * @desc    Base class for all test classes that aim to test the CUBRID database support.
@@ -16,8 +18,11 @@ namespace RedUNIT;
  */
 class CUBRID extends RedUNIT
 {
-	/*
-	 * What drivers should be loaded for this test pack?
+	/**
+	 * Returns a list of drivers for which this driver supports
+	 * 'test rounds'. This class only supports the CUBRID driver.
+	 *
+	 * @see RedUNIT::getTargetDrivers() for details.
 	 *
 	 * @return array
 	 */

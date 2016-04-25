@@ -23,7 +23,7 @@ class Base extends RedUNIT
 {
 
 	/**
-	 * List of DB drivers
+	 * List of DB drivers.
 	 *
 	 * @var array
 	 */
@@ -32,7 +32,7 @@ class Base extends RedUNIT
 	/**
 	 * Adds a driver to the list.
 	 *
-	 * @param string $driverID
+	 * @param string $driverID driver identifier.
 	 */
 	public static function addToDriverList( $driverID )
 	{
@@ -40,7 +40,10 @@ class Base extends RedUNIT
 	}
 
 	/**
-	 * What drivers should be loaded for this test pack?
+	 * Returns a list of drivers for which this driver supports
+	 * 'test rounds'. This class only supports all base drivers.
+	 *
+	 * @see RedUNIT::getTargetDrivers() for details.
 	 *
 	 * @return array
 	 */
