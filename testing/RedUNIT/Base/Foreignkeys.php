@@ -65,7 +65,9 @@ class Foreignkeys extends Base implements Observer
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
-		$book->cover;
+		$cover = $book->cover;
+		asrt( ( $cover instanceof OODBBean ), TRUE );
+		asrt( $cover->getMeta( 'type' ), 'page' );
 		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
 		R::aliases( array() );
 		R::nuke();
