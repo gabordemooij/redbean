@@ -2,8 +2,14 @@
 namespace RedUNIT\CUBRID;
 use RedBeanPHP\Facade as R;
 use \RedBeanPHP\QueryWriter\CUBRID as CUBRID;
+
 /**
- * RedUNIT_CUBRID_Writer
+ * Writer
+ *
+ * Tests for CUBRID Query Writer.
+ * This test class contains Query Writer specific tests.
+ * Use this class to add tests to test Query Writer specific
+ * behaviours, quirks and issues.
  *
  * @file    RedUNIT/CUBRID/Writer.php
  * @desc    A collection of database specific writer functions.

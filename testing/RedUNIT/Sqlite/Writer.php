@@ -11,6 +11,11 @@ use RedBeanPHP\RedException\SQL as SQL;
 /**
  * Writer
  *
+ * Tests for SQLite Query Writer.
+ * This test class contains Query Writer specific tests.
+ * Use this class to add tests to test Query Writer specific
+ * behaviours, quirks and issues.
+ *
  * @file    RedUNIT/Sqlite/Writer.php
  * @desc    Tests writer specific functions.
  * @author  Gabor de Mooij and the RedBeanPHP Community

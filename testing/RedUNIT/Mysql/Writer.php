@@ -13,6 +13,11 @@ use RedBeanPHP\RedException as RedException;
 /**
  * Writer
  *
+ * Tests for MySQL and MariaDB Query Writer.
+ * This test class contains Query Writer specific tests.
+ * Use this class to add tests to test Query Writer specific
+ * behaviours, quirks and issues.
+ *
  * @file    RedUNIT/Mysql/Writer.php
  * @desc    A collection of database specific writer functions.
  * @author  Gabor de Mooij and the RedBeanPHP Community

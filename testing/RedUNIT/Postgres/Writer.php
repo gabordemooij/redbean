@@ -11,6 +11,11 @@ use RedBeanPHP\RedException\SQL as SQL;
 /**
  * Writer
  *
+ * Tests for PostgreSQL Query Writer.
+ * This test class contains Query Writer specific tests.
+ * Use this class to add tests to test Query Writer specific
+ * behaviours, quirks and issues.
+ *
  * @file    RedUNIT/Postgres/Writer.php
  * @desc    A collection of writer specific tests.
  * @author  Gabor de Mooij and the RedBeanPHP Community
