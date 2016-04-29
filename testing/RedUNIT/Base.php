@@ -24,6 +24,7 @@ class Base extends RedUNIT
 
 	/**
 	 * List of DB drivers.
+	 * Contains the list of database drivers as returned by getTargetDrivers().
 	 *
 	 * @var array
 	 */
