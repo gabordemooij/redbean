@@ -8,6 +8,20 @@ use RedBeanPHP\Facade as R;
 /**
  * Setget
  *
+ * This class has been designed to test set/get operations
+ * for a specific Query Writer / Adapter. Since RedBeanPHP
+ * creates columns based on values it's essential that you
+ * get back the 'same' value as you put in - or - if that's
+ * not the case, that there are at least very clear rules
+ * about what to expect. Examples of possible issues tested in
+ * this class include:
+ *
+ * - Test whether booleans are returned correctly (they will become integers)
+ * - Test whether large numbers are preserved
+ * - Test whether floating point numbers are preserved
+ * - Test whether date/time values are preserved
+ * and so on...
+ *
  * @file    RedUNIT/Mysql/Setget.php
  * @desc    Tests whether values are stored correctly.
  * @author  Gabor de Mooij and the RedBeanPHP Community
