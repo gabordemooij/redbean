@@ -76,11 +76,8 @@ class Setget extends \RedUNIT\CUBRID
 	public function testDates()
 	{
 		asrt( setget( "2010-10-11" ), "2010-10-11" );
-
 		asrt( setget( "2010-10-11 12:10" ), "2010-10-11 12:10" );
-
 		asrt( setget( "2010-10-11 12:10:11" ), "2010-10-11 12:10:11.000" );
-
 		asrt( setget( "x2010-10-11 12:10:11" ), "x2010-10-11 12:10:11" );
 	}
 
@@ -92,11 +89,8 @@ class Setget extends \RedUNIT\CUBRID
 	public function testStrings()
 	{
 		asrt( setget( "a" ), "a" );
-
 		asrt( setget( "." ), "." );
-
 		asrt( setget( "\"" ), "\"" );
-
 		asrt( setget( "just some text" ), "just some text" );
 	}
 
@@ -109,7 +103,6 @@ class Setget extends \RedUNIT\CUBRID
 	{
 		asrt( setget( TRUE ), "1" );
 		asrt( setget( FALSE ), "0" );
-
 		asrt( setget( "TRUE" ), "TRUE" );
 		asrt( setget( "FALSE" ), "FALSE" );
 	}
@@ -137,18 +130,14 @@ class Setget extends \RedUNIT\CUBRID
 
 		// minor test sqltest
 		$a = R::getWriter()->sqlStateIn( '000', array() );
-
 		// Unknown state must return FALSE.
 		asrt( $a, FALSE );
-
 		try {
 			R::getWriter()->esc( '`aaa`' );
-
 			fail();
 		} catch (\Exception $e ) {
 			pass();
 		}
-
 		asrt( ( $e instanceof RedException ), TRUE );
 	}
 }

@@ -81,11 +81,8 @@ class Setget extends Postgres
 	public function testDates()
 	{
 		asrt( setget( "2010-10-11" ), "2010-10-11" );
-
 		asrt( setget( "2010-10-11 12:10" ), "2010-10-11 12:10" );
-
 		asrt( setget( "2010-10-11 12:10:11" ), "2010-10-11 12:10:11" );
-
 		asrt( setget( "x2010-10-11 12:10:11" ), "x2010-10-11 12:10:11" );
 	}
 
@@ -97,11 +94,8 @@ class Setget extends Postgres
 	public function testStrings()
 	{
 		asrt( setget( "a" ), "a" );
-
 		asrt( setget( "." ), "." );
-
 		asrt( setget( "\"" ), "\"" );
-
 		asrt( setget( "just some text" ), "just some text" );
 	}
 

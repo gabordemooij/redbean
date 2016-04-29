@@ -91,7 +91,6 @@ class Setget extends Sqlite
 		asrt( setget( "a" ), "a" );
 		asrt( setget( "." ), "." );
 		asrt( setget( "\"" ), "\"" );
-
 		asrt( setget( "just some text" ), "just some text" );
 	}
 
@@ -104,7 +103,6 @@ class Setget extends Sqlite
 	{
 		asrt( setget( TRUE ), "1" );
 		asrt( setget( FALSE ), "0" );
-
 		asrt( setget( "TRUE" ), "TRUE" );
 		asrt( setget( "FALSE" ), "FALSE" );
 	}
