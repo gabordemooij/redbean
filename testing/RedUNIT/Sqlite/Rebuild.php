@@ -8,6 +8,12 @@ use RedBeanPHP\Facade as R;
 /**
  * Rebuild
  *
+ * SQLite cannot ALTER tables like other databases can.
+ * To implement fluid mode in RedBeanPHP we have to
+ * rebuild the entire table whenever we add or remove a column.
+ * This test class tests whether rebuilding tables works properly,
+ * i.e. we get the same table plus/minus some column...
+ *
  * @file    RedUNIT/Sqlite/Rebuild.php
  * @desc    Test rebuilding of tables for SQLite
  * @author  Gabor de Mooij and the RedBeanPHP Community
