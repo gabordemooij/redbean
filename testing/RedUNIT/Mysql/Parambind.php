@@ -51,7 +51,6 @@ class Parambind extends Mysql
 		}
 		try {
 			R::exec( "select * from job limit ? ", array( 1 ) );
-
 			fail();
 		} catch (\Exception $e ) {
 			pass();
@@ -67,7 +66,6 @@ class Parambind extends Mysql
 			R::getAll( "select * from job limit ? ", array( 1 ) );
 			pass();
 		} catch (\Exception $e ) {
-			print_r( $e );
 			fail();
 		}
 		try {
