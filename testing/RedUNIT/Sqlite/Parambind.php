@@ -8,6 +8,10 @@ use RedBeanPHP\Facade as R;
 /**
  * Parambind
  *
+ * Tests the parameter binding functionality in RedBeanPHP.
+ * These test scenarios include for instance: NULL handling,
+ * binding parameters in LIMIT clauses and so on.
+ *
  * @file    RedUNIT/Sqlite/Parambind.php
  * @desc    Tests\PDO parameter binding.
  * @author  Gabor de Mooij and the RedBeanPHP Community
