@@ -8,6 +8,10 @@ use RedBeanPHP\Facade as R;
 /**
  * Foreignkeys
  *
+ * Tests creation and validity of foreign keys,
+ * foreign key constraints and indexes in SQLite.
+ * Also tests whether the correct contraint action has been selected.
+ *
  * @file    RedUNIT/Sqlite/Foreignkeys.php
  * @desc    Tests the creation of foreign keys.
  * @author  Gabor de Mooij and the RedBeanPHP Community

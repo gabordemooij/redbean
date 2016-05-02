@@ -8,6 +8,10 @@ use RedBeanPHP\Facade as R;
 /**
  * Foreignkeys
  *
+ * Tests creation and validity of foreign keys,
+ * foreign key constraints and indexes in Mysql/MariaDB.
+ * Also tests whether the correct contraint action has been selected.
+ *
  * @file    RedUNIT/Mysql/Foreignkeys.php
  * @desc    Tests creation of foreign keys.
  * @author  Gabor de Mooij and the RedBeanPHP Community
