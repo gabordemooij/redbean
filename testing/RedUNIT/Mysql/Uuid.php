@@ -10,7 +10,14 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\ToolBox as ToolBox;
 
 /**
- * Uuid
+ * UUID
+ *
+ * Tests whether we can use UUIDs with MySQL/MariaDB, to this
+ * end we use a reference implementation of a UUID MySQL Writer:
+ * UUIDWriterMySQL, however this class is not part of the code base,
+ * it should be considered a reference or example implementation.
+ * These tests focus on whether UUIDs in general do not cause any
+ * unexpected issues.
  *
  * @file    RedUNIT/Mysql/Uuid.php
  * @desc    Tests read support for UUID tables.
