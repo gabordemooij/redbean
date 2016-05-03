@@ -8,6 +8,11 @@ use RedBeanPHP\Facade as R;
 /**
  * Bigint
  *
+ * Tests handling of bigint type columns for primary key IDs,
+ * can we use bigint primary keys without issues ?
+ * These tests should be able to detect incorrect intval
+ * casts for instance.
+ *
  * @file    RedUNIT/Postgres/Bigint.php
  * @desc    Tests support for BIGINT primary keys.
  * @author  Gabor de Mooij and the RedBeanPHP Community
