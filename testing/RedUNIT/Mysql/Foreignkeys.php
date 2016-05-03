@@ -23,12 +23,11 @@ use RedBeanPHP\Facade as R;
  */
 class Foreignkeys extends Mysql
 {
-
 	/**
-	* Test whether we can use foreign keys with keywords.
-	*
-	* @return void
-	*/
+	 * Test whether we can use foreign keys with keywords.
+	 *
+	 * @return void
+	 */
 	public function testKWConflicts()
 	{
 		R::nuke();
