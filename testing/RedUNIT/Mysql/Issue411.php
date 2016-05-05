@@ -8,6 +8,12 @@ use RedBeanPHP\Facade as R;
 /**
  * Issue 411
  *
+ * InnoDB has a maximum index length of 767 bytes, so with utf8mb4
+ * you can only store 191 characters. This means that when you
+ * subsequently add an index to the column you get a
+ * (not-so-obvious) MySQL-error.  That's why we limit the varchar to
+ * 191 chars and then switch to TEXT type.
+ *
  * @file    RedUNIT/Mysql/Issue411.php
  * @desc    Tests intermediate varchar 191 type for MySQL utf8mb4.
  * @author  Gabor de Mooij and the RedBeanPHP Community
