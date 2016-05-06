@@ -10,6 +10,9 @@ use RedBeanPHP\Logger\RDefault\Debug as Debugger;
 /**
  * Debug
  *
+ * Tests debugging functions and checks whether the output
+ * of the debugger displays the correct information.
+ *
  * @file    RedUNIT/Blackhole/Debug.php
  * @desc    Tests Debugger II.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -21,9 +24,7 @@ use RedBeanPHP\Logger\RDefault\Debug as Debugger;
  */
 class Debug extends Blackhole
 {
-
 	/**
-	 * Performs a test.
 	 * Given a query, a set of bindings and an expected outcome,
 	 * this method tests the result of the debugger.
 	 *
@@ -52,7 +53,8 @@ class Debug extends Blackhole
 	}
 
 	/**
-	 * Test dump().
+	 * Tests the bean dump function used to inspect
+	 * the contents of a bean.
 	 *
 	 * @return void
 	 */
@@ -70,11 +72,9 @@ class Debug extends Blackhole
 		$array = R::dump($beans);
 		asrt( is_array( $array ), TRUE );
 		asrt( strpos( $array[1], '...' ), 35 );
-
 		//just to get 100% test cov, we dont need to test this
 		dmp( $beans );
 		pass();
-
 		//test wrong input
 		asrt( is_array( R::dump( NULL ) ), TRUE );
 		asrt( count( R::dump( NULL ) ), 0 );
@@ -87,7 +87,7 @@ class Debug extends Blackhole
 	}
 
 	/**
-	 * Performs tests for debugger.
+	 * Tests debugging with parameters.
 	 *
 	 * @return void
 	 */
