@@ -9,6 +9,10 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Export
  *
+ * Tests whether we can export beans to arrays and whether we can
+ * use the exportAll function to convert entire hierarchies into
+ * nested array structures.
+ *
  * @file    RedUNIT/Blackhole/Export.php
  * @desc    Tests basic bean exporting features.
  * @author  Gabor de Mooij and the RedBeanPHP Community
