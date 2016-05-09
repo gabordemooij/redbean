@@ -10,6 +10,14 @@ use RedBeanPHP\RedException as RedException;
 /**
  * Import
  *
+ * RedBeanPHP offers some methods to import arrays into
+ * beans. For instance using the dispense() method. This
+ * test suite checks whether RedBeanPHP can correctly convert
+ * array structures to beans and also checks the expected effects
+ * on the taint flags. This test suite further tests the 'simple'
+ * single bean import() function, the inject() function (bean-to-bean) and
+ * array access (because this is somehow related).
+ *
  * @file    RedUNIT/Blackhole/Import.php
  * @desc    Tests basic bean importing features.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -66,7 +74,6 @@ class Import extends Blackhole
 				)
 			)
 		);
-
 		$id = R::store( $book );
 		$book = R::load( 'book', $id );
 		asrt( $book->title, 'The magic book' );
@@ -76,9 +83,7 @@ class Import extends Blackhole
 		asrt( $page1->content, 'magic potions' );
 		$page2 = array_shift( $pages );
 		asrt( $page2->content, 'magic spells' );
-
 		R::nuke();
-
 		$book = R::dispense(
 			array(
 				'_type'=>'book',
@@ -114,7 +119,6 @@ class Import extends Blackhole
 				)
 			)
 		);
-
 		$id = R::store( $book );
 		$book = R::load( 'book', $id );
 		asrt( $book->title, 'The magic book' );
@@ -138,7 +142,6 @@ class Import extends Blackhole
 		asrt( $category->label, 'wizardry' );
 		asrt( $book->author->name, 'Dr. Evil' );
 		asrt( $book->fetchAs('author')->coAuthor->name, 'Dr. Creepy' );
-
 		try {
 			$list = R::dispense( array() );
 			pass();
@@ -147,21 +150,18 @@ class Import extends Blackhole
 		} catch ( RedException $ex ) {
 			pass();
 		}
-
 		try {
 			R::dispense( array( array() ) );
 			fail();
 		} catch ( RedException $ex ) {
 			pass();
 		}
-
 		try {
 			R::dispense( array( 'a' ) );
 			fail();
 		} catch ( RedException $ex ) {
 			pass();
 		}
-
 		try {
 			R::dispense( array( 'property' => 'value' ) );
 			fail();
@@ -178,80 +178,46 @@ class Import extends Blackhole
 	public function testImportFromAndTainted()
 	{
 		testpack( 'Test importFrom() and Tainted' );
-
 		$bean = R::dispense( 'bean' );
-
 		R::store( $bean );
-
 		$bean->name = 'abc';
-
 		asrt( $bean->getMeta( 'tainted' ), TRUE );
-
 		R::store( $bean );
-
 		asrt( $bean->getMeta( 'tainted' ), FALSE );
-
 		$copy = R::dispense( 'bean' );
-
 		R::store( $copy );
-
 		$copy = R::load( 'bean', $copy->id );
-
 		asrt( $copy->getMeta( 'tainted' ), FALSE );
-
 		$copy->import( array( 'name' => 'xyz' ) );
-
 		asrt( $copy->getMeta( 'tainted' ), TRUE );
-
 		$copy->setMeta( 'tainted', FALSE );
-
 		asrt( $copy->getMeta( 'tainted' ), FALSE );
-
 		$copy->importFrom( $bean );
-
 		asrt( $copy->getMeta( 'tainted' ), TRUE );
-
 		testpack( 'Test basic import() feature.' );
-
 		$bean = new OODBBean;
-
 		$bean->import( array( "a" => 1, "b" => 2 ) );
-
 		asrt( $bean->a, 1 );
 		asrt( $bean->b, 2 );
-
 		$bean->import( array( "a" => 3, "b" => 4 ), "a,b" );
-
 		asrt( $bean->a, 3 );
 		asrt( $bean->b, 4 );
-
 		$bean->import( array( "a" => 5, "b" => 6 ), " a , b " );
-
 		asrt( $bean->a, 5 );
 		asrt( $bean->b, 6 );
-
 		$bean->import( array( "a" => 1, "b" => 2 ) );
-
 		testpack( 'Test inject() feature.' );
-
 		$coffee = R::dispense( 'coffee' );
-
 		$coffee->id     = 2;
 		$coffee->liquid = 'black';
-
 		$cup = R::dispense( 'cup' );
-
 		$cup->color = 'green';
-
 		// Pour coffee in cup
 		$cup->inject( $coffee );
-
 		// Do we still have our own property?
 		asrt( $cup->color, 'green' );
-
 		// Did we pour the liquid in the cup?
 		asrt( $cup->liquid, 'black' );
-
 		// Id should not be transferred
 		asrt( $cup->id, 0 );
 	}
@@ -269,45 +235,37 @@ class Import extends Blackhole
 		$book = R::dispense( 'book' );
 		$book['isAwesome'] = TRUE;
 		asrt( isset( $book->isAwesome ), TRUE );
-
 		$book = R::dispense( 'book' );
 		$book['xownPageList'] = R::dispense( 'page', 2 );
 		asrt( isset( $book->ownPage ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPageList ), TRUE );
-
 		$book = R::dispense( 'book' );
 		$book['ownPageList'] = R::dispense( 'page', 2 );
 		asrt( isset( $book->ownPage ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPageList ), TRUE );
-
 		$book = R::dispense( 'book' );
 		$book['xownPage'] = R::dispense( 'page', 2 );
 		asrt( isset( $book->ownPage ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPageList ), TRUE );
-
 		$book = R::dispense( 'book' );
 		$book['ownPage'] = R::dispense( 'page', 2 );
 		asrt( isset( $book->ownPage ), TRUE );
 		asrt( isset( $book->xownPage ), TRUE );
 		asrt( isset( $book->ownPageList ), TRUE );
 		asrt( isset( $book->xownPageList ), TRUE );
-
 		$book = R::dispense( 'book' );
 		$book['sharedTag'] = R::dispense( 'tag', 2 );
 		asrt( isset( $book->sharedTag ), TRUE );
 		asrt( isset( $book->sharedTagList ), TRUE );
-
 		$book = R::dispense( 'book' );
 		$book['sharedTagList'] = R::dispense( 'tag', 2 );
 		asrt( isset( $book->sharedTag ), TRUE );
 		asrt( isset( $book->sharedTagList ), TRUE );
-
 	}
-
 }
