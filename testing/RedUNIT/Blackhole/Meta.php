@@ -9,6 +9,13 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Meta
  *
+ * Beans can have meta data. Meta data will not be stored
+ * in the database and cannot be loaded from the database
+ * (except for using special meta masks - this feature is available
+ * in 4.3.2+). This test suite tests whether we can set and get
+ * meta data from beans and verifies meta data does not end up
+ * in the database.
+ *
  * @file    RedUNIT/Blackhole/Meta.php
  * @desc    Tests meta data features on OODBBean class.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -28,40 +35,24 @@ class Meta extends Blackhole
 	public function testMetaData()
 	{
 		testpack( 'Test meta data' );
-
 		$bean = new OODBBean;
-
 		$bean->setMeta( "this.is.a.custom.metaproperty", "yes" );
-
 		asrt( $bean->getMeta( "this.is.a.custom.metaproperty" ), "yes" );
-
 		asrt( $bean->getMeta( "nonexistant" ), NULL );
 		asrt( $bean->getMeta( "nonexistant", "abc" ), "abc" );
-
 		asrt( $bean->getMeta( "nonexistant.nested" ), NULL );
 		asrt( $bean->getMeta( "nonexistant,nested", "abc" ), "abc" );
-
 		$bean->setMeta( "test.two", "second" );
-
 		asrt( $bean->getMeta( "test.two" ), "second" );
-
 		$bean->setMeta( "another.little.property", "yes" );
-
 		asrt( $bean->getMeta( "another.little.property" ), "yes" );
-
 		asrt( $bean->getMeta( "test.two" ), "second" );
-
 		// Copy Metadata
 		$bean = new OODBBean;
-
 		$bean->setMeta( "meta.meta", "123" );
-
 		$bean2 = new OODBBean;
-
 		asrt( $bean2->getMeta( "meta.meta" ), NULL );
-
 		$bean2->copyMetaFrom( $bean );
-
 		asrt( $bean2->getMeta( "meta.meta" ), "123" );
 	}
 
