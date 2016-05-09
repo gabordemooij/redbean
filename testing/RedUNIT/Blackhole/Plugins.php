@@ -10,6 +10,9 @@ use RedBeanPHP\RedException as RedException;
 /**
  * Plugins
  *
+ * This test suite tests whether we can define dynamic
+ * plugins using the ext() method on the facade.
+ *
  * @file    RedUNIT/Blackhole/Plugins.php
  * @desc    Tests extending R facade dynamically.
  * @author  Gabor de Mooij and the RedBeanPHP Community
