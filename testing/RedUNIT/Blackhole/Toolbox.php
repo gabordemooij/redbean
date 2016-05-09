@@ -18,6 +18,12 @@ use RedBeanPHP\RedException as RedException;
 /**
  * Toolbox
  *
+ * The Toolbox acts as a kind of micro service locator.
+ * The toolbox is passed around by RedBeanPHP core objects
+ * to share services. It contains an adapter, a query writer
+ * and the RedBeanPHP Object Database object (OODB).
+ * This test suite focuses on the toolbox.
+ *
  * @file    RedUNIT/Blackhole/Toolbox.php
  * @desc    Toolbox tests.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -73,7 +79,6 @@ class Toolbox extends Blackhole {
 		asrt( ( $extractedToolbox[1] instanceof Adapter ), TRUE );
 		asrt( ( $extractedToolbox[2] instanceof QueryWriter ), TRUE );
 		asrt( ( $extractedToolbox[3] instanceof TB ), TRUE );
-
 		$beanHelper = new SimpleFacadeBeanHelper;
 		$toolbox2 = $beanHelper->getToolbox();
 		asrt( ( $toolbox2 instanceof TB), TRUE );
