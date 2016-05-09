@@ -14,6 +14,10 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 /**
  * Misc
  *
+ * This test suite contains tests for a various functionalities
+ * and scenarios. For more details please consult the document
+ * section attached to each individual test method listed here.
+ *
  * @file    RedUNIT/Blackhole/Misc.php
  * @desc    Tests various features that do not rely on a database connection.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -132,23 +136,19 @@ class Misc extends Blackhole
 		R::store( $bean );
 		$bean = $bean->fresh();
 		$bean->ownBean;
-
 		$bean->setProperty( 'ownBean', array(), FALSE, FALSE );
 		asrt( count( $bean->ownBean ), 0 );
 		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 2 );
 		asrt( $bean->isTainted(), TRUE );
-
 		$bean->setProperty( 'ownBean', array(), TRUE, FALSE );
 		asrt( count( $bean->ownBean ), 0 );
 		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 0 );
 		asrt( $bean->isTainted(), TRUE );
-
 		$bean = $bean->fresh();
 		$bean->setProperty( 'ownBean', array(), TRUE, FALSE );
 		asrt( count( $bean->ownBean ), 0 );
 		asrt( count( $bean->getMeta( 'sys.shadow.ownBean' ) ), 0 );
 		asrt( $bean->isTainted(), FALSE );
-
 		$bean = $bean->fresh();
 		$bean->setProperty( 'ownBean', array(), TRUE, TRUE );
 		asrt( count( $bean->ownBean ), 0 );
@@ -164,12 +164,10 @@ class Misc extends Blackhole
 	public function testBeansToArray()
 	{
 		testpack('Test R::beansToArray method');
-
 		$bean1 = R::dispense( 'bean' );
 		$bean1->name = 'hello';
 		$bean2 = R::dispense( 'bean' );
 		$bean2->name = 'world';
-
 		$beans = array( $bean1, $bean2 );
 		$array = R::beansToArray( $beans );
 		asrt( $array[0]['name'], 'hello' );
