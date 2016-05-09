@@ -8,6 +8,10 @@ use RedBeanPHP\Facade as R;
 /**
  * Version
  *
+ * This test suite tests whether we can properly
+ * obtain the version string. It also tests the availability
+ * of 'well known' entities like R, EID() and SimpleModel.
+ *
  * @file    RedUNIT/Blackhole/Version.php
  * @desc    Tests identification features.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -27,7 +31,6 @@ class Version extends Blackhole
 	public function testVersion()
 	{
 		$version = R::getVersion();
-
 		asrt( is_string( $version ), TRUE );
 	}
 
