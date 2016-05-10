@@ -10,6 +10,9 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Aliasing
  *
+ * Tests aliasing functionality, i.e. fetching beans as,
+ * inferring correct type and retrieving lists as alias.
+ *
  * @file    RedUNIT/Base/Aliasing.php
  * @desc    Tests for nested beans with aliases, i.e. teacher alias for person etc.
  * @author  Gabor de Mooij and the RedBeanPHP Community
