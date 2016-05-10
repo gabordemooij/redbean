@@ -8,6 +8,10 @@ use RedBeanPHP\Facade as R;
 /**
  * Arrays
  *
+ * Beans can also be treated like arrays, this test verifies
+ * whether the bean array interface works correctly in various
+ * scenarios (combination with lists and so on).
+ *
  * @file    RedUNIT/Base/Arrays.php
  * @desc    Tests the array interface of beans
  * @author  Gabor de Mooij and the RedBeanPHP Community

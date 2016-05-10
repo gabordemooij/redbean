@@ -12,6 +12,10 @@ use RedBeanPHP\RedException\SQL as SQL;
 /**
  * Association
  *
+ * Originally meant to test R::associate - which is no longer
+ * used, this class tests all kinds of relations from
+ * one-to-one to polymorph relations using the poly() method.
+ *
  * @file    RedUNIT/Base/Association.php
  * @desc    Tests Association API (N:N associations)
  * @author  Gabor de Mooij and the RedBeanPHP Community

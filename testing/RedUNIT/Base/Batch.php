@@ -10,6 +10,10 @@ use RedBeanPHP\RedException\SQL as SQL;
 /**
  * Batch
  *
+ * Test whether we can load a group of beans in one go, i.e.
+ * the batch loading functionality of RedBeanPHP, also in combination
+ * with aliasing.
+ *
  * @file    RedUNIT/Base/Batch.php
  * @desc    Tests batch loading of beans, i.e. loading large collections of beans in optimized way.
  * @author  Gabor de Mooij and the RedBeanPHP Community

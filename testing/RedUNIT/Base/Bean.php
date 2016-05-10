@@ -7,6 +7,10 @@ use RedBeanPHP\Facade as R;
 /**
  * Bean
  *
+ * One of the core test suites of RedBeanPHP, tests the
+ * bean interface and all basic bean functions, including
+ * deletion, updating, inserting, importing and more...
+ *
  * @file    RedUNIT/Base/Bean.php
  * @desc    Tests list manipulations of bean.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -431,7 +435,6 @@ class Bean extends Base
 	 */
 	public function testWhetherWeCanAddToLists()
 	{
-
 		$book = $this->_createBook();
 		$book->ownPage[] = R::dispense( 'page' );
 		R::store( $book );
