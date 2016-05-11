@@ -10,7 +10,9 @@ use RedBeanPHP\OODBBean as OODBBean;
  * Copy
  *
  * Tests whether we can make a copy or a deep copy of a bean
- * and whether recursion is handled well.
+ * and whether recursion is handled well. Also tests
+ * versioning: copying can be used to implement a versioning feature,
+ * some test cases will reflect this particular use case.
  *
  * @file    RedUNIT/Base/Copy.php
  * @desc    Tests whether we can make a deep copy of a bean.

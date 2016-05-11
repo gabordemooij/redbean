@@ -10,6 +10,10 @@ use RedBeanPHP\RedException\SQL as SQL;
 /**
  * Count
  *
+ * Tests whether we can count beans with or without
+ * additional conditions and whether we can count associated
+ * beans (relationCount).
+ *
  * @file    RedUNIT/Base/Count.php
  * @desc    Tests for simple bean counting.
  * @author  Gabor de Mooij and the RedBeanPHP Community
