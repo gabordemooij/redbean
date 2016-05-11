@@ -8,6 +8,10 @@ use RedBeanPHP\Facade as R;
 /**
  * Chill
  *
+ * Tests 'chill' mode. In this mode some bean types are frozen,
+ * their schemas cannot be modified while others are fluid and
+ * can still be adjusted.
+ *
  * @file    RedUNIT/Base/Chill.php
  * @desc    Tests chill list functionality, i.e. freezing a subset of all types.
  * @author  Gabor de Mooij and the RedBeanPHP Community

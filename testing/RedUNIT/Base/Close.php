@@ -10,6 +10,8 @@ use RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
 /**
  * Close
  *
+ * Tests whether we can close the database connection.
+ *
  * @file    RedUNIT/Base/Close.php
  * @desc    Tests database closing functionality.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -21,7 +23,6 @@ use RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
  */
 class Close extends Base
 {
-
 	/**
 	 * Test closing database connection.
 	 *
@@ -30,11 +31,8 @@ class Close extends Base
 	public function testClose()
 	{
 		asrt( R::getDatabaseAdapter()->getDatabase()->isConnected(), TRUE );
-
 		R::close();
-
 		asrt( R::getDatabaseAdapter()->getDatabase()->isConnected(), FALSE );
-
 	}
 }
 
