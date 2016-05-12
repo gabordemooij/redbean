@@ -19,6 +19,8 @@ use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 /**
  * Database
  *
+ * Tests basic RedBeanPHP database functionality.
+ *
  * @file    RedUNIT/Base/Database.php
  * @desc    Tests basic database behaviors
  * @author  Gabor de Mooij and the RedBeanPHP Community

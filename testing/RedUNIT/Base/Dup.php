@@ -11,6 +11,9 @@ use RedBeanPHP\RedException as RedException;
 /**
  * Dup
  *
+ * Tests duplication. Like the 'copy' test suite but
+ * focuses on more complex scenarios.
+ *
  * @file    RedUNIT/Base/Dup.php
  * @desc    Intensive test for dup()
  * @author  Gabor de Mooij and the RedBeanPHP Community

@@ -14,6 +14,9 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Facade
  *
+ * The facade provides a convenient way to access all or most RedBeanPHP
+ * functionality without the need to interact with all the objects involved.
+ *
  * @file    RedUNIT/Base/Facade.php
  * @desc    Tests basic functions through facade.
  * @author  Gabor de Mooij and the RedBeanPHP Community

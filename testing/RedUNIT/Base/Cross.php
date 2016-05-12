@@ -12,6 +12,9 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Cross
  *
+ * Tests self referential many-to-many relations, including the
+ * aggr feature.
+ *
  * @file    RedUNIT/Base/Cross.php
  * @desc    Tests associations within the same table (i.e. page_page2 alike)
  *  		Cross tables, self referential many-to-many relations

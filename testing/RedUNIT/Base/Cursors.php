@@ -9,6 +9,9 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Cursors
  *
+ * Tests whether RedBeanPHP can use cursors (using the
+ * findCollection method) to iterate over large data sets.
+ *
  * @file    RedUNIT/Base/Cursors.php
  * @desc    Tests whether we can use cursors
  * @author  Gabor de Mooij and the RedBeanPHP Community
