@@ -248,80 +248,49 @@ class Fuse extends Base
 	{
 		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
-
 		$blog = R::dispense( 'blog' );
-
 		$blog->title = 'testing';
 		$blog->blog  = 'tesing';
-
 		R::store( $blog );
-
 		$blogpost = R::load( "blog", 1 );
-
 		$post = R::dispense( "post" );
-
 		$post->message = "hello";
-
 		$blog->sharedPost[] = $post;
 		R::store($blog);
-
 		$a = R::getAll( "select * from blog " );
-
 		R::tag( $post, "lousy,smart" );
-
 		asrt( implode( ',', R::tag( $post ) ), "lousy,smart" );
-
 		R::tag( $post, "clever,smart" );
-
 		$tagz = implode( ',', R::tag( $post ) );
-
 		asrt( ( $tagz == "smart,clever" || $tagz == "clever,smart" ), TRUE );
-
 		R::tag( $blog, array( "smart", "interesting" ) );
-
 		asrt( implode( ',', R::tag( $blog ) ), "smart,interesting" );
-
 		try {
 			R::tag( $blog, array( "smart", "interesting", "lousy!" ) );
-
 			pass();
 		} catch ( RedException $e ) {
 			fail();
 		}
-
 		asrt( implode( ',', R::tag( $blog ) ), "smart,interesting,lousy!" );
 		asrt( implode( ",", R::tag( $blog ) ), "smart,interesting,lousy!" );
-
 		R::untag( $blog, array( "smart", "interesting" ) );
-
 		asrt( implode( ",", R::tag( $blog ) ), "lousy!" );
-
 		asrt( R::hasTag( $blog, array( "lousy!" ) ), TRUE );
 		asrt( R::hasTag( $blog, array( "lousy!", "smart" ) ), TRUE );
 		asrt( R::hasTag( $blog, array( "lousy!", "smart" ), TRUE ), FALSE );
-
 		R::tag( $blog, FALSE );
-
 		asrt( count( R::tag( $blog ) ), 0 );
-
 		R::tag( $blog, array( "funny", "comic" ) );
-
 		asrt( count( R::tag( $blog ) ), 2 );
-
 		R::addTags( $blog, array( "halloween" ) );
-
 		asrt( count( R::tag( $blog ) ), 3 );
 		asrt( R::hasTag( $blog, array( "funny", "commic", "halloween" ), TRUE ), FALSE );
-
 		R::unTag( $blog, array( "funny" ) );
 		R::addTags( $blog, "horror" );
-
 		asrt( count( R::tag( $blog ) ), 3 );
 		asrt( R::hasTag( $blog, array( "horror", "commic", "halloween" ), TRUE ), FALSE );
-
 		// No double tags
 		R::addTags( $blog, "horror" );
-
 		asrt( R::hasTag( $blog, array( "horror", "commic", "halloween" ), TRUE ), FALSE );
 		asrt( count( R::tag( $blog ) ), 3 );
 	}
@@ -341,7 +310,6 @@ class Fuse extends Base
 		asrt( $old[1], NULL);
 		$test->nonExistantMethod(); //we cant really test this... :(
 		pass();
-
 		$old = R::setErrorHandlingFUSE( OODBBean::C_ERR_NOTICE );
 		asrt( is_array( $old ), TRUE );
 		asrt( count( $old ), 2 );
@@ -352,7 +320,6 @@ class Fuse extends Base
 		}, E_USER_NOTICE);
 		$test->nonExistantMethod();
 		restore_error_handler();
-
 		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_WARN );
 		asrt( is_array( $old ), TRUE );
 		asrt( count( $old ), 2 );
@@ -363,7 +330,6 @@ class Fuse extends Base
 		}, E_USER_WARNING);
 		$test->nonExistantMethod();
 		restore_error_handler();
-
 		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_FATAL );
 		asrt( is_array( $old ), TRUE );
 		asrt( count( $old ), 2 );
@@ -374,7 +340,6 @@ class Fuse extends Base
 		}, E_USER_ERROR);
 		$test->nonExistantMethod();
 		restore_error_handler();
-
 		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_EXCEPTION );
 		asrt( is_array( $old ), TRUE );
 		asrt( count( $old ), 2 );
@@ -386,7 +351,6 @@ class Fuse extends Base
 		} catch (\Exception $e) {
 			pass();
 		}
-
 		global $test_bean;
 		$test_bean = $test;
 		global $has_executed_error_func_fuse;
@@ -406,19 +370,16 @@ class Fuse extends Base
 		asrt( $old[1], NULL);
 		$test->nonExistantMethod();
 		asrt( $has_executed_error_func_fuse, TRUE );
-
 		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_IGNORE );
 		asrt( is_array( $old ), TRUE );
 		asrt( count( $old ), 2 );
 		asrt( $old[0], OODBBean::C_ERR_FUNC );
 		asrt( is_callable( $old[1] ), TRUE );
-
 		$old = OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_IGNORE );
 		asrt( is_array( $old ), TRUE );
 		asrt( count( $old ), 2 );
 		asrt( $old[0], OODBBean::C_ERR_IGNORE );
 		asrt( $old[1], NULL);
-
 		try {
 			OODBBean::setErrorHandlingFUSE( 900 );
 			fail();
@@ -426,7 +387,6 @@ class Fuse extends Base
 			pass();
 			asrt( $e->getMessage(), 'Invalid error mode selected' );
 		}
-
 		try {
 			OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_FUNC, 'hello' );
 			fail();
@@ -434,7 +394,6 @@ class Fuse extends Base
 			pass();
 			asrt( $e->getMessage(), 'Invalid error handler' );
 		}
-
 		OODBBean::setErrorHandlingFUSE( OODBBean::C_ERR_EXCEPTION );
 		//make sure ignore FUSE events
 		$test = R::dispense('feed');
