@@ -14,7 +14,7 @@ use RedBeanPHP\Adapter as Adapter;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 
 /**
- * Fuse
+ * FUSE
  *
  * Tests whether we can associate model logic on-the-fly
  * by defining models extending from SimpleModel. Tests
