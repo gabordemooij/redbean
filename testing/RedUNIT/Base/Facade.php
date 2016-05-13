@@ -14,8 +14,15 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Facade
  *
- * The facade provides a convenient way to access all or most RedBeanPHP
- * functionality without the need to interact with all the objects involved.
+ * Tests the facade. The facade is a single class (often aliased with R)
+ * that provides access to all (or most) RedBeanPHP functionality without
+ * the need to interact with all the objects involved. The facade has
+ * been designed to be as 'straightfoward' as possible, many methods
+ * of the facade class should be 'almost identical' to simple calls
+ * to objects behind the facade. This test focuses on basic usage
+ * scenarios. Complex scenarios are tested in other suites because
+ * we often test 'the complete route' as the facade code path always
+ * includes the non-facade code path as well (as proven by the coverage numbers).
  *
  * @file    RedUNIT/Base/Facade.php
  * @desc    Tests basic functions through facade.
@@ -66,111 +73,66 @@ class Facade extends Base
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
 		$a       = new AssociationManager( $toolbox );
-
 		asrt( R::getRedBean() instanceof OODB, TRUE );
 		asrt( R::getToolBox() instanceof ToolBox, TRUE );
 		asrt( R::getDatabaseAdapter() instanceof Adapter, TRUE );
 		asrt( R::getWriter() instanceof QueryWriter, TRUE );
-
 		$book = R::dispense( "book" );
-
 		asrt( $book instanceof OODBBean, TRUE );
-
 		$book->title = "a nice book";
-
 		$id = R::store( $book );
-
 		asrt( ( $id > 0 ), TRUE );
-
 		$book = R::load( "book", (int) $id );
-
 		asrt( $book->title, "a nice book" );
-
 		asrt( R::load( 'book', 999 )->title, NULL );
-
 		R::freeze( TRUE );
-
 		try {
 			R::load( 'bookies', 999 );
-
 			fail();
 		} catch (\Exception $e ) {
 			pass();
 		}
-
 		R::freeze( FALSE );
-
 		$author = R::dispense( "author" );
-
 		$author->name = "me";
-
 		R::store( $author );
-
 		$book9   = R::dispense( "book" );
 		$author9 = R::dispense( "author" );
-
 		$author9->name = "mr Nine";
-
 		$a9 = R::store( $author9 );
-
 		$book9->author_id = $a9;
-
 		$bk9 = R::store( $book9 );
-
 		$book9  = R::load( "book", $bk9 );
 		$author = R::load( "author", $book9->author_id );
-
 		asrt( $author->name, "mr Nine" );
-
 		R::trash( $author );
 		R::trash( $book9 );
-
 		pass();
-
 		$book2 = R::dispense( "book" );
-
 		$book2->title = "second";
-
 		R::store( $book2 );
-
 		$book3 = R::dispense( "book" );
-
 		$book3->title = "third";
-
 		R::store( $book3 );
-
 		asrt( count( R::find( "book" ) ), 3 );
 		asrt( count( R::findAll( "book" ) ), 3 );
 		asrt( count( R::findAll( "book", " LIMIT 2" ) ), 2 );
-
 		asrt( count( R::find( "book", " id=id " ) ), 3 );
 		asrt( count( R::find( "book", " title LIKE ?", array( "third" ) ) ), 1 );
 		asrt( count( R::find( "book", " title LIKE ?", array( "%d%" ) ) ), 2 );
-
 		// Find without where clause
 		asrt( count( R::findAll( 'book', ' order by id' ) ), 3 );
-
 		R::trash( $book3 );
 		R::trash( $book2 );
-
 		asrt( count( R::getAll( "SELECT * FROM book " ) ), 1 );
 		asrt( count( R::getCol( "SELECT title FROM book " ) ), 1 );
-
 		asrt( (int) R::getCell( "SELECT 123 " ), 123 );
-
 		$book = R::dispense( "book" );
-
 		$book->title = "not so original title";
-
 		$author = R::dispense( "author" );
-
 		$author->name = "Bobby";
-
 		R::store( $book );
-
 		$aid = R::store( $author );
-
 		$author = R::findOne( "author", " name = ? ", array( "Bobby" ) );
-
 	}
 }
