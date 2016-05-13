@@ -16,6 +16,11 @@ use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
 /**
  * Fuse
  *
+ * Tests whether we can associate model logic on-the-fly
+ * by defining models extending from SimpleModel. Tests
+ * whether the calls to facade trigger the corresponding
+ * methods on the model.
+ *
  * @file    RedUNIT/Base/Fuse.php
  * @desc    Tests Fuse feature; coupling beans to models.
  * @author  Gabor de Mooij and the RedBeanPHP Community
