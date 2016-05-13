@@ -12,6 +12,10 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 /**
  * Foreignkeys
  *
+ * Tests whether foreign keys are correctly generated and whether
+ * depending beans are correctly removed. Also tests auto resolving
+ * types inferred by inspecting foreign keys.
+ *
  * @file    RedUNIT/Base/Foreignkeys.php
  * @desc    Tests foreign key handling and dynamic foreign keys with
  * @author  Gabor de Mooij and the RedBeanPHP Community
