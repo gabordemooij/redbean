@@ -8,6 +8,10 @@ use RedBeanPHP\Facade as R;
 /**
  * Indexes
  *
+ * Tests whether indexes are created properly and whether
+ * index creation errors are supressed (they are not important
+ * enough to cause exceptions during development phase).
+ *
  * @file    RedUNIT/Base/Indexes.php
  * @desc    Tests whether indexes are applied properly.
  * @author  Gabor de Mooij and the RedBeanPHP Community
