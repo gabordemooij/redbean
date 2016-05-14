@@ -8,6 +8,9 @@ use RedBeanPHP\Facade as R;
 /**
  * Issue90
  *
+ * Tests whether this specific issue on github has been resolved.
+ * Checking 'own' relationship, makes it impossible to trash a bean.
+ *
  * @file    RedUNIT/Base/Issue90.php
  * @desc    Issue #90 - cannot trash bean with ownproperty if checked in model.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -28,23 +31,14 @@ class Issue90 extends Base
 	public function testIssue90()
 	{
 		$s = R::dispense( 'box' );
-
 		$s->name = 'a';
-
 		$f = R::dispense( 'bottle' );
-
 		$s->ownBottle[] = $f;
-
 		R::store( $s );
-
 		$s2 = R::dispense( 'box' );
-
 		$s2->name = 'a';
-
 		R::store( $s2 );
-
 		R::trash( $s2 );
-
 		pass();
 	}
 }

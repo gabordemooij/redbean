@@ -8,6 +8,8 @@ use RedBeanPHP\Facade as R;
 /**
  * Large Number Limit Test (issue #386)
  *
+ * Tests whether we can use large numbers for limit clause.
+ *
  * @file    RedUNIT/Base/Largenum.php
  * @desc    Test whether we can use large numbers in LIMIT clause (PDO bindings).
  * @author  Gabor de Mooij and the RedBeanPHP Community

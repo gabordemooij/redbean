@@ -8,6 +8,9 @@ use RedBeanPHP\Facade as R;
 /**
  * Issue 408
  *
+ * Tests whether this specific issue on github has been resolved.
+ * Tests whether we can use export on beans having arrays in properties.
+ *
  * @file    RedUNIT/Mysql/Issue408.php
  * @desc    Test whether we can export beans with arrays in properties
  *          (deserialized/serialized on open/update).

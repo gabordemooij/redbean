@@ -9,6 +9,10 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Joins
  *
+ * Tests the @joined keyword, this keyword in an SQL snippet
+ * allows you to join another table and use one or more of its columns
+ * in the query snippet, for instance for sorting or filtering.
+ *
  * @file    RedUNIT/Base/Joins.php
  * @desc    Tests joins in ownLists and trees.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -56,7 +60,6 @@ class Joins extends Base
 	public function testJoins()
 	{
 		R::nuke();
-
 		list($a1, $a2, $a3) = R::dispense('area', 3);
 		list($p1, $p2) = R::dispense('person', 2);
 		list($v1, $v2, $v3, $v4) = R::dispense('visit', 4);

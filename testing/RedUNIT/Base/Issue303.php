@@ -9,6 +9,10 @@ use RedBeanPHP\RedException as RedException;
 /**
  * Issue303
  *
+ * Tests whether this specific issue on github has been resolved.
+ * Test whether we have two different exception messages for
+ * properties and values.
+ *
  * @file    RedUNIT/Base/Issue303.php
  * @desc    Issue #303 - Split bean property exception.
  * @author  Gabor de Mooij and the RedBeanPHP Community

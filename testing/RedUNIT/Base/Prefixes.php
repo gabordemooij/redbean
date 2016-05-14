@@ -22,6 +22,9 @@ define('FRIENDLIST', 'sharedTbl_friend');
 /**
  * Prefixes
  *
+ * Tests whether we can use tables with prefixes.
+ * Some people seem to like that.
+ *
  * @file    RedUNIT/Base/Prefixes.php
  * @desc    Tests whether you can use RedBeanPHP with table prefixes.
  * @author  Gabor de Mooij and the RedBeanPHP Community

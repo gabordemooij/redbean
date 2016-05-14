@@ -10,6 +10,8 @@ use RedBeanPHP\Logger\RDefault as RDefault;
 /**
  * Logging
  *
+ * Tests the Query Logging tools that are part of RedBeanPHP.
+ *
  * @file    RedUNIT/Base/Logging.php
  * @desc    Tests Logging facilities.
  * @author  Gabor de Mooij and the RedBeanPHP Community
