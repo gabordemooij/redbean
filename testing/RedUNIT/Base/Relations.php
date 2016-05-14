@@ -10,6 +10,10 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Relations
  *
+ * Tests whether RedBeanPHP handles relational data properly.
+ * This test suite is quite large because it tests various types
+ * of relations as well as simple and complex usage scenarios.
+ *
  * @file    RedUNIT/Base/Relations.php
  * @desc    Tests N:1 relations, nested beans.
  * @author  Gabor de Mooij and the RedBeanPHP Community

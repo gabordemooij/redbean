@@ -8,6 +8,8 @@ use RedBeanPHP\Facade as R;
 /**
  * Utf8
  *
+ * Tests whether we can store and retrive unicode characters.
+ *
  * @file    RedUNIT/Base/UTF8.php
  * @desc    Tests handling of NULL values.
  * @author  Gabor de Mooij and the RedBeanPHP Community

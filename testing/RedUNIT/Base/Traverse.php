@@ -10,6 +10,9 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Traverse
  *
+ * Tests whether RedBeanPHP can easily deal with hierarchies
+ * of beans.
+ *
  * @file    RedUNIT/Base/Traverse.php
  * @desc    Tests traversal functionality
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -35,17 +38,13 @@ class Traverse extends Base
 		foreach( $books as $book ) {
 			$book->title = 'Book ' . ( $i++ );
 		}
-
 		$books[5]->marked = TRUE;
-
 		$shelf = R::dispense( 'shelf' );
 		$shelf->ownBook = $books;
-
 		$found = NULL;
 		$shelf->traverse('ownBookList', function( $book ) use ( &$found ) {
 			if ( $book->marked ) $found = $book;
 		});
-
 		asrt( ( $found->marked == TRUE ), TRUE );
 		asrt( $found->title, 'Book 6' );
 	}
@@ -66,26 +65,20 @@ class Traverse extends Base
 		$pageF = R::dispense( 'page' )->setAttr( 'title', 'f' );
 		$pageG = R::dispense( 'page' )->setAttr( 'title', 'g' );
 		$pageH = R::dispense( 'page' )->setAttr( 'title', 'h' );
-
 		$pageA->ownPage = array( $pageB, $pageC );
 		$pageB->ownPage = array( $pageD );
 		$pageC->ownPage = array( $pageE, $pageF );
 		$pageD->ownPage = array( $pageG );
 		$pageF->ownPage = array( $pageH );
-
 		R::store( $pageA );
 		$pageA = $pageA->fresh();
-
 		//also tests non-existant column handling by count().
 		asrt( R::count( 'page', ' price = ? ', array( '5' ) ), 0);
 		asrt( R::count( 'tag',  ' title = ? ', array( 'new' ) ), 0);
-
 		$pageA->traverse( 'ownPageList', function( $bean ) {
 			$bean->price = 5;
 		});
-
 		R::store( $pageA );
-
 		asrt( R::count( 'page', ' price = ? ', array( '5' ) ), 7);
 	}
 
@@ -105,55 +98,41 @@ class Traverse extends Base
 		$pageF = R::dispense( 'page' )->setAttr( 'title', 'f' );
 		$pageG = R::dispense( 'page' )->setAttr( 'title', 'g' );
 		$pageH = R::dispense( 'page' )->setAttr( 'title', 'h' );
-
 		$pageA->ownPage = array( $pageB, $pageC );
 		$pageB->ownPage = array( $pageD );
 		$pageC->ownPage = array( $pageE, $pageF );
 		$pageD->ownPage = array( $pageG );
 		$pageF->ownPage = array( $pageH );
-
 		R::store( $pageA );
-
 		$parents = array();
 		$pageF->traverse( 'page', function( $page ) use ( &$parents ) {
 			$parents[] = $page->title;
 		} );
-
 		asrt( implode( ',', $parents ), 'c,a' );
-
 		$parents = array();
 		$pageH->traverse( 'page', function( $page ) use ( &$parents ) {
 			$parents[] = $page->title;
 		} );
-
 		asrt( implode( ',', $parents ), 'f,c,a' );
-
 		$parents = array();
 		$pageG->traverse( 'page', function( $page ) use ( &$parents ) {
 			$parents[] = $page->title;
 		} );
-
 		asrt( implode( ',', $parents ), 'd,b,a' );
-
 		$path = array();
 		$pageA->traverse( 'ownPageList', function( $page ) use ( &$path ) {
 			$path[] = $page->title;
 		} );
-
 		asrt( implode( ',', $path ), 'b,d,g,c,e,f,h' );
-
 		$path = array();
 		$pageC->traverse( 'ownPageList', function( $page ) use ( &$path ) {
 			$path[] = $page->title;
 		} );
-
 		asrt( implode( ',', $path ), 'e,f,h' );
-
 		$path = array();
 		$pageA->traverse( 'ownPageList', function( $page ) use ( &$path ) {
 			$path[] = $page->title;
 		}, 2 );
-
 		asrt( implode( ',', $path ), 'b,d,c,e,f' );
 	}
 
@@ -175,21 +154,17 @@ class Traverse extends Base
 		$tasks[7]->ownTask = array( $tasks[6] );
 		R::storeAll( $tasks );
 		$task = R::load('task', $tasks[0]->id);
-
 		$todo = array();
 		$task->with(' ORDER BY descr ASC ')->traverse('ownTaskList', function( $t ) use ( &$todo ) {
 			$todo[] = $t->descr;
 		} );
-
 		asrt( implode( ',', $todo ), 't1,t5,t7,t6,t9,t3,t8' );
-
 		$task = R::load( 'task', $tasks[0]->id );
 		$todo = array();
 		$task->withCondition( ' ( descr = ? OR descr = ? ) ', array( 't7','t6' ) )
 			->traverse( 'ownTaskList', function( $task ) use( &$todo ){
 				$todo[] = $task->descr;
 			} );
-
 		asrt( implode( ',', $todo ), 't7,t6' );
 	}
 
@@ -211,20 +186,17 @@ class Traverse extends Base
 		$cats[0]->genre = $cats[1];
 		$cats[2]->genre = $cats[1];
 		R::store( $book );
-
 		$book2 = R::dispense( 'book' );
 		$book2->genre = $cats[2];
 		$book2->name = 'Ghost Story';
 		R::store( $book2 );
 		$fantasy = R::load( 'category', $cats[1]->id );
-
 		$cats = array();
 		$book = $book->fresh();
 		$book->fetchAs( 'category' )->traverse( 'genre', function( $cat ) use ( &$cats ) {
 			$cats[] = $cat->gname;
 		} );
 		asrt( implode( ',', $cats ), 'SF,Fantasy' );
-
 		$catList = array();
 		$fantasy->alias( 'genre' )
 			->with( ' ORDER BY gname ASC ' )

@@ -10,6 +10,9 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 /**
  * Threeway
  *
+ * Tests link/via relations, i.e. N-M tables with additional
+ * columns.
+ *
  * @file    RedUNIT/Base/Threeway.php
  * @desc    Various tests for 3-way tables or X-way tables.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -30,39 +33,29 @@ class Threeway extends Base
 	public function testUniqueConstraintOnThreeways()
 	{
 		AQueryWriter::clearRenames();
-
 		R::nuke();
-
 		$person = R::dispense( 'person' );
 		$role = R::dispense( 'role' );
 		$person->sharedRole[] = $role;
 		R::store( $person );
-
 		$person->link( 'person_role', array(
 			 'unit' => R::dispense('unit')
 		))->role = $role;
-
 		//Can we add a duplicate role now? - No because we started with a simple N-M table
 		//and unique constraint has been applied accordingly, manually change database.
 		asrt( R::count( 'person_role' ), 1 );
-
 		R::nuke();
-
 		$person = R::dispense( 'person' );
 		$role = R::dispense( 'role' );
 		$person->via('participant')->sharedRole[] = $role;
 		R::store( $person );
-
 		$person->link( 'participant', array(
 			 'unit' => R::dispense('unit')
 		))->role = $role;
-
 		//Can we add a duplicate role now? - No because we started with a simple N-M table
 		//and unique constraint has been applied accordingly, manually change database.
 		asrt( R::count( 'participant' ), 1 );
-
 		R::nuke();
-
 		$participant = R::dispense( 'participant' );
 		$person = R::dispense( 'person' );
 		$role = R::dispense( 'role' );
@@ -71,13 +64,10 @@ class Threeway extends Base
 		$participant->role = $role;
 		$participant->unit = $unit;
 		R::store( $participant );
-
 		$person->link( 'participant', array(
 			 'unit' => R::dispense('unit')
 		))->role = $role;
-
 		R::store( $person );
-
 		//Can we add a duplicate role now?
 		asrt( R::count( 'participant' ), 2 );
 		AQueryWriter::clearRenames();
@@ -104,19 +94,15 @@ class Threeway extends Base
 		$book = $book->fresh();
 		$book->sharedPageList[] = $page;
 		R::store( $book );
-
 		//don't save the duplicate bean!
 		asrt( R::count( 'page' ), 1 );
-
 		$book = $book->fresh();
 		$page->item = 2; //even if we change a property ?
 		$book->sharedPageList[] = $page;
 		R::store( $book );
-
 		foreach( $book->sharedPageList as $listItem) {
 			asrt( is_string( $listItem->id ), TRUE );
 		}
-
 		//same test but for own-list
 		R::nuke();
 		$book = R::dispense( 'book' );
@@ -129,14 +115,12 @@ class Threeway extends Base
 		R::store( $book );
 		//don't save the duplicate bean!
 		asrt( R::count( 'page' ), 1 );
-
 		$book = $book->fresh();
 		$book->ownPageList[] = $page;
 		$page->item = 3;
 		R::store( $book );
 		//don't save the duplicate bean!
 		asrt( R::count( 'page' ), 1 );
-
 		foreach( $book->ownPageList as $listItem) {
 			asrt( is_string( $listItem->id ), TRUE );
 		}

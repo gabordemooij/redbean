@@ -10,6 +10,8 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Typechecking
  *
+ * Tests whether RedBeanPHP handles type casting correctly.
+ *
  * @file    RedUNIT/Base/Typechecking.php
  * @desc    Tests basic bean validation rules; invalid bean handling.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -53,11 +55,8 @@ class Typechecking extends Base
 	public function testTypes()
 	{
 		testpack( 'Beans can only contain STRING and NULL after reload' );
-
 		R::nuke();
-
 		$bean = R::dispense( 'bean' );
-
 		$bean->number   = 123;
 		$bean->float    = 12.3;
 		$bean->bool     = false;
@@ -65,9 +64,7 @@ class Typechecking extends Base
 		$bean->text     = 'abc';
 		$bean->null     = null;
 		$bean->datetime = new\DateTime( 'NOW', new\DateTimeZone( 'Europe/Amsterdam' ) );
-
 		$id = R::store( $bean );
-
 		asrt( is_int( $id ), TRUE );
 		asrt( is_float( $bean->float ), TRUE );
 		asrt( is_integer( $bean->number ), TRUE );
@@ -76,9 +73,7 @@ class Typechecking extends Base
 		asrt( is_string( $bean->datetime ), TRUE );
 		asrt( is_string( $bean->text ), TRUE );
 		asrt( is_null( $bean->null ), TRUE );
-
 		$bean = R::load('bean', $id );
-
 		asrt( is_string( $bean->id ), TRUE );
 		asrt( is_string( $bean->float ), TRUE );
 		asrt( is_string( $bean->number ), TRUE );
@@ -99,76 +94,55 @@ class Typechecking extends Base
 	public function testBeanTypeChecking()
 	{
 		$redbean = R::getRedBean();
-
 		$bean    = $redbean->dispense( "page" );
-
 		// Set some illegal values in the bean; this should trigger Security exceptions.
 		// Arrays are not allowed.
 		$bean->name = array( "1" );
-
 		try {
 			$redbean->store( $bean );
-
 			fail();
 		} catch ( RedException $e ) {
 			pass();
 		}
-
 		try {
 			$redbean->check( $bean );
-
 			fail();
 		} catch ( RedException $e ) {
 			pass();
 		}
-
 		$bean->name = new OODBBean;
-
 		try {
 			$redbean->check( $bean );
-
 			fail();
 		} catch ( RedException $e ) {
 			pass();
 		}
-
 		// Property names should be alphanumeric
 		$prop        = ".";
-
 		$bean->$prop = 1;
-
 		try {
 			$redbean->store( $bean );
-
 			fail();
 		} catch ( RedException $e ) {
 			pass();
 		}
-
 		try {
 			$redbean->check( $bean );
-
 			fail();
 		} catch ( RedException $e ) {
 			pass();
 		}
-
 		// Really...
 		$prop        = "-";
-
 		$bean->$prop = 1;
-
 		try {
 			$redbean->store( $bean );
-
 			fail();
 		} catch ( RedException $e ) {
 			pass();
 		}
-
 		try {
 			$redbean->check( $bean );
-
 			fail();
 		} catch ( RedException $e ) {
 			pass();
