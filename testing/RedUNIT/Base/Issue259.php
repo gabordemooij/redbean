@@ -9,6 +9,9 @@ use RedBeanPHP\SimpleModel as SimpleModel;
 /**
  * Issue259
  *
+ * Tests whether this specific issue on github has been resolved.
+ * Issue #259 - Stash Cache breaks model delegation in open().
+ *
  * @file    RedUNIT/Base/Issue259.php
  * @desc    Issue #259 - Stash cache breaks model delegation in open().
  * @author  Gabor de Mooij and the RedBeanPHP Community
