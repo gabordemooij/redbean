@@ -32,24 +32,15 @@ class Issue259 extends Base
 	public function testIssue259()
 	{
 		testpack( 'Testing Issue #259 - Stash Cache breaks model delegation in open().' );
-
 		$mother = R::dispense( 'mother' );
-
 		$mother->desc = 'I am mother';
-
 		R::store( $mother );
-
 		$child = R::dispense( 'child' );
-
 		$child->mother = $mother;
 		$child->desc   = 'I am child';
-
 		$id = R::store( $child );
-
 		R::findOne( 'child', ' id = ?', array( $id ) );
-
 		R::find( 'child', ' id = ? ', array( $id ) );
-
 		R::load( 'child', $id );
 	}
 }
