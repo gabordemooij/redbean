@@ -47,7 +47,7 @@ if (!function_exists('EID')) {
  *
  * @return void
  */
-if ( !function_exists( 'dump' ) ) {
+if ( !function_exists( 'dmp' ) ) {
 
 	function dmp( $list )
 	{
