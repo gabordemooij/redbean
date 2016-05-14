@@ -9,6 +9,8 @@ use RedBeanPHP\OODBBean as OODBBean;
 /**
  * Null
  *
+ * Tests NULL handling.
+ *
  * @file    RedUNIT/Base/Xnull.php
  * @desc    Tests handling of NULL values.
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -20,7 +22,6 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Xnull extends Base
 {
-
 	/**
 	 * Test Null bindings.
 	 */
@@ -193,48 +194,29 @@ class Xnull extends Base
 		// NULL can change bean
 		$bean      = R::dispense( 'bean' );
 		$bean->bla = 'a';
-
 		R::store( $bean );
-
 		$bean = $bean->fresh();
-
 		asrt( $bean->hasChanged( 'bla' ), FALSE );
-
 		$bean->bla = NULL;
-
 		asrt( $bean->hasChanged( 'bla' ), TRUE );
-
 		// NULL test
 		$page = R::dispense( 'page' );
 		$book = R::dispense( 'book' );
-
 		$page->title = 'a NULL page';
 		$page->book  = $book;
 		$book->title = 'Why NUll is painful..';
-
 		R::store( $page );
-
 		$bookid = $page->book->id;
-
 		unset( $page->book );
-
 		$id = R::store( $page );
-
 		$page = R::load( 'page', $id );
-
 		$page->title = 'another title';
-
 		R::store( $page );
-
 		pass();
-
 		$page = R::load( 'page', $id );
-
 		$page->title   = 'another title';
 		$page->book_id = NULL;
-
 		R::store( $page );
-
 		pass();
 	}
 
@@ -251,13 +233,9 @@ class Xnull extends Base
 
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
-
 		$book->ownPage[] = $page;
-
 		R::store( $book );
-
 		pass();
-
 		asrt( $page->getMeta( 'cast.book_id' ), 'id' );
 	}
 
@@ -270,13 +248,9 @@ class Xnull extends Base
 	{
 		$book = R::dispense( 'book' );
 		$page = R::dispense( 'page' );
-
 		$page->book = $book;
-
 		R::store( $page );
-
 		pass();
-
 		asrt( $page->getMeta( 'cast.book_id' ), 'id' );
 	}
 }
