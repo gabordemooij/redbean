@@ -9,8 +9,18 @@ use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 /**
- * Duplication Manager.
- * Creates deep copies of beans.
+ * Duplication Manager
+ * The Duplication Manager creates deep copies from beans, this means
+ * it can duplicate an entire bean hierarchy. You can use this feature to
+ * implement versioning for instance. Because duplication and exporting are
+ * closely related this class is also used to export beans recursively
+ * (i.e. we make a duplicate and then convert to array). This class allows
+ * you to tune the duplication process by specifying filters determining
+ * which relations to take into account and by specifying tables
+ * (in which case no reflective queries have to be issued thus improving
+ * performance). This class also hosts the Camelfy function used to
+ * reformat the keys of an array, this method is publicly available and
+ * used internally by exportAll().
  *
  * @file    RedBeanPHP/DuplicationManager.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
