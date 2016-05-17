@@ -52,7 +52,17 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
+	 * Returns a string containing the most recent SQL query
+	 * processed by the database adapter, thus conforming to the
+	 * interface:
+	 *
 	 * @see Adapter::getSQL
+	 *
+	 * Methods like get(), getRow() and exec() cause this SQL cache
+	 * to get filled. If no SQL query has been processed yet this function
+	 * will return an empty string.
+	 *
+	 * @return string
 	 */
 	public function getSQL()
 	{

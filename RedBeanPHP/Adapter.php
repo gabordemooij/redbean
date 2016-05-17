@@ -20,7 +20,8 @@ namespace RedBeanPHP;
 interface Adapter
 {
 	/**
-	 * Returns the latest SQL statement.
+	 * Should returns a string containing the most recent SQL query
+	 * that has been processed by the adapter.
 	 *
 	 * @return string
 	 */
