@@ -27,7 +27,6 @@ use RedBeanPHP\Adapter as Adapter;
  */
 class ToolBox
 {
-
 	/**
 	 * @var OODB
 	 */
