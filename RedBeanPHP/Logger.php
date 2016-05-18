@@ -28,6 +28,7 @@ interface Logger
 	 * functions like func_num_args/func_get_args.
 	 *
 	 * @param string $message, ...
+	 *
 	 * @return void
 	 */
 	public function log();
