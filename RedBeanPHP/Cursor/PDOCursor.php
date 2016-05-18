@@ -8,6 +8,9 @@ use RedBeanPHP\Cursor as Cursor;
  * PDO Database Cursor
  * Implementation of PDO Database Cursor.
  * Used by the BeanCollection to fetch one bean at a time.
+ * The PDO Cursor is used by Query Writers to support retrieval
+ * of large bean collections. For instance, this class is used to
+ * implement the findCollection()/BeanCollection functionality.
  *
  * @file    RedBeanPHP/Cursor/PDOCursor.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
