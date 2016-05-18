@@ -5,6 +5,10 @@ namespace RedBeanPHP;
 /**
  * RedBean Plugin.
  * Marker interface for plugins.
+ * Use this interface when defining new plugins, it's an
+ * easy way for the rest of the application to recognize your
+ * plugin. This plugin interface does not require you to
+ * implement a specific API.
  *
  * @file    RedBean/Plugin.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
