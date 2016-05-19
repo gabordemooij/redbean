@@ -146,8 +146,6 @@ class AssociationManager extends Observable
 	 * Manages the get the correct name for the linking table for the
 	 * types provided.
 	 *
-	 * @todo find a nice way to decouple this class from QueryWriter?
-	 *
 	 * @param array $types 2 types as strings
 	 *
 	 * @return string
