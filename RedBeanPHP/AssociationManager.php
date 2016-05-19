@@ -40,7 +40,7 @@ class AssociationManager extends Observable
 	/**
 	 * Handles exceptions. Suppresses exceptions caused by missing structures.
 	 *
-	 * @param Exception $exception exception to handle
+	 * @param \Exception $exception exception to handle
 	 *
 	 * @return void
 	 */
