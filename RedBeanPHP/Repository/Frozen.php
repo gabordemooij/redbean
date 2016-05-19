@@ -38,7 +38,6 @@ class Frozen extends Repository
 	 * @param \Exception $exception exception to handle
 	 *
 	 * @return void
-	 * @throws \Exception
 	 */
 	protected function handleException( \Exception $exception )
 	{
