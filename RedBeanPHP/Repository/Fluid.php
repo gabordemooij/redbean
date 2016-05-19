@@ -31,6 +31,14 @@ class Fluid extends Repository
 {
 	/**
 	 * Figures out the desired type given the cast string ID.
+	 * Given a cast ID, this method will return the associated
+	 * type (INT(10) or VARCHAR for instance). The returned type
+	 * can be processed by the Query Writer to build the specified
+	 * column for you in the database. The Cast ID is actually just
+	 * a superset of the QueryWriter types. In addition to default
+	 * Query Writer column types you can pass the following 'cast types':
+	 * 'id' and 'string'. These will map to Query Writer specific
+	 * column types (probably INT and VARCHAR).
 	 *
 	 * @param string $cast cast identifier
 	 *
