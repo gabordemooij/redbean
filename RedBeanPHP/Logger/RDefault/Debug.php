@@ -124,9 +124,8 @@ class Debug extends RDefault implements Logger
 	 */
 	protected function normalizeSlots( $sql )
 	{
-		$i = 0;
 		$newSql = $sql;
-		while($i < 20 && strpos($newSql, '?') !== FALSE ){
+		while(strpos($newSql, '?') !== FALSE ){
 			$pos   = strpos( $newSql, '?' );
 			$slot  = ':slot'.$i;
 			$begin = substr( $newSql, 0, $pos );
@@ -136,7 +135,6 @@ class Debug extends RDefault implements Logger
 			} else {
 				$newSql = "{$begin}<b style=\"color:green\">$slot</b>{$end}";
 			}
-			$i++;
 		}
 		return $newSql;
 	}
