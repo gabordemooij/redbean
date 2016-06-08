@@ -674,6 +674,23 @@ class Facade
 	{
 		return self::$finder->findOne( $type, $sql, $bindings );
 	}
+	
+	/**
+	 * @see Facade::find
+	 * This variation returns the first bean only or dispense a bean
+	 *
+	 * @param string $type     the type of bean you are looking for
+	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings array of values to be bound to parameters in query
+	 *
+	 * @return OODBBean
+	 */
+	public static function findOneOrDispense( $type, $sql = NULL, $bindings = array() )
+	{
+		$bean = self::$finder->findOne( $type, $sql, $bindings );
+		if ( !$bean ) $bean = DispenseHelper::dispense( self::$redbean, $type );
+		return $bean;
+	}
 
 	/**
 	 * @see Facade::find
