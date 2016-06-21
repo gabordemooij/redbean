@@ -521,4 +521,15 @@ class Misc extends Base
 		asrt( $beanA->equals( $beanB ), FALSE );
 		asrt( $beanB->equals( $beanA ), FALSE );
 	}
+  
+  public function testSharedListsAutoUnbox() {
+    $bean = R::dispense( 'bean' );
+    $bean->sharedBoxedbeanList[] = new Model_Boxedbean();
+    try {
+		  R::store( $bean );
+			pass();
+		} catch ( \Exception $e ) {
+      fail();
+		}
+  }
 }
