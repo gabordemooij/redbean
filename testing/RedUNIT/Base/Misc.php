@@ -523,17 +523,20 @@ class Misc extends Base
 		asrt( $beanB->equals( $beanA ), FALSE );
 	}
   
-    /**
-     * Test if adding SimpleModles to a shared list wil auto unbox them.
-     */
-    public function testSharedListsAutoUnbox() {
-      $bean = R::dispense( 'bean' );
-      $bean->sharedBoxedbeanList[] = new SimpleModel();
-      try {
-		    R::store( $bean );
-			  pass();
-		  } catch ( \Exception $e ) {
-        fail();
-		  }
-    }
+	/**
+	 * Test if adding SimpleModles to a shared list will auto unbox them.
+	 */
+	public function testSharedListsAutoUnbox() {
+		$boxedBean = R::dispense( 'boxedbean' );
+		$bean = R::dispense( 'bean' );
+		$model = new SimpleModel();
+		$model->loadBean($boxedBean);
+		$bean->ownBoxedbeanList[] = $model;
+		try {
+			R::store( $bean );
+			pass();
+		} catch ( \Exception $e ) {
+			fail();
+		}
+	}
 }
