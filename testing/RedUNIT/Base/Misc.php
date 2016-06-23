@@ -13,6 +13,7 @@ use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\Driver\RPDO as RPDO;
+use RedBeanPHP\SimpleModel as SimpleModel;
 
 /**
  * Misc
@@ -520,5 +521,22 @@ class Misc extends Base
 		$beanB->id = $beanA->id;
 		asrt( $beanA->equals( $beanB ), FALSE );
 		asrt( $beanB->equals( $beanA ), FALSE );
+	}
+  
+	/**
+	 * Test if adding SimpleModles to a shared list will auto unbox them.
+	 */
+	public function testSharedListsAutoUnbox() {
+		$boxedBean = R::dispense( 'boxedbean' );
+		$bean = R::dispense( 'bean' );
+		$model = new SimpleModel();
+		$model->loadBean($boxedBean);
+		$bean->ownBoxedbeanList[] = $model;
+		try {
+			R::store( $bean );
+			pass();
+		} catch ( \Exception $e ) {
+			fail();
+		}
 	}
 }
