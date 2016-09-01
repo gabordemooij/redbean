@@ -125,6 +125,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	protected $all = FALSE;
 
 	/**
+	 * @var boolean
+	 */
+	protected $__inToStringCall = FALSE;
+
+	/**
 	 * Sets the error mode for FUSE.
 	 * What to do if a FUSE model method does not exist?
 	 * You can set the following options:
@@ -1262,14 +1267,22 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				trigger_error( $message, E_USER_WARNING );
 				return NULL;
 			} elseif ( self::$errorHandlingFUSE === self::C_ERR_EXCEPTION ) {
-				throw new \Exception( $message );
+				/*
+				 * http://php.net/manual/en/language.oop5.magic.php#object.tostring
+				 * Dont throw exceptions when in __toString() method, switch to C_ERR_FATAL behaviour
+				 */
+				if($this->__inToStringCall === FALSE){
+					throw new \Exception( $message );
+				}
 			} elseif ( self::$errorHandlingFUSE === self::C_ERR_FUNC ) {
 				$func = self::$errorHandler;
+				//give the error handling function the information if its safe to throw an exception
 				return $func(array(
 					'message' => $message,
 					'method' => $method,
 					'args' => $args,
-					'bean' => $this
+					'bean' => $this,
+					'canSafelyThrowException' => !$this->__inToStringCall
 				));
 			}
 			trigger_error( $message, E_USER_ERROR );
@@ -1291,7 +1304,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __toString()
 	{
+		$this->__inToStringCall = TRUE;
 		$string = $this->__call( '__toString', array() );
+		$this->__inToStringCall = FALSE;
 
 		if ( $string === NULL ) {
 			$list = array();
