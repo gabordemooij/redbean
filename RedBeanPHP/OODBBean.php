@@ -1242,8 +1242,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$this->__info['model'] = $model;
 		}
 		if ( !method_exists( $this->__info['model'], $method ) ) {
-
-			if ( self::$errorHandlingFUSE === FALSE ) {
+			//If __toString is not defined, fallback to built in behaviour
+			if ( self::$errorHandlingFUSE === FALSE || $method === '__toString') {
 				return NULL;
 			}
 
@@ -1265,6 +1265,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				throw new \Exception( $message );
 			} elseif ( self::$errorHandlingFUSE === self::C_ERR_FUNC ) {
 				$func = self::$errorHandler;
+				//give the error handling function the information if its safe to throw an exception
 				return $func(array(
 					'message' => $message,
 					'method' => $method,
