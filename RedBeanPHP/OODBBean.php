@@ -125,11 +125,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	protected $all = FALSE;
 
 	/**
-	 * @var boolean
-	 */
-	protected $__inToStringCall = FALSE;
-
-	/**
 	 * Sets the error mode for FUSE.
 	 * What to do if a FUSE model method does not exist?
 	 * You can set the following options:
@@ -1247,8 +1242,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$this->__info['model'] = $model;
 		}
 		if ( !method_exists( $this->__info['model'], $method ) ) {
-
-			if ( self::$errorHandlingFUSE === FALSE ) {
+			//If __toString is not defined, fallback to built in behaviour
+			if ( self::$errorHandlingFUSE === FALSE || $method === '__toString') {
 				return NULL;
 			}
 
@@ -1256,7 +1251,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				return NULL;
 			}
 
-			$message = "FUSE: method does not exist in model: $method";
+			$message = "FUSE: method does not exist in model '" . $this->getMeta( 'type' ) . "': $method";
 			if ( self::$errorHandlingFUSE === self::C_ERR_LOG ) {
 				error_log( $message );
 				return NULL;
@@ -1267,13 +1262,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				trigger_error( $message, E_USER_WARNING );
 				return NULL;
 			} elseif ( self::$errorHandlingFUSE === self::C_ERR_EXCEPTION ) {
-				/*
-				 * http://php.net/manual/en/language.oop5.magic.php#object.tostring
-				 * Dont throw exceptions when in __toString() method, switch to C_ERR_FATAL behaviour
-				 */
-				if($this->__inToStringCall === FALSE){
-					throw new \Exception( $message );
-				}
+				throw new \Exception( $message );
 			} elseif ( self::$errorHandlingFUSE === self::C_ERR_FUNC ) {
 				$func = self::$errorHandler;
 				//give the error handling function the information if its safe to throw an exception
@@ -1281,8 +1270,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 					'message' => $message,
 					'method' => $method,
 					'args' => $args,
-					'bean' => $this,
-					'canSafelyThrowException' => !$this->__inToStringCall
+					'bean' => $this
 				));
 			}
 			trigger_error( $message, E_USER_ERROR );
@@ -1304,9 +1292,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __toString()
 	{
-		$this->__inToStringCall = TRUE;
 		$string = $this->__call( '__toString', array() );
-		$this->__inToStringCall = FALSE;
 
 		if ( $string === NULL ) {
 			$list = array();
