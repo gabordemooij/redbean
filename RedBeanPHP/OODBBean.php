@@ -1251,7 +1251,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				return NULL;
 			}
 
-			$message = "FUSE: method does not exist in model '" . $this->getMeta( 'type' ) . "': $method";
+			$message = "FUSE: method does not exist in model: $method";
 			if ( self::$errorHandlingFUSE === self::C_ERR_LOG ) {
 				error_log( $message );
 				return NULL;
