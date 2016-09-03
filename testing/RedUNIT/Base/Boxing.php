@@ -52,5 +52,19 @@ class Boxing extends Base
 		asrt( ( $box instanceof \Model_Boxedbean ), TRUE );
 		R::store( $box );
 	}
-}
 
+	/**
+	 * Test fix for issue #512 - thanks for reporting Bernhard H.
+	 * OODBBean::__toString() implementation only works with C_ERR_IGNORE
+	 *
+	 * @return void
+	 */
+	public function testToStringIssue512()
+	{
+		R::setErrorHandlingFUSE( OODBBean::C_ERR_FATAL );
+		$boxedBean = R::dispense( 'boxedbean' );
+		$str = (string) $boxedBean;
+		asrt( $str, '{"id":0}' ); //no fatal error
+		R::setErrorHandlingFUSE( FALSE );
+	}
+}

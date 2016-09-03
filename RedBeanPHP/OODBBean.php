@@ -1224,6 +1224,20 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 	/**
 	 * Sends the call to the registered model.
+	 * This method can also be used to override bean behaviour.
+	 * In that case you don't want an error or exception to be triggered
+	 * if the method does not exist in the model (because it's optional).
+	 * Unfortunately we cannot add an extra argument to __call() for this
+	 * because the signature is fixed. Another option would be to set
+	 * a special flag ( i.e. $this->isOptionalCall ) but that would
+	 * cause additional complexity because we have to deal with extra temporary state.
+	 * So, instead I allowed the method name to be prefixed with '@', in practice
+	 * nobody creates methods like that - however the '@' symbol in PHP is widely known
+	 * to suppress error handling, so we can reuse the semantics of this symbol.
+	 * If a method name gets passed starting with '@' the overrideDontFail variable
+	 * will be set to TRUE and the '@' will be stripped from the function name before
+	 * attempting to invoke the method on the model. This way, we have all the
+	 * logic in one place.
 	 *
 	 * @param string $method name of the method
 	 * @param array  $args   argument list
@@ -1232,6 +1246,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __call( $method, $args )
 	{
+		$overrideDontFail = FALSE;
+		if ( strpos( $method, '@' ) === 0 ) {
+			$method = substr( $method, 1 );
+			$overrideDontFail = TRUE;
+		}
+
 		if ( !isset( $this->__info['model'] ) ) {
 			$model = $this->beanHelper->getModelForBean( $this );
 
@@ -1243,7 +1263,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		}
 		if ( !method_exists( $this->__info['model'], $method ) ) {
 
-			if ( self::$errorHandlingFUSE === FALSE ) {
+			if ( self::$errorHandlingFUSE === FALSE || $overrideDontFail ) {
 				return NULL;
 			}
 
@@ -1291,7 +1311,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __toString()
 	{
-		$string = $this->__call( '__toString', array() );
+		$string = $this->__call( '@__toString', array() );
 
 		if ( $string === NULL ) {
 			$list = array();
