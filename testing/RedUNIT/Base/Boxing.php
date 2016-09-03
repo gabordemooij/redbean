@@ -61,7 +61,7 @@ class Boxing extends Base
 	 */
 	public function testToStringIssue512()
 	{
-		R::setErrorHandlingFUSE( OODBBean::C_ERR_FATAL );
+		R::setErrorHandlingFUSE( \RedBeanPHP\OODBBean::C_ERR_FATAL );
 		$boxedBean = R::dispense( 'boxedbean' );
 		$str = (string) $boxedBean;
 		asrt( $str, '{"id":0}' ); //no fatal error
