@@ -145,6 +145,7 @@ class Finder
 	/**
 	 * Tries to find beans of a certain type,
 	 * if no beans are found, it dispenses a bean of that type.
+	 * Note that this function always returns an array.
 	 *
 	 * @see Finder::find
 	 *
