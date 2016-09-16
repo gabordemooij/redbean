@@ -739,6 +739,9 @@ class Finding extends Base {
 		} catch ( RedException $exception ) {
 			pass();
 		}
+		R::nuke();
+		$bean = R::findOneOrDispense( 'jellybean' );
+		asrt( is_object( $bean ), TRUE );
 	}
 
 	/**

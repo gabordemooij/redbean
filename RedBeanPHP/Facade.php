@@ -609,6 +609,20 @@ class Facade
 	}
 
 	/**
+	 * Same as findOrDispense but returns just one element.
+	 *
+	 * @param  string $type     type of bean you are looking for
+	 * @param  string $sql      SQL code for finding the bean
+	 * @param  array  $bindings parameters to bind to SQL
+	 *
+	 * @return OODBBean
+	 */
+	public static function findOneOrDispense( $type, $sql = NULL, $bindings = array() )
+	{
+		return reset( self::findOrDispense( $type, $sql, $bindings ) );
+	}
+
+	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
 	 * be inserted in the SQL statement by populating the value
