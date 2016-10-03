@@ -51,7 +51,7 @@ class RDefault implements Logger
 
 		foreach ( func_get_args() as $argument ) {
 			if ( is_array( $argument ) ) {
-				$log = print_r( $argument, TRUE );
+				$log = var_export( $argument, TRUE );
 				if ( $this->mode === self::C_LOGGER_ECHO ) {
 					echo $log;
 				} else {
