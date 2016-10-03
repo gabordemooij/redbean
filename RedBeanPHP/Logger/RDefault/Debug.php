@@ -69,7 +69,7 @@ class Debug extends RDefault implements Logger
 			$value = substr( $value, 0, ( $this->strLen ) ).'... ';
 		}
 
-		if ( !is_numeric( $value ) && $value !== 'NULL') {
+		if ( !\RedBeanPHP\QueryWriter\AQueryWriter::canBeTreatedAsInt( $value ) && $value !== 'NULL') {
 			$value = '\''.$value.'\'';
 		}
 
