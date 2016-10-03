@@ -339,37 +339,28 @@ abstract class AQueryWriter
 
 			if ( !is_array( $values ) ) $values = array( $values );
 
-			// If it's safe to skip bindings, do so...
-			if ( ctype_digit( implode( '', $values ) ) ) {
-				$sql .= implode( ',', $values ) . ' ) ';
+			if ( $paramTypeIsNum ) {
+				$sql .= implode( ',', array_fill( 0, count( $values ), '?' ) ) . ' ) ';
 
-				// only numeric, cant do much harm
-				$sqlConditions[] = $sql;
+				array_unshift($sqlConditions, $sql);
+
+				foreach ( $values as $k => $v ) {
+					$values[$k] = strval( $v );
+
+					array_unshift( $bindings, $v );
+				}
 			} else {
 
-				if ( $paramTypeIsNum ) {
-					$sql .= implode( ',', array_fill( 0, count( $values ), '?' ) ) . ' ) ';
+				$slots = array();
 
-					array_unshift($sqlConditions, $sql);
-
-					foreach ( $values as $k => $v ) {
-						$values[$k] = strval( $v );
-
-						array_unshift( $bindings, $v );
-					}
-				} else {
-
-					$slots = array();
-
-					foreach( $values as $k => $v ) {
-						$slot            = ':slot'.$counter++;
-						$slots[]         = $slot;
-						$bindings[$slot] = strval( $v );
-					}
-
-					$sql .= implode( ',', $slots ).' ) ';
-					$sqlConditions[] = $sql;
+				foreach( $values as $k => $v ) {
+					$slot            = ':slot'.$counter++;
+					$slots[]         = $slot;
+					$bindings[$slot] = strval( $v );
 				}
+
+				$sql .= implode( ',', $slots ).' ) ';
+				$sqlConditions[] = $sql;
 			}
 		}
 
