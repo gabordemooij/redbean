@@ -299,7 +299,7 @@ class Foreignkeys extends Mysql
 
 		$sql   = '
 			CREATE TABLE book (
-				id INT( 11 ) UNSIGNED NULL AUTO_INCREMENT,
+				id INT( 11 ) UNSIGNED AUTO_INCREMENT,
 				PRIMARY KEY ( id )
 			)
 			ENGINE = InnoDB

@@ -118,7 +118,7 @@ class Indexes extends Base {
 	{
 		R::nuke();
 		$book = R::dispense( 'book' );
-		$book->author_id = 'a';
+		$book->author_id = '999';
 		R::store( $book );
 		$indexes = getIndexes( 'book' );
 		//should just work fine

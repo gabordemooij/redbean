@@ -39,7 +39,7 @@ class Bigint extends Mysql
 			(
 				id BIGINT(20) UNSIGNED NOT NULL,
 				book_id BIGINT(20) UNSIGNED NOT NULL,
-				magazine_id BIGINT(20) UNSIGNED NOT NULL,
+				magazine_id BIGINT(20) UNSIGNED NULL,
 				title VARCHAR(255),
 				PRIMARY KEY ( id )
 			)
