@@ -43,6 +43,17 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	protected $quoteCharacter = '`';
 
 	/**
+     * Tasks to be done at DB-connect.
+     *
+	 * @return void
+	 */
+    private function boot()
+    {
+        // See Github issue #545
+        $this->adapter->exec( "PRAGMA foreign_keys = 1" );
+    }
+
+	/**
 	 * Gets all information about a table (from a type).
 	 *
 	 * Format:
@@ -234,6 +245,8 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		}
 
 		$this->adapter = $adapter;
+
+        $this->boot();
 	}
 
 	/**
