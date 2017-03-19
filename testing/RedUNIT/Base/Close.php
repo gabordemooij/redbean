@@ -30,6 +30,7 @@ class Close extends Base
 	 */
 	public function testClose()
 	{
+		R::getDatabaseAdapter()->setOption( 'setInitQuery', NULL );
 		asrt( R::getDatabaseAdapter()->getDatabase()->isConnected(), TRUE );
 		R::close();
 		asrt( R::getDatabaseAdapter()->getDatabase()->isConnected(), FALSE );

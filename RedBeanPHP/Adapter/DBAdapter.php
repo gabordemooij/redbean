@@ -237,4 +237,15 @@ class DBAdapter extends Observable implements Adapter
 	{
 		$this->db->close();
 	}
+
+	/**
+	 * @see Adapter::setOption
+	 */
+	public function setOption( $optionKey, $optionValue ) {
+		if ( method_exists( $this->db, $optionKey ) ) {
+			call_user_func( array( $this->db, $optionKey ), $optionValue );
+			return TRUE;
+		}
+		return FALSE;
+	}
 }

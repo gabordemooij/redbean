@@ -89,6 +89,16 @@ class RPDO implements Driver
 	protected $mysqlEncoding = '';
 
 	/**
+	 * @var boolean
+	 */
+	protected $stringifyFetches = TRUE;
+
+	/**
+	 * @var string
+	 */
+	protected $initSQL = NULL;
+
+	/**
 	 * Binds parameters. This method binds parameters to a PDOStatement for
 	 * Query Execution. This method binds parameters as NULL, INTEGER or STRING
 	 * and supports both named keys and question mark keys.
@@ -239,6 +249,15 @@ class RPDO implements Driver
 	}
 
 	/**
+	 * Sets PDO in stringify fetch mode.
+	 *
+	 * @param boolean $bool
+	 */
+	public function stringifyFetches( $bool ) {
+		$this->stringifyFetches = $bool;
+	}
+
+	/**
 	 * Returns the best possible encoding for MySQL based on version data.
 	 *
 	 * @return string
@@ -303,11 +322,16 @@ class RPDO implements Driver
 				$pass
 			);
 			$this->setEncoding();
-			$this->pdo->setAttribute( \PDO::ATTR_STRINGIFY_FETCHES, TRUE );
+			$this->pdo->setAttribute( \PDO::ATTR_STRINGIFY_FETCHES, $this->stringifyFetches );
 			//cant pass these as argument to constructor, CUBRID driver does not understand...
 			$this->pdo->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION );
 			$this->pdo->setAttribute( \PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC );
 			$this->isConnected = TRUE;
+			/* run initialisation query if any */
+			if ( $this->initSQL !== NULL ) {
+				$this->Execute( $this->initSQL );
+				$this->initSQL = NULL;
+			}
 		} catch ( \PDOException $exception ) {
 			$matches = array();
 			$dbname  = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
@@ -617,5 +641,23 @@ class RPDO implements Driver
 	public function getIntegerBindingMax()
 	{
 		return $this->max;
+	}
+
+	/**
+	 * Sets a query to be executed upon connecting to the database.
+	 * This method provides an opportunity to configure the connection
+	 * to a database through an SQL-based interface. Objects can provide
+	 * an SQL string to be executed upon establishing a connection to
+	 * the database. This has been used to solve issues with default
+	 * foreign key settings in SQLite3 for instance, see Github issues:
+	 * #545 and #548.
+	 *
+	 * @param string $sql SQL query to run upon connecting to database
+	 *
+	 * @return self
+	 */
+	public function setInitQuery( $sql ) {
+		$this->initSQL = $sql;
+		return $this;
 	}
 }
