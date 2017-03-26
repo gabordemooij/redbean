@@ -1874,6 +1874,21 @@ class Facade
 	}
 
 	/**
+	 * Toggles 'partial bean mode'. If this mode has been
+	 * selected the repository will only update the fields of a bean that
+	 * have been changed rather than the entire bean.
+	 * This method will return the previous mode (TRUE/FALSE).
+	 *
+	 * @param boolean $yesNo TRUE to activate 'partial bean mode'
+	 *
+	 * @return boolean
+	 */
+	public static function usePartialBeans( $yesNo )
+	{
+		return self::$redbean->getCurrentRepository()->usePartialBeans( $yesNo );
+	}
+
+	/**
 	 * Dynamically extends the facade with a plugin.
 	 * Using this method you can register your plugin with the facade and then
 	 * use the plugin by invoking the name specified plugin name as a method on

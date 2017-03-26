@@ -422,7 +422,7 @@ class Finding extends Base {
 			LEFT JOIN book_category ON book_category.book_id = book.id
 			LEFT JOIN category ON book_category.category_id = category.id
 			WHERE category_id > ?
-			ORDER BY book.title ASC
+			ORDER BY book.title,page.id ASC
 		', array( 0 ), array(
 				array(
 					'b'=>'page',

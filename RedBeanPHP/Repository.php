@@ -47,6 +47,28 @@ abstract class Repository
 	protected $writer;
 
 	/**
+	 * @var boolean
+	 */
+	protected $partialBeans = FALSE;
+
+	/**
+	 * Toggles 'partial bean mode'. If this mode has been
+	 * selected the repository will only update the fields of a bean that
+	 * have been changed rather than the entire bean.
+	 * This method will return the previous mode (TRUE/FALSE).
+	 *
+	 * @param boolean $yesNo TRUE to activate 'partial bean mode'
+	 *
+	 * @return boolean
+	 */
+	public function usePartialBeans( $yesNo )
+	{
+		$oldValue = (boolean) $this->partialBeans;
+		$this->partialBeans = $yesNo;
+		return $oldValue;
+	}
+
+	/**
 	 * Stores a bean and its lists in one run.
 	 *
 	 * @param OODBBean $bean bean to process

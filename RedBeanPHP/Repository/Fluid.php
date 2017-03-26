@@ -204,7 +204,14 @@ class Fluid extends Repository
 			$this->createTableIfNotExists( $bean, $table );
 
 			$updateValues = array();
+
+			if ( $this->partialBeans ) {
+				$mask = $bean->getMeta( 'changelist' );
+				$bean->setMeta( 'changelist', array() );
+			}
+
 			foreach ( $bean as $property => $value ) {
+				if ( $this->partialBeans && !in_array( $property, $mask ) ) continue;
 				if ( $property !== 'id' ) {
 					$this->modifySchema( $bean, $property, $value );
 				}
