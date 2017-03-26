@@ -605,6 +605,7 @@ class Facade
 	 */
 	public static function findOrDispense( $type, $sql = NULL, $bindings = array() )
 	{
+		DispenseHelper::checkType( $type );
 		return self::$finder->findOrDispense( $type, $sql, $bindings );
 	}
 
@@ -619,6 +620,7 @@ class Facade
 	 */
 	public static function findOneOrDispense( $type, $sql = NULL, $bindings = array() )
 	{
+		DispenseHelper::checkType( $type );
 		return reset( self::findOrDispense( $type, $sql, $bindings ) );
 	}
 

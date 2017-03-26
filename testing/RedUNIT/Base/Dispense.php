@@ -7,6 +7,7 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\Facade as Facade;
 use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\Util\DispenseHelper as DispenseHelper;
 
 /**
  * Dispense
@@ -25,6 +26,35 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Dispense extends Base
 {
+	/**
+	 * Test whether findOrDispense and findOneOrDispense
+	 * will trigger same validation Exception for invalid
+	 * bean types as R::dispense(). Github issue #546.
+	 *
+	 * @return void
+	 */
+	public function testIssue546()
+	{
+		try {
+			R::findOrDispense( 'invalid_type' );
+			fail();
+		} catch ( RedException $exception ) {
+			pass();
+		}
+		try {
+			R::findOneOrDispense( 'invalid_type' );
+			fail();
+		} catch ( RedException $exception ) {
+			pass();
+		}
+		try {
+			DispenseHelper::checkType( 'invalid_type' );
+			fail();
+		} catch ( RedException $exception ) {
+			pass();
+		}
+	}
+
 	/**
 	 * Test dispense.
 	 *
