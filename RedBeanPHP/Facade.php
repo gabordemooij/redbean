@@ -1879,15 +1879,19 @@ class Facade
 	 * Toggles 'partial bean mode'. If this mode has been
 	 * selected the repository will only update the fields of a bean that
 	 * have been changed rather than the entire bean.
-	 * This method will return the previous mode (TRUE/FALSE).
+	 * Pass the value TRUE to select 'partial mode' for all beans.
+	 * Pass the value FALSE to disable 'partial mode'.
+	 * Pass an array of bean types if you wish to use partial mode only
+	 * for some types.
+	 * This method will return the previous value.
 	 *
-	 * @param boolean $yesNo TRUE to activate 'partial bean mode'
+	 * @param boolean|array $list List of type names or 'all'
 	 *
-	 * @return boolean
+	 * @return mixed
 	 */
-	public static function usePartialBeans( $yesNo )
+	public static function usePartialBeans( $yesNoBeans )
 	{
-		return self::$redbean->getCurrentRepository()->usePartialBeans( $yesNo );
+		return self::$redbean->getCurrentRepository()->usePartialBeans( $yesNoBeans );
 	}
 
 	/**

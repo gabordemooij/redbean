@@ -205,13 +205,14 @@ class Fluid extends Repository
 
 			$updateValues = array();
 
-			if ( $this->partialBeans ) {
+			$partial = ( $this->partialBeans === TRUE || ( is_array( $this->partialBeans ) && in_array( $table, $this->partialBeans ) ) );
+			if ( $partial ) {
 				$mask = $bean->getMeta( 'changelist' );
 				$bean->setMeta( 'changelist', array() );
 			}
 
 			foreach ( $bean as $property => $value ) {
-				if ( $this->partialBeans && !in_array( $property, $mask ) ) continue;
+				if ( $partial && !in_array( $property, $mask ) ) continue;
 				if ( $property !== 'id' ) {
 					$this->modifySchema( $bean, $property, $value );
 				}
