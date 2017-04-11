@@ -605,6 +605,7 @@ class Facade
 	 */
 	public static function findOrDispense( $type, $sql = NULL, $bindings = array() )
 	{
+		DispenseHelper::checkType( $type );
 		return self::$finder->findOrDispense( $type, $sql, $bindings );
 	}
 
@@ -619,6 +620,7 @@ class Facade
 	 */
 	public static function findOneOrDispense( $type, $sql = NULL, $bindings = array() )
 	{
+		DispenseHelper::checkType( $type );
 		return reset( self::findOrDispense( $type, $sql, $bindings ) );
 	}
 
@@ -1871,6 +1873,25 @@ class Facade
 	public static function setAutoResolve( $automatic = TRUE )
 	{
 		OODBBean::setAutoResolve( (boolean) $automatic );
+	}
+
+	/**
+	 * Toggles 'partial bean mode'. If this mode has been
+	 * selected the repository will only update the fields of a bean that
+	 * have been changed rather than the entire bean.
+	 * Pass the value TRUE to select 'partial mode' for all beans.
+	 * Pass the value FALSE to disable 'partial mode'.
+	 * Pass an array of bean types if you wish to use partial mode only
+	 * for some types.
+	 * This method will return the previous value.
+	 *
+	 * @param boolean|array $list List of type names or 'all'
+	 *
+	 * @return mixed
+	 */
+	public static function usePartialBeans( $yesNoBeans )
+	{
+		return self::$redbean->getCurrentRepository()->usePartialBeans( $yesNoBeans );
 	}
 
 	/**

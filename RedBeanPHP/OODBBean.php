@@ -410,6 +410,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->__info['sys.orig'] = array( 'id' => 0 );
 		$this->__info['tainted']  = TRUE;
 		$this->__info['changed']  = TRUE;
+		$this->__info['changelist'] = array();
 		$this->properties['id']   = 0;
 	}
 
@@ -548,7 +549,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	{
 		$myID = $this->properties['id'];
 
-		$this->import( $otherBean->export() );
+		$this->import( $otherBean->export( FALSE, FALSE, TRUE ) );
 
 		$this->id = $myID;
 
@@ -1094,6 +1095,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 		$this->__info['tainted'] = TRUE;
 		$this->__info['changed'] = TRUE;
+		array_push( $this->__info['changelist'], $property );
 
 		if ( array_key_exists( $fieldLink, $this->properties ) && !( $value instanceof OODBBean ) ) {
 			if ( is_null( $value ) || $value === FALSE ) {

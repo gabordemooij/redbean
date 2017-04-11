@@ -64,7 +64,15 @@ class Frozen extends Repository
 			$updateValues = array();
 			$k1 = 'property';
 			$k2 = 'value';
+
+			$partial = ( $this->partialBeans === TRUE || ( is_array( $this->partialBeans ) && in_array( $table, $this->partialBeans ) ) );
+			if ( $partial ) {
+				$mask = $bean->getMeta( 'changelist' );
+				$bean->setMeta( 'changelist', array() );
+			}
+
 			foreach( $properties as $key => $value ) {
+				if ( $partial && !in_array( $key, $mask ) ) continue;
 				$updateValues[] = array( $k1 => $key, $k2 => $value );
 			}
 			$bean->id = $this->writer->updateRecord( $table, $updateValues, $id );

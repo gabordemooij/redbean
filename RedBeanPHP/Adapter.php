@@ -187,4 +187,18 @@ interface Adapter
 	 * @return void
 	 */
 	public function close();
+
+	/**
+	 * Sets a driver specific option.
+	 * Using this method you can access driver-specific functions.
+	 * If the selected option exists the value will be passed and
+	 * this method will return boolean TRUE, otherwise it will return
+	 * boolean FALSE.
+	 *
+	 * @param string $optionKey   option key
+	 * @param string $optionValue option value
+	 *
+	 * @return boolean
+	 */
+	public function setOption( $optionKey, $optionValue );
 }

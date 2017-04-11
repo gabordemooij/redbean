@@ -234,6 +234,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		}
 
 		$this->adapter = $adapter;
+		$this->adapter->setOption( 'setInitQuery', ' PRAGMA foreign_keys = 1 ' );
 	}
 
 	/**
