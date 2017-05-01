@@ -65,6 +65,7 @@ require( REDBEANPHP_MAIN_DIR . 'Util/DispenseHelper.php' );
 require( REDBEANPHP_MAIN_DIR . 'Util/Dump.php' );
 require( REDBEANPHP_MAIN_DIR . 'Util/MultiLoader.php' );
 require( REDBEANPHP_MAIN_DIR . 'Util/Transaction.php' );
+require( REDBEANPHP_MAIN_DIR . 'Util/QuickExport.php' );
 
 //Allow users to mount the plugin folder.
 if ( defined( 'REDBEANPHP_PLUGINS' ) ) {

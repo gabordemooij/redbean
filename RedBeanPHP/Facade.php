@@ -18,6 +18,7 @@ use RedBeanPHP\Util\Transaction as Transaction;
 use RedBeanPHP\Util\Dump as Dump;
 use RedBeanPHP\Util\DispenseHelper as DispenseHelper;
 use RedBeanPHP\Util\ArrayTool as ArrayTool;
+use RedBeanPHP\Util\QuickExport as QuickExport;
 
 /**
  * RedBean Facade
@@ -1892,6 +1893,23 @@ class Facade
 	public static function usePartialBeans( $yesNoBeans )
 	{
 		return self::$redbean->getCurrentRepository()->usePartialBeans( $yesNoBeans );
+	}
+
+	/**
+	 * Exposes the result of the specified SQL query as a CSV file.
+	 *
+	 * @param string  $sql      SQL query to expose result of
+	 * @param array   $bindings parameter bindings
+	 * @param array   $columns  column headers for CSV file
+	 * @param string  $path     path to save CSV file to
+	 * @param boolean $output   TRUE to output CSV directly using readfile
+	 *
+	 * @return void
+	 */
+	public static function csv( $sql = '', $bindings = [], $columns = NULL, $path = '/tmp/redexport_%s.csv', $output = true )
+	{
+		$quickExport = new QuickExport( self::$toolbox );
+		$quickExport->csv( $sql, $bindings, $columns, $path, $output );
 	}
 
 	/**

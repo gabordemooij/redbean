@@ -60,6 +60,7 @@ addFile( DIR . 'Util/DispenseHelper.php' );
 addFile( DIR . 'Util/Dump.php' );
 addFile( DIR . 'Util/MultiLoader.php' );
 addFile( DIR . 'Util/Transaction.php' );
+addFile( DIR . 'Util/QuickExport.php' );
 addFile( DIR . 'Plugin.php' );
 
 $func = file_get_contents(DIR . 'Functions.php');
