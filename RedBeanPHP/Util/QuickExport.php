@@ -56,7 +56,7 @@ class QuickExport
 		list( $delimiter, $enclosure, $escapeChar ) = $options;
 		$path = sprintf( $path, date('Ymd_his') );
 		$handle = fopen( $path, 'w' );
-		if ($columns) fputcsv($handle, $columns, $delimiter, $enclosure );
+		if ($columns) fputcsv($handle, $columns, $delimiter, $enclosure, $escapeChar );
 		$cursor = $this->toolbox->getDatabaseAdapter()->getCursor( $sql, $bindings );
 		while( $row = $cursor->getNextItem() ) {
 			fputcsv($handle, $row, $delimiter, $enclosure, $escapeChar );

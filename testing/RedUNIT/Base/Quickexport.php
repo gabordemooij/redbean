@@ -32,8 +32,9 @@ class Quickexport extends Base
 	 */
 	public function testCSV()
 	{
+		if ( phpversion() < 5.5 || strpos( strtolower( phpversion() ), 'hhvm' ) !== FALSE ) return;
 		R::store( R::dispense( array( '_type'=>'bean', 'a' => 1, 'b' => 2, 'c' => 3 ) ) );
-		$path = tempnam(sys_get_temp_dir(), 'redbeantest' );
+		$path = '/tmp/redbeantest.txt';
 		R::csv( 'SELECT a,b,c FROM bean', array(), array( 'A', 'B', 'C' ), $path, FALSE );
 		$csv = file_get_contents( $path );
 		$expected = "A,B,C\n1,2,3";
