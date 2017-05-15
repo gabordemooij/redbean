@@ -23,6 +23,61 @@ use RedBeanPHP\Facade as R;
 class Bean extends Base
 {
 	/**
+	 * From github (issue #549):
+	 * Imagine you have a simple Post object, which has a person_id and
+	 * is supposed to be associated to a Person.
+	 *
+	 * $post = R::findOne('post');
+	 * $a = $post->person ?? null;
+	 * $b = $post->person;
+	 * $c = $post->person ?? null;
+	 *
+	 * var_dump($a ? 'Person A is named ' . $a->name : 'No person A');
+	 * var_dump($b ? 'Person B is named ' . $b->name : 'No person B');
+	 * var_dump($c ? 'Person C is named ' . $c->name : 'No person C');
+	 *
+	 * I would expect to either have the person's name in the output three times,
+	 * or 'No person' in the output three times.
+	 * What actually happens is that $a is null,
+	 * so the first access fails, but the other two succeed.
+	 * I'm guessing this happens because the implementation of offsetExists
+	 * doesn't agree with offsetGet around relations.
+	 *
+	 * @return void
+	 */
+	public function testIssue549OffsetExistsVsOffsetGet()
+	{
+		R::nuke();
+		list( $post, $person ) = R::dispenseAll( 'post,person' );
+		$post->person = $person;
+		R::store( $post );
+		$post = R::findOne('post');
+		$a = (isset( $post->person )) ? $post->person : NULL;
+		$b = $post->person;
+		$c = (isset( $post->person )) ? $post->person : NULL;
+		$strA = ($a ? 'Y' : 'N');
+		$strB = ($b ? 'Y' : 'N');
+		$strC = ($c ? 'Y' : 'N');
+		$out = "{$strA}{$strB}{$strC}";
+		asrt( $out, 'NYY' );
+		asrt( isset( $post->other ), FALSE );
+		R::nuke();
+		list( $post, $person ) = R::dispenseAll( 'post,person' );
+		$post->person = $person;
+		R::store( $post );
+		$post = R::findOne('post');
+		$a = ( $post->exists('person') ) ? $post->person : NULL;
+		$b = $post->person;
+		$c = ( $post->exists('person') ) ? $post->person : NULL;
+		$strA = ($a ? 'Y' : 'N');
+		$strB = ($b ? 'Y' : 'N');
+		$strC = ($c ? 'Y' : 'N');
+		$out = "{$strA}{$strB}{$strC}";
+		asrt( $out, 'YYY' );
+		asrt( isset( $post->other ), FALSE );
+	}
+
+	/**
 	 * Tests whether we can send results of a query to meta data
 	 * when converting to bean.
 	 */

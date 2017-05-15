@@ -628,6 +628,29 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
+	 * Checks whether a related bean exists.
+	 * For instance if a post bean has a related author, this method
+	 * can be used to check if the author is set without loading the author.
+	 * This method works by checking the related ID-field.
+	 *
+	 * @param string $property name of the property you wish to check
+	 *
+	 * @return boolean
+	 */
+	public function exists( $property )
+	{
+		$property = $this->beau( $property );
+		/* fixes issue #549, see Base/Bean test */
+		$hiddenRelationField = "{$property}_id";
+		if ( array_key_exists( $hiddenRelationField, $this->properties ) ) {
+			if ( !is_null( $this->properties[$hiddenRelationField] ) ) {
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+
+	/**
 	 * Returns the ID of the bean no matter what the ID field is.
 	 *
 	 * @return string|null
