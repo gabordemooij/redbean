@@ -622,7 +622,8 @@ class Facade
 	public static function findOneOrDispense( $type, $sql = NULL, $bindings = array() )
 	{
 		DispenseHelper::checkType( $type );
-		return reset( self::findOrDispense( $type, $sql, $bindings ) );
+		$arrayOfBeans = self::findOrDispense( $type, $sql, $bindings );
+		return reset($arrayOfBeans);
 	}
 
 	/**
