@@ -4,6 +4,7 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * Utf8
@@ -21,6 +22,22 @@ use RedBeanPHP\Facade as R;
  */
 class Utf8 extends Base
 {
+	/**
+	 * Tests whether we can process malformed strings in beans.
+	 *
+	 * @return void
+	 */
+	public function testMalformed()
+	{
+		$byte = pack( 'I', 129 );
+		$bean = R::dispense( 'bean' );
+		$bean->byte = $byte;
+		OODBBean::setEnforceUTF8encoding( TRUE );
+		$str = strval( $bean );
+		OODBBean::setEnforceUTF8encoding( FALSE );
+		pass();
+	}
+
 	/**
 	 * Test UTF8 handling.
 	 *
