@@ -333,6 +333,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	private function getSharedList( $type, $redbean, $toolbox )
 	{
 		$writer = $toolbox->getWriter();
+		$type             = $this->beau( $type );
 
 		if ( $this->via ) {
 			$oldName = $writer->getAssocTable( array( $this->__info['type'], $type ) );
@@ -345,7 +346,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 		$beans = array();
 		if ($this->getID()) {
-			$type             = $this->beau( $type );
+
 			$assocManager     = $redbean->getAssociationManager();
 			$beans            = $assocManager->related( $this, $type, $this->withSql, $this->withParams );
 		}
