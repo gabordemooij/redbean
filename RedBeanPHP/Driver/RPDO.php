@@ -333,9 +333,13 @@ class RPDO implements Driver
 				$this->initSQL = NULL;
 			}
 		} catch ( \PDOException $exception ) {
-			$matches = array();
-			$dbname  = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
-			throw new \PDOException( 'Could not connect to database (' . $dbname . ').', $exception->getCode() );
+			if ( preg_match( '/Access denied/', $exception->getMessage() ) ) {
+				$matches = array();
+				$dbname  = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
+				throw new \PDOException( 'Could not connect to database (' . $dbname . ').', $exception->getCode() );
+			} else {
+				throw new \PDOException( $exception->getMessage(), $exception->getCode() );
+			}
 		}
 	}
 
