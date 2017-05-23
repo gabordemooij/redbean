@@ -29,7 +29,6 @@ use RedBeanPHP\Util\MatchUp;
  */
 class Productivity extends Base
 {
-	
 	/**
 	 * Test matchup
 	 *
@@ -43,69 +42,53 @@ class Productivity extends Base
 		$account->pass = sha1( 'sheep' );
 		$account->archived = 0;
 		$account->attempts = 1;
-		
+
 		R::store( $account );
 		$matchUp = new MatchUp( R::getToolbox() );
-		
+
 		/* simulate a token generation script */
 		$account = NULL;
-		$didGenToken = $matchUp->matchUp( 'account', ' uname = ? AND archived = ?', ['Shawn',0], [
+		$didGenToken = $matchUp->matchUp( 'account', ' uname = ? AND archived = ?', array('Shawn',0), array(
 			'token'     => sha1(rand(0,9000) . time()),
 			'tokentime' => time()
-		], NULL, $account );
+		), NULL, $account );
 		
 		asrt( $didGenToken, TRUE );
 		asrt( !is_null( $account->token ) , TRUE );
 		asrt( !is_null( $account->tokentime ) , TRUE );
-		
-		
+
 		/* simulate a password reset script */
 		$newpass = '1234';
-		$didResetPass = $matchUp->matchUp( 'account', ' token = ? AND tokentime > ? ', [ $account->token, time()-100 ], [
+		$didResetPass = $matchUp->matchUp( 'account', ' token = ? AND tokentime > ? ', array( $account->token, time()-100 ), array(
 			'pass' => $newpass,
 			'token' => ''
-		], NULL, $account );
+		), NULL, $account );
 		asrt( $account->pass, '1234' );
 		asrt( $account->token, '' );
 		
 		/* simulate a login */
-		$didFindUsr = $matchUp->matchUp( 'account', ' uname = ? ', ['Shawn'], [
+		$didFindUsr = $matchUp->matchUp( 'account', ' uname = ? ', array( 'Shawn' ), array(
 			'attempts' => function( $acc ) {
 				return ( $acc->pass !== '1234' ) ? ( $acc->attempts + 1 ) : 0;
 			}
-		], NULL, $account);
-		
+		), NULL, $account);
+
 		asrt( $didFindUsr, TRUE );
 		asrt( $account->attempts, 0 );
-		
+
 		/* Login failure */
-		$didFindUsr = $matchUp->matchUp( 'account', ' uname = ? ', ['Shawn'], [
+		$didFindUsr = $matchUp->matchUp( 'account', ' uname = ? ', array( 'Shawn' ), array(
 			'attempts' => function( $acc ) {
 				return ( $acc->pass !== '1236' ) ? ( $acc->attempts + 1 ) : 0;
 			}
-		], NULL, $account);
-		
+		), NULL, $account);
+
 		/* Create user if not exists */
-		$didFindUsr = R::matchUp( 'account', ' uname = ? ', ['Anonymous'], [
-		], [
+		$didFindUsr = R::matchUp( 'account', ' uname = ? ', array( 'Anonymous' ), array(
+		), array(
 			'uname' => 'newuser'
-		], $account);
-			
-		
+		), $account);
 		asrt( $didFindUsr, FALSE );
 		asrt( $account->uname, 'newuser' );
-		
-		
-		
-		
 	}
-	
-	public function testLook()
-	{
-		
-		
-		
-	}
-	
-	
 }
