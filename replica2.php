@@ -61,6 +61,7 @@ addFile( DIR . 'Util/Dump.php' );
 addFile( DIR . 'Util/MultiLoader.php' );
 addFile( DIR . 'Util/Transaction.php' );
 addFile( DIR . 'Util/QuickExport.php' );
+addFile( DIR . 'Util/MatchUp.php' );
 addFile( DIR . 'Plugin.php' );
 
 $func = file_get_contents(DIR . 'Functions.php');

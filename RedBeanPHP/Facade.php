@@ -19,6 +19,7 @@ use RedBeanPHP\Util\Dump as Dump;
 use RedBeanPHP\Util\DispenseHelper as DispenseHelper;
 use RedBeanPHP\Util\ArrayTool as ArrayTool;
 use RedBeanPHP\Util\QuickExport as QuickExport;
+use RedBeanPHP\Util\MatchUp as MatchUp;
 
 /**
  * RedBean Facade
@@ -1911,6 +1912,24 @@ class Facade
 	{
 		$quickExport = new QuickExport( self::$toolbox );
 		$quickExport->csv( $sql, $bindings, $columns, $path, $output );
+	}
+
+	/**
+	 * Productivity method to quickly find-and-update a bean.
+	 * @see RedBeanPHP\Util\MatchUp
+	 *
+	 * @param string   $type         type of bean you're looking for
+	 * @param string   $sql          SQL snippet (starting at the WHERE clause, omit WHERE-keyword)
+	 * @param array    $bindings     array of parameter bindings for SQL snippet
+	 * @param array    $onFoundDo    task list to be considered on finding the bean
+	 * @param array    $onNotFoundDo task list to be considered on NOT finding the bean
+	 * @param OODBBean &$bean        reference to obtain the found bean
+	 *
+	 * @return mixed
+	 */
+	public static function matchUp( $type, $sql, $bindings = array(), $onFoundDo = NULL, $onNotFoundDo = NULL, &$bean = NULL 	) {
+		$matchUp = new MatchUp( self::$toolbox );
+		return $matchUp->matchUp( $type, $sql, $bindings, $onFoundDo, $onNotFoundDo, $bean );
 	}
 
 	/**
