@@ -20,6 +20,7 @@ use RedBeanPHP\Util\DispenseHelper as DispenseHelper;
 use RedBeanPHP\Util\ArrayTool as ArrayTool;
 use RedBeanPHP\Util\QuickExport as QuickExport;
 use RedBeanPHP\Util\MatchUp as MatchUp;
+use RedBeanPHP\Util\Look as Look;
 
 /**
  * RedBean Facade
@@ -1930,6 +1931,16 @@ class Facade
 	public static function matchUp( $type, $sql, $bindings = array(), $onFoundDo = NULL, $onNotFoundDo = NULL, &$bean = NULL 	) {
 		$matchUp = new MatchUp( self::$toolbox );
 		return $matchUp->matchUp( $type, $sql, $bindings, $onFoundDo, $onNotFoundDo, $bean );
+	}
+
+	/**
+	 * Returns an instance of the Look Helper class.
+	 * The instance will be configured with the current toolbox.
+	 *
+	 * @return Look
+	 */
+	public static function getLook() {
+		return new Look( self::$toolbox );
 	}
 
 	/**

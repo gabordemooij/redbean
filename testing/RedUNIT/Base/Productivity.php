@@ -7,6 +7,7 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\Util\MatchUp;
+use RedBeanPHP\Util\Look;
 
 /**
  * MatchUp
@@ -90,5 +91,30 @@ class Productivity extends Base
 		), $account);
 		asrt( $didFindUsr, FALSE );
 		asrt( $account->uname, 'newuser' );
+	}
+
+	/**
+	 * Tests the look function.
+	 */
+	public function testLook()
+	{
+		R::nuke();
+		$beans = R::dispenseAll( 'color*3' );
+		list( $red, $green, $blue ) = $beans[0];
+		$red->name = 'red';
+		$green->name = 'green';
+		$blue->name = 'blue';
+		$red->value = 'r';
+		$green->value = 'g';
+		$blue->value = 'b';
+		R::storeAll( array( $red, $green, $blue ) );
+		$look = R::getLook();
+		asrt( ( $look instanceof Look ), TRUE );
+		$str = R::getLook()->look( 'SELECT * FROM color WHERE value != ? ORDER BY value ASC', array( 'g' ),  array( 'value', 'name' ),
+			'<option value="%s">%s</option>', 'strtoupper', "\n"
+		);
+		asrt( $str,
+		"<option value=\"B\">BLUE</option>\n<option value=\"R\">RED</option>"
+		);
 	}
 }
