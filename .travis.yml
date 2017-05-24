@@ -6,7 +6,12 @@ php:
   - 5.6
   - 7.0
   - 7.1
-  - hhvm
+  - hhvm-3.3
+  - hhvm-3.6
+  - hhvm-3.9
+  - hhvm-3.12
+  - hhvm-3.15
+  - hhvm-3.1
 
 before_script:
   - touch /tmp/oodb.db
