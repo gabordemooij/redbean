@@ -7,14 +7,23 @@ echo "-------------------------------------------\n";
 
 
 $code = '';
+$codeMySQL = '';
+$codePostgres = '';
+$codeSQLite = '';
 
-function addFile($file) {
+function addFile($file, $only = null) {
 	global $code;
+	global $codeMySQL;
+	global $codePostgres;
+	global $codeSQLite;
 	echo 'Added ', $file , ' to package... ',PHP_EOL;
 	$raw = file_get_contents($file);
 	$raw = preg_replace('/namespace\s+([a-zA-Z0-9\\\;]+);/m', 'namespace $1 {', $raw);
 	$raw .= '}';
 	$code .= $raw;
+	if ( $only == null || $only == 'mysql' ) $codeMySQL .= $raw;
+	if ( $only == null || $only == 'postgres' ) $codePostgres .= $raw;
+	if ( $only == null || $only == 'sqlite' ) $codeSQLite .= $raw;
 }
 
 define('DIR', 'RedBeanPHP/');
@@ -35,9 +44,9 @@ addFile( DIR . 'Cursor/NullCursor.php');
 addFile( DIR . 'BeanCollection.php' );
 addFile( DIR . 'QueryWriter.php' );
 addFile( DIR . 'QueryWriter/AQueryWriter.php' );
-addFile( DIR . 'QueryWriter/MySQL.php' );
-addFile( DIR . 'QueryWriter/SQLiteT.php' );
-addFile( DIR . 'QueryWriter/PostgreSQL.php' );
+addFile( DIR . 'QueryWriter/MySQL.php', 'mysql' );
+addFile( DIR . 'QueryWriter/SQLiteT.php', 'postgres' );
+addFile( DIR . 'QueryWriter/PostgreSQL.php', 'sqlite' );
 addFile( DIR . 'RedException.php' );
 addFile( DIR . 'RedException/SQL.php' );
 addFile( DIR . 'Repository.php' );
@@ -68,7 +77,7 @@ addFile( DIR . 'Plugin.php' );
 
 $func = file_get_contents(DIR . 'Functions.php');
 
-$code .= "
+$extra = "
 namespace {
 
 //make some classes available for backward compatibility
@@ -83,16 +92,27 @@ $func
 }
 ";
 
+$code .= $extra;
+$codeMySQL .= $extra;
+$codePostgres .= $extra;
+$codeSQLite .= $extra;
+
 $code = '<?php'.str_replace('<?php', '', $code);
+$codeMySQL = '<?php'.str_replace('<?php', '', $codeMySQL);
+$codePostgres = '<?php'.str_replace('<?php', '', $codePostgres);
+$codeSQLite = '<?php'.str_replace('<?php', '', $codeSQLite);
 
-echo 'Okay, seems we have all the code.. now writing file: rb.php' ,PHP_EOL;
-
-$b = file_put_contents('rb.php', $code);
-
-echo 'Written: ',$b,' bytes.',PHP_EOL;
-
-if ($b > 0) {
-	echo 'Done!' ,PHP_EOL;
-} else {
-	echo 'Hm, something seems to have gone wrong... ',PHP_EOL;
+$files = array( 'rb.php' => $code, 'rb-mysql.php' => $codeMySQL, 'rb-postgres.php' => $codePostgres, 'rb-sqlite.php' => $codeSQLite );
+foreach( $files as $file => $content ) {
+	echo 'Okay, seems we have all the code.. now writing file: ', $file ,PHP_EOL;
+	$b = file_put_contents($file, $content);
+	echo 'Written: ',$b,' bytes.',PHP_EOL;
+	if ($b > 0) {
+		echo 'Done!' ,PHP_EOL;
+	} else {
+		echo 'Hm, something seems to have gone wrong... ',PHP_EOL;
+	}
 }
+
+
+
