@@ -21,6 +21,7 @@ use RedBeanPHP\Util\ArrayTool as ArrayTool;
 use RedBeanPHP\Util\QuickExport as QuickExport;
 use RedBeanPHP\Util\MatchUp as MatchUp;
 use RedBeanPHP\Util\Look as Look;
+use RedBeanPHP\Util\Diff as Diff;
 
 /**
  * RedBean Facade
@@ -1941,6 +1942,17 @@ class Facade
 	 */
 	public static function getLook() {
 		return new Look( self::$toolbox );
+	}
+
+	/**
+	 * Calculates a diff.
+	 * @see Diff::diff
+	 *
+	 * @return array
+	 */
+	public static function diff( $bean, $other, $filters = array( 'created', 'modified' ), $pattern = '%s.%s.%s' ) {
+		$diff = new Diff( self::$toolbox );
+		return $diff->diff( $bean, $other, $filters, $pattern );
 	}
 
 	/**

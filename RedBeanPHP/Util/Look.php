@@ -55,7 +55,7 @@ class Look
 	 *
 	 * @return string
 	 */
-	function look( $sql, $bindings = array(), $keys = array( 'selected', 'id', 'name' ), $template = '<option %s value="%s">%s</option>', $filter = 'trim', $glue = '' )
+	public function look( $sql, $bindings = array(), $keys = array( 'selected', 'id', 'name' ), $template = '<option %s value="%s">%s</option>', $filter = 'trim', $glue = '' )
 	{
 		$adapter = $this->toolbox->getDatabaseAdapter();
 		$lines = array();

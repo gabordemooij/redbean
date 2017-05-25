@@ -63,6 +63,7 @@ addFile( DIR . 'Util/Transaction.php' );
 addFile( DIR . 'Util/QuickExport.php' );
 addFile( DIR . 'Util/MatchUp.php' );
 addFile( DIR . 'Util/Look.php' );
+addFile( DIR . 'Util/Diff.php' );
 addFile( DIR . 'Plugin.php' );
 
 $func = file_get_contents(DIR . 'Functions.php');

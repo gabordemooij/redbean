@@ -117,4 +117,74 @@ class Productivity extends Base
 		"<option value=\"B\">BLUE</option>\n<option value=\"R\">RED</option>"
 		);
 	}
+
+	/**
+	 * Test Bean differ.
+	 */
+	public function testDiff()
+	{
+		R::nuke();
+		$ad = R::dispense( 'ad' );
+		$ad->title = 'dog looking for new home';
+		$ad->created = time();
+		$ad->modified = time();
+		$ad->ownDog[] = R::dispense( 'dog' );
+		$ad->ownDog[0]->name = 'Dweep';
+		$ad->ownDog[0]->color = 'green';
+		$ad->author = R::dispense('user');
+		$ad->author->name = 'John';
+		R::store( $ad );
+		$ad->title = 'green dog';
+		$diff = R::diff( $ad->fresh(), $ad );
+		/* simple case, property changed */
+		var_dump( $diff );
+		asrt( is_array( $diff ), TRUE );
+		asrt( count( $diff ), 1 );
+		asrt( $diff['ad.1.title'][0], 'dog looking for new home' );
+		asrt( $diff['ad.1.title'][1], 'green dog' );
+		/* test use specific format */
+		$diff = R::diff( $ad->fresh(), $ad,  array(), '%1$s.%3$s' );
+		asrt( is_array( $diff ), TRUE );
+		asrt( count( $diff ), 1 );
+		asrt( $diff['ad.title'][0], 'dog looking for new home' );
+		asrt( $diff['ad.title'][1], 'green dog' );
+		/* skip created modified */
+		$ad = $ad->fresh();
+		$ad->modified = 111;
+		$ad->created = 111;
+		$diff = R::diff( $ad->fresh(), $ad );
+		asrt( is_array( $diff ), TRUE );
+		asrt( count( $diff ), 0 );
+		/* unless we set anothe filter */
+		$ad = $ad->fresh();
+		$ad->modified = 111;
+		$ad->created = 111;
+		$ad->name = 'x';
+		$diff = R::diff( $ad->fresh(), $ad, array( 'name' ) );
+		asrt( is_array( $diff ), TRUE );
+		asrt( count( $diff ), 2 );
+		asrt( $diff['ad.1.modified'][1], 111 );
+		asrt( $diff['ad.1.created'][1], 111 );
+		$ad = $ad->fresh();
+		/* also diff changes in related beans */
+		$ad->fetchAs('user')->author->name = 'Fred';
+		$dog = reset( $ad->ownDog );
+		$dog->color = 999;
+		$old = $ad->fresh();
+		$old->ownDog;
+		$old->fetchAs('user')->author;
+		$diff = R::diff( $ad, $old );
+		asrt( is_array( $diff ), TRUE );
+		asrt( count( $diff ), 2 );
+		asrt( $diff['ad.1.ownDog.1.color'][1], 'green' );
+		asrt( $diff['ad.1.ownDog.1.color'][0], 999 );
+		asrt( $diff['ad.1.author.1.name'][1], 'John' );
+		asrt( $diff['ad.1.author.1.name'][0], 'Fred' );
+		$diff = R::diff( $ad, null );
+		asrt( is_array( $diff ), TRUE );
+		asrt( count( $diff ), 0 );
+		$diff = R::diff( null, $ad );
+		asrt( is_array( $diff ), TRUE );
+		asrt( count( $diff ), 0 );
+	}
 }
