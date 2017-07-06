@@ -79,6 +79,16 @@ class RDefault implements Logger
 	{
 		return $this->logs;
 	}
+	
+	/**
+	 * Returns the internal log array count.
+	 * The internal log array is where all log messages are stored.
+	 *
+	 * @return int
+	 */
+	public function count(){
+	    return count($this->logs);
+        }
 
 	/**
 	 * Clears the internal log array, removing all
