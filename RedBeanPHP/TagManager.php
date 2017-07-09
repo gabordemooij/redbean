@@ -32,6 +32,11 @@ class TagManager
 	protected $toolbox;
 
 	/**
+	* @var string
+	*/
+	public $tagType;
+
+	/**
 	 * @var AssociationManager
 	 */
 	protected $associationManager;
@@ -71,7 +76,7 @@ class TagManager
 	 */
 	protected function findTagByTitle( $title )
 	{
-		$beans = $this->redbean->find( 'tag', array( 'title' => array( $title ) ) );
+		$beans = $this->redbean->find( $this->tagType, array( 'title' => array( $title ) ) );
 
 		if ( $beans ) {
 			$bean = reset( $beans );
@@ -89,10 +94,11 @@ class TagManager
 	 *
 	 * @param ToolBox $toolbox toolbox object
 	 */
-	public function __construct( ToolBox $toolbox )
+	public function __construct( ToolBox $toolbox, $tagType = 'tag' )
 	{
 		$this->toolbox = $toolbox;
 		$this->redbean = $toolbox->getRedBean();
+		$this->tagType = $tagType;
 
 		$this->associationManager = $this->redbean->getAssociationManager();
 	}
@@ -182,7 +188,7 @@ class TagManager
 			return $foundTags;
 		}
 
-		$this->associationManager->clearRelations( $bean, 'tag' );
+		$this->associationManager->clearRelations( $bean, $this->tagType );
 		$this->addTags( $bean, $tagList );
 
 		return $tagList;
@@ -212,7 +218,7 @@ class TagManager
 
 		foreach ( $tags as $tag ) {
 			if ( !$t = $this->findTagByTitle( $tag ) ) {
-				$t        = $this->redbean->dispense( 'tag' );
+				$t        = $this->redbean->dispense( $this->tagType );
 				$t->title = $tag;
 
 				$this->redbean->store( $t );
