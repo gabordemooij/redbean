@@ -45,9 +45,16 @@ abstract class RedUNIT
 	 */
 	public function prepare()
 	{
-		R::freeze( FALSE );
-		R::debug( FALSE );
-		R::nuke();
+		R::getDatabaseAdapter()->getDatabase()->connect();
+		try {
+			R::freeze( FALSE );
+			R::debug( FALSE );
+			R::nuke();
+		} catch( \Exception $e ) {
+			R::freeze( FALSE );
+			R::debug( FALSE );
+			R::nuke();
+		}
 	}
 
 	/**

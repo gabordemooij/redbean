@@ -518,14 +518,33 @@ class Facade
 	 * If the bean cannot be found in the database a new bean of
 	 * the specified type will be generated and returned.
 	 *
-	 * @param string  $type type of bean you want to load
-	 * @param integer $id   ID of the bean you want to load
+	 * @param string  $type    type of bean you want to load
+	 * @param integer $id      ID of the bean you want to load
+	 * @param string  $snippet string to use after select  (optional)
 	 *
 	 * @return OODBBean
 	 */
-	public static function load( $type, $id )
+	public static function load( $type, $id, $snippet = NULL )
 	{
-		return self::$redbean->load( $type, $id );
+		if ( $snippet !== NULL ) self::$writer->setSQLSelectSnippet( $snippet );
+		$bean = self::$redbean->load( $type, $id );
+		if ( $snippet !== NULL ) self::$writer->setSQLSelectSnippet( '' );
+		return $bean;
+	}
+
+	/**
+	 * Same as load, but selects the bean for update, thus locking the bean.
+	 * @see Facade::load
+	 *
+	 * @param string  $type    type of bean you want to load
+	 * @param integer $id      ID of the bean you want to load
+	 * @param string  $snippet string to use after select
+	 *
+	 * @return OODBBean
+	 */
+	public static function loadForUpdate( $type, $id )
+	{
+		return self::load( $type, $id, AQueryWriter::C_SELECT_SNIPPET_FOR_UPDATE );
 	}
 
 	/**

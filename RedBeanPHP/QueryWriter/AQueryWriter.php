@@ -27,6 +27,11 @@ use RedBeanPHP\RedException\SQL as SQLException;
 abstract class AQueryWriter
 {
 	/**
+	 * Constant: Select Snippet 'FOR UPDATE'
+	 */
+	const C_SELECT_SNIPPET_FOR_UPDATE = 'FOR UPDATE';
+
+	/**
 	 * @var array
 	 */
 	private static $sqlFilters = array();
@@ -75,6 +80,11 @@ abstract class AQueryWriter
 	 * @var integer
 	 */
 	protected $maxCacheSizePerType = 20;
+
+	/**
+	 * @var string
+	 */
+	protected $sqlSelectSnippet = '';
 
 	/**
 	 * @var array
@@ -802,6 +812,18 @@ abstract class AQueryWriter
 	}
 
 	/**
+	 * Sets a select-snippet.
+	 *
+	 * @param string $sql sql
+	 *
+	 * return self
+	 */
+	public function setSQLSelectSnippet( $sqlSelectSnippet = '' ) {
+		$this->sqlSelectSnippet = $sqlSelectSnippet;
+		return $this;
+	}
+
+	/**
 	 * @see QueryWriter::queryRecord
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
@@ -823,14 +845,10 @@ abstract class AQueryWriter
 		if ( count( self::$sqlFilters ) ) {
 			$sqlFilterStr = $this->getSQLFilterSnippet( $type );
 		}
-
 		$sql   = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
-
 		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
-		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} -- keep-cache";
-
+		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} {$this->sqlSelectSnippet} -- keep-cache";
 		$rows  = $this->adapter->get( $sql, $bindings );
-
 		if ( $this->flagUseCache && $key ) {
 			$this->putResultInCache( $type, $key, $rows );
 		}

@@ -58,6 +58,7 @@ if ( isset( $ini['mysql'] ) ) {
 	$dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";
 
 	R::addDatabase( 'mysql', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
+	R::addDatabase( 'mysqlc', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
 
 	R::selectDatabase( 'mysql' );
 
@@ -71,6 +72,7 @@ if ( defined( 'HHVM_VERSION' ) ) {
 	if ( isset( $ini['pgsql'] ) ) {
 		$dsn = "pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
 		R::addDatabase( 'pgsql', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
+		R::addDatabase( 'pgsqlc', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
 	}
 }
 
@@ -122,6 +124,7 @@ $allPacks = array(
 	'Blackhole/Debug',
 	'Base/Productivity',
 	'Base/Quickexport',
+	'Base/Concurrency',
 	'Base/Dispense',
 	'Base/Logging',
 	'Base/Cursors',
