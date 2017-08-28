@@ -186,5 +186,21 @@ class Productivity extends Base
 		$diff = R::diff( null, $ad );
 		asrt( is_array( $diff ), TRUE );
 		asrt( count( $diff ), 0 );
+
+		/* demo case */
+		list($book,$pages) = R::dispenseAll('book,page*2');
+		$book->title = 'Old Book';
+		$book->price = 999;
+		$book->ownPageList = $pages;
+		$pages[0]->text = 'abc';
+		$pages[1]->text = 'def';
+		R::store($book);
+		$book->title = 'new Book';
+		$page = end($book->ownPageList);
+		$page->text = 'new';
+		$oldBook = $book->fresh();
+		$oldBook->ownPageList;
+		$diff = R::diff($oldBook, $book);
+		print_r($diff);
 	}
 }

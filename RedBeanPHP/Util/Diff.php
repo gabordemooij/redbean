@@ -41,7 +41,7 @@ class Diff
 	}
 
 	/**
-	 * Calculates a diff between two beans.
+	 * Calculates a diff between two beans (or arrays of beans).
 	 * The result of this method is an array describing the differences of the second bean compared to
 	 * the first, where the first bean is taken as reference. The array is keyed by type/property, id and property name, where
 	 * type/property is either the type (in case of the root bean) or the property of the parent bean where the type resides.
