@@ -63,7 +63,11 @@ class Look
 		foreach( $rows as $row ) {
 			$values = array();
 			foreach( $keys as $key ) {
-				$values[] = call_user_func_array( $filter, array( $row[$key] ) );
+				if (!empty($filter)) {
+					$values[] = call_user_func_array( $filter, array( $row[$key] ) );
+				} else {
+					$values[] = $row[$key];
+				}
 			}
 			$lines[] = vsprintf( $template, $values );
 		}
