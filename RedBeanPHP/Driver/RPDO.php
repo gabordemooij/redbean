@@ -207,10 +207,7 @@ class RPDO implements Driver
 		$driver = $this->pdo->getAttribute( \PDO::ATTR_DRIVER_NAME );
 		if ($driver === 'mysql') {
 			$charset = $this->hasCap( 'utf8mb4' ) ? 'utf8mb4' : 'utf8';
-			$collate = '_unicode_ci';
-			if (version_compare(PHP_VERSION, '5.4', '>=')) {
-				if ($this->hasCap( 'utf8mb4_520' )) $collate = '_unicode_520_ci';
-			}
+			$collate = $this->hasCap( 'utf8mb4_520' ) ? '_unicode_520_ci' : '_unicode_ci';
 			$this->pdo->setAttribute(\PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '. $charset ); //on every re-connect
 			$this->pdo->exec(' SET NAMES '. $charset); //also for current connection
 			$this->mysqlCharset = $charset;
