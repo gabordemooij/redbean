@@ -154,8 +154,11 @@ class MySQL extends AQueryWriter implements QueryWriter
 	{
 		$table = $this->esc( $table );
 
-		$encoding = $this->adapter->getDatabase()->getMysqlEncoding();
-		$sql   = "CREATE TABLE $table (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET={$encoding} COLLATE={$encoding}_unicode_ci ";
+		$charset_collate = $this->adapter->getDatabase()->getMysqlEncoding( TRUE );
+		$charset = $charset_collate['charset'];
+		$collate = $charset_collate['collate'];
+		
+		$sql   = "CREATE TABLE $table (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET={$charset} COLLATE={$collate} ";
 
 		$this->adapter->exec( $sql );
 	}
