@@ -23,4 +23,7 @@ Thumbs.db
 /.settings/org.eclipse.php.debug.core.Debug_Process_Preferences.prefs
 /rb.phar
 /rb.php
+/rb-mysql.php
+/rb-postgres.php
+/rb-sqlite.php
 build/
