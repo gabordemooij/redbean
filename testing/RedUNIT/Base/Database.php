@@ -41,6 +41,23 @@ class Database extends Base
 	}
 
 	/**
+	 * Test whether we can obtain the PDO object from the
+	 * database driver for custom database operations.
+	 *
+	 * @return void
+	 */
+	public function testGetPDO()
+	{
+		$driver = R::getDatabaseAdapter();
+		asrt( ( $driver instanceof DBAdapter), TRUE );
+		$pdo = $driver->getDatabase()->getPDO();
+		asrt( ( $pdo instanceof \PDO ), TRUE );
+		$pdo2 = R::getPDO();
+		asrt( ( $pdo2 instanceof \PDO ), TRUE );
+		asrt( ( $pdo === $pdo2 ), TRUE );
+	}
+
+	/**
 	 * Test setter maximum integer bindings.
 	 *
 	 * @return void
