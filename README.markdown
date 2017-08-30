@@ -23,13 +23,13 @@ Just open your composer.json file and add the package name ```(e.g. "gabordemooi
 ```
 
 **NOTE**: 
-You will find many examples on the redbean website make use of RedBean's `R` class. Because of namespaced autoloading in composer, this class will be available as `\RedbeanPHP\R` instead of `R`. If you desire to use the much shorter `R` class, you can utilize PHP's `class_alias()` function to take care of the job for you as so:
+You will find many examples on the RedBean website make use of RedBean's `R` class. Because of namespaced autoloading in Composer, this class will be available as `\RedbeanPHP\R` instead of `R`. If you desire to use the much shorter `R` alias, you can add a `use` statement at the beginning of your code:
 
 ```php
-class_alias('\RedBeanPHP\R','\R');
+use \RedBeanPHP\R as R;
 ```
 
-If you are not using composer then [try it.](http://redbeanphp.com/install)
+If you are not using [Composer](https://getcomposer.org/) then [try it.](http://redbeanphp.com/install)
 
 
 Quick Example
