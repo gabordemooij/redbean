@@ -205,6 +205,17 @@ class Bean extends Base
 	}
 
 	/**
+	 * Can we set a date string by passing a date object?
+	 */
+	 public function testBeanDates()
+	 {
+		 $bean = R::dispense('bean');
+		 $dateTime = '1980-01-01 10:11:12';
+		 $bean->date = new \DateTime( $dateTime );
+		 asrt( $bean->date, $dateTime );
+	 }
+
+	/**
 	 * Only fire update query if the bean really contains different
 	 * values. But make sure beans several 'parents' away still get
 	 * saved.
