@@ -39,8 +39,5 @@ class Quickexport extends Base
 		$csv = file_get_contents( $path );
 		$expected = "A,B,C\n1,2,3";
 		asrt( strpos($csv, $expected) !== FALSE, TRUE  );
-		//cant test this, should not trigger error though (header()) --this will trigger warnings.
-		R::csv( 'SELECT a,b,c FROM bean', array(), array( 'A', 'B', 'C' ), $path, TRUE );
-		pass();
 	}
 }
