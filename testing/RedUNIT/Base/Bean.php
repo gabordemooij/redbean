@@ -75,6 +75,7 @@ class Bean extends Base
 		$out = "{$strA}{$strB}{$strC}";
 		asrt( $out, 'YYY' );
 		asrt( isset( $post->other ), FALSE );
+		asrt( $post->exists('comment'), FALSE );
 	}
 
 	/**
