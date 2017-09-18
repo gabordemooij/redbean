@@ -41,6 +41,17 @@ class Database extends Base
 	}
 
 	/**
+	 * Test the (protected) database capability checker method
+	 * of the RedBeanPHP PDO driver (RPDO).
+	 */
+	public function testDatabaseCapabilityChecker()
+	{
+		$capChecker = new \DatabaseCapabilityChecker( R::getDatabaseAdapter()->getDatabase()->getPDO() );
+		$result = $capChecker->checkCapability('creativity');
+		asrt( $result, FALSE ); /* nope, no strong AI yet.. */
+	}
+
+	/**
 	 * Test whether we can obtain the PDO object from the
 	 * database driver for custom database operations.
 	 *
