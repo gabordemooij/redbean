@@ -48,6 +48,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	/**
 	 * @var boolean
 	 */
+	protected static $convertArraysToJSON = FALSE;
+
+	/**
+	 * @var boolean
+	 */
 	protected static $errorHandlingFUSE = FALSE;
 
 	/**
@@ -199,6 +204,24 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		} else {
 			self::$errorHandler = NULL;
 		}
+		return $old;
+	}
+
+	/**
+	 * Toggles array to JSON conversion. If set to TRUE any array
+	 * set to a bean property that's not a list will be turned into
+	 * a JSON string. Used together with AQueryWriter::useJSONColumns this
+	 * extends the data type support for JSON columns. Returns the previous
+	 * value of the flag.
+	 *
+	 * @param boolean $flag flag
+	 *
+	 * @return boolean
+	 */
+	public static function convertArraysToJSON( $flag )
+	{
+		$old = self::$convertArraysToJSON;
+		self::$convertArraysToJSON = $flag;
 		return $old;
 	}
 
@@ -1109,6 +1132,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			} elseif ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
 				$isShared = TRUE;
 			}
+		} elseif ( self::$convertArraysToJSON && is_array( $value ) ) {
+			$value = json_encode( $value );
 		}
 
 		$hasAlias       = (!is_null($this->aliasName));

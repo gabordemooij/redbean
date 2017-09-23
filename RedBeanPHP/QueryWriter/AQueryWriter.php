@@ -47,6 +47,11 @@ abstract class AQueryWriter
 	private static $flagNarrowFieldMode = true;
 
 	/**
+	 * @var boolean
+	 */
+	protected static $flagUseJSONColumns = FALSE;
+
+	/**
 	 * @var array
 	 */
 	public static $renames = array();
@@ -90,6 +95,25 @@ abstract class AQueryWriter
 	 * @var array
 	 */
 	public $typeno_sqltype = array();
+
+	/**
+	 * Toggles support for automatic generation of JSON columns.
+	 * Using JSON columns means that strings containing JSON will
+	 * cause the column to be created (not modified) as a JSON column.
+	 * However it might also trigger exceptions if this means the DB attempts to
+	 * convert a non-json column to a JSON column. Returns the previous
+	 * value of the flag.
+	 *
+	 * @param boolean $flag TRUE or FALSE
+	 *
+	 * @return boolean
+	 */
+	public static function useJSONColumns( $flag )
+	{
+		$old = self::$flagUseJSONColumns;
+		self::$flagUseJSONColumns = $flag;
+		return $old;
+	}
 
 	/**
 	 * Checks whether a number can be treated like an int.
@@ -411,6 +435,25 @@ abstract class AQueryWriter
 		$destTable   = $this->esc( $destType, $noQuote );
 
 		return array( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol );
+	}
+
+	/**
+	 * Determines whether a string can be considered JSON or not.
+	 * This is used by writers that support JSON columns. However
+	 * we dont want that code duplicated over all JSON supporting
+	 * Query Writers.
+	 *
+	 * @param string $value value to determine 'JSONness' of.
+	 *
+	 * @return boolean
+	 */
+	protected function isJSON( $value )
+	{
+		return (
+			is_string($value) &&
+			is_array(json_decode($value, TRUE)) &&
+			(json_last_error() == JSON_ERROR_NONE)
+		);
 	}
 
 	/**

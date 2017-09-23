@@ -1975,6 +1975,25 @@ class Facade
 	}
 
 	/**
+	 * Toggles JSON column features.
+	 * Invoking this method with boolean TRUE causes 2 JSON features to be enabled.
+	 * Beans will automatically JSONify any array that's not in a list property and
+	 * the Query Writer (if capable) will attempt to create a JSON column for strings that
+	 * appear to contain JSON.
+	 * @see AQueryWriter::useJSONColumns
+	 * @see OODBBean::convertArraysToJSON
+	 *
+	 * @param boolean $flag feature flag (either TRUE or FALSE)
+	 *
+	 * @return void
+	 */
+	public static function useJSONFeatures( $flag )
+	{
+		AQueryWriter::useJSONColumns( $flag );
+		OODBBean::convertArraysToJSON( $flag );
+	}
+
+	/**
 	 * Dynamically extends the facade with a plugin.
 	 * Using this method you can register your plugin with the facade and then
 	 * use the plugin by invoking the name specified plugin name as a method on

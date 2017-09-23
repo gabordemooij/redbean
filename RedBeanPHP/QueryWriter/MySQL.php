@@ -39,7 +39,8 @@ class MySQL extends AQueryWriter implements QueryWriter
 	const C_DATATYPE_SPECIAL_POINT    = 90;
 	const C_DATATYPE_SPECIAL_LINESTRING = 91;
 	const C_DATATYPE_SPECIAL_POLYGON    = 92;
-	const C_DATATYPE_SPECIAL_MONEY    = 93;
+	const C_DATATYPE_SPECIAL_MONEY      = 93;
+	const C_DATATYPE_SPECIAL_JSON       = 94;  //JSON support (only manual)
 
 	const C_DATATYPE_SPECIFIED        = 99;
 
@@ -114,7 +115,8 @@ class MySQL extends AQueryWriter implements QueryWriter
 			MySQL::C_DATATYPE_SPECIAL_POINT    => ' POINT ',
 			MySQL::C_DATATYPE_SPECIAL_LINESTRING => ' LINESTRING ',
 			MySQL::C_DATATYPE_SPECIAL_POLYGON => ' POLYGON ',
-			MySQL::C_DATATYPE_SPECIAL_MONEY    => ' DECIMAL(10,2) '
+			MySQL::C_DATATYPE_SPECIAL_MONEY    => ' DECIMAL(10,2) ',
+			MYSQL::C_DATATYPE_SPECIAL_JSON     => ' JSON '
 		);
 
 		$this->sqltype_typeno = array();
@@ -226,6 +228,8 @@ class MySQL extends AQueryWriter implements QueryWriter
 				return MySQL::C_DATATYPE_DOUBLE;
 			}
 		}
+
+		if ( self::$flagUseJSONColumns && $this->isJSON( $value ) ) return self::C_DATATYPE_SPECIAL_JSON;
 
 		if ( mb_strlen( $value, 'UTF-8' ) <= 191 ) {
 			return MySQL::C_DATATYPE_TEXT7;

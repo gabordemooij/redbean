@@ -245,6 +245,8 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 
 		if ( $this->startsWithZeros( $value ) ) return self::C_DATATYPE_TEXT;
 
+		if ( self::$flagUseJSONColumns && $this->isJSON( $value ) ) return self::C_DATATYPE_SPECIAL_JSON;
+
 		if ( $value === FALSE || $value === TRUE || $value === NULL || ( is_numeric( $value )
 				&& AQueryWriter::canBeTreatedAsInt( $value )
 				&& $value < 2147483648
