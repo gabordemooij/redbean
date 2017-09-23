@@ -35,6 +35,8 @@ class Writer extends \RedUNIT\Mysql
 	 */
 	public function testSetGetJSON()
 	{
+		global $travis;
+		if ($travis) return;
 		R::nuke();
 		$bean = R::dispense('bean');
 		$message = json_encode( array( 'message' => 'hello', 'type' => 'greeting' ) );

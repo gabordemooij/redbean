@@ -15,6 +15,7 @@ if ( file_exists( 'config/test.ini' ) ) {
 	$ini = parse_ini_file( "config/test.ini", TRUE );
 } elseif ( file_exists( 'config/test-travis.ini' ) ) {
 	$ini = parse_ini_file( "config/test-travis.ini", TRUE );
+	$travis = TRUE;
 } else {
 	die( 'Cant find configuration file.' );
 }
