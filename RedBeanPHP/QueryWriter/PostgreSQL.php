@@ -239,13 +239,14 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 			if ( preg_match( '/^-?\d+\.\d{2}$/', $value ) ) {
 				return PostgreSQL::C_DATATYPE_SPECIAL_MONEY2;
 			}
+			if ( self::$flagUseJSONColumns && $this->isJSON( $value ) ) {
+				return self::C_DATATYPE_SPECIAL_JSON;
+			}
 		}
 
 		if ( is_float( $value ) ) return self::C_DATATYPE_DOUBLE;
 
 		if ( $this->startsWithZeros( $value ) ) return self::C_DATATYPE_TEXT;
-
-		if ( self::$flagUseJSONColumns && $this->isJSON( $value ) ) return self::C_DATATYPE_SPECIAL_JSON;
 
 		if ( $value === FALSE || $value === TRUE || $value === NULL || ( is_numeric( $value )
 				&& AQueryWriter::canBeTreatedAsInt( $value )

@@ -209,6 +209,9 @@ class MySQL extends AQueryWriter implements QueryWriter
 			if ( preg_match( '/^POLYGON\(/', $value ) ) {
 				return MySQL::C_DATATYPE_SPECIAL_POLYGON;
 			}
+			if ( self::$flagUseJSONColumns && $this->isJSON( $value ) ) {
+				return self::C_DATATYPE_SPECIAL_JSON;
+			}
 		}
 
 		//setter turns TRUE FALSE into 0 and 1 because database has no real bools (TRUE and FALSE only for test?).
@@ -228,8 +231,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 				return MySQL::C_DATATYPE_DOUBLE;
 			}
 		}
-
-		if ( self::$flagUseJSONColumns && $this->isJSON( $value ) ) return self::C_DATATYPE_SPECIAL_JSON;
 
 		if ( mb_strlen( $value, 'UTF-8' ) <= 191 ) {
 			return MySQL::C_DATATYPE_TEXT7;

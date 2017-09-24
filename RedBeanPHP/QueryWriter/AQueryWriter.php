@@ -30,6 +30,8 @@ abstract class AQueryWriter
 	 * Constant: Select Snippet 'FOR UPDATE'
 	 */
 	const C_SELECT_SNIPPET_FOR_UPDATE = 'FOR UPDATE';
+	const C_DATA_TYPE_ONLY_IF_NOT_EXISTS = 80;
+	const C_DATA_TYPE_MANUAL = 99;
 
 	/**
 	 * @var array

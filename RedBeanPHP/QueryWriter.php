@@ -158,9 +158,20 @@ interface QueryWriter
 	/**
 	 * Returns the Column Type Code (integer) that corresponds
 	 * to the given value type. This method is used to determine the minimum
-	 * column type required to represent the given value.
+	 * column type required to represent the given value. There are two modes of
+	 * operation: with or without special types. Scanning without special types
+	 * requires the second parameter to be set to FALSE. This is useful when the
+	 * column has already been created and prevents it from being modified to
+	 * an incompatible type leading to data loss. Special types will be taken
+	 * into account when a column does not exist yet (parameter is then set to TRUE).
 	 *
-	 * @param string $value value
+	 * Special column types are determines by the AQueryWriter constant
+	 * C_DATA_TYPE_ONLY_IF_NOT_EXISTS (usually 80). Another 'very special' type is type
+	 * C_DATA_TYPE_MANUAL (usually 99) which represents a user specified type. Although
+	 * no special treatment has been associated with the latter for now.
+	 *
+	 * @param string  $value                   value
+	 * @param boolean $alsoScanSpecialForTypes take special types into account
 	 *
 	 * @return integer
 	 */

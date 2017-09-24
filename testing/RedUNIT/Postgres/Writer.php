@@ -70,7 +70,8 @@ class Writer extends Postgres
 		asrt( $book->page, 'lorem ipsum' );
 		$book2 = R::dispense( 'book' );
 		$book2->page = array( 'chapter' => '1' );
-		try { R::store( $book2 ); } catch(\Exception $e) {}
+		R::store( $book2 );
+		pass(); //should not try to modify column and trigger exception
 		$book = $book->fresh();
 		asrt( $book->page, 'lorem ipsum' );
 		$columns = R::inspect('book');
