@@ -539,11 +539,12 @@ class RPDO implements Driver
 	 *
 	 * @param Logger $logger the logger instance to be used for logging
 	 *
-	 * @return void
+	 * @return self
 	 */
 	public function setLogger( Logger $logger )
 	{
 		$this->logger = $logger;
+		return $this;
 	}
 
 	/**
@@ -650,6 +651,7 @@ class RPDO implements Driver
 	public function setEnableLogging( $enable )
 	{
 		$this->loggingEnabled = (boolean) $enable;
+		return $this;
 	}
 
 	/**
