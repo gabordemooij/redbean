@@ -348,7 +348,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::sqlStateIn
 	 */
-	public function sqlStateIn( $state, $list )
+	public function sqlStateIn( $state, $list, $extraDriverDetails = array() )
 	{
 		$stateMap = array(
 			'42S02' => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
