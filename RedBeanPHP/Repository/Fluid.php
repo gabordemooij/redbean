@@ -314,6 +314,14 @@ class Fluid extends Repository
 				) {
 					$rows = 0;
 				}
+
+				if ( $this->writer->sqlStateIn(
+					$exception->getSQLState(),
+					array( QueryWriter::C_SQLSTATE_LOCK_TIMEOUT ),
+					$exception->getDriverDetails()
+				) ) {
+					throw $exception;
+				}
 			}
 			if ( empty( $rows ) ) {
 				return $bean;

@@ -25,6 +25,27 @@ class SQL extends RedException
 	private $sqlState;
 
 	/**
+	 * @var array
+	 */
+	private $driverDetails = array();
+
+	/**
+	 * @return array
+	 */
+	public function getDriverDetails()
+	{
+		return $this->driverDetails;
+	}
+
+	/**
+	 * @param array $driverDetails
+	 */
+	public function setDriverDetails($driverDetails)
+	{
+		$this->driverDetails = $driverDetails;
+	}
+
+	/**
 	 * Returns an ANSI-92 compliant SQL state.
 	 *
 	 * @return string

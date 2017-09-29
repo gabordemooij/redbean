@@ -191,6 +191,14 @@ class Frozen extends Repository
 				) {
 					throw $exception; //only throw if frozen
 				}
+
+				if ( $this->writer->sqlStateIn(
+					$exception->getSQLState(),
+					array( QueryWriter::C_SQLSTATE_LOCK_TIMEOUT ),
+					$exception->getDriverDetails()
+				) ) {
+					throw $exception;
+				}
 			}
 			if ( empty( $rows ) ) {
 				return $bean;
