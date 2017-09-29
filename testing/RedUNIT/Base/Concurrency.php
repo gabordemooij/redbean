@@ -19,6 +19,51 @@ class Concurrency extends Base
 		R::close();
 	}
 
+	public function testLockException()
+	{
+		R::nuke();
+		$lock = R::dispense('lock');
+		$lock->value = 123;
+		R::store($lock);
+		$c = pcntl_fork();
+		if ($c == -1) exit(1);
+		if (!$c) {
+			R::selectDatabase($this->currentlyActiveDriverID . 'c2');
+			R::freeze(TRUE);
+			try { R::exec('SET SESSION innodb_lock_wait_timeout=5');}catch( \Exception $e ){}
+			try { R::exec('SET autocommit = 0'); }catch( \Exception $e ){}
+			R::begin();
+			$lock = R::loadForUpdate('lock', $lock->id);
+			$lock->value = 4;
+			sleep(10);
+			R::store($lock);
+			exit(0);
+		} else {
+			R::selectDatabase($this->currentlyActiveDriverID . 'c2');
+			sleep(1);
+			R::freeze(TRUE);
+			try{ R::exec('SET SESSION innodb_lock_wait_timeout=5');}catch( \Exception $e ){}
+			try{R::exec("SET lock_timeout = '1s';");}catch( \Exception $e ){}
+			try { R::exec('SET autocommit = 0'); }catch( \Exception $e ){}
+			R::begin();
+			$exception = NULL;
+			try {
+				$lock = R::loadForUpdate('lock', $lock->id);
+			} catch( \Exception $e ) {
+				$exception = $e;
+			}
+			if ( !$exception ) fail();
+			pass();
+			$details = $exception->getDriverDetails();
+			asrt( ($details[1]===1205 || $details[0]==='55P03'), TRUE );
+			var_dump($lock);
+		}
+		try { R::exec('SET autocommit = 1'); }catch( \Exception $e ){}
+		pcntl_wait($status);
+		try { R::exec('SET SESSION innodb_lock_wait_timeout=50');}catch( \Exception $e ){}
+		try{R::exec("SET lock_timeout = '50s';");}catch( \Exception $e ){}
+	}
+
 	public function testConcurrency()
 	{
 		
@@ -26,6 +71,8 @@ class Concurrency extends Base
 		if ($c == -1) exit(1);
 		if (!$c) {
 			R::selectDatabase($this->currentlyActiveDriverID . 'c');
+			try{ R::exec('SET SESSION innodb_lock_wait_timeout=51');}catch( \Exception $e ){}
+			try{R::exec("SET lock_timeout = '51s';");}catch( \Exception $e ){}
 			//R::getWriter()->setSqlSelectSnippet('FOR UPDATE');
 			R::exec('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
 			sleep(1);
@@ -44,6 +91,8 @@ class Concurrency extends Base
 			exit(0);
 		} else {
 			R::selectDatabase($this->currentlyActiveDriverID . 'c');
+			try{ R::exec('SET SESSION innodb_lock_wait_timeout=51');}catch( \Exception $e ){}
+			try{R::exec("SET lock_timeout = '51s';");}catch( \Exception $e ){}
 			echo "PARENT: PREP START\n";
 			R::nuke();
 			$i = R::dispense('inventory');

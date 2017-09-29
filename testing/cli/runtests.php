@@ -61,6 +61,7 @@ if ( isset( $ini['mysql'] ) ) {
 
 	R::addDatabase( 'mysql', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
 	R::addDatabase( 'mysqlc', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
+	R::addDatabase( 'mysqlc2', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
 
 	R::selectDatabase( 'mysql' );
 
@@ -75,6 +76,7 @@ if ( defined( 'HHVM_VERSION' ) ) {
 		$dsn = "pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
 		R::addDatabase( 'pgsql', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
 		R::addDatabase( 'pgsqlc', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
+		R::addDatabase( 'pgsqlc2', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
 	}
 }
 
