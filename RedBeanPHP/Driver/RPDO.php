@@ -188,8 +188,9 @@ class RPDO implements Driver
 			//So we need a property to convey the SQL State code.
 			$err = $e->getMessage();
 			if ( $this->loggingEnabled && $this->logger ) $this->logger->log( 'An error occurred: ' . $err );
-			$exception = new SQL( $err, 0 );
+			$exception = new SQL( $err, 0, $e );
 			$exception->setSQLState( $e->getCode() );
+			$exception->setDriverDetails( $e->errorInfo );
 			throw $exception;
 		}
 	}

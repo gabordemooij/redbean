@@ -407,6 +407,7 @@ class TroubleDapter extends DBAdapter
 	{
 		$exception = new SQL( 'Just a trouble maker' );
 		$exception->setSQLState( $this->sqlState );
+		$exception->setDriverDetails( array() );
 		throw $exception;
 	}
 
