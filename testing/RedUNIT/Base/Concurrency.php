@@ -19,7 +19,10 @@ class Concurrency extends Base
 		R::close();
 	}
 
-	public function testLockException()
+	/**
+	 * This test has to be run manually.
+	 */
+	private function testLockException()
 	{
 		R::nuke();
 		$lock = R::dispense('lock');
