@@ -348,13 +348,21 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::sqlStateIn
 	 */
-	public function sqlStateIn( $state, $list )
+	public function sqlStateIn( $state, $list, $extraDriverDetails = array() )
 	{
 		$stateMap = array(
 			'42S02' => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 			'42S22' => QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			'23000' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'23000' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,
 		);
+
+		if ( $state == 'HY000' && !empty( $extraDriverDetails[1] ) ) {
+			$driverCode = $extraDriverDetails[1];
+
+			if ( $driverCode == '1205' && in_array( QueryWriter::C_SQLSTATE_LOCK_TIMEOUT, $list ) ) {
+				return true;
+			}
+		}
 
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
 	}

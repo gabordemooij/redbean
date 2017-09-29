@@ -276,7 +276,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::sqlStateIn
 	 */
-	public function sqlStateIn( $state, $list )
+	public function sqlStateIn( $state, $list, $extraDriverDetails = array() )
 	{
 		return ( $state == 'HY000' ) ? ( count( array_diff( array(
 				QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,

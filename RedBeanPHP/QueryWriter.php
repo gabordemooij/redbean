@@ -41,6 +41,7 @@ interface QueryWriter
 	const C_SQLSTATE_NO_SUCH_TABLE                  = 1;
 	const C_SQLSTATE_NO_SUCH_COLUMN                 = 2;
 	const C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION = 3;
+	const C_SQLSTATE_LOCK_TIMEOUT                   = 4;
 
 	/**
 	 * Define data type regions
@@ -377,10 +378,13 @@ interface QueryWriter
 	 *
 	 * @param string $state SQL state to consider
 	 * @param array  $list  list of standardized SQL state constants to check against
+	 * @param array  $extraDriverDetails Some databases communicate state information in a driver-specific format
+	 *                                   rather than through the main sqlState code. For those databases, this extra
+	 *                                   information can be used to determine the standardized state
 	 *
 	 * @return boolean
 	 */
-	public function sqlStateIn( $state, $list );
+	public function sqlStateIn( $state, $list, $extraDriverDetails = array() );
 
 	/**
 	 * This method will remove all beans of a certain type.
