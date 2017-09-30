@@ -123,8 +123,22 @@ class Concurrency extends Base
 			R::freeze(false);
 			try { R::exec('SET autocommit = 1'); }catch( \Exception $e ){}
 			pcntl_wait($status); 
-			
-			
 		}
+	}
+
+	public function testLoadingBeanWithoutDefault()
+	{
+		R::nuke();
+		$bean = R::load( 'bean', 999, NULL, TRUE );
+		pass();
+		asrt( $bean->id, 0 );
+		$exception = NULL;
+		try {
+			$bean = R::load( 'bean', 999, NULL, FALSE );
+		} catch( \Exception $e ) {
+			$exception = $e;
+		}
+		var_dump( $exception );
+		asrt( ( $exception instanceof \RedBeanPHP\RedException ), TRUE );
 	}
 }
