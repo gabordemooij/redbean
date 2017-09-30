@@ -7,20 +7,47 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\OODBBean as OODBBean;
 
+/**
+ * Concurrency
+ *
+ * Tests whether we can lock beans.
+ *
+ * @file    RedUNIT/Base/Concurrency.php
+ * @desc    Tests concurrency scenarios
+ * @author  Gabor de Mooij and the RedBeanPHP Community
+ * @license New BSD/GPLv2
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij and the RedBeanPHP Community.
+ * This source file is subject to the New BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
+ */
 class Concurrency extends Base
 {
-	
+	/**
+	 * Returns the target drivers for this test.
+	 * This test only works with Postgres and MySQL/MariaDB.
+	 *
+	 * @return array
+	 */
 	public function getTargetDrivers()
 	{
 		return array( 'pgsql','mysql' );
 	}
 
-	public function prepare() {
+	/**
+	 * Prepares the database connection.
+	 *
+	 * @return void
+	 */
+	public function prepare()
+	{
 		R::close();
 	}
 
 	/**
 	 * This test has to be run manually.
+	 *
+	 * @return void
 	 */
 	private function testLockException()
 	{
@@ -67,16 +94,19 @@ class Concurrency extends Base
 		try{R::exec("SET lock_timeout = '50s';");}catch( \Exception $e ){}
 	}
 
+	/**
+	 * Tests basic locking scenarios using fork().
+	 *
+	 * @return void
+	 */
 	public function testConcurrency()
 	{
-		
 		$c = pcntl_fork();
 		if ($c == -1) exit(1);
 		if (!$c) {
 			R::selectDatabase($this->currentlyActiveDriverID . 'c');
 			try{ R::exec('SET SESSION innodb_lock_wait_timeout=51');}catch( \Exception $e ){}
 			try{R::exec("SET lock_timeout = '51s';");}catch( \Exception $e ){}
-			//R::getWriter()->setSqlSelectSnippet('FOR UPDATE');
 			R::exec('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
 			sleep(1);
 			try { R::exec('SET autocommit = 0'); }catch( \Exception $e ){}
@@ -101,7 +131,6 @@ class Concurrency extends Base
 			$i = R::dispense('inventory');
 			$i->apples = 10;
 			R::store($i);
-			//R::getWriter()->setSqlSelectSnippet('FOR UPDATE');
 			R::exec('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
 			echo "PARENT: PREP DONE\n";
 			sleep(2);
@@ -115,10 +144,8 @@ class Concurrency extends Base
 			R::store($i);
 			R::commit();
 			echo "PARENT ADDING 5 DONE\n";
-			//sleep(6);
 			$i = R::getAll('select * from inventory where id = 1');
 			print_r($i);
-			//exit;
 			asrt((int)$i[0]['apples'], 13);
 			R::freeze(false);
 			try { R::exec('SET autocommit = 1'); }catch( \Exception $e ){}
@@ -126,6 +153,12 @@ class Concurrency extends Base
 		}
 	}
 
+	/**
+	 * Test whether we can trigger exceptions with load instead
+	 * of getting empty beans.
+	 *
+	 * @return void
+	 */
 	public function testLoadingBeanWithoutDefault()
 	{
 		R::nuke();
