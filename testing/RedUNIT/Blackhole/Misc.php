@@ -9,7 +9,10 @@ use RedBeanPHP\Driver\RPDO as RPDO;
 use RedBeanPHP\Logger\RDefault as RDefault;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
+use RedBeanPHP\QueryWriter;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\QueryWriter\MySQL as MySQLQueryWriter;
+use RedBeanPHP\QueryWriter\PostgreSQL as PostgresQueryWriter;
 
 /**
  * Misc
@@ -36,6 +39,30 @@ class Misc extends Blackhole
 	public function getTargetDrivers()
 	{
 		return array( 'sqlite' );
+	}
+
+	/**
+	 * Test whether sqlStateIn can detect lock timeouts.
+	 *
+	 * @return void
+	 */
+	public function testLockTimeoutDetection()
+	{
+		$queryWriter = new MySQLQueryWriter( R::getDatabaseAdapter() );
+		asrt($queryWriter->sqlStateIn('HY000', array(QueryWriter::C_SQLSTATE_LOCK_TIMEOUT), array(0,'1205')), TRUE);
+		$queryWriter = new PostgresQueryWriter( R::getDatabaseAdapter() );
+		asrt($queryWriter->sqlStateIn('55P03', array(QueryWriter::C_SQLSTATE_LOCK_TIMEOUT), array(0,'')), TRUE);
+	}
+
+	/**
+	 * Tests setOption
+	 *
+	 * @return void
+	 */
+	public function testSetOptionFalse()
+	{
+		$false = R::getDatabaseAdapter()->setOption( 'unknown', 1 );
+		asrt( $false, FALSE );
 	}
 
 	/**
