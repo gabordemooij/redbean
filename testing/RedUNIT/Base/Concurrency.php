@@ -152,26 +152,4 @@ class Concurrency extends Base
 			pcntl_wait($status); 
 		}
 	}
-
-	/**
-	 * Test whether we can trigger exceptions with load instead
-	 * of getting empty beans.
-	 *
-	 * @return void
-	 */
-	public function testLoadingBeanWithoutDefault()
-	{
-		R::nuke();
-		$bean = R::load( 'bean', 999, NULL, TRUE );
-		pass();
-		asrt( $bean->id, 0 );
-		$exception = NULL;
-		try {
-			$bean = R::load( 'bean', 999, NULL, FALSE );
-		} catch( \Exception $e ) {
-			$exception = $e;
-		}
-		var_dump( $exception );
-		asrt( ( $exception instanceof \RedBeanPHP\RedException ), TRUE );
-	}
 }

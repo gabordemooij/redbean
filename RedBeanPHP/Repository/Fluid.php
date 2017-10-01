@@ -307,20 +307,17 @@ class Fluid extends Repository
 			try {
 				$rows = $this->writer->queryRecord( $type, array( 'id' => array( $id ) ) );
 			} catch ( SQLException $exception ) {
-				if ( $this->writer->sqlStateIn( $exception->getSQLState(),
-					array(
-						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-						QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
-				)
+				if (
+					$this->writer->sqlStateIn(
+						$exception->getSQLState(),
+						array(
+							QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+							QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
+						)
+					)
 				) {
 					$rows = array();
-				}
-
-				if ( $this->writer->sqlStateIn(
-					$exception->getSQLState(),
-					array( QueryWriter::C_SQLSTATE_LOCK_TIMEOUT ),
-					$exception->getDriverDetails()
-				) ) {
+				} else {
 					throw $exception;
 				}
 			}

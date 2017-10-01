@@ -190,7 +190,7 @@ class Frozen extends Repository
 						QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
 				)
 				) {
-					throw $exception; //only throw if frozen
+					throw $exception;
 				}
 
 				if ( $this->writer->sqlStateIn(

@@ -521,20 +521,14 @@ class Facade
 	 * @param string  $type    type of bean you want to load
 	 * @param integer $id      ID of the bean you want to load
 	 * @param string  $snippet string to use after select  (optional)
-	 * @param boolean $default if TRUE (default) returns an empty bean, otherwise throws exception
 	 *
 	 * @return OODBBean
 	 */
-	public static function load( $type, $id, $snippet = NULL, $default = TRUE )
+	public static function load( $type, $id, $snippet = NULL )
 	{
 		if ( $snippet !== NULL ) self::$writer->setSQLSelectSnippet( $snippet );
 		$bean = self::$redbean->load( $type, $id );
 		if ( $snippet !== NULL ) self::$writer->setSQLSelectSnippet( '' );
-
-		if ( !$default && $bean->id == 0 ) {
-			throw new SQLException('Unable to load bean');
-		}
-
 		return $bean;
 	}
 
@@ -549,7 +543,7 @@ class Facade
 	 */
 	public static function loadForUpdate( $type, $id )
 	{
-		return self::load( $type, $id, AQueryWriter::C_SELECT_SNIPPET_FOR_UPDATE, FALSE );
+		return self::load( $type, $id, AQueryWriter::C_SELECT_SNIPPET_FOR_UPDATE );
 	}
 
 	/**
