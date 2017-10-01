@@ -299,6 +299,7 @@ class Fluid extends Repository
 	 */
 	public function load( $type, $id )
 	{
+		$rows = array();
 		$bean = $this->dispense( $type );
 		if ( isset( $this->stash[$this->nesting][$id] ) ) {
 			$row = $this->stash[$this->nesting][$id];
@@ -312,7 +313,7 @@ class Fluid extends Repository
 						QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
 				)
 				) {
-					$rows = 0;
+					$rows = array();
 				}
 
 				if ( $this->writer->sqlStateIn(
@@ -323,7 +324,7 @@ class Fluid extends Repository
 					throw $exception;
 				}
 			}
-			if ( empty( $rows ) ) {
+			if ( !count( $rows ) ) {
 				return $bean;
 			}
 			$row = array_pop( $rows );
