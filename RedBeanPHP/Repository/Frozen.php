@@ -181,26 +181,7 @@ class Frozen extends Repository
 		if ( isset( $this->stash[$this->nesting][$id] ) ) {
 			$row = $this->stash[$this->nesting][$id];
 		} else {
-			try {
-				$rows = $this->writer->queryRecord( $type, array( 'id' => array( $id ) ) );
-			} catch ( SQLException $exception ) {
-				if ( $this->writer->sqlStateIn( $exception->getSQLState(),
-					array(
-						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-						QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
-				)
-				) {
-					throw $exception;
-				}
-
-				if ( $this->writer->sqlStateIn(
-					$exception->getSQLState(),
-					array( QueryWriter::C_SQLSTATE_LOCK_TIMEOUT ),
-					$exception->getDriverDetails()
-				) ) {
-					throw $exception;
-				}
-			}
+			$rows = $this->writer->queryRecord( $type, array( 'id' => array( $id ) ) );
 			if ( !count( $rows ) ) {
 				return $bean;
 			}
