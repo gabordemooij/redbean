@@ -893,6 +893,7 @@ abstract class AQueryWriter
 		$sql   = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
 		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
 		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} {$this->sqlSelectSnippet} -- keep-cache";
+		$this->sqlSelectSnippet = '';
 		$rows  = $this->adapter->get( $sql, $bindings );
 		if ( $this->flagUseCache && $key ) {
 			$this->putResultInCache( $type, $key, $rows );

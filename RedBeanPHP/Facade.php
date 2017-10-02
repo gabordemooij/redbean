@@ -528,7 +528,6 @@ class Facade
 	{
 		if ( $snippet !== NULL ) self::$writer->setSQLSelectSnippet( $snippet );
 		$bean = self::$redbean->load( $type, $id );
-		if ( $snippet !== NULL ) self::$writer->setSQLSelectSnippet( '' );
 		return $bean;
 	}
 
