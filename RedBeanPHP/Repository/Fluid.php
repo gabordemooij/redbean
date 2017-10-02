@@ -313,7 +313,8 @@ class Fluid extends Repository
 						array(
 							QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
 							QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
-						)
+						),
+						$exception->getDriverDetails()
 					)
 				) {
 					$rows = array();

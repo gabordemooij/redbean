@@ -141,6 +141,7 @@ $allPacks = array(
 	'Base/Typechecking',
 	'Base/Observers',
 	'Base/Database',
+	'Base/Exceptions',
 	'Base/Foreignkeys',
 	'Base/Namedparams',
 	'Base/Prefixes',
