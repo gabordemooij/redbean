@@ -215,22 +215,23 @@ class RPDO implements Driver
 			$this->mysqlCollate = $charset . $collate;
 		}
 	}
-	
+
 	/**
 	 * Determine if a database supports a particular feature.
+	 *
+	 * @param $db_cap identifier of database capability
 	 *
 	 * @return int|false Whether the database feature is supported, false otherwise.
 	 **/
 	protected function hasCap( $db_cap )
 	{
 		$version = $this->pdo->getAttribute( \PDO::ATTR_SERVER_VERSION );
-		
 		switch ( strtolower( $db_cap ) ) {
 			case 'utf8mb4':
 				if ( version_compare( $version, '5.5.3', '<' ) ) {
 					return false;
 				}
-				
+
 				$client_version = $this->pdo->getAttribute(\PDO::ATTR_CLIENT_VERSION );
 				/*
 				 * libmysql has supported utf8mb4 since 5.5.3, same as the MySQL server.
@@ -247,7 +248,7 @@ class RPDO implements Driver
 				return version_compare( $version, '5.6', '>=' );
 			break;
 		}
-		
+
 		return false;
 	}
 
