@@ -308,7 +308,7 @@ class OODB extends Observable
 	 * Same as find() but returns a BeanCollection.
 	 *
 	 * @param string $type     type of beans you are looking for
-	 * @param string $addSQL   SQL to be used in query
+	 * @param string $sql      SQL to be used in query
 	 * @param array  $bindings a list of values to bind to query parameters
 	 *
 	 * @return array
