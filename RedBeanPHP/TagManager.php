@@ -252,6 +252,8 @@ class TagManager
 	 *
 	 * @param string       $beanType type of bean you are looking for
 	 * @param array|string $tagList  list of tags to match
+	 * @param string       $sql      additional sql snippet
+	 * @param array        $bindings bindings
 	 *
 	 * @return array
 	 */
