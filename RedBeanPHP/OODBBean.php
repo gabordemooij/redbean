@@ -1746,7 +1746,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * example #1. After preparing the linking bean, the bean is returned thus
 	 * allowing the chained setter: ->song = $song.
 	 *
-	 * @param string|OODBBean $type          type of bean to dispense or the full bean
+	 * @param string|OODBBean $typeOrBean    type of bean to dispense or the full bean
 	 * @param string|array    $qualification JSON string or array (optional)
 	 *
 	 * @return OODBBean
@@ -1785,6 +1785,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * This is as far as support for 1-1 goes in RedBeanPHP. This
 	 * method will only return a reference to the bean, changing it
 	 * and storing the bean will not update the related one-bean.
+	 *
+	 * @param  $type type of bean to load
 	 *
 	 * @return OODBBean
 	 */

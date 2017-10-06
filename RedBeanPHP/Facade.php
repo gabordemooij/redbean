@@ -476,7 +476,7 @@ class Facade
 	 * Let's call this chilly mode, it's just like fluid mode except that
 	 * certain types (i.e. tables) aren't touched.
 	 *
-	 * @param boolean|array $trueFalse
+	 * @param boolean|array $tf mode of operation (TRUE means frozen)
 	 */
 	public static function freeze( $tf = TRUE )
 	{
@@ -554,8 +554,8 @@ class Facade
 	 * in the latter case this method will attempt to load the specified bean
 	 * and THEN trash it.
 	 *
-	 * @param string|OODBBean|SimpleModel $bean bean you want to remove from database
-	 * @param integer                     $id   ID if the bean to trash (optional, type-id variant only)
+	 * @param string|OODBBean|SimpleModel $beanOrType bean you want to remove from database
+	 * @param integer                     $id         ID if the bean to trash (optional, type-id variant only)
 	 *
 	 * @return void
 	 */
@@ -570,7 +570,7 @@ class Facade
 	 * the rest of the methods.
 	 *
 	 * @param string|array $typeOrBeanArray   type or bean array to import
-	 * @param integer      $number            number of beans to dispense
+	 * @param integer      $num               number of beans to dispense
 	 * @param boolean      $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return array|OODBBean
@@ -752,7 +752,7 @@ class Facade
 	 * @see Finder::findMulti()
 	 *
 	 * @param array|string $types      a list of bean types to find
-	 * @param string|array $sqlOrArr   SQL query string or result set array
+	 * @param string|array $sql        SQL query string or result set array
 	 * @param array        $bindings   SQL bindings
 	 * @param array        $remappings an array of remapping arrays containing closures
 	 *
@@ -935,10 +935,10 @@ class Facade
 	 * This function has a confusing method signature, the R::duplicate() function
 	 * only accepts two arguments: bean and filters.
 	 *
-	 * @param OODBBean $bean  bean to be copied
-	 * @param array    $trail for internal usage, pass array()
-	 * @param boolean  $pid   for internal usage
-	 * @param array    $white white list filter with bean types to duplicate
+	 * @param OODBBean $bean    bean to be copied
+	 * @param array    $trail   for internal usage, pass array()
+	 * @param boolean  $pid     for internal usage
+	 * @param array    $filters white list filter with bean types to duplicate
 	 *
 	 * @return array
 	 */
@@ -1047,8 +1047,15 @@ class Facade
 	 * $extra_count = $data['extra_count'];
 	 * </code>
 	 *
-	 * @param string $type type of beans to produce
-	 * @param array  $rows must contain an array of array
+	 * New in 4.3.2: meta mask. The meta mask is a special mask to send
+	 * data from raw result rows to the meta store of the bean. This is
+	 * useful for bundling additional information with custom queries.
+	 * Values of every column whos name starts with $mask will be
+	 * transferred to the meta section of the bean under key 'data.bundle'.
+	 *
+	 * @param string $type     type of beans to produce
+	 * @param array  $rows     must contain an array of array
+	 * @param string $metamask meta mask to apply (optional)
 	 *
 	 * @return array
 	 */
@@ -1061,8 +1068,9 @@ class Facade
 	 * Just like converToBeans, but for one bean.
 	 * @see convertToBeans for more details.
 	 *
-	 * @param string $type type of beans to produce
-	 * @param array  $row  one row from the database
+	 * @param string $type      type of bean to produce
+	 * @param array  $row       one row from the database
+	 * @param string $metamask  metamask (see convertToBeans)
 	 *
 	 * @return array
 	 */
@@ -1291,6 +1299,7 @@ class Facade
 	 * Generates question mark slots for an array of values.
 	 *
 	 * @param array  $array array to generate question mark slots for
+	 * @param string $template template to use
 	 *
 	 * @return string
 	 */
@@ -1303,6 +1312,7 @@ class Facade
 	 * Flattens a multi dimensional bindings array for use with genSlots().
 	 *
 	 * @param array $array array to flatten
+	 * @param array $result result array parameter (for recursion)
 	 *
 	 * @return array
 	 */
@@ -1907,7 +1917,7 @@ class Facade
 	 * for some types.
 	 * This method will return the previous value.
 	 *
-	 * @param boolean|array $list List of type names or 'all'
+	 * @param boolean|array $yesNoBeans List of type names or 'all'
 	 *
 	 * @return mixed
 	 */
@@ -1962,8 +1972,34 @@ class Facade
 	}
 
 	/**
-	 * Calculates a diff.
-	 * @see Diff::diff
+	 * Calculates a diff between two beans (or arrays of beans).
+	 * The result of this method is an array describing the differences of the second bean compared to
+	 * the first, where the first bean is taken as reference. The array is keyed by type/property, id and property name, where
+	 * type/property is either the type (in case of the root bean) or the property of the parent bean where the type resides.
+	 * The diffs are mainly intended for logging, you cannot apply these diffs as patches to other beans.
+	 * However this functionality might be added in the future.
+	 *
+	 * The keys of the array can be formatted using the $format parameter.
+	 * A key will be composed of a path (1st), id (2nd) and property (3rd).
+	 * Using printf-style notation you can determine the exact format of the key.
+	 * The default format will look like:
+	 *
+	 * 'book.1.title' => array( <OLDVALUE>, <NEWVALUE> )
+	 *
+	 * If you only want a simple diff of one bean and you don't care about ids,
+	 * you might pass a format like: '%1$s.%3$s' which gives:
+	 *
+	 * 'book.1.title' => array( <OLDVALUE>, <NEWVALUE> )
+	 *
+	 * The filter parameter can be used to set filters, it should be an array
+	 * of property names that have to be skipped. By default this array is filled with
+	 * two strings: 'created' and 'modified'.
+	 *
+	 * @param OODBBean|array $bean    reference beans
+	 * @param OODBBean|array $other   beans to compare
+	 * @param array          $filters names of properties of all beans to skip
+	 * @param string         $format  the format of the key, defaults to '%s.%s.%s'
+	 * @param string         $type    type/property of bean to use for key generation
 	 *
 	 * @return array
 	 */

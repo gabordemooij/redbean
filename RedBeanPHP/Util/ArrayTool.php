@@ -30,7 +30,8 @@ class ArrayTool
 	/**
 	 * Generates question mark slots for an array of values.
 	 *
-	 * @param array  $array array to generate question mark slots for
+	 * @param array  $array    array to generate question mark slots for
+	 * @param string $template template to use
 	 *
 	 * @return string
 	 */

@@ -44,7 +44,7 @@ class DispenseHelper
 	 *
 	 * @param OODB         $oodb              OODB
 	 * @param string|array $typeOrBeanArray   type or bean array to import
-	 * @param integer      $number            number of beans to dispense
+	 * @param integer      $num               number of beans to dispense
 	 * @param boolean	   $alwaysReturnArray if TRUE always returns the result as an array
 	 *
 	 * @return array|OODBBean

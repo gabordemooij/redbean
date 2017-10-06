@@ -311,7 +311,7 @@ class Finder
 	 * @note instead of an SQL query you can pass a result array as well.
 	 *
 	 * @param string|array $types         a list of types (either array or comma separated string)
-	 * @param string|array $sqlOrArr      an SQL query or an array of prefetched records
+	 * @param string|array $sql           an SQL query or an array of prefetched records
 	 * @param array        $bindings      optional, bindings for SQL query
 	 * @param array        $remappings    optional, an array of remapping arrays
 	 * @param string       $queryTemplate optional, query template

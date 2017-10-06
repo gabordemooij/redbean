@@ -73,7 +73,7 @@ interface QueryWriter
 	 *
 	 * @param string $type       source type
 	 * @param string $targetType target type (type to join)
-	 * @param string $leftRight  type of join (possible: 'LEFT', 'RIGHT' or 'INNER').
+	 * @param string $joinType   type of join (possible: 'LEFT', 'RIGHT' or 'INNER').
 	 *
 	 * @return string $joinSQLSnippet
 	 */
@@ -223,7 +223,7 @@ interface QueryWriter
 	 *
 	 * @param string $type       name of the table you want to query
 	 * @param array  $conditions criteria ( $column => array( $values ) )
-	 * @param string $addSQL     additional SQL snippet
+	 * @param string $addSql     additional SQL snippet
 	 * @param array  $bindings   bindings for SQL snippet
 	 *
 	 * @return array
@@ -335,7 +335,7 @@ interface QueryWriter
 	 *
 	 * @param string $type       name of the table you want to query
 	 * @param array  $conditions criteria ( $column => array( $values ) )
-	 * @param string $sql        additional SQL
+	 * @param string $addSql     additional SQL
 	 * @param array  $bindings   bindings
 	 *
 	 * @return void

@@ -30,9 +30,9 @@ class QuickExport
 
 	/**
 	 * Constructor.
-	 * The Quick Export requires a Finder.
+	 * The Quick Export requires a toolbox.
 	 *
-	 * @param Finder $finder
+	 * @param ToolBox $toolbox
 	 */
 	public function __construct( ToolBox $toolbox )
 	{
