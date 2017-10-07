@@ -665,9 +665,8 @@ class Facade
 	}
 
 	/**
-	 * @see Facade::find
-	 *      The findAll() method differs from the find() method in that it does
-	 *      not assume a WHERE-clause, so this is valid:
+	 * The findAll() method differs from the find() method in that it does
+	 * not assume a WHERE-clause, so this is valid:
 	 *
 	 * R::findAll('person',' ORDER BY name DESC ');
 	 *
@@ -685,8 +684,7 @@ class Facade
 	}
 
 	/**
-	 * @see Facade::find
-	 * The variation also exports the beans (i.e. it returns arrays).
+	 * Like R::find() but also exports the beans (i.e. it returns arrays).
 	 *
 	 * @param string $type     the type of bean you are looking for
 	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
@@ -700,8 +698,7 @@ class Facade
 	}
 
 	/**
-	 * @see Facade::find
-	 * This variation returns the first bean only.
+	 * Like R::find() but returns the first bean only.
 	 *
 	 * @param string $type     the type of bean you are looking for
 	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
@@ -715,8 +712,7 @@ class Facade
 	}
 
 	/**
-	 * @see Facade::find
-	 * This variation returns the last bean only.
+	 * Like R::find() but returns the last bean only.
 	 *
 	 * @param string $type     the type of bean you are looking for
 	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
@@ -745,16 +741,70 @@ class Facade
 	}
 
 	/**
-	 * Finds multiple types of beans at once and offers additional
-	 * remapping functionality. This is a very powerful yet complex function.
-	 * For details see Finder::findMulti().
+	 * Returns a hashmap with bean arrays keyed by type using an SQL
+	 * query as its resource. Given an SQL query like 'SELECT movie.*, review.* FROM movie... JOIN review'
+	 * this method will return movie and review beans.
 	 *
-	 * @see Finder::findMulti()
+	 * Example:
 	 *
-	 * @param array|string $types      a list of bean types to find
-	 * @param string|array $sql        SQL query string or result set array
-	 * @param array        $bindings   SQL bindings
-	 * @param array        $remappings an array of remapping arrays containing closures
+	 * <code>
+	 * $stuff = $finder->findMulti('movie,review', '
+	 *          SELECT movie.*, review.* FROM movie
+	 *          LEFT JOIN review ON review.movie_id = movie.id');
+	 * </code>
+	 *
+	 * After this operation, $stuff will contain an entry 'movie' containing all
+	 * movies and an entry named 'review' containing all reviews (all beans).
+	 * You can also pass bindings.
+	 *
+	 * If you want to re-map your beans, so you can use $movie->ownReviewList without
+	 * having RedBeanPHP executing an SQL query you can use the fourth parameter to
+	 * define a selection of remapping closures.
+	 *
+	 * The remapping argument (optional) should contain an array of arrays.
+	 * Each array in the remapping array should contain the following entries:
+	 *
+	 * <code>
+	 * array(
+	 * 	'a'       => TYPE A
+	 *    'b'       => TYPE B
+	 *    'matcher' => MATCHING FUNCTION ACCEPTING A, B and ALL BEANS
+	 *    'do'      => OPERATION FUNCTION ACCEPTING A, B, ALL BEANS, ALL REMAPPINGS
+	 * )
+	 * </code>
+	 *
+	 * Using this mechanism you can build your own 'preloader' with tiny function
+	 * snippets (and those can be re-used and shared online of course).
+	 *
+	 * Example:
+	 *
+	 * <code>
+	 * array(
+	 * 	'a'       => 'movie'     //define A as movie
+	 *    'b'       => 'review'    //define B as review
+	 *    'matcher' => function( $a, $b ) {
+	 *       return ( $b->movie_id == $a->id );  //Perform action if review.movie_id equals movie.id
+	 *    }
+	 *    'do'      => function( $a, $b ) {
+	 *       $a->noLoad()->ownReviewList[] = $b; //Add the review to the movie
+	 *       $a->clearHistory();                 //optional, act 'as if these beans have been loaded through ownReviewList'.
+	 *    }
+	 * )
+	 * </code>
+	 *
+	 * @note the SQL query provided IS NOT THE ONE used internally by this function,
+	 * this function will pre-process the query to get all the data required to find the beans.
+	 *
+	 * @note if you use the 'book.*' notation make SURE you're
+	 * selector starts with a SPACE. ' book.*' NOT ',book.*'. This is because
+	 * it's actually an SQL-like template SLOT, not real SQL.
+	 *
+	 * @note instead of an SQL query you can pass a result array as well.
+	 *
+	 * @param string|array $types         a list of types (either array or comma separated string)
+	 * @param string|array $sql           an SQL query or an array of prefetched records
+	 * @param array        $bindings      optional, bindings for SQL query
+	 * @param array        $remappings    optional, an array of remapping arrays
 	 *
 	 * @return array
 	 */
