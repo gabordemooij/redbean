@@ -533,7 +533,7 @@ class Facade
 
 	/**
 	 * Same as load, but selects the bean for update, thus locking the bean.
-	 * @see Facade::load
+	 * This equals an SQL query like 'SELECT ... FROM ... FOR UPDATE'.
 	 *
 	 * @param string  $type    type of bean you want to load
 	 * @param integer $id      ID of the bean you want to load
@@ -833,8 +833,6 @@ class Facade
 	}
 
 	/**
-	 * @see Facade::batch
-	 *
 	 * Alias for batch(). Batch method is older but since we added so-called *All
 	 * methods like storeAll, trashAll, dispenseAll and findAll it seemed logical to
 	 * improve the consistency of the Facade API and also add an alias for batch() called
@@ -1116,7 +1114,6 @@ class Facade
 
 	/**
 	 * Just like converToBeans, but for one bean.
-	 * @see convertToBeans for more details.
 	 *
 	 * @param string $type      type of bean to produce
 	 * @param array  $row       one row from the database
@@ -1994,8 +1991,22 @@ class Facade
 	}
 
 	/**
-	 * Productivity method to quickly find-and-update a bean.
-	 * @see RedBeanPHP\Util\MatchUp
+	 * MatchUp is a powerful productivity boosting method that can replace simple control
+	 * scripts with a single RedBeanPHP command. Typically, matchUp() is used to
+	 * replace login scripts, token generation scripts and password reset scripts.
+	 * The MatchUp method takes a bean type, an SQL query snippet (starting at the WHERE clause),
+	 * SQL bindings, a pair of task arrays and a bean reference.
+	 *
+	 * If the first 3 parameters match a bean, the first task list will be considered,
+	 * otherwise the second one will be considered. On consideration, each task list,
+	 * an array of keys and values will be executed. Every key in the task list should
+	 * correspond to a bean property while every value can either be an expression to
+	 * be evaluated or a closure (PHP 5.3+). After applying the task list to the bean
+	 * it will be stored. If no bean has been found, a new bean will be dispensed.
+	 *
+	 * This method will return TRUE if the bean was found and FALSE if not AND
+	 * there was a NOT-FOUND task list. If no bean was found AND there was also
+	 * no second task list, NULL will be returned.
 	 *
 	 * @param string   $type         type of bean you're looking for
 	 * @param string   $sql          SQL snippet (starting at the WHERE clause, omit WHERE-keyword)
@@ -2064,8 +2075,31 @@ class Facade
 	 * Beans will automatically JSONify any array that's not in a list property and
 	 * the Query Writer (if capable) will attempt to create a JSON column for strings that
 	 * appear to contain JSON.
-	 * @see AQueryWriter::useJSONColumns
-	 * @see OODBBean::convertArraysToJSON
+	 *
+	 * Feature #1:
+	 * AQueryWriter::useJSONColumns
+	 *
+	 * Toggles support for automatic generation of JSON columns.
+	 * Using JSON columns means that strings containing JSON will
+	 * cause the column to be created (not modified) as a JSON column.
+	 * However it might also trigger exceptions if this means the DB attempts to
+	 * convert a non-json column to a JSON column.
+	 *
+	 * Feature #2:
+	 * OODBBean::convertArraysToJSON
+	 *
+	 * Toggles array to JSON conversion. If set to TRUE any array
+	 * set to a bean property that's not a list will be turned into
+	 * a JSON string. Used together with AQueryWriter::useJSONColumns this
+	 * extends the data type support for JSON columns.
+	 *
+	 * So invoking this method is the same as:
+	 *
+	 * AQueryWriter::useJSONColumns( $flag );
+	 * OODBBean::convertArraysToJSON( $flag );
+	 *
+	 * Unlike the methods above, that return the previous state, this
+	 * method does not return anything (void).
 	 *
 	 * @param boolean $flag feature flag (either TRUE or FALSE)
 	 *
