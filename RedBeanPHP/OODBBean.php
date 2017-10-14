@@ -1719,6 +1719,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				$this->__info['sys.shadow.'.$key] = $value;
 			}
 		}
+		$this->__info[ 'changelist' ] = array();
 		return $this;
 	}
 
