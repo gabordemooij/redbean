@@ -108,7 +108,7 @@ class Concurrency extends Base
 			try{ R::exec('SET SESSION innodb_lock_wait_timeout=51');}catch( \Exception $e ){}
 			try{R::exec("SET lock_timeout = '51s';");}catch( \Exception $e ){}
 			R::exec('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
-			sleep(1);
+			sleep(2);
 			try { R::exec('SET autocommit = 0'); }catch( \Exception $e ){}
 			R::freeze(true);
 			R::begin();
@@ -133,7 +133,7 @@ class Concurrency extends Base
 			R::store($i);
 			R::exec('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
 			echo "PARENT: PREP DONE\n";
-			sleep(2);
+			sleep(3);
 			echo "PARENT: ADDING 5 START\n"; 
 			try { R::exec('SET autocommit = 0'); }catch( \Exception $e ){}
 			R::freeze(true);
