@@ -203,4 +203,26 @@ class Productivity extends Base
 		$diff = R::diff($oldBook, $book);
 		print_r($diff);
 	}
+
+	/**
+	 * Test misc. matchUp scenarios.
+	 *
+	 * @return void
+	 */
+	public function testMatchUpMisc()
+	{
+		R::nuke();
+		asrt( R::count( 'bean' ), 0 );
+		$found = R::matchUp( 'bean', ' id = ? ',  array(1), array(), array(
+			'notfound' => function( $bean ) {
+				$bean->status = 'not found';
+			}
+		) );
+		asrt( $found, FALSE );
+		asrt( R::count( 'bean' ), 1 );
+		$bean = R::findOne( 'bean' );
+		asrt( $bean->status, 'not found' );
+		$null = R::matchUp( 'bean', ' id = ? ', array( $bean->id ) );
+		asrt( is_null( $null ), TRUE );
+	}
 }
