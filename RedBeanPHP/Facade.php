@@ -684,11 +684,17 @@ class Facade
 	}
 
 	/**
-	 * Like R::find() but also exports the beans (i.e. it returns arrays).
+	 * Like find() but also exports the beans as an array.
+	 * This method will perform a find-operation. For every bean
+	 * in the result collection this method will call the export() method.
+	 * This method returns an array containing the array representations
+	 * of every bean in the result set.
 	 *
-	 * @param string $type     the type of bean you are looking for
-	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings array of values to be bound to parameters in query
+	 * @see Finder::find
+	 *
+	 * @param string $type     type   the type of bean you are looking for
+	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
@@ -712,11 +718,15 @@ class Facade
 	}
 
 	/**
-	 * Like R::find() but returns the last bean only.
+	 * Like find() but returns the last bean of the result array.
+	 * Opposite of Finder::findLast().
+	 * If no beans are found, this method will return NULL.
+	 *
+	 * @see Finder::find
 	 *
 	 * @param string $type     the type of bean you are looking for
 	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings array of values to be bound to parameters in query
+	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return OODBBean
 	 */
@@ -726,12 +736,14 @@ class Facade
 	}
 
 	/**
-	 * Finds a bean collection.
-	 * Use this for large datasets.
+	 * Finds a BeanCollection using the repository.
+	 * A bean collection can be used to retrieve one bean at a time using
+	 * cursors - this is useful for processing large datasets. A bean collection
+	 * will not load all beans into memory all at once, just one at a time.
 	 *
-	 * @param string $type     the type of bean you are looking for
-	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings array of values to be bound to parameters in query
+	 * @param  string $type     the type of bean you are looking for
+	 * @param  string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param  array  $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return BeanCollection
 	 */
