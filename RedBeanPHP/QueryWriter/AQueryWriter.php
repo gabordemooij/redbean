@@ -857,9 +857,16 @@ abstract class AQueryWriter
 	}
 
 	/**
-	 * Sets a select-snippet.
+	 * Sets an SQL snippet to be used for the next queryRecord() operation.
+	 * A select snippet will be inserted at the end of the SQL select statement and
+	 * can be used to modify SQL-select commands to enable locking, for instance
+	 * using the 'FOR UPDATE' snippet (this will generate an SQL query like:
+	 * 'SELECT * FROM ... FOR UPDATE'. After the query has been executed the
+	 * SQL snippet will be erased. Note that only the first upcoming direct or
+	 * indirect invocation of queryRecord() through batch(), find() or load()
+	 * will be affected. The SQL snippet will be cached.
 	 *
-	 * @param string $sql sql
+	 * @param string $sql SQL snippet to use in SELECT statement.
 	 *
 	 * return self
 	 */
@@ -877,7 +884,7 @@ abstract class AQueryWriter
 
 		$key = NULL;
 		if ( $this->flagUseCache ) {
-			$key = $this->getCacheKey( array( $conditions, $addSql, $bindings, 'select' ) );
+			$key = $this->getCacheKey( array( $conditions, "$addSql {$this->sqlSelectSnippet}", $bindings, 'select' ) );
 
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
