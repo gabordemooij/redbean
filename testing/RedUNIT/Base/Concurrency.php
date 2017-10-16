@@ -152,4 +152,98 @@ class Concurrency extends Base
 			pcntl_wait($status); 
 		}
 	}
+
+	/**
+	 * Test whether we can use setSQLSnippet with find() and batch().
+	 *
+	 * @return void
+	 */
+	public function testBatchAndFind()
+	{
+		/* baseline */
+		R::nuke();
+		$beans = R::dispenseAll('bean*10');
+		R::storeAll($beans[0]);
+		$ids = array();
+		foreach($beans[0] as $bean) $ids[] = $bean->id;
+		R::debug( TRUE, 1 );
+		$logs = R::getDatabaseAdapter()
+            ->getDatabase()
+            ->getLogger();
+		$beans = R::batch( 'bean', $ids );
+		asrt( count( $beans ), 10 );
+		$entries = $logs->grep('for update');
+		asrt( count( $entries ), 0 );
+		$logs->clear();
+
+		/* batch + snippet */
+		R::nuke();
+		$beans = R::dispenseAll('bean*10');
+		R::storeAll($beans[0]);
+		$ids = array();
+		R::getWriter()->setSQLSelectSnippet('for update');
+		foreach($beans[0] as $bean) $ids[] = $bean->id;
+		R::debug( TRUE, 1 );
+		$logs = R::getDatabaseAdapter()
+            ->getDatabase()
+            ->getLogger();
+		$beans = R::batch( 'bean', $ids );
+		asrt( count( $beans ), 10 );
+		$entries = $logs->grep('for update');
+		asrt( count( $entries ), 1 );
+		print_r( $entries );
+		$logs->clear();
+
+		/* baseline */
+		R::nuke();
+		$beans = R::dispenseAll('bean*10');
+		R::storeAll($beans[0]);
+		$ids = array();
+		foreach($beans[0] as $bean) $ids[] = $bean->id;
+		R::debug( TRUE, 1 );
+		$logs = R::getDatabaseAdapter()
+            ->getDatabase()
+            ->getLogger();
+		$beans = R::batch( 'bean', $ids );
+		asrt( count( $beans ), 10 );
+		$entries = $logs->grep('for update');
+		asrt( count( $entries ), 0 );
+		$logs->clear();
+
+		/* find + snippet */
+		R::nuke();
+		$beans = R::dispenseAll('bean*10');
+		R::storeAll($beans[0]);
+		$ids = array();
+		R::getWriter()->setSQLSelectSnippet('for update');
+		foreach($beans[0] as $bean) $ids[] = $bean->id;
+		R::debug( TRUE, 1 );
+		$logs = R::getDatabaseAdapter()
+            ->getDatabase()
+            ->getLogger();
+		$beans = R::find( 'bean' );
+		asrt( count( $beans ), 10 );
+		$entries = $logs->grep('for update');
+		asrt( count( $entries ), 1 );
+		print_r( $entries );
+		$logs->clear();
+
+		/* baseline */
+		R::nuke();
+		$beans = R::dispenseAll('bean*10');
+		R::storeAll($beans[0]);
+		$ids = array();
+		foreach($beans[0] as $bean) $ids[] = $bean->id;
+		R::debug( TRUE, 1 );
+		$logs = R::getDatabaseAdapter()
+            ->getDatabase()
+            ->getLogger();
+		$beans = R::batch( 'bean', $ids );
+		asrt( count( $beans ), 10 );
+		$entries = $logs->grep('for update');
+		asrt( count( $entries ), 0 );
+		$logs->clear();
+
+		R::debug( FALSE );
+	}
 }
