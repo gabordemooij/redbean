@@ -261,9 +261,7 @@ class Database extends Base
 		R::store( R::dispense( 'justabean' ) );
 
 		$adapter = new TroubleDapter( R::getToolBox()->getDatabaseAdapter()->getDatabase() );
-
 		$adapter->setSQLState( 'HY000' );
-
 		$writer  = new SQLiteT( $adapter );
 		$redbean = new OODB( $writer );
 		$toolbox = new ToolBox( $redbean, $adapter, $writer );
@@ -407,7 +405,7 @@ class TroubleDapter extends DBAdapter
 	{
 		$exception = new SQL( 'Just a trouble maker' );
 		$exception->setSQLState( $this->sqlState );
-		$exception->setDriverDetails( array() );
+		$exception->setDriverDetails( array(0,1,0) );
 		throw $exception;
 	}
 

@@ -49,7 +49,8 @@ class AssociationManager extends Observable
 		if ( $this->oodb->isFrozen() || !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
 				QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN )
+				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ),
+				$exception->getDriverDetails()
 			)
 		) {
 			throw $exception;
@@ -119,7 +120,8 @@ class AssociationManager extends Observable
 			$results[] = $id;
 		} catch ( SQLException $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
-				array( QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ) )
+				array( QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ),
+				$exception->getDriverDetails() )
 			) {
 				throw $exception;
 			}

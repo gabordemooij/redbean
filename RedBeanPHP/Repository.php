@@ -571,7 +571,8 @@ abstract class Repository
 		} catch ( SQLException $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array(
 				 QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				 QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ) ) ) {
+				 QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ),
+				 $exception->getDriverDetails() ) ) {
 				throw $exception;
 			}
 		}
@@ -641,7 +642,7 @@ abstract class Repository
 
 			return TRUE;
 		} catch ( SQLException $exception ) {
-			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( QueryWriter::C_SQLSTATE_NO_SUCH_TABLE ) ) ) {
+			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( QueryWriter::C_SQLSTATE_NO_SUCH_TABLE ), $exception->getDriverDetails() ) ) {
 				throw $exception;
 			}
 

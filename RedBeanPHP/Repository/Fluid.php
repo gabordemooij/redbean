@@ -239,7 +239,8 @@ class Fluid extends Repository
 		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
 				QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ) )
+				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ),
+				$exception->getDriverDetails() )
 		) {
 			throw $exception;
 		}

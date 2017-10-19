@@ -293,4 +293,44 @@ class Writer extends Sqlite
 
 		asrt( $cols['date'], 'NUMERIC' );
 	}
+
+	/**
+	 * Test renewed error handling in SQLite.
+	 * In fluid mode ignore table/column not exists (HY000 + code 1).
+	 * In frozen mode ignore nothing.
+	 *
+	 * @return void
+	 */
+	public function testErrorHandling()
+	{
+		R::nuke();
+		R::store( R::dispense( 'book' ) );
+		R::freeze( FALSE );
+		R::find( 'book2', ' id > 0' );
+		pass();
+		R::find( 'book', ' id2 > ?' );
+		pass();
+		$exception = NULL;
+		try {
+			R::find( 'book', ' id = ?', array( 0, 1 ) );
+		} catch( \Exception $e ) {
+			$exception = $e;
+		}
+		asrt( ( $exception instanceof SQL ), TRUE );
+		R::freeze( TRUE );
+		$exception = NULL;
+		try {
+			R::find( 'book2', ' id > 0' );
+		} catch( \Exception $e ) {
+			$exception = $e;
+		}
+		asrt( ( $exception instanceof SQL ), TRUE );
+		$exception = NULL;
+		try {
+			R::find( 'book', ' id2 > 0' );
+		} catch( \Exception $e ) {
+			$exception = $e;
+		}
+		asrt( ( $exception instanceof SQL ), TRUE );
+	}
 }
