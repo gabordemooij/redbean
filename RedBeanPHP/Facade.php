@@ -47,7 +47,7 @@ class Facade
 	/**
 	 * RedBeanPHP version constant.
 	 */
-	const C_REDBEANPHP_VERSION = '4.3';
+	const C_REDBEANPHP_VERSION = '5';
 
 	/**
 	 * @var ToolBox
