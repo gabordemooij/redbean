@@ -29,7 +29,7 @@ You will find many examples on the RedBean website make use of RedBean's `R` cla
 use \RedBeanPHP\R as R;
 ```
 
-If you are not using [Composer](https://getcomposer.org/) then [try it.](http://redbeanphp.com/install)
+If you are not using [Composer](https://getcomposer.org/) then [try it.](https://redbeanphp.com/install)
 
 
 Quick Example
@@ -52,4 +52,4 @@ More information
 For more information about RedBeanPHP please consult
 the RedBeanPHP website:
 
-http://www.redbeanphp.com/
+https://www.redbeanphp.com/
