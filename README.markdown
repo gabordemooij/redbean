@@ -31,7 +31,7 @@ use \RedBeanPHP\R as R;
 **NOTE:**
 It is important to note that when using RedBeanPHP with Composer, there are some extra precautions needed when working with [Models](https://redbeanphp.com/index.php?p=/models). Due to the namespace requirements of Composer, when creating Models we need to use the `SimpleModel` to extend, not `RedBean_SimpleModel`. Furthermore, we need to specify the namespace of the `SimpleModel`, so a full example of using a Model with RedBean with Composer is as follows:
 
-```
+```php
 use \RedBeanPHP\R;
 
 class Model_User extends \RedBeanPHP\SimpleModel
