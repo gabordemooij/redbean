@@ -297,6 +297,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	{
 		foreach( $beans as $bean ) {
 			if ( $bean instanceof OODBBean ) $bean->__info[ $property ] = $value;
+			if ( $property == 'type') {
+				$bean->__info['model'] = $bean->beanHelper->getModelForBean( $bean );
+			}
 		}
 
 		return $beans;
@@ -1286,6 +1289,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	public function setMeta( $path, $value )
 	{
 		$this->__info[$path] = $value;
+		if ( $path == 'type') {
+			$this->__info['model'] = $this->beanHelper->getModelForBean( $this );
+		}
 
 		return $this;
 	}
