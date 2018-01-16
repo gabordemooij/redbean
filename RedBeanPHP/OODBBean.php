@@ -459,6 +459,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->__info['tainted']  = TRUE;
 		$this->__info['changed']  = TRUE;
 		$this->__info['changelist'] = array();
+		$this->__info['model'] = $this->beanHelper->getModelForBean( $this );
 		$this->properties['id']   = 0;
 	}
 
@@ -1335,14 +1336,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$overrideDontFail = TRUE;
 		}
 
-		if ( !isset( $this->__info['model'] ) ) {
-			$model = $this->beanHelper->getModelForBean( $this );
-
-			if ( !$model ) {
-				return NULL;
-			}
-
-			$this->__info['model'] = $model;
+		if (!$this->__info['model']) {
+			return NULL;
 		}
 		if ( !method_exists( $this->__info['model'], $method ) ) {
 
