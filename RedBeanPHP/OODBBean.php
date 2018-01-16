@@ -1336,15 +1336,16 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __call( $method, $args )
 	{
+		if (!$this->__info['model']) {
+			return NULL;
+		}
+		
 		$overrideDontFail = FALSE;
 		if ( strpos( $method, '@' ) === 0 ) {
 			$method = substr( $method, 1 );
 			$overrideDontFail = TRUE;
 		}
-
-		if (!$this->__info['model']) {
-			return NULL;
-		}
+		
 		if ( !method_exists( $this->__info['model'], $method ) ) {
 
 			if ( self::$errorHandlingFUSE === FALSE || $overrideDontFail ) {
