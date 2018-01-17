@@ -297,6 +297,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	{
 		foreach( $beans as $bean ) {
 			if ( $bean instanceof OODBBean ) $bean->__info[ $property ] = $value;
+			if ( $property == 'type' && !empty($bean->beanHelper)) {
+				$bean->__info['model'] = $bean->beanHelper->getModelForBean( $bean );
+			}
 		}
 
 		return $beans;
@@ -459,6 +462,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->__info['tainted']  = TRUE;
 		$this->__info['changed']  = TRUE;
 		$this->__info['changelist'] = array();
+		$this->__info['model'] = $this->beanHelper->getModelForBean( $this );
 		$this->properties['id']   = 0;
 	}
 
@@ -1285,6 +1289,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	public function setMeta( $path, $value )
 	{
 		$this->__info[$path] = $value;
+		if ( $path == 'type' && !empty($this->beanHelper)) {
+			$this->__info['model'] = $this->beanHelper->getModelForBean( $this );
+		}
 
 		return $this;
 	}
@@ -1329,21 +1336,16 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __call( $method, $args )
 	{
+		if (!$this->__info['model']) {
+			return NULL;
+		}
+		
 		$overrideDontFail = FALSE;
 		if ( strpos( $method, '@' ) === 0 ) {
 			$method = substr( $method, 1 );
 			$overrideDontFail = TRUE;
 		}
-
-		if ( !isset( $this->__info['model'] ) ) {
-			$model = $this->beanHelper->getModelForBean( $this );
-
-			if ( !$model ) {
-				return NULL;
-			}
-
-			$this->__info['model'] = $model;
-		}
+		
 		if ( !method_exists( $this->__info['model'], $method ) ) {
 
 			if ( self::$errorHandlingFUSE === FALSE || $overrideDontFail ) {
