@@ -590,10 +590,10 @@ class Finding extends Base {
 	public function testFindOrCreate()
 	{
 		R::nuke();
-		$book = R::findOrCreate( 'book', array( 'title' => 'my book', 'price' => 50 ) );
+		$book = R::findOrCreate( 'book', array( 'title' => array( 'my book' ), 'price' => array( 50 ) ) );
 		asrt( ( $book instanceof OODBBean ), TRUE );
 		$id = $book->id;
-		$book = R::findOrCreate( 'book', array( 'title' => 'my book', 'price' => 50 ) );
+		$book = R::findOrCreate( 'book', array( 'title' => array( 'my book' ), 'price' => array( 50 ) ) );
 		asrt( $book->id, $id );
 		asrt( $book->title, 'my book' );
 		asrt( (int) $book->price, 50 );
@@ -619,18 +619,18 @@ class Finding extends Base {
 			'price' => 80
 		) );
 		R::store( $book );
-		$books = R::findLike( 'book', array( 'price' => 80 ) );
+		$books = R::findLike( 'book', array( 'price' => array(80) ) );
 		asrt( count( $books ), 2 );
 		foreach( $books as $book ) {
 			asrt( $book->getMeta( 'type' ), 'book' );
 		}
 		$books = R::findLike( 'book' );
 		asrt( count( $books ), 2 );
-		$books = R::findLike( 'book', array( 'title' => 'my book' ) );
+		$books = R::findLike( 'book', array( 'title' => array( 'my book' ) ) );
 		asrt( count( $books ), 1 );
 		$books = R::findLike( 'book', array( 'title' => array( 'my book', 'other book' ) ) );
 		asrt( count( $books ), 2 );
-		$books = R::findLike( 'book', array( 'title' => 'strange book') );
+		$books = R::findLike( 'book', array( 'title' => array( 'strange book' ) ) );
 		asrt( is_array( $books ), TRUE );
 		asrt( count( $books ), 0 );
 		$books = R::findLike( 'magazine' );
