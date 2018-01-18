@@ -368,12 +368,16 @@ abstract class AQueryWriter
 
 		$sqlConditions = array();
 		foreach ( $conditions as $column => $values ) {
-			if ( !count( $values ) ) continue;
+			if ( $values === NULL ) continue;
+
+			if ( is_array( $values ) ) {
+				if ( empty( $values ) ) continue;
+			} else {
+				$values = array( $values );
+			}
 
 			$sql = $this->esc( $column );
 			$sql .= ' IN ( ';
-
-			if ( !is_array( $values ) ) $values = array( $values );
 
 			if ( $paramTypeIsNum ) {
 				$sql .= implode( ',', array_fill( 0, count( $values ), '?' ) ) . ' ) ';
