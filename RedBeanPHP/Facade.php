@@ -1877,9 +1877,9 @@ class Facade
 	 *
 	 * @return OODBBean
 	 */
-	public static function findOrCreate( $type, $like = array() )
+	public static function findOrCreate( $type, $like = array(), $sql = '' )
 	{
-		return self::$finder->findOrCreate( $type, $like );
+		return self::$finder->findOrCreate( $type, $like, $sql = '' );
 	}
 
 	/**

@@ -200,9 +200,10 @@ class Finder
 	 *
 	 * @return OODBBean
 	 */
-	public function findOrCreate( $type, $like = array() )
+	public function findOrCreate( $type, $like = array(), $sql = '' )
 	{
-			$beans = $this->findLike( $type, $like );
+			$sql = $this->toolbox->getWriter()->glueLimitOne( $sql );
+			$beans = $this->findLike( $type, $like, $sql );
 			if ( count( $beans ) ) {
 				$bean = reset( $beans );
 				return $bean;
