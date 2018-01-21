@@ -405,7 +405,8 @@ abstract class AQueryWriter
 		}
 
 		$sql = '';
-		if ( is_array( $sqlConditions ) && count( $sqlConditions ) > 0 ) {
+		$addSql = $this->glueSQLCondition( $addSql, !empty( $sqlConditions ) ? QueryWriter::C_GLUE_AND : NULL );
+		if ( !empty( $sqlConditions ) ) {
 			$sql = implode( ' AND ', $sqlConditions );
 			$sql = " WHERE ( $sql ) ";
 
@@ -884,8 +885,6 @@ abstract class AQueryWriter
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, ( count($conditions) > 0) ? QueryWriter::C_GLUE_AND : NULL );
-
 		$key = NULL;
 		if ( $this->flagUseCache ) {
 			$key = $this->getCacheKey( array( $conditions, "$addSql {$this->sqlSelectSnippet}", $bindings, 'select' ) );
@@ -1049,8 +1048,6 @@ abstract class AQueryWriter
 	 */
 	public function queryRecordCount( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql );
-
 		$table  = $this->esc( $type );
 
 		$this->updateCache(); //check if cache chain has been broken
@@ -1099,8 +1096,6 @@ abstract class AQueryWriter
 	 */
 	public function deleteRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql );
-
 		$table  = $this->esc( $type );
 
 		$sql    = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
