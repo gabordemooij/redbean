@@ -900,7 +900,13 @@ abstract class AQueryWriter
 		if ( count( self::$sqlFilters ) ) {
 			$sqlFilterStr = $this->getSQLFilterSnippet( $type );
 		}
-		$sql   = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		
+		if ( is_array ( $conditions ) && !empty ( $conditions ) ) {
+			$sql = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		} else {
+			$sql = $this->glueSQLCondition( $addSql );
+		}
+
 		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
 		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} {$this->sqlSelectSnippet} -- keep-cache";
 		$this->sqlSelectSnippet = '';
@@ -1052,7 +1058,12 @@ abstract class AQueryWriter
 
 		$this->updateCache(); //check if cache chain has been broken
 
-		$sql    = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		if ( is_array ( $conditions ) && !empty ( $conditions ) ) {
+			$sql = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		} else {
+			$sql = $this->glueSQLCondition( $addSql );
+		}
+		
 		$sql    = "SELECT COUNT(*) FROM {$table} {$sql} -- keep-cache";
 
 		return (int) $this->adapter->getCell( $sql, $bindings );
@@ -1098,7 +1109,12 @@ abstract class AQueryWriter
 	{
 		$table  = $this->esc( $type );
 
-		$sql    = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		if ( is_array ( $conditions ) && !empty ( $conditions ) ) {
+			$sql = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		} else {
+			$sql = $this->glueSQLCondition( $addSql );
+		}
+		
 		$sql    = "DELETE FROM {$table} {$sql}";
 
 		$this->adapter->exec( $sql, $bindings );
