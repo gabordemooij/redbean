@@ -42,6 +42,26 @@ class Misc extends Blackhole
 	}
 
 	/**
+	 * Test whether we can toggle enforcement of the RedBeanPHP
+	 * naming policy.
+	 *
+	 * @return void
+	 */
+	public function testEnforceNamingPolicy()
+	{
+		\RedBeanPHP\Util\DispenseHelper::setEnforceNamingPolicy( FALSE );
+		R::dispense('a_b');
+		pass();
+		\RedBeanPHP\Util\DispenseHelper::setEnforceNamingPolicy( TRUE );
+		try {
+			R::dispense('a_b');
+			fail();
+		} catch( \Exception $e ) {
+			pass();
+		}
+	}
+
+	/**
 	 * Test whether sqlStateIn can detect lock timeouts.
 	 *
 	 * @return void

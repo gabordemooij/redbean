@@ -22,6 +22,26 @@ use RedBeanPHP\RedException as RedException;
 class DispenseHelper
 {
 	/**
+	 * @var boolean
+	 */
+	private static $enforceNamingPolicy = TRUE;
+
+	/**
+	 * Sets the enforce naming policy flag. If set to
+	 * TRUE the RedBeanPHP naming policy will be enforced.
+	 * Otherwise it will not. Use at your own risk.
+	 * Setting this to FALSE is not recommended.
+	 *
+	 * @param boolean $yesNo whether to enforce RB name policy
+	 *
+	 * @return void
+	 */
+	public static function setEnforceNamingPolicy( $yesNo )
+	{
+		self::$enforceNamingPolicy = (boolean) $yesNo;
+	}
+
+	/**
 	 * Checks whether the bean type conforms to the RedbeanPHP
 	 * naming policy. This method will throw an exception if the
 	 * type does not conform to the RedBeanPHP database column naming
@@ -73,7 +93,7 @@ class DispenseHelper
 			$type = $typeOrBeanArray;
 		}
 
-		self::checkType( $type );
+		if (self::$enforceNamingPolicy) self::checkType( $type );
 
 		$beanOrBeans = $oodb->dispense( $type, $num, $alwaysReturnArray );
 
