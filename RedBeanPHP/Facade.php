@@ -560,10 +560,23 @@ class Facade
 	 *
 	 * @return void
 	 */
-	public static function trash( $beanOrType, $id = NULL )
+	public static function trash( $beansOrType, $idOrConditions = NULL, $sql = '' )
 	{
-		if ( is_string( $beanOrType ) ) return self::trash( self::load( $beanOrType, $id ) );
-		return self::$redbean->trash( $beanOrType );
+		if ( is_string ( $beansOrType ) ) {
+			if ( is_array ( $idOrConditions ) ) {
+				$beans = self::findLike( $beansOrType, $idOrConditions, $sql );
+			} else {
+				$beans = array( self::load( $beansOrType, $idOrConditions ) );
+			}
+		} elseif ( !is_array( $beansOrType ) ) {
+			$beans = array( $beansOrType );
+		} else {
+			$beans = $beansOrType;
+		}
+
+		foreach ( $beans as $bean ) {
+			self::$redbean->trash( $bean );
+		}
 	}
 
 	/**
@@ -1443,9 +1456,7 @@ class Facade
 	 */
 	public static function trashAll( $beans )
 	{
-		foreach ( $beans as $bean ) {
-			self::trash( $bean );
-		}
+		self::trash( $beans );
 	}
 
 	/**
