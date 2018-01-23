@@ -79,6 +79,11 @@ class Facade
 	 */
 	private static $tagManager;
 
+    /**
+     * @var array
+     */
+    protected static $tagManagersMap = array();
+
 	/**
 	 * @var DuplicationManager
 	 */
@@ -1158,6 +1163,26 @@ class Facade
 	}
 
 	/**
+	* Part of RedBeanPHP Tagging API.
+	* To use different table instead of tag as tagging table
+	*
+	* @param string $tagType
+	*
+	* @return TagManager
+	*/
+	public static function tagManager( $tagType = null )
+	{
+		if ( empty($tagType) || $tagType == self::$tagManager->tagType ) {
+			return self::$tagManager;
+		} else if ( isset(self::$tagManagersMap[$tagType]) ) {
+			return self::$tagManagersMap[$tagType];
+		} else {
+			self::$tagManagersMap[$tagType] = new TagManager( self::$toolbox, $tagType );
+			return self::$tagManagersMap[$tagType];
+		}
+	}
+
+	/**
 	 * Part of RedBeanPHP Tagging API.
 	 * Tests whether a bean has been associated with one ore more
 	 * of the listed tags. If the third parameter is TRUE this method
@@ -1175,7 +1200,7 @@ class Facade
 	 */
 	public static function hasTag( $bean, $tags, $all = FALSE )
 	{
-		return self::$tagManager->hasTag( $bean, $tags, $all );
+		return self::tagManager()->hasTag( $bean, $tags, $all );
 	}
 
 	/**
@@ -1190,7 +1215,7 @@ class Facade
 	 */
 	public static function untag( $bean, $tagList )
 	{
-		self::$tagManager->untag( $bean, $tagList );
+        	self::tagManager()->untag( $bean, $tagList );
 	}
 
 	/**
@@ -1209,7 +1234,7 @@ class Facade
 	 */
 	public static function tag( OODBBean $bean, $tagList = NULL )
 	{
-		return self::$tagManager->tag( $bean, $tagList );
+		return self::tagManager()->tag( $bean, $tagList );
 	}
 
 	/**
@@ -1226,7 +1251,7 @@ class Facade
 	 */
 	public static function addTags( OODBBean $bean, $tagList )
 	{
-		self::$tagManager->addTags( $bean, $tagList );
+        	self::tagManager()->addTags( $bean, $tagList );
 	}
 
 	/**
@@ -1242,7 +1267,7 @@ class Facade
 	 */
 	public static function tagged( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
-		return self::$tagManager->tagged( $beanType, $tagList, $sql, $bindings );
+		return self::tagManager()->tagged( $beanType, $tagList, $sql, $bindings );
 	}
 
 	/**
@@ -1258,7 +1283,7 @@ class Facade
 	 */
 	public static function taggedAll( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
-		return self::$tagManager->taggedAll( $beanType, $tagList, $sql, $bindings );
+		return self::tagManager()->taggedAll( $beanType, $tagList, $sql, $bindings );
 	}
 
 	/**
