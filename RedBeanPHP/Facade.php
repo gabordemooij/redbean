@@ -719,9 +719,16 @@ class Facade
 	}
 
 	/**
+	 * @deprecated
+	 *
 	 * Like find() but returns the last bean of the result array.
 	 * Opposite of Finder::findLast().
 	 * If no beans are found, this method will return NULL.
+	 *
+	 * Please do not use this function, it is horribly ineffective.
+	 * Instead use a reversed ORDER BY clause and a LIMIT 1 with R::findOne().
+	 * This function should never be used and only remains for
+	 * the sake of backward compatibility.
 	 *
 	 * @see Finder::find
 	 *
