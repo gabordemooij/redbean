@@ -62,6 +62,30 @@ class Misc extends Blackhole
 	}
 
 	/**
+	 * Test R::csv()
+	 *
+	 * @return void
+	 */
+	public function testCSV()
+	{
+		\RedBeanPHP\Util\QuickExport::operation( 'test', TRUE, TRUE );
+		R::nuke();
+		$city = R::dispense('city');
+		$city->name = 'city1';
+		$city->region = 'region1';
+		$city->population = '200k';
+		R::store($city);
+		$qe = new \RedBeanPHP\Util\QuickExport( R::getToolBox() );
+		$out = $qe->csv( 'SELECT `name`, population FROM city WHERE region = :region ',
+			array( ':region' => 'region1' ),
+			array( 'city', 'population' ),
+			'/tmp/cities.csv'
+			);
+		$out = preg_replace( '/\W/', '', $out );
+		asrt( 'PragmapublicExpires0CacheControlmustrevalidatepostcheck0precheck0CacheControlprivateContentTypetextcsvContentDispositionattachmentfilenamecitiescsvContentTransferEncodingbinarycitypopulationcity1200k', $out );
+	}
+
+	/**
 	 * Test whether sqlStateIn can detect lock timeouts.
 	 *
 	 * @return void

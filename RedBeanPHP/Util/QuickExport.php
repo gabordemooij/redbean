@@ -29,6 +29,11 @@ class QuickExport
 	protected $toolbox;
 
 	/**
+	 * @boolean
+	 */
+	private static $test = FALSE;
+
+	/**
 	 * Constructor.
 	 * The Quick Export requires a toolbox.
 	 *
@@ -37,6 +42,28 @@ class QuickExport
 	public function __construct( ToolBox $toolbox )
 	{
 		$this->toolbox = $toolbox;
+	}
+
+	/**
+	 * Makes csv() testable.
+	 */
+	public static function operation( $name, $arg1, $arg2 = TRUE ) {
+		$out = '';
+		switch( $name ) {
+			case 'test':
+				self::$test = (boolean) $arg1;
+				break;
+			case 'header':
+				$out = ( self::$test ) ? $arg1 : header( $arg1, $arg2 );
+				break;
+			case 'readfile':
+				$out = ( self::$test ) ? file_get_contents( $arg1 ) : readfile( $arg1 );
+				break;
+			case 'exit':
+				$out = ( self::$test ) ? 'exit' : exit();
+				break;
+		}
+		return $out;
 	}
 
 	/**
@@ -80,16 +107,17 @@ class QuickExport
 		fclose($handle);
 		if ( $output ) {
 			$file = basename($path);
-			header("Pragma: public");
-			header("Expires: 0");
-			header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-			header("Cache-Control: private",false);
-			header("Content-Type: text/csv");
-			header("Content-Disposition: attachment; filename={$file}" );
-			header("Content-Transfer-Encoding: binary");
-			readfile( $path );
+			$out = self::operation('header',"Pragma: public");
+			$out .= self::operation('header',"Expires: 0");
+			$out .= self::operation('header',"Cache-Control: must-revalidate, post-check=0, pre-check=0");
+			$out .= self::operation('header',"Cache-Control: private",false);
+			$out .= self::operation('header',"Content-Type: text/csv");
+			$out .= self::operation('header',"Content-Disposition: attachment; filename={$file}" );
+			$out .= self::operation('header',"Content-Transfer-Encoding: binary");
+			$out .= self::operation('readfile',$path );
 			@unlink( $path );
-			exit;
+			self::operation('exit', FALSE);
+			return $out;
 		}
 	}
 }
