@@ -49,7 +49,8 @@ class AssociationManager extends Observable
 		if ( $this->oodb->isFrozen() || !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
 				QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN )
+				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ),
+				$exception->getDriverDetails()
 			)
 		) {
 			throw $exception;
@@ -119,7 +120,8 @@ class AssociationManager extends Observable
 			$results[] = $id;
 		} catch ( SQLException $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
-				array( QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ) )
+				array( QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION ),
+				$exception->getDriverDetails() )
 			) {
 				throw $exception;
 			}
@@ -233,8 +235,8 @@ class AssociationManager extends Observable
 	 * set to boolean TRUE this method will remove the beans without their consent,
 	 * bypassing FUSE. This can be used to improve performance.
 	 *
-	 * @param OODBBean $bean1 first bean in target association
-	 * @param OODBBean $bean2 second bean in target association
+	 * @param OODBBean $beans1 first bean in target association
+	 * @param OODBBean $beans2 second bean in target association
 	 * @param boolean  $fast  if TRUE, removes the entries by query without FUSE
 	 *
 	 * @return void

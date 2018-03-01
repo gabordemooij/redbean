@@ -195,7 +195,7 @@ class Import extends Blackhole
 		$copy->importFrom( $bean );
 		asrt( $copy->getMeta( 'tainted' ), TRUE );
 		testpack( 'Test basic import() feature.' );
-		$bean = new OODBBean;
+		$bean = R::dispense('bean');
 		$bean->import( array( "a" => 1, "b" => 2 ) );
 		asrt( $bean->a, 1 );
 		asrt( $bean->b, 2 );

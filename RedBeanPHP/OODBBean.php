@@ -48,6 +48,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	/**
 	 * @var boolean
 	 */
+	protected static $convertArraysToJSON = FALSE;
+
+	/**
+	 * @var boolean
+	 */
 	protected static $errorHandlingFUSE = FALSE;
 
 	/**
@@ -203,6 +208,24 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
+	 * Toggles array to JSON conversion. If set to TRUE any array
+	 * set to a bean property that's not a list will be turned into
+	 * a JSON string. Used together with AQueryWriter::useJSONColumns this
+	 * extends the data type support for JSON columns. Returns the previous
+	 * value of the flag.
+	 *
+	 * @param boolean $flag flag
+	 *
+	 * @return boolean
+	 */
+	public static function convertArraysToJSON( $flag )
+	{
+		$old = self::$convertArraysToJSON;
+		self::$convertArraysToJSON = $flag;
+		return $old;
+	}
+
+	/**
 	 * Sets global aliases.
 	 * Registers a batch of aliases in one go. This works the same as
 	 * fetchAs and setAutoResolve but explicitly. For instance if you register
@@ -274,6 +297,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	{
 		foreach( $beans as $bean ) {
 			if ( $bean instanceof OODBBean ) $bean->__info[ $property ] = $value;
+			if ( $property == 'type' && !empty($bean->beanHelper)) {
+				$bean->__info['model'] = $bean->beanHelper->getModelForBean( $bean );
+			}
 		}
 
 		return $beans;
@@ -436,6 +462,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->__info['tainted']  = TRUE;
 		$this->__info['changed']  = TRUE;
 		$this->__info['changelist'] = array();
+		$this->__info['model'] = $this->beanHelper->getModelForBean( $this );
 		$this->properties['id']   = 0;
 	}
 
@@ -1109,6 +1136,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			} elseif ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
 				$isShared = TRUE;
 			}
+		} elseif ( self::$convertArraysToJSON && is_array( $value ) ) {
+			$value = json_encode( $value );
 		}
 
 		$hasAlias       = (!is_null($this->aliasName));
@@ -1260,6 +1289,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	public function setMeta( $path, $value )
 	{
 		$this->__info[$path] = $value;
+		if ( $path == 'type' && !empty($this->beanHelper)) {
+			$this->__info['model'] = $this->beanHelper->getModelForBean( $this );
+		}
 
 		return $this;
 	}
@@ -1304,21 +1336,16 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __call( $method, $args )
 	{
+		if (!$this->__info['model']) {
+			return NULL;
+		}
+		
 		$overrideDontFail = FALSE;
 		if ( strpos( $method, '@' ) === 0 ) {
 			$method = substr( $method, 1 );
 			$overrideDontFail = TRUE;
 		}
-
-		if ( !isset( $this->__info['model'] ) ) {
-			$model = $this->beanHelper->getModelForBean( $this );
-
-			if ( !$model ) {
-				return NULL;
-			}
-
-			$this->__info['model'] = $model;
-		}
+		
 		if ( !method_exists( $this->__info['model'], $method ) ) {
 
 			if ( self::$errorHandlingFUSE === FALSE || $overrideDontFail ) {
@@ -1694,6 +1721,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				$this->__info['sys.shadow.'.$key] = $value;
 			}
 		}
+		$this->__info[ 'changelist' ] = array();
 		return $this;
 	}
 
@@ -1721,7 +1749,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * example #1. After preparing the linking bean, the bean is returned thus
 	 * allowing the chained setter: ->song = $song.
 	 *
-	 * @param string|OODBBean $type          type of bean to dispense or the full bean
+	 * @param string|OODBBean $typeOrBean    type of bean to dispense or the full bean
 	 * @param string|array    $qualification JSON string or array (optional)
 	 *
 	 * @return OODBBean
@@ -1760,6 +1788,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * This is as far as support for 1-1 goes in RedBeanPHP. This
 	 * method will only return a reference to the bean, changing it
 	 * and storing the bean will not update the related one-bean.
+	 *
+	 * @param  $type type of bean to load
 	 *
 	 * @return OODBBean
 	 */

@@ -239,6 +239,9 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 			if ( preg_match( '/^-?\d+\.\d{2}$/', $value ) ) {
 				return PostgreSQL::C_DATATYPE_SPECIAL_MONEY2;
 			}
+			if ( self::$flagUseJSONColumns && $this->isJSON( $value ) ) {
+				return self::C_DATATYPE_SPECIAL_JSON;
+			}
 		}
 
 		if ( is_float( $value ) ) return self::C_DATATYPE_DOUBLE;
@@ -314,14 +317,14 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::sqlStateIn
 	 */
-	public function sqlStateIn( $state, $list )
+	public function sqlStateIn( $state, $list, $extraDriverDetails = array() )
 	{
 		$stateMap = array(
 			'42P01' => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 			'42703' => QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			'23505' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'23505' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,
+			'55P03' => QueryWriter::C_SQLSTATE_LOCK_TIMEOUT
 		);
-
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
 	}
 

@@ -664,6 +664,19 @@ class DiagnosticModel extends \RedBeanPHP\SimpleModel
 
 }
 
+class DatabaseCapabilityChecker extends \RedBeanPHP\Driver\RPDO {
+
+	public function __construct( \PDO $pdo )
+	{
+		$this->pdo = $pdo;
+	}
+
+	public function checkCapability( $capID )
+	{
+		return $this->hasCap( $capID );
+	}
+}
+
 class Model_Probe extends DiagnosticModel {};
 
 define('REDBEAN_OODBBEAN_CLASS', '\DiagnosticBean');

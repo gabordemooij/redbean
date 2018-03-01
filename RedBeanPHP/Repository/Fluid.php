@@ -239,7 +239,8 @@ class Fluid extends Repository
 		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(
 				QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ) )
+				QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ),
+				$exception->getDriverDetails() )
 		) {
 			throw $exception;
 		}
@@ -299,6 +300,7 @@ class Fluid extends Repository
 	 */
 	public function load( $type, $id )
 	{
+		$rows = array();
 		$bean = $this->dispense( $type );
 		if ( isset( $this->stash[$this->nesting][$id] ) ) {
 			$row = $this->stash[$this->nesting][$id];
@@ -306,16 +308,22 @@ class Fluid extends Repository
 			try {
 				$rows = $this->writer->queryRecord( $type, array( 'id' => array( $id ) ) );
 			} catch ( SQLException $exception ) {
-				if ( $this->writer->sqlStateIn( $exception->getSQLState(),
-					array(
-						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-						QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
-				)
+				if (
+					$this->writer->sqlStateIn(
+						$exception->getSQLState(),
+						array(
+							QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+							QueryWriter::C_SQLSTATE_NO_SUCH_TABLE
+						),
+						$exception->getDriverDetails()
+					)
 				) {
-					$rows = 0;
+					$rows = array();
+				} else {
+					throw $exception;
 				}
 			}
-			if ( empty( $rows ) ) {
+			if ( !count( $rows ) ) {
 				return $bean;
 			}
 			$row = array_pop( $rows );

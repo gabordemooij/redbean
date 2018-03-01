@@ -28,6 +28,72 @@ use RedBeanPHP\RedException\SQL as SQL;
 class Writer extends Postgres
 {
 	/**
+	 * Test whether we can store JSON as a JSON column
+	 * and whether this plays well with the other data types.
+	 */
+	public function testSetGetJSON()
+	{
+		global $travis;
+		if ($travis) return;
+		R::nuke();
+		$bean = R::dispense('bean');
+		$message = json_encode( array( 'message' => 'hello', 'type' => 'greeting' ) ) ;
+		$bean->data = $message;
+		R::store( $bean );
+		$columns = R::inspect('bean');
+		asrt( array_key_exists( 'data', $columns ), TRUE );
+		asrt( ( $columns['data'] !== 'json' ), TRUE );
+		R::useJSONFeatures( TRUE );
+		R::nuke();
+		$bean = R::dispense('bean');
+		$message = array( 'message' => 'hello', 'type' => 'greeting' );
+		$bean->data = $message;
+		R::store( $bean );
+		$columns = R::inspect('bean');
+		asrt( array_key_exists( 'data', $columns ), TRUE );
+		asrt( $columns['data'], 'json' );
+		$bean = $bean->fresh();
+		$message = json_decode( $bean->data, TRUE );
+		asrt( $message['message'], 'hello' );
+		asrt( $message['type'], 'greeting' );
+		$message['message'] = 'hi';
+		$bean->data = $message;
+		R::store( $bean );
+		pass();
+		$bean = R::findOne( 'bean' );
+		$message = json_decode( $bean->data );
+		asrt( $message->message, 'hi' );
+		$book = R::dispense( 'book' );
+		$book->page = 'lorem ipsum';
+		R::store( $book );
+		$book = $book->fresh();
+		asrt( $book->page, 'lorem ipsum' );
+		$book2 = R::dispense( 'book' );
+		$book2->page = array( 'chapter' => '1' );
+		R::store( $book2 );
+		pass(); //should not try to modify column and trigger exception
+		$book = $book->fresh();
+		asrt( $book->page, 'lorem ipsum' );
+		$columns = R::inspect('book');
+		asrt( ( $columns['page'] !== 'json' ), TRUE );
+		$building = R::dispense( 'building' );
+		$building->year = 'MLXXVIII';
+		R::store( $building );
+		$shop = R::dispense( 'building' );
+		$shop->year = '2010-01-01';
+		R::store( $shop );
+		$building = R::load( 'building', $building->id );
+		asrt( $building->year, 'MLXXVIII' );
+		$columns = R::inspect( 'building' );
+		asrt( strpos( strtolower( $columns['year'] ), 'date' ), FALSE );
+		$shop->anno = '2010-01-01';
+		R::store( $shop );
+		$columns = R::inspect( 'building' );
+		asrt( $columns['anno'], 'date' );
+		R::useJSONFeatures( FALSE );
+	}
+
+	/**
 	 * Test scanning and coding.
 	 *
 	 * @return void

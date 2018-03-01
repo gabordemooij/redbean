@@ -61,7 +61,7 @@ abstract class Repository
 	 * for some types.
 	 * This method will return the previous value.
 	 *
-	 * @param boolean|array $list List of type names or 'all'
+	 * @param boolean|array $yesNoBeans List of type names or 'all'
 	 *
 	 * @return mixed
 	 */
@@ -182,7 +182,6 @@ abstract class Repository
 	 * checks if there have been any modification to this bean, in that case
 	 * the bean is stored once again, otherwise the bean will be left untouched.
 	 *
-	 * @param OODBBean $bean       bean tor process
 	 * @param array    $ownresidue list to process
 	 *
 	 * @return void
@@ -301,9 +300,10 @@ abstract class Repository
 	}
 
 	/**
-	 * Constructor, requires a query writer.
+	 * Constructor, requires a query writer and OODB.
 	 * Creates a new instance of the bean respository class.
 	 *
+	 * @param OODB        $oodb   instance of object database
 	 * @param QueryWriter $writer the Query Writer to use for this repository
 	 *
 	 * @return void
@@ -375,7 +375,7 @@ abstract class Repository
 	 *
 	 * @param string $type       type of beans you are looking for
 	 * @param array  $conditions list of conditions
-	 * @param string $addSQL     SQL to be used in query
+	 * @param string $sql        SQL to be used in query
 	 * @param array  $bindings   whether you prefer to use a WHERE clause or not (TRUE = not)
 	 *
 	 * @return array
@@ -571,7 +571,8 @@ abstract class Repository
 		} catch ( SQLException $exception ) {
 			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array(
 				 QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
-				 QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ) ) ) {
+				 QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN ),
+				 $exception->getDriverDetails() ) ) {
 				throw $exception;
 			}
 		}
@@ -641,7 +642,7 @@ abstract class Repository
 
 			return TRUE;
 		} catch ( SQLException $exception ) {
-			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( QueryWriter::C_SQLSTATE_NO_SUCH_TABLE ) ) ) {
+			if ( !$this->writer->sqlStateIn( $exception->getSQLState(), array( QueryWriter::C_SQLSTATE_NO_SUCH_TABLE ), $exception->getDriverDetails() ) ) {
 				throw $exception;
 			}
 

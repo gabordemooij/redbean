@@ -45,6 +45,8 @@ class Utf8 extends Base
 	 */
 	public function testUTF8()
 	{
+		//skip if < 5.3
+		if (version_compare(PHP_VERSION, '5.4', '<')) return pass();
 		$str = '𠜎ὃ𠻗𠻹𠻺𠼭𠼮𠽌𠾴𠾼𠿪𡁜';
 		$bean      = R::dispense( 'bean' );
 		$bean->bla = $str;

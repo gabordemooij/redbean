@@ -13,8 +13,10 @@ error_reporting( E_ALL );
 //Load configuration file
 if ( file_exists( 'config/test.ini' ) ) {
 	$ini = parse_ini_file( "config/test.ini", TRUE );
+	$travis = FALSE;
 } elseif ( file_exists( 'config/test-travis.ini' ) ) {
 	$ini = parse_ini_file( "config/test-travis.ini", TRUE );
+	$travis = TRUE;
 } else {
 	die( 'Cant find configuration file.' );
 }
@@ -58,6 +60,8 @@ if ( isset( $ini['mysql'] ) ) {
 	$dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";
 
 	R::addDatabase( 'mysql', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
+	R::addDatabase( 'mysqlc', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
+	R::addDatabase( 'mysqlc2', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
 
 	R::selectDatabase( 'mysql' );
 
@@ -71,6 +75,8 @@ if ( defined( 'HHVM_VERSION' ) ) {
 	if ( isset( $ini['pgsql'] ) ) {
 		$dsn = "pgsql:host={$ini['pgsql']['host']};dbname={$ini['pgsql']['schema']}";
 		R::addDatabase( 'pgsql', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
+		R::addDatabase( 'pgsqlc', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
+		R::addDatabase( 'pgsqlc2', $dsn, $ini['pgsql']['user'], $ini['pgsql']['pass'], FALSE );
 	}
 }
 
@@ -122,6 +128,7 @@ $allPacks = array(
 	'Blackhole/Debug',
 	'Base/Productivity',
 	'Base/Quickexport',
+	'Base/Concurrency',
 	'Base/Dispense',
 	'Base/Logging',
 	'Base/Cursors',
@@ -134,6 +141,7 @@ $allPacks = array(
 	'Base/Typechecking',
 	'Base/Observers',
 	'Base/Database',
+	'Base/Exceptions',
 	'Base/Foreignkeys',
 	'Base/Namedparams',
 	'Base/Prefixes',

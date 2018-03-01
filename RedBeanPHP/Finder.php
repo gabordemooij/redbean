@@ -200,9 +200,10 @@ class Finder
 	 *
 	 * @return OODBBean
 	 */
-	public function findOrCreate( $type, $like = array() )
+	public function findOrCreate( $type, $like = array(), $sql = '' )
 	{
-			$beans = $this->findLike( $type, $like );
+			$sql = $this->toolbox->getWriter()->glueLimitOne( $sql );
+			$beans = $this->findLike( $type, $like, $sql );
 			if ( count( $beans ) ) {
 				$bean = reset( $beans );
 				return $bean;
@@ -237,12 +238,6 @@ class Finder
 	 */
 	public function findLike( $type, $conditions = array(), $sql = '' )
 	{
-		if ( count( $conditions ) > 0 ) {
-			foreach( $conditions as $key => $condition ) {
-				if ( !count( $condition ) ) unset( $conditions[$key] );
-			}
-		}
-
 		return $this->redbean->find( $type, $conditions, $sql );
 	}
 
@@ -311,7 +306,7 @@ class Finder
 	 * @note instead of an SQL query you can pass a result array as well.
 	 *
 	 * @param string|array $types         a list of types (either array or comma separated string)
-	 * @param string|array $sqlOrArr      an SQL query or an array of prefetched records
+	 * @param string|array $sql           an SQL query or an array of prefetched records
 	 * @param array        $bindings      optional, bindings for SQL query
 	 * @param array        $remappings    optional, an array of remapping arrays
 	 * @param string       $queryTemplate optional, query template

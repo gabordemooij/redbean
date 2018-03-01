@@ -41,6 +41,34 @@ class Database extends Base
 	}
 
 	/**
+	 * Test the (protected) database capability checker method
+	 * of the RedBeanPHP PDO driver (RPDO).
+	 */
+	public function testDatabaseCapabilityChecker()
+	{
+		$capChecker = new \DatabaseCapabilityChecker( R::getDatabaseAdapter()->getDatabase()->getPDO() );
+		$result = $capChecker->checkCapability('creativity');
+		asrt( $result, FALSE ); /* nope, no strong AI yet.. */
+	}
+
+	/**
+	 * Test whether we can obtain the PDO object from the
+	 * database driver for custom database operations.
+	 *
+	 * @return void
+	 */
+	public function testGetPDO()
+	{
+		$driver = R::getDatabaseAdapter();
+		asrt( ( $driver instanceof DBAdapter), TRUE );
+		$pdo = $driver->getDatabase()->getPDO();
+		asrt( ( $pdo instanceof \PDO ), TRUE );
+		$pdo2 = R::getPDO();
+		asrt( ( $pdo2 instanceof \PDO ), TRUE );
+		asrt( ( $pdo === $pdo2 ), TRUE );
+	}
+
+	/**
 	 * Test setter maximum integer bindings.
 	 *
 	 * @return void
@@ -233,9 +261,7 @@ class Database extends Base
 		R::store( R::dispense( 'justabean' ) );
 
 		$adapter = new TroubleDapter( R::getToolBox()->getDatabaseAdapter()->getDatabase() );
-
 		$adapter->setSQLState( 'HY000' );
-
 		$writer  = new SQLiteT( $adapter );
 		$redbean = new OODB( $writer );
 		$toolbox = new ToolBox( $redbean, $adapter, $writer );
@@ -379,6 +405,7 @@ class TroubleDapter extends DBAdapter
 	{
 		$exception = new SQL( 'Just a trouble maker' );
 		$exception->setSQLState( $this->sqlState );
+		$exception->setDriverDetails( array(0,1,0) );
 		throw $exception;
 	}
 

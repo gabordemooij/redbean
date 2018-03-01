@@ -41,6 +41,7 @@ interface QueryWriter
 	const C_SQLSTATE_NO_SUCH_TABLE                  = 1;
 	const C_SQLSTATE_NO_SUCH_COLUMN                 = 2;
 	const C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION = 3;
+	const C_SQLSTATE_LOCK_TIMEOUT                   = 4;
 
 	/**
 	 * Define data type regions
@@ -72,7 +73,7 @@ interface QueryWriter
 	 *
 	 * @param string $type       source type
 	 * @param string $targetType target type (type to join)
-	 * @param string $leftRight  type of join (possible: 'LEFT', 'RIGHT' or 'INNER').
+	 * @param string $joinType   type of join (possible: 'LEFT', 'RIGHT' or 'INNER').
 	 *
 	 * @return string $joinSQLSnippet
 	 */
@@ -158,9 +159,20 @@ interface QueryWriter
 	/**
 	 * Returns the Column Type Code (integer) that corresponds
 	 * to the given value type. This method is used to determine the minimum
-	 * column type required to represent the given value.
+	 * column type required to represent the given value. There are two modes of
+	 * operation: with or without special types. Scanning without special types
+	 * requires the second parameter to be set to FALSE. This is useful when the
+	 * column has already been created and prevents it from being modified to
+	 * an incompatible type leading to data loss. Special types will be taken
+	 * into account when a column does not exist yet (parameter is then set to TRUE).
 	 *
-	 * @param string $value value
+	 * Special column types are determines by the AQueryWriter constant
+	 * C_DATA_TYPE_ONLY_IF_NOT_EXISTS (usually 80). Another 'very special' type is type
+	 * C_DATA_TYPE_MANUAL (usually 99) which represents a user specified type. Although
+	 * no special treatment has been associated with the latter for now.
+	 *
+	 * @param string  $value                   value
+	 * @param boolean $alsoScanSpecialForTypes take special types into account
 	 *
 	 * @return integer
 	 */
@@ -211,7 +223,7 @@ interface QueryWriter
 	 *
 	 * @param string $type       name of the table you want to query
 	 * @param array  $conditions criteria ( $column => array( $values ) )
-	 * @param string $addSQL     additional SQL snippet
+	 * @param string $addSql     additional SQL snippet
 	 * @param array  $bindings   bindings for SQL snippet
 	 *
 	 * @return array
@@ -323,7 +335,7 @@ interface QueryWriter
 	 *
 	 * @param string $type       name of the table you want to query
 	 * @param array  $conditions criteria ( $column => array( $values ) )
-	 * @param string $sql        additional SQL
+	 * @param string $addSql     additional SQL
 	 * @param array  $bindings   bindings
 	 *
 	 * @return void
@@ -366,10 +378,13 @@ interface QueryWriter
 	 *
 	 * @param string $state SQL state to consider
 	 * @param array  $list  list of standardized SQL state constants to check against
+	 * @param array  $extraDriverDetails Some databases communicate state information in a driver-specific format
+	 *                                   rather than through the main sqlState code. For those databases, this extra
+	 *                                   information can be used to determine the standardized state
 	 *
 	 * @return boolean
 	 */
-	public function sqlStateIn( $state, $list );
+	public function sqlStateIn( $state, $list, $extraDriverDetails = array() );
 
 	/**
 	 * This method will remove all beans of a certain type.

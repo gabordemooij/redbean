@@ -31,8 +31,8 @@ class Debug extends RDefault implements Logger
 	 * Writes a query for logging with all bindings / params filled
 	 * in.
 	 *
-	 * @param string $newSql   the query
-	 * @param array  $bindings the bindings to process (key-value pairs)
+	 * @param string $newSql      the query
+	 * @param array  $newBindings the bindings to process (key-value pairs)
 	 *
 	 * @return string
 	 */

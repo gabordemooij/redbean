@@ -364,13 +364,19 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::sqlStateIn
 	 */
-	public function sqlStateIn( $state, $list )
+	public function sqlStateIn( $state, $list, $extraDriverDetails = array() )
 	{
 		$stateMap = array(
-			'HY000' => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 			'23000' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
 		);
-
+		if ( $state == 'HY000'
+		&& isset($extraDriverDetails[1])
+		&& $extraDriverDetails[1] == 1
+		&& ( in_array( QueryWriter::C_SQLSTATE_NO_SUCH_TABLE, $list )
+			|| in_array( QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN, $list )
+		)) {
+			return TRUE;
+		}
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
 	}
 

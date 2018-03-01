@@ -75,6 +75,7 @@ class Bean extends Base
 		$out = "{$strA}{$strB}{$strC}";
 		asrt( $out, 'YYY' );
 		asrt( isset( $post->other ), FALSE );
+		asrt( $post->exists('comment'), FALSE );
 	}
 
 	/**
@@ -202,6 +203,17 @@ class Bean extends Base
 		R::store( $book );
 		asrt( R::count( 'book' ), 0 );
 	}
+
+	/**
+	 * Can we set a date string by passing a date object?
+	 */
+	 public function testBeanDates()
+	 {
+		 $bean = R::dispense('bean');
+		 $dateTime = '1980-01-01 10:11:12';
+		 $bean->date = new \DateTime( $dateTime );
+		 asrt( $bean->date, $dateTime );
+	 }
 
 	/**
 	 * Only fire update query if the bean really contains different

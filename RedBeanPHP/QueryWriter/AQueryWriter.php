@@ -27,6 +27,13 @@ use RedBeanPHP\RedException\SQL as SQLException;
 abstract class AQueryWriter
 {
 	/**
+	 * Constant: Select Snippet 'FOR UPDATE'
+	 */
+	const C_SELECT_SNIPPET_FOR_UPDATE = 'FOR UPDATE';
+	const C_DATA_TYPE_ONLY_IF_NOT_EXISTS = 80;
+	const C_DATA_TYPE_MANUAL = 99;
+
+	/**
 	 * @var array
 	 */
 	private static $sqlFilters = array();
@@ -40,6 +47,11 @@ abstract class AQueryWriter
 	 * @var boolean
 	 */
 	private static $flagNarrowFieldMode = true;
+
+	/**
+	 * @var boolean
+	 */
+	protected static $flagUseJSONColumns = FALSE;
 
 	/**
 	 * @var array
@@ -77,9 +89,33 @@ abstract class AQueryWriter
 	protected $maxCacheSizePerType = 20;
 
 	/**
+	 * @var string
+	 */
+	protected $sqlSelectSnippet = '';
+
+	/**
 	 * @var array
 	 */
 	public $typeno_sqltype = array();
+
+	/**
+	 * Toggles support for automatic generation of JSON columns.
+	 * Using JSON columns means that strings containing JSON will
+	 * cause the column to be created (not modified) as a JSON column.
+	 * However it might also trigger exceptions if this means the DB attempts to
+	 * convert a non-json column to a JSON column. Returns the previous
+	 * value of the flag.
+	 *
+	 * @param boolean $flag TRUE or FALSE
+	 *
+	 * @return boolean
+	 */
+	public static function useJSONColumns( $flag )
+	{
+		$old = self::$flagUseJSONColumns;
+		self::$flagUseJSONColumns = $flag;
+		return $old;
+	}
 
 	/**
 	 * Checks whether a number can be treated like an int.
@@ -332,12 +368,16 @@ abstract class AQueryWriter
 
 		$sqlConditions = array();
 		foreach ( $conditions as $column => $values ) {
-			if ( !count( $values ) ) continue;
+			if ( $values === NULL ) continue;
+
+			if ( is_array( $values ) ) {
+				if ( empty( $values ) ) continue;
+			} else {
+				$values = array( $values );
+			}
 
 			$sql = $this->esc( $column );
 			$sql .= ' IN ( ';
-
-			if ( !is_array( $values ) ) $values = array( $values );
 
 			if ( $paramTypeIsNum ) {
 				$sql .= implode( ',', array_fill( 0, count( $values ), '?' ) ) . ' ) ';
@@ -365,7 +405,8 @@ abstract class AQueryWriter
 		}
 
 		$sql = '';
-		if ( is_array( $sqlConditions ) && count( $sqlConditions ) > 0 ) {
+		$addSql = $this->glueSQLCondition( $addSql, !empty( $sqlConditions ) ? QueryWriter::C_GLUE_AND : NULL );
+		if ( !empty( $sqlConditions ) ) {
 			$sql = implode( ' AND ', $sqlConditions );
 			$sql = " WHERE ( $sql ) ";
 
@@ -401,6 +442,25 @@ abstract class AQueryWriter
 		$destTable   = $this->esc( $destType, $noQuote );
 
 		return array( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol );
+	}
+
+	/**
+	 * Determines whether a string can be considered JSON or not.
+	 * This is used by writers that support JSON columns. However
+	 * we dont want that code duplicated over all JSON supporting
+	 * Query Writers.
+	 *
+	 * @param string $value value to determine 'JSONness' of.
+	 *
+	 * @return boolean
+	 */
+	protected function isJSON( $value )
+	{
+		return (
+			is_string($value) &&
+			is_array(json_decode($value, TRUE)) &&
+			(json_last_error() == JSON_ERROR_NONE)
+		);
 	}
 
 	/**
@@ -802,15 +862,32 @@ abstract class AQueryWriter
 	}
 
 	/**
+	 * Sets an SQL snippet to be used for the next queryRecord() operation.
+	 * A select snippet will be inserted at the end of the SQL select statement and
+	 * can be used to modify SQL-select commands to enable locking, for instance
+	 * using the 'FOR UPDATE' snippet (this will generate an SQL query like:
+	 * 'SELECT * FROM ... FOR UPDATE'. After the query has been executed the
+	 * SQL snippet will be erased. Note that only the first upcoming direct or
+	 * indirect invocation of queryRecord() through batch(), find() or load()
+	 * will be affected. The SQL snippet will be cached.
+	 *
+	 * @param string $sql SQL snippet to use in SELECT statement.
+	 *
+	 * return self
+	 */
+	public function setSQLSelectSnippet( $sqlSelectSnippet = '' ) {
+		$this->sqlSelectSnippet = $sqlSelectSnippet;
+		return $this;
+	}
+
+	/**
 	 * @see QueryWriter::queryRecord
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, ( count($conditions) > 0) ? QueryWriter::C_GLUE_AND : NULL );
-
 		$key = NULL;
 		if ( $this->flagUseCache ) {
-			$key = $this->getCacheKey( array( $conditions, $addSql, $bindings, 'select' ) );
+			$key = $this->getCacheKey( array( $conditions, "$addSql {$this->sqlSelectSnippet}", $bindings, 'select' ) );
 
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
@@ -823,14 +900,17 @@ abstract class AQueryWriter
 		if ( count( self::$sqlFilters ) ) {
 			$sqlFilterStr = $this->getSQLFilterSnippet( $type );
 		}
-
-		$sql   = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		
+		if ( is_array ( $conditions ) && !empty ( $conditions ) ) {
+			$sql = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		} else {
+			$sql = $this->glueSQLCondition( $addSql );
+		}
 
 		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
-		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} -- keep-cache";
-
+		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} {$this->sqlSelectSnippet} -- keep-cache";
+		$this->sqlSelectSnippet = '';
 		$rows  = $this->adapter->get( $sql, $bindings );
-
 		if ( $this->flagUseCache && $key ) {
 			$this->putResultInCache( $type, $key, $rows );
 		}
@@ -974,13 +1054,16 @@ abstract class AQueryWriter
 	 */
 	public function queryRecordCount( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql );
-
 		$table  = $this->esc( $type );
 
 		$this->updateCache(); //check if cache chain has been broken
 
-		$sql    = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		if ( is_array ( $conditions ) && !empty ( $conditions ) ) {
+			$sql = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		} else {
+			$sql = $this->glueSQLCondition( $addSql );
+		}
+		
 		$sql    = "SELECT COUNT(*) FROM {$table} {$sql} -- keep-cache";
 
 		return (int) $this->adapter->getCell( $sql, $bindings );
@@ -1024,11 +1107,14 @@ abstract class AQueryWriter
 	 */
 	public function deleteRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql );
-
 		$table  = $this->esc( $type );
 
-		$sql    = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		if ( is_array ( $conditions ) && !empty ( $conditions ) ) {
+			$sql = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
+		} else {
+			$sql = $this->glueSQLCondition( $addSql );
+		}
+		
 		$sql    = "DELETE FROM {$table} {$sql}";
 
 		$this->adapter->exec( $sql, $bindings );

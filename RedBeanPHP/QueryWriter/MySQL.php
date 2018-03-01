@@ -39,7 +39,8 @@ class MySQL extends AQueryWriter implements QueryWriter
 	const C_DATATYPE_SPECIAL_POINT    = 90;
 	const C_DATATYPE_SPECIAL_LINESTRING = 91;
 	const C_DATATYPE_SPECIAL_POLYGON    = 92;
-	const C_DATATYPE_SPECIAL_MONEY    = 93;
+	const C_DATATYPE_SPECIAL_MONEY      = 93;
+	const C_DATATYPE_SPECIAL_JSON       = 94;  //JSON support (only manual)
 
 	const C_DATATYPE_SPECIFIED        = 99;
 
@@ -114,7 +115,8 @@ class MySQL extends AQueryWriter implements QueryWriter
 			MySQL::C_DATATYPE_SPECIAL_POINT    => ' POINT ',
 			MySQL::C_DATATYPE_SPECIAL_LINESTRING => ' LINESTRING ',
 			MySQL::C_DATATYPE_SPECIAL_POLYGON => ' POLYGON ',
-			MySQL::C_DATATYPE_SPECIAL_MONEY    => ' DECIMAL(10,2) '
+			MySQL::C_DATATYPE_SPECIAL_MONEY    => ' DECIMAL(10,2) ',
+			MYSQL::C_DATATYPE_SPECIAL_JSON     => ' JSON '
 		);
 
 		$this->sqltype_typeno = array();
@@ -154,8 +156,11 @@ class MySQL extends AQueryWriter implements QueryWriter
 	{
 		$table = $this->esc( $table );
 
-		$encoding = $this->adapter->getDatabase()->getMysqlEncoding();
-		$sql   = "CREATE TABLE $table (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET={$encoding} COLLATE={$encoding}_unicode_ci ";
+		$charset_collate = $this->adapter->getDatabase()->getMysqlEncoding( TRUE );
+		$charset = $charset_collate['charset'];
+		$collate = $charset_collate['collate'];
+		
+		$sql   = "CREATE TABLE $table (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET={$charset} COLLATE={$collate} ";
 
 		$this->adapter->exec( $sql );
 	}
@@ -203,6 +208,9 @@ class MySQL extends AQueryWriter implements QueryWriter
 			}
 			if ( preg_match( '/^POLYGON\(/', $value ) ) {
 				return MySQL::C_DATATYPE_SPECIAL_POLYGON;
+			}
+			if ( self::$flagUseJSONColumns && $this->isJSON( $value ) ) {
+				return self::C_DATATYPE_SPECIAL_JSON;
 			}
 		}
 
@@ -340,13 +348,21 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::sqlStateIn
 	 */
-	public function sqlStateIn( $state, $list )
+	public function sqlStateIn( $state, $list, $extraDriverDetails = array() )
 	{
 		$stateMap = array(
 			'42S02' => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 			'42S22' => QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-			'23000' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION
+			'23000' => QueryWriter::C_SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION,
 		);
+
+		if ( $state == 'HY000' && !empty( $extraDriverDetails[1] ) ) {
+			$driverCode = $extraDriverDetails[1];
+
+			if ( $driverCode == '1205' && in_array( QueryWriter::C_SQLSTATE_LOCK_TIMEOUT, $list ) ) {
+				return true;
+			}
+		}
 
 		return in_array( ( isset( $stateMap[$state] ) ? $stateMap[$state] : '0' ), $list );
 	}
