@@ -59,7 +59,7 @@ class QuickExport
 		if ($columns) fputcsv($handle, $columns, $delimiter, $enclosure, $escapeChar );
 		$cursor = $this->toolbox->getDatabaseAdapter()->getCursor( $sql, $bindings );
 		while( $row = $cursor->getNextItem() ) {
-			fputcsv($handle, $row, $delimiter, $enclosure, $escapeChar );
+			if (PHP_VERSION_ID>=505040) fputcsv($handle, $row, $delimiter, $enclosure, $escapeChar ); else fputcsv($handle, $row, $delimiter, $enclosure );
 		}
 		fclose($handle);
 		if ( $output ) {
