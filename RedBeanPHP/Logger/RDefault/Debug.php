@@ -28,6 +28,11 @@ class Debug extends RDefault implements Logger
 	private $strLen = 40;
 
 	/**
+	 * @var boolean
+	 */
+	public static $noCLI = FALSE;
+
+	/**
 	 * Writes a query for logging with all bindings / params filled
 	 * in.
 	 *
@@ -99,7 +104,7 @@ class Debug extends RDefault implements Logger
 			|| strpos( $str, 'DROP' ) === 0) {
 				$highlight = TRUE;
 			}
-			if (PHP_SAPI === 'cli') {
+			if (PHP_SAPI === 'cli' && !self::$noCLI) {
 				if ($highlight) echo "\e[91m";
 				echo $str, PHP_EOL;
 				echo "\e[39m";
