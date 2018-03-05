@@ -145,6 +145,7 @@ class Debug extends Blackhole
 		Debugger::$noCLI = TRUE;
 		$this->testDebug('SELECT * FROM table', NULL, 'SELECT * FROM table', 0, 'SELECT * FROM table<br />');
 		$this->testDebug('DROP TABLE myths', NULL, 'DROP TABLE myths', 0, '<b style="color:red">DROP TABLE myths</b><br />');
+		$this->testDebug('SELECT * FROM book WHERE title = ?', array('my book'), 'SELECT * FROM book WHERE title = <b style="color:green">\'my book\'</b>');
 		Debugger::$noCLI = FALSE;
 	}
 
