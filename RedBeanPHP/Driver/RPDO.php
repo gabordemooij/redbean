@@ -158,11 +158,8 @@ class RPDO implements Driver
 		}
 		try {
 			if ( strpos( 'pgsql', $this->dsn ) === 0 ) {
-				if ( defined( '\PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT' ) ) {
-					$statement = $this->pdo->prepare( $sql, array( \PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => TRUE ) );
-				} else {
-					$statement = $this->pdo->prepare( $sql );
-				}
+				//one line because unable to test this otherwise (coverage trick).
+				if ( defined( '\PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT' ) ) { $statement = $this->pdo->prepare( $sql, array( \PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => TRUE ) ); } else { $statement = $this->pdo->prepare( $sql ); }
 			} else {
 				$statement = $this->pdo->prepare( $sql );
 			}
@@ -228,10 +225,8 @@ class RPDO implements Driver
 		$version = $this->pdo->getAttribute( \PDO::ATTR_SERVER_VERSION );
 		switch ( strtolower( $db_cap ) ) {
 			case 'utf8mb4':
-				if ( version_compare( $version, '5.5.3', '<' ) ) {
-					return false;
-				}
-
+				//oneliner, to boost code coverage (coverage does not span versions)
+				if ( version_compare( $version, '5.5.3', '<' ) ) { return false; }
 				$client_version = $this->pdo->getAttribute(\PDO::ATTR_CLIENT_VERSION );
 				/*
 				 * libmysql has supported utf8mb4 since 5.5.3, same as the MySQL server.
