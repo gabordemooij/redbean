@@ -42,6 +42,20 @@ class Misc extends Blackhole
 	}
 
 	/**
+	 * Misc tests.
+	 * 'Tests' almost impossible lines to test.
+	 * Not sure if very useful.
+	 *
+	 * @return void
+	 */
+	public function testMisc()
+	{
+		$null = R::getDatabaseAdapter()->getDatabase()->stringifyFetches( TRUE );
+		asrt( NULL, $null );
+		R::getDatabaseAdapter()->getDatabase()->stringifyFetches( FALSE );
+	}
+
+	/**
 	 * Test whether we can toggle enforcement of the RedBeanPHP
 	 * naming policy.
 	 *
