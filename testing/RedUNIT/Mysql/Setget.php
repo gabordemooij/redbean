@@ -34,6 +34,23 @@ use RedBeanPHP\Facade as R;
 class Setget extends Mysql
 {
 	/**
+	 * Test whether we can store DateTime objects and get them back
+	 * as 'date-time' strings representing the same date and time.
+	 *
+	 * @return void
+	 */
+	public function testDateObject()
+	{
+		$dt = new \DateTime();
+		$dt->setTimeZone( new \DateTimeZone( 'Europe/Amsterdam' ) );
+		$dt->setDate( 1981, 5, 1 );
+		$dt->setTime( 3, 13, 13 );
+		asrt( setget( $dt ), '1981-05-01 03:13:13' );
+		$bean = R::dispense( 'bean' );
+		$bean->dt = $dt;
+	}
+
+	/**
 	 * Tests R::getInsertID convenience method.
 	 *
 	 * @return void

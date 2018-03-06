@@ -1196,10 +1196,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$value = '0';
 		} elseif ( $value === TRUE ) {
 			$value = '1';
-		} elseif ( $value instanceof \DateTime ) {
-			$value = $value->format( 'Y-m-d H:i:s' );
-		}
-
+			/* for some reason there is some kind of bug in xdebug so that it doesnt count this line otherwise... */
+		} elseif ( $value instanceof \DateTime ) { $value = $value->format( 'Y-m-d H:i:s' ); }
 		$this->properties[$property] = $value;
 	}
 
