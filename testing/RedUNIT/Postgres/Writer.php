@@ -29,6 +29,50 @@ use RedBeanPHP\RedException as RedException;
 class Writer extends Postgres
 {
 	/**
+	 * Tests wheter we can write a deletion query
+	 * for PostgreSQL using NO conditions but only an
+	 * additional SQL snippet.
+	 *
+	 * @return void
+	 */
+	public function testWriteDeleteQuery()
+	{
+		$queryWriter = R::getWriter();
+		asrt( ( $queryWriter instanceof PostgreSQL ), TRUE );
+		R::nuke();
+		$bean = R::dispense( 'bean' );
+		$bean->name = 'a';
+		$id = R::store( $bean );
+		asrt( R::count( 'bean' ), 1 );
+		$queryWriter->deleteRecord( 'bean', array(), $addSql = ' id = :id ', $bindings = array( ':id' => $id ) );
+		asrt( R::count( 'bean' ), 0 );
+	}
+
+	/**
+	 * Tests wheter we can write a counting query
+	 * for PostgreSQL using conditions and an additional SQL snippet.
+	 *
+	 * @return void
+	 */
+	public function testWriteCountQuery()
+	{
+		$queryWriter = R::getWriter();
+		asrt( ( $queryWriter instanceof PostgreSQL ), TRUE );
+		R::nuke();
+		$bean = R::dispense( 'bean' );
+		$bean->name = 'a';
+		R::store( $bean );
+		$bean = R::dispense( 'bean' );
+		$bean->name = 'b';
+		R::store( $bean );
+		$bean = R::dispense( 'bean' );
+		$bean->name = 'b';
+		R::store( $bean );
+		$count = $queryWriter->queryRecordCount( 'bean', array( 'name' => 'b' ), $addSql = ' id > :id ', $bindings = array( ':id' => 0 ) );
+		asrt( $count, 2 );
+	}
+
+	/**
 	 * Tests whether we can write a PostgreSQL join and
 	 * whether the correct exception is thrown in case
 	 * of an invalid join.
