@@ -30,6 +30,45 @@ use RedBeanPHP\RedException as RedException;
 class Writer extends \RedUNIT\Mysql
 {
 	/**
+	 * Tests whether we can write a MySQL join and
+	 * whether the correct exception is thrown in case
+	 * of an invalid join.
+	 *
+	 * @return void
+	 */
+	public function testWriteJoinSnippets()
+	{
+		$queryWriter = R::getWriter();
+		asrt( ( $queryWriter instanceof MySQL ), TRUE );
+		$snippet = $queryWriter->writeJoin( 'book', 'page' ); //default must be LEFT
+		asrt( is_string( $snippet ), TRUE );
+		asrt( ( strlen( $snippet ) > 0 ), TRUE );
+		asrt( ' LEFT JOIN `page` ON `page`.id = `book`.page_id ', $snippet );
+		$snippet = $queryWriter->writeJoin( 'book', 'page', 'LEFT' );
+		asrt( is_string( $snippet ), TRUE );
+		asrt( ( strlen( $snippet ) > 0 ), TRUE );
+		asrt( ' LEFT JOIN `page` ON `page`.id = `book`.page_id ', $snippet );
+		$snippet = $queryWriter->writeJoin( 'book', 'page', 'RIGHT' );
+		asrt( is_string( $snippet ), TRUE );
+		asrt( ( strlen( $snippet ) > 0 ), TRUE );
+		asrt( ' RIGHT JOIN `page` ON `page`.id = `book`.page_id ', $snippet );
+		$snippet = $queryWriter->writeJoin( 'book', 'page', 'INNER' );
+		asrt( ' INNER JOIN `page` ON `page`.id = `book`.page_id ', $snippet );
+		$exception = NULL;
+		try {
+			$snippet = $queryWriter->writeJoin( 'book', 'page', 'MIDDLE' );
+		}
+		catch(\Exception $e) {
+			$exception = $e;
+		}
+		asrt( ( $exception instanceof RedException ), TRUE );
+		$errorMessage = $exception->getMessage();
+		asrt( is_string( $errorMessage ), TRUE );
+		asrt( ( strlen( $errorMessage ) > 0 ), TRUE );
+		asrt( $errorMessage, 'Invalid JOIN.' );
+	}
+
+	/**
 	 * Test whether we can store JSON as a JSON column
 	 * and whether this plays well with the other data types.
 	 */
