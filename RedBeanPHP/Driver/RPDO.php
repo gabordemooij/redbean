@@ -222,6 +222,7 @@ class RPDO implements Driver
 	 **/
 	protected function hasCap( $db_cap )
 	{
+		$compare = FALSE;
 		$version = $this->pdo->getAttribute( \PDO::ATTR_SERVER_VERSION );
 		switch ( strtolower( $db_cap ) ) {
 			case 'utf8mb4':
@@ -234,17 +235,17 @@ class RPDO implements Driver
 				 */
 				if ( false !== strpos( $client_version, 'mysqlnd' ) ) {
 					$client_version = preg_replace( '/^\D+([\d.]+).*/', '$1', $client_version );
-					return version_compare( $client_version, '5.0.9', '>=' );
+					$compare = version_compare( $client_version, '5.0.9', '>=' );
 				} else {
-					return version_compare( $client_version, '5.5.3', '>=' );
+					$compare = version_compare( $client_version, '5.5.3', '>=' );
 				}
 			break;
 			case 'utf8mb4_520':
-				return version_compare( $version, '5.6', '>=' );
+				$compare = version_compare( $version, '5.6', '>=' );
 			break;
 		}
 
-		return false;
+		return $compare;
 	}
 
 	/**

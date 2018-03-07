@@ -6,14 +6,12 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException as RedException;
 
-/* PHP 5.3 compatibility */
-if (interface_exists('\JsonSerializable')) {
-		/* We extend JsonSerializable to avoid namespace conflicts,
-		can't define interface with special namespace in PHP */
-		interface Jsonable extends \JsonSerializable {};
-} else {
-	interface Jsonable {};
-}
+/**
+ * PHP 5.3 compatibility
+ * We extend JsonSerializable to avoid namespace conflicts,
+ * can't define interface with special namespace in PHP
+ */
+if (interface_exists('\JsonSerializable')) { interface Jsonable extends \JsonSerializable {}; } else { interface Jsonable {}; }
 
 /**
  * OODBBean (Object Oriented DataBase Bean).

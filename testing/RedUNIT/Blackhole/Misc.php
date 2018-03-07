@@ -57,7 +57,11 @@ class Misc extends Blackhole
 		}
 		asrt( ( $exception instanceof RedException ), TRUE );
 		asrt( $exception->getMessage(), 'Unsupported database (blackhole).' );
+		$rpdo = new TestRPO( new MockPDO );
+		asrt( @$rpdo->testCap( 'utf8mb4' ), FALSE );
 	}
+
+
 
 	/**
 	 * Misc tests.
@@ -615,5 +619,20 @@ class CustomLogger extends RDefault
 	public function log()
 	{
 		$this->log = func_get_args();
+	}
+}
+
+
+class TestRPO extends RPDO {
+	public function testCap( $cap ) {
+		return $this->hasCap( $cap );
+	}
+}
+class MockPDO extends \PDO {
+	public function __construct() { }
+	public function setAttribute( $att, $val = NULL ) { ; }
+	public function getAttribute( $att ) {
+		if ($att == \PDO::ATTR_SERVER_VERSION) return '5.5.3';
+		return 'x';
 	}
 }

@@ -375,15 +375,8 @@ class MySQL extends AQueryWriter implements QueryWriter
 		$this->adapter->exec( 'SET FOREIGN_KEY_CHECKS = 0;' );
 
 		foreach ( $this->getTables() as $t ) {
-			try {
-				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
-			} catch ( SQLException $e ) {
-			}
-
-			try {
-				$this->adapter->exec( "DROP VIEW IF EXISTS `$t`" );
-			} catch ( SQLException $e ) {
-			}
+			try { $this->adapter->exec( "DROP TABLE IF EXISTS `$t`" ); } catch ( SQLException $e ) { ; }
+			try { $this->adapter->exec( "DROP VIEW IF EXISTS `$t`" ); } catch ( SQLException $e ) { ; }
 		}
 
 		$this->adapter->exec( 'SET FOREIGN_KEY_CHECKS = 1;' );

@@ -428,15 +428,8 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$this->adapter->exec( 'PRAGMA foreign_keys = 0 ' );
 
 		foreach ( $this->getTables() as $t ) {
-			try {
-				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
-			} catch ( SQLException $e ) {
-			}
-
-			try {
-				$this->adapter->exec( "DROP TABLE IF EXISTS `$t`" );
-			} catch ( SQLException $e ) {
-			}
+			try { $this->adapter->exec( "DROP TABLE IF EXISTS `$t`" ); } catch ( SQLException $e ) { ; }
+			try { $this->adapter->exec( "DROP TABLE IF EXISTS `$t`" ); } catch ( SQLException $e ) { ; }
 		}
 
 		$this->adapter->exec( 'PRAGMA foreign_keys = 1 ' );
