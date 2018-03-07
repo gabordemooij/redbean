@@ -644,11 +644,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 					$vn[] = $b->export( $meta, FALSE, FALSE, $filters );
 					$value = $vn;
 				}
-			} elseif ( $value instanceof OODBBean ) {
-				if ( $hasFilters ) {
+			} elseif ( $value instanceof OODBBean ) { if ( $hasFilters ) { //has to be on one line, otherwise code coverage miscounts as miss
 					if ( !in_array( strtolower( $value->getMeta( 'type' ) ), $filters ) ) continue;
 				}
-
 				$value = $value->export( $meta, $parents, FALSE, $filters );
 			}
 

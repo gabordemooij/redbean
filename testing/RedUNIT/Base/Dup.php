@@ -26,6 +26,21 @@ use RedBeanPHP\RedException as RedException;
 class Dup extends Base
 {
 	/**
+	 * Tests basic export functionality
+	 *
+	 * @return void
+	 */
+	public function testExport()
+	{
+		$bean = R::dispense('bean');
+		$bean->name = R::dispense('book');
+		$export = $bean->export( FALSE, FALSE, FALSE, array( 'book' ) );
+		asrt( isset( $export['name'] ), TRUE );
+		$export = $bean->export( FALSE, FALSE, FALSE, array( 'book2' ) );
+		asrt( isset( $export['name'] ), FALSE );
+	}
+
+	/**
 	 * Tests whether the original ID is stored
 	 * in meta data (quite handy for ID mappings).
 	 */
