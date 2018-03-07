@@ -42,6 +42,24 @@ class Misc extends Blackhole
 	}
 
 	/**
+	 * Test whether we get the correct exception if we try to
+	 * add a database we don't have a compatible QueryWriter for.
+	 *
+	 * @return void
+	 */
+	public function testUnsupportedDatabaseWriter()
+	{
+		$exception = NULL;
+		try {
+			R::addDatabase( 'x', 'blackhole:host=localhost;dbname=db', 'username', 'password' );
+		} catch( \Exception $e ) {
+			$exception = $e;
+		}
+		asrt( ( $exception instanceof RedException ), TRUE );
+		asrt( $exception->getMessage(), 'Unsupported database (blackhole).' );
+	}
+
+	/**
 	 * Misc tests.
 	 * 'Tests' almost impossible lines to test.
 	 * Not sure if very useful.
