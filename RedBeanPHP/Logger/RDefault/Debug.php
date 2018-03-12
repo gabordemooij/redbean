@@ -30,7 +30,24 @@ class Debug extends RDefault implements Logger
 	/**
 	 * @var boolean
 	 */
-	public static $noCLI = FALSE;
+	private static $noCLI = FALSE;
+
+	/**
+	 * Toggles CLI override. By default debugging functions will
+	 * output differently based on PHP_SAPI values. This function
+	 * allows you to override the PHP_SAPI setting. If you set
+	 * this to TRUE, CLI output will be supressed in favour of
+	 * HTML output. So, to get HTML on the command line use
+	 * setOverrideCLIOutput( TRUE ).
+	 *
+	 * @param boolean $yesNo CLI-override setting flag
+	 *
+	 * @return void
+	 */
+	public static function setOverrideCLIOutput( $yesNo )
+	{
+		self::$noCLI = $yesNo;
+	}
 
 	/**
 	 * Writes a query for logging with all bindings / params filled

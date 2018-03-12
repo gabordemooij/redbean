@@ -142,11 +142,11 @@ class Debug extends Blackhole
 		'a','b','c','d','e','f','g','h','i','j','k'
 		),"'a' 'b' 'c' 'd' 'e' 'f' 'g' 'h' 'i' 'j' 'k'");
 		$this->testDebug(':a :aaa :ab', array(':a'=>1,':aaa'=>2,':ab'=>3),'1 2 3');
-		Debugger::$noCLI = TRUE;
+		Debugger::setOverrideCLIOutput( TRUE );
 		$this->testDebug('SELECT * FROM table', NULL, 'SELECT * FROM table', 0, 'SELECT * FROM table<br />');
 		$this->testDebug('DROP TABLE myths', NULL, 'DROP TABLE myths', 0, '<b style="color:red">DROP TABLE myths</b><br />');
 		$this->testDebug('SELECT * FROM book WHERE title = ?', array('my book'), 'SELECT * FROM book WHERE title = <b style="color:green">\'my book\'</b>');
-		Debugger::$noCLI = FALSE;
+		Debugger::setOverrideCLIOutput( FALSE );
 	}
 
 	/**
