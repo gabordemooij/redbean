@@ -93,6 +93,13 @@ class SimpleModel
 	 * You can box your beans before passing them to functions or methods
 	 * with typed parameters.
 	 *
+	 * Note about beans vs models:
+	 * Use unbox to obtain the bean powering the model. If you want to use bean functionality,
+	 * you should -always- unbox first. While some functionality (like magic get/set) is
+	 * available in the model, this is just read-only. To use a model as a typical RedBean
+	 * OODBBean you should always unbox the model to a bean. Models are meant to
+	 * expose only domain logic added by the developer (business logic, no ORM logic).
+	 *
 	 * @return SimpleModel
 	 */
 	public function box()
@@ -103,6 +110,13 @@ class SimpleModel
 	/**
 	 * Unbox the bean from the model.
 	 * This method returns the bean inside the model.
+	 *
+	 * Note about beans vs models:
+	 * Use unbox to obtain the bean powering the model. If you want to use bean functionality,
+	 * you should -always- unbox first. While some functionality (like magic get/set) is
+	 * available in the model, this is just read-only. To use a model as a typical RedBean
+	 * OODBBean you should always unbox the model to a bean. Models are meant to
+	 * expose only domain logic added by the developer (business logic, no ORM logic).
 	 *
 	 * @return OODBBean
 	 */
