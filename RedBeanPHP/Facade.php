@@ -27,7 +27,7 @@ use RedBeanPHP\Util\Diff as Diff;
  * RedBean Facade
  *
  * Version Information
- * RedBean Version @version 5
+ * RedBean Version @version 5.1
  *
  * This class hides the object landscape of
  * RedBeanPHP behind a single letter class providing
@@ -47,7 +47,7 @@ class Facade
 	/**
 	 * RedBeanPHP version constant.
 	 */
-	const C_REDBEANPHP_VERSION = '5';
+	const C_REDBEANPHP_VERSION = '5.1';
 
 	/**
 	 * @var ToolBox
