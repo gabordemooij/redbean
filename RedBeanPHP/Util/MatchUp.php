@@ -61,6 +61,9 @@ class MatchUp
 	 * there was a NOT-FOUND task list. If no bean was found AND there was also
 	 * no second task list, NULL will be returned.
 	 *
+	 * To obtain the bean, pass a variable as the sixth parameter.
+	 * The function will put the matching bean in the specified variable.
+	 *
 	 * @param string   $type         type of bean you're looking for
 	 * @param string   $sql          SQL snippet (starting at the WHERE clause, omit WHERE-keyword)
 	 * @param array    $bindings     array of parameter bindings for SQL snippet
