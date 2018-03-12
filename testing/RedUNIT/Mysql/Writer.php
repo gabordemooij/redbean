@@ -30,6 +30,55 @@ use RedBeanPHP\RedException as RedException;
 class Writer extends \RedUNIT\Mysql
 {
 	/**
+	 * Test whether optimizations do not have effect on Writer query outcomes.
+	 *
+	 * @return void
+	 */
+	public function testWriterSpeedUp()
+	{
+		R::nuke();
+		$id = R::store( R::dispense( 'book' ) );
+		$writer = R::getWriter();
+		$count1 = $writer->queryRecordCount( 'book', array( 'id' => $id ), ' id = :id ', array( ':id' => $id ) );
+		$count2 = $writer->queryRecordCount( 'book', array( ), ' id = :id ', array( ':id' => $id ) );
+		$count3 = $writer->queryRecordCount( 'book', NULL, ' id = :id ', array( ':id' => $id ) );
+		$count4 = $writer->queryRecordCount( 'book', array( 'id' => $id ) );
+		asrt( $count1, $count2 );
+		asrt( $count2, $count3 );
+		asrt( $count3, $count4 );
+		R::nuke();
+		$books = R::dispenseAll( 'book*4' );
+		$ids = R::storeAll( $books[0] );
+		$writer->deleteRecord( 'book', array( 'id' => $ids[0] ) );
+		$writer->deleteRecord( 'book', array( 'id' => $ids[1] ), ' id = :id ', array( ':id' => $ids[1] ) );
+		$writer->deleteRecord( 'book', NULL, ' id = :id ', array( ':id' => $ids[2] ) );
+		$writer->deleteRecord( 'book', array(), ' id = :id ', array( ':id' => $ids[3] ) );
+		asrt( R::count( 'book' ), 0 );
+		R::nuke();
+		$id = R::store( R::dispense( 'book' ) );
+		$record = $writer->queryRecord( 'book', array( 'id' => $id ) );
+		asrt( is_array( $record ), TRUE );
+		asrt( is_array( $record[0] ), TRUE );
+		asrt( isset( $record[0]['id'] ), TRUE );
+		asrt( (int) $record[0]['id'], $id );
+		$record = $writer->queryRecord( 'book', array( 'id' => $id ), ' id = :id ', array( ':id' => $id ) );
+		asrt( is_array( $record ), TRUE );
+		asrt( is_array( $record[0] ), TRUE );
+		asrt( isset( $record[0]['id'] ), TRUE );
+		asrt( (int) $record[0]['id'], $id );
+		$record = $writer->queryRecord( 'book', NULL, ' id = :id ', array( ':id' => $id ) );
+		asrt( is_array( $record ), TRUE );
+		asrt( is_array( $record[0] ), TRUE );
+		asrt( isset( $record[0]['id'] ), TRUE );
+		asrt( (int) $record[0]['id'], $id );
+		$record = $writer->queryRecord( 'book', array(), ' id = :id ', array( ':id' => $id ) );
+		asrt( is_array( $record ), TRUE );
+		asrt( is_array( $record[0] ), TRUE );
+		asrt( isset( $record[0]['id'] ), TRUE );
+		asrt( (int) $record[0]['id'], $id );
+	}
+
+	/**
 	 * Tests wheter we can write a deletion query
 	 * for MySQL using NO conditions but only an
 	 * additional SQL snippet.
