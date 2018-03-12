@@ -1470,7 +1470,8 @@ class Facade
 	 *
 	 * @return void
 	 */
-	public static function trashBatch( $type, $ids ) {
+	public static function trashBatch( $type, $ids )
+	{
 		self::trashAll( self::batch( $type, $ids ) );
 	}
 
