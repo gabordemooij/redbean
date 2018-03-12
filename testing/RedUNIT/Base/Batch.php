@@ -25,6 +25,22 @@ use RedBeanPHP\RedException\SQL as SQL;
  */
 class Batch extends Base
 {
+	/**
+	 * Tests batch trashing. Can we trash beans using
+	 * IDs only?
+	 *
+	 * @return void
+	 */
+	public function testBatchTrash()
+	{
+		R::nuke();
+		$books = R::dispenseAll( 'book*3' );
+		R::storeAll( $books[0] );
+		pass();
+		asrt( ( R::count( 'book' ) === 3 ), TRUE );
+		R::trashBatch( 'book', R::getCol( 'SELECT id FROM book' ) );
+		asrt( ( R::count( 'book' ) === 0 ), TRUE );
+	}
 
 	/**
 	 * Begin testing.

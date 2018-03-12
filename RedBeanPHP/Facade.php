@@ -1456,6 +1456,25 @@ class Facade
 	}
 
 	/**
+	 * Short hand function to trash a series of beans using
+	 * only IDs. This function combines trashAll and batch loading
+	 * in one call. Note that while this function accepts just
+	 * bean IDs, the beans will still be loaded first. This is because
+	 * the function still respects all the FUSE hooks that may have beeb
+	 * associated with the domain logic associated with these beans.
+	 * If you really want to delete just records from the database use
+	 * a simple DELETE-FROM SQL query instead.
+	 *
+	 * @param string type  $type the bean type you wish to trash
+	 * @param string array $ids  list of bean IDs
+	 *
+	 * @return void
+	 */
+	public static function trashBatch( $type, $ids ) {
+		self::trashAll( self::batch( $type, $ids ) );
+	}
+
+	/**
 	 * Toggles Writer Cache.
 	 * Turns the Writer Cache on or off. The Writer Cache is a simple
 	 * query based caching system that may improve performance without the need
