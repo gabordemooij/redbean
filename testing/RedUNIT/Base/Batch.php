@@ -26,6 +26,23 @@ use RedBeanPHP\RedException\SQL as SQL;
 class Batch extends Base
 {
 	/**
+	 * Can we delete beans by find-query?
+	 *
+	 * @return void
+	 */
+	public function testHunt()
+	{
+		R::nuke();
+		$books = R::dispenseAll( 'book*3' );
+		R::storeAll( $books[0] );
+		pass();
+		asrt( ( R::count( 'book' ) === 3 ), TRUE );
+		$ids = R::getCol( 'SELECT id FROM book' );
+		R::hunt( 'book', ' id IN ( '. R::genSlots( $ids ) .' ) ', $ids );
+		asrt( ( R::count( 'book' ) === 0 ), TRUE );
+	}
+
+	/**
 	 * Tests batch trashing. Can we trash beans using
 	 * IDs only?
 	 *

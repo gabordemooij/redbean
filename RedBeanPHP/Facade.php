@@ -1475,6 +1475,32 @@ class Facade
 	}
 
 	/**
+	 * Short hand function to find and trash beans.
+	 * This function combines trashAll and find.
+	 * Given a bean type, a query snippet and optionally some parameter
+	 * bindings, this function will search for the beans described in the
+	 * query and its parameters and then feed them to the trashAll function
+	 * to be trashed.
+	 *
+	 * Note that while this function accepts just
+	 * a bean type and query snippet, the beans will still be loaded first. This is because
+	 * the function still respects all the FUSE hooks that may have beeb
+	 * associated with the domain logic associated with these beans.
+	 * If you really want to delete just records from the database use
+	 * a simple DELETE-FROM SQL query instead.
+	 *
+	 * @param string $type       bean type to look for in database
+	 * @param string $sqlSnippet an SQL query snippet
+	 * @param array  $bindings   SQL parameter bindings
+	 *
+	 * @return array
+	 */
+	public static function hunt( $type, $sqlSnippet, $bindings = array() )
+	{
+		return self::trashAll( self::find( $type, $sqlSnippet, $bindings ) );
+	}
+
+	/**
 	 * Toggles Writer Cache.
 	 * Turns the Writer Cache on or off. The Writer Cache is a simple
 	 * query based caching system that may improve performance without the need
