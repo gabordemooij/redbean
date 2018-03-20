@@ -445,6 +445,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * It is not recommended to use this method to initialize beans. Instead
 	 * use the OODB object to dispense new beans. You can use this method
 	 * if you build your own bean dispensing mechanism.
+	 * This is not recommended.
+	 *
+	 * Unless you know what you are doing, do NOT use this method.
+	 * This is for advanced users only!
 	 *
 	 * @param string     $type       type of the new bean
 	 * @param BeanHelper $beanhelper bean helper to obtain a toolbox and a model
