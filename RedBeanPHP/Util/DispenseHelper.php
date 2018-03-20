@@ -47,6 +47,26 @@ class DispenseHelper
 	 * type does not conform to the RedBeanPHP database column naming
 	 * policy.
 	 *
+	 * The RedBeanPHP naming policy for beans states that valid
+	 * bean type names contain only:
+	 *
+	 * - lowercase alphanumeric characters a-z
+	 * - numbers 0-9
+	 * - at least one character
+	 *
+	 * Although there are no restrictions on length, database
+	 * specific implementations may apply further restrictions
+	 * regarding the length of a table which means these restrictions
+	 * also apply to bean types.
+	 *
+	 * The RedBeanPHP naming policy ensures that, without any
+	 * configuration, the core functionalities work across many
+	 * databases and operating systems, including those that are
+	 * case insensitive or restricted to the ASCII character set.
+	 *
+	 * Although these restrictions can be bypassed, this is not
+	 * recommended.
+	 *
 	 * @param string $type type of bean
 	 *
 	 * @return void
