@@ -316,6 +316,7 @@ class Misc extends Base
 		asrt( R::genSlots( array( 'a', 'b' ) ), '?,?' );
 		asrt( R::genSlots( array( 'a' ) ), '?' );
 		asrt( R::genSlots( array() ), '' );
+		asrt( R::genSlots( array('a', 'b'), ' IN( %s ) ' ), ' IN( ?,? ) ' );
 	}
 
 	/**
