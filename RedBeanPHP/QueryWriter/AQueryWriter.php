@@ -193,6 +193,7 @@ abstract class AQueryWriter
 	 * more flexibility (for instance joins). However if you need
 	 * the wide selector for backward compatibility; use this method
 	 * to turn OFF Narrow Field Mode by passing FALSE.
+	 * Default is TRUE.
 	 *
 	 * @param boolean $narrowField TRUE = Narrow Field FALSE = Wide Field
 	 *

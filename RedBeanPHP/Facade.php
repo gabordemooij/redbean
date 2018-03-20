@@ -215,10 +215,23 @@ class Facade
 	}
 
 	/**
-	 * Toggles Narrow Field Mode.
-	 * See documentation in QueryWriter.
+	 * Toggles 'Narrow Field Mode'.
+	 * In Narrow Field mode the queryRecord method will
+	 * narrow its selection field to
 	 *
-	 * @param boolean $mode TRUE = Narrow Field Mode
+	 * SELECT {table}.*
+	 *
+	 * instead of
+	 *
+	 * SELECT *
+	 *
+	 * This is a better way of querying because it allows
+	 * more flexibility (for instance joins). However if you need
+	 * the wide selector for backward compatibility; use this method
+	 * to turn OFF Narrow Field Mode by passing FALSE.
+	 * Default is TRUE.
+	 *
+	 * @param boolean $narrowField TRUE = Narrow Field FALSE = Wide Field
 	 *
 	 * @return void
 	 */
