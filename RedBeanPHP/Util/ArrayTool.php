@@ -29,6 +29,27 @@ class ArrayTool
 {
 	/**
 	 * Generates question mark slots for an array of values.
+	 * Given an array and an optional template string this method
+	 * will produce string containing parameter slots for use in
+	 * an SQL query string.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::genSlots( array( 'a', 'b' ) );
+	 * </code>
+	 *
+	 * The statement in the example will produce the string:
+	 * '?,?'.
+	 *
+	 * Another example, using a template string:
+	 *
+	 * <code>
+	 * R::genSlots( array('a', 'b'), ' IN( %s ) ' );
+	 * </code>
+	 *
+	 * The statement in the example will produce the string:
+	 * ' IN( ?,? ) '.
 	 *
 	 * @param array  $array    array to generate question mark slots for
 	 * @param string $template template to use
