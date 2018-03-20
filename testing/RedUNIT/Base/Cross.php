@@ -276,9 +276,9 @@ class Cross extends Base
 		$page = reset( $page->sharedPage );
 		asrt( $page->title, 'b' );
 		$tables = array_flip( R::inspect() );
-		asrt( isset( $tables['page_page'] ), true );
+		asrt( isset( $tables['page_page'] ), TRUE );
 		$columns = R::inspect( 'page_page' );
-		asrt( isset( $columns['page2_id'] ), true );
+		asrt( isset( $columns['page2_id'] ), TRUE );
 	}
 
 	/**

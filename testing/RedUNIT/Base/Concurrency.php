@@ -110,7 +110,7 @@ class Concurrency extends Base
 			R::exec('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
 			sleep(2);
 			try { R::exec('SET autocommit = 0'); }catch( \Exception $e ){}
-			R::freeze(true);
+			R::freeze(TRUE);
 			R::begin();
 			echo "CHILD: SUBTRACTING 2 START\n";
 			$i = R::loadForUpdate('inventory', 1);
@@ -136,7 +136,7 @@ class Concurrency extends Base
 			sleep(3);
 			echo "PARENT: ADDING 5 START\n"; 
 			try { R::exec('SET autocommit = 0'); }catch( \Exception $e ){}
-			R::freeze(true);
+			R::freeze( TRUE );
 			R::begin();
 			$i = R::loadForUpdate('inventory', 1);
 			print_r($i);
@@ -147,7 +147,7 @@ class Concurrency extends Base
 			$i = R::getAll('select * from inventory where id = 1');
 			print_r($i);
 			asrt((int)$i[0]['apples'], 13);
-			R::freeze(false);
+			R::freeze( FALSE );
 			try { R::exec('SET autocommit = 1'); }catch( \Exception $e ){}
 			pcntl_wait($status); 
 		}

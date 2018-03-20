@@ -2083,7 +2083,7 @@ class Facade
 	 *
 	 * @return void
 	 */
-	public static function csv( $sql = '', $bindings = array(), $columns = NULL, $path = '/tmp/redexport_%s.csv', $output = true )
+	public static function csv( $sql = '', $bindings = array(), $columns = NULL, $path = '/tmp/redexport_%s.csv', $output = TRUE )
 	{
 		$quickExport = new QuickExport( self::$toolbox );
 		$quickExport->csv( $sql, $bindings, $columns, $path, $output );

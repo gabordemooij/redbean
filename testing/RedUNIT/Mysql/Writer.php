@@ -237,14 +237,14 @@ class Writer extends \RedUNIT\Mysql
 		R::bindFunc( 'read', 'location.point', 'asText' );
 		R::bindFunc( 'write', 'location.point', 'GeomFromText' );
 		R::store(R::dispense('location'));
-		R::freeze( true );
+		R::freeze( TRUE );
 		try {
 			R::find('location');
 			fail();
 		} catch( SQL $exception ) {
 			pass();
 		}
-		R::freeze( false );
+		R::freeze( FALSE );
 		try {
 			R::find('location');
 			pass();

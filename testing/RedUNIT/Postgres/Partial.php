@@ -41,9 +41,9 @@ class Partial extends Postgres
 	 * Error in SQL query:
 	 * SQLSTATE[22P02]: Invalid text representation:
 	 * 7 ERROR: invalid input syntax for type boolean: ""
-	 * This happens, when there is a boolean field set to false and
+	 * This happens, when there is a boolean field set to FALSE and
 	 * I don't update that field. When R::store() is called,
-	 * the value isn't translated to '0' but instead stays false. PostgreSQL doesn't like this.
+	 * the value isn't translated to '0' but instead stays FALSE. PostgreSQL doesn't like this.
 	 * When setting a boolean value, it gets converted correctly,
 	 * but any unchanged values stay of type boolean.
 	 *

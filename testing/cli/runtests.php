@@ -281,12 +281,12 @@ foreach( $report as $file => $lines ) {
 	$pi = pathinfo( $file );
 
 	if ( $covFilter !== null ) {
-		if ( strpos( $file, $covFilter ) === false ) continue;
+		if ( strpos( $file, $covFilter ) === FALSE ) continue;
 	} else {
-		if ( strpos( $file, '/rb.php' ) === false) {
-			if ( strpos( $file, 'phar/' ) === false ) continue;
-			if ( strpos( $file, '.php' ) === false ) continue;
-			if ( strpos( $file, 'RedBeanPHP' ) === false ) continue;
+		if ( strpos( $file, '/rb.php' ) === FALSE ) {
+			if ( strpos( $file, 'phar/' ) === FALSE ) continue;
+			if ( strpos( $file, '.php' ) === FALSE ) continue;
+			if ( strpos( $file, 'RedBeanPHP' ) === FALSE ) continue;
 		}
 	}
 	$covLines[] = '***** File:'.$file.' ******';

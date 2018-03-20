@@ -342,7 +342,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 		} catch ( SQLException $e ) {
 			// Failure of fk-constraints is not a problem
 		}
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -360,7 +360,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 			$driverCode = $extraDriverDetails[1];
 
 			if ( $driverCode == '1205' && in_array( QueryWriter::C_SQLSTATE_LOCK_TIMEOUT, $list ) ) {
-				return true;
+				return TRUE;
 			}
 		}
 

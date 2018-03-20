@@ -414,7 +414,7 @@ interface QueryWriter
 	 *
 	 * @return void
 	 */
-	public function addFK( $type, $targetType, $property, $targetProperty, $isDep = false );
+	public function addFK( $type, $targetType, $property, $targetProperty, $isDep = FALSE );
 
 	/**
 	 * This method will add an index to a type and field with name

@@ -169,8 +169,8 @@ class Batch extends Base
 	{
 		$ids = R::storeAll( R::dispense( 'page', 2 ) );
 		$pages = R::loadAll( 'page', $ids );
-		asrt( is_array( $pages ), true );
+		asrt( is_array( $pages ), TRUE );
 		asrt( count( $pages ), 2 );
-		asrt( ( $pages[$ids[0]] instanceof OODBBean ), true );
+		asrt( ( $pages[$ids[0]] instanceof OODBBean ), TRUE );
 	}
 }

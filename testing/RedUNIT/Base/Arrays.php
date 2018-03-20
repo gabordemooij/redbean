@@ -192,7 +192,7 @@ class Arrays extends Base
 		$book['ownPageList'] = R::dispense( 'page', 3 );
 		R::store( $book );
 		$book = $book->fresh();
-		//note that isset first returns false, so you can check if a list is loaded
+		//note that isset first returns FALSE, so you can check if a list is loaded
 		asrt( isset( $book['ownPage'] ), FALSE );
 		asrt( isset( $book['ownPageList'] ), FALSE );
 		asrt( isset( $book['xownPage'] ), FALSE );
@@ -234,7 +234,7 @@ class Arrays extends Base
 		$book['sharedTag'] = R::dispense( 'tag', 2 );
 		R::store( $book );
 		$book = $book->fresh();
-		//note that isset first returns false, so you can check if a list is loaded
+		//note that isset first returns FALSE, so you can check if a list is loaded
 		asrt( isset( $book['sharedTagList'] ), FALSE );
 		asrt( isset( $book['sharedTag'] ), FALSE );
 		//count triggers load...

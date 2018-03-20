@@ -20,7 +20,7 @@ function add_writer_to_tests( $name, $dsn, $user, $pass )
 	\RedUNIT\Base::addToDriverList( $name );
 	R::addDatabase( $name, $dsn, $user, $pass );
 
-	$ini[ $name ] = true;
+	$ini[ $name ] = TRUE;
 }
 
 /**

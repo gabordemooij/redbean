@@ -336,7 +336,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				$joinInfo  = array_shift( $explosion );
 				//Dont join more than once..
 				if ( !isset( $joins[$joinInfo] ) ) {
-					$joins[ $joinInfo ] = true;
+					$joins[ $joinInfo ] = TRUE;
 					$joinSql  .= $writer->writeJoin( $type, $joinInfo, 'LEFT' );
 				}
 			}

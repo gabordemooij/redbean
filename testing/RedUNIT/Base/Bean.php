@@ -235,7 +235,7 @@ class Bean extends Base
 		$i = $i->fresh();
 		asrt( $i->customer->city->state->name, 'x' );
 		$i->status = 1;
-		R::freeze( true );
+		R::freeze( TRUE );
 		$logger = R::debug( 1, 1 );
 		//do we properly skip unmodified but tainted parent beans?
 		R::store( $i );

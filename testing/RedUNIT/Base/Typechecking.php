@@ -59,8 +59,8 @@ class Typechecking extends Base
 		$bean = R::dispense( 'bean' );
 		$bean->number   = 123;
 		$bean->float    = 12.3;
-		$bean->bool     = false;
-		$bean->bool2    = true;
+		$bean->bool     = FALSE;
+		$bean->bool2    = TRUE;
 		$bean->text     = 'abc';
 		$bean->null     = null;
 		$bean->datetime = new\DateTime( 'NOW', new\DateTimeZone( 'Europe/Amsterdam' ) );

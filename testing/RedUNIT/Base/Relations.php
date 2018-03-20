@@ -39,10 +39,10 @@ class Relations extends Base
 		$book = R::dispense( 'book' );
 		$book->author = $author;
 		$book->author->name = 'x';
-		$book->author->setMeta( 'tainted', false );
+		$book->author->setMeta( 'tainted', FALSE );
 		R::store( $book );
 		$author = $author->fresh();
-		asrt( isset( $author->name ), false );
+		asrt( isset( $author->name ), FALSE );
 	}
 
 	/**
@@ -781,7 +781,7 @@ class Relations extends Base
 		$book3 = R::load( 'book', R::store( $book3 ) );
 		asrt( count( $book3->sharedTopic ), 1 );
 		// Test performance
-		$logger = R::debug( true, 1 );
+		$logger = R::debug( TRUE, 1 );
 		$book = R::load( 'book', 1 );
 		$book->sharedTopic = array();
 		R::store( $book );

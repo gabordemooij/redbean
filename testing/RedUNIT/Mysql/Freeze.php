@@ -80,7 +80,7 @@ class Freeze extends Mysql
 		} catch ( SQL $e ) {
 			pass();
 		}
-		$logger = R::debug( true, 1 );
+		$logger = R::debug( TRUE, 1 );
 		// Now log and make sure no 'describe SQL' happens
 		$page = $redbean->dispense( "page" );
 		$page->name = "just another page that has been frozen...";

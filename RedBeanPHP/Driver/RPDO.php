@@ -218,7 +218,7 @@ class RPDO implements Driver
 	 *
 	 * @param $db_cap identifier of database capability
 	 *
-	 * @return int|false Whether the database feature is supported, false otherwise.
+	 * @return int|false Whether the database feature is supported, FALSE otherwise.
 	 **/
 	protected function hasCap( $db_cap )
 	{
@@ -227,13 +227,13 @@ class RPDO implements Driver
 		switch ( strtolower( $db_cap ) ) {
 			case 'utf8mb4':
 				//oneliner, to boost code coverage (coverage does not span versions)
-				if ( version_compare( $version, '5.5.3', '<' ) ) { return false; }
+				if ( version_compare( $version, '5.5.3', '<' ) ) { return FALSE; }
 				$client_version = $this->pdo->getAttribute(\PDO::ATTR_CLIENT_VERSION );
 				/*
 				 * libmysql has supported utf8mb4 since 5.5.3, same as the MySQL server.
 				 * mysqlnd has supported utf8mb4 since 5.0.9.
 				 */
-				if ( false !== strpos( $client_version, 'mysqlnd' ) ) {
+				if ( strpos( $client_version, 'mysqlnd' ) !== FALSE ) {
 					$client_version = preg_replace( '/^\D+([\d.]+).*/', '$1', $client_version );
 					$compare = version_compare( $client_version, '5.0.9', '>=' );
 				} else {

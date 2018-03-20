@@ -155,7 +155,7 @@ class Update extends Base
 		$account->alias( 'seller' )->ownTransaction = R::dispense( 'transaction', 10 );
 		$account->alias( 'boo' ); //try to trick me...
 		$id = R::store( $account );
-		R::freeze( true );
+		R::freeze( TRUE );
 		$account = R::load( 'user', $id );
 		asrt( count( $account->alias( 'seller' )->ownTransaction ), 10 );
 		//you cannot unset a list

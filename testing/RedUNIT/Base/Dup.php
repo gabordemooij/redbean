@@ -69,53 +69,53 @@ class Dup extends Base
 	{
 		R::nuke();
 		$book = R::dispense( 'book' );
-		$book->isCheap = true;
-		$book->hasISBNCode = false;
+		$book->isCheap = TRUE;
+		$book->hasISBNCode = FALSE;
 		$page = R::dispense('page');
-		$page->isWrittenWell = true;
-		$page->containsInterestingText = true;
+		$page->isWrittenWell = TRUE;
+		$page->containsInterestingText = TRUE;
 		$book->ownPageList[] = $page;
 		R::store( $book );
 		$book = $book->fresh();
 		$export = R::exportAll( $book );
 
-		asrt( isset( $export[0]['id'] ), true );
-		asrt( isset( $export[0]['is_cheap'] ), true );
-		asrt( isset( $export[0]['has_isbn_code'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['id'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['is_written_well'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['contains_interesting_text'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['book_id'] ), true );
+		asrt( isset( $export[0]['id'] ), TRUE );
+		asrt( isset( $export[0]['is_cheap'] ), TRUE );
+		asrt( isset( $export[0]['has_isbn_code'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['id'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['is_written_well'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['contains_interesting_text'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['book_id'] ), TRUE );
 
 		R::useExportCase( 'camel' );
 		$export = R::exportAll( $book );
-		asrt( isset( $export[0]['id'] ), true );
-		asrt( isset( $export[0]['isCheap'] ), true );
-		asrt( isset( $export[0]['hasIsbnCode'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['id'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['isWrittenWell'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['containsInterestingText'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['bookId'] ), true );
+		asrt( isset( $export[0]['id'] ), TRUE );
+		asrt( isset( $export[0]['isCheap'] ), TRUE );
+		asrt( isset( $export[0]['hasIsbnCode'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['id'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['isWrittenWell'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['containsInterestingText'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['bookId'] ), TRUE );
 
 		R::useExportCase( 'dolphin' );
 		$export = R::exportAll( $book );
-		asrt( isset( $export[0]['id'] ), true );
-		asrt( isset( $export[0]['isCheap'] ), true );
-		asrt( isset( $export[0]['hasIsbnCode'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['id'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['isWrittenWell'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['containsInterestingText'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['bookID'] ), true );
+		asrt( isset( $export[0]['id'] ), TRUE );
+		asrt( isset( $export[0]['isCheap'] ), TRUE );
+		asrt( isset( $export[0]['hasIsbnCode'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['id'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['isWrittenWell'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['containsInterestingText'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['bookID'] ), TRUE );
 
 		R::useExportCase( 'default' );
 		$export = R::exportAll( $book );
-		asrt( isset( $export[0]['id'] ), true );
-		asrt( isset( $export[0]['is_cheap'] ), true );
-		asrt( isset( $export[0]['has_isbn_code'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['id'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['is_written_well'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['contains_interesting_text'] ), true );
-		asrt( isset( $export[0]['ownPage']['0']['book_id'] ), true );
+		asrt( isset( $export[0]['id'] ), TRUE );
+		asrt( isset( $export[0]['is_cheap'] ), TRUE );
+		asrt( isset( $export[0]['has_isbn_code'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['id'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['is_written_well'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['contains_interesting_text'] ), TRUE );
+		asrt( isset( $export[0]['ownPage']['0']['book_id'] ), TRUE );
 
 		try {
 			R::useExportCase( 'invalid' );

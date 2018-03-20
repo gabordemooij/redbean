@@ -94,7 +94,7 @@ class QuickExport
 	 *
 	 * @return void
 	 */
-	public function csv( $sql = '', $bindings = array(), $columns = NULL, $path = '/tmp/redexport_%s.csv', $output = true, $options = array(',','"','\\') )
+	public function csv( $sql = '', $bindings = array(), $columns = NULL, $path = '/tmp/redexport_%s.csv', $output = TRUE, $options = array(',','"','\\') )
 	{
 		list( $delimiter, $enclosure, $escapeChar ) = $options;
 		$path = sprintf( $path, date('Ymd_his') );
@@ -110,7 +110,7 @@ class QuickExport
 			$out = self::operation('header',"Pragma: public");
 			$out .= self::operation('header',"Expires: 0");
 			$out .= self::operation('header',"Cache-Control: must-revalidate, post-check=0, pre-check=0");
-			$out .= self::operation('header',"Cache-Control: private",false);
+			$out .= self::operation('header',"Cache-Control: private", FALSE );
 			$out .= self::operation('header',"Content-Type: text/csv");
 			$out .= self::operation('header',"Content-Disposition: attachment; filename={$file}" );
 			$out .= self::operation('header',"Content-Transfer-Encoding: binary");

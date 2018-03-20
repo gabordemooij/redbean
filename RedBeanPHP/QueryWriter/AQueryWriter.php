@@ -41,12 +41,12 @@ abstract class AQueryWriter
 	/**
 	 * @var boolean
 	 */
-	private static $flagSQLFilterSafeMode = false;
+	private static $flagSQLFilterSafeMode = FALSE;
 
 	/**
 	 * @var boolean
 	 */
-	private static $flagNarrowFieldMode = true;
+	private static $flagNarrowFieldMode = TRUE;
 
 	/**
 	 * @var boolean
@@ -238,7 +238,7 @@ abstract class AQueryWriter
 	 *
 	 * @return void
 	 */
-	public static function setSQLFilters( $sqlFilters, $safeMode = false )
+	public static function setSQLFilters( $sqlFilters, $safeMode = FALSE )
 	{
 		self::$flagSQLFilterSafeMode = (boolean) $safeMode;
 		self::$sqlFilters = $sqlFilters;

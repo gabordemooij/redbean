@@ -217,7 +217,7 @@ abstract class Repository
 			$alias = $bean->getMeta( 'sys.alias.' . $trash->getMeta( 'type' ) );
 			if ( $alias ) $myFieldLink = $alias . '_id';
 
-			if ( $trash->getMeta( 'sys.garbage' ) === true ) {
+			if ( $trash->getMeta( 'sys.garbage' ) === TRUE ) {
 				$this->trash( $trash );
 			} else {
 				$trash->$myFieldLink = NULL;

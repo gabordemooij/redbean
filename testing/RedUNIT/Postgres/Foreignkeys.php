@@ -31,7 +31,7 @@ class Foreignkeys extends Postgres
 		testpack( 'Test Postgres Foreign keys' );
 		$a = R::getWriter()->addFK( 'a', 'b', 'c', 'd' ); //must fail
 		pass(); //survive without exception
-		asrt( $a, FALSE ); //must return false
+		asrt( $a, FALSE ); //must return FALSE
 		$book  = R::dispense( 'book' );
 		$page  = R::dispense( 'page' );
 		$cover = R::dispense( 'cover' );

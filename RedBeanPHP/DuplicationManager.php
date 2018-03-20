@@ -265,7 +265,7 @@ class DuplicationManager
 	 *
 	 * @return array
 	 */
-	public function camelfy( $array, $dolphinMode = false ) {
+	public function camelfy( $array, $dolphinMode = FALSE ) {
 		$newArray = array();
 		foreach( $array as $key => $element ) {
 			$newKey = preg_replace_callback( '/_(\w)/', function( &$matches ){
@@ -458,7 +458,7 @@ class DuplicationManager
 		}
 
 		if ( $caseStyle === 'camel' ) $array = $this->camelfy( $array );
-		if ( $caseStyle === 'dolphin' ) $array = $this->camelfy( $array, true );
+		if ( $caseStyle === 'dolphin' ) $array = $this->camelfy( $array, TRUE );
 
 		return $array;
 	}

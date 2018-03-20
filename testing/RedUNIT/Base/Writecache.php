@@ -88,7 +88,7 @@ class Writecache extends Base
 	public function testCachingAndFetchAs()
 	{
 		testpack( 'Testing whether you can cache multiple records of the same type' );
-		R::debug( true, 1 );
+		R::debug( TRUE, 1 );
 		$logger = R::getDatabaseAdapter()->getDatabase()->getLogger();
 		R::nuke();
 		$coauthor1 = R::dispense( 'author' );
@@ -373,7 +373,7 @@ class Writecache extends Base
 	{
 		testpack( 'Test cache flush (explicit)' );
 		R::setNarrowFieldMode( FALSE );
-		R::debug( true, 1 );
+		R::debug( TRUE, 1 );
 		$logger = R::getDatabaseAdapter()->getDatabase()->getLogger();
 		$bean = R::dispense( 'bean' );
 		$bean->title = 'abc';
