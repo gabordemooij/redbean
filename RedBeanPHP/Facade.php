@@ -1494,7 +1494,15 @@ class Facade
 	/**
 	 * Flattens a multi dimensional bindings array for use with genSlots().
 	 *
-	 * @param array $array array to flatten
+	 * Usage:
+	 *
+	 * <code>
+	 * R::flat( array( 'a', array( 'b' ), 'c' ) );
+	 * </code>
+	 *
+	 * produces an array like: [ 'a', 'b', 'c' ]
+	 *
+	 * @param array $array  array to flatten
 	 * @param array $result result array parameter (for recursion)
 	 *
 	 * @return array
