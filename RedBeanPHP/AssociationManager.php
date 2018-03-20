@@ -9,7 +9,10 @@ use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
  * Association Manager.
- * Manages simple bean associations.
+ * The association manager can be used to create and manage
+ * many-to-many relations (for example sharedLists). In a many-to-many relation,
+ * one bean can be associated with many other beans, while each of those beans
+ * can also be related to multiple beans.
  *
  * @file    RedBeanPHP/AssociationManager.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
@@ -131,9 +134,14 @@ class AssociationManager extends Observable
 	}
 
 	/**
-	 * Constructor
+	 * Constructor, creates a new instance of the Association Manager.
+	 * The association manager can be used to create and manage
+	 * many-to-many relations (for example sharedLists). In a many-to-many relation,
+	 * one bean can be associated with many other beans, while each of those beans
+	 * can also be related to multiple beans. To create an Association Manager
+	 * instance you'll need to pass a ToolBox object.
 	 *
-	 * @param ToolBox $tools toolbox
+	 * @param ToolBox $tools toolbox supplying core RedBeanPHP objects
 	 */
 	public function __construct( ToolBox $tools )
 	{
