@@ -192,8 +192,22 @@ class Facade
 
 	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
-	 * RedBean. The Setup() method can be called without any arguments, in this case it will
+	 * RedBeanPHP. The Setup() method can be called without any arguments, in this case it will
 	 * try to create a SQLite database in /tmp called red.db (this only works on UNIX-like systems).
+	 *
+	 * Usage:
+	 *
+	 * R::setup( 'mysql:host=localhost;dbname=mydatabase', 'dba', 'dbapassword' );
+	 *
+	 * You can replace 'mysql:' with the name of the database you want to use.
+	 * Possible values are:
+	 *
+	 * - pgsql  (PostgreSQL database)
+	 * - sqlite (SQLite database)
+	 * - mysql  (MySQL database)
+	 * - mysql  (also for Maria database)
+	 * - sqlsrv (MS SQL Server - community supported experimental driver)
+	 * - CUBRID (CUBRID driver - basic support provided by Plugin)
 	 *
 	 * @param string  $dsn      Database connection string
 	 * @param string  $username Username for database
