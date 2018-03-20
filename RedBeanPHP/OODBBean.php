@@ -490,7 +490,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * This method is meant for PHP and allows you to access beans as if
 	 * they were arrays, i.e. using array notation:
 	 *
+	 * <code>
 	 * $bean[$key] = $value;
+	 * </code>
 	 *
 	 * Note that not all PHP functions work with the array interface.
 	 *
