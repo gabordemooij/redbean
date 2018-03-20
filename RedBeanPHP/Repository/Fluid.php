@@ -93,11 +93,13 @@ class Fluid extends Repository
 	 *
 	 * @return void
 	 */
-	private function modifySchema( OODBBean $bean, $property, $value )
+	private function modifySchema( OODBBean $bean, $property, $value, &$columns = NULL )
 	{
 		$doFKStuff = FALSE;
 		$table   = $bean->getMeta( 'type' );
-		$columns = $this->writer->getColumns( $table );
+		if ($columns === NULL) {
+			$columns = $this->writer->getColumns( $table );
+		}
 		$columnNoQ = $this->writer->esc( $property, TRUE );
 		if ( !$this->oodb->isChilled( $bean->getMeta( 'type' ) ) ) {
 			if ( $bean->getMeta( "cast.$property", -1 ) !== -1 ) { //check for explicitly specified types
@@ -211,10 +213,11 @@ class Fluid extends Repository
 				$bean->setMeta( 'changelist', array() );
 			}
 
+			$columnCache = NULL;
 			foreach ( $bean as $property => $value ) {
 				if ( $partial && !in_array( $property, $mask ) ) continue;
 				if ( $property !== 'id' ) {
-					$this->modifySchema( $bean, $property, $value );
+					$this->modifySchema( $bean, $property, $value, $columnCache );
 				}
 				if ( $property !== 'id' ) {
 					$updateValues[] = array( 'property' => $property, 'value' => $value );
