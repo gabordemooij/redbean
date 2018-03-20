@@ -611,7 +611,20 @@ class Facade
 
 	/**
 	 * Dispenses a new RedBean OODB Bean for use with
-	 * the rest of the methods.
+	 * the rest of the methods. RedBeanPHP thinks in beans, the bean is the
+	 * primary way to interact with RedBeanPHP and the database managed by
+	 * RedBeanPHP. To load, store and delete data from the database using RedBeanPHP
+	 * you exchange these RedBeanPHP OODB Beans. The only exception to this rule
+	 * are the raw query methods like R::getCell() or R::exec() and so on.
+	 * The dispense method is the 'preferred way' to create a new bean.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $book = R::dispense( 'book' );
+	 * $book->title = 'My Book';
+	 * R::store( $book );
+	 * </code>
 	 *
 	 * @param string|array $typeOrBeanArray   type or bean array to import
 	 * @param integer      $num               number of beans to dispense
