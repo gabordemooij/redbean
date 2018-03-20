@@ -568,6 +568,16 @@ class Facade
 	/**
 	 * Same as load, but selects the bean for update, thus locking the bean.
 	 * This equals an SQL query like 'SELECT ... FROM ... FOR UPDATE'.
+	 * Use this method if you want to load a bean you intend to UPDATE.
+	 * This method should be used to 'LOCK a bean'.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $bean = R::loadForUpdate( 'bean', $id );
+	 * ...update...
+	 * R::store( $bean );
+	 * </code>
 	 *
 	 * @param string  $type    type of bean you want to load
 	 * @param integer $id      ID of the bean you want to load
