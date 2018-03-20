@@ -197,7 +197,9 @@ class Facade
 	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * R::setup( 'mysql:host=localhost;dbname=mydatabase', 'dba', 'dbapassword' );
+	 * </code>
 	 *
 	 * You can replace 'mysql:' with the name of the database you want to use.
 	 * Possible values are:
@@ -233,11 +235,15 @@ class Facade
 	 * In Narrow Field mode the queryRecord method will
 	 * narrow its selection field to
 	 *
+	 * <code>
 	 * SELECT {table}.*
+	 * </code>
 	 *
 	 * instead of
 	 *
+	 * <code>
 	 * SELECT *
+	 * </code>
 	 *
 	 * This is a better way of querying because it allows
 	 * more flexibility (for instance joins). However if you need
