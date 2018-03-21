@@ -1267,6 +1267,18 @@ class Facade
 	 * Removes all specified tags from the bean. The tags specified in
 	 * the second parameter will no longer be associated with the bean.
 	 *
+	 * Tag list can be either an array with tag names or a comma separated list
+	 * of tag names.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::untag( $blog, 'smart,interesting' );
+	 * </code>
+	 *
+	 * In the example above, the $blog bean will no longer
+	 * be associated with the tags 'smart' and 'interesting'.
+	 *
 	 * @param  OODBBean $bean    tagged bean
 	 * @param  array    $tagList list of tags (names)
 	 *
