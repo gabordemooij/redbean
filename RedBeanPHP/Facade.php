@@ -520,10 +520,16 @@ class Facade
 	/**
 	 * Loads multiple types of beans with the same ID.
 	 * This might look like a strange method, however it can be useful
-	 * for loading a one-to-one relation.
+	 * for loading a one-to-one relation. In a typical 1-1 relation,
+	 * you have two records sharing the same primary key.
+	 * RedBeanPHP has only limited support for 1-1 relations.
+	 * In general it is recommended to use 1-N for this.
 	 *
 	 * Usage:
+	 *
+	 * <code>
 	 * list( $author, $bio ) = R::loadMulti( 'author, bio', $id );
+	 * </code>
 	 *
 	 * @param string|array $types the set of types to load at once
 	 * @param mixed        $id    the common ID
