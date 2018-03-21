@@ -2415,7 +2415,8 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function diff( $bean, $other, $filters = array( 'created', 'modified' ), $pattern = '%s.%s.%s' ) {
+	public static function diff( $bean, $other, $filters = array( 'created', 'modified' ), $pattern = '%s.%s.%s' )
+	{
 		$diff = new Diff( self::$toolbox );
 		return $diff->diff( $bean, $other, $filters, $pattern );
 	}
