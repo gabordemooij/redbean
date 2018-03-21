@@ -1336,13 +1336,31 @@ class Facade
 	}
 
 	/**
-	 * Part of RedBeanPHP Tagging API.
-	 * Returns all beans that have been tagged with one of the tags given.
+	 * Returns all beans that have been tagged with one or more
+	 * of the specified tags.
 	 *
-	 * @param string $beanType type of bean you are looking for
-	 * @param array  $tagList  list of tags to match
-	 * @param string $sql      additional SQL query snippet
-	 * @param array  $bindings a list of values to bind to the query parameters
+	 * Tag list can be either an array with tag names or a comma separated list
+	 * of tag names.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $watchList = R::tagged(
+	 *   'movie',
+	 *   'horror,gothic',
+	 *   ' ORDER BY movie.title DESC LIMIT ?',
+	 *   [ 10 ]
+	 * );
+	 * </code>
+	 *
+	 * The example uses R::tagged() to find all movies that have been
+	 * tagged as 'horror' or 'gothic', order them by title and limit
+	 * the number of movies to be returned to 10.
+	 *
+	 * @param string       $beanType type of bean you are looking for
+	 * @param array|string $tagList  list of tags to match
+	 * @param string       $sql      additional SQL (use only for pagination)
+	 * @param array        $bindings bindings
 	 *
 	 * @return array
 	 */

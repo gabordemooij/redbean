@@ -245,6 +245,21 @@ class TagManager
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $watchList = R::tagged(
+	 *   'movie',
+	 *   'horror,gothic',
+	 *   ' ORDER BY movie.title DESC LIMIT ?',
+	 *   [ 10 ]
+	 * );
+	 * </code>
+	 *
+	 * The example uses R::tagged() to find all movies that have been
+	 * tagged as 'horror' or 'gothic', order them by title and limit
+	 * the number of movies to be returned to 10.
+	 *
 	 * @param string       $beanType type of bean you are looking for
 	 * @param array|string $tagList  list of tags to match
 	 * @param string       $sql      additional SQL (use only for pagination)
