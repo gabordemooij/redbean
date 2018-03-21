@@ -153,6 +153,7 @@ class TagManager
 	}
 
 	/**
+	 * Part of RedBeanPHP Tagging API.
 	 * Tags a bean or returns tags associated with a bean.
 	 * If $tagList is NULL or omitted this method will return a
 	 * comma separated list of tags associated with the bean provided.
@@ -160,13 +161,21 @@ class TagManager
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
 	 *
-	 * Tag list can be either an array with tag names or a comma separated list
-	 * of tag names.
+	 * Usage:
 	 *
-	 * @param OODBBean     $bean    bean to be tagged
-	 * @param array|string $tagList a list of tags
+	 * <code>
+	 * R::tag( $meal, "TexMex,Mexican" );
+	 * $tags = R::tag( $meal );
+	 * </code>
 	 *
-	 * @return array
+	 * The first line in the example above will tag the $meal
+	 * as 'TexMex' and 'Mexican Cuisine'. The second line will
+	 * retrieve all tags attached to the meal object.
+	 *
+	 * @param OODBBean $bean    bean to tag
+	 * @param mixed    $tagList tags to attach to the specified bean
+	 *
+	 * @return string
 	 */
 	public function tag( OODBBean $bean, $tagList = NULL )
 	{

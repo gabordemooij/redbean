@@ -1288,6 +1288,17 @@ class Facade
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::tag( $meal, "TexMex,Mexican" );
+	 * $tags = R::tag( $meal );
+	 * </code>
+	 *
+	 * The first line in the example above will tag the $meal
+	 * as 'TexMex' and 'Mexican Cuisine'. The second line will
+	 * retrieve all tags attached to the meal object.
+	 *
 	 * @param OODBBean $bean    bean to tag
 	 * @param mixed    $tagList tags to attach to the specified bean
 	 *
