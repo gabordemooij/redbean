@@ -116,6 +116,12 @@ class Productivity extends Base
 		asrt( $str,
 		"<option value=\"B\">BLUE</option>\n<option value=\"R\">RED</option>"
 		);
+		$str = R::look( 'SELECT * FROM color WHERE value != ? ORDER BY value ASC', array( 'g' ),  array( 'value', 'name' ),
+			'<option value="%s">%s</option>', 'strtoupper', "\n"
+		);
+		asrt( $str,
+		"<option value=\"B\">BLUE</option>\n<option value=\"R\">RED</option>"
+		);
 	}
 
 	/**
