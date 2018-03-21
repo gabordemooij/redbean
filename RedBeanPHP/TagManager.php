@@ -277,9 +277,25 @@ class TagManager
 
 	/**
 	 * Returns all beans that have been tagged with ALL of the tags given.
+	 * This method works the same as R::tagged() except that this method only returns
+	 * beans that have been tagged with all the specified labels.
 	 *
 	 * Tag list can be either an array with tag names or a comma separated list
 	 * of tag names.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $watchList = R::taggedAll(
+	 *    'movie',
+	 *    [ 'gothic', 'short' ],
+	 *    ' ORDER BY movie.id DESC LIMIT ? ',
+	 *    [ 4 ]
+	 * );
+	 * </code>
+	 *
+	 * The example above returns at most 4 movies (due to the LIMIT clause in the SQL
+	 * Query Snippet) that have been tagged as BOTH 'short' AND 'gothic'.
 	 *
 	 * @param string       $beanType type of bean you are looking for
 	 * @param array|string $tagList  list of tags to match
