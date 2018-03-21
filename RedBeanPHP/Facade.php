@@ -173,9 +173,11 @@ class Facade
 	}
 
 	/**
-	 * Tests the connection.
+	 * Tests the database connection.
 	 * Returns TRUE if connection has been established and
-	 * FALSE otherwise.
+	 * FALSE otherwise. Suppresses any warnings that may
+	 * occur during the testing process and catches all
+	 * exceptions that might be thrown during the test.
 	 *
 	 * @return boolean
 	 */
