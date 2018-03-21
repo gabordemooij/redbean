@@ -198,16 +198,23 @@ class TagManager
 	}
 
 	/**
+	 * Part of RedBeanPHP Tagging API.
 	 * Adds tags to a bean.
 	 * If $tagList is a comma separated list of tags all tags will
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
 	 *
-	 * Tag list can be either an array with tag names or a comma separated list
-	 * of tag names.
+	 * Usage:
 	 *
-	 * @param OODBBean     $bean    bean to add tags to
-	 * @param array|string $tagList list of tags to add to bean
+	 * <code>
+	 * R::addTags( $blog, ["halloween"] );
+	 * </code>
+	 *
+	 * The example adds the tag 'halloween' to the $blog
+	 * bean.
+	 *
+	 * @param OODBBean $bean    bean to tag
+	 * @param array    $tagList list of tags to add to bean
 	 *
 	 * @return void
 	 */

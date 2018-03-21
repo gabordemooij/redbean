@@ -1316,6 +1316,15 @@ class Facade
 	 * be associated with the bean.
 	 * You may also pass an array instead of a string.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::addTags( $blog, ["halloween"] );
+	 * </code>
+	 *
+	 * The example adds the tag 'halloween' to the $blog
+	 * bean.
+	 *
 	 * @param OODBBean $bean    bean to tag
 	 * @param array    $tagList list of tags to add to bean
 	 *
