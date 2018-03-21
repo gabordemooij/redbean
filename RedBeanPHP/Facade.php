@@ -2150,7 +2150,25 @@ class Facade
 	/**
 	 * Starts logging queries.
 	 * Use this method to start logging SQL queries being
-	 * executed by the adapter.
+	 * executed by the adapter. Logging queries will not
+	 * print them on the screen. Use R::getLogs() to
+	 * retrieve the logs.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::startLogging();
+	 * R::store( R::dispense( 'book' ) );
+	 * R::find('book', 'id > ?',[0]);
+	 * $logs = R::getLogs();
+	 * $count = count( $logs );
+	 * print_r( $logs );
+	 * R::stopLogging();
+	 * </code>
+	 *
+	 * In the example above we start a logging session during
+	 * which we store an empty bean of type book. To inspect the
+	 * logs we invoke R::getLogs() after stopping the logging.
 	 *
 	 * @note you cannot use R::debug and R::startLogging
 	 * at the same time because R::debug is essentially a
@@ -2164,7 +2182,34 @@ class Facade
 	}
 
 	/**
-	 * Stops logging, comfortable method to stop logging of queries.
+	 * Stops logging and flushes the logs,
+	 * convient method to stop logging of queries.
+	 * Use this method to stop logging SQL queries being
+	 * executed by the adapter. Logging queries will not
+	 * print them on the screen. Use R::getLogs() to
+	 * retrieve the logs.
+	 *
+	 * <code>
+	 * R::startLogging();
+	 * R::store( R::dispense( 'book' ) );
+	 * R::find('book', 'id > ?',[0]);
+	 * $logs = R::getLogs();
+	 * $count = count( $logs );
+	 * print_r( $logs );
+	 * R::stopLogging();
+	 * </code>
+	 *
+	 * In the example above we start a logging session during
+	 * which we store an empty bean of type book. To inspect the
+	 * logs we invoke R::getLogs() after stopping the logging.
+	 *
+	 * @note you cannot use R::debug and R::startLogging
+	 * at the same time because R::debug is essentially a
+	 * special kind of logging.
+	 *
+	 * @note by stopping the logging you also flush the logs.
+	 * Therefore, only stop logging AFTER you have obtained the
+	 * query logs using R::getLogs()
 	 *
 	 * @return void
 	 */
@@ -2175,6 +2220,43 @@ class Facade
 
 	/**
 	 * Returns the log entries written after the startLogging.
+	 *
+	 * Use this method to obtain the query logs gathered
+	 * by the logging mechanisms.
+	 * Logging queries will not
+	 * print them on the screen. Use R::getLogs() to
+	 * retrieve the logs.
+	 *
+	 * <code>
+	 * R::startLogging();
+	 * R::store( R::dispense( 'book' ) );
+	 * R::find('book', 'id > ?',[0]);
+	 * $logs = R::getLogs();
+	 * $count = count( $logs );
+	 * print_r( $logs );
+	 * R::stopLogging();
+	 * </code>
+	 *
+	 * In the example above we start a logging session during
+	 * which we store an empty bean of type book. To inspect the
+	 * logs we invoke R::getLogs() after stopping the logging.
+	 *
+	 * The logs may look like:
+	 *
+	 * [1] => SELECT `book`.*  FROM `book`  WHERE id > ?  -- keep-cache
+	 * [2] => array ( 0 => 0, )
+	 * [3] => resultset: 1 rows
+	 *
+	 * Basically, element in the array is a log entry.
+	 * Parameter bindings are  represented as nested arrays (see 2).
+	 *
+	 * @note you cannot use R::debug and R::startLogging
+	 * at the same time because R::debug is essentially a
+	 * special kind of logging.
+	 *
+	 * @note by stopping the logging you also flush the logs.
+	 * Therefore, only stop logging AFTER you have obtained the
+	 * query logs using R::getLogs()
 	 *
 	 * @return array
 	 */
