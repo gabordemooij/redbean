@@ -1244,7 +1244,6 @@ class Facade
 	}
 
 	/**
-	 * Part of RedBeanPHP Tagging API.
 	 * Tests whether a bean has been associated with one ore more
 	 * of the listed tags. If the third parameter is TRUE this method
 	 * will return TRUE only if all tags that have been specified are indeed
@@ -1265,7 +1264,6 @@ class Facade
 	}
 
 	/**
-	 * Part of RedBeanPHP Tagging API.
 	 * Removes all specified tags from the bean. The tags specified in
 	 * the second parameter will no longer be associated with the bean.
 	 *
@@ -1280,7 +1278,6 @@ class Facade
 	}
 
 	/**
-	 * Part of RedBeanPHP Tagging API.
 	 * Tags a bean or returns tags associated with a bean.
 	 * If $tagList is NULL or omitted this method will return a
 	 * comma separated list of tags associated with the bean provided.
@@ -1310,7 +1307,6 @@ class Facade
 	}
 
 	/**
-	 * Part of RedBeanPHP Tagging API.
 	 * Adds tags to a bean.
 	 * If $tagList is a comma separated list of tags all tags will
 	 * be associated with the bean.
