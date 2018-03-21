@@ -103,7 +103,7 @@ class Finder
 	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $bindings values array of values to be bound to parameters in query
 	 *
-	 * @return OODBBean
+	 * @return OODBBean|NULL
 	 */
 	public function findOne( $type, $sql = NULL, $bindings = array() )
 	{
