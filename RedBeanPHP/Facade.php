@@ -2176,9 +2176,20 @@ class Facade
 	}
 
 	/**
-	 * Resets the Query counter.
+	 * Resets the query counter.
+	 * The query counter can be used to monitor the number
+	 * of database queries that have
+	 * been processed according to the database driver. You can use this
+	 * to monitor the number of queries required to render a page.
 	 *
-	 * @return integer
+	 * Usage:
+	 *
+	 * <code>
+	 * R::resetQueryCount();
+	 * echo R::getQueryCount() . ' queries processed.';
+	 * </code>
+	 *
+	 * @return void
 	 */
 	public static function resetQueryCount()
 	{
