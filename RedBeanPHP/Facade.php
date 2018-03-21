@@ -1252,9 +1252,23 @@ class Facade
 	 * method will return TRUE if one of the tags matches, FALSE if none
 	 * match.
 	 *
-	 * @param  OODBBean $bean bean to check for tags
-	 * @param  array    $tags list of tags
-	 * @param  boolean  $all  whether they must all match or just some
+	 * Tag list can be either an array with tag names or a comma separated list
+	 * of tag names.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::hasTag( $blog, 'horror,movie', TRUE );
+	 * </code>
+	 *
+	 * The example above returns TRUE if the $blog bean has been tagged
+	 * as BOTH horror and movie. If the post has only been tagged as 'movie'
+	 * or 'horror' this operation will return FALSE because the third parameter
+	 * has been set to TRUE.
+	 *
+	 * @param  OODBBean     $bean bean to check for tags
+	 * @param  array|string $tags list of tags
+	 * @param  boolean      $all  whether they must all match or just some
 	 *
 	 * @return boolean
 	 */
