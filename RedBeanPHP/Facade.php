@@ -1541,6 +1541,27 @@ class Facade
 	 * Facade Convience method for adapter transaction system.
 	 * Begins a transaction.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::begin();
+	 * try {
+	 * 	$bean1 = R::dispense( 'bean' );
+	 * 	R::store( $bean1 );
+	 * 	$bean2 = R::dispense( 'bean' );
+	 * 	R::store( $bean2 );
+	 *  R::commit();
+	 * } catch( \Exception $e ) {
+	 *  R::rollback();
+	 * }
+	 * </code>
+	 *
+	 * The example above illustrates how transactions in RedBeanPHP are used.
+	 * In this example 2 beans are stored or nothing is stored at all.
+	 * It's not possible for this piece of code to store only half of the beans.
+	 * If an exception occurs, the transaction gets rolled back and the database
+	 * will be left 'untouched'.
+	 *
 	 * @return bool
 	 */
 	public static function begin()
@@ -1554,6 +1575,27 @@ class Facade
 	 * Facade Convience method for adapter transaction system.
 	 * Commits a transaction.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::begin();
+	 * try {
+	 * 	$bean1 = R::dispense( 'bean' );
+	 * 	R::store( $bean1 );
+	 * 	$bean2 = R::dispense( 'bean' );
+	 * 	R::store( $bean2 );
+	 *  R::commit();
+	 * } catch( \Exception $e ) {
+	 *  R::rollback();
+	 * }
+	 * </code>
+	 *
+	 * The example above illustrates how transactions in RedBeanPHP are used.
+	 * In this example 2 beans are stored or nothing is stored at all.
+	 * It's not possible for this piece of code to store only half of the beans.
+	 * If an exception occurs, the transaction gets rolled back and the database
+	 * will be left 'untouched'.
+	 *
 	 * @return bool
 	 */
 	public static function commit()
@@ -1566,6 +1608,27 @@ class Facade
 	/**
 	 * Facade Convience method for adapter transaction system.
 	 * Rolls back a transaction.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::begin();
+	 * try {
+	 * 	$bean1 = R::dispense( 'bean' );
+	 * 	R::store( $bean1 );
+	 * 	$bean2 = R::dispense( 'bean' );
+	 * 	R::store( $bean2 );
+	 *  R::commit();
+	 * } catch( \Exception $e ) {
+	 *  R::rollback();
+	 * }
+	 * </code>
+	 *
+	 * The example above illustrates how transactions in RedBeanPHP are used.
+	 * In this example 2 beans are stored or nothing is stored at all.
+	 * It's not possible for this piece of code to store only half of the beans.
+	 * If an exception occurs, the transaction gets rolled back and the database
+	 * will be left 'untouched'.
 	 *
 	 * @return bool
 	 */
