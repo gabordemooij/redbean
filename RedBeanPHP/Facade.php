@@ -1546,10 +1546,10 @@ class Facade
 	 * <code>
 	 * R::begin();
 	 * try {
-	 * 	$bean1 = R::dispense( 'bean' );
-	 * 	R::store( $bean1 );
-	 * 	$bean2 = R::dispense( 'bean' );
-	 * 	R::store( $bean2 );
+	 *  $bean1 = R::dispense( 'bean' );
+	 *  R::store( $bean1 );
+	 *  $bean2 = R::dispense( 'bean' );
+	 *  R::store( $bean2 );
 	 *  R::commit();
 	 * } catch( \Exception $e ) {
 	 *  R::rollback();
@@ -1580,10 +1580,10 @@ class Facade
 	 * <code>
 	 * R::begin();
 	 * try {
-	 * 	$bean1 = R::dispense( 'bean' );
-	 * 	R::store( $bean1 );
-	 * 	$bean2 = R::dispense( 'bean' );
-	 * 	R::store( $bean2 );
+	 *  $bean1 = R::dispense( 'bean' );
+	 *  R::store( $bean1 );
+	 *  $bean2 = R::dispense( 'bean' );
+	 *  R::store( $bean2 );
 	 *  R::commit();
 	 * } catch( \Exception $e ) {
 	 *  R::rollback();
@@ -1614,10 +1614,10 @@ class Facade
 	 * <code>
 	 * R::begin();
 	 * try {
-	 * 	$bean1 = R::dispense( 'bean' );
-	 * 	R::store( $bean1 );
-	 * 	$bean2 = R::dispense( 'bean' );
-	 * 	R::store( $bean2 );
+	 *  $bean1 = R::dispense( 'bean' );
+	 *  R::store( $bean1 );
+	 *  $bean2 = R::dispense( 'bean' );
+	 *  R::store( $bean2 );
 	 *  R::commit();
 	 * } catch( \Exception $e ) {
 	 *  R::rollback();
