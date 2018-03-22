@@ -494,6 +494,22 @@ class Facade
 	 * The return value is an integer if possible. If it is not possible to
 	 * represent the value as an integer a string will be returned.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $post = R::dispense('post');
+	 * $post->title = 'my post';
+	 * $id = R::store( $post );
+	 * $post = R::load( 'post', $id );
+	 * R::trash( $post );
+	 * </code>
+	 *
+	 * In the example above, we create a new bean of type 'post'.
+	 * We then set the title of the bean to 'my post' and we
+	 * store the bean. The store() method will return the primary
+	 * key ID $id assigned by the database. We can now use this
+	 * ID to load the bean from the database again and delete it.
+	 *
 	 * @param OODBBean|SimpleModel $bean bean to store
 	 *
 	 * @return integer|string
@@ -560,6 +576,22 @@ class Facade
 	 * If the bean cannot be found in the database a new bean of
 	 * the specified type will be generated and returned.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $post = R::dispense('post');
+	 * $post->title = 'my post';
+	 * $id = R::store( $post );
+	 * $post = R::load( 'post', $id );
+	 * R::trash( $post );
+	 * </code>
+	 *
+	 * In the example above, we create a new bean of type 'post'.
+	 * We then set the title of the bean to 'my post' and we
+	 * store the bean. The store() method will return the primary
+	 * key ID $id assigned by the database. We can now use this
+	 * ID to load the bean from the database again and delete it.
+	 *
 	 * @param string  $type    type of bean you want to load
 	 * @param integer $id      ID of the bean you want to load
 	 * @param string  $snippet string to use after select  (optional)
@@ -605,6 +637,22 @@ class Facade
 	 * This facade method also accepts a type-id combination,
 	 * in the latter case this method will attempt to load the specified bean
 	 * and THEN trash it.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $post = R::dispense('post');
+	 * $post->title = 'my post';
+	 * $id = R::store( $post );
+	 * $post = R::load( 'post', $id );
+	 * R::trash( $post );
+	 * </code>
+	 *
+	 * In the example above, we create a new bean of type 'post'.
+	 * We then set the title of the bean to 'my post' and we
+	 * store the bean. The store() method will return the primary
+	 * key ID $id assigned by the database. We can now use this
+	 * ID to load the bean from the database again and delete it.
 	 *
 	 * @param string|OODBBean|SimpleModel $beanOrType bean you want to remove from database
 	 * @param integer                     $id         ID if the bean to trash (optional, type-id variant only)
