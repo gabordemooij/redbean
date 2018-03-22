@@ -50,6 +50,21 @@ class ToolBox
 	 * the adapter, the query writer and the core functionality of RedBeanPHP in
 	 * OODB.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $toolbox = new ToolBox( $oodb, $adapter, $writer );
+	 * $plugin  = new MyPlugin( $toolbox );
+	 * </code>
+	 *
+	 * The example above illustrates how the toolbox is used.
+	 * The core objects are passed to the ToolBox constructor to
+	 * assemble a toolbox instance. The toolbox is then passed to
+	 * the plugin, helper or manager object. Instances of
+	 * TagManager, AssociationManager and so on are examples of
+	 * this, they all require a toolbox. The toolbox can also
+	 * be obtained from the facade using: R::getToolBox();
+	 *
 	 * @param OODB        $oodb    Object Database, OODB
 	 * @param DBAdapter   $adapter Database Adapter
 	 * @param QueryWriter $writer  Query Writer
@@ -67,6 +82,23 @@ class ToolBox
 	 * The Query Writer is responsible for building the queries for a
 	 * specific database and executing them through the adapter.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $toolbox = R::getToolBox();
+	 * $redbean = $toolbox->getRedBean();
+	 * $adapter = $toolbox->getDatabaseAdapter();
+	 * $writer  = $toolbox->getWriter();
+	 * </code>
+	 *
+	 * The example above illustrates how to obtain the core objects
+	 * from a toolbox instance. If you are working with the R-object
+	 * only, the following shortcuts exist as well:
+	 *
+	 * - R::getRedBean()
+	 * - R::getDatabaseAdapter()
+	 * - R::getWriter()
+	 *
 	 * @return QueryWriter
 	 */
 	public function getWriter()
@@ -80,6 +112,23 @@ class ToolBox
 	 * single beans. Other components rely
 	 * on OODB for their basic functionality.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $toolbox = R::getToolBox();
+	 * $redbean = $toolbox->getRedBean();
+	 * $adapter = $toolbox->getDatabaseAdapter();
+	 * $writer  = $toolbox->getWriter();
+	 * </code>
+	 *
+	 * The example above illustrates how to obtain the core objects
+	 * from a toolbox instance. If you are working with the R-object
+	 * only, the following shortcuts exist as well:
+	 *
+	 * - R::getRedBean()
+	 * - R::getDatabaseAdapter()
+	 * - R::getWriter()
+	 *
 	 * @return OODB
 	 */
 	public function getRedBean()
@@ -91,6 +140,23 @@ class ToolBox
 	 * Returns the database adapter in this toolbox.
 	 * The adapter is responsible for executing the query and binding the values.
 	 * The adapter also takes care of transaction handling.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $toolbox = R::getToolBox();
+	 * $redbean = $toolbox->getRedBean();
+	 * $adapter = $toolbox->getDatabaseAdapter();
+	 * $writer  = $toolbox->getWriter();
+	 * </code>
+	 *
+	 * The example above illustrates how to obtain the core objects
+	 * from a toolbox instance. If you are working with the R-object
+	 * only, the following shortcuts exist as well:
+	 *
+	 * - R::getRedBean()
+	 * - R::getDatabaseAdapter()
+	 * - R::getWriter()
 	 *
 	 * @return DBAdapter
 	 */
