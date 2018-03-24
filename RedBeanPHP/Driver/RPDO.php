@@ -207,7 +207,8 @@ class RPDO implements Driver
 			$charset = $this->hasCap( 'utf8mb4' ) ? 'utf8mb4' : 'utf8';
 			$collate = $this->hasCap( 'utf8mb4_520' ) ? '_unicode_520_ci' : '_unicode_ci';
 			$this->pdo->setAttribute(\PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES '. $charset ); //on every re-connect
-			$this->pdo->exec(' SET NAMES '. $charset); //also for current connection
+			/* #624 removed space before SET NAMES because it causes trouble with ProxySQL */
+			$this->pdo->exec('SET NAMES '. $charset); //also for current connection
 			$this->mysqlCharset = $charset;
 			$this->mysqlCollate = $charset . $collate;
 		}
