@@ -1036,7 +1036,7 @@ abstract class AQueryWriter
 		$score = ( $all ) ? count( $tagList ) : 1;
 
 		$sql = "
-			SELECT {$table}.*, count({$table}.id) FROM {$table}
+			SELECT {$table}.* FROM {$table}
 			INNER JOIN {$assocTable} ON {$assocField} = {$table}.id
 			INNER JOIN tag ON {$assocTable}.tag_id = tag.id
 			WHERE tag.title IN ({$slots})
