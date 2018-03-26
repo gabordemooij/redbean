@@ -360,7 +360,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * </code>
 	 *
 	 * The code snippet above demonstrates how to obtain all beans of
-	 * type 'friend' that have associated using an N-M relationship.
+	 * type 'friend' that have associated using an N-M relation.
 	 * This is a private method used by the magic getter / accessor.
 	 * The example illustrates usage through these accessors.
 	 *
@@ -397,8 +397,22 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * Internal method.
-	 * Obtains the own list of a certain type.
+	 * Accesses the ownList. The 'own' list contains beans
+	 * associated using a one-to-many relation. The own-lists can
+	 * be accessed through the magic getter/setter property
+	 * ownXList where X is the type of beans in that list.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $book = R::load( 'book', $id );
+	 * $pages = $book->ownPageList;
+	 * </code>
+	 *
+	 * The example above demonstrates how to access the
+	 * pages associated with the book. Since this is a private method
+	 * meant to be used by the magic accessors, the example uses the
+	 * magic getter instead.
 	 *
 	 * @param string      $type   name of the list you want to retrieve
 	 * @param OODB        $oodb   The RB OODB object database instance
