@@ -1871,6 +1871,21 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	/**
 	 * Counts all shared beans of type $type.
 	 * Also works with via(), with() and withCondition().
+	 * Shared beans are beans that have an many-to-many relation.
+	 * They can be accessed using the sharedXList, where X the
+	 * type of the shared bean.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $book = R::dispense( 'book' );
+	 * $book->sharedPageList = R::dispense( 'page', 5 );
+	 * R::store( $book );
+	 * echo $book->countShared( 'page' );
+	 * </code>
+	 *
+	 * The code snippet above will output '5', because there
+	 * are 5 beans of type 'page' in the shared list.
 	 *
 	 * @param string $type type of bean you wish to count
 	 *
@@ -1881,24 +1896,19 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$toolbox = $this->beanHelper->getToolbox();
 		$redbean = $toolbox->getRedBean();
 		$writer  = $toolbox->getWriter();
-
 		if ( $this->via ) {
 			$oldName = $writer->getAssocTable( array( $this->__info['type'], $type ) );
-
 			if ( $oldName !== $this->via ) {
 				//set the new renaming rule
 				$writer->renameAssocTable( $oldName, $this->via );
 				$this->via = NULL;
 			}
 		}
-
 		$type  = $this->beau( $type );
 		$count = 0;
-
 		if ( $this->getID() ) {
 			$count = $redbean->getAssociationManager()->relatedCount( $this, $type, $this->withSql, $this->withParams );
 		}
-
 		$this->clearModifiers();
 		return (integer) $count;
 	}
