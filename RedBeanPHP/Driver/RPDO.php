@@ -216,6 +216,19 @@ class RPDO implements Driver
 
 	/**
 	 * Determine if a database supports a particular feature.
+	 * Currently this function can be used to detect the following features:
+	 *
+	 * - utf8mb4
+	 * - utf8mb4 520
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $this->hasCap( 'utf8mb4_520' );
+	 * </code>
+	 *
+	 * By default, RedBeanPHP uses this method under the hood to make sure
+	 * you use the latest UTF8 encoding possible for your database.
 	 *
 	 * @param $db_cap identifier of database capability
 	 *
