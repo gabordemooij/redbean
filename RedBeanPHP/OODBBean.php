@@ -1709,6 +1709,22 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Clears (syncs) the history of the bean.
 	 * Resets all shadow values of the bean to their current value.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $book->title = 'book';
+	 * echo $book->hasChanged( 'title' ); //TRUE
+	 * R::store( $book );
+	 * echo $book->hasChanged( 'title' ); //TRUE
+	 * $book->clearHistory();
+	 * echo $book->hasChanged( 'title' ); //FALSE
+	 * </code>
+	 *
+	 * Note that even after store(), the history of the bean still
+	 * contains the act of changing the title of the book.
+	 * Only after invoking clearHistory() will the history of the bean
+	 * be cleared and will hasChanged() return FALSE.
+	 *
 	 * @return self
 	 */
 	public function clearHistory()
