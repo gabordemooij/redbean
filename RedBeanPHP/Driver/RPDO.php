@@ -587,7 +587,22 @@ class RPDO implements Driver
 	/**
 	 * Returns the name of database driver for PDO.
 	 * Uses the PDO attribute DRIVER NAME to obtain the name of the
-	 * PDO driver.
+	 * PDO driver. Use this method to identify the current PDO driver
+	 * used to provide access to the database. Example of a database
+	 * driver string:
+	 *
+	 * <code>
+	 * mysql
+	 * </code>
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * echo R::getDatabaseAdapter()->getDatabase()->getDatabaseType();
+	 * </code>
+	 *
+	 * The example above prints the current database driver string to
+	 * stdout.
 	 *
 	 * @return string
 	 */
