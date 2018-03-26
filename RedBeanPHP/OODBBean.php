@@ -347,10 +347,26 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * Internal method.
-	 * Obtains a shared list for a certain type.
+	 * Accesses the shared list of a bean.
+	 * To access beans that have been associated with the current bean
+	 * using a many-to-many relationship use sharedXList where
+	 * X is the type of beans in the list.
 	 *
-	 * @param string $type the name of the list you want to retrieve.
+	 * Usage:
+	 *
+	 * <code>
+	 * $person = R::load( 'person', $id );
+	 * $friends = $person->sharedFriendList;
+	 * </code>
+	 *
+	 * The code snippet above demonstrates how to obtain all beans of
+	 * type 'friend' that have associated using an N-M relationship.
+	 * This is a private method used by the magic getter / accessor.
+	 * The example illustrates usage through these accessors.
+	 *
+	 * @param string  $type    the name of the list you want to retrieve
+	 * @param OODB    $redbean instance of the RedBeanPHP OODB class
+	 * @param ToolBox $toolbox instance of ToolBox (to get access to core objects)
 	 *
 	 * @return array
 	 */
