@@ -318,6 +318,21 @@ class RPDO implements Driver
 
 	/**
 	 * Sets PDO in stringify fetch mode.
+	 * If set to TRUE, this method will make sure all data retrieved from
+	 * the database will be fetched as a string. Default: TRUE.
+	 *
+	 * To set it to FALSE...
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::getDatabaseAdapter()->getDatabase()->stringifyFetches( FALSE );
+	 * </code>
+	 *
+	 * Important!
+	 * Note, this method only works if you set the value BEFORE the connection
+	 * has been establish. Also, this setting ONLY works with SOME drivers.
+	 * It's up to the driver to honour this setting.
 	 *
 	 * @param boolean $bool
 	 */
