@@ -1978,9 +1978,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * Magic method jsonSerialize, implementation for the \JsonSerializable interface,
-	 * this method gets called by json_encode and facilitates a better JSON representation
-	 * of the bean. Exports the bean on JSON serialization, for the JSON fans.
+	 * Magic method jsonSerialize,
+	 * implementation for the \JsonSerializable interface,
+	 * this method gets called by json_encode and
+	 * facilitates a better JSON representation
+	 * of the bean. Exports the bean on JSON serialization,
+	 * for the JSON fans.
 	 *
 	 * @see  http://php.net/manual/en/class.jsonserializable.php
 	 *
