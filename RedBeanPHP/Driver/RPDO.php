@@ -327,6 +327,16 @@ class RPDO implements Driver
 
 	/**
 	 * Returns the best possible encoding for MySQL based on version data.
+	 * This method can be used to obtain the best character set parameters
+	 * possible for your database when constructing a table creation query
+	 * containing clauses like:  CHARSET=... COLLATE=...
+	 * This is a MySQL-specific method and not part of the driver interface.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $charset_collate = $this->adapter->getDatabase()->getMysqlEncoding( TRUE );
+	 * </code>
 	 *
 	 * @param boolean $retCol pass TRUE to return both charset/collate
 	 *
