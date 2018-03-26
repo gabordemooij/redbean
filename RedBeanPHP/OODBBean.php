@@ -299,7 +299,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				$bean->__info['model'] = $bean->beanHelper->getModelForBean( $bean );
 			}
 		}
-
 		return $beans;
 	}
 
@@ -373,7 +372,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	private function getSharedList( $type, $redbean, $toolbox )
 	{
 		$writer = $toolbox->getWriter();
-
 		if ( $this->via ) {
 			$oldName = $writer->getAssocTable( array( $this->__info['type'], $type ) );
 			if ( $oldName !== $this->via ) {
@@ -382,17 +380,14 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			}
 			$this->via = NULL;
 		}
-
 		$beans = array();
 		if ($this->getID()) {
 			$type             = $this->beau( $type );
 			$assocManager     = $redbean->getAssociationManager();
 			$beans            = $assocManager->related( $this, $type, $this->withSql, $this->withParams );
 		}
-
 		$this->withSql    = '';
 		$this->withParams = array();
-
 		return $beans;
 	}
 
@@ -422,7 +417,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	private function getOwnList( $type, $redbean )
 	{
 		$type = $this->beau( $type );
-
 		if ( $this->aliasName ) {
 			$parentField = $this->aliasName;
 			$myFieldLink = $parentField . '_id';
@@ -434,39 +428,28 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$parentField = $this->__info['type'];
 			$myFieldLink = $parentField . '_id';
 		}
-
 		$beans = array();
-
 		if ( $this->getID() ) {
-
 			$firstKey = NULL;
 			if ( count( $this->withParams ) > 0 ) {
 				reset( $this->withParams );
-
 				$firstKey = key( $this->withParams );
 			}
-
 			$joinSql = $this->parseJoin( $type );
-
 			if ( !is_numeric( $firstKey ) || $firstKey === NULL ) {
 				$bindings           = $this->withParams;
 				$bindings[':slot0'] = $this->getID();
-
 				$beans = $redbean->find( $type, array(), " {$joinSql} $myFieldLink = :slot0 " . $this->withSql, $bindings );
 			} else {
 				$bindings = array_merge( array( $this->getID() ), $this->withParams );
-
 				$beans = $redbean->find( $type, array(), " {$joinSql} $myFieldLink = ? " . $this->withSql, $bindings );
 			}
 		}
-
 		$this->withSql    = '';
 		$this->withParams = array();
-
 		foreach ( $beans as $beanFromList ) {
 			$beanFromList->__info['sys.parentcache.' . $parentField] = $this;
 		}
-
 		return $beans;
 	}
 
@@ -552,13 +535,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		if ( is_string( $selection ) ) {
 			$selection = explode( ',', $selection );
 		}
-
 		if ( !$notrim && is_array( $selection ) ) {
 			foreach ( $selection as $key => $selected ) {
 				$selection[$key] = trim( $selected );
 			}
 		}
-
 		foreach ( $array as $key => $value ) {
 			if ( $key != '__info' ) {
 				if ( !$selection || ( $selection && in_array( $key, $selection ) ) ) {
@@ -584,13 +565,16 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				}
 			}
 		}
-
 		return $this;
 	}
 
 	/**
-	* Fast way to import a row.
-	* Does not perform any checks.
+	* Imports an associative array directly into the
+	* internal property array of the bean as well as the
+	* meta property sys.orig and sets the changed flag to FALSE.
+	* This is used by the repository objects to inject database rows
+	* into the beans. It is not recommended to use this method outside
+	* of a bean repository.
 	*
 	* @param array $row a database row
 	*
@@ -608,6 +592,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Imports data from another bean. Chainable.
 	 * Copies the properties from the source bean to the internal
 	 * property list.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $copy->importFrom( $bean );
+	 * </code>
+	 *
+	 * The example above demonstrates how to make a shallow copy
+	 * of a bean using the importFrom() method.
 	 *
 	 * @param OODBBean $sourceBean the source bean to take properties from
 	 *
@@ -634,9 +627,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	public function inject( OODBBean $otherBean )
 	{
 		$myID = $this->properties['id'];
-
 		$this->import( $otherBean->export( FALSE, FALSE, TRUE ) );
-
 		$this->id = $myID;
 
 		return $this;
@@ -657,7 +648,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	public function export( $meta = FALSE, $parents = FALSE, $onlyMe = FALSE, $filters = array() )
 	{
 		$arr = array();
-
 		if ( $parents ) {
 			foreach ( $this as $key => $value ) {
 				if ( substr( $key, -3 ) != '_id' ) continue;
@@ -666,9 +656,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				$this->$prop;
 			}
 		}
-
 		$hasFilters = is_array( $filters ) && count( $filters );
-
 		foreach ( $this as $key => $value ) {
 			if ( !$onlyMe && is_array( $value ) ) {
 				$vn = array();
@@ -683,14 +671,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				}
 				$value = $value->export( $meta, $parents, FALSE, $filters );
 			}
-
 			$arr[$key] = $value;
 		}
-
 		if ( $meta ) {
 			$arr['__info'] = $this->__info;
 		}
-
 		return $arr;
 	}
 
@@ -704,7 +689,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	public function __isset( $property )
 	{
 		$property = $this->beau( $property );
-
 		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) {
 			$property = substr($property, 1);
 		}
@@ -760,12 +744,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) {
 			$property = substr($property, 1);
 		}
-
 		unset( $this->properties[$property] );
-
 		$shadowKey = 'sys.shadow.'.$property;
 		if ( isset( $this->__info[ $shadowKey ] ) ) unset( $this->__info[$shadowKey] );
-
 		//also clear modifiers
 		$this->withSql    = '';
 		$this->withParams = array();
@@ -774,7 +755,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->noLoad     = FALSE;
 		$this->all        = FALSE;
 		$this->via        = NULL;
-
 		return;
 	}
 
@@ -892,7 +872,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	public function alias( $aliasName )
 	{
 		$this->aliasName = $this->beau( $aliasName );
-
 		return $this;
 	}
 
@@ -929,8 +908,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * Examples:
 	 *
-	 * * oneACLRoute -> one_acl_route
-	 * * camelCase -> camel_case
+	 * - oneACLRoute -> one_acl_route
+	 * - camelCase -> camel_case
 	 *
 	 * Also caches the result to improve performance.
 	 *
@@ -943,7 +922,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		static $beautifulColumns = array();
 
 		if ( ctype_lower( $property ) ) return $property;
-
 		if (
 			( strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) ) )
 			|| ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) )
@@ -953,11 +931,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$property = preg_replace( '/List$/', '', $property );
 			return $property;
 		}
-
 		if ( !isset( $beautifulColumns[$property] ) ) {
 			$beautifulColumns[$property] = AQueryWriter::camelsSnake( $property );
 		}
-
 		return $beautifulColumns[$property];
 	}
 
@@ -994,9 +970,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		if ( strpos( $listName, 'xown' ) === 0 && ctype_upper( substr( $listName, 4, 1 ) ) ) {
 			$listName = substr($listName, 1);
 		}
-
 		$listName = lcfirst( substr( $listName, 3 ) );
-
 		return ( isset( $this->__info['sys.exclusive-'.$listName] ) && $this->__info['sys.exclusive-'.$listName] );
 	}
 
@@ -1028,7 +1002,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$isEx          = FALSE;
 		$isOwn         = FALSE;
 		$isShared      = FALSE;
-
 		if ( !ctype_lower( $property ) ) {
 			$property = $this->beau( $property );
 			if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) {
@@ -1044,10 +1017,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				$isShared = TRUE;
 			}
 		}
-
 		$fieldLink      = $property . '_id';
 		$exists         = isset( $this->properties[$property] );
-
 		//If not exists and no field link and no list, bail out.
 		if ( !$exists && !isset($this->$fieldLink) && (!$isOwn && !$isShared )) {
 
@@ -1062,7 +1033,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$NULL = NULL;
 			return $NULL;
 		}
-
 		$hasAlias       = (!is_null($this->aliasName));
 		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
 								($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
@@ -1071,7 +1041,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 		//If exists and no list or exits and list not changed, bail out.
 		if ( $exists && ((!$isOwn && !$isShared ) ||  (!$hasSQL && !$differentAlias && !$hasAll)) ) {
-
 			$this->withSql    = '';
 			$this->withParams = array();
 			$this->aliasName  = NULL;
@@ -1086,7 +1055,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 		if ( isset( $this->$fieldLink ) ) {
 			$this->__info['tainted'] = TRUE;
-
 			if ( isset( $this->__info["sys.parentcache.$property"] ) ) {
 				$bean = $this->__info["sys.parentcache.$property"];
 			} else {
@@ -1111,7 +1079,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 					}
 				}
 			}
-
 			$this->properties[$property] = $bean;
 			$this->withSql               = '';
 			$this->withParams            = array();
@@ -1120,7 +1087,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$this->noLoad                = FALSE;
 			$this->all                   = FALSE;
 			$this->via                   = NULL;
-
 			return $this->properties[$property];
 
 		}
@@ -1136,7 +1102,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->properties[$property]          = $beans;
 		$this->__info["sys.shadow.$property"] = $beans;
 		$this->__info['tainted']              = TRUE;
-
 		$this->withSql    = '';
 		$this->withParams = array();
 		$this->aliasName  = NULL;
