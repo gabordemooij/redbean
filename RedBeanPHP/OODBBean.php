@@ -1757,28 +1757,21 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	public function link( $typeOrBean, $qualification = array() )
 	{
 		if ( is_string( $typeOrBean ) ) {
-
 			$typeOrBean = AQueryWriter::camelsSnake( $typeOrBean );
-
 			$bean = $this->beanHelper->getToolBox()->getRedBean()->dispense( $typeOrBean );
-
 			if ( is_string( $qualification ) ) {
 				$data = json_decode( $qualification, TRUE );
 			} else {
 				$data = $qualification;
 			}
-
 			foreach ( $data as $key => $value ) {
 				$bean->$key = $value;
 			}
 		} else {
 			$bean = $typeOrBean;
 		}
-
 		$list = 'own' . ucfirst( $bean->getMeta( 'type' ) );
-
 		array_push( $this->$list, $bean );
-
 		return $bean;
 	}
 
