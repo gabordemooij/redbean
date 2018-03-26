@@ -610,6 +610,17 @@ class RPDO implements Driver
 
 	/**
 	 * Returns the underlying PHP PDO instance.
+	 * For some low-level database operations you'll need access to the PDO
+	 * object. Not that this method is only available in RPDO and other
+	 * PDO based database drivers for RedBeanPHP. Other drivers may not have
+	 * a method like this. The following example demonstrates how to obtain
+	 * a reference to the PDO instance from the facade:
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $pdo = R::getDatabaseAdapter()->getDatabase()->getPDO();
+	 * </code>
 	 *
 	 * @return PDO
 	 */
