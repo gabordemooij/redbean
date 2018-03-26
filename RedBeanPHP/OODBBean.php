@@ -1007,6 +1007,18 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * properties. If the property can not be found this method will
 	 * return NULL instead.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $title = $book->title;
+	 * $pages = $book->ownPageList;
+	 * $tags  = $book->sharedTagList;
+	 * </code>
+	 *
+	 * The example aboves lists several ways to invoke the magic getter.
+	 * You can use the magic setter to access properties, own-lists,
+	 * exclusive own-lists (xownLists) and shared-lists.
+	 *
 	 * @param string $property name of the property you wish to obtain the value of
 	 *
 	 * @return mixed
