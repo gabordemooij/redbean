@@ -213,6 +213,11 @@ class Facade
 	 * - sqlsrv (MS SQL Server - community supported experimental driver)
 	 * - CUBRID (CUBRID driver - basic support provided by Plugin)
 	 *
+	 * Note that setup() will not immediately establish a connection to the database.
+	 * Instead, it will prepare the connection and connect 'lazily', i.e. the moment
+	 * a connection is really required, for instance when attempting to load
+	 * a bean.
+	 *
 	 * @param string  $dsn      Database connection string
 	 * @param string  $username Username for database
 	 * @param string  $password Password for database
