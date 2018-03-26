@@ -598,7 +598,24 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Returns the version number of the database.
+	 * Returns the version identifier string of the database.
+	 * This method can be used to identify the currently installed
+	 * database. Note that this method will also establish a connection
+	 * (because this is required to obtain the version information).
+	 *
+	 * Example of a version string:
+	 *
+	 * <code>
+	 * mysqlnd 5.0.12-dev - 20150407 - $Id: b5c5906d452ec590732a93b051f3827e02749b83 $
+	 * </code>
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * echo R::getDatabaseAdapter()->getDatabase()->getDatabaseVersion();
+	 * </code>
+	 *
+	 * The example above will print the version string to stdout.
 	 *
 	 * @return mixed
 	 */
