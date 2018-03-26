@@ -1809,6 +1809,41 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 	/**
 	 * Registers a association renaming globally.
+	 * Use via() and link() to associate shared beans using a
+	 * 3rd bean that will act as an intermediate type. For instance
+	 * consider an employee and a project. We could associate employees
+	 * with projects using a sharedEmployeeList. But, maybe there is more
+	 * to the relationship than just the association. Maybe we want
+	 * to qualify the relation between a project and an employee with
+	 * a role: 'developer', 'designer', 'tester' and so on. In that case,
+	 * it might be better to introduce a new concept to reflect this:
+	 * the participant. However, we still want the flexibility to
+	 * query our employees in one go. This is where link() and via()
+	 * can help. You can still introduce the more applicable
+	 * concept (participant) and have your easy access to the shared beans.
+	 *
+	 * <code>
+	 * $Anna = R::dispense( 'employee' );
+	 * $Anna->badge   = 'Anna';
+	 * $project = R::dispense( 'project' );
+	 * $project->name = 'x';
+	 * $Anna->link( 'participant', array(
+	 *	 'arole' => 'developer'
+	 *	) )->project = $project;
+	 * R::storeAll( array( $project,  $Anna )  );
+	 * $employees = $project
+	 *	->with(' ORDER BY badge ASC ')
+	 *  ->via( 'participant' )
+	 *  ->sharedEmployee;
+	 * </code>
+	 *
+	 * This piece of code creates a project and an employee.
+	 * It then associates the two using a via-relation called
+	 * 'participant' ( employee <-> participant <-> project ).
+	 * So, there will be a table named 'participant' instead of
+	 * a table named 'employee_project'. Using the via() method, the
+	 * employees associated with the project are retrieved 'via'
+	 * the participant table (and an SQL snippet to order them by badge).
 	 *
 	 * @param string $via type you wish to use for shared lists
 	 *
@@ -1824,6 +1859,20 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	/**
 	 * Counts all own beans of type $type.
 	 * Also works with alias(), with() and withCondition().
+	 * Own-beans or xOwn-beans (exclusively owned beans) are beans
+	 * that have been associated using a one-to-many relation. They can
+	 * be accessed through the ownXList where X is the type of the
+	 * associated beans.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $Bill->alias( 'author' )
+	 *      ->countOwn( 'book' );
+	 * </code>
+	 *
+	 * The example above counts all the books associated with 'author'
+	 * $Bill.
 	 *
 	 * @param string $type the type of bean you want to count
 	 *
@@ -1832,27 +1881,20 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	public function countOwn( $type )
 	{
 		$type = $this->beau( $type );
-
 		if ( $this->aliasName ) {
 			$myFieldLink     = $this->aliasName . '_id';
-
 			$this->aliasName = NULL;
 		} else {
 			$myFieldLink = $this->__info['type'] . '_id';
 		}
-
 		$count = 0;
-
 		if ( $this->getID() ) {
-
 			$firstKey = NULL;
 			if ( count( $this->withParams ) > 0 ) {
 				reset( $this->withParams );
 				$firstKey = key( $this->withParams );
 			}
-
 			$joinSql = $this->parseJoin( $type );
-
 			if ( !is_numeric( $firstKey ) || $firstKey === NULL ) {
 					$bindings           = $this->withParams;
 					$bindings[':slot0'] = $this->getID();
@@ -1861,9 +1903,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 					$bindings = array_merge( array( $this->getID() ), $this->withParams );
 					$count    = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " {$joinSql} $myFieldLink = ? " . $this->withSql, $bindings );
 			}
-
 		}
-
 		$this->clearModifiers();
 		return (int) $count;
 	}
