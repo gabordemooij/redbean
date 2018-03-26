@@ -1599,6 +1599,19 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 	/**
 	 * Chainable setter.
+	 * This method is actually the same as just setting a value
+	 * using a magic setter (->property = ...). The difference
+	 * is that you can chain these setters like this:
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $book->setAttr('title', 'mybook')->setAttr('author', 'me');
+	 * </code>
+	 *
+	 * This is the same as setting both properties $book->title and
+	 * $book->author. Sometimes a chained notation can improve the
+	 * readability of the code.
 	 *
 	 * @param string $property the property of the bean
 	 * @param mixed  $value    the value you want to set
