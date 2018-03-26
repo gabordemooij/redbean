@@ -253,9 +253,24 @@ class RPDO implements Driver
 	 * Constructor. You may either specify dsn, user and password or
 	 * just give an existing PDO connection.
 	 *
-	 * Examples:
-	 *    $driver = new RPDO($dsn, $user, $password);
-	 *    $driver = new RPDO($existingConnection);
+	 * Usage:
+	 *
+	 * <code>
+	 * $driver = new RPDO( $dsn, $user, $password );
+	 * </code>
+	 *
+	 * The example above illustrates how to create a driver
+	 * instance from a database connection string (dsn), a username
+	 * and a password. It's also possible to pass a PDO object.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $driver = new RPDO( $existingConnection );
+	 * </code>
+	 *
+	 * The second example shows how to create an RPDO instance
+	 * from an existing PDO object.
 	 *
 	 * @param string|object $dsn  database connection string
 	 * @param string        $user optional, usename to sign in
