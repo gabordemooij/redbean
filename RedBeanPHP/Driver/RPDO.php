@@ -604,6 +604,10 @@ class RPDO implements Driver
 	 * The example above prints the current database driver string to
 	 * stdout.
 	 *
+	 * Note that this is a driver-specific method, not part of the
+	 * driver interface. This method might not be available in other
+	 * drivers since it relies on PDO.
+	 *
 	 * @return string
 	 */
 	public function getDatabaseType()
@@ -631,6 +635,10 @@ class RPDO implements Driver
 	 * </code>
 	 *
 	 * The example above will print the version string to stdout.
+	 *
+	 * Note that this is a driver-specific method, not part of the
+	 * driver interface. This method might not be available in other
+	 * drivers since it relies on PDO.
 	 *
 	 * @return mixed
 	 */
