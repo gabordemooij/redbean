@@ -1964,6 +1964,25 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 	/**
 	 * Tests whether the database identities of two beans are equal.
+	 * Two beans are considered 'equal' if:
+	 *
+	 * a. the types of the beans match
+	 * b. the ids of the beans match
+	 *
+	 * Returns TRUE if the beans are considered equal according to this
+	 * specification and FALSE otherwise.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $coffee->fetchAs( 'flavour' )->taste->equals(
+	 *    R::enum('flavour:mocca')
+	 * );
+	 * </code>
+	 *
+	 * The example above compares the flavour label 'mocca' with
+	 * the flavour label attachec to the $coffee bean. This illustrates
+	 * how to use equals() with RedBeanPHP-style enums.
 	 *
 	 * @param OODBBean $bean other bean
 	 *
