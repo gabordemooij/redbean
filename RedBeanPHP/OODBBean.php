@@ -1234,7 +1234,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * Sets a property directly, for internal use only.
+	 * @deprecated
+	 *
+	 * Sets a property of the bean allowing you to keep track of
+	 * the state yourself. This method sets a property of the bean and
+	 * allows you to control how the state of the bean will be affected.
+	 *
+	 * While there may be some circumstances where this method is needed,
+	 * this method is considered to be extremely dangerous.
+	 * This method is only for advanced users.
 	 *
 	 * @param string  $property     property
 	 * @param mixed   $value        value
