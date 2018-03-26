@@ -1613,8 +1613,17 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * Comfort method.
-	 * Unsets all properties in array.
+	 * Convience method.
+	 * Unsets all properties in the internal properties array.
+	 *
+	 * <code>
+	 * $bean->property = 1;
+	 * $bean->unsetAll( array( 'property' ) );
+	 * $bean->property; //NULL
+	 * </code>
+	 *
+	 * In the example above the 'property' of the bean will be
+	 * unset, resulting in the getter returning NULL instead of 1.
 	 *
 	 * @param array $properties properties you want to unset.
 	 *
@@ -1627,7 +1636,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				unset( $this->properties[$prop] );
 			}
 		}
-
 		return $this;
 	}
 
@@ -1653,6 +1661,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 	/**
 	 * Convenience method.
+	 *
 	 * Returns TRUE if the bean has been changed, or FALSE otherwise.
 	 * Same as $bean->getMeta('tainted');
 	 * Note that a bean becomes tainted as soon as you retrieve a list from
