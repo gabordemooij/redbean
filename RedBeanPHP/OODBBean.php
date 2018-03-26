@@ -1789,12 +1789,26 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * method will only return a reference to the bean, changing it
 	 * and storing the bean will not update the related one-bean.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $author = R::load( 'author', $id );
+	 * $biography = $author->one( 'bio' );
+	 * </code>
+	 *
+	 * The example loads the biography associated with the author
+	 * using a one-to-one relation. These relations are generally not
+	 * created (nor supported) by RedBeanPHP.
+	 *
 	 * @param  $type type of bean to load
 	 *
 	 * @return OODBBean
 	 */
 	public function one( $type ) {
-		return $this->beanHelper->getToolBox()->getRedBean()->load( $type, $this->id );
+		return $this->beanHelper
+			->getToolBox()
+			->getRedBean()
+			->load( $type, $this->id );
 	}
 
 	/**
