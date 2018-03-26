@@ -1798,13 +1798,38 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
+	 * Reloads the bean.
 	 * Returns the same bean freshly loaded from the database.
+	 * This method is equal to the following code:
+	 *
+	 * <code>
+	 * $id = $bean->id;
+	 * $type = $bean->getMeta( 'type' );
+	 * $bean = R::load( $type, $id );
+	 * </code>
+	 *
+	 * This is just a convenience method to reload beans
+	 * quickly.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::exec( ...update query... );
+	 * $book = $book->fresh();
+	 * </code>
+	 *
+	 * The code snippet above illustrates how to obtain changes
+	 * caused by an UPDATE query, simply by reloading the bean using
+	 * the fresh() method.
 	 *
 	 * @return OODBBean
 	 */
 	public function fresh()
 	{
-		return $this->beanHelper->getToolbox()->getRedBean()->load( $this->getMeta( 'type' ), $this->properties['id'] );
+		return $this->beanHelper
+			->getToolbox()
+			->getRedBean()
+			->load( $this->getMeta( 'type' ), $this->properties['id'] );
 	}
 
 	/**
