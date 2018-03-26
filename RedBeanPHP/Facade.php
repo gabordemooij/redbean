@@ -1895,6 +1895,17 @@ class Facade
 
 	/**
 	 * Closes the database connection.
+	 * While database connections are closed automatically at the end of the PHP script,
+	 * closing database connections is generally recommended to improve performance.
+	 * Closing a database connection will immediately return the resources to PHP.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::setup( ... );
+	 * ... do stuff ...
+	 * R::close();
+	 * </code>
 	 *
 	 * @return void
 	 */
