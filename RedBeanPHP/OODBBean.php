@@ -1618,6 +1618,16 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * if all the other properties are 'empty()' (this might
 	 * include NULL and FALSE values).
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $newBean = R::dispense( 'bean' );
+	 * $newBean->isEmpty(); // TRUE
+	 * </code>
+	 *
+	 * The example above demonstrates that newly dispensed beans are
+	 * considered 'empty'.
+	 *
 	 * @return boolean
 	 */
 	public function isEmpty()
