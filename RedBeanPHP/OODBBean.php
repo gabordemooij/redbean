@@ -681,6 +681,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 	/**
 	 * Implements isset() function for use as an array.
+	 * This allows you to use isset() on bean properties.
 	 *
 	 * @param string $property name of the property you want to check
 	 *
@@ -719,7 +720,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * Returns the ID of the bean no matter what the ID field is.
+	 * Returns the ID of the bean.
+	 * If for some reason the ID has not been set, this method will
+	 * return NULL. This is actually the same as accessing the
+	 * id property using $bean->id. The ID of a bean is it's primary
+	 * key and should always correspond with a table column named
+	 * 'id'.
 	 *
 	 * @return string|null
 	 */
@@ -730,7 +736,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 	/**
 	 * Unsets a property of a bean.
-	 * Magic method, gets called implicitly when performing the unset() operation
+	 * Magic method, gets called implicitly when
+	 * performing the unset() operation
 	 * on a bean property.
 	 *
 	 * @param  string $property property to unset
@@ -1565,9 +1572,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		if ( !is_array( $beans ) ) $beans = array( $beans );
 
 		foreach( $beans as $bean ) {
-			/** @var OODBBean $bean */
 			$function( $bean );
-
 			$bean->fetchType  = $oldFetchType;
 			$bean->aliasName  = $oldAliasName;
 			$bean->withSql    = $oldWith;
@@ -1581,7 +1586,24 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 	/**
 	 * Implementation of Countable interface. Makes it possible to use
-	 * count() function on a bean.
+	 * count() function on a bean. This method gets invoked if you use
+	 * the count() function on a bean. The count() method will return
+	 * the number of properties of the bean, this includes the id property.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $bean = R::dispense('bean');
+	 * $bean->property1 = 1;
+	 * $bean->property2 = 2;
+	 * echo count($bean); //prints 3 (cause id is also a property)
+	 * </code>
+	 *
+	 * The example above will print the number 3 to stdout.
+	 * Although we have assigned values to just two properties, the
+	 * primary key id is also a property of the bean and together
+	 * that makes 3. Besides using the count() function, you can also
+	 * call this method using a method notation: $bean->count().
 	 *
 	 * @return integer
 	 */
@@ -1593,7 +1615,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	/**
 	 * Checks whether a bean is empty or not.
 	 * A bean is empty if it has no other properties than the id field OR
-	 * if all the other property are empty().
+	 * if all the other properties are 'empty()' (this might
+	 * include NULL and FALSE values).
 	 *
 	 * @return boolean
 	 */
@@ -1643,6 +1666,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	/**
 	 * Convience method.
 	 * Unsets all properties in the internal properties array.
+	 *
+	 * Usage:
 	 *
 	 * <code>
 	 * $bean->property = 1;
