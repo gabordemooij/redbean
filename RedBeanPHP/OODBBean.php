@@ -1670,7 +1670,19 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	/**
 	 * Returns original (old) value of a property.
 	 * You can use this method to see what has changed in a
-	 * bean.
+	 * bean. The original value of a property is the value that
+	 * this property has had since the bean has been retrieved
+	 * from the databases.
+	 *
+	 * <code>
+	 * $book->title = 'new title';
+	 * $oldTitle = $book->old('title');
+	 * </code>
+	 *
+	 * The example shows how to use the old() method.
+	 * Here we set the title property of the bean to 'new title', then
+	 * we obtain the original value using old('title') and store it in
+	 * a variable $oldTitle.
 	 *
 	 * @param string $property name of the property you want the old value of
 	 *
