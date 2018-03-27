@@ -945,7 +945,31 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * Clears all modifiers.
+	 * Modifiers are a powerful concept in RedBeanPHP, they make it possible
+	 * to change the way a property has to be loaded.
+	 * RedBeanPHP uses property modifiers using a prefix notation like this:
+	 *
+	 * <code>
+	 * $book->fetchAs('page')->cover;
+	 * </code>
+	 *
+	 * Here, we load a bean of type page, identified by the cover property
+	 * (or cover_id in the database). Because the modifier is called before
+	 * the property is accessed, the modifier must be remembered somehow,
+	 * this changes the state of the bean. Accessing a property causes the
+	 * bean to clear its modifiers. To clear the modifiers manually you can
+	 * use this method.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $book->with( 'LIMIT 1' );
+	 * $book->clearModifiers()->ownPageList;
+	 * </code>
+	 *
+	 * In the example above, the 'LIMIT 1' clause is
+	 * cleared before accessing the pages of the book, causing all pages
+	 * to be loaded in the list instead of just one.
 	 *
 	 * @return self
 	 */
