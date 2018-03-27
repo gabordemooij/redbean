@@ -1724,9 +1724,23 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * Returns TRUE if the specified list exists, has been loaded and has been changed:
-	 * beans have been added or deleted. This method will not tell you anything about
+	 * Returns TRUE if the specified list exists, has been loaded
+	 * and has been changed:
+	 * beans have been added or deleted.
+	 * This method will not tell you anything about
 	 * the state of the beans in the list.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $book->hasListChanged( 'ownPage' ); // FALSE
+	 * array_pop( $book->ownPageList );
+	 * $book->hasListChanged( 'ownPage' ); // TRUE
+	 * </code>
+	 *
+	 * In the example, the first time we ask whether the
+	 * own-page list has been changed we get FALSE. Then we pop
+	 * a page from the list and the hasListChanged() method returns TRUE.
 	 *
 	 * @param string $property name of the list to check
 	 *
