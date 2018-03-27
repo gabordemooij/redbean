@@ -837,6 +837,19 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * its contents. Use this if you only want to add something to a list
 	 * and you have no interest in retrieving its contents from the database.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $book->noLoad()->ownPage[] = $newPage;
+	 * </code>
+	 *
+	 * In the example above we add the $newPage bean to the
+	 * page list of book without loading all the pages first.
+	 * If you know in advance that you are not going to use
+	 * the contents of the list, you may use the noLoad() modifier
+	 * to make sure the queries required to load the list will not
+	 * be executed.
+	 *
 	 * @return self
 	 */
 	public function noLoad()
