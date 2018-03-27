@@ -1523,8 +1523,30 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * For polymorphic bean relations.
-	 * Same as fetchAs but uses a column instead of a direct value.
+	 * Prepares to load a bean using the bean type specified by
+	 * another property.
+	 * Similar to fetchAs but uses a column instead of a direct value.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $car = R::load( 'car', $id );
+	 * $engine = $car->poly('partType')->part;
+	 * </code>
+	 *
+	 * In the example above, we have a bean of type car that
+	 * may consists of several parts (i.e. chassis, wheels).
+	 * To obtain the 'engine' we access the property 'part'
+	 * using the type (i.e. engine) specified by the property
+	 * indicated by the argument of poly().
+	 * This essentially is a polymorph relation, hence the name.
+	 * In database this relation might look like this:
+	 *
+	 * partType | part_id
+	 * --------------------
+	 * engine   | 1020300
+	 * wheel    | 4820088
+	 * chassis  | 7823122
 	 *
 	 * @param string $field field name to use for mapping
 	 *
