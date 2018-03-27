@@ -636,7 +636,18 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	/**
 	 * Exports the bean as an array.
 	 * This function exports the contents of a bean to an array and returns
-	 * the resulting array.
+	 * the resulting array. Depending on the parameters you can also
+	 * export an entire graph of beans, apply filters or exclude meta data.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $bookData = $book->export( TRUE, TRUE, FALSE, [ 'author' ] );
+	 * </code>
+	 *
+	 * The example above exports all bean properties to an array
+	 * called $bookData including its meta data, parent objects but without
+	 * any beans of type 'author'.
 	 *
 	 * @param boolean $meta    set to TRUE if you want to export meta data as well
 	 * @param boolean $parents set to TRUE if you want to export parents as well
