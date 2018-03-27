@@ -1564,6 +1564,18 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * Can be used together with with, withCondition, alias and fetchAs.
 	 *
+	 * <code>
+	 * $task
+	 *    ->withCondition(' priority >= ? ', [ $priority ])
+	 *    ->traverse('ownTaskList', function( $t ) use ( &$todo ) {
+	 *       $todo[] = $t->descr;
+	 *    } );
+	 * </code>
+	 *
+	 * In the example, we create a to-do list by traversing a
+	 * hierarchical list of tasks while filtering out all tasks
+	 * having a low priority.
+	 *
 	 * @param string $property property
 	 * @param callable $function function
 	 * @param integer $maxDepth maximum depth for traversal
