@@ -683,6 +683,16 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Implements isset() function for use as an array.
 	 * This allows you to use isset() on bean properties.
 	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $book->title = 'my book';
+	 * echo isset($book['title']); //TRUE
+	 * </code>
+	 *
+	 * The example illustrates how one can apply the
+	 * isset() function to a bean.
+	 *
 	 * @param string $property name of the property you want to check
 	 *
 	 * @return boolean
