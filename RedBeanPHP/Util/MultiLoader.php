@@ -46,10 +46,6 @@ class MultiLoader
 	 *
 	 * @return OODBBean
 	 */
-	public static function loadMulti( $types, $id )
-	{
-		return MultiLoader::load( self::$redbean, $types, $id );
-	}
 	public static function load( OODB $oodb, $types, $id )
 	{
 		if ( is_string( $types ) ) {
