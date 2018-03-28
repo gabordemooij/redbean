@@ -1954,8 +1954,9 @@ class Facade
 	}
 
 	/**
-	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
+	 * The database adapter manages the connection to the database
+	 * and abstracts away database driver specific interfaces.
 	 *
 	 * @param Adapter $adapter Database Adapter for facade to use
 	 *
@@ -1967,8 +1968,10 @@ class Facade
 	}
 
 	/**
-	 * Optional accessor for neat code.
-	 * Sets the database adapter you want to use.
+	 * Sets the Query Writer you want to use.
+	 * The Query Writer writes and executes database queries using
+	 * the database adapter. It turns RedBeanPHP 'commands' into
+	 * database 'statements'.
 	 *
 	 * @param QueryWriter $writer Query Writer instance for facade to use
 	 *
@@ -1980,8 +1983,10 @@ class Facade
 	}
 
 	/**
-	 * Optional accessor for neat code.
-	 * Sets the database adapter you want to use.
+	 * Sets the OODB you want to use.
+	 * The RedBeanPHP Object oriented database is the main RedBeanPHP
+	 * interface that allows you to store and retrieve RedBeanPHP
+	 * objects (i.e. beans).
 	 *
 	 * @param OODB $redbean Object Database for facade to use
 	 */
