@@ -413,11 +413,7 @@ class RPDO implements Driver
 		try {
 			$user = $this->connectInfo['user'];
 			$pass = $this->connectInfo['pass'];
-			$this->pdo = new \PDO(
-				$this->dsn,
-				$user,
-				$pass
-			);
+			$this->pdo = new \PDO( $this->dsn, $user, $pass );
 			$this->setEncoding();
 			$this->pdo->setAttribute( \PDO::ATTR_STRINGIFY_FETCHES, $this->stringifyFetches );
 			//cant pass these as argument to constructor, CUBRID driver does not understand...
