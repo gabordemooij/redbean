@@ -468,7 +468,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return void
 	 */
-	public function initializeForDispense( $type, BeanHelper $beanhelper )
+	public function initializeForDispense( $type, $beanhelper = NULL )
 	{
 		$this->beanHelper         = $beanhelper;
 		$this->__info['type']     = $type;
@@ -477,7 +477,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->__info['tainted']  = TRUE;
 		$this->__info['changed']  = TRUE;
 		$this->__info['changelist'] = array();
-		$this->__info['model'] = $this->beanHelper->getModelForBean( $this );
+		if ( $beanhelper ) {
+			$this->__info['model'] = $this->beanHelper->getModelForBean( $this );
+		}
 		$this->properties['id']   = 0;
 	}
 
@@ -1416,7 +1418,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __call( $method, $args )
 	{
-		if (!$this->__info['model']) {
+		if (!isset($this->__info['model']) || !$this->__info['model']) {
 			return NULL;
 		}
 		
