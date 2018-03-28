@@ -3,6 +3,13 @@ namespace RedUNIT\Base;
 
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
+use RedBeanPHP\Adapter\DBAdapter;
+use RedBeanPHP\QueryWriter\PostgreSQL;
+use RedBeanPHP\QueryWriter\SQLiteT;
+use RedBeanPHP\QueryWriter\MySQL;
+use RedBeanPHP\OODB;
+use RedBeanPHP\BeanHelper;
+use RedBeanPHP\Driver\RPDO;
 
 /**
  * Bean
@@ -22,6 +29,32 @@ use RedBeanPHP\Facade as R;
  */
 class Bean extends Base
 {
+	/**
+	 * Tests whether we can use RedBeanPHP core objects without
+	 * Facade related objects in a non-static style.
+	 *
+	 * @return void
+	 */
+	public function testLooselyWired()
+	{
+		$pdo = R::getDatabaseAdapter()->getDatabase()->getPDO();
+		$database = new RPDO( $pdo );
+		$adapter = new DBAdapter( $database );
+		if ($this->currentlyActiveDriverID == 'pgsql') $writer = new PostgreSQL( $adapter );
+		if ($this->currentlyActiveDriverID == 'mysql') $writer = new MySQL( $adapter );
+		if ($this->currentlyActiveDriverID == 'sqlite') $writer = new SQLiteT( $adapter );
+		$oodb = new OODB( $writer, FALSE );
+		$bean = $oodb->dispense( 'bean' );
+		$bean->name = 'coffeeBean';
+		$id = $oodb->store( $bean );
+		asrt( ( $id > 0 ), TRUE );
+		$bean = $oodb->load( 'bean', $id );
+		asrt( $bean->name, 'coffeeBean' );
+		asrt( $oodb->count( 'bean' ), 1 );
+		$oodb->trash( $bean );
+		asrt( $oodb->count( 'bean' ), 0 );
+	}
+
 	/**
 	 * From github (issue #549):
 	 * Imagine you have a simple Post object, which has a person_id and
