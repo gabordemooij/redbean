@@ -645,7 +645,11 @@ abstract class Repository
 	}
 
 	/**
-	 * Trash all beans of a given type. Wipes an entire type of bean.
+	 * Trash all beans of a given type.
+	 * Wipes an entire type of bean. After this operation there
+	 * will be no beans left of the specified type.
+	 * This method will ignore exceptions caused by database
+	 * tables that do not exist.
 	 *
 	 * @param string $type type of bean you wish to delete all instances of
 	 *
