@@ -231,9 +231,21 @@ class Fluid extends Repository
 	}
 
 	/**
-	 * Handles exceptions. Suppresses exceptions caused by missing structures.
+	 * Exception handler.
+	 * Fluid and Frozen mode have different ways of handling
+	 * exceptions. Fluid mode (using the fluid repository) ignores
+	 * exceptions caused by the following:
 	 *
-	 * @param Exception $exception exception
+	 * - missing tables
+	 * - missing column
+	 *
+	 * In these situations, the repository will behave as if
+	 * no beans could be found. This is because in fluid mode
+	 * it might happen to query a table or column that has not been
+	 * created yet. In frozen mode, this is not supposed to happen
+	 * and the corresponding exceptions will be thrown.
+	 *
+	 * @param \Exception $exception exception
 	 *
 	 * @return void
 	 */
