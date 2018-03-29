@@ -73,7 +73,19 @@ abstract class Repository
 	}
 
 	/**
-	 * Stores a bean and its lists in one run.
+	 * Fully processes a bean and updates the associated records in the database.
+	 * First the bean properties will be grouped as 'embedded' bean,
+	 * addition, deleted 'trash can' or residue. Next, the different groups
+	 * of beans will be processed accordingly and the reference bean (i.e.
+	 * the one that was passed to the method as an argument) will be stored.
+	 * Each type of list (own/shared) has 3 bean processors: 
+	 *
+	 * - trashCanProcessor : removes the bean or breaks its association with the current bean
+	 * - additionProcessor : associates the bean with the current one
+	 * - residueProcessor  : manages beans in lists that 'remain' but may need to be updated
+	 * 
+	 * This method first groups the beans and then calls the
+	 * internal processing methods.
 	 *
 	 * @param OODBBean $bean bean to process
 	 *
@@ -140,27 +152,15 @@ abstract class Repository
 	}
 
 	/**
-	 * Processes an embedded bean.
+	 * Processes a list of beans from a bean.
+	 * A bean may contain lists. This
+	 * method handles shared addition lists; i.e.
+	 * the $bean->sharedObject properties.
+	 * Shared beans will be associated with eachother using the
+	 * Association Manager.
 	 *
-	 * @param OODBBean|SimpleModel $embeddedBean the bean or model
-	 *
-	 * @return integer
-	 */
-	protected function prepareEmbeddedBean( $embeddedBean )
-	{
-		if ( !$embeddedBean->id || $embeddedBean->getMeta( 'tainted' ) ) {
-			$this->store( $embeddedBean );
-		}
-
-		return $embeddedBean->id;
-	}
-
-	/**
-	 * Processes a list of beans from a bean. A bean may contain lists. This
-	 * method handles shared addition lists; i.e. the $bean->sharedObject properties.
-	 *
-	 * @param OODBBean $bean             the bean
-	 * @param array            $sharedAdditions  list with shared additions
+	 * @param OODBBean $bean            the bean
+	 * @param array    $sharedAdditions list with shared additions
 	 *
 	 * @return void
 	 */
@@ -176,10 +176,13 @@ abstract class Repository
 	}
 
 	/**
-	 * Processes a list of beans from a bean. A bean may contain lists. This
-	 * method handles own lists; i.e. the $bean->ownObject properties.
-	 * A residue is a bean in an own-list that stays where it is. This method
-	 * checks if there have been any modification to this bean, in that case
+	 * Processes a list of beans from a bean.
+	 * A bean may contain lists. This
+	 * method handles own lists; i.e.
+	 * the $bean->ownObject properties.
+	 * A residue is a bean in an own-list that stays
+	 * where it is. This method checks if there have been any
+	 * modification to this bean, in that case
 	 * the bean is stored once again, otherwise the bean will be left untouched.
 	 *
 	 * @param array    $ownresidue list to process
@@ -279,8 +282,9 @@ abstract class Repository
 	}
 
 	/**
-	 * Converts an embedded bean to an ID, removed the bean property and
-	 * stores the bean in the embedded beans array.
+	 * Converts an embedded bean to an ID, removes the bean property and
+	 * stores the bean in the embedded beans array. The id will be
+	 * assigned to the link field property, i.e. 'bean_id'.
 	 *
 	 * @param array    $embeddedBeans destination array for embedded bean
 	 * @param OODBBean $bean          target bean to process
@@ -292,7 +296,10 @@ abstract class Repository
 	protected function processEmbeddedBean( &$embeddedBeans, $bean, $property, OODBBean $value )
 	{
 		$linkField = $property . '_id';
-		$id = $this->prepareEmbeddedBean( $value );
+		if ( !$value->id || $value->getMeta( 'tainted' ) ) {
+			$this->store( $value );
+		}
+		$id = $value->id;
 		if ($bean->$linkField != $id) $bean->$linkField = $id;
 		$bean->setMeta( 'cast.' . $linkField, 'id' );
 		$embeddedBeans[$linkField] = $value;
