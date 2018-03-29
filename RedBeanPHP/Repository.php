@@ -409,6 +409,15 @@ abstract class Repository
 
 	/**
 	 * Finds a BeanCollection.
+	 * Given a type, an SQL snippet and optionally some parameter bindings
+	 * this methods returns a BeanCollection for your query.
+	 *
+	 * The BeanCollection represents a collection of beans and
+	 * makes it possible to use database cursors. The BeanCollection
+	 * has a method next() to obtain the first, next and last bean
+	 * in the collection. The BeanCollection does not implement the array
+	 * interface nor does it try to act like an array because it cannot go
+	 * backward or rewind itself.
 	 *
 	 * @param string $type     type of beans you are looking for
 	 * @param string $sql      SQL to be used in query
