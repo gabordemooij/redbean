@@ -231,6 +231,10 @@ abstract class Repository
 
 	/**
 	 * Unassociates the list items in the trashcan.
+	 * This bean processor processes the beans in the shared trash can.
+	 * This group of beans has been deleted from a shared list.
+	 * The affected beans will no longer be associated with the bean
+	 * that contains the shared list.
 	 *
 	 * @param OODBBean $bean           bean to process
 	 * @param array    $sharedTrashcan list to process
@@ -246,6 +250,10 @@ abstract class Repository
 
 	/**
 	 * Stores all the beans in the residue group.
+	 * This bean processor processes the beans in the shared residue
+	 * group. This group of beans 'remains' in the list but might need
+	 * to be updated or synced. The affected beans will be stored
+	 * to perform the required database queries.
 	 *
 	 * @param OODBBean $bean          bean to process
 	 * @param array    $sharedresidue list to process
@@ -324,7 +332,14 @@ abstract class Repository
 	/**
 	 * Checks whether a OODBBean bean is valid.
 	 * If the type is not valid or the ID is not valid it will
-	 * throw an exception: Security.
+	 * throw an exception: Security. To be valid a bean
+	 * must abide to the following rules:
+	 *
+	 * - It must have an primary key id property named: id
+	 * - It must have a type
+	 * - The type must conform to the RedBeanPHP naming policy
+	 * - All properties must be valid
+	 * - All values must be valid
 	 *
 	 * @param OODBBean $bean the bean that needs to be checked
 	 *
