@@ -27,7 +27,7 @@ use RedBeanPHP\OODBBean as OODBBean;
 class Dump
 {
 	/**
-	 * Simple but effective debug function.
+	 * Dumps bean data to array.
 	 * Given a one or more beans this method will
 	 * return an array containing first part of the string
 	 * representation of each item in the array.

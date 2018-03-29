@@ -2160,10 +2160,22 @@ class Facade
 	}
 
 	/**
-	 * Simple but effective debug function.
+	 * Dumps bean data to array.
 	 * Given a one or more beans this method will
 	 * return an array containing first part of the string
 	 * representation of each item in the array.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * echo R::dump( $bean );
+	 * </code>
+	 *
+	 * The example shows how to echo the result of a simple
+	 * dump. This will print the string representation of the
+	 * specified bean to the screen, limiting the output per bean
+	 * to 35 characters to improve readability. Nested beans will
+	 * also be dumped.
 	 *
 	 * @param OODBBean|array $data either a bean or an array of beans
 	 *
