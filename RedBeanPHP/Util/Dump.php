@@ -51,7 +51,6 @@ class Dump
 	public static function dump( $data )
 	{
 		$array = array();
-
 		if ( $data instanceof OODBBean ) {
 			$str = strval( $data );
 			if (strlen($str) > 35) {
@@ -61,13 +60,11 @@ class Dump
 			}
 			return $beanStr;
 		}
-
 		if ( is_array( $data ) ) {
 			foreach( $data as $key => $item ) {
 				$array[$key] = self::dump( $item );
 			}
 		}
-
 		return $array;
 	}
 }
