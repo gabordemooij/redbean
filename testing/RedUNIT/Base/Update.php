@@ -7,6 +7,7 @@ use RedBeanPHP\Facade as R;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\QueryWriter as QueryWriter;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\Logger\RDefault as Logger;
 
 /**
  * Update
@@ -27,6 +28,48 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
  */
 class Update extends Base
 {
+	/**
+	 * Tests whether no unncessary DESCRIBE-queries are executed,
+	 * (Commit 3b8ce88e5b796bfde6485ab0a51a4fcfb1bcf0fa by davidsickmiller).
+	 * Even thtough we add 2 properties, only 1 DESCRIBE query is necessary
+	 * to load the column cache.
+	 */
+	public function testModifySchemaColCache()
+	{
+		R::nuke();
+		$toolbox = R::getToolbox();
+		$repository = $toolbox->getRedBean()->getCurrentRepository();
+		$database = $toolbox->getDatabaseAdapter()->getDatabase();
+		$logger = new Logger;
+		$database->setLogger( $logger );
+		$bean = R::dispense('bean');
+		$bean->property1 = 'test';
+		$bean->property2 = 'test'; //should not cause 2nd DESCRIBE.
+		R::startLogging();
+		R::store( $bean );
+		$logger = R::getLogger();
+		asrt(
+			count( $logger->grep('DESCRIBE') ) +
+			count( $logger->grep('SELECT column_name') ) +
+			count( $logger->grep('PRAGMA table_info') )
+		, 1);
+		R::stopLogging();
+		//new round, same results, no cache between beans
+		R::nuke();
+		$bean = R::dispense('bean');
+		$bean->property1 = 'test';
+		$bean->property2 = 'test'; //should not cause 2nd DESCRIBE.
+		R::startLogging();
+		R::store( $bean );
+		$logger = R::getLogger();
+		asrt(
+			count( $logger->grep('DESCRIBE') ) +
+			count( $logger->grep('SELECT column_name') ) +
+			count( $logger->grep('PRAGMA table_info') )
+		, 1);
+		R::stopLogging();
+	}
+
 	/**
 	 * Test whether we can use SQL filters and
 	 * whether they are being applied properly for
