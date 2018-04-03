@@ -3,7 +3,7 @@
   "description": "RedBeanPHP ORM",
   "keywords": ["orm"],
   "homepage": "https://redbeanphp.com/",
-  "license": " BSD-3-Clause",
+  "license": "BSD-3-Clause",
   "authors": [
     {
       "name": "Gabor de Mooij",
