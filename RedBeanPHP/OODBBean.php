@@ -1097,8 +1097,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$this->all        = FALSE;
 			$this->via        = NULL;
 
-			$NULL = NULL;
-			return $NULL;
+			return NULL;
 		}
 		$hasAlias       = (!is_null($this->aliasName));
 		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
