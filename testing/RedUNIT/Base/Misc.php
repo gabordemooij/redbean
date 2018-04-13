@@ -30,6 +30,26 @@ use RedBeanPHP\SimpleModel as SimpleModel;
 class Misc extends Base
 {
 	/**
+	 * Check partial beans at setup()
+	 */
+	 public function testPartialBeansAtSetup()
+	 {
+		 $key  = 'partialBeanBase' . time();
+		 $dsn  = 'sqlite:/tmp/test.txt';
+		 $user = '';
+		 $pass = '';
+		 $frozen = FALSE;
+		 $partialBeans = TRUE;
+		 R::addDatabase( $key, $dsn, $user, $pass, $frozen, $partialBeans);
+		 $redbean = R::getRedBean();
+		 $wasItSet = $redbean->getCurrentRepository()->usePartialBeans( FALSE );
+		 R::selectDatabase( $key );
+		 $redbean = R::getRedBean();
+		 $wasItSet = $redbean->getCurrentRepository()->usePartialBeans( FALSE );
+		 asrt( $wasItSet, TRUE );
+	 }
+
+	/**
 	 * Test whether we can set the 'auto clear'
 	 * option in OODB.
 	 *
