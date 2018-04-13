@@ -1066,126 +1066,92 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function &__get( $property )
 	{
-		$isEx          = FALSE;
-		$isOwn         = FALSE;
-		$isShared      = FALSE;
-		if ( !ctype_lower( $property ) ) {
-			$property = $this->beau( $property );
-			if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) {
-				$property = substr($property, 1);
-				$listName = lcfirst( substr( $property, 3 ) );
-				$isEx     = TRUE;
-				$isOwn    = TRUE;
-				$this->__info['sys.exclusive-'.$listName] = TRUE;
-			} elseif ( strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) ) )  {
-				$isOwn    = TRUE;
-				$listName = lcfirst( substr( $property, 3 ) );
-			} elseif ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
-				$isShared = TRUE;
-			}
-		}
-		$fieldLink      = $property . '_id';
-		$exists         = isset( $this->properties[$property] );
-		//If not exists and no field link and no list, bail out.
-		if ( !$exists && !isset($this->$fieldLink) && (!$isOwn && !$isShared )) {
-
-			$this->withSql    = '';
-			$this->withParams = array();
-			$this->aliasName  = NULL;
-			$this->fetchType  = NULL;
-			$this->noLoad     = FALSE;
-			$this->all        = FALSE;
-			$this->via        = NULL;
-
-			/**
-			 * Github issue:
-			 * Remove $NULL to directly return NULL #625
-			 * @@ -1097,8 +1097,7 @@ public function &__get( $property )
-			 *		$this->all        = FALSE;
-			 *		$this->via        = NULL;
-			 *
-			 * - $NULL = NULL;
-			 * - return $NULL;
-			 * + return NULL;
-			 *
-			 * leads to regression:
-			 * PHP Stack trace:
-			 * PHP 1. {main}() testje.php:0
-			 * PHP 2. RedBeanPHP\OODBBean->__get() testje.php:22
-			 * Notice: Only variable references should be returned by reference in rb.php on line 2529
-			 */
-			$NULL = NULL;
-			return $NULL;
-		}
-		$hasAlias       = (!is_null($this->aliasName));
-		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
-								($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
-		$hasSQL         = ($this->withSql !== '' || $this->via !== NULL);
-		$hasAll         = (boolean) ($this->all);
-
-		//If exists and no list or exits and list not changed, bail out.
-		if ( $exists && ((!$isOwn && !$isShared ) ||  (!$hasSQL && !$differentAlias && !$hasAll)) ) {
-			$this->withSql    = '';
-			$this->withParams = array();
-			$this->aliasName  = NULL;
-			$this->fetchType  = NULL;
-			$this->noLoad     = FALSE;
-			$this->all        = FALSE;
-			$this->via        = NULL;
-			return $this->properties[$property];
-		}
-
-		list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
-
-		if ( isset( $this->$fieldLink ) ) {
-			$this->__info['tainted'] = TRUE;
-			if ( isset( $this->__info["sys.parentcache.$property"] ) ) {
-				$bean = $this->__info["sys.parentcache.$property"];
-			} else {
-				if ( isset( self::$aliases[$property] ) ) {
-					$type = self::$aliases[$property];
-				} elseif ( $this->fetchType ) {
-					$type = $this->fetchType;
-					$this->fetchType = NULL;
-				} else {
-					$type = $property;
+		do {
+			$isEx          = FALSE;
+			$isOwn         = FALSE;
+			$isShared      = FALSE;
+			if ( !ctype_lower( $property ) ) {
+				$property = $this->beau( $property );
+				if ( strpos( $property, 'xown' ) === 0 && ctype_upper( substr( $property, 4, 1 ) ) ) {
+					$property = substr($property, 1);
+					$listName = lcfirst( substr( $property, 3 ) );
+					$isEx     = TRUE;
+					$isOwn    = TRUE;
+					$this->__info['sys.exclusive-'.$listName] = TRUE;
+				} elseif ( strpos( $property, 'own' ) === 0 && ctype_upper( substr( $property, 3, 1 ) ) )  {
+					$isOwn    = TRUE;
+					$listName = lcfirst( substr( $property, 3 ) );
+				} elseif ( strpos( $property, 'shared' ) === 0 && ctype_upper( substr( $property, 6, 1 ) ) ) {
+					$isShared = TRUE;
 				}
-				$bean = NULL;
-				if ( !is_null( $this->properties[$fieldLink] ) ) {
-					$bean = $redbean->load( $type, $this->properties[$fieldLink] );
-					//If the IDs dont match, we failed to load, so try autoresolv in that case...
-					if ( $bean->id !== $this->properties[$fieldLink] && self::$autoResolve ) {
-						$type = $this->beanHelper->getToolbox()->getWriter()->inferFetchType( $this->__info['type'], $property );
-						if ( !is_null( $type) ) {
-							$bean = $redbean->load( $type, $this->properties[$fieldLink] );
-							$this->__info["sys.autoresolved.{$property}"] = $type;
+			}
+			$fieldLink      = $property . '_id';
+			$exists         = isset( $this->properties[$property] );
+
+			//If not exists and no field link and no list, bail out.
+			if ( !$exists && !isset($this->$fieldLink) && (!$isOwn && !$isShared )) {
+				break;
+			}
+
+			$hasAlias       = (!is_null($this->aliasName));
+			$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
+									($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
+			$hasSQL         = ($this->withSql !== '' || $this->via !== NULL);
+			$hasAll         = (boolean) ($this->all);
+
+			//If exists and no list or exits and list not changed, bail out.
+			if ( $exists && ((!$isOwn && !$isShared ) || (!$hasSQL && !$differentAlias && !$hasAll)) ) {
+				break;
+			}
+
+			list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
+
+			//If it's another bean, then we load it and break
+			if ( isset( $this->$fieldLink ) ) {
+				$this->__info['tainted'] = TRUE;
+				if ( isset( $this->__info["sys.parentcache.$property"] ) ) {
+					$bean = $this->__info["sys.parentcache.$property"];
+				} else {
+					if ( isset( self::$aliases[$property] ) ) {
+						$type = self::$aliases[$property];
+					} elseif ( $this->fetchType ) {
+						$type = $this->fetchType;
+						$this->fetchType = NULL;
+					} else {
+						$type = $property;
+					}
+					$bean = NULL;
+					if ( !is_null( $this->properties[$fieldLink] ) ) {
+						$bean = $redbean->load( $type, $this->properties[$fieldLink] );
+						//If the IDs dont match, we failed to load, so try autoresolv in that case...
+						if ( $bean->id !== $this->properties[$fieldLink] && self::$autoResolve ) {
+							$type = $this->beanHelper->getToolbox()->getWriter()->inferFetchType( $this->__info['type'], $property );
+							if ( !is_null( $type) ) {
+								$bean = $redbean->load( $type, $this->properties[$fieldLink] );
+								$this->__info["sys.autoresolved.{$property}"] = $type;
+							}
 						}
 					}
 				}
+				$this->properties[$property] = $bean;
+				break;
 			}
-			$this->properties[$property] = $bean;
-			$this->withSql               = '';
-			$this->withParams            = array();
-			$this->aliasName             = NULL;
-			$this->fetchType             = NULL;
-			$this->noLoad                = FALSE;
-			$this->all                   = FALSE;
-			$this->via                   = NULL;
-			return $this->properties[$property];
 
-		}
-		//Implicit: elseif ( $isOwn || $isShared ) {
-		if ( $this->noLoad ) {
-			$beans = array();
-		} elseif ( $isOwn ) {
-			$beans = $this->getOwnList( $listName, $redbean );
-		} else {
-			$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
-		}
+			//Implicit: elseif ( $isOwn || $isShared ) {
+			if ( $this->noLoad ) {
+				$beans = array();
+			} elseif ( $isOwn ) {
+				$beans = $this->getOwnList( $listName, $redbean );
+			} else {
+				$beans = $this->getSharedList( lcfirst( substr( $property, 6 ) ), $redbean, $toolbox );
+			}
 
-		$this->properties[$property]          = $beans;
-		$this->__info["sys.shadow.$property"] = $beans;
-		$this->__info['tainted']              = TRUE;
+			$this->properties[$property]          = $beans;
+			$this->__info["sys.shadow.$property"] = $beans;
+			$this->__info['tainted']              = TRUE;
+
+		} while ( FALSE );
+
 		$this->withSql    = '';
 		$this->withParams = array();
 		$this->aliasName  = NULL;
