@@ -1090,6 +1090,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 			//If not exists and no field link and no list, bail out.
 			if ( !$exists && !isset($this->$fieldLink) && (!$isOwn && !$isShared )) {
+				$returnValue = NULL;
 				break;
 			}
 
@@ -1101,6 +1102,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 			//If exists and no list or exits and list not changed, bail out.
 			if ( $exists && ((!$isOwn && !$isShared ) || (!$hasSQL && !$differentAlias && !$hasAll)) ) {
+				$returnValue = $this->properties[$property];
 				break;
 			}
 
@@ -1134,6 +1136,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 					}
 				}
 				$this->properties[$property] = $bean;
+				$returnValue = $this->properties[$property];
 				break;
 			}
 
@@ -1149,6 +1152,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$this->properties[$property]          = $beans;
 			$this->__info["sys.shadow.$property"] = $beans;
 			$this->__info['tainted']              = TRUE;
+			$returnValue = $this->properties[$property];
 
 		} while ( FALSE );
 
@@ -1160,7 +1164,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->all        = FALSE;
 		$this->via        = NULL;
 
-		return $this->properties[$property];
+		return $returnValue;
 	}
 
 	/**
