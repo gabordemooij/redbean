@@ -74,8 +74,7 @@ class BeanCollection
 		$row = $this->cursor->getNextItem();
 		if ( $row ) {
 			$beans = $this->repository->convertToBeans( $this->type, array( $row ) );
-			$bean = array_shift( $beans );
-			return $bean;
+			return reset( $beans );
 		}
 		return NULL;
 	}
