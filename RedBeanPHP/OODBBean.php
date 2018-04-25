@@ -332,7 +332,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			array_shift( $parts );
 			foreach($parts as $part) {
 				$explosion = explode( '.', $part );
-				$joinInfo  = array_shift( $explosion );
+				$joinInfo  = reset( $explosion );
 				//Dont join more than once..
 				if ( !isset( $joins[$joinInfo] ) ) {
 					$joins[ $joinInfo ] = TRUE;
