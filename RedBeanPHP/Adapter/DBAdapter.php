@@ -166,7 +166,7 @@ class DBAdapter extends Observable implements Adapter
 					$value = $key;
 					break;
 				case 2:
-					$value = array_shift( $row );
+					$value = reset( $row );
 					break;
 				default:
 					$value = $row;
