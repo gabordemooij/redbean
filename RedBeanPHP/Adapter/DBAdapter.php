@@ -151,23 +151,25 @@ class DBAdapter extends Observable implements Adapter
 
 		$rows  = $this->db->GetAll( $sql, $bindings );
 
-		$assoc = array();
 		if ( !$rows ) {
-			return $assoc;
+			return array();
 		}
 
+		$assoc = array();
+		
 		foreach ( $rows as $row ) {
 			if ( empty( $row ) ) continue;
 
-			if ( count( $row ) > 2 ) {
-            $key   = array_shift( $row );
-            $value = $row;
-        } elseif ( count( $row ) > 1 ) {
-				$key   = array_shift( $row );
-				$value = array_shift( $row );
-			} else {
-				$key   = array_shift( $row );
-				$value = $key;
+			$key   = array_shift( $row );
+			switch ( count( $row ) ) {
+				case 0:
+					$value = $key;
+					break;
+				case 1:
+					$value = reset( $row );
+					break;
+				default:
+					$value = $row;
 			}
 
 			$assoc[$key] = $value;
