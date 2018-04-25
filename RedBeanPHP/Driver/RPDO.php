@@ -474,11 +474,14 @@ class RPDO implements Driver
 	public function GetCol( $sql, $bindings = array() )
 	{
 		$rows = $this->GetAll( $sql, $bindings );
+
+		if ( empty( $rows ) || !is_array( $rows ) ) {
+			return array();
+		}
+
 		$cols = array();
-		if ( $rows && is_array( $rows ) && count( $rows ) > 0 ) {
-			foreach ( $rows as $row ) {
-				$cols[] = array_shift( $row );
-			}
+		foreach ( $rows as $row ) {
+			$cols[] = reset( $row );
 		}
 
 		return $cols;
@@ -490,14 +493,12 @@ class RPDO implements Driver
 	public function GetOne( $sql, $bindings = array() )
 	{
 		$arr = $this->GetAll( $sql, $bindings );
-		$res = NULL;
-		if ( !is_array( $arr ) ) return NULL;
-		if ( count( $arr ) === 0 ) return NULL;
-		$row1 = array_shift( $arr );
-		if ( !is_array( $row1 ) ) return NULL;
-		if ( count( $row1 ) === 0 ) return NULL;
-		$col1 = array_shift( $row1 );
-		return $col1;
+
+		if ( empty( $arr[0] ) || !is_array( $arr[0] ) ) {
+			return NULL;
+		}
+
+		return reset( $arr[0] );
 	}
 
 	/**
@@ -520,7 +521,7 @@ class RPDO implements Driver
 	public function GetRow( $sql, $bindings = array() )
 	{
 		$arr = $this->GetAll( $sql, $bindings );
-		return array_shift( $arr );
+		return reset( $arr );
 	}
 
 	/**
