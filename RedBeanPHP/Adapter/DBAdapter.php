@@ -162,10 +162,10 @@ class DBAdapter extends Observable implements Adapter
 
 			$key   = array_shift( $row );
 			switch ( count( $row ) ) {
-				case 1:
+				case 0:
 					$value = $key;
 					break;
-				case 2:
+				case 1:
 					$value = reset( $row );
 					break;
 				default:
