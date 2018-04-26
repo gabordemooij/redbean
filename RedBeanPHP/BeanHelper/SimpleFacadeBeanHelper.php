@@ -72,7 +72,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 *
 	 * @return void
 	 */
-	public function __construct( $databaseKey )
+	public function __construct( $databaseKey = 'default' )
 	{
 		$this->database = $databaseKey;
 	}
