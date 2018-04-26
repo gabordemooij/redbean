@@ -64,7 +64,11 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 */
 	public function getToolbox()
 	{
-		return Facade::getToolBox();
+		if ( Facade::$useBeanOODB ) {
+			return $toolbox = Facade::$toolboxes[$this->database];
+		} else {
+			return Facade::getToolBox();
+		}
 	}
 
 	/**
@@ -104,6 +108,11 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 */
 	public function getExtractedToolbox()
 	{
-		return Facade::getExtractedToolbox();
+		if ( Facade::$useBeanOODB ) {
+			$toolbox = Facade::$toolboxes[$this->database];
+		        return array( $toolbox->getRedbean(), $toolbox->getDatabaseAdapter(), $toolbox->getWriter(), $toolbox );
+		} else {
+			return Facade::getExtractedToolbox();
+		}
 	}
 }
