@@ -500,6 +500,16 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
+	 * Returns the Bean Helper for this bean.
+	 *
+	 * @return BeanHelper
+	 */
+	public function getBeanHelper( BeanHelper $helper )
+	{
+		return $this->beanHelper;
+	}
+
+	/**
 	 * Returns an ArrayIterator so you can treat the bean like
 	 * an array with the properties container as its contents.
 	 * This method is meant for PHP and allows you to access beans as if
