@@ -1186,7 +1186,7 @@ class Facade
 	public static function dup( $bean, $trail = array(), $pid = FALSE, $filters = array() )
 	{
 		if ( self::$useBeanOODB ) {
-			$duplicationManager = self::$bean->getBeanHelper()->getToolbox()->getRedBean()->getDuplicationManager();
+			$duplicationManager = $bean->getBeanHelper()->getToolbox()->getRedBean()->getDuplicationManager();
 		} else {
 			$duplicationManager = self::$redbean->getDuplicationManager();
 		}
