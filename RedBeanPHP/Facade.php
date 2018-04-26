@@ -68,6 +68,21 @@ class Facade
 	 * @var DBAdapter
 	 */
 	private static $adapter;
+	
+	/**
+	 * @var AssociationManager
+	 */
+	private static $associationManager;
+
+	/**
+	 * @var TagManager
+	 */
+	private static $tagManager;
+
+	/**
+	 * @var DuplicationManager
+	 */
+	private static $duplicationManager;
 
 	/**
 	 * @var LabelMaker
@@ -1554,13 +1569,30 @@ class Facade
 		self::$adapter            = self::$toolbox->getDatabaseAdapter();
 		self::$redbean            = self::$toolbox->getRedBean();
 		self::$finder             = new Finder( self::$toolbox );
-		self::$redbean->setAssociationManager( new AssociationManager( self::$toolbox ); );
+		try {
+			self::$associationManager = self::$redbean->getAssociationManager();
+		} catch ( RedException $e ) {
+			self::$associationManager = new AssociationManager( self::$toolbox );
+			self::$redbean->setAssociationManager( self::$associationManager );;
+		}
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
 		$helper                   = new SimpleModelHelper();
 		$helper->attachEventListeners( self::$redbean );
-		self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper( self::$currentDB ) );
-		self::$redbean->setDuplicationManager( new DuplicationManager( self::$toolbox ) );
-		self::$redbean->setTagManager( new TagManager( self::$toolbox ) );
+		if ( self::$redbean->getBeanHelper() == NULL ) {
+			self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper( self::$currentDB ) );
+		}
+		try {
+			self::$duplicationManager = self::$redbean->getDuplicationManager();
+		} catch ( RedException $e ) {
+			self::$duplicationManager = new DuplicationManager( self::$toolbox );
+			self::$redbean->setDuplicationManager( self::$duplicationManager );
+		}
+		try {
+			self::$tagManager = self::$redbean->getTagManager();
+		} catch ( RedException $e ) {
+			self::$tagManager         = new TagManager( self::$toolbox );
+			self::$redbean->setTagManager( self::$tagManager );
+		}
 		return $oldTools;
 	}
 
