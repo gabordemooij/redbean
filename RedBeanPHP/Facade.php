@@ -70,11 +70,6 @@ class Facade
 	private static $adapter;
 
 	/**
-	 * @var AssociationManager
-	 */
-	private static $associationManager;
-
-	/**
 	 * @var LabelMaker
 	 */
 	private static $labelMaker;
@@ -1539,8 +1534,7 @@ class Facade
 		self::$adapter            = self::$toolbox->getDatabaseAdapter();
 		self::$redbean            = self::$toolbox->getRedBean();
 		self::$finder             = new Finder( self::$toolbox );
-		self::$associationManager = new AssociationManager( self::$toolbox );
-		self::$redbean->setAssociationManager( self::$associationManager );
+		self::$redbean->setAssociationManager( new AssociationManager( self::$toolbox ); );
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
 		$helper                   = new SimpleModelHelper();
 		$helper->attachEventListeners( self::$redbean );
