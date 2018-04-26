@@ -75,11 +75,6 @@ class Facade
 	private static $associationManager;
 
 	/**
-	 * @var TagManager
-	 */
-	private static $tagManager;
-
-	/**
 	 * @var LabelMaker
 	 */
 	private static $labelMaker;
@@ -1346,9 +1341,9 @@ class Facade
 	 *
 	 * @return boolean
 	 */
-	public static function hasTag( $bean, $tags, $all = FALSE )
+	public static function hasTag( OODBBean $bean, $tags, $all = FALSE )
 	{
-		return self::$tagManager->hasTag( $bean, $tags, $all );
+		return $bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->hasTag( $bean, $tags, $all );
 	}
 
 	/**
@@ -1372,9 +1367,9 @@ class Facade
 	 *
 	 * @return void
 	 */
-	public static function untag( $bean, $tagList )
+	public static function untag( OODBBean $bean, $tagList )
 	{
-		self::$tagManager->untag( $bean, $tagList );
+		$bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->untag( $bean, $tagList );
 	}
 
 	/**
@@ -1403,7 +1398,7 @@ class Facade
 	 */
 	public static function tag( OODBBean $bean, $tagList = NULL )
 	{
-		return self::$tagManager->tag( $bean, $tagList );
+		return $bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->tag( $bean, $tagList );
 	}
 
 	/**
@@ -1428,7 +1423,7 @@ class Facade
 	 */
 	public static function addTags( OODBBean $bean, $tagList )
 	{
-		self::$tagManager->addTags( $bean, $tagList );
+		$bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->addTags( $bean, $tagList );
 	}
 
 	/**
@@ -1462,7 +1457,7 @@ class Facade
 	 */
 	public static function tagged( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
-		return self::$tagManager->tagged( $beanType, $tagList, $sql, $bindings );
+		return self::$redbean->getTagManager()->tagged( $beanType, $tagList, $sql, $bindings );
 	}
 
 	/**
@@ -1496,7 +1491,7 @@ class Facade
 	 */
 	public static function taggedAll( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
-		return self::$tagManager->taggedAll( $beanType, $tagList, $sql, $bindings );
+		return self::$redbean->getTagManager()->taggedAll( $beanType, $tagList, $sql, $bindings );
 	}
 
 	/**
@@ -1551,7 +1546,7 @@ class Facade
 		$helper->attachEventListeners( self::$redbean );
 		self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
 		self::$redbean->setDuplicationManager( new DuplicationManager( self::$toolbox ) );
-		self::$tagManager         = new TagManager( self::$toolbox );
+		self::$redbean->setTagManager( new TagManager( self::$toolbox ) );
 		return $oldTools;
 	}
 
