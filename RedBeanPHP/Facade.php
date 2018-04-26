@@ -127,7 +127,7 @@ class Facade
 	/**
 	 * @var bool
 	 */
-	private static $useBeanOODB = FALSE;
+	public static $useBeanOODB = FALSE;
 
 	/**
 	 * Internal Query function, executes the desired query. Used by
