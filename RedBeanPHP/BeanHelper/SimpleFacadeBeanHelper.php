@@ -83,7 +83,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	public function getToolbox()
 	{
 		if ( Facade::$useBeanOODB ) {
-			return $toolbox = Facade::$toolboxes[$this->databaseKey];
+			return Facade::$toolboxes[$this->databaseKey];
 		} else {
 			return Facade::getToolBox();
 		}
@@ -128,7 +128,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	{
 		if ( Facade::$useBeanOODB ) {
 			$toolbox = Facade::$toolboxes[$this->databaseKey];
-		        return array( $toolbox->getRedbean(), $toolbox->getDatabaseAdapter(), $toolbox->getWriter(), $toolbox );
+			return array( $toolbox->getRedbean(), $toolbox->getDatabaseAdapter(), $toolbox->getWriter(), $toolbox );
 		} else {
 			return Facade::getExtractedToolbox();
 		}
