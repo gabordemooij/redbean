@@ -1170,7 +1170,11 @@ class Facade
 	 */
 	public static function dup( $bean, $trail = array(), $pid = FALSE, $filters = array() )
 	{
-		$duplicationManager = self::$redbean->getDuplicationManager();
+		if ( self::$useBeanOODB ) {
+			$duplicationManager = self::$bean->getBeanHelper()->getToolbox()->getRedBean()->getDuplicationManager();
+		} else {
+			$duplicationManager = self::$redbean->getDuplicationManager();
+		}
 		$duplicationManager->setFilters( $filters );
 		return $duplicationManager->dup( $bean, $trail, $pid );
 	}
@@ -1338,7 +1342,11 @@ class Facade
 	 */
 	public static function hasTag( OODBBean $bean, $tags, $all = FALSE )
 	{
-		return $bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->hasTag( $bean, $tags, $all );
+		if (self::$useBeanOODB) {
+			return $bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->hasTag( $bean, $tags, $all );
+		} else {
+			return self::$redbean->getTagManager()->hasTag( $bean, $tags, $all );
+		}
 	}
 
 	/**
@@ -1364,7 +1372,11 @@ class Facade
 	 */
 	public static function untag( OODBBean $bean, $tagList )
 	{
-		$bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->untag( $bean, $tagList );
+		if (self::$useBeanOODB) {
+			$bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->untag( $bean, $tagList );
+		} else {
+			self::$redbean->getTagManager()->untag( $bean, $tagList );
+		}
 	}
 
 	/**
@@ -1393,7 +1405,11 @@ class Facade
 	 */
 	public static function tag( OODBBean $bean, $tagList = NULL )
 	{
-		return $bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->tag( $bean, $tagList );
+		if (self::$useBeanOODB) {
+			return $bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->tag( $bean, $tagList );
+		} else {
+			return self::$redbean->getTagManager()->tag( $bean, $tagList );
+		}
 	}
 
 	/**
@@ -1418,7 +1434,11 @@ class Facade
 	 */
 	public static function addTags( OODBBean $bean, $tagList )
 	{
-		$bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->addTags( $bean, $tagList );
+		if (self::$useBeanOODB) {
+			$bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->addTags( $bean, $tagList );
+		} else {
+			self::$redbean->getTagManager()->addTags( $bean, $tagList );
+		}
 	}
 
 	/**
