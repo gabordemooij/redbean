@@ -1540,7 +1540,7 @@ class Facade
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
 		$helper                   = new SimpleModelHelper();
 		$helper->attachEventListeners( self::$redbean );
-		if (empty(self::$redbean->getBeanHelper())) {
+		if (self::$redbean->getBeanHelper() != NULL) {
 			self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
 		}
 		self::$duplicationManager = new DuplicationManager( self::$toolbox );
