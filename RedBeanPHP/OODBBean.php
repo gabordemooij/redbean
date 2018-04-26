@@ -504,7 +504,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return BeanHelper
 	 */
-	public function getBeanHelper( BeanHelper $helper )
+	public function getBeanHelper()
 	{
 		return $this->beanHelper;
 	}
