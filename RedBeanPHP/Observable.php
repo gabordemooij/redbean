@@ -42,10 +42,8 @@ abstract class Observable { //bracket must be here - otherwise coverage software
 			$this->observers[$eventname] = array();
 		}
 
-		foreach ( $this->observers[$eventname] as $o ) {
-			if ( $o == $observer ) {
-				return;
-			}
+		if ( in_array( $observer, $this->observers[$eventname] ) ) {
+			return;
 		}
 
 		$this->observers[$eventname][] = $observer;
