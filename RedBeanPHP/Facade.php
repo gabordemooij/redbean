@@ -392,8 +392,8 @@ class Facade
 			throw new RedException( 'Database not found in registry. Add database using R::addDatabase().' );
 		}
 
-		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 		self::$currentDB = $key;
+		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 
 		return TRUE;
 	}
@@ -1558,7 +1558,7 @@ class Facade
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
 		$helper                   = new SimpleModelHelper();
 		$helper->attachEventListeners( self::$redbean );
-		self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
+		self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper( self::$currentDB ) );
 		self::$redbean->setDuplicationManager( new DuplicationManager( self::$toolbox ) );
 		self::$redbean->setTagManager( new TagManager( self::$toolbox ) );
 		return $oldTools;
