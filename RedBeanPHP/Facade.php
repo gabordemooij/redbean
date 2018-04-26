@@ -2558,7 +2558,7 @@ class Facade
 	 */
 	public static function useBeanOODB( $toggle = TRUE )
 	{
-		self::$useBeanOODB = $automatic;
+		self::$useBeanOODB = $toggle;
 	}
 
 	/**
