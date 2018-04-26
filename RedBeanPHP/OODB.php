@@ -68,6 +68,11 @@ class OODB extends Observable
 	 * @var AssociationManager
 	 */
 	protected $assocManager = NULL;
+	
+	/**
+	 * @var DuplicationManager
+	 */
+	protected $duplicationManager = NULL;
 
 	/**
 	 * @var Repository
@@ -526,6 +531,34 @@ class OODB extends Observable
 	public function setAssociationManager( AssociationManager $assocManager )
 	{
 		$this->assocManager = $assocManager;
+	}
+	
+	/**
+	 * Returns the Duplication Manager for use with OODB.
+	 * A simple getter function to obtain a reference.
+	 *
+	 * @return DuplicationManager
+	 */
+	public function getDuplicationManager()
+	{
+		if ( !isset( $this->duplicationManager ) ) {
+			throw new RedException( 'No duplication manager available.' );
+		}
+
+		return $this->duplicationManager;
+	}
+
+	/**
+	 * Sets the duplication manager instance to be used by this OODB.
+	 * A simple setter function to set the duplication manager.
+	 *
+	 * @param DuplicationManager $duplicationManager sets the duplication manager to be used
+	 *
+	 * @return void
+	 */
+	public function setDuplicationManager( DuplicationManager $duplicationManager )
+	{
+		$this->duplicationManager = $duplicationManager;
 	}
 
 	/**
