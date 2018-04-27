@@ -1,5 +1,12 @@
 <?php
 
+function redunit_error_handler($errno,$errstr,$errfile,$errline) {
+	$err = "REDUNITERROR: $errno,$errstr,$errfile,$errline";
+	echo $err;
+	throw new \Exception($err);
+	return true;
+}
+
 chdir( '..' );
 $xdebugSupported = (function_exists('xdebug_start_code_coverage'));
 

@@ -30,6 +30,35 @@ use RedBeanPHP\SimpleModel as SimpleModel;
 class Misc extends Base
 {
 	/**
+	 * Github issue:
+	 * Remove $NULL to directly return NULL #625
+	 * @@ -1097,8 +1097,7 @@ public function &__get( $property )
+	 *		$this->all        = FALSE;
+	 *		$this->via        = NULL;
+	 *
+	 * - $NULL = NULL;
+	 * - return $NULL;
+	 * + return NULL;
+	 *
+	 * leads to regression:
+	 * PHP Stack trace:
+	 * PHP 1. {main}() testje.php:0
+	 * PHP 2. RedBeanPHP\OODBBean->__get() testje.php:22
+	 * Notice: Only variable references should be returned by reference in rb.php on line 2529
+	 */
+	public function testReferencedGetInBeans()
+	{
+		$bean = R::dispense( 'bean' );
+		//this will trigger notice if &__get() returns NULL instead of $NULL.#625
+		$x = $bean->hello;
+		pass();
+		$x = $bean->reference;
+		pass();
+		$x = $bean->nullvalue;
+		pass();
+	}
+
+	/**
 	 * Check partial beans at setup()
 	 */
 	 public function testPartialBeansAtSetup()
@@ -134,7 +163,7 @@ class Misc extends Base
 	public function testCheckDirectly()
 	{
 		$bean = new OODBBean;
-		$bean->id = 0;
+		$bean->setProperty('id', 0);
 		$bean->setMeta( 'type', 'book' );
 		R::getRedBean()->check( $bean );
 		$bean->setMeta( 'type', '.' );

@@ -324,7 +324,9 @@ class Aliasing extends Base
 			} catch ( RedException $e ) {
 				pass();
 			} catch ( \Exception $e ) {
-				fail();
+				if (strpos($e->getMessage(),'8,Array to string conversion')===FALSE) {
+					fail();
+				}
 			}
 		}
 	}
