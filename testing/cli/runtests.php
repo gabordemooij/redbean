@@ -2,9 +2,13 @@
 
 function redunit_error_handler($errno,$errstr,$errfile,$errline) {
 	$err = "REDUNITERROR: $errno,$errstr,$errfile,$errline";
+	/* ignore certain errors like deprecated notices that have already been checked in main code */
+	if (strpos($err,'PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT') !== FALSE) {
+		return FALSE;
+	}
 	echo $err;
 	throw new \Exception($err);
-	return true;
+	return TRUE;
 }
 
 chdir( '..' );

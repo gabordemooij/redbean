@@ -86,7 +86,7 @@ abstract class RedUNIT
 				// Some tests use a broken database on purpose, so an exception is ok
 			}
 		}
-		set_error_handler($old_error_handler);
+		restore_error_handler();
 	}
 
 	/**
