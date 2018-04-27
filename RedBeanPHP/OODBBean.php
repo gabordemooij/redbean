@@ -1435,7 +1435,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __call( $method, $args )
 	{
-		if (!isset($this->__info['model']) || !$this->__info['model']) {
+		if ( empty( $this->__info['model'] ) ) {
 			return NULL;
 		}
 		
