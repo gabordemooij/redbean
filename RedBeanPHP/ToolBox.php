@@ -106,9 +106,16 @@ class ToolBox
 	 */
 	public function __construct( OODB $oodb, Adapter $adapter, QueryWriter $writer )
 	{
-		$this->oodb    = $oodb;
-		$this->adapter = $adapter;
-		$this->writer  = $writer;
+		$this->oodb               = $oodb;
+		$this->adapter            = $adapter;
+		$this->writer             = $writer;
+		$this->finder             = NULL;
+		$this->associationManger  = NULL;
+		$this->labelMaker         = NULL;
+		$this->simpleModelHelper  = NULL;
+		$this->beanHelper         = NULL;
+		$this->duplicationManager = NULL;
+		$this->tagManager         = NULL;
 		return $this;
 	}
 
@@ -201,11 +208,12 @@ class ToolBox
 	}
 	
 	/**
-	 * Sets the finder.
+	 * Sets and returns the finder.
 	 */
 	public function setFinder( Finder $finder )
 	{
 		$this->finder = $finder;
+		return $this->finder;
 	}
 
 	/**
@@ -217,11 +225,13 @@ class ToolBox
 	}
 
 	/**
-	 * Sets the association manager.
+	 * Sets and returns the association manager.
 	 */
 	public function setAssociationManager( AssociationManager $associationManager )
 	{
 		$this->associationManager = $associationManager;
+		$this->oodb->setAssociationManager( $associationManager );
+		return $this->associationManager;
 	}
 
 	/**
@@ -233,11 +243,12 @@ class ToolBox
 	}
 
 	/**
-	 * Sets the label maker.
+	 * Sets and returns the label maker.
 	 */
 	public function setLabelMaker( LabelMaker $labelMaker )
 	{
 		$this->labelMaker = $labelMaker;
+		return $this->labelMaker;
 	}
 
 	/**
@@ -249,11 +260,13 @@ class ToolBox
 	}
 
 	/**
-	 * Sets the simple model helper.
+	 * Sets and returns the simple model helper.
 	 */
 	public function setSimpleModelHelper( SimpleModelHelper $simpleModelHelper )
 	{
 		$this->simpleModelHelper = $simpleModelHelper;
+		$this->simpleModelHelper->attachEventListeners( $this->oodb );
+		return $this->simpleModelHelper;
 	}
 
 	/**
@@ -265,11 +278,13 @@ class ToolBox
 	}
 
 	/**
-	 * Sets the bean helper.
+	 * Sets and returns the bean helper.
 	 */
 	public function setBeanHelper( BeanHelper $beanHelper )
 	{
 		$this->beanHelper = $beanHelper;
+		$this->oodb->setBeanHelper( $beanHelper );
+		return $this->beanHelper;
 	}
 
 	/**
@@ -281,11 +296,12 @@ class ToolBox
 	}
 
 	/**
-	 * Sets the duplication manager.
+	 * Sets and returns the duplication manager.
 	 */
 	public function setDuplicationManager( DuplicationManager $duplicationManager )
 	{
 		$this->duplicationManager = $duplicationManager;
+		return $this->duplicationManager;
 	}
 
 	/**
@@ -297,11 +313,12 @@ class ToolBox
 	}
 
 	/**
-	 * Sets the tag manager.
+	 * Sets and returns the tag manager.
 	 */
 	public function setTagManager( TagManager $tagManager )
 	{
 		$this->tagManager = $tagManager;
+		return $this->tagManager;
 	}
 
 	/**
