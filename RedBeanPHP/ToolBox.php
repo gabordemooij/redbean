@@ -43,6 +43,41 @@ class ToolBox
 	protected $adapter;
 
 	/**
+	 * @var Finder
+	 */
+	protected $finder;
+
+	/**
+	 * @var AssociationManager
+	 */
+	protected $associationManager;
+
+	/**
+	 * @var LabelMaker
+	 */
+	protected $labelMaker;
+
+	/**
+	 * @var SimpleModelHelper
+	 */
+	protected $simpleModelHelper;
+
+	/**
+	 * @var BeanHelper
+	 */
+	protected $beanHelper;
+
+	/**
+	 * @var DuplicationManager
+	 */
+	protected $duplicationManager;
+
+	/**
+	 * @var TagManager
+	 */
+	protected $tagManager;
+
+	/**
 	 * Constructor.
 	 * The toolbox is an integral part of RedBeanPHP providing the basic
 	 * architectural building blocks to manager objects, helpers and additional tools
@@ -163,5 +198,117 @@ class ToolBox
 	public function getDatabaseAdapter()
 	{
 		return $this->adapter;
+	}
+	
+	/**
+	 * Sets the finder.
+	 */
+	public function setFinder( Finder $finder )
+	{
+		$this->finder = $finder;
+	}
+
+	/**
+	 * Returns the finder.
+	 */
+	public function getFinder()
+	{
+		return $this->finder;
+	}
+
+	/**
+	 * Sets the association manager.
+	 */
+	public function setAssociationManager( AssociationManager $associationManager )
+	{
+		$this->associationManager = $associationManager;
+	}
+
+	/**
+	 * Returns the association manager.
+	 */
+	public function getAssociationManager()
+	{
+		return $this->associationManager;
+	}
+
+	/**
+	 * Sets the label maker.
+	 */
+	public function setLabelMaker( LabelMaker $labelMaker )
+	{
+		$this->labelMaker = $labelMaker;
+	}
+
+	/**
+	 * Returns the label maker.
+	 */
+	public function getLabelMaker()
+	{
+		return $this->labelMaker;
+	}
+
+	/**
+	 * Sets the simple model helper.
+	 */
+	public function setSimpleModelHelper( SimpleModelHelper $simpleModelHelper )
+	{
+		$this->simpleModelHelper = $simpleModelHelper;
+	}
+
+	/**
+	 * Returns the simple model helper.
+	 */
+	public function getSimpleModelHelper()
+	{
+		return $this->simpleModelHelper;
+	}
+
+	/**
+	 * Sets the bean helper.
+	 */
+	public function setBeanHelper( BeanHelper $beanHelper )
+	{
+		$this->beanHelper = $beanHelper;
+	}
+
+	/**
+	 * Returns the bean helper.
+	 */
+	public function getBeanHelper()
+	{
+		return $this->beanHelper;
+	}
+
+	/**
+	 * Sets the duplication manager.
+	 */
+	public function setDuplicationManager( DuplicationManager $duplicationManager )
+	{
+		$this->duplicationManager = $duplicationManager;
+	}
+
+	/**
+	 * Returns the duplicationManager.
+	 */
+	public function getDuplicationManager()
+	{
+		return $this->duplicationManager;
+	}
+
+	/**
+	 * Sets the tag manager.
+	 */
+	public function setTagManager( TagManager $tagManager )
+	{
+		$this->tagManager = $tagManager;
+	}
+
+	/**
+	 * Returns the tag manager.
+	 */
+	public function getTagManager()
+	{
+		return $this->tagManager;
 	}
 }
