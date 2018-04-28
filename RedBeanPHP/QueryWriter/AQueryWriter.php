@@ -378,8 +378,8 @@ abstract class AQueryWriter
 			}
 
 			$checkOODB = reset( $values );
-			if ( $checkOODB instanceof OODBBean && $checkOODB->getMeta( 'type' ) == $column && substr( $column, -3 ) != '_id' )
-				$column = $column . "_id";
+			if ( $checkOODB instanceof OODBBean && $checkOODB->getMeta( 'type' ) === $column && substr( $column, -3 ) != '_id' )
+				$column = $column . '_id';
 
 
 			$sql = $this->esc( $column );
