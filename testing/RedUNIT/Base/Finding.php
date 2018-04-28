@@ -614,12 +614,25 @@ class Finding extends Base {
 		$page2 = R::dispense( 'page' );
 		$page2->book = $book2;
 		R::store( $page2 );
-		$pages = R::findLike( 'page', array( 'book_id' => [ 1, 2 ] ) );
-		$pagesWithOODB = R::findLike( 'page', array( 'book' => [ $book, $book2 ] ) );
+		$pages = R::findLike( 'page', array( 'book_id' => array( 1, 2 ) ) );
+		$pagesWithOODB = R::findLike( 'page', array( 'book' => array( $book, $book2 ) ) );
 		asrt( count( $pagesWithOODB ), 2 );
 		asrt( json_encode($pagesWithOODB), json_encode($pages) );
 		asrt( reset( $pagesWithOODB )->id, $page->id );
 		asrt( end( $pagesWithOODB )->id, $page2->id );
+
+		$pages = R::findLike( 'page', array( 'book' => array( $book, $book2->id ) ) );
+		asrt( count( $pages ), 2 );
+		asrt( reset( $pages )->id, $page->id );
+		asrt( end( $pages )->id, $page2->id );
+
+		$pages = R::findLike( 'page', array( 'book_id' => array( $book->id, $book2 ) ) );
+		asrt( count( $pages ), 2 );
+		asrt( reset( $pages )->id, $page->id );
+		asrt( end( $pages )->id, $page2->id );
+
+		$pagesFail = R::findLike( 'page', array( 'book' => array( $book->id, $book2 ) ) );
+		asrt( count( $pagesFail ), 0 );
 
 		$book3 = R::dispense( 'book' );
 		$page3 = R::dispense( 'page' );
@@ -627,6 +640,7 @@ class Finding extends Base {
 		$page3->book = $book3;
 		$pagesFail = R::findLike( 'page', array( 'book' => $book3 ) );
 		asrt( count( $pagesFail ), 0 );
+
 	}
 
 	/**
