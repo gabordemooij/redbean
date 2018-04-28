@@ -641,6 +641,12 @@ class Finding extends Base {
 		$pagesFail = R::findLike( 'page', array( 'book' => $book3 ) );
 		asrt( count( $pagesFail ), 0 );
 
+		$pen = R::dispense( 'pen' );
+		R::store( $pen );
+		asrt( $pen->id, $book->id );
+		$pagesFail = R::findLike( 'page', array( 'book' => $pen ) );
+		asrt( count( $pagesFail ), 0 );
+
 	}
 
 	/**
