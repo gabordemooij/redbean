@@ -600,6 +600,29 @@ class Finding extends Base {
 	}
 
 	/**
+	 * Tests OODBBean as conditions
+	 *
+	 * @return void
+	 */
+	public function testFindLikeWithOODBBeans() {
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$page->book = $book;
+		R::store( $page );
+		$book2 = R::dispense( 'book' );
+		$page2 = R::dispense( 'page' );
+		$page2->book = $book2;
+		R::store( $page2 );
+		$pages = R::findLike( 'page', array( 'book_id' => [ 1, 2 ] ) );
+		$pagesWithOODB = R::findLike( 'page', array( 'book' => [ $book, $book2 ] ) );
+		asrt( count( $pagesWithOODB ), 2 );
+		asrt( json_encode($pagesWithOODB), json_encode($pages) );
+		asrt( reset( $pagesWithOODB )->id, $page->id );
+		asrt( end( $pagesWithOODB )->id, $page2->id );
+	}
+
+	/**
 	 * Tests the findLike method.
 	 *
 	 * @return void
