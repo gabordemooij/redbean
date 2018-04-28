@@ -620,6 +620,13 @@ class Finding extends Base {
 		asrt( json_encode($pagesWithOODB), json_encode($pages) );
 		asrt( reset( $pagesWithOODB )->id, $page->id );
 		asrt( end( $pagesWithOODB )->id, $page2->id );
+
+		$book3 = R::dispense( 'book' );
+		$page3 = R::dispense( 'page' );
+		R::store( $page3 );
+		$page3->book = $book3;
+		$pagesFail = R::findLike( 'page', array( 'book' => $book3 ) );
+		asrt( count( $pagesFail ), 0 );
 	}
 
 	/**

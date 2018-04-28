@@ -392,7 +392,6 @@ abstract class AQueryWriter
 
 				foreach ( $values as $k => $v ) {
 					if ( $v instanceof OODBBean ) {
-						if ( empty( $v->id ) ) continue;
 						$v = $v->id;
 					}
 					$values[$k] = strval( $v );
@@ -405,7 +404,6 @@ abstract class AQueryWriter
 
 				foreach( $values as $k => $v ) {
 					if ( $v instanceof OODBBean ) {
-						if ( empty( $v->id ) ) continue;
 						$v = $v->id;
 					}
 					$slot            = ':slot'.$counter++;
