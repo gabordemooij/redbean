@@ -37,9 +37,9 @@ if ( isset( $ini['pgsql'] ) ) {
 
 if ( isset( $ini['sqlite'] ) ) {
 	R::addDatabase( 'sqlite', 'sqlite:' . $ini['sqlite']['file'], NULL, NULL, FALSE );
+	R::selectDatabase( 'sqlite' );
 }
 
-R::selectDatabase( 'sqlite' );
 
 // Function to activate a driver
 function activate_driver( $d )
