@@ -1,5 +1,16 @@
 <?php
 
+function redunit_error_handler($errno,$errstr,$errfile,$errline) {
+	$err = "REDUNITERROR: $errno,$errstr,$errfile,$errline";
+	/* ignore certain errors like deprecated notices that have already been checked in main code */
+	if (strpos($err,'PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT') !== FALSE) {
+		return FALSE;
+	}
+	echo $err;
+	throw new \Exception($err);
+	return TRUE;
+}
+
 chdir( '..' );
 $xdebugSupported = (function_exists('xdebug_start_code_coverage'));
 
@@ -82,9 +93,9 @@ if ( defined( 'HHVM_VERSION' ) ) {
 
 if ( isset( $ini['sqlite'] ) ) {
 	R::addDatabase( 'sqlite', 'sqlite:' . $ini['sqlite']['file'], NULL, NULL, FALSE );
+	R::selectDatabase( 'sqlite' );
 }
 
-R::selectDatabase( 'sqlite' );
 
 // Function to activate a driver
 function activate_driver( $d )

@@ -324,24 +324,27 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	private function parseJoin( $type )
 	{
+		if ( strpos($this->withSql, '@joined.' ) === FALSE ) {
+			return '';
+		}
+		
 		$joinSql = '';
 		$joins = array();
-		if ( strpos($this->withSql, '@joined.' ) !== FALSE ) {
-			$writer   = $this->beanHelper->getToolBox()->getWriter();
-			$oldParts = $parts = explode( '@joined.', $this->withSql );
-			array_shift( $parts );
-			foreach($parts as $part) {
-				$explosion = explode( '.', $part );
-				$joinInfo  = reset( $explosion );
-				//Dont join more than once..
-				if ( !isset( $joins[$joinInfo] ) ) {
-					$joins[ $joinInfo ] = TRUE;
-					$joinSql  .= $writer->writeJoin( $type, $joinInfo, 'LEFT' );
-				}
+		$writer   = $this->beanHelper->getToolBox()->getWriter();
+		$oldParts = $parts = explode( '@joined.', $this->withSql );
+		array_shift( $parts );
+		foreach($parts as $part) {
+			$explosion = explode( '.', $part );
+			$joinInfo  = reset( $explosion );
+			//Dont join more than once..
+			if ( !isset( $joins[$joinInfo] ) ) {
+				$joins[ $joinInfo ] = TRUE;
+				$joinSql  .= $writer->writeJoin( $type, $joinInfo, 'LEFT' );
 			}
-			$this->withSql = implode( '', $oldParts );
-			$joinSql      .= ' WHERE ';
 		}
+		$this->withSql = implode( '', $oldParts );
+		$joinSql      .= ' WHERE ';
+		
 		return $joinSql;
 	}
 
@@ -1445,7 +1448,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __call( $method, $args )
 	{
-		if (!isset($this->__info['model']) || !$this->__info['model']) {
+		if ( empty( $this->__info['model'] ) ) {
 			return NULL;
 		}
 		

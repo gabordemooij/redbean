@@ -377,6 +377,11 @@ abstract class AQueryWriter
 				$values = array( $values );
 			}
 
+			$checkOODB = reset( $values );
+			if ( $checkOODB instanceof OODBBean && $checkOODB->getMeta( 'type' ) === $column && substr( $column, -3 ) != '_id' )
+				$column = $column . '_id';
+
+
 			$sql = $this->esc( $column );
 			$sql .= ' IN ( ';
 
@@ -386,6 +391,9 @@ abstract class AQueryWriter
 				array_unshift($sqlConditions, $sql);
 
 				foreach ( $values as $k => $v ) {
+					if ( $v instanceof OODBBean ) {
+						$v = $v->id;
+					}
 					$values[$k] = strval( $v );
 
 					array_unshift( $bindings, $v );
@@ -395,6 +403,9 @@ abstract class AQueryWriter
 				$slots = array();
 
 				foreach( $values as $k => $v ) {
+					if ( $v instanceof OODBBean ) {
+						$v = $v->id;
+					}
 					$slot            = ':slot'.$counter++;
 					$slots[]         = $slot;
 					$bindings[$slot] = strval( $v );
@@ -406,15 +417,12 @@ abstract class AQueryWriter
 		}
 
 		$sql = '';
-		$addSql = $this->glueSQLCondition( $addSql, !empty( $sqlConditions ) ? QueryWriter::C_GLUE_AND : NULL );
 		if ( !empty( $sqlConditions ) ) {
-			$sql = implode( ' AND ', $sqlConditions );
-			$sql = " WHERE ( $sql ) ";
-
-			if ( $addSql ) $sql .= $addSql;
-		} elseif ( $addSql ) {
-			$sql = $addSql;
+			$sql .= " WHERE ( " . implode( ' AND ', $sqlConditions ) . ") ";
 		}
+
+		$addSql = $this->glueSQLCondition( $addSql, !empty( $sqlConditions ) ? QueryWriter::C_GLUE_AND : NULL );
+		if ( $addSql ) $sql .= $addSql;
 
 		return $sql;
 	}

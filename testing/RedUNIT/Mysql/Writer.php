@@ -169,6 +169,14 @@ class Writer extends \RedUNIT\Mysql
 	{
 		global $travis;
 		if ($travis) return;
+		// Check if database platform is MariaDB < 10.2
+		$selectVersion = R::getDatabaseAdapter()->getCol( 'SELECT VERSION()' );
+		list ( $version, $dbPlatform ) = explode( '-', reset ( $selectVersion ) );
+		list( $versionMajor, $versionMinor, $versionPatch ) = explode( '.', $version );
+		if ( $dbPlatform == "MariaDB" && $versionMajor <= 10 && $versionMinor < 2 ) {
+			// No support for JSON columns, abort test
+			return;
+		}
 		R::nuke();
 		$bean = R::dispense('bean');
 		$message = json_encode( array( 'message' => 'hello', 'type' => 'greeting' ) );
