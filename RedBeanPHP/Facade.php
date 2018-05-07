@@ -68,7 +68,7 @@ class Facade
 	 * @var DBAdapter
 	 */
 	private static $adapter;
-	
+
 	/**
 	 * @var AssociationManager
 	 */
@@ -123,7 +123,7 @@ class Facade
 	 * @var array
 	 */
 	public static $toolboxes = array();
-	
+
 	/**
 	 * @var bool
 	 */
@@ -530,11 +530,10 @@ class Facade
 	 */
 	public static function store( $bean )
 	{
-		if (self::$useBeanOODB) {
+		if (self::$useBeanOODB)
 			return $bean->getBeanHelper()->getToolbox()->getRedBean()->store( $bean );
-		} else {
-			return self::$redbean->store( $bean );
-		}
+
+		return self::$redbean->store( $bean );
 	}
 
 	/**
@@ -680,11 +679,10 @@ class Facade
 	public static function trash( $beanOrType, $id = NULL )
 	{
 		if ( is_string( $beanOrType ) ) return self::trash( self::load( $beanOrType, $id ) );
-		if ( self::$useBeanOODB ) {
+		if ( self::$useBeanOODB )
 			return $beanOrType->getBeanHelper()->getToolbox()->getRedBean()->trash( $beanOrType );
-		} else {
-			return self::$redbean->trash( $beanOrType );
-		}
+
+		return self::$redbean->trash( $beanOrType );
 	}
 
 	/**
@@ -1357,11 +1355,10 @@ class Facade
 	 */
 	public static function hasTag( OODBBean $bean, $tags, $all = FALSE )
 	{
-		if (self::$useBeanOODB) {
+		if (self::$useBeanOODB)
 			return $bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->hasTag( $bean, $tags, $all );
-		} else {
-			return self::$redbean->getTagManager()->hasTag( $bean, $tags, $all );
-		}
+
+		return self::$redbean->getTagManager()->hasTag( $bean, $tags, $all );
 	}
 
 	/**
@@ -1420,11 +1417,10 @@ class Facade
 	 */
 	public static function tag( OODBBean $bean, $tagList = NULL )
 	{
-		if (self::$useBeanOODB) {
+		if (self::$useBeanOODB)
 			return $bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->tag( $bean, $tagList );
-		} else {
-			return self::$redbean->getTagManager()->tag( $bean, $tagList );
-		}
+
+		return self::$redbean->getTagManager()->tag( $bean, $tagList );
 	}
 
 	/**
