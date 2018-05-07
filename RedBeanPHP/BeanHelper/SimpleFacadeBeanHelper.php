@@ -31,9 +31,9 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 * @var \Closure
 	 */
 	private static $factory = null;
-	
+
 	/**
-	 * @var string
+	 * @var string|null
 	 */
 	private $databaseKey = NULL;
 
@@ -63,7 +63,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	{
 		self::$factory = $factory;
 	}
-	
+
 	/**
 	 * Sets the name of the database to get specific toolbox if needed.
 	 *
@@ -82,11 +82,10 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 */
 	public function getToolbox()
 	{
-		if ( Facade::$useBeanOODB ) {
+		if ( Facade::$useBeanOODB )
 			return Facade::$toolboxes[$this->databaseKey];
-		} else {
-			return Facade::getToolBox();
-		}
+
+		return Facade::getToolBox();
 	}
 
 	/**
@@ -129,8 +128,8 @@ class SimpleFacadeBeanHelper implements BeanHelper
 		if ( Facade::$useBeanOODB ) {
 			$toolbox = Facade::$toolboxes[$this->databaseKey];
 			return array( $toolbox->getRedbean(), $toolbox->getDatabaseAdapter(), $toolbox->getWriter(), $toolbox );
-		} else {
-			return Facade::getExtractedToolbox();
 		}
+
+		return Facade::getExtractedToolbox();
 	}
 }
