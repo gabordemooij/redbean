@@ -1065,7 +1065,14 @@ abstract class AQueryWriter
 	{
 		$table  = $this->esc( $type );
 
-		$this->updateCache(); //check if cache chain has been broken
+		$key = NULL;
+		if ( $this->flagUseCache ) {
+			$key = $this->getCacheKey( array( $conditions, "$addSql {$this->sqlSelectSnippet}", $bindings, 'count' ) );
+
+			if ( $cached = $this->getCached( $type, $key ) ) {
+				return $cached;
+			}
+		}
 
 		if ( is_array ( $conditions ) && !empty ( $conditions ) ) {
 			$sql = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
@@ -1074,8 +1081,13 @@ abstract class AQueryWriter
 		}
 		
 		$sql    = "SELECT COUNT(*) FROM {$table} {$sql} -- keep-cache";
+		$count  = (int) $this->adapter->getCell( $sql, $bindings );
 
-		return (int) $this->adapter->getCell( $sql, $bindings );
+		if ( $this->flagUseCache ) {
+			$this->putResultInCache( $type, $key, $count );
+		}
+
+		return $count;
 	}
 
 	/**
