@@ -95,6 +95,16 @@ class Facade
 	private static $finder;
 
 	/**
+	 * @var SimpleModelHelper
+	 */
+	private static $simpleModelHelper;
+
+	/**
+	 * @var beanHelper
+	 */
+	private static $beanHelper;
+
+	/**
 	 * @var Logger
 	 */
 	private static $logger;
@@ -1534,17 +1544,34 @@ class Facade
 		self::$writer             = self::$toolbox->getWriter();
 		self::$adapter            = self::$toolbox->getDatabaseAdapter();
 		self::$redbean            = self::$toolbox->getRedBean();
-		self::$finder             = new Finder( self::$toolbox );
-		self::$associationManager = new AssociationManager( self::$toolbox );
-		self::$redbean->setAssociationManager( self::$associationManager );
-		self::$labelMaker         = new LabelMaker( self::$toolbox );
-		$helper                   = new SimpleModelHelper();
-		$helper->attachEventListeners( self::$redbean );
-		if (self::$redbean->getBeanHelper() == NULL) {
-			self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
+
+		if ( ( self::$finder = self::$toolbox->getFinder() ) === NULL ) {
+			self::$finder = self::$toolbox->setFinder( new Finder( self::$toolbox ) );
 		}
-		self::$duplicationManager = new DuplicationManager( self::$toolbox );
-		self::$tagManager         = new TagManager( self::$toolbox );
+
+		if ( ( self::$associationManager = self::$toolbox->getAssociationManager() ) === NULL ) {
+			self::$associationManager = self::$toolbox->setAssociationManager( new AssociationManager( self::$toolbox ) );
+		}
+
+		if ( ( self::$labelMaker = self::$toolbox->getLabelMaker() ) === NULL ) {
+			self::$labelMaker = self::$toolbox->setLabelMaker( new LabelMaker( self::$toolbox ) );
+		}
+
+		if ( ( self::$simpleModelHelper = self::$toolbox->getSimpleModelHelper() ) === NULL ) {
+			self::$simpleModelHelper = self::$toolbox->setSimpleModelHelper( new SimpleModelHelper( self::$toolbox ) );
+		}
+
+		if ( ( self::$beanHelper = self::$toolbox->getBeanHelper() ) === NULL ) {
+			self::$beanHelper = self::$toolbox->setBeanHelper( new SimpleFacadeBeanHelper( self::$toolbox ) );
+		}
+
+		if ( ( self::$duplicationManager = self::$toolbox->getDuplicationManager() ) === NULL ) {
+			self::$duplicationManager = self::$toolbox->setDuplicationManager( new DuplicationManager( self::$toolbox ) );
+		}
+
+		if ( ( self::$tagManager = self::$toolbox->getTagManager() ) === NULL ) {
+			self::$tagManager = self::$toolbox->setTagManager( new TagManager( self::$toolbox ) );
+		}
 		return $oldTools;
 	}
 

@@ -43,6 +43,41 @@ class ToolBox
 	protected $adapter;
 
 	/**
+	 * @var Finder
+	 */
+	protected $finder;
+
+	/**
+	 * @var AssociationManager
+	 */
+	protected $associationManager;
+
+	/**
+	 * @var LabelMaker
+	 */
+	protected $labelMaker;
+
+	/**
+	 * @var SimpleModelHelper
+	 */
+	protected $simpleModelHelper;
+
+	/**
+	 * @var BeanHelper
+	 */
+	protected $beanHelper;
+
+	/**
+	 * @var DuplicationManager
+	 */
+	protected $duplicationManager;
+
+	/**
+	 * @var TagManager
+	 */
+	protected $tagManager;
+
+	/**
 	 * Constructor.
 	 * The toolbox is an integral part of RedBeanPHP providing the basic
 	 * architectural building blocks to manager objects, helpers and additional tools
@@ -71,9 +106,16 @@ class ToolBox
 	 */
 	public function __construct( OODB $oodb, Adapter $adapter, QueryWriter $writer )
 	{
-		$this->oodb    = $oodb;
-		$this->adapter = $adapter;
-		$this->writer  = $writer;
+		$this->oodb               = $oodb;
+		$this->adapter            = $adapter;
+		$this->writer             = $writer;
+		$this->finder             = NULL;
+		$this->associationManger  = NULL;
+		$this->labelMaker         = NULL;
+		$this->simpleModelHelper  = NULL;
+		$this->beanHelper         = NULL;
+		$this->duplicationManager = NULL;
+		$this->tagManager         = NULL;
 		return $this;
 	}
 
@@ -163,5 +205,127 @@ class ToolBox
 	public function getDatabaseAdapter()
 	{
 		return $this->adapter;
+	}
+	
+	/**
+	 * Sets and returns the finder.
+	 */
+	public function setFinder( Finder $finder )
+	{
+		$this->finder = $finder;
+		return $this->finder;
+	}
+
+	/**
+	 * Returns the finder.
+	 */
+	public function getFinder()
+	{
+		return $this->finder;
+	}
+
+	/**
+	 * Sets and returns the association manager.
+	 */
+	public function setAssociationManager( AssociationManager $associationManager )
+	{
+		$this->associationManager = $associationManager;
+		$this->oodb->setAssociationManager( $associationManager );
+		return $this->associationManager;
+	}
+
+	/**
+	 * Returns the association manager.
+	 */
+	public function getAssociationManager()
+	{
+		return $this->associationManager;
+	}
+
+	/**
+	 * Sets and returns the label maker.
+	 */
+	public function setLabelMaker( LabelMaker $labelMaker )
+	{
+		$this->labelMaker = $labelMaker;
+		return $this->labelMaker;
+	}
+
+	/**
+	 * Returns the label maker.
+	 */
+	public function getLabelMaker()
+	{
+		return $this->labelMaker;
+	}
+
+	/**
+	 * Sets and returns the simple model helper.
+	 */
+	public function setSimpleModelHelper( SimpleModelHelper $simpleModelHelper )
+	{
+		$this->simpleModelHelper = $simpleModelHelper;
+		$this->simpleModelHelper->attachEventListeners( $this->oodb );
+		return $this->simpleModelHelper;
+	}
+
+	/**
+	 * Returns the simple model helper.
+	 */
+	public function getSimpleModelHelper()
+	{
+		return $this->simpleModelHelper;
+	}
+
+	/**
+	 * Sets and returns the bean helper.
+	 */
+	public function setBeanHelper( BeanHelper $beanHelper )
+	{
+		$this->beanHelper = $beanHelper;
+		$this->oodb->setBeanHelper( $beanHelper );
+		return $this->beanHelper;
+	}
+
+	/**
+	 * Returns the bean helper.
+	 */
+	public function getBeanHelper()
+	{
+		return $this->beanHelper;
+	}
+
+	/**
+	 * Sets and returns the duplication manager.
+	 */
+	public function setDuplicationManager( DuplicationManager $duplicationManager )
+	{
+		$this->duplicationManager = $duplicationManager;
+		return $this->duplicationManager;
+	}
+
+	/**
+	 * Returns the duplicationManager.
+	 */
+	public function getDuplicationManager()
+	{
+		return $this->duplicationManager;
+	}
+
+	/**
+	 * Sets and returns the tag manager.
+	 */
+	public function setTagManager( TagManager $tagManager )
+	{
+		$this->tagManager = $tagManager;
+		return $this->tagManager;
+	}
+
+	/**
+	 * Returns the tag manager.
+	 */
+	public function getTagManager()
+	{
+		return $this->tagManager;
 	}
 }
