@@ -895,7 +895,7 @@ abstract class AQueryWriter
 	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
 		if ( $this->flagUseCache ) {
-			$key = $this->getCacheKey( array( $conditions, "$addSql {$this->sqlSelectSnippet}", $bindings, 'select' ) );
+			$key = $this->getCacheKey( array( $conditions, trim("$addSql {$this->sqlSelectSnippet}"), $bindings, 'select' ) );
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
 			}
@@ -945,7 +945,7 @@ abstract class AQueryWriter
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 
 		if ( $this->flagUseCache ) {
-			$key = $this->getCacheKey( array( $sourceType, implode( ',', $linkIDs ), $addSql, $bindings, 'selectrelated' ) );
+			$key = $this->getCacheKey( array( $sourceType, implode( ',', $linkIDs ), trim($addSql), $bindings, 'selectrelated' ) );
 			if ( $cached = $this->getCached( $destType, $key ) ) {
 				return $cached;
 			}
@@ -1041,7 +1041,7 @@ abstract class AQueryWriter
 	public function queryTagged( $type, $tagList, $all = FALSE, $addSql = '', $bindings = array() )
 	{
 		if ( $this->flagUseCache ) {
-			$key = $this->getCacheKey( array( implode( ',', $tagList ), $all, $addSql, $bindings, 'selectTagged' ) );
+			$key = $this->getCacheKey( array( implode( ',', $tagList ), $all, trim($addSql), $bindings, 'selectTagged' ) );
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
 			}
@@ -1080,7 +1080,7 @@ abstract class AQueryWriter
 	public function queryRecordCount( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
 		if ( $this->flagUseCache ) {
-			$key = $this->getCacheKey( array( $conditions, $addSql, $bindings, 'count' ) );
+			$key = $this->getCacheKey( array( $conditions, trim($addSql), $bindings, 'count' ) );
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
 			}
@@ -1112,7 +1112,7 @@ abstract class AQueryWriter
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 
 		if ( $this->flagUseCache ) {
-			$key = $this->getCacheKey( array( $sourceType, $destType, $linkID, $addSql, $bindings, 'countrelated' ) );
+			$key = $this->getCacheKey( array( $sourceType, $destType, $linkID, trim($addSql), $bindings, 'countrelated' ) );
 			if ( $cached = $this->getCached( $destType, $key ) ) {
 				return $cached;
 			}
