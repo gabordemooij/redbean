@@ -1112,7 +1112,7 @@ abstract class AQueryWriter
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 
 		if ( $this->flagUseCache ) {
-			$key = $this->getCacheKey( array( $sourceType, $destType, implode( ',', $linkIDs ), $addSql, $bindings, 'countrelated' ) );
+			$key = $this->getCacheKey( array( $sourceType, $destType, $linkID, $addSql, $bindings, 'countrelated' ) );
 			if ( $cached = $this->getCached( $destType, $key ) ) {
 				return $cached;
 			}
