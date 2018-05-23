@@ -431,9 +431,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		}
 		$beans = array();
 		if ( $this->getID() ) {
+			reset( $this->withParams );
 			$joinSql = $this->parseJoin( $type );
 			$firstKey = count( $this->withParams ) > 0
-				? key( reset( $this->withParams ) )
+				? key( $this->withParams )
 				: 0;
 			if ( is_int( $firstKey ) ) {
 				$bindings = array_merge( array( $this->getID() ), $this->withParams );
@@ -2108,9 +2109,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		}
 		$count = 0;
 		if ( $this->getID() ) {
+			reset( $this->withParams );
 			$joinSql = $this->parseJoin( $type );
 			$firstKey = count( $this->withParams ) > 0
-				? key( reset( $this->withParams ) )
+				? key( $this->withParams )
 				: 0;
 			if ( is_int( $firstKey ) ) {
 				$bindings = array_merge( array( $this->getID() ), $this->withParams );
