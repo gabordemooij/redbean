@@ -328,7 +328,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			return '';
 		}
 		
-		$joinSql = '';
+		$joinSql = ' ';
 		$joins = array();
 		$writer   = $this->beanHelper->getToolBox()->getWriter();
 		$oldParts = $parts = explode( '@joined.', $this->withSql );
@@ -436,7 +436,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				reset( $this->withParams );
 				$firstKey = key( $this->withParams );
 			}
-			$joinSql = ' ' . $this->parseJoin( $type );
+			$joinSql = $this->parseJoin( $type );
 			if ( !is_numeric( $firstKey ) || $firstKey === NULL ) {
 				$bindings           = $this->withParams;
 				$bindings[':slot0'] = $this->getID();
