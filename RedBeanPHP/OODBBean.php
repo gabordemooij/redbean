@@ -2119,10 +2119,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			if ( !is_numeric( $firstKey ) || $firstKey === NULL ) {
 					$bindings           = $this->withParams;
 					$bindings[':slot0'] = $this->getID();
-					$count              = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " {$joinSql} $myFieldLink = :slot0 " . $this->withSql, $bindings );
+					$count              = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), "{$joinSql} $myFieldLink = :slot0 " . $this->withSql, $bindings );
 			} else {
 					$bindings = array_merge( array( $this->getID() ), $this->withParams );
-					$count    = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " {$joinSql} $myFieldLink = ? " . $this->withSql, $bindings );
+					$count    = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), "{$joinSql} $myFieldLink = ? " . $this->withSql, $bindings );
 			}
 		}
 		$this->clearModifiers();
