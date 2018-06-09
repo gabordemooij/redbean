@@ -70,6 +70,16 @@ class OODB extends Observable
 	protected $assocManager = NULL;
 
 	/**
+	 * @var DuplicationManager
+	 */
+	protected $duplicationManager = NULL;
+
+	/**
+	 * @var TagManager
+	 */
+	protected $tagManager = NULL;
+
+	/**
 	 * @var Repository
 	 */
 	protected $repository = NULL;
@@ -526,6 +536,62 @@ class OODB extends Observable
 	public function setAssociationManager( AssociationManager $assocManager )
 	{
 		$this->assocManager = $assocManager;
+	}
+
+	/**
+	 * Returns the Duplication Manager for use with OODB.
+	 * A simple getter function to obtain a reference.
+	 *
+	 * @return DuplicationManager
+	 */
+	public function getDuplicationManager()
+	{
+		if ( !isset( $this->duplicationManager ) ) {
+			throw new RedException( 'No duplication manager available.' );
+		}
+
+		return $this->duplicationManager;
+	}
+
+	/**
+	 * Sets the duplication manager instance to be used by this OODB.
+	 * A simple setter function to set the duplication manager.
+	 *
+	 * @param DuplicationManager $duplicationManager sets the duplication manager to be used
+	 *
+	 * @return void
+	 */
+	public function setDuplicationManager( DuplicationManager $duplicationManager )
+	{
+		$this->duplicationManager = $duplicationManager;
+	}
+
+	/**
+	 * Returns the Tag Manager for use with OODB.
+	 * A simple getter function to obtain a reference.
+	 *
+	 * @return TagManager
+	 */
+	public function getTagManager()
+	{
+		if ( !isset( $this->tagManager ) ) {
+			throw new RedException( 'No tag manager available.' );
+		}
+
+		return $this->tagManager;
+	}
+
+	/**
+	 * Sets the tag manager instance to be used by this OODB.
+	 * A simple setter function to set the tag manager.
+	 *
+	 * @param TagManager $tagManager sets the tag manager to be used
+	 *
+	 * @return void
+	 */
+	public function setTagManager( TagManager $tagManager )
+	{
+		$this->tagManager = $tagManager;
 	}
 
 	/**

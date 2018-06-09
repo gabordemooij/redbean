@@ -33,6 +33,11 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	private static $factory = null;
 
 	/**
+	 * @var string|null
+	 */
+	private $databaseKey = NULL;
+
+	/**
 	 * Factory method using a customizable factory function to create
 	 * the instance of the Simple Model.
 	 *
@@ -60,10 +65,26 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	}
 
 	/**
+	 * Sets the name of the database to get specific toolbox if needed.
+	 *
+	 * For more details regarding the name, consult R::addDatabase().
+	 * @see Facade::addDatabase
+	 *
+	 * @return void
+	 */
+	public function __construct( $databaseKey = 'default' )
+	{
+		$this->databaseKey = $databaseKey;
+	}
+
+	/**
 	 * @see BeanHelper::getToolbox
 	 */
 	public function getToolbox()
 	{
+		if ( Facade::$useBeanOODB )
+			return Facade::$toolboxes[$this->databaseKey];
+
 		return Facade::getToolBox();
 	}
 
@@ -104,6 +125,11 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 */
 	public function getExtractedToolbox()
 	{
+		if ( Facade::$useBeanOODB ) {
+			$toolbox = Facade::$toolboxes[$this->databaseKey];
+			return array( $toolbox->getRedbean(), $toolbox->getDatabaseAdapter(), $toolbox->getWriter(), $toolbox );
+		}
+
 		return Facade::getExtractedToolbox();
 	}
 }

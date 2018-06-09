@@ -125,6 +125,11 @@ class Facade
 	public static $toolboxes = array();
 
 	/**
+	 * @var bool
+	 */
+	public static $useBeanOODB = FALSE;
+
+	/**
 	 * Internal Query function, executes the desired query. Used by
 	 * all facade query functions. This keeps things DRY.
 	 *
@@ -402,8 +407,8 @@ class Facade
 			throw new RedException( 'Database not found in registry. Add database using R::addDatabase().' );
 		}
 
-		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 		self::$currentDB = $key;
+		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 
 		return TRUE;
 	}
@@ -525,6 +530,9 @@ class Facade
 	 */
 	public static function store( $bean )
 	{
+		if (self::$useBeanOODB)
+			return $bean->getBeanHelper()->getToolbox()->getRedBean()->store( $bean );
+
 		return self::$redbean->store( $bean );
 	}
 
@@ -671,6 +679,9 @@ class Facade
 	public static function trash( $beanOrType, $id = NULL )
 	{
 		if ( is_string( $beanOrType ) ) return self::trash( self::load( $beanOrType, $id ) );
+		if ( self::$useBeanOODB )
+			return $beanOrType->getBeanHelper()->getToolbox()->getRedBean()->trash( $beanOrType );
+
 		return self::$redbean->trash( $beanOrType );
 	}
 
@@ -1172,8 +1183,13 @@ class Facade
 	 */
 	public static function dup( $bean, $trail = array(), $pid = FALSE, $filters = array() )
 	{
-		self::$duplicationManager->setFilters( $filters );
-		return self::$duplicationManager->dup( $bean, $trail, $pid );
+		if ( self::$useBeanOODB ) {
+			$duplicationManager = $bean->getBeanHelper()->getToolbox()->getRedBean()->getDuplicationManager();
+		} else {
+			$duplicationManager = self::$redbean->getDuplicationManager();
+		}
+		$duplicationManager->setFilters( $filters );
+		return $duplicationManager->dup( $bean, $trail, $pid );
 	}
 
 	/**
@@ -1222,7 +1238,7 @@ class Facade
 	 */
 	public static function exportAll( $beans, $parents = FALSE, $filters = array())
 	{
-		return self::$duplicationManager->exportAll( $beans, $parents, $filters, self::$exportCaseStyle );
+		return self::$redbean->getDuplicationManager()->exportAll( $beans, $parents, $filters, self::$exportCaseStyle );
 	}
 
 	/**
@@ -1337,9 +1353,12 @@ class Facade
 	 *
 	 * @return boolean
 	 */
-	public static function hasTag( $bean, $tags, $all = FALSE )
+	public static function hasTag( OODBBean $bean, $tags, $all = FALSE )
 	{
-		return self::$tagManager->hasTag( $bean, $tags, $all );
+		if (self::$useBeanOODB)
+			return $bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->hasTag( $bean, $tags, $all );
+
+		return self::$redbean->getTagManager()->hasTag( $bean, $tags, $all );
 	}
 
 	/**
@@ -1363,9 +1382,13 @@ class Facade
 	 *
 	 * @return void
 	 */
-	public static function untag( $bean, $tagList )
+	public static function untag( OODBBean $bean, $tagList )
 	{
-		self::$tagManager->untag( $bean, $tagList );
+		if (self::$useBeanOODB) {
+			$bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->untag( $bean, $tagList );
+		} else {
+			self::$redbean->getTagManager()->untag( $bean, $tagList );
+		}
 	}
 
 	/**
@@ -1394,7 +1417,10 @@ class Facade
 	 */
 	public static function tag( OODBBean $bean, $tagList = NULL )
 	{
-		return self::$tagManager->tag( $bean, $tagList );
+		if (self::$useBeanOODB)
+			return $bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->tag( $bean, $tagList );
+
+		return self::$redbean->getTagManager()->tag( $bean, $tagList );
 	}
 
 	/**
@@ -1419,7 +1445,11 @@ class Facade
 	 */
 	public static function addTags( OODBBean $bean, $tagList )
 	{
-		self::$tagManager->addTags( $bean, $tagList );
+		if (self::$useBeanOODB) {
+			$bean->getBeanHelper()->getToolbox()->getRedBean()->getTagManager()->addTags( $bean, $tagList );
+		} else {
+			self::$redbean->getTagManager()->addTags( $bean, $tagList );
+		}
 	}
 
 	/**
@@ -1453,7 +1483,7 @@ class Facade
 	 */
 	public static function tagged( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
-		return self::$tagManager->tagged( $beanType, $tagList, $sql, $bindings );
+		return self::$redbean->getTagManager()->tagged( $beanType, $tagList, $sql, $bindings );
 	}
 
 	/**
@@ -1487,7 +1517,7 @@ class Facade
 	 */
 	public static function taggedAll( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
-		return self::$tagManager->taggedAll( $beanType, $tagList, $sql, $bindings );
+		return self::$redbean->getTagManager()->taggedAll( $beanType, $tagList, $sql, $bindings );
 	}
 
 	/**
@@ -1535,16 +1565,30 @@ class Facade
 		self::$adapter            = self::$toolbox->getDatabaseAdapter();
 		self::$redbean            = self::$toolbox->getRedBean();
 		self::$finder             = new Finder( self::$toolbox );
-		self::$associationManager = new AssociationManager( self::$toolbox );
-		self::$redbean->setAssociationManager( self::$associationManager );
+		try {
+			self::$associationManager = self::$redbean->getAssociationManager();
+		} catch ( RedException $e ) {
+			self::$associationManager = new AssociationManager( self::$toolbox );
+			self::$redbean->setAssociationManager( self::$associationManager );;
+		}
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
 		$helper                   = new SimpleModelHelper();
 		$helper->attachEventListeners( self::$redbean );
-		if (self::$redbean->getBeanHelper() == NULL) {
-			self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
+		if ( self::$redbean->getBeanHelper() == NULL ) {
+			self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper( self::$currentDB ) );
 		}
-		self::$duplicationManager = new DuplicationManager( self::$toolbox );
-		self::$tagManager         = new TagManager( self::$toolbox );
+		try {
+			self::$duplicationManager = self::$redbean->getDuplicationManager();
+		} catch ( RedException $e ) {
+			self::$duplicationManager = new DuplicationManager( self::$toolbox );
+			self::$redbean->setDuplicationManager( self::$duplicationManager );
+		}
+		try {
+			self::$tagManager = self::$redbean->getTagManager();
+		} catch ( RedException $e ) {
+			self::$tagManager         = new TagManager( self::$toolbox );
+			self::$redbean->setTagManager( self::$tagManager );
+		}
 		return $oldTools;
 	}
 
@@ -2043,7 +2087,7 @@ class Facade
 	 */
 	public static function getDuplicationManager()
 	{
-		return self::$duplicationManager;
+		return self::$redbean->getDuplicationManager();
 	}
 
 	/**
@@ -2499,6 +2543,18 @@ class Facade
 	public static function usePartialBeans( $yesNoBeans )
 	{
 		return self::$redbean->getCurrentRepository()->usePartialBeans( $yesNoBeans );
+	}
+
+	/**
+	 * Enables or disables the use of bean OODB.
+	 *
+	 * @param boolean|array $yesNoBeans List of type names or 'all'
+	 *
+	 * @return void
+	 */
+	public static function useBeanOODB( $toggle = TRUE )
+	{
+		self::$useBeanOODB = $toggle;
 	}
 
 	/**
