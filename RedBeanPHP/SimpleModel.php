@@ -52,7 +52,7 @@ class SimpleModel
 	 *
 	 * @return mixed
 	 */
-	public function __get( $prop )
+	public function &__get( $prop )
 	{
 		return $this->bean->$prop;
 	}
