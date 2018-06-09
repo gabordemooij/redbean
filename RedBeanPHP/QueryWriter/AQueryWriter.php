@@ -894,10 +894,8 @@ abstract class AQueryWriter
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$key = NULL;
 		if ( $this->flagUseCache ) {
-			$key = $this->getCacheKey( array( $conditions, "$addSql {$this->sqlSelectSnippet}", $bindings, 'select' ) );
-
+			$key = $this->getCacheKey( array( $conditions, trim("$addSql {$this->sqlSelectSnippet}"), $bindings, 'select' ) );
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
 			}
@@ -920,7 +918,8 @@ abstract class AQueryWriter
 		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} {$this->sqlSelectSnippet} -- keep-cache";
 		$this->sqlSelectSnippet = '';
 		$rows  = $this->adapter->get( $sql, $bindings );
-		if ( $this->flagUseCache && $key ) {
+
+		if ( $this->flagUseCache ) {
 			$this->putResultInCache( $type, $key, $rows );
 		}
 
@@ -943,16 +942,16 @@ abstract class AQueryWriter
 	 */
 	public function queryRecordRelated( $sourceType, $destType, $linkIDs, $addSql = '', $bindings = array() )
 	{
-		$addSql = $this->glueSQLCondition( $addSql, QueryWriter::C_GLUE_WHERE );
-
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 
-		$key = $this->getCacheKey( array( $sourceType, $destType, implode( ',', $linkIDs ), $addSql, $bindings ) );
-
-		if ( $this->flagUseCache && $cached = $this->getCached( $destType, $key ) ) {
-			return $cached;
+		if ( $this->flagUseCache ) {
+			$key = $this->getCacheKey( array( $sourceType, implode( ',', $linkIDs ), trim($addSql), $bindings, 'selectrelated' ) );
+			if ( $cached = $this->getCached( $destType, $key ) ) {
+				return $cached;
+			}
 		}
 
+		$addSql = $this->glueSQLCondition( $addSql, QueryWriter::C_GLUE_WHERE );
 		$inClause = $this->getParametersForInClause( $linkIDs, $bindings );
 
 		$sqlFilterStr = '';
@@ -992,7 +991,9 @@ abstract class AQueryWriter
 
 		$rows = $this->adapter->get( $sql, $bindings );
 
-		$this->putResultInCache( $destType, $key, $rows );
+		if ( $this->flagUseCache ) {
+			$this->putResultInCache( $destType, $key, $rows );
+		}
 
 		return $rows;
 	}
@@ -1004,10 +1005,11 @@ abstract class AQueryWriter
 	{
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 
-		$key = $this->getCacheKey( array( $sourceType, $destType, $sourceID, $destID ) );
-
-		if ( $this->flagUseCache && $cached = $this->getCached( $linkTable, $key ) ) {
-			return $cached;
+		if ( $this->flagUseCache ) {
+			$key = $this->getCacheKey( array( $sourceType, $destType, $sourceID, $destID, 'selectlink' ) );
+			if ( $cached = $this->getCached( $linkTable, $key ) ) {
+				return $cached;
+			}
 		}
 
 		$sqlFilterStr = '';
@@ -1026,7 +1028,9 @@ abstract class AQueryWriter
 			$row = $this->adapter->getRow( $sql, array( $sourceID, $destID ) );
 		}
 
-		$this->putResultInCache( $linkTable, $key, $row );
+		if ( $this->flagUseCache ) {
+			$this->putResultInCache( $linkTable, $key, $row );
+		}
 
 		return $row;
 	}
@@ -1036,6 +1040,13 @@ abstract class AQueryWriter
 	 */
 	public function queryTagged( $type, $tagList, $all = FALSE, $addSql = '', $bindings = array() )
 	{
+		if ( $this->flagUseCache ) {
+			$key = $this->getCacheKey( array( implode( ',', $tagList ), $all, trim($addSql), $bindings, 'selectTagged' ) );
+			if ( $cached = $this->getCached( $type, $key ) ) {
+				return $cached;
+			}
+		}
+
 		$assocType = $this->getAssocTable( array( $type, 'tag' ) );
 		$assocTable = $this->esc( $assocType );
 		$assocField = $type . '_id';
@@ -1055,6 +1066,11 @@ abstract class AQueryWriter
 
 		$bindings = array_merge( $tagList, array( $score ), $bindings );
 		$rows = $this->adapter->get( $sql, $bindings );
+
+		if ( $this->flagUseCache ) {
+			$this->putResultInCache( $type, $key, $rows );
+		}
+
 		return $rows;
 	}
 
@@ -1063,23 +1079,21 @@ abstract class AQueryWriter
 	 */
 	public function queryRecordCount( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		$table  = $this->esc( $type );
-
-		$key = NULL;
 		if ( $this->flagUseCache ) {
-			$key = $this->getCacheKey( array( $conditions, "$addSql {$this->sqlSelectSnippet}", $bindings, 'count' ) );
-
+			$key = $this->getCacheKey( array( $conditions, trim($addSql), $bindings, 'count' ) );
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
 			}
 		}
+
+		$table  = $this->esc( $type );
 
 		if ( is_array ( $conditions ) && !empty ( $conditions ) ) {
 			$sql = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
 		} else {
 			$sql = $this->glueSQLCondition( $addSql );
 		}
-		
+
 		$sql    = "SELECT COUNT(*) FROM {$table} {$sql} -- keep-cache";
 		$count  = (int) $this->adapter->getCell( $sql, $bindings );
 
@@ -1097,7 +1111,12 @@ abstract class AQueryWriter
 	{
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 
-		$this->updateCache(); //check if cache chain has been broken
+		if ( $this->flagUseCache ) {
+			$key = $this->getCacheKey( array( $sourceType, $destType, $linkID, trim($addSql), $bindings, 'countrelated' ) );
+			if ( $cached = $this->getCached( $destType, $key ) ) {
+				return $cached;
+			}
+		}
 
 		if ( $sourceType === $destType ) {
 			$sql = "
@@ -1120,7 +1139,13 @@ abstract class AQueryWriter
 			$bindings = array_merge( array( $linkID ), $bindings );
 		}
 
-		return (int) $this->adapter->getCell( $sql, $bindings );
+		$count = (int) $this->adapter->getCell( $sql, $bindings );
+
+		if ( $this->flagUseCache ) {
+			$this->putResultInCache( $sourceType, $key, $count );
+		}
+
+		return $count;
 	}
 
 	/**

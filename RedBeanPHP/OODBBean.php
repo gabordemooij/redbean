@@ -328,7 +328,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			return '';
 		}
 		
-		$joinSql = '';
+		$joinSql = ' ';
 		$joins = array();
 		$writer   = $this->beanHelper->getToolBox()->getWriter();
 		$oldParts = $parts = explode( '@joined.', $this->withSql );
@@ -431,19 +431,18 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		}
 		$beans = array();
 		if ( $this->getID() ) {
-			$firstKey = NULL;
-			if ( count( $this->withParams ) > 0 ) {
-				reset( $this->withParams );
-				$firstKey = key( $this->withParams );
-			}
+			reset( $this->withParams );
 			$joinSql = $this->parseJoin( $type );
-			if ( !is_numeric( $firstKey ) || $firstKey === NULL ) {
+			$firstKey = count( $this->withParams ) > 0
+				? key( $this->withParams )
+				: 0;
+			if ( is_int( $firstKey ) ) {
+				$bindings = array_merge( array( $this->getID() ), $this->withParams );
+				$beans = $redbean->find( $type, array(), "{$joinSql} $myFieldLink = ? " . $this->withSql, $bindings );
+			} else {
 				$bindings           = $this->withParams;
 				$bindings[':slot0'] = $this->getID();
-				$beans = $redbean->find( $type, array(), " {$joinSql} $myFieldLink = :slot0 " . $this->withSql, $bindings );
-			} else {
-				$bindings = array_merge( array( $this->getID() ), $this->withParams );
-				$beans = $redbean->find( $type, array(), " {$joinSql} $myFieldLink = ? " . $this->withSql, $bindings );
+				$beans = $redbean->find( $type, array(), "{$joinSql} $myFieldLink = :slot0 " . $this->withSql, $bindings );
 			}
 		}
 		foreach ( $beans as $beanFromList ) {
@@ -2110,19 +2109,18 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		}
 		$count = 0;
 		if ( $this->getID() ) {
-			$firstKey = NULL;
-			if ( count( $this->withParams ) > 0 ) {
-				reset( $this->withParams );
-				$firstKey = key( $this->withParams );
-			}
+			reset( $this->withParams );
 			$joinSql = $this->parseJoin( $type );
-			if ( !is_numeric( $firstKey ) || $firstKey === NULL ) {
-					$bindings           = $this->withParams;
-					$bindings[':slot0'] = $this->getID();
-					$count              = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " {$joinSql} $myFieldLink = :slot0 " . $this->withSql, $bindings );
+			$firstKey = count( $this->withParams ) > 0
+				? key( $this->withParams )
+				: 0;
+			if ( is_int( $firstKey ) ) {
+				$bindings = array_merge( array( $this->getID() ), $this->withParams );
+				$count    = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), "{$joinSql} $myFieldLink = ? " . $this->withSql, $bindings );
 			} else {
-					$bindings = array_merge( array( $this->getID() ), $this->withParams );
-					$count    = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), " {$joinSql} $myFieldLink = ? " . $this->withSql, $bindings );
+				$bindings           = $this->withParams;
+				$bindings[':slot0'] = $this->getID();
+				$count              = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), "{$joinSql} $myFieldLink = :slot0 " . $this->withSql, $bindings );
 			}
 		}
 		$this->clearModifiers();
