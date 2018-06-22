@@ -535,14 +535,21 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		if ( is_string( $selection ) ) {
 			$selection = explode( ',', $selection );
 		}
-		if ( !$notrim && is_array( $selection ) ) {
-			foreach ( $selection as $key => $selected ) {
-				$selection[$key] = trim( $selected );
+		if ( is_array( $selection ) ) {
+			if ( $notrim ) {
+				$selected = array_flip($selection);
+			} else {
+				$selected = array();
+				foreach ( $selection as $key => $select ) {
+					$selected[trim( $select )] = TRUE;
+				}
 			}
+		} else {
+			$selected = FALSE;
 		}
 		foreach ( $array as $key => $value ) {
 			if ( $key != '__info' ) {
-				if ( !$selection || ( $selection && in_array( $key, $selection ) ) ) {
+				if ( !$selected || isset( $selected[$key] ) ) {
 					if ( is_array($value ) ) {
 						if ( isset( $value['_type'] ) ) {
 							$bean = $this->beanHelper->getToolbox()->getRedBean()->dispense( $value['_type'] );
