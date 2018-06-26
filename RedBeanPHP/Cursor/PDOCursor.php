@@ -54,6 +54,15 @@ class PDOCursor implements Cursor
 	{
 		return $this->res->fetch();
 	}
+	
+	/**
+	 * @see Cursor::reset
+	 */
+	public function reset()
+	{
+		$this->close();
+		$this->res->execute();
+	}
 
 	/**
 	 * @see Cursor::close
