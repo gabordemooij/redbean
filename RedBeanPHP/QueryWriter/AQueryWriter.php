@@ -931,9 +931,18 @@ abstract class AQueryWriter
 	 */
 	public function queryRecordWithCursor( $type, $addSql = NULL, $bindings = array() )
 	{
-		$sql = $this->glueSQLCondition( $addSql, NULL );
 		$table = $this->esc( $type );
-		$sql   = "SELECT {$table}.* FROM {$table} {$sql}";
+
+		$sqlFilterStr = '';
+		if ( count( self::$sqlFilters ) ) {
+			$sqlFilterStr = $this->getSQLFilterSnippet( $type );
+		}
+
+		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
+
+		$sql = $this->glueSQLCondition( $addSql, NULL );
+		$sql = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} -- keep-cache";
+
 		return $this->adapter->getCursor( $sql, $bindings );
 	}
 
