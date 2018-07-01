@@ -78,6 +78,16 @@ class BeanCollection
 		}
 		return NULL;
 	}
+	
+	/**
+	 * Resets the collection from the start, like a fresh() on a bean.
+	 *
+	 * @return void
+	 */
+	public function reset()
+	{
+		$this->cursor->reset();
+	}
 
 	/**
 	 * Closes the underlying cursor (needed for some databases).
