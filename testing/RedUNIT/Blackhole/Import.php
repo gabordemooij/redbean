@@ -39,7 +39,7 @@ class Import extends Blackhole
 	{
 		$book = R::dispense( 'book' );
 		$book->import( array( ' title ' => 'my book' ), array( ' title ' ), TRUE );
-		assert( $book[' title '], 'my book' );
+		asrt( $book[' title '], 'my book' );
 	}
 
 	/**
