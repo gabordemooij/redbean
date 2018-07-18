@@ -31,6 +31,18 @@ use RedBeanPHP\RedException as RedException;
 class Import extends Blackhole
 {
 	/**
+	 * Test import without trimming.
+	 *
+	 * @return void
+	 */
+	public function testImportWithoutTrim()
+	{
+		$book = R::dispense( 'book' );
+		$book->import( array( ' title ' => 'my book' ), array( ' title ' ), TRUE );
+		assert( $book[' title '], 'my book' );
+	}
+
+	/**
 	 * Test multi array dispense import.
 	 *
 	 * @return void

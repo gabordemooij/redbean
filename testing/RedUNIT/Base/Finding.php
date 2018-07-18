@@ -689,6 +689,30 @@ class Finding extends Base {
 	}
 
 	/**
+	 * Can we find books based on associations with other
+	 * entities?
+	 *
+	 * @return void
+	 */
+	public function testFindLikeBean()
+	{
+		R::nuke();
+		$book1 = R::dispense( 'book' );
+		$page1 = R::dispense( 'page' );
+		$book2 = R::dispense( 'book' );
+		$page2 = R::dispense( 'page' );
+		$book1->page = $page1;
+		$book2->page = $page2;
+		R::storeAll( array( $book1, $book2 ) );
+		$books = R::findLike( 'book', array( 'page' => array( $page2 ) ), ' AND id > ?', array( 0 ) );
+		$book = reset( $books );
+		asrt( $book->id, $book2->id );
+		$books = R::findLike( 'book', array( 'page' => array( $page1 ) ), ' AND id > ?', array( 0 )  );
+		$book = reset( $books );
+		asrt( $book->id, $book1->id );
+	}
+
+	/**
 	 * Test whether findOne gets a LIMIT 1
 	 * clause.
 	 *

@@ -233,12 +233,13 @@ class Finder
 	 * @param string $type       type of bean to search for
 	 * @param array  $conditions criteria set describing the bean to search for
 	 * @param string $sql        additional SQL (for sorting)
+	 * @param array  $bindings   bindings
 	 *
 	 * @return array
 	 */
-	public function findLike( $type, $conditions = array(), $sql = '' )
+	public function findLike( $type, $conditions = array(), $sql = '', $bindings = array() )
 	{
-		return $this->redbean->find( $type, $conditions, $sql );
+		return $this->redbean->find( $type, $conditions, $sql, $bindings );
 	}
 
 	/**

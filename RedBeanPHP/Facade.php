@@ -2289,12 +2289,13 @@ class Facade
 	 * @param string $type type of bean to search for
 	 * @param array  $like optional criteria set describing the bean to search for
 	 * @param string $sql  optional additional SQL for sorting
+	 * @param array  $bindings bindings
 	 *
 	 * @return array
 	 */
-	public static function findLike( $type, $like = array(), $sql = '' )
+	public static function findLike( $type, $like = array(), $sql = '', $bindings = array() )
 	{
-		return self::$finder->findLike( $type, $like, $sql );
+		return self::$finder->findLike( $type, $like, $sql, $bindings );
 	}
 
 	/**

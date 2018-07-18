@@ -37,7 +37,7 @@ class Cursors extends Base
 			$page->content = sha1( $i );
 			R::store( $page );
 		}
-		$collection = R::findCollection( 'page' );
+		$collection = R::findCollection( 'page', 'ORDER BY page.number ASC' );
 		asrt( get_class( $collection ), 'RedBeanPHP\BeanCollection');
 		$i = 0;
 		$list = array();
@@ -46,6 +46,14 @@ class Cursors extends Base
 			asrt( (string) $bean->number, strval( $i )  );
 			asrt( $bean->content, sha1( $i ) );
 			$list[] = $bean->content;
+			$i ++;
+		}
+		$collection->reset();
+		$i = 0;
+		while( $bean = $collection->next() ) {
+			asrt( ( $bean instanceof OODBBean ), TRUE );
+			asrt( (string) $bean->number, strval( $i )  );
+			asrt( $bean->content, sha1( $i ) );
 			$i ++;
 		}
 		$collection = R::findCollection( 'page', ' ORDER BY content ASC ' );
@@ -90,6 +98,7 @@ class Cursors extends Base
 		$collection = R::findCollection( 'something' );
 		asrt( get_class( $collection ), 'RedBeanPHP\BeanCollection');
 		asrt( is_null( $collection->next() ), TRUE );
+		asrt( is_null( $collection->reset() ), TRUE );
 		$collection->close();
 	}
 }
