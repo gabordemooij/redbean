@@ -101,7 +101,7 @@ class Cursors extends Base
 		$books = R::findCollection( 'book' );
 		$book = $books->next();
 		asrt( $book->title, 'title' );
-		AQueryWriter::setSQLFilters( NULL );
+		AQueryWriter::setSQLFilters( array() );
 		$books = R::findCollection( 'book' );
 		$book = $books->next();
 		asrt( $book->title, 'Title' );
