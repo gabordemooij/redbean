@@ -283,7 +283,6 @@ abstract class AQueryWriter
 	private function getCached( $cacheTag, $key )
 	{
 		$sql = $this->adapter->getSQL();
-
 		if ($this->updateCache()) {
 			if ( isset( $this->cache[$cacheTag][$key] ) ) {
 				return $this->cache[$cacheTag][$key];
@@ -1071,6 +1070,7 @@ abstract class AQueryWriter
 			GROUP BY {$table}.id
 			HAVING count({$table}.id) >= ?
 			{$addSql}
+			-- keep-cache
 		";
 
 		$bindings = array_merge( $tagList, array( $score ), $bindings );

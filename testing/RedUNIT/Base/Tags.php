@@ -25,6 +25,27 @@ use RedBeanPHP\RedException as RedException;
  */
 class Tags extends Base
 {
+	public function testTagsCache()
+	{
+		R::nuke();
+		R::getWriter()->setUseCache( TRUE );
+		list( $beer1, $beer2, $beer3 ) = R::dispense( 'beer', 3 );
+		$beer1->title = 'b1';
+		$beer2->title = 'b2';
+		$beer3->title = 'b3';
+		R::tag( $beer1, 'stout' );
+		R::tag( $beer2, 'porter' );
+		R::tag( $beer3, 'lager,popular' );
+		$beers = R::tagged( 'beer', 'lager,popular' );
+		asrt(count($beers),1);
+		R::exec( 'DELETE FROM beer_tag WHERE beer_id = ? -- keep-cache', array( $beer3->id ) );
+		$beers = R::tagged( 'beer', 'lager,popular' );
+		asrt(count($beers),1);
+		R::getWriter()->setUseCache( FALSE );
+		$beers = R::tagged( 'beer', 'lager,popular' );
+		asrt(count($beers),0);
+	}
+
 	/**
 	 * Tests tags with SQL.
 	 *
