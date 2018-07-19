@@ -5,6 +5,8 @@ namespace RedUNIT\Base;
 use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\QueryWriter;
+use RedBeanPHP\QueryWriter\AQueryWriter;
 
 /**
  * Cursors
@@ -77,6 +79,32 @@ class Cursors extends Base
 		$bean = $collection->next();
 		asrt( $bean->content, $content );
 		$collection->close();
+	}
+
+	/**
+	 * Can we use a filtered cursor?
+	 *
+	 * @return void
+	 */
+	public function testCursorWithFilter()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->title = 'Title';
+		R::store( $book );
+		$filter = array(
+			QueryWriter::C_SQLFILTER_READ => array(
+				'book' => array('title' => ' LOWER(book.title) ' )
+			)
+		);
+		AQueryWriter::setSQLFilters( $filter );
+		$books = R::findCollection( 'book' );
+		$book = $books->next();
+		asrt( $book->title, 'title' );
+		AQueryWriter::setSQLFilters( NULL );
+		$books = R::findCollection( 'book' );
+		$book = $books->next();
+		asrt( $book->title, 'Title' );
 	}
 
 	/**
