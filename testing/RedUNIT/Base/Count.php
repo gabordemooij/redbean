@@ -141,7 +141,12 @@ class Count extends Base
 		} catch( RedException $e ) {
 			pass();
 		}
-
+		R::getWriter()->setUseCache(TRUE);
+		asrt( $book->countShared('page'), 5 );
+		R::exec('DELETE FROM book_page WHERE book_id > 0 -- keep-cache');
+		asrt( $book->countShared('page'), 5 );
+		R::getWriter()->setUseCache(FALSE);
+		asrt( $book->countShared('page'), 0 );
 	}
 
 }

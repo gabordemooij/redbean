@@ -338,7 +338,6 @@ abstract class AQueryWriter
 		} else {
 			$this->cache[$cacheTag] = array();
 		}
-
 		$this->cache[$cacheTag][$key] = $values;
 	}
 
@@ -1121,8 +1120,9 @@ abstract class AQueryWriter
 		list( $sourceTable, $destTable, $linkTable, $sourceCol, $destCol ) = $this->getRelationalTablesAndColumns( $sourceType, $destType );
 
 		if ( $this->flagUseCache ) {
+			$cacheType = "#{$sourceType}/{$destType}";
 			$key = $this->getCacheKey( array( $sourceType, $destType, $linkID, trim($addSql), $bindings, 'countrelated' ) );
-			if ( $cached = $this->getCached( $destType, $key ) ) {
+			if ( $cached = $this->getCached( $cacheType, $key ) ) {
 				return $cached;
 			}
 		}
@@ -1151,7 +1151,7 @@ abstract class AQueryWriter
 		$count = (int) $this->adapter->getCell( $sql, $bindings );
 
 		if ( $this->flagUseCache ) {
-			$this->putResultInCache( $sourceType, $key, $count );
+			$this->putResultInCache( $cacheType, $key, $count );
 		}
 
 		return $count;
