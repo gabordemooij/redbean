@@ -2286,6 +2286,12 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function jsonSerialize()
 	{
+		$json = $this->__call( '__jsonSerialize', array( ) );
+
+		if ( $json !== NULL ) {
+			return $json;
+		}
+
 		return $this->export();
 	}
 }
