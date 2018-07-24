@@ -159,6 +159,14 @@ class Model_Taste extends RedBeanPHP\SimpleModel
  */
 class Model_Coffee extends RedBeanPHP\SimpleModel
 {
+	public function __jsonSerialize()
+	{
+		return array_merge(
+			$this->bean->export(),
+			array( 'description' => "{$this->bean->variant}.{$this->bean->strength}" )
+		);
+	}
+
 	public function update()
 	{
 		while ( count( $this->bean->ownSugar ) > 3 ) {
