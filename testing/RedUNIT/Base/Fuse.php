@@ -42,6 +42,7 @@ class Fuse extends Base
 	 */
 	public function testFUSEJSonSerialize()
 	{
+		if ( phpversion() < 5.4 ) return;
 		$coffee = R::dispense( 'coffee' );
 		$coffee->variant = 'Tropical';
 		$coffee->strength = 4;
