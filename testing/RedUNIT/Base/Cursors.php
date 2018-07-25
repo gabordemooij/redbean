@@ -26,6 +26,34 @@ use RedBeanPHP\QueryWriter\AQueryWriter;
 class Cursors extends Base
 {
 	/**
+	 * Test whether we can use cursors with raw SQL
+	 * from the facade (#656).
+	 *
+	 * @return void
+	 */
+	public function testSQLCursors()
+	{
+		R::nuke();
+		for( $i=0; $i<20; $i++ ) {
+			$page = R::dispense( 'page' );
+			$page->number = $i;
+			$page->content = sha1( $i );
+			R::store( $page );
+		}
+		$cursor = R::getCursor( 'SELECT * FROM page ORDER BY page.number ASC' );
+		asrt( get_class( $cursor ), 'RedBeanPHP\Cursor\PDOCursor');
+		$i = 0;
+		$list = array();
+		while( $row = $cursor->getNextItem() ) {
+			asrt( is_array( $row ), TRUE );
+			asrt( (string) $row['number'], strval( $i )  );
+			asrt( $row['content'], sha1( $i ) );
+			$list[] = $row['content'];
+			$i ++;
+		}
+	}
+
+	/**
 	 * Test basic cursor functionality.
 	 *
 	 * @return void
