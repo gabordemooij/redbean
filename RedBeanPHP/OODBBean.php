@@ -2280,13 +2280,18 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * of the bean. Exports the bean on JSON serialization,
 	 * for the JSON fans.
 	 *
+	 * Models can override jsonSerialize (issue #651) by
+	 * implementing a __jsonSerialize method which should return
+	 * an array. The __jsonSerialize override gets called with
+	 * the @ modifier to prevent errors or warnings.
+	 *
 	 * @see  http://php.net/manual/en/class.jsonserializable.php
 	 *
 	 * @return array
 	 */
 	public function jsonSerialize()
 	{
-		$json = $this->__call( '__jsonSerialize', array( ) );
+		$json = $this->__call( '@__jsonSerialize', array( ) );
 
 		if ( $json !== NULL ) {
 			return $json;
