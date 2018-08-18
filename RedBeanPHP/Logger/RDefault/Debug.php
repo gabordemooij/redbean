@@ -180,13 +180,9 @@ class Debug extends RDefault implements Logger
 		$sql = func_get_arg( 0 );
 
 		if ( func_num_args() < 2) {
-			$bindings = array();
+			return $this->output( $sql );
 		} else {
 			$bindings = func_get_arg( 1 );
-		}
-
-		if ( !is_array( $bindings ) ) {
-			return $this->output( $sql );
 		}
 
 		$newSql = $this->normalizeSlots( $sql );
