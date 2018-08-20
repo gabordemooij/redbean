@@ -201,11 +201,15 @@ class Debug extends RDefault implements Logger
 
 		$sql = func_get_arg( 0 );
 
-		$bindings = func_get_arg( 1 );
-        	
+		if ( func_num_args() < 2) {
+		    $bindings = NULL;
+		} else {
+		    $bindings = func_get_arg( 1 );
+		}
+
 		if ( !(boolean) $bindings || !is_array( $bindings )) {
-            		return $this->output( $sql);
-        	}
+		    return $this->output( $sql);
+		}
 
 		$newSql = $this->normalizeSlots( $sql );
 		$newBindings = $this->normalizeBindings( $bindings );
