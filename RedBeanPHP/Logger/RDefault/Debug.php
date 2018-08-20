@@ -28,11 +28,33 @@ class Debug extends RDefault implements Logger
 	private $strLen = 40;
 
 	/**
+	 * @var boolean
+	 */
+	private static $noCLI = FALSE;
+
+	/**
+	 * Toggles CLI override. By default debugging functions will
+	 * output differently based on PHP_SAPI values. This function
+	 * allows you to override the PHP_SAPI setting. If you set
+	 * this to TRUE, CLI output will be supressed in favour of
+	 * HTML output. So, to get HTML on the command line use
+	 * setOverrideCLIOutput( TRUE ).
+	 *
+	 * @param boolean $yesNo CLI-override setting flag
+	 *
+	 * @return void
+	 */
+	public static function setOverrideCLIOutput( $yesNo )
+	{
+		self::$noCLI = $yesNo;
+	}
+
+	/**
 	 * Writes a query for logging with all bindings / params filled
 	 * in.
 	 *
-	 * @param string $newSql   the query
-	 * @param array  $bindings the bindings to process (key-value pairs)
+	 * @param string $newSql      the query
+	 * @param array  $newBindings the bindings to process (key-value pairs)
 	 *
 	 * @return string
 	 */
@@ -99,7 +121,7 @@ class Debug extends RDefault implements Logger
 			|| strpos( $str, 'DROP' ) === 0) {
 				$highlight = TRUE;
 			}
-			if (PHP_SAPI === 'cli') {
+			if (PHP_SAPI === 'cli' && !self::$noCLI) {
 				if ($highlight) echo "\e[91m";
 				echo $str, PHP_EOL;
 				echo "\e[39m";
@@ -131,7 +153,7 @@ class Debug extends RDefault implements Logger
 			$slot  = ':slot'.$i;
 			$begin = substr( $newSql, 0, $pos );
 			$end   = substr( $newSql, $pos+1 );
-			if (PHP_SAPI === 'cli') {
+			if (PHP_SAPI === 'cli' && !self::$noCLI) {
 				$newSql = "{$begin}\e[32m{$slot}\e[39m{$end}";
 			} else {
 				$newSql = "{$begin}<b style=\"color:green\">$slot</b>{$end}";
@@ -180,9 +202,13 @@ class Debug extends RDefault implements Logger
 		$sql = func_get_arg( 0 );
 
 		if ( func_num_args() < 2) {
-			return $this->output( $sql );
+			$bindings = NULL;
 		} else {
 			$bindings = func_get_arg( 1 );
+		}
+
+		if ( !is_array( $bindings ) ) {
+			return $this->output( $sql );
 		}
 
 		$newSql = $this->normalizeSlots( $sql );
