@@ -179,6 +179,9 @@ class Facade
 	 * occur during the testing process and catches all
 	 * exceptions that might be thrown during the test.
 	 *
+	 * @param boolean   $autoReconnect   if the function attempts to reconnect to the server on failure
+	 * @param string    $sql             the sql you want to execute to test the connection
+	 *
 	 * @return boolean
 	 */
 	public static function testConnection( $autoReconnect = FALSE, $sql = 'SELECT 1' )
