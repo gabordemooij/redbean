@@ -181,15 +181,19 @@ class Facade
 	 *
 	 * @return boolean
 	 */
-	public static function testConnection()
+	public static function testConnection( $autoReconnect = FALSE, $sql = 'SELECT 1' )
 	{
 		if ( !isset( self::$adapter ) ) return FALSE;
 
 		$database = self::$adapter->getDatabase();
 		try {
-			@$database->connect();
-		} catch ( \Exception $e ) {}
-		return $database->isConnected();
+			$database->getPDO()->query( $sql );
+		} catch ( \Exception $e ) {
+			if ( !$autoReconnect ) return FALSE;
+			$database->close();
+			$database->connect();
+		}
+		return TRUE;
 	}
 
 	/**
