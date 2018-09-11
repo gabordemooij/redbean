@@ -21,7 +21,7 @@ Extract the archive and put it in your PHP project, voila!
 Optional: sha256sum and check signature.
 
 
-Installation via Composer (not preferred)
+Installation via Composer (not recommended)
 -----------------------------------------
 
 Just open your composer.json file and add the package name ```(e.g. "gabordemooij/redbean": "dev-master")``` in your require list.
