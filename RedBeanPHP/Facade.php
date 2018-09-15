@@ -1833,7 +1833,7 @@ class Facade
 	 */
 	public static function hunt( $type, $sqlSnippet = NULL, $bindings = array() )
 	{
-		$numberOfTrashedBeans = 0
+		$numberOfTrashedBeans = 0;
 		$beans = self::findCollection( $type, $sqlSnippet, $bindings );
 		while( $bean = $beans->next() ) {
 			self::trash( $bean );
