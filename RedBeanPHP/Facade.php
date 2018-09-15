@@ -966,13 +966,13 @@ class Facade
 	 * @note instead of an SQL query you can pass a result array as well.
 	 *
 	 * @param string|array $types         a list of types (either array or comma separated string)
-	 * @param string|array $sql           an SQL query or an array of prefetched records
+	 * @param string|array $sql           optional, an SQL query or an array of prefetched records
 	 * @param array        $bindings      optional, bindings for SQL query
 	 * @param array        $remappings    optional, an array of remapping arrays
 	 *
 	 * @return array
 	 */
-	public static function findMulti( $types, $sql, $bindings = array(), $remappings = array() )
+	public static function findMulti( $types, $sql = NULL, $bindings = array(), $remappings = array() )
 	{
 		return self::$finder->findMulti( $types, $sql, $bindings, $remappings );
 	}
