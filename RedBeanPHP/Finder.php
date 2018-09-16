@@ -316,7 +316,7 @@ class Finder
 	 */
 	public function findMulti( $types, $sql, $bindings = array(), $remappings = array(), $queryTemplate = ' %s.%s AS %s__%s' )
 	{
-		if ( !is_array( $types ) ) $types = explode( ',', $types );
+		if ( !is_array( $types ) ) $types = array_map( 'trim', explode( ',', $types ) );
 		if ( !is_array( $sql ) ) {
 			$writer = $this->toolbox->getWriter();
 			$adapter = $this->toolbox->getDatabaseAdapter();
