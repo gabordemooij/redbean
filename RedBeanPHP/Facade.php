@@ -1818,20 +1818,28 @@ class Facade
 	 *
 	 * Note that while this function accepts just
 	 * a bean type and query snippet, the beans will still be loaded first. This is because
-	 * the function still respects all the FUSE hooks that may have beeb
+	 * the function still respects all the FUSE hooks that may have been
 	 * associated with the domain logic associated with these beans.
 	 * If you really want to delete just records from the database use
 	 * a simple DELETE-FROM SQL query instead.
+	 *
+	 * Returns the number of beans deleted.
 	 *
 	 * @param string $type       bean type to look for in database
 	 * @param string $sqlSnippet an SQL query snippet
 	 * @param array  $bindings   SQL parameter bindings
 	 *
-	 * @return array
+	 * @return int
 	 */
-	public static function hunt( $type, $sqlSnippet, $bindings = array() )
+	public static function hunt( $type, $sqlSnippet = NULL, $bindings = array() )
 	{
-		return self::trashAll( self::find( $type, $sqlSnippet, $bindings ) );
+		$numberOfTrashedBeans = 0;
+		$beans = self::findCollection( $type, $sqlSnippet, $bindings );
+		while( $bean = $beans->next() ) {
+			self::trash( $bean );
+			$numberOfTrashedBeans++;
+		}
+		return $numberOfTrashedBeans;
 	}
 
 	/**
