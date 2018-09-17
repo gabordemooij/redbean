@@ -204,6 +204,7 @@ $allPacks = array(
 	'Postgres/Uuid',
 	'Postgres/Bigint',
 	'Postgres/Partial',
+	'Postgres/Trees',
 	'Sqlite/Setget',
 	'Sqlite/Foreignkeys',
 	'Sqlite/Parambind',
