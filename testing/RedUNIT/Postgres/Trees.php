@@ -40,22 +40,22 @@ class Trees extends Postgres
 	public function testDateObject()
 	{
 		R::nuke();
-		$pages = R::dispense([
+		$pages = R::dispense(array(
 			'_type' => 'page',
 			'title' => 'home',
-			'ownPageList' => [[
+			'ownPageList' => array(array(
 				'_type' => 'page',
 				'title' => 'shop',
-				'ownPageList' => [[
+				'ownPageList' => array(array(
 					'_type' => 'page',
 					'title' => 'wines',
-					'ownPageList' => [[
+					'ownPageList' => array(array(
 						'_type' => 'page',
 						'title' => 'whiskies',
-					]]
-				]]
-			]]
-		]);
+					))
+				))
+			))
+		));
 		R::store( $pages );
 		$whiskyPage = R::findOne( 'page', 'title = ?', array('whiskies') );
 		asrt( $this->summarize( R::parents( $whiskyPage, ' ORDER BY title ASC ' ) ), 'home,shop,whiskies,wines' );
