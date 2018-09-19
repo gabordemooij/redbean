@@ -145,4 +145,20 @@ class Toolbox extends Blackhole {
 		asrt( $repo, $frozen );
 		R::freeze( FALSE );
 	}
+
+	/**
+	 * Can we add and remove toolboxes using
+	 * neat accessors?
+	 *
+	 * @return void
+	 */
+	public function testAddRemoveToolBox()
+	{
+		$t1 = R::getToolBox();
+		R::addToolBoxWithKey( 't1', $t1 );
+		asrt( ( R::getToolBoxByKey('t2') instanceof Toolbox), FALSE );
+		asrt( ( R::getToolBoxByKey('t1') instanceof Toolbox), FALSE );
+		asrt( R::removeToolBoxByKey('t1'), TRUE );
+		asrt( R::removeToolBoxByKey('t2'), FALSE );
+	}
 }
