@@ -169,6 +169,11 @@ class Writer extends \RedUNIT\Mysql
 	{
 		global $travis;
 		if ($travis) return;
+
+		/* does not work on MariaDB */
+		$version = strtolower( R::getCell('select version()') );
+		if ( strpos( $version, 'mariadb' ) !== FALSE ) return;
+
 		// Check if database platform is MariaDB < 10.2
 		$selectVersion = R::getDatabaseAdapter()->getCol( 'SELECT VERSION()' );
 		list ( $version, $dbPlatform ) = explode( '-', reset ( $selectVersion ) );

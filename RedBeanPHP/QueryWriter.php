@@ -314,6 +314,22 @@ interface QueryWriter
 	public function queryTagged( $type, $tagList, $all = FALSE, $addSql = '', $bindings = array() );
 
 	/**
+	 * Returns all parent rows or child rows of a specified row.
+	 * Given a type specifier and a primary key id, this method returns either all child rows
+	 * as defined by having <type>_id = id or all parent rows as defined per id = <type>_id
+	 * taking into account an optional SQL snippet along with parameters.
+	 *
+	 * @param string  $type     the bean type you want to query rows for
+	 * @param integer $id       id of the reference row
+	 * @param boolean $up       TRUE to query parent rows, FALSE to query child rows
+	 * @param string  $addSql   optional SQL snippet to embed in the query
+	 * @param array   $bindings parameter bindings for additional SQL snippet
+	 *
+	 * @return array
+	 */
+	public function queryRecursiveCommonTableExpression( $type, $id, $up = TRUE, $addSql = NULL, $bindings = array() );
+
+	/**
 	 * This method should update (or insert a record), it takes
 	 * a table name, a list of update values ( $field => $value ) and an
 	 * primary key ID (optional). If no primary key ID is provided, an

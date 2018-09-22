@@ -1158,6 +1158,34 @@ abstract class AQueryWriter
 	}
 
 	/**
+	 * @see QueryWriter::queryRecursiveCommonTableExpression
+	 */
+	public function queryRecursiveCommonTableExpression( $type, $id, $up = TRUE, $addSql = NULL, $bindings = array() )
+	{
+		$alias     = $up ? 'parent' : 'child';
+		$direction = $up ? " {$alias}.{$type}_id = {$type}.id " : " {$alias}.id = {$type}.{$type}_id ";
+
+		array_unshift( $bindings, $id );
+
+		$sql = $this->glueSQLCondition( $addSql, QueryWriter::C_GLUE_WHERE );
+
+		$rows = $this->adapter->get("
+			WITH RECURSIVE tree AS
+			(
+				SELECT *
+				FROM {$type} WHERE {$type}.id = ?
+				UNION ALL
+				SELECT {$type}.* FROM {$type}
+				INNER JOIN tree {$alias} ON {$direction}
+			)
+			SELECT * FROM tree {$sql};",
+			$bindings
+		);
+
+		return $rows;
+	}
+
+	/**
 	 * @see QueryWriter::deleteRecord
 	 */
 	public function deleteRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )

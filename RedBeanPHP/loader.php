@@ -69,6 +69,7 @@ require( REDBEANPHP_MAIN_DIR . 'Util/QuickExport.php' );
 require( REDBEANPHP_MAIN_DIR . 'Util/MatchUp.php' );
 require( REDBEANPHP_MAIN_DIR . 'Util/Look.php' );
 require( REDBEANPHP_MAIN_DIR . 'Util/Diff.php' );
+require( REDBEANPHP_MAIN_DIR . 'Util/Tree.php' );
 
 //Allow users to mount the plugin folder.
 if ( defined( 'REDBEANPHP_PLUGINS' ) ) {
