@@ -323,12 +323,14 @@ class Finder
 
 			//Repair the query, replace book.* with book.id AS book_id etc..
 			foreach( $types as $type ) {
-				$pattern = " {$type}.*";
-				if ( strpos( $sql, $pattern ) !== FALSE ) {
+				$regex = "#( (`?{$type}`?)\.\*)#";
+				if ( preg_match( $regex, $sql, $matches ) ) {
+					$pattern = $matches[1];
+					$table = $matches[2];
 					$newSelectorArray = array();
 					$columns = $writer->getColumns( $type );
 					foreach( $columns as $column => $definition ) {
-						$newSelectorArray[] = sprintf( $queryTemplate, $type, $column, $type, $column );
+						$newSelectorArray[] = sprintf( $queryTemplate, $table, $column, $type, $column );
 					}
 					$newSelector = implode( ',', $newSelectorArray );
 					$sql = str_replace( $pattern, $newSelector, $sql );
