@@ -145,6 +145,54 @@ class Finding extends Base {
 	}
 
 	/**
+	 * Like testFindMultiExtFunc but uses findMulti with
+	 * $sql = NULL.
+	 *
+	 * @return void
+	 */
+	public function testFindMultiWithSQLNULL()
+	{
+		R::nuke();
+		$shop = R::dispense( 'shop' );
+		$shop2 = R::dispense( 'shop' );
+		$products = R::dispense( 'product', 3 );
+		$price = R::dispense( 'price' );
+		$price->tag = 5;
+		$products[0]->name = 'vase';
+		$products[1]->name = 'candle';
+		$products[2]->name = 'plate';
+		$products[1]->ownPriceList[] = $price;
+		$shop->ownProduct[] = $products[0];
+		$shop->ownProduct[] = $products[1];
+		$shop2->ownProduct[] = $products[2];
+		R::storeAll( array( $shop, $shop2 ) );
+		$collection = R::findMulti( 'shop,product,price', NULL, array(), array(
+			'0' => $this->map( 'shop', 'product' ),
+			'1' => $this->map( 'product', 'price' ),
+		));
+		asrt( is_array( $collection ), TRUE );
+		asrt( count( $collection ), 3 );
+		asrt( count( $collection['shop'] ), 2 );
+		asrt( count( $collection['product'] ), 3 );
+		asrt( count( $collection['price'] ), 1 );
+		$shop = reset( $collection['shop'] );
+		asrt( count( $shop->ownProductList ), 2 );
+		$shop2 = next( $collection['shop'] );
+		asrt( count( $shop2->ownProductList ), 1 );
+		$candle = NULL;
+		foreach( $shop->ownProduct as $product ) {
+				if ( $product->name == 'candle' ) {
+					$candle = $product;
+				}
+		}
+		asrt( is_null( $candle ), FALSE );
+		asrt( count( $candle->ownPrice ), 1 );
+		asrt( $candle->name, 'candle' );
+		$price = reset( $candle->ownPrice );
+		asrt( (int) $price->tag, 5 );
+	}
+
+	/**
 	 * You can build your own mapping functions to remap records to bean.
 	 * Just like the preloader once did. However now you can define the
 	 * mapping yourself using closures. This test verifies that such a

@@ -47,7 +47,7 @@ addFile( DIR . 'QueryWriter/AQueryWriter.php' );
 addFile( DIR . 'QueryWriter/MySQL.php', 'mysql' );
 addFile( DIR . 'QueryWriter/SQLiteT.php', 'sqlite' );
 addFile( DIR . 'QueryWriter/PostgreSQL.php', 'postgres' );
-addFile( DIR . 'QueryWriter/CUBRID.php' );
+//addFile( DIR . 'QueryWriter/CUBRID.php' );
 addFile( DIR . 'RedException.php' );
 addFile( DIR . 'RedException/SQL.php' );
 addFile( DIR . 'Repository.php' );
