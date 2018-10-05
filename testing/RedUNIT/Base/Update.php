@@ -51,6 +51,7 @@ class Update extends Base
 		asrt(
 			count( $logger->grep('DESCRIBE') ) +
 			count( $logger->grep('SELECT column_name') ) +
+			count( $logger->grep('SHOW COLUMNS') ) + //CUBRID
 			count( $logger->grep('PRAGMA table_info') )
 		, 1);
 		R::stopLogging();
@@ -65,6 +66,7 @@ class Update extends Base
 		asrt(
 			count( $logger->grep('DESCRIBE') ) +
 			count( $logger->grep('SELECT column_name') ) +
+			count( $logger->grep('SHOW COLUMNS') ) + //CUBRID
 			count( $logger->grep('PRAGMA table_info') )
 		, 1);
 		R::stopLogging();

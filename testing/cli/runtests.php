@@ -52,7 +52,7 @@ require_once( 'RedUNIT/Blackhole.php' );
 require_once( 'RedUNIT/Mysql.php' );
 require_once( 'RedUNIT/Postgres.php' );
 require_once( 'RedUNIT/Sqlite.php' );
-
+require_once( 'RedUNIT/CUBRID.php' );
 require_once( 'RedUNIT/Pretest.php' );
 
 $extraTestsFromHook = array();
@@ -62,6 +62,7 @@ $colorMap = array(
 		 'mysql'  => '0;31',
 		 'pgsql'  => '0;32',
 		 'sqlite' => '0;34',
+		 'CUBRID' => '0;35',
 );
 
 @include 'cli/test_hook.php';
@@ -96,6 +97,12 @@ if ( isset( $ini['sqlite'] ) ) {
 	R::selectDatabase( 'sqlite' );
 }
 
+if ( isset( $ini['CUBRID'] ) ) {
+       $dsn = "cubrid:host={$ini['CUBRID']['host']};port=33000;dbname={$ini['CUBRID']['schema']}";
+       R::addDatabase( 'CUBRID', $dsn, $ini['CUBRID']['user'], $ini['CUBRID']['pass'], FALSE );
+       R::selectDatabase( 'CUBRID' );
+       R::exec( 'AUTOCOMMIT IS ON' );
+}
 
 // Function to activate a driver
 function activate_driver( $d )
@@ -210,6 +217,8 @@ $allPacks = array(
 	'Sqlite/Parambind',
 	'Sqlite/Writer',
 	'Sqlite/Rebuild',
+	'CUBRID/Writer',
+	'CUBRID/Setget',
 );
 
 $suffix = array(

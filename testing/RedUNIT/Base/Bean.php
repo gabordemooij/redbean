@@ -7,6 +7,7 @@ use RedBeanPHP\Adapter\DBAdapter;
 use RedBeanPHP\QueryWriter\PostgreSQL;
 use RedBeanPHP\QueryWriter\SQLiteT;
 use RedBeanPHP\QueryWriter\MySQL;
+use RedBeanPHP\QueryWriter\CUBRID;
 use RedBeanPHP\OODB;
 use RedBeanPHP\BeanHelper;
 use RedBeanPHP\Driver\RPDO;
@@ -43,6 +44,7 @@ class Bean extends Base
 		if ($this->currentlyActiveDriverID == 'pgsql') $writer = new PostgreSQL( $adapter );
 		if ($this->currentlyActiveDriverID == 'mysql') $writer = new MySQL( $adapter );
 		if ($this->currentlyActiveDriverID == 'sqlite') $writer = new SQLiteT( $adapter );
+		if ($this->currentlyActiveDriverID == 'CUBRID') $writer = new CUBRID( $adapter );
 		$oodb = new OODB( $writer, FALSE );
 		$bean = $oodb->dispense( 'bean' );
 		$bean->name = 'coffeeBean';

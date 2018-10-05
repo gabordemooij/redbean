@@ -45,7 +45,7 @@ class Setget extends \RedUNIT\CUBRID
 		$dt->setTimeZone( new \DateTimeZone( 'Europe/Amsterdam' ) );
 		$dt->setDate( 1981, 5, 1 );
 		$dt->setTime( 3, 13, 13 );
-		asrt( setget( $dt ), '1981-05-01 03:13:13' );
+		asrt( setget( $dt ), '1981-05-01 03:13:13.000' );
 		$bean = R::dispense( 'bean' );
 		$bean->dt = $dt;
 	}
