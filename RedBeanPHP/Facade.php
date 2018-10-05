@@ -28,7 +28,7 @@ use RedBeanPHP\Util\Tree as Tree;
  * RedBean Facade
  *
  * Version Information
- * RedBean Version @version 5.1
+ * RedBean Version @version 5.2
  *
  * This class hides the object landscape of
  * RedBeanPHP behind a single letter class providing
@@ -48,7 +48,7 @@ class Facade
 	/**
 	 * RedBeanPHP version constant.
 	 */
-	const C_REDBEANPHP_VERSION = '5.1';
+	const C_REDBEANPHP_VERSION = '5.2';
 
 	/**
 	 * @var ToolBox
