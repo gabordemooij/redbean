@@ -36,6 +36,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	const C_DATATYPE_TEXT32           = 7;
 	const C_DATATYPE_SPECIAL_DATE     = 80;
 	const C_DATATYPE_SPECIAL_DATETIME = 81;
+	const C_DATATYPE_SPECIAL_TIME     = 83;  //MySQL time column (only manual)
 	const C_DATATYPE_SPECIAL_POINT    = 90;
 	const C_DATATYPE_SPECIAL_LINESTRING = 91;
 	const C_DATATYPE_SPECIAL_POLYGON    = 92;
@@ -141,6 +142,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 			MySQL::C_DATATYPE_TEXT32           => ' LONGTEXT ',
 			MySQL::C_DATATYPE_SPECIAL_DATE     => ' DATE ',
 			MySQL::C_DATATYPE_SPECIAL_DATETIME => ' DATETIME ',
+			MySQL::C_DATATYPE_SPECIAL_TIME     => ' TIME ',
 			MySQL::C_DATATYPE_SPECIAL_POINT    => ' POINT ',
 			MySQL::C_DATATYPE_SPECIAL_LINESTRING => ' LINESTRING ',
 			MySQL::C_DATATYPE_SPECIAL_POLYGON => ' POLYGON ',

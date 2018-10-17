@@ -874,4 +874,26 @@ class Writer extends \RedUNIT\Mysql
 
 		asrt( R::getCell( 'SELECT AsText(location) FROM place LIMIT 1' ), $data );
 	}
+
+	/**
+	 * Can we manually add a MySQL time column?
+	 *
+	 * @return void
+	 */
+	public function testTime()
+	{
+		R::nuke();
+		$clock = R::dispense('clock');
+		$clock->time = '10:00:00';
+		$clock->setMeta('cast.time', 'time');
+		R::store( $clock );
+		$columns = R::inspect('clock');
+		asrt( $columns['time'], 'time' );
+		$clock = R::findOne('clock');
+		$clock->time = '12';
+		R::store($clock);
+		$clock = R::findOne('clock');
+		$time = $clock->time;
+		asrt( ( strpos( $time, ':' ) > 0 ), TRUE );
+	}
 }

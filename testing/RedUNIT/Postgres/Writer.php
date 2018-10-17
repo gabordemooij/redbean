@@ -900,4 +900,28 @@ class Writer extends Postgres
 
 		asrt( $cols['data'], 'text' );
 	}
+
+	/**
+	 * Can we manually add a Postgres time column without a time zone
+	 * and with a time zone?
+	 *
+	 * @return void
+	 */
+	public function testTime()
+	{
+		R::nuke();
+		$clock = R::dispense('clock');
+		$clock->time = '10:00:00';
+		$clock->setMeta('cast.time', 'time');
+		R::store( $clock );
+		$columns = R::inspect('clock');
+		asrt( $columns['time'], 'time without time zone' );
+		R::nuke();
+		$clock = R::dispense('clock');
+		$clock->time = '10:00:00 PST';
+		$clock->setMeta('cast.time', 'time with time zone');
+		R::store( $clock );
+		$columns = R::inspect('clock');
+		asrt( $columns['time'], 'time with time zone' );
+	}
 }
