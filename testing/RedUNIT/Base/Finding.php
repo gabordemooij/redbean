@@ -9,6 +9,7 @@ use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\Finder;
 
 /**
  * Finding
@@ -93,29 +94,6 @@ class Finding extends Base {
 	}
 
 	/**
-	 * A custom record-to-bean mapping function for findMulti test.
-	 *
-	 * @param string $parentName name of the parent bean
-	 * @param string $childName  name of the child bean
-	 *
-	 * @return array
-	 */
-	private function map($parentName,$childName) {
-		return array(
-			'a' => $parentName,
-			'b' => $childName,
-			'matcher' => function( $parent, $child ) use ( $parentName ) {
-				$property = "{$parentName}ID";
-				return ( $child->$property == $parent->id );
-			},
-			'do' => function( $parent, $child ) use ( $childName ) {
-				$list = 'own'.ucfirst( $childName ).'List';
-				$parent->noLoad()->{$list}[] = $child;
-			}
-		);
-	}
-
-	/**
 	 * FindMulti should not throw errors in case of
 	 * a record-type mismatch.
 	 *
@@ -167,8 +145,8 @@ class Finding extends Base {
 		$shop2->ownProduct[] = $products[2];
 		R::storeAll( array( $shop, $shop2 ) );
 		$collection = R::findMulti( 'shop,product,price', NULL, array(), array(
-			'0' => $this->map( 'shop', 'product' ),
-			'1' => $this->map( 'product', 'price' ),
+			'0' => Finder::map( 'shop', 'product' ),
+			'1' => Finder::map( 'product', 'price' ),
 		));
 		asrt( is_array( $collection ), TRUE );
 		asrt( count( $collection ), 3 );
@@ -224,8 +202,8 @@ class Finding extends Base {
 			LEFT JOIN product ON product.shop_id = shop.id
 			LEFT JOIN price ON price.product_id = product.id
 		', array(), array(
-			'0' => $this->map( 'shop', 'product' ),
-			'1' => $this->map( 'product', 'price' ),
+			'0' => Finder::map( 'shop', 'product' ),
+			'1' => Finder::map( 'product', 'price' ),
 		));
 		asrt( is_array( $collection ), TRUE );
 		asrt( count( $collection ), 3 );
@@ -292,8 +270,8 @@ class Finding extends Base {
 			LEFT JOIN product ON product.shop_id = shop.id
 			LEFT JOIN price ON price.product_id = product.id
 		', array(), array(
-			'0' => $this->map('shop', 'product'),
-			'1' => $this->map('product', 'price'),
+			'0' => Finder::map('shop', 'product'),
+			'1' => Finder::map('product', 'price'),
 		));
 		$collection = R::findMulti( 'shop,product', array(
 			array( 'shop__id' => 1, 'product__id' => 1, 'product__name' => 'vase', 'product__shop_id' => 1 ),
