@@ -1,5 +1,7 @@
 <?php
  
+namespace RedBeanPHP\Plugin;
+ 
 use RedBeanPHP\ToolBox;
 use RedBeanPHP\OODBBean;
 
