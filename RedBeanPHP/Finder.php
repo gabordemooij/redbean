@@ -67,12 +67,61 @@ class Finder
 		return array(
 			'a' => $parentName,
 			'b' => $childName,
-			'matcher' => function( $parent, $child ) use ( $parentName ) {
+			'matcher' => function( $parent, $child ) use ( $parentName, $childName ) {
+				$propertyName = 'own' . ucfirst( $childName );
+				if (!isset($parent[$propertyName])) {
+					$parent[$propertyName] = array();
+				}
 				$property = "{$parentName}ID";
 				return ( $child->$property == $parent->id );
 			},
 			'do' => function( $parent, $child ) use ( $childName ) {
 				$list = 'own'.ucfirst( $childName ).'List';
+				$parent->noLoad()->{$list}[] = $child;
+			}
+		);
+	}
+
+	/**
+	* A custom record-to-bean mapping function for findMulti.
+	*
+	* Usage:
+	*
+	* <code>
+	* $collection = R::findMulti( 'book,book_tag,tag',
+	* 'SELECT book.*, book_tag.*, tag.* FROM book
+	*      LEFT JOIN book_tag ON book_tag.book_id = book.id
+	*      LEFT JOIN tag ON book_tag.tag_id = tag.id', [], [
+	*              Finder::nmMap( 'book', 'tag' ),
+	*      ]);
+	* </code>
+	*
+	* @param string $parentName name of the parent bean
+	* @param string $childName  name of the child bean
+	*
+	* @return array
+	*/
+	public static function nmMap( $parentName, $childName )
+	{
+		$types = array($parentName, $childName);
+		sort( $types );
+		$link = implode( '_', $types );
+		return array(
+			'a' => $parentName,
+			'b' => $childName,
+			'matcher' => function( $parent, $child, $beans ) use ( $parentName, $childName, $link ) {
+				$propertyName = 'shared' . ucfirst( $childName );
+				if (!isset($parent[$propertyName])) {
+					$parent[$propertyName] = array();
+				}
+				foreach( $beans[$link] as $linkBean ) {
+					if ( $linkBean["{$parentName}ID"] == $parent->id && $linkBean["{$childName}ID"] == $child->id ) {
+						return true;
+					}
+				}
+			},
+			'do' => function( $parent, $child ) use ( $childName ) {
+				$list = 'shared'.ucfirst( $childName ).'List';
 				$parent->noLoad()->{$list}[] = $child;
 			}
 		);
