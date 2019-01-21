@@ -133,7 +133,7 @@ abstract class AQueryWriter
 	 */
 	public static function forbidNuke( $flag ) {
 		$old = self::$noNuke;
-		self::$noNuke = boolval( $flag );
+		self::$noNuke = (bool) $flag;
 		return $old;
 	}
 
