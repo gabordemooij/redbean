@@ -44,4 +44,26 @@ class Nuke extends Base
 		asrt( count( R::getWriter()->getTables() ), 1 );
 		R::freeze( FALSE );
 	}
+
+	/**
+	 * Test noNuke().
+	 *
+	 * @return void
+	 */
+	public function testNoNuke() {
+		$bean = R::dispense( 'bean' );
+		R::store( $bean );
+		asrt( count( R::getWriter()->getTables() ), 1 );
+		R::noNuke( TRUE );
+		try {
+			R::nuke();
+			fail();
+		} catch( \Exception $e ) {
+			pass();
+		}
+		asrt( count( R::getWriter()->getTables() ), 1 );
+		R::noNuke( FALSE );
+		R::nuke();
+		asrt( count( R::getWriter()->getTables() ), 0 );
+	}
 }

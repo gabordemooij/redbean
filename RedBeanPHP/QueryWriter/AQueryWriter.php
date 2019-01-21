@@ -99,6 +99,11 @@ abstract class AQueryWriter
 	public $typeno_sqltype = array();
 
 	/**
+	 * @var bool
+	 */
+	protected static $noNuke = false;
+
+	/**
 	 * Toggles support for automatic generation of JSON columns.
 	 * Using JSON columns means that strings containing JSON will
 	 * cause the column to be created (not modified) as a JSON column.
@@ -114,6 +119,21 @@ abstract class AQueryWriter
 	{
 		$old = self::$flagUseJSONColumns;
 		self::$flagUseJSONColumns = $flag;
+		return $old;
+	}
+
+	/**
+	 * Toggles support for nuke().
+	 * Can be used to turn off the nuke() feature for security reasons.
+	 * Returns the old flag value.
+	 *
+	 * @param boolean $flag TRUE or FALSE
+	 *
+	 * @return boolean
+	 */
+	public static function forbidNuke( $flag ) {
+		$old = self::$noNuke;
+		self::$noNuke = boolval( $flag );
 		return $old;
 	}
 

@@ -406,6 +406,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	 */
 	public function wipeAll()
 	{
+		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		$this->adapter->exec( 'SET CONSTRAINTS ALL DEFERRED' );
 
 		foreach ( $this->getTables() as $t ) {

@@ -343,6 +343,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	 */
 	public function wipeAll()
 	{
+		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		foreach ( $this->getTables() as $t ) {
 			foreach ( $this->getKeyMapForType( $t ) as $k ) {
 				$this->adapter->exec( "ALTER TABLE \"$t\" DROP FOREIGN KEY \"{$k['name']}\"" );

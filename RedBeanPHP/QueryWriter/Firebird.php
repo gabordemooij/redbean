@@ -346,6 +346,7 @@ class Firebird extends AQueryWriter implements QueryWriter
 	 */
 	public function wipeAll()
 	{
+		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		$tables = $this->getTables();
 		foreach( $tables as $table ) {
 			$table = trim( $table );

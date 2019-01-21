@@ -23,6 +23,7 @@ use RedBeanPHP\Util\MatchUp as MatchUp;
 use RedBeanPHP\Util\Look as Look;
 use RedBeanPHP\Util\Diff as Diff;
 use RedBeanPHP\Util\Tree as Tree;
+use RedBeanPHP\Util\Feature;
 
 /**
  * RedBean Facade
@@ -2852,6 +2853,34 @@ class Facade
 	public static function parents( OODBBean $bean, $sql = NULL, $bindings = array() )
 	{
 		return self::$tree->parents( $bean, $sql, $bindings );
+	}
+
+	/**
+	 * Toggles support for nuke().
+	 * Can be used to turn off the nuke() feature for security reasons.
+	 * Returns the old flag value.
+	 *
+	 * @param boolean $flag TRUE or FALSE
+	 *
+	 * @return boolean
+	 */
+	public static function noNuke( $yesNo ) {
+		return AQueryWriter::forbidNuke( $yesNo );
+	}
+
+	/**
+	 * Selects the feature set you want as specified by
+	 * the label.
+	 *
+	 * Usage:
+	 * R::useFeatureSet( 'novice/latest' );
+	 *
+	 * @param string $label label
+	 *
+	 * @return void
+	 */
+	public static function usefeatureSet( $label ) {
+		return Feature::feature($label);
 	}
 
 	/**
