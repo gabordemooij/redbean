@@ -117,7 +117,7 @@ class RPDO implements Driver
 	{
 		foreach ( $bindings as $key => &$value ) {
 			$k = is_integer( $key ) ? $key + 1 : $key;
-			if ( is_array( $value ) && count( $value ) == 2) {
+			if ( is_array( $value ) && count( $value ) == 2 ) {
 				$paramType = end( $value );
 				$value = reset( $value );
 			}
@@ -129,11 +129,11 @@ class RPDO implements Driver
 
 			if ( !isset( $paramType ) || ( $paramType != \PDO::PARAM_INT && $paramType != \PDO::PARAM_STR ) ) {
 				if ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && abs( $value ) <= $this->max ) {
-					$paramType = \PDO::PARAM_INT
+					$paramType = \PDO::PARAM_INT;
 				} else {
 					$paramType = \PDO::PARAM_STR;
 				}
-			} 
+			}
 
 			$statement->bindParam( $k, $value, $paramType );
 		}
