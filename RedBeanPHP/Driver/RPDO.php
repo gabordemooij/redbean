@@ -116,23 +116,29 @@ class RPDO implements Driver
 	protected function bindParams( $statement, $bindings )
 	{
 		foreach ( $bindings as $key => &$value ) {
-			if ( is_integer( $key ) ) {
-				if ( is_null( $value ) ) {
-					$statement->bindValue( $key + 1, NULL, \PDO::PARAM_NULL );
-				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && abs( $value ) <= $this->max ) {
-					$statement->bindParam( $key + 1, $value, \PDO::PARAM_INT );
-				} else {
-					$statement->bindParam( $key + 1, $value, \PDO::PARAM_STR );
-				}
+			$k = is_integer( $key ) ? $key + 1 : $key;
+
+			if ( is_array( $value ) && count( $value ) == 2 ) {
+				$paramType = end( $value );
+				$value = reset( $value );
 			} else {
-				if ( is_null( $value ) ) {
-					$statement->bindValue( $key, NULL, \PDO::PARAM_NULL );
-				} elseif ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && abs( $value ) <= $this->max ) {
-					$statement->bindParam( $key, $value, \PDO::PARAM_INT );
+				$paramType = NULL;
+			}
+
+			if ( is_null( $value ) ) {
+				$statement->bindValue( $k, NULL, \PDO::PARAM_NULL );
+				continue;
+			}
+
+			if ( $paramType != \PDO::PARAM_INT && $paramType != \PDO::PARAM_STR ) {
+				if ( !$this->flagUseStringOnlyBinding && AQueryWriter::canBeTreatedAsInt( $value ) && abs( $value ) <= $this->max ) {
+					$paramType = \PDO::PARAM_INT;
 				} else {
-					$statement->bindParam( $key, $value, \PDO::PARAM_STR );
+					$paramType = \PDO::PARAM_STR;
 				}
 			}
+
+			$statement->bindParam( $k, $value, $paramType );
 		}
 	}
 
