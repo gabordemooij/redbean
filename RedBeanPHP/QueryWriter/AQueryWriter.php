@@ -1063,9 +1063,22 @@ abstract class AQueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::queryTagged
+	 * Returns or counts all rows of specified type that have been tagged with one of the
+	 * strings in the specified tag list array.
+	 *
+	 * Note that the additional SQL snippet can only be used for pagination,
+	 * the SQL snippet will be appended to the end of the query.
+	 *
+	 * @param string  $type     the bean type you want to query
+	 * @param array   $tagList  an array of strings, each string containing a tag title
+	 * @param boolean $all      if TRUE only return records that have been associated with ALL the tags in the list
+	 * @param string  $addSql   addition SQL snippet, for pagination
+	 * @param array   $bindings parameter bindings for additional SQL snippet
+	 * @param string  $wrap     SQL wrapper string (use %s for subquery)
+	 *
+	 * @return array
 	 */
-	public function queryTagged( $type, $tagList, $all = FALSE, $addSql = '', $bindings = array() )
+	private function queryTaggedGeneric( $type, $tagList, $all = FALSE, $addSql = '', $bindings = array(), $wrap = '%s' )
 	{
 		if ( $this->flagUseCache ) {
 			$key = $this->getCacheKey( array( implode( ',', $tagList ), $all, trim($addSql), $bindings, 'selectTagged' ) );
@@ -1091,6 +1104,7 @@ abstract class AQueryWriter
 			{$addSql}
 			-- keep-cache
 		";
+		$sql = sprintf($wrap,$sql);
 
 		$bindings = array_merge( $tagList, array( $score ), $bindings );
 		$rows = $this->adapter->get( $sql, $bindings );
@@ -1100,6 +1114,23 @@ abstract class AQueryWriter
 		}
 
 		return $rows;
+	}
+
+	/**
+	 * @see QueryWriter::queryTagged
+	 */
+	public function queryTagged( $type, $tagList, $all = FALSE, $addSql = '', $bindings = array() )
+	{
+		return $this->queryTaggedGeneric( $type, $tagList, $all, $addSql, $bindings );
+	}
+
+	/**
+	 * @see QueryWriter::queryCountTagged
+	 */
+	public function queryCountTagged( $type, $tagList, $all = FALSE, $addSql = '', $bindings = array() )
+	{
+		$rows = $this->queryTaggedGeneric( $type, $tagList, $all, $addSql, $bindings, 'SELECT COUNT(*) AS counted FROM (%s) AS counting' );
+		return intval($rows[0]['counted']);
 	}
 
 	/**
