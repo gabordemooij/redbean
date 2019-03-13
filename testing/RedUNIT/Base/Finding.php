@@ -94,6 +94,27 @@ class Finding extends Base {
 	}
 
 	/**
+	 * Test explicit param binding.
+	 *
+	 * @return void
+	 */
+	 public function testExplParaBin()
+	 {
+		 R::nuke();
+		 $bean = R::dispense('bean');
+		 $bean->property = 1;
+		 $bean->property2 = 2;
+		 $bean->property3 = '3';
+		 R::store($bean);
+		 $value = 1;
+		 $value2 = 2;
+		 $value3 = '3';
+		 $found = R::findOne( 'bean', ' property = ? AND property2 = ? AND property3 = ? ',
+		 array($value, array( $value2, \PDO::PARAM_INT ),array( $value3, \PDO::PARAM_STR )));
+		 asrt( $bean->id, $found->id );
+	 }
+
+	/**
 	 * FindMulti should not throw errors in case of
 	 * a record-type mismatch.
 	 *
