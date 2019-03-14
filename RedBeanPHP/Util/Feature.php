@@ -1,7 +1,7 @@
 <?php
 
 namespace RedBeanPHP\Util;
-use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\Facade as R;
 
 /**
  * Feature Utility
@@ -35,19 +35,17 @@ class Feature
 	public static function feature( $label ) {
 		switch( $label ) {
 			case "novice/latest":
-				AQueryWriter::noNuke( TRUE );
+				R::noNuke( TRUE );
 				R::setAutoResolve( TRUE );
 				break;
 			case "latest":
-				AQueryWriter::noNuke( TRUE );
 				R::setAutoResolve( TRUE );
 				break;
 			case "novice/5.3":
-				AQueryWriter::noNuke( TRUE );
+				R::noNuke( TRUE );
 				R::setAutoResolve( TRUE );
 				break;
 			case "5.3":
-				AQueryWriter::noNuke( TRUE );
 				R::setAutoResolve( TRUE );
 				break;
 			default:

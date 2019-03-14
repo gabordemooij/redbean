@@ -2928,7 +2928,7 @@ class Facade
 	 *
 	 * @return void
 	 */
-	public static function usefeatureSet( $label ) {
+	public static function useFeatureSet( $label ) {
 		return Feature::feature($label);
 	}
 
