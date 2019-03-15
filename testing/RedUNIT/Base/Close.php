@@ -30,6 +30,30 @@ class Close extends Base
 	 */
 	public function testClose()
 	{
+		// Test whether we can select a specific feature set
+		R::useFeatureSet('novice/latest');
+		pass();
+		R::useFeatureSet('latest');
+		pass();
+		R::useFeatureSet('5.3');
+		pass();
+		R::useFeatureSet('novice/5.3');
+		pass();
+		try {
+			R::useFeatureSet('5.2');
+			fail();
+		} catch ( \Exception $e ) {
+			asrt( $e->getMessage(), 'Unknown feature set label.' );
+		}
+		try {
+			R::nuke();
+			fail();
+		} catch( \Exception $e ) {
+			asrt( $e->getMessage(), 'The nuke() command has been disabled using noNuke() or R::feature(novice/...).' );
+		}
+		R::useFeatureSet('latest');
+
+		//Close
 		R::getDatabaseAdapter()->setOption( 'setInitQuery', NULL );
 		asrt( R::getDatabaseAdapter()->getDatabase()->isConnected(), TRUE );
 		R::close();

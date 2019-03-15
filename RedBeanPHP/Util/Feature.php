@@ -39,6 +39,7 @@ class Feature
 				R::setAutoResolve( TRUE );
 				break;
 			case "latest":
+				R::noNuke( FALSE );
 				R::setAutoResolve( TRUE );
 				break;
 			case "novice/5.3":
@@ -46,6 +47,7 @@ class Feature
 				R::setAutoResolve( TRUE );
 				break;
 			case "5.3":
+				R::noNuke( FALSE );
 				R::setAutoResolve( TRUE );
 				break;
 			default:
