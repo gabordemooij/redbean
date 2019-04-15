@@ -352,13 +352,22 @@ class Misc extends Base
 	public function testTransactions()
 	{
 		testpack( 'transactions' );
-		R::begin();
+		$false = R::begin();
+		asrt( $false, FALSE );
 		$bean = R::dispense( 'bean' );
 		R::store( $bean );
 		R::commit();
 		asrt( R::count( 'bean' ), 1 );
-		R::wipe( 'bean' );
-		R::freeze( 1 );
+		R::trash( $bean );
+		R::setAllowFluidTransactions( TRUE );
+		asrt( R::begin(), TRUE );
+		$bean = R::dispense( 'bean' );
+		R::store( $bean );
+		asrt( R::commit(), TRUE );
+		asrt( R::count( 'bean' ), 1 );
+		R::setAllowFluidTransactions( FALSE );
+		R::wipe('bean');
+		R::freeze( TRUE );
 		R::begin();
 		$bean = R::dispense( 'bean' );
 		R::store( $bean );

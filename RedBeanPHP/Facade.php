@@ -117,6 +117,11 @@ class Facade
 	private static $exportCaseStyle = 'default';
 
 	/**
+	 * @var flag allows transactions through facade in fluid mode
+	 */
+	private static $allowFluidTransactions = FALSE;
+
+	/**
 	 * Not in use (backward compatibility SQLHelper)
 	 */
 	public static $f;
@@ -272,6 +277,23 @@ class Facade
 	public static function setNarrowFieldMode( $mode )
 	{
 		AQueryWriter::setNarrowFieldMode( $mode );
+	}
+
+	/**
+	 * Toggles fluid transactions. By default fluid transactions
+	 * are not active. Starting, committing or rolling back a transaction
+	 * through the facade in fluid mode will have no effect. If you wish
+	 * to replace this standard portable behavor with behavior depending
+	 * on how the used database platform handles fluid (DDL) transactions
+	 * set this flag to TRUE.
+	 *
+	 * @param boolean $mode allow fluid transaction mode
+	 *
+	 * @return void
+	 */
+	public static function setAllowFluidTransactions( $mode )
+	{
+		self::$allowFluidTransactions = $mode;
 	}
 
 	/**
@@ -1644,11 +1666,18 @@ class Facade
 	 * If an exception occurs, the transaction gets rolled back and the database
 	 * will be left 'untouched'.
 	 *
+	 * In fluid mode transactions will be ignored and all queries will
+	 * be executed as-is because database schema changes will automatically
+	 * trigger the transaction system to commit everything in some database
+	 * systems. If you use a database that can handle DDL changes you might wish
+	 * to use setAllowFluidTransactions(TRUE). If you do this, the behavior of
+	 * this function in fluid mode will depend on the database platform used.
+	 *
 	 * @return bool
 	 */
 	public static function begin()
 	{
-		if ( !self::$redbean->isFrozen() ) return FALSE;
+		if ( !self::$allowFluidTransactions && !self::$redbean->isFrozen() ) return FALSE;
 		self::$adapter->startTransaction();
 		return TRUE;
 	}
@@ -1678,11 +1707,18 @@ class Facade
 	 * If an exception occurs, the transaction gets rolled back and the database
 	 * will be left 'untouched'.
 	 *
+	 * In fluid mode transactions will be ignored and all queries will
+	 * be executed as-is because database schema changes will automatically
+	 * trigger the transaction system to commit everything in some database
+	 * systems. If you use a database that can handle DDL changes you might wish
+	 * to use setAllowFluidTransactions(TRUE). If you do this, the behavior of
+	 * this function in fluid mode will depend on the database platform used.
+	 *
 	 * @return bool
 	 */
 	public static function commit()
 	{
-		if ( !self::$redbean->isFrozen() ) return FALSE;
+		if ( !self::$allowFluidTransactions && !self::$redbean->isFrozen() ) return FALSE;
 		self::$adapter->commit();
 		return TRUE;
 	}
@@ -1712,11 +1748,18 @@ class Facade
 	 * If an exception occurs, the transaction gets rolled back and the database
 	 * will be left 'untouched'.
 	 *
+	 * In fluid mode transactions will be ignored and all queries will
+	 * be executed as-is because database schema changes will automatically
+	 * trigger the transaction system to commit everything in some database
+	 * systems. If you use a database that can handle DDL changes you might wish
+	 * to use setAllowFluidTransactions(TRUE). If you do this, the behavior of
+	 * this function in fluid mode will depend on the database platform used.
+	 *
 	 * @return bool
 	 */
 	public static function rollback()
 	{
-		if ( !self::$redbean->isFrozen() ) return FALSE;
+		if ( !self::$allowFluidTransactions && !self::$redbean->isFrozen() ) return FALSE;
 		self::$adapter->rollback();
 		return TRUE;
 	}
