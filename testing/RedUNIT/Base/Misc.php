@@ -365,6 +365,12 @@ class Misc extends Base
 		R::store( $bean );
 		asrt( R::commit(), TRUE );
 		asrt( R::count( 'bean' ), 1 );
+		R::trash( $bean );
+		asrt( R::begin(), TRUE );
+		$bean = R::dispense( 'bean' );
+		R::store( $bean );
+		R::rollback();
+		asrt( R::count( 'bean' ), 0 );
 		R::setAllowFluidTransactions( FALSE );
 		R::wipe('bean');
 		R::freeze( TRUE );
