@@ -25,12 +25,12 @@ class Debug extends RDefault implements Logger
 	/**
 	 * @var integer
 	 */
-	private $strLen = 40;
+	protected $strLen = 40;
 
 	/**
 	 * @var boolean
 	 */
-	private static $noCLI = FALSE;
+	protected static $noCLI = FALSE;
 
 	/**
 	 * Toggles CLI override. By default debugging functions will
@@ -58,7 +58,7 @@ class Debug extends RDefault implements Logger
 	 *
 	 * @return string
 	 */
-	private function writeQuery( $newSql, $newBindings )
+	protected function writeQuery( $newSql, $newBindings )
 	{
 		//avoid str_replace collisions: slot1 and slot10 (issue 407).
 		uksort( $newBindings, function( $a, $b ) {
