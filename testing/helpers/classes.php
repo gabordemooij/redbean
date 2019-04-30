@@ -577,7 +577,6 @@ class DiagnosticBean extends \RedBeanPHP\OODBBean {
 
 		return $modFlags;
 	}
-
 }
 
 class DiagnosticModel extends \RedBeanPHP\SimpleModel
@@ -682,6 +681,12 @@ class DatabaseCapabilityChecker extends \RedBeanPHP\Driver\RPDO {
 	public function checkCapability( $capID )
 	{
 		return $this->hasCap( $capID );
+	}
+}
+
+class Model_String extends \RedBeanPHP\SimpleModel {
+	public function __toString() {
+		return base64_encode( $this->bean->text );
 	}
 }
 

@@ -31,6 +31,18 @@ use RedBeanPHP\Driver\RPDO;
 class Bean extends Base
 {
 	/**
+	 * Tests whether we can override the __toString() method of
+	 * a bean (for example to display binary data).
+	 */
+	public function testToStringOverride()
+	{
+		$bean = R::dispense('string');
+		$bean->text = '"Hello"';
+		$base64 = strval( $bean );
+		asrt( $base64, 'IkhlbGxvIg==' );
+	}
+
+	/**
 	 * Tests whether we can use RedBeanPHP core objects without
 	 * Facade related objects in a non-static style.
 	 *
