@@ -77,7 +77,7 @@ class Finder
 			},
 			'do' => function( $parent, $child ) use ( $childName ) {
 				$list = 'own'.ucfirst( $childName ).'List';
-				$parent->noLoad()->{$list}[] = $child;
+				$parent->noLoad()->{$list}[$child->id] = $child;
 			}
 		);
 	}
@@ -122,7 +122,7 @@ class Finder
 			},
 			'do' => function( $parent, $child ) use ( $childName ) {
 				$list = 'shared'.ucfirst( $childName ).'List';
-				$parent->noLoad()->{$list}[] = $child;
+				$parent->noLoad()->{$list}[$child->id] = $child;
 			}
 		);
 	}
