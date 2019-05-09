@@ -70,7 +70,7 @@ class Finder
 			'matcher' => function( $parent, $child ) use ( $parentName, $childName ) {
 				$propertyName = 'own' . ucfirst( $childName );
 				if (!isset($parent[$propertyName])) {
-					$parent[$propertyName] = array();
+					$parent->noLoad()->{$propertyName} = array();
 				}
 				$property = "{$parentName}ID";
 				return ( $child->$property == $parent->id );
@@ -112,7 +112,7 @@ class Finder
 			'matcher' => function( $parent, $child, $beans ) use ( $parentName, $childName, $link ) {
 				$propertyName = 'shared' . ucfirst( $childName );
 				if (!isset($parent[$propertyName])) {
-					$parent[$propertyName] = array();
+					$parent->noLoad()->{$propertyName} = array();
 				}
 				foreach( $beans[$link] as $linkBean ) {
 					if ( $linkBean["{$parentName}ID"] == $parent->id && $linkBean["{$childName}ID"] == $child->id ) {
