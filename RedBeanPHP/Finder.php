@@ -70,14 +70,14 @@ class Finder
 			'matcher' => function( $parent, $child ) use ( $parentName, $childName ) {
 				$propertyName = 'own' . ucfirst( $childName );
 				if (!isset($parent[$propertyName])) {
-					$parent[$propertyName] = array();
+					$parent->noLoad()->{$propertyName} = array();
 				}
 				$property = "{$parentName}ID";
 				return ( $child->$property == $parent->id );
 			},
 			'do' => function( $parent, $child ) use ( $childName ) {
 				$list = 'own'.ucfirst( $childName ).'List';
-				$parent->noLoad()->{$list}[] = $child;
+				$parent->noLoad()->{$list}[$child->id] = $child;
 			}
 		);
 	}
@@ -112,7 +112,7 @@ class Finder
 			'matcher' => function( $parent, $child, $beans ) use ( $parentName, $childName, $link ) {
 				$propertyName = 'shared' . ucfirst( $childName );
 				if (!isset($parent[$propertyName])) {
-					$parent[$propertyName] = array();
+					$parent->noLoad()->{$propertyName} = array();
 				}
 				foreach( $beans[$link] as $linkBean ) {
 					if ( $linkBean["{$parentName}ID"] == $parent->id && $linkBean["{$childName}ID"] == $child->id ) {
@@ -122,7 +122,7 @@ class Finder
 			},
 			'do' => function( $parent, $child ) use ( $childName ) {
 				$list = 'shared'.ucfirst( $childName ).'List';
-				$parent->noLoad()->{$list}[] = $child;
+				$parent->noLoad()->{$list}[$child->id] = $child;
 			}
 		);
 	}
