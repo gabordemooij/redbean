@@ -340,7 +340,7 @@ class OODB extends Observable
 	 * @param string $sql      SQL to be used in query
 	 * @param array  $bindings a list of values to bind to query parameters
 	 *
-	 * @return array
+	 * @return BeanCollection
 	 */
 	public function findCollection(  $type, $sql = NULL, $bindings = array() )
 	{
