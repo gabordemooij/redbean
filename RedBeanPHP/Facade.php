@@ -1357,7 +1357,7 @@ class Facade
 	 * @param array  $row       one row from the database
 	 * @param string $metamask  metamask (see convertToBeans)
 	 *
-	 * @return RedBeanPHP\OODBBean
+	 * @return OODBBean
 	 */
 	public static function convertToBean( $type, $row, $metamask = NULL )
 	{
