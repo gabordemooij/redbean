@@ -144,6 +144,7 @@ $allPacks = array(
 	'Blackhole/Glue',
 	'Blackhole/Plugins',
 	'Blackhole/Debug',
+	'Blackhole/Stub',
 	'Base/Productivity',
 	'Base/Quickexport',
 	'Base/Concurrency',

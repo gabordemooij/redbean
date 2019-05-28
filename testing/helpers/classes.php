@@ -692,4 +692,24 @@ class Model_String extends \RedBeanPHP\SimpleModel {
 
 class Model_Probe extends DiagnosticModel {};
 
+class Mockdapter implements \RedBeanPHP\Adapter {
+	public function getSQL(){}
+	public function exec( $sql, $bindings = array(), $noevent = FALSE ){}
+	public function get( $sql, $bindings = array() ){ return array(); }
+	public function getRow( $sql, $bindings = array() ){ return array(); }
+	public function getCol( $sql, $bindings = array() ){ return array(); }
+	public function getCell( $sql, $bindings = array() ){ return ''; }
+	public function getAssoc( $sql, $bindings = array() ){ return array();  }
+	public function getAssocRow( $sql, $bindings = array() ){ return array(); }
+	public function getInsertID(){}
+	public function getAffectedRows(){}
+	public function getCursor( $sql, $bindings = array() ){}
+	public function getDatabase(){}
+	public function startTransaction(){}
+	public function commit(){}
+	public function rollback(){}
+	public function close(){}
+	public function setOption( $optionKey, $optionValue ){}
+}
+
 define('REDBEAN_OODBBEAN_CLASS', '\DiagnosticBean');

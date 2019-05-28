@@ -94,6 +94,52 @@ class Finding extends Base {
 	}
 
 	/**
+	 * Test NM-Map.
+	 *
+	 * @return void
+	 */
+	public function testNMMap()
+	{
+		R::nuke();
+		$book1 = R::dispense( 'book' );
+		$book1->title = 'book 1';
+		R::tag( $book1, ['tag 1','tag 2'] );
+		$book2 = R::dispense( 'book' );
+		$book2->title = 'book 2';
+		R::tag( $book2, ['tag 2', 'tag 3'] );
+		$collection = R::findMulti( 'book,book_tag,tag',
+			'SELECT book.*, book_tag.*, tag.* FROM book
+			LEFT JOIN book_tag ON book_tag.book_id = book.id
+			LEFT JOIN tag ON book_tag.tag_id = tag.id
+			ORDER BY tag.title ASC
+			', [], [
+			Finder::nmMap( 'book', 'tag' ),
+		]);
+		asrt( count( $collection ), 3 );
+		asrt( isset( $collection['book'] ), TRUE );
+		asrt( isset( $collection['book_tag'] ), TRUE );
+		asrt( isset( $collection['tag'] ), TRUE );
+		$books = $collection['book'];
+		foreach( $books as $book ) {
+			asrt( count( $book->noLoad()->sharedTagList ), 2 );
+			$tags = array();
+			if ( $book->title == 'book 1' ) {
+				foreach( $book->sharedTagList as $tag ) {
+					$tags[] = $tag->title;
+				}
+				asrt( implode( ',', $tags ), 'tag 1,tag 2' );
+			}
+			$tags = array();
+			if ( $book->title == 'book 2' ) {
+				foreach( $book->sharedTagList as $tag ) {
+					$tags[] = $tag->title;
+				}
+				asrt( implode( ',', $tags ), 'tag 2,tag 3' );
+			}
+		}
+	}
+
+	/**
 	 * Test explicit param binding.
 	 *
 	 * @return void
