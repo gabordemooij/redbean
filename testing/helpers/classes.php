@@ -693,11 +693,20 @@ class Model_String extends \RedBeanPHP\SimpleModel {
 class Model_Probe extends DiagnosticModel {};
 
 class Mockdapter implements \RedBeanPHP\Adapter {
+	
+	public function answer( $id )
+	{
+		$error = "error{$id}";
+		$property = "answer{$id}";
+		if (isset($this->$error)) throw $this->$error;
+		if (isset($this->$property)) return $this->$property;
+	}
+	
 	public function getSQL(){}
-	public function exec( $sql, $bindings = array(), $noevent = FALSE ){}
-	public function get( $sql, $bindings = array() ){ return array(); }
+	public function exec( $sql, $bindings = array(), $noevent = FALSE ){ return $this->answer('Exec'); }
+	public function get( $sql, $bindings = array() ){ return $this->answer('GetSQL'); }
 	public function getRow( $sql, $bindings = array() ){ return array(); }
-	public function getCol( $sql, $bindings = array() ){ return array(); }
+	public function getCol( $sql, $bindings = array() ){ return $this->answer('GetCol'); }
 	public function getCell( $sql, $bindings = array() ){ return ''; }
 	public function getAssoc( $sql, $bindings = array() ){ return array();  }
 	public function getAssocRow( $sql, $bindings = array() ){ return array(); }
