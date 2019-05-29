@@ -167,6 +167,11 @@ class Writer extends \RedUNIT\Mysql
 	 */
 	public function testSetGetJSON()
 	{
+		/* a stub test in case full test cannot be performed, see below */
+		R::useJSONFeatures( TRUE );
+		asrt( R::getWriter()->scanType( '[1,2,3]', TRUE ), MySQL::C_DATATYPE_SPECIAL_JSON );
+		R::useJSONFeatures( FALSE );
+
 		global $travis;
 		if ($travis) return;
 

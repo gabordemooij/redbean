@@ -693,7 +693,7 @@ class Model_String extends \RedBeanPHP\SimpleModel {
 class Model_Probe extends DiagnosticModel {};
 
 class Mockdapter implements \RedBeanPHP\Adapter {
-	
+
 	public function answer( $id )
 	{
 		$error = "error{$id}";
@@ -701,7 +701,7 @@ class Mockdapter implements \RedBeanPHP\Adapter {
 		if (isset($this->$error)) throw $this->$error;
 		if (isset($this->$property)) return $this->$property;
 	}
-	
+
 	public function getSQL(){}
 	public function exec( $sql, $bindings = array(), $noevent = FALSE ){ return $this->answer('Exec'); }
 	public function get( $sql, $bindings = array() ){ return $this->answer('GetSQL'); }
@@ -720,5 +720,56 @@ class Mockdapter implements \RedBeanPHP\Adapter {
 	public function close(){}
 	public function setOption( $optionKey, $optionValue ){}
 }
+
+/**
+ * Custom Logger class.
+ * For testing purposes.
+ */
+class CustomLogger extends \RedBeanPHP\Logger\RDefault
+{
+
+	private $log;
+
+	public function getLogMessage()
+	{
+		return $this->log;
+	}
+
+	public function log()
+	{
+		$this->log = func_get_args();
+	}
+}
+
+
+class TestRPO extends \RedBeanPHP\Driver\RPDO {
+	public function testCap( $cap ) {
+		return $this->hasCap( $cap );
+	}
+}
+
+class MockPDO extends \PDO {
+	public $attributes = array();
+	public function __construct() { }
+	public function setAttribute( $att, $val = NULL )
+	{
+		$this->attributes[ $att ] = $val;
+	}
+	public function getDiagAttribute( $att )
+	{
+		return $this->attributes[ $att ];
+	}
+	public function getAttribute( $att ) {
+		if ($att == \PDO::ATTR_SERVER_VERSION) return '5.5.3';
+		return 'x';
+	}
+}
+
+class DiagnosticCUBRIDWriter extends \RedBeanPHP\QueryWriter\CUBRID {
+	public function callMethod( $method, $arg1 = NULL, $arg2 = NULL, $arg3 = NULL, $arg4 = NULL, $arg5 = NULL ) {
+		return $this->$method( $arg1, $arg2, $arg3, $arg4, $arg5 );
+	}
+}
+
 
 define('REDBEAN_OODBBEAN_CLASS', '\DiagnosticBean');

@@ -29,7 +29,7 @@ class Stub extends Base
 	public function testCUBRID()
 	{
 		$mockdapter = new \Mockdapter();
-		$writer = new DiagnosticCUBRIDWriter( $mockdapter );
+		$writer = new \DiagnosticCUBRIDWriter( $mockdapter );
 		pass();
 		$type = 'bean';
 		$targetType = 'other';
@@ -122,11 +122,27 @@ class Stub extends Base
 		$writer->esc( $dbStructure, $noQuotes = FALSE );
 		pass();
 	}
+
+	/**
+	 * Stub test for SSL-connect.
+	 * 
+	 * @return void
+	 */
+	 public function testSSL()
+	 {
+		$pdo = R::getPDO();
+		$mock = new \MockPDO;
+		R::getDatabaseAdapter()->getDatabase()->setPDO( $mock );
+		R::addToolBoxWithKey( 'stub', new \RedBeanPHP\ToolBox( R::getRedBean(), R::getDatabaseAdapter(), R::getWriter()) );
+		R::useMysqlSSL( 'key.pem','cert.pem','cacert.pem', 'stub' );
+		R::getDatabaseAdapter()->getDatabase()->setPDO( $pdo );
+		$prop = \PDO::MYSQL_ATTR_SSL_KEY;
+		asrt( $mock->getDiagAttribute($prop), 'key.pem' );
+		$prop = \PDO::MYSQL_ATTR_SSL_CERT;
+		asrt( $mock->getDiagAttribute($prop), 'cert.pem' );
+		$prop = \PDO::MYSQL_ATTR_SSL_CA;
+		asrt( $mock->getDiagAttribute($prop), 'cacert.pem' );
+	 }
 }
 
-class DiagnosticCUBRIDWriter extends \RedBeanPHP\QueryWriter\CUBRID {
-	
-	public function callMethod( $method, $arg1 = NULL, $arg2 = NULL, $arg3 = NULL, $arg4 = NULL, $arg5 = NULL ) {
-		return $this->$method( $arg1, $arg2, $arg3, $arg4, $arg5 );
-	}
-}
+
