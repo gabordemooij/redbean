@@ -1,0 +1,4327 @@
+<h1>Quick Tour</h1>
+<p>
+In this <b>Quick Tour</b> we will show you
+how to use <b>RedBeanPHP</b> and highlight some of its features.
+<br>
+Because your time is precious, the Quick Tour is very brief and should only take about
+<b>5 minutes</b> to walk through...
+</p> 
+<h2>Quick Tour in 10 seconds</h2>
+<p>
+	Have an associative array in PHP? You can store an entire
+	array structure (even from a form) in one line:
+</p>
+<?php code("
+	R::store(R::dispense([
+		'_type' => 'book',
+        	'title' => 'My Book',
+        	'ownPageList' => [
+                	['_type'=>'page', 'name'=>'first page']
+        	]
+	]));
+
+"); ?>
+<p>
+	This creates a book table with one entry called 'My Book' and a related page
+	(using proper foreign keys). ...8...9...10. :)
+</p>
+<h2>Quick Tour in 5 minutes... minute 1:</h2>
+<p>
+To begin with RedBeanPHP,
+<a href="/download" title="download">download</a> the package from the website and
+put in somewhere in your PHP project (check the signature).
+</p>
+<p>
+Now, before you begin you have to <i>include</i> RedBeanPHP in your project,
+to do so, add a line like this:
+</p>
+<?php code("
+	require 'rb.php';
+");?>
+<h2>Minute 2: Create a database</h2>
+<p>
+Now you have to setup your <i>database connection</i>.<br>
+If you just want to play with RedBeanPHP you may also use:
+</p>
+<?php code("
+	R::setup();
+");?>
+<p>
+This will create a simple, <b>temporary</b> <b>SQLite</b> database, after rebooting
+your system this database will be <b>gone</b>.
+</p>
+
+<p class="note">
+ For Windows users: make sure PHP has write access to C:\Windows\Temp.
+</p>
+
+<p>
+If you want to start using RedBeanPHP for <b>real</b>, you can connect to a
+<b>MySQL</b> database like this:
+</p>
+<?php code("
+	R::setup( 'mysql:host=localhost;dbname=mydatabase', 'myusername', 'mypassword' );
+");?>
+<h2>Minute 3: Beans</h2>
+<p>
+Now you're ready to start using RedBeanPHP. RedBeanPHP makes it really easy to store stuff
+in the database. For instance, to store a blog post in the database you write:
+</p>
+<?php code("
+	\$post = R::dispense( 'post' );
+	\$post->title = 'My holiday';
+	\$id = R::store( \$post );
+");?>
+<p>
+Now, RedBeanPHP will <b>create</b> a <b>table</b> called post for you in the database and add
+a <b>column</b> called <b>title</b>, big enough to hold your text.
+<br>
+The store() function will also
+return the <b>primary key ID</b> of the record, which we capture in the variable <i>$id</i>.
+</p>
+<p class="note">
+	RedBeanPHP automatically creates a column for your property, in this case 'title'.
+	RedBeanPHP determines the column type by scanning the value in the property.
+	For instance in this case the value is a small text, so RedBeanPHP will add a column
+	of type <b>VARCHAR</b> (assuming this is a <b>MySQL/MariaDB</b> database). Imagine you store
+	a large text in this property later, then RedBeanPHP will change the column type to <b>TEXT</b>
+	to make room for the new value. This is called <b>fluid</b> mode. In fluid mode, RedBeanPHP
+	will <i>adapt</i> the database to meet the requirements of your app. It will never throw away
+	columns though nor will it ever shrink the size of a column, so you don't have to worry about
+	data loss. If you want to clean up your database by removing columns you have to do this
+	manually. Some datatypes are <i>immutable</i>, for instance if you store an ISO date string in a
+	property (2005-01-01), RedBeanPHP will create a date column for you. However in this case, the
+	date column will not change (to TEXT for example). This is because we consider it unlikely you ever
+	want to change a date column into something else (like a <b>TEXT</b> column). If you try to
+	put an invalid date string into this column RedBeanPHP assumes it's by accident.
+</p>
+<p>
+Note that you don't need any configuration to make this work. RedBeanPHP is
+<b>configurationless</b>, everything just works out of the box.
+You also don't need to configure <b>paths</b> or <b>autoloaders</b> because 
+everything is just in <b>one file</b>!<br>
+You don't even have to <b>instantiate an object</b>, all methods in RedBeanPHP are <i>static</i>.
+<br>
+Just type <b>R::</b> and then the name of the <i>method</i> you want to use!
+</p>
+<p>
+To <b>load</b> the post you just saved, just pass the <b>ID</b> to the
+load function:
+</p>
+<?php code("
+	\$post = R::load( 'post', \$id );
+");?>
+
+<p class="note" id="loadForUpdate">
+	If you want to lock a bean while loading it, so nobody can change
+	the record associated with your bean until your transaction completes use
+	R::loadForUpdate() instead (version 5+).
+	<br><br>
+	You can also use SQL snippets like <b>' for update '</b>
+	with operations like R::find() and R::batch(). Before invoking these commands
+	just set the SQL snippet you wish to use:<br>
+	<br>
+	<b>R::getWriter()-&gt;setSQLSelectSnippet( ... );</b>
+</p>
+<p>
+Yep, there's your post again. To <b>echo</b> the title of your post:
+</p>
+<?php code("
+	echo \$post->title;
+");?>
+<p>
+Nothing fancy there, but did you know beans can also be treated like <b>arrays</b> ?
+</p>
+<?php code("
+	echo \$post['title'];
+");?>
+<p>
+To <b>delete</b> your post, pass it to the <b>trash</b> method:
+</p>
+<?php code("
+	R::trash( \$post );
+");?>
+<p>
+Now, the post is gone, it will no longer be available in your database.
+</p>
+<h2>Minute 4: Finding stuff</h2>
+<p>
+Finding stuff in the database is <b>easy</b>:
+</p>
+<?php code("
+	\$posts = R::find(
+	'post', ' title LIKE ?', [ 'holiday' ] );
+");?>
+<p>
+This will <b>search</b> for all posts have the word 'holiday' in the title and will
+return an array containing all the relevant beans as a result.
+As you see, we don't use a fancy query builder, just <b>good old SQL</b>.
+<br>
+We like to keep things simple.
+</p>
+<p>
+Besides using the find() functions, you can also use <b>raw</b> SQL queries:
+</p>
+<?php code("
+	\$books = R::getAll(
+	'SELECT * FROM book WHERE price < ? ',
+	[ 50 ] );
+");?>
+<h2>Minute 5: Relations</h2>
+<p>
+RedBeanPHP also makes it easy to manage <b>relations</b>. For instance, if we like
+to add some photos to our holiday post we do this:
+</p>
+<?php code("
+	\$post->ownPhotoList[] = \$photo1;
+	\$post->ownPhotoList[] = \$photo2;
+	R::store( \$post );
+");?>
+<p>
+Here, <i>$photo1</i> and <i>$photo2</i> are also beans (but of <b>type</b> <i>'photo'</i>). 
+<br>
+After storing the
+post, these photos will be associated with the blog post. 
+<br>
+To associate a bean you
+simply <b>add</b> it to a list.
+The name of the list <b>must match</b> the name of the related bean <b>type</b>.
+<br>
+So <b>photo</b> beans go in: 
+<br><br>
+$post-&gt;own<b>Photo</b>List
+<br><br>
+<b>comments</b> go in:
+<br><br>
+$post-&gt;own<b>Comment</b>List 
+<br><br>
+and <b>notes</b> go in:
+<br><br>
+$post-&gt;own<b>Note</b>List
+<br><br>
+See? It's that simple!
+</p>
+<p>
+To <b>retrieve</b> associated beans, just <b>access</b> the corresponding list:
+</p>
+<?php code("
+	\$post = R::load( 'post', \$id );
+	\$firstPhoto = reset( \$post->ownPhotoList );
+");?>
+<p>
+In the example above, we load the blog post and then access the list.
+The <i>moment</i> we <b>access</b> the <b>ownPhotoList</b> property, the relation will be loaded <b>automatically</b>,
+this is often called <b>lazy loading</b>, because RedBeanPHP only loads the beans when you really need them.
+</p>
+<p>
+To get the <b>first element</b> of the photo list, we simply use PHP's native <b>reset()</b> function...
+</p>
+<?php code("
+	\$firstPost = reset( \$post->ownPhotoList );
+");?>
+<p>
+Although <b>no SQL</b> is necessary, RedBeanPHP is very <b>SQL friendly</b>. For instance, suppose some of
+your posts have quite a big photo collection associated with it and you want to <b>limit</b> the number
+of photos to a maximum of 3:
+</p>
+
+<?php code("
+	\$threePhotos = \$post->with( 'LIMIT 3' )->ownPhotoList;
+");?>
+
+<p>
+See? Just pass a little <b>SQL Snippet</b>!
+<p>
+
+<h2>Final note</h2>
+<p>
+As you have seen, RedBeanPHP dynamically changes the structure of the database during development.
+This is a very nice feature, but you don't want that to happen on your <b>production server</b>! So, before
+deploying your <b>app</b>, be sure to <i>freeze</i> the database by adding the following line just below the setup:
+</p>
+
+<?php code("
+	R::freeze( TRUE );
+");?>
+
+<p>
+Before you deploy, <b>review</b> your database schema. RedBeanPHP tries to make a <b>good</b> database schema for
+you, but you might want to improve it.<br>
+Maybe you added a column you no longer use, or you want an extra index.
+<br>
+Always make sure you review the final database schema before you put it on a production server!
+<br>
+After freezing the database, RedBeanPHP will
+no longer change the structure, so you have the best of both worlds. <b>NoSQL-like</b> flexibility during development and
+a <b>reliable schema</b> on your production server!
+</p>
+
+<p>
+This was just a quick tour, showcasing some basic usage of RedBeanPHP. For more details please explore the
+documentation on this website!
+</p>
+
+
+<h1>Requirements</h1>
+
+<p>
+	<b>Short</b> version first... minimal requirements
+</p>
+<ul>
+<li>GNU/Linux, BSD</li>
+<li>PHP 5.3.0 or higher (PHP 5.3.4+ recommended)</li>
+<li>PDO plus driver for your database</li>
+<li>Multibyte String Support</li>
+</ul>
+
+
+<h2>PHP versions</h2>
+<p>
+	<strong>RedBeanPHP</strong>
+	requires PHP 5.3.4 or higher.
+	RedBeanPHP is works on both ZEND PHP and HHVM.<br>
+	RedBeanPHP also works with <b>PHP 7</b>.
+	You can also use RedBeanPHP with PHP 5.3 - 5.3.3, just make sure
+	you run the <a href="/install#p533patch" title="P533Patch">p533 patch</a> first.
+	<b>PHP 5.2</b> and earlier are <b>not</b> supported by RedBeanPHP. If you
+	happen to work with PHP 5.2 or earlier it's recommended to upgrade to a
+	newer version of PHP.
+	<br>
+	<b>PHP 6.0</b> is also <b>not</b> supported, since this version has never
+	been officially released. Still, some people have been e-mailing me about
+	PHP 6.0. Although RedBeanPHP officially does not support this version, it is
+	said to work <i>'reasonably'</i>.
+</p>
+
+
+
+<h2>Environment</h2>
+<p>
+	RedBeanPHP works on all well known operating systems, including
+	<b>GNU/Linux</b>, <b>BSD</b> and <b>Mac OSX</b>.
+	<br>
+	You need to have <abbr title="PHP Data Objects">PDO</abbr> installed and you need
+	a PDO driver for the database you want to connect to. Most PHP stacks
+	already take care of this.
+	<br>
+	RedBeanPHP also requires the MB String extension, once
+	again, chances are, this is already there.
+</p>
+
+<h2>Databases</h2>
+<p>
+	RedBeanPHP supports all <b>well known</b>, <b>open source</b>,
+	<b>relational databases</b>. Official support is provided for:
+	<a title="MySQL" href="https://www.mysql.com/" target="_blank">MySQL</a>,
+	<a title="MariaDB" href="https://mariadb.org/" target="_blank">MariaDB</a>,
+	<a title="PostgreSQL" href="http://www.postgresql.org/" target="_blank">PostgreSQL</a>,
+	<a title="SQLite" href="https://www.sqlite.org/" target="_blank">SQLite</a>,
+	<a title="CUBRID" href="http://www.cubrid.org/" target="_blank">CUBRID</a> and
+	<a title="Firebird/Interbase" href="https://firebirdsql.org/" target="_blank">Firebird/Interbase</a> (experimental).
+	Support for other databases might be provided by 3rd parties.
+</p>
+
+
+
+<h2>MySQL Strict Mode</h2>
+<p>
+	RedBeanPHP does <b>not</b> work with <b>MySQL strict mode</b>.
+	To turn off strict mode execute the following SQL query:
+</p>
+<?php code("
+	SET @@global.sql_mode= '';
+");?>
+
+<h2>Existing schemas</h2>
+<p>
+	RedBeanPHP has been designed to build your database <b>on-the-fly</b>, as you go.
+	Afterwards, you can <b>manually</b> change the schema to suit your needs (change column types, add additional indexes).
+	Remember that the purpose of RedBeanPHP is to have an easy, configuration-less ORM. This can be achieved only by
+	respecting certain conventions.
+</p>
+
+<h2>Ready to download?</h2>
+<p>
+	Did you check your system requirements? Proceed to
+	<a href="/download" title="Download Page.">download RedBeanPHP</a>.
+</p>
+
+
+
+<h1>Install</h1>
+
+<p>
+	Installing RedBeanPHP is very easy.
+	First of all, you need to download the <i>tarball</i> from our server.
+	Just head over to the download section and click on the download link to
+	start downloading the package. You can also use a tool like <b>wget</b> of course.
+</p>
+
+
+
+<h2>Simple installation</h2>
+<kbd>
+url=http://www.redbeanphp.com/downloadredbean.php<br>
+wget $url --output-document=&quot;redbeanphp.tar.gz&quot;<br>
+tar xvf redbeanphp.tar.gz 
+</kbd>
+<p>
+	RedBeanPHP is always distributed as a <b>TGZ</b> package, also known
+	as a <i>'tarball'</i>. To extract the contents of this package use:
+</p>
+<kbd>
+tar xvf redbeanphp.tar.gz
+</kbd>
+<p>
+	You'll then see...
+</p>
+<kbd>
+license.txt<br>
+rb.php
+</kbd>
+<p>
+	<b>OPTIONAL</b>
+	Check integrity:
+</p>
+<kbd>
+sha256sum redbean.tgz
+</kbd>
+<p>
+	Now compare the output of that command with the SHA signature shown
+	on the download pages.
+</p>
+
+
+<p>
+	<b>OPTIONAL</b>
+	Check authenticity (public keys available on download page and groups forum):
+</p>
+
+
+<kbd>
+cat redbean.tgz | signify -Vz -p red.pub -t arc | tar xvzf -
+</kbd>
+	
+<p>
+	Inside the package you'll find a <b>license.txt</b> and a <b>rb.php</b> file.
+	The first file contains the license information. The second file is the
+	compiled RedBeanPHP all-in-one script. All RedBeanPHP code has been
+	<b>combined</b> into a <b>single file</b> for your convenience.
+</p>
+
+<h2>Including in your project</h2>
+
+<p>
+	To include RedBeanPHP in your project, simply copy the file to
+	a location somewhere inside your PHP project and then use
+	the PHP <i>'require'</i> command to load it:
+</p>
+
+<?php code("
+	require 'rb.php';
+"); ?>
+<p>
+	You are now ready to use RedBeanPHP! <br>
+	Let's try to setup
+	<a href="/connection" title="Learn how to connect to a database using RedBeanPHP!">a database connection</a>!
+</p>
+
+<h2 id="p533patch">Patch for PHP 5.3.3 and earlier</h2>
+<p>
+	<b>This patch is only required for people using old versions of PHP, i.e. PHP 5.3.3 or earlier</b>.
+	If you are running a PHP instance with a higher version number please skip this section.
+	People using PHP version 5.3.3 or older should run the p533patch.php file first and then
+	include the newly generated rb-p533.php file. The patch will modify the source for compatibility with these older
+	PHP editions. Use the patch like this:
+</p>
+<kbd>
+	php p533patch.php
+</kbd>
+<p>
+	You will now see the following output:
+</p>
+<kbd>
+	Running Patch P533...<br>
+	Applied patch for PHP &lt; 5.3.3
+</kbd>
+<p>
+	After running the patch, you'll see a new file in your folder:
+</p>
+<kbd>
+	rb-p533.php
+</kbd>
+<p>
+	This is the file to be used with your version of PHP.
+</p>
+
+<h2>Composer</h2>
+
+<p class="note" style="color:red">
+Composer is <b>not</b> the preferred way to install RedBeanPHP and never will be. Using package management systems for
+development can be <b>dangerous</b> because people can inject malicious dependencies or remove dependencies.
+Related news items:
+<br>
+<a href="https://news.ycombinator.com/item?id=15272394" target="_blank">Malicious code snuck into in Python repository</a><br>
+<a href="https://news.ycombinator.com/item?id=11340510" target="_blank">The &quot;Left-pad&quot; incident at NPM</a><br>
+<a href="https://sensorstechforum.com/arch-linux-aur-repository-found-contain-malware/" target="_blank">Arch-linux incident</a><br>
+</p>
+
+<p>
+To install RedBeanPHP with Composer...
+Just open your composer.json file and add the package name (e.g. "gabordemooij/redbean": "dev-master") in your require list.
+</p>
+<kbd>
+{<br>
+&nbsp;"require": {<br>
+&nbsp;"gabordemooij/redbean": "dev-master"<br>
+&nbsp;}<br>
+}<br>
+</kbd>
+<p>
+	..for more details on Composer based installation see the <a href="https://github.com/gabordemooij/redbean/blob/master/README.markdown" target="_blank">readme on github</a>.
+</p>
+
+
+
+<h1>Connection</h1>
+<p>
+	To connect to an <b>SQLite</b> testing database,
+	without having to make one yourself, use:
+</p>
+
+<?php code("
+	require 'rb.php';
+	R::setup();
+"); ?>
+
+<p>
+	On most systems, this just works.
+	<br>
+	This code creates a test database in your <b>/tmp</b> folder.
+	<br>
+	Of course, this is meant for testing purposes only
+	(and to fool around),
+	to connect to a real database, use one of the following snippets:
+</p>
+
+<p class="note">
+ For <b>Windows</b>: make sure PHP has write access to <b>C:\Windows\Temp</b>.
+</p>
+
+<h2>MariaDB</h2>
+<p>
+	MariaDB (formerly known as <b>MySQL</b>) is the most popular database among web developers.
+	Use MariaDB or MySQL for <b>light</b> web development.
+	To connect to a
+	<a target="_blank" href="https://mariadb.com/kb/en/a-mariadb-primer-01-intro/" title="Learn more about the MySQL database">MySQL</a> database or a
+	MariaDB database:
+</p>
+
+<?php code("
+	R::setup( 'mysql:host=localhost;dbname=mydatabase',
+		'user', 'password' ); //for both mysql or mariaDB
+")?>
+
+<p class="note">
+	Did you manage to establish a connection to the database?
+	Proceed to learn the
+	<a href="/crud" title="Basic RedBeanPHP">basics</a>
+	of RedBeanPHP!
+</p>
+
+
+<h2>PostgreSQL</h2>
+<p>
+	Postgres  evolved from the classic Ingres database and is by far the most advanced database
+	you can get. Use Postgres for serious application development. Postgres is rock solid and
+	has lots of power features like window functions, support for hierarchical queries and materialized views.
+	To connect to a
+	<a target="_blank" href="http://www.postgresql.org/docs/9.3/interactive/tutorial-start.html" title="Learn more about Postgres database">PostgreSQL</a> database:
+</p>
+<?php code("
+	R::setup( 'pgsql:host=localhost;dbname=mydatabase',
+		'user', 'password' );
+");?>
+
+<h2>SQLite</h2>
+<p>
+	SQLite is file based database, ideal for embedded applications, prototyping, small (and smart) applications,
+	small websites (not too much traffic) and data analysis.
+	To connect to an
+	<a target="_blank" href="http://www.sqlite.org/quickstart.html" title="Read more about SQLite">SQLite</a> database:
+</p>
+<?php code("
+	R::setup( 'sqlite:/tmp/dbfile.db' );
+"); ?>
+
+<h2>CUBRID</h2>
+<p>
+	CUBRID is an exciting database platform focusing on web development.
+	It's an ideal replacement for rusty MySQL servers. While CUBRID seems to be almost
+	completely compatible with MySQL it also offers a great deal of advanced features, like hierarchical queries and
+	<b>click counters</b>. However, CUBRID
+	also offers a very complete, easy-to-use GUI based toolchain.
+	To use the
+	<a target="_blank" title="Learn more about the CUBRID database" href="http://www.cubrid.org/wiki_tutorials/entry/cubrid-tutorials">CUBRID</a>
+	database with RedBeanPHP4, first install the
+	<a target="_blank" title="Download the plugin pack for RedBeanPHP4" href="https://github.com/gabordemooij/RB4Plugins">plugin pack</a>.
+	To connect to a CUBRID database:
+</p>
+<?php code("
+	R::setup('cubrid:host=localhost;port=30000;
+	dbname=mydatabase',
+    'user','password');
+"); ?>
+
+
+
+
+<h2 id="closing">Closing</h2>
+
+<p>
+	To disconnect use:
+</p>
+<?php code("
+	R::close();
+");?>
+<p>
+	This will close the database connection.
+</p>
+
+
+<h1>Tutorial</h1>
+
+<p>
+	
+	<img style="float:right;margin:10px;border-radius:100%;" src="/img/whisky_in_devilsadvocate.jpg" alt="Picture of a glass of Whisky, taken in Devils Advocate, Edinburgh.">
+	In this tutorial we're going to write a little
+	application to demonstrate some <b>basic features</b> of RedBeanPHP.
+	Instead of a boring <i>todo app</i>, we'll write a little application
+	to manage <i>whisky tasting notes</i>. We call this application 
+	<a target="_blank" href="https://en.wikipedia.org/wiki/Dram_%28unit%29" title="Dram">'dram'</a>
+	which is 'a small glass of whisky'.
+	<br><br><br><br><br>
+	
+</p>
+
+<h2>The Environment</h2>
+<p>
+	We'll build a <b>CLI</b> application. This means we don't create
+	a graphical user interface. Our application will run on the command line.
+	This allows us to focus solely on the program code
+	without having to bother with things like HTML templates.
+	We also assume you're using a <b>UNIX</b> or <b>GNU/Linux</b>
+	operating system.
+</p>
+
+
+<h2>Step 1: Setup</h2>
+<p>
+	First, we need to <b>download</b> and <b>install</b> the RedBeanPHP
+	package. Luckily, this is a no-brainer. RedBeanPHP is distributed
+	as a single file which we just grab from the internet like this:
+</p>
+<kbd>
+	url=http://www.redbeanphp.com/downloadredbean.php<br>
+	wget $url --output-document="redbeanphp.tar.gz"<br>
+	tar xvf redbeanphp.tar.gz
+</kbd>
+<p>
+	Here we download the RedBeanPHP package from the RedBeanPHP servers.
+	We then extract the contents of the <b>tarball</b>. RedBeanPHP is always
+	distributed as a single tarball containing the single code file.
+	The code file inside the tarball is named:
+</p>
+<kbd>
+	rb.php
+</kbd>
+<p>
+	For this tutorial, we'll use a temporary database, so after <b>rebooting</b>
+	your system, the data will be <b>gone</b>.<br>
+	While not very practical in real life, this
+	is ideal for testing and playing with RedBeanPHP.
+	So, let's create our application, the <b>dram.php</b> file:
+</p>
+<kbd>
+	touch dram.php
+</kbd>
+<p>
+	...and we're going to edit it using our favourite editor...
+</p>
+<kbd>
+	vim dram.php
+</kbd>
+<p>
+	I like to use <b>VIM</b> but that's of course just a matter of choice.
+	Any plaintext editor would do fine of course.<br>
+	Now, let's require the RedBeanPHP library file and setup our
+	database connection:
+</p>
+<?php code("
+	require 'rb.php';
+	R::setup();	
+"); ?>
+<p>
+	That's all, we're now ready to start coding now.
+</p>
+
+
+<h2>Step 2: Let's add a bottle of whisky</h2>
+<p>
+	When working with RedBeanPHP, it's important to start by <b>creating</b>
+	records first. So first write your logic for adding records to the database.
+	Some people like to begin by
+	creating an overview page listing all the records in a table,
+	however this means your <i>database</i>
+	must already contain at least <i>some</i> data.<br>
+	Since we like RedBeanPHP to do all the
+	heavy lifting for us, including <i>table</i> and <i>column</i> creation, 
+	we better start the other way around, by adding records.
+	So, always start with your 'add' code.
+</p>
+<?php code("
+	\$opts = getopt( '', [ 'add:', 'list' ] );
+"); ?>
+<p>
+	We use the <b>getopt()</b> function of PHP to read commands
+	from the console.<br>
+	In this case we listen for two commands: <b>add</b> and <b>list</b>.<br>
+	Now let's see how we add a bottle of whisky to our collection:
+</p>
+<?php code("
+	if ( isset( \$opts['add'] ) ) {
+	\$w = R::dispense( 'whisky' );
+	\$w->name = \$opts['add'];
+	\$id = R::store( \$w );
+	die( \"OK.\\n\" );
+	}
+");?>
+<p>
+	This code works very simple: it takes the value of the <i>add</i> 
+	parameter from the command
+	line and creates a new <b>bean</b> of type whisky. It then puts the text in the
+	name property of the bean and stores it. To make it possible for our
+	users to view the whisky menu we also implement a <b>list</b> feature:
+</p>
+<?php code("
+	if ( isset( \$opts['list'] ) ) {
+  		\$bottles = R::find( 'whisky' );
+  		if ( !count( \$bottles ) )
+			die( \"The cellar is empty!\\n\" );
+  		foreach( \$bottles as \$b ) {
+    		echo \"* #{\$b->id}: {\$b->name}\\n\";
+  		}
+  	exit;
+	}
+");?>
+<p>
+	We can now use the application like this:
+</p>
+<kbd>
+	php dram.php --add=&quot;Bowmore 12yo&quot;<br>
+	OK.<br>
+	php dram.php --add=&quot;Lagavulin 16yo&quot;<br>
+	OK.
+</kbd>
+<p>
+	...and to view the list...
+</p>
+<kbd>
+	php dram.php --list<br>
+	* #1: Bowmore 12yo<br>
+	* #2: Lagavulin 16yo
+</kbd>
+<p>
+	That's already quite a fancy application in just a couple of lines.
+	But we can do more! However, before we continue, let's take a look
+	at the database. Before we began, it was empty, but now we see this:
+</p>
+<kbd>
+geek@beans$ sqlite3 /tmp/red.db<br>
+SQLite version 3.7.13 2025-06-11 02:05:22<br>
+Enter &quot;.help&quot; for instructions<br>
+Enter SQL statements terminated with a &quot;;&quot;<br>
+sqlite&gt; .tables<br>
+whisky<br>
+</kbd>
+<p>
+	We see the whisky table has been created. The required columns are there as well:
+</p>
+<kbd>
+sqlite&gt; .schema<br>
+CREATE TABLE `whisky` (<br>
+id INTEGER PRIMARY KEY AUTOINCREMENT ,<br>
+`name` TEXT<br>
+);<br>
+</kbd>
+
+<p class="note">
+	RedBeanPHP creates the necessary <b>tables</b> and <b>columns</b> automatically.
+	The <b>type</b> of the column in the database depends on the value you want to store in it.
+	RedBeanPHP <i>scans</i> the value you want to store in a column and makes sure the column has
+	a type that can contain your data properly. You can always <b>tune</b> your database schema
+	manually of course.
+</p>
+
+<h2>Step 3: Throwing bottles away</h2>
+<p>
+	We are now going to add a new feature: <i>'delete'</i>.
+	Not suprising, the delete command will remove a specific
+	record from the database. First we add the 'delete' command
+	to getopts, so our application can recognize this command:
+</p>
+<?php code("
+	\$opts = getopt( '', ['add:', 'list', 'delete:' ] );
+"); ?>
+<p>
+	Next, we write a little code to perform the actual
+	deletion:
+</p>
+<?php code("
+	if ( isset( \$opts['delete'] ) ) {
+	R::trash( 'whisky', \$opts['delete'] );
+	die( \"Threw the bottle away!\\n\" );
+	}
+");?>
+<p>
+	Nice, so we can now add, list and delete whiskies! Let's give it
+	a try!
+</p>
+<kbd>
+	php dram.php --add=&quot;daluaine 16yo&quot;<br>
+	OK.<br>
+	php dram.php --list<br>
+	* #1: Bowmore 12yo<br>
+	* #3: Daluaine 16yo<br>
+</kbd>
+<p>
+	Oops, a typo, it's <b>Dailuaine</b> not Daluaine. A delicious whisky by the way.
+	Thanks to our new delete function, we can now remove this faulty record and correct
+	our silly mistake:
+</p>
+<kbd>
+	php dram.php --delete=3<br>
+	Threw the bottle away!<br>
+	php dram.php --list<br>
+	* #1: Bowmore 12yo<br>
+	php dram.php --add=&quot;Dailuaine 16yo&quot;<br>
+</kbd>
+<p>
+	Now this is all nice and fun but where are the notes?
+	It's supposed to be a tasting <b>notes</b> app after all?
+	So, let's add the notes before the 
+	<a 
+	target="_blank" 
+	href="https://en.wikipedia.org/wiki/Haggis"
+	title="Haggis">Haggis</a> gets cold!
+</p>
+<h2>Step 4: Adding some tasting notes</h2>
+<p>
+	Let's first consider the relation between a <b>tasting note</b> and
+	a <b>bottle of whisky</b>. A whisky bottle can have <b>many</b> tasting notes, yes?
+	Right, so what about the other way around? Can <b>one</b> tasting note
+	belong to many <b>whiskies</b>? Unlikely, since we consider every whisky to have
+	a unique taste (except the very cheap stuff maybe).<br>
+	This means we need a <b>one-to-many</b>
+	relation here.<br>
+	<b>One</b> whisky has <b>many</b> notes, each of these notes belongs to <b>one</b> whisky.
+	This kind of relation is sometimes expressed as: <i>1-N</i>.
+	Now, when we throw away a bottle of whisky because we are no longer interested in it,
+	should we keep the corresponding notes? No! of course not! The notes themselves are not of
+	any interest, they only matter in relation to the whisky they describe. This means we have
+	to use an <b>exclusive own list</b>: xownNoteList. We relate the note and the whisky like this:
+</p>
+<?php code("
+	\$n = R::dispense( 'note' );
+	\$n->note = \$text;
+	\$whisky->xownNoteList[] = \$n;
+	R::store( \$whisky );
+	");?>
+<p>
+	Note that the name of the list contains the type of bean we're storing in it.
+	This is by convention. The format for a list is:
+</p>
+<kbd>
+	&lt;x&gt; own &lt;BEAN TYPE NAME&gt; List
+</kbd>
+<p>
+	So if we want to store pages in a book we use <b>ownPageList</b>.
+	Because we want to throw the notes away with the bottle, we use an <b>exclusive</b> list.
+	Therefore we begin the name of this list with an <b>'x'</b>. Once an exclusive list has been
+	defined, there is no way back. If you want the notes to stay after all, you'll have to
+	open your database management tool (<i>phpmyadmin</i>) and change the <b>foreign key</b> setting.
+</p>
+<p>
+	Now, let's make a feature for our users to list all the notes attached to
+	a certain bottle of whisky:
+</p>
+<?php code("
+	\$notes = \$whisky->xownNoteList;
+	foreach( \$notes as \$note ) echo \$note->note;
+"); ?>
+<h2>Step 5: Wrapping up</h2>
+<p>
+	Now let's take a look at the whole application, here is my version:
+</p>
+<?php code("
+	require 'rb.php';
+	R::setup();
+	\$opts = getopt( '', [
+	  'add:',
+	  'delete:',
+	  'attach-to:',
+	  'note:',
+	  'notes:',
+	  'remove-note:',
+	  'list' ] );
+	if ( isset( \$opts [ 'add' ] ) ) {
+	  \$w = R::dispense( 'whisky' );
+	  \$w->name = \$opts['add'];
+	  \$id = R::store( \$w );
+	  die( \"OK.\\n\" );
+	}
+	if ( isset( \$opts['delete'] ) ) {
+	  R::trash( 'whisky', \$opts['delete'] );
+	  die( \"Threw the bottle away!\\n\" );
+	}
+	if ( isset( \$opts['note'] ) && isset( \$opts['attach-to'] ) ) {
+	  \$w = R::load( 'whisky', \$opts['attach-to'] );
+	  if (!\$w->id) die( \"No such bottle.\\n\" );
+	  \$n = R::dispense( 'note' );
+	  \$n->note = \$opts['note'];
+	  \$w->xownNoteList[] = \$n;
+	  R::store( \$w );
+	  die( \"Added note to whisky.\\n\" );
+	}
+	if ( isset( \$opts['notes'] ) ) {
+	\$w = R::load( 'whisky', \$opts['notes'] );
+	foreach( \$w->xownNoteList as \$note ) {
+	echo \"* #{\$note->id}: {\$note->note}\\n\";
+	}
+ 	 exit;
+	}
+	if ( isset( \$opts['remove-note'] ) ) {
+	R::trash( 'note', \$opts['remove-note'] );
+  	die( \"Removed note.\\n\" );	
+	}
+	if ( isset( \$opts['list'] ) ) {
+ 	\$bottles = R::find( 'whisky' );
+	if ( !count( \$bottles ) ) die( \"The cellar is empty!\\n\" );
+	foreach( \$bottles as \$b ) {
+	echo \"* #{\$b->id}: {\$b->name}\\n\";
+	}
+	exit;
+	}
+"); ?>
+<p>
+	Here is how to use it:
+</p>
+<kbd>
+php dram.php --add=&quot;Dailuaine 16yo&quot;<br>
+OK.<br>
+php dram.php --list<br>
+* #1: Bowmore 12yo<br>
+* #4: Dailuaine 16yo<br>
+php dram.php --attach-to=4 --note=&quot;vanilla, buttered cream&quot;<br>
+Added note to whisky.<br>
+php dram.php --attach-to=4 --note=&quot;apple, pear&quot;<br>
+Added note to whisky.<br>
+php dram.php --notes=4<br>
+* #4: vanilla, buttered cream<br>
+* #5: apple, pear
+</kbd>
+
+<h2>Step 6: Playing with models</h2>
+<p>
+	Just for fun, we're going to add a <b>model</b>.
+	In many web application using the <abbr title="Model View Controller">MVC</abbr> pattern, models are used
+	to encapsulate the business rules. Now let's say we don't accept
+	tasting notes containing less than four characters. This
+	qualifies as a business rule in the drinking business :).
+	To add this <b>validation</b> rule we need to have a model.
+	In most <b>object relational mappers</b> this is why you have
+	to create a whole class first. In RedBeanPHP we like to things a
+	little different. We have <b>no models</b> remember? Just <b>beans</b>.
+	So, how do we go from a <i>bean</i> to a <i>model</i> ? Simple, we just
+	add a model and RedBeanPHP will <b>automatically</b> detect its presence.
+	Based on the <i>naming convention</i> it will connect the model to the bean.
+	Here we go:
+</p>
+<?php code("
+	class Model_Note extends RedBean_SimpleModel {
+		public function update() {
+		if ( strlen( \$this->bean->note ) < 4 ) 
+		die( \"Note is too short!\\n\" );
+		}
+	}
+");?>
+<p>
+	Within the note model we can refer to our bean using:
+</p>
+<?php code("
+	\$this->bean;
+");?>
+<p>
+	The <b>update()</b> method will be invoked by the bean once we try to store it.
+	There is no way to stop the code flow though, to prevent RedBeanPHP from storing the bean
+	we have to throw an <b>exception</b>, or issue a <i>die()</i> statement. Let's test it:
+</p>
+<kbd>
+php dram.php --attach-to=4 --note="ap"<br>
+Note is too short!
+</kbd>
+<p>
+	Nice! That works really well! See? We did not have to <b>change</b> our code,
+	simply add models whenever you like. No need to take all your code, put it in a class
+	or add validation rules here and there, no, just add the model and suddenly all actions
+	will flow <i>through</i> it.
+	Besides <b>update()</b> we can use a lot of other <i>'hooks'</i>
+	to do all sorts of model stuff.
+</p>
+<h2>Step 7: Freezing</h2>
+<p>
+	Before we <b>deploy</b> our application, we need to review the database and <i>freeze</i> it.
+	To freeze the database we simply invoke the <i>freeze()</i>
+	method on top of our code, just below the <i>setup line</i>:
+</p>
+<?php code("
+	R::setup();
+	R::freeze( TRUE );
+");?>
+<p>
+	That's it, we have our whisky app!<br>
+	Of course there's much more to RedBeanPHP than just doing <b>CRUD</b>
+	and <b>one-to-many</b> relations, but it's
+	nearly impossible to fit all those features in a single tutorial.<br>
+	Feel free to extend this little app
+	with <b>tags</b>, <b>categories</b>
+	and other concepts to explore all the other features RedBeanPHP has to offer. <b>Enjoy!</b>
+	<br><br><br>
+	<img style="display:block;margin:auto;border-radius:10%;" src="/img/every_loaf.jpg" alt="Funny wisdom, Edinburgh.">
+</p>
+
+<h1>Videos</h1>
+<p>
+	<img src="/img/movies.png" alt="film reel" style="float:right">
+	Besides the <a href="/quick_tour">Quick Tour</a> and the <a href="/tutorial">Tutorial</a>
+	there are also a lot of video tutorials about RedBeanPHP on the web. Here is a selection.
+	Did you create a useful screencast on RedBeanPHP? Just drop me a link and I might add it here.
+	
+</p>
+
+<p>
+	<b>
+	Note: these videos are hosted on external sites.
+	Upon clicking on one of these videos you will be taken to an external site.
+	</b>
+</p>
+
+<p>
+	<a href="https://www.youtube.com/watch?v=aNISC_-Dhlk" target="_blank"><img src="/img/videos/rbvideo12.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=a5qaRQNrX3Q" target="_blank"><img src="/img/videos/rbvideo10.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=rIWfb6nihGA" target="_blank"><img src="/img/videos/rbvideo11.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=7NRAsvl3qDA&t=221s" target="_blank"><img src="/img/videos/rbvideo1.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=ioXsGP3zCOc" target="_blank"><img src="/img/videos/rbvideo2.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=iU8zlbkpwyo" target="_blank"><img src="/img/videos/rbvideo3.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=vwa_i9jyDmk&t=4s" target="_blank"><img src="/img/videos/rbvideo4.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=p1NucoC_ZLo&t=1376s" target="_blank"><img src="/img/videos/rbvideo5.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=xU3rnNnKDe8&t=7s" target="_blank"><img src="/img/videos/rbvideo6.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=WPbplKryjOo" target="_blank"><img src="/img/videos/rbvideo7.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=ZzECqFOURxQ" target="_blank"><img src="/img/videos/rbvideo8.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	<a href="https://www.youtube.com/watch?v=uDCmL-5UZrM" target="_blank"><img src="/img/videos/rbvideo9.jpg" alt="RedBeanPHP video" style="width:200px;height:120px;"></a>
+	
+	
+</p>
+
+<p>
+	Have you created a RedBeanPHP video? Just notify me and I'll put it on this video page as well!
+</p>
+
+
+<category>Basics</category>
+
+
+
+<h1>CRUD</h1>
+<p>
+	CRUD stands for <b>C</b>reate, <b>U</b>pdate, <b>R</b>etrieve and <b>D</b>elete.
+	CRUD operations are the core of many web applications.
+</p>
+
+<h2>Working with beans</h2>
+<p>
+	RedBeanPHP works with beans. Most interactions with the <b>database</b> are
+	accomplished using beans. Beans are used to carry data from and to the database.
+	<br><br >
+	Every bean has a <b>type</b> and an <b>ID</b>.
+	The type of a bean tells you which <b>table</b> in the database is used to store the bean.
+	Every type maps to a corresponding table. The ID of a bean is the <b>primary key</b>
+	of the corresponding <b>record</b>.
+	<br>
+	You can create a new bean by dispensing one.
+</p>
+
+<h2 id="dispense">Create</h2>
+<p>
+	To create a new bean (of type 'book') use:
+</p>
+<?php code("
+	\$book = R::dispense( 'book' );
+"); ?>
+<p>
+	You can now add properties:
+</p>
+<?php code("
+	\$book->title = 'Learn to Program';
+	\$book->rating = 10;
+");?>
+<p>
+	You can also use <i>array notation</i> if you like:
+</p>
+<?php code("
+	\$book['price'] = 29.99; //you can use array notation as well
+"); ?>
+<p>
+	and store the bean in the database:
+</p>
+<?php code("
+	\$id = R::store( \$book );
+"); ?>
+<p>
+	At this point, the bean will be stored in the database and all
+	<b>tables</b> and <b>columns</b> have been created.
+	<br>
+	The bean will now have an ID, which is
+	also returned for your convenience.
+</p>
+<p class="note">
+	RedBeanPHP will build all the necessary structures to store your data.
+	However custom
+	indexes and constraints have to be added manually (after
+	<a href="/fluid_and_frozen" title="Learn about Frozen mode.">freezing</a>
+	your web application).
+</p>
+
+<h2 id="conventions">Conventions</h2>
+<p>
+	You can dispense any type of bean you like, as long
+	as the type name consists of <strong>lowercase alphabetical</strong>
+	characters:
+</p>
+<?php code("
+	\$page = R::dispense('page'); //valid
+	\$page = R::dispense( 'Page' ); //invalid: uppercase
+	\$page = R::dispense( 'cms_page' ); //invalid: _
+	\$page = R::dispense( '@#!' ); //invalid
+"); ?>
+<p>
+	However dispense also offers some shortcuts:
+</p>
+<?php code("
+	\$twoBooks = R::dispense( 'book', 2 );
+	
+	//Return an array with 2 beans
+	\$twoBooks = R::dispense( 'book', 2 );
+	
+	//Always returns an array with
+	//\$i beans even if \$i=1
+	\$moreBooks = R::dispense( 'book', \$i, TRUE ); 
+
+	list(\$book, \$page) = R::dispenseAll( 'book,page' );
+	list(\$book, \$pages) = R::dispenseAll( 'book,page*2' );
+"); ?>
+<p>
+	Properties of beans may contain alphanumeric characters and underscores.
+	<b>Camelcased</b> properties will automatically convert to <b>snake_case</b>:
+</p>
+<?php code("
+	\$book->isSoldOut = TRUE; //is_sold_out
+	\$book->hasISBNCode = TRUE; //has_isbn_code
+"); ?>
+
+<p>
+	Do not use field names ending with <b>_id</b>, these are reserved for
+	bean relations. <a href="https://www.redbeanphp.com/many_to_one">Learn more...</a>
+	Other restrictions:
+</p>
+<ul>
+	<li>primary key need to be &quot;id&quot;</li>
+	<li>do not name a field &quot;field&quot; if a field &quot;field_id&quot; exist (because of a bean relation)</li>
+	<li>do not name a field &quot;field_id&quot; if it's not a foreign key</li>
+</ul>
+
+<h2 id="load">Retrieve</h2>
+<p>
+	To load a bean, simply pass the <b>type</b>
+	and <b>ID</b> of the bean you're looking for:
+</p>
+<?php code("
+	\$book = R::load( 'book', \$id ); //reloads our book
+"); ?>
+<p>
+	If the bean does not exist an <b>empty</b> bean with ID <b>0</b>
+	will be returned.
+</p>
+
+
+<p class="note" id="lock">
+<b>Locking</b> (version 5+)<br>
+If you want to lock a bean while loading it, so nobody can change the record associated with your bean until your transaction completes use 
+<b>R::loadForUpdate()</b> (version 5+).
+<br><br>
+It's also possible to attach other kinds of <b>SQL snippets</b> along with the loading function, for instance to
+make use of the <i>lock-in-shared-mode</i> feature of a database, you can attach a snippet like this:
+<br><br>
+<b>R::load('bean', 1, 'LOCK IN SHARED MODE');</b>
+<br><br>
+	
+You can also use SQL snippets like <b>' for update '</b>
+with operations like R::find() and R::batch(). Before invoking these commands
+just set the SQL snippet you wish to use:<br>
+<br>
+<b>R::getWriter()-&gt;setSQLSelectSnippet( ... );</b>
+</p>
+
+<p class="note" id="loadexception">
+<b>Load Exceptions</b> (version 5+)
+<br>
+If a bean does not exist, <b>R::load()</b> and <b>R::loadForUpdate()</b> will return <b>an empty bean</b>.
+<br><br>
+If there is an error because of a missing table or column, both methods will return an empty bean in <b>fluid</b> mode
+and throw an exception in <b>frozen</b> mode.
+<br><br>
+If something else happens (lock timeout for instance) both methods will <i>always</i> throw an exception, even in fluid mode*.
+<br><br>
+*except for SQLite, because in fluid mode it's too difficult to separate error types.
+</p>
+
+
+<h2 id="store">Update</h2>
+<p>
+	To update a bean in the database, <b>add</b> or <b>change</b>
+	properties:
+</p>
+<?php code("
+	\$book->title = 'Learn to fly';
+	\$book->rating = 'good';
+	\$book->published = '2015-02-15';
+	R::store( \$book );
+"); ?>
+<p>
+	Note that we added a new property 'published', RedBeanPHP will add a new column
+	of type 'date' for this property. Also, it will widen the 'rating' from
+	<b>INTEGER</b> to <b>VARCHAR</b> to support text as well as numbers.
+</p>
+<?php code("
+	//Examples of other data types
+	\$meeting->when = '1995-12-05'; //Date
+	\$photo->created = '1995-12-05 19:00:00'; //Date time
+	\$meeting->place = '(1,2)'; //SPATIAL only works in postgreSQL
+	\$price->amount = '12.37'; //FIXED POINT NUMERIC - MySQL and Postgres
+	\$price->amount = '\$25.00'; //MONEY TYPE - Postgres only
+	\$price->json = array( 'message' => 'hello' ); //JSON TYPE 5+
+");?>
+<p>
+	If you want a suitable data type of <b>monetary</b> values, 
+	use the 'XX.XX'
+	format and you'll get a <b>fixed precision</b> number data field.
+	To make use of Postgres <i>special purpose</i>, 
+	<i>currency-aware</i> <b>money data type</b>,
+	prefix the value with a common currency symbol.
+</p>
+<p>
+	You can use R::isoDate() and R::isoDateTime()
+	to generate the current date(time) if you like.
+</p>
+
+<p class="note">
+	As of RedBeanPHP 4.1 you can also use spatial columns for
+	MySQL, <a href="/database#column_functions" title="Learn about RedBeanPHP SQL column functions">learn more</a>.
+</p>
+
+<p class="note" id="json">
+	As of RedBeanPHP 5 you can now use JSON columns. Arrays in bean properties will be automatically
+	converted to JSON strings and the database Query Writer will automatically adjust the column type to JSON
+	for you. To enable these features use: <b>R::useJSONFeatures(TRUE);</b> (by default these features are NOT active).
+	JSON support should be considered experimental at this stage. JSON support is still very new, check whether your
+	DB version supports this.
+</p>
+
+<p>
+	RedBeanPHP will dynamically add new columns to your database.
+	It determines the column type to use by looking at the value you are trying to store.
+	For instance, a short text might be stored as a <b>VARCHAR</b> 
+	while a large text might be stored as <b>TEXT</b>.
+	Similarly, a boolean value will probably get stored as 
+	<b>TINYINT</b> but when you put a float in that 
+	property the column will probably be changed to <b>FLOAT</b> or <b>DOUBLE</b>
+	(depending on your database).<br>
+	Some column types behave differently, for instance if you store a valid 
+	<i>ISO formatted date</i> (i.e. 2015-01-01) 
+	RedBeanPHP builds a <b>DATE</b> column, but this column will not change. In general, RedBeanPHP
+	tries to adapt the database to your application. If you're done developing, you can freeze the
+	database using the <b>freeze()</b> function. After that, the database schema will no longer change
+	(because it is very unlikely you want to store something other than a date in a column you filled with
+	perfectly formatted date in the first place).<br>
+	Note that RedBeanPHP will never throw away columns or 'shrink' columns (from <b>TEXT</b> to <b>VARCHAR</b>) 
+	to
+	avoid data loss. RedBeanPHP also only manipulates column types it recognizes, so if you change
+	a <b>VARCHAR(255)</b> to a <b>VARCHAR(254)</b> 
+	it will leave that column alone, since it no longer <i>recognizes</i> the type.
+	This means that if you customize columns, RedBeanPHP leaves them alone from that point on.<br>
+	If RedBeanPHP alters the database in a way you don't like, don't worry, you can always tune
+	the schema to your liking (just use your database management tool or <b>phpmyadmin</b>), 
+	you can even <b>freeze</b> certain tables only.
+</p>
+
+
+<h2 id="delete">Delete</h2>
+<p>
+	To delete a bean:
+</p>
+<?php code("
+	R::trash( \$book ); //for one bean
+	R::trashAll( \$books ); //for multiple beans
+"); ?>
+<p>
+	To delete all beans of a certain type:
+</p>
+<?php code("
+	R::wipe( 'book' ); //burns all the books!
+") ?>
+<p>
+	To destroy the entire database simply invoke the
+	nuclear method (be careful!):
+</p>
+<?php code("
+	R::nuke();
+");?>
+
+
+<h2 id="batch">Batch</h2>
+<p>
+	To load a series of beans use:
+</p>
+<?php code("
+	\$books = R::loadAll( 'book', \$ids );
+"); ?>
+<p>
+	This will load all beans of type 'book' that have their id listed in the
+	$ids list.
+</p>
+
+<h2 id="trashBatch">trashBatch (5.1+)</h2>
+<p>
+	Similarly, you can use trashBatch to delete an entire collection of beans in one go:
+</p>
+<?php code("
+	R::trashBatch( 'book', \$ids );
+"); ?>
+
+
+
+<h2 id="reload">Reload</h2>
+<p>
+	To quickly reload a bean:
+</p>
+<?php code("
+	\$bean = \$bean->fresh();
+"); ?>
+
+
+
+<h2>Finding Beans</h2>
+<p>
+	Instead of loading beans, you can also use the find()
+	method to search for beans using certain criteria.
+	Learn <a href="/finding" title="Learn more about find.">how to query beans</a>  in RedBeanPHP.
+</p>
+
+
+<h1>Finding</h1>
+<p>
+	If you do not know the
+	<b>ID</b> of a bean, you can search for beans using the
+	<strong>find</strong> method:
+</p>
+<?php code("
+	\$book  = R::find( 'book', ' rating > 4 ');
+"); ?>
+<p>
+	The find() method uses good old <abbr title="Structured Query Language">SQL</abbr>.
+	No fancy, custom query language &mdash; just plain old SQL.
+	<br><br>
+	The find operation in this example returns all beans of type <b>book</b>
+	having a rating of four stars or more.
+</p>
+
+<h2>Find and SQL</h2>
+<p>
+	The following example demonstrates how to use find() with
+	bindings.
+</p>
+<?php code("
+	\$books = R::find( 'book', ' title LIKE ? ', [ 'Learn to%' ] );
+"); ?>
+
+<p>
+	This find operation will return all beans of type 'book' having
+	a title that begins with the phrase: 'Learn to'.
+	<br><br>
+	If find() has no results it will return an <b>empty array</b>.
+</p>
+
+<p class="note">
+	There is no need to use mysql_real_escape.
+	Always use the bindings.
+	<br><br>
+	PDO bindings do not work for tables
+	(<a target="_blank" href="https://stackoverflow.com/questions/15182910/php-pdo-bind-table-name">see discussion here</a>), however
+	if you wish to escape a table name you can use: R::getWriter()->esc( $tableName ).
+	<br><br>
+	<b style="color:red">Never put user input directly in your query!</b>
+</p>
+
+<h2 id="hunt">Hunting Beans (5.1+)</h2>
+<p>
+	To find and delete beans in one go:
+</p>
+<?php code("
+	R::hunt( 'book',
+	' id IN ( '. R::genSlots( \$ids ) .' ) ',
+	\$ids );
+"); ?>
+
+<p id="hunt52">
+	As of RedBeanPHP 5.2:<br>
+	returns the number of beans deleted.<br>
+	the SQL parameter is optional.
+</p>
+
+
+<h2 id="in-queries">IN-queries</h2>
+<p>
+	To use a 'SELECT-IN' style query use the R::genSlots function
+	to generate the correct number of '?' slots:
+</p>
+<?php code("
+	\$promotions = R::find( 'person',
+	' contract_id IN ('.R::genSlots( \$contractIDs ).')',
+	\$contractIDs );
+"); ?>
+
+<h2>Find One</h2>
+<p>
+	If you want a single bean instead of an array, use:
+</p>
+
+<?php code("
+	\$book  = R::findOne( 'book', ' title = ? ', [ 'SQL Dreams' ] );
+"); ?>
+
+<p>
+	If no beans match the criteria, this function will return
+	<b>NULL</b>.
+</p>
+
+<p id="explicit_params">
+	As of 5.3 you can use explicit parameter binding if you like:
+</p>
+
+<?php code("
+	\$bean = R::findOne( 'bean', ' property = ? AND property2 = ? AND property3 = ? ', [
+    \$value,
+    [ \$value2, PDO::PARAM_INT ],
+    [ \$value3, PDO::PARAM_STR ]
+	]);
+");?>
+
+
+<h2>Find All</h2>
+<p>
+	Use <b>findAll</b> if you don't want to add any conditions (but you want to
+	order or limit... )
+</p>
+<?php code("
+	\$books = R::findAll( 'book' );
+	\$books = R::findAll( 'book' , ' ORDER BY title DESC LIMIT 10 ' );
+"); ?>
+<p>
+	If no beans match your criteria, this function returns an <b>empty array</b>.
+</p>
+
+<h2>Named slots</h2>
+<p>
+	All find methods: find, findOne and findAll also accept named slots:
+</p>
+<?php code("
+	\$books  = R::find( 'book', ' rating < :rating ', [ ':rating' => 2 ] );
+"); ?>
+
+<p class="note">
+	Besides querying beans, you can also use
+	<a href="/querying" title="Using regular SQL queries in RedBeanPHP">regular SQL queries</a>.
+</p>
+
+<h2 id="cursors">Cursors (4.2+)</h2>
+<p>
+	You can also use find with cursors:
+</p>
+<?php code("
+	\$collection = R::findCollection( 'page', ' ORDER BY content ASC LIMIT 5 ' );
+	while( \$item = \$collection->next() ) {
+		...
+	}
+"); ?>
+<p>
+	The advantage of using a cursor is that the entire collection will
+	not be loaded into memory all at once. This is handy for dealing with
+	large bean collections.
+</p>
+
+<h2 id="find_like">Find like (4.2+)</h2>
+<p>
+	To find a bean matching certain <b>criteria</b>, you can use R::findLike().
+	The following code returns all flowers that are either yellow OR blue:
+</p>
+<?php code("
+	R::findLike( 'flower', [
+		'color' => ['yellow', 'blue']
+	], ' ORDER BY color ASC ' );
+"); ?>
+<p>
+	Note that you can append some SQL here along with bindings.
+</p>
+<p id="beanconditions">As of RedBeanPHP 5.2 you can also use beans as conditions:</p>
+
+<?php code("
+	R::findLike( 'page', 
+	[ 'book' => [ \$book, \$book2 ] ]
+	);
+"); ?>
+
+<h2 id="find_create">Find or create (4.2+)</h2>
+<p>
+	This works like R::findLike() but <b>also creates</b> (and stores) 
+	the bean if it does not exist
+	yet...
+</p>
+<?php code("
+	\$book = R::findOrCreate( 'book', [
+		'title' => 'my book', 
+		'price' => 50] );
+"); ?>
+<h2 id="find_multi">Find Multiple (4.2+)</h2>
+<p>
+	findMulti() takes a query and turns the result into
+	<b>several</b> bean collections having <b>different types</b>:
+</p>
+<?php code("
+	\$beans = R::findMulti( 'book,page', '
+		SELECT book.*, page.* FROM book
+		INNER JOIN page.book_id = book.id
+		WHERE book.category = ?
+	', [ \$cat] );
+"); ?>
+<p>
+	The <b>first</b> parameter of this function lists the <b>types</b>
+	to load, the <b>second</b> parameter is the <b>query</b>, then
+	come the optional query parameter <b>bindings</b>. 
+	The result of this operation
+	will be something like:
+</p>
+<?php code("
+	array(
+		'book' => book beans...
+		'page' => page beans...
+	)
+"); ?>
+<p>
+	Besides loading various bean types at once from a query,
+	this method can also <b>restructure</b> them, for instance to
+	<i>'put the pages in the book'</i> use (example of 4th parameter):
+</p>
+<?php code("
+	array(array(
+		'a'       => 'book' 
+		'b'       => 'page'
+		'matcher' =>  function( \$a, \$b ) {
+		   return ( \$b->book_id == \$a->id );
+		}
+		'do'      => function( \$a, \$b ) {
+		   \$a->noLoad()->ownPageList[] = \$b;
+		}
+	));
+
+"); ?>
+<p>
+	The <b>fourth</b> parameter of findMulti takes an array containing arrays
+	like the one above. The array in the example tells findMulti how to <i>restructure</i>
+	the pages and the books. 
+	First it defines two <b>variables</b> 'a' and 'b'
+	it then defines a <b>matcher</b> function, telling RedBeanPHP to execute
+	the <b>'do'</b> clause if the book_id of a page matches the id of a page.
+	The 'do' clause then puts the page in the pageList of the selected book.
+	While you can specify mappings like this, a better idea might be to write
+	your own set of <i>mapping functions</i> returning structures like this.
+</p>
+
+<h2>Finder::map helper (5.3+)</h2>
+<p>
+	You can shorten the syntax above using the mapper helper:
+</p>
+<?php code("
+	\$collection = R::findMulti( 'shop,product,price',
+	'SELECT shop.*, product.*, price.* FROM shop
+	LEFT JOIN product ON product.shop_id = shop.id
+	LEFT JOIN price ON price.product_id = product.id', [], [
+		Finder::map( 'shop', 'product' ),
+		Finder::map( 'product', 'price' ),
+	]);
+"); ?>
+
+<h2 id="sqn">Short Query Notation (SQN)</h2>
+<p>
+	If you wish to use a shorter syntax than SQL you can try
+	my <a href="http://gabordemooij.com/sqn/" target="_blank">short query notation library</a>.
+	Example:
+</p>
+<?php code("
+	R::findMulti('book,book_tag,tag',
+	sqn('book<<tag'), [], [Finder::nmMap( 'book', 'tag' )]);
+"); ?>
+
+
+<p class="note" id="beantrimmulti">
+	As of RedBeanPHP 5.2 bean type names will be trimmed automatically.
+</p>
+
+<p class="note" id="multinull">
+	As of RedBeanPHP 5.2 the SQL parameter is optional.
+</p>
+
+
+
+<h1>Querying</h1>
+<p>
+	Querying the database <i>manually</i> is also possible with RedBeanPHP.
+	You can use the
+	<abbr title="Structured Query Language">SQL</abbr> query functions provided by
+	<strong>RedBeanPHP</strong>. To execute a query:
+</p>
+
+
+<?php code("
+	R::exec( 'UPDATE page SET title=\"test\" WHERE id = 1' );
+");?>
+<p>
+	To get a <b>multidimensional</b> array:
+</p>
+<?php code("
+	R::getAll( 'SELECT * FROM page' );
+");?>
+<p>
+	The result of such a query will be a <b>multidimensional</b> array:
+</p>
+<?php code("
+	Array
+	(
+	    [0] => Array
+	        (
+	            [id] => 1
+	            [title] => frontpage
+	            [text] => hello
+	        )
+	    ...
+	)
+");?>
+<p>
+	Note that you can use <b>parameter bindings</b> as well:
+</p>
+<?php code("
+	R::getAll( 'SELECT * FROM page WHERE title = :title',
+		[':title' => 'home']
+	);
+");?>
+<p>
+	To fetch a <b>single row</b>:
+</p>
+<?php code("
+	R::getRow( 'SELECT * FROM page WHERE title LIKE ? LIMIT 1',
+		[ '%Jazz%' ]
+	);
+");?>
+<p>
+	To fetch a <b>single column</b>:
+</p>
+<?php code("
+	R::getCol( 'SELECT title FROM page' );
+");?>
+<p>
+	And finally, a <b>single cell</b>...
+</p>
+<?php code("
+	R::getCell( 'SELECT title FROM page LIMIT 1' );
+");?>
+<p>
+	To get an associative array with a specified key and value column use:
+</p>
+<?php code("
+	R::getAssoc( 'SELECT id, title FROM page' );
+");?>
+<p>
+	In this case, the keys will be the IDs and the values will be the titles.
+	<b>getAssocRow</b> will return complete rows.
+</p>
+<p class="note">
+	In my examples, I like to use the short array notation.
+	<br>
+	In PHP &lt; 5.4 you'll have to use the classic array notation:
+	<br><br>
+	<i>array( 'key' =&gt; 'value' )</i>.
+</p>
+
+
+<h2 id="get_insert_id">Get the insert ID (4.2+)</h2>
+<p>
+	To get the ID after an insert in MySQL/MariaDB compatible databases use:
+</p>
+<?php code("
+	R::exec( 'INSERT INTO ... ' );
+	\$id = R::getInsertID();
+"); ?>
+<h2 id="convert">Converting records to beans</h2>
+<p>
+	You can convert rows to beans using the convertToBeans() function:
+</p>
+<?php code("
+	\$sql = 'SELECT author.* FROM author
+		JOIN club WHERE club.id = 7 ';
+	\$rows = R::getAll( \$sql );
+	\$authors = R::convertToBeans( 'author', \$rows );
+");?>
+
+<p class="note">
+	As of version 4.3.2 you can also use: <b>R::convertToBean</b>, 
+	without the <b>s</b>, for <b>single</b> rows.
+</p>
+
+<p class="note">
+	<b>Remember:</b>
+	<br>
+	There is no need to use <b>mysql_real_escape</b> as long as you use parameter binding.
+</p>
+
+<p class="note">
+	Besides querying you can also use other database functionality (like transactions) in RedBeanPHP.
+	Learn more about
+	<a href="/database" title="Database functions in RedBeanPHP">database functions</a>.
+</p>
+
+<h1>Data Tools</h1>
+<p>
+	In RedBeanPHP version 5, some additional functions have been added to increase your
+	productivity even more. These are convience functions building upon the solid
+	foundation of RedBeanPHP, allowing you to quickly perform a lot of work with just
+	a single command.
+</p>
+<h2 id="look">Look (5+)</h2>
+<p>
+	To quickly generate template snippets that rely on database data you can use Look:
+</p>
+<?php code("
+	 R::getLook()->look(
+		'SELECT * FROM color 
+		 WHERE value != ? 
+                 ORDER BY value ASC',
+		[ 'green' ],
+		[ 'value', 'name' ],
+		'<option value=\"%s\">%s</option>', 'strtoupper', \"\\n\"
+	);
+");?>
+<p>
+	Given the colors red, green and blue, this code will return an HTML snippet
+	for a select-list with the colors RED and BLUE in uppercase.
+</p>
+
+<h2 id="matchup">MatchUp (5+)</h2>
+<p>
+	MatchUp is a powerful productivity boosting method that can replace simple control
+	scripts with a single RedBeanPHP command. Typically, matchUp() is used to
+	replace login scripts, token generation scripts and password reset scripts.
+	The MatchUp method takes a bean type, an SQL query snippet (starting at the WHERE clause),
+	SQL bindings, a pair of task arrays and a bean reference.<br>
+	If the first 3 parameters match a bean, the first task list will be considered,
+	otherwise the second one will be considered. On consideration, each task list,
+	an array of keys and values will be executed. Every key in the task list should
+	correspond to a bean property while every value can either be an expression to
+	be evaluated or a closure (PHP 5.3+). After applying the task list to the bean
+	it will be stored. If no bean has been found, a new bean will be dispensed.
+	This method will return TRUE if the bean was found and FALSE if not AND
+	there was a NOT-FOUND task list. If no bean was found AND there was also
+	no second task list, NULL will be returned. Here is an example of how we could
+	use MatchUp for a typical password-reset script:
+</p>
+<?php code("
+	\$newpass = '1234';
+	\$didResetPass = R::matchUp(
+		'account',
+		' token = ? AND tokentime > ? ',
+		[ \$token, time()-100 ],
+		[
+			'pass' => \$newpass,
+			'token' => ''
+		],
+		NULL,
+		\$account );
+");?>
+
+<h2 id="csv">CSV Queries (5+)</h2>
+<p>
+	To quickly generate a CSV file with a single RedBeanPHP command use R::csv()
+	like this:
+</p>
+<?php code("
+	R::csv( '
+		SELECT city,popularity 
+		FROM scores 
+		WHERE score > ?
+	', [5], ['CITY','SCORE'] );
+
+"); ?>
+
+<h2 id="diff">Diff (5+)</h2>
+<p>
+	To quickly get the difference between two beans (or arrays of beans) and their relations use R::diff().
+	For instance, let's create a book with some pages:
+</p>
+<?php code("
+		list(\$book,\$pages) = R::dispenseAll('book,page*2');
+		\$book->title = 'Old Book';
+		\$book->price = 999;
+		\$book->ownPageList = \$pages;
+		\$pages[0]->text = 'abc';
+		\$pages[1]->text = 'def';
+		R::store(\$book);
+");?>
+<p>
+Now we change the book:
+</p>
+<?php code("
+		\$book->title = 'new Book';
+		\$page = end(\$book->ownPageList);
+		\$page->text = 'new';
+");?>
+<p>
+We can now compare both books using:
+</p>
+<?php code("
+		\$oldBook = \$book->fresh();
+		\$oldBook->ownPageList;
+		\$diff = R::diff(\$oldBook, \$book);
+"); ?>
+<p>
+If we print_r() that variable we'll see:
+</p>
+<kbd>
+Array
+(
+    [book.1.title] => Array
+        (
+            [0] => Old Book
+            [1] => new Book
+        )
+
+    [book.1.ownPage.2.text] => Array
+        (
+            [0] => def
+            [1] => new
+        )
+
+)
+</kbd>
+<p>
+	The 3rd parameter can be used to set a filter, all bean types in the filter will
+	be omitted. To format the keys set a format in the 4th parameter, the default value
+	(giving us this result) is: '%s.%s.%s'. This is printf-like format.
+</p>
+
+
+<h2>How to use queries</h2>
+<p>
+	Sometimes using a plain query is more efficient than using beans.
+	For instance, consider the following example:
+</p>
+<?php code("
+	\$books = R::findAll( 'book' );
+	foreach( \$books as \$book ) {
+		echo \$book->title;
+		echo \$book->author->name;
+		foreach( \$book->sharedCategoryList as \$cat ) {
+			echo \$cat->name;
+		}
+	}
+"); ?>
+<p>
+	Using a plain query this task could be accomplished far more
+	efficiently:
+</p>
+<?php code("
+	\$books = R::getAll( 'SELECT 
+	book.title AS title, 
+	author.name AS author, 
+	GROUP_CONCAT(category.name) AS categories FROM book
+	JOIN author ON author.id = book.author_id
+	LEFT JOIN book_category ON book_category.book_id = book.id
+	LEFT JOIN category ON book_category.category_id = category.id 
+	GROUP BY book.id
+	' );
+	foreach( \$books as \$book ) {
+		echo \$book['title'];
+		echo \$book['author'];
+		echo \$book['categories'];
+	}
+"); ?>
+<p>
+	One of the biggest mistakes people make with <b>ORM</b> tools is to
+	try to accomplish <i>everything</i> with objects (or beans). They forget
+	SQL is a very powerful tool as well. Use <b>SQL</b> if you are merely
+	interested in generating reports or lists.
+</p>
+
+<h1>Database</h1>
+<p>
+	This chapter discusses general database functionality of RedBeanPHP.
+</p>
+
+<h2>Reflection</h2>
+<p>
+	To get all the columns of table '<b>book</b>':
+</p>
+<?php code("
+	\$fields = R::inspect( 'book' );
+"); ?>
+<p>
+	To get all tables:
+</p>
+<?php
+code("
+	\$listOfTables = R::inspect();
+");
+?>
+
+
+<h2>Multiple databases</h2>
+<p>
+	There are two important methods to keep in mind when working with multiple <b>databases</b>:
+	<b>addDatabase()</b> and <b>selectDatabase()</b>.
+	<br>
+	To add a new database connection use R::addDatabase() like this:
+</p>
+<?php
+code("
+	R::addDatabase( 'DB1', 'sqlite:/tmp/d1.db', 'usr', 'pss', \$frozen );
+");
+?>
+<p>
+	To select a database, use the key you have previously specified:
+</p>
+<?php
+code("
+	R::selectDatabase( 'DB1' );
+");
+?>
+<p>
+	If you used <b>R::setup()</b> to connect to your database you can switch back to this database
+	using:
+</p>
+<?php
+code("
+	R::selectDatabase( 'default' );
+");
+?>
+
+
+<h2>Transactions</h2>
+<p>
+	RedBeanPHP offers three simple methods to use database <b>transactions</b>: begin(), commit() and rollback().
+	Usage:
+</p>
+<?php
+
+echo code("
+	R::begin();
+	try{
+		R::store( \$page );
+		R::commit();
+	}
+	catch( Exception \$e ) {
+		R::rollback();
+	}
+");
+?>
+<p>
+	Because RedBeanPHP throws <b>exceptions</b>, you can catch
+	the exceptions thrown by methods like R::store(), R::trash(), or one of your 'fuse' methods,
+	and perform a rollback(). The rollback() will completely undo
+	all the pending database changes.
+</p>
+
+<h2>Transaction closure</h2>
+<p>
+	You can also use this variation:
+</p>
+<?php code("
+	R::transaction( function() {
+		..store some beans..
+	} );
+");?>
+<p>
+	The transaction() method supports nested transactions.
+</p>
+<p class="note">
+	Note about auto-commits:
+	<br>Many databases automatically commit after changing schemas,
+	so make sure you test your transactions after <b>R::freeze(true);</b> !
+</p>
+
+<h2 id="column_functions">Column Functions (version 4.1+)</h2>
+<p>
+	As of RedBeanPHP 4.1 you can <i>bind</i> an <b>SQL function</b> to a column.
+	This is useful for wrapping values when reading from / writing to
+	the database. <br>
+	For instance, to use <i>MySQL spatial
+	data types</i> you need to prepare the columns like this:
+</p>
+<?php code("
+	R::bindFunc( 'read', 'location.point', 'asText' );
+	R::bindFunc( 'write', 'location.point', 'GeomFromText' );
+
+	\$location = R::dispense( 'location' );
+	\$location->point = 'POINT(14 6)';
+
+	//inserts using GeomFromText() function
+	R::store( \$location );
+
+	//to unbind a function, pass NULL:
+	R::bindFunc( 'read', 'location.point', NULL );
+"); ?>
+<p>
+	While this method has been implemented to support MySQL spatial
+	data types, you can use it for other purposes as well.<br>
+	For instance, you can <i>encode</i> your own data types,
+	create an <b>encryption</b> function or a <b>UUID</b> function.
+</p>
+
+
+<p class="note">
+	As you have seen in the previous chapters RedBeanPHP will keep changing the schema to fit your needs,
+	this is called '<b>fluid mode</b>'.
+	While this is great for development, you don't want this to happen on your
+	production server. Learn how to
+	<a href="/fluid_and_frozen" title="Freeze the database.">freeze</a> your database for deployment.
+</p>
+
+<h2 id="query_counter">Query counter (4.2+)</h2>
+<p>
+	To count get number of queries processed use:
+</p>
+<?php code("
+	R::resetQueryCount(); //reset counter
+	R::getQueryCount(); //get number of queries processed by adapter
+");?>
+
+<h2 id="logging">Logging (4.2+)</h2>
+<p>
+	Logging has always been possible with RedBeanPHP, however from 4.2 on there
+	is an easier way to setup logging:
+</p>
+<?php code("
+	R::startLogging(); //start logging
+	\$logs = R::getLogs(); //obtain logs
+");?>
+
+<h2 id="partialBeans">Partial Beans (5+)</h2>
+<?php code("
+	R::usePartialBeans( TRUE );
+");?>
+
+
+<p>
+Toggles 'partial bean mode'. If this mode has been
+selected the repository will only update the fields of a bean that
+have been changed rather than the entire bean.
+This method will return the previous mode (TRUE/FALSE).
+</p>
+
+<p class="note" id="partialbeansetup">
+In RedBeanPHP 5.2+ you can also set the 4th parameter of setup() to TRUE
+to enable partial beans.
+</p>
+
+<h1>Fluid and Frozen</h1>
+
+
+<p>
+	RedBeanPHP has two modes, <b>fluid</b> and <b>frozen</b>.
+	<br>
+	As you have seen in the previous chapters,
+	RedBeanPHP will keep changing the schema to fit your needs,
+	this is what we call '<b>fluid mode</b>'.
+	<br>
+	While this is great for development you don't want this to happen on your
+	production server. That's why you need to <b>freeze</b> the schema before
+	you deploy your application. To freeze your app, put <b>R::freeze( TRUE )</b>
+	at the beginning of your script, like this:
+</p>
+<?php code("
+	require 'rb.php';
+	R::setup();
+	R::freeze( TRUE );
+	...your code...
+"); ?>
+<p>
+	After freezing the schema, open your database client and inspect the schema
+	RedBeanPHP has created for you. You can now refine it where necessary, i.e.
+	add some indexes, change some columns, add or change constraints and more.
+</p>
+<p class="note">
+	Always review the schema generated by RedBeanPHP and allow yourself some
+	time to refine it.
+	<br>
+	Do not change the table or column names though, these are part of the
+	RedBeanPHP conventions. Instead I recommend to inspect and refine
+	column types ( maybe a bit too wide ? ), indexes and foreign key constraint settings.
+</p>
+
+
+
+<h2>Partial freezing (Chill mode)</h2>
+<p>
+	It's also possible to only lock the schemas of several types of beans, for instance
+	to lock the schemas of bean types 'book', 'page' and 'book_page' use:
+</p>
+<?php code("
+	R::freeze( ['book','page','book_page'] );
+"); ?>
+<p>
+	This makes RedBeanPHP operate in fluid mode, but those tables will not get
+	modified. To reset, pass an empty array.
+</p>
+
+<p class="note">
+	Learn how to use the
+	<a href="/debugging" title="Learn how to use the debugging tools of RedBeanPHP">debugging tools</a>.
+</p>
+
+<h2 id="deepfreeze">DeepFreeze (4.2+)</h2>
+<p>
+	The <a href="https://github.com/gabordemooij/redbean" target="_blank" title="DeepFreeze">Deepfreeze</a> script
+	is a PHP script available from the Github repository. This script will remove all fluid parts of RedBeanPHP, i.e.
+	all the schema modifying code. This will essentially disable fluid mode permanently and make the rb.php file more
+	compact. This script is experimental though because it's quite hard to test. To run the DeepFreeze script:
+</p>
+<kbd>
+	php deepfreeze.php
+</kbd>
+<p>
+	The DeepFreeze script will search for an rb.php file in the current folder and generate
+	a rbf.php file in the same folder.
+</p>
+
+
+<h1>Debugging</h1>
+<p>
+	The debug() method will reveal all queries being executed by RedBeanPHP:
+</p>
+<?php code("
+	//turns debugging ON (recommended way)
+	R::fancyDebug( TRUE );
+
+	//turns debugging ON (classic)
+	R::debug( TRUE );
+
+	//turns debugging OFF
+	R::debug( FALSE );
+"); ?>
+<p>
+	The queries will be printed on the screen.
+	The output of the debugging function looks like this:
+</p>
+<kbd>
+
+INSERT INTO &quot;event&quot; ( id, &quot;name&quot; ) VALUES<br>
+			( NULL,  ?  )<br>
+Array<br><br>
+(<br>
+    [0] =&gt; party<br>
+)<br>
+<br>
+</kbd>
+
+
+<p>
+	You can also log the queries:
+</p>
+<?php code("
+	R::debug( TRUE, 1 ); //select mode 1 to suppress screen output
+"); ?>
+<p>
+	To access the logs:
+</p>
+<?php code("
+	\$logs = R::getDatabaseAdapter()
+			->getDatabase()
+			->getLogger();
+
+	print_r( \$logs->grep( 'SELECT' ) );
+"); ?>
+<p>
+	Use the grep() method to search the logs.
+</p>
+
+<h2 id="debugger2">Query parameters</h2>
+<p>
+	By default, the debugger prints the queries
+	and parameters in separate sections. Sometimes you might
+	prefer to see what the actual query would look like if the
+	parameters had been filled in.
+	RedBeanPHP 4.1+ offers two new debugger modes to facilitate
+	this:
+</p>
+<?php code("
+	R::debug( TRUE, 2 ); //select MODE 2 to see parameters filled in
+	R::fancyDebug();   //since 4.2
+");?>
+<p>Outputs the query above like this:</p>
+<kbd>
+
+INSERT INTO &quot;event&quot; ( id, &quot;name&quot; ) VALUES<br>
+			( NULL,  &quot;party&quot;  )<br>
+</kbd>
+<p>
+	Mode 2 also writes to the logs, if you want to suppress
+	screen output, select mode 3.
+</p>
+
+<p>
+	In 'fancy' mode schema altering queries are highlighted as well as bound
+        parameters. Parameter bindings are also included in the SQL instead of in a separate
+        list. If a parameter value is too long, fancy debug will only show the first part so
+        your query remains readable. Also, fancy debug works with HTML colors as well, in case
+        you like to debug with a browser instead of a command line.
+</p>
+
+<h2>Under the hood</h2>
+<p>
+	Under the hood, all debugging functionality makes use of the logger
+	classes. There are two logger classes available in RedBeanPHP:
+	the Default Logger and the Debugger Logger (4.1+). Besides using the
+	convenience methods listed here you can create your own logger
+	instance and attach it to some object:
+</p>
+<?php
+code("
+	\$myLogger = new \RedBeanPHP\Logger\RDefault;
+	\$database->setLogger(\$myLogger);
+");
+?>
+
+<p class="note">
+	As of version <b>4.3.2</b> R::fancyDebug( TRUE ); is the recommended
+	way to debug.
+</p>
+
+<h2 id="dump">Inspecting Beans</h2>
+<p>
+	The easiest way to inspect a bean is to just echo it.
+</p>
+<?php
+code("
+	echo \$bean;
+");
+?>
+<p>
+	If you have a list of beans, an array, you can use good old
+	print_r of course, but print_r will also print useless details.
+	To get a shorter and more descriptive summary of a bean or an
+	array of beans you can use the dump() function:
+</p>
+<?php code("
+	print_r( R::dump( \$myBeans ) );
+	print_r( R::dump( \$singleBean ) );
+"); ?>
+<p>
+	The output looks like this:
+</p>
+<kbd>
+[1] =&gt; {&quot;id&quot;:&quot;1&quot;,&quot;name&quot;:&quot;party&quot;}
+</kbd>
+<p>
+	An even shorter syntax:
+</p>
+<?php code("
+	dmp( \$myBean );
+");?>
+<p>
+	The dmp() function is a global function for your convenience.
+</p>
+
+
+
+<h2 id="error_handling">Error handling</h2>
+<p>
+	Error handling is different in fluid and frozen mode. In fluid mode
+	SQL errors caused by missing columns or tables will be suppressed but
+	other errors (syntax) will throw <b>RedException\SQL</b> exceptions.
+</p>
+<p class="note">
+	SQLite and some plugin drivers do not provide meaningful <b>SQLSTATE</b> codes, therefore
+	under these drivers fluid mode will suppress all errors.
+</p>
+
+<h2 id="test_connection">Testing the connection</h2>
+<p>
+	In RedBeanPHP 4.1+ you can test the connection using a special test
+	function. This function will refrain from throwing exceptions and
+	simply return TRUE if the connection has been established and
+	FALSE otherwise:
+</p>
+<?php code("
+	\$isConnected = R::testConnection();
+") ?>
+<p>
+	Besides debugging, this function is handy for installers and setup scripts
+	of web applications to determine whether database credentials have been
+	entered correctly.
+</p>
+
+<p class="note">
+	Learn about
+	<a href="/one_to_many" title="Learn about relations in RedBeanPHP.">relations</a> in RedBeanPHP.
+</p>
+
+
+
+
+<category>Relations</category>
+
+<h1>One-to-many</h1>
+<p>
+	In a <b>one-to-many</b> relation,
+	one bean has a list of other beans but all those beans
+	cannot belong to another bean at the same time.
+	For instance, let's create a shop:
+</p>
+<?php code("
+	\$shop = R::dispense( 'shop' );
+	\$shop->name = 'Antiques';
+"); ?>
+<p>
+	To add products to the shop, add
+	beans to the <b>ownProductList</b> property, like this:
+</p>
+<?php code("
+	\$vase = R::dispense( 'product' );
+	\$vase->price = 25;
+	\$shop->ownProductList[] = \$vase
+	R::store( \$shop );
+"); ?>
+<p>
+	Each product in the <b>ownProductList</b>
+	belongs to shop and <i>cannot</i> belong to another shop.
+	<br><br>
+	Note that the name of the list <b>has to match the type of beans it contains</b>.
+	So, the 'ownProductList' contains beans of type 'product', a pageList contains pages,
+	an 'ownCarList' contains 'cars' and so on. This convention is used to create the database mapping, in case of the
+	shop, every product record will get a <b>'shop_id'</b> field.
+	<br><br>
+	When you access an own-list, RedBeanPHP will query the related beans
+	and populate the array, this is called <i>lazy loading</i>. So, to load the list:
+</p>
+<?php code("
+	\$shop = R::load( 'shop', \$id );
+	\$first = reset( \$shop->ownProductList ); //gets first product
+	\$last = end( \$shop->ownProductList ); //gets last product
+	foreach( \$shop->ownProductList as \$product ) {...} //iterate
+"); ?>
+<p>
+	To remove the products from the shop:
+</p>
+<?php code("
+	//remove one product by its ID
+	unset( \$store->ownProductList[\$id] );
+
+	//remove all
+	\$store->ownProductList = array();
+	R::store( \$shop );
+"); ?>
+
+<p>
+	To replace the current list of products:
+</p>
+<?php code("
+	\$store->ownProductList = [ \$vase, \$lamp ];
+"); ?>
+
+
+
+<h2 id="exclusive-one-to-many">Exclusive mode</h2>
+<p>
+	Note that those products continue to <i>exist</i> in the database, they are just <b>unrelated</b>, don't want that ?
+	Then open the <b>own-list</b> in <b>exclusive mode</b>, using
+	the <b>x-own-list</b> like this:
+</p>
+<?php code("
+	\$shop->xownProductList = array();
+	R::store( \$shop );
+");?>
+<p>
+	Emptying the list now will cause the vases to be gone too.
+	In <i>exclusive mode</i> the beans in the list are considered to be dependent on their owner. If they
+	are removed from the list, they are deleted as well (i.e. they <b>depend</b> exclusively on their owner).
+	<br><br>
+	When using the <b>x-own-list</b> from the <b>start</b>, if you <b>delete</b> the shop,
+	its products will be <b>deleted</b> as well.
+</p>
+<p class="note">
+	This happens because the first time
+	you access an own-list, a foreign key will be created for the owned bean, one that will
+	<b>CASCADE ON DELETE</b> for an x-own-list and one that will <b>SET-TO-NULL</b> otherwise.
+	Once the foreign key is in place, it will not be modified by RedBeanPHP anymore.
+
+	However you can
+	always change the constraint manually using your database client.
+</p>
+
+<h2>Other end of the one-to-many</h2>
+<p>
+	The other end of the one-to-many relation is
+	the many-to-one relation.
+	Learn more about the
+	<a href="/many_to_one" title="Many-to-one.">many-to-one relation</a>.
+</p>
+
+
+
+<h1>Many-to-one</h1>
+<p>
+	Now let's look at this relation from the perspective of a product.
+	A product belongs to a shop, so you can access the shop like this:
+</p>
+<?php code("
+	\$shop = \$product->shop;
+"); ?>
+<p>
+	This is called the <b>'parent bean'</b>.
+	<br>
+	The shop is considered the parent of
+	the product. It <b>owns</b> the product.
+</p>
+<h2 id="exists">Exists (5+)</h2>
+<p>
+	To check if a related bean exists:
+</p>
+<?php code("
+	\$product->exists('shop');
+"); ?>
+<p>
+	This function will return TRUE if a shop has been
+	associated with the product and FALSE otherwise.
+</p>
+<h2>Setting a parent bean</h2>
+<p>
+	To set a parent bean:
+</p>
+<?php code("
+	\$product->shop = \$someShop;
+	R::store( \$product );
+");?>
+<p>
+	Note that, when you <b>set</b> a new shop the property
+	shop_id <b>still</b> points to the old shop (or is still NULL if there
+	was no previous shop). This field gets updated <b>after</b> the bean
+	has been saved. So, the shop_id and shop fields are not always in sync.
+</p>
+<?php code("
+	\$product->shop = \$newShop;
+	echo \$product->shop_id; //still old value
+	R::store( \$product );
+	echo \$product->shop_id; //has been updated!
+");?>
+<p>
+	Another way to update the shop is to simply set the new id,
+	once again, shop_id and shop will be out-of-sync until
+	the next R::store().
+</p>
+<?php code("
+	\$oldShop = \$product->shop;
+	\$product->shop_id = \$newID;
+	echo \$product->shop->id; //old id
+	R::store( \$product );
+	echo \$product->shop->id; //new id
+");?>
+<p>
+	However if we change the id <b>before</b>
+	we load the shop, the new shop <b>will be loaded</b>:
+</p>
+<?php code("
+	\$product->shop_id = \$newID;
+	echo \$product->shop->id; //old id
+	R::store( \$product );
+	echo \$product->shop->id; //new id
+");?>
+<p>
+	This may seem a bit weird but it's actually quite logical.
+	When <b>accessing</b> the <b>parent bean</b>, RedBeanPHP
+	simply looks at the value of shop_id and loads the shop
+	identified by <b>that</b> id.
+</p>
+<p class="note">
+	As of RedBeanPHP 4.3.4 the latter behavior has been resolved.
+	Changing the _id property after loading will also sync the
+	loaded bean.
+</p>
+
+
+
+<h2>Removing the parent</h2>
+<p>
+	To remove the shop from our product in the example above, simply
+	assign the value <b>NULL</b> to the property 'shop':
+</p>
+<?php code("
+	\$product->shop = NULL; //removes product from shop
+"); ?>
+
+<p>
+	Besides one-to-many, RedBeanPHP has a special version of this
+	relation: the one-to-X also known as the one-to-fixed relation.
+	Read more about the
+	<a href="/one_to_fixed" title="One-to-fixed">One-to-fixed relation</a>.
+</p>
+
+
+
+
+<h1>Aliases</h1>
+<p>
+	Sometimes you want to refer to a bean using a different name.
+	For instance,
+	when you have a course referring to a teacher and a student, both of which are people.
+	In this case you can use <b>fetchAs</b>:
+</p>
+<?php code("
+	\$c = R::dispense( 'course' );
+
+	//At assignment time, no difference...
+	\$c->teacher = R::dispense( 'person' );
+	\$c->student = R::dispense( 'person' );
+
+	\$id = R::store( \$c );
+	\$c = R::load( 'course', \$id );
+
+	//when accessing the aliased properties,
+	//tell RedBeanPHP how to find the bean:
+	\$teacher = \$c->fetchAs( 'person' )->teacher;
+"); ?>
+
+
+<p>
+	fetchAs tells RedBeanPHP the <b>ID</b> has to be associated with a
+	different <i>type</i> (in this case 'person' instead of 'teacher' or 'student').
+	This also works the other way:
+</p>
+<?php code("
+	//returns all courses for this person
+	//where he/she is the teacher.
+	\$person->alias( 'teacher' )->ownCourseList;
+"); ?>
+
+<p>
+	From a relational point of view, we have <b>exactly</b> two people
+	for every row (although one or both can be NULL of course). This is why
+	we call these 'aliases' <b>one-to-X</b> relations
+	(or <b>one-to-fixed</b> relations), where <i>X</i> is a fixed number.
+	<br>
+	You can use as many of these 'aliases' as you like.
+</p>
+
+<p class="note" id="autoresolve">
+	As of 4.2 RedBeanPHP supports automatic resolve, this means you can use
+	$course-&gt;teacher <b>without</b> fetchAs. Autoresolve also works with
+	R::dup() and R::export(). To use automatic resolvement of aliased parent beans,
+	use R::setAutoResolve( TRUE ).
+</p>
+
+<p class="note" id="global_aliases">
+	As of 4.2 you can use global aliases. Instead of specifying the alias
+	with fetchAs each time you can specify the alias using R::aliases( ...aliases... );
+</p>
+
+
+<p>
+	Also learn about
+	<a href="/many_to_many" title="Many-to-many relations">Many-to-many relations</a>.
+</p>
+
+
+
+<h1>Many-to-many</h1>
+<p>
+	A <b>shared list</b> contains beans that may be associated with more than just one
+	other bean (<b>many-to-many relation</b>). Tags are a common example:
+</p>
+<?php code("
+	list(\$vase, \$lamp) = R::dispense('product', 2);
+
+	\$tag = R::dispense( 'tag' );
+	\$tag->name = 'Art Deco';
+
+	//creates product_tag table!
+	\$vase->sharedTagList[] = \$tag;
+	\$lamp->sharedTagList[] = \$tag;
+	R::storeAll( [\$vase, \$lamp] );
+"); ?>
+<p>
+	In this example, a product can have multiple tags
+	and every tag in the list can be associated with other products as well.
+	The latter was <i>not</i> possible in the one-to-many relation.
+	<br><br>
+	Like the <b>own-list</b> the name of the <b>shared-list</b> has to
+	<b>match the type</b> of beans it contains.
+	In the database, these assocations will be stored using
+	a link table called 'product_tag'.
+</p>
+<p class="note">
+	This link table is cleaned up automatically, if you break the association
+	between two beans in a shared list the link record is removed as well.
+	Also note that a shared list cannot have <b>aliases</b> and always applies
+	a UNIQUE constraint (you cannot have duplicate links). In some situations
+	this means you have to use a slighly different approach; the <a href="/other_relations#aggr" title="Aggregations">N11N relation</a>.
+</p>
+
+
+<h2>Via relations</h2>
+<p>
+	Using the <b>via()</b> method,
+	you can treat normal beans as if they were
+	<b>N-M</b> relations:
+</p>
+<?php code("
+	\$participant->project = \$project;
+	\$participant->employee = \$lisa;
+	\$participant->role = 'developer';
+	R::store( \$participant );
+
+	//get all associated employees via the participants
+	//(includes \$lisa!)
+	\$employees = \$project
+		->via( 'participant' )
+		->sharedEmployeeList;
+"); ?>
+<p>
+	Remember that, since unrelated link beans are removed automatically,
+	emptying a shared list (even using via) causes the link beans to be removed!
+	However, you can always <i>nullify</i> the relations manually of course.
+</p>
+
+<p class="note">
+	Via is <b>sticky</b>, once you tell RedBeanPHP to fetch a type of bean via another
+	bean it will remember this for the rest of the program. So, once you told RedBeanPHP:
+	$project-&gt;via('participant')-&gt;sharedEmployee it will always load employees using
+	the participant table as a link table, even if you later say: $project-&gt;sharedEmployee.
+	Also note that via() reloads the list.
+</p>
+
+
+
+<h2 id="self_referential_many_to_many">Self referential N-M</h2>
+<p>
+	You can have a shared list containing beans of the same type
+	as the owner of the list:
+</p>
+<?php
+code("
+	\$friends = \$friend->sharedFriend;
+");
+?><p>
+	In this case RedBeanPHP will operate in a special self-referential many-to-many relationship mode.
+	It will not only retrieve all friends of $friend, but also all other friends that are associated with
+	$friend.
+</p>
+
+<p class="note">
+	You can use two complimentary one-to-many relations as one many-to-many relation.
+	This is called <a href="/other_relations#aggr" title="Learn more about aggregation">an aggregation or N11N-relation</a>.
+</p>
+
+
+
+<h1>Using SQL Snippets</h1>
+<p>
+	You can modify the contents of an own-list and a shared-list using additional
+	<b>SQL snippets</b>. Use <b>with()</b> to order or limit the list and
+	<b>withCondition</b> to add additional filtering.
+</p>
+<?php code("
+	\$pages = \$book
+		->with( ' ORDER BY pagenum ASC ' )
+		->ownPageList;
+
+	\$vases = \$shop
+		->withCondition(' category = ? ', ['vase'] )
+		->ownProductList;
+
+	//combine condition and order
+	\$vases = \$shop
+		->withCondition(' category = ? ORDER BY price ASC ', ['vase'] )
+		->ownProductList;
+
+	\$employees = \$project
+		->withCondition(' priority > 40 ')
+		->sharedEmployeeList;
+
+	//Special case, filter on linking records...
+	\$employees = \$project
+		->withCondition(' employee_project.assigned < ? ', [ \$date ])
+		->sharedEmployeeList;
+
+"); ?>
+<p>
+	Note the last case in this example. Here we use a column from the link table
+	to filter the rows. This technique allows you to filter on relational qualifications like
+	the duration of the assignment to the project.
+</p>
+<p class="note">
+	You cannot combine <b>with()</b> and <b>withCondition()</b>. Instead, you
+	can append additional clauses like in the third example.
+</p>
+
+<p class="note">
+	<b>Important note about AND/OR statements in snippets</b>. If you plan to use AND/OR
+	statements in your conditions, please remember your snippet is <i>integrated</i>
+	into a larger query. For the best results, it is recommended that you put your
+	AND/OR snippets between parenthesis like this:
+	<br>
+	<br>
+	...-&gt;withCondition(' <b>(</b> deleted IS NULL OR deleted = 0 <b>)</b> ')...
+</p>
+
+
+<h2 id="via-and-sql">Via and SQL</h2>
+<p>
+	Via can be used with SQL snippets as well:
+</p>
+<?php code("
+	\$designers = \$project
+		->withCondition( ' participant.role = ? ', ['designer'] )
+		->via( 'participant' )
+		->sharedEmployeeList;
+"); ?>
+
+
+
+
+<p class="note">
+	Both with() and
+	withCondition() cause the list to reload, however if the SQL snippet hasn't changed
+	and the writer cache is active (default) then no query will be send
+	to the database.
+</p>
+
+<h2>Reloading a list</h2>
+<p>
+	To reload a list without an SQL snippet use the <b>all()</b> method or unset it:
+</p>
+
+<?php code("
+	\$shop->all()->xownProductList;
+	unset( \$shop->xownProductList ); //will be reloaded next time.
+"); ?>
+
+
+
+<h2 id="joins">Joins (version 4.1+)</h2>
+<p>
+	Sometimes you want to sort or filter an own-list based on some
+	other property in <b>another bean</b>. You can use the <b>@joined</b>
+	keyword to select such a property and RedBeanPHP will automatically
+	join-in this field:
+</p>
+<?php code("
+	\$books = \$author
+		->withCondition(' 
+			@joined.info.title LIKE ? 
+			AND @joined.category.title = ? 
+			ORDER BY @joined.info.title ASC ', 
+		[ '%ing%', 'computers' ] )->xownBookList;
+	
+"); ?>
+<p>
+	In the example above, each book has an information bean
+	called 'info' that contains the title of the book
+	and a category bean called 'category'.
+	We like to filter on category and book title - so we use the 
+	<b>@joined.info.title</b> and <b>@joined.category.title</b> for the filtering.
+	We also like to order the resulting records, so we add an <b>ORDER BY</b>
+	clause with <b>@joined.info.title</b> (orders on the book title).
+</p>
+
+
+<h2>The noLoad modifier</h2>
+<p>
+	Sometimes, when you only want to add something to a list, there is no need to
+	load the entire list. To keep RedBeanPHP from loading a list use the noLoad
+	modifier as depicted in the following example:
+</p>
+<?php code("
+	\$book->noLoad()->xownPageList[] = \$newPage;
+"); ?>
+<p>
+	This will add a new page to the list, but the initial loading
+	of the list will not take place.
+</p>
+
+<h1>Counting</h1>
+<p>
+	Counting records is very easy with RedBeanPHP.
+	For instance, to count all beans of type <i>book</i> use:
+</p>
+<?php code("
+	\$numOfBooks = R::count( 'book' );
+"); ?>
+<p>
+	You can use additional SQL here as well:
+</p>
+<?php code("
+	\$numOfBooks = R::count( 'book', ' pages > ? ', [ 250 ] );
+"); ?>
+
+
+
+<h2>Count related beans</h2>
+<p>
+	Counting related beans is just as simple.
+	To count all the pages of a 'book' bean:
+</p>
+<?php code("
+    \$numPages = \$book->countOwn( 'page' );
+");?>
+<p>
+	You can use the same technique for shared lists:
+</p>
+<?php code("
+    \$numProjects = \$member->countShared( 'project' );
+");?>
+<p>
+	You can also use withCondition() and alias():
+</p>
+<?php code("
+    \$numProj = \$member
+            ->withCondition(' member_project.role ', ['lead'] ) )
+            ->countShared( 'project' );
+
+    \$numPages = \$book
+            ->withCondition( ' book_page.number > ? ', [100] )
+            ->countOwn( 'page' );
+
+    \$andy->alias( 'coAuthor' )->countOwn( 'book' );
+
+    \$shop->via( 'relation' )->countShared( 'customer' );
+
+"); ?>
+<p>
+	The first example counts all projects associated with the member
+	in which the member has the 'lead' role. The second example counts
+	all the pages of a book having a page number &gt; 100.
+	Finally the last example demonstrates the use of an aliased list.
+	Here we count the number of books written by Andy where he
+	has been the co-author. All count operations return a number.
+</p>
+
+<p class="note">
+	Counting something (R::count) that does not exist will not trigger an
+	error but just return the number 0.
+</p>
+
+<h1>Labels, Enums, Tags</h1>
+
+<p>
+	Labels, Enums and Tags are all based on very simple beans.
+	These beans only have an <b>id</b>, a <b>type</b> and a <b>name</b>.
+	While they might look simple, these beans can offer various
+	powerful services in your applications.
+	<a href="#labels" title="labels">Labels</a> form the basis for enums and tags.
+	<a href="#enums" title="enums">Enums</a> are in fact labels in a one-to-many relation while
+	<a href="#tags" title="tags">Tags</a> are labels in a many-to-many relation.
+</p>
+
+<h2 id="labels">Labels</h2>
+<p>
+	A Label is a bean with just a name property. You can generate a batch of labels of a certain type
+	using:
+
+</p>
+<?php code("
+	\$labels = R::dispenseLabels( 'meals', ['pizza', 'pasta'] );
+");
+?>
+<p>
+	This will create two meal objects. Each bean will have a name property
+	that corresponds to one of the strings in array.
+</p>
+<p>
+	You can also collect the strings from label beans using:
+</p>
+<?php code("
+	\$array = R::gatherLabels( \$meals );
+");
+?>
+<p>
+	The gatherLabels() function returns an alphabetically sorted array of strings each
+	containing one name property of a bean in the bean list provided.
+</p>
+
+
+
+<h2 id="enums">Enums</h2>
+<p>
+	An enum type is a special bean that enables for a property to be a set of predefined values.
+	To use an ENUM:
+</p>
+<?php code("
+	\$tea->flavour = R::enum( 'flavour:english' );
+"); ?>
+<p>
+	The ENUM method will do a lot of work here. First it checks whether there exists
+	a 'flavour' bean with the name 'ENGLISH'. If this is the case, enum() will
+	return this bean, otherwise it will create such a bean, store it in the database and
+	return it. This way your ENUMs are created on the fly - properly. To compare an
+	enum value:
+</p>
+<?php code("
+	\$tea->flavour->equals( R::enum( 'flavour:english' ) );
+");?>
+<p>
+	To get a list of all flavours, just omit the value part:
+</p>
+<?php code("
+	\$flavours = R::enum( 'flavour' );
+");?>
+<p>
+	To get a comma separated list of flavours you might want to combine
+	this method with other Label Maker methods:
+</p>
+<?php code("
+	implode( ',', R::gatherLabels( R::enum( 'flavour' ) ) );
+"); ?>
+<p>
+	Since RedBeanPHP enums are beans you can add other properties as well.
+	To query using an enum:
+</p>
+<?php code("
+	\$flowers = R::find( 'flower', ' color_id = ? ', [ R::enum( 'color:red' )->id ] );
+"); ?>
+<p>
+	The find query above will retrieve all red flowers. While this query is perfectly
+	readable the syntax is a bit clunky, therefore there is a shorthand notation for
+	the R::enum(...)-&gt;id part:
+</p>
+<?php code("
+	\$flowers = R::find( 'flower', ' color_id = ? ', [ EID('color:red') ] );
+"); ?>
+<p>
+	The global function EID() returns the ID of the given ENUM directly.
+</p>
+
+<h2 id="tags">Tags</h2>
+
+<p>
+Tags are often used to categorize or group items.
+To tag a an item:
+</p>
+<?php code("
+	R::tag( \$page, array( 'topsecret', 'mi6' ) );
+");?>
+<p>
+To <b>fetch all tags</b> attached to a certain bean we use the same method but without the tag parameter:
+</p>
+<?php code("
+	\$tags = R::tag( \$page ); //returns array with tags
+"); ?>
+<p>
+	To <b>untag</b> an item use:
+
+</p>
+<?php code("
+	R::untag( \$bean, \$tagListArray );"); ?>
+<p>
+	To get all beans that have been tagged with $tags, use <b>tagged()</b>:
+</p>
+<?php code("
+	R::tagged( \$beanType, \$tagList );"); ?>
+<p>
+	To find out whether beans have been tagged with specific tags, use <b>hasTag()</b>:
+</p>
+<?php code("
+	R::hasTag( \$bean, \$tags, \$all = FALSE )");?>
+<p>
+	To <b>add tags</b> without removing the old ones:
+</p>
+<?php code("
+	R::addTags( \$page, ['funny', 'hilarious'] );
+");?>
+<p>
+	To get beans that have ALL these tags:
+</p>
+<?php code("
+	//must be tagged with both tags
+	R::taggedAll( \$page, ['funny', 'hilarious'] );
+");?>
+
+<p class="note" id="countTagged">
+	As of version 5.3:<br>
+	To just count tags use: R::countTagged() and R::countTaggedAll().
+	Same parameters.
+</p>
+
+<category>Advanced</category>
+
+<h1>Trees</h1>
+<p>
+	RedBeanPHP supports <b>self-referential</b> relationships.
+	In RedBeanPHP terminology, these are called trees. Here is an example, let's decorate a christmas tree with some
+	candy canes:
+</p>
+<?php code("
+	\$cane = R::dispense('cane',10);
+	\$cane[1]->ownCane = [ \$cane[2], \$cane[9] ];
+	\$cane[2]->ownCane = [ \$cane[3], \$cane[4] ];
+	\$cane[4]->ownCane = [( \$cane[5],
+				\$cane[7], \$cane[8] ];
+	\$cane[5]->ownCane = [ \$cane[6] ];
+	\$id = R::store( \$cane[1] );
+	\$root = R::load( 'cane', \$id );
+
+	echo \$root->ownCane[2]->ownCane[4]
+		->ownCane[5]->ownCane[6]->id;
+	//outputs: 6
+"); ?>
+<p>
+	Trees are just a special case of lists,
+	you use a list with the same name as the parent type.
+	In the example script above, a <b>cane</b> has an <b>ownCaneList</b>.
+	Another example: <i>page-&gt;ownPageList</i>. As you can see in the example
+	above you can navigate the lists using the IDs.
+</p>
+
+<h2 id="traversal">Traversal</h2>
+<p>
+	Instead of manually looping through each own-list of a bean you
+	can use the traverse() method:
+</p>
+<?php code("
+	\$page->traverse( 'ownPage', function( \$page ) {
+		....
+	} );
+"); ?>
+<p>
+	This allows you to recursively apply a function to a list.
+	To limit the results when accessing a list you can use the with/withCondition()
+	method:
+</p>
+<?php code("
+	\$page->with( ' LIMIT 10 ')->traverse( ... );
+	\$page->withCondition( '  rating > ? ', [ 5 ] )->traverse( ... );
+");?>
+<p>
+	You can also use <b>withCondition</b> and <b>alias</b> together with the traverse
+	function.
+	<br><br>
+	Use the third parameter to specify the maximum depth:
+</p>
+<?php code("
+	\$page->traverse( 'ownPage', \$func, 3 ); //max 3 levels
+");?>
+<p>
+	Use the PHP <b>use</b> statement to import variables into the function scope:
+</p>
+<?php code("
+	\$task->traverse( 'ownTask', function( \$task ) use ( &\$todos ) {
+		\$todos[] = \$task->name;
+	} );
+"); ?>
+
+<p class="note">
+	The traverse() function does not check for <i>recursion</i> in trees.
+</p>
+
+
+<h2>Traversing upwards</h2>
+<p>
+	You can also traverse the other way around, here is a quick example:
+</p>
+<?php code("
+	\$page = R::dispense('page');
+	\$page->title = 'chapter';
+	\$page2 = R::dispense('page');
+	\$page2->title = 'article';
+	\$page3 = R::dispense('page');
+	\$page3->title = 'text';
+	\$page->ownPageList[] = \$page2;
+	\$page2->ownPageList[] = \$page3;
+	R::store(\$page);
+	\$p = \$page3->fresh();
+	\$p->traverse('page', function(\$parent) {
+        	echo \$parent->title. PHP_EOL;
+	});
+"); ?>
+
+
+<h2>Importing Trees</h2>
+<p>
+	Do you want to import a hierarchical data structure ?
+	This can be accomplished using the <a href="/import_and_export" title="Import trees with dispense().">R::dispense()</a> feature.
+</p>
+
+<h2 id="ctetrees">Faster trees (5.2+)</h2>
+<p>
+	If your database supports <b>common table expressions</b> (Postgres, MariaDB 10.3+) you can use
+	the CTE-based tree tools as well:
+</p>
+<?php code("
+	\$pages = R::dispense(array(
+		'_type' => 'page',
+		'title' => 'home',
+		'ownPageList' => array(array(
+			'_type' => 'page',
+			'title' => 'shop',
+			'ownPageList' => array(array(
+				'_type' => 'page',
+				'title' => 'wines',
+				'ownPageList' => array(array(
+					'_type' => 'page',
+					'title' => 'whiskies',
+				))
+			))
+		))
+	));
+ ");?>
+<p>
+	Given the page hierarchy of the shop above you can use
+	R::parents() and R::children() like this:
+</p>
+<?php code("
+	R::parents( \$whiskyPage, ' ORDER BY title ASC ' );
+	//gives: home,shop,whiskies,wines
+	
+	R::children( \$homePage, ' ORDER BY title ASC ' ) );
+	//gives:home,shop,whiskies,wines
+	
+	R::children( \$winePage, ' title NOT IN (\'wines\') ORDER BY title ASC ' );
+	//whiskies
+	
+	R::parents( \$winePage, '  title NOT IN (\'home\') ORDER BY title ASC ' );
+	//shop,wines
+"); ?>
+<p>
+	Because this approach uses common table expressions the performance is much better.
+</p>
+
+<p class="note">
+	Caution!
+	This is a new, <b>experimental</b> feature available as of RedBeanPHP 5.2.
+	The CTE API has been tested but may still contain bugs. Also the CTE API may be subject
+	to change in future versions.
+</p>
+
+<h1>Link Beans</h1>
+<p>
+	The following code associates an employee with a project using a
+	<a href="/many-to-many" title="Learn more about a many-to-many relation.">many-to-many</a>
+	relation.
+</p>
+<?php code("
+	\$project->sharedEmployeeList[] = \$employee;
+"); ?>
+<p>
+	The project and the
+	employee are linked by a <b>link bean</b>. Link beans have their own <b>type</b>, in this case:
+	<b>employeeProject</b>. In the database, these beans are stored in the <b>employee_project</b> table.
+</p>
+
+
+
+<h2 id="link">Qualified links</h2>
+<p>
+	Sometimes you want to qualify a relationship.
+	For instance,
+	in the case of projects and employees, you might want to
+	add a 'role' property to the relation:
+</p>
+<?php code("
+	list(\$e, \$p) = R::dispenseAll('employee,project');
+	\$p->link( 'employee_project', [
+		'role' => 'director'
+	] )->employee = \$e;
+"); ?>
+
+<p>
+	While this is quite handy, it's often better to introduce the missing concept:
+	<b>participant</b> in this case. Often, when you find yourself qualifying a relationship,
+	you might have missed an important part of your data model. A relation or link is not a
+	very good substitute for this. <br>
+
+</p>
+
+<p class="note">
+	Be careful with adding to much properties and logic to relations, make sure you haven't missed
+	an important concept in your domain model.
+</p>
+
+
+<h2 id="access-link-beans">Accessing link beans</h2>
+<p>
+	Since a many-to-many relation can be viewed as a combination of
+	two one-to-many relations you can access the link beans through the
+	ownList on either side of the relation.
+	In the case of a project-employee relations you can access the
+	intermediate bean like this:
+</p>
+<?php code("
+	\$employee->ownEmployeeProjectList;
+"); ?>
+<p>
+	To remove the intermediate beans upon assigning an empty array open the
+	list in exclusive mode:
+</p>
+<?php code("
+	\$employee->xownEmployeeProjectList;
+"); ?>
+
+
+
+
+<h1>Other relations</h1>
+
+<p>
+	This chapter discusses less common relations.
+</p>
+
+<h2 id="aggr">Aggregations</h2>
+<p>
+	It's possible to treat two complementary <b>N-1</b> relations as one
+	many-to-many relation, thus benefiting from the advantages of a shared list.
+	In <b>RedBeanPHP 4.1+</b> you can use the <b>aggr()</b> method of a bean to collect
+	the parent beans for each member of an own-list:
+</p>
+<?php code("
+	\$targets = \$quest1->aggr( 'ownQuestTargetList', 'target', 'quest' );
+"); ?>
+<p>
+	This code will iterate over the ownQuestionTargetList and for every
+	questTarget bean in the list it will load the bean in the target property
+	as a bean of type 'quest'. This relation could not have been formed as
+	as shared list because a shared list does not allow aliases. Without aliases
+	the relation would have been a <i>symmetrical</i> one, lacking the notion of
+	direction. Another solution to this problem would be to use the shared list
+	and create a <b>VIEW</b> of quest called target.
+</p>
+
+
+
+<h2>One-to-one</h2>
+<p>
+	One-to-one relations are not used frequently. Traditional 1-1 records are
+	linked by their primary keys. Load them like this:
+</p>
+<?php code("
+	list( \$author, \$bio ) = R::loadMulti( 'author,bio', \$id );
+"); ?>
+<p>
+	This loads an author and a biography with the same ID.
+	You need to make sure the IDs are in sync yourself.
+</p>
+
+<p class="note">
+	In RedBeanPHP one-to-one relations are an <b>anti-pattern</b>, the fields
+	should belong to the same bean. This method has been added for compatibility
+	reasons only, try to avoid it!
+</p>
+
+
+<h2>Polymorph relations</h2>
+<p>
+	To load a bean whose type is determined by another column:
+</p>
+<?php code("
+	\$ad = \$page->poly( 'contentType' )->content;
+");
+?>
+<p>
+	This code returns the bean referred to in <b>content_id</b> using the bean type
+	specified in column <b>content_type</b>. If content_type contains the value 'advertisement'
+	the content will be a bean of type 'advertisement'.
+</p>
+<p class="note">
+	This is an <b>anti-pattern</b> in RedBeanPHP, do not use this functionality unless you have to.
+	<br>
+	Use poly() to retrieve polymorph data
+	from an external or legacy database only.
+</p>
+
+<h1>Models</h1>
+<p>
+	A <b>model</b> is a place to put validation and business logic.
+	Imagine a Jazz band that can only have up to 4 members.
+	We could implement this rule like this:
+</p>
+<?php code("
+	if ( count( \$members ) > 4 )
+	throw new Exception( 'Too many!' );
+
+	\$band->ownMember = \$members;
+	R::store( \$band );
+");?>
+<p>
+	However, now we need to add this check <i>everytime</i> we call R::store().
+	It would be much more convenient if R::store() was smart enough to perform this
+	check by itself. We can accomplish this by putting the <b>validation rule</b> in our model.
+	RedBeanPHP automatically discovers the models that belong to beans, so we can
+	implement this validation like this:
+</p>
+<?php code("
+
+	class Model_Band extends RedBean_SimpleModel {
+        	public function update() {
+                if ( count( \$this->bean->ownMember ) >4 )
+                throw new Exception( 'Too many members!' );
+        	}
+	}
+
+	list( \$band, \$members ) = R::dispenseAll( 'band,member*5' );
+	\$band->ownMember = \$members;
+	R::store( \$band ); //will trigger exception
+
+");?>
+<p>
+	RedBeanPHP automatically connects beans with models using a naming convention
+	(i.e. Model_{TYPE OF BEAN}).
+	<br>
+	Now, every time we call store and something is wrong with the number of
+	members, an exception will be triggered automatically.
+	The mechanism that connects beans to models is called <b>FUSE</b>, because
+	beans are <i>fused</i> with their models. Within a model, <b>$this-&gt;bean</b>
+	refers to the bean.
+	<br>
+	To create a model for your bean, simply add a class like this:
+</p>
+<?php
+code("
+	//with classic namespace style
+	class Model_Band extends RedBean_SimpleModel { ... }
+");?>
+<p>
+	If you like your models to reside in the namespace
+	<b>\Model</b>, you can set the following constant:
+</p>
+<?php code("
+	//with namespace Model
+	define( 'REDBEAN_MODEL_PREFIX', '\\\Model\\\' )
+");?>
+<p>
+	You can now create a model class like this:
+</p>
+<?php code("
+	class \Model\Band extends \RedBeanPHP\SimpleModel { ... }
+");?>
+<p>
+	If you prefer no namespacing at all:
+</p>
+<?php code("
+	//use plain classes (without any namespacing)
+	define( 'REDBEAN_MODEL_PREFIX', '' )
+
+	class Band extends \RedBeanPHP\SimpleModel { ... }
+");?>
+
+<p class="note">
+	Beans of types like 'book_page' will search for a model
+	'BookPage' first and if no such model is found they will
+	try to connect to 'Book_Page'.
+</p>
+
+<h2>Scoping rules</h2>
+<p>
+	Within the model, the <b>$this-&gt;bean</b> variable refers to the bean.
+	Simply <b>$this</b> also refers to the bean but without
+	returning references, in
+	practice this can be very confusing so I recommend to use
+	<b>$this-&gt;bean</b>.
+</p>
+
+<h2>Fused methods</h2>
+<p>
+	Besides <b>update()</b> RedBeanPHP FUSE calls other methods on the model as well:
+	R::store() invokes <b>update()</b> and <b>after_update()</b>,<br>
+	R::load() invokes <b>open()</b>,<br>
+	R::trash() invokes <b>delete()</b> and <b>after_delete()</b>,<br>
+	R::dispense() invokes <b>dispense()</b>.
+</p>
+<p>
+	Note that since loading a bean also causes a new bean to be dispensed to
+	receive the record from the database, load also invokes <b>dispense()</b>.
+</p>
+<h2>Example: all fused methods</h2>
+<p>
+	To demonstrate the order and use of all of these methods let's consider
+	an example:
+</p>
+<?php code("
+	\$lifeCycle = '';
+	class Model_Bandmember extends RedBean_SimpleModel {
+		public function open() {
+		   global \$lifeCycle;
+		   \$lifeCycle .= \"called open: \".\$this->id;
+		}
+		public function dispense() {
+		    global \$lifeCycle;
+		    \$lifeCycle .= \"called dispense() \".\$this->bean;
+		}
+		public function update() {
+		    global \$lifeCycle;
+		    \$lifeCycle .= \"called update() \".\$this->bean;
+		}
+		public function after_update() {
+		    global \$lifeCycle;
+		    \$lifeCycle .= \"called after_update() \".\$this->bean;
+		}
+		public function delete() {
+		    global \$lifeCycle;
+		    \$lifeCycle .= \"called delete() \".\$this->bean;
+		}
+		public function after_delete() {
+		    global \$lifeCycle;
+		    \$lifeCycle .= \"called after_delete() \".\$this->bean;
+		}
+	}
+
+	\$bandmember = R::dispense( 'bandmember' );
+	\$bandmember->name = 'Fatz Waller';
+	\$id = R::store( \$bandmember );
+	\$bandmember = R::load( 'bandmember', \$id );
+
+	R::trash( \$bandmember );
+	echo \$lifeCycle;
+");?>
+<p>output:</p>
+<?php code("
+	called dispense() {\"id\":0}
+	called update() {\"id\":0,\"name\":\"Fatz Waller\"}
+	called after_update() {\"id\":5,\"name\":\"Fatz Waller\"}
+	called dispense() {\"id\":0}
+	called open: 5
+	called delete() {\"id\":\"5\",\"band_id\":null,\"name\":\"Fatz Waller\"}
+	called after_delete() {\"id\":0,\"band_id\":null,\"name\":\"Fatz Waller\"}
+");?>
+
+
+<h2 id="custom_fused_methods">Custom FUSED methods</h2>
+<p>
+	Besides the standard methods mentioned above, any method on the model
+	can be invoked by calling it on the bean (assuming it does not collide with
+	a native bean method):
+</p>
+<?php code("
+	\$dog = R::dispense( 'dog' );
+
+	//call bark() on Model_Dog:
+	\$dog->bark();
+"); ?>
+<p>
+	If you call a method on a bean that does <b>not exist</b> in the bean
+	and also <b>not in the model</b> the call will be ignored. You change
+	this behaviour by selecting a different FUSE error handling mechanism using
+	the <b>setErrorHandlingFUSE()</b> method, see API.
+</p>
+
+<h2 id="boxing">Boxing and Unboxing</h2>
+<p>
+	If you have a bean and you want to obtain the corresponding model use:
+
+</p>
+<?php code("
+	\$dogBean = R::dispense( 'dog' );
+
+	//get reference to Model_Dog
+	\$dogModel = \$dogBean->box();
+");?>
+<p>
+	Similarly, if you have a model and you want its inner bean, call:
+</p>
+<?php code("
+	\$dogBean = \$dogModel->unbox();
+");?>
+<p>
+	We call this technique <b>boxing</b> (and unboxing). This can be handy if you want
+	to make use of typehinting:
+</p>
+<?php code("
+	public function addDog( Model_Dog \$dog ) {
+		...
+	}
+");?>
+<p>
+	Otherwise, we would have to use type RedBean_OODBBean which is less descriptive.
+</p>
+
+<h2>Model Factory and Dependency Injection</h2>
+<p>
+	If for some reason you need to control how the bean turns into a model you
+	can pass a factory function like this:
+</p>
+<?php code("
+	use RedBeanPHP\\BeanHelper\\SimpleFacadeBeanHelper as SimpleFacadeBeanHelper;
+	SimpleFacadeBeanHelper::setFactoryFunction( function( \$name ) {
+		\$model = new \$name();
+		\$model->setMailer( new MailLib() );
+		return \$model;
+	} );
+"); ?>
+<p>
+	In this example we inject a mail library in a model using the factory function.
+	For more complex scenarios you can even use the factory to pass the model to
+	your own dependency injection framework.
+</p>
+
+
+<p class="note">
+	If you need even more flexibility you can subclass the 
+	<a target="_blank" href="https://redbeanphp.com/api/classes/RedBeanPHP.BeanHelper.SimpleFacadeBeanHelper.html" title="API documentation for SimpleFacadeBeanHelper">SimpleFacadeBeanHelper</a> 
+	and override the <b>getModelForBean()</b> method. 
+	<br><br>
+	Use: <br>
+	<b>R::getRedBean()-&gt;setBeanHelper( new MyBeanHelper );</b><br>
+	to set the bean helper.
+	<br><br>
+	Don't forget to call <b>$this-&gt;loadBean( $bean )</b>;
+	in the overridden method to attach the bean to the model. If you use
+	the facade you have to set the bean helper for <i>every</i> database
+	connection.
+
+</p>
+
+<p id="jsonret">
+	As of RedBeanPHP 5.2 models can also return jsonSerialized objects by implementing
+	the __jsonSerialize method (will override the default OODB implementation.
+</p>
+
+<h1>Meta data</h1>
+<p>
+	Beans contain meta data. For instance, the <b>type</b> of the bean is stored in the meta data.
+	To obtain the type of a bean:
+</p>
+<?php code("
+	\$bean->getMeta( 'type' );
+");?>
+<p>
+	You can also store your own meta data in a bean:
+</p>
+<?php code("
+	\$bean->setMeta( 'my.secret.property', 'secret' );
+"); ?>
+<p>
+	this data will not get stored in the database.
+</p>
+<h2 id="tainted">Tainted</h2>
+<p>
+	Some meta data is accessible using convenience method. For instance, if you would like to
+	know whether a bean has been changed since it got retrieved from the database
+	use the tainted() method.
+</p>
+<?php code("
+	\$bean->isTainted();
+
+	//or:
+
+	\$bean->getMeta( 'tainted' );
+"); ?>
+<p>
+	Note that a bean is marked as tainted if a list gets <b>accessed</b>.
+	You can also set the tainted flag yourself.
+</p>
+
+<h2 id="old">Old</h2>
+<p>
+	To determine if a certain property has changed:
+</p>
+<?php code("
+	\$book = R::load( 'book', \$id );
+	\$book->hasChanged( 'title' ); //returns FALSE
+	\$book->title = 'New title';
+	\$book->hasChanged( 'title' ); //returns TRUE
+"); ?>
+
+<p>
+	These properties will be marked as changed even if you do
+	a R::store(), if you would like to clear the history
+	after every store use:
+</p>
+<?php code("
+	OODB::autoClearHistoryAfterStore( TRUE );
+");?>
+<p>
+	To manually clear the history of a bean:
+</p>
+<?php code("
+	\$bean->clearHistory();
+");?>
+
+<p>
+	To get the old value of the property:
+</p>
+<?php code("
+	\$book->old( 'title' );
+");?>
+<p>
+	The behaviour of hasChanged sometimes suprises people,
+	for instance take a look at the following code:
+</p>
+<?php code("
+	\$employee = R::load( 'employee', \$id );
+	var_dump( \$employee->hasChanged( 'organisation' ) ); //FALSE
+	var_dump( \$employee->hasChanged( 'organisation_id' ) ); //FALSE
+	\$employee->organisation = \$newOrganisation;
+	var_dump( \$employee->hasChanged( 'organisation' ) ); //TRUE
+	var_dump( \$employee->hasChanged( 'organisation_id' ) ); //FALSE
+");?>
+<p>
+	The reason for this behaviour is that organisation_id will
+	not be updated automatically until you call R::store(). Until,
+	then the property has not been changed.
+</p>
+
+
+<h2 id="has_list_changed">List Changed (4.2+)</h2>
+<p>
+	To determine whether a list has been changed (beans have been
+	added or deleted):
+</p>
+<?php code("
+	\$author->hasListChanged( 'ownBook' );
+"); ?>
+<p>
+	This method will return TRUE if some elements of the array
+	have been removed or added. Note that this method does not
+	check the state of the beans themselves. It's just about the list.
+</p>
+
+
+<h2 id="testing_equality">Testing Equality</h2>
+<p>
+	To test whether two beans have the same type and <b>primary key</b> ID:
+</p>
+<?php code("
+	\$bean->equals( \$otherBean );
+"); ?>
+<h2 id="empty">Empty</h2>
+<p>
+	To determine if a bean is empty, or only contains <b>empty</b> values
+	(everything that qualifies as empty() in PHP) use:
+</p>
+<?php code("
+	\$bean->isEmpty();
+"); ?>
+<h2>Copy meta data</h2>
+<p>
+	You can copy meta data from another bean like this:
+</p>
+<?php code("
+	\$bean->copyMetaFrom( \$otherBean );
+");
+?>
+
+<h2 id="masks">Meta Mask (4.3.2)</h2>
+<p>
+	As of version 4.3.2 you can specify a <b>meta mask</b> when
+	converting rows to beans:
+</p>
+<?php code("
+	\$rows = R::getRow( 'SELECT book.*, count( page.id ) AS meta_pages... ' );
+	\$book = R::convertToBean( 'book', \$data, 'meta_' );
+	\$queryData = \$book->getMeta('data.bundle');
+	echo \$queryData['meta_pages'];
+"); ?>
+<p>
+	Here, convertToBeans will put all columns starting with 'meta_' in the
+	meta section of the bean. This allows the query above to select all the
+	fields of the book and query some additional meta data in the process.
+	The meta data from the query will be available under the key 'data.bundle'.
+</p>
+
+
+
+<h1>Duplicate</h1>
+<p>
+	<b>R::duplicate()</b> makes a deep copy of a bean properly and without storing the bean.
+	All beans in own-lists will be duplicated recursively.
+	All references to shared beans will be copied but not the shared beans themselves.
+	All references to parent objects (_id fields) will be copied but not the parents themselves.
+	The bean will not be stored so you have the chance to modify it before saving. Usage:
+</p>
+<?php code("
+	//entire bean hierarchy
+	\$book->sharedReader[] = \$reader;
+	\$book->ownPage[] = \$page;
+	\$duplicated = R::duplicate( \$book ); //R::dup in RB4.0 and earlier
+	//..change something...
+	\$book->name = 'copy!';
+	//..then store...
+	R::store( \$duplicated );
+"); ?>
+<p>
+	As of <b>RedBeanPHP 4</b>, the R::duplicate() method also duplicates trees, in earlier versions
+	the duplication manager skipped tree lists ($page-&gt;ownPage). Note that duplication/export won't work
+	for aliased beans.
+</p>
+<h2 id="original_ids">ID mappings</h2>
+<p>
+	Curious about the old IDs of the beans that have been duplicated. You can still find them
+	in the meta properties of the copied bean:
+</p>
+<?php code("
+	\$myOldID = \$book->getMeta( 'sys.old-id' );
+"); ?>
+
+<h2 id="speed_up_dup">Performance</h2>
+<p>
+	Both dup() and exportAll() need to query the database schema which is slow.
+	To speed up the process you can
+	pass a database schema:
+</p>
+<?php code("
+	R::getDuplicationManager()->setTables( \$schema );
+");?>
+<p>
+	To obtain the schema use:
+</p>
+<?php code("
+	\$schema = R::getDuplicationManager()->getSchema();
+");?>
+<p>
+	You can now use this schema to feed it to setTables().
+	R::duplicate() and R::exportAll() both use this schema.
+</p>
+<h2 id="duplicate">Filtering</h2>
+<p>
+	Don't want to duplicate every aspect of a bean? You can
+	pass a white list of bean types to duplicate like this:
+</p>
+<?php
+code("
+	//only duplicates the patatoes and the tomatoes...
+	R::duplicate( 'bean', ['patato', 'tomatos'] );
+");
+?>
+<p>
+	The code above only works in RedBeanPHP 4.1. In 4.0 and earlier
+	you have to use R::dup() (see API for method signature).
+</p>
+<p class="note">
+	As of RedBeanPHP 4.1 the R::dup() method is deprecated,
+	use R::duplicate instead, it has a less confusing method
+	signature.
+</p>
+
+
+<h1>Import and Export</h1>
+
+<p>
+	RedBeanPHP offers several functions to exchange data with beans.
+</p>
+
+<h2 id="import">Import</h2>
+
+<p>
+	You can import an array into a bean using:
+</p>
+<?php code("
+    \$book->import( \$_POST );
+");?>
+<p>
+	The code above is handy if your $_POST
+	request array only contains book data.
+	It will simply load all data into the book bean.
+	You can also add a selection filter:
+</p>
+<?php code("
+    \$book->import( \$_POST, 'title,subtitle,summary,price' );
+");?>
+<p>
+	This will restrict the import to the fields specified.
+	Note that this does not apply any form of <b>validation</b> to the bean.
+	Validation rules have to be written in the <i>model</i> or the <i>controller</i>.
+</p>
+<p>
+	To import from another bean:
+</p>
+<?php code("
+    \$book->importFrom( \$otherBean );
+");?>
+
+
+<h2 id="import_using_dispense">Import using Dispense</h2>
+<p>
+	Dispense can even convert a multi dimensional array to a bean
+	hierarchy like this (use _type to indicate the type of the bean):
+</p>
+<?php code("
+	\$book = R::dispense( [
+		'_type' => 'book',
+		'title'  => 'Gifted Programmers',
+		'author' => [ '_type' => 'author', 'name' => 'Xavier' ],
+		'ownPageList' => [ ['_type'=>'page', 'text' => '...'] ]
+	] );
+"); ?>
+
+<p class="note">
+	R::dispense() also accepts multi dimensional arrays (4.2+)
+</p>
+
+<h2 id="export">Export</h2>
+<p>
+	To export the properties and values of a single bean use:
+</p>
+<?php code("
+	\$array = \$bean->export();
+");?>
+<p>
+	To recursively export one or an array of beans use:
+</p>
+<?php code("
+	\$arrays = R::exportAll( \$beans );
+");?>
+<p>
+	Bean lists in exports are keyless, 0 indexed.
+	To also export parent beans:
+</p>
+<?php code("
+	\$arrays = R::exportAll( \$beans, TRUE );
+");?>
+
+
+<h1>Non-static</h1>
+<p>
+	If you don't like static methods, you can use
+	the objects behind the facade directly.
+	Almost every method of the R-class is available through
+	the original RedBeanPHP objects as well. The facade
+	is just that: a thin layer on top of these objects.
+	Here is an overview of the most important R-methods
+	and how to use them 'the non-static way'.
+</p>
+<p>
+	Note that there are three important objects in RedBeanPHP:
+	the adapter (DBAdapter), the query writer (QueryWriter)
+	and the RedBeanPHP object database (OODB).
+	We call these objects the core objects, because together they
+	represent the foundation of RedBeanPHP.
+	Other objects need these core objects, that's why they are bundled in
+	a toolbox (ToolBox). So, if you need let's say an instance
+	of the Tag Manager class (TagManager) you'll have to
+	pass an instance of the toolbox to the contructor.
+</p>
+
+<h2 id="toolbox">Toolbox</h2>
+<p>	You can manually assemble your toolbox
+	like this:
+</p>
+<?php code("
+	\$pdo = new RPDO( \$dsn );
+	\$adapter = new DBAdapter( \$pdo );
+	\$writer = new MySQL( \$adapter );
+	\$oodb = new OODB( \$writer );
+	\$tb = new ToolBox( \$oodb, \$adapter, \$writer );
+");?>
+
+
+<h2 id="wiring">Wiring</h2>
+<p>
+	RedBeanPHP has a very decoupled architecture, which makes it very flexibile.
+	However this means you need to introduce some objects to eachother.
+	First we need to tell RedBeanPHP how beans can obtain the toolbox, this
+	means we need to define our own BeanHelper:
+</p>
+<?php code("
+	class BeanHelper extends SimpleFacadeBeanHelper {
+        	private \$toolbox;
+        	public function getToolbox() {
+                	return \$this->toolbox;
+        	}
+        	public function setToolbox( \$toolbox ) {
+                	\$this->toolbox = \$toolbox;
+        	}
+	}
+");?>
+<p class="note" id="using_interface">
+	Note that we extend the SimpleFacadeBeanHelper here, if you want to implement the
+	interface directly you'll have to add the methods getModelForBean() and
+	getExtractedToolbox() <a href="/api/classes/RedBeanPHP.BeanHelper.SimpleFacadeBeanHelper.html" target="_blank" 
+	title="Interface definition BeanHelper">as well</a>.
+</p>
+<p>
+	Now let's do the wiring:
+</p>
+<?php code("
+	\$r = \$tb->getRedBean();
+
+	//A helper for OODB to give to its beans
+	\$b = new BeanHelper;
+	\$b->setToolbox( \$tb );
+	\$r->setBeanHelper( \$b );
+
+	//allow OODB to associate beans
+	\$r->setAssociationManager(new AssociationManager( \$tb ));
+
+	//enable FUSE
+	\$h = new SimpleModelHelper;
+	\$h->attachEventListeners( \$r );
+
+");?>
+
+<h2 id="hybrid">Hybrid</h2>
+<p>
+	Normally the facade does all this dull work for you.
+	You can also let the facade do this work and still work with instances;
+	simply steal the toolbox from the facade after it has been configured:
+</p>
+<?php code("
+	R::setup(...);
+	\$toolbox = R::getToolBox(); //give it to me!
+");?>
+
+<h2 id="service-objects">Service objects</h2>
+<p>
+	Many methods in the R-facade are just <i>wrappers</i> around calls to
+	methods on one of these core objects: <b>OODB</b>, <b>Writer</b> and <b>Adapter</b>. However
+	many static methods in R also call so-called service objects. Service
+	objects offer secondary functionality. To instantiate a <i>service object</i>
+	you need to pass the toolbox to its constructor. The toolbox contains everything
+	service object needs to operate: the adapter to connect to the
+	database, the OODB object to call basic ORM methods and the writer
+	to write queries for the database.
+</p>
+<p>
+	For instance, R::find() uses the Finder class.
+	To create an instance of Finder yourself:
+</p>
+<?php code("
+	\$f = new Finder( \$tb );
+"); ?>
+<p>
+	That's it. Now we have an instance of the Finder service object.
+	Now to find a bean use:
+</p>
+<?php code("
+	\$x = \$f->find( 'music', ' composer = ? ', 'Bach' );
+");?>
+
+<h2>API</h2>
+<p>
+	This manual focuses on the facade.
+	For details on individual objects, please consult the
+	<a href="https://redbeanphp.com/api/namespaces/RedBeanPHP.html" title="Learn more about individual objects">API pages</a>.
+</p>
+<p class="note">
+	Read more about the <a href="/internals" title="Internals">internals</a> of RedBeanPHP.
+</p>
+
+<h1>UUIDs</h1>
+<p>
+	RedBeanPHP has not been designed for use with <abbr title="Universal unique identifiers">UUIDs</abbr> or
+	<abbr title="Global unique identifiers">GUIDs</abbr>. However if you really want, you can tune RedBeanPHP
+	to support this.
+</p>
+<h2>Enabling UUID support in MySQL</h2>
+<p>
+	To enable <b>UUID</b> support in MySQL in fluid and frozen mode you need to provide your own
+	<i>QueryWriter</i>. Here is an example of a QueryWriter that enables UUIDs in MySQL:
+</p>
+<?php code("
+	class UUIDWriterMySQL extends MySQL {
+
+		protected \$defaultValue = '@uuid';
+		const C_DATATYPE_SPECIAL_UUID  = 97;
+
+		public function __construct( Adapter \$adapter ) {
+			parent::__construct( \$adapter );
+			\$this->addDataType(
+			self::C_DATATYPE_SPECIAL_UUID, 'char(36)'  );
+		}
+
+		public function createTable( \$table ) {
+			\$table = \$this->esc( \$table );
+			\$sql   = \"
+				CREATE TABLE {\$table} (
+				id char(36) NOT NULL,
+				PRIMARY KEY ( id ))
+				ENGINE = InnoDB DEFAULT
+				CHARSET=utf8mb4
+				COLLATE=utf8mb4_unicode_ci \";
+			\$this->adapter->exec( \$sql );
+		}
+
+		public function updateRecord( \$table, \$updateValues, \$id = NULL ) {
+			\$flagNeedsReturnID = (!\$id);
+			if (\$flagNeedsReturnID) R::exec('SET @uuid = uuid() ');
+			\$id = parent::updateRecord( \$table, \$updateValues, \$id );
+			if (\$flagNeedsReturnID ) \$id = R::getCell('SELECT @uuid');
+			return \$id;
+		}
+
+		public function getTypeForID(){
+			return self::C_DATATYPE_SPECIAL_UUID;
+		}
+	}
+");?>
+<p>
+	Now you need to rewire the objects to swap the old Query Writer for
+	the new one:
+</p>
+<?php code("
+		\$oldToolBox = R::getToolBox();
+		\$oldAdapter = \$oldToolBox->getDatabaseAdapter();
+		\$uuidWriter = new UUIDWriterMySQL( \$oldAdapter );
+		\$newRedBean = new OODB( \$uuidWriter );
+		\$newToolBox = new ToolBox( \$newRedBean, \$oldAdapter, \$uuidWriter );
+		R::configureFacadeWithToolbox( \$newToolBox );
+"); ?>
+<p>
+	Depending on the namespaces and aliases you use you might have to adjust
+	this code accordingly.
+</p>
+
+
+<h2>Enabling UUID support in PostgreSQL</h2>
+<p>
+	To install the UUID module for <b>PostgreSQL</b> run the following query:
+</p>
+<?php code("
+	CREATE EXTENSION \"uuid-ossp\";
+"); ?>
+<p>
+	This command requires at least PostgreSQL version <b>9.1</b>, for earlier versions of
+	Postgres please consult their documentation.
+</p>
+<p>
+	Here is an example class for PostgreSQL:
+</p>
+<?php code("
+	class UUIDWriterPostgres extends PostgreSQL {
+
+		protected \$defaultValue = 'uuid_generate_v4()';
+		const C_DATATYPE_SPECIAL_UUID  = 97;
+
+		public function __construct( Adapter \$adapter ){
+			parent::__construct( \$adapter );
+			\$this->addDataType( self::C_DATATYPE_SPECIAL_UUID, 'uuid'  );
+		}
+
+		public function createTable( \$table ){
+			\$table = \$this->esc( \$table );
+			\$this->adapter->exec( \"
+			CREATE TABLE \$table (id uuid PRIMARY KEY); \" );
+		}
+
+		public function getTypeForID(){
+			return self::C_DATATYPE_SPECIAL_UUID;
+		}
+	}
+"); ?>
+<p>
+	These are just examples, they allow you to use UUID but they
+	may not fit your needs. I recommend to craft your own Query Writer,
+	tailored to your needs.
+</p>
+
+
+<h1>Prefixes</h1>
+<p>
+	In RedBeanPHP, the <b>underscore</b> '_' 
+	is used to denote a <b>relation</b> between two tables.
+	For instance a table 'book_tag' is used to associate books with tags.<br>
+	So, if you want to use table prefixes like 'cms_' or 'tbl_' you'll have to
+	<i>bypass</i> the RedBeanPHP schema policy check like this:
+</p>
+<?php code("
+	R::ext('xdispense', function( \$type ){ 
+		return R::getRedBean()->dispense( \$type ); 
+	});
+"); ?>
+<p>
+	Now you can use an underscore in your bean <b>type</b>:
+<?php code("
+	\$page = R::xdispense( 'cms_page' );
+"); ?>
+<p>
+	However, the name of the type still looks odd. Using a <b>constant</b>,
+	you can improve the readability of this code:
+</p>
+<?php code("
+	define( 'PAGE', 'cms_page' );
+	\$page = R::xdispense( PAGE );
+");?>
+<p>
+	This also works for relations:
+</p>
+<?php code("
+	define( 'PAGES', 'ownCms_page' );
+	\$pages = \$site->{PAGES};
+"); ?>
+<p>
+	Here is a complete example:
+</p>
+<?php code("
+	//Define your mappings like this
+	define( 'POEM', 'tbl_poem' );
+	define( 'BOOK', 'tbl_book' );
+	define( 'AUTHOR', 'tbl_author' );
+	define( 'CATEGORY', 'tbl_category' );
+	define( 'POEMS', 'ownTblPoem' );
+	define( 'CATEGORIES', 'sharedTblCategory' );
+
+	//Create an extension to by-pass security check in R::dispense
+	R::ext('xdispense', function( \$type ){
+		return R::getRedBean()->dispense( \$type );
+	});
+
+	//Use tbl_book_category instead of tbl_book_tbl_category
+	R::renameAssociation([
+		'tbl_book_tbl_category' => 'tbl_book_category' 
+	]);
+
+	//Use them like this:
+	\$poem = R::xdispense( POEM );
+	\$poem->title = 'Trees';
+	\$author = R::xdispense( AUTHOR );
+	\$author->name = 'Joyce Kilmer';
+	\$book = R::xdispense( BOOK );
+	\$book->title = 'Trees and other poems';
+	\$category = R::xdispense( CATEGORY );
+	\$category->name = 'nature';
+	\$book->{AUTHOR} = \$author;
+	\$book->{POEMS}[] = \$poem;
+	\$book->{CATEGORIES}[] = \$category;
+	\$id = R::store( \$book );
+
+	//For testing purposes let's output something:
+	\$book = R::load( BOOK, \$id );
+	\$poem = reset( \$book->{POEMS} );
+	\$author = \$book->{AUTHOR};
+	\$category = reset( \$book->{CATEGORIES} );
+
+	echo \"Have you ever read '{\$poem->title}' ({\$book->title}) by {\$author->name} ?
+	it's a beautiful poem about {\$category->name}.\";
+"); ?>
+<p>
+	This code will output:
+</p>
+<kbd>
+	Have you ever read 'Trees' (Trees and other poems) by Joyce Kilmer ?
+	it's a beautiful poem about nature.
+</kbd>
+
+<p>
+	Use the R::renameAssociation method to select a proper name for the
+	association table.
+</p>
+
+<p class="note">
+	Note that using table prefixes can be quite <b>dangerous</b>,
+	especially if you use them to avoid having to create multiple databases:
+	mixing data from <b>multiple clients</b> in one database can cause serious
+	security issues !
+</p>
+
+<p class="note">
+	Another way to map tables is to use VIEWS of course.
+	This is an even simpler approach but it might affect performance.
+</p>
+
+<h2>Using multiple schemas</h2>
+<p>
+	If you use Postgres you can devide your databases in multiple
+	'schemas'.
+	Simply tell RedBeanPHP where to look for its beans using the 'search path':
+</p>
+<?php code("
+	R::exec( 'SET search_path TO crm' ); //use RedBeanPHP for the CRM module
+"); ?>
+
+<h1>Query Builder</h1>
+<p>
+	You might notice this page is very short... <br>
+	RedBeanPHP does not offer a <b>Query Builder</b>. The reason for this is that I
+	like to keep things <b>simple</b>. RedBeanPHP uses good old 'plain SQL'. Nothing fancy.
+	There is no new syntax to learn, no Query Objects, not an SQL dialect, nothing.
+	<br>
+	Query Builders can be quite <b>complex</b> and you have to judge for
+	yourself whether this additional complexity is <i>justified</i> or not.
+	<br>
+	Also, the choice for a certain Query Builder is highly <b>subjective</b>, it
+	depends on personal preferences.
+</p>
+
+<p>
+	So, no Query Builder in RedBeanPHP. However, on this page I offer some
+	suggestions for those of you searching for a Query Builder. Feel free to mail
+	me if you have some suggestions of your own.
+</p>
+
+<h2>Dark Roast</h2>
+<p>
+	<b>Dark Roast</b> is a Query Builder created by Twiggler. It's a very complete
+	Query Builder attempting to abstract SQL away. It has many interesting
+	features for those who like the concept of a Query Builder. It can even
+	work on <b>arrays</b> instead of a database making it easy to <b>mock</b> the database.
+	<br>
+	Feel free to take a look at <a target="_blank" href="https://github.com/twiggler/DarkRoast" title="Dark Roast">Dark Roast</a>.
+</p>
+
+<h2>Tiniest Query Builder in the World</h2>
+<p>
+	I am not sure whether this is Query Builder at all.
+	Maybe it's no more than just a <i>'string builder'</i>. <br>
+	I have written this one
+	myself, I use it for complex dynamic queries (search forms):
+	<a href="http://gabordemooij.com/tiniest_query_builder" title="Tiniest Query Builder" target="_blank">Tiniest Query Builder</a>.
+</p>
+
+
+<h1>LOBs</h1>
+
+<p>
+	<b>LOBs</b> are <i>large objects</i>. The term refers to special database 
+	<i>column types</i> and
+	<i>functions</i> for dealing with large 
+	chunks of unstructured data, like <i>photos</i>.
+</p>
+
+<h2>No Support</h2>
+<p>
+	<b>RedBeanPHP</b> does <b>not</b> offer support for <b>LOBS</b>.
+	<br>
+	However it's possible
+	to leverage LOB functions of your database through the <b>PDO</b> object which
+	can be accessed like this:
+<p>
+<?php code("
+	R::getDatabaseAdapter()->getDatabase()->getPDO();
+"); ?>
+
+
+<h2>Advantages/Disadvantages LOBs</h2>
+<p>
+	Storing files as LOBs in the database has some advantages.
+	The most important advantage of using LOBs this way is to have
+	<i>data integrity</i> and <i>transactions</i> for files.
+</p>
+<p>
+	Using LOBs comes at a price though. You're databases will become
+	<b>quite large</b> which makes it hard to backup them or move them around.
+	Another possible drawback is that your files cannot be served from
+	a <b>cache layer</b>, due to the fact they are <i>tucked away</i> in the database.
+	Some people might argue you're using the <i>wrong tool for the job</i>:
+	a file system is for files, a database is for records. I am not
+	sure how important this philosophical consideration is in practice though.
+</p>
+<h2>Alternatives</h2>
+<p>
+	There are alternatives to using LOBs.
+	One solution is to store the <b>path</b> to the file in the database and
+	the actual file on disk. If you're worried about data integrity you can
+	also rename the file to a <b>hash</b> and store the hash in the database.
+</p>
+
+<h1>Migrations</h1>
+<p>
+	After a release you might add new features to your application in your development
+	environment. New columns and tables may also be added. At that point the database structures
+	of production and development environments are <b>out-of-sync</b>. Normally you would solve this
+	problem with <b>migration scripts</b>. These are little SQL scripts generated on your development
+	box that can sync the database structure. With RedBeanPHP this is often not needed. The easiest
+	way to solve the migration issue with RedBeanPHP is just to temporarily turn on fluid mode for a single
+	script and have RedBeanPHP create the missing tables and columns for you in the production environment.
+</p>
+<h2>Fluid Migrations</h2>
+<p>
+	To make the above work you need to be a little strategic about the PHP scripts you write.
+	The easiest way is to have a single script for adding new tables. This script can also make the new
+	tables and columns for you on the production server. Don't forget to only temporary enable
+	fluid mode on a production server (and add IP-restriction, recommended!). You can temporarily
+	re-activate fluid mode using:
+</p>
+<?php code("
+	R::freeze(FALSE);
+"); ?>
+<p>
+	Don't forget to remove this line after the script has been executed and the required columns and tables
+	have been generated.
+</p>
+
+<h2>Migration Logger</h2>
+<p>
+	Another option is to create your own logger by extending one of the default Logging classes.
+	You can then make your logger write any query that contains phrases like 'ALTER TABLE' or 'CREATE TABLE'
+	to a file. As such this solution kind of creates an SQL trail: a trail of queries reflecting the
+	changes RedBeanPHP has applied to your database schema. Here is an example implementation
+	of a migration logger:
+</p>
+<?php code("
+
+class MigrationLogger implements Logger {
+
+	private \$file;
+
+	public function __construct( \$file ) {
+		\$this->file = \$file;
+	}
+
+	public function log() {
+		\$query = func_get_arg(0);
+		if (preg_match( '/^(CREATE|ALTER)/', \$query )) {
+			file_put_contents( \$this->file, \"{\$query};\\n\",  FILE_APPEND );
+		}
+	}
+}
+"); ?>
+<p>
+	and this is how to wire it:
+</p>
+<?php code("
+
+\$ml = new MigrationLogger( sprintf( '/tmp/migration_%s.sql', date('Y-m-d') ) );
+
+R::getDatabaseAdapter()
+	->getDatabase()
+	->setLogger(\$ml)
+	->setEnableLogging(TRUE);
+"); ?>
+
+<p>
+	The example above will create a file like:
+</p>
+<kbd>
+/tmp/migration_2017-09-27.sql
+</kbd>
+
+<p>
+	the file may contain something like:
+</p>
+
+<kbd>
+CREATE TABLE `book` ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ;<br>
+ALTER TABLE `book` ADD `title` TEXT ;
+</kbd>
+
