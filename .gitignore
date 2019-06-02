@@ -1,0 +1,42 @@
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.pyc
+
+# Logs and databases #
+######################
+*.log
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+/.project
+/.settings/org.eclipse.php.core.prefs
+/.settings/org.eclipse.php.debug.core.Debug_Process_Preferences.prefs
+/rb.phar
+/rb.php
+/rb-mysql.php
+/rb-postgres.php
+/rb-sqlite.php
+build/
+
+#manual#
+.travis.yml
+README.markdown
+composer.json
+deepfreeze.php
+p533patch.php
+replica2-win.php
+replica2.php
+run_all_tests.sh
+run_single_test.sh
+test-dist.ini
+
