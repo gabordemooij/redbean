@@ -529,6 +529,18 @@ Just open your composer.json file and add the package name (e.g. "gabordemooij/r
 	of RedBeanPHP!
 </p>
 
+<p class="note">
+	Did you receive a connection error?<br>
+	Note that PDO errors are not passed to the client as under certain circumstances they can reveal secrets (such as passwords). To see exact error messages you must create a direct PDO connection without RedBeanPHP. A sample is shown below:
+</p>
+
+<?php code("
+	try{
+		\$db = new database('hostname','username','password','database_name');
+	} catch(PDOException \$e){
+		echo \$e->getmessage();
+	}
+");?>
 
 <h2>PostgreSQL</h2>
 <p>
