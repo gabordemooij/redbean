@@ -536,7 +536,7 @@ Just open your composer.json file and add the package name (e.g. "gabordemooij/r
 
 <?php code("
 	try{
-		\$db = new database('hostname','username','password','database_name');
+		\$db = new PDO('mysql:host=HOSTNAME;dbnname=TABLE_NAME','USERNAME','PASSWORD');
 	} catch(PDOException \$e){
 		echo \$e->getmessage();
 	}
