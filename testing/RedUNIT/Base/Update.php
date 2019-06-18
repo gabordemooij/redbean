@@ -42,6 +42,15 @@ class Update extends Base
 		$database = $toolbox->getDatabaseAdapter()->getDatabase();
 		$logger = new Logger;
 		$database->setLogger( $logger );
+
+		// Modifying the schema may cause multiple DESCRIBES, so
+		// make sure the columns exist first
+		$bean = R::dispense('bean');
+		$bean->property1 = 'test';
+		$bean->property2 = 'test';
+		R::store( $bean );
+
+		// Now the schema exists, so further stores should be very efficient
 		$bean = R::dispense('bean');
 		$bean->property1 = 'test';
 		$bean->property2 = 'test'; //should not cause 2nd DESCRIBE.
@@ -55,6 +64,8 @@ class Update extends Base
 			count( $logger->grep('PRAGMA table_info') )
 		, 1);
 		R::stopLogging();
+
+
 		//new round, same results, no cache between beans
 		R::nuke();
 
