@@ -191,48 +191,6 @@ class Fluid extends Repository
 	}
 
 	/**
-	 * Stores a cleaned bean; i.e. only scalar values. This is the core of the store()
-	 * method. When all lists and embedded beans (parent objects) have been processed and
-	 * removed from the original bean the bean is passed to this method to be stored
-	 * in the database.
-	 *
-	 * @param OODBBean $bean the clean bean
-	 *
-	 * @return void
-	 */
-	protected function storeBean( OODBBean $bean )
-	{
-		if ( $bean->getMeta( 'changed' ) ) {
-			$this->check( $bean );
-			$table = $bean->getMeta( 'type' );
-			$this->createTableIfNotExists( $bean, $table );
-
-			$updateValues = array();
-
-			$partial = ( $this->partialBeans === TRUE || ( is_array( $this->partialBeans ) && in_array( $table, $this->partialBeans ) ) );
-			if ( $partial ) {
-				$mask = $bean->getMeta( 'changelist' );
-				$bean->setMeta( 'changelist', array() );
-			}
-
-			$columnCache = NULL;
-			foreach ( $bean as $property => $value ) {
-				if ( $partial && !in_array( $property, $mask ) ) continue;
-				if ( $property !== 'id' ) {
-					$this->modifySchema( $bean, $property, $value, $columnCache );
-				}
-				if ( $property !== 'id' ) {
-					$updateValues[] = array( 'property' => $property, 'value' => $value );
-				}
-			}
-
-			$bean->id = $this->writer->updateRecord( $table, $updateValues, $bean->id );
-			$bean->setMeta( 'changed', FALSE );
-		}
-		$bean->setMeta( 'tainted', FALSE );
-	}
-
-	/**
 	 * Stores cleaned beans; i.e. only scalar values. This is the core of the store()
 	 * method. When all lists and embedded beans (parent objects) have been processed and
 	 * removed from the original bean the bean is passed to this method to be stored
@@ -242,7 +200,7 @@ class Fluid extends Repository
 	 *
 	 * @return void
 	 */
-	protected function storeAllBeans( $beans )
+	protected function storeCleanedBeans( $beans )
 	{
 		$tables = array();
 		foreach ( $beans as $bean ) {
@@ -259,16 +217,15 @@ class Fluid extends Repository
 			$columnCache = NULL;
 			$alreadySeenBeanForThisTable = false;
 			foreach ( $beans as $bean ) {
-				if ( $bean->getMeta( 'changed' ) && $table == $bean->getMeta( 'type' ) ) {
+				if ( $bean->getMeta( 'changed' ) && $table === $bean->getMeta( 'type' ) ) {
 					if ( !$alreadySeenBeanForThisTable ) {
-						$this->createTableIfNotExists($bean, $table);
+						$this->createTableIfNotExists( $bean, $table );
 						$alreadySeenBeanForThisTable = true;
 					}
 
 					$partial = ( $this->partialBeans === TRUE || ( is_array( $this->partialBeans ) && in_array( $table, $this->partialBeans ) ) );
 					if ( $partial ) {
 						$mask = $bean->getMeta( 'changelist' );
-						$bean->setMeta( 'changelist', array() );
 					}
 
 					foreach ( $bean as $property => $value ) {
@@ -282,7 +239,7 @@ class Fluid extends Repository
 
 			// Now update the records
 			foreach ( $beans as $bean ) {
-				if ( $bean->getMeta( 'changed' ) && $table == $bean->getMeta( 'type' ) ) {
+				if ( $bean->getMeta( 'changed' ) && $table === $bean->getMeta( 'type' ) ) {
 					$updateValues = array();
 
 					$partial = ( $this->partialBeans === TRUE || ( is_array( $this->partialBeans ) && in_array( $table, $this->partialBeans ) ) );

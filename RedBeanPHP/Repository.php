@@ -118,7 +118,7 @@ abstract class Repository
 				}
 			}
 		}
-		$this->storeBean( $bean );
+		$this->storeCleanedBeans( array( $bean ) );
 		$this->processTrashcan( $bean, $ownTrashcan );
 		$this->processAdditions( $bean, $ownAdditions );
 		$this->processResidue( $ownresidue );
@@ -482,7 +482,7 @@ abstract class Repository
 		if ( $processLists ) {
 			$this->storeBeanWithLists( $bean );
 		} else {
-			$this->storeBean( $bean );
+			$this->storeCleanedBeans( array( $bean ) );
 		}
 		$this->oodb->signal( 'after_update', $bean );
 
@@ -531,7 +531,7 @@ abstract class Repository
 		}
 		unset($bean);
 
-		$this->storeAllBeans( $beans );
+		$this->storeCleanedBeans( $beans );
 
 		foreach ( $postProcessing as $arr ) {
 			$this->processTrashcan( $arr['bean'], $arr['ownTrashcan'] );

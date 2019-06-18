@@ -63,7 +63,7 @@ class Frozen extends Repository
 	 *
 	 * @return void
 	 */
-	protected function storeBean( OODBBean $bean )
+	private function storeBean( OODBBean $bean )
 	{
 		if ( $bean->getMeta( 'changed' ) ) {
 
@@ -100,7 +100,7 @@ class Frozen extends Repository
 	 *
 	 * @return void
 	 */
-	protected function storeAllBeans( $beans )
+	protected function storeCleanedBeans( $beans )
 	{
 		foreach ( $beans as $bean ) {
 			$this->storeBean( $bean );
