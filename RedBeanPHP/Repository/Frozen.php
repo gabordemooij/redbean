@@ -90,7 +90,24 @@ class Frozen extends Repository
 		$bean->setMeta( 'tainted', FALSE );
 	}
 
-	/**
+    /**
+     * Stores cleaned beans; i.e. only scalar values. This is the core of the store()
+     * method. When all lists and embedded beans (parent objects) have been processed and
+     * removed from the original bean the bean is passed to this method to be stored
+     * in the database.
+     *
+     * @param array $beans the clean beans
+     *
+     * @return void
+     */
+    protected function storeAllBeans( $beans )
+    {
+        foreach ( $beans as $bean ) {
+            $this->storeBean( $bean );
+        }
+    }
+
+    /**
 	 * Part of the store() functionality.
 	 * Handles all new additions after the bean has been saved.
 	 * Stores addition bean in own-list, extracts the id and

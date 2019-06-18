@@ -122,7 +122,32 @@ class OODB extends Observable
 		return $bean;
 	}
 
-	/**
+    /**
+     * Unboxes an array of beans from a FUSE model if needed and checks whether the beans are
+     * instances of OODBBean.
+     *
+     * @param array $beans beans you wish to unbox
+     *
+     * @return array
+     */
+    protected function unboxAllIfNeeded( $beans )
+    {
+        $results = array();
+
+        foreach ($beans as $bean) {
+            if ($bean instanceof SimpleModel) {
+                $bean = $bean->unbox();
+            }
+            if (!($bean instanceof OODBBean)) {
+                throw new RedException('OODB Store require only beans, got: ' . gettype($bean));
+            }
+            $results[] = $bean;
+        }
+
+        return $results;
+    }
+
+    /**
 	 * Constructor, requires a query writer.
 	 * Most of the time, you do not need to use this constructor,
 	 * since the facade takes care of constructing and wiring the
@@ -384,15 +409,43 @@ class OODB extends Observable
 	 */
 	public function store( $bean )
 	{
-		$bean = $this->unboxIfNeeded( $bean );
-		$id = $this->repository->store( $bean );
-		if ( self::$autoClearHistoryAfterStore ) {
-				$bean->clearHistory();
-		}
-		return $id;
+	    $arr = $this->storeAll(array($bean));
+	    return reset($arr);
 	}
 
-	/**
+    /**
+     * Stores an array of bean in the database. This method takes an array
+     * of OODBBean Bean Objects $beans and stores them
+     * in the database. If the database schema is not compatible
+     * with this bean and RedBean runs in fluid mode the schema
+     * will be altered to store the bean correctly.
+     * If the database schema is not compatible with this bean and
+     * RedBean runs in frozen mode it will throw an exception.
+     * This function returns the primary key ID of the inserted
+     * bean.
+     *
+     * The return value is an array of integers if possible. If it is not possible to
+     * represent the value as an integer a string element will be returned. We use
+     * explicit casts instead of functions to preserve performance
+     * (0.13 vs 0.28 for 10000 iterations on Core i3).
+     *
+     * @param array $beans beans to store
+     *
+     * @return array
+     */
+    public function storeAll( $beans )
+    {
+        $beans = $this->unboxAllIfNeeded( $beans );
+        $ids = $this->repository->storeAll( $beans );
+        if ( self::$autoClearHistoryAfterStore ) {
+            foreach ($beans as $bean) {
+                $bean->clearHistory();
+            }
+        }
+        return $ids;
+    }
+
+    /**
 	 * Loads a bean from the object database.
 	 * It searches for a OODBBean Bean Object in the
 	 * database. It does not matter how this bean has been stored.

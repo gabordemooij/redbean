@@ -1862,11 +1862,7 @@ class Facade
 	 */
 	public static function storeAll( $beans )
 	{
-		$ids = array();
-		foreach ( $beans as $bean ) {
-			$ids[] = self::store( $bean );
-		}
-		return $ids;
+        return self::$redbean->storeAll( $beans );
 	}
 
 	/**
