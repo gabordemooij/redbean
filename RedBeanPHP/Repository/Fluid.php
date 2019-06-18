@@ -258,8 +258,11 @@ class Fluid extends Repository
 					$bean->id = $this->writer->updateRecord( $table, $updateValues, $bean->id );
 					$bean->setMeta( 'changed', FALSE );
 				}
-				$bean->setMeta( 'tainted', FALSE );
 			}
+		}
+
+		foreach ( $beans as $bean ) {
+			$bean->setMeta( 'tainted', FALSE );
 		}
 	}
 
