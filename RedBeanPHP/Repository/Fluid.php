@@ -118,11 +118,13 @@ class Fluid extends Repository
 					$this->writer->widenColumn( $table, $property, $typeno );
 					$bean->setMeta( 'buildreport.flags.widen', TRUE );
 					$doFKStuff = TRUE;
+					$columns = NULL;    // Flush column cache
 				}
 			} else {
 				$this->writer->addColumn( $table, $property, $typeno );
 				$bean->setMeta( 'buildreport.flags.addcolumn', TRUE );
 				$doFKStuff = TRUE;
+				$columns = NULL;    // Flush column cache
 			}
 			if ($doFKStuff) {
 				if (strrpos($columnNoQ, '_id')===(strlen($columnNoQ)-3)) {
