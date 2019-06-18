@@ -1862,7 +1862,7 @@ class Facade
 	 */
 	public static function storeAll( $beans )
 	{
-        return self::$redbean->storeAll( $beans );
+		return self::$redbean->storeAll( $beans );
 	}
 
 	/**

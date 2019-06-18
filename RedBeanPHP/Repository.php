@@ -490,112 +490,112 @@ abstract class Repository
 	}
 
 	private function storeBeansThatMightHaveLists( $beans )
-    {
-        $postProcessing = array();
-        foreach ($beans as &$bean) {
-            $sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = $ownAdditions = $ownTrashcan = $ownresidue = $embeddedBeans = array(); //Define groups
-            foreach ( $bean as $property => $value ) {
-                $value = ( $value instanceof SimpleModel ) ? $value->unbox() : $value;
-                if ( $value instanceof OODBBean ) {
-                    $this->processEmbeddedBean( $embeddedBeans, $bean, $property, $value );
-                    $bean->setMeta("sys.typeof.{$property}", $value->getMeta('type'));
-                } elseif ( is_array( $value ) ) {
-                    foreach($value as &$item) {
-                        $item = ( $item instanceof SimpleModel ) ? $item->unbox() : $item;
-                    }
-                    $originals = $bean->moveMeta( 'sys.shadow.' . $property, array() );
-                    if ( strpos( $property, 'own' ) === 0 ) {
-                        list( $ownAdditions, $ownTrashcan, $ownresidue ) = $this->processGroups( $originals, $value, $ownAdditions, $ownTrashcan, $ownresidue );
-                        $listName = lcfirst( substr( $property, 3 ) );
-                        if ($bean->moveMeta( 'sys.exclusive-'.  $listName ) ) {
-                            OODBBean::setMetaAll( $ownTrashcan, 'sys.garbage', TRUE );
-                            OODBBean::setMetaAll( $ownAdditions, 'sys.buildcommand.fkdependson', $bean->getMeta( 'type' ) );
-                        }
-                        unset( $bean->$property );
-                    } elseif ( strpos( $property, 'shared' ) === 0 ) {
-                        list( $sharedAdditions, $sharedTrashcan, $sharedresidue ) = $this->processGroups( $originals, $value, $sharedAdditions, $sharedTrashcan, $sharedresidue );
-                        unset( $bean->$property );
-                    }
-                }
-            }
+	{
+		$postProcessing = array();
+		foreach ($beans as &$bean) {
+			$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = $ownAdditions = $ownTrashcan = $ownresidue = $embeddedBeans = array(); //Define groups
+			foreach ( $bean as $property => $value ) {
+				$value = ( $value instanceof SimpleModel ) ? $value->unbox() : $value;
+				if ( $value instanceof OODBBean ) {
+					$this->processEmbeddedBean( $embeddedBeans, $bean, $property, $value );
+					$bean->setMeta("sys.typeof.{$property}", $value->getMeta('type'));
+				} elseif ( is_array( $value ) ) {
+					foreach($value as &$item) {
+						$item = ( $item instanceof SimpleModel ) ? $item->unbox() : $item;
+					}
+					$originals = $bean->moveMeta( 'sys.shadow.' . $property, array() );
+					if ( strpos( $property, 'own' ) === 0 ) {
+						list( $ownAdditions, $ownTrashcan, $ownresidue ) = $this->processGroups( $originals, $value, $ownAdditions, $ownTrashcan, $ownresidue );
+						$listName = lcfirst( substr( $property, 3 ) );
+						if ($bean->moveMeta( 'sys.exclusive-'.  $listName ) ) {
+							OODBBean::setMetaAll( $ownTrashcan, 'sys.garbage', TRUE );
+							OODBBean::setMetaAll( $ownAdditions, 'sys.buildcommand.fkdependson', $bean->getMeta( 'type' ) );
+						}
+						unset( $bean->$property );
+					} elseif ( strpos( $property, 'shared' ) === 0 ) {
+						list( $sharedAdditions, $sharedTrashcan, $sharedresidue ) = $this->processGroups( $originals, $value, $sharedAdditions, $sharedTrashcan, $sharedresidue );
+						unset( $bean->$property );
+					}
+				}
+			}
 
-            $postProcessing[] = array(
-                'bean' => $bean,
-                'sharedAdditions' => $sharedAdditions,
-                'sharedTrashcan' => $sharedTrashcan,
-                'sharedresidue' => $sharedresidue,
-                'ownAdditions' => $ownAdditions,
-                'ownTrashcan' => $ownTrashcan,
-                'ownresidue' => $ownresidue
-            );
-        }
-        unset($bean);
+			$postProcessing[] = array(
+				'bean' => $bean,
+				'sharedAdditions' => $sharedAdditions,
+				'sharedTrashcan' => $sharedTrashcan,
+				'sharedresidue' => $sharedresidue,
+				'ownAdditions' => $ownAdditions,
+				'ownTrashcan' => $ownTrashcan,
+				'ownresidue' => $ownresidue
+			);
+		}
+		unset($bean);
 
-        $this->storeAllBeans( $beans );
+		$this->storeAllBeans( $beans );
 
-        foreach ($postProcessing as $arr) {
-            $this->processTrashcan( $arr['bean'], $arr['ownTrashcan'] );
-            $this->processAdditions( $arr['bean'], $arr['ownAdditions'] );
-            $this->processResidue( $arr['ownresidue'] );
-            $this->processSharedTrashcan( $arr['bean'], $arr['sharedTrashcan'] );
-            $this->processSharedAdditions( $arr['bean'], $arr['sharedAdditions'] );
-            $this->processSharedResidue( $arr['bean'], $arr['sharedresidue'] );
-        }
-    }
+		foreach ( $postProcessing as $arr ) {
+			$this->processTrashcan( $arr['bean'], $arr['ownTrashcan'] );
+			$this->processAdditions( $arr['bean'], $arr['ownAdditions'] );
+			$this->processResidue( $arr['ownresidue'] );
+			$this->processSharedTrashcan( $arr['bean'], $arr['sharedTrashcan'] );
+			$this->processSharedAdditions( $arr['bean'], $arr['sharedAdditions'] );
+			$this->processSharedResidue( $arr['bean'], $arr['sharedresidue'] );
+		}
+	}
 
-    /**
-     * Stores an array of beans in the database. This method takes an array
-     * of OODBBean Bean Objects $beans and stores it
-     * in the database. If the database schema is not compatible
-     * with this bean and RedBean runs in fluid mode the schema
-     * will be altered to store the bean correctly.
-     * If the database schema is not compatible with this bean and
-     * RedBean runs in frozen mode it will throw an exception.
-     * This function returns the primary key ID of the inserted
-     * bean.
-     *
-     * The return value is an integer if possible. If it is not possible to
-     * represent the value as an integer a string will be returned. We use
-     * explicit casts instead of functions to preserve performance
-     * (0.13 vs 0.28 for 10000 iterations on Core i3).
-     *
-     * @param array $beans beans to store
-     *
-     * @return array
-     */
-    public function storeAll( $beans )
-    {
-        $weHaveWorkToDo = false;
-        $ids = array();
-        foreach ($beans as $bean) {
-            $ids[] = $bean->getID();
-            $processLists = $this->hasListsOrObjects( $bean );
-            if ( $processLists || $bean->getMeta( 'tainted' ) ) {
-                $weHaveWorkToDo = true;
-            }
-        }
-        if (!$weHaveWorkToDo) {
-            return $ids;
-        }
+	/**
+	 * Stores an array of beans in the database. This method takes an array
+	 * of OODBBean Bean Objects $beans and stores it
+	 * in the database. If the database schema is not compatible
+	 * with this bean and RedBean runs in fluid mode the schema
+	 * will be altered to store the bean correctly.
+	 * If the database schema is not compatible with this bean and
+	 * RedBean runs in frozen mode it will throw an exception.
+	 * This function returns the primary key ID of the inserted
+	 * bean.
+	 *
+	 * The return value is an integer if possible. If it is not possible to
+	 * represent the value as an integer a string will be returned. We use
+	 * explicit casts instead of functions to preserve performance
+	 * (0.13 vs 0.28 for 10000 iterations on Core i3).
+	 *
+	 * @param array $beans beans to store
+	 *
+	 * @return array
+	 */
+	public function storeAll( $beans )
+	{
+		$weHaveWorkToDo = false;
+		$ids = array();
+		foreach ( $beans as $bean ) {
+			$ids[] = $bean->getID();
+			$processLists = $this->hasListsOrObjects( $bean );
+			if ( $processLists || $bean->getMeta( 'tainted' ) ) {
+				$weHaveWorkToDo = true;
+			}
+		}
+		if (!$weHaveWorkToDo) {
+			return $ids;
+		}
 
-        // Send 'update' signals on all the beans
-        foreach ($beans as $bean) {
-            $this->oodb->signal('update', $bean);
-        }
+		// Send 'update' signals on all the beans
+		foreach ( $beans as $bean ) {
+			$this->oodb->signal( 'update', $bean );
+		}
 
-        $this->storeBeansThatMightHaveLists( $beans );
+		$this->storeBeansThatMightHaveLists( $beans );
 
-        // Send 'after_update' signals on all the beans
-        $ids = array();
-        foreach ($beans as $bean) {
-            $this->oodb->signal( 'after_update', $bean );
-            $ids[] = ( (string) $bean->id === (string) (int) $bean->id ) ? (int) $bean->id : (string) $bean->id;
-        }
+		// Send 'after_update' signals on all the beans
+		$ids = array();
+		foreach ( $beans as $bean ) {
+			$this->oodb->signal( 'after_update', $bean );
+			$ids[] = ( (string) $bean->id === (string) (int) $bean->id ) ? (int) $bean->id : (string) $bean->id;
+		}
 
-        return $ids;
-    }
+		return $ids;
+	}
 
-    /**
+	/**
 	 * Returns an array of beans. Pass a type and a series of ids and
 	 * this method will bring you the corresponding beans.
 	 *
