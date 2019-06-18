@@ -31,7 +31,7 @@ class Update extends Base
 	/**
 	 * Tests whether no unncessary DESCRIBE-queries are executed,
 	 * (Commit 3b8ce88e5b796bfde6485ab0a51a4fcfb1bcf0fa by davidsickmiller).
-	 * Even thtough we add 2 properties, only 1 DESCRIBE query is necessary
+	 * Even though we have 2 properties, only 1 DESCRIBE query is necessary
 	 * to load the column cache.
 	 */
 	public function testModifySchemaColCache()
@@ -57,6 +57,15 @@ class Update extends Base
 		R::stopLogging();
 		//new round, same results, no cache between beans
 		R::nuke();
+
+		// Modifying the schema may cause multiple DESCRIBES, so
+		// make sure the columns exist first
+		$bean = R::dispense('bean');
+		$bean->property1 = 'test';
+		$bean->property2 = 'test';
+		R::store( $bean );
+
+		// Now the schema exists, so further stores should be very efficient
 		$bean = R::dispense('bean');
 		$bean->property1 = 'test';
 		$bean->property2 = 'test'; //should not cause 2nd DESCRIBE.
