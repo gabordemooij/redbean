@@ -2838,6 +2838,9 @@ class Facade
 		if ( !array_key_exists( $key, self::$toolboxes ) ) {
 			return FALSE;
 		}
+		
+		unset( self::$toolboxes[$key] );
+		
 		return TRUE;
 	}
 
