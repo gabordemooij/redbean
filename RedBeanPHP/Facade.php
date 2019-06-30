@@ -2758,10 +2758,11 @@ class Facade
 	 */
 	public static function removeToolBoxByKey( $key )
 	{
-		if ( !array_key_exists( $key, self::$toolboxes ) ) {
-			return FALSE;
+		if ( isset( self::$toolboxes[$key] ) ) {
+			unset( self::$toolboxes[$key] );
+			return TRUE;
 		}
-		return TRUE;
+		return FALSE;
 	}
 
 	/**
