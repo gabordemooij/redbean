@@ -1087,7 +1087,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$exists         = isset( $this->properties[$property] );
 
 		//If not exists and no field link and no list, bail out.
-		if ( !$exists && !isset($this->$fieldLink) && (!$isOwn && !$isShared )) {
+		if ( !$exists && !array_key_exists( $fieldLink, $this->properties ) && (!$isOwn && !$isShared )) {
 			$this->clearModifiers();
 			/**
 			 * Github issue:
@@ -1125,7 +1125,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
 
 		//If it's another bean, then we load it and return
-		if ( isset( $this->$fieldLink ) ) {
+		if ( array_key_exists( $fieldLink, $this->properties ) ) {
 			$this->__info['tainted'] = TRUE;
 			if ( isset( $this->__info["sys.parentcache.$property"] ) ) {
 				$bean = $this->__info["sys.parentcache.$property"];
@@ -1138,8 +1138,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				} else {
 					$type = $property;
 				}
-				$bean = NULL;
-				if ( !is_null( $this->properties[$fieldLink] ) ) {
+				
+				if ( $this->properties[$fieldLink] === NULL ) {
+					$bean = $redbean->dispense( $type );
+				} else {
 					$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 					//If the IDs dont match, we failed to load, so try autoresolv in that case...
 					if ( $bean->id !== $this->properties[$fieldLink] && self::$autoResolve ) {
