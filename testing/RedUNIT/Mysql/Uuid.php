@@ -39,6 +39,7 @@ class Uuid extends Mysql
 	{
 
 		R::nuke();
+		R::getWriter()->useSchemaCache( FALSE );
 
 		$createPageTableSQL = '
 			CREATE TABLE
@@ -153,6 +154,7 @@ class Uuid extends Mysql
 		$page3 = R::findOne( 'page', ' title = ? ', array( 'page 1 of book 2' ) );
 		asrt( $page3->id, $page3ID );
 		asrt( $page3->book->id, $book2ID );
+		R::getWriter()->useSchemaCache( TRUE );
 	}
 
 	/**
@@ -169,6 +171,7 @@ class Uuid extends Mysql
 		$newRedBean = new OODB( $uuidWriter );
 		$newToolBox = new ToolBox( $newRedBean, $oldAdapter, $uuidWriter );
 		R::configureFacadeWithToolbox( $newToolBox );
+		R::getWriter()->useSchemaCache( FALSE );
 
 		list( $mansion, $rooms, $ghosts, $key ) = R::dispenseAll( 'mansion,room*3,ghost*4,key' );
 		$mansion->name = 'Haunted Mansion';
@@ -322,6 +325,7 @@ class Uuid extends Mysql
 		asrt($room->countShared('ghost'), 2);
 
 		//Finally restore old toolbox
+		R::getWriter()->useSchemaCache( TRUE );
 		R::configureFacadeWithToolbox( $oldToolBox );
 	}
 }

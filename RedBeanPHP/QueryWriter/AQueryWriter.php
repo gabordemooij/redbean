@@ -1296,7 +1296,7 @@ abstract class AQueryWriter
 	/**
 	 * @see QueryWriter::wipe
 	 */
-	public function wipe( $type )
+	protected function truncate( $type )
 	{
 		$table = $this->esc( $type );
 

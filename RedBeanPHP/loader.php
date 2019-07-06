@@ -26,6 +26,7 @@ require( REDBEANPHP_MAIN_DIR . 'BeanCollection.php' );
 //Load SQL drivers
 require( REDBEANPHP_MAIN_DIR . 'QueryWriter.php' );
 require( REDBEANPHP_MAIN_DIR . 'QueryWriter/AQueryWriter.php' );
+require( REDBEANPHP_MAIN_DIR . 'QueryWriter/CachedSchemaWriter.php' );
 require( REDBEANPHP_MAIN_DIR . 'QueryWriter/MySQL.php' );
 require( REDBEANPHP_MAIN_DIR . 'QueryWriter/SQLiteT.php' );
 require( REDBEANPHP_MAIN_DIR . 'QueryWriter/PostgreSQL.php' );

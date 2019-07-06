@@ -36,7 +36,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class Firebird extends AQueryWriter implements QueryWriter
+class Firebird extends CachedSchemaWriter implements QueryWriter
 {
 	/**
 	 * Data types
@@ -149,7 +149,7 @@ class Firebird extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::getTables
 	 */
-	public function getTables()
+	public function loadTables()
 	{
 		return $this->adapter->getCol( 'SELECT RDB$RELATION_NAME FROM RDB$RELATIONS
 			WHERE RDB$VIEW_BLR IS NULL AND
@@ -159,7 +159,7 @@ class Firebird extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::createTable
 	 */
-	public function createTable( $table )
+	protected function addTable( $table )
 	{
 		$tableNoQ         = $this->esc( $table );
 		$tableSQL         = "CREATE TABLE \"{$table}\" ( id INT )";
@@ -344,7 +344,7 @@ class Firebird extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::wipeAll
 	 */
-	public function wipeAll()
+	protected function dropAll()
 	{
 		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		$tables = $this->getTables();

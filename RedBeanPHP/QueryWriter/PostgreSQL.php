@@ -22,7 +22,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class PostgreSQL extends AQueryWriter implements QueryWriter
+class PostgreSQL extends CachedSchemaWriter implements QueryWriter
 {
 	/**
 	 * Data types
@@ -199,7 +199,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::getTables
 	 */
-	public function getTables()
+	public function loadTables()
 	{
 		return $this->adapter->getCol( 'SELECT table_name FROM information_schema.tables WHERE table_schema = ANY( current_schemas( FALSE ) )' );
 	}
@@ -207,7 +207,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::createTable
 	 */
-	public function createTable( $table )
+	protected function addTable( $table )
 	{
 		$table = $this->esc( $table );
 
@@ -404,7 +404,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::wipeAll
 	 */
-	public function wipeAll()
+	protected function dropAll()
 	{
 		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		$this->adapter->exec( 'SET CONSTRAINTS ALL DEFERRED' );

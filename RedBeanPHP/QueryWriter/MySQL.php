@@ -22,7 +22,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class MySQL extends AQueryWriter implements QueryWriter
+class MySQL extends CachedSchemaWriter implements QueryWriter
 {
 	/**
 	 * Data types
@@ -175,7 +175,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::getTables
 	 */
-	public function getTables()
+	protected function loadTables()
 	{
 		return $this->adapter->getCol( 'show tables' );
 	}
@@ -183,7 +183,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::createTable
 	 */
-	public function createTable( $table )
+	protected function addTable( $table )
 	{
 		$table = $this->esc( $table );
 
@@ -401,7 +401,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::wipeAll
 	 */
-	public function wipeAll()
+	protected function dropAll()
 	{
 		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		$this->adapter->exec( 'SET FOREIGN_KEY_CHECKS = 0;' );

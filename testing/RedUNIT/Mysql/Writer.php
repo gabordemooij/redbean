@@ -479,6 +479,7 @@ class Writer extends \RedUNIT\Mysql
 		$redbean = $toolbox->getRedBean();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
+		$writer->useSchemaCache( FALSE );
 		$pdo     = $adapter->getDatabase();
 
 		$pdo->Execute( "DROP TABLE IF EXISTS `zero`" );
@@ -718,6 +719,7 @@ class Writer extends \RedUNIT\Mysql
 		$redbean->trash( $bean );
 
 		pass();
+		$writer->useSchemaCache( TRUE );
 	}
 
 	/**

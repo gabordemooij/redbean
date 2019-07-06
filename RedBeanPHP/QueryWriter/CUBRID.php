@@ -21,7 +21,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class CUBRID extends AQueryWriter implements QueryWriter
+class CUBRID extends CachedSchemaWriter implements QueryWriter
 {
 	/**
 	 * Data types
@@ -176,7 +176,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::getTables
 	 */
-	public function getTables()
+	public function loadTables()
 	{
 		$rows = $this->adapter->getCol( "SELECT class_name FROM db_class WHERE is_system_class = 'NO';" );
 
@@ -186,7 +186,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::createTable
 	 */
-	public function createTable( $table )
+	protected function addTable( $table )
 	{
 		$sql  = 'CREATE TABLE '
 			. $this->esc( $table )
@@ -341,7 +341,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::wipeAll
 	 */
-	public function wipeAll()
+	protected function dropAll()
 	{
 		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		foreach ( $this->getTables() as $t ) {

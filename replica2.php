@@ -44,6 +44,7 @@ addFile( DIR . 'Cursor/NullCursor.php');
 addFile( DIR . 'BeanCollection.php' );
 addFile( DIR . 'QueryWriter.php' );
 addFile( DIR . 'QueryWriter/AQueryWriter.php' );
+addFile( DIR . 'QueryWriter/CachedSchemaWriter.php' );
 addFile( DIR . 'QueryWriter/MySQL.php', 'mysql' );
 addFile( DIR . 'QueryWriter/SQLiteT.php', 'sqlite' );
 addFile( DIR . 'QueryWriter/PostgreSQL.php', 'postgres' );

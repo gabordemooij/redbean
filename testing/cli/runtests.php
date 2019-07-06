@@ -108,6 +108,7 @@ if ( isset( $ini['CUBRID'] ) ) {
 function activate_driver( $d )
 {
 	R::selectDatabase( $d );
+	R::getWriter()->useSchemaCache( TRUE );
 }
 
 $arguments = $_SERVER['argc'];

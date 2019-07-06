@@ -22,7 +22,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class SQLiteT extends AQueryWriter implements QueryWriter
+class SQLiteT extends CachedSchemaWriter implements QueryWriter
 {
 	/**
 	 * Data types
@@ -340,7 +340,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::getTables();
 	 */
-	public function getTables()
+	public function loadTables()
 	{
 		return $this->adapter->getCol( "SELECT name FROM sqlite_master
 			WHERE type='table' AND name!='sqlite_sequence';" );
@@ -349,7 +349,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::createTable
 	 */
-	public function createTable( $table )
+	protected function addTable( $table )
 	{
 		$table = $this->esc( $table );
 
@@ -434,7 +434,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::wipe
 	 */
-	public function wipe( $type )
+	protected function truncate( $type )
 	{
 		$table = $this->esc( $type );
 
@@ -452,7 +452,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::wipeAll
 	 */
-	public function wipeAll()
+	protected function dropAll()
 	{
 		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		$this->adapter->exec( 'PRAGMA foreign_keys = 0 ' );

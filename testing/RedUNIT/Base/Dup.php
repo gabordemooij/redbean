@@ -268,6 +268,7 @@ class Dup extends Base
 	public function testExportAllAndCache()
 	{
 		testpack( 'exportAll() and Cache' );
+		R::getWriter()->useSchemaCache( FALSE );
 
 		$can = R::dispense( 'can' )->setAttr( 'size', 3 );
 
@@ -350,6 +351,7 @@ class Dup extends Base
 		asrt( $data[0]['ownCoffee'][0]['color'], 'black' );
 
 		R::getDuplicationManager()->setCacheTables( FALSE );
+		R::getWriter()->useSchemaCache( TRUE );
 	}
 
 	/**
