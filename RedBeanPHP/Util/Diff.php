@@ -75,33 +75,42 @@ class Diff
 	public function diff( $beans, $others, $filters = array( 'created', 'modified' ), $format = '%s.%s.%s', $type = NULL )
 	{
 		$diff = array();
+
 		if ( !is_array( $beans ) ) $beans = array( $beans );
-		if ( !is_array( $others ) ) $others = array( $others );
-		foreach( $beans as $bean ) {
-			if ( !is_object( $bean ) ) continue;
+		$beansI = array();
+		foreach ( $beans as $bean ) {
 			if ( !( $bean instanceof OODBBean ) ) continue;
-			if ( $type == NULL ) $type = $bean->getMeta( 'type' );
-			foreach( $others as $other ) {
-				if ( !is_object( $other ) ) continue;
-				if ( !( $other instanceof OODBBean ) ) continue;
-				if ( $other->id == $bean->id ) {
-					foreach( $bean as $property => $value ) {
-						if ( in_array( $property, $filters ) ) continue;
-						$key = vsprintf( $format, array( $type, $bean->id, $property ) );
-						$compare = $other->{$property};
-						if ( !is_object( $value ) && !is_array( $value ) ) {
-							if ( $value != $compare ) {
-								$diff[$key] = array( $value, $compare );
-							}
-							continue;
-						} else {
-							$diff = array_merge( $diff, $this->diff( $value, $compare, $filters, $format, $key ) );
-							continue;
-						}
-					}
+			$beansI[$bean->id] = $bean;
+		}
+
+		if ( !is_array( $others ) ) $others = array( $others );
+		$othersI = array();
+		foreach ( $others as $other ) {
+			if ( !( $other instanceof OODBBean ) ) continue;
+			$othersI[$other->id] = $other;
+		}
+
+		if ( count( $beansI ) == 0 || count( $othersI ) == 0 ) {
+			return array();
+		}
+
+		$type = $type != NULL ? $type : reset($beansI)->getMeta( 'type' );
+
+		foreach( $beansI as $id => $bean ) {
+			if ( !isset( $othersI[$id] ) ) continue;
+			$other = $othersI[$id];
+			foreach( $bean as $property => $value ) {
+				if ( in_array( $property, $filters ) ) continue;
+				$key = vsprintf( $format, array( $type, $bean->id, $property ) );
+				$compare = $other->{$property};
+				if ( !is_object( $value ) && !is_array( $value ) && $value != $compare ) {
+					$diff[$key] = array( $value, $compare );
+				} else {
+					$diff = array_merge( $diff, $this->diff( $value, $compare, $filters, $format, $key ) );
 				}
 			}
 		}
+
 		return $diff;
 	}
 }
