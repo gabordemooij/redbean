@@ -265,8 +265,6 @@ class Misc extends Base
 		asrt( $bean->property, NULL );
 		asrt( ( $bean->setAttr( 'property', 2 ) instanceof OODBBean ), TRUE );
 		asrt( $bean->property, 2 );
-		asrt( preg_match( '/\d\d\d\d\-\d\d\-\d\d/', R::isoDate() ), 1 );
-		asrt( preg_match( '/\d\d\d\d\-\d\d\-\d\d\s\d\d:\d\d:\d\d/', R::isoDateTime() ), 1 );
 		$redbean = R::getRedBean();
 		$adapter = R::getDatabaseAdapter();
 		$writer  = R::getWriter();
