@@ -2050,38 +2050,6 @@ class Facade
 	}
 
 	/**
-	 * Simple convenience function, returns ISO date formatted representation
-	 * of $time.
-	 *
-	 * @param mixed $time UNIX timestamp
-	 *
-	 * @return string
-	 */
-	public static function isoDate( $time = NULL )
-	{
-		if ( !$time ) {
-			$time = time();
-		}
-
-		return @date( 'Y-m-d', $time );
-	}
-
-	/**
-	 * Simple convenience function, returns ISO date time
-	 * formatted representation
-	 * of $time.
-	 *
-	 * @param mixed $time UNIX timestamp
-	 *
-	 * @return string
-	 */
-	public static function isoDateTime( $time = NULL )
-	{
-		if ( !$time ) $time = time();
-		return @date( 'Y-m-d H:i:s', $time );
-	}
-
-	/**
 	 * Sets the database adapter you want to use.
 	 * The database adapter manages the connection to the database
 	 * and abstracts away database driver specific interfaces.
