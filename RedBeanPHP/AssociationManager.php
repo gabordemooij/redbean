@@ -276,6 +276,9 @@ class AssociationManager extends Observable
 					$type2 = $bean2->getMeta( 'type' );
 
 					$row      = $this->writer->queryRecordLink( $type1, $type2, $bean1->id, $bean2->id );
+
+					if ( !$row ) return;
+
 					$linkType = $this->getTable( array( $type1, $type2 ) );
 
 					if ( $fast ) {
