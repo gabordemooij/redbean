@@ -41,6 +41,30 @@ class Database extends Base
 	}
 
 	/**
+	 * Test for bugfix:
+	 * adhere to return type specification for R::getRow #728
+	 * public static function getRow is documented as a function
+	 * that returns an array. However, in a situation
+	 * where the resultset is empty, this returns a boolean
+	 * and causes an unexpected failure in
+	 * code like this because it is expecting an array.
+	 */
+	public function testReturnTypeGetRow()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		R::store( $book );
+		$row = R::getRow('SELECT * FROM book');
+		asrt( is_array( $row ), TRUE );
+		R::trash( $book );
+		$row = R::getRow('SELECT * FROM book');
+		asrt( is_array( $row ), TRUE );
+		R::nuke();
+		$row = R::getRow('SELECT * FROM book');
+		asrt( is_array( $row ), TRUE );
+	}
+
+	/**
 	 * Test the (protected) database capability checker method
 	 * of the RedBeanPHP PDO driver (RPDO).
 	 */

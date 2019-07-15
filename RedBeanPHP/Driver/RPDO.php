@@ -527,7 +527,12 @@ class RPDO implements Driver
 	public function GetRow( $sql, $bindings = array() )
 	{
 		$arr = $this->GetAll( $sql, $bindings );
-		return reset( $arr );
+
+		if ( is_array( $arr ) && count( $arr ) ) {
+			return reset( $arr );
+		}
+
+		return array();
 	}
 
 	/**
