@@ -71,11 +71,14 @@ class Association extends Base
 		$ghost = R::dispense( 'ghost' );
 		$house = R::dispense( 'house' );
 		$house->sharedGhost[] = $ghost;
+		R::store($house);
 		\Model_Ghost_House::$deleted = FALSE;
 		R::getRedBean()->getAssociationManager()->unassociate( $house, $ghost );
 		// No fast-track, assoc bean got trashed
 		asrt( \Model_Ghost_House::$deleted, TRUE );
 		\Model_Ghost_House::$deleted = FALSE;
+		$house->sharedGhost[] = $ghost;
+		R::store($house);
 		R::getRedBean()->getAssociationManager()->unassociate( $house, $ghost, TRUE );
 		// Fast-track, assoc bean got deleted right away
 		asrt( \Model_Ghost_House::$deleted, FALSE );
