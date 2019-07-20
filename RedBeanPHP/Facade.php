@@ -653,7 +653,10 @@ class Facade
 	 */
 	public static function load( $type, $id, $snippet = NULL )
 	{
-		if ( $snippet !== NULL ) self::$writer->setSQLSelectSnippet( $snippet );
+		if ( $snippet !== NULL ) {
+			self::$writer->clearCache();
+			self::$writer->setSQLSelectSnippet( $snippet );
+		}
 		$bean = self::$redbean->load( $type, $id );
 		return $bean;
 	}
@@ -680,6 +683,35 @@ class Facade
 	public static function loadForUpdate( $type, $id )
 	{
 		return self::load( $type, $id, AQueryWriter::C_SELECT_SNIPPET_FOR_UPDATE );
+	}
+
+	/**
+	 * Same as find(), but selects the beans for update, thus locking the beans.
+	 * This equals an SQL query like 'SELECT ... FROM ... FOR UPDATE'.
+	 * Use this method if you want to load a bean you intend to UPDATE.
+	 * This method should be used to 'LOCK a bean'.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $bean = R::findForUpdate(
+	 *    'bean',
+	 *    ' title LIKE ? ',
+	 *    array('title')
+	 * );
+	 * ...update...
+	 * R::store( $bean );
+	 * </code>
+	 *
+	 * @param string $type     the type of bean you are looking for
+	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array  $bindings array of values to be bound to parameters in query
+	 *
+	 * @return OODBBean
+	 */
+	public static function findForUpdate( $type, $sql, $bindings = array() )
+	{
+		return self::find( $type, $sql, $bindings, AQueryWriter::C_SELECT_SNIPPET_FOR_UPDATE );
 	}
 
 	/**
@@ -850,8 +882,12 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function find( $type, $sql = NULL, $bindings = array() )
+	public static function find( $type, $sql = NULL, $bindings = array(), $snippet = NULL )
 	{
+		if ( $snippet !== NULL ) {
+			self::$writer->clearCache();
+			self::$writer->setSQLSelectSnippet( $snippet );
+		}
 		return self::$finder->find( $type, $sql, $bindings );
 	}
 

@@ -334,6 +334,14 @@ abstract class AQueryWriter
 	}
 
 	/**
+	 * Explicitly clears writer cache.
+	 */
+	public function clearCache()
+	{
+		$this->cache = array();
+	}
+
+	/**
 	 * Stores data from the writer in the cache under a specific key and cache tag.
 	 * A cache tag is used to make sure the cache remains consistent. In most cases the cache tag
 	 * will be the bean type, this makes sure queries associated with a certain reference type will
