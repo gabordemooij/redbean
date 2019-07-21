@@ -1352,7 +1352,7 @@ abstract class AQueryWriter
 			$this->cache = array();
 			return $count;
 		}
-		$this->cache = array()
+		$this->cache = array();
 	}
 
 	/**
