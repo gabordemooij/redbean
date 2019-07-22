@@ -1347,12 +1347,9 @@ abstract class AQueryWriter
 		if ( !is_null( $newMaxCacheSizePerType ) && $newMaxCacheSizePerType > 0 ) {
 			$this->maxCacheSizePerType = $newMaxCacheSizePerType;
 		}
-		if ( $countCache ) {
-			$count = count( $this->cache, COUNT_RECURSIVE );
-			$this->cache = array();
-			return $count;
-		}
+		$count = $countCache ? count( $this->cache, COUNT_RECURSIVE ) : NULL;
 		$this->cache = array();
+		return $count;
 	}
 
 	/**
