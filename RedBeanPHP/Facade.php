@@ -653,10 +653,7 @@ class Facade
 	 */
 	public static function load( $type, $id, $snippet = NULL )
 	{
-		if ( $snippet !== NULL ) {
-			self::$writer->clearCache();
-			self::$writer->setSQLSelectSnippet( $snippet );
-		}
+		if ( $snippet !== NULL ) self::$writer->setSQLSelectSnippet( $snippet );
 		$bean = self::$redbean->load( $type, $id );
 		return $bean;
 	}
@@ -884,10 +881,7 @@ class Facade
 	 */
 	public static function find( $type, $sql = NULL, $bindings = array(), $snippet = NULL )
 	{
-		if ( $snippet !== NULL ) {
-			self::$writer->clearCache();
-			self::$writer->setSQLSelectSnippet( $snippet );
-		}
+		if ( $snippet !== NULL ) self::$writer->setSQLSelectSnippet( $snippet );
 		return self::$finder->find( $type, $sql, $bindings );
 	}
 

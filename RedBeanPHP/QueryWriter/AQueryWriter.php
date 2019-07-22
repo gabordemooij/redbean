@@ -334,14 +334,6 @@ abstract class AQueryWriter
 	}
 
 	/**
-	 * Explicitly clears writer cache.
-	 */
-	public function clearCache()
-	{
-		$this->cache = array();
-	}
-
-	/**
 	 * Stores data from the writer in the cache under a specific key and cache tag.
 	 * A cache tag is used to make sure the cache remains consistent. In most cases the cache tag
 	 * will be the bean type, this makes sure queries associated with a certain reference type will
@@ -920,7 +912,7 @@ abstract class AQueryWriter
 	 */
 	public function queryRecord( $type, $conditions = array(), $addSql = NULL, $bindings = array() )
 	{
-		if ( $this->flagUseCache ) {
+		if ( $this->flagUseCache && $this->sqlSelectSnippet != self::C_SELECT_SNIPPET_FOR_UPDATE ) {
 			$key = $this->getCacheKey( array( $conditions, trim("$addSql {$this->sqlSelectSnippet}"), $bindings, 'select' ) );
 			if ( $cached = $this->getCached( $type, $key ) ) {
 				return $cached;
@@ -945,7 +937,7 @@ abstract class AQueryWriter
 		$this->sqlSelectSnippet = '';
 		$rows  = $this->adapter->get( $sql, $bindings );
 
-		if ( $this->flagUseCache ) {
+		if ( $this->flagUseCache && !empty( $key ) ) {
 			$this->putResultInCache( $type, $key, $rows );
 		}
 
@@ -1348,14 +1340,14 @@ abstract class AQueryWriter
 	 * Clears the internal query cache array and returns its overall
 	 * size.
 	 *
-	 * @return integer
+	 * @return mixed
 	 */
-	public function flushCache( $newMaxCacheSizePerType = NULL )
+	public function flushCache( $newMaxCacheSizePerType = NULL, $countCache = TRUE )
 	{
 		if ( !is_null( $newMaxCacheSizePerType ) && $newMaxCacheSizePerType > 0 ) {
 			$this->maxCacheSizePerType = $newMaxCacheSizePerType;
 		}
-		$count = count( $this->cache, COUNT_RECURSIVE );
+		$count = $countCache ? count( $this->cache, COUNT_RECURSIVE ) : NULL;
 		$this->cache = array();
 		return $count;
 	}
