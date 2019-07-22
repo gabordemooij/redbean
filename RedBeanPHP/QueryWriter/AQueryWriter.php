@@ -934,12 +934,12 @@ abstract class AQueryWriter
 
 		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
 		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} {$this->sqlSelectSnippet} -- keep-cache";
+		$this->sqlSelectSnippet = '';
 		$rows  = $this->adapter->get( $sql, $bindings );
 
-		if ( $this->flagUseCache && $this->sqlSelectSnippet != self::C_SELECT_SNIPPET_FOR_UPDATE ) {
+		if ( $this->flagUseCache && !empty( $key ) ) {
 			$this->putResultInCache( $type, $key, $rows );
 		}
-		$this->sqlSelectSnippet = '';
 
 		return $rows;
 	}
