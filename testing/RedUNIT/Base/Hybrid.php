@@ -59,6 +59,47 @@ class Hybrid extends Base
 	}
 
 	/**
+	 * Test whether we can use Hybrid mode to alter columns.
+	 * This won't work for SQLite.
+	 */
+	public function testHybridDataType()
+	{
+		R::nuke();
+		if ($this->currentlyActiveDriverID == 'mysql') {
+			R::exec('SET @@SESSION.sql_mode=\'STRICT_TRANS_TABLES\';');
+		}
+		if ($this->currentlyActiveDriverID == 'sqlite') return;
+		$book = R::dispense('book');
+		$book->pages = 1;
+		$id = R::store( $book );
+		R::freeze( TRUE );
+		R::setAllowHybridMode( FALSE );
+		$book->pages = 'too many';
+		try {
+			R::store( $book );
+			fail();
+		} catch(\Exception $e) {
+			pass();
+		}
+		R::setAllowHybridMode( TRUE );
+		R::debug(1);
+		try {
+			R::store( $book );
+			pass();
+		} catch(\Exception $e) {
+			fail();
+		}
+		$book = $book->fresh();
+		echo $book;
+		asrt( $book->pages, 'too many' );
+		R::setAllowHybridMode( FALSE );
+		R::freeze( FALSE );
+		if ($this->currentlyActiveDriverID == 'mysql') {
+			R::exec('SET @@SESSION.sql_mode=\'\';');
+		}
+	}
+
+	/**
 	 * Other exceptions must fall through...
 	 */
 	public function testHybridNonSQLException()
