@@ -147,6 +147,7 @@ $allPacks = array(
 	'Blackhole/Stub',
 	'Base/Productivity',
 	'Base/Quickexport',
+	'Base/Hybrid',
 	'Base/Concurrency',
 	'Base/Dispense',
 	'Base/Logging',

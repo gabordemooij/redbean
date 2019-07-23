@@ -771,5 +771,14 @@ class DiagnosticCUBRIDWriter extends \RedBeanPHP\QueryWriter\CUBRID {
 	}
 }
 
+/**
+ * Test Model that throws an exception upon update().
+ */
+class Model_Brokentoy extends \RedbeanPHP\SimpleModel {
+	public function update(){
+		throw new \Exception('Totally on purpose.');
+	}
+}
+
 
 define('REDBEAN_OODBBEAN_CLASS', '\DiagnosticBean');
