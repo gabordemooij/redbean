@@ -1953,9 +1953,11 @@ class Facade
 	 */
 	public static function trashAll( $beans )
 	{
+		$numberOfDeletion = 0;
 		foreach ( $beans as $bean ) {
-			self::trash( $bean );
+			$numberOfDeletion += self::trash( $bean );
 		}
+		return $numberOfDeletion;
 	}
 
 	/**
