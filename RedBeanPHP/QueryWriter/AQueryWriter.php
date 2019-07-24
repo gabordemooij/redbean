@@ -1251,7 +1251,7 @@ abstract class AQueryWriter
 		
 		$sql    = "DELETE FROM {$table} {$sql}";
 
-		$this->adapter->exec( $sql, $bindings );
+		return $this->adapter->exec( $sql, $bindings );
 	}
 
 	/**
