@@ -642,7 +642,7 @@ abstract class Repository
 		}
 		$bean->id = 0;
 		$this->oodb->signal( 'after_delete', $bean );
-		return $deleted ? $deleted : 0;
+		return isset($deleted) ? $deleted : 0;
 	}
 
 	/**
