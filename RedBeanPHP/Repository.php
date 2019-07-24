@@ -636,12 +636,13 @@ abstract class Repository
 			}
 		}
 		try {
-			$this->writer->deleteRecord( $bean->getMeta( 'type' ), array( 'id' => array( $bean->id ) ), NULL );
+			$deleted = $this->writer->deleteRecord( $bean->getMeta( 'type' ), array( 'id' => array( $bean->id ) ), NULL );
 		} catch ( SQLException $exception ) {
 			$this->handleException( $exception );
 		}
 		$bean->id = 0;
 		$this->oodb->signal( 'after_delete', $bean );
+		return $deleted ? $deleted : 0;
 	}
 
 	/**
