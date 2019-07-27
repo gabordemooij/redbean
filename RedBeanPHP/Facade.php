@@ -318,6 +318,24 @@ class Facade
 	}
 
 	/**
+	 * Toggles support for IS-NULL-conditions.
+	 * If IS-NULL-conditions are enabled condition arrays
+	 * for functions including findLike() are treated so that
+	 * 'field' => NULL will be interpreted as field IS NULL
+	 * instead of being skipped. Returns the previous
+	 * value of the flag.
+	 *
+	 * @param boolean $flag TRUE or FALSE
+	 *
+	 * @return boolean
+	 */
+	public static function useISNULLConditions( $mode )
+	{
+		self::getWriter()->flushCache(); /* otherwise same queries might fail (see Unit test XNull) */
+		return AQueryWriter::useISNULLConditions( $mode );
+	}
+
+	/**
 	 * Wraps a transaction around a closure or string callback.
 	 * If an Exception is thrown inside, the operation is automatically rolled back.
 	 * If no Exception happens, it commits automatically.

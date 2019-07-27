@@ -23,6 +23,30 @@ use RedBeanPHP\OODBBean as OODBBean;
 class Xnull extends Base
 {
 	/**
+	 * Tests whether we can create queries containing IS-NULL with
+	 * the IS-NULL-Condition flag.
+	 */
+	public function testISNULLConditions()
+	{
+		R::nuke();
+		R::useISNULLConditions( FALSE );
+		$book = R::dispense('book');
+		$book->title = 'Much ado about Null';
+		R::store( $book );
+		$book = R::dispense('book');
+		$book->title = NULL;
+		R::store( $book );
+		$books = R::findLike('book', array( 'title' => NULL ) );
+		asrt(count($books), 2);
+		$wasFalse = R::useISNULLConditions( TRUE );
+		asrt( $wasFalse, FALSE );
+		$books = R::findLike('book', array( 'title' => NULL ) );
+		asrt(count($books), 1);
+		$books = R::find('book', ' title = :title ',  array( 'title' => NULL ) );
+		asrt(count($books), 0);
+	}
+
+	/**
 	 * Test Null bindings.
 	 */
 	public function testBindings()

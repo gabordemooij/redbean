@@ -57,6 +57,7 @@ class Feature
 				R::noNuke( TRUE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );
+				R::useISNULLConditions( TRUE );
 				break;
 			case "latest":
 			case "5.4":

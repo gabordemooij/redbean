@@ -54,6 +54,11 @@ abstract class AQueryWriter
 	protected static $flagUseJSONColumns = FALSE;
 
 	/**
+	 * @var boolean
+	 */
+	protected static $enableISNULLConditions = FALSE;
+
+	/**
 	 * @var array
 	 */
 	public static $renames = array();
@@ -102,6 +107,25 @@ abstract class AQueryWriter
 	 * @var bool
 	 */
 	protected static $noNuke = false;
+
+	/**
+	 * Toggles support for IS-NULL-conditions.
+	 * If IS-NULL-conditions are enabled condition arrays
+	 * for functions including findLike() are treated so that
+	 * 'field' => NULL will be interpreted as field IS NULL
+	 * instead of being skipped. Returns the previous
+	 * value of the flag.
+	 *
+	 * @param boolean $flag TRUE or FALSE
+	 *
+	 * @return boolean
+	 */
+	public static function useISNULLConditions( $flag )
+	{
+		$old = self::$enableISNULLConditions;
+		self::$enableISNULLConditions = $flag;
+		return $old;
+	}
 
 	/**
 	 * Toggles support for automatic generation of JSON columns.
@@ -388,7 +412,9 @@ abstract class AQueryWriter
 		$sqlConditions = array();
 		foreach ( $conditions as $column => $values ) {
 			if ( $values === NULL ) {
-				$sqlConditions[] = $this->esc( $column ) . ' IS NULL';
+				if ( self::$enableISNULLConditions ) {
+					$sqlConditions[] = $this->esc( $column ) . ' IS NULL';
+				}
 				continue;
 			}
 
