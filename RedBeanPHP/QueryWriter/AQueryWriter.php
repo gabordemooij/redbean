@@ -387,7 +387,10 @@ abstract class AQueryWriter
 
 		$sqlConditions = array();
 		foreach ( $conditions as $column => $values ) {
-			if ( $values === NULL ) continue;
+			if ( $values === NULL ) {
+				$sqlConditions[] = $this->esc( $column ) . ' IS NULL';
+				continue;
+			}
 
 			if ( is_array( $values ) ) {
 				if ( empty( $values ) ) continue;
