@@ -424,7 +424,7 @@ class Facade
 		$writerClass = '\\RedBeanPHP\\QueryWriter\\'.$writers[$wkey];
 		$writer      = new $writerClass( $adapter );
 		$redbean     = new OODB( $writer, $frozen );
-		
+
 		if ( $partialBeans ) {
 			$redbean->getCurrentRepository()->usePartialBeans( $partialBeans );
 		}
@@ -931,6 +931,7 @@ class Facade
 	 * @param string $type     the type of bean you are looking for
 	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $bindings array of values to be bound to parameters in query
+	 * @param string $snippet  SQL snippet to include in query (for example: FOR UPDATE)
 	 *
 	 * @return array
 	 */
@@ -2931,9 +2932,7 @@ class Facade
 		if ( !array_key_exists( $key, self::$toolboxes ) ) {
 			return FALSE;
 		}
-		
 		unset( self::$toolboxes[$key] );
-		
 		return TRUE;
 	}
 

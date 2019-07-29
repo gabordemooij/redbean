@@ -156,7 +156,7 @@ class DBAdapter extends Observable implements Adapter
 		}
 
 		$assoc = array();
-		
+
 		foreach ( $rows as $row ) {
 			if ( empty( $row ) ) continue;
 

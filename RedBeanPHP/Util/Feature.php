@@ -9,7 +9,7 @@ use RedBeanPHP\Facade as R;
  * The Feature Utility class provides an easy way to turn
  * on or off features. This allows us to introduce new features
  * without accidentally breaking backward compatibility.
- * 
+ *
  * @file    RedBeanPHP/Util/Feature.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

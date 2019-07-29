@@ -29,7 +29,7 @@ class NullCursor implements Cursor
 	{
 		return NULL;
 	}
-	
+
 	/**
 	 * @see Cursor::reset
 	 */

@@ -954,7 +954,7 @@ abstract class AQueryWriter
 		if ( count( self::$sqlFilters ) ) {
 			$sqlFilterStr = $this->getSQLFilterSnippet( $type );
 		}
-		
+
 		if ( is_array ( $conditions ) && !empty ( $conditions ) ) {
 			$sql = $this->makeSQLFromConditions( $conditions, $bindings, $addSql );
 		} else {
@@ -1277,7 +1277,7 @@ abstract class AQueryWriter
 		} else {
 			$sql = $this->glueSQLCondition( $addSql );
 		}
-		
+
 		$sql    = "DELETE FROM {$table} {$sql}";
 
 		return $this->adapter->exec( $sql, $bindings );

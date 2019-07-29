@@ -12,7 +12,7 @@ use RedBeanPHP\Finder;
  *
  * The Look Utility class provides an easy way to generate
  * tables and selects (pulldowns) from the database.
- * 
+ *
  * @file    RedBeanPHP/Util/Look.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

@@ -78,7 +78,7 @@ class BeanCollection
 		}
 		return NULL;
 	}
-	
+
 	/**
 	 * Resets the collection from the start, like a fresh() on a bean.
 	 *

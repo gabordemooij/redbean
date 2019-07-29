@@ -24,7 +24,7 @@ use RedBeanPHP\RedException\SQL as SQLException;
  * RedBeanPHP Firebird/Interbase QueryWriter.
  * This is a QueryWriter class for RedBeanPHP.
  * This QueryWriter provides support for the Firebird/Interbase database platform.
- * 
+ *
  * *** Warning - Experimental Software | Not ready for Production ****
  *
  * @file    RedBeanPHP/QueryWriter/Firebird.php
@@ -44,7 +44,7 @@ class Firebird extends AQueryWriter implements QueryWriter
 	const C_DATATYPE_INTEGER           = 2;
 	const C_DATATYPE_FLOAT             = 3;
 	const C_DATATYPE_TEXT              = 5;
-   
+
 	/**
 	 * @var DBAdapter
 	 */
@@ -127,11 +127,8 @@ class Firebird extends AQueryWriter implements QueryWriter
 		foreach ( $this->typeno_sqltype as $k => $v ) {
 			$this->sqltype_typeno[trim( strtoupper( $v ) )] = $k;
 		}
-	   
-		print_r($this->sqltype_typeno);
 
 		$this->adapter = $adapter;
-	   
 		$this->encoding = $this->adapter->getDatabase()->getMysqlEncoding();
 	}
 
@@ -181,7 +178,7 @@ class Firebird extends AQueryWriter implements QueryWriter
 		$this->adapter->exec( $generatorSQL2 );
 		$this->adapter->exec( $triggerSQL );
 	}
-   
+
 	/**
 	 * @see QueryWriter::widenColumn
 	 */
@@ -233,11 +230,9 @@ class Firebird extends AQueryWriter implements QueryWriter
 		if ( AQueryWriter::canBeTreatedAsInt( $value ) ) {
 			return FireBird::C_DATATYPE_INTEGER;
 		}
-	   
 		if ( !$this->startsWithZeros( $value ) && is_numeric( $value ) ) {
 			return FireBird::C_DATATYPE_DOUBLE;
 		}
-	   
 		return FireBird::C_DATATYPE_TEXT;
 	}
 

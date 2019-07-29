@@ -87,7 +87,7 @@ class RPDO implements Driver
 	 * @var string
 	 */
 	protected $mysqlCharset = '';
-	
+
 	/**
 	 * @var string
 	 */

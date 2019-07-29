@@ -54,7 +54,7 @@ class PDOCursor implements Cursor
 	{
 		return $this->res->fetch();
 	}
-	
+
 	/**
 	 * @see Cursor::reset
 	 */

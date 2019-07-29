@@ -74,7 +74,7 @@ class Tree {
 
 		return $this->oodb->convertToBeans( $type, $rows );
 	}
-	
+
 	/**
 	 * Returns all parent beans associates with the specified
 	 * bean in a tree structure.
@@ -95,6 +95,6 @@ class Tree {
 
 		$rows = $this->writer->queryRecursiveCommonTableExpression( $type, $id, TRUE, $sql, $bindings );
 
-		return $this->oodb->convertToBeans( $type, $rows );		
-	}	
+		return $this->oodb->convertToBeans( $type, $rows );
+	}
 }

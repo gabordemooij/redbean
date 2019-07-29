@@ -327,7 +327,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		if ( strpos($this->withSql, '@joined.' ) === FALSE ) {
 			return '';
 		}
-		
+
 		$joinSql = ' ';
 		$joins = array();
 		$writer   = $this->beanHelper->getToolBox()->getWriter();
@@ -344,7 +344,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		}
 		$this->withSql = implode( '', $oldParts );
 		$joinSql      .= ' WHERE ';
-		
+
 		return $joinSql;
 	}
 
@@ -1156,7 +1156,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			return $this->properties[$property];
 		}
 
-		//Implicit: elseif ( $isOwn || $isShared ) {
+		/* Implicit: elseif ( $isOwn || $isShared ) */
 		if ( $this->noLoad ) {
 			$beans = array();
 		} elseif ( $isOwn ) {
@@ -1167,7 +1167,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->properties[$property]          = $beans;
 		$this->__info["sys.shadow.$property"] = $beans;
 		$this->__info['tainted']              = TRUE;
-		
+
 		$this->clearModifiers();
 		return $this->properties[$property];
 
@@ -1248,7 +1248,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				throw new RedException( 'Cannot cast to bean.' );
 			}
 		}
-		
+
 		if ( $isFieldLink ){
 			unset( $this->properties[ $fieldName ]);
 			$this->properties[ $property ] = NULL;
@@ -1408,13 +1408,13 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		if ( empty( $this->__info['model'] ) ) {
 			return NULL;
 		}
-		
+
 		$overrideDontFail = FALSE;
 		if ( strpos( $method, '@' ) === 0 ) {
 			$method = substr( $method, 1 );
 			$overrideDontFail = TRUE;
 		}
-		
+
 		if ( !method_exists( $this->__info['model'], $method ) ) {
 
 			if ( self::$errorHandlingFUSE === FALSE || $overrideDontFail ) {

@@ -15,7 +15,7 @@ use RedBeanPHP\Finder;
  * A matchUp is a match-and-update combination in terms of beans.
  * Typically login related problems are all about a match and
  * a conditional update.
- * 
+ *
  * @file    RedBeanPHP/Util/MatchUp.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2

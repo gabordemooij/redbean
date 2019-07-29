@@ -1,7 +1,7 @@
 <?php
- 
+
 namespace RedBeanPHP\Plugin;
- 
+
 use RedBeanPHP\ToolBox;
 use RedBeanPHP\OODBBean;
 
@@ -11,7 +11,7 @@ use RedBeanPHP\OODBBean;
  * PoolDB
  *
  * Experimental plugin that makes bean automatically connect
- * to the database they come from. 
+ * to the database they come from.
  */
 
 /**
@@ -34,7 +34,7 @@ class NonStaticBeanHelper extends RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * Creates a new instance of the NonStaticBeanHelper.
 	 * The NonStaticBeanHelper is used by the database pool class PoolDB.
 	 */
@@ -58,7 +58,7 @@ class NonStaticBeanHelper extends RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper {
  * only.
  *
  * Usage:
- * 
+ *
  * <code>
  * // Let's add some databases
  * R::addPoolDatabase( 'db1', 'sqlite:/tmp/db1.txt' );
@@ -94,7 +94,7 @@ class NonStaticBeanHelper extends RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper {
  * // create pizza in db 2
  * $pizza = R::dispense('pizza');
  *
- * // switch to db3 
+ * // switch to db3
  * R::selectDatabase( 'db3' );
  *
  * // store pizza in db2
@@ -123,7 +123,7 @@ class PoolDB extends \RedBeanPHP\OODB {
 	 * @var array
 	 */
 	private static $pool = array();
-	
+
 	/**
 	 * @var ToolBox
 	 */
@@ -159,7 +159,6 @@ class PoolDB extends \RedBeanPHP\OODB {
 		$this->key = $key;
 		parent::__construct( $oodb->writer, $oodb->isFrozen );
 	}
-	
 
 	/**
 	 * Sets the toolbox to be used by the database pool.
@@ -175,10 +174,10 @@ class PoolDB extends \RedBeanPHP\OODB {
 		$this->beanHelper->key = $this->key;
 		$this->oodb->setBeanHelper( $this->beanHelper );
 	}
-	
+
 	/**
 	 * Returns the bean helper of the database pool.
-	 * 
+	 *
 	 * @return BeanHelper
 	 */
 	public function getBeanHelper()
