@@ -2,6 +2,7 @@
 
 namespace RedBeanPHP\Util;
 use RedBeanPHP\Facade as R;
+use RedBeanPHP\OODBBean;
 
 /**
  * Feature Utility
@@ -54,6 +55,7 @@ class Feature
 		switch( $label ) {
 			case "novice/latest":
 			case "novice/5.4":
+				OODBBean::useFluidCount( FALSE );
 				R::noNuke( TRUE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );
@@ -61,16 +63,19 @@ class Feature
 				break;
 			case "latest":
 			case "5.4":
+				OODBBean::useFluidCount( FALSE );
 				R::noNuke( FALSE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( TRUE );
 				break;
 			case "novice/5.3":
+				OODBBean::useFluidCount( TRUE );
 				R::noNuke( TRUE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );
 				break;
 			case "5.3":
+				OODBBean::useFluidCount( TRUE );
 				R::noNuke( FALSE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );

@@ -6,6 +6,7 @@ use RedUNIT\Base as Base;
 use RedBeanPHP\Facade as R;
 use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
+use RedBeanPHP\OODBBean;
 
 /**
  * Count
@@ -89,7 +90,12 @@ class Count extends Base
 
 		R::freeze( TRUE );
 
-		asrt( R::getRedBean()->count( "kazoo" ), 0 ); // non existing table
+		try {
+			asrt( R::getRedBean()->count( "kazoo" ), 0 ); // non existing table
+			fail();
+		} catch( \Exception $e ) {
+			pass();
+		}
 
 		R::freeze( FALSE );
 
@@ -149,4 +155,44 @@ class Count extends Base
 		asrt( $book->countShared('page'), 0 );
 	}
 
+	/**
+	 * Test $bean->countOwn($type);
+	 */
+	public function testCountOwn()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$empty = R::dispense( 'book' );
+		$nothing = R::dispense( 'book' );
+		$page = R::dispense( 'page' );
+		$book->ownPageList[] = $page;
+		R::store( $book );
+		R::store( $empty );
+		OODBBean::useFluidCount( FALSE );
+		asrt( $book->countOwn('page'), 1 );
+		asrt( $empty->countOwn('page'), 0 );
+		asrt( $nothing->countOwn('page'), 0 );
+		$old = OODBBean::useFluidCount( TRUE );
+		asrt( $old, FALSE );
+		asrt( $book->countOwn('page'), 1 );
+		asrt( $empty->countOwn('page'), 0 );
+		asrt( $nothing->countOwn('page'), 0 );
+		R::freeze( TRUE );
+		asrt( $book->countOwn('page'), 1 );
+		asrt( $empty->countOwn('page'), 0 );
+		asrt( $nothing->countOwn('page'), 0 );
+		R::freeze( FALSE );
+		R::nuke();
+		asrt( $empty->countOwn('page'), 0 );
+		asrt( $nothing->countOwn('page'), 0 );
+		R::freeze( TRUE );
+		asrt( $nothing->countOwn('page'), 0 );
+		try { asrt( $empty->countOwn('page'), 0 ); fail(); } catch(\Exception $e) { pass(); }
+		try { asrt( $book->countOwn('page'), 0 ); fail(); } catch(\Exception $e) { pass(); }
+		R::freeze( FALSE );
+		OODBBean::useFluidCount( FALSE );
+		try { asrt( $empty->countOwn('page'), 0 ); fail(); } catch(\Exception $e) { pass(); }
+		try { asrt( $book->countOwn('page'), 0 ); fail(); } catch(\Exception $e) { pass(); }
+		OODBBean::useFluidCount( TRUE );
+	}
 }
