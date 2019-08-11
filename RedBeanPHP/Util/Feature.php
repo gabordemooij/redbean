@@ -22,6 +22,14 @@ use RedBeanPHP\OODBBean;
  */
 class Feature
 {
+	/* Feature set constants */
+	const C_FEATURE_NOVICE_LATEST = 'novice/latest';
+	const C_FEATURE_LATEST        = 'latest';
+	const C_FEATURE_NOVICE_5_4    = 'novice/5.4';
+	const C_FEATURE_5_4           = '5.4';
+	const C_FEATURE_NOVICE_5_3    = 'novice/5.3';
+	const C_FEATURE_5_3           = '5.3';
+
 	/**
 	 * Selects the feature set you want as specified by
 	 * the label.
@@ -53,28 +61,28 @@ class Feature
 	 */
 	public static function feature( $label ) {
 		switch( $label ) {
-			case "novice/latest":
-			case "novice/5.4":
+			case self::C_FEATURE_NOVICE_LATEST:
+			case self::C_FEATURE_NOVICE_5_4:
 				OODBBean::useFluidCount( FALSE );
 				R::noNuke( TRUE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );
 				R::useISNULLConditions( TRUE );
 				break;
-			case "latest":
-			case "5.4":
+			case self::C_FEATURE_LATEST:
+			case self::C_FEATURE_5_4:
 				OODBBean::useFluidCount( FALSE );
 				R::noNuke( FALSE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( TRUE );
 				break;
-			case "novice/5.3":
+			case self::C_FEATURE_NOVICE_5_3:
 				OODBBean::useFluidCount( TRUE );
 				R::noNuke( TRUE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );
 				break;
-			case "5.3":
+			case self::C_FEATURE_5_3:
 				OODBBean::useFluidCount( TRUE );
 				R::noNuke( FALSE );
 				R::setAutoResolve( TRUE );
