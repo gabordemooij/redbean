@@ -2145,7 +2145,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				: 0;
 			if ( is_int( $firstKey ) ) {
 				$bindings = array_merge( array( $this->getID() ), $this->withParams );
-				var_dump( self::$useFluidCount );
 				if ( !self::$useFluidCount ) {
 					$count = $this->beanHelper->getToolbox()->getWriter()->queryRecordCount( $type, array(), "{$joinSql} $myFieldLink = ? " . $this->withSql, $bindings );
 				} else {
