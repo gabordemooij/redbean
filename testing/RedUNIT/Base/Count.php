@@ -195,4 +195,49 @@ class Count extends Base
 		try { asrt( $book->countOwn('page'), 0 ); fail(); } catch(\Exception $e) { pass(); }
 		OODBBean::useFluidCount( TRUE );
 	}
+
+	/**
+	 * Test $bean->withCondition( ... )->countOwn( $type );
+	 */
+	public function testCountWithCondition()
+	{
+		R::nuke();
+		$book = R::dispense( 'book' );
+		$book->ownPageList[] = R::dispense( 'page' );
+		R::store( $book );
+		OODBBean::useFluidCount( FALSE );
+		$count = $book
+			->withCondition(' id > :id ', array( ':id' => 0 ) )
+			->countOwn('page');
+		asrt( $count, 1 );
+		$count = $book
+			->withCondition(' id > ? ', array( 0 ) )
+			->countOwn('page');
+		asrt( $count, 1 );
+		$count = $book
+			->withCondition(' id < :id ', array( ':id' => 0 ) )
+			->countOwn('page');
+		asrt( $count, 0 );
+		$count = $book
+			->withCondition(' id < ? ', array( 0 ) )
+			->countOwn('page');
+		asrt( $count, 0 );
+		OODBBean::useFluidCount( TRUE );
+		$count = $book
+			->withCondition(' id > :id ', array( ':id' => 0 ) )
+			->countOwn('page');
+		asrt( $count, 1 );
+		$count = $book
+			->withCondition(' id > ? ', array( 0 ) )
+			->countOwn('page');
+		asrt( $count, 1 );
+		$count = $book
+			->withCondition(' id < :id ', array( ':id' => 0 ) )
+			->countOwn('page');
+		asrt( $count, 0 );
+		$count = $book
+			->withCondition(' id < ? ', array( 0 ) )
+			->countOwn('page');
+		asrt( $count, 0 );
+	}
 }
