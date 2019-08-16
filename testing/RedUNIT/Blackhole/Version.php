@@ -4,6 +4,7 @@ namespace RedUNIT\Blackhole;
 
 use RedUNIT\Blackhole as Blackhole;
 use RedBeanPHP\Facade as R;
+use RedBeanPHP\OODBBean;
 
 /**
  * Version
@@ -23,6 +24,34 @@ use RedBeanPHP\Facade as R;
  */
 class Version extends Blackhole
 {
+	/**
+	 * Returns all features as a single string of
+	 * comma separated values. For testing only.
+	 *
+	 * @return string
+	 */
+	private function getFeatureFlags()
+	{
+		$features = array();
+		$old = OODBBean::useFluidCount( TRUE );
+		OODBBean::useFluidCount( $old );
+		$features[] = intval( $old );
+		$old = R::noNuke( TRUE );
+		R::noNuke( $old );
+		$features[] = intval( $old );
+		$old = R::setAutoResolve( TRUE );
+		R::setAutoResolve( $old );
+		$features[] = intval( $old );
+		$old = R::setAllowHybridMode( TRUE );
+		R::setAllowHybridMode( $old );
+		$features[] = intval( $old );
+		$old = R::useISNULLConditions( TRUE );
+		R::useISNULLConditions( $old );
+		$features[] = intval( $old );
+		$features = implode( ',', $features );
+		return $features;
+	}
+
 	/**
 	 * Test version info.
 	 *
@@ -44,5 +73,47 @@ class Version extends Blackhole
 		asrt( class_exists( '\\RedBean_SimpleModel' ), TRUE );
 		asrt( class_exists( '\\R' ), TRUE );
 		asrt( function_exists( 'EID' ), TRUE );
+	}
+
+	/**
+	 * Test whether every label returns the correct set of
+	 * feature flags.
+	 *
+	 * @return void
+	 */
+	public function testFeature()
+	{
+		R::useFeatureSet('original');
+		asrt( $this->getFeatureFlags(), '1,0,0,0,0' );
+		R::useFeatureSet('5.3');
+		asrt( $this->getFeatureFlags(), '1,0,1,0,0' );
+		R::useFeatureSet('novice/5.3');
+		asrt( $this->getFeatureFlags(), '1,1,1,0,0' );
+		R::useFeatureSet('5.4');
+		asrt( $this->getFeatureFlags(), '0,0,1,1,1' );
+		R::useFeatureSet('latest');
+		asrt( $this->getFeatureFlags(), '0,0,1,1,1' );
+		R::useFeatureSet('novice/5.4');
+		asrt( $this->getFeatureFlags(), '0,1,1,0,1' );
+		R::useFeatureSet('novice/latest');
+		asrt( $this->getFeatureFlags(), '0,1,1,0,1' );
+		R::useFeatureSet('original');
+		asrt( $this->getFeatureFlags(), '1,0,0,0,0' );
+	}
+
+	/**
+	 * Test whether an invalid feature set label will
+	 * cause an exception.
+	 *
+	 * @return void
+	 */
+	public function testInvalidFeatureLabel()
+	{
+		try {
+			R::useFeatureSet('Invalid');
+			fail();
+		} catch( \Exception $e ) {
+			pass();
+		}
 	}
 }
