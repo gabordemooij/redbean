@@ -29,6 +29,7 @@ class Feature
 	const C_FEATURE_5_4           = '5.4';
 	const C_FEATURE_NOVICE_5_3    = 'novice/5.3';
 	const C_FEATURE_5_3           = '5.3';
+	const C_FEATURE_ORIGINAL      = 'original';
 
 	/**
 	 * Selects the feature set you want as specified by
@@ -75,18 +76,28 @@ class Feature
 				R::noNuke( FALSE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( TRUE );
+				R::useISNULLConditions( TRUE );
 				break;
 			case self::C_FEATURE_NOVICE_5_3:
 				OODBBean::useFluidCount( TRUE );
 				R::noNuke( TRUE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );
+				R::useISNULLConditions( FALSE );
 				break;
 			case self::C_FEATURE_5_3:
 				OODBBean::useFluidCount( TRUE );
 				R::noNuke( FALSE );
 				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );
+				R::useISNULLConditions( FALSE );
+				break;
+			case self::C_FEATURE_ORIGINAL:
+				OODBBean::useFluidCount( TRUE );
+				R::noNuke( FALSE );
+				R::setAutoResolve( FALSE );
+				R::setAllowHybridMode( FALSE );
+				R::useISNULLConditions( FALSE );
 				break;
 			default:
 				throw new \Exception("Unknown feature set label.");
