@@ -291,14 +291,17 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Auto-resolving aliased parent beans is convenient but can
 	 * be slower and can create infinite recursion if you
 	 * used aliases to break cyclic relations in your domain.
+	 * Returns previous value of the flag.
 	 *
 	 * @param boolean $automatic TRUE to enable automatic resolving aliased parents
 	 *
-	 * @return void
+	 * @return boolean
 	 */
 	public static function setAutoResolve( $automatic = TRUE )
 	{
+		$old = self::$autoResolve;
 		self::$autoResolve = (boolean) $automatic;
+		return $old;
 	}
 
 	/**
