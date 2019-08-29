@@ -262,36 +262,6 @@ class Fluid extends Repository
 	}
 
 	/**
-	 * Dispenses a new bean (a OODBBean Bean Object)
-	 * of the specified type. Always
-	 * use this function to get an empty bean object. Never
-	 * instantiate a OODBBean yourself because it needs
-	 * to be configured before you can use it with RedBean. This
-	 * function applies the appropriate initialization /
-	 * configuration for you.
-	 *
-	 * @param string  $type              type of bean you want to dispense
-	 * @param string  $number            number of beans you would like to get
-	 * @param boolean $alwaysReturnArray if TRUE always returns the result as an array
-	 *
-	 * @return OODBBean
-	 */
-	public function dispense( $type, $number = 1, $alwaysReturnArray = FALSE )
-	{
-		$OODBBEAN = defined( 'REDBEAN_OODBBEAN_CLASS' ) ? REDBEAN_OODBBEAN_CLASS : '\RedBeanPHP\OODBBean';
-		$beans = array();
-		for ( $i = 0; $i < $number; $i++ ) {
-			$bean = new $OODBBEAN;
-			$bean->initializeForDispense( $type, $this->oodb->getBeanHelper() );
-			$this->check( $bean );
-			$this->oodb->signal( 'dispense', $bean );
-			$beans[] = $bean;
-		}
-
-		return ( count( $beans ) === 1 && !$alwaysReturnArray ) ? array_pop( $beans ) : $beans;
-	}
-
-	/**
 	 * Loads a bean from the object database.
 	 * It searches for a OODBBean Bean Object in the
 	 * database. It does not matter how this bean has been stored.

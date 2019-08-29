@@ -377,6 +377,39 @@ abstract class Repository
 	}
 
 	/**
+	 * Dispenses a new bean (a OODBBean Bean Object)
+	 * of the specified type. Always
+	 * use this function to get an empty bean object. Never
+	 * instantiate a OODBBean yourself because it needs
+	 * to be configured before you can use it with RedBean. This
+	 * function applies the appropriate initialization /
+	 * configuration for you.
+	 *
+	 * To use a different class for beans (instead of OODBBean) set:
+	 * REDBEAN_OODBBEAN_CLASS to the name of the class to be used.
+	 *
+	 * @param string  $type              type of bean you want to dispense
+	 * @param int     $number            number of beans you would like to get
+	 * @param boolean $alwaysReturnArray if TRUE always returns the result as an array
+	 *
+	 * @return OODBBean
+	 */
+	public function dispense( $type, $number = 1, $alwaysReturnArray = FALSE )
+	{
+		$OODBBEAN = defined( 'REDBEAN_OODBBEAN_CLASS' ) ? REDBEAN_OODBBEAN_CLASS : '\RedBeanPHP\OODBBean';
+		$beans = array();
+		for ( $i = 0; $i < $number; $i++ ) {
+			$bean = new $OODBBEAN;
+			$bean->initializeForDispense( $type, $this->oodb->getBeanHelper() );
+			$this->check( $bean );
+			$this->oodb->signal( 'dispense', $bean );
+			$beans[] = $bean;
+		}
+
+		return ( count( $beans ) === 1 && !$alwaysReturnArray ) ? array_pop( $beans ) : $beans;
+	}
+
+	/**
 	 * Searches the database for a bean that matches conditions $conditions and sql $addSQL
 	 * and returns an array containing all the beans that have been found.
 	 *
