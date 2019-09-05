@@ -1493,6 +1493,20 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	}
 "); ?>
 <p>
+	Or directly
+</p>
+<?php code("
+	$cursor = R::getCursor('SELECT * FROM `book` WHERE < :rating LIMIT 5', [ ':rating' => 2 ]);
+	while($row = $cursor->getNextItem()){
+	    ...
+	}
+	//Reset and get the first item
+	$cursor->reset();
+	$first = $cursor->getNextItem();
+	
+	$cursor->close();
+"); ?>
+<p>
 	The advantage of using a cursor is that the entire collection will
 	not be loaded into memory all at once. This is handy for dealing with
 	large bean collections.
