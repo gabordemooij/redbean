@@ -1692,6 +1692,16 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	In this case, the keys will be the IDs and the values will be the titles.
 	<b>getAssocRow</b> will return complete rows.
 </p>
+<p>
+	For dynamic queries use <b>R::getWriter()-&gt;esc()</b> &amp; <b>R::getPDO()-&gt;quote()</b>	
+</p>
+<?php code("
+	\$pdo = R::getPDO();
+	\$writer = R::getWriter();
+	\$table = 'page';
+	\$value = 'unsafe_string';
+	R::exec('SELECT * FROM '.\$writer->esc(\$table).' WHERE '.\$writer->esc(\$table).'.title = '. \$pdo->quote(\$value).' LIMIT 1' ,[]);
+");?>
 <p class="note">
 	In my examples, I like to use the short array notation.
 	<br>
