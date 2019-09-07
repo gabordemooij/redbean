@@ -1700,7 +1700,7 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	\$writer = R::getWriter();
 	\$table = 'page';
 	\$value = 'unsafe_string';
-	R::exec('SELECT * FROM '.\$writer->esc(\$table).' WHERE '.\$writer->esc(\$table).'.title = '. \$pdo->quote(\$value).' LIMIT 1' ,[]);
+	\$result = R::getRow('SELECT * FROM '.\$writer->esc(\$table).' WHERE '.\$writer->esc(\$table).'.title = '. \$pdo->quote(\$value).' LIMIT 1' ,[]);
 ");?>
 <p class="note">
 	In my examples, I like to use the short array notation.
