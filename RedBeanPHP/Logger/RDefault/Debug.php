@@ -99,7 +99,7 @@ class Debug extends RDefault implements Logger
 		if ( is_null( $value ) ) if ( is_null( $value ) ) $value = 'NULL';
 
 		if ( $paramType != \PDO::PARAM_INT && $paramType != \PDO::PARAM_STR ) {
-			if ( !$this->flagUseStringOnlyBinding && \RedBeanPHP\QueryWriter\AQueryWriter::canBeTreatedAsInt( $value ) ) {
+			if ( ( !$this->flagUseStringOnlyBinding && \RedBeanPHP\QueryWriter\AQueryWriter::canBeTreatedAsInt( $value ) ) || $value === 'NULL') {
 				$paramType = \PDO::PARAM_INT;
 			} else {
 				$paramType = \PDO::PARAM_STR;
