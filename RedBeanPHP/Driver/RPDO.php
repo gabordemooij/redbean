@@ -382,6 +382,9 @@ class RPDO implements Driver
 	public function setUseStringOnlyBinding( $yesNo )
 	{
 		$this->flagUseStringOnlyBinding = (boolean) $yesNo;
+		if ( $this->loggingEnabled && $this->logger && $this->logger->setUseStringOnlyBinding) {
+			$this->logger->setUseStringOnlyBinding( $this->flagUseStringOnlyBinding );
+		}
 	}
 
 	/**
