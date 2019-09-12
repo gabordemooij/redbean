@@ -33,6 +33,11 @@ class Debug extends RDefault implements Logger
 	protected static $noCLI = FALSE;
 
 	/**
+	 * @var boolean
+	 */
+	protected $flagUseStringOnlyBinding = FALSE;
+
+	/**
 	 * Toggles CLI override. By default debugging functions will
 	 * output differently based on PHP_SAPI values. This function
 	 * allows you to override the PHP_SAPI setting. If you set
@@ -84,14 +89,28 @@ class Debug extends RDefault implements Logger
 	 */
 	protected function fillInValue( $value )
 	{
-		if ( is_null( $value ) ) $value = 'NULL';
+		if ( is_array( $value ) && count( $value ) == 2 ) {
+			$paramType = end( $value );
+			$value = reset( $value );
+		} else {
+			$paramType = NULL;
+		}
 
-		$value = strval( $value );
+		if ( is_null( $value ) ) if ( is_null( $value ) ) $value = 'NULL';
+
+		if ( $paramType != \PDO::PARAM_INT && $paramType != \PDO::PARAM_STR ) {
+			if ( !$this->flagUseStringOnlyBinding && \RedBeanPHP\QueryWriter\AQueryWriter::canBeTreatedAsInt( $value ) ) {
+				$paramType = \PDO::PARAM_INT;
+			} else {
+				$paramType = \PDO::PARAM_STR;
+			}
+		}
+
 		if ( strlen( $value ) > ( $this->strLen ) ) {
 			$value = substr( $value, 0, ( $this->strLen ) ).'... ';
 		}
 
-		if ( !\RedBeanPHP\QueryWriter\AQueryWriter::canBeTreatedAsInt( $value ) && $value !== 'NULL') {
+		if ($paramType === \PDO::PARAM_STR) {
 			$value = '\''.$value.'\'';
 		}
 
@@ -229,6 +248,21 @@ class Debug extends RDefault implements Logger
 	public function setParamStringLength( $len = 20 )
 	{
 		$this->strLen = max(0, $len);
+		return $this;
+	}
+
+	/**
+	 * Whether to bind all parameters as strings.
+	 * If set to TRUE this will cause all integers to be bound as STRINGS.
+	 * This will NOT affect NULL values.
+	 *
+	 * @param boolean $yesNo pass TRUE to bind all parameters as strings.
+	 *
+	 * @return self
+	 */
+	public function setUseStringOnlyBinding( $yesNo = false )
+	{
+		$this->flagUseStringOnlyBinding = (boolean) $yesNo;
 		return $this;
 	}
 }
