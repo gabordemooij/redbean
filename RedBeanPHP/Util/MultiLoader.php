@@ -48,18 +48,11 @@ class MultiLoader
 	 */
 	public static function load( OODB $oodb, $types, $id )
 	{
-		if ( is_string( $types ) ) {
-			$types = explode( ',', $types );
-		}
-
-		if ( !is_array( $types ) ) {
-			return array();
-		}
-
+		if ( is_string( $types ) ) $types = explode( ',', $types );
+		if ( !is_array( $types ) ) return array();
 		foreach ( $types as $k => $typeItem ) {
 			$types[$k] = $oodb->load( $typeItem, $id );
 		}
-
 		return $types;
 	}
 }
