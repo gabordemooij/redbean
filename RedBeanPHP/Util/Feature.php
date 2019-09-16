@@ -41,11 +41,13 @@ class Feature
 	 * - forbid R::nuke()
 	 * - enable automatic relation resolver based on foreign keys
 	 * - forbid R::store(All)( $bean, TRUE ) (Hybrid mode)
+	 * - use IS-NULL conditions in findLike() etc
 	 *
 	 * latest:
 	 * - allow R::nuke()
 	 * - enable auto resolve
 	 * - allow hybrid mode
+	 * - use IS-NULL conditions in findLike() etc
 	 *
 	 * novice/X or X:
 	 * - keep everything as it was in version X
