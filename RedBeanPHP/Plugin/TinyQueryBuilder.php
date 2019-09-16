@@ -3,6 +3,7 @@
 /**
  * Tiny Query Builder
  *
+ * <code>
  * $sql = build_query([
  * [               'SELECT * FROM book'],
  * [$title         ,'WHERE','title = ?'],
@@ -10,6 +11,7 @@
  * [$order         ,'ORDER BY ? ASC'],
  * [$limit         ,'LIMIT ?']
  * ]);
+ * </code>
  *
  * Now, if we have a $title and a $price the query will be:
  * 'SELECT * FROM book WHERE title = ? AND price < ? '
