@@ -194,25 +194,25 @@ class Logging extends Base
 	 */
 	public function testCanSetLogger()
 	{
-			R::nuke();
-			R::store( R::dispense( 'bean' ) );
-			$logger = new RDefault;
-			$logger->setMode( RDefault::C_LOGGER_ARRAY );
-			$database = R::getDatabaseAdapter()->getDatabase();
-			$database->setLogger( $logger );
-			asrt( $database->getLogger(), $logger );
-			$database->setEnableLogging( FALSE );
-			$logs = $logger->getLogs();
-			asrt( is_array( $logs ), TRUE );
-			asrt( count( $logs ), 0 );
-			$database->setEnableLogging( TRUE );
-			$logs = $logger->getLogs();
-			asrt( is_array( $logs ), TRUE );
-			asrt( count( $logs ), 0 );
-			R::findOne( 'bean' ); //writes 3 log entries
-			$logs = $logger->getLogs();
-			asrt( is_array( $logs ), TRUE );
-			asrt( count( $logs ), 3 );
+		R::nuke();
+		R::store( R::dispense( 'bean' ) );
+		$logger = new RDefault;
+		$logger->setMode( RDefault::C_LOGGER_ARRAY );
+		$database = R::getDatabaseAdapter()->getDatabase();
+		$database->setLogger( $logger );
+		asrt( $database->getLogger(), $logger );
+		$database->setEnableLogging( FALSE );
+		$logs = $logger->getLogs();
+		asrt( is_array( $logs ), TRUE );
+		asrt( count( $logs ), 0 );
+		$database->setEnableLogging( TRUE );
+		$logs = $logger->getLogs();
+		asrt( is_array( $logs ), TRUE );
+		asrt( count( $logs ), 0 );
+		R::findOne( 'bean' ); //writes 3 log entries
+		$logs = $logger->getLogs();
+		asrt( is_array( $logs ), TRUE );
+		asrt( count( $logs ), 3 );
 	}
 
 	/**
