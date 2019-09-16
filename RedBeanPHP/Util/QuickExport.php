@@ -68,17 +68,20 @@ class QuickExport
 
 	/**
 	 * Exposes the result of the specified SQL query as a CSV file.
+	 *
 	 * Usage:
 	 *
+	 * <code>
 	 * R::csv( 'SELECT
-	 *                 `name`,
-	 *                  population
-	 *          FROM city
-	 *          WHERE region = :region ',
-	 *          array( ':region' => 'Denmark' ),
-	 *          array( 'city', 'population' ),
-	 *          '/tmp/cities.csv'
+	 *   `name`,
+	 *   population
+	 *   FROM city
+	 *   WHERE region = :region ',
+	 *   array( ':region' => 'Denmark' ),
+	 *   array( 'city', 'population' ),
+	 *   '/tmp/cities.csv'
 	 * );
+	 * </code>
 	 *
 	 * The command above will select all cities in Denmark
 	 * and create a CSV with columns 'city' and 'population' and
