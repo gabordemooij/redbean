@@ -58,6 +58,16 @@ class Tree {
 	 *
 	 * @note this only works for databases that support
 	 * recusrive common table expressions.
+	 * 
+	 * Usage:
+	 *
+	 * <code>
+	 * $newsArticles = R::children( $newsPage, ' ORDER BY title ASC ' ) 
+	 * </code>
+	 *
+	 * Note:
+	 * This method only supports simple bindings using question marks
+	 * as slots. Named bindings are not supported.
 	 *
 	 * @param OODBBean $bean     reference bean to find children of
 	 * @param string   $sql      optional SQL snippet
@@ -81,6 +91,14 @@ class Tree {
 	 *
 	 * @note this only works for databases that support
 	 * recusrive common table expressions.
+	 *
+	 * <code>
+	 * $newsPages = R::parents( $newsArticle, ' ORDER BY title ASC ' );
+	 * </code>
+	 *
+	 * Note:
+	 * This method only supports simple bindings using question marks
+	 * as slots. Named bindings are not supported.
 	 *
 	 * @param OODBBean $bean     reference bean to find parents of
 	 * @param string   $sql      optional SQL snippet
