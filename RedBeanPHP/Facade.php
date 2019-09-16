@@ -3063,7 +3063,10 @@ class Facade
 	 * the label.
 	 *
 	 * Usage:
+	 *
+	 * <code>
 	 * R::useFeatureSet( 'novice/latest' );
+	 * </code>
 	 *
 	 * @param string $label label
 	 *
