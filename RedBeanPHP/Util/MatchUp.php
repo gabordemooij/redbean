@@ -64,6 +64,18 @@ class MatchUp
 	 * To obtain the bean, pass a variable as the sixth parameter.
 	 * The function will put the matching bean in the specified variable.
 	 *
+	 * Usage (this example resets a password in one go):
+	 *
+	 * <code>
+	 * $newpass = '1234';
+	 * $didResetPass = R::matchUp(
+	 * 'account', ' token = ? AND tokentime > ? ',
+	 * [ $token, time()-100 ],
+	 * [ 'pass' => $newpass, 'token' => '' ],
+	 * NULL,
+	 * $account );
+	 * </code>
+	 *
 	 * @param string   $type         type of bean you're looking for
 	 * @param string   $sql          SQL snippet (starting at the WHERE clause, omit WHERE-keyword)
 	 * @param array    $bindings     array of parameter bindings for SQL snippet
