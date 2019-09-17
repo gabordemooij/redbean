@@ -150,7 +150,9 @@ class Debug extends Blackhole
 	}
 
 	/**
-	 * Test facade fancyDebug function
+	 * Test facade fancyDebug function.
+	 *
+	 * @return void
 	 */
 	public function testDebug2InFacade()
 	{
