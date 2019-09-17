@@ -133,7 +133,7 @@ function set1toNAssoc( $a, \RedBeanPHP\OODBBean $bean1, \RedBeanPHP\OODBBean $be
 	$a->associate( $bean1, $bean2 );
 
 	if ( count( $a->related( $bean2, $type ) ) === 1 ) {
-		// return $this;
+		;
 	} else {
 		throw new \RedBeanPHP\RedException\SQL( "Failed to enforce 1-N Relation for $type " );
 	}
