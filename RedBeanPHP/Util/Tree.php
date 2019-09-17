@@ -63,11 +63,16 @@ class Tree {
 	 *
 	 * <code>
 	 * $newsArticles = R::children( $newsPage, ' ORDER BY title ASC ' ) 
+	 * $newsArticles = R::children( $newsPage, ' WHERE title = ? ', [ $t ] );
+	 * $newsArticles = R::children( $newsPage, ' WHERE title = :t ', [ ':t' => $t ] );
 	 * </code>
 	 *
 	 * Note:
-	 * This method only supports simple bindings using question marks
-	 * as slots. Named bindings are not supported.
+	 * You are allowed to use named parameter bindings as well as
+	 * numeric parameter bindings (using the question mark notation).
+	 * However, you can not mix. Also, if using named parameter bindings,
+	 * parameter binding key ':slot0' is reserved for the ID of the bean
+	 * and used in the query.
 	 *
 	 * @param OODBBean $bean     reference bean to find children of
 	 * @param string   $sql      optional SQL snippet
@@ -94,11 +99,16 @@ class Tree {
 	 *
 	 * <code>
 	 * $newsPages = R::parents( $newsArticle, ' ORDER BY title ASC ' );
+	 * $newsPages = R::parents( $newsArticle, ' WHERE title = ? ', [ $t ] );
+	 * $newsPages = R::parents( $newsArticle, ' WHERE title = :t ', [ ':t' => $t ] );
 	 * </code>
 	 *
 	 * Note:
-	 * This method only supports simple bindings using question marks
-	 * as slots. Named bindings are not supported.
+	 * You are allowed to use named parameter bindings as well as
+	 * numeric parameter bindings (using the question mark notation).
+	 * However, you can not mix. Also, if using named parameter bindings,
+	 * parameter binding key ':slot0' is reserved for the ID of the bean
+	 * and used in the query.
 	 *
 	 * @param OODBBean $bean     reference bean to find parents of
 	 * @param string   $sql      optional SQL snippet

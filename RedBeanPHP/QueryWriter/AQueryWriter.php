@@ -1245,7 +1245,14 @@ abstract class AQueryWriter
 		$alias     = $up ? 'parent' : 'child';
 		$direction = $up ? " {$alias}.{$type}_id = {$type}.id " : " {$alias}.id = {$type}.{$type}_id ";
 
-		array_unshift( $bindings, $id );
+		/* allow numeric and named param bindings, if '0' exists then numeric */
+		if ( array_key_exists( 0,$bindings ) ) {
+			array_unshift( $bindings, $id );
+			$idSlot = '?';
+		} else {
+			$idSlot = ':slot0';
+			$bindings[$idSlot] = $id;
+		}
 
 		$sql = $this->glueSQLCondition( $addSql, QueryWriter::C_GLUE_WHERE );
 
@@ -1253,7 +1260,7 @@ abstract class AQueryWriter
 			WITH RECURSIVE tree AS
 			(
 				SELECT *
-				FROM {$type} WHERE {$type}.id = ?
+				FROM {$type} WHERE {$type}.id = {$idSlot}
 				UNION ALL
 				SELECT {$type}.* FROM {$type}
 				INNER JOIN tree {$alias} ON {$direction}

@@ -71,7 +71,13 @@ class Trees extends Postgres
 		asrt( $this->summarize( R::children( $winePage, ' ORDER BY title ASC ' ) ), 'whiskies,wines' );
 		asrt( $this->summarize( R::children( $winePage, ' title NOT IN (\'wines\') ORDER BY title ASC ' ) ), 'whiskies' );
 		asrt( $this->summarize( R::parents( $winePage, '  title NOT IN (\'home\') ORDER BY title ASC ' ) ), 'shop,wines' );
+		asrt( $this->summarize( R::parents( $winePage, ' ORDER BY title ASC ', array() ) ), 'home,shop,wines' );
+		asrt( $this->summarize( R::children( $winePage, ' ORDER BY title ASC ', array() ) ), 'whiskies,wines' );
+		asrt( $this->summarize( R::children( $winePage, ' title NOT IN (\'wines\') ORDER BY title ASC ', array() ) ), 'whiskies' );
+		asrt( $this->summarize( R::parents( $winePage, '  title NOT IN (\'home\') ORDER BY title ASC ', array() ) ), 'shop,wines' );
 		asrt( $this->summarize( R::children( $winePage, ' title != ? ORDER BY title ASC ', array( 'wines' ) ) ), 'whiskies' );
 		asrt( $this->summarize( R::parents( $winePage, '  title != ? ORDER BY title ASC ', array( 'home' ) ) ), 'shop,wines' );
+		asrt( $this->summarize( R::children( $winePage, ' title != :title ORDER BY title ASC ', array( ':title' => 'wines' ) ) ), 'whiskies' );
+		asrt( $this->summarize( R::parents( $winePage, '  title != :title ORDER BY title ASC ', array( ':title' => 'home' ) ) ), 'shop,wines' );
 	}
 }
