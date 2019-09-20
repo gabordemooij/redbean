@@ -1,5 +1,4 @@
 <?php
-
 /**
  * RedUNIT Shared Test Classes / Mock Objects
  * This file contains a collection of test classes that can be used by
@@ -7,123 +6,55 @@
  */
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Observable Mock
- * This is just for testing
  */
 class ObservableMock extends \RedBeanPHP\Observable
 {
-	/**
-	 * @param $eventname
-	 * @param $info
-	 */
-	public function test( $eventname, $info )
-	{
-		$this->signal( $eventname, $info );
-	}
+	public function test( $eventname, $info ){ $this->signal( $eventname, $info ); }
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Observer Mock
- * This is just for testing
  */
 class ObserverMock implements \RedBeanPHP\Observer
 {
-	/**
-	 * @var bool
-	 */
 	public $event = FALSE;
-
-	/**
-	 * @var bool
-	 */
 	public $info = FALSE;
-
-	/**
-	 * @param string $event
-	 * @param        $info
-	 */
-	public function onEvent( $event, $info )
-	{
-		$this->event = $event;
-		$this->info  = $info;
-	}
+	public function onEvent( $event, $info ){ $this->event = $event; $this->info  = $info; }
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Shared helper class for tests.
  * A test model to test FUSE functions.
  */
 class Model_Band extends RedBeanPHP\SimpleModel
 {
 	public function after_update() { }
-
 	private $notes = array();
-
-	/**
-	 * @throws Exception
-	 */
 	public function update()
 	{
-		if ( count( $this->ownBandmember ) > 4 ) {
-			throw new Exception( 'too many!' );
-		}
+		if ( count( $this->ownBandmember ) > 4 ) throw new Exception( 'too many!' );
 	}
-
-	/**
-	 * @return string
-	 */
-	public function __toString()
-	{
-		return 'bigband';
-	}
-
-	/**
-	 * @param $prop
-	 * @param $value
-	 */
-	public function setProperty( $prop, $value )
-	{
-		$this->$prop = $value;
-	}
-
-	/**
-	 * @param $prop
-	 *
-	 * @return bool
-	 */
-	public function checkProperty( $prop )
-	{
-		return isset( $this->$prop );
-	}
-
-	/**
-	 * Sets a note.
-	 *
-	 * @param string $note
-	 *
-	 * @param mixed $value
-	 *
-	 * @return void
-	 */
-	public function setNote( $note, $value )
-	{
-		$this->notes[ $note ] = $value;
-	}
-
-	/**
-	 * Returns the value of a note.
-	 *
-	 * @param string $note
-	 *
-	 * @return string
-	 */
-	public function getNote( $note )
-	{
-		return $this->notes[ $note ];
-	}
+	public function __toString(){ return 'bigband'; }
+	public function setProperty( $prop, $value ) { $this->$prop = $value; }
+	public function checkProperty( $prop ) { return isset( $this->$prop ); }
+	public function setNote( $note, $value ){ $this->notes[ $note ] = $value; }
+	public function getNote( $note ) { return $this->notes[ $note ]; }
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
@@ -133,6 +64,9 @@ class Model_Box extends RedBeanPHP\SimpleModel
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
@@ -140,8 +74,10 @@ class Model_Cocoa extends RedBeanPHP\SimpleModel
 {
 	public function update(){}
 }
-
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
@@ -154,6 +90,9 @@ class Model_Taste extends RedBeanPHP\SimpleModel
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
@@ -176,6 +115,9 @@ class Model_Coffee extends RedBeanPHP\SimpleModel
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
  */
@@ -197,314 +139,217 @@ class Model_Test extends RedBeanPHP\SimpleModel
 	}
 }
 
-global $lifeCycle;
-
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Shared helper class for tests.
  * A Model class for testing Models/FUSE and related features.
+ * Used in Blackhole/Export.
  */
+global $lifeCycle;
 class Model_Bandmember extends RedBeanPHP\SimpleModel
 {
-	public function open()
-	{
-		global $lifeCycle;
-
-		$lifeCycle .= "\n called open: " . $this->id;
-	}
-
-	public function dispense()
-	{
-		global $lifeCycle;
-
-		$lifeCycle .= "\n called dispense() " . $this->bean;
-	}
-
-	public function update()
-	{
-		global $lifeCycle;
-
-		$lifeCycle .= "\n called update() " . $this->bean;
-	}
-
-	public function after_update()
-	{
-		global $lifeCycle;
-
-		$lifeCycle .= "\n called after_update() " . $this->bean;
-	}
-
-	public function delete()
-	{
-		global $lifeCycle;
-
-		$lifeCycle .= "\n called delete() " . $this->bean;
-	}
-
-	public function after_delete()
-	{
-		global $lifeCycle;
-
-		$lifeCycle .= "\n called after_delete() " . $this->bean;
-	}
+	public function open(){ global $lifeCycle; $lifeCycle .= "\n called open: " . $this->id; }
+	public function dispense(){ global $lifeCycle; $lifeCycle .= "\n called dispense() " . $this->bean; }
+	public function update() { global $lifeCycle; $lifeCycle .= "\n called update() " . $this->bean; }
+	public function after_update(){ global $lifeCycle; $lifeCycle .= "\n called after_update() " . $this->bean; }
+	public function delete(){ global $lifeCycle; $lifeCycle .= "\n called delete() " . $this->bean; }
+	public function after_delete(){ global $lifeCycle; $lifeCycle .= "\n called after_delete() " . $this->bean; }
 }
 
 /**
- * A model to box soup models :)
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * A custom BeanHelper to test custom FUSE operations in
+ * Blackhole/Fusebox
  */
 class Model_Soup extends \RedBeanPHP\SimpleModel
 {
 	private $flavour = '';
-
-	public function taste()
-	{
-		return 'A bit too salty';
-	}
-
-	public function setFlavour( $flavour )
-	{
-		$this->flavour = $flavour;
-	}
-
-	public function getFlavour()
-	{
-		return $this->flavour;
-	}
+	public function taste() { return 'A bit too salty'; }
+	public function setFlavour( $flavour ) { $this->flavour = $flavour; }
+	public function getFlavour(){ return $this->flavour; }
 }
 
 /**
- * A custom BeanHelper to test custom FUSE operations.
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * A custom BeanHelper to test custom FUSE operations in
+ * Base/Fuse.
  */
 class SoupBeanHelper extends \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper
 {
-	/**
-	 * Returns a model for a bean based on its type.
-	 *
-	 * @param OODBBean $bean
-	 *
-	 * @return object
-	 */
 	public function getModelForBean( \RedBeanPHP\OODBBean $bean )
 	{
-			if ( $bean->getMeta( 'type' ) === 'meal' ) {
-				$model = new Model_Soup;
-				$model->loadBean( $bean );
-				return $model;
-			} else {
-				return parent::getModelForBean( $bean );
-			}
+		if ( $bean->getMeta( 'type' ) === 'meal' ) {
+			$model = new Model_Soup;
+			$model->loadBean( $bean );
+			return $model;
+		} else {
+			return parent::getModelForBean( $bean );
+		}
 	}
 }
 
 /**
- * Test Model.
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Used in Base/Boxing and Base/Misc to test boxing of beans.
+ * Just a plain model for use with a bean with nothing in it.
  */
-class Model_Boxedbean extends \RedBeanPHP\SimpleModel
-{
-}
+class Model_Boxedbean extends \RedBeanPHP\SimpleModel{}
 
 /**
- * Mock class for testing purposes.
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Used in Mysql/Uuid, Postgres/Uuid and Base/Association. Meant
+ * to be a versatile, generic test model.
  */
 class Model_Ghost_House extends \RedBeanPHP\SimpleModel
 {
 	public static $deleted = FALSE;
-
-	public function delete()
-	{
-		self::$deleted = TRUE;
-	}
+	public function delete() { self::$deleted = TRUE; }
 }
 
 /**
- * Mock class for testing purposes.
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Used in Mysql/Uuid, Postgres/Uuid and Base/Association. Meant
+ * to be a versatile, generic test model for N-M relations.
  */
 class Model_Ghost_Ghost extends \RedBeanPHP\SimpleModel
 {
 	public static $deleted = FALSE;
-
-	public function delete()
-	{
-		self::$deleted = TRUE;
-	}
+	public function delete() { self::$deleted = TRUE; }
 }
 
 /**
- * Mock class for testing purposes.
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Mock class for testing purposes. Used in Base/Association and
+ * Base/Foreignkeys to emit errors to test handling of errors
+ * originating from the Query Writer.
  */
 class FaultyWriter extends \RedBeanPHP\QueryWriter\MySQL
 {
-
 	protected $sqlState;
-
-	/**
-	 * Mock method.
-	 *
-	 * @param string $sqlState sql state
-	 */
-	public function setSQLState( $sqlState )
-	{
-		$this->sqlState = $sqlState;
-	}
-
-	/**
-	 * Mock method
-	 *
-	 * @param string $sourceType destination type
-	 * @param string $destType   source type
-	 *
-	 * @throws SQL
-	 */
-	public function addUniqueConstraint( $sourceType, $destType )
-	{
+	public function setSQLState( $sqlState ){ $this->sqlState = $sqlState; }
+	public function addUniqueConstraint( $sourceType, $destType ){
 		$exception = new \RedBeanPHP\RedException\SQL;
 		$exception->setSQLState( $this->sqlState );
 		throw $exception;
 	}
-
-	/**
-	 * Mock method.
-	 * Generates an exception when trying to invoke
-	 * getKeyMapForType via getForeignKeyForTypeProperty.
-	 *
-	 * @return void
-	 */
-	protected function getKeyMapForType( $type )
-	{
-		throw new \RedBeanPHP\RedException\SQL;
-	}
+	protected function getKeyMapForType( $type ){throw new \RedBeanPHP\RedException\SQL;}
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Mock class to test default implementations in AQueryWriter.
  */
-class NullWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
-}
+class NullWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {}
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Used in Base/Foreignkeys (testFKInspect) to test foreign keys.
+*/
 class ProxyWriter extends \RedBeanPHP\QueryWriter\AQueryWriter {
-
 	public static function callMethod( $object, $method, $arg1 = NULL, $arg2 = NULL, $arg3 = NULL ) {
 		return $object->$method( $arg1, $arg2, $arg3 );
 	}
-
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Mock class to test proper model name
  * beautificattion for link table beans in FUSE.
  */
 class Model_PageWidget extends RedBean_SimpleModel {
-	/**
-	 * @var string
-	 */
 	private static $test = '';
-
-	/**
-	 * Returns the test flag.
-	 *
-	 * @return string
-	 */
-	public static function getTestReport()
-	{
-		return self::$test;
-	}
-
-	/**
-	 * Update method to set the flag.
-	 */
-	public function update()
-	{
-		self::$test = 'didSave';
-	}
+	public static function getTestReport(){ return self::$test; }
+	public function update(){ self::$test = 'didSave'; }
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Mock class to test proper model name
  * beautificattion for link table beans in FUSE.
  */
 class Model_Gadget_Page extends RedBean_SimpleModel {
-	/**
-	 * @var string
-	 */
 	private static $test = '';
-
-	/**
-	 * Returns the test flag.
-	 *
-	 * @return string
-	 */
-	public static function getTestReport()
-	{
-		return self::$test;
-	}
-
-	/**
-	 * Update method to set the flag.
-	 */
-	public function update()
-	{
-		self::$test = 'didSave';
-	}
+	public static function getTestReport(){ return self::$test;}
+	public function update(){ self::$test = 'didSave'; }
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Mock class to test proper model name
  * beautificattion for link table beans in FUSE.
  */
 class Model_A_B_C extends RedBean_SimpleModel {
-	/**
-	 * @var string
-	 */
 	private static $test = '';
-
-	/**
-	 * Returns the test flag.
-	 *
-	 * @return string
-	 */
-	public static function getTestReport()
-	{
-		return self::$test;
-	}
-
-	/**
-	 * Update method to set the flag.
-	 */
-	public function update()
-	{
-		self::$test = 'didSave';
-	}
+	public static function getTestReport(){ return self::$test; }
+	public function update() { self::$test = 'didSave'; }
 }
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Used in Base/Update to test SQL filters with links
+ */
 class Model_BookBook extends \RedBean_SimpleModel {
 	public function delete() {
 		asrt($this->bean->shelf, 'x13');
 	}
 }
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Used in Base/Fuse (error handling in Fuse) and
+ * Base/Issue408 (export issue).
+ */
 class Model_Feed extends \RedbeanPHP\SimpleModel {
-    public function update() {
-        $this->bean->post = json_encode( $this->bean->post );
-    }
-
-    public function open() {
-        $this->bean->post = json_decode( $this->bean->post, TRUE );
-    }
+	public function update() { $this->bean->post = json_encode( $this->bean->post );}
+	public function open() { $this->bean->post = json_decode( $this->bean->post, TRUE );}
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * UUID QueryWriter for MySQL for testing purposes.
+ * Used in Mysql/Uuid to test if RedBeanPHP can be used with a
+ * UUID-strategy. While UUID keys are not part of the RedBeanPHP core,
+ * examples are given on the website and this test makes sure those examples
+ * are working as expected.
  */
 class UUIDWriterMySQL extends \RedBeanPHP\QueryWriter\MySQL {
-
 	protected $defaultValue = '@uuid';
 	const C_DATATYPE_SPECIAL_UUID  = 97;
-
 	public function __construct( \RedBeanPHP\Adapter $adapter )
 	{
 		parent::__construct( $adapter );
 		$this->addDataType( self::C_DATATYPE_SPECIAL_UUID, 'char(36)'  );
 	}
-
 	public function createTable( $table )
 	{
 		$table = $this->esc( $table );
@@ -517,7 +362,6 @@ class UUIDWriterMySQL extends \RedBeanPHP\QueryWriter\MySQL {
 			COLLATE=utf8mb4_unicode_ci ";
 		$this->adapter->exec( $sql );
 	}
-
 	public function updateRecord($table, $updateValues, $id = NULL)
 	{
 		$flagNeedsReturnID = (!$id);
@@ -526,15 +370,18 @@ class UUIDWriterMySQL extends \RedBeanPHP\QueryWriter\MySQL {
 		if ( $flagNeedsReturnID ) $id = R::getCell('SELECT @uuid');
 		return $id;
 	}
-
-	public function getTypeForID()
-	{
-		return self::C_DATATYPE_SPECIAL_UUID;
-	}
+	public function getTypeForID(){return self::C_DATATYPE_SPECIAL_UUID;}
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * UUID QueryWriter for PostgreSQL for testing purposes.
+ * Used in Postgres/Uuid to test if RedBeanPHP can be used with a
+ * UUID-strategy. While UUID keys are not part of the RedBeanPHP core,
+ * examples are given on the website and this test makes sure those examples
+ * are working as expected.
  */
 class UUIDWriterPostgres extends \RedBeanPHP\QueryWriter\PostgreSQL {
 
@@ -559,6 +406,14 @@ class UUIDWriterPostgres extends \RedBeanPHP\QueryWriter\PostgreSQL {
 	}
 }
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * This diagnostic bean class adds a method to read the current
+ * status of the modifier flags. Used to test interactions with
+ * beans and monitor the effect on the internal flags.
+ */
 class DiagnosticBean extends \RedBeanPHP\OODBBean {
 
 	/**
@@ -574,103 +429,47 @@ class DiagnosticBean extends \RedBeanPHP\OODBBean {
 		if ($this->noLoad === TRUE) $modFlags .= 'n';
 		if ($this->all === TRUE) $modFlags .= 'r';
 		if ($this->withSql !== '') $modFlags .= 'w';
-
 		return $modFlags;
 	}
 }
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * This is diagnostic class that allows access to otherwise
+ * protected methods.Used to test FUSE hooks in Base/Fuse.php
+ * Subclassed by Model_Probe.
+ */
 class DiagnosticModel extends \RedBeanPHP\SimpleModel
 {
 
 	private $logs = array();
-
-	public function open()
-	{
-		$this->logs[] = array(
-			'action' => 'open',
-			'data'   => array(
-				'id' => $this->id
-			)
-		);
-	}
-
-	public function dispense()
-	{
-		$this->logs[] = array(
-			'action' => 'dispense',
-			'data'   => array(
-				'bean' => $this->bean
-			)
-		);
-	}
-
-	public function update()
-	{
-		$this->logs[] = array(
-			'action' => 'update',
-			'data'   => array(
-				'bean' => $this->bean
-			)
-		);
-	}
-
-	public function after_update()
-	{
-		$this->logs[] = array(
-			'action' => 'after_update',
-			'data'   => array(
-				'bean' => $this->bean
-			)
-		);
-	}
-
-	public function delete()
-	{
-		$this->logs[] = array(
-			'action' => 'delete',
-			'data'   => array(
-				'bean' => $this->bean
-			)
-		);
-	}
-
-	public function after_delete()
-	{
-		$this->logs[] = array(
-			'action' => 'after_delete',
-			'data'   => array(
-				'bean' => $this->bean
-			)
-		);
-	}
-
-	public function getLogs()
-	{
-		return $this->logs;
-	}
-
+	public function open() { $this->logs[] = array('action' => 'open','data'=> array('id' => $this->id));}
+	public function dispense(){$this->logs[] = array('action' => 'dispense','data' => array('bean' => $this->bean));}
+	public function update(){$this->logs[] = array('action' => 'update','data' => array('bean' => $this->bean));}
+	public function after_update(){$this->logs[] = array('action' => 'after_update','data'=> array('bean' => $this->bean));}
+	public function delete(){$this->logs[] = array('action' => 'delete','data'=> array('bean' => $this->bean));}
+	public function after_delete(){$this->logs[] = array('action' => 'after_delete','data'   => array('bean' => $this->bean));}
+	public function getLogs(){return $this->logs;}
 	public function getLogActionCount( $action = NULL )
 	{
 		if ( is_null( $action ) ) return count( $this->logs );
 		$counter = 0;
-		foreach( $this->logs as $log ) {
-			if ( $log['action'] == $action ) $counter ++;
-		}
+		foreach( $this->logs as $log ) if ( $log['action'] == $action ) $counter ++;
 		return $counter;
 	}
-
-	public function clearLog()
-	{
-		return $this->logs = array();
-	}
-
-	public function getDataFromLog( $logIndex = 0, $property )
-	{
-		return $this->logs[$logIndex]['data'][$property];
-	}
-
+	public function clearLog(){return $this->logs = array();}
+	public function getDataFromLog( $logIndex = 0, $property ){return $this->logs[$logIndex]['data'][$property];}
 }
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Used in Base/Database (testDatabaseCapabilityChecker) to check
+ * database capabilities.
+*/
 class DatabaseCapabilityChecker extends \RedBeanPHP\Driver\RPDO {
 
 	public function __construct( \PDO $pdo )
@@ -684,14 +483,36 @@ class DatabaseCapabilityChecker extends \RedBeanPHP\Driver\RPDO {
 	}
 }
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Used in Test Suite Base/Bean (testToStringOverride)
+ * to test string overrides.
+ */
 class Model_String extends \RedBeanPHP\SimpleModel {
 	public function __toString() {
 		return base64_encode( $this->bean->text );
 	}
 }
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * This is diagnostic class that allows access to otherwise
+ * protected methods.Used to test FUSE hooks in Base/Fuse.php
+ */
 class Model_Probe extends DiagnosticModel {};
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Class to mock adapter.
+ * Inspects behavior of classes interacting with the adapter class
+ * by capturing the method invocations.
+ */
 class Mockdapter implements \RedBeanPHP\Adapter {
 
 	public function answer( $id )
@@ -722,49 +543,57 @@ class Mockdapter implements \RedBeanPHP\Adapter {
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
  * Custom Logger class.
- * For testing purposes.
  */
 class CustomLogger extends \RedBeanPHP\Logger\RDefault
 {
 
 	private $log;
-
-	public function getLogMessage()
-	{
-		return $this->log;
-	}
-
-	public function log()
-	{
-		$this->log = func_get_args();
-	}
+	public function getLogMessage(){ return $this->log; }
+	public function log() { $this->log = func_get_args(); }
 }
 
-
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * This is diagnostic class that allows access to otherwise
+ * protected methods.
+ * Class to test protected method hasCap in RPDO.
+ */
 class TestRPO extends \RedBeanPHP\Driver\RPDO {
 	public function testCap( $cap ) {
 		return $this->hasCap( $cap );
 	}
 }
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * Class to mock PDO behavior.
+ */
 class MockPDO extends \PDO {
 	public $attributes = array();
 	public function __construct() { }
-	public function setAttribute( $att, $val = NULL )
-	{
-		$this->attributes[ $att ] = $val;
-	}
-	public function getDiagAttribute( $att )
-	{
-		return $this->attributes[ $att ];
-	}
+	public function setAttribute( $att, $val = NULL ){ $this->attributes[ $att ] = $val; }
+	public function getDiagAttribute( $att ){ return $this->attributes[ $att ]; }
 	public function getAttribute( $att ) {
 		if ($att == \PDO::ATTR_SERVER_VERSION) return '5.5.3';
 		return 'x';
 	}
 }
 
+/**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * DiagnosticCUBRIDWriter
+ * Class for stub test for CUBRID database support.
+ */
 class DiagnosticCUBRIDWriter extends \RedBeanPHP\QueryWriter\CUBRID {
 	public function callMethod( $method, $arg1 = NULL, $arg2 = NULL, $arg3 = NULL, $arg4 = NULL, $arg5 = NULL ) {
 		return $this->$method( $arg1, $arg2, $arg3, $arg4, $arg5 );
@@ -772,6 +601,11 @@ class DiagnosticCUBRIDWriter extends \RedBeanPHP\QueryWriter\CUBRID {
 }
 
 /**
+ * Test utility class.
+ * This class is meant for testing purposes only and should
+ * never be used for anything else than RedBeanPHP Unit Testing.
+ * This is an error class that allows RedBeanPHP Unit Tests to
+ * test error handling.
  * Test Model that throws an exception upon update().
  */
 class Model_Brokentoy extends \RedbeanPHP\SimpleModel {
