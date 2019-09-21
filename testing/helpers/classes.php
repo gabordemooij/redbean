@@ -2,7 +2,12 @@
 /**
  * RedUNIT Shared Test Classes / Mock Objects
  * This file contains a collection of test classes that can be used by
- * and shared by tests.
+ * the test suite. None of these classes should be used by users of
+ * the RedBeanPHP library, they are meant for internal use only!
+ * These classes are most of the time, single purpose classes, that are
+ * only used once or twice. They are written down in a compact format
+ * because the overview of their limited functionality is handy wereas
+ * documentation per method is not very useful in this case.
  */
 
 /**
