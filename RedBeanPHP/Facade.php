@@ -835,11 +835,11 @@ class Facade
 	 *
 	 * <code>
 	 *  $book = R::dispense( [
-     *   '_type' => 'book',
-     *   'title'  => 'Gifted Programmers',
-     *   'author' => [ '_type' => 'author', 'name' => 'Xavier' ],
-     *   'ownPageList' => [ ['_type'=>'page', 'text' => '...'] ]
-     * ] );
+	 *   '_type' => 'book',
+	 *   'title'  => 'Gifted Programmers',
+	 *   'author' => [ '_type' => 'author', 'name' => 'Xavier' ],
+	 *   'ownPageList' => [ ['_type'=>'page', 'text' => '...'] ]
+	 * ] );
 	 * </code>
 	 *
 	 * @param string|array $typeOrBeanArray   type or bean array to import
