@@ -115,7 +115,7 @@ load function:
 <p class="note" id="loadForUpdate">
 	If you want to lock a bean while loading it, so nobody can change
 	the record associated with your bean until your transaction completes use
-	R::loadForUpdate() instead (version 5+).
+	R::loadForUpdate()/R::findForUpdate() instead (version 5+).
 	<br><br>
 	You can also use SQL snippets like <b>' for update '</b>
 	with operations like R::find() and R::batch(). Before invoking these commands
