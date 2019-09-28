@@ -2157,19 +2157,12 @@ to enable partial beans.
 	<a href="/debugging" title="Learn how to use the debugging tools of RedBeanPHP">debugging tools</a>.
 </p>
 
-<h2 id="deepfreeze">DeepFreeze (4.2+)</h2>
+<h2 id="hybrid">Hybrid Mode (5.4+)</h2>
 <p>
-	The <a href="https://github.com/gabordemooij/redbean" target="_blank" title="DeepFreeze">Deepfreeze</a> script
-	is a PHP script available from the Github repository. This script will remove all fluid parts of RedBeanPHP, i.e.
-	all the schema modifying code. This will essentially disable fluid mode permanently and make the rb.php file more
-	compact. This script is experimental though because it's quite hard to test. To run the DeepFreeze script:
-</p>
-<kbd>
-	php deepfreeze.php
-</kbd>
-<p>
-	The DeepFreeze script will search for an rb.php file in the current folder and generate
-	a rbf.php file in the same folder.
+	R::store() and R::storeAll() both take a second parameter: $unfreezeIfNeeded.
+	If set to TRUE in frozen mode, RedBeanPHP will
+	automatically temporarily switch to fluid mode to attempt to store the
+	bean in case of an SQLException.
 </p>
 
 
