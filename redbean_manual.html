@@ -1180,6 +1180,7 @@ Note is too short!
 
 <p class="note">
 	By default RedBeanPHP returns only strings, to change this use:
+	<b>R::getDatabaseAdapter()-&gt;getDatabase()-&gt;getPDO()-&gt;setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);</b>
 	<b>R::getDatabaseAdapter()-&gt;getDatabase()-&gt;stringifyFetches( FALSE );</b>
 </p>
 
