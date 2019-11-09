@@ -66,6 +66,7 @@ class Misc extends Base
 	 public function testPartialBeansAtSetup()
 	 {
 		 if (self::$setupPartialBeansTestDone) return; /* only needs to be tested once */
+		 $currentDB = R::$currentDB;
 		 $key  = 'partialBeanBase' . time();
 		 $dsn  = 'sqlite:/tmp/test.txt';
 		 $user = '';
@@ -80,6 +81,7 @@ class Misc extends Base
 		 $wasItSet = $redbean->getCurrentRepository()->usePartialBeans( FALSE );
 		 asrt( $wasItSet, TRUE );
 		 self::$setupPartialBeansTestDone = 1;
+		 R::selectDatabase( $currentDB );
 	 }
 
 	/**
