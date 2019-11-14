@@ -617,6 +617,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->properties = $row;
 		$this->__info['sys.orig'] = $row;
 		$this->__info['changed'] = FALSE;
+		$this->__info['changelist'] = array();
 		return $this;
 	}
 
