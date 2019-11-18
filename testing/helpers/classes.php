@@ -103,6 +103,17 @@ class Model_Taste extends RedBeanPHP\SimpleModel
  */
 class Model_Coffee extends RedBeanPHP\SimpleModel
 {
+	public static $defaults = array();
+
+	public function dispense()
+	{
+		if ( count( self::$defaults ) && !$this->bean->id ) {
+			foreach (self::$defaults as $key => $value) {
+				$this->{$key} = $value;
+			}
+		}
+	}
+
 	public function __jsonSerialize()
 	{
 		return array_merge(

@@ -27,6 +27,42 @@ use RedBeanPHP\Facade as R;
 class Partial extends Base {
 
 	/**
+	 * Github Issue #754.
+	 * If I set up the default values to some specific columns,
+	 * these columns can not act the same expectation in partial bean mode. #754.
+	 * "When I upgrade my code to Redbean 5.4 and turn on the partial bean mode,
+	 * I found this issue I mentioned.
+	 * As Redbean recommends, I set up the default values
+	 * to some specific columns before I use them.
+	 * And then I use the partial bean mode to store
+	 * the columns updated rather than the entire bean.
+	 * But I found if I set up the default values,
+	 * it will change the changelist in the bean which is the
+	 * foundation of the partial bean mode."
+	 */
+	public function testChangeListIssue()
+	{
+		R::nuke();
+		R::usePartialBeans( TRUE );
+		\Model_Coffee::$defaults = array(
+			'strength'    => 'strong',
+			'beans'       => 'Arabica',
+			'preparation' => 'Kettle'
+		);
+		$coffee = R::dispense('coffee');
+		$changelist = $coffee->getMeta('changelist');
+		print_r( $changelist );
+		asrt( count( $changelist), 3 );
+		$coffee->preparation = 'Espresso';
+		$changelist = $coffee->getMeta('changelist');
+		asrt( count( $changelist), 4 );
+		$id = R::store( $coffee );
+		$coffee = R::load( 'coffee', $id );
+		$changelist = $coffee->getMeta('changelist');
+		asrt( count( $changelist), 0 );
+	}
+
+	/**
 	 * Tests the basic scenarios for Partial Beans.
 	 *
 	 * @return void
