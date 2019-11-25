@@ -39,6 +39,8 @@ class Partial extends Base {
 	 * But I found if I set up the default values,
 	 * it will change the changelist in the bean which is the
 	 * foundation of the partial bean mode."
+	 *
+	 * @return void
 	 */
 	public function testChangeListIssue()
 	{
@@ -60,6 +62,23 @@ class Partial extends Base {
 		$coffee = R::load( 'coffee', $id );
 		$changelist = $coffee->getMeta('changelist');
 		asrt( count( $changelist), 0 );
+	}
+	
+	/**
+	 * Github Issue #754.
+	 * The importRow() function should clear the changeList.
+	 *
+	 * @return void
+	 */
+	public function testChangeListImportRow()
+	{
+		R::usePartialBeans( TRUE );
+		$bean = R::dispense( 'bean' );
+		asrt( count( $bean->getMeta('changelist') ), 0 );
+		$bean->property = 'abc';
+		asrt( count( $bean->getMeta('changelist') ), 1 );
+		$bean->importRow( array( 'property' => 123 ) );
+		asrt( count( $bean->getMeta('changelist') ), 0 );
 	}
 
 	/**
