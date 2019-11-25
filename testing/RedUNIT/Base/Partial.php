@@ -53,7 +53,6 @@ class Partial extends Base {
 		);
 		$coffee = R::dispense('coffee');
 		$changelist = $coffee->getMeta('changelist');
-		print_r( $changelist );
 		asrt( count( $changelist), 3 );
 		$coffee->preparation = 'Espresso';
 		$changelist = $coffee->getMeta('changelist');
@@ -63,7 +62,7 @@ class Partial extends Base {
 		$changelist = $coffee->getMeta('changelist');
 		asrt( count( $changelist), 0 );
 	}
-	
+
 	/**
 	 * Github Issue #754.
 	 * The importRow() function should clear the changeList.
