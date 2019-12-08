@@ -1443,10 +1443,13 @@ class Facade
 	 * @param array  $row       one row from the database
 	 * @param string $metamask  metamask (see convertToBeans)
 	 *
-	 * @return OODBBean
+	 * @return OODBBean?
 	 */
 	public static function convertToBean( $type, $row, $metamask = NULL )
 	{
+		if ($row === []) {
+			return null;
+		}
 		$beans = self::$redbean->convertToBeans( $type, array( $row ), $metamask );
 		$bean  = reset( $beans );
 		return $bean;
