@@ -41,6 +41,24 @@ class Database extends Base
 	}
 
 	/**
+	 * Make ConvertToBean work together with getRow #759.
+	 * When no results are found for getRow it returns []
+	 * Then when you give that to convertToBean it wraps your
+	 * single row into an array of multiple rows, so you get [[]].
+	 * Then this loop has something to
+	 * iterate on foreach ( $rows as $row ) { ...
+	 * And then it crashes on: $id = $row['id'];
+	 */
+	public function testHarmonizeConvertToBeanAndGetRow()
+	{
+		R::nuke();
+		$book = R::convertToBean( 'book', R::getRow( 'SELECT * FROM book' ) );
+		asrt( is_null( $book ), TRUE );
+		$book = R::convertToBean( 'book', array() );
+		asrt( is_null( $book ), TRUE );
+	}
+
+	/**
 	 * Test for bugfix:
 	 * adhere to return type specification for R::getRow #728
 	 * public static function getRow is documented as a function
