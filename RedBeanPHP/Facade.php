@@ -619,10 +619,10 @@ class Facade
 			$result = self::$redbean->store( $bean );
 		} catch (SQLException $exception) {
 			$wasFrozen = self::$redbean->isFrozen();
-			if ( !self::$allowHybridMode || !$wasFrozen ) throw $exception;
+			if ( !self::$allowHybridMode || !$unfreezeIfNeeded ) throw $exception;
 			self::freeze( FALSE );
 			$result = self::$redbean->store( $bean );
-			self::freeze( !$wasFrozen );
+			self::freeze( $wasFrozen );
 		}
 		return $result;
 	}

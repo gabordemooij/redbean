@@ -37,7 +37,13 @@ class Hybrid extends Base
 		R::setAllowHybridMode( FALSE );
 		$book->title = 'Tales of a misfit';
 		try {
-			R::store( $book );
+			R::store( $book, TRUE );
+			fail();
+		} catch(\Exception $e) {
+			pass();
+		}
+		try {
+			R::store( $book, FALSE );
 			fail();
 		} catch(\Exception $e) {
 			pass();
@@ -48,6 +54,18 @@ class Hybrid extends Base
 		$book->title = 'Tales of a misfit';
 		try {
 			R::store( $book );
+			fail();
+		} catch(\Exception $e) {
+			pass();
+		}
+		try {
+			R::store( $book, FALSE );
+			fail();
+		} catch(\Exception $e) {
+			pass();
+		}
+		try {
+			R::store( $book, TRUE );
 			pass();
 		} catch(\Exception $e) {
 			fail();
@@ -71,24 +89,28 @@ class Hybrid extends Base
 		if ($this->currentlyActiveDriverID == 'sqlite') return;
 		$book = R::dispense('book');
 		$book->pages = 1;
-		$id = R::store( $book );
+		$id = R::store( $book, TRUE );
 		R::freeze( TRUE );
+		asrt( R::getRedBean()->isFrozen(), TRUE );
 		R::setAllowHybridMode( FALSE );
 		$book->pages = 'too many';
 		try {
-			R::store( $book );
+			R::store( $book, TRUE );
 			fail();
 		} catch(\Exception $e) {
 			pass();
 		}
+		asrt( R::getRedBean()->isFrozen(), TRUE );
 		R::setAllowHybridMode( TRUE );
+		asrt( R::getRedBean()->isFrozen(), TRUE );
 		R::debug(1);
 		try {
-			R::store( $book );
+			R::store( $book, TRUE );
 			pass();
 		} catch(\Exception $e) {
 			fail();
 		}
+		asrt( R::getRedBean()->isFrozen(), TRUE );
 		$book = $book->fresh();
 		echo $book;
 		asrt( $book->pages, 'too many' );
@@ -109,7 +131,7 @@ class Hybrid extends Base
 		R::freeze( TRUE );
 		R::setAllowHybridMode( TRUE );
 		try {
-			R::store( $toy );
+			R::store( $toy, TRUE );
 			fail();
 		} catch(\Exception $e) {
 			pass();
@@ -120,7 +142,7 @@ class Hybrid extends Base
 		R::freeze( TRUE );
 		R::setAllowHybridMode( TRUE );
 		try {
-			R::store( $toy );
+			R::store( $toy, TRUE );
 			pass();
 		} catch(\Exception $e) {
 			fail();
