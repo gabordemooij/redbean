@@ -1682,6 +1682,16 @@ class Facade
 	}
 
 	/**
+	 * Wipes all beans of all types.
+	 *
+	 * @return boolean
+	 */
+	public static function wipeAll()
+	{
+		return Facade::$redbean->wipeAll();
+	}
+
+	/**
 	 * Counts the number of beans of type $type.
 	 * This method accepts a second argument to modify the count-query.
 	 * A third argument can be used to provide bindings for the SQL snippet.
@@ -1933,7 +1943,7 @@ class Facade
 	public static function nuke()
 	{
 		if ( !self::$redbean->isFrozen() ) {
-			self::$writer->wipeAll();
+			self::$writer->nuke();
 		}
 	}
 
