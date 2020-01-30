@@ -109,7 +109,7 @@ class Stub extends Base
 		$mockdapter->errorExec = NULL;
 		$writer->addIndex( $type, $name, $column );
 		pass();
-		$writer->wipeAll();
+		$writer->nuke();
 		pass();
 		$mockdapter->answerGetCol = array( 'table1' );
 		$mockdapter->answerGetSQL = array(
@@ -117,7 +117,7 @@ class Stub extends Base
 				'CREATE TABLE' => 'CONSTRAINT [key] FOREIGN KEY ([bean]) REFERENCES [bean] ON DELETE CASCADE ON UPDATE RESTRICT'
 			)
 		);
-		$writer->wipeAll();
+		$writer->nuke();
 		pass();
 		$writer->esc( $dbStructure, $noQuotes = FALSE );
 		pass();
