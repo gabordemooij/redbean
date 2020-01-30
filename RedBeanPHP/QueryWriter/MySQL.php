@@ -399,9 +399,9 @@ class MySQL extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::wipeAll
+	 * @see QueryWriter::nuke
 	 */
-	public function wipeAll()
+	public function nuke()
 	{
 		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		$this->adapter->exec( 'SET FOREIGN_KEY_CHECKS = 0;' );
