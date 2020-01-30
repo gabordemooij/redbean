@@ -1688,7 +1688,9 @@ class Facade
 	 */
 	public static function wipeAll()
 	{
-		return Facade::$redbean->wipeAll();
+		foreach ( self::$writer->getTables() as $t ) {
+			self::wipe($t);
+		}
 	}
 
 	/**
