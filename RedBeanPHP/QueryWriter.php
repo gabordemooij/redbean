@@ -477,7 +477,7 @@ interface QueryWriter
 	 *
 	 * @return void
 	 */
-	public function wipeAll();
+	public function nuke();
 
 	/**
 	 * Renames an association. For instance if you would like to refer to
