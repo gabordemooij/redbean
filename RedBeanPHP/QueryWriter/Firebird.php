@@ -337,9 +337,9 @@ class Firebird extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::wipeAll
+	 * @see QueryWriter::nuke
 	 */
-	public function wipeAll()
+	public function nuke()
 	{
 		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		$tables = $this->getTables();
