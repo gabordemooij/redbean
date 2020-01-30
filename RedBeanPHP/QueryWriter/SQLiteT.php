@@ -450,9 +450,9 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::wipeAll
+	 * @see QueryWriter::nuke
 	 */
-	public function wipeAll()
+	public function nuke()
 	{
 		if (AQueryWriter::$noNuke) throw new \Exception('The nuke() command has been disabled using noNuke() or R::feature(novice/...).');
 		$this->adapter->exec( 'PRAGMA foreign_keys = 0 ' );
