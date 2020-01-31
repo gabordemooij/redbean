@@ -593,7 +593,7 @@ abstract class Repository
 					if ( !is_string( $m ) ) {
 						$mask = NULL;
 						$masktype = 'NULL';
-						break;
+						break 2;
 					}
 					$maskflip[$m] = TRUE;
 				}
