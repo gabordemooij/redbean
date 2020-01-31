@@ -583,18 +583,43 @@ abstract class Repository
 	 */
 	public function convertToBeans( $type, $rows, $mask = NULL )
 	{
-		$masklen = 0;
-		if ( $mask !== NULL ) $masklen = mb_strlen( $mask );
+		$masktype = gettype( $mask );
+		switch ( $masktype ) {
+			case 'string':
+				break;
+			case 'array':
+				$maskflip = array();
+				foreach ( $mask as $m ) {
+					if ( !is_string( $m ) ) {
+						$mask = NULL;
+						$masktype = 'NULL';
+						break;
+					}
+					$maskflip[$m] = TRUE;
+				}
+				$mask = $maskflip;
+				break;
+			default:
+				$mask = NULL;
+				$masktype = 'NULL';
+		}
 
 		$collection                  = array();
 		$this->stash[$this->nesting] = array();
 		foreach ( $rows as $row ) {
-			$meta = array();
-			if ( !is_null( $mask ) ) {
+			if ( $mask !== NULL ) {
+				$meta = array();
 				foreach( $row as $key => $value ) {
-					if ( strpos( $key, $mask ) === 0 ) {
-						unset( $row[$key] );
-						$meta[$key] = $value;
+					if ( $masktype === 'string' ) {
+						if ( strpos( $key, $mask ) === 0 ) {
+							unset( $row[$key] );
+							$meta[$key] = $value;
+						}
+					} elseif ( $masktype === 'array' ) {
+						if ( isset( $mask[$key] ) ) {
+							unset( $row[$key] );
+							$meta[$key] = $value;
+						}
 					}
 				}
 			}
