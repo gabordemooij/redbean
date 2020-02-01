@@ -62,14 +62,14 @@ class Plugins extends Blackhole
 			R::ext( '---', function() {} );
 			fail();
 		} catch ( RedException $e ) {
-			asrt( $e->getMessage(), 'Plugin name may only contain alphanumeric characters.' );
+			asrt( $e->getMessage(), 'Plugin name may only contain alphanumeric characters and underscores and cannot start with a number.' );
 		}
 
 		try {
 			R::__callStatic( '---', function() {} );
 			fail();
 		} catch ( RedException $e ) {
-			asrt( $e->getMessage(), 'Plugin name may only contain alphanumeric characters.' );
+			asrt( $e->getMessage(), 'Plugin name may only contain alphanumeric characters and underscores and cannot start with a number.' );
 		}
 
 		try {
