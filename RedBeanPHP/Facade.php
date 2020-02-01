@@ -3106,7 +3106,7 @@ class Facade
 	public static function ext( $pluginName, $callable )
 	{
 		if ( !preg_match( '#^[a-zA-Z_][a-zA-Z0-9_]*$#', $pluginName ) ) {
-			throw new RedException( 'Plugin name may only contain alphanumeric characters.' );
+			throw new RedException( 'Plugin name may only contain alphanumeric characters and underscores and cannot start with a number.' );
 		}
 		self::$plugins[$pluginName] = $callable;
 	}
@@ -3124,7 +3124,7 @@ class Facade
 	{
 		if ( !isset( self::$plugins[$pluginName] ) ) {
 			if ( !preg_match( '#^[a-zA-Z_][a-zA-Z0-9_]*$#', $pluginName ) ) {
-				throw new RedException( 'Plugin name may only contain alphanumeric characters.' );
+				throw new RedException( 'Plugin name may only contain alphanumeric characters and underscores and cannot start with a number.' );
 			}
 			throw new RedException( 'Plugin \''.$pluginName.'\' does not exist, add this plugin using: R::ext(\''.$pluginName.'\')' );
 		}
