@@ -287,6 +287,16 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
+	 * Return list of global aliases
+	 *
+	 * @return array
+	 */
+	public static function getAliases()
+	{
+		return self::$aliases;
+	}
+
+	/**
 	 * Enables or disables auto-resolving fetch types.
 	 * Auto-resolving aliased parent beans is convenient but can
 	 * be slower and can create infinite recursion if you
