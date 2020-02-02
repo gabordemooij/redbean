@@ -949,9 +949,18 @@ abstract class AQueryWriter
 			throw new RedException( 'Invalid JOIN.' );
 
 		$table = $this->esc( $type );
-		$targetTable = $this->esc( $targetType );
 		$field = $this->esc( $targetType, TRUE );
-		return " {$leftRight} JOIN {$targetTable} ON {$targetTable}.id = {$table}.{$field}_id ";
+		$aliases = OODBBean::getAliases();
+		if ( isset( $aliases[$targetType] ) ) {
+			$alias       = $this->esc( $targetType );
+			$targetTable = $this->esc( $aliases[$targetType] );
+			$joinSql     = " {$leftRight} JOIN {$targetTable} AS {$alias} ON {$alias}.id = {$table}.{$field}_id ";
+		} else {
+			$targetTable = $this->esc( $targetType );
+			$joinSql     = " {$leftRight} JOIN {$targetTable} ON {$targetTable}.id = {$table}.{$field}_id ";
+		}
+
+		return $joinSql;
 	}
 
 	/**
