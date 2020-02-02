@@ -923,7 +923,7 @@ abstract class AQueryWriter
 			//Dont join more than once..
 			if ( !isset( $joins[$joinInfo] ) ) {
 				$joins[ $joinInfo ] = TRUE;
-				if ( !preg_match( "#JOIN\s+`?{$joinInfo}.*WHERE#i", $sql ) ) {
+				if ( !preg_match( "#JOIN\s+(\w*\s+AS\s+|`)?{$joinInfo}.*WHERE#i", $sql ) ) {
 					$joinSql .= $this->writeJoin( $type, $joinInfo, 'LEFT' );
 				}
 			}
