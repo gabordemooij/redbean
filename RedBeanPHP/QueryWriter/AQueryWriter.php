@@ -904,6 +904,43 @@ abstract class AQueryWriter
 	}
 
 	/**
+	 * @see QueryWriter::parseJoin
+	 */
+	public function parseJoin( $type, $sql )
+	{
+		$sql = ' ' . $sql;
+		if ( strpos( $sql, '@joined.' ) === FALSE ) {
+			return $sql;
+		}
+ 
+		$joinSql = '';
+		$joins = array();
+		$oldParts = $parts = explode( '@joined.', $sql );
+		array_shift( $parts );
+		foreach($parts as $part) {
+			$explosion = explode( '.', $part );
+			$joinInfo  = reset( $explosion );
+			//Dont join more than once..
+			if ( !isset( $joins[$joinInfo] ) ) {
+				$joins[ $joinInfo ] = TRUE;
+				if ( !preg_match( "#JOIN\s+`?{$joinInfo}.*WHERE#i", $sql ) ) {
+					$joinSql .= $this->writeJoin( $type, $joinInfo, 'LEFT' );
+				}
+			}
+		}
+ 
+		$sql = implode( '', $oldParts );
+		if ( strpos( $sql, ' WHERE ') === FALSE ) {
+			$sql = "{$joinSql} WHERE {$sql}";
+		} else {
+			$sqlParts = explode( ' WHERE ', $sql, 2 );
+			$sql = "{$sqlParts[0]} {$joinSql} WHERE {$sqlParts[1]}";
+		}
+ 
+		return $sql;
+	}
+
+	/**
 	 * @see QueryWriter::writeJoin
 	 */
 	public function writeJoin( $type, $targetType, $leftRight = 'LEFT' )
@@ -961,7 +998,9 @@ abstract class AQueryWriter
 			$sql = $this->glueSQLCondition( $addSql );
 		}
 
-		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
+		$sql = $this->parseJoin( $type, $sql );
+		$fieldSelection = self::$flagNarrowFieldMode ? "{$table}.*" : '*';
+
 		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} {$this->sqlSelectSnippet} -- keep-cache";
 		$this->sqlSelectSnippet = '';
 		$rows  = $this->adapter->get( $sql, $bindings );
@@ -985,7 +1024,8 @@ abstract class AQueryWriter
 			$sqlFilterStr = $this->getSQLFilterSnippet( $type );
 		}
 
-		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
+		$sql = $this->parseJoin( $type, $sql );
+		$fieldSelection = self::$flagNarrowFieldMode ? "{$table}.*" : '*';
 
 		$sql = $this->glueSQLCondition( $addSql, NULL );
 		$sql = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} -- keep-cache";
@@ -1182,6 +1222,8 @@ abstract class AQueryWriter
 			$sql = $this->glueSQLCondition( $addSql );
 		}
 
+		$sql = $this->parseJoin( $type, $sql );
+
 		$sql    = "SELECT COUNT(*) FROM {$table} {$sql} -- keep-cache";
 		$count  = (int) $this->adapter->getCell( $sql, $bindings );
 
@@ -1285,7 +1327,9 @@ abstract class AQueryWriter
 			$sql = $this->glueSQLCondition( $addSql );
 		}
 
-		$sql    = "DELETE FROM {$table} {$sql}";
+		$sql = $this->parseJoin( $type, $sql );
+
+		$sql    = "DELETE {$table} FROM {$table} {$sql}";
 
 		return $this->adapter->exec( $sql, $bindings );
 	}
