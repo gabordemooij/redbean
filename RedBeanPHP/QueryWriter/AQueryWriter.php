@@ -1327,9 +1327,7 @@ abstract class AQueryWriter
 			$sql = $this->glueSQLCondition( $addSql );
 		}
 
-		$sql = $this->parseJoin( $type, $sql );
-
-		$sql    = "DELETE {$table} FROM {$table} {$sql}";
+		$sql    = "DELETE FROM {$table} {$sql}";
 
 		return $this->adapter->exec( $sql, $bindings );
 	}
