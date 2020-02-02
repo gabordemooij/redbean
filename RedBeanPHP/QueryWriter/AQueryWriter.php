@@ -1033,10 +1033,11 @@ abstract class AQueryWriter
 			$sqlFilterStr = $this->getSQLFilterSnippet( $type );
 		}
 
+		$sql = $this->glueSQLCondition( $addSql, NULL );
+
 		$sql = $this->parseJoin( $type, $sql );
 		$fieldSelection = self::$flagNarrowFieldMode ? "{$table}.*" : '*';
 
-		$sql = $this->glueSQLCondition( $addSql, NULL );
 		$sql = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} -- keep-cache";
 
 		return $this->adapter->getCursor( $sql, $bindings );
