@@ -29,6 +29,20 @@ use RedBeanPHP\Finder;
 class Finding extends Base {
 
 	/**
+	 * Improve the sql check in glueLimitOne #776.
+	 *
+	 * @return void
+	 */
+	public function testIssue776()
+	{
+		$writer = R::getWriter();
+		asrt( 'SELECT * FROM people LIMIT 2', $writer->glueLimitOne('SELECT * FROM people LIMIT 2') );
+		asrt( 'SELECT * FROM limits LIMIT 2', $writer->glueLimitOne('SELECT * FROM limits LIMIT 2') );
+		asrt( 'SELECT * FROM people LIMIT 1 ', $writer->glueLimitOne('SELECT * FROM people') );
+		asrt( 'SELECT * FROM limits LIMIT 1 ', $writer->glueLimitOne('SELECT * FROM limits') );
+	}
+
+	/**
 	 * Helper for testing findLike.
 	 *
 	 * @param array   $flowers beans
