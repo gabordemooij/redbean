@@ -25,6 +25,35 @@ use RedBeanPHP\OODBBean as OODBBean;
 class Aliasing extends Base
 {
 	/**
+	 * Issue #780
+	 * Autoresolve throws an exception because the system first tries to
+	 * load a teacher bean (line 1169 below), but since that teacher table doesn't
+	 * exist it fails and stops there instead of continuing. It works in Fluid mode because
+	 * that error is simply discarded and the script moves on.
+	 *
+	 * @return void
+	 */
+	public function testIssue780()
+	{
+		R::nuke();
+		R::freeze( FALSE );
+		R::usePartialBeans( TRUE );
+		$p = R::dispense('project');
+		$p->name    = 'Is the earth flat?';
+		$p->teacher = R::dispense('person');
+		$p->student = R::dispense('person');
+		$p->teacher->name = 'Bob';
+		$p->student->name = 'Sarah';
+		R::store($p);
+		R::freeze( TRUE );
+		R::setAutoResolve( TRUE );
+		$p = R::load('project', 1);
+		asrt($p->name,'Is the earth flat?');
+		asrt($p->teacher->name, 'Bob');
+		asrt($p->student->name, 'Sarah');
+	}
+
+	/**
 	 * Tests automatic resolvement of parent beans
 	 * without fetchAs() using inferFetchType (foreign keys).
 	 *
@@ -32,6 +61,8 @@ class Aliasing extends Base
 	 */
 	public function testAutoResolver()
 	{
+		R::freeze( FALSE );
+		R::usePartialBeans( FALSE );
 		R::nuke();
 		list( $project, $teacher, $student ) = R::dispenseAll( 'project,person,person' );
 		$teacher->name = 'teacher';

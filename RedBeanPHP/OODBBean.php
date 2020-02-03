@@ -1166,9 +1166,15 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				}
 				$bean = NULL;
 				if ( !is_null( $this->properties[$fieldLink] ) ) {
-					$bean = $redbean->load( $type, $this->properties[$fieldLink] );
-					//If the IDs dont match, we failed to load, so try autoresolv in that case...
-					if ( $bean->id !== $this->properties[$fieldLink] && self::$autoResolve ) {
+					$failed = FALSE;
+					try {
+						$bean = $redbean->load( $type, $this->properties[$fieldLink] );
+					} catch( \Exception $e ) {
+						$failed = TRUE;
+					}
+					if (!$failed && $bean->id == 0) $failed = TRUE;
+					//If failed to load, so try autoresolv in that case...
+					if ( $failed && self::$autoResolve ) {
 						$type = $this->beanHelper->getToolbox()->getWriter()->inferFetchType( $this->__info['type'], $property );
 						if ( !is_null( $type) ) {
 							$bean = $redbean->load( $type, $this->properties[$fieldLink] );
