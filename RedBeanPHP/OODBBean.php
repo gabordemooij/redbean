@@ -1169,20 +1169,26 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				}
 				$bean = NULL;
 				if ( !is_null( $this->properties[$fieldLink] ) ) {
+					$e = NULL;
 					$failed = FALSE;
 					try {
 						$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 					} catch( \Exception $e ) {
+						/* If no autoresolvement for types, than rethrow any exception... (also in fluid) */
+						if (!self::$autoResolve) throw $e;
 						$failed = TRUE;
 					}
 					if (!$failed && $bean->id == 0) $failed = TRUE;
-					//If failed to load, so try autoresolv in that case...
+					//If failed to load and autoresolve is true then attempt to automatically resolve the type
 					if ( $failed && self::$autoResolve ) {
 						$type = $this->beanHelper->getToolbox()->getWriter()->inferFetchType( $this->__info['type'], $property );
 						if ( !is_null( $type) ) {
 							$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 							$this->__info["sys.autoresolved.{$property}"] = $type;
 							$bean->__info['sys.autoresolved-property'] = $property;
+						} elseif ($e) {
+							/* if no type is found, just rethrow original exception. */
+							throw $e;
 						}
 					}
 				}

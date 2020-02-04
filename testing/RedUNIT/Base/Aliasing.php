@@ -37,10 +37,12 @@ class Aliasing extends Base
 		$Mike  = R::dispense(array('_type'=>'person', 'name'=>'Mike'));
 		$p1    = R::dispense('project');
 		$p2    = R::dispense('project');
+		$alien = R::dispense('alien');
 		/* To be honest, I have solid evidence this is the case... */
 		$p1->name    = 'Is the earth triangular?';
 		$p1->teacher = $Sarah;
 		$p1->student = $Bob;
+		$p1->janitor_id = 999;
 		$id1 = R::store($p1);
 		/* but question everything! - why not? */
 		$p2->name    = 'Is the earth flat?';
@@ -74,6 +76,19 @@ class Aliasing extends Base
 		asrt( count( $projects ), 1 );
 		$project = reset($projects);
 		asrt( $project->name, 'Is the earth triangular?' );
+		/* If frozen and table does not exist, Exception should bubble up */
+		try { $project->janitor; fail(); }catch(\Exception $e){};
+		/* Also if no auto resolve... */
+		R::setAutoResolve( FALSE );
+		try { $project->janitor; fail(); }catch(\Exception $e){};
+		R::setAutoResolve( TRUE );
+		/* If something else goes wrong then also Exceptions in both cases */
+		$project = $project->fresh();
+		R::freeze(FALSE);
+		R::nuke();
+		R::freeze(TRUE);
+		try { $project->student; fail(); } catch(\Exception $e){ pass(); }
+		R::freeze(FALSE);
 	}
 
 	/**
