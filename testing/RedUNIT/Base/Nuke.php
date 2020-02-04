@@ -24,6 +24,28 @@ use RedBeanPHP\Facade as R;
 class Nuke extends Base
 {
 	/**
+	 * Test wipeAll().
+	 *
+	 * @return void
+	 */
+	public function testWipe()
+	{
+		R::nuke();
+		$bean = R::dispense( 'bean' );
+		asrt( count( R::inspect() ), 0 );
+		R::store( $bean );
+		asrt( count( R::inspect() ), 1 );
+		asrt( count( R::count( 'bean' ) ), 1 );
+		R::debug(1);
+		R::wipeAll();
+		asrt( count( R::inspect() ), 1 );
+		asrt( R::count( 'bean' ), 0 );
+		R::wipeAll( TRUE );
+		asrt( count( R::inspect() ), 0 );
+		asrt( R::count( 'bean' ), 0 );
+	}
+
+	/**
 	 * Nuclear test suite.
 	 *
 	 * @return void
