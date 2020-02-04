@@ -443,6 +443,9 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	private function getOwnList( $type, $redbean )
 	{
 		$type = $this->beau( $type );
+		if (array_key_exists('sys.autoresolved-property', $this->__info)) {
+			$this->aliasName = $this->__info['sys.autoresolved-property'];
+		}
 		if ( $this->aliasName ) {
 			$parentField = $this->aliasName;
 			$myFieldLink = $parentField . '_id';
@@ -1179,6 +1182,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 						if ( !is_null( $type) ) {
 							$bean = $redbean->load( $type, $this->properties[$fieldLink] );
 							$this->__info["sys.autoresolved.{$property}"] = $type;
+							$bean->__info['sys.autoresolved-property'] = $property;
 						}
 					}
 				}

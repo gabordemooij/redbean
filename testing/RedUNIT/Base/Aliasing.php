@@ -25,6 +25,58 @@ use RedBeanPHP\OODBBean as OODBBean;
 class Aliasing extends Base
 {
 	/**
+	 * See Aliasing::testIssue780 for details.
+	 *
+	 * return void
+	 */
+	private function testIssue780b()
+	{
+		$p = R::dispense('project');
+		$Bob   = R::dispense(array('_type'=>'person', 'name'=>'Bob'));
+		$Sarah = R::dispense(array('_type'=>'person', 'name'=>'Sarah'));
+		$Mike  = R::dispense(array('_type'=>'person', 'name'=>'Mike'));
+		$p1    = R::dispense('project');
+		$p2    = R::dispense('project');
+		/* To be honest, I have solid evidence this is the case... */
+		$p1->name    = 'Is the earth triangular?';
+		$p1->teacher = $Sarah;
+		$p1->student = $Bob;
+		$id1 = R::store($p1);
+		/* but question everything! - why not? */
+		$p2->name    = 'Is the earth flat?';
+		$p2->teacher = $Bob;
+		$p2->student = $Sarah;
+		$id2 = R::store($p2);
+		R::freeze( TRUE );
+		R::setAutoResolve( TRUE );
+		$p2 = R::load('project', $id2);
+		asrt($p2->name,'Is the earth flat?');
+		/* Because of autoresolve - Bob and Sarah should be retrieved */
+		asrt($p2->teacher->name, 'Bob');
+		/* RedBeanPHP will figure out that teacher and student are actually of type: person */
+		asrt($p2->student->name, 'Sarah');
+		/* Now if we 'have' an auto-resolved student person, we might want to use that to obtain projects: */
+		$projects = $p2->student->ownProjectList;
+		asrt( count( $projects ), 1 );
+		$project = reset($projects);
+		asrt($project->name,'Is the earth flat?');
+		/* However, if we just treat Sarah as a person, not in a role... */
+		$student = $p2->student->fresh();
+		try {
+			$projects = $student->ownProjectList;
+			fail();
+		} catch( \Exception $e ) {
+			pass();
+		}
+		/* We get no projects because the relationship is not defined on a person-basis */
+		$projects = $student->alias('teacher')->ownProjectList;
+		/* But we can use an explicit alias instead.. */
+		asrt( count( $projects ), 1 );
+		$project = reset($projects);
+		asrt( $project->name, 'Is the earth triangular?' );
+	}
+
+	/**
 	 * Issue #780
 	 * Autoresolve throws an exception because the system first tries to
 	 * load a teacher bean (line 1169 below), but since that teacher table doesn't
@@ -38,19 +90,11 @@ class Aliasing extends Base
 		R::nuke();
 		R::freeze( FALSE );
 		R::usePartialBeans( TRUE );
-		$p = R::dispense('project');
-		$p->name    = 'Is the earth flat?';
-		$p->teacher = R::dispense('person');
-		$p->student = R::dispense('person');
-		$p->teacher->name = 'Bob';
-		$p->student->name = 'Sarah';
-		R::store($p);
-		R::freeze( TRUE );
-		R::setAutoResolve( TRUE );
-		$p = R::load('project', 1);
-		asrt($p->name,'Is the earth flat?');
-		asrt($p->teacher->name, 'Bob');
-		asrt($p->student->name, 'Sarah');
+		$this->testIssue780b();
+		R::usePartialBeans( FALSE );
+		$this->testIssue780b();
+		R::freeze( FALSE );
+		R::usePartialBeans( FALSE );
 	}
 
 	/**
