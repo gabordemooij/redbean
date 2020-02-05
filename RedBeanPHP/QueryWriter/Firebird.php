@@ -70,7 +70,7 @@ class Firebird extends AQueryWriter implements QueryWriter
 	/**
 	 * @see AQueryWriter::getKeyMapForType
 	 */
-	protected function getKeyMapForType( $type )
+	public function getKeyMapForType( $type )
 	{
 		$table = $this->esc( $type, TRUE );
 		$keys = $this->adapter->get('
@@ -97,7 +97,7 @@ class Firebird extends AQueryWriter implements QueryWriter
 		$keyInfoList = array();
 		foreach ( $keys as $k ) {
 			$label = $this->makeFKLabel( $k['from'], $k['table'], $k['to'] );
-			$keyInfoList[$label] = array(
+			$keyInfoList[$k['from']] = array(
 				'name'          => $k['name'],
 				'from'          => $k['from'],
 				'table'         => $k['table'],
