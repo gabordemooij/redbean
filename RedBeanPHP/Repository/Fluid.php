@@ -140,6 +140,7 @@ class Fluid extends Repository
 						$bean->setMeta("sys.typeof.{$destinationColumnNoQ}", NULL);
 					}
 				}
+				$this->flushKeyMapsCache();
 			}
 		}
 	}

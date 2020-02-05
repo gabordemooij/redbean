@@ -451,14 +451,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		// We won't autoResolve if an explicit alias is set
 		if ( self::$autoResolve && empty( $this->aliasName ) ) {
 			list( $redbean, , $writer, $toolbox ) = $this->beanHelper->getExtractedToolbox();
-			if ( $redbean->isFrozen() ) {
-				if ( !isset( self::$keyMaps[$type] ) ) {
-					self::$keyMaps[$type] = $writer->getKeyMapForType( $type );
-				}
-				$keyMap = self::$keyMaps[$type];
-			} else {
-				$keyMap = $writer->getKeyMapForType( $type );
+			$keyMaps = $redbean->getKeyMapsCache();
+			if ( !isset( $keyMaps[$type] ) ) {
+				$keyMaps[$type] = $writer->getKeyMapForType( $type );
 			}
+			$keyMap = $keyMaps[$type];
 			$property = $this->__info['type'];
 			$alreadyResolved = FALSE;
 			foreach ( $keyMap as $from => $key ) {
@@ -1194,14 +1191,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				} elseif ( !is_null( $this->properties[$fieldLink] ) ) {
 					if ( self::$autoResolve ) {
 						$thisType = $this->__info['type'];
-						if ( $redbean->isFrozen() ) {
-							if ( !isset( self::$keyMaps[$thisType] ) ) {
-								self::$keyMaps[$thisType] = $writer->getKeyMapForType( $thisType );
-							}
-							$keyMap = self::$keyMaps[$thisType];
-						} else {
-							$keyMap = $writer->getKeyMapForType( $thisType );
+						$keyMaps = $redbean->getKeyMapsCache();
+						if ( !isset( $keyMaps[$thisType] ) ) {
+							$keyMaps[$thisType] = $writer->getKeyMapForType( $thisType );
 						}
+						$keyMap = $keyMaps[$thisType];
 						if ( isset( $keyMap[$fieldLink]['table'] ) ) {
 							$type = $keyMap[$fieldLink]['table'];
 							$this->__info["sys.autoresolved.{$property}"] = $type;

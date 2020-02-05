@@ -32,6 +32,13 @@ use RedBeanPHP\Cursor\NullCursor as NullCursor;
 abstract class Repository
 {
 	/**
+	 * Stores information used by the autoResolve feature
+	 *
+	 * @var array
+	 */
+	protected static $keyMapsCache = array();
+
+	/**
 	 * @var array
 	 */
 	protected $stash = NULL;
@@ -50,6 +57,27 @@ abstract class Repository
 	 * @var boolean
 	 */
 	protected $partialBeans = FALSE;
+
+	/**
+	 * Return keyMapsCache
+	 *
+	 * @return array
+	 */
+	public function getKeyMapsCache()
+	{
+		return self::$keyMapsCache;
+	}
+
+	/**
+	 * Reset the keyMapsCache, used after the schema has been modified
+	 * Made public so that it can be called manually after an R:exec()
+	 *
+	 * @return void
+	 */
+	public function flushKeyMapsCache()
+	{
+		self::$keyMapsCache = array();
+	}
 
 	/**
 	 * Toggles 'partial bean mode'. If this mode has been

@@ -540,6 +540,14 @@ class OODB extends Observable
 	}
 
 	/**
+	 * Return the key maps cache
+	 */
+	public function getKeyMapsCache()
+	{
+		return $this->repository->getKeyMapsCache();
+	}
+
+	/**
 	 * Binds an SQL function to a column.
 	 * This method can be used to setup a decode/encode scheme or
 	 * perform UUID insertion. This method is especially useful for handling
