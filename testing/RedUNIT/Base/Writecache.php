@@ -145,6 +145,7 @@ class Writecache extends Base
 	{
 		testpack( 'Testing WriteCache Query Writer Cache' );
 		R::setNarrowFieldMode( FALSE );
+		$oldAutoResolve = R::setAutoResolve( FALSE );
 		R::useWriterCache( FALSE );
 		R::debug( TRUE, 1 );
 		$logger = R::getDatabaseAdapter()->getDatabase()->getLogger();
@@ -254,6 +255,7 @@ class Writecache extends Base
 		asrt( count( $logger->grep( 'SELECT' ) ), 2 );
 		R::getWriter()->setUseCache( TRUE );
 		R::setNarrowFieldMode( TRUE );
+		R::setAutoResolve( $oldAutoResolve );
 	}
 
 	/**
