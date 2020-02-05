@@ -67,6 +67,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * @var array
 	 */
 	protected static $aliases = array();
+	
+	/**
+	 * @var array
+	 */
+	protected static $keyMaps = array();
 
 	/**
 	 * @var boolean
@@ -443,6 +448,31 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	private function getOwnList( $type, $redbean )
 	{
 		$type = $this->beau( $type );
+		// We won't autoResolve if an explicit alias is set
+		if ( self::$autoResolve && empty( $this->aliasName ) ) {
+			list( $redbean, , $writer, $toolbox ) = $this->beanHelper->getExtractedToolbox();
+			if ( $redbean->isFrozen() ) {
+				if ( !isset( self::$keyMaps[$type] ) ) {
+					self::$keyMaps[$type] = $writer->getKeyMapForType( $type );
+				}
+				$keyMap = self::$keyMaps[$type];
+			} else {
+				$keyMap = $writer->getKeyMapForType( $type );
+			}
+			$property = $this->__info['type'];
+			$alreadyResolved = FALSE;
+			foreach ( $keyMap as $from => $key ) {
+				if ( $key['table'] == $property ) {
+					// We will autoResolve if there's only one column that could match the type
+					if ( $alreadyResolved ) {
+						$this->aliasName = NULL;
+						break;
+					}
+					$this->aliasName = substr( $from, 0, -3 );
+					$alreadyResolved = TRUE;
+				}
+			}
+		}
 		if ( $this->aliasName ) {
 			$parentField = $this->aliasName;
 			$myFieldLink = $parentField . '_id';
@@ -1148,7 +1178,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			return $this->properties[$property];
 		}
 
-		list( $redbean, , , $toolbox ) = $this->beanHelper->getExtractedToolbox();
+		list( $redbean, , $writer, $toolbox ) = $this->beanHelper->getExtractedToolbox();
 
 		//If it's another bean, then we load it and return
 		if ( isset( $this->$fieldLink ) ) {
@@ -1161,20 +1191,32 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				} elseif ( $this->fetchType ) {
 					$type = $this->fetchType;
 					$this->fetchType = NULL;
+				} elseif ( !is_null( $this->properties[$fieldLink] ) ) {
+					if ( self::$autoResolve ) {
+						$thisType = $this->__info['type'];
+						if ( $redbean->isFrozen() ) {
+							if ( !isset( self::$keyMaps[$thisType] ) ) {
+								self::$keyMaps[$thisType] = $writer->getKeyMapForType( $thisType );
+							}
+							$keyMap = self::$keyMaps[$thisType];
+						} else {
+							$keyMap = $writer->getKeyMapForType( $thisType );
+						}
+						if ( isset( $keyMap[$fieldLink]['table'] ) ) {
+							$type = $keyMap[$fieldLink]['table'];
+							$this->__info["sys.autoresolved.{$property}"] = $type;
+						} else {
+							$type = $property;
+						}
+					} else {
+						$type = $property;
+					}
 				} else {
-					$type = $property;
+					$type = NULL;
 				}
 				$bean = NULL;
-				if ( !is_null( $this->properties[$fieldLink] ) ) {
+				if ( NULL !== $type ) {
 					$bean = $redbean->load( $type, $this->properties[$fieldLink] );
-					//If the IDs dont match, we failed to load, so try autoresolv in that case...
-					if ( $bean->id !== $this->properties[$fieldLink] && self::$autoResolve ) {
-						$type = $this->beanHelper->getToolbox()->getWriter()->inferFetchType( $this->__info['type'], $property );
-						if ( !is_null( $type) ) {
-							$bean = $redbean->load( $type, $this->properties[$fieldLink] );
-							$this->__info["sys.autoresolved.{$property}"] = $type;
-						}
-					}
 				}
 			}
 			$this->properties[$property] = $bean;
