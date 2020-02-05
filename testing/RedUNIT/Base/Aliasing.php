@@ -33,6 +33,7 @@ class Aliasing extends Base
 	public function testAutoResolver()
 	{
 		R::nuke();
+		R::setAutoResolve( TRUE );
 		list( $project, $teacher, $student ) = R::dispenseAll( 'project,person,person' );
 		$teacher->name = 'teacher';
 		$student->name = 'student';
@@ -67,15 +68,15 @@ class Aliasing extends Base
 		//Also test the default implementation...
 		$nullWriter = new \NullWriter( R::getDatabaseAdapter() );
 		asrt( is_null( $nullWriter->inferFetchType( 'test', 'test' ) ), TRUE );
-		//Realteacher should take precedence over fetchAs-teacher, name conventions first!
-		//also: ensure we do not use autoresolv for anything except when truly necessary! (performance)
+		//Realteacher should NOT take precedence over fetchAs-teacher, as there's already a foreign key
+		//linking the table project and the table person on the teacher_id column
 		$realTeacher = R::dispense( 'teacher' );
 		$realTeacher->name = 'real';
 		R::store( $realTeacher );
 		//ID must be same
 		asrt( $realTeacher->id, $teacher->id );
 		$project = $project->fresh();
-		asrt( $project->teacher->name, 'real' );
+		asrt( $project->teacher->name, 'teacher' );
 	}
 
 	/**
