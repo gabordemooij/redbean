@@ -538,8 +538,8 @@ abstract class AQueryWriter
 			return NULL;
 		}
 
-		foreach( $map as $key ) {
-			if ( $key['from'] === $property ) return $key;
+		if ( isset( $map[$property] ) ) {
+			return $map[$property];
 		}
 		return NULL;
 	}
@@ -567,7 +567,7 @@ abstract class AQueryWriter
 	 *
 	 * @return array
 	 */
-	protected function getKeyMapForType( $type )
+	public function getKeyMapForType( $type )
 	{
 		return array();
 	}
@@ -1423,10 +1423,8 @@ abstract class AQueryWriter
 		$field = $this->esc( $property, TRUE ) . '_id';
 		$keys = $this->getKeyMapForType( $type );
 
-		foreach( $keys as $key ) {
-			if (
-				$key['from'] === $field
-			) return $key['table'];
+		if ( isset( $keys[$field]['table'] ) ) {
+			return $keys[$field]['table'];
 		}
 		return NULL;
 	}
