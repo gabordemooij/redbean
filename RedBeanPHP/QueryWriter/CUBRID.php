@@ -84,7 +84,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	/**
 	 * @see AQueryWriter::getKeyMapForType
 	 */
-	protected function getKeyMapForType( $type  )
+	public function getKeyMapForType( $type  )
 	{
 		$sqlCode = $this->adapter->get("SHOW CREATE TABLE `{$type}`");
 		if (!isset($sqlCode[0])) return array();
@@ -95,7 +95,7 @@ class CUBRID extends AQueryWriter implements QueryWriter
 		$max = count($matches[0]);
 		for($i = 0; $i < $max; $i++) {
 			$label = $this->makeFKLabel( $matches[2][$i], $matches[3][$i], 'id' );
-			$list[ $label ] = array(
+			$list[ $matches[2][$i] ] = array(
 				'name' => $matches[1][$i],
 				'from' => $matches[2][$i],
 				'table' => $matches[3][$i],
@@ -371,10 +371,8 @@ class CUBRID extends AQueryWriter implements QueryWriter
 		$field = $this->esc( $property, TRUE ) . '_id';
 		$keys = $this->getKeyMapForType( $table );
 
-		foreach( $keys as $key ) {
-			if (
-				$key['from'] === $field
-			) return $key['table'];
+		if ( isset( $keys[$field]['table'] ) ) {
+			return $keys[$field]['table'];
 		}
 		return NULL;
 	}
