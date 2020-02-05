@@ -127,7 +127,14 @@ class Aliasing extends Base
 		//cached - same list
 		asrt( count( $ilse->ownProject ), 0);
 		//now test state
-		asrt( count( $ilse->setAttr( 'a', 'b' )->alias( 'developer' )->ownProject ), 2);
+		try {
+			count( $ilse->setAttr( 'a', 'b' )->alias( 'developer' )->ownProject );
+			fail();
+		} catch ( \RedException $e ) {
+			asrt( $e->getMessage(), 'Ambiguous autoResolve for person bean when loading ownprojectList.');
+		} catch ( \Exception $e ) {
+			fail();
+		}
 		//now test state
 		$ilse = $ilse->fresh();
 		//attr clears state...
