@@ -465,7 +465,8 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				if ( $key['table'] == $property ) {
 					// We will autoResolve if there's only one column that could match the type
 					if ( $alreadyResolved ) {
-						throw new RedException( "Ambiguous autoResolve for {$property} bean when loading own{$type}List." );
+						$this->aliasName = NULL;
+						break;
 					}
 					$this->aliasName = substr( $from, 0, -3 );
 					$alreadyResolved = TRUE;
