@@ -67,11 +67,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * @var array
 	 */
 	protected static $aliases = array();
-	
-	/**
-	 * @var array
-	 */
-	protected static $keyMaps = array();
 
 	/**
 	 * @var boolean
