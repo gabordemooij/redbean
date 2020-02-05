@@ -127,7 +127,7 @@ class Aliasing extends Base
 		//cached - same list
 		asrt( count( $ilse->ownProject ), 0);
 		//now test state
-		asrt( count( $ilse->setAttr( 'a', 'b' )->alias( 'developer' )->ownProject ), 0);
+		asrt( count( $ilse->setAttr( 'a', 'b' )->alias( 'developer' )->ownProject ), 2);
 		//now test state
 		$ilse = $ilse->fresh();
 		//attr clears state...
