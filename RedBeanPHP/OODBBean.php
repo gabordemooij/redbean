@@ -1186,11 +1186,11 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			if ( isset( $this->__info["sys.parentcache.$property"] ) ) {
 				$bean = $this->__info["sys.parentcache.$property"];
 			} else {
-				if ( isset( self::$aliases[$property] ) ) {
-					$type = self::$aliases[$property];
-				} elseif ( $this->fetchType ) {
+				if ( $this->fetchType ) {
 					$type = $this->fetchType;
 					$this->fetchType = NULL;
+				} elseif ( isset( self::$aliases[$property] ) ) {
+					$type = self::$aliases[$property];
 				} elseif ( !is_null( $this->properties[$fieldLink] ) ) {
 					if ( self::$autoResolve ) {
 						$thisType = $this->__info['type'];
