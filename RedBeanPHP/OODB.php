@@ -542,7 +542,7 @@ class OODB extends Observable
 	/**
 	 * Return the key maps cache
 	 */
-	public function getKeyMapsCache()
+	public function &getKeyMapsCache()
 	{
 		return $this->repository->getKeyMapsCache();
 	}

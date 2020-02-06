@@ -446,7 +446,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		// We won't autoResolve if an explicit alias is set
 		if ( self::$autoResolve && empty( $this->aliasName ) ) {
 			list( $redbean, , $writer, $toolbox ) = $this->beanHelper->getExtractedToolbox();
-			$keyMaps = $redbean->getKeyMapsCache();
+			$keyMaps = &$redbean->getKeyMapsCache();
 			if ( !isset( $keyMaps[$type] ) ) {
 				$keyMaps[$type] = $writer->getKeyMapForType( $type );
 			}
@@ -1186,7 +1186,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 				} elseif ( !is_null( $this->properties[$fieldLink] ) ) {
 					if ( self::$autoResolve ) {
 						$thisType = $this->__info['type'];
-						$keyMaps = $redbean->getKeyMapsCache();
+						$keyMaps = &$redbean->getKeyMapsCache();
 						if ( !isset( $keyMaps[$thisType] ) ) {
 							$keyMaps[$thisType] = $writer->getKeyMapForType( $thisType );
 						}

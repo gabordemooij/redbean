@@ -63,7 +63,7 @@ abstract class Repository
 	 *
 	 * @return array
 	 */
-	public function getKeyMapsCache()
+	public function &getKeyMapsCache()
 	{
 		return self::$keyMapsCache;
 	}
