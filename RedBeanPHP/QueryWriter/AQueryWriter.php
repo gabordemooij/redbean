@@ -908,56 +908,101 @@ abstract class AQueryWriter
 	 */
 	public function parseJoin( $type, $sql )
 	{
-		$sql = ' ' . $sql;
-		if ( strpos( $sql, '@joined.' ) === FALSE ) {
+		if ( strpos( $sql, '@' ) === FALSE ) {
 			return $sql;
 		}
- 
-		$joinSql = '';
+
+		$sql = ' ' . $sql;
 		$joins = array();
-		$oldParts = $parts = explode( '@joined.', $sql );
-		array_shift( $parts );
-		foreach($parts as $part) {
-			$explosion = explode( '.', $part );
-			$joinInfo  = reset( $explosion );
-			//Dont join more than once..
-			if ( !isset( $joins[$joinInfo] ) ) {
-				$joins[ $joinInfo ] = TRUE;
-				if ( !preg_match( "#JOIN\s+(\w*\s+AS\s+|`)?{$joinInfo}.*WHERE#i", $sql ) ) {
-					$joinSql .= $this->writeJoin( $type, $joinInfo, 'LEFT' );
+		$joinSql = '';
+
+		$joinTypes = array( 'shared', 'own', 'joined' );
+
+		foreach ( $joinTypes as $joinType ) {
+			$parts = explode( "@{$joinType}.", $sql );
+			if ( count( $parts ) <= 1 ) {
+				continue;
+			}
+
+			$oldParts = $parts;
+			array_shift( $parts );
+			foreach($parts as $part) {
+				$explosion = explode( '.', $part );
+				$joinInfo  = $explosion[0];
+				//Dont join more than once..
+				if ( !isset( $joins[$joinInfo] ) ) {
+					$joins[ $joinInfo ] = TRUE;
+					if ( !preg_match( "#JOIN\s+(\w*\s+AS\s+|`)?{$joinInfo}.*WHERE#i", $sql ) ) {
+						$joinSql .= $this->writeJoin( $type, $joinInfo, 'LEFT', $joinType );
+					}
 				}
 			}
+
+			$sql = implode( '', $oldParts );
 		}
- 
-		$sql = implode( '', $oldParts );
+
 		if ( strpos( $sql, ' WHERE ') === FALSE ) {
 			$sql = "{$joinSql} WHERE {$sql}";
 		} else {
 			$sqlParts = explode( ' WHERE ', $sql, 2 );
 			$sql = "{$sqlParts[0]} {$joinSql} WHERE {$sqlParts[1]}";
 		}
- 
+
 		return $sql;
 	}
 
 	/**
 	 * @see QueryWriter::writeJoin
 	 */
-	public function writeJoin( $type, $targetType, $leftRight = 'LEFT' )
+	public function writeJoin( $type, $targetType, $leftRight = 'LEFT', $joinType = 'parent' )
 	{
 		if ( $leftRight !== 'LEFT' && $leftRight !== 'RIGHT' && $leftRight !== 'INNER' )
 			throw new RedException( 'Invalid JOIN.' );
 
-		$table = $this->esc( $type );
-		$field = $this->esc( $targetType, TRUE );
 		$aliases = OODBBean::getAliases();
 		if ( isset( $aliases[$targetType] ) ) {
 			$alias       = $this->esc( $targetType );
-			$targetTable = $this->esc( $aliases[$targetType] );
-			$joinSql     = " {$leftRight} JOIN {$targetTable} AS {$alias} ON {$alias}.id = {$table}.{$field}_id ";
+			$destType    = $aliases[$targetType];
 		} else {
-			$targetTable = $this->esc( $targetType );
-			$joinSql     = " {$leftRight} JOIN {$targetTable} ON {$targetTable}.id = {$table}.{$field}_id ";
+			$destType    = $targetType;
+		}
+
+		$table       = $this->esc( $type );
+		$targetTable = $this->esc( $destType );
+
+		if ( $joinType == 'shared' ) {
+			$field      = $this->esc( $type, TRUE );
+			$leftField  = "id";
+			$rightField = "{$field}_id";
+
+			$linkTable      = $this->esc( $this->getAssocTable( array( $type, $destType ) ) );
+			$linkField      = $this->esc( $targetType, TRUE );
+			$linkLeftField  = "id";
+			$linkRightField = "{$linkField}_id";
+
+			$joinSql = "
+				{$leftRight} JOIN {$linkTable}
+				INNER JOIN {$targetTable} ON (
+					{$targetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField}
+					AND {$table}.{$leftField} = {$linkTable}.{$rightField}
+				)
+			";
+		} else {
+			if ( $joinType == 'own' ) {
+				$field      = $this->esc( $type, TRUE );
+				$leftField  = "{$field}_id";
+				$rightField = "id";
+			} else {
+				$field      = $this->esc( $targetType, TRUE );
+				$leftField  = "id";
+				$rightField = "{$field}_id";
+			}
+
+			if ( isset( $aliases[$targetType] ) ) {
+				$joinSql = " {$leftRight} JOIN {$targetTable} AS {$alias} ON {$alias}.{$leftField} = {$table}.{$rightField} ";
+			} else {
+				$joinSql = " {$leftRight} JOIN {$targetTable} ON {$targetTable}.{$leftField} = {$table}.{$rightField} ";
+			}
 		}
 
 		return $joinSql;

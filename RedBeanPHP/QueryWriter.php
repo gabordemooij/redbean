@@ -98,7 +98,7 @@ interface QueryWriter
 	 *
 	 * @return string $joinSQLSnippet
 	 */
-	public function writeJoin( $type, $targetType, $joinType );
+	public function writeJoin( $type, $targetType, $leftRight, $joinType );
 
 	/**
 	 * Glues an SQL snippet to the beginning of a WHERE clause.
