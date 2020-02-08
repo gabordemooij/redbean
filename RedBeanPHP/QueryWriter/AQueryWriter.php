@@ -976,17 +976,27 @@ abstract class AQueryWriter
 			$rightField = "{$field}_id";
 
 			$linkTable      = $this->esc( $this->getAssocTable( array( $type, $destType ) ) );
-			$linkField      = $this->esc( $targetType, TRUE );
+			$linkField      = $this->esc( $destType, TRUE );
 			$linkLeftField  = "id";
 			$linkRightField = "{$linkField}_id";
 
-			$joinSql = "
-				{$leftRight} JOIN {$linkTable}
-				INNER JOIN {$targetTable} ON (
-					{$targetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField}
-					AND {$table}.{$leftField} = {$linkTable}.{$rightField}
-				)
-			";
+			if ( isset( $aliases[$targetType] ) ) {
+				$joinSql = "
+					{$leftRight} JOIN {$linkTable}
+					INNER JOIN {$targetTable} AS {$alias} ON (
+						{$alias}.{$linkLeftField} = {$linkTable}.{$linkRightField}
+						AND {$table}.{$leftField} = {$linkTable}.{$rightField}
+					)
+				";
+			} else {
+				$joinSql = "
+					{$leftRight} JOIN {$linkTable}
+					INNER JOIN {$targetTable} ON (
+						{$targetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField}
+						AND {$table}.{$leftField} = {$linkTable}.{$rightField}
+					)
+				";
+			}
 		} else {
 			if ( $joinType == 'own' ) {
 				$field      = $this->esc( $type, TRUE );
