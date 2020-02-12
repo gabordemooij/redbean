@@ -904,17 +904,118 @@ abstract class AQueryWriter
 	}
 
 	/**
+	 * @see QueryWriter::parseJoin
+	 */
+	public function parseJoin( $type, $sql )
+	{
+		if ( strpos( $sql, '@' ) === FALSE ) {
+			return $sql;
+		}
+
+		$sql = ' ' . $sql;
+		$joins = array();
+		$joinSql = '';
+
+		$joinTypes = array( 'shared', 'own', 'joined' );
+
+		foreach ( $joinTypes as $joinType ) {
+			$parts = explode( "@{$joinType}.", $sql );
+			if ( count( $parts ) <= 1 ) {
+				continue;
+			}
+
+			$oldParts = $parts;
+			array_shift( $parts );
+			foreach($parts as $part) {
+				$explosion = explode( '.', $part );
+				$joinInfo  = $explosion[0];
+				//Dont join more than once..
+				if ( !isset( $joins[$joinInfo] ) ) {
+					$joins[ $joinInfo ] = TRUE;
+					if ( !preg_match( "#JOIN\s+(\w*\s+AS\s+|`)?{$joinInfo}.*WHERE#i", $sql ) ) {
+						$joinSql .= $this->writeJoin( $type, $joinInfo, 'LEFT', $joinType );
+					}
+				}
+			}
+
+			$sql = implode( '', $oldParts );
+		}
+
+		if ( strpos( $sql, ' WHERE ') === FALSE ) {
+			$sql = "{$joinSql} WHERE {$sql}";
+		} else {
+			$sqlParts = explode( ' WHERE ', $sql, 2 );
+			$sql = "{$sqlParts[0]} {$joinSql} WHERE {$sqlParts[1]}";
+		}
+
+		return $sql;
+	}
+
+	/**
 	 * @see QueryWriter::writeJoin
 	 */
-	public function writeJoin( $type, $targetType, $leftRight = 'LEFT' )
+	public function writeJoin( $type, $targetType, $leftRight = 'LEFT', $joinType = 'parent' )
 	{
 		if ( $leftRight !== 'LEFT' && $leftRight !== 'RIGHT' && $leftRight !== 'INNER' )
 			throw new RedException( 'Invalid JOIN.' );
 
-		$table = $this->esc( $type );
-		$targetTable = $this->esc( $targetType );
-		$field = $this->esc( $targetType, TRUE );
-		return " {$leftRight} JOIN {$targetTable} ON {$targetTable}.id = {$table}.{$field}_id ";
+		$aliases = OODBBean::getAliases();
+		if ( isset( $aliases[$targetType] ) ) {
+			$alias       = $this->esc( $targetType );
+			$destType    = $aliases[$targetType];
+		} else {
+			$destType    = $targetType;
+		}
+
+		$table       = $this->esc( $type );
+		$targetTable = $this->esc( $destType );
+
+		if ( $joinType == 'shared' ) {
+			$field      = $this->esc( $type, TRUE );
+			$leftField  = "id";
+			$rightField = "{$field}_id";
+
+			$linkTable      = $this->esc( $this->getAssocTable( array( $type, $destType ) ) );
+			$linkField      = $this->esc( $destType, TRUE );
+			$linkLeftField  = "id";
+			$linkRightField = "{$linkField}_id";
+
+			if ( isset( $aliases[$targetType] ) ) {
+				$joinSql = "
+					{$leftRight} JOIN {$linkTable}
+					INNER JOIN {$targetTable} AS {$alias} ON (
+						{$alias}.{$linkLeftField} = {$linkTable}.{$linkRightField}
+						AND {$table}.{$leftField} = {$linkTable}.{$rightField}
+					)
+				";
+			} else {
+				$joinSql = "
+					{$leftRight} JOIN {$linkTable}
+					INNER JOIN {$targetTable} ON (
+						{$targetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField}
+						AND {$table}.{$leftField} = {$linkTable}.{$rightField}
+					)
+				";
+			}
+		} else {
+			if ( $joinType == 'own' ) {
+				$field      = $this->esc( $type, TRUE );
+				$leftField  = "{$field}_id";
+				$rightField = "id";
+			} else {
+				$field      = $this->esc( $targetType, TRUE );
+				$leftField  = "id";
+				$rightField = "{$field}_id";
+			}
+
+			if ( isset( $aliases[$targetType] ) ) {
+				$joinSql = " {$leftRight} JOIN {$targetTable} AS {$alias} ON {$alias}.{$leftField} = {$table}.{$rightField} ";
+			} else {
+				$joinSql = " {$leftRight} JOIN {$targetTable} ON {$targetTable}.{$leftField} = {$table}.{$rightField} ";
+			}
+		}
+
+		return $joinSql;
 	}
 
 	/**
@@ -961,7 +1062,9 @@ abstract class AQueryWriter
 			$sql = $this->glueSQLCondition( $addSql );
 		}
 
-		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
+		$sql = $this->parseJoin( $type, $sql );
+		$fieldSelection = self::$flagNarrowFieldMode ? "{$table}.*" : '*';
+
 		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} {$this->sqlSelectSnippet} -- keep-cache";
 		$this->sqlSelectSnippet = '';
 		$rows  = $this->adapter->get( $sql, $bindings );
@@ -985,9 +1088,11 @@ abstract class AQueryWriter
 			$sqlFilterStr = $this->getSQLFilterSnippet( $type );
 		}
 
-		$fieldSelection = ( self::$flagNarrowFieldMode ) ? "{$table}.*" : '*';
-
 		$sql = $this->glueSQLCondition( $addSql, NULL );
+
+		$sql = $this->parseJoin( $type, $sql );
+		$fieldSelection = self::$flagNarrowFieldMode ? "{$table}.*" : '*';
+
 		$sql = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} -- keep-cache";
 
 		return $this->adapter->getCursor( $sql, $bindings );
@@ -1181,6 +1286,8 @@ abstract class AQueryWriter
 		} else {
 			$sql = $this->glueSQLCondition( $addSql );
 		}
+
+		$sql = $this->parseJoin( $type, $sql );
 
 		$sql    = "SELECT COUNT(*) FROM {$table} {$sql} -- keep-cache";
 		$count  = (int) $this->adapter->getCell( $sql, $bindings );
