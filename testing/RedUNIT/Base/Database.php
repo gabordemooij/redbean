@@ -48,19 +48,19 @@ class Database extends Base
 	 */
 	public function testBindFuncFunctionTemplates()
 	{
-		R::bindFunc('read', 'bean.lucky', '111 * %s', TRUE);
-		$bean = R::dispense('bean');
+		R::bindFunc('read', 'xbean.lucky', '111 * %s', TRUE);
+		$bean = R::dispense('xbean');
 		$bean->lucky = 7;
 		$id = R::store( $bean );
-		$bean = R::load( 'bean', $id );
+		$bean = R::load( 'xbean', $id );
 		asrt( intval($bean->lucky), 777 );
-		R::bindFunc('write', 'bean.triple', '3 * %s', TRUE);
+		R::bindFunc('write', 'xbean.triple', '3 * %s', TRUE);
 		$bean->triple = 3;
 		R::store($bean);
 		$bean = $bean->fresh();
 		asrt( intval($bean->triple), 9);
-		R::bindFunc('read', 'bean.lucky', NULL);
-		R::bindFunc('write', 'bean.triple', NULL);
+		R::bindFunc('read', 'xbean.lucky', NULL);
+		R::bindFunc('write', 'xbean.triple', NULL);
 	}
 
 	/**
