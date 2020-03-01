@@ -2450,12 +2450,13 @@ class Facade
 	 * @param string $mode     mode for function: i.e. read or write
 	 * @param string $field    field (table.column) to bind function to
 	 * @param string $function SQL function to bind to specified column
+	 * @param boolean $isTemplate TRUE if $function is an SQL string, FALSE for just a function name
 	 *
 	 * @return void
 	 */
-	public static function bindFunc( $mode, $field, $function )
+	public static function bindFunc( $mode, $field, $function, $isTemplate = FALSE )
 	{
-		self::$redbean->bindFunc( $mode, $field, $function );
+		self::$redbean->bindFunc( $mode, $field, $function, $isTemplate );
 	}
 
 	/**

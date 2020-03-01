@@ -41,6 +41,29 @@ class Database extends Base
 	}
 
 	/**
+	 * Test whether we cannot just bind function names but
+	 * also function templates, i.e. little SQL snippets.
+	 *
+	 * @return void
+	 */
+	public function testBindFuncFunctionTemplates()
+	{
+		R::bindFunc('read', 'bean.lucky', '111 * %s', TRUE);
+		$bean = R::dispense('bean');
+		$bean->lucky = 7;
+		$id = R::store( $bean );
+		$bean = R::load( 'bean', $id );
+		asrt( intval($bean->lucky), 777 );
+		R::bindFunc('write', 'bean.triple', '3 * %s', TRUE);
+		$bean->triple = 3;
+		R::store($bean);
+		$bean = $bean->fresh();
+		asrt( intval($bean->triple), 9);
+		R::bindFunc('read', 'bean.lucky', NULL);
+		R::bindFunc('write', 'bean.triple', NULL);
+	}
+
+	/**
 	 * Make ConvertToBean work together with getRow #759.
 	 * When no results are found for getRow it returns []
 	 * Then when you give that to convertToBean it wraps your

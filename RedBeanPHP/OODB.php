@@ -546,13 +546,14 @@ class OODB extends Observable
 	 * MySQL spatial columns, because they need to be processed first using
 	 * the asText/GeomFromText functions.
 	 *
-	 * @param string $mode     mode to set function for, i.e. read or write
-	 * @param string $field    field (table.column) to bind SQL function to
-	 * @param string $function SQL function to bind to field
+	 * @param string  $mode       mode to set function for, i.e. read or write
+	 * @param string  $field      field (table.column) to bind SQL function to
+	 * @param string  $function   SQL function to bind to field
+	 * @param boolean $isTemplate TRUE if $function is an SQL string, FALSE for just a function name
 	 *
 	 * @return void
 	 */
-	public function bindFunc( $mode, $field, $function )
+	public function bindFunc( $mode, $field, $function, $isTemplate = FALSE )
 	{
 		list( $type, $property ) = explode( '.', $field );
 		$mode = ($mode === 'write') ? QueryWriter::C_SQLFILTER_WRITE : QueryWriter::C_SQLFILTER_READ;
@@ -564,12 +565,21 @@ class OODB extends Observable
 			unset( self::$sqlFilters[$mode][$type][$property] );
 		} else {
 			if ($mode === QueryWriter::C_SQLFILTER_WRITE) {
-				self::$sqlFilters[$mode][$type][$property] = $function.'(?)';
+				if ($isTemplate) {
+					$code = sprintf( $function, '?' );
+				} else {
+					$code = "{$function}(?)";
+				}
+				self::$sqlFilters[$mode][$type][$property] = $code;
 			} else {
-				self::$sqlFilters[$mode][$type][$property] = $function."($field)";
+				if ($isTemplate) {
+					$code = sprintf( $function, $field );
+				} else {
+					$code = "{$function}({$field})";
+				}
+				self::$sqlFilters[$mode][$type][$property] = $code;
 			}
 		}
-
 		AQueryWriter::setSQLFilters( self::$sqlFilters, ( !$this->isFrozen ) );
 	}
 }
