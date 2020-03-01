@@ -540,6 +540,17 @@ class OODB extends Observable
 	}
 
 	/**
+	 * Clears all function bindings.
+	 *
+	 * @return void
+	 */
+	public function clearAllFuncBindings()
+	{
+		self::$sqlFilters = array();
+		AQueryWriter::setSQLFilters( self::$sqlFilters, FALSE );
+	}
+
+	/**
 	 * Binds an SQL function to a column.
 	 * This method can be used to setup a decode/encode scheme or
 	 * perform UUID insertion. This method is especially useful for handling

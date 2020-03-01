@@ -61,6 +61,7 @@ class Database extends Base
 		asrt( intval($bean->triple), 9);
 		R::bindFunc('read', 'xbean.lucky', NULL);
 		R::bindFunc('write', 'xbean.triple', NULL);
+		R::getRedBean()->clearAllFuncBindings();
 	}
 
 	/**
