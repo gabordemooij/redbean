@@ -68,7 +68,6 @@ class Feature
 			case self::C_FEATURE_NOVICE_5_4:
 				OODBBean::useFluidCount( FALSE );
 				R::noNuke( TRUE );
-				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );
 				R::useISNULLConditions( TRUE );
 				break;
@@ -76,28 +75,24 @@ class Feature
 			case self::C_FEATURE_5_4:
 				OODBBean::useFluidCount( FALSE );
 				R::noNuke( FALSE );
-				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( TRUE );
 				R::useISNULLConditions( TRUE );
 				break;
 			case self::C_FEATURE_NOVICE_5_3:
 				OODBBean::useFluidCount( TRUE );
 				R::noNuke( TRUE );
-				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );
 				R::useISNULLConditions( FALSE );
 				break;
 			case self::C_FEATURE_5_3:
 				OODBBean::useFluidCount( TRUE );
 				R::noNuke( FALSE );
-				R::setAutoResolve( TRUE );
 				R::setAllowHybridMode( FALSE );
 				R::useISNULLConditions( FALSE );
 				break;
 			case self::C_FEATURE_ORIGINAL:
 				OODBBean::useFluidCount( TRUE );
 				R::noNuke( FALSE );
-				R::setAutoResolve( FALSE );
 				R::setAllowHybridMode( FALSE );
 				R::useISNULLConditions( FALSE );
 				break;

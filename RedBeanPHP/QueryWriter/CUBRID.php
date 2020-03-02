@@ -361,21 +361,4 @@ class CUBRID extends AQueryWriter implements QueryWriter
 	{
 		return parent::esc( strtolower( $dbStructure ), $noQuotes );
 	}
-
-	/**
-	 * @see QueryWriter::inferFetchType
-	 */
-	public function inferFetchType( $type, $property )
-	{
-		$table = $this->esc( $type, TRUE );
-		$field = $this->esc( $property, TRUE ) . '_id';
-		$keys = $this->getKeyMapForType( $table );
-
-		foreach( $keys as $key ) {
-			if (
-				$key['from'] === $field
-			) return $key['table'];
-		}
-		return NULL;
-	}
 }

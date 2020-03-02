@@ -25,60 +25,6 @@ use RedBeanPHP\OODBBean as OODBBean;
 class Aliasing extends Base
 {
 	/**
-	 * Tests automatic resolvement of parent beans
-	 * without fetchAs() using inferFetchType (foreign keys).
-	 *
-	 * @return void
-	 */
-	public function testAutoResolver()
-	{
-		R::nuke();
-		list( $project, $teacher, $student ) = R::dispenseAll( 'project,person,person' );
-		$teacher->name = 'teacher';
-		$student->name = 'student';
-		$project->teacher = $teacher;
-		$project->student = $student;
-		R::store( $project );
-		$project = $project->fresh();
-		asrt( ( $project->teacher instanceof OODBBean), TRUE );
-		asrt( ( $project->student instanceof OODBBean), TRUE );
-		asrt( $project->teacher->name, 'teacher' );
-		asrt( $project->student->name, 'student' );
-		$project2 = R::dispense( 'project' );
-		$teacher2 = R::dispense( 'person' );
-		$teacher2->name = 'teacher2';
-		$project2->teacher = $teacher2;
-		R::store( $project2 );
-		$project2 = $project2->fresh();
-		asrt( ( $project2->teacher instanceof OODBBean), TRUE );
-		asrt( $project2->teacher->name, 'teacher2' );
-		asrt( is_null( $project2->student ), TRUE );
-		$project = $project->fresh();
-		asrt( ( $project->fetchAs('person')->teacher instanceof OODBBean), TRUE );
-		asrt( ( $project->fetchAs('person')->student instanceof OODBBean), TRUE );
-		asrt( $project->fetchAs('person')->teacher->name, 'teacher' );
-		asrt( $project->fetchAs('person')->student->name, 'student' );
-		$project = $project->fresh();
-		$export = R::exportAll( array( $project ), TRUE );
-		asrt( isset( $export[0]['teacher']['name'] ), TRUE );
-		asrt( isset( $export[0]['student']['name'] ), TRUE );
-		asrt( $export[0]['teacher']['name'], 'teacher' );
-		asrt( $export[0]['student']['name'], 'student' );
-		//Also test the default implementation...
-		$nullWriter = new \NullWriter( R::getDatabaseAdapter() );
-		asrt( is_null( $nullWriter->inferFetchType( 'test', 'test' ) ), TRUE );
-		//Realteacher should take precedence over fetchAs-teacher, name conventions first!
-		//also: ensure we do not use autoresolv for anything except when truly necessary! (performance)
-		$realTeacher = R::dispense( 'teacher' );
-		$realTeacher->name = 'real';
-		R::store( $realTeacher );
-		//ID must be same
-		asrt( $realTeacher->id, $teacher->id );
-		$project = $project->fresh();
-		asrt( $project->teacher->name, 'real' );
-	}
-
-	/**
 	 * Test for aliasing issue for LTS version.
 	 *
 	 * @return void

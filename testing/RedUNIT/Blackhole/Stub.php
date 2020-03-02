@@ -61,8 +61,6 @@ class Stub extends Base
 		pass();
 		$writer->callMethod( 'getKeyMapForType', 'bean' );
 		pass();
-		$writer->inferFetchType( $type, $property );
-		pass();
 		$writer->getTypeForID();
 		pass();
 		$writer->getTables();
