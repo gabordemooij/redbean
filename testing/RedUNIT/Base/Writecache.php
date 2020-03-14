@@ -39,6 +39,40 @@ class Writecache extends Base
 	}
 
 	/**
+	 * Lynesth:
+	 * Using flushCache() obviously fixes it.
+	 * The example might be a bit stupid but it gets to the point.
+	 * Someone might be using a specific query more than once with
+	 * getCell (or any other) and thinking the
+	 * cache works for those as well, try to make use of it.
+	 *
+	 * @return void
+	 */
+	public function testCacheFail()
+	{
+		R::nuke();
+		R::freeze( FALSE );
+		R::usePartialBeans( TRUE );
+		$author = R::dispense('author');
+		$author->name = "John";
+		$id = R::store($author);
+		$author = R::load('author', 1);                    // This gets cached
+		$author = $author->fresh();                        // This gets cached
+		$author = R::findOne('author', ' id = ? ', [ 1 ]); // This gets cached
+		asrt($author->name, 'John');
+		R::exec('UPDATE author SET name = "Bob" WHERE id = 1');
+		// It's broken because there's no cache check between those two calls
+		//more realistic query: 'SELECT MAX(id) FROM author -- keep-cache');
+		R::getCell('SELECT 123 -- keep-cache');
+		$author = R::load('author', $id);
+		asrt($author->name, 'John');
+		$author = $author->fresh();
+		asrt($author->name, 'John');
+		$author = R::findOne('author', ' id = ? ', [ 1 ]);
+		asrt($author->name, 'John');
+	}
+
+	/**
 	 * Test whether cache size remains constant (per type).
 	 * Avoiding potential memory leaks. (Issue #424).
 	 *
