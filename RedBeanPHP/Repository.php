@@ -581,7 +581,7 @@ abstract class Repository
 	 *
 	 * @return array
 	 */
-	public function convertToBeans( $type, $rows, $mask = NULL )
+	public function convertToBeans( $type, $rows, $mask = '__meta' )
 	{
 		$masktype = gettype( $mask );
 		switch ( $masktype ) {

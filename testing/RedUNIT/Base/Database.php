@@ -41,6 +41,27 @@ class Database extends Base
 	}
 
 	/**
+	 * Can we use meta mask with find() ?
+	 *
+	 * @return void
+	 */
+	public function testSelectFindOne()
+	{
+			R::store(R::dispense('book'));
+			R::store(R::dispense('book'));
+			if ($this->currentlyActiveDriverID == 'pgsql') {
+				R::getWriter()->setSQLFilters(array('r'=>array('book'=>array('__meta_total'=>'COUNT(*) OVER()'))), FALSE);
+			} else {
+				R::getWriter()->setSQLFilters(array('r'=>array('book'=>array('__meta_total'=>'2'))), FALSE);
+			}
+			$books = R::find('book', 'LIMIT 1');
+			$book = reset($books);
+			$bundle = $book->getMeta('data.bundle');
+			asrt(intval($bundle['__meta_total']),2);
+			R::getWriter()->setSQLFilters(array(), FALSE);
+	}
+
+	/**
 	 * Test whether we cannot just bind function names but
 	 * also function templates, i.e. little SQL snippets.
 	 *
