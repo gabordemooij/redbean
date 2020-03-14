@@ -47,7 +47,7 @@ class Joins extends Base
 		$bert = $person;
 		$person->movement = R::dispense(array('_type'=>'movement','name'=>'gothic'));
 		R::store( $book );
-		R::aliases([ 'author' => 'person' ]);
+		R::aliases(array( 'author' => 'person' ));
 		$books = R::find( 'book', ' @joined.author.name LIKE ? ', array('A%'));
 		asrt(count($books), 1);
 		$book = reset($books);
@@ -65,7 +65,7 @@ class Joins extends Base
 		asrt($movement->name, 'romanticism');
 		R::freeze(TRUE);
 		try{
-			R::find( 'person', ' @own.book.title LIKE ? ', [ 'A%' ]); // This doesn't work as RedBean cannot guess which column it should bind the person to in the book table.
+			R::find( 'person', ' @own.book.title LIKE ? ', array( 'A%' )); // This doesn't work as RedBean cannot guess which column it should bind the person to in the book table.
 			fail();
 		} catch(\Exception $e) {
 			pass();
