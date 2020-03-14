@@ -982,19 +982,13 @@ abstract class AQueryWriter
 
 			if ( isset( $aliases[$targetType] ) ) {
 				$joinSql = "
-					{$leftRight} JOIN {$linkTable}
-					INNER JOIN {$targetTable} AS {$alias} ON (
-						{$alias}.{$linkLeftField} = {$linkTable}.{$linkRightField}
-						AND {$table}.{$leftField} = {$linkTable}.{$rightField}
-					)
+					{$leftRight} JOIN {$linkTable} ON {$table}.{$leftField} = {$linkTable}.{$rightField}
+					INNER JOIN {$targetTable} AS {$alias} ON {$alias}.{$linkLeftField} = {$linkTable}.{$linkRightField}
 				";
 			} else {
 				$joinSql = "
-					{$leftRight} JOIN {$linkTable}
-					INNER JOIN {$targetTable} ON (
-						{$targetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField}
-						AND {$table}.{$leftField} = {$linkTable}.{$rightField}
-					)
+					{$leftRight} JOIN {$linkTable} ON {$table}.{$leftField} = {$linkTable}.{$rightField}
+					INNER JOIN {$targetTable} ON {$targetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField}
 				";
 			}
 		} else {
