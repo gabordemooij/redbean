@@ -57,7 +57,7 @@ class Writecache extends Base
 		$id = R::store($author);
 		$author = R::load('author', 1);                    // This gets cached
 		$author = $author->fresh();                        // This gets cached
-		$author = R::findOne('author', ' id = ? ', [ 1 ]); // This gets cached
+		$author = R::findOne('author', ' id = ? ', array( 1 )); // This gets cached
 		asrt($author->name, 'John');
 		R::exec('UPDATE author SET name = "Bob" WHERE id = 1');
 		// It's broken because there's no cache check between those two calls
@@ -67,7 +67,7 @@ class Writecache extends Base
 		asrt($author->name, 'John');
 		$author = $author->fresh();
 		asrt($author->name, 'John');
-		$author = R::findOne('author', ' id = ? ', [ 1 ]);
+		$author = R::findOne('author', ' id = ? ', array( 1 ));
 		asrt($author->name, 'John');
 	}
 
