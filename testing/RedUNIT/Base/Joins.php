@@ -24,6 +24,92 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Joins extends Base
 {
+	/**
+	 * Tests new parsed joins.
+	 *
+	 * @return void
+	 */
+	public function testParsedJoins()
+	{
+		$person = R::dispense('person');
+		$person->name = 'Albert';
+		$book = R::dispense('book');
+		$book->title = 'Book by Albert.';
+		$book->author = $person;
+		$person->movement = R::dispense(array('_type'=>'movement','name'=>'romanticism'));
+		R::store( $book );
+		$albert = $person;
+		$person = R::dispense('person');
+		$person->name = 'Bert';
+		$book = R::dispense('book');
+		$book->title = 'Book by Bert.';
+		$book->author = $person;
+		$bert = $person;
+		$person->movement = R::dispense(array('_type'=>'movement','name'=>'gothic'));
+		R::store( $book );
+		R::aliases([ 'author' => 'person' ]);
+		$books = R::find( 'book', ' @joined.author.name LIKE ? ', array('A%'));
+		asrt(count($books), 1);
+		$book = reset($books);
+		asrt($book->title,'Book by Albert.');
+		asrt($book->fetchAs('person')->author->name,'Albert');
+		$people = R::find( 'person', ' @joined.movement.name = ? ', array('romanticism')); // This works (aliases not involved)
+		asrt(count($people), 1);
+		$people = R::find( 'person', ' @joined.movement.name = ? ', array('gothic')); // This works (aliases not involved)
+		asrt(count($people), 1);		
+		$people = R::find( 'person', ' @joined.movement.name = ? ', array('popscience')); // This works (aliases not involved)
+		asrt(count($people), 0);
+		$movements = R::find( 'movement', ' @own.author.name LIKE ? ', array( 'A%' )); // This works
+		asrt(count($movements), 1);
+		$movement = reset($movements);
+		asrt($movement->name, 'romanticism');
+		R::freeze(TRUE);
+		try{
+			R::find( 'person', ' @own.book.title LIKE ? ', [ 'A%' ]); // This doesn't work as RedBean cannot guess which column it should bind the person to in the book table.
+			fail();
+		} catch(\Exception $e) {
+			pass();
+		}
+		R::freeze(FALSE);
+		$group = R::dispense('group');
+		$group->name = 'a';
+		$group->sharedAuthorList =  array($bert, $albert);
+		R::store($group);
+		$group = R::dispense('group');
+		$group->name = 'b';
+		$group->sharedAuthorList =  array($bert);
+		R::store($group);
+		$groups = R::find( 'group', ' @shared.author.name = ? ', array( 'Bert' )); // This works
+		asrt(count($groups),2);
+		R::tag($albert, array('male','writer'));
+		R::tag($bert, array('male'));
+		$people = R::find( 'person', ' @shared.tag.title = ? ', array( 'writer' )); // This works (aliases not involved)
+		asrt(count($people),1);
+		R::tag($albert, array('male','writer'));
+		R::tag($bert, array('male'));
+		$people = R::find( 'person', ' @shared.tag.title = ? ', array( 'male' )); // This works (aliases not involved)
+		asrt(count($people),2);
+		$user1 = R::dispense('user');
+		$user1->name = 'user1';
+		$user2 = R::dispense('user');
+		$user2->name = 'user2';
+		$status = R::dispense('status');
+		$status->whitelist = TRUE;
+		$user1->status = $status;
+		$status2 = R::dispense('status');
+		$status2->whitelist = FALSE;
+		$user2->status = $status2;
+		R::storeAll(array($user1,$user2));
+		$whitelisted = R::find( 'user', ' @joined.status.whitelist = ? ', array( 1 ) );
+		asrt(count($whitelisted), 1);
+		$user = reset($whitelisted);
+		asrt($user->name, 'user1');
+		$whitelisted = R::find( 'user', ' @joined.status.whitelist = ? ', array( 0 ) );
+		R::debug(0);
+		asrt(count($whitelisted), 1);
+		$user = reset($whitelisted);
+		asrt($user->name, 'user2');
+	}
 
 	/**
 	 * Tests joins with ownCount().

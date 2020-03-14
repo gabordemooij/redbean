@@ -52,7 +52,6 @@ class Writecache extends Base
 	{
 		R::nuke();
 		R::freeze( FALSE );
-		R::usePartialBeans( TRUE );
 		$author = R::dispense('author');
 		$author->name = "John";
 		$id = R::store($author);
