@@ -39,9 +39,7 @@ class Version extends Blackhole
 		$old = R::noNuke( TRUE );
 		R::noNuke( $old );
 		$features[] = intval( $old );
-		$old = R::setAutoResolve( TRUE );
-		R::setAutoResolve( $old );
-		$features[] = intval( $old );
+		$features[] = 0;
 		$old = R::setAllowHybridMode( TRUE );
 		R::setAllowHybridMode( $old );
 		$features[] = intval( $old );
@@ -86,17 +84,17 @@ class Version extends Blackhole
 		R::useFeatureSet('original');
 		asrt( $this->getFeatureFlags(), '1,0,0,0,0' );
 		R::useFeatureSet('5.3');
-		asrt( $this->getFeatureFlags(), '1,0,1,0,0' );
+		asrt( $this->getFeatureFlags(), '1,0,0,0,0' );
 		R::useFeatureSet('novice/5.3');
-		asrt( $this->getFeatureFlags(), '1,1,1,0,0' );
+		asrt( $this->getFeatureFlags(), '1,1,0,0,0' );
 		R::useFeatureSet('5.4');
-		asrt( $this->getFeatureFlags(), '0,0,1,1,1' );
+		asrt( $this->getFeatureFlags(), '0,0,0,1,1' );
 		R::useFeatureSet('latest');
-		asrt( $this->getFeatureFlags(), '0,0,1,1,1' );
+		asrt( $this->getFeatureFlags(), '0,0,0,1,1' );
 		R::useFeatureSet('novice/5.4');
-		asrt( $this->getFeatureFlags(), '0,1,1,0,1' );
+		asrt( $this->getFeatureFlags(), '0,1,0,0,1' );
 		R::useFeatureSet('novice/latest');
-		asrt( $this->getFeatureFlags(), '0,1,1,0,1' );
+		asrt( $this->getFeatureFlags(), '0,1,0,0,1' );
 		R::useFeatureSet('original');
 		asrt( $this->getFeatureFlags(), '1,0,0,0,0' );
 	}

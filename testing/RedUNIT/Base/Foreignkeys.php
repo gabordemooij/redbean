@@ -35,59 +35,6 @@ class Foreignkeys extends Base implements Observer
 	private $queries = array();
 
 	/**
-	 * Test whether aliases are not used if not necessary:
-	 * when using fetchAs() or R::aliases().
-	 *
-	 * @return void
-	 */
-	public function testAutoResolvAvoid()
-	{
-		R::setAutoResolve( TRUE );
-		R::nuke();
-		$book = R::dispense( 'book' );
-		$page = R::dispense( 'page' );
-		$book->cover = $page;
-		R::store( $book );
-		$book = $book->fresh();
-		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
-		$book->cover;
-		asrt( $book->getMeta('sys.autoresolved.cover'), 'page' );
-		R::nuke();
-		$book = R::dispense( 'book' );
-		$page = R::dispense( 'page' );
-		$book->cover = $page;
-		R::store( $book );
-		$book = $book->fresh();
-		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
-		$book->fetchAs('page')->cover;
-		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
-		R::nuke();
-		R::aliases( array( 'cover' => 'page' ) );
-		$book = R::dispense( 'book' );
-		$page = R::dispense( 'page' );
-		$book->cover = $page;
-		R::store( $book );
-		$book = $book->fresh();
-		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
-		$cover = $book->cover;
-		asrt( ( $cover instanceof OODBBean ), TRUE );
-		asrt( $cover->getMeta( 'type' ), 'page' );
-		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
-		R::aliases( array() );
-		R::nuke();
-		R::setAutoResolve( FALSE );
-		$book = R::dispense( 'book' );
-		$page = R::dispense( 'page' );
-		$book->cover = $page;
-		R::store( $book );
-		$book = $book->fresh();
-		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
-		$book->cover;
-		asrt( $book->getMeta('sys.autoresolved.cover'), NULL );
-		R::setAutoResolve( TRUE );
-	}
-
-	/**
 	 * Test whether unique constraints are properly created using
 	 * reflection.
 	 *

@@ -540,20 +540,4 @@ interface QueryWriter
 	 */
 	public function getAssocTable( $types );
 
-	/**
-	 * Given a bean type and a property, this method
-	 * tries to infer the fetch type using the foreign key
-	 * definitions in the database.
-	 * For instance: project, student -> person.
-	 * If no fetchType can be inferred, this method will return NULL.
-	 *
-	 * @note QueryWriters do not have to implement this method,
-	 * it's optional. A default version is available in AQueryWriter.
-	 *
-	 * @param $type     the source type to fetch a target type for
-	 * @param $property the property to fetch the type of
-	 *
-	 * @return string|NULL
-	 */
-	public function inferFetchType( $type, $property );
 }

@@ -1522,23 +1522,6 @@ abstract class AQueryWriter
 	}
 
 	/**
-	 * @see QueryWriter::inferFetchType
-	 */
-	public function inferFetchType( $type, $property )
-	{
-		$type = $this->esc( $type, TRUE );
-		$field = $this->esc( $property, TRUE ) . '_id';
-		$keys = $this->getKeyMapForType( $type );
-
-		foreach( $keys as $key ) {
-			if (
-				$key['from'] === $field
-			) return $key['table'];
-		}
-		return NULL;
-	}
-
-	/**
 	 * @see QueryWriter::addUniqueConstraint
 	 */
 	public function addUniqueIndex( $type, $properties )

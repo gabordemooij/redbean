@@ -37,8 +37,7 @@ class PullRequest530 extends Base
 	{
 		testpack( 'Testing Pull Request #530 - OODBBean __set() checks if $property is a field link' );
 		R::freeze( FALSE );
-		R::setAutoResolve( TRUE );
-		$linkedObjects = R::dispense('linkedobject', 2);
+		$linkedObjects = R::dispense('linked', 2);
 		R::storeAll($linkedObjects);
 		$tester = R::dispense('parent');
 		$tester->linked = $linkedObjects[0];
@@ -50,5 +49,3 @@ class PullRequest530 extends Base
 		asrt($tester->linked->id, $linkedObjects[1]->id);
 	}
 }
-
-?>

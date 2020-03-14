@@ -2462,7 +2462,7 @@ class Facade
 	/**
 	 * Sets global aliases.
 	 * Registers a batch of aliases in one go. This works the same as
-	 * fetchAs and setAutoResolve but explicitly. For instance if you register
+	 * fetchAs but explicitly. For instance if you register
 	 * the alias 'cover' for 'page' a property containing a reference to a
 	 * page bean called 'cover' will correctly return the page bean and not
 	 * a (non-existant) cover bean.
@@ -2487,9 +2487,7 @@ class Facade
 	 * cover => page
 	 *
 	 * From that point on, every bean reference to a cover
-	 * will return a 'page' bean. Note that with autoResolve this
-	 * feature along with fetchAs() is no longer very important, although
-	 * relying on explicit aliases can be a bit faster.
+	 * will return a 'page' bean.
 	 *
 	 * @param array $list list of global aliases to use
 	 *
@@ -2707,20 +2705,10 @@ class Facade
 	}
 
 	/**
-	 * Alias for setAutoResolve() method on OODBBean.
-	 * Enables or disables auto-resolving fetch types.
-	 * Auto-resolving aliased parent beans is convenient but can
-	 * be slower and can create infinite recursion if you
-	 * used aliases to break cyclic relations in your domain.
-	 * Returns previous value of the flag.
-	 *
-	 * @param boolean $automatic TRUE to enable automatic resolving aliased parents
-	 *
-	 * @return boolean
+	 * @deprecated
 	 */
 	public static function setAutoResolve( $automatic = TRUE )
 	{
-		return OODBBean::setAutoResolve( (boolean) $automatic );
 	}
 
 	/**
