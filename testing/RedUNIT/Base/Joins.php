@@ -25,6 +25,191 @@ use RedBeanPHP\OODBBean as OODBBean;
 class Joins extends Base
 {
 	/**
+	 * Complex tests for the parsed joins featured.
+	 *
+	 * @return void
+	 */
+	public function testComplexParsedJoins()
+	{
+		R::nuke();
+		R::aliases(array( 'author' => 'person' ));
+		$book   = R::dispense('book');
+		$author = R::dispense('person');
+		$detail = R::dispense('detail');
+		$shop   = R::dispense('shop');
+		$shop->name    = 'Books4you';
+		$shop2          = R::dispense('shop');
+		$shop2->name    = 'Readers Delight';
+		$author->name  = 'Albert';
+		$detail->title = 'Book by Albert';
+		$book->ownDetailList[] = $detail;
+		$book->author = $author;
+		$shop->sharedBookList[] = $book;
+		$book2   = R::dispense('book');
+		$author2 = R::dispense('person');
+		$detail2 = R::dispense('detail');
+		$author2->name  = 'Bert';
+		$detail2->title = 'Book by Bert';
+		$book2->ownDetailList[] = $detail2;
+		$book2->author = $author2;
+		$shop->sharedBookList[] = $book2;
+		$shop2->sharedBookList[] = $book2;
+		R::store($shop);
+		R::store($shop2);
+		//joined+own
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @own.detail.title LIKE ? ', array('Albert', 'Book by Albert'));
+		asrt(count($books),1);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @own.detail.title LIKE ? ', array('%ert%', '%Book by%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @own.detail.title LIKE ? ', array('%ert%', '%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @own.detail.title LIKE ? ', array('%ert%', 'Old Bookshop'));
+		asrt(count($books),0);
+		//joined+shared
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', '%Books%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', '%Read%'));
+		asrt(count($books),1);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', '%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', 'Old Bookshop'));
+		asrt(count($books),0);
+		//own+shared
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', '%Read%'));
+		asrt(count($books),1);
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', '%Book%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', '%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', 'Old Bookshop'));
+		asrt(count($books),0);
+		//joined+own+shared
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @own.detail.title LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', '%Book by%', 'Books%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @own.detail.title LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', '%Book by%', 'Read%'));
+		asrt(count($books),1);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @own.detail.title LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', '%Book by%', 'Old'));
+		asrt(count($books),0);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @own.detail.title LIKE ? AND @shared.shop.name LIKE ? ', array('%ert%', '%Book by%', '%'));
+		asrt(count($books),2);
+		//joined+joined
+		$page = R::dispense('page');
+		$page->text = 'Lorem Ipsum';
+		$category = R::dispense('category');
+		$category->name = 'biography';
+		$publisher = R::dispense('publisher');
+		$publisher->name = 'Good Books';
+		$book->publisher = $publisher;
+		$book->ownPageList[] = $page;
+		$category->sharedBookList[] = $book;
+		$page2 = R::dispense('page');
+		$page2->text = 'Blah Blah';
+		$category2 = R::dispense('category');
+		$category2->name = 'fiction';
+		$publisher2 = R::dispense('publisher');
+		$publisher2->name = 'Gutenberg';
+		$book2->publisher = $publisher2;
+		$book2->ownPageList = array($page2);
+		$category2->sharedBookList[] = $book2;
+		R::store($category);
+		R::store($category2);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @joined.publisher.name LIKE ?', array('%ert%', 'Good Books'));
+		asrt(count($books),1);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @joined.publisher.name LIKE ?', array('%ert%', '%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @joined.publisher.name LIKE ?', array('Unknown', '%'));
+		asrt(count($books),0);
+		$books = R::find('book', ' @joined.author.name LIKE ? AND @joined.publisher.name LIKE ?', array('%', '%'));
+		asrt(count($books),2);
+		//shared+shared
+		$books = R::find('book', ' @shared.shop.name LIKE ? AND @shared.category.name LIKE ?', array('Reader%', 'fiction'));
+		asrt(count($books),1);
+		$books = R::find('book', ' @shared.shop.name LIKE ? AND @shared.category.name LIKE ?', array('Book%', '%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @shared.shop.name LIKE ? AND @shared.category.name LIKE ?', array('Book%', 'biography'));
+		asrt(count($books),1);
+		$books = R::find('book', ' @shared.shop.name LIKE ? AND @shared.category.name LIKE ?', array('Old Bookshop', '%'));
+		asrt(count($books),0);
+		$books = R::find('book', ' @shared.shop.name LIKE ? AND @shared.category.name LIKE ?', array('%', 'horror'));
+		asrt(count($books),0);
+		//own+own
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ?', array('Book%', 'Blah%'));
+		asrt(count($books),1);
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ?', array('Book%', 'Lorem%'));
+		asrt(count($books),1);
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ?', array('Book%', '%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ?', array('%', '%'));
+		asrt(count($books),2);
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ?', array('%', 'Nah'));
+		asrt(count($books),0);
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ?', array('Nah', '%'));
+		asrt(count($books),0);
+		//joined+joined+shared+shared+own+own
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ? 
+		AND @joined.publisher.name LIKE ? AND @joined.author.name LIKE ?
+		AND @shared.shop.name LIKE ? AND @shared.category.name LIKE ?', array('Book%', 'Lorem%','Good%','Albert','Books4%','bio%'));
+		asrt(count($books),1);
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ? 
+		AND @joined.publisher.name LIKE ? AND @joined.author.name LIKE ?
+		AND @shared.shop.name LIKE ? AND @shared.category.name LIKE ?', array('%', '%','%','%','%','%'));
+		asrt(count($books),2);
+		//in order clause
+		$book = R::findOne('book', ' ORDER BY @shared.category.name ASC LIMIT 1');
+		asrt($book->author->name, 'Albert');
+		$book = R::findOne('book', ' ORDER BY @shared.category.name DESC LIMIT 1');
+		asrt($book->author->name, 'Bert');
+		$book = R::findOne('book', ' ORDER BY @own.detail.title ASC LIMIT 1');
+		asrt($book->author->name, 'Albert');
+		$book = R::findOne('book', ' ORDER BY @own.detail.title DESC LIMIT 1');
+		asrt($book->author->name, 'Bert');
+		//order+criteria
+		$book = R::findOne('book', ' @joined.publisher.name LIKE ? ORDER BY @shared.category.name ASC LIMIT 1', array('%'));
+		asrt($book->author->name, 'Albert');
+		$book = R::findOne('book', ' @joined.publisher.name LIKE ? ORDER BY @shared.category.name DESC LIMIT 1', array('%'));
+		asrt($book->author->name, 'Bert');
+		$book = R::findOne('book', ' @joined.publisher.name LIKE ? ORDER BY @own.detail.title ASC LIMIT 1', array('%'));
+		asrt($book->author->name, 'Albert');
+		$book = R::findOne('book', ' @joined.publisher.name LIKE ? ORDER BY @own.detail.title DESC LIMIT 1', array('%'));
+		asrt($book->author->name, 'Bert');
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ?
+		AND @joined.publisher.name LIKE ? AND @joined.author.name LIKE ?
+		AND @shared.shop.name LIKE ? AND @shared.category.name LIKE ?
+		ORDER BY @own.detail.title ASC
+		', array('%', '%','%','%','%','%'));
+		asrt(count($books),2);
+		$first = reset($books);
+		$last  = end($books);
+		asrt($first->author->name, 'Albert');
+		asrt($last->author->name, 'Bert');
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ?
+		AND @joined.publisher.name LIKE ? AND @joined.author.name LIKE ?
+		AND @shared.shop.name LIKE ? AND @shared.category.name LIKE ?
+		ORDER BY
+		@shared.shop.name DESC,
+		@own.detail.title ASC
+		', array('%', '%','%','%','%','%'));
+		asrt(count($books),2);
+		$first = reset($books);
+		$last  = end($books);
+		asrt($first->author->name, 'Bert');
+		asrt($last->author->name, 'Albert');
+		$books = R::find('book', ' @own.detail.title LIKE ? AND @own.page.text LIKE ?
+		AND @joined.publisher.name LIKE ? AND @joined.author.name LIKE ?
+		AND @shared.shop.name LIKE ? AND @shared.category.name LIKE ?
+		ORDER BY
+		@joined.publisher.name ASC,
+		@shared.shop.name DESC,
+		@own.detail.title ASC
+		', array('%', '%','%','%','%','%'));
+		asrt(count($books),2);
+		$first = reset($books);
+		$last  = end($books);
+		asrt($first->author->name, 'Albert');
+		asrt($last->author->name, 'Bert');
+	}
+
+	/**
 	 * Tests new parsed joins.
 	 *
 	 * @return void
