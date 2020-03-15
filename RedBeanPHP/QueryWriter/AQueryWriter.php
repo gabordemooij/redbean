@@ -941,8 +941,13 @@ abstract class AQueryWriter
 			$sql = implode( '', $oldParts );
 		}
 
+		$sql = str_ireplace( ' where ', ' WHERE ', $sql );
 		if ( strpos( $sql, ' WHERE ') === FALSE ) {
-			$sql = "{$joinSql} WHERE {$sql}";
+			if ( preg_match( '/^(ORDER|GROUP|HAVING|LIMIT|OFFSET)\s+/i', trim($sql) ) ) {
+				$sql = "{$joinSql} {$sql}";
+			} else {
+				$sql = "{$joinSql} WHERE {$sql}";
+			}
 		} else {
 			$sqlParts = explode( ' WHERE ', $sql, 2 );
 			$sql = "{$sqlParts[0]} {$joinSql} WHERE {$sqlParts[1]}";
