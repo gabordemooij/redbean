@@ -1810,7 +1810,7 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	\$didResetPass = R::matchUp(
 		'account',
 		' token = ? AND tokentime > ? ',
-		[ [ \$token, \PDO::PARAM_STR ], time()-100 ],
+		[ [ \$token , \PDO::PARAM_STR ], time()-100 ],
 		[
 			'pass' => \$newpass,
 			'token' => ''
