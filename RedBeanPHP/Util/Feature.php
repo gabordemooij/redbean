@@ -25,6 +25,8 @@ class Feature
 	/* Feature set constants */
 	const C_FEATURE_NOVICE_LATEST = 'novice/latest';
 	const C_FEATURE_LATEST        = 'latest';
+	const C_FEATURE_NOVICE_5_5    = 'novice/5.5';
+	const C_FEATURE_5_5           = '5.5';
 	const C_FEATURE_NOVICE_5_4    = 'novice/5.4';
 	const C_FEATURE_5_4           = '5.4';
 	const C_FEATURE_NOVICE_5_3    = 'novice/5.3';
@@ -66,6 +68,7 @@ class Feature
 		switch( $label ) {
 			case self::C_FEATURE_NOVICE_LATEST:
 			case self::C_FEATURE_NOVICE_5_4:
+			case self::C_FEATURE_NOVICE_5_5:
 				OODBBean::useFluidCount( FALSE );
 				R::noNuke( TRUE );
 				R::setAllowHybridMode( FALSE );
@@ -73,6 +76,7 @@ class Feature
 				break;
 			case self::C_FEATURE_LATEST:
 			case self::C_FEATURE_5_4:
+			case self::C_FEATURE_5_5:
 				OODBBean::useFluidCount( FALSE );
 				R::noNuke( FALSE );
 				R::setAllowHybridMode( TRUE );
