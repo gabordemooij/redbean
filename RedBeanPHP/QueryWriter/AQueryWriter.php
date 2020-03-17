@@ -1350,7 +1350,6 @@ abstract class AQueryWriter
 	{
 		$alias     = $up ? 'parent' : 'child';
 		$direction = $up ? " {$alias}.{$type}_id = {$type}.id " : " {$alias}.id = {$type}.{$type}_id ";
-
 		/* allow numeric and named param bindings, if '0' exists then numeric */
 		if ( array_key_exists( 0,$bindings ) ) {
 			array_unshift( $bindings, $id );
@@ -1359,9 +1358,8 @@ abstract class AQueryWriter
 			$idSlot = ':slot0';
 			$bindings[$idSlot] = $id;
 		}
-
 		$sql = $this->glueSQLCondition( $addSql, QueryWriter::C_GLUE_WHERE );
-
+		$sql = $this->parseJoin( 'tree', $sql );
 		$rows = $this->adapter->get("
 			WITH RECURSIVE tree AS
 			(
@@ -1371,10 +1369,9 @@ abstract class AQueryWriter
 				SELECT {$type}.* FROM {$type}
 				INNER JOIN tree {$alias} ON {$direction}
 			)
-			SELECT * FROM tree {$sql};",
+			SELECT tree.* FROM tree {$sql};",
 			$bindings
 		);
-
 		return $rows;
 	}
 
