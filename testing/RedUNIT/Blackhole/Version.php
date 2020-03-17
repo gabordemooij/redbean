@@ -93,6 +93,10 @@ class Version extends Blackhole
 		asrt( $this->getFeatureFlags(), '0,0,0,1,1' );
 		R::useFeatureSet('novice/5.4');
 		asrt( $this->getFeatureFlags(), '0,1,0,0,1' );
+		R::useFeatureSet('5.5');
+		asrt( $this->getFeatureFlags(), '0,0,0,1,1' );
+		R::useFeatureSet('novice/5.5');
+		asrt( $this->getFeatureFlags(), '0,1,0,0,1' );
 		R::useFeatureSet('novice/latest');
 		asrt( $this->getFeatureFlags(), '0,1,0,0,1' );
 		R::useFeatureSet('original');
