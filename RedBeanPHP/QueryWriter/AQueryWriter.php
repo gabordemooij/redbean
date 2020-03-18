@@ -906,7 +906,7 @@ abstract class AQueryWriter
 	/**
 	 * @see QueryWriter::parseJoin
 	 */
-	public function parseJoin( $type, $sql )
+	public function parseJoin( $type, $sql, $overrideLinkType = FALSE )
 	{
 		if ( strpos( $sql, '@' ) === FALSE ) {
 			return $sql;
@@ -933,7 +933,7 @@ abstract class AQueryWriter
 				if ( !isset( $joins[$joinInfo] ) ) {
 					$joins[ $joinInfo ] = TRUE;
 					if ( !preg_match( "#JOIN\s+(\w*\s+AS\s+|`)?{$joinInfo}.*WHERE#i", $sql ) ) {
-						$joinSql .= $this->writeJoin( $type, $joinInfo, 'LEFT', $joinType );
+						$joinSql .= $this->writeJoin( $type, $joinInfo, 'LEFT', $joinType, $overrideLinkType );
 					}
 				}
 			}
@@ -959,7 +959,7 @@ abstract class AQueryWriter
 	/**
 	 * @see QueryWriter::writeJoin
 	 */
-	public function writeJoin( $type, $targetType, $leftRight = 'LEFT', $joinType = 'parent' )
+	public function writeJoin( $type, $targetType, $leftRight = 'LEFT', $joinType = 'parent', $overrideLinkType = FALSE )
 	{
 		if ( $leftRight !== 'LEFT' && $leftRight !== 'RIGHT' && $leftRight !== 'INNER' )
 			throw new RedException( 'Invalid JOIN.' );
@@ -971,20 +971,16 @@ abstract class AQueryWriter
 		} else {
 			$destType    = $targetType;
 		}
-
 		$table       = $this->esc( $type );
 		$targetTable = $this->esc( $destType );
-
 		if ( $joinType == 'shared' ) {
 			$field      = $this->esc( $type, TRUE );
 			$leftField  = "id";
-			$rightField = "{$field}_id";
-
-			$linkTable      = $this->esc( $this->getAssocTable( array( $type, $destType ) ) );
+			$linkTable      = $this->esc( $this->getAssocTable( array( ($overrideLinkType) ? $overrideLinkType : $type, $destType ) ) );
 			$linkField      = $this->esc( $destType, TRUE );
+			$rightField     = ($overrideLinkType) ? "{$overrideLinkType}_id" :"{$field}_id";
 			$linkLeftField  = "id";
 			$linkRightField = "{$linkField}_id";
-
 			if ( isset( $aliases[$targetType] ) ) {
 				$joinSql = "
 					{$leftRight} JOIN {$linkTable} ON {$table}.{$leftField} = {$linkTable}.{$rightField}
@@ -999,21 +995,19 @@ abstract class AQueryWriter
 		} else {
 			if ( $joinType == 'own' ) {
 				$field      = $this->esc( $type, TRUE );
-				$leftField  = "{$field}_id";
+				$leftField  = ($overrideLinkType) ? "{$overrideLinkType}_id" :"{$field}_id";
 				$rightField = "id";
 			} else {
 				$field      = $this->esc( $targetType, TRUE );
 				$leftField  = "id";
 				$rightField = "{$field}_id";
 			}
-
 			if ( isset( $aliases[$targetType] ) ) {
 				$joinSql = " {$leftRight} JOIN {$targetTable} AS {$alias} ON {$alias}.{$leftField} = {$table}.{$rightField} ";
 			} else {
 				$joinSql = " {$leftRight} JOIN {$targetTable} ON {$targetTable}.{$leftField} = {$table}.{$rightField} ";
 			}
 		}
-
 		return $joinSql;
 	}
 
@@ -1359,7 +1353,7 @@ abstract class AQueryWriter
 			$bindings[$idSlot] = $id;
 		}
 		$sql = $this->glueSQLCondition( $addSql, QueryWriter::C_GLUE_WHERE );
-		$sql = $this->parseJoin( 'tree', $sql );
+		$sql = $this->parseJoin( 'tree', $sql, $type );
 		$rows = $this->adapter->get("
 			WITH RECURSIVE tree AS
 			(
