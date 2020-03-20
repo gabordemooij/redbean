@@ -911,36 +911,36 @@ abstract class AQueryWriter
 		if ( strpos( $sql, '@' ) === FALSE ) {
 			return $sql;
 		}
-
 		$sql = ' ' . $sql;
 		$joins = array();
 		$joinSql = '';
-
-		$joinTypes = array( 'shared', 'own', 'joined' );
-
-		foreach ( $joinTypes as $joinType ) {
-			$parts = explode( "@{$joinType}.", $sql );
-			if ( count( $parts ) <= 1 ) {
-				continue;
-			}
-
-			$oldParts = $parts;
-			array_shift( $parts );
-			foreach($parts as $part) {
-				$explosion = explode( '.', $part );
-				$joinInfo  = $explosion[0];
-				//Dont join more than once..
-				if ( !isset( $joins[$joinInfo] ) ) {
-					$joins[ $joinInfo ] = TRUE;
-					if ( !preg_match( "#JOIN\s+(\w*\s+AS\s+|`)?{$joinInfo}.*WHERE#i", $sql ) ) {
-						$joinSql .= $this->writeJoin( $type, $joinInfo, 'LEFT', $joinType, $overrideLinkType );
-					}
+		$criteria = array();
+		$joins = array();
+		$startType = $type;
+		$matches = array();
+		if (!preg_match_all('/@((shared|own|joined)\.\S+)/', $sql, $matches)) return $sql;
+		if (count($matches)<3) return $sql;
+		$expressions = $matches[1];
+		while( $expressionStr = array_shift( $expressions ) ) {
+			$expression = explode( '.', $expressionStr );
+			$type = $startType;
+			$i = 0;
+			while( $unit = array_splice( $expression, 0, 2 ) ) {
+				list( $joinType, $target ) = $unit;
+				if (!isset($joins["$type.$target"])) {
+					$joins["$type.$target"] = TRUE;
+					$joinSql .= $this->writeJoin( $type, $target, 'LEFT', $joinType, (!$i) ? $overrideLinkType : FALSE );
+				}
+				$type = $target;
+				$i ++;
+				if (count($expression)==1) {
+					$field = array_shift($expression);
+					$criteria[] = "{$target}.{$field}";
+					$sql = str_replace( "@$expressionStr", "{$target}.{$field}", $sql );
+					break;
 				}
 			}
-
-			$sql = implode( '', $oldParts );
 		}
-
 		$sql = str_ireplace( ' where ', ' WHERE ', $sql );
 		if ( strpos( $sql, ' WHERE ') === FALSE ) {
 			if ( preg_match( '/^(ORDER|GROUP|HAVING|LIMIT|OFFSET)\s+/i', trim($sql) ) ) {
@@ -952,7 +952,6 @@ abstract class AQueryWriter
 			$sqlParts = explode( ' WHERE ', $sql, 2 );
 			$sql = "{$sqlParts[0]} {$joinSql} WHERE {$sqlParts[1]}";
 		}
-
 		return $sql;
 	}
 

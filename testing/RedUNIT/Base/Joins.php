@@ -32,6 +32,26 @@ class Joins extends Base
 	public function testComplexParsedJoins()
 	{
 		R::nuke();
+		$other = R::dispense('book');
+		R::store( $other );
+		$book = R::dispense('book');
+		$page = R::dispense('page');
+		$paragraph = R::dispense('paragraph');
+		$paragraph->title = 'hello';
+		$book->title = 'book';
+		$book->ownPage[] = $page;
+		$page->ownParagraph[] = $paragraph;
+		$figure = R::dispense('figure');
+		$chart = R::dispense('chart');
+		$chart->title = 'results';
+		$page->ownFigure[] = $figure;
+		$figure->ownChart[] = $chart;
+		R::store($book);
+		$books = R::find('book',' @own.page.own.paragraph.title = ? OR @own.page.own.figure.own.chart.title = ?', ['hello','results']);
+		asrt(count($books),1);
+		$book = reset($books);
+		asrt($book->title, 'book');
+		R::nuke();
 		R::aliases(array( 'author' => 'person' ));
 		$book   = R::dispense('book');
 		$author = R::dispense('person');
