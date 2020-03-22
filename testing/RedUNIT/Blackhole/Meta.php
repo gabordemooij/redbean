@@ -87,4 +87,32 @@ class Meta extends Blackhole
 		asrt( isset( $bean['meta'] ), FALSE );
 		asrt( count( $bean ), 1 );
 	}
+
+	/**
+	 * Test meta masks.
+	 *
+	 * @return void
+	 */
+	public function testMetaMask()
+	{
+		$rows = array(
+			array('id'=>1, 'name'=>'a', '__meta_rows'=>2, '__meta_columns'=>4),
+			array('id'=>2, 'name'=>'b', '__meta_rows'=>2, '__meta_columns'=>4)
+		);
+		$books = R::convertToBeans( 'book', $rows, '__meta' );
+		$book = reset($books);
+		$data = $book->getMeta('data.bundle');
+		asrt( $data['__meta_rows'], 2 );
+		asrt( $data['__meta_columns'], 4 );
+		$books = R::convertToBeans( 'book', $rows, array( '__meta_rows', '__meta_columns' ) );
+		$book = reset($books);
+		$data = $book->getMeta('data.bundle');
+		asrt( $data['__meta_rows'], 2 );
+		asrt( $data['__meta_columns'], 4 );
+		$books = R::convertToBeans( 'book', $rows, array( '__meta_rows' ) );
+		$book = reset($books);
+		$data = $book->getMeta('data.bundle');
+		asrt( $data['__meta_rows'], 2 );
+		asrt( isset($data['__meta_columns']), FALSE );
+	}
 }
