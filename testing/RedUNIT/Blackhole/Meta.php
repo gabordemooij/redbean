@@ -114,5 +114,10 @@ class Meta extends Blackhole
 		$data = $book->getMeta('data.bundle');
 		asrt( $data['__meta_rows'], 2 );
 		asrt( isset($data['__meta_columns']), FALSE );
+		$books = R::convertToBeans( 'book', $rows, array( '__meta_rows', TRUE ) );
+		$book = reset($books);
+		$data = $book->getMeta('data.bundle');
+		asrt( isset($data['__meta_rows']), FALSE );
+		asrt( isset($data['__meta_columns']), FALSE );
 	}
 }
