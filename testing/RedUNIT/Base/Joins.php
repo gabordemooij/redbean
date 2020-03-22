@@ -47,7 +47,7 @@ class Joins extends Base
 		$page->ownFigure[] = $figure;
 		$figure->ownChart[] = $chart;
 		R::store($book);
-		$books = R::find('book',' @own.page.own.paragraph.title = ? OR @own.page.own.figure.own.chart.title = ?', ['hello','results']);
+		$books = R::find('book',' @own.page.own.paragraph.title = ? OR @own.page.own.figure.own.chart.title = ?', array('hello','results'));
 		asrt(count($books),1);
 		$book = reset($books);
 		asrt($book->title, 'book');
