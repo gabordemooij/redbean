@@ -911,6 +911,7 @@ abstract class AQueryWriter
 		if ( strpos( $sql, '@' ) === FALSE ) {
 			return $sql;
 		}
+		$aliases = OODBBean::getAliases();
 		$sql = ' ' . $sql;
 		$joins = array();
 		$joinSql = '';
@@ -962,10 +963,9 @@ abstract class AQueryWriter
 	{
 		if ( $leftRight !== 'LEFT' && $leftRight !== 'RIGHT' && $leftRight !== 'INNER' )
 			throw new RedException( 'Invalid JOIN.' );
-
+		$alias   = $this->esc( $targetType );
 		$aliases = OODBBean::getAliases();
 		if ( isset( $aliases[$targetType] ) ) {
-			$alias       = $this->esc( $targetType );
 			$destType    = $aliases[$targetType];
 		} else {
 			$destType    = $targetType;
@@ -973,24 +973,21 @@ abstract class AQueryWriter
 		$table       = $this->esc( $type );
 		$targetTable = $this->esc( $destType );
 		if ( $joinType == 'shared' ) {
-			$field      = $this->esc( $type, TRUE );
+			$field      = $this->esc((isset($aliases[$type])) ? $aliases[$type] : $type, TRUE);
 			$leftField  = "id";
-			$linkTable      = $this->esc( $this->getAssocTable( array( ($overrideLinkType) ? $overrideLinkType : $type, $destType ) ) );
+			if ( isset( $aliases[$type] ) ) {
+				$linkTable      = $this->esc( $this->getAssocTable( array( ($overrideLinkType) ? $overrideLinkType : $aliases[$type], $destType ) ) );
+			} else {
+				$linkTable      = $this->esc( $this->getAssocTable( array( ($overrideLinkType) ? $overrideLinkType : $type, $destType ) ) );
+			}
 			$linkField      = $this->esc( $destType, TRUE );
 			$rightField     = ($overrideLinkType) ? "{$overrideLinkType}_id" :"{$field}_id";
 			$linkLeftField  = "id";
 			$linkRightField = "{$linkField}_id";
-			if ( isset( $aliases[$targetType] ) ) {
-				$joinSql = "
+			$joinSql = "
 					{$leftRight} JOIN {$linkTable} ON {$table}.{$leftField} = {$linkTable}.{$rightField}
 					INNER JOIN {$targetTable} AS {$alias} ON {$alias}.{$linkLeftField} = {$linkTable}.{$linkRightField}
-				";
-			} else {
-				$joinSql = "
-					{$leftRight} JOIN {$linkTable} ON {$table}.{$leftField} = {$linkTable}.{$rightField}
-					INNER JOIN {$targetTable} ON {$targetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField}
-				";
-			}
+			";
 		} else {
 			if ( $joinType == 'own' ) {
 				$field      = $this->esc( $type, TRUE );
@@ -1053,10 +1050,8 @@ abstract class AQueryWriter
 		} else {
 			$sql = $this->glueSQLCondition( $addSql );
 		}
-
 		$sql = $this->parseJoin( $type, $sql );
 		$fieldSelection = self::$flagNarrowFieldMode ? "{$table}.*" : '*';
-
 		$sql   = "SELECT {$fieldSelection} {$sqlFilterStr} FROM {$table} {$sql} {$this->sqlSelectSnippet} -- keep-cache";
 		$this->sqlSelectSnippet = '';
 		$rows  = $this->adapter->get( $sql, $bindings );

@@ -166,4 +166,43 @@ class Trees extends Postgres
 		$found = R::children($cards[3], ' @own.owner.name IN (?,?) ', array('User3','User7'));
 		asrt(count($found),2);
 	}
+
+	/**
+	 * Test CTE and Parsed Joins with aliases as well
+	 * as chained parsed joins.
+	 *
+	 * @return void
+	 */
+	public function testCTETreesAndParsedJoinsAndAliases() {
+		R::nuke();
+		R::aliases(array( 'author' => 'person' ));
+		$person = R::dispense( 'person' );
+		$ceo = R::dispense('person');
+		$ceo->name = 'John';
+		$role = R::dispense('role');
+		$role->label = 'CEO';
+		$ceo->sharedRoleList = array( $role );
+		$person->name = 'James';
+		$website = R::dispense('page');
+		$about = R::dispense('page');
+		$about->title = 'about';
+		$about->author = $ceo;
+		$blog = R::dispense('page');
+		$article = R::dispense('page');
+		$article->title = 'a walk in the park';
+		$website->ownPageList = array( $about, $blog );
+		$blog->ownPageList = array( $article );
+		$article->author = $person;
+		R::store( $website );
+		//joined-alias
+		$pages = R::children( $website, ' @joined.author.name = ? ', array('James') );
+		asrt(count($pages), 1);
+		$page = reset($pages);
+		asrt($page->title, 'a walk in the park');
+		//Chained joined-alias+shared
+		$pages = R::children( $website, ' @joined.author.shared.role.label = ? ', array('CEO') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+	}
 }
