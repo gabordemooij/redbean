@@ -175,7 +175,7 @@ class Trees extends Postgres
 	 */
 	public function testCTETreesAndParsedJoinsAndAliases() {
 		R::nuke();
-		R::aliases(array( 'author' => 'person' ));
+		R::aliases(array( 'author' => 'person', 'chart' => 'image' ));
 		$person = R::dispense( 'person' );
 		$ceo = R::dispense('person');
 		$ceo->name = 'John';
@@ -183,15 +183,35 @@ class Trees extends Postgres
 		$role->label = 'CEO';
 		$ceo->sharedRoleList = array( $role );
 		$person->name = 'James';
+		$editor = R::dispense('role');
+		$editor->label = 'editor';
+		$person->sharedRoleList = array( $editor );
 		$website = R::dispense('page');
 		$about = R::dispense('page');
-		$about->title = 'about';
-		$about->author = $ceo;
+		$investor = R::dispense('page');
+		$links = R::dispense('page');
+		$category = R::dispense('category');
+		$category->title = 'business';
+		$about->sharedCategoryList = array( $category );
 		$blog = R::dispense('page');
 		$article = R::dispense('page');
+		$investor->title = 'investors';
+		$links->title = 'links';
+		$about->title = 'about';
+		$chart = R::dispense('image');
+		$chart->file = 'report.jpg';
+		$picture = R::dispense('image');
+		$picture->file = 'logo.jpg';
+		$website->ownImageList = array( $picture );
+		$article->ownImageList = array( $picture );
+		$investor->ownImageList = array( $picture );
+		$about->ownImageList = array( $chart );
+		$about->author = $ceo;
 		$article->title = 'a walk in the park';
 		$website->ownPageList = array( $about, $blog );
 		$blog->ownPageList = array( $article );
+		$article->ownPageList = array( $links );
+		$about->ownPageList = array( $investor );
 		$article->author = $person;
 		R::store( $website );
 		//joined-alias
@@ -201,6 +221,57 @@ class Trees extends Postgres
 		asrt($page->title, 'a walk in the park');
 		//Chained joined-alias+shared
 		$pages = R::children( $website, ' @joined.author.shared.role.label = ? ', array('CEO') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+		//joined-alias+shared parents
+		$pages = R::parents( $investor, ' @joined.author.shared.role.label = ? ', array('CEO') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+		//joined-alias parents
+		$pages = R::parents( $links, ' @joined.author.name = ? ', array('James') );
+		asrt(count($pages), 1);
+		$page = reset($pages);
+		asrt($page->title, 'a walk in the park');
+		//own-alias
+		$pages = R::children( $website, '@own.chart.file = ?', array('report.jpg') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+		//own-alias parent
+		$pages = R::parents( $investor, '@own.chart.file = ?', array('report.jpg') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+		//own-alias parent + joined-alias+shared parents
+		$pages = R::parents( $investor, '@own.chart.file = ? AND @joined.author.shared.role.label = ? ', array('report.jpg', 'CEO') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+		//own-alias + Chained joined-alias+shared
+		$pages = R::children( $website, ' @own.chart.file = ? AND @joined.author.shared.role.label = ? ',  array('report.jpg', 'CEO') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+		//own-alias + Chained joined-alias+shared + joined-alias
+		$pages = R::children( $website, ' @joined.author.name = ? AND @own.chart.file = ? AND @joined.author.shared.role.label = ? ',  array('John', 'report.jpg', 'CEO') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+		//own-alias + Chained joined-alias+shared + joined-alias parents
+		$pages = R::parents( $investor, ' @joined.author.name = ? AND @own.chart.file = ? AND @joined.author.shared.role.label = ? ',  array('John', 'report.jpg', 'CEO') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+		$pages = R::parents( $links, ' @joined.author.name = ? AND @own.chart.file = ? AND @joined.author.shared.role.label = ? ',  array('James', 'logo.jpg', 'editor') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'a walk in the park');
+		$pages = R::parents( $links, ' @joined.author.name = ? AND @own.chart.file = ? AND @joined.author.shared.role.label = ? ',  array('James', 'report.jpg', 'editor') );
+		asrt(count($pages),0);
+		//other variations
+		$pages = R::parents( $investor, ' @shared.category.title = ? ',  array('business') );
 		asrt(count($pages),1);
 		$page = reset($pages);
 		asrt($page->title,'about');
