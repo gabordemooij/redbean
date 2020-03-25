@@ -25,6 +25,110 @@ use RedBeanPHP\OODBBean as OODBBean;
 class Joins extends Base
 {
 	/**
+	 * Can we join multiple tables with the same parent?
+	 * 
+	 * @return void
+	 */
+	public function testMultipleJoinsSameParent()
+	{
+		R::nuke();
+		$TheHagueNorthEnd = R::dispense(array(
+			'_type' => 'painting',
+			'title' => 'Northend, The Hague',
+			'artist' => array(
+				'_type' => 'artist',
+				'name'  => 'Isaac Israels',
+				'sharedCategory' => array(
+					array( '_type' => 'category', 'label' => 'Haagse School' )
+				)
+			),
+			'ownDetail' => array(
+				array(
+					'_type' => 'detail',
+					'description' => 'awnings',
+					'sharedCategory' => array(
+						array( '_type' => 'category', 'label' => 'object' )
+					)
+				),
+				array(
+					'_type' => 'detail',
+					'description' => 'sunlight',
+					'sharedCategory' => array(
+						array( '_type' => 'category', 'label' => 'daytime' )
+					)
+				),
+			)
+		));
+		$Nighthawks = R::dispense(array(
+			'_type' => 'painting',
+			'title' => 'Nighthawks',
+			'artist' => array(
+				'_type' => 'artist',
+				'name'  => 'Hopper',
+				'sharedCategory' => array(
+					array( '_type' => 'category', 'label' => 'American Realism' )
+				)
+			),
+			'ownDetail' => array(
+				array(
+					'_type' => 'detail',
+					'description' => 'percolator',
+					'sharedCategory' => array(
+						array( '_type' => 'category', 'label' => 'object' )
+					)
+				),
+				array(
+					'_type' => 'detail',
+					'description' => 'cigarette',
+					'sharedCategory' => array(
+						array( '_type' => 'category', 'label' => 'object' )
+					)
+				),
+				array(
+					'_type' => 'detail',
+					'description' => 'night',
+					'sharedCategory' => array(
+						array( '_type' => 'category', 'label' => 'nocturnal' )
+					)
+				)
+			)
+		));
+		R::storeAll( array( $Nighthawks, $TheHagueNorthEnd ) );
+		$paintings = R::find('painting', '
+			@joined.artist.shared.category.label = ?
+			OR
+			@own.detail.shared.category.label= ?
+		', array('American Realism', 'nocturnal'));
+		asrt(count($paintings),1);
+		$painting = reset($paintings);
+		asrt($painting->title, 'Nighthawks');
+		$paintings = R::find('painting', '
+			@joined.artist.shared.category.label = ?
+			OR
+			@own.detail.shared.category.label= ?
+		', array('Haagse School', 'daytime'));
+		asrt(count($paintings),1);
+		$painting = reset($paintings);
+		asrt($painting->title, 'Northend, The Hague');
+		$paintings = R::find('painting', '
+			@own.detail.shared.category.label= ?
+		', array('object'));
+		asrt(count($paintings),2);
+		$paintings = R::find('painting', '
+			@own.detail.shared.category.label= ?
+			AND @own.detail.description= ?
+		', array('object', 'percolator'));
+		asrt(count($paintings),1);
+		$painting = reset($paintings);
+		asrt($painting->title, 'Nighthawks');
+		$paintings = R::find('painting', '
+			@own.detail.shared.category.label= ?
+			AND @own.detail.description= ?
+		', array('object', 'ashtray'));
+		asrt(count($paintings),0);
+	}
+
+	/**
 	 * Complex tests for the parsed joins featured.
 	 *
 	 * @return void
