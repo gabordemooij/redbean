@@ -1024,11 +1024,12 @@ abstract class AQueryWriter
 			$linkLeftField  = "id";
 			$linkRightField = "{$linkField}_id";
 
-			$joinSql = " {$leftRight} JOIN {$linkTable} INNER JOIN {$targetTable}";
+			$joinSql = " {$leftRight} JOIN {$linkTable} ON {$table}.{$leftField} = {$linkTable}.{$rightField} ";
+			$joinSql = " {$leftRight} JOIN {$targetTable}";
 			if ( isset( $aliases[$targetType] ) || $suffix ) {
 				$joinSql .= " AS {$asTargetTable}";
 			}
-			$joinSql .= " ON {$asTargetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField} ON {$table}.{$leftField} = {$linkTable}.{$rightField} ";
+			$joinSql .= " ON {$asTargetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField}"
 		} else {
 			if ( $joinType == 'own' ) {
 				$field      = $this->esc( $type, TRUE );
