@@ -925,22 +925,20 @@ abstract class AQueryWriter
 		$expressions = $matches[1];
 		// Sort to make the joins from the longest to the shortest
 		uasort( $expressions, function($a, $b) {
-			return substr_count($b, '.') - substr_count($a, '.');
+			return substr_count( $b, '.' ) - substr_count( $a, '.' );
 		});
 
 		$nsuffix = 1;
 		foreach ( $expressions as $exp ) {
 			$explosion = explode( '.', $exp );
-
-			$joinType  = array_shift( $explosion );
 			$joinTable = $type;
-
-			$lastPart  = array_pop($explosion);
-			$lastKey   = count($explosion) - 1;
+			$joinType  = array_shift( $explosion );
+			$lastPart  = array_pop( $explosion );
+			$lastKey   = count( $explosion ) - 1;
 
 			// Let's check if we already joined that chain
 			// If that's the case we skip this
-			$joinKey  = implode('.', $explosion);
+			$joinKey  = implode( '.', $explosion );
 			foreach ( $joins as $chain => $suffix ) {
 				if ( strpos ( $chain, $joinKey ) === 0 ) {
 					$sql = str_replace( "@{$exp}", "{$explosion[$lastKey]}__rb{$suffix}.{$lastPart}", $sql );
@@ -953,7 +951,6 @@ abstract class AQueryWriter
 			// We loop on the elements of the join
 			$i = 0;
 			while ( TRUE ) {
-
 				$joinInfo = $explosion[$i];
 				if ($i) {
 					$joinType = $explosion[$i-1];
@@ -970,9 +967,7 @@ abstract class AQueryWriter
 				if ( !isset( $explosion[$i] ) ) {
 					break;
 				}
-
 			}
-
 			$nsuffix++;
 		}
 
@@ -1016,9 +1011,6 @@ abstract class AQueryWriter
 		$targetTable   = $this->esc( $destType );
 
 		if ( $joinType == 'shared' ) {
-			$leftField  = "id";
-			$rightField = $cteType ? "{$cteType}_id" : "{$field}_id";
-
 			if ( isset( $aliases[$type] ) ) {
 				$field      = $this->esc( $aliases[$type], TRUE );
 				$linkTable  = $this->esc( $this->getAssocTable( array( $cteType ? $cteType : $aliases[$type], $destType ) ) );
@@ -1026,6 +1018,8 @@ abstract class AQueryWriter
 				$field      = $this->esc( $type, TRUE );
 				$linkTable  = $this->esc( $this->getAssocTable( array( $cteType ? $cteType : $type, $destType ) ) );
 			}
+			$leftField      = "id";
+			$rightField     = $cteType ? "{$cteType}_id" : "{$field}_id";
 			$linkField      = $this->esc( $destType, TRUE );
 			$linkLeftField  = "id";
 			$linkRightField = "{$linkField}_id";
