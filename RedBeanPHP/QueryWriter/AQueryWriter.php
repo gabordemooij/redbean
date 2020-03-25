@@ -906,7 +906,7 @@ abstract class AQueryWriter
 	/**
 	 * @see QueryWriter::parseJoin
 	 */
-	public function parseJoin( $type, $sql )
+	public function parseJoin( $type, $sql, $cteType = NULL )
 	{
 		if ( strpos( $sql, '@' ) === FALSE ) {
 			return $sql;
@@ -960,7 +960,11 @@ abstract class AQueryWriter
 					$joinTable = $explosion[$i-2];
 				}
 
-				$joinSql .= $this->writeJoin( $joinTable, $joinInfo, ($i ? 'INNER' : 'LEFT'), $joinType, ($i ? FALSE : TRUE), "__rb{$nsuffix}" );
+				if ($i) {
+					$joinSql .= $this->writeJoin( $joinTable, $joinInfo, 'INNER', $joinType, FALSE, "__rb{$nsuffix}", NULL );
+				} else {
+					$joinSql .= $this->writeJoin( $joinTable, $joinInfo, 'LEFT', $joinType, TRUE, "__rb{$nsuffix}", $cteType );
+				}
 
 				$i += 2;
 				if ( !isset( $explosion[$i] ) ) {
@@ -990,7 +994,7 @@ abstract class AQueryWriter
 	/**
 	 * @see QueryWriter::writeJoin
 	 */
-	public function writeJoin( $type, $targetType, $leftRight = 'LEFT', $joinType = 'parent', $firstOfChain = TRUE, $suffix = '' )
+	public function writeJoin( $type, $targetType, $leftRight = 'LEFT', $joinType = 'parent', $firstOfChain = TRUE, $suffix = '', $cteType = NULL )
 	{
 		if ( $leftRight !== 'LEFT' && $leftRight !== 'RIGHT' && $leftRight !== 'INNER' )
 			throw new RedException( 'Invalid JOIN.' );
@@ -1012,14 +1016,15 @@ abstract class AQueryWriter
 		$targetTable   = $this->esc( $destType );
 
 		if ( $joinType == 'shared' ) {
-			$field      = $this->esc( $type, TRUE );
 			$leftField  = "id";
-			$rightField = "{$field}_id";
+			$rightField = $cteType ? "{$cteType}_id" : "{$field}_id";
 
 			if ( isset( $aliases[$type] ) ) {
-				$linkTable      = $this->esc( $this->getAssocTable( array( $aliases[$type], $destType ) ) );
+				$field      = $this->esc( $aliases[$type], TRUE );
+				$linkTable  = $this->esc( $this->getAssocTable( array( $cteType ? $cteType : $aliases[$type], $destType ) ) );
 			} else {
-				$linkTable      = $this->esc( $this->getAssocTable( array( $type, $destType ) ) );
+				$field      = $this->esc( $type, TRUE );
+				$linkTable  = $this->esc( $this->getAssocTable( array( $cteType ? $cteType : $type, $destType ) ) );
 			}
 			$linkField      = $this->esc( $destType, TRUE );
 			$linkLeftField  = "id";
@@ -1029,12 +1034,11 @@ abstract class AQueryWriter
 			if ( isset( $aliases[$targetType] ) || $suffix ) {
 				$joinSql .= " AS {$asTargetTable}";
 			}
-			$joinSql .= " ON {$asTargetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField}";
-			$joinSql .= " ) ON {$table}.{$leftField} = {$linkTable}.{$rightField} ";
+			$joinSql .= " ON {$asTargetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField} ) ON {$table}.{$leftField} = {$linkTable}.{$rightField} ";
 		} else {
 			if ( $joinType == 'own' ) {
 				$field      = $this->esc( $type, TRUE );
-				$leftField  = "{$field}_id";
+				$leftField  = $cteType ? "{$cteType}_id" : "{$field}_id"; 
 				$rightField = "id";
 			} else {
 				$field      = $this->esc( $targetType, TRUE );
