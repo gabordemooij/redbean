@@ -80,11 +80,10 @@ interface QueryWriter
 	 *
 	 * @param string         $type the source type for the join
 	 * @param string         $sql  the sql string to be parsed
-	 * @param string|boolean $overrideLinkType override link field (for trees)
 	 *
 	 * @return string
 	 */
-	public function parseJoin( $type, $sql, $overrideLinkType = FALSE );
+	public function parseJoin( $type, $sql );
 
 	/**
 	 * Writes an SQL Snippet for a JOIN, returns the
@@ -93,14 +92,16 @@ interface QueryWriter
 	 * @note A default implementation is available in AQueryWriter
 	 * unless a database uses very different SQL this should suffice.
 	 *
-	 * @param string $type       source type
-	 * @param string $targetType target type (type to join)
-	 * @param string $joinType   type of join (possible: 'LEFT', 'RIGHT' or 'INNER')
-	 * @param string|boolean $overrideLinkType override link field (for trees)
+	 * @param string  $type         source type
+	 * @param string  $targetType   target type (type to join)
+	 * @param string  $leftRight    type of join (possible: 'LEFT', 'RIGHT' or 'INNER')
+	 * @param string  $joinType     relation between joined tables (possible: 'parent', 'own', 'shared')
+	 * @param boolean $firstOfChain is it the join of a chain (or the only join)
+	 * @param string  $suffix       suffix to add for aliasing tables (for joining same table multiple times)
 	 *
 	 * @return string $joinSQLSnippet
 	 */
-	public function writeJoin( $type, $targetType, $leftRight, $joinType, $overrideLinkType = FALSE );
+	public function writeJoin( $type, $targetType, $leftRight, $joinType, $firstOfChain, $suffix );
 
 	/**
 	 * Glues an SQL snippet to the beginning of a WHERE clause.
