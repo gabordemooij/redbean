@@ -1013,23 +1013,29 @@ abstract class AQueryWriter
 		if ( $joinType == 'shared' ) {
 			if ( isset( $aliases[$type] ) ) {
 				$field      = $this->esc( $aliases[$type], TRUE );
-				$linkTable  = $this->esc( $this->getAssocTable( array( $cteType ? $cteType : $aliases[$type], $destType ) ) );
+				$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $aliases[$type], $destType ) );
 			} else {
 				$field      = $this->esc( $type, TRUE );
-				$linkTable  = $this->esc( $this->getAssocTable( array( $cteType ? $cteType : $type, $destType ) ) );
+				$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $type, $destType ) );
 			}
+			$linkTable      = $this->esc( $assocTable );
+			$asLinkTable    = $this->esc( $assocTable.$suffix );
 			$leftField      = "id";
 			$rightField     = $cteType ? "{$cteType}_id" : "{$field}_id";
 			$linkField      = $this->esc( $destType, TRUE );
 			$linkLeftField  = "id";
 			$linkRightField = "{$linkField}_id";
 
-			$joinSql = " {$leftRight} JOIN {$linkTable} ON {$table}.{$leftField} = {$linkTable}.{$rightField}";
+			$joinSql = " {$leftRight} JOIN {$linkTable}";
+			if ( isset( $aliases[$targetType] ) || $suffix ) {
+				$joinSql .= " AS {$asLinkTable}";
+			}
+			$joinSql .= " ON {$table}.{$leftField} = {$asLinkTable}.{$rightField}";
 			$joinSql .= " {$leftRight} JOIN {$targetTable}";
 			if ( isset( $aliases[$targetType] ) || $suffix ) {
 				$joinSql .= " AS {$asTargetTable}";
 			}
-			$joinSql .= " ON {$asTargetTable}.{$linkLeftField} = {$linkTable}.{$linkRightField}";
+			$joinSql .= " ON {$asTargetTable}.{$linkLeftField} = {$asLinkTable}.{$linkRightField}";
 		} else {
 			if ( $joinType == 'own' ) {
 				$field      = $this->esc( $type, TRUE );
