@@ -906,42 +906,71 @@ abstract class AQueryWriter
 	/**
 	 * @see QueryWriter::parseJoin
 	 */
-	public function parseJoin( $type, $sql, $overrideLinkType = FALSE )
+	public function parseJoin( $type, $sql, $cteType = NULL )
 	{
 		if ( strpos( $sql, '@' ) === FALSE ) {
 			return $sql;
 		}
-		$aliases = OODBBean::getAliases();
+
 		$sql = ' ' . $sql;
 		$joins = array();
 		$joinSql = '';
-		$criteria = array();
-		$joins = array();
-		$startType = $type;
-		$matches = array();
-		if (!preg_match_all('/@((shared|own|joined)\.\S+)/', $sql, $matches)) return $sql;
-		if (count($matches)<3) return $sql;
+
+		if ( !preg_match_all( '#@((shared|own|joined)\.[^\s(,=!?]+)#', $sql, $matches) )
+			return $sql;
+
+		if ( count( $matches ) < 3 )
+			return $sql;
+
 		$expressions = $matches[1];
-		while( $expressionStr = array_shift( $expressions ) ) {
-			$expression = explode( '.', $expressionStr );
-			$type = $startType;
-			$i = 0;
-			while( $unit = array_splice( $expression, 0, 2 ) ) {
-				list( $joinType, $target ) = $unit;
-				if (!isset($joins["$type.$target"])) {
-					$joins["$type.$target"] = TRUE;
-					$joinSql .= $this->writeJoin( $type, $target, 'LEFT', $joinType, (!$i) ? $overrideLinkType : FALSE );
+		// Sort to make the joins from the longest to the shortest
+		uasort( $expressions, function($a, $b) {
+			return substr_count( $b, '.' ) - substr_count( $a, '.' );
+		});
+
+		$nsuffix = 1;
+		foreach ( $expressions as $exp ) {
+			$explosion = explode( '.', $exp );
+			$joinTable = $type;
+			$joinType  = array_shift( $explosion );
+			$lastPart  = array_pop( $explosion );
+			$lastKey   = count( $explosion ) - 1;
+
+			// Let's check if we already joined that chain
+			// If that's the case we skip this
+			$joinKey  = implode( '.', $explosion );
+			foreach ( $joins as $chain => $suffix ) {
+				if ( strpos ( $chain, $joinKey ) === 0 ) {
+					$sql = str_replace( "@{$exp}", "{$explosion[$lastKey]}__rb{$suffix}.{$lastPart}", $sql );
+					continue 2;
 				}
-				$type = $target;
-				$i ++;
-				if (count($expression)==1) {
-					$field = array_shift($expression);
-					$criteria[] = "{$target}.{$field}";
-					$sql = str_replace( "@$expressionStr", "{$target}.{$field}", $sql );
+			}
+			$sql = str_replace( "@{$exp}", "{$explosion[$lastKey]}__rb{$nsuffix}.{$lastPart}", $sql );
+			$joins[$joinKey] = $nsuffix;
+
+			// We loop on the elements of the join
+			$i = 0;
+			while ( TRUE ) {
+				$joinInfo = $explosion[$i];
+				if ($i) {
+					$joinType = $explosion[$i-1];
+					$joinTable = $explosion[$i-2];
+				}
+
+				if ($i) {
+					$joinSql .= $this->writeJoin( $joinTable, $joinInfo, 'INNER', $joinType, FALSE, "__rb{$nsuffix}", NULL );
+				} else {
+					$joinSql .= $this->writeJoin( $joinTable, $joinInfo, 'LEFT', $joinType, TRUE, "__rb{$nsuffix}", $cteType );
+				}
+
+				$i += 2;
+				if ( !isset( $explosion[$i] ) ) {
 					break;
 				}
 			}
+			$nsuffix++;
 		}
+
 		$sql = str_ireplace( ' where ', ' WHERE ', $sql );
 		if ( strpos( $sql, ' WHERE ') === FALSE ) {
 			if ( preg_match( '/^(ORDER|GROUP|HAVING|LIMIT|OFFSET)\s+/i', trim($sql) ) ) {
@@ -953,57 +982,78 @@ abstract class AQueryWriter
 			$sqlParts = explode( ' WHERE ', $sql, 2 );
 			$sql = "{$sqlParts[0]} {$joinSql} WHERE {$sqlParts[1]}";
 		}
+
 		return $sql;
 	}
 
 	/**
 	 * @see QueryWriter::writeJoin
 	 */
-	public function writeJoin( $type, $targetType, $leftRight = 'LEFT', $joinType = 'parent', $overrideLinkType = FALSE )
+	public function writeJoin( $type, $targetType, $leftRight = 'LEFT', $joinType = 'parent', $firstOfChain = TRUE, $suffix = '', $cteType = NULL )
 	{
 		if ( $leftRight !== 'LEFT' && $leftRight !== 'RIGHT' && $leftRight !== 'INNER' )
 			throw new RedException( 'Invalid JOIN.' );
-		$alias   = $this->esc( $targetType );
+
 		$aliases = OODBBean::getAliases();
 		if ( isset( $aliases[$targetType] ) ) {
-			$destType    = $aliases[$targetType];
+			$destType      = $aliases[$targetType];
+			$asTargetTable = $this->esc( $targetType.$suffix );
 		} else {
-			$destType    = $targetType;
+			$destType      = $targetType;
+			$asTargetTable = $this->esc( $destType.$suffix );
 		}
-		$table       = $this->esc( $type );
-		$targetTable = $this->esc( $destType );
+
+		if ( $firstOfChain ) {
+			$table = $this->esc( $type );
+		} else {
+			$table = $this->esc( $type.$suffix );
+		}
+		$targetTable   = $this->esc( $destType );
+
 		if ( $joinType == 'shared' ) {
-			$field      = $this->esc((isset($aliases[$type])) ? $aliases[$type] : $type, TRUE);
-			$leftField  = "id";
 			if ( isset( $aliases[$type] ) ) {
-				$linkTable      = $this->esc( $this->getAssocTable( array( ($overrideLinkType) ? $overrideLinkType : $aliases[$type], $destType ) ) );
+				$field      = $this->esc( $aliases[$type], TRUE );
+				$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $aliases[$type], $destType ) );
 			} else {
-				$linkTable      = $this->esc( $this->getAssocTable( array( ($overrideLinkType) ? $overrideLinkType : $type, $destType ) ) );
+				$field      = $this->esc( $type, TRUE );
+				$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $type, $destType ) );
 			}
+			$linkTable      = $this->esc( $assocTable );
+			$asLinkTable    = $this->esc( $assocTable.$suffix );
+			$leftField      = "id";
+			$rightField     = $cteType ? "{$cteType}_id" : "{$field}_id";
 			$linkField      = $this->esc( $destType, TRUE );
-			$rightField     = ($overrideLinkType) ? "{$overrideLinkType}_id" :"{$field}_id";
 			$linkLeftField  = "id";
 			$linkRightField = "{$linkField}_id";
-			$joinSql = "
-					{$leftRight} JOIN {$linkTable} ON {$table}.{$leftField} = {$linkTable}.{$rightField}
-					INNER JOIN {$targetTable} AS {$alias} ON {$alias}.{$linkLeftField} = {$linkTable}.{$linkRightField}
-			";
+
+			$joinSql = " {$leftRight} JOIN {$linkTable}";
+			if ( isset( $aliases[$targetType] ) || $suffix ) {
+				$joinSql .= " AS {$asLinkTable}";
+			}
+			$joinSql .= " ON {$table}.{$leftField} = {$asLinkTable}.{$rightField}";
+			$joinSql .= " {$leftRight} JOIN {$targetTable}";
+			if ( isset( $aliases[$targetType] ) || $suffix ) {
+				$joinSql .= " AS {$asTargetTable}";
+			}
+			$joinSql .= " ON {$asTargetTable}.{$linkLeftField} = {$asLinkTable}.{$linkRightField}";
 		} else {
 			if ( $joinType == 'own' ) {
 				$field      = $this->esc( $type, TRUE );
-				$leftField  = ($overrideLinkType) ? "{$overrideLinkType}_id" :"{$field}_id";
+				$leftField  = $cteType ? "{$cteType}_id" : "{$field}_id"; 
 				$rightField = "id";
 			} else {
 				$field      = $this->esc( $targetType, TRUE );
 				$leftField  = "id";
 				$rightField = "{$field}_id";
 			}
-			if ( isset( $aliases[$targetType] ) ) {
-				$joinSql = " {$leftRight} JOIN {$targetTable} AS {$alias} ON {$alias}.{$leftField} = {$table}.{$rightField} ";
-			} else {
-				$joinSql = " {$leftRight} JOIN {$targetTable} ON {$targetTable}.{$leftField} = {$table}.{$rightField} ";
+
+			$joinSql = " {$leftRight} JOIN {$targetTable}";
+			if ( isset( $aliases[$targetType] ) || $suffix ) {
+				$joinSql .= " AS {$asTargetTable}";
 			}
+			$joinSql .= " ON {$asTargetTable}.{$leftField} = {$table}.{$rightField} ";
 		}
+
 		return $joinSql;
 	}
 
@@ -1347,17 +1397,17 @@ abstract class AQueryWriter
 			$bindings[$idSlot] = $id;
 		}
 		$sql = $this->glueSQLCondition( $addSql, QueryWriter::C_GLUE_WHERE );
-		$sql = $this->parseJoin( 'tree', $sql, $type );
+		$sql = $this->parseJoin( 'redbeantree', $sql, $type );
 		$rows = $this->adapter->get("
-			WITH RECURSIVE tree AS
+			WITH RECURSIVE redbeantree AS
 			(
 				SELECT *
 				FROM {$type} WHERE {$type}.id = {$idSlot}
 				UNION ALL
 				SELECT {$type}.* FROM {$type}
-				INNER JOIN tree {$alias} ON {$direction}
+				INNER JOIN redbeantree {$alias} ON {$direction}
 			)
-			SELECT tree.* FROM tree {$sql};",
+			SELECT redbeantree.* FROM redbeantree {$sql};",
 			$bindings
 		);
 		return $rows;
