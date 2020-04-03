@@ -759,7 +759,7 @@ class Facade
 	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $bindings array of values to be bound to parameters in query
 	 *
-	 * @return OODBBean
+	 * @return array
 	 */
 	public static function findForUpdate( $type, $sql, $bindings = array() )
 	{
