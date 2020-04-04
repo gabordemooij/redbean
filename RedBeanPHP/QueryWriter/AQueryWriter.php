@@ -919,9 +919,6 @@ abstract class AQueryWriter
 		if ( !preg_match_all( '#@((shared|own|joined)\.[^\s(,=!?]+)#', $sql, $matches) )
 			return $sql;
 
-		if ( count( $matches ) < 3 )
-			return $sql;
-
 		$expressions = $matches[1];
 		// Sort to make the joins from the longest to the shortest
 		uasort( $expressions, function($a, $b) {
