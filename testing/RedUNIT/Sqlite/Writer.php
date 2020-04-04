@@ -8,7 +8,7 @@ use RedBeanPHP\AssociationManager as AssociationManager;
 use RedBeanPHP\QueryWriter\SQLiteT as SQLiteT;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\RedException as RedException;
-
+use RedBeanPHP\QueryWriter\AQueryWriter;
 /**
  * Writer
  *
@@ -28,6 +28,27 @@ use RedBeanPHP\RedException as RedException;
  */
 class Writer extends Sqlite
 {
+	/**
+	 * Test whether SQLite QueryWriter safely filters FOR-UPDATE snippets.
+	 *
+	 * @return void
+	 */
+	public function testWriterShouldFilterSelectForUpdate()
+	{
+		R::nuke();
+		$id = R::store( R::dispense('bean') );
+		R::debug( TRUE, 1 );
+		$bean = R::findForUpdate('bean', 'id > 0');
+		$logs = R::getDatabaseAdapter()->getDatabase()->getLogger()->grep( AQueryWriter::C_SELECT_SNIPPET_FOR_UPDATE );
+		asrt( count($logs), 0 ); //if no cache clear, then would have been 2
+		$bean = R::loadForUpdate('bean', $id);
+		$logs = R::getDatabaseAdapter()->getDatabase()->getLogger()->grep( AQueryWriter::C_SELECT_SNIPPET_FOR_UPDATE );
+		asrt( count($logs), 0 ); //if no cache clear, then would have been 2
+		R::getWriter()->setUseCache( FALSE );
+		R::debug( FALSE );
+		R::nuke();
+	}
+
 	/**
 	 * Test whether optimizations do not have effect on Writer query outcomes.
 	 *
