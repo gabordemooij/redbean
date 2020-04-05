@@ -24,6 +24,250 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Joins extends Base
 {
+
+	private function quickTestBeans( $beans, $property ) {
+		$list = array();
+		foreach( $beans as $bean ) {
+			$list[] = $bean->{$property};
+		}
+		sort($list);
+		return implode(',', $list);
+	}
+
+	/**
+	 * Can we use joins with aliases?
+	 * Can we perform bean->alias->ownlist and bean->fetchas->other
+	 * like operation in SQL as well?
+	 *
+	 * In this test:
+	 * Albert: Almanac, Study Guide
+	 * Bob: Poetry Bundle, Study Guide (coauthor)
+	 *
+	 * Texts:
+	 * Example -> in Study Guide (as source)
+	 * Essay   -> in Study Guide (as book)
+	 * Poem    -> in Poetry Bundle (as book)
+	 * Poem    -> also in Almanac (as magazine)
+	 *
+	 * @return void
+	 */
+	public function testParsedJoinsWithAliasing()
+	{
+		R::nuke();
+		R::aliases(array());
+		$albert = R::dispense('person');
+		$bob    = R::dispense('person');
+		$guide  = R::dispense('book');
+		$almanac= R::dispense('book');
+		$poetry = R::dispense('book');
+		$albert->firstname = 'Albert';
+		$bob->firstname    = 'Bob';
+		$guide->title = 'Study Guide';
+		$almanac->title = 'Almanac';
+		$poetry->title = 'Poems';
+		$guide->author = $albert;
+		$guide->coauthor = $bob;
+		$almanac->author = $albert;
+		$poetry->author = $bob;
+		$poem = R::dispense('text');
+		$essay = R::dispense('text');
+		$example = R::dispense('text');
+		$poem->content = 'poem';
+		$essay->content = 'essay';
+		$example->content = 'example';
+		$poem->magazine = $almanac;
+		$poem->book = $poetry;
+		$essay->book = $guide;
+		$example->source = $guide;
+		$fiction = R::dispense('tag');
+		$nonfiction = R::dispense('tag');
+		$fiction->description    = 'fiction';
+		$nonfiction->description = 'non-fiction';
+		$example->sharedTag[] = $nonfiction;
+		$poem->sharedTag[] = $fiction;
+		$essay->sharedTag = array( $nonfiction, $fiction );
+		R::storeAll( array( $poem, $essay, $example ) );
+		$books = R::find('book', ' @joined.author.firstname = ? ', array('Bob'));
+		asrt(count($books), 0);
+		$books = R::find('book', ' @joined.author.firstname = ? ', array('Albert'));
+		asrt(count($books), 0);
+		$books = R::find('book', ' @joined.person[as:author].firstname = ? ', array('Bob'));
+		asrt(count($books), 1);
+		$books = R::find('book', ' @joined.person[as:author].firstname = ? ', array('Albert'));
+		asrt(count($books), 2);
+		R::freeze( TRUE );
+		try { $books = R::find('book', ' @joined.author.firstname = ? ', array('Bob')); fail(); } catch ( \Exception $e ) { pass(); }
+		try { $books = R::find('book', ' @joined.author.firstname = ? ', array('Albert')); fail();	} catch ( \Exception $e ) {pass();}
+		$books = R::find('book', ' @joined.person[as:author].firstname = ? ', array('Bob'));
+		asrt(count($books), 1);
+		$books = R::find('book', ' @joined.person[as:author].firstname = ? ', array('Albert'));
+		asrt(count($books), 2);
+		R::aliases(array('author' => 'person','coauthor' => 'person'));
+		$books = R::find('book', ' @joined.author.firstname = ? ', array('Bob'));
+		asrt(count($books), 1);
+		$books = R::find('book', ' @joined.author.firstname = ? ', array('Albert'));
+		asrt(count($books), 2);
+		$books = R::find('book', ' @joined.person[as:author].firstname = ? ', array('Bob'));
+		asrt(count($books), 1);
+		$books = R::find('book', ' @joined.person[as:author].firstname = ? ', array('Albert'));
+		asrt(count($books), 2);
+		R::freeze( FALSE );
+		R::aliases(array());
+		//If we want to find all the people who authored books like X
+		$authors = R::find( 'person', ' @own.book[author].title LIKE ? ', array( '%Study%' ) );
+		asrt( count($authors), 1 );
+		$authors = R::find( 'person', ' @own.book[alias:author].title LIKE ? ', array( '%Study%' ) );
+		asrt( count($authors), 1 );
+		//yields Almanac and Poems
+		$authors = R::find( 'person', ' @own.book[author].title LIKE ? ', array( '%m%' ) );
+		asrt( count($authors), 2 );
+		//yields Almanac and Poems
+		$authors = R::find( 'person', ' @own.book[alias:author].title LIKE ? ', array( '%m%' ) );
+		asrt( count($authors), 2 );
+		//yields nothing
+		$authors = R::find( 'person', ' @own.book[author].title LIKE ? ', array( '%x%' ) );
+		asrt( count($authors), 0 );
+		//yields nothing
+		$authors = R::find( 'person', ' @own.book[alias:author].title LIKE ? ', array( '%x%' ) );
+		asrt( count($authors), 0 );
+		//If we want to find all the people who authored books starting with X
+		$authors = R::find( 'person', ' @own.book[coauthor].title LIKE ? ', array( '%Study%' ) );
+		asrt( count($authors), 1 );
+		R::freeze( TRUE );
+		$authors = R::find( 'person', ' @own.book[author].title LIKE ? ', array( '%Study%' ) );
+		asrt( count($authors), 1 );
+		$authors = R::find( 'person', ' @own.book[alias:author].title LIKE ? ', array( '%Study%' ) );
+		asrt( count($authors), 1 );
+		//yields Almanac and Poems
+		$authors = R::find( 'person', ' @own.book[author].title LIKE ? ', array( '%m%' ) );
+		asrt( count($authors), 2 );
+		//yields Almanac and Poems
+		$authors = R::find( 'person', ' @own.book[alias:author].title LIKE ? ', array( '%m%' ) );
+		asrt( count($authors), 2 );
+		asrt( $this->quickTestBeans( $authors, 'firstname' ), 'Albert,Bob');
+		//yields nothing
+		$authors = R::find( 'person', ' @own.book[author].title LIKE ? ', array( '%x%' ) );
+		asrt( count($authors), 0 );
+		//yields nothing
+		$authors = R::find( 'person', ' @own.book[alias:author].title LIKE ? ', array( '%x%' ) );
+		asrt( count($authors), 0 );
+		$authors = R::find( 'person', ' @own.book[coauthor].title LIKE ? ', array( '%Study%' ) );
+		asrt( count($authors), 1 );
+		asrt( $this->quickTestBeans( $authors, 'firstname' ), 'Bob');
+		R::freeze(FALSE);
+		$books = R::find( 'book', ' @joined.person[author/coauthor].firstname = ?', array( 'Bob' ) );
+		asrt( count($books), 2 );
+		asrt( $this->quickTestBeans( $books, 'title' ), 'Poems,Study Guide');
+		//If we want all books where the author or the coauthor is named 'Bob':
+		$books = R::find( 'book', ' @joined.person[as:author/coauthor].firstname = ?', array( 'Bob' ) );
+		asrt( count($books), 2 );
+		asrt( $this->quickTestBeans( $books, 'title' ), 'Poems,Study Guide');
+		//If we want all books where the author or the coauthor is named 'Albert':
+		$books = R::find( 'book', ' @joined.person[as:author/].firstname = ?', array( 'Albert' ) );
+		asrt( count($books), 2 );
+		asrt( $this->quickTestBeans( $books, 'title' ), 'Almanac,Study Guide');
+		$books = R::find( 'book', ' @joined.person[as:coauthor/author].firstname = ?', array( 'Albert' ) );
+		asrt( count($books), 2 );
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].title LIKE ?', array( '%Study%' ) );
+		asrt( count($authors), 2 );
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].title LIKE ?', array( '%Poem%' ) );
+		asrt( count($authors), 1 );
+		asrt( $this->quickTestBeans( $authors, 'firstname' ), 'Bob');
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].title LIKE ?', array( '%Alm%' ) );
+		asrt( $this->quickTestBeans( $authors, 'firstname' ), 'Albert');
+		asrt( count($authors), 1 );
+		R::freeze(TRUE);
+		$books = R::find( 'book', ' @joined.person[author/coauthor].firstname = ?', array( 'Bob' ) );
+		asrt( count($books), 2 );
+		$books = R::find( 'book', ' @joined.person[as:author/coauthor].firstname = ?', array( 'Bob' ) );
+		asrt( count($books), 2 );
+		$books = R::find( 'book', ' @joined.person[as:author/coauthor].firstname = ?', array( 'Albert' ) );
+		asrt( count($books), 2 );
+		$books = R::find( 'book', ' @joined.person[as:author/coauthor].firstname = ?', array( 'Albert' ) );
+		asrt( count($books), 2 );
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].title LIKE ?', array( '%Study%' ) );
+		asrt( count($authors), 2 );
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].title LIKE ?', array( '%Poem%' ) );
+		asrt( count($authors), 1 );
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].title LIKE ?', array( '%Alm%' ) );
+		asrt( count($authors), 1 );
+		R::freeze(FALSE);
+		//2 people as author/coauthor have written a book (study guide) that contains the essay
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].own.text.content = ?', array( 'essay' ) );
+		asrt( count($authors), 2 );
+		//2 people as author/coauthor have written a book as source that contains the example
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].own.text[alias:source].content = ?', array( 'example' ) );
+		asrt( count($authors), 2 );
+		//1 person as author/coauthor has written a book as magazine/source that contains the poem
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].own.text[alias:source/magazine].content = ?', array( 'poem' ) );
+		asrt( count($authors), 1 );
+		//If we include book, we get 2 authors because the poem is also in the poetry bundle (book)
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].own.text[alias:book/source/magazine].content = ?', array( 'poem' ) );
+		asrt( count($authors), 2 );
+		R::freeze(TRUE);
+		//2 people as author/coauthor have written a book (study guide) that contains the essay
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].own.text.content = ?', array( 'essay' ) );
+		asrt( count($authors), 2 );
+		//2 people as author/coauthor have written a book as source that contains the example
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].own.text[alias:source].content = ?', array( 'example' ) );
+		asrt( count($authors), 2 );
+		//1 person as author/coauthor has written a book as magazine/source that contains the poem
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].own.text[alias:source/magazine].content = ?', array( 'poem' ) );
+		asrt( count($authors), 1 );
+		//If we include book, we get 2 authors because the poem is also in the poetry bundle (book)
+		$authors = R::find( 'person', ' @own.book[alias:author/coauthor].own.text[alias:book/source/magazine].content = ?', array( 'poem' ) );
+		asrt( count($authors), 2 );
+		R::freeze(FALSE);
+		//Get all texts in books authored by Bob
+		$texts = R::find('text', ' @joined.book.joined.person[as:author].firstname = ? ',array('Bob'));
+		asrt( count($texts), 1 );
+		//Get all texts in books authored by Bob as author/coauthor
+		$texts = R::find('text', ' @joined.book.joined.person[as:author/coauthor].firstname = ? ',array('Bob'));
+		asrt( count($texts), 2 );
+		//Get all texts in books as magazines or sources authored by Bob as author/coauthor
+		$texts = R::find('text', ' @joined.book[as:magazine/source].joined.person[as:author/coauthor].firstname = ? ',array('Bob'));
+		asrt( count($texts), 1 );
+		//Get all texts in books as magazines or sources or books authored by Bob as author/coauthor
+		$texts = R::find('text', ' @joined.book[as:magazine/source/book].joined.person[as:author/coauthor].firstname = ? ',array('Bob'));
+		asrt( count($texts), 3 );
+		//Get all texts in books as magazines or sources or books authored by Albert as author/coauthor
+		$texts = R::find('text', ' @joined.book[as:magazine/source/book].joined.person[as:author/coauthor].firstname = ? ',array('Albert'));
+		asrt( count($texts), 3 );
+		R::freeze(TRUE);
+		//Get all texts in books authored by Bob
+		$texts = R::find('text', ' @joined.book.joined.person[as:author].firstname = ? ',array('Bob'));
+		asrt( count($texts), 1 );
+		//Get all texts in books authored by Bob as author/coauthor
+		$texts = R::find('text', ' @joined.book.joined.person[as:author/coauthor].firstname = ? ',array('Bob'));
+		asrt( count($texts), 2 );
+		//Get all texts in books as magazines or sources authored by Bob as author/coauthor
+		$texts = R::find('text', ' @joined.book[as:magazine/source].joined.person[as:author/coauthor].firstname = ? ',array('Bob'));
+		asrt( count($texts), 1 );
+		//Get all texts in books as magazines or sources or books authored by Bob as author/coauthor
+		$texts = R::find('text', ' @joined.book[as:magazine/source/book].joined.person[as:author/coauthor].firstname = ? ',array('Bob'));
+		asrt( count($texts), 3 );
+		//Get all texts in books as magazines or sources or books authored by Albert as author/coauthor
+		$texts = R::find('text', ' @joined.book[as:magazine/source/book].joined.person[as:author/coauthor].firstname = ? ',array('Albert'));
+		asrt( count($texts), 3 );
+		R::freeze(FALSE);
+		//Get all texts in books as magazines or sources or books authored by Albert as author/coauthor that have been tagged
+		//as non-fiction, i.e. the example text and the essay.
+		$texts = R::find('text', '
+			@joined.book[as:magazine/source/book].joined.person[as:author/coauthor].firstname = ?
+			AND
+			@shared.tag.description = ?
+			',array('Albert', 'non-fiction'));
+		asrt( count($texts), 2 );
+		//Get all texts in books or sources or books authored by Albert as author/coauthor that have been tagged
+		//as non-fiction, i.e. nothing, only the essay
+		$texts = R::find('text', '
+			@joined.book[as:source/book].joined.person[as:author/coauthor].firstname = ?
+			AND
+			@shared.tag.description = ?
+			',array('Albert', 'fiction'));
+		asrt( count($texts), 1 );
+	}
+
 	/**
 	 * Non-join keywords starting with @ should be
 	 * left untouched.
