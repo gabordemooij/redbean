@@ -960,7 +960,7 @@ abstract class AQueryWriter
 
 				$aliases = array();
 				if ( ( $index = strpos( $joinInfo, '[' ) ) !== FALSE ) {
-					if ( preg_match_all( '#\s*(([^\s:/\][]+)\s*[/\]])#', $joinInfo, $matches ) ) {
+					if ( preg_match_all( '#(([^\s:/\][]+)[/\]])#', $joinInfo, $matches ) ) {
 						$aliases = $matches[2];
 						$joinInfo = substr( $joinInfo, 0, $index);
 					}
