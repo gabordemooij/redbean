@@ -931,18 +931,22 @@ abstract class AQueryWriter
 			$joinTable = $type;
 			$joinType  = array_shift( $explosion );
 			$lastPart  = array_pop( $explosion );
-			$lastKey   = count( $explosion ) - 1;
+			$lastJoin  = end($explosion);
+			if ( ( $index = strpos( $lastJoin, '[' ) ) !== FALSE ) {
+				$lastJoin = substr( $lastJoin, 0, $index);
+			}
+			reset($explosion);
 
 			// Let's check if we already joined that chain
 			// If that's the case we skip this
 			$joinKey  = implode( '.', $explosion );
 			foreach ( $joins as $chain => $suffix ) {
 				if ( strpos ( $chain, $joinKey ) === 0 ) {
-					$sql = str_replace( "@{$exp}", "{$explosion[$lastKey]}__rb{$suffix}.{$lastPart}", $sql );
+					$sql = str_replace( "@{$exp}", "{$lastJoin}__rb{$suffix}.{$lastPart}", $sql );
 					continue 2;
 				}
 			}
-			$sql = str_replace( "@{$exp}", "{$explosion[$lastKey]}__rb{$nsuffix}.{$lastPart}", $sql );
+			$sql = str_replace( "@{$exp}", "{$lastJoin}__rb{$nsuffix}.{$lastPart}", $sql );
 			$joins[$joinKey] = $nsuffix;
 
 			// We loop on the elements of the join
