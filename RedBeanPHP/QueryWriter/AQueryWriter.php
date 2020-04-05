@@ -916,7 +916,7 @@ abstract class AQueryWriter
 		$joins = array();
 		$joinSql = '';
 
-		if ( !preg_match_all( '#@((shared|own|joined)\.[^\s(,=!?]+)#', $sql, $matches) )
+		if ( !preg_match_all( '#@((shared|own|joined)\.[^\s(,=!?]+)#', $sql, $matches ) )
 			return $sql;
 
 		$expressions = $matches[1];
@@ -931,33 +931,48 @@ abstract class AQueryWriter
 			$joinTable = $type;
 			$joinType  = array_shift( $explosion );
 			$lastPart  = array_pop( $explosion );
-			$lastKey   = count( $explosion ) - 1;
+			$lastJoin  = end($explosion);
+			if ( ( $index = strpos( $lastJoin, '[' ) ) !== FALSE ) {
+				$lastJoin = substr( $lastJoin, 0, $index);
+			}
+			reset($explosion);
 
 			// Let's check if we already joined that chain
 			// If that's the case we skip this
 			$joinKey  = implode( '.', $explosion );
 			foreach ( $joins as $chain => $suffix ) {
 				if ( strpos ( $chain, $joinKey ) === 0 ) {
-					$sql = str_replace( "@{$exp}", "{$explosion[$lastKey]}__rb{$suffix}.{$lastPart}", $sql );
+					$sql = str_replace( "@{$exp}", "{$lastJoin}__rb{$suffix}.{$lastPart}", $sql );
 					continue 2;
 				}
 			}
-			$sql = str_replace( "@{$exp}", "{$explosion[$lastKey]}__rb{$nsuffix}.{$lastPart}", $sql );
+			$sql = str_replace( "@{$exp}", "{$lastJoin}__rb{$nsuffix}.{$lastPart}", $sql );
 			$joins[$joinKey] = $nsuffix;
 
 			// We loop on the elements of the join
 			$i = 0;
 			while ( TRUE ) {
 				$joinInfo = $explosion[$i];
-				if ($i) {
+				if ( $i ) {
 					$joinType = $explosion[$i-1];
 					$joinTable = $explosion[$i-2];
 				}
 
-				if ($i) {
-					$joinSql .= $this->writeJoin( $joinTable, $joinInfo, 'INNER', $joinType, FALSE, "__rb{$nsuffix}", NULL );
+				$aliases = array();
+				if ( ( $index = strpos( $joinInfo, '[' ) ) !== FALSE ) {
+					if ( preg_match_all( '#(([^\s:/\][]+)[/\]])#', $joinInfo, $matches ) ) {
+						$aliases = $matches[2];
+						$joinInfo = substr( $joinInfo, 0, $index);
+					}
+				}
+				if ( ( $index = strpos( $joinTable, '[' ) ) !== FALSE ) {
+					$joinTable = substr( $joinTable, 0, $index);
+				}
+
+				if ( $i ) {
+					$joinSql .= $this->writeJoin( $joinTable, $joinInfo, 'INNER', $joinType, FALSE, "__rb{$nsuffix}", $aliases, NULL );
 				} else {
-					$joinSql .= $this->writeJoin( $joinTable, $joinInfo, 'LEFT', $joinType, TRUE, "__rb{$nsuffix}", $cteType );
+					$joinSql .= $this->writeJoin( $joinTable, $joinInfo, 'LEFT', $joinType, TRUE, "__rb{$nsuffix}", $aliases, $cteType );
 				}
 
 				$i += 2;
@@ -986,14 +1001,14 @@ abstract class AQueryWriter
 	/**
 	 * @see QueryWriter::writeJoin
 	 */
-	public function writeJoin( $type, $targetType, $leftRight = 'LEFT', $joinType = 'parent', $firstOfChain = TRUE, $suffix = '', $cteType = NULL )
+	public function writeJoin( $type, $targetType, $leftRight = 'LEFT', $joinType = 'parent', $firstOfChain = TRUE, $suffix = '', $aliases = array(), $cteType = NULL )
 	{
 		if ( $leftRight !== 'LEFT' && $leftRight !== 'RIGHT' && $leftRight !== 'INNER' )
 			throw new RedException( 'Invalid JOIN.' );
 
-		$aliases = OODBBean::getAliases();
-		if ( isset( $aliases[$targetType] ) ) {
-			$destType      = $aliases[$targetType];
+		$globalAliases = OODBBean::getAliases();
+		if ( isset( $globalAliases[$targetType] ) ) {
+			$destType      = $globalAliases[$targetType];
 			$asTargetTable = $this->esc( $targetType.$suffix );
 		} else {
 			$destType      = $targetType;
@@ -1005,12 +1020,13 @@ abstract class AQueryWriter
 		} else {
 			$table = $this->esc( $type.$suffix );
 		}
-		$targetTable   = $this->esc( $destType );
+		$targetTable = $this->esc( $destType );
 
 		if ( $joinType == 'shared' ) {
-			if ( isset( $aliases[$type] ) ) {
-				$field      = $this->esc( $aliases[$type], TRUE );
-				$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $aliases[$type], $destType ) );
+
+			if ( isset( $globalAliases[$type] ) ) {
+				$field      = $this->esc( $globalAliases[$type], TRUE );
+				$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $globalAliases[$type], $destType ) );
 			} else {
 				$field      = $this->esc( $type, TRUE );
 				$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $type, $destType ) );
@@ -1024,31 +1040,58 @@ abstract class AQueryWriter
 			$linkRightField = "{$linkField}_id";
 
 			$joinSql = " {$leftRight} JOIN {$linkTable}";
-			if ( isset( $aliases[$targetType] ) || $suffix ) {
+			if ( isset( $globalAliases[$targetType] ) || $suffix ) {
 				$joinSql .= " AS {$asLinkTable}";
 			}
 			$joinSql .= " ON {$table}.{$leftField} = {$asLinkTable}.{$rightField}";
 			$joinSql .= " {$leftRight} JOIN {$targetTable}";
-			if ( isset( $aliases[$targetType] ) || $suffix ) {
+			if ( isset( $globalAliases[$targetType] ) || $suffix ) {
 				$joinSql .= " AS {$asTargetTable}";
 			}
 			$joinSql .= " ON {$asTargetTable}.{$linkLeftField} = {$asLinkTable}.{$linkRightField}";
-		} else {
-			if ( $joinType == 'own' ) {
-				$field      = $this->esc( $type, TRUE );
-				$leftField  = $cteType ? "{$cteType}_id" : "{$field}_id"; 
-				$rightField = "id";
-			} else {
-				$field      = $this->esc( $targetType, TRUE );
-				$leftField  = "id";
-				$rightField = "{$field}_id";
-			}
+
+		} elseif ( $joinType == 'own' ) {
+
+			$field      = $this->esc( $type, TRUE );
+			$rightField = "id";
 
 			$joinSql = " {$leftRight} JOIN {$targetTable}";
-			if ( isset( $aliases[$targetType] ) || $suffix ) {
+			if ( isset( $globalAliases[$targetType] ) || $suffix ) {
 				$joinSql .= " AS {$asTargetTable}";
 			}
-			$joinSql .= " ON {$asTargetTable}.{$leftField} = {$table}.{$rightField} ";
+
+			if ( $aliases ) {
+				$conditions = array();
+				foreach ( $aliases as $alias ) {
+					$conditions[] = "{$asTargetTable}.{$alias}_id = {$table}.{$rightField}";
+				}
+				$joinSql .= " ON ( " . implode( ' OR ', $conditions ) . " ) ";
+			} else {
+				$leftField  = $cteType ? "{$cteType}_id" : "{$field}_id";
+				$joinSql .= " ON {$asTargetTable}.{$leftField} = {$table}.{$rightField} ";
+			}
+
+		} else {
+
+			$field      = $this->esc( $targetType, TRUE );
+			$leftField  = "id";
+
+			$joinSql = " {$leftRight} JOIN {$targetTable}";
+			if ( isset( $globalAliases[$targetType] ) || $suffix ) {
+				$joinSql .= " AS {$asTargetTable}";
+			}
+
+			if ( $aliases ) {
+				$conditions = array();
+				foreach ( $aliases as $alias ) {
+					$conditions[] = "{$asTargetTable}.{$leftField} = {$table}.{$alias}_id";
+				}
+				$joinSql .= " ON ( " . implode( ' OR ', $conditions ) . " ) ";
+			} else {
+				$rightField = "{$field}_id";
+				$joinSql .= " ON {$asTargetTable}.{$leftField} = {$table}.{$rightField} ";
+			}
+
 		}
 
 		return $joinSql;
