@@ -410,6 +410,20 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	}
 
 	/**
+	 * Sets an SQL snippet to be used for the next queryRecord() operation.
+	 * SQLite has no SELECT-FOR-UPDATE and filters this.
+	 *
+	 * @param string $sql SQL snippet to use in SELECT statement.
+	 *
+	 * return self
+	 */
+	public function setSQLSelectSnippet( $sqlSelectSnippet = '' ) {
+		if ( $sqlSelectSnippet === AQueryWriter::C_SELECT_SNIPPET_FOR_UPDATE) $sqlSelectSnippet = '';
+		$this->sqlSelectSnippet = $sqlSelectSnippet;
+		return $this;
+	}
+
+	/**
 	 * @see QueryWriter::addIndex
 	 */
 	public function addIndex( $type, $name, $column )

@@ -25,6 +25,45 @@ use RedBeanPHP\OODBBean as OODBBean;
 class Joins extends Base
 {
 	/**
+	 * Non-join keywords starting with @ should be
+	 * left untouched.
+	 */
+	public function testNonJoinsLeftUntouched()
+	{
+		$writer = R::getWriter();
+		$types = array( 'book', 'cafe', 'bean' );
+		$sqls  = array(
+		'@version',
+		'@oined.satire',
+		'@oined.satire.laugh',
+		'@hared.lookalike.title',
+		'@powned.by.a.hacker',
+		'nothing here!',
+		'shared.person.name',
+		'owned.thing.name',
+		'joined.thing.name',
+		'shared.person.shared.tag.name',
+		'owned.thing.shared.tag.name',
+		'joined.thing.shared.tag.name',
+		'shared.person.joined.tag.name',
+		'owned.thing.joined.tag.name',
+		'joined.thing.joined.tag.name',
+		'shared.person.owned.tag.name',
+		'owned.thing.owned.tag.name',
+		'joined.thing.owned.tag.name'
+		);
+		$ctes   = array( TRUE, FALSE );
+		foreach($types as $type) {
+			foreach($sqls as $sql) {
+				foreach($ctes as $cte) {
+					$same = $writer->parseJoin( $type, $sql, $cte );
+					asrt( trim($same), trim($sql) );
+				}
+			}
+		}
+	}
+
+	/**
 	 * Can we join multiple tables with the same parent?
 	 * 
 	 * @return void
