@@ -955,14 +955,14 @@ abstract class AQueryWriter
 				}
 
 				$aliases = array();
-				if ( $index = strpos( $joinInfo, '[' ) !== FALSE ) {
+				if ( ( $index = strpos( $joinInfo, '[' ) ) !== FALSE ) {
 					if ( preg_match_all( '#\s*(([^\s:/\][]+)\s*[/\]])#', $joinInfo, $matches ) ) {
 						$aliases = $matches[2];
-						$joinInfo = substr( $joinInfo, 0, $index - 1);
+						$joinInfo = substr( $joinInfo, 0, $index);
 					}
 				}
-				if ( $index = strpos( $joinTable, '[' ) !== FALSE ) {
-					$joinTable = substr( $joinTable, 0, $index - 1);
+				if ( ( $index = strpos( $joinTable, '[' ) ) !== FALSE ) {
+					$joinTable = substr( $joinTable, 0, $index);
 				}
 
 				if ( $i ) {
