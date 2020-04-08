@@ -206,11 +206,13 @@ class Trees extends Postgres
 		$chart->file = 'report.jpg';
 		$picture = R::dispense('image');
 		$picture->file = 'logo.jpg';
+		$picture->source = $website;
 		$website->ownImageList = array( $picture );
 		$article->ownImageList = array( $picture );
 		$investor->ownImageList = array( $picture );
 		$about->ownImageList = array( $chart );
 		$about->author = $ceo;
+		$about->coauthor = $person;
 		$article->title = 'a walk in the park';
 		$website->ownPageList = array( $about, $blog );
 		$blog->ownPageList = array( $article );
@@ -279,5 +281,36 @@ class Trees extends Postgres
 		asrt(count($pages),1);
 		$page = reset($pages);
 		asrt($page->title,'about');
+		R::aliases(array());
+		//joined-alias - explicit/non-global
+		$pages = R::children( $website, ' @joined.person[as:author].name = ? ', array('James') );
+		asrt(count($pages), 1);
+		$page = reset($pages);
+		asrt($page->title, 'a walk in the park');
+		//Chained joined-alias+shared - explicit/non-global
+		$pages = R::children( $website, ' @joined.person[as:author].shared.role.label = ? ', array('CEO') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+		//joined-alias+shared parents - explicit/non-global
+		$pages = R::parents( $investor, ' @joined.person[as:author].shared.role.label = ? ', array('CEO') );
+		asrt(count($pages),1);
+		$page = reset($pages);
+		asrt($page->title,'about');
+		//joined-alias parents - explicit/non-global
+		$pages = R::parents( $links, ' @joined.person[as:author].name = ? ', array('James') );
+		asrt(count($pages), 1);
+		$page = reset($pages);
+		asrt($page->title, 'a walk in the park');
+		//double joined-alias parents - explicit/non-global
+		$pages = R::children( $website, ' @joined.person[as:author/coauthor].name = ? ', array('James') );
+		asrt(count($pages), 2);
+		//own-alias - explicit/non-global
+		$pages = R::children( $website, ' @own.image[alias:source].file = ?', array('logo.jpg') );
+		asrt(count($pages),1);
+		$pages = R::children( $website, ' @own.image[alias:source].file = ?', array('report.jpg') );
+		asrt(count($pages),0);
+		$pages = R::children( $about, ' @own.image[alias:source].file = ?', array('logo.jpg') );
+		asrt(count($pages),0);
 	}
 }
