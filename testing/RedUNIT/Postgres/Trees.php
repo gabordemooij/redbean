@@ -79,6 +79,10 @@ class Trees extends Postgres
 		asrt( $this->summarize( R::parents( $winePage, '  title != ? ORDER BY title ASC ', array( 'home' ) ) ), 'shop,wines' );
 		asrt( $this->summarize( R::children( $winePage, ' title != :title ORDER BY title ASC ', array( ':title' => 'wines' ) ) ), 'whiskies' );
 		asrt( $this->summarize( R::parents( $winePage, '  title != :title ORDER BY title ASC ', array( ':title' => 'home' ) ) ), 'shop,wines' );
+		asrt( R::countChildren( $homePage ), 3 );
+		asrt( R::countParents( $whiskyPage ), 3 );
+		asrt( R::countChildren( $winePage, ' title != :title  ', array( ':title' => 'wines' ) ) , 0 );
+		asrt( R::countParents( $winePage, '  title != :title  ', array( ':title' => 'home' ) ) , 1 );
 	}
 	
 	/**

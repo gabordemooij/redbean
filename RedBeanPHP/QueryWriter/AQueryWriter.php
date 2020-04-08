@@ -1424,7 +1424,7 @@ abstract class AQueryWriter
 	/**
 	 * @see QueryWriter::queryRecursiveCommonTableExpression
 	 */
-	public function queryRecursiveCommonTableExpression( $type, $id, $up = TRUE, $addSql = NULL, $bindings = array() )
+	public function queryRecursiveCommonTableExpression( $type, $id, $up = TRUE, $addSql = NULL, $bindings = array(), $count = FALSE )
 	{
 		$alias     = $up ? 'parent' : 'child';
 		$direction = $up ? " {$alias}.{$type}_id = {$type}.id " : " {$alias}.id = {$type}.{$type}_id ";
@@ -1447,7 +1447,7 @@ abstract class AQueryWriter
 				SELECT {$type}.* FROM {$type}
 				INNER JOIN redbeantree {$alias} ON {$direction}
 			)
-			SELECT redbeantree.* FROM redbeantree {$sql};",
+			SELECT ".($count ? "count(redbeantree.*)" : "redbeantree.*" )." FROM redbeantree {$sql};",
 			$bindings
 		);
 		return $rows;

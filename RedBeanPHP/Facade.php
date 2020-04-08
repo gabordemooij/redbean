@@ -3012,19 +3012,15 @@ class Facade
 	}
 
 	/**
-	 * @experimental
-	 *
 	 * Given a bean and an optional SQL snippet,
-	 * this method will return all child beans in a hierarchically structured
+	 * this method will return the bean together with all 
+	 * child beans in a hierarchically structured
 	 * bean table.
 	 *
 	 * @note that not all database support this functionality. You'll need
 	 * at least MariaDB 10.2.2 or Postgres. This method does not include
 	 * a warning mechanism in case your database does not support this
 	 * functionality.
-	 *
-	 * @note that this functionality is considered 'experimental'.
-	 * It may still contain bugs.
 	 *
 	 * @param OODBBean $bean     bean to find children of
 	 * @param string   $sql      optional SQL snippet
@@ -3036,10 +3032,8 @@ class Facade
 	}
 
 	/**
-	 * @experimental
-	 *
 	 * Given a bean and an optional SQL snippet,
-	 * this method will return all parent beans in a hierarchically structured
+	 * this method will count all child beans in a hierarchically structured
 	 * bean table.
 	 *
 	 * @note that not all database support this functionality. You'll need
@@ -3047,8 +3041,43 @@ class Facade
 	 * a warning mechanism in case your database does not support this
 	 * functionality.
 	 *
-	 * @note that this functionality is considered 'experimental'.
-	 * It may still contain bugs.
+	 * @param OODBBean $bean     bean to find children of
+	 * @param string   $sql      optional SQL snippet
+	 * @param array    $bindings SQL snippet parameter bindings
+	 */
+	public static function countChildren( OODBBean $bean, $sql = NULL, $bindings = array() )
+	{
+		return self::$tree->countChildren( $bean, $sql, $bindings );
+	}
+
+	/**
+	 * Given a bean and an optional SQL snippet,
+	 * this method will count all parent beans in a hierarchically structured
+	 * bean table.
+	 *
+	 * @note that not all database support this functionality. You'll need
+	 * at least MariaDB 10.2.2 or Postgres. This method does not include
+	 * a warning mechanism in case your database does not support this
+	 * functionality.
+	 *
+	 * @param OODBBean $bean     bean to find children of
+	 * @param string   $sql      optional SQL snippet
+	 * @param array    $bindings SQL snippet parameter bindings
+	 */
+	public static function countParents( OODBBean $bean, $sql = NULL, $bindings = array() )
+	{
+		return self::$tree->countParents( $bean, $sql, $bindings );
+	}
+
+	/**
+	 * Given a bean and an optional SQL snippet,
+	 * this method will return the bean along with all parent beans
+	 * in a hierarchically structured bean table.
+	 *
+	 * @note that not all database support this functionality. You'll need
+	 * at least MariaDB 10.2.2 or Postgres. This method does not include
+	 * a warning mechanism in case your database does not support this
+	 * functionality.
 	 *
 	 * @param OODBBean $bean     bean to find parents of
 	 * @param string   $sql      optional SQL snippet
