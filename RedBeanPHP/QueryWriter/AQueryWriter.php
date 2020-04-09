@@ -1026,10 +1026,18 @@ abstract class AQueryWriter
 
 			if ( isset( $globalAliases[$type] ) ) {
 				$field      = $this->esc( $globalAliases[$type], TRUE );
-				$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $globalAliases[$type], $destType ) );
+				if ( $aliases && count( $aliases ) === 1 ) {
+					$assocTable = reset( $aliases );
+				} else {
+					$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $globalAliases[$type], $destType ) );
+				}
 			} else {
 				$field      = $this->esc( $type, TRUE );
-				$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $type, $destType ) );
+				if ( $aliases && count( $aliases ) === 1 ) {
+					$assocTable = reset( $aliases );
+				} else {
+					$assocTable = $this->getAssocTable( array( $cteType ? $cteType : $type, $destType ) );
+				}
 			}
 			$linkTable      = $this->esc( $assocTable );
 			$asLinkTable    = $this->esc( $assocTable.$suffix );
