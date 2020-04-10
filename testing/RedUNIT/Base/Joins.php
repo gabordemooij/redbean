@@ -35,6 +35,45 @@ class Joins extends Base
 	}
 
 	/**
+	 * Test whether we can use [via] notation in parsed joins.
+	 *
+	 * @return void
+	 */
+	public function testParsedJoinsWithVia()
+	{
+		$project1 = R::dispense('project');
+		$project2 = R::dispense('project');
+		$project1->title = 'project1';
+		$project2->title = 'project2';
+		$employee1 = R::dispense('employee');
+		$employee2 = R::dispense('employee');
+		$employee1->name = 'a';
+		$employee2->name = 'b';
+		$participant1 = R::dispense('participant');
+		$participant2 = R::dispense('participant');
+		$participant3 = R::dispense('participant');
+		$participant1->employee = $employee1;
+		$participant2->employee = $employee1;
+		$participant3->employee = $employee2;
+		$participant1->project = $project1;
+		$participant2->project = $project2;
+		$participant3->project = $project2;
+		R::storeAll(array($participant1,$participant2,$participant3));
+		$projects = R::find('project', ' @shared.employee[via:participant].name LIKE ? ', array('a'));
+		asrt(count($projects),2);
+		$projects = R::find('project', ' @shared.employee[via:participant].name LIKE ? AND project.title = ? ', array('a','project1'));
+		asrt(count($projects),1);
+		$projects = R::find('project', ' @shared.employee[via:participant].name LIKE ? AND project.title = ? ', array('a','project2'));
+		asrt(count($projects),1);
+		$projects = R::find('project', ' @shared.employee[via:participant].name LIKE ? ', array('b'));
+		asrt(count($projects),1);
+		$projects = R::find('project', ' @shared.employee[via:participant].name LIKE ? AND project.title = ? ', array('b','project1'));
+		asrt(count($projects),0);
+		$projects = R::find('project', ' @shared.employee[via:participant].name LIKE ? AND project.title = ? ', array('b','project2'));
+		asrt(count($projects),1);
+	}
+
+	/**
 	 * Can we use joins with aliases?
 	 * Can we perform bean->alias->ownlist and bean->fetchas->other
 	 * like operation in SQL as well?
