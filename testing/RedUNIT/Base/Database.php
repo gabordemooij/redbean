@@ -86,6 +86,42 @@ class Database extends Base
 	}
 
 	/**
+	 * Test whether we can select 'extra' columns with beans.
+	 *
+	 * @return void
+	 */
+	public function testExtraColumn()
+	{
+		R::nuke();
+		$page1 = R::dispense('page');
+		$page2 = R::dispense('page');
+		R::storeAll( array( $page1, $page2 ) );
+		$old = R::addSelectColumns( 'page', array('total' => '( SELECT 2 )') );
+		$page = R::findOne('page', ' ORDER BY id ASC LIMIT 1');
+		$bundle = $page->getMeta('data.bundle');
+		asrt( intval($bundle['__meta_total']) , 2 );
+		asrt( intval($page->extra('total')), 2 );
+		$page = R::findOne('page', ' ORDER BY id DESC LIMIT 1');
+		$bundle = $page->getMeta('data.bundle');
+		asrt( intval($page->extra('total')), 2 );
+		asrt( intval($bundle['__meta_total']) , 2 );
+		R::getWriter()->flushCache();
+		R::addSelectColumns( 'page', array('total' => '( SELECT 2 )', 'another' => '(SELECT 123)') );
+		$page = R::findOne('page', ' ORDER BY id DESC LIMIT 1');
+		$bundle = $page->getMeta('data.bundle');
+		asrt( intval($bundle['__meta_total']) , 2 );
+		asrt( intval($bundle['__meta_another']) , 123 );
+		asrt( intval($page->extra('total')), 2 );
+		asrt( intval($page->extra('another')), 123 );
+		R::getWriter()->flushCache();
+		R::restoreSelectColumns( $old );
+		$page = R::findOne('page', ' ORDER BY id DESC LIMIT 1');
+		$bundle = $page->getMeta('data.bundle');
+		asrt( isset($bundle['__meta_total']) , FALSE );
+		asrt( isset($bundle['__meta_another']) , FALSE );
+	}
+
+	/**
 	 * Make ConvertToBean work together with getRow #759.
 	 * When no results are found for getRow it returns []
 	 * Then when you give that to convertToBean it wraps your
