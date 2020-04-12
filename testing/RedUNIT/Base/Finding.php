@@ -11,6 +11,15 @@ use RedBeanPHP\RedException as RedException;
 use RedBeanPHP\RedException\SQL as SQL;
 use RedBeanPHP\Finder;
 
+
+if(!function_exists("array_column"))
+{
+    function array_column($array,$column_name)
+    {
+        return array_map(function($element) use($column_name){return $element[$column_name];}, $array);
+    }
+}
+
 /**
  * Finding
  *
@@ -27,6 +36,166 @@ use RedBeanPHP\Finder;
  * with this source code in the file license.txt.
  */
 class Finding extends Base {
+
+	/**
+	 * Can we quickly attach additional beans?
+	 *
+	 * @return void
+	 */
+	public function testPreloadUsingFindMulti()
+	{
+		R::nuke();
+		$gebruiker1 = R::dispense('gebruiker');
+		$gebruiker2 = R::dispense('gebruiker');
+		$gebruiker3 = R::dispense('gebruiker');
+		$country1 = R::dispense('country');
+		$country2 = R::dispense('country');
+		$country3 = R::dispense('country');
+		$language1 = R::dispense('language');
+		$language2 = R::dispense('language');
+		$language3 = R::dispense('language');
+		$gebruiker1->name = 'a';
+		$gebruiker2->name = 'b';
+		$gebruiker3->name = 'c';
+		$country1->name = 'Netherlands';
+		$country2->name = 'France';
+		$country3->name = 'USA';
+		$language1->name = 'Dutch';
+		$language2->name = 'French';
+		$language3->name = 'English';
+		$gebruiker1->country = $country1;
+		$gebruiker1->language = $language1;
+		$gebruiker2->country = $country2;
+		$gebruiker2->language = $language2;
+		$gebruiker3->country = $country3;
+		$gebruiker3->language = $language3;
+		R::storeAll(array($gebruiker1,$gebruiker2,$gebruiker3));
+		$gebruikers = R::find('gebruiker'); //imagine some difficult query here
+		//can we attach other beans using findMulti?
+		$all = R::findMulti(
+			'country',
+			'SELECT country.* FROM country WHERE id IN ('. R::genSlots( $gebruikers ) . ') ', array_column( $gebruikers, 'country_id' ),
+			array(
+				array(
+					'a' => 'country',
+					'b' => $gebruikers,
+					'matcher' => function( $a, $b ) {
+						return ($b->country_id == $a->id);
+					},
+					'do' => function( $a, $b ) {
+						$b->noLoad()->country = $a;
+					}
+				)
+			)
+		);
+		asrt(count($all),2);
+		asrt(isset($all['country']), TRUE);
+		asrt(isset($all['gebruiker']), TRUE);
+		asrt(count($all['country']), 3);
+		asrt(count($all['gebruiker']), 3);
+		foreach($all['gebruiker'] as $gebruiker) {
+			asrt( $gebruiker->noLoad()->country instanceof OODBBean, TRUE );
+		}
+		//Using a static mapper makes it more readable
+		$gebruikers = R::find('gebruiker'); //imagine some difficult query here
+		$all = R::findMulti(
+			'country',
+			'SELECT country.* FROM country WHERE id IN ('. R::genSlots( $gebruikers ) . ') ', array_column( $gebruikers, 'country_id' ),
+			array(
+				Finder::onMap('country', $gebruikers)
+			)
+		);
+		asrt(count($all),2);
+		asrt(isset($all['country']), TRUE);
+		asrt(isset($all['gebruiker']), TRUE);
+		asrt(count($all['country']), 3);
+		asrt(count($all['gebruiker']), 3);
+		foreach($all['gebruiker'] as $gebruiker) {
+			asrt( $gebruiker->noLoad()->country instanceof OODBBean, TRUE );
+		}
+		//Even more compact
+		$gebruikers = R::find('gebruiker'); //imagine some difficult query here
+		$all = R::findMulti(
+			'country',
+			R::genSlots( $gebruikers, 'SELECT country.* FROM country WHERE id IN ( %s )' ), array_column( $gebruikers, 'country_id' ),
+			array(
+				Finder::onMap('country', $gebruikers)
+			)
+		);
+		asrt(count($all),2);
+		asrt(isset($all['country']), TRUE);
+		asrt(isset($all['gebruiker']), TRUE);
+		asrt(count($all['country']), 3);
+		asrt(count($all['gebruiker']), 3);
+		foreach($all['gebruiker'] as $gebruiker) {
+			asrt( $gebruiker->noLoad()->country instanceof OODBBean, TRUE );
+		}
+		//Yet, even more compact
+		$gebruikers = R::find('gebruiker'); //imagine some difficult query here
+		$gebruikers = R::also( $gebruikers, 'country' );
+		asrt(count($gebruikers), 3);
+		foreach($gebruikers as $gebruiker) {
+			asrt( $gebruiker->noLoad()->country instanceof OODBBean, TRUE );
+		}
+	}
+
+	/**
+	 * Test somewhat more complex findMulti plus onmap()
+	 *
+	 * @return void
+	 */
+	public function testComplexFindMultis()
+	{
+		R::nuke();
+		$gebruiker1 = R::dispense('gebruiker');
+		$gebruiker2 = R::dispense('gebruiker');
+		$gebruiker3 = R::dispense('gebruiker');
+		$country1 = R::dispense('country');
+		$country2 = R::dispense('country');
+		$country3 = R::dispense('country');
+		$language1 = R::dispense('language');
+		$language2 = R::dispense('language');
+		$language3 = R::dispense('language');
+		$gebruiker1->name = 'a';
+		$gebruiker2->name = 'b';
+		$gebruiker3->name = 'c';
+		$country1->name = 'Netherlands';
+		$country2->name = 'France';
+		$country3->name = 'USA';
+		$language1->name = 'Dutch';
+		$language2->name = 'French';
+		$language3->name = 'English';
+		$gebruiker1->country = $country1;
+		$gebruiker1->language = $language1;
+		$gebruiker2->country = $country2;
+		$gebruiker2->language = $language2;
+		$gebruiker3->country = $country3;
+		$gebruiker3->language = $language3;
+		R::storeAll(array($gebruiker1,$gebruiker2,$gebruiker3));
+		$all = R::findMulti(
+		'gebruiker,country,language', '
+			SELECT gebruiker.*, country.*, language.*
+			FROM gebruiker
+			INNER JOIN country ON country.id = gebruiker.country_id
+			INNER JOIN language ON language.id = gebruiker.language_id
+		',
+		array(),
+		array(
+			Finder::onMap('country','gebruiker'),
+			Finder::onMap('language', 'gebruiker')
+		));
+		asrt(count($all), 3);
+		asrt(isset($all['gebruiker']), TRUE);
+		asrt(isset($all['country']), TRUE);
+		asrt(isset($all['language']), TRUE);
+		asrt(count($all['gebruiker']), 3);
+		asrt(count($all['country']), 3);
+		asrt(count($all['language']), 3);
+		foreach( $all['gebruiker'] as $gebruiker ) {
+			asrt( $gebruiker->noLoad()->country instanceof OODBBean, TRUE );
+			asrt( $gebruiker->noLoad()->language instanceof OODBBean, TRUE );
+		}
+	}
 
 	/**
 	 * Improve the sql check in glueLimitOne #776.

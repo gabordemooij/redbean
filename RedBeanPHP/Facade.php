@@ -1901,6 +1901,55 @@ class Facade
 	}
 
 	/**
+	 * Convenience method to quickly attach parent beans.
+	 * Although usually this can also be done with findMulti(), that
+	 * approach can be a bit verbose sometimes. This convenience method
+	 * uses a default yet overridable SQL snippet to perform the
+	 * operation, leveraging the power of findMulti().
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $users = R::find('user');
+	 * $users = R::also( $users, 'country' );
+	 * </code>
+	 *
+	 * This is an alternative for:
+	 *
+	 * <code>
+	 * $all = R::findMulti('country',
+	 *    R::genSlots( $users,
+	 *       'SELECT country.* FROM country WHERE id IN ( %s )' ),
+	 *    array_column( $users, 'country_id' ),
+	 *    [Finder::onmap('country', $gebruikers)]
+	 * );
+	 * </code>
+	 *
+	 * @param array  $beans       a list of OODBBeans
+	 * @param string $type        a type string
+	 * @param string $sqlTemplate an SQL template string for the SELECT-query
+	 *
+	 * @return array
+	 */
+	public static function also( $beans, $type, $sqlTemplate = 'SELECT %s.* FROM %s WHERE id IN (%s)' )
+	{
+		if (!count($beans)) return array();
+		$ids  = array();
+		$key  = "{$type}_id";
+		foreach( $beans as $bean ) $ids[] = $bean->{$key};
+		$result = self::findMulti(
+			$type,
+			self::genSlots( $beans,sprintf($sqlTemplate, $type, $type, '%s')),
+			$ids,
+			array(
+				Finder::onmap($type, $beans)
+			)
+		);
+		$bean = reset($beans);
+		return $result[ $bean->getMeta('type') ];
+	}
+
+	/**
 	 * Flattens a multi dimensional bindings array for use with genSlots().
 	 *
 	 * Usage:

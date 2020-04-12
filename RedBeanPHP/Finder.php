@@ -128,6 +128,59 @@ class Finder
 	}
 
 	/**
+	 * Finder::onMap() -> One-to-N mapping.
+	 * A custom record-to-bean mapping function for findMulti.
+	 * Opposite of Finder::map(). Maps child beans to parents.
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * $collection = R::findMulti( 'shop,product',
+	 * 'SELECT shop.*, product.* FROM shop
+	 *	LEFT JOIN product ON product.shop_id = shop.id',
+	 *  [], [
+	 *		Finder::onmap( 'product', 'shop' ),
+	 *	]);
+	 * </code>
+	 *
+	 * Can also be used for instance to attach related beans
+	 * in one-go to save some queries:
+	 *
+	 * Given $users that have a country_id:
+	 *
+	 * <code>
+	 * $all = R::findMulti('country',
+	 *    R::genSlots( $users,
+	 *       'SELECT country.* FROM country WHERE id IN ( %s )' ),
+	 *    array_column( $users, 'country_id' ),
+	 *    [Finder::onmap('country', $gebruikers)]
+	 * );
+	 * </code>
+	 *
+	 * For your convenience, an even shorter notation has been added:
+	 *
+	 * $countries = R::also( $users, 'country' );
+	 *
+	 * @param string $parentName name of the parent bean
+	 * @param string $childName  name of the child bean
+	 *
+	 * @return array
+	 */
+	public static function onMap($parentName,$childName) {
+		return array(
+			'a' => $parentName,
+			'b' => $childName,
+			'matcher' => function( $parent, $child ) use ( $parentName, $childName ) {
+				$property = "{$parentName}_id";
+				return ( $child->$property == $parent->id );
+			},
+			'do' => function( $parent, $child ) use ( $parentName ) {
+				$child->noLoad()->{$parentName} = $parent;
+			}
+		);
+	}
+
+	/**
 	 * Finds a bean using a type and a where clause (SQL).
 	 * As with most Query tools in RedBean you can provide values to
 	 * be inserted in the SQL statement by populating the value
@@ -461,6 +514,18 @@ class Finder
 		foreach($remappings as $remapping) {
 			$a       = $remapping['a'];
 			$b       = $remapping['b'];
+			if (is_array($a)) {
+				$firstBean = reset($a);
+				$type = $firstBean->getMeta('type');
+				$beans[$type] = $a;
+				$a = $type;
+			}
+			if (is_array($b)) {
+				$firstBean = reset($b);
+				$type = $firstBean->getMeta('type');
+				$beans[$type] = $b;
+				$b = $type;
+			}
 			$matcher = $remapping['matcher'];
 			$do      = $remapping['do'];
 			foreach( $beans[$a] as $bean ) {
