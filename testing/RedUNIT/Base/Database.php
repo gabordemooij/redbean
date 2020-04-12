@@ -113,6 +113,8 @@ class Database extends Base
 		asrt( intval($bundle['__meta_another']) , 123 );
 		asrt( intval($page->extra('total')), 2 );
 		asrt( intval($page->extra('another')), 123 );
+		asrt( $page->total, NULL );
+		asrt( $page->another, NULL );
 		R::getWriter()->flushCache();
 		R::restoreSelectColumns( $old );
 		$page = R::findOne('page', ' ORDER BY id DESC LIMIT 1');

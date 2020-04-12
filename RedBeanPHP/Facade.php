@@ -2547,6 +2547,7 @@ class Facade
 	public static function addSelectColumns( $type, $columns, $prefix='__meta_' )
 	{
 		$raw = $columns;
+		$columns = array();
 		foreach( $raw as $key => $value ) {
 			$columns["{$prefix}{$key}"] = $value;
 		}
