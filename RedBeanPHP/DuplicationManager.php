@@ -124,6 +124,7 @@ class DuplicationManager
 		$copy->setMeta( 'sys.dup-from-id', $bean->id );
 		$copy->setMeta( 'sys.old-id', $bean->id );
 		$copy->importFrom( $bean );
+		if ($this->copyMeta) $copy->copyMetaFrom($bean);
 		$copy->id = 0;
 
 		return $copy;
@@ -438,19 +439,21 @@ class DuplicationManager
 	 * @param boolean        $parents   also export parents
 	 * @param array          $filters   only these types (whitelist)
 	 * @param string         $caseStyle case style identifier
+	 * @param boolean        $meta      export meta data as well
 	 *
 	 * @return array
 	 */
-	public function exportAll( $beans, $parents = FALSE, $filters = array(), $caseStyle = 'snake')
+	public function exportAll( $beans, $parents = FALSE, $filters = array(), $caseStyle = 'snake', $meta = FALSE)
 	{
 		$array = array();
 		if ( !is_array( $beans ) ) {
 			$beans = array( $beans );
 		}
+		$this->copyMeta = $meta;
 		foreach ( $beans as $bean ) {
 			$this->setFilters( $filters );
 			$duplicate = $this->dup( $bean, array(), TRUE );
-			$array[]   = $duplicate->export( FALSE, $parents, FALSE, $filters );
+			$array[]   = $duplicate->export( $meta, $parents, FALSE, $filters );
 		}
 		if ( $caseStyle === 'camel' ) $array = $this->camelfy( $array );
 		if ( $caseStyle === 'dolphin' ) $array = $this->camelfy( $array, TRUE );

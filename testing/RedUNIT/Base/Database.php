@@ -113,6 +113,10 @@ class Database extends Base
 		asrt( intval($bundle['__meta_another']) , 123 );
 		asrt( intval($page->extra('total')), 2 );
 		asrt( intval($page->extra('another')), 123 );
+		$exported = R::exportAll( array( $page ), FALSE, array(), TRUE );
+		$exported = reset($exported);
+		asrt( intval($exported['__info']['data.bundle']['__meta_total']), 2 );
+		asrt( intval($exported['__info']['data.bundle']['__meta_another']), 123 );
 		asrt( $page->total, NULL );
 		asrt( $page->another, NULL );
 		R::getWriter()->flushCache();
