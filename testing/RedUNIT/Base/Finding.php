@@ -65,7 +65,7 @@ class Finding extends Base {
 		//can we attach other beans using findMulti?
 		$all = R::findMulti(
 			'country',
-			'SELECT country.* FROM country WHERE id IN ('. R::genSlots( $gebruikers ) . ') ', array_column( $gebruikers, 'country_id' ),
+			'SELECT country.* FROM country WHERE id IN ('. R::genSlots( $gebruikers ) . ') ', colfield( $gebruikers, 'country_id' ),
 			array(
 				array(
 					'a' => 'country',
@@ -91,7 +91,7 @@ class Finding extends Base {
 		$gebruikers = R::find('gebruiker'); //imagine some difficult query here
 		$all = R::findMulti(
 			'country',
-			'SELECT country.* FROM country WHERE id IN ('. R::genSlots( $gebruikers ) . ') ', array_column( $gebruikers, 'country_id' ),
+			'SELECT country.* FROM country WHERE id IN ('. R::genSlots( $gebruikers ) . ') ', colfield( $gebruikers, 'country_id' ),
 			array(
 				Finder::onMap('country', $gebruikers)
 			)
@@ -108,7 +108,7 @@ class Finding extends Base {
 		$gebruikers = R::find('gebruiker'); //imagine some difficult query here
 		$all = R::findMulti(
 			'country',
-			R::genSlots( $gebruikers, 'SELECT country.* FROM country WHERE id IN ( %s )' ), array_column( $gebruikers, 'country_id' ),
+			R::genSlots( $gebruikers, 'SELECT country.* FROM country WHERE id IN ( %s )' ), colfield( $gebruikers, 'country_id' ),
 			array(
 				Finder::onMap('country', $gebruikers)
 			)
