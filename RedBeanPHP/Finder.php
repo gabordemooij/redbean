@@ -514,12 +514,6 @@ class Finder
 		foreach($remappings as $remapping) {
 			$a       = $remapping['a'];
 			$b       = $remapping['b'];
-			if (is_array($a)) {
-				$firstBean = reset($a);
-				$type = $firstBean->getMeta('type');
-				$beans[$type] = $a;
-				$a = $type;
-			}
 			if (is_array($b)) {
 				$firstBean = reset($b);
 				$type = $firstBean->getMeta('type');
