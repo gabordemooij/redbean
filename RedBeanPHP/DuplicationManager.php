@@ -69,6 +69,11 @@ class DuplicationManager
 	protected $cacheTables = FALSE;
 
 	/**
+	 * @var boolean
+	 */
+	protected $copyMeta = FALSE;
+
+	/**
 	 * Copies the shared beans in a bean, i.e. all the sharedBean-lists.
 	 *
 	 * @param OODBBean $copy   target bean to copy lists to
