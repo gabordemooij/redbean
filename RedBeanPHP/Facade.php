@@ -1955,14 +1955,7 @@ class Facade
 		$ids  = array();
 		$key  = "{$type}_id";
 		foreach( $beans as $bean ) $ids[] = $bean->{$key};
-		$result = self::findMulti(
-			$type,
-			self::genSlots( $beans,sprintf($sqlTemplate, $type, $type, '%s')),
-			$ids,
-			array(
-				Finder::onmap($type, $beans)
-			)
-		);
+		$result = self::findMulti($type, self::genSlots( $beans,sprintf($sqlTemplate, $type, $type, '%s')), $ids, array( Finder::onmap($type, $beans) ) );
 		$bean = reset($beans);
 		return $result[ $bean->getMeta('type') ];
 	}
