@@ -180,6 +180,38 @@ class Concurrency extends Base
 		asrt( count( $entries ), 0 );
 		$logs->clear();
 
+		/* findOneForUpdate */
+		R::nuke();
+		$beans = R::dispenseAll('bean*10');
+		R::storeAll($beans[0]);
+		$ids = array();
+		foreach($beans[0] as $bean) $ids[] = $bean->id;
+		R::debug( TRUE, 1 );
+		$logs = R::getDatabaseAdapter()
+            ->getDatabase()
+            ->getLogger();
+		$beans = R::findOneForUpdate( 'bean' );
+		asrt( count( $beans ), 1 );
+		$entries = $logs->grep('for update');
+		asrt( count( $entries ), 0 );
+		$logs->clear();
+
+		/* findForUpdate */
+		R::nuke();
+		$beans = R::dispenseAll('bean*10');
+		R::storeAll($beans[0]);
+		$ids = array();
+		foreach($beans[0] as $bean) $ids[] = $bean->id;
+		R::debug( TRUE, 1 );
+		$logs = R::getDatabaseAdapter()
+            ->getDatabase()
+            ->getLogger();
+		$beans = R::findForUpdate( 'bean' );
+		asrt( count( $beans ), 10 );
+		$entries = $logs->grep('for update');
+		asrt( count( $entries ), 0 );
+		$logs->clear();
+
 		/* batch + snippet */
 		R::nuke();
 		$beans = R::dispenseAll('bean*10');
