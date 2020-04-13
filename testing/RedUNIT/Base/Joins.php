@@ -84,6 +84,24 @@ class Joins extends Base
 		asrt(count($projects),0);
 		$projects = R::find('project', ' @shared.participant.name LIKE ? AND project.title = ? ', array('b','project2'));
 		asrt(count($projects),0);
+		R::aliases(array('work'=>'project'));
+		$company1 = R::dispense('company');
+		$company2 = R::dispense('company');
+		$company1->work = $project1;
+		$company2->work = $project2;
+		R::storeAll( array( $company1, $company2 ) );
+		$companies = R::find('company', ' @joined.work.shared.employee[via:participant].name LIKE ? ', array('a'));
+		asrt(count($companies),2);
+		$companies = R::find('company', ' @joined.work.shared.employee[via:participant].name LIKE ? AND @joined.work.title = ? ', array('a','project1'));
+		asrt(count($companies),1);
+		$companies = R::find('company', ' @joined.work.shared.employee[via:participant].name LIKE ? AND @joined.work.title = ? ', array('a','project2'));
+		asrt(count($companies),1);
+		$companies = R::find('company', ' @joined.work.shared.employee[via:participant].name LIKE ? ', array('b'));
+		asrt(count($companies),1);
+		$companies = R::find('company', ' @joined.work.shared.employee[via:participant].name LIKE ? AND @joined.work.title = ?', array('b','project1'));
+		asrt(count($companies),0);
+		$companies = R::find('company', ' @joined.work.shared.employee[via:participant].name LIKE ? AND @joined.work.title = ? ', array('b','project2'));
+		asrt(count($companies),1);
 	}
 
 	/**
