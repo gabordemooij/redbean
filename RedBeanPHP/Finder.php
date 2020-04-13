@@ -419,15 +419,15 @@ class Finder
 	 *
 	 * <code>
 	 * array(
-	 * 	'a'       => 'movie'     //define A as movie
-	 *    'b'       => 'review'    //define B as review
-	 *    'matcher' => function( $a, $b ) {
-	 *       return ( $b->movie_id == $a->id );  //Perform action if review.movie_id equals movie.id
-	 *    }
-	 *    'do'      => function( $a, $b ) {
+	 * 	'a' => 'movie'     //define A as movie
+	 *  'b' => 'review'    //define B as review
+	 *  matcher' => function( $a, $b ) {
+	 *     return ( $b->movie_id == $a->id );  //Perform action if review.movie_id equals movie.id
+	 *  }
+	 *  'do' => function( $a, $b ) {
 	 *       $a->noLoad()->ownReviewList[] = $b; //Add the review to the movie
 	 *       $a->clearHistory();                 //optional, act 'as if these beans have been loaded through ownReviewList'.
-	 *    }
+	 *   }
 	 * )
 	 * </code>
 	 *
@@ -442,6 +442,16 @@ class Finder
 	 * it's actually an SQL-like template SLOT, not real SQL.
 	 *
 	 * @note instead of an SQL query you can pass a result array as well.
+	 *
+	 * @note the performance of this function is poor, if you deal with large number of records
+	 * please use plain SQL instead. This function has been added as a bridge between plain SQL
+	 * and bean oriented approaches but it is really on the edge of both worlds. You can safely
+	 * use this function to load additional records as beans in paginated context, let's say
+	 * 50-250 records. Anything above that will gradually perform worse. RedBeanPHP was never
+	 * intended to replace SQL but offer tooling to integrate SQL with object oriented
+	 * designs. If you have come to this function, you have reached the final border between
+	 * SQL-oriented design and OOP. Anything after this will be just as good as custom mapping
+	 * or plain old database querying. I recommend the latter.
 	 *
 	 * @param string|array $types         a list of types (either array or comma separated string)
 	 * @param string|array $sql           optional, an SQL query or an array of prefetched records
