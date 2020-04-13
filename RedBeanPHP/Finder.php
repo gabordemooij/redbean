@@ -161,16 +161,16 @@ class Finder
 	 *
 	 * $countries = R::also( $users, 'country' );
 	 *
-	 * @param string $parentName name of the parent bean
-	 * @param string $childName  name of the child bean
+	 * @param string       $parentName name of the parent bean
+	 * @param string|array $childName  name of the child bean
 	 *
 	 * @return array
 	 */
-	public static function onMap($parentName,$childName) {
+	public static function onMap($parentName,$childNameOrBeans) {
 		return array(
 			'a' => $parentName,
-			'b' => $childName,
-			'matcher' => function( $parent, $child ) use ( $parentName, $childName ) {
+			'b' => $childNameOrBeans,
+			'matcher' => function( $parent, $child ) use ( $parentName ) {
 				$property = "{$parentName}_id";
 				return ( $child->$property == $parent->id );
 			},
