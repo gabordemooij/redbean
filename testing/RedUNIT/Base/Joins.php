@@ -71,6 +71,19 @@ class Joins extends Base
 		asrt(count($projects),0);
 		$projects = R::find('project', ' @shared.employee[via:participant].name LIKE ? AND project.title = ? ', array('b','project2'));
 		asrt(count($projects),1);
+		/* shouldnt work if no [via:...] and no global aliases */
+		$projects = R::find('project', ' @shared.participant.name LIKE ? ', array('a'));
+		asrt(count($projects),0);
+		$projects = R::find('project', ' @shared.participant.name LIKE ? AND project.title = ? ', array('a','project1'));
+		asrt(count($projects),0);
+		$projects = R::find('project', ' @shared.participant.name LIKE ? AND project.title = ? ', array('a','project2'));
+		asrt(count($projects),0);
+		$projects = R::find('project', ' @shared.participant.name LIKE ? ', array('b'));
+		asrt(count($projects),0);
+		$projects = R::find('project', ' @shared.participant.name LIKE ? AND project.title = ? ', array('b','project1'));
+		asrt(count($projects),0);
+		$projects = R::find('project', ' @shared.participant.name LIKE ? AND project.title = ? ', array('b','project2'));
+		asrt(count($projects),0);
 	}
 
 	/**

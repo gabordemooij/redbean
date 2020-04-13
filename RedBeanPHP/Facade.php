@@ -2823,9 +2823,7 @@ class Facade
 	/**
 	 * @deprecated
 	 */
-	public static function setAutoResolve( $automatic = TRUE )
-	{
-	}
+	public static function setAutoResolve( $automatic = TRUE ){}
 
 	/**
 	 * Toggles 'partial bean mode'. If this mode has been

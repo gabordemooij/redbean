@@ -141,6 +141,30 @@ class Stub extends Base
 		$prop = \PDO::MYSQL_ATTR_SSL_CA;
 		asrt( $mock->getDiagAttribute($prop), 'cacert.pem' );
 	 }
+
+	 /**
+	  * Test base implementation of getKeyMapForType().
+	  *
+	  * @return void
+	  */
+	 public function testKeyMap()
+	 {
+		 $proxyWriter = new \ProxyWriter;
+		 $empty = $proxyWriter->callMethod( $proxyWriter, 'getKeyMapForType', 'bean' );
+		 asrt( is_array( $empty ), TRUE );
+		 asrt( count( $empty ), 0 );
+	 }
+
+	  /**
+	  * Test whether autoresolve() function for BC exists.
+	  *
+	  * @return void
+	  */
+	 public function testSetAutoResolve()
+	 {
+		R::setAutoResolve( TRUE );
+		pass();
+	 }
 }
 
 
