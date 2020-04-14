@@ -104,6 +104,47 @@ class Finding extends Base {
 		foreach($all['gebruiker'] as $gebruiker) {
 			asrt( $gebruiker->noLoad()->country instanceof OODBBean, TRUE );
 		}
+		//More generic scenario
+		$all = R::findMulti(
+			'gebruiker,country',
+			'
+			SELECT gebruiker.*, country.* FROM gebruiker
+			LEFT JOIN country ON gebruiker.country_id = country.id',
+			array(),
+			array(
+				Finder::onMap('country', 'gebruiker')
+			)
+		);
+		asrt(count($all),2);
+		asrt(isset($all['country']), TRUE);
+		asrt(isset($all['gebruiker']), TRUE);
+		asrt(count($all['country']), 3);
+		asrt(count($all['gebruiker']), 3);
+		foreach($all['gebruiker'] as $gebruiker) {
+			asrt( $gebruiker->noLoad()->country instanceof OODBBean, TRUE );
+			if ( $gebruiker->name == 'a' ) {
+				asrt( (
+					$gebruiker->name == 'a' &&
+					$gebruiker->country->name == 'Netherlands' ),
+				TRUE );
+			}
+			elseif ( $gebruiker->name == 'b' ) {
+				asrt( (
+					$gebruiker->name == 'b' &&
+					$gebruiker->country->name == 'France' ),
+				TRUE );
+			}
+			elseif ( $gebruiker->name == 'c' ) {
+				asrt( (
+					$gebruiker->name == 'c' &&
+					$gebruiker->country->name == 'USA' ),
+				TRUE );
+			}
+			else {
+				fail();
+			}
+			pass();
+		}
 		//Even more compact
 		$gebruikers = R::find('gebruiker'); //imagine some difficult query here
 		$all = R::findMulti(
