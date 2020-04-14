@@ -167,16 +167,12 @@ class Finder
 	 * @return array
 	 */
 	public static function onMap($parentName,$childNameOrBeans) {
+		$fieldName = "{$parentName}_id";
 		return array(
 			'a' => $parentName,
 			'b' => $childNameOrBeans,
-			'matcher' => function( $parent, $child ) use ( $parentName ) {
-				$property = "{$parentName}_id";
-				return ( $child->$property == $parent->id );
-			},
-			'do' => function( $parent, $child ) use ( $parentName ) {
-				$child->noLoad()->{$parentName} = $parent;
-			}
+			'matcher' => array( $parentName, "{$parentName}_id" ),
+			'do' => 'match'
 		);
 	}
 
@@ -407,7 +403,12 @@ class Finder
 	 * array(
 	 * 	'a'       => TYPE A
 	 *    'b'       => TYPE B
-	 *    'matcher' => MATCHING FUNCTION ACCEPTING A, B and ALL BEANS
+	 *    'matcher' =>
+	 * 			MATCHING FUNCTION ACCEPTING A, B and ALL BEANS
+	 * 			OR ARRAY
+	 * 				WITH FIELD on B that should match with FIELD on A
+	 * 				AND  FIELD on A that should match with FIELD on B
+	 *
 	 *    'do'      => OPERATION FUNCTION ACCEPTING A, B, ALL BEANS, ALL REMAPPINGS
 	 * )
 	 * </code>
@@ -532,9 +533,16 @@ class Finder
 			}
 			$matcher = $remapping['matcher'];
 			$do      = $remapping['do'];
-			foreach( $beans[$a] as $bean ) {
-				foreach( $beans[$b] as $putBean ) {
-					if ( $matcher( $bean, $putBean, $beans ) ) $do( $bean, $putBean, $beans, $remapping );
+			if (is_callable($matcher)) {
+				foreach( $beans[$a] as $bean ) {
+					foreach( $beans[$b] as $putBean ) {
+						if ( $matcher( $bean, $putBean, $beans ) ) $do( $bean, $putBean, $beans, $remapping );
+					}
+				}
+			} else {
+				list($field1, $field2) = $matcher;
+				foreach( $beans[$b] as $key => $bean ) {
+					$beans[$b][$key]->{$field1} = $beans[$a][$bean->{$field2}];
 				}
 			}
 		}

@@ -120,13 +120,61 @@ class Finding extends Base {
 		asrt(count($all['gebruiker']), 3);
 		foreach($all['gebruiker'] as $gebruiker) {
 			asrt( $gebruiker->noLoad()->country instanceof OODBBean, TRUE );
+			if ( $gebruiker->name == 'a' ) {
+				asrt( (
+					$gebruiker->name == 'a' &&
+					$gebruiker->country->name == 'Netherlands' ),
+				TRUE );
+			}
+			elseif ( $gebruiker->name == 'b' ) {
+				asrt( (
+					$gebruiker->name == 'b' &&
+					$gebruiker->country->name == 'France' ),
+				TRUE );
+			}
+			elseif ( $gebruiker->name == 'c' ) {
+				asrt( (
+					$gebruiker->name == 'c' &&
+					$gebruiker->country->name == 'USA' ),
+				TRUE );
+			}
+			else {
+				fail();
+			}
+			pass();
 		}
 		//Yet, even more compact
 		$gebruikers = R::find('gebruiker'); //imagine some difficult query here
 		$gebruikers = R::also( $gebruikers, 'country' );
+		$gebruikers = R::also( $gebruikers, 'language' );
 		asrt(count($gebruikers), 3);
 		foreach($gebruikers as $gebruiker) {
 			asrt( $gebruiker->noLoad()->country instanceof OODBBean, TRUE );
+			if ( $gebruiker->name == 'a' ) {
+				asrt( (
+					$gebruiker->name == 'a' &&
+					$gebruiker->country->name == 'Netherlands' &&
+					$gebruiker->language->name == 'Dutch' ),
+				TRUE );
+			}
+			elseif ( $gebruiker->name == 'b' ) {
+				asrt( (
+					$gebruiker->name == 'b' &&
+					$gebruiker->country->name == 'France' &&
+					$gebruiker->language->name == 'French' ),
+				TRUE );
+			}
+			elseif ( $gebruiker->name == 'c' ) {
+				asrt( (
+					$gebruiker->name == 'c' &&
+					$gebruiker->country->name == 'USA' &&
+					$gebruiker->language->name == 'English' ),
+				TRUE );
+			}
+			else {
+				fail();
+			}
+			pass();
 		}
 	}
 
