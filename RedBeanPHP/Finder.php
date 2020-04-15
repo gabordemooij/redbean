@@ -167,7 +167,6 @@ class Finder
 	 * @return array
 	 */
 	public static function onMap($parentName,$childNameOrBeans) {
-		$fieldName = "{$parentName}_id";
 		return array(
 			'a' => $parentName,
 			'b' => $childNameOrBeans,
@@ -410,6 +409,7 @@ class Finder
 	 * 				AND  FIELD on A that should match with FIELD on B
 	 *
 	 *    'do'      => OPERATION FUNCTION ACCEPTING A, B, ALL BEANS, ALL REMAPPINGS
+	 * 				   (ONLY IF MATCHER IS ALSO A FUNCTION)
 	 * )
 	 * </code>
 	 *
@@ -532,8 +532,8 @@ class Finder
 				$b = $type;
 			}
 			$matcher = $remapping['matcher'];
-			$do      = $remapping['do'];
 			if (is_callable($matcher)) {
+				$do = $remapping['do'];
 				foreach( $beans[$a] as $bean ) {
 					foreach( $beans[$b] as $putBean ) {
 						if ( $matcher( $bean, $putBean, $beans ) ) $do( $bean, $putBean, $beans, $remapping );
