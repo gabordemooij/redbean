@@ -227,7 +227,7 @@ class Finding extends Base {
 		R::nuke();
 		R::freeze(TRUE);
 		for($i=0;$i<10;$i++) {
-			R::freeze(boolval($i));
+			R::freeze((boolean)($i));
 			$book = R::dispense('book');
 			$book->title = "book{$i}";
 			list($pages) = R::dispenseAll('page*2');
