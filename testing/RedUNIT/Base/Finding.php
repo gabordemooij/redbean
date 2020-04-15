@@ -254,7 +254,6 @@ class Finding extends Base {
 		asrt(count($all['page']),20);
 		$i=0;
 		foreach($all['book'] as $book) {
-			print_r($book->noLoad()->ownPageList);
 			asrt(count($book->noLoad()->ownPageList),2);
 			asrt($book->title,"book{$i}");
 			$pages = $book->noLoad()->ownPageList;

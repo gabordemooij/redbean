@@ -401,7 +401,7 @@ class Finder
 	 * <code>
 	 * array(
 	 * 	'a'       => TYPE A
-	 *  'b'       => TYPE B
+	 *  'b'       => TYPE B OR BEANS
 	 *    'matcher' =>
 	 * 			MATCHING FUNCTION ACCEPTING A, B and ALL BEANS
 	 * 			OR ARRAY
