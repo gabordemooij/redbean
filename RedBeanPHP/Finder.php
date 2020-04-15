@@ -401,12 +401,14 @@ class Finder
 	 * <code>
 	 * array(
 	 * 	'a'       => TYPE A
-	 *    'b'       => TYPE B
+	 *  'b'       => TYPE B
 	 *    'matcher' =>
 	 * 			MATCHING FUNCTION ACCEPTING A, B and ALL BEANS
 	 * 			OR ARRAY
 	 * 				WITH FIELD on B that should match with FIELD on A
 	 * 				AND  FIELD on A that should match with FIELD on B
+	 *          OR TRUE
+	 *              TO JUST PERFORM THE DO-FUNCTION ON EVERY A-BEAN
 	 *
 	 *    'do'      => OPERATION FUNCTION ACCEPTING A, B, ALL BEANS, ALL REMAPPINGS
 	 * 				   (ONLY IF MATCHER IS ALSO A FUNCTION)
@@ -532,9 +534,13 @@ class Finder
 				$b = $type;
 			}
 			$matcher = $remapping['matcher'];
-			if (is_callable($matcher)) {
+			if (is_callable($matcher) || $matcher === TRUE) {
 				$do = $remapping['do'];
 				foreach( $beans[$a] as $bean ) {
+					if ( $matcher === TRUE ) {
+						$do( $bean, $beans[$b], $beans, $remapping );
+						continue;
+					}
 					foreach( $beans[$b] as $putBean ) {
 						if ( $matcher( $bean, $putBean, $beans ) ) $do( $bean, $putBean, $beans, $remapping );
 					}

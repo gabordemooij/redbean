@@ -220,6 +220,55 @@ class Finding extends Base {
 	}
 
 	/**
+	 * Test whether we can also preload own-lists.
+	 */
+	public function testPreloadingOwnListWithMulti()
+	{
+		R::nuke();
+		R::freeze(TRUE);
+		for($i=0;$i<10;$i++) {
+			R::freeze(boolval($i));
+			$book = R::dispense('book');
+			$book->title = "book{$i}";
+			list($pages) = R::dispenseAll('page*2');
+			$pages[0]->title = "1/{$i}";
+			$pages[1]->title = "2/{$i}";
+			$book->noLoad()->ownPage = $pages;
+			R::store($book);
+		}
+		$books = R::find('book');
+		$all = R::findMulti( 'page',
+			'SELECT page.* FROM page where book_id IN ('. R::genSlots($books).')',
+			colfield($books,'id'),
+			array(array(
+			'a' => 'page',
+			'b' => $books,
+			'matcher' => TRUE,
+			'do' => function($page, $books){
+				$books[$page->book_id]->noLoad()->ownPage[] = $page;
+			},
+			))
+		);
+		asrt(count($all),2);
+		asrt(count($all['book']),10);
+		asrt(count($all['page']),20);
+		$i=0;
+		foreach($all['book'] as $book) {
+			print_r($book->noLoad()->ownPageList);
+			asrt(count($book->noLoad()->ownPageList),2);
+			asrt($book->title,"book{$i}");
+			$pages = $book->noLoad()->ownPageList;
+			usort($pages, function($a,$b){ return $a->title > $b->title; });
+			$first = reset($pages);
+			asrt( $first->title, "1/$i" );
+			$last = end($pages);
+			asrt( $last->title, "2/$i" );
+			$i++;
+		}
+		R::freeze(FALSE);
+	}
+
+	/**
 	 * Test somewhat more complex findMulti plus onmap()
 	 *
 	 * @return void
