@@ -3286,6 +3286,18 @@ To <b>fetch all tags</b> attached to a certain bean we use the same method but w
 	to change in future versions.
 </p>
 
+<h2>Counting in Trees (5.5)</h2>
+<p>
+	To count beans in trees use R::countParents() or R::countChildren.
+</p>
+<?php code(
+"
+R::countParents( \$whiskyPage );
+R::countChildren( \$winePage, ' title != :title  ', [ ':title' => 'wines' ] );
+"
+); ?>
+
+
 <h1>Link Beans</h1>
 <p>
 	The following code associates an employee with a project using a
