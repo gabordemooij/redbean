@@ -1844,7 +1844,7 @@ If something else happens (lock timeout for instance) both methods will <i>alway
          \$books = R::find( 'book',
          ' @joined.person[as:author/coauthor].firstname = ?',
          [ 'Bob' ] );
-?>
+");?>
 <p>
 	Note that the word in front of the colon (as:) is only there for yourself
 	as a reminder, RedBeanPHP figures out how to use the alias depending on the
