@@ -1761,6 +1761,116 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	<a href="/database" title="Database functions in RedBeanPHP">database functions</a>.
 </p>
 
+<h1>Extended SQL</h1>
+
+<p>
+        As of RedBeanPHP 5.5 you can use some SQL extensions besides @joined,
+	and you can use those extensions with almost any RedBeanPHP function
+	that accepts an SQL snippet.
+</p>
+
+<h2>@joined</h2>
+<p>
+	Use @joined to access parent beans directly in SQL:
+</p>
+<?php code("
+         \$people = R::find( 'person', 
+         ' @joined.movement.name = ? ',
+         ['romanticism']);
+");?>
+
+<h2>@own</h2>
+<p>
+	Use @own to access own-lists in SQL:
+</p>
+<?php code("
+         \$movements = R::find( 'movement',
+         ' @own.author.name LIKE ? ', 
+         [ 'A%' ]);
+?>
+
+<h2>@shared</h2>
+<p>
+	Use @own to access own-lists in SQL:
+</p>
+<?php code("
+        \$people = R::find( 'person', ' @shared.tag.title = ? ', ['writer']);
+?>
+
+<h2>Chaining</h2>
+<p>
+      SQL-extensions also work with CTEs (trees) and you can chain them.
+</p>
+<?php code("
+       \$pages = R::children( \$website, 
+       ' @joined.author.name = ? AND 
+         @own.chart.file = ? AND 
+         @joined.author.shared.role.label = ? ',
+         ['John', 'report.jpg', 'CEO']
+       );
+"); ?>
+
+<p>
+	In the tree-query above we use multiple SQL-extensions together and
+	we also chain them, @joined.author.shared.role.label will access the
+	author parent beans and then check the label associated with its shared role.
+	You can make it as complex as you wish. Under the hood, RedBeanPHP translates
+	these @-lists to JOINS.
+</p>
+
+<h2>Aliasing in SQL-extensions</h2>
+<p>
+	Use aliases in SQL-extensions as follows:
+</p>
+<?php code("
+         \$books = R::find('book', 
+         ' @joined.person[as:author].firstname = ? ',
+         ['Bob']);
+"); ?>
+<p>
+	This will find any book written by Bob, checking the name using
+	the author-property of the bean instead of the person property. You can also
+	use aliases for own-lists:
+</p>
+<?php code("
+         \$authors = R::find( 'person',
+         ' @own.book[alias:author].title LIKE ? ',
+         [ '%Study%' ]);
+"); ?>
+<p>
+	Separate multiple aliases with a slash:
+</p>
+<?php code("
+         \$books = R::find( 'book',
+         ' @joined.person[as:author/coauthor].firstname = ?',
+         [ 'Bob' ] );
+?>
+<p>
+	Note that the word in front of the colon (as:) is only there for yourself
+	as a reminder, RedBeanPHP figures out how to use the alias depending on the
+	type of list you access. Of course you can chain aliased items as well:
+</p>
+<?php code("
+         \$texts = R::find('text', 
+         ' @joined.book[as:magazine/source/book].joined.person[as:author/coauthor].firstname = ? ',
+        ['Albert']);
+"); ?>
+
+<h2>Vias in Extensions</h2>
+<p>
+	To treat an intermediate bean type or two complimentary N-1 relations as
+	as a N-M relation in SQL, you can use the via-operator as well:
+</p>
+<?php code("
+         \$companies = R::find('company', 
+         ' @joined.work.shared.employee[via:participant].name LIKE ? ',
+         ['a']);
+
+"); ?>
+<p>
+	These features can also be used in $books = $author-&gt;withCondition( SQL ) - context.
+</p>
+
 <h1>Data Tools</h1>
 <p>
 	In RedBeanPHP version 5, some additional functions have been added to increase your
