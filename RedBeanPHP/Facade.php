@@ -398,11 +398,49 @@ class Facade
 			throw new RedException( 'A database has already been specified for this key.' );
 		}
 
+		self::$toolboxes[$key] = self::createToolbox($key, $dsn, $user, $pass, $frozen, $partialBeans);
+	}
+
+	/**
+	 * Creates a toolbox. This method can be called if you want to use redbean non-static.
+   * It has the same interface as R::setup(). The createToolbx() method can be called
+   * without any arguments, in this case it will try to create a SQLite database in
+   * /tmp called red.db (this only works on UNIX-like systems).
+	 *
+	 * Usage:
+	 *
+	 * <code>
+	 * R::createToolbox( 'mysql:host=localhost;dbname=mydatabase', 'dba', 'dbapassword' );
+	 * </code>
+	 *
+	 * You can replace 'mysql:' with the name of the database you want to use.
+	 * Possible values are:
+	 *
+	 * - pgsql  (PostgreSQL database)
+	 * - sqlite (SQLite database)
+	 * - mysql  (MySQL database)
+	 * - mysql  (also for Maria database)
+	 * - sqlsrv (MS SQL Server - community supported experimental driver)
+	 * - CUBRID (CUBRID driver - basic support provided by Plugin)
+	 *
+	 * Note that createToolbox() will not immediately establish a connection to the database.
+	 * Instead, it will prepare the connection and connect 'lazily', i.e. the moment
+	 * a connection is really required, for instance when attempting to load a bean.
+	 *
+	 * @param string  $dsn      Database connection string
+	 * @param string  $username Username for database
+	 * @param string  $password Password for database
+	 * @param boolean $frozen   TRUE if you want to setup in frozen mode
+	 *
+	 * @return ToolBox
+	 */
+  public static function createToolbox( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE )
+  {
 		if ( is_object($dsn) ) {
 			$db  = new RPDO( $dsn );
 			$dbType = $db->getDatabaseType();
 		} else {
-			$db = new RPDO( $dsn, $user, $pass, TRUE );
+			$db = new RPDO( $dsn, $username, $password, TRUE );
 			$dbType = substr( $dsn, 0, strpos( $dsn, ':' ) );
 		}
 
@@ -429,8 +467,8 @@ class Facade
 			$redbean->getCurrentRepository()->usePartialBeans( $partialBeans );
 		}
 
-		self::$toolboxes[$key] = new ToolBox( $redbean, $adapter, $writer );
-	}
+		return new ToolBox( $redbean, $adapter, $writer );
+  }
 
 	/**
 	 * Sets PDO attributes for MySQL SSL connection.
