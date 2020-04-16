@@ -3291,10 +3291,9 @@ To <b>fetch all tags</b> attached to a certain bean we use the same method but w
 	To count beans in trees use R::countParents() or R::countChildren.
 </p>
 <?php code("
-         R::countParents( \$whiskyPage );
-         R::countChildren( \$winePage, ' title != :title  ', [ ':title' => 'wines' ] );
-"
-); ?>
+	R::countParents( \$whiskyPage );
+	R::countChildren( \$winePage, ' title != :title  ', [ ':title' => 'wines' ] );
+"); ?>
 
 
 <h1>Link Beans</h1>
@@ -3821,7 +3820,19 @@ code("
 	The meta data from the query will be available under the key 'data.bundle'.
 </p>
 
-
+<h2>Add columns (5.5)</h2>
+<p>
+	To use the meta mask to add columns with a common query, use
+	the convience functions addSelectColumns() and resetSelectColumns().
+	For instance, in this example we implement pagination by also querying
+	the total number of pages in one single query:
+</p>
+<?php code("
+	 \$old = R::addSelectColumns( 'page', ['total' => 'COUNT(*) OVER()' ] ); //Postgres
+	 \$page = R::find('page');
+	 \$total = $page->getMeta('data.bundle');
+	 R::restoreSelectColumns( \$old );
+");?>
 
 <h1>Duplicate</h1>
 <p>
