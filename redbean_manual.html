@@ -1633,7 +1633,25 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	As of RedBeanPHP 5.2 the SQL parameter is optional.
 </p>
 
-
+<h2>Also() 5.5</h2>
+<p>
+	As of RedBeanPHP 5.5 you can use Finder::onmap for N-1 relations:	
+</p>
+<?php code("
+	\$all = R::findMulti('country',
+	R::genSlots( \$users,
+	'SELECT country.* FROM country WHERE id IN ( %s )' ),
+	array_column( \$users, 'country_id' ),
+	[Finder::onmap('country', \$gebruikers)]
+	);
+");?>
+<p>But you can also use the shortcut:</p>
+<?php
+code("
+	\$users = R::find('user');
+	\$users = R::also( \$users, 'country' );
+");?>
+	
 
 <h1>Querying</h1>
 <p>
