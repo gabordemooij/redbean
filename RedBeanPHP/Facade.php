@@ -398,7 +398,7 @@ class Facade
 			throw new RedException( 'A database has already been specified for this key.' );
 		}
 
-		self::$toolboxes[$key] = self::createToolbox($key, $dsn, $user, $pass, $frozen, $partialBeans);
+		self::$toolboxes[$key] = self::createToolbox($dsn, $user, $pass, $frozen, $partialBeans);
 	}
 
 	/**
