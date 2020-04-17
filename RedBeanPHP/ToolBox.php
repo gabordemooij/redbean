@@ -2,10 +2,11 @@
 
 namespace RedBeanPHP;
 
+use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
 use RedBeanPHP\OODB as OODB;
 use RedBeanPHP\QueryWriter as QueryWriter;
-use RedBeanPHP\Adapter\DBAdapter as DBAdapter;
-use RedBeanPHP\Adapter as Adapter;
+use RedBeanPHP\RedException\SQL as SQLException;
 
 /**
  * ToolBox.
@@ -163,5 +164,178 @@ class ToolBox
 	public function getDatabaseAdapter()
 	{
 		return $this->adapter;
+  }
+
+  /**
+	 * Query function, executes the desired query.
+	 *
+	 * @param string    $method   desired query method (i.e. 'cell', 'col', 'exec' etc..)
+	 * @param string    $sql      the sql you want to execute
+	 * @param array     $bindings array of values to be bound to query statement
+	 *
+	 * @return array
+	 */
+  public function query($method, $sql, $bindings )
+	{
+		if ( !$this->oodb->isFrozen() ) {
+			try {
+				$rs = $this->adapter->$method( $sql, $bindings );
+			} catch ( SQLException $exception ) {
+				if ( $this->writer->sqlStateIn( $exception->getSQLState(),
+					array(
+						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
+						QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
+					,$exception->getDriverDetails()
+					)
+				) {
+					return ( $method === 'getCell' ) ? NULL : array();
+				} else {
+					throw $exception;
+				}
+			}
+
+			return $rs;
+		} else {
+			return $this->adapter->$method( $sql, $bindings );
+		}
+  }
+
+	/**
+	 * Convenience function to execute Queries directly.
+	 * Executes SQL.
+	 *
+	 * @param string $sql       SQL query to execute
+	 * @param array  $bindings  a list of values to be bound to query parameters
+	 *
+	 * @return integer
+	 */
+	public function exec( $sql, $bindings = array() )
+	{
+		return $this->query( 'exec', $sql, $bindings );
 	}
+
+	/**
+	 * Convenience function to fire an SQL query using the RedBeanPHP
+	 * database adapter. This method allows you to directly query the
+	 * database without having to obtain an database adapter instance first.
+	 * Executes the specified SQL query together with the specified
+	 * parameter bindings and returns all rows
+	 * and all columns.
+	 *
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
+	 *
+	 * @return array
+	 */
+	public function getAll( $sql, $bindings = array() )
+	{
+		return $this->query( 'get', $sql, $bindings );
+	}
+
+	/**
+	 * Convenience function to fire an SQL query using the RedBeanPHP
+	 * database adapter. This method allows you to directly query the
+	 * database without having to obtain an database adapter instance first.
+	 * Executes the specified SQL query together with the specified
+	 * parameter bindings and returns a single cell.
+	 *
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
+	 *
+	 * @return string
+	 */
+	public function getCell( $sql, $bindings = array() )
+	{
+		return $this->query( 'getCell', $sql, $bindings );
+	}
+
+	/**
+	 * Convenience function to fire an SQL query using the RedBeanPHP
+	 * database adapter. This method allows you to directly query the
+	 * database without having to obtain an database adapter instance first.
+	 * Executes the specified SQL query together with the specified
+	 * parameter bindings and returns a PDOCursor instance.
+	 *
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
+	 *
+	 * @return RedBeanPHP\Cursor\PDOCursor
+	 */
+	public function getCursor( $sql, $bindings = array() )
+	{
+		return $this->query( 'getCursor', $sql, $bindings );
+	}
+
+	/**
+	 * Convenience function to fire an SQL query using the RedBeanPHP
+	 * database adapter. This method allows you to directly query the
+	 * database without having to obtain an database adapter instance first.
+	 * Executes the specified SQL query together with the specified
+	 * parameter bindings and returns a single row.
+	 *
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
+	 *
+	 * @return array
+	 */
+	public function getRow( $sql, $bindings = array() )
+	{
+		return $this->query( 'getRow', $sql, $bindings );
+	}
+
+	/**
+	 * Convenience function to fire an SQL query using the RedBeanPHP
+	 * database adapter. This method allows you to directly query the
+	 * database without having to obtain an database adapter instance first.
+	 * Executes the specified SQL query together with the specified
+	 * parameter bindings and returns a single column.
+	 *
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
+	 *
+	 * @return array
+	 */
+	public function getCol( $sql, $bindings = array() )
+	{
+		return $this->query( 'getCol', $sql, $bindings );
+	}
+
+	/**
+	 * Convenience function to execute Queries directly.
+	 * Executes SQL.
+	 * Results will be returned as an associative array. The first
+	 * column in the select clause will be used for the keys in this array and
+	 * the second column will be used for the values. If only one column is
+	 * selected in the query, both key and value of the array will have the
+	 * value of this field for each row.
+	 *
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
+	 *
+	 * @return array
+	 */
+	public function getAssoc( $sql, $bindings = array() )
+	{
+		return $this->query( 'getAssoc', $sql, $bindings );
+	}
+
+	/**
+	 *Convenience function to fire an SQL query using the RedBeanPHP
+	 * database adapter. This method allows you to directly query the
+	 * database without having to obtain an database adapter instance first.
+	 * Executes the specified SQL query together with the specified
+	 * parameter bindings and returns an associative array.
+	 * Results will be returned as an associative array indexed by the first
+	 * column in the select.
+	 *
+	 * @param string $sql      SQL query to execute
+	 * @param array  $bindings a list of values to be bound to query parameters
+	 *
+	 * @return array
+	 */
+	public function getAssocRow( $sql, $bindings = array() )
+	{
+		return $this->query( 'getAssocRow', $sql, $bindings );
+	}
+
 }

@@ -153,27 +153,7 @@ class Facade
 	 */
 	private static function query( $method, $sql, $bindings )
 	{
-		if ( !self::$redbean->isFrozen() ) {
-			try {
-				$rs = Facade::$adapter->$method( $sql, $bindings );
-			} catch ( SQLException $exception ) {
-				if ( self::$writer->sqlStateIn( $exception->getSQLState(),
-					array(
-						QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
-						QueryWriter::C_SQLSTATE_NO_SUCH_TABLE )
-					,$exception->getDriverDetails()
-					)
-				) {
-					return ( $method === 'getCell' ) ? NULL : array();
-				} else {
-					throw $exception;
-				}
-			}
-
-			return $rs;
-		} else {
-			return Facade::$adapter->$method( $sql, $bindings );
-		}
+    return self::$toolbox->query($method, $sql, $bindings);
 	}
 
 	/**
