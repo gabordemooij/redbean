@@ -1282,21 +1282,6 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * Returns data from the metadata bundle.
-	 *
-	 * @param string $field   field
-	 * @param string $prefix  prefix (default: __meta_)
-	 * @param mixed  $default default
-	 *
-	 * @return mixed
-	 */
-	public function extra( $field, $prefix = '__meta_', $default = NULL )
-	{
-		$field = "{$prefix}{$field}";
-		return ( isset( $this->__info['data.bundle'][$field] ) ) ? $this->__info['data.bundle'][$field] : $default;
-	}
-
-	/**
 	 * Gets and unsets a meta property.
 	 * Moves a meta property out of the bean.
 	 * This is a short-cut method that can be used instead

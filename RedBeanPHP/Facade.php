@@ -2558,62 +2558,6 @@ class Facade
 	}
 
 	/**
-	 * For purposes like pagination you sometimes want an additional meta field,
-	 * not part of the beans. To accomplish this you can bind an function to the bean
-	 * to alter the select query. For instance:
-	 *
-	 * <code>
-	 *  R::getWriter()->setSQLFilters( [
-	 *    QueryWriter::C_SQLFILTER_READ =>
-	 *        [ 'book'=> [ '__meta_total'=>'COUNT(*) OVER()' ] ]
-	 * ] ), FALSE );
-	 * </code>
-	 *
-	 * While flexible, this is a bit verbose and complex.
-	 *
-	 * This convenience function tries to take away some of the clunkyness of
-	 * this approach.
-	 *
-	 * Usage:
-	 *
-	 * <code>
-	 * R::getWriter()->flushCache(); //you might need to flush the cache
-	 * R::addSelectColumns( 'page', ['total' => $sql ] );
-	 * $page = R::find('page');
-	 * $data = $page->getMeta('data.bundle');
-	 * R::addSelectColumns('page', '');
-	 * </code>
-	 *
-	 * This method returns the old SQL-function bindings to be
-	 * restored afterwards using R::restoreSelectColumns( $old ).
-	 *
-	 * @param string $type     type of bean to add select columns for
-	 * @param array  $columns  format: <FIELD> => <SQL>
-	 * @param string $prefix   prefix to use (default: __meta_)
-	 *
-	 * @return array $old
-	 */
-	public static function addSelectColumns( $type, $columns, $prefix='__meta_' )
-	{
-		$raw = $columns;
-		$columns = array();
-		foreach( $raw as $key => $value ) {
-			$columns["{$prefix}{$key}"] = $value;
-		}
-		$old = self::getWriter()->getSQLFilters();
-		self::getWriter()->setSQLFilters( array( QueryWriter::C_SQLFILTER_READ => array( $type => $columns ), FALSE ) );
-		return $old;
-	}
-
-	/**
-	 * @see Facade::addSelectColumns
-	 */
-	public static function restoreSelectColumns( $old )
-	{
-		self::getWriter()->setSQLFilters( $old );
-	}
-
-	/**
 	 * Sets global aliases.
 	 * Registers a batch of aliases in one go. This works the same as
 	 * fetchAs but explicitly. For instance if you register
