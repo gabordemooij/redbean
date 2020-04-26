@@ -1633,7 +1633,7 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	As of RedBeanPHP 5.2 the SQL parameter is optional.
 </p>
 
-<h2 id="also">Also() 5.5</h2>
+<h2 id="also">loadJoined() 5.5</h2>
 <p>
 	As of RedBeanPHP 5.5 you can use Finder::onmap for N-1 relations:	
 </p>
@@ -1645,11 +1645,11 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	[Finder::onmap('country', \$gebruikers)]
 	);
 ");?>
-<p>But you can also use the shortcut:</p>
+<p>But you can also use the loadJoined() shortcut:</p>
 <?php
 code("
 	\$users = R::find('user');
-	\$users = R::also( \$users, 'country' );
+	\$users = R::loadJoined( \$users, 'country' );
 ");?>
 	
 
