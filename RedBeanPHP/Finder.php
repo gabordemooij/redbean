@@ -159,7 +159,7 @@ class Finder
 	 *
 	 * For your convenience, an even shorter notation has been added:
 	 *
-	 * $countries = R::also( $users, 'country' );
+	 * $countries = R::loadJoined( $users, 'country' );
 	 *
 	 * @param string       $parentName name of the parent bean
 	 * @param string|array $childName  name of the child bean

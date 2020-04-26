@@ -186,8 +186,8 @@ class Finding extends Base {
 		}
 		//Yet, even more compact
 		$gebruikers = R::find('gebruiker'); //imagine some difficult query here
-		$gebruikers = R::also( $gebruikers, 'country' );
-		$gebruikers = R::also( $gebruikers, 'language' );
+		$gebruikers = R::loadJoined( $gebruikers, 'country' );
+		$gebruikers = R::loadJoined( $gebruikers, 'language' );
 		asrt(count($gebruikers), 3);
 		foreach($gebruikers as $gebruiker) {
 			asrt( $gebruiker->noLoad()->country instanceof OODBBean, TRUE );

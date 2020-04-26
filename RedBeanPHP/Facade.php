@@ -1967,7 +1967,7 @@ class Facade
 	 *
 	 * <code>
 	 * $users = R::find('user');
-	 * $users = R::also( $users, 'country' );
+	 * $users = R::loadJoined( $users, 'country' );
 	 * </code>
 	 *
 	 * This is an alternative for:
@@ -1987,7 +1987,7 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function also( $beans, $type, $sqlTemplate = 'SELECT %s.* FROM %s WHERE id IN (%s)' )
+	public static function loadJoined( $beans, $type, $sqlTemplate = 'SELECT %s.* FROM %s WHERE id IN (%s)' )
 	{
 		if (!count($beans)) return array();
 		$ids  = array();
