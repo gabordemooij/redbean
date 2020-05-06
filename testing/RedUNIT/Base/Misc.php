@@ -30,6 +30,34 @@ use RedBeanPHP\SimpleModel as SimpleModel;
 class Misc extends Base
 {
 	/**
+	 * Can we use data definition templates?
+	 *
+	 * @return void
+	 */
+	public function testDDLTemplates()
+	{
+		R::nuke();
+		R::debug( TRUE, 1 );
+		$writer = R::getWriter();
+		$writer->setDDLTemplate( 'createTable', 'joke', $writer->getDDLTemplate( 'createTable', 'joke' ) . ' /* haha */ ' );
+		$writer->setDDLTemplate( 'addColumn', 'joke', $writer->getDDLTemplate( 'addColumn', 'joke' ) . ' /* hihi */ ' );
+		$writer->setDDLTemplate( 'widenColumn', 'joke', $writer->getDDLTemplate( 'widenColumn', 'joke' ) . ' /* hoho */ ' );
+		$joke = R::dispense('joke');
+		R::store( $joke );
+		$logs = R::getDatabaseAdapter()->getDatabase()->getLogger()->grep( 'haha' );
+		asrt( count( $logs ), 1 );
+		$joke->punchline = 1;
+		R::store( $joke );
+		$logs = R::getDatabaseAdapter()->getDatabase()->getLogger()->grep( 'hihi' );
+		asrt( count( $logs ), 1 );
+		$joke->punchline = '...';
+		R::store( $joke );
+		$logs = R::getDatabaseAdapter()->getDatabase()->getLogger()->grep( 'hoho' );
+		asrt( count( $logs ), 1 );
+		R::debug( FALSE );
+	}
+
+	/**
 	 * Github issue:
 	 * Remove $NULL to directly return NULL #625
 	 * @@ -1097,8 +1097,7 @@ public function &__get( $property )

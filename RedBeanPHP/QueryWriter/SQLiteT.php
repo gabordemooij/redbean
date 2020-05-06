@@ -43,6 +43,21 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	protected $quoteCharacter = '`';
 
 	/**
+	 * @var array
+	 */
+	protected $DDLTemplates = array(
+		'addColumn' => array(
+			'*' => 'ALTER TABLE `%s` ADD `%s` %s'
+		),
+		'createTable' => array(
+			'*' => 'CREATE TABLE %s ( id INTEGER PRIMARY KEY AUTOINCREMENT )'
+		),
+		'widenColumn' => array(
+			'*' => ',`%s` %s '
+		)
+	);
+
+	/**
 	 * Gets all information about a table (from a type).
 	 *
 	 * Format:
@@ -104,7 +119,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$newTableDefStr = '';
 		foreach ( $tableMap['columns'] as $column => $type ) {
 			if ( $column != 'id' ) {
-				$newTableDefStr .= ",`$column` $type";
+				$newTableDefStr .= sprintf( $this->getDDLTemplate( 'widenColumn', $table ), $column, $type );
 			}
 		}
 
@@ -312,7 +327,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$table  = $this->check( $table );
 		$type   = $this->typeno_sqltype[$type];
 
-		$this->adapter->exec( "ALTER TABLE `$table` ADD `$column` $type " );
+		$this->adapter->exec( sprintf( $this->getDDLTemplate( 'addColumn', $table ), $table, $column, $type ) );
 	}
 
 	/**
@@ -349,11 +364,11 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::createTable
 	 */
-	public function createTable( $table )
+	public function createTable( $type )
 	{
-		$table = $this->esc( $table );
+		$table = $this->esc( $type );
 
-		$sql   = "CREATE TABLE $table ( id INTEGER PRIMARY KEY AUTOINCREMENT ) ";
+		$sql = sprintf( $this->getDDLTemplate( 'createTable', $type ), $table );
 
 		$this->adapter->exec( $sql );
 	}

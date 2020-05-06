@@ -59,6 +59,21 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	protected $defaultValue = 'DEFAULT';
 
 	/**
+	 * @var array
+	 */
+	protected $DDLTemplates = array(
+		'addColumn' => array(
+			'*' => 'ALTER TABLE %s ADD %s %s '
+		),
+		'createTable' => array(
+			'*' => 'CREATE TABLE %s (id SERIAL PRIMARY KEY) '
+		),
+		'widenColumn' => array(
+			'*' => 'ALTER TABLE %s ALTER COLUMN %s TYPE %s'
+		)
+	);
+
+	/**
 	 * Returns the insert suffix SQL Snippet
 	 *
 	 * @param string $table table
@@ -207,11 +222,11 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::createTable
 	 */
-	public function createTable( $table )
+	public function createTable( $type )
 	{
-		$table = $this->esc( $table );
+		$table = $this->esc( $type );
 
-		$this->adapter->exec( " CREATE TABLE $table (id SERIAL PRIMARY KEY); " );
+		$this->adapter->exec( sprintf( $this->getDDLTemplate( 'createTable', $type ), $table ) );
 	}
 
 	/**
@@ -313,9 +328,9 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::widenColumn
 	 */
-	public function widenColumn( $type, $column, $datatype )
+	public function widenColumn( $beanType, $column, $datatype )
 	{
-		$table   = $type;
+		$table   = $beanType;
 		$type    = $datatype;
 
 		$table   = $this->esc( $table );
@@ -323,7 +338,8 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 
 		$newtype = $this->typeno_sqltype[$type];
 
-		$this->adapter->exec( "ALTER TABLE $table \n\t ALTER COLUMN $column TYPE $newtype " );
+		$this->adapter->exec( sprintf( $this->getDDLTemplate( 'widenColumn', $beanType ), $table, $column, $newtype ) );
+
 	}
 
 	/**

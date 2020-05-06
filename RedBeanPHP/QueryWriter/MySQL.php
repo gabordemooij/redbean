@@ -56,6 +56,21 @@ class MySQL extends AQueryWriter implements QueryWriter
 	protected $quoteCharacter = '`';
 
 	/**
+	 * @var array
+	 */
+	protected $DDLTemplates = array(
+		'addColumn' => array(
+			'*' => 'ALTER TABLE %s ADD %s %s '
+		),
+		'createTable' => array(
+			'*' => 'CREATE TABLE %s (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET=%s COLLATE=%s '
+		),
+		'widenColumn' => array(
+			'*' => 'ALTER TABLE %s CHANGE %s %s %s '
+		)
+	);
+
+	/**
 	 * @see AQueryWriter::getKeyMapForType
 	 */
 	protected function getKeyMapForType( $type )
@@ -183,15 +198,15 @@ class MySQL extends AQueryWriter implements QueryWriter
 	/**
 	 * @see QueryWriter::createTable
 	 */
-	public function createTable( $table )
+	public function createTable( $type )
 	{
-		$table = $this->esc( $table );
+		$table = $this->esc( $type );
 
 		$charset_collate = $this->adapter->getDatabase()->getMysqlEncoding( TRUE );
 		$charset = $charset_collate['charset'];
 		$collate = $charset_collate['collate'];
 
-		$sql   = "CREATE TABLE $table (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET={$charset} COLLATE={$collate} ";
+		$sql = sprintf( $this->getDDLTemplate( 'createTable', $type ), $table, $charset, $collate );
 
 		$this->adapter->exec( $sql );
 	}

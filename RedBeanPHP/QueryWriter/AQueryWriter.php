@@ -109,6 +109,45 @@ abstract class AQueryWriter
 	protected static $noNuke = false;
 
 	/**
+	 * Sets a data definition template to change the data
+	 * creation statements per type.
+	 *
+	 * For instance to add  ROW_FORMAT=DYNAMIC to all MySQL tables
+	 * upon creation:
+	 *
+	 * $sql = $writer->getDDLTemplate( 'createTable', '*' );
+	 * $writer->setDDLTemplate( 'createTable', '*', $sql . '  ROW_FORMAT=DYNAMIC ' );
+	 *
+	 * @param string $type     ( 'createTable' | 'widenColumn' | 'addColumn' )
+	 * @param string $beanType ( type of bean or '*' to apply to all types )
+	 * @param string $template SQL template, contains %s for slots
+	 *
+	 * @return void
+	 */
+	public function setDDLTemplate( $type, $beanType, $template )
+	{
+		$this->DDLTemplates[ $type ][ $beanType ] = $template;
+	}
+
+	/**
+	 * Returns the specified data definition template.
+	 * If no template can be found for the specified type, the template for
+	 * '*' will be returned instead.
+	 *
+	 * @param string $type     ( 'createTable' | 'widenColumn' | 'addColumn' )
+	 * @param string $beanType ( type of bean or '*' to apply to all types )
+	 *
+	 * @return string
+	 */
+	public function getDDLTemplate( $type, $beanType = '*' )
+	{
+		if ( isset( $this->DDLTemplates[ $type ][ $beanType ] ) ) {
+			return $this->DDLTemplates[ $type ][ $beanType ];
+		}
+		return $this->DDLTemplates[ $type ][ '*' ];
+	}
+
+	/**
 	 * Toggles support for IS-NULL-conditions.
 	 * If IS-NULL-conditions are enabled condition arrays
 	 * for functions including findLike() are treated so that
@@ -843,16 +882,16 @@ abstract class AQueryWriter
 	/**
 	 * @see QueryWriter::addColumn
 	 */
-	public function addColumn( $type, $column, $field )
+	public function addColumn( $beanType, $column, $field )
 	{
-		$table  = $type;
+		$table  = $beanType;
 		$type   = $field;
 		$table  = $this->esc( $table );
 		$column = $this->esc( $column );
 
 		$type = ( isset( $this->typeno_sqltype[$type] ) ) ? $this->typeno_sqltype[$type] : '';
 
-		$this->adapter->exec( "ALTER TABLE $table ADD $column $type " );
+		$this->adapter->exec( sprintf( $this->getDDLTemplate('addColumn', $beanType), $table, $column, $type ) );
 	}
 
 	/**
@@ -1513,7 +1552,7 @@ abstract class AQueryWriter
 
 		$newType = $this->typeno_sqltype[$dataType];
 
-		$this->adapter->exec( "ALTER TABLE $table CHANGE $column $column $newType " );
+		$this->adapter->exec( sprintf( $this->getDDLTemplate( 'widenColumn', $type ), $type, $column, $column, $newType ) );
 
 		return TRUE;
 	}
