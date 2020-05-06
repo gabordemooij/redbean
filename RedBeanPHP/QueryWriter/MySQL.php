@@ -66,7 +66,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 			'*' => 'CREATE TABLE %s (id INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY ( id )) ENGINE = InnoDB DEFAULT CHARSET=%s COLLATE=%s '
 		),
 		'widenColumn' => array(
-			'*' => 'ALTER TABLE %s CHANGE %s %s %s '
+			'*' => 'ALTER TABLE `%s` CHANGE %s %s %s '
 		)
 	);
 
