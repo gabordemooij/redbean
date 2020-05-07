@@ -118,6 +118,10 @@ abstract class AQueryWriter
 	 * $sql = $writer->getDDLTemplate( 'createTable', '*' );
 	 * $writer->setDDLTemplate( 'createTable', '*', $sql . '  ROW_FORMAT=DYNAMIC ' );
 	 *
+	 * For property-specific templates set $beanType to:
+	 * account.username -- then the template will only be applied to SQL statements relating
+	 * to that column/property.
+	 *
 	 * @param string $type     ( 'createTable' | 'widenColumn' | 'addColumn' )
 	 * @param string $beanType ( type of bean or '*' to apply to all types )
 	 * @param string $template SQL template, contains %s for slots
@@ -136,11 +140,16 @@ abstract class AQueryWriter
 	 *
 	 * @param string $type     ( 'createTable' | 'widenColumn' | 'addColumn' )
 	 * @param string $beanType ( type of bean or '*' to apply to all types )
+	 * @param string $property specify if you're looking for a property-specific template
 	 *
 	 * @return string
 	 */
-	public function getDDLTemplate( $type, $beanType = '*' )
+	public function getDDLTemplate( $type, $beanType = '*', $property = NULL )
 	{
+		$key = ( $property ) ? "{$beanType}.{$property}" : $beanType;
+		if ( isset( $this->DDLTemplates[ $type ][ $key ] ) ) {
+			return $this->DDLTemplates[ $type ][ $key ];
+		}
 		if ( isset( $this->DDLTemplates[ $type ][ $beanType ] ) ) {
 			return $this->DDLTemplates[ $type ][ $beanType ];
 		}
@@ -891,7 +900,7 @@ abstract class AQueryWriter
 
 		$type = ( isset( $this->typeno_sqltype[$type] ) ) ? $this->typeno_sqltype[$type] : '';
 
-		$this->adapter->exec( sprintf( $this->getDDLTemplate('addColumn', $beanType), $table, $column, $type ) );
+		$this->adapter->exec( sprintf( $this->getDDLTemplate('addColumn', $beanType, $column ), $table, $column, $type ) );
 	}
 
 	/**
@@ -1552,7 +1561,7 @@ abstract class AQueryWriter
 
 		$newType = $this->typeno_sqltype[$dataType];
 
-		$this->adapter->exec( sprintf( $this->getDDLTemplate( 'widenColumn', $type ), $type, $column, $column, $newType ) );
+		$this->adapter->exec( sprintf( $this->getDDLTemplate( 'widenColumn', $type, $column ), $type, $column, $column, $newType ) );
 
 		return TRUE;
 	}

@@ -338,7 +338,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 
 		$newtype = $this->typeno_sqltype[$type];
 
-		$this->adapter->exec( sprintf( $this->getDDLTemplate( 'widenColumn', $beanType ), $table, $column, $newtype ) );
+		$this->adapter->exec( sprintf( $this->getDDLTemplate( 'widenColumn', $beanType, $column ), $table, $column, $newtype ) );
 
 	}
 

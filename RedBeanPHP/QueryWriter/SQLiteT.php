@@ -119,7 +119,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$newTableDefStr = '';
 		foreach ( $tableMap['columns'] as $column => $type ) {
 			if ( $column != 'id' ) {
-				$newTableDefStr .= sprintf( $this->getDDLTemplate( 'widenColumn', $table ), $column, $type );
+				$newTableDefStr .= sprintf( $this->getDDLTemplate( 'widenColumn', $table, $column ), $column, $type );
 			}
 		}
 
@@ -327,7 +327,7 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 		$table  = $this->check( $table );
 		$type   = $this->typeno_sqltype[$type];
 
-		$this->adapter->exec( sprintf( $this->getDDLTemplate( 'addColumn', $table ), $table, $column, $type ) );
+		$this->adapter->exec( sprintf( $this->getDDLTemplate( 'addColumn', $table, $column ), $table, $column, $type ) );
 	}
 
 	/**
