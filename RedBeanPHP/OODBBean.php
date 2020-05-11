@@ -1364,6 +1364,10 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	public function __call( $method, $args )
 	{
+		if($method == 'store'){
+			$this->beanHelper->getToolbox()->getRedBean()->store($this);
+		}
+		
 		if ( empty( $this->__info['model'] ) ) {
 			return NULL;
 		}
