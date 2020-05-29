@@ -994,13 +994,16 @@ class Finding extends Base {
 	public function testFindOrCreate()
 	{
 		R::nuke();
-		$book = R::findOrCreate( 'book', array( 'title' => 'my book', 'price' => 50 ) );
+		$created = false;
+		$book = R::findOrCreate( 'book', array( 'title' => 'my book', 'price' => 50 ), '', $created );
 		asrt( ( $book instanceof OODBBean ), TRUE );
+		asrt( $created, true );
 		$id = $book->id;
-		$book = R::findOrCreate( 'book', array( 'title' => 'my book', 'price' => 50 ) );
+		$book = R::findOrCreate( 'book', array( 'title' => 'my book', 'price' => 50 ), '', $created );
 		asrt( $book->id, $id );
 		asrt( $book->title, 'my book' );
 		asrt( (int) $book->price, 50 );
+		asrt( $created, false );
 	}
 
 	/**

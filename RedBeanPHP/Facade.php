@@ -2606,12 +2606,13 @@ class Facade
 	 *
 	 * @param string $type type of bean to search for
 	 * @param array  $like criteria set describing the bean to search for
+	 * @param boolean $hasBeenCreated set to TRUE if bean has been created
 	 *
 	 * @return OODBBean
 	 */
-	public static function findOrCreate( $type, $like = array(), $sql = '' )
+	public static function findOrCreate( $type, $like = array(), $sql = '', &$hasBeenCreated = false )
 	{
-		return self::$finder->findOrCreate( $type, $like, $sql = '' );
+		return self::$finder->findOrCreate( $type, $like, $sql = '', $hasBeenCreated );
 	}
 
 	/**
