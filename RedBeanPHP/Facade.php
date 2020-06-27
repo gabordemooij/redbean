@@ -261,7 +261,7 @@ class Facade
 	public static function setup( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE )
 	{
 		if ( is_null( $dsn ) ) {
-			$dsn = 'sqlite:/' . sys_get_temp_dir() . '/red.db';
+			$dsn = 'sqlite:' . DIRECTORY_SEPARATOR . sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'red.db';
 		}
 
 		self::addDatabase( 'default', $dsn, $username, $password, $frozen, $partialBeans );
