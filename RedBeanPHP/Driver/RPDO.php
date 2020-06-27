@@ -104,6 +104,11 @@ class RPDO implements Driver
 	protected $initSQL = NULL;
 
 	/**
+	 * @var callable
+	 */
+	protected $initCode = NULL;
+
+	/**
 	 * Binds parameters. This method binds parameters to a PDOStatement for
 	 * Query Execution. This method binds parameters as NULL, INTEGER or STRING
 	 * and supports both named keys and question mark keys.
@@ -408,6 +413,18 @@ class RPDO implements Driver
 	}
 
 	/**
+	 * Sets initialization code to execute upon connecting.
+	 *
+	 * @param callable $code
+	 *
+	 * @return void
+	 */
+	public function setInitCode($code)
+	{
+		$this->initCode= $code;
+	}
+
+	/**
 	 * Establishes a connection to the database using PHP\PDO
 	 * functionality. If a connection has already been established this
 	 * method will simply return directly. This method also turns on
@@ -433,6 +450,10 @@ class RPDO implements Driver
 			if ( $this->initSQL !== NULL ) {
 				$this->Execute( $this->initSQL );
 				$this->initSQL = NULL;
+			}
+			if ( $this->initCode !== NULL ) {
+				$code = $this->initCode;
+				$code( $this->pdo->getAttribute( \PDO::ATTR_SERVER_VERSION ) );
 			}
 		} catch ( \PDOException $exception ) {
 			$matches = array();

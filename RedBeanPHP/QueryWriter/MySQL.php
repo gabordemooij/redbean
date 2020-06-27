@@ -172,8 +172,35 @@ class MySQL extends AQueryWriter implements QueryWriter
 		}
 
 		$this->adapter = $adapter;
-
 		$this->encoding = $this->adapter->getDatabase()->getMysqlEncoding();
+		$me = $this;
+		$this->adapter->setInitCode(function($version) use(&$me) {
+			try {
+				if (strpos($version, 'maria')===FALSE && intval($version)>=8) {
+						$me->useFeature('ignoreDisplayWidth');
+				}
+			} catch( \Exception $e ){}
+		});
+	}
+
+	/**
+	 * Enables certain features/dialects.
+	 *
+	 * - ignoreDisplayWidth required for MySQL8+
+	 *   (automatically set by setup() if you pass dsn instead of PDO object)
+	 *
+	 * @param string $name feature ID
+	 *
+	 * @return void
+	 */
+	public function useFeature($name) {
+		if ($name == 'ignoreDisplayWidth') {
+			$this->typeno_sqltype[MySQL::C_DATATYPE_BOOL] = ' TINYINT UNSIGNED ';
+			$this->typeno_sqltype[MySQL::C_DATATYPE_UINT32] = ' INT UNSIGNED ';
+			foreach ( $this->typeno_sqltype as $k => $v ) {
+				$this->sqltype_typeno[trim( strtolower( $v ) )] = $k;
+			}
+		}
 	}
 
 	/**

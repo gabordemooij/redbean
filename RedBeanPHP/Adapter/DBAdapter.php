@@ -264,6 +264,15 @@ class DBAdapter extends Observable implements Adapter
 	}
 
 	/**
+	 * Sets initialization code for connection.
+	 *
+	 * @param callable $code
+	 */
+	public function setInitCode($code) {
+		$this->db->setInitCode($code);
+	}
+
+	/**
 	 * @see Adapter::setOption
 	 */
 	public function setOption( $optionKey, $optionValue ) {
