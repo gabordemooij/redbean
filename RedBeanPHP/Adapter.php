@@ -94,12 +94,8 @@ interface Adapter
 	public function getCell( $sql, $bindings = array() );
 
 	/**
-	 * Executes the SQL query specified in $sql and takes
-	 * the first two columns of the resultset. This function transforms the
-	 * resultset into an associative array. Values from the the first column will
-	 * serve as keys while the values of the second column will be used as values.
-	 * The values array can be used to bind values to the place holders in the
-	 * SQL query.
+	 * Executes the SQL query specified in $sql and indexes
+	 * the row by the first column.
 	 *
 	 * @param string $sql      string containing SQL code for database
 	 * @param array  $bindings array of values to bind to parameters in query string
@@ -109,8 +105,8 @@ interface Adapter
 	public function getAssoc( $sql, $bindings = array() );
 
 	/**
-	 * Executes the SQL query specified in $sql and indexes
-	 * the row by the first column.
+	 * Executes the SQL query specified in $sql and returns
+	 * an associative array where the column names are the keys.
 	 *
 	 * @param string $sql      Sstring containing SQL code for databaseQL
 	 * @param array  $bindings values to bind
