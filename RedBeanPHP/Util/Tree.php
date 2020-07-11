@@ -165,7 +165,7 @@ class Tree {
 		$rows = $this->writer->queryRecursiveCommonTableExpression( $type, $id, FALSE, $sql, $bindings, $select );
 		$first = reset($rows);
 		$cell  = reset($first);
-		return intval($cell) - ($select === TRUE ? 1 : 0);
+		return max(0, (intval($cell) - ($select === TRUE ? 1 : 0));
 	}
 
 	/**
@@ -207,6 +207,6 @@ class Tree {
 		$rows = $this->writer->queryRecursiveCommonTableExpression( $type, $id, TRUE, $sql, $bindings, $select );
 		$first = reset($rows);
 		$cell  = reset($first);
-		return intval($cell) - ($select === TRUE ? 1 : 0);
+		return max(0, (intval($cell) - ($select === TRUE ? 1 : 0)));
 	}
 }
