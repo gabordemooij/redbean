@@ -2071,6 +2071,15 @@ Array
 	This chapter discusses general database functionality of RedBeanPHP.
 </p>
 
+<h2>Server version (5.6+)</h2>
+<p id="server_version">
+	Due to slight difference appearing between MySQL and MariaDB it might sometimes by handy
+	to obtain the database server version string. You can use R::getDatabaseServerVersion() for this.
+</p>
+<?php code("
+	\$version = R::getDatabaseServerVersion();
+"); ?>
+	
 <h2>Reflection</h2>
 <p>
 	To get all the columns of table '<b>book</b>':
