@@ -3349,7 +3349,7 @@ To <b>fetch all tags</b> attached to a certain bean we use the same method but w
 	As of 5.6 you can add your own SELECT clause like 'count(distinct vendor)'.
 	By default, countChildren() and countParents() subtract 1 from total number of
 	counted records to exclude the starting bean. If you provide your own select
-	clause, this might not make sense, so this won't happen in that case.
+	clause (or an SQL snippet), this might not make sense, so it won't happen in that case.
 </p>
 
 <h1>Link Beans</h1>
