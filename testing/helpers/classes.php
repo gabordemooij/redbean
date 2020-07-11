@@ -556,6 +556,7 @@ class Mockdapter implements \RedBeanPHP\Adapter {
 	public function rollback(){}
 	public function close(){}
 	public function setOption( $optionKey, $optionValue ){}
+	public function getDatabaseServerVersion(){ return 'Mock'; }
 }
 
 /**

@@ -711,9 +711,9 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * Returns the version identifier string of the database.
+	 * Returns the version identifier string of the database client.
 	 * This method can be used to identify the currently installed
-	 * database. Note that this method will also establish a connection
+	 * database client. Note that this method will also establish a connection
 	 * (because this is required to obtain the version information).
 	 *
 	 * Example of a version string:
@@ -733,6 +733,9 @@ class RPDO implements Driver
 	 * Note that this is a driver-specific method, not part of the
 	 * driver interface. This method might not be available in other
 	 * drivers since it relies on PDO.
+	 *
+	 * To obtain the database server version, use getDatabaseServerVersion()
+	 * instead.
 	 *
 	 * @return mixed
 	 */
@@ -880,5 +883,14 @@ class RPDO implements Driver
 	public function setInitQuery( $sql ) {
 		$this->initSQL = $sql;
 		return $this;
+	}
+
+	/**
+	 * Returns the version string from the database server.
+	 *
+	 * @return string
+	 */
+	public function DatabaseServerVersion() {
+		return trim( strval( $this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION) ) );
 	}
 }

@@ -184,4 +184,11 @@ interface Driver
 	 * @return void
 	 */
 	public function setInitCode( $code );
+
+	/**
+	 * Returns the version string from the database server.
+	 *
+	 * @return string
+	 */
+	public function DatabaseServerVersion();
 }

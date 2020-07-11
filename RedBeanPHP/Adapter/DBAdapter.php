@@ -282,4 +282,12 @@ class DBAdapter extends Observable implements Adapter
 		}
 		return FALSE;
 	}
+
+	/**
+	 * @see Adapter::getDatabaseServerVersion
+	 */
+	public function getDatabaseServerVersion()
+	{
+		return $this->db->DatabaseServerVersion();
+	}
 }

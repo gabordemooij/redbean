@@ -206,6 +206,16 @@ class Facade
 	}
 
 	/**
+	 * Returns the version string from the database server.
+	 *
+	 * @return string
+	 */
+	public static function getDatabaseServerVersion()
+	{
+		return self::$adapter->getDatabaseServerVersion();
+	}
+
+	/**
 	 * Tests the database connection.
 	 * Returns TRUE if connection has been established and
 	 * FALSE otherwise. Suppresses any warnings that may

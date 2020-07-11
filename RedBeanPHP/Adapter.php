@@ -197,4 +197,11 @@ interface Adapter
 	 * @return boolean
 	 */
 	public function setOption( $optionKey, $optionValue );
+
+	/**
+	 * Returns the version string from the database server.
+	 *
+	 * @return string
+	 */
+	public function getDatabaseServerVersion();
 }
