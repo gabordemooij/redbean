@@ -147,7 +147,7 @@ class Tree {
 	 * and used in the query.
 	 *
 	 * @note:
-	 * By default, if no select is given or select=TRUE this method will subtract 1 of
+	 * By default, if no SQL or select is given or select=TRUE this method will subtract 1 of
 	 * the total count to omit the starting bean. If you provide your own select,
 	 * this method assumes you take control of the resulting total yourself since
 	 * it cannot 'predict' what or how you are trying to 'count'.
@@ -165,7 +165,7 @@ class Tree {
 		$rows = $this->writer->queryRecursiveCommonTableExpression( $type, $id, FALSE, $sql, $bindings, $select );
 		$first = reset($rows);
 		$cell  = reset($first);
-		return max(0, (intval($cell) - ($select === TRUE ? 1 : 0)));
+		return (intval($cell) - (($select === TRUE && is_null($sql)) ? 1 : 0));
 	}
 
 	/**
@@ -189,7 +189,7 @@ class Tree {
 	 * and used in the query.
 	 *
 	 * Note:
-	 * By default, if no select is given or select=TRUE this method will subtract 1 of
+	 * By default, if no SQL or select is given or select=TRUE this method will subtract 1 of
 	 * the total count to omit the starting bean. If you provide your own select,
 	 * this method assumes you take control of the resulting total yourself since
 	 * it cannot 'predict' what or how you are trying to 'count'.
@@ -207,6 +207,6 @@ class Tree {
 		$rows = $this->writer->queryRecursiveCommonTableExpression( $type, $id, TRUE, $sql, $bindings, $select );
 		$first = reset($rows);
 		$cell  = reset($first);
-		return max(0, (intval($cell) - ($select === TRUE ? 1 : 0)));
+		return (intval($cell) - (($select === TRUE && is_null($sql)) ? 1 : 0));
 	}
 }
