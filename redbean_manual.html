@@ -1769,6 +1769,27 @@ code("
 	without the <b>s</b>, for <b>single</b> rows.
 </p>
 
+<h2 id="find_from_sql">Find from SQL (5.6+)</h2>
+<p>
+	As of version 5.6, you can create beans from an SQL in one go,
+	using the additional Facade convenience method findFromSQL.<br>
+	Usage (Postgres dialect):
+</p>
+<?php code("
+	\$books = R::findFromSQL('book',\"
+		SELECT *, count(*) OVER() AS total FROM book WHERE
+	 	genre = ? ORDER BY title ASC OFFSET {\$from} LIMIT {\$to} 
+	", [ \$bindings ],  [ 'total' ]);
+	\$book  = reset(\$books);
+	\$total = \$book->info('total');
+"); ?>
+<p>
+	This style of querying might be handy for finding beans along
+	with pagination data to paginate results properly (in this case
+	the OVER-clause only works with Postgres). You can use the info()
+	method on a bean to access the <a href="https://redbeanphp.com/index.php?p=/meta_data#masks">meta data</a>.
+</p>
+
 <p class="note">
 	<b>Remember:</b>
 	<br>
@@ -3854,6 +3875,15 @@ code("
 	fields of the book and query some additional meta data in the process.
 	The meta data from the query will be available under the key 'data.bundle'.
 </p>
+
+<h2 id="meta_info">Info (5.6+)</h2>
+<p>
+	As of version 5.6, you can use info() to access data.bundle
+	values directly:
+</P>
+<?php code("
+	\$pages = \$book->info('totalNumberOfPages', 0);
+"); ?>
 
 <h1>Duplicate</h1>
 <p>
