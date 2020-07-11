@@ -1557,7 +1557,7 @@ class Facade
 	 *
 	 * @return array
 	 */
-	public static function findFromSQL( $type, $sql, $bindings = [], $metamask = 'extra_') {
+	public static function findFromSQL( $type, $sql, $bindings = array(), $metamask = 'extra_') {
 		$rows = self::query( 'get', $sql, $bindings );
 		if (!count($rows)) return array();
 		$beans = self::$redbean->convertToBeans( $type, $rows, $metamask );
