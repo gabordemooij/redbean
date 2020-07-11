@@ -1480,8 +1480,13 @@ abstract class AQueryWriter
 	/**
 	 * @see QueryWriter::queryRecursiveCommonTableExpression
 	 */
-	public function queryRecursiveCommonTableExpression( $type, $id, $up = TRUE, $addSql = NULL, $bindings = array(), $count = FALSE )
+	public function queryRecursiveCommonTableExpression( $type, $id, $up = TRUE, $addSql = NULL, $bindings = array(), $selectForm = FALSE )
 	{
+		if ($selectForm === QueryWriter::C_CTE_SELECT_COUNT) {
+			$selectForm = "count(redbeantree.*)";
+		} elseif ( $selectForm === QueryWriter::C_CTE_SELECT_NORMAL ) {
+			$selectForm = "redbeantree.*";
+		}
 		$alias     = $up ? 'parent' : 'child';
 		$direction = $up ? " {$alias}.{$type}_id = {$type}.id " : " {$alias}.id = {$type}.{$type}_id ";
 		/* allow numeric and named param bindings, if '0' exists then numeric */
@@ -1503,7 +1508,7 @@ abstract class AQueryWriter
 				SELECT {$type}.* FROM {$type}
 				INNER JOIN redbeantree {$alias} ON {$direction}
 			)
-			SELECT ".($count ? "count(redbeantree.*)" : "redbeantree.*" )." FROM redbeantree {$sql};",
+			SELECT {$selectForm} FROM redbeantree {$sql};",
 			$bindings
 		);
 		return $rows;

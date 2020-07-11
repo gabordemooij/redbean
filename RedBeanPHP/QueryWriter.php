@@ -65,6 +65,13 @@ interface QueryWriter
 	const C_GLUE_AND   = 2;
 
 	/**
+	 * CTE Select Snippet
+	 * Constants specifying select snippets for CTE queries
+	 */
+	 const C_CTE_SELECT_NORMAL = FALSE;
+	 const C_CTE_SELECT_COUNT  = TRUE;
+
+	/**
 	 * Parses an sql string to create joins if needed.
 	 *
 	 * For instance with $type = 'book' and $sql = ' @joined.author.name LIKE ? OR @joined.detail.title LIKE ? '
@@ -356,15 +363,21 @@ interface QueryWriter
 	 * as defined by having <type>_id = id or all parent rows as defined per id = <type>_id
 	 * taking into account an optional SQL snippet along with parameters.
 	 *
+	 * The $select parameter can be used to adjust the select snippet of the query.
+	 * Possible values are: C_CTE_SELECT_NORMAL (just select all columns, default), C_CTE_SELECT_COUNT
+	 * (count rows) used for countParents and countChildren functions - or you can specify a
+	 * string yourself like 'count(distinct brand)'.
+	 *
 	 * @param string  $type     the bean type you want to query rows for
 	 * @param integer $id       id of the reference row
 	 * @param boolean $up       TRUE to query parent rows, FALSE to query child rows
 	 * @param string  $addSql   optional SQL snippet to embed in the query
 	 * @param array   $bindings parameter bindings for additional SQL snippet
+	 * @param mixed   $select   Select Snippet to use when querying (optional)
 	 *
 	 * @return array
 	 */
-	public function queryRecursiveCommonTableExpression( $type, $id, $up = TRUE, $addSql = NULL, $bindings = array() );
+	public function queryRecursiveCommonTableExpression( $type, $id, $up = TRUE, $addSql = NULL, $bindings = array(), $select = QueryWriter::C_CTE_SELECT_NORMAL );
 
 	/**
 	 * This method should update (or insert a record), it takes

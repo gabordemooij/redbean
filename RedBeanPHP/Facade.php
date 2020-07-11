@@ -3138,13 +3138,27 @@ class Facade
 	 * a warning mechanism in case your database does not support this
 	 * functionality.
 	 *
-	 * @param OODBBean $bean     bean to find children of
-	 * @param string   $sql      optional SQL snippet
-	 * @param array    $bindings SQL snippet parameter bindings
+	 * @note:
+	 * You are allowed to use named parameter bindings as well as
+	 * numeric parameter bindings (using the question mark notation).
+	 * However, you can not mix. Also, if using named parameter bindings,
+	 * parameter binding key ':slot0' is reserved for the ID of the bean
+	 * and used in the query.
+	 *
+	 * @note:
+	 * By default, if no select is given or select=TRUE this method will subtract 1 of
+	 * the total count to omit the starting bean. If you provide your own select,
+	 * this method assumes you take control of the resulting total yourself since
+	 * it cannot 'predict' what or how you are trying to 'count'.
+	 *
+	 * @param OODBBean       $bean     bean to find children of
+	 * @param string         $sql      optional SQL snippet
+	 * @param array          $bindings SQL snippet parameter bindings
+	 * @param string|boolean $select   select snippet to use (advanced, optional, see QueryWriter::queryRecursiveCommonTableExpression)
 	 */
-	public static function countChildren( OODBBean $bean, $sql = NULL, $bindings = array() )
+	public static function countChildren( OODBBean $bean, $sql = NULL, $bindings = array(), $select = QueryWriter::C_CTE_SELECT_COUNT )
 	{
-		return self::$tree->countChildren( $bean, $sql, $bindings );
+		return self::$tree->countChildren( $bean, $sql, $bindings, $select );
 	}
 
 	/**
@@ -3157,13 +3171,27 @@ class Facade
 	 * a warning mechanism in case your database does not support this
 	 * functionality.
 	 *
-	 * @param OODBBean $bean     bean to find children of
-	 * @param string   $sql      optional SQL snippet
-	 * @param array    $bindings SQL snippet parameter bindings
+	 * @note:
+	 * You are allowed to use named parameter bindings as well as
+	 * numeric parameter bindings (using the question mark notation).
+	 * However, you can not mix. Also, if using named parameter bindings,
+	 * parameter binding key ':slot0' is reserved for the ID of the bean
+	 * and used in the query.
+	 *
+	 * @note:
+	 * By default, if no select is given or select=TRUE this method will subtract 1 of
+	 * the total count to omit the starting bean. If you provide your own select,
+	 * this method assumes you take control of the resulting total yourself since
+	 * it cannot 'predict' what or how you are trying to 'count'.
+	 *
+	 * @param OODBBean       $bean     bean to find children of
+	 * @param string         $sql      optional SQL snippet
+	 * @param array          $bindings SQL snippet parameter bindings
+	 * @param string|boolean $select   select snippet to use (advanced, optional, see QueryWriter::queryRecursiveCommonTableExpression)
 	 */
-	public static function countParents( OODBBean $bean, $sql = NULL, $bindings = array() )
+	public static function countParents( OODBBean $bean, $sql = NULL, $bindings = array(), $select = QueryWriter::C_CTE_SELECT_COUNT )
 	{
-		return self::$tree->countParents( $bean, $sql, $bindings );
+		return self::$tree->countParents( $bean, $sql, $bindings, $select );
 	}
 
 	/**
