@@ -3315,6 +3315,12 @@ To <b>fetch all tags</b> attached to a certain bean we use the same method but w
 	R::countChildren( \$winePage, ' title != :title  ', [ ':title' => 'wines' ] );
 "); ?>
 
+<p id="cte_select_snippet">
+	As of 5.6 you can add your own SELECT clause like 'count(distinct vendor)'.
+	By default, countChildren() and countParents() subtract 1 from total number of
+	counted records to exclude the starting bean. If you provide your own select
+	clause, this might not make sense, so this won't happen in that case.
+</p>
 
 <h1>Link Beans</h1>
 <p>
