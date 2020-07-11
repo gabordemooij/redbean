@@ -1282,6 +1282,22 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
+	 * Returns a value from the data bundle.
+	 * The data bundle might contain additional data send from an SQL query,
+	 * for instance, the total number of rows. If the property cannot be
+	 * found, the default value will be returned. If no default has
+	 * been specified, this method returns NULL.
+	 *
+	 * @param string $key     key
+	 * @param mixed  $default default (defaults to NULL)
+	 *
+	 * @return mixed;
+	 */
+	public function info( $key, $default = NULL ) {
+		return ( isset( $this->__info['data.bundle'][$key] ) ) ? $this->__info['data.bundle'][$key] : $default;
+	}
+
+	/**
 	 * Gets and unsets a meta property.
 	 * Moves a meta property out of the bean.
 	 * This is a short-cut method that can be used instead

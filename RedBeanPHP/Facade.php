@@ -1520,6 +1520,51 @@ class Facade
 	}
 
 	/**
+	 * Convenience function to 'find' beans from an SQL query.
+	 * Used mostly to obtain a series of beans as well as
+	 * pagination data (to paginate results) and optionally
+	 * other data as well (that should not be considered part of
+	 * a bean).
+	 *
+	 * Example:
+	 *
+	 *  $books = R::findFromSQL('book',"
+	 *  SELECT *, count(*) OVER() AS total
+	 *  FROM book
+	 *  WHERE {$filter}
+	 *  OFFSET {$from} LIMIT {$to} ", ['total']);
+	 *
+	 * This is the same as doing (example uses PostgreSQL dialect):
+	 *
+	 *  $rows = R::getAll("
+	 *  SELECT *, count(*) OVER() AS total
+	 *  FROM book
+	 *  WHERE {$filter}
+	 *  OFFSET {$from} LIMIT {$to}
+	 *  ", $params);
+	 *  $books = R::convertToBeans('book', $rows, ['total']);
+	 *
+	 * The additional data can be obtained using:
+	 *
+	 * $book->info('total');
+	 *
+	 * For further details see R::convertToBeans().
+	 *
+	 * @param string $type     Type of bean to produce
+	 * @param string $sql      SQL query snippet to use
+	 * @param array  $bindings bindings for query (optional)
+	 * @param mixed  $metamask meta mask (optional, defaults to 'extra_')
+	 *
+	 * @return array
+	 */
+	public static function findFromSQL( $type, $sql, $bindings = [], $metamask = 'extra_') {
+		$rows = self::query( 'get', $sql, $bindings );
+		if (!count($rows)) return array();
+		$beans = self::$redbean->convertToBeans( $type, $rows, $metamask );
+		return $beans;
+	}
+
+	/**
 	 * Tests whether a bean has been associated with one ore more
 	 * of the listed tags. If the third parameter is TRUE this method
 	 * will return TRUE only if all tags that have been specified are indeed

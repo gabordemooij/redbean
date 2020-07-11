@@ -31,6 +31,29 @@ use RedBeanPHP\Driver\RPDO;
 class Bean extends Base
 {
 	/**
+	 * Test whether we can use findFromSQL to extract beans
+	 * from the result of an SQL query.
+	 */
+	public function testFindFromSQL() {
+		R::nuke();
+		$book = R::dispense('book');
+		$book->title = 'My Book';
+		R::store( $book );
+		$books = R::findFromSQL('book','SELECT *, 100 AS pages FROM book WHERE title = ? ', array('My Book'), array('pages'));
+		asrt(is_array($books), TRUE);
+		asrt(count($books), 1);
+		$book = reset($books);
+		asrt($book->title, 'My Book');
+		asrt(intval($book->info('pages')), 100);
+		asrt(intval($book->info('pages',0)), 100);
+		asrt($book->info('signatures',0), 0);
+		asrt(is_null($book->info('signatures')), TRUE);
+		$books = R::findFromSQL('book','SELECT *, 100 AS pages FROM book WHERE title = ? ', array('Not My Book'), array('pages'));
+		asrt(is_array($books), TRUE);
+		asrt(count($books), 0);
+	}
+
+	/**
 	 * Tests whether we can override the __toString() method of
 	 * a bean (for example to display binary data).
 	 */
