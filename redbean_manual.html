@@ -4229,6 +4229,28 @@ code("
 	tailored to your needs.
 </p>
 
+<h1>Templates</h1>
+<p>
+	As of RedBeanPHP 5.6 you can use data definition language templates to
+	make sure RedBeanPHP constructs its tables according to your specifications.
+	For instance, if you want to construct your MySQL tables using the
+	option <a title="MySQL Row Format Options" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html" target="_blank">ROW_FORMAT=DYNAMIC</a>
+	you can alter the DDL template for table creation
+	like this:
+</p>
+
+<?php code("
+	\$writer->setDDLTemplate( 'createTable', '*',  
+		\$writer->getDDLTemplate('createTable', '*') . ' ROW_FORMAT=DYNAMIC '
+	);
+"); ?>
+
+<p>
+	Currently, RedBeanPHP supports overriding the following DDL templates: 'createTable' 
+	(used by RedBeanPHP for table creation),
+	'addColumn' (used by RedBeanPHP to add a new column to a table on-the-fly) and
+	'widenColumn' (used by RedBeanPHP to adjust the column to hold a different kind of data).
+</p>
 
 <h1>Prefixes</h1>
 <p>
