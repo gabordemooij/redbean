@@ -1779,7 +1779,7 @@ code("
 	\$books = R::findFromSQL('book',\"
 		SELECT *, count(*) OVER() AS total FROM book WHERE
 	 	genre = ? ORDER BY title ASC OFFSET {\$from} LIMIT {\$to} 
-	", [ \$bindings ],  [ 'total' ]);
+	\", [ \$bindings ],  [ 'total' ]);
 	\$book  = reset(\$books);
 	\$total = \$book->info('total');
 "); ?>
