@@ -1469,7 +1469,7 @@ class Facade
 	 *
 	 * <code>
 	 * $rows = R::getAll( 'SELECT FROM... COUNT(*) AS extra_count ...' );
-	 * $beans = R::convertToBeans( $rows );
+	 * $beans = R::convertToBeans( $rows, 'extra_' );
 	 * $bean = reset( $beans );
 	 * $data = $bean->getMeta( 'data.bundle' );
 	 * $extra_count = $data['extra_count'];
