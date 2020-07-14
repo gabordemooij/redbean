@@ -1549,18 +1549,32 @@ class Facade
 	 * $book->info('total');
 	 *
 	 * For further details see R::convertToBeans().
+	 * If you set $autoExtract to TRUE and meta mask is an array,
+	 * an array will be returned containing two nested arrays, the
+	 * first of those nested arrays will contain the meta values
+	 * you requested, the second array will contain the beans.
 	 *
-	 * @param string $type     Type of bean to produce
-	 * @param string $sql      SQL query snippet to use
-	 * @param array  $bindings bindings for query (optional)
-	 * @param mixed  $metamask meta mask (optional, defaults to 'extra_')
+	 * @param string  $type        Type of bean to produce
+	 * @param string  $sql         SQL query snippet to use
+	 * @param array   $bindings    bindings for query (optional)
+	 * @param mixed   $metamask    meta mask (optional, defaults to 'extra_')
+	 * @param boolean $autoExtract TRUE to return meta mask values as first item of array
 	 *
 	 * @return array
 	 */
-	public static function findFromSQL( $type, $sql, $bindings = array(), $metamask = 'extra_') {
+	public static function findFromSQL( $type, $sql, $bindings = array(), $metamask = 'extra_', $autoExtract = false) {
 		$rows = self::query( 'get', $sql, $bindings );
-		if (!count($rows)) return array();
-		$beans = self::$redbean->convertToBeans( $type, $rows, $metamask );
+		$beans = array();
+		if (count($rows)) $beans = self::$redbean->convertToBeans( $type, $rows, $metamask );
+		if ($autoExtract && is_array($metamask)) {
+			$values = array();
+			$firstBean = NULL;
+			if (count($beans)) $firstBean = reset($beans);
+			foreach($metamask as $key) {
+				$values[$key] = ($firstBean) ? $firstBean->info($key) : NULL;
+			}
+			return array( $values, $beans );
+		}
 		return $beans;
 	}
 
