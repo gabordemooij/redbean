@@ -3865,7 +3865,7 @@ code("
 </p>
 <?php code("
 	\$rows = R::getRow( 'SELECT book.*, count( page.id ) AS meta_pages... ' );
-	\$book = R::convertToBean( 'book', \$data, 'meta_' );
+	\$book = R::convertToBean( 'book', \$rows, 'meta_' );
 	\$queryData = \$book->getMeta('data.bundle');
 	echo \$queryData['meta_pages'];
 "); ?>
