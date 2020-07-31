@@ -121,27 +121,6 @@ class Stub extends Base
 		pass();
 	}
 
-	/**
-	 * Stub test for SSL-connect.
-	 * 
-	 * @return void
-	 */
-	 public function testSSL()
-	 {
-		$pdo = R::getPDO();
-		$mock = new \MockPDO;
-		R::getDatabaseAdapter()->getDatabase()->setPDO( $mock );
-		R::addToolBoxWithKey( 'stub', new \RedBeanPHP\ToolBox( R::getRedBean(), R::getDatabaseAdapter(), R::getWriter()) );
-		R::useMysqlSSL( 'key.pem','cert.pem','cacert.pem', 'stub' );
-		R::getDatabaseAdapter()->getDatabase()->setPDO( $pdo );
-		$prop = \PDO::MYSQL_ATTR_SSL_KEY;
-		asrt( $mock->getDiagAttribute($prop), 'key.pem' );
-		$prop = \PDO::MYSQL_ATTR_SSL_CERT;
-		asrt( $mock->getDiagAttribute($prop), 'cert.pem' );
-		$prop = \PDO::MYSQL_ATTR_SSL_CA;
-		asrt( $mock->getDiagAttribute($prop), 'cacert.pem' );
-	 }
-
 	 /**
 	  * Test base implementation of getKeyMapForType().
 	  *

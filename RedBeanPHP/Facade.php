@@ -29,7 +29,7 @@ use RedBeanPHP\Util\Feature;
  * RedBean Facade
  *
  * Version Information
- * RedBean Version @version 5.5
+ * RedBean Version @version 5.6
  *
  * This class hides the object landscape of
  * RedBeanPHP behind a single letter class providing
@@ -261,20 +261,22 @@ class Facade
 	 * a connection is really required, for instance when attempting to load
 	 * a bean.
 	 *
-	 * @param string  $dsn      Database connection string
-	 * @param string  $username Username for database
-	 * @param string  $password Password for database
-	 * @param boolean $frozen   TRUE if you want to setup in frozen mode
+	 * @param string  $dsn          Database connection string
+	 * @param string  $username     Username for database
+	 * @param string  $password     Password for database
+	 * @param boolean $frozen       TRUE if you want to setup in frozen mode
+	 * @param boolean $partialBeans TRUE to enable partial bean updates
+	 * @param array   $options      Additional (PDO) options to pass
 	 *
 	 * @return ToolBox
 	 */
-	public static function setup( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE )
+	public static function setup( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
 	{
 		if ( is_null( $dsn ) ) {
 			$dsn = 'sqlite:' . DIRECTORY_SEPARATOR . sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'red.db';
 		}
 
-		self::addDatabase( 'default', $dsn, $username, $password, $frozen, $partialBeans );
+		self::addDatabase( 'default', $dsn, $username, $password, $frozen, $partialBeans, $options );
 		self::selectDatabase( 'default' );
 
 		return self::$toolbox;
@@ -402,13 +404,13 @@ class Facade
 	 *
 	 * @return void
 	 */
-	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE, $partialBeans = FALSE )
+	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
 	{
 		if ( isset( self::$toolboxes[$key] ) ) {
 			throw new RedException( 'A database has already been specified for this key.' );
 		}
 
-		self::$toolboxes[$key] = self::createToolbox($dsn, $user, $pass, $frozen, $partialBeans);
+		self::$toolboxes[$key] = self::createToolbox($dsn, $user, $pass, $frozen, $partialBeans, $options);
 	}
 
 	/**
@@ -444,13 +446,13 @@ class Facade
 	 *
 	 * @return ToolBox
 	 */
-  public static function createToolbox( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE )
+  public static function createToolbox( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
   {
 		if ( is_object($dsn) ) {
 			$db  = new RPDO( $dsn );
 			$dbType = $db->getDatabaseType();
 		} else {
-			$db = new RPDO( $dsn, $username, $password, TRUE );
+			$db = new RPDO( $dsn, $username, $password, TRUE, $options );
 			$dbType = substr( $dsn, 0, strpos( $dsn, ':' ) );
 		}
 
@@ -478,21 +480,6 @@ class Facade
 		}
 
 		return new ToolBox( $redbean, $adapter, $writer );
-  }
-
-	/**
-	 * Sets PDO attributes for MySQL SSL connection.
-	 *
-	 * @param string $key  path client key i.e. '/etc/mysql/ssl/client-key.pem'
-	 * @param string $cert path client cert i.e. '/etc/mysql/ssl/client-cert.pem'
-	 * @param string $ca   path certifying agent certificate '/etc/mysql/ssl/ca-cert.pem'
-	 * @param string $id   apply to toolbox (default = 'default')
-	 */
-	public static function useMysqlSSL( $key, $cert, $ca, $id = 'default' ) {
-		$pdo = self::$toolboxes[$id]->getDatabaseAdapter()->getDatabase()->getPDO();
-		$pdo->setAttribute( \PDO::MYSQL_ATTR_SSL_KEY,  $key);
-		$pdo->setAttribute( \PDO::MYSQL_ATTR_SSL_CERT,  $cert);
-		$pdo->setAttribute( \PDO::MYSQL_ATTR_SSL_CA,  $ca);
 	}
 
 	/**
