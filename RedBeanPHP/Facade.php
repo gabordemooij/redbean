@@ -452,7 +452,7 @@ class Facade
 			$db  = new RPDO( $dsn );
 			$dbType = $db->getDatabaseType();
 		} else {
-			$db = new RPDO( $dsn, $username, $password, TRUE, $options );
+			$db = new RPDO( $dsn, $username, $password, $options );
 			$dbType = substr( $dsn, 0, strpos( $dsn, ':' ) );
 		}
 
