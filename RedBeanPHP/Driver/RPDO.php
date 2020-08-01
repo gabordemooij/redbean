@@ -474,12 +474,40 @@ class RPDO implements Driver
 	 * this method if you are an expert on RedBeanPHP, PDO and UTF8 connections and
 	 * you know your database server VERY WELL.
 	 *
-	 * @param PDO $pdo PDO instance
+	 * - connected     TRUE|FALSE (treat this instance as connected, default: TRUE)
+	 * - setEncoding   TRUE|FALSE (let RedBeanPHP set encoding for you, default: TRUE)
+	 * - setAttributes TRUE|FALSE (let RedBeanPHP set attributes for you, default: TRUE)*
+	 * - setDSNString  TRUE|FALSE (extract DSN string from PDO instance, default: TRUE)
+	 *
+	 * *attributes:
+	 * - RedBeanPHP will ask database driver to throw Exceptions on errors (recommended for compatibility)
+         * - RedBeanPHP will ask database driver to use associative arrays when fetching (recommended for compatibility)
+	 *
+	 * @param PDO     $pdo       PDO instance
+	 * @param array   $options   Options to apply
 	 *
 	 * @return void
 	 */
-	public function setPDO( \PDO $pdo ) {
+	public function setPDO( \PDO $pdo, $options = array() ) {
 		$this->pdo = $pdo;
+
+		$connected     = TRUE;
+		$setEncoding   = TRUE;
+		$setAttributes = TRUE;
+		$setDSNString  = TRUE;
+
+		if ( isset($options['connected']) )     $connected     = $options['connected'];
+		if ( isset($options['setEncoding']) )   $setEncoding   = $options['setEncoding'];
+		if ( isset($options['setAttributes']) ) $setAttributes = $options['setAttributes'];
+		if ( isset($options['setDSNString']) )  $setDSNString  = $options['setDSNString'];
+
+		if ($connected) $this->connected = $connected;
+		if ($setEncoding) $this->setEncoding();
+		if ($setAttributes) {
+			$this->pdo->setAttribute( \PDO::ATTR_ERRMODE,\PDO::ERRMODE_EXCEPTION );
+			$this->pdo->setAttribute( \PDO::ATTR_DEFAULT_FETCH_MODE,\PDO::FETCH_ASSOC );
+		}
+		if ($setDSNString) $this->dsn = $this->getDatabaseType();
 	}
 
 	/**
