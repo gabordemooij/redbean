@@ -481,6 +481,7 @@ class RPDO implements Driver
 	 * - setEncoding   TRUE|FALSE (let RedBeanPHP set encoding for you, default: TRUE)
 	 * - setAttributes TRUE|FALSE (let RedBeanPHP set attributes for you, default: TRUE)*
 	 * - setDSNString  TRUE|FALSE (extract DSN string from PDO instance, default: TRUE)
+	 * - runInitCode   TRUE|FALSE (run init code if any, default: TRUE)
 	 *
 	 * *attributes:
 	 * - RedBeanPHP will ask database driver to throw Exceptions on errors (recommended for compatibility)
@@ -498,17 +499,31 @@ class RPDO implements Driver
 		$setEncoding   = TRUE;
 		$setAttributes = TRUE;
 		$setDSNString  = TRUE;
+		$runInitCode   = TRUE;
 
 		if ( isset($options['connected']) )     $connected     = $options['connected'];
 		if ( isset($options['setEncoding']) )   $setEncoding   = $options['setEncoding'];
 		if ( isset($options['setAttributes']) ) $setAttributes = $options['setAttributes'];
 		if ( isset($options['setDSNString']) )  $setDSNString  = $options['setDSNString'];
+		if ( isset($options['runInitCode']) )   $runInitCode   = $options['runInitCode'];
 
 		if ($connected) $this->connected = $connected;
 		if ($setEncoding) $this->setEncoding();
 		if ($setAttributes) {
 			$this->pdo->setAttribute( \PDO::ATTR_ERRMODE,\PDO::ERRMODE_EXCEPTION );
 			$this->pdo->setAttribute( \PDO::ATTR_DEFAULT_FETCH_MODE,\PDO::FETCH_ASSOC );
+			$this->pdo->setAttribute( \PDO::ATTR_STRINGIFY_FETCHES, $this->stringifyFetches );
+		}
+		if ($runInitCode) {
+			/* run initialisation query if any */
+			if ( $this->initSQL !== NULL ) {
+				$this->Execute( $this->initSQL );
+				$this->initSQL = NULL;
+			}
+			if ( $this->initCode !== NULL ) {
+				$code = $this->initCode;
+				$code( $this->pdo->getAttribute( \PDO::ATTR_SERVER_VERSION ) );
+			}
 		}
 		if ($setDSNString) $this->dsn = $this->getDatabaseType();
 	}
