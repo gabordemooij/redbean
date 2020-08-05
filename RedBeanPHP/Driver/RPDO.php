@@ -466,7 +466,7 @@ class RPDO implements Driver
 		} catch ( \PDOException $exception ) {
 			$matches = array();
 			$dbname  = ( preg_match( '/dbname=(\w+)/', $this->dsn, $matches ) ) ? $matches[1] : '?';
-			throw new \PDOException( 'Could not connect to database (' . $dbname . ').', $exception->getCode() );
+			throw new \PDOException( 'Could not connect to database (' . $dbname . '). Reason: ' . $exception->getMessage(), $exception->getCode() );
 		}
 	}
 
