@@ -1390,7 +1390,7 @@ class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$overrideDontFail = TRUE;
 		}
 
-		if ( !method_exists( $this->__info['model'], $method ) ) {
+		if ( !is_callable( array( $this->__info['model'], $method ) ) ) {
 
 			if ( self::$errorHandlingFUSE === FALSE || $overrideDontFail ) {
 				return NULL;
