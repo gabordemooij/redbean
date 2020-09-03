@@ -288,7 +288,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 		}
 
 		//setter turns TRUE FALSE into 0 and 1 because database has no real bools (TRUE and FALSE only for test?).
-		if ( $value === FALSE || $value === TRUE || $value === '0' || $value === '1' ) {
+		if ( $value === FALSE || $value === TRUE || $value === '0' || $value === '1' || $value === 0 || $value === 1 ) {
 			return MySQL::C_DATATYPE_BOOL;
 		}
 
