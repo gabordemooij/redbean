@@ -20,7 +20,7 @@ matrix:
     dist: trusty
   - php: 7.4
     dist: trusty
-  - nightly
+  - php: nightly
     dist: trusty
 
 before_script:
