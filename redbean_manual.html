@@ -2564,7 +2564,10 @@ code("
 	\$store->ownProductList = [ \$vase, \$lamp ];
 "); ?>
 
-
+<p class="note">
+        Be careful with __toString methods in beans, RedBeanPHP uses the string representation of a bean to determine
+	whether it should be added or removed from the list.
+</p>
 
 <h2 id="exclusive-one-to-many">Exclusive mode</h2>
 <p>
