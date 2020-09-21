@@ -145,7 +145,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	 *
 	 * @param Adapter $adapter Database Adapter
 	 */
-	public function __construct( Adapter $adapter )
+	public function __construct( Adapter $adapter, $options = array() )
 	{
 		$this->typeno_sqltype = array(
 			MySQL::C_DATATYPE_BOOL             => ' TINYINT(1) UNSIGNED ',
@@ -174,6 +174,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 		$this->adapter = $adapter;
 		$this->encoding = $this->adapter->getDatabase()->getMysqlEncoding();
 		$me = $this;
+		if (!isset($options['noInitcode']))
 		$this->adapter->setInitCode(function($version) use(&$me) {
 			try {
 				if (strpos($version, 'maria')===FALSE && intval($version)>=8) {
