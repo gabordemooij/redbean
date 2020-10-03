@@ -144,6 +144,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 	 * object.
 	 *
 	 * @param Adapter $adapter Database Adapter
+	 * @param array   $options options array
 	 */
 	public function __construct( Adapter $adapter, $options = array() )
 	{
