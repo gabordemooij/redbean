@@ -1027,33 +1027,27 @@ class Finding extends Base {
 		asrt( json_encode($pagesWithOODB), json_encode($pages) );
 		asrt( reset( $pagesWithOODB )->id, $page->id );
 		asrt( end( $pagesWithOODB )->id, $page2->id );
-
 		$pages = R::findLike( 'page', array( 'book' => array( $book, $book2->id ) ) );
 		asrt( count( $pages ), 2 );
 		asrt( reset( $pages )->id, $page->id );
 		asrt( end( $pages )->id, $page2->id );
-
 		$pages = R::findLike( 'page', array( 'book_id' => array( $book->id, $book2 ) ) );
 		asrt( count( $pages ), 2 );
 		asrt( reset( $pages )->id, $page->id );
 		asrt( end( $pages )->id, $page2->id );
-
 		$pagesFail = R::findLike( 'page', array( 'book' => array( $book->id, $book2 ) ) );
 		asrt( count( $pagesFail ), 0 );
-
 		$book3 = R::dispense( 'book' );
 		$page3 = R::dispense( 'page' );
 		R::store( $page3 );
 		$page3->book = $book3;
 		$pagesFail = R::findLike( 'page', array( 'book' => $book3 ) );
 		asrt( count( $pagesFail ), 0 );
-
 		$pen = R::dispense( 'pen' );
 		R::store( $pen );
 		asrt( $pen->id, $book->id );
 		$pagesFail = R::findLike( 'page', array( 'book' => $pen ) );
 		asrt( count( $pagesFail ), 0 );
-
 	}
 
 	/**

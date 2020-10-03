@@ -81,7 +81,6 @@ class Debug extends Blackhole
 		$array = R::dump($beans);
 		asrt( is_array( $array ), TRUE );
 		asrt( strpos( $array[1], '...' ), 35 );
-		//just to get 100% test cov, we dont need to test this
 		dmp( $beans );
 		pass();
 		//test wrong input

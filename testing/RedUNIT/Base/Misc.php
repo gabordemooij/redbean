@@ -625,7 +625,8 @@ class Misc extends Base
 	/**
 	 * Test if adding SimpleModles to a shared list will auto unbox them.
 	 */
-	public function testSharedListsAutoUnbox() {
+	public function testSharedListsAutoUnbox()
+	{
 		$boxedBean = R::dispense( 'boxedbean' );
 		$bean = R::dispense( 'bean' );
 		$model = new SimpleModel();

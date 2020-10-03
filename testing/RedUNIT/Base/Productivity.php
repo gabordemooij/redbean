@@ -207,7 +207,6 @@ class Productivity extends Base
 		$oldBook = $book->fresh();
 		$oldBook->ownPageList;
 		$diff = R::diff($oldBook, $book);
-		print_r($diff);
 	}
 
 	/**

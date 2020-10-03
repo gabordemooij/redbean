@@ -35,7 +35,6 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Facade extends Base
 {
-
 	/**
 	 * What drivers should be loaded for this test pack?
 	 * This pack contains some SQL incomp. with OCI

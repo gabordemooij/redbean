@@ -25,6 +25,8 @@ class Trash extends Base
 	/**
 	 * Test whether R::trash/trashAll() returns the correct
 	 * number of deleted beans.
+	 *
+	 * @return void
 	 */
 	public function testTrash()
 	{
@@ -34,12 +36,10 @@ class Trash extends Base
 			'pages'=>3
 			)
 		));
-		
 		asrt( R::count('book'), 1 );
 		$n = R::trash(R::findOne('book'));
 		asrt( $n, 1 );
 		asrt( R::count('book'), 0 );
-		
 		list($books) = R::dispenseAll('book*10');
 		R::storeAll( $books );
 		asrt( R::count('book'), 10 );

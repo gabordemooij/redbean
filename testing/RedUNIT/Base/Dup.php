@@ -43,6 +43,8 @@ class Dup extends Base
 	/**
 	 * Tests whether the original ID is stored
 	 * in meta data (quite handy for ID mappings).
+	 *
+	 * @return void
 	 */
 	public function testKeepOldID()
 	{
@@ -78,7 +80,6 @@ class Dup extends Base
 		R::store( $book );
 		$book = $book->fresh();
 		$export = R::exportAll( $book );
-
 		asrt( isset( $export[0]['id'] ), TRUE );
 		asrt( isset( $export[0]['is_cheap'] ), TRUE );
 		asrt( isset( $export[0]['has_isbn_code'] ), TRUE );
@@ -86,7 +87,6 @@ class Dup extends Base
 		asrt( isset( $export[0]['ownPage']['0']['is_written_well'] ), TRUE );
 		asrt( isset( $export[0]['ownPage']['0']['contains_interesting_text'] ), TRUE );
 		asrt( isset( $export[0]['ownPage']['0']['book_id'] ), TRUE );
-
 		R::useExportCase( 'camel' );
 		$export = R::exportAll( $book );
 		asrt( isset( $export[0]['id'] ), TRUE );
@@ -96,7 +96,6 @@ class Dup extends Base
 		asrt( isset( $export[0]['ownPage']['0']['isWrittenWell'] ), TRUE );
 		asrt( isset( $export[0]['ownPage']['0']['containsInterestingText'] ), TRUE );
 		asrt( isset( $export[0]['ownPage']['0']['bookId'] ), TRUE );
-
 		R::useExportCase( 'dolphin' );
 		$export = R::exportAll( $book );
 		asrt( isset( $export[0]['id'] ), TRUE );
@@ -106,7 +105,6 @@ class Dup extends Base
 		asrt( isset( $export[0]['ownPage']['0']['isWrittenWell'] ), TRUE );
 		asrt( isset( $export[0]['ownPage']['0']['containsInterestingText'] ), TRUE );
 		asrt( isset( $export[0]['ownPage']['0']['bookID'] ), TRUE );
-
 		R::useExportCase( 'default' );
 		$export = R::exportAll( $book );
 		asrt( isset( $export[0]['id'] ), TRUE );
@@ -116,7 +114,6 @@ class Dup extends Base
 		asrt( isset( $export[0]['ownPage']['0']['is_written_well'] ), TRUE );
 		asrt( isset( $export[0]['ownPage']['0']['contains_interesting_text'] ), TRUE );
 		asrt( isset( $export[0]['ownPage']['0']['book_id'] ), TRUE );
-
 		try {
 			R::useExportCase( 'invalid' );
 			fail();
@@ -171,15 +168,12 @@ class Dup extends Base
 		foreach( $dupBeans as $dupBean ) {
 			asrt( $dupBean->name, 'article 6' );
 		}
-
 		//so we have extracted part of the tree, can we store it?
 		$id = R::store( $dupArticle2 );
 		asrt( ( $id > 0 ), TRUE );
 		asrt( R::count( 'article' ), 11 );
-
 		$originalArticle = $article->fresh();
 		asrt( $originalArticle->name, 'article 1' );
-
 		$subArticles = $originalArticle->xownArticleList;
 		$list = array();
 		foreach( $subArticles as $subArticle ) {
@@ -188,7 +182,6 @@ class Dup extends Base
 		sort( $list );
 		$listStr = implode( ',', $list );
 		asrt( $listStr, 'article 2,article 2b,article 3' );
-
 		foreach( $subArticles as $subArticle ) {
 			if ( $subArticle->name === 'article 2' ) {
 				$sub2 = $subArticle;
@@ -197,7 +190,6 @@ class Dup extends Base
 				$sub3 = $subArticle;
 			}
 		}
-
 		$subArticles = $sub2->xownArticleList;
 		$list = array();
 		foreach( $subArticles as $subArticle ) {
@@ -206,7 +198,6 @@ class Dup extends Base
 		sort( $list );
 		$listStr = implode( ',', $list );
 		asrt( $listStr, 'article 4,article 5' );
-
 		$subArticles = $sub3->xownArticleList;
 		$list = array();
 		foreach( $subArticles as $subArticle ) {
@@ -215,7 +206,6 @@ class Dup extends Base
 		sort( $list );
 		$listStr = implode( ',', $list );
 		asrt( $listStr, 'article 7' );
-
 		$subArticles = $sub2->xownArticleList;
 		foreach( $subArticles as $subArticle ) {
 			if ( $subArticle->name === 'article 4' ) {
@@ -225,14 +215,11 @@ class Dup extends Base
 				$sub5 = $subArticle;
 			}
 		}
-
 		asrt( count( $sub4->xownArticleList ), 1 );
 		$subBeans = $sub4->xownArticleList;
 		$subBean = reset( $subBeans );
 		asrt( $subBean->name, 'article 6');
-
 		asrt( count( $sub5->xownArticleList ), 0 );
-
 		$dupArticle2 = $dupArticle2->fresh();
 		$subArticles = $dupArticle2->xownArticleList;
 		$list = array();
@@ -242,7 +229,6 @@ class Dup extends Base
 		sort( $list );
 		$listStr = implode( ',', $list );
 		asrt( $listStr, 'article 4,article 5' );
-
 		foreach( $subArticles as $subArticle ) {
 			if ( $subArticle->name === 'article 4' ) {
 				$sub4 = $subArticle;
@@ -251,12 +237,10 @@ class Dup extends Base
 				$sub5 = $subArticle;
 			}
 		}
-
 		asrt( count( $sub4->xownArticleList ), 1 );
 		$subBeans = $sub4->xownArticleList;
 		$subBean = reset( $subBeans );
 		asrt( $subBean->name, 'article 6');
-
 		asrt( count( $sub5->xownArticleList ), 0 );
 	}
 
@@ -268,87 +252,50 @@ class Dup extends Base
 	public function testExportAllAndCache()
 	{
 		testpack( 'exportAll() and Cache' );
-
 		$can = R::dispense( 'can' )->setAttr( 'size', 3 );
-
 		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
 		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
-
 		$id = R::store( $can );
-
 		R::debug( TRUE );
-
 		ob_start();
-
 		$can = R::load( 'can', $id );
-
 		$cache = $this->getCache();
-
 		$data = R::exportAll( array( $can ), TRUE );
-
 		$queries = ob_get_contents();
-
 		R::debug( FALSE );
 		ob_end_clean();
 		$len1 = strlen( $queries );
-
 		$can              = R::dispense( 'can' )->setAttr( 'size', 3 );
 		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
 		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
-
 		$id = R::store( $can );
-
 		R::debug( TRUE );
-
 		ob_start();
-
 		$can = R::load( 'can', $id );
-
 		$cache = $this->getCache();
-
 		$data = R::exportAll( array( $can ), TRUE );
-
 		$queries = ob_get_contents();
-
 		R::debug( FALSE );
-
 		ob_end_clean();
-
 		$len2 = strlen( $queries );
-
 		asrt( ( $len1 ), ( $len2 ) );
-
 		$can = R::dispense( 'can' )->setAttr( 'size', 3 );
-
 		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
 		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
-
 		$id = R::store( $can );
-
 		R::debug( TRUE );
-
 		ob_start();
-
 		$can = R::load( 'can', $id );
-
 		$cache = $this->getCache();
-
 		R::getDuplicationManager()->setTables( $cache );
-
 		$data = R::exportAll( array( $can ), TRUE );
-
 		$queries = ob_get_contents();
-
 		R::debug( FALSE );
-
 		ob_end_clean();
-
 		$len3 = strlen( $queries );
-
 		asrt( ( ( $len3 ) < ( $len2 ) ), TRUE );
 		asrt( count( $data ), 1 );
 		asrt( $data[0]['ownCoffee'][0]['color'], 'black' );
-
 		R::getDuplicationManager()->setCacheTables( FALSE );
 	}
 
@@ -360,49 +307,30 @@ class Dup extends Base
 	public function DupAndCache()
 	{
 		testpack( 'Dup() and Cache' );
-
 		$can = R::dispense( 'can' )->setAttr( 'size', 3 );
-
 		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
 		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
-
 		$can = R::load( 'can', R::store( $can ) );
-
 		$d = new DuplicationManager( R::getToolBox() );
-
 		$d->setCacheTables( TRUE );
-
 		ob_start();
-
 		R::debug( 1 );
-
 		$x = $d->dup( $can );
-
 		$queries = ob_get_contents();
-
 		R::debug( 0 );
-
 		ob_end_clean();
-
 		$len1 = strlen( $queries );
-
 		asrt( ( $len1 > 40 ), TRUE );
 		asrt( isset( $x->ownCoffee ), TRUE );
 		asrt( count( $x->ownCoffee ), 1 );
 		asrt( isset( $x->sharedTag ), TRUE );
 		asrt( count( $x->sharedTag ), 1 );
-
 		$cache = $d->getSchema();
-
 		R::nuke();
-
 		$can = R::dispense( 'can' )->setAttr( 'size', 3 );
-
 		$can->ownCoffee[] = R::dispense( 'coffee' )->setAttr( 'color', 'black' );
 		$can->sharedTag[] = R::dispense( 'tag' )->setAttr( 'name', 'cool' );
-
 		$can = R::load( 'can', R::store( $can ) );
-
 		$d = new DuplicationManager( R::getToolBox() );
 
 		/**
@@ -443,21 +371,13 @@ class Dup extends Base
 		 */
 
 		$d->setTables( $cache );
-
 		ob_start();
-
 		R::debug( 1 );
-
 		$x = $d->dup( $can );
-
 		$queries = ob_get_contents();
-
 		ob_end_clean();
-
 		R::debug( 0 );
-
 		$len2 = strlen( $queries );
-
 		asrt( isset( $x->ownCoffee ), TRUE );
 		asrt( count( $x->ownCoffee ), 1 );
 		asrt( isset( $x->sharedTag ), TRUE );
@@ -474,34 +394,23 @@ class Dup extends Base
 	public function testDupAndExportNonTainting()
 	{
 		testpack( 'Dup() and Export() should not taint beans' );
-
-		$p            = R::dispense( 'page' );
-		$b            = R::dispense( 'book' );
-
+		$p = R::dispense( 'page' );
+		$b = R::dispense( 'book' );
 		$b->ownPage[] = $p;
-		$b->title     = 'a';
-
-		$id           = R::store( $b );
-
-		$b            = R::load( 'book', $id );
-
+		$b->title = 'a';
+		$id = R::store( $b );
+		$b = R::load( 'book', $id );
 		asrt( ( !$b->getMeta( 'tainted' ) ), TRUE );
-
 		R::exportAll( $b );
-
 		asrt( ( !$b->getMeta( 'tainted' ) ), TRUE );
-
 		R::dup( $b );
-
 		asrt( ( !$b->getMeta( 'tainted' ) ), TRUE );
-
 		testpack( 'Test issue with ownItems and stealing Ids.' );
-
 		R::nuke();
-		$bill                  = R::dispense( 'bill' );
-		$item                  = R::dispense( 'item' );
-		$element               = R::dispense( 'element' );
-		$bill->ownItem[]       = $item;
+		$bill = R::dispense( 'bill' );
+		$item = R::dispense( 'item' );
+		$element = R::dispense( 'element' );
+		$bill->ownItem[] = $item;
 		$bill->sharedElement[] = $element;
 		R::store( $bill );
 		$bill = R::load( 'bill', 1 );
@@ -509,24 +418,16 @@ class Dup extends Base
 		$bill->sharedElement;
 		$copy = R::dup( $bill );
 		R::store( $copy );
-
 		$rows = ( R::getAll( 'select * from bill_element' ) );
 		asrt( count( $rows ), 2 );
-
 		$rows = ( R::getAll( 'select * from item' ) );
-
 		foreach ( $rows as $row ) {
 			asrt( ( $row['bill_id'] > 0 ), TRUE );
 		}
-
 		R::nuke();
-
 		$this->runOnce();
-
 		R::freeze( TRUE );
-
 		$this->runOnce( FALSE );
-
 		R::freeze( FALSE );
 	}
 
@@ -538,36 +439,27 @@ class Dup extends Base
 	public function ExportWithFilters()
 	{
 		testpack( 'Export with filters' );
-
-		$book      = R::dispense( 'book' );
-		$pages     = R::dispense( 'page', 2 );
-		$texts     = R::dispense( 'text', 2 );
-		$images    = R::dispense( 'image', 2 );
-		$author    = R::dispense( 'author' );
-		$pub       = R::dispense( 'publisher' );
+		$book = R::dispense( 'book' );
+		$pages = R::dispense( 'page', 2 );
+		$texts = R::dispense( 'text', 2 );
+		$images = R::dispense( 'image', 2 );
+		$author = R::dispense( 'author' );
+		$pub = R::dispense( 'publisher' );
 		$bookmarks = R::dispense( 'bookmark', 2 );
-
 		$pages[0]->ownText  = array( $texts[0] );
 		$pages[0]->ownImage = array( $images[0] );
 		$pages[1]->ownText  = array( $texts[1] );
 		$pages[1]->ownImage = array( $images[1] );
-
 		$pages[0]->sharedBookmark[] = $bookmarks[0];
 		$pages[1]->sharedBookmark[] = $bookmarks[1];
-
 		$bookmarks[0]->ownNote[] = R::dispense( 'note' )->setAttr( 'text', 'a note' );
 		$bookmarks[1]->ownNote[] = R::dispense( 'note' )->setAttr( 'text', 'a note' );
-
 		$book->ownPage = $pages;
 		$book->author  = $author;
-
 		$author->publisher = $pub;
-		$bookID            = R::store( $book );
-
+		$bookID = R::store( $book );
 		R::getDuplicationManager()->setTables( R::getWriter()->getTables() );
-
 		$objects = ( R::exportAll( array( $book ), TRUE, array() ) );
-
 		asrt( isset( $objects[0]['ownPage'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'] ), 2 );
 		asrt( isset( $objects[0]['author'] ), TRUE );
@@ -575,9 +467,7 @@ class Dup extends Base
 		asrt( count( $objects[0]['ownPage'][0]['ownText'] ), 1 );
 		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'][0]['ownImage'] ), 1 );
-
 		$objects = ( R::exportAll( array( $book ), TRUE, array( 'page', 'author', 'text', 'image' ) ) );
-
 		asrt( isset( $objects[0]['ownPage'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'] ), 2 );
 		asrt( isset( $objects[0]['author'] ), TRUE );
@@ -585,44 +475,28 @@ class Dup extends Base
 		asrt( count( $objects[0]['ownPage'][0]['ownText'] ), 1 );
 		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'][0]['ownImage'] ), 1 );
-
 		$objects = ( R::exportAll( array( $book ), TRUE, 'author' ) );
-
 		asrt( isset( $objects[0]['ownPage'] ), FALSE );
 		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), FALSE );
-
 		$objects = ( R::exportAll( array( $book ), TRUE, array( 'page' ) ) );
-
 		asrt( isset( $objects[0]['author'] ), FALSE );
 		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), FALSE );
-
 		$objects = ( R::exportAll( array( $book ), TRUE, array( 'page', 'text' ) ) );
-
 		asrt( isset( $objects[0]['author'] ), FALSE );
 		asrt( isset( $objects[0]['ownPage'] ), TRUE );
 		asrt( isset( $objects[0]['ownPage'][0]['ownText'] ), TRUE );
 		asrt( count( $objects[0]['ownPage'][0]['ownText'] ), 1 );
 		asrt( isset( $objects[0]['ownPage'][0]['ownImage'] ), FALSE );
-
 		$objects = ( R::exportAll( array( $book ), TRUE, array( 'none' ) ) );
-
 		asrt( isset( $objects[0]['author'] ), FALSE );
 		asrt( isset( $objects[0]['ownPage'] ), FALSE );
-
 		$texts = R::find( 'text' );
-
 		R::getDuplicationManager()->setCacheTables( FALSE );
-
 		testpack( 'Keyless export' );
-
 		$book = R::load( 'book', $bookID );
-
 		$book->ownPage;
-
 		$export = $book->export();
-
 		asrt( isset( $export['ownPage'][0] ), TRUE );
-
 	}
 
 	/**
@@ -658,6 +532,8 @@ class Dup extends Base
 	 *
 	 * @param type $object
 	 * @param type $array
+	 *
+	 * @return void
 	 */
 	private function compare( $object, $array )
 	{
@@ -688,12 +564,10 @@ class Dup extends Base
 	 */
 	private function runOnce( $n = TRUE )
 	{
-
 		$books   = R::dispense( 'book', 10 );
 		$pages   = R::dispense( 'page', 10 );
 		$readers = R::dispense( 'reader', 10 );
 		$texts   = R::dispense( 'text', 10 );
-
 		$i = 0;
 		foreach ( $books as $book ) $book->name = 'book-' . ( $i++ );
 		$i = 0;
@@ -720,7 +594,6 @@ class Dup extends Base
 			foreach ( $book->ownPage as $page ) $noOfTexts += count( $page->ownText );
 			$arr = R::exportAll( $book );
 			echo "\nIntermediate info: " . json_encode( $arr ) . ": Totals = $i,$noOfPages,$noOfReaders,$noOfTexts ";
-
 			$this->compare( $book, $arr[0] );
 			$copiedBook      = R::dup( $book );
 			$copiedBookArray = R::exportAll( $copiedBook );
@@ -756,7 +629,6 @@ class Dup extends Base
 			$this->compare( $modifiedCopy, $exportMod[0] );
 			asrt( count( $modifiedCopy->ownPage ), count( $copiedBook->ownPage ) + 1 );
 			R::store( $modifiedCopy );
-
 			if ( $n ) {
 				asrt( (int) R::getCell( 'SELECT count(*) FROM book' ), $i * 4 );
 				asrt( (int) R::getCell( 'SELECT count(*) FROM page' ), ( $noOfPages * 4 ) + $i );
@@ -765,7 +637,6 @@ class Dup extends Base
 				asrt( (int) R::getCell( 'SELECT count(*) FROM reader' ), $noOfReaders );
 			}
 		}
-
 		if ( $n ) {
 			asrt( $noOfTexts, 10 );
 			asrt( $noOfReaders, 10 );

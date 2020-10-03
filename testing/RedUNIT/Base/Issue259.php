@@ -52,7 +52,6 @@ class Model_Mother extends SimpleModel
 	public function open()
 	{
 		$bean = $this->bean;
-		// $this & $bean are both referencing child incorrectly!
 		asrt( $this->bean->desc, 'I am mother' );
 	}
 }

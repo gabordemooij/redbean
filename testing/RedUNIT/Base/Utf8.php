@@ -50,11 +50,9 @@ class Utf8 extends Base
 		$str = '𠜎ὃ𠻗𠻹𠻺𠼭𠼮𠽌𠾴𠾼𠿪𡁜';
 		$bean      = R::dispense( 'bean' );
 		$bean->bla = $str;
-
 		R::store( $bean );
 		$bean = R::load( 'bean', $bean->id );
 		asrt( $bean->bla, $str );
-
 		pass();
 	}
 }

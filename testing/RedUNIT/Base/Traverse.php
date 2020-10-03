@@ -24,7 +24,6 @@ use RedBeanPHP\OODBBean as OODBBean;
  */
 class Traverse extends Base
 {
-
 	/**
 	 * Very simple traverse case (one-level).
 	 *

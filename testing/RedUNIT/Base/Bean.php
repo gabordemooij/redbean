@@ -283,7 +283,9 @@ class Bean extends Base
 	}
 
 	/**
-	 * Other tests...
+	 * Misc bean tests.
+	 *
+	 * @return void
 	 */
 	public function testMisc()
 	{
@@ -616,7 +618,6 @@ class Bean extends Base
 		$book->xownPageList[] = R::dispense('page');
 		R::store( $book );
 		asrt( R::count('page'), 3 );
-
 		$ads = R::dispense('ad', 3 );
 		$book = $this->_createBook();
 		$book->alias('magazine')->ownAd = $ads;
@@ -645,7 +646,6 @@ class Bean extends Base
 		R::store( $book );
 		asrt( R::count('ad'), 3 );
 		asrt( R::count('page'), 3 );
-
 		$book = $this->_createBook();
 		$book->sharedTag[] = R::dispense('tag');
 		R::store( $book );
@@ -680,7 +680,6 @@ class Bean extends Base
 		try { R::store( $book ); fail(); }catch(\Exception $e) { pass(); }
 		$book = $book->fresh();
 		asrt( count( $book->ownPage ), 0 );
-
 		$book = $this->_createBook();
 		$firstAd = reset( $book->alias('magazine')->ownAd );
 		$book->alias('magazine')->ownAd[ $firstAd->id ] = NULL;

@@ -25,6 +25,8 @@ class Stub extends Base
 {
 	/**
 	 * Test CUBRID.
+	 *
+	 * @return void
 	 */
 	public function testCUBRID()
 	{

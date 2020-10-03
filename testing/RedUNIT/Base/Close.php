@@ -52,7 +52,6 @@ class Close extends Base
 			asrt( $e->getMessage(), 'The nuke() command has been disabled using noNuke() or R::feature(novice/...).' );
 		}
 		R::useFeatureSet('latest');
-
 		//Close
 		R::getDatabaseAdapter()->setOption( 'setInitQuery', NULL );
 		asrt( R::getDatabaseAdapter()->getDatabase()->isConnected(), TRUE );

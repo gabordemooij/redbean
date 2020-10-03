@@ -775,6 +775,8 @@ class Joins extends Base
 
 	/**
 	 * Tests joins with ownCount().
+	 * 
+	 * @return void
 	 */
 	public function testJoinsInCount()
 	{

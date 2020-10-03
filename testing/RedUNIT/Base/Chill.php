@@ -31,47 +31,29 @@ class Chill extends Base
 	public function testChill()
 	{
 		$bean = R::dispense( 'bean' );
-
 		$bean->col1 = '1';
 		$bean->col2 = '2';
-
 		R::store( $bean );
-
 		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 3 );
-
 		$bean->col3 = '3';
-
 		R::store( $bean );
-
 		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 4 );
-
 		R::freeze( array( 'umbrella' ) );
-
 		$bean->col4 = '4';
-
 		R::store( $bean );
-
 		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 5 );
-
 		R::freeze( array( 'bean' ) );
-
 		$bean->col5 = '5';
-
 		try {
 			R::store( $bean );
 			fail();
 		} catch (\Exception $e ) {
 			pass();
 		}
-
 		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 5 );
-
 		R::freeze( array() );
-
 		$bean->col5 = '5';
-
 		R::store( $bean );
-
 		asrt( count( R::getWriter()->getColumns( 'bean' ) ), 6 );
 	}
 
@@ -102,7 +84,6 @@ class Chill extends Base
 			pass();
 		}
 		asrt(R::count('person_role'), 2);
-
 		R::nuke();
 		$link = R::getRedBean()->dispense('person_role');
 		$person = R::dispense( 'person' );

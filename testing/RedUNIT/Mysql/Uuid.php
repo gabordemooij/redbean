@@ -37,9 +37,7 @@ class Uuid extends Mysql
 	 */
 	public function testUUIDReadSupport()
 	{
-
 		R::nuke();
-
 		$createPageTableSQL = '
 			CREATE TABLE
 			`page`
@@ -53,7 +51,6 @@ class Uuid extends Mysql
 			ENGINE = InnoDB DEFAULT
 			CHARSET=utf8mb4
 			COLLATE=utf8mb4_unicode_ci ';
-
 		$createBookTableSQL = '
 			CREATE TABLE
 			`book`
@@ -65,7 +62,6 @@ class Uuid extends Mysql
 			ENGINE = InnoDB DEFAULT
 			CHARSET=utf8mb4
 			COLLATE=utf8mb4_unicode_ci ';
-
 		$createPagePageTableSQL = '
 			CREATE TABLE
 			`page_page`
@@ -78,78 +74,58 @@ class Uuid extends Mysql
 			ENGINE = InnoDB DEFAULT
 			CHARSET=utf8mb4
 			COLLATE=utf8mb4_unicode_ci ';
-
 		R::exec( $createBookTableSQL );
 		R::exec( $createPageTableSQL );
 		R::exec( $createPagePageTableSQL );
-
 		//insert some records
-
 		$book1ID     = '6ccd780c-baba-1026-9564-0040f4311e21';
 		$book2ID     = '6ccd780c-baba-1026-9564-0040f4311e22';
 		$page1ID     = '6ccd780c-baba-1026-9564-0040f4311e23';
 		$page2ID     = '6ccd780c-baba-1026-9564-0040f4311e24';
 		$page3ID     = '6ccd780c-baba-1026-9564-0040f4311e25';
 		$pagePage1ID = '6ccd780c-baba-1026-9564-0040f4311e26';
-
 		$insertBook1SQL = "
 			INSERT INTO book (id, title) VALUES( '$book1ID', 'book 1' );
 		";
-
 		$insertBook2SQL = "
 			INSERT INTO book (id, title) VALUES( '$book2ID', 'book 2' );
 		";
-
 		$insertPage1SQL = "
 			INSERT INTO page (id, book_id, title, magazine_id) VALUES( '$page1ID', '$book1ID', 'page 1 of book 1', '$book2ID' );
 		";
-
 		$insertPage2SQL = "
 			INSERT INTO page (id, book_id, title) VALUES( '$page2ID', '$book1ID', 'page 2 of book 1' );
 		";
-
 		$insertPage3SQL = "
 			INSERT INTO page (id, book_id, title) VALUES( '$page3ID', '$book2ID', 'page 1 of book 2' );
 		";
-
 		$insertPagePage1SQL = "
 			INSERT INTO page_page (id, page_id, page2_id) VALUES( '$pagePage1ID', '$page2ID', '$page3ID' );
 		";
-
 		R::exec( $insertBook1SQL );
 		R::exec( $insertBook2SQL );
 		R::exec( $insertPage1SQL );
 		R::exec( $insertPage2SQL );
 		R::exec( $insertPage3SQL );
 		R::exec( $insertPagePage1SQL );
-
 		//basic tour of basic functions....
-
 		$book1 = R::load( 'book', $book1ID );
-
 		asrt( $book1->id, $book1ID );
 		asrt( $book1->title, 'book 1' );
-
 		$book2 = R::load( 'book', $book2ID );
-
 		asrt( $book2->id, $book2ID );
 		asrt( $book2->title, 'book 2' );
-
 		asrt( count( $book1->ownPage ), 2 );
 		asrt( count( $book1->fresh()->with( 'LIMIT 1' )->ownPage ), 1 );
 		asrt( count( $book1->fresh()->withCondition( ' title = ? ', array('page 2 of book 1'))->ownPage ), 1 );
-
 		asrt( count($book2->ownPage), 1 );
 		asrt( $book2->fresh()->countOwn( 'page' ), 1 );
-
 		$page1 = R::load( 'page', $page1ID );
 		asrt( count( $page1->sharedPage ), 0 );
 		asrt( $page1->fetchAs( 'book' )->magazine->id, $book2ID );
-
 		$page2 = R::load( 'page', $page2ID );
 		asrt( count($page2->sharedPage), 1 );
 		asrt( $page2->fresh()->countShared( 'page' ), 1 );
-
 		$page3 = R::findOne( 'page', ' title = ? ', array( 'page 1 of book 2' ) );
 		asrt( $page3->id, $page3ID );
 		asrt( $page3->book->id, $book2ID );
@@ -158,6 +134,7 @@ class Uuid extends Mysql
 	/**
 	 * Test Full fluid UUID support.
 	 *
+	 * @return void
 	 */
 	public function testFullSupport()
 	{
@@ -169,7 +146,6 @@ class Uuid extends Mysql
 		$newRedBean = new OODB( $uuidWriter );
 		$newToolBox = new ToolBox( $newRedBean, $oldAdapter, $uuidWriter );
 		R::configureFacadeWithToolbox( $newToolBox );
-
 		list( $mansion, $rooms, $ghosts, $key ) = R::dispenseAll( 'mansion,room*3,ghost*4,key' );
 		$mansion->name = 'Haunted Mansion';
 		$mansion->xownRoomList = $rooms;
@@ -195,7 +171,6 @@ class Uuid extends Mysql
 		asrt( is_array( $haunted->xownRoomList ), TRUE );
 		asrt( count( $haunted->ownRoom ), 3 );
 		$rooms = $haunted->xownRoomList;
-
 		//Do some counting...
 		$greenRoom = NULL;
 		foreach( $rooms as $room ) {
@@ -243,7 +218,6 @@ class Uuid extends Mysql
 		asrt( !is_null( $redRoom ), TRUE );
 		asrt( is_array( $redRoom->sharedGhostList ), TRUE );
 		asrt( count( $redRoom->sharedGhostList ), 2 );
-
 		//Can we repaint a room?
 		$redRoom->name = 'Yellow Room';
 		$id = R::store($redRoom);
@@ -252,7 +226,6 @@ class Uuid extends Mysql
 		asrt( !is_null( $yellowRoom ), TRUE );
 		asrt( is_array( $yellowRoom->sharedGhostList ), TRUE );
 		asrt( count( $yellowRoom->sharedGhostList ), 2 );
-
 		//Can we throw one ghost out?
 		array_pop( $yellowRoom->sharedGhost );
 		R::store( $yellowRoom );
@@ -261,7 +234,6 @@ class Uuid extends Mysql
 		asrt( !is_null( $yellowRoom ), TRUE );
 		asrt( is_array( $yellowRoom->sharedGhostList ), TRUE );
 		asrt( count( $yellowRoom->sharedGhostList ), 1 );
-
 		//can we remove one of the rooms?
 		asrt( R::count('key'), 1);
 		$list = $mansion->withCondition(' `name` = ? ', array('Blue Room'))->xownRoomList;
@@ -269,11 +241,9 @@ class Uuid extends Mysql
 		unset($mansion->xownRoomList[$room->id]);
 		R::store($mansion);
 		asrt(R::count('room'), 2);
-
 		//and what about its dependent beans?
 		asrt(R::count('key'), 0);
 		asrt(R::count('ghost_room'), 3);
-
 		//and can we find ghosts?
 		$ghosts = R::find('ghost');
 		asrt(count($ghosts), 4);
@@ -283,7 +253,6 @@ class Uuid extends Mysql
 		asrt(count($ghosts), 2);
 		$ghostZero = R::findOne('ghost', ' `name` = ? ', array( 'zero' ) );
 		asrt( ($ghostZero instanceof OODBBean), TRUE );
-
 		//can we create link properties on existing tables?
 		$blackRoom = R::dispense( 'room' );
 		$blackRoom->name = 'Black Room';
@@ -295,16 +264,13 @@ class Uuid extends Mysql
 		$ghostZero  = $ghostZero->fresh();
 		$list = $ghostZero->withCondition(' ghost_room.mood = ? ', array('grumpy'))->sharedRoomList;
 		asrt(count($list), 1);
-
 		//can we load a batch?
 		$ids = R::getCol('SELECT id FROM ghost');
 		$ghosts = R::batch('ghost', $ids);
 		asrt(count($ghosts), 4);
-
 		//can we do an aggregation?
 		$ghosts = $greenRoom->aggr('ownGhostRoom', 'ghost', 'ghost');
 		asrt(count($ghosts), 2);
-
 		//can we duplicate the mansion?
 		asrt(R::count('mansion'), 1);
 		asrt(R::count('room'), 3);
@@ -314,13 +280,11 @@ class Uuid extends Mysql
 		asrt(R::count('mansion'), 2);
 		asrt(R::count('room'), 5); //black room does not belong to mansion 1
 		asrt(R::count('ghost'), 4);
-
 		//can we do some counting using the list?
 		asrt( $copy->countOwn('room'), 2);
 		$rooms = $copy->withCondition(' `name` = ? ', array('Green Room'))->xownRoomList;
 		$room = reset($rooms);
 		asrt($room->countShared('ghost'), 2);
-
 		//Finally restore old toolbox
 		R::configureFacadeWithToolbox( $oldToolBox );
 	}

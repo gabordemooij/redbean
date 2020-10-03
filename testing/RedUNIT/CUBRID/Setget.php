@@ -59,28 +59,20 @@ class Setget extends \RedUNIT\CUBRID
 	{
 		asrt( setget( "-1" ), "-1" );
 		asrt( setget( -1 ), "-1" );
-
 		asrt( setget( "1.0" ), "1" );
 		asrt( setget( 1.0 ), "1" );
-
 		asrt( setget( "-0.25" ), "-0.2500000000000000" );
 		asrt( setget( -0.25 ), "-0.2500000000000000" );
-
 		asrt( setget( "0.12345678" ), "0.1234567800000000" );
 		asrt( setget( 0.12345678 ), "0.1234567800000000" );
-
 		asrt( setget( "-0.12345678" ), "-0.1234567800000000" );
 		asrt( setget( -0.12345678 ), "-0.1234567800000000" );
-
 		asrt( setget( "2147483647" ), "2147483647" );
 		asrt( setget( 2147483647 ), "2147483647" );
-
 		asrt( setget( -2147483647 ), "-2147483647" );
 		asrt( setget( "-2147483647" ), "-2147483647" );
-
 		asrt( setget( "2147483648" ), "2147483648.0000000000000000" );
 		asrt( setget( "-2147483648" ), "-2147483648.0000000000000000" );
-
 		asrt( setget( "199936710040730" ), "199936710040730.0000000000000000" );
 		asrt( setget( "-199936710040730" ), "-199936710040730.0000000000000000" );
 	}
@@ -133,18 +125,13 @@ class Setget extends \RedUNIT\CUBRID
 	{
 		asrt( setget( "NULL" ), "NULL" );
 		asrt( setget( "NULL" ), "NULL" );
-
 		asrt( setget( "0123" ), "0123" );
 		asrt( setget( "0000123" ), "0000123" );
-
 		asrt( setget( NULL ), NULL );
-
 		asrt( ( setget( 0 ) == 0 ), TRUE );
 		asrt( ( setget( 1 ) == 1 ), TRUE );
-
 		asrt( ( setget( TRUE ) == TRUE ), TRUE );
 		asrt( ( setget( FALSE ) == FALSE ), TRUE );
-
 		// minor test sqltest
 		$a = R::getWriter()->sqlStateIn( '000', array() );
 		// Unknown state must return FALSE.

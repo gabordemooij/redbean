@@ -39,14 +39,12 @@ class Count extends Base
 		$book->sharedPage = R::dispense( 'page', 10 );
 		R::store( $book );
 		asrt( R::count('bookPage'), 10 );
-
 		try {
 			R::count( 'WrongTypeName' );
 			fail();
 		} catch ( RedException $ex ) {
 			pass();
 		}
-
 		try {
 			R::count( 'wrong_type_name' );
 			fail();
@@ -63,62 +61,38 @@ class Count extends Base
 	public function testCountAndWipe()
 	{
 		testpack( "Test count and wipe" );
-
 		$page = R::dispense( "page" );
-
 		$page->name = "ABC";
-
 		R::store( $page );
-
 		$n1 = R::count( "page" );
-
 		$page = R::dispense( "page" );
-
 		$page->name = "DEF";
-
 		R::store( $page );
-
 		$n2 = R::count( "page" );
-
 		asrt( $n1 + 1, $n2 );
-
 		R::wipe( "page" );
-
 		asrt( R::count( "page" ), 0 );
 		asrt( R::getRedBean()->count( "page" ), 0 );
 		asrt( R::getRedBean()->count( "kazoo" ), 0 ); // non existing table
-
 		R::freeze( TRUE );
-
 		try {
 			asrt( R::getRedBean()->count( "kazoo" ), 0 ); // non existing table
 			fail();
 		} catch( \Exception $e ) {
 			pass();
 		}
-
 		R::freeze( FALSE );
-
 		$page = R::dispense( 'page' );
-
 		$page->name = 'foo';
-
 		R::store( $page );
-
 		$page = R::dispense( 'page' );
-
 		$page->name = 'bar';
-
 		R::store( $page );
-
 		asrt( R::count( 'page', ' name = ? ', array( 'foo' ) ), 1 );
-
 		// Now count something that does not exist, this should return 0. (just be polite)
 		asrt( R::count( 'teapot', ' name = ? ', array( 'flying' ) ), 0 );
 		asrt( R::count( 'teapot' ), 0 );
-
 		$currentDriver = $this->currentlyActiveDriverID;
-
 		// Some drivers don't support that many error codes.
 		if ( $currentDriver === 'mysql' || $currentDriver === 'postgres' ) {
 			try {
@@ -130,8 +104,13 @@ class Count extends Base
 		}
 	}
 
-	public function testCountShared() {
-
+	/**
+	 * Can we count the number of shared beans?
+	 *
+	 * @return void
+	 */
+	public function testCountShared()
+	{
 		R::nuke();
 		$book = R::dispense( 'book' );
 		$book->sharedPageList = R::dispense( 'page', 5 );
@@ -157,6 +136,8 @@ class Count extends Base
 
 	/**
 	 * Test $bean->countOwn($type);
+	 *
+	 * @return void
 	 */
 	public function testCountOwn()
 	{
@@ -198,6 +179,8 @@ class Count extends Base
 
 	/**
 	 * Test $bean->withCondition( ... )->countOwn( $type );
+	 *
+	 * @return void
 	 */
 	public function testCountWithCondition()
 	{

@@ -196,12 +196,9 @@ class Fuse extends Base
 			$model->setNote( 'injected', 'dependency' );
 			return $model;
 		} );
-
 		$bean = R::dispense( 'band' )->box();
-
 		asrt( ( $bean instanceof \Model_Band ), TRUE );
 		asrt( ( $bean->getNote('injected') ), 'dependency' );
-
 		SimpleFacadeBeanHelper::setFactoryFunction( NULL );
 	}
 
@@ -217,7 +214,6 @@ class Fuse extends Base
 		R::store( $page );
 		$testReport = \Model_PageWidget::getTestReport();
 		asrt( $testReport, 'didSave' );
-
 		$page = R::dispense( 'page' );
 		$gadget = R::dispense( 'gadget' );
 		$page->sharedGadgetList[] = $gadget;
@@ -248,9 +244,7 @@ class Fuse extends Base
 	public function testGetExtractedToolBox()
 	{
 		$helper = new SimpleFacadeBeanHelper;
-
 		list( $redbean, $database, $writer, $toolbox ) = $helper->getExtractedToolbox();
-
 		asrt( ( $redbean  instanceof OODB        ), TRUE );
 		asrt( ( $database instanceof Adapter     ), TRUE );
 		asrt( ( $writer   instanceof QueryWriter ), TRUE );

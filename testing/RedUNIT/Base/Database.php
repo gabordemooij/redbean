@@ -262,47 +262,34 @@ class Database extends Base
 	public function testFetchTypes()
 	{
 		R::nuke();
-
 		$page = R::dispense( 'page' );
 		$page->a = 'a';
 		$page->b = 'b';
 		R::store( $page );
-
 		$page = R::dispense( 'page' );
 		$page->a = 'c';
 		$page->b = 'd';
 		R::store( $page );
-
 		$expect = '[{"id":"1","a":"a","b":"b"},{"id":"2","a":"c","b":"d"}]';
 		asrt( json_encode( R::getAll( 'SELECT * FROM page' ) ), $expect );
-
 		$expect = '{"1":"a","2":"c"}';
 		asrt( json_encode( R::getAssoc( 'SELECT id, a FROM page' ) ), $expect );
-
 		$expect = '{"1":{"a":"a","b":"b"},"2":{"a":"c","b":"d"}}';
 		asrt( json_encode( R::getAssoc( 'SELECT id, a, b FROM page' ) ), $expect );
-
 		$expect = '[{"id":"1","a":"a"},{"id":"2","a":"c"}]';
 		asrt( json_encode( R::getAssocRow( 'SELECT id, a FROM page' ) ), $expect );
-
 		$expect = '[{"id":"1","a":"a","b":"b"},{"id":"2","a":"c","b":"d"}]';
 		asrt( json_encode( R::getAssocRow( 'SELECT id, a, b FROM page' ) ), $expect );
-
 		$expect = '{"id":"1","a":"a","b":"b"}';
 		asrt( json_encode( R::getRow( 'SELECT * FROM page WHERE id = 1' ) ), $expect );
-
 		$expect = '"a"';
 		asrt( json_encode( R::getCell( 'SELECT a FROM page WHERE id = 1' ) ), $expect );
-
 		$expect = '"b"';
 		asrt( json_encode( R::getCell( 'SELECT b FROM page WHERE id = 1') ), $expect );
-
 		$expect = '"c"';
 		asrt( json_encode( R::getCell('SELECT a FROM page WHERE id = 2') ), $expect );
-
 		$expect = '["a","c"]';
 		asrt( json_encode( R::getCol( 'SELECT a FROM page' ) ), $expect );
-
 		$expect = '["b","d"]';
 		asrt( json_encode( R::getCol('SELECT b FROM page') ), $expect );
 	}
@@ -344,87 +331,65 @@ class Database extends Base
 	public function testDriver()
 	{
 		$currentDriver = $this->currentlyActiveDriverID;
-
 		R::store( R::dispense( 'justabean' ) );
-
 		$adapter = new TroubleDapter( R::getToolBox()->getDatabaseAdapter()->getDatabase() );
 		$adapter->setSQLState( 'HY000' );
 		$writer  = new SQLiteT( $adapter );
 		$redbean = new OODB( $writer );
 		$toolbox = new ToolBox( $redbean, $adapter, $writer );
-
 		// We can only test this for a known driver...
 		if ( $currentDriver === 'sqlite' ) {
 			try {
 				$redbean->find( 'bean' );
-
 				pass();
 			} catch (\Exception $e ) {
 				var_dump( $e->getSQLState() );
-
 				fail();
 			}
 		}
-
 		$adapter->setSQLState( -999 );
-
 		try {
 			$redbean->find( 'bean' );
-
 			fail();
 		} catch (\Exception $e ) {
 			pass();
 		}
-
 		try {
 			$redbean->wipe( 'justabean' );
-
 			fail();
 		} catch (\Exception $e ) {
 			pass();
 		}
-
 		$toolbox = R::getToolBox();
 		$adapter = $toolbox->getDatabaseAdapter();
 		$writer  = $toolbox->getWriter();
 		$redbean = $toolbox->getRedBean();
 		$pdo     = $adapter->getDatabase();
-
 		$page = $redbean->dispense( "page" );
-
 		try {
 			$adapter->exec( "an invalid query" );
 			fail();
 		} catch ( SQL $e ) {
 			pass();
 		}
-
 		// Special data type description should result in magic number 99 (specified)
 		if ( $currentDriver == 'mysql' ) {
 			asrt( $writer->code( MySQL::C_DATATYPE_SPECIAL_DATE ), 99 );
 		}
-
 		if ( $currentDriver == 'pgsql' ) {
 			asrt( $writer->code( PostgreSQL::C_DATATYPE_SPECIAL_DATE ), 99 );
 		}
-
 		if ( $currentDriver == 'CUBRID' ) {
 			asrt( $writer->code( CUBRID::C_DATATYPE_SPECIAL_DATE ), 99 );
 		}
-
 		asrt( (int) $adapter->getCell( "SELECT 123" ), 123 );
-
 		$page->aname = "my page";
-
 		$id = (int) $redbean->store( $page );
-
 		asrt( (int) $page->id, 1 );
 		asrt( (int) $pdo->GetCell( "SELECT count(*) FROM page" ), 1 );
 		asrt( $pdo->GetCell( "SELECT aname FROM page LIMIT 1" ), "my page" );
 		asrt( (int) $id, 1 );
-
 		$page = $redbean->load( "page", 1 );
-
 		asrt( $page->aname, "my page" );
 		asrt( ( (bool) $page->getMeta( "type" ) ), TRUE );
 		asrt( isset( $page->id ), TRUE );
@@ -440,37 +405,28 @@ class Database extends Base
 	public function testSelects()
 	{
 		$rooms = R::dispense( 'room', 2 );
-
 		$rooms[0]->kind   = 'suite';
 		$rooms[1]->kind   = 'classic';
 		$rooms[0]->number = 6;
 		$rooms[1]->number = 7;
-
 		R::store( $rooms[0] );
 		R::store( $rooms[1] );
-
 		$rooms = R::getAssoc('SELECT * FROM room WHERE id < -999');
 		asrt(is_array($rooms), TRUE);
 		asrt(count($rooms), 0);
-
 		$rooms = R::getAssoc( 'SELECT ' . R::getWriter()->esc( 'number' ) . ', kind FROM room ORDER BY kind ASC' );
-
 		foreach ( $rooms as $key => $room ) {
 			asrt( ( $key === 6 || $key === 7 ), TRUE );
 			asrt( ( $room == 'classic' || $room == 'suite' ), TRUE );
 		}
-
 		$rooms = R::getDatabaseAdapter()->getAssoc( 'SELECT kind FROM room' );
 		foreach ( $rooms as $key => $room ) {
 			asrt( ( $room == 'classic' || $room == 'suite' ), TRUE );
 			asrt( $room, $key );
 		}
-
 		$rooms = R::getAssoc( 'SELECT `number`, kind FROM rooms2 ORDER BY kind ASC' );
-
 		asrt( count( $rooms ), 0 );
 		asrt( is_array( $rooms ), TRUE );
-
 		// GetCell should return NULL in case of exception
 		asrt( NULL, R::getCell( 'SELECT dream FROM fantasy' ) );
 	}
@@ -482,12 +438,10 @@ class Database extends Base
 class TroubleDapter extends DBAdapter
 {
 	private $sqlState;
-
 	public function setSQLState( $sqlState )
 	{
 		$this->sqlState = $sqlState;
 	}
-
 	public function get( $sql, $values = array() )
 	{
 		$exception = new SQL( 'Just a trouble maker' );
@@ -495,12 +449,10 @@ class TroubleDapter extends DBAdapter
 		$exception->setDriverDetails( array(0,1,0) );
 		throw $exception;
 	}
-
 	public function getRow( $sql, $aValues = array() )
 	{
 		$this->get( $sql, $aValues );
 	}
-
 	public function exec( $sql, $aValues = array(), $noEvent = FALSE )
 	{
 		$this->get( $sql, $aValues );

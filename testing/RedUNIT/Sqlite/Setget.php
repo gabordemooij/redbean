@@ -59,28 +59,20 @@ class Setget extends Sqlite
 	{
 		asrt( setget( "-1" ), "-1" );
 		asrt( setget( -1 ), "-1" );
-
 		asrt( setget( "-0.25" ), "-0.25" );
 		asrt( setget( -0.25 ), "-0.25" );
-
 		asrt( setget( "1.0" ), "1" );
 		asrt( setget( 1.0 ), "1" );
-
 		asrt( setget( "0.12345678" ), "0.12345678" );
 		asrt( setget( 0.12345678 ), "0.12345678" );
-
 		asrt( setget( "-0.12345678" ), "-0.12345678" );
 		asrt( setget( -0.12345678 ), "-0.12345678" );
-
 		asrt( setget( "2147483647" ), "2147483647" );
 		asrt( setget( 2147483647 ), "2147483647" );
-
 		asrt( setget( -2147483647 ), "-2147483647" );
 		asrt( setget( "-2147483647" ), "-2147483647" );
-
 		asrt( setget( "2147483648" ), "2147483648" );
 		asrt( setget( "-2147483648" ), "-2147483648" );
-
 		asrt( setget( "199936710040730" ), "199936710040730" );
 		asrt( setget( "-199936710040730" ), "-199936710040730" );
 	}
@@ -133,12 +125,9 @@ class Setget extends Sqlite
 	{
 		asrt( setget( "NULL" ), "NULL" );
 		asrt( setget( "NULL" ), "NULL" );
-
 		asrt( setget( NULL ), NULL );
-
 		asrt( ( setget( 0 ) == 0 ), TRUE );
 		asrt( ( setget( 1 ) == 1 ), TRUE );
-
 		asrt( ( setget( TRUE ) == TRUE ), TRUE );
 		asrt( ( setget( FALSE ) == FALSE ), TRUE );
 	}

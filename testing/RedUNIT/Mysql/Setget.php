@@ -72,42 +72,30 @@ class Setget extends Mysql
 	{
 		asrt( setget( "-1" ), "-1" );
 		asrt( setget( -1 ), "-1" );
-
 		asrt( setget( "-0.25" ), "-0.25" );
 		asrt( setget( -0.25 ), "-0.25" );
-
 		asrt( setget( "1.0" ), "1" );
 		asrt( setget( 1.0 ), "1" );
-
 		asrt( setget( "3.20" ), "3.20" );
 		asrt( setget( "13.20" ), "13.20" );
 		asrt( setget( "134.20" ), "134.20" );
 		asrt( setget( 3.21 ), '3.21' );
-
 		asrt( setget( "0.12345678" ), "0.12345678" );
 		asrt( setget( 0.12345678 ), "0.12345678" );
-
 		asrt( setget( "-0.12345678" ), "-0.12345678" );
 		asrt( setget( -0.12345678 ), "-0.12345678" );
-
 		asrt( setget( "2147483647" ), "2147483647" );
 		asrt( setget( 2147483647 ), "2147483647" );
-
 		asrt( setget( -2147483647 ), "-2147483647" );
 		asrt( setget( "-2147483647" ), "-2147483647" );
-
 		asrt( setget( -4294967295 ), "-4294967295" );
 		asrt( setget( "-4294967295" ), "-4294967295" );
-
 		asrt( setget( 4294967295 ), "4294967295" );
 		asrt( setget( "4294967295" ), "4294967295" );
-
 		asrt( setget( "2147483648" ), "2147483648" );
 		asrt( setget( "-2147483648" ), "-2147483648" );
-
 		asrt( setget( "199936710040730" ), "199936710040730" );
 		asrt( setget( "-199936710040730" ), "-199936710040730" );
-
 		//Architecture dependent... only test this if you are sure what arch
 		//asrt(setget("2147483647123456"),"2.14748364712346e+15");
 		//asrt(setget(2147483647123456),"2.14748364712e+15");
@@ -148,7 +136,6 @@ class Setget extends Mysql
 	{
 		asrt( setget( TRUE ), "1" );
 		asrt( setget( FALSE ), "0" );
-
 		asrt( setget( "TRUE" ), "TRUE" );
 		asrt( setget( "FALSE" ), "FALSE" );
 	}
@@ -162,15 +149,11 @@ class Setget extends Mysql
 	{
 		asrt( setget( "NULL" ), "NULL" );
 		asrt( setget( "NULL" ), "NULL" );
-
 		asrt( setget( "0123" ), "0123" );
 		asrt( setget( "0000123" ), "0000123" );
-
 		asrt( setget( NULL ), NULL );
-
 		asrt( ( setget( 0 ) == 0 ), TRUE );
 		asrt( ( setget( 1 ) == 1 ), TRUE );
-
 		asrt( ( setget( TRUE ) == TRUE ), TRUE );
 		asrt( ( setget( FALSE ) == FALSE ), TRUE );
 	}
