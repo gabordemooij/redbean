@@ -905,4 +905,34 @@ class Writer extends \RedUNIT\Mysql
 		$time = $clock->time;
 		asrt( ( strpos( $time, ':' ) > 0 ), TRUE );
 	}
+
+	/**
+	 * Can we use the 'ignoreDisplayWidth'-feature for MySQL 8
+	 * compatibility?
+	 *
+	 * @return void
+	 */
+	public function testWriterFeature() {
+		$adapter = R::getToolBox()->getDatabaseAdapter();
+		$writer = new \RedBeanPHP\QueryWriter\MySQL( $adapter );
+		$writer->useFeature('ignoreDisplayWidth');
+		asrt($writer->typeno_sqltype[MySQL::C_DATATYPE_BOOL],' TINYINT UNSIGNED ');
+		asrt($writer->typeno_sqltype[MySQL::C_DATATYPE_UINT32],' INT UNSIGNED ');
+		asrt($writer->sqltype_typeno['tinyint unsigned'],MySQL::C_DATATYPE_BOOL);
+		asrt($writer->sqltype_typeno['int unsigned'],MySQL::C_DATATYPE_UINT32);
+		//Can we also pass invalid features without errors?
+		$writer->useFeature('nonsense');
+		pass();
+	}
+
+	/**
+	 * Can we pass an options array to Writer Constructor?
+	 *
+	 * @return void
+	 */
+	public function testWriterOptions() {
+		$adapter = R::getToolBox()->getDatabaseAdapter();
+		$writer = new \RedBeanPHP\QueryWriter\MySQL( $adapter, ['noInitcode'=>TRUE] );
+		pass();
+	}
 }
