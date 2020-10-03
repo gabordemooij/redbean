@@ -600,5 +600,25 @@ class Misc extends Blackhole
 		asrt( AQueryWriter::camelsSnake('bookItems4Page'), 'book_items4_page' );
 		asrt( AQueryWriter::camelsSnake('book☀Items4Page'), 'book☀_items4_page' );
 	}
+
+	/**
+	 * Test that init SQL is being executed upon setting PDO.
+	 *
+	 * @return void
+	 */
+	public function testRunInitCodeOnSetPDO()
+	{
+		$pdo = R::getToolBox()->getDatabaseAdapter()->getDatabase()->getPDO();
+		$rpdo = new \RedBeanPHP\Driver\RPDO( $pdo );
+		$rpdo->setEnableLogging(true);
+		$logger = new \RedBeanPHP\Logger\RDefault\Debug;
+		$logger->setMode( \RedBeanPHP\Logger\RDefault::C_LOGGER_ARRAY );
+		$rpdo->setLogger( $logger );
+		$rpdo->setInitQuery('SELECT 123');
+		$rpdo->setPDO( $pdo );
+		$found = $logger->grep('SELECT 123');
+		asrt(count($found), 1);
+		asrt($found[0], 'SELECT 123');
+	}
 }
 

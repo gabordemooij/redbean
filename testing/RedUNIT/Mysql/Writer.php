@@ -738,7 +738,7 @@ class Writer extends \RedUNIT\Mysql
 	public function testWriterOptions()
 	{
 		$adapter = R::getToolBox()->getDatabaseAdapter();
-		$writer = new \RedBeanPHP\QueryWriter\MySQL( $adapter, ['noInitcode'=>TRUE] );
+		$writer = new \RedBeanPHP\QueryWriter\MySQL( $adapter, array('noInitcode'=>TRUE) );
 		pass();
 	}
 }
