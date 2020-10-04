@@ -360,6 +360,15 @@ documentation on this website!
 
 
 <h2>Simple installation</h2>
+
+<kbd>
+curl -L https://redbeanphp.com/downloadredbeanversion.php?f=all-drivers | signify -Vz -p ./red.pub -t arc | tar xvzf -
+</kbd>
+<p>
+	This will automatically download RedBeanPHP, verify the signature and (see download page) and
+	extract the contents of the package.
+</p>
+
 <kbd>
 url=http://www.redbeanphp.com/downloadredbean.php<br>
 wget $url --output-document=&quot;redbeanphp.tar.gz&quot;<br>
