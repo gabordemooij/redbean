@@ -42,7 +42,7 @@ class Issue841 extends Base
 		R::store($record);
 		asrt(count($record->sharedTagList),1);
 		$record = R::load('record',1);
-		$record->sharedTagList = [];
+		$record->sharedTagList = array();
 		R::store($record);
 		$record = R::load('record',1);
 		asrt(count($record->sharedTagList),0);
