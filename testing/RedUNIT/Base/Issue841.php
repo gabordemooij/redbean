@@ -37,7 +37,7 @@ class Issue841 extends Base
 			R::store($tag);
 		}
 		$record = R::dispense('record');
-		$record->point = random_int(-100,-1);
+		$record->point = rand(-100,-1);
 		$record->sharedTagList[] = R::load('tag',2);
 		R::store($record);
 		asrt(count($record->sharedTagList),1);
