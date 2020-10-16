@@ -1308,7 +1308,8 @@ abstract class AQueryWriter
 
 		$sqlFilterStr = '';
 		if ( count( self::$sqlFilters ) ) {
-			$sqlFilterStr = $this->getSQLFilterSnippet( $destType );
+			$linkType = $this->getAssocTable( array( $sourceType, $destType ) );
+			$sqlFilterStr = $this->getSQLFilterSnippet( "{$linkType}" );
 		}
 
 		if ( $sourceTable === $destTable ) {
