@@ -1126,6 +1126,16 @@ Note is too short!
 	your web application).
 </p>
 
+<p class="note">
+	TIP: If you start building an application with RedBeanPHP,
+	the easiest way is to start with the add/update form, use
+	R::load(bean, id) to either create (0) or update a record (id != 0)
+	with a single form! Then use R::find() for the overview (in fluid mode
+	it will not throw exceptions if the table does not exist yet). You can
+	also use a special install url to prepare the database or take a look
+	at <a target="_blank" href="https://github.com/benmajor/RedSeed">RedSeed</a>.
+</p>
+
 <h2 id="conventions">Conventions</h2>
 <p>
 	You can dispense any type of bean you like, as long
