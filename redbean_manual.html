@@ -3923,7 +3923,7 @@ code("
 	\$book->ownPage[] = \$page;
 	\$duplicated = R::duplicate( \$book ); //R::dup in RB4.0 and earlier
 	//..change something...
-	\$book->name = 'copy!';
+	\$duplicated->name = 'copy!';
 	//..then store...
 	R::store( \$duplicated );
 "); ?>
