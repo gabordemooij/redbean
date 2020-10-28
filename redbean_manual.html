@@ -1945,7 +1945,7 @@ code("
 	To quickly generate template snippets that rely on database data you can use Look:
 </p>
 <?php code("
-	 R::getLook()->look(
+	 R::look(
 		'SELECT * FROM color 
 		 WHERE value != ? 
                  ORDER BY value ASC',
