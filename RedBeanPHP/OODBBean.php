@@ -30,7 +30,7 @@ if (interface_exists('\JsonSerializable')) { interface Jsonable extends \JsonSer
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class OODBBean implements\IteratorAggregate,\ArrayAccess,\Countable,Jsonable
+class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 {
 	/**
 	 * FUSE error modes.
