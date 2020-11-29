@@ -1622,7 +1622,7 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	your own set of <i>mapping functions</i> returning structures like this.
 </p>
 
-<h2>Finder::map helper (5.3+)</h2>
+<h2>Finder::map helpers (5.3+)</h2>
 <p>
 	You can shorten the syntax above using the mapper helper:
 </p>
@@ -1635,6 +1635,16 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 		Finder::map( 'product', 'price' ),
 	]);
 "); ?>
+
+<p>
+	Use Finder::map to map the price data and the products to the
+	shops. Finder-helpers like map() will return a mapping structure
+	like described above, consisting of an array with a/b entries
+	as well as a matcher function and a do-function. Use <b>map()</b>
+	to map 1-N relations (one shop, many products), use <b>onmap()</b>
+	to map N-1 relations (many users belong to one country) and use <b>nmmap()</b>
+	for N-M relations (many books share many tags).
+</p>
 
 <h2 id="sqn">Short Query Notation (SQN)</h2>
 <p>
@@ -1665,7 +1675,7 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	R::genSlots( \$users,
 	'SELECT country.* FROM country WHERE id IN ( %s )' ),
 	array_column( \$users, 'country_id' ),
-	[Finder::onmap('country', \$gebruikers)]
+	[Finder::onmap('country', \$users)]
 	);
 ");?>
 <p>But you can also use the loadJoined() shortcut:</p>
@@ -1674,7 +1684,25 @@ code("
 	\$users = R::find('user');
 	\$users = R::loadJoined( \$users, 'country' );
 ");?>
-	
+
+<p class="note" id="parents_in_loops">
+	Don't access parent beans in loops, that is bad for performance.
+	With 100 users the following code will run 101 queries:<br>
+	<br>
+	$users = R::find('gebruiker');<br>
+	foreach($users as $user) $user-&gt;country;<br>
+	<br><br>
+	Instead use:<br>
+	<br>
+	$users = R::find('gebruiker');<br>
+	R::loadJoined($users, 'country');<br>
+	foreach($users as $user) $user-&gt;country;<br>
+	<br>
+	This will only run 2 queries.<br><br>
+	Even better: If you want to display a list or report, extracting
+	information from various beans, consider using plain sql instead (R::getAll()).
+	<br>
+</p>
 
 <h1>Querying</h1>
 <p>
