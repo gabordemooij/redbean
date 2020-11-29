@@ -153,7 +153,7 @@ class Finder
 	 *    R::genSlots( $users,
 	 *       'SELECT country.* FROM country WHERE id IN ( %s )' ),
 	 *    array_column( $users, 'country_id' ),
-	 *    [Finder::onmap('country', $gebruikers)]
+	 *    [Finder::onmap('country', $users)]
 	 * );
 	 * </code>
 	 *
