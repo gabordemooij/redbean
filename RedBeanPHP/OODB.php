@@ -172,7 +172,7 @@ class OODB extends Observable
 	 * this is not the case.
 	 *
 	 * You can also pass an array containing a selection of frozen types.
-	 * Let's call this chilly mode, it's just like fluid mode except that
+	 * Let's call this chill mode, it's just like fluid mode except that
 	 * certain types (i.e. tables) aren't touched.
 	 *
 	 * @param boolean|array $toggle TRUE if you want to use OODB instance in frozen mode
