@@ -1,5 +1,8 @@
 language: php
 
+env:
+    global:
+        - XDEBUG_MODE=coverage
 matrix:
  include:
   - php: 5.3
