@@ -24,7 +24,7 @@ matrix:
   - php: 7.4
     dist: trusty
   - php: 8.0
-    dist: xenial
+    dist: trusty
   - php: nightly
     dist: trusty
 
