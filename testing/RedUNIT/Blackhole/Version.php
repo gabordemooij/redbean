@@ -88,17 +88,17 @@ class Version extends Blackhole
 		R::useFeatureSet('novice/5.3');
 		asrt( $this->getFeatureFlags(), '1,1,0,0,0' );
 		R::useFeatureSet('5.4');
-		asrt( $this->getFeatureFlags(), '0,0,0,1,1' );
+		asrt( $this->getFeatureFlags(), '1,0,0,1,1' );
 		R::useFeatureSet('latest');
-		asrt( $this->getFeatureFlags(), '0,0,0,1,1' );
+		asrt( $this->getFeatureFlags(), '1,0,0,1,1' );
 		R::useFeatureSet('novice/5.4');
-		asrt( $this->getFeatureFlags(), '0,1,0,0,1' );
+		asrt( $this->getFeatureFlags(), '1,1,0,0,1' );
 		R::useFeatureSet('5.5');
-		asrt( $this->getFeatureFlags(), '0,0,0,1,1' );
+		asrt( $this->getFeatureFlags(), '1,0,0,1,1' );
 		R::useFeatureSet('novice/5.5');
-		asrt( $this->getFeatureFlags(), '0,1,0,0,1' );
+		asrt( $this->getFeatureFlags(), '1,1,0,0,1' );
 		R::useFeatureSet('novice/latest');
-		asrt( $this->getFeatureFlags(), '0,1,0,0,1' );
+		asrt( $this->getFeatureFlags(), '1,1,0,0,1' );
 		R::useFeatureSet('original');
 		asrt( $this->getFeatureFlags(), '1,0,0,0,0' );
 	}

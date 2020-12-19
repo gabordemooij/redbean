@@ -69,7 +69,7 @@ class Feature
 			case self::C_FEATURE_NOVICE_LATEST:
 			case self::C_FEATURE_NOVICE_5_4:
 			case self::C_FEATURE_NOVICE_5_5:
-				OODBBean::useFluidCount( FALSE );
+				OODBBean::useFluidCount( TRUE );
 				R::noNuke( TRUE );
 				R::setAllowHybridMode( FALSE );
 				R::useISNULLConditions( TRUE );
@@ -77,7 +77,7 @@ class Feature
 			case self::C_FEATURE_LATEST:
 			case self::C_FEATURE_5_4:
 			case self::C_FEATURE_5_5:
-				OODBBean::useFluidCount( FALSE );
+				OODBBean::useFluidCount( TRUE );
 				R::noNuke( FALSE );
 				R::setAllowHybridMode( TRUE );
 				R::useISNULLConditions( TRUE );
