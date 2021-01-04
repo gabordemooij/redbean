@@ -1881,7 +1881,7 @@ code("
 
 <h2>@shared</h2>
 <p>
-	Use @own to access own-lists in SQL:
+	Use @shared to access shared-lists in SQL:
 </p>
 <?php code("
         \$people = R::find( 'person', ' @shared.tag.title = ? ', ['writer']);
