@@ -76,3 +76,26 @@ if ( !function_exists( 'array_flatten' ) ) {
 		return \RedBeanPHP\Facade::flat( $array );
 	}
 }
+
+/**
+ * Function pstr() generates [ $value, \PDO::PARAM_STR ]
+ */
+if ( !function_exists( 'pstr' ) ) {
+
+	function pstr( $value )
+	{
+		return array( strval( $value ) , \PDO::PARAM_STR );
+	}
+}
+
+
+/**
+ * Function pint() generates [ $value, \PDO::PARAM_INT ]
+ */
+if ( !function_exists( 'pint' ) ) {
+
+	function pint( $value )
+	{
+		return array( intval( $value ) , \PDO::PARAM_INT );
+	}
+}

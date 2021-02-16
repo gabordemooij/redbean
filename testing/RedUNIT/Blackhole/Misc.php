@@ -61,7 +61,22 @@ class Misc extends Blackhole
 		asrt( @$rpdo->testCap( 'utf8mb4' ), FALSE );
 	}
 
-
+	/**
+	 * Test pstr and pint functions
+	 *
+	 * @return void
+	 */
+	public function testPintPstr()
+	{
+		$x = pstr('test');
+		asrt(is_array($x), TRUE);
+		asrt($x[0],'test');
+		asrt($x[1],\PDO::PARAM_STR);
+		$x = pint(123);
+		asrt(is_array($x), TRUE);
+		asrt($x[0],123);
+		asrt($x[1],\PDO::PARAM_INT);
+	}
 
 	/**
 	 * Misc tests.
