@@ -1478,6 +1478,11 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	]);
 ");?>
 
+<p>
+	As of 5.6.3 you can use pstr( $str ) to generate [ $str, PDO::PARAM_STR ] for you
+	and pint( $num ) to generate [ $int, PDO::PARAM_INT ] - these are just shortcut
+	functions for your convience.
+</p>
 
 <h2>Find All</h2>
 <p>
@@ -2799,16 +2804,11 @@ code("
 	You can use as many of these 'aliases' as you like.
 </p>
 
-<p class="note" id="autoresolve">
-	As of 4.2 RedBeanPHP supports automatic resolve, this means you can use
-	$course-&gt;teacher <b>without</b> fetchAs. Autoresolve also works with
-	R::dup() and R::export(). To use automatic resolvement of aliased parent beans,
-	use R::setAutoResolve( TRUE ).
-</p>
 
 <p class="note" id="global_aliases">
 	As of 4.2 you can use global aliases. Instead of specifying the alias
 	with fetchAs each time you can specify the alias using R::aliases( ...aliases... );
+	i.e. R::aliases( ['teacher' =&gt; 'person', and so on...] );
 </p>
 
 
@@ -4084,7 +4084,10 @@ code("
 <?php code("
 	\$arrays = R::exportAll( \$beans, TRUE );
 ");?>
-
+<p class="note">
+	Because exportAll() does not know about any aliases you have to
+	use R::aliases( [ 'teacher' =&gt; 'person', ... ] ) to inform the export function about aliased beans.
+</p>
 
 <h1>Non-static</h1>
 <p>
