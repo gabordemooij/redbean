@@ -251,13 +251,26 @@ abstract class AQueryWriter
 	 * Globally available service method for RedBeanPHP.
 	 * Converts a camel cased string to a snake cased string.
 	 *
-	 * @param string $camel camelCased string to converty to snake case
+	 * @param string $camel camelCased string to convert to snake case
 	 *
 	 * @return string
 	 */
 	public static function camelsSnake( $camel )
 	{
 		return strtolower( preg_replace( '/(?<=[a-z])([A-Z])|([A-Z])(?=[a-z])/', '_$1$2', $camel ) );
+	}
+
+	/**
+	 * Globally available service method for RedBeanPHP.
+	 * Converts a snake cased string to a camel cased string.
+	 *
+	 * @param string $snake snake_cased string to convert to camelCase
+	 *
+	 * @return string
+	 */
+	public static function snakeCamel( $snake )
+	{
+		return lcfirst( str_replace(' ', '', ucwords( str_replace('_', ' ', $snake ) ) ) );
 	}
 
 	/**

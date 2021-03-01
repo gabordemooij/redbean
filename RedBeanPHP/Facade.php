@@ -3283,6 +3283,56 @@ class Facade
 	}
 
 	/**
+	 * Globally available service method for RedBeanPHP.
+	 * Converts a snake cased string to a camel cased string.
+	 * If the parameter is an array, the keys will be converted.
+	 *
+	 * @param string|array $snake snake_cased string to convert to camelCase
+	 *
+	 * @return string|array
+	 */
+	public static function camelfy( $snake )
+	{
+		if ( is_array( $snake ) ) {
+			$newArray = array();
+			foreach( $snake as $key => $value ) {
+				$newKey = self::camelfy( $key );
+				if ( is_array( $value ) ) {
+					$value = self::camelfy( $value );
+				}
+				$newArray[ $newKey ] = $value;
+			}
+			return $newArray;
+		}
+		return AQueryWriter::snakeCamel( $snake );
+	}
+
+	/**
+	 * Globally available service method for RedBeanPHP.
+	 * Converts a camel cased string to a snake cased string.
+	 * If the parameter is an array, the keys will be converted.
+	 *
+	 * @param string|array $camel camelCased string to convert to snake case
+	 *
+	 * @return string|array
+	 */
+	public static function uncamelfy( $camel )
+	{
+		if ( is_array( $camel ) ) {
+			$newArray = array();
+			foreach( $camel as $key => $value ) {
+				$newKey = self::uncamelfy( $key );
+				if ( is_array( $value ) ) {
+					$value = self::uncamelfy( $value );
+				}
+				$newArray[ $newKey ] = $value;
+			}
+			return $newArray;
+		}
+		return AQueryWriter::camelsSnake( $camel );
+	}
+
+	/**
 	 * Selects the feature set you want as specified by
 	 * the label.
 	 *

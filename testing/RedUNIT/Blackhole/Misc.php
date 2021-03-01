@@ -614,6 +614,38 @@ class Misc extends Blackhole
 		asrt( AQueryWriter::camelsSnake('objectACL2Factory'), 'object_acl2_factory' );
 		asrt( AQueryWriter::camelsSnake('bookItems4Page'), 'book_items4_page' );
 		asrt( AQueryWriter::camelsSnake('book☀Items4Page'), 'book☀_items4_page' );
+		asrt( R::uncamelfy('book☀Items4Page'), 'book☀_items4_page' );
+		$array = R::uncamelfy( array( 'bookPage' => 1, 'camelCaseString' => 2, 'snakeCaseString' => array( 'dolphinCaseString' => 3 ) ) );
+		asrt( isset( $array['book_page'] ), TRUE );
+		asrt( isset( $array['camel_case_string'] ), TRUE );
+		asrt( isset( $array['snake_case_string']['dolphin_case_string'] ), TRUE );
+		$array = R::uncamelfy( array( 'oneTwo' => array( 'twoThree' => array( 'threeFour' => 1 ) ) ) );
+		asrt( isset( $array['one_two']['two_three']['three_four'] ), TRUE );
+	}
+
+	/**
+	 * Test camelCase to snake_case conversions.
+	 *
+	 * @return void
+	 */
+	public function testSnake2Camel()
+	{
+		asrt( AQueryWriter::snakeCamel('book_page'), 'bookPage' );
+		asrt( AQueryWriter::snakeCamel('ftp'), 'ftp' );
+		asrt( AQueryWriter::snakeCamel('acl_rules'), 'aclRules' );
+		asrt( AQueryWriter::snakeCamel('ssh_connection_proxy'), 'sshConnectionProxy' );
+		asrt( AQueryWriter::snakeCamel('proxy_server_facade'), 'proxyServerFacade' );
+		asrt( AQueryWriter::snakeCamel('proxy_ssh_client'), 'proxySshClient' );
+		asrt( AQueryWriter::snakeCamel('object_acl2_factory'), 'objectAcl2Factory' );
+		asrt( AQueryWriter::snakeCamel('book_items4_page'), 'bookItems4Page' );
+		asrt( AQueryWriter::snakeCamel('book☀_items4_page'), 'book☀Items4Page' );
+		asrt( R::camelfy('book☀_items4_page'), 'book☀Items4Page' );
+		$array = R::camelfy( array( 'book_page' => 1, 'camel_case_string' => 2, 'snake_case_string' => array( 'dolphin_case_string' => 3 )  ) );
+		asrt( isset( $array['bookPage'] ), TRUE );
+		asrt( isset( $array['camelCaseString'] ), TRUE );
+		asrt( isset( $array['snakeCaseString']['dolphinCaseString'] ), TRUE );
+		$array = R::camelfy( array( 'one_two' => array( 'two_three' => array( 'three_four' => 1 ) ) ) );
+		asrt( isset( $array['oneTwo']['twoThree']['threeFour'] ), TRUE );
 	}
 
 	/**
