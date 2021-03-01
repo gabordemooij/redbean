@@ -63,7 +63,7 @@ class Typechecking extends Base
 		$bean->bool2    = TRUE;
 		$bean->text     = 'abc';
 		$bean->null     = null;
-		$bean->datetime = new\DateTime( 'NOW', new\DateTimeZone( 'Europe/Amsterdam' ) );
+		$bean->datetime = new \DateTime( 'NOW', new \DateTimeZone( 'Europe/Amsterdam' ) );
 		$id = R::store( $bean );
 		asrt( is_int( $id ), TRUE );
 		asrt( is_float( $bean->float ), TRUE );

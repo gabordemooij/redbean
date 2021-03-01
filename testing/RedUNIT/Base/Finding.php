@@ -257,7 +257,7 @@ class Finding extends Base {
 			asrt(count($book->noLoad()->ownPageList),2);
 			asrt($book->title,"book{$i}");
 			$pages = $book->noLoad()->ownPageList;
-			usort($pages, function($a,$b){ return $a->title > $b->title; });
+			usort($pages, function($a,$b){ return strcmp( $a->title, $b->title ); });
 			$first = reset($pages);
 			asrt( $first->title, "1/$i" );
 			$last = end($pages);

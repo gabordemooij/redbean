@@ -363,7 +363,7 @@ class Misc extends Blackhole
 			R::transaction( function () use ( $bean ) {
 				R::store( $bean );
 				R::transaction( function () {
-					throw new\Exception();
+					throw new \Exception();
 				} );
 			} );
 		} catch (\Exception $e ) {
@@ -376,7 +376,7 @@ class Misc extends Blackhole
 			R::transaction( function () use ( $bean ) {
 				R::transaction( function () use ( $bean ) {
 					R::store( $bean );
-					throw new\Exception();
+					throw new \Exception();
 				} );
 			} );
 		} catch (\Exception $e ) {

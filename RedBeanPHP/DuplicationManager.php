@@ -274,7 +274,7 @@ class DuplicationManager
 	public function camelfy( $array, $dolphinMode = FALSE ) {
 		$newArray = array();
 		foreach( $array as $key => $element ) {
-			$newKey = preg_replace_callback( '/_(\w)/', function( &$matches ){
+			$newKey = preg_replace_callback( '/_(\w)/', function( $matches ){
 				return strtoupper( $matches[1] );
 			}, $key);
 

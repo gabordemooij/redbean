@@ -3,6 +3,12 @@ language: php
 env:
     global:
         - XDEBUG_MODE=coverage
+        
+services:
+  - mysql
+  - postgresql
+
+
 matrix:
  include:
   - php: 5.3
@@ -23,6 +29,8 @@ matrix:
     dist: trusty
   - php: 7.4
     dist: trusty
+  - php: 8.0
+    dist: xenial
 
 
 before_script:

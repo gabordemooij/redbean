@@ -271,7 +271,7 @@ class Misc extends Base
 		asrt( ( $town->name == 'BeautyVille' ), TRUE );
 		testpack( 'Accept datetime objects.' );
 		$cal = R::dispense( 'calendar' );
-		$cal->when = new\DateTime( '2000-01-01', new\DateTimeZone( 'Pacific/Nauru' ) );
+		$cal->when = new \DateTime( '2000-01-01', new \DateTimeZone( 'Pacific/Nauru' ) );
 		asrt( $cal->when, '2000-01-01 00:00:00' );
 		testpack( 'Affected rows test' );
 		$currentDriver = $this->currentlyActiveDriverID;
