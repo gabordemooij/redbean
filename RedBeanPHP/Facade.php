@@ -3288,23 +3288,25 @@ class Facade
 	 * If the parameter is an array, the keys will be converted.
 	 *
 	 * @param string|array $snake snake_cased string to convert to camelCase
+	 * @param boolean $dolphin exception for Ids - (bookId -> bookID)
+	 *                         too complicated for the human mind, only dolphins can understand this
 	 *
 	 * @return string|array
 	 */
-	public static function camelfy( $snake )
+	public static function camelfy( $snake, $dolphin = false )
 	{
 		if ( is_array( $snake ) ) {
 			$newArray = array();
 			foreach( $snake as $key => $value ) {
-				$newKey = self::camelfy( $key );
+				$newKey = self::camelfy( $key, $dolphin );
 				if ( is_array( $value ) ) {
-					$value = self::camelfy( $value );
+					$value = self::camelfy( $value, $dolphin );
 				}
 				$newArray[ $newKey ] = $value;
 			}
 			return $newArray;
 		}
-		return AQueryWriter::snakeCamel( $snake );
+		return AQueryWriter::snakeCamel( $snake, $dolphin );
 	}
 
 	/**

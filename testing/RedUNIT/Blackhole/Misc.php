@@ -646,6 +646,15 @@ class Misc extends Blackhole
 		asrt( isset( $array['snakeCaseString']['dolphinCaseString'] ), TRUE );
 		$array = R::camelfy( array( 'one_two' => array( 'two_three' => array( 'three_four' => 1 ) ) ) );
 		asrt( isset( $array['oneTwo']['twoThree']['threeFour'] ), TRUE );
+		//Dolphin mode
+		asrt( AQueryWriter::snakeCamel('book_id', true), 'bookID' );
+		$array = R::camelfy( array( 'bookid' => array( 'page_id' => 3 )  ), true );
+		asrt( isset( $array['bookid']['pageID'] ), TRUE );
+		asrt( AQueryWriter::snakeCamel('book_id', true), 'bookID' );
+		$array = R::camelfy( array( 'book_id' => array( 'page_id' => 3 )  ), true );
+		asrt( isset( $array['bookID']['pageID'] ), TRUE );
+		$array = R::camelfy( array( 'book_ids' => array( 'page_id' => 3 )  ), true );
+		asrt( isset( $array['bookIds']['pageID'] ), TRUE );
 	}
 
 	/**

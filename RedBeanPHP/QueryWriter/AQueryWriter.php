@@ -264,13 +264,19 @@ abstract class AQueryWriter
 	 * Globally available service method for RedBeanPHP.
 	 * Converts a snake cased string to a camel cased string.
 	 *
-	 * @param string $snake snake_cased string to convert to camelCase
+	 * @param string  $snake   snake_cased string to convert to camelCase
+	 * @param boolean $dolphin exception for Ids - (bookId -> bookID)
+	 *                         too complicated for the human mind, only dolphins can understand this
 	 *
 	 * @return string
 	 */
-	public static function snakeCamel( $snake )
+	public static function snakeCamel( $snake, $dolphinMode = false )
 	{
-		return lcfirst( str_replace(' ', '', ucwords( str_replace('_', ' ', $snake ) ) ) );
+		$camel = lcfirst( str_replace(' ', '', ucwords( str_replace('_', ' ', $snake ) ) ) );
+		if ( $dolphinMode ) {
+			$camel = preg_replace( '/(\w)Id$/', '$1ID', $camel );
+		}
+		return $camel;
 	}
 
 	/**
