@@ -3,7 +3,7 @@ language: php
 env:
     global:
         - XDEBUG_MODE=coverage
-        
+
 services:
   - mysql
   - postgresql
