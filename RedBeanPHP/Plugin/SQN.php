@@ -12,8 +12,10 @@
  *
  * Usage:
  *
+ * <code>
  * R::sqn('shop<product<price'); - left joins shop, product and price
  * R::sqn('book<<tag'); - doubly left joins book, and tag using book_tag
+ * </code>
  *
  * SQN assumes id fields follow the following conventions:
  *
@@ -23,7 +25,9 @@
  *
  * SQN can also generate additional aliases:
  *
+ * <code>
  * R::sqn( ..., 'area/x,y;place/x,y' ) - area_x area_y place_x place_y
+ * </code>
  *
  * @author  Gabor de Mooij
  * @license BSD/GPLv2

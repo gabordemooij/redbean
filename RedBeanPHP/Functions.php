@@ -79,6 +79,13 @@ if ( !function_exists( 'array_flatten' ) ) {
 
 /**
  * Function pstr() generates [ $value, \PDO::PARAM_STR ]
+ * Ensures that your parameter is being treated as a string.
+ *
+ * Usage:
+ *
+ * <code>
+ * R::find('book', 'title = ?', [ pstr('1') ]);
+ * </code>
  */
 if ( !function_exists( 'pstr' ) ) {
 
@@ -91,6 +98,13 @@ if ( !function_exists( 'pstr' ) ) {
 
 /**
  * Function pint() generates [ $value, \PDO::PARAM_INT ]
+ * Ensures that your parameter is being treated as an integer.
+ *
+ * Usage:
+ *
+ * <code>
+ * R::find('book', ' pages > ? ', [ pint(2) ] );
+ * </code>
  */
 if ( !function_exists( 'pint' ) ) {
 
