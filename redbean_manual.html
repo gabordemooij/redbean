@@ -1581,7 +1581,7 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 <?php code("
 	\$beans = R::findMulti( 'book,page', '
 		SELECT book.*, page.* FROM book
-		INNER JOIN page.book_id = book.id
+		INNER JOIN page ON page.book_id = book.id
 		WHERE book.category = ?
 	', [ \$cat] );
 "); ?>
