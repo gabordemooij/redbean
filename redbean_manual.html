@@ -1517,6 +1517,7 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	You can also use find with cursors:
 </p>
 <?php code("
+	\R::getPDO()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
 	\$collection = R::findCollection( 'page', ' ORDER BY content ASC LIMIT 5 ' );
 	while( \$item = \$collection->next() ) {
 		...
@@ -1526,6 +1527,7 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	Or directly
 </p>
 <?php code("
+	R::getPDO()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
 	\$cursor = R::getCursor('SELECT * FROM `book` WHERE < :rating LIMIT 5', [ ':rating' => 2 ]);
 	while(\$row = \$cursor->getNextItem()){	    
 	    ...
