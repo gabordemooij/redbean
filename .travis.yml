@@ -31,8 +31,6 @@ matrix:
     dist: trusty
   - php: 8.0
     dist: xenial
-  - php: 8.1
-    dist: focal
 
 
 before_script:
