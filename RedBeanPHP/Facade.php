@@ -985,6 +985,9 @@ class Facade
 	 * @param array  $bindings array of values to be bound to parameters in query
 	 * @param string $snippet  SQL snippet to include in query (for example: FOR UPDATE)
 	 *
+	 * @phpstan-param literal-string|null $sql
+	 * @psalm-param   literal-string|null $sql
+	 *
 	 * @return array
 	 */
 	public static function find( $type, $sql = NULL, $bindings = array(), $snippet = NULL )
