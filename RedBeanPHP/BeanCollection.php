@@ -46,19 +46,26 @@ class BeanCollection
 	protected $type = NULL;
 
 	/**
+	 * @var string
+	 */
+	protected $mask = NULL;
+
+	/**
 	 * Constructor, creates a new instance of the BeanCollection.
 	 *
 	 * @param string     $type       type of beans in this collection
 	 * @param Repository $repository repository to use to generate bean objects
 	 * @param Cursor     $cursor     cursor object to use
+	 * @param string     $mask       meta mask to apply (optional)
 	 *
 	 * @return void
 	 */
-	public function __construct( $type, Repository $repository, Cursor $cursor )
+	public function __construct( $type, Repository $repository, Cursor $cursor, $mask = '__meta' )
 	{
 		$this->type = $type;
 		$this->cursor = $cursor;
 		$this->repository = $repository;
+		$this->mask = $mask;
 	}
 
 	/**
@@ -73,7 +80,7 @@ class BeanCollection
 	{
 		$row = $this->cursor->getNextItem();
 		if ( $row ) {
-			$beans = $this->repository->convertToBeans( $this->type, array( $row ) );
+			$beans = $this->repository->convertToBeans( $this->type, array( $row ), $this->mask );
 			return reset( $beans );
 		}
 		return NULL;
