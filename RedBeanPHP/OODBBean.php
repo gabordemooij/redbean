@@ -477,7 +477,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return ArrayIterator
 	 */
-	 #[ReturnTypeWillChange]
+	 #[\ReturnTypeWillChange]
 	public function getIterator()
 	{
 		return new \ArrayIterator( $this->properties );
@@ -1471,7 +1471,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return void
 	 */
-	 #[ReturnTypeWillChange]
+	 #[\ReturnTypeWillChange]
 	public function offsetSet( $offset, $value )
 	{
 		$this->__set( $offset, $value );
@@ -1489,7 +1489,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return boolean
 	 */
-	 #[ReturnTypeWillChange]
+	 #[\ReturnTypeWillChange]
 	public function offsetExists( $offset )
 	{
 		return $this->__isset( $offset );
@@ -1508,7 +1508,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return void
 	 */
-	 #[ReturnTypeWillChange]
+	 #[\ReturnTypeWillChange]
 	public function offsetUnset( $offset )
 	{
 		$this->__unset( $offset );
@@ -1527,7 +1527,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return mixed
 	 */
-	 #[ReturnTypeWillChange]
+	 #[\ReturnTypeWillChange]
 	public function &offsetGet( $offset )
 	{
 		return $this->__get( $offset );
@@ -1668,7 +1668,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return integer
 	 */
-	 #[ReturnTypeWillChange]
+	 #[\ReturnTypeWillChange]
 	public function count()
 	{
 		return count( $this->properties );
@@ -2276,7 +2276,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return array
 	 */
-	 #[ReturnTypeWillChange]
+	 #[\ReturnTypeWillChange]
 	public function jsonSerialize()
 	{
 		$json = $this->__call( '@__jsonSerialize', array( ) );

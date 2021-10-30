@@ -187,7 +187,11 @@ class RPDO implements Driver
 					$this->resultArray = array();
 					return $statement;
 				}
-				$this->resultArray = $statement->fetchAll( $fetchStyle );
+				if ( is_null( $fetchStyle) ) {
+					$this->resultArray = $statement->fetchAll();
+				} else {
+					$this->resultArray = $statement->fetchAll( $fetchStyle );
+				}
 				if ( $this->loggingEnabled && $this->logger ) {
 					$this->logger->log( 'resultset: ' . count( $this->resultArray ) . ' rows' );
 				}
