@@ -147,6 +147,11 @@ class Facade
 	public static $toolboxes = array();
 
 	/**
+	 * @var array
+	 */
+	public static $toolboxModelPrefixes = array();
+
+	/**
 	 * Internal Query function, executes the desired query. Used by
 	 * all facade query functions. This keeps things DRY.
 	 *
@@ -280,6 +285,10 @@ class Facade
 		if ( is_null( $dsn ) ) {
 			$dsn = 'sqlite:' . DIRECTORY_SEPARATOR . sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'red.db';
 		}
+
+		self::$toolboxModelPrefixes['default'] = defined('REDBEAN_MODEL_PREFIX')
+			? REDBEAN_MODEL_PREFIX
+			'\\Model_';
 
 		self::addDatabase( 'default', $dsn, $username, $password, $frozen, $partialBeans, $options );
 		self::selectDatabase( 'default' );
@@ -420,6 +429,7 @@ class Facade
 
 		// Set the model prefix:
 		self::$modelPrefix = $modelPrefix;
+		self::$toolboxModelPrefixes[$key] = $modelPrefix;
 
 		self::$toolboxes[$key] = self::createToolbox($dsn, $user, $pass, $frozen, $partialBeans, $options);
 	}
@@ -471,8 +481,8 @@ class Facade
 	 *
 	 * @return ToolBox
 	 */
-  public static function createToolbox( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
-  {
+  	public static function createToolbox( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
+  	{
 		if ( is_object($dsn) ) {
 			$db  = new RPDO( $dsn );
 			$dbType = $db->getDatabaseType();
@@ -544,6 +554,11 @@ class Facade
 		if ( !isset( self::$toolboxes[$key] ) ) {
 			throw new RedException( 'Database not found in registry. Add database using R::addDatabase().' );
 		}
+
+		// Set the model prefix:
+		self::setModelPrefix(
+			self::$toolboxModelPrefixes[$key]
+		);
 
 		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 		self::$currentDB = $key;
