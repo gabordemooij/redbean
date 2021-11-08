@@ -288,7 +288,7 @@ class Facade
 
 		self::$toolboxModelPrefixes['default'] = defined('REDBEAN_MODEL_PREFIX')
 			? REDBEAN_MODEL_PREFIX
-			'\\Model_';
+			: '\\Model_';
 
 		self::addDatabase( 'default', $dsn, $username, $password, $frozen, $partialBeans, $options );
 		self::selectDatabase( 'default' );
