@@ -433,7 +433,7 @@ class Facade
 	 * 
 	 * @return void
 	 */
-	public static function setModelPrefix( ?string $prefix = null )
+	public static function setModelPrefix( $prefix = null )
 	{
 		self::$modelPrefix = $prefix;
 	}
