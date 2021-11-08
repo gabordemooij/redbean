@@ -73,7 +73,16 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	public function getModelForBean( OODBBean $bean )
 	{
 		$model     = $bean->getMeta( 'type' );
-		$prefix    = defined( 'REDBEAN_MODEL_PREFIX' ) ? REDBEAN_MODEL_PREFIX : '\\Model_';
+
+		// The prefix has not been explicltly set on the Facade, or is set to default:
+		if ((Facade::$modelPrefix == NULL || Facade::$modelPrefix == 'default' || empty(Facade::$modelPrefix))) {
+			$prefix = defined('REDBEAN_MODEL_PREFIX') 
+				? REDBEAN_MODEL_PREFIX 
+				: '\\Model_';
+		}
+		else {
+			$prefix = Facade::$modelPrefix;
+		}
 
 		if ( strpos( $model, '_' ) !== FALSE ) {
 			$modelParts = explode( '_', $model );

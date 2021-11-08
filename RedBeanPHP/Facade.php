@@ -137,6 +137,11 @@ class Facade
 	public static $currentDB = '';
 
 	/**
+	 * @var string
+	 */
+	public static $modelPrefix = NULL;
+
+	/**
 	 * @var array
 	 */
 	public static $toolboxes = array();
@@ -396,21 +401,41 @@ class Facade
 	 * This method allows you to dynamically add (and select) new databases
 	 * to the facade. Adding a database with the same key will cause an exception.
 	 *
-	 * @param string      $key    ID for the database
-	 * @param string      $dsn    DSN for the database
-	 * @param string      $user   user for connection
-	 * @param NULL|string $pass   password for connection
-	 * @param bool        $frozen whether this database is frozen or not
+	 * @param string      $key    		ID for the database
+	 * @param string      $dsn    		DSN for the database
+	 * @param string      $user   		user for connection
+	 * @param NULL|string $pass   		password for connection
+	 * @param bool        $frozen 		whether this database is frozen or not
+	 * @param bool 		  $partialBeans should we load partial beans?
+	 * @param array		  $options		additional options for the query writer
+	 * @param NULL|string $modelPrefix	model prefix to be used with this database
 	 *
 	 * @return void
 	 */
-	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
+	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array(), $modelPrefix = NULL )
 	{
 		if ( isset( self::$toolboxes[$key] ) ) {
 			throw new RedException( 'A database has already been specified for this key.' );
 		}
 
+		// Set the model prefix:
+		self::$modelPrefix = $modelPrefix;
+
 		self::$toolboxes[$key] = self::createToolbox($dsn, $user, $pass, $frozen, $partialBeans, $options);
+	}
+
+	/**
+	 * Sets the model prefix to be used by RedBean explicitly. This can be useful
+	 * when dealing with legacy code where don't want to manage the namespacing 
+	 * of models through the database management
+	 * 
+	 * @param NULL|string $prefix	the model prefix to set.
+	 * 
+	 * @return void
+	 */
+	public static function setModelPrefix( ?string $prefix = null )
+	{
+		self::$modelPrefix = $prefix;
 	}
 
 	/**
