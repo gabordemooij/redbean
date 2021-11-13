@@ -3,7 +3,7 @@
 namespace RedBeanPHP;
 
 /**
- * R-Facade (for Composer)
+ * R-Facade
  *
  * If you use Composer you don't use the rb.php file which
  * has the R-facade, so here is a separate, namespaced R-facade for
