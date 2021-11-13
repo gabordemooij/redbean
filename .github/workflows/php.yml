@@ -1,0 +1,61 @@
+name: RedBeanPHP
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: "oodb"
+          MYSQL_HOST: "127.0.0.1"
+          MYSQL_ROOT_PASSWORD: "root"
+          MYSQL_PASSWORD: "root"
+        ports:
+            - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      postgres:
+        image: postgres:10.10
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: oodb
+        ports:
+          - 5432/tcp
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    
+    strategy:
+      matrix:
+       include:
+         - php-version: 8.0
+        
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build with Replica2
+      run: php replica2.php onlyphp
+    
+    - name: Copy Artifact to Container
+      run: cp rb.php testing/cli/testcontainer/rb.php
+      
+    - name: Create SQLite Database
+      run: touch /tmp/oodb.db
+    
+    - name: Create MySQL Database
+      run: |
+        sudo systemctl start mysql.service
+    
+    - name: Create Postgres Database
+      run: |
+        sudo systemctl start postgresql.service
+
+    - name: Navigate to Test Suite
+      run: cd testing/cli ; php runtests.php

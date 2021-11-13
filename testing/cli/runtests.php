@@ -23,9 +23,11 @@ error_reporting( E_ALL );
 
 //Load configuration file
 if ( file_exists( 'config/test.ini' ) ) {
+	echo "USE Local Config\n";
 	$ini = parse_ini_file( "config/test.ini", TRUE );
 	$travis = FALSE;
 } elseif ( file_exists( 'config/test-travis.ini' ) ) {
+	echo "USE CI Config\n";
 	$ini = parse_ini_file( "config/test-travis.ini", TRUE );
 	$travis = TRUE;
 } else {
@@ -72,8 +74,8 @@ $colorMap = array(
 
 //Configure the databases
 if ( isset( $ini['mysql'] ) ) {
-	$dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']}";
-
+	$dsn = "mysql:host={$ini['mysql']['host']};dbname={$ini['mysql']['schema']};port={$ini['mysql']['port']}";
+	var_dump($ini);
 	R::addDatabase( 'mysql', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
 	R::addDatabase( 'mysqlc', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
 	R::addDatabase( 'mysqlc2', $dsn, $ini['mysql']['user'], $ini['mysql']['pass'], FALSE );
