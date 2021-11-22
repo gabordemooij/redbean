@@ -1250,7 +1250,7 @@ class Facade
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
-	 * @return RedBeanPHP\Cursor\PDOCursor
+	 * @return Cursor\PDOCursor
 	 */
 	public static function getCursor( $sql, $bindings = array() )
 	{
