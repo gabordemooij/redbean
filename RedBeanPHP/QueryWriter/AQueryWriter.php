@@ -866,6 +866,10 @@ abstract class AQueryWriter
 	{
 		static $snippetCache = array();
 
+		if ( is_null( $sql ) ) {
+			return '';
+		}
+
 		if ( trim( $sql ) === '' ) {
 			return $sql;
 		}
