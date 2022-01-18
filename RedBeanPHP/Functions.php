@@ -113,3 +113,22 @@ if ( !function_exists( 'pint' ) ) {
 		return array( intval( $value ) , \PDO::PARAM_INT );
 	}
 }
+
+/**
+ * Function DBPrefix() is a simple function to allow you to
+ * quickly set a different namespace for FUSE model resolution
+ * per database connection. It works by creating a new DynamicBeanHelper
+ * with the specified string as model prefix.
+ *
+ * Usage:
+ *
+ * <code>
+ * R::addDatabase( ..., DBPrefix( 'Prefix1_' )  );
+ * </code>
+ */
+if ( !function_exists( 'DBPrefix' ) ) {
+
+	function DBPrefix( $prefix = '\\Model' ) {
+		return new \RedBeanPHP\BeanHelper\DynamicBeanHelper( $prefix );
+	}
+}

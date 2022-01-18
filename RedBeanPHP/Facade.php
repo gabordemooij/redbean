@@ -137,19 +137,9 @@ class Facade
 	public static $currentDB = '';
 
 	/**
-	 * @var string
-	 */
-	public static $modelPrefix = NULL;
-
-	/**
 	 * @var array
 	 */
 	public static $toolboxes = array();
-
-	/**
-	 * @var array
-	 */
-	public static $toolboxModelPrefixes = array();
 
 	/**
 	 * Internal Query function, executes the desired query. Used by
@@ -286,10 +276,6 @@ class Facade
 			$dsn = 'sqlite:' . DIRECTORY_SEPARATOR . sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'red.db';
 		}
 
-		self::$toolboxModelPrefixes['default'] = defined('REDBEAN_MODEL_PREFIX')
-			? REDBEAN_MODEL_PREFIX
-			: '\\Model_';
-
 		self::addDatabase( 'default', $dsn, $username, $password, $frozen, $partialBeans, $options );
 		self::selectDatabase( 'default' );
 
@@ -417,35 +403,21 @@ class Facade
 	 * @param bool        $frozen 		whether this database is frozen or not
 	 * @param bool 		  $partialBeans should we load partial beans?
 	 * @param array		  $options		additional options for the query writer
-	 * @param NULL|string $modelPrefix	model prefix to be used with this database
+	 * @param BeanHelper  $beanHelper	Beanhelper to use (use this for DB specific model prefixes)
 	 *
 	 * @return void
 	 */
-	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array(), $modelPrefix = NULL )
+	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array(), $beanHelper = NULL )
 	{
 		if ( isset( self::$toolboxes[$key] ) ) {
 			throw new RedException( 'A database has already been specified for this key.' );
 		}
 
-		// Set the model prefix:
-		self::$modelPrefix = $modelPrefix;
-		self::$toolboxModelPrefixes[$key] = $modelPrefix;
-
 		self::$toolboxes[$key] = self::createToolbox($dsn, $user, $pass, $frozen, $partialBeans, $options);
-	}
 
-	/**
-	 * Sets the model prefix to be used by RedBean explicitly. This can be useful
-	 * when dealing with legacy code where don't want to manage the namespacing 
-	 * of models through the database management
-	 * 
-	 * @param NULL|string $prefix	the model prefix to set.
-	 * 
-	 * @return void
-	 */
-	public static function setModelPrefix( $prefix = null )
-	{
-		self::$modelPrefix = $prefix;
+		if ( !is_null( $beanHelper ) ) {
+			self::$toolboxes[$key]->getRedBean()->setBeanHelper( $beanHelper );
+		}
 	}
 
 	/**
@@ -481,8 +453,8 @@ class Facade
 	 *
 	 * @return ToolBox
 	 */
-  	public static function createToolbox( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
-  	{
+	public static function createToolbox( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
+	{
 		if ( is_object($dsn) ) {
 			$db  = new RPDO( $dsn );
 			$dbType = $db->getDatabaseType();
@@ -555,10 +527,6 @@ class Facade
 			throw new RedException( 'Database not found in registry. Add database using R::addDatabase().' );
 		}
 
-		// Set the model prefix:
-		self::setModelPrefix(
-			self::$toolboxModelPrefixes[$key]
-		);
 
 		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 		self::$currentDB = $key;
