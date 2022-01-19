@@ -3589,6 +3589,10 @@ To <b>fetch all tags</b> attached to a certain bean we use the same method but w
 	<br>
 	To create a model for your bean, simply add a class like this:
 </p>
+<p class="note">
+	R::store() will not invoke FUSE-methods if nothing has changed.
+        In fact, store() will do nothing but return the ID if no changes have to be processed.
+</p>
 <?php
 code("
 	//with classic namespace style
