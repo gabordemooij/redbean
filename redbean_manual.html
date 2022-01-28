@@ -2237,6 +2237,11 @@ echo code("
 	all the pending database changes.
 </p>
 
+<p class="note">
+	If you use caching, don't forget to call R::getWriter()->flushCache(); after rolling back!
+	Otherwise, the database cache might still return old data.
+</p>
+
 <h2>Transaction closure</h2>
 <p>
 	You can also use this variation:
