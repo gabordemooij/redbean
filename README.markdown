@@ -46,7 +46,7 @@ It is important to note that when using RedBeanPHP with Composer, there are some
 ```php
 use \RedBeanPHP\R;
 
-class Model_User extends \RedBeanPHP\SimpleModel
+class User extends \RedBeanPHP\SimpleModel
 {
     ...
 }
