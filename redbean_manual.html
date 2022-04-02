@@ -150,7 +150,7 @@ Finding stuff in the database is <b>easy</b>:
 </p>
 <?php code("
 	\$posts = R::find(
-	'post', ' title LIKE ?', [ 'holiday' ] );
+	'post', ' title LIKE ?', [ '%holiday%' ] );
 ");?>
 <p>
 This will <b>search</b> for all posts have the word 'holiday' in the title and will
