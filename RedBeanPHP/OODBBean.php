@@ -548,6 +548,21 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
+	 * Same as import() but trims all values by default.
+	 * Set the second parameter to apply a different function.
+	 *
+	 * @param array        $array     what you want to import
+	 * @param string       $function  function to apply (default is trim)
+	 * @param string|array $selection selection of values
+	 * @param boolean      $notrim    if TRUE selection keys will NOT be trimmed
+	 *
+	 * @return OODBBean
+	 */
+	public function trimport( $array, $function='trim', $selection = FALSE, $notrim = FALSE ) {
+		return $this->import( array_map( $function, $array ), $selection, $notrim );
+	}
+
+	/**
 	* Imports an associative array directly into the
 	* internal property array of the bean as well as the
 	* meta property sys.orig and sets the changed flag to FALSE.

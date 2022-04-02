@@ -31,6 +31,21 @@ use RedBeanPHP\Driver\RPDO;
 class Bean extends Base
 {
 	/**
+	 * Test whether we can use trimport().
+	 */
+	public function testTrimport()
+	{
+		$array = ['greeting'=>' hello ', 'to'=>'	world	'];
+		$bean = R::dispense('greeting');
+		$bean->trimport($array);
+		asrt($bean->greeting,'hello');
+		asrt($bean->to,'world');
+		$bean->trimport($bean->export(), 'strtoupper');
+		asrt($bean->greeting,'HELLO');
+		asrt($bean->to,'WORLD');
+	}
+
+	/**
 	 * Test whether we can use findFromSQL to extract beans
 	 * from the result of an SQL query.
 	 */
