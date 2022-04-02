@@ -35,7 +35,7 @@ class Bean extends Base
 	 */
 	public function testTrimport()
 	{
-		$array = ['greeting'=>' hello ', 'to'=>'	world	'];
+		$array = array('greeting'=>' hello ', 'to'=>'	world	');
 		$bean = R::dispense('greeting');
 		$bean->trimport($array);
 		asrt($bean->greeting,'hello');
