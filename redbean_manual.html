@@ -1281,7 +1281,23 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 <p>
 	You can use R::isoDate() and R::isoDateTime()
 	to generate the current date(time) if you like.
+	DateTime object are automatically converted to strings.
 </p>
+
+<?php code("
+	\$meeting->when = DateTime('1995-12-05'); //Becomes string
+");?>
+
+<p>
+	As of RedBeanPHP 5.7.2 you can tell RedBeanPHP to automatically
+	return a property value as an object (like DateTime) using the asClass() method,
+	where 'Class' is the class you want to use to wrap the value in:
+</p>
+
+<?php code("
+	echo \$meeting->asDateTime()->when->format('Y-m-d');
+");?>
+
 
 <p class="note">
 	As of RedBeanPHP 4.1 you can also use spatial columns for
@@ -4056,6 +4072,18 @@ code("
 	Note that this does not apply any form of <b>validation</b> to the bean.
 	Validation rules have to be written in the <i>model</i> or the <i>controller</i>.
 </p>
+
+<p class="note">
+	As of RedBeanPHP 5.7.2 you can use trimport() to automatically trim the values.
+        The 2nd parameter of trimport() can be used to define a different function to apply.
+        The rest of the parameters are the same as import().
+</p>
+
+<?php code("
+    \$book->trimport( \$_POST ); //trim values
+    \$book->trimport( \$_POST, 'strtoupper' ); //uppercase values
+");?>
+
 <p>
 	To import from another bean:
 </p>
