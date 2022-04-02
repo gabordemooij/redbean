@@ -1288,7 +1288,7 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	\$meeting->when = DateTime('1995-12-05'); //Becomes string
 ");?>
 
-<p>
+<p id="asobj">
 	As of RedBeanPHP 5.7.2 you can tell RedBeanPHP to automatically
 	return a property value as an object (like DateTime) using the asClass() method,
 	where 'Class' is the class you want to use to wrap the value in:
@@ -4073,7 +4073,7 @@ code("
 	Validation rules have to be written in the <i>model</i> or the <i>controller</i>.
 </p>
 
-<p class="note">
+<p class="note" id="trimport">
 	As of RedBeanPHP 5.7.2 you can use trimport() to automatically trim the values.
         The 2nd parameter of trimport() can be used to define a different function to apply.
         The rest of the parameters are the same as import().
