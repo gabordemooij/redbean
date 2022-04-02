@@ -422,9 +422,9 @@ class Facade
 
 	/**
 	 * Creates a toolbox. This method can be called if you want to use redbean non-static.
-   * It has the same interface as R::setup(). The createToolbx() method can be called
-   * without any arguments, in this case it will try to create a SQLite database in
-   * /tmp called red.db (this only works on UNIX-like systems).
+	 * It has the same interface as R::setup(). The createToolbx() method can be called
+	 * without any arguments, in this case it will try to create a SQLite database in
+	 * /tmp called red.db (this only works on UNIX-like systems).
 	 *
 	 * Usage:
 	 *
