@@ -3654,6 +3654,16 @@ code("
 	try to connect to 'Book_Page'.
 </p>
 
+<p id="dbprefix">
+	As of RedBeanPHP 5.7.2 you can also use different namespaces per
+	database:
+</p>
+
+<?php code("
+	R::addDatabase( ..., DBPrefix( 'Prefix1_' )  );
+	R::addDatabase( ..., DBPrefix( 'Prefix2_' )  );
+");?>
+
 <h2>Scoping rules</h2>
 <p>
 	Within the model, the <b>$this-&gt;bean</b> variable refers to the bean.
@@ -3818,6 +3828,20 @@ code("
 	As of RedBeanPHP 5.2 models can also return jsonSerialized objects by implementing
 	the __jsonSerialize method (will override the default OODB implementation.
 </p>
+
+<p id="typedmodel">
+	As of RedBeanPHP 5.7.2 you can also use the TypedModel instead of the SimpleModel
+	to make use of PHP 8 type hinting features:
+</p>
+
+<?php code("
+	define( 'REDBEAN_MODEL_PREFIX', '\\' );
+ 	R::setup();
+ 	class Book extends \RedBeanPHP\TypedModel { }
+ 	\$book = R::dispense('book');
+ 	\$book = Book::cast(\$book);
+ 	var_dump( \$book ); //and you'll see Book...
+"); ?>
 
 <h1>Meta data</h1>
 <p>
