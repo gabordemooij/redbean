@@ -3835,9 +3835,7 @@ code("
 </p>
 
 <?php code("
-	define( 'REDBEAN_MODEL_PREFIX', '\\' );
- 	R::setup();
- 	class Book extends \RedBeanPHP\TypedModel { }
+	class Book extends \RedBeanPHP\TypedModel { }
  	\$book = R::dispense('book');
  	\$book = Book::cast(\$book);
  	var_dump( \$book ); //and you'll see Book...
