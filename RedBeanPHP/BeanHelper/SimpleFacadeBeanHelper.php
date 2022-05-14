@@ -82,6 +82,10 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 * Resolves the model associated with the bean using the model name (type),
 	 * the prefix and the bean.
 	 *
+	 * @note
+	 * If REDBEAN_CLASS_AUTOLOAD is defined this will be passed to class_exist as
+	 * autoloading flag.
+	 *
 	 * @param string   $prefix Prefix to use for resolution
 	 * @param string   $model  Type name
 	 * @param OODBBean $bean   Bean to resolve model for
@@ -89,6 +93,10 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 * @return SimpleModel|CustomModel|NULL
 	 */
 	protected function resolveModel($prefix, $model, $bean) {
+
+		/* Determine autoloading preference */
+		$autoloadFlag = ( defined( 'REDBEAN_CLASS_AUTOLOAD' ) ? REDBEAN_CLASS_AUTOLOAD : TRUE );
+
 		if ( strpos( $model, '_' ) !== FALSE ) {
 			$modelParts = explode( '_', $model );
 			$modelName = '';
@@ -98,13 +106,13 @@ class SimpleFacadeBeanHelper implements BeanHelper
 			$modelName = $prefix . $modelName;
 			if ( !class_exists( $modelName ) ) {
 				$modelName = $prefix . ucfirst( $model );
-				if ( !class_exists( $modelName ) ) {
+				if ( !class_exists( $modelName, $autoloadFlag ) ) {
 					return NULL;
 				}
 			}
 		} else {
 			$modelName = $prefix . ucfirst( $model );
-			if ( !class_exists( $modelName ) ) {
+			if ( !class_exists( $modelName, $autoloadFlag ) ) {
 				return NULL;
 			}
 		}
