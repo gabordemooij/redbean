@@ -59,6 +59,7 @@ addFile( DIR . 'Finder.php' );
 addFile( DIR . 'AssociationManager.php' );
 addFile( DIR . 'BeanHelper.php' );
 addFile( DIR . 'BeanHelper/SimpleFacadeBeanHelper.php' );
+addFile( DIR . 'BeanHelper/DynamicBeanHelper.php' );
 addFile( DIR . 'SimpleModel.php' );
 addFile( DIR . 'SimpleModelHelper.php' );
 addFile( DIR . 'TagManager.php' );

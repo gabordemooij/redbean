@@ -79,6 +79,13 @@ if ( !function_exists( 'array_flatten' ) ) {
 
 /**
  * Function pstr() generates [ $value, \PDO::PARAM_STR ]
+ * Ensures that your parameter is being treated as a string.
+ *
+ * Usage:
+ *
+ * <code>
+ * R::find('book', 'title = ?', [ pstr('1') ]);
+ * </code>
  */
 if ( !function_exists( 'pstr' ) ) {
 
@@ -91,11 +98,37 @@ if ( !function_exists( 'pstr' ) ) {
 
 /**
  * Function pint() generates [ $value, \PDO::PARAM_INT ]
+ * Ensures that your parameter is being treated as an integer.
+ *
+ * Usage:
+ *
+ * <code>
+ * R::find('book', ' pages > ? ', [ pint(2) ] );
+ * </code>
  */
 if ( !function_exists( 'pint' ) ) {
 
 	function pint( $value )
 	{
 		return array( intval( $value ) , \PDO::PARAM_INT );
+	}
+}
+
+/**
+ * Function DBPrefix() is a simple function to allow you to
+ * quickly set a different namespace for FUSE model resolution
+ * per database connection. It works by creating a new DynamicBeanHelper
+ * with the specified string as model prefix.
+ *
+ * Usage:
+ *
+ * <code>
+ * R::addDatabase( ..., DBPrefix( 'Prefix1_' )  );
+ * </code>
+ */
+if ( !function_exists( 'DBPrefix' ) ) {
+
+	function DBPrefix( $prefix = '\\Model' ) {
+		return new \RedBeanPHP\BeanHelper\DynamicBeanHelper( $prefix );
 	}
 }

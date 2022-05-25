@@ -75,6 +75,20 @@ class SimpleFacadeBeanHelper implements BeanHelper
 		$model     = $bean->getMeta( 'type' );
 		$prefix    = defined( 'REDBEAN_MODEL_PREFIX' ) ? REDBEAN_MODEL_PREFIX : '\\Model_';
 
+		return $this->resolveModel($prefix, $model, $bean);
+	}
+
+	/**
+	 * Resolves the model associated with the bean using the model name (type),
+	 * the prefix and the bean.
+	 *
+	 * @param string   $prefix Prefix to use for resolution
+	 * @param string   $model  Type name
+	 * @param OODBBean $bean   Bean to resolve model for
+	 *
+	 * @return SimpleModel|CustomModel|NULL
+	 */
+	protected function resolveModel($prefix, $model, $bean) {
 		if ( strpos( $model, '_' ) !== FALSE ) {
 			$modelParts = explode( '_', $model );
 			$modelName = '';

@@ -31,6 +31,21 @@ use RedBeanPHP\Driver\RPDO;
 class Bean extends Base
 {
 	/**
+	 * Test whether we can use trimport().
+	 */
+	public function testTrimport()
+	{
+		$array = array('greeting'=>' hello ', 'to'=>'	world	');
+		$bean = R::dispense('greeting');
+		$bean->trimport($array);
+		asrt($bean->greeting,'hello');
+		asrt($bean->to,'world');
+		$bean->trimport($bean->export(), 'strtoupper');
+		asrt($bean->greeting,'HELLO');
+		asrt($bean->to,'WORLD');
+	}
+
+	/**
 	 * Test whether we can use findFromSQL to extract beans
 	 * from the result of an SQL query.
 	 */
@@ -313,6 +328,11 @@ class Bean extends Base
 		 $dateTime = '1980-01-01 10:11:12';
 		 $bean->date = new \DateTime( $dateTime );
 		 asrt( $bean->date, $dateTime );
+		 R::store( $bean );
+		 $bean = $bean->fresh();
+		 asrt( ($bean->date instanceof \DateTime), FALSE );
+		 asrt( ($bean->asDateTime()->date instanceof \DateTime), TRUE );
+		 asrt( $bean->asDateTime()->date->format('Y-m-d H:i:s'), $dateTime );
 	 }
 
 	/**

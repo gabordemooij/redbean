@@ -187,7 +187,11 @@ class RPDO implements Driver
 					$this->resultArray = array();
 					return $statement;
 				}
-				$this->resultArray = $statement->fetchAll( $fetchStyle );
+				if ( is_null( $fetchStyle) ) {
+					$this->resultArray = $statement->fetchAll();
+				} else {
+					$this->resultArray = $statement->fetchAll( $fetchStyle );
+				}
 				if ( $this->loggingEnabled && $this->logger ) {
 					$this->logger->log( 'resultset: ' . count( $this->resultArray ) . ' rows' );
 				}
@@ -510,7 +514,7 @@ class RPDO implements Driver
 		if ( isset($options['runInitCode']) )   $runInitCode   = $options['runInitCode'];
 		if ( isset($options['stringFetch']) )   $stringFetch   = $options['stringFetch'];
 
-		if ($connected) $this->connected = $connected;
+		if ($connected) $this->isConnected = $connected;
 		if ($setEncoding) $this->setEncoding();
 		if ($setAttributes) {
 			$this->pdo->setAttribute( \PDO::ATTR_ERRMODE,\PDO::ERRMODE_EXCEPTION );

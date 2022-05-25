@@ -29,7 +29,7 @@ use RedBeanPHP\Util\Feature;
  * RedBean Facade
  *
  * Version Information
- * RedBean Version @version 5.6
+ * RedBean Version @version 5.7
  *
  * This class hides the object landscape of
  * RedBeanPHP behind a single letter class providing
@@ -49,7 +49,7 @@ class Facade
 	/**
 	 * RedBeanPHP version constant.
 	 */
-	const C_REDBEANPHP_VERSION = '5.6';
+	const C_REDBEANPHP_VERSION = '5.7';
 
 	/**
 	 * @var ToolBox
@@ -396,28 +396,35 @@ class Facade
 	 * This method allows you to dynamically add (and select) new databases
 	 * to the facade. Adding a database with the same key will cause an exception.
 	 *
-	 * @param string      $key    ID for the database
-	 * @param string      $dsn    DSN for the database
-	 * @param string      $user   user for connection
-	 * @param NULL|string $pass   password for connection
-	 * @param bool        $frozen whether this database is frozen or not
+	 * @param string      $key    		ID for the database
+	 * @param string      $dsn    		DSN for the database
+	 * @param string      $user   		user for connection
+	 * @param NULL|string $pass   		password for connection
+	 * @param bool        $frozen 		whether this database is frozen or not
+	 * @param bool 		  $partialBeans should we load partial beans?
+	 * @param array		  $options		additional options for the query writer
+	 * @param BeanHelper  $beanHelper	Beanhelper to use (use this for DB specific model prefixes)
 	 *
 	 * @return void
 	 */
-	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
+	public static function addDatabase( $key, $dsn, $user = NULL, $pass = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array(), $beanHelper = NULL )
 	{
 		if ( isset( self::$toolboxes[$key] ) ) {
 			throw new RedException( 'A database has already been specified for this key.' );
 		}
 
 		self::$toolboxes[$key] = self::createToolbox($dsn, $user, $pass, $frozen, $partialBeans, $options);
+
+		if ( !is_null( $beanHelper ) ) {
+			self::$toolboxes[$key]->getRedBean()->setBeanHelper( $beanHelper );
+		}
 	}
 
 	/**
 	 * Creates a toolbox. This method can be called if you want to use redbean non-static.
-   * It has the same interface as R::setup(). The createToolbx() method can be called
-   * without any arguments, in this case it will try to create a SQLite database in
-   * /tmp called red.db (this only works on UNIX-like systems).
+	 * It has the same interface as R::setup(). The createToolbx() method can be called
+	 * without any arguments, in this case it will try to create a SQLite database in
+	 * /tmp called red.db (this only works on UNIX-like systems).
 	 *
 	 * Usage:
 	 *
@@ -446,8 +453,8 @@ class Facade
 	 *
 	 * @return ToolBox
 	 */
-  public static function createToolbox( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
-  {
+	public static function createToolbox( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
+	{
 		if ( is_object($dsn) ) {
 			$db  = new RPDO( $dsn );
 			$dbType = $db->getDatabaseType();
@@ -519,6 +526,7 @@ class Facade
 		if ( !isset( self::$toolboxes[$key] ) ) {
 			throw new RedException( 'Database not found in registry. Add database using R::addDatabase().' );
 		}
+
 
 		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 		self::$currentDB = $key;
@@ -809,7 +817,7 @@ class Facade
 	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $bindings array of values to be bound to parameters in query
 	 *
-	 * @return array
+	 * @return OODBBean|NULL
 	 */
 	public static function findOneForUpdate( $type, $sql = NULL, $bindings = array() )
 	{
@@ -984,6 +992,9 @@ class Facade
 	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $bindings array of values to be bound to parameters in query
 	 * @param string $snippet  SQL snippet to include in query (for example: FOR UPDATE)
+	 *
+	 * @phpstan-param literal-string|null $sql
+	 * @psalm-param   literal-string|null $sql
 	 *
 	 * @return array
 	 */

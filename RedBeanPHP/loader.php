@@ -48,6 +48,7 @@ require( REDBEANPHP_MAIN_DIR . 'Finder.php' );
 require( REDBEANPHP_MAIN_DIR . 'AssociationManager.php' );
 require( REDBEANPHP_MAIN_DIR . 'BeanHelper.php' );
 require( REDBEANPHP_MAIN_DIR . 'BeanHelper/SimpleFacadeBeanHelper.php' );
+require( REDBEANPHP_MAIN_DIR . 'BeanHelper/DynamicBeanHelper.php' );
 
 /* Developer Comfort */
 require( REDBEANPHP_MAIN_DIR . 'SimpleModel.php' );

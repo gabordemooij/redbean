@@ -138,6 +138,11 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	protected $all = FALSE;
 
 	/**
+	 * @var string
+	 */
+	protected $castProperty = NULL;
+
+	/**
 	 * If fluid count is set to TRUE then $bean->ownCount() will
 	 * return 0 if the table does not exists.
 	 * Only for backward compatibility.
@@ -477,6 +482,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return ArrayIterator
 	 */
+	 #[\ReturnTypeWillChange]
 	public function getIterator()
 	{
 		return new \ArrayIterator( $this->properties );
@@ -539,6 +545,21 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			}
 		}
 		return $this;
+	}
+
+	/**
+	 * Same as import() but trims all values by default.
+	 * Set the second parameter to apply a different function.
+	 *
+	 * @param array        $array     what you want to import
+	 * @param string       $function  function to apply (default is trim)
+	 * @param string|array $selection selection of values
+	 * @param boolean      $notrim    if TRUE selection keys will NOT be trimmed
+	 *
+	 * @return OODBBean
+	 */
+	public function trimport( $array, $function='trim', $selection = FALSE, $notrim = FALSE ) {
+		return $this->import( array_map( $function, $array ), $selection, $notrim );
 	}
 
 	/**
@@ -984,6 +1005,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->noLoad     = FALSE;
 		$this->all        = FALSE;
 		$this->via        = NULL;
+		$this->castProperty = NULL;
 		return $this;
 	}
 
@@ -1085,7 +1107,12 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 
 		//If exists and no list or exits and list not changed, bail out.
 		if ( $exists && ((!$isOwn && !$isShared ) || (!$hasSQL && !$differentAlias && !$hasAll)) ) {
+			$castProperty = $this->castProperty;
 			$this->clearModifiers();
+			if (!is_null($castProperty)) {
+				$object = new $castProperty( $this->properties[$property] );
+				return $object;
+			}
 			return $this->properties[$property];
 		}
 
@@ -1126,7 +1153,6 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$this->properties[$property]          = $beans;
 		$this->__info["sys.shadow.$property"] = $beans;
 		$this->__info['tainted']              = TRUE;
-
 		$this->clearModifiers();
 		return $this->properties[$property];
 
@@ -1357,6 +1383,29 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
+	 * Captures a dynamic casting.
+	 * Enables you to obtain a bean value as an object by type-hinting
+	 * the desired return object using asX where X is the class you wish
+	 * to use as a wrapper for the property.
+	 *
+	 * Usage:
+	 *
+	 * $dateTime = $bean->asDateTime()->date;
+	 *
+	 * @param string $method method (asXXX)...
+	 *
+	 * @return self|NULL
+	 */
+	public function captureDynamicCasting( $method )
+	{
+		if ( strpos( $method, 'as' ) === 0 && ctype_upper( substr( $method, 2, 1) ) === TRUE ) {
+			$this->castProperty = substr( $method, 2 );
+			return $this;
+		}
+		return NULL;
+	}
+
+	/**
 	 * Sends the call to the registered model.
 	 * This method can also be used to override bean behaviour.
 	 * In that case you don't want an error or exception to be triggered
@@ -1381,7 +1430,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	public function __call( $method, $args )
 	{
 		if ( empty( $this->__info['model'] ) ) {
-			return NULL;
+			return $this->captureDynamicCasting($method);
 		}
 
 		$overrideDontFail = FALSE;
@@ -1391,6 +1440,9 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		}
 
 		if ( !is_callable( array( $this->__info['model'], $method ) ) ) {
+
+			$self = $this->captureDynamicCasting($method);
+			if ($self) return $self;
 
 			if ( self::$errorHandlingFUSE === FALSE || $overrideDontFail ) {
 				return NULL;
@@ -1470,6 +1522,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return void
 	 */
+	 #[\ReturnTypeWillChange]
 	public function offsetSet( $offset, $value )
 	{
 		$this->__set( $offset, $value );
@@ -1487,6 +1540,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return boolean
 	 */
+	 #[\ReturnTypeWillChange]
 	public function offsetExists( $offset )
 	{
 		return $this->__isset( $offset );
@@ -1505,6 +1559,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return void
 	 */
+	 #[\ReturnTypeWillChange]
 	public function offsetUnset( $offset )
 	{
 		$this->__unset( $offset );
@@ -1523,6 +1578,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return mixed
 	 */
+	 #[\ReturnTypeWillChange]
 	public function &offsetGet( $offset )
 	{
 		return $this->__get( $offset );
@@ -1663,6 +1719,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return integer
 	 */
+	 #[\ReturnTypeWillChange]
 	public function count()
 	{
 		return count( $this->properties );
@@ -2270,6 +2327,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @return array
 	 */
+	 #[\ReturnTypeWillChange]
 	public function jsonSerialize()
 	{
 		$json = $this->__call( '@__jsonSerialize', array( ) );

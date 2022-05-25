@@ -631,5 +631,11 @@ class Model_Brokentoy extends \RedbeanPHP\SimpleModel {
 	}
 }
 
+/**
+ * To test Dynamic BeanHelpers, resolving models with different prefixes and/or
+ * namespaces.
+ */
+class Prefix1_Bean extends \RedbeanPHP\SimpleModel { }
+class Prefix2_Bean extends \RedbeanPHP\SimpleModel { }
 
 define('REDBEAN_OODBBEAN_CLASS', '\DiagnosticBean');

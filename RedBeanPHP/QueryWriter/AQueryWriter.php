@@ -115,8 +115,10 @@ abstract class AQueryWriter
 	 * For instance to add  ROW_FORMAT=DYNAMIC to all MySQL tables
 	 * upon creation:
 	 *
+	 * <code>
 	 * $sql = $writer->getDDLTemplate( 'createTable', '*' );
 	 * $writer->setDDLTemplate( 'createTable', '*', $sql . '  ROW_FORMAT=DYNAMIC ' );
+	 * </code>
 	 *
 	 * For property-specific templates set $beanType to:
 	 * account.username -- then the template will only be applied to SQL statements relating
@@ -863,6 +865,10 @@ abstract class AQueryWriter
 	public function glueSQLCondition( $sql, $glue = NULL )
 	{
 		static $snippetCache = array();
+
+		if ( is_null( $sql ) ) {
+			return '';
+		}
 
 		if ( trim( $sql ) === '' ) {
 			return $sql;
