@@ -50,7 +50,7 @@ class OODB extends Observable
 	protected $nesting = 0;
 
 	/**
-	 * @var DBAdapter
+	 * @var QueryWriter
 	 */
 	protected $writer;
 

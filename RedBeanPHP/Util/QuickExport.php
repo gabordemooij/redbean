@@ -24,12 +24,12 @@ use RedBeanPHP\ToolBox as ToolBox;
 class QuickExport
 {
 	/**
-	 * @var Finder
+	 * @var ToolBox
 	 */
 	protected $toolbox;
 
 	/**
-	 * @boolean
+	 * @var boolean
 	 */
 	private static $test = FALSE;
 

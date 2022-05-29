@@ -55,11 +55,11 @@ class AssociationManager extends Observable
 	 * created yet. In frozen mode, this is not supposed to happen
 	 * and the corresponding exceptions will be thrown.
 	 *
-	 * @param \Exception $exception exception
+	 * @param SQLException $exception exception
 	 *
 	 * @return void
 	 */
-	private function handleException( \Exception $exception )
+	private function handleException( SQLException $exception )
 	{
 		if ( $this->oodb->isFrozen() || !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(

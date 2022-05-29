@@ -64,7 +64,7 @@ class DuplicationManager
 	protected $filters = array();
 
 	/**
-	 * @var array
+	 * @var boolean
 	 */
 	protected $cacheTables = FALSE;
 

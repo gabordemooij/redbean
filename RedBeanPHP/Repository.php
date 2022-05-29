@@ -42,7 +42,7 @@ abstract class Repository
 	protected $nesting = 0;
 
 	/**
-	 * @var DBAdapter
+	 * @var QueryWriter
 	 */
 	protected $writer;
 

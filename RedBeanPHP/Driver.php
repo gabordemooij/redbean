@@ -83,7 +83,7 @@ interface Driver
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
-	 * @return array Affected Rows
+	 * @return int Affected Rows
 	 */
 	public function Execute( $sql, $bindings = array() );
 
@@ -109,7 +109,7 @@ interface Driver
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
-	 * @return mixed
+	 * @return Cursor
 	 */
 	public function GetCursor( $sql, $bindings = array() );
 

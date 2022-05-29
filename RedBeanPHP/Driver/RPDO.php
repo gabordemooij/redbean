@@ -59,7 +59,7 @@ class RPDO implements Driver
 	protected $affectedRows;
 
 	/**
-	 * @var integer
+	 * @var array
 	 */
 	protected $resultArray;
 

@@ -37,7 +37,7 @@ interface Adapter
 	 * @param array   $bindings array of values to bind to parameters in query string
 	 * @param boolean $noevent  no event firing
 	 *
-	 * @return void
+	 * @return int
 	 */
 	public function exec( $sql, $bindings = array(), $noevent = FALSE );
 
@@ -146,7 +146,7 @@ interface Adapter
 	 * adapter. RedBean will only access the adapter and never to talk
 	 * directly to the driver though.
 	 *
-	 * @return mixed
+	 * @return Driver
 	 */
 	public function getDatabase();
 

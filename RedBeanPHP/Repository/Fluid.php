@@ -245,11 +245,11 @@ class Fluid extends Repository
 	 * created yet. In frozen mode, this is not supposed to happen
 	 * and the corresponding exceptions will be thrown.
 	 *
-	 * @param \Exception $exception exception
+	 * @param SQLException $exception exception
 	 *
 	 * @return void
 	 */
-	protected function handleException( \Exception $exception )
+	protected function handleException( SQLException $exception )
 	{
 		if ( !$this->writer->sqlStateIn( $exception->getSQLState(),
 			array(

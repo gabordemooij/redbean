@@ -19,7 +19,7 @@ use RedBeanPHP\OODBBean;
  *
  * The NonStaticBeanHelper is used by the database pool class PoolDB.
  */
-class NonStaticBeanHelper extends RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper {
+class NonStaticBeanHelper extends \RedBeanPHP\BeanHelper\SimpleFacadeBeanHelper {
 
 	/**
 	 * Returns the extracted toolbox.
