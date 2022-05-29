@@ -60,7 +60,7 @@ class OODB extends Observable
 	protected $isFrozen = FALSE;
 
 	/**
-	 * @var FacadeBeanHelper
+	 * @var BeanHelper
 	 */
 	protected $beanhelper = NULL;
 

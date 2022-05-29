@@ -480,7 +480,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * Note that not all PHP functions work with the array interface.
 	 *
-	 * @return ArrayIterator
+	 * @return \ArrayIterator
 	 */
 	 #[\ReturnTypeWillChange]
 	public function getIterator()

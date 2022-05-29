@@ -49,7 +49,7 @@ class RPDO implements Driver
 	protected $logger = NULL;
 
 	/**
-	 * @var PDO
+	 * @var \PDO
 	 */
 	protected $pdo;
 
@@ -113,8 +113,8 @@ class RPDO implements Driver
 	 * Query Execution. This method binds parameters as NULL, INTEGER or STRING
 	 * and supports both named keys and question mark keys.
 	 *
-	 * @param PDOStatement $statement PDO Statement instance
-	 * @param array        $bindings  values that need to get bound to the statement
+	 * @param \PDOStatement $statement PDO Statement instance
+	 * @param array         $bindings  values that need to get bound to the statement
 	 *
 	 * @return void
 	 */
@@ -248,7 +248,7 @@ class RPDO implements Driver
 	 * By default, RedBeanPHP uses this method under the hood to make sure
 	 * you use the latest UTF8 encoding possible for your database.
 	 *
-	 * @param $db_cap identifier of database capability
+	 * @param string $db_cap identifier of database capability
 	 *
 	 * @return int|false Whether the database feature is supported, FALSE otherwise.
 	 **/
@@ -492,7 +492,7 @@ class RPDO implements Driver
 	 * - RedBeanPHP will ask database driver to throw Exceptions on errors (recommended for compatibility)
          * - RedBeanPHP will ask database driver to use associative arrays when fetching (recommended for compatibility)
 	 *
-	 * @param PDO     $pdo       PDO instance
+	 * @param \PDO    $pdo       PDO instance
 	 * @param array   $options   Options to apply
 	 *
 	 * @return void
@@ -817,7 +817,7 @@ class RPDO implements Driver
 	 * $pdo = R::getDatabaseAdapter()->getDatabase()->getPDO();
 	 * </code>
 	 *
-	 * @return PDO
+	 * @return \PDO
 	 */
 	public function getPDO()
 	{

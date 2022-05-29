@@ -2427,7 +2427,7 @@ class Facade
 	 * If the PDO object could not be found, for whatever reason, this method
 	 * will return NULL instead.
 	 *
-	 * @return NULL|PDO
+	 * @return NULL|\PDO
 	 */
 	public static function getPDO()
 	{
