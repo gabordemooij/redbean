@@ -860,7 +860,7 @@ class Facade
 	 * @param string|OODBBean|SimpleModel $beanOrType bean you want to remove from database
 	 * @param integer                     $id         ID if the bean to trash (optional, type-id variant only)
 	 *
-	 * @return void
+	 * @return int
 	 */
 	public static function trash( $beanOrType, $id = NULL )
 	{
@@ -2161,7 +2161,7 @@ class Facade
 	 *
 	 * @param array $beans list of beans to be trashed
 	 *
-	 * @return void
+	 * @return int
 	 */
 	public static function trashAll( $beans )
 	{

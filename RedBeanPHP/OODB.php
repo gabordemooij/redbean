@@ -426,7 +426,7 @@ class OODB extends Observable
 	 *
 	 * @param OODBBean|SimpleModel $bean bean you want to remove from database
 	 *
-	 * @return void
+	 * @return int
 	 */
 	public function trash( $bean )
 	{

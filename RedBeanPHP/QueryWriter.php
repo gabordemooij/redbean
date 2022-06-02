@@ -404,7 +404,7 @@ interface QueryWriter
 	 * @param string $addSql     additional SQL
 	 * @param array  $bindings   bindings
 	 *
-	 * @return void
+	 * @return int
 	 */
 	public function deleteRecord( $type, $conditions = array(), $addSql = '', $bindings = array() );
 
