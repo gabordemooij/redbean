@@ -337,7 +337,7 @@ class AssociationManager extends Observable
 	 * Since 3.2, you can now also pass an array of beans instead just one
 	 * bean as the first parameter.
 	 *
-	 * @param OODBBean|array $bean the bean you have
+	 * @param OODBBean       $bean the bean you have
 	 * @param string         $type      the type of beans you want
 	 * @param string         $sql       SQL snippet for extra filtering
 	 * @param array          $bindings  values to be inserted in SQL slots

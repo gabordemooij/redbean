@@ -106,7 +106,7 @@ interface QueryWriter
 	 * @param boolean $firstOfChain is it the join of a chain (or the only join)
 	 * @param string  $suffix       suffix to add for aliasing tables (for joining same table multiple times)
 	 *
-	 * @return string $joinSQLSnippet
+	 * @return string
 	 */
 	public function writeJoin( $type, $targetType, $leftRight, $joinType, $firstOfChain, $suffix );
 

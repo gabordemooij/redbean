@@ -90,6 +90,7 @@ class Fluid extends Repository
 	 * @param OODBBean $bean     bean to get cast data from and store meta in
 	 * @param string   $property property to store
 	 * @param mixed    $value    value to store
+	 * @param array|null &$columns
 	 *
 	 * @return void
 	 */

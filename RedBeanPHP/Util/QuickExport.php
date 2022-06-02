@@ -46,7 +46,13 @@ class QuickExport
 
 	/**
 	 * Makes csv() testable.
-	 */
+	 *
+	 * @param string $name
+	 * @param mixed $arg1
+	 * @param boolean $arg2
+	 *
+	 * @return mixed
+ 	 */
 	public static function operation( $name, $arg1, $arg2 = TRUE ) {
 		$out = '';
 		switch( $name ) {
