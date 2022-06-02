@@ -106,7 +106,7 @@ class OODB extends Observable
 	 * Unboxes a bean from a FUSE model if needed and checks whether the bean is
 	 * an instance of OODBBean.
 	 *
-	 * @param OODBBean $bean bean you wish to unbox
+	 * @param OODBBean|SimpleModel $bean bean you wish to unbox
 	 *
 	 * @return OODBBean
 	 */
@@ -252,7 +252,7 @@ class OODB extends Observable
 	 * @param string  $number            number of beans you would like to get
 	 * @param boolean $alwaysReturnArray if TRUE always returns the result as an array
 	 *
-	 * @return OODBBean
+	 * @return OODBBean|OODBBean[]
 	 */
 	public function dispense( $type, $number = 1, $alwaysReturnArray = FALSE )
 	{
@@ -303,7 +303,7 @@ class OODB extends Observable
 	}
 
 	/**
-	 * Searches the database for a bean that matches conditions $conditions and sql $addSQL
+	 * Searches the database for a bean that matches conditions $conditions and sql $sql
 	 * and returns an array containing all the beans that have been found.
 	 *
 	 * Conditions need to take form:

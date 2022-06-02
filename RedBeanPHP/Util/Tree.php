@@ -3,7 +3,9 @@
 namespace RedBeanPHP\Util;
 
 use RedBeanPHP\ToolBox;
+use RedBeanPHP\OODB;
 use RedBeanPHP\OODBBean;
+use RedBeanPHP\QueryWriter;
 
 /**
  * Tree

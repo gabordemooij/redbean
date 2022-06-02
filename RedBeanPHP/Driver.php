@@ -142,14 +142,14 @@ interface Driver
 	public function setDebugMode( $tf, $customLogger );
 
 	/**
-	 * Starts a transaction.
+	 * Commits a transaction.
 	 *
 	 * @return void
 	 */
 	public function CommitTrans();
 
 	/**
-	 * Commits a transaction.
+	 * Starts a transaction.
 	 *
 	 * @return void
 	 */

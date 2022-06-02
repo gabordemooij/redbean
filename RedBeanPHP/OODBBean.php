@@ -103,7 +103,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	protected $beanHelper = NULL;
 
 	/**
-	 * @var null
+	 * @var string|null
 	 */
 	protected $fetchType = NULL;
 
@@ -552,7 +552,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Set the second parameter to apply a different function.
 	 *
 	 * @param array        $array     what you want to import
-	 * @param string       $function  function to apply (default is trim)
+	 * @param callable     $function  function to apply (default is trim)
 	 * @param string|array $selection selection of values
 	 * @param boolean      $notrim    if TRUE selection keys will NOT be trimmed
 	 *

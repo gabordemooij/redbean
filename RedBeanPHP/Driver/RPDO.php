@@ -303,7 +303,7 @@ class RPDO implements Driver
 	 * The second example shows how to create an RPDO instance
 	 * from an existing PDO object.
 	 *
-	 * @param string|object $dsn  database connection string
+	 * @param string|\PDO   $dsn  database connection string
 	 * @param string        $user optional, usename to sign in
 	 * @param string        $pass optional, password for connection login
 	 *

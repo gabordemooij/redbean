@@ -26,7 +26,7 @@ interface Cursor
 	 * Should retrieve the next row of the result set.
 	 * This method is used to iterate over the result set.
 	 *
-	 * @return array
+	 * @return array|null
 	 */
 	public function getNextItem();
 

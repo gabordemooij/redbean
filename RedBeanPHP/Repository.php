@@ -36,7 +36,7 @@ abstract class Repository
 	 */
 	protected $stash = NULL;
 
-	/*
+	/**
 	 * @var integer
 	 */
 	protected $nesting = 0;
@@ -47,7 +47,7 @@ abstract class Repository
 	protected $writer;
 
 	/**
-	 * @var boolean
+	 * @var boolean|array
 	 */
 	protected $partialBeans = FALSE;
 
@@ -63,7 +63,7 @@ abstract class Repository
 	 *
 	 * @param boolean|array $yesNoBeans List of type names or 'all'
 	 *
-	 * @return mixed
+	 * @return boolean|array
 	 */
 	public function usePartialBeans( $yesNoBeans )
 	{
@@ -392,7 +392,7 @@ abstract class Repository
 	 * @param int     $number            number of beans you would like to get
 	 * @param boolean $alwaysReturnArray if TRUE always returns the result as an array
 	 *
-	 * @return OODBBean
+	 * @return OODBBean|OODBBean[]
 	 */
 	public function dispense( $type, $number = 1, $alwaysReturnArray = FALSE )
 	{

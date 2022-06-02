@@ -3,6 +3,7 @@
 namespace RedBeanPHP\Util;
 
 use RedBeanPHP\OODB as OODB;
+use RedBeanPHP\OODBBean as OODBBean;
 
 /**
  * Multi Bean Loader Helper
@@ -44,7 +45,7 @@ class MultiLoader
 	 * @param string|array $types the set of types to load at once
 	 * @param mixed        $id    the common ID
 	 *
-	 * @return OODBBean
+	 * @return OODBBean[]
 	 */
 	public static function load( OODB $oodb, $types, $id )
 	{

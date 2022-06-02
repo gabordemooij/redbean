@@ -202,7 +202,7 @@ interface QueryWriter
 	 * C_DATA_TYPE_MANUAL (usually 99) which represents a user specified type. Although
 	 * no special treatment has been associated with the latter for now.
 	 *
-	 * @param string  $value                   value
+	 * @param mixed   $value                   value
 	 * @param boolean $alsoScanSpecialForTypes take special types into account
 	 *
 	 * @return integer
@@ -268,7 +268,7 @@ interface QueryWriter
 	 *
 	 * @param string $type       name of the table you want to query
 	 * @param array  $conditions criteria ( $column => array( $values ) )
-	 * @param string $addSQL     additional SQL snippet
+	 * @param string $addSql     additional SQL snippet
 	 * @param array  $bindings   bindings for SQL snippet
 	 *
 	 * @return Cursor
@@ -307,7 +307,7 @@ interface QueryWriter
 	 *
 	 * @param string $type       name of the table you want to query
 	 * @param array  $conditions criteria ( $column => array( $values ) )
-	 * @param string $addSQL     additional SQL snippet
+	 * @param string $addSql     additional SQL snippet
 	 * @param array  $bindings   bindings for SQL snippet
 	 *
 	 * @return integer
@@ -373,7 +373,7 @@ interface QueryWriter
 	 * @param boolean $up       TRUE to query parent rows, FALSE to query child rows
 	 * @param string  $addSql   optional SQL snippet to embed in the query
 	 * @param array   $bindings parameter bindings for additional SQL snippet
-	 * @param mixed   $select   Select Snippet to use when querying (optional)
+	 * @param bool    $select   Select Snippet to use when querying (optional)
 	 *
 	 * @return array
 	 */
@@ -476,7 +476,7 @@ interface QueryWriter
 	 * @param  string $targetType     points to this type
 	 * @param  string $property       field that contains the foreign key value
 	 * @param  string $targetProperty field where the fk points to
-	 * @param  string $isDep          whether target is dependent and should cascade on update/delete
+	 * @param  bool   $isDep          whether target is dependent and should cascade on update/delete
 	 *
 	 * @return void
 	 */

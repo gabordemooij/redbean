@@ -83,7 +83,7 @@ class MatchUp
 	 * @param array    $onNotFoundDo task list to be considered on NOT finding the bean
 	 * @param OODBBean &$bean        reference to obtain the found bean
 	 *
-	 * @return mixed
+	 * @return bool|null
 	 */
 	public function matchUp( $type, $sql, $bindings = array(), $onFoundDo = NULL, $onNotFoundDo = NULL, &$bean = NULL )
 	{

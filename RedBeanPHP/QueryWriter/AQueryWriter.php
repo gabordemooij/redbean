@@ -438,9 +438,9 @@ abstract class AQueryWriter
 	 * In previous versions you could only store one key-entry, I have changed this to
 	 * improve caching efficiency (issue #400).
 	 *
-	 * @param string $cacheTag cache tag (secondary key)
-	 * @param string $key      key to store values under
-	 * @param array  $values   content to be stored
+	 * @param string    $cacheTag cache tag (secondary key)
+	 * @param string    $key      key to store values under
+	 * @param array|int $values   rows or count to be stored
 	 *
 	 * @return void
 	 */

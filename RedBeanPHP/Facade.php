@@ -117,12 +117,12 @@ class Facade
 	private static $exportCaseStyle = 'default';
 
 	/**
-	 * @var flag allows transactions through facade in fluid mode
+	 * @var bool flag allows transactions through facade in fluid mode
 	 */
 	private static $allowFluidTransactions = FALSE;
 
 	/**
-	 * @var flag allows to unfreeze if needed with store(all)
+	 * @var bool flag allows to unfreeze if needed with store(all)
 	 */
 	private static $allowHybridMode = FALSE;
 
@@ -703,7 +703,7 @@ class Facade
 	 * @param string|array $types the set of types to load at once
 	 * @param mixed        $id    the common ID
 	 *
-	 * @return OODBBean
+	 * @return OODBBean[]
 	 */
 	public static function loadMulti( $types, $id )
 	{
@@ -1322,7 +1322,7 @@ class Facade
 	}
 
 	/**
-	 *Convenience function to fire an SQL query using the RedBeanPHP
+	 * Convenience function to fire an SQL query using the RedBeanPHP
 	 * database adapter. This method allows you to directly query the
 	 * database without having to obtain an database adapter instance first.
 	 * Executes the specified SQL query together with the specified
@@ -1403,7 +1403,7 @@ class Facade
 	 * This is a simplified version of the deprecated R::dup() function.
 	 *
 	 * @param OODBBean $bean  bean to be copied
-	 * @param array    $white white list filter with bean types to duplicate
+	 * @param array    $filters white list filter with bean types to duplicate
 	 *
 	 * @return OODBBean
 	 */
@@ -2334,7 +2334,7 @@ class Facade
 	 * Simple convenience function, returns ISO date formatted representation
 	 * of $time.
 	 *
-	 * @param mixed $time UNIX timestamp
+	 * @param int|null $time UNIX timestamp
 	 *
 	 * @return string
 	 */
@@ -2352,7 +2352,7 @@ class Facade
 	 * formatted representation
 	 * of $time.
 	 *
-	 * @param mixed $time UNIX timestamp
+	 * @param int|null $time UNIX timestamp
 	 *
 	 * @return string
 	 */
@@ -3004,7 +3004,7 @@ class Facade
 	 *   'strtoupper',
 	 *   "\n"
 	 * );
-	 *</code>
+	 * </code>
 	 *
 	 * The example above creates an HTML fragment like this:
 	 *
