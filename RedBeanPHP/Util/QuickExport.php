@@ -101,7 +101,7 @@ class QuickExport
 	 * @param boolean $output   TRUE to output CSV directly using readfile
 	 * @param array   $options  delimiter, quote and escape character respectively
 	 *
-	 * @return void
+	 * @return string|NULL
 	 */
 	public function csv( $sql = '', $bindings = array(), $columns = NULL, $path = '/tmp/redexport_%s.csv', $output = TRUE, $options = array(',','"','\\') )
 	{

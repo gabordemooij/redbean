@@ -76,9 +76,9 @@ class Tree {
 	 * parameter binding key ':slot0' is reserved for the ID of the bean
 	 * and used in the query.
 	 *
-	 * @param OODBBean $bean     reference bean to find children of
-	 * @param string   $sql      optional SQL snippet
-	 * @param array    $bindings optional parameter bindings for SQL snippet
+	 * @param OODBBean    $bean     reference bean to find children of
+	 * @param string|NULL $sql      optional SQL snippet
+	 * @param array       $bindings optional parameter bindings for SQL snippet
 	 *
 	 * @return array
 	 */
@@ -112,9 +112,9 @@ class Tree {
 	 * parameter binding key ':slot0' is reserved for the ID of the bean
 	 * and used in the query.
 	 *
-	 * @param OODBBean $bean     reference bean to find parents of
-	 * @param string   $sql      optional SQL snippet
-	 * @param array    $bindings optional parameter bindings for SQL snippet
+	 * @param OODBBean    $bean     reference bean to find parents of
+	 * @param string|NULL $sql      optional SQL snippet
+	 * @param array       $bindings optional parameter bindings for SQL snippet
 	 *
 	 * @return array
 	 */
@@ -155,7 +155,7 @@ class Tree {
 	 * it cannot 'predict' what or how you are trying to 'count'.
 	 *
 	 * @param OODBBean       $bean     reference bean to find children of
-	 * @param string         $sql      optional SQL snippet
+	 * @param string|NULL    $sql      optional SQL snippet
 	 * @param array          $bindings optional parameter bindings for SQL snippet
 	 * @param string|boolean $select   select snippet to use (advanced, optional, see QueryWriter::queryRecursiveCommonTableExpression)
 	 *
@@ -196,9 +196,9 @@ class Tree {
 	 * this method assumes you take control of the resulting total yourself since
 	 * it cannot 'predict' what or how you are trying to 'count'.
 	 *
-	 * @param OODBBean $bean     reference bean to find parents of
-	 * @param string   $sql      optional SQL snippet
-	 * @param array    $bindings optional parameter bindings for SQL snippet
+	 * @param OODBBean       $bean     reference bean to find parents of
+	 * @param string|NULL    $sql      optional SQL snippet
+	 * @param array          $bindings optional parameter bindings for SQL snippet
 	 * @param string|boolean $select   select snippet to use (advanced, optional, see QueryWriter::queryRecursiveCommonTableExpression)
 	 *
 	 * @return integer

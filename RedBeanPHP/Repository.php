@@ -572,7 +572,7 @@ abstract class Repository
 	 * New in 4.3.2: meta mask. The meta mask is a special mask to send
 	 * data from raw result rows to the meta store of the bean. This is
 	 * useful for bundling additional information with custom queries.
-	 * Values of every column whos name starts with $mask will be
+	 * Values of every column who's name starts with $mask will be
 	 * transferred to the meta section of the bean under key 'data.bundle'.
 	 *
 	 * @param string $type type of beans you would like to have

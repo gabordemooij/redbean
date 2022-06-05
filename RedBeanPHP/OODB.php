@@ -60,12 +60,12 @@ class OODB extends Observable
 	protected $isFrozen = FALSE;
 
 	/**
-	 * @var BeanHelper
+	 * @var BeanHelper|NULL
 	 */
 	protected $beanhelper = NULL;
 
 	/**
-	 * @var AssociationManager
+	 * @var AssociationManager|NULL
 	 */
 	protected $assocManager = NULL;
 
@@ -75,12 +75,12 @@ class OODB extends Observable
 	protected $repository = NULL;
 
 	/**
-	 * @var FrozenRepo
+	 * @var FrozenRepo|NULL
 	 */
 	protected $frozenRepository = NULL;
 
 	/**
-	 * @var FluidRepo
+	 * @var FluidRepo|NULL
 	 */
 	protected $fluidRepository = NULL;
 
@@ -281,7 +281,7 @@ class OODB extends Observable
 	 * Returns the current bean helper.
 	 * Bean helpers assist beans in getting a reference to a toolbox.
 	 *
-	 * @return BeanHelper
+	 * @return BeanHelper|NULL
 	 */
 	public function getBeanHelper()
 	{
@@ -321,10 +321,10 @@ class OODB extends Observable
 	 * Note that you can use property names; the columns will be extracted using the
 	 * appropriate bean formatter.
 	 *
-	 * @param string $type       type of beans you are looking for
-	 * @param array  $conditions list of conditions
-	 * @param string $sql        SQL to be used in query
-	 * @param array  $bindings   a list of values to bind to query parameters
+	 * @param string      $type       type of beans you are looking for
+	 * @param array       $conditions list of conditions
+	 * @param string|NULL $sql        SQL to be used in query
+	 * @param array       $bindings   a list of values to bind to query parameters
 	 *
 	 * @return array
 	 */
@@ -336,9 +336,9 @@ class OODB extends Observable
 	/**
 	 * Same as find() but returns a BeanCollection.
 	 *
-	 * @param string $type     type of beans you are looking for
-	 * @param string $sql      SQL to be used in query
-	 * @param array  $bindings a list of values to bind to query parameters
+	 * @param string      $type     type of beans you are looking for
+	 * @param string|NULL $sql      SQL to be used in query
+	 * @param array       $bindings a list of values to bind to query parameters
 	 *
 	 * @return BeanCollection
 	 */
@@ -557,10 +557,10 @@ class OODB extends Observable
 	 * MySQL spatial columns, because they need to be processed first using
 	 * the asText/GeomFromText functions.
 	 *
-	 * @param string  $mode       mode to set function for, i.e. read or write
-	 * @param string  $field      field (table.column) to bind SQL function to
-	 * @param string  $function   SQL function to bind to field
-	 * @param boolean $isTemplate TRUE if $function is an SQL string, FALSE for just a function name
+	 * @param string       $mode       mode to set function for, i.e. read or write
+	 * @param string       $field      field (table.column) to bind SQL function to
+	 * @param string|NULL  $function   SQL function to bind to field
+	 * @param boolean      $isTemplate TRUE if $function is an SQL string, FALSE for just a function name
 	 *
 	 * @return void
 	 */

@@ -63,7 +63,7 @@ interface Adapter
 	 * @param string $sql      string containing SQL code for database
 	 * @param array  $bindings array of values to bind to parameters in query string
 	 *
-	 * @return array
+	 * @return array|NULL
 	 */
 	public function getRow( $sql, $bindings = array() );
 
@@ -89,7 +89,7 @@ interface Adapter
 	 * @param string $sql      string containing SQL code for database
 	 * @param array  $bindings array of values to bind to parameters in query string
 	 *
-	 * @return string
+	 * @return string|NULL
 	 */
 	public function getCell( $sql, $bindings = array() );
 
@@ -100,7 +100,7 @@ interface Adapter
 	 * @param string $sql      string containing SQL code for database
 	 * @param array  $bindings array of values to bind to parameters in query string
 	 *
-	 * @return array
+	 * @return array|NULL
 	 */
 	public function getAssoc( $sql, $bindings = array() );
 

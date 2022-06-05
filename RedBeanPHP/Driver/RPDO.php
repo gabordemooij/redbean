@@ -44,12 +44,12 @@ class RPDO implements Driver
 	protected $loggingEnabled = FALSE;
 
 	/**
-	 * @var Logger
+	 * @var Logger|NULL
 	 */
 	protected $logger = NULL;
 
 	/**
-	 * @var \PDO
+	 * @var \PDO|NULL
 	 */
 	protected $pdo;
 
@@ -99,12 +99,12 @@ class RPDO implements Driver
 	protected $stringifyFetches = TRUE;
 
 	/**
-	 * @var string
+	 * @var string|NULL
 	 */
 	protected $initSQL = NULL;
 
 	/**
-	 * @var callable
+	 * @var callable|NULL
 	 */
 	protected $initCode = NULL;
 
@@ -423,7 +423,7 @@ class RPDO implements Driver
 	/**
 	 * Sets initialization code to execute upon connecting.
 	 *
-	 * @param callable $code
+	 * @param callable|NULL $code
 	 *
 	 * @return void
 	 */
@@ -596,7 +596,7 @@ class RPDO implements Driver
 	 * @param string $sql      SQL
 	 * @param array  $bindings bindings
 	 *
-	 * @return mixed
+	 * @return string|NULL
 	 */
 	public function GetCell( $sql, $bindings = array() )
 	{

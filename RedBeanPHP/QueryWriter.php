@@ -136,8 +136,8 @@ interface QueryWriter
 	 * @note A default implementation is available in AQueryWriter
 	 * unless a database uses very different SQL this should suffice.
 	 *
-	 * @param string  $sql  SQL Snippet
-	 * @param integer $glue the GLUE type - how to glue (C_GLUE_WHERE or C_GLUE_AND)
+	 * @param string       $sql  SQL Snippet
+	 * @param integer|NULL $glue the GLUE type - how to glue (C_GLUE_WHERE or C_GLUE_AND)
 	 *
 	 * @return string
 	 */
@@ -252,10 +252,10 @@ interface QueryWriter
 	 * This methods selects the records from the database that match the specified
 	 * type, conditions (optional) and additional SQL snippet (optional).
 	 *
-	 * @param string $type       name of the table you want to query
-	 * @param array  $conditions criteria ( $column => array( $values ) )
-	 * @param string $addSql     additional SQL snippet
-	 * @param array  $bindings   bindings for SQL snippet
+	 * @param string      $type       name of the table you want to query
+	 * @param array       $conditions criteria ( $column => array( $values ) )
+	 * @param string|NULL $addSql     additional SQL snippet
+	 * @param array       $bindings   bindings for SQL snippet
 	 *
 	 * @return array
 	 */
@@ -266,10 +266,10 @@ interface QueryWriter
 	 * This methods selects the records from the database that match the specified
 	 * type, conditions (optional) and additional SQL snippet (optional).
 	 *
-	 * @param string $type       name of the table you want to query
-	 * @param array  $conditions criteria ( $column => array( $values ) )
-	 * @param string $addSql     additional SQL snippet
-	 * @param array  $bindings   bindings for SQL snippet
+	 * @param string      $type       name of the table you want to query
+	 * @param array       $conditions criteria ( $column => array( $values ) )
+	 * @param string|NULL $addSql     additional SQL snippet
+	 * @param array       $bindings   bindings for SQL snippet
 	 *
 	 * @return Cursor
 	 */
@@ -305,10 +305,10 @@ interface QueryWriter
 	 * Counts the number of records in the database that match the
 	 * conditions and additional SQL.
 	 *
-	 * @param string $type       name of the table you want to query
-	 * @param array  $conditions criteria ( $column => array( $values ) )
-	 * @param string $addSql     additional SQL snippet
-	 * @param array  $bindings   bindings for SQL snippet
+	 * @param string      $type       name of the table you want to query
+	 * @param array       $conditions criteria ( $column => array( $values ) )
+	 * @param string|NULL $addSql     additional SQL snippet
+	 * @param array       $bindings   bindings for SQL snippet
 	 *
 	 * @return integer
 	 */
@@ -368,12 +368,12 @@ interface QueryWriter
 	 * (count rows) used for countParents and countChildren functions - or you can specify a
 	 * string yourself like 'count(distinct brand)'.
 	 *
-	 * @param string  $type     the bean type you want to query rows for
-	 * @param integer $id       id of the reference row
-	 * @param boolean $up       TRUE to query parent rows, FALSE to query child rows
-	 * @param string  $addSql   optional SQL snippet to embed in the query
-	 * @param array   $bindings parameter bindings for additional SQL snippet
-	 * @param bool    $select   Select Snippet to use when querying (optional)
+	 * @param string      $type     the bean type you want to query rows for
+	 * @param integer     $id       id of the reference row
+	 * @param boolean     $up       TRUE to query parent rows, FALSE to query child rows
+	 * @param string|NULL $addSql   optional SQL snippet to embed in the query
+	 * @param array       $bindings parameter bindings for additional SQL snippet
+	 * @param bool        $select   Select Snippet to use when querying (optional)
 	 *
 	 * @return array
 	 */
@@ -387,9 +387,9 @@ interface QueryWriter
 	 * Returns the new ID.
 	 * This methods accepts a type and infers the corresponding table name.
 	 *
-	 * @param string  $type         name of the table to update
-	 * @param array   $updatevalues list of update values
-	 * @param integer $id           optional primary key ID value
+	 * @param string       $type         name of the table to update
+	 * @param array        $updatevalues list of update values
+	 * @param integer|NULL $id           optional primary key ID value
 	 *
 	 * @return integer
 	 */

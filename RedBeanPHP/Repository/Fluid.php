@@ -87,10 +87,10 @@ class Fluid extends Repository
 	 *
 	 * This method will also apply indexes, unique constraints and foreign keys.
 	 *
-	 * @param OODBBean $bean     bean to get cast data from and store meta in
-	 * @param string   $property property to store
-	 * @param mixed    $value    value to store
-	 * @param array|null &$columns
+	 * @param OODBBean   $bean     bean to get cast data from and store meta in
+	 * @param string     $property property to store
+	 * @param mixed      $value    value to store
+	 * @param array|NULL &$columns
 	 *
 	 * @return void
 	 */

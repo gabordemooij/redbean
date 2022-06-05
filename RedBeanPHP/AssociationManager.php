@@ -218,7 +218,7 @@ class AssociationManager extends Observable
 	 *
 	 * @param OODBBean|array $bean     a bean object or an array of beans
 	 * @param string         $type     type of bean you're interested in
-	 * @param string         $sql      SQL snippet (optional)
+	 * @param string|NULL    $sql      SQL snippet (optional)
 	 * @param array          $bindings bindings for your SQL string
 	 *
 	 * @return integer

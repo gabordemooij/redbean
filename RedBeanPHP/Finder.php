@@ -182,9 +182,9 @@ class Finder
 	 * array parameter; you can either use the question mark notation
 	 * or the slot-notation (:keyname).
 	 *
-	 * @param string $type     type   the type of bean you are looking for
-	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string      $type     type   the type of bean you are looking for
+	 * @param string|NULL $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array       $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
@@ -208,9 +208,9 @@ class Finder
 	 *
 	 * @see Finder::find
 	 *
-	 * @param string $type     type   the type of bean you are looking for
-	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string      $type     type   the type of bean you are looking for
+	 * @param string|NULL $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array       $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
@@ -231,9 +231,9 @@ class Finder
 	 *
 	 * @see Finder::find
 	 *
-	 * @param string $type     type   the type of bean you are looking for
-	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string      $type     type   the type of bean you are looking for
+	 * @param string|NULL $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array       $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return OODBBean|NULL
 	 */
@@ -257,9 +257,9 @@ class Finder
 	 *
 	 * @see Finder::find
 	 *
-	 * @param string $type     the type of bean you are looking for
-	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string      $type     the type of bean you are looking for
+	 * @param string|NULL $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array       $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return OODBBean|NULL
 	 */
@@ -281,9 +281,9 @@ class Finder
 	 *
 	 * @see Finder::find
 	 *
-	 * @param  string $type     the type of bean you are looking for
-	 * @param  string $sql      SQL query to find the desired bean, starting right after WHERE clause
-	 * @param  array  $bindings values array of values to be bound to parameters in query
+	 * @param  string      $type     the type of bean you are looking for
+	 * @param  string|NULL $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param  array       $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */

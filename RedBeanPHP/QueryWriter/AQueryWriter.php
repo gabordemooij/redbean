@@ -140,9 +140,9 @@ abstract class AQueryWriter
 	 * If no template can be found for the specified type, the template for
 	 * '*' will be returned instead.
 	 *
-	 * @param string $type     ( 'createTable' | 'widenColumn' | 'addColumn' )
-	 * @param string $beanType ( type of bean or '*' to apply to all types )
-	 * @param string $property specify if you're looking for a property-specific template
+	 * @param string      $type     ( 'createTable' | 'widenColumn' | 'addColumn' )
+	 * @param string      $beanType ( type of bean or '*' to apply to all types )
+	 * @param string|NULL $property specify if you're looking for a property-specific template
 	 *
 	 * @return string
 	 */

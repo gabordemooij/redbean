@@ -55,7 +55,6 @@ interface Driver
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
-	 * @return mixed
 	 */
 	public function GetAssocRow( $sql, $bindings = array() );
 
@@ -179,7 +178,7 @@ interface Driver
 	/**
 	 * Sets initialization code for connection.
 	 *
-	 * @param callable $code code
+	 * @param callable|NULL $code code
 	 *
 	 * @return void
 	 */

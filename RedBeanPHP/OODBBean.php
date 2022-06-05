@@ -98,12 +98,12 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * rich functionality, otherwise you would have to do everything with R or
 	 * external objects.
 	 *
-	 * @var BeanHelper
+	 * @var BeanHelper|NULL
 	 */
 	protected $beanHelper = NULL;
 
 	/**
-	 * @var string|null
+	 * @var string|NULL
 	 */
 	protected $fetchType = NULL;
 
@@ -118,12 +118,12 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	protected $withParams = array();
 
 	/**
-	 * @var string
+	 * @var string|NULL
 	 */
 	protected $aliasName = NULL;
 
 	/**
-	 * @var string
+	 * @var string|NULL
 	 */
 	protected $via = NULL;
 
@@ -138,7 +138,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	protected $all = FALSE;
 
 	/**
-	 * @var string
+	 * @var string|NULL
 	 */
 	protected $castProperty = NULL;
 
@@ -432,8 +432,8 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Unless you know what you are doing, do NOT use this method.
 	 * This is for advanced users only!
 	 *
-	 * @param string     $type       type of the new bean
-	 * @param BeanHelper $beanhelper bean helper to obtain a toolbox and a model
+	 * @param string          $type       type of the new bean
+	 * @param BeanHelper|NULL $beanhelper bean helper to obtain a toolbox and a model
 	 *
 	 * @return void
 	 */
@@ -743,7 +743,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * key and should always correspond with a table column named
 	 * 'id'.
 	 *
-	 * @return string|null
+	 * @return string|NULL
 	 */
 	public function getID()
 	{
@@ -1656,7 +1656,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @param string $property property
 	 * @param callable $function function
-	 * @param integer $maxDepth maximum depth for traversal
+	 * @param integer|NULL $maxDepth maximum depth for traversal
 	 *
 	 * @return OODBBean
 	 * @throws RedException
@@ -2235,9 +2235,9 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * quest beans residing in the $questTarget->target properties
 	 * of each element in the xownQuestTargetList.
 	 *
-	 * @param string $list     the list you wish to process
-	 * @param string $property the property to load
-	 * @param string $type     the type of bean residing in this property (optional)
+	 * @param string      $list     the list you wish to process
+	 * @param string      $property the property to load
+	 * @param string|NULL $type     the type of bean residing in this property (optional)
 	 *
 	 * @return array
 	 */
