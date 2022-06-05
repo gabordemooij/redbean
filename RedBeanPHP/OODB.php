@@ -168,7 +168,7 @@ class OODB extends Observable
 
 	/**
 	 * Toggles fluid or frozen mode. In fluid mode the database
-	 * structure is adjusted to accomodate your objects. In frozen mode
+	 * structure is adjusted to accommodate your objects. In frozen mode
 	 * this is not the case.
 	 *
 	 * You can also pass an array containing a selection of frozen types.
@@ -212,7 +212,7 @@ class OODB extends Observable
 	/**
 	 * Returns the current mode of operation of RedBean.
 	 * In fluid mode the database
-	 * structure is adjusted to accomodate your objects.
+	 * structure is adjusted to accommodate your objects.
 	 * In frozen mode
 	 * this is not the case.
 	 *

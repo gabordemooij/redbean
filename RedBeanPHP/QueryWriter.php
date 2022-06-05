@@ -290,7 +290,7 @@ interface QueryWriter
 	public function queryRecordRelated( $sourceType, $destType, $linkID, $addSql = '', $bindings = array() );
 
 	/**
-	 * Returns the row that links $sourceType $sourcID to $destType $destID in an N-M relation.
+	 * Returns the row that links $sourceType $sourceID to $destType $destID in an N-M relation.
 	 *
 	 * @param string $sourceType source type, the first part of the link you're looking for
 	 * @param string $destType   destination type, the second part of the link you're looking for
@@ -420,7 +420,7 @@ interface QueryWriter
 	public function deleteRelations( $sourceType, $destType, $sourceID );
 
 	/**
-	 * @see QueryWriter::addUniqueConstaint
+	 * @see QueryWriter::addUniqueConstraint
 	 */
 	public function addUniqueIndex( $type, $columns );
 

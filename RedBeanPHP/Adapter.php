@@ -108,7 +108,7 @@ interface Adapter
 	 * Executes the SQL query specified in $sql and returns
 	 * an associative array where the column names are the keys.
 	 *
-	 * @param string $sql      Sstring containing SQL code for databaseQL
+	 * @param string $sql      String containing SQL code for databaseQL
 	 * @param array  $bindings values to bind
 	 *
 	 * @return array

@@ -41,7 +41,7 @@ class Debug extends RDefault implements Logger
 	 * Toggles CLI override. By default debugging functions will
 	 * output differently based on PHP_SAPI values. This function
 	 * allows you to override the PHP_SAPI setting. If you set
-	 * this to TRUE, CLI output will be supressed in favour of
+	 * this to TRUE, CLI output will be suppressed in favour of
 	 * HTML output. So, to get HTML on the command line use
 	 * setOverrideCLIOutput( TRUE ).
 	 *
@@ -120,7 +120,7 @@ class Debug extends RDefault implements Logger
 	}
 
 	/**
-	 * Dependending on the current mode of operation,
+	 * Depending on the current mode of operation,
 	 * this method will either log and output to STDIN or
 	 * just log.
 	 *
@@ -136,7 +136,7 @@ class Debug extends RDefault implements Logger
 		$this->logs[] = $str;
 		if ( !$this->mode ) {
 			$highlight = FALSE;
-			/* just a quick heuritsic to highlight schema changes */
+			/* just a quick heuristic to highlight schema changes */
 			if ( strpos( $str, 'CREATE' ) === 0
 			|| strpos( $str, 'ALTER' ) === 0
 			|| strpos( $str, 'DROP' ) === 0) {

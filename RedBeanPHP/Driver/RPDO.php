@@ -304,7 +304,7 @@ class RPDO implements Driver
 	 * from an existing PDO object.
 	 *
 	 * @param string|\PDO   $dsn  database connection string
-	 * @param string        $user optional, usename to sign in
+	 * @param string        $user optional, username to sign in
 	 * @param string        $pass optional, password for connection login
 	 *
 	 * @return void
@@ -618,7 +618,7 @@ class RPDO implements Driver
 	}
 
 	/**
-	 * @see Driver::Excecute
+	 * @see Driver::Execute
 	 */
 	public function Execute( $sql, $bindings = array() )
 	{

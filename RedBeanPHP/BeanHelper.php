@@ -11,7 +11,7 @@ use RedBeanPHP\OODBBean as OODBBean;
  * Interface for Bean Helper.
  * A little bolt that glues the whole machinery together.
  * The Bean Helper is passed to the OODB RedBeanPHP Object to
- * faciliatte the creation of beans and providing them with
+ * facilitate the creation of beans and providing them with
  * a toolbox. The Helper also facilitates the FUSE feature,
  * determining how beans relate to their models. By overriding
  * the getModelForBean method you can tune the FUSEing to

@@ -11,7 +11,7 @@ use RedBeanPHP\QueryWriter;
  * Tree
  *
  * Given a bean, finds it children or parents
- * in a hierchical structure.
+ * in a hierarchical structure.
  *
  * @experimental feature
  *
@@ -59,8 +59,8 @@ class Tree {
 	 * bean in a tree structure.
 	 *
 	 * @note this only works for databases that support
-	 * recusrive common table expressions.
-	 * 
+	 * recursive common table expressions.
+	 *
 	 * Usage:
 	 *
 	 * <code>
@@ -97,7 +97,7 @@ class Tree {
 	 * bean in a tree structure.
 	 *
 	 * @note this only works for databases that support
-	 * recusrive common table expressions.
+	 * recursive common table expressions.
 	 *
 	 * <code>
 	 * $newsPages = R::parents( $newsArticle, ' ORDER BY title ASC ' );
@@ -133,7 +133,7 @@ class Tree {
 	 * bean in a tree structure.
 	 *
 	 * @note this only works for databases that support
-	 * recusrive common table expressions.
+	 * recursive common table expressions.
 	 *
 	 * <code>
 	 * $count = R::countChildren( $newsArticle );
@@ -175,7 +175,7 @@ class Tree {
 	 * bean in a tree structure.
 	 *
 	 * @note this only works for databases that support
-	 * recusrive common table expressions.
+	 * recursive common table expressions.
 	 *
 	 * <code>
 	 * $count = R::countParents( $newsArticle );

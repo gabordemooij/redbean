@@ -318,7 +318,7 @@ class Facade
 	 * Toggles fluid transactions. By default fluid transactions
 	 * are not active. Starting, committing or rolling back a transaction
 	 * through the facade in fluid mode will have no effect. If you wish
-	 * to replace this standard portable behavor with behavior depending
+	 * to replace this standard portable behavior with behavior depending
 	 * on how the used database platform handles fluid (DDL) transactions
 	 * set this flag to TRUE.
 	 *
@@ -424,7 +424,7 @@ class Facade
 
 	/**
 	 * Creates a toolbox. This method can be called if you want to use redbean non-static.
-	 * It has the same interface as R::setup(). The createToolbx() method can be called
+	 * It has the same interface as R::setup(). The createToolbox() method can be called
 	 * without any arguments, in this case it will try to create a SQLite database in
 	 * /tmp called red.db (this only works on UNIX-like systems).
 	 *
@@ -548,7 +548,7 @@ class Facade
 	 * There are 2 debug styles:
 	 *
 	 * Classic: separate parameter bindings, explicit and complete but less readable
-	 * Fancy:   interpersed bindings, truncates large strings, highlighted schema changes
+	 * Fancy:   interspersed bindings, truncates large strings, highlighted schema changes
 	 *
 	 * Fancy style is more readable but sometimes incomplete.
 	 *
@@ -676,7 +676,7 @@ class Facade
 
 	/**
 	 * Toggles fluid or frozen mode. In fluid mode the database
-	 * structure is adjusted to accomodate your objects. In frozen mode
+	 * structure is adjusted to accommodate your objects. In frozen mode
 	 * this is not the case.
 	 *
 	 * You can also pass an array containing a selection of frozen types.
@@ -953,7 +953,7 @@ class Facade
 	}
 
 	/**
-	 * Convience method. Tries to find beans of a certain type,
+	 * Convenience method. Tries to find beans of a certain type,
 	 * if no beans are found, it dispenses a bean of that type.
 	 * Note that this function always returns an array.
 	 *
@@ -1492,7 +1492,7 @@ class Facade
 	 * New in 4.3.2: meta mask. The meta mask is a special mask to send
 	 * data from raw result rows to the meta store of the bean. This is
 	 * useful for bundling additional information with custom queries.
-	 * Values of every column whos name starts with $mask will be
+	 * Values of every column who's name starts with $mask will be
 	 * transferred to the meta section of the bean under key 'data.bundle'.
 	 *
 	 * @param string $type     type of beans to produce
@@ -1507,7 +1507,7 @@ class Facade
 	}
 
 	/**
-	 * Just like converToBeans, but for one bean.
+	 * Just like convertToBeans, but for one bean.
 	 *
 	 * @param string $type      type of bean to produce
 	 * @param array  $row       one row from the database
@@ -1858,7 +1858,7 @@ class Facade
 	}
 
 	/**
-	 * Facade Convience method for adapter transaction system.
+	 * Facade Convenience method for adapter transaction system.
 	 * Begins a transaction.
 	 *
 	 * Usage:
@@ -1899,7 +1899,7 @@ class Facade
 	}
 
 	/**
-	 * Facade Convience method for adapter transaction system.
+	 * Facade Convenience method for adapter transaction system.
 	 * Commits a transaction.
 	 *
 	 * Usage:
@@ -1940,7 +1940,7 @@ class Facade
 	}
 
 	/**
-	 * Facade Convience method for adapter transaction system.
+	 * Facade Convenience method for adapter transaction system.
 	 * Rolls back a transaction.
 	 *
 	 * Usage:
@@ -2177,7 +2177,7 @@ class Facade
 	 * only IDs. This function combines trashAll and batch loading
 	 * in one call. Note that while this function accepts just
 	 * bean IDs, the beans will still be loaded first. This is because
-	 * the function still respects all the FUSE hooks that may have beeb
+	 * the function still respects all the FUSE hooks that may have been
 	 * associated with the domain logic associated with these beans.
 	 * If you really want to delete just records from the database use
 	 * a simple DELETE-FROM SQL query instead.
@@ -2264,7 +2264,7 @@ class Facade
 
 	/**
 	 * Generates and returns an ENUM value. This is how RedBeanPHP handles ENUMs.
-	 * Either returns a (newly created) bean respresenting the desired ENUM
+	 * Either returns a (newly created) bean representing the desired ENUM
 	 * value or returns a list of all enums for the type.
 	 *
 	 * To obtain (and add if necessary) an ENUM value:
@@ -2636,7 +2636,7 @@ class Facade
 	 * fetchAs but explicitly. For instance if you register
 	 * the alias 'cover' for 'page' a property containing a reference to a
 	 * page bean called 'cover' will correctly return the page bean and not
-	 * a (non-existant) cover bean.
+	 * a (non-existent) cover bean.
 	 *
 	 * <code>
 	 * R::aliases( array( 'cover' => 'page' ) );
@@ -2743,7 +2743,7 @@ class Facade
 
 	/**
 	 * Stops logging and flushes the logs,
-	 * convient method to stop logging of queries.
+	 * convenient method to stop logging of queries.
 	 * Use this method to stop logging SQL queries being
 	 * executed by the adapter. Logging queries will not
 	 * print them on the screen. Use R::getLogs() to

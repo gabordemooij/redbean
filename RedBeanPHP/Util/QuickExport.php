@@ -12,7 +12,7 @@ use RedBeanPHP\ToolBox as ToolBox;
  * The Quick Export Utility Class provides functionality to easily
  * expose the result of SQL queries as well-known formats like CSV.
  *
- * @file    RedBeanPHP/Util/QuickExporft.php
+ * @file    RedBeanPHP/Util/QuickExport.php
  * @author  Gabor de Mooij and the RedBeanPHP Community
  * @license BSD/GPLv2
  *

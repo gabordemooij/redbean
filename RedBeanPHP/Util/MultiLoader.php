@@ -14,7 +14,7 @@ use RedBeanPHP\OODBBean as OODBBean;
  *
  * This helper class offers limited support for one-to-one
  * relations by providing a service to load a set of beans
- * with differnt types and a common ID.
+ * with different types and a common ID.
  *
  * @file    RedBeanPHP/Util/MultiLoader.php
  * @author  Gabor de Mooij and the RedBeanPHP Community

@@ -14,7 +14,7 @@ use RedBeanPHP\Cursor\NullCursor as NullCursor;
  * Abstract Repository.
  *
  * OODB manages two repositories, a fluid one that
- * adjust the database schema on-the-fly to accomodate for
+ * adjust the database schema on-the-fly to accommodate for
  * new bean types (tables) and new properties (columns) and
  * a frozen one for use in a production environment. OODB
  * allows you to swap the repository instances using the freeze()
@@ -156,7 +156,7 @@ abstract class Repository
 	 * A bean may contain lists. This
 	 * method handles shared addition lists; i.e.
 	 * the $bean->sharedObject properties.
-	 * Shared beans will be associated with eachother using the
+	 * Shared beans will be associated with each other using the
 	 * Association Manager.
 	 *
 	 * @param OODBBean $bean            the bean

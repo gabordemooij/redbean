@@ -572,7 +572,7 @@ abstract class AQueryWriter
 	/**
 	 * Determines whether a string can be considered JSON or not.
 	 * This is used by writers that support JSON columns. However
-	 * we dont want that code duplicated over all JSON supporting
+	 * we don't want that code duplicated over all JSON supporting
 	 * Query Writers.
 	 *
 	 * @param string $value value to determine 'JSONness' of.
@@ -736,7 +736,7 @@ abstract class AQueryWriter
 	 * Used for UUID support.
 	 *
 	 * @param integer $dataTypeID    magic number constant assigned to this data type
-	 * @param string  $SQLDefinition SQL column definition (i.e. INT(11))
+	 * @param string  $SQLDefinition SQL column definition (e.g. INT(11))
 	 *
 	 * @return self
 	 */
