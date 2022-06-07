@@ -55,6 +55,7 @@ interface Driver
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
+	 * @return array
 	 */
 	public function GetAssocRow( $sql, $bindings = array() );
 

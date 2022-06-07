@@ -144,7 +144,7 @@ class Facade
 	 * @param string $sql      the sql you want to execute
 	 * @param array  $bindings array of values to be bound to query statement
 	 *
-	 * @return array|int|Cursor\PDOCursor|null
+	 * @return array|int|Cursor|NULL
 	 */
 	private static function query( $method, $sql, $bindings )
 	{
@@ -2963,7 +2963,7 @@ class Facade
 	 * @param array    $onNotFoundDo task list to be considered on NOT finding the bean
 	 * @param OODBBean &$bean        reference to obtain the found bean
 	 *
-	 * @return bool|null
+	 * @return bool|NULL
 	 */
 	public static function matchUp( $type, $sql, $bindings = array(), $onFoundDo = NULL, $onNotFoundDo = NULL, &$bean = NULL 	) {
 		$matchUp = new MatchUp( self::$toolbox );
