@@ -102,6 +102,11 @@ class Facade
 	private static $tree;
 
 	/**
+	 * @var Logger
+	 */
+	private static $logger;
+
+	/**
 	 * @var callable[]
 	 */
 	private static $plugins = array();
