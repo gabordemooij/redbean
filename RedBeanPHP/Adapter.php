@@ -100,7 +100,7 @@ interface Adapter
 	 * @param string $sql      string containing SQL code for database
 	 * @param array  $bindings array of values to bind to parameters in query string
 	 *
-	 * @return array|NULL
+	 * @return array
 	 */
 	public function getAssoc( $sql, $bindings = array() );
 
