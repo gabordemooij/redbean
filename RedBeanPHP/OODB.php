@@ -50,7 +50,7 @@ class OODB extends Observable
 	protected $nesting = 0;
 
 	/**
-	 * @var DBAdapter
+	 * @var QueryWriter
 	 */
 	protected $writer;
 
@@ -60,12 +60,12 @@ class OODB extends Observable
 	protected $isFrozen = FALSE;
 
 	/**
-	 * @var FacadeBeanHelper
+	 * @var BeanHelper|NULL
 	 */
 	protected $beanhelper = NULL;
 
 	/**
-	 * @var AssociationManager
+	 * @var AssociationManager|NULL
 	 */
 	protected $assocManager = NULL;
 
@@ -75,12 +75,12 @@ class OODB extends Observable
 	protected $repository = NULL;
 
 	/**
-	 * @var FrozenRepo
+	 * @var FrozenRepo|NULL
 	 */
 	protected $frozenRepository = NULL;
 
 	/**
-	 * @var FluidRepo
+	 * @var FluidRepo|NULL
 	 */
 	protected $fluidRepository = NULL;
 
@@ -106,7 +106,7 @@ class OODB extends Observable
 	 * Unboxes a bean from a FUSE model if needed and checks whether the bean is
 	 * an instance of OODBBean.
 	 *
-	 * @param OODBBean $bean bean you wish to unbox
+	 * @param OODBBean|SimpleModel $bean bean you wish to unbox
 	 *
 	 * @return OODBBean
 	 */
@@ -168,7 +168,7 @@ class OODB extends Observable
 
 	/**
 	 * Toggles fluid or frozen mode. In fluid mode the database
-	 * structure is adjusted to accomodate your objects. In frozen mode
+	 * structure is adjusted to accommodate your objects. In frozen mode
 	 * this is not the case.
 	 *
 	 * You can also pass an array containing a selection of frozen types.
@@ -212,7 +212,7 @@ class OODB extends Observable
 	/**
 	 * Returns the current mode of operation of RedBean.
 	 * In fluid mode the database
-	 * structure is adjusted to accomodate your objects.
+	 * structure is adjusted to accommodate your objects.
 	 * In frozen mode
 	 * this is not the case.
 	 *
@@ -252,7 +252,7 @@ class OODB extends Observable
 	 * @param string  $number            number of beans you would like to get
 	 * @param boolean $alwaysReturnArray if TRUE always returns the result as an array
 	 *
-	 * @return OODBBean
+	 * @return OODBBean|OODBBean[]
 	 */
 	public function dispense( $type, $number = 1, $alwaysReturnArray = FALSE )
 	{
@@ -281,7 +281,7 @@ class OODB extends Observable
 	 * Returns the current bean helper.
 	 * Bean helpers assist beans in getting a reference to a toolbox.
 	 *
-	 * @return BeanHelper
+	 * @return BeanHelper|NULL
 	 */
 	public function getBeanHelper()
 	{
@@ -303,7 +303,7 @@ class OODB extends Observable
 	}
 
 	/**
-	 * Searches the database for a bean that matches conditions $conditions and sql $addSQL
+	 * Searches the database for a bean that matches conditions $conditions and sql $sql
 	 * and returns an array containing all the beans that have been found.
 	 *
 	 * Conditions need to take form:
@@ -321,10 +321,10 @@ class OODB extends Observable
 	 * Note that you can use property names; the columns will be extracted using the
 	 * appropriate bean formatter.
 	 *
-	 * @param string $type       type of beans you are looking for
-	 * @param array  $conditions list of conditions
-	 * @param string $sql        SQL to be used in query
-	 * @param array  $bindings   a list of values to bind to query parameters
+	 * @param string      $type       type of beans you are looking for
+	 * @param array       $conditions list of conditions
+	 * @param string|NULL $sql        SQL to be used in query
+	 * @param array       $bindings   a list of values to bind to query parameters
 	 *
 	 * @return array
 	 */
@@ -336,9 +336,9 @@ class OODB extends Observable
 	/**
 	 * Same as find() but returns a BeanCollection.
 	 *
-	 * @param string $type     type of beans you are looking for
-	 * @param string $sql      SQL to be used in query
-	 * @param array  $bindings a list of values to bind to query parameters
+	 * @param string      $type     type of beans you are looking for
+	 * @param string|NULL $sql      SQL to be used in query
+	 * @param array       $bindings a list of values to bind to query parameters
 	 *
 	 * @return BeanCollection
 	 */
@@ -426,7 +426,7 @@ class OODB extends Observable
 	 *
 	 * @param OODBBean|SimpleModel $bean bean you want to remove from database
 	 *
-	 * @return void
+	 * @return int
 	 */
 	public function trash( $bean )
 	{
@@ -557,10 +557,10 @@ class OODB extends Observable
 	 * MySQL spatial columns, because they need to be processed first using
 	 * the asText/GeomFromText functions.
 	 *
-	 * @param string  $mode       mode to set function for, i.e. read or write
-	 * @param string  $field      field (table.column) to bind SQL function to
-	 * @param string  $function   SQL function to bind to field
-	 * @param boolean $isTemplate TRUE if $function is an SQL string, FALSE for just a function name
+	 * @param string       $mode       mode to set function for, i.e. read or write
+	 * @param string       $field      field (table.column) to bind SQL function to
+	 * @param string|NULL  $function   SQL function to bind to field
+	 * @param boolean      $isTemplate TRUE if $function is an SQL string, FALSE for just a function name
 	 *
 	 * @return void
 	 */

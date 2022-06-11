@@ -24,7 +24,7 @@ use RedBeanPHP\Cursor as Cursor;
 class PDOCursor implements Cursor
 {
 	/**
-	 * @var PDOStatement
+	 * @var \PDOStatement
 	 */
 	protected $res;
 
@@ -36,7 +36,7 @@ class PDOCursor implements Cursor
 	/**
 	 * Constructor, creates a new instance of a PDO Database Cursor.
 	 *
-	 * @param PDOStatement $res        the PDO statement
+	 * @param \PDOStatement $res        the PDO statement
 	 * @param string       $fetchStyle fetch style constant to use
 	 *
 	 * @return void

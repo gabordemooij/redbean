@@ -79,11 +79,11 @@ class MatchUp
 	 * @param string   $type         type of bean you're looking for
 	 * @param string   $sql          SQL snippet (starting at the WHERE clause, omit WHERE-keyword)
 	 * @param array    $bindings     array of parameter bindings for SQL snippet
-	 * @param array    $onFoundDo    task list to be considered on finding the bean
-	 * @param array    $onNotFoundDo task list to be considered on NOT finding the bean
-	 * @param OODBBean &$bean        reference to obtain the found bean
+	 * @param array|NULL    $onFoundDo    task list to be considered on finding the bean
+	 * @param array|NULL    $onNotFoundDo task list to be considered on NOT finding the bean
+	 * @param OODBBean|NULL &$bean        reference to obtain the found bean
 	 *
-	 * @return mixed
+	 * @return bool|NULL
 	 */
 	public function matchUp( $type, $sql, $bindings = array(), $onFoundDo = NULL, $onNotFoundDo = NULL, &$bean = NULL )
 	{

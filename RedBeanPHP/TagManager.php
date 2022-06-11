@@ -37,7 +37,7 @@ class TagManager
 	protected $associationManager;
 
 	/**
-	 * @var OODBBean
+	 * @var OODB
 	 */
 	protected $redbean;
 
@@ -46,7 +46,7 @@ class TagManager
 	 * it will split the string into words and return an array instead.
 	 * In case of an array the argument will be returned 'as is'.
 	 *
-	 * @param array|string $tagList list of tags
+	 * @param array|string|false $tagList list of tags
 	 *
 	 * @return array
 	 */
@@ -62,12 +62,12 @@ class TagManager
 	}
 
 	/**
-	 * Finds a tag bean by it's title.
+	 * Finds a tag bean by its title.
 	 * Internal method.
 	 *
 	 * @param string $title title to search for
 	 *
-	 * @return OODBBean
+	 * @return OODBBean|NULL
 	 */
 	protected function findTagByTitle( $title )
 	{
@@ -98,7 +98,7 @@ class TagManager
 	}
 
 	/**
-	 * Tests whether a bean has been associated with one ore more
+	 * Tests whether a bean has been associated with one or more
 	 * of the listed tags. If the third parameter is TRUE this method
 	 * will return TRUE only if all tags that have been specified are indeed
 	 * associated with the given bean, otherwise FALSE.
@@ -156,8 +156,8 @@ class TagManager
 	 * In the example above, the $blog bean will no longer
 	 * be associated with the tags 'smart' and 'interesting'.
 	 *
-	 * @param  OODBBean $bean    tagged bean
-	 * @param  array    $tagList list of tags (names)
+	 * @param  OODBBean     $bean    tagged bean
+	 * @param  array|string $tagList list of tags (names)
 	 *
 	 * @return void
 	 */
@@ -233,8 +233,8 @@ class TagManager
 	 * The example adds the tag 'halloween' to the $blog
 	 * bean.
 	 *
-	 * @param OODBBean $bean    bean to tag
-	 * @param array    $tagList list of tags to add to bean
+	 * @param OODBBean           $bean    bean to tag
+	 * @param array|string|false $tagList list of tags to add to bean
 	 *
 	 * @return void
 	 */

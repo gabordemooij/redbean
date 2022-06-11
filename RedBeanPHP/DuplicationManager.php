@@ -64,7 +64,7 @@ class DuplicationManager
 	protected $filters = array();
 
 	/**
-	 * @var array
+	 * @var boolean
 	 */
 	protected $cacheTables = FALSE;
 
@@ -341,6 +341,8 @@ class DuplicationManager
 	 * every time a duplication action is performed (dup()).
 	 *
 	 * @param boolean $yesNo TRUE to use caching, FALSE otherwise
+	 *
+	 * @return void
 	 */
 	public function setCacheTables( $yesNo )
 	{

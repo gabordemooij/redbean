@@ -55,7 +55,7 @@ interface Driver
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
-	 * @return mixed
+	 * @return array
 	 */
 	public function GetAssocRow( $sql, $bindings = array() );
 
@@ -83,7 +83,7 @@ interface Driver
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
-	 * @return array Affected Rows
+	 * @return int Affected Rows
 	 */
 	public function Execute( $sql, $bindings = array() );
 
@@ -109,7 +109,7 @@ interface Driver
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings list of values to bind to SQL snippet
 	 *
-	 * @return mixed
+	 * @return Cursor
 	 */
 	public function GetCursor( $sql, $bindings = array() );
 
@@ -142,14 +142,14 @@ interface Driver
 	public function setDebugMode( $tf, $customLogger );
 
 	/**
-	 * Starts a transaction.
+	 * Commits a transaction.
 	 *
 	 * @return void
 	 */
 	public function CommitTrans();
 
 	/**
-	 * Commits a transaction.
+	 * Starts a transaction.
 	 *
 	 * @return void
 	 */
@@ -179,7 +179,7 @@ interface Driver
 	/**
 	 * Sets initialization code for connection.
 	 *
-	 * @param callable $code code
+	 * @param callable|NULL $code code
 	 *
 	 * @return void
 	 */

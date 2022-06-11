@@ -98,12 +98,12 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * rich functionality, otherwise you would have to do everything with R or
 	 * external objects.
 	 *
-	 * @var BeanHelper
+	 * @var BeanHelper|NULL
 	 */
 	protected $beanHelper = NULL;
 
 	/**
-	 * @var null
+	 * @var string|NULL
 	 */
 	protected $fetchType = NULL;
 
@@ -118,12 +118,12 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	protected $withParams = array();
 
 	/**
-	 * @var string
+	 * @var string|NULL
 	 */
 	protected $aliasName = NULL;
 
 	/**
-	 * @var string
+	 * @var string|NULL
 	 */
 	protected $via = NULL;
 
@@ -138,7 +138,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	protected $all = FALSE;
 
 	/**
-	 * @var string
+	 * @var string|NULL
 	 */
 	protected $castProperty = NULL;
 
@@ -146,7 +146,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * If fluid count is set to TRUE then $bean->ownCount() will
 	 * return 0 if the table does not exists.
 	 * Only for backward compatibility.
-	 * Returns previouds value.
+	 * Returns previous value.
 	 *
 	 * @param boolean $toggle toggle
 	 *
@@ -251,7 +251,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * fetchAs and setAutoResolve but explicitly. For instance if you register
 	 * the alias 'cover' for 'page' a property containing a reference to a
 	 * page bean called 'cover' will correctly return the page bean and not
-	 * a (non-existant) cover bean.
+	 * a (non-existent) cover bean.
 	 *
 	 * <code>
 	 * R::aliases( array( 'cover' => 'page' ) );
@@ -432,8 +432,8 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Unless you know what you are doing, do NOT use this method.
 	 * This is for advanced users only!
 	 *
-	 * @param string     $type       type of the new bean
-	 * @param BeanHelper $beanhelper bean helper to obtain a toolbox and a model
+	 * @param string          $type       type of the new bean
+	 * @param BeanHelper|NULL $beanhelper bean helper to obtain a toolbox and a model
 	 *
 	 * @return void
 	 */
@@ -480,7 +480,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * Note that not all PHP functions work with the array interface.
 	 *
-	 * @return ArrayIterator
+	 * @return \ArrayIterator
 	 */
 	 #[\ReturnTypeWillChange]
 	public function getIterator()
@@ -491,7 +491,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	/**
 	 * Imports all values from an associative array $array. Chainable.
 	 * This method imports the values in the first argument as bean
-	 * propery and value pairs. Use the second parameter to provide a
+	 * property and value pairs. Use the second parameter to provide a
 	 * selection. If a selection array is passed, only the entries
 	 * having keys mentioned in the selection array will be imported.
 	 * Set the third parameter to TRUE to preserve spaces in selection keys.
@@ -552,7 +552,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Set the second parameter to apply a different function.
 	 *
 	 * @param array        $array     what you want to import
-	 * @param string       $function  function to apply (default is trim)
+	 * @param callable     $function  function to apply (default is trim)
 	 * @param string|array $selection selection of values
 	 * @param boolean      $notrim    if TRUE selection keys will NOT be trimmed
 	 *
@@ -739,11 +739,11 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Returns the ID of the bean.
 	 * If for some reason the ID has not been set, this method will
 	 * return NULL. This is actually the same as accessing the
-	 * id property using $bean->id. The ID of a bean is it's primary
+	 * id property using $bean->id. The ID of a bean is its primary
 	 * key and should always correspond with a table column named
 	 * 'id'.
 	 *
-	 * @return string|null
+	 * @return string|NULL
 	 */
 	public function getID()
 	{
@@ -1012,7 +1012,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	/**
 	 * Determines whether a list is opened in exclusive mode or not.
 	 * If a list has been opened in exclusive mode this method will return TRUE,
-	 * othwerwise it will return FALSE.
+	 * otherwise it will return FALSE.
 	 *
 	 * @param string $listName name of the list to check
 	 *
@@ -1244,7 +1244,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$value = '0';
 		} elseif ( $value === TRUE ) {
 			$value = '1';
-			/* for some reason there is some kind of bug in xdebug so that it doesnt count this line otherwise... */
+			/* for some reason there is some kind of bug in xdebug so that it doesn't count this line otherwise... */
 		} elseif ( $value instanceof \DateTime ) { $value = $value->format( 'Y-m-d H:i:s' ); }
 		$this->properties[$property] = $value;
 	}
@@ -1552,7 +1552,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Unsets a value from the array/bean.
 	 *
 	 * Array functions do not reveal x-own-lists and list-alias because
-	 * you dont want duplicate entries in foreach-loops.
+	 * you don't want duplicate entries in foreach-loops.
 	 * Also offers a slight performance improvement for array access.
 	 *
 	 * @param  mixed $offset property
@@ -1571,7 +1571,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * Returns value of a property.
 	 *
 	 * Array functions do not reveal x-own-lists and list-alias because
-	 * you dont want duplicate entries in foreach-loops.
+	 * you don't want duplicate entries in foreach-loops.
 	 * Also offers a slight performance improvement for array access.
 	 *
 	 * @param  mixed $offset property
@@ -1656,7 +1656,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * @param string $property property
 	 * @param callable $function function
-	 * @param integer $maxDepth maximum depth for traversal
+	 * @param integer|NULL $maxDepth maximum depth for traversal
 	 *
 	 * @return OODBBean
 	 * @throws RedException
@@ -1787,7 +1787,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	}
 
 	/**
-	 * Convience method.
+	 * Convenience method.
 	 * Unsets all properties in the internal properties array.
 	 *
 	 * Usage:
@@ -1870,7 +1870,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 *
 	 * Note that this method will return TRUE if applied to a loaded list.
 	 * Also note that this method keeps track of the bean's history regardless whether
-	 * it has been stored or not. Storing a bean does not undo it's history,
+	 * it has been stored or not. Storing a bean does not undo its history,
 	 * to clean the history of a bean use: clearHistory().
 	 *
 	 * @param string  $property name of the property you want the change-status of
@@ -2235,9 +2235,9 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * quest beans residing in the $questTarget->target properties
 	 * of each element in the xownQuestTargetList.
 	 *
-	 * @param string $list     the list you wish to process
-	 * @param string $property the property to load
-	 * @param string $type     the type of bean residing in this property (optional)
+	 * @param string      $list     the list you wish to process
+	 * @param string      $property the property to load
+	 * @param string|NULL $type     the type of bean residing in this property (optional)
 	 *
 	 * @return array
 	 */
@@ -2293,7 +2293,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * </code>
 	 *
 	 * The example above compares the flavour label 'mocca' with
-	 * the flavour label attachec to the $coffee bean. This illustrates
+	 * the flavour label attached to the $coffee bean. This illustrates
 	 * how to use equals() with RedBeanPHP-style enums.
 	 *
 	 * @param OODBBean|null $bean other bean

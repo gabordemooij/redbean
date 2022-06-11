@@ -30,7 +30,7 @@ class SimpleModelHelper implements Observer
 	 * invoke the corresponding method on the bean.
 	 *
 	 * @param string  $eventName i.e. 'delete', 'after_delete'
-	 * @param OODBean $bean      affected bean
+	 * @param OODBBean $bean      affected bean
 	 *
 	 * @return void
 	 */

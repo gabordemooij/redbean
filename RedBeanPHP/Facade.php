@@ -67,7 +67,7 @@ class Facade
 	private static $writer;
 
 	/**
-	 * @var DBAdapter
+	 * @var Adapter
 	 */
 	private static $adapter;
 
@@ -107,7 +107,7 @@ class Facade
 	private static $logger;
 
 	/**
-	 * @var array
+	 * @var callable[]
 	 */
 	private static $plugins = array();
 
@@ -117,12 +117,12 @@ class Facade
 	private static $exportCaseStyle = 'default';
 
 	/**
-	 * @var flag allows transactions through facade in fluid mode
+	 * @var bool flag allows transactions through facade in fluid mode
 	 */
 	private static $allowFluidTransactions = FALSE;
 
 	/**
-	 * @var flag allows to unfreeze if needed with store(all)
+	 * @var bool flag allows to unfreeze if needed with store(all)
 	 */
 	private static $allowHybridMode = FALSE;
 
@@ -137,7 +137,7 @@ class Facade
 	public static $currentDB = '';
 
 	/**
-	 * @var array
+	 * @var ToolBox[]
 	 */
 	public static $toolboxes = array();
 
@@ -149,7 +149,7 @@ class Facade
 	 * @param string $sql      the sql you want to execute
 	 * @param array  $bindings array of values to be bound to query statement
 	 *
-	 * @return array
+	 * @return array|int|Cursor|NULL
 	 */
 	private static function query( $method, $sql, $bindings )
 	{
@@ -184,6 +184,8 @@ class Facade
 	 * flag.
 	 *
 	 * @param boolean $hybrid
+	 *
+	 * @return bool
 	 */
 	public static function setAllowHybridMode( $hybrid )
 	{
@@ -261,11 +263,11 @@ class Facade
 	 * a connection is really required, for instance when attempting to load
 	 * a bean.
 	 *
-	 * @param string  $dsn          Database connection string
-	 * @param string  $username     Username for database
-	 * @param string  $password     Password for database
-	 * @param boolean $frozen       TRUE if you want to setup in frozen mode
-	 * @param boolean $partialBeans TRUE to enable partial bean updates
+	 * @param string|\PDO|NULL $dsn     Database connection string
+	 * @param string|NULL $username     Username for database
+	 * @param string|NULL $password     Password for database
+	 * @param boolean|string[] $frozen       TRUE if you want to setup in frozen mode
+	 * @param boolean|string[] $partialBeans TRUE to enable partial bean updates
 	 * @param array   $options      Additional (PDO) options to pass
 	 *
 	 * @return ToolBox
@@ -316,7 +318,7 @@ class Facade
 	 * Toggles fluid transactions. By default fluid transactions
 	 * are not active. Starting, committing or rolling back a transaction
 	 * through the facade in fluid mode will have no effect. If you wish
-	 * to replace this standard portable behavor with behavior depending
+	 * to replace this standard portable behavior with behavior depending
 	 * on how the used database platform handles fluid (DDL) transactions
 	 * set this flag to TRUE.
 	 *
@@ -397,13 +399,13 @@ class Facade
 	 * to the facade. Adding a database with the same key will cause an exception.
 	 *
 	 * @param string      $key    		ID for the database
-	 * @param string      $dsn    		DSN for the database
-	 * @param string      $user   		user for connection
-	 * @param NULL|string $pass   		password for connection
-	 * @param bool        $frozen 		whether this database is frozen or not
-	 * @param bool 		  $partialBeans should we load partial beans?
-	 * @param array		  $options		additional options for the query writer
-	 * @param BeanHelper  $beanHelper	Beanhelper to use (use this for DB specific model prefixes)
+	 * @param string|\PDO $dsn    		DSN for the database
+	 * @param string|NULL $user   		user for connection
+	 * @param string|NULL $pass   		password for connection
+	 * @param bool|string[]   $frozen 		  whether this database is frozen or not
+	 * @param bool|string[]   $partialBeans should we load partial beans?
+	 * @param array		        $options	   	additional options for the query writer
+	 * @param BeanHelper|NULL $beanHelper  	Beanhelper to use (use this for DB specific model prefixes)
 	 *
 	 * @return void
 	 */
@@ -422,7 +424,7 @@ class Facade
 
 	/**
 	 * Creates a toolbox. This method can be called if you want to use redbean non-static.
-	 * It has the same interface as R::setup(). The createToolbx() method can be called
+	 * It has the same interface as R::setup(). The createToolbox() method can be called
 	 * without any arguments, in this case it will try to create a SQLite database in
 	 * /tmp called red.db (this only works on UNIX-like systems).
 	 *
@@ -446,14 +448,16 @@ class Facade
 	 * Instead, it will prepare the connection and connect 'lazily', i.e. the moment
 	 * a connection is really required, for instance when attempting to load a bean.
 	 *
-	 * @param string  $dsn      Database connection string
+	 * @param string|\PDO $dsn      Database connection string
 	 * @param string  $username Username for database
 	 * @param string  $password Password for database
-	 * @param boolean $frozen   TRUE if you want to setup in frozen mode
+	 * @param boolean|string[] $frozen   TRUE if you want to setup in frozen mode
+	 * @param boolean|string[] $partialBeans TRUE to enable partial bean updates
+	 * @param array   $options
 	 *
 	 * @return ToolBox
 	 */
-	public static function createToolbox( $dsn = NULL, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
+	public static function createToolbox( $dsn, $username = NULL, $password = NULL, $frozen = FALSE, $partialBeans = FALSE, $options = array() )
 	{
 		if ( is_object($dsn) ) {
 			$db  = new RPDO( $dsn );
@@ -479,6 +483,7 @@ class Facade
 			throw new RedException( 'Unsupported database ('.$wkey.').' );
 		}
 		$writerClass = '\\RedBeanPHP\\QueryWriter\\'.$writers[$wkey];
+		/** @var AQueryWriter $writer */
 		$writer      = new $writerClass( $adapter );
 		$redbean     = new OODB( $writer, $frozen );
 
@@ -514,6 +519,7 @@ class Facade
 	 * switched and FALSE otherwise (for instance if you already using the specified database).
 	 *
 	 * @param  string $key Key of the database to select
+	 * @param  bool   $force
 	 *
 	 * @return boolean
 	 */
@@ -526,7 +532,6 @@ class Facade
 		if ( !isset( self::$toolboxes[$key] ) ) {
 			throw new RedException( 'Database not found in registry. Add database using R::addDatabase().' );
 		}
-
 
 		self::configureFacadeWithToolbox( self::$toolboxes[$key] );
 		self::$currentDB = $key;
@@ -544,7 +549,7 @@ class Facade
 	 * There are 2 debug styles:
 	 *
 	 * Classic: separate parameter bindings, explicit and complete but less readable
-	 * Fancy:   interpersed bindings, truncates large strings, highlighted schema changes
+	 * Fancy:   interspersed bindings, truncates large strings, highlighted schema changes
 	 *
 	 * Fancy style is more readable but sometimes incomplete.
 	 *
@@ -606,9 +611,9 @@ class Facade
 	* the column types used to store their values.
 	* If no type is passed, this method returns a list of all tables in the database.
 	*
-	* @param string $type Type of bean (i.e. table) you want to inspect
+	* @param string|NULL $type Type of bean (i.e. table) you want to inspect, or NULL for a list of all tables
 	*
-	* @return array
+	* @return string[]
 	*/
 	public static function inspect( $type = NULL )
 	{
@@ -672,14 +677,16 @@ class Facade
 
 	/**
 	 * Toggles fluid or frozen mode. In fluid mode the database
-	 * structure is adjusted to accomodate your objects. In frozen mode
+	 * structure is adjusted to accommodate your objects. In frozen mode
 	 * this is not the case.
 	 *
 	 * You can also pass an array containing a selection of frozen types.
 	 * Let's call this chilly mode, it's just like fluid mode except that
 	 * certain types (i.e. tables) aren't touched.
 	 *
-	 * @param boolean|array $tf mode of operation (TRUE means frozen)
+	 * @param boolean|string[] $tf mode of operation (TRUE means frozen)
+	 *
+	 * @return void
 	 */
 	public static function freeze( $tf = TRUE )
 	{
@@ -700,10 +707,10 @@ class Facade
 	 * list( $author, $bio ) = R::loadMulti( 'author, bio', $id );
 	 * </code>
 	 *
-	 * @param string|array $types the set of types to load at once
-	 * @param mixed        $id    the common ID
+	 * @param string|string[] $types the set of types to load at once
+	 * @param int             $id    the common ID
 	 *
-	 * @return OODBBean
+	 * @return OODBBean[]
 	 */
 	public static function loadMulti( $types, $id )
 	{
@@ -745,7 +752,7 @@ class Facade
 	 *
 	 * @param string  $type    type of bean you want to load
 	 * @param integer $id      ID of the bean you want to load
-	 * @param string  $snippet string to use after select  (optional)
+	 * @param string|NULL $snippet string to use after select  (optional)
 	 *
 	 * @return OODBBean
 	 */
@@ -799,10 +806,10 @@ class Facade
 	 * </code>
 	 *
 	 * @param string $type     the type of bean you are looking for
-	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param string|NULL $sql      SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $bindings array of values to be bound to parameters in query
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function findForUpdate( $type, $sql = NULL, $bindings = array() )
 	{
@@ -814,7 +821,7 @@ class Facade
 	 * Same as findForUpdate but returns just one bean and adds LIMIT-clause.
 	 *
 	 * @param string $type     the type of bean you are looking for
-	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param string|NULL $sql      SQL query to find the desired bean, starting right after WHERE clause
 	 * @param array  $bindings array of values to be bound to parameters in query
 	 *
 	 * @return OODBBean|NULL
@@ -823,7 +830,7 @@ class Facade
 	{
 		$sql = self::getWriter()->glueLimitOne( $sql );
 		$beans = self::findForUpdate($type, $sql, $bindings);
-		return !empty($beans) ? reset($beans) : NULL;
+		return empty($beans) ? NULL : reset($beans);
 	}
 
 	/**
@@ -854,7 +861,7 @@ class Facade
 	 * @param string|OODBBean|SimpleModel $beanOrType bean you want to remove from database
 	 * @param integer                     $id         ID if the bean to trash (optional, type-id variant only)
 	 *
-	 * @return void
+	 * @return int
 	 */
 	public static function trash( $beanOrType, $id = NULL )
 	{
@@ -902,11 +909,11 @@ class Facade
 	 * ] );
 	 * </code>
 	 *
-	 * @param string|array $typeOrBeanArray   type or bean array to import
+	 * @param string|OODBBean[] $typeOrBeanArray   type or bean array to import
 	 * @param integer      $num               number of beans to dispense
 	 * @param boolean      $alwaysReturnArray if TRUE always returns the result as an array
 	 *
-	 * @return array|OODBBean
+	 * @return OODBBean|OODBBean[]
 	 */
 	public static function dispense( $typeOrBeanArray, $num = 1, $alwaysReturnArray = FALSE )
 	{
@@ -947,15 +954,15 @@ class Facade
 	}
 
 	/**
-	 * Convience method. Tries to find beans of a certain type,
+	 * Convenience method. Tries to find beans of a certain type,
 	 * if no beans are found, it dispenses a bean of that type.
 	 * Note that this function always returns an array.
 	 *
-	 * @param  string $type     type of bean you are looking for
-	 * @param  string $sql      SQL code for finding the bean
-	 * @param  array  $bindings parameters to bind to SQL
+	 * @param  string      $type     type of bean you are looking for
+	 * @param  string|NULL $sql      SQL code for finding the bean
+	 * @param  array       $bindings parameters to bind to SQL
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function findOrDispense( $type, $sql = NULL, $bindings = array() )
 	{
@@ -966,9 +973,9 @@ class Facade
 	/**
 	 * Same as findOrDispense but returns just one element.
 	 *
-	 * @param  string $type     type of bean you are looking for
-	 * @param  string $sql      SQL code for finding the bean
-	 * @param  array  $bindings parameters to bind to SQL
+	 * @param  string      $type     type of bean you are looking for
+	 * @param  string|NULL $sql      SQL code for finding the bean
+	 * @param  array       $bindings parameters to bind to SQL
 	 *
 	 * @return OODBBean
 	 */
@@ -988,15 +995,15 @@ class Facade
 	 *
 	 * Your SQL does not have to start with a WHERE-clause condition.
 	 *
-	 * @param string $type     the type of bean you are looking for
-	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings array of values to be bound to parameters in query
-	 * @param string $snippet  SQL snippet to include in query (for example: FOR UPDATE)
+	 * @param string      $type     the type of bean you are looking for
+	 * @param string|NULL $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array       $bindings array of values to be bound to parameters in query
+	 * @param string|NULL $snippet  SQL snippet to include in query (for example: FOR UPDATE)
 	 *
 	 * @phpstan-param literal-string|null $sql
 	 * @psalm-param   literal-string|null $sql
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function find( $type, $sql = NULL, $bindings = array(), $snippet = NULL )
 	{
@@ -1007,11 +1014,11 @@ class Facade
 	/**
 	 * Alias for find().
 	 *
-	 * @param string $type     the type of bean you are looking for
-	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings array of values to be bound to parameters in query
+	 * @param string      $type     the type of bean you are looking for
+	 * @param string|NULL $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array       $bindings array of values to be bound to parameters in query
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function findAll( $type, $sql = NULL, $bindings = array() )
 	{
@@ -1027,9 +1034,9 @@ class Facade
 	 *
 	 * @see Finder::find
 	 *
-	 * @param string $type     type   the type of bean you are looking for
-	 * @param string $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string      $type     type   the type of bean you are looking for
+	 * @param string|NULL $sql      sql    SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array       $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return array
 	 */
@@ -1041,9 +1048,9 @@ class Facade
 	/**
 	 * Like R::find() but returns the first bean only.
 	 *
-	 * @param string $type     the type of bean you are looking for
-	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings array of values to be bound to parameters in query
+	 * @param string      $type     the type of bean you are looking for
+	 * @param string|NULL $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array       $bindings array of values to be bound to parameters in query
 	 *
 	 * @return OODBBean|NULL
 	 */
@@ -1066,9 +1073,9 @@ class Facade
 	 *
 	 * @see Finder::find
 	 *
-	 * @param string $type     the type of bean you are looking for
-	 * @param string $sql      SQL query to find the desired bean, starting right after WHERE clause
-	 * @param array  $bindings values array of values to be bound to parameters in query
+	 * @param string      $type     the type of bean you are looking for
+	 * @param string|NULL $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param array       $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return OODBBean|NULL
 	 */
@@ -1083,9 +1090,9 @@ class Facade
 	 * cursors - this is useful for processing large datasets. A bean collection
 	 * will not load all beans into memory all at once, just one at a time.
 	 *
-	 * @param  string $type     the type of bean you are looking for
-	 * @param  string $sql      SQL query to find the desired bean, starting right after WHERE clause
-	 * @param  array  $bindings values array of values to be bound to parameters in query
+	 * @param  string      $type     the type of bean you are looking for
+	 * @param  string|NULL $sql      SQL query to find the desired bean, starting right after WHERE clause
+	 * @param  array       $bindings values array of values to be bound to parameters in query
 	 *
 	 * @return BeanCollection
 	 */
@@ -1155,10 +1162,10 @@ class Facade
 	 *
 	 * @note instead of an SQL query you can pass a result array as well.
 	 *
-	 * @param string|array $types         a list of types (either array or comma separated string)
-	 * @param string|array $sql           an SQL query or an array of prefetched records
-	 * @param array        $bindings      optional, bindings for SQL query
-	 * @param array        $remappings    optional, an array of remapping arrays
+	 * @param string|string[]      $types         a list of types (either array or comma separated string)
+	 * @param string|array[]|NULL  $sql           an SQL query or an array of prefetched records
+	 * @param array                $bindings      optional, bindings for SQL query
+	 * @param array[]              $remappings    optional, an array of remapping arrays
 	 *
 	 * @return array
 	 */
@@ -1177,9 +1184,9 @@ class Facade
 	 * passed IDs as their keys.
 	 *
 	 * @param string $type type of beans
-	 * @param array  $ids  ids to load
+	 * @param int[]  $ids  ids to load
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function batch( $type, $ids )
 	{
@@ -1193,9 +1200,9 @@ class Facade
 	 * loadAll.
 	 *
 	 * @param string $type type of beans
-	 * @param array  $ids  ids to load
+	 * @param int[]  $ids  ids to load
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function loadAll( $type, $ids )
 	{
@@ -1227,7 +1234,7 @@ class Facade
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
-	 * @return array
+	 * @return string[][]
 	 */
 	public static function getAll( $sql, $bindings = array() )
 	{
@@ -1244,7 +1251,7 @@ class Facade
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
-	 * @return string
+	 * @return string|NULL
 	 */
 	public static function getCell( $sql, $bindings = array() )
 	{
@@ -1261,7 +1268,7 @@ class Facade
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
-	 * @return RedBeanPHP\Cursor\PDOCursor
+	 * @return Cursor
 	 */
 	public static function getCursor( $sql, $bindings = array() )
 	{
@@ -1278,7 +1285,7 @@ class Facade
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
-	 * @return array
+	 * @return array|NULL
 	 */
 	public static function getRow( $sql, $bindings = array() )
 	{
@@ -1295,7 +1302,7 @@ class Facade
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public static function getCol( $sql, $bindings = array() )
 	{
@@ -1314,7 +1321,7 @@ class Facade
 	 * @param string $sql      SQL query to execute
 	 * @param array  $bindings a list of values to be bound to query parameters
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public static function getAssoc( $sql, $bindings = array() )
 	{
@@ -1322,7 +1329,7 @@ class Facade
 	}
 
 	/**
-	 *Convenience function to fire an SQL query using the RedBeanPHP
+	 * Convenience function to fire an SQL query using the RedBeanPHP
 	 * database adapter. This method allows you to directly query the
 	 * database without having to obtain an database adapter instance first.
 	 * Executes the specified SQL query together with the specified
@@ -1344,7 +1351,7 @@ class Facade
 	 * Returns the insert ID for databases that support/require this
 	 * functionality. Alias for R::getAdapter()->getInsertID().
 	 *
-	 * @return mixed
+	 * @return int
 	 */
 	public static function getInsertID()
 	{
@@ -1370,10 +1377,10 @@ class Facade
 	 * This function has a confusing method signature, the R::duplicate() function
 	 * only accepts two arguments: bean and filters.
 	 *
-	 * @param OODBBean $bean    bean to be copied
-	 * @param array    $trail   for internal usage, pass array()
-	 * @param boolean  $pid     for internal usage
-	 * @param array    $filters white list filter with bean types to duplicate
+	 * @param OODBBean   $bean    bean to be copied
+	 * @param OODBBean[] $trail   for internal usage, pass array()
+	 * @param boolean    $pid     for internal usage
+	 * @param array      $filters white list filter with bean types to duplicate
 	 *
 	 * @return OODBBean
 	 */
@@ -1402,8 +1409,8 @@ class Facade
 	 * Note:
 	 * This is a simplified version of the deprecated R::dup() function.
 	 *
-	 * @param OODBBean $bean  bean to be copied
-	 * @param array    $white white list filter with bean types to duplicate
+	 * @param OODBBean $bean    bean to be copied
+	 * @param array    $filters white list filter with bean types to duplicate
 	 *
 	 * @return OODBBean
 	 */
@@ -1421,12 +1428,12 @@ class Facade
 	 * * all own bean lists (recursively)
 	 * * all shared beans (not THEIR own lists)
 	 *
-	 * @param    array|OODBBean $beans   beans to be exported
-	 * @param    boolean        $parents whether you want parent beans to be exported
-	 * @param    array          $filters whitelist of types
-	 * @param    boolean        $meta      export meta data as well
+	 * @param    OODBBean|OODBBean[] $beans   beans to be exported
+	 * @param    boolean             $parents whether you want parent beans to be exported
+	 * @param    array               $filters whitelist of types
+	 * @param    boolean             $meta      export meta data as well
 	 *
-	 * @return array
+	 * @return array[]
 	 */
 	public static function exportAll( $beans, $parents = FALSE, $filters = array(), $meta = FALSE )
 	{
@@ -1486,14 +1493,14 @@ class Facade
 	 * New in 4.3.2: meta mask. The meta mask is a special mask to send
 	 * data from raw result rows to the meta store of the bean. This is
 	 * useful for bundling additional information with custom queries.
-	 * Values of every column whos name starts with $mask will be
+	 * Values of every column who's name starts with $mask will be
 	 * transferred to the meta section of the bean under key 'data.bundle'.
 	 *
-	 * @param string $type     type of beans to produce
-	 * @param array  $rows     must contain an array of array
-	 * @param string $metamask meta mask to apply (optional)
+	 * @param string            $type     type of beans to produce
+	 * @param string[][]        $rows     must contain an array of array
+	 * @param string|array|NULL $metamask meta mask to apply (optional)
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function convertToBeans( $type, $rows, $metamask = NULL )
 	{
@@ -1501,11 +1508,11 @@ class Facade
 	}
 
 	/**
-	 * Just like converToBeans, but for one bean.
+	 * Just like convertToBeans, but for one bean.
 	 *
-	 * @param string $type      type of bean to produce
-	 * @param array  $row       one row from the database
-	 * @param string $metamask  metamask (see convertToBeans)
+	 * @param string            $type      type of bean to produce
+	 * @param string[]          $row       one row from the database
+	 * @param string|array|NULL $metamask  metamask (see convertToBeans)
 	 *
 	 * @return OODBBean|NULL
 	 */
@@ -1555,7 +1562,7 @@ class Facade
 	 * @param string  $type        Type of bean to produce
 	 * @param string  $sql         SQL query snippet to use
 	 * @param array   $bindings    bindings for query (optional)
-	 * @param mixed   $metamask    meta mask (optional, defaults to 'extra_')
+	 * @param string|array   $metamask    meta mask (optional, defaults to 'extra_')
 	 * @param boolean $autoExtract TRUE to return meta mask values as first item of array
 	 *
 	 * @return array
@@ -1599,9 +1606,9 @@ class Facade
 	 * or 'horror' this operation will return FALSE because the third parameter
 	 * has been set to TRUE.
 	 *
-	 * @param  OODBBean     $bean bean to check for tags
-	 * @param  array|string $tags list of tags
-	 * @param  boolean      $all  whether they must all match or just some
+	 * @param  OODBBean        $bean bean to check for tags
+	 * @param  string|string[] $tags list of tags
+	 * @param  boolean         $all  whether they must all match or just some
 	 *
 	 * @return boolean
 	 */
@@ -1626,8 +1633,8 @@ class Facade
 	 * In the example above, the $blog bean will no longer
 	 * be associated with the tags 'smart' and 'interesting'.
 	 *
-	 * @param  OODBBean $bean    tagged bean
-	 * @param  array    $tagList list of tags (names)
+	 * @param  OODBBean        $bean    tagged bean
+	 * @param  string|string[] $tagList list of tags (names)
 	 *
 	 * @return void
 	 */
@@ -1655,10 +1662,10 @@ class Facade
 	 * as 'TexMex' and 'Mexican Cuisine'. The second line will
 	 * retrieve all tags attached to the meal object.
 	 *
-	 * @param OODBBean $bean    bean to tag
-	 * @param mixed    $tagList tags to attach to the specified bean
+	 * @param OODBBean      $bean    bean to tag
+	 * @param string[]|NULL $tagList tags to attach to the specified bean
 	 *
-	 * @return string
+	 * @return string[]
 	 */
 	public static function tag( OODBBean $bean, $tagList = NULL )
 	{
@@ -1680,8 +1687,8 @@ class Facade
 	 * The example adds the tag 'halloween' to the $blog
 	 * bean.
 	 *
-	 * @param OODBBean $bean    bean to tag
-	 * @param array    $tagList list of tags to add to bean
+	 * @param OODBBean        $bean    bean to tag
+	 * @param string|string[] $tagList list of tags to add to bean
 	 *
 	 * @return void
 	 */
@@ -1712,12 +1719,12 @@ class Facade
 	 * tagged as 'horror' or 'gothic', order them by title and limit
 	 * the number of movies to be returned to 10.
 	 *
-	 * @param string       $beanType type of bean you are looking for
-	 * @param array|string $tagList  list of tags to match
-	 * @param string       $sql      additional SQL (use only for pagination)
-	 * @param array        $bindings bindings
+	 * @param string          $beanType type of bean you are looking for
+	 * @param string|string[] $tagList  list of tags to match
+	 * @param string          $sql      additional SQL (use only for pagination)
+	 * @param array           $bindings bindings
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function tagged( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
@@ -1746,12 +1753,12 @@ class Facade
 	 * The example above returns at most 4 movies (due to the LIMIT clause in the SQL
 	 * Query Snippet) that have been tagged as BOTH 'short' AND 'gothic'.
 	 *
-	 * @param string       $beanType type of bean you are looking for
-	 * @param array|string $tagList  list of tags to match
-	 * @param string       $sql      additional sql snippet
-	 * @param array        $bindings bindings
+	 * @param string          $beanType type of bean you are looking for
+	 * @param string|string[] $tagList  list of tags to match
+	 * @param string          $sql      additional sql snippet
+	 * @param array           $bindings bindings
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function taggedAll( $beanType, $tagList, $sql = '', $bindings = array() )
 	{
@@ -1763,10 +1770,10 @@ class Facade
 	 *
 	 * @see R::taggedAll
 	 *
-	 * @param string       $beanType type of bean you are looking for
-	 * @param array|string $tagList  list of tags to match
-	 * @param string       $sql      additional sql snippet
-	 * @param array        $bindings bindings
+	 * @param string          $beanType type of bean you are looking for
+	 * @param string|string[] $tagList  list of tags to match
+	 * @param string          $sql      additional sql snippet
+	 * @param array           $bindings bindings
 	 *
 	 * @return integer
 	 */
@@ -1780,10 +1787,10 @@ class Facade
 	 *
 	 * @see R::tagged
 	 *
-	 * @param string       $beanType type of bean you are looking for
-	 * @param array|string $tagList  list of tags to match
-	 * @param string       $sql      additional sql snippet
-	 * @param array        $bindings bindings
+	 * @param string          $beanType type of bean you are looking for
+	 * @param string|string[] $tagList  list of tags to match
+	 * @param string          $sql      additional sql snippet
+	 * @param array           $bindings bindings
 	 *
 	 * @return integer
 	 */
@@ -1843,7 +1850,7 @@ class Facade
 		self::$labelMaker         = new LabelMaker( self::$toolbox );
 		$helper                   = new SimpleModelHelper();
 		$helper->attachEventListeners( self::$redbean );
-		if (self::$redbean->getBeanHelper() == NULL) {
+		if (self::$redbean->getBeanHelper() === NULL) {
 			self::$redbean->setBeanHelper( new SimpleFacadeBeanHelper );
 		}
 		self::$duplicationManager = new DuplicationManager( self::$toolbox );
@@ -1852,7 +1859,7 @@ class Facade
 	}
 
 	/**
-	 * Facade Convience method for adapter transaction system.
+	 * Facade Convenience method for adapter transaction system.
 	 * Begins a transaction.
 	 *
 	 * Usage:
@@ -1893,7 +1900,7 @@ class Facade
 	}
 
 	/**
-	 * Facade Convience method for adapter transaction system.
+	 * Facade Convenience method for adapter transaction system.
 	 * Commits a transaction.
 	 *
 	 * Usage:
@@ -1934,7 +1941,7 @@ class Facade
 	}
 
 	/**
-	 * Facade Convience method for adapter transaction system.
+	 * Facade Convenience method for adapter transaction system.
 	 * Rolls back a transaction.
 	 *
 	 * Usage:
@@ -1982,7 +1989,7 @@ class Facade
 	 *
 	 * @param  string $table name of the table (not type) you want to get columns of
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public static function getColumns( $table )
 	{
@@ -2014,7 +2021,7 @@ class Facade
 	 * ' IN( ?,? ) '.
 	 *
 	 * @param array  $array    array to generate question mark slots for
-	 * @param string $template template to use
+	 * @param string|NULL $template template to use
 	 *
 	 * @return string
 	 */
@@ -2048,11 +2055,11 @@ class Facade
 	 * );
 	 * </code>
 	 *
-	 * @param array  $beans       a list of OODBBeans
-	 * @param string $type        a type string
-	 * @param string $sqlTemplate an SQL template string for the SELECT-query
+	 * @param OODBBean[]  $beans       a list of OODBBeans
+	 * @param string      $type        a type string
+	 * @param string      $sqlTemplate an SQL template string for the SELECT-query
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function loadJoined( $beans, $type, $sqlTemplate = 'SELECT %s.* FROM %s WHERE id IN (%s)' )
 	{
@@ -2134,10 +2141,10 @@ class Facade
 	 * will automatically temporarily switch to fluid mode to attempt to store the
 	 * bean in case of an SQLException.
 	 *
-	 * @param array   $beans            list of beans to be stored
-	 * @param boolean $unfreezeIfNeeded retries in fluid mode in hybrid mode
+	 * @param OODBBean[] $beans            list of beans to be stored
+	 * @param boolean    $unfreezeIfNeeded retries in fluid mode in hybrid mode
 	 *
-	 * @return array
+	 * @return int[] ids
 	 */
 	public static function storeAll( $beans, $unfreezeIfNeeded = FALSE )
 	{
@@ -2153,9 +2160,9 @@ class Facade
 	 * For information please consult the R::trash() function.
 	 * A loop saver.
 	 *
-	 * @param array $beans list of beans to be trashed
+	 * @param OODBBean[] $beans list of beans to be trashed
 	 *
-	 * @return void
+	 * @return int
 	 */
 	public static function trashAll( $beans )
 	{
@@ -2171,13 +2178,13 @@ class Facade
 	 * only IDs. This function combines trashAll and batch loading
 	 * in one call. Note that while this function accepts just
 	 * bean IDs, the beans will still be loaded first. This is because
-	 * the function still respects all the FUSE hooks that may have beeb
+	 * the function still respects all the FUSE hooks that may have been
 	 * associated with the domain logic associated with these beans.
 	 * If you really want to delete just records from the database use
 	 * a simple DELETE-FROM SQL query instead.
 	 *
-	 * @param string type  $type the bean type you wish to trash
-	 * @param string array $ids  list of bean IDs
+	 * @param string $type the bean type you wish to trash
+	 * @param int[]  $ids  list of bean IDs
 	 *
 	 * @return void
 	 */
@@ -2203,9 +2210,9 @@ class Facade
 	 *
 	 * Returns the number of beans deleted.
 	 *
-	 * @param string $type       bean type to look for in database
-	 * @param string $sqlSnippet an SQL query snippet
-	 * @param array  $bindings   SQL parameter bindings
+	 * @param string      $type       bean type to look for in database
+	 * @param string|NULL $sqlSnippet an SQL query snippet
+	 * @param array       $bindings   SQL parameter bindings
 	 *
 	 * @return int
 	 */
@@ -2246,10 +2253,10 @@ class Facade
 	 * values of the array will be assigned to the name property of each
 	 * individual bean.
 	 *
-	 * @param string $type   type of beans you would like to have
-	 * @param array  $labels list of labels, names for each bean
+	 * @param string   $type   type of beans you would like to have
+	 * @param string[] $labels list of labels, names for each bean
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function dispenseLabels( $type, $labels )
 	{
@@ -2258,7 +2265,7 @@ class Facade
 
 	/**
 	 * Generates and returns an ENUM value. This is how RedBeanPHP handles ENUMs.
-	 * Either returns a (newly created) bean respresenting the desired ENUM
+	 * Either returns a (newly created) bean representing the desired ENUM
 	 * value or returns a list of all enums for the type.
 	 *
 	 * To obtain (and add if necessary) an ENUM value:
@@ -2285,7 +2292,7 @@ class Facade
 	 *
 	 * @param string $enum either type or type-value
 	 *
-	 * @return array|OODBBean
+	 * @return OODBBean|OODBBean[]
 	 */
 	public static function enum( $enum )
 	{
@@ -2298,9 +2305,9 @@ class Facade
 	 * and stores the names in a new array. The array then gets sorted using the
 	 * default sort function of PHP (sort).
 	 *
-	 * @param array $beans list of beans to loop
+	 * @param OODBBean[] $beans list of beans to loop
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public static function gatherLabels( $beans )
 	{
@@ -2334,7 +2341,7 @@ class Facade
 	 * Simple convenience function, returns ISO date formatted representation
 	 * of $time.
 	 *
-	 * @param mixed $time UNIX timestamp
+	 * @param int|NULL $time UNIX timestamp
 	 *
 	 * @return string
 	 */
@@ -2352,7 +2359,7 @@ class Facade
 	 * formatted representation
 	 * of $time.
 	 *
-	 * @param mixed $time UNIX timestamp
+	 * @param int|NULL $time UNIX timestamp
 	 *
 	 * @return string
 	 */
@@ -2408,7 +2415,7 @@ class Facade
 	 * Optional accessor for neat code.
 	 * Sets the database adapter you want to use.
 	 *
-	 * @return DBAdapter
+	 * @return Adapter
 	 */
 	public static function getDatabaseAdapter()
 	{
@@ -2427,7 +2434,7 @@ class Facade
 	 * If the PDO object could not be found, for whatever reason, this method
 	 * will return NULL instead.
 	 *
-	 * @return NULL|PDO
+	 * @return NULL|\PDO
 	 */
 	public static function getPDO()
 	{
@@ -2436,6 +2443,8 @@ class Facade
 		$database = $databaseAdapter->getDatabase();
 		if ( is_null( $database ) ) return NULL;
 		if ( !method_exists( $database, 'getPDO' ) ) return NULL;
+
+		/** @var RPDO $database */
 		return $database->getPDO();
 	}
 
@@ -2507,8 +2516,8 @@ class Facade
 	/**
 	 * Facade method for AQueryWriter::renameAssociation()
 	 *
-	 * @param string|array $from
-	 * @param string       $to
+	 * @param string|string[] $from
+	 * @param string          $to
 	 *
 	 * @return void
 	 */
@@ -2524,9 +2533,9 @@ class Facade
 	 * and shared lists, the beans are exported as-is, only loaded lists
 	 * are exported.
 	 *
-	 * @param array $beans beans
+	 * @param OODBBean[] $beans beans
 	 *
-	 * @return array
+	 * @return array[]
 	 */
 	public static function beansToArray( $beans )
 	{
@@ -2586,9 +2595,9 @@ class Facade
 	 * to 35 characters to improve readability. Nested beans will
 	 * also be dumped.
 	 *
-	 * @param OODBBean|array $data either a bean or an array of beans
+	 * @param OODBBean|OODBBean[] $data either a bean or an array of beans
 	 *
-	 * @return array
+	 * @return string|string[]
 	 */
 	public static function dump( $data )
 	{
@@ -2630,7 +2639,7 @@ class Facade
 	 * fetchAs but explicitly. For instance if you register
 	 * the alias 'cover' for 'page' a property containing a reference to a
 	 * page bean called 'cover' will correctly return the page bean and not
-	 * a (non-existant) cover bean.
+	 * a (non-existent) cover bean.
 	 *
 	 * <code>
 	 * R::aliases( array( 'cover' => 'page' ) );
@@ -2654,7 +2663,7 @@ class Facade
 	 * From that point on, every bean reference to a cover
 	 * will return a 'page' bean.
 	 *
-	 * @param array $list list of global aliases to use
+	 * @param string[] $list list of global aliases to use
 	 *
 	 * @return void
 	 */
@@ -2673,13 +2682,13 @@ class Facade
 	 *
 	 * @param string $type type of bean to search for
 	 * @param array  $like criteria set describing the bean to search for
-	 * @param boolean $hasBeenCreated set to TRUE if bean has been created
+	 * @param boolean &$hasBeenCreated set to TRUE if bean has been created
 	 *
 	 * @return OODBBean
 	 */
 	public static function findOrCreate( $type, $like = array(), $sql = '', &$hasBeenCreated = false )
 	{
-		return self::$finder->findOrCreate( $type, $like, $sql = '', $hasBeenCreated );
+		return self::$finder->findOrCreate( $type, $like, $sql, $hasBeenCreated );
 	}
 
 	/**
@@ -2694,7 +2703,7 @@ class Facade
 	 * @param string $sql  optional additional SQL for sorting
 	 * @param array  $bindings bindings
 	 *
-	 * @return array
+	 * @return OODBBean[]
 	 */
 	public static function findLike( $type, $like = array(), $sql = '', $bindings = array() )
 	{
@@ -2737,7 +2746,7 @@ class Facade
 
 	/**
 	 * Stops logging and flushes the logs,
-	 * convient method to stop logging of queries.
+	 * convenient method to stop logging of queries.
 	 * Use this method to stop logging SQL queries being
 	 * executed by the adapter. Logging queries will not
 	 * print them on the screen. Use R::getLogs() to
@@ -2812,7 +2821,7 @@ class Facade
 	 * Therefore, only stop logging AFTER you have obtained the
 	 * query logs using R::getLogs()
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public static function getLogs()
 	{
@@ -2863,7 +2872,7 @@ class Facade
 	 * Returns the current logger instance being used by the
 	 * database object.
 	 *
-	 * @return Logger
+	 * @return Logger|NULL
 	 */
 	public static function getLogger()
 	{
@@ -2885,9 +2894,9 @@ class Facade
 	 * for some types.
 	 * This method will return the previous value.
 	 *
-	 * @param boolean|array $yesNoBeans List of type names or 'all'
+	 * @param boolean|string[] $yesNoBeans List of type names or 'all'
 	 *
-	 * @return mixed
+	 * @return boolean|string[]
 	 */
 	public static function usePartialBeans( $yesNoBeans )
 	{
@@ -2959,7 +2968,7 @@ class Facade
 	 * @param array    $onNotFoundDo task list to be considered on NOT finding the bean
 	 * @param OODBBean &$bean        reference to obtain the found bean
 	 *
-	 * @return mixed
+	 * @return bool|NULL
 	 */
 	public static function matchUp( $type, $sql, $bindings = array(), $onFoundDo = NULL, $onNotFoundDo = NULL, &$bean = NULL 	) {
 		$matchUp = new MatchUp( self::$toolbox );
@@ -3004,7 +3013,7 @@ class Facade
 	 *   'strtoupper',
 	 *   "\n"
 	 * );
-	 *</code>
+	 * </code>
 	 *
 	 * The example above creates an HTML fragment like this:
 	 *
@@ -3063,11 +3072,10 @@ class Facade
 	 * of property names that have to be skipped. By default this array is filled with
 	 * two strings: 'created' and 'modified'.
 	 *
-	 * @param OODBBean|array $bean    reference beans
-	 * @param OODBBean|array $other   beans to compare
+	 * @param OODBBean|OODBBean[] $bean    reference beans
+	 * @param OODBBean|OODBBean[] $other   beans to compare
 	 * @param array          $filters names of properties of all beans to skip
-	 * @param string         $format  the format of the key, defaults to '%s.%s.%s'
-	 * @param string         $type    type/property of bean to use for key generation
+	 * @param string         $pattern the format of the key, defaults to '%s.%s.%s'
 	 *
 	 * @return array
 	 */
@@ -3119,7 +3127,6 @@ class Facade
 	 * Returns the toolbox associated with the specified key.
 	 *
 	 * @param string  $key     key to store toolbox instance under
-	 * @param ToolBox $toolbox toolbox to register
 	 *
 	 * @return ToolBox|NULL
 	 */
@@ -3177,7 +3184,7 @@ class Facade
 
 	/**
 	 * Given a bean and an optional SQL snippet,
-	 * this method will return the bean together with all 
+	 * this method will return the bean together with all
 	 * child beans in a hierarchically structured
 	 * bean table.
 	 *
@@ -3186,9 +3193,11 @@ class Facade
 	 * a warning mechanism in case your database does not support this
 	 * functionality.
 	 *
-	 * @param OODBBean $bean     bean to find children of
-	 * @param string   $sql      optional SQL snippet
-	 * @param array    $bindings SQL snippet parameter bindings
+	 * @param OODBBean    $bean     bean to find children of
+	 * @param string|NULL $sql      optional SQL snippet
+	 * @param array       $bindings SQL snippet parameter bindings
+	 *
+	 * @return OODBBean[]
 	 */
 	public static function children( OODBBean $bean, $sql = NULL, $bindings = array() )
 	{
@@ -3219,9 +3228,11 @@ class Facade
 	 * it cannot 'predict' what or how you are trying to 'count'.
 	 *
 	 * @param OODBBean       $bean     bean to find children of
-	 * @param string         $sql      optional SQL snippet
+	 * @param string|NULL    $sql      optional SQL snippet
 	 * @param array          $bindings SQL snippet parameter bindings
 	 * @param string|boolean $select   select snippet to use (advanced, optional, see QueryWriter::queryRecursiveCommonTableExpression)
+	 *
+	 * @return int
 	 */
 	public static function countChildren( OODBBean $bean, $sql = NULL, $bindings = array(), $select = QueryWriter::C_CTE_SELECT_COUNT )
 	{
@@ -3252,9 +3263,11 @@ class Facade
 	 * it cannot 'predict' what or how you are trying to 'count'.
 	 *
 	 * @param OODBBean       $bean     bean to find children of
-	 * @param string         $sql      optional SQL snippet
+	 * @param string|NULL    $sql      optional SQL snippet
 	 * @param array          $bindings SQL snippet parameter bindings
 	 * @param string|boolean $select   select snippet to use (advanced, optional, see QueryWriter::queryRecursiveCommonTableExpression)
+	 *
+	 * @return int
 	 */
 	public static function countParents( OODBBean $bean, $sql = NULL, $bindings = array(), $select = QueryWriter::C_CTE_SELECT_COUNT )
 	{
@@ -3271,9 +3284,11 @@ class Facade
 	 * a warning mechanism in case your database does not support this
 	 * functionality.
 	 *
-	 * @param OODBBean $bean     bean to find parents of
-	 * @param string   $sql      optional SQL snippet
-	 * @param array    $bindings SQL snippet parameter bindings
+	 * @param OODBBean    $bean     bean to find parents of
+	 * @param string|NULL $sql      optional SQL snippet
+	 * @param array       $bindings SQL snippet parameter bindings
+	 *
+	 * @return OODBBean[]
 	 */
 	public static function parents( OODBBean $bean, $sql = NULL, $bindings = array() )
 	{
