@@ -551,7 +551,7 @@ class Finder
 			} else {
 				list($field1, $field2) = $matcher;
 				foreach( $beans[$b] as $key => $bean ) {
-					$beans[$b][$key]->{$field1} = $beans[$a][$bean->{$field2}];
+					$beans[$b][$key]->{$field1} = (isset($beans[$a][$bean->{$field2}]) ? $beans[$a][$bean->{$field2}] : NULL);
 				}
 			}
 		}
