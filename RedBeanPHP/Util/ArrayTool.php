@@ -51,8 +51,8 @@ class ArrayTool
 	 * The statement in the example will produce the string:
 	 * ' IN( ?,? ) '.
 	 *
-	 * @param array  $array    array to generate question mark slots for
-	 * @param string $template template to use
+	 * @param array       $array    array to generate question mark slots for
+	 * @param string|NULL $template template to use
 	 *
 	 * @return string
 	 */

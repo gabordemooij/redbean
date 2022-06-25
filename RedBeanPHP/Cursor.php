@@ -6,7 +6,7 @@ namespace RedBeanPHP;
  * Database Cursor Interface.
  * A cursor is used by Query Writers to fetch Query Result rows
  * one row at a time. This is useful if you expect the result set to
- * be quite large. This interface dscribes the API of a database
+ * be quite large. This interface describes the API of a database
  * cursor. There can be multiple implementations of the Cursor,
  * by default RedBeanPHP offers the PDOCursor for drivers shipping
  * with RedBeanPHP and the NULLCursor.
@@ -26,7 +26,7 @@ interface Cursor
 	 * Should retrieve the next row of the result set.
 	 * This method is used to iterate over the result set.
 	 *
-	 * @return array
+	 * @return array|NULL
 	 */
 	public function getNextItem();
 

@@ -3,13 +3,15 @@
 namespace RedBeanPHP\Util;
 
 use RedBeanPHP\ToolBox;
+use RedBeanPHP\OODB;
 use RedBeanPHP\OODBBean;
+use RedBeanPHP\QueryWriter;
 
 /**
  * Tree
  *
  * Given a bean, finds it children or parents
- * in a hierchical structure.
+ * in a hierarchical structure.
  *
  * @experimental feature
  *
@@ -57,8 +59,8 @@ class Tree {
 	 * bean in a tree structure.
 	 *
 	 * @note this only works for databases that support
-	 * recusrive common table expressions.
-	 * 
+	 * recursive common table expressions.
+	 *
 	 * Usage:
 	 *
 	 * <code>
@@ -74,9 +76,9 @@ class Tree {
 	 * parameter binding key ':slot0' is reserved for the ID of the bean
 	 * and used in the query.
 	 *
-	 * @param OODBBean $bean     reference bean to find children of
-	 * @param string   $sql      optional SQL snippet
-	 * @param array    $bindings optional parameter bindings for SQL snippet
+	 * @param OODBBean    $bean     reference bean to find children of
+	 * @param string|NULL $sql      optional SQL snippet
+	 * @param array       $bindings optional parameter bindings for SQL snippet
 	 *
 	 * @return array
 	 */
@@ -95,7 +97,7 @@ class Tree {
 	 * bean in a tree structure.
 	 *
 	 * @note this only works for databases that support
-	 * recusrive common table expressions.
+	 * recursive common table expressions.
 	 *
 	 * <code>
 	 * $newsPages = R::parents( $newsArticle, ' ORDER BY title ASC ' );
@@ -110,9 +112,9 @@ class Tree {
 	 * parameter binding key ':slot0' is reserved for the ID of the bean
 	 * and used in the query.
 	 *
-	 * @param OODBBean $bean     reference bean to find parents of
-	 * @param string   $sql      optional SQL snippet
-	 * @param array    $bindings optional parameter bindings for SQL snippet
+	 * @param OODBBean    $bean     reference bean to find parents of
+	 * @param string|NULL $sql      optional SQL snippet
+	 * @param array       $bindings optional parameter bindings for SQL snippet
 	 *
 	 * @return array
 	 */
@@ -131,7 +133,7 @@ class Tree {
 	 * bean in a tree structure.
 	 *
 	 * @note this only works for databases that support
-	 * recusrive common table expressions.
+	 * recursive common table expressions.
 	 *
 	 * <code>
 	 * $count = R::countChildren( $newsArticle );
@@ -153,7 +155,7 @@ class Tree {
 	 * it cannot 'predict' what or how you are trying to 'count'.
 	 *
 	 * @param OODBBean       $bean     reference bean to find children of
-	 * @param string         $sql      optional SQL snippet
+	 * @param string|NULL    $sql      optional SQL snippet
 	 * @param array          $bindings optional parameter bindings for SQL snippet
 	 * @param string|boolean $select   select snippet to use (advanced, optional, see QueryWriter::queryRecursiveCommonTableExpression)
 	 *
@@ -173,7 +175,7 @@ class Tree {
 	 * bean in a tree structure.
 	 *
 	 * @note this only works for databases that support
-	 * recusrive common table expressions.
+	 * recursive common table expressions.
 	 *
 	 * <code>
 	 * $count = R::countParents( $newsArticle );
@@ -194,9 +196,9 @@ class Tree {
 	 * this method assumes you take control of the resulting total yourself since
 	 * it cannot 'predict' what or how you are trying to 'count'.
 	 *
-	 * @param OODBBean $bean     reference bean to find parents of
-	 * @param string   $sql      optional SQL snippet
-	 * @param array    $bindings optional parameter bindings for SQL snippet
+	 * @param OODBBean       $bean     reference bean to find parents of
+	 * @param string|NULL    $sql      optional SQL snippet
+	 * @param array          $bindings optional parameter bindings for SQL snippet
 	 * @param string|boolean $select   select snippet to use (advanced, optional, see QueryWriter::queryRecursiveCommonTableExpression)
 	 *
 	 * @return integer

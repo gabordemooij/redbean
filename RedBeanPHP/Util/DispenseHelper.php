@@ -3,6 +3,7 @@
 namespace RedBeanPHP\Util;
 
 use RedBeanPHP\OODB as OODB;
+use RedBeanPHP\OODBBean as OODBBean;
 use RedBeanPHP\RedException as RedException;
 
 /**
@@ -122,7 +123,7 @@ class DispenseHelper
 	 * @param integer      $num               number of beans to dispense
 	 * @param boolean      $alwaysReturnArray if TRUE always returns the result as an array
 	 *
-	 * @return array|OODBBean
+	 * @return OODBBean|OODBBean[]
 	 */
 	public static function dispense( OODB $oodb, $typeOrBeanArray, $num = 1, $alwaysReturnArray = FALSE ) {
 

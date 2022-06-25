@@ -12,7 +12,7 @@ use RedBeanPHP\Repository as Repository;
 /**
  * Fluid Repository.
  * OODB manages two repositories, a fluid one that
- * adjust the database schema on-the-fly to accomodate for
+ * adjust the database schema on-the-fly to accommodate for
  * new bean types (tables) and new properties (columns) and
  * a frozen one for use in a production environment. OODB
  * allows you to swap the repository instances using the freeze()
@@ -87,9 +87,10 @@ class Fluid extends Repository
 	 *
 	 * This method will also apply indexes, unique constraints and foreign keys.
 	 *
-	 * @param OODBBean $bean     bean to get cast data from and store meta in
-	 * @param string   $property property to store
-	 * @param mixed    $value    value to store
+	 * @param OODBBean   $bean     bean to get cast data from and store meta in
+	 * @param string     $property property to store
+	 * @param mixed      $value    value to store
+	 * @param array|NULL &$columns
 	 *
 	 * @return void
 	 */

@@ -68,7 +68,7 @@ class Diff
 	 * @param OODBBean|array $others  beans to compare
 	 * @param array          $filters names of properties of all beans to skip
 	 * @param string         $format  the format of the key, defaults to '%s.%s.%s'
-	 * @param string         $type    type/property of bean to use for key generation
+	 * @param string|NULL    $type    type/property of bean to use for key generation
 	 *
 	 * @return array
 	 */

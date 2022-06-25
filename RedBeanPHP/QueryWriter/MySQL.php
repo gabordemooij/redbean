@@ -360,7 +360,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 						 ADD UNIQUE INDEX $name (" . implode( ',', $columns ) . ")";
 			$this->adapter->exec( $sql );
 		} catch ( SQLException $e ) {
-			//do nothing, dont use alter table ignore, this will delete duplicate records in 3-ways!
+			//do nothing, don't use alter table ignore, this will delete duplicate records in 3-ways!
 			return FALSE;
 		}
 		return TRUE;
@@ -384,7 +384,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 
 	/**
 	 * @see QueryWriter::addFK
-	 * @return bool
 	 */
 	public function addFK( $type, $targetType, $property, $targetProperty, $isDependent = FALSE )
 	{
