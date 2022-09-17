@@ -145,7 +145,7 @@ class Either {
 	 *
 	 * @return mixed
 	 */
-	public function or( $value ) {
+	public function _or( $value ) {
 		$reference = (is_null($this->result)) ? $value : $this->result;
 		return $reference;
 	}

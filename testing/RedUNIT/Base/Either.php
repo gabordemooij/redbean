@@ -46,16 +46,16 @@ class Either extends Base {
 			)
 		)));
 		$book = R::load('book', $id);
-		asrt($book->either()->title->or('nothing'),'Socratic Questions');
+		asrt($book->either()->title->_or('nothing'),'Socratic Questions');
 		$pageId = R::findOne('page')->id;
-		asrt($book->either()->ownPageList->index($pageId)->id->or(0), $pageId);
-		asrt($book->either()->ownPageList->index($pageId+1)->ownTextList->index(1)->or(0), 0);
-		$textId = $book->either()->ownPageList->first()->ownParagraphList->last()->id->or(0);
+		asrt($book->either()->ownPageList->index($pageId)->id->_or(0), $pageId);
+		asrt($book->either()->ownPageList->index($pageId+1)->ownTextList->index(1)->_or(0), 0);
+		$textId = $book->either()->ownPageList->first()->ownParagraphList->last()->id->_or(0);
 		asrt($textId > 0, TRUE);
 		$text = R::load('paragraph', $textId);
-		asrt($text->either()->page->book->title->or('nothing'), 'Socratic Questions');
-		asrt($book->either()->ownPageList->last()->id->or(-1),$pageId);
-		asrt($book->either()->ownPageList->id->or(-1),-1);
-		asrt($book->either()->ownPageList->first()->ownQuoteList->first()->or('?'),'?');
+		asrt($text->either()->page->book->title->_or('nothing'), 'Socratic Questions');
+		asrt($book->either()->ownPageList->last()->id->_or(-1),$pageId);
+		asrt($book->either()->ownPageList->id->_or(-1),-1);
+		asrt($book->either()->ownPageList->first()->ownQuoteList->first()->_or('?'),'?');
 	}
 }
