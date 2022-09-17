@@ -5,6 +5,7 @@ namespace RedBeanPHP;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\RedException as RedException;
+use RedBeanPHP\Util\Either as Either;
 
 /**
  * PHP 5.3 compatibility
@@ -773,6 +774,19 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		//also clear modifiers
 		$this->clearModifiers();
 		return;
+	}
+
+	/**
+	 * Returns the bean wrapped in an Either-instance.
+	 * This allows the user to extract data from the bean using a chain
+	 * of methods without any NULL checks, similar to the ?? operator but also
+	 * in a way that is compatible with older versions of PHP.
+	 * For more details consult the documentation of the Either class.
+	 *
+	 * @return Either
+	 */
+	public function either() {
+		return new Either( $this );
 	}
 
 	/**

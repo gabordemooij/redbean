@@ -77,6 +77,7 @@ addFile( DIR . 'Util/Look.php' );
 addFile( DIR . 'Util/Diff.php' );
 addFile( DIR . 'Util/Tree.php' );
 addFile( DIR . 'Util/Feature.php' );
+addFile( DIR . 'Util/Either.php' );
 addFile( DIR . 'Plugin.php' );
 
 $func = file_get_contents(DIR . 'Functions.php');
