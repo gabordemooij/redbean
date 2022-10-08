@@ -2705,6 +2705,32 @@ code("
 	The shop is considered the parent of
 	the product. It <b>owns</b> the product.
 </p>
+<h2 id="either">Either (5.7.3+)</h2>
+<p>
+	The PHP ?? operator does not work properly because of lazy loading, you can use
+	either() instead:
+</p>
+<?php code("
+	\$text
+		->either()
+		->page
+		->book
+		->title
+		->_or('nothing');
+"); ?>
+<p>
+	The Either object also works with lists and offers a convenient first() and last() method:
+</p>
+<?php code("
+	\$book
+		->either()
+		->ownPageList
+		->first()
+		->ownParagraphList
+		->last()
+		->id
+		->_or(0);
+"); ?>
 <h2 id="exists">Exists (5+)</h2>
 <p>
 	To check if a related bean exists:
