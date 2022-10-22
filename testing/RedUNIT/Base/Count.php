@@ -27,30 +27,17 @@ use RedBeanPHP\OODBBean;
 class Count extends Base
 {
 	/**
-	 * Tests type check and conversion in
-	 * OODB for count().
-	 *
-	 * @return void
+	 * Test counting invalid bean types.
+	 * Invalid bean types, i.e. beans that do not adhere to the RedBeanPHP
+	 * schema policy should not raise exceptions. Of course, RedBeanPHP
+	 * expects 'valid' types but this is the responsibility of the author.
 	 */
-	public function testCountType()
+	public function testCountInvalidTypes()
 	{
+		testpack( "Test count with invalid types" );
 		R::nuke();
-		$book = R::dispense( 'book' );
-		$book->sharedPage = R::dispense( 'page', 10 );
-		R::store( $book );
-		asrt( R::count('bookPage'), 10 );
-		try {
-			R::count( 'WrongTypeName' );
-			fail();
-		} catch ( RedException $ex ) {
-			pass();
-		}
-		try {
-			R::count( 'wrong_type_name' );
-			fail();
-		} catch ( RedException $ex ) {
-			pass();
-		}
+		R::store( $bean = R::getRedBean()->dispense( "a_b_c" ) );
+		asrt( R::count("a_b_c"), 1 );
 	}
 
 	/**

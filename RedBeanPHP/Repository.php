@@ -651,10 +651,6 @@ abstract class Repository
 	public function count( $type, $addSQL = '', $bindings = array() )
 	{
 		$type = AQueryWriter::camelsSnake( $type );
-		if ( count( explode( '_', $type ) ) > 2 ) {
-			throw new RedException( 'Invalid type for count.' );
-		}
-
 		try {
 			$count = (int) $this->writer->queryRecordCount( $type, array(), $addSQL, $bindings );
 		} catch ( SQLException $exception ) {
