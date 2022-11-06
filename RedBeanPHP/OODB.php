@@ -351,8 +351,6 @@ class OODB extends Observable
 	 * Checks whether the specified table already exists in the database.
 	 * Not part of the Object Database interface!
 	 *
-	 * @deprecated Use AQueryWriter::typeExists() instead.
-	 *
 	 * @param string $table table name
 	 *
 	 * @return boolean
