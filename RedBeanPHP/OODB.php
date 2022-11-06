@@ -349,7 +349,6 @@ class OODB extends Observable
 
 	/**
 	 * Checks whether the specified table already exists in the database.
-	 * Not part of the Object Database interface!
 	 *
 	 * @param string $table table name
 	 *
