@@ -52,6 +52,11 @@ abstract class Repository
 	protected $partialBeans = FALSE;
 
 	/**
+	 * @var OODB
+	 */
+	public $oodb = NULL;
+
+	/**
 	 * Toggles 'partial bean mode'. If this mode has been
 	 * selected the repository will only update the fields of a bean that
 	 * have been changed rather than the entire bean.

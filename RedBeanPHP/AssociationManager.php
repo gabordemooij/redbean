@@ -41,6 +41,11 @@ class AssociationManager extends Observable
 	protected $writer;
 
 	/**
+	 * @var ToolBox
+	 */
+	public $toolbox;
+
+	/**
 	 * Exception handler.
 	 * Fluid and Frozen mode have different ways of handling
 	 * exceptions. Fluid mode (using the fluid repository) ignores

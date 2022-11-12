@@ -104,6 +104,16 @@ abstract class AQueryWriter
 	public $typeno_sqltype = array();
 
 	/**
+	 * @var array
+	 */
+	public $sqltype_typeno = array();
+
+	/**
+	 * @var array
+	 */
+	public $encoding = array();
+
+	/**
 	 * @var bool
 	 */
 	protected static $noNuke = false;
