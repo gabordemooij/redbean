@@ -29,7 +29,10 @@ use RedBeanPHP\SimpleModel as SimpleModel;
  */
 class TypedModel extends SimpleModel
 {
-	public static function cast($instance): static
+	/**
+	 * @return static
+	 */
+	public static function cast($instance)
 	{
 		return $instance->box();
 	}
