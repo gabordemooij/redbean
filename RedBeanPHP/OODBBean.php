@@ -1259,7 +1259,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		} elseif ( $value === TRUE ) {
 			$value = '1';
 			/* for some reason there is some kind of bug in xdebug so that it doesn't count this line otherwise... */
-		} elseif ( $value instanceof \DateTime ) { $value = $value->format( 'Y-m-d H:i:s' ); }
+		} elseif ( ( ( $value instanceof \DateTime ) or ( $value instanceof \DateTimeInterface ) ) ) { $value = $value->format( 'Y-m-d H:i:s' ); }
 		$this->properties[$property] = $value;
 	}
 
