@@ -260,8 +260,6 @@ class MySQL extends AQueryWriter implements QueryWriter
 	 */
 	public function scanType( $value, $flagSpecial = FALSE )
 	{
-		$this->svalue = $value;
-
 		if ( is_null( $value ) ) return MySQL::C_DATATYPE_BOOL;
 		if ( $value === INF ) return MySQL::C_DATATYPE_TEXT7;
 

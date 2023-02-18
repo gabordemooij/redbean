@@ -251,8 +251,6 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	 */
 	public function scanType( $value, $flagSpecial = FALSE )
 	{
-		$this->svalue = $value;
-
 		if ( $value === INF ) return self::C_DATATYPE_TEXT;
 
 		if ( $flagSpecial && $value ) {
