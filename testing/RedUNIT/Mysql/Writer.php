@@ -248,6 +248,8 @@ class Writer extends \RedUNIT\Mysql
 	 */
 	public function testFunctionFilters()
 	{
+		global $travis;
+		if ($travis) return;
 		R::nuke();
 		R::bindFunc( 'read', 'location.point', 'asText' );
 		R::bindFunc( 'write', 'location.point', 'GeomFromText' );

@@ -45,6 +45,11 @@ class SQLiteT extends AQueryWriter implements QueryWriter
 	/**
 	 * @var array
 	 */
+	protected $tableArchive = array();
+
+	/**
+	 * @var array
+	 */
 	protected $DDLTemplates = array(
 		'addColumn' => array(
 			'*' => 'ALTER TABLE `%s` ADD `%s` %s'

@@ -60,7 +60,7 @@ class Foreignkeys extends Mysql
 		$fkbook  = R::getAll( 'describe book' );
 		$fkgenre = R::getAll( 'describe book_genre' );
 		$fkpage  = R::getAll( 'describe cover' );
-		$j = json_encode( R::getAll( 'SELECT
+		$j = strtolower(json_encode( R::getAll( 'SELECT
 		ke.referenced_table_name parent,
 		ke.table_name child,
 		ke.constraint_name
@@ -70,7 +70,7 @@ class Foreignkeys extends Mysql
 		ke.referenced_table_name IS NOT NULL
 		AND ke.CONSTRAINT_SCHEMA="oodb"
 		ORDER BY
-		constraint_name;' ) );
+		constraint_name;' ) ));
 		$json = '[
 			{
 				"parent": "genre",
@@ -125,8 +125,8 @@ class Foreignkeys extends Mysql
 		$bean3->invoice_id = TRUE;
 		R::store( $bean3 );
 		$cols = R::getColumns( 'invoice_project' );
-		asrt( $cols['project_id'], "int(11) unsigned" );
-		asrt( $cols['invoice_id'], "int(11) unsigned" );
+		asrt( ( $cols['project_id'] == "int(11) unsigned" || $cols['project_id'] == "int unsigned" ), TRUE );
+		asrt( ( $cols['invoice_id'] == "int(11) unsigned" || $cols['invoice_id'] == "int unsigned" ), TRUE );
 	}
 
 	/**

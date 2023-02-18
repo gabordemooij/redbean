@@ -440,6 +440,13 @@ function get_uniques_for_type( $type )
 				AND information_schema.table_constraints.constraint_type = \'UNIQUE\'
 			', array( $table ) );
 			$uniques = array();
+
+			foreach( $columns as $key => $column ) {
+				foreach( $column as $field => $value ) {
+					$columns[$key][strtolower($field)] = $value;
+				}
+			}
+
 			foreach( $columns as $column ) {
 				if ( !isset( $uniques[ $column['constraint_name'] ] ) ) $uniques[ $column['constraint_name'] ] = array();
 				$uniques[ $column['constraint_name'] ][] = $column['column_name'];
