@@ -11,30 +11,8 @@ services:
 
 matrix:
  include:
-  - php: 5.3
-    dist: precise
-  - php: 5.4
-    dist: trusty
-  - php: 5.5
-    dist: trusty
-  - php: 5.6
-    dist: trusty
-  - php: 7.0
-    dist: trusty
-  - php: 7.1
-    dist: trusty
-  - php: 7.2
-    dist: trusty
-  - php: 7.3
-    dist: trusty
-  - php: 7.4
-    dist: trusty
-  - php: 8.0
-    dist: xenial
-  - php: 8.1.0
-    dist: bionic
   - php: 8.2.0
-    dist: bionic
+    dist: focal
 
 
 before_script:
