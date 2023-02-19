@@ -12,7 +12,7 @@ function redunit_error_handler($errno,$errstr,$errfile,$errline) {
 }
 
 chdir( '..' );
-$xdebugSupported = (function_exists('xdebug_start_code_coverage') && in_array('coverage', explode(',', ini_get('xdebug.mode'))));
+$xdebugSupported = (function_exists('xdebug_start_code_coverage'));
 
 if ($xdebugSupported) xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
 require 'testcontainer/rb.php';
