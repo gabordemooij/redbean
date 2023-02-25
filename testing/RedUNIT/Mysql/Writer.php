@@ -248,8 +248,8 @@ class Writer extends \RedUNIT\Mysql
 	 */
 	public function testFunctionFilters()
 	{
-		global $travis;
-		if ($travis) return;
+		if (strpos(R::getCell('select version()'), '10.3.9-MariaDB') === FALSE)
+		return;
 		R::nuke();
 		R::bindFunc( 'read', 'location.point', 'asText' );
 		R::bindFunc( 'write', 'location.point', 'GeomFromText' );

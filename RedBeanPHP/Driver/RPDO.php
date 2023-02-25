@@ -161,7 +161,7 @@ class RPDO implements Driver
 	 * @return mixed
 	 * @throws SQL
 	 */
-	protected function runQuery( $sql, $bindings, $options = array() )
+	public function runQuery( $sql, $bindings, $options = array() )
 	{
 		$this->connect();
 		if ( $this->loggingEnabled && $this->logger ) {
@@ -181,12 +181,12 @@ class RPDO implements Driver
 			$statement->execute();
 			$this->queryCounter ++;
 			$this->affectedRows = $statement->rowCount();
+			if ( isset( $options['noFetch'] ) && $options['noFetch'] ) {
+				$this->resultArray = array();
+				return $statement;
+			}
 			if ( $statement->columnCount() ) {
 				$fetchStyle = ( isset( $options['fetchStyle'] ) ) ? $options['fetchStyle'] : NULL;
-				if ( isset( $options['noFetch'] ) && $options['noFetch'] ) {
-					$this->resultArray = array();
-					return $statement;
-				}
 				if ( is_null( $fetchStyle) ) {
 					$this->resultArray = $statement->fetchAll();
 				} else {

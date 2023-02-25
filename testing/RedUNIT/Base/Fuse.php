@@ -205,8 +205,10 @@ class Fuse extends Base
 	/**
 	 * Make sure that beans of type book_page can be fused with
 	 * models like BookPage (beautified) as well as Book_Page (non-beautified).
+	 *
+	 * @return void
 	 */
-	public function testBeutificationOfLinkModel()
+	public function testBeautificationOfLinkModel()
 	{
 		$page = R::dispense( 'page' );
 		$widget = R::dispense( 'widget' );
