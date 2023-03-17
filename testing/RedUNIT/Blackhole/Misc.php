@@ -396,13 +396,14 @@ class Misc extends Blackhole
 			pass();
 		}
 		asrt( R::count( 'bean' ), 1 );
-		R::freeze( FALSE );
 		try {
 			R::transaction( 'nope' );
 			fail();
 		} catch (\Exception $e ) {
 			pass();
 		}
+		R::freeze( FALSE );
+		asrt(R::transaction( 'nope' ), FALSE);
 		testpack( 'Test Camelcase 2 underscore' );
 		$names = array(
 			'oneACLRoute'              => 'one_acl_route',

@@ -381,6 +381,7 @@ class Facade
 	 */
 	public static function transaction( $callback )
 	{
+		if ( !self::$allowFluidTransactions && !self::$redbean->isFrozen() ) return FALSE;
 		return Transaction::transaction( self::$adapter, $callback );
 	}
 
