@@ -691,4 +691,16 @@ class Misc extends Blackhole
 		R::selectDatabase('TST2');
 		asrt( R::dispense('bean')->box() instanceof \Prefix2_Bean, TRUE );
 	}
+
+	/**
+	 * Test toggle to treat SQL FALSE bindings as INT 0.
+	 */
+	public function testTreatFalseAsInt()
+	{
+		AQueryWriter::treatFalseBindingsAsInt( FALSE );
+		asrt( AQueryWriter::canBeTreatedAsInt( FALSE ), FALSE );
+		AQueryWriter::treatFalseBindingsAsInt( TRUE );
+		asrt( AQueryWriter::canBeTreatedAsInt( FALSE ), TRUE );
+		AQueryWriter::treatFalseBindingsAsInt( FALSE );
+	}
 }
