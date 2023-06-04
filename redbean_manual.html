@@ -1279,6 +1279,12 @@ If something else happens (lock timeout for instance) both methods will <i>alway
 	<i>currency-aware</i> <b>money data type</b>,
 	prefix the value with a common currency symbol.
 </p>
+
+<p class="note">
+	You might want to tweak <a href="https://www.php.net/manual/en/ini.core.php#ini.precision" target="_blank">ini_set('precision', ...)</a>
+	to set the number of significant digits displayed in floating point numbers.
+</p>
+
 <p>
 	You can use R::isoDate() and R::isoDateTime()
 	to generate the current date(time) if you like.
