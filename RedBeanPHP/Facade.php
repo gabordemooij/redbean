@@ -238,6 +238,34 @@ class Facade
 	}
 
 	/**
+	 * Tests the database connection.
+	 * Returns TRUE if connection has been established and
+	 * FALSE otherwise. Suppresses any warnings that may
+	 * occur during the testing process and catches all
+	 * exceptions that might be thrown during the test.
+	 *
+	 * @param boolean   $autoReconnect   if the function attempts to reconnect to the server on failure
+	 * @param string    $sql             the sql you want to execute to test the connection
+	 *
+	 * @return boolean
+	 */
+	public static function testConnectionSQL( $autoReconnect = FALSE, $sql = 'SELECT 1' )
+	{
+		if ( !isset( self::$adapter ) ) return FALSE;
+
+		$database = self::$adapter->getDatabase();
+		try {
+			$database->getPDO()->query( $sql );
+		} catch ( \Exception $e ) {
+			if ( !$autoReconnect ) return FALSE;
+			$database->close();
+			$database->connect();
+			return self::testConnectionSQL( FALSE, $sql );
+		}
+		return TRUE;
+	}
+
+	/**
 	 * Kickstarts redbean for you. This method should be called before you start using
 	 * RedBeanPHP. The Setup() method can be called without any arguments, in this case it will
 	 * try to create a SQLite database in /tmp called red.db (this only works on UNIX-like systems).
