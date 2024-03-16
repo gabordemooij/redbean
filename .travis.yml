@@ -31,6 +31,8 @@ matrix:
     dist: bionic
   - php: 8.2.0
     dist: focal
+  - php: 8.3.0
+    dist: bionic
 
 env:
   global:
