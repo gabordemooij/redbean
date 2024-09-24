@@ -642,8 +642,8 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 * </code>
 	 *
 	 * The example above exports all bean properties to an array
-	 * called $bookData including its meta data, parent objects but without
-	 * any beans of type 'author'.
+	 * called $bookData including its meta data, parent objects and includes only
+	 * beans of type 'author'.
 	 *
 	 * @param boolean $meta    set to TRUE if you want to export meta data as well
 	 * @param boolean $parents set to TRUE if you want to export parents as well
