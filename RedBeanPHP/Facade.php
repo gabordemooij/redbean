@@ -1249,7 +1249,7 @@ class Facade
 	 */
 	public static function exec( $sql, $bindings = array() )
 	{
-		return self::query( 'exec', $sql, $bindings );
+		return intval( self::query( 'exec', $sql, $bindings ) );
 	}
 
 	/**
