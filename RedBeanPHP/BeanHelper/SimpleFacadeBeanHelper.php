@@ -90,7 +90,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 * @param string   $model  Type name
 	 * @param OODBBean $bean   Bean to resolve model for
 	 *
-	 * @return SimpleModel|CustomModel|NULL
+	 * @return SimpleModel|NULL
 	 */
 	protected function resolveModel($prefix, $model, $bean) {
 
