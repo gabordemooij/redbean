@@ -54,7 +54,7 @@ interface BeanHelper
 	 *
 	 * @param OODBBean $bean bean to obtain the corresponding model of
 	 *
-	 * @return SimpleModel|CustomModel|NULL
+	 * @return SimpleModel|NULL
 	 */
 	public function getModelForBean( OODBBean $bean );
 }
