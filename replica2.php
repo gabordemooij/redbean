@@ -61,7 +61,6 @@ addFile( DIR . 'BeanHelper.php' );
 addFile( DIR . 'BeanHelper/SimpleFacadeBeanHelper.php' );
 addFile( DIR . 'BeanHelper/DynamicBeanHelper.php' );
 addFile( DIR . 'SimpleModel.php' );
-addFile( DIR . 'SimpleModelTrait.php' );
 addFile( DIR . 'SimpleModelInterface.php' );
 addFile( DIR . 'SimpleModelHelper.php' );
 addFile( DIR . 'TagManager.php' );

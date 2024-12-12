@@ -52,7 +52,6 @@ require( REDBEANPHP_MAIN_DIR . 'BeanHelper/DynamicBeanHelper.php' );
 
 /* Developer Comfort */
 require( REDBEANPHP_MAIN_DIR . 'SimpleModel.php' );
-require( REDBEANPHP_MAIN_DIR . 'SimpleModelTrait.php' );
 require( REDBEANPHP_MAIN_DIR . 'SimpleModelInterface.php' );
 require( REDBEANPHP_MAIN_DIR . 'SimpleModelHelper.php' );
 require( REDBEANPHP_MAIN_DIR . 'TagManager.php' );
