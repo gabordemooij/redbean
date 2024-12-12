@@ -14,7 +14,7 @@ namespace RedBeanPHP;
  * models. Models are connected to beans by naming conventions.
  * Actions on beans will result in actions on models.
  *
- * @file       RedBeanPHP/SimpleModel.php
+ * @file       RedBeanPHP/SimpleModelInterface.php
  * @author     Gabor de Mooij and the RedBeanPHP Team
  * @license    BSD/GPLv2
  *
