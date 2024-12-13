@@ -1,7 +1,4 @@
 <?php
-/**
- * BeConcierge
- */
 
 namespace RedBeanPHP;
 
