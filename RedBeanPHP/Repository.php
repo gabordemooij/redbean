@@ -88,7 +88,7 @@ abstract class Repository
 	 * - trashCanProcessor : removes the bean or breaks its association with the current bean
 	 * - additionProcessor : associates the bean with the current one
 	 * - residueProcessor  : manages beans in lists that 'remain' but may need to be updated
-	 *
+	 * 
 	 * This method first groups the beans and then calls the
 	 * internal processing methods.
 	 *
