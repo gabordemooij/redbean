@@ -4,8 +4,8 @@ namespace RedBeanPHP;
 
 
 /**
- * SimpleModel
- * Base Model For All RedBeanPHP Models using FUSE.
+ * SimpleModelInterface
+ * Interface For All RedBeanPHP Models using FUSE.
  *
  * RedBeanPHP FUSE is a mechanism to connect beans to posthoc
  * models. Models are connected to beans by naming conventions.
