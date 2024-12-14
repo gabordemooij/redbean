@@ -684,7 +684,7 @@ class Facade
 	 * will automatically temporarily switch to fluid mode to attempt to store the
 	 * bean in case of an SQLException.
 	 *
-	 * @param OODBBean|SimpleModel $bean             bean to store
+	 * @param OODBBean|SimpleModel|SimpleModelInterface $bean             bean to store
 	 * @param boolean              $unfreezeIfNeeded retries in fluid mode in hybrid mode
 	 *
 	 * @return integer|string
@@ -887,7 +887,7 @@ class Facade
 	 * key ID $id assigned by the database. We can now use this
 	 * ID to load the bean from the database again and delete it.
 	 *
-	 * @param string|OODBBean|SimpleModel $beanOrType bean you want to remove from database
+	 * @param string|OODBBean|SimpleModel|SimpleModelInterface $beanOrType bean you want to remove from database
 	 * @param integer                     $id         ID if the bean to trash (optional, type-id variant only)
 	 *
 	 * @return int

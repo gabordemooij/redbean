@@ -83,7 +83,7 @@ abstract class Repository
 	 * addition, deleted 'trash can' or residue. Next, the different groups
 	 * of beans will be processed accordingly and the reference bean (i.e.
 	 * the one that was passed to the method as an argument) will be stored.
-	 * Each type of list (own/shared) has 3 bean processors: 
+	 * Each type of list (own/shared) has 3 bean processors:
 	 *
 	 * - trashCanProcessor : removes the bean or breaks its association with the current bean
 	 * - additionProcessor : associates the bean with the current one
@@ -100,13 +100,13 @@ abstract class Repository
 	{
 		$sharedAdditions = $sharedTrashcan = $sharedresidue = $sharedItems = $ownAdditions = $ownTrashcan = $ownresidue = $embeddedBeans = array(); //Define groups
 		foreach ( $bean as $property => $value ) {
-			$value = ( $value instanceof SimpleModel ) ? $value->unbox() : $value;
+			$value = ( $value instanceof SimpleModelInterface ) ? $value->unbox() : $value;
 			if ( $value instanceof OODBBean ) {
 				$this->processEmbeddedBean( $embeddedBeans, $bean, $property, $value );
 				$bean->setMeta("sys.typeof.{$property}", $value->getMeta('type'));
 			} elseif ( is_array( $value ) ) {
 				foreach($value as &$item) {
-					$item = ( $item instanceof SimpleModel ) ? $item->unbox() : $item;
+					$item = ( $item instanceof SimpleModelInterface ) ? $item->unbox() : $item;
 				}
 				$originals = $bean->moveMeta( 'sys.shadow.' . $property, array() );
 				if ( strpos( $property, 'own' ) === 0 ) {
@@ -505,7 +505,7 @@ abstract class Repository
 	 * explicit casts instead of functions to preserve performance
 	 * (0.13 vs 0.28 for 10000 iterations on Core i3).
 	 *
-	 * @param OODBBean|SimpleModel $bean bean to store
+	 * @param OODBBean|SimpleModel|SimpleModelInterface $bean bean to store
 	 *
 	 * @return integer|string
 	 */
@@ -670,7 +670,7 @@ abstract class Repository
 	 * This function will remove the specified OODBBean
 	 * Bean Object from the database.
 	 *
-	 * @param OODBBean|SimpleModel $bean bean you want to remove from database
+	 * @param OODBBean|SimpleModel|SimpleModelInterface $bean bean you want to remove from database
 	 *
 	 * @return int
 	 */

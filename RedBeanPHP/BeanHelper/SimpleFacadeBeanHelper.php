@@ -5,7 +5,9 @@ namespace RedBeanPHP\BeanHelper;
 use RedBeanPHP\BeanHelper as BeanHelper;
 use RedBeanPHP\Facade as Facade;
 use RedBeanPHP\OODBBean as OODBBean;
+use RedBeanPHP\SimpleModel;
 use RedBeanPHP\SimpleModelHelper as SimpleModelHelper;
+use RedBeanPHP\SimpleModelInterface;
 
 /**
  * Bean Helper.
@@ -38,7 +40,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 *
 	 * @param string $modelClassName name of the class
 	 *
-	 * @return SimpleModel
+	 * @return SimpleModel|SimpleModelInterface
 	 */
 	public static function factory( $modelClassName )
 	{
@@ -90,7 +92,7 @@ class SimpleFacadeBeanHelper implements BeanHelper
 	 * @param string   $model  Type name
 	 * @param OODBBean $bean   Bean to resolve model for
 	 *
-	 * @return SimpleModel|NULL
+	 * @return SimpleModel|SimpleModelInterface|NULL
 	 */
 	protected function resolveModel($prefix, $model, $bean) {
 

@@ -21,7 +21,7 @@ use RedBeanPHP\OODBBean as OODBBean;
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
  */
-class SimpleModel
+class SimpleModel implements SimpleModelInterface
 {
 	/**
 	 * @var OODBBean
@@ -100,7 +100,7 @@ class SimpleModel
 	 * OODBBean you should always unbox the model to a bean. Models are meant to
 	 * expose only domain logic added by the developer (business logic, no ORM logic).
 	 *
-	 * @return SimpleModel
+	 * @return SimpleModel|SimpleModelInterface
 	 */
 	public function box()
 	{
