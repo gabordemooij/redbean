@@ -541,6 +541,7 @@ class RPDO implements Driver
 	public function GetAll( $sql, $bindings = array() )
 	{
 		$this->runQuery( $sql, $bindings );
+
 		$result_array = $this->resultArray;
 		$this->resultArray = null;
 		return $result_array;
