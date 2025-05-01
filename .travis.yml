@@ -33,8 +33,8 @@ matrix:
     dist: focal
   - php: 8.3.0
     dist: bionic
-  - php: 8.4snapshot
-    dist: focal
+  - php: 8.4.0
+    dist: noble
 
 env:
   global:
