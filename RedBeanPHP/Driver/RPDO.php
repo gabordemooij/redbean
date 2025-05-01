@@ -566,15 +566,29 @@ class RPDO implements Driver
 	 */
 	public function GetCol( $sql, $bindings = array() )
 	{
-		$this->runQuery( $sql, $bindings, array(
-				'fetchStyle' => \PDO::FETCH_COLUMN
-			)
-		);
-		$result_array = $this->resultArray;
-		$this->resultArray = null;
+		if (!defined('PDO::FETCH_COLUMN')) { //PHP 5.3
+			$rows = $this->GetAll( $sql, $bindings );
+			if ( empty( $rows ) || !is_array( $rows ) ) {
+				return array();
+			}
+			$cols = array();
+			foreach ( $rows as $row ) {
+				   $cols[] = reset( $row );
+			}
 
-		if ( empty( $result_array ) || !is_array( $result_array ) ) {
-			return array();
+			$result_array = $cols;
+			$this->resultArray = null;
+		} else {
+			$this->runQuery( $sql, $bindings, array(
+					'fetchStyle' => \PDO::FETCH_COLUMN
+				)
+			);
+			$result_array = $this->resultArray;
+			$this->resultArray = null;
+
+			if ( empty( $result_array ) || !is_array( $result_array ) ) {
+				return array();
+			}
 		}
 
 		return $result_array;
