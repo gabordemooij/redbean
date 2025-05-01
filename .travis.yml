@@ -8,6 +8,7 @@ matrix:
  include:
   - php: 5.3
     dist: precise
+    group: legacy
   - php: 5.4
     dist: trusty
   - php: 5.5
