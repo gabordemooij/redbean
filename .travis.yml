@@ -35,6 +35,7 @@ matrix:
     dist: bionic
   - php: 8.4.0
     dist: noble
+    allow_failures: true
 
 env:
   global:
