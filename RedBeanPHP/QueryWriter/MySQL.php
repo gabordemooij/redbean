@@ -178,7 +178,7 @@ class MySQL extends AQueryWriter implements QueryWriter
 		if (!isset($options['noInitcode']))
 		$this->adapter->setInitCode(function($version) use(&$me) {
 			try {
-				if (strpos($version, 'maria')===FALSE && intval($version)>=8) {
+				if (strpos(strtolower($version), 'maria')===FALSE && intval($version)>=8) {
 						$me->useFeature('ignoreDisplayWidth');
 				}
 			} catch( \Exception $e ){}
