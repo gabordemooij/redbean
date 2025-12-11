@@ -344,7 +344,7 @@ abstract class AQueryWriter
 	 */
 	public static function setNarrowFieldMode( $narrowField )
 	{
-		self::$flagNarrowFieldMode = (boolean) $narrowField;
+		self::$flagNarrowFieldMode = (bool) $narrowField;
 	}
 
 	/**
@@ -384,7 +384,7 @@ abstract class AQueryWriter
 	 */
 	public static function setSQLFilters( $sqlFilters, $safeMode = FALSE )
 	{
-		self::$flagSQLFilterSafeMode = (boolean) $safeMode;
+		self::$flagSQLFilterSafeMode = (bool) $safeMode;
 		self::$sqlFilters = $sqlFilters;
 	}
 

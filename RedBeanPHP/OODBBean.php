@@ -172,7 +172,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 	 */
 	 public static function setEnforceUTF8encoding( $toggle )
 	 {
-		 self::$enforceUTF8encoding = (boolean) $toggle;
+		 self::$enforceUTF8encoding = (bool) $toggle;
 	 }
 
 	/**
@@ -1117,7 +1117,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 		$differentAlias = ($hasAlias && $isOwn && isset($this->__info['sys.alias.'.$listName])) ?
 									($this->__info['sys.alias.'.$listName] !== $this->aliasName) : FALSE;
 		$hasSQL         = ($this->withSql !== '' || $this->via !== NULL);
-		$hasAll         = (boolean) ($this->all);
+		$hasAll         = (bool) ($this->all);
 
 		//If exists and no list or exits and list not changed, bail out.
 		if ( $exists && ((!$isOwn && !$isShared ) || (!$hasSQL && !$differentAlias && !$hasAll)) ) {
@@ -2226,7 +2226,7 @@ class OODBBean implements \IteratorAggregate,\ArrayAccess,\Countable,Jsonable
 			$count = $redbean->getAssociationManager()->relatedCount( $this, $type, $this->withSql, $this->withParams );
 		}
 		$this->clearModifiers();
-		return (integer) $count;
+		return (int) $count;
 	}
 
 	/**

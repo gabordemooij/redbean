@@ -39,7 +39,7 @@ class DispenseHelper
 	 */
 	public static function setEnforceNamingPolicy( $yesNo )
 	{
-		self::$enforceNamingPolicy = (boolean) $yesNo;
+		self::$enforceNamingPolicy = (bool) $yesNo;
 	}
 
 	/**
