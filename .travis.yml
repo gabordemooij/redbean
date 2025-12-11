@@ -6,34 +6,31 @@ services:
 
 matrix:
  include:
-  - php: 5.3
-    dist: precise
-    group: legacy
-  - php: 5.4
-    dist: trusty
-  - php: 5.5
-    dist: trusty
+   # Older PHP versions not supported by travis.
   - php: 5.6
-    dist: trusty
-  - php: 7.0
-    dist: trusty
-  - php: 7.1
-    dist: trusty
-  - php: 7.2
-    dist: trusty
-  - php: 7.3
-    dist: trusty
-  - php: 7.4
-    dist: trusty
-  - php: 8.0
     dist: xenial
-  - php: 8.1.0
+  - php: 7.0
+    dist: xenial
+  - php: 7.1
     dist: bionic
-  - php: 8.2.0
+  - php: 7.2
+    dist: bionic
+  - php: 7.3
+    dist: bionic
+  - php: 7.4
+    dist: bionic
+  - php: 8.0
+    dist: bionic
+  - php: 8.1
+    dist: bionic
+  - php: 8.2
     dist: focal
-  - php: 8.3.0
+  - php: 8.3
     dist: bionic
-  - php: 8.4.0
+  - php: 8.4
+    dist: noble
+    allow_failures: true
+  - php: 8.5
     dist: noble
     allow_failures: true
 
@@ -54,8 +51,8 @@ before_script:
   - psql template1 -c 'CREATE EXTENSION "uuid-ossp";' -U postgres
   - psql -c 'create database oodb;' -U postgres
   - php replica2.php onlyphp
-  - cp rb.php testing/cli/testcontainer/rb.php  
+  - cp rb.php testing/cli/testcontainer/rb.php
   - cd testing/cli
-    
- 
+
+
 script: php runtests.php
