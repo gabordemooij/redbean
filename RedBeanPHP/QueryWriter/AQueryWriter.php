@@ -250,7 +250,17 @@ abstract class AQueryWriter
 	 */
 	public static function canBeTreatedAsInt( $value )
 	{
-		return (bool) ( strval( ($value === FALSE && self::$treatFalseAsInt) ? 0 : $value ) === strval( intval( $value ) ) );
+		// Fix for PHP 8.x: avoid intval() on strings that look like scientific notation
+		// (e.g., MD5 hashes starting with "3e08...", UUIDs, etc.)
+		// PHP 8 throws "float-string not representable as int" for these values
+		// See: https://github.com/gabordemooij/redbean/issues/967
+		if ($value === FALSE && self::$treatFalseAsInt) {
+			return true;
+		}
+		if (!is_numeric($value)) {
+			return false;
+		}
+		return strval($value) === strval((int)$value);
 	}
 
 	/**
