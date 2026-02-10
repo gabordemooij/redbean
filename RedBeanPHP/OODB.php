@@ -99,7 +99,7 @@ class OODB extends Observable
 	 */
 	public static function autoClearHistoryAfterStore( $autoClear = TRUE )
 	{
-		self::$autoClearHistoryAfterStore = (boolean) $autoClear;
+		self::$autoClearHistoryAfterStore = (bool) $autoClear;
 	}
 
 	/**
@@ -185,7 +185,7 @@ class OODB extends Observable
 			$this->chillList = $toggle;
 			$this->isFrozen  = FALSE;
 		} else {
-			$this->isFrozen = (boolean) $toggle;
+			$this->isFrozen = (bool) $toggle;
 		}
 
 		if ( $this->isFrozen ) {
@@ -236,7 +236,7 @@ class OODB extends Observable
 	 */
 	public function isChilled( $type )
 	{
-		return (boolean) ( in_array( $type, $this->chillList ) );
+		return (bool) ( in_array( $type, $this->chillList ) );
 	}
 
 	/**

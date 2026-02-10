@@ -188,7 +188,7 @@ interface QueryWriter
 	public function getColumns( $type );
 
 	/**
-	 * Returns the Column Type Code (integer) that corresponds
+	 * Returns the Column Type Code (int) that corresponds
 	 * to the given value type. This method is used to determine the minimum
 	 * column type required to represent the given value. There are two modes of
 	 * operation: with or without special types. Scanning without special types

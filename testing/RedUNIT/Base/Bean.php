@@ -1050,12 +1050,12 @@ class Bean extends Base
 	{
 		$book = $this->_createBook();
 		asrt( isset($book->author), FALSE );
-		asrt( (boolean) ($book->author), TRUE );
+		asrt( (bool) ($book->author), TRUE );
 		unset( $book->author );
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( isset($book->author), FALSE );
-		asrt( (boolean) ($book->author), TRUE );
+		asrt( (bool) ($book->author), TRUE );
 	}
 
 	/**
@@ -1067,12 +1067,12 @@ class Bean extends Base
 	{
 		$book = $this->_createBook();
 		asrt( isset($book->author), FALSE );
-		asrt( (boolean) ($book->author), TRUE );
+		asrt( (bool) ($book->author), TRUE );
 		$book->author = NULL;
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( isset($book->author), FALSE );
-		asrt( (boolean) ($book->author), FALSE );
+		asrt( (bool) ($book->author), FALSE );
 	}
 
 	/**
@@ -1084,12 +1084,12 @@ class Bean extends Base
 	{
 		$book = $this->_createBook();
 		asrt( isset($book->author), FALSE );
-		asrt( (boolean) ($book->author), TRUE );
+		asrt( (bool) ($book->author), TRUE );
 		$book->author = FALSE;
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( isset($book->author), FALSE );
-		asrt( (boolean) ($book->author), FALSE );
+		asrt( (bool) ($book->author), FALSE );
 	}
 
 	/**
@@ -1101,12 +1101,12 @@ class Bean extends Base
 	{
 		$book = $this->_createBook();
 		asrt( isset($book->fetchAs('author')->coauthor), FALSE );
-		asrt( (boolean) ($book->fetchAs('author')->coauthor), TRUE );
+		asrt( (bool) ($book->fetchAs('author')->coauthor), TRUE );
 		unset( $book->fetchAs('author')->coauthor );
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( isset($book->fetchAs('author')->coauthor), FALSE );
-		asrt( (boolean) ($book->fetchAs('author')->coauthor), TRUE );
+		asrt( (bool) ($book->fetchAs('author')->coauthor), TRUE );
 	}
 
 	/**
@@ -1118,12 +1118,12 @@ class Bean extends Base
 	{
 		$book = $this->_createBook();
 		asrt( isset($book->fetchAs('author')->coauthor), FALSE );
-		asrt( (boolean) ($book->fetchAs('author')->coauthor), TRUE );
+		asrt( (bool) ($book->fetchAs('author')->coauthor), TRUE );
 		$book->fetchAs('author')->coauthor = NULL;
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( isset($book->fetchAs('author')->coauthor), FALSE );
-		asrt( (boolean) ($book->fetchAs('author')->coauthor), FALSE );
+		asrt( (bool) ($book->fetchAs('author')->coauthor), FALSE );
 	}
 
 	/**
@@ -1135,12 +1135,12 @@ class Bean extends Base
 	{
 		$book = $this->_createBook();
 		asrt( isset($book->fetchAs('author')->coauthor), FALSE );
-		asrt( (boolean) ($book->fetchAs('author')->coauthor), TRUE );
+		asrt( (bool) ($book->fetchAs('author')->coauthor), TRUE );
 		$book->fetchAs('author')->coauthor = FALSE;
 		R::store( $book );
 		$book = $book->fresh();
 		asrt( isset($book->fetchAs('author')->coauthor), FALSE );
-		asrt( (boolean) ($book->fetchAs('author')->coauthor), FALSE );
+		asrt( (bool) ($book->fetchAs('author')->coauthor), FALSE );
 	}
 
 	/**
