@@ -424,7 +424,7 @@ class Database extends Base
 			asrt( ( $room == 'classic' || $room == 'suite' ), TRUE );
 			asrt( $room, $key );
 		}
-		$rooms = R::getAssoc( 'SELECT `number`, kind FROM rooms2 ORDER BY kind ASC' );
+		$rooms = R::getAssoc( 'SELECT ' . R::getWriter()->esc( 'number' ) . ', kind FROM rooms2 ORDER BY kind ASC' );
 		asrt( count( $rooms ), 0 );
 		asrt( is_array( $rooms ), TRUE );
 		// GetCell should return NULL in case of exception
