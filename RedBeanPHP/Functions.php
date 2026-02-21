@@ -132,3 +132,10 @@ if ( !function_exists( 'DBPrefix' ) ) {
 		return new \RedBeanPHP\BeanHelper\DynamicBeanHelper( $prefix );
 	}
 }
+
+
+if (defined('Pdo\Mysql::ATTR_INIT_COMMAND')) {
+	define('RB_PDO_MYSQL_ATTR_INIT_COMMAND', Pdo\Mysql::ATTR_INIT_COMMAND);
+} else {
+	define('RB_PDO_MYSQL_ATTR_INIT_COMMAND', \PDO::MYSQL_ATTR_INIT_COMMAND);
+}
