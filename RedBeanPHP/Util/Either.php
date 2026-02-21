@@ -87,12 +87,16 @@ class Either {
 	 */
 	public function first() {
 		if (is_array($this->result)) {
-			reset($this->result);
-			$key = key($this->result);
-			if (isset($this->result[$key])) {
-				$this->result = $this->result[$key];
-			} else {
+			if (!count($this->result)) {
 				$this->result = NULL;
+			} else {
+				reset($this->result);
+				$key = key($this->result);
+				if (isset($this->result[$key])) {
+					$this->result = $this->result[$key];
+				} else {
+					$this->result = NULL;
+				}
 			}
 		}
 		return $this;
@@ -107,12 +111,16 @@ class Either {
 	 */
 	public function last() {
 		if (is_array($this->result)) {
-			end($this->result);
-			$key = key($this->result);
-			if (isset($this->result[$key])) {
-				$this->result = $this->result[$key];
-			} else {
+			if (!count($this->result)) {
 				$this->result = NULL;
+			} else {
+				end($this->result);
+				$key = key($this->result);
+				if (isset($this->result[$key])) {
+					$this->result = $this->result[$key];
+				} else {
+					$this->result = NULL;
+				}
 			}
 		}
 		return $this;
