@@ -366,6 +366,7 @@ class PostgreSQL extends AQueryWriter implements QueryWriter
 	 */
 	public function sqlStateIn( $state, $list, $extraDriverDetails = array() )
 	{
+		if (is_null($state)) $state = 'NULL';
 		$stateMap = array(
 			'42P01' => QueryWriter::C_SQLSTATE_NO_SUCH_TABLE,
 			'42703' => QueryWriter::C_SQLSTATE_NO_SUCH_COLUMN,
