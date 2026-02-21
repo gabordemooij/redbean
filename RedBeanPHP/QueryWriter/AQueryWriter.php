@@ -261,7 +261,11 @@ abstract class AQueryWriter
 		if (!is_numeric($value)) {
 			return false;
 		}
-		return strval($value) === strval((int)$value);
+		try {
+			return ( strval($value) === strval((int)$value) );
+		} catch( \Exception $e ) {
+			return false;
+		}
 	}
 
 	/**
