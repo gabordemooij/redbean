@@ -29,7 +29,6 @@ matrix:
     dist: bionic
   - php: 8.4
     dist: noble
-    allow_failures: true
   - php: 8.5
     dist: noble
     allow_failures: true
