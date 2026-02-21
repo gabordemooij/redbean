@@ -109,7 +109,7 @@ class QuickExport
 		$path = sprintf( $path, date('Ymd_his') );
 		$handle = fopen( $path, 'w' );
 		if ($columns) {
-			if (PHP_VERSION_ID>=505040) {
+			if (PHP_VERSION_ID>=50504) {
 				fputcsv($handle, $columns, $delimiter, $enclosure, $escapeChar );
 			} else {
 				fputcsv($handle, $columns, $delimiter, $enclosure );
@@ -117,7 +117,7 @@ class QuickExport
 		}
 		$cursor = $this->toolbox->getDatabaseAdapter()->getCursor( $sql, $bindings );
 		while( $row = $cursor->getNextItem() ) {
-			if (PHP_VERSION_ID>=505040) {
+			if (PHP_VERSION_ID>=50504) {
 				fputcsv($handle, $row, $delimiter, $enclosure, $escapeChar ); 
 			} else { 
 				fputcsv($handle, $row, $delimiter, $enclosure );
