@@ -325,11 +325,11 @@ class Misc extends Base
 		$id = R::store( $painting );
 		testpack( 'Testing SQL Error Types' );
 		foreach ( $writer->typeno_sqltype as $code => $text ) {
-			asrt( is_integer( $code ), TRUE );
+			asrt( is_int( $code ), TRUE );
 			asrt( is_string( $text ), TRUE );
 		}
 		foreach ( $writer->sqltype_typeno as $text => $code ) {
-			asrt( is_integer( $code ), TRUE );
+			asrt( is_int( $code ), TRUE );
 			asrt( is_string( $text ), TRUE );
 		}
 		testpack( 'Testing Nowhere Pt. 1 (unfrozen)' );

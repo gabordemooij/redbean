@@ -121,7 +121,7 @@ class RPDO implements Driver
 	protected function bindParams( $statement, $bindings )
 	{
 		foreach ( $bindings as $key => &$value ) {
-			$k = is_integer( $key ) ? $key + 1 : $key;
+			$k = is_int( $key ) ? $key + 1 : $key;
 
 			if ( is_array( $value ) && count( $value ) == 2 ) {
 				$paramType = end( $value );
@@ -414,7 +414,7 @@ class RPDO implements Driver
 	 */
 	public function setMaxIntBind( $max )
 	{
-		if ( !is_integer( $max ) ) throw new RedException( 'Parameter has to be integer.' );
+		if ( !is_int( $max ) ) throw new RedException( 'Parameter has to be integer.' );
 		$oldMax = $this->max;
 		$this->max = $max;
 		return $oldMax;
