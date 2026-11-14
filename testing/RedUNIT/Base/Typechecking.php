@@ -67,7 +67,7 @@ class Typechecking extends Base
 		$id = R::store( $bean );
 		asrt( is_int( $id ), TRUE );
 		asrt( is_float( $bean->float ), TRUE );
-		asrt( is_integer( $bean->number ), TRUE );
+		asrt( is_int( $bean->number ), TRUE );
 		asrt( is_string( $bean->bool ), TRUE );
 		asrt( is_string( $bean->bool2 ), TRUE );
 		asrt( is_string( $bean->datetime ), TRUE );
