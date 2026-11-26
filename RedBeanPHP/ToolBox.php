@@ -74,7 +74,6 @@ class ToolBox
 		$this->oodb    = $oodb;
 		$this->adapter = $adapter;
 		$this->writer  = $writer;
-		return $this;
 	}
 
 	/**
